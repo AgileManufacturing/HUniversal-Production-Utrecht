@@ -6,7 +6,6 @@ foreach(SINGLE_PACKDIR "${ROSPACKS}")
 	add_lcv_doc(${SINGLE_PACKDIR})
 endforeach(SINGLE_PACKDIR "${ROSPACKS}")
 
-
 ######
 ### Don't change anything below, the part below checks if ROS is installed and configured correctly. 
 ######
