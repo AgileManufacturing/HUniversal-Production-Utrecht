@@ -30,7 +30,7 @@
 
 #pragma once
 
-#include <huniplacer/point3.h>
+#include <huniplacer/Point3D.h>
 #include <huniplacer/imotor3.h>
 #include <huniplacer/effector_boundaries.h>
 
@@ -41,7 +41,7 @@
  **/
 namespace huniplacer
 {
-	class inverse_kinematics_model;
+	class InverseKinematicsModel;
 
 	/**
 	 * @brief this class symbolises an entire deltarobot
@@ -49,11 +49,11 @@ namespace huniplacer
     class deltarobot 
     {
         private:
-            inverse_kinematics_model& kinematics;
+            InverseKinematicsModel& kinematics;
             imotor3& motors;
             effector_boundaries* boundaries;
 
-            point3 effector_location;
+            Point3D effector_location;
             bool boundaries_generated;
 
             bool is_valid_angle(double angle);
@@ -64,7 +64,7 @@ namespace huniplacer
              * @param kinematics kinematics model that will be used to convert points to motions
              * @param motors implementation of motor interface that will be used to communicate with the motors
              **/
-            deltarobot(inverse_kinematics_model& kinematics, imotor3& motors);
+            deltarobot(InverseKinematicsModel& kinematics, imotor3& motors);
 
             ~deltarobot(void);
             
@@ -77,7 +77,7 @@ namespace huniplacer
 			 * @param begin start point
 			 * @param end finish point
 			 **/
-            bool check_path(const point3& begin,const point3& end);
+            bool check_path(const Point3D& begin,const Point3D& end);
 
             /**
              * @brief makes the deltarobot move to a point
@@ -85,7 +85,7 @@ namespace huniplacer
              * @param speed movement speed speed in degrees per second
              * @param async motions will be stored in a queue for later execution if true
              **/
-            void moveto(const point3& p, double speed, bool async = true);
+            void moveto(const Point3D& p, double speed, bool async = true);
 
             /**
              * @brief stops the motors
