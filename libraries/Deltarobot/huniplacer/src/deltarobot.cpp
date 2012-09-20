@@ -34,19 +34,19 @@
 #include <stdexcept>
 #include <cmath>
 
-#include <huniplacer/point3.h>
+#include <huniplacer/Point3D.h>
 #include <huniplacer/imotor3.h>
 #include <huniplacer/motor3_exception.h>
 #include <huniplacer/effector_boundaries.h>
-#include <huniplacer/inverse_kinematics_exception.h>
+#include <huniplacer/InverseKinematicsException.h>
 #include <huniplacer/deltarobot.h>
 
 namespace huniplacer
 {
-    deltarobot::deltarobot(inverse_kinematics_model& kinematics, imotor3& motors) :
+    deltarobot::deltarobot(InverseKinematicsModel& kinematics, imotor3& motors) :
         kinematics(kinematics),
         motors(motors),
-        effector_location(point3(0, 0, -161.9)),
+        effector_location(Point3D(0, 0, -161.9)),
         boundaries_generated(false)
     {
     }
@@ -69,12 +69,12 @@ namespace huniplacer
         return angle > motors.get_min_angle() && angle < motors.get_max_angle();
     }
 
-    bool deltarobot::check_path(const point3& begin,const point3& end)
+    bool deltarobot::check_path(const Point3D& begin,const Point3D& end)
     {
     	return boundaries->check_path(begin, end);
     }
 
-    void deltarobot::moveto(const point3& p, double speed, bool async)
+    void deltarobot::moveto(const Point3D& p, double speed, bool async)
     {
     	if(!motors.is_powerd_on())
     	{
@@ -84,9 +84,9 @@ namespace huniplacer
         motionf mf;
         try
         {
-        	kinematics.point_to_motion(p, mf);
+        	kinematics.pointToMotion(p, mf);
         }
-        catch(inverse_kinematics_exception& ex)
+        catch(InverseKinematicsException& ex)
         {
         	throw ex;
         }
@@ -96,13 +96,13 @@ namespace huniplacer
             !is_valid_angle(mf.angles[1]) ||
             !is_valid_angle(mf.angles[2]))
         {
-            throw inverse_kinematics_exception("motion angles outside of valid range", p);
+            throw InverseKinematicsException("motion angles outside of valid range", p);
         }
         
 
     	if(!boundaries->check_path(effector_location, p))
     	{
-    		throw inverse_kinematics_exception("invalid path", p);
+    		throw InverseKinematicsException("invalid path", p);
     	}
 
         double move_time = p.distance(effector_location) / speed;

@@ -29,6 +29,4 @@ ros/grippernode/src/grippernode/msg/
 ros/grippernode/src/grippernode/srv/
 ros/huniplacer_3d/src/huniplacer_3d/
 ros/vision/src/vision/
-ros/deltaRobotNode/src/deltaRobotNode/
-
 

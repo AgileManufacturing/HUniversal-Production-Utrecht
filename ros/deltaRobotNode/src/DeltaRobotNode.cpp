@@ -45,8 +45,8 @@ bool movePath(deltaRobotNode::MovePath::Request &req,
 			currentMotion = req.motion[n];			
 			nextMotion = req.motion[n+1];
 			if(!deltarobot->check_path(
-				huniplacer::point3(currentMotion.x, currentMotion.y, currentMotion.z),
-				huniplacer::point3(nextMotion.x, nextMotion.y, nextMotion.z)))
+				huniplacer::Point3D(currentMotion.x, currentMotion.y, currentMotion.z),
+				huniplacer::Point3D(nextMotion.x, nextMotion.y, nextMotion.z)))
 			{
 				res.succeeded = false;
 				return true;
@@ -56,7 +56,7 @@ bool movePath(deltaRobotNode::MovePath::Request &req,
 		{	
 			currentMotion = req.motion[n];
 			ROS_INFO("moveTo: (%f, %f, %f) speed=%f", currentMotion.x, currentMotion.y,currentMotion.z, currentMotion.speed);
-			deltarobot->moveto(huniplacer::point3(currentMotion.x, currentMotion.y, currentMotion.z),currentMotion.speed);
+			deltarobot->moveto(huniplacer::Point3D(currentMotion.x, currentMotion.y, currentMotion.z),currentMotion.speed);
 		}
 		//deltaRobotNode::Motion msg;
 		//msg = req.motion; 		

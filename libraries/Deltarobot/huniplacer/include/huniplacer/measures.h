@@ -44,15 +44,15 @@ namespace huniplacer
 		*/
 		
 		/* Robot v2 */
-		//TODO: change BASE variable
 		const double BASE 				  = 101.3; //mm
 		const double HIP 				  = 100; //mm
 		const double EFFECTOR			  = 46.19; //mm
 		const double ANKLE 				  = 250; //mm
 		
 		const double HIP_ANKLE_ANGLE_MAX  = utils::rad(22);    //radians
-		const double MOTOR_ROT_MIN 	      = utils::rad(-45);   //radians
-		const double MOTOR_ROT_MAX 	      = utils::rad(83);    //radians
+		//safety constants, roughly determined to be as safe as possible for testing purposes
+		const double MOTOR_ROT_MIN 	      = utils::rad(-42);   //radians
+		const double MOTOR_ROT_MAX 	      = utils::rad(45);    //radians
 
 		const double MOTOR1_DEVIATION	  = utils::rad(-45);   //radians
 		const double MOTOR2_DEVIATION	  = utils::rad(-45);   //radians
@@ -76,7 +76,8 @@ namespace huniplacer
 		const double MAX_Y = MAX_X;
 		const double MIN_X = -MAX_X;
 		const double MIN_Y = -MAX_Y;
-		const double MIN_Z = -410;
-		const double MAX_Z = -100;
+		//safety constants, roughly determined to be as safe as possible for testing purposes
+		const double MIN_Z = -280;
+		const double MAX_Z = -200;
 	}
 }

@@ -30,10 +30,10 @@
 
 #pragma once
 
-#include <huniplacer/point3.h>
+#include <huniplacer/Point3D.h>
 #include <huniplacer/imotor3.h>
 #include <huniplacer/measures.h>
-#include <huniplacer/inverse_kinematics_model.h>
+#include <huniplacer/InverseKinematicsModel.h>
 #include <vector>
 
 namespace huniplacer
@@ -55,7 +55,7 @@ namespace huniplacer
 		 * @param voxel_size the size of the voxels
 		 * @return pointer to the object
 		 */
-		static effector_boundaries* generate_effector_boundaries(const inverse_kinematics_model& model, const imotor3& motors, double voxel_size);
+		static effector_boundaries* generate_effector_boundaries(const InverseKinematicsModel& model, const imotor3& motors, double voxel_size);
 		/*
 		 * Checks if the path from the starting to the destination point is not going out of the
 		 * robots boundaries
@@ -63,7 +63,7 @@ namespace huniplacer
 		 * @param to the destination point
 		 * @return true if path is valid
 		 */
-		bool check_path(const point3& from, const point3& to) const;
+		bool check_path(const Point3D& from, const Point3D& to) const;
 		/*
 		 * returns a const bool pointer to the boundaries bitmap
 		 * @return const bool pointer to the boundaries bitmap
@@ -98,7 +98,7 @@ namespace huniplacer
 		 * @param motors used for the minimum and maximum angle of the motors
 		 * @param voxel_size the size of the voxels
 		 */
-		effector_boundaries(const inverse_kinematics_model& model, const imotor3& motors, double voxel_size);
+		effector_boundaries(const InverseKinematicsModel& model, const imotor3& motors, double voxel_size);
 
 		/*
 		 * represents a location in the 3D voxel array
@@ -124,12 +124,12 @@ namespace huniplacer
 		 * converts a bitmap coordinate to a real life coordinate
 		 * @param coordinate the bitmap coordinate
 		 */
-		inline point3 from_bitmap_coordinate(effector_boundaries::bitmap_coordinate coordinate) const;
+		inline Point3D from_bitmap_coordinate(effector_boundaries::bitmap_coordinate coordinate) const;
 		/*
 		 * converts a real life coordinate to a bitmap coordinate
 		 * @param coordinate the real life coordinate
 		 */
-		inline bitmap_coordinate from_real_coordinate(point3 coordinate) const;
+		inline bitmap_coordinate from_real_coordinate(Point3D coordinate) const;
 
 		enum cache_entry
 		{
@@ -142,7 +142,7 @@ namespace huniplacer
 
 		char* point_validity_cache;
 		bool* boundaries_bitmap;
-		const inverse_kinematics_model &kinematics;
+		const InverseKinematicsModel &kinematics;
 		const imotor3 &motors;
 		double voxel_size;
 
@@ -155,15 +155,15 @@ namespace huniplacer
 	int effector_boundaries::get_width() const {return width;}
 	double effector_boundaries::get_voxel_size() const {return voxel_size;}
 
-	point3 effector_boundaries::from_bitmap_coordinate(effector_boundaries::bitmap_coordinate coordinate) const
+	Point3D effector_boundaries::from_bitmap_coordinate(effector_boundaries::bitmap_coordinate coordinate) const
 	{
-		return point3(
+		return Point3D(
 				(double) coordinate.x * voxel_size + measures::MIN_X,
 				(double) coordinate.y * voxel_size + measures::MIN_Y,
 				(double) coordinate.z * voxel_size + measures::MIN_Z);
 	}
 
-	effector_boundaries::bitmap_coordinate effector_boundaries::from_real_coordinate(point3 coordinate) const
+	effector_boundaries::bitmap_coordinate effector_boundaries::from_real_coordinate(Point3D coordinate) const
 	{
 		return effector_boundaries::bitmap_coordinate(
 			(coordinate.x - measures::MIN_X) / voxel_size,

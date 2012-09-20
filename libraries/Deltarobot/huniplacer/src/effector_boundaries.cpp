@@ -30,7 +30,7 @@
 
 #include <huniplacer/measures.h>
 #include <huniplacer/effector_boundaries.h>
-#include <huniplacer/inverse_kinematics_exception.h>
+#include <huniplacer/InverseKinematicsException.h>
 #include <stack>
 #include <vector>
 #include <set>
@@ -40,7 +40,7 @@ namespace huniplacer
 {
 	using namespace measures;
 
-	effector_boundaries* effector_boundaries::generate_effector_boundaries(const inverse_kinematics_model& model, const imotor3& motors, double voxel_size)
+	effector_boundaries* effector_boundaries::generate_effector_boundaries(const InverseKinematicsModel& model, const imotor3& motors, double voxel_size)
 	{
 		effector_boundaries* boundaries = new effector_boundaries(model, motors, voxel_size);
 
@@ -59,7 +59,7 @@ namespace huniplacer
         return boundaries;
     }
 
-    bool effector_boundaries::check_path(const point3 & from, const point3 & to) const
+    bool effector_boundaries::check_path(const Point3D & from, const Point3D & to) const
     {
     	double x_length = to.x - from.x;
     	double y_length = to.y - from.y;
@@ -77,7 +77,7 @@ namespace huniplacer
 			int x = (from.x + x_length * i);
 			int y = (from.y + y_length * i);
 			int z = (from.z + z_length * i);
-			bitmap_coordinate temp = from_real_coordinate(point3(x, y, z));
+			bitmap_coordinate temp = from_real_coordinate(Point3D(x, y, z));
 
 			int index = temp.x + temp.y * width + temp.z * width * depth;
 
@@ -90,7 +90,7 @@ namespace huniplacer
         return true;
     }
 
-    effector_boundaries::effector_boundaries(const inverse_kinematics_model& model, const imotor3& motors, double voxel_size)
+    effector_boundaries::effector_boundaries(const InverseKinematicsModel& model, const imotor3& motors, double voxel_size)
     	: point_validity_cache(NULL), kinematics(model), motors(motors), voxel_size(voxel_size)
     {
     }
@@ -136,9 +136,9 @@ namespace huniplacer
 			motionf mf;
 			try
 			{
-				kinematics.point_to_motion(from_bitmap_coordinate(p), mf);
+				kinematics.pointToMotion(from_bitmap_coordinate(p), mf);
 			}
-			catch(huniplacer::inverse_kinematics_exception & ex)
+			catch(huniplacer::InverseKinematicsException & ex)
 			{
 				*from_cache = INVALID;
 				return false;
@@ -167,7 +167,7 @@ namespace huniplacer
     	std::stack<bitmap_coordinate> cstack;
 
     	//search from the center to the right side to the first point out of reach
-    	point3 begin (0, 0, MIN_Z + (MAX_Z - MIN_Z) / 2);
+    	Point3D begin (0, 0, MIN_Z + (MAX_Z - MIN_Z) / 2);
 		for(; begin.x < MAX_X; begin.x += voxel_size)
 		{
 			if(!is_valid(from_real_coordinate(begin)))
@@ -198,7 +198,7 @@ namespace huniplacer
 						}
 
 						int index = x + y * width + z * width * depth;
-						point3 real_coordinate = from_bitmap_coordinate(bitmap_coordinate(x, y, z));
+						Point3D real_coordinate = from_bitmap_coordinate(bitmap_coordinate(x, y, z));
 
 						if(is_valid(bitmap_coordinate(x, y, z))
 								&& (real_coordinate.x < measures::MAX_X && real_coordinate.x >= measures::MIN_X && real_coordinate.y < measures::MAX_Y && real_coordinate.y >= measures::MIN_Y && real_coordinate.z < measures::MAX_Z && real_coordinate.z >= measures::MIN_Z)
@@ -217,7 +217,7 @@ namespace huniplacer
 		point_validity_cache = NULL;
 
 		//adds all the points within the boundaries
-		cstack.push(from_real_coordinate(point3(0, 0, MIN_Z + (MAX_Z - MIN_Z) / 2)));
+		cstack.push(from_real_coordinate(Point3D(0, 0, MIN_Z + (MAX_Z - MIN_Z) / 2)));
 		while(!cstack.empty())
 		{
 			bitmap_coordinate c = cstack.top();
