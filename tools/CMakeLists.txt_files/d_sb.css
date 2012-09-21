@@ -1,0 +1,174 @@
+/* Style sheet for source browsing pages. */
+
+/* List */
+#resultstable {table-layout:fixed}
+#resultstable div {white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+
+/* Diffs */
+.diff pre {
+ margin:0;
+ padding:0;
+ white-space: pre-wrap;
+ white-space: -moz-pre-wrap;
+ white-space: -pre-wrap;
+ white-space: -o-pre-wrap;
+ word-wrap: break-word;
+}
+.diff th {padding:0 .6em; text-align:right; font-weight:normal; color:#666}
+.diff b {font-weight: normal}
+.diff .noline {background: #eee; border: 1px solid #888; border-width: 0 1px 0 1px}
+.diff .oldbackrm {background: #f88; border: 1px solid #a33; border-width: 0 1px 0 1px}
+.diff .oldbackeq {background: #ffd8d8; border: 1px solid #a33; border-width: 0 1px 0 1px}
+.diff .newbackadd {background: #9f9; border: 1px solid #3a3; border-width: 0 1px 0 1px}
+.diff .newbackeq {background: #ddf8cc; border: 1px solid #3a3; border-width: 0 1px 0 1px}
+.diff .oldrm {background: #f88;}
+.diff .oldeq {background: #ffd8d8;}
+.diff .newadd {background: #9f9;}
+.diff .neweq {background: #ddf8cc;}
+.diff .first td {border-top-width:1px}
+.diff .last td {border-bottom-width:1px}
+.header td {padding-bottom:.3em; text-align:center; font-family:arial, sans-serif}
+#controls {padding:.5em; white-space:nowrap}
+#controls td {padding:0 2px}
+#controls input, #controls select {font-size:93%; margin:0; padding:0}
+#controls form {margin:0; padding:0 1em}
+#controls a.revchoose {
+  text-decoration: none;
+  color: #000;
+  padding: 4px;
+  border: 1px solid #ebeff9;
+}
+#controls a.revchoose:hover {
+  border: 1px inset #fff;
+}
+
+/* Property Diffs */
+.diff .firstseg {padding-left: 2px}
+.diff .lastseg {padding-right: 2px}
+.diff .samepropback {border: 1px solid #000; border-width: 0 1px 0 1px}
+.diff td.nopropsep {border-bottom-width: 0px}
+.diff .propname td {font-size: 110%; font-weight: bold; padding: 1em 0.5em}
+.diff .bincontent {border-bottom-width: 1px; font-style: italic; font-size: 110%; padding: 0px 0.5em}
+.diff .propspace {font-size: 100%}
+.diff .sectiontitle {padding: 2em 0; font-style: italic; font-size: 110%}
+
+/* Meta bubble */
+#older, #props, #fileinfo {border-top:3px solid white; padding-top:6px; margin-top: 1em}
+#older pre {margin-top:4px; margin-left:1em}
+
+/* File */
+.fc pre, .fc td, .fc tr, .fc table, .fc tbody, #nums, #lines {padding:0; margin:0}
+.fc {position:relative; width:100%; min-height:30em}
+.fc table {border-collapse:collapse; margin:0; padding:0}
+#nums, #lines, #nums th, #lines th, #nums td, #lines td { vertical-align:top }
+pre {
+  font-family: Monaco, 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
+  font-size: 93%;
+}
+#nums {padding-right:.5em; width:3.7em}
+#nums td {text-align:right}
+#nums a {color:#77c; text-decoration:none}
+#nums tr:hover a {color:blue; text-decoration:underline}
+#nums td:target a {color:black; font-weight:bold}
+.sep {visibility:hidden; width:2px}
+#nums span { cursor: pointer; width: 14px; float: left; background-repeat: no-repeat; }
+#lines td {padding-left:4px;}
+
+/* Applies only to sb files and issue attachments */
+.fc #nums, .fc #lines {
+  padding-top: 0.5em;
+}
+.fc #lines {
+  border-left: 3px solid #ebeff9;
+}
+
+#log { position:absolute; top:2px; right:0; width:28em}
+#log p { font-size:120%; margin: 0 0 0.5em 0}
+#log pre { margin-top: 0.3em}
+
+/* IE Whitespace Fix */
+.prettyprint td.source {
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+}
+
+/* Header */
+.src_nav {
+  height:1.2em;
+  padding-top:0.2em;
+}
+.src_crumbs {
+  padding:0;
+  margin:0;
+}
+#crumb_root {
+  padding:0.2em 0 0.2em 0.2em;
+  margin:0;
+}
+#crumb_links {
+  margin-top:0;
+  margin-right:0;
+  padding:0.2em 1px;
+}
+form.src_nav {
+  padding:0;
+  margin:0;
+  display: inline;
+}
+#src_nav_title {
+  margin-right: 0.5em;
+}
+
+.heading {
+  background:#c3d9ff;
+}
+.sp {
+  color:#555;
+}
+.sourcelabel {
+  margin-left: 20px;
+  white-space: nowrap;
+}
+.sourcelabel select {
+  font-size: 93%;
+}
+#contents {
+  display: none;
+}
+
+/* Branch detail and revision log message */
+pre.wrap {
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+}
+
+.edit_icon {
+  width: 14px;
+  height: 14px;
+  padding-right: 4px;
+}
+
+/* Source editing */
+.CodeMirror-line-numbers {
+  margin: .4em;
+  padding-right: 0.3em;
+  font-size: 83%;
+  font-family: Monaco, 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
+  color: #777;
+  text-align: right;
+  border-right: 1px solid #aaa;
+}
+.editbox {
+  border-color: #999 #ccc #ccc;
+  border-width: 1px;
+  border-style: solid;
+  background: white;
+}
+.pending_bubble {
+  background-color: #e5ecf9;
+}
+#pending {
+  padding: 2px 2px 2px 4px;
+}

@@ -78,6 +78,6 @@ namespace huniplacer
 		const double MIN_Y = -MAX_Y;
 		//safety constants, roughly determined to be as safe as possible for testing purposes
 		const double MIN_Z = -280;
-		const double MAX_Z = -200;
+		const double MAX_Z = -180;
 	}
 }

@@ -30,6 +30,7 @@
 
 #pragma once
 
+#include <iostream>
 #include <huniplacer/Point3D.h>
 #include <huniplacer/imotor3.h>
 #include <huniplacer/measures.h>
@@ -165,6 +166,7 @@ namespace huniplacer
 
 	effector_boundaries::bitmap_coordinate effector_boundaries::from_real_coordinate(Point3D coordinate) const
 	{
+		std::cout << "In from_real_coordinates" << std::endl;
 		return effector_boundaries::bitmap_coordinate(
 			(coordinate.x - measures::MIN_X) / voxel_size,
 			(coordinate.y - measures::MIN_Y) / voxel_size,

@@ -17,6 +17,14 @@
 
  static huniplacer::deltarobot * deltarobot;
 
+//callback function that gets called by the deltarobot thread when an exception occured in it
+static void modbus_exhandler(std::exception& ex)
+{
+        std::stringstream ss;
+        ss << "runtime error of type "<< typeid(ex).name()<<" in delta robot" << std::endl;
+        ss <<"what(): " << ex.what()<<std::endl;
+}
+
 
 /*
  *
@@ -101,6 +109,37 @@ bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
  */
 int main(int argc, char** argv) {
 	ros::init(argc, argv, NODE_NAME);
+
+    huniplacer::InverseKinematics kinematics(
+    huniplacer::measures::BASE,
+    huniplacer::measures::HIP,
+    huniplacer::measures::EFFECTOR,
+    huniplacer::measures::ANKLE,
+    huniplacer::measures::HIP_ANKLE_ANGLE_MAX);
+
+
+    modbus_t* modbus_rtu = modbus_new_rtu(
+        "/dev/ttyS0",
+        crd514_kd::rtu_config::BAUDRATE,
+        crd514_kd::rtu_config::PARITY,
+        crd514_kd::rtu_config::DATA_BITS,
+        crd514_kd::rtu_config::STOP_BITS);
+
+	double deviation[3] = {huniplacer::measures::MOTOR1_DEVIATION, huniplacer::measures::MOTOR2_DEVIATION, huniplacer::measures::MOTOR3_DEVIATION};
+	huniplacer::steppermotor3 motors(modbus_rtu, huniplacer::measures::MOTOR_ROT_MIN, huniplacer::measures::MOTOR_ROT_MAX, modbus_exhandler, deviation);
+	motors.power_on();
+
+	char key;
+	std::cin >> key;
+
+    deltarobot = new huniplacer::deltarobot(kinematics, motors);
+    std::cin >> key;
+    deltarobot->generate_boundaries(2);
+    std::cin >> key;
+    deltarobot->power_on();
+
+	std::cin >> key;
+
 	ros::NodeHandle nodeHandle;
 
 	ros::ServiceServer moveToPointService =
@@ -114,6 +153,8 @@ int main(int argc, char** argv) {
 
 	ros::ServiceServer moveRelativePathService =
 		nodeHandle.advertiseService("moveRelativePath", moveRelativePath);
+
+
 
 	ROS_INFO("DeltaRobotNode ready.");
 
