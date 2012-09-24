@@ -54,7 +54,6 @@ namespace huniplacer
         	boundaries->boundaries_bitmap[i] = false;
         }
         char c;
-        std::cout << "before generate boundaries bitmap" << std::endl;
         std::cin >> c;
         boundaries->generate_boundaries_bitmap();
 
@@ -82,7 +81,7 @@ namespace huniplacer
 			bitmap_coordinate temp = from_real_coordinate(Point3D(x, y, z));
 			int index = temp.x + temp.y * width + temp.z * width * depth;
 
-			if(!boundaries_bitmap[index])
+			if(index >= (width * height * depth) || !boundaries_bitmap[index])
 			{
 				return false;
 			}
@@ -109,7 +108,7 @@ namespace huniplacer
             {
                 for(int z = p.z - 1; z <= p.z + 1; z++)
                 {
-                    if(x != p.x && y != p.y && z != p.z && !is_valid(bitmap_coordinate(x, y, z)))
+                    if((x != p.x || y != p.y || z != p.z) && !is_valid(bitmap_coordinate(x, y, z)))
                     {
                         return true;
                     }
@@ -173,12 +172,9 @@ namespace huniplacer
 		{
 			if(!is_valid(from_real_coordinate(begin)))
 			{
-				
 				begin.x -= voxel_size;
 				bitmap_coordinate coordinate = from_real_coordinate(begin);
-				std::cout << "after from_bitmap_coordinate" << std::endl;
 				cstack.push(coordinate);
-				std::cout << "after cstack push" << std::endl;
 				boundaries_bitmap[coordinate.x + coordinate.y * width + coordinate.z * width * depth] = true;
 				break;
 			}
@@ -204,7 +200,12 @@ namespace huniplacer
 						int index = x + y * width + z * width * depth;
 						Point3D real_coordinate = from_bitmap_coordinate(bitmap_coordinate(x, y, z));
 						if(is_valid(bitmap_coordinate(x, y, z))
-								&& (real_coordinate.x < measures::MAX_X && real_coordinate.x >= measures::MIN_X && real_coordinate.y < measures::MAX_Y && real_coordinate.y >= measures::MIN_Y && real_coordinate.z < measures::MAX_Z && real_coordinate.z >= measures::MIN_Z)
+								&& (real_coordinate.x < measures::MAX_X 
+								&& real_coordinate.x >= measures::MIN_X 
+								&& real_coordinate.y < measures::MAX_Y 
+								&& real_coordinate.y >= measures::MIN_Y 
+								&& real_coordinate.z < measures::MAX_Z 
+								&& real_coordinate.z >= measures::MIN_Z)
 								&& !boundaries_bitmap[index]
 							    && has_invalid_neighbours(bitmap_coordinate(x, y, z)))
 						{
@@ -221,8 +222,6 @@ namespace huniplacer
 
 		//adds all the points within the boundaries
 		cstack.push(from_real_coordinate(Point3D(0, 0, MIN_Z + (MAX_Z - MIN_Z) / 2)));
-		std::cout << "after from_real_coordinate" << std::endl;
-		std::cout << "cstack size" << cstack.size() << std::endl;
 		while(!cstack.empty())
 		{
 			bitmap_coordinate c = cstack.top();
@@ -230,32 +229,23 @@ namespace huniplacer
 			//std::cout << "after cstack pop" << std::endl;
 			int index = c.x + c.y * width + c.z * width * depth;
 			int indices[6] = {index - 1, index + 1, index - width, index + width, index - width * depth, index + width * depth};
+			
+
+
 
 			for(unsigned int i = 0; i < ( sizeof(indices) / sizeof(indices[0]) ); i++)
 			{
-				//std::cout << "in indices loop " << i << std::endl;
-				//std::cout << "in indices loop size of indices " << sizeof(indices) << std::endl;
-				//std::cout << "in indices loop size of sizeof(indices) / sizeof(indices[0])" << ( sizeof(indices) / sizeof(indices[0]) ) << std::endl;
-				//std::cout << "in indices loop boundaries_bitmap size" << sizeof(boundaries_bitmap) << std::endl;
-				//std::cout << "in indices loop indices[i]" << indices[i] << std::endl;
-			
-
-				if(boundaries_bitmap[indices[i]] == false)
+				if(indices[i] >= (width * height * depth))
 				{
-					//std::cout << "in if indices loop" << std::endl;
-					std::cout << "indices[i]" << indices[i] << std::endl;
-					char key1;
-					std::cin >> key1;
+					std::cerr << "line=" << __LINE__ << " index=" << indices[i] << " out of bounds because maxsize/index = " << double(width*height*depth)/double(indices[1]) << " ";
+				}
+				else if(boundaries_bitmap[indices[i]] == false)
+				{
 					boundaries_bitmap[indices[i]] = true;
-					//std::cout << "before bitmap coord in indices loop" << std::endl;
 					cstack.push(bitmap_coordinate(indices[i] % width, (indices[i] % (width * depth)) / width, indices[i] / (width * depth)));
-					//std::cout << "after cstack push bitmap_coordinate" << std::endl;
 				    
 				}
-			}
-			//std::cout << "after indices loop" << std::endl;
-			break;
+			}	
 		}
-		std::cout << "after indices while loopie" << std::endl;
 	}
 }

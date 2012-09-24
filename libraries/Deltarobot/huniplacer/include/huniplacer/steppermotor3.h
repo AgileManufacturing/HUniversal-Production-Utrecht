@@ -100,6 +100,9 @@ namespace huniplacer
              **/
             void moveto(const motionf& mf, bool async = true);
 
+
+            void customMoveTo(int motorIndex, double angle);
+
             /**
              * @brief same as moveto, but rotates to an angle within a certain time.
              * @param time time in seconds that the motors will take to rotate to the given angle

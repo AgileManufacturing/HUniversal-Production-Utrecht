@@ -143,6 +143,7 @@ namespace huniplacer
 
 		char* point_validity_cache;
 		bool* boundaries_bitmap;
+		//TODO std::vector<bool> boundaries_bitmap;
 		const InverseKinematicsModel &kinematics;
 		const imotor3 &motors;
 		double voxel_size;

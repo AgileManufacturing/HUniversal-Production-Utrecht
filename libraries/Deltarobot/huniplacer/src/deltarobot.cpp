@@ -77,24 +77,19 @@ namespace huniplacer
 
     void deltarobot::moveto(const Point3D& p, double speed, bool async)
     {
-        std::cout << "before motors is power on" << std::endl;
     	if(!motors.is_powerd_on())
     	{
     		throw motor3_exception("motor drivers are not powered on");
     	}
-        std::cout << "Motors are powerered on" << std::endl;
         motionf mf;
         try
         {
-            std::cout <<"before pointToMotion" << std::endl;
         	kinematics.pointToMotion(p, mf);
-            std::cout <<"after pointToMotion" << std::endl;
         }
         catch(InverseKinematicsException& ex)
         {
         	throw ex;
         }
-        std::cout <<"before angle check" << std::endl;
         if(
             !is_valid_angle(mf.angles[0]) ||
             !is_valid_angle(mf.angles[1]) ||
@@ -102,19 +97,16 @@ namespace huniplacer
         {
             throw InverseKinematicsException("motion angles outside of valid range", p);
         }
-        std::cout <<"after angle check"<< std::endl;
 
     	if(!boundaries->check_path(effector_location, p))
     	{
     		throw InverseKinematicsException("invalid path", p);
     	}
-        std::cout <<"After boudaries check"<< std::endl;
         double move_time = p.distance(effector_location) / speed;
 
         try
         {
         	motors.moveto_within(mf, move_time, async);
-            std::cout <<"after moveto_within"<< std::endl;
         }
         catch(std::out_of_range& ex) { throw ex; }
 

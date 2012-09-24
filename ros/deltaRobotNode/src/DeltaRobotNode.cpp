@@ -109,7 +109,7 @@ bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
  */
 int main(int argc, char** argv) {
 	ros::init(argc, argv, NODE_NAME);
-
+	
     huniplacer::InverseKinematics kinematics(
     huniplacer::measures::BASE,
     huniplacer::measures::HIP,
@@ -129,16 +129,13 @@ int main(int argc, char** argv) {
 	huniplacer::steppermotor3 motors(modbus_rtu, huniplacer::measures::MOTOR_ROT_MIN, huniplacer::measures::MOTOR_ROT_MAX, modbus_exhandler, deviation);
 	motors.power_on();
 
-	char key;
-	std::cin >> key;
-
     deltarobot = new huniplacer::deltarobot(kinematics, motors);
-    std::cin >> key;
+
     deltarobot->generate_boundaries(2);
-    std::cin >> key;
+
     deltarobot->power_on();
 
-	std::cin >> key;
+
 
 	ros::NodeHandle nodeHandle;
 

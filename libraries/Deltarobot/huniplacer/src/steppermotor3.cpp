@@ -138,12 +138,13 @@ namespace huniplacer
                     owner->motion_queue.pop();
                     
                     owner->queue_mutex.unlock();
-                    
+                    std::cout << "before powered_on if statement" << std::endl;
                     if(owner->powered_on)
                     {
-
+                        std::cout << "before lock" << std::endl;
 						//write motion
 						boost::lock_guard<boost::mutex> lock(owner->modbus_mutex);
+                        std::cout << "After lock" << std::endl;
 						owner->modbus.write_u32(crd514_kd::slaves::MOTOR_1, crd514_kd::registers::OP_SPEED, mi.speed[0], true);
 						owner->modbus.write_u32(crd514_kd::slaves::MOTOR_1, crd514_kd::registers::OP_POS, mi.angles[0], true);
 						owner->modbus.write_u32(crd514_kd::slaves::MOTOR_1, crd514_kd::registers::OP_ACC, mi.acceleration[0], true);
@@ -160,12 +161,16 @@ namespace huniplacer
 						owner->modbus.write_u32(crd514_kd::slaves::MOTOR_3, crd514_kd::registers::OP_DEC, mi.deceleration[2], true);
 
 						//execute motion
+                        std::cout << "Motor3: "  << "Alarm code: " << owner->modbus.read_u16(crd514_kd::slaves::MOTOR_3, 0x100);
+                        std::cout << "preready" << std::endl;
 						owner->wait_till_ready();
+                        std::cout << "postready" << std::endl;
 
 						owner->modbus.write_u16(crd514_kd::slaves::BROADCAST, crd514_kd::registers::CMD_1, crd514_kd::cmd1_bits::EXCITEMENT_ON);
 						owner->modbus.write_u16(crd514_kd::slaves::BROADCAST, crd514_kd::registers::CMD_1, crd514_kd::cmd1_bits::EXCITEMENT_ON | crd514_kd::cmd1_bits::START);
 						owner->modbus.write_u16(crd514_kd::slaves::BROADCAST, crd514_kd::registers::CMD_1, crd514_kd::cmd1_bits::EXCITEMENT_ON);
                     }
+                    std::cout << "after powered_on if statement" << std::endl;
                 }
                 else //empty
                 {
@@ -210,6 +215,7 @@ namespace huniplacer
         		if((status_1 & crd514_kd::status1_bits::ALARM) ||
         		   (status_1 & crd514_kd::status1_bits::WARNING))
         		{
+                    std::cout << "Motor: " << i << "Alarm code: " << modbus.read_u16(slaves[i], 0x100);
         			throw crd514_kd_exception(
         				slaves[i], status_1 & crd514_kd::status1_bits::WARNING,
         				status_1 & crd514_kd::status1_bits::ALARM);
@@ -250,6 +256,30 @@ namespace huniplacer
         current_angles[0] = mf.angles[0] + deviation[0];
         current_angles[1] = mf.angles[1] + deviation[1];
         current_angles[2] = mf.angles[2] + deviation[2];
+    }
+
+    void steppermotor3::customMoveTo(int motorIndex, double angle){
+        boost::lock_guard<boost::mutex> lock(modbus_mutex);
+
+        uint32_t motorSteps = (uint32_t)(angle / crd514_kd::MOTOR_STEP_ANGLE);
+        uint32_t motorSpeed = (uint32_t)(1 / crd514_kd::MOTOR_STEP_ANGLE);
+        uint32_t motorAcceleration = (uint32_t)(crd514_kd::MOTOR_STEP_ANGLE * 1000000000.0 / 360);
+        uint32_t motorDeceleration = (uint32_t)(crd514_kd::MOTOR_STEP_ANGLE * 1000000000.0 / 360);
+
+        crd514_kd::slaves::t motor = crd514_kd::slaves::t(crd514_kd::slaves::MOTOR_1 + motorIndex);
+
+        modbus.write_u32(motor, crd514_kd::registers::OP_SPEED, motorSpeed, true);
+        modbus.write_u32(motor, crd514_kd::registers::OP_POS, motorSteps, true);
+        modbus.write_u32(motor, crd514_kd::registers::OP_ACC, motorAcceleration, true);
+        modbus.write_u32(motor, crd514_kd::registers::OP_DEC, motorDeceleration, true);
+
+        
+        //execute motion
+        wait_till_ready();
+
+        modbus.write_u16(motor, crd514_kd::registers::CMD_1, crd514_kd::cmd1_bits::EXCITEMENT_ON);
+        modbus.write_u16(motor, crd514_kd::registers::CMD_1, crd514_kd::cmd1_bits::EXCITEMENT_ON | crd514_kd::cmd1_bits::START);
+        modbus.write_u16(motor, crd514_kd::registers::CMD_1, crd514_kd::cmd1_bits::EXCITEMENT_ON);
     }
 
     void steppermotor3::stop(void)
