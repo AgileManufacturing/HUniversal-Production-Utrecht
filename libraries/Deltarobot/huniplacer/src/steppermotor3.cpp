@@ -260,7 +260,14 @@ namespace huniplacer
         current_angles[2] = mf.angles[2] + deviation[2];
     }
 
-    void steppermotor3::customMoveTo(int motorIndex, double angle){
+    /**
+    * Moves a single motor to a certain angle. Does not use the thread queue, is only used in the calibration.
+    * Moves at a speed of 1 radian per second
+    * 
+    * @param motorIndex The index of the motor, 0, 1 or 2. 
+    * @param angle The angle which the motor will move to.
+    */
+    void steppermotor3::moveSingleMotor(int motorIndex, double angle){
         boost::lock_guard<boost::mutex> lock(modbus_mutex);
 
         uint32_t motorSteps = (uint32_t)(angle / crd514_kd::MOTOR_STEP_ANGLE);

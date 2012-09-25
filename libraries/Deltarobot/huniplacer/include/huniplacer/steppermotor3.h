@@ -101,7 +101,7 @@ namespace huniplacer
             void moveto(const motionf& mf, bool async = true);
 
 
-            void customMoveTo(int motorIndex, double angle);
+            void moveSingleMotor(int motorIndex, double angle);
 
             /**
              * @brief same as moveto, but rotates to an angle within a certain time.

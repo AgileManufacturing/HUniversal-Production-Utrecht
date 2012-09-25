@@ -84,7 +84,7 @@ namespace huniplacer
             /**
              * @brief makes the deltarobot move to a point
              * @param p 3-dimensional point to move to
-             * @param speed movement speed speed in degrees per second
+             * @param speed movement speed in millimeters per second
              * @param async motions will be stored in a queue for later execution if true
              **/
             void moveto(const Point3D& p, double speed, bool async = true);
