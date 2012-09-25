@@ -21,14 +21,7 @@ msg_gen/
 # Ignore the folders that are uniquely generated
 
 
-ros/crate_vision/src/crate_vision/
-ros/cratedemo/src/cratedemo/
-ros/deltarobotnode/src/deltarobotnode/
-ros/equipletnode/src/equipletnode/
-ros/grippernode/src/grippernode/msg/
-ros/grippernode/src/grippernode/srv/
-ros/huniplacer_3d/src/huniplacer_3d/
-ros/vision/src/vision/
 ros/deltaRobotNode/src/deltaRobotNode/
+tools/CMakeLists.txt_files/
 
 
