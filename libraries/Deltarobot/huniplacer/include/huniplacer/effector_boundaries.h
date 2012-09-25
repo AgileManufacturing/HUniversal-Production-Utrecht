@@ -40,6 +40,7 @@
 
 #pragma once
 
+#include <iostream>
 #include <huniplacer/Point3D.h>
 #include <huniplacer/imotor3.h>
 #include <huniplacer/measures.h>
@@ -152,6 +153,7 @@ namespace huniplacer
 
 		char* point_validity_cache;
 		bool* boundaries_bitmap;
+		//TODO std::vector<bool> boundaries_bitmap;
 		const InverseKinematicsModel &kinematics;
 		const imotor3 &motors;
 		double voxel_size;

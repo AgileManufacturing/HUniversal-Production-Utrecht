@@ -45,6 +45,15 @@
 
  static huniplacer::deltarobot * deltarobot;
 
+//callback function that gets called by the deltarobot thread when an exception occured in it
+static void modbus_exhandler(std::exception& ex)
+{
+        std::stringstream ss;
+        ss << "runtime error of type "<< typeid(ex).name()<<" in delta robot" << std::endl;
+        ss <<"what(): " << ex.what()<<std::endl;
+        std::cerr << ss;
+}
+
 
 /*
  *
@@ -111,7 +120,41 @@ bool movePath(deltaRobotNode::MovePath::Request &req,
  */
 bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
 	deltaRobotNode::MoveToRelativePoint::Response &res) {
+	ROS_INFO("moveToRelativePoint called");
+	deltaRobotNode::Motion currentMotion;
+	try {
+		currentMotion = req.motion;
+		huniplacer::Point3D& effectorLocation = deltarobot->getEffectorLocation();
+		ROS_INFO("Current effector location: x: %f y: %f z: %f", effectorLocation.x, effectorLocation.y, effectorLocation.z);
+		double relativeX = effectorLocation.x + currentMotion.x;
+		double relativeY = effectorLocation.y + currentMotion.y;
+		double relativeZ = effectorLocation.z + currentMotion.z;
+		ROS_INFO("Current motion z: %f", currentMotion.z);
 
+		//std::cout << "relativeZ " << relativeZ << std::endl;
+		//ROS_INFO("New effector location: x: %lf y: %lf z: %lf", relativeX, relativeY, relativeZ);
+		if(!deltarobot->check_path(
+				huniplacer::Point3D(effectorLocation.x, effectorLocation.y, effectorLocation.z),
+				huniplacer::Point3D(relativeX, relativeY, relativeZ)))
+		{
+			res.succeeded = false;
+			return true;
+		}
+		deltarobot->moveto(huniplacer::Point3D(relativeX, relativeY, relativeZ), currentMotion.speed);
+		deltarobot->wait_for_idle();
+
+	} catch(std::runtime_error& ex) {
+		std::stringstream ss;
+		ss << "runtime error of type "<< typeid(ex).name()<<" in delta robot" << std::endl;
+		ss <<"what(): " << ex.what()<<std::endl;
+		//msg.errorMsg = ss.str();
+		//msg.errorType = 2;
+		//pub->publish(msg);
+		res.succeeded = false;
+		ROS_ERROR("moveTo: %s", ss.str().c_str());
+	}
+
+    res.succeeded = true;
 	return true;
 }
 
@@ -129,6 +172,50 @@ bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
  */
 int main(int argc, char** argv) {
 	ros::init(argc, argv, NODE_NAME);
+
+    // Initialize modbus for IO controller
+    modbus_t* modbus = modbus_new_tcp("192.168.0.2", 502);
+    if(modbus == NULL)
+    {
+        throw std::runtime_error("Unable to allocate libmodbus context");
+    }
+    if(modbus_connect(modbus) == -1)
+    {
+        throw std::runtime_error("Connection failed");
+    }
+    assert(modbus != NULL);
+
+    huniplacer::InverseKinematics kinematics(
+    huniplacer::measures::BASE,
+    huniplacer::measures::HIP,
+    huniplacer::measures::EFFECTOR,
+    huniplacer::measures::ANKLE,
+    huniplacer::measures::HIP_ANKLE_ANGLE_MAX);
+
+
+    modbus_t* modbus_rtu = modbus_new_rtu(
+        "/dev/ttyS0",
+        crd514_kd::rtu_config::BAUDRATE,
+        crd514_kd::rtu_config::PARITY,
+        crd514_kd::rtu_config::DATA_BITS,
+        crd514_kd::rtu_config::STOP_BITS);
+
+	double deviation[3] = {huniplacer::measures::MOTOR1_DEVIATION, huniplacer::measures::MOTOR2_DEVIATION, huniplacer::measures::MOTOR3_DEVIATION};
+	huniplacer::steppermotor3 motors(modbus_rtu, huniplacer::measures::MOTOR_ROT_MIN, huniplacer::measures::MOTOR_ROT_MAX, modbus_exhandler, deviation);
+
+	// power on the motors
+	motors.power_on();
+
+   
+    deltarobot = new huniplacer::deltarobot(kinematics, motors);
+
+    deltarobot->generate_boundaries(2);
+
+    deltarobot->power_on();
+
+    deltarobot->calibrateMotors(modbus);
+
+
 	ros::NodeHandle nodeHandle;
 
 	ros::ServiceServer moveToPointService =
@@ -142,6 +229,8 @@ int main(int argc, char** argv) {
 
 	ros::ServiceServer moveRelativePathService =
 		nodeHandle.advertiseService("moveRelativePath", moveRelativePath);
+
+
 
 	ROS_INFO("DeltaRobotNode ready.");
 

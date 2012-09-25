@@ -123,12 +123,20 @@ double InverseKinematics::motorAngle(const Point3D& destinationPoint,
 
 void InverseKinematics::pointToMotion(const Point3D& destinationPoint,
 		motionf& motionPointer) const {
-	//adding 180 degrees switches 0 degrees from the engine midpoint to
-	//directly opposite
+	/*
+	 * Adding 180 degrees switches 0 degrees for the motor from the 
+	 * midpoint of the engines to directly opposite.
+	 * When determining motorAngle the degrees determine the position of the engines:
+	 * 	  0 degrees: the hip from this motor moves on the yz plane
+	 *  120 degrees: this motor is located 120 degrees counter clockwise of the 0 degrees motor 
+	 * when looking at the side the effector is not located
+	 *  240 degrees: this motor is located 240 degrees counter clockwise of the 0 degrees motor
+	 * when looking at the side the effector is not located
+	 */
 	motionPointer.angles[0] = utils::rad(180)
-			+ motorAngle(destinationPoint, utils::rad(0 * 120));
-	motionPointer.angles[1] = utils::rad(180)
 			+ motorAngle(destinationPoint, utils::rad(1 * 120));
+	motionPointer.angles[1] = utils::rad(180)
+			+ motorAngle(destinationPoint, utils::rad(0 * 120));
 	motionPointer.angles[2] = utils::rad(180)
 			+ motorAngle(destinationPoint, utils::rad(2 * 120));
 

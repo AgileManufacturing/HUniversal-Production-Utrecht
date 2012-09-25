@@ -68,6 +68,9 @@ namespace huniplacer
 		const double MOTOR2_DEVIATION	  = utils::rad(-45);   //radians
 		const double MOTOR3_DEVIATION	  = utils::rad(-45);   //radians
 
+		// Top (granite) to middle point is 45 degrees. Removing the hip thickness results in +-42.5 degrees!
+		const double MOTORS_DEVIATION	= huniplacer::utils::rad(42.5); 
+
 		/* Robot v1 
 		//make sure all the points that the effector can reach are included in the box
 		// with the following dimensions:
@@ -82,12 +85,15 @@ namespace huniplacer
 		/* Robot v2 */
 		//make sure all the points that the effector can reach are included in the box
 		// with the following dimensions:
-		const double MAX_X = 150;
+
+		// This values cannot be changed, because the bounding box must be greater than
+		// the work area of the robot. If they are changed the software will fail. 
+		// A fix for this will be applied in the future. 
+ 		const double MAX_X = 500;
 		const double MAX_Y = MAX_X;
 		const double MIN_X = -MAX_X;
 		const double MIN_Y = -MAX_Y;
-		//safety constants, roughly determined to be as safe as possible for testing purposes
-		const double MIN_Z = -280;
-		const double MAX_Z = -200;
+		const double MIN_Z = -500;
+		const double MAX_Z = 0;
 	}
 }

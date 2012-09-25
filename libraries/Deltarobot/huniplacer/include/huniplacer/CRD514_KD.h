@@ -47,7 +47,7 @@
 namespace crd514_kd
 {
     const double MOTOR_STEP_ANGLE = (0.072 / 180.) * M_PI;
-    
+    const double MOTOR_STEP_IN_DEGREES = 1.8;
 
     /// @brief crd514_kd slave addresses
     namespace slaves
@@ -84,7 +84,12 @@ namespace crd514_kd
             RESET_ALARM             = 0x040, //16-bit
             
             CMD_1                   = 0x01E, //16-bit
-            STATUS_1                = 0x020  //16-bit
+            STATUS_1                = 0x020, //16-bit
+
+            CFG_PRESET_POSITION = 0x214, //32-bit Preset position value argument
+            OP_PRESET_POSITION = 0x048, //16-bit? Set the preset position to the preset position value argument
+
+            OP_SOFTWARE_OVERTRAVEL = 0x252 //16-bit Sets the software motor limitation (in the motor controller)
         };
     }
 

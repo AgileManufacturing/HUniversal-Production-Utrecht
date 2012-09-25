@@ -110,6 +110,9 @@ namespace huniplacer
              **/
             void moveto(const motionf& mf, bool async = true);
 
+
+            void customMoveTo(int motorIndex, double angle);
+
             /**
              * @brief same as moveto, but rotates to an angle within a certain time.
              * @param time time in seconds that the motors will take to rotate to the given angle
@@ -133,9 +136,21 @@ namespace huniplacer
 
             bool is_powerd_on(void);
 
+            void setMotorLimits(double minAngle, double maxAngle);
+
+            void resetCounter(int motorIndex);
+
             inline double get_min_angle(void) const { return min_angle; }
             inline double get_max_angle(void) const { return max_angle; }
             void set_min_angle(double min_angle);
             void set_max_angle(double max_angle);
+
+            void disableControllerLimitations();
+            double get_deviation(int motorIndex){
+                assert(motorIndex >= 0 && motorIndex < 3);
+                return deviation[motorIndex];
+            }
+
+            void set_deviation(const double* deviation);
     };
 }

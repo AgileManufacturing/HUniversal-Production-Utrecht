@@ -37,7 +37,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //******************************************************************************
 
-
+#include <iostream>
 #include <huniplacer/measures.h>
 #include <huniplacer/effector_boundaries.h>
 #include <huniplacer/InverseKinematicsException.h>
@@ -63,7 +63,6 @@ namespace huniplacer
         {
         	boundaries->boundaries_bitmap[i] = false;
         }
-
         boundaries->generate_boundaries_bitmap();
 
         return boundaries;
@@ -88,10 +87,9 @@ namespace huniplacer
 			int y = (from.y + y_length * i);
 			int z = (from.z + z_length * i);
 			bitmap_coordinate temp = from_real_coordinate(Point3D(x, y, z));
-
 			int index = temp.x + temp.y * width + temp.z * width * depth;
 
-			if(!boundaries_bitmap[index])
+			if(index >= (width * height * depth) || !boundaries_bitmap[index])
 			{
 				return false;
 			}
@@ -118,7 +116,7 @@ namespace huniplacer
             {
                 for(int z = p.z - 1; z <= p.z + 1; z++)
                 {
-                    if(x != p.x && y != p.y && z != p.z && !is_valid(bitmap_coordinate(x, y, z)))
+                    if((x != p.x || y != p.y || z != p.z) && !is_valid(bitmap_coordinate(x, y, z)))
                     {
                         return true;
                     }
@@ -209,9 +207,13 @@ namespace huniplacer
 
 						int index = x + y * width + z * width * depth;
 						Point3D real_coordinate = from_bitmap_coordinate(bitmap_coordinate(x, y, z));
-
 						if(is_valid(bitmap_coordinate(x, y, z))
-								&& (real_coordinate.x < measures::MAX_X && real_coordinate.x >= measures::MIN_X && real_coordinate.y < measures::MAX_Y && real_coordinate.y >= measures::MIN_Y && real_coordinate.z < measures::MAX_Z && real_coordinate.z >= measures::MIN_Z)
+								&& (real_coordinate.x < measures::MAX_X 
+								&& real_coordinate.x >= measures::MIN_X 
+								&& real_coordinate.y < measures::MAX_Y 
+								&& real_coordinate.y >= measures::MIN_Y 
+								&& real_coordinate.z < measures::MAX_Z 
+								&& real_coordinate.z >= measures::MIN_Z)
 								&& !boundaries_bitmap[index]
 							    && has_invalid_neighbours(bitmap_coordinate(x, y, z)))
 						{
@@ -232,18 +234,26 @@ namespace huniplacer
 		{
 			bitmap_coordinate c = cstack.top();
 			cstack.pop();
-
+			//std::cout << "after cstack pop" << std::endl;
 			int index = c.x + c.y * width + c.z * width * depth;
 			int indices[6] = {index - 1, index + 1, index - width, index + width, index - width * depth, index + width * depth};
+			
 
-			for(unsigned int i = 0; i < sizeof(indices) / sizeof(indices[0]); i++)
+
+
+			for(unsigned int i = 0; i < ( sizeof(indices) / sizeof(indices[0]) ); i++)
 			{
-				if(boundaries_bitmap[indices[i]] == false)
+				if(indices[i] >= (width * height * depth))
+				{
+					std::cerr << "line=" << __LINE__ << " index=" << indices[i] << " out of bounds because maxsize/index = " << double(width*height*depth)/double(indices[1]) << " ";
+				}
+				else if(boundaries_bitmap[indices[i]] == false)
 				{
 					boundaries_bitmap[indices[i]] = true;
 					cstack.push(bitmap_coordinate(indices[i] % width, (indices[i] % (width * depth)) / width, indices[i] / (width * depth)));
+				    
 				}
-			}
+			}	
 		}
 	}
 }
