@@ -115,7 +115,7 @@ namespace huniplacer
     bool effector_boundaries::has_invalid_neighbours(const bitmap_coordinate & p) const
     {
     	//check if the voxel is valid and on the edge of the box
-    	if(isvalid(bitmap_coordinate(p.x,p.y,p.z))){
+    	if(is_valid(bitmap_coordinate(p.x,p.y,p.z))){
     		//voxel is on the edge of the box, automatically boardering invalid territory
     		if(p.x == 0 
     			|| p.x == width 
@@ -212,8 +212,9 @@ namespace huniplacer
 			 */
 			if(!is_valid(from_real_coordinate(begin))){
 				begin.x -= voxel_size;
-				cstack.push(from_real_coordinate(begin));
-				boundaries_bitmap[coordinate.x + coordinate.y * width + coordinate.z * width * depth] = true;
+				bitmap_coordinate startingVoxel = from_real_coordinate(begin);
+				cstack.push(startingVoxel);
+				boundaries_bitmap[startingVoxel.x + startingVoxel.y * width + startingVoxel.z * width * depth] = true;
 				break;
 			}
 		}
@@ -224,8 +225,11 @@ namespace huniplacer
 		 */
 		if(begin.x >= MAX_X){
 			begin.x -= voxel_size;
-			cstack.push(from_real_coordinate(begin));
-			boundaries_bitmap[coordinate.x + coordinate.y * width + coordinate.z * width * depth] = true;
+			bitmap_coordinate startingVoxel = from_real_coordinate(begin);
+			cstack.push(startingVoxel);
+			boundaries_bitmap[startingVoxel.x 
+				+ startingVoxel.y * width 
+				+ startingVoxel.z * width * depth] = true;
 		}
 
 		/**
@@ -251,8 +255,9 @@ namespace huniplacer
 							 * new valid voxels on the valid border are 
 							 * added to the stack and set in the bitmap
 							 */
+							int index = x + y * width + z * width * depth;
 							if(is_valid(bitmap_coordinate(x, y, z))
-									&& !boundaries_bitmap[x + y * width + z * width * depth]
+									&& !boundaries_bitmap[index]
 								    && has_invalid_neighbours(bitmap_coordinate(x, y, z))){
 								cstack.push(bitmap_coordinate(x, y, z));
 								boundaries_bitmap[index] = true;
