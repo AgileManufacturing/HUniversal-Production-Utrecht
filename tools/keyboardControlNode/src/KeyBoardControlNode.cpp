@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
 				motion.x = 0;
 				motion.y = 0;
 				motion.z = -196;
-				motion.speed = 1;
+				motion.speed = 15;
 				movePathService.request.motion.push_back(motion);
 				deltaRobotClient.call(movePathService);
 			  	break;
@@ -102,7 +102,7 @@ int main(int argc, char** argv) {
 				motion.x = 0;
 				motion.y = 0;
 				motion.z = -210;
-				motion.speed = 1;
+				motion.speed = 15;
 				movePathService.request.motion.push_back(motion);
 				deltaRobotClient.call(movePathService);
 				break;

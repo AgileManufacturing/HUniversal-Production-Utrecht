@@ -115,7 +115,9 @@ namespace huniplacer
                 {
                     //get motion, convert and pop
                     motionf& mf = owner->motion_queue.front();
-                    printf("angles: %lf, %lf, %lf\n", mf.angles[0], mf.angles[1], mf.angles[2]);
+                    printf("angles rad: %lf, %lf, %lf\n", mf.angles[0], mf.angles[1], mf.angles[2]);
+                    printf("angles deg: %lf, %lf, %lf\n", huniplacer::utils::deg(mf.angles[0]), huniplacer::utils::deg(mf.angles[1]), huniplacer::utils::deg(mf.angles[2]));
+                    
                     fflush(stdout);
                     motioni mi;
                     owner->motion_float_to_int(mi, mf);
@@ -170,8 +172,8 @@ namespace huniplacer
 						owner->modbus.write_u16(crd514_kd::slaves::BROADCAST, crd514_kd::registers::CMD_1, crd514_kd::cmd1_bits::EXCITEMENT_ON | crd514_kd::cmd1_bits::START);
 						owner->modbus.write_u16(crd514_kd::slaves::BROADCAST, crd514_kd::registers::CMD_1, crd514_kd::cmd1_bits::EXCITEMENT_ON);
                     }
-                    std::cout << "after powered_on if statement" << std::endl;
                 }
+                    //std::cout << "after powered_on if statement" << std::endl;
                 else //empty
                 {
                     owner->queue_mutex.unlock();
@@ -487,5 +489,36 @@ namespace huniplacer
         modbus.write_u32(crd514_kd::slaves::MOTOR_1, crd514_kd::registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((max_angle + deviation[0]) / crd514_kd::MOTOR_STEP_ANGLE));
         modbus.write_u32(crd514_kd::slaves::MOTOR_2, crd514_kd::registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((max_angle + deviation[1]) / crd514_kd::MOTOR_STEP_ANGLE));
         modbus.write_u32(crd514_kd::slaves::MOTOR_3, crd514_kd::registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((max_angle + deviation[2]) / crd514_kd::MOTOR_STEP_ANGLE));
+    }
+
+    void steppermotor3::disableControllerLimitations(){
+        modbus.write_u16(crd514_kd::slaves::BROADCAST, crd514_kd::registers::OP_SOFTWARE_OVERTRAVEL, 0);
+    }
+
+
+    void steppermotor3::resetCounter(int motorIndex){
+        crd514_kd::slaves::t motor = crd514_kd::slaves::t(crd514_kd::slaves::MOTOR_1 + motorIndex);
+        //clear counter
+
+
+        wait_till_ready();
+        modbus.write_u16(motor, crd514_kd::registers::CMD_1, 0);
+
+        modbus.write_u16(motor, crd514_kd::registers::CLEAR_COUNTER, 1);
+        modbus.write_u16(motor, crd514_kd::registers::CLEAR_COUNTER, 0);
+        modbus.write_u16(motor, crd514_kd::registers::CMD_1, crd514_kd::cmd1_bits::EXCITEMENT_ON);
+    }
+
+    void steppermotor3::setMotorLimits(double minAngle, double maxAngle){
+        //set motors limits
+        set_min_angle(minAngle);
+        set_max_angle(maxAngle);
+    }
+
+    void steppermotor3::set_deviation(const double* deviation){
+        //set deviation
+        this->deviation[0] = deviation[0];
+        this->deviation[1] = deviation[1];
+        this->deviation[2] = deviation[2];
     }
 }

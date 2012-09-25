@@ -58,6 +58,9 @@ namespace huniplacer
 		const double MOTOR2_DEVIATION	  = utils::rad(-45);   //radians
 		const double MOTOR3_DEVIATION	  = utils::rad(-45);   //radians
 
+		// Top (granite) to middle point is 45 degrees. Removing the hip thickness results in +-42.5 degrees!
+		const double MOTORS_DEVIATION	= huniplacer::utils::rad(42.5); 
+
 		/* Robot v1 
 		//make sure all the points that the effector can reach are included in the box
 		// with the following dimensions:

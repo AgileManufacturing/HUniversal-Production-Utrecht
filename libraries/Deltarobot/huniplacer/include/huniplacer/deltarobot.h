@@ -30,9 +30,11 @@
 
 #pragma once
 
+#include <modbus/modbus.h>
 #include <huniplacer/Point3D.h>
 #include <huniplacer/imotor3.h>
 #include <huniplacer/effector_boundaries.h>
+#include <huniplacer/huniplacer.h>
 
 //TODO: implement forward kinematics and use that to calculate the current effector position
 
@@ -50,7 +52,7 @@ namespace huniplacer
     {
         private:
             InverseKinematicsModel& kinematics;
-            imotor3& motors;
+            steppermotor3& motors;
             effector_boundaries* boundaries;
 
             Point3D effector_location;
@@ -64,7 +66,7 @@ namespace huniplacer
              * @param kinematics kinematics model that will be used to convert points to motions
              * @param motors implementation of motor interface that will be used to communicate with the motors
              **/
-            deltarobot(InverseKinematicsModel& kinematics, imotor3& motors);
+            deltarobot(InverseKinematicsModel& kinematics, steppermotor3& motors);
 
             ~deltarobot(void);
             
@@ -86,6 +88,10 @@ namespace huniplacer
              * @param async motions will be stored in a queue for later execution if true
              **/
             void moveto(const Point3D& p, double speed, bool async = true);
+
+            void calibrateMotor(modbus_t* modbus, int motorIndex);
+            bool checkSensor(modbus_t* modbus, int sensorIndex);
+            void calibrateMotors(modbus_t* modbus);
 
             /**
              * @brief stops the motors

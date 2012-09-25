@@ -23,6 +23,7 @@ static void modbus_exhandler(std::exception& ex)
         std::stringstream ss;
         ss << "runtime error of type "<< typeid(ex).name()<<" in delta robot" << std::endl;
         ss <<"what(): " << ex.what()<<std::endl;
+        std::cerr << ss;
 }
 
 
@@ -109,7 +110,19 @@ bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
  */
 int main(int argc, char** argv) {
 	ros::init(argc, argv, NODE_NAME);
-	
+
+    // Initialize modbus for IO controller
+    modbus_t* modbus = modbus_new_tcp("192.168.0.2", 502);
+    if(modbus == NULL)
+    {
+        throw std::runtime_error("Unable to allocate libmodbus context");
+    }
+    if(modbus_connect(modbus) == -1)
+    {
+        throw std::runtime_error("Connection failed");
+    }
+    assert(modbus != NULL);
+
     huniplacer::InverseKinematics kinematics(
     huniplacer::measures::BASE,
     huniplacer::measures::HIP,
@@ -127,14 +140,21 @@ int main(int argc, char** argv) {
 
 	double deviation[3] = {huniplacer::measures::MOTOR1_DEVIATION, huniplacer::measures::MOTOR2_DEVIATION, huniplacer::measures::MOTOR3_DEVIATION};
 	huniplacer::steppermotor3 motors(modbus_rtu, huniplacer::measures::MOTOR_ROT_MIN, huniplacer::measures::MOTOR_ROT_MAX, modbus_exhandler, deviation);
+	
+	// Disable limitations
+	//motors.disableControllerLimitations();
+
+	// power on the motors
 	motors.power_on();
 
+   
     deltarobot = new huniplacer::deltarobot(kinematics, motors);
 
     deltarobot->generate_boundaries(2);
 
     deltarobot->power_on();
 
+    deltarobot->calibrateMotors(modbus);
 
 
 	ros::NodeHandle nodeHandle;

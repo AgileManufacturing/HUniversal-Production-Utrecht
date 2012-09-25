@@ -42,9 +42,10 @@
 #include <huniplacer/InverseKinematicsException.h>
 #include <huniplacer/deltarobot.h>
 
+
 namespace huniplacer
 {
-    deltarobot::deltarobot(InverseKinematicsModel& kinematics, imotor3& motors) :
+    deltarobot::deltarobot(InverseKinematicsModel& kinematics, steppermotor3& motors) :
         kinematics(kinematics),
         motors(motors),
         effector_location(Point3D(0, 0, -161.9)),
@@ -113,6 +114,78 @@ namespace huniplacer
 
         effector_location = p;
     }
+
+    /**
+    Reads calibration sensor and returns whether it is hit.
+    @param modbus The TCP modbus connection for IO controller.
+    @param sensorIndex index of the sensor. This corresponds to the motor index.
+    @returns True if sensor is hit, false otherwise.
+    */
+    bool deltarobot::checkSensor(modbus_t* modbus, int sensorIndex){
+        // The modbus library only reads
+        uint16_t sensorRegister;
+        int result;
+
+        // Read register 8000 -- this register contains the values of the input sensors.
+        result = modbus_read_registers(modbus, 8000, 1, &sensorRegister);
+        if (result == -1) {
+            throw std::runtime_error(modbus_strerror(errno));
+        }
+        return (sensorRegister ^ 7) & 1 << sensorIndex;
+    }
+
+    /**
+    @brief Calibrates a single motor by moving the motor upwards till the calibration sensor is pushed.
+    @param modbus The TCP modbus connection for IO controller.
+    @param motors The StepperMotor class controlling the 3 deltarobot motors.
+    @param motorIndex Index of the motor to be calibrated. When standing in front of the robot looking towards it, 0 is the right motor, 1 is the front motor and 2 is the left motor.
+    */
+    void deltarobot::calibrateMotor(modbus_t* modbus, int motorIndex){
+        std::cout << "Calibrating motor number " << motorIndex << std::endl;
+        
+        // Starting point of calibration
+        double angle = 0;
+
+        // Move motor upwards till the calibration sensor is pushed
+        do {
+            angle -= huniplacer::utils::rad(crd514_kd::MOTOR_STEP_IN_DEGREES);
+            motors.customMoveTo(motorIndex, angle);
+            
+            usleep(25000);
+        } while(!checkSensor(modbus, motorIndex));
+
+        //
+        angle += huniplacer::measures::MOTORS_DEVIATION;
+        motors.customMoveTo(motorIndex, angle);
+        motors.resetCounter(motorIndex);
+        motors.customMoveTo(motorIndex, 0);
+    }
+
+    /**
+    @brief Calibrates all three motors of the deltarobot by moving the motors upwards one by one.
+    After a motor is moved upwards, it is moved back to the 0 degrees state.
+    This function temporarily removes the limitations for the motorcontrollers.
+    @param modbus The TCP modbus connection for IO controller.
+    @param motors The steppermotor3 class controlling the 3 deltarobot motors.
+    */
+    void deltarobot::calibrateMotors(modbus_t* modbus){
+        // Disable limitations
+        motors.disableControllerLimitations();
+        
+        // Calibrate motors
+        calibrateMotor(modbus, 0);
+        calibrateMotor(modbus, 1);
+        calibrateMotor(modbus, 2);
+
+        // Set limitations
+        motors.setMotorLimits(huniplacer::measures::MOTOR_ROT_MIN, huniplacer::measures::MOTOR_ROT_MAX);
+        
+        // Set deviation to 0 for the 3 motors
+        double deviation[3] = {0,0,0};
+        motors.set_deviation(deviation);
+    }
+
+
     
     void deltarobot::stop(void)
     {
