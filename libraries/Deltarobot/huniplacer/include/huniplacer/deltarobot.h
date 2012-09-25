@@ -122,6 +122,8 @@ namespace huniplacer
              * @brief turns on the deltarobot's hardware
              */
             void power_on(void);
+
+            Point3D& getEffectorLocation();
     };
 
     effector_boundaries* deltarobot::get_boundaries(){return boundaries;}

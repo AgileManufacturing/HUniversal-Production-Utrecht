@@ -6,7 +6,9 @@
 #include <cstdlib>
 #include "ros/ros.h"
 #include "deltaRobotNode/MovePath.h"
+#include "deltaRobotNode/MoveToRelativePoint.h"
 #include "deltaRobotNode/Motion.h"
+
 
 
 #define NODE_NAME "KeyBoardControlNode"
@@ -41,8 +43,8 @@ int main(int argc, char** argv) {
 	ros::NodeHandle nodeHandle;
 
 	// Getting MovePath Services
-    ros::ServiceClient deltaRobotClient = nodeHandle.serviceClient<deltaRobotNode::MovePath>("movePath");
-    deltaRobotNode::MovePath movePathService;
+    ros::ServiceClient deltaRobotClient = nodeHandle.serviceClient<deltaRobotNode::MoveToRelativePoint>("moveToRelativePoint");
+    deltaRobotNode::MoveToRelativePoint moveToRelativePointService;
     
 	// Initing the keyboard read and setting up clean shutdown
 	signal(SIGINT, quit);
@@ -69,45 +71,62 @@ int main(int argc, char** argv) {
 		// Check which key was pressed
 		switch(c) {
 			case KEYCODE_LEFT:
-				std::cout << "Left";
+				std::cout << "PRESSED LEFT" << std::endl;
  				break;
 			case KEYCODE_RIGHT:
-				std::cout << "Right";
+				std::cout << "PRESSED RIGHT" << std::endl;
 				break;
 			case KEYCODE_UP:
-				std::cout << "Up";
+				std::cout << "PRESSED UP" << std::endl;
+				moveToRelativePointService.request.motion.x = 0;
+				moveToRelativePointService.request.motion.y = 0;
+				moveToRelativePointService.request.motion.z = 1;
+				moveToRelativePointService.request.motion.speed = 10;
+				deltaRobotClient.call(moveToRelativePointService);
 				break;
 			case KEYCODE_DOWN:
-				std::cout << "Down";
+				std::cout << "PRESSED DOWN" << std::endl;
+				moveToRelativePointService.request.motion.x = 0;
+				moveToRelativePointService.request.motion.y = 0;
+				moveToRelativePointService.request.motion.z = -1;
+				moveToRelativePointService.request.motion.speed = 10;
+				deltaRobotClient.call(moveToRelativePointService);
 				break;
 			case KEYCODE_W:
 				std::cout << "PRESSED W " << std::endl;
+				moveToRelativePointService.request.motion.x = 0;
+				moveToRelativePointService.request.motion.y = 1;
+				moveToRelativePointService.request.motion.z = 0;
+				moveToRelativePointService.request.motion.speed = 10;
+				deltaRobotClient.call(moveToRelativePointService);
 				break;
 			case KEYCODE_A:
 			  	std::cout << "PRESSED A " << std::endl;
 				// change x,y,z to safe coordinates!
-				motion.x = 0;
-				motion.y = 0;
-				motion.z = -196;
-				motion.speed = 15;
-				movePathService.request.motion.push_back(motion);
-				deltaRobotClient.call(movePathService);
+				moveToRelativePointService.request.motion.x = -1;
+				moveToRelativePointService.request.motion.y = 0;
+				moveToRelativePointService.request.motion.z = 0;
+				moveToRelativePointService.request.motion.speed = 10;
+				deltaRobotClient.call(moveToRelativePointService);
 			  	break;
 			case KEYCODE_S:
 				std::cout << "PRESSED S " << std::endl;
+				moveToRelativePointService.request.motion.x = 0;
+				moveToRelativePointService.request.motion.y = -1;
+				moveToRelativePointService.request.motion.z = 0;
+				moveToRelativePointService.request.motion.speed = 10;
+				deltaRobotClient.call(moveToRelativePointService);
 			  	break;
 			case KEYCODE_D:
 			  	std::cout << "PRESSED D " << std::endl;
 				// change x,y,z to safe coordinates!
-				motion.x = 0;
-				motion.y = 0;
-				motion.z = -210;
-				motion.speed = 15;
-				movePathService.request.motion.push_back(motion);
-				deltaRobotClient.call(movePathService);
+				moveToRelativePointService.request.motion.x = +1;
+				moveToRelativePointService.request.motion.y = 0;
+				moveToRelativePointService.request.motion.z = 0;
+				moveToRelativePointService.request.motion.speed = 10;
+				deltaRobotClient.call(moveToRelativePointService);
 				break;
 		}
-		movePathService.request.motion.clear();
 		ros::spinOnce();
 	}
 	return 0;

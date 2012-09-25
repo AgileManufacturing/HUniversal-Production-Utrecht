@@ -41,7 +41,7 @@
 #include <huniplacer/effector_boundaries.h>
 #include <huniplacer/InverseKinematicsException.h>
 #include <huniplacer/deltarobot.h>
-
+#define square(x) ((x)*(x))
 
 namespace huniplacer
 {
@@ -183,6 +183,10 @@ namespace huniplacer
         // Set deviation to 0 for the 3 motors
         double deviation[3] = {0,0,0};
         motors.set_deviation(deviation);
+        effector_location.x = 0;
+        effector_location.y = 0;
+        effector_location.z = -sqrt(square(huniplacer::measures::ANKLE) - square(huniplacer::measures::BASE+huniplacer::measures::HIP-huniplacer::measures::EFFECTOR));
+        std::cout << "effector location z: " << effector_location.z << std::endl; 
     }
 
 
@@ -225,4 +229,9 @@ namespace huniplacer
         	motors.power_on();
         }
     }
+
+    Point3D& deltarobot::getEffectorLocation() {
+        return effector_location;
+    }
 }
+#undef square

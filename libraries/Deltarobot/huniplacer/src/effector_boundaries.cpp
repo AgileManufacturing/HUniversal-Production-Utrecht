@@ -53,8 +53,6 @@ namespace huniplacer
         {
         	boundaries->boundaries_bitmap[i] = false;
         }
-        char c;
-        std::cin >> c;
         boundaries->generate_boundaries_bitmap();
 
         return boundaries;

@@ -92,7 +92,41 @@ bool movePath(deltaRobotNode::MovePath::Request &req,
  */
 bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
 	deltaRobotNode::MoveToRelativePoint::Response &res) {
+	ROS_INFO("moveToRelativePoint called");
+	deltaRobotNode::Motion currentMotion;
+	try {
+		currentMotion = req.motion;
+		huniplacer::Point3D& effectorLocation = deltarobot->getEffectorLocation();
+		ROS_INFO("Current effector location: x: %f y: %f z: %f", effectorLocation.x, effectorLocation.y, effectorLocation.z);
+		double relativeX = effectorLocation.x + currentMotion.x;
+		double relativeY = effectorLocation.y + currentMotion.y;
+		double relativeZ = effectorLocation.z + currentMotion.z;
+		ROS_INFO("Current motion z: %f", currentMotion.z);
 
+		//std::cout << "relativeZ " << relativeZ << std::endl;
+		//ROS_INFO("New effector location: x: %lf y: %lf z: %lf", relativeX, relativeY, relativeZ);
+		if(!deltarobot->check_path(
+				huniplacer::Point3D(effectorLocation.x, effectorLocation.y, effectorLocation.z),
+				huniplacer::Point3D(relativeX, relativeY, relativeZ)))
+		{
+			res.succeeded = false;
+			return true;
+		}
+		deltarobot->moveto(huniplacer::Point3D(relativeX, relativeY, relativeZ), currentMotion.speed);
+		deltarobot->wait_for_idle();
+
+	} catch(std::runtime_error& ex) {
+		std::stringstream ss;
+		ss << "runtime error of type "<< typeid(ex).name()<<" in delta robot" << std::endl;
+		ss <<"what(): " << ex.what()<<std::endl;
+		//msg.errorMsg = ss.str();
+		//msg.errorType = 2;
+		//pub->publish(msg);
+		res.succeeded = false;
+		ROS_ERROR("moveTo: %s", ss.str().c_str());
+	}
+
+    res.succeeded = true;
 	return true;
 }
 
@@ -140,9 +174,6 @@ int main(int argc, char** argv) {
 
 	double deviation[3] = {huniplacer::measures::MOTOR1_DEVIATION, huniplacer::measures::MOTOR2_DEVIATION, huniplacer::measures::MOTOR3_DEVIATION};
 	huniplacer::steppermotor3 motors(modbus_rtu, huniplacer::measures::MOTOR_ROT_MIN, huniplacer::measures::MOTOR_ROT_MAX, modbus_exhandler, deviation);
-	
-	// Disable limitations
-	//motors.disableControllerLimitations();
 
 	// power on the motors
 	motors.power_on();
