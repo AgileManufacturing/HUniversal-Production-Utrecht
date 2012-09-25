@@ -90,12 +90,16 @@ namespace huniplacer
 			bitmap_coordinate temp = from_real_coordinate(Point3D(x, y, z));
 			int index = temp.x + temp.y * width + temp.z * width * depth;
 
-			if(index >= (width * height * depth) || !boundaries_bitmap[index])
-			{
+			if(temp.x < 0
+				|| temp.x > width
+				|| temp.y < 0
+				|| temp.y > depth
+				|| temp.z < 0
+				|| temp.z > height
+				|| !boundaries_bitmap[index]){
 				return false;
 			}
 		}
-
         return true;
     }
 
