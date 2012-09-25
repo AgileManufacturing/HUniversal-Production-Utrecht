@@ -63,7 +63,7 @@ namespace huniplacer
 		 * Function to generate the boundaries and returns a pointer to the object
 		 * @param model used to calculate the boundaries
 		 * @param motors used for the minimum and maximum angle of the motors
-		 * @param voxel_size the size of the voxels
+		 * @param voxel_size the size of the voxels in mm
 		 * @return pointer to the object
 		 */
 		static effector_boundaries* generate_effector_boundaries(const InverseKinematicsModel& model, const imotor3& motors, double voxel_size);
