@@ -42,8 +42,16 @@
 
 namespace huniplacer
 {
+    /**
+     * utils.cpp -> Various utilities
+     **/
     namespace utils
     {
+
+        /**
+         * Get the current time in milliseconds
+         * @return time in milliseconds
+         **/
         long time_now(void)
         {
             boost::posix_time::ptime time = boost::posix_time::microsec_clock::local_time();
@@ -51,16 +59,30 @@ namespace huniplacer
             return duration.total_milliseconds();
         }
         
+        /**
+         * Sleep for X milliseconds
+         * @param ms time in milliseconds
+         **/
         void sleep(long ms)
         {
             boost::this_thread::sleep(boost::posix_time::milliseconds(ms));
         }
 
+        /**
+         * Convert radians to degrees
+         * @param rad radians
+         * @return degrees
+         **/
         double deg(double rad)
 		{
 			return (rad / M_PI) * 180;
 		}
 
+        /**
+         * Convert degrees to radians
+         * @param deg degrees
+         * @return radians
+         **/
 		double rad(double deg)
 		{
 			return (deg / 180) * M_PI;

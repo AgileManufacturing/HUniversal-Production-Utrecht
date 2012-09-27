@@ -48,7 +48,7 @@
 namespace huniplacer {
 /**
  * Inverse Kinematics -> Instances of deltarobot will throw this exception whenever they fail to convert a point.
- */
+ **/
 class InverseKinematicsException: public std::runtime_error {
 private:
 	Point3D notConvertablePoint;
@@ -65,7 +65,7 @@ public:
 
 	/**
 	 * Used to access the point that could not be converted
-	 */
+	 **/
 	Point3D getNotConvertablePoint(void) {
 		return notConvertablePoint;
 	}

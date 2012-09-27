@@ -55,27 +55,27 @@ namespace huniplacer {
 	 *	y-axis goes from front to back
 	 *	z-axis goes from bottom to top
 	 *	point (0,0,0) lies in the middle of all the motors at the motor's height
-	 */
+	 **/
 	class InverseKinematicsModel {
 	protected:
 		/**
 		 * Radius of the base in millimeters
-		 */ 
+		 **/ 
 		const double base;
 
 		/*
 		 * Length of the hip in millimeters
-		 */
+		 **/
 		const double hip;
 
 		/**
 		 * Radius of the effector in millimeters
-		 */ 
+		 **/ 
 		const double effector;
 
-		/*
+		/**
 		 * Length of the ankle in millimeters
-		 */
+		 **/
 		const double ankle;
 
 		InverseKinematicsModel(const double base, const double hip,
@@ -89,16 +89,16 @@ namespace huniplacer {
 		virtual ~InverseKinematicsModel(void) {
 		}
 
-		/* 
+		/** 
 		 * Maximum angle between hip and ankle on x-z plane in radians.
-		 */
+		 **/
 		const double maxAngleHipAnkle;
 
 		/**
 		 * @brief converts a point to a motion
 		 * @param destinationPoint point that shall be converted
 		 * @param motionPointer output parameter, the results of the conversion will be stored here
-		 */
+		 **/
 		virtual void pointToMotion(const Point3D& destinationPoint,
 				motionf& motionPointer) const = 0;
 	};

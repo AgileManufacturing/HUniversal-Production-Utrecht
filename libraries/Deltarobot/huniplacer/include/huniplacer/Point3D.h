@@ -42,61 +42,61 @@
 #include <cmath>
 
 namespace huniplacer {
-/**
- * Point3D.h -> 3 dimensional point class
- */
-class Point3D {
-public:
-	double x, y, z;
-
-	Point3D(double x, double y, double z) :
-			x(x), y(y), z(z) {
-	}
-	~Point3D() {
-	}
-
-	Point3D offset(Point3D& p);
-
-	inline Point3D& operator+=(const Point3D& rhs) {
-		x += rhs.x;
-		y += rhs.y;
-		z += rhs.z;
-		return *this;
-	}
-
-	inline const Point3D operator+(const Point3D& rhs) const {
-		Point3D res = *this;
-		res += rhs;
-		return res;
-	}
-
 	/**
-	 * Calculates the euclidean distance between *this and p
-	 * @return distance
-	 */
-	inline double distance(const Point3D& p) const {
-		double dx = x - p.x;
-		double dy = y - p.y;
-		double dz = z - p.z;
-		return sqrt(dx * dx + dy * dy + dz * dz);
-	}
-
-	/**
-	 * Rotate over the Y axis
-	 * @param phi rotation in radians
-	 */
-	inline Point3D rotateAroundYAxis(double rotationRadians) const {
-		return Point3D(x * cos(rotationRadians) - z * sin(rotationRadians), y,
-				x * sin(rotationRadians) + z * cos(rotationRadians));
-	}
-
-	/**
-	 * Rotate over the Z axis
-	 * @param phi rotation in radians
+	 * Point3D.h -> 3 dimensional point class
 	 **/
-	inline Point3D rotateAroundZAxis(double rotationRadians) const {
-		return Point3D(x * cos(rotationRadians) - y * sin(rotationRadians),
-				x * sin(rotationRadians) + y * cos(rotationRadians), z);
-	}
-};
+	class Point3D {
+	public:
+		double x, y, z;
+
+		Point3D(double x, double y, double z) :
+				x(x), y(y), z(z) {
+		}
+		~Point3D() {
+		}
+
+		Point3D offset(Point3D& p);
+
+		inline Point3D& operator+=(const Point3D& rhs) {
+			x += rhs.x;
+			y += rhs.y;
+			z += rhs.z;
+			return *this;
+		}
+
+		inline const Point3D operator+(const Point3D& rhs) const {
+			Point3D res = *this;
+			res += rhs;
+			return res;
+		}
+
+		/**
+		 * Calculates the euclidean distance between *this and p
+		 * @return distance
+		 **/
+		inline double distance(const Point3D& p) const {
+			double dx = x - p.x;
+			double dy = y - p.y;
+			double dz = z - p.z;
+			return sqrt(dx * dx + dy * dy + dz * dz);
+		}
+
+		/**
+		 * Rotate over the Y axis
+		 * @param phi rotation in radians
+		 **/
+		inline Point3D rotateAroundYAxis(double rotationRadians) const {
+			return Point3D(x * cos(rotationRadians) - z * sin(rotationRadians), y,
+					x * sin(rotationRadians) + z * cos(rotationRadians));
+		}
+
+		/**
+		 * Rotate over the Z axis
+		 * @param phi rotation in radians
+		 **/
+		inline Point3D rotateAroundZAxis(double rotationRadians) const {
+			return Point3D(x * cos(rotationRadians) - y * sin(rotationRadians),
+					x * sin(rotationRadians) + y * cos(rotationRadians), z);
+		}
+	};
 }

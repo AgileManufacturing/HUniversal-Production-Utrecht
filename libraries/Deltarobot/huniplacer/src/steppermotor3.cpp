@@ -50,8 +50,13 @@
 #include <huniplacer/crd514_kd_exception.h>
 #include <huniplacer/motor3_exception.h>
 
+/** 
+ * steppermotor3.cpp -> Implementation of imotor3 for steppermotors
+ **/
+
 namespace huniplacer
 {
+
     steppermotor3::steppermotor3(modbus_t* context, double min_angle, double max_angle, motion_thread_exception_handler exhandler, const double* deviation) :
         imotor3(),
         motion_queue(),
@@ -111,6 +116,13 @@ namespace huniplacer
         return false;
     }
 
+    /**
+     * Function passed to motion_thread
+     * @param owner pointer to object that start the thread
+     * @note (un)locks queue_mutex
+     * @note waits for queue_newitem_flag
+     * @note signals queue_empty_flag
+     **/
     void steppermotor3::motion_thread_func(steppermotor3* owner)
     {
     	using namespace utils;
@@ -236,6 +248,14 @@ namespace huniplacer
         }
     }
 
+    
+    /**
+     * @brief pushes a motion into the motion queue
+     * @param mf a motion
+     * @param async if false: the calling thread will wait until the motion queue is empty
+     * @note signals queue_newitem_flag
+     * @note may wait for queue_empty_flag
+     **/
     void steppermotor3::moveto(const motionf& mf, bool async)
     {
         if(!powered_on)
@@ -271,12 +291,12 @@ namespace huniplacer
     }
 
     /**
-    * Moves a single motor to a certain angle. Does not use the thread queue, is only used in the calibration.
-    * Moves at a speed of 1 radian per second
-    * 
-    * @param motorIndex The index of the motor, 0, 1 or 2. 
-    * @param angle The angle which the motor will move to.
-    */
+     * Moves a single motor to a certain angle. Does not use the thread queue, is only used in the calibration.
+     * Moves at a speed of 1 radian per second
+     * 
+     * @param motorIndex The index of the motor, 0, 1 or 2. 
+     * @param angle The angle which the motor will move to.
+     **/
     void steppermotor3::moveSingleMotor(int motorIndex, double angle){
         boost::lock_guard<boost::mutex> lock(modbus_mutex);
 
@@ -301,6 +321,10 @@ namespace huniplacer
         modbus.write_u16(motor, crd514_kd::registers::CMD_1, crd514_kd::cmd1_bits::EXCITEMENT_ON);
     }
 
+    /**
+     * Stops the motors & clears the motion queue
+     * @note (un)locks queue_mutex
+     **/
     void steppermotor3::stop(void)
     {
     	if(!powered_on)
@@ -377,6 +401,11 @@ namespace huniplacer
 		return true;
     }
 
+    /**
+     * Converts a motion in floating point notation to values for the motor controllers
+     * @param mi angles(0-360), speed(?-?), acceleration(?-?), deceleration(?-?)
+     * @param mf angles(0-5000), speed(?-?), acceleration(?-?), deceleration(?-?)
+     **/
     void steppermotor3::motion_float_to_int(motioni& mi, const motionf& mf)
     {
         for(int i = 0; i < 3; i++)
@@ -398,6 +427,10 @@ namespace huniplacer
         }
     }
 
+    /**
+     * Same as moveto, but rotates to an angle within a certain time.
+     * @param time time in seconds that the motors will take to rotate to the given angle. Speed member of given motion is ignored
+     **/
     void steppermotor3::moveto_within(const motionf & mf, double time, bool async)
     {
         motionf newmf = mf;

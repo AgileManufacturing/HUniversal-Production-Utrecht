@@ -59,14 +59,14 @@
  * - shadowing of certain registers
  * - the ability to write 32-bit values (instead of only 16-bit values)
  * - thread safety
- */
+ **/
 
 namespace huniplacer
 {
     /**
      * Constructor
      * @param context initialized modbus_t
-     */
+     **/
     modbus_ctrl::modbus_ctrl(modbus_t* context) :
         next_write_time(0),
         shadow_registers()
@@ -103,7 +103,7 @@ namespace huniplacer
 
     /**
      * Utility function. used to wait the remaining time till next_write_time.
-     */
+     **/
     void modbus_ctrl::wait(void)
     {
         long delta = next_write_time - utils::time_now();
@@ -115,7 +115,7 @@ namespace huniplacer
 
     /**
      * Calculate a 64-bit value representing the slave and register address
-     */
+     **/
     uint64_t modbus_ctrl::get_shadow_address(crd514_kd::slaves::t slave, uint16_t address)
     {
     	uint16_t s = (uint16_t)slave;
@@ -128,7 +128,7 @@ namespace huniplacer
      * @param address the register address
      * @param out_value output parameter, the value gets stored here
      * @return true if the value was shadowed, false otherwise
-     */
+     **/
     bool modbus_ctrl::get_shadow(crd514_kd::slaves::t slave, uint32_t address, uint16_t& out_value)
     {
         uint64_t a = get_shadow_address(slave, address);
@@ -146,7 +146,7 @@ namespace huniplacer
      * @param slave slave address
      * @param address the registers address
      * @param value the value that will be written
-     */
+     **/
     void modbus_ctrl::set_shadow(crd514_kd::slaves::t slave, uint32_t address, uint16_t value)
     {
         shadow_registers[get_shadow_address(slave, address)] = value;
@@ -157,7 +157,7 @@ namespace huniplacer
      * @param slave slave address
      * @param address the registers address
      * @param value the value that will be written
-     */    
+     **/    
     void modbus_ctrl::set_shadow32(crd514_kd::slaves::t slave, uint32_t address, uint32_t value)
     {
         shadow_registers[get_shadow_address(slave, address+0)] = (value >> 16) & 0xFFFF;
@@ -170,7 +170,7 @@ namespace huniplacer
      * @param address the register address
      * @param data data that will be written
      * @param use_shadow will check if write is necesary by first checking the shadow registers if true
-     */
+     **/
     void modbus_ctrl::write_u16(crd514_kd::slaves::t slave, uint16_t address, uint16_t data, bool use_shadow)
     {
         if(use_shadow)
@@ -211,7 +211,7 @@ namespace huniplacer
      * @param first_address the first registers address
      * @param data data that will be written
      * @param len data length (in words)
-     */
+     **/
     void modbus_ctrl::write_u16(crd514_kd::slaves::t slave, uint16_t first_address, uint16_t* data, unsigned int len)
     {
         if(len > 10)
@@ -243,7 +243,7 @@ namespace huniplacer
      * @param address the register address
      * @param data data that will be written
      * @param use_shadow will check if write is necesary by first checking the shadow registers if true
-     */    
+     **/    
     void modbus_ctrl::write_u32(crd514_kd::slaves::t slave, uint16_t address, uint32_t data, bool use_shadow)
     {
     	try
@@ -319,7 +319,7 @@ namespace huniplacer
      * @param first_address first registers address from which on data will be read
      * @param data will be stored here
      * @param len data length (in words)
-     */    
+     **/    
     void modbus_ctrl::read_u16(crd514_kd::slaves::t slave, uint16_t first_address, uint16_t* data, unsigned int len)
     {
         wait();
@@ -338,7 +338,7 @@ namespace huniplacer
      * @param slave the slave address
      * @param address address from which will be read
      * @return value that was read
-     */    
+     **/    
     uint32_t modbus_ctrl::read_u32(crd514_kd::slaves::t slave, uint16_t address)
     {
         try

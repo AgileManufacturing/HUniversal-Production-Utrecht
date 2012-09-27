@@ -49,97 +49,108 @@
 
 namespace huniplacer
 {
-	/*
+	/**
 	 * This class represents a delta robot's effector work field.
 	 * This work field is stored as a 3D bitmap (bool array).
 	 * Every "pixel" in this map is called a voxel.
-	 */
+	 **/
 	class effector_boundaries
 	{
 	public:
 		~effector_boundaries();
 
-		/*
+		/**
 		 * Function to generate the boundaries and returns a pointer to the object
 		 * @param model used to calculate the boundaries
 		 * @param motors used for the minimum and maximum angle of the motors
 		 * @param voxel_size the size of the voxels in mm
 		 * @return pointer to the object
-		 */
+		 **/
 		static effector_boundaries* generate_effector_boundaries(const InverseKinematicsModel& model, const imotor3& motors, double voxel_size);
-		/*
+		
+		/**
 		 * Checks if the path from the starting to the destination point is not going out of the
 		 * robots boundaries
 		 * @param from the starting point
 		 * @param to the destination point
 		 * @return true if path is valid
-		 */
+		 **/
 		bool check_path(const Point3D& from, const Point3D& to) const;
+		
 		/*
 		 * returns a const bool pointer to the boundaries bitmap
 		 * @return const bool pointer to the boundaries bitmap
 		 */
 		inline const bool* get_bitmap() const;
-		/*
+		
+		/**
 		 * Gets the width of the boundary bitmap
 		 * @return returns the width
-		 */
+		 **/
 		inline int get_width() const;
-		/*
+		
+		/**
 		 * Gets the height of the boundary bitmap
 		 * @return returns the height
-		 */
+		 **/
 		inline int get_height() const;
-		/*
+		
+		/**
 		 * Gets the depth of the boundary bitmap
 		 * @return returns the depth
-		 */
+		 **/
 		inline int get_depth() const;
-		/*
+		
+		/**
 		 * Gets the used voxel_size for this boundary bitmap
 		 * @return returns the used voxel_size
-		 */
+		 **/
 		inline double get_voxel_size() const;
 
 	private:
-		/*
+		
+		/**
 		 * private constructor
 		 * also initializes the voxel array
 		 * @param model used to calculate the boundaries
 		 * @param motors used for the minimum and maximum angle of the motors
 		 * @param voxel_size the size of the voxels
-		 */
+		 **/
 		effector_boundaries(const InverseKinematicsModel& model, const imotor3& motors, double voxel_size);
 
-		/*
+		/**
 		 * represents a location in the 3D voxel array
-		 */
+		 **/
 		typedef struct bitmap_coordinate { int x, y, z; bitmap_coordinate(int x, int y, int z) : x(x), y(y), z(z) {} } bitmap_coordinate;
 
-		/*
+		/**
 		 * Checks if one of the neighbor voxels can't be reached by the effector
 		 * @param p the point in the bitmap
-		 */
+		 **/
 		bool has_invalid_neighbours(const bitmap_coordinate& p) const;
-		/*
+		
+		/**
 		 * Checks if the point is reachable by the effector
 		 * @param the point to reach
-		 */
+		 **/
 		bool is_valid(const bitmap_coordinate& p) const;
-		/*
+		
+		/**
 		 * generates boundaries for the robot
 		 * all members should be initialized before calling this function
-		 */
+		 **/
 		void generate_boundaries_bitmap();
-		/*
+		
+		/**
 		 * converts a bitmap coordinate to a real life coordinate
 		 * @param coordinate the bitmap coordinate
-		 */
+		 **/
 		inline Point3D from_bitmap_coordinate(effector_boundaries::bitmap_coordinate coordinate) const;
-		/*
+		
+		/**
 		 * converts a real life coordinate to a bitmap coordinate
 		 * @param coordinate the real life coordinate
-		 */
+		 **/
 		inline bitmap_coordinate from_real_coordinate(Point3D coordinate) const;
 
 		enum cache_entry

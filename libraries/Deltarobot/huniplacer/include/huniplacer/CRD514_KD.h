@@ -43,7 +43,7 @@
 
 /**
  * CRD514_KD.h -> holds various CRD514_KD related constants
- */
+ **/
 namespace crd514_kd
 {
     const double MOTOR_STEP_ANGLE = (0.072 / 180.) * M_PI;
@@ -51,7 +51,7 @@ namespace crd514_kd
 
     /**
      * crd514_kd slave addresses
-     */
+     **/
     namespace slaves
     {
         typedef enum _t
@@ -64,8 +64,8 @@ namespace crd514_kd
     }
 
     /*
-     *crd514_kd registers
-     */
+     * crd514_kd registers
+     **/
     namespace registers
     {
         enum _registers
@@ -99,7 +99,7 @@ namespace crd514_kd
 
     /*
      * Bits of value at address CMD_1
-     */
+     **/
     namespace cmd1_bits
     {
         enum _cmd1_bits
@@ -112,7 +112,7 @@ namespace crd514_kd
 
     /*
      * Bits of value at address STATUS_1
-     */
+     **/
     namespace status1_bits
     {
         enum _status1_bits
@@ -126,7 +126,7 @@ namespace crd514_kd
 
     /* 
      * Constants used when constructing a modbus rtu (using modbus_new_rtu)
-     */
+     **/
     namespace rtu_config
     {
     	const char DEVICE[] = "/dev/ttyS0";

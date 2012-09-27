@@ -48,7 +48,15 @@
 
 /**
  * InverseKinematics.cpp -> An implementation of the kinematics model
- */
+ * 
+ * ideas from Viacheslav Slavinsky are used
+ * conventions:
+ * sitting in front of delta robot
+ * x-axis goes from left to right
+ * y-axis goes from front to back
+ * z-axis goes from bottom to top
+ * point (0,0,0) lies in the middle of all the motors at the motor's height
+ **/
 
 namespace huniplacer {
 	InverseKinematics::InverseKinematics(const double base, const double hip,
@@ -67,16 +75,9 @@ namespace huniplacer {
 	 * @param destinationPoint point where the midpoint of the effector is wanted.
 	 * @param motorLocation angle of the motor on the z axis where 0 radians is directly in front of the deltarobot.
 	 * @return angle the motor should move to.
-	 */
+	 **/
 	double InverseKinematics::motorAngle(const Point3D& destinationPoint,
 			double motorLocation) const {
-		//ideas from Viacheslav Slavinsky are used
-		//conventions:
-		//	sitting in front of delta robot
-		//	x-axis goes from left to right
-		//	y-axis goes from front to back
-		//	z-axis goes from bottom to top
-		//	point (0,0,0) lies in the middle of all the motors at the motor's height
 
 		//rotate the destination point so calculations can be made as if the motor is always in front
 		//(rotating the point places it in the same position relative to the front motor
@@ -138,9 +139,9 @@ namespace huniplacer {
 	 * @param destinationPoint destination point.
 	 * @param motionPointer output parameter, the resulting motion is stored here.
 	 * @return true on success, false otherwise.
-	 */
+	 **/
 	void InverseKinematics::pointToMotion(const Point3D& destinationPoint, motionf& motionPointer) const {
-		/*
+		/**
 		 * Adding 180 degrees switches 0 degrees for the motor from the 
 		 * midpoint of the engines to directly opposite.
 		 * When determining motorAngle the degrees determine the position of the engines:
@@ -149,7 +150,7 @@ namespace huniplacer {
 		 * when looking at the side the effector is not located
 		 *  240 degrees: this motor is located 240 degrees counter clockwise of the 0 degrees motor
 		 * when looking at the side the effector is not located
-		 */
+		 **/
 		motionPointer.angles[0] = utils::rad(180)
 				+ motorAngle(destinationPoint, utils::rad(1 * 120));
 		motionPointer.angles[1] = utils::rad(180)

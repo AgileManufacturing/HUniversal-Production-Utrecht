@@ -48,7 +48,7 @@ namespace huniplacer
 {
 	/**
 	 * imotor3.h -> Interface for the 3 motors
-	 */
+	 **/
 	class imotor3
     {
         protected:
@@ -61,65 +61,65 @@ namespace huniplacer
              * Rotate the motors
              * @param mf defines the angles, speed, acceleration and deceleration of the motors
              * @param async function is performed asyncronous if true
-             */
+             **/
             virtual void moveto(const motionf& mf, bool async) = 0;
 
             /**
              * Same as moveto, but rotates to an angle within a certain time.
              * @param time time in seconds that the motors will take to rotate to the given angle.  Speed member of given motion is ignored.
-             */
+             **/
             virtual void moveto_within(const motionf& mf, double time, bool async) = 0;
 
             /**
              * Get the minimal angle the motors can move to
              * @return angle in radians
-             */
+             **/
             virtual double get_min_angle(void) const = 0;
 
             /**
              * Get the maximum angle the motors can move to
              * @return angle in radians
-             */
+             **/
             virtual double get_max_angle(void) const = 0;
 
             /**
              * Stops the motors
-             */
+             **/
             virtual void stop(void) = 0;
 
             /**
              * Wait for all motor controllers to become idle
              * @param timeout time in milliseconds until timeout (0 means infinite)
              * @return false if timed out, true otherwise
-             */
+             **/
             virtual bool wait_for_idle(long timeout) = 0;
 
             /**
              * Test whether the motor controllers are idle
              * @return true if idle, false otherwise
-             */
+             **/
             virtual bool is_idle(void) = 0;
 
             /**
              * Shuts down the motors
-             */
+             **/
             virtual void power_off(void) = 0;
 
             /**
-             * @brief turns on the motors
-             */
+             * Turns on the motors
+             **/
             virtual void power_on(void) = 0;
 
             /**
              * Determine if the motor driver(s) are powered on
              * @return true of powered on, false otherwise
-             */
+             **/
             virtual bool is_powerd_on(void) = 0;
 
             /**
              * Synchronises software and real world angels.
              * @param angles the new angles
-             */
+             **/
             virtual void override_current_angles(double * angles) = 0;
     };
 }

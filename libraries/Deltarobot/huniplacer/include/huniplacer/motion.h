@@ -46,7 +46,7 @@
 namespace huniplacer
 {
 	/**
-	 * @brief template class for use in types motioni and motionf (see below)
+	 * motion.h -> Template class for use in types motioni and motionf (see below)
 	 **/
     template<typename T>
     class motion
@@ -94,9 +94,13 @@ namespace huniplacer
             ~motion(void) { }
     };
     
-    /// @brief floating point motion type
+    /**
+     * Floating point motion type
+     **/ 
     typedef motion<double> motionf;
 
-    /// @brief integer motion type
+    /** 
+     * Integer motion type
+     **/
     typedef motion<uint32_t> motioni;
 }

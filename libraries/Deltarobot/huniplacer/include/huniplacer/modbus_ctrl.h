@@ -75,7 +75,7 @@ namespace huniplacer
 
             /** 
              * Values at certain addresses are shadowed here
-             */
+             **/
             shadow_map shadow_registers;
 
             void wait(void);

@@ -55,7 +55,7 @@
 
 /**
  * deltarobot.cpp -> This class symbolises an entire deltarobot
- */
+ **/
 
 namespace huniplacer
 {
@@ -63,7 +63,7 @@ namespace huniplacer
      * Constructor
      * @param kinematics kinematics model that will be used to convert points to motions
      * @param motors implementation of motor interface that will be used to communicate with the motors
-     */
+     **/
     deltarobot::deltarobot(InverseKinematicsModel& kinematics, steppermotor3& motors) :
         kinematics(kinematics),
         motors(motors),
@@ -94,7 +94,7 @@ namespace huniplacer
      * Checks the path between two points
      * @param begin start point
      * @param end finish point
-     */
+     **/
     bool deltarobot::check_path(const Point3D& begin,const Point3D& end)
     {
     	return boundaries->check_path(begin, end);
@@ -105,7 +105,7 @@ namespace huniplacer
      * @param p 3-dimensional point to move to
      * @param speed movement speed in millimeters per second
      * @param async motions will be stored in a queue for later execution if true
-     */
+     **/
     void deltarobot::moveto(const Point3D& p, double speed, bool async)
     {
     	if(!motors.is_powerd_on())
@@ -150,7 +150,7 @@ namespace huniplacer
     * @param modbus The TCP modbus connection for IO controller.
     * @param sensorIndex index of the sensor. This corresponds to the motor index.
     * @returns True if sensor is hit, false otherwise.
-    */
+    **/
     bool deltarobot::checkSensor(modbus_t* modbus, int sensorIndex){
         // The modbus library only reads
         uint16_t sensorRegister;
@@ -169,7 +169,7 @@ namespace huniplacer
     * @param modbus The TCP modbus connection for IO controller.
     * @param motors The StepperMotor class controlling the 3 deltarobot motors.
     * @param motorIndex Index of the motor to be calibrated. When standing in front of the robot looking towards it, 0 is the right motor, 1 is the front motor and 2 is the left motor.
-    */
+    **/
     void deltarobot::calibrateMotor(modbus_t* modbus, int motorIndex){
         std::cout << "Calibrating motor number " << motorIndex << std::endl;
         
@@ -197,7 +197,7 @@ namespace huniplacer
     * This function temporarily removes the limitations for the motorcontrollers.
     * @param modbus The TCP modbus connection for IO controller.
     * @param motors The steppermotor3 class controlling the 3 deltarobot motors.
-    */
+    **/
     void deltarobot::calibrateMotors(modbus_t* modbus){
         // Disable limitations
         motors.disableControllerLimitations();
@@ -221,7 +221,7 @@ namespace huniplacer
 
     /**
      * Stops the motors
-     */    
+     **/    
     void deltarobot::stop(void)
     {
     	if(!motors.is_powerd_on())
@@ -238,7 +238,7 @@ namespace huniplacer
      * and it has stopped moving
      *
      * @param timeout time in milliseconds for the wait to timeout. 0 means infinite
-     */    
+     **/    
     bool deltarobot::wait_for_idle(long timeout)
     {
     	if(motors.is_powerd_on())
@@ -258,7 +258,7 @@ namespace huniplacer
 
     /**
      * Shuts down the deltarobot's hardware
-     */
+     **/
     void huniplacer::deltarobot::power_off(void)
     {
         if(motors.is_powerd_on())
@@ -269,7 +269,7 @@ namespace huniplacer
 
     /**
      * Turns on the deltarobot's hardware
-     */
+     **/
     void huniplacer::deltarobot::power_on(void)
     {
         if(!motors.is_powerd_on())
