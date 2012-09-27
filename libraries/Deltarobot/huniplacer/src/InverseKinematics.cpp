@@ -46,104 +46,122 @@
 
 #include <huniplacer/utils.h>
 
+/**
+ * InverseKinematics.cpp -> An implementation of the kinematics model
+ * 
+ * ideas from Viacheslav Slavinsky are used
+ * conventions:
+ * sitting in front of delta robot
+ * x-axis goes from left to right
+ * y-axis goes from front to back
+ * z-axis goes from bottom to top
+ * point (0,0,0) lies in the middle of all the motors at the motor's height
+ **/
+
 namespace huniplacer {
-InverseKinematics::InverseKinematics(const double base, const double hip,
-		const double effector, const double ankle,
-		const double MaxAngleHipAnkle) :
-		InverseKinematicsModel(base, hip, effector, ankle, MaxAngleHipAnkle) {
-}
-
-InverseKinematics::~InverseKinematics(void) {
-}
-
-#define square(x) ((x)*(x))
-double InverseKinematics::motorAngle(const Point3D& destinationPoint,
-		double motorLocation) const {
-	//ideas from Viacheslav Slavinsky are used
-	//conventions:
-	//	sitting in front of delta robot
-	//	x-axis goes from left to right
-	//	y-axis goes from front to back
-	//	z-axis goes from bottom to top
-	//	point (0,0,0) lies in the middle of all the motors at the motor's height
-
-	//rotate the destination point so calculations can be made as if the motor is always in front
-	//(rotating the point places it in the same position relative to the front motor
-	//as it would be relative to the motor indicated by motor_angle)
-	Point3D destinationPointRotatedAroundZAxis =
-			destinationPoint.rotateAroundZAxis(-motorLocation);
-
-	//places the point towards the "ankle to effector connection"
-	destinationPointRotatedAroundZAxis.y -= effector;
-	//places the point relative to a motor in (x,y,z) = (0,0,0)
-	destinationPointRotatedAroundZAxis.y += base;
-
-	//why is this?
-	double distanceMotorToEffectorOnYAndZAxis = sqrt(
-			square(destinationPointRotatedAroundZAxis.y)
-					+ square(destinationPointRotatedAroundZAxis.z));
-
-	//checks if the "ankle to effector connection" is directly
-	//to the left of, to the right of, or in the motor
-	if (distanceMotorToEffectorOnYAndZAxis == 0) {
-		throw InverseKinematicsException("point out of range",
-				destinationPoint);
+	InverseKinematics::InverseKinematics(const double base, const double hip,
+			const double effector, const double ankle,
+			const double MaxAngleHipAnkle) :
+			InverseKinematicsModel(base, hip, effector, ankle, MaxAngleHipAnkle) {
 	}
 
-	//to calculate alpha, the angle between actuator arm and goal vector
-	double alpha_acos_input = (square(destinationPointRotatedAroundZAxis.x)
-			- square(ankle) + square(hip)
-			+ square(distanceMotorToEffectorOnYAndZAxis))
-			/ (2 * hip * distanceMotorToEffectorOnYAndZAxis);
-
-	if (alpha_acos_input < -1 || alpha_acos_input > 1) {
-		throw InverseKinematicsException("point out of range",
-				destinationPoint);
+	InverseKinematics::~InverseKinematics(void) {
 	}
 
-	//the required angle between actuator arm and goal vector
-	double alpha = acos(alpha_acos_input);
-	//the required angle between the base and goal vector
-	double beta = atan2(destinationPointRotatedAroundZAxis.z,
-			destinationPointRotatedAroundZAxis.y);
-	//the required angle between actuator arm and base (0 degrees)
-	double rho = beta - alpha;
+	#define square(x) ((x)*(x))
 
-	double hip_ankle_angle = asin(
-			abs(destinationPointRotatedAroundZAxis.x) / ankle);
-	if (hip_ankle_angle > maxAngleHipAnkle) {
-		throw InverseKinematicsException(
-				"angle between hip and ankle is out of range",
-				destinationPoint);
+	/**
+	 * Translates a point to an angle for a motor.
+	 * @param destinationPoint point where the midpoint of the effector is wanted.
+	 * @param motorLocation angle of the motor on the z axis where 0 radians is directly in front of the deltarobot.
+	 * @return angle the motor should move to.
+	 **/
+	double InverseKinematics::motorAngle(const Point3D& destinationPoint,
+			double motorLocation) const {
+
+		//rotate the destination point so calculations can be made as if the motor is always in front
+		//(rotating the point places it in the same position relative to the front motor
+		//as it would be relative to the motor indicated by motor_angle)
+		Point3D destinationPointRotatedAroundZAxis =
+				destinationPoint.rotateAroundZAxis(-motorLocation);
+
+		//places the point towards the "ankle to effector connection"
+		destinationPointRotatedAroundZAxis.y -= effector;
+		//places the point relative to a motor in (x,y,z) = (0,0,0)
+		destinationPointRotatedAroundZAxis.y += base;
+
+		//why is this?
+		double distanceMotorToEffectorOnYAndZAxis = sqrt(
+				square(destinationPointRotatedAroundZAxis.y)
+						+ square(destinationPointRotatedAroundZAxis.z));
+
+		//checks if the "ankle to effector connection" is directly
+		//to the left of, to the right of, or in the motor
+		if (distanceMotorToEffectorOnYAndZAxis == 0) {
+			throw InverseKinematicsException("point out of range",
+					destinationPoint);
+		}
+
+		//to calculate alpha, the angle between actuator arm and goal vector
+		double alpha_acos_input = (square(destinationPointRotatedAroundZAxis.x)
+				- square(ankle) + square(hip)
+				+ square(distanceMotorToEffectorOnYAndZAxis))
+				/ (2 * hip * distanceMotorToEffectorOnYAndZAxis);
+
+		if (alpha_acos_input < -1 || alpha_acos_input > 1) {
+			throw InverseKinematicsException("point out of range",
+					destinationPoint);
+		}
+
+		//the required angle between actuator arm and goal vector
+		double alpha = acos(alpha_acos_input);
+		//the required angle between the base and goal vector
+		double beta = atan2(destinationPointRotatedAroundZAxis.z,
+				destinationPointRotatedAroundZAxis.y);
+		//the required angle between actuator arm and base (0 degrees)
+		double rho = beta - alpha;
+
+		double hip_ankle_angle = asin(
+				abs(destinationPointRotatedAroundZAxis.x) / ankle);
+		if (hip_ankle_angle > maxAngleHipAnkle) {
+			throw InverseKinematicsException(
+					"angle between hip and ankle is out of range",
+					destinationPoint);
+		}
+
+		return rho;
 	}
+	#undef square
 
-	return rho;
-}
-#undef square
 
-void InverseKinematics::pointToMotion(const Point3D& destinationPoint,
-		motionf& motionPointer) const {
-	/*
-	 * Adding 180 degrees switches 0 degrees for the motor from the 
-	 * midpoint of the engines to directly opposite.
-	 * When determining motorAngle the degrees determine the position of the engines:
-	 * 	  0 degrees: the hip from this motor moves on the yz plane
-	 *  120 degrees: this motor is located 120 degrees counter clockwise of the 0 degrees motor 
-	 * when looking at the side the effector is not located
-	 *  240 degrees: this motor is located 240 degrees counter clockwise of the 0 degrees motor
-	 * when looking at the side the effector is not located
-	 */
-	motionPointer.angles[0] = utils::rad(180)
-			+ motorAngle(destinationPoint, utils::rad(1 * 120));
-	motionPointer.angles[1] = utils::rad(180)
-			+ motorAngle(destinationPoint, utils::rad(0 * 120));
-	motionPointer.angles[2] = utils::rad(180)
-			+ motorAngle(destinationPoint, utils::rad(2 * 120));
+	/**
+	 * Translates a point to a motion.
+	 * @param destinationPoint destination point.
+	 * @param motionPointer output parameter, the resulting motion is stored here.
+	 * @return true on success, false otherwise.
+	 **/
+	void InverseKinematics::pointToMotion(const Point3D& destinationPoint, motionf& motionPointer) const {
+		/**
+		 * Adding 180 degrees switches 0 degrees for the motor from the 
+		 * midpoint of the engines to directly opposite.
+		 * When determining motorAngle the degrees determine the position of the engines:
+		 * 	  0 degrees: the hip from this motor moves on the yz plane
+		 *  120 degrees: this motor is located 120 degrees counter clockwise of the 0 degrees motor 
+		 * when looking at the side the effector is not located
+		 *  240 degrees: this motor is located 240 degrees counter clockwise of the 0 degrees motor
+		 * when looking at the side the effector is not located
+		 **/
+		motionPointer.angles[0] = utils::rad(180)
+				+ motorAngle(destinationPoint, utils::rad(1 * 120));
+		motionPointer.angles[1] = utils::rad(180)
+				+ motorAngle(destinationPoint, utils::rad(0 * 120));
+		motionPointer.angles[2] = utils::rad(180)
+				+ motorAngle(destinationPoint, utils::rad(2 * 120));
 
-	motionPointer.acceleration[0] = motionPointer.acceleration[1] =
-			motionPointer.acceleration[2] = utils::rad(3600);
-	motionPointer.deceleration[0] = motionPointer.deceleration[1] =
-			motionPointer.deceleration[2] = utils::rad(3600);
-}
+		motionPointer.acceleration[0] = motionPointer.acceleration[1] =
+				motionPointer.acceleration[2] = utils::rad(3600);
+		motionPointer.deceleration[0] = motionPointer.deceleration[1] =
+				motionPointer.deceleration[2] = utils::rad(3600);
+	}
 }
 

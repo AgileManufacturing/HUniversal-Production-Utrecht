@@ -47,39 +47,15 @@
 
 namespace huniplacer
 {
-	/**
-	 * @brief various utilities
-	 **/
     namespace utils
     {
-    	/**
-    	 * @brief get the current time in milliseconds
-    	 * @return time in milliseconds
-    	 **/
         long time_now(void);
-
-        /**
-         * @brief sleep for X milliseconds
-         * @param ms time in milliseconds
-         **/
         void sleep(long ms);
-
-        /**
-         * @brief convert radians to degrees
-         * @param rad radians
-         * @return degrees
-         **/
         double deg(double rad);
-
-        /**
-         * @brief convert degrees to radians
-         * @param deg degrees
-         * @return radians
-         **/
         double rad(double deg);
 
         /**
-         * @brief utility class to time stuff
+         * Utility class to time stuff
          * @note TEMPORARY
          **/
         class stopwatch
@@ -97,7 +73,8 @@ namespace huniplacer
 				~stopwatch(void) { }
 				void start(void) { t0 = time_now(); }
 				void stop(void) { t1 = time_now(); }
-				void print(FILE* stream)
+				
+                void print(FILE* stream)
 				{
 					fprintf(stream, "%s: %ld ms\n", name, t1 - t0);
 				}

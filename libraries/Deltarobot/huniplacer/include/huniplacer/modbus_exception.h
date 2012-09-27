@@ -50,16 +50,20 @@
 namespace huniplacer
 {
 	/**
-	 * @brief exception to indicate modbus errors
+	 * modbus_exception.h -> Exception to indicate modbus errors
 	 *
 	 * modbus_ctrl can throw this exception whenever a modbus related error occurs
 	 **/
     class modbus_exception : public std::runtime_error
     {
         private:
-    		/// @brief modbus error code
+    		/**
+             * modbus error code
+             **/
             const int error_code;
-            /// @brief modbus error string (obtained using modbus_strerror)
+            /** 
+             * modbus error string (obtained using modbus_strerror)
+             **/ 
             std::string msg;
             
         public:

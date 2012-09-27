@@ -49,7 +49,7 @@
 namespace huniplacer
 {
 	/**
-	 * @brief raised if the alarm flag is set
+	 * Raised if the alarm flag is set
 	 **/
 	class crd514_kd_exception : public std::runtime_error
 	{
