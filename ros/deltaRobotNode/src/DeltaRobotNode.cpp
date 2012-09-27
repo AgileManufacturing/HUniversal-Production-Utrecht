@@ -204,7 +204,7 @@ int main(int argc, char** argv) {
 	huniplacer::steppermotor3 motors(modbus_rtu, huniplacer::measures::MOTOR_ROT_MIN, huniplacer::measures::MOTOR_ROT_MAX, modbus_exhandler, deviation);
 
 	// power on the motors
-	motors.power_on();
+	//motors.power_on();
 
    
     deltarobot = new huniplacer::deltarobot(kinematics, motors);

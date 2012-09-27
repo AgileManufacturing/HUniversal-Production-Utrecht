@@ -4,8 +4,8 @@
 //
 //******************************************************************************
 // Project:        huniplacer
-// File:           measures.h
-// Description:    miscellaneous measures
+// File:           crd514_kd_exception.h
+// Description:    exception thrown if the motorcontroller alarm flag is set
 // Author:         Lukas Vermond & Kasper van Nieuwland
 // Notes:          -
 //
@@ -39,38 +39,28 @@
 
 
 #pragma once
-#include <huniplacer/utils.h>
+
+#include <huniplacer/effector_boundaries.h>
+
+#include <stdexcept>
+#include <string>
+#include <sstream>
+
 
 namespace huniplacer
 {
-	namespace measures
-	{
-		/* Robot v2 */
-		const double BASE 				  = 101.3; //mm
-		const double HIP 				  = 100; //mm
-		const double EFFECTOR			  = 46.19; //mm
-		const double ANKLE 				  = 250; //mm
-		
-		const double HIP_ANKLE_ANGLE_MAX  = utils::rad(22);    //radians
-		//safety constants, roughly determined to be as safe as possible for testing purposes
-		const double MOTOR_ROT_MIN 	      = utils::rad(-42);   //radians
-		const double MOTOR_ROT_MAX 	      = utils::rad(45);    //radians
 
-		const double MOTOR1_DEVIATION	  = utils::rad(-45);   //radians
-		const double MOTOR2_DEVIATION	  = utils::rad(-45);   //radians
-		const double MOTOR3_DEVIATION	  = utils::rad(-45);   //radians
 
-		// Top (granite) to middle point is 45 degrees. Removing the hip thickness results in +-42.5 degrees!
-		const double MOTORS_DEVIATION	= huniplacer::utils::rad(42.5); 
-
-		/* Robot v2 */
-		//make sure all the points that the effector can reach are included in the box
-		// with the following dimensions:
- 		const double MAX_X = 500;
-		const double MAX_Y = MAX_X;
-		const double MIN_X = -MAX_X;
-		const double MIN_Y = -MAX_Y;
-		const double MIN_Z = -250;
-		const double MAX_Z = -180;
-	}
+	/**
+	 * @brief exception to indicate modbus errors
+	 *
+	 * modbus_ctrl can throw this exception whenever a modbus related error occurs
+	 **/
+    class effector_boundaries_exception : public std::runtime_error
+    {
+        public:
+            effector_boundaries_exception(const std::string& msg) :
+                std::runtime_error(msg)
+            {}
+    };
 }

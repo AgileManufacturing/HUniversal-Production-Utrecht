@@ -48,6 +48,7 @@
 #include <huniplacer/utils.h>
 #include <huniplacer/CRD514_KD.h>
 #include <huniplacer/crd514_kd_exception.h>
+#include <huniplacer/effector_boundaries_exception.h>
 #include <huniplacer/motor3_exception.h>
 
 namespace huniplacer
@@ -227,7 +228,7 @@ namespace huniplacer
         		if((status_1 & crd514_kd::status1_bits::ALARM) ||
         		   (status_1 & crd514_kd::status1_bits::WARNING))
         		{
-                    std::cout << "Motor: " << i << "Alarm code: " << modbus.read_u16(slaves[i], 0x100);
+                    std::cout << "Motor: " << i << " Alarm code: " << std::hex << modbus.read_u16(slaves[i], 0x100) << "h" << std::endl;
         			throw crd514_kd_exception(
         				slaves[i], status_1 & crd514_kd::status1_bits::WARNING,
         				status_1 & crd514_kd::status1_bits::ALARM);
@@ -291,8 +292,7 @@ namespace huniplacer
         modbus.write_u32(motor, crd514_kd::registers::OP_POS, motorSteps, true);
         modbus.write_u32(motor, crd514_kd::registers::OP_ACC, motorAcceleration, true);
         modbus.write_u32(motor, crd514_kd::registers::OP_DEC, motorDeceleration, true);
-
-        
+  
         //execute motion
         wait_till_ready();
 
@@ -515,12 +515,11 @@ namespace huniplacer
 
     void steppermotor3::resetCounter(int motorIndex){
         crd514_kd::slaves::t motor = crd514_kd::slaves::t(crd514_kd::slaves::MOTOR_1 + motorIndex);
-        //clear counter
-
 
         wait_till_ready();
         modbus.write_u16(motor, crd514_kd::registers::CMD_1, 0);
 
+        //clear counter
         modbus.write_u16(motor, crd514_kd::registers::CLEAR_COUNTER, 1);
         modbus.write_u16(motor, crd514_kd::registers::CLEAR_COUNTER, 0);
         modbus.write_u16(motor, crd514_kd::registers::CMD_1, crd514_kd::cmd1_bits::EXCITEMENT_ON);

@@ -38,9 +38,11 @@
 //******************************************************************************
 
 #include <huniplacer/utils.h>
-#include <huniplacer/crd514_kd_exception.h>
 #include <huniplacer/CRD514_KD.h>
+#include <huniplacer/crd514_kd_exception.h>
 #include <huniplacer/deltarobot.h>
+#include <huniplacer/effector_boundaries.h>
+#include <huniplacer/effector_boundaries_exception.h>
 #include <huniplacer/imotor3.h>
 #include <huniplacer/InverseKinematicsException.h>
 #include <huniplacer/InverseKinematics.h>
@@ -49,7 +51,8 @@
 #include <huniplacer/modbus_ctrl.h>
 #include <huniplacer/modbus_exception.h>
 #include <huniplacer/motion.h>
+#include <huniplacer/motor3_exception.h>
 #include <huniplacer/Point3D.h>
 #include <huniplacer/steppermotor3.h>
-#include <huniplacer/motor3_exception.h>
-#include <huniplacer/effector_boundaries.h>
+
+
