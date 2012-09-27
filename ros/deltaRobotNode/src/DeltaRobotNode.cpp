@@ -46,7 +46,8 @@
  static huniplacer::deltarobot * deltarobot;
 
 /**
- * Callback function that gets called by the deltarobot thread when an exception occured in it.
+ * Callback function that gets called by the deltarobot thread when an exception occured in it
+ *
  * @param ex the exception that has occured 
  */
 static void modbus_exhandler(std::exception& ex)
@@ -59,8 +60,11 @@ static void modbus_exhandler(std::exception& ex)
 
 /*
  * Move to an absolute point. Will be implemented in a later release.
- * @param req The request for this service 
- * @param res The response for this service
+ *
+ * @param req The request for this service as defined in moveToPoint.srv 
+ * @param res The response for this service as defined in moveToPoint.srv
+ * 
+ * @return true
  */
 bool moveToPoint(deltaRobotNode::MoveToPoint::Request &req,
 	deltaRobotNode::MoveToPoint::Response &res) {
@@ -70,8 +74,11 @@ bool moveToPoint(deltaRobotNode::MoveToPoint::Request &req,
 
 /*
  * Move to a number of absolute points.
- * @param req The request for this service 
- * @param res The response for this service
+ *
+ * @param req The request for this service as defined in movePath.srv 
+ * @param res The response for this service as defined in movePath.srv
+ * 
+ * @return true
  */
 bool movePath(deltaRobotNode::MovePath::Request &req,
 	deltaRobotNode::MovePath::Response &res) {
@@ -116,8 +123,11 @@ bool movePath(deltaRobotNode::MovePath::Request &req,
 
 /**
  * Move to a point that is relative to the current effector location
- * @param req The request for this service
- * @param res The response for this service
+ *
+ * @param req The request for this service as defined in MoveToRelativePoint.srv 
+ * @param res The response for this service as defined in MoveToRelativePoint.srv
+ * 
+ * @return true
  */
 bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
 	deltaRobotNode::MoveToRelativePoint::Response &res) {
@@ -159,8 +169,11 @@ bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
 
 /*
  * Move to a number of relative points. Will be implemented in a later release
- * @param req The request message for this service
- * @param res The response message for this service
+ *
+ * @param req The request for this service as defined in moveRelativePath.srv 
+ * @param res The response for this service as defined in moveRelativePath.srv
+ *
+ * @return true
  */
 bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
 	deltaRobotNode::MoveRelativePath::Response &res) {
@@ -200,20 +213,21 @@ int main(int argc, char** argv) {
 	double deviation[3] = {huniplacer::measures::MOTOR1_DEVIATION, huniplacer::measures::MOTOR2_DEVIATION, huniplacer::measures::MOTOR3_DEVIATION};
 	huniplacer::steppermotor3 motors(modbus_rtu, huniplacer::measures::MOTOR_ROT_MIN, huniplacer::measures::MOTOR_ROT_MAX, modbus_exhandler, deviation);
 
-	// Create a deltarobot. 
-	// Generate the effector boundaries.
-	// Power on the deltarobot and calibrate the motors.
+	// Create a deltarobot	
     deltarobot = new huniplacer::deltarobot(kinematics, motors);
 
+    // Generate the effector boundaries with voxel size 2
     deltarobot->generate_boundaries(2);
 
+	// Power on the deltarobot and calibrate the motors.
     deltarobot->power_on();
 
+    // Calibrate the motors
     deltarobot->calibrateMotors(modbus);
 
-    // Advertise the services
 	ros::NodeHandle nodeHandle;
 
+	// Advertise the services
 	ros::ServiceServer moveToPointService =
 		nodeHandle.advertiseService("moveToPoint", moveToPoint);
 
