@@ -45,34 +45,19 @@
 #include <huniplacer/InverseKinematicsModel.h>
 
 namespace huniplacer {
-/**
- * @brief an implementation of the kinematics model
- **/
-class InverseKinematics: public InverseKinematicsModel {
-private:
-	/**
-	 * @brief translates a point to an angle for a motor
-	 * @param destinationPoint point where the midpoint of the effector is wanted
-	 * @param motorLocation angle of the motor on the z axis where 0 radians is directly in front of the deltarobot
-	 * @return angle the motor should move to
-	 **/
-	double motorAngle(const Point3D& destinationPoint,
-			double motorLocation) const;
+	class InverseKinematics: public InverseKinematicsModel {
+	private:
+		double motorAngle(const Point3D& destinationPoint,
+				double motorLocation) const;
 
-public:
-	InverseKinematics(const double base, const double hip,
-			const double effector, const double ankle,
-			const double hip_ankle_angle_max);
+	public:
+		InverseKinematics(const double base, const double hip,
+				const double effector, const double ankle,
+				const double hip_ankle_angle_max);
 
-	virtual ~InverseKinematics(void);
-
-	/**
-	 * @brief translates a point to a motion
-	 * @param destinationPoint destination point
-	 * @param motionPointer output parameter, the resulting motion is stored here
-	 * @return true on success, false otherwise
-	 **/
-	void pointToMotion(const Point3D& destinationPoint,
-			motionf& motionPointer) const;
-};
+		virtual ~InverseKinematics(void);
+		
+		void pointToMotion(const Point3D& destinationPoint,
+				motionf& motionPointer) const;
+	};
 }
