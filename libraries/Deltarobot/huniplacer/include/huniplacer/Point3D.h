@@ -42,7 +42,9 @@
 #include <cmath>
 
 namespace huniplacer {
-/// @brief 3 dimensional point class
+/**
+ * Point3D.h -> 3 dimensional point class
+ */
 class Point3D {
 public:
 	double x, y, z;
@@ -69,9 +71,9 @@ public:
 	}
 
 	/**
-	 * @brief calculates the euclidean distance between *this and p
+	 * Calculates the euclidean distance between *this and p
 	 * @return distance
-	 **/
+	 */
 	inline double distance(const Point3D& p) const {
 		double dx = x - p.x;
 		double dy = y - p.y;
@@ -80,16 +82,16 @@ public:
 	}
 
 	/**
-	 * @brief rotate over the Y axis
+	 * Rotate over the Y axis
 	 * @param phi rotation in radians
-	 **/
+	 */
 	inline Point3D rotateAroundYAxis(double rotationRadians) const {
 		return Point3D(x * cos(rotationRadians) - z * sin(rotationRadians), y,
 				x * sin(rotationRadians) + z * cos(rotationRadians));
 	}
 
 	/**
-	 * @brief rotate over the Z axis
+	 * Rotate over the Z axis
 	 * @param phi rotation in radians
 	 **/
 	inline Point3D rotateAroundZAxis(double rotationRadians) const {

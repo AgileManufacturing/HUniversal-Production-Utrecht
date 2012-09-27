@@ -44,52 +44,62 @@
 #include <huniplacer/motion.h>
 
 namespace huniplacer {
-/**
- * @brief kinematics model of the deltarobot
- *
- * uses various lengths and sizes to calculate a point to a motion
- *
- *  conventions:
- *	sitting in front of delta robot
- *	x-axis goes from left to right
- *	y-axis goes from front to back
- *	z-axis goes from bottom to top
- *	point (0,0,0) lies in the middle of all the motors at the motor's height
- **/
-class InverseKinematicsModel {
-protected:
-	/// @brief radius of the base in millimeters
-	const double base;
-
-	/// @brief length of the hip in millimeters
-	const double hip;
-
-	/// @brief radius of the effector in millimeters
-	const double effector;
-
-	/// @brief length of the ankle in millimeters
-	const double ankle;
-
-	InverseKinematicsModel(const double base, const double hip,
-			const double effector, const double ankle,
-			const double maxAngleHipAnkle) :
-			base(base), hip(hip), effector(effector), ankle(ankle), maxAngleHipAnkle(
-					maxAngleHipAnkle) {
-	}
-
-public:
-	virtual ~InverseKinematicsModel(void) {
-	}
-
-	/// @brief maximum angle between hip and ankle on x-z plane in radians
-	const double maxAngleHipAnkle;
-
 	/**
-	 * @brief converts a point to a motion
-	 * @param destinationPoint point that shall be converted
-	 * @param motionPointer output parameter, the results of the conversion will be stored here
-	 **/
-	virtual void pointToMotion(const Point3D& destinationPoint,
-			motionf& motionPointer) const = 0;
-};
+	 * InverseKinematicsModel.h -> kinematics model of the deltarobot.
+	 *
+	 * Uses various lengths and sizes to calculate a point to a motion.
+	 *
+	 *  conventions:
+	 *	sitting in front of delta robot
+	 *	x-axis goes from left to right
+	 *	y-axis goes from front to back
+	 *	z-axis goes from bottom to top
+	 *	point (0,0,0) lies in the middle of all the motors at the motor's height
+	 */
+	class InverseKinematicsModel {
+	protected:
+		/**
+		 * Radius of the base in millimeters
+		 */ 
+		const double base;
+
+		/*
+		 * Length of the hip in millimeters
+		 */
+		const double hip;
+
+		/**
+		 * Radius of the effector in millimeters
+		 */ 
+		const double effector;
+
+		/*
+		 * Length of the ankle in millimeters
+		 */
+		const double ankle;
+
+		InverseKinematicsModel(const double base, const double hip,
+				const double effector, const double ankle,
+				const double maxAngleHipAnkle) :
+				base(base), hip(hip), effector(effector), ankle(ankle), maxAngleHipAnkle(
+						maxAngleHipAnkle) {
+		}
+
+	public:
+		virtual ~InverseKinematicsModel(void) {
+		}
+
+		/* 
+		 * Maximum angle between hip and ankle on x-z plane in radians.
+		 */
+		const double maxAngleHipAnkle;
+
+		/**
+		 * @brief converts a point to a motion
+		 * @param destinationPoint point that shall be converted
+		 * @param motionPointer output parameter, the results of the conversion will be stored here
+		 */
+		virtual void pointToMotion(const Point3D& destinationPoint,
+				motionf& motionPointer) const = 0;
+	};
 }
