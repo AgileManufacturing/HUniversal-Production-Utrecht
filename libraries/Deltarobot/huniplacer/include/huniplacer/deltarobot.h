@@ -77,7 +77,7 @@ namespace huniplacer
             void moveto(const Point3D& p, double speed, bool async = true);
             void calibrateMotor(modbus_t* modbus, int motorIndex);
             bool checkSensor(modbus_t* modbus, int sensorIndex);
-            void calibrateMotors(modbus_t* modbus);
+            bool calibrateMotors(modbus_t* modbus);
             void stop(void);
             bool wait_for_idle(long timeout = 0);
             bool is_idle(void);

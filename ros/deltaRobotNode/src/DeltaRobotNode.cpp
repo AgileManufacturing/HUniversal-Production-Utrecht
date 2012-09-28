@@ -222,7 +222,10 @@ int main(int argc, char** argv) {
     deltarobot->power_on();
 
     // Calibrate the motors
-    deltarobot->calibrateMotors(modbus);
+    if(!deltarobot->calibrateMotors(modbus)){
+    	ROS_ERROR("Calibration FAILED. EXITING.");
+    	return 1;
+    }
 
 	ros::NodeHandle nodeHandle;
 
