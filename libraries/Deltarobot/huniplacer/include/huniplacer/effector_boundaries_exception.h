@@ -4,8 +4,8 @@
 //
 //******************************************************************************
 // Project:        huniplacer
-// File:           huniplacer.h
-// Description:    convenience include
+// File:           crd514_kd_exception.h
+// Description:    exception thrown if the motorcontroller alarm flag is set
 // Author:         Lukas Vermond & Kasper van Nieuwland
 // Notes:          -
 //
@@ -37,22 +37,30 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //******************************************************************************
 
-#include <huniplacer/utils.h>
-#include <huniplacer/CRD514_KD.h>
-#include <huniplacer/crd514_kd_exception.h>
-#include <huniplacer/deltarobot.h>
+
+#pragma once
+
 #include <huniplacer/effector_boundaries.h>
-#include <huniplacer/effector_boundaries_exception.h>
-#include <huniplacer/imotor3.h>
-#include <huniplacer/InverseKinematicsException.h>
-#include <huniplacer/InverseKinematics.h>
-#include <huniplacer/InverseKinematicsModel.h>
-#include <huniplacer/measures.h>
-#include <huniplacer/modbus_ctrl.h>
-#include <huniplacer/modbus_exception.h>
-#include <huniplacer/motion.h>
-#include <huniplacer/motor3_exception.h>
-#include <huniplacer/Point3D.h>
-#include <huniplacer/steppermotor3.h>
+
+#include <stdexcept>
+#include <string>
+#include <sstream>
 
 
+namespace huniplacer
+{
+
+
+	/**
+	 * @brief exception to indicate modbus errors
+	 *
+	 * modbus_ctrl can throw this exception whenever a modbus related error occurs
+	 **/
+    class effector_boundaries_exception : public std::runtime_error
+    {
+        public:
+            effector_boundaries_exception(const std::string& msg) :
+                std::runtime_error(msg)
+            {}
+    };
+}

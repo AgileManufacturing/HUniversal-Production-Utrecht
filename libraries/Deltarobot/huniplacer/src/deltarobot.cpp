@@ -149,7 +149,7 @@ namespace huniplacer
     * Reads calibration sensor and returns whether it is hit.
     * @param modbus The TCP modbus connection for IO controller.
     * @param sensorIndex index of the sensor. This corresponds to the motor index.
-    * @returns True if sensor is hit, false otherwise.
+    * @return True if sensor is hit, false otherwise.
     **/
     bool deltarobot::checkSensor(modbus_t* modbus, int sensorIndex){
         // The modbus library only reads
@@ -197,8 +197,30 @@ namespace huniplacer
     * This function temporarily removes the limitations for the motorcontrollers.
     * @param modbus The TCP modbus connection for IO controller.
     * @param motors The steppermotor3 class controlling the 3 deltarobot motors.
+    * @return True if the calibration was succesful. False otherwise (eg. failure on sensors.)
     **/
-    void deltarobot::calibrateMotors(modbus_t* modbus){
+    bool deltarobot::calibrateMotors(modbus_t* modbus){
+        // Check the availability of the sensors
+        bool sensorFailure = false;
+        if(checkSensor(modbus, 0)){
+            std::cout << "Sensor 1 failure (is the hardware connected?)" << std::endl;
+            sensorFailure = true;
+        }
+
+        if(checkSensor(modbus, 1)){
+            std::cout << "Sensor 2 failure (is the hardware connected?)" << std::endl;
+            sensorFailure = true;
+        }
+
+        if(checkSensor(modbus, 2)){
+            std::cout << "Sensor 3 failure (is the hardware connected?)" << std::endl;
+            sensorFailure = true;
+        }
+
+        if(sensorFailure){
+            return false;
+        }
+
         // Disable limitations
         motors.disableControllerLimitations();
         
@@ -217,6 +239,8 @@ namespace huniplacer
         effector_location.y = 0;
         effector_location.z = -sqrt(square(huniplacer::measures::ANKLE) - square(huniplacer::measures::BASE+huniplacer::measures::HIP-huniplacer::measures::EFFECTOR));
         std::cout << "effector location z: " << effector_location.z << std::endl; 
+
+        return true;
     }
 
     /**

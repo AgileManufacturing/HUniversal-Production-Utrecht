@@ -66,13 +66,11 @@ namespace huniplacer
 		// Top (granite) to middle point is 45 degrees. Removing the hip thickness results in +-42.5 degrees!
 		const double MOTORS_DEVIATION	= huniplacer::utils::rad(42.5); 
 		
-		//make sure all the points that the effector can reach are included in the box
-		// with the following dimensions:
  		const double MAX_X = 500;
 		const double MAX_Y = MAX_X;
 		const double MIN_X = -MAX_X;
 		const double MIN_Y = -MAX_Y;
-		const double MIN_Z = -500;
-		const double MAX_Z = 0;
+		const double MIN_Z = -250;
+		const double MAX_Z = -180;
 	}
 }

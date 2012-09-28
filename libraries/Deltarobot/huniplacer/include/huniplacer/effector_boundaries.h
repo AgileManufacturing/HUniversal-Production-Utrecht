@@ -127,13 +127,13 @@ namespace huniplacer
 		 * Checks if one of the neighbor voxels can't be reached by the effector
 		 * @param p the point in the bitmap
 		 **/
-		bool has_invalid_neighbours(const bitmap_coordinate& p) const;
+		bool has_invalid_neighbours(const bitmap_coordinate& p, char* point_validity_cache) const;
 		
 		/**
 		 * Checks if the point is reachable by the effector
 		 * @param the point to reach
 		 **/
-		bool is_valid(const bitmap_coordinate& p) const;
+		bool is_valid(const bitmap_coordinate& p, char* point_validity_cache) const;
 		
 		/**
 		 * generates boundaries for the robot
@@ -162,9 +162,7 @@ namespace huniplacer
 
 		int width, height, depth;
 
-		char* point_validity_cache;
 		bool* boundaries_bitmap;
-		//TODO std::vector<bool> boundaries_bitmap;
 		const InverseKinematicsModel &kinematics;
 		const imotor3 &motors;
 		double voxel_size;
