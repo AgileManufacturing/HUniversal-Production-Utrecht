@@ -242,8 +242,8 @@ namespace huniplacer
 
     /**
      * Write a 32-bit value over modbus
-     * @param slave the slave address
-     * @param address the register address
+     * @param slave crd514-kd motorcontroller address
+     * @param address the register's address
      * @param data data that will be written
      * @param use_shadow will check if write is necesary by first checking the shadow registers if true
      **/    
