@@ -114,7 +114,10 @@ namespace huniplacer
     }
 
     /**
-     * Calculate a 64-bit value representing the slave and register address
+     * Calculate a 64-bit value representing the crd514-kd motorcontroller and register address
+     * @param slave crd514-kd motorcontroller address
+     * @param address the register address
+     * @return the 64-bit motorcontroller and register address value
      **/
     uint64_t modbus_ctrl::get_shadow_address(crd514_kd::slaves::t slave, uint16_t address)
     {
@@ -123,8 +126,8 @@ namespace huniplacer
     }
 
     /**
-     * Used to access 16-bit shadow registers
-     * @param slave slave address
+     * Reads a 16-bit shadow register
+     * @param slave crd514-kd motorcontroller address
      * @param address the register address
      * @param out_value output parameter, the value gets stored here
      * @return true if the value was shadowed, false otherwise
@@ -142,9 +145,9 @@ namespace huniplacer
     }
     
     /**
-     * Used to write 16-bit values to the shadow registers
-     * @param slave slave address
-     * @param address the registers address
+     * Writes a 16-bit value to a shadow register
+     * @param slave crd514-kd motorcontroller address
+     * @param address the register's address
      * @param value the value that will be written
      **/
     void modbus_ctrl::set_shadow(crd514_kd::slaves::t slave, uint32_t address, uint16_t value)
@@ -153,9 +156,9 @@ namespace huniplacer
     }
 
     /**
-     * Used to write 32-bit values to the shadow registers
-     * @param slave slave address
-     * @param address the registers address
+     * Writes a 32-bit value to a shadow register
+     * @param slave crd514-kd motorcontroller address
+     * @param address the register's address
      * @param value the value that will be written
      **/    
     void modbus_ctrl::set_shadow32(crd514_kd::slaves::t slave, uint32_t address, uint32_t value)
@@ -166,7 +169,7 @@ namespace huniplacer
 
     /**
      * Write a 16-bit value over modbus
-     * @param slave the slave address
+     * @param slave crd514-kd motorcontroller address
      * @param address the register address
      * @param data data that will be written
      * @param use_shadow will check if write is necesary by first checking the shadow registers if true
@@ -206,9 +209,9 @@ namespace huniplacer
     }
 
     /**
-     * Write an array 16-bit values over modbus
-     * @param slave the slave address
-     * @param first_address the first registers address
+     * Write an array of 16-bit values over modbus
+     * @param slave crd514-kd motorcontroller address
+     * @param first_address the first register's address
      * @param data data that will be written
      * @param len data length (in words)
      **/

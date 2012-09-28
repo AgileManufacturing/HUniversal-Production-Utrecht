@@ -82,7 +82,7 @@ namespace huniplacer {
 		}
 
 		/**
-		 * Rotate over the Y axis
+		 * Rotate the point around the Y axis
 		 * @param phi rotation in radians
 		 **/
 		inline Point3D rotateAroundYAxis(double rotationRadians) const {
@@ -91,7 +91,7 @@ namespace huniplacer {
 		}
 
 		/**
-		 * Rotate over the Z axis
+		 * Rotate the point around the Z axis
 		 * @param phi rotation in radians
 		 **/
 		inline Point3D rotateAroundZAxis(double rotationRadians) const {

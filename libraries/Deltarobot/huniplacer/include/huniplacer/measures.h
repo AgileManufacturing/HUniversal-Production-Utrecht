@@ -41,19 +41,14 @@
 #pragma once
 #include <huniplacer/utils.h>
 
+/**
+ * measures.h -> deltarobot measures, specifically for the huniplacer deltarobot
+ **/
+
 namespace huniplacer
 {
 	namespace measures
 	{
-		/* Robot v1 
-		
-		const double BASE 				  = 101.3; //mm
-		const double HIP 				  = 61.1;  //mm
-		const double EFFECTOR 			  = 46.19; //mm old value: 42.15
-		const double ANKLE				  = 150.8; //mm
-		*/
-		
-		/* Robot v2 */
 		const double BASE 				  = 101.3; //mm
 		const double HIP 				  = 100; //mm
 		const double EFFECTOR			  = 46.19; //mm
@@ -70,25 +65,9 @@ namespace huniplacer
 
 		// Top (granite) to middle point is 45 degrees. Removing the hip thickness results in +-42.5 degrees!
 		const double MOTORS_DEVIATION	= huniplacer::utils::rad(42.5); 
-
-		/* Robot v1 
-		//make sure all the points that the effector can reach are included in the box
-		// with the following dimensions:
-		const double MAX_X = 85;
-		const double MAX_Y = MAX_X;
-		const double MIN_X = -MAX_X;
-		const double MIN_Y = -MAX_Y;
-		const double MIN_Z = -210;
-		const double MAX_Z = -100;
-		*/
 		
-		/* Robot v2 */
 		//make sure all the points that the effector can reach are included in the box
 		// with the following dimensions:
-
-		// This values cannot be changed, because the bounding box must be greater than
-		// the work area of the robot. If they are changed the software will fail. 
-		// A fix for this will be applied in the future. 
  		const double MAX_X = 500;
 		const double MAX_Y = MAX_X;
 		const double MIN_X = -MAX_X;
