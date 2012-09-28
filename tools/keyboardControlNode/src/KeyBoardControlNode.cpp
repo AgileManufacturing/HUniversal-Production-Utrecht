@@ -1,3 +1,35 @@
+/**
+ * KeyBoardControlNode.cpp
+ *
+ * Author: Dick van der Steen & Dennis Koole
+ *
+ * License: newBSD
+ * Copyright © 2012, HU University of Applied Sciences Utrecht
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * * Neither the name of the HU University of Applied Sciences Utrecht nor the
+ * names of its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
+
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * ******************************************************************************
+**/
 #include <iostream>
 #include <termios.h>
 #include <stdio.h>
@@ -9,13 +41,9 @@
 #include "deltaRobotNode/MoveToRelativePoint.h"
 #include "deltaRobotNode/Motion.h"
 
-
-
 #define NODE_NAME "KeyBoardControlNode"
 
 // Keycodes
-#define KEYCODE_RIGHT 0x43
-#define KEYCODE_LEFT 0x44
 #define KEYCODE_UP 0x41
 #define KEYCODE_DOWN 0x42
 #define KEYCODE_Q 0x71
@@ -24,12 +52,15 @@
 #define KEYCODE_S 0x73
 #define KEYCODE_D 0x64
 
-int kfd =0; // Keyboard number
+// Keyboard number
+int kfd =0; 
+
 struct termios cooked, raw;
 
 /**
+* Release keyboard safely when Ctrl+C is pressed
 *
-*
+* @param sig The signal received from the Linux OS
 **/
 void quit(int sig)
 {
@@ -52,13 +83,20 @@ int main(int argc, char** argv) {
 	tcgetattr(kfd, &cooked);
 	memcpy(&raw, &cooked, sizeof(struct termios));
 	raw.c_lflag &=~ (ICANON | ECHO);
+
 	// Setting a new line, then end of file
 	raw.c_cc[VEOL] = 1;
   	raw.c_cc[VEOF] = 2;
 	tcsetattr(kfd, TCSANOW, &raw);
 
+	// The speed in mm per second
+	double speed = 10.0;
+	
+	// The step we take in mm 
+	double step = 1.0;
+
 	ROS_INFO("Reading from keyboard");
-	ROS_INFO("Start controlling the robot by pressing WASD keys");
+	ROS_INFO("Start controlling the robot by pressing WASD keys and Up and Down keys");
 
 	deltaRobotNode::Motion motion;
 	for(;;) {
@@ -68,62 +106,41 @@ int main(int argc, char** argv) {
 		  exit(0);
 		}
 
+		moveToRelativePointService.request.motion.x = 0;
+		moveToRelativePointService.request.motion.y = 0;
+		moveToRelativePointService.request.motion.z = 0;
+		moveToRelativePointService.request.motion.speed = speed;
+
 		// Check which key was pressed
 		switch(c) {
-			case KEYCODE_LEFT:
-				std::cout << "PRESSED LEFT" << std::endl;
- 				break;
-			case KEYCODE_RIGHT:
-				std::cout << "PRESSED RIGHT" << std::endl;
-				break;
 			case KEYCODE_UP:
-				std::cout << "PRESSED UP" << std::endl;
-				moveToRelativePointService.request.motion.x = 0;
-				moveToRelativePointService.request.motion.y = 0;
-				moveToRelativePointService.request.motion.z = 1;
-				moveToRelativePointService.request.motion.speed = 10;
+				ROS_INFO("PRESSED UP");
+				moveToRelativePointService.request.motion.z = step;
 				deltaRobotClient.call(moveToRelativePointService);
 				break;
 			case KEYCODE_DOWN:
-				std::cout << "PRESSED DOWN" << std::endl;
-				moveToRelativePointService.request.motion.x = 0;
-				moveToRelativePointService.request.motion.y = 0;
-				moveToRelativePointService.request.motion.z = -1;
-				moveToRelativePointService.request.motion.speed = 10;
+				ROS_INFO("PRESSED DOWN");
+				moveToRelativePointService.request.motion.z = -step;
 				deltaRobotClient.call(moveToRelativePointService);
 				break;
 			case KEYCODE_W:
-				std::cout << "PRESSED W " << std::endl;
-				moveToRelativePointService.request.motion.x = 0;
-				moveToRelativePointService.request.motion.y = 1;
-				moveToRelativePointService.request.motion.z = 0;
-				moveToRelativePointService.request.motion.speed = 10;
+				ROS_INFO("PRESSED W");
+				moveToRelativePointService.request.motion.y = step;
 				deltaRobotClient.call(moveToRelativePointService);
 				break;
 			case KEYCODE_A:
-			  	std::cout << "PRESSED A " << std::endl;
-				// change x,y,z to safe coordinates!
-				moveToRelativePointService.request.motion.x = -1;
-				moveToRelativePointService.request.motion.y = 0;
-				moveToRelativePointService.request.motion.z = 0;
-				moveToRelativePointService.request.motion.speed = 10;
+			  	ROS_INFO("PRESSED A");
+				moveToRelativePointService.request.motion.x = -step;
 				deltaRobotClient.call(moveToRelativePointService);
 			  	break;
 			case KEYCODE_S:
-				std::cout << "PRESSED S " << std::endl;
-				moveToRelativePointService.request.motion.x = 0;
-				moveToRelativePointService.request.motion.y = -1;
-				moveToRelativePointService.request.motion.z = 0;
-				moveToRelativePointService.request.motion.speed = 10;
+				ROS_INFO("PRESSED S");
+				moveToRelativePointService.request.motion.y = -step;
 				deltaRobotClient.call(moveToRelativePointService);
 			  	break;
 			case KEYCODE_D:
-			  	std::cout << "PRESSED D " << std::endl;
-				// change x,y,z to safe coordinates!
-				moveToRelativePointService.request.motion.x = +1;
-				moveToRelativePointService.request.motion.y = 0;
-				moveToRelativePointService.request.motion.z = 0;
-				moveToRelativePointService.request.motion.speed = 10;
+			  	ROS_INFO("PRESSED D");
+			  	moveToRelativePointService.request.motion.x = step;
 				deltaRobotClient.call(moveToRelativePointService);
 				break;
 		}
