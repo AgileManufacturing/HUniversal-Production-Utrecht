@@ -191,7 +191,7 @@ int main(int argc, char** argv) {
     }
     if(modbus_connect(modbus) == -1)
     {
-        throw std::runtime_error("Connection failed");
+        throw std::runtime_error("Modbus connection to IO controller failed");
     }
     assert(modbus != NULL);
 
