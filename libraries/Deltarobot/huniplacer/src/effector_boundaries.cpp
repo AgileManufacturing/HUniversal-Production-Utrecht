@@ -50,6 +50,13 @@ namespace huniplacer
 {
 	using namespace measures;
 
+	/**
+	 * Function to generate the boundaries and returns a pointer to the object
+	 * @param model used to calculate the boundaries
+	 * @param motors used for the minimum and maximum angle of the motors
+	 * @param voxel_size the size of the voxels in mm
+	 * @return pointer to the object
+	 **/
 	effector_boundaries* effector_boundaries::generate_effector_boundaries(const InverseKinematicsModel& model, const imotor3& motors, double voxel_size)
 	{
 		effector_boundaries* boundaries = new effector_boundaries(model, motors, voxel_size);
@@ -69,6 +76,14 @@ namespace huniplacer
         return boundaries;
     }
 
+	/**
+	 * Checks if the path from the starting to the destination point is not going out of the
+	 * robots boundaries
+	 * @param from the starting point
+	 * @param to the destination point
+	 *
+	 * @return true if a straight path from from to to is valid
+	 **/
     bool effector_boundaries::check_path(const Point3D & from, const Point3D & to) const
     {
     	double x_length = to.x - from.x;
@@ -103,6 +118,13 @@ namespace huniplacer
         return true;
     }
 
+	/**
+	 * private constructor
+	 * also initializes the voxel array
+	 * @param model used to calculate the boundaries
+	 * @param motors used for the minimum and maximum angle of the motors
+	 * @param voxel_size the size of the voxels
+	 **/
     effector_boundaries::effector_boundaries(const InverseKinematicsModel& model, const imotor3& motors, double voxel_size)
     	: point_validity_cache(NULL), kinematics(model), motors(motors), voxel_size(voxel_size)
     {
@@ -113,9 +135,17 @@ namespace huniplacer
     	delete[] boundaries_bitmap;
     }
 
-    //TODO: change from has_invalid_neighbours to isOnTheEdgeOfValidArea due to functionality change
-    bool effector_boundaries::has_invalid_neighbours(const bitmap_coordinate & p) const
+	/**
+	 * Checks if one of the neighbouring voxels can't be reached by the effector. This includes voxels outside of the MIN/MAX_X/Y/Z box as defined in measures.
+	 * @param p The point in the bitmap that has to be checked.
+	 * @param point_validity_cache Pointer to the cache where already checked values are stored, and unchecked points are unknown. This as opposed to the bitmap, which is defaulted to false instead of unknown.
+	 *
+	 * @return True if p has unreachable neighbouring voxels.
+	 **/
+	bool effector_boundaries::has_invalid_neighbours(const bitmap_coordinate & p, char* point_validity_cache) const
     {
+		//TODO: change from has_invalid_neighbours to isOnTheEdgeOfValidArea due to functionality change
+
     	//check if the voxel is valid and on the edge of the box
     	if(is_valid(bitmap_coordinate(p.x,p.y,p.z))){
     		//voxel is on the edge of the box, automatically boardering invalid territory
@@ -140,14 +170,17 @@ namespace huniplacer
 	            }
 	        }
 	    }
-	    /**
-	     * voxel is invalid OR 
-	     * inside a box of 3x3x3 valid voxels
-	     */
+	    // voxel is invalid OR inside of a box of 3x3x3 valid voxels
         return false;
     }
 
-    bool effector_boundaries::is_valid(const bitmap_coordinate & p) const
+	/**
+	 * Checks if the point can be reached by the effector. Whether the point can be reached is determined by the kinematics, minimum and maximum angles of the motors and the MIN/MAX_X/Y/Z box determined in measures.
+	 * @param p The point that is checked if it can be reached by the effector.
+	 * @param point_validity_cache Pointer to the cache where already checked values are stored, and unchecked points are unknown. This as opposed to the bitmap, which is defaulted to false instead of unknown.
+	 * 
+	 * @return True if p is reachable by the effector.
+	 **/
     {
     	char* from_cache;
     	char dummy = UNKNOWN;
@@ -174,7 +207,8 @@ namespace huniplacer
 			}
 			for(int i = 0;i < 3;i++)
 			{
-				if(mf.angles[i] <= motors.get_min_angle() || mf.angles[i] >= motors.get_max_angle()){
+				if(mf.angles[i] <= motors.get_min_angle() 
+					|| mf.angles[i] >= motors.get_max_angle()){
 					*from_cache = INVALID;
 					return false;
 				}
@@ -189,6 +223,9 @@ namespace huniplacer
     	}
     }
 
+	/**
+	 * Generates boundaries for the robot. All members should be initialized before calling this function.
+	 **/
     void effector_boundaries::generate_boundaries_bitmap()
     {
     	point_validity_cache = new char[width * depth * height];
@@ -207,7 +244,7 @@ namespace huniplacer
 		{
 			/**
 			 * If an invalid voxel is found:
-			 * Step back to the last valid voxel
+			 * step back to the last valid voxel
 			 * push the voxel on the empty stack
 			 * set the voxel as true in the bitmap
 			 * end the loop
@@ -221,9 +258,7 @@ namespace huniplacer
 			}
 		}
 		/**
-		 * If the right-most voxel is in reach and an invalid voxel is never found:
-		 * the position of begin.x will be outside of the box limits
-		 * Step back inside the box and add that voxel to the stack and set it as true in the bitmap
+		 * If the right-most voxel is in reach and an invalid voxel is never found the position of begin.x will be outside of the box limits. Step back inside the box and add that voxel to the stack and set it as true in the bitmap.
 		 */
 		if(begin.x >= MAX_X){
 			begin.x -= voxel_size;
@@ -235,9 +270,7 @@ namespace huniplacer
 		}
 
 		/**
-		 * start with the last added voxel on the stack and add new voxels to the stack
-		 * do this until the valid borders (all valid voxels bordering unvalid voxels or 
-		 * the MAX/MIN_X/Y/Z box) of the valid voxel area are known (stack = empty)
+		 * Start with the last added voxel on the stack and add new voxels to the stack. Do this until the valid borders (all valid voxels bordering unvalid voxels or the MAX/MIN_X/Y/Z box) of the valid voxel area are known (stack = empty).
 		 */
 		while(!cstack.empty())
 		{
