@@ -142,8 +142,7 @@ namespace huniplacer
 	 *
 	 * @return True if p has unreachable neighbouring voxels.
 	 **/
-	bool effector_boundaries::has_invalid_neighbours(const bitmap_coordinate & p, char* point_validity_cache) const
-    {
+	bool effector_boundaries::has_invalid_neighbours(const bitmap_coordinate & p, char* point_validity_cache) const {
 		//TODO: change from has_invalid_neighbours to isOnTheEdgeOfValidArea due to functionality change
 
     	//check if the voxel is valid and on the edge of the box
@@ -181,7 +180,7 @@ namespace huniplacer
 	 * 
 	 * @return True if p is reachable by the effector.
 	 **/
-    {
+    bool effector_boundaries::is_valid(const bitmap_coordinate& p, char* point_validity_cache) const {
     	char* from_cache;
     	char dummy = UNKNOWN;
     	if(point_validity_cache == NULL)
