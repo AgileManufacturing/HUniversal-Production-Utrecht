@@ -191,7 +191,7 @@ int main(int argc, char** argv) {
     }
     if(modbus_connect(modbus) == -1)
     {
-        throw std::runtime_error("Connection failed");
+        throw std::runtime_error("Modbus connection to IO controller failed");
     }
     assert(modbus != NULL);
 
@@ -222,7 +222,10 @@ int main(int argc, char** argv) {
     deltarobot->power_on();
 
     // Calibrate the motors
-    deltarobot->calibrateMotors(modbus);
+    if(!deltarobot->calibrateMotors(modbus)){
+    	ROS_ERROR("Calibration FAILED. EXITING.");
+    	return 1;
+    }
 
 	ros::NodeHandle nodeHandle;
 
