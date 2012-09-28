@@ -4,9 +4,9 @@
 //
 //******************************************************************************
 // Project:        huniplacer
-// File:           crd514_kd_exception.h
-// Description:    exception thrown if the motorcontroller alarm flag is set
-// Author:         Lukas Vermond & Kasper van Nieuwland
+// File:           effector_boundaries_exception.h
+// Description:    exception thrown if effector boundaries cannot be determined
+// Author:         Koen Braham & Daan Veltman
 // Notes:          -
 //
 // License:        newBSD
