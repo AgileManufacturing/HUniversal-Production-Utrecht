@@ -4,8 +4,8 @@
 //
 //******************************************************************************
 // Project:        huniplacer
-// File:           Point3D.h
-// Description:    3 dimensional point class
+// File:           crd514_kd_exception.h
+// Description:    exception thrown if the motorcontroller alarm flag is set
 // Author:         Lukas Vermond & Kasper van Nieuwland
 // Notes:          -
 //
@@ -37,66 +37,30 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //******************************************************************************
 
+
 #pragma once
 
-#include <cmath>
+#include <huniplacer/effector_boundaries.h>
 
-namespace huniplacer {
+#include <stdexcept>
+#include <string>
+#include <sstream>
+
+
+namespace huniplacer
+{
+
+
 	/**
-	 * Point3D.h -> 3 dimensional point class
+	 * @brief exception to indicate modbus errors
+	 *
+	 * modbus_ctrl can throw this exception whenever a modbus related error occurs
 	 **/
-	class Point3D {
-	public:
-		double x, y, z;
-
-		Point3D(double x, double y, double z) :
-				x(x), y(y), z(z) {
-		}
-		~Point3D() {
-		}
-
-		Point3D offset(Point3D& p);
-
-		inline Point3D& operator+=(const Point3D& rhs) {
-			x += rhs.x;
-			y += rhs.y;
-			z += rhs.z;
-			return *this;
-		}
-
-		inline const Point3D operator+(const Point3D& rhs) const {
-			Point3D res = *this;
-			res += rhs;
-			return res;
-		}
-
-		/**
-		 * Calculates the euclidean distance between *this and p
-		 * @return distance
-		 **/
-		inline double distance(const Point3D& p) const {
-			double dx = x - p.x;
-			double dy = y - p.y;
-			double dz = z - p.z;
-			return sqrt(dx * dx + dy * dy + dz * dz);
-		}
-
-		/**
-		 * Rotate the point around the Y axis
-		 * @param phi rotation in radians
-		 **/
-		inline Point3D rotateAroundYAxis(double rotationRadians) const {
-			return Point3D(x * cos(rotationRadians) - z * sin(rotationRadians), y,
-					x * sin(rotationRadians) + z * cos(rotationRadians));
-		}
-
-		/**
-		 * Rotate the point around the Z axis
-		 * @param phi rotation in radians
-		 **/
-		inline Point3D rotateAroundZAxis(double rotationRadians) const {
-			return Point3D(x * cos(rotationRadians) - y * sin(rotationRadians),
-					x * sin(rotationRadians) + y * cos(rotationRadians), z);
-		}
-	};
+    class effector_boundaries_exception : public std::runtime_error
+    {
+        public:
+            effector_boundaries_exception(const std::string& msg) :
+                std::runtime_error(msg)
+            {}
+    };
 }

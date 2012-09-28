@@ -65,53 +65,53 @@ namespace huniplacer
             virtual void moveto(const motionf& mf, bool async) = 0;
 
             /**
-             * Same as moveto, but rotates to an angle within a certain time.
-             * @param time time in seconds that the motors will take to rotate to the given angle.  Speed member of given motion is ignored.
+             * Rotates the motors within a certain time. The speed member of the given motion is ignored.
+             * @param time Time in seconds that the motors will take to rotate to the given angles. 
              **/
             virtual void moveto_within(const motionf& mf, double time, bool async) = 0;
 
             /**
-             * Get the minimal angle the motors can move to
+             * Get the minimal angle the motors can move to.
              * @return angle in radians
              **/
             virtual double get_min_angle(void) const = 0;
 
             /**
-             * Get the maximum angle the motors can move to
+             * Get the maximum angle the motors can move to.
              * @return angle in radians
              **/
             virtual double get_max_angle(void) const = 0;
 
             /**
-             * Stops the motors
+             * Stops the motors.
              **/
             virtual void stop(void) = 0;
 
             /**
-             * Wait for all motor controllers to become idle
-             * @param timeout time in milliseconds until timeout (0 means infinite)
+             * Wait for all motor controllers to become idle.
+             * @param timeout Time in milliseconds until timeout (0 means infinite)
              * @return false if timed out, true otherwise
              **/
             virtual bool wait_for_idle(long timeout) = 0;
 
             /**
-             * Test whether the motor controllers are idle
+             * Test whether the motor controllers are idle.
              * @return true if idle, false otherwise
              **/
             virtual bool is_idle(void) = 0;
 
             /**
-             * Shuts down the motors
+             * Shuts down the motors.
              **/
             virtual void power_off(void) = 0;
 
             /**
-             * Turns on the motors
+             * Turns on the motors.
              **/
             virtual void power_on(void) = 0;
 
             /**
-             * Determine if the motor driver(s) are powered on
+             * Determine if the motor driver(s) are powered on.
              * @return true of powered on, false otherwise
              **/
             virtual bool is_powerd_on(void) = 0;

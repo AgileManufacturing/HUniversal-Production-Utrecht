@@ -102,10 +102,10 @@ namespace huniplacer
 		 **/
 		typedef struct bitmap_coordinate { int x, y, z; bitmap_coordinate(int x, int y, int z) : x(x), y(y), z(z) {} } bitmap_coordinate;
 
-		bool has_invalid_neighbours(const bitmap_coordinate& p) const;
+		bool has_invalid_neighbours(const bitmap_coordinate& p, char* point_validity_cache) const;
 		
 
-		bool is_valid(const bitmap_coordinate& p) const;
+		bool is_valid(const bitmap_coordinate& p, char* point_validity_cache) const;
 		
 		void generate_boundaries_bitmap();
 		
@@ -130,9 +130,7 @@ namespace huniplacer
 
 		int width, height, depth;
 
-		char* point_validity_cache;
 		bool* boundaries_bitmap;
-		//TODO std::vector<bool> boundaries_bitmap;
 		const InverseKinematicsModel &kinematics;
 		const imotor3 &motors;
 		double voxel_size;

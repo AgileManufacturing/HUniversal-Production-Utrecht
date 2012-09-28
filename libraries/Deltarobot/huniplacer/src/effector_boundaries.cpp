@@ -41,6 +41,7 @@
 #include <huniplacer/measures.h>
 #include <huniplacer/effector_boundaries.h>
 #include <huniplacer/InverseKinematicsException.h>
+#include <huniplacer/effector_boundaries_exception.h>
 #include <stack>
 #include <vector>
 #include <set>
@@ -72,7 +73,6 @@ namespace huniplacer
         	boundaries->boundaries_bitmap[i] = false;
         }
         boundaries->generate_boundaries_bitmap();
-
         return boundaries;
     }
 
@@ -89,15 +89,15 @@ namespace huniplacer
     	double x_length = to.x - from.x;
     	double y_length = to.y - from.y;
     	double z_length = to.z - from.z;
-    	int largest_length = (fabs(x_length) > fabs(y_length) ?
+    	double largest_length = (double)(fabs(x_length) > fabs(y_length) ?
     			(fabs(x_length) > fabs(z_length) ? fabs(x_length) : fabs(z_length)) :
     			(fabs(y_length) > fabs(z_length) ? fabs(y_length) : fabs(z_length)));
 
     	x_length = x_length / largest_length;
     	y_length = y_length / largest_length;
     	z_length = z_length / largest_length;
-
-		for(double i = 1; i < largest_length; i++)
+    	
+		for(double i = 1; i <= largest_length; i++)
 		{
 			int x = (from.x + x_length * i);
 			int y = (from.y + y_length * i);
@@ -126,7 +126,7 @@ namespace huniplacer
 	 * @param voxel_size the size of the voxels
 	 **/
     effector_boundaries::effector_boundaries(const InverseKinematicsModel& model, const imotor3& motors, double voxel_size)
-    	: point_validity_cache(NULL), kinematics(model), motors(motors), voxel_size(voxel_size)
+    	: kinematics(model), motors(motors), voxel_size(voxel_size)
     {
     }
 
@@ -147,7 +147,7 @@ namespace huniplacer
 		//TODO: change from has_invalid_neighbours to isOnTheEdgeOfValidArea due to functionality change
 
     	//check if the voxel is valid and on the edge of the box
-    	if(is_valid(bitmap_coordinate(p.x,p.y,p.z))){
+    	if(is_valid(bitmap_coordinate(p.x,p.y,p.z), point_validity_cache)){
     		//voxel is on the edge of the box, automatically boardering invalid territory
     		if(p.x == 0 
     			|| p.x == width 
@@ -163,7 +163,7 @@ namespace huniplacer
 	            for(int x = p.x - 1; x <= p.x + 1; x++){
 	                for(int z = p.z - 1; z <= p.z + 1; z++){
 	                    //check if one of the neighbours is not valid
-	                    if(!is_valid(bitmap_coordinate(x, y, z))){
+	                    if(!is_valid(bitmap_coordinate(x, y, z), point_validity_cache)){
 	                        return true;
 	                    }
 	                }
@@ -228,15 +228,15 @@ namespace huniplacer
 	 **/
     void effector_boundaries::generate_boundaries_bitmap()
     {
-    	point_validity_cache = new char[width * depth * height];
+    	char * point_validity_cache = new char[width * depth * height];
     	memset(point_validity_cache, 0, width * depth * height * sizeof(char));
     	std::stack<bitmap_coordinate> cstack;
 
     	//determine the center of the box
     	Point3D begin (0, 0, MIN_Z + (MAX_Z - MIN_Z) / 2);
     	//if begin pixel is not part of a valid voxel the box dimensions are incorrect
-    	if(!is_valid(from_real_coordinate(begin))){
-    		//TODO: throw exception
+    	if(!is_valid(from_real_coordinate(begin), point_validity_cache)){
+    		throw effector_boundaries_exception("starting point outide of valid area, please adjust MAX/MIN_X/Y/Z values to have a valid center");
     	}
     	
     	//scan towards the right
@@ -249,7 +249,7 @@ namespace huniplacer
 			 * set the voxel as true in the bitmap
 			 * end the loop
 			 */
-			if(!is_valid(from_real_coordinate(begin))){
+			if(!is_valid(from_real_coordinate(begin), point_validity_cache)){
 				begin.x -= voxel_size;
 				bitmap_coordinate startingVoxel = from_real_coordinate(begin);
 				cstack.push(startingVoxel);
@@ -283,7 +283,7 @@ namespace huniplacer
 				for(int x = borderVoxel.x-1; x <= borderVoxel.x+1; x++){
 					for(int z = borderVoxel.z-1; z <= borderVoxel.z+1; z++){
 						//don't do anything with voxels outside of the MAX/MIN_X/Y/Z box
-						if(z > height || z < 0 || x > width || x < 0 || y > depth || y < 0){
+						if(z >= height || z < 0 || x >= width || x < 0 || y >= depth || y < 0){
 							continue;
 						} else {
 							/**
@@ -291,10 +291,11 @@ namespace huniplacer
 							 * added to the stack and set in the bitmap
 							 */
 							int index = x + y * width + z * width * depth;
-							if(is_valid(bitmap_coordinate(x, y, z))
+							if(is_valid(bitmap_coordinate(x, y, z), point_validity_cache)
 									&& !boundaries_bitmap[index]
-								    && has_invalid_neighbours(bitmap_coordinate(x, y, z))){
-								cstack.push(bitmap_coordinate(x, y, z));
+								    && has_invalid_neighbours(bitmap_coordinate(x, y, z), point_validity_cache)){
+								bitmap_coordinate bitmapCoordinate = bitmap_coordinate(x, y, z);
+								cstack.push(bitmapCoordinate);
 								boundaries_bitmap[index] = true;
 							}
 						}
@@ -305,24 +306,41 @@ namespace huniplacer
 
 		delete[] point_validity_cache;
 		point_validity_cache = NULL;
-
+		
 		//adds all the points within the boundaries
 		cstack.push(from_real_coordinate(Point3D(0, 0, MIN_Z + (MAX_Z - MIN_Z) / 2)));
 		while(!cstack.empty())
 		{
 			bitmap_coordinate validVoxel = cstack.top();
 			cstack.pop();
-
+			if(validVoxel.x <= 0
+				|| validVoxel.x >= width
+				|| validVoxel.y <= 0
+				|| validVoxel.y >= depth
+				|| validVoxel.z <= 0
+				|| validVoxel.z >= height){
+				continue;
+			}
 			int index = validVoxel.x + 
 						validVoxel.y * width + 
 						validVoxel.z * width * depth;
-			int indices[6] = {index - 1, index + 1, index - width, index + width, index - width * depth, index + width * depth};
+
+			int indices[6] = {
+				index - 1, 
+				index + 1, 
+				index - width, 
+				index + width, 
+				index - width * depth, 
+				index + width * depth
+			};
 
 			for(unsigned int i = 0; i < ( sizeof(indices) / sizeof(indices[0]) ); i++)
 			{
-				if(boundaries_bitmap[indices[i]] == false){
-					boundaries_bitmap[indices[i]] = true;
-					cstack.push(bitmap_coordinate(indices[i] % width, (indices[i] % (width * depth)) / width, indices[i] / (width * depth)));
+				if(indices[i] < ((width*height*depth))){
+					if(boundaries_bitmap[indices[i]] == false){
+						boundaries_bitmap[indices[i]] = true;
+						cstack.push(bitmap_coordinate(indices[i] % width, (indices[i] % (width * depth)) / width, indices[i] / (width * depth)));
+					}
 				}
 			}	
 		}

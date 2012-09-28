@@ -90,14 +90,18 @@ namespace crd514_kd
             CMD_1                   = 0x01E, //16-bit
             STATUS_1                = 0x020, //16-bit
 
-            CFG_PRESET_POSITION = 0x214, //32-bit Preset position value argument
-            OP_PRESET_POSITION = 0x048, //16-bit? Set the preset position to the preset position value argument
+            //32-bit Preset position value argument
+            CFG_PRESET_POSITION = 0x214,
 
-            OP_SOFTWARE_OVERTRAVEL = 0x252 //16-bit Sets the software motor limitation (in the motor controller)
+            //16-bit Set the preset position to the preset position value argument
+            OP_PRESET_POSITION = 0x048, 
+
+            //16-bit Sets the software motor limitation (in the motor controller)
+            OP_SOFTWARE_OVERTRAVEL = 0x252 
         };
     }
 
-    /*
+    /**
      * Bits of value at address CMD_1
      **/
     namespace cmd1_bits
@@ -110,7 +114,7 @@ namespace crd514_kd
         };
     }
 
-    /*
+    /**
      * Bits of value at address STATUS_1
      **/
     namespace status1_bits
@@ -124,7 +128,7 @@ namespace crd514_kd
         };
     }
 
-    /* 
+    /** 
      * Constants used when constructing a modbus rtu (using modbus_new_rtu)
      **/
     namespace rtu_config
