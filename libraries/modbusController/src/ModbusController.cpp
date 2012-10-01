@@ -79,15 +79,15 @@ namespace ModbusController
         }
         
         //set timeout
-        struct timeval timeout_end;
-        struct timeval timeout_begin;
-        modbus_get_byte_timeout(context, &timeout_end);
-        timeout_end.tv_usec = TIMEOUT_END;
-        modbus_set_byte_timeout(context, &timeout_end);
+        struct timeval timeoutEnd;
+        struct timeval timeoutBegin;
+        modbus_get_byte_timeout(context, &timeoutEnd);
+        timeoutEnd.tv_usec = TIMEOUT_END;
+        modbus_set_byte_timeout(context, &timeoutEnd);
 
-        modbus_get_response_timeout(context, &timeout_begin);
-        timeout_begin.tv_usec = TIMEOUT_BEGIN;
-        modbus_set_response_timeout(context, &timeout_begin);
+        modbus_get_response_timeout(context, &timeoutBegin);
+        timeoutBegin.tv_usec = TIMEOUT_BEGIN;
+        modbus_set_response_timeout(context, &timeoutBegin);
         
         //connect
         if(modbus_connect(context) == -1)

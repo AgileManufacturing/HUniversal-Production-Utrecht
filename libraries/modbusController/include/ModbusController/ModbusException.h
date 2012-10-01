@@ -6,7 +6,8 @@
 // Project:        huniplacer
 // File:           modbus_exception.h
 // Description:    exception thrown if an error ocures during modbus actions
-// Author:         Lukas Vermond & Kasper van Nieuwland
+// Author:      1.0 Lukas Vermond & Kasper van Nieuwland
+//              1.1 Koen Braham
 // Notes:          -
 //
 // License:        newBSD
@@ -47,47 +48,57 @@
 
 #include <modbus/modbus.h>
 
-namespace huniplacer
+namespace ModbusController
 {
 	/**
 	 * modbus_exception.h -> Exception to indicate modbus errors
 	 *
 	 * modbus_ctrl can throw this exception whenever a modbus related error occurs
 	 **/
-    class modbus_exception : public std::runtime_error
+    class ModbusException : public std::runtime_error
     {
         private:
     		/**
              * modbus error code
              **/
-            const int error_code;
+            const int errorCode;
             /** 
              * modbus error string (obtained using modbus_strerror)
              **/ 
-            std::string msg;
+            std::string message;
             
         public:
-            modbus_exception(void) :
+            ModbusException(void) :
                 std::runtime_error(""),
                 error_code(errno)
             {
                 std::stringstream ss;
-                ss << "modbus error[" << error_code << "]: " << modbus_strerror(error_code);
-                msg = ss.str();
+                ss << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
+                message = ss.str();
+            }
+
+            ModbusException(const std::String msg) :
+                std::runtime_error(""),
+                error_code(errno)
+            {
+                std::stringstream ss;
+                ss << msg << std::endl;
+                ss << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
+                message = ss.str();
             }
             
-            virtual ~modbus_exception(void) throw()
+            virtual ~ModbusException(void) throw()
             {
             }
             
             virtual const char* what() const throw()
 			{
-				return msg.c_str();
+				return message.c_str();
 			}
             
-            int get_error_code(void)
+            int getErrorCode(void)
             {
-                return error_code;
+                return errorCode;
             }
     };
 }

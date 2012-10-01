@@ -6,7 +6,8 @@
 // Project:        huniplacer
 // File:           modbus_ctrl.h
 // Description:    wrapper for libmodbus with some extra functionality
-// Author:         Lukas Vermond & Kasper van Nieuwland
+// Author:      1.0 Lukas Vermond & Kasper van Nieuwland
+//              1.1 Koen Braham
 // Notes:          -
 //
 // License:        newBSD
@@ -40,7 +41,7 @@
 
 #pragma once
 
-#include "huniplacer/CRD514_KD.h"
+#include <Motor/CRD514KDMotorController.h>
 
 extern "C"
 {
