@@ -69,13 +69,13 @@ namespace ModbusController
      * @param context initialized modbus_t
      **/
     ModbusController::ModbusController(modbus_t* context) :
-        next_write_time(0),
-        shadow_registers()
+        nextWriteTime(0),
+        shadowRegisters()
     {
         this->context = context;
         if(context == NULL)
         {
-            throw modbus_exception();
+            throw modbus_exception("Error uninitialized connection");
         }
         
         //set timeout
@@ -92,7 +92,7 @@ namespace ModbusController
         //connect
         if(modbus_connect(context) == -1)
         {
-            throw modbus_exception();
+            throw modbus_exception("Unable to connect modbus");
         }
     }
 
@@ -103,11 +103,11 @@ namespace ModbusController
     }
 
     /**
-     * Utility function. used to wait the remaining time till next_write_time.
+     * Utility function. used to wait the remaining time till nextWriteTime.
      **/
     void ModbusController::wait(void)
     {
-        long delta = next_write_time - utils::time_now();
+        long delta = nextWriteTime - utils::time_now();
         if(delta > 0)
         {
             utils::sleep(delta);
@@ -120,7 +120,7 @@ namespace ModbusController
      * @param address the register address
      * @return the 64-bit motorcontroller and register address value
      **/
-    uint64_t ModbusController::get_shadow_address(uint16_t slave, uint16_t address)
+    uint64_t ModbusController::getShadowAddress(uint16_t slave, uint16_t address)
     {
     	return (slave << 16) | address;
     }
@@ -129,18 +129,18 @@ namespace ModbusController
      * Reads a 16-bit shadow register
      * @param slave crd514-kd motorcontroller address
      * @param address the register address
-     * @param out_value output parameter, the value gets stored here
+     * @param outValue output parameter, the value gets stored here
      * @return true if the value was shadowed, false otherwise
      **/
-    bool ModbusController::get_shadow(uint16_t slave, uint32_t address, uint16_t& out_value)
+    bool ModbusController::getShadow(uint16_t slave, uint32_t address, uint16_t& outValue)
     {
-        uint64_t a = get_shadow_address(slave, address);
-        shadow_map::iterator it = shadow_registers.find(a);
-        if(it == shadow_registers.end())
+        uint64_t a = getShadowAddress(slave, address);
+        shadow_map::iterator it = shadowRegisters.find(a);
+        if(it == shadowRegisters.end())
         {
             return false;
         }
-        out_value = it->second;
+        outValue = it->second;
         return true;
     }
     
@@ -150,9 +150,9 @@ namespace ModbusController
      * @param address the register's address
      * @param value the value that will be written
      **/
-    void ModbusController::set_shadow(uint16_t slave, uint32_t address, uint16_t value)
+    void ModbusController::setShadow(uint16_t slave, uint32_t address, uint16_t value)
     {
-        shadow_registers[get_shadow_address(slave, address)] = value;
+        shadowRegisters[getShadowAddress(slave, address)] = value;
     }
 
     /**
@@ -161,10 +161,10 @@ namespace ModbusController
      * @param address the register's address
      * @param value the value that will be written
      **/    
-    void ModbusController::set_shadow32(uint16_t slave, uint32_t address, uint32_t value)
+    void ModbusController::setShadow32(uint16_t slave, uint32_t address, uint32_t value)
     {
-        shadow_registers[get_shadow_address(slave, address+0)] = (value >> 16) & 0xFFFF;
-        shadow_registers[get_shadow_address(slave, address+1)] = value & 0xFFFF;
+        shadowRegisters[getShadowAddress(slave, address+0)] = (value >> 16) & 0xFFFF;
+        shadowRegisters[getShadowAddress(slave, address+1)] = value & 0xFFFF;
     }
 
     /**
@@ -174,12 +174,12 @@ namespace ModbusController
      * @param data data that will be written
      * @param use_shadow will check if write is necesary by first checking the shadow registers if true
      **/
-    void ModbusController::write_u16(uint16_t slave, uint16_t address, uint16_t data, bool use_shadow)
+    void ModbusController::writeU16(uint16_t slave, uint16_t address, uint16_t data, bool useShadow)
     {
-        if(use_shadow)
+        if(useShadow)
         {
-            uint16_t shadow_data;
-            if(get_shadow(slave, address, shadow_data) && shadow_data == data)
+            uint16_t shadowData;
+            if(get_shadow(slave, address, shadowData) && shadowData == data)
             {
                 return;
             }
@@ -188,7 +188,7 @@ namespace ModbusController
         wait();
         modbus_set_slave(context, slave);
         int r = modbus_write_register(context, (int)address, (int)data);
-        next_write_time = utils::time_now() + (slave == crd514_kd::slaves::BROADCAST ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
+        nextWriteTime = utils::time_now() + (slave == crd514_kd::slaves::BROADCAST ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
         
         if(r == -1)
         {
@@ -198,13 +198,13 @@ namespace ModbusController
                 return;
             }
             
-            throw modbus_exception();
+            throw modbus_exception("Error writing u16");
 
         }
         
-        if(use_shadow)
+        if(useShadow)
         {
-        	set_shadow(slave, address, data);
+        	setShadow(slave, address, data);
         }
     }
 
@@ -213,20 +213,20 @@ namespace ModbusController
      * @param slave crd514-kd motorcontroller address
      * @param first_address the first register's address
      * @param data data that will be written
-     * @param len data length (in words)
+     * @param length data length (in words)
      **/
-    void ModbusController::write_u16(uint16_t slave, uint16_t first_address, uint16_t* data, unsigned int len)
+    void ModbusController::writeU16(uint16_t slave, uint16_t first_address, uint16_t* data, unsigned int length)
     {
-        if(len > 10)
+        if(length > 10)
         {
-            throw modbus_exception();
+            throw modbus_exception("length > 10");
         }
         
         wait();
         
         modbus_set_slave(context, slave);
-        int r = modbus_write_registers(context, first_address, len, data);
-        next_write_time = utils::time_now() + (slave == crd514_kd::slaves::BROADCAST ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
+        int r = modbus_write_registers(context, first_address, length, data);
+        nextWriteTime = utils::time_now() + (slave == crd514_kd::slaves::BROADCAST ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
         
         if(r == -1)
         {
@@ -236,7 +236,7 @@ namespace ModbusController
                 return;
             }
             
-            throw modbus_exception();
+            throw modbus_exception("Error writing u16 array");
         }
     }
 
@@ -247,7 +247,7 @@ namespace ModbusController
      * @param data data that will be written
      * @param use_shadow will check if write is necesary by first checking the shadow registers if true
      **/    
-    void ModbusController::write_u32(uint16_t slave, uint16_t address, uint32_t data, bool use_shadow)
+    void ModbusController::writeU32(uint16_t slave, uint16_t address, uint32_t data, bool useShadow)
     {
     	try
     	{
@@ -255,24 +255,24 @@ namespace ModbusController
 			_data[0] = (data >> 16) & 0xFFFF;
 			_data[1] = data & 0xFFFF;
 
-			if(use_shadow)
+			if(useShadow)
 			{
-				uint16_t shadow_up;
-				bool skip_up = get_shadow(slave, address+0, shadow_up) && shadow_up == _data[0];
-				uint16_t shadow_lo;
-				bool skip_lo = get_shadow(slave, address+1, shadow_lo) && shadow_lo == _data[1];
+				uint16_t shadowHigh;
+                uint16_t shadowLow;
+				bool skipHigh = get_shadow(slave, address+0, shadowHigh) && shadowHigh == _data[0];
+				bool skipLow = get_shadow(slave, address+1, shadowLow) && shadowLow == _data[1];
 
-				if(skip_up && skip_lo)
+				if(skipHigh && skipLow)
 				{
 					return;
 				}
-				else if(skip_lo) //write only up
+				else if(skipLow) //write only up
 				{
 					write_u16(slave, address, _data[0]);
 					set_shadow(slave, address, _data[0]);
 					return;
 				}
-				else if(skip_up) //write only lo
+				else if(skipHigh) //write only lo
 				{
 					write_u16(slave, address+1, _data[1]);
 					set_shadow(slave, address+1, _data[1]);
@@ -283,7 +283,7 @@ namespace ModbusController
 			//write up & lo
 			write_u16(slave, address, _data, 2);
 
-			if(use_shadow)
+			if(useShadow)
 			{
 				set_shadow32(slave, address, data);
 			}
@@ -300,17 +300,17 @@ namespace ModbusController
      * @param address address that will be read from
      * @return the value that was read
      **/    
-    uint16_t ModbusController::read_u16(uint16_t slave, uint16_t address)
+    uint16_t ModbusController::readU16(uint16_t slave, uint16_t address)
     {
         wait();
         modbus_set_slave(context, slave);
         uint16_t data;
         int r = modbus_read_registers(context, (int)address, 1, &data); 
-        next_write_time = utils::time_now() + (slave == crd514_kd::slaves::BROADCAST ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
+        nextWriteTime = utils::time_now() + (slave == crd514_kd::slaves::BROADCAST ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
         
         if(r == -1)
         {
-            throw modbus_exception();
+            throw modbus_exception("Error reading u16");
         }
         
         return data;
@@ -321,18 +321,18 @@ namespace ModbusController
      * @param slave the slave address
      * @param first_address first registers address from which on data will be read
      * @param data will be stored here
-     * @param len data length (in words)
+     * @param length data length (in words)
      **/    
-    void ModbusController::read_u16(uint16_t slave, uint16_t first_address, uint16_t* data, unsigned int len)
+    void ModbusController::readU16(uint16_t slave, uint16_t first_address, uint16_t* data, unsigned int length)
     {
         wait();
         modbus_set_slave(context, slave);
-        int r = modbus_read_registers(context, (int)first_address, len, data); 
-        next_write_time = utils::time_now() + (slave == crd514_kd::slaves::BROADCAST ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
+        int r = modbus_read_registers(context, (int)first_address, length, data); 
+        nextWriteTime = utils::time_now() + (slave == crd514_kd::slaves::BROADCAST ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
         
         if(r == -1)
         {
-            throw modbus_exception();
+            throw modbus_exception("Error reading u16 array");
         }
     }
   
@@ -342,7 +342,7 @@ namespace ModbusController
      * @param address address from which will be read
      * @return value that was read
      **/    
-    uint32_t ModbusController::read_u32(uint16_t slave, uint16_t address)
+    uint32_t ModbusController::readU32(uint16_t slave, uint16_t address)
     {
         try
         {

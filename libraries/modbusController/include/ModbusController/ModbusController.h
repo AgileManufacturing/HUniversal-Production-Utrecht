@@ -70,7 +70,7 @@ namespace ModbusController
             };
             
             modbus_t* context;
-            long next_write_time;
+            long nextWriteTime;
             
             typedef std::map<uint64_t, uint16_t> ShadowMap;
 
@@ -82,7 +82,7 @@ namespace ModbusController
             void wait(void);
 
             uint64_t get_shadow_address(uint16_t slave, uint16_t address);
-            bool get_shadow(uint16_t slave, uint32_t address, uint16_t& out_value);
+            bool get_shadow(uint16_t slave, uint32_t address, uint16_t& outValue);
             void set_shadow(uint16_t slave, uint32_t address, uint16_t value);
             void set_shadow32(uint16_t slave, uint32_t address, uint32_t value);
 
@@ -90,9 +90,9 @@ namespace ModbusController
             modbus_ctrl(modbus_t* context);
             ~modbus_ctrl(void);
 
-            void write_u16(uint16_t slave, uint16_t address, uint16_t data, bool use_shadow = false);
+            void write_u16(uint16_t slave, uint16_t address, uint16_t data, bool useShadow = false);
             void write_u16(uint16_t slave, uint16_t first_address, uint16_t* data, unsigned int len);
-            void write_u32(uint16_t slave, uint16_t address, uint32_t data, bool use_shadow = false);
+            void write_u32(uint16_t slave, uint16_t address, uint32_t data, bool useShadow = false);
             uint16_t read_u16(uint16_t slave, uint16_t address);
             void read_u16(uint16_t slave, uint16_t first_address, uint16_t* data, unsigned int len);
             uint32_t read_u32(uint16_t slave, uint16_t address);
