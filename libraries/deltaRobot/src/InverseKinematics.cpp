@@ -42,9 +42,9 @@
 #include <cmath>
 #include <cstdio>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <huniplacer/InverseKinematicsException.h>
+#include <DeltaRobot/InverseKinematicsException.h>
 
-#include <huniplacer/utils.h>
+#include <Utilities/Utils.h>
 
 /**
  * InverseKinematics.cpp -> An implementation of the kinematics model

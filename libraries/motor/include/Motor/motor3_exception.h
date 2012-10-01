@@ -43,7 +43,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace huniplacer
+namespace Motor
 {
 	class motor3_exception : public std::runtime_error
 	{

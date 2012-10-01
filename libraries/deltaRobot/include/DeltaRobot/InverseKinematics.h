@@ -40,11 +40,11 @@
 
 #pragma once
 
-#include <huniplacer/Point3D.h>
-#include <huniplacer/motion.h>
-#include <huniplacer/InverseKinematicsModel.h>
+#include <DataTypes/Point3D.h>
+#include <DataTypes/motion.h>
+#include <DeltaRobot/InverseKinematicsModel.h>
 
-namespace huniplacer {
+namespace DeltaRobot {
 	class InverseKinematics: public InverseKinematicsModel {
 	private:
 		double motorAngle(const Point3D& destinationPoint,
@@ -58,6 +58,6 @@ namespace huniplacer {
 		virtual ~InverseKinematics(void);
 		
 		void pointToMotion(const Point3D& destinationPoint,
-				motionf& motionPointer) const;
+				MotionF& motionPointer) const;
 	};
 }

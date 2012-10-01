@@ -40,10 +40,10 @@
 
 #pragma once
 
-#include <huniplacer/Point3D.h>
-#include <huniplacer/motion.h>
+#include <DataTypes/Point3D.h>
+#include <DataTypes/motion.h>
 
-namespace huniplacer {
+namespace DeltaRobot {
 	/**
 	 * InverseKinematicsModel.h -> kinematics model of the deltarobot.
 	 *
