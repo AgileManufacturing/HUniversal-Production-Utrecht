@@ -48,9 +48,9 @@
 #include <huniplacer/Point3D.h>
 #include <huniplacer/imotor3.h>
 #include <huniplacer/motor3_exception.h>
-#include <huniplacer/effector_boundaries.h>
+#include <huniplacer/EffectorBoundaries.h>
 #include <huniplacer/InverseKinematicsException.h>
-#include <huniplacer/deltarobot.h>
+#include <huniplacer/DeltaRobot.h>
 #define square(x) ((x)*(x))
 
 /**
@@ -74,15 +74,15 @@ namespace huniplacer
 
     deltarobot::~deltarobot(void)
     {
-    	if(motors.is_powerd_on())
-    	{
-    		motors.stop();
-    	}
+        if(motors.is_powerd_on())
+        {
+            motors.stop();
+        }
     }
     
     void deltarobot::generate_boundaries(double voxel_size){
-    	boundaries = effector_boundaries::generate_effector_boundaries(kinematics, motors, voxel_size);
-    	boundaries_generated = true;
+        boundaries = effector_boundaries::generate_effector_boundaries(kinematics, motors, voxel_size);
+        boundaries_generated = true;
     }
 
     bool deltarobot::is_valid_angle(double angle)
@@ -97,7 +97,7 @@ namespace huniplacer
      **/
     bool deltarobot::check_path(const Point3D& begin,const Point3D& end)
     {
-    	return boundaries->check_path(begin, end);
+        return boundaries->check_path(begin, end);
     }
 
     /**
@@ -108,18 +108,18 @@ namespace huniplacer
      **/
     void deltarobot::moveto(const Point3D& p, double speed, bool async)
     {
-    	if(!motors.is_powerd_on())
-    	{
-    		throw motor3_exception("motor drivers are not powered on");
-    	}
+        if(!motors.is_powerd_on())
+        {
+            throw motor3_exception("motor drivers are not powered on");
+        }
         motionf mf;
         try
         {
-        	kinematics.pointToMotion(p, mf);
+            kinematics.pointToMotion(p, mf);
         }
         catch(InverseKinematicsException& ex)
         {
-        	throw ex;
+            throw ex;
         }
         if(
             !is_valid_angle(mf.angles[0]) ||
@@ -129,15 +129,15 @@ namespace huniplacer
             throw InverseKinematicsException("motion angles outside of valid range", p);
         }
 
-    	if(!boundaries->check_path(effector_location, p))
-    	{
-    		throw InverseKinematicsException("invalid path", p);
-    	}
+        if(!boundaries->check_path(effector_location, p))
+        {
+            throw InverseKinematicsException("invalid path", p);
+        }
         double move_time = p.distance(effector_location) / speed;
 
         try
         {
-        	motors.moveto_within(mf, move_time, async);
+            motors.moveto_within(mf, move_time, async);
         }
         catch(std::out_of_range& ex) { throw ex; }
 
@@ -248,10 +248,10 @@ namespace huniplacer
      **/    
     void deltarobot::stop(void)
     {
-    	if(!motors.is_powerd_on())
-		{
-			throw motor3_exception("motor drivers are not powered on");
-		}
+        if(!motors.is_powerd_on())
+        {
+            throw motor3_exception("motor drivers are not powered on");
+        }
         motors.stop();
     }
     
@@ -265,11 +265,11 @@ namespace huniplacer
      **/    
     bool deltarobot::wait_for_idle(long timeout)
     {
-    	if(motors.is_powerd_on())
-    	{
-    		return motors.wait_for_idle(timeout);
-    	}
-    	return true;
+        if(motors.is_powerd_on())
+        {
+            return motors.wait_for_idle(timeout);
+        }
+        return true;
     }
 
     /**
@@ -287,7 +287,7 @@ namespace huniplacer
     {
         if(motors.is_powerd_on())
         {
-        	motors.power_off();
+            motors.power_off();
         }
     }
 
@@ -298,7 +298,7 @@ namespace huniplacer
     {
         if(!motors.is_powerd_on())
         {
-        	motors.power_on();
+            motors.power_on();
         }
     }
 
@@ -306,4 +306,3 @@ namespace huniplacer
         return effector_location;
     }
 }
-#undef square

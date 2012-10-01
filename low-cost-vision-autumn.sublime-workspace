@@ -1,0 +1,468 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"ROS",
+				"ROS_ERROR"
+			],
+			[
+				"get",
+				"get_process_state"
+			],
+			[
+				"crd",
+				"crd514_kd"
+			],
+			[
+				"motor",
+				"motorIndex"
+			],
+			[
+				"custo",
+				"custom_power_on"
+			],
+			[
+				"MOT",
+				"MOTOR_2"
+			],
+			[
+				"call-",
+				"macro-callbox-recording"
+			],
+			[
+				"y",
+				"yVel"
+			],
+			[
+				"pro",
+				"processInput"
+			],
+			[
+				"key",
+				"keysPressed"
+			],
+			[
+				"wi",
+				"width"
+			],
+			[
+				"he",
+				"height"
+			],
+			[
+				"tempe",
+				"temperatures"
+			],
+			[
+				"temp",
+				"temperature_date"
+			],
+			[
+				"backgrou",
+				"background-color"
+			],
+			[
+				"ima",
+				"imageAspectRatio"
+			],
+			[
+				"imageM",
+				"imageMaxWidth"
+			],
+			[
+				"imageMa",
+				"imageMaxWidth"
+			],
+			[
+				"max",
+				"imageMaxHeight"
+			],
+			[
+				"le",
+				"length"
+			],
+			[
+				"add",
+				"add_filter"
+			],
+			[
+				"we",
+				"weaponID"
+			],
+			[
+				"player",
+				"playerID"
+			],
+			[
+				"CHE",
+				"CHECKSUM_MASK"
+			],
+			[
+				"WEAPON",
+				"WEAPON_ID_OFFSET"
+			],
+			[
+				"PLAYER",
+				"PLAYER_ID_OFFSET"
+			],
+			[
+				"playerID",
+				"PLAYER_ID_MASK"
+			],
+			[
+				"heal",
+				"health"
+			],
+			[
+				"shield",
+				"shieldDamage"
+			],
+			[
+				"p",
+				"pGameStats"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 138.0,
+		"selected_items":
+		[
+			[
+				"clang",
+				"Preferences: SublimeClang Settings – User"
+			],
+			[
+				"sublime",
+				"Preferences: SublimeClang Settings – Default"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Remove Package"
+			],
+			[
+				"d",
+				"Package Control: Discover Packages"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 139.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Datatypes/include/DataTypes/point3.hpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/include/DeltaRobot/Point3D.h",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/include/DeltaRobot/deltarobot.h",
+		"/home/kbraham/Documents/school/stage/modbus/test/libmodbus-3.0.1-2/src/modbus.c",
+		"/home/kbraham/.gvfs/SFTP for root on agilemanufacturing.nl/etc/php5/apache2/php.ini",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/ROS/deltarobotnode/src/main.cpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/autumn_path",
+		"/home/kbraham/rsync_exclude.txt",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/huniplacer/include/huniplacer/deltarobot.h",
+		"/home/kbraham/Documents/school/stage/modbus/changes/modbus.diff",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/ros/deltaRobotNode/src/DeltaRobotNode.cpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/huniplacer/src/steppermotor3.cpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/huniplacer/src/deltarobot.cpp",
+		"/home/kbraham/.config/sublime-text-2/Packages/User/SublimeClang.sublime-settings",
+		"/home/kbraham/.config/sublime-text-2/Packages/SublimeClang/SublimeClang.sublime-settings",
+		"/home/kbraham/.gvfs/SFTP for root on agilemanufacturing.nl/var/log/rkhunter.log",
+		"/home/kbraham/.gvfs/SFTP for rex on agilemanufacturing.nl/etc/php5/apache2/php.ini",
+		"/home/kbraham/Documents/school/stage/modbus/libmodbus_3.0.1-2_amd64.changes",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/tools/readio/src/readio.cpp",
+		"/home/kbraham/.gvfs/SFTP for root on 10.0.0.8/mnt/sdb1/var/www/cgi-bin/backup/bnd2_server.sh",
+		"/home/kbraham/.gvfs/SFTP for root on bnd3.adminlite.nl/mnt/sdb1/BACKUP/agilemanufacturing.nl/backup.sh",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/huniplacer/include/huniplacer/CRD514_KD.h",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/huniplacer/include/huniplacer/imotor3.h",
+		"/home/kbraham/.gvfs/SFTP for root on bnd3.adminlite.nl/mnt/sdb1/BACKUP/agilemanufacturing.nl/agileflybackup.sh",
+		"/home/kbraham/.gvfs/SFTP for root on bnd3.adminlite.nl/mnt/sdb1/BACKUP/agilemanufacturing.nl/rsyncexclude",
+		"/home/kbraham/.gvfs/SFTP for root on bnd3.adminlite.nl/home/braham/cgi-bin/backuponline/bnd3_backup_online.sh",
+		"/home/kbraham/.gvfs/SFTP for root on 10.0.0.8/mnt/sdb1/var/www/cgi-bin/backup/bnd2_server_exclude.txt",
+		"/home/kbraham/.gvfs/SFTP for root on agilemanufacturing.nl/root/backup/backup.sh",
+		"/home/kbraham/.gvfs/SFTP for root on 10.0.0.8/mnt/sdb1/var/www/cgi-bin/backup/bs2_server.sh",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/ros/equipletNode/CMakeLists.txt",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/ros/equipletNode/manifest.xml",
+		"/home/kbraham/.bashrc",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/ros/CMakeLists.txt",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/ros/equipletNode/src/main.cpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/ros/equipletNode/cmake_install.cmake",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/Libraries/BlackboardClient/src/BlackboardClientUtils.cpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/ROS/equipletnode/src/main.cpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/ROS/equipletnode/src/MotionWrapper.cpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/ROS/equipletnode/src/Crate.cpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/.gitignore",
+		"/home/kbraham/Documents/pythonbrewinstal/pythonbrewinstall",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/Tools/AutoKeyStoreServer/src/nl/hu/autokeystore/server/AutoConfServer.java",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/Libraries/Blackboard/src/org/openbbs/blackboard/Blackboard.java",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/ROS/grippernode/srv/grippersrv.srv",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/ROS/equipletnode/msg/registerNode.msg",
+		"/home/kbraham/Documents/PostIt.pb.cc",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/Agents/Agent framework/src/PostIt.proto",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/Libraries/BlackboardClient/include/BlackboardClient/PostIt.pb.h",
+		"/home/kbraham/Documents/school/stage/server/open_ports",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/huniplacer/include/huniplacer/measures.h",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/CMakeLists.txt",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/cmake/macros.cmake",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/huniplacer/include/huniplacer/motion.h",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/huniplacer/include/huniplacer/modbus_ctrl.h",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/huniplacer/src/modbus_ctrl.cpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/huniplacer/include/huniplacer/utils.h",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/huniplacer/include/huniplacer/steppermotor3.h",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/huniplacer/include/huniplacer/inverse_kinematics_impl.h",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/huniplacer/src/inverse_kinematics_impl.cpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/huniplacer/include/huniplacer/huniplacer.h",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/Agents/ReadMe.txt",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/Libraries/Devices/gripper/src/gripper.cpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/huniplacer/src/effector_boundaries.cpp",
+		"/media/3663-3930/NIKON001.DSC",
+		"/home/kbraham/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Deltarobot/huniplacer/src/utils.cpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/tools/CMakeLists.txt",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/Libraries/Deltarobot/huniplacer/src/steppermotor3.cpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/tools/README.md",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/tools/ReadMe.txt",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/Utilities/cmake_install.cmake",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/CMakeFiles/CMakeDirectoryInformation.cmake",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/Tools/readio/src/readio.cpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/CMakeLists.txt",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/CMakeLists.txt",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/ROS/deltarobotnode/CMakeLists.txt",
+		"/home/kbraham/.ssh/config",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/ROS/CMakeLists.txt",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/libraries/LibrariesExport.cmake",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/tools/relax/src/relax.c",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/CMake/ExternalLibraries.cmake",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/CMake/macros.cmake",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/Libraries/LibrariesExport.cmake",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/tools/relax/include/relax/config.h",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/Tools/ReadMe.txt",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/CMake/FindModbus.cmake",
+		"/home/kbraham/.gvfs/SFTP for root on 145.89.191.129/var/www/agilemanufacturing.nl/web/.htaccess",
+		"/home/kbraham/low-cost-vision/low-cost-vision-autumn/README.md",
+		"/etc/hosts",
+		"/etc/resolv",
+		"/home/kbraham/.gvfs/SFTP for root on 145.89.191.129/etc/nginx/sites-available/100-forum.agilemanufacturing.nl",
+		"/home/kbraham/.gvfs/SFTP for root on 145.89.191.129/var/www/forum.agilemanufacturing.nl/webold/inc/config.php",
+		"/home/kbraham/.gvfs/SFTP for root on 145.89.191.129/var/www/forum.agilemanufacturing.nl/web/install/convertors/convert_mybb.php",
+		"/home/kbraham/.gvfs/SFTP for root on 145.89.191.129/etc/apache2/sites-available/rexsite",
+		"/home/kbraham/.gvfs/SFTP for root on 145.89.191.129/etc/apache2/sites-available/rexforum",
+		"/home/kbraham/.gvfs/SFTP for root on 145.89.191.129/etc/apache2/sites-available/default",
+		"/home/kbraham/.gvfs/SFTP for root on braham.eu/etc/apache2/sites-available/rex.braham.eu.vhost",
+		"/home/kbraham/.gvfs/SFTP for root on braham.eu/etc/apache2/sites-available/braham.eu.vhost",
+		"/home/kbraham/.gvfs/SFTP for root on 145.89.191.129/var/www/forum.agilemanufacturing.nl/web/install/convertors/functions_mybb.php",
+		"/home/kbraham/.gvfs/SFTP for root on 145.89.191.129/etc/nginx/sites-available/default",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/Libraries/Deltarobot/huniplacer/src/effector_boundaries.cpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/Tools/relax/src/relax.c",
+		"/home/kbraham/Documents/school/stage/low-cost-vision/low-cost-vision-spring/Tools/relax/src/relax.c",
+		"/home/kbraham/Documents/school/stage/low-cost-vision/low-cost-vision-spring/Tools/readio/src/readio.cpp",
+		"/home/kbraham/Documents/school/stage/low-cost-vision/low-cost-vision-spring/Tools/cmake_install.cmake",
+		"/home/kbraham/.gvfs/SFTP for rex on 145.89.191.129/home/rex/default",
+		"/home/kbraham/.gvfs/SFTP for lcv on 192.168.1.123/home/lcv/SVN/low-cost-vision-2012/Tools/readio/src/readio.cpp",
+		"/home/kbraham/.gvfs/SFTP for rex on 145.89.191.129/etc/nginx/sites-available/default",
+		"/home/kbraham/.cache/.fr-5PF2ek/zaphoyd-websocketpp-16aaa00/examples/echo_server_tls/echo_server_tls.cpp",
+		"/home/kbraham/Documents/low-cost-vision-2012/ROS/deltarobotnode/src/main.cpp",
+		"/home/kbraham/Documents/low-cost-vision-2012/Libraries/Deltarobot/huniplacer/src/steppermotor3.cpp",
+		"/home/kbraham/Documents/zaphoyd-websocketpp-16aaa00/Makefile",
+		"/home/kbraham/Documents/zaphoyd-websocketpp-16aaa00/examples/Makefile",
+		"/home/kbraham/asterisk_outgoing",
+		"/home/kbraham/Documents/asterisk2",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/ROS/grippernode/src/main.cpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/Libraries/Devices/gripper/include/gripper/gripper.h",
+		"/home/kbraham/.gvfs/SFTP on 192.168.1.123/home/lcv/SVN/low-cost-vision-2012/Tools/CMakeLists.txt",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/Tools/CMakeLists.txt",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/ROS/grippernode/CMakeCache.txt",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/ROS/grippernode/CMakeLists.txt",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/Tools/relax/include/relax/config.h",
+		"/home/kbraham/Documents/zaphoyd-websocketpp-16aaa00/doc/uri.txt",
+		"/home/kbraham/callbox/extensions_custom.conf",
+		"/home/kbraham/test.cpp",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/ROS/vision/src/visionNode.cpp",
+		"/home/kbraham/.cache/.fr-cJDlzO/unicap_tutorial/Makefile",
+		"/home/kbraham/low-cost-vision/low-cost-vision-spring/Libraries/Vision/unicap_cv_bridge/src/unicap_cv_bridge.cpp"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			"/home/kbraham/low-cost-vision/low-cost-vision-autumn",
+			"/home/kbraham/low-cost-vision",
+			"/home/kbraham/Documents/low-cost-vision",
+			"/home/kbraham/Documents/low-cost-vision-2012"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"max_up",
+			"connection failed",
+			"exhandler",
+			"modbus_exhandler",
+			"currentCoordinates",
+			"listOfNodes",
+			"MOTOR_STEP_IN_DEGREES",
+			"MICROSTEP_DEG",
+			"cout",
+			"wait",
+			"status1_bits",
+			"deviation",
+			"MOTOR1_DEVIATION",
+			"waitForIdle",
+			"wait_for_idle",
+			"stop",
+			"set_max_angle",
+			"set_min_angle",
+			"0118",
+			"cout",
+			"override_current_angles",
+			"current_angles",
+			"crd514_kd::slaves::t(crd514_kd::slaves::MOTOR_1 + motorIndex)",
+			"moto_to",
+			"0x0214",
+			"override_current_angles",
+			"CMake",
+			"cmake",
+			"motionf(",
+			"motion_float_to_int",
+			"fabs",
+			"\"",
+			"!",
+			"calibrateMotor",
+			"override_current_angles",
+			"modbus",
+			"foreground",
+			"entities",
+			"<?=$site_url;?>",
+			"rhythmbox",
+			"totem",
+			"year",
+			"temperature_date",
+			"maanden",
+			"menu_days",
+			"argUserStylePath",
+			"argInjectScript",
+			"boundY",
+			"boundx",
+			"gedit",
+			"regenerateShield"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"huniplacer::CRD514_KD::MOTOR_STEP_IN_DEGREES",
+			"MOTOR_STEP_IN_DEGREES",
+			"wait_for_idle",
+			"waitForIdle",
+			"motor",
+			"",
+			"vlc",
+			"height",
+			"width"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.clang":
+	{
+		"height": 112.0
+	},
+	"output.exec":
+	{
+		"height": 112.0
+	},
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 311.0,
+	"status_bar_visible": true
+}
