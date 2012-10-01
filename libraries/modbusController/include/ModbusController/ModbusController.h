@@ -52,9 +52,9 @@ extern "C"
 #include <boost/thread.hpp>
 #include <map>
 
-namespace huniplacer
+namespace ModbusController
 {
-    class modbus_ctrl
+    class ModbusController
     {
         private:
             enum
@@ -71,29 +71,29 @@ namespace huniplacer
             modbus_t* context;
             long next_write_time;
             
-            typedef std::map<uint64_t, uint16_t> shadow_map;
+            typedef std::map<uint64_t, uint16_t> ShadowMap;
 
             /** 
              * Values at certain addresses are shadowed here
              **/
-            shadow_map shadow_registers;
+            ShadowMap shadowRegisters;
 
             void wait(void);
 
-            uint64_t get_shadow_address(crd514_kd::slaves::t slave, uint16_t address);
-            bool get_shadow(crd514_kd::slaves::t slave, uint32_t address, uint16_t& out_value);
-            void set_shadow(crd514_kd::slaves::t slave, uint32_t address, uint16_t value);
-            void set_shadow32(crd514_kd::slaves::t slave, uint32_t address, uint32_t value);
+            uint64_t get_shadow_address(uint16_t slave, uint16_t address);
+            bool get_shadow(uint16_t slave, uint32_t address, uint16_t& out_value);
+            void set_shadow(uint16_t slave, uint32_t address, uint16_t value);
+            void set_shadow32(uint16_t slave, uint32_t address, uint32_t value);
 
         public:
             modbus_ctrl(modbus_t* context);
             ~modbus_ctrl(void);
 
-            void write_u16(crd514_kd::slaves::t slave, uint16_t address, uint16_t data, bool use_shadow = false);
-            void write_u16(crd514_kd::slaves::t slave, uint16_t first_address, uint16_t* data, unsigned int len);
-            void write_u32(crd514_kd::slaves::t slave, uint16_t address, uint32_t data, bool use_shadow = false);
-            uint16_t read_u16(crd514_kd::slaves::t slave, uint16_t address);
-            void read_u16(crd514_kd::slaves::t slave, uint16_t first_address, uint16_t* data, unsigned int len);
-            uint32_t read_u32(crd514_kd::slaves::t slave, uint16_t address);
+            void write_u16(uint16_t slave, uint16_t address, uint16_t data, bool use_shadow = false);
+            void write_u16(uint16_t slave, uint16_t first_address, uint16_t* data, unsigned int len);
+            void write_u32(uint16_t slave, uint16_t address, uint32_t data, bool use_shadow = false);
+            uint16_t read_u16(uint16_t slave, uint16_t address);
+            void read_u16(uint16_t slave, uint16_t first_address, uint16_t* data, unsigned int len);
+            uint32_t read_u32(uint16_t slave, uint16_t address);
     };
 }

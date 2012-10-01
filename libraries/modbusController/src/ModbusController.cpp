@@ -3,10 +3,11 @@
 //                 Low Cost Vision
 //
 //******************************************************************************
-// Project:        modbus_ctrl.cpp
+// Project:        ModbusController.cpp
 // File:           wrapper for libmodbus with some extra functionality
-// Description:    Lukas Vermond & Kasper van Nieuwland
-// Author:         -
+// Description:    
+// Author:      1.0 Lukas Vermond & Kasper van Nieuwland
+//              1.1 Koen Braham
 // Notes:          
 //
 // License:        newBSD
@@ -38,20 +39,20 @@
 //******************************************************************************
 
 
-#include <huniplacer/modbus_ctrl.h>
-#include <huniplacer/modbus_exception.h>
-#include <huniplacer/utils.h>
+#include <ModbusController/ModbusController.h>
+#include <ModbusController/ModbusException.h>
+#include <Utilities/Utils.h>
 
 #include <sstream>
 #include <string>
 #include <stdexcept>
 #include <boost/thread.hpp>
-#include <huniplacer/CRD514_KD.h>
+#include <Motor/CRD514KDMotorController.h>
 #include <cstdio>
 #include <iostream>
 
 /**
- * modbus_ctrl.cpp -> Class that implements the modbus protocol
+ * ModbusController.cpp -> Class that implements the modbus protocol
  *
  * Modbus communication is realised with use of libmodbus.
  * This class merely adds a couple of features:
@@ -61,13 +62,13 @@
  * - thread safety
  **/
 
-namespace huniplacer
+namespace ModbusController
 {
     /**
      * Constructor
      * @param context initialized modbus_t
      **/
-    modbus_ctrl::modbus_ctrl(modbus_t* context) :
+    ModbusController::ModbusController(modbus_t* context) :
         next_write_time(0),
         shadow_registers()
     {
@@ -95,7 +96,7 @@ namespace huniplacer
         }
     }
 
-    modbus_ctrl::~modbus_ctrl(void)
+    ModbusController::~ModbusController(void)
     {
         modbus_close(context);
         modbus_free(context);
@@ -104,7 +105,7 @@ namespace huniplacer
     /**
      * Utility function. used to wait the remaining time till next_write_time.
      **/
-    void modbus_ctrl::wait(void)
+    void ModbusController::wait(void)
     {
         long delta = next_write_time - utils::time_now();
         if(delta > 0)
@@ -119,10 +120,9 @@ namespace huniplacer
      * @param address the register address
      * @return the 64-bit motorcontroller and register address value
      **/
-    uint64_t modbus_ctrl::get_shadow_address(crd514_kd::slaves::t slave, uint16_t address)
+    uint64_t ModbusController::get_shadow_address(uint16_t slave, uint16_t address)
     {
-    	uint16_t s = (uint16_t)slave;
-    	return (s << 16) | address;
+    	return (slave << 16) | address;
     }
 
     /**
@@ -132,7 +132,7 @@ namespace huniplacer
      * @param out_value output parameter, the value gets stored here
      * @return true if the value was shadowed, false otherwise
      **/
-    bool modbus_ctrl::get_shadow(crd514_kd::slaves::t slave, uint32_t address, uint16_t& out_value)
+    bool ModbusController::get_shadow(uint16_t slave, uint32_t address, uint16_t& out_value)
     {
         uint64_t a = get_shadow_address(slave, address);
         shadow_map::iterator it = shadow_registers.find(a);
@@ -150,7 +150,7 @@ namespace huniplacer
      * @param address the register's address
      * @param value the value that will be written
      **/
-    void modbus_ctrl::set_shadow(crd514_kd::slaves::t slave, uint32_t address, uint16_t value)
+    void ModbusController::set_shadow(uint16_t slave, uint32_t address, uint16_t value)
     {
         shadow_registers[get_shadow_address(slave, address)] = value;
     }
@@ -161,7 +161,7 @@ namespace huniplacer
      * @param address the register's address
      * @param value the value that will be written
      **/    
-    void modbus_ctrl::set_shadow32(crd514_kd::slaves::t slave, uint32_t address, uint32_t value)
+    void ModbusController::set_shadow32(uint16_t slave, uint32_t address, uint32_t value)
     {
         shadow_registers[get_shadow_address(slave, address+0)] = (value >> 16) & 0xFFFF;
         shadow_registers[get_shadow_address(slave, address+1)] = value & 0xFFFF;
@@ -174,7 +174,7 @@ namespace huniplacer
      * @param data data that will be written
      * @param use_shadow will check if write is necesary by first checking the shadow registers if true
      **/
-    void modbus_ctrl::write_u16(crd514_kd::slaves::t slave, uint16_t address, uint16_t data, bool use_shadow)
+    void ModbusController::write_u16(uint16_t slave, uint16_t address, uint16_t data, bool use_shadow)
     {
         if(use_shadow)
         {
@@ -215,7 +215,7 @@ namespace huniplacer
      * @param data data that will be written
      * @param len data length (in words)
      **/
-    void modbus_ctrl::write_u16(crd514_kd::slaves::t slave, uint16_t first_address, uint16_t* data, unsigned int len)
+    void ModbusController::write_u16(uint16_t slave, uint16_t first_address, uint16_t* data, unsigned int len)
     {
         if(len > 10)
         {
@@ -247,7 +247,7 @@ namespace huniplacer
      * @param data data that will be written
      * @param use_shadow will check if write is necesary by first checking the shadow registers if true
      **/    
-    void modbus_ctrl::write_u32(crd514_kd::slaves::t slave, uint16_t address, uint32_t data, bool use_shadow)
+    void ModbusController::write_u32(uint16_t slave, uint16_t address, uint32_t data, bool use_shadow)
     {
     	try
     	{
@@ -300,7 +300,7 @@ namespace huniplacer
      * @param address address that will be read from
      * @return the value that was read
      **/    
-    uint16_t modbus_ctrl::read_u16(crd514_kd::slaves::t slave, uint16_t address)
+    uint16_t ModbusController::read_u16(uint16_t slave, uint16_t address)
     {
         wait();
         modbus_set_slave(context, slave);
@@ -323,7 +323,7 @@ namespace huniplacer
      * @param data will be stored here
      * @param len data length (in words)
      **/    
-    void modbus_ctrl::read_u16(crd514_kd::slaves::t slave, uint16_t first_address, uint16_t* data, unsigned int len)
+    void ModbusController::read_u16(uint16_t slave, uint16_t first_address, uint16_t* data, unsigned int len)
     {
         wait();
         modbus_set_slave(context, slave);
@@ -342,7 +342,7 @@ namespace huniplacer
      * @param address address from which will be read
      * @return value that was read
      **/    
-    uint32_t modbus_ctrl::read_u32(crd514_kd::slaves::t slave, uint16_t address)
+    uint32_t ModbusController::read_u32(uint16_t slave, uint16_t address)
     {
         try
         {
