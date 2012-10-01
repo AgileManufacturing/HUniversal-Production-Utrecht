@@ -42,7 +42,7 @@
 
 #include <vector>
 
-#include <huniplacer/motion.h>
+#include <DataTypes/Motion.h>
 
 namespace Motor
 {

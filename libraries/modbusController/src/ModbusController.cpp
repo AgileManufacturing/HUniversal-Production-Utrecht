@@ -41,13 +41,12 @@
 
 #include <ModbusController/ModbusController.h>
 #include <ModbusController/ModbusException.h>
-#include <Utilities/Utils.h>
+#include <Utilities/Utilities.h>
 
 #include <sstream>
 #include <string>
 #include <stdexcept>
 #include <boost/thread.hpp>
-#include <Motor/CRD514KDMotorController.h>
 #include <cstdio>
 #include <iostream>
 
@@ -75,7 +74,7 @@ namespace ModbusController
         this->context = context;
         if(context == NULL)
         {
-            throw modbus_exception("Error uninitialized connection");
+            throw ModbusException("Error uninitialized connection");
         }
         
         //set timeout
@@ -92,7 +91,7 @@ namespace ModbusController
         //connect
         if(modbus_connect(context) == -1)
         {
-            throw modbus_exception("Unable to connect modbus");
+            throw ModbusException("Unable to connect modbus");
         }
     }
 
@@ -107,10 +106,10 @@ namespace ModbusController
      **/
     void ModbusController::wait(void)
     {
-        long delta = nextWriteTime - utils::time_now();
+        long delta = nextWriteTime - Utilities::timeNow();
         if(delta > 0)
         {
-            utils::sleep(delta);
+            Utilities::sleep(delta);
         }
     }
 
@@ -135,7 +134,7 @@ namespace ModbusController
     bool ModbusController::getShadow(uint16_t slave, uint32_t address, uint16_t& outValue)
     {
         uint64_t a = getShadowAddress(slave, address);
-        shadow_map::iterator it = shadowRegisters.find(a);
+        ShadowMap::iterator it = shadowRegisters.find(a);
         if(it == shadowRegisters.end())
         {
             return false;
@@ -179,7 +178,7 @@ namespace ModbusController
         if(useShadow)
         {
             uint16_t shadowData;
-            if(get_shadow(slave, address, shadowData) && shadowData == data)
+            if(getShadow(slave, address, shadowData) && shadowData == data)
             {
                 return;
             }
@@ -188,17 +187,18 @@ namespace ModbusController
         wait();
         modbus_set_slave(context, slave);
         int r = modbus_write_register(context, (int)address, (int)data);
-        nextWriteTime = utils::time_now() + (slave == crd514_kd::slaves::BROADCAST ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
+        // TODO: fix the broadcast issue slave == crd514_kd::slaves::BROADCAST temporary == 0
+        nextWriteTime = Utilities::timeNow() + (slave == 0 ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
         
         if(r == -1)
         {
             //when broadcasting; ignore timeout errors
-            if(slave == crd514_kd::slaves::BROADCAST && errno == MODBUS_ERRNO_TIMEOUT)
+            if(slave == 0 && errno == MODBUS_ERRNO_TIMEOUT)
             {
                 return;
             }
             
-            throw modbus_exception("Error writing u16");
+            throw ModbusException("Error writing u16");
 
         }
         
@@ -219,24 +219,25 @@ namespace ModbusController
     {
         if(length > 10)
         {
-            throw modbus_exception("length > 10");
+            throw ModbusException("length > 10");
         }
         
         wait();
         
         modbus_set_slave(context, slave);
         int r = modbus_write_registers(context, first_address, length, data);
-        nextWriteTime = utils::time_now() + (slave == crd514_kd::slaves::BROADCAST ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
+        // TODO: fix the broadcast issue slave == crd514_kd::slaves::BROADCAST temporary == 0
+        nextWriteTime = Utilities::timeNow() + (slave == 0 ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
         
         if(r == -1)
         {
             //when broadcasting; ignore timeout errors
-            if(slave == crd514_kd::slaves::BROADCAST && errno == MODBUS_ERRNO_TIMEOUT)
+            if(slave == 0 && errno == MODBUS_ERRNO_TIMEOUT)
             {
                 return;
             }
             
-            throw modbus_exception("Error writing u16 array");
+            throw ModbusException("Error writing u16 array");
         }
     }
 
@@ -259,8 +260,8 @@ namespace ModbusController
 			{
 				uint16_t shadowHigh;
                 uint16_t shadowLow;
-				bool skipHigh = get_shadow(slave, address+0, shadowHigh) && shadowHigh == _data[0];
-				bool skipLow = get_shadow(slave, address+1, shadowLow) && shadowLow == _data[1];
+				bool skipHigh = getShadow(slave, address+0, shadowHigh) && shadowHigh == _data[0];
+				bool skipLow = getShadow(slave, address+1, shadowLow) && shadowLow == _data[1];
 
 				if(skipHigh && skipLow)
 				{
@@ -268,27 +269,27 @@ namespace ModbusController
 				}
 				else if(skipLow) //write only up
 				{
-					write_u16(slave, address, _data[0]);
-					set_shadow(slave, address, _data[0]);
+					writeU16(slave, address, _data[0]);
+					setShadow(slave, address, _data[0]);
 					return;
 				}
 				else if(skipHigh) //write only lo
 				{
-					write_u16(slave, address+1, _data[1]);
-					set_shadow(slave, address+1, _data[1]);
+					writeU16(slave, address+1, _data[1]);
+					setShadow(slave, address+1, _data[1]);
 					return;
 				}
 			}
 
 			//write up & lo
-			write_u16(slave, address, _data, 2);
+			writeU16(slave, address, _data, 2);
 
 			if(useShadow)
 			{
-				set_shadow32(slave, address, data);
+				setShadow32(slave, address, data);
 			}
     	}
-    	catch(modbus_exception& ex)
+    	catch(ModbusException& ex)
     	{
     		throw ex;
     	}
@@ -306,11 +307,12 @@ namespace ModbusController
         modbus_set_slave(context, slave);
         uint16_t data;
         int r = modbus_read_registers(context, (int)address, 1, &data); 
-        nextWriteTime = utils::time_now() + (slave == crd514_kd::slaves::BROADCAST ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
+        // TODO: fix the broadcast issue slave == crd514_kd::slaves::BROADCAST temporary == 0
+        nextWriteTime = Utilities::timeNow() + (slave == 0 ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
         
         if(r == -1)
         {
-            throw modbus_exception("Error reading u16");
+            throw ModbusException("Error reading u16");
         }
         
         return data;
@@ -328,11 +330,12 @@ namespace ModbusController
         wait();
         modbus_set_slave(context, slave);
         int r = modbus_read_registers(context, (int)first_address, length, data); 
-        nextWriteTime = utils::time_now() + (slave == crd514_kd::slaves::BROADCAST ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
+        // TODO: fix the broadcast issue slave == crd514_kd::slaves::BROADCAST temporary == 0
+        nextWriteTime = Utilities::timeNow() + (slave == 0 ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
         
         if(r == -1)
         {
-            throw modbus_exception("Error reading u16 array");
+            throw ModbusException("Error reading u16 array");
         }
     }
   
@@ -347,10 +350,10 @@ namespace ModbusController
         try
         {
             uint16_t data[2];
-            read_u16(slave, address, data, 2);
+            readU16(slave, address, data, 2);
             return ((data[0] << 16) & 0xFFFF0000) | data[1];
         }
-        catch(modbus_exception& ex)
+        catch(ModbusException& ex)
         {
             throw ex;
         }

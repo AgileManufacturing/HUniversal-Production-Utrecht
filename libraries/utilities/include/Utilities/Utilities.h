@@ -1,8 +1,13 @@
-// Project:        Utils.cpp
-// File:           miscellaneous utilities
-// Description:    Lukas Vermond & Kasper van Nieuwland
-// Author:         -
-// Notes:          
+//******************************************************************************
+//
+//                 Low Cost Vision
+//
+//******************************************************************************
+// Project:        huniplacer
+// File:           utils.h
+// Description:    miscellaneous utilities
+// Author:         Lukas Vermond & Kasper van Nieuwland
+// Notes:          -
 //
 // License:        newBSD
 //
@@ -33,57 +38,55 @@
 //******************************************************************************
 
 
-#include <Utilities/Utils.h>
+#pragma once
 
-/**
- * Utils.cpp -> Various utilities
- **/
-namespace Utilities
-{
+#include <boost/thread.hpp>
+#include <cstdio>
+#include <algorithm>
+#include <vector>
 
-    /**
-     * Get the current time in milliseconds
-     *
-     * @return time in milliseconds
-     **/
-    long time_now(void)
+    namespace Utilities
     {
-        boost::posix_time::ptime time = boost::posix_time::microsec_clock::local_time();
-        boost::posix_time::time_duration duration(time.time_of_day());
-        return duration.total_milliseconds();
-    }
-    
-    /**
-     * Sleep for X milliseconds
-     *
-     * @param ms time in milliseconds
-     **/
-    void sleep(long ms)
-    {
-        boost::this_thread::sleep(boost::posix_time::milliseconds(ms));
-    }
+        long timeNow(void);
+        void sleep(long ms);
+        double deg(double rad);
+        double rad(double deg);
 
-    /**
-     * Convert radians to degrees
-     *
-     * @param rad radians
-     *
-     * @return degrees
-     **/
-    double deg(double rad)
-	{
-		return (rad / M_PI) * 180;
-	}
+        /**
+         * Utility class to time stuff
+         * @note TEMPORARY
+         **/
+        class StopWatch
+        {
+			private:
+        		const char* name;
+				long t0, t1;
 
-    /**
-     * Convert degrees to radians
-     *
-     * @param deg degrees
-     *
-     * @return radians
-     **/
-	double rad(double deg)
-	{
-		return (deg / 180) * M_PI;
-	}
-}
+			public:
+				StopWatch(const char* name, bool s = false) : name(name)
+				{
+					if(s) { start(); }
+				}
+
+				~StopWatch(void) { }
+				void start(void) { t0 = timeNow(); }
+				void stop(void) { t1 = timeNow(); }
+				
+                void print(FILE* stream)
+				{
+					fprintf(stream, "%s: %ld ms\n", name, t1 - t0);
+				}
+
+				void stopAndPrint(FILE* stream)
+				{
+					stop();
+					print(stream);
+				}
+        };
+
+        template<typename T>
+        bool vectorContains(const std::vector<T>& vec, const T& elem)
+        {
+        	return std::find(vec.begin(), vec.end(), elem) != vec.end();
+        }
+    }

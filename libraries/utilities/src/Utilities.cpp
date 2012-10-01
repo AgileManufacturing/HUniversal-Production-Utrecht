@@ -1,13 +1,8 @@
-//******************************************************************************
-//
-//                 Low Cost Vision
-//
-//******************************************************************************
-// Project:        huniplacer
-// File:           utils.h
-// Description:    miscellaneous utilities
-// Author:         Lukas Vermond & Kasper van Nieuwland
-// Notes:          -
+// Project:        Utils.cpp
+// File:           miscellaneous utilities
+// Description:    Lukas Vermond & Kasper van Nieuwland
+// Author:         -
+// Notes:          
 //
 // License:        newBSD
 //
@@ -38,58 +33,57 @@
 //******************************************************************************
 
 
-#pragma once
+#include <Utilities/Utilities.h>
 
-#include <boost/thread.hpp>
-#include <cstdio>
-#include <algorithm>
-#include <vector>
-
-namespace huniplacer
+/**
+ * Utilities.cpp -> Various utilities
+ **/
+namespace Utilities
 {
-    namespace utils
+
+    /**
+     * Get the current time in milliseconds
+     *
+     * @return time in milliseconds
+     **/
+    long timeNow(void)
     {
-        long time_now(void);
-        void sleep(long ms);
-        double deg(double rad);
-        double rad(double deg);
-
-        /**
-         * Utility class to time stuff
-         * @note TEMPORARY
-         **/
-        class stopwatch
-        {
-			private:
-        		const char* name;
-				long t0, t1;
-
-			public:
-				stopwatch(const char* name, bool s = false) : name(name)
-				{
-					if(s) { start(); }
-				}
-
-				~stopwatch(void) { }
-				void start(void) { t0 = time_now(); }
-				void stop(void) { t1 = time_now(); }
-				
-                void print(FILE* stream)
-				{
-					fprintf(stream, "%s: %ld ms\n", name, t1 - t0);
-				}
-
-				void stop_and_print(FILE* stream)
-				{
-					stop();
-					print(stream);
-				}
-        };
-
-        template<typename T>
-        bool vector_contains(const std::vector<T>& vec, const T& elem)
-        {
-        	return std::find(vec.begin(), vec.end(), elem) != vec.end();
-        }
+        boost::posix_time::ptime time = boost::posix_time::microsec_clock::local_time();
+        boost::posix_time::time_duration duration(time.time_of_day());
+        return duration.total_milliseconds();
     }
+    
+    /**
+     * Sleep for X milliseconds
+     *
+     * @param ms time in milliseconds
+     **/
+    void sleep(long ms)
+    {
+        boost::this_thread::sleep(boost::posix_time::milliseconds(ms));
+    }
+
+    /**
+     * Convert radians to degrees
+     *
+     * @param rad radians
+     *
+     * @return degrees
+     **/
+    double deg(double rad)
+	{
+		return (rad / M_PI) * 180;
+	}
+
+    /**
+     * Convert degrees to radians
+     *
+     * @param deg degrees
+     *
+     * @return radians
+     **/
+	double rad(double deg)
+	{
+		return (deg / 180) * M_PI;
+	}
 }

@@ -41,8 +41,6 @@
 
 #pragma once
 
-#include <Motor/CRD514KDMotorController.h>
-
 extern "C"
 {
     #include <modbus/modbus.h>

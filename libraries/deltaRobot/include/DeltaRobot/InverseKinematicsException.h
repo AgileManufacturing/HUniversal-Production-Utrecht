@@ -42,10 +42,10 @@
 
 #include <stdexcept>
 
-#include <huniplacer/motion.h>
-#include <huniplacer/Point3D.h>
+#include <DataTypes/Motion.h>
+#include <DataTypes/Point3D.h>
 
-namespace huniplacer {
+namespace DeltaRobot {
 /**
  * Inverse Kinematics -> Instances of deltarobot will throw this exception whenever they fail to convert a point.
  **/

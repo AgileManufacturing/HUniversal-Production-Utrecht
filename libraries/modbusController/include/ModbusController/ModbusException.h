@@ -70,16 +70,16 @@ namespace ModbusController
         public:
             ModbusException(void) :
                 std::runtime_error(""),
-                error_code(errno)
+                errorCode(errno)
             {
                 std::stringstream ss;
                 ss << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
                 message = ss.str();
             }
 
-            ModbusException(const std::String msg) :
+            ModbusException(const std::string msg) :
                 std::runtime_error(""),
-                error_code(errno)
+                errorCode(errno)
             {
                 std::stringstream ss;
                 ss << msg << std::endl;

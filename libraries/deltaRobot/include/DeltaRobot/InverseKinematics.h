@@ -41,7 +41,7 @@
 #pragma once
 
 #include <DataTypes/Point3D.h>
-#include <DataTypes/motion.h>
+#include <DataTypes/Motion.h>
 #include <DeltaRobot/InverseKinematicsModel.h>
 
 namespace DeltaRobot {

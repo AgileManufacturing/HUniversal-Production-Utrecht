@@ -38,18 +38,18 @@
 //******************************************************************************
 
 
-#include <huniplacer/steppermotor3.h>
+#include <Motor/steppermotor3.h>
 
 #include <cstdio>
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
 
-#include <huniplacer/utils.h>
-#include <huniplacer/CRD514_KD.h>
-#include <huniplacer/crd514_kd_exception.h>
-#include <huniplacer/effector_boundaries_exception.h>
-#include <huniplacer/motor3_exception.h>
+#include <Utilities/Utilities.h>
+#include <Motor/CRD514KDMotorController.h>
+#include <Motor/CRD514KDException.h>
+#include <DeltaRobot/EffectorBoundariesException.h>
+#include <Motor/motor3_exception.h>
 
 /** 
  * steppermotor3.cpp -> Implementation of imotor3 for steppermotors

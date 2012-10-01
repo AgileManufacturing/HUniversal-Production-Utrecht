@@ -43,12 +43,12 @@
 #include <queue>
 #include <boost/thread.hpp>
 
-#include <huniplacer/motion.h>
-#include <huniplacer/modbus_exception.h>
-#include <huniplacer/modbus_ctrl.h>
-#include <huniplacer/imotor3.h>
+#include <DataTypes/Motion.h>
+#include <ModbusController/ModbusException.h>
+#include <ModbusController/ModbusController.h>
+#include <Motor/imotor3.h>
 
-namespace huniplacer
+namespace Motor
 {
     /**
      * Exception handler to which modbus_exception's will be passed that occur in motion_thread
