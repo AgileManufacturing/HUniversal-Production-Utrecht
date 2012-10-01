@@ -41,51 +41,45 @@
 #pragma once
 
 #include <modbus/modbus.h>
-#include <huniplacer/Point3D.h>
-#include <huniplacer/imotor3.h>
-#include <huniplacer/effector_boundaries.h>
-#include <huniplacer/huniplacer.h>
+#include <DataTypes/Point3D.h>
+#include <Motors/imotor3.h>
+#include <DeltaRobot/EffectorBoundaries.h>
 
-//TODO: implement forward kinematics and use that to calculate the current effector position
-
-namespace huniplacer
+namespace DeltaRobot
 {
 	class InverseKinematicsModel;
 
 	
-    class deltarobot 
+    class DeltaRobot 
     {
         private:
             InverseKinematicsModel& kinematics;
             steppermotor3& motors;
-            effector_boundaries* boundaries;
+            effectorBoundaries* boundaries;
 
-            Point3D effector_location;
-            bool boundaries_generated;
+            Point3D effectorLocation;
+            bool boundariesGenerated;
 
-            bool is_valid_angle(double angle);
+            bool isValidAngle(double angle);
         
         public:
-            deltarobot(InverseKinematicsModel& kinematics, steppermotor3& motors);
-            ~deltarobot(void);
+            DeltaRobot(InverseKinematicsModel& kinematics, steppermotor3& motors);
+            ~DeltaRobot(void);
             
-            inline effector_boundaries* get_boundaries();
-            inline bool has_boundaries();
+            inline effectorBoundaries* getBoundaries(){return boundaries;}
+            inline bool hasBoundaries(){return boundariesGenerated;}
 
-            void generate_boundaries(double voxel_size);
-            bool check_path(const Point3D& begin,const Point3D& end);
-            void moveto(const Point3D& p, double speed, bool async = true);
+            void generateBoundaries(double voxelSize);
+            bool checkPath(const Point3D& begin, const Point3D& end);
+            void moveTo(const Point3D& p, double speed, bool async = true);
             void calibrateMotor(modbus_t* modbus, int motorIndex);
             bool checkSensor(modbus_t* modbus, int sensorIndex);
             bool calibrateMotors(modbus_t* modbus);
             void stop(void);
-            bool wait_for_idle(long timeout = 0);
-            bool is_idle(void);
-            void power_off(void);
-            void power_on(void);
+            bool waitForIdle(long timeout = 0);
+            bool isIdle(void);
+            void powerOff(void);
+            void powerOn(void);
             Point3D& getEffectorLocation();
     };
-
-    effector_boundaries* deltarobot::get_boundaries(){return boundaries;}
-    bool deltarobot::has_boundaries(){return boundaries_generated;}
 }
