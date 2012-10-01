@@ -81,20 +81,20 @@ namespace ModbusController
 
             void wait(void);
 
-            uint64_t get_shadow_address(uint16_t slave, uint16_t address);
-            bool get_shadow(uint16_t slave, uint32_t address, uint16_t& outValue);
-            void set_shadow(uint16_t slave, uint32_t address, uint16_t value);
-            void set_shadow32(uint16_t slave, uint32_t address, uint32_t value);
+            uint64_t getShadowAddress(uint16_t slave, uint16_t address);
+            bool getShadow(uint16_t slave, uint32_t address, uint16_t& outValue);
+            void setShadow(uint16_t slave, uint32_t address, uint16_t value);
+            void setShadow32(uint16_t slave, uint32_t address, uint32_t value);
 
         public:
-            modbus_ctrl(modbus_t* context);
-            ~modbus_ctrl(void);
+            ModbusController(modbus_t* context);
+            ~ModbusController(void);
 
-            void write_u16(uint16_t slave, uint16_t address, uint16_t data, bool useShadow = false);
-            void write_u16(uint16_t slave, uint16_t first_address, uint16_t* data, unsigned int len);
-            void write_u32(uint16_t slave, uint16_t address, uint32_t data, bool useShadow = false);
-            uint16_t read_u16(uint16_t slave, uint16_t address);
-            void read_u16(uint16_t slave, uint16_t first_address, uint16_t* data, unsigned int len);
-            uint32_t read_u32(uint16_t slave, uint16_t address);
+            void writeU16(uint16_t slave, uint16_t address, uint16_t data, bool useShadow = false);
+            void writeU16(uint16_t slave, uint16_t first_address, uint16_t* data, unsigned int length);
+            void writeU32(uint16_t slave, uint16_t address, uint32_t data, bool useShadow = false);
+            uint16_t readU16(uint16_t slave, uint16_t address);
+            void readU16(uint16_t slave, uint16_t first_address, uint16_t* data, unsigned int length);
+            uint32_t readU32(uint16_t slave, uint16_t address);
     };
 }
