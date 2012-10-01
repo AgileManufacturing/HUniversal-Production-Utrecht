@@ -42,7 +42,7 @@
 
 #include <DataTypes/Point3D.h>
 #include <DataTypes/motion.h>
-#include <huniplacer/InverseKinematicsModel.h>
+#include <DeltaRobot/InverseKinematicsModel.h>
 
 namespace DeltaRobot {
 	class InverseKinematics: public InverseKinematicsModel {
@@ -58,6 +58,6 @@ namespace DeltaRobot {
 		virtual ~InverseKinematics(void);
 		
 		void pointToMotion(const Point3D& destinationPoint,
-				motionf& motionPointer) const;
+				MotionF& motionPointer) const;
 	};
 }

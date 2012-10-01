@@ -44,7 +44,7 @@
 
 #include <huniplacer/motion.h>
 
-namespace huniplacer
+namespace Motor
 {
 	/**
 	 * imotor3.h -> Interface for the 3 motors

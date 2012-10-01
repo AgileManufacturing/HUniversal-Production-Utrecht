@@ -44,7 +44,7 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <DeltaRobot/InverseKinematicsException.h>
 
-#include <DeltaRobot/utils.h>
+#include <Utilities/Utils.h>
 
 /**
  * InverseKinematics.cpp -> An implementation of the kinematics model

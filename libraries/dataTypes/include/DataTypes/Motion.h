@@ -3,11 +3,11 @@
 //                 Low Cost Vision
 //
 //******************************************************************************
-// Project:        utils.cpp
-// File:           miscellaneous utilities
-// Description:    Lukas Vermond & Kasper van Nieuwland
-// Author:         -
-// Notes:          
+// Project:        huniplacer
+// File:           motion.h
+// Description:    template class for motion. also 2 definitions for integer and floating point motions
+// Author:         Lukas Vermond & Kasper van Nieuwland
+// Notes:          -
 //
 // License:        newBSD
 //
@@ -38,54 +38,66 @@
 //******************************************************************************
 
 
-#include <huniplacer/utils.h>
+#pragma once
 
-namespace huniplacer
+#include <stdint.h>
+#include <cstring>
+
+namespace DataTypes
 {
-    /**
-     * utils.cpp -> Various utilities
-     **/
-    namespace utils
+	/**
+	 * motion.h -> Template class for use in types motioni and motionf (see below)
+	 **/
+    template<typename T>
+    class Motion
     {
+        public:
+            T angles[3];
+            T speed[3];
+            T acceleration[3];
+            T deceleration[3];
+            
+            Motion(bool clear = false) {
+            	if(clear) {
+            		memset(angles, 0, 3 * sizeof(T));
+            		memset(speed, 0, 3 * sizeof(T));
+            		memset(acceleration, 0, 3 * sizeof(T));
+            		memset(deceleration, 0, 3 * sizeof(T));
+            	}
+            }
+            
+            Motion(
+                T angle0, T angle1, T angle2,
+                T speed0, T speed1, T speed2,
+                T acc0, T acc1, T acc2,
+                T dec0, T dec1, T dec2) {
+                angles[0] = angle0;
+                angles[1] = angle1;
+                angles[2] = angle2;
+                
+                speed[0] = speed0;
+                speed[1] = speed1;
+                speed[2] = speed2;
+                
+                acceleration[0] = acc0;
+                acceleration[1] = acc1;
+                acceleration[2] = acc2;
+                
+                deceleration[0] = dec0;
+                deceleration[1] = dec1;
+                deceleration[2] = dec2;
+            }
+            
+            ~Motion(void) { }
+    };
+    
+    /**
+     * Floating point motion type
+     **/ 
+    typedef Motion<double> MotionF;
 
-        /**
-         * Get the current time in milliseconds
-         * @return time in milliseconds
-         **/
-        long time_now(void)
-        {
-            boost::posix_time::ptime time = boost::posix_time::microsec_clock::local_time();
-            boost::posix_time::time_duration duration(time.time_of_day());
-            return duration.total_milliseconds();
-        }
-        
-        /**
-         * Sleep for X milliseconds
-         * @param ms time in milliseconds
-         **/
-        void sleep(long ms)
-        {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(ms));
-        }
-
-        /**
-         * Convert radians to degrees
-         * @param rad radians
-         * @return degrees
-         **/
-        double deg(double rad)
-		{
-			return (rad / M_PI) * 180;
-		}
-
-        /**
-         * Convert degrees to radians
-         * @param deg degrees
-         * @return radians
-         **/
-		double rad(double deg)
-		{
-			return (deg / 180) * M_PI;
-		}
-    }
+    /** 
+     * Integer motion type
+     **/
+    typedef Motion<uint32_t> MotionI;
 }

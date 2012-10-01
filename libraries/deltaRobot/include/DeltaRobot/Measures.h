@@ -4,8 +4,8 @@
 //
 //******************************************************************************
 // Project:        huniplacer
-// File:           motion.h
-// Description:    template class for motion. also 2 definitions for integer and floating point motions
+// File:           measures.h
+// Description:    miscellaneous measures
 // Author:         Lukas Vermond & Kasper van Nieuwland
 // Notes:          -
 //
@@ -39,68 +39,38 @@
 
 
 #pragma once
+#include <Utilities/Utils.h>
 
-#include <stdint.h>
-#include <cstring>
+/**
+ * measures.h -> deltarobot measures, specifically for the huniplacer deltarobot
+ **/
 
-namespace huniplacer
+namespace DeltaRobot
 {
-	/**
-	 * motion.h -> Template class for use in types motioni and motionf (see below)
-	 **/
-    template<typename T>
-    class motion
-    {
-        public:
-            T angles[3];
-            T speed[3];
-            T acceleration[3];
-            T deceleration[3];
-            
-            motion(bool clear = false)
-            {
-            	if(clear)
-            	{
-            		memset(angles, 0, 3 * sizeof(T));
-            		memset(speed, 0, 3 * sizeof(T));
-            		memset(acceleration, 0, 3 * sizeof(T));
-            		memset(deceleration, 0, 3 * sizeof(T));
-            	}
-            }
-            
-            motion(
-                T angle0, T angle1, T angle2,
-                T speed0, T speed1, T speed2,
-                T acc0, T acc1, T acc2,
-                T dec0, T dec1, T dec2)
-            {
-                angles[0] = angle0;
-                angles[1] = angle1;
-                angles[2] = angle2;
-                
-                speed[0] = speed0;
-                speed[1] = speed1;
-                speed[2] = speed2;
-                
-                acceleration[0] = acc0;
-                acceleration[1] = acc1;
-                acceleration[2] = acc2;
-                
-                deceleration[0] = dec0;
-                deceleration[1] = dec1;
-                deceleration[2] = dec2;
-            }
-            
-            ~motion(void) { }
-    };
-    
-    /**
-     * Floating point motion type
-     **/ 
-    typedef motion<double> motionf;
+	namespace measures
+	{
+		const double BASE 				  = 101.3; //mm
+		const double HIP 				  = 100; //mm
+		const double EFFECTOR			  = 46.19; //mm
+		const double ANKLE 				  = 250; //mm
+		
+		const double HIP_ANKLE_ANGLE_MAX  = utils::rad(22);    //radians
+		//safety constants, roughly determined to be as safe as possible for testing purposes
+		const double MOTOR_ROT_MIN 	      = utils::rad(-42);   //radians
+		const double MOTOR_ROT_MAX 	      = utils::rad(45);    //radians
 
-    /** 
-     * Integer motion type
-     **/
-    typedef motion<uint32_t> motioni;
+		const double MOTOR1_DEVIATION	  = utils::rad(-45);   //radians
+		const double MOTOR2_DEVIATION	  = utils::rad(-45);   //radians
+		const double MOTOR3_DEVIATION	  = utils::rad(-45);   //radians
+
+		// Top (granite) to middle point is 45 degrees. Removing the hip thickness results in +-42.5 degrees!
+		const double MOTORS_DEVIATION	= huniplacer::utils::rad(42.5); 
+		
+ 		const double MAX_X = 500;
+		const double MAX_Y = MAX_X;
+		const double MIN_X = -MAX_X;
+		const double MIN_Y = -MAX_Y;
+		const double MIN_Z = -250;
+		const double MAX_Z = -180;
+	}
 }
