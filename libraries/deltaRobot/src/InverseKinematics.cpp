@@ -37,14 +37,14 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //******************************************************************************
 
-#include <huniplacer/InverseKinematics.h>
+#include <DeltaRobot/InverseKinematics.h>
 
 #include <cmath>
 #include <cstdio>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <huniplacer/InverseKinematicsException.h>
+#include <DeltaRobot/InverseKinematicsException.h>
 
-#include <huniplacer/utils.h>
+#include <DeltaRobot/utils.h>
 
 /**
  * InverseKinematics.cpp -> An implementation of the kinematics model
@@ -58,7 +58,7 @@
  * point (0,0,0) lies in the middle of all the motors at the motor's height
  **/
 
-namespace huniplacer {
+namespace DeltaRobot {
 	InverseKinematics::InverseKinematics(const double base, const double hip,
 			const double effector, const double ankle,
 			const double MaxAngleHipAnkle) :
@@ -103,27 +103,27 @@ namespace huniplacer {
 		}
 
 		//to calculate alpha, the angle between actuator arm and goal vector
-		double alpha_acos_input = (square(destinationPointRotatedAroundZAxis.x)
+		double alphaAcosInput = (square(destinationPointRotatedAroundZAxis.x)
 				- square(ankle) + square(hip)
 				+ square(distanceMotorToEffectorOnYAndZAxis))
 				/ (2 * hip * distanceMotorToEffectorOnYAndZAxis);
 
-		if (alpha_acos_input < -1 || alpha_acos_input > 1) {
+		if (alphaAcosInput < -1 || alphaAcosInput > 1) {
 			throw InverseKinematicsException("point out of range",
 					destinationPoint);
 		}
 
 		//the required angle between actuator arm and goal vector
-		double alpha = acos(alpha_acos_input);
+		double alpha = acos(alphaAcosInput);
 		//the required angle between the base and goal vector
 		double beta = atan2(destinationPointRotatedAroundZAxis.z,
 				destinationPointRotatedAroundZAxis.y);
 		//the required angle between actuator arm and base (0 degrees)
 		double rho = beta - alpha;
 
-		double hip_ankle_angle = asin(
+		double hipAnkleAngle = asin(
 				abs(destinationPointRotatedAroundZAxis.x) / ankle);
-		if (hip_ankle_angle > maxAngleHipAnkle) {
+		if (hipAnkleAngle > maxAngleHipAnkle) {
 			throw InverseKinematicsException(
 					"angle between hip and ankle is out of range",
 					destinationPoint);
