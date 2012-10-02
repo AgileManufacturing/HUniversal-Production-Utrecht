@@ -42,7 +42,7 @@
 
 #include <stdexcept>
 
-#include <DataTypes/Motion.h>
+#include <DataTypes/MotorRotation.h>
 #include <DataTypes/Point3D.h>
 
 namespace DeltaRobot {
@@ -51,11 +51,11 @@ namespace DeltaRobot {
  **/
 class InverseKinematicsException: public std::runtime_error {
 private:
-	Point3D notConvertablePoint;
+	DataTypes::Point3D<double> notConvertablePoint;
 
 public:
 	InverseKinematicsException(const char* exceptionMessage,
-			Point3D destinationPoint) :
+			DataTypes::Point3D<double> destinationPoint) :
 			std::runtime_error(exceptionMessage), notConvertablePoint(
 					destinationPoint) {
 	}
@@ -66,7 +66,7 @@ public:
 	/**
 	 * Used to access the point that could not be converted
 	 **/
-	Point3D getNotConvertablePoint(void) {
+	DataTypes::Point3D<double> getNotConvertablePoint(void) {
 		return notConvertablePoint;
 	}
 };

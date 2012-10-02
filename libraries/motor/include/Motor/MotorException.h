@@ -4,8 +4,8 @@
 //
 //******************************************************************************
 // Project:        huniplacer
-// File:           measures.h
-// Description:    miscellaneous measures
+// File:           MotorException.h
+// Description:    exception thrown if an error occures when the motor controllers fail
 // Author:         Lukas Vermond & Kasper van Nieuwland
 // Notes:          -
 //
@@ -39,38 +39,22 @@
 
 
 #pragma once
-#include <Utilities/Utilities.h>
 
-/**
- * measures.h -> deltarobot measures, specifically for the huniplacer deltarobot
- **/
+#include <stdexcept>
+#include <string>
 
-namespace DeltaRobot
+namespace Motor
 {
-	namespace Measures
+	class MotorException : public std::runtime_error
 	{
-		const double BASE 				  = 101.3; //mm
-		const double HIP 				  = 100; //mm
-		const double EFFECTOR			  = 46.19; //mm
-		const double ANKLE 				  = 250; //mm
-		
-		const double HIP_ANKLE_ANGLE_MAX  = Utilities::rad(22);    //radians
-		//safety constants, roughly determined to be as safe as possible for testing purposes
-		const double MOTOR_ROT_MIN 	      = Utilities::rad(-42);   //radians
-		const double MOTOR_ROT_MAX 	      = Utilities::rad(45);    //radians
+		public:
+			MotorException(const std::string& message = std::string()) :
+				std::runtime_error(message)
+			{
+			}
 
-		const double MOTOR1_DEVIATION	  = Utilities::rad(-45);   //radians
-		const double MOTOR2_DEVIATION	  = Utilities::rad(-45);   //radians
-		const double MOTOR3_DEVIATION	  = Utilities::rad(-45);   //radians
-
-		// Top (granite) to middle point is 45 degrees. Removing the hip thickness results in +-42.5 degrees!
-		const double MOTORS_DEVIATION	=   Utilities::rad(42.5); 
-		
- 		const double MAX_X = 500;
-		const double MAX_Y = MAX_X;
-		const double MIN_X = -MAX_X;
-		const double MIN_Y = -MAX_Y;
-		const double MIN_Z = -250;
-		const double MAX_Z = -180;
-	}
+			virtual ~MotorException(void) throw()
+			{
+			}
+	};
 }

@@ -40,7 +40,7 @@
 
 #pragma once
 
-#include <huniplacer/effector_boundaries.h>
+#include <DeltaRobot/EffectorBoundaries.h>
 
 #include <stdexcept>
 #include <string>
@@ -56,10 +56,10 @@ namespace DeltaRobot
 	 *
 	 * modbus_ctrl can throw this exception whenever a modbus related error occurs
 	 **/
-    class effector_boundaries_exception : public std::runtime_error
+    class EffectorBoundariesException : public std::runtime_error
     {
         public:
-            effector_boundaries_exception(const std::string& msg) :
+            EffectorBoundariesException(const std::string& msg) :
                 std::runtime_error(msg)
             {}
     };

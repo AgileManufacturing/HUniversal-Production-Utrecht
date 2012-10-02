@@ -1,6 +1,6 @@
 // File:           CRD514KDMotorController.h
 // Description:    CRD514 KD constants
-// Author:         Lukas Vermond & Kasper van Nieuwland
+// Author:         Koen Braham Dennis Koole
 // Notes:          
 //
 // License:        newBSD
@@ -33,14 +33,16 @@
 
 
 #pragma once
+#include <ModbusController/ModbusController.h>
 #include <cmath>
+
 
 /**
  * CRD514KDMotorController.h -> holds various CRD514_KD related constants
  **/
 namespace Motor
 {
-    namespace CRD541KDMotorController 
+    namespace CRD514KD
     {
         const double MOTOR_STEP_ANGLE = (0.072 / 180.) * M_PI;
         const double MOTOR_STEP_IN_DEGREES = 1.8;
@@ -53,9 +55,9 @@ namespace Motor
             typedef enum _t
             {
                 BROADCAST = 0,
-                MOTOR_1 = 1,
-                MOTOR_2 = 2,
-                MOTOR_3 = 3
+                MOTOR_0 = 1,
+                MOTOR_1 = 2,
+                MOTOR_2 = 3
             } t;
         }
 

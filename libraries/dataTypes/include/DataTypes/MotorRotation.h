@@ -5,7 +5,7 @@
 //******************************************************************************
 // Project:        huniplacer
 // File:           motion.h
-// Description:    template class for motion. also 2 definitions for integer and floating point motions
+// Description:    template class for motion.
 // Author:         Lukas Vermond & Kasper van Nieuwland
 // Notes:          -
 //
@@ -40,64 +40,20 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <cstring>
-
 namespace DataTypes
 {
-	/**
-	 * motion.h -> Template class for use in types motioni and motionf (see below)
-	 **/
     template<typename T>
-    class Motion
+    class MotorRotation
     {
         public:
-            T angles[3];
-            T speed[3];
-            T acceleration[3];
-            T deceleration[3];
+            T angle;
+            T speed;
+            T acceleration;
+            T deceleration;
             
-            Motion(bool clear = false) {
-            	if(clear) {
-            		memset(angles, 0, 3 * sizeof(T));
-            		memset(speed, 0, 3 * sizeof(T));
-            		memset(acceleration, 0, 3 * sizeof(T));
-            		memset(deceleration, 0, 3 * sizeof(T));
-            	}
+            MotorRotation() {
             }
             
-            Motion(
-                T angle0, T angle1, T angle2,
-                T speed0, T speed1, T speed2,
-                T acc0, T acc1, T acc2,
-                T dec0, T dec1, T dec2) {
-                angles[0] = angle0;
-                angles[1] = angle1;
-                angles[2] = angle2;
-                
-                speed[0] = speed0;
-                speed[1] = speed1;
-                speed[2] = speed2;
-                
-                acceleration[0] = acc0;
-                acceleration[1] = acc1;
-                acceleration[2] = acc2;
-                
-                deceleration[0] = dec0;
-                deceleration[1] = dec1;
-                deceleration[2] = dec2;
-            }
-            
-            ~Motion(void) { }
+            MotorRotation(T angle, T speed, T acc, T dec) : angle(angle), speed(speed), acceleration(acc), deceleration(dec) {}
     };
-    
-    /**
-     * Floating point motion type
-     **/ 
-    typedef Motion<double> MotionF;
-
-    /** 
-     * Integer motion type
-     **/
-    typedef Motion<uint32_t> MotionI;
 }

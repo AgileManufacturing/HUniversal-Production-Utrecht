@@ -39,10 +39,12 @@
 
 #include <DeltaRobot/InverseKinematics.h>
 
+#include <cassert>
 #include <cmath>
 #include <cstdio>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <DeltaRobot/InverseKinematicsException.h>
+#include <DataTypes/MotorRotation.h>
 
 #include <Utilities/Utilities.h>
 
@@ -76,13 +78,13 @@ namespace DeltaRobot {
 	 * @param motorLocation angle of the motor on the z axis where 0 radians is directly in front of the deltarobot.
 	 * @return angle the motor should move to.
 	 **/
-	double InverseKinematics::motorAngle(const Point3D& destinationPoint,
+	double InverseKinematics::motorAngle(const DataTypes::Point3D<double>& destinationPoint,
 			double motorLocation) const {
 
 		//rotate the destination point so calculations can be made as if the motor is always in front
 		//(rotating the point places it in the same position relative to the front motor
 		//as it would be relative to the motor indicated by motor_angle)
-		Point3D destinationPointRotatedAroundZAxis =
+		DataTypes::Point3D<double> destinationPointRotatedAroundZAxis =
 				destinationPoint.rotateAroundZAxis(-motorLocation);
 
 		//places the point towards the "ankle to effector connection"
@@ -140,7 +142,7 @@ namespace DeltaRobot {
 	 * @param motionPointer output parameter, the resulting motion is stored here.
 	 * @return true on success, false otherwise.
 	 **/
-	void InverseKinematics::pointToMotion(const Point3D& destinationPoint, motionf& motionPointer) const {
+	void InverseKinematics::pointToMotion(const DataTypes::Point3D<double>& destinationPoint, DataTypes::MotorRotation<double>* motionPointer) const {
 		/**
 		 * Adding 180 degrees switches 0 degrees for the motor from the 
 		 * midpoint of the engines to directly opposite.
@@ -151,17 +153,19 @@ namespace DeltaRobot {
 		 *  240 degrees: this motor is located 240 degrees counter clockwise of the 0 degrees motor
 		 * when looking at the side the effector is not located
 		 **/
-		motionPointer.angles[0] = utils::rad(180)
-				+ motorAngle(destinationPoint, utils::rad(1 * 120));
-		motionPointer.angles[1] = utils::rad(180)
-				+ motorAngle(destinationPoint, utils::rad(0 * 120));
-		motionPointer.angles[2] = utils::rad(180)
-				+ motorAngle(destinationPoint, utils::rad(2 * 120));
+		 assert(motionPointer != NULL && sizeof(motionPointer)/sizeof(motionPointer[0]) == 3);
 
-		motionPointer.acceleration[0] = motionPointer.acceleration[1] =
-				motionPointer.acceleration[2] = utils::rad(3600);
-		motionPointer.deceleration[0] = motionPointer.deceleration[1] =
-				motionPointer.deceleration[2] = utils::rad(3600);
+		motionPointer[0].angle = Utilities::rad(180)
+				+ motorAngle(destinationPoint, Utilities::rad(1 * 120));
+		motionPointer[1].angle = Utilities::rad(180)
+				+ motorAngle(destinationPoint, Utilities::rad(0 * 120));
+		motionPointer[2].angle = Utilities::rad(180)
+				+ motorAngle(destinationPoint, Utilities::rad(2 * 120));
+
+		motionPointer[0].acceleration = motionPointer[1].acceleration =
+				motionPointer[2].acceleration = Utilities::rad(3600);
+		motionPointer[0].deceleration = motionPointer[1].deceleration =
+				motionPointer[2].deceleration = Utilities::rad(3600);
 	}
 }
 

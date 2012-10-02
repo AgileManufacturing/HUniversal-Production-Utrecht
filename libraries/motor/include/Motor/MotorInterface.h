@@ -4,7 +4,7 @@
 //
 //******************************************************************************
 // Project:        huniplacer
-// File:           imotor3.h
+// File:           Motor.h
 // Description:    delta robot motor interface
 // Author:         Lukas Vermond & Kasper van Nieuwland
 // Notes:          -
@@ -40,47 +40,45 @@
 
 #pragma once
 
-#include <vector>
-
-#include <DataTypes/Motion.h>
+#include <DataTypes/MotorRotation.h>
 
 namespace Motor
 {
 	/**
-	 * imotor3.h -> Interface for the 3 motors
+	 * Motor.h -> Interface for the 3 motors
 	 **/
-	class imotor3
-    {
+       class MotorInterface
+       {
         protected:
-            imotor3(void) { }
+            MotorInterface(void) { }
             
         public:
-            virtual ~imotor3(void) { }
+            virtual ~MotorInterface(void) { }
 
             /**
              * Rotate the motors
              * @param mf defines the angles, speed, acceleration and deceleration of the motors
              * @param async function is performed asyncronous if true
              **/
-            virtual void moveto(const motionf& mf, bool async) = 0;
+            virtual void moveTo(const DataTypes::MotorRotation<double>& mr) = 0;
 
             /**
              * Rotates the motors within a certain time. The speed member of the given motion is ignored.
              * @param time Time in seconds that the motors will take to rotate to the given angles. 
              **/
-            virtual void moveto_within(const motionf& mf, double time, bool async) = 0;
+            virtual void moveToWithin(const DataTypes::MotorRotation<double>& mr, double time) = 0;
 
             /**
              * Get the minimal angle the motors can move to.
              * @return angle in radians
              **/
-            virtual double get_min_angle(void) const = 0;
+            virtual double getMinAngle(void) const = 0;
 
             /**
              * Get the maximum angle the motors can move to.
              * @return angle in radians
              **/
-            virtual double get_max_angle(void) const = 0;
+            virtual double getMaxAngle(void) const = 0;
 
             /**
              * Stops the motors.
@@ -92,34 +90,34 @@ namespace Motor
              * @param timeout Time in milliseconds until timeout (0 means infinite)
              * @return false if timed out, true otherwise
              **/
-            virtual bool wait_for_idle(long timeout) = 0;
+            virtual bool waitForIdle(long timeout) = 0;
 
             /**
              * Test whether the motor controllers are idle.
              * @return true if idle, false otherwise
              **/
-            virtual bool is_idle(void) = 0;
+            virtual bool isIdle(void) = 0;
 
             /**
              * Shuts down the motors.
              **/
-            virtual void power_off(void) = 0;
+            virtual void powerOff(void) = 0;
 
             /**
              * Turns on the motors.
              **/
-            virtual void power_on(void) = 0;
+            virtual void powerOn(void) = 0;
 
             /**
              * Determine if the motor driver(s) are powered on.
              * @return true of powered on, false otherwise
              **/
-            virtual bool is_powerd_on(void) = 0;
+            virtual bool isPowerdOn(void) = 0;
 
             /**
              * Synchronises software and real world angels.
              * @param angles the new angles
              **/
-            virtual void override_current_angles(double * angles) = 0;
+            virtual void overrideCurrentAngles(double * angles) = 0;
     };
 }

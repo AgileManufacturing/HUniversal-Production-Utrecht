@@ -47,11 +47,12 @@
 #include <cmath>
 
 #include <DataTypes/Point3D.h>
-#include <Motor/imotor3.h>
-#include <Motor/motor3_exception.h>
+#include <Motor/MotorInterface.h>
 #include <DeltaRobot/EffectorBoundaries.h>
 #include <DeltaRobot/InverseKinematicsException.h>
 #include <DeltaRobot/DeltaRobot.h>
+#include <Motor/MotorException.h>
+#include <Utilities/Utilities.h>
 
 /**
  * DeltaRobot.cpp -> This class symbolises an entire deltarobot
@@ -64,30 +65,30 @@ namespace DeltaRobot
      * @param kinematics kinematics model that will be used to convert points to motions
      * @param motors implementation of motor interface that will be used to communicate with the motors
      **/
-    DeltaRobot::DeltaRobot(InverseKinematicsModel& kinematics, steppermotor3& motors) :
-        kinematics(kinematics),
-        motors(motors),
-        effectorLocation(Point3D(0, 0, -161.9)),
-        boundariesGenerated(false)
+    DeltaRobot::DeltaRobot(InverseKinematicsModel& kinematics, Motor::MotorManager* motorManager, Motor::StepperMotor* motors) :
+        kinematics(kinematics), effectorLocation(DataTypes::Point3D<double>(0, 0, -161.9)), boundariesGenerated(false)
     {
+        this->motorManager = motorManager;
+        this->motors = motors;
     }
 
     DeltaRobot::~DeltaRobot(void)
     {
-        if(motors.isPowerdOn())
+        if(motorManager->isPoweredOn())
         {
-            motors.stop();
+            motorManager->powerOff();
         }
     }
     
     void DeltaRobot::generateBoundaries(double voxelSize){
-        boundaries = effectorBoundaries::generateEffectorBoundaries(kinematics, motors, voxelSize);
+        boundaries = EffectorBoundaries::generateEffectorBoundaries(kinematics, motors, voxelSize);
         boundariesGenerated = true;
     }
 
-    bool DeltaRobot::isValidAngle(double angle)
+    bool DeltaRobot::isValidAngle(int motorIndex, double angle)
     {
-        return angle > motors.getMinAngle() && angle < motors.getMaxAngle();
+        assert(motorIndex >= 0 && motorIndex < 3);
+        return angle > motors[motorIndex].getMinAngle() && angle < motors[motorIndex].getMaxAngle();
     }
 
     /**
@@ -95,7 +96,7 @@ namespace DeltaRobot
      * @param begin start point
      * @param end finish point
      **/
-    bool DeltaRobot::checkPath(const Point3D& begin,const Point3D& end)
+    bool DeltaRobot::checkPath(const DataTypes::Point3D<double>& begin,const DataTypes::Point3D<double>& end)
     {
         return boundaries->checkPath(begin, end);
     }
@@ -106,25 +107,26 @@ namespace DeltaRobot
      * @param speed movement speed in millimeters per second
      * @param async motions will be stored in a queue for later execution if true
      **/
-    void DeltaRobot::moveTo(const Point3D& p, double speed, bool async)
+    void DeltaRobot::moveTo(const DataTypes::Point3D<double>& p, double speed)
     {
-        if(!motors.isPowerdOn())
+        if(!motorManager->isPoweredOn())
         {
-            throw Motor3Exception("motor drivers are not powered on");
+            throw Motor::MotorException("motor drivers are not powered on");
         }
-        motionf mf;
-        try
-        {
-            kinematics.pointToMotion(p, mf);
+
+
+        DataTypes::MotorRotation<double> mr[3];
+        try{
+            kinematics.pointToMotion(p, mr);
         }
-        catch(InverseKinematicsException& ex)
-        {
+        catch(InverseKinematicsException& ex){
             throw ex;
         }
+
         if(
-            !isValidAngle(mf.angles[0]) ||
-            !isValidAngle(mf.angles[1]) ||
-            !isValidAngle(mf.angles[2]))
+            !isValidAngle(0, mr[0].angle) ||
+            !isValidAngle(1, mr[1].angle) ||
+            !isValidAngle(2, mr[2].angle))
         {
             throw InverseKinematicsException("motion angles outside of valid range", p);
         }
@@ -137,7 +139,10 @@ namespace DeltaRobot
 
         try
         {
-            motors.moveToWithin(mf, moveTime, async);
+            motors[0].moveToWithin(mr[0], moveTime);
+            motors[1].moveToWithin(mr[1], moveTime);
+            motors[2].moveToWithin(mr[2], moveTime);
+            motorManager->startMovement();
         }
         catch(std::out_of_range& ex) { throw ex; }
 
@@ -170,25 +175,35 @@ namespace DeltaRobot
     * @param motors The StepperMotor class controlling the 3 deltarobot motors.
     * @param motorIndex Index of the motor to be calibrated. When standing in front of the robot looking towards it, 0 is the right motor, 1 is the front motor and 2 is the left motor.
     **/
-    void DeltaRobot::calibrateMotor(modbus_t* modbus, int motorIndex){
+    void DeltaRobot::calibrateMotor(modbus_t* modbus, int motorIndex) {
         std::cout << "Calibrating motor number " << motorIndex << std::endl;
         
         // Starting point of calibration
-        double angle = 0;
+        DataTypes::MotorRotation<double> mr;
+        mr.speed = 10;
+        mr.acceleration = 360;
+        mr.deceleration = 360;
+        mr.angle = 0;
 
         // Move motor upwards till the calibration sensor is pushed
         do {
-            angle -= huniplacer::utils::rad(crd514_kd::MOTOR_STEP_IN_DEGREES);
-            motors.moveSingleMotor(motorIndex, angle);
-            
+            mr.angle -= Utilities::rad(Motor::CRD514KD::MOTOR_STEP_IN_DEGREES);
+            motors[motorIndex].writeRotationData(mr);
+            motors[motorIndex].startMovement();
+
             usleep(25000);
         } while(!checkSensor(modbus, motorIndex));
 
         //
-        angle += huniplacer::measures::MOTORS_DEVIATION;
-        motors.moveSingleMotor(motorIndex, angle);
-        motors.resetCounter(motorIndex);
-        motors.moveSingleMotor(motorIndex, 0);
+        mr.angle += Measures::MOTORS_DEVIATION;
+        motors[motorIndex].writeRotationData(mr);
+        motors[motorIndex].startMovement();
+
+        motors[motorIndex].resetCounter();
+
+        mr.angle = 0;
+        motors[motorIndex].writeRotationData(mr);
+        motors[motorIndex].startMovement();
     }
 
     /**
@@ -222,7 +237,7 @@ namespace DeltaRobot
         }
 
         // Disable limitations
-        motors.disableControllerLimitations();
+        motorManager->disableAngleLimitations();
         
         // Calibrate motors
         calibrateMotor(modbus, 0);
@@ -230,54 +245,26 @@ namespace DeltaRobot
         calibrateMotor(modbus, 2);
 
         // Set limitations
-        motors.setMotorLimits(huniplacer::measures::MOTOR_ROT_MIN, huniplacer::measures::MOTOR_ROT_MAX);
+        motors[0].setMotorLimits(Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MAX);
+        motors[1].setMotorLimits(Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MAX);
+        motors[2].setMotorLimits(Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MAX);
         
         // Set deviation to 0 for the 3 motors
-        double deviation[3] = {0,0,0};
-        motors.setDeviation(deviation);
+        motors[0].setDeviation(0);
+        motors[1].setDeviation(0);
+        motors[2].setDeviation(0);
+
         effectorLocation.x = 0;
         effectorLocation.y = 0;
-        effectorLocation.z = -sqrt((huniplacer::measures::ANKLE * huniplacer::measures::ANKLE) - ((huniplacer::measures::BASE+huniplacer::measures::HIP-huniplacer::measures::EFFECTOR) * (huniplacer::measures::BASE+huniplacer::measures::HIP-huniplacer::measures::EFFECTOR)));
+        effectorLocation.z = -sqrt(
+            ( Measures::ANKLE * Measures::ANKLE ) - ((
+                Measures::BASE + Measures::HIP - Measures::EFFECTOR ) * (
+                Measures::BASE + Measures::HIP - Measures::EFFECTOR )
+            )
+        );
         std::cout << "effector location z: " << effectorLocation.z << std::endl; 
 
         return true;
-    }
-
-    /**
-     * Stops the motors
-     **/    
-    void DeltaRobot::stop(void)
-    {
-        if(!motors.isPowerdOn())
-        {
-            throw Motor3Exception("motor drivers are not powered on");
-        }
-        motors.stop();
-    }
-    
-    /**
-     * Wait for the deltarobot to become idle
-     *
-     * The deltarobot is idle when all it's motions are completed
-     * and it has stopped moving
-     *
-     * @param timeout time in milliseconds for the wait to timeout. 0 means infinite
-     **/    
-    bool DeltaRobot::waitForIdle(long timeout)
-    {
-        if(motors.isPowerdOn())
-        {
-            return motors.waitForIdle(timeout);
-        }
-        return true;
-    }
-
-    /**
-     * True if the deltarobot is idle, false otherwise
-     **/    
-    bool DeltaRobot::isIdle(void)
-    {
-        return motors.isIdle();
     }
 
     /**
@@ -285,9 +272,9 @@ namespace DeltaRobot
      **/
     void DeltaRobot::powerOff(void)
     {
-        if(motors.isPowerdOn())
+        if(motorManager->isPoweredOn())
         {
-            motors.powerOff();
+            motorManager->powerOff();
         }
     }
 
@@ -296,13 +283,13 @@ namespace DeltaRobot
      **/
     void DeltaRobot::powerOn(void)
     {
-        if(!motors.isPowerdOn())
+        if(!motorManager->isPoweredOn())
         {
-            motors.powerOn();
+            motorManager->powerOn();
         }
     }
 
-    Point3D& DeltaRobot::getEffectorLocation() {
+    DataTypes::Point3D<double>& DeltaRobot::getEffectorLocation() {
         return effectorLocation;
     }
 }

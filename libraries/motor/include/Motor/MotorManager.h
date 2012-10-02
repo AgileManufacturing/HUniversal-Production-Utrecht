@@ -1,13 +1,7 @@
-//******************************************************************************
-//
-//                 Low Cost Vision
-//
-//******************************************************************************
-// Project:        huniplacer
-// File:           measures.h
-// Description:    miscellaneous measures
-// Author:         Lukas Vermond & Kasper van Nieuwland
-// Notes:          -
+// File:           CRD514KDMotorController.h
+// Description:    CRD514 KD constants
+// Author:         Koen Braham Dennis Koole
+// Notes:          
 //
 // License:        newBSD
 //
@@ -36,41 +30,28 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //******************************************************************************
-
-
 #pragma once
-#include <Utilities/Utilities.h>
 
-/**
- * measures.h -> deltarobot measures, specifically for the huniplacer deltarobot
- **/
+#include <ModbusController/ModbusController.h>
+#include <Motor/StepperMotor.h>
 
-namespace DeltaRobot
-{
-	namespace Measures
-	{
-		const double BASE 				  = 101.3; //mm
-		const double HIP 				  = 100; //mm
-		const double EFFECTOR			  = 46.19; //mm
-		const double ANKLE 				  = 250; //mm
-		
-		const double HIP_ANKLE_ANGLE_MAX  = Utilities::rad(22);    //radians
-		//safety constants, roughly determined to be as safe as possible for testing purposes
-		const double MOTOR_ROT_MIN 	      = Utilities::rad(-42);   //radians
-		const double MOTOR_ROT_MAX 	      = Utilities::rad(45);    //radians
+namespace Motor {
+	class MotorManager {
+		public:
+		    // No need to copy a motor, or can we duplicate it?
+		    MotorManager(ModbusController::ModbusController& modbus, StepperMotor* motors, int numberOfMotors) : 
+		        modbus(modbus), motors(motors), numberOfMotors(numberOfMotors), poweredOn(false) { }
+		    void powerOn();
+		    void powerOff();
+		    bool isPoweredOn(){ return poweredOn; }
 
-		const double MOTOR1_DEVIATION	  = Utilities::rad(-45);   //radians
-		const double MOTOR2_DEVIATION	  = Utilities::rad(-45);   //radians
-		const double MOTOR3_DEVIATION	  = Utilities::rad(-45);   //radians
+		    void startMovement();
 
-		// Top (granite) to middle point is 45 degrees. Removing the hip thickness results in +-42.5 degrees!
-		const double MOTORS_DEVIATION	=   Utilities::rad(42.5); 
-		
- 		const double MAX_X = 500;
-		const double MAX_Y = MAX_X;
-		const double MIN_X = -MAX_X;
-		const double MIN_Y = -MAX_Y;
-		const double MIN_Z = -250;
-		const double MAX_Z = -180;
-	}
+		    void disableAngleLimitations();
+		private:
+			ModbusController::ModbusController& modbus;
+			StepperMotor* motors;
+			int numberOfMotors;
+			bool poweredOn;
+	};
 }

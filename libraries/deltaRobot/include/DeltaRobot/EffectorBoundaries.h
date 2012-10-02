@@ -42,7 +42,7 @@
 
 #include <iostream>
 #include <DataTypes/Point3D.h>
-#include <DeltaRobot/imotor3.h>
+#include <Motor/MotorInterface.h>
 #include <DeltaRobot/Measures.h>
 #include <DeltaRobot/InverseKinematicsModel.h>
 #include <vector>
@@ -59,9 +59,9 @@ namespace DeltaRobot
 	public:
 		~EffectorBoundaries();
 
-		static EffectorBoundaries* generateEffectorBoundaries(const InverseKinematicsModel& model, const imotor3& motors, double voxelSize);
+		static EffectorBoundaries* generateEffectorBoundaries(const InverseKinematicsModel& model, const Motor::MotorInterface* motors, double voxelSize);
 		
-		bool checkPath(const Point3D& from, const Point3D& to) const;
+		bool checkPath(const DataTypes::Point3D<double>& from, const DataTypes::Point3D<double>& to) const;
 		
 		/*
 		 * Returns a const bool pointer to the boundaries bitmap.
@@ -95,7 +95,7 @@ namespace DeltaRobot
 
 	private:
 		
-		EffectorBoundaries(const InverseKinematicsModel& model, const imotor3& motors, double voxelSize);
+		EffectorBoundaries(const InverseKinematicsModel& model, const Motor::MotorInterface* motors, double voxelSize);
 
 		/**
 		 * Represents a 3-dimensional point in the 3D voxel array.
@@ -116,13 +116,13 @@ namespace DeltaRobot
 		 * Converts a bitmap coordinate to a real life coordinate.
 		 * @param coordinate The bitmap coordinate.
 		 **/
-		inline Point3D fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const;
+		inline DataTypes::Point3D<double> fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const;
 		
 		/**
 		 * Converts a real life coordinate to a bitmap coordinate.
 		 * @param coordinate The real life coordinate.
 		 **/
-		inline BitmapCoordinate fromRealCoordinate(Point3D coordinate) const;
+		inline BitmapCoordinate fromRealCoordinate(DataTypes::Point3D<double> coordinate) const;
 
 		enum cacheEntry
 		{
@@ -135,7 +135,7 @@ namespace DeltaRobot
 
 		bool* boundariesBitmap;
 		const InverseKinematicsModel &kinematics;
-		const imotor3 &motors;
+		const Motor::MotorInterface* motors;
 		double voxelSize;
 
 
@@ -147,19 +147,19 @@ namespace DeltaRobot
 	int EffectorBoundaries::getWidth() const {return width;}
 	double EffectorBoundaries::getVoxelSize() const {return voxelSize;}
 
-	Point3D EffectorBoundaries::fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const
+	DataTypes::Point3D<double> EffectorBoundaries::fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const
 	{
-		return Point3D(
-				(double) coordinate.x * voxelSize + measures::MIN_X,
-				(double) coordinate.y * voxelSize + measures::MIN_Y,
-				(double) coordinate.z * voxelSize + measures::MIN_Z);
+		return DataTypes::Point3D<double>(
+				(double) coordinate.x * voxelSize + Measures::MIN_X,
+				(double) coordinate.y * voxelSize + Measures::MIN_Y,
+				(double) coordinate.z * voxelSize + Measures::MIN_Z);
 	}
 
-	EffectorBoundaries::BitmapCoordinate EffectorBoundaries::fromRealCoordinate(Point3D coordinate) const
+	EffectorBoundaries::BitmapCoordinate EffectorBoundaries::fromRealCoordinate(DataTypes::Point3D<double> coordinate) const
 	{
 		return EffectorBoundaries::BitmapCoordinate(
-			(coordinate.x - measures::MIN_X) / voxelSize,
-			(coordinate.y - measures::MIN_Y) / voxelSize,
-			(coordinate.z - measures::MIN_Z) / voxelSize);
+			(coordinate.x - Measures::MIN_X) / voxelSize,
+			(coordinate.y - Measures::MIN_Y) / voxelSize,
+			(coordinate.z - Measures::MIN_Z) / voxelSize);
 	}
 }

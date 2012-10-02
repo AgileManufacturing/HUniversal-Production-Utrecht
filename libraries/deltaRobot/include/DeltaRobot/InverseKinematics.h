@@ -41,13 +41,13 @@
 #pragma once
 
 #include <DataTypes/Point3D.h>
-#include <DataTypes/Motion.h>
+#include <DataTypes/MotorRotation.h>
 #include <DeltaRobot/InverseKinematicsModel.h>
 
 namespace DeltaRobot {
 	class InverseKinematics: public InverseKinematicsModel {
 	private:
-		double motorAngle(const Point3D& destinationPoint,
+		double motorAngle(const DataTypes::Point3D<double>& destinationPoint,
 				double motorLocation) const;
 
 	public:
@@ -57,7 +57,7 @@ namespace DeltaRobot {
 
 		virtual ~InverseKinematics(void);
 		
-		void pointToMotion(const Point3D& destinationPoint,
-				MotionF& motionPointer) const;
+		void pointToMotion(const DataTypes::Point3D<double>& destinationPoint,
+				DataTypes::MotorRotation<double>* motionPointer) const;
 	};
 }

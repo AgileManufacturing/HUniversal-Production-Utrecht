@@ -42,7 +42,9 @@
 
 #include <modbus/modbus.h>
 #include <DataTypes/Point3D.h>
-#include <Motors/imotor3.h>
+#include <Motor/MotorInterface.h>
+#include <Motor/StepperMotor.h>
+#include <Motor/MotorManager.h>
 #include <DeltaRobot/EffectorBoundaries.h>
 
 namespace DeltaRobot
@@ -54,32 +56,30 @@ namespace DeltaRobot
     {
         private:
             InverseKinematicsModel& kinematics;
-            steppermotor3& motors;
-            effectorBoundaries* boundaries;
+            Motor::StepperMotor* motors;
+            Motor::MotorManager* motorManager;
+            EffectorBoundaries* boundaries;
 
-            Point3D effectorLocation;
+            DataTypes::Point3D<double> effectorLocation;
             bool boundariesGenerated;
 
-            bool isValidAngle(double angle);
+            bool isValidAngle(int motorIndex, double angle);
         
         public:
-            DeltaRobot(InverseKinematicsModel& kinematics, steppermotor3& motors);
-            ~DeltaRobot(void);
+            DeltaRobot(InverseKinematicsModel& kinematics, Motor::MotorManager* motorManager, Motor::StepperMotor* motors);
+            ~DeltaRobot();
             
-            inline effectorBoundaries* getBoundaries(){return boundaries;}
-            inline bool hasBoundaries(){return boundariesGenerated;}
+            inline EffectorBoundaries* getBoundaries() { return boundaries; }
+            inline bool hasBoundaries() { return boundariesGenerated; }
 
             void generateBoundaries(double voxelSize);
-            bool checkPath(const Point3D& begin, const Point3D& end);
-            void moveTo(const Point3D& p, double speed, bool async = true);
+            bool checkPath(const DataTypes::Point3D<double>& begin, const DataTypes::Point3D<double>& end);
+            void moveTo(const DataTypes::Point3D<double>& p, double speed);
             void calibrateMotor(modbus_t* modbus, int motorIndex);
             bool checkSensor(modbus_t* modbus, int sensorIndex);
             bool calibrateMotors(modbus_t* modbus);
-            void stop(void);
-            bool waitForIdle(long timeout = 0);
-            bool isIdle(void);
-            void powerOff(void);
-            void powerOn(void);
-            Point3D& getEffectorLocation();
+            void powerOff();
+            void powerOn();
+            DataTypes::Point3D<double>& getEffectorLocation();
     };
 }

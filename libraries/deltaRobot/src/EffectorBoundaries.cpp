@@ -38,7 +38,7 @@
 //******************************************************************************
 
 #include <iostream>
-#include <DeltaRobot/measures.h>
+#include <DeltaRobot/Measures.h>
 #include <DeltaRobot/EffectorBoundaries.h>
 #include <DeltaRobot/InverseKinematicsException.h>
 #include <DeltaRobot/EffectorBoundariesException.h>
@@ -49,7 +49,6 @@
 
 namespace DeltaRobot
 {
-	using namespace measures;
 
 	/**
 	 * Function to generate the boundaries and returns a pointer to the object
@@ -58,14 +57,15 @@ namespace DeltaRobot
 	 * @param voxelSize the size of the voxels in mm
 	 * @return pointer to the object
 	 **/
-	EffectorBoundaries* EffectorBoundaries::generateEffectorBoundaries(const InverseKinematicsModel& model, const imotor3& motors, double voxelSize)
+	EffectorBoundaries* EffectorBoundaries::generateEffectorBoundaries(const InverseKinematicsModel& model, const Motor::MotorInterface* motors, double voxelSize)
 	{
+		assert(motors != NULL && sizeof(motors)/sizeof(motors[0]) == 3);
 		EffectorBoundaries* boundaries = new EffectorBoundaries(model, motors, voxelSize);
 		
 		//create boundaries variables in voxel space by dividing real space variables with the voxel size
-		boundaries->width = (MAX_X - MIN_X) / voxelSize;
-        boundaries->height = (MAX_Z - MIN_Z) / voxelSize;
-        boundaries->depth = (MAX_Y - MIN_Y) / voxelSize;
+		boundaries->width = (Measures::MAX_X  - Measures::MIN_X) / voxelSize;
+        boundaries->height = (Measures::MAX_Z - Measures::MIN_Z) / voxelSize;
+        boundaries->depth = (Measures::MAX_Y  - Measures::MIN_Y) / voxelSize;
         //create bitmap with value false for all voxels
         boundaries->boundariesBitmap = new bool[boundaries->width * boundaries->height * boundaries->depth];
         for(int i = 0; i < boundaries->width * boundaries->height * boundaries->depth; i++)
@@ -84,7 +84,7 @@ namespace DeltaRobot
 	 *
 	 * @return true if a straight path from from to to is valid
 	 **/
-    bool EffectorBoundaries::checkPath(const Point3D & from, const Point3D & to) const
+    bool EffectorBoundaries::checkPath(const DataTypes::Point3D<double> & from, const DataTypes::Point3D<double> & to) const
     {
     	double x_length = to.x - from.x;
     	double y_length = to.y - from.y;
@@ -102,7 +102,7 @@ namespace DeltaRobot
 			int x = (from.x + x_length * i);
 			int y = (from.y + y_length * i);
 			int z = (from.z + z_length * i);
-			bitmap_coordinate temp = from_real_coordinate(Point3D(x, y, z));
+			BitmapCoordinate temp = fromRealCoordinate(DataTypes::Point3D<double>(x, y, z));
 			int index = temp.x + temp.y * width + temp.z * width * depth;
 
 			if(temp.x < 0
@@ -111,7 +111,7 @@ namespace DeltaRobot
 				|| temp.y > depth
 				|| temp.z < 0
 				|| temp.z > height
-				|| !boundaries_bitmap[index]){
+				|| !boundariesBitmap[index]){
 				return false;
 			}
 		}
@@ -125,13 +125,15 @@ namespace DeltaRobot
 	 * @param motors used for the minimum and maximum angle of the motors
 	 * @param voxelSize the size of the voxels
 	 **/
-    EffectorBoundaries::EffectorBoundaries(const InverseKinematicsModel& model, const imotor3& motors, double voxelSize)
-    	: kinematics(model), motors(motors), voxelSize(voxelSize)
+    EffectorBoundaries::EffectorBoundaries(const InverseKinematicsModel& model, const Motor::MotorInterface* motors, double voxelSize)
+    	: kinematics(model), voxelSize(voxelSize)
     {
+    	motors = motors;
     }
 
     EffectorBoundaries::~EffectorBoundaries()
     {
+
     	delete[] boundariesBitmap;
     }
 
@@ -142,11 +144,11 @@ namespace DeltaRobot
 	 *
 	 * @return True if p has unreachable neighbouring voxels.
 	 **/
-	bool EffectorBoundaries::hasInvalidNeighbours(const bitmapCoordinate & p, char* pointValidityCache) const {
+	bool EffectorBoundaries::hasInvalidNeighbours(const BitmapCoordinate & p, char* pointValidityCache) const {
 		//TODO: change from has_invalid_neighbours to isOnTheEdgeOfValidArea due to functionality change
 
     	//check if the voxel is valid and on the edge of the box
-    	if(isValid(bitmapCoordinate(p.x,p.y,p.z), pointValidityCache)){
+    	if(isValid(BitmapCoordinate(p.x,p.y,p.z), pointValidityCache)){
     		//voxel is on the edge of the box, automatically boardering invalid territory
     		if(p.x == 0 
     			|| p.x == width 
@@ -162,7 +164,7 @@ namespace DeltaRobot
 	            for(int x = p.x - 1; x <= p.x + 1; x++){
 	                for(int z = p.z - 1; z <= p.z + 1; z++){
 	                    //check if one of the neighbours is not valid
-	                    if(!isValid(bitmapCoordinate(x, y, z), pointValidityCache)){
+	                    if(!isValid(BitmapCoordinate(x, y, z), pointValidityCache)){
 	                        return true;
 	                    }
 	                }
@@ -180,7 +182,7 @@ namespace DeltaRobot
 	 * 
 	 * @return True if p is reachable by the effector.
 	 **/
-    bool EffectorBoundaries::isValid(const bitmapCoordinate& p, char* pointValidityCache) const {
+    bool EffectorBoundaries::isValid(const BitmapCoordinate& p, char* pointValidityCache) const {
     	char* fromCache;
     	char dummy = UNKNOWN;
     	if(pointValidityCache == NULL)
@@ -194,24 +196,24 @@ namespace DeltaRobot
 
     	if(*fromCache == UNKNOWN)
     	{
-			motionf mf;
-			try
-			{
-				kinematics.pointToMotion(from_bitmap_coordinate(p), mf);
-			}
-			catch(huniplacer::InverseKinematicsException & ex)
-			{
+    		DataTypes::MotorRotation<double> mr[3];
+			try {
+				kinematics.pointToMotion(fromBitmapCoordinate(p), mr);
+
+			} catch(DeltaRobot::InverseKinematicsException & ex) {
 				*fromCache = INVALID;
 				return false;
 			}
-			for(int i = 0;i < 3;i++)
-			{
-				if(mf.angles[i] <= motors.getMinAngle() 
-					|| mf.angles[i] >= motors.getMaxAngle()){
-					*fromCache = INVALID;
-					return false;
-				}
+
+
+			// Check motor angles
+			if(mr[0].angle <= motors[0].getMinAngle() || mr[0].angle >= motors[0].getMaxAngle() ||
+			  mr[1].angle <= motors[1].getMinAngle() || mr[1].angle >= motors[1].getMaxAngle()  ||
+			  mr[2].angle <= motors[2].getMinAngle() || mr[2].angle >= motors[2].getMaxAngle()	){
+			  	*fromCache = INVALID;
+			  	return false;
 			}
+
 
 			*fromCache = VALID;
 			return true;
@@ -229,17 +231,17 @@ namespace DeltaRobot
     {
     	char * pointValidityCache = new char[width * depth * height];
     	memset(pointValidityCache, 0, width * depth * height * sizeof(char));
-    	std::stack<bitmap_coordinate> cstack;
+    	std::stack<BitmapCoordinate> cstack;
 
     	//determine the center of the box
-    	Point3D begin (0, 0, MIN_Z + (MAX_Z - MIN_Z) / 2);
+    	DataTypes::Point3D<double> begin (0, 0, Measures::MIN_Z + (Measures::MAX_Z - Measures::MIN_Z) / 2);
     	//if begin pixel is not part of a valid voxel the box dimensions are incorrect
     	if(!isValid(fromRealCoordinate(begin), pointValidityCache)){
     		throw EffectorBoundariesException("starting point outide of valid area, please adjust MAX/MIN_X/Y/Z values to have a valid center");
     	}
     	
     	//scan towards the right
-		for(; begin.x < MAX_X; begin.x += voxelSize)
+		for(; begin.x < Measures::MAX_X; begin.x += voxelSize)
 		{
 			/**
 			 * If an invalid voxel is found:
@@ -250,20 +252,20 @@ namespace DeltaRobot
 			 */
 			if(!isValid(fromRealCoordinate(begin), pointValidityCache)){
 				begin.x -= voxelSize;
-				bitmapCoordinate startingVoxel = fromRealCoordinate(begin);
+				BitmapCoordinate startingVoxel = fromRealCoordinate(begin);
 				cstack.push(startingVoxel);
-				BoundariesBitmap[startingVoxel.x + startingVoxel.y * width + startingVoxel.z * width * depth] = true;
+				boundariesBitmap[startingVoxel.x + startingVoxel.y * width + startingVoxel.z * width * depth] = true;
 				break;
 			}
 		}
 		/**
 		 * If the right-most voxel is in reach and an invalid voxel is never found the position of begin.x will be outside of the box limits. Step back inside the box and add that voxel to the stack and set it as true in the bitmap.
 		 */
-		if(begin.x >= MAX_X){
+		if(begin.x >= Measures::MAX_X){
 			begin.x -= voxelSize;
 			BitmapCoordinate startingVoxel = fromRealCoordinate(begin);
 			cstack.push(startingVoxel);
-			BoundariesBitmap[startingVoxel.x 
+			boundariesBitmap[startingVoxel.x 
 				+ startingVoxel.y * width 
 				+ startingVoxel.z * width * depth] = true;
 		}
@@ -293,9 +295,9 @@ namespace DeltaRobot
 							if(isValid(BitmapCoordinate(x, y, z), pointValidityCache)
 									&& !boundariesBitmap[index]
 								    && hasInvalidNeighbours(BitmapCoordinate(x, y, z), pointValidityCache)){
-								BitmapCoordinate BitmapCoordinate = BitmapCoordinate(x, y, z);
-								cstack.push(BitmapCoordinate);
-								BoundariesBitmap[index] = true;
+								BitmapCoordinate bitmapCoordinate = BitmapCoordinate(x, y, z);
+								cstack.push(bitmapCoordinate);
+								boundariesBitmap[index] = true;
 							}
 						}
 					}
@@ -307,7 +309,7 @@ namespace DeltaRobot
 		pointValidityCache = NULL;
 		
 		//adds all the points within the boundaries
-		cstack.push(fromRealCoordinate(Point3D(0, 0, MIN_Z + (MAX_Z - MIN_Z) / 2)));
+		cstack.push(fromRealCoordinate(DataTypes::Point3D<double>(0, 0, Measures::MIN_Z + (Measures::MAX_Z - Measures::MIN_Z) / 2)));
 		while(!cstack.empty())
 		{
 			BitmapCoordinate validVoxel = cstack.top();
@@ -336,8 +338,8 @@ namespace DeltaRobot
 			for(unsigned int i = 0; i < ( sizeof(indices) / sizeof(indices[0]) ); i++)
 			{
 				if(indices[i] < ((width*height*depth))){
-					if(BoundariesBitmap[indices[i]] == false){
-						BoundariesBitmap[indices[i]] = true;
+					if(boundariesBitmap[indices[i]] == false){
+						boundariesBitmap[indices[i]] = true;
 						cstack.push(BitmapCoordinate(indices[i] % width, (indices[i] % (width * depth)) / width, indices[i] / (width * depth)));
 					}
 				}

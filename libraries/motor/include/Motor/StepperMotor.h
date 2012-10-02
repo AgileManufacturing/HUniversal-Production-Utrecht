@@ -4,9 +4,9 @@
 //
 //******************************************************************************
 // Project:        huniplacer
-// File:           measures.h
-// Description:    miscellaneous measures
-// Author:         Lukas Vermond & Kasper van Nieuwland
+// File:           Steppermotor.h
+// Description:    steppermotor driver
+// Author:         Koen Braham & Dennis Koole
 // Notes:          -
 //
 // License:        newBSD
@@ -39,38 +39,56 @@
 
 
 #pragma once
-#include <Utilities/Utilities.h>
 
-/**
- * measures.h -> deltarobot measures, specifically for the huniplacer deltarobot
- **/
+#include <queue>
+#include <boost/thread.hpp>
 
-namespace DeltaRobot
+#include <DataTypes/MotorRotation.h>
+#include <ModbusController/ModbusException.h>
+#include <ModbusController/ModbusController.h>
+#include <Motor/CRD514KD.h>
+#include <Motor/MotorInterface.h>
+
+namespace Motor
 {
-	namespace Measures
-	{
-		const double BASE 				  = 101.3; //mm
-		const double HIP 				  = 100; //mm
-		const double EFFECTOR			  = 46.19; //mm
-		const double ANKLE 				  = 250; //mm
-		
-		const double HIP_ANKLE_ANGLE_MAX  = Utilities::rad(22);    //radians
-		//safety constants, roughly determined to be as safe as possible for testing purposes
-		const double MOTOR_ROT_MIN 	      = Utilities::rad(-42);   //radians
-		const double MOTOR_ROT_MAX 	      = Utilities::rad(45);    //radians
+    class StepperMotor : public MotorInterface
+    {
+        public:
+            //StepperMotor(ModbusController::ModbusController& modbusController, CRD514KD::Slaves::t motorIndex);
+            StepperMotor(ModbusController::ModbusController& modbusController, CRD514KD::Slaves::t motorIndex) :
+        MotorInterface(), modbus(modbusController), motorIndex(motorIndex), poweredOn(false)  {}
 
-		const double MOTOR1_DEVIATION	  = Utilities::rad(-45);   //radians
-		const double MOTOR2_DEVIATION	  = Utilities::rad(-45);   //radians
-		const double MOTOR3_DEVIATION	  = Utilities::rad(-45);   //radians
 
-		// Top (granite) to middle point is 45 degrees. Removing the hip thickness results in +-42.5 degrees!
-		const double MOTORS_DEVIATION	=   Utilities::rad(42.5); 
-		
- 		const double MAX_X = 500;
-		const double MAX_Y = MAX_X;
-		const double MIN_X = -MAX_X;
-		const double MIN_Y = -MAX_Y;
-		const double MIN_Z = -250;
-		const double MAX_Z = -180;
-	}
+            virtual ~StepperMotor();
+        
+            void powerOn();
+            void powerOff();
+            void stop();
+
+            void resetCounter();
+            void setMotorLimits(double minAngle, double maxAngle);
+
+            void writeRotationData(const DataTypes::MotorRotation<double>& mr);
+            void startMovement();
+            void moveToWithin(const DataTypes::MotorRotation<double>& mr, double time);
+            void waitTillReady();
+
+            bool isPowerdOn() { return poweredOn; }
+            inline double getMinAngle() const { return minAngle; }
+            inline double getMaxAngle() const { return maxAngle; }
+            void setMinAngle(double minAngle);
+            void setMaxAngle(double maxAngle);
+
+            double getDeviation(){ return deviation; }
+            void setDeviation(double deviation){ deviation = deviation; }
+
+        private:
+            double currentAngle, deviation, minAngle, maxAngle;
+            
+            ModbusController::ModbusController& modbus;
+
+            CRD514KD::Slaves::t motorIndex;
+            
+            volatile bool poweredOn;
+    };
 }

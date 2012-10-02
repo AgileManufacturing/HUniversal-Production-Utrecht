@@ -34,7 +34,7 @@
 
 #pragma once
 
-#include <Motor/CRD514KDMotorController.h>
+#include <Motor/CRD514KD.h>
 
 #include <stdexcept>
 #include <string>
@@ -48,12 +48,12 @@ namespace Motor
 	class CRD514KDException : public std::runtime_error
 	{
 		private:
-			const CRD514KD::slaves::t slave;
+			const CRD514KD::Slaves::t slave;
 			const bool warning, alarm;
 			std::string message;
 
 		public:
-			CRD514KDException(const CRD514KD::slaves::t slave, const bool warning, const bool alarm) :
+			CRD514KDException(const CRD514KD::Slaves::t slave, const bool warning, const bool alarm) :
 				std::runtime_error(""),
 				slave(slave),
 				warning(warning),
@@ -72,7 +72,7 @@ namespace Motor
 				return message.c_str();
 			}
 
-			CRD514KD::slaves::t getSlave(void)
+			CRD514KD::Slaves::t getSlave(void)
 			{
 				return slave;
 			}

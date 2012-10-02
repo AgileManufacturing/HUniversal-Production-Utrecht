@@ -40,10 +40,12 @@ namespace DataTypes {
 	/**
 	 * Point3D.h -> 3 dimensional point class
 	 **/
+	template<typename T>
 	class Point3D {
 	public:
 		T x, y, z;
 
+		Point3D() {}
 		Point3D(T x, T y, T z) : x(x), y(y), z(z) { }
 		~Point3D() { }
 
@@ -94,4 +96,5 @@ namespace DataTypes {
 					x * sin(rotationRadians) + y * cos(rotationRadians), z);
 		}
 	};
+
 }

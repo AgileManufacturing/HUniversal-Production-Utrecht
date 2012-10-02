@@ -1,13 +1,7 @@
-//******************************************************************************
-//
-//                 Low Cost Vision
-//
-//******************************************************************************
-// Project:        huniplacer
-// File:           measures.h
-// Description:    miscellaneous measures
-// Author:         Lukas Vermond & Kasper van Nieuwland
-// Notes:          -
+// File:           MotorManager.cpp
+// Description:    CRD514 KD constants
+// Author:         Koen Braham Dennis Koole
+// Notes:          
 //
 // License:        newBSD
 //
@@ -37,40 +31,51 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //******************************************************************************
 
+#include <Motor/MotorManager.h>
+#include <Motor/CRD514KD.h>
+#include <Motor/MotorException.h>
 
-#pragma once
-#include <Utilities/Utilities.h>
-
-/**
- * measures.h -> deltarobot measures, specifically for the huniplacer deltarobot
- **/
-
-namespace DeltaRobot
+extern "C"
 {
-	namespace Measures
-	{
-		const double BASE 				  = 101.3; //mm
-		const double HIP 				  = 100; //mm
-		const double EFFECTOR			  = 46.19; //mm
-		const double ANKLE 				  = 250; //mm
-		
-		const double HIP_ANKLE_ANGLE_MAX  = Utilities::rad(22);    //radians
-		//safety constants, roughly determined to be as safe as possible for testing purposes
-		const double MOTOR_ROT_MIN 	      = Utilities::rad(-42);   //radians
-		const double MOTOR_ROT_MAX 	      = Utilities::rad(45);    //radians
+    #include <modbus/modbus.h>
+}
 
-		const double MOTOR1_DEVIATION	  = Utilities::rad(-45);   //radians
-		const double MOTOR2_DEVIATION	  = Utilities::rad(-45);   //radians
-		const double MOTOR3_DEVIATION	  = Utilities::rad(-45);   //radians
+namespace Motor {
+	void MotorManager::powerOn() {
+		if(!poweredOn){
+			for(int i = 0; i < numberOfMotors; ++i) {
+				motors[i].powerOn();
+			}
+		}
+		poweredOn = true;
+	}
 
-		// Top (granite) to middle point is 45 degrees. Removing the hip thickness results in +-42.5 degrees!
-		const double MOTORS_DEVIATION	=   Utilities::rad(42.5); 
-		
- 		const double MAX_X = 500;
-		const double MAX_Y = MAX_X;
-		const double MIN_X = -MAX_X;
-		const double MIN_Y = -MAX_Y;
-		const double MIN_Z = -250;
-		const double MAX_Z = -180;
+	void MotorManager::powerOff() {
+		if(poweredOn){
+			for(int i = 0; i < numberOfMotors; ++i){
+				motors[i].powerOff();
+			}
+		}
+		poweredOn = false;
+	}
+
+	void MotorManager::startMovement(){
+		if(!poweredOn)
+        {
+            throw MotorException("motor drivers are not powered on");
+        }
+
+        //execute motion
+        motors[0].waitTillReady();
+        motors[1].waitTillReady();
+        motors[2].waitTillReady();
+
+        modbus.writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
+        modbus.writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
+        modbus.writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
+	}
+
+	void MotorManager::disableAngleLimitations() {
+		modbus.writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::OP_SOFTWARE_OVERTRAVEL, 0);
 	}
 }

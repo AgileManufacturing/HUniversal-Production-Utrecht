@@ -202,15 +202,18 @@ int main(int argc, char** argv) {
     huniplacer::measures::ANKLE,
     huniplacer::measures::HIP_ANKLE_ANGLE_MAX);
 
-    modbus_t* modbus_rtu = modbus_new_rtu(
+    ModbusController::ModbusController* modbus = new ModbusController::ModbusController(modbus_new_rtu(
         "/dev/ttyS0",
         crd514_kd::rtu_config::BAUDRATE,
         crd514_kd::rtu_config::PARITY,
         crd514_kd::rtu_config::DATA_BITS,
-        crd514_kd::rtu_config::STOP_BITS);
+        crd514_kd::rtu_config::STOP_BITS));
 
-	double deviation[3] = {huniplacer::measures::MOTOR1_DEVIATION, huniplacer::measures::MOTOR2_DEVIATION, huniplacer::measures::MOTOR3_DEVIATION};
-	huniplacer::steppermotor3 motors(modbus_rtu, huniplacer::measures::MOTOR_ROT_MIN, huniplacer::measures::MOTOR_ROT_MAX, modbus_exhandler, deviation);
+
+    Motor::StepperMotor motors[3];
+    motors[0] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_0);
+    motors[1] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_1);
+    motors[2] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_2);
 
 	// Create a deltarobot	
     deltarobot = new huniplacer::deltarobot(kinematics, motors);
