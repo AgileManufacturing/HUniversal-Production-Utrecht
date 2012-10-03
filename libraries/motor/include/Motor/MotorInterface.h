@@ -56,17 +56,38 @@ namespace Motor
             virtual ~MotorInterface(void) { }
 
             /**
+             * Turns on the motors.
+             **/
+            virtual void powerOn(void) = 0;
+
+            /**
+             * Shuts down the motors.
+             **/
+            virtual void powerOff(void) = 0;
+
+            /**
+             * Stops the motors.
+             **/
+            virtual void stop(void) = 0;
+
+            virtual void setMotorLimits(double minAngle, double maxAngle) = 0;
+
+
+            /**
              * Rotate the motors
              * @param mf defines the angles, speed, acceleration and deceleration of the motors
              * @param async function is performed asyncronous if true
              **/
             virtual void moveTo(const DataTypes::MotorRotation<double>& mr) = 0;
 
+
             /**
              * Rotates the motors within a certain time. The speed member of the given motion is ignored.
              * @param time Time in seconds that the motors will take to rotate to the given angles. 
              **/
-            virtual void moveToWithin(const DataTypes::MotorRotation<double>& mr, double time) = 0;
+            virtual void moveToWithin(const DataTypes::MotorRotation<double>& mr, double time, bool start) = 0;
+
+            void waitTillReady();
 
             /**
              * Get the minimal angle the motors can move to.
@@ -80,44 +101,11 @@ namespace Motor
              **/
             virtual double getMaxAngle(void) const = 0;
 
-            /**
-             * Stops the motors.
-             **/
-            virtual void stop(void) = 0;
-
-            /**
-             * Wait for all motor controllers to become idle.
-             * @param timeout Time in milliseconds until timeout (0 means infinite)
-             * @return false if timed out, true otherwise
-             **/
-            virtual bool waitForIdle(long timeout) = 0;
-
-            /**
-             * Test whether the motor controllers are idle.
-             * @return true if idle, false otherwise
-             **/
-            virtual bool isIdle(void) = 0;
-
-            /**
-             * Shuts down the motors.
-             **/
-            virtual void powerOff(void) = 0;
-
-            /**
-             * Turns on the motors.
-             **/
-            virtual void powerOn(void) = 0;
 
             /**
              * Determine if the motor driver(s) are powered on.
              * @return true of powered on, false otherwise
              **/
-            virtual bool isPowerdOn(void) = 0;
-
-            /**
-             * Synchronises software and real world angels.
-             * @param angles the new angles
-             **/
-            virtual void overrideCurrentAngles(double * angles) = 0;
+            virtual bool isPoweredOn(void) = 0;
     };
 }

@@ -88,6 +88,12 @@ namespace ModbusController
         timeoutBegin.tv_usec = TIMEOUT_BEGIN;
         modbus_set_response_timeout(context, &timeoutBegin);
         
+        logFile.open("/home/lcv/modbus.log");
+        if(!logFile.is_open()){
+            throw ModbusException( "File Error!");
+        }
+        logFile << "Start logging " << std::endl;
+
         //connect
         if(modbus_connect(context) == -1)
         {
@@ -97,6 +103,7 @@ namespace ModbusController
 
     ModbusController::~ModbusController(void)
     {
+        logFile.close();
         modbus_close(context);
         modbus_free(context);
     }
@@ -175,6 +182,7 @@ namespace ModbusController
      **/
     void ModbusController::writeU16(uint16_t slave, uint16_t address, uint16_t data, bool useShadow)
     {
+        logFile << "WriteU16\t" << slave << "\t" << address << "\t" << data << std::endl;
         if(useShadow)
         {
             uint16_t shadowData;
@@ -224,6 +232,11 @@ namespace ModbusController
         
         wait();
         
+        for(int i = 0; i < length; i++){
+            logFile << "WriteU16Array\t" << slave << "\t" << (first_address + i) << "\t" << data[i] << std::endl;
+        }
+        
+
         modbus_set_slave(context, slave);
         int r = modbus_write_registers(context, first_address, length, data);
         // TODO: fix the broadcast issue slave == crd514_kd::slaves::BROADCAST temporary == 0
@@ -250,6 +263,7 @@ namespace ModbusController
      **/    
     void ModbusController::writeU32(uint16_t slave, uint16_t address, uint32_t data, bool useShadow)
     {
+        logFile << "WriteU32\t" << slave << "\t" << address << "\t" << data << std::endl;
     	try
     	{
 			uint16_t _data[2];
@@ -315,6 +329,7 @@ namespace ModbusController
             throw ModbusException("Error reading u16");
         }
         
+        logFile << "Read\t" << slave << "\t" << address << "\t" << data << std::endl;
         return data;
     }
 
@@ -351,6 +366,7 @@ namespace ModbusController
         {
             uint16_t data[2];
             readU16(slave, address, data, 2);
+            logFile << "Read\t" << slave << "\t" << address << "\t" << (((data[0] << 16) & 0xFFFF0000) | data[1]) << std::endl;
             return ((data[0] << 16) & 0xFFFF0000) | data[1];
         }
         catch(ModbusException& ex)

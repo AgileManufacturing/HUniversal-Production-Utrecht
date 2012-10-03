@@ -57,9 +57,8 @@ namespace DeltaRobot
 	 * @param voxelSize the size of the voxels in mm
 	 * @return pointer to the object
 	 **/
-	EffectorBoundaries* EffectorBoundaries::generateEffectorBoundaries(const InverseKinematicsModel& model, const Motor::MotorInterface* motors, double voxelSize)
+	EffectorBoundaries* EffectorBoundaries::generateEffectorBoundaries(const InverseKinematicsModel& model,  Motor::StepperMotor* (&motors)[3], double voxelSize)
 	{
-		assert(motors != NULL && sizeof(motors)/sizeof(motors[0]) == 3);
 		EffectorBoundaries* boundaries = new EffectorBoundaries(model, motors, voxelSize);
 		
 		//create boundaries variables in voxel space by dividing real space variables with the voxel size
@@ -125,11 +124,8 @@ namespace DeltaRobot
 	 * @param motors used for the minimum and maximum angle of the motors
 	 * @param voxelSize the size of the voxels
 	 **/
-    EffectorBoundaries::EffectorBoundaries(const InverseKinematicsModel& model, const Motor::MotorInterface* motors, double voxelSize)
-    	: kinematics(model), voxelSize(voxelSize)
-    {
-    	motors = motors;
-    }
+    EffectorBoundaries::EffectorBoundaries(const InverseKinematicsModel& model,  Motor::StepperMotor* (&motors)[3], double voxelSize)
+    	: kinematics(model), motors(motors), voxelSize(voxelSize) { }
 
     EffectorBoundaries::~EffectorBoundaries()
     {
@@ -196,9 +192,9 @@ namespace DeltaRobot
 
     	if(*fromCache == UNKNOWN)
     	{
-    		DataTypes::MotorRotation<double> mr[3];
+    		DataTypes::DeltaRobotRotation drr;
 			try {
-				kinematics.pointToMotion(fromBitmapCoordinate(p), mr);
+				kinematics.pointToMotion(fromBitmapCoordinate(p), drr);
 
 			} catch(DeltaRobot::InverseKinematicsException & ex) {
 				*fromCache = INVALID;
@@ -207,9 +203,9 @@ namespace DeltaRobot
 
 
 			// Check motor angles
-			if(mr[0].angle <= motors[0].getMinAngle() || mr[0].angle >= motors[0].getMaxAngle() ||
-			  mr[1].angle <= motors[1].getMinAngle() || mr[1].angle >= motors[1].getMaxAngle()  ||
-			  mr[2].angle <= motors[2].getMinAngle() || mr[2].angle >= motors[2].getMaxAngle()	){
+			if(drr.rotations[0].angle <= motors[0]->getMinAngle() || drr.rotations[0].angle >= motors[0]->getMaxAngle() ||
+			  drr.rotations[1].angle <= motors[1]->getMinAngle() || drr.rotations[1].angle >= motors[1]->getMaxAngle()  ||
+			  drr.rotations[2].angle <= motors[2]->getMinAngle() || drr.rotations[2].angle >= motors[2]->getMaxAngle()  ){
 			  	*fromCache = INVALID;
 			  	return false;
 			}
@@ -237,7 +233,7 @@ namespace DeltaRobot
     	DataTypes::Point3D<double> begin (0, 0, Measures::MIN_Z + (Measures::MAX_Z - Measures::MIN_Z) / 2);
     	//if begin pixel is not part of a valid voxel the box dimensions are incorrect
     	if(!isValid(fromRealCoordinate(begin), pointValidityCache)){
-    		throw EffectorBoundariesException("starting point outide of valid area, please adjust MAX/MIN_X/Y/Z values to have a valid center");
+    		throw EffectorBoundariesException("starting point outside of valid area, please adjust MAX/MIN_X/Y/Z values to have a valid center");
     	}
     	
     	//scan towards the right

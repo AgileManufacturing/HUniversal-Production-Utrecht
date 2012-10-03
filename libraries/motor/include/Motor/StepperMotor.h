@@ -54,10 +54,14 @@ namespace Motor
     class StepperMotor : public MotorInterface
     {
         public:
-            //StepperMotor(ModbusController::ModbusController& modbusController, CRD514KD::Slaves::t motorIndex);
-            StepperMotor(ModbusController::ModbusController& modbusController, CRD514KD::Slaves::t motorIndex) :
-        MotorInterface(), modbus(modbusController), motorIndex(motorIndex), poweredOn(false)  {}
+            //StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex);
+            //StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle);
 
+                StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex) :
+        MotorInterface(), modbus(modbusController), motorIndex(motorIndex), anglesLimited(false), poweredOn(false)  {}
+
+    StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle):
+        MotorInterface(), minAngle(minAngle), maxAngle(maxAngle), modbus(modbusController), motorIndex(motorIndex), anglesLimited(true), poweredOn(false)  {}
 
             virtual ~StepperMotor();
         
@@ -68,12 +72,23 @@ namespace Motor
             void resetCounter();
             void setMotorLimits(double minAngle, double maxAngle);
 
-            void writeRotationData(const DataTypes::MotorRotation<double>& mr);
+
+            void moveTo(const DataTypes::MotorRotation<double>& mr);
+            /**
+             * Set the rotate data for the motors
+             * @param mf defines the angles, speed, acceleration and deceleration of the motors
+             * @param async function is performed asyncronous if true
+             **/
+            void writeRotationData(const DataTypes::MotorRotation<double>& mr, bool breaking = false);
+
+            /**
+             * Start the rotation of the motors
+             **/
             void startMovement();
-            void moveToWithin(const DataTypes::MotorRotation<double>& mr, double time);
+            void moveToWithin(const DataTypes::MotorRotation<double>& mr, double time, bool start);
             void waitTillReady();
 
-            bool isPowerdOn() { return poweredOn; }
+            bool isPoweredOn() { return poweredOn; }
             inline double getMinAngle() const { return minAngle; }
             inline double getMaxAngle() const { return maxAngle; }
             void setMinAngle(double minAngle);
@@ -82,13 +97,15 @@ namespace Motor
             double getDeviation(){ return deviation; }
             void setDeviation(double deviation){ deviation = deviation; }
 
+            void disableAngleLimitations();
         private:
             double currentAngle, deviation, minAngle, maxAngle;
             
-            ModbusController::ModbusController& modbus;
+            ModbusController::ModbusController* modbus;
 
             CRD514KD::Slaves::t motorIndex;
             
+            bool anglesLimited;
             volatile bool poweredOn;
     };
 }

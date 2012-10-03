@@ -49,6 +49,7 @@
 #include <DataTypes/Point3D.h>
 #include <Motor/MotorInterface.h>
 #include <DeltaRobot/EffectorBoundaries.h>
+#include <DeltaRobot/InverseKinematics.h>
 #include <DeltaRobot/InverseKinematicsException.h>
 #include <DeltaRobot/DeltaRobot.h>
 #include <Motor/MotorException.h>
@@ -63,13 +64,15 @@ namespace DeltaRobot
     /**
      * Constructor
      * @param kinematics kinematics model that will be used to convert points to motions
-     * @param motors implementation of motor interface that will be used to communicate with the motors
+     * @param motors implementation of motor interface that will be used to communicate with the motors. MUST BE EXACTLY 3.
      **/
-    DeltaRobot::DeltaRobot(InverseKinematicsModel& kinematics, Motor::MotorManager* motorManager, Motor::StepperMotor* motors) :
-        kinematics(kinematics), effectorLocation(DataTypes::Point3D<double>(0, 0, -161.9)), boundariesGenerated(false)
+    DeltaRobot::DeltaRobot(DataTypes::DeltaRobotMeasures& drm, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3]) :
+        motors(motors),
+         effectorLocation(DataTypes::Point3D<double>(0, 0, -161.9)), 
+         boundariesGenerated(false)
     {
+        kinematics = new InverseKinematics(drm);
         this->motorManager = motorManager;
-        this->motors = motors;
     }
 
     DeltaRobot::~DeltaRobot(void)
@@ -78,17 +81,18 @@ namespace DeltaRobot
         {
             motorManager->powerOff();
         }
+        delete kinematics;
     }
     
     void DeltaRobot::generateBoundaries(double voxelSize){
-        boundaries = EffectorBoundaries::generateEffectorBoundaries(kinematics, motors, voxelSize);
+        boundaries = EffectorBoundaries::generateEffectorBoundaries((*kinematics), motors, voxelSize);
         boundariesGenerated = true;
     }
 
     bool DeltaRobot::isValidAngle(int motorIndex, double angle)
     {
         assert(motorIndex >= 0 && motorIndex < 3);
-        return angle > motors[motorIndex].getMinAngle() && angle < motors[motorIndex].getMaxAngle();
+        return angle > motors[motorIndex]->getMinAngle() && angle < motors[motorIndex]->getMaxAngle();
     }
 
     /**
@@ -114,19 +118,23 @@ namespace DeltaRobot
             throw Motor::MotorException("motor drivers are not powered on");
         }
 
+        DataTypes::DeltaRobotRotation drr;
+        drr.rotations[0].speed = speed;
+        drr.rotations[1].speed = speed;
+        drr.rotations[2].speed = speed;
 
-        DataTypes::MotorRotation<double> mr[3];
         try{
-            kinematics.pointToMotion(p, mr);
+            kinematics->pointToMotion(p, drr);
         }
         catch(InverseKinematicsException& ex){
             throw ex;
         }
 
+        std::cout << "Angles\t" << drr.rotations[0].angle << "\t" << drr.rotations[1].angle << "\t" << drr.rotations[2].angle << std::endl;
         if(
-            !isValidAngle(0, mr[0].angle) ||
-            !isValidAngle(1, mr[1].angle) ||
-            !isValidAngle(2, mr[2].angle))
+            !isValidAngle(0, drr.rotations[0].angle) ||
+            !isValidAngle(1, drr.rotations[1].angle) ||
+            !isValidAngle(2, drr.rotations[2].angle))
         {
             throw InverseKinematicsException("motion angles outside of valid range", p);
         }
@@ -135,13 +143,16 @@ namespace DeltaRobot
         {
             throw InverseKinematicsException("invalid path", p);
         }
+
+        std::cout << "moveTime coord1 (" << p.x << " " << p.y << " " << p.z << ") coord2 (" << effectorLocation.x << " " << effectorLocation.y << " " << effectorLocation.z << ") speed " << speed << " distance " << p.distance(effectorLocation) << std::endl;
         double moveTime = p.distance(effectorLocation) / speed;
 
         try
         {
-            motors[0].moveToWithin(mr[0], moveTime);
-            motors[1].moveToWithin(mr[1], moveTime);
-            motors[2].moveToWithin(mr[2], moveTime);
+
+            motors[0]->moveToWithin(drr.rotations[0], moveTime, false);
+            motors[1]->moveToWithin(drr.rotations[1], moveTime, false);
+            motors[2]->moveToWithin(drr.rotations[2], moveTime, false);
             motorManager->startMovement();
         }
         catch(std::out_of_range& ex) { throw ex; }
@@ -180,7 +191,7 @@ namespace DeltaRobot
         
         // Starting point of calibration
         DataTypes::MotorRotation<double> mr;
-        mr.speed = 10;
+        mr.speed = 1;
         mr.acceleration = 360;
         mr.deceleration = 360;
         mr.angle = 0;
@@ -188,22 +199,19 @@ namespace DeltaRobot
         // Move motor upwards till the calibration sensor is pushed
         do {
             mr.angle -= Utilities::rad(Motor::CRD514KD::MOTOR_STEP_IN_DEGREES);
-            motors[motorIndex].writeRotationData(mr);
-            motors[motorIndex].startMovement();
+            motors[motorIndex]->moveTo(mr);
 
             usleep(25000);
         } while(!checkSensor(modbus, motorIndex));
 
         //
         mr.angle += Measures::MOTORS_DEVIATION;
-        motors[motorIndex].writeRotationData(mr);
-        motors[motorIndex].startMovement();
+        motors[motorIndex]->moveTo(mr);
 
-        motors[motorIndex].resetCounter();
+        motors[motorIndex]->resetCounter();
 
         mr.angle = 0;
-        motors[motorIndex].writeRotationData(mr);
-        motors[motorIndex].startMovement();
+        motors[motorIndex]->moveTo(mr);
     }
 
     /**
@@ -237,7 +245,9 @@ namespace DeltaRobot
         }
 
         // Disable limitations
-        motorManager->disableAngleLimitations();
+        motors[0]->disableAngleLimitations();
+        motors[1]->disableAngleLimitations();
+        motors[2]->disableAngleLimitations();
         
         // Calibrate motors
         calibrateMotor(modbus, 0);
@@ -245,14 +255,14 @@ namespace DeltaRobot
         calibrateMotor(modbus, 2);
 
         // Set limitations
-        motors[0].setMotorLimits(Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MAX);
-        motors[1].setMotorLimits(Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MAX);
-        motors[2].setMotorLimits(Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MAX);
+        motors[0]->setMotorLimits(Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MAX);
+        motors[1]->setMotorLimits(Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MAX);
+        motors[2]->setMotorLimits(Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MAX);
         
         // Set deviation to 0 for the 3 motors
-        motors[0].setDeviation(0);
-        motors[1].setDeviation(0);
-        motors[2].setDeviation(0);
+        motors[0]->setDeviation(0);
+        motors[1]->setDeviation(0);
+        motors[2]->setDeviation(0);
 
         effectorLocation.x = 0;
         effectorLocation.y = 0;

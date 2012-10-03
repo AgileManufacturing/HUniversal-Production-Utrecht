@@ -63,9 +63,13 @@
 namespace DeltaRobot {
 	InverseKinematics::InverseKinematics(const double base, const double hip,
 			const double effector, const double ankle,
-			const double MaxAngleHipAnkle) :
-			InverseKinematicsModel(base, hip, effector, ankle, MaxAngleHipAnkle) {
+			const double maxAngleHipAnkle) :
+			InverseKinematicsModel(base, hip, effector, ankle, maxAngleHipAnkle) {
 	}
+
+	InverseKinematics::InverseKinematics(DataTypes::DeltaRobotMeasures & drm) :
+			InverseKinematicsModel(drm.base, drm.hip, drm.effector, drm.ankle, drm.maxAngleHipAnkle) {
+	}	
 
 	InverseKinematics::~InverseKinematics(void) {
 	}
@@ -126,6 +130,7 @@ namespace DeltaRobot {
 		double hipAnkleAngle = asin(
 				abs(destinationPointRotatedAroundZAxis.x) / ankle);
 		if (hipAnkleAngle > maxAngleHipAnkle) {
+			//std::cerr << "hipAnkleAngle > maxAngleHipAnklel " << Utilities::deg(hipAnkleAngle) << " > " << Utilities::deg(maxAngleHipAnkle) << std::endl;
 			throw InverseKinematicsException(
 					"angle between hip and ankle is out of range",
 					destinationPoint);
@@ -142,7 +147,7 @@ namespace DeltaRobot {
 	 * @param motionPointer output parameter, the resulting motion is stored here.
 	 * @return true on success, false otherwise.
 	 **/
-	void InverseKinematics::pointToMotion(const DataTypes::Point3D<double>& destinationPoint, DataTypes::MotorRotation<double>* motionPointer) const {
+	void InverseKinematics::pointToMotion(const DataTypes::Point3D<double>& destinationPoint, DataTypes::DeltaRobotRotation& rotation) const {
 		/**
 		 * Adding 180 degrees switches 0 degrees for the motor from the 
 		 * midpoint of the engines to directly opposite.
@@ -153,19 +158,23 @@ namespace DeltaRobot {
 		 *  240 degrees: this motor is located 240 degrees counter clockwise of the 0 degrees motor
 		 * when looking at the side the effector is not located
 		 **/
-		 assert(motionPointer != NULL && sizeof(motionPointer)/sizeof(motionPointer[0]) == 3);
 
-		motionPointer[0].angle = Utilities::rad(180)
+		rotation.rotations[0].angle = Utilities::rad(180)
 				+ motorAngle(destinationPoint, Utilities::rad(1 * 120));
-		motionPointer[1].angle = Utilities::rad(180)
+		rotation.rotations[1].angle = Utilities::rad(180)
 				+ motorAngle(destinationPoint, Utilities::rad(0 * 120));
-		motionPointer[2].angle = Utilities::rad(180)
+		rotation.rotations[2].angle = Utilities::rad(180)
 				+ motorAngle(destinationPoint, Utilities::rad(2 * 120));
 
-		motionPointer[0].acceleration = motionPointer[1].acceleration =
-				motionPointer[2].acceleration = Utilities::rad(3600);
-		motionPointer[0].deceleration = motionPointer[1].deceleration =
-				motionPointer[2].deceleration = Utilities::rad(3600);
+		rotation.rotations[0].acceleration =
+			rotation.rotations[1].acceleration =
+			rotation.rotations[2].acceleration = 
+			Utilities::rad(3600);
+
+		rotation.rotations[0].deceleration =
+			rotation.rotations[1].deceleration =
+			rotation.rotations[2].deceleration = 
+			Utilities::rad(3600);
 	}
 }
 

@@ -42,7 +42,7 @@
 
 #include <iostream>
 #include <DataTypes/Point3D.h>
-#include <Motor/MotorInterface.h>
+#include <Motor/StepperMotor.h>
 #include <DeltaRobot/Measures.h>
 #include <DeltaRobot/InverseKinematicsModel.h>
 #include <vector>
@@ -59,7 +59,8 @@ namespace DeltaRobot
 	public:
 		~EffectorBoundaries();
 
-		static EffectorBoundaries* generateEffectorBoundaries(const InverseKinematicsModel& model, const Motor::MotorInterface* motors, double voxelSize);
+		// TODO: change Motor::StepperMotor to Motor::MotorInterface
+		static EffectorBoundaries* generateEffectorBoundaries(const InverseKinematicsModel& model,  Motor::StepperMotor* (&motors)[3], double voxelSize);
 		
 		bool checkPath(const DataTypes::Point3D<double>& from, const DataTypes::Point3D<double>& to) const;
 		
@@ -95,7 +96,7 @@ namespace DeltaRobot
 
 	private:
 		
-		EffectorBoundaries(const InverseKinematicsModel& model, const Motor::MotorInterface* motors, double voxelSize);
+		EffectorBoundaries(const InverseKinematicsModel& model,  Motor::StepperMotor* (&motors)[3], double voxelSize);
 
 		/**
 		 * Represents a 3-dimensional point in the 3D voxel array.
@@ -135,7 +136,7 @@ namespace DeltaRobot
 
 		bool* boundariesBitmap;
 		const InverseKinematicsModel &kinematics;
-		const Motor::MotorInterface* motors;
+		Motor::StepperMotor* (&motors)[3];
 		double voxelSize;
 
 

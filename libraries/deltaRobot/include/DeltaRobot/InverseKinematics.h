@@ -42,7 +42,9 @@
 
 #include <DataTypes/Point3D.h>
 #include <DataTypes/MotorRotation.h>
+#include <DataTypes/DeltaRobotMeasures.h>
 #include <DeltaRobot/InverseKinematicsModel.h>
+#include <DataTypes/DeltaRobotRotation.h>
 
 namespace DeltaRobot {
 	class InverseKinematics: public InverseKinematicsModel {
@@ -52,12 +54,14 @@ namespace DeltaRobot {
 
 	public:
 		InverseKinematics(const double base, const double hip,
-				const double effector, const double ankle,
-				const double hip_ankle_angle_max);
+			const double effector, const double ankle,
+			const double maxAngleHipAnkle);
+
+		InverseKinematics(DataTypes::DeltaRobotMeasures & drm);
 
 		virtual ~InverseKinematics(void);
 		
 		void pointToMotion(const DataTypes::Point3D<double>& destinationPoint,
-				DataTypes::MotorRotation<double>* motionPointer) const;
+				DataTypes::DeltaRobotRotation& rotation) const;
 	};
 }

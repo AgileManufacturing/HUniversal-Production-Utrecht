@@ -19,7 +19,7 @@
 # template: set(libraryname "${REXOS_SOURCE_DIR}library directory")
 set(LIB_DATATYPES_INCLUDE "${REXOS_SOURCE_DIR}/libraries/dataTypes/include")
 set(LIB_DELTAROBOT_INCLUDE "${REXOS_SOURCE_DIR}/libraries/deltaRobot/include")
-set(LIB_MODBUS_CONTROLLER "${REXOS_SOURCE_DIR}/libraries/modbusController/include")
-set(LIB_UTILITIES "${REXOS_SOURCE_DIR}/libraries/utilities/include")
-set(LIB_MOTOR "${REXOS_SOURCE_DIR}/libraries/motor/include")
+set(LIB_MODBUS_CONTROLLER_INCLUDE "${REXOS_SOURCE_DIR}/libraries/modbusController/include")
+set(LIB_UTILITIES_INCLUDE "${REXOS_SOURCE_DIR}/libraries/utilities/include")
+set(LIB_MOTOR_INCLUDE "${REXOS_SOURCE_DIR}/libraries/motor/include")
 

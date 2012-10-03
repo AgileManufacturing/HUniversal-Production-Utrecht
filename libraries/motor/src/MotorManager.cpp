@@ -1,7 +1,13 @@
+//******************************************************************************
+//
+//                 REXOS
+//
+//******************************************************************************
+// Project:        huniplacer
 // File:           MotorManager.cpp
-// Description:    CRD514 KD constants
-// Author:         Koen Braham Dennis Koole
-// Notes:          
+// Description:    Motor management for concurrent movement
+// Author:         Koen Braham		Dennis Koole
+// Notes:          -
 //
 // License:        newBSD
 //
@@ -44,7 +50,7 @@ namespace Motor {
 	void MotorManager::powerOn() {
 		if(!poweredOn){
 			for(int i = 0; i < numberOfMotors; ++i) {
-				motors[i].powerOn();
+				motors[i]->powerOn();
 			}
 		}
 		poweredOn = true;
@@ -53,7 +59,7 @@ namespace Motor {
 	void MotorManager::powerOff() {
 		if(poweredOn){
 			for(int i = 0; i < numberOfMotors; ++i){
-				motors[i].powerOff();
+				motors[i]->powerOff();
 			}
 		}
 		poweredOn = false;
@@ -66,16 +72,12 @@ namespace Motor {
         }
 
         //execute motion
-        motors[0].waitTillReady();
-        motors[1].waitTillReady();
-        motors[2].waitTillReady();
+        motors[0]->waitTillReady();
+        motors[1]->waitTillReady();
+        motors[2]->waitTillReady();
 
-        modbus.writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
-        modbus.writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
-        modbus.writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
-	}
-
-	void MotorManager::disableAngleLimitations() {
-		modbus.writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::OP_SOFTWARE_OVERTRAVEL, 0);
+        modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
+        modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
+        modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 	}
 }

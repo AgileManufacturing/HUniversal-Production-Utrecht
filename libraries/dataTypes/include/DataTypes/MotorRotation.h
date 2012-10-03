@@ -6,7 +6,7 @@
 // Project:        huniplacer
 // File:           motion.h
 // Description:    template class for motion.
-// Author:         Lukas Vermond & Kasper van Nieuwland
+// Author:         Koen Braham      Dennis Koole
 // Notes:          -
 //
 // License:        newBSD
@@ -52,6 +52,9 @@ namespace DataTypes
             T deceleration;
             
             MotorRotation() {
+                speed = 10;
+                acceleration = 360;
+                deceleration = 360;
             }
             
             MotorRotation(T angle, T speed, T acc, T dec) : angle(angle), speed(speed), acceleration(acc), deceleration(dec) {}

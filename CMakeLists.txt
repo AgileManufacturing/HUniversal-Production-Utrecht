@@ -16,7 +16,7 @@
 
 ######## Configuration ##########
 
-set(REXOS_PARTS libraries) # ros tools) # TODO: Agents Libraries ROS
+set(REXOS_PARTS libraries ros tools) # TODO: Agents Libraries ROS
 
 # Note: Set buildtype with cmake -D CMAKE_BUILD_TYPE=<Debug|Release> <source>
 # It might be a smart idea to make two out-of-source build directories, 

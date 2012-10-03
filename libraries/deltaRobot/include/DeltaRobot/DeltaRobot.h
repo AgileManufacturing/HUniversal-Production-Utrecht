@@ -42,6 +42,7 @@
 
 #include <modbus/modbus.h>
 #include <DataTypes/Point3D.h>
+#include <DataTypes/DeltaRobotMeasures.h>
 #include <Motor/MotorInterface.h>
 #include <Motor/StepperMotor.h>
 #include <Motor/MotorManager.h>
@@ -54,19 +55,8 @@ namespace DeltaRobot
 	
     class DeltaRobot 
     {
-        private:
-            InverseKinematicsModel& kinematics;
-            Motor::StepperMotor* motors;
-            Motor::MotorManager* motorManager;
-            EffectorBoundaries* boundaries;
-
-            DataTypes::Point3D<double> effectorLocation;
-            bool boundariesGenerated;
-
-            bool isValidAngle(int motorIndex, double angle);
-        
         public:
-            DeltaRobot(InverseKinematicsModel& kinematics, Motor::MotorManager* motorManager, Motor::StepperMotor* motors);
+            DeltaRobot(DataTypes::DeltaRobotMeasures& drm, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3]);
             ~DeltaRobot();
             
             inline EffectorBoundaries* getBoundaries() { return boundaries; }
@@ -81,5 +71,16 @@ namespace DeltaRobot
             void powerOff();
             void powerOn();
             DataTypes::Point3D<double>& getEffectorLocation();
+
+        private:
+            InverseKinematicsModel* kinematics;
+            Motor::StepperMotor* (&motors)[3];
+            Motor::MotorManager* motorManager;
+            EffectorBoundaries* boundaries;
+
+            DataTypes::Point3D<double> effectorLocation;
+            bool boundariesGenerated;
+
+            bool isValidAngle(int motorIndex, double angle);
     };
 }

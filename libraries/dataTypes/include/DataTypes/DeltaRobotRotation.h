@@ -1,12 +1,12 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 Rexos
 //
 //******************************************************************************
 // Project:        huniplacer
-// File:           utils.h
-// Description:    miscellaneous utilities
-// Author:         Lukas Vermond & Kasper van Nieuwland
+// File:           motion.h
+// Description:    template class for motion.
+// Author:         Koen Braham
 // Notes:          -
 //
 // License:        newBSD
@@ -39,55 +39,15 @@
 
 
 #pragma once
+#include <DataTypes/MotorRotation.h>
 
-#include <boost/thread.hpp>
-#include "boost/date_time/posix_time/posix_time.hpp"
-#include <cstdio>
-#include <algorithm>
-#include <vector>
-
-    namespace Utilities
+namespace DataTypes
+{
+    class DeltaRobotRotation
     {
-        long timeNow(void);
-        void sleep(long ms);
-        double deg(double rad);
-        double rad(double deg);
-
-        /**
-         * Utility class to time stuff
-         * @note TEMPORARY
-         **/
-        class StopWatch
-        {
-			private:
-        		const char* name;
-				long t0, t1;
-
-			public:
-				StopWatch(const char* name, bool s = false) : name(name)
-				{
-					if(s) { start(); }
-				}
-
-				~StopWatch(void) { }
-				void start(void) { t0 = timeNow(); }
-				void stop(void) { t1 = timeNow(); }
-				
-                void print(FILE* stream)
-				{
-					fprintf(stream, "%s: %ld ms\n", name, t1 - t0);
-				}
-
-				void stopAndPrint(FILE* stream)
-				{
-					stop();
-					print(stream);
-				}
-        };
-
-        template<typename T>
-        bool vectorContains(const std::vector<T>& vec, const T& elem)
-        {
-        	return std::find(vec.begin(), vec.end(), elem) != vec.end();
-        }
-    }
+        public:
+            MotorRotation<double> rotations[3];
+            
+            DeltaRobotRotation() {}
+    };
+}

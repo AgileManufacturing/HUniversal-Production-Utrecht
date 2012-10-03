@@ -1,12 +1,12 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 REXOS
 //
 //******************************************************************************
-// Project:        huniplacer
-// File:           utils.h
-// Description:    miscellaneous utilities
-// Author:         Lukas Vermond & Kasper van Nieuwland
+// Project:        DataTypes
+// File:           DeltaRobotMeasures.h
+// Description:    Holds all measures for the deltarobot
+// Author:         Koen Braham
 // Notes:          -
 //
 // License:        newBSD
@@ -40,54 +40,17 @@
 
 #pragma once
 
-#include <boost/thread.hpp>
-#include "boost/date_time/posix_time/posix_time.hpp"
-#include <cstdio>
-#include <algorithm>
-#include <vector>
-
-    namespace Utilities
+namespace DataTypes
+{
+    class DeltaRobotMeasures
     {
-        long timeNow(void);
-        void sleep(long ms);
-        double deg(double rad);
-        double rad(double deg);
-
-        /**
-         * Utility class to time stuff
-         * @note TEMPORARY
-         **/
-        class StopWatch
-        {
-			private:
-        		const char* name;
-				long t0, t1;
-
-			public:
-				StopWatch(const char* name, bool s = false) : name(name)
-				{
-					if(s) { start(); }
-				}
-
-				~StopWatch(void) { }
-				void start(void) { t0 = timeNow(); }
-				void stop(void) { t1 = timeNow(); }
-				
-                void print(FILE* stream)
-				{
-					fprintf(stream, "%s: %ld ms\n", name, t1 - t0);
-				}
-
-				void stopAndPrint(FILE* stream)
-				{
-					stop();
-					print(stream);
-				}
-        };
-
-        template<typename T>
-        bool vectorContains(const std::vector<T>& vec, const T& elem)
-        {
-        	return std::find(vec.begin(), vec.end(), elem) != vec.end();
-        }
-    }
+        public:
+            double base, hip, effector, ankle, maxAngleHipAnkle;
+            
+            DeltaRobotMeasures() {
+            }
+            
+            /*DeltaRobotMeasures(const double base, const double hip, const double effector, const double ankle, const double MaxAngleHipAnkle) :
+             base(base), hip(hip), effector(effector), ankle(ankle), maxAngleHipAnkle(maxAngleHipAnkle) {}*/
+    };
+}

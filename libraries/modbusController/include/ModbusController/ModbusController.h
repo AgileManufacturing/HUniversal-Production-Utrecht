@@ -51,6 +51,10 @@ extern "C"
 #include <boost/thread.hpp>
 #include <map>
 
+#include <fstream>
+#include <iostream>
+#include <string>
+
 namespace ModbusController
 {
     class ModbusController
@@ -90,6 +94,8 @@ namespace ModbusController
         * Values at certain addresses are shadowed here
         **/
         ShadowMap shadowRegisters;
+
+        std::ofstream logFile;
 
         void wait(void);
 
