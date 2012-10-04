@@ -1,3 +1,8 @@
+//******************************************************************************
+//
+//                 REXOS
+//
+//******************************************************************************
 /**
  * DeltaRobotNode.cpp
  *
@@ -33,35 +38,46 @@
 **/
 
 #include "ros/ros.h"
-#include <huniplacer/huniplacer.h> 
 #include "deltaRobotNode/MoveToPoint.h"
 #include "deltaRobotNode/MovePath.h"
 #include "deltaRobotNode/MoveToRelativePoint.h"
 #include "deltaRobotNode/MoveRelativePath.h"
 #include "deltaRobotNode/Motion.h"
+#include "deltaRobotNode/Calibrate.h"
+#include "deltaRobotNode/Calibration.h"
+
+#include <DataTypes/Point3D.h>
+#include <DeltaRobot/DeltaRobot.h>
+#include <Motor/StepperMotor.h>
+#include <DeltaRobotNode/Services.h>
 
 #define NODE_NAME "DeltaRobotNode"
 
- static huniplacer::deltarobot * deltarobot;
+
+static DeltaRobot::DeltaRobot * deltaRobot;
 
 /**
- * Callback function that gets called by the deltarobot thread when an exception occured in it
- *
- * @param ex the exception that has occured 
- **/
-static void modbus_exhandler(std::exception& ex)
-{
-        std::stringstream ss;
-        ss << "runtime error of type "<< typeid(ex).name()<<" in delta robot" << std::endl;
-        ss <<"what(): " << ex.what()<<std::endl;
-        std::cerr << ss;
+ * Starts the (re)calibration of the robot
+ * @param req The request for this service as defined in Calibrate.srv 
+ * @param res The response for this service as defined in Calibrate.srv
+ * 
+ * @return true if the calibration was succesfully. false otherwise.
+ */
+bool calibrate(deltaRobotNode::Calibrate::Request &req,
+	deltaRobotNode::Calibrate::Response &res) {
+    // Calibrate the motors
+    if(!deltaRobot->calibrateMotors()){
+    	ROS_ERROR("Calibration FAILED. EXITING.");
+    	return false;
+    }
+	return true;	
 }
 
 /**
  * Move to an absolute point. Will be implemented in a later release.
  *
- * @param req The request for this service as defined in moveToPoint.srv 
- * @param res The response for this service as defined in moveToPoint.srv
+ * @param req The request for this service as defined in MoveToPoint.srv 
+ * @param res The response for this service as defined in MoveToPoint.srv
  * 
  * @return true
  **/
@@ -74,8 +90,8 @@ bool moveToPoint(deltaRobotNode::MoveToPoint::Request &req,
 /**
  * Move to a number of absolute points.
  *
- * @param req The request for this service as defined in movePath.srv 
- * @param res The response for this service as defined in movePath.srv
+ * @param req The request for this service as defined in MovePath.srv 
+ * @param res The response for this service as defined in MovePath.srv
  * 
  * @return true
  **/
@@ -93,9 +109,9 @@ bool movePath(deltaRobotNode::MovePath::Request &req,
 		{
 			currentMotion = req.motion[n];			
 			nextMotion = req.motion[n+1];
-			if(!deltarobot->check_path(
-				huniplacer::Point3D(currentMotion.x, currentMotion.y, currentMotion.z),
-				huniplacer::Point3D(nextMotion.x, nextMotion.y, nextMotion.z)))
+			if(!deltaRobot->checkPath(
+				DataTypes::Point3D<double>(currentMotion.x, currentMotion.y, currentMotion.z),
+				DataTypes::Point3D<double>(nextMotion.x, nextMotion.y, nextMotion.z)))
 			{
 				res.succeeded = false;
 				return true;
@@ -105,9 +121,9 @@ bool movePath(deltaRobotNode::MovePath::Request &req,
 		{	
 			currentMotion = req.motion[n];
 			ROS_INFO("moveTo: (%f, %f, %f) speed=%f", currentMotion.x, currentMotion.y,currentMotion.z, currentMotion.speed);
-			deltarobot->moveto(huniplacer::Point3D(currentMotion.x, currentMotion.y, currentMotion.z),currentMotion.speed);
+			deltaRobot->moveTo(DataTypes::Point3D<double>(currentMotion.x, currentMotion.y, currentMotion.z),currentMotion.speed);
 		}
-		deltarobot->wait_for_idle();
+		//deltaRobot->waitForReady();
 	}
 	catch(std::runtime_error& ex)
 	{
@@ -137,22 +153,22 @@ bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
 	
 	try {
 		currentMotion = req.motion;
-		huniplacer::Point3D& effectorLocation = deltarobot->getEffectorLocation();
+		DataTypes::Point3D<double>& effectorLocation = deltaRobot->getEffectorLocation();
 		ROS_INFO("Current effector location: x: %f y: %f z: %f", effectorLocation.x, effectorLocation.y, effectorLocation.z);
 		double relativeX = effectorLocation.x + currentMotion.x;
 		double relativeY = effectorLocation.y + currentMotion.y;
 		double relativeZ = effectorLocation.z + currentMotion.z;
 		ROS_INFO("Current motion z: %f", currentMotion.z);
 
-		if(!deltarobot->check_path(
-				huniplacer::Point3D(effectorLocation.x, effectorLocation.y, effectorLocation.z),
-				huniplacer::Point3D(relativeX, relativeY, relativeZ)))
+		if(!deltaRobot->checkPath(
+				DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
+				DataTypes::Point3D<double>(relativeX, relativeY, relativeZ)))
 		{
 			res.succeeded = false;
 			return true;
 		}
-		deltarobot->moveto(huniplacer::Point3D(relativeX, relativeY, relativeZ), currentMotion.speed);
-		deltarobot->wait_for_idle();
+		deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ), currentMotion.speed);
+		//deltaRobot->waitForReady();
 
 	} catch(std::runtime_error& ex) {
 		std::stringstream ss;
@@ -169,8 +185,8 @@ bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
 /**
  * Move to a number of relative points. Will be implemented in a later release
  *
- * @param req The request for this service as defined in moveRelativePath.srv 
- * @param res The response for this service as defined in moveRelativePath.srv
+ * @param req The request for this service as defined in MoveRelativePath.srv 
+ * @param res The response for this service as defined in MoveRelativePath.srv
  *
  * @return true
  **/
@@ -183,64 +199,76 @@ bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
 int main(int argc, char** argv) {
 	ros::init(argc, argv, NODE_NAME);
 
+	std::cout << "Starting refurbished code!" << std::endl;
+
     // Initialize modbus for IO controller
-    modbus_t* modbus = modbus_new_tcp("192.168.0.2", 502);
-    if(modbus == NULL)
+    modbus_t* modbusIO = modbus_new_tcp("192.168.0.2", 502);
+    if(modbusIO == NULL)
     {
         throw std::runtime_error("Unable to allocate libmodbus context");
     }
-    if(modbus_connect(modbus) == -1)
+    if(modbus_connect(modbusIO) == -1)
     {
         throw std::runtime_error("Modbus connection to IO controller failed");
     }
-    assert(modbus != NULL);
+    assert(modbusIO != NULL);
 
-    huniplacer::InverseKinematics kinematics(
-    huniplacer::measures::BASE,
-    huniplacer::measures::HIP,
-    huniplacer::measures::EFFECTOR,
-    huniplacer::measures::ANKLE,
-    huniplacer::measures::HIP_ANKLE_ANGLE_MAX);
+    DataTypes::DeltaRobotMeasures drm;
+    drm.base = DeltaRobot::Measures::BASE;
+    drm.hip = DeltaRobot::Measures::HIP;
+    drm.effector = DeltaRobot::Measures::EFFECTOR;
+    drm.ankle = DeltaRobot::Measures::ANKLE;
+    drm.maxAngleHipAnkle = DeltaRobot::Measures::HIP_ANKLE_ANGLE_MAX;
 
-    modbus_t* modbus_rtu = modbus_new_rtu(
+
+    ModbusController::ModbusController* modbus = new ModbusController::ModbusController(modbus_new_rtu(
         "/dev/ttyS0",
-        crd514_kd::rtu_config::BAUDRATE,
-        crd514_kd::rtu_config::PARITY,
-        crd514_kd::rtu_config::DATA_BITS,
-        crd514_kd::rtu_config::STOP_BITS);
+        Motor::CRD514KD::RtuConfig::BAUDRATE,
+        Motor::CRD514KD::RtuConfig::PARITY,
+        Motor::CRD514KD::RtuConfig::DATA_BITS,
+        Motor::CRD514KD::RtuConfig::STOP_BITS));
 
-	double deviation[3] = {huniplacer::measures::MOTOR1_DEVIATION, huniplacer::measures::MOTOR2_DEVIATION, huniplacer::measures::MOTOR3_DEVIATION};
-	huniplacer::steppermotor3 motors(modbus_rtu, huniplacer::measures::MOTOR_ROT_MIN, huniplacer::measures::MOTOR_ROT_MAX, modbus_exhandler, deviation);
+
+    Motor::StepperMotor* motors[3];
+    motors[0] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_0, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
+    motors[1] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_1, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
+    motors[2] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_2, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
+
+    Motor::MotorManager* motorManager = new Motor::MotorManager(modbus, motors, 3);
 
 	// Create a deltarobot	
-    deltarobot = new huniplacer::deltarobot(kinematics, motors);
+    deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO);
 
     // Generate the effector boundaries with voxel size 2
-    deltarobot->generate_boundaries(2);
+    deltaRobot->generateBoundaries(2);
 
 	// Power on the deltarobot and calibrate the motors.
-    deltarobot->power_on();
+    deltaRobot->powerOn();
 
     // Calibrate the motors
-    if(!deltarobot->calibrateMotors(modbus)){
+    if(!deltaRobot->calibrateMotors()){
     	ROS_ERROR("Calibration FAILED. EXITING.");
     	return 1;
     }
+    
 
 	ros::NodeHandle nodeHandle;
 
 	// Advertise the services
 	ros::ServiceServer moveToPointService =
-		nodeHandle.advertiseService("moveToPoint", moveToPoint);
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_POINT, moveToPoint);
 
 	ros::ServiceServer movePathService =
-		nodeHandle.advertiseService("movePath", movePath);
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_PATH, movePath);
 
 	ros::ServiceServer moveToRelativePointService =
-		nodeHandle.advertiseService("moveToRelativePoint", moveToRelativePoint);
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT, moveToRelativePoint);
 
 	ros::ServiceServer moveRelativePathService =
-		nodeHandle.advertiseService("moveRelativePath", moveRelativePath);
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_RELATIVE_PATH, moveRelativePath);
+
+	ros::ServiceServer calibrateService =
+		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, calibrate);
 
 	ROS_INFO("DeltaRobotNode ready...");
 
