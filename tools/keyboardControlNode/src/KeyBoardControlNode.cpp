@@ -1,3 +1,8 @@
+//******************************************************************************
+//
+//                 REXOS
+//
+//******************************************************************************
 /**
  * KeyBoardControlNode.cpp
  *
@@ -40,6 +45,8 @@
 #include "deltaRobotNode/MovePath.h"
 #include "deltaRobotNode/MoveToRelativePoint.h"
 #include "deltaRobotNode/Motion.h"
+#include "deltaRobotNode/Calibrate.h"
+#include "DeltaRobotNode/Services.h"
 
 #define NODE_NAME "KeyBoardControlNode"
 
@@ -51,6 +58,7 @@
 #define KEYCODE_A 0x61
 #define KEYCODE_S 0x73
 #define KEYCODE_D 0x64
+#define KEYCODE_C 0x63
 
 // Keyboard number
 int kfd =0; 
@@ -74,8 +82,12 @@ int main(int argc, char** argv) {
 	ros::NodeHandle nodeHandle;
 
 	// Getting MovePath Services
-    ros::ServiceClient deltaRobotClient = nodeHandle.serviceClient<deltaRobotNode::MoveToRelativePoint>("moveToRelativePoint");
+    ros::ServiceClient deltaRobotClient = nodeHandle.serviceClient<deltaRobotNode::MoveToRelativePoint>(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT);
     deltaRobotNode::MoveToRelativePoint moveToRelativePointService;
+
+    // Getting Calibrate Services
+    ros::ServiceClient calibrateClient = nodeHandle.serviceClient<deltaRobotNode::Calibrate>(DeltaRobotNodeServices::CALIBRATE);
+    deltaRobotNode::Calibrate calibrateService;
     
 	// Initing the keyboard read and setting up clean shutdown
 	signal(SIGINT, quit);
@@ -90,7 +102,7 @@ int main(int argc, char** argv) {
 	tcsetattr(kfd, TCSANOW, &raw);
 
 	// The speed in mm per second
-	double speed = 10.0;
+	double speed = 100.0;
 	
 	// The step we take in mm 
 	double step = 1.0;
@@ -142,6 +154,9 @@ int main(int argc, char** argv) {
 			  	ROS_INFO("PRESSED D");
 			  	moveToRelativePointService.request.motion.x = step;
 				deltaRobotClient.call(moveToRelativePointService);
+				break;
+			case KEYCODE_C:
+				calibrateClient.call(calibrateService);
 				break;
 		}
 		ros::spinOnce();
