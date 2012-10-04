@@ -1,12 +1,13 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 REXOS
 //
 //******************************************************************************
-// Project:        inverseKinematics.cpp
-// File:           inverse kinematics implementation. Based on work from Viacheslav Slavinsky
-// Original:       Lukas Vermond & Kasper van Nieuwland
-// Edited by:      Daan Veltman
+// Project:        DeltaRobot
+// File:           InverseKinematics.cpp
+// Original:       inverse kinematics implementation. Based on work from Viacheslav Slavinsky
+// Author:         1.0 Lukas Vermond & Kasper van Nieuwland
+//				   1.1 Koen Braham		Daan Veltman
 // Notes:  
 //       
 // License:        newBSD

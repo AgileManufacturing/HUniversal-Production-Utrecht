@@ -1,12 +1,13 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 Rexos
 //
 //******************************************************************************
-// Project:        huniplacer
+// Project:        DeltaRobot
 // File:           deltarobot.h
 // Description:    symbolizes an entire deltarobot
-// Author:         Lukas Vermond & Kasper van Nieuwland
+// Author:         1.0 Lukas Vermond & Kasper van Nieuwland
+//                 1.1 Koen Braham      Dennis Koole
 // Notes:          -
 //
 // License:        newBSD
@@ -56,7 +57,7 @@ namespace DeltaRobot
     class DeltaRobot 
     {
         public:
-            DeltaRobot(DataTypes::DeltaRobotMeasures& drm, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3]);
+            DeltaRobot(DataTypes::DeltaRobotMeasures& drm, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3], modbus_t* modbusIO);
             ~DeltaRobot();
             
             inline EffectorBoundaries* getBoundaries() { return boundaries; }
@@ -65,9 +66,9 @@ namespace DeltaRobot
             void generateBoundaries(double voxelSize);
             bool checkPath(const DataTypes::Point3D<double>& begin, const DataTypes::Point3D<double>& end);
             void moveTo(const DataTypes::Point3D<double>& p, double speed);
-            void calibrateMotor(modbus_t* modbus, int motorIndex);
-            bool checkSensor(modbus_t* modbus, int sensorIndex);
-            bool calibrateMotors(modbus_t* modbus);
+            void calibrateMotor(int motorIndex);
+            bool checkSensor(int sensorIndex);
+            bool calibrateMotors();
             void powerOff();
             void powerOn();
             DataTypes::Point3D<double>& getEffectorLocation();
@@ -80,6 +81,7 @@ namespace DeltaRobot
 
             DataTypes::Point3D<double> effectorLocation;
             bool boundariesGenerated;
+            modbus_t* modbusIO;
 
             bool isValidAngle(int motorIndex, double angle);
     };

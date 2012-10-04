@@ -1,3 +1,8 @@
+//******************************************************************************
+//
+//                 REXOS
+//
+//******************************************************************************
 /**
  * DeltaRobotNode.cpp
  *
@@ -38,33 +43,41 @@
 #include "deltaRobotNode/MoveToRelativePoint.h"
 #include "deltaRobotNode/MoveRelativePath.h"
 #include "deltaRobotNode/Motion.h"
+#include "deltaRobotNode/Calibrate.h"
+#include "deltaRobotNode/Calibration.h"
 
 #include <DataTypes/Point3D.h>
 #include <DeltaRobot/DeltaRobot.h>
 #include <Motor/StepperMotor.h>
+#include <DeltaRobotNode/Services.h>
 
 #define NODE_NAME "DeltaRobotNode"
 
- static DeltaRobot::DeltaRobot * deltaRobot;
+
+static DeltaRobot::DeltaRobot * deltaRobot;
 
 /**
- * Callback function that gets called by the deltarobot thread when an exception occured in it
- *
- * @param ex the exception that has occured 
- **/
-/*static void modbus_exhandler(std::exception& ex)
-{
-        std::stringstream ss;
-        ss << "runtime error of type "<< typeid(ex).name()<<" in delta robot" << std::endl;
-        ss <<"what(): " << ex.what()<<std::endl;
-        std::cerr << ss;
-}*/
+ * Starts the (re)calibration of the robot
+ * @param req The request for this service as defined in Calibrate.srv 
+ * @param res The response for this service as defined in Calibrate.srv
+ * 
+ * @return true if the calibration was succesfully. false otherwise.
+ */
+bool calibrate(deltaRobotNode::Calibrate::Request &req,
+	deltaRobotNode::Calibrate::Response &res) {
+    // Calibrate the motors
+    if(!deltaRobot->calibrateMotors()){
+    	ROS_ERROR("Calibration FAILED. EXITING.");
+    	return false;
+    }
+	return true;	
+}
 
 /**
  * Move to an absolute point. Will be implemented in a later release.
  *
- * @param req The request for this service as defined in moveToPoint.srv 
- * @param res The response for this service as defined in moveToPoint.srv
+ * @param req The request for this service as defined in MoveToPoint.srv 
+ * @param res The response for this service as defined in MoveToPoint.srv
  * 
  * @return true
  **/
@@ -77,8 +90,8 @@ bool moveToPoint(deltaRobotNode::MoveToPoint::Request &req,
 /**
  * Move to a number of absolute points.
  *
- * @param req The request for this service as defined in movePath.srv 
- * @param res The response for this service as defined in movePath.srv
+ * @param req The request for this service as defined in MovePath.srv 
+ * @param res The response for this service as defined in MovePath.srv
  * 
  * @return true
  **/
@@ -172,8 +185,8 @@ bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
 /**
  * Move to a number of relative points. Will be implemented in a later release
  *
- * @param req The request for this service as defined in moveRelativePath.srv 
- * @param res The response for this service as defined in moveRelativePath.srv
+ * @param req The request for this service as defined in MoveRelativePath.srv 
+ * @param res The response for this service as defined in MoveRelativePath.srv
  *
  * @return true
  **/
@@ -224,7 +237,7 @@ int main(int argc, char** argv) {
     Motor::MotorManager* motorManager = new Motor::MotorManager(modbus, motors, 3);
 
 	// Create a deltarobot	
-    deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors);
+    deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO);
 
     // Generate the effector boundaries with voxel size 2
     deltaRobot->generateBoundaries(2);
@@ -233,35 +246,29 @@ int main(int argc, char** argv) {
     deltaRobot->powerOn();
 
     // Calibrate the motors
-    if(!deltaRobot->calibrateMotors(modbusIO)){
+    if(!deltaRobot->calibrateMotors()){
     	ROS_ERROR("Calibration FAILED. EXITING.");
     	return 1;
     }
-
-    char k;
-    std::cout << "Ready to move" << std::endl;
-    std::cin >> k;
-    deltaRobot->moveTo(DataTypes::Point3D<double>(0,0,-244), 1);
-    std::cin >> k;
-    deltaRobot->moveTo(DataTypes::Point3D<double>(-20,0,-210), 1);
-
-    return 0;
-
+    
 
 	ros::NodeHandle nodeHandle;
 
 	// Advertise the services
 	ros::ServiceServer moveToPointService =
-		nodeHandle.advertiseService("moveToPoint", moveToPoint);
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_POINT, moveToPoint);
 
 	ros::ServiceServer movePathService =
-		nodeHandle.advertiseService("movePath", movePath);
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_PATH, movePath);
 
 	ros::ServiceServer moveToRelativePointService =
-		nodeHandle.advertiseService("moveToRelativePoint", moveToRelativePoint);
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT, moveToRelativePoint);
 
 	ros::ServiceServer moveRelativePathService =
-		nodeHandle.advertiseService("moveRelativePath", moveRelativePath);
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_RELATIVE_PATH, moveRelativePath);
+
+	ros::ServiceServer calibrateService =
+		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, calibrate);
 
 	ROS_INFO("DeltaRobotNode ready...");
 

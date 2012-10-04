@@ -1,9 +1,9 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 REXOS
 //
 //******************************************************************************
-// Project:        huniplacer
+// Project:        Motor
 // File:           MotorManager.h
 // Description:    Motor management for concurrent movement
 // Author:         Koen Braham		Dennis Koole

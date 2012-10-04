@@ -1,4 +1,10 @@
-// File:           CRD514KDMotorController.h
+//******************************************************************************
+//
+//                 REXOS
+//
+//******************************************************************************
+// Project:        Motor
+// File:           CRD514KD.h
 // Description:    CRD514 KD constants
 // Author:         Koen Braham Dennis Koole
 // Notes:          

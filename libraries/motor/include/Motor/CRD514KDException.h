@@ -1,3 +1,9 @@
+//******************************************************************************
+//
+//                 REXOS
+//
+//******************************************************************************
+// Project:        Motor
 // File:           CRD514KDException.h
 // Description:    exception thrown if the motorcontroller alarm flag is set
 // Author:         Lukas Vermond & Kasper van Nieuwland

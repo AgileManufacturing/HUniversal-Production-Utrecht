@@ -1,12 +1,13 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 REXOS
 //
 //******************************************************************************
-// Project:        huniplacer
-// File:           effector_boundaries.h
+// Project:        DeltaRobot
+// File:           EffectorBoundaries.h
 // Description:    represents the effector's moving volume
-// Author:         Lukas Vermond & Kasper van Nieuwland
+// Author:         1.0 Lukas Vermond & Kasper van Nieuwland
+//				   1.1 Koen Braham		Daan Veltman
 // Notes:          -
 //
 // License:        newBSD

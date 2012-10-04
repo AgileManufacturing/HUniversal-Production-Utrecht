@@ -1,13 +1,13 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 REXOS
 //
 //******************************************************************************
-// Project:        huniplacer
-// File:           modbus_ctrl.h
+// Project:        ModbusController
+// File:           ModbusController.h
 // Description:    wrapper for libmodbus with some extra functionality
-// Author:      1.0 Lukas Vermond & Kasper van Nieuwland
-//              1.1 Koen Braham
+// Author:         1.0 Lukas Vermond & Kasper van Nieuwland
+//                 1.1 Koen Braham
 // Notes:          -
 //
 // License:        newBSD

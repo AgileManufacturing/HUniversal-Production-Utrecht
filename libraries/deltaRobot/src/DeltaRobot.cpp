@@ -1,13 +1,13 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 REXOS
 //
 //******************************************************************************
-// Project:        deltarobot.cpp
-// File:           symbolizes an entire deltarobot
-// Description:
-// Author:      1.0 Lukas Vermond & Kasper van Nieuwland
-//              1.1 Koen Braham
+// Project:        DeltaRobot
+// File:           DeltaRobot.cpp
+// Description:     symbolizes an entire deltarobot
+// Author:          1.0 Lukas Vermond & Kasper van Nieuwland
+//                  1.1 Koen Braham
 // Notes:          
 //
 // License:        newBSD
@@ -66,12 +66,21 @@ namespace DeltaRobot
      * @param kinematics kinematics model that will be used to convert points to motions
      * @param motors implementation of motor interface that will be used to communicate with the motors. MUST BE EXACTLY 3.
      **/
-    DeltaRobot::DeltaRobot(DataTypes::DeltaRobotMeasures& drm, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3]) :
+    DeltaRobot::DeltaRobot(DataTypes::DeltaRobotMeasures& drm, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3], modbus_t* modbusIO) :
         motors(motors),
          effectorLocation(DataTypes::Point3D<double>(0, 0, -161.9)), 
-         boundariesGenerated(false)
+         boundariesGenerated(false),
+         modbusIO(modbusIO)
     {
+
+        if(modbusIO == NULL){
+            throw std::runtime_error("Unable to open modbusIO");
+        }
         kinematics = new InverseKinematics(drm);
+
+        if(motorManager == NULL){
+            throw std::runtime_error("No motorManager given");
+        }
         this->motorManager = motorManager;
     }
 
@@ -130,7 +139,6 @@ namespace DeltaRobot
             throw ex;
         }
 
-        std::cout << "Angles\t" << drr.rotations[0].angle << "\t" << drr.rotations[1].angle << "\t" << drr.rotations[2].angle << std::endl;
         if(
             !isValidAngle(0, drr.rotations[0].angle) ||
             !isValidAngle(1, drr.rotations[1].angle) ||
@@ -144,9 +152,7 @@ namespace DeltaRobot
             throw InverseKinematicsException("invalid path", p);
         }
 
-        std::cout << "moveTime coord1 (" << p.x << " " << p.y << " " << p.z << ") coord2 (" << effectorLocation.x << " " << effectorLocation.y << " " << effectorLocation.z << ") speed " << speed << " distance " << p.distance(effectorLocation) << std::endl;
         double moveTime = p.distance(effectorLocation) / speed;
-
         try
         {
 
@@ -167,13 +173,13 @@ namespace DeltaRobot
     * @param sensorIndex index of the sensor. This corresponds to the motor index.
     * @return True if sensor is hit, false otherwise.
     **/
-    bool DeltaRobot::checkSensor(modbus_t* modbus, int sensorIndex){
+    bool DeltaRobot::checkSensor(int sensorIndex){
         // The modbus library only reads
         uint16_t sensorRegister;
         int result;
 
         // Read register 8000 -- this register contains the values of the input sensors.
-        result = modbus_read_registers(modbus, 8000, 1, &sensorRegister);
+        result = modbus_read_registers(modbusIO, 8000, 1, &sensorRegister);
         if (result == -1) {
             throw std::runtime_error(modbus_strerror(errno));
         }
@@ -186,7 +192,7 @@ namespace DeltaRobot
     * @param motors The StepperMotor class controlling the 3 deltarobot motors.
     * @param motorIndex Index of the motor to be calibrated. When standing in front of the robot looking towards it, 0 is the right motor, 1 is the front motor and 2 is the left motor.
     **/
-    void DeltaRobot::calibrateMotor(modbus_t* modbus, int motorIndex) {
+    void DeltaRobot::calibrateMotor(int motorIndex) {
         std::cout << "Calibrating motor number " << motorIndex << std::endl;
         
         // Starting point of calibration
@@ -202,16 +208,18 @@ namespace DeltaRobot
             motors[motorIndex]->moveTo(mr);
 
             usleep(25000);
-        } while(!checkSensor(modbus, motorIndex));
+        } while(!checkSensor(motorIndex));
 
-        //
-        mr.angle += Measures::MOTORS_DEVIATION;
-        motors[motorIndex]->moveTo(mr);
+        double deviation = mr.angle + Measures::MOTORS_DEVIATION;
 
-        motors[motorIndex]->resetCounter();
+        // Set deviation to the calculated value.
+        motors[motorIndex]->setDeviation(deviation);
 
         mr.angle = 0;
         motors[motorIndex]->moveTo(mr);
+
+        // Wait for steady
+        motors[motorIndex]->waitTillReady();
     }
 
     /**
@@ -222,20 +230,20 @@ namespace DeltaRobot
     * @param motors The steppermotor3 class controlling the 3 deltarobot motors.
     * @return True if the calibration was succesful. False otherwise (eg. failure on sensors.)
     **/
-    bool DeltaRobot::calibrateMotors(modbus_t* modbus){
+    bool DeltaRobot::calibrateMotors(){
         // Check the availability of the sensors
         bool sensorFailure = false;
-        if(checkSensor(modbus, 0)){
+        if(checkSensor(0)){
             std::cout << "Sensor 0 failure (is the hardware connected?)" << std::endl;
             sensorFailure = true;
         }
 
-        if(checkSensor(modbus, 1)){
+        if(checkSensor(1)){
             std::cout << "Sensor 1 failure (is the hardware connected?)" << std::endl;
             sensorFailure = true;
         }
 
-        if(checkSensor(modbus, 2)){
+        if(checkSensor(2)){
             std::cout << "Sensor 2 failure (is the hardware connected?)" << std::endl;
             sensorFailure = true;
         }
@@ -244,25 +252,38 @@ namespace DeltaRobot
             return false;
         }
 
+        // Return to base! Remove the deviation, we have to find the controller 0 point.
+        DataTypes::MotorRotation<double> mr;
+        mr.speed = 0.1;
+        mr.angle = 0;
+
+        motors[0]->setDeviation(0);
+        motors[1]->setDeviation(0);
+        motors[2]->setDeviation(0);
+
+        motors[0]->writeRotationData(mr);
+        motors[1]->writeRotationData(mr);
+        motors[2]->writeRotationData(mr);
+        motorManager->startMovement();
+
+        motors[0]->waitTillReady();
+        motors[1]->waitTillReady();
+        motors[2]->waitTillReady();
+
         // Disable limitations
         motors[0]->disableAngleLimitations();
         motors[1]->disableAngleLimitations();
         motors[2]->disableAngleLimitations();
         
         // Calibrate motors
-        calibrateMotor(modbus, 0);
-        calibrateMotor(modbus, 1);
-        calibrateMotor(modbus, 2);
+        calibrateMotor(0);
+        calibrateMotor(1);
+        calibrateMotor(2);
 
         // Set limitations
         motors[0]->setMotorLimits(Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MAX);
         motors[1]->setMotorLimits(Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MAX);
         motors[2]->setMotorLimits(Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MAX);
-        
-        // Set deviation to 0 for the 3 motors
-        motors[0]->setDeviation(0);
-        motors[1]->setDeviation(0);
-        motors[2]->setDeviation(0);
 
         effectorLocation.x = 0;
         effectorLocation.y = 0;

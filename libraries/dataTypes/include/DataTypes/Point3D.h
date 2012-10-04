@@ -1,7 +1,13 @@
-// Project:        huniplacer
+//******************************************************************************
+//
+//                 REXOS
+//
+//******************************************************************************
+// Project:        DataTypes
 // File:           Point3D.h
 // Description:    3 dimensional point class
-// Author:         Lukas Vermond & Kasper van Nieuwland
+// Author:         1.0 Lukas Vermond & Kasper van Nieuwland
+//                 1.1 Dennis Koole
 // Notes:          -
 //
 // License:        newBSD
@@ -37,9 +43,6 @@
 #include <cmath>
 
 namespace DataTypes {
-	/**
-	 * Point3D.h -> 3 dimensional point class
-	 **/
 	template<typename T>
 	class Point3D {
 	public:

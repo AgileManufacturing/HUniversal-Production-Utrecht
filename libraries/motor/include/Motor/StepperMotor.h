@@ -1,10 +1,10 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 REXOS
 //
 //******************************************************************************
-// Project:        huniplacer
-// File:           Steppermotor.h
+// Project:        Motor
+// File:           StepperMotor.h
 // Description:    steppermotor driver
 // Author:         Koen Braham & Dennis Koole
 // Notes:          -
@@ -54,14 +54,8 @@ namespace Motor
     class StepperMotor : public MotorInterface
     {
         public:
-            //StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex);
-            //StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle);
-
-                StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex) :
-        MotorInterface(), modbus(modbusController), motorIndex(motorIndex), anglesLimited(false), poweredOn(false)  {}
-
-    StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle):
-        MotorInterface(), minAngle(minAngle), maxAngle(maxAngle), modbus(modbusController), motorIndex(motorIndex), anglesLimited(true), poweredOn(false)  {}
+            StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex);
+            StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle);
 
             virtual ~StepperMotor();
         
@@ -74,16 +68,8 @@ namespace Motor
 
 
             void moveTo(const DataTypes::MotorRotation<double>& mr);
-            /**
-             * Set the rotate data for the motors
-             * @param mf defines the angles, speed, acceleration and deceleration of the motors
-             * @param async function is performed asyncronous if true
-             **/
-            void writeRotationData(const DataTypes::MotorRotation<double>& mr, bool breaking = false);
+            void writeRotationData(const DataTypes::MotorRotation<double>& mr);
 
-            /**
-             * Start the rotation of the motors
-             **/
             void startMovement();
             void moveToWithin(const DataTypes::MotorRotation<double>& mr, double time, bool start);
             void waitTillReady();
@@ -94,12 +80,15 @@ namespace Motor
             void setMinAngle(double minAngle);
             void setMaxAngle(double maxAngle);
 
-            double getDeviation(){ return deviation; }
-            void setDeviation(double deviation){ deviation = deviation; }
+            void setCurrentAngle(double angle){ currentAngle = angle; }
 
+            double getDeviation(){ return deviation; }
+            void setDeviation(double deviation){ this->deviation = deviation; }
+
+            void updateAngle();
             void disableAngleLimitations();
         private:
-            double currentAngle, deviation, minAngle, maxAngle;
+            double currentAngle, setAngle, deviation, minAngle, maxAngle;
             
             ModbusController::ModbusController* modbus;
 

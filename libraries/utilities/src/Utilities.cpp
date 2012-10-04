@@ -1,8 +1,13 @@
-// Project:        Utils.cpp
-// File:           miscellaneous utilities
-// Description:    Lukas Vermond & Kasper van Nieuwland
-// Author:         -
-// Notes:          
+//******************************************************************************
+//
+//                 REXOS
+//
+//******************************************************************************
+// Project:        Utilities
+// File:           Utilities.cpp
+// Description:    miscellaneous utilities
+// Author:         Lukas Vermond & Kasper van Nieuwland
+// Notes:          -        
 //
 // License:        newBSD
 //

@@ -3,9 +3,9 @@
 //                 Rexos
 //
 //******************************************************************************
-// Project:        huniplacer
-// File:           motion.h
-// Description:    template class for motion.
+// Project:        DataTypes
+// File:           DeltaRobotRotation.h
+// Description:    template class for rotations.
 // Author:         Koen Braham
 // Notes:          -
 //

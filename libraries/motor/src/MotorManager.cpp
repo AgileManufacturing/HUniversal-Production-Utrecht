@@ -3,7 +3,7 @@
 //                 REXOS
 //
 //******************************************************************************
-// Project:        huniplacer
+// Project:        MotorManager
 // File:           MotorManager.cpp
 // Description:    Motor management for concurrent movement
 // Author:         Koen Braham		Dennis Koole
@@ -79,5 +79,9 @@ namespace Motor {
         modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
         modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
         modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
+
+        motors[0]->updateAngle();
+        motors[1]->updateAngle();
+        motors[2]->updateAngle();
 	}
 }

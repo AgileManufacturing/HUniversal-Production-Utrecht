@@ -1,13 +1,13 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 REXOS
 //
 //******************************************************************************
-// Project:        	huniplacer
-// File:           	inverseKinematicsModel.h
+// Project:        	DeltaRobot
+// File:           	InverseKinematicsModel.h
 // Description:    	abstract inverse kinematics model for use in deltarobot class
-// Author:         	Lukas Vermond & Kasper van Nieuwland
-// Edited by:		Daan Veltman
+// Author:         	1.0 Lukas Vermond & Kasper van Nieuwland
+// 					1.1 Daan Veltman
 // Notes:          	-
 //
 // License:        newBSD

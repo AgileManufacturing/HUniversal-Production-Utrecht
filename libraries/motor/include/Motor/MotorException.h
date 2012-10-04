@@ -1,9 +1,9 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 REXOS
 //
 //******************************************************************************
-// Project:        huniplacer
+// Project:        Motor
 // File:           MotorException.h
 // Description:    exception thrown if an error occures when the motor controllers fail
 // Author:         Lukas Vermond & Kasper van Nieuwland

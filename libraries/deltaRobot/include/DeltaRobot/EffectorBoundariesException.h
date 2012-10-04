@@ -1,10 +1,10 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 REXOS
 //
 //******************************************************************************
-// Project:        huniplacer
-// File:           effector_boundaries_exception.h
+// Project:        DeltaRobot
+// File:           EffectorBoundariesException.h
 // Description:    exception thrown if effector boundaries cannot be determined
 // Author:         Koen Braham & Daan Veltman
 // Notes:          -

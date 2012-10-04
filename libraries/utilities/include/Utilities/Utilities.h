@@ -1,10 +1,10 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 REXOS
 //
 //******************************************************************************
-// Project:        huniplacer
-// File:           utils.h
+// Project:        Utilities
+// File:           Utilities.h
 // Description:    miscellaneous utilities
 // Author:         Lukas Vermond & Kasper van Nieuwland
 // Notes:          -

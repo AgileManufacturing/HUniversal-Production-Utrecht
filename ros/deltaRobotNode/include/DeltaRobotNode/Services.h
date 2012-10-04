@@ -3,10 +3,10 @@
 //                 REXOS
 //
 //******************************************************************************
-// Project:        DataTypes
-// File:           MotorRotation.h
-// Description:    template class for rotation.
-// Author:         Koen Braham      Dennis Koole
+// Project:        DeltaRobotNode
+// File:           Services.h
+// Description:    Names for the deltarobotservices.
+// Author:         Dick vd Steen
 // Notes:          -
 //
 // License:        newBSD
@@ -37,26 +37,16 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //******************************************************************************
 
-
 #pragma once
 
-namespace DataTypes
+#include <string>
+
+namespace DeltaRobotNodeServices
 {
-    template<typename T>
-    class MotorRotation
-    {
-        public:
-            T angle;
-            T speed;
-            T acceleration;
-            T deceleration;
-            
-            MotorRotation() {
-                speed = 10;
-                acceleration = 360;
-                deceleration = 360;
-            }
-            
-            MotorRotation(T angle, T speed, T acc, T dec) : angle(angle), speed(speed), acceleration(acc), deceleration(dec) {}
-    };
+	const std::string MOVE_TO_POINT = "moveToPoint";
+	const std::string MOVE_PATH = "movePath";
+	const std::string MOVE_TO_RELATIVE_POINT = "moveToRelativePoint";
+	const std::string MOVE_RELATIVE_PATH = "moveRelativePath";
+	const std::string CALIBRATE = "calibrate";
 }
+

@@ -1,6 +1,6 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 REXOS
 //
 //******************************************************************************
 // Project:        ModbusController.cpp
@@ -232,7 +232,7 @@ namespace ModbusController
         
         wait();
         
-        for(int i = 0; i < length; i++){
+        for(unsigned int i = 0; i < length; i++){
             logFile << "WriteU16Array\t" << slave << "\t" << (first_address + i) << "\t" << data[i] << std::endl;
         }
         

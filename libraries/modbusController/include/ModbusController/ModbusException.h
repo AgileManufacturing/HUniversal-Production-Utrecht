@@ -1,10 +1,10 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 REXOS
 //
 //******************************************************************************
-// Project:        huniplacer
-// File:           modbus_exception.h
+// Project:        ModbusController
+// File:           ModbusException.h
 // Description:    exception thrown if an error ocures during modbus actions
 // Author:      1.0 Lukas Vermond & Kasper van Nieuwland
 //              1.1 Koen Braham

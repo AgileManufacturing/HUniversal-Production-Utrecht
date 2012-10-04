@@ -1,13 +1,13 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 REXOS
 //
 //******************************************************************************
-// Project:        	huniplacer
+// Project:        	DeltaRobot
 // File:           	InverseKinematicsException.h
 // Description:    	exception thrown if an invalid value is calculated during inverse kinematics
-// Author:         	Lukas Vermond & Kasper van Nieuwland
-// Edited by:		Daan Veltman
+// Author:         	1.0 Lukas Vermond & Kasper van Nieuwland
+// 					1.1 Daan Veltman
 // Notes:          	-
 //
 // License:        newBSD

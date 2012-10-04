@@ -1,13 +1,13 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 REXOS
 //
 //******************************************************************************
-// Project:        	huniplacer
-// File:           	inverseKinematics.h
+// Project:        	DeltaRobot
+// File:           	InverseKinematics.h
 // Description:    	inverse kinematics implementation. Based on work from Viacheslav Slavinsky
-// Author:         	Lukas Vermond & Kasper van Nieuwland
-// Edited by:		Daan Veltman
+// Author:         	1.0 Lukas Vermond & Kasper van Nieuwland
+// 					1.1 Daan Veltman
 // Notes:          	-
 //
 // License:        newBSD

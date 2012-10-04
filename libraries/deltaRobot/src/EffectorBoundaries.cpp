@@ -1,12 +1,13 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 REXOS
 //
 //******************************************************************************
-// Project:        EffectorBoundaries.cpp
-// File:           represents the effector's moving volume
-// Description:    Lukas Vermond & Kasper van Nieuwland
-// Author:         -
+// Project:        DeltaRobot
+// File:           EffectorBoundaries.cpp
+// Description:    represents the effector's moving volume
+// Author:         1.0 Lukas Vermond & Kasper van Nieuwland
+//				   1.1 Koen Braham		Daan Veltman
 // Notes:          
 //
 // License:        newBSD

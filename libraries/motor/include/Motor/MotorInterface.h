@@ -1,12 +1,14 @@
 //******************************************************************************
 //
-//                 Low Cost Vision
+//                 REXOS
 //
 //******************************************************************************
-// Project:        huniplacer
+// Project:        Motor
 // File:           Motor.h
 // Description:    delta robot motor interface
-// Author:         Lukas Vermond & Kasper van Nieuwland
+// Author:         1.0 Lukas Vermond & Kasper van Nieuwland
+//                 1.1 Koen Braham      Dennis Koole
+//
 // Notes:          -
 //
 // License:        newBSD
@@ -100,6 +102,11 @@ namespace Motor
              * @return angle in radians
              **/
             virtual double getMaxAngle(void) const = 0;
+
+            /**
+            * Sets the current angle
+            **/
+            virtual void setCurrentAngle(double angle) = 0;
 
 
             /**
