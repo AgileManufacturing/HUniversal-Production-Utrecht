@@ -83,7 +83,22 @@ bool calibrate(deltaRobotNode::Calibrate::Request &req,
  **/
 bool moveToPoint(deltaRobotNode::MoveToPoint::Request &req,
 	deltaRobotNode::MoveToPoint::Response &res) {
-
+	ROS_INFO("moveToPoint called");
+	DataTypes::Point3D<double>& effectorLocation = deltaRobot->getEffectorLocation();
+	deltaRobotNode::Motion motion = req.motion;
+	/**
+	 * Check if the DeltaRobot can move from the current effector location
+	 * to the absolute point given as argument for this service.
+	 **/
+	if(!deltaRobot->checkPath(
+		DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
+		DataTypes::Point3D<double>(motion.x, motion.y, motion.z)))
+	{
+		res.succeeded = false;
+		return true;
+	}
+	ROS_INFO("moveTo: (%f, %f, %f) speed=%f", motion.x, motion.y,motion.z, motion.speed);
+	deltaRobot->moveTo(DataTypes::Point3D<double>(motion.x, motion.y, motion.z),motion.speed);
 	return true;
 }
 
