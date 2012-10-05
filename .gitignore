@@ -26,5 +26,5 @@ tools/CMakeLists.txt_files/
 build
 REXOS.sublime-project
 REXOS.sublime-workspace
-
+sync.sh
 

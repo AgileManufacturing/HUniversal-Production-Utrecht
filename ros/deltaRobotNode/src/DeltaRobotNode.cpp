@@ -214,7 +214,7 @@ bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
 	double relativeX;
 	double relativeY;
 	double relativeZ;
-	DataTypes::Point3D<double>& effectorLocation;
+	DataTypes::Point3D<double> effectorLocation;
 	try
 	{
 		effectorLocation = deltaRobot->getEffectorLocation();
@@ -230,10 +230,11 @@ bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
 				DataTypes::Point3D<double>(relativeX, relativeY, relativeZ)))
 			{
 				res.succeeded = false;
+				ROS_INFO("FROM %f, %f, %f TO %f, %f, %f Not allowed",effectorLocation.x,effectorLocation.z,effectorLocation.y,relativeX,relativeY,relativeZ );
 				return false;
 			}
 			effectorLocation.x = relativeX;
-			effectorLocation.y = relativeY
+			effectorLocation.y = relativeY;
 			effectorLocation.z = relativeZ;
 		}
 		for(n = 0; n < req.motion.size(); n++)

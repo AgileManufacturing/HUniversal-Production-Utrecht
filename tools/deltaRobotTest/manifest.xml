@@ -1,0 +1,16 @@
+<package>
+  <description brief="deltaRobotTest">
+
+     deltaRobotTest
+
+  </description>
+  <author>Dennis Koole</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/deltaRobotTest</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="deltaRobotNode"/>
+</package>
+
+
