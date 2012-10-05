@@ -178,24 +178,21 @@ macro(rexos_check_ros_path)
 endmacro(rexos_check_ros_path)
 
 
+
 ##############################################################################
- # rexos_add_doc(<doc_name>)
- # 
- # == Description == 
- # This macro generates a documentation target
+# rexos_add_doc(<doc_name>)
+# 
+# == Description == 
+# This macro generates a documentation target
 ##############################################################################
 macro(rexos_add_doc doc_name)
-	if(DOXYGEN_FOUND)
-		set(DOCS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${doc_name}")
-		configure_file(${CMAKE_SOURCE_DIR}/cmake/Doxyfile.in ${CMAKE_BINARY_DIR}/doc/${doc_name}/Doxyfile @ONLY)
-		add_custom_target("doc-${doc_name}"
-			${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/doc/${doc_name}/Doxyfile
-			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/${doc_name}
-			COMMENT "Generating documentation for target ${doc_name} with Doxygen" VERBATIM
-		)
-	endif(DOXYGEN_FOUND)
+       if(DOXYGEN_FOUND)
+               set(DOCS_PATH "${CMAKE_SOURCE_DIR}")
+               configure_file(${CMAKE_SOURCE_DIR}/cmake/Doxyfile.in ${CMAKE_BINARY_DIR}/doc/${doc_name}/Doxyfile @ONLY)
+               add_custom_target("doc-${doc_name}"
+                       ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/doc/${doc_name}/Doxyfile
+                       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/${doc_name}
+                       COMMENT "Generating documentation for target ${doc_name} with Doxygen" VERBATIM
+               )
+       endif(DOXYGEN_FOUND)
 endmacro(rexos_add_doc)
-
-
-
-

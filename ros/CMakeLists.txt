@@ -1,11 +1,6 @@
 ####### Add all ROS packages here
 set(ROSPACKS deltaRobotNode)
 
-# Add documentation targets
-foreach(SINGLE_PACKDIR "${ROSPACKS}")
-	rexos_add_doc(${SINGLE_PACKDIR})
-endforeach(SINGLE_PACKDIR "${ROSPACKS}")
-
 ######
 ### Don't change anything below, the part below checks if ROS is installed and configured correctly. 
 ######

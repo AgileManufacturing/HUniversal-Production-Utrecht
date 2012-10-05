@@ -1,11 +1,6 @@
 ## Add all ROS packages here ##
 set(TOOLSPACKS keyboardControlNode)
 
-# Add documentation targets
-foreach(SINGLE_PACKDIR "${TOOLSPACKS}")
-	rexos_add_doc(${SINGLE_PACKDIR})
-endforeach(SINGLE_PACKDIR "${TOOLSPACKS}")
-
 ### Don't change anything below, the part below checks if ROS is installed and configured correctly. 
 ######
 rexos_check_ros()
