@@ -16,15 +16,14 @@
 bin/
 srv_gen/
 msg_gen/
-
-
-# Ignore the folders that are uniquely generated
-
-
 ros/deltaRobotNode/src/deltaRobotNode/
-tools/CMakeLists.txt_files/
 build
-REXOS.sublime-project
-REXOS.sublime-workspace
+
+
+# Ignore project file and cmake text file
+
+tools/CMakeLists.txt_files/
+*.sublime-project
+*.sublime-workspace
 
 
