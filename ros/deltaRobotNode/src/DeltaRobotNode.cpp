@@ -83,8 +83,24 @@ bool calibrate(deltaRobotNode::Calibrate::Request &req,
  **/
 bool moveToPoint(deltaRobotNode::MoveToPoint::Request &req,
 	deltaRobotNode::MoveToPoint::Response &res) {
-
-	return true;
+	ROS_INFO("moveToPoint called");
+	DataTypes::Point3D<double>& effectorLocation = deltaRobot->getEffectorLocation();
+	deltaRobotNode::Motion motion = req.motion;
+	/**
+	 * Check if the DeltaRobot can move from the current effector location
+	 * to the absolute point given as argument for this service.
+	 **/
+	if(!deltaRobot->checkPath(
+		DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
+		DataTypes::Point3D<double>(motion.x, motion.y, motion.z)))
+	{
+		res.succeeded = false;
+		return res.succeeded;
+	}
+	ROS_INFO("moveTo: (%f, %f, %f) speed=%f", motion.x, motion.y,motion.z, motion.speed);
+	deltaRobot->moveTo(DataTypes::Point3D<double>(motion.x, motion.y, motion.z),motion.speed);
+	res.succeeded = true;
+	return res.succeeded;
 }
 
 /**
@@ -98,8 +114,6 @@ bool moveToPoint(deltaRobotNode::MoveToPoint::Request &req,
 bool movePath(deltaRobotNode::MovePath::Request &req,
 	deltaRobotNode::MovePath::Response &res) {
 	ROS_INFO("movePath called");
-	res.succeeded = true;
-
 	deltaRobotNode::Motion currentMotion;
 	deltaRobotNode::Motion nextMotion;
 	try
@@ -114,7 +128,7 @@ bool movePath(deltaRobotNode::MovePath::Request &req,
 				DataTypes::Point3D<double>(nextMotion.x, nextMotion.y, nextMotion.z)))
 			{
 				res.succeeded = false;
-				return true;
+				return res.succeeded;
 			}
 		}
 		for(n = 0; n < req.motion.size(); n++)
@@ -123,7 +137,6 @@ bool movePath(deltaRobotNode::MovePath::Request &req,
 			ROS_INFO("moveTo: (%f, %f, %f) speed=%f", currentMotion.x, currentMotion.y,currentMotion.z, currentMotion.speed);
 			deltaRobot->moveTo(DataTypes::Point3D<double>(currentMotion.x, currentMotion.y, currentMotion.z),currentMotion.speed);
 		}
-		//deltaRobot->waitForReady();
 	}
 	catch(std::runtime_error& ex)
 	{
@@ -133,7 +146,8 @@ bool movePath(deltaRobotNode::MovePath::Request &req,
 		res.succeeded = false;
 		ROS_ERROR("moveTo: %s", ss.str().c_str());
 	}
-	return true;
+	res.succeeded = true;
+	return res.succeeded;
 }
 
 /**
@@ -146,11 +160,8 @@ bool movePath(deltaRobotNode::MovePath::Request &req,
  **/
 bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
 	deltaRobotNode::MoveToRelativePoint::Response &res) {
-	
 	ROS_INFO("moveToRelativePoint called");
-	
 	deltaRobotNode::Motion currentMotion;
-	
 	try {
 		currentMotion = req.motion;
 		DataTypes::Point3D<double>& effectorLocation = deltaRobot->getEffectorLocation();
@@ -165,7 +176,7 @@ bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
 				DataTypes::Point3D<double>(relativeX, relativeY, relativeZ)))
 		{
 			res.succeeded = false;
-			return true;
+			return res.succeeded;
 		}
 		deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ), currentMotion.speed);
 		//deltaRobot->waitForReady();
@@ -179,21 +190,71 @@ bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
 	}
 
     res.succeeded = true;
-	return true;
+	return res.succeeded;
 }
 
 /**
- * Move to a number of relative points. Will be implemented in a later release
+ * Move to a number of relative points. 
  *
  * @param req The request for this service as defined in MoveRelativePath.srv 
  * @param res The response for this service as defined in MoveRelativePath.srv
  *
- * @return true
+ * @return true if path is allowed else return false.
  **/
 bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
 	deltaRobotNode::MoveRelativePath::Response &res) {
+	ROS_INFO("moveRelativePath called");
 
-	return true;
+	deltaRobotNode::Motion currentMotion;
+	double relativeX;
+	double relativeY;
+	double relativeZ;
+	DataTypes::Point3D<double> effectorLocation;
+	try
+	{
+		effectorLocation = deltaRobot->getEffectorLocation();
+		unsigned int n;
+		for(n = 0; n < req.motion.size(); n++)
+		{
+			currentMotion = req.motion[n];			
+			relativeX = effectorLocation.x + currentMotion.x;
+			relativeY = effectorLocation.y + currentMotion.y;
+			relativeZ = effectorLocation.z + currentMotion.z;
+			if(!deltaRobot->checkPath(
+				DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
+				DataTypes::Point3D<double>(relativeX, relativeY, relativeZ)))
+			{
+				res.succeeded = false;
+				ROS_INFO("FROM %f, %f, %f TO %f, %f, %f Not allowed",effectorLocation.x,effectorLocation.z,effectorLocation.y,relativeX,relativeY,relativeZ );
+				return res.succeeded;
+			}
+			effectorLocation.x = relativeX;
+			effectorLocation.y = relativeY;
+			effectorLocation.z = relativeZ;
+		}
+		for(n = 0; n < req.motion.size(); n++)
+		{	
+			currentMotion = req.motion[n];			
+			effectorLocation = deltaRobot->getEffectorLocation();
+			relativeX = effectorLocation.x + currentMotion.x;
+			relativeY = effectorLocation.y + currentMotion.y;
+			relativeZ = effectorLocation.z + currentMotion.z;
+			ROS_INFO("moveTo: (%f, %f, %f) speed=%f", relativeX, relativeY,relativeZ, currentMotion.speed);
+			deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ),currentMotion.speed);
+		}
+		//deltaRobot->waitForReady();
+	}
+	catch(std::runtime_error& ex)
+	{
+		std::stringstream ss;
+		ss << "runtime error of type "<< typeid(ex).name()<<" in delta robot" << std::endl;
+		ss <<"what(): " << ex.what()<<std::endl;
+		res.succeeded = false;
+		ROS_ERROR("moveTo: %s", ss.str().c_str());
+	}
+	res.succeeded = true;
+	return res.succeeded;
+	
 }
 
 int main(int argc, char** argv) {
@@ -249,7 +310,6 @@ int main(int argc, char** argv) {
     	return 1;
     }
     
-
 	ros::NodeHandle nodeHandle;
 
 	// Advertise the services

@@ -25,5 +25,5 @@ build
 tools/CMakeLists.txt_files/
 *.sublime-project
 *.sublime-workspace
-
+sync.sh
 
