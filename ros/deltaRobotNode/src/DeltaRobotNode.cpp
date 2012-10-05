@@ -198,17 +198,66 @@ bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
 }
 
 /**
- * Move to a number of relative points. Will be implemented in a later release
+ * Move to a number of relative points. 
  *
  * @param req The request for this service as defined in MoveRelativePath.srv 
  * @param res The response for this service as defined in MoveRelativePath.srv
  *
- * @return true
+ * @return true if path is allowed else return false.
  **/
 bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
 	deltaRobotNode::MoveRelativePath::Response &res) {
+	ROS_INFO("moveRelativePath called");
+	res.succeeded = true;
 
+	deltaRobotNode::Motion currentMotion;
+	double relativeX;
+	double relativeY;
+	double relativeZ;
+	DataTypes::Point3D<double>& effectorLocation;
+	try
+	{
+		effectorLocation = deltaRobot->getEffectorLocation();
+		unsigned int n;
+		for(n = 0; n < req.motion.size(); n++)
+		{
+			currentMotion = req.motion[n];			
+			relativeX = effectorLocation.x + currentMotion.x;
+			relativeY = effectorLocation.y + currentMotion.y;
+			relativeZ = effectorLocation.z + currentMotion.z;
+			if(!deltaRobot->checkPath(
+				DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
+				DataTypes::Point3D<double>(relativeX, relativeY, relativeZ)))
+			{
+				res.succeeded = false;
+				return false;
+			}
+			effectorLocation.x = relativeX;
+			effectorLocation.y = relativeY
+			effectorLocation.z = relativeZ;
+		}
+		for(n = 0; n < req.motion.size(); n++)
+		{	
+			currentMotion = req.motion[n];			
+			effectorLocation = deltaRobot->getEffectorLocation();
+			relativeX = effectorLocation.x + currentMotion.x;
+			relativeY = effectorLocation.y + currentMotion.y;
+			relativeZ = effectorLocation.z + currentMotion.z;
+			ROS_INFO("moveTo: (%f, %f, %f) speed=%f", relativeX, relativeY,relativeZ, currentMotion.speed);
+			deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ),currentMotion.speed);
+		}
+		//deltaRobot->waitForReady();
+	}
+	catch(std::runtime_error& ex)
+	{
+		std::stringstream ss;
+		ss << "runtime error of type "<< typeid(ex).name()<<" in delta robot" << std::endl;
+		ss <<"what(): " << ex.what()<<std::endl;
+		res.succeeded = false;
+		ROS_ERROR("moveTo: %s", ss.str().c_str());
+	}
 	return true;
+	
 }
 
 int main(int argc, char** argv) {
