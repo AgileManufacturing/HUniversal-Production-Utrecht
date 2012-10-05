@@ -193,7 +193,7 @@ namespace DeltaRobot
     * @param motorIndex Index of the motor to be calibrated. When standing in front of the robot looking towards it, 0 is the right motor, 1 is the front motor and 2 is the left motor.
     **/
     void DeltaRobot::calibrateMotor(int motorIndex) {
-        std::cout << "Calibrating motor number " << motorIndex << std::endl;
+        std::cout << "[DEBUG] Calibrating motor number " << motorIndex << std::endl;
         
         // Starting point of calibration
         DataTypes::MotorRotation<double> mr;
@@ -234,17 +234,17 @@ namespace DeltaRobot
         // Check the availability of the sensors
         bool sensorFailure = false;
         if(checkSensor(0)){
-            std::cout << "Sensor 0 failure (is the hardware connected?)" << std::endl;
+            std::cerr << "Sensor 0 failure (is the hardware connected?)" << std::endl;
             sensorFailure = true;
         }
 
         if(checkSensor(1)){
-            std::cout << "Sensor 1 failure (is the hardware connected?)" << std::endl;
+            std::cerr << "Sensor 1 failure (is the hardware connected?)" << std::endl;
             sensorFailure = true;
         }
 
         if(checkSensor(2)){
-            std::cout << "Sensor 2 failure (is the hardware connected?)" << std::endl;
+            std::cerr << "Sensor 2 failure (is the hardware connected?)" << std::endl;
             sensorFailure = true;
         }
 
@@ -293,7 +293,7 @@ namespace DeltaRobot
                 Measures::BASE + Measures::HIP - Measures::EFFECTOR )
             )
         );
-        std::cout << "effector location z: " << effectorLocation.z << std::endl; 
+        std::cout << "[DEBUG] effector location z: " << effectorLocation.z << std::endl; 
 
         return true;
     }

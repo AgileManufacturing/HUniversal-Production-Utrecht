@@ -199,8 +199,6 @@ bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
 int main(int argc, char** argv) {
 	ros::init(argc, argv, NODE_NAME);
 
-	std::cout << "Starting refurbished code!" << std::endl;
-
     // Initialize modbus for IO controller
     modbus_t* modbusIO = modbus_new_tcp("192.168.0.2", 502);
     if(modbusIO == NULL)

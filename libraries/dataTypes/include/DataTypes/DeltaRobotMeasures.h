@@ -46,11 +46,5 @@ namespace DataTypes
     {
         public:
             double base, hip, effector, ankle, maxAngleHipAnkle;
-            
-            DeltaRobotMeasures() {
-            }
-            
-            /*DeltaRobotMeasures(const double base, const double hip, const double effector, const double ankle, const double MaxAngleHipAnkle) :
-             base(base), hip(hip), effector(effector), ankle(ankle), maxAngleHipAnkle(maxAngleHipAnkle) {}*/
     };
 }
