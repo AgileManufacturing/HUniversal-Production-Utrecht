@@ -7,7 +7,6 @@ if(${MODBUS_FOUND})
 else(${MODBUS_FOUND})
 	rexos_cannot_build(deltaRobot, "libraries/deltaRobot")
 endif()
-rexos_add_doc(deltaRobot)
 
 
 

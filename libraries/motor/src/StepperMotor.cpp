@@ -166,7 +166,6 @@ namespace Motor
             throw std::out_of_range("one or more angles out of range");
         }
 
-        std::cout << "writeRotationData " << mr.angle << "  " << deviation << std::endl;
         uint32_t motorSteps = (uint32_t)((mr.angle + deviation) / CRD514KD::MOTOR_STEP_ANGLE);
         uint32_t motorSpeed = (uint32_t)(mr.speed / CRD514KD::MOTOR_STEP_ANGLE);
         uint32_t motorAcceleration = (uint32_t)(CRD514KD::MOTOR_STEP_ANGLE * 1000000000.0 / mr.acceleration);
@@ -231,14 +230,14 @@ namespace Motor
     void StepperMotor::setMinAngle(double minAngle)
     {
     	this->minAngle = minAngle;
-        modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((minAngle - deviation) / CRD514KD::MOTOR_STEP_ANGLE));
+        modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((minAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
         anglesLimited = true;
     }
 
     void StepperMotor::setMaxAngle(double maxAngle)
     {
     	this->maxAngle = maxAngle;
-        modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((maxAngle - deviation) / CRD514KD::MOTOR_STEP_ANGLE));
+        modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((maxAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
         anglesLimited = true;
     }
 

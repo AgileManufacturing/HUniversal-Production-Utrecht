@@ -49,4 +49,5 @@ endif()
 
 # Recursively add CMakeLists.txt rules for all REXOS_PARTS (directories)
 add_subdirectories("${REXOS_PARTS}")
+rexos_add_doc(REXOS)
 

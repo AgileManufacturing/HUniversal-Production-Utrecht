@@ -7,10 +7,3 @@ if(${MODBUS_FOUND})
 else(${MODBUS_FOUND})
 	rexos_cannot_build(modbusController, "libraries/modbusController")
 endif()
-rexos_add_doc(modbusController)
-
-
-
-
-
-

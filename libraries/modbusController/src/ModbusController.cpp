@@ -88,11 +88,13 @@ namespace ModbusController
         timeoutBegin.tv_usec = TIMEOUT_BEGIN;
         modbus_set_response_timeout(context, &timeoutBegin);
         
-        logFile.open("/home/lcv/modbus.log");
-        if(!logFile.is_open()){
-            throw ModbusException( "File Error!");
-        }
-        logFile << "Start logging " << std::endl;
+        #ifdef MODBUS_LOGGING
+            logFile.open();
+            if(!logFile.is_open(MODBUS_LOGGING)){
+                throw ModbusException( "File Error!");
+            }
+            logFile << "Start logging " << std::endl;
+        #endif
 
         //connect
         if(modbus_connect(context) == -1)
@@ -103,7 +105,9 @@ namespace ModbusController
 
     ModbusController::~ModbusController(void)
     {
-        logFile.close();
+        #ifdef MODBUS_LOGGING
+            logFile.close();
+        #endif
         modbus_close(context);
         modbus_free(context);
     }
@@ -182,7 +186,9 @@ namespace ModbusController
      **/
     void ModbusController::writeU16(uint16_t slave, uint16_t address, uint16_t data, bool useShadow)
     {
-        logFile << "WriteU16\t" << slave << "\t" << address << "\t" << data << std::endl;
+        #ifdef MODBUS_LOGGING
+            logFile << "WriteU16\t" << slave << "\t" << address << "\t" << data << std::endl;
+        #endif
         if(useShadow)
         {
             uint16_t shadowData;
@@ -232,9 +238,11 @@ namespace ModbusController
         
         wait();
         
-        for(unsigned int i = 0; i < length; i++){
-            logFile << "WriteU16Array\t" << slave << "\t" << (first_address + i) << "\t" << data[i] << std::endl;
-        }
+        #ifdef MODBUS_LOGGING
+            for(unsigned int i = 0; i < length; i++){
+                logFile << "WriteU16Array\t" << slave << "\t" << (first_address + i) << "\t" << data[i] << std::endl;
+            }
+        #endif
         
 
         modbus_set_slave(context, slave);
@@ -263,7 +271,9 @@ namespace ModbusController
      **/    
     void ModbusController::writeU32(uint16_t slave, uint16_t address, uint32_t data, bool useShadow)
     {
-        logFile << "WriteU32\t" << slave << "\t" << address << "\t" << data << std::endl;
+        #ifdef MODBUS_LOGGING
+            logFile << "WriteU32\t" << slave << "\t" << address << "\t" << data << std::endl;
+        #endif
     	try
     	{
 			uint16_t _data[2];
@@ -329,7 +339,9 @@ namespace ModbusController
             throw ModbusException("Error reading u16");
         }
         
-        logFile << "Read\t" << slave << "\t" << address << "\t" << data << std::endl;
+        #ifdef MODBUS_LOGGING
+            logFile << "ReadU16\t" << slave << "\t" << address << "\t" << data << std::endl;
+        #endif
         return data;
     }
 
@@ -352,6 +364,12 @@ namespace ModbusController
         {
             throw ModbusException("Error reading u16 array");
         }
+
+        #ifdef MODBUS_LOGGING
+            for(unsigned int i = 0; i < length; i++){
+                logFile << "ReadU16Array\t" << slave << "\t" << (first_address + i) << "\t" << data[i] << std::endl;
+            }
+        #endif
     }
   
     /**
@@ -366,7 +384,10 @@ namespace ModbusController
         {
             uint16_t data[2];
             readU16(slave, address, data, 2);
-            logFile << "Read\t" << slave << "\t" << address << "\t" << (((data[0] << 16) & 0xFFFF0000) | data[1]) << std::endl;
+
+            #ifdef MODBUS_LOGGING
+                logFile << "ReadU32\t" << slave << "\t" << address << "\t" << (((data[0] << 16) & 0xFFFF0000) | data[1]) << std::endl;
+            #endif
             return ((data[0] << 16) & 0xFFFF0000) | data[1];
         }
         catch(ModbusException& ex)
