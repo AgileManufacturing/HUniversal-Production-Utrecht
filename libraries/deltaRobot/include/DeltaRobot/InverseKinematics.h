@@ -33,7 +33,6 @@
 #include <DataTypes/MotorRotation.h>
 #include <DataTypes/DeltaRobotMeasures.h>
 #include <DeltaRobot/InverseKinematicsModel.h>
-#include <DataTypes/DeltaRobotRotation.h>
 
 namespace DeltaRobot {
 	class InverseKinematics: public InverseKinematicsModel {
@@ -51,6 +50,6 @@ namespace DeltaRobot {
 		virtual ~InverseKinematics(void);
 		
 		void pointToMotion(const DataTypes::Point3D<double>& destinationPoint,
-				DataTypes::DeltaRobotRotation& rotation) const;
+				DataTypes::MotorRotation<double>* (&rotations)[3]) const;
 	};
 }

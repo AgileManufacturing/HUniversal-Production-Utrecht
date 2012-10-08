@@ -206,7 +206,7 @@ namespace Motor
        while(!((status_1 = modbus->readU16(motorIndex, CRD514KD::Registers::STATUS_1)) & CRD514KD::Status1Bits::READY))
        {
             if((status_1 & CRD514KD::Status1Bits::ALARM) || (status_1 & CRD514KD::Status1Bits::WARNING)) {
-                std::cerr << "Motor: " << motorIndex << " Alarm code: " << std::hex << modbus->readU16(motorIndex, 0x100) << "h" << std::endl;
+                std::cerr << "Motor: " << motorIndex << " Alarm code: " << std::hex << modbus->readU16(motorIndex, CRD514KD::Registers::PRESENT_ALARM) << "h" << std::endl;
                 
                 throw CRD514KDException(
                     motorIndex, status_1 & CRD514KD::Status1Bits::WARNING,

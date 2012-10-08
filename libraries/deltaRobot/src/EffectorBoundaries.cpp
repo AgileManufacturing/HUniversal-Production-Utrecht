@@ -183,30 +183,42 @@ namespace DeltaRobot
 
     	if(*fromCache == UNKNOWN)
     	{
-    		DataTypes::DeltaRobotRotation drr;
+    		DataTypes::MotorRotation<double>* rotations[3];
+    		rotations[0] = new DataTypes::MotorRotation<double>();
+    		rotations[1] = new DataTypes::MotorRotation<double>();
+    		rotations[2] = new DataTypes::MotorRotation<double>();
+
 			try {
-				kinematics.pointToMotion(fromBitmapCoordinate(p), drr);
+				kinematics.pointToMotion(fromBitmapCoordinate(p), rotations);
 
 			} catch(DeltaRobot::InverseKinematicsException & ex) {
 				*fromCache = INVALID;
+				delete rotations[0];
+				delete rotations[1];
+				delete rotations[2];
 				return false;
 			}
 
 
 			// Check motor angles
-			if(drr.rotations[0].angle <= motors[0]->getMinAngle() || drr.rotations[0].angle >= motors[0]->getMaxAngle() ||
-			  drr.rotations[1].angle <= motors[1]->getMinAngle() || drr.rotations[1].angle >= motors[1]->getMaxAngle()  ||
-			  drr.rotations[2].angle <= motors[2]->getMinAngle() || drr.rotations[2].angle >= motors[2]->getMaxAngle()  ){
+			if(rotations[0]->angle <= motors[0]->getMinAngle() || rotations[0]->angle >= motors[0]->getMaxAngle() ||
+			  rotations[1]->angle <= motors[1]->getMinAngle() || rotations[1]->angle >= motors[1]->getMaxAngle()  ||
+			  rotations[2]->angle <= motors[2]->getMinAngle() || rotations[2]->angle >= motors[2]->getMaxAngle()  ){
 			  	*fromCache = INVALID;
+				delete rotations[0];
+				delete rotations[1];
+				delete rotations[2];
 			  	return false;
 			}
 
 
 			*fromCache = VALID;
+
+			delete rotations[0];
+			delete rotations[1];
+			delete rotations[2];
 			return true;
-    	}
-    	else
-    	{
+    	} else {
     		return *fromCache == VALID;
     	}
     }

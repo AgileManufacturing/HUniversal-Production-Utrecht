@@ -98,7 +98,7 @@ namespace DeltaRobot
      * @param begin start point
      * @param end finish point
      **/
-    bool DeltaRobot::checkPath(const DataTypes::Point3D<double>& begin,const DataTypes::Point3D<double>& end)
+    bool DeltaRobot::checkPath(const DataTypes::Point3D<double>& begin, const DataTypes::Point3D<double>& end)
     {
         return boundaries->checkPath(begin, end);
     }
@@ -116,43 +116,61 @@ namespace DeltaRobot
             throw Motor::MotorException("motor drivers are not powered on");
         }
 
-        DataTypes::DeltaRobotRotation drr;
-        drr.rotations[0].speed = speed;
-        drr.rotations[1].speed = speed;
-        drr.rotations[2].speed = speed;
+        DataTypes::MotorRotation<double>* rotations[3];
+        rotations[0] = new DataTypes::MotorRotation<double>();
+        rotations[1] = new DataTypes::MotorRotation<double>();
+        rotations[2] = new DataTypes::MotorRotation<double>();
+
+        rotations[0]->speed = speed;
+        rotations[1]->speed = speed;
+        rotations[2]->speed = speed;
 
         try{
-            kinematics->pointToMotion(p, drr);
-        }
-        catch(InverseKinematicsException& ex){
+            kinematics->pointToMotion(p, rotations);
+        } catch(InverseKinematicsException& ex){
+
+            delete rotations[0];
+            delete rotations[1];
+            delete rotations[2];
             throw ex;
         }
 
         if(
-            !isValidAngle(0, drr.rotations[0].angle) ||
-            !isValidAngle(1, drr.rotations[1].angle) ||
-            !isValidAngle(2, drr.rotations[2].angle))
-        {
+            !isValidAngle(0, rotations[0]->angle) ||
+            !isValidAngle(1, rotations[1]->angle) ||
+            !isValidAngle(2, rotations[2]->angle)
+        ) {
+            delete rotations[0];
+            delete rotations[1];
+            delete rotations[2];
             throw InverseKinematicsException("motion angles outside of valid range", p);
         }
 
-        if(!boundaries->checkPath(effectorLocation, p))
-        {
+        if(!boundaries->checkPath(effectorLocation, p)){
+            delete rotations[0];
+            delete rotations[1];
+            delete rotations[2];
             throw InverseKinematicsException("invalid path", p);
         }
 
         double moveTime = p.distance(effectorLocation) / speed;
-        try
-        {
-
-            motors[0]->moveToWithin(drr.rotations[0], moveTime, false);
-            motors[1]->moveToWithin(drr.rotations[1], moveTime, false);
-            motors[2]->moveToWithin(drr.rotations[2], moveTime, false);
+        try {
+            motors[0]->moveToWithin(*rotations[0], moveTime, false);
+            motors[1]->moveToWithin(*rotations[1], moveTime, false);
+            motors[2]->moveToWithin(*rotations[2], moveTime, false);
             motorManager->startMovement();
+
+        } catch(std::out_of_range& ex) {
+            delete rotations[0];
+            delete rotations[1];
+            delete rotations[2];
+            throw ex;
         }
-        catch(std::out_of_range& ex) { throw ex; }
 
 
+        delete rotations[0];
+        delete rotations[1];
+        delete rotations[2];
         effectorLocation = p;
     }
 

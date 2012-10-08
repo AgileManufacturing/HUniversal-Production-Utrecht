@@ -85,6 +85,8 @@ namespace Motor
                 CMD_1                   = 0x01E, //16-bit
                 STATUS_1                = 0x020, //16-bit
 
+                PRESENT_ALARM           = 0x100, // 16-bit current alarm code.
+
                 //32-bit Preset position value argument
                 CFG_PRESET_POSITION = 0x214,
 

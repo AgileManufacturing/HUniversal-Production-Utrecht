@@ -78,8 +78,8 @@ namespace ModbusController
         modbus_set_response_timeout(context, &timeoutBegin);
         
         #ifdef MODBUS_LOGGING
-            logFile.open();
-            if(!logFile.is_open(MODBUS_LOGGING)){
+            logFile.open(MODBUS_LOGGING);
+            if(!logFile.is_open()){
                 throw ModbusException( "File Error!");
             }
             logFile << "Start logging " << std::endl;
