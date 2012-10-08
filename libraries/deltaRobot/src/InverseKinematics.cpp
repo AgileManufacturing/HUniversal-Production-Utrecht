@@ -148,7 +148,7 @@ namespace DeltaRobot {
 	 * @param motionPointer output parameter, the resulting motion is stored here.
 	 * @return true on success, false otherwise.
 	 **/
-	void InverseKinematics::pointToMotion(const DataTypes::Point3D<double>& destinationPoint, DataTypes::DeltaRobotRotation& rotation) const {
+	void InverseKinematics::pointToMotion(const DataTypes::Point3D<double>& destinationPoint, DataTypes::MotorRotation<double>* (&rotations)[3]) const {
 		/**
 		 * Adding 180 degrees switches 0 degrees for the motor from the 
 		 * midpoint of the engines to directly opposite.
@@ -160,21 +160,21 @@ namespace DeltaRobot {
 		 * when looking at the side the effector is not located
 		 **/
 
-		rotation.rotations[0].angle = Utilities::rad(180)
+		rotations[0]->angle = Utilities::rad(180)
 				+ motorAngle(destinationPoint, Utilities::rad(1 * 120));
-		rotation.rotations[1].angle = Utilities::rad(180)
+		rotations[1]->angle = Utilities::rad(180)
 				+ motorAngle(destinationPoint, Utilities::rad(0 * 120));
-		rotation.rotations[2].angle = Utilities::rad(180)
+		rotations[2]->angle = Utilities::rad(180)
 				+ motorAngle(destinationPoint, Utilities::rad(2 * 120));
 
-		rotation.rotations[0].acceleration =
-			rotation.rotations[1].acceleration =
-			rotation.rotations[2].acceleration = 
+		rotations[0]->acceleration =
+			rotations[1]->acceleration =
+			rotations[2]->acceleration = 
 			Utilities::rad(3600);
 
-		rotation.rotations[0].deceleration =
-			rotation.rotations[1].deceleration =
-			rotation.rotations[2].deceleration = 
+		rotations[0]->deceleration =
+			rotations[1]->deceleration =
+			rotations[2]->deceleration = 
 			Utilities::rad(3600);
 	}
 }
