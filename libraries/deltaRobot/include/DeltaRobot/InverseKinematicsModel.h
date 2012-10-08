@@ -42,7 +42,6 @@
 
 #include <DataTypes/Point3D.h>
 #include <DataTypes/MotorRotation.h>
-#include <DataTypes/DeltaRobotRotation.h>
 
 namespace DeltaRobot {
 	/**
@@ -101,7 +100,7 @@ namespace DeltaRobot {
 		 * @param motionPointer output parameter, the results of the conversion will be stored here
 		 **/
 		virtual void pointToMotion(const DataTypes::Point3D<double>& destinationPoint,
-				DataTypes::DeltaRobotRotation& rotation) const = 0;
+				DataTypes::MotorRotation<double>* (&rotations)[3]) const = 0;
 
 	};
 }
