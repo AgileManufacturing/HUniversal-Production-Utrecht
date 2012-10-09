@@ -93,6 +93,13 @@ void printHardwareModules(moduleList *moduleTable) {
 }
 
 int main(int argc, char **argv) {
+	/**
+	 * The safety state of the Equiplet. This is equal 
+	 * to the highest state of the actuator modules
+	 **/
+	Mast::state safetyState;
+
+
 	// The table that holds the information about all hardware modules
 	moduleList *moduleTable = new moduleList();
 	Mast::HardwareModuleProperties topCamera(TOP_CAMERA, Mast::safe, false, false);
