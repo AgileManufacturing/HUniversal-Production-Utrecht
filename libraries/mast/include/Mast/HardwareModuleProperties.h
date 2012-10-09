@@ -29,14 +29,14 @@
 #include <string>
 #include <iostream>
 
-namespace DataTypes
+namespace Mast
 {
 	// The states we defined for MAST
 	enum state {normal, standby, safe, setup, shutdown, start, stop};
 
-	class HardwareModule {
+	class HardwareModuleProperties {
 	public:
-		HardwareModule();
+		HardwareModuleProperties();
 		/**
 		 * Create a new hardware module
 		 * 
@@ -45,7 +45,7 @@ namespace DataTypes
 		 * @param ac Is this  module an actor
 		 * @param nd Is this module needed for the current service
 		 **/
-		HardwareModule(const std::string& nm, state st, bool ac, bool nd):
+		HardwareModuleProperties(const std::string& nm, state st, bool ac, bool nd):
 			name(nm), currentState(st), actuator(ac), needed(nd), error(false){}
 		/**
 		 * The use of a name for a module is a temporary solution. 
@@ -57,7 +57,7 @@ namespace DataTypes
 		// Is this hardware module needed for the current service
 		bool needed;
 		bool error;
-	friend std::ostream& operator<<(std::ostream& stream, HardwareModule &module) {
+	friend std::ostream& operator<<(std::ostream& stream, HardwareModuleProperties &module) {
 		stream << "Name: " << module.name << ", current state: " << module.currentState;
 		return stream;
 	}
