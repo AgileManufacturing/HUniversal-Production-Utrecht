@@ -19,7 +19,7 @@ rexos_rospack_init("equipletNode" true true)
 rosbuild_add_executable(EquipletNode src/EquipletNode.cpp)
 
 # Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
-include_directories(${LIB_DATATYPES_INCLUDE})
+include_directories(${LIB_MAST_INCLUDE})
 
 # MUST be called after lcv_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()

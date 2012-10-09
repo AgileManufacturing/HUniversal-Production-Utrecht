@@ -18,6 +18,7 @@
 # add rexos libraries here 
 # template: set(libraryname "${REXOS_SOURCE_DIR}library directory")
 set(LIB_DATATYPES_INCLUDE "${REXOS_SOURCE_DIR}/libraries/dataTypes/include")
+set(LIB_MAST_INCLUDE "${REXOS_SOURCE_DIR}/libraries/mast/include")
 set(LIB_DELTAROBOT_INCLUDE "${REXOS_SOURCE_DIR}/libraries/deltaRobot/include")
 set(LIB_MODBUS_CONTROLLER_INCLUDE "${REXOS_SOURCE_DIR}/libraries/modbusController/include")
 set(LIB_UTILITIES_INCLUDE "${REXOS_SOURCE_DIR}/libraries/utilities/include")

@@ -27,13 +27,13 @@
 **/
 
 #include <vector>
-#include <DataTypes/HardwareModule.h>
+#include <Mast/HardwareModuleProperties.h>
 
 #define TOP_CAMERA "TopCamera"
 #define BOTTOM_CAMERA "BottomCamera"
 #define GRIPPER "Gripper"
 
-typedef std::vector<DataTypes::HardwareModule> moduleList;
+typedef std::vector<Mast::HardwareModuleProperties> moduleList;
 
 /**
  * Add a hardware module to the module table
@@ -42,7 +42,7 @@ typedef std::vector<DataTypes::HardwareModule> moduleList;
  * @param module The hardware to add to the table
  * @return true if the module has a unique name, otherwise false
  **/
-bool addHardwareModule(moduleList *moduleTable, const DataTypes::HardwareModule module) {
+bool addHardwareModule(moduleList *moduleTable, const Mast::HardwareModuleProperties module) {
 	/**
 	 * The use of the name to uniquely identify a hardware module is a temporary,
 	 * solution. This will probably be changed when the module database is implemented.
@@ -95,9 +95,9 @@ void printHardwareModules(moduleList *moduleTable) {
 int main(int argc, char **argv) {
 	// The table that holds the information about all hardware modules
 	moduleList *moduleTable = new moduleList();
-	DataTypes::HardwareModule topCamera(TOP_CAMERA, DataTypes::safe, false, false);
-	DataTypes::HardwareModule bottomCamera(BOTTOM_CAMERA, DataTypes::safe, false, false);
-	DataTypes::HardwareModule gripper(GRIPPER, DataTypes::safe, true, false);
+	Mast::HardwareModuleProperties topCamera(TOP_CAMERA, Mast::safe, false, false);
+	Mast::HardwareModuleProperties bottomCamera(BOTTOM_CAMERA, Mast::safe, false, false);
+	Mast::HardwareModuleProperties gripper(GRIPPER, Mast::safe, true, false);
 
 	addHardwareModule(moduleTable, topCamera);
 	addHardwareModule(moduleTable, bottomCamera);
@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
 
 	printHardwareModules(moduleTable);
 
-	topCamera.currentState = DataTypes::normal;
+	topCamera.currentState = Mast::normal;
 	printHardwareModules(moduleTable);
 
 	removeHardwareModule(moduleTable, BOTTOM_CAMERA);
