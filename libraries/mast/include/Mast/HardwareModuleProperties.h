@@ -32,6 +32,7 @@
 namespace Mast
 {
 	// The states we defined for MAST
+	enum state {safe = 0, setup = 1, shutdown = 2, standby = 3, start = 4, stop = 5, normal = 6};
 	enum state {normal, standby, safe, setup, shutdown, start, stop};
 
 	class HardwareModuleProperties {
