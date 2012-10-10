@@ -11,7 +11,7 @@
 // Author:         Pascal Muller
 // Notes:          
 //
-// License:        GNU GPL v3
+// License:        newBSD
 //
 // This file is part of AutoKeyStore.
 //
