@@ -33,7 +33,6 @@ namespace Mast
 {
 	// The states we defined for MAST
 	enum state {safe = 0, setup = 1, shutdown = 2, standby = 3, start = 4, stop = 5, normal = 6};
-	enum state {normal, standby, safe, setup, shutdown, start, stop};
 
 	class HardwareModuleProperties {
 	public:
@@ -59,7 +58,7 @@ namespace Mast
 		bool needed;
 		bool error;
 	friend std::ostream& operator<<(std::ostream& stream, HardwareModuleProperties &module) {
-		stream << "Name: " << module.name << ", current state: " << module.currentState;
+		stream << "Name: " << module.name << ", current state: " << module.currentState << " actuator " << module.actuator << " Required for current service " << module.needed;
 		return stream;
 	}
 	};
