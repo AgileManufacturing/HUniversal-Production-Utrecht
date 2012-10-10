@@ -30,20 +30,22 @@ set(REXOS_PARTS libraries ros tools) # TODO: Agents Libraries ROS
 cmake_minimum_required (VERSION 2.8)
 
 # Set the name of our project to LCV and require a C and C++ compiler. 
-project (REXOS CXX C Java) # TODO, add java??
+project (REXOS CXX C Java)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
+# Include so that JAVA can be used
+include (UseJava)
+
 # Include our own macros
 include(cmake/macros.cmake) 
+
+# Include support for executable jars
 include(cmake/jar.cmake)
-include (UseJava)
 
 # Check for all external libraries and export our own library includes
 include(cmake/ExternalLibraries.cmake)
 include(libraries/LibrariesExport.cmake) 
-
-
 
 # I like to see all the warnings, no matter what happens. 
 # This is actually a bit hacky and probably it should be done differently
