@@ -1,0 +1,4 @@
+#These values can be loaded in the key value store on startup
+#Wed Apr 11 13:54:03 CEST 2012
+blackboard.port=5678
+blackboard.ip=127.0.0.1
