@@ -1,7 +1,7 @@
 <project name="REXOS" default="dist" basedir=".">
 
   <property name="distdir" value="dist" />
-  <property name="builddir" value="build" />
+  <property name="builddir" value="build~" />
 
   <property name="openBBS" value="openBBS.jar" />  
   <property name="autoKeyStoreServer" value="autoKeyStoreServer.jar" />
