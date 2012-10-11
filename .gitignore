@@ -14,16 +14,17 @@
 # Ignore the generated folders by the build system
 
 bin/
+dist/
 srv_gen/
 msg_gen/
 ros/deltaRobotNode/src/deltaRobotNode/
-build
+build/
 
-
-# Ignore project file and cmake text file
+# Ignore project file, cmake text file and editor temporary files
 
 tools/CMakeLists.txt_files/
 *.sublime-project
 *.sublime-workspace
 sync.sh
+*~
 
