@@ -23,8 +23,10 @@ build/
 # Ignore project file, cmake text file and editor temporary files
 
 tools/CMakeLists.txt_files/
+sync.sh
 *.sublime-project
 *.sublime-workspace
-sync.sh
 *~
+
+
 
