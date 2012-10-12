@@ -27,27 +27,26 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 #pragma once
 
-namespace DataTypes
-{
+namespace DataTypes{
     template<typename T>
-    class MotorRotation
-    {
-        public:
-            T angle;
-            T speed;
-            T acceleration;
-            T deceleration;
-            
-            MotorRotation() {
-                speed = 10;
-                acceleration = 360;
-                deceleration = 360;
-            }
-            
-            MotorRotation(T angle, T speed, T acc, T dec) : angle(angle), speed(speed), acceleration(acc), deceleration(dec) {}
+    
+    class MotorRotation{
+    public:
+        T angle;
+        T speed;
+        T acceleration;
+        T deceleration;
+        
+        MotorRotation(){
+            speed = 10;
+            acceleration = 360;
+            deceleration = 360;
+        }
+        
+        MotorRotation(T angle, T speed, T acceleration, T deceleration) : angle(angle), speed(speed), acceleration(acceleration), deceleration(deceleration){}
     };
 }

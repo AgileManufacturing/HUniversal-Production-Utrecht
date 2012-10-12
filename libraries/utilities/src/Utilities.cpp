@@ -26,59 +26,50 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 #include <Utilities/Utilities.h>
 
-/**
- * Utilities.cpp -> Various utilities
- **/
-namespace Utilities
-{
-
+namespace Utilities{
     /**
-     * Get the current time in milliseconds
+     * @brief Get the current time in milliseconds.
      *
-     * @return time in milliseconds
-     **/
-    long timeNow(void)
-    {
+     * @return time in milliseconds.
+     */
+    long timeNow(void){
         boost::posix_time::ptime time = boost::posix_time::microsec_clock::local_time();
         boost::posix_time::time_duration duration(time.time_of_day());
         return duration.total_milliseconds();
     }
     
     /**
-     * Sleep for X milliseconds
+     * @brief Sleep for X milliseconds.
      *
-     * @param ms time in milliseconds
-     **/
-    void sleep(long ms)
-    {
-        boost::this_thread::sleep(boost::posix_time::milliseconds(ms));
+     * @param milliseconds time in milliseconds.
+     */
+    void sleep(long milliseconds){
+        boost::this_thread::sleep(boost::posix_time::milliseconds(milliseconds));
     }
 
     /**
-     * Convert radians to degrees
+     * @brief Converts radians to degrees.
      *
-     * @param rad radians
+     * @param rad Amount of radians.
      *
-     * @return degrees
-     **/
-    double deg(double rad)
-	{
-		return (rad / M_PI) * 180;
+     * @return degrees.
+     */
+    double radiansToDegrees(double radians){
+		return (radians / M_PI) * 180;
 	}
 
     /**
-     * Convert degrees to radians
+     * @brief Converts degrees to radians.
      *
-     * @param deg degrees
+     * @param deg Amount of degrees.
      *
-     * @return radians
-     **/
-	double rad(double deg)
-	{
-		return (deg / 180) * M_PI;
+     * @return radians.
+     */
+	double degreesToRadians(double degrees){
+		return (degrees / 180) * M_PI;
 	}
 }

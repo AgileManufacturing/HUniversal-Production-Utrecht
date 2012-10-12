@@ -27,7 +27,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 #pragma once
 
@@ -36,29 +36,23 @@
 #include <DataTypes/MotorRotation.h>
 #include <DataTypes/Point3D.h>
 
-namespace DeltaRobot {
-/**
- * Inverse Kinematics -> Instances of deltarobot will throw this exception whenever they fail to convert a point.
- **/
-class InverseKinematicsException: public std::runtime_error {
-private:
-	DataTypes::Point3D<double> notConvertablePoint;
+namespace DeltaRobot{
+	class InverseKinematicsException: public std::runtime_error{
+	private:
+		DataTypes::Point3D<double> notConvertablePoint;
 
-public:
-	InverseKinematicsException(const char* exceptionMessage,
-			DataTypes::Point3D<double> destinationPoint) :
-			std::runtime_error(exceptionMessage), notConvertablePoint(
-					destinationPoint) {
-	}
+	public:
+		InverseKinematicsException(const char* exceptionMessage, DataTypes::Point3D<double> destinationPoint) :
+				std::runtime_error(exceptionMessage), notConvertablePoint(destinationPoint){}
 
-	virtual ~InverseKinematicsException(void) throw () {
-	}
+		virtual ~InverseKinematicsException(void) throw(){}
 
-	/**
-	 * Used to access the point that could not be converted
-	 **/
-	DataTypes::Point3D<double> getNotConvertablePoint(void) {
-		return notConvertablePoint;
-	}
-};
+		/**
+		   TODO: DOXYGENIZE!
+		 * Used to access the point that could not be converted
+		 **/
+		DataTypes::Point3D<double> getNotConvertablePoint(void){
+			return notConvertablePoint;
+		}
+	};
 }

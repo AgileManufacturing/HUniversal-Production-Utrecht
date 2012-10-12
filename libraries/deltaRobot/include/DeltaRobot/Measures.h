@@ -28,35 +28,33 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 #pragma once
 #include <Utilities/Utilities.h>
 
-/**
- * measures.h -> deltarobot measures, specifically for the huniplacer deltarobot
- **/
-
-namespace DeltaRobot
-{
-	namespace Measures
-	{
-		const double BASE 				  = 101.3; //mm
-		const double HIP 				  = 100; //mm
-		const double EFFECTOR			  = 46.19; //mm
-		const double ANKLE 				  = 250; //mm
+namespace DeltaRobot{
+	namespace Measures{
+		// The following variables are in millimeters
+		const double BASE 				  = 101.3;
+		const double HIP 				  = 100;
+		const double EFFECTOR			  = 46.19;
+		const double ANKLE 				  = 250;
 		
-		const double HIP_ANKLE_ANGLE_MAX  = Utilities::rad(22);    //radians
-		//safety constants, roughly determined to be as safe as possible for testing purposes
-		const double MOTOR_ROT_MIN 	      = Utilities::rad(-42);   //radians
-		const double MOTOR_ROT_MAX 	      = Utilities::rad(45);    //radians
 
-		const double MOTOR1_DEVIATION	  = Utilities::rad(-45);   //radians
-		const double MOTOR2_DEVIATION	  = Utilities::rad(-45);   //radians
-		const double MOTOR3_DEVIATION	  = Utilities::rad(-45);   //radians
-
-		// Top (granite) to middle point is 45 degrees. Removing the hip thickness results in +-42.5 degrees!
-		const double MOTORS_DEVIATION	=   Utilities::rad(42.5); 
+		// The following variables are in radians
+		const double HIP_ANKLE_ANGLE_MAX  = Utilities::degreesToRadians(22);
+		// Safety constants, roughly determined to be as safe as possible for testing purposes
+		const double MOTOR_ROT_MIN 	      = Utilities::degreesToRadians(-42);
+		const double MOTOR_ROT_MAX 	      = Utilities::degreesToRadians(45);
+		
+		const double MOTOR1_DEVIATION	  = Utilities::degreesToRadians(-45);
+		const double MOTOR2_DEVIATION	  = Utilities::degreesToRadians(-45);
+		const double MOTOR3_DEVIATION	  = Utilities::degreesToRadians(-45);
+		
+		// Top (granite) to middle point is 45 degrees. Removing the hip thickness results into +-42.5 degrees!
+		const double MOTORS_DEVIATION	=   Utilities::degreesToRadians(42.5); 
+		
 		
  		const double MAX_X = 500;
 		const double MAX_Y = MAX_X;

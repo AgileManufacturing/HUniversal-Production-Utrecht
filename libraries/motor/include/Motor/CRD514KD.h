@@ -29,30 +29,22 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
-
+ */
 
 #pragma once
 #include <ModbusController/ModbusController.h>
 #include <cmath>
 
-/**
- * CRD514KDMotorController.h -> holds various CRD514_KD related constants
- **/
-namespace Motor
-{
-    namespace CRD514KD
-    {
+namespace Motor{
+    namespace CRD514KD{
         const double MOTOR_STEP_ANGLE = (0.072 / 180.) * M_PI;
         const double MOTOR_STEP_IN_DEGREES = 1.8;
 
         /**
-         * CRD514KD slave addresses
-         **/
-        namespace Slaves
-        {
-            typedef enum _t
-            {
+         * CRD514KD slave addresses.
+         */
+        namespace Slaves{
+            typedef enum _t{
                 BROADCAST = 0,
                 MOTOR_0 = 1,
                 MOTOR_1 = 2,
@@ -61,52 +53,62 @@ namespace Motor
         }
 
         /**
-         * CRD514KD registers
-         **/
-        namespace Registers
-        {
-            enum _registers
-            {
-                OP_POS                  = 0x402, //32-bit
-                OP_SPEED                = 0x502, //32-bit
-                OP_POSMODE              = 0x601, //16-bit
-                OP_OPMODE               = 0x701, //16-bit
-                OP_SEQ_MODE             = 0x801, //16-bit
-                OP_ACC                  = 0x902, //32-bit
-                OP_DEC                  = 0xA02, //32-bit
-                OP_DWELL                = 0xC01, //16-bit
-                
-                CFG_POSLIMIT_POSITIVE   = 0x254, //32-bit
-                CFG_POSLIMIT_NEGATIVE   = 0x256, //32-bit
-                CFG_STOP_ACTION         = 0x202, //16-bit
-                CFG_START_SPEED         = 0x228, //32-bit
-                
-                CLEAR_COUNTER           = 0x04b, //16-bit
-                RESET_ALARM             = 0x040, //16-bit
-                
-                CMD_1                   = 0x01E, //16-bit
-                STATUS_1                = 0x020, //16-bit
+         * CRD514KD registers.
+         */
+        namespace Registers{
+            enum _registers{
+                // 32-bit.
+                OP_POS                  = 0x402,
+                OP_SPEED                = 0x502,
 
-                PRESENT_ALARM           = 0x100, // 16-bit current alarm code.
+                // 16-bit.
+                OP_POSMODE              = 0x601,
+                OP_OPMODE               = 0x701,
+                OP_SEQ_MODE             = 0x801,
 
-                //32-bit Preset position value argument
+                // 32-bit.
+                OP_ACC                  = 0x902,
+                OP_DEC                  = 0xA02,
+
+                // 16-bit.
+                OP_DWELL                = 0xC01,
+                
+                // 32-bit.
+                CFG_POSLIMIT_POSITIVE   = 0x254,
+                CFG_POSLIMIT_NEGATIVE   = 0x256,
+
+                // 16-bit.
+                CFG_STOP_ACTION         = 0x202,
+
+                // 32-bit.
+                CFG_START_SPEED         = 0x228,
+                
+                // 16-bit.
+                CLEAR_COUNTER           = 0x04b,
+                RESET_ALARM             = 0x040,
+                
+                CMD_1                   = 0x01E,
+                STATUS_1                = 0x020,
+
+                // 16-bit current alarm code.
+                PRESENT_ALARM           = 0x100,
+
+                // 32-bit Preset position value argument.
                 CFG_PRESET_POSITION = 0x214,
 
-                //16-bit Set the preset position to the preset position value argument
+                // 16-bit Set the preset position to the preset position value argument.
                 OP_PRESET_POSITION = 0x048, 
 
-                //16-bit Sets the software motor limitation (in the motor controller)
+                // 16-bit Sets the software motor limitation (in the motor controller).
                 OP_SOFTWARE_OVERTRAVEL = 0x252 
             };
         }
 
         /**
-         * Bits of value at address CMD_1
-         **/
-        namespace CMD1Bits
-        {
-            enum _cmd1_bits
-            {
+         * Bits of value at address CMD_1.
+         */
+        namespace CMD1Bits{
+            enum _cmd1_bits{
                 START         = (1 << 8),
                 STOP          = (1 << 11),
                 EXCITEMENT_ON = (1 << 13)
@@ -114,12 +116,10 @@ namespace Motor
         }
 
         /**
-         * Bits of value at address STATUS_1
-         **/
-        namespace Status1Bits
-        {
-            enum _status1_bits
-            {
+         * Bits of value at address STATUS_1.
+         */
+        namespace Status1Bits{
+            enum _status1_bits{
                 WARNING = (1 << 6),
                 ALARM   = (1 << 7),
                 MOVE    = (1 << 10),
@@ -128,13 +128,11 @@ namespace Motor
         }
 
         /** 
-         * Constants used when constructing a modbus rtu (using modbus_new_rtu)
-         **/
-        namespace RtuConfig
-        {
+         * Constants used when constructing a modbus rtu (using modbus_new_rtu).
+         */
+        namespace RtuConfig{
             const char DEVICE[] = "/dev/ttyS0";
-            enum _rtu_config
-            {
+            enum _rtu_config{
                 BAUDRATE = 115200,
                 PARITY   = 'N',
                 DATA_BITS = 8,

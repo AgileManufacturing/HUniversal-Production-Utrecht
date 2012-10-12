@@ -26,18 +26,16 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 #pragma once
 
 #include <string>
 
-namespace DeltaRobotNodeServices
-{
+namespace DeltaRobotNodeServices{
 	const std::string MOVE_TO_POINT = "moveToPoint";
 	const std::string MOVE_PATH = "movePath";
 	const std::string MOVE_TO_RELATIVE_POINT = "moveToRelativePoint";
 	const std::string MOVE_RELATIVE_PATH = "moveRelativePath";
 	const std::string CALIBRATE = "calibrate";
 }
-

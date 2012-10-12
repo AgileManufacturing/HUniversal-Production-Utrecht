@@ -28,7 +28,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 #include <DeltaRobot/InverseKinematics.h>
 
@@ -42,7 +42,8 @@
 #include <Utilities/Utilities.h>
 
 /**
- * InverseKinematics.cpp -> An implementation of the kinematics model
+   TODO: DOXYGENIZE!
+ * InverseKinematics.cpp -> An implementation of the kinematics model.
  * 
  * ideas from Viacheslav Slavinsky are used
  * conventions:
@@ -51,96 +52,93 @@
  * y-axis goes from front to back
  * z-axis goes from bottom to top
  * point (0,0,0) lies in the middle of all the motors at the motor's height
- **/
+ */
 
 namespace DeltaRobot {
 	InverseKinematics::InverseKinematics(const double base, const double hip,
 			const double effector, const double ankle,
 			const double maxAngleHipAnkle) :
-			InverseKinematicsModel(base, hip, effector, ankle, maxAngleHipAnkle) {
+			InverseKinematicsModel(base, hip, effector, ankle, maxAngleHipAnkle){
 	}
 
-	InverseKinematics::InverseKinematics(DataTypes::DeltaRobotMeasures & drm) :
-			InverseKinematicsModel(drm.base, drm.hip, drm.effector, drm.ankle, drm.maxAngleHipAnkle) {
+	InverseKinematics::InverseKinematics(DataTypes::DeltaRobotMeasures & deltaRobotMeasures) :
+			InverseKinematicsModel(deltaRobotMeasures.base, deltaRobotMeasures.hip, deltaRobotMeasures.effector, deltaRobotMeasures.ankle, deltaRobotMeasures.maxAngleHipAnkle){
 	}	
 
-	InverseKinematics::~InverseKinematics(void) {
+	InverseKinematics::~InverseKinematics(void){
 	}
 
 	#define square(x) ((x)*(x))
 
 	/**
-	 * Translates a point to an angle for a motor.
-	 * @param destinationPoint point where the midpoint of the effector is wanted.
-	 * @param motorLocation angle of the motor on the z axis where 0 radians is directly in front of the deltarobot.
+	 * @brief Translates a point to an angle for a motor.
+	 * 
+	 * @param destinationPoint Point where the midpoint of the effector is wanted.
+	 * @param motorLocation Angle of the motor on the z axis where 0 radians is directly in front of the deltarobot.
+	 * 
 	 * @return angle the motor should move to.
-	 **/
-	double InverseKinematics::motorAngle(const DataTypes::Point3D<double>& destinationPoint,
-			double motorLocation) const {
-
-		//rotate the destination point so calculations can be made as if the motor is always in front
-		//(rotating the point places it in the same position relative to the front motor
-		//as it would be relative to the motor indicated by motor_angle)
+	 */
+	double InverseKinematics::motorAngle(const DataTypes::Point3D<double>& destinationPoint, double motorLocation) const{
+		// Rotate the destination point so calculations can be made as if the motor is always in front
+		// (rotating the point places it in the same position relative to the front motor
+		// as it would be relative to the motor indicated by motor_angle).
 		DataTypes::Point3D<double> destinationPointRotatedAroundZAxis =
 				destinationPoint.rotateAroundZAxis(-motorLocation);
 
-		//places the point towards the "ankle to effector connection"
+		// Places the point towards the "ankle to effector connection".
 		destinationPointRotatedAroundZAxis.y -= effector;
-		//places the point relative to a motor in (x,y,z) = (0,0,0)
+		
+		// Places the point relative to a motor in (x,y,z) = (0, 0, 0).
 		destinationPointRotatedAroundZAxis.y += base;
 
-		//why is this?
-		double distanceMotorToEffectorOnYAndZAxis = sqrt(
-				square(destinationPointRotatedAroundZAxis.y)
-						+ square(destinationPointRotatedAroundZAxis.z));
+		// TODO: (look at the comment below)
+		// why is this?
+		double distanceMotorToEffectorOnYAndZAxis = sqrt(square(destinationPointRotatedAroundZAxis.y)
+				+ square(destinationPointRotatedAroundZAxis.z));
 
-		//checks if the "ankle to effector connection" is directly
-		//to the left of, to the right of, or in the motor
-		if (distanceMotorToEffectorOnYAndZAxis == 0) {
-			throw InverseKinematicsException("point out of range",
-					destinationPoint);
+		// Checks if the "ankle to effector connection" is directly to the left of, to the right of, or in the motor.
+		if(distanceMotorToEffectorOnYAndZAxis == 0){
+			throw InverseKinematicsException("point out of range", destinationPoint);
 		}
 
-		//to calculate alpha, the angle between actuator arm and goal vector
+		// To calculate alpha, the angle between actuator arm and goal vector.
 		double alphaAcosInput = (square(destinationPointRotatedAroundZAxis.x)
 				- square(ankle) + square(hip)
 				+ square(distanceMotorToEffectorOnYAndZAxis))
 				/ (2 * hip * distanceMotorToEffectorOnYAndZAxis);
 
-		if (alphaAcosInput < -1 || alphaAcosInput > 1) {
-			throw InverseKinematicsException("point out of range",
-					destinationPoint);
+		if(alphaAcosInput < -1 || alphaAcosInput > 1){
+			throw InverseKinematicsException("point out of range", destinationPoint);
 		}
 
-		//the required angle between actuator arm and goal vector
+		// The required angle between actuator arm and goal vector.
 		double alpha = acos(alphaAcosInput);
-		//the required angle between the base and goal vector
-		double beta = atan2(destinationPointRotatedAroundZAxis.z,
-				destinationPointRotatedAroundZAxis.y);
-		//the required angle between actuator arm and base (0 degrees)
+		
+		// The required angle between the base and goal vector.
+		double beta = atan2(destinationPointRotatedAroundZAxis.z, destinationPointRotatedAroundZAxis.y);
+		
+		// The required angle between actuator arm and base (0 degrees).
 		double rho = beta - alpha;
 
-		double hipAnkleAngle = asin(
-				abs(destinationPointRotatedAroundZAxis.x) / ankle);
+		double hipAnkleAngle = asin(abs(destinationPointRotatedAroundZAxis.x) / ankle);
 		if (hipAnkleAngle > maxAngleHipAnkle) {
-			//std::cerr << "hipAnkleAngle > maxAngleHipAnklel " << Utilities::deg(hipAnkleAngle) << " > " << Utilities::deg(maxAngleHipAnkle) << std::endl;
-			throw InverseKinematicsException(
-					"angle between hip and ankle is out of range",
-					destinationPoint);
+			throw InverseKinematicsException("angle between hip and ankle is out of range", destinationPoint);
 		}
 
 		return rho;
 	}
 	#undef square
 
-
 	/**
-	 * Translates a point to a motion.
+	 * @brief Translates a point to a motion.
+	 * 
+	   TODO: motionPointer is gone and param rotations is missing.
 	 * @param destinationPoint destination point.
 	 * @param motionPointer output parameter, the resulting motion is stored here.
+	 * 
 	 * @return true on success, false otherwise.
-	 **/
-	void InverseKinematics::pointToMotion(const DataTypes::Point3D<double>& destinationPoint, DataTypes::MotorRotation<double>* (&rotations)[3]) const {
+	 */
+	void InverseKinematics::pointToMotion(const DataTypes::Point3D<double>& destinationPoint, DataTypes::MotorRotation<double>* (&rotations)[3]) const{
 		/**
 		 * Adding 180 degrees switches 0 degrees for the motor from the 
 		 * midpoint of the engines to directly opposite.
@@ -150,24 +148,12 @@ namespace DeltaRobot {
 		 * when looking at the side the effector is not located
 		 *  240 degrees: this motor is located 240 degrees counter clockwise of the 0 degrees motor
 		 * when looking at the side the effector is not located
-		 **/
+		 */
+		rotations[0]->angle = Utilities::degreesToRadians(180) + motorAngle(destinationPoint, Utilities::degreesToRadians(1 * 120));
+		rotations[1]->angle = Utilities::degreesToRadians(180) + motorAngle(destinationPoint, Utilities::degreesToRadians(0 * 120));
+		rotations[2]->angle = Utilities::degreesToRadians(180) + motorAngle(destinationPoint, Utilities::degreesToRadians(2 * 120));
 
-		rotations[0]->angle = Utilities::rad(180)
-				+ motorAngle(destinationPoint, Utilities::rad(1 * 120));
-		rotations[1]->angle = Utilities::rad(180)
-				+ motorAngle(destinationPoint, Utilities::rad(0 * 120));
-		rotations[2]->angle = Utilities::rad(180)
-				+ motorAngle(destinationPoint, Utilities::rad(2 * 120));
-
-		rotations[0]->acceleration =
-			rotations[1]->acceleration =
-			rotations[2]->acceleration = 
-			Utilities::rad(3600);
-
-		rotations[0]->deceleration =
-			rotations[1]->deceleration =
-			rotations[2]->deceleration = 
-			Utilities::rad(3600);
+		rotations[0]->acceleration = rotations[1]->acceleration = rotations[2]->acceleration = Utilities::degreesToRadians(3600);
+		rotations[0]->deceleration = rotations[1]->deceleration = rotations[2]->deceleration = Utilities::degreesToRadians(3600);
 	}
 }
-

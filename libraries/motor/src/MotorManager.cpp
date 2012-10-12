@@ -27,28 +27,29 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 #include <Motor/MotorManager.h>
 #include <Motor/CRD514KD.h>
 #include <Motor/MotorException.h>
 
-extern "C"
-{
+extern "C"{
     #include <modbus/modbus.h>
 }
 
-namespace Motor {
-	void MotorManager::powerOn() {
+namespace Motor{
+	// TODO: Need comment!
+	void MotorManager::powerOn(void){
 		if(!poweredOn){
-			for(int i = 0; i < numberOfMotors; ++i) {
+			for(int i = 0; i < numberOfMotors; ++i){
 				motors[i]->powerOn();
 			}
 		}
 		poweredOn = true;
 	}
 
-	void MotorManager::powerOff() {
+	// TODO: Need comment!
+	void MotorManager::powerOff(void){
 		if(poweredOn){
 			for(int i = 0; i < numberOfMotors; ++i){
 				motors[i]->powerOff();
@@ -57,13 +58,13 @@ namespace Motor {
 		poweredOn = false;
 	}
 
-	void MotorManager::startMovement(){
-		if(!poweredOn)
-        {
+	// TODO: Need comment!
+	void MotorManager::startMovement(void){
+		if(!poweredOn){
             throw MotorException("motor drivers are not powered on");
         }
 
-        //execute motion
+        // Execute motion.
         motors[0]->waitTillReady();
         motors[1]->waitTillReady();
         motors[2]->waitTillReady();

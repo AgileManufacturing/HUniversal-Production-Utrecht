@@ -27,7 +27,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 #pragma once
 
@@ -36,8 +36,8 @@
 #include <DataTypes/DeltaRobotMeasures.h>
 #include <DeltaRobot/InverseKinematicsModel.h>
 
-namespace DeltaRobot {
-	class InverseKinematics: public InverseKinematicsModel {
+namespace DeltaRobot{
+	class InverseKinematics : public InverseKinematicsModel{
 	private:
 		double motorAngle(const DataTypes::Point3D<double>& destinationPoint,
 				double motorLocation) const;
@@ -47,7 +47,7 @@ namespace DeltaRobot {
 			const double effector, const double ankle,
 			const double maxAngleHipAnkle);
 
-		InverseKinematics(DataTypes::DeltaRobotMeasures & drm);
+		InverseKinematics(DataTypes::DeltaRobotMeasures& deltaRobotMeasures);
 
 		virtual ~InverseKinematics(void);
 		

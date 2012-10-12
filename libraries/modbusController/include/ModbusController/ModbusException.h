@@ -28,7 +28,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 
 #pragma once
@@ -40,57 +40,40 @@
 
 #include <modbus/modbus.h>
 
-namespace ModbusController
-{
-	/**
-	 * modbus_exception.h -> Exception to indicate modbus errors
-	 *
-	 * modbus_ctrl can throw this exception whenever a modbus related error occurs
-	 **/
-    class ModbusException : public std::runtime_error
-    {
-        private:
-    		/**
-             * modbus error code
-             **/
-            const int errorCode;
-            /** 
-             * modbus error string (obtained using modbus_strerror)
-             **/ 
-            std::string message;
-            
-        public:
-            ModbusException(void) :
-                std::runtime_error(""),
-                errorCode(errno)
-            {
-                std::stringstream ss;
-                ss << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
-                message = ss.str();
-            }
+namespace ModbusController{
+    class ModbusException : public std::runtime_error{
+    private:
+		// Modbus error code.
+        const int errorCode;
+        
+        // Modbus error string (obtained using modbus_strerror).
+        std::string message;
+        
+    public:
+        // TODO: Need comment!
+        ModbusException(void) : std::runtime_error(""), errorCode(errno){
+            std::stringstream stream;
+            stream << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
+            message = stream.str();
+        }
 
-            ModbusException(const std::string msg) :
-                std::runtime_error(""),
-                errorCode(errno)
-            {
-                std::stringstream ss;
-                ss << msg << std::endl;
-                ss << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
-                message = ss.str();
-            }
-            
-            virtual ~ModbusException(void) throw()
-            {
-            }
-            
-            virtual const char* what() const throw()
-			{
-				return message.c_str();
-			}
-            
-            int getErrorCode(void)
-            {
-                return errorCode;
-            }
+        // TODO: Need comment!
+        ModbusException(const std::string msg) : std::runtime_error(""), errorCode(errno){
+            std::stringstream stream;
+            stream << msg << std::endl;
+            stream << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
+            message = stream.str();
+        }
+        
+        virtual ~ModbusException(void) throw(){}
+        
+        // TODO: Need comment
+        virtual const char* what(void) const throw(){
+			return message.c_str();
+		}
+        
+        int getErrorCode(void){
+            return errorCode;
+        }
     };
 }

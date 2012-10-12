@@ -31,65 +31,71 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @note 2012-10-11 DV: Removed unused methods
- **/
+ */
 
 #pragma once
 
 #include <cmath>
 
-namespace DataTypes {
+namespace DataTypes{
 	template<typename T>
-	class Point3D {
+
+	class Point3D{
 	public:
 		T x, y, z;
 
-		Point3D() {}
-		Point3D(T x, T y, T z) : x(x), y(y), z(z) { }
+		Point3D(){}
+		Point3D(T x, T y, T z) : x(x), y(y), z(z){}
 
-		inline Point3D<T>& operator+=(const Point3D<T>& rhs) {
+		inline Point3D<T>& operator+=(const Point3D<T>& rhs){
 			x += rhs.x;
 			y += rhs.y;
 			z += rhs.z;
 			return *this;
 		}
 
-		inline const Point3D<T> operator+(const Point3D<T>& rhs) const {
-			Point3D<T> res = *this;
-			res += rhs;
-			return res;
+		inline const Point3D<T> operator+(const Point3D<T>& rhs) const{
+			Point3D<T> result = *this;
+			result += rhs;
+			return result;
 		}
 
 		/**
-		 * Calculates the euclidean distance between *this and p
+		 * @brief Calculates the euclidean distance between *this and p.
 		 *
-		 * @return distance
-		 **/
-		inline T distance(const Point3D<T>& p) const {
-			T dx = x - p.x;
-			T dy = y - p.y;
-			T dz = z - p.z;
+		 * @param p The point to calculate the euclidean distance to from *this.
+		 * 
+		 * @return the euclidean distance.
+		 */
+		inline T distance(const Point3D<T>& point) const{
+			T dx = x - point.x;
+			T dy = y - point.y;
+			T dz = z - point.z;
 			return sqrt(dx * dx + dy * dy + dz * dz);
 		}
 
 		/**
-		 * Rotate the point around the Y axis
+		 * @brief Rotate the point around the Y axis.
 		 *
-		 * @param phi rotation in radians
-		 **/
-		inline Point3D<T> rotateAroundYAxis(T rotationRadians) const {
+		 * @param rotationRadians Rotation in radians.
+		 * 
+		 * @return the rotated point.
+		 */
+		inline Point3D<T> rotateAroundYAxis(T rotationRadians) const{
 			return Point3D<T>(x * cos(rotationRadians) - z * sin(rotationRadians), y,
 					x * sin(rotationRadians) + z * cos(rotationRadians));
 		}
 
 		/**
-		 * Rotate the point around the Z axis
+		 * @brief Rotate the point around the Z axis.
 		 *
-		 * @param phi rotation in radians
-		 **/
-		inline Point3D<T> rotateAroundZAxis(T rotationRadians) const {
+		 * @param rotationRadians Rotation in radians.
+		 * 
+		 * @return the rotated point.
+		 */
+		inline Point3D<T> rotateAroundZAxis(T rotationRadians) const{
 			return Point3D<T>(x * cos(rotationRadians) - y * sin(rotationRadians),
 					x * sin(rotationRadians) + y * cos(rotationRadians), z);
 		}
 	};
-
 }

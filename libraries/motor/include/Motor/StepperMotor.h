@@ -27,7 +27,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 #pragma once
 
@@ -40,52 +40,49 @@
 #include <Motor/CRD514KD.h>
 #include <Motor/MotorInterface.h>
 
-namespace Motor
-{
-    class StepperMotor : public MotorInterface
-    {
-        public:
-            StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex);
-            StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle);
+namespace Motor{
+    class StepperMotor : public MotorInterface{
+    public:
+        StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex);
+        StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle);
 
-            virtual ~StepperMotor();
+        virtual ~StepperMotor(void);
+    
+        void powerOn(void);
+        void powerOff(void);
+        void stop(void);
+
+        void resetCounter(void);
+        void setMotorLimits(double minAngle, double maxAngle);
+
+        void moveTo(const DataTypes::MotorRotation<double>& motorRotation);
+        void writeRotationData(const DataTypes::MotorRotation<double>& motorRotation);
+
+        void startMovement(void);
+        void moveToWithin(const DataTypes::MotorRotation<double>& motorRotation, double time, bool start);
+        void waitTillReady(void);
+
+        bool isPoweredOn(void){ return poweredOn; }
+        inline double getMinAngle(void) const{ return minAngle; }
+        inline double getMaxAngle(void) const{ return maxAngle; }
+        void setMinAngle(double minAngle);
+        void setMaxAngle(double maxAngle);
+        void setCurrentAngle(double angle){ currentAngle = angle; }
+
+        double getDeviation(void){ return deviation; }
+        void setDeviation(double deviation){ this->deviation = deviation; }
+
+        void disableAngleLimitations(void);
+        void updateAngle(void);
+
+    private:
+        double currentAngle, setAngle, deviation, minAngle, maxAngle;
         
-            void powerOn();
-            void powerOff();
-            void stop();
+        ModbusController::ModbusController* modbus;
 
-            void resetCounter();
-            void setMotorLimits(double minAngle, double maxAngle);
-
-
-            void moveTo(const DataTypes::MotorRotation<double>& mr);
-            void writeRotationData(const DataTypes::MotorRotation<double>& mr);
-
-            void startMovement();
-            void moveToWithin(const DataTypes::MotorRotation<double>& mr, double time, bool start);
-            void waitTillReady();
-
-            bool isPoweredOn() { return poweredOn; }
-            inline double getMinAngle() const { return minAngle; }
-            inline double getMaxAngle() const { return maxAngle; }
-            void setMinAngle(double minAngle);
-            void setMaxAngle(double maxAngle);
-
-            void setCurrentAngle(double angle){ currentAngle = angle; }
-
-            double getDeviation(){ return deviation; }
-            void setDeviation(double deviation){ this->deviation = deviation; }
-
-            void updateAngle();
-            void disableAngleLimitations();
-        private:
-            double currentAngle, setAngle, deviation, minAngle, maxAngle;
-            
-            ModbusController::ModbusController* modbus;
-
-            CRD514KD::Slaves::t motorIndex;
-            
-            bool anglesLimited;
-            volatile bool poweredOn;
+        CRD514KD::Slaves::t motorIndex;
+        
+        bool anglesLimited;
+        volatile bool poweredOn;
     };
 }

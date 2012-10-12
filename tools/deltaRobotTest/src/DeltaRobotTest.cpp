@@ -27,28 +27,27 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
-#include "ros/ros.h"
-#include "deltaRobotNode/MovePath.h"
-#include "deltaRobotNode/MoveRelativePath.h"
-#include "deltaRobotNode/MoveToRelativePoint.h"
-#include "deltaRobotNode/MoveToPoint.h"
-#include "deltaRobotNode/Motion.h"
-#include "deltaRobotNode/Calibrate.h"
-#include "DeltaRobotNode/Services.h"
+ #include "ros/ros.h"
+ #include "deltaRobotNode/MovePath.h"
+ #include "deltaRobotNode/MoveRelativePath.h"
+ #include "deltaRobotNode/MoveToRelativePoint.h"
+ #include "deltaRobotNode/MoveToPoint.h"
+ #include "deltaRobotNode/Motion.h"
+ #include "deltaRobotNode/Calibrate.h"
+ #include "DeltaRobotNode/Services.h"
 
-#define NODE_NAME "DeltaRobotTest"
+ #define NODE_NAME "DeltaRobotTest"
 
-const double speed = 100.0;
-
- // key pressed
+ const double speed = 100.0;
  char keyPress;
 
- // Getting MoveToPoint Services
-ros::ServiceClient moveToPointClient;
-deltaRobotNode::MoveToPoint moveToPointService;
- void moveToStartPoint() {
+ // Getting MoveToPoint Services.
+ ros::ServiceClient moveToPointClient;
+ deltaRobotNode::MoveToPoint moveToPointService;
+
+ void moveToStartPoint(){
 	std:: cout << "Press any key to goto startpoint" << std::endl;
     std:: cin >> keyPress; 
 	moveToPointService.request.motion.x = 0;
@@ -58,36 +57,35 @@ deltaRobotNode::MoveToPoint moveToPointService;
 	moveToPointClient.call(moveToPointService);
  }
 
- int main(int argc, char **argv) {
-	// Ros init
+ int main(int argc, char **argv){
+	// Ros init.
 	ros::init(argc, argv, NODE_NAME);
 	ros::NodeHandle nodeHandle;
 
-	// Getting Calibrate Services
+	// Getting Calibrate Services.
     ros::ServiceClient calibrateClient = nodeHandle.serviceClient<deltaRobotNode::Calibrate>(DeltaRobotNodeServices::CALIBRATE);
     deltaRobotNode::Calibrate calibrateService;
 
     moveToPointClient = nodeHandle.serviceClient<deltaRobotNode::MoveToPoint>(DeltaRobotNodeServices::MOVE_TO_POINT);
 
-	// Getting MoveToRelativePoint Services
+	// Getting MoveToRelativePoint Services.
     ros::ServiceClient moveToRelativePointClient = nodeHandle.serviceClient<deltaRobotNode::MoveToRelativePoint>(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT);
     deltaRobotNode::MoveToRelativePoint moveToRelativePointService;
 
-    // Getting MovePath Service
+    // Getting MovePath Service.
     ros::ServiceClient movePathClient = nodeHandle.serviceClient<deltaRobotNode::MovePath>(DeltaRobotNodeServices::MOVE_PATH);
     deltaRobotNode::MovePath movePathService;
 
-    // Getting MoveRelativePath Service
+    // Getting MoveRelativePath Service.
     ros::ServiceClient moveRelativePathClient = nodeHandle.serviceClient<deltaRobotNode::MoveRelativePath>(DeltaRobotNodeServices::MOVE_RELATIVE_PATH);
     deltaRobotNode::MoveRelativePath moveRelativePathService;
-
    
-	// Test Calibrate Service
+	// Test Calibrate Service.
     std:: cout << "Press any key to start the Calibrate" << std::endl;
     std:: cin >> keyPress;    
     calibrateClient.call(calibrateService);
 
-	//Test MoveToPoint Service
+	// Test MoveToPoint Service.
 	std:: cout << "Press any key to start the MoveToPoint" << std::endl;
     std:: cin >> keyPress;   
 	moveToPointService.request.motion.x = 10;
@@ -98,7 +96,7 @@ deltaRobotNode::MoveToPoint moveToPointService;
 
 	moveToStartPoint();
 
-	//Test MoveToRelativePoint Service
+	// Test MoveToRelativePoint Service.
 	std:: cout << "Press any key to start the MoveToRelativePoint" << std::endl;
     std:: cin >> keyPress;   
 	moveToRelativePointService.request.motion.x = -1;
@@ -109,7 +107,7 @@ deltaRobotNode::MoveToPoint moveToPointService;
 
 	moveToStartPoint();
 
-	// Test MovePath Service
+	// Test MovePath Service.
 	std:: cout << "Press any key to start the MovePathService" << std::endl;
     std:: cin >> keyPress;   
 	deltaRobotNode::Motion point1;
@@ -144,7 +142,7 @@ deltaRobotNode::MoveToPoint moveToPointService;
 
 	moveToStartPoint();
 
-	// Test MoveRelativePath Service
+	// Test MoveRelativePath Service.
 	std:: cout << "Press any key to start the MoveRelativePath" << std::endl;
     std:: cin >> keyPress; 
 	for(double z = 0; z < 10; z++){

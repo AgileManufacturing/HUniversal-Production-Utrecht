@@ -26,7 +26,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 #pragma once
 
@@ -36,48 +36,43 @@
 #include <algorithm>
 #include <vector>
 
-namespace Utilities
-{
+namespace Utilities{
     long timeNow(void);
-    void sleep(long ms);
-    double deg(double rad);
-    double rad(double deg);
+    void sleep(long milliseconds);
+    double radiansToDegrees(double radians);
+    double degreesToRadians(double degrees);
 
     /**
-     * Utility class to time stuff
-     * @note TEMPORARY
-     **/
-    class StopWatch
-    {
-		private:
-    		const char* name;
-			long t0, t1;
+     * @brief Utility class to time stuff.
+     * @note TEMPORARY.
+     */
+    class StopWatch{
+	private:
+		const char* name;
+		long t0, t1;
 
-		public:
-			StopWatch(const char* name, bool s = false) : name(name)
-			{
-				if(s) { start(); }
-			}
+	public:
+		StopWatch(const char* name, bool s = false) : name(name){
+			if(s){ start(); }
+		}
 
-			~StopWatch(void) { }
-			void start(void) { t0 = timeNow(); }
-			void stop(void) { t1 = timeNow(); }
-			
-            void print(FILE* stream)
-			{
-				fprintf(stream, "%s: %ld ms\n", name, t1 - t0);
-			}
+		~StopWatch(void){}
+		void start(void){ t0 = timeNow(); }
+		void stop(void){ t1 = timeNow(); }
+		
+        void print(FILE* stream){
+			fprintf(stream, "%s: %ld ms\n", name, t1 - t0);
+		}
 
-			void stopAndPrint(FILE* stream)
-			{
-				stop();
-				print(stream);
-			}
+		void stopAndPrint(FILE* stream){
+			stop();
+			print(stream);
+		}
     };
 
+    // TODO: Need comment!
     template<typename T>
-    bool vectorContains(const std::vector<T>& vec, const T& elem)
-    {
-    	return std::find(vec.begin(), vec.end(), elem) != vec.end();
+    bool vectorContains(const std::vector<T>& vector, const T& element){
+    	return std::find(vector.begin(), vector.end(), element) != vector.end();
     }
 }

@@ -28,12 +28,11 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 #pragma once
 
-extern "C"
-{
+extern "C"{
     #include <modbus/modbus.h>
 }
 
@@ -51,34 +50,32 @@ extern "C"
  */
 //#define MODBUS_LOGGING "/home/lcv/modbus.log"
 
-namespace ModbusController
-{
-    class ModbusController
-    {
+namespace ModbusController{
+    class ModbusController{
     public:
         ModbusController(modbus_t* context);
         ~ModbusController(void);
 
         void writeU16(uint16_t slave, uint16_t address, uint16_t data, bool useShadow = false);
-        void writeU16(uint16_t slave, uint16_t first_address, uint16_t* data, unsigned int length);
+        void writeU16(uint16_t slave, uint16_t firstAddress, uint16_t* data, unsigned int length);
         void writeU32(uint16_t slave, uint16_t address, uint32_t data, bool useShadow = false);
         uint16_t readU16(uint16_t slave, uint16_t address);
-        void readU16(uint16_t slave, uint16_t first_address, uint16_t* data, unsigned int length);
+        void readU16(uint16_t slave, uint16_t firstAddress, uint16_t* data, unsigned int length);
         uint32_t readU32(uint16_t slave, uint16_t address);
-
 
         boost::mutex modbusMutex;
 
     private:
-        enum
-        {
+        enum{
             MODBUS_ERRNO_TIMEOUT = 0x6E,
 
-            WRITE_INTERVAL_UNICAST   = 8,  //ms
-            WRITE_INTERVAL_BROADCAST = 16, //ms
-                
-            TIMEOUT_BEGIN = 150000, //us
-            TIMEOUT_END   = 150000, //us
+            // The following variables are in milliseconds.
+            WRITE_INTERVAL_UNICAST   = 8,
+            WRITE_INTERVAL_BROADCAST = 16,
+            
+            // The following variables are in microseconds.
+            TIMEOUT_BEGIN = 150000,
+            TIMEOUT_END   = 150000,
         };
             
         modbus_t* context;
@@ -86,9 +83,7 @@ namespace ModbusController
             
         typedef std::map<uint64_t, uint16_t> ShadowMap;
 
-        /** 
-        * Values at certain addresses are shadowed here
-        **/
+        // Values at certain addresses are shadowed here.
         ShadowMap shadowRegisters;
 
         #ifdef MODBUS_LOGGING

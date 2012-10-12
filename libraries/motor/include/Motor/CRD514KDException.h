@@ -29,7 +29,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 
 #pragma once
@@ -40,59 +40,48 @@
 #include <string>
 #include <sstream>
 
-namespace Motor
-{
-	/**
-	 * CRD514KDException -> An exception that is raied when the CRD514KD alarm flag is set
-	 **/
-	class CRD514KDException : public std::runtime_error
-	{
-		private:
-			const CRD514KD::Slaves::t slave;
-			const bool warning, alarm;
-			std::string message;
+namespace Motor{
+	class CRD514KDException : public std::runtime_error{
+	private:
+		const CRD514KD::Slaves::t slave;
+		const bool warning, alarm;
+		std::string message;
 
-		public:
-			CRD514KDException(const CRD514KD::Slaves::t slave, const bool warning, const bool alarm) :
-				std::runtime_error(""),
-				slave(slave),
-				warning(warning),
-				alarm(alarm)
-			{
-				std::stringstream ss;
-				ss << "slave: " << (int)slave << ": warning=" << (int)warning << " alarm=" << (int)alarm;
-				message = ss.str();
-			}
+	public:
+		CRD514KDException(const CRD514KD::Slaves::t slave, const bool warning, const bool alarm) :
+				std::runtime_error(""), slave(slave), warning(warning), alarm(alarm){
+			std::stringstream stream;
+			stream << "slave: " << (int)slave << ": warning=" << (int)warning << " alarm=" << (int)alarm;
+			message = stream.str();
+		}
 
-			virtual ~CRD514KDException() throw()
-			{ }
+		virtual ~CRD514KDException() throw(){}
 
-			virtual const char* what() const throw()
-			{
-				return message.c_str();
-			}
+		// TODO: need comment
+		virtual const char* what() const throw(){
+			return message.c_str();
+		}
 
-			CRD514KD::Slaves::t getSlave(void)
-			{
-				return slave;
-			}
+		CRD514KD::Slaves::t getSlave(void){
+			return slave;
+		}
 
-			/**
-			 * Check if there is a warning
-			 * @return warning True if there is a warning
-			 **/
-			bool isWarning(void)
-			{
-				return warning;
-			}
+		/**
+		 * @brief Check if there is a warning.
+		 * 
+		 * @return true if there is a warning.
+		 */
+		bool isWarning(void){
+			return warning;
+		}
 
-			/**
-			 * Check if there is an alarm
-			 * @return alarm is true when there is an alarm
-			 **/
-			bool isAlarm(void)
-			{
-				return alarm;
-			}
+		/**
+		 * @brief Check if there is an alarm.
+		 * 
+		 * @return true when there is an alarm.
+		 */
+		bool isAlarm(void){
+			return alarm;
+		}
 	};
 }

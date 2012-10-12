@@ -1,5 +1,5 @@
 /**
- * @file Deltarobot.h
+ * @file DeltaRobot.h
  * @brief Symbolizes an entire DeltaRobot.
  *
  * @author 1.0 Lukas Vermond
@@ -28,7 +28,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 #pragma once
 
@@ -40,23 +40,20 @@
 #include <Motor/MotorManager.h>
 #include <DeltaRobot/EffectorBoundaries.h>
 
-namespace DeltaRobot
-{
+namespace DeltaRobot{
 	class InverseKinematicsModel;
-
 	
-    class DeltaRobot 
-    {
+    class DeltaRobot{
         public:
-            DeltaRobot(DataTypes::DeltaRobotMeasures& drm, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3], modbus_t* modbusIO);
+            DeltaRobot(DataTypes::DeltaRobotMeasures& deltaRobotMeasures, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3], modbus_t* modbusIO);
             ~DeltaRobot();
             
-            inline EffectorBoundaries* getBoundaries() { return boundaries; }
-            inline bool hasBoundaries() { return boundariesGenerated; }
+            inline EffectorBoundaries* getBoundaries(){ return boundaries; }
+            inline bool hasBoundaries(){ return boundariesGenerated; }
 
             void generateBoundaries(double voxelSize);
             bool checkPath(const DataTypes::Point3D<double>& begin, const DataTypes::Point3D<double>& end);
-            void moveTo(const DataTypes::Point3D<double>& p, double speed);
+            void moveTo(const DataTypes::Point3D<double>& point, double speed);
             void calibrateMotor(int motorIndex);
             bool checkSensor(int sensorIndex);
             bool calibrateMotors();

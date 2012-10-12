@@ -27,15 +27,16 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 #pragma once
 
 #include <DataTypes/Point3D.h>
 #include <DataTypes/MotorRotation.h>
 
-namespace DeltaRobot {
+namespace DeltaRobot{
 	/**
+	   TODO: DOXYGENIZE!
 	 * InverseKinematicsModel.h -> kinematics model of the deltarobot.
 	 *
 	 * Uses various lengths and sizes to calculate a point to a motion.
@@ -46,52 +47,42 @@ namespace DeltaRobot {
 	 *	y-axis goes from front to back
 	 *	z-axis goes from bottom to top
 	 *	point (0,0,0) lies in the middle of all the motors at the motor's height
-	 **/
-	class InverseKinematicsModel {
+	 */
+	class InverseKinematicsModel{
 	protected:
-		/**
-		 * Radius of the base in millimeters
-		 **/ 
+		// Radius of the base in millimeters.
 		const double base;
 
-		/*
-		 * Length of the hip in millimeters
-		 **/
+		// Length of the hip in millimeters.
 		const double hip;
 
-		/**
-		 * Radius of the effector in millimeters
-		 **/ 
+		// Radius of the effector in millimeters.
 		const double effector;
 
-		/**
-		 * Length of the ankle in millimeters
-		 **/
+		// Length of the ankle in millimeters.
 		const double ankle;
 
 		InverseKinematicsModel(const double base, const double hip,
 				const double effector, const double ankle,
 				const double maxAngleHipAnkle) :
 				base(base), hip(hip), effector(effector), ankle(ankle), maxAngleHipAnkle(
-						maxAngleHipAnkle) {
+						maxAngleHipAnkle){
 		}
 
 	public:
-		virtual ~InverseKinematicsModel(void) {
-		}
+		virtual ~InverseKinematicsModel(void){}
 
-		/** 
-		 * Maximum angle between hip and ankle on x-z plane in radians.
-		 **/
+		// Maximum angle between hip and ankle on x-z plane in radians.
 		const double maxAngleHipAnkle;
 
 		/**
-		 * @brief converts a point to a motion
-		 * @param destinationPoint point that shall be converted
-		 * @param motionPointer output parameter, the results of the conversion will be stored here
-		 **/
+		 * @brief converts a point to a motion.
+		 * 
+		   TODO: motionPointer -> rotations?
+		 * @param destinationPoint point that shall be converted.
+		 * @param motionPointer output parameter, the results of the conversion will be stored here.
+		 */
 		virtual void pointToMotion(const DataTypes::Point3D<double>& destinationPoint,
 				DataTypes::MotorRotation<double>* (&rotations)[3]) const = 0;
-
 	};
 }

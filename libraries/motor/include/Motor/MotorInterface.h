@@ -28,81 +28,80 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 #pragma once
 
 #include <DataTypes/MotorRotation.h>
 
-namespace Motor
-{
-	/**
-	 * Motor.h -> Interface for the 3 motors
-	 **/
-       class MotorInterface
-       {
-        protected:
-            MotorInterface(void) { }
-            
-        public:
-            virtual ~MotorInterface(void) { }
+namespace Motor{
+      class MotorInterface{
+      protected:
+           MotorInterface(void){}
+           
+      public:
+           virtual ~MotorInterface(void){}
 
-            /**
-             * Turns on the motors.
-             **/
-            virtual void powerOn(void) = 0;
+           /**
+            * @brief Turns on the motors.
+            */
+           virtual void powerOn(void) = 0;
 
-            /**
-             * Shuts down the motors.
-             **/
-            virtual void powerOff(void) = 0;
+           /**
+            * @brief Shuts down the motors.
+            */
+           virtual void powerOff(void) = 0;
 
-            /**
-             * Stops the motors.
-             **/
-            virtual void stop(void) = 0;
+           /**
+            * @brief Stops the motors.
+            */
+           virtual void stop(void) = 0;
 
-            virtual void setMotorLimits(double minAngle, double maxAngle) = 0;
+           virtual void setMotorLimits(double minAngle, double maxAngle) = 0;
 
+           /**
+            * @brief Rotate the motors.
+            * 
+            * @param motorRotation Defines the angles, speed, acceleration and deceleration of the motors.
+            * @param async function is performed asyncronous if true.
+            */
+           virtual void moveTo(const DataTypes::MotorRotation<double>& motorRotation) = 0;
 
-            /**
-             * Rotate the motors
-             * @param mf defines the angles, speed, acceleration and deceleration of the motors
-             * @param async function is performed asyncronous if true
-             **/
-            virtual void moveTo(const DataTypes::MotorRotation<double>& mr) = 0;
+           /**
+            * @brief Rotates the motors within a certain time. The speed member of the given motion is ignored.
+            * 
+            * @param motorRotation Defines the angles, speed, acceleration and deceleration of the motors.
+            * @param time Time in seconds that the motors will take to rotate to the given angles. 
+              TODO: Missing param start??
+            */
+           virtual void moveToWithin(const DataTypes::MotorRotation<double>& motorRotation, double time, bool start) = 0;
 
+           void waitTillReady(void);
 
-            /**
-             * Rotates the motors within a certain time. The speed member of the given motion is ignored.
-             * @param time Time in seconds that the motors will take to rotate to the given angles. 
-             **/
-            virtual void moveToWithin(const DataTypes::MotorRotation<double>& mr, double time, bool start) = 0;
+           /**
+            * @brief Get the minimal angle the motors can move to.
+            * 
+            * @return angle in radians.
+            */
+           virtual double getMinAngle(void) const = 0;
 
-            void waitTillReady();
+           /**
+            * @brief Get the maximum angle the motors can move to.
+            * 
+            * @return angle in radians.
+            */
+           virtual double getMaxAngle(void) const = 0;
 
-            /**
-             * Get the minimal angle the motors can move to.
-             * @return angle in radians
-             **/
-            virtual double getMinAngle(void) const = 0;
+           /**
+            * @brief Sets the current angle.
+            */
+           virtual void setCurrentAngle(double angle) = 0;
 
-            /**
-             * Get the maximum angle the motors can move to.
-             * @return angle in radians
-             **/
-            virtual double getMaxAngle(void) const = 0;
-
-            /**
-            * Sets the current angle
-            **/
-            virtual void setCurrentAngle(double angle) = 0;
-
-
-            /**
-             * Determine if the motor driver(s) are powered on.
-             * @return true of powered on, false otherwise
-             **/
-            virtual bool isPoweredOn(void) = 0;
+           /**
+            * @brief Determine if the motor driver(s) are powered on.
+            * 
+            * @return true of powered on, false otherwise.
+            */
+           virtual bool isPoweredOn(void) = 0;
     };
 }

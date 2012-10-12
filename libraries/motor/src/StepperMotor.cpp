@@ -27,7 +27,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 #include <Motor/StepperMotor.h>
 
@@ -41,43 +41,43 @@
 #include <Motor/CRD514KDException.h>
 #include <Motor/MotorException.h>
 
-namespace Motor
-{
+namespace Motor{
     StepperMotor::StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex) :
         MotorInterface(), modbus(modbusController), motorIndex(motorIndex), anglesLimited(false), poweredOn(false)  {}
 
     StepperMotor::StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle):
-        MotorInterface(), minAngle(minAngle), maxAngle(maxAngle), modbus(modbusController), motorIndex(motorIndex), anglesLimited(true), poweredOn(false)  {}
+        MotorInterface(), minAngle(minAngle), maxAngle(maxAngle), modbus(modbusController), motorIndex(motorIndex), anglesLimited(true), poweredOn(false){}
 
-    StepperMotor::~StepperMotor(void)
-    {
-
-        try {
+    StepperMotor::~StepperMotor(void){
+        try{
             powerOff();
-        } catch(std::runtime_error& err) {}
+        } catch(std::runtime_error& err){}
     }
 
-    void StepperMotor::powerOn(void)
-    {
-        if(!poweredOn) {
+    // Need comment!
+    void StepperMotor::powerOn(void){
+        if(!poweredOn){
             boost::lock_guard<boost::mutex> lock(modbus->modbusMutex);
-            //reset alarm
+
+            //Reset alarm
             modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 0);
             modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 1);
             modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 0);
-            //set operating modes
+
+            // Set operating modes
             modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, 0);
             modbus->writeU16(motorIndex, CRD514KD::Registers::OP_POSMODE, 1);
             modbus->writeU16(motorIndex, CRD514KD::Registers::OP_OPMODE, 0);
             modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SEQ_MODE + 0, 1);
-            modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SEQ_MODE + 1, /*1*/
-            0);
+            modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SEQ_MODE + 1, /*1*/ 0);
             modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
-            //set motors limits
+            
+            // Set motor limits
             modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((maxAngle - deviation) / CRD514KD::MOTOR_STEP_ANGLE));
             modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((minAngle - deviation) / CRD514KD::MOTOR_STEP_ANGLE));
             modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_START_SPEED, 1);
-            //clear counter
+            
+            // Clear counter
             modbus->writeU16(motorIndex, CRD514KD::Registers::CLEAR_COUNTER, 1);
             modbus->writeU16(motorIndex, CRD514KD::Registers::CLEAR_COUNTER, 0);
 
@@ -86,9 +86,9 @@ namespace Motor
         }
     }
 
-    void StepperMotor::powerOff(void)
-    {
-        if(poweredOn) {
+    // Need comment!
+    void StepperMotor::powerOff(void){
+        if(poweredOn){
             stop();
             boost::lock_guard<boost::mutex> lock(modbus->modbusMutex);
             modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, 0);
@@ -97,87 +97,82 @@ namespace Motor
     }
 
     /**
-     * Stops the motors & clears the motion queue
-     * @note (un)locks queue_mutex
+     * @brief Stops the motors & clears the motion queue.
+     * 
+     * @note (un)locks queue_mutex.
      **/
-    void StepperMotor::stop(void)
-    {
-        if(!poweredOn)
-        {
+    void StepperMotor::stop(void){
+        if(!poweredOn){
             throw MotorException("motor drivers are not powered on");
         }
         
-        try
-        {
+        try{
             modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::STOP);
             modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
-        }
-        catch(ModbusController::ModbusException& ex)
-        {
-            std::cerr << "steppermotor::stop failed: " << std::endl << "what(): " << ex.what() << std::endl;
+        } catch(ModbusController::ModbusException& exception){
+            std::cerr << "steppermotor::stop failed: " << std::endl << "what(): " << exception.what() << std::endl;
         }
     }
 
-  void StepperMotor::resetCounter(){
-
+    // Need comment!
+    void StepperMotor::resetCounter(void){
         waitTillReady();
         modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, 0);
 
-        //clear counter
+        // Clear counter.
         modbus->writeU16(motorIndex, CRD514KD::Registers::CLEAR_COUNTER, 1);
         modbus->writeU16(motorIndex, CRD514KD::Registers::CLEAR_COUNTER, 0);
         modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
     }
 
+    // Need comment!
     void StepperMotor::setMotorLimits(double minAngle, double maxAngle){
-        //set motors limits
+        // Set motors limits.
         setMinAngle(minAngle);
         setMaxAngle(maxAngle);
     }
 
-    
-    void StepperMotor::moveTo(const DataTypes::MotorRotation<double>& mr){
-        writeRotationData(mr);
+    // Need comment!
+    void StepperMotor::moveTo(const DataTypes::MotorRotation<double>& motorRotation){
+        writeRotationData(motorRotation);
         startMovement();
     }
 
     /**
-     * @brief Writes the rotation data into the motor controller
-     * @param mr a MotorRotation
-     **/
-    void StepperMotor::writeRotationData(const DataTypes::MotorRotation<double>& mr)
-    {
-        if(!poweredOn)
-        {
+     * @brief Writes the rotation data into the motor controller.
+     * 
+     * @param motorRotation A MotorRotation.
+     */
+    void StepperMotor::writeRotationData(const DataTypes::MotorRotation<double>& motorRotation){
+        if(!poweredOn){
         	throw MotorException("motor drivers are not powered on");
         }
 
-        if(anglesLimited && (mr.angle <= minAngle || mr.angle >= maxAngle)){
+        if(anglesLimited && (motorRotation.angle <= minAngle || motorRotation.angle >= maxAngle)){
             throw std::out_of_range("one or more angles out of range");
         }
 
-        uint32_t motorSteps = (uint32_t)((mr.angle + deviation) / CRD514KD::MOTOR_STEP_ANGLE);
-        uint32_t motorSpeed = (uint32_t)(mr.speed / CRD514KD::MOTOR_STEP_ANGLE);
-        uint32_t motorAcceleration = (uint32_t)(CRD514KD::MOTOR_STEP_ANGLE * 1000000000.0 / mr.acceleration);
-        uint32_t motorDeceleration = (uint32_t)(CRD514KD::MOTOR_STEP_ANGLE * 1000000000.0 / mr.deceleration);
+        uint32_t motorSteps = (uint32_t)((motorRotation.angle + deviation) / CRD514KD::MOTOR_STEP_ANGLE);
+        uint32_t motorSpeed = (uint32_t)(motorRotation.speed / CRD514KD::MOTOR_STEP_ANGLE);
+        uint32_t motorAcceleration = (uint32_t)(CRD514KD::MOTOR_STEP_ANGLE * 1000000000.0 / motorRotation.acceleration);
+        uint32_t motorDeceleration = (uint32_t)(CRD514KD::MOTOR_STEP_ANGLE * 1000000000.0 / motorRotation.deceleration);
 
         modbus->writeU32(motorIndex, CRD514KD::Registers::OP_SPEED, motorSpeed, true);
         modbus->writeU32(motorIndex, CRD514KD::Registers::OP_POS, motorSteps, true);
         modbus->writeU32(motorIndex, CRD514KD::Registers::OP_ACC, motorAcceleration, true);
         modbus->writeU32(motorIndex, CRD514KD::Registers::OP_DEC, motorDeceleration, true);
-        setAngle = mr.angle;
+        setAngle = motorRotation.angle;
     }
 
     /**
-    * @brief Start the movement of the motor
-    */
-    void StepperMotor::startMovement(){
-        if(!poweredOn)
-        {
+     * @brief Start the movement of the motor.
+     */
+    void StepperMotor::startMovement(void){
+        if(!poweredOn){
             throw MotorException("motor drivers are not powered on");
         }
 
-        //execute motion
+        // Execute motion.
         waitTillReady();
 
         modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
@@ -188,26 +183,25 @@ namespace Motor
 
 
     /**
-     * Same as moveto, but rotates to an angle within a certain time.
-     * @param time time in seconds that the motors will take to rotate to the given angle. Speed member of given motion is ignored
-     **/
-    void StepperMotor::moveToWithin(const DataTypes::MotorRotation<double>& mr, double time, bool start)
-    {
-        DataTypes::MotorRotation<double> newmr = mr;
-        newmr.speed = fabs(currentAngle - mr.angle) / time;
+     * @brief Same as moveto, but rotates to an angle within a certain time.
+     * 
+     * @param time Time in seconds that the motors will take to rotate to the given angle. Speed member of given motion is ignored.
+     */
+    void StepperMotor::moveToWithin(const DataTypes::MotorRotation<double>& motorRotation, double time, bool start){
+        DataTypes::MotorRotation<double> newMotorRotation = motorRotation;
+        newMotorRotation.speed = fabs(currentAngle - motorRotation.angle) / time;
         if(start){
-            moveTo(newmr);
-        } else {
-            writeRotationData(newmr);
+            moveTo(newMotorRotation);
+        } else{
+            writeRotationData(newMotorRotation);
         }
     }
 
-    void StepperMotor::waitTillReady(void)
-    {
+    // Need comment!
+    void StepperMotor::waitTillReady(void){
        uint16_t status_1;
-       while(!((status_1 = modbus->readU16(motorIndex, CRD514KD::Registers::STATUS_1)) & CRD514KD::Status1Bits::READY))
-       {
-            if((status_1 & CRD514KD::Status1Bits::ALARM) || (status_1 & CRD514KD::Status1Bits::WARNING)) {
+       while(!((status_1 = modbus->readU16(motorIndex, CRD514KD::Registers::STATUS_1)) & CRD514KD::Status1Bits::READY)){
+            if((status_1 & CRD514KD::Status1Bits::ALARM) || (status_1 & CRD514KD::Status1Bits::WARNING)){
                 std::cerr << "Motor: " << motorIndex << " Alarm code: " << std::hex << modbus->readU16(motorIndex, CRD514KD::Registers::PRESENT_ALARM) << "h" << std::endl;
                 
                 throw CRD514KDException(
@@ -217,26 +211,28 @@ namespace Motor
         }
     }
 
-    void StepperMotor::setMinAngle(double minAngle)
-    {
+    // Need comment!
+    void StepperMotor::setMinAngle(double minAngle){
     	this->minAngle = minAngle;
         modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((minAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
         anglesLimited = true;
     }
 
-    void StepperMotor::setMaxAngle(double maxAngle)
-    {
+    // Need comment!
+    void StepperMotor::setMaxAngle(double maxAngle){
     	this->maxAngle = maxAngle;
         modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((maxAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
         anglesLimited = true;
     }
 
-    void StepperMotor::disableAngleLimitations() {
+    // Need comment!
+    void StepperMotor::disableAngleLimitations(void){
         modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SOFTWARE_OVERTRAVEL, 0);
         anglesLimited = false;
     }
 
-    void StepperMotor::updateAngle(){
+    // Need comment!
+    void StepperMotor::updateAngle(void){
         currentAngle = setAngle;
     }
 }

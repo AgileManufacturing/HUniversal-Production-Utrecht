@@ -27,7 +27,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 #pragma once
 
@@ -36,19 +36,19 @@
 
 namespace Motor {
 	class MotorManager {
-		public:
-		    // No need to copy a motor, or can we duplicate it?
-		    MotorManager(ModbusController::ModbusController* modbus, StepperMotor** motors, int numberOfMotors) : 
-		        modbus(modbus), motors(motors), numberOfMotors(numberOfMotors), poweredOn(false) { }
-		    void powerOn();
-		    void powerOff();
-		    bool isPoweredOn(){ return poweredOn; }
+	public:
+	    // TODO: No need to copy a motor or can we duplicate it?
+	    MotorManager(ModbusController::ModbusController* modbus, StepperMotor** motors, int numberOfMotors) : 
+	        modbus(modbus), motors(motors), numberOfMotors(numberOfMotors), poweredOn(false){}
+	    void powerOn(void);
+	    void powerOff(void);
+	    bool isPoweredOn(void){ return poweredOn; }
 
-		    void startMovement();
-		private:
-			ModbusController::ModbusController* modbus;
-			StepperMotor** motors;
-			int numberOfMotors;
-			bool poweredOn;
+	    void startMovement(void);
+	private:
+		ModbusController::ModbusController* modbus;
+		StepperMotor** motors;
+		int numberOfMotors;
+		bool poweredOn;
 	};
 }

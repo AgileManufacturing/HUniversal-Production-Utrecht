@@ -28,7 +28,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 
 #pragma once
 
@@ -39,15 +39,13 @@
 #include <DeltaRobot/InverseKinematicsModel.h>
 #include <vector>
 
-namespace DeltaRobot
-{
+namespace DeltaRobot{
 	/**
 	 * This class represents a delta robot's effector work field.
 	 * This work field is stored as a 3D bitmap (bool array).
 	 * Every "pixel" in this map is called a voxel.
-	 **/
-	class EffectorBoundaries
-	{
+	 */
+	class EffectorBoundaries{
 	public:
 		~EffectorBoundaries();
 
@@ -57,99 +55,98 @@ namespace DeltaRobot
 		bool checkPath(const DataTypes::Point3D<double>& from, const DataTypes::Point3D<double>& to) const;
 		
 		/*
-		 * Returns a const bool pointer to the boundaries bitmap.
+		 * @brief Returns a const bool pointer to the boundaries bitmap.
+		 * 
 		 * @return Const bool pointer to the boundaries bitmap.
 		 */
 		inline const bool* getBitmap() const;
 		
 		/**
-		 * Gets the width of the boundary bitmap.
+		 * @brief Gets the width of the boundary bitmap.
+		 * 
 		 * @return returns The width of the boundary bitmap.
-		 **/
+		 */
 		inline int getWidth() const;
 		
 		/**
-		 * Gets the height of the boundary bitmap.
+		 * @brief Gets the height of the boundary bitmap.
+		 * 
 		 * @return returns The height of the boundary bitmap.
-		 **/
+		 */
 		inline int getHeight() const;
 		
 		/**
-		 * Gets the depth of the boundary bitmap.
+		 * @brief Gets the depth of the boundary bitmap.
+		 * 
 		 * @return returns The depth of the boundary bitmap.
-		 **/
+		 */
 		inline int getDepth() const;
 		
 		/**
-		 * Gets the used voxel_size for this boundary bitmap.
+		 * @brief Gets the used voxel_size for this boundary bitmap.
+		 * 
 		 * @return returns The used voxel_size.
-		 **/
+		 */
 		inline double getVoxelSize() const;
 
 	private:
-		
 		EffectorBoundaries(const InverseKinematicsModel& model,  Motor::StepperMotor* (&motors)[3], double voxelSize);
 
 		/**
 		 * Represents a 3-dimensional point in the 3D voxel array.
-		 **/
-		typedef struct BitmapCoordinate {
+		 */
+		typedef struct BitmapCoordinate{
 			int x, y, z;
-			BitmapCoordinate(int x, int y, int z) : x(x), y(y), z(z) {}
+			BitmapCoordinate(int x, int y, int z) : x(x), y(y), z(z){}
 		} BitmapCoordinate;
 
-		bool hasInvalidNeighbours(const BitmapCoordinate& p, char* pointValidityCache) const;
-		
-
-		bool isValid(const BitmapCoordinate& p, char* pointValidityCache) const;
-		
+		bool hasInvalidNeighbours(const BitmapCoordinate& coordinate, char* pointValidityCache) const;
+		bool isValid(const BitmapCoordinate& coordinate, char* pointValidityCache) const;
 		void generateBoundariesBitmap();
 		
 		/**
-		 * Converts a bitmap coordinate to a real life coordinate.
+		 * @brief Converts a bitmap coordinate to a real life coordinate.
+		 * 
 		 * @param coordinate The bitmap coordinate.
-		 **/
+		 */
 		inline DataTypes::Point3D<double> fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const;
 		
 		/**
-		 * Converts a real life coordinate to a bitmap coordinate.
+		 * @brief Converts a real life coordinate to a bitmap coordinate.
+		 * 
 		 * @param coordinate The real life coordinate.
-		 **/
+		 */
 		inline BitmapCoordinate fromRealCoordinate(DataTypes::Point3D<double> coordinate) const;
 
-		enum cacheEntry
-		{
+		enum cacheEntry{
 			UNKNOWN,
 			VALID,
 			INVALID
 		};
 
 		int width, height, depth;
-
 		bool* boundariesBitmap;
 		const InverseKinematicsModel &kinematics;
 		Motor::StepperMotor* (&motors)[3];
 		double voxelSize;
-
-
 	};
+	
+	const bool* EffectorBoundaries::getBitmap() const{ return boundariesBitmap; }
+	int EffectorBoundaries::getDepth() const{ return depth; }
+	int EffectorBoundaries::getHeight() const{ return height; }
+	int EffectorBoundaries::getWidth() const{ return width; }
+	double EffectorBoundaries::getVoxelSize() const{ return voxelSize; }
 
-	const bool* EffectorBoundaries::getBitmap() const {return boundariesBitmap;}
-	int EffectorBoundaries::getDepth() const {return depth;}
-	int EffectorBoundaries::getHeight() const {return height;}
-	int EffectorBoundaries::getWidth() const {return width;}
-	double EffectorBoundaries::getVoxelSize() const {return voxelSize;}
-
-	DataTypes::Point3D<double> EffectorBoundaries::fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const
-	{
+	// TODO: Need comment!
+	DataTypes::Point3D<double> EffectorBoundaries::fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const{
 		return DataTypes::Point3D<double>(
 				(double) coordinate.x * voxelSize + Measures::MIN_X,
 				(double) coordinate.y * voxelSize + Measures::MIN_Y,
 				(double) coordinate.z * voxelSize + Measures::MIN_Z);
 	}
 
-	EffectorBoundaries::BitmapCoordinate EffectorBoundaries::fromRealCoordinate(DataTypes::Point3D<double> coordinate) const
-	{
+	// TODO: Need comment!
+	EffectorBoundaries::BitmapCoordinate EffectorBoundaries::fromRealCoordinate(DataTypes::Point3D<double> coordinate) const{
 		return EffectorBoundaries::BitmapCoordinate(
 			(coordinate.x - Measures::MIN_X) / voxelSize,
 			(coordinate.y - Measures::MIN_Y) / voxelSize,
