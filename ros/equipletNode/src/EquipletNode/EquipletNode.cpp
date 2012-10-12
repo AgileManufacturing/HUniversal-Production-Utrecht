@@ -1,7 +1,7 @@
 /**
 * @file EquipletNode.cpp
-* @brief Symbolizes an entire Equiplet.
-* @date Created: 2012-10-09
+* @brief Symbolizes an entire EquipletNode.
+* @date Created: 2012-10-12
 *
 * @author Dennis Koole
 *
@@ -26,33 +26,15 @@
 * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#include <vector>
-#include <Mast/HardwareModuleProperties.h>
+#include "EquipletNode/EquipletNode.h"
 #include <algorithm>
-
-#define TOP_CAMERA "TopCamera"
-#define BOTTOM_CAMERA "BottomCamera"
-#define DELTAROBOT "DeltaRobot"
-#define GRIPPER2 "Gripper2"
-
-/**
- * The safety state of the Equiplet. This is equal 
- * to the highest state of the actor modules
- **/
-Mast::state safetyState;
-
-/**
- * The minimal operation state is equal to the lowest state of 
- * all modules that are actors
- **/
-Mast::state operationState;
 
 /**
  * Update the safetyState of the Equiplet
  * 
  * @param moduleTable The module containing all hardware modules
  **/
-void updateSafetyState(std::vector<Mast::HardwareModuleProperties> *moduleTable) {
+void EquipletNode::updateSafetyState() {
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
 	Mast::state newSafetyState = Mast::safe;
 	for(it = moduleTable->begin(); it < moduleTable->end(); it++) {
@@ -68,7 +50,7 @@ void updateSafetyState(std::vector<Mast::HardwareModuleProperties> *moduleTable)
  * 
  * @param moduleTable The module containing all hardware modules
  **/
-void updateOperationState(std::vector<Mast::HardwareModuleProperties> *moduleTable) {
+void EquipletNode::updateOperationState() {
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
 	bool operationStateSet = false;
 	// first set the operation state to the highest state possible 
@@ -103,7 +85,7 @@ void updateOperationState(std::vector<Mast::HardwareModuleProperties> *moduleTab
  * @param module The hardware to add to the table
  * @return true if the module has a unique name, otherwise false
  **/
-bool addHardwareModule(std::vector<Mast::HardwareModuleProperties> *moduleTable, const Mast::HardwareModuleProperties module) {
+bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 	/**
 	 * The use of the name to uniquely identify a hardware module is a temporary,
 	 * solution. This will probably be changed when the module database is implemented.
@@ -115,8 +97,8 @@ bool addHardwareModule(std::vector<Mast::HardwareModuleProperties> *moduleTable,
 		}
 	}	
 	moduleTable->push_back(module);
-	updateSafetyState(moduleTable);
-	updateOperationState(moduleTable);
+	updateSafetyState();
+	updateOperationState();
 	return true;
 }
 
@@ -128,7 +110,7 @@ bool addHardwareModule(std::vector<Mast::HardwareModuleProperties> *moduleTable,
  *
  * @return true if the hardware module is removed, false if the module could not be found in the table
  **/
-bool removeHardwareModule(std::vector<Mast::HardwareModuleProperties> *moduleTable, const std::string& name) {
+bool EquipletNode::removeHardwareModule(const std::string& name) {
 	/**
 	 * The use of the name to uniquely identify a hardware module is a temporary,
 	 * solution. This will probably be changed when the module database is implemented.
@@ -137,8 +119,8 @@ bool removeHardwareModule(std::vector<Mast::HardwareModuleProperties> *moduleTab
 	for(it = moduleTable->begin(); it < moduleTable->end(); it++) {
 		if((*it).name.compare(name) == 0) {
 			moduleTable->erase(it);
-			updateSafetyState(moduleTable);
-			updateOperationState(moduleTable);
+			updateSafetyState();
+			updateOperationState();
 			return true;
 		}
 	}	
@@ -150,46 +132,9 @@ bool removeHardwareModule(std::vector<Mast::HardwareModuleProperties> *moduleTab
  *
  * @param moduleTable The module table containing the hardware modules
  **/
-void printHardwareModules(std::vector<Mast::HardwareModuleProperties> *moduleTable) {
+void EquipletNode::printHardwareModules() {
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
 	for(it = moduleTable->begin(); it < moduleTable->end(); it++) {
 		std::cout << *it << std::endl;
 	}
-}
-
-int main(int argc, char **argv) {
-	// The table that holds the information about all hardware modules
-	std::vector<Mast::HardwareModuleProperties> *moduleTable = new std::vector<Mast::HardwareModuleProperties>();
-	Mast::HardwareModuleProperties topCamera(TOP_CAMERA, Mast::safe, false, false);
-	Mast::HardwareModuleProperties bottomCamera(BOTTOM_CAMERA, Mast::safe, false, false);
-	Mast::HardwareModuleProperties deltarobot(DELTAROBOT, Mast::start, true, false);
-	Mast::HardwareModuleProperties gripper2(GRIPPER2, Mast::standby, true, true);
-
-	// Add the three hardware modules
-	std::cout << "Add four hardware modules..." << std::endl;
-	addHardwareModule(moduleTable, topCamera);
-	addHardwareModule(moduleTable, bottomCamera);
-	addHardwareModule(moduleTable, deltarobot);
-	addHardwareModule(moduleTable, gripper2);
-
-	printHardwareModules(moduleTable);
-
-	std::cout << std::endl;
-	std::cout << "safety state: " << safetyState << std::endl;
-	std::cout << "operation state: " << operationState << std::endl; 
-
-	std::cout << std::endl;
-	std::cout << "Remove the hardware module " << GRIPPER2 << std::endl;
-	removeHardwareModule(moduleTable, GRIPPER2);
-
-	printHardwareModules(moduleTable);
-
-	std::cout << std::endl;
-	std::cout << "safety state: " << safetyState << std::endl;
-	std::cout << "operation state: " << operationState << std::endl; 
-
-	// delete the vector
-	delete moduleTable;
-
-	return 0;
 }
