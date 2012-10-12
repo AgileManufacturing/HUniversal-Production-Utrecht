@@ -33,7 +33,7 @@ package nl.hu.autokeystore.server;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Properties;
-
+import java.io.*;
 /**
  * The Storage class is responsible for storing and retrieving key-value-pairs. 
  * @author pascal
@@ -66,7 +66,7 @@ public class Storage
         }
         catch (Exception ex)
         {
-            System.out.println("Warning: Properties file could not be read. Starting with an empty database");
+                   System.out.println("Warning: Properties file could not be read. Starting with an empty database");
         }
     }
 
