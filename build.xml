@@ -5,6 +5,8 @@
 
   <property name="openBBS" value="openBBS.jar" />  
   <property name="autoKeyStoreServer" value="autoKeyStoreServer.jar" />
+  <property name="autoKeyStoreJava" value="autoKeyStoreJava.jar" />
+ <property name="blackboardServer" value="blackboardServer.jar" />
 
   <target name="init">
     <delete dir="${distdir}"/>
@@ -18,7 +20,7 @@
      <mkdir dir="${builddir}/openBBS"/>
     <javac
       srcdir="libraries/openBBS/src" 
-      classpath="libraries/openBBS/dependencies/commons-lang-2.3.jar" 
+      classpath="libraries/commons-lang-2.3.jar" 
       destdir="${builddir}/openBBS" 
       includeantruntime="true">
     </javac>
@@ -40,10 +42,41 @@
     </jar>
   </target>
 
+  <target name="autoKeyStoreJava">
+    <mkdir dir="${builddir}/autoKeyStoreJava"/>
+    <javac 
+      srcdir="libraries/autoKeyStoreJava/src" 
+      destdir="${builddir}/autoKeyStoreJava" 
+      includeantruntime="true">
+    </javac>
+    <jar jarfile="dist/${autoKeyStoreJava}" basedir="${builddir}/autoKeyStoreJava"/>
+  </target>
+
+  <!-- AUTO KEYSTORE SERVER TARGET-->
+  <target name="blackBoardServer" depends="autoKeyStoreJava, openBBS">
+    <mkdir dir="${builddir}/blackboardServer"/>
+    <javac 
+      srcdir="libraries/blackboardServer/src" 
+      destdir="${builddir}/blackboardServer"
+      classpath="libraries/commons-lang-2.3.jar:libraries/protobuf-java-2.4.1.jar:dist/autoKeyStoreJava.jar:dist/openBBS.jar"
+      includeantruntime="true">
+    </javac>
+    <jar jarfile="dist/${blackboardServer}" basedir="${builddir}/blackboardServer">
+      <manifest>  
+        <attribute name="Class-Path" value="../libraries/commons-lang-2.3.jar ../libraries/protobuf-java-2.4.1.jar autoKeyStoreJava.jar openBBS.jar"/> 
+        <attribute name="Main-Class" value="nl.hu.blackboard.server.Main" /> 
+      </manifest>  
+    </jar>
+  </target>
+
+
+
   <!-- ADD ALL LIBRARIES HERE-->
-  <target name="build"  depends="init, openBBS, autoKeyStoreServer">
+  <target name="build"  depends="init, openBBS, autoKeyStoreServer, autoKeyStoreJava, blackBoardServer">
       <delete dir="${builddir}"/>
   </target>
+
+
 
   <target name="clean"  description="clean up" >
     <!-- Delete the ${build} and ${dist} directory trees -->
