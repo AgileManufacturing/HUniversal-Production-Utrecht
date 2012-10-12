@@ -46,7 +46,7 @@ public final class AutoKeyStoreServer
         try
         {
             int port = 4447; //Default port for the KeyValueServer
-            String storageFile = "keystoredata"; //Default file with data to be served
+            String storageFile = "keyvalDB"; //Default file with data to be served
             boolean writeTestMode = false; 
 
             int i = 0;
