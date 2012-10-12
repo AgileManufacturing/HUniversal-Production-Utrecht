@@ -29,7 +29,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+ **/
 
 #pragma once
 #include <ModbusController/ModbusController.h>
@@ -42,7 +42,7 @@ namespace Motor{
 
         /**
          * CRD514KD slave addresses.
-         */
+         **/
         namespace Slaves{
             typedef enum _t{
                 BROADCAST = 0,
@@ -54,7 +54,7 @@ namespace Motor{
 
         /**
          * CRD514KD registers.
-         */
+         **/
         namespace Registers{
             enum _registers{
                 // 32-bit.
@@ -106,7 +106,7 @@ namespace Motor{
 
         /**
          * Bits of value at address CMD_1.
-         */
+         **/
         namespace CMD1Bits{
             enum _cmd1_bits{
                 START         = (1 << 8),
@@ -117,7 +117,7 @@ namespace Motor{
 
         /**
          * Bits of value at address STATUS_1.
-         */
+         **/
         namespace Status1Bits{
             enum _status1_bits{
                 WARNING = (1 << 6),
@@ -129,7 +129,7 @@ namespace Motor{
 
         /** 
          * Constants used when constructing a modbus rtu (using modbus_new_rtu).
-         */
+         **/
         namespace RtuConfig{
             const char DEVICE[] = "/dev/ttyS0";
             enum _rtu_config{

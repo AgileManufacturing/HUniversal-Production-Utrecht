@@ -27,7 +27,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+ **/
 
 #pragma once
 
@@ -47,7 +47,7 @@ namespace DeltaRobot{
 	 *	y-axis goes from front to back
 	 *	z-axis goes from bottom to top
 	 *	point (0,0,0) lies in the middle of all the motors at the motor's height
-	 */
+	 **/
 	class InverseKinematicsModel{
 	protected:
 		// Radius of the base in millimeters.
@@ -81,7 +81,7 @@ namespace DeltaRobot{
 		   TODO: motionPointer -> rotations?
 		 * @param destinationPoint point that shall be converted.
 		 * @param motionPointer output parameter, the results of the conversion will be stored here.
-		 */
+		 **/
 		virtual void pointToMotion(const DataTypes::Point3D<double>& destinationPoint,
 				DataTypes::MotorRotation<double>* (&rotations)[3]) const = 0;
 	};

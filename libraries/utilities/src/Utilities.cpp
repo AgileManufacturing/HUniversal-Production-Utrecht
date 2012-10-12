@@ -26,7 +26,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+ **/
 
 #include <Utilities/Utilities.h>
 
@@ -35,7 +35,7 @@ namespace Utilities{
      * @brief Get the current time in milliseconds.
      *
      * @return time in milliseconds.
-     */
+     **/
     long timeNow(void){
         boost::posix_time::ptime time = boost::posix_time::microsec_clock::local_time();
         boost::posix_time::time_duration duration(time.time_of_day());
@@ -46,7 +46,7 @@ namespace Utilities{
      * @brief Sleep for X milliseconds.
      *
      * @param milliseconds time in milliseconds.
-     */
+     **/
     void sleep(long milliseconds){
         boost::this_thread::sleep(boost::posix_time::milliseconds(milliseconds));
     }
@@ -57,7 +57,7 @@ namespace Utilities{
      * @param rad Amount of radians.
      *
      * @return degrees.
-     */
+     **/
     double radiansToDegrees(double radians){
 		return (radians / M_PI) * 180;
 	}
@@ -68,7 +68,7 @@ namespace Utilities{
      * @param deg Amount of degrees.
      *
      * @return radians.
-     */
+     **/
 	double degreesToRadians(double degrees){
 		return (degrees / 180) * M_PI;
 	}

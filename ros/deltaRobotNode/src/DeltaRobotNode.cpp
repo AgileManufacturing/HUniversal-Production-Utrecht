@@ -27,7 +27,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+ **/
 
 #include "ros/ros.h"
 #include "deltaRobotNode/MoveToPoint.h"
@@ -55,7 +55,7 @@ static DeltaRobot::DeltaRobot * deltaRobot;
  * @param res The response for this service as defined in Calibrate.srv
  * 
  * @return true if the calibration was succesfully, false otherwise.
- */
+ **/
 bool calibrate(deltaRobotNode::Calibrate::Request &req, deltaRobotNode::Calibrate::Response &res){
     // Calibrate the motors.
     if(!deltaRobot->calibrateMotors()){
@@ -72,7 +72,7 @@ bool calibrate(deltaRobotNode::Calibrate::Request &req, deltaRobotNode::Calibrat
  * @param res The response for this service as defined in MoveToPoint.srv
  * 
  * @return true.
- */
+ **/
 bool moveToPoint(deltaRobotNode::MoveToPoint::Request &req, deltaRobotNode::MoveToPoint::Response &res){
 	ROS_INFO("moveToPoint called");
 	DataTypes::Point3D<double>& effectorLocation = deltaRobot->getEffectorLocation();
@@ -81,7 +81,7 @@ bool moveToPoint(deltaRobotNode::MoveToPoint::Request &req, deltaRobotNode::Move
 	/**
 	 * Check if the DeltaRobot can move from the current effector location
 	 * to the absolute point given as argument for this service.
-	 */
+	 **/
 	if(!deltaRobot->checkPath(
 		DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
 		DataTypes::Point3D<double>(motion.x, motion.y, motion.z))){
@@ -101,7 +101,7 @@ bool moveToPoint(deltaRobotNode::MoveToPoint::Request &req, deltaRobotNode::Move
  * @param res The response for this service as defined in MovePath.srv
  * 
  * @return true.
- */
+ **/
 bool movePath(deltaRobotNode::MovePath::Request &req, deltaRobotNode::MovePath::Response &res){
 	ROS_INFO("movePath called");
 	deltaRobotNode::Motion currentMotion;
@@ -141,7 +141,7 @@ bool movePath(deltaRobotNode::MovePath::Request &req, deltaRobotNode::MovePath::
  * @param res The response for this service as defined in MoveToRelativePoint.srv
  * 
  * @return true.
- */
+ **/
 bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req, deltaRobotNode::MoveToRelativePoint::Response &res){
 	ROS_INFO("moveToRelativePoint called");
 	deltaRobotNode::Motion currentMotion;
@@ -182,7 +182,7 @@ bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req, delt
  * @param res The response for this service as defined in MoveRelativePath.srv
  *
  * @return true if path is allowed else return false.
- */
+ **/
 bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req, deltaRobotNode::MoveRelativePath::Response &res){
 	ROS_INFO("moveRelativePath called");
 

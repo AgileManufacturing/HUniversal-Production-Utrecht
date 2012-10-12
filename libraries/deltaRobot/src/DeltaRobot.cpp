@@ -27,7 +27,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+ **/
 
 #include <sstream>
 #include <iostream>
@@ -53,7 +53,7 @@ namespace DeltaRobot{
        TODO: param kinematics???
      * @param kinematics kinematics model that will be used to convert points to motions.
      * @param motors Implementation of motor interface that will be used to communicate with the motors. MUST BE EXACTLY 3.
-     */
+     **/
     DeltaRobot::DeltaRobot(DataTypes::DeltaRobotMeasures& deltaRobotMeasures, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3], modbus_t* modbusIO) :
         motors(motors),
         effectorLocation(DataTypes::Point3D<double>(0, 0, -161.9)), 
@@ -84,7 +84,7 @@ namespace DeltaRobot{
      * 
      * @param begin Starting point.
      * @param end Finish point.
-     */
+     **/
     void DeltaRobot::generateBoundaries(double voxelSize){
         boundaries = EffectorBoundaries::generateEffectorBoundaries((*kinematics), motors, voxelSize);
         boundariesGenerated = true;
@@ -96,7 +96,7 @@ namespace DeltaRobot{
      * 
      * @param begin Starting point.
      * @param end Finish point.
-     */
+     **/
     bool DeltaRobot::isValidAngle(int motorIndex, double angle){
         assert(motorIndex >= 0 && motorIndex < 3);
         return angle > motors[motorIndex]->getMinAngle() && angle < motors[motorIndex]->getMaxAngle();
@@ -110,7 +110,7 @@ namespace DeltaRobot{
      * 
        TODO: Guessed this is what it returns, correct?
      * @return if the path between two points is valid.
-     */
+     **/
     bool DeltaRobot::checkPath(const DataTypes::Point3D<double>& begin, const DataTypes::Point3D<double>& end){
         return boundaries->checkPath(begin, end);
     }
@@ -122,7 +122,7 @@ namespace DeltaRobot{
      * @param point 3-dimensional point to move to.
      * @param speed Movement speed in millimeters per second.
      * @param async Motions will be stored in a queue for later execution if true.
-     */
+     **/
     void DeltaRobot::moveTo(const DataTypes::Point3D<double>& point, double speed){
         // TODO: Some comments in this function would be nice.
         if(!motorManager->isPoweredOn()){
@@ -188,7 +188,7 @@ namespace DeltaRobot{
     * @param sensorIndex Index of the sensor. This corresponds to the motor index.
     * 
     * @return true if sensor is hit, false otherwise.
-    */
+    **/
     bool DeltaRobot::checkSensor(int sensorIndex){
         // The modbus library only reads
         uint16_t sensorRegister;
@@ -209,7 +209,7 @@ namespace DeltaRobot{
     * @param modbus The TCP modbus connection for IO controller.
     * @param motors The StepperMotor class controlling the 3 deltarobot motors.
     * @param motorIndex Index of the motor to be calibrated. When standing in front of the robot looking towards it, 0 is the right motor, 1 is the front motor and 2 is the left motor.
-    */
+    **/
     void DeltaRobot::calibrateMotor(int motorIndex){
         std::cout << "[DEBUG] Calibrating motor number " << motorIndex << std::endl;
         
@@ -249,7 +249,7 @@ namespace DeltaRobot{
     * @param motors The steppermotor3 class controlling the 3 deltarobot motors.
     * 
     * @return true if the calibration was succesful. False otherwise (e.g. failure on sensors.)
-    */
+    **/
     bool DeltaRobot::calibrateMotors(){
         // Check the availability of the sensors
         bool sensorFailure = false;
@@ -318,7 +318,7 @@ namespace DeltaRobot{
 
     /**
      * @brief Shuts down the deltarobot's hardware.
-     */
+     **/
     void DeltaRobot::powerOff(void){
         if(motorManager->isPoweredOn()){
             motorManager->powerOff();
@@ -327,7 +327,7 @@ namespace DeltaRobot{
 
     /**
      * @brief Turns on the deltarobot's hardware.
-     */
+     **/
     void DeltaRobot::powerOn(void){
         if(!motorManager->isPoweredOn()){
             motorManager->powerOn();

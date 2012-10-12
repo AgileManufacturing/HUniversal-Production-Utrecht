@@ -27,7 +27,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+ **/
 
 #include <Motor/StepperMotor.h>
 
@@ -142,7 +142,7 @@ namespace Motor{
      * @brief Writes the rotation data into the motor controller.
      * 
      * @param motorRotation A MotorRotation.
-     */
+     **/
     void StepperMotor::writeRotationData(const DataTypes::MotorRotation<double>& motorRotation){
         if(!poweredOn){
         	throw MotorException("motor drivers are not powered on");
@@ -166,7 +166,7 @@ namespace Motor{
 
     /**
      * @brief Start the movement of the motor.
-     */
+     **/
     void StepperMotor::startMovement(void){
         if(!poweredOn){
             throw MotorException("motor drivers are not powered on");
@@ -186,7 +186,7 @@ namespace Motor{
      * @brief Same as moveto, but rotates to an angle within a certain time.
      * 
      * @param time Time in seconds that the motors will take to rotate to the given angle. Speed member of given motion is ignored.
-     */
+     **/
     void StepperMotor::moveToWithin(const DataTypes::MotorRotation<double>& motorRotation, double time, bool start){
         DataTypes::MotorRotation<double> newMotorRotation = motorRotation;
         newMotorRotation.speed = fabs(currentAngle - motorRotation.angle) / time;

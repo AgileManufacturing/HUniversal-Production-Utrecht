@@ -28,7 +28,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+ **/
 
 #pragma once
 
@@ -44,7 +44,7 @@ namespace DeltaRobot{
 	 * This class represents a delta robot's effector work field.
 	 * This work field is stored as a 3D bitmap (bool array).
 	 * Every "pixel" in this map is called a voxel.
-	 */
+	 **/
 	class EffectorBoundaries{
 	public:
 		~EffectorBoundaries();
@@ -54,39 +54,39 @@ namespace DeltaRobot{
 		
 		bool checkPath(const DataTypes::Point3D<double>& from, const DataTypes::Point3D<double>& to) const;
 		
-		/*
+		/**
 		 * @brief Returns a const bool pointer to the boundaries bitmap.
 		 * 
 		 * @return Const bool pointer to the boundaries bitmap.
-		 */
+		 **/
 		inline const bool* getBitmap() const;
 		
 		/**
 		 * @brief Gets the width of the boundary bitmap.
 		 * 
 		 * @return returns The width of the boundary bitmap.
-		 */
+		 **/
 		inline int getWidth() const;
 		
 		/**
 		 * @brief Gets the height of the boundary bitmap.
 		 * 
 		 * @return returns The height of the boundary bitmap.
-		 */
+		 **/
 		inline int getHeight() const;
 		
 		/**
 		 * @brief Gets the depth of the boundary bitmap.
 		 * 
 		 * @return returns The depth of the boundary bitmap.
-		 */
+		 **/
 		inline int getDepth() const;
 		
 		/**
 		 * @brief Gets the used voxel_size for this boundary bitmap.
 		 * 
 		 * @return returns The used voxel_size.
-		 */
+		 **/
 		inline double getVoxelSize() const;
 
 	private:
@@ -94,7 +94,7 @@ namespace DeltaRobot{
 
 		/**
 		 * Represents a 3-dimensional point in the 3D voxel array.
-		 */
+		 **/
 		typedef struct BitmapCoordinate{
 			int x, y, z;
 			BitmapCoordinate(int x, int y, int z) : x(x), y(y), z(z){}
@@ -108,14 +108,14 @@ namespace DeltaRobot{
 		 * @brief Converts a bitmap coordinate to a real life coordinate.
 		 * 
 		 * @param coordinate The bitmap coordinate.
-		 */
+		 **/
 		inline DataTypes::Point3D<double> fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const;
 		
 		/**
 		 * @brief Converts a real life coordinate to a bitmap coordinate.
 		 * 
 		 * @param coordinate The real life coordinate.
-		 */
+		 **/
 		inline BitmapCoordinate fromRealCoordinate(DataTypes::Point3D<double> coordinate) const;
 
 		enum cacheEntry{

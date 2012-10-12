@@ -28,7 +28,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+ **/
 
 #include <ModbusController/ModbusController.h>
 #include <ModbusController/ModbusException.h>
@@ -51,13 +51,13 @@
  * - shadowing of certain registers
  * - the ability to write 32-bit values (instead of only 16-bit values)
  * - thread safety
- */
+ **/
 namespace ModbusController{
     /**
      * @brief Constructor.
      * 
      * @param context Initialized modbus_t.
-     */
+     **/
     ModbusController::ModbusController(modbus_t* context) : nextWriteTime(0), shadowRegisters(){
         this->context = context;
         if(context == NULL){
@@ -100,7 +100,7 @@ namespace ModbusController{
     /**
        TODO: DOXYGENIZE!
      * Utility function. used to wait the remaining time till nextWriteTime.
-     */
+     **/
     void ModbusController::wait(void){
         long delta = nextWriteTime - Utilities::timeNow();
         if(delta > 0){
@@ -115,7 +115,7 @@ namespace ModbusController{
      * @param address The register address.
      * 
      * @return the 64-bit motorcontroller and register address value.
-     */
+     **/
     uint64_t ModbusController::getShadowAddress(uint16_t slave, uint16_t address){
     	return (slave << 16) | address;
     }
@@ -128,7 +128,7 @@ namespace ModbusController{
      * @param outValue Output parameter, the value gets stored here.
      * 
      * @return true if the value was shadowed, false otherwise.
-     */
+     **/
     bool ModbusController::getShadow(uint16_t slave, uint32_t address, uint16_t& outValue){
         uint64_t shadowAddress = getShadowAddress(slave, address);
         ShadowMap::iterator it = shadowRegisters.find(shadowAddress);
@@ -145,7 +145,7 @@ namespace ModbusController{
      * @param slave crd514-kd motorcontroller address.
      * @param address The register's address.
      * @param value The value that will be written.
-     */
+     **/
     void ModbusController::setShadow(uint16_t slave, uint32_t address, uint16_t value){
         shadowRegisters[getShadowAddress(slave, address)] = value;
     }
@@ -156,7 +156,7 @@ namespace ModbusController{
      * @param slave crd514-kd motorcontroller address.
      * @param address The register's address.
      * @param value The value that will be written.
-     */    
+     **/    
     void ModbusController::setShadow32(uint16_t slave, uint32_t address, uint32_t value){
         shadowRegisters[getShadowAddress(slave, address+0)] = (value >> 16) & 0xFFFF;
         shadowRegisters[getShadowAddress(slave, address+1)] = value & 0xFFFF;
@@ -169,7 +169,7 @@ namespace ModbusController{
      * @param address The register address.
      * @param data Data that will be written.
      * @param useShadow If true is passed, it will check if writing is necessary by first checking the shadow registers.
-     */
+     **/
     void ModbusController::writeU16(uint16_t slave, uint16_t address, uint16_t data, bool useShadow){
         #ifdef MODBUS_LOGGING
             logFile << "WriteU16\t" << slave << "\t" << address << "\t" << data << std::endl;
@@ -209,7 +209,7 @@ namespace ModbusController{
      * @param firstAddress The first register's address.
      * @param data Data that will be written.
      * @param length Data length (in words).
-     */
+     **/
     void ModbusController::writeU16(uint16_t slave, uint16_t firstAddress, uint16_t* data, unsigned int length){
         if(length > 10){
             throw ModbusException("length > 10");
@@ -247,7 +247,7 @@ namespace ModbusController{
      * @param address The register's address.
      * @param data Data that will be written.
      * @param useShadow If true is passed, it will check if writing is necessary by first checking the shadow registers.
-     */    
+     **/    
     void ModbusController::writeU32(uint16_t slave, uint16_t address, uint32_t data, bool useShadow){
         #ifdef MODBUS_LOGGING
             logFile << "WriteU32\t" << slave << "\t" << address << "\t" << data << std::endl;
@@ -296,7 +296,7 @@ namespace ModbusController{
      * @param address Address that will be read from.
      * 
      * @return the value that was read.
-     */    
+     **/    
     uint16_t ModbusController::readU16(uint16_t slave, uint16_t address){
         wait();
         modbus_set_slave(context, slave);
@@ -323,7 +323,7 @@ namespace ModbusController{
      * @param firstAddress First registers address from which on data will be read.
      * @param data Will be stored here.
      * @param length Data length (in words).
-     */    
+     **/    
     void ModbusController::readU16(uint16_t slave, uint16_t firstAddress, uint16_t* data, unsigned int length){
         wait();
         modbus_set_slave(context, slave);
@@ -350,7 +350,7 @@ namespace ModbusController{
      * @param address Address from which will be read.
      * 
      * @return value that was read.
-     */    
+     **/    
     uint32_t ModbusController::readU32(uint16_t slave, uint16_t address){
         try{
             uint16_t data[2];

@@ -28,7 +28,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+ **/
 
 #include <DeltaRobot/InverseKinematics.h>
 
@@ -52,7 +52,7 @@
  * y-axis goes from front to back
  * z-axis goes from bottom to top
  * point (0,0,0) lies in the middle of all the motors at the motor's height
- */
+ **/
 
 namespace DeltaRobot {
 	InverseKinematics::InverseKinematics(const double base, const double hip,
@@ -77,7 +77,7 @@ namespace DeltaRobot {
 	 * @param motorLocation Angle of the motor on the z axis where 0 radians is directly in front of the deltarobot.
 	 * 
 	 * @return angle the motor should move to.
-	 */
+	 **/
 	double InverseKinematics::motorAngle(const DataTypes::Point3D<double>& destinationPoint, double motorLocation) const{
 		// Rotate the destination point so calculations can be made as if the motor is always in front
 		// (rotating the point places it in the same position relative to the front motor
@@ -137,7 +137,7 @@ namespace DeltaRobot {
 	 * @param motionPointer output parameter, the resulting motion is stored here.
 	 * 
 	 * @return true on success, false otherwise.
-	 */
+	 **/
 	void InverseKinematics::pointToMotion(const DataTypes::Point3D<double>& destinationPoint, DataTypes::MotorRotation<double>* (&rotations)[3]) const{
 		/**
 		 * Adding 180 degrees switches 0 degrees for the motor from the 
@@ -148,7 +148,7 @@ namespace DeltaRobot {
 		 * when looking at the side the effector is not located
 		 *  240 degrees: this motor is located 240 degrees counter clockwise of the 0 degrees motor
 		 * when looking at the side the effector is not located
-		 */
+		 **/
 		rotations[0]->angle = Utilities::degreesToRadians(180) + motorAngle(destinationPoint, Utilities::degreesToRadians(1 * 120));
 		rotations[1]->angle = Utilities::degreesToRadians(180) + motorAngle(destinationPoint, Utilities::degreesToRadians(0 * 120));
 		rotations[2]->angle = Utilities::degreesToRadians(180) + motorAngle(destinationPoint, Utilities::degreesToRadians(2 * 120));

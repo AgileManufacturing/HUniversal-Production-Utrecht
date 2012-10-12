@@ -27,7 +27,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+ **/
 
  #include <iostream>
  #include <termios.h>
@@ -63,7 +63,7 @@
   * @brief Release keyboard safely when Ctrl+C is pressed.
   *
   * @param sig The signal received from the Linux OS.
-  */
+  **/
  void quit(int sig){
     tcsetattr(kfd, TCSANOW, &cooked);
  	exit(0);

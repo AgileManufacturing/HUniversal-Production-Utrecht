@@ -29,7 +29,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+ **/
 
 #include <iostream>
 #include <DeltaRobot/Measures.h>
@@ -50,7 +50,7 @@ namespace DeltaRobot{
 	 * @param voxelSize The size of the voxels in millimeters.
 	 * 
 	 * @return Pointer to the object.
-	 */
+	 **/
 	EffectorBoundaries* EffectorBoundaries::generateEffectorBoundaries(const InverseKinematicsModel& model, Motor::StepperMotor* (&motors)[3], double voxelSize){
 		EffectorBoundaries* boundaries = new EffectorBoundaries(model, motors, voxelSize);
 		
@@ -76,7 +76,7 @@ namespace DeltaRobot{
 	 * @param to The destination point.
 	 *
 	 * @return true if a straight path from parameter 'from' to parameter 'to' is valid.
-	 */
+	 **/
     bool EffectorBoundaries::checkPath(const DataTypes::Point3D<double>& from, const DataTypes::Point3D<double>& to) const{
     	double x_length = to.x - from.x;
     	double y_length = to.y - from.y;
@@ -115,7 +115,7 @@ namespace DeltaRobot{
 	 * @param model Used to calculate the boundaries.
 	 * @param motors Used for the minimum and maximum angle of the motors.
 	 * @param voxelSize The size of the voxels.
-	 */
+	 **/
     EffectorBoundaries::EffectorBoundaries(const InverseKinematicsModel& model,  Motor::StepperMotor* (&motors)[3], double voxelSize)
     	: kinematics(model), motors(motors), voxelSize(voxelSize){}
 
@@ -130,7 +130,7 @@ namespace DeltaRobot{
 	 * @param pointValidityCache Pointer to the cache where already checked values are stored, and unchecked points are unknown. This as opposed to the bitmap, which is defaulted to false instead of unknown.
 	 *
 	 * @return True if coordinate has unreachable neighbouring voxels.
-	 */
+	 **/
 	bool EffectorBoundaries::hasInvalidNeighbours(const BitmapCoordinate& coordinate, char* pointValidityCache) const{
 		//TODO: Change from has_invalid_neighbours to isOnTheEdgeOfValidArea due to functionality change.
 
@@ -163,7 +163,7 @@ namespace DeltaRobot{
 	 * @param pointValidityCache Pointer to the cache where already checked values are stored, and unchecked points are unknown. This as opposed to the bitmap, which is defaulted to false instead of unknown.
 	 * 
 	 * @return true if coordinate is reachable by the effector.
-	 */
+	 **/
     bool EffectorBoundaries::isValid(const BitmapCoordinate& coordinate, char* pointValidityCache) const{
     	char* fromCache;
     	char dummy = UNKNOWN;
@@ -214,7 +214,7 @@ namespace DeltaRobot{
 	/**
 	   TODO: DOXYGENIZE!
 	 * Generates boundaries for the robot. All members should be initialized before calling this function.
-	 */
+	 **/
     void EffectorBoundaries::generateBoundariesBitmap(void){
     	char* pointValidityCache = new char[width * depth * height];
     	memset(pointValidityCache, 0, width * depth * height * sizeof(char));
@@ -236,7 +236,7 @@ namespace DeltaRobot{
 			 * - push the voxel on the empty stack
 			 * - set the voxel as true in the bitmap
 			 * - end the loop
-			 */
+			 **/
 			if(!isValid(fromRealCoordinate(begin), pointValidityCache)){
 				begin.x -= voxelSize;
 				BitmapCoordinate startingVoxel = fromRealCoordinate(begin);
@@ -247,7 +247,7 @@ namespace DeltaRobot{
 		}
 		/**
 		 * If the right-most voxel is in reach and an invalid voxel is never found, the position of begin.x will be outside of the box limits. Step back inside the box and add that voxel to the stack and set it as true in the bitmap.
-		 */
+		 **/
 		if(begin.x >= Measures::MAX_X){
 			begin.x -= voxelSize;
 			BitmapCoordinate startingVoxel = fromRealCoordinate(begin);
@@ -257,7 +257,7 @@ namespace DeltaRobot{
 
 		/**
 		 * Start with the last added voxel on the stack and add new voxels to the stack. Do this until the valid borders (all valid voxels bordering unvalid voxels or the MAX/MIN_X/Y/Z box) of the valid voxel area are known (stack = empty).
-		 */
+		 **/
 		while(!cstack.empty()){
 			// Get last added voxel from the stack and remove it from the stack.
 			BitmapCoordinate borderVoxel = cstack.top();
@@ -273,7 +273,7 @@ namespace DeltaRobot{
 						} else{
 							/**
 							 * New valid voxels on the valid border are added to the stack and set in the bitmap.
-							 */
+							 **/
 							int index = x + y * width + z * width * depth;
 							if(isValid(BitmapCoordinate(x, y, z), pointValidityCache)
 									&& !boundariesBitmap[index]

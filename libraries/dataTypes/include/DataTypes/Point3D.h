@@ -31,7 +31,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @note 2012-10-11 DV: Removed unused methods
- */
+ **/
 
 #pragma once
 
@@ -66,7 +66,7 @@ namespace DataTypes{
 		 * @param p The point to calculate the euclidean distance to from *this.
 		 * 
 		 * @return the euclidean distance.
-		 */
+		 **/
 		inline T distance(const Point3D<T>& point) const{
 			T dx = x - point.x;
 			T dy = y - point.y;
@@ -80,7 +80,7 @@ namespace DataTypes{
 		 * @param rotationRadians Rotation in radians.
 		 * 
 		 * @return the rotated point.
-		 */
+		 **/
 		inline Point3D<T> rotateAroundYAxis(T rotationRadians) const{
 			return Point3D<T>(x * cos(rotationRadians) - z * sin(rotationRadians), y,
 					x * sin(rotationRadians) + z * cos(rotationRadians));
@@ -92,7 +92,7 @@ namespace DataTypes{
 		 * @param rotationRadians Rotation in radians.
 		 * 
 		 * @return the rotated point.
-		 */
+		 **/
 		inline Point3D<T> rotateAroundZAxis(T rotationRadians) const{
 			return Point3D<T>(x * cos(rotationRadians) - y * sin(rotationRadians),
 					x * sin(rotationRadians) + y * cos(rotationRadians), z);
