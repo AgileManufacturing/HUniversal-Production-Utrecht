@@ -54,7 +54,7 @@ namespace Motor{
         } catch(std::runtime_error& err){}
     }
 
-    // Need comment!
+    // TODO: Need comment!
     void StepperMotor::powerOn(void){
         if(!poweredOn){
             boost::lock_guard<boost::mutex> lock(modbus->modbusMutex);
@@ -86,7 +86,7 @@ namespace Motor{
         }
     }
 
-    // Need comment!
+    // TODO: Need comment!
     void StepperMotor::powerOff(void){
         if(poweredOn){
             stop();
@@ -97,7 +97,7 @@ namespace Motor{
     }
 
     /**
-     * @brief Stops the motors & clears the motion queue.
+     * Stops the motors & clears the motion queue.
      * 
      * @note (un)locks queue_mutex.
      **/
@@ -114,7 +114,7 @@ namespace Motor{
         }
     }
 
-    // Need comment!
+    // TODO: Need comment!
     void StepperMotor::resetCounter(void){
         waitTillReady();
         modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, 0);
@@ -125,21 +125,21 @@ namespace Motor{
         modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
     }
 
-    // Need comment!
+    // TODO: Need comment!
     void StepperMotor::setMotorLimits(double minAngle, double maxAngle){
         // Set motors limits.
         setMinAngle(minAngle);
         setMaxAngle(maxAngle);
     }
 
-    // Need comment!
+    // TODO: Need comment!
     void StepperMotor::moveTo(const DataTypes::MotorRotation<double>& motorRotation){
         writeRotationData(motorRotation);
         startMovement();
     }
 
     /**
-     * @brief Writes the rotation data into the motor controller.
+     * Writes the rotation data into the motor controller.
      * 
      * @param motorRotation A MotorRotation.
      **/
@@ -165,7 +165,7 @@ namespace Motor{
     }
 
     /**
-     * @brief Start the movement of the motor.
+     * Start the movement of the motor.
      **/
     void StepperMotor::startMovement(void){
         if(!poweredOn){
@@ -183,7 +183,7 @@ namespace Motor{
 
 
     /**
-     * @brief Same as moveto, but rotates to an angle within a certain time.
+     * Same as moveto, but rotates to an angle within a certain time.
      * 
      * @param time Time in seconds that the motors will take to rotate to the given angle. Speed member of given motion is ignored.
      **/
@@ -197,7 +197,7 @@ namespace Motor{
         }
     }
 
-    // Need comment!
+    // TODO: Need comment!
     void StepperMotor::waitTillReady(void){
        uint16_t status_1;
        while(!((status_1 = modbus->readU16(motorIndex, CRD514KD::Registers::STATUS_1)) & CRD514KD::Status1Bits::READY)){
@@ -211,27 +211,27 @@ namespace Motor{
         }
     }
 
-    // Need comment!
+    // TODO: Need comment!
     void StepperMotor::setMinAngle(double minAngle){
     	this->minAngle = minAngle;
         modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((minAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
         anglesLimited = true;
     }
 
-    // Need comment!
+    // TODO: Need comment!
     void StepperMotor::setMaxAngle(double maxAngle){
     	this->maxAngle = maxAngle;
         modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((maxAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
         anglesLimited = true;
     }
 
-    // Need comment!
+    // TODO: Need comment!
     void StepperMotor::disableAngleLimitations(void){
         modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SOFTWARE_OVERTRAVEL, 0);
         anglesLimited = false;
     }
 
-    // Need comment!
+    // TODO: Need comment!
     void StepperMotor::updateAngle(void){
         currentAngle = setAngle;
     }

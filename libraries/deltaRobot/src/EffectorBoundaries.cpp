@@ -43,7 +43,7 @@
 
 namespace DeltaRobot{
 	/**
-	 * @brief Function to generate the boundaries and returns a pointer to the object.
+	 * Function to generate the boundaries and returns a pointer to the object.
 	 * 
 	 * @param model Used to calculate the boundaries.
 	 * @param motors Used for the minimum and maximum angle of the motors.
@@ -69,7 +69,7 @@ namespace DeltaRobot{
     }
 
 	/**
-	 * @brief Checks if the path from the starting- to the destination point is not going out of the
+	 * Checks if the path from the starting- to the destination point is not going out of the
 	 * robot's boundaries.
 	 * 
 	 * @param from The starting point.
@@ -110,7 +110,7 @@ namespace DeltaRobot{
     }
 
 	/**
-	 * @brief Private constructor, it also initializes the voxel array.
+	 * Private constructor, it also initializes the voxel array.
 	 * 
 	 * @param model Used to calculate the boundaries.
 	 * @param motors Used for the minimum and maximum angle of the motors.
@@ -124,7 +124,7 @@ namespace DeltaRobot{
     }
 
 	/**
-	 * @brief Checks if one of the neighbouring voxels can't be reached by the effector. This includes voxels outside of the MIN/MAX_X/Y/Z box as defined in measures.
+	 * Checks if one of the neighbouring voxels can't be reached by the effector. This includes voxels outside of the MIN/MAX_X/Y/Z box as defined in measures.
 	 * 
 	 * @param coordinate The point in the bitmap that has to be checked.
 	 * @param pointValidityCache Pointer to the cache where already checked values are stored, and unchecked points are unknown. This as opposed to the bitmap, which is defaulted to false instead of unknown.
@@ -158,7 +158,7 @@ namespace DeltaRobot{
     }
 
 	/**
-	 * @brief Checks if the point can be reached by the effector. Whether the point can be reached is determined by the kinematics, minimum and maximum angles of the motors and the MIN/MAX_X/Y/Z box determined in measures.
+	 * Checks if the point can be reached by the effector. Whether the point can be reached is determined by the kinematics, minimum and maximum angles of the motors and the MIN/MAX_X/Y/Z box determined in measures.
 	 * @param coordinate The point that is checked if it can be reached by the effector.
 	 * @param pointValidityCache Pointer to the cache where already checked values are stored, and unchecked points are unknown. This as opposed to the bitmap, which is defaulted to false instead of unknown.
 	 * 
@@ -212,7 +212,6 @@ namespace DeltaRobot{
     }
 
 	/**
-	   TODO: DOXYGENIZE!
 	 * Generates boundaries for the robot. All members should be initialized before calling this function.
 	 **/
     void EffectorBoundaries::generateBoundariesBitmap(void){

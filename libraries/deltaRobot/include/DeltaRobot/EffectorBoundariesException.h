@@ -39,9 +39,9 @@
 
 namespace DeltaRobot{
 	/**
-	 * @brief exception to indicate modbus errors.
+	 * Exception to indicate modbus errors.
 	 *
-	 * modbus_ctrl can throw this exception whenever a modbus related error occurs.
+	 * ModbusController can throw this exception whenever a modbus related error occurs.
 	 **/
     class EffectorBoundariesException : public std::runtime_error{
     public:

@@ -67,7 +67,7 @@ namespace Motor{
 		}
 
 		/**
-		 * @brief Check if there is a warning.
+		 * Check if there is a warning.
 		 * 
 		 * @return true if there is a warning.
 		 **/
@@ -76,7 +76,7 @@ namespace Motor{
 		}
 
 		/**
-		 * @brief Check if there is an alarm.
+		 * Check if there is an alarm.
 		 * 
 		 * @return true when there is an alarm.
 		 **/

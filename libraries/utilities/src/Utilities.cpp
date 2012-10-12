@@ -32,7 +32,7 @@
 
 namespace Utilities{
     /**
-     * @brief Get the current time in milliseconds.
+     * Get the current time in milliseconds.
      *
      * @return time in milliseconds.
      **/
@@ -43,7 +43,7 @@ namespace Utilities{
     }
     
     /**
-     * @brief Sleep for X milliseconds.
+     * Sleep for X milliseconds.
      *
      * @param milliseconds time in milliseconds.
      **/
@@ -52,7 +52,7 @@ namespace Utilities{
     }
 
     /**
-     * @brief Converts radians to degrees.
+     * Converts radians to degrees.
      *
      * @param rad Amount of radians.
      *
@@ -63,7 +63,7 @@ namespace Utilities{
 	}
 
     /**
-     * @brief Converts degrees to radians.
+     * Converts degrees to radians.
      *
      * @param deg Amount of degrees.
      *

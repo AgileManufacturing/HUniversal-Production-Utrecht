@@ -43,24 +43,24 @@ namespace Motor{
            virtual ~MotorInterface(void){}
 
            /**
-            * @brief Turns on the motors.
+            * Turns on the motors.
             **/
            virtual void powerOn(void) = 0;
 
            /**
-            * @brief Shuts down the motors.
+            * Shuts down the motors.
             **/
            virtual void powerOff(void) = 0;
 
            /**
-            * @brief Stops the motors.
+            * Stops the motors.
             **/
            virtual void stop(void) = 0;
 
            virtual void setMotorLimits(double minAngle, double maxAngle) = 0;
 
            /**
-            * @brief Rotate the motors.
+            * Rotate the motors.
             * 
             * @param motorRotation Defines the angles, speed, acceleration and deceleration of the motors.
             * @param async function is performed asyncronous if true.
@@ -68,7 +68,7 @@ namespace Motor{
            virtual void moveTo(const DataTypes::MotorRotation<double>& motorRotation) = 0;
 
            /**
-            * @brief Rotates the motors within a certain time. The speed member of the given motion is ignored.
+            * Rotates the motors within a certain time. The speed member of the given motion is ignored.
             * 
             * @param motorRotation Defines the angles, speed, acceleration and deceleration of the motors.
             * @param time Time in seconds that the motors will take to rotate to the given angles. 
@@ -79,26 +79,26 @@ namespace Motor{
            void waitTillReady(void);
 
            /**
-            * @brief Get the minimal angle the motors can move to.
+            * Get the minimal angle the motors can move to.
             * 
             * @return angle in radians.
             **/
            virtual double getMinAngle(void) const = 0;
 
            /**
-            * @brief Get the maximum angle the motors can move to.
+            * Get the maximum angle the motors can move to.
             * 
             * @return angle in radians.
             **/
            virtual double getMaxAngle(void) const = 0;
 
            /**
-            * @brief Sets the current angle.
+            * Sets the current angle.
             **/
            virtual void setCurrentAngle(double angle) = 0;
 
            /**
-            * @brief Determine if the motor driver(s) are powered on.
+            * Determine if the motor driver(s) are powered on.
             * 
             * @return true of powered on, false otherwise.
             **/

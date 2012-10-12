@@ -54,7 +54,7 @@
  **/
 namespace ModbusController{
     /**
-     * @brief Constructor.
+     * Constructor.
      * 
      * @param context Initialized modbus_t.
      **/
@@ -98,7 +98,6 @@ namespace ModbusController{
     }
 
     /**
-       TODO: DOXYGENIZE!
      * Utility function. used to wait the remaining time till nextWriteTime.
      **/
     void ModbusController::wait(void){
@@ -109,7 +108,7 @@ namespace ModbusController{
     }
 
     /**
-     * @brief Calculates a 64-bit value representing the crd514-kd motorcontroller and register address.
+     * Calculates a 64-bit value representing the crd514-kd motorcontroller and register address.
      * 
      * @param slave crd514-kd motorcontroller address.
      * @param address The register address.
@@ -121,7 +120,7 @@ namespace ModbusController{
     }
 
     /**
-     * @brief Reads a 16-bit shadow register.
+     * Reads a 16-bit shadow register.
      * 
      * @param slave crd514-kd motorcontroller address.
      * @param address The register address.
@@ -140,7 +139,7 @@ namespace ModbusController{
     }
     
     /**
-     * @brief Writes a 16-bit value to a shadow register.
+     * Writes a 16-bit value to a shadow register.
      * 
      * @param slave crd514-kd motorcontroller address.
      * @param address The register's address.
@@ -151,7 +150,7 @@ namespace ModbusController{
     }
 
     /**
-     * @brief Writes a 32-bit value to a shadow register.
+     * Writes a 32-bit value to a shadow register.
      * 
      * @param slave crd514-kd motorcontroller address.
      * @param address The register's address.
@@ -163,7 +162,7 @@ namespace ModbusController{
     }
 
     /**
-     * @brief Write a 16-bit value over modbus.
+     * Write a 16-bit value over modbus.
      * 
      * @param slave crd514-kd motorcontroller address.
      * @param address The register address.
@@ -203,7 +202,7 @@ namespace ModbusController{
     }
 
     /**
-     * @brief Write an array of 16-bit values over modbus.
+     * Write an array of 16-bit values over modbus.
      * 
      * @param slave crd514-kd motorcontroller address.
      * @param firstAddress The first register's address.
@@ -241,7 +240,7 @@ namespace ModbusController{
     }
 
     /**
-     * @brief Write a 32-bit value over modbus.
+     * Write a 32-bit value over modbus.
      * 
      * @param slave crd514-kd motorcontroller address.
      * @param address The register's address.
@@ -290,7 +289,7 @@ namespace ModbusController{
     }
 
     /**
-     * @brief Read a 16-bit value.
+     * Read a 16-bit value.
      * 
      * @param slave Slave address.
      * @param address Address that will be read from.
@@ -317,7 +316,7 @@ namespace ModbusController{
     }
 
     /**
-     * @brief Read an array of 16-bit values.
+     * Read an array of 16-bit values.
      * 
      * @param slave The slave address.
      * @param firstAddress First registers address from which on data will be read.
@@ -344,7 +343,7 @@ namespace ModbusController{
     }
   
     /**
-     * @brief Read a 32-bit value.
+     * Read a 32-bit value.
      * 
      * @param slave The slave address.
      * @param address Address from which will be read.

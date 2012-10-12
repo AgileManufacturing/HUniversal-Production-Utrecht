@@ -1,6 +1,11 @@
 /**
  * @file InverseKinematics.cpp
- * @brief Inverse kinematics implementation. Based on work from Viacheslav Slavinsky.
+ * @brief Inverse kinematics implementation. Based on work from Viacheslav Slavinsky. 
+ * conventions sitting in front of delta robot:
+ * x-axis goes from left to right
+ * y-axis goes from front to back
+ * z-axis goes from bottom to top
+ * point (0,0,0) lies in the middle of all the motors at the motor's height
  *
  * @author 1.0 Lukas Vermond
  * @author 1.0 Kasper van Nieuwland
@@ -42,7 +47,6 @@
 #include <Utilities/Utilities.h>
 
 /**
-   TODO: DOXYGENIZE!
  * InverseKinematics.cpp -> An implementation of the kinematics model.
  * 
  * ideas from Viacheslav Slavinsky are used
@@ -71,7 +75,7 @@ namespace DeltaRobot {
 	#define square(x) ((x)*(x))
 
 	/**
-	 * @brief Translates a point to an angle for a motor.
+	 * Translates a point to an angle for a motor.
 	 * 
 	 * @param destinationPoint Point where the midpoint of the effector is wanted.
 	 * @param motorLocation Angle of the motor on the z axis where 0 radians is directly in front of the deltarobot.
@@ -130,7 +134,7 @@ namespace DeltaRobot {
 	#undef square
 
 	/**
-	 * @brief Translates a point to a motion.
+	 * Translates a point to a motion.
 	 * 
 	   TODO: motionPointer is gone and param rotations is missing.
 	 * @param destinationPoint destination point.

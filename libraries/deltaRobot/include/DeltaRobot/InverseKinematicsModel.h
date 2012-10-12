@@ -76,7 +76,7 @@ namespace DeltaRobot{
 		const double maxAngleHipAnkle;
 
 		/**
-		 * @brief converts a point to a motion.
+		 * Converts a point to a motion.
 		 * 
 		   TODO: motionPointer -> rotations?
 		 * @param destinationPoint point that shall be converted.

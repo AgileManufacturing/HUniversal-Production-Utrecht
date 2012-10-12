@@ -49,7 +49,7 @@
 static DeltaRobot::DeltaRobot * deltaRobot;
 
 /**
- * @brief Starts the (re)calibration of the robot.
+ * Starts the (re)calibration of the robot.
  * 
  * @param req The request for this service as defined in Calibrate.srv
  * @param res The response for this service as defined in Calibrate.srv
@@ -66,7 +66,7 @@ bool calibrate(deltaRobotNode::Calibrate::Request &req, deltaRobotNode::Calibrat
 }
 
 /**
- * @brief Move to an absolute point. Will be implemented in a later release.
+ * Move to an absolute point. Will be implemented in a later release.
  *
  * @param req The request for this service as defined in MoveToPoint.srv
  * @param res The response for this service as defined in MoveToPoint.srv
@@ -95,7 +95,7 @@ bool moveToPoint(deltaRobotNode::MoveToPoint::Request &req, deltaRobotNode::Move
 }
 
 /**
- * @brief Move to a number of absolute points.
+ * Move to a number of absolute points.
  *
  * @param req The request for this service as defined in MovePath.srv
  * @param res The response for this service as defined in MovePath.srv
@@ -135,7 +135,7 @@ bool movePath(deltaRobotNode::MovePath::Request &req, deltaRobotNode::MovePath::
 }
 
 /**
- * @brief Move to a point that is relative to the current effector location.
+ * Move to a point that is relative to the current effector location.
  *
  * @param req The request for this service as defined in MoveToRelativePoint.srv
  * @param res The response for this service as defined in MoveToRelativePoint.srv
@@ -176,7 +176,7 @@ bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req, delt
 }
 
 /**
- * @brief Move to a number of relative points. 
+ * Move to a number of relative points. 
  *
  * @param req The request for this service as defined in MoveRelativePath.srv
  * @param res The response for this service as defined in MoveRelativePath.srv

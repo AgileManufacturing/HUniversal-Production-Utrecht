@@ -60,7 +60,7 @@
  struct termios cooked, raw;
 
  /**
-  * @brief Release keyboard safely when Ctrl+C is pressed.
+  * Release keyboard safely when Ctrl+C is pressed.
   *
   * @param sig The signal received from the Linux OS.
   **/

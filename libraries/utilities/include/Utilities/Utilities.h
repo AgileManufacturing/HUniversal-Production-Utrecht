@@ -43,7 +43,7 @@ namespace Utilities{
     double degreesToRadians(double degrees);
 
     /**
-     * @brief Utility class to time stuff.
+     * Utility class to time stuff.
      * @note TEMPORARY.
      **/
     class StopWatch{

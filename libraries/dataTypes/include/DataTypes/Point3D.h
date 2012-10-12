@@ -61,7 +61,7 @@ namespace DataTypes{
 		}
 
 		/**
-		 * @brief Calculates the euclidean distance between *this and p.
+		 * Calculates the euclidean distance between *this and p.
 		 *
 		 * @param p The point to calculate the euclidean distance to from *this.
 		 * 
@@ -75,7 +75,7 @@ namespace DataTypes{
 		}
 
 		/**
-		 * @brief Rotate the point around the Y axis.
+		 * Rotate the point around the Y axis.
 		 *
 		 * @param rotationRadians Rotation in radians.
 		 * 
@@ -87,7 +87,7 @@ namespace DataTypes{
 		}
 
 		/**
-		 * @brief Rotate the point around the Z axis.
+		 * Rotate the point around the Z axis.
 		 *
 		 * @param rotationRadians Rotation in radians.
 		 * 

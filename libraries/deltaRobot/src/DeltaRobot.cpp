@@ -47,7 +47,7 @@
 
 namespace DeltaRobot{
     /**
-     * @brief Constructor.
+     * Constructor.
      * 
        TODO: missing params deltaRobotMeasures, motorManager, modbusIO
        TODO: param kinematics???
@@ -79,11 +79,7 @@ namespace DeltaRobot{
     }
     
     /**
-       TODO: This comments needs a review, it's totally non-sense
-     * @brief Checks the path between two points.
-     * 
-     * @param begin Starting point.
-     * @param end Finish point.
+       TODO: comment
      **/
     void DeltaRobot::generateBoundaries(double voxelSize){
         boundaries = EffectorBoundaries::generateEffectorBoundaries((*kinematics), motors, voxelSize);
@@ -91,11 +87,7 @@ namespace DeltaRobot{
     }
 
     /**
-       TODO: This comments needs a review, it's totally non-sense
-     * @brief Checks the path between two points.
-     * 
-     * @param begin Starting point.
-     * @param end Finish point.
+       TODO: comment
      **/
     bool DeltaRobot::isValidAngle(int motorIndex, double angle){
         assert(motorIndex >= 0 && motorIndex < 3);
@@ -103,12 +95,11 @@ namespace DeltaRobot{
     }
 
     /**
-     * @brief Checks the path between two points.
+     * Checks the path between two points.
      * 
      * @param begin Starting point.
      * @param end Finish point.
      * 
-       TODO: Guessed this is what it returns, correct?
      * @return if the path between two points is valid.
      **/
     bool DeltaRobot::checkPath(const DataTypes::Point3D<double>& begin, const DataTypes::Point3D<double>& end){
@@ -116,12 +107,10 @@ namespace DeltaRobot{
     }
 
     /**
-     * @brief Makes the deltarobot move to a point.
+     * Makes the deltarobot move to a point.
      * 
-       TODO: param async???
      * @param point 3-dimensional point to move to.
      * @param speed Movement speed in millimeters per second.
-     * @param async Motions will be stored in a queue for later execution if true.
      **/
     void DeltaRobot::moveTo(const DataTypes::Point3D<double>& point, double speed){
         // TODO: Some comments in this function would be nice.
@@ -181,10 +170,8 @@ namespace DeltaRobot{
     }
 
     /**
-    * @brief Reads calibration sensor and returns whether it is hit.
+    * Reads calibration sensor and returns whether it is hit.
     * 
-      TODO: param modbus????
-    * @param modbus The TCP modbus connection for IO controller.
     * @param sensorIndex Index of the sensor. This corresponds to the motor index.
     * 
     * @return true if sensor is hit, false otherwise.
@@ -203,11 +190,8 @@ namespace DeltaRobot{
     }
 
     /**
-    * @brief Calibrates a single motor by moving the motor upwards till the calibration sensor is pushed.
+    * Calibrates a single motor by moving the motor upwards till the calibration sensor is pushed.
     * 
-      TODO: param modbus & param motors?????
-    * @param modbus The TCP modbus connection for IO controller.
-    * @param motors The StepperMotor class controlling the 3 deltarobot motors.
     * @param motorIndex Index of the motor to be calibrated. When standing in front of the robot looking towards it, 0 is the right motor, 1 is the front motor and 2 is the left motor.
     **/
     void DeltaRobot::calibrateMotor(int motorIndex){
@@ -241,7 +225,7 @@ namespace DeltaRobot{
     }
 
     /**
-    * @brief Calibrates all three motors of the deltarobot by moving the motors upwards one by one.
+    * Calibrates all three motors of the deltarobot by moving the motors upwards one by one.
     * After a motor is moved upwards, it is moved back to the 0 degrees state.
     * This function temporarily removes the limitations for the motorcontrollers.
     * 
@@ -317,7 +301,7 @@ namespace DeltaRobot{
     }
 
     /**
-     * @brief Shuts down the deltarobot's hardware.
+     * Shuts down the deltarobot's hardware.
      **/
     void DeltaRobot::powerOff(void){
         if(motorManager->isPoweredOn()){
@@ -326,7 +310,7 @@ namespace DeltaRobot{
     }
 
     /**
-     * @brief Turns on the deltarobot's hardware.
+     * Turns on the deltarobot's hardware.
      **/
     void DeltaRobot::powerOn(void){
         if(!motorManager->isPoweredOn()){

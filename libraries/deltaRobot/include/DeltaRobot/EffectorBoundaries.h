@@ -55,35 +55,35 @@ namespace DeltaRobot{
 		bool checkPath(const DataTypes::Point3D<double>& from, const DataTypes::Point3D<double>& to) const;
 		
 		/**
-		 * @brief Returns a const bool pointer to the boundaries bitmap.
+		 * Returns a const bool pointer to the boundaries bitmap.
 		 * 
 		 * @return Const bool pointer to the boundaries bitmap.
 		 **/
 		inline const bool* getBitmap() const;
 		
 		/**
-		 * @brief Gets the width of the boundary bitmap.
+		 * Gets the width of the boundary bitmap.
 		 * 
 		 * @return returns The width of the boundary bitmap.
 		 **/
 		inline int getWidth() const;
 		
 		/**
-		 * @brief Gets the height of the boundary bitmap.
+		 * Gets the height of the boundary bitmap.
 		 * 
 		 * @return returns The height of the boundary bitmap.
 		 **/
 		inline int getHeight() const;
 		
 		/**
-		 * @brief Gets the depth of the boundary bitmap.
+		 * Gets the depth of the boundary bitmap.
 		 * 
 		 * @return returns The depth of the boundary bitmap.
 		 **/
 		inline int getDepth() const;
 		
 		/**
-		 * @brief Gets the used voxel_size for this boundary bitmap.
+		 * Gets the used voxel_size for this boundary bitmap.
 		 * 
 		 * @return returns The used voxel_size.
 		 **/
@@ -105,14 +105,14 @@ namespace DeltaRobot{
 		void generateBoundariesBitmap();
 		
 		/**
-		 * @brief Converts a bitmap coordinate to a real life coordinate.
+		 * Converts a bitmap coordinate to a real life coordinate.
 		 * 
 		 * @param coordinate The bitmap coordinate.
 		 **/
 		inline DataTypes::Point3D<double> fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const;
 		
 		/**
-		 * @brief Converts a real life coordinate to a bitmap coordinate.
+		 * Converts a real life coordinate to a bitmap coordinate.
 		 * 
 		 * @param coordinate The real life coordinate.
 		 **/
