@@ -1,13 +1,12 @@
 include(FindPackageHandleStandardArgs)
 
-FIND_PROGRAM(ANT_FOUND
+FIND_PROGRAM(ANT_EXECUTABLE
   NAMES "ant"
   PATH /usr/bin
   DOC "Ant - build generator for Java"
 )
 
-set(ANT_EXECUTABLE "${ANT_FOUND}")
-find_package_handle_standard_args(ANT DEFAULT_MSG ANT_FOUND)
+find_package_handle_standard_args(ANT DEFAULT_MSG ANT_EXECUTABLE)
 
 LIST(APPEND DEFAULT_JAR_DIRS
   /usr/share/java/ 
