@@ -40,7 +40,15 @@
 #include <DataTypes/MotorRotation.h>
 
 namespace DeltaRobot{
-
+	
+	/**
+	 * Abstract inverse kinematics model class. Based on work from Viacheslav Slavinsky.\n
+	 * conventions sitting in front of delta robot:\n
+	 * x-axis goes from left to right\n
+	 * y-axis goes from front to back\n
+	 * z-axis goes from bottom to top\n
+	 * point (0,0,0) lies in the middle of all the motors at the motor's height
+	 **/
 	class InverseKinematicsModel{
 	protected:
 		/**

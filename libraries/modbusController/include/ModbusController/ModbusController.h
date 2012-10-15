@@ -51,6 +51,9 @@ extern "C"{
 //#define MODBUS_LOGGING "/home/lcv/modbus.log"
 
 namespace ModbusController{
+    /**
+     * Wrapper class for libmodbus with some extra functionality.
+     **/
     class ModbusController{
     public:
         ModbusController(modbus_t* context);

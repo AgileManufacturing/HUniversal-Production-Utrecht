@@ -82,9 +82,9 @@ namespace DeltaRobot{
     }
     
     /**
-     * Generates the effectorBoundaries for the give voxelSize
+     * Generates the effectorBoundaries for the given voxelSize
      *
-     * @param voxelSize The size in mm of a side of a voxel in the boundaries.
+     * @param voxelSize The size in millimeters of a side of a voxel in the boundaries.
      **/
     void DeltaRobot::generateBoundaries(double voxelSize){
         boundaries = EffectorBoundaries::generateEffectorBoundaries((*kinematics), motors, voxelSize);

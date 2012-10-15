@@ -55,9 +55,9 @@ namespace DeltaRobot{
 		EffectorBoundaries* boundaries = new EffectorBoundaries(model, motors, voxelSize);
 		
 		// Create boundaries variables in voxel space by dividing real space variables with the voxel size
-		boundaries->width = (Measures::MAX_X  - Measures::MIN_X) / voxelSize;
-        boundaries->height = (Measures::MAX_Z - Measures::MIN_Z) / voxelSize;
-        boundaries->depth = (Measures::MAX_Y  - Measures::MIN_Y) / voxelSize;
+		boundaries->width = (Measures::BOUNDARY_BOX_MAX_X  - Measures::BOUNDARY_BOX_MIN_X) / voxelSize;
+        boundaries->height = (Measures::BOUNDARY_BOX_MAX_Z - Measures::BOUNDARY_BOX_MIN_Z) / voxelSize;
+        boundaries->depth = (Measures::BOUNDARY_BOX_MAX_Y  - Measures::BOUNDARY_BOX_MIN_Y) / voxelSize;
         
         // Create bitmap with value false for all voxels
         boundaries->boundariesBitmap = new bool[boundaries->width * boundaries->height * boundaries->depth];
@@ -124,7 +124,7 @@ namespace DeltaRobot{
     }
 
 	/**
-	 * Checks if one of the neighbouring voxels can't be reached by the effector. This includes voxels outside of the MIN/MAX_X/Y/Z box as defined in measures.
+	 * Checks if one of the neighbouring voxels can't be reached by the effector. This includes voxels outside of the MIN/BOUNDARY_BOX_MAX_X/Y/Z box as defined in measures.
 	 * 
 	 * @param coordinate The point in the bitmap that has to be checked.
 	 * @param pointValidityCache Pointer to the cache where already checked values are stored, and unchecked points are unknown. This as opposed to the bitmap, which is defaulted to false instead of unknown.
@@ -158,7 +158,7 @@ namespace DeltaRobot{
     }
 
 	/**
-	 * Checks if the point can be reached by the effector. Whether the point can be reached is determined by the kinematics, minimum and maximum angles of the motors and the MIN/MAX_X/Y/Z box determined in measures.
+	 * Checks if the point can be reached by the effector. Whether the point can be reached is determined by the kinematics, minimum and maximum angles of the motors and the MIN/BOUNDARY_BOX_MAX_X/Y/Z box determined in measures.
 	 * @param coordinate The point that is checked if it can be reached by the effector.
 	 * @param pointValidityCache Pointer to the cache where already checked values are stored, and unchecked points are unknown. This as opposed to the bitmap, which is defaulted to false instead of unknown.
 	 * 
@@ -220,15 +220,15 @@ namespace DeltaRobot{
     	std::stack<BitmapCoordinate> cstack;
 
     	// Determine the center of the box.
-    	DataTypes::Point3D<double> begin (0, 0, Measures::MIN_Z + (Measures::MAX_Z - Measures::MIN_Z) / 2);
+    	DataTypes::Point3D<double> begin (0, 0, Measures::BOUNDARY_BOX_MIN_Z + (Measures::BOUNDARY_BOX_MAX_Z - Measures::BOUNDARY_BOX_MIN_Z) / 2);
     	
     	// If begin pixel is not part of a valid voxel the box dimensions are incorrect.
     	if(!isValid(fromRealCoordinate(begin), pointValidityCache)){
-    		throw EffectorBoundariesException("starting point outside of valid area, please adjust MAX/MIN_X/Y/Z values to have a valid center");
+    		throw EffectorBoundariesException("starting point outside of valid area, please adjust MAX/BOUNDARY_BOX_MIN_X/Y/Z values to have a valid center");
     	}
     	
     	// Scan towards the right.
-		for(; begin.x < Measures::MAX_X; begin.x += voxelSize){
+		for(; begin.x < Measures::BOUNDARY_BOX_MAX_X; begin.x += voxelSize){
 			/**
 			 * If an invalid voxel is found:
 			 * - step back to the last valid voxel
@@ -247,7 +247,7 @@ namespace DeltaRobot{
 		/**
 		 * If the right-most voxel is in reach and an invalid voxel is never found, the position of begin.x will be outside of the box limits. Step back inside the box and add that voxel to the stack and set it as true in the bitmap.
 		 **/
-		if(begin.x >= Measures::MAX_X){
+		if(begin.x >= Measures::BOUNDARY_BOX_MAX_X){
 			begin.x -= voxelSize;
 			BitmapCoordinate startingVoxel = fromRealCoordinate(begin);
 			cstack.push(startingVoxel);
@@ -255,7 +255,7 @@ namespace DeltaRobot{
 		}
 
 		/**
-		 * Start with the last added voxel on the stack and add new voxels to the stack. Do this until the valid borders (all valid voxels bordering unvalid voxels or the MAX/MIN_X/Y/Z box) of the valid voxel area are known (stack = empty).
+		 * Start with the last added voxel on the stack and add new voxels to the stack. Do this until the valid borders (all valid voxels bordering unvalid voxels or the MAX/BOUNDARY_BOX_MIN_X/Y/Z box) of the valid voxel area are known (stack = empty).
 		 **/
 		while(!cstack.empty()){
 			// Get last added voxel from the stack and remove it from the stack.
@@ -266,7 +266,7 @@ namespace DeltaRobot{
 			for(int y = borderVoxel.y - 1; y <= borderVoxel.y + 1; y++){
 				for(int x = borderVoxel.x - 1; x <= borderVoxel.x + 1; x++){
 					for(int z = borderVoxel.z - 1; z <= borderVoxel.z + 1; z++){
-						// Don't do anything with voxels outside of the MAX/MIN_X/Y/Z box.
+						// Don't do anything with voxels outside of the MAX/BOUNDARY_BOX_MIN_X/Y/Z box.
 						if(z >= height || z < 0 || x >= width || x < 0 || y >= depth || y < 0){
 							continue;
 						} else{
@@ -291,7 +291,7 @@ namespace DeltaRobot{
 		pointValidityCache = NULL;
 		
 		// Adds all the points within the boundaries.
-		cstack.push(fromRealCoordinate(DataTypes::Point3D<double>(0, 0, Measures::MIN_Z + (Measures::MAX_Z - Measures::MIN_Z) / 2)));
+		cstack.push(fromRealCoordinate(DataTypes::Point3D<double>(0, 0, Measures::BOUNDARY_BOX_MIN_Z + (Measures::BOUNDARY_BOX_MAX_Z - Measures::BOUNDARY_BOX_MIN_Z) / 2)));
 		while(!cstack.empty()){
 			BitmapCoordinate validVoxel = cstack.top();
 			cstack.pop();

@@ -35,27 +35,89 @@
 
 namespace DeltaRobot{
 	namespace Measures{
-		// The following variables are in millimeters
+		
+		/**
+    	 * @var double BASE
+    	 * Radius of the base in millimeters.
+    	 **/
 		const double BASE		= 101.3;
+
+		/**
+		 * @var double HIP
+		 * Length of the hip in millimeters.
+		 **/
 		const double HIP		= 100;
+
+		/**
+		 * @var double EFFECTOR
+		 * Radius of the effector in millimeters.
+		 **/
 		const double EFFECTOR	= 46.19;
+
+		/**
+         * @var double ANKLE
+         * Length of the ankle in millimeters.
+         **/
 		const double ANKLE		= 250;
 		
-		// The following variables are in radians
+		/**
+         * @var double HIP_ANKLE_ANGLE_MAX
+         * Maximum angle between hip and ankle on x-z plane in radians.
+         **/
 		const double HIP_ANKLE_ANGLE_MAX = Utilities::degreesToRadians(22);
 
-		// Safety constants, roughly determined to be as safe as possible for testing purposes
+		/**
+		 * @var double MOTOR_ROT_MIN
+		 * Mathematical minimum angle the motor is allowed to move to in radians.
+		 **/
 		const double MOTOR_ROT_MIN = Utilities::degreesToRadians(-42);
+
+		/**
+		 * @var double MOTOR_ROT_MAX
+		 * Mathematical maximum angle the motor is allowed to move to in radians.
+		 **/
 		const double MOTOR_ROT_MAX = Utilities::degreesToRadians(45);
 		
-		// Top (granite) to middle point is 45 degrees. Removing the hip thickness results into +-42.5 degrees!
+		/**
+		 * @var double MOTORS_FROM_ZERO_TO_TOP_POSITION
+		 * The angle from zero (horizontal) to the top position in radians.
+		 **/
 		const double MOTORS_FROM_ZERO_TO_TOP_POSITION = Utilities::degreesToRadians(42.5); 
 
- 		const double MAX_X = 500;
-		const double MAX_Y = MAX_X;
-		const double MIN_X = -MAX_X;
-		const double MIN_Y = -MAX_Y;
-		const double MIN_Z = -250;
-		const double MAX_Z = -180;
+		/**
+		 * @var double BOUNDARY_BOX_MAX_X
+		 * The max x-coordinate of the effector boundary box in millimeters.
+		 **/
+ 		const double BOUNDARY_BOX_MAX_X = 500;
+
+ 		/**
+		 * @var double BOUNDARY_BOX_MAX_Y
+		 * The max y-coordinate of the effector boundary box in millimeters.
+		 **/
+		const double BOUNDARY_BOX_MAX_Y = BOUNDARY_BOX_MAX_X;
+
+		/**
+		 * @var double BOUNDARY_BOX_MIN_X
+		 * The min x-coordinate of the effector boundary box in millimeters.
+		 **/
+		const double BOUNDARY_BOX_MIN_X = -BOUNDARY_BOX_MAX_X;
+
+		/**
+		 * @var double BOUNDARY_BOX_MIN_Y
+		 * The min y-coordinate of the effector boundary box in millimeters.
+		 **/
+		const double BOUNDARY_BOX_MIN_Y = -BOUNDARY_BOX_MAX_Y;
+
+		/**
+		 * @var double BOUNDARY_BOX_MIN_Z
+		 * The min z-coordinate of the effector boundary box in millimeters.
+		 **/
+		const double BOUNDARY_BOX_MIN_Z = -250;
+
+		/**
+		 * @var double BOUNDARY_BOX_MAX_Z
+		 * The max z-coordinate of the effector boundary box in millimeters.
+		 **/
+		const double BOUNDARY_BOX_MAX_Z = -180;
 	}
 }

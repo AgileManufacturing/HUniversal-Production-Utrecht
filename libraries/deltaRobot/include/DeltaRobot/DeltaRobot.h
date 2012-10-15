@@ -1,6 +1,6 @@
 /**
  * @file DeltaRobot.h
- * @brief Symbolizes an entire DeltaRobot.
+ * @brief Symbolizes an entire deltarobot.
  *
  * @author 1.0 Lukas Vermond
  * @author 1.0 Kasper van Nieuwland
@@ -44,7 +44,7 @@ namespace DeltaRobot{
 	class InverseKinematicsModel;
 	
       /**
-       * A class that symbolizes an entire DeltaRobot.
+       * A class that symbolizes an entire deltarobot.
        **/
       class DeltaRobot{
       public:
