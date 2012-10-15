@@ -26,7 +26,7 @@
 * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#include "EquipletNode/EquipletNode.h"
+#include <EquipletNode/EquipletNode.h>
 #include <algorithm>
 
 /**

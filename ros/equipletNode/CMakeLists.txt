@@ -16,7 +16,8 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 rexos_rospack_init("equipletNode" true true)
 
 # Add executables as documented by ROS
-rosbuild_add_executable(EquipletNode src/Main.cpp)
+file(GLOB sources src/*.cpp)
+rosbuild_add_executable(EquipletNode ${sources})
 
 include_directories(${LIB_MAST_INCLUDE})
 

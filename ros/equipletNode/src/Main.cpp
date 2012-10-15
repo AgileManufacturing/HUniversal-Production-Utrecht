@@ -26,7 +26,7 @@
 * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#include "EquipletNode/EquipletNode.h"
+#include <EquipletNode/EquipletNode.h>
 
 #define TOP_CAMERA "TopCamera"
 #define BOTTOM_CAMERA "BottomCamera"
@@ -36,7 +36,6 @@
 int main(int argc, char **argv) {
 	EquipletNode equiplet("Equiplet1");
 
-	//std::vector<Mast::HardwareModuleProperties> *moduleTable = new std::vector<Mast::HardwareModuleProperties>();
 	Mast::HardwareModuleProperties topCamera(TOP_CAMERA, Mast::safe, false, false);
 	Mast::HardwareModuleProperties bottomCamera(BOTTOM_CAMERA, Mast::safe, false, false);
 	Mast::HardwareModuleProperties deltarobot(DELTAROBOT, Mast::start, true, false);
