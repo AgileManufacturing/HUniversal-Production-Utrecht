@@ -220,7 +220,7 @@ namespace DeltaRobot{
             usleep(25000);
         } while(!checkSensor(motorIndex));
 
-        double deviation = motorRotation.angle + Measures::MOTORS_DEVIATION;
+        double deviation = motorRotation.angle + Measures::MOTORS_FROM_ZERO_TO_TOP_POSITION;
 
         // Set deviation to the calculated value.
         motors[motorIndex]->setDeviation(deviation);

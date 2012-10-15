@@ -49,45 +49,45 @@ namespace DeltaRobot{
 	public:
 		~EffectorBoundaries();
 
-		// TODO: change Motor::StepperMotor to Motor::MotorInterface
+		// TODO: change Motor::StepperMotor to two doubles for max and min angle
 		static EffectorBoundaries* generateEffectorBoundaries(const InverseKinematicsModel& model,  Motor::StepperMotor* (&motors)[3], double voxelSize);
 		
 		bool checkPath(const DataTypes::Point3D<double>& from, const DataTypes::Point3D<double>& to) const;
 		
 		/**
-		 * Returns a const bool pointer to the boundaries bitmap.
-		 * 
-		 * @return Const bool pointer to the boundaries bitmap.
+		 * Gets the boundariesBitmap.
+		 *
+		 * @return A const bool pointer to the voxel bitmap.
 		 **/
-		inline const bool* getBitmap() const;
+		inline const bool* getBitmap() const{ return boundariesBitmap; }
 		
 		/**
-		 * Gets the width of the boundary bitmap.
-		 * 
-		 * @return returns The width of the boundary bitmap.
+		 * Gets the depth used to make the boundaries bitmap.
+		 *
+		 * @return The depth in voxels.
 		 **/
-		inline int getWidth() const;
+		inline int getDepth() const{ return depth; }
+
+		/**
+		 * Gets the height used to make the boundaries bitmap.
+		 *
+		 * @return The height in voxels.
+		 **/
+		inline int getHeight() const{ return height; }
 		
 		/**
-		 * Gets the height of the boundary bitmap.
-		 * 
-		 * @return returns The height of the boundary bitmap.
+		 * Gets the width used to make the boundaries bitmap.
+		 *
+		 * @return The width in voxels.
 		 **/
-		inline int getHeight() const;
-		
+		inline int getWidth() const{ return width; }
+
 		/**
-		 * Gets the depth of the boundary bitmap.
-		 * 
-		 * @return returns The depth of the boundary bitmap.
+		 * Gets the size of a side of a voxel.
+		 *
+		 * @return Voxel size in mm.
 		 **/
-		inline int getDepth() const;
-		
-		/**
-		 * Gets the used voxel_size for this boundary bitmap.
-		 * 
-		 * @return returns The used voxel_size.
-		 **/
-		inline double getVoxelSize() const;
+		inline double getVoxelSize() const{ return voxelSize; }
 
 	private:
 		EffectorBoundaries(const InverseKinematicsModel& model,  Motor::StepperMotor* (&motors)[3], double voxelSize);
@@ -103,20 +103,30 @@ namespace DeltaRobot{
 		bool hasInvalidNeighbours(const BitmapCoordinate& coordinate, char* pointValidityCache) const;
 		bool isValid(const BitmapCoordinate& coordinate, char* pointValidityCache) const;
 		void generateBoundariesBitmap();
-		
+
 		/**
 		 * Converts a bitmap coordinate to a real life coordinate.
 		 * 
 		 * @param coordinate The bitmap coordinate.
 		 **/
-		inline DataTypes::Point3D<double> fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const;
-		
+		inline DataTypes::Point3D<double> fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const{
+			return DataTypes::Point3D<double>(
+					(double) coordinate.x * voxelSize + Measures::MIN_X,
+					(double) coordinate.y * voxelSize + Measures::MIN_Y,
+					(double) coordinate.z * voxelSize + Measures::MIN_Z);
+		}
+
 		/**
 		 * Converts a real life coordinate to a bitmap coordinate.
 		 * 
 		 * @param coordinate The real life coordinate.
 		 **/
-		inline BitmapCoordinate fromRealCoordinate(DataTypes::Point3D<double> coordinate) const;
+		inline EffectorBoundaries::BitmapCoordinate fromRealCoordinate(DataTypes::Point3D<double> coordinate) const{
+			return EffectorBoundaries::BitmapCoordinate(
+				(coordinate.x - Measures::MIN_X) / voxelSize,
+				(coordinate.y - Measures::MIN_Y) / voxelSize,
+				(coordinate.z - Measures::MIN_Z) / voxelSize);
+		}
 
 		enum cacheEntry{
 			UNKNOWN,
@@ -130,26 +140,4 @@ namespace DeltaRobot{
 		Motor::StepperMotor* (&motors)[3];
 		double voxelSize;
 	};
-	
-	const bool* EffectorBoundaries::getBitmap() const{ return boundariesBitmap; }
-	int EffectorBoundaries::getDepth() const{ return depth; }
-	int EffectorBoundaries::getHeight() const{ return height; }
-	int EffectorBoundaries::getWidth() const{ return width; }
-	double EffectorBoundaries::getVoxelSize() const{ return voxelSize; }
-
-	// TODO: Need comment!
-	DataTypes::Point3D<double> EffectorBoundaries::fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const{
-		return DataTypes::Point3D<double>(
-				(double) coordinate.x * voxelSize + Measures::MIN_X,
-				(double) coordinate.y * voxelSize + Measures::MIN_Y,
-				(double) coordinate.z * voxelSize + Measures::MIN_Z);
-	}
-
-	// TODO: Need comment!
-	EffectorBoundaries::BitmapCoordinate EffectorBoundaries::fromRealCoordinate(DataTypes::Point3D<double> coordinate) const{
-		return EffectorBoundaries::BitmapCoordinate(
-			(coordinate.x - Measures::MIN_X) / voxelSize,
-			(coordinate.y - Measures::MIN_Y) / voxelSize,
-			(coordinate.z - Measures::MIN_Z) / voxelSize);
-	}
 }
