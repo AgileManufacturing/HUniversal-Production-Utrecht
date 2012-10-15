@@ -36,32 +36,34 @@
 int main(int argc, char **argv) {
 	EquipletNode equiplet("Equiplet1");
 
-	Mast::HardwareModuleProperties topCamera(TOP_CAMERA, Mast::safe, false, false);
-	Mast::HardwareModuleProperties bottomCamera(BOTTOM_CAMERA, Mast::safe, false, false);
-	Mast::HardwareModuleProperties deltarobot(DELTAROBOT, Mast::start, true, false);
-	Mast::HardwareModuleProperties gripper2(GRIPPER2, Mast::standby, true, true);
+	// Mast::HardwareModuleProperties topCamera(TOP_CAMERA, Mast::safe, false, false);
+	// Mast::HardwareModuleProperties bottomCamera(BOTTOM_CAMERA, Mast::safe, false, false);
+	// Mast::HardwareModuleProperties deltarobot(DELTAROBOT, Mast::start, true, false);
+	// Mast::HardwareModuleProperties gripper2(GRIPPER2, Mast::standby, true, true);
 
-	// Add the three hardware modules
-	std::cout << "Add four hardware modules..." << std::endl;
-	equiplet.addHardwareModule(topCamera);
-	equiplet.addHardwareModule(bottomCamera);
-	equiplet.addHardwareModule(deltarobot);
-	equiplet.addHardwareModule(gripper2);
+	// // Add the three hardware modules
+	// std::cout << "Add four hardware modules..." << std::endl;
+	// equiplet.addHardwareModule(topCamera);
+	// equiplet.addHardwareModule(bottomCamera);
+	// equiplet.addHardwareModule(deltarobot);
+	// equiplet.addHardwareModule(gripper2);
 
-	equiplet.printHardwareModules();
+	// equiplet.printHardwareModules();
 
-	std::cout << std::endl;
-	//std::cout << "safety state: " << safetyState << std::endl;
-	//std::cout << "operation state: " << operationState << std::endl; 
+	// std::cout << std::endl;
+	// //std::cout << "safety state: " << safetyState << std::endl;
+	// //std::cout << "operation state: " << operationState << std::endl; 
 
-	std::cout << std::endl;
-	std::cout << "Remove the hardware module " << GRIPPER2 << std::endl;
-	equiplet.removeHardwareModule(GRIPPER2);
+	// std::cout << std::endl;
+	// std::cout << "Remove the hardware module " << GRIPPER2 << std::endl;
+	// equiplet.removeHardwareModule(GRIPPER2);
 
-	equiplet.printHardwareModules();
+	// equiplet.printHardwareModules();
 
-	std::cout << std::endl;
-	//std::cout << "safety state: " << safetyState << std::endl;
-	//std::cout << "operation state: " << operationState << std::endl; 
+	// std::cout << std::endl;
+	// //std::cout << "safety state: " << safetyState << std::endl;
+	// //std::cout << "operation state: " << operationState << std::endl; 
+	equiplet.readFromBlackboard();
+
 	return 0;
 }

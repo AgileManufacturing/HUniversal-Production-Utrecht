@@ -28,7 +28,7 @@
 **/
 
 #include "BlackboardClient/BlackboardClientUtils.h"
-#include <AutoKeyStore/AutoKeyStore.h>
+#include <AutoKeyStoreClient/AutoKeyStore.h>
 #include <iostream>
 #include <string>
 

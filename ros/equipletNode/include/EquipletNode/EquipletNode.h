@@ -28,23 +28,35 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
 #include <Mast/HardwareModuleProperties.h>
-#include <string>
+#include <BlackboardClient/BlackboardClientUtils.h>
+#include <BlackboardClient/PostIt.pb.h>
 
 class EquipletNode {
 public:
 	EquipletNode(const std::string& nm): name(nm) {
 		moduleTable = new std::vector<Mast::HardwareModuleProperties>();
+		bbUtils = new BlackboardClient::BlackboardClientUtils();
+		
+		// Initialize the PostIt box
+		postItBox = new PostItBox();
+		postItBox->set_iswrite(false);
+    	postItBox->set_readowner("DummyAgent");
+    	postItBox->set_zone("BB1");
 	};
-	~EquipletNode() {
+	virtual ~EquipletNode() {
 		delete moduleTable;
+		delete bbUtils;
+		delete postItBox;
 	}
 	bool addHardwareModule(Mast::HardwareModuleProperties module);
 	bool removeHardwareModule(const std::string& name);
 	void updateOperationState();
 	void updateSafetyState();
 	void printHardwareModules();
+	void readFromBlackboard();
 private:
 	/**
 	 * The name of the Equiplet.
@@ -64,4 +76,13 @@ private:
 	 * The table that holds all information about the modules currently attached to this Equiplet  
 	 **/
 	std::vector<Mast::HardwareModuleProperties> *moduleTable;
+	/**
+	 *
+	 *
+	 **/
+	BlackboardClient::BlackboardClientUtils *bbUtils;
+	/**
+	 * The postIt box where the messages are stored that are read from the blackboard
+	 **/
+	PostItBox *postItBox;
 };

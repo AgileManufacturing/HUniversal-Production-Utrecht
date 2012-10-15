@@ -30,8 +30,8 @@
 #ifndef BLACKBOARDCLIENTUTILS_H_
 #define BLACKBOARDCLIENTUTILS_H_
 
-#include "BlackboardClient/PostIt.pb.h"
-#include <AutoKeyStore/AutoKeyStore.h>
+#include <BlackboardClient/PostIt.pb.h>
+#include <AutoKeyStoreClient/AutoKeyStore.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <sys/socket.h>

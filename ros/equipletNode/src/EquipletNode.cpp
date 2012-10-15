@@ -138,3 +138,14 @@ void EquipletNode::printHardwareModules() {
 		std::cout << *it << std::endl;
 	}
 }
+
+/**
+ * Read from the blackboard, store the messages in postItBox
+ **/
+void EquipletNode::readFromBlackboard() {
+    PostItBox_Filter * f = postItBox->mutable_filter();
+    PostItBox * received = new PostItBox();
+    f->set_filtername("PostItFilter");
+	bbUtils->readFromBlackboard(postItBox);
+	std::cout << "Number of postIts: " << received->postits_size() << std::endl;
+}
