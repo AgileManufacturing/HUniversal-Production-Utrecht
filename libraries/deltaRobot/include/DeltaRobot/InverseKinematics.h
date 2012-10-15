@@ -37,6 +37,14 @@
 #include <DeltaRobot/InverseKinematicsModel.h>
 
 namespace DeltaRobot{
+	/**
+	 * Inverse kinematics implementation. Based on work from Viacheslav Slavinsky\n
+	 * Conventions sitting in front of delta robot:\n
+	 * x-axis goes from left to right\n
+	 * y-axis goes from front to back\n
+	 * z-axis goes from bottom to top\n
+	 * point (0,0,0) lies in the middle of all the motors at the motor's height
+	 **/
 	class InverseKinematics : public InverseKinematicsModel{
 	private:
 		double motorAngle(const DataTypes::Point3D<double>& destinationPoint,

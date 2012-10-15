@@ -37,6 +37,9 @@
 #include <DataTypes/Point3D.h>
 
 namespace DeltaRobot{
+	/**
+	 * Exception thrown if an invalid value is calculated during inverse kinematics.
+	 **/
 	class InverseKinematicsException: public std::runtime_error{
 	private:
 		DataTypes::Point3D<double> notConvertablePoint;

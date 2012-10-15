@@ -52,7 +52,7 @@ namespace DeltaRobot{
      * @param deltaRobotMeasures The measures of the deltarobot configuration in use.
      * @param motorManager The manager that allows all motors to be simultaneously activated.
      * @param motors The motor array with the three motor objects.
-     * @param modbusIO The TCP modubs connection for the IO controller.
+     * @param modbusIO The TCP modbus connection for the IO controller.
      **/
     DeltaRobot::DeltaRobot(DataTypes::DeltaRobotMeasures& deltaRobotMeasures, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3], modbus_t* modbusIO) :
         motors(motors),

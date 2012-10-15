@@ -31,8 +31,39 @@
 #pragma once
 
 namespace DataTypes{
+    /**
+     * A class that holds all measures for the DeltaRobot.
+     **/
     class DeltaRobotMeasures{
     public:
-        double base, hip, effector, ankle, maxAngleHipAnkle;
+    	/**
+    	 * @var double base
+    	 * Radius of the base in millimeters.
+    	 **/
+        double base;
+
+        /**
+         * @var double hip
+         * Length of the hip in millimeters.
+         **/
+        double hip;
+
+        /**
+         * @var double effector
+         * Radius of the effector in millimeters.
+         **/
+        double effector; 
+
+        /**
+         * @var double ankle
+         * Length of the ankle in millimeters.
+         **/
+        double ankle; 
+
+        /**
+         * @var double maxAngleHipAnkle
+         * Maximum angle between hip and ankle on x-z plane in radians.
+         **/
+        double maxAngleHipAnkle;
     };
 }
