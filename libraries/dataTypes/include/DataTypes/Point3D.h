@@ -44,9 +44,24 @@ namespace DataTypes{
 	public:
 		T x, y, z;
 
+		/**
+		 * 3 dimensional point class constructor.
+		 **/
 		Point3D(){}
+		/**
+		 * 3 dimensional point class constructor.
+		 * 
+		 * @param x x-coordinate, from left to right
+		 * @param y y-coordinate, from front to back
+		 * @param z z-coordinate, from bottom to top
+		 **/
 		Point3D(T x, T y, T z) : x(x), y(y), z(z){}
 
+		/**
+		 * Adds the values of rhs to *this
+		 *
+		 * @param rhs point to be added to this point
+		 **/
 		inline Point3D<T>& operator+=(const Point3D<T>& rhs){
 			x += rhs.x;
 			y += rhs.y;
@@ -54,6 +69,13 @@ namespace DataTypes{
 			return *this;
 		}
 
+		/**
+		 * Adds the value of rhs to *this and returns it as a new point
+		 *
+		 * @param rhs point to be added to this point
+		 *
+		 * @return the point with as values the addition of this and rhs
+		 **/
 		inline const Point3D<T> operator+(const Point3D<T>& rhs) const{
 			Point3D<T> result = *this;
 			result += rhs;
@@ -61,9 +83,9 @@ namespace DataTypes{
 		}
 
 		/**
-		 * Calculates the euclidean distance between *this and p.
+		 * Calculates the euclidean distance between *this and the given point.
 		 *
-		 * @param p The point to calculate the euclidean distance to from *this.
+		 * @param point The point to calculate the euclidean distance to from *this.
 		 * 
 		 * @return the euclidean distance.
 		 **/

@@ -41,12 +41,23 @@ namespace DataTypes{
         T acceleration;
         T deceleration;
         
+        /**
+         * Instantiation of rotation data for the motor, sets speed, acceleration and deceleration to default values
+         **/
         MotorRotation(){
             speed = 10;
             acceleration = 360;
             deceleration = 360;
         }
         
+        /**
+         * Instantiation of rotation data for the motor.
+         *
+         * @param angle The angle in radians the motor has to travel towards
+         * @param speed The speed in degrees per second
+         * @param acceleration The acceleration in steps per second
+         * @param deceleration The deceleration in steps per second
+         **/
         MotorRotation(T angle, T speed, T acceleration, T deceleration) : angle(angle), speed(speed), acceleration(acceleration), deceleration(deceleration){}
     };
 }

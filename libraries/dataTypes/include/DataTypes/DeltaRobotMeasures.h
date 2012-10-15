@@ -1,6 +1,6 @@
 /**
  * @file DeltaRobotMeasures.h
- * @brief Holds all measures for the DeltaRobot.
+ * @brief Holds all measures for the DeltaRobot
  * @date Created: 2012-10-03
  *
  * @author Koen Braham

@@ -47,16 +47,16 @@
 
 namespace DeltaRobot{
     /**
-     * Constructor.
+     * Constructor of a DeltaRobot.
      * 
-       TODO: missing params deltaRobotMeasures, motorManager, modbusIO
-       TODO: param kinematics???
-     * @param kinematics kinematics model that will be used to convert points to motions.
-     * @param motors Implementation of motor interface that will be used to communicate with the motors. MUST BE EXACTLY 3.
+     * @param deltaRobotMeasures The measures of the deltarobot configuration in use.
+     * @param motorManager The manager that allows all motors to be simultaneously activated.
+     * @param motors The motor array with the three motor objects.
+     * @param modbusIO The TCP modubs connection for the IO controller.
      **/
     DeltaRobot::DeltaRobot(DataTypes::DeltaRobotMeasures& deltaRobotMeasures, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3], modbus_t* modbusIO) :
         motors(motors),
-        effectorLocation(DataTypes::Point3D<double>(0, 0, -161.9)), 
+        effectorLocation(DataTypes::Point3D<double>(0, 0, 0)), 
         boundariesGenerated(false),
         modbusIO(modbusIO){
 
@@ -71,6 +71,9 @@ namespace DeltaRobot{
         this->motorManager = motorManager;
     }
 
+    /**
+     * Deconstructor of a deltarobot. Turns off the motors and deletes the kinematics model.
+     **/
     DeltaRobot::~DeltaRobot(void){
         if(motorManager->isPoweredOn()){
             motorManager->powerOff();
@@ -87,7 +90,12 @@ namespace DeltaRobot{
     }
 
     /**
-       TODO: comment
+     * Checks the validity of an angle for a motor.
+     *
+     * @param motorIndex The index for the motor from 0 to (amount of motors - 1) to be checked for.
+     * @param angle The angle in degrees where 0 degrees is directly opposite of the center of the imaginary circle for the engines.
+     *
+     * @return If the angle is valid for the motor.
      **/
     bool DeltaRobot::isValidAngle(int motorIndex, double angle){
         assert(motorIndex >= 0 && motorIndex < 3);
@@ -97,8 +105,8 @@ namespace DeltaRobot{
     /**
      * Checks the path between two points.
      * 
-     * @param begin Starting point.
-     * @param end Finish point.
+     * @param begin The starting point.
+     * @param end The end point.
      * 
      * @return if the path between two points is valid.
      **/
@@ -229,9 +237,6 @@ namespace DeltaRobot{
     * After a motor is moved upwards, it is moved back to the 0 degrees state.
     * This function temporarily removes the limitations for the motorcontrollers.
     * 
-    * @param modbus The TCP modbus connection for IO controller.
-    * @param motors The steppermotor3 class controlling the 3 deltarobot motors.
-    * 
     * @return true if the calibration was succesful. False otherwise (e.g. failure on sensors.)
     **/
     bool DeltaRobot::calibrateMotors(){
@@ -318,6 +323,11 @@ namespace DeltaRobot{
         }
     }
 
+    /**
+     * Get the location of the midpoint of the effector.
+     *
+     * @return The coordinate for the midpoint of the effector.
+     **/
     DataTypes::Point3D<double>& DeltaRobot::getEffectorLocation(){
         return effectorLocation;
     }
