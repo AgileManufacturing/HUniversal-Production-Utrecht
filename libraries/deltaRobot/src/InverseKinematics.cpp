@@ -1,10 +1,10 @@
 /**
  * @file InverseKinematics.cpp
- * @brief Inverse kinematics implementation. Based on work from Viacheslav Slavinsky. 
- * conventions sitting in front of delta robot:
- * x-axis goes from left to right
- * y-axis goes from front to back
- * z-axis goes from bottom to top
+ * @brief Inverse kinematics implementation. Based on work from Viacheslav Slavinsky.\n
+ * conventions sitting in front of delta robot:\n
+ * x-axis goes from left to right\n
+ * y-axis goes from front to back\n
+ * z-axis goes from bottom to top\n
  * point (0,0,0) lies in the middle of all the motors at the motor's height
  *
  * @author 1.0 Lukas Vermond
@@ -46,25 +46,27 @@
 
 #include <Utilities/Utilities.h>
 
-/**
- * InverseKinematics.cpp -> An implementation of the kinematics model.
- * 
- * ideas from Viacheslav Slavinsky are used
- * conventions:
- * sitting in front of delta robot
- * x-axis goes from left to right
- * y-axis goes from front to back
- * z-axis goes from bottom to top
- * point (0,0,0) lies in the middle of all the motors at the motor's height
- **/
-
 namespace DeltaRobot {
+	/**
+	 * Constructor for inverse kinematics.
+	 *
+	 * @param base Radius of the base in millimeters.
+	 * @param hip Length of the hip in millimeters.
+	 * @param effector Radius of the effector in millimeters.
+	 * @param ankle Length of the ankle in millimeters.
+	 * @param maxAngleHipAnkle Maximal angle, in radians, between the hip and ankle.
+	 **/
 	InverseKinematics::InverseKinematics(const double base, const double hip,
 			const double effector, const double ankle,
 			const double maxAngleHipAnkle) :
 			InverseKinematicsModel(base, hip, effector, ankle, maxAngleHipAnkle){
 	}
 
+	/**
+	 * Constructor for inverse kinematics.
+	 * 
+	 * @param deltaRobotMeasures The measures of the deltarobot configuration.
+	 **/
 	InverseKinematics::InverseKinematics(DataTypes::DeltaRobotMeasures & deltaRobotMeasures) :
 			InverseKinematicsModel(deltaRobotMeasures.base, deltaRobotMeasures.hip, deltaRobotMeasures.effector, deltaRobotMeasures.ankle, deltaRobotMeasures.maxAngleHipAnkle){
 	}	
@@ -72,15 +74,13 @@ namespace DeltaRobot {
 	InverseKinematics::~InverseKinematics(void){
 	}
 
-	#define square(x) ((x)*(x))
-
 	/**
 	 * Translates a point to an angle for a motor.
 	 * 
 	 * @param destinationPoint Point where the midpoint of the effector is wanted.
 	 * @param motorLocation Angle of the motor on the z axis where 0 radians is directly in front of the deltarobot.
 	 * 
-	 * @return angle the motor should move to.
+	 * @return The angle, in radians, the motor should move to.
 	 **/
 	double InverseKinematics::motorAngle(const DataTypes::Point3D<double>& destinationPoint, double motorLocation) const{
 		// Rotate the destination point so calculations can be made as if the motor is always in front
@@ -95,10 +95,8 @@ namespace DeltaRobot {
 		// Places the point relative to a motor in (x,y,z) = (0, 0, 0).
 		destinationPointRotatedAroundZAxis.y += base;
 
-		// TODO: (look at the comment below)
-		// why is this?
-		double distanceMotorToEffectorOnYAndZAxis = sqrt(square(destinationPointRotatedAroundZAxis.y)
-				+ square(destinationPointRotatedAroundZAxis.z));
+		double distanceMotorToEffectorOnYAndZAxis = sqrt(pow(destinationPointRotatedAroundZAxis.y, 2)
+				+ pow(destinationPointRotatedAroundZAxis.z, 2));
 
 		// Checks if the "ankle to effector connection" is directly to the left of, to the right of, or in the motor.
 		if(distanceMotorToEffectorOnYAndZAxis == 0){
@@ -106,10 +104,14 @@ namespace DeltaRobot {
 		}
 
 		// To calculate alpha, the angle between actuator arm and goal vector.
-		double alphaAcosInput = (square(destinationPointRotatedAroundZAxis.x)
-				- square(ankle) + square(hip)
-				+ square(distanceMotorToEffectorOnYAndZAxis))
-				/ (2 * hip * distanceMotorToEffectorOnYAndZAxis);
+		double alphaAcosInput = (
+				pow(destinationPointRotatedAroundZAxis.x, 2)
+				- pow(ankle, 2) + pow(hip, 2)
+				+ pow(distanceMotorToEffectorOnYAndZAxis, 2)
+				)/(
+				2 
+				* hip 
+				* distanceMotorToEffectorOnYAndZAxis);
 
 		if(alphaAcosInput < -1 || alphaAcosInput > 1){
 			throw InverseKinematicsException("point out of range", destinationPoint);
@@ -131,18 +133,14 @@ namespace DeltaRobot {
 
 		return rho;
 	}
-	#undef square
 
 	/**
-	 * Translates a point to a motion.
-	 * 
-	   TODO: motionPointer is gone and param rotations is missing.
-	 * @param destinationPoint destination point.
-	 * @param motionPointer output parameter, the resulting motion is stored here.
-	 * 
-	 * @return true on success, false otherwise.
+	 * Translates a point to the motor rotations.
+	 *
+	 * @param destinationPoint The destination point.
+	 * @param rotations Array of MotorRotation objects, will be adjusted by the function to the correct rotations per motor.
 	 **/
-	void InverseKinematics::pointToMotion(const DataTypes::Point3D<double>& destinationPoint, DataTypes::MotorRotation<double>* (&rotations)[3]) const{
+	void InverseKinematics::destinationPointToMotorRotations(const DataTypes::Point3D<double>& destinationPoint, DataTypes::MotorRotation<double>* (&rotations)[3]) const{
 		/**
 		 * Adding 180 degrees switches 0 degrees for the motor from the 
 		 * midpoint of the engines to directly opposite.

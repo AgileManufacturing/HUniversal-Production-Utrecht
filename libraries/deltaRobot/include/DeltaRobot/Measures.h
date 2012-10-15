@@ -36,26 +36,21 @@
 namespace DeltaRobot{
 	namespace Measures{
 		// The following variables are in millimeters
-		const double BASE 				  = 101.3;
-		const double HIP 				  = 100;
-		const double EFFECTOR			  = 46.19;
-		const double ANKLE 				  = 250;
+		const double BASE		= 101.3;
+		const double HIP		= 100;
+		const double EFFECTOR	= 46.19;
+		const double ANKLE		= 250;
 		
-
 		// The following variables are in radians
-		const double HIP_ANKLE_ANGLE_MAX  = Utilities::degreesToRadians(22);
+		const double HIP_ANKLE_ANGLE_MAX = Utilities::degreesToRadians(22);
+
 		// Safety constants, roughly determined to be as safe as possible for testing purposes
-		const double MOTOR_ROT_MIN 	      = Utilities::degreesToRadians(-42);
-		const double MOTOR_ROT_MAX 	      = Utilities::degreesToRadians(45);
-		
-		const double MOTOR1_DEVIATION	  = Utilities::degreesToRadians(-45);
-		const double MOTOR2_DEVIATION	  = Utilities::degreesToRadians(-45);
-		const double MOTOR3_DEVIATION	  = Utilities::degreesToRadians(-45);
+		const double MOTOR_ROT_MIN = Utilities::degreesToRadians(-42);
+		const double MOTOR_ROT_MAX = Utilities::degreesToRadians(45);
 		
 		// Top (granite) to middle point is 45 degrees. Removing the hip thickness results into +-42.5 degrees!
-		const double MOTORS_DEVIATION	=   Utilities::degreesToRadians(42.5); 
-		
-		
+		const double MOTORS_FROM_ZERO_TO_TOP_POSITION = Utilities::degreesToRadians(42.5); 
+
  		const double MAX_X = 500;
 		const double MAX_Y = MAX_X;
 		const double MIN_X = -MAX_X;

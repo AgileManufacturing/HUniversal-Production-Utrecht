@@ -47,7 +47,7 @@
 
 namespace DeltaRobot{
     /**
-     * Constructor of a DeltaRobot.
+     * Constructor of a deltarobot.
      * 
      * @param deltaRobotMeasures The measures of the deltarobot configuration in use.
      * @param motorManager The manager that allows all motors to be simultaneously activated.
@@ -82,7 +82,9 @@ namespace DeltaRobot{
     }
     
     /**
-       TODO: comment
+     * Generates the effectorBoundaries for the give voxelSize
+     *
+     * @param voxelSize The size in mm of a side of a voxel in the boundaries.
      **/
     void DeltaRobot::generateBoundaries(double voxelSize){
         boundaries = EffectorBoundaries::generateEffectorBoundaries((*kinematics), motors, voxelSize);
@@ -136,7 +138,7 @@ namespace DeltaRobot{
         rotations[2]->speed = speed;
 
         try{
-            kinematics->pointToMotion(point, rotations);
+            kinematics->destinationPointToMotorRotations(point, rotations);
         } catch(InverseKinematicsException& ex){
             delete rotations[0];
             delete rotations[1];
@@ -220,7 +222,7 @@ namespace DeltaRobot{
             usleep(25000);
         } while(!checkSensor(motorIndex));
 
-        double deviation = motorRotation.angle + Measures::MOTORS_DEVIATION;
+        double deviation = motorRotation.angle + Measures::MOTORS_FROM_ZERO_TO_TOP_POSITION;
 
         // Set deviation to the calculated value.
         motors[motorIndex]->setDeviation(deviation);

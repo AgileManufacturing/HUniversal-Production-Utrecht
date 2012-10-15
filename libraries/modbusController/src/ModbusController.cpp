@@ -41,20 +41,9 @@
 #include <cstdio>
 #include <iostream>
 
-/**
-   TODO: Is this still valid or is this just old?
- * ModbusController.cpp -> Class that implements the modbus protocol
- *
- * Modbus communication is realised with use of libmodbus.
- * This class merely adds a couple of features:
- * - timing control
- * - shadowing of certain registers
- * - the ability to write 32-bit values (instead of only 16-bit values)
- * - thread safety
- **/
 namespace ModbusController{
     /**
-     * Constructor.
+     * Constructor of a modbuscontroller.
      * 
      * @param context Initialized modbus_t.
      **/
@@ -89,6 +78,9 @@ namespace ModbusController{
         }
     }
 
+    /**
+     * Deconstructor of a modbuscontroller, ends logging and closes modbus connection.
+     **/
     ModbusController::~ModbusController(void){
         #ifdef MODBUS_LOGGING
             logFile.close();
