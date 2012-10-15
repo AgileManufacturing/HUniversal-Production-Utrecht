@@ -136,7 +136,7 @@ namespace DeltaRobot{
         rotations[2]->speed = speed;
 
         try{
-            kinematics->pointToMotion(point, rotations);
+            kinematics->destinationPointToMotorRotations(point, rotations);
         } catch(InverseKinematicsException& ex){
             delete rotations[0];
             delete rotations[1];

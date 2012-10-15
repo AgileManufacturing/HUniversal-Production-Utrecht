@@ -180,7 +180,7 @@ namespace DeltaRobot{
     		rotations[2] = new DataTypes::MotorRotation<double>();
 
 			try{
-				kinematics.pointToMotion(fromBitmapCoordinate(coordinate), rotations);
+				kinematics.destinationPointToMotorRotations(fromBitmapCoordinate(coordinate), rotations);
 			} catch(DeltaRobot::InverseKinematicsException & exception){
 				*fromCache = INVALID;
 				delete rotations[0];

@@ -1,6 +1,11 @@
 /**
  * @file InverseKinematics.h
- * @brief Inverse kinematics implementation. Based on work from Viacheslav Slavinsky
+ * @brief Inverse kinematics implementation. Based on work from Viacheslav Slavinsky.\n
+ * conventions sitting in front of delta robot:\n
+ * x-axis goes from left to right\n
+ * y-axis goes from front to back\n
+ * z-axis goes from bottom to top\n
+ * point (0,0,0) lies in the middle of all the motors at the motor's height
  *
  * @author 1.0 Lukas Vermond
  * @author 1.0 Kasper van Nieuwland
@@ -51,7 +56,7 @@ namespace DeltaRobot{
 
 		virtual ~InverseKinematics(void);
 		
-		void pointToMotion(const DataTypes::Point3D<double>& destinationPoint,
+		void destinationPointToMotorRotations(const DataTypes::Point3D<double>& destinationPoint,
 				DataTypes::MotorRotation<double>* (&rotations)[3]) const;
 	};
 }

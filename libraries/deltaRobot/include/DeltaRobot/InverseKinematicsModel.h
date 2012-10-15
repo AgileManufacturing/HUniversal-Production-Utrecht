@@ -1,6 +1,11 @@
 /**
  * @file InverseKinematicsModel.h
- * @brief Abstract inverse kinematics model for use in DeltaRobot class.
+ * @brief Abstract inverse kinematics model. Based on work from Viacheslav Slavinsky.\n
+ * conventions sitting in front of delta robot:\n
+ * x-axis goes from left to right\n
+ * y-axis goes from front to back\n
+ * z-axis goes from bottom to top\n
+ * point (0,0,0) lies in the middle of all the motors at the motor's height
  *
  * @author 1.0 Lukas Vermond
  * @author 1.0 Kasper van Nieuwland
@@ -35,19 +40,7 @@
 #include <DataTypes/MotorRotation.h>
 
 namespace DeltaRobot{
-	/**
-	   TODO: DOXYGENIZE!
-	 * InverseKinematicsModel.h -> kinematics model of the deltarobot.
-	 *
-	 * Uses various lengths and sizes to calculate a point to a motion.
-	 *
-	 *  conventions:
-	 *	sitting in front of delta robot
-	 *	x-axis goes from left to right
-	 *	y-axis goes from front to back
-	 *	z-axis goes from bottom to top
-	 *	point (0,0,0) lies in the middle of all the motors at the motor's height
-	 **/
+
 	class InverseKinematicsModel{
 	protected:
 		// Radius of the base in millimeters.
@@ -76,13 +69,12 @@ namespace DeltaRobot{
 		const double maxAngleHipAnkle;
 
 		/**
-		 * Converts a point to a motion.
-		 * 
-		   TODO: motionPointer -> rotations?
-		 * @param destinationPoint point that shall be converted.
-		 * @param motionPointer output parameter, the results of the conversion will be stored here.
+		 * Translates a point to the motor rotations.
+		 *
+		 * @param destinationPoint The destination point.
+		 * @param rotations Array of MotorRotation objects, will be adjusted by the function to the correct rotations per motor.
 		 **/
-		virtual void pointToMotion(const DataTypes::Point3D<double>& destinationPoint,
+		virtual void destinationPointToMotorRotations(const DataTypes::Point3D<double>& destinationPoint,
 				DataTypes::MotorRotation<double>* (&rotations)[3]) const = 0;
 	};
 }
