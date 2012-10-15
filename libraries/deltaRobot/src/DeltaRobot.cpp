@@ -47,7 +47,7 @@
 
 namespace DeltaRobot{
     /**
-     * Constructor of a DeltaRobot.
+     * Constructor of a deltarobot.
      * 
      * @param deltaRobotMeasures The measures of the deltarobot configuration in use.
      * @param motorManager The manager that allows all motors to be simultaneously activated.
@@ -82,7 +82,9 @@ namespace DeltaRobot{
     }
     
     /**
-       TODO: comment
+     * Generates the effectorBoundaries for the give voxelSize
+     *
+     * @param voxelSize The size in mm of a side of a voxel in the boundaries.
      **/
     void DeltaRobot::generateBoundaries(double voxelSize){
         boundaries = EffectorBoundaries::generateEffectorBoundaries((*kinematics), motors, voxelSize);
