@@ -1,10 +1,9 @@
 /**
-* @file MotorController.h
-* @brief Motor management for concurrent movement.
-* @date Created: 2012-10-02
+* @file OutputDevice.cpp
+* @brief Output device interface
+* @date Created: 2012-10-16
 *
 * @author Koen Braham
-* @author Dennis Koole
 *
 * @section LICENSE
 * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -27,17 +26,24 @@
 * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#include <modbusController/ModbusController.h>
+#include <InputOutput/OutputDevice.h>
 
-namespace InputOutputController
-{
+namespace InputOutput {
+	/**
+	 * Constructor for OutputDevice
+	 *
+	 * @param modbus Pointer to an established modbus connection.
+	 * @param address Register address that contains the device boolean.
+	 * @param pin The pin (bit) that is connected to the device.
+	 */
+	OutputDevice::OutputDevice(InputOutputController& ioController, uint32_t address, uint8_t pin) : 
+		ioController(ioController), address(address), pin(pin) {}
 
-	class InputOutputController
-	{
-	public:
-		InputOutputController(ModbusController::ModbusController& modbus)
+	OutputDevice::enable(){
+		ioController.pinHigh(address, pin);
+	}
 
-	private:
-		ModbusController::ModbusController& modbus;
-	};
+	OutputDevice::disable(){
+		ioController.pinLow(address, pin);
+	}
 }
