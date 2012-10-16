@@ -45,12 +45,17 @@ extern "C"{
 #include <iostream>
 #include <string>
 
+<<<<<<< HEAD
 /**
  * Turn on for modbus logging
+ * Parameter is the logfile location. Change before enabling the log!
  **/
 //#define MODBUS_LOGGING "/home/lcv/modbus.log"
 
+=======
+>>>>>>> origin/release-1.1
 namespace ModbusController{
+
     /**
      * Wrapper class for libmodbus with some extra functionality.
      **/
@@ -89,9 +94,17 @@ namespace ModbusController{
              **/
             WRITE_INTERVAL_BROADCAST = 16,
             
-            // TODO: comment this (also the variables are in microseconds)
-            TIMEOUT_BEGIN = 150000,
-            TIMEOUT_END   = 150000,
+            /**
+             * Timeout for bytes in a response. This timeout will occur when a message is delayed while being send.
+             * Value in microseconds.
+             **/
+            TIMEOUT_BYTE    = 150000,
+
+            /**
+             * Timeout for responses. This timeout will occur before a message is send.
+             * Value in microseconds.
+             **/
+            TIMEOUT_RESPONE = 150000,
         };
         
         /**
@@ -100,13 +113,30 @@ namespace ModbusController{
          **/    
         modbus_t* context;
 
+        /**
+         * @var long nextWriteTime
+         * Next time is used for synchronisation on the modbus interface.
+         * Some devices require a certain wait time before a next request can be processed.
+         **/
         long nextWriteTime;
-            
+
+        /**
+         * Typedef for a shadowMap registers spread over multiple slaves.
+         * Key is slave address. 64bit for multiple slaves.
+         **/
         typedef std::map<uint64_t, uint16_t> ShadowMap;
 
-        // Values at certain addresses are shadowed here.
+        /**
+         * @var ShadowMap shadowRegisters
+         * Actual shadowmap instance.
+         * @see ShadowMap
+         **/
         ShadowMap shadowRegisters;
 
+        /**
+         * @var std::ofstream logFile
+         * Logfile used for debugging the modbus communication.
+         */
         #ifdef MODBUS_LOGGING
             std::ofstream logFile;
         #endif

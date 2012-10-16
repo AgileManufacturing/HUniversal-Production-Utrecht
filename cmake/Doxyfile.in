@@ -619,13 +619,10 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = @DOCS_PATH@/libraries/dataTypes/include @DOCS_PATH@/libraries/dataTypes/src \
-                         @DOCS_PATH@/libraries/deltaRobot/include @DOCS_PATH@/libraries/deltaRobot/src \
-                         @DOCS_PATH@/libraries/modbusController/include @DOCS_PATH@/libraries/motor/src \
-                         @DOCS_PATH@/libraries/utilities/AutoKeyStore/include @DOCS_PATH@/libraries/utilities/AutoKeyStore/src \
-                         @DOCS_PATH@/libraries/utilities/JavaLibAutoKeyStore/include @DOCS_PATH@/libraries/utilities/JavaLibAutoKeyStore/src \
-                         @DOCS_PATH@/libraries/utilities/xml_io/include @DOCS_PATH@/libraries/utilities/xml_io/src \
-                         @DOCS_PATH@/libraries/utilities/include @DOCS_PATH@/libraries/utilities/src 
+INPUT                  = @DOCS_PATH@/libraries \ 
+                         @DOCS_PATH@/ros \
+                         @DOCS_PATH@/tools \
+                         @DOCS_PATH@/mainpage.dox
 
 
 # This tag can be used to specify the character encoding of the source files 
@@ -701,7 +698,7 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories 
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = 
+EXCLUDE_PATTERNS       = */msg_gen/* */srv_gen/* */src/*/srv/* */src/*/msg/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names 
 # (namespaces, classes, functions, etc.) that should be excluded from the 
