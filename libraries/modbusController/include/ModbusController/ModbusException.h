@@ -41,23 +41,40 @@
 #include <modbus/modbus.h>
 
 namespace ModbusController{
+
+    /** 
+     * Exception calss for modbus communication.
+     **/
     class ModbusException : public std::runtime_error{
     private:
-		// Modbus error code.
+        /**
+         * @var int errorCode
+         * The error code is set by libmodbus5.
+         **/
         const int errorCode;
         
-        // Modbus error string (obtained using modbus_strerror).
+        /**
+         * @var std::string message
+         * Modbus error string (obtained using modbus_strerror).
+         */
         std::string message;
         
     public:
-        // TODO: Need comment!
+        /**
+         * Constructor of the modbus exception
+         * Retrieves an error string from the modbus library.
+         **/
         ModbusException(void) : std::runtime_error(""), errorCode(errno){
             std::stringstream stream;
             stream << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
             message = stream.str();
         }
 
-        // TODO: Need comment!
+        /**
+         * Constructor of the modbus exception
+         * Adds a user specified message
+         * @see ModbusException
+         **/
         ModbusException(const std::string msg) : std::runtime_error(""), errorCode(errno){
             std::stringstream stream;
             stream << msg << std::endl;
@@ -65,13 +82,24 @@ namespace ModbusController{
             message = stream.str();
         }
         
+        /**
+         * Deconstructor
+         * Use for modbus error extends
+         **/
         virtual ~ModbusException(void) throw(){}
         
-        // TODO: Need comment
+        /**
+         * what getter
+         * @return const char* The error message
+         **/
         virtual const char* what(void) const throw(){
 			return message.c_str();
 		}
-        
+
+        /**
+         * Error code getter
+         * @return int The modbus error code
+         **/
         int getErrorCode(void){
             return errorCode;
         }
