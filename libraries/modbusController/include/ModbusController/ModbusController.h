@@ -45,11 +45,6 @@ extern "C"{
 #include <iostream>
 #include <string>
 
-/**
- * Turn on for modbus logging
- **/
-//#define MODBUS_LOGGING "/home/lcv/modbus.log"
-
 namespace ModbusController{
     class ModbusController{
     public:
