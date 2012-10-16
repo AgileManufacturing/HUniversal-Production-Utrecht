@@ -81,7 +81,7 @@ namespace DeltaRobot{
             InverseKinematicsModel* kinematics;
 
             /**
-             * @var StepperMotor*[] motors
+             * @var StepperMotor* motors
              * An array holding pointers to the three StepperMotors that are connected to the DeltaRobot. This array HAS to be of size 3.
              **/
             Motor::StepperMotor* (&motors)[3];

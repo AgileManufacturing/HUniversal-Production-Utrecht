@@ -42,6 +42,10 @@ namespace DeltaRobot{
 	 **/
 	class InverseKinematicsException: public std::runtime_error{
 	private:
+		/**
+		 * @var Point3D<double> notConvertablePoint
+		 * Point that could not be converted into angles for the motors.
+		 **/
 		DataTypes::Point3D<double> notConvertablePoint;
 
 	public:
