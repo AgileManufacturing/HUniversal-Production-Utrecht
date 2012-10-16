@@ -45,12 +45,18 @@ public:
 		postItBox->set_iswrite(false);
     	postItBox->set_readowner("DummyAgent");
     	postItBox->set_zone("BB1");
+
+    	// Create the map with moduleType mapped to package name and node name
+    	modulePackageNodeMap = map< int, std::pair<std::string, std::string> >();
+    	modulePackageNodeMap[1] = std::pair< std::string, std::string > ("deltaRobotNode", "DeltaRobotNode");
 	};
+
 	virtual ~EquipletNode() {
 		delete moduleTable;
 		delete bbUtils;
 		delete postItBox;
 	}
+
 	bool addHardwareModule(Mast::HardwareModuleProperties module);
 	bool removeHardwareModule(const std::string& name);
 	void updateOperationState();
@@ -59,20 +65,24 @@ public:
 	void readFromBlackboard();
 private:
 	/**
+	 * @var std::string name
 	 * The name of the Equiplet.
 	 **/
 	std::string name;
 	/**
+	 * @var Mast::state operationState
 	 * The minimal operation state is equal to the lowest state of 
 	 * all modules that are actors
 	 **/
 	Mast::state operationState;
 	/**
+	 * @var Mast::state safetyState
 	 * The safety state of the Equiplet. This is equal 
 	 * to the highest state of the actor modules
 	 **/
 	Mast::state safetyState;
 	/**
+	 * @var std::vector<Mast::HardwareModuleProperties> *moduleTable
 	 * The table that holds all information about the modules currently attached to this Equiplet  
 	 **/
 	std::vector<Mast::HardwareModuleProperties> *moduleTable;
@@ -82,7 +92,16 @@ private:
 	 **/
 	BlackboardClient::BlackboardClientUtils *bbUtils;
 	/**
+	 * @var PostItBox postItBox
 	 * The postIt box where the messages are stored that are read from the blackboard
 	 **/
 	PostItBox *postItBox;
+	/**
+	 * @var std::map<int, pair> modulePackageNodeMap
+	 * A map with the moduleType as key and a pair of package name and node name as value.
+	 * This is used to find the name of the node that has to be started when a
+	 * module is added, and the package name where the node can be find. This is a TEMPORARY!!
+	 * solution. Better is to store this in some kind of database.
+	 **/
+	 std::map<int, std::pair< std::string, std::string> > modulePackageNodeMap;
 };

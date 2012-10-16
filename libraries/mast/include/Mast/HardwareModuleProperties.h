@@ -45,13 +45,14 @@ namespace Mast
 		 * @param ac Is this  module an actor
 		 * @param nd Is this module needed for the current service
 		 **/
-		HardwareModuleProperties(const std::string& nm, state st, bool ac, bool nd):
-			name(nm), currentState(st), actuator(ac), needed(nd), error(false){}
+		HardwareModuleProperties(const std::string& nm, int tp, state st, bool ac, bool nd):
+			name(nm), type(tp), currentState(st), actuator(ac), needed(nd), error(false){}
 		/**
 		 * The use of a name for a module is a temporary solution. 
 		 * This will probably be changed when the module database is implemented.
 		 **/
 		std::string name;
+		int type;
 		state currentState;
 		bool actuator;
 		// Is this hardware module needed for the current service

@@ -27,14 +27,28 @@
 **/
 
 #include <EquipletNode/EquipletNode.h>
+#include "ros/ros.h"
 
 #define TOP_CAMERA "TopCamera"
 #define BOTTOM_CAMERA "BottomCamera"
-#define DELTAROBOT "DeltaRobot"
+#define DELTAROBOT "DeltaRobot1"
 #define GRIPPER2 "Gripper2"
 
 int main(int argc, char **argv) {
+	ros::init(argc, argv, "Equiplet");
 	EquipletNode equiplet("Equiplet1");
+	Mast::HardwareModuleProperties deltarobot(DELTAROBOT, 1, Mast::start, true, false);
+	equiplet.addHardwareModule(deltarobot);
+	std::cout << "Added hardware module!" << std::endl;
+	char key;
+	while(true){
+		std::cin >> key;
+		std::cout << "key pressed!" << std::endl;
+	}
+	ros::spin();
+
+
+	//equiplet.readFromBlackboard();
 
 	// Mast::HardwareModuleProperties topCamera(TOP_CAMERA, Mast::safe, false, false);
 	// Mast::HardwareModuleProperties bottomCamera(BOTTOM_CAMERA, Mast::safe, false, false);
@@ -63,7 +77,6 @@ int main(int argc, char **argv) {
 	// std::cout << std::endl;
 	// //std::cout << "safety state: " << safetyState << std::endl;
 	// //std::cout << "operation state: " << operationState << std::endl; 
-	equiplet.readFromBlackboard();
 
 	return 0;
 }

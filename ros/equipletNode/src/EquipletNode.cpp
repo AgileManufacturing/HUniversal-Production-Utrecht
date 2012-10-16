@@ -27,6 +27,9 @@
 **/
 
 #include <EquipletNode/EquipletNode.h>
+#include <sstream>
+#include <cstdio>
+#include <unistd.h>
 #include <algorithm>
 
 /**
@@ -95,10 +98,33 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 		if(module.name.compare(((*it).name)) == 0) {
 			return false;
 		}
-	}	
+	}
+
+	//std::pair< std::string, std::string > packaNodeName;
+	stringstream ss (stringstream::in | stringstream::out);
+	ss << "rosrun keyboardControlNode KeyBoardControlNode __name:=";
+	ss << ' ';
+	ss << module.name;
+
+	// Start a ros Node for the hardware module
+	int pid = -1;
+	std::cout << "pid: " << pid << std::endl;
+	switch(pid = fork()) {
+		case 0:
+			fclose(stderr);
+			fclose(stdout);
+			fclose(stdin);
+			execl("/bin/sh", "/bin/sh", "-c", ss.str().c_str(), NULL);
+		case -1: 
+			std::cerr << "Cannot start node for hardwaremodule " << module.name << std::endl;
+			return false;
+		default:
+			break; 
+	}
+	// Add it to the table and update the safety state and operation state	
 	moduleTable->push_back(module);
 	updateSafetyState();
-	updateOperationState();
+	updateOperationState(); 
 	return true;
 }
 
