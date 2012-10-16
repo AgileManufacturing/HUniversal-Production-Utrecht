@@ -39,10 +39,5 @@ namespace InputOutputController
 
 	private:
 		ModbusController::ModbusController& modbus;
-		
-        /** 
-        * Values at certain addresses are shadowed here
-        **/
-        std::map<uint32_t, uint16_t> shadowRegisters;
 	};
 }
