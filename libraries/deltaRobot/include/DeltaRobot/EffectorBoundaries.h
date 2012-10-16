@@ -96,7 +96,31 @@ namespace DeltaRobot{
 		 * Represents a 3-dimensional point in the 3D voxel array.
 		 **/
 		typedef struct BitmapCoordinate{
-			int x, y, z;
+			/**
+			 * @var int x
+			 * The x coordinate of the point.
+			 **/
+			int x;
+
+			/**
+			 * @var int y
+			 * The y coordinate of the point.
+			 **/
+			int y;
+
+			/**
+			 * @var int z 
+			 * The z coordinate of the point.
+			 **/ 
+			int z;
+
+			/**
+			 * Constructor for the BitmapCoordinate.
+			 * 
+			 * @param x The x coordinate of the point.
+			 * @param y The y coordinate of the point
+			 * @param z The z coordinate of the point.
+			 **/
 			BitmapCoordinate(int x, int y, int z) : x(x), y(y), z(z){}
 		} BitmapCoordinate;
 
@@ -128,6 +152,9 @@ namespace DeltaRobot{
 				(coordinate.z - Measures::BOUNDARY_BOX_MIN_Z) / voxelSize);
 		}
 
+		/**
+		 * An enum holding the values an entry in the pointValidityCache can have. They indicate whether a point fits within the boundaries or not, or if this has not yet been determined.
+		 **/
 		enum cacheEntry{
 			UNKNOWN,
 			VALID,
