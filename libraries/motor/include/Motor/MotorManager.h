@@ -35,14 +35,18 @@
 #include <Motor/StepperMotor.h>
 
 namespace Motor {
+
+	/**
+	 * Motor management for concurrent movement.
+	 **/
 	class MotorManager {
 	public:
 	    /**
 	     * Constructor for the motor manager
 	     *
-	     * @param ModbusController::ModbusController* modbus Pointer to an established modbus connection.
-	     * @param StepperMotor** motors Pointer array containing all motors for this manager.
-	     * @param int numberOfMotors Number of motors in the pointer array.
+	     * @param modbus Pointer to an established modbus connection.
+	     * @param motors Pointer array containing all motors for this manager.
+	     * @param numberOfMotors Number of motors in the pointer array.
 	     **/
 	    MotorManager(ModbusController::ModbusController* modbus, StepperMotor** motors, int numberOfMotors) : 
 	        modbus(modbus), motors(motors), numberOfMotors(numberOfMotors), poweredOn(false){}

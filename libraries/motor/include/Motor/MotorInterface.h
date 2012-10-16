@@ -70,7 +70,6 @@ namespace Motor{
 		 * Rotate the motors.
 		 * 
 		 * @param motorRotation Defines the angles, speed, acceleration and deceleration of the motors.
-		 * @param async function is performed asyncronous if true.
 		 **/
 	 	virtual void moveTo(const DataTypes::MotorRotation<double>& motorRotation) = 0;
 
@@ -83,6 +82,9 @@ namespace Motor{
 		 **/
 		virtual void moveToWithin(const DataTypes::MotorRotation<double>& motorRotation, double time, bool start) = 0;
 
+		/**
+		 * Wait till the motor has finished any rotations.
+		 **/
 		void waitTillReady(void);
 
 		/**
