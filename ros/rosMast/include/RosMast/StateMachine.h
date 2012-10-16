@@ -72,9 +72,7 @@ class StateMachine {
 
 		void StateEngine();
 		void changeState(StateType requestedState);
-		void setState(StateType newState) {
-			currentState = newState;
-		}
+		void setState(StateType newState);
 	
 	protected:
 		bool locked;
@@ -83,6 +81,9 @@ class StateMachine {
 		stateFunctionPtr stateMap[STATE_MAP_SIZE];
 		
 		struct StateTransition TransitionTable[TRANSITION_MAP_SIZE];
+
+		ros::Publisher pub;
+		ros::Subcriber sub;
 
 	private:
 		StateType currentState;

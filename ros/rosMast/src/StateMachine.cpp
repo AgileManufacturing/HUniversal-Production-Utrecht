@@ -47,10 +47,17 @@ StateMachine::StateMachine() {
 	TransitionTable[1] = StateTransition(standby, normal);
 	TransitionTable[2] = StateTransition(standby, safe);
 	TransitionTable[3] = StateTransition(normal, standby);
+
+	//Initialize publisher and subcriber
 }
 
 void StateMachine::changeState(StateType requestedState) {
-	setState(requestedState);
+	//find function to execute
+}
+
+void StateMachine::setState(StateType newState) {
+	currentState = newState;
+	//send update over publisher
 }
 
 void StateMachine::StateEngine() {
