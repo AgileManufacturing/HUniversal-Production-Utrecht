@@ -58,7 +58,7 @@ namespace Motor{
 		 * @var bool warning
 		 * Boolean that is set if there is a warning.
 		 **/
-		const bool warning 
+		const bool warning;
 		
 		/**
 		 * @var bool alarm

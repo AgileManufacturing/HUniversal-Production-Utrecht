@@ -57,11 +57,11 @@ namespace ModbusController{
         struct timeval timeoutEnd;
         struct timeval timeoutBegin;
         modbus_get_byte_timeout(context, &timeoutEnd);
-        timeoutEnd.tv_usec = TIMEOUT_END;
+        timeoutEnd.tv_usec = TIMEOUT_BYTE;
         modbus_set_byte_timeout(context, &timeoutEnd);
 
         modbus_get_response_timeout(context, &timeoutBegin);
-        timeoutBegin.tv_usec = TIMEOUT_BEGIN;
+        timeoutBegin.tv_usec = TIMEOUT_RESPONE;
         modbus_set_response_timeout(context, &timeoutBegin);
         
         #ifdef MODBUS_LOGGING

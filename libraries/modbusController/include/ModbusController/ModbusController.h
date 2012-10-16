@@ -45,15 +45,13 @@ extern "C"{
 #include <iostream>
 #include <string>
 
-<<<<<<< HEAD
+
 /**
  * Turn on for modbus logging
  * Parameter is the logfile location. Change before enabling the log!
  **/
 //#define MODBUS_LOGGING "/home/lcv/modbus.log"
 
-=======
->>>>>>> origin/release-1.1
 namespace ModbusController{
 
     /**
