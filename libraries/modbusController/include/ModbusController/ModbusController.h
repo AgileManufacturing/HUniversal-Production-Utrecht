@@ -80,17 +80,26 @@ namespace ModbusController{
             MODBUS_ERRNO_TIMEOUT = 0x6E,
 
             /**
-             * The interval between writing
+             * The interval between writing on the modbus in unicast mode milliseconds.
              **/
             WRITE_INTERVAL_UNICAST   = 8,
+
+            /**
+             * The interval between writing on the modbus in broadcast mode in milliseconds.
+             **/
             WRITE_INTERVAL_BROADCAST = 16,
             
-            // The following variables are in microseconds.
+            // TODO: comment this (also the variables are in microseconds)
             TIMEOUT_BEGIN = 150000,
             TIMEOUT_END   = 150000,
         };
-            
+        
+        /**
+         * @var modbus_t* context
+         * A pointer to the modbus interface.
+         **/    
         modbus_t* context;
+
         long nextWriteTime;
             
         typedef std::map<uint64_t, uint16_t> ShadowMap;
