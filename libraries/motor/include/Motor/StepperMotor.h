@@ -41,6 +41,9 @@
 #include <Motor/MotorInterface.h>
 
 namespace Motor{
+    /**
+     * Steppermotor driver.
+     **/
     class StepperMotor : public MotorInterface{
     public:
         StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex);
