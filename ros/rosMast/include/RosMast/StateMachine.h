@@ -29,14 +29,20 @@
 #ifndef STATEMACHINE_H
 #define STATEMACHINE_H
 
+#include "ros/ros.h"
+
 #define TRANSITION_MAP_SIZE 4
 #define STATE_MAP_SIZE 3
-
 
 typedef enum {safe = 0, standby = 1, normal = 2, setup = 3, shutdown = 4, start = 5, stop = 6} StateType;
 
 struct StateTransition 
 {
+	StateTransition() { }
+	StateTransition(StateType src, StateType des) {
+		SourceState = src;
+		DestinationState = des;
+	}
 	StateType SourceState;
 	StateType DestinationState;
 };
@@ -47,6 +53,7 @@ class StateMachine {
 	
 	public:
 		StateMachine();
+
 		//Transition functions
 		virtual int transitionSetup() = 0;		//Safe to standby transition
 		virtual int transitionStart() = 0; 		//Standby to normal transitiion
@@ -64,12 +71,21 @@ class StateMachine {
 		int getState() { return currentState; }
 
 		void StateEngine();
+		void changeState(StateType requestedState);
+		void setState(StateType newState) {
+			currentState = newState;
+		}
 	
 	protected:
-		StateType currentState;
 		bool locked;
+		
 		stateFunctionPtr transitionMap[TRANSITION_MAP_SIZE];
 		stateFunctionPtr stateMap[STATE_MAP_SIZE];
+		
+		struct StateTransition TransitionTable[TRANSITION_MAP_SIZE];
+
+	private:
+		StateType currentState;
 };
 
 #endif 

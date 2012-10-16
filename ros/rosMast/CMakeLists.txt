@@ -13,19 +13,13 @@ cmake_minimum_required(VERSION 2.4.6)
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
 # Initialize ROS package to be in our build system.
-rexos_rospack_init("mastTestNode" true true)
+rexos_rospack_init("rosMast" true true)
 
 # Add executables as documented by ROS
-rosbuild_add_executable(mastTestNode src/mastNode.cpp)
-
-# Add dependencies to our libraries and other ROS packages in the same directory as this one.
-add_dependencies(mastTestNode mast)
-
-# Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
-include_directories(${LIB_MAST_INCLUDE})
+rosbuild_add_executable(ROS_MAST src/StateMachine.cpp)
 
 # Link target to our libraries
-target_link_libraries(mastTestNode mast)
+target_link_libraries(ROS_MAST)
 
 # MUST be called after lcv_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()

@@ -1,0 +1,16 @@
+<package>
+  <description brief="rosMast">
+
+     Machine states implementation for ROS
+
+  </description>
+  <author>Arjan Groenewegen</author>
+  
+  <depend package="roscpp" />  
+  <depend package="std_msgs" />     
+  
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+</package>
+
+

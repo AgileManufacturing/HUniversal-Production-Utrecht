@@ -1,5 +1,5 @@
 ####### Add all ROS packages here
-set(ROSPACKS deltaRobotNode mastTestNode)
+set(ROSPACKS deltaRobotNode rosMast)
 
 ######
 ### Don't change anything below, the part below checks if ROS is installed and configured correctly. 
