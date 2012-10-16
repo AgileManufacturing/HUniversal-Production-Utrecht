@@ -37,8 +37,18 @@
 
 namespace Motor{
     namespace CRD514KD{
+
+        /**
+         * @var double MOTOR_STEP_ANGLE
+         * The angle of a single motor microstep in radians
+         **/
         const double MOTOR_STEP_ANGLE = (0.072 / 180.) * M_PI;
-        const double MOTOR_STEP_IN_DEGREES = 1.8;
+
+        /**
+         * @var double MOTOR_FULL_STEP_IN_DEGREES
+         * The angle of a single motor full step in degrees
+         **/
+        const double MOTOR_FULL_STEP_IN_DEGREES = 1.8;
 
         /**
          * CRD514KD slave addresses.
@@ -131,6 +141,11 @@ namespace Motor{
          * Constants used when constructing a modbus rtu (using modbus_new_rtu).
          **/
         namespace RtuConfig{
+
+            /**
+             * @var char DEVICE[]
+             * A char array (c string) holding the address of the modbus rtu.
+             **/
             const char DEVICE[] = "/dev/ttyS0";
             enum _rtu_config{
                 BAUDRATE = 115200,

@@ -216,7 +216,7 @@ namespace DeltaRobot{
 
         // Move motor upwards till the calibration sensor is pushed
         do{
-            motorRotation.angle -= Utilities::degreesToRadians(Motor::CRD514KD::MOTOR_STEP_IN_DEGREES);
+            motorRotation.angle -= Utilities::degreesToRadians(Motor::CRD514KD::MOTOR_FULL_STEP_IN_DEGREES);
             motors[motorIndex]->moveTo(motorRotation);
 
             usleep(25000);

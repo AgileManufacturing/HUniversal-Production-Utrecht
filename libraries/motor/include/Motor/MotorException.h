@@ -34,10 +34,22 @@
 #include <string>
 
 namespace Motor{
+	/**
+	 * Exception thrown if an error occures when the motor controllers fail.
+	 **/
 	class MotorException : public std::runtime_error{
 	public:
+
+		/**
+		 * Constructor of MotorException.
+		 * 
+		 * @param message Error message.
+		 **/
 		MotorException(const std::string& message = std::string()) : std::runtime_error(message){}
 
+		/**
+		 * Destructor of MotorException.
+		 **/
 		virtual ~MotorException(void) throw(){}
 	};
 }

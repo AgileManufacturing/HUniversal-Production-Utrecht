@@ -41,13 +41,45 @@
 #include <sstream>
 
 namespace Motor{
+	
+	/**
+	 * Exception thrown if the motorcontroller alarm flag is set.
+	 **/
 	class CRD514KDException : public std::runtime_error{
 	private:
+
+		/**
+		 * @var t slave
+		 * The modbus slave which set the alarm flag.
+		 **/
 		const CRD514KD::Slaves::t slave;
-		const bool warning, alarm;
+
+		/**
+		 * @var bool warning
+		 * Boolean that is set if there is a warning.
+		 **/
+		const bool warning 
+		
+		/**
+		 * @var bool alarm
+		 * Boolean that is set if there is an alarm.
+		 **/
+		const bool alarm;
+
+		/**
+		 * @var string message
+		 * The exception message.
+		 **/
 		std::string message;
 
 	public:
+		/**
+		 * Constructor for the CRD514KDException.
+		 *
+		 * @param slave The modbus slave which set the alarm flag.
+		 * @param warning Boolean that indicates whether there is a warning.
+		 * @param alarm Boolean that indicates whether there is an alarm.
+		 **/
 		CRD514KDException(const CRD514KD::Slaves::t slave, const bool warning, const bool alarm) :
 				std::runtime_error(""), slave(slave), warning(warning), alarm(alarm){
 			std::stringstream stream;
@@ -55,13 +87,25 @@ namespace Motor{
 			message = stream.str();
 		}
 
+		/**
+		 * Destructor for the CRD514KDException.
+		 **/
 		virtual ~CRD514KDException() throw(){}
 
-		// TODO: need comment
+		/**
+		 * Virtual method returning the exception message.
+		 * 
+		 * @return A C string containing the exception message.
+		 **/
 		virtual const char* what() const throw(){
 			return message.c_str();
 		}
 
+		/**
+		 * Gets the slave.
+		 * 
+		 * @return The slave
+		 **/
 		CRD514KD::Slaves::t getSlave(void){
 			return slave;
 		}
