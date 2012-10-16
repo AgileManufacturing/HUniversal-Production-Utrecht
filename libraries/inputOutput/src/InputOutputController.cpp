@@ -64,5 +64,4 @@ namespace InputOutput {
 		modbus->writeU16(MODBUS_TCP_SLAVE, address, value, false);
 		std::cout << "[DEBUG] pinLow " << address << " " << pin << "\r";
 	}
-
 }
