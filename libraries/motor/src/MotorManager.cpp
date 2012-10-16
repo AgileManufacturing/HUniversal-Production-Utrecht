@@ -38,7 +38,9 @@ extern "C"{
 }
 
 namespace Motor{
-	// TODO: Need comment!
+	/**
+	 * Powers on all motors by doing a broadcast to turn on all excitement for the motors.
+	 **/
 	void MotorManager::powerOn(void){
 		if(!poweredOn){
 			for(int i = 0; i < numberOfMotors; ++i){
@@ -48,7 +50,9 @@ namespace Motor{
 		poweredOn = true;
 	}
 
-	// TODO: Need comment!
+	/**
+	 * Powers off all motors by broadcasting a clear for the excitement.
+	 **/
 	void MotorManager::powerOff(void){
 		if(poweredOn){
 			for(int i = 0; i < numberOfMotors; ++i){
@@ -58,10 +62,12 @@ namespace Motor{
 		poweredOn = false;
 	}
 
-	// TODO: Need comment!
+	/**
+	 * Start simultaneously movement of all motors
+	 **/
 	void MotorManager::startMovement(void){
 		if(!poweredOn){
-            throw MotorException("motor drivers are not powered on");
+            throw MotorException("motor manager is not powered on");
         }
 
         // Execute motion.

@@ -37,18 +37,49 @@
 namespace Motor {
 	class MotorManager {
 	public:
-	    // TODO: No need to copy a motor or can we duplicate it?
+	    /**
+	     * Constructor for the motor manager
+	     *
+	     * @param ModbusController::ModbusController* modbus Pointer to an established modbus connection.
+	     * @param StepperMotor** motors Pointer array containing all motors for this manager.
+	     * @param int numberOfMotors Number of motors in the pointer array.
+	     **/
 	    MotorManager(ModbusController::ModbusController* modbus, StepperMotor** motors, int numberOfMotors) : 
 	        modbus(modbus), motors(motors), numberOfMotors(numberOfMotors), poweredOn(false){}
+
 	    void powerOn(void);
 	    void powerOff(void);
-	    bool isPoweredOn(void){ return poweredOn; }
 
+	    /**
+	     * Check whether the motormanager has been initiated.
+	     * @return bool PowerOn state.
+	     **/
+	    bool isPoweredOn(void){ return poweredOn; }
 	    void startMovement(void);
+
 	private:
+		/**
+		 * @var ModbusController::ModbusController* modbus
+		 * Pointer to an established modbus connection.
+		 **/
 		ModbusController::ModbusController* modbus;
+
+		/**
+		 * @var StepperMotor** motors
+		 * Pointer array containing all motors for this manager.
+		 **/
 		StepperMotor** motors;
+
+		/**
+		 * @var int numberOfMotors
+		 * Number of motors in the pointer array.
+		 **/
 		int numberOfMotors;
+
+		/**
+		 * @var bool poweredOn
+		 * Stores whether the motor manager has been turned on.
+		 **/
 		bool poweredOn;
 	};
 }
