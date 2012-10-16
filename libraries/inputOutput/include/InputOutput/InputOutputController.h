@@ -31,11 +31,10 @@
 namespace InputOutput
 {
 	/**
-	 * Input output modbus communication interface
-	 * In the near future a dummy interface could replace this interface and simulate io devices.
+	 *
 	 **/
-	class InputOutputController {
-		
+	class InputOutputController
+	{
 	public:
 		InputOutputController(ModbusController::ModbusController& modbus);
 
@@ -43,10 +42,6 @@ namespace InputOutput
 		void pinLow(uint32_t address, uint8_t pin);
 
 	private:
-		/**
-		 * @var ModbusController::ModbusController* modbus
-		 * Pointer to an established modbus connection.
-		 **/
 		ModbusController::ModbusController& modbus;
 	};
 }
