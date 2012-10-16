@@ -43,7 +43,7 @@ namespace Utilities{
     }
     
     /**
-     * Sleep for X milliseconds.
+     * Sleep the current thread for a specific time. Then resume the thread.
      *
      * @param milliseconds time in milliseconds.
      **/
@@ -56,7 +56,7 @@ namespace Utilities{
      *
      * @param rad Amount of radians.
      *
-     * @return degrees.
+     * @return An Amount of degrees.
      **/
     double radiansToDegrees(double radians){
 		return (radians / M_PI) * 180;
@@ -67,7 +67,7 @@ namespace Utilities{
      *
      * @param deg Amount of degrees.
      *
-     * @return radians.
+     * @return An amount of radians.
      **/
 	double degreesToRadians(double degrees){
 		return (degrees / 180) * M_PI;

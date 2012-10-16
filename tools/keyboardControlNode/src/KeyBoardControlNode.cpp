@@ -29,76 +29,95 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
- #include <iostream>
- #include <termios.h>
- #include <stdio.h>
- #include <signal.h>
- #include <string.h>
- #include <cstdlib>
- #include "ros/ros.h"
- #include "deltaRobotNode/MovePath.h"
- #include "deltaRobotNode/MoveToRelativePoint.h"
- #include "deltaRobotNode/Motion.h"
- #include "deltaRobotNode/Calibrate.h"
- #include "DeltaRobotNode/Services.h"
+#include <iostream>
+#include <termios.h>
+#include <stdio.h>
+#include <signal.h>
+#include <string.h>
+#include <cstdlib>
+#include "ros/ros.h"
+#include "deltaRobotNode/MovePath.h"
+#include "deltaRobotNode/MoveToRelativePoint.h"
+#include "deltaRobotNode/Motion.h"
+#include "deltaRobotNode/Calibrate.h"
+#include "DeltaRobotNode/Services.h"
+#define NODE_NAME "KeyBoardControlNode"
 
- #define NODE_NAME "KeyBoardControlNode"
+// Keycodes.
+#define KEYCODE_UP 0x41
+#define KEYCODE_DOWN 0x42
+#define KEYCODE_Q 0x71
+#define KEYCODE_W 0x77
+#define KEYCODE_A 0x61
+#define KEYCODE_S 0x73
+#define KEYCODE_D 0x64
+#define KEYCODE_C 0x63
 
- // Keycodes.
- #define KEYCODE_UP 0x41
- #define KEYCODE_DOWN 0x42
- #define KEYCODE_Q 0x71
- #define KEYCODE_W 0x77
- #define KEYCODE_A 0x61
- #define KEYCODE_S 0x73
- #define KEYCODE_D 0x64
- #define KEYCODE_C 0x63
+/**
+ * @var int keyboardNummer
+ * The number of the keyboard, e.g.: 0 is the primary keyboard.
+ **/
+int keyboardNumber = 0;
 
- // Keyboard number.
- int kfd = 0; 
+/**
+ * @var double speed
+ * The speed of the effector in milimeters per second.
+ **/
+double speed = 100.0;
+	
+/**
+ * @var double step
+ * The size in milimeters per movement.
+ **/
+double step = 1.0;
 
- struct termios cooked, raw;
+/**
+ *  A terminal interface data struct.
+ **/
+struct termios oldTerminalSettings, newTerminalSettings;
 
- /**
-  * Release keyboard safely when Ctrl+C is pressed.
-  *
-  * @param sig The signal received from the Linux OS.
-  **/
- void quit(int sig){
-    tcsetattr(kfd, TCSANOW, &cooked);
+/**
+ * Release keyboard safely when Ctrl+C is pressed.
+ *
+ * @param sig The signal received from the Linux OS.
+ **/
+void quit(int sig){
+    tcsetattr(keyboardNumber, TCSANOW, &oldTerminalSettings);
  	exit(0);
- }
+}
  
- int main(int argc, char** argv){
+/**
+ * Starting method for the KeyBoardControlNode.
+ *
+ * @param argc Argument count.
+ * @param argv Argument vector.
+ * 
+ * @return 1 on keyboard read error.
+ **/
+int main(int argc, char** argv){
 	// Ros init.
 	ros::init(argc, argv, NODE_NAME);
 	ros::NodeHandle nodeHandle;
 
 	// Getting MovePath Services.
-    ros::ServiceClient deltaRobotClient = nodeHandle.serviceClient<deltaRobotNode::MoveToRelativePoint>(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT);
-    deltaRobotNode::MoveToRelativePoint moveToRelativePointService;
+	ros::ServiceClient deltaRobotClient = nodeHandle.serviceClient<deltaRobotNode::MoveToRelativePoint>(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT);
+	deltaRobotNode::MoveToRelativePoint moveToRelativePointService;
 
-    // Getting Calibrate Services.
-    ros::ServiceClient calibrateClient = nodeHandle.serviceClient<deltaRobotNode::Calibrate>(DeltaRobotNodeServices::CALIBRATE);
-    deltaRobotNode::Calibrate calibrateService;
-    
+	// Getting Calibrate Services.
+	ros::ServiceClient calibrateClient = nodeHandle.serviceClient<deltaRobotNode::Calibrate>(DeltaRobotNodeServices::CALIBRATE);
+	deltaRobotNode::Calibrate calibrateService;
+
 	// Initing the keyboard read and setting up clean shutdown.
 	signal(SIGINT, quit);
-	char c;
-	tcgetattr(kfd, &cooked);
-	memcpy(&raw, &cooked, sizeof(struct termios));
-	raw.c_lflag &=~ (ICANON | ECHO);
+	char inputCharacter;
+	tcgetattr(keyboardNumber, &oldTerminalSettings);
+	memcpy(&newTerminalSettings, &oldTerminalSettings, sizeof(struct termios));
+	newTerminalSettings.c_lflag &=~ (ICANON | ECHO);
 
 	// Setting a new line, then end of file.
-	raw.c_cc[VEOL] = 1;
-  	raw.c_cc[VEOF] = 2;
-	tcsetattr(kfd, TCSANOW, &raw);
-
-	// The speed in mm per second.
-	double speed = 100.0;
-	
-	// The step we take in mm.
-	double step = 1.0;
+	newTerminalSettings.c_cc[VEOL] = 1;
+	newTerminalSettings.c_cc[VEOF] = 2;
+	tcsetattr(keyboardNumber, TCSANOW, &newTerminalSettings);
 
 	ROS_INFO("Reading from keyboard");
 	ROS_INFO("Start controlling the robot by pressing WASD keys and Up and Down keys");
@@ -106,9 +125,9 @@
 	deltaRobotNode::Motion motion;
 	for(;;) {
 		// Get the next event from the keyboard.
-		if(read(kfd, &c, 1) < 0){
+		if(read(keyboardNumber, &inputCharacter, 1) < 0){
 		  perror("read():");
-		  exit(0);
+		  exit(1);
 		}
 
 		moveToRelativePointService.request.motion.x = 0;
@@ -117,7 +136,7 @@
 		moveToRelativePointService.request.motion.speed = speed;
 
 		// Check which key was pressed.
-		switch(c){
+		switch(inputCharacter){
 			case KEYCODE_UP:
 				ROS_INFO("PRESSED UP");
 				moveToRelativePointService.request.motion.z = step;
@@ -155,4 +174,4 @@
 		ros::spinOnce();
 	}
 	return 0;
- }
+}
