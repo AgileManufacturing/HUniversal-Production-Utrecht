@@ -56,8 +56,8 @@ namespace Motor{
 	 *
 	 * @param modbusController Controller for the modbus communication.
 	 * @param motorIndex Index of the motor from 0 to N dependant on the amount of motors.
-	 * @param minAngle Minimum for the angle, in radians, the StepperMotor can travel.
-	 * @param maxAngle Maximum for the angle, in radians, the StepperMotor can travel.
+	 * @param minAngle Minimum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
+	 * @param maxAngle Maximum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
 	 **/
 	StepperMotor::StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle):
 		MotorInterface(), minAngle(minAngle), maxAngle(maxAngle), modbus(modbusController), motorIndex(motorIndex), anglesLimited(true), poweredOn(false){}
@@ -153,8 +153,8 @@ namespace Motor{
 	/**
 	 * Set the motor limits in the motor hardware.
 	 *
-	 * @param minAngle Minimum for the angle, in radians, the StepperMotor can travel.
-	 * @param maxAngle Maximum for the angle, in radians, the StepperMotor can travel.
+	 * @param minAngle Minimum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
+	 * @param maxAngle Maximum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
 	 **/
 	void StepperMotor::setMotorLimits(double minAngle, double maxAngle){
 		// Set motors limits.
@@ -220,7 +220,9 @@ namespace Motor{
 	/**
 	 * Same as moveTo, but rotates to an angle within a certain time.
 	 * 
+	 * @param motorRotation The rotational data for the motor.
 	 * @param time Time in seconds that the motors will take to rotate to the given angle. Speed member of given motion is ignored.
+	 * @param start If the movement should start immediately.
 	 **/
 	void StepperMotor::moveToWithin(const DataTypes::MotorRotation<double>& motorRotation, double time, bool start){
 		DataTypes::MotorRotation<double> newMotorRotation = motorRotation;
@@ -251,7 +253,7 @@ namespace Motor{
 	/**
 	 * Sets the angle limitations for the minimum the motor can travel in the motor hardware.
 	 *
-	 * @param minAngle Minimum for the angle, in radians, the StepperMotor can travel.
+	 * @param minAngle Minimum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
 	 **/
 	void StepperMotor::setMinAngle(double minAngle){
 		this->minAngle = minAngle;
@@ -262,7 +264,7 @@ namespace Motor{
 	/**
 	 * Sets the angle limitations for the maximum the motor can travel in the motor hardware.
 	 *
-	 * @param maxAngle Maximum for the angle, in radians, the StepperMotor can travel.
+	 * @param maxAngle Maximum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
 	 **/
 	void StepperMotor::setMaxAngle(double maxAngle){
 		this->maxAngle = maxAngle;

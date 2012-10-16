@@ -41,20 +41,63 @@
 #include "deltaRobotNode/Motion.h"
 #include "deltaRobotNode/Calibrate.h"
 #include "DeltaRobotNode/Services.h"
+
+/**
+ * @var NODE_NAME
+ * Name for the KeyBoardControlNode.
+ **/
 #define NODE_NAME "KeyBoardControlNode"
 
-// Keycodes.
+/**
+ * @var KEYCODE_UP
+ * The ascii representation of the up key on the keyboard.
+ **/
 #define KEYCODE_UP 0x41
+
+ /**
+ * @var KEYCODE_DOWN
+ * The ascii representation of the down key on the keyboard.
+ **/
 #define KEYCODE_DOWN 0x42
+
+ /**
+ * @var KEYCODE_Q
+ * The ascii representation of the Q key on the keyboard.
+ **/
 #define KEYCODE_Q 0x71
+
+ /**
+ * @var KEYCODE_W
+ * The ascii representation of the W key on the keyboard.
+ **/
 #define KEYCODE_W 0x77
+
+ /**
+ * @var KEYCODE_A
+ * The ascii representation of the A key on the keyboard.
+ **/
 #define KEYCODE_A 0x61
+
+ /**
+ * @var KEYCODE_S
+ * The ascii representation of the S key on the keyboard.
+ **/
 #define KEYCODE_S 0x73
+
+ /**
+ * @var KEYCODE_D
+ * The ascii representation of the D key on the keyboard.
+ **/
 #define KEYCODE_D 0x64
+
+ /**
+ * @var KEYCODE_C
+ * The ascii representation of the C key on the keyboard.
+ **/
 #define KEYCODE_C 0x63
 
 /**
- * @var int keyboardNummer
+ * @var int keyboardNumber
  * The number of the keyboard, e.g.: 0 is the primary keyboard.
  **/
 int keyboardNumber = 0;
@@ -64,7 +107,7 @@ int keyboardNumber = 0;
  * The speed of the effector in milimeters per second.
  **/
 double speed = 100.0;
-	
+
 /**
  * @var double step
  * The size in milimeters per movement.

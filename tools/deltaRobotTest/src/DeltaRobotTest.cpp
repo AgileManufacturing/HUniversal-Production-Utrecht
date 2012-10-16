@@ -29,65 +29,96 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
- #include "ros/ros.h"
- #include "deltaRobotNode/MovePath.h"
- #include "deltaRobotNode/MoveRelativePath.h"
- #include "deltaRobotNode/MoveToRelativePoint.h"
- #include "deltaRobotNode/MoveToPoint.h"
- #include "deltaRobotNode/Motion.h"
- #include "deltaRobotNode/Calibrate.h"
- #include "DeltaRobotNode/Services.h"
+#include "ros/ros.h"
+#include "deltaRobotNode/MovePath.h"
+#include "deltaRobotNode/MoveRelativePath.h"
+#include "deltaRobotNode/MoveToRelativePoint.h"
+#include "deltaRobotNode/MoveToPoint.h"
+#include "deltaRobotNode/Motion.h"
+#include "deltaRobotNode/Calibrate.h"
+#include "DeltaRobotNode/Services.h"
 
- #define NODE_NAME "DeltaRobotTest"
+/**
+ * @var NODE_NAME
+ * Name of the DeltaRobotTest node.
+ **/
+#define NODE_NAME "DeltaRobotTest"
 
- const double speed = 100.0;
- char keyPress;
+/**
+ * @var const double speed
+ * The speed in milimeters the deltarobot moves per second.
+ **/
+const double speed = 100.0;
 
- // Getting MoveToPoint Services.
- ros::ServiceClient moveToPointClient;
- deltaRobotNode::MoveToPoint moveToPointService;
+/**
+ * @var char keyPress
+ * The key received from the terminal.
+ **/
+char keyPress;
 
- void moveToStartPoint(){
+/**
+ * @var ServiceClient moveToPointClient
+ * Client to call the moveToPointService with.
+ **/
+ros::ServiceClient moveToPointClient;
+/**
+ * @var MoveToPoint moveToPointService
+ * Service to move the deltaRobot to a specific point.
+ **/
+deltaRobotNode::MoveToPoint moveToPointService;
+
+/**
+ * Moves the deltaRobot effector to the starting point, with all the hips horizontal.
+ **/
+void moveToStartPoint(){
 	std:: cout << "Press any key to goto startpoint" << std::endl;
-    std:: cin >> keyPress; 
+	std:: cin >> keyPress; 
 	moveToPointService.request.motion.x = 0;
 	moveToPointService.request.motion.y = 0;
 	moveToPointService.request.motion.z = -196.063;	
 	moveToPointService.request.motion.speed = speed;
 	moveToPointClient.call(moveToPointService);
- }
+}
 
- int main(int argc, char **argv){
+/**
+ * Starting method for the DeltaRobotTest.
+ *
+ * @param argc Argument count.
+ * @param argv Argument vector.
+ * 
+ * @return 0.
+ **/
+int main(int argc, char **argv){
 	// Ros init.
 	ros::init(argc, argv, NODE_NAME);
 	ros::NodeHandle nodeHandle;
 
 	// Getting Calibrate Services.
-    ros::ServiceClient calibrateClient = nodeHandle.serviceClient<deltaRobotNode::Calibrate>(DeltaRobotNodeServices::CALIBRATE);
-    deltaRobotNode::Calibrate calibrateService;
+	ros::ServiceClient calibrateClient = nodeHandle.serviceClient<deltaRobotNode::Calibrate>(DeltaRobotNodeServices::CALIBRATE);
+	deltaRobotNode::Calibrate calibrateService;
 
-    moveToPointClient = nodeHandle.serviceClient<deltaRobotNode::MoveToPoint>(DeltaRobotNodeServices::MOVE_TO_POINT);
+	moveToPointClient = nodeHandle.serviceClient<deltaRobotNode::MoveToPoint>(DeltaRobotNodeServices::MOVE_TO_POINT);
 
 	// Getting MoveToRelativePoint Services.
-    ros::ServiceClient moveToRelativePointClient = nodeHandle.serviceClient<deltaRobotNode::MoveToRelativePoint>(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT);
-    deltaRobotNode::MoveToRelativePoint moveToRelativePointService;
+	ros::ServiceClient moveToRelativePointClient = nodeHandle.serviceClient<deltaRobotNode::MoveToRelativePoint>(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT);
+	deltaRobotNode::MoveToRelativePoint moveToRelativePointService;
 
-    // Getting MovePath Service.
-    ros::ServiceClient movePathClient = nodeHandle.serviceClient<deltaRobotNode::MovePath>(DeltaRobotNodeServices::MOVE_PATH);
-    deltaRobotNode::MovePath movePathService;
+	// Getting MovePath Service.
+	ros::ServiceClient movePathClient = nodeHandle.serviceClient<deltaRobotNode::MovePath>(DeltaRobotNodeServices::MOVE_PATH);
+	deltaRobotNode::MovePath movePathService;
 
-    // Getting MoveRelativePath Service.
-    ros::ServiceClient moveRelativePathClient = nodeHandle.serviceClient<deltaRobotNode::MoveRelativePath>(DeltaRobotNodeServices::MOVE_RELATIVE_PATH);
-    deltaRobotNode::MoveRelativePath moveRelativePathService;
-   
+	// Getting MoveRelativePath Service.
+	ros::ServiceClient moveRelativePathClient = nodeHandle.serviceClient<deltaRobotNode::MoveRelativePath>(DeltaRobotNodeServices::MOVE_RELATIVE_PATH);
+	deltaRobotNode::MoveRelativePath moveRelativePathService;
+	
 	// Test Calibrate Service.
-    std:: cout << "Press any key to start the Calibrate" << std::endl;
-    std:: cin >> keyPress;    
-    calibrateClient.call(calibrateService);
+	std:: cout << "Press any key to start the Calibrate" << std::endl;
+	std:: cin >> keyPress;    
+	calibrateClient.call(calibrateService);
 
 	// Test MoveToPoint Service.
 	std:: cout << "Press any key to start the MoveToPoint" << std::endl;
-    std:: cin >> keyPress;   
+	std:: cin >> keyPress;   
 	moveToPointService.request.motion.x = 10;
 	moveToPointService.request.motion.y = 10;
 	moveToPointService.request.motion.z = -210;	
@@ -98,7 +129,7 @@
 
 	// Test MoveToRelativePoint Service.
 	std:: cout << "Press any key to start the MoveToRelativePoint" << std::endl;
-    std:: cin >> keyPress;   
+	std:: cin >> keyPress;   
 	moveToRelativePointService.request.motion.x = -1;
 	moveToRelativePointService.request.motion.y = -1;
 	moveToRelativePointService.request.motion.z = -1;	
@@ -109,7 +140,7 @@
 
 	// Test MovePath Service.
 	std:: cout << "Press any key to start the MovePathService" << std::endl;
-    std:: cin >> keyPress;   
+	std:: cin >> keyPress;   
 	deltaRobotNode::Motion point1;
 	deltaRobotNode::Motion point2;
 	deltaRobotNode::Motion point3;
@@ -144,7 +175,7 @@
 
 	// Test MoveRelativePath Service.
 	std:: cout << "Press any key to start the MoveRelativePath" << std::endl;
-    std:: cin >> keyPress; 
+	std:: cin >> keyPress; 
 	for(double z = 0; z < 10; z++){
 		deltaRobotNode::Motion point1;
 		deltaRobotNode::Motion point2;
@@ -182,5 +213,5 @@
 		moveRelativePathService.request.motion.push_back(point5);
 	}
 	moveRelativePathClient.call(moveRelativePathService);
- 	return 0;
- }
+	return 0;
+}

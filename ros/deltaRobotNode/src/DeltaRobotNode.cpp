@@ -43,9 +43,16 @@
 #include <Motor/StepperMotor.h>
 #include <DeltaRobotNode/Services.h>
 
+/**
+ * @var NODE_NAME
+ * Name for the DeltaRobotNode.
+ **/
 #define NODE_NAME "DeltaRobotNode"
 
-
+/**
+ * @var DeltaRobot * deltaRobot
+ * Pointer to the DeltaRobot object.
+ **/
 static DeltaRobot::DeltaRobot * deltaRobot;
 
 /**
