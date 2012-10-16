@@ -39,10 +39,29 @@
 
 namespace DataTypes{
 	template<typename T>
-
+	/**
+	 * 3 dimensional point class.
+	 **/
 	class Point3D{
 	public:
-		T x, y, z;
+		
+		/**
+		 * @var T x
+		 * X-coordinate, from left to right
+		 **/
+		T x;
+
+		/**
+		 * @var T y
+		 * Y-coordinate, from front to back
+		 **/
+		T y;
+
+		/**
+		 * @var T z
+		 * Z-coordinate, from bottom to top
+		 **/
+		T z;
 
 		/**
 		 * 3 dimensional point class constructor.

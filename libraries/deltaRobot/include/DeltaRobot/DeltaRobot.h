@@ -1,6 +1,6 @@
 /**
  * @file DeltaRobot.h
- * @brief Symbolizes an entire DeltaRobot.
+ * @brief Symbolizes an entire deltarobot.
  *
  * @author 1.0 Lukas Vermond
  * @author 1.0 Kasper van Nieuwland
@@ -43,11 +43,14 @@
 namespace DeltaRobot{
 	class InverseKinematicsModel;
 	
-    class DeltaRobot{
-        public:
+      /**
+       * A class that symbolizes an entire deltarobot.
+       **/
+      class DeltaRobot{
+      public:
             DeltaRobot(DataTypes::DeltaRobotMeasures& deltaRobotMeasures, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3], modbus_t* modbusIO);
             ~DeltaRobot();
-            
+
             inline EffectorBoundaries* getBoundaries(){ return boundaries; }
             inline bool hasBoundaries(){ return boundariesGenerated; }
 
@@ -61,16 +64,50 @@ namespace DeltaRobot{
             void powerOn();
             DataTypes::Point3D<double>& getEffectorLocation();
 
-        private:
+      private:
+            /**
+             * @var InverseKinematicsModel* kinematics
+             * A pointer to the kinematics model used by the DeltaRobot.
+             **/
             InverseKinematicsModel* kinematics;
+
+            /**
+             * @var StepperMotor*[] motors
+             * An array holding pointers to the three StepperMotors that are connected to the DeltaRobot. This array HAS to be of size 3.
+             **/
             Motor::StepperMotor* (&motors)[3];
+
+            /**
+             * @var MotorManager* motorManager
+             * A pointer to the MotorManager that handles the movement for the DeltaRobot.
+             **/
             Motor::MotorManager* motorManager;
+
+            /**
+             * @var EffectorBoundaries* boundaries
+             * A pointer to the EffectorBoundaries of the DeltaRobot.
+             **/
             EffectorBoundaries* boundaries;
 
+            /**
+             * @var Point3D<double> effectorLocation
+             * A 3D point in doubles that points to the location of the effector.
+             **/
             DataTypes::Point3D<double> effectorLocation;
+
+            /**
+             * @var bool boundariesGenerated
+             * A boolean indicating whether the EffectorBoundaries have been generated or not.
+             **/
             bool boundariesGenerated;
+
+            /**
+             * @var modbus_t* modbusIO
+             * A pointer to the TCP modbus connection for the IO controller.
+             **/
             modbus_t* modbusIO;
 
+
             bool isValidAngle(int motorIndex, double angle);
-    };
+            };
 }

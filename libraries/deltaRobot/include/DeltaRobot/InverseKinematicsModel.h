@@ -40,21 +40,50 @@
 #include <DataTypes/MotorRotation.h>
 
 namespace DeltaRobot{
-
+	
+	/**
+	 * Abstract inverse kinematics model class. Based on work from Viacheslav Slavinsky.\n
+	 * conventions sitting in front of delta robot:\n
+	 * x-axis goes from left to right\n
+	 * y-axis goes from front to back\n
+	 * z-axis goes from bottom to top\n
+	 * point (0,0,0) lies in the middle of all the motors at the motor's height
+	 **/
 	class InverseKinematicsModel{
 	protected:
-		// Radius of the base in millimeters.
+		/**
+		 * @var double base
+		 * Radius of the base in millimeters.
+		 **/
 		const double base;
 
-		// Length of the hip in millimeters.
+		/**
+		 * @var double hip
+		 * Length of the hip in millimeters.
+		 **/
 		const double hip;
 
-		// Radius of the effector in millimeters.
+		/**
+		 * @var double effector
+		 * Radius of the effector in millimeters.
+		 **/
 		const double effector;
 
-		// Length of the ankle in millimeters.
+		/**
+		 * @var double ankle
+		 * Length of the ankle in millimeters.
+		 **/
 		const double ankle;
 
+		/**
+		 * InverseKinematicsModel constructor. It is protected so that it can only be constructed by the InverseKinematics class.
+		 * 
+		 * @param base Radius of the base in millimeters.
+		 * @param hip Length of the hip in millimeters.
+		 * @param effector Radius of the effector in millimeters.
+		 * @param ankle Length of the ankle in millimeters.
+		 * @param maxAngleHipAnkle Maximum angle between hip and ankle on x-z plane in radians.
+		 **/
 		InverseKinematicsModel(const double base, const double hip,
 				const double effector, const double ankle,
 				const double maxAngleHipAnkle) :
@@ -65,7 +94,10 @@ namespace DeltaRobot{
 	public:
 		virtual ~InverseKinematicsModel(void){}
 
-		// Maximum angle between hip and ankle on x-z plane in radians.
+		/**
+		 * @var double maxAngleHipAnkle
+		 * Maximum angle between hip and ankle on x-z plane in radians.
+		 **/
 		const double maxAngleHipAnkle;
 
 		/**

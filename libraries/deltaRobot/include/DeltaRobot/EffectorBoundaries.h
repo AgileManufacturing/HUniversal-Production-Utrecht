@@ -111,9 +111,9 @@ namespace DeltaRobot{
 		 **/
 		inline DataTypes::Point3D<double> fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const{
 			return DataTypes::Point3D<double>(
-					(double) coordinate.x * voxelSize + Measures::MIN_X,
-					(double) coordinate.y * voxelSize + Measures::MIN_Y,
-					(double) coordinate.z * voxelSize + Measures::MIN_Z);
+					(double) coordinate.x * voxelSize + Measures::BOUNDARY_BOX_MIN_X,
+					(double) coordinate.y * voxelSize + Measures::BOUNDARY_BOX_MIN_Y,
+					(double) coordinate.z * voxelSize + Measures::BOUNDARY_BOX_MIN_Z);
 		}
 
 		/**
@@ -123,9 +123,9 @@ namespace DeltaRobot{
 		 **/
 		inline EffectorBoundaries::BitmapCoordinate fromRealCoordinate(DataTypes::Point3D<double> coordinate) const{
 			return EffectorBoundaries::BitmapCoordinate(
-				(coordinate.x - Measures::MIN_X) / voxelSize,
-				(coordinate.y - Measures::MIN_Y) / voxelSize,
-				(coordinate.z - Measures::MIN_Z) / voxelSize);
+				(coordinate.x - Measures::BOUNDARY_BOX_MIN_X) / voxelSize,
+				(coordinate.y - Measures::BOUNDARY_BOX_MIN_Y) / voxelSize,
+				(coordinate.z - Measures::BOUNDARY_BOX_MIN_Z) / voxelSize);
 		}
 
 		enum cacheEntry{
@@ -134,10 +134,46 @@ namespace DeltaRobot{
 			INVALID
 		};
 
-		int width, height, depth;
+		/**
+		 * @var int width
+		 * The width of the boundary bitmap.
+		 **/
+		int width;
+		
+		/**
+		 * @var int height
+		 * The height of the boundary bitmap.
+		 **/
+		int height; 
+
+		/**
+		 * @var int depth
+		 * The depth of the boundary bitmap.
+		 **/
+		int depth;
+
+		/**
+		 * @var bool* boundariesBitmap
+		 * A pointer to the boundaries bitmap.
+		 **/
 		bool* boundariesBitmap;
+
+		/**
+		 * @var InverseKinematicsModel& kinematics
+		 * A reference to the InverseKinematicsModel of the deltarobot, which is used to calculate the boundaries.
+		 **/
 		const InverseKinematicsModel &kinematics;
+
+		/**
+		 * @var StepperMotor* motors
+		 * An array holding pointers to the three StepperMotors that are connected to the DeltaRobot. This array HAS to be of size 3. The EffectorBoundaries needs to know the motors to find out their max and min angles.
+		 **/
 		Motor::StepperMotor* (&motors)[3];
+
+		/**
+		 * @var double voxelSize
+		 * The size of the voxels in the boundary bitmap.
+		 **/
 		double voxelSize;
 	};
 }

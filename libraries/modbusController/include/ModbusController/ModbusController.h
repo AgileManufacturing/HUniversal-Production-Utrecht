@@ -46,6 +46,9 @@ extern "C"{
 #include <string>
 
 namespace ModbusController{
+    /**
+     * Wrapper class for libmodbus with some extra functionality.
+     **/
     class ModbusController{
     public:
         ModbusController(modbus_t* context);
@@ -58,22 +61,40 @@ namespace ModbusController{
         void readU16(uint16_t slave, uint16_t firstAddress, uint16_t* data, unsigned int length);
         uint32_t readU32(uint16_t slave, uint16_t address);
 
+        /**
+         * @var mutex modbusMutex
+         * A mutex for locking the modbus.
+         **/
         boost::mutex modbusMutex;
 
     private:
         enum{
+            /**
+             * modbus timeout error code
+             **/
             MODBUS_ERRNO_TIMEOUT = 0x6E,
 
-            // The following variables are in milliseconds.
+            /**
+             * The interval between writing on the modbus in unicast mode milliseconds.
+             **/
             WRITE_INTERVAL_UNICAST   = 8,
+
+            /**
+             * The interval between writing on the modbus in broadcast mode in milliseconds.
+             **/
             WRITE_INTERVAL_BROADCAST = 16,
             
-            // The following variables are in microseconds.
+            // TODO: comment this (also the variables are in microseconds)
             TIMEOUT_BEGIN = 150000,
             TIMEOUT_END   = 150000,
         };
-            
+        
+        /**
+         * @var modbus_t* context
+         * A pointer to the modbus interface.
+         **/    
         modbus_t* context;
+
         long nextWriteTime;
             
         typedef std::map<uint64_t, uint16_t> ShadowMap;

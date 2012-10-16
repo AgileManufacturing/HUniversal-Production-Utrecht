@@ -34,11 +34,33 @@
 namespace DataTypes{
     template<typename T>
     
+    /**
+     * Template class for rotation data for the motor.
+     **/
     class MotorRotation{
     public:
+        /**
+         * @var T angle
+         * The angle in radians the motor has to travel towards
+         **/
         T angle;
+
+        /**
+         * @var T speed
+         * The speed in degrees per second
+         **/
         T speed;
+
+        /**
+         * @var T acceleration
+         * The acceleration in steps per second
+         **/
         T acceleration;
+
+        /**
+         * @var T deceleration
+         * The deceleration in steps per second
+         **/
         T deceleration;
         
         /**
