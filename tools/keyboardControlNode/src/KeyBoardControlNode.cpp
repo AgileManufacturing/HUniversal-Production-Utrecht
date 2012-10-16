@@ -42,93 +42,96 @@
 #include "deltaRobotNode/Calibrate.h"
 #include "DeltaRobotNode/Services.h"
 
-/**
- * @var NODE_NAME
- * Name for the KeyBoardControlNode.
- **/
+
+// @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "KeyBoardControlNode"
+// @endcond
 
-/**
- * @var KEYCODE_UP
- * The ascii representation of the up key on the keyboard.
- **/
-#define KEYCODE_UP 0x41
+namespace KeyBoardControlNodeNamespace {
+	/**
+	 * @var char KEYCODE_UP
+	 * The ascii representation of the up key on the keyboard.
+	 **/
+	const char KEYCODE_UP = 0x41;
 
- /**
- * @var KEYCODE_DOWN
- * The ascii representation of the down key on the keyboard.
- **/
-#define KEYCODE_DOWN 0x42
+	 /**
+	 * @var char KEYCODE_DOWN
+	 * The ascii representation of the down key on the keyboard.
+	 **/
+	const char KEYCODE_DOWN = 0x42;
 
- /**
- * @var KEYCODE_Q
- * The ascii representation of the Q key on the keyboard.
- **/
-#define KEYCODE_Q 0x71
+	 /**
+	 * @var char KEYCODE_Q
+	 * The ascii representation of the Q key on the keyboard.
+	 **/
+	const char KEYCODE_Q = 0x71;
 
- /**
- * @var KEYCODE_W
- * The ascii representation of the W key on the keyboard.
- **/
-#define KEYCODE_W 0x77
+	 /**
+	 * @var char KEYCODE_W
+	 * The ascii representation of the W key on the keyboard.
+	 **/
+	const char KEYCODE_W = 0x77;
 
- /**
- * @var KEYCODE_A
- * The ascii representation of the A key on the keyboard.
- **/
-#define KEYCODE_A 0x61
+	 /**
+	 * @var char KEYCODE_A
+	 * The ascii representation of the A key on the keyboard.
+	 **/
+	const char KEYCODE_A = 0x61;
 
- /**
- * @var KEYCODE_S
- * The ascii representation of the S key on the keyboard.
- **/
-#define KEYCODE_S 0x73
+	 /**
+	 * @var char KEYCODE_S
+	 * The ascii representation of the S key on the keyboard.
+	 **/
+	const char KEYCODE_S = 0x73;
 
- /**
- * @var KEYCODE_D
- * The ascii representation of the D key on the keyboard.
- **/
-#define KEYCODE_D 0x64
+	 /**
+	 * @var char KEYCODE_D
+	 * The ascii representation of the D key on the keyboard.
+	 **/
+	const char KEYCODE_D = 0x64;
 
- /**
- * @var KEYCODE_C
- * The ascii representation of the C key on the keyboard.
- **/
-#define KEYCODE_C 0x63
+	 /**
+	 * @var char KEYCODE_C
+	 * The ascii representation of the C key on the keyboard.
+	 **/
+	const char KEYCODE_C = 0x63;
 
-/**
- * @var int keyboardNumber
- * The number of the keyboard, e.g.: 0 is the primary keyboard.
- **/
-int keyboardNumber = 0;
+	/**
+	 * @var int keyboardNumber
+	 * The number of the keyboard, e.g.: 0 is the primary keyboard.
+	 **/
+	int keyboardNumber = 0;
 
-/**
- * @var double speed
- * The speed of the effector in milimeters per second.
- **/
-double speed = 100.0;
+	/**
+	 * @var double speed
+	 * The speed of the effector in millimeters per second.
+	 **/
+	double speed = 100.0;
 
-/**
- * @var double step
- * The size in milimeters per movement.
- **/
-double step = 1.0;
+	/**
+	 * @var double step
+	 * The size in millimeters per movement.
+	 **/
+	double step = 1.0;
 
-/**
- *  A terminal interface data struct.
- **/
-struct termios oldTerminalSettings, newTerminalSettings;
+	/**
+	 * A terminal interface data struct.
+	 **/
+	struct termios oldTerminalSettings, newTerminalSettings;
 
-/**
- * Release keyboard safely when Ctrl+C is pressed.
- *
- * @param sig The signal received from the Linux OS.
- **/
-void quit(int sig){
-    tcsetattr(keyboardNumber, TCSANOW, &oldTerminalSettings);
- 	exit(0);
+	/**
+	 * Release keyboard safely when Ctrl+C is pressed.
+	 *
+	 * @param sig The signal received from the Linux OS.
+	 **/
+	void quit(int sig){
+	    tcsetattr(keyboardNumber, TCSANOW, &oldTerminalSettings);
+	 	exit(0);
+	}
 }
- 
+
+using namespace KeyBoardControlNodeNamespace;
+
 /**
  * Starting method for the KeyBoardControlNode.
  *

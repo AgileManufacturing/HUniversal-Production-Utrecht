@@ -38,47 +38,49 @@
 #include "deltaRobotNode/Calibrate.h"
 #include "DeltaRobotNode/Services.h"
 
-/**
- * @var NODE_NAME
- * Name of the DeltaRobotTest node.
- **/
+// @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "DeltaRobotTest"
+// @endcond
 
-/**
- * @var const double speed
- * The speed in milimeters the deltarobot moves per second.
- **/
-const double speed = 100.0;
+namespace DeltaRobotTestNamespace {
+	/**
+	 * @var const double speed
+	 * The speed in milimeters the deltarobot moves per second.
+	 **/
+	const double speed = 100.0;
 
-/**
- * @var char keyPress
- * The key received from the terminal.
- **/
-char keyPress;
+	/**
+	 * @var char keyPress
+	 * The key received from the terminal.
+	 **/
+	char keyPress;
 
-/**
- * @var ServiceClient moveToPointClient
- * Client to call the moveToPointService with.
- **/
-ros::ServiceClient moveToPointClient;
-/**
- * @var MoveToPoint moveToPointService
- * Service to move the deltaRobot to a specific point.
- **/
-deltaRobotNode::MoveToPoint moveToPointService;
+	/**
+	 * @var ServiceClient moveToPointClient
+	 * Client to call the moveToPointService with.
+	 **/
+	ros::ServiceClient moveToPointClient;
+	/**
+	 * @var MoveToPoint moveToPointService
+	 * Service to move the deltaRobot to a specific point.
+	 **/
+	deltaRobotNode::MoveToPoint moveToPointService;
 
-/**
- * Moves the deltaRobot effector to the starting point, with all the hips horizontal.
- **/
-void moveToStartPoint(){
-	std:: cout << "Press any key to goto startpoint" << std::endl;
-	std:: cin >> keyPress; 
-	moveToPointService.request.motion.x = 0;
-	moveToPointService.request.motion.y = 0;
-	moveToPointService.request.motion.z = -196.063;	
-	moveToPointService.request.motion.speed = speed;
-	moveToPointClient.call(moveToPointService);
+	/**
+	 * Moves the deltaRobot effector to the starting point, with all the hips horizontal.
+	 **/
+	void moveToStartPoint(){
+		std:: cout << "Press any key to goto startpoint" << std::endl;
+		std:: cin >> keyPress; 
+		moveToPointService.request.motion.x = 0;
+		moveToPointService.request.motion.y = 0;
+		moveToPointService.request.motion.z = -196.063;	
+		moveToPointService.request.motion.speed = speed;
+		moveToPointClient.call(moveToPointService);
+	}
 }
+
+using namespace DeltaRobotTestNamespace;
 
 /**
  * Starting method for the DeltaRobotTest.

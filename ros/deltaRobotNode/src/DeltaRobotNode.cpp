@@ -43,201 +43,204 @@
 #include <Motor/StepperMotor.h>
 #include <DeltaRobotNode/Services.h>
 
-/**
- * @var NODE_NAME
- * Name for the DeltaRobotNode.
- **/
+// @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "DeltaRobotNode"
+// @endcond
 
-/**
- * @var DeltaRobot * deltaRobot
- * Pointer to the DeltaRobot object.
- **/
-static DeltaRobot::DeltaRobot * deltaRobot;
+namespace DeltaRobotNodeNamespace {
 
-/**
- * Starts the (re)calibration of the robot.
- * 
- * @param request The request for this service as defined in Calibrate.srv
- * @param response The response for this service as defined in Calibrate.srv
- * 
- * @return True if the calibration was succesfully, false otherwise.
- **/
-bool calibrate(deltaRobotNode::Calibrate::Request &request, deltaRobotNode::Calibrate::Response &response){
-    // Calibrate the motors.
-    if(!deltaRobot->calibrateMotors()){
-    	ROS_ERROR("Calibration FAILED. EXITING.");
-    	return false;
-    }
-	return true;	
-}
-
-/**
- * Move to an absolute point.
- *
- * @param request The request for this service as defined in MoveToPoint.srv
- * @param response The response for this service as defined in MoveToPoint.srv
- * 
- * @return True if the point has been reached, false if the point can't be reached or an error occurred during travelling.
- **/
-bool moveToPoint(deltaRobotNode::MoveToPoint::Request &request, deltaRobotNode::MoveToPoint::Response &response){
-	ROS_INFO("moveToPoint called");
-	DataTypes::Point3D<double>& effectorLocation = deltaRobot->getEffectorLocation();
-	deltaRobotNode::Motion motion = request.motion;
-	
 	/**
-	 * Check if the DeltaRobot can move from the current effector location
-	 * to the absolute point given as argument for this service.
+	 * @var DeltaRobot * deltaRobot
+	 * Pointer to the DeltaRobot object.
 	 **/
-	if(!deltaRobot->checkPath(
-		DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
-		DataTypes::Point3D<double>(motion.x, motion.y, motion.z))){
-		response.succeeded = false;
-		return response.succeeded;
-	}
-	ROS_INFO("moveTo: (%f, %f, %f) speed=%f", motion.x, motion.y,motion.z, motion.speed);
-	deltaRobot->moveTo(DataTypes::Point3D<double>(motion.x, motion.y, motion.z),motion.speed);
-	response.succeeded = true;
-	return response.succeeded;
-}
+	static DeltaRobot::DeltaRobot * deltaRobot;
 
-/**
- * Move to a number of absolute points.
- *
- * @param request The request for this service as defined in MovePath.srv
- * @param response The response for this service as defined in MovePath.srv
- * 
- * @return True if the path is finished, false if path can't be travelled along or if an error occured during the travelling.
- **/
-bool movePath(deltaRobotNode::MovePath::Request &request, deltaRobotNode::MovePath::Response &response){
-	ROS_INFO("movePath called");
-	deltaRobotNode::Motion currentMotion;
-	deltaRobotNode::Motion nextMotion;
-	try{
-		unsigned int n;
-		for(n = 0; n < request.motion.size() -1; n++){
-			currentMotion = request.motion[n];			
-			nextMotion = request.motion[n+1];
-			if(!deltaRobot->checkPath(
-				DataTypes::Point3D<double>(currentMotion.x, currentMotion.y, currentMotion.z),
-				DataTypes::Point3D<double>(nextMotion.x, nextMotion.y, nextMotion.z))){
-				response.succeeded = false;
-				return response.succeeded;
-			}
-		}
-		for(n = 0; n < request.motion.size(); n++){	
-			currentMotion = request.motion[n];
-			ROS_INFO("moveTo: (%f, %f, %f) speed=%f", currentMotion.x, currentMotion.y,currentMotion.z, currentMotion.speed);
-			deltaRobot->moveTo(DataTypes::Point3D<double>(currentMotion.x, currentMotion.y, currentMotion.z),currentMotion.speed);
-		}
-	} catch(std::runtime_error& ex){
-		std::stringstream ss;
-		ss << "runtime error of type " << typeid(ex).name() << " in delta robot" << std::endl;
-		ss << "what(): " << ex.what() << std::endl;
-		response.succeeded = false;
-		ROS_ERROR("moveTo: %s", ss.str().c_str());
-		return response.succeeded;
+	/**
+	 * Starts the (re)calibration of the robot.
+	 * 
+	 * @param request The request for this service as defined in Calibrate.srv
+	 * @param response The response for this service as defined in Calibrate.srv
+	 * 
+	 * @return True if the calibration was succesfully, false otherwise.
+	 **/
+	bool calibrate(deltaRobotNode::Calibrate::Request &request, deltaRobotNode::Calibrate::Response &response){
+	    // Calibrate the motors.
+	    if(!deltaRobot->calibrateMotors()){
+	    	ROS_ERROR("Calibration FAILED. EXITING.");
+	    	return false;
+	    }
+		return true;	
 	}
-	response.succeeded = true;
-	return response.succeeded;
-}
 
-/**
- * Move to a point that is relative to the current effector location.
- *
- * @param request The request for this service as defined in MoveToRelativePoint.srv
- * @param response The response for this service as defined in MoveToRelativePoint.srv
- * 
- * @return True if the point has been reached, false if the point can't be reached or an error occurred during travelling.
- **/
-bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &request, deltaRobotNode::MoveToRelativePoint::Response &response){
-	ROS_INFO("moveToRelativePoint called");
-	deltaRobotNode::Motion currentMotion;
-	try{
-		currentMotion = request.motion;
+	/**
+	 * Move to an absolute point.
+	 *
+	 * @param request The request for this service as defined in MoveToPoint.srv
+	 * @param response The response for this service as defined in MoveToPoint.srv
+	 * 
+	 * @return True if the point has been reached, false if the point can't be reached or an error occurred during travelling.
+	 **/
+	bool moveToPoint(deltaRobotNode::MoveToPoint::Request &request, deltaRobotNode::MoveToPoint::Response &response){
+		ROS_INFO("moveToPoint called");
 		DataTypes::Point3D<double>& effectorLocation = deltaRobot->getEffectorLocation();
-		ROS_INFO("Current effector location: x: %f y: %f z: %f", effectorLocation.x, effectorLocation.y, effectorLocation.z);
-		double relativeX = effectorLocation.x + currentMotion.x;
-		double relativeY = effectorLocation.y + currentMotion.y;
-		double relativeZ = effectorLocation.z + currentMotion.z;
-		ROS_INFO("Current motion z: %f", currentMotion.z);
-
+		deltaRobotNode::Motion motion = request.motion;
+		
+		/**
+		 * Check if the DeltaRobot can move from the current effector location
+		 * to the absolute point given as argument for this service.
+		 **/
 		if(!deltaRobot->checkPath(
-				DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
-				DataTypes::Point3D<double>(relativeX, relativeY, relativeZ))){
+			DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
+			DataTypes::Point3D<double>(motion.x, motion.y, motion.z))){
 			response.succeeded = false;
 			return response.succeeded;
 		}
-		deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ), currentMotion.speed);
-		//deltaRobot->waitForReady();
-
-	} catch(std::runtime_error& ex){
-		std::stringstream ss;
-		ss << "runtime error of type "<< typeid(ex).name()<<" in delta robot" << std::endl;
-		ss <<"what(): " << ex.what()<<std::endl;
-		response.succeeded = false;
-		ROS_ERROR("moveTo: %s", ss.str().c_str());
+		ROS_INFO("moveTo: (%f, %f, %f) speed=%f", motion.x, motion.y,motion.z, motion.speed);
+		deltaRobot->moveTo(DataTypes::Point3D<double>(motion.x, motion.y, motion.z),motion.speed);
+		response.succeeded = true;
+		return response.succeeded;
 	}
 
-    response.succeeded = true;
-	return response.succeeded;
-}
+	/**
+	 * Move to a number of absolute points.
+	 *
+	 * @param request The request for this service as defined in MovePath.srv
+	 * @param response The response for this service as defined in MovePath.srv
+	 * 
+	 * @return True if the path is finished, false if path can't be travelled along or if an error occured during the travelling.
+	 **/
+	bool movePath(deltaRobotNode::MovePath::Request &request, deltaRobotNode::MovePath::Response &response){
+		ROS_INFO("movePath called");
+		deltaRobotNode::Motion currentMotion;
+		deltaRobotNode::Motion nextMotion;
+		try{
+			unsigned int n;
+			for(n = 0; n < request.motion.size() -1; n++){
+				currentMotion = request.motion[n];			
+				nextMotion = request.motion[n+1];
+				if(!deltaRobot->checkPath(
+					DataTypes::Point3D<double>(currentMotion.x, currentMotion.y, currentMotion.z),
+					DataTypes::Point3D<double>(nextMotion.x, nextMotion.y, nextMotion.z))){
+					response.succeeded = false;
+					return response.succeeded;
+				}
+			}
+			for(n = 0; n < request.motion.size(); n++){	
+				currentMotion = request.motion[n];
+				ROS_INFO("moveTo: (%f, %f, %f) speed=%f", currentMotion.x, currentMotion.y,currentMotion.z, currentMotion.speed);
+				deltaRobot->moveTo(DataTypes::Point3D<double>(currentMotion.x, currentMotion.y, currentMotion.z),currentMotion.speed);
+			}
+		} catch(std::runtime_error& ex){
+			std::stringstream ss;
+			ss << "runtime error of type " << typeid(ex).name() << " in delta robot" << std::endl;
+			ss << "what(): " << ex.what() << std::endl;
+			response.succeeded = false;
+			ROS_ERROR("moveTo: %s", ss.str().c_str());
+			return response.succeeded;
+		}
+		response.succeeded = true;
+		return response.succeeded;
+	}
 
-/**
- * Move to a number of relative points. 
- *
- * @param request The request for this service as defined in MoveRelativePath.srv
- * @param response The response for this service as defined in MoveRelativePath.srv
- *
- * @return True if the path is finished, false if path can't be travelled along or if an error occured during the travelling.
- **/
-bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &request, deltaRobotNode::MoveRelativePath::Response &response){
-	ROS_INFO("moveRelativePath called");
+	/**
+	 * Move to a point that is relative to the current effector location.
+	 *
+	 * @param request The request for this service as defined in MoveToRelativePoint.srv
+	 * @param response The response for this service as defined in MoveToRelativePoint.srv
+	 * 
+	 * @return True if the point has been reached, false if the point can't be reached or an error occurred during travelling.
+	 **/
+	bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &request, deltaRobotNode::MoveToRelativePoint::Response &response){
+		ROS_INFO("moveToRelativePoint called");
+		deltaRobotNode::Motion currentMotion;
+		try{
+			currentMotion = request.motion;
+			DataTypes::Point3D<double>& effectorLocation = deltaRobot->getEffectorLocation();
+			ROS_INFO("Current effector location: x: %f y: %f z: %f", effectorLocation.x, effectorLocation.y, effectorLocation.z);
+			double relativeX = effectorLocation.x + currentMotion.x;
+			double relativeY = effectorLocation.y + currentMotion.y;
+			double relativeZ = effectorLocation.z + currentMotion.z;
+			ROS_INFO("Current motion z: %f", currentMotion.z);
 
-	deltaRobotNode::Motion currentMotion;
-	double relativeX;
-	double relativeY;
-	double relativeZ;
-	DataTypes::Point3D<double> effectorLocation;
-	
-	try{
-		effectorLocation = deltaRobot->getEffectorLocation();
-		unsigned int n;
-		for(n = 0; n < request.motion.size(); n++){
-			currentMotion = request.motion[n];			
-			relativeX = effectorLocation.x + currentMotion.x;
-			relativeY = effectorLocation.y + currentMotion.y;
-			relativeZ = effectorLocation.z + currentMotion.z;
 			if(!deltaRobot->checkPath(
-				DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
-				DataTypes::Point3D<double>(relativeX, relativeY, relativeZ))){
+					DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
+					DataTypes::Point3D<double>(relativeX, relativeY, relativeZ))){
 				response.succeeded = false;
-				ROS_INFO("FROM %f, %f, %f TO %f, %f, %f Not allowed", effectorLocation.x, effectorLocation.z, effectorLocation.y, relativeX, relativeY, relativeZ);
 				return response.succeeded;
 			}
-			effectorLocation.x = relativeX;
-			effectorLocation.y = relativeY;
-			effectorLocation.z = relativeZ;
+			deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ), currentMotion.speed);
+			//deltaRobot->waitForReady();
+
+		} catch(std::runtime_error& ex){
+			std::stringstream ss;
+			ss << "runtime error of type "<< typeid(ex).name()<<" in delta robot" << std::endl;
+			ss <<"what(): " << ex.what()<<std::endl;
+			response.succeeded = false;
+			ROS_ERROR("moveTo: %s", ss.str().c_str());
 		}
-		for(n = 0; n < request.motion.size(); n++){	
-			currentMotion = request.motion[n];			
-			effectorLocation = deltaRobot->getEffectorLocation();
-			relativeX = effectorLocation.x + currentMotion.x;
-			relativeY = effectorLocation.y + currentMotion.y;
-			relativeZ = effectorLocation.z + currentMotion.z;
-			ROS_INFO("moveTo: (%f, %f, %f) speed=%f", relativeX, relativeY,relativeZ, currentMotion.speed);
-			deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ),currentMotion.speed);
-		}
-	} catch(std::runtime_error& ex){
-		std::stringstream ss;
-		ss << "runtime error of type " << typeid(ex).name() << " in delta robot" << std::endl;
-		ss << "what(): " << ex.what() << std::endl;
-		response.succeeded = false;
-		ROS_ERROR("moveTo: %s", ss.str().c_str());
+
+	    response.succeeded = true;
+		return response.succeeded;
 	}
-	response.succeeded = true;
-	return response.succeeded;
+
+	/**
+	 * Move to a number of relative points. 
+	 *
+	 * @param request The request for this service as defined in MoveRelativePath.srv
+	 * @param response The response for this service as defined in MoveRelativePath.srv
+	 *
+	 * @return True if the path is finished, false if path can't be travelled along or if an error occured during the travelling.
+	 **/
+	bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &request, deltaRobotNode::MoveRelativePath::Response &response){
+		ROS_INFO("moveRelativePath called");
+
+		deltaRobotNode::Motion currentMotion;
+		double relativeX;
+		double relativeY;
+		double relativeZ;
+		DataTypes::Point3D<double> effectorLocation;
+		
+		try{
+			effectorLocation = deltaRobot->getEffectorLocation();
+			unsigned int n;
+			for(n = 0; n < request.motion.size(); n++){
+				currentMotion = request.motion[n];			
+				relativeX = effectorLocation.x + currentMotion.x;
+				relativeY = effectorLocation.y + currentMotion.y;
+				relativeZ = effectorLocation.z + currentMotion.z;
+				if(!deltaRobot->checkPath(
+					DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
+					DataTypes::Point3D<double>(relativeX, relativeY, relativeZ))){
+					response.succeeded = false;
+					ROS_INFO("FROM %f, %f, %f TO %f, %f, %f Not allowed", effectorLocation.x, effectorLocation.z, effectorLocation.y, relativeX, relativeY, relativeZ);
+					return response.succeeded;
+				}
+				effectorLocation.x = relativeX;
+				effectorLocation.y = relativeY;
+				effectorLocation.z = relativeZ;
+			}
+			for(n = 0; n < request.motion.size(); n++){	
+				currentMotion = request.motion[n];			
+				effectorLocation = deltaRobot->getEffectorLocation();
+				relativeX = effectorLocation.x + currentMotion.x;
+				relativeY = effectorLocation.y + currentMotion.y;
+				relativeZ = effectorLocation.z + currentMotion.z;
+				ROS_INFO("moveTo: (%f, %f, %f) speed=%f", relativeX, relativeY,relativeZ, currentMotion.speed);
+				deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ),currentMotion.speed);
+			}
+		} catch(std::runtime_error& ex){
+			std::stringstream ss;
+			ss << "runtime error of type " << typeid(ex).name() << " in delta robot" << std::endl;
+			ss << "what(): " << ex.what() << std::endl;
+			response.succeeded = false;
+			ROS_ERROR("moveTo: %s", ss.str().c_str());
+		}
+		response.succeeded = true;
+		return response.succeeded;
+	}
 }
+
+using namespace DeltaRobotNodeNamespace;
 
 /**
  * Starting method for the DeltaRobotNode.
