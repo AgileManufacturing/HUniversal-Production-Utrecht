@@ -63,26 +63,100 @@ namespace Motor{
         void waitTillReady(void);
 
         bool isPoweredOn(void){ return poweredOn; }
+
+        /**
+         * Returns the minimum angle, in radians, the StepperMotor can travel on the theoretical plane.
+         * 
+         * @return The minimum angle, in radians, the StepperMotor can travel on the theoretical plane.
+         **/
         inline double getMinAngle(void) const{ return minAngle; }
+        
+        /**
+         * Returns the maximum angle, in radians, the StepperMotor can travel on the theoretical plane.
+         * 
+         * @return The maximum angle, in radians, the StepperMotor can travel on the theoretical plane. 
+         **/
         inline double getMaxAngle(void) const{ return maxAngle; }
         void setMinAngle(double minAngle);
         void setMaxAngle(double maxAngle);
+        
+        /**
+         * Stores the angle that was given to the motor in the local variable currentAngle.
+         *
+         * @param angle The angle that is the current location of the motor.
+         **/
         void setCurrentAngle(double angle){ currentAngle = angle; }
 
+        /**
+         * Returns the deviation between the motors 0 degrees and the horizontal 0 degrees.
+         *
+         * @return The deviation between the hardware and theoretical 0 degrees.
+         **/
         double getDeviation(void){ return deviation; }
+
+        /**
+         * Sets the deviation between the motors 0 degrees and the horizontal 0 degrees.
+         *
+         * @param deviation The deviation between the hardware and theoretical 0 degrees.
+         **/
         void setDeviation(double deviation){ this->deviation = deviation; }
 
         void disableAngleLimitations(void);
         void updateAngle(void);
 
     private:
-        double currentAngle, setAngle, deviation, minAngle, maxAngle;
+        /**
+         * @var double currentAngle
+         * The angle most recently written to the motors since the most recently executed movement.
+         **/
+        double currentAngle;
+
+        /**
+         * @var double setAngle
+         * The angle most recently written to the motors. This does not mean the movement is executed.
+         **/
+        double setAngle;
+
+        /**
+         * @var double deviation
+         * The deviation between the motors 0 degrees and the horizontal 0 degrees.
+         **/
+        double deviation;
+
+        /**
+         * @var double minAngle
+         * The minimum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
+         **/
+        double minAngle;
+
+        /**
+         * @var double maxAngle
+         * The maximum angle, in radians, the StepperMotor can travel on the theoretical plane.
+         **/
+        double maxAngle;
         
+        /**
+         * @var ModbusController* modbus
+         * Controller for the modbus communication.
+         **/
         ModbusController::ModbusController* modbus;
 
+        /**
+         * @var Slaves::t motorIndex
+         * Index for the motor in the CRD514KD slaves enum.
+         **/
         CRD514KD::Slaves::t motorIndex;
         
+        /**
+         * @var bool anglesLimited
+         * If hardware limitations are set on the angles the motor can travel.
+         **/
         bool anglesLimited;
+
+        /**
+         * @var volatile bool poweredOn
+         * If the motor is already powered on.
+         **/
         volatile bool poweredOn;
     };
 }
