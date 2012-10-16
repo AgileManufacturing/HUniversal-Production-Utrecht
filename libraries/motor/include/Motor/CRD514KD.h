@@ -50,10 +50,10 @@ namespace Motor{
          **/
         const double MOTOR_FULL_STEP_IN_DEGREES = 1.8;
 
-        /**
-         * CRD514KD slave addresses.
-         **/
         namespace Slaves{
+            /**
+             * CRD514KD slave addresses.
+             **/
             typedef enum _t{
                 BROADCAST = 0,
                 MOTOR_0 = 1,
@@ -62,10 +62,10 @@ namespace Motor{
             } t;
         }
 
-        /**
-         * CRD514KD registers.
-         **/
         namespace Registers{
+            /**
+             * CRD514KD registers.
+             **/
             enum _registers{
                 // 32-bit.
                 OP_POS                  = 0x402,
@@ -114,10 +114,10 @@ namespace Motor{
             };
         }
 
-        /**
-         * Bits of value at address CMD_1.
-         **/
         namespace CMD1Bits{
+            /**
+             * Bits of value at address CMD_1.
+             **/
             enum _cmd1_bits{
                 START         = (1 << 8),
                 STOP          = (1 << 11),
@@ -125,10 +125,10 @@ namespace Motor{
             };
         }
 
-        /**
-         * Bits of value at address STATUS_1.
-         **/
         namespace Status1Bits{
+            /**
+             * Bits of value at address STATUS_1.
+             **/
             enum _status1_bits{
                 WARNING = (1 << 6),
                 ALARM   = (1 << 7),
@@ -137,16 +137,17 @@ namespace Motor{
             };
         }
 
-        /** 
-         * Constants used when constructing a modbus rtu (using modbus_new_rtu).
-         **/
+        
         namespace RtuConfig{
-
             /**
              * @var char DEVICE[]
              * A char array (c string) holding the address of the modbus rtu.
              **/
             const char DEVICE[] = "/dev/ttyS0";
+            
+            /** 
+             * Constants used when constructing a modbus rtu (using modbus_new_rtu).
+             **/
             enum _rtu_config{
                 BAUDRATE = 115200,
                 PARITY   = 'N',
