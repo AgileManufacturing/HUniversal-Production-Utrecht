@@ -45,14 +45,22 @@ namespace DeltaRobot{
 		DataTypes::Point3D<double> notConvertablePoint;
 
 	public:
+		/**
+		 * Constructor for InverseKinematicsException.
+		 * @param exceptionMessage The exception message
+		 * @param destinationPoint The point of the destination.
+		 **/
 		InverseKinematicsException(const char* exceptionMessage, DataTypes::Point3D<double> destinationPoint) :
 				std::runtime_error(exceptionMessage), notConvertablePoint(destinationPoint){}
 
+		/**
+		 * Destructor for InverseKinematicsException.
+		 **/
 		virtual ~InverseKinematicsException(void) throw(){}
 
 		/**
-		   TODO: DOXYGENIZE!
-		 * Used to access the point that could not be converted
+		 * Used to access the point that could not be converted.
+		 * @return A point3D<double> of the point that could not be converted.
 		 **/
 		DataTypes::Point3D<double> getNotConvertablePoint(void){
 			return notConvertablePoint;
