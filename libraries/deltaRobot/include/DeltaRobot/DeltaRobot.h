@@ -51,7 +51,16 @@ namespace DeltaRobot{
             DeltaRobot(DataTypes::DeltaRobotMeasures& deltaRobotMeasures, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3], modbus_t* modbusIO);
             ~DeltaRobot();
 
+            /**
+             * Gets the EffectorBoundaries of the deltarobot.
+             * @return The EffectorBoundaries of the deltarobot.
+             **/
             inline EffectorBoundaries* getBoundaries(){ return boundaries; }
+
+            /**
+             * Checks whether the EffectorBoundaries have been generated, via the boundariesGenerated boolean.
+             * @return True if the EffectorBoundaries have been generated.
+             **/
             inline bool hasBoundaries(){ return boundariesGenerated; }
 
             void generateBoundaries(double voxelSize);

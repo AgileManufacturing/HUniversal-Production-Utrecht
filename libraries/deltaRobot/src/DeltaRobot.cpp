@@ -82,7 +82,7 @@ namespace DeltaRobot{
     }
     
     /**
-     * Generates the effectorBoundaries for the given voxelSize
+     * Generates the effectorBoundaries for the given voxelSize.
      *
      * @param voxelSize The size in millimeters of a side of a voxel in the boundaries.
      **/
