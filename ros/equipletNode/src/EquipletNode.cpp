@@ -180,3 +180,25 @@ void EquipletNode::readFromBlackboard() {
 	bbUtils->readFromBlackboard(postItBox);
 	std::cout << "Number of postIts: " << received->postits_size() << std::endl;
 }
+
+/**
+ * Update the state of a module in the module table. Also automatically updates the operationState and
+ * safe state of the Equiplet
+ *
+ * @param moduleID the id of the module
+ * @param state the new state of the module 
+ * 
+ * @return true if the module is found and the state is updated, false if the module is not found in module table
+ **/
+bool EquipletNode::updateModuleState(int moduleID, rosMast::StateType state) {
+	std::vector<Mast::HardwareModuleProperties>::iterator it;
+	for(it = moduleTable->begin(); it < moduleTable->end(); it++) {
+		if((*it).id == moduleId) {
+			(*it).state = state;
+			updateSafetyState();
+			updateOperationState();
+			return true;
+		}
+	}
+	return false;
+}	

@@ -34,38 +34,47 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "rosMast/StateChanged.h"
+#include "rosMast/StateMachine.h"
 
 #define TOP_CAMERA "TopCamera"
 #define BOTTOM_CAMERA "BottomCamera"
 #define DELTAROBOT "DeltaRobot1"
 #define GRIPPER2 "Gripper2"
 
+EquipletNode equiplet;
 
+void stateChanged(const rosMast::StateChangedPtr &msg) {
+	int moduleType = msg->moduleID;
+	rosMast::StateType state = rosMast::StateType(msg->state);
+	equiplet->updateModuleState(moduleType, stateChanged);
+}
 
 int main(int argc, char **argv) {
 	ros::init(argc, argv, "Equiplet1");
-	EquipletNode equiplet("Equiplet1");
+	equiplet = new EquipletNode("Equiplet1");
+	ros::NodeHandle nh;
+	
+	equiplet.updateOperationState();
+	ros::Subscriber sub = nh.subscribe("equiplet_statechanged", 5 , stateChanged);
+	//ros::Publisher stateRequestPublisher = nodeHandle.advertise<std_msgs::String>("chatter", 1000);
 
-	ros::NodeHandle nodeHandle;
-	ros::Publisher stateRequestPublisher = nodeHandle.advertise<std_msgs::String>("chatter", 1000);
+	//ros::Rate loop_rate(10); 
 
-	ros::Rate loop_rate(10); 
+	// while(ros::ok()) {
+	//     std_msgs::String msg;
 
-	while(ros::ok()) {
-	    std_msgs::String msg;
+	//     std::stringstream ss;
+	//     ss << "Seconds since epoch: " << time(NULL);
+	//     msg.data = ss.str();
 
-	    std::stringstream ss;
-	    ss << "Seconds since epoch: " << time(NULL);
-	    msg.data = ss.str();
+	//     stateRequestPublisher.publish(msg);
 
-	    stateRequestPublisher.publish(msg);
-
-	    ros::spinOnce();
-	    loop_rate.sleep();
-	}
+	//     ros::spinOnce();
+	//     loop_rate.sleep();
+	// }
 
 
-	// Mast::HardwareModuleProperties deltarobot(DELTAROBOT, 1, Mast::start, true, false);
+	// Mast::HardwareModuleProperties deltarobot(1, 1, Mast::start, true, false);
 	// equiplet.addHardwareModule(deltarobot);
 	// std::cout << "Added hardware module!" << std::endl;
 	// char key;
@@ -105,6 +114,8 @@ int main(int argc, char **argv) {
 	// std::cout << std::endl;
 	// //std::cout << "safety state: " << safetyState << std::endl;
 	// //std::cout << "operation state: " << operationState << std::endl; 
+
+	delete equiplet;
 
 	return 0;
 }

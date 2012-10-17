@@ -28,11 +28,12 @@
 
 #include <string>
 #include <iostream>
+#include "rosMast/StateMachine.h"
 
 namespace Mast
 {
 	// The states we defined for MAST
-	enum state {safe = 0, setup = 1, shutdown = 2, standby = 3, start = 4, stop = 5, normal = 6};
+	//enum state {safe = 0, setup = 1, shutdown = 2, standby = 3, start = 4, stop = 5, normal = 6};
 
 	class HardwareModuleProperties {
 	public:
@@ -45,21 +46,21 @@ namespace Mast
 		 * @param ac Is this  module an actor
 		 * @param nd Is this module needed for the current service
 		 **/
-		HardwareModuleProperties(const std::string& nm, int tp, state st, bool ac, bool nd):
-			name(nm), type(tp), currentState(st), actuator(ac), needed(nd), error(false){}
+		HardwareModuleProperties(int identity, int tp, rosMast::StateType st, bool ac, bool nd):
+			id(identity), type(tp), currentState(st), actuator(ac), needed(nd), error(false){}
 		/**
 		 * The use of a name for a module is a temporary solution. 
 		 * This will probably be changed when the module database is implemented.
 		 **/
-		std::string name;
+		int id;
 		int type;
-		state currentState;
+		rosMast::StateType currentState;
 		bool actuator;
 		// Is this hardware module needed for the current service
 		bool needed;
 		bool error;
 	friend std::ostream& operator<<(std::ostream& stream, HardwareModuleProperties &module) {
-		stream << "Name: " << module.name << ", current state: " << module.currentState << " actuator " << module.actuator << " Required for current service " << module.needed;
+		stream << "Id: " << module.id << ", current state: " << module.currentState << " actuator " << module.actuator << " Required for current service " << module.needed;
 		return stream;
 	}
 	};
