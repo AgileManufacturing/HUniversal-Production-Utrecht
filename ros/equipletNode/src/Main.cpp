@@ -34,9 +34,15 @@
 #define DELTAROBOT "DeltaRobot1"
 #define GRIPPER2 "Gripper2"
 
+
+
 int main(int argc, char **argv) {
-	ros::init(argc, argv, "Equiplet");
+	ros::init(argc, argv, "Equiplet1");
 	EquipletNode equiplet("Equiplet1");
+
+	// ros::NodeHandle nodeHandle;
+	// ros::Publisher stateRequestPublisher = nodeHandle.advertise<std_msgs::String>
+
 	Mast::HardwareModuleProperties deltarobot(DELTAROBOT, 1, Mast::start, true, false);
 	equiplet.addHardwareModule(deltarobot);
 	std::cout << "Added hardware module!" << std::endl;

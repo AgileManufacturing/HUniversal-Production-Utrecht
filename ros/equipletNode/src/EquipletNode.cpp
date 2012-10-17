@@ -100,15 +100,15 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 		}
 	}
 
-	//std::pair< std::string, std::string > packaNodeName;
+	/**
+	 * Create the string that is used to start another ROS node
+	 **/ 
+	std::pair< std::string, std::string > packageNodeName = modulePackageNodeMap[module.type];
 	stringstream ss (stringstream::in | stringstream::out);
-	ss << "rosrun keyboardControlNode KeyBoardControlNode __name:=";
-	ss << ' ';
-	ss << module.name;
+	ss << "rosrun " << packageNodeName.first << " " << packageNodeName.second
+	<< " __name:=" << module.name;
 
-	// Start a ros Node for the hardware module
 	int pid = -1;
-	std::cout << "pid: " << pid << std::endl;
 	switch(pid = fork()) {
 		case 0:
 			fclose(stderr);
@@ -121,7 +121,10 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 		default:
 			break; 
 	}
-	// Add it to the table and update the safety state and operation state	
+
+	/**
+	 * Add the module to the table and update the safety state and operation state	
+	 **/
 	moduleTable->push_back(module);
 	updateSafetyState();
 	updateOperationState(); 
