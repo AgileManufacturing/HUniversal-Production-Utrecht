@@ -54,7 +54,7 @@ namespace DeltaRobot {
 	 * @param hip Length of the hip in millimeters.
 	 * @param effector Radius of the effector in millimeters.
 	 * @param ankle Length of the ankle in millimeters.
-	 * @param maxAngleHipAnkle Maximal angle, in radians, between the hip and ankle.
+	 * @param maxAngleHipAnkle Maximal angle between the hip and ankle when moving the hip sideways, in radians.
 	 **/
 	InverseKinematics::InverseKinematics(const double base, const double hip,
 			const double effector, const double ankle,
@@ -141,16 +141,11 @@ namespace DeltaRobot {
 	 * @param rotations Array of MotorRotation objects, will be adjusted by the function to the correct rotations per motor.
 	 **/
 	void InverseKinematics::destinationPointToMotorRotations(const DataTypes::Point3D<double>& destinationPoint, DataTypes::MotorRotation<double>* (&rotations)[3]) const{
-		/**
-		 * Adding 180 degrees switches 0 degrees for the motor from the 
-		 * midpoint of the engines to directly opposite.
-		 * When determining motorAngle the degrees determine the position of the engines:
-		 * 	  0 degrees: the hip from this motor moves on the yz plane
-		 *  120 degrees: this motor is located 120 degrees counter clockwise of the 0 degrees motor 
-		 * when looking at the side the effector is not located
-		 *  240 degrees: this motor is located 240 degrees counter clockwise of the 0 degrees motor
-		 * when looking at the side the effector is not located
-		 **/
+		// Adding 180 degrees switches 0 degrees for the motor from the midpoint of the engines to directly opposite.
+		// When determining motorAngle the degrees determine the position of the engines:
+		// 	  0 degrees: the hip from this motor moves on the yz plane
+		//  120 degrees: this motor is located 120 degrees counter clockwise of the 0 degrees motor when looking at the side the effector is not located
+		//  240 degrees: this motor is located 240 degrees counter clockwise of the 0 degrees motor when looking at the side the effector is not located
 		rotations[0]->angle = Utilities::degreesToRadians(180) + motorAngle(destinationPoint, Utilities::degreesToRadians(1 * 120));
 		rotations[1]->angle = Utilities::degreesToRadians(180) + motorAngle(destinationPoint, Utilities::degreesToRadians(0 * 120));
 		rotations[2]->angle = Utilities::degreesToRadians(180) + motorAngle(destinationPoint, Utilities::degreesToRadians(2 * 120));

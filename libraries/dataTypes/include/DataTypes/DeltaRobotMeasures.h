@@ -62,7 +62,7 @@ namespace DataTypes{
 
         /**
          * @var double maxAngleHipAnkle
-         * Maximum angle between hip and ankle on x-z plane in radians.
+         * Maximum angle between hip and ankle when moving the ankle sideways.
          **/
         double maxAngleHipAnkle;
     };

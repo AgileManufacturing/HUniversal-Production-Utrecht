@@ -211,7 +211,7 @@ namespace DeltaRobot{
     }
 
 	/**
-	 * Generates boundaries for the robot. All members should be initialized before calling this function.
+	 * Generates boundaries bitmap for the robot. From the centre of the BOUNDARY_BOX voxels are checked and set to true in the bitmap if they are reachable. All members should be initialized before calling this function.
 	 **/
     void EffectorBoundaries::generateBoundariesBitmap(void){
     	char* pointValidityCache = new char[width * depth * height];
@@ -219,43 +219,37 @@ namespace DeltaRobot{
     	std::stack<BitmapCoordinate> cstack;
 
     	// Determine the center of the box.
-    	DataTypes::Point3D<double> begin (0, 0, Measures::BOUNDARY_BOX_MIN_Z + (Measures::BOUNDARY_BOX_MAX_Z - Measures::BOUNDARY_BOX_MIN_Z) / 2);
+    	DataTypes::Point3D<double> point (0, 0, Measures::BOUNDARY_BOX_MIN_Z + (Measures::BOUNDARY_BOX_MAX_Z - Measures::BOUNDARY_BOX_MIN_Z) / 2);
     	
-    	// If begin pixel is not part of a valid voxel the box dimensions are incorrect.
-    	if(!isValid(fromRealCoordinate(begin), pointValidityCache)){
-    		throw EffectorBoundariesException("starting point outside of valid area, please adjust MAX/BOUNDARY_BOX_MIN_X/Y/Z values to have a valid center");
+    	// If point pixel is not part of a valid voxel the box dimensions are incorrect.
+    	if(!isValid(fromRealCoordinate(point), pointValidityCache)){
+    		throw EffectorBoundariesException("starting point outside of valid area, please adjust BOUNDARY_BOX_MAX/BOUNDARY_BOX_MIN_X/Y/Z values to have a valid center");
     	}
     	
     	// Scan towards the right.
-		for(; begin.x < Measures::BOUNDARY_BOX_MAX_X; begin.x += voxelSize){
-			/**
-			 * If an invalid voxel is found:
-			 * - step back to the last valid voxel
-			 * - push the voxel on the empty stack
-			 * - set the voxel as true in the bitmap
-			 * - end the loop
-			 **/
-			if(!isValid(fromRealCoordinate(begin), pointValidityCache)){
-				begin.x -= voxelSize;
-				BitmapCoordinate startingVoxel = fromRealCoordinate(begin);
+		for(; point.x < Measures::BOUNDARY_BOX_MAX_X; point.x += voxelSize){
+			// If an invalid voxel is found:
+			// - step back to the last valid voxel
+			// - push the voxel on the empty stack
+			// - set the voxel as true in the bitmap
+			// - end the loop
+			if(!isValid(fromRealCoordinate(point), pointValidityCache)){
+				point.x -= voxelSize;
+				BitmapCoordinate startingVoxel = fromRealCoordinate(point);
 				cstack.push(startingVoxel);
 				boundariesBitmap[startingVoxel.x + startingVoxel.y * width + startingVoxel.z * width * depth] = true;
 				break;
 			}
 		}
-		/**
-		 * If the right-most voxel is in reach and an invalid voxel is never found, the position of begin.x will be outside of the box limits. Step back inside the box and add that voxel to the stack and set it as true in the bitmap.
-		 **/
-		if(begin.x >= Measures::BOUNDARY_BOX_MAX_X){
-			begin.x -= voxelSize;
-			BitmapCoordinate startingVoxel = fromRealCoordinate(begin);
+		// If the right-most voxel is in reach and an invalid voxel is never found, the position of point.x will be outside of the box limits. Step back inside the box and add that voxel to the stack and set it as true in the bitmap.
+		if(point.x >= Measures::BOUNDARY_BOX_MAX_X){
+			point.x -= voxelSize;
+			BitmapCoordinate startingVoxel = fromRealCoordinate(point);
 			cstack.push(startingVoxel);
 			boundariesBitmap[startingVoxel.x + startingVoxel.y * width + startingVoxel.z * width * depth] = true;
 		}
 
-		/**
-		 * Start with the last added voxel on the stack and add new voxels to the stack. Do this until the valid borders (all valid voxels bordering unvalid voxels or the MAX/BOUNDARY_BOX_MIN_X/Y/Z box) of the valid voxel area are known (stack = empty).
-		 **/
+		// Start with the last added voxel on the stack and add new voxels to the stack. Do this until the valid borders (all valid voxels bordering unvalid voxels or the BOUNDARY_BOX_MAX/BOUNDARY_BOX_MIN_X/Y/Z box) of the valid voxel area are known (stack = empty).
 		while(!cstack.empty()){
 			// Get last added voxel from the stack and remove it from the stack.
 			BitmapCoordinate borderVoxel = cstack.top();
@@ -265,13 +259,11 @@ namespace DeltaRobot{
 			for(int y = borderVoxel.y - 1; y <= borderVoxel.y + 1; y++){
 				for(int x = borderVoxel.x - 1; x <= borderVoxel.x + 1; x++){
 					for(int z = borderVoxel.z - 1; z <= borderVoxel.z + 1; z++){
-						// Don't do anything with voxels outside of the MAX/BOUNDARY_BOX_MIN_X/Y/Z box.
+						// Don't do anything with voxels outside of the BOUNDARY_BOX_MAX/BOUNDARY_BOX_MIN_X/Y/Z box.
 						if(z >= height || z < 0 || x >= width || x < 0 || y >= depth || y < 0){
 							continue;
 						} else{
-							/**
-							 * New valid voxels on the valid border are added to the stack and set in the bitmap.
-							 **/
+							// New valid voxels on the valid border are added to the stack and set in the bitmap.
 							int index = x + y * width + z * width * depth;
 							if(isValid(BitmapCoordinate(x, y, z), pointValidityCache)
 									&& !boundariesBitmap[index]

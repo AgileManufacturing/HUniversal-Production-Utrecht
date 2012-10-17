@@ -62,7 +62,7 @@ namespace DeltaRobot{
 		
 		/**
          * @var double HIP_ANKLE_ANGLE_MAX
-         * Maximum angle between hip and ankle on x-z plane in radians.
+         * Maximum angle between hip and ankle when moving the ankle sideways in radians.
          **/
 		const double HIP_ANKLE_ANGLE_MAX = Utilities::degreesToRadians(22);
 

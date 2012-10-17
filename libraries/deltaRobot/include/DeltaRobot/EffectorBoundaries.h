@@ -55,9 +55,9 @@ namespace DeltaRobot{
 		bool checkPath(const DataTypes::Point3D<double>& from, const DataTypes::Point3D<double>& to) const;
 		
 		/**
-		 * Gets the boundariesBitmap.
+		 * Gets the boundariesBitmap. This bitmap is a one dimensional array of booleans, defaulted to false, where voxels are checked and set to true if they are reachable.
 		 *
-		 * @return A const bool pointer to the voxel bitmap.
+		 * @return A const bool pointer to the voxel bitmap. This bitmap is a one dimensional array of booleans, defaulted to false, where voxels are checked and set to true if they are reachable.
 		 **/
 		inline const bool* getBitmap() const{ return boundariesBitmap; }
 		
@@ -85,7 +85,7 @@ namespace DeltaRobot{
 		/**
 		 * Gets the size of a side of a voxel.
 		 *
-		 * @return Voxel size in mm.
+		 * @return Voxel size in millimeters.
 		 **/
 		inline double getVoxelSize() const{ return voxelSize; }
 
@@ -181,7 +181,7 @@ namespace DeltaRobot{
 
 		/**
 		 * @var bool* boundariesBitmap
-		 * A pointer to the boundaries bitmap.
+		 * A pointer to the boundaries bitmap. This bitmap is a one dimensional array of booleans, defaulted to false, where voxels are checked and set to true if they are reachable.
 		 **/
 		bool* boundariesBitmap;
 

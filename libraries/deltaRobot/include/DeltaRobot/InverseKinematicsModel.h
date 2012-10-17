@@ -82,7 +82,7 @@ namespace DeltaRobot{
 		 * @param hip Length of the hip in millimeters.
 		 * @param effector Radius of the effector in millimeters.
 		 * @param ankle Length of the ankle in millimeters.
-		 * @param maxAngleHipAnkle Maximum angle between hip and ankle on x-z plane in radians.
+		 * @param maxAngleHipAnkle Maximum angle between hip and ankle when moving the ankle sideways in radians.
 		 **/
 		InverseKinematicsModel(const double base, const double hip,
 				const double effector, const double ankle,
