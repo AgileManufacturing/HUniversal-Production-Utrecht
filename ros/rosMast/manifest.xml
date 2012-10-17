@@ -10,6 +10,11 @@
   <depend package="std_msgs" />     
   
   <license>BSD</license>
+
+  <export>
+  	<cpp cflags="-I${prefix}/include"/>
+  </export>
+
   <review status="unreviewed" notes=""/>
 </package>
 

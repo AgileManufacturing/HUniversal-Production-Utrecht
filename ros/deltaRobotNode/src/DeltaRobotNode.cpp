@@ -36,6 +36,9 @@
 #include "deltaRobotNode/Calibrate.h"
 #include "deltaRobotNode/Calibration.h"
 
+#include "rosMast/StateChanged.h"
+#include <rosMast/StateMachine.h>
+
 #include <DataTypes/Point3D.h>
 #include <DeltaRobot/DeltaRobot.h>
 #include <Motor/StepperMotor.h>

@@ -32,66 +32,66 @@
 #include "ros/ros.h"
 #include "rosMast/StateChanged.h"
 
-#define TRANSITION_MAP_SIZE 4
-#define STATE_MAP_SIZE 3
+#define STATE_MAX 7
 
-typedef enum {safe = 0, standby = 1, normal = 2, setup = 3, shutdown = 4, start = 5, stop = 6, nostate = 7 } StateType;
+namespace rosMast {
 
-struct StateTransition 
-{
-	StateTransition() { }
-	StateTransition(StateType src, StateType des) {
-		SourceState = src;
-		DestinationState = des;
-	}
-	StateType SourceState;
-	StateType DestinationState;
-};
+	typedef enum {safe = 0, setup = 1, shutdown = 2, standby = 3, start = 4, stop = 5, normal = 6, nostate = 7 } StateType;
 
-class StateMachine {
-	//Function pointer to transitionFunction or StateFunction
-	typedef int (StateMachine::*stateFunctionPtr)();
-	
-	public:
-		StateMachine();
+	struct StateTransition 
+	{
+		StateTransition() { }
+		StateTransition(StateType src, StateType des) {
+			SourceState = src;
+			DestinationState = des;
+		}
+		StateType SourceState;
+		StateType DestinationState;
+	};
 
-		//Transition functions
-		virtual int transitionSetup() = 0;		//Safe to standby transition
-		virtual int transitionStart() = 0; 		//Standby to normal transitiion
-		virtual int transitionStop() = 0;		//Normal to standby
-		virtual int transitionShutdown() = 0;	//standby to safe
+	class StateMachine {
+		//Function pointer to transitionFunction or StateFunction
+		typedef int (StateMachine::*stateFunctionPtr)();
 		
-		//State functions
-		virtual int stateSafe() = 0;
-		virtual int stateStandby() = 0;
-		virtual int stateNormal() = 0;
-
-		void lock() 	{ locked = true; }
-		void unlock() 	{ locked = false;}
-
-		int getState() { return currentState; }
-
-		void StateEngine();
-		void changeState(const rosMast::StateChangedPtr &msg);
-		void setState(StateType newState);
-		stateFunctionPtr lookupTransition(StateType currentState, StateType desiredState);
-		StateType lookupState(int state);
-	
-	protected:
-		bool locked;
+		public:
+			StateMachine(int i);
 		
-		stateFunctionPtr transitionMap[TRANSITION_MAP_SIZE];
-		stateFunctionPtr stateMap[STATE_MAP_SIZE];
+			//State functions
+			virtual int stateSafe() = 0;
+			virtual int stateStandby() = 0;
+			virtual int stateNormal() = 0;
+
+			virtual int transitionSetup() = 0;
+			virtual int transitionShutdown() = 0;
+			virtual int transitionStart() = 0;
+			virtual int transitionStop() = 0;
+
+			void lock() 	{ locked = true; }
+			void unlock() 	{ locked = false;}
+
+			int getState() { return currentState; }
+
+			void StateEngine();
+			void changeState(const rosMast::StateChangedPtr &msg);
+			void setState(StateType newState);
+			stateFunctionPtr lookupTransition(StateType currentState, StateType desiredState);
+			StateType lookupState(int state);
 		
-		struct StateTransition TransitionTable[TRANSITION_MAP_SIZE];
+		protected:
+			bool locked;
+			
+			stateFunctionPtr stateMap[STATE_MAX];
 
-		ros::Publisher pub;
-		ros::Subscriber sub;
+			ros::Publisher pub;
+			ros::Subscriber sub;
 
-	private:
-		StateType currentState;
-		const static int myequipletid = 5;
-		const static int mymoduleid = 5;
-};
+		private:
+			StateType currentState;
+			int interval;
+			const static int myequipletid = 5;
+			const static int mymoduleid = 5;
+	};
+
+}
 
 #endif 

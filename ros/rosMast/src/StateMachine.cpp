@@ -26,9 +26,9 @@
 * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#include "RosMast/StateMachine.h"
+#include "rosMast/StateMachine.h"
 
-void StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
+void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 	//decode msg
 	int equipletID = msg->equipletID;
 	int moduleID = msg->moduleID;
@@ -37,30 +37,24 @@ void StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 	if( myequipletid == equipletID && mymoduleid == moduleID) {
 		//find transition function
 		stateFunctionPtr fptr = lookupTransition(currentState, state);
-		(this->*fptr)();
+		if(fptr != NULL)
+			(this->*fptr)();
 	}
 	
 }
 
-StateMachine::StateMachine() {
+rosMast::StateMachine::StateMachine(int ival) {
 	currentState = safe;
+	interval = ival;
 
-	// Initialize the transitionMap array	
-	transitionMap[0] = &StateMachine::transitionSetup;
-	transitionMap[1] = &StateMachine::transitionStart;
-	transitionMap[2] = &StateMachine::transitionStop;
-	transitionMap[3] = &StateMachine::transitionShutdown; 
-	
 	// Initialize the state map array
 	stateMap[0] = &StateMachine::stateSafe;
-	stateMap[1] = &StateMachine::stateStandby;
-	stateMap[2] = &StateMachine::stateNormal; 
-
-	// Initialize the Transition table
-	TransitionTable[0] = StateTransition(safe, standby);
-	TransitionTable[1] = StateTransition(standby, normal);
-	TransitionTable[2] = StateTransition(standby, safe);
-	TransitionTable[3] = StateTransition(normal, standby);
+	stateMap[1] = &StateMachine::transitionSetup;
+	stateMap[2] = &StateMachine::transitionShutdown; 
+	stateMap[3] = &StateMachine::stateStandby;
+	stateMap[4] = &StateMachine::transitionStart;
+	stateMap[5] = &StateMachine::transitionStop;
+	stateMap[6] = &StateMachine::stateNormal; 
 
 	//Initialize publisher and subcriber
 	ros::NodeHandle nh;
@@ -68,17 +62,17 @@ StateMachine::StateMachine() {
 	sub = nh.subscribe("requestStateChange", 1, &StateMachine::changeState, this);
 }
 
-StateMachine::stateFunctionPtr StateMachine::lookupTransition(StateType currentState, StateType desiredState) {
-	
+rosMast::StateMachine::stateFunctionPtr rosMast::StateMachine::lookupTransition(StateType currentState, StateType desiredState) {
+	return NULL;
 }
 
 
-void StateMachine::setState(StateType newState) {
+void rosMast::StateMachine::setState(StateType newState) {
 	currentState = newState;
 	//send update over publisher
 }
 
-StateType StateMachine::lookupState(int state) {
+rosMast::StateType rosMast::StateMachine::lookupState(int state) {
 	switch(state) {
 		case safe:
 			return safe;
@@ -91,7 +85,7 @@ StateType StateMachine::lookupState(int state) {
 	}
 }
 
-void StateMachine::StateEngine() {
+void rosMast::StateMachine::StateEngine() {
 	while(true) { 
 		//execute state function
 		(this->*stateMap[currentState])();

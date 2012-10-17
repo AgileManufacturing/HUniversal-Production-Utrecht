@@ -33,6 +33,7 @@
 #include <ctime>
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include "rosMast/StateChanged.h"
 
 #define TOP_CAMERA "TopCamera"
 #define BOTTOM_CAMERA "BottomCamera"
