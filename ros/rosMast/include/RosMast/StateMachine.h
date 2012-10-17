@@ -30,11 +30,12 @@
 #define STATEMACHINE_H
 
 #include "ros/ros.h"
+#include "rosMast/StateChanged.h"
 
 #define TRANSITION_MAP_SIZE 4
 #define STATE_MAP_SIZE 3
 
-typedef enum {safe = 0, standby = 1, normal = 2, setup = 3, shutdown = 4, start = 5, stop = 6} StateType;
+typedef enum {safe = 0, standby = 1, normal = 2, setup = 3, shutdown = 4, start = 5, stop = 6, nostate = 7 } StateType;
 
 struct StateTransition 
 {
@@ -71,8 +72,10 @@ class StateMachine {
 		int getState() { return currentState; }
 
 		void StateEngine();
-		void changeState(StateType requestedState);
+		void changeState(const rosMast::StateChangedPtr &msg);
 		void setState(StateType newState);
+		stateFunctionPtr lookupTransition(StateType currentState, StateType desiredState);
+		StateType lookupState(int state);
 	
 	protected:
 		bool locked;
@@ -83,10 +86,12 @@ class StateMachine {
 		struct StateTransition TransitionTable[TRANSITION_MAP_SIZE];
 
 		ros::Publisher pub;
-		ros::Subcriber sub;
+		ros::Subscriber sub;
 
 	private:
 		StateType currentState;
+		const static int myequipletid = 5;
+		const static int mymoduleid = 5;
 };
 
 #endif 

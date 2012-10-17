@@ -28,6 +28,20 @@
 
 #include "RosMast/StateMachine.h"
 
+void StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
+	//decode msg
+	int equipletID = msg->equipletID;
+	int moduleID = msg->moduleID;
+	StateType state = lookupState(msg->state);
+	//StateType test = state;
+	if( myequipletid == equipletID && mymoduleid == moduleID) {
+		//find transition function
+		stateFunctionPtr fptr = lookupTransition(currentState, state);
+		(this->*fptr)();
+	}
+	
+}
+
 StateMachine::StateMachine() {
 	currentState = safe;
 
@@ -49,15 +63,32 @@ StateMachine::StateMachine() {
 	TransitionTable[3] = StateTransition(normal, standby);
 
 	//Initialize publisher and subcriber
+	ros::NodeHandle nh;
+	pub = nh.advertise<rosMast::StateChanged>("equiplet_statechanged", 5);
+	sub = nh.subscribe("requestStateChange", 1, &StateMachine::changeState, this);
 }
 
-void StateMachine::changeState(StateType requestedState) {
-	//find function to execute
+StateMachine::stateFunctionPtr StateMachine::lookupTransition(StateType currentState, StateType desiredState) {
+	
 }
+
 
 void StateMachine::setState(StateType newState) {
 	currentState = newState;
 	//send update over publisher
+}
+
+StateType StateMachine::lookupState(int state) {
+	switch(state) {
+		case safe:
+			return safe;
+		case standby:
+			return standby;
+		case normal:
+			return normal;
+		default:
+			return nostate;
+	}
 }
 
 void StateMachine::StateEngine() {

@@ -1,1 +1,3 @@
-uint8 requestedState
+int32 equipletID
+int32 moduleID
+int32  state
