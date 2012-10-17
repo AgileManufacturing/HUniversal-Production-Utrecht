@@ -31,6 +31,10 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 
+/**
+ * Callback that is called when a message is received
+ * @param msg the message that is received
+ **/
 void chatterCallback(const std_msgs::String::ConstPtr& msg)
 {
   ROS_INFO("%s", msg->data.c_str());
@@ -40,6 +44,9 @@ int main(int argc, char **argv) {
 	ros::init(argc, argv, "EquipletNodeTest");
 	ros::NodeHandle nodeHandle;
 
+	/**
+	 * Subscribe to the topic published by the EquipletNode
+	 **/
 	ros::Subscriber sub = nodeHandle.subscribe("chatter", 1000, chatterCallback);
 
 	ros::spin();
