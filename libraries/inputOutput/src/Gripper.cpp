@@ -80,7 +80,7 @@ namespace InputOutput {
 						device->timeEnabled = Utilities::timeNow();
 						device->warned = false;
 
-						// If devices stays on
+					// If devices stays on
 					} else if (device->previousState && device->state) {
 						long timeEnabled = Utilities::timeNow() - device->timeEnabled;
 
@@ -92,14 +92,14 @@ namespace InputOutput {
 							device->disable();
 							device->previousState = device->state = false;
 
-							// Test for warning time. Send warning to the warning handler.
+						// Test for warning time. Send warning to the warning handler.
 						} else if (!device->warned && timeEnabled > GRIPPER_TIME_ENABLED_WARNING) {
 							std::cerr << "[GRIPPER WATCHDOG] Valve open time has reached the warning limit of " << GRIPPER_TIME_ENABLED_WARNING << " milliseconds." << std::endl;
 							device->warningHandler(device->gripperNode);
 							device->warned = true;
 						}
 
-						// If device was cooling down, check if the time has been passed.
+					// If device was cooling down, check if the time has been passed.
 					} else if (device->overheated && ((Utilities::timeNow() - device->timeCooldownStarted) > GRIPPER_TIME_COOLDOWN)) {
 						std::cerr << "[GRIPPER WATCHDOG] Valve cooled down. Returning to normal mode." << std::endl;
 						device->overheated = false;
