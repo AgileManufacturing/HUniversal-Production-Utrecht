@@ -6,6 +6,8 @@
 * @author Dennis Koole
 *
 * @section LICENSE
+* License: newBSD
+*
 * Copyright © 2012, HU University of Applied Sciences Utrecht.
 * All rights reserved.
 *
@@ -27,7 +29,10 @@
 **/
 
 #include <EquipletNode/EquipletNode.h>
+#include <sstream>
+#include <ctime>
 #include "ros/ros.h"
+#include "std_msgs/String.h"
 
 #define TOP_CAMERA "TopCamera"
 #define BOTTOM_CAMERA "BottomCamera"
@@ -40,18 +45,34 @@ int main(int argc, char **argv) {
 	ros::init(argc, argv, "Equiplet1");
 	EquipletNode equiplet("Equiplet1");
 
-	// ros::NodeHandle nodeHandle;
-	// ros::Publisher stateRequestPublisher = nodeHandle.advertise<std_msgs::String>
+	ros::NodeHandle nodeHandle;
+	ros::Publisher stateRequestPublisher = nodeHandle.advertise<std_msgs::String>("chatter", 1000);
 
-	Mast::HardwareModuleProperties deltarobot(DELTAROBOT, 1, Mast::start, true, false);
-	equiplet.addHardwareModule(deltarobot);
-	std::cout << "Added hardware module!" << std::endl;
-	char key;
-	while(true){
-		std::cin >> key;
-		std::cout << "key pressed!" << std::endl;
+	ros::Rate loop_rate(10); 
+
+	while(ros::ok()) {
+	    std_msgs::String msg;
+
+	    std::stringstream ss;
+	    ss << "Seconds since epoch: " << time(NULL);
+	    msg.data = ss.str();
+
+	    stateRequestPublisher.publish(msg);
+
+	    ros::spinOnce();
+	    loop_rate.sleep();
 	}
-	ros::spin();
+
+
+	// Mast::HardwareModuleProperties deltarobot(DELTAROBOT, 1, Mast::start, true, false);
+	// equiplet.addHardwareModule(deltarobot);
+	// std::cout << "Added hardware module!" << std::endl;
+	// char key;
+	// while(true){
+	// 	std::cin >> key;
+	// 	std::cout << "key pressed!" << std::endl;
+	// }
+	// ros::spin();
 
 
 	//equiplet.readFromBlackboard();
