@@ -31,19 +31,34 @@
 namespace InputOutput
 {
 	/**
-	 *
+	 * OutputDevice interface.
+	 * This device provides a general way of communication to the input output controller.
 	 **/
-	class OutputDevice
-	{
+	class OutputDevice {
+	
 	public:
 		OutputDevice(InputOutputController& ioController, uint32_t address, uint8_t pin);
 
-		void enable();
-		void disable();
+		virtual void enable();
+		virtual void disable();
 
 	private:
+		/**
+		 * @var InputOutputController& ioController
+		 * The InputOutput interface
+		 **/
 		InputOutputController& ioController;
+
+		/**
+		 * @var uint32_t address;
+		 * Register that holds the on / off state of the device pin
+		 **/
 		uint32_t address;
+
+		/**
+		 * @var uint8_t pin;
+		 * The pin connected to the output device
+		 **/
 		uint8_t pin;
 	};
 }

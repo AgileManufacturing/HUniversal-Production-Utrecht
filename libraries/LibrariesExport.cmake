@@ -19,6 +19,7 @@ set(LIB_MODBUS_CONTROLLER_INCLUDE "${REXOS_SOURCE_DIR}/libraries/modbusControlle
 set(LIB_UTILITIES_INCLUDE "${REXOS_SOURCE_DIR}/libraries/utilities/include")
 set(LIB_MOTOR_INCLUDE "${REXOS_SOURCE_DIR}/libraries/motor/include")
 set(LIB_VISION_INCLUDE "${REXOS_SOURCE_DIR}/libraries/vision/include")
+set(LIB_INPUT_OUTPUT_INCLUDE  "${REXOS_SOURCE_DIR}/libraries/inputOutput/include")
 set(NODE_DELTA_ROBOT "${REXOS_SOURCE_DIR}/ros/deltaRobotNode/include")
 set(NODE_CRATE_LOCATOR "${REXOS_SOURCE_DIR}/ros/crateLocatorNode/include")
 set(NODE_FOLLOW "${REXOS_SOURCE_DIR}/ros/followNode/include")

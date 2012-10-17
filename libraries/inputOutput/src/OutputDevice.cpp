@@ -39,11 +39,17 @@ namespace InputOutput {
 	OutputDevice::OutputDevice(InputOutputController& ioController, uint32_t address, uint8_t pin) : 
 		ioController(ioController), address(address), pin(pin) {}
 
-	OutputDevice::enable(){
+	/**
+	 * Turns on the pin of the output device
+	 **/
+	void OutputDevice::enable(){
 		ioController.pinHigh(address, pin);
 	}
 
-	OutputDevice::disable(){
+	/**
+	 * Turns off the pin of the output device
+	 **/
+	void OutputDevice::disable(){
 		ioController.pinLow(address, pin);
 	}
 }
