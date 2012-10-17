@@ -47,10 +47,13 @@ extern "C"{
 
 
 /**
+ * @cond HIDE_FROM_DOXYGEN
  * Turn on for modbus logging
  * Parameter is the logfile location. Change before enabling the log!
+ *
+ * #define MODBUS_LOGGING "/home/lcv/modbus.log"
+ * @endcond
  **/
-//#define MODBUS_LOGGING "/home/lcv/modbus.log"
 
 namespace ModbusController{
 

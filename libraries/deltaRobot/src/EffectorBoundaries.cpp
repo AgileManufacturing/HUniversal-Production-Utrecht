@@ -1,7 +1,6 @@
 /**
-   TODO: InverseKinematicsException? Copy/paste problem!
- * @file InverseKinematicsException.h
- * @brief Exception thrown if an invalid value is calculated during inverse kinematics.
+ * @file EffectorBoundaries.cpp
+ * @brief Represents the effector's moving volume.
  *
  * @author 1.0 Lukas Vermond
  * @author 1.0 Kasper van Nieuwland
