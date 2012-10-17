@@ -13,16 +13,16 @@ cmake_minimum_required(VERSION 2.4.6)
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
 # Initialize ROS package to be in our build system.
-lcv_rospack_init("keyboardControlNode" true true)
+rexos_rospack_init("keyboardControlNode" false false)
 
 # Add executables as documented by ROS
 rosbuild_add_executable(KeyBoardControlNode src/KeyBoardControlNode.cpp)
 
 # Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
-#include_directories("${LIB_HUNIPLACER_INCLUDE}")
+include_directories("${NODE_DELTA_ROBOT}")
 
 # Link target to our libraries
 #target_link_libraries(deltarobot huniplacer)
 
 # MUST be called after lcv_rospack_init to clean up after ROSBUILD!
-lcv_rospack_end()
+rexos_rospack_end()

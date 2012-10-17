@@ -13,19 +13,13 @@ cmake_minimum_required(VERSION 2.4.6)
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
 # Initialize ROS package to be in our build system.
-rexos_rospack_init("deltaRobotNode" true true)
+rexos_rospack_init("deltaRobotTest" false false)
 
 # Add executables as documented by ROS
-rosbuild_add_executable(DeltaRobotNode src/DeltaRobotNode.cpp)
-
-# Add dependencies to our libraries and other ROS packages in the same directory as this one.
-add_dependencies(DeltaRobotNode deltaRobot)
+rosbuild_add_executable(DeltaRobotTest src/DeltaRobotTest.cpp)
 
 # Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
-include_directories(${LIB_DATATYPES_INCLUDE} ${LIB_DATATYPES_INCLUDE} ${LIB_UTILITIES_INCLUDE} ${LIB_DELTAROBOT_INCLUDE} ${LIB_MOTOR_INCLUDE} ${LIB_MODBUS_CONTROLLER_INCLUDE})
-
-# Link target to our libraries
-target_link_libraries(DeltaRobotNode deltaRobot modbusController motor)
+include_directories("${NODE_DELTA_ROBOT}")
 
 # MUST be called after lcv_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()

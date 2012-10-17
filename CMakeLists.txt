@@ -16,7 +16,7 @@
 
 ######## Configuration ##########
 
-set(LCV_PARTS libraries ros tools) # TODO: Agents Libraries ROS
+set(REXOS_PARTS libraries ros tools) # TODO: Agents Libraries ROS
 
 # Note: Set buildtype with cmake -D CMAKE_BUILD_TYPE=<Debug|Release> <source>
 # It might be a smart idea to make two out-of-source build directories, 
@@ -30,7 +30,7 @@ set(LCV_PARTS libraries ros tools) # TODO: Agents Libraries ROS
 cmake_minimum_required (VERSION 2.8)
 
 # Set the name of our project to LCV and require a C and C++ compiler. 
-project (LCV CXX C) # TODO, add java??
+project (REXOS CXX C) # TODO, add java??
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
@@ -47,6 +47,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
 
-# Recursively add CMakeLists.txt rules for all LCV_PARTS (directories)
-add_subdirectories("${LCV_PARTS}")
+# Recursively add CMakeLists.txt rules for all REXOS_PARTS (directories)
+add_subdirectories("${REXOS_PARTS}")
+rexos_add_doc(REXOS)
 
