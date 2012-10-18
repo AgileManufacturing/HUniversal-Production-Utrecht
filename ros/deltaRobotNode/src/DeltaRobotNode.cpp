@@ -240,10 +240,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::M
 **/
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 	setState(rosMast::setup);
-	ROS_INFO("Setup transition called");
-
-	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID);    
-	
+	ROS_INFO("Setup transition called");	
 	// Initialize modbus for IO controller
     modbus_t* modbusIO = modbus_new_tcp("192.168.0.2", 502);
     if(modbusIO == NULL)
@@ -328,6 +325,7 @@ int main(int argc, char **argv) {
 	int equipletID = atoi(argv[1]);
 	int moduleID = atoi(argv[2]);
 
+	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID);    
     
 	ros::NodeHandle nodeHandle;
 
