@@ -9,5 +9,3 @@ if(ROS_OK)
 else(ROS_OK)
 	message("ROS packages cannot be build")
 endif(ROS_OK)
-
-
