@@ -30,6 +30,7 @@
 
 void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 	//decode msg
+	std::cout << "State changed message received";
 	int equipletID = msg->equipletID;
 	int moduleID = msg->moduleID;
 	StateType state = StateType(msg->state);
@@ -38,19 +39,21 @@ void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 		//find transition function
 		stateFunctionPtr fptr = lookupTransition(currentState, state);
 		if(fptr != NULL) {
+			std::cout << "Function pointer point";
 			if( ((this->*fptr)()) == 0 ) {
+				std::cout << "Transition executed succesfull";
 				setState(state);
 			} 
 			else {
+				std::cout << "Error in Transition function";
 				// Error so I want back to my current state from state
 				stateFunctionPtr fptr = lookupTransition(state, currentState);
 				if( ((this->*fptr)()) != 0 ) {
-					// FUU
+					std::cout << "Error in trying to transition to lower state afer fail transition";
 				}
 				else {
-					// TODO
-					rosMast::StateType mah = rosMast::StateType(currentState - 1);
-					setState(mah);
+					std::cout << "Error transition back to previous state succesfull";
+					setState(rosMast::StateType(currentState - 1));
 				}
 			}
 		}
@@ -72,20 +75,27 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
 	ros::NodeHandle nh;
 	pub = nh.advertise<rosMast::StateChanged>("equiplet_statechanged", 5);
 	sub = nh.subscribe("requestStateChange", 1, &StateMachine::changeState, this);
+
+	StateEngine();
 }
 
 rosMast::StateMachine::stateFunctionPtr rosMast::StateMachine::lookupTransition(StateType currentState, StateType desiredState) {
+	std::cout << "Lookup transition, currentState " << currentState;
 	if(currentState > desiredState) {
+		std::cout << "you want to go to a lower state";
 		return transitionMap[currentState - 1];
 	}
 	else if(currentState < desiredState) {
+		std::cout << "you want to go to a higher state";
 		return transitionMap[currentState + 1];
 	}
+	std::cout << "return NULL";
 	return NULL;
 }
 
 
 void rosMast::StateMachine::setState(StateType newState) {
+	std::cout << "Set state called " << currentState;
 	currentState = newState;
 	rosMast::StateChanged msg;
 	msg.equipletID = myequipletid;
@@ -96,7 +106,6 @@ void rosMast::StateMachine::setState(StateType newState) {
 
 void rosMast::StateMachine::StateEngine() {
 	while(ros::ok()) { 
-		std::cout << currentState;
 		ros::spinOnce();
 	}
 }

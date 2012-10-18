@@ -240,7 +240,10 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::M
 **/
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 	setState(rosMast::setup);
+
+	std::cout << "Setup transition called";
 	ROS_INFO("Setup transition called");
+	
 	// Initialize modbus for IO controller
     modbus_t* modbusIO = modbus_new_tcp("192.168.0.2", 502);
     if(modbusIO == NULL)
@@ -294,6 +297,7 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 }
 
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
+	std::cout << "Setup transition called";
 	setState(rosMast::shutdown);
 	ROS_INFO("Shutdown transition called");
 	deltaRobot->powerOff();
@@ -343,8 +347,7 @@ int main(int argc, char **argv) {
 	ros::ServiceServer calibrateService =
 		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate, &drn); 
 
-	ROS_INFO("DeltaRobotNode ready..."); 
-	ros::spin();
+	ROS_INFO("DeltaRobotNode ready..."); 	
 	return 0;
 }
 
