@@ -1,4 +1,3 @@
-
 /**
  * @file EquipletNode.cpp
  * @brief Symbolizes an entire EquipletNode.
@@ -89,6 +88,7 @@ void EquipletNode::updateOperationState() {
  *
  * @param moduleTable The table containing the hardware module
  * @param module The hardware to add to the table
+ *
  * @return true if the module has a unique name, otherwise false
  **/
 bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
@@ -131,6 +131,7 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 	moduleTable->push_back(module);
 	updateSafetyState();
 	updateOperationState(); 
+	
 	return true;
 }
 

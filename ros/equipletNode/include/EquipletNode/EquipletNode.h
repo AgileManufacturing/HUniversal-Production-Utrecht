@@ -73,14 +73,12 @@ private:
 	std::string name;
 	/**
 	 * @var Mast::state operationState
-	 * The minimal operation state is equal to the lowest state of 
-	 * all modules that are actors
+	 * The minimal operation state is equal to the lowest state of all modules that are actors
 	 **/
 	rosMast::StateType operationState;
 	/**
 	 * @var Mast::state safetyState
-	 * The safety state of the Equiplet. This is equal 
-	 * to the highest state of the actor modules
+	 * The safety state of the Equiplet. This is equal to the highest state of the actor modules
 	 **/
 	rosMast::StateType safetyState;
 	/**
