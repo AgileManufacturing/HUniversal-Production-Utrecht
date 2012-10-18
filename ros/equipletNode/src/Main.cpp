@@ -43,20 +43,70 @@
 
 EquipletNode *equiplet;
 
+/**
+ * Callback function that is called when a message is received on the equiplet_statechanged topic
+ * It updates the state of a hardware module.
+ **/
 void stateChanged(const rosMast::StateChangedPtr &msg) {
-	//cout << msg->moduleID;
-	// int moduleType = msg->moduleID;
-	// rosMast::StateType state = rosMast::StateType(msg->state);
+	std::cout << "stateChanged called" << std::endl;
 	equiplet->updateModuleState(msg->moduleID, rosMast::StateType(msg->state));
+	equiplet->printHardwareModules();
 }
 
 int main(int argc, char **argv) {
 	ros::init(argc, argv, "Equiplet1");
-	equiplet = new EquipletNode("Equiplet1");
 	ros::NodeHandle nh;
+
+	/**
+	 * Create an EquipletNode
+	 **/
+	equiplet = new EquipletNode("Equiplet1");
+
+	/**
+	 * Add some hardware modules to this equiplet
+	 **/
+	Mast::HardwareModuleProperties deltaRobot(1, 1, rosMast::safe, true, true);
+	equiplet->addHardwareModule(deltaRobot);
+	equiplet->printHardwareModules();
 	
-	equiplet->updateOperationState();
-	ros::Subscriber sub = nh.subscribe("equiplet_statechanged", 5 , stateChanged);
+	/**
+	 * Subscribe to the equiplet_statechanged topic. On that topic messages are received that
+	 * the state of a hardware module has changed.
+	 **/
+	ros::Subscriber sub = nh.subscribe("equiplet_statechanged", 1 , stateChanged);
+
+	/**
+	 * Publish to the requestStateChange topic. On this topic the Equiplet requests a state change by a hardware
+	 * module
+	 **/
+	ros::Publisher pub = nh.advertise<rosMast::StateChanged>("requestStateChange", 5);
+
+	sleep(5);
+
+	rosMast::StateChanged msg;
+
+	msg.equipletID = 1;
+	msg.moduleID = 1;
+	msg.state = rosMast::standby;
+
+	ros::Rate poll_rate(100);
+
+	// while(pub.getNumSubscribers() == 0) {
+	// 	poll_rate.sleep();	
+	// }
+	pub.publish(msg);	
+
+
+	while(ros::ok()) {
+		poll_rate.sleep();
+		ros::spinOnce();	
+	}
+	
+
+	// while(ros::ok()) {
+	// 	ros::spinOnce();
+	// }
+
 	//ros::Publisher stateRequestPublisher = nodeHandle.advertise<std_msgs::String>("chatter", 1000);
 
 	//ros::Rate loop_rate(10); 

@@ -30,6 +30,8 @@
 
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include "rosMast/StateMachine.h"
+#include "rosMast/StateChanged.h"
 
 /**
  * Callback that is called when a message is received
@@ -47,9 +49,20 @@ int main(int argc, char **argv) {
 	/**
 	 * Subscribe to the topic published by the EquipletNode
 	 **/
-	ros::Subscriber sub = nodeHandle.subscribe("chatter", 1000, chatterCallback);
+	ros::Publisher pub = nodeHandle.advertise<rosMast::StateChanged>("equiplet_statechanged", 1);
+	//ros::spinOnce();
+	//ros::Subscriber sub = nodeHandle.subscribe("chatter", 1000, chatterCallback);
+
+	sleep(2);
+
+	rosMast::StateChanged msg;	
+	msg.equipletID = 1;
+	msg.moduleID = 1;
+	msg.state = rosMast::standby;
+	//ros::Rate loop_rate(4);
+	pub.publish(msg);	
 
 	ros::spin();
-	
+
 	return 0;
 }
