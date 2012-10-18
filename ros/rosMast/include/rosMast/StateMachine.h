@@ -54,7 +54,7 @@ namespace rosMast {
 		typedef int (StateMachine::*stateFunctionPtr)();
 		
 		public:
-			StateMachine();
+			StateMachine(int equipletID, int moduleID);
 		
 			virtual int transitionSetup() = 0;
 			virtual int transitionShutdown() = 0;
@@ -82,8 +82,8 @@ namespace rosMast {
 
 		private:
 			StateType currentState;
-			const static int myequipletid = 5;
-			const static int mymoduleid = 5;
+			int myequipletid;
+			int mymoduleid;
 	};
 
 }

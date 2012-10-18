@@ -233,32 +233,15 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::M
 	return res.succeeded;
 	
 }
+/**
+ * Transition from Safe to Standby state
 
-
-
+ @return 0 if everything went OK else error
+**/
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
-	return 0;
-}
-
-int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
-	return 0;
-}
-
-int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
-	return 0;
-}
-
-int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
-	return 0;
-}
-
-int main(int argc, char** argv) {
-	ros::init(argc, argv, NODE_NAME);
-
-	deltaRobotNodeNamespace::DeltaRobotNode drn;
-
-    // Initialize modbus for IO controller
-    /*modbus_t* modbusIO = modbus_new_tcp("192.168.0.2", 502);
+	ROS_INFO("Setup transition called");
+	// Initialize modbus for IO controller
+    modbus_t* modbusIO = modbus_new_tcp("192.168.0.2", 502);
     if(modbusIO == NULL)
     {
         throw std::runtime_error("Unable to allocate libmodbus context");
@@ -305,29 +288,56 @@ int main(int argc, char** argv) {
     if(!deltaRobot->calibrateMotors()){
     	ROS_ERROR("Calibration FAILED. EXITING.");
     	return 1;
-    }
+    } 
+	return 0;
+}
+
+int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
+	ROS_INFO("Shutdown transition called");
+	deltaRobot->powerOff();
+	return 0;
+}
+
+int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
+	ROS_INFO("Start transition called");
+    // Calibrate the motors
+    if(!deltaRobot->calibrateMotors()){
+    	ROS_ERROR("Calibration FAILED. EXITING.");
+    	return 1;
+    } 	
+	return 0;
+}
+
+int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
+	ROS_INFO("Stop transition called");
+	return 0;
+}
+
+int main(int argc, char** argv) {
+	ros::init(argc, argv, NODE_NAME);
+
+	deltaRobotNodeNamespace::DeltaRobotNode drn(1, 1);    
     
 	ros::NodeHandle nodeHandle;
 
 	// Advertise the services
 	ros::ServiceServer moveToPointService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_POINT, moveToPoint);
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint, &drn);
 
 	ros::ServiceServer movePathService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_PATH, movePath);
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::movePath, &drn);
 
 	ros::ServiceServer moveToRelativePointService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT, moveToRelativePoint);
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint, &drn);
 
 	ros::ServiceServer moveRelativePathService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_RELATIVE_PATH, moveRelativePath);
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_RELATIVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath, &drn);
 
 	ros::ServiceServer calibrateService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, calibrate);
+		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate, &drn);
 
-	ROS_INFO("DeltaRobotNode ready..."); */
+	ROS_INFO("DeltaRobotNode ready..."); 
 
-	ros::spin();
 	return 0;
 }
 

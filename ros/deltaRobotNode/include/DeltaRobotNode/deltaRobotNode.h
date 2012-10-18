@@ -21,15 +21,16 @@ namespace deltaRobotNodeNamespace
 	class DeltaRobotNode : rosMast::StateMachine 
 	{
 		public:
-			DeltaRobotNode() : rosMast::StateMachine() {
+			DeltaRobotNode(int equipletID, int moduleID) 
+				: rosMast::StateMachine(equipletID, moduleID) {
 				// FUU
 			}
 			int transitionSetup();
 			int transitionShutdown();
 			int transitionStart();
 			int transitionStop();
+			
 			DeltaRobot::DeltaRobot * deltaRobot;
-		private:
 			
 			bool calibrate(deltaRobotNode::Calibrate::Request &req, 
 				deltaRobotNode::Calibrate::Response &res);

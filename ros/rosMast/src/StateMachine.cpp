@@ -38,13 +38,24 @@ void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 		//find transition function
 		stateFunctionPtr fptr = lookupTransition(currentState, state);
 		if(fptr != NULL) {
-			(this->*fptr)();
+			if( ((this->*fptr)()) == 0 ) {
+				currentState = state;
+			} 
+			else {
+				// Error so I want back to my current state from state
+				stateFunctionPtr fptr = lookupTransition(state, currentState);
+				if( ((this->*fptr)()) != 0 ) {
+					// FUU
+				}
+			}
 		}
 	}
 	
 }
 
-rosMast::StateMachine::StateMachine() {
+rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
+	myequipletid = equipletID;
+	mymoduleid = moduleID;
 	currentState = safe;
 
 	// Initialize the state map array
@@ -72,12 +83,12 @@ rosMast::StateMachine::stateFunctionPtr rosMast::StateMachine::lookupTransition(
 
 void rosMast::StateMachine::setState(StateType newState) {
 	currentState = newState;
-	//send update over publisher
+	
 }
 
 void rosMast::StateMachine::StateEngine() {
 	while(ros::ok()) { 
-		// Spin
+		std::cout << currentState;
 		ros::spinOnce();
 	}
 }
