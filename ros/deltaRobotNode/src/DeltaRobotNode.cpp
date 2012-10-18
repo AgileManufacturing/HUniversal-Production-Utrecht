@@ -317,10 +317,13 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
 	return 0;
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
 	ros::init(argc, argv, NODE_NAME);
 
-	deltaRobotNodeNamespace::DeltaRobotNode drn(atoi(argv[1]), atoi(argv[2]));    
+	int equipletID = atoi(argv[1]);
+	int moduleID = atoi(argv[2]);
+
+	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID);    
     
 	ros::NodeHandle nodeHandle;
 
@@ -338,10 +341,10 @@ int main(int argc, char** argv) {
 		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_RELATIVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath, &drn);
 
 	ros::ServiceServer calibrateService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate, &drn);
+		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate, &drn); 
 
 	ROS_INFO("DeltaRobotNode ready..."); 
-
+	ros::spin();
 	return 0;
 }
 

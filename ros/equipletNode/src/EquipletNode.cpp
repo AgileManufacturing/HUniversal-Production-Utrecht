@@ -108,7 +108,7 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 	 **/ 
 	std::pair< std::string, std::string > packageNodeName = modulePackageNodeMap[module.type];
 	stringstream ss (stringstream::in | stringstream::out);
-	ss << "rosrun " << packageNodeName.first << " " << packageNodeName.second << "1 1"
+	ss << "rosrun " << packageNodeName.first << " " << packageNodeName.second << " 1 1"
 	<< " __name:=" << packageNodeName.second << "" << module.id;
 
 	int pid = -1;
