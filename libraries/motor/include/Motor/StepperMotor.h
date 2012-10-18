@@ -46,7 +46,6 @@ namespace Motor{
      **/
     class StepperMotor : public MotorInterface{
     public:
-        StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex);
         StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle);
 
         virtual ~StepperMotor(void);
