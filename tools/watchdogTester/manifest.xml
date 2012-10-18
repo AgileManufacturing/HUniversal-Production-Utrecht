@@ -1,0 +1,17 @@
+<package>
+  <description brief="keyboardControlNode">
+
+     keyboardControlNode
+
+  </description>
+  <author>Dennis Koole en Dick van der Steen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/keyboardControlNode</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="deltaRobotNode"/>
+
+</package>
+
+
