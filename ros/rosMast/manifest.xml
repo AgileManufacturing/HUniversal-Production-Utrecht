@@ -12,8 +12,8 @@
   <license>BSD</license>
 
   <export>
-  	<cpp cflags="-I${prefix}/include"/>
-  </export>
+    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lrosMast"/>
+ </export>
 
   <review status="unreviewed" notes=""/>
 </package>

@@ -32,7 +32,7 @@
 #include "ros/ros.h"
 #include "rosMast/StateChanged.h"
 
-#define STATE_MAX 7
+#define TRANSITIONMAP_SIZE 4
 
 namespace rosMast {
 
@@ -54,13 +54,8 @@ namespace rosMast {
 		typedef int (StateMachine::*stateFunctionPtr)();
 		
 		public:
-			StateMachine(int i);
+			StateMachine();
 		
-			//State functions
-			virtual int stateSafe() = 0;
-			virtual int stateStandby() = 0;
-			virtual int stateNormal() = 0;
-
 			virtual int transitionSetup() = 0;
 			virtual int transitionShutdown() = 0;
 			virtual int transitionStart() = 0;
@@ -80,14 +75,13 @@ namespace rosMast {
 		protected:
 			bool locked;
 			
-			stateFunctionPtr stateMap[STATE_MAX];
+			stateFunctionPtr transitionMap[TRANSITIONMAP_SIZE];
 
 			ros::Publisher pub;
 			ros::Subscriber sub;
 
 		private:
 			StateType currentState;
-			int interval;
 			const static int myequipletid = 5;
 			const static int mymoduleid = 5;
 	};

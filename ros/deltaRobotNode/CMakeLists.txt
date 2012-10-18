@@ -25,7 +25,7 @@ add_dependencies(DeltaRobotNode deltaRobot)
 include_directories(${LIB_DATATYPES_INCLUDE} ${LIB_DATATYPES_INCLUDE} ${LIB_UTILITIES_INCLUDE} ${LIB_DELTAROBOT_INCLUDE} ${LIB_MOTOR_INCLUDE} ${LIB_MODBUS_CONTROLLER_INCLUDE})
 
 # Link target to our libraries
-target_link_libraries(DeltaRobotNode deltaRobot modbusController motor)
+target_link_libraries(DeltaRobotNode deltaRobot modbusController motor rosMast)
 
 # MUST be called after lcv_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()

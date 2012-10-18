@@ -15,11 +15,7 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 # Initialize ROS package to be in our build system.
 rexos_rospack_init("rosMast" true true)
 
-# Add executables as documented by ROS
-rosbuild_add_executable(ROS_MAST src/StateMachine.cpp)
-
-# Link target to our libraries
-target_link_libraries(ROS_MAST)
+rosbuild_add_library(rosMast src/StateMachine.cpp)
 
 # MUST be called after lcv_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()

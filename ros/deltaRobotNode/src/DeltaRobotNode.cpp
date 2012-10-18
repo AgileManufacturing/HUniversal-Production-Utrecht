@@ -27,27 +27,11 @@
 * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#include "ros/ros.h"
-#include "deltaRobotNode/MoveToPoint.h"
-#include "deltaRobotNode/MovePath.h"
-#include "deltaRobotNode/MoveToRelativePoint.h"
-#include "deltaRobotNode/MoveRelativePath.h"
-#include "deltaRobotNode/Motion.h"
-#include "deltaRobotNode/Calibrate.h"
-#include "deltaRobotNode/Calibration.h"
 
-#include "rosMast/StateChanged.h"
-#include <rosMast/StateMachine.h>
-
-#include <DataTypes/Point3D.h>
-#include <DeltaRobot/DeltaRobot.h>
-#include <Motor/StepperMotor.h>
-#include <DeltaRobotNode/Services.h>
+#include "DeltaRobotNode/deltaRobotNode.h"
 
 #define NODE_NAME "DeltaRobotNode"
 
-
-static DeltaRobot::DeltaRobot * deltaRobot;
 
 /**
  * Starts the (re)calibration of the robot
@@ -56,7 +40,7 @@ static DeltaRobot::DeltaRobot * deltaRobot;
  * 
  * @return true if the calibration was succesfully. false otherwise.
  */
-bool calibrate(deltaRobotNode::Calibrate::Request &req,
+bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate(deltaRobotNode::Calibrate::Request &req,
 	deltaRobotNode::Calibrate::Response &res) {
     // Calibrate the motors
     if(!deltaRobot->calibrateMotors()){
@@ -74,7 +58,7 @@ bool calibrate(deltaRobotNode::Calibrate::Request &req,
  * 
  * @return true
  **/
-bool moveToPoint(deltaRobotNode::MoveToPoint::Request &req,
+bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(deltaRobotNode::MoveToPoint::Request &req,
 	deltaRobotNode::MoveToPoint::Response &res) {
 	ROS_INFO("moveToPoint called");
 	DataTypes::Point3D<double>& effectorLocation = deltaRobot->getEffectorLocation();
@@ -104,7 +88,7 @@ bool moveToPoint(deltaRobotNode::MoveToPoint::Request &req,
  * 
  * @return true
  **/
-bool movePath(deltaRobotNode::MovePath::Request &req,
+bool deltaRobotNodeNamespace::DeltaRobotNode::movePath(deltaRobotNode::MovePath::Request &req,
 	deltaRobotNode::MovePath::Response &res) {
 	ROS_INFO("movePath called");
 	deltaRobotNode::Motion currentMotion;
@@ -151,7 +135,7 @@ bool movePath(deltaRobotNode::MovePath::Request &req,
  * 
  * @return true
  **/
-bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
+bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
 	deltaRobotNode::MoveToRelativePoint::Response &res) {
 	ROS_INFO("moveToRelativePoint called");
 	deltaRobotNode::Motion currentMotion;
@@ -194,7 +178,7 @@ bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
  *
  * @return true if path is allowed else return false.
  **/
-bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
+bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
 	deltaRobotNode::MoveRelativePath::Response &res) {
 	ROS_INFO("moveRelativePath called");
 
@@ -250,11 +234,31 @@ bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
 	
 }
 
+
+
+int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
+	return 0;
+}
+
+int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
+	return 0;
+}
+
+int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
+	return 0;
+}
+
+int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
+	return 0;
+}
+
 int main(int argc, char** argv) {
 	ros::init(argc, argv, NODE_NAME);
 
+	deltaRobotNodeNamespace::DeltaRobotNode drn;
+
     // Initialize modbus for IO controller
-    modbus_t* modbusIO = modbus_new_tcp("192.168.0.2", 502);
+    /*modbus_t* modbusIO = modbus_new_tcp("192.168.0.2", 502);
     if(modbusIO == NULL)
     {
         throw std::runtime_error("Unable to allocate libmodbus context");
@@ -321,7 +325,7 @@ int main(int argc, char** argv) {
 	ros::ServiceServer calibrateService =
 		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, calibrate);
 
-	ROS_INFO("DeltaRobotNode ready...");
+	ROS_INFO("DeltaRobotNode ready..."); */
 
 	ros::spin();
 	return 0;

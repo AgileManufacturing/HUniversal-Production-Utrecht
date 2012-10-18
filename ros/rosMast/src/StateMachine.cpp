@@ -32,29 +32,26 @@ void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 	//decode msg
 	int equipletID = msg->equipletID;
 	int moduleID = msg->moduleID;
-	StateType state = lookupState(msg->state);
+	StateType state = StateType(msg->state);
 	//StateType test = state;
 	if( myequipletid == equipletID && mymoduleid == moduleID) {
 		//find transition function
 		stateFunctionPtr fptr = lookupTransition(currentState, state);
-		if(fptr != NULL)
+		if(fptr != NULL) {
 			(this->*fptr)();
+		}
 	}
 	
 }
 
-rosMast::StateMachine::StateMachine(int ival) {
+rosMast::StateMachine::StateMachine() {
 	currentState = safe;
-	interval = ival;
 
 	// Initialize the state map array
-	stateMap[0] = &StateMachine::stateSafe;
-	stateMap[1] = &StateMachine::transitionSetup;
-	stateMap[2] = &StateMachine::transitionShutdown; 
-	stateMap[3] = &StateMachine::stateStandby;
-	stateMap[4] = &StateMachine::transitionStart;
-	stateMap[5] = &StateMachine::transitionStop;
-	stateMap[6] = &StateMachine::stateNormal; 
+	transitionMap[0] = &StateMachine::transitionSetup;
+	transitionMap[1] = &StateMachine::transitionShutdown; 
+	transitionMap[2] = &StateMachine::transitionStart;
+	transitionMap[3] = &StateMachine::transitionStop;
 
 	//Initialize publisher and subcriber
 	ros::NodeHandle nh;
@@ -63,6 +60,12 @@ rosMast::StateMachine::StateMachine(int ival) {
 }
 
 rosMast::StateMachine::stateFunctionPtr rosMast::StateMachine::lookupTransition(StateType currentState, StateType desiredState) {
+	if(currentState > desiredState) {
+		return transitionMap[currentState - 1];
+	}
+	else if(currentState < desiredState) {
+		return transitionMap[currentState + 1];
+	}
 	return NULL;
 }
 
@@ -72,26 +75,9 @@ void rosMast::StateMachine::setState(StateType newState) {
 	//send update over publisher
 }
 
-rosMast::StateType rosMast::StateMachine::lookupState(int state) {
-	switch(state) {
-		case safe:
-			return safe;
-		case standby:
-			return standby;
-		case normal:
-			return normal;
-		default:
-			return nostate;
-	}
-}
-
 void rosMast::StateMachine::StateEngine() {
-	while(true) { 
-		//execute state function
-		(this->*stateMap[currentState])();
+	while(ros::ok()) { 
+		// Spin
+		ros::spinOnce();
 	}
-}
-
-int main() {
-	return 0;
 }
