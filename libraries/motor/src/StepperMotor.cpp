@@ -47,20 +47,11 @@ namespace Motor{
 	 *
 	 * @param modbusController Controller for the modbus communication.
 	 * @param motorIndex Index of the motor from 0 to N dependant on the amount of motors.
-	 **/
-	StepperMotor::StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex) :
-		MotorInterface(), modbus(modbusController), motorIndex(motorIndex), anglesLimited(false), poweredOn(false)  {}
-
-	/**
-	 * Constructor of StepperMotor. Sets angles to unlimited.
-	 *
-	 * @param modbusController Controller for the modbus communication.
-	 * @param motorIndex Index of the motor from 0 to N dependant on the amount of motors.
 	 * @param minAngle Minimum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
 	 * @param maxAngle Maximum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
 	 **/
 	StepperMotor::StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle):
-		MotorInterface(), minAngle(minAngle), maxAngle(maxAngle), modbus(modbusController), motorIndex(motorIndex), anglesLimited(true), poweredOn(false){}
+		MotorInterface(), deviation(0), minAngle(minAngle), maxAngle(maxAngle), modbus(modbusController), motorIndex(motorIndex), anglesLimited(true), poweredOn(false){}
 
 	/**
 	 * Deconstructor of StepperMotor. Tries to turn to power off.
