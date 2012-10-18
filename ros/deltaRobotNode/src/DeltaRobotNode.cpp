@@ -240,43 +240,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::M
 **/
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 	setState(rosMast::setup);
-
 	ROS_INFO("Setup transition called");
-	
-	return 0;
-}
-
-int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
-	setState(rosMast::shutdown);
-	ROS_INFO("Shutdown transition called");
-	deltaRobot->powerOff();
-	return 0;
-}
-
-int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
-	setState(rosMast::start);
-	ROS_INFO("Start transition called");
-    // Calibrate the motors
-    if(!deltaRobot->calibrateMotors()){
-    	ROS_ERROR("Calibration FAILED. EXITING.");
-    	return 1;
-    } 	
-	return 0;
-}
-
-int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
-	setState(rosMast::stop);
-	ROS_INFO("Stop transition called");
-	return 0;
-}
-
-int main(int argc, char **argv) {
-	ros::init(argc, argv, NODE_NAME);
-
-	DeltaRobot::DeltaRobot * deltaRobot;
-
-	int equipletID = atoi(argv[1]);
-	int moduleID = atoi(argv[2]);
 
 	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID);    
 	
@@ -330,7 +294,39 @@ int main(int argc, char **argv) {
     if(!deltaRobot->calibrateMotors()){
     	ROS_ERROR("Calibration FAILED. EXITING.");
     	return 1;
-    } 
+    } 	
+	return 0;
+}
+
+int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
+	setState(rosMast::shutdown);
+	ROS_INFO("Shutdown transition called");
+	deltaRobot->powerOff();
+	return 0;
+}
+
+int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
+	setState(rosMast::start);
+	ROS_INFO("Start transition called");
+    // Calibrate the motors
+    if(!deltaRobot->calibrateMotors()){
+    	ROS_ERROR("Calibration FAILED. EXITING.");
+    	return 1;
+    } 	
+	return 0;
+}
+
+int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
+	setState(rosMast::stop);
+	ROS_INFO("Stop transition called");
+	return 0;
+}
+
+int main(int argc, char **argv) {
+	ros::init(argc, argv, NODE_NAME);
+
+	int equipletID = atoi(argv[1]);
+	int moduleID = atoi(argv[2]);
 
     
 	ros::NodeHandle nodeHandle;
