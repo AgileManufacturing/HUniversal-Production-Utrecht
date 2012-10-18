@@ -39,7 +39,7 @@ void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 		stateFunctionPtr fptr = lookupTransition(currentState, state);
 		if(fptr != NULL) {
 			if( ((this->*fptr)()) == 0 ) {
-				currentState = state;
+				setState(state);
 			} 
 			else {
 				// Error so I want back to my current state from state
@@ -47,10 +47,14 @@ void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 				if( ((this->*fptr)()) != 0 ) {
 					// FUU
 				}
+				else {
+					// TODO
+					rosMast::StateType mah = rosMast::StateType(currentState - 1);
+					setState(mah);
+				}
 			}
 		}
-	}
-	
+	}	
 }
 
 rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
@@ -83,7 +87,11 @@ rosMast::StateMachine::stateFunctionPtr rosMast::StateMachine::lookupTransition(
 
 void rosMast::StateMachine::setState(StateType newState) {
 	currentState = newState;
-	
+	rosMast::StateChanged msg;
+	msg.equipletID = myequipletid;
+	msg.moduleID = mymoduleid;
+	msg.state = currentState;
+	pub.publish(msg);
 }
 
 void rosMast::StateMachine::StateEngine() {

@@ -239,6 +239,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::M
  @return 0 if everything went OK else error
 **/
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
+	setState(rosMast::setup);
 	ROS_INFO("Setup transition called");
 	// Initialize modbus for IO controller
     modbus_t* modbusIO = modbus_new_tcp("192.168.0.2", 502);
@@ -293,12 +294,14 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 }
 
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
+	setState(rosMast::shutdown);
 	ROS_INFO("Shutdown transition called");
 	deltaRobot->powerOff();
 	return 0;
 }
 
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
+	setState(rosMast::start);
 	ROS_INFO("Start transition called");
     // Calibrate the motors
     if(!deltaRobot->calibrateMotors()){
@@ -309,6 +312,7 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
 }
 
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
+	setState(rosMast::stop);
 	ROS_INFO("Stop transition called");
 	return 0;
 }
@@ -316,7 +320,7 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
 int main(int argc, char** argv) {
 	ros::init(argc, argv, NODE_NAME);
 
-	deltaRobotNodeNamespace::DeltaRobotNode drn(1, 1);    
+	deltaRobotNodeNamespace::DeltaRobotNode drn(atoi(argv[1]), atoi(argv[2]));    
     
 	ros::NodeHandle nodeHandle;
 

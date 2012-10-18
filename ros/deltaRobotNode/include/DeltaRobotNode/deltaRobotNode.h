@@ -23,7 +23,7 @@ namespace deltaRobotNodeNamespace
 		public:
 			DeltaRobotNode(int equipletID, int moduleID) 
 				: rosMast::StateMachine(equipletID, moduleID) {
-				// FUU
+				
 			}
 			int transitionSetup();
 			int transitionShutdown();
