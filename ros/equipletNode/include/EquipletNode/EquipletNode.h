@@ -31,6 +31,7 @@
 #include <string>
 #include <vector>
 #include <Mast/HardwareModuleProperties.h>
+#include "rosMast/StateMachine.h"
 #include <BlackboardClient/BlackboardClientUtils.h>
 #include <BlackboardClient/PostIt.pb.h>
 
@@ -58,9 +59,10 @@ public:
 	}
 
 	bool addHardwareModule(Mast::HardwareModuleProperties module);
-	bool removeHardwareModule(const std::string& name);
+	bool removeHardwareModule(int id);
 	void updateOperationState();
 	void updateSafetyState();
+	bool updateModuleState(int moduleID, rosMast::StateType state);
 	void printHardwareModules();
 	void readFromBlackboard();
 private:
@@ -74,13 +76,13 @@ private:
 	 * The minimal operation state is equal to the lowest state of 
 	 * all modules that are actors
 	 **/
-	Mast::state operationState;
+	rosMast::StateType operationState;
 	/**
 	 * @var Mast::state safetyState
 	 * The safety state of the Equiplet. This is equal 
 	 * to the highest state of the actor modules
 	 **/
-	Mast::state safetyState;
+	rosMast::StateType safetyState;
 	/**
 	 * @var std::vector<Mast::HardwareModuleProperties> *moduleTable
 	 * The table that holds all information about the modules currently attached to this Equiplet  
