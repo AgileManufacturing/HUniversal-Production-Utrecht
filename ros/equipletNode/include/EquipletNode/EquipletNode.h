@@ -59,7 +59,7 @@ public:
 	}
 
 	bool addHardwareModule(Mast::HardwareModuleProperties module);
-	bool removeHardwareModule(const std::string& name);
+	bool removeHardwareModule(int id);
 	void updateOperationState();
 	void updateSafetyState();
 	bool updateModuleState(int moduleID, rosMast::StateType state);

@@ -41,12 +41,13 @@
 #define DELTAROBOT "DeltaRobot1"
 #define GRIPPER2 "Gripper2"
 
-EquipletNode equiplet;
+EquipletNode *equiplet;
 
 void stateChanged(const rosMast::StateChangedPtr &msg) {
-	int moduleType = msg->moduleID;
-	rosMast::StateType state = rosMast::StateType(msg->state);
-	equiplet->updateModuleState(moduleType, stateChanged);
+	//cout << msg->moduleID;
+	// int moduleType = msg->moduleID;
+	// rosMast::StateType state = rosMast::StateType(msg->state);
+	equiplet->updateModuleState(msg->moduleID, rosMast::StateType(msg->state));
 }
 
 int main(int argc, char **argv) {
@@ -54,7 +55,7 @@ int main(int argc, char **argv) {
 	equiplet = new EquipletNode("Equiplet1");
 	ros::NodeHandle nh;
 	
-	equiplet.updateOperationState();
+	equiplet->updateOperationState();
 	ros::Subscriber sub = nh.subscribe("equiplet_statechanged", 5 , stateChanged);
 	//ros::Publisher stateRequestPublisher = nodeHandle.advertise<std_msgs::String>("chatter", 1000);
 

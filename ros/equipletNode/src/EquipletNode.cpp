@@ -1,3 +1,4 @@
+
 /**
  * @file EquipletNode.cpp
  * @brief Symbolizes an entire EquipletNode.
@@ -41,7 +42,7 @@
  **/
 void EquipletNode::updateSafetyState() {
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
-	Mast::state newSafetyState = Mast::safe;
+	rosMast::StateType newSafetyState = rosMast::safe;
 	for(it = moduleTable->begin(); it < moduleTable->end(); it++) {
 		if((*it).actuator && (*it).currentState > newSafetyState) {
 			newSafetyState = (*it).currentState;
@@ -59,7 +60,7 @@ void EquipletNode::updateOperationState() {
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
 	bool operationStateSet = false;
 	// first set the operation state to the highest state possible 
-	Mast::state newOperationState = Mast::normal;
+	rosMast::StateType newOperationState = rosMast::normal;
 
 	for(it = moduleTable->begin(); it < moduleTable->end(); it++) {
 		/**
@@ -78,7 +79,7 @@ void EquipletNode::updateOperationState() {
 	 * the safe state.
 	 **/
 	if(!operationStateSet) {
-		newOperationState = Mast::safe;
+		newOperationState = rosMast::safe;
 	}
 	operationState = newOperationState;
 }
@@ -97,7 +98,7 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 	 **/
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
 	for(it = moduleTable->begin(); it < moduleTable->end(); it++) {
-		if(module.name.compare(((*it).name)) == 0) {
+		if(module.id == (*it).id) {
 			return false;
 		}
 	}
@@ -108,7 +109,7 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 	std::pair< std::string, std::string > packageNodeName = modulePackageNodeMap[module.type];
 	stringstream ss (stringstream::in | stringstream::out);
 	ss << "rosrun " << packageNodeName.first << " " << packageNodeName.second
-	<< " __name:=" << module.name;
+	<< " __name:=" << packageNodeName.second << "" << module.id;
 
 	int pid = -1;
 	switch(pid = fork()) {
@@ -118,7 +119,7 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 			fclose(stdin);
 			execl("/bin/sh", "/bin/sh", "-c", ss.str().c_str(), NULL);
 		case -1: 
-			std::cerr << "Cannot start node for hardwaremodule " << module.name << std::endl;
+			std::cerr << "Cannot start node for hardwaremodule " << module.id << std::endl;
 			return false;
 		default:
 			break; 
@@ -141,14 +142,14 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
  *
  * @return true if the hardware module is removed, false if the module could not be found in the table
  **/
-bool EquipletNode::removeHardwareModule(const std::string& name) {
+bool EquipletNode::removeHardwareModule(int id) {
 	/**
 	 * The use of the name to uniquely identify a hardware module is a temporary,
 	 * solution. This will probably be changed when the module database is implemented.
 	 **/
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
 	for(it = moduleTable->begin(); it < moduleTable->end(); it++) {
-		if((*it).name.compare(name) == 0) {
+		if((*it).id == id) {
 			moduleTable->erase(it);
 			updateSafetyState();
 			updateOperationState();
@@ -193,8 +194,8 @@ void EquipletNode::readFromBlackboard() {
 bool EquipletNode::updateModuleState(int moduleID, rosMast::StateType state) {
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
 	for(it = moduleTable->begin(); it < moduleTable->end(); it++) {
-		if((*it).id == moduleId) {
-			(*it).state = state;
+		if((*it).id == moduleID) {
+			(*it).currentState = state;
 			updateSafetyState();
 			updateOperationState();
 			return true;
