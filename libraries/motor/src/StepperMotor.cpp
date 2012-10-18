@@ -258,6 +258,7 @@ namespace Motor{
 	void StepperMotor::setMinAngle(double minAngle){
 		this->minAngle = minAngle;
 		modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((minAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
+		modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SOFTWARE_OVERTRAVEL, 1);
 		anglesLimited = true;
 	}
 
@@ -269,6 +270,7 @@ namespace Motor{
 	void StepperMotor::setMaxAngle(double maxAngle){
 		this->maxAngle = maxAngle;
 		modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((maxAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
+		modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SOFTWARE_OVERTRAVEL, 1);
 		anglesLimited = true;
 	}
 
