@@ -3,4 +3,6 @@
 
 void Garbage::testPrint() {
 	std::cout << fuu << "\n";
+	fuu = 10;
+	std::cout << fuu << "\n";
 }
