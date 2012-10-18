@@ -241,7 +241,6 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::M
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 	setState(rosMast::setup);
 
-	std::cout << "Setup transition called";
 	ROS_INFO("Setup transition called");
 	
 	// Initialize modbus for IO controller
@@ -287,6 +286,8 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 
 	// Power on the deltarobot and calibrate the motors.
     deltaRobot->powerOn();
+
+    ROS_INFO("Motor Power on!");
 
     // Calibrate the motors
     if(!deltaRobot->calibrateMotors()){
