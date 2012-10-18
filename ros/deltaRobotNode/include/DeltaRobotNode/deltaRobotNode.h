@@ -15,7 +15,6 @@
 #include <Motor/StepperMotor.h>
 #include <DeltaRobotNode/Services.h>
 #include <rosMast/StateMachine.h>
-#include <rosMast/Garbage.h>
 
 namespace deltaRobotNodeNamespace
 {
@@ -32,7 +31,6 @@ namespace deltaRobotNodeNamespace
 			int transitionStop();
 			
 			DeltaRobot::DeltaRobot * deltaRobot;
-			Garbage * gb;
 			
 			bool calibrate(deltaRobotNode::Calibrate::Request &req, 
 				deltaRobotNode::Calibrate::Response &res);
