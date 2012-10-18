@@ -2,5 +2,5 @@
 #include  <iostream>
 
 void Garbage::testPrint() {
-	std::cout << "FUUU \n";
+	std::cout << fuu << "\n";
 }

@@ -3,8 +3,10 @@
 
 class Garbage {
 	public: 
-		Garbage() {}
+		Garbage() { fuu  = 5; }
 		void testPrint();
+	private: 
+		int fuu;
 };
 
 #endif
