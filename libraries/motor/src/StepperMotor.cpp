@@ -221,7 +221,7 @@ namespace Motor
     {
     	this->minAngle = minAngle;
         modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((minAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
-        std::cout << "[DEBUG] poweron " << (uint32_t)((minAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE) << "  " << minAngle << std::endl;
+        std::cout << "[DEBUG] setMinAngle " << (uint32_t)((minAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE) << "  " << minAngle << std::endl;
         anglesLimited = true;
     }
 

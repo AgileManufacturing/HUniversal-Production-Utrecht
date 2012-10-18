@@ -41,7 +41,7 @@ void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 		if(fptr != NULL) {
 			std::cout << "Function pointer found";
 			std::cout << &fptr;
-			if( ((this->*fptr)()) == 0 ) {
+			if( ( (this->*fptr) () ) == 0 ) {
 				std::cout << "Transition executed succesfull";
 				setState(state);
 			} 
@@ -49,7 +49,7 @@ void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 				std::cout << "Error in Transition function";
 				// Error so I want back to my current state from state
 				stateFunctionPtr fptr = lookupTransition(state, currentState);
-				if( ((this->*fptr)()) != 0 ) {
+				if( ( (this->*fptr) () ) != 0 ) {
 					std::cout << "Error in trying to transition to lower state afer fail transition";
 				}
 				else {

@@ -278,12 +278,14 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 
 	// Create a deltarobot	
     deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO);
+    gb = new Garbage();
 
     // Generate the effector boundaries with voxel size 2
     deltaRobot->generateBoundaries(2);
 
 	// Power on the deltarobot and calibrate the motors.
     deltaRobot->powerOn();
+    gb->testPrint();
 
     ROS_INFO("Motor Power on!");
 
@@ -345,7 +347,6 @@ int main(int argc, char **argv) {
 	ros::ServiceServer calibrateService =
 		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate, &drn); 
 
-	std::cout << "DeltaRobotNode ready";
 	ROS_INFO("DeltaRobotNode ready..."); 	
 	ros::spin();
 	return 0;
