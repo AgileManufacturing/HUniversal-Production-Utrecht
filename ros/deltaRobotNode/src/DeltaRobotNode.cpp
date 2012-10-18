@@ -297,7 +297,6 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 }
 
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
-	std::cout << "Setup transition called";
 	setState(rosMast::shutdown);
 	ROS_INFO("Shutdown transition called");
 	deltaRobot->powerOff();
@@ -347,7 +346,9 @@ int main(int argc, char **argv) {
 	ros::ServiceServer calibrateService =
 		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate, &drn); 
 
+	std::cout << "DeltaRobotNode ready";
 	ROS_INFO("DeltaRobotNode ready..."); 	
+	ros::spin();
 	return 0;
 }
 

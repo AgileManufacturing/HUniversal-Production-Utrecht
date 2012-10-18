@@ -39,7 +39,8 @@ void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 		//find transition function
 		stateFunctionPtr fptr = lookupTransition(currentState, state);
 		if(fptr != NULL) {
-			std::cout << "Function pointer point";
+			std::cout << "Function pointer found";
+			std::cout << &fptr;
 			if( ((this->*fptr)()) == 0 ) {
 				std::cout << "Transition executed succesfull";
 				setState(state);
@@ -68,28 +69,29 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
 	// Initialize the state map array
 	transitionMap[0] = &StateMachine::transitionSetup;
 	transitionMap[1] = &StateMachine::transitionShutdown; 
-	transitionMap[2] = &StateMachine::transitionStart;
-	transitionMap[3] = &StateMachine::transitionStop;
+	transitionMap[2] = &StateMachine::transitionStop;
+	transitionMap[3] = &StateMachine::transitionStart;
+
 
 	//Initialize publisher and subcriber
 	ros::NodeHandle nh;
 	pub = nh.advertise<rosMast::StateChanged>("equiplet_statechanged", 5);
 	sub = nh.subscribe("requestStateChange", 1, &StateMachine::changeState, this);
 
-	StateEngine();
+	//StateEngine();
 }
 
 rosMast::StateMachine::stateFunctionPtr rosMast::StateMachine::lookupTransition(StateType currentState, StateType desiredState) {
-	std::cout << "Lookup transition, currentState " << currentState;
+	std::cout << "Lookup transition, currentState " << currentState << "\n";
 	if(currentState > desiredState) {
-		std::cout << "you want to go to a lower state";
-		return transitionMap[currentState - 1];
+		std::cout << "you want to go to a lower state" << "\n";
+		return transitionMap[currentState - 2];
 	}
 	else if(currentState < desiredState) {
-		std::cout << "you want to go to a higher state";
-		return transitionMap[currentState + 1];
+		std::cout << "you want to go to a higher state" << "\n";
+		return transitionMap[currentState];
 	}
-	std::cout << "return NULL";
+	std::cout << "return NULL" << "\n";
 	return NULL;
 }
 
