@@ -89,7 +89,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 
 	// Create a deltarobot	
     deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO);
-    		
+
 	StateMachine::StateEngine();
 }
 
@@ -102,6 +102,11 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
  */
 bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate(deltaRobotNode::Calibrate::Request &req,
 	deltaRobotNode::Calibrate::Response &res) {
+
+	if(currentState != rosMast::normal) {
+		return false;
+	}
+
     // Calibrate the motors
     if(!deltaRobot->calibrateMotors()){
     	ROS_ERROR("Calibration FAILED. EXITING.");
@@ -121,6 +126,11 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate(deltaRobotNode::Calibrat
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(deltaRobotNode::MoveToPoint::Request &req,
 	deltaRobotNode::MoveToPoint::Response &res) {
 	ROS_INFO("moveToPoint called");
+
+	if(currentState != rosMast::normal) {
+		return false;
+	}
+
 	DataTypes::Point3D<double>& effectorLocation = deltaRobot->getEffectorLocation();
 	deltaRobotNode::Motion motion = req.motion;
 	/**
@@ -151,6 +161,11 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(deltaRobotNode::MoveTo
 bool deltaRobotNodeNamespace::DeltaRobotNode::movePath(deltaRobotNode::MovePath::Request &req,
 	deltaRobotNode::MovePath::Response &res) {
 	ROS_INFO("movePath called");
+
+	if(currentState != rosMast::normal) {
+		return false;
+	}
+
 	deltaRobotNode::Motion currentMotion;
 	deltaRobotNode::Motion nextMotion;
 	try
@@ -198,6 +213,11 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath(deltaRobotNode::MovePath:
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
 	deltaRobotNode::MoveToRelativePoint::Response &res) {
 	ROS_INFO("moveToRelativePoint called");
+
+	if(currentState != rosMast::normal) {
+		return false;
+	}
+
 	deltaRobotNode::Motion currentMotion;
 	try {
 		currentMotion = req.motion;
@@ -241,6 +261,10 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(deltaRobotNode
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
 	deltaRobotNode::MoveRelativePath::Response &res) {
 	ROS_INFO("moveRelativePath called");
+
+	if(currentState != rosMast::normal) {
+		return false;
+	}
 
 	deltaRobotNode::Motion currentMotion;
 	double relativeX;

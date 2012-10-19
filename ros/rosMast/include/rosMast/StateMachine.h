@@ -85,12 +85,12 @@ namespace rosMast {
 		
 		protected:
 			bool locked;
-		
+			StateType currentState;
+
 			ros::Publisher pub;
 			ros::Subscriber sub;
 
-		private:
-			StateType currentState;
+		private:		
 			int myequipletid;
 			int mymoduleid;
 
