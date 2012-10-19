@@ -32,6 +32,27 @@
 
 #define NODE_NAME "DeltaRobotNode"
 
+deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) : rosMast::StateMachine(equipletID, moduleID)
+{	
+	ros::NodeHandle nodeHandle;
+
+	// Advertise the services
+	ros::ServiceServer moveToPointService =
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint, this);
+
+	ros::ServiceServer movePathService =
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::movePath, this);
+
+	ros::ServiceServer moveToRelativePointService =
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint, this);
+
+	ros::ServiceServer moveRelativePathService =
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_RELATIVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath, this);
+
+	ros::ServiceServer calibrateService =
+		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate, this); 
+	StateMachine::StateEngine();
+}
 
 /**
  * Starts the (re)calibration of the robot
@@ -327,24 +348,6 @@ int main(int argc, char **argv) {
 	int moduleID = atoi(argv[2]);
 
 	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID);    
-    
-	ros::NodeHandle nodeHandle;
-
-	// Advertise the services
-	ros::ServiceServer moveToPointService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint, &drn);
-
-	ros::ServiceServer movePathService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::movePath, &drn);
-
-	ros::ServiceServer moveToRelativePointService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint, &drn);
-
-	ros::ServiceServer moveRelativePathService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_RELATIVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath, &drn);
-
-	ros::ServiceServer calibrateService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate, &drn); 
 
 	ROS_INFO("DeltaRobotNode ready..."); 	
 	return 0;

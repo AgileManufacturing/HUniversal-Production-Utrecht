@@ -21,10 +21,9 @@ namespace deltaRobotNodeNamespace
 	class DeltaRobotNode : rosMast::StateMachine 
 	{
 		public:
-			DeltaRobotNode(int equipletID, int moduleID) 
-				: rosMast::StateMachine(equipletID, moduleID) {
-				
-			}
+			
+			DeltaRobotNode(int equipletID, int moduleID);
+			
 			int transitionSetup();
 			int transitionShutdown();
 			int transitionStart();
@@ -42,6 +41,8 @@ namespace deltaRobotNodeNamespace
 				deltaRobotNode::MoveToRelativePoint::Response &res);
 			bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
 				deltaRobotNode::MoveRelativePath::Response &res);	
+
+
 	};
 }
 
