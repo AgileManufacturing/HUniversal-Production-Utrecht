@@ -51,6 +51,45 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 
 	ros::ServiceServer calibrateService =
 		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate, this); 
+
+	// Initialize modbus for IO controller
+    modbus_t* modbusIO = modbus_new_tcp("192.168.0.2", 502);
+    if(modbusIO == NULL)
+    {
+        throw std::runtime_error("Unable to allocate libmodbus context");
+    }
+    if(modbus_connect(modbusIO) == -1)
+    {
+        throw std::runtime_error("Modbus connection to IO controller failed");
+    }
+    assert(modbusIO != NULL);
+
+    DataTypes::DeltaRobotMeasures drm;
+    drm.base = DeltaRobot::Measures::BASE;
+    drm.hip = DeltaRobot::Measures::HIP;
+    drm.effector = DeltaRobot::Measures::EFFECTOR;
+    drm.ankle = DeltaRobot::Measures::ANKLE;
+    drm.maxAngleHipAnkle = DeltaRobot::Measures::HIP_ANKLE_ANGLE_MAX;
+
+
+    ModbusController::ModbusController* modbus = new ModbusController::ModbusController(modbus_new_rtu(
+        "/dev/ttyS0",
+        Motor::CRD514KD::RtuConfig::BAUDRATE,
+        Motor::CRD514KD::RtuConfig::PARITY,
+        Motor::CRD514KD::RtuConfig::DATA_BITS,
+        Motor::CRD514KD::RtuConfig::STOP_BITS));
+
+
+    Motor::StepperMotor* motors[3];
+    motors[0] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_0, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
+    motors[1] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_1, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
+    motors[2] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_2, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
+
+    Motor::MotorManager* motorManager = new Motor::MotorManager(modbus, motors, 3);
+
+	// Create a deltarobot	
+    deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO);
+    		
 	StateMachine::StateEngine();
 }
 
@@ -264,44 +303,6 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 
 	ROS_INFO("Setup transition called");	
 	
-	// Initialize modbus for IO controller
-    modbus_t* modbusIO = modbus_new_tcp("192.168.0.2", 502);
-    if(modbusIO == NULL)
-    {
-        throw std::runtime_error("Unable to allocate libmodbus context");
-    }
-    if(modbus_connect(modbusIO) == -1)
-    {
-        throw std::runtime_error("Modbus connection to IO controller failed");
-    }
-    assert(modbusIO != NULL);
-
-    DataTypes::DeltaRobotMeasures drm;
-    drm.base = DeltaRobot::Measures::BASE;
-    drm.hip = DeltaRobot::Measures::HIP;
-    drm.effector = DeltaRobot::Measures::EFFECTOR;
-    drm.ankle = DeltaRobot::Measures::ANKLE;
-    drm.maxAngleHipAnkle = DeltaRobot::Measures::HIP_ANKLE_ANGLE_MAX;
-
-
-    ModbusController::ModbusController* modbus = new ModbusController::ModbusController(modbus_new_rtu(
-        "/dev/ttyS0",
-        Motor::CRD514KD::RtuConfig::BAUDRATE,
-        Motor::CRD514KD::RtuConfig::PARITY,
-        Motor::CRD514KD::RtuConfig::DATA_BITS,
-        Motor::CRD514KD::RtuConfig::STOP_BITS));
-
-
-    Motor::StepperMotor* motors[3];
-    motors[0] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_0, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
-    motors[1] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_1, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
-    motors[2] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_2, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
-
-    Motor::MotorManager* motorManager = new Motor::MotorManager(modbus, motors, 3);
-
-	// Create a deltarobot	
-    deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO);
-
     // Generate the effector boundaries with voxel size 2
     deltaRobot->generateBoundaries(2);
 
