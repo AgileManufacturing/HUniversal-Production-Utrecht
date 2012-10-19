@@ -37,26 +37,9 @@
 
 class EquipletNode {
 public:
-	EquipletNode(const std::string& nm, int id = 1): name(nm), equipletId(id) {
-		moduleTable = new std::vector<Mast::HardwareModuleProperties>();
-		bbUtils = new BlackboardClient::BlackboardClientUtils();
-		
-		// Initialize the PostIt box
-		postItBox = new PostItBox();
-		postItBox->set_iswrite(false);
-    	postItBox->set_readowner("DummyAgent");
-    	postItBox->set_zone("BB1");
+	EquipletNode(int id = 1);
 
-    	// Create the map with moduleType mapped to package name and node name
-    	modulePackageNodeMap = map< int, std::pair<std::string, std::string> >();
-    	modulePackageNodeMap[1] = std::pair< std::string, std::string > ("deltaRobotNode", "DeltaRobotNode");
-	};
-
-	virtual ~EquipletNode() {
-		delete moduleTable;
-		delete bbUtils;
-		delete postItBox;
-	}
+	virtual ~EquipletNode();
 
 	bool addHardwareModule(Mast::HardwareModuleProperties module);
 	bool removeHardwareModule(int id);
@@ -66,11 +49,6 @@ public:
 	void printHardwareModules();
 	void readFromBlackboard();
 private:
-	/**
-	 * @var std::string name
-	 * The name of the Equiplet.
-	 **/
-	std::string name;
 	/**
 	 * @var int equipletId
 	 * The id of the equiplet
@@ -88,15 +66,15 @@ private:
 	 **/
 	rosMast::StateType safetyState;
 	/**
-	 * @var std::vector<Mast::HardwareModuleProperties> *moduleTable
+	 * @var std::vector<Mast::HardwareModuleProperties> moduleTable
 	 * The table that holds all information about the modules currently attached to this Equiplet  
 	 **/
-	std::vector<Mast::HardwareModuleProperties> *moduleTable;
+	std::vector<Mast::HardwareModuleProperties> moduleTable;
 	/**
 	 *
 	 *
 	 **/
-	BlackboardClient::BlackboardClientUtils *bbUtils;
+	BlackboardClient::BlackboardClientUtils bbUtils;
 	/**
 	 * @var PostItBox postItBox
 	 * The postIt box where the messages are stored that are read from the blackboard

@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
 	ros::init(argc, argv, equipletName);
 	ros::NodeHandle nodeHandle;
 
-	equipletNode = new EquipletNode(equipletName, equipletId);
+	equipletNode = new EquipletNode(equipletId);
 
 	/**
 	 * Add some hardware modules to this equiplet
