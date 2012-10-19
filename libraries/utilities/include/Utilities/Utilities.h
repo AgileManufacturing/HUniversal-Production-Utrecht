@@ -40,6 +40,7 @@ namespace Utilities
     void sleep(long ms);
     double deg(double rad);
     double rad(double deg);
+    int str2int(int &i, char const *s, int base = 0);
 
     /**
      * Utility class to time stuff

@@ -89,13 +89,9 @@ void EquipletNode::updateOperationState() {
  * @param moduleTable The table containing the hardware module
  * @param module The hardware to add to the table
  *
- * @return true if the module has a unique name, otherwise false
+ * @return true if the module has a unique id, otherwise false
  **/
 bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
-	/**
-	 * The use of the name to uniquely identify a hardware module is a temporary,
-	 * solution. This will probably be changed when the module database is implemented.
-	 **/
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
 	for(it = moduleTable->begin(); it < moduleTable->end(); it++) {
 		if(module.id == (*it).id) {
@@ -108,7 +104,7 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 	 **/ 
 	std::pair< std::string, std::string > packageNodeName = modulePackageNodeMap[module.type];
 	stringstream ss (stringstream::in | stringstream::out);
-	ss << "rosrun " << packageNodeName.first << " " << packageNodeName.second << " 1 1"
+	ss << "rosrun " << packageNodeName.first << " " << packageNodeName.second << " " << equipletId << " 1"
 	<< " __name:=" << packageNodeName.second << "" << module.id;
 
 	int pid = -1;
@@ -144,10 +140,6 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
  * @return true if the hardware module is removed, false if the module could not be found in the table
  **/
 bool EquipletNode::removeHardwareModule(int id) {
-	/**
-	 * The use of the name to uniquely identify a hardware module is a temporary,
-	 * solution. This will probably be changed when the module database is implemented.
-	 **/
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
 	for(it = moduleTable->begin(); it < moduleTable->end(); it++) {
 		if((*it).id == id) {

@@ -79,4 +79,35 @@ namespace Utilities
 	{
 		return (deg / 180) * M_PI;
 	}
+
+    /**
+     * Converts a string to integer
+     * @param i Reference to integer to be assigned
+     * @param s String that contains the value
+     * @param base A value between 2 and 36 inclusive, which determines the base of the value in the string. Special value is 0, which takes the value as base 10 unless a prefix of 0x (hexadecimal) or 0 (octal).
+     *
+     * @return error code
+     *  0 is normal
+     *  1 is overflow
+     *  2 is underflow
+     *  3 is inconvertible
+     **/
+    int str2int(int &i, char const *s, int base) {
+        char *end;
+        long  l;
+        errno = 0;
+        l = strtol(s, &end, base);
+        if ((errno == ERANGE && l == LONG_MAX) || l > INT_MAX) {
+            return 1;
+        }
+        if ((errno == ERANGE && l == LONG_MIN) || l < INT_MIN) {
+            return 2;
+        }
+        if (*s == '\0' || *end != '\0') {
+            return 3;
+        }
+        i = l;
+
+        return 0;
+    }
 }

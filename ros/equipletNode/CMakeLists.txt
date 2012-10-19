@@ -22,10 +22,10 @@ rosbuild_add_executable(EquipletNode ${sources})
 rosbuild_add_executable(EquipletNodeTest ${testsources})
 
 # Link target to our libraries
-target_link_libraries(EquipletNode blackboardClientCpp autoKeyStoreCppClient ${PROTOBUF_LIBRARIES})
+target_link_libraries(EquipletNode blackboardClientCpp autoKeyStoreCppClient ${PROTOBUF_LIBRARIES} utilities)
 
 # Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
-include_directories(${LIB_MAST_INCLUDE} ${LIB_BLACKBOARDCLIENT_INCLUDE} ${LIB_AUTOKEYSTORE_INCLUDE} ${PROTOBUF_INCLUDE_DIRS})
+include_directories(${LIB_MAST_INCLUDE} ${LIB_BLACKBOARDCLIENT_INCLUDE} ${LIB_AUTOKEYSTORE_INCLUDE} ${PROTOBUF_INCLUDE_DIRS} ${LIB_UTILITIES_INCLUDE})
 
 # MUST be called after rexos_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()

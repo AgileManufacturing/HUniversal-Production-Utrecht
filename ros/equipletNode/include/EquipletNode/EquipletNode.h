@@ -37,7 +37,7 @@
 
 class EquipletNode {
 public:
-	EquipletNode(const std::string& nm): name(nm) {
+	EquipletNode(const std::string& nm, int id = 1): name(nm), equipletId(id) {
 		moduleTable = new std::vector<Mast::HardwareModuleProperties>();
 		bbUtils = new BlackboardClient::BlackboardClientUtils();
 		
@@ -71,6 +71,12 @@ private:
 	 * The name of the Equiplet.
 	 **/
 	std::string name;
+	/**
+	 * @var int equipletId
+	 * The id of the equiplet
+	 **/
+	int equipletId;
+
 	/**
 	 * @var Mast::state operationState
 	 * The minimal operation state is equal to the lowest state of all modules that are actors
