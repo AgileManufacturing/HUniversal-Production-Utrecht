@@ -31,9 +31,10 @@
 #include <string>
 #include <vector>
 #include <Mast/HardwareModuleProperties.h>
-#include "rosMast/StateMachine.h"
+#include "rosMast/States.h"
 #include <BlackboardClient/BlackboardClientUtils.h>
 #include <BlackboardClient/PostIt.pb.h>
+
 
 class EquipletNode {
 public:

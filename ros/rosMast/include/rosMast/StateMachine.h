@@ -31,14 +31,12 @@
 
 #include "ros/ros.h"
 #include "rosMast/StateChanged.h"
+#include "rosMast/States.h"
 #include <boost/unordered_map.hpp>
 
 #define TRANSITIONMAP_SIZE 4
 
 namespace rosMast {
-
-	typedef enum {safe = 0, setup = 1, shutdown = 2, standby = 3, start = 4, stop = 5, normal = 6, nostate = 7 } StateType;
-
 	struct StateTransition 
 	{
 		StateTransition() { }
