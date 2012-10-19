@@ -62,12 +62,18 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
 	mymoduleid = moduleID;
 	currentState = safe;
 
-	// Initialize the state map array
-	transitionMap[0] = &StateMachine::transitionSetup;
-	transitionMap[1] = &StateMachine::transitionShutdown; 
-	transitionMap[2] = &StateMachine::transitionStop;
-	transitionMap[3] = &StateMachine::transitionStart;
+	struct StateTransition transitionTable[] {
+		{safe, standby},
+		{standby, safe},
+		{standby, normal},
+		{normal, standby}
+	};
 
+	//Must be in sync with transitionTable in header!!!
+	transitionMap[transitionTable[0]] = &StateMachine::transitionSetup;
+	transitionMap[transitionTable[1]] = &StateMachine::transitionShutdown; 
+	transitionMap[transitionTable[2]] = &StateMachine::transitionStop;
+	transitionMap[transitionTable[3]] = &StateMachine::transitionStart;
 
 	//Initialize publisher and subcriber
 	ros::NodeHandle nh;
@@ -76,16 +82,8 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
 }
 
 rosMast::StateMachine::stateFunctionPtr rosMast::StateMachine::lookupTransition(StateType currentState, StateType desiredState) {
-	if(currentState > desiredState) {
-		std::cout << "you want to go to a lower state" << "\n";
-		return transitionMap[currentState - 2];
-	}
-	else if(currentState < desiredState) {
-		std::cout << "you want to go to a higher state" << "\n";
-		return transitionMap[currentState];
-	}
-	std::cout << "return NULL" << "\n";
-	return NULL;
+	StateTransition st(currentState, desiredState);
+	return transitionMap[st];
 }
 
 

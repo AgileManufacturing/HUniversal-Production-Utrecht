@@ -47,6 +47,14 @@ namespace rosMast {
 		}
 		StateType SourceState;
 		StateType DestinationState;
+
+		friend bool operator < (const StateTransition& id1, const StateTransition &other) 
+		{
+			if(id1.DestinationState < other.DestinationState && id1.SourceState < other.SourceState) {
+				return true;
+			} 
+			return false;
+		}
 	};
 
 	class StateMachine {
@@ -55,6 +63,8 @@ namespace rosMast {
 		
 		public:
 			StateMachine(int equipletID, int moduleID);
+			//Key type = transition state like Setup, t
+			std::map<StateTransition, stateFunctionPtr> transitionMap;
 		
 			virtual int transitionSetup() = 0;
 			virtual int transitionShutdown() = 0;
@@ -74,9 +84,7 @@ namespace rosMast {
 		
 		protected:
 			bool locked;
-			
-			stateFunctionPtr transitionMap[TRANSITIONMAP_SIZE];
-
+		
 			ros::Publisher pub;
 			ros::Subscriber sub;
 
