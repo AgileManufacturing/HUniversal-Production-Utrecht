@@ -16,10 +16,8 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 rexos_rospack_init("equipletNode" false false)
 
 # Add executables as documented by ROS
-file(GLOB sources src/EquipletNode.cpp src/Main.cpp)
-file(GLOB testsources src/EquipletNodeTest.cpp)
+file(GLOB sources src/*.cpp)
 rosbuild_add_executable(EquipletNode ${sources})
-rosbuild_add_executable(EquipletNodeTest ${testsources})
 
 # Link target to our libraries
 target_link_libraries(EquipletNode blackboardClientCpp autoKeyStoreCppClient ${PROTOBUF_LIBRARIES} utilities)
