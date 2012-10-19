@@ -32,6 +32,27 @@
 
 #define NODE_NAME "DeltaRobotNode"
 
+deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) : rosMast::StateMachine(equipletID, moduleID)
+{	
+	ros::NodeHandle nodeHandle;
+
+	// Advertise the services
+	ros::ServiceServer moveToPointService =
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint, this);
+
+	ros::ServiceServer movePathService =
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::movePath, this);
+
+	ros::ServiceServer moveToRelativePointService =
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint, this);
+
+	ros::ServiceServer moveRelativePathService =
+		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_RELATIVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath, this);
+
+	ros::ServiceServer calibrateService =
+		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate, this); 
+	StateMachine::StateEngine();
+}
 
 /**
  * Starts the (re)calibration of the robot
@@ -240,6 +261,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::M
 **/
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 	setState(rosMast::setup);
+
 	ROS_INFO("Setup transition called");	
 	// Initialize modbus for IO controller
     modbus_t* modbusIO = modbus_new_tcp("192.168.0.2", 502);
@@ -278,16 +300,12 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 
 	// Create a deltarobot	
     deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO);
-    gb = new Garbage();
 
     // Generate the effector boundaries with voxel size 2
     deltaRobot->generateBoundaries(2);
 
 	// Power on the deltarobot and calibrate the motors.
     deltaRobot->powerOn();
-    gb->testPrint();
-
-    ROS_INFO("Motor Power on!");
 
     // Calibrate the motors
     if(!deltaRobot->calibrateMotors()){
@@ -307,11 +325,13 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
 	setState(rosMast::start);
 	ROS_INFO("Start transition called");
+    
     // Calibrate the motors
     if(!deltaRobot->calibrateMotors()){
     	ROS_ERROR("Calibration FAILED. EXITING.");
     	return 1;
     } 	
+	
 	return 0;
 }
 
@@ -328,27 +348,8 @@ int main(int argc, char **argv) {
 	int moduleID = atoi(argv[2]);
 
 	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID);    
-    
-	ros::NodeHandle nodeHandle;
-
-	// Advertise the services
-	ros::ServiceServer moveToPointService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint, &drn);
-
-	ros::ServiceServer movePathService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::movePath, &drn);
-
-	ros::ServiceServer moveToRelativePointService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint, &drn);
-
-	ros::ServiceServer moveRelativePathService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_RELATIVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath, &drn);
-
-	ros::ServiceServer calibrateService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate, &drn); 
 
 	ROS_INFO("DeltaRobotNode ready..."); 	
-	ros::spin();
 	return 0;
 }
 

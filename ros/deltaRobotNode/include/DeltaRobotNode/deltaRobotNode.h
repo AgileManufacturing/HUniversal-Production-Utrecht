@@ -15,24 +15,21 @@
 #include <Motor/StepperMotor.h>
 #include <DeltaRobotNode/Services.h>
 #include <rosMast/StateMachine.h>
-#include <rosMast/Garbage.h>
 
 namespace deltaRobotNodeNamespace
 {
 	class DeltaRobotNode : rosMast::StateMachine 
 	{
 		public:
-			DeltaRobotNode(int equipletID, int moduleID) 
-				: rosMast::StateMachine(equipletID, moduleID) {
-				
-			}
+			
+			DeltaRobotNode(int equipletID, int moduleID);
+			
 			int transitionSetup();
 			int transitionShutdown();
 			int transitionStart();
 			int transitionStop();
 			
 			DeltaRobot::DeltaRobot * deltaRobot;
-			Garbage * gb;
 			
 			bool calibrate(deltaRobotNode::Calibrate::Request &req, 
 				deltaRobotNode::Calibrate::Response &res);
@@ -44,6 +41,8 @@ namespace deltaRobotNodeNamespace
 				deltaRobotNode::MoveToRelativePoint::Response &res);
 			bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
 				deltaRobotNode::MoveRelativePath::Response &res);	
+
+
 	};
 }
 
