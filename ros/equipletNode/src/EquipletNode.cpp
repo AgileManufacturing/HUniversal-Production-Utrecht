@@ -35,6 +35,30 @@
 #include <algorithm>
 
 /**
+ * Create a new EquipletNode
+ * @var nm The name of the Equiplet
+ * @var id The id of the Equiplet
+ **/
+EquipletNode::EquipletNode(int id): equipletId(id), moduleTable(), bbUtils() {
+	// Initialize the PostIt box
+	postItBox = new PostItBox();
+	postItBox->set_iswrite(false);
+	postItBox->set_readowner("DummyAgent");
+	postItBox->set_zone("BB1");
+
+	// Create the map with moduleType mapped to package name and node name
+	modulePackageNodeMap = map< int, std::pair<std::string, std::string> >();
+	modulePackageNodeMap[1] = std::pair< std::string, std::string > ("deltaRobotNode", "DeltaRobotNode");
+}; 
+
+/**
+ * Cleanup the pointers for the EquipletNode
+ **/
+EquipletNode::~EquipletNode() {
+	delete postItBox;
+}
+
+/**
  * Update the safetyState of the Equiplet
  * 
  * @param moduleTable The module containing all hardware modules
@@ -42,7 +66,7 @@
 void EquipletNode::updateSafetyState() {
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
 	rosMast::StateType newSafetyState = rosMast::safe;
-	for(it = moduleTable->begin(); it < moduleTable->end(); it++) {
+	for(it = moduleTable.begin(); it < moduleTable.end(); it++) {
 		if((*it).actuator && (*it).currentState > newSafetyState) {
 			newSafetyState = (*it).currentState;
 		}
@@ -61,7 +85,7 @@ void EquipletNode::updateOperationState() {
 	// first set the operation state to the highest state possible 
 	rosMast::StateType newOperationState = rosMast::normal;
 
-	for(it = moduleTable->begin(); it < moduleTable->end(); it++) {
+	for(it = moduleTable.begin(); it < moduleTable.end(); it++) {
 		/**
 		 * Set the new operation state if the hardware module is an actor, required for
 		 * the current service and if its state is lower than the new operation state as
@@ -89,15 +113,11 @@ void EquipletNode::updateOperationState() {
  * @param moduleTable The table containing the hardware module
  * @param module The hardware to add to the table
  *
- * @return true if the module has a unique name, otherwise false
+ * @return true if the module has a unique id, otherwise false
  **/
 bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
-	/**
-	 * The use of the name to uniquely identify a hardware module is a temporary,
-	 * solution. This will probably be changed when the module database is implemented.
-	 **/
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
-	for(it = moduleTable->begin(); it < moduleTable->end(); it++) {
+	for(it = moduleTable.begin(); it < moduleTable.end(); it++) {
 		if(module.id == (*it).id) {
 			return false;
 		}
@@ -108,7 +128,7 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 	 **/ 
 	std::pair< std::string, std::string > packageNodeName = modulePackageNodeMap[module.type];
 	stringstream ss (stringstream::in | stringstream::out);
-	ss << "rosrun " << packageNodeName.first << " " << packageNodeName.second << " 1 1"
+	ss << "rosrun " << packageNodeName.first << " " << packageNodeName.second << " " << equipletId << " 1"
 	<< " __name:=" << packageNodeName.second << "" << module.id;
 
 	int pid = -1;
@@ -128,7 +148,7 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 	/**
 	 * Add the module to the table and update the safety state and operation state	
 	 **/
-	moduleTable->push_back(module);
+	moduleTable.push_back(module);
 	updateSafetyState();
 	updateOperationState(); 
 	
@@ -144,14 +164,10 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
  * @return true if the hardware module is removed, false if the module could not be found in the table
  **/
 bool EquipletNode::removeHardwareModule(int id) {
-	/**
-	 * The use of the name to uniquely identify a hardware module is a temporary,
-	 * solution. This will probably be changed when the module database is implemented.
-	 **/
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
-	for(it = moduleTable->begin(); it < moduleTable->end(); it++) {
+	for(it = moduleTable.begin(); it < moduleTable.end(); it++) {
 		if((*it).id == id) {
-			moduleTable->erase(it);
+			moduleTable.erase(it);
 			updateSafetyState();
 			updateOperationState();
 			return true;
@@ -167,7 +183,7 @@ bool EquipletNode::removeHardwareModule(int id) {
  **/
 void EquipletNode::printHardwareModules() {
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
-	for(it = moduleTable->begin(); it < moduleTable->end(); it++) {
+	for(it = moduleTable.begin(); it < moduleTable.end(); it++) {
 		std::cout << *it << std::endl;
 	}
 }
@@ -179,7 +195,7 @@ void EquipletNode::readFromBlackboard() {
     PostItBox_Filter * f = postItBox->mutable_filter();
     PostItBox * received = new PostItBox();
     f->set_filtername("PostItFilter");
-	bbUtils->readFromBlackboard(postItBox);
+	bbUtils.readFromBlackboard(postItBox);
 	std::cout << "Number of postIts: " << received->postits_size() << std::endl;
 }
 
@@ -194,7 +210,7 @@ void EquipletNode::readFromBlackboard() {
  **/
 bool EquipletNode::updateModuleState(int moduleID, rosMast::StateType state) {
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
-	for(it = moduleTable->begin(); it < moduleTable->end(); it++) {
+	for(it = moduleTable.begin(); it < moduleTable.end(); it++) {
 		if((*it).id == moduleID) {
 			(*it).currentState = state;
 			updateSafetyState();

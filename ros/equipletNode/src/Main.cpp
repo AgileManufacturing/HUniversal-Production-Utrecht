@@ -32,16 +32,12 @@
 #include "ros/ros.h"
 #include "rosMast/StateChanged.h"
 #include "rosMast/StateMachine.h"
-
-#define TOP_CAMERA "TopCamera"
-#define BOTTOM_CAMERA "BottomCamera"
-#define DELTAROBOT "DeltaRobot1"
-#define GRIPPER2 "Gripper2"
+#include <Utilities/Utilities.h>
 
 /**
  * @var equipletNode
  * The pointer for the EquipletNode class. Needed because the stateChanged method needs
- * to call some functions from the EquipletNode object
+ * to call some functions from the EquipletNode object.
  **/
 EquipletNode *equipletNode;
 
@@ -50,30 +46,45 @@ EquipletNode *equipletNode;
  * It updates the state of a hardware module.
  **/
 void stateChanged(const rosMast::StateChangedPtr &msg) {
-	std::cout << "stateChanged called" << std::endl;
-	equipletNode->updateModuleState(msg->moduleID, rosMast::StateType(msg->state));
-	equipletNode->printHardwareModules();
+	if(equipletNode->updateModuleState(msg->moduleID, rosMast::StateType(msg->state))) {
+		std::cout << "The state of module " << msg->moduleID << " has been changed to " << msg->state << std::endl; 
+	} else{
+		std::cerr << "Cannot update the state of the module " << msg->moduleID << " run for your life!" << std::endl;
+	}	
 }
 
 int main(int argc, char **argv) {
 
-	ros::init(argc, argv, "Equiplet1");
-	
-	// Create a ros node handle
-	ros::NodeHandle nodeHandle;
+	/**
+	 * Check if a equiplet id is given at the commandline
+	 **/
+	int equipletId = 1;
+	if(argc != 2 || Utilities::str2int(equipletId, argv[1]) != 0) {
+		std::cerr << "Cannot read equiplet id from commandline. Assuming equiplet id is 1" <<std::endl;
+	} 
 
 	/**
-	 * Create an EquipletNode
+	 * Set the name of the Equiplet
 	 **/
-	equipletNode = new EquipletNode("Equiplet1");
+	ostringstream ss;
+	ss << "Equiplet" << equipletId;
+	const char* equipletName = ss.str().c_str();
+	
+	ros::init(argc, argv, equipletName);
+	ros::NodeHandle nodeHandle;
+
+	equipletNode = new EquipletNode(equipletId);
 
 	/**
 	 * Add some hardware modules to this equiplet
 	 **/
-	Mast::HardwareModuleProperties deltaRobot(1, 1, rosMast::safe, true, true);
+	int moduleId = 1;
+	Mast::HardwareModuleProperties deltaRobot(moduleId, 1, rosMast::safe, true, true);
 	equipletNode->addHardwareModule(deltaRobot);
 
-
+	/**
+	 * print the hardware modules that are currently added to the Equiplet
+	 **/
 	equipletNode->printHardwareModules();
 	
 	/**
@@ -91,7 +102,7 @@ int main(int argc, char **argv) {
 	ros::Rate poll_rate(100);
 
 	/**
-	 * Wait until there are subscribers on the requestStateChange topic 
+	 * Wait until there are subscribers on the requestStateChange topic before publishing a message
 	 **/
 	while(publisher.getNumSubscribers() == 0) {
 		poll_rate.sleep();
@@ -99,11 +110,11 @@ int main(int argc, char **argv) {
 	}
 
 	/**
-	 * Send a message to the hardware module with id 1 to go to the standby state
+	 * Send a message to the hardware module with id moduleId to go to the standby state
 	 **/
 	rosMast::StateChanged msg;	
-	msg.equipletID = 1;
-	msg.moduleID = 1;
+	msg.equipletID = equipletId;
+	msg.moduleID = moduleId;
 	msg.state = rosMast::standby;
 
 	publisher.publish(msg);	
