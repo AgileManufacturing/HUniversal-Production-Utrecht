@@ -57,7 +57,7 @@ namespace rosMast {
 			return id1.SourceState < other.SourceState;
 		}
 	};
-
+	
 	class StateMachine {
 		//Function pointer to transitionFunction or StateFunction
 		typedef int (StateMachine::*stateFunctionPtr)();
@@ -93,6 +93,8 @@ namespace rosMast {
 			StateType currentState;
 			int myequipletid;
 			int mymoduleid;
+
+		
 	};
 
 }

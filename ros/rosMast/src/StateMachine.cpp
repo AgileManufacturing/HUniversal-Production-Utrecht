@@ -30,34 +30,31 @@
 
 void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 	//decode msg
-
 	ROS_INFO("State changed message received");
-//	std::cout << "function pointer in changeState: " << &transitionMap[st] << std::endl;
+	StateType oldState = currentState;
 	int equipletID = msg->equipletID;
 	int moduleID = msg->moduleID;
 	StateType state = StateType(msg->state);
-	//StateType test = state;
 	if( myequipletid == equipletID && mymoduleid == moduleID) {
 		//find transition function
+
 		stateFunctionPtr fptr = lookupTransition(currentState, state);
 		if(fptr != NULL) {
-			ROS_INFO("Executing POINTER");
 			if( ( (this->*fptr) () ) == 0 ) {
-
-				setState(state);
+				setState(state); //set new state and send message
 				ROS_INFO("Function pointer executed succesfully");
 			} 
 			else {
 				// Error so I want back to my current state from state
-				stateFunctionPtr fptr = lookupTransition(state, currentState);
-				if( ( (this->*fptr) () ) != 0 ) {
-					ROS_INFO("Error in trying to transition to lower state afer fail transition");
+				ROS_INFO("Error in transitioning to new state");
+				stateFunctionPtr fptr = lookupTransition(state, oldState);
+				if( ( (this->*fptr) () ) == 0 ) {
+					ROS_INFO("Transition back to previous state succesfull");
+					setState(rosMast::StateType(oldState));
 				}
 				else {
-					std::cout << "Error transition back to previous state succesfull";
-					setState(rosMast::StateType(currentState - 1));
+					ROS_INFO("Error in trying to transition to lower state afer fail transition");
 				}
-				ROS_INFO("ERROR");
 			}
 		} else {
 			ROS_INFO("Function pointer NULL");
@@ -70,23 +67,19 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
 	mymoduleid = moduleID;
 	currentState = safe;
 
-	struct StateTransition transitionTable[] {
+	//Gives warning
+	StateTransition transitionTable[] = { 
 		{safe, standby}, 	//0, 3
 		{standby, safe}, 	//3, 0
 		{standby, normal}, 	//3, 6
 		{normal, standby} 	//6, 3
-	};
+	};	
 
 	//Must be in sync with transitionTable!!!
 	transitionMap[transitionTable[0]] = &StateMachine::transitionSetup;
 	transitionMap[transitionTable[1]] = &StateMachine::transitionShutdown; 
 	transitionMap[transitionTable[2]] = &StateMachine::transitionStart;
 	transitionMap[transitionTable[3]] = &StateMachine::transitionStop;
-
-
-	for(int i = 0; i < 4; i++) {
-		std::cout << &transitionMap[transitionTable[i]] << std::endl;
-	}
 
 	//Initialize publisher and subcriber
 	ros::NodeHandle nh;
@@ -96,13 +89,12 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
 
 rosMast::StateMachine::stateFunctionPtr rosMast::StateMachine::lookupTransition(StateType curState, StateType desiredState) {
 	StateTransition st(curState, desiredState);
-	std::cout << &transitionMap[st] << std::endl;
-	std::cout << curState << "  " << desiredState << std::endl;
 	return transitionMap[st];
 }
 
 
 void rosMast::StateMachine::setState(StateType newState) {
+	std::cout << "setting state to: " << newState << std::endl;
 	currentState = newState;
 	rosMast::StateChanged msg;
 	msg.equipletID = myequipletid;
