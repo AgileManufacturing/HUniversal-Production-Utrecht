@@ -263,7 +263,8 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 	setState(rosMast::setup);
 
 	ROS_INFO("Setup transition called");	
-	// Initialize modbus for IO controller
+	
+	/*// Initialize modbus for IO controller
     modbus_t* modbusIO = modbus_new_tcp("192.168.0.2", 502);
     if(modbusIO == NULL)
     {
@@ -311,33 +312,39 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
     if(!deltaRobot->calibrateMotors()){
     	ROS_ERROR("Calibration FAILED. EXITING.");
     	return 1;
-    } 	
+    } 	*/
 	return 0;
 }
 
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
-	setState(rosMast::shutdown);
+	
 	ROS_INFO("Shutdown transition called");
-	deltaRobot->powerOff();
+	
+	setState(rosMast::shutdown);
+
+	//deltaRobot->powerOff();
 	return 0;
 }
 
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
 	setState(rosMast::start);
+	
 	ROS_INFO("Start transition called");
     
     // Calibrate the motors
-    if(!deltaRobot->calibrateMotors()){
+    /*if(!deltaRobot->calibrateMotors()){
     	ROS_ERROR("Calibration FAILED. EXITING.");
     	return 1;
-    } 	
+    } 	*/
 	
 	return 0;
 }
 
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
-	setState(rosMast::stop);
 	ROS_INFO("Stop transition called");
+	
+	setState(rosMast::stop);
+
 	return 0;
 }
 

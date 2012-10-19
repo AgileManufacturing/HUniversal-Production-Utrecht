@@ -31,6 +31,7 @@
 
 #include "ros/ros.h"
 #include "rosMast/StateChanged.h"
+#include <boost/unordered_map.hpp>
 
 #define TRANSITIONMAP_SIZE 4
 
@@ -50,10 +51,10 @@ namespace rosMast {
 
 		friend bool operator < (const StateTransition& id1, const StateTransition &other) 
 		{
-			if(id1.DestinationState < other.DestinationState && id1.SourceState < other.SourceState) {
-				return true;
-			} 
-			return false;
+			if(id1.SourceState == other.SourceState) {
+				return id1.DestinationState < other.DestinationState;
+			}				
+			return id1.SourceState < other.SourceState;
 		}
 	};
 
