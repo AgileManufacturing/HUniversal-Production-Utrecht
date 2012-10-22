@@ -35,6 +35,8 @@
 
 deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) : rosMast::StateMachine(equipletID, moduleID)
 {	
+	ROS_INFO("DeltaRobotnode Constructor entering..."); 
+	
 	ros::NodeHandle nodeHandle;
 
 	// Advertise the services
