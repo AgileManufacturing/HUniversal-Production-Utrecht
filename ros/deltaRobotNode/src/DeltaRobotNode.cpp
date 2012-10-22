@@ -7,6 +7,7 @@
 * @author Dennis Koole
 *
 * @section LICENSE
+* License: newBSD
 * Copyright © 2012, HU University of Applied Sciences Utrecht.
 * All rights reserved.
 *
@@ -31,6 +32,8 @@
 #include "DeltaRobotNode/deltaRobotNode.h"
 
 #define NODE_NAME "DeltaRobotNode"
+#define MODBUS_IP "192.168.0.2"
+#define MODBUS_PORT 502
 
 deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) : rosMast::StateMachine(equipletID, moduleID)
 {	
@@ -53,7 +56,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate, this); 
 
 	// Initialize modbus for IO controller
-    modbus_t* modbusIO = modbus_new_tcp("192.168.0.2", 502);
+    modbus_t* modbusIO = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
     if(modbusIO == NULL)
     {
         throw std::runtime_error("Unable to allocate libmodbus context");
@@ -71,14 +74,12 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
     drm.ankle = DeltaRobot::Measures::ANKLE;
     drm.maxAngleHipAnkle = DeltaRobot::Measures::HIP_ANKLE_ANGLE_MAX;
 
-
     ModbusController::ModbusController* modbus = new ModbusController::ModbusController(modbus_new_rtu(
         "/dev/ttyS0",
         Motor::CRD514KD::RtuConfig::BAUDRATE,
         Motor::CRD514KD::RtuConfig::PARITY,
         Motor::CRD514KD::RtuConfig::DATA_BITS,
         Motor::CRD514KD::RtuConfig::STOP_BITS));
-
 
     Motor::StepperMotor* motors[3];
     motors[0] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_0, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
@@ -90,6 +91,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 	// Create a deltarobot	
     deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO);
 
+    // Run the state engine of the StateMachine
 	StateMachine::StateEngine();
 }
 
@@ -303,7 +305,6 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::M
 			ROS_INFO("moveTo: (%f, %f, %f) speed=%f", relativeX, relativeY,relativeZ, currentMotion.speed);
 			deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ),currentMotion.speed);
 		}
-		//deltaRobot->waitForReady();
 	}
 	catch(std::runtime_error& ex)
 	{
@@ -319,21 +320,15 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::M
 }
 /**
  * Transition from Safe to Standby state
-
- @return 0 if everything went OK else error
+ * @return 0 if everything went OK else error
 **/
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
+	ROS_INFO("Setup transition called");
 	setState(rosMast::setup);
-
-	ROS_INFO("Setup transition called");	
-	
     // Generate the effector boundaries with voxel size 2
     deltaRobot->generateBoundaries(2);
-
 	// Power on the deltarobot and calibrate the motors.
     deltaRobot->powerOn();
-
-    // Calibrate the motors
     if(!deltaRobot->calibrateMotors()){
     	ROS_ERROR("Calibration FAILED. EXITING.");
     	return 1;
@@ -341,33 +336,38 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 	return 0; 
 }
 
-int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
-	
-	ROS_INFO("Shutdown transition called");
-	
+/**
+* Transition from Standby to Safe state
+ * Will turn power off the motor 
+ * @return will be 0 if everything went ok else error
+**/
+int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {	
+	ROS_INFO("Shutdown transition called");	
 	setState(rosMast::shutdown);
 	deltaRobot->powerOff();
 	return 0;
 }
 
+/**
+ * Transition from Standby to Normal state
+ * @return will be 0 if everything went ok else error 
+**/
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
-	setState(rosMast::start);
-	
-	ROS_INFO("Start transition called");
-    
-    // Calibrate the motors
-    if(!deltaRobot->calibrateMotors()){
-    	ROS_ERROR("Calibration FAILED. EXITING.");
-    	return 1;
-    }	
+	ROS_INFO("Start transition called");   
+
+	// Set currentState to start
+	setState(rosMast::start);	
 	return 0;
 }
-
+/**
+ * Transition from Normal to Standby state
+ * @return will be 0 if everything went ok else error
+**/
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
 	ROS_INFO("Stop transition called");
 	
+	// Set currentState to stop
 	setState(rosMast::stop);
-
 	return 0;
 }
 

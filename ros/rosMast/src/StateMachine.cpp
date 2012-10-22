@@ -6,6 +6,7 @@
 * @author Arjan Groenewegen
 *
 * @section LICENSE
+* License: newBSD 
 * Copyright © 2012, HU University of Applied Sciences Utrecht.
 * All rights reserved.
 *
@@ -28,77 +29,102 @@
 
 #include "rosMast/StateMachine.h"
 
+/**
+* Callback for the requestStateChange topic
+* Will lookup the transition function and execute it
+* @var Message that contains the data with the requested new sate
+**/
 void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
-	//decode msg
-	ROS_INFO("State changed message received");
+	if(locked) {
+		return;
+	}
+	// save the old state
 	StateType oldState = currentState;
+	
+	// decode msg and read variables
+	ROS_INFO("State changed message received");
 	int equipletID = msg->equipletID;
 	int moduleID = msg->moduleID;
-	StateType state = StateType(msg->state);
-	if( myequipletid == equipletID && mymoduleid == moduleID) {
-		//find transition function
-
-		stateFunctionPtr fptr = lookupTransition(currentState, state);
+	StateType desiredState = StateType(msg->state);
+	
+	// Check if the message is meant for this StateMachine
+	if( myEquipletId == equipletID && myModuleId == moduleID ) {
+		// Lookup transition function ptr
+		stateFunctionPtr fptr = lookupTransition(currentState, desiredState);
 		if(fptr != NULL) {
 			if( ( (this->*fptr) () ) == 0 ) {
-				setState(state); //set new state and send message
+				setState(desiredState);
 				ROS_INFO("Function pointer executed succesfully");
 			} 
 			else {
-				// Error so I want back to my current state from state
 				ROS_INFO("Error in transitioning to new state");
-				stateFunctionPtr fptr = lookupTransition(state, oldState);
+				stateFunctionPtr fptr = lookupTransition(desiredState, oldState);
 				if( ( (this->*fptr) () ) == 0 ) {
 					ROS_INFO("Transition back to previous state succesfull");
-					setState(rosMast::StateType(oldState));
+					setState(oldState);
 				}
 				else {
-					ROS_INFO("Error in trying to transition to lower state afer fail transition");
+					ROS_INFO("Error in transition to old state afer failure in transition");
 				}
 			}
 		} else {
-			ROS_INFO("Function pointer NULL");
+			ROS_INFO("Function pointer NULL, no function found in lookup table");
 		}
 	}	
 }
 
+/**
+* Create a stateMachine
+* @var the unique identifier for the equiplet
+* @var the unique identifier for the module that implements the statemachine
+**/
 rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
-	myequipletid = equipletID;
-	mymoduleid = moduleID;
+	myEquipletId = equipletID;
+	myModuleId = moduleID;
 	currentState = safe;
 
-	//Gives warning
+	// Gives warning
 	StateTransition transitionTable[] = { 
-		{safe, standby}, 	//0, 3
-		{standby, safe}, 	//3, 0
-		{standby, normal}, 	//3, 6
-		{normal, standby} 	//6, 3
+		{safe, standby}, 	
+		{standby, safe}, 	
+		{standby, normal}, 	
+		{normal, standby} 	
 	};	
 
-	//Must be in sync with transitionTable!!!
+	// Must be in sync with transitionTable!
 	transitionMap[transitionTable[0]] = &StateMachine::transitionSetup;
 	transitionMap[transitionTable[1]] = &StateMachine::transitionShutdown; 
 	transitionMap[transitionTable[2]] = &StateMachine::transitionStart;
 	transitionMap[transitionTable[3]] = &StateMachine::transitionStop;
 
-	//Initialize publisher and subcriber
+	// Initialize publisher and subcriber
 	ros::NodeHandle nh;
 	pub = nh.advertise<rosMast::StateChanged>("equiplet_statechanged", 5);
-	sub = nh.subscribe("requestStateChange", 1, &StateMachine::changeState, this);
+	sub = nh.subscribe("requestStateChange", 5, &StateMachine::changeState, this);
 }
 
+
+/**
+* Lookup function for the function pointer to the transition function	
+* @var the currentState of the equiplet
+* @var the desired state
+* @return The pointer to the transition function, will be NULL when there is no function in lookup table
+**/
 rosMast::StateMachine::stateFunctionPtr rosMast::StateMachine::lookupTransition(StateType curState, StateType desiredState) {
 	StateTransition st(curState, desiredState);
 	return transitionMap[st];
 }
 
-
+/**
+* Sets the private variable currentState and will send a message over the stateChanged topic
+* @var the new state of the machine
+**/
 void rosMast::StateMachine::setState(StateType newState) {
 	std::cout << "setting state to: " << newState << std::endl;
 	currentState = newState;
 	rosMast::StateChanged msg;
-	msg.equipletID = myequipletid;
-	msg.moduleID = mymoduleid;
+	msg.equipletID = myEquipletId;
+	msg.moduleID = myModuleId;
 	msg.state = currentState;
 	pub.publish(msg);
 }

@@ -6,6 +6,7 @@
 * @author Arjan Groenewegen
 *
 * @section LICENSE
+* License: newBSD
 * Copyright © 2012, HU University of Applied Sciences Utrecht.
 * All rights reserved.
 *
@@ -32,37 +33,40 @@
 #include "ros/ros.h"
 #include "rosMast/StateChanged.h"
 #include "rosMast/States.h"
-#include <boost/unordered_map.hpp>
-
-#define TRANSITIONMAP_SIZE 4
 
 namespace rosMast {
+	/**
+	* Struct for a StateTransition
+	* Used to build a array of transitions so they can be mapped to function pointers
+	**/
 	struct StateTransition 
 	{
 		StateTransition() { }
 		StateTransition(StateType src, StateType des) {
-			SourceState = src;
-			DestinationState = des;
+			sourceState = src;
+			destinationState = des;
 		}
-		StateType SourceState;
-		StateType DestinationState;
+		StateType sourceState;
+		StateType destinationState;
 
+		/**
+		* Required for building a map, as thats a sorted data structure
+		**/
 		friend bool operator < (const StateTransition& id1, const StateTransition &other) 
 		{
-			if(id1.SourceState == other.SourceState) {
-				return id1.DestinationState < other.DestinationState;
+			if(id1.sourceState == other.sourceState) {
+				return id1.destinationState < other.destinationState;
 			}				
-			return id1.SourceState < other.SourceState;
+			return id1.sourceState < other.sourceState;
 		}
 	};
 	
 	class StateMachine {
-		//Function pointer to transitionFunction or StateFunction
+		/** Function pointer definition **/
 		typedef int (StateMachine::*stateFunctionPtr)();
 		
 		public:
-			StateMachine(int equipletID, int moduleID);
-			//Key type = transition state like Setup, t
+			StateMachine(int equipletID, int moduleID);			
 			std::map<StateTransition, stateFunctionPtr> transitionMap;
 		
 			virtual int transitionSetup() = 0;
@@ -70,31 +74,24 @@ namespace rosMast {
 			virtual int transitionStart() = 0;
 			virtual int transitionStop() = 0;
 
-			void lock() 	{ locked = true; }
-			void unlock() 	{ locked = false;}
+			void lock()  	{ locked = true;  }
+			void unlock() 	{ locked = false; }
 
-			int getState() { return currentState; }
-
-			void StateEngine();
-			void changeState(const rosMast::StateChangedPtr &msg);
-			void setState(StateType newState);
+			void setState( StateType newState );
+			StateType getState() { return currentState; }			
+			void changeState(const rosMast::StateChangedPtr &msg);			
 			stateFunctionPtr lookupTransition(StateType currentState, StateType desiredState);
-			StateType lookupState(int state);
-		
+			void StateEngine();			
 		protected:
-			bool locked;
 			StateType currentState;
+			bool locked;		
 
 			ros::Publisher pub;
 			ros::Subscriber sub;
-
 		private:		
-			int myequipletid;
-			int mymoduleid;
-
-		
+			int myEquipletId;
+			int myModuleId;		
 	};
 
 }
-
 #endif 

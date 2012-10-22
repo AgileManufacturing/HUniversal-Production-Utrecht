@@ -6,6 +6,7 @@
 * @author Arjan Groenewegen & Dennis Koole
 *
 * @section LICENSE
+* License: newBSD
 * Copyright © 2012, HU University of Applied Sciences Utrecht.
 * All rights reserved.
 *
