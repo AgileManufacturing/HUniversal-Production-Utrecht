@@ -55,7 +55,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 	ros::ServiceServer calibrateService =
 		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate, this); 
 
-	ROS_INFO("Configuring Modbus..."); 	
+	/* ROS_INFO("Configuring Modbus..."); 	
 
 	// Initialize modbus for IO controller
     modbus_t* modbusIO = modbus_new_tcp("192.168.0.2", 502);
@@ -89,9 +89,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
     Motor::MotorManager* motorManager = new Motor::MotorManager(modbus, motors, 3);
 
 	// Create a deltarobot	
-    deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO); 
-
-    ROS_INFO("Starting state engine"); 
+    deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO);  */
 }
 
 /**
@@ -324,13 +322,13 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 	ROS_INFO("Setup transition called");
 	setState(rosMast::setup);
     // Generate the effector boundaries with voxel size 2
-    deltaRobot->generateBoundaries(2);
+   /* deltaRobot->generateBoundaries(2);
 	// Power on the deltarobot and calibrate the motors.
     deltaRobot->powerOn();
     if(!deltaRobot->calibrateMotors()){
     	ROS_ERROR("Calibration FAILED. EXITING.");
     	return 1;
-    } 
+    }  */
 	return 0; 
 }
 
@@ -342,7 +340,7 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {	
 	ROS_INFO("Shutdown transition called");	
 	setState(rosMast::shutdown);
-	deltaRobot->powerOff();
+	//deltaRobot->powerOff();
 	return 0;
 }
 
