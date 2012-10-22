@@ -326,14 +326,14 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::M
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 	ROS_INFO("Setup transition called");
 	setState(rosMast::setup);
-    // Generate the effector boundaries with voxel size 2
-    /* deltaRobot->generateBoundaries(2);
+    //Generate the effector boundaries with voxel size 2
+    deltaRobot->generateBoundaries(2);
 	// Power on the deltarobot and calibrate the motors.
     deltaRobot->powerOn();
     if(!deltaRobot->calibrateMotors()){
     	ROS_ERROR("Calibration FAILED. EXITING.");
     	return 1;
-    } */
+    }
 	return 0; 
 }
 
@@ -345,7 +345,7 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {	
 	ROS_INFO("Shutdown transition called");	
 	setState(rosMast::shutdown);
-	//deltaRobot->powerOff();
+	deltaRobot->powerOff();
 	return 0;
 }
 
@@ -354,8 +354,7 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
  * @return will be 0 if everything went ok else error 
  **/
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
-	ROS_INFO("Start transition called");   
-
+	ROS_INFO("Start transition called");  
 	// Set currentState to start
 	setState(rosMast::start);	
 	return 0;
@@ -365,8 +364,7 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
  * @return will be 0 if everything went ok else error
  **/
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
-	ROS_INFO("Stop transition called");
-	
+	ROS_INFO("Stop transition called");	
 	// Set currentState to stop
 	setState(rosMast::stop);
 	return 0;
