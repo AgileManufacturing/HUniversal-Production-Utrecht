@@ -32,6 +32,7 @@
 
 namespace rosMast {
 	typedef enum { safe = 0, setup = 1, shutdown = 2, standby = 3, start = 4, stop = 5, normal = 6, nostate = 7 } StateType;
+	const char* const state_txt[] = {"Safe", "Setup", "Shutdown", "Standby", "Start", "Stop", "Normal", "Nostate"};
 }
 
 #endif

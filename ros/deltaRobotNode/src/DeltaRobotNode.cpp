@@ -32,8 +32,6 @@
 #include "DeltaRobotNode/deltaRobotNode.h"
 
 #define NODE_NAME "DeltaRobotNode"
-#define MODBUS_IP "192.168.0.2"
-#define MODBUS_PORT 502
 
 deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) : rosMast::StateMachine(equipletID, moduleID)
 {	
@@ -55,8 +53,10 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 	ros::ServiceServer calibrateService =
 		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate, this); 
 
+	ROS_INFO("Configuring Modbus..."); 	
+
 	// Initialize modbus for IO controller
-    modbus_t* modbusIO = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
+    modbus_t* modbusIO = modbus_new_tcp("192.168.0.2", 502);
     if(modbusIO == NULL) {
         throw std::runtime_error("Unable to allocate libmodbus context");
     }
@@ -87,7 +87,9 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
     Motor::MotorManager* motorManager = new Motor::MotorManager(modbus, motors, 3);
 
 	// Create a deltarobot	
-    deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO);
+    deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO); 
+
+    ROS_INFO("Starting state engine"); 
 
     // Run the state engine of the StateMachine
 	StateMachine::StateEngine();
@@ -323,13 +325,13 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 	ROS_INFO("Setup transition called");
 	setState(rosMast::setup);
     // Generate the effector boundaries with voxel size 2
-    deltaRobot->generateBoundaries(2);
+    /* deltaRobot->generateBoundaries(2);
 	// Power on the deltarobot and calibrate the motors.
     deltaRobot->powerOn();
     if(!deltaRobot->calibrateMotors()){
     	ROS_ERROR("Calibration FAILED. EXITING.");
     	return 1;
-    } 
+    } */
 	return 0; 
 }
 
@@ -341,7 +343,7 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {	
 	ROS_INFO("Shutdown transition called");	
 	setState(rosMast::shutdown);
-	deltaRobot->powerOff();
+	//deltaRobot->powerOff();
 	return 0;
 }
 
@@ -373,6 +375,8 @@ int main(int argc, char **argv) {
 
 	int equipletID = atoi(argv[1]);
 	int moduleID = atoi(argv[2]);
+
+	ROS_INFO("Creating DeltaRobotNode"); 	
 
 	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID);    
 
