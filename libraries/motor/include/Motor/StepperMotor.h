@@ -38,12 +38,9 @@
 #include <Motor/CRD514KD.h>
 #include <Motor/MotorInterface.h>
 
-namespace Motor
-{
-    class StepperMotor : public MotorInterface
-    {
+namespace Motor {
+    class StepperMotor : public MotorInterface {
         public:
-
             StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle);
 
             virtual ~StepperMotor();
@@ -54,7 +51,6 @@ namespace Motor
 
             void resetCounter();
             void setMotorLimits(double minAngle, double maxAngle);
-
 
             void moveTo(const DataTypes::MotorRotation<double>& mr);
             void writeRotationData(const DataTypes::MotorRotation<double>& mr);

@@ -1,39 +1,39 @@
 /**
-* @file StateMachine.h
-* @brief Mast Implementation
-* @date Created: 2012-10-12
-*
-* @author Arjan Groenewegen
-*
-* @section LICENSE
-* License: newBSD 
-* Copyright © 2012, HU University of Applied Sciences Utrecht.
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-* - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-* - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-* - Neither the name of the HU University of Applied Sciences Utrecht nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-* "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-* THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT
-* BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
-* GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-* LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-* OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**/
+ * @file StateMachine.h
+ * @brief Mast Implementation
+ * @date Created: 2012-10-12
+ *
+ * @author Arjan Groenewegen
+ *
+ * @section LICENSE
+ * License: newBSD 
+ * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ * - Neither the name of the HU University of Applied Sciences Utrecht nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **/
 
 #include "rosMast/StateMachine.h"
 
 /**
-* Callback for the requestStateChange topic
-* Will lookup the transition function and execute it
-* @var Message that contains the data with the requested new sate
-**/
+ * Callback for the requestStateChange topic
+ * Will lookup the transition function and execute it
+ * @param Message that contains the data with the requested new state
+ **/
 void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 	if(locked) {
 		return;
@@ -48,7 +48,7 @@ void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 	StateType desiredState = StateType(msg->state);
 	
 	// Check if the message is meant for this StateMachine
-	if( myEquipletId == equipletID && myModuleId == moduleID ) {
+	if( this->equipletID == equipletID && this->moduleID == moduleID ) {
 		// Lookup transition function ptr
 		stateFunctionPtr fptr = lookupTransition(currentState, desiredState);
 		if(fptr != NULL) {
@@ -74,13 +74,13 @@ void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 }
 
 /**
-* Create a stateMachine
-* @var the unique identifier for the equiplet
-* @var the unique identifier for the module that implements the statemachine
-**/
+ * Create a stateMachine
+ * @param the unique identifier for the equiplet
+ * @param the unique identifier for the module that implements the statemachine
+ **/
 rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
-	myEquipletId = equipletID;
-	myModuleId = moduleID;
+	this->equipletID = equipletID;
+	this->moduleID = moduleID;
 	currentState = safe;
 
 	// Gives warning
@@ -105,26 +105,26 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
 
 
 /**
-* Lookup function for the function pointer to the transition function	
-* @var the currentState of the equiplet
-* @var the desired state
-* @return The pointer to the transition function, will be NULL when there is no function in lookup table
-**/
+ * Lookup function for the function pointer to the transition function	
+ * @param the currentState of the equiplet
+ * @param the desired state
+ * @return The pointer to the transition function, will be NULL when there is no function in lookup table
+ **/
 rosMast::StateMachine::stateFunctionPtr rosMast::StateMachine::lookupTransition(StateType curState, StateType desiredState) {
 	StateTransition st(curState, desiredState);
 	return transitionMap[st];
 }
 
 /**
-* Sets the private variable currentState and will send a message over the stateChanged topic
-* @var the new state of the machine
-**/
+ * Sets the private variable currentState and will send a message over the stateChanged topic
+ * @param the new state of the machine
+ **/
 void rosMast::StateMachine::setState(StateType newState) {
 	std::cout << "setting state to: " << newState << std::endl;
 	currentState = newState;
 	rosMast::StateChanged msg;
-	msg.equipletID = myEquipletId;
-	msg.moduleID = myModuleId;
+	msg.equipletID = this->equipletID;
+	msg.moduleID = this->moduleID;
 	msg.state = currentState;
 	pub.publish(msg);
 }

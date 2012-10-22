@@ -30,21 +30,21 @@
 #include <iostream>
 #include "rosMast/StateMachine.h"
 
-namespace Mast
-{
+namespace Mast {
 	class HardwareModuleProperties {
 	public:
 		HardwareModuleProperties();
 		/**
 		 * Create a new hardware module
 		 * 
-		 * @param nm The name of the module
-		 * @param st The current state of this module
-		 * @param ac Is this  module an actor
-		 * @param nd Is this module needed for the current service
+		 * @param id unique identifier of the module
+		 * @param type type of the module
+		 * @param state The current state of this module
+		 * @param actuator Is this module an actor
+		 * @param needed Is this module needed for the current service
 		 **/
-		HardwareModuleProperties(int identity, int tp, rosMast::StateType st, bool ac, bool nd):
-			id(identity), type(tp), currentState(st), actuator(ac), needed(nd), error(false){}
+		HardwareModuleProperties(int id, int type, rosMast::StateType state, bool actuator, bool needed):
+			id(id), type(type), currentState(state), actuator(actuator), needed(needed), error(false){}
 		/**
 		 * The use of a name for a module is a temporary solution. 
 		 * This will probably be changed when the module database is implemented.
@@ -52,10 +52,9 @@ namespace Mast
 		int id;
 		int type;
 		rosMast::StateType currentState;
-		bool actuator;
-		
+		bool actuator;		
 		/**
-		 * Is this hardware module needed for the current service
+		 * defines if the hardware module is needed for the current service
 		 **/
 		bool needed;
 		bool error;

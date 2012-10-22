@@ -26,7 +26,7 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**/
+ **/
 
 #include <EquipletNode/EquipletNode.h>
 #include <sstream>
@@ -36,8 +36,7 @@
 
 /**
  * Create a new EquipletNode
- * @var nm The name of the Equiplet
- * @var id The id of the Equiplet
+ * @var id The unique identifier of the Equiplet
  **/
 EquipletNode::EquipletNode(int id): equipletId(id), moduleTable(), bbUtils() {
 	// Initialize the PostIt box
@@ -60,8 +59,6 @@ EquipletNode::~EquipletNode() {
 
 /**
  * Update the safetyState of the Equiplet
- * 
- * @param moduleTable The module containing all hardware modules
  **/
 void EquipletNode::updateSafetyState() {
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
@@ -76,8 +73,6 @@ void EquipletNode::updateSafetyState() {
 
 /**
  * Update the operation state of the Equiplet
- * 
- * @param moduleTable The module containing all hardware modules
  **/
 void EquipletNode::updateOperationState() {
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
@@ -109,13 +104,15 @@ void EquipletNode::updateOperationState() {
 
 /**
  * Add a hardware module to the module table
- *
- * @param moduleTable The table containing the hardware module
+ * 
  * @param module The hardware to add to the table
  *
  * @return true if the module has a unique id, otherwise false
  **/
 bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
+	/**
+	 * First check if the module already exists
+	 **/
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
 	for(it = moduleTable.begin(); it < moduleTable.end(); it++) {
 		if(module.id == (*it).id) {
@@ -139,7 +136,7 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 			fclose(stdin);
 			execl("/bin/sh", "/bin/sh", "-c", ss.str().c_str(), NULL);
 		case -1: 
-			std::cerr << "Cannot start node for hardwaremodule " << module.id << std::endl;
+			std::cerr << "Cannot start node for hardware module " << module.id << std::endl;
 			return false;
 		default:
 			break; 
@@ -158,8 +155,7 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 /**
  * Remove a hardware module from the module table
  *
- * @param moduleTable The table containing the hardware modules
- * @param name The name that is used to uniquely identify the hardware module that needs to be removed
+ * @param id The identifier that is used to identify the hardware module that needs to be removed
  *
  * @return true if the hardware module is removed, false if the module could not be found in the table
  **/
@@ -178,8 +174,6 @@ bool EquipletNode::removeHardwareModule(int id) {
 
 /**
  * Print all hardware modules in the table
- *
- * @param moduleTable The module table containing the hardware modules
  **/
 void EquipletNode::printHardwareModules() {
 	std::vector<Mast::HardwareModuleProperties>::iterator it;

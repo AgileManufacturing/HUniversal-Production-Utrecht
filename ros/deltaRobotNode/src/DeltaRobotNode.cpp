@@ -57,12 +57,10 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 
 	// Initialize modbus for IO controller
     modbus_t* modbusIO = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
-    if(modbusIO == NULL)
-    {
+    if(modbusIO == NULL) {
         throw std::runtime_error("Unable to allocate libmodbus context");
     }
-    if(modbus_connect(modbusIO) == -1)
-    {
+    if(modbus_connect(modbusIO) == -1) {
         throw std::runtime_error("Modbus connection to IO controller failed");
     }
     assert(modbusIO != NULL);
@@ -100,17 +98,16 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
  * @param req The request for this service as defined in Calibrate.srv 
  * @param res The response for this service as defined in Calibrate.srv
  * 
- * @return true if the calibration was succesfully. false otherwise.
- */
+ * @return true if the calibration was successful else false
+ **/
 bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate(deltaRobotNode::Calibrate::Request &req,
 	deltaRobotNode::Calibrate::Response &res) {
 
 	if(currentState != rosMast::normal) {
 		return false;
 	}
-
     // Calibrate the motors
-    if(!deltaRobot->calibrateMotors()){
+    if(!deltaRobot->calibrateMotors()) {
     	ROS_ERROR("Calibration FAILED. EXITING.");
     	return false;
     }
@@ -123,7 +120,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate(deltaRobotNode::Calibrat
  * @param req The request for this service as defined in MoveToPoint.srv 
  * @param res The response for this service as defined in MoveToPoint.srv
  * 
- * @return true
+ * @return true when the moveToPoint was successful, else false
  **/
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(deltaRobotNode::MoveToPoint::Request &req,
 	deltaRobotNode::MoveToPoint::Response &res) {
@@ -158,7 +155,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(deltaRobotNode::MoveTo
  * @param req The request for this service as defined in MovePath.srv 
  * @param res The response for this service as defined in MovePath.srv
  * 
- * @return true
+ * @return true when movePath was successful else false
  **/
 bool deltaRobotNodeNamespace::DeltaRobotNode::movePath(deltaRobotNode::MovePath::Request &req,
 	deltaRobotNode::MovePath::Response &res) {
@@ -210,7 +207,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath(deltaRobotNode::MovePath:
  * @param req The request for this service as defined in MoveToRelativePoint.srv 
  * @param res The response for this service as defined in MoveToRelativePoint.srv
  * 
- * @return true
+ * @return true when the moveToRelativePoint was successful, else false
  **/
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
 	deltaRobotNode::MoveToRelativePoint::Response &res) {
@@ -321,7 +318,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::M
 /**
  * Transition from Safe to Standby state
  * @return 0 if everything went OK else error
-**/
+ **/
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 	ROS_INFO("Setup transition called");
 	setState(rosMast::setup);
@@ -337,10 +334,10 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 }
 
 /**
-* Transition from Standby to Safe state
+ * Transition from Standby to Safe state
  * Will turn power off the motor 
  * @return will be 0 if everything went ok else error
-**/
+ **/
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {	
 	ROS_INFO("Shutdown transition called");	
 	setState(rosMast::shutdown);
@@ -351,7 +348,7 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
 /**
  * Transition from Standby to Normal state
  * @return will be 0 if everything went ok else error 
-**/
+ **/
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
 	ROS_INFO("Start transition called");   
 
@@ -362,7 +359,7 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
 /**
  * Transition from Normal to Standby state
  * @return will be 0 if everything went ok else error
-**/
+ **/
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
 	ROS_INFO("Stop transition called");
 	

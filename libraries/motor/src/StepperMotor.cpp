@@ -39,14 +39,13 @@
 #include <Motor/CRD514KDException.h>
 #include <Motor/MotorException.h>
 
-namespace Motor
-{
+namespace Motor 
+    {
     StepperMotor::StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle):
         MotorInterface(), deviation(0), minAngle(minAngle), maxAngle(maxAngle), modbus(modbusController), motorIndex(motorIndex), anglesLimited(true), poweredOn(false)  {}
 
     StepperMotor::~StepperMotor(void)
     {
-
         try {
             powerOff();
         } catch(std::runtime_error& err) {}
