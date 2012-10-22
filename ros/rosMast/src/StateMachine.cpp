@@ -54,13 +54,13 @@ void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 		if(fptr != NULL) {
 			if( ( (this->*fptr) () ) == 0 ) {
 				setState(desiredState);
-				ROS_INFO("Function pointer executed succesfully");
+				ROS_INFO("Function pointer executed successfully");
 			} 
 			else {
 				ROS_INFO("Error in transitioning to new state");
 				stateFunctionPtr fptr = lookupTransition(desiredState, oldState);
 				if( ( (this->*fptr) () ) == 0 ) {
-					ROS_INFO("Transition back to previous state succesfull");
+					ROS_INFO("Transition back to previous state successful");
 					setState(oldState);
 				}
 				else {
@@ -99,6 +99,7 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
 
 	// Initialize publisher and subcriber
 	ros::NodeHandle nh;
+	locked = false;
 	pub = nh.advertise<rosMast::StateChanged>("equiplet_statechanged", 5);
 	sub = nh.subscribe("requestStateChange", 5, &StateMachine::changeState, this);
 }
