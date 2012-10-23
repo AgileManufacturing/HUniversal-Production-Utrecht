@@ -58,7 +58,7 @@ namespace Motor{
         void setMotorLimits(double minAngle, double maxAngle);
 
         void moveTo(const DataTypes::MotorRotation& motorRotation);
-        void writeRotationData(const DataTypes::MotorRotation& motorRotation);
+        void writeRotationData(const DataTypes::MotorRotation& motorRotation, bool useDeviation = true);
 
         void startMovement(void);
         void moveToWithin(const DataTypes::MotorRotation& motorRotation, double time, bool start);
