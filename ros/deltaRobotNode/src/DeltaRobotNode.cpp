@@ -265,7 +265,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::M
 	deltaRobotNode::MoveRelativePath::Response &res) {
 	ROS_INFO("moveRelativePath called");
 
-	if(currentState != rosMast::normal) {
+	if(getState() != rosMast::normal) {
 		return false;
 	}
 

@@ -85,12 +85,12 @@ namespace rosMast {
 			stateFunctionPtr lookupTransition(StateType currentState, StateType desiredState);
 			void StateEngine();			
 		protected:
-			StateType currentState;
 			bool locked;		
 
 			ros::Publisher pub;
 			ros::Subscriber sub;
-		private:		
+		private:	
+			StateType currentState;	
 			int equipletID;
 			int moduleID;		
 	};
