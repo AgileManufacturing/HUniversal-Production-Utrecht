@@ -158,7 +158,7 @@ namespace Motor{
 	 *
 	 * @param motorRotation The rotational data for the motor.
 	 **/
-	void StepperMotor::moveTo(const DataTypes::MotorRotation<double>& motorRotation){
+	void StepperMotor::moveTo(const DataTypes::MotorRotation& motorRotation){
 		writeRotationData(motorRotation);
 		startMovement();
 	}
@@ -168,7 +168,7 @@ namespace Motor{
 	 * 
 	 * @param motorRotation A MotorRotation.
 	 **/
-	void StepperMotor::writeRotationData(const DataTypes::MotorRotation<double>& motorRotation){
+	void StepperMotor::writeRotationData(const DataTypes::MotorRotation& motorRotation){
 		if(!poweredOn){
 			throw MotorException("motor drivers are not powered on");
 		}
@@ -215,8 +215,8 @@ namespace Motor{
 	 * @param time Time in seconds that the motors will take to rotate to the given angle. Speed member of given motion is ignored.
 	 * @param start If the movement should start immediately.
 	 **/
-	void StepperMotor::moveToWithin(const DataTypes::MotorRotation<double>& motorRotation, double time, bool start){
-		DataTypes::MotorRotation<double> newMotorRotation = motorRotation;
+	void StepperMotor::moveToWithin(const DataTypes::MotorRotation& motorRotation, double time, bool start){
+		DataTypes::MotorRotation newMotorRotation = motorRotation;
 		newMotorRotation.speed = fabs(currentAngle - motorRotation.angle) / time;
 		if(start){
 			moveTo(newMotorRotation);

@@ -32,54 +32,48 @@
 #pragma once
 
 namespace DataTypes{
-    template<typename T>
     
     /**
-     * Template class for rotation data for the motor.
+     * Data entity for rotation data for the motor.
      **/
     class MotorRotation{
     public:
         /**
-         * @var T angle
+         * @var double angle
          * The angle in radians the motor has to travel towards
          **/
-        T angle;
+        double angle;
 
         /**
-         * @var T speed
-         * The speed in degrees per second
+         * @var double speed
+         * The speed in radians per second.
          **/
-        T speed;
+        double speed;
 
         /**
-         * @var T acceleration
-         * The acceleration in steps per second
+         * @var double acceleration
+         * The acceleration in radians per second per second.\n 
+         * Minimum: 1 microstep per second == 0.001246637061 rad\n
+         * Maximum: 1000000 microsteps per second = 1256.637061 rad
          **/
-        T acceleration;
+        double acceleration;
 
         /**
-         * @var T deceleration
-         * The deceleration in steps per second
+         * @var double deceleration
+         * The deceleration in radians per second per second.\n 
+         * Minimum: 1 microstep per second == 0.001246637061 rad\n
+         * Maximum: 1000000 microsteps per second = 1256.637061 rad
          **/
-        T deceleration;
-        
-        /**
-         * Instantiation of rotation data for the motor, sets speed, acceleration and deceleration to default values
-         **/
-        MotorRotation(){
-            speed = 10;
-            acceleration = 360;
-            deceleration = 360;
-        }
+        double deceleration;
         
         /**
          * Instantiation of rotation data for the motor.
          *
          * @param angle The angle in radians the motor has to travel towards
-         * @param speed The speed in degrees per second
-         * @param acceleration The acceleration in steps per second
-         * @param deceleration The deceleration in steps per second
+         * @param speed The speed in radians per second
+         * @param acceleration The acceleration in radians per second per second
+         * @param deceleration The deceleration in radians per second per second
          **/
-        MotorRotation(T angle, T speed, T acceleration, T deceleration) : angle(angle), speed(speed), acceleration(acceleration), deceleration(deceleration){}
+        MotorRotation(double angle = 0, double speed = 0.1, double acceleration = 0.1, double deceleration = 0.1) : angle(angle), speed(speed), acceleration(acceleration), deceleration(deceleration){}
     };
 }

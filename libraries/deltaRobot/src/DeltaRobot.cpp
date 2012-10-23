@@ -128,10 +128,10 @@ namespace DeltaRobot{
             throw Motor::MotorException("motor drivers are not powered on");
         }
 
-        DataTypes::MotorRotation<double>* rotations[3];
-        rotations[0] = new DataTypes::MotorRotation<double>();
-        rotations[1] = new DataTypes::MotorRotation<double>();
-        rotations[2] = new DataTypes::MotorRotation<double>();
+        DataTypes::MotorRotation* rotations[3];
+        rotations[0] = new DataTypes::MotorRotation();
+        rotations[1] = new DataTypes::MotorRotation();
+        rotations[2] = new DataTypes::MotorRotation();
 
         rotations[0]->speed = speed;
         rotations[1]->speed = speed;
@@ -208,7 +208,7 @@ namespace DeltaRobot{
         std::cout << "[DEBUG] Calibrating motor number " << motorIndex << std::endl;
         
         // Starting point of calibration
-        DataTypes::MotorRotation<double> motorRotation;
+        DataTypes::MotorRotation motorRotation;
         motorRotation.speed = 1;
         motorRotation.acceleration = 360;
         motorRotation.deceleration = 360;
@@ -264,7 +264,7 @@ namespace DeltaRobot{
         }
 
         // Return to base! Remove the deviation, we have to find the controller 0 point.
-        DataTypes::MotorRotation<double> motorRotation;
+        DataTypes::MotorRotation motorRotation;
         motorRotation.speed = 0.1;
         motorRotation.angle = 0;
 

@@ -65,6 +65,6 @@ namespace DeltaRobot{
 		virtual ~InverseKinematics(void);
 		
 		void destinationPointToMotorRotations(const DataTypes::Point3D<double>& destinationPoint,
-				DataTypes::MotorRotation<double>* (&rotations)[3]) const;
+				DataTypes::MotorRotation* (&rotations)[3]) const;
 	};
 }
