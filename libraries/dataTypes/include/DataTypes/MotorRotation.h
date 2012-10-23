@@ -53,16 +53,16 @@ namespace DataTypes{
         /**
          * @var double acceleration
          * The acceleration in radians per second per second.\n 
-         * Minimum: 1 microstep per second == 0.001246637061 rad\n
-         * Maximum: 1000000 microsteps per second = 1256.637061 rad
+         * Minimum: 1.256637061 rad\n
+         * Maximum: 1256637.061 rad
          **/
         double acceleration;
 
         /**
          * @var double deceleration
          * The deceleration in radians per second per second.\n 
-         * Minimum: 1 microstep per second == 0.001246637061 rad\n
-         * Maximum: 1000000 microsteps per second = 1256.637061 rad
+         * Minimum: 1.256637061 rad\n
+         * Maximum: 1256637.061 rad
          **/
         double deceleration;
         
@@ -74,6 +74,6 @@ namespace DataTypes{
          * @param acceleration The acceleration in radians per second per second
          * @param deceleration The deceleration in radians per second per second
          **/
-        MotorRotation(double angle = 0, double speed = 0.1, double acceleration = 0.1, double deceleration = 0.1) : angle(angle), speed(speed), acceleration(acceleration), deceleration(deceleration){}
+        MotorRotation(double angle = 0, double speed = 1, double acceleration = 10, double deceleration = 10) : angle(angle), speed(speed), acceleration(acceleration), deceleration(deceleration){}
     };
 }

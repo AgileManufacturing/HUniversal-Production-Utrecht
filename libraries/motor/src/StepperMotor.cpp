@@ -185,14 +185,16 @@ namespace Motor{
 
 		uint32_t motorSpeed = (uint32_t)(motorRotation.speed / CRD514KD::MOTOR_STEP_ANGLE);
 		
-		// Formula to turn rad/s² into ms/kHz
-		// First 1000 is for amount of milliseconds in a second
-		// Second 1000 is for amount of steps/s in a kHz
-		uint32_t motorAcceleration = (uint32_t)((1000/(motorRotation.acceleration/(CRD514KD::MOTOR_STEP_ANGLE * 1000))));
-		uint32_t motorDeceleration = (uint32_t)((1000/(motorRotation.deceleration/(CRD514KD::MOTOR_STEP_ANGLE * 1000))));
+		// Formula to turn rad/s² into µs/kHz
+		// 1000000 is for amount of microseconds in a second
+		// 1000 is for amount of steps/s in a kHz
+		uint32_t motorAcceleration = (uint32_t)((1000000/(motorRotation.acceleration/(CRD514KD::MOTOR_STEP_ANGLE * 1000))));
+		uint32_t motorDeceleration = (uint32_t)((1000000/(motorRotation.deceleration/(CRD514KD::MOTOR_STEP_ANGLE * 1000))));
 
 		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_SPEED, motorSpeed, true);
 		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_POS, motorSteps, true);
+
+		std::cout << "Writing acceleration " << motorRotation.acceleration << " -> " << motorAcceleration << std::endl;
 		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_ACC, motorAcceleration, true);
 		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_DEC, motorDeceleration, true);
 		setAngle = motorRotation.angle;

@@ -209,9 +209,6 @@ namespace DeltaRobot{
         
         // Starting point of calibration
         DataTypes::MotorRotation motorRotation;
-        motorRotation.speed = 1;
-        motorRotation.acceleration = 360;
-        motorRotation.deceleration = 360;
         motorRotation.angle = 0;
 
         // Move motor upwards till the calibration sensor is pushed
