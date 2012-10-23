@@ -107,6 +107,6 @@ namespace DeltaRobot{
 		 * @param rotations Array of MotorRotation objects, will be adjusted by the function to the correct rotations per motor.
 		 **/
 		virtual void destinationPointToMotorRotations(const DataTypes::Point3D<double>& destinationPoint,
-				DataTypes::MotorRotation<double>* (&rotations)[3]) const = 0;
+				DataTypes::MotorRotation* (&rotations)[3]) const = 0;
 	};
 }
