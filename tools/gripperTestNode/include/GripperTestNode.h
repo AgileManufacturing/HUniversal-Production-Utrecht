@@ -20,5 +20,4 @@ class GripperTestNode: public rosMast::StateMachine
 		Gripper * gripper;
 		ros::ServiceServer gripService;
 		ros::ServiceServer releaseService;
-
 };
