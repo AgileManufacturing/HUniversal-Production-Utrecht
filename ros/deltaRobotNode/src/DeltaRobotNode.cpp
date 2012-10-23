@@ -92,6 +92,8 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 
 	// Create a deltarobot	
     deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO);  
+	
+	ROS_INFO("Running StateEngine"); 	
 
     StateMachine::StateEngine();
 }

@@ -50,7 +50,7 @@ EquipletNode *equipletNode;
  **/
 void stateChanged(const rosMast::StateChangedPtr &msg) {
 	if(equipletNode->updateModuleState(msg->moduleID, rosMast::StateType(msg->state))) {
-		std::cout << "The state of module " << msg->moduleID << " has been changed to " << msg->state << std::endl; 
+		std::cout << "The state of module " << msg->moduleID << " has been changed to " << rosMast::state_txt[msg->state] << std::endl; 
 	} else{
 		std::cerr << "Cannot update the state of the module " << msg->moduleID << " run for your life!" << std::endl;
 	}	
