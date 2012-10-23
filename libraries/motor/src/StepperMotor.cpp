@@ -199,7 +199,7 @@ namespace Motor{
 	}
 
 	/**
-	 * Start the motor to move according to the set registers.
+	 * Start the motor to move according to the set registers. Will wait for the motor to be ready before moving.
 	 **/
 	void StepperMotor::startMovement(void){
 		if(!poweredOn){
