@@ -3,7 +3,7 @@
 #include <GripperTestNode.h>
 
 
-#define NODE_NAME "GripperripperTestNode"
+#define NODE_NAME "GripperTestNode"
 
 GripperTestNode::GripperTestNode(int equipletID, int moduleID): rosMast::StateMachine(equipletID, moduleID)
 {
@@ -21,6 +21,7 @@ GripperTestNode::~GripperTestNode()
 
 void GripperTestNode::error(){
 	std::cout << "Gripper handler warning!" << std::endl;
+	// ask equiplet to change to standbye
 }
 
 /**
@@ -41,7 +42,7 @@ int GripperTestNode::transitionSetup() {
  **/
 int GripperTestNode::transitionShutdown() {	
 	ROS_INFO("Shutdown transition called");	
-	gripper->release();
+
 	setState(rosMast::shutdown);
 	return 0;
 }
@@ -63,7 +64,7 @@ int GripperTestNode::transitionStart() {
  **/
 int GripperTestNode::transitionStop() {
 	ROS_INFO("Stop transition called");
-	
+	gripper->release();
 	// Set currentState to stop
 	setState(rosMast::stop);
 	return 0;
@@ -81,8 +82,7 @@ bool GripperTestNode::grip(gripperTestNode::Grip::Request &req, gripperTestNode:
 	{
 		res.succeeded = false;
 	}
-	return res.succeeded;
-
+	return true;
 }	
 
 bool GripperTestNode::release(gripperTestNode::Release::Request &req, gripperTestNode::Release::Response &res)
@@ -92,13 +92,14 @@ bool GripperTestNode::release(gripperTestNode::Release::Request &req, gripperTes
 	{
 		gripper->release();
 		res.succeeded = true;
+		ROS_INFO("Gripper released");
 	}
 	else
 	{
 		res.succeeded = false;
+		ROS_INFO("Gripper not released, state was not normal");
 	}
-	return res.succeeded;
-
+	return true;
 }
 
 
@@ -116,7 +117,5 @@ int main(int argc, char** argv){
 
 	ROS_INFO("GripperTestNode ready..."); 	
 	gripperTestNode.StateEngine();
-
-
 	return 0;
 }
