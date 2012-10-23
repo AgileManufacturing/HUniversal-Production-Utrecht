@@ -66,7 +66,13 @@ namespace deltaRobotNodeNamespace {
 			bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
 				deltaRobotNode::MoveToRelativePoint::Response &res);
 			bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
-				deltaRobotNode::MoveRelativePath::Response &res);	
+				deltaRobotNode::MoveRelativePath::Response &res);
+		protected:
+			ros::ServiceServer moveToPointService;	
+			ros::ServiceServer movePathService;
+			ros::ServiceServer moveToRelativePointService;
+			ros::ServiceServer moveRelativePathService;
+			ros::ServiceServer calibrateService;
 	};
 }
 

@@ -42,19 +42,19 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 	ros::NodeHandle nodeHandle;
 
 	// Advertise the services
-	ros::ServiceServer moveToPointService =
+	moveToPointService =
 		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint, this);
 
-	ros::ServiceServer movePathService =
+	movePathService =
 		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::movePath, this);
 
-	ros::ServiceServer moveToRelativePointService =
+	moveToRelativePointService =
 		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint, this);
 
-	ros::ServiceServer moveRelativePathService =
+	moveRelativePathService =
 		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_RELATIVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath, this);
 
-	ros::ServiceServer calibrateService =
+	calibrateService =
 		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate, this); 
 
 	ROS_INFO("Configuring Modbus..."); 	
