@@ -34,6 +34,8 @@
 #include "rosMast/StateChanged.h"
 #include "rosMast/States.h"
 
+#define TRANSITION_TABLE_SIZE 4
+
 namespace rosMast {
 	/**
 	 * Struct for a StateTransition

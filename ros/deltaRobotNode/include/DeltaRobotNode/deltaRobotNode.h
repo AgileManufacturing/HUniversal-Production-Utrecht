@@ -46,7 +46,7 @@
 #include <rosMast/StateMachine.h>
 
 namespace deltaRobotNodeNamespace {
-	class DeltaRobotNode : rosMast::StateMachine {
+	class DeltaRobotNode : public rosMast::StateMachine {
 		public:			
 			DeltaRobotNode(int equipletID, int moduleID);
 			

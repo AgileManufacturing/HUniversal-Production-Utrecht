@@ -91,11 +91,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
     Motor::MotorManager* motorManager = new Motor::MotorManager(modbus, motors, 3);
 
 	// Create a deltarobot	
-    deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO);  
-	
-	ROS_INFO("Running StateEngine"); 	
-
-    StateMachine::StateEngine();
+    deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO); 
 }
 
 /**
@@ -381,9 +377,9 @@ int main(int argc, char **argv) {
 	ROS_INFO("Creating DeltaRobotNode"); 	
 
 	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID);    
-
-	ROS_INFO("DeltaRobotNode ready..."); 	
-	ros::spin();
+	
+	ROS_INFO("Running StateEngine"); 	
+    drn.StateEngine();	
 	return 0;
 }
 
