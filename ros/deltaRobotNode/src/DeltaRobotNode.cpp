@@ -108,7 +108,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate(deltaRobotNode::Calibrate::Request &req,
 	deltaRobotNode::Calibrate::Response &res) {
 
-	if(currentState != rosMast::normal) {
+	if(getState() != rosMast::normal) {
 		return false;
 	}
     // Calibrate the motors
@@ -131,7 +131,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(deltaRobotNode::MoveTo
 	deltaRobotNode::MoveToPoint::Response &res) {
 	ROS_INFO("moveToPoint called");
 
-	if(currentState != rosMast::normal) {
+	if(getState() != rosMast::normal) {
 		return false;
 	}
 
@@ -166,7 +166,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath(deltaRobotNode::MovePath:
 	deltaRobotNode::MovePath::Response &res) {
 	ROS_INFO("movePath called");
 
-	if(currentState != rosMast::normal) {
+	if(getState() != rosMast::normal) {
 		return false;
 	}
 
@@ -218,7 +218,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(deltaRobotNode
 	deltaRobotNode::MoveToRelativePoint::Response &res) {
 	ROS_INFO("moveToRelativePoint called");
 
-	if(currentState != rosMast::normal) {
+	if(getState() != rosMast::normal) {
 		return false;
 	}
 
