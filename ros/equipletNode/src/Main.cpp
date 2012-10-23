@@ -30,31 +30,7 @@
 
 #include <EquipletNode/EquipletNode.h>
 #include "ros/ros.h"
-#include "rosMast/StateChanged.h"
-#include "rosMast/StateMachine.h"
 #include <Utilities/Utilities.h>
-
-/**
- * @var equipletNode
- * The pointer for the EquipletNode class. Needed because the stateChanged method needs
- * to call some functions from the EquipletNode object.
- **/
-EquipletNode *equipletNode;
-
-/**
- * Callback function that is called when a message is received on the equiplet_statechanged topic
- * It updates the state of a hardware module.
- * 
- * @param msg Contains the data required for a state transition
- * 
- **/
-void stateChanged(const rosMast::StateChangedPtr &msg) {
-	if(equipletNode->updateModuleState(msg->moduleID, rosMast::StateType(msg->state))) {
-		std::cout << "The state of module " << msg->moduleID << " has been changed to " << rosMast::state_txt[msg->state] << std::endl; 
-	} else{
-		std::cerr << "Cannot update the state of the module " << msg->moduleID << " run for your life!" << std::endl;
-	}	
-}
 
 int main(int argc, char **argv) {
 
@@ -74,12 +50,11 @@ int main(int argc, char **argv) {
 	const char* equipletName = ss.str().c_str();
 	
 	ros::init(argc, argv, equipletName);
-	ros::NodeHandle nodeHandle;
-
-	equipletNode = new EquipletNode(equipletId);
+	EquipletNode * equipletNode = new EquipletNode(equipletId);
 
 	/**
 	 * Add some hardware modules to this equiplet
+	 * This should change to modules being created in the Node itself after commands on blackboard
 	 **/
 	int moduleId = 1;
 	Mast::HardwareModuleProperties deltaRobot(moduleId, 1, rosMast::safe, true, true);
@@ -90,38 +65,7 @@ int main(int argc, char **argv) {
 	 **/
 	equipletNode->printHardwareModules();
 	
-	/**
-	 * Subscribe to the equipletNode_statechanged topic. On that topic messages are received that
-	 * the state of a hardware module has changed.
-	 **/
-	ros::Subscriber sub = nodeHandle.subscribe("equiplet_statechanged", 1 , stateChanged);
-
-	/**
-	 * Publish to the requestStateChange topic. On this topic the Equiplet requests a state change by a hardware
-	 * module
-	 **/
-	ros::Publisher publisher = nodeHandle.advertise<rosMast::StateChanged>("requestStateChange", 5);
-
-	ros::Rate poll_rate(100);
-
-	/**
-	 * Wait until there are subscribers on the requestStateChange topic before publishing a message
-	 **/
-	while(publisher.getNumSubscribers() == 0) {
-		poll_rate.sleep();
-		ros::spinOnce();	
-	}
-
-	/**
-	 * Send a message to the hardware module with id moduleId to go to the standby state
-	 **/
-	rosMast::StateChanged msg;	
-	msg.equipletID = equipletId;
-	msg.moduleID = moduleId;
-	msg.state = rosMast::standby;
-
-	publisher.publish(msg);	
-
+	ros::Rate poll_rate(10);
 	while(ros::ok()) {
 		poll_rate.sleep();
 		ros::spinOnce();	

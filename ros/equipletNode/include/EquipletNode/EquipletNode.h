@@ -34,6 +34,8 @@
 #include <vector>
 #include <Mast/HardwareModuleProperties.h>
 #include "rosMast/States.h"
+#include "rosMast/StateChanged.h"
+#include "rosMast/ModuleError.h"
 #include <BlackboardClient/BlackboardClientUtils.h>
 #include <BlackboardClient/PostIt.pb.h>
 
@@ -50,13 +52,17 @@ class EquipletNode {
 		bool updateModuleState(int moduleID, rosMast::StateType state);
 		void printHardwareModules();
 		void readFromBlackboard();
+		void moduleErrorCallback();
+		void stateChanged(const rosMast::StateChangedPtr &msg);
+		void moduleErrorCallback(const rosMast::ModuleErrorPtr &msg);
+		void sendStateChangeRequest(int moduleID, rosMast::StateType newState);
+		rosMast::StateType getModuleState(int moduleID);
 	private:
 		/**
 		 * @var int equipletId
 		 * The id of the equiplet
 		 **/
 		int equipletId;
-
 		/**
 		 * @var Mast::state operationState
 		 * The minimal operation state is equal to the lowest state of all modules that are actors
@@ -77,6 +83,21 @@ class EquipletNode {
 		 * Utility for the blackboard client
 		 **/
 		BlackboardClient::BlackboardClientUtils bbUtils;
+		/**
+		 * @var ros::Subscriber errorModuleSubscriber
+		 * The subscriber that will read when a error occurs inside a module
+		 **/
+		ros::Subscriber errorModuleSubscriber; 
+		/**
+		 * @var ros::Subscriber stateChangedSubscriber
+		 * The subscriber that will receive messages about state changes from modules
+		 **/
+		ros::Subscriber stateChangedSubscriber;
+		/**
+		 * @var ros::Publisher requestStateChangePublisher
+		 * The publisher that can request state changes for a specific module
+		 **/
+		ros::Publisher requestStateChangePublisher; 
 		/**
 		 * @var PostItBox postItBox
 		 * The postIt box where the messages are stored that are read from the blackboard

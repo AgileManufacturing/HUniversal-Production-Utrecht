@@ -32,6 +32,7 @@
 
 #include "ros/ros.h"
 #include "rosMast/StateChanged.h"
+#include "rosMast/ModuleError.h"
 #include "rosMast/States.h"
 
 #define TRANSITION_TABLE_SIZE 4
@@ -85,13 +86,15 @@ namespace rosMast {
 			StateType getState() { return currentState; }			
 			void changeState(const rosMast::StateChangedPtr &msg);			
 			stateFunctionPtr lookupTransition(StateType currentState, StateType desiredState);
+			void sendErrorMessage(int errorCode);
 			void StateEngine();			
-		protected:
+		private:
 			bool locked;		
 
-			ros::Publisher pub;
-			ros::Subscriber sub;
-		private:	
+			ros::Publisher stateChangedPublisher;
+			ros::Publisher moduleErrorPublisher;
+			ros::Subscriber requestStateChangeSubscriber;
+
 			StateType currentState;	
 			int equipletID;
 			int moduleID;		

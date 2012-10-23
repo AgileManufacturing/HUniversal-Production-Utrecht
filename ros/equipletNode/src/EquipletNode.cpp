@@ -34,6 +34,7 @@
 #include <unistd.h>
 #include <algorithm>
 
+
 /**
  * Create a new EquipletNode
  * @var id The unique identifier of the Equiplet
@@ -48,6 +49,11 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable(), bbUtils() {
 	// Create the map with moduleType mapped to package name and node name
 	modulePackageNodeMap = map< int, std::pair<std::string, std::string> >();
 	modulePackageNodeMap[1] = std::pair< std::string, std::string > ("deltaRobotNode", "DeltaRobotNode");
+
+	ros::NodeHandle nodeHandle;
+	errorModuleSubscriber = nodeHandle.subscribe("equiplet_moduleError", 5, &EquipletNode::moduleErrorCallback, this); 
+	stateChangedSubscriber = nodeHandle.subscribe("equiplet_stateChanged", 5 , &EquipletNode::stateChanged, this);
+	requestStateChangePublisher = nodeHandle.advertise<rosMast::StateChanged>("requestStateChange", 5);
 }; 
 
 /**
@@ -55,6 +61,42 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable(), bbUtils() {
  **/
 EquipletNode::~EquipletNode() {
 	delete postItBox;
+}
+
+/**
+ * Callback function that is called when a message is received on the equiplet_statechanged topic
+ * It updates the state of a hardware module.
+ * 
+ * @param msg Contains the data required for a state transition
+ * 
+ **/
+void EquipletNode::stateChanged(const rosMast::StateChangedPtr &msg) {
+	if(updateModuleState(msg->moduleID, rosMast::StateType(msg->state))) {
+		std::cout << "The state of module " << msg->moduleID << " has been changed to " << rosMast::state_txt[msg->state] << std::endl; 
+	} else{
+		std::cerr << "Cannot update the state of the module " << msg->moduleID << " run for your life!" << std::endl;
+	}	
+}
+
+void EquipletNode::moduleErrorCallback(const rosMast::ModuleErrorPtr &msg) {
+	int errorCode = msg->errorCode;
+	int moduleID = msg->moduleID;
+
+	// Lookup errorcode in the DB and decide accordingly
+	// Lookup current state of the module
+	rosMast::StateType currentModuleState = getModuleState(moduleID);
+	// This will be changed to a proper way to decide what state should be entered on error
+	rosMast::StateType newState = rosMast::StateType(currentModuleState - 3); 
+	sendStateChangeRequest(moduleID, newState);
+}
+
+void EquipletNode::sendStateChangeRequest(int moduleID, rosMast::StateType newState) {
+	rosMast::StateChanged msg;	
+	msg.equipletID = equipletId;
+	msg.moduleID = moduleID;
+	msg.state = newState;
+
+	requestStateChangePublisher.publish(msg);
 }
 
 /**
@@ -182,15 +224,14 @@ void EquipletNode::printHardwareModules() {
 	}
 }
 
-/**
- * Read from the blackboard, store the messages in postItBox
- **/
-void EquipletNode::readFromBlackboard() {
-    PostItBox_Filter * f = postItBox->mutable_filter();
-    PostItBox * received = new PostItBox();
-    f->set_filtername("PostItFilter");
-	bbUtils.readFromBlackboard(postItBox);
-	std::cout << "Number of postIts: " << received->postits_size() << std::endl;
+rosMast::StateType EquipletNode::getModuleState(int moduleID) {
+	std::vector<Mast::HardwareModuleProperties>::iterator it;
+	for(it = moduleTable.begin(); it < moduleTable.end(); it++) {
+		if((*it).id == moduleID) {
+			return (*it).currentState;
+		}
+	}
+	return rosMast::nostate;
 }
 
 /**
@@ -213,4 +254,15 @@ bool EquipletNode::updateModuleState(int moduleID, rosMast::StateType state) {
 		}
 	}
 	return false;
+}
+
+/**
+ * Read from the blackboard, store the messages in postItBox
+ **/
+void EquipletNode::readFromBlackboard() {
+    PostItBox_Filter * f = postItBox->mutable_filter();
+    PostItBox * received = new PostItBox();
+    f->set_filtername("PostItFilter");
+	bbUtils.readFromBlackboard(postItBox);
+	std::cout << "Number of postIts: " << received->postits_size() << std::endl;
 }	

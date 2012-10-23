@@ -100,8 +100,9 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
 	// Initialize publisher and subcriber
 	ros::NodeHandle nh;
 	locked = false;
-	pub = nh.advertise<rosMast::StateChanged>("equiplet_statechanged", 5);
-	sub = nh.subscribe("requestStateChange", 5, &StateMachine::changeState, this);
+	stateChangedPublisher = nh.advertise<rosMast::StateChanged>("equiplet_stateChanged", 5);
+	moduleErrorPublisher = nh.advertise<rosMast::ModuleError>("equiplet_moduleError", 5);
+	requestStateChangeSubscriber = nh.subscribe("requestStateChange", 5, &StateMachine::changeState, this);
 }
 
 
@@ -127,7 +128,18 @@ void rosMast::StateMachine::setState(StateType newState) {
 	msg.equipletID = this->equipletID;
 	msg.moduleID = this->moduleID;
 	msg.state = currentState;
-	pub.publish(msg);
+	stateChangedPublisher.publish(msg);
+}
+
+/**
+ * Send an error message over equiplet_modulerror topic
+ * @param represents an error code that can be looked up in the database
+ **/
+void rosMast::StateMachine::sendErrorMessage(int errorCode) {
+	rosMast::ModuleError msg;
+	msg.moduleID = this->moduleID;
+	msg.errorCode = errorCode;
+	moduleErrorPublisher.publish(msg);
 }
 
 void rosMast::StateMachine::StateEngine() {
