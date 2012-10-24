@@ -119,5 +119,11 @@ namespace DeltaRobot{
 		 * The max z-coordinate of the effector boundary box in millimeters.
 		 **/
 		const double BOUNDARY_BOX_MAX_Z = -180;
+
+		/**
+		 * @var double CALIBRATION_RESOLUTION
+		 * The resolution at which the calibration takes place in radians.
+		 **/
+		const double CALIBRATION_RESOLUTION = Utilities::degreesToRadians(0.5);
 	}
 }
