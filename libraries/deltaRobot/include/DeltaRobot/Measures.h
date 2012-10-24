@@ -32,6 +32,7 @@
 
 #pragma once
 #include <Utilities/Utilities.h>
+#include <Motor/CRD514KD.h>
 
 namespace DeltaRobot{
 	namespace Measures{
@@ -124,6 +125,6 @@ namespace DeltaRobot{
 		 * @var double CALIBRATION_RESOLUTION
 		 * The resolution at which the calibration takes place in radians.
 		 **/
-		const double CALIBRATION_RESOLUTION = Utilities::degreesToRadians(0.5);
+		const double CALIBRATION_RESOLUTION = Motor::CRD514KD::MOTOR_STEP_ANGLE;
 	}
 }

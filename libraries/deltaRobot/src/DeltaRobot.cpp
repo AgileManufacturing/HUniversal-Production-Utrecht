@@ -200,7 +200,31 @@ namespace DeltaRobot{
     }
 
     /**
-    * Calibrates a single motor by moving the motor upwards till the calibration sensor is pushed.
+     * Incrementally moves the motor to until the sensor is of the value given in sensorValue. 
+     * Calculates how many steps are made on basis of the given presetAngle, this angle must be written to the motor controller using writeRotationData() beforehand. 
+     *
+     * @param motorIndex the index of the motor
+     * @param presetAngle the angle that has already been written to the motor controller using writeRotationData()
+     * @param sensorValue value that the sensor needs to be for the motor to stop.
+     * 
+     * @return The amount of motor steps the motor has moved.
+     **/
+    int DeltaRobot::moveMotorUntilSensorIsOfValue(int motorIndex, double presetAngle, bool sensorValue){
+        int steps = 0;
+        do {
+            motors[motorIndex]->startMovement();
+            steps += (presetAngle / Motor::CRD514KD::MOTOR_STEP_ANGLE);  
+        } while(checkSensor(motorIndex) != sensorValue);
+
+        return steps;
+    }
+
+    /**
+    * Calibrates a single motor by:
+    * * Moving it to the sensor in large steps until the sensor is pushed
+    * * Moving it away from the sensor in large steps until the sensor is no longer pushed
+    * * Moving back to the sensor in tiny steps until the sensor is pushed.
+    * * Using the moved steps to calculate the deviation
     * 
     * @param motorIndex Index of the motor to be calibrated. When standing in front of the robot looking towards it, 0 is the right motor, 1 is the front motor and 2 is the left motor.
     **/
@@ -210,22 +234,28 @@ namespace DeltaRobot{
         // Setup for incremental motion in steps equal to CALIBRATION_RESOLUTION.
         motors[motorIndex]->setIncrementalMode();
         DataTypes::MotorRotation motorRotation;
-        motorRotation.angle = -Measures::CALIBRATION_RESOLUTION;
+        motorRotation.angle = -Measures::CALIBRATION_RESOLUTION * 20;
         motors[motorIndex]->writeRotationData(motorRotation, false);
         
-        // Make the incremental motions while checking the sensor. 
+        // Move to the sensor in large steps until it is pushed
         // actualAngleInSteps keeps track of how many microsteps the motor has moved. This is necessary to avoid accummulating errors.
-        int actualAngleInSteps = 0;
-        do {
-            motors[motorIndex]->startMovement();
-            actualAngleInSteps += (motorRotation.angle / Motor::CRD514KD::MOTOR_STEP_ANGLE);  
-        } while(!checkSensor(motorIndex));
+        int actualAngleInSteps = moveMotorUntilSensorIsOfValue(motorIndex, motorRotation.angle, true);
 
+        // Move away from the sensor in large steps until it is no longer pushed.
+        motorRotation.angle = -motorRotation.angle;
+        motors[motorIndex]->writeRotationData(motorRotation, false);
+        actualAngleInSteps += moveMotorUntilSensorIsOfValue(motorIndex, motorRotation.angle, false);
+        
+        // Move back to the sensor in small steps until it is pushed.
+        motorRotation.angle = -Measures::CALIBRATION_RESOLUTION;
+        motors[motorIndex]->writeRotationData(motorRotation, false);
+        actualAngleInSteps += moveMotorUntilSensorIsOfValue(motorIndex, motorRotation.angle, true);
+
+        // calculate and set the deviation.
         double deviation = (actualAngleInSteps * Motor::CRD514KD::MOTOR_STEP_ANGLE) + Measures::MOTORS_FROM_ZERO_TO_TOP_POSITION;
-
         motors[motorIndex]->setDeviation(deviation);
         
-        // Absolute motion back to the new 0.
+        // Move back to the new 0.
         motors[motorIndex]->setAbsoluteMode();
         motorRotation.angle = 0;
         motors[motorIndex]->moveTo(motorRotation);
