@@ -178,6 +178,13 @@ namespace Motor{
 			throw std::out_of_range("one or more angles out of range");
 		}
 
+		if(motorRotation.acceleration > CRD514KD::MOTOR_MAX_ACCELERATION 
+			|| motorRotation.acceleration < CRD514KD::MOTOR_MIN_ACCELERATION
+			|| motorRotation.deceleration > CRD514KD::MOTOR_MAX_ACCELERATION
+			|| motorRotation.deceleration < CRD514KD::MOTOR_MIN_ACCELERATION){
+			throw std::out_of_range("Acceleration or deceleration out of range.");
+		}
+
 		uint32_t motorSteps = (uint32_t)(motorRotation.angle / CRD514KD::MOTOR_STEP_ANGLE);
 		if(useDeviation) {
 			motorSteps += (uint32_t)(deviation / CRD514KD::MOTOR_STEP_ANGLE);
@@ -193,8 +200,6 @@ namespace Motor{
 
 		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_SPEED, motorSpeed, true);
 		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_POS, motorSteps, true);
-
-		std::cout << "Writing acceleration " << motorRotation.acceleration << " -> " << motorAcceleration << std::endl;
 		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_ACC, motorAcceleration, true);
 		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_DEC, motorDeceleration, true);
 		setAngle = motorRotation.angle;
