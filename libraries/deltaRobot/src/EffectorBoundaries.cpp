@@ -173,10 +173,10 @@ namespace DeltaRobot{
     	}
 
     	if(*fromCache == UNKNOWN){
-    		DataTypes::MotorRotation<double>* rotations[3];
-    		rotations[0] = new DataTypes::MotorRotation<double>();
-    		rotations[1] = new DataTypes::MotorRotation<double>();
-    		rotations[2] = new DataTypes::MotorRotation<double>();
+    		DataTypes::MotorRotation* rotations[3];
+    		rotations[0] = new DataTypes::MotorRotation();
+    		rotations[1] = new DataTypes::MotorRotation();
+    		rotations[2] = new DataTypes::MotorRotation();
 
 			try{
 				kinematics.destinationPointToMotorRotations(fromBitmapCoordinate(coordinate), rotations);
