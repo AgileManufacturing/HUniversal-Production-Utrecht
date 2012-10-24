@@ -207,27 +207,29 @@ namespace DeltaRobot{
     void DeltaRobot::calibrateMotor(int motorIndex){
         std::cout << "[DEBUG] Calibrating motor number " << motorIndex << std::endl;
         
-        // Starting point of calibration
+        // Setup for incremental motion in steps equal to CALIBRATION_RESOLUTION.
+        motors[motorIndex]->setIncrementalMode();
         DataTypes::MotorRotation motorRotation;
-        motorRotation.angle = 0;
-
-        // Move motor upwards till the calibration sensor is pushed
-        do{
-            motorRotation.angle -= Utilities::degreesToRadians(Motor::CRD514KD::MOTOR_FULL_STEP_IN_DEGREES);
-            motors[motorIndex]->moveTo(motorRotation);
-
-            usleep(25000);
+        motorRotation.angle = -Measures::CALIBRATION_RESOLUTION;
+        motors[motorIndex]->writeRotationData(motorRotation, false);
+        
+        // Make the incremental motions while checking the sensor. 
+        // actualAngleInSteps keeps track of how many microsteps the motor has moved. This is necessary to avoid accummulating errors.
+        int actualAngleInSteps = 0;
+        do {
+            motors[motorIndex]->startMovement();
+            actualAngleInSteps += (motorRotation.angle / Motor::CRD514KD::MOTOR_STEP_ANGLE);  
         } while(!checkSensor(motorIndex));
 
-        double deviation = motorRotation.angle + Measures::MOTORS_FROM_ZERO_TO_TOP_POSITION;
+        double deviation = (actualAngleInSteps * Motor::CRD514KD::MOTOR_STEP_ANGLE) + Measures::MOTORS_FROM_ZERO_TO_TOP_POSITION;
 
-        // Set deviation to the calculated value.
         motors[motorIndex]->setDeviation(deviation);
-
+        
+        // Absolute motion back to the new 0.
+        motors[motorIndex]->setAbsoluteMode();
         motorRotation.angle = 0;
         motors[motorIndex]->moveTo(motorRotation);
 
-        // Wait for steady
         motors[motorIndex]->waitTillReady();
     }
 
