@@ -32,14 +32,15 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include "Vision/QRCodeDetector.h"
 
-QRCodeDetector::QRCodeDetector() {
-    scanner.set_config(zbar::ZBAR_QRCODE, zbar::ZBAR_CFG_ENABLE, 1);
-}
+namespace Vision{
+	QRCodeDetector::QRCodeDetector() {
+		scanner.set_config(zbar::ZBAR_QRCODE, zbar::ZBAR_CFG_ENABLE, 1);
+	}
 
-QRCodeDetector::~QRCodeDetector() {}
+	QRCodeDetector::~QRCodeDetector() {}
 
-bool QRCodeDetector::detect(cv::Mat& image, std::string &result) {
-	try {
+	bool QRCodeDetector::detect(cv::Mat& image, std::string &result) {
+		try {
 		/**
 		 * create an image in zbar with:
 		 * width
@@ -48,27 +49,27 @@ bool QRCodeDetector::detect(cv::Mat& image, std::string &result) {
 		 * pointer to image.data
 		 * area of the image
 		**/
-		zbar::Image zbarImage(image.cols, image.rows, "Y800", (void*)image.data, image.cols * image.rows);
+		 zbar::Image zbarImage(image.cols, image.rows, "Y800", (void*)image.data, image.cols * image.rows);
 
 		// scan for symbols
-		int amountOfScannedResults = scanner.scan(zbarImage);
+		 int amountOfScannedResults = scanner.scan(zbarImage);
 
-		if (amountOfScannedResults) {
-			zbar::Image::SymbolIterator symbol = zbarImage.symbol_begin();
+		 if (amountOfScannedResults) {
+		 	zbar::Image::SymbolIterator symbol = zbarImage.symbol_begin();
 
-			result = symbol->get_data();
+		 	result = symbol->get_data();
 
-		} else {
+		 } else {
+		 	return false;
+		 }
+		} catch (std::exception &e) {
 			return false;
 		}
-	} catch (std::exception &e) {
-		return false;
+		return true;
 	}
-	return true;
-}
 
-void QRCodeDetector::detectCrates(cv::Mat& image, std::vector<Crate> &crates, cv::TermCriteria criteria) {
-	try {
+	void QRCodeDetector::detectCrates(cv::Mat& image, std::vector<DataTypes::Crate> &crates, cv::TermCriteria criteria) {
+		try {
 		/**
 		 * create an image in zbar with:
 		 * width
@@ -77,19 +78,19 @@ void QRCodeDetector::detectCrates(cv::Mat& image, std::vector<Crate> &crates, cv
 		 * pointer to image.data
 		 * area of the image
 		**/
-		zbar::Image zbarImage(image.cols, image.rows, "Y800", (void*)image.data, image.cols * image.rows);
+		 zbar::Image zbarImage(image.cols, image.rows, "Y800", (void*)image.data, image.cols * image.rows);
 
-		int amountOfScannedResults = scanner.scan(zbarImage);
+		 int amountOfScannedResults = scanner.scan(zbarImage);
 
-		if (amountOfScannedResults > 0) {
+		 if (amountOfScannedResults > 0) {
 
-			zbar::Image::SymbolIterator it = zbarImage.symbol_begin();
-			for(; it!=zbarImage.symbol_end(); ++it) {
+		 	zbar::Image::SymbolIterator it = zbarImage.symbol_begin();
+		 	for(; it!=zbarImage.symbol_end(); ++it) {
 				// add all "position" corners of a qr code to a vector
-				std::vector<cv::Point2f> corners;
-				corners.push_back(cv::Point2f(it->get_location_x(1), it->get_location_y(1)));
-				corners.push_back(cv::Point2f(it->get_location_x(0), it->get_location_y(0)));
-				corners.push_back(cv::Point2f(it->get_location_x(3), it->get_location_y(3)));
+		 		std::vector<cv::Point2f> corners;
+		 		corners.push_back(cv::Point2f(it->get_location_x(1), it->get_location_y(1)));
+		 		corners.push_back(cv::Point2f(it->get_location_x(0), it->get_location_y(0)));
+		 		corners.push_back(cv::Point2f(it->get_location_x(3), it->get_location_y(3)));
 
 				/**
 				 * windowsSize is half of the sidelength of the window around every coordinate to check by cornerSubPix.
@@ -104,18 +105,19 @@ void QRCodeDetector::detectCrates(cv::Mat& image, std::vector<Crate> &crates, cv
 				 * 520 px distance = (8 x 8) windowsSize > (17 x 17) window
 				 * etc...
 				 **/
-				float windowsSize = 2.0 * (Crate::distance(corners[0], corners[2]) / 130.0);
+				 float windowsSize = 2.0 * (DataTypes::Crate::distance(corners[0], corners[2]) / 130.0);
 
 				/**
 				 * The cornerSubPix function iterates to find the sub-pixel accurate location of corners or radial saddle points
 				 * corners is now updated!
 				 **/
-				cv::cornerSubPix(image, corners, cv::Size(windowsSize,windowsSize), cv::Size(-1,-1), criteria);
+				 cv::cornerSubPix(image, corners, cv::Size(windowsSize,windowsSize), cv::Size(-1,-1), criteria);
 
-				crates.push_back(Crate(it->get_data(), corners));
+				 crates.push_back(DataTypes::Crate(it->get_data(), corners));
+				}
 			}
+		} catch (std::exception &e) {
+			return;
 		}
-	} catch (std::exception &e) {
-		return;
 	}
 }
