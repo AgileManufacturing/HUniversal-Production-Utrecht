@@ -50,6 +50,18 @@ namespace Motor{
          **/
         const double MOTOR_FULL_STEP_IN_DEGREES = 1.8;
 
+        /**
+         * @var double MOTOR_MIN_ACCELERATION
+         * The minimum acceleration in radians per second per second. This same value counts for the minimum deceleration.
+         **/
+        const double MOTOR_MIN_ACCELERATION = 1.256637061;
+
+        /**
+         * @var double MOTOR_MAX_ACCELERATION
+         * The maximum acceleration in radians per second per second. This same value counts for the maximum deceleration.
+         **/
+        const double MOTOR_MAX_ACCELERATION = 1256637.061;        
+
         namespace Slaves{
             /**
              * CRD514KD slave addresses.

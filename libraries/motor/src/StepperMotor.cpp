@@ -158,7 +158,7 @@ namespace Motor{
 	 *
 	 * @param motorRotation The rotational data for the motor.
 	 **/
-	void StepperMotor::moveTo(const DataTypes::MotorRotation<double>& motorRotation){
+	void StepperMotor::moveTo(const DataTypes::MotorRotation& motorRotation){
 		writeRotationData(motorRotation);
 		startMovement();
 	}
@@ -167,8 +167,9 @@ namespace Motor{
 	 * Writes the rotation data into the motor controller.
 	 * 
 	 * @param motorRotation A MotorRotation.
+	 * @param deviationOn Sets whether or not to use the deviation. Defaults to true.
 	 **/
-	void StepperMotor::writeRotationData(const DataTypes::MotorRotation<double>& motorRotation){
+	void StepperMotor::writeRotationData(const DataTypes::MotorRotation& motorRotation, bool useDeviation){
 		if(!poweredOn){
 			throw MotorException("motor drivers are not powered on");
 		}
@@ -177,11 +178,25 @@ namespace Motor{
 			throw std::out_of_range("one or more angles out of range");
 		}
 
-		uint32_t motorSteps = (uint32_t)((motorRotation.angle + deviation) / CRD514KD::MOTOR_STEP_ANGLE);
+		if(motorRotation.acceleration > CRD514KD::MOTOR_MAX_ACCELERATION 
+			|| motorRotation.acceleration < CRD514KD::MOTOR_MIN_ACCELERATION
+			|| motorRotation.deceleration > CRD514KD::MOTOR_MAX_ACCELERATION
+			|| motorRotation.deceleration < CRD514KD::MOTOR_MIN_ACCELERATION){
+			throw std::out_of_range("Acceleration or deceleration out of range.");
+		}
+
+		uint32_t motorSteps = (uint32_t)(motorRotation.angle / CRD514KD::MOTOR_STEP_ANGLE);
+		if(useDeviation) {
+			motorSteps += (uint32_t)(deviation / CRD514KD::MOTOR_STEP_ANGLE);
+		}
+
 		uint32_t motorSpeed = (uint32_t)(motorRotation.speed / CRD514KD::MOTOR_STEP_ANGLE);
-		// TODO: figure out unknown magical variable 1000000000.0
-		uint32_t motorAcceleration = (uint32_t)(CRD514KD::MOTOR_STEP_ANGLE * 1000000000.0 / motorRotation.acceleration);
-		uint32_t motorDeceleration = (uint32_t)(CRD514KD::MOTOR_STEP_ANGLE * 1000000000.0 / motorRotation.deceleration);
+		
+		// Formula to turn rad/s² into µs/kHz
+		// 1000000 is for amount of microseconds in a second
+		// 1000 is for amount of steps/s in a kHz
+		uint32_t motorAcceleration = (uint32_t)((1000000/(motorRotation.acceleration/(CRD514KD::MOTOR_STEP_ANGLE * 1000))));
+		uint32_t motorDeceleration = (uint32_t)((1000000/(motorRotation.deceleration/(CRD514KD::MOTOR_STEP_ANGLE * 1000))));
 
 		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_SPEED, motorSpeed, true);
 		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_POS, motorSteps, true);
@@ -191,7 +206,7 @@ namespace Motor{
 	}
 
 	/**
-	 * Start the motor to move according to the set registers.
+	 * Start the motor to move according to the set registers. Will wait for the motor to be ready before moving.
 	 **/
 	void StepperMotor::startMovement(void){
 		if(!poweredOn){
@@ -215,8 +230,8 @@ namespace Motor{
 	 * @param time Time in seconds that the motors will take to rotate to the given angle. Speed member of given motion is ignored.
 	 * @param start If the movement should start immediately.
 	 **/
-	void StepperMotor::moveToWithin(const DataTypes::MotorRotation<double>& motorRotation, double time, bool start){
-		DataTypes::MotorRotation<double> newMotorRotation = motorRotation;
+	void StepperMotor::moveToWithin(const DataTypes::MotorRotation& motorRotation, double time, bool start){
+		DataTypes::MotorRotation newMotorRotation = motorRotation;
 		newMotorRotation.speed = fabs(currentAngle - motorRotation.angle) / time;
 		if(start){
 			moveTo(newMotorRotation);

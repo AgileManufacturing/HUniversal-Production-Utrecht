@@ -140,7 +140,7 @@ namespace DeltaRobot {
 	 * @param destinationPoint The destination point.
 	 * @param rotations Array of MotorRotation objects, will be adjusted by the function to the correct rotations per motor.
 	 **/
-	void InverseKinematics::destinationPointToMotorRotations(const DataTypes::Point3D<double>& destinationPoint, DataTypes::MotorRotation<double>* (&rotations)[3]) const{
+	void InverseKinematics::destinationPointToMotorRotations(const DataTypes::Point3D<double>& destinationPoint, DataTypes::MotorRotation* (&rotations)[3]) const{
 		// Adding 180 degrees switches 0 degrees for the motor from the midpoint of the engines to directly opposite.
 		// When determining motorAngle the degrees determine the position of the engines:
 		// 	  0 degrees: the hip from this motor moves on the yz plane
@@ -149,8 +149,5 @@ namespace DeltaRobot {
 		rotations[0]->angle = Utilities::degreesToRadians(180) + motorAngle(destinationPoint, Utilities::degreesToRadians(1 * 120));
 		rotations[1]->angle = Utilities::degreesToRadians(180) + motorAngle(destinationPoint, Utilities::degreesToRadians(0 * 120));
 		rotations[2]->angle = Utilities::degreesToRadians(180) + motorAngle(destinationPoint, Utilities::degreesToRadians(2 * 120));
-
-		rotations[0]->acceleration = rotations[1]->acceleration = rotations[2]->acceleration = Utilities::degreesToRadians(3600);
-		rotations[0]->deceleration = rotations[1]->deceleration = rotations[2]->deceleration = Utilities::degreesToRadians(3600);
 	}
 }
