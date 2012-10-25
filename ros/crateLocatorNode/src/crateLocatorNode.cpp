@@ -44,7 +44,6 @@ void on_mouse(int event, int x, int y, int flags, void* param) {
 		DataTypes::Point2D result = cordTransformer->to_rc(DataTypes::Point2D(x, y));
 		ROS_INFO("RX: %f, RY:%f", result.x, result.y);
 		ROS_INFO("PX: %d, PY:%d", x, y);
-		// TODO: Find another way for eclipse to print lines w/o endl;
 		std::cout.flush();
 	}
 }
@@ -106,7 +105,7 @@ void CrateLocatorNode::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 		return;
 	}
 
-	// Find qr codes
+	// Find QR codes
 
 	cv::Mat gray;
 	cv::cvtColor(cv_ptr->image, gray, CV_BGR2GRAY);
@@ -133,10 +132,6 @@ void CrateLocatorNode::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 	for (std::vector<DataTypes::Crate>::iterator it = crates.begin(); it != crates.end(); ++it) {
 		it->draw(cv_ptr->image);
 	}
-
-	//if (cv_ptr->image.rows > 60 && cv_ptr->image.cols > 60){
-	//	cv::circle(cv_ptr->image, cv::Point(50, 50), 10, CV_RGB(255,0,0));
-	//}
 
 	cv::imshow(WINDOW, cv_ptr->image);
 	cv::waitKey(3);
@@ -168,31 +163,9 @@ inline float averageY(std::vector<cv::Point2f> points){
 	return total / pointsCounter;
 }
 
-// TODO: median??? unsorted???
-inline float medianX(std::vector<cv::Point2f> points) {
-	std::vector<cv::Point2f>::iterator n = points.begin() + points.size() / 2;
-	if (points.size() % 2 == 0) {
-		nth_element(points.begin(), n, points.end(), xComp);
-		return ((n->x + (n + 1)->x) / 2.0);
-	} else {
-		nth_element(points.begin(), n, points.end(), xComp);
-		return n->x;
-	}
-}
-
-// TODO: median??? unsorted???
-inline float medianY(std::vector<cv::Point2f> points) {
-	std::vector<cv::Point2f>::iterator n = points.begin() + points.size() / 2;
-	if (points.size() % 2 == 0) {
-		nth_element(points.begin(), n, points.end(), yComp);
-		return ((n->y + (n + 1)->y) / 2.0);
-	} else {
-		nth_element(points.begin(), n, points.end(), yComp);
-		return n->y;
-	}
-}
 bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErrors) {
 	ROS_INFO("Updating calibration markers...");
+
 
 	std::vector<cv::Point2f> fid1_buffer;
 	std::vector<cv::Point2f> fid2_buffer;
@@ -283,10 +256,6 @@ void CrateLocatorNode::run( ) {
 
 	if (!calibrate())
 		ros::shutdown();
-
-	//VideoWriter outputVideo;
-	//Size S = cv::Size(cam->get_img_width(),cam->get_img_height());
-	//outputVideo.open("/home/lcv/output.avi" , CV_FOURCC('M','P','2','V'), 30, S, true);
 
 	//main loop
 	while (ros::ok()) {

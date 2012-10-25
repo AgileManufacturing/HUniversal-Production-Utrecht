@@ -119,13 +119,8 @@ private:
 	int numberOfStableFrames;
 	bool invokeCalibration;
 
-
 	bool firstFrameReceived;
-
 	bool calibrate(unsigned int measurements = 100, unsigned int maxErrors = 100);
-	//void printUsage(char* invokeName);
-
-
 	void imageCallback(const sensor_msgs::ImageConstPtr& msg);
 
 	image_transport::ImageTransport imageTransport;
