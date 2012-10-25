@@ -4,7 +4,7 @@
 //
 //******************************************************************************
 // Project:        VisionNode
-// File:           visionNode.h
+// File:           CrateLocatorNode.h
 // Description:    This vision RosNode detects the crates and publishes events on the crateEvent topic.
 // Author:         Kasper van Nieuwland en Zep Mouris
 // Notes:          ...
@@ -26,9 +26,9 @@
 // You should have received a copy of the GNU General Public License
 // along with VisionNode.  If not, see <http://www.gnu.org/licenses/>.
 //******************************************************************************
+
 #pragma once
 /*#include <pcrctransformation/pcrctransformer.hpp>
-#include <pcrctransformation/point2f.hpp>
 #include <CameraCalibration/RectifyImage.h>
 #include <unicap_cv_bridge.hpp>
 #include <FiducialDetector.h>
@@ -43,6 +43,11 @@
 #include <iostream>
 #include <sstream>
 
+#include <DataTypes/Point2D.h>
+#include <Vision/QRCodeDetector.h>
+#include <Vision/FiducialDetector.h>
+#include <Vision/PixelToRealCoordinateTransformer.h>
+
 /*#include <vision/CrateEventMsg.h>
 #include <vision/error.h>
 #include <vision/registerNode.h>
@@ -50,7 +55,7 @@
 #include <vision/getAllCrates.h>
 */#include <std_srvs/Empty.h>
 
-class visionNode{
+class CrateLocatorNode{
 public:
 
 	/**
@@ -58,11 +63,11 @@ public:
 	 * @param argc use the parameters form main
 	 * @param argv use the parameters form main
 	 */
-	visionNode();
+	CrateLocatorNode();
 	/**
 	 * the destructor
 	 */
-	~visionNode();
+	~CrateLocatorNode();
 
 	/**
 	 * blocking function that contains the main loop: take frame, detect crates, send event. this function ends when ros receives a ^c
@@ -92,14 +97,14 @@ public:
 	//bool recalibrate(std_srvs::Empty &req, std_srvs::Empty &res);
 
 private:
-	/*unicap_cv_bridge::unicap_cv_camera * cam;
-	FiducialDetector * fidDetector;
-	QRCodeDetector * qrDetector;
-	pcrctransformation::pc_rc_transformer * cordTransformer;
+	Vision::FiducialDetector * fidDetector;
+	Vision::QRCodeDetector * qrDetector;
+	Vision::PixelToRealCoordinateTransformer * cordTransformer;
+	/*
 	RectifyImage * rectifier;
 	CrateTracker * crateTracker;
-	pcrctransformation::point2f::point2fvector markers;
-*/
+	*/
+	std::vector<DataTypes::Point2D> markers;
 	cv::Mat camFrame;
 	cv::Mat rectifiedCamFrame;
 
@@ -114,7 +119,10 @@ private:
 	int numberOfStableFrames;
 	bool invokeCalibration;
 
-	//bool calibrate(unsigned int measurements = 100, unsigned int maxErrors = 100);
+
+	bool firstFrameReceived;
+
+	bool calibrate(unsigned int measurements = 100, unsigned int maxErrors = 100);
 	//void printUsage(char* invokeName);
 
 

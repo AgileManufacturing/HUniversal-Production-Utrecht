@@ -41,9 +41,11 @@
 #include <opencv2/core/core.hpp>
 #include "DataTypes/Crate.h"
 
+namespace Vision{
 /**
  * This class can detect QR-/barcodes from a Mat object
  */
+<<<<<<< HEAD
 class QRCodeDetector{
 private:
 	/**
@@ -59,6 +61,38 @@ public:
 
     void detectCrates(cv::Mat& image, std::vector<string>& reconfigureCommands);
 };
+=======
+
+    class QRCodeDetector{
+    private:
+	///@brief the scanner which scans the code from an image
+        zbar::ImageScanner scanner;
+    public:
+        ///@brief constructor sets the values for the scanner
+        QRCodeDetector();
+        ///@brief deconstructor
+        ~QRCodeDetector();
+    
+        /**
+         * @fn bool detect(cv::Mat image, std::string &result)
+         * @brief detects QR codes on the image
+         * @param image the image to detect the code on
+         * @param result the string to write the result to
+         * @return true if we have a result
+         **/
+        bool detect(cv::Mat& image, std::string& result);
+    
+        /**
+         * @fn bool detect(cv::Mat image, std::string &result)
+         * @brief detects crates using the QR code
+         * @param image the image to detect the code on
+         * @param crates list of crates
+         */
+        void detectCrates(cv::Mat& image, std::vector<DataTypes::Crate>& crates, cv::TermCriteria criteria =
+        cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 15, 0.1));
+    };
+}
+>>>>>>> b610a9128f0b1a774cbc856246e7edf0901d801f
 
 
 #endif /* QRCodeDetector_h */
