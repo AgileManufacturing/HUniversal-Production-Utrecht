@@ -88,7 +88,6 @@ CrateLocatorNode::CrateLocatorNode( ) :
 }
 
 CrateLocatorNode::~CrateLocatorNode( ) {
-	delete qrDetector;
 	delete fidDetector;
 	delete cordTransformer;
 	cv::destroyWindow(WINDOW);
@@ -126,7 +125,7 @@ void CrateLocatorNode::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 	//cv::cvtColor( cv_ptr->image, camFrame, )
 
 	std::vector<DataTypes::Crate> crates;
-	qrDetector->detectCrates(gray, crates);
+	qrDetector->detectQRCodes(gray, crates);
 
 	//transform crate coordinates
 	for (std::vector<DataTypes::Crate>::iterator it = crates.begin(); it != crates.end(); ++it) {

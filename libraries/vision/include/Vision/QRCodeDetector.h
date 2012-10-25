@@ -1,33 +1,38 @@
-//******************************************************************************
-//
-//                 Low Cost Vision
-//
-//******************************************************************************
-// Project:        DetectQRCode
-// File:           BarcodeDetector.h
-// Description:    Detects barcodes and extract values
-// Author:         Glenn Meerstra & Zep Mouris
-// Notes:          ...
-//
-// License:        GNU GPL v3
-//
-// This file is part of DetectQRCode.
-//
-// DetectQRCode is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// DetectQRCode is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with DetectQRCode.  If not, see <http://www.gnu.org/licenses/>.
-//******************************************************************************
-#ifndef DETECTBARCODE_H_
-#define DETECTBARCODE_H_
+/**
+ * @file QRCodeDetector.h
+ * @brief Detects QR codes and extract their values. If the QR code belongs to a crate, also give positionary data.
+ * @date Created: 2012-10-02
+ *
+ * @author Glenn Meerstra
+ * @author Zep Mouris
+ * @author Koen Braham
+ * @author Daan Veltman
+ *
+ * @section LICENSE
+ * License: newBSD
+ * 
+ * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ * - Neither the name of the HU University of Applied Sciences Utrecht nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **/
+
+#ifndef QRCodeDetector_h
+#define QRCodeDetector_h
 
 #include <stdlib.h>
 #include <zbar.h>
@@ -37,39 +42,24 @@
 #include "DataTypes/Crate.h"
 
 namespace Vision{
-/**
- * @brief This class can detect barcodes from a Mat object
- */
-
+    /**
+     * This class can detect QR-/barcodes from a Mat object
+     */
     class QRCodeDetector{
-    private:
-	///@brief the scanner which scans the code from an image
-        zbar::ImageScanner scanner;
-    public:
-        ///@brief constructor sets the values for the scanner
-        QRCodeDetector();
-        ///@brief deconstructor
-        ~QRCodeDetector();
-    
-        /**
-         * @fn bool detect(cv::Mat image, std::string &result)
-         * @brief detects QR codes on the image
-         * @param image the image to detect the code on
-         * @param result the string to write the result to
-         * @return true if we have a result
-         **/
-        bool detect(cv::Mat& image, std::string& result);
-    
-        /**
-         * @fn bool detect(cv::Mat image, std::string &result)
-         * @brief detects crates using the QR code
-         * @param image the image to detect the code on
-         * @param crates list of crates
-         */
-        void detectCrates(cv::Mat& image, std::vector<DataTypes::Crate>& crates, cv::TermCriteria criteria =
-        cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 15, 0.1));
-    };
+        private:
+    	///@brief the scanner which scans the code from an image
+            zbar::ImageScanner scanner;
+        public:
+            ///@brief constructor sets the values for the scanner
+            QRCodeDetector();
+            ///@brief deconstructor
+            ~QRCodeDetector();
+        
+            void detectQRCodes(cv::Mat& image, std::vector<DataTypes::Crate>& crates, cv::TermCriteria criteria =
+            cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 15, 0.1));
+            void detectQRCodes(cv::Mat& image, std::vector<std::string>& reconfigureCommands);
+        };
 }
 
 
-#endif /* DETECTBARCODE_H_ */
+#endif /* QRCodeDetector_h */
