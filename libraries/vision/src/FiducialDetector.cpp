@@ -1,31 +1,34 @@
-//******************************************************************************
-//
-//                 Low Cost Vision
-//
-//******************************************************************************
-// Project:        Fiducial
-// File:           FiducialDetector.cpp
-// Description:    Detects fiduciary markers
-// Author:         Jules Blok
-// Notes:          None
-//
-// License:        GNU GPL v3
-//
-// This file is part of Fiducial.
-//
-// Fiducial is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Fiducial is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Fiducial.  If not, see <http://www.gnu.org/licenses/>.
-//******************************************************************************
+/**
+ * @file FiducialDetector.h
+ * @brief Detects fiduciary markers.
+ * @date Created: 2012-10-02
+ *
+ * @author Jules Blok
+ * @author Koen Braham
+ * @author Daan Veltman
+ *
+ * @section LICENSE
+ * License: newBSD
+ * 
+ * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ * - Neither the name of the HU University of Applied Sciences Utrecht nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **/
 
 #include "Vision/FiducialDetector.h"
 #include <opencv2/core/core.hpp>
@@ -35,6 +38,12 @@
 #include <math.h>
 
 namespace Vision {
+	/**
+	 * Constructs the fiducial detector with default properties. The minimum and maximum radius can be changed in the constructor, all other properties can be changed after construction.
+	 * 
+	 * @param minRad The minimum radius in pixels of a circle.
+	 * @param maxRad The maximum radius in pixels of a circle.
+	 **/
 	FiducialDetector::FiducialDetector(int minRad, int maxRad) {
 		this->verbose = false;
 		this->minRad = minRad;
@@ -53,9 +62,21 @@ namespace Vision {
 		this->sigma = 2.0;
 	}
 
+	/**
+	 * Virtual function to destruct the fiducial detector.
+	 **/
 	FiducialDetector::~FiducialDetector( ) {
 	}
 
+	/**
+	 * Draw a polar coordinate line.
+	 * 
+	 * @param image The image to draw on.
+	 * @param rho The distance from point to origin.
+	 * @param theta The angle.
+	 * @param color The color to draw the line with.
+	 * @param thickness The thickness of the line.
+	 **/
 	inline void FiducialDetector::polarLine(cv::Mat& image, float rho, float theta, cv::Scalar color, int thickness) {
 		if (theta < M_PI / 4. || theta > 3. * M_PI / 4.) { // ~vertical line
 		// point of intersection of the line with first row
@@ -74,6 +95,13 @@ namespace Vision {
 		}
 	}
 
+	/**
+	 *  Detects all fiducials in the image and automatically calls detectCrosshair for each fiducial adding the center points to the points vector.
+	 *
+	 *  @param image Image with the fiducials
+	 *  @param points Output vector that will contain the center points
+	 *  @param debugImage Output image where debug information will be drawn on, set to NULL for no debug information
+	 */
 	void FiducialDetector::detect(cv::Mat& image, std::vector<cv::Point2f>& points, cv::Mat* debugImage) {
 		// Apply gaussian blur
 		cv::Mat blur;
@@ -132,25 +160,68 @@ namespace Vision {
 		}
 	}
 
+	/**
+	 * Compares two OpenCV Vec2f's to see which has a bigger rho (distance).
+	 * 
+	 * @param i The first Vec2f.
+	 * @param j The second Vec2f.
+	 *
+	 * @return True if first vector's rho is smaller than the second vector's rho, false otherwise.
+	 **/
 	bool rhoComp(cv::Vec2f i, cv::Vec2f j) {
 		return (i[0] < j[0]);
 	}
+	
+	/**
+	 * Calculate the median rho (distance) of the lines found.
+	 *
+	 * @param first First line found.
+	 * @param last Last line found.
+	 *
+	 * @return The median line location.
+	 **/
 	inline cv::Vec2f medoidRho(std::vector<cv::Vec2f>::iterator first, std::vector<cv::Vec2f>::iterator last) {
 		std::vector<cv::Vec2f>::iterator n = first + std::distance(first, last) / 2;
 		nth_element(first, n, last, rhoComp);
 		return *n;
 	}
+	/**
+	 * Compares two OpenCV Vec2f's to see which has a bigger theta (angle).
+	 * 
+	 * @param i The first Vec2f.
+	 * @param j The second Vec2f.
+	 *
+	 * @return True if first vector's theta is smaller than the second vector's theta, false otherwise.
+	 **/
 	bool thetaComp(cv::Vec2f i, cv::Vec2f j) {
 		return (i[1] < j[1]);
 	}
+
+	/**
+	 * Calculate the median theta (angle) of the lines found.
+	 *
+	 * @param first First line found.
+	 * @param last Last line found.
+	 *
+	 * @return The median line location in the iterator.
+	 **/
 	inline cv::Vec2f medoidTheta(std::vector<cv::Vec2f>::iterator first, std::vector<cv::Vec2f>::iterator last) {
 		std::vector<cv::Vec2f>::iterator n = first + std::distance(first, last) / 2;
 		nth_element(first, n, last, thetaComp);
 		return *n;
 	}
 
-	bool FiducialDetector::detectCrosshair(cv::Mat& image, cv::Point2f& center, const cv::Mat& mask,
-	        cv::Mat* debugImage) {
+	/** 
+	 * Automatically called by detect(). After the fiducial has been segmented this function will determine the center point of the crosshair.
+	 *
+	 * @param image Image with the crosshair
+	 * @param center Output point that will be set to the center point
+	 * @param mask Operation mask of the same size as image
+	 * @param debugImage Output image where debug information will be drawn on, set to NULL for no debug information
+	 *
+	 * @return True if center point was detected, false if detection failed.
+	 **/
+	bool FiducialDetector::detectCrosshair(cv::Mat& image, cv::Point2f& center, const cv::Mat& mask, cv::Mat* debugImage) {
 		cv::Mat filtered;
 		cv::bilateralFilter(image, filtered, 5, 50, 50);
 
@@ -264,6 +335,15 @@ namespace Vision {
 		return false;
 	}
 
+	/**
+	 * Detect the center line.
+	 * 
+	 * @param centerLine Pointer to the center line that will be detected.
+	 * @param lines Lines as detected where the center line will lie between.
+	 * @param debugImage Output image where debug information will be drawn on, set to NULL for no debug information
+	 *
+	 * @return True if a center line could be detected, false otherwise.
+	 **/
 	bool FiducialDetector::detectCenterLine(cv::Vec2f& centerLine, std::vector<cv::Vec2f> lines, cv::Mat* debugImage) {
 		if (lines.size() < 2) {
 			if (verbose)
@@ -317,6 +397,14 @@ namespace Vision {
 		return true;
 	}
 
+	/**
+	 * Order a list of three fiducial points. When you have three fiducials there will be three different distances, longest, shortest, and the middle distance.
+	 * points[0] = point where the middle and longest lines meet
+	 * points[1] = point where the shortest and middle lines meet
+	 * points[2] = point where the shortest and longest lines meet
+	 *
+	 * @param points The points to be ordered.
+	 */
 	void FiducialDetector::order(std::vector<cv::Point2f>& points) {
 		// Find the two diagonal opposite points
 		float distance = 0;
