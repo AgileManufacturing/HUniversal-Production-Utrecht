@@ -101,12 +101,9 @@ private:
 	Vision::QRCodeDetector * qrDetector;
 	Vision::PixelToRealCoordinateTransformer * cordTransformer;
 	/*
-	RectifyImage * rectifier;
 	CrateTracker * crateTracker;
 	*/
 	std::vector<DataTypes::Point2D> markers;
-	cv::Mat camFrame;
-	cv::Mat rectifiedCamFrame;
 
 	ros::NodeHandle node;
 	ros::Publisher crateEventPublisher;
@@ -117,12 +114,20 @@ private:
 
 	double crateMovementThresshold;
 	int numberOfStableFrames;
-	bool invokeCalibration;
 
-	bool firstFrameReceived;
-	bool calibrate(unsigned int measurements = 100, unsigned int maxErrors = 100);
-	void imageCallback(const sensor_msgs::ImageConstPtr& msg);
+	// For calibration
+	bool invokeCalibration;
+	std::vector<cv::Point2f> fid1_buffer;
+	std::vector<cv::Point2f> fid2_buffer;
+	std::vector<cv::Point2f> fid3_buffer;
+	unsigned int measurementCount;
+	unsigned int measurements;
+	unsigned int failCount;
 
 	image_transport::ImageTransport imageTransport;
 	image_transport::Subscriber sub;
+
+	bool calibrate(unsigned int measurements = 100, unsigned int maxErrors = 100);
+	void calibrateCallback(const sensor_msgs::ImageConstPtr& msg);
+	void crateLocateCallback(const sensor_msgs::ImageConstPtr& msg);
 };
