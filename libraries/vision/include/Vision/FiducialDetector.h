@@ -1,31 +1,34 @@
-//******************************************************************************
-//
-//                 Low Cost Vision
-//
-//******************************************************************************
-// Project:        Fiducial
-// File:           FiducialDetector.h
-// Description:    Detects fiduciary markers
-// Author:         Jules Blok
-// Notes:          None
-//
-// License:        GNU GPL v3
-//
-// This file is part of Fiducial.
-//
-// Fiducial is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Fiducial is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Fiducial.  If not, see <http://www.gnu.org/licenses/>.
-//******************************************************************************
+/**
+ * @file FiducialDetector.h
+ * @brief Detects fiduciary markers.
+ * @date Created: 2012-10-02
+ *
+ * @author Jules Blok
+ * @author Koen Braham
+ * @author Daan Veltman
+ *
+ * @section LICENSE
+ * License: newBSD
+ * 
+ * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ * - Neither the name of the HU University of Applied Sciences Utrecht nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **/
 
 #ifndef FIDUCIALDETECTOR_H_
 #define FIDUCIALDETECTOR_H_
@@ -36,105 +39,103 @@
 
 namespace Vision {
 
-	/*! \brief Detects fiducial markers.
-	 *
-	 *  This class allows you to locate the cross.png
-	 *  and the crosshair.png fiducials in an image.
-	 */
+	/**
+	 * Detects fiducial markers in an image.
+	 **/
 	class FiducialDetector {
 	private:
-		//! Draw a polar coordinate line
 		void polarLine(cv::Mat& image, float rho, float theta, cv::Scalar color, int thickness);
-		//! Determine the center line
 		bool detectCenterLine(cv::Vec2f& centerLine, std::vector<cv::Vec2f> lines, cv::Mat* debugImage = NULL);
 	public:
-		//! Turn on console debug messages
+		/**
+		 * var bool verbose
+		 * Turn on and off console messages.
+		 **/
 		bool verbose;
 
-		//! Gaussian blur size
+		/**
+		 * var int blur
+		 * The size of a gaussian blur.
+		 **/
 		int blur;
-		//! Gaussian blur sigma
+		/**
+		 * var double sigma
+		 * The sigma of a gaussian blur.
+		 **/
 		double sigma;
-		//! Vote threshold for circles
+		
+		/**
+		 * var int circleVotes
+		 * The minimum number of votes needed for an object to be detected as a circle.
+		 **/
 		int circleVotes;
-		//! Minimum distance between circles
+		/**
+		 * var double distance
+		 * The minimum distance between circles in pixels.
+		 **/
 		double distance;
-		//! Minimum circle radius
+		/**
+		 * var int minRad
+		 * The minimum radius in pixels of a circle.
+		 **/
 		int minRad;
-		//! Maximum circle radius
+		/**
+		 * var int maxRad
+		 * The maximum radius in pixels of a circle.
+		 **/
 		int maxRad;
-		//! High canny threshold for circle detection (low threshold is twice smaller)
+		/**
+		 * var double circleThreshold
+		 * High canny threshold for circle detection (low threshold is twice smaller).
+		 **/
 		double circleThreshold;
 
-		//! Starting vote threshold for lines, thinner lines get less votes.
+		/**
+		 * var int lineVotes
+		 * Starting vote threshold for lines, thinner lines get less votes.
+		 **/
 		int lineVotes;
-		//! Maximum amount of lines that can be found.
+		/**
+		 * var unsigned int maxlines
+		 * Maximum amount of lines that can be found.
+		 **/
 		unsigned int maxLines;
-		//! Minimum distance between lines to use for the center line.
+		/**
+		 * var float minDist
+		 * Minimum distance between lines to use for the center line.
+		 **/
 		float minDist;
-		//! Maximum distance between lines to use for the center line.
+		/**
+		 * var float maxDist
+		 * Maximum distance between lines to use for the center line.
+		 **/
 		float maxDist;
-		//! Low canny threshold for line detection
+		/**
+		 * var double lowThreshold
+		 * Low canny threshold for line detection.
+		 **/
 		double lowThreshold;
-		//! High canny threshold for line detection
+		/**
+		 * var double highThreshold
+		 * High canny threshold for line detection.
+		 **/
 		double highThreshold;
 
-		/*! \brief The FiducialDetector constructor
-		 *
-		 *  Constructs the fiducial detector with default properties.
-		 *  The minimum and maximum radius can be changed in the constructor,
-		 *  all other properties can be changed after construction.
-		 */
 		FiducialDetector(int minRad = 20, int maxRad = 40);
-
-		//! The FiducialDetector deconstructor
 		virtual ~FiducialDetector( );
 
-		/*! \brief Detects all fiducials in an image
-		 *
-		 *  Detects all fiducials in the image and automatically
-		 *  calls detectCrosshair for each fiducial adding the
-		 *  center points to the points vector.
-		 *
-		 *  \param image Image with the fiducials
-		 *  \param points Output vector that will contain the
-		 *  center points
-		 *  \param debugImage Output image where debug information
-		 *  will be drawn on, set to NULL for no debug information
-		 */
 		void detect(cv::Mat& image, std::vector<cv::Point2f>& points, cv::Mat* debugImage = NULL);
-
-		/*! \brief Detects the center point
-		 *
-		 *  Automatically called by detect(). After the fiducial has
-		 *  been segmented this function will determine the center
-		 *  point of the crosshair.
-		 *
-		 *  \sa detect()
-		 *
-		 *  \param image Image with the crosshair
-		 *  \param center Output point that will be set to the
-		 *  center point
-		 *  \param mask Operation mask of the same size as image
-		 *  \param debugImage Output image where debug information
-		 *  will be drawn on, set to NULL for no debug information
-		 *  \return <i>true</i> if center point was detected\n
-		 *  <i>false</i> if detection failed
-		 */
-		bool detectCrosshair(cv::Mat& image, cv::Point2f& center, const cv::Mat& mask = cv::Mat(), cv::Mat* debugImage =
-		        NULL);
-
-		/*! \brief Order a list of fiducial points
-		 *
-		 *  Orders a vector with 3 fiducial points according
-		 *  to the clockwise crate ordering.
-		 */
+		bool detectCrosshair(cv::Mat& image, cv::Point2f& center, const cv::Mat& mask = cv::Mat(), cv::Mat* debugImage = NULL);
 		static void order(std::vector<cv::Point2f>& points);
 
-		/*! \brief Calculate distance
+		/**
+		 * Calculate distance between two fiducial points
 		 *
-		 *  Calculates the distance between two fiducial points
-		 */
+		 * @param pt1 Point 1.
+		 * @param pt2 Point 2.
+		 *
+		 * @return The distance between the two points in pixels.
+		 **/
 		static inline float fiducialDistance(const cv::Point2f& pt1, const cv::Point2f& pt2) {
 			float dx = pt1.x-pt2.x;
 			float dy = pt1.y-pt2.y;

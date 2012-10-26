@@ -155,15 +155,15 @@ bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErro
 		// TODO: Determine usefulness?
 		// It was used in the ROS_INFO below..
 		/*
-		 // Determine mean deviation
-		 double totalDistance = 0;
-		 for (std::vector<DataTypes::Point2D>::iterator it = fid1_buffer.begin(); it != fid1_buffer.end(); ++it)
-		 totalDistance += fid1.distance(*it);
-		 for (std::vector<DataTypes::Point2D>::iterator it = fid2_buffer.begin(); it != fid2_buffer.end(); ++it)
-		 totalDistance += fid2.distance(*it);
-		 for (std::vector<DataTypes::Point2D>::iterator it = fid3_buffer.begin(); it != fid3_buffer.end(); ++it)
-		 totalDistance += fid3.distance(*it);
-		 float meanDeviation = totalDistance / double(fid1_buffer.size() + fid2_buffer.size() + fid3_buffer.size());*/
+		// Determine mean deviation
+		double totalDistance = 0;
+		for (std::vector<DataTypes::Point2D>::iterator it = fid1_buffer.begin(); it != fid1_buffer.end(); ++it)
+			totalDistance += fid1.distance(*it);
+		for (std::vector<DataTypes::Point2D>::iterator it = fid2_buffer.begin(); it != fid2_buffer.end(); ++it)
+			totalDistance += fid2.distance(*it);
+		for (std::vector<DataTypes::Point2D>::iterator it = fid3_buffer.begin(); it != fid3_buffer.end(); ++it)
+			totalDistance += fid3.distance(*it);
+		float meanDeviation = totalDistance / double(fid1_buffer.size() + fid2_buffer.size() + fid3_buffer.size());*/
 
 		ROS_INFO( "Calibration markers updated.\nMeasured: %d Failed: %d", measurements, failCount);
 		return true;
