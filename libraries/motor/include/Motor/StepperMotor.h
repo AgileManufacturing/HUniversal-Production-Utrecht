@@ -106,6 +106,9 @@ namespace Motor{
         void disableAngleLimitations(void);
         void updateAngle(void);
 
+        void setIncrementalMode();
+        void setAbsoluteMode();
+
     private:
         /**
          * @var double currentAngle
