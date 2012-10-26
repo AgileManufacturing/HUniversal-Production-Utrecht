@@ -1,7 +1,7 @@
 /**
  * @file FiducialDetector.h
  * @brief Detects fiduciary markers.
- * @date Created: 2012-10-02
+ * @date Created: 2011-11-11
  *
  * @author Jules Blok
  * @author Koen Braham

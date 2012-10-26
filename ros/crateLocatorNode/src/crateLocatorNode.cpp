@@ -252,7 +252,7 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 
 	// Detect all QR crates in the image.
 	std::vector<DataTypes::Crate> crates;
-	qrDetector->detectCrates(gray, crates);
+	qrDetector->detectQRCodes(gray, crates);
 
 	// Transform crate coordinates
 	for (std::vector<DataTypes::Crate>::iterator it = crates.begin(); it != crates.end(); ++it) {

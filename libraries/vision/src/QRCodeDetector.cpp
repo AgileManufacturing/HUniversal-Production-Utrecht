@@ -1,7 +1,7 @@
 /**
  * @file QRCodeDetector.cpp
  * @brief Detects QR codes and extract their values. If the QR code belongs to a crate, also give positionary data.
- * @date Created: 2012-10-02
+ * @date Created: 2011-11-11
  *
  * @author Glenn Meerstra
  * @author Zep Mouris
