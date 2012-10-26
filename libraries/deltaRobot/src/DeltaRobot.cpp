@@ -223,9 +223,9 @@ namespace DeltaRobot{
 
     /**
     * Calibrates a single motor by:
-    * -# Moving it to the sensor in large steps until the sensor is pushed
-    * -# Moving it away from the sensor in large steps until the sensor is no longer pushed
-    * -# Moving back to the sensor in tiny steps until the sensor is pushed.
+    * -# Moving it to the sensor in big steps until the sensor is pushed
+    * -# Moving it away from the sensor in big steps until the sensor is no longer pushed
+    * -# Moving back to the sensor in small steps until the sensor is pushed.
     * -# Using the moved steps to calculate the deviation
     * 
     * @param motorIndex Index of the motor to be calibrated. When standing in front of the robot looking towards it, 0 is the right motor, 1 is the front motor and 2 is the left motor.
@@ -242,7 +242,7 @@ namespace DeltaRobot{
         // actualAngleInSteps keeps track of how many motor steps the motor has moved. This is necessary to avoid accummulating errors.
         int actualAngleInSteps = moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, true);
 
-        // Move away from the sensor in large steps until it is no longer pushed.
+        // Move away from the sensor in big steps until it is no longer pushed.
         motorRotation.angle = -motorRotation.angle;
         actualAngleInSteps += moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, false);
         
