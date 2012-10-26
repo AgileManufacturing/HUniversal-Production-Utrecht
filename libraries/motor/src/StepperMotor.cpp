@@ -167,7 +167,7 @@ namespace Motor{
 	 * Writes the rotation data into the motor controller.
 	 * 
 	 * @param motorRotation A MotorRotation.
-	 * @param deviationOn Sets whether or not to use the deviation. Defaults to true.
+	 * @param useDeviation Sets whether or not to use the deviation. Defaults to true.
 	 **/
 	void StepperMotor::writeRotationData(const DataTypes::MotorRotation& motorRotation, bool useDeviation){
 		if(!poweredOn){
