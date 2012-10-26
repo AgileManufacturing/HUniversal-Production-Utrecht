@@ -32,6 +32,7 @@
 
 #pragma once
 #include <Utilities/Utilities.h>
+#include <Motor/CRD514KD.h>
 
 namespace DeltaRobot{
 	namespace Measures{
@@ -119,5 +120,17 @@ namespace DeltaRobot{
 		 * The max z-coordinate of the effector boundary box in millimeters.
 		 **/
 		const double BOUNDARY_BOX_MAX_Z = -180;
+
+		/**
+		 * @var double CALIBRATION_STEP_SMALL
+		 * The size of the small steps in the calibration in radians.
+		 **/
+		const double CALIBRATION_STEP_SMALL = Motor::CRD514KD::MOTOR_STEP_ANGLE;
+		
+		/**
+		 * @var double CALIBRATION_STEP_BIG
+		 * The size of the big calibration steps in radians. Currently equal to 20 small calibration steps.
+		 **/
+		 const double CALIBRATION_STEP_BIG = CALIBRATION_STEP_SMALL * 20;
 	}
 }

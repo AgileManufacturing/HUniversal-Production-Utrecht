@@ -292,4 +292,18 @@ namespace Motor{
 	void StepperMotor::updateAngle(void){
 		currentAngle = setAngle;
 	}
+
+	/**
+	 * Sets the motor controller to incremental mode.
+	 **/
+	 void StepperMotor::setIncrementalMode(){
+	 	modbus->writeU16(motorIndex, Motor::CRD514KD::Registers::OP_POSMODE, 0);
+	 }
+
+	/**
+	 * Sets the motor controller to absolute mode.
+	 **/
+	 void StepperMotor::setAbsoluteMode(){
+	 	modbus->writeU16(motorIndex, Motor::CRD514KD::Registers::OP_POSMODE, 1);
+	 }
 }
