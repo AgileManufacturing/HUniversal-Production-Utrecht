@@ -201,17 +201,16 @@ namespace DeltaRobot{
 
     /**
      * Incrementally moves the motor until the sensor is of the value given in sensorValue. 
-     * Calculates how many steps are made on basis of the given presetAngle, this angle must be written to the motor controller using writeRotationData() beforehand. 
+     * Calculates how many steps are made, and returns this as an int. 
      *
      * @param motorIndex The index of the motor
      * @param motorRotation The MotorRotation object that holds that the rotation data.
      * @param sensorValue value that the sensor needs to be for the motor to stop.
-     * @param useDeviation Sets whether or not to use the deviation. Defaults to true. 
      *
      * @return The amount of motor steps the motor has moved.
      **/
-    int DeltaRobot::moveMotorUntilSensorIsOfValue(int motorIndex, DataTypes::MotorRotation motorRotation, bool sensorValue, bool useDeviation){
-        motors[motorIndex]->writeRotationData(motorRotation, useDeviation);
+    int DeltaRobot::moveMotorUntilSensorIsOfValue(int motorIndex, DataTypes::MotorRotation motorRotation, bool sensorValue){
+        motors[motorIndex]->writeRotationData(motorRotation, false);
 
         int steps = 0;
         do {
@@ -224,32 +223,32 @@ namespace DeltaRobot{
 
     /**
     * Calibrates a single motor by:
-    * * Moving it to the sensor in large steps until the sensor is pushed
-    * * Moving it away from the sensor in large steps until the sensor is no longer pushed
-    * * Moving back to the sensor in tiny steps until the sensor is pushed.
-    * * Using the moved steps to calculate the deviation
+    * -# Moving it to the sensor in large steps until the sensor is pushed
+    * -# Moving it away from the sensor in large steps until the sensor is no longer pushed
+    * -# Moving back to the sensor in tiny steps until the sensor is pushed.
+    * -# Using the moved steps to calculate the deviation
     * 
     * @param motorIndex Index of the motor to be calibrated. When standing in front of the robot looking towards it, 0 is the right motor, 1 is the front motor and 2 is the left motor.
     **/
     void DeltaRobot::calibrateMotor(int motorIndex){
         std::cout << "[DEBUG] Calibrating motor number " << motorIndex << std::endl;
         
-        // Setup for incremental motion in steps equal to CALIBRATION_RESOLUTION.
+        // Setup for incremental motion in big steps, to get to the sensor quickly.
         motors[motorIndex]->setIncrementalMode();
         DataTypes::MotorRotation motorRotation;
-        motorRotation.angle = -Measures::CALIBRATION_RESOLUTION * 20;
+        motorRotation.angle = -Measures::CALIBRATION_STEP_BIG;
         
         // Move to the sensor in large steps until it is pushed
-        // actualAngleInSteps keeps track of how many microsteps the motor has moved. This is necessary to avoid accummulating errors.
-        int actualAngleInSteps = moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, true, false);
+        // actualAngleInSteps keeps track of how many motor steps the motor has moved. This is necessary to avoid accummulating errors.
+        int actualAngleInSteps = moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, true);
 
         // Move away from the sensor in large steps until it is no longer pushed.
         motorRotation.angle = -motorRotation.angle;
-        actualAngleInSteps += moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, false, false);
+        actualAngleInSteps += moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, false);
         
         // Move back to the sensor in small steps until it is pushed.
-        motorRotation.angle = -Measures::CALIBRATION_RESOLUTION;
-        actualAngleInSteps += moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, true, false);
+        motorRotation.angle = -Measures::CALIBRATION_STEP_SMALL;
+        actualAngleInSteps += moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, true);
 
         // calculate and set the deviation.
         double deviation = (actualAngleInSteps * Motor::CRD514KD::MOTOR_STEP_ANGLE) + Measures::MOTORS_FROM_ZERO_TO_TOP_POSITION;
