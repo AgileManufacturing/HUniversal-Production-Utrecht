@@ -125,6 +125,12 @@ namespace DeltaRobot{
 		 * @var double CALIBRATION_RESOLUTION
 		 * The resolution at which the calibration takes place in radians.
 		 **/
-		const double CALIBRATION_RESOLUTION = Motor::CRD514KD::MOTOR_STEP_ANGLE;
+		const double CALIBRATION_STEP_SMALL = Motor::CRD514KD::MOTOR_STEP_ANGLE;
+		
+		/**
+		 * @var double CALIBRATION_STEP_BIG
+		 * The size of the big calibration steps in radians. Currently equal to 20 small calibration steps.
+		 **/
+		 const double CALIBRATION_STEP_BIG = CALIBRATION_STEP_SMALL * 20;
 	}
 }
