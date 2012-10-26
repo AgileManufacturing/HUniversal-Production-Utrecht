@@ -118,6 +118,6 @@ namespace DeltaRobot{
 
 
             bool isValidAngle(int motorIndex, double angle);
-            int moveMotorUntilSensorIsOfValue(int motorIndex, double presetAngle, bool sensorValue);
+            int moveMotorUntilSensorIsOfValue(int motorIndex, DataTypes::MotorRotation motorRotation, bool sensorValue, bool useDeviation);
       };
 }
