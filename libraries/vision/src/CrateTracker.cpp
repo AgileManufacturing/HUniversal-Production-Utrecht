@@ -1,55 +1,55 @@
-//******************************************************************************
-//
-//                 Low Cost Vision
-//
-//******************************************************************************
-// Project:        VisionNode
-// File:           CrateTracker.cpp
-// Description:    keeps track of the crates and generates events like: new crate, crate removed or crate moved.
-// Author:         Kasper van Nieuwland en Zep Mouris
-// Notes:          ...
-//
-// License:        GNU GPL v3
-//
-// This file is part of VisionNode.
-//
-// VisionNode is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// VisionNode is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with VisionNode.  If not, see <http://www.gnu.org/licenses/>.
-//******************************************************************************
+/**
+ * @file CrateTracker.cpp
+ * @brief Keeps track of the crates and generates events like: new crate, crate removed or crate moved.
+ * @date Created: 2011-11-11
+ *
+ * @author Kasper van Nieuwland
+ * @author Zep Mouris
+ * @author Koen Braham
+ * @author Daan Veltman
+ *
+ * @section LICENSE
+ * License: newBSD
+ *
+ * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ * - Neither the name of the HU University of Applied Sciences Utrecht nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **/
+
 #include <Vision/CrateTracker.h>
-#include <Crate.h>
+#include <DataTypes/Crate.h>
 #include <map>
 
 CrateTracker::CrateTracker(int stableFrames, double movementThresshold) :
 		stableFrames(stableFrames), movementThresshold(movementThresshold) {
 }
 
-std::vector<CrateEvent> CrateTracker::update(std::vector<Crate> updatedCrates) {
+std::vector<CrateEvent> CrateTracker::update(std::vector<DataTypes::Crate> updatedCrates) {
 	std::vector<CrateEvent> events;
 
-	for (std::map<std::string, exCrate>::iterator it = knownCrates.begin();
-		it != knownCrates.end(); ++it) {
+	// Disable all crates (mark for removal).
+	for (std::map<std::string, exCrate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it) {
 		it->second.exists = false;
 	}
 
-	for (std::vector<Crate>::iterator it = updatedCrates.begin();
-			it != updatedCrates.end(); ++it) {
-		//ROS_INFO("%f %f", it->getPoints()[0].x, it->getPoints()[1].x);
-
+	for (std::vector<DataTypes::Crate>::iterator it = updatedCrates.begin(); it != updatedCrates.end(); ++it) {
 		if (knownCrates.find(it->name) == knownCrates.end()) {
-			//does not exists in knownCrates yet
-
-			//add crate
+			// Crate does not exists in knownCrates yet, add the crate
 			exCrate newCrate = exCrate(*it);
 			newCrate.exists = true;
 			newCrate.oldSituation = false;
@@ -59,17 +59,17 @@ std::vector<CrateEvent> CrateTracker::update(std::vector<Crate> updatedCrates) {
 
 			knownCrates.insert(std::pair<std::string, exCrate>(it->name, newCrate));
 		} else {
-			//already exists
+			// Crate already exists, update location
 			exCrate& crate = knownCrates.find(it->name)->second;
 			crate.exists = true;
 
 			//check for movement
 			if (hasChanged(crate, (*it))) {
 				if (crate.stable) {
-					//crate began to move
-					//add moving event
+					//crate began to move as old state was stable. Push moving event
 					events.push_back(CrateEvent(CrateEvent::type_moving, crate.name));
 				}
+
 				//reset timer
 				crate.framesLeft = stableFrames;
 				crate.stable = false;
@@ -78,6 +78,7 @@ std::vector<CrateEvent> CrateTracker::update(std::vector<Crate> updatedCrates) {
 				//store new location in knownCrates
 				std::vector<cv::Point2f> tempPoints = it->getPoints();
 				crate.setPoints(tempPoints);
+
 			} else if (!crate.stable) {
 				crate.framesLeft--;
 				if (crate.framesLeft <= 0) {
@@ -86,14 +87,18 @@ std::vector<CrateEvent> CrateTracker::update(std::vector<Crate> updatedCrates) {
 					//add event
 					if (crate.oldSituation) {
 						//crate moved
-						events.push_back(CrateEvent(CrateEvent::type_moved, crate.name, crate.rect().center.x, crate.rect().center.y, crate.rect().angle));
+						events.push_back(
+						        CrateEvent(CrateEvent::type_moved, crate.name, crate.rect().center.x,
+						                crate.rect().center.y, crate.rect().angle));
 						//store new location in knownCrates
 						std::vector<cv::Point2f> tempPoints = it->getPoints();
 						crate.setPoints(tempPoints);
 						crate.newSituation = true;
 					} else if (!crate.oldSituation && crate.newSituation) {
 						//crate entered
-						events.push_back(CrateEvent(CrateEvent::type_in, crate.name, crate.rect().center.x, crate.rect().center.y, crate.rect().angle));
+						events.push_back(
+						        CrateEvent(CrateEvent::type_in, crate.name, crate.rect().center.x,
+						                crate.rect().center.y, crate.rect().angle));
 						crate.oldSituation = true;
 					}
 				}
@@ -101,10 +106,9 @@ std::vector<CrateEvent> CrateTracker::update(std::vector<Crate> updatedCrates) {
 		}
 	}
 
-	//crates that were not updated
+	// Remove all crate that were not found in the update loop. These have been marked as non existing.
 	std::vector<std::string> cratesToBeRemoved;
-	for (std::map<std::string, exCrate>::iterator it = knownCrates.begin();
-			it != knownCrates.end(); ++it) {
+	for (std::map<std::string, exCrate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it) {
 		if (!it->second.exists) {
 			exCrate& crate = it->second;
 			if (crate.stable) {
@@ -118,8 +122,7 @@ std::vector<CrateEvent> CrateTracker::update(std::vector<Crate> updatedCrates) {
 
 			crate.framesLeft--;
 			if (crate.framesLeft <= 0) {
-				if(crate.oldSituation)
-				{
+				if (crate.oldSituation) {
 					//add event crate left
 					events.push_back(CrateEvent(CrateEvent::type_out, crate.name));
 				}
@@ -132,40 +135,33 @@ std::vector<CrateEvent> CrateTracker::update(std::vector<Crate> updatedCrates) {
 	}
 
 	//remove crates
-	for(std::vector<std::string>::iterator it = cratesToBeRemoved.begin(); it != cratesToBeRemoved.end(); it++)
-	{
+	for (std::vector<std::string>::iterator it = cratesToBeRemoved.begin(); it != cratesToBeRemoved.end(); it++) {
 		knownCrates.erase(*it);
 	}
 	return events;
 }
 
-bool CrateTracker::getCrate(const std::string& name, exCrate& result)
-{
+bool CrateTracker::getCrate(const std::string& name, exCrate& result) {
 	std::map<std::string, exCrate>::iterator it = knownCrates.find(name);
-	if(it != knownCrates.end() && it->second.getState() != exCrate::state_non_existing)
-	{
+	if (it != knownCrates.end() && it->second.getState() != exCrate::state_non_existing) {
 		result = it->second;
 		return true;
-	}
-	else
-	{
+	} else {
 		return false;
 	}
 }
 
-std::vector<exCrate> CrateTracker::getAllCrates()
-{
+std::vector<exCrate> CrateTracker::getAllCrates( ) {
 	std::vector<exCrate> allCrates;
-	for (std::map<std::string, exCrate>::iterator it = knownCrates.begin();
-		it != knownCrates.end(); ++it) {
-		if(it->second.getState() != exCrate::state_non_existing){
+	for (std::map<std::string, exCrate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it) {
+		if (it->second.getState() != exCrate::state_non_existing) {
 			allCrates.push_back(it->second);
 		}
 	}
 	return allCrates;
 }
 
-bool CrateTracker::hasChanged(const Crate& newCrate, const Crate& oldCrate) {
+bool CrateTracker::hasChanged(const DataTypes::Crate& newCrate, const DataTypes::Crate& oldCrate) {
 	const std::vector<cv::Point2f>& oldp = oldCrate.getPoints();
 	const std::vector<cv::Point2f>& newp = newCrate.getPoints();
 	for (int i = 0; i < 3; i++) {
@@ -178,18 +174,14 @@ bool CrateTracker::hasChanged(const Crate& newCrate, const Crate& oldCrate) {
 	return false;
 }
 
-exCrate::crate_state exCrate::getState()
-{
-	if(oldSituation){
-		if(stable){
+exCrate::crate_state exCrate::getState( ) {
+	if (oldSituation) {
+		if (stable) {
 			return state_stable;
-		}
-		else{
+		} else {
 			return state_moving;
 		}
 	}
 	return state_non_existing;
 }
-
-
 
