@@ -122,8 +122,8 @@ namespace DeltaRobot{
 		const double BOUNDARY_BOX_MAX_Z = -180;
 
 		/**
-		 * @var double CALIBRATION_RESOLUTION
-		 * The resolution at which the calibration takes place in radians.
+		 * @var double CALIBRATION_STEP_SMALL
+		 * The size of the small steps in the calibration in radians.
 		 **/
 		const double CALIBRATION_STEP_SMALL = Motor::CRD514KD::MOTOR_STEP_ANGLE;
 		
