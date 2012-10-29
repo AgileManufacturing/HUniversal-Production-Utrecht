@@ -49,6 +49,7 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable(), bbUtils() {
 	// Create the map with moduleType mapped to package name and node name
 	modulePackageNodeMap = map< int, std::pair<std::string, std::string> >();
 	modulePackageNodeMap[1] = std::pair< std::string, std::string > ("deltaRobotNode", "DeltaRobotNode");
+	modulePackageNodeMap[2] = std::pair< std::string, std::string > ("gripperTestNode", "GripperTestNode");
 
 	ros::NodeHandle nodeHandle;
 	errorModuleSubscriber = nodeHandle.subscribe("equiplet_moduleError", 5, &EquipletNode::moduleErrorCallback, this); 
