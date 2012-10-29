@@ -35,153 +35,143 @@
 #include <DataTypes/Crate.h>
 #include <map>
 
-CrateTracker::CrateTracker(int stableFrames, double movementThresshold) :
-		stableFrames(stableFrames), movementThresshold(movementThresshold) {
-}
-
-std::vector<CrateEvent> CrateTracker::update(std::vector<DataTypes::Crate> updatedCrates) {
-	std::vector<CrateEvent> events;
-
-	// Disable all crates (mark for removal).
-	for (std::map<std::string, exCrate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it) {
-		it->second.exists = false;
+namespace Vision {
+	CrateTracker::CrateTracker(int stableFrames, double movementThresshold) :
+			stableFrames(stableFrames), movementThresshold(movementThresshold) {
 	}
 
-	for (std::vector<DataTypes::Crate>::iterator it = updatedCrates.begin(); it != updatedCrates.end(); ++it) {
-		if (knownCrates.find(it->name) == knownCrates.end()) {
-			// Crate does not exists in knownCrates yet, add the crate
-			exCrate newCrate = exCrate(*it);
-			newCrate.exists = true;
-			newCrate.oldSituation = false;
-			newCrate.newSituation = true;
-			newCrate.stable = false;
-			newCrate.framesLeft = stableFrames;
+	std::vector<CrateEvent> CrateTracker::update(std::vector<DataTypes::Crate> updatedCrates) {
+		std::vector<CrateEvent> events;
 
-			knownCrates.insert(std::pair<std::string, exCrate>(it->name, newCrate));
-		} else {
-			// Crate already exists, update location
-			exCrate& crate = knownCrates.find(it->name)->second;
-			crate.exists = true;
+		// Disable all crates (mark for removal).
+		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it) {
+			it->second.exists = false;
+		}
 
-			//check for movement
-			if (hasChanged(crate, (*it))) {
-				if (crate.stable) {
-					//crate began to move as old state was stable. Push moving event
-					events.push_back(CrateEvent(CrateEvent::type_moving, crate.name));
-				}
+		for (std::vector<DataTypes::Crate>::iterator it = updatedCrates.begin(); it != updatedCrates.end(); ++it) {
+			if (knownCrates.find(it->name) == knownCrates.end()) {
+				// Crate does not exists in knownCrates yet, add the crate
+				DataTypes::Crate newCrate = DataTypes::Crate(*it);
+				newCrate.exists = true;
+				newCrate.oldSituation = false;
+				newCrate.newSituation = true;
+				newCrate.stable = false;
+				newCrate.framesLeft = stableFrames;
 
-				//reset timer
-				crate.framesLeft = stableFrames;
-				crate.stable = false;
-				crate.newSituation = true;
+				knownCrates.insert(std::pair<std::string, DataTypes::Crate>(it->name, newCrate));
+			} else {
+				// Crate already exists, update location
+				DataTypes::Crate& crate = knownCrates.find(it->name)->second;
+				crate.exists = true;
 
-				//store new location in knownCrates
-				std::vector<cv::Point2f> tempPoints = it->getPoints();
-				crate.setPoints(tempPoints);
+				//check for movement
+				if (hasChanged(crate, (*it))) {
+					if (crate.stable) {
+						//crate began to move as old state was stable. Push moving event
+						events.push_back(CrateEvent(CrateEvent::type_moving, crate.name));
+					}
 
-			} else if (!crate.stable) {
-				crate.framesLeft--;
-				if (crate.framesLeft <= 0) {
-					crate.stable = true;
+					//reset timer
+					crate.framesLeft = stableFrames;
+					crate.stable = false;
+					crate.newSituation = true;
 
-					//add event
-					if (crate.oldSituation) {
-						//crate moved
-						events.push_back(
-						        CrateEvent(CrateEvent::type_moved, crate.name, crate.rect().center.x,
-						                crate.rect().center.y, crate.rect().angle));
-						//store new location in knownCrates
-						std::vector<cv::Point2f> tempPoints = it->getPoints();
-						crate.setPoints(tempPoints);
-						crate.newSituation = true;
-					} else if (!crate.oldSituation && crate.newSituation) {
-						//crate entered
-						events.push_back(
-						        CrateEvent(CrateEvent::type_in, crate.name, crate.rect().center.x,
-						                crate.rect().center.y, crate.rect().angle));
-						crate.oldSituation = true;
+					//store new location in knownCrates
+					std::vector<cv::Point2f> tempPoints = it->getPoints();
+					crate.setPoints(tempPoints);
+
+				} else if (!crate.stable) {
+					crate.framesLeft--;
+					if (crate.framesLeft <= 0) {
+						crate.stable = true;
+
+						//add event
+						if (crate.oldSituation) {
+							//crate moved
+							events.push_back(
+							        CrateEvent(CrateEvent::type_moved, crate.name, crate.rect().center.x,
+							                crate.rect().center.y, crate.rect().angle));
+							//store new location in knownCrates
+							std::vector<cv::Point2f> tempPoints = it->getPoints();
+							crate.setPoints(tempPoints);
+							crate.newSituation = true;
+						} else if (!crate.oldSituation && crate.newSituation) {
+							//crate entered
+							events.push_back(
+							        CrateEvent(CrateEvent::type_in, crate.name, crate.rect().center.x,
+							                crate.rect().center.y, crate.rect().angle));
+							crate.oldSituation = true;
+						}
 					}
 				}
 			}
 		}
-	}
 
-	// Remove all crate that were not found in the update loop. These have been marked as non existing.
-	std::vector<std::string> cratesToBeRemoved;
-	for (std::map<std::string, exCrate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it) {
-		if (!it->second.exists) {
-			exCrate& crate = it->second;
-			if (crate.stable) {
-				events.push_back(CrateEvent(CrateEvent::type_moving, crate.name));
-				//reset timer
-				crate.framesLeft = stableFrames;
-				crate.stable = false;
-			}
-
-			crate.newSituation = false;
-
-			crate.framesLeft--;
-			if (crate.framesLeft <= 0) {
-				if (crate.oldSituation) {
-					//add event crate left
-					events.push_back(CrateEvent(CrateEvent::type_out, crate.name));
+		// Remove all crate that were not found in the update loop. These have been marked as non existing.
+		std::vector<std::string> cratesToBeRemoved;
+		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it) {
+			if (!it->second.exists) {
+				DataTypes::Crate& crate = it->second;
+				if (crate.stable) {
+					events.push_back(CrateEvent(CrateEvent::type_moving, crate.name));
+					//reset timer
+					crate.framesLeft = stableFrames;
+					crate.stable = false;
 				}
 
-				//add to cratesToBeRemoved list
-				cratesToBeRemoved.push_back(it->second.name);
+				crate.newSituation = false;
 
+				crate.framesLeft--;
+				if (crate.framesLeft <= 0) {
+					if (crate.oldSituation) {
+						//add event crate left
+						events.push_back(CrateEvent(CrateEvent::type_out, crate.name));
+					}
+
+					//add to cratesToBeRemoved list
+					cratesToBeRemoved.push_back(it->second.name);
+
+				}
 			}
+		}
+
+		//remove crates
+		for (std::vector<std::string>::iterator it = cratesToBeRemoved.begin(); it != cratesToBeRemoved.end(); it++) {
+			knownCrates.erase(*it);
+		}
+		return events;
+	}
+
+	bool CrateTracker::getCrate(const std::string& name, DataTypes::Crate& result) {
+		std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.find(name);
+		if (it != knownCrates.end() && it->second.getState() != DataTypes::Crate::state_non_existing) {
+			result = it->second;
+			return true;
+		} else {
+			return false;
 		}
 	}
 
-	//remove crates
-	for (std::vector<std::string>::iterator it = cratesToBeRemoved.begin(); it != cratesToBeRemoved.end(); it++) {
-		knownCrates.erase(*it);
+	std::vector<DataTypes::Crate> CrateTracker::getAllCrates( ) {
+		std::vector<DataTypes::Crate> allCrates;
+		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it) {
+			if (it->second.getState() != DataTypes::Crate::state_non_existing) {
+				allCrates.push_back(it->second);
+			}
+		}
+		return allCrates;
 	}
-	return events;
-}
 
-bool CrateTracker::getCrate(const std::string& name, exCrate& result) {
-	std::map<std::string, exCrate>::iterator it = knownCrates.find(name);
-	if (it != knownCrates.end() && it->second.getState() != exCrate::state_non_existing) {
-		result = it->second;
-		return true;
-	} else {
+	bool CrateTracker::hasChanged(const DataTypes::Crate& newCrate, const DataTypes::Crate& oldCrate) {
+		const std::vector<cv::Point2f>& oldp = oldCrate.getPoints();
+		const std::vector<cv::Point2f>& newp = newCrate.getPoints();
+		for (int i = 0; i < 3; i++) {
+			const float dx = newp[i].x - oldp[i].x;
+			const float dy = newp[i].y - oldp[i].y;
+			if (sqrt(dx * dx + dy * dy) > movementThresshold) {
+				return true;
+			}
+		}
 		return false;
 	}
 }
-
-std::vector<exCrate> CrateTracker::getAllCrates( ) {
-	std::vector<exCrate> allCrates;
-	for (std::map<std::string, exCrate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it) {
-		if (it->second.getState() != exCrate::state_non_existing) {
-			allCrates.push_back(it->second);
-		}
-	}
-	return allCrates;
-}
-
-bool CrateTracker::hasChanged(const DataTypes::Crate& newCrate, const DataTypes::Crate& oldCrate) {
-	const std::vector<cv::Point2f>& oldp = oldCrate.getPoints();
-	const std::vector<cv::Point2f>& newp = newCrate.getPoints();
-	for (int i = 0; i < 3; i++) {
-		const float dx = newp[i].x - oldp[i].x;
-		const float dy = newp[i].y - oldp[i].y;
-		if (sqrt(dx * dx + dy * dy) > movementThresshold) {
-			return true;
-		}
-	}
-	return false;
-}
-
-exCrate::crate_state exCrate::getState( ) {
-	if (oldSituation) {
-		if (stable) {
-			return state_stable;
-		} else {
-			return state_moving;
-		}
-	}
-	return state_non_existing;
-}
-

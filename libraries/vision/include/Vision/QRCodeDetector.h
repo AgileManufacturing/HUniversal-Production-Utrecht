@@ -52,8 +52,6 @@ namespace Vision{
         public:
             ///@brief constructor sets the values for the scanner
             QRCodeDetector();
-            ///@brief deconstructor
-            ~QRCodeDetector();
         
             void detectQRCodes(cv::Mat& image, std::vector<DataTypes::Crate>& crates, cv::TermCriteria criteria =
             cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 15, 0.1));

@@ -1,33 +1,38 @@
-//******************************************************************************
-//
-//                 Low Cost Vision
-//
-//******************************************************************************
-// Project:        VisionNode
-// File:           CrateLocatorNode.cpp
-// Description:    his vision RosNode detects the crates and publishes events on the crateEvent topic.
-// Author:         Kasper van Nieuwland en Zep Mouris
-// Notes:          ...
-//
-// License:        GNU GPL v3
-//
-// This file is part of VisionNode.
-//
-// VisionNode is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// VisionNode is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with VisionNode.  If not, see <http://www.gnu.org/licenses/>.
-//******************************************************************************
+/**
+ * @file CrateLocatorNode.cpp
+ * @brief Detects the crates and publishes events on the crateEvent topic.
+ * @date Created: 2011-11-11
+ * @date Revisioned: 2012-10-22
+ *
+ * @author Kasper van Nieuwland
+ * @author Zep Mouris
+ * @author Koen Braham
+ * @author Daan Veltman
+ *
+ * @section LICENSE
+ * License: newBSD
+ *
+ * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ * - Neither the name of the HU University of Applied Sciences Utrecht nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **/
 
-#include <CrateLocatorNode/crateLocatorNode.h>
+#include <CrateLocatorNode/CrateLocatorNode.h>
 #include <DataTypes/Crate.h>
 
 #include <cv_bridge/cv_bridge.h>
@@ -80,6 +85,19 @@ CrateLocatorNode::CrateLocatorNode( ) :
 
 	cordTransformer = new Vision::PixelToRealCoordinateTransformer(rc, rc);
 
+	//crate tracking configuration
+	//the amount of pixels a point has to move before we mark it as moving.
+	// When not moving we found a deviation of ~0.5 pixel.
+	crateMovementThresshold = 0.75;
+	//the number of frames before a change is marked definite.
+	numberOfStableFrames = 10;
+	crateTracker = new Vision::CrateTracker(numberOfStableFrames, crateMovementThresshold);
+
+	//ROS things
+	crateEventPublisher = node.advertise<crateLocatorNode::CrateEventMsg>("crateEvent", 100);
+	getCrateService = node.advertiseService("getCrate", &CrateLocatorNode::getCrate, this);
+	getAllCratesService = node.advertiseService("getAllCrates", &CrateLocatorNode::getAllCrates, this);
+
 	//GUI stuff
 	cv::namedWindow(WINDOW_NAME);
 	cvSetMouseCallback(WINDOW_NAME, &on_mouse, cordTransformer);
@@ -89,7 +107,46 @@ CrateLocatorNode::~CrateLocatorNode( ) {
 	delete qrDetector;
 	delete fidDetector;
 	delete cordTransformer;
+	delete crateTracker;
 	cv::destroyWindow(WINDOW_NAME);
+}
+
+bool CrateLocatorNode::getCrate(crateLocatorNode::getCrate::Request &req, crateLocatorNode::getCrate::Response &res) {
+	DataTypes::Crate crate;
+	bool succeeded = crateTracker->getCrate(req.name, crate);
+	if (succeeded) {
+		res.state = crate.getState();
+		crateLocatorNode::CrateMsg msg;
+		msg.name = crate.name;
+		msg.x = crate.rect().center.x;
+		msg.y = crate.rect().center.y;
+		msg.angle = crate.rect().angle;
+		res.crate = msg;
+	} else {
+		res.state = DataTypes::Crate::state_non_existing;
+		crateLocatorNode::CrateMsg msg;
+		msg.name = "";
+		msg.x = 0;
+		msg.y = 0;
+		msg.angle = 0;
+		res.crate = msg;
+	}
+	return true;
+}
+
+bool CrateLocatorNode::getAllCrates(crateLocatorNode::getAllCrates::Request &req,
+        crateLocatorNode::getAllCrates::Response &res) {
+	std::vector<DataTypes::Crate> allCrates = crateTracker->getAllCrates();
+	for (std::vector<DataTypes::Crate>::iterator it = allCrates.begin(); it != allCrates.end(); ++it) {
+		res.states.push_back(it->getState());
+		crateLocatorNode::CrateMsg msg;
+		msg.name = it->name;
+		msg.x = it->rect().center.x;
+		msg.y = it->rect().center.y;
+		msg.angle = it->rect().angle;
+		res.crates.push_back(msg);
+	}
+	return true;
 }
 
 bool xComp(cv::Point2f a, cv::Point2f b) {
@@ -134,7 +191,7 @@ bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErro
 	{
 		std::cout << "[DEBUG] Starting calibration" << std::endl;
 		image_transport::Subscriber subscriber = imageTransport.subscribe("camera/image", 1,
-		        &CrateLocatorNode::calibrateCallback, this);
+		        &CrateLocatorNode::calibrateCallback, this, image_transport::TransportHints("compressed"));
 		while (ros::ok() && (measurementCount < measurements && failCount < maxErrors)) {
 			ros::spinOnce();
 		}
@@ -155,15 +212,15 @@ bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErro
 		// TODO: Determine usefulness?
 		// It was used in the ROS_INFO below..
 		/*
-		// Determine mean deviation
-		double totalDistance = 0;
-		for (std::vector<DataTypes::Point2D>::iterator it = fid1_buffer.begin(); it != fid1_buffer.end(); ++it)
-			totalDistance += fid1.distance(*it);
-		for (std::vector<DataTypes::Point2D>::iterator it = fid2_buffer.begin(); it != fid2_buffer.end(); ++it)
-			totalDistance += fid2.distance(*it);
-		for (std::vector<DataTypes::Point2D>::iterator it = fid3_buffer.begin(); it != fid3_buffer.end(); ++it)
-			totalDistance += fid3.distance(*it);
-		float meanDeviation = totalDistance / double(fid1_buffer.size() + fid2_buffer.size() + fid3_buffer.size());*/
+		 // Determine mean deviation
+		 double totalDistance = 0;
+		 for (std::vector<DataTypes::Point2D>::iterator it = fid1_buffer.begin(); it != fid1_buffer.end(); ++it)
+		 totalDistance += fid1.distance(*it);
+		 for (std::vector<DataTypes::Point2D>::iterator it = fid2_buffer.begin(); it != fid2_buffer.end(); ++it)
+		 totalDistance += fid2.distance(*it);
+		 for (std::vector<DataTypes::Point2D>::iterator it = fid3_buffer.begin(); it != fid3_buffer.end(); ++it)
+		 totalDistance += fid3.distance(*it);
+		 float meanDeviation = totalDistance / double(fid1_buffer.size() + fid2_buffer.size() + fid3_buffer.size());*/
 
 		ROS_INFO( "Calibration markers updated.\nMeasured: %d Failed: %d", measurements, failCount);
 		return true;
@@ -257,6 +314,34 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 	// Transform crate coordinates
 	for (std::vector<DataTypes::Crate>::iterator it = crates.begin(); it != crates.end(); ++it) {
 		it->draw(cv_ptr->image);
+
+		std::vector<cv::Point2f> points = it->getPoints();
+		for (int n = 0; n < 3; n++) {
+			std::cout << "[DEBUG] " << it->name << " " << points[n].x << ", " << points[n].y << std::endl;
+			DataTypes::Point2D coordinate(points[n].x, points[n].y);
+			coordinate = cordTransformer->to_rc(coordinate);
+			points[n].x = coordinate.x;
+			points[n].y = coordinate.y;
+		}
+		it->setPoints(points);
+
+		std::cout << "[DEBUG] Crate " << it->name << std::endl;
+	}
+
+	//inform the crate tracker about the seen crates
+	std::vector<Vision::CrateEvent> events = crateTracker->update(crates);
+
+	//publish events
+	for (std::vector<Vision::CrateEvent>::iterator it = events.begin(); it != events.end(); ++it) {
+		crateLocatorNode::CrateEventMsg msg;
+		msg.event = it->type;
+		msg.crate.name = it->name;
+		msg.crate.x = it->x;
+		msg.crate.y = it->y;
+		msg.crate.angle = it->angle;
+
+		ROS_INFO("%s", it->toString().c_str());
+		crateEventPublisher.publish(msg);
 	}
 
 	cv::imshow(WINDOW_NAME, cv_ptr->image);
@@ -273,7 +358,8 @@ void CrateLocatorNode::run( ) {
 		// subscribe example: (poorly documented on ros wiki)
 		// Images are transported in JPEG format to decrease tranfer time per image.
 		// imageTransport.subscribe(<base image topic>, <queue_size>, <callback>, <tracked object>, <TransportHints(<transport type>)>)
-		sub = imageTransport.subscribe("camera/image", 1, &CrateLocatorNode::crateLocateCallback, this, image_transport::TransportHints("compressed"));
+		sub = imageTransport.subscribe("camera/image", 1, &CrateLocatorNode::crateLocateCallback, this,
+		        image_transport::TransportHints("compressed"));
 		std::cout << "[DEBUG] Starting crateLocateCallback loop" << std::endl;
 
 		while (ros::ok()) {

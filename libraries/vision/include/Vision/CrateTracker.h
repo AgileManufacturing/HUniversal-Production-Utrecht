@@ -37,126 +37,98 @@
 #include <vector>
 #include <string>
 
-class CrateEvent {
-public:
-	enum crate_event_type {
-		type_in = 1, type_out = 2, type_moving = 3, type_moved = 4
-	};
-	/**
-	 * the constructor
-	 * @param type the type of crate event.
-	 * @param name the name of the crate
-	 * @param x the x coordinate
-	 * @param y the y coordinate
-	 * @param angle the angle of the crate
-	 */
-	CrateEvent(crate_event_type type = type_moving, std::string name = "", float x = 0, float y = 0, float angle = 0) :
-			type(type), name(name), x(x), y(y), angle(angle) {
-	}
-
-	/**
-	 * returns a string with the information about the event
-	 * @return string with the information about the event
-	 */
-	std::string toString( ) {
-		std::stringstream ss;
-		std::string typeString;
-		switch (type) {
-		case type_in:
-			typeString = "In";
-			break;
-		case type_out:
-			typeString = "Out";
-			break;
-		case type_moving:
-			typeString = "Moving";
-			break;
-		case type_moved:
-			typeString = "Moved";
-			break;
+namespace Vision {
+	class CrateEvent {
+	public:
+		enum crate_event_type {
+			type_in = 1, type_out = 2, type_moving = 3, type_moved = 4
+		};
+		/**
+		 * the constructor
+		 * @param type the type of crate event.
+		 * @param name the name of the crate
+		 * @param x the x coordinate
+		 * @param y the y coordinate
+		 * @param angle the angle of the crate
+		 */
+		CrateEvent(crate_event_type type = type_moving, std::string name = "", float x = 0, float y = 0,
+		        float angle = 0) :
+				type(type), name(name), x(x), y(y), angle(angle) {
 		}
-		ss << "CrateEvent: \n\ttype: " << typeString << "\n\tName: " << name << "\n\tX: " << x << "\n\tY: " << y
-		        << "\n\tAngle: " << angle;
-		return ss.str();
-	}
 
-	int type;
-	std::string name;
-	float x, y, angle;
-};
+		/**
+		 * returns a string with the information about the event
+		 * @return string with the information about the event
+		 */
+		std::string toString( ) {
+			std::stringstream ss;
+			std::string typeString;
+			switch (type) {
+			case type_in:
+				typeString = "In";
+				break;
+			case type_out:
+				typeString = "Out";
+				break;
+			case type_moving:
+				typeString = "Moving";
+				break;
+			case type_moved:
+				typeString = "Moved";
+				break;
+			}
+			ss << "CrateEvent: \n\ttype: " << typeString << "\n\tName: " << name << "\n\tX: " << x << "\n\tY: " << y
+			        << "\n\tAngle: " << angle;
+			return ss.str();
+		}
 
-class exCrate: public DataTypes::Crate {
-public:
-	enum crate_state {
-		state_stable = 1, state_moving = 2, state_non_existing = 3
+		int type;
+		std::string name;
+		float x, y, angle;
 	};
-	/**
-	 * empty constructor.
-	 */
-	exCrate( ) :
-			Crate(), oldSituation(false), newSituation(false), exists(true), stable(false), framesLeft(0) {
-	}
 
-	/**
-	 * constructor
-	 * @param crate crate from fiducial project
-	 * @param framesLeft the number of frames before a change is definite
-	 */
-	exCrate(const Crate& crate, int framesLeft = 0) :
-			Crate(crate), oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(framesLeft) {
-	}
+	class CrateTracker {
+	public:
+		/**
+		 * Constructor
+		 * @param stableFrames framesLeft the number of frames before a change is definite
+		 * @param movementThresshold the amount of mm a point has to move before it is marked as moving
+		 */
+		CrateTracker(int stableFrames, double movementThresshold);
 
-	/**
-	 * function determines the last known stable state
-	 * @return the last stable state
-	 */
-	crate_state getState( );
+		/**
+		 * determines the current state of all crates from a list of seen crates and generates CrateEvent.
+		 * @param crates list of seen crates
+		 * @return list of events
+		 */
+		std::vector<CrateEvent> update(std::vector<DataTypes::Crate> crates);
 
-	bool oldSituation, newSituation, exists, stable;
-	int framesLeft;
-};
+		/**
+		 * returns a list of crates with their last stable state
+		 * @return list with crates with their last stable state
+		 */
+		std::vector<DataTypes::Crate> getAllCrates( );
 
-class CrateTracker {
-public:
-	/**
-	 * Constructor
-	 * @param stableFrames framesLeft the number of frames before a change is definite
-	 * @param movementThresshold the amount of mm a point has to move before it is marked as moving
-	 */
-	CrateTracker(int stableFrames, double movementThresshold);
+		/**
+		 * returns the last stable state of a crate
+		 * @param name the name of the crate
+		 * @param result the last stable info of the crate
+		 * @return true if crates exists, false otherwise
+		 */
+		bool getCrate(const std::string& name, DataTypes::Crate& result);
 
-	/**
-	 * determines the current state of all crates from a list of seen crates and generates CrateEvent.
-	 * @param crates list of seen crates
-	 * @return list of events
-	 */
-	std::vector<CrateEvent> update(std::vector<DataTypes::Crate> crates);
+		int stableFrames;
+		double movementThresshold;
+		double rotationThresshold;
+	private:
+		/**
+		 * determines whether a crate has moved or rotated
+		 * @param newCrate the up to date values of the crate
+		 * @param oldCrate the previous values of the crate
+		 * @return true if moved
+		 */
+		bool hasChanged(const DataTypes::Crate& newCrate, const DataTypes::Crate& oldCrate);
+		std::map<std::string, DataTypes::Crate> knownCrates;
 
-	/**
-	 * returns a list of crates with their last stable state
-	 * @return list with crates with their last stable state
-	 */
-	std::vector<exCrate> getAllCrates( );
-
-	/**
-	 * returns the last stable state of a crate
-	 * @param name the name of the crate
-	 * @param result the last stable info of the crate
-	 * @return true if crates exists, false otherwise
-	 */
-	bool getCrate(const std::string& name, exCrate& result);
-
-	int stableFrames;
-	double movementThresshold;
-	double rotationThresshold;
-private:
-	/**
-	 * determines whether a crate has moved or rotated
-	 * @param newCrate the up to date values of the crate
-	 * @param oldCrate the previous values of the crate
-	 * @return true if moved
-	 */
-	bool hasChanged(const DataTypes::Crate& newCrate, const DataTypes::Crate& oldCrate);
-	std::map<std::string, exCrate> knownCrates;
-
-};
+	};
+}

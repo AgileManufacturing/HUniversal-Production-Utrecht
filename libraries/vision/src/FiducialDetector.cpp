@@ -171,7 +171,7 @@ namespace Vision {
 	bool rhoComp(cv::Vec2f i, cv::Vec2f j) {
 		return (i[0] < j[0]);
 	}
-	
+
 	/**
 	 * Calculate the median rho (distance) of the lines found.
 	 *
@@ -221,7 +221,8 @@ namespace Vision {
 	 *
 	 * @return True if center point was detected, false if detection failed.
 	 **/
-	bool FiducialDetector::detectCrosshair(cv::Mat& image, cv::Point2f& center, const cv::Mat& mask, cv::Mat* debugImage) {
+	bool FiducialDetector::detectCrosshair(cv::Mat& image, cv::Point2f& center, const cv::Mat& mask,
+	        cv::Mat* debugImage) {
 		cv::Mat filtered;
 		cv::bilateralFilter(image, filtered, 5, 50, 50);
 
@@ -414,7 +415,7 @@ namespace Vision {
 		// check fiducial 0 against 1 and 2 and fiducial 1 against 2
 		for (int i = 0; i < 2; i++) {
 			for (int j = 1; j < 3; j++) {
-				if(i == j){
+				if (i == j) {
 					continue;
 				}
 				//find the maximum distance
@@ -434,7 +435,7 @@ namespace Vision {
 			}
 		}
 
-		if (fiducialDistance(maxLinePoint1, extra) > fiducialDistance(maxLinePoint2, extra)){
+		if (fiducialDistance(maxLinePoint1, extra) > fiducialDistance(maxLinePoint2, extra)) {
 			points[0] = maxLinePoint1;
 			points[1] = extra;
 			points[2] = maxLinePoint2;
