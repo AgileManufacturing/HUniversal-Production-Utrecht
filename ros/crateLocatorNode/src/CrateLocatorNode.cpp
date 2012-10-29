@@ -86,12 +86,12 @@ CrateLocatorNode::CrateLocatorNode( ) :
 	cordTransformer = new Vision::PixelToRealCoordinateTransformer(rc, rc);
 
 	//crate tracking configuration
-	//the amount of pixels a point has to move before we mark it as moving.
+	//the amount of mm a point has to move before we mark it as moving.
 	// When not moving we found a deviation of ~0.5 pixel.
-	crateMovementThresshold = 0.75;
+	double crateMovementThreshold = 0.75;
 	//the number of frames before a change is marked definite.
-	numberOfStableFrames = 10;
-	crateTracker = new Vision::CrateTracker(numberOfStableFrames, crateMovementThresshold);
+	int numberOfStableFrames = 10;
+	crateTracker = new Vision::CrateTracker(numberOfStableFrames, crateMovementThreshold);
 
 	//ROS things
 	crateEventPublisher = node.advertise<crateLocatorNode::CrateEventMsg>("crateEvent", 100);
@@ -203,6 +203,20 @@ bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErro
 		DataTypes::Point2D fid1(averageX(fid1_buffer), averageY(fid1_buffer));
 		DataTypes::Point2D fid2(averageX(fid2_buffer), averageY(fid2_buffer));
 		DataTypes::Point2D fid3(averageX(fid3_buffer), averageY(fid3_buffer));
+
+		double maxDeviation = 0.0;
+		double minDeviation = 0.0;
+		for (std::vector<cv::Point2f>::iterator it = fid1_buffer.begin(); it != fid1_buffer.end(); ++it) {
+			std::cout << (*it).x << std::endl;
+			if(fid1.x - (*it).x > maxDeviation){
+				maxDeviation = fid1.x - (*it).x;
+			}
+			if(fid1.x - (*it).x < minDeviation){
+				minDeviation = fid1.x - (*it).x;
+			}
+		}
+
+		std::cout << "deviation " << fabs(maxDeviation - minDeviation) << std::endl;
 
 		markers.push_back(DataTypes::Point2D(fid1.x, fid1.y));
 		markers.push_back(DataTypes::Point2D(fid2.x, fid2.y));
@@ -317,15 +331,13 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 
 		std::vector<cv::Point2f> points = it->getPoints();
 		for (int n = 0; n < 3; n++) {
-			std::cout << "[DEBUG] " << it->name << " " << points[n].x << ", " << points[n].y << std::endl;
 			DataTypes::Point2D coordinate(points[n].x, points[n].y);
 			coordinate = cordTransformer->to_rc(coordinate);
 			points[n].x = coordinate.x;
 			points[n].y = coordinate.y;
+			std::cout << "[DEBUG] " << it->name << " " << points[n].x << ", " << points[n].y << std::endl;
 		}
 		it->setPoints(points);
-
-		std::cout << "[DEBUG] Crate " << it->name << std::endl;
 	}
 
 	//inform the crate tracker about the seen crates

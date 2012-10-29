@@ -108,9 +108,6 @@ private:
 	ros::ServiceServer getCrateService;
 	ros::ServiceServer getAllCratesService;
 
-	double crateMovementThresshold;
-	int numberOfStableFrames;
-
 	// For calibration
 	std::vector<cv::Point2f> fid1_buffer;
 	std::vector<cv::Point2f> fid2_buffer;
