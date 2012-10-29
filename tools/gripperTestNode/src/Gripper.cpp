@@ -36,8 +36,8 @@
 	 	 * @param ioController Output controller for the ouput device (controller contains the registers)
 	 	 * @param warningHandler Handler to warn when the valve is almost opened for too long.
 	 	 */
-		Gripper::Gripper(watchdogWarningHandler warningHandler) :
-		 warningHandler(warningHandler), watchdogRunning(true),
+		Gripper::Gripper(void* gripperNodeObject, watchdogWarningHandler warningHandler) :
+		 warningHandler(warningHandler), gripperNode(gripperNodeObject), watchdogRunning(true),
 		 state(false), previousState(false), warned(false), overheated(false) {
 
 			//start watchdog thread
@@ -85,7 +85,7 @@
 						// Test for warning time. Send warning to the warning handler.
 						} else if(!device->warned && timeEnabled > GRIPPER_TIME_ENABLED_WARNING){
 							std::cerr << "[GRIPPER WATCHDOG] Valve open time has reached the warning limit of " << GRIPPER_TIME_ENABLED_WARNING << " milliseconds." << std::endl;
-							device->warningHandler();
+							device->warningHandler(device->gripperNode);
 							device->warned = true;
 						}
 

@@ -1,13 +1,10 @@
-#include <iostream>
-#include <Gripper.h>
-#include <GripperTestNode.h>
-
+#include "GripperTestNode.h"
 
 #define NODE_NAME "GripperTestNode"
 
 GripperTestNode::GripperTestNode(int equipletID, int moduleID): rosMast::StateMachine(equipletID, moduleID)
 {
-	gripper = new Gripper(&error);
+	gripper = new Gripper(this, WrapperForGripperError);
 	ros::NodeHandle nodeHandle;
 	// Advertise the services
 	gripService = nodeHandle.advertiseService(GripperTestNodeServices::GRIP, &GripperTestNode::grip, this);
@@ -19,9 +16,13 @@ GripperTestNode::~GripperTestNode()
 	delete gripper;
 }
 
+void GripperTestNode::WrapperForGripperError(void* gripperNodeObject) {
+	GripperTestNode* myself = (GripperTestNode*) gripperNodeObject;
+	myself->error();
+}
+
 void GripperTestNode::error(){
-	std::cout << "Gripper handler warning!" << std::endl;
-	// ask equiplet to change to standbye
+	sendErrorMessage(-1);
 }
 
 /**

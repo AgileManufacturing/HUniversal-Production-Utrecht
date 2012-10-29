@@ -25,86 +25,86 @@
 * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
+#ifndef GRIPPER_H
+#define GRIPPER_H
 
 #include <boost/thread.hpp>
-		/**
-	 	 * Gripper device
-	 	 * Gripper valve could be overheated. A watchdog is running to check the valve is not opened for too long.
-	 	 **/
-		class Gripper {
 
-		/**
-		 * @typedef
-		 * Notifies the handler when valve open time > GRIPPER_TIME_ENABLED_WARNING
-		 **/
-    	typedef void (*watchdogWarningHandler)();
+/**
+ * Gripper device
+ * Gripper valve could be overheated. A watchdog is running to check the valve is not opened for too long.
+ **/
+class Gripper {
+	/**
+	* @typedef
+	* Notifies the handler when valve open time > GRIPPER_TIME_ENABLED_WARNING
+	**/
+	typedef void (*watchdogWarningHandler)(void* object);
 
-		public:
-			// Config parameters
-			/**
-			 * @var static int GRIPPER_MODBUS_ADRESS
-			 * Register containing the bit (port) for the gripper device
-			 * TODO: Should be moved into a dynamic location? QRCODE / Database?
-			 **/
- 			const static int GRIPPER_MODBUS_ADRESS = 8001;
+	public:
+	// Config parameters
+	/**
+	 * @var static int GRIPPER_MODBUS_ADRESS
+	 * Register containing the bit (port) for the gripper device
+	 * TODO: Should be moved into a dynamic location? QRCODE / Database?
+	 **/
+	const static int GRIPPER_MODBUS_ADRESS = 8001;
 
- 			/**
- 			 * @var static int GRIPPER_DEVICE_PIN
- 			 * Pin (port / bit) of the gripper device
- 			 * TODO: Should be moved into a dynamic location? QRCODE / Database?
- 			 **/
-			const static int GRIPPER_DEVICE_PIN = 1;
+	/**
+	 * @var static int GRIPPER_DEVICE_PIN
+	 * Pin (port / bit) of the gripper device
+	 * TODO: Should be moved into a dynamic location? QRCODE / Database?
+	 **/
+	const static int GRIPPER_DEVICE_PIN = 1;
 
-			/**
-			 * @section time
-			 * Timeouts settings for the watchdog. All times are in milliseconds.
-			 **/
+	/**
+	 * @var static int GRIPPER_TIME_ENABLED_MAX
+	 * Maximum time for the gripper valve to be opened
+	 **/
+	const static int GRIPPER_TIME_ENABLED_MAX = 10000; //60 * 1000;
 
-			/**
-			 * @var static int GRIPPER_TIME_ENABLED_MAX
-			 * Maximum time for the gripper valve to be opened
-			 **/
-			const static int GRIPPER_TIME_ENABLED_MAX = 10000; //60 * 1000;
+	/**
+	 * @var static int GRIPPER_TIME_ENABLED_WARNING
+	 * Maximum time before a warning is thrown
+	 **/
+	const static int GRIPPER_TIME_ENABLED_WARNING = 5000; //50 * 1000;
 
-			/**
-			 * @var static int GRIPPER_TIME_ENABLED_WARNING
-			 * Maximum time before a warning is thrown
-			 **/
-			const static int GRIPPER_TIME_ENABLED_WARNING = 5000; //50 * 1000;
+	/**
+	 * @var static int GRIPPER_TIME_COOLDOWN
+	 * Cooldown time for the gripper valve
+	 **/
+	const static int GRIPPER_TIME_COOLDOWN = 3000; //3 * 60 * 1000;
 
-			/**
-			 * @var static int GRIPPER_TIME_COOLDOWN
-			 * Cooldown time for the gripper valve
-			 **/
-			const static int GRIPPER_TIME_COOLDOWN = 3000; //3 * 60 * 1000;
+	/**
+	 * @var static int GRIPPER_TIME_WATCHDOG_INTERVAL
+	 * Watchdog loop interval.
+	 * TODO: tune for optimal performance?
+	 **/
+	const static int GRIPPER_TIME_WATCHDOG_INTERVAL = 100;
 
-			/**
-			 * @var static int GRIPPER_TIME_WATCHDOG_INTERVAL
-			 * Watchdog loop interval.
-			 * TODO: tune for optimal performance?
-			 **/
-			const static int GRIPPER_TIME_WATCHDOG_INTERVAL = 100;
+	Gripper(void* GripperNode, watchdogWarningHandler warningHandler);
+	virtual ~Gripper();
 
-			Gripper(watchdogWarningHandler warningHandler);
-			virtual ~Gripper();
+	void grab(){
+		state = true;
+	}
 
-			void grab(){
-				state = true;
-			}
+	void release(){
+		state = false;
+	}
 
-			void release(){
-				state = false;
-			}
+	private:
+	boost::thread* watchdogThread;
+	watchdogWarningHandler warningHandler;
+	void* gripperNode;
+	bool watchdogRunning;
 
-		private:
-			boost::thread* watchdogThread;
-			watchdogWarningHandler warningHandler;
-			bool watchdogRunning;
+	bool state, previousState, warned, overheated;
 
-			bool state, previousState, warned, overheated;
+	unsigned long timeEnabled;
+	unsigned long timeCooldownStarted;
 
-			unsigned long timeEnabled;
-			unsigned long timeCooldownStarted;
+	static void watchdogFunction(Gripper* device);
+};
 
-			static void watchdogFunction(Gripper* device);
-	 	};
+#endif

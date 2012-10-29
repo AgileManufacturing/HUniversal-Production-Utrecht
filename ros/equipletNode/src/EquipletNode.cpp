@@ -83,8 +83,10 @@ void EquipletNode::moduleErrorCallback(const rosMast::ModuleErrorPtr &msg) {
 	int moduleID = msg->moduleID;
 
 	// Lookup errorcode in the DB and decide accordingly
+	
 	// Lookup current state of the module
 	rosMast::StateType currentModuleState = getModuleState(moduleID);
+
 	// This will be changed to a proper way to decide what state should be entered on error
 	rosMast::StateType newState = rosMast::StateType(currentModuleState - 3); 
 	sendStateChangeRequest(moduleID, newState);
