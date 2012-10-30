@@ -83,7 +83,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
         Motor::CRD514KD::RtuConfig::DATA_BITS,
         Motor::CRD514KD::RtuConfig::STOP_BITS));
 
-
+    //Motors is declared in the header file, size = 3
     motors[0] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_0, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
     motors[1] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_1, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
     motors[2] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_2, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);

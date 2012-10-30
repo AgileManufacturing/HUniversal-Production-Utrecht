@@ -80,6 +80,11 @@ void EquipletNode::stateChanged(const rosMast::StateChangedPtr &msg) {
 	}	
 }
 
+/**
+ * Callback for when a error occurs in a module
+ *
+ * @param msg Contains a errorCode and the ID of the module were the error occured
+ **/
 void EquipletNode::moduleErrorCallback(const rosMast::ModuleErrorPtr &msg) {
 	//int errorCode = msg->errorCode;
 	int moduleID = msg->moduleID;
@@ -94,6 +99,12 @@ void EquipletNode::moduleErrorCallback(const rosMast::ModuleErrorPtr &msg) {
 	sendStateChangeRequest(moduleID, newState);
 }
 
+/**
+ * Send a StateChange request to a specific module
+ * 
+ * @param moduleID the unique identifier for the module which state needs to change
+ * @param newState the new state for the module
+ **/
 void EquipletNode::sendStateChangeRequest(int moduleID, rosMast::StateType newState) {
 	rosMast::StateChanged msg;	
 	msg.equipletID = equipletId;
@@ -226,6 +237,14 @@ void EquipletNode::printHardwareModules() {
 		std::cout << *it << std::endl;
 	}
 }
+
+/**
+ * Get the state of the module corresponding to the moduleID
+ *
+ * @param moduleID the unique identifier for a module
+ *
+ * @return the State of the module
+ **/
 
 rosMast::StateType EquipletNode::getModuleState(int moduleID) {
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
