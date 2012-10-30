@@ -65,8 +65,6 @@ public:
 
 	/**
 	 * the constructor
-	 * @param argc use the parameters form main
-	 * @param argv use the parameters form main
 	 */
 	CrateLocatorNode();
 	/**

@@ -40,6 +40,9 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include <CrateLocatorNode/Topics.h>
+#include <CrateLocatorNode/Services.h>
+
 static const char WINDOW_NAME[] = "Image window";
 
 //on mouse click event, print the real life coordinate at the clicked pixel
@@ -94,9 +97,9 @@ CrateLocatorNode::CrateLocatorNode( ) :
 	crateTracker = new Vision::CrateTracker(numberOfStableFrames, crateMovementThreshold);
 
 	//ROS things
-	crateEventPublisher = node.advertise<crateLocatorNode::CrateEventMsg>("crateEvent", 100);
-	getCrateService = node.advertiseService("getCrate", &CrateLocatorNode::getCrate, this);
-	getAllCratesService = node.advertiseService("getAllCrates", &CrateLocatorNode::getAllCrates, this);
+	crateEventPublisher = node.advertise<crateLocatorNode::CrateEventMsg>(CrateLocatorNodeTopics::CRATE_EVENT, 100);
+	getCrateService = node.advertiseService(CrateLocatorNodeServices::GET_CRATE, &CrateLocatorNode::getCrate, this);
+	getAllCratesService = node.advertiseService(CrateLocatorNodeServices::GET_ALL_CRATES, &CrateLocatorNode::getAllCrates, this);
 
 	//GUI stuff
 	cv::namedWindow(WINDOW_NAME);
@@ -335,7 +338,7 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 			coordinate = cordTransformer->to_rc(coordinate);
 			points[n].x = coordinate.x;
 			points[n].y = coordinate.y;
-			std::cout << "[DEBUG] " << it->name << " " << points[n].x << ", " << points[n].y << std::endl;
+			//std::cout << "[DEBUG] " << it->name << " " << points[n].x << ", " << points[n].y << std::endl;
 		}
 		it->setPoints(points);
 	}
@@ -381,7 +384,7 @@ void CrateLocatorNode::run( ) {
 }
 
 int main(int argc, char* argv[]) {
-	ros::init(argc, argv, "vision");
+	ros::init(argc, argv, "crateLocator");
 	CrateLocatorNode crateLocatorNode;
 	crateLocatorNode.run();
 
