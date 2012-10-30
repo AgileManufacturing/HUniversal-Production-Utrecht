@@ -36,10 +36,23 @@
 #include <map>
 
 namespace Vision {
-	CrateTracker::CrateTracker(int stableFrames, double movementThresshold) :
-			stableFrames(stableFrames), movementThresshold(movementThresshold) {
+	/**
+	 * Constructor
+	 *
+	 * @param stableFrames The number of frames a change has to be observed before a change is definite.
+	 * @param movementThreshold The amount of mm a point has to move on the camera image before it is marked as moving.
+	 */
+	CrateTracker::CrateTracker(int stableFrames, double movementThreshold) :
+			stableFrames(stableFrames), movementThreshold(movementThreshold) {
 	}
-
+		
+	/**
+	 * Determines the current state of all crates from a list of seen crates. It generates appropriate CrateEvent messages.
+	 *
+	 * @param updatedCrates List of seen crates.
+	 *
+	 * @return Vector list of CrateEvent messages.
+	 */
 	std::vector<CrateEvent> CrateTracker::update(std::vector<DataTypes::Crate> updatedCrates) {
 		std::vector<CrateEvent> events;
 
@@ -141,7 +154,15 @@ namespace Vision {
 		}
 		return events;
 	}
-
+	
+	/**
+	 * Returns the last stable state of a crate.
+	 *
+	 * @param name The name of the crate, QR data.
+	 * @param result The last stable info of the crate.
+	 *
+	 * @return True if crates exists, false otherwise.
+	 */
 	bool CrateTracker::getCrate(const std::string& name, DataTypes::Crate& result) {
 		std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.find(name);
 		if (it != knownCrates.end() && it->second.getState() != DataTypes::Crate::state_non_existing) {
@@ -152,6 +173,11 @@ namespace Vision {
 		}
 	}
 
+	/**
+	 * Returns a list of crates with their last stable state.
+	 *
+	 * @return Vector with crates with their last stable state.
+	 */
 	std::vector<DataTypes::Crate> CrateTracker::getAllCrates( ) {
 		std::vector<DataTypes::Crate> allCrates;
 		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it) {
@@ -162,13 +188,21 @@ namespace Vision {
 		return allCrates;
 	}
 
+	/**
+	 * Determines whether a crate has moved or rotated.
+	 *
+	 * @param newCrate The up to date values of the crate.
+	 * @param oldCrate The values of the crate for comparison.
+	 *
+	 * @return True if the crate has moved or rotated, false otherwise.
+	 */
 	bool CrateTracker::hasChanged(const DataTypes::Crate& newCrate, const DataTypes::Crate& oldCrate) {
-		const std::vector<cv::Point2f>& oldp = oldCrate.getPoints();
-		const std::vector<cv::Point2f>& newp = newCrate.getPoints();
-		for (int i = 0; i < 3; i++) {
-			const float dx = newp[i].x - oldp[i].x;
-			const float dy = newp[i].y - oldp[i].y;
-			if (sqrt(dx * dx + dy * dy) > movementThresshold) {
+		const std::vector<cv::Point2f>& oldPoints = oldCrate.getPoints();
+		const std::vector<cv::Point2f>& newPoints = newCrate.getPoints();
+		for (int point = 0; point < 3; point++) {
+			const float deltaX = newPoints[point].x - oldPoints[point].x;
+			const float deltaY = newPoints[point].y - oldPoints[point].y;
+			if (sqrt(deltaX * deltaX + deltaY * deltaY) > movementThreshold) {
 				return true;
 			}
 		}

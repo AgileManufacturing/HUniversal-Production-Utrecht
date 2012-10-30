@@ -44,21 +44,22 @@ namespace Vision {
 			type_in = 1, type_out = 2, type_moving = 3, type_moved = 4
 		};
 		/**
-		 * the constructor
-		 * @param type the type of crate event.
-		 * @param name the name of the crate
-		 * @param x the x coordinate
-		 * @param y the y coordinate
-		 * @param angle the angle of the crate
+		 * The constructor.
+		 *
+		 * @param type The type of crate event.
+		 * @param name The name of the crate.
+		 * @param x The x coordinate.
+		 * @param y The y coordinate.
+		 * @param angle The angle of the crate.
 		 */
-		CrateEvent(crate_event_type type = type_moving, std::string name = "", float x = 0, float y = 0,
-		        float angle = 0) :
+		CrateEvent(crate_event_type type = type_moving, std::string name = "", float x = 0, float y = 0, float angle = 0) :
 				type(type), name(name), x(x), y(y), angle(angle) {
 		}
 
 		/**
-		 * returns a string with the information about the event
-		 * @return string with the information about the event
+		 * Returns a string with the information about the event.
+		 *
+		 * @return String with the information about the event, namely type, name, x and y coordinates and angle.
 		 */
 		std::string toString( ) {
 			std::stringstream ss;
@@ -82,53 +83,54 @@ namespace Vision {
 			return ss.str();
 		}
 
+		/**
+		 * @var int type
+		 * Event type, namely in, out, moving or moved.
+		 **/
 		int type;
+		/**
+		 * @var std::string name
+		 * Name of the crate.
+		 **/
 		std::string name;
-		float x, y, angle;
+		/**
+		 * @var float x
+		 * x-coordinate
+		 **/
+		float x;
+		/**
+		 * @var float y
+		 * y-coordinate
+		 **/
+		float y;
+		/**
+		 * @var float angle
+		 * Angle of the crate, where 0 is up on the image of the camera.
+		 **/
+		float angle;
 	};
 
 	class CrateTracker {
 	public:
-		/**
-		 * Constructor
-		 * @param stableFrames framesLeft the number of frames before a change is definite
-		 * @param movementThresshold the amount of mm a point has to move before it is marked as moving
-		 */
-		CrateTracker(int stableFrames, double movementThresshold);
+		CrateTracker(int stableFrames, double movementThreshold);
 
-		/**
-		 * determines the current state of all crates from a list of seen crates and generates CrateEvent.
-		 * @param crates list of seen crates
-		 * @return list of events
-		 */
 		std::vector<CrateEvent> update(std::vector<DataTypes::Crate> crates);
-
-		/**
-		 * returns a list of crates with their last stable state
-		 * @return list with crates with their last stable state
-		 */
 		std::vector<DataTypes::Crate> getAllCrates( );
-
-		/**
-		 * returns the last stable state of a crate
-		 * @param name the name of the crate
-		 * @param result the last stable info of the crate
-		 * @return true if crates exists, false otherwise
-		 */
 		bool getCrate(const std::string& name, DataTypes::Crate& result);
 
-		int stableFrames;
-		double movementThresshold;
-		double rotationThresshold;
-	private:
 		/**
-		 * determines whether a crate has moved or rotated
-		 * @param newCrate the up to date values of the crate
-		 * @param oldCrate the previous values of the crate
-		 * @return true if moved
-		 */
+		 * @var int stableFrames
+		 * Amount of frames a change has to be present for the crate to be counted as changed.
+		 **/
+		int stableFrames;
+		/**
+		 * @var double movementThreshold
+		 * The amount of mm a point has to move on the camera image before it is marked as moving.
+		 **/
+		double movementThreshold;
+	private:
 		bool hasChanged(const DataTypes::Crate& newCrate, const DataTypes::Crate& oldCrate);
+		
 		std::map<std::string, DataTypes::Crate> knownCrates;
-
 	};
 }
