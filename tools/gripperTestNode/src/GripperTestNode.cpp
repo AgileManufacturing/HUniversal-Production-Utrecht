@@ -2,6 +2,8 @@
 
 #define NODE_NAME "GripperTestNode"
 
+
+
 GripperTestNode::GripperTestNode(int equipletID, int moduleID): rosMast::StateMachine(equipletID, moduleID)
 {
 	gripper = new Gripper(this, WrapperForGripperError);
@@ -112,11 +114,8 @@ int main(int argc, char** argv){
 	int equipletID = atoi(argv[1]);
 	int moduleID = atoi(argv[2]);
 
-	ROS_INFO("Creating GripperTestNode"); 	
-
 	GripperTestNode gripperTestNode(equipletID, moduleID);    
 
-	ROS_INFO("GripperTestNode ready..."); 	
 	gripperTestNode.StateEngine();
 	return 0;
 }

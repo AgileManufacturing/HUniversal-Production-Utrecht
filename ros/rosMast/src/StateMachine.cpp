@@ -38,12 +38,11 @@ void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 	if(locked) {
 		return;
 	}
-
 	// save the old state
 	StateType oldState = currentState;
 	
 	// decode msg and read variables
-	ROS_INFO("State changed message received");
+	ROS_INFO("Request Statechange message received");
 	int equipletID = msg->equipletID;
 	int moduleID = msg->moduleID;
 	StateType desiredState = StateType(msg->state);
@@ -71,6 +70,10 @@ void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 		} else {
 			ROS_INFO("Function pointer NULL, no function found in lookup table");
 		}
+	} else {
+		ROS_INFO("Not for me");
+		ROS_INFO("Statemachine equipletID = %d", this->equipletID);
+		ROS_INFO("Statemachine moduleID = %d", this->moduleID);
 	}	
 }
 
@@ -122,7 +125,7 @@ rosMast::StateMachine::stateFunctionPtr rosMast::StateMachine::lookupTransition(
  * @param the new state of the machine
  **/
 void rosMast::StateMachine::setState(StateType newState) {
-	std::cout << "setting state to: " << newState << std::endl;
+	ROS_INFO("Setting state to: %d", newState);
 	currentState = newState;
 	rosMast::StateChanged msg;
 	msg.equipletID = this->equipletID;

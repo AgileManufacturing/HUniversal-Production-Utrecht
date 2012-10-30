@@ -72,6 +72,7 @@ EquipletNode::~EquipletNode() {
  * 
  **/
 void EquipletNode::stateChanged(const rosMast::StateChangedPtr &msg) {
+	ROS_INFO("State changed message received");
 	if(updateModuleState(msg->moduleID, rosMast::StateType(msg->state))) {
 		std::cout << "The state of module " << msg->moduleID << " has been changed to " << rosMast::state_txt[msg->state] << std::endl; 
 	} else{
@@ -80,7 +81,7 @@ void EquipletNode::stateChanged(const rosMast::StateChangedPtr &msg) {
 }
 
 void EquipletNode::moduleErrorCallback(const rosMast::ModuleErrorPtr &msg) {
-	int errorCode = msg->errorCode;
+	//int errorCode = msg->errorCode;
 	int moduleID = msg->moduleID;
 
 	// Lookup errorcode in the DB and decide accordingly
@@ -170,9 +171,8 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 	 **/ 
 	std::pair< std::string, std::string > packageNodeName = modulePackageNodeMap[module.type];
 	stringstream ss (stringstream::in | stringstream::out);
-	ss << "rosrun " << packageNodeName.first << " " << packageNodeName.second << " " << equipletId << " 1"
-	<< " __name:=" << packageNodeName.second << "" << module.id;
-
+	ss << "rosrun " << packageNodeName.first << " " << packageNodeName.second << " " << equipletId << " " << module.id; // << " __name:=" << packageNodeName.second;
+	std::cout << ss.str() << std::endl;
 	int pid = -1;
 	switch(pid = fork()) {
 		case 0:

@@ -73,6 +73,8 @@ namespace deltaRobotNodeNamespace {
 			ros::ServiceServer moveToRelativePointService;
 			ros::ServiceServer moveRelativePathService;
 			ros::ServiceServer calibrateService;
+		private:
+			Motor::StepperMotor* motors[3];
 	};
 }
 
