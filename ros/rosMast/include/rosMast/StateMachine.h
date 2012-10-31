@@ -72,13 +72,14 @@ namespace rosMast {
 	
 	class StateMachine {
 		/** 
+		 * @var typedef int (StateMachine::*stateFunctionPtr)()
 		 * Function pointer definition for a state transition function
 		 **/
 		typedef int (StateMachine::*stateFunctionPtr)();
 		
 		public:
 			StateMachine(int equipletID, int moduleID);			
-			std::map<StateTransition, stateFunctionPtr> transitionMap;
+
 		
 			virtual int transitionSetup() = 0;
 			virtual int transitionShutdown() = 0;
@@ -94,6 +95,11 @@ namespace rosMast {
 			
 			void StateEngine();			
 		private:
+			/**
+			 * @var std::map<StateTransition, stateFunctionPtr> transitionMap;
+			 * The map that links a StateTransition struct to a function pointer
+			 **/
+			std::map<StateTransition, stateFunctionPtr> transitionMap;
 			/**
 			 * @var ros::Publisher stateChangedPublisher
 			 * The publisher for posting updated state messages

@@ -94,9 +94,25 @@ class Gripper {
 	}
 
 	private:
+	/**
+	 * @var boost::thread* watchdogThread
+	 * The thread that checks the watchdog
+	 **/
 	boost::thread* watchdogThread;
+	/**
+     * @var watchdogWarningHandler warningHandler
+     * The callback function when the gripper is powered on too long
+	 **/
 	watchdogWarningHandler warningHandler;
+	/**
+	 * @var void* gripperNode
+	 * The object pointer for the object that contains the member callback function
+	 **/
 	void* gripperNode;
+	/**
+	 * @var bool watchdogRunning
+	 * bool that says wether the watchdog is running
+	 **/
 	bool watchdogRunning;
 
 	bool state, previousState, warned, overheated;
