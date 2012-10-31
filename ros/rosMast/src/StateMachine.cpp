@@ -68,7 +68,7 @@ void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
 			ROS_INFO("Function pointer NULL, no function found in lookup table");
 		}
 	} else {
-		ROS_INFO("Not for me");
+		ROS_INFO("State changerequest not meant for this statemachine");
 		ROS_INFO("Statemachine equipletID = %d", this->equipletID);
 		ROS_INFO("Statemachine moduleID = %d", this->moduleID);
 	}	
@@ -141,6 +141,9 @@ void rosMast::StateMachine::sendErrorMessage(int errorCode) {
 	moduleErrorPublisher.publish(msg);
 }
 
+/** 
+ * The run part of the state machine
+ **/
 void rosMast::StateMachine::StateEngine() {
 	while(ros::ok()) { 
 		ros::spinOnce();

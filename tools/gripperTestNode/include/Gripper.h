@@ -36,7 +36,7 @@
  **/
 class Gripper {
 	/**
-	* @typedef
+	* @ typedef void (*watchdogWarningHandler)(void* object)
 	* Notifies the handler when valve open time > GRIPPER_TIME_ENABLED_WARNING
 	**/
 	typedef void (*watchdogWarningHandler)(void* object);
