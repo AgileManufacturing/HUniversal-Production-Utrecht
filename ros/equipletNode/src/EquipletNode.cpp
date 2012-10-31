@@ -51,13 +51,6 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
 }; 
 
 /**
- * Cleanup the pointers for the EquipletNode
- **/
-EquipletNode::~EquipletNode() {
-		
-}
-
-/**
  * Callback function that is called when a message is received on the equiplet_statechanged topic
  * It updates the state of a hardware module.
  * 

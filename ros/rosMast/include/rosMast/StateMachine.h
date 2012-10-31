@@ -78,8 +78,7 @@ namespace rosMast {
 		typedef int (StateMachine::*stateFunctionPtr)();
 		
 		public:
-			StateMachine(int equipletID, int moduleID);			
-
+			StateMachine(int equipletID, int moduleID);	
 		
 			virtual int transitionSetup() = 0;
 			virtual int transitionShutdown() = 0;

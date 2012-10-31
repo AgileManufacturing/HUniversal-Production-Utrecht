@@ -49,6 +49,7 @@ namespace deltaRobotNodeNamespace {
 	class DeltaRobotNode : public rosMast::StateMachine {
 		public:			
 			DeltaRobotNode(int equipletID, int moduleID);
+			virtual ~DeltaRobotNode();
 			
 			int transitionSetup();
 			int transitionShutdown();

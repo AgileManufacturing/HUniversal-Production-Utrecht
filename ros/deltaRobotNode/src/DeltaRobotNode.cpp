@@ -94,6 +94,11 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
     deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO); 
 }
 
+deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
+	delete motors;
+	delete deltaRobot;
+}
+
 /**
  * Starts the (re)calibration of the robot
  * @param req The request for this service as defined in Calibrate.srv 

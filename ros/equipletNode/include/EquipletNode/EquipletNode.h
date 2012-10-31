@@ -41,8 +41,6 @@ class EquipletNode {
 	public:
 		EquipletNode(int id = 1);
 
-		virtual ~EquipletNode();
-
 		bool addHardwareModule(Mast::HardwareModuleProperties module);
 		bool removeHardwareModule(int id);
 		void updateOperationState();
