@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
 	/**
 	 * Set the id of the Equiplet
 	 **/
-	ostringstream ss;
+	std::ostringstream ss;
 	ss << "Equiplet" << equipletId;
 	const char* equipletName = ss.str().c_str();
 	

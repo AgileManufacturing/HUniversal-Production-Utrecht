@@ -76,7 +76,6 @@ namespace deltaRobotNodeNamespace {
 			 * the collection of motors
 			 **/
 			Motor::StepperMotor* motors[3];
-			DeltaRobot::DeltaRobot * deltaRobot;
 			/**
 			 * @var ros::ServiceServer moveToPointService;	
 			 * Service for receiving move to point commands

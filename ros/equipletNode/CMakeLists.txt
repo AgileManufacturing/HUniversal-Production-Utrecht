@@ -20,10 +20,10 @@ file(GLOB sources src/*.cpp)
 rosbuild_add_executable(EquipletNode ${sources})
 
 # Link target to our libraries
-target_link_libraries(EquipletNode blackboardClientCpp autoKeyStoreCppClient ${PROTOBUF_LIBRARIES} utilities)
+target_link_libraries(EquipletNode utilities)
 
 # Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
-include_directories(${LIB_MAST_INCLUDE} ${LIB_BLACKBOARDCLIENT_INCLUDE} ${LIB_AUTOKEYSTORE_INCLUDE} ${PROTOBUF_INCLUDE_DIRS} ${LIB_UTILITIES_INCLUDE})
+include_directories(${LIB_MAST_INCLUDE} ${LIB_UTILITIES_INCLUDE})
 
 # MUST be called after rexos_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()

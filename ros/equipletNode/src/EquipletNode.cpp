@@ -34,20 +34,13 @@
 #include <unistd.h>
 #include <algorithm>
 
-
 /**
  * Create a new EquipletNode
  * @var id The unique identifier of the Equiplet
  **/
-EquipletNode::EquipletNode(int id): equipletId(id), moduleTable(), bbUtils() {
-	// Initialize the PostIt box
-	postItBox = new PostItBox();
-	postItBox->set_iswrite(false);
-	postItBox->set_readowner("DummyAgent");
-	postItBox->set_zone("BB1");
-
+EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
 	// Create the map with moduleType mapped to package name and node name
-	modulePackageNodeMap = map< int, std::pair<std::string, std::string> >();
+	modulePackageNodeMap = std::map< int, std::pair<std::string, std::string> >();
 	modulePackageNodeMap[1] = std::pair< std::string, std::string > ("deltaRobotNode", "DeltaRobotNode");
 	modulePackageNodeMap[2] = std::pair< std::string, std::string > ("gripperTestNode", "GripperTestNode");
 
@@ -61,7 +54,7 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable(), bbUtils() {
  * Cleanup the pointers for the EquipletNode
  **/
 EquipletNode::~EquipletNode() {
-	delete postItBox;
+		
 }
 
 /**
@@ -181,7 +174,7 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 	 * Create the string that is used to start another ROS node
 	 **/ 
 	std::pair< std::string, std::string > packageNodeName = modulePackageNodeMap[module.type];
-	stringstream ss (stringstream::in | stringstream::out);
+	std::stringstream ss(std::stringstream::in | std::stringstream::out);
 	ss << "rosrun " << packageNodeName.first << " " << packageNodeName.second << " " << equipletId << " " << module.id; // << " __name:=" << packageNodeName.second;
 	std::cout << ss.str() << std::endl;
 	int pid = -1;
@@ -277,14 +270,3 @@ bool EquipletNode::updateModuleState(int moduleID, rosMast::StateType state) {
 	}
 	return false;
 }
-
-/**
- * Read from the blackboard, store the messages in postItBox
- **/
-void EquipletNode::readFromBlackboard() {
-    PostItBox_Filter * f = postItBox->mutable_filter();
-    PostItBox * received = new PostItBox();
-    f->set_filtername("PostItFilter");
-	bbUtils.readFromBlackboard(postItBox);
-	std::cout << "Number of postIts: " << received->postits_size() << std::endl;
-}	

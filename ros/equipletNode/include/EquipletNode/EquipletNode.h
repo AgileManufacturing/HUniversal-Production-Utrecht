@@ -36,8 +36,6 @@
 #include "rosMast/States.h"
 #include "rosMast/StateChanged.h"
 #include "rosMast/ModuleError.h"
-#include <BlackboardClient/BlackboardClientUtils.h>
-#include <BlackboardClient/PostIt.pb.h>
 
 class EquipletNode {
 	public:
@@ -51,7 +49,6 @@ class EquipletNode {
 		void updateSafetyState();
 		bool updateModuleState(int moduleID, rosMast::StateType state);
 		void printHardwareModules();
-		void readFromBlackboard();
 		void stateChanged(const rosMast::StateChangedPtr &msg);
 		void moduleErrorCallback(const rosMast::ModuleErrorPtr &msg);
 		void sendStateChangeRequest(int moduleID, rosMast::StateType newState);
@@ -77,16 +74,6 @@ class EquipletNode {
 		 * The table that holds all information about the modules currently attached to this Equiplet  
 		 **/
 		std::vector<Mast::HardwareModuleProperties> moduleTable;
-		/**
-		 * @var BlackboardClient::BlackboardClientUtils bbUtils
-		 * Utility for the blackboard client
-		 **/
-		BlackboardClient::BlackboardClientUtils bbUtils;
-		/**
-		 * @var PostItBox postItBox
-		 * The postIt box where the messages are stored that are read from the blackboard
-		 **/
-		PostItBox *postItBox;
 		/**
 		 * @var ros::Subscriber errorModuleSubscriber
 		 * The subscriber that will read when a error occurs inside a module

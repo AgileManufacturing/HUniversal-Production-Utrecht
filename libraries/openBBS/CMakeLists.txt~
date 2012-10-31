@@ -1,4 +1,0 @@
-
-add_java_sources(java_sources)
-add_jar2(openBBS STATIC ${java_sources})
-#message("${java_sources}")

@@ -99,7 +99,6 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
 
 	// Initialize publisher and subcriber
 	ros::NodeHandle nh;
-	locked = false;
 	stateChangedPublisher = nh.advertise<rosMast::StateChanged>("equiplet_stateChanged", 5);
 	moduleErrorPublisher = nh.advertise<rosMast::ModuleError>("equiplet_moduleError", 5);
 	requestStateChangeSubscriber = nh.subscribe("requestStateChange", 5, &StateMachine::changeState, this);
