@@ -52,7 +52,6 @@ class EquipletNode {
 		bool updateModuleState(int moduleID, rosMast::StateType state);
 		void printHardwareModules();
 		void readFromBlackboard();
-		void moduleErrorCallback();
 		void stateChanged(const rosMast::StateChangedPtr &msg);
 		void moduleErrorCallback(const rosMast::ModuleErrorPtr &msg);
 		void sendStateChangeRequest(int moduleID, rosMast::StateType newState);
@@ -84,6 +83,11 @@ class EquipletNode {
 		 **/
 		BlackboardClient::BlackboardClientUtils bbUtils;
 		/**
+		 * @var PostItBox postItBox
+		 * The postIt box where the messages are stored that are read from the blackboard
+		 **/
+		PostItBox *postItBox;
+		/**
 		 * @var ros::Subscriber errorModuleSubscriber
 		 * The subscriber that will read when a error occurs inside a module
 		 **/
@@ -98,11 +102,7 @@ class EquipletNode {
 		 * The publisher that can request state changes for a specific module
 		 **/
 		ros::Publisher requestStateChangePublisher; 
-		/**
-		 * @var PostItBox postItBox
-		 * The postIt box where the messages are stored that are read from the blackboard
-		 **/
-		PostItBox *postItBox;
+
 		/**
 		 * @var std::map<int, pair> modulePackageNodeMap
 		 * A map with the moduleType as key and a pair of package name and node name as value.

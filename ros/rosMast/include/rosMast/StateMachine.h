@@ -49,7 +49,13 @@ namespace rosMast {
 			sourceState = src;
 			destinationState = des;
 		}
+		/**
+		 * The original state
+		 **/
 		StateType sourceState;
+		/**
+		 * Destination state for transition
+		 **/
 		StateType destinationState;
 
 		/**
@@ -66,7 +72,7 @@ namespace rosMast {
 	
 	class StateMachine {
 		/** 
-		 * Function pointer definition 
+		 * Function pointer definition for a state transition function
 		 **/
 		typedef int (StateMachine::*stateFunctionPtr)();
 		
@@ -79,24 +85,45 @@ namespace rosMast {
 			virtual int transitionStart() = 0;
 			virtual int transitionStop() = 0;
 
-			void lock()  	{ locked = true;  }
-			void unlock() 	{ locked = false; }
-
-			void setState( StateType newState );
-			StateType getState() { return currentState; }			
+			StateType getState() { return currentState; }	
+			void setState( StateType newState );				
 			void changeState(const rosMast::StateChangedPtr &msg);			
+			
 			stateFunctionPtr lookupTransition(StateType currentState, StateType desiredState);
 			void sendErrorMessage(int errorCode);
+			
 			void StateEngine();			
 		private:
-			bool locked;		
-
+			/**
+			 * @var ros::Publisher stateChangedPublisher
+			 * The publisher for posting updated state messages
+			 **/
 			ros::Publisher stateChangedPublisher;
+			/**
+			 * @var ros::Publisher moduleErrorPublisher
+			 * The publisher for posting error messages
+			 **/
 			ros::Publisher moduleErrorPublisher;
+			/**
+			 * @var ros::Subscriber requestStateChangeSubscriber
+			 * The subscriber for request for state change messages
+			 **/
 			ros::Subscriber requestStateChangeSubscriber;
 
+			/**
+			 * @var StateType currentState
+			 * The current state of the the state machine
+			 **/
 			StateType currentState;	
+			/**
+			 * @var int equipletID
+			 * The identifier for the equiplet the module (and so the statemachine) belongs to
+			 **/
 			int equipletID;
+			/**
+			 * @var int moduleID
+			 * The identifier for the module the state machine belongs to
+			 **/
 			int moduleID;		
 	};
 

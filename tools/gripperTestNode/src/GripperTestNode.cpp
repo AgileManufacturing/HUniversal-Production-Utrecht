@@ -2,8 +2,11 @@
 
 #define NODE_NAME "GripperTestNode"
 
-
-
+/**
+ * Constructor 
+ *
+ *
+ **/
 GripperTestNode::GripperTestNode(int equipletID, int moduleID): rosMast::StateMachine(equipletID, moduleID)
 {
 	gripper = new Gripper(this, WrapperForGripperError);

@@ -31,8 +31,16 @@
 #define STATES_H
 
 namespace rosMast {
+	/**
+	 * @ typedef var enum StateType
+	 * The enumeration for the states
+	 **/
 	typedef enum { safe = 0, setup = 1, shutdown = 2, standby = 3, start = 4, stop = 5, normal = 6, nostate = 7 } StateType;
-	const char* const state_txt[] = {"Safe", "Setup", "Shutdown", "Standby", "Start", "Stop", "Normal", "Nostate"};
+	/**
+	 * @var const char* const state_txt[]
+	 * The representation of the states in a char array so its easy to print the enum values instead of the integer
+	 **/
+	const char* const state_txt[] = {"Safe", "Setup", "Shutdown", "Standby", "Start", "Stop", "Normal"};
 }
 
 #endif

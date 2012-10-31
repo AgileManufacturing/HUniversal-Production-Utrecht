@@ -35,9 +35,6 @@
  * @param Message that contains the data with the requested new state
  **/
 void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
-	if(locked) {
-		return;
-	}
 	// save the old state
 	StateType oldState = currentState;
 	

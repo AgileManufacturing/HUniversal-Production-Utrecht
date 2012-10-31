@@ -54,9 +54,7 @@ namespace deltaRobotNodeNamespace {
 			int transitionShutdown();
 			int transitionStart();
 			int transitionStop();
-			
-			DeltaRobot::DeltaRobot * deltaRobot;
-			
+						
 			bool calibrate(deltaRobotNode::Calibrate::Request &req, 
 				deltaRobotNode::Calibrate::Response &res);
 			bool moveToPoint(deltaRobotNode::MoveToPoint::Request &req,
@@ -67,14 +65,44 @@ namespace deltaRobotNodeNamespace {
 				deltaRobotNode::MoveToRelativePoint::Response &res);
 			bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
 				deltaRobotNode::MoveRelativePath::Response &res);
-		protected:
-			ros::ServiceServer moveToPointService;	
-			ros::ServiceServer movePathService;
-			ros::ServiceServer moveToRelativePointService;
-			ros::ServiceServer moveRelativePathService;
-			ros::ServiceServer calibrateService;
 		private:
+			/**
+			 * @var DeltaRobot::DeltaRobot * deltaRobot
+			 * the deltaRobot
+			 **/
+			DeltaRobot::DeltaRobot * deltaRobot;
+			/**
+			 * @var Motor::StepperMotor* motors[3]
+			 * the collection of motors
+			 **/
 			Motor::StepperMotor* motors[3];
+			DeltaRobot::DeltaRobot * deltaRobot;
+			/**
+			 * @var ros::ServiceServer moveToPointService;	
+			 * Service for receiving move to point commands
+			 **/
+			ros::ServiceServer moveToPointService;	
+			/**
+			 * @var ros::ServiceServer movePathService;	
+			 * Service for receiving movePath commands
+			 **/			
+			ros::ServiceServer movePathService;
+			/**
+			 * @var ros::ServiceServer moveToRelativePointService;	
+			 * Service for receiving move to relative point commands
+			 **/
+			ros::ServiceServer moveToRelativePointService;
+			/**
+			 * @var ros::ServiceServer moveRelativePathService;	
+			 * Service for receiving move relative path commands
+			 **/			
+			ros::ServiceServer moveRelativePathService;
+			/**
+			 * @var ros::ServiceServer calibrateService;	
+			 * Service for receiving calibrate commands
+			 **/
+			ros::ServiceServer calibrateService;
+
 	};
 }
 
