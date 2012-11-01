@@ -45,7 +45,7 @@ namespace Vision {
 	CrateTracker::CrateTracker(int stableFrames, double movementThreshold) :
 			stableFrames(stableFrames), movementThreshold(movementThreshold) {
 	}
-		
+
 	/**
 	 * Determines the current state of all crates from a list of seen crates. It generates appropriate CrateEvent messages.
 	 *
@@ -57,7 +57,8 @@ namespace Vision {
 		std::vector<CrateEvent> events;
 
 		// Disable all crates (mark for removal).
-		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it) {
+		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end();
+		        ++it) {
 			it->second.exists = false;
 		}
 
@@ -68,7 +69,8 @@ namespace Vision {
 				newCrate.exists = true;
 				newCrate.oldSituation = false;
 				newCrate.newSituation = true;
-				newCrate.stable = false;
+				// TODO: hacked to true to determine behavior when framesLeft/stableFrames is irrelevant
+				newCrate.stable = true;
 				newCrate.framesLeft = stableFrames;
 
 				knownCrates.insert(std::pair<std::string, DataTypes::Crate>(it->name, newCrate));
@@ -81,7 +83,8 @@ namespace Vision {
 				if (hasChanged(crate, (*it))) {
 					if (crate.stable) {
 						//crate began to move as old state was stable. Push moving event
-						events.push_back(CrateEvent(CrateEvent::type_moving, crate.name));
+						cv::RotatedRect crateRect = it->rect();
+						events.push_back(CrateEvent(CrateEvent::type_moving, crate.name, crateRect.center.x, crateRect.center.y, crateRect.angle));
 					}
 
 					//reset timer
@@ -122,7 +125,8 @@ namespace Vision {
 
 		// Remove all crate that were not found in the update loop. These have been marked as non existing.
 		std::vector<std::string> cratesToBeRemoved;
-		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it) {
+		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end();
+		        ++it) {
 			if (!it->second.exists) {
 				DataTypes::Crate& crate = it->second;
 				if (crate.stable) {
@@ -154,7 +158,7 @@ namespace Vision {
 		}
 		return events;
 	}
-	
+
 	/**
 	 * Returns the last stable state of a crate.
 	 *
@@ -180,7 +184,8 @@ namespace Vision {
 	 **/
 	std::vector<DataTypes::Crate> CrateTracker::getAllCrates( ) {
 		std::vector<DataTypes::Crate> allCrates;
-		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it) {
+		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end();
+		        ++it) {
 			if (it->second.getState() != DataTypes::Crate::state_non_existing) {
 				allCrates.push_back(it->second);
 			}

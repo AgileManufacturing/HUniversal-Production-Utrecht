@@ -65,99 +65,110 @@ public:
 
 private:
 	/**
-	 * @var fidDetector
+	 * @var Vision::FiducialDetector * fidDetector
 	 * The fiducials detector that localizes markers on the working area.
-	 */
+	 **/
 	Vision::FiducialDetector * fidDetector;
 
 	/**
-	 * @var qrDetector
+	 * @var Vision::QRCodeDetector * qrDetector
 	 * The QR detector that detects all QR codes within the camera frame.
-	 */
+	 **/
 	Vision::QRCodeDetector * qrDetector;
 
 	/**
-	 * @var cordTransformer
+	 * @var Vision::PixelAndRealCoordinateTransformer * cordTransformer
 	 * Coordinate transformer that transform pixel (camera) coordinates into real life (deltarobot) coordinates.
 	 * Uses three marked points relative to the robot to determine the orientation and scale.
-	 */
+	 **/
 	Vision::PixelAndRealCoordinateTransformer * cordTransformer;
 
 	/**
-	 * @var crateTracker
+	 * @var Vision::CrateTracker * crateTracker
 	 * The CrateTracker follows all movements of the crates. It sends events if a crate is new, moving, moved or removed.
-	 */
+	 **/
 	Vision::CrateTracker * crateTracker;
 
 	/**
-	 * @var markers
+	 * @var std::vector<DataTypes::Point2D> markers
 	 * Vector containing the locations of the three fiducial markers.
-	 */
+	 **/
 	std::vector<DataTypes::Point2D> markers;
 
 	/**
-	 * @var node
+	 * @var ros::NodeHandle node
 	 * The nodeHandle used by ros services and topics
-	 */
+	 **/
 	ros::NodeHandle node;
 
 	/**
-	 * @var crateEventPublisher
-	 */
+	 * @var ros::Publisher crateEventPublisher
+	 * Publisher for the crate event topic. The publisher opens the topic for writing.
+	 **/
 	ros::Publisher crateEventPublisher;
+
+	/**
+	 * @var ros::ServiceServer getCrateService
+	 * Service server for the getCrateService. As long as the service server is "running" the service is provided.
+	 **/
 	ros::ServiceServer getCrateService;
+
+	/**
+	 * @var ros::ServiceServer getAllCratesService
+	 * Service server for the getAllCratesService. As long as the service server is "running" the service is provided.
+	 **/
 	ros::ServiceServer getAllCratesService;
 
 	// For calibration
 	/**
-	 * @var fid1_buffer
+	 * @var std::vector<cv::Point2f> fid1_buffer
 	 * The point buffer for fiducial 1.
 	 * This buffer is averaged before used as a definitive point.
-	 */
+	 **/
 	std::vector<cv::Point2f> fid1_buffer;
 
 	/**
-	 * @var fid2_buffer
+	 * @var std::vector<cv::Point2f> fid2_buffer
 	 * The point buffer for fiducial 12
 	 * This buffer is averaged before used as a definitive point.
-	 */
+	 **/
 	std::vector<cv::Point2f> fid2_buffer;
 
 	/**
-	 * @var fid3_buffer
+	 * @var std::vector<cv::Point2f> fid3_buffer
 	 * The point buffer for fiducial 3.
 	 * This buffer is averaged before used as a definitive point.
-	 */
+	 **/
 	std::vector<cv::Point2f> fid3_buffer;
 
 	/**
-	 * @var measurementCount
+	 * @var unsigned int measurementCount
 	 * Amount of measurements that were successful.
-	 */
+	 **/
 	unsigned int measurementCount;
 
 	/**
-	 * @var measurements
+	 * @var unsigned int measurements
 	 * Number of measurements to be done.
-	 */
+	 **/
 	unsigned int measurements;
 
 	/**
-	 * @var failCount
+	 * @var unsigned int failCount
 	 * Number of failed measurements.
-	 */
+	 **/
 	unsigned int failCount;
 
 	/**
-	 * @var imageTransport
+	 * @var image_transport::ImageTransport imageTransport
 	 * ImageTransport is used to transport camera frames over a ros topic.
-	 */
+	 **/
 	image_transport::ImageTransport imageTransport;
 
 	/**
-	 * @var cameraSubscriber
+	 * @var image_transport::Subscriber cameraSubscriber
 	 * Subscription to the camera topic for receiving frames.
-	 */
+	 **/
 	image_transport::Subscriber cameraSubscriber;
 
 	bool calibrate(unsigned int measurements = 100, unsigned int maxErrors = 100);

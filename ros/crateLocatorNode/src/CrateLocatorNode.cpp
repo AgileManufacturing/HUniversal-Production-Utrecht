@@ -43,7 +43,7 @@
 /**
  * @var WINDOW_NAME
  * Name for the opencv image window.
- */
+ **/
 static const char WINDOW_NAME[] = "Image window";
 
 /**
@@ -54,7 +54,7 @@ static const char WINDOW_NAME[] = "Image window";
  * @param int y Y coordinate of the click
  * @param int flags CV_EVENT_FLAG
  * @param Vision::PixelToRealCoordinateTransformer * param Pointer to the PixelToRealCoordinateTransformer used to conversion.
- */
+ **/
 void on_mouse(int event, int x, int y, int flags, void* param) {
 	if (event == CV_EVENT_LBUTTONDOWN) {
 		Vision::PixelAndRealCoordinateTransformer* cordTransformer = (Vision::PixelAndRealCoordinateTransformer*) param;
@@ -117,7 +117,7 @@ CrateLocatorNode::CrateLocatorNode( ) :
 
 /**
  * Destructor for the CrateLocator. Removes the QR detector, fiducial detector, crate tracker and coordinate transformer.
- */
+ **/
 CrateLocatorNode::~CrateLocatorNode( ) {
 	delete qrDetector;
 	delete fidDetector;
@@ -133,7 +133,7 @@ CrateLocatorNode::~CrateLocatorNode( ) {
  * @param req Request arguments for the service. Should include the name of the crate
  * @param res Reponse for the caller. Contains a crate message and crate state.
  * @return true if the service is handled.
- */
+ **/
 bool CrateLocatorNode::getCrate(crateLocatorNode::getCrate::Request &req, crateLocatorNode::getCrate::Response &res) {
 	DataTypes::Crate crate;
 	bool succeeded = crateTracker->getCrate(req.name, crate);
@@ -164,7 +164,7 @@ bool CrateLocatorNode::getCrate(crateLocatorNode::getCrate::Request &req, crateL
  * @param req Request arguments for the service. Empty as unused.
  * @param res Reponse for the caller. Contains a crate message and crate state for each crate.
  * @return true if the service is handled.
- */
+ **/
 bool CrateLocatorNode::getAllCrates(crateLocatorNode::getAllCrates::Request &req,
         crateLocatorNode::getAllCrates::Response &res) {
 	std::vector<DataTypes::Crate> allCrates = crateTracker->getAllCrates();
@@ -185,7 +185,7 @@ bool CrateLocatorNode::getAllCrates(crateLocatorNode::getAllCrates::Request &req
  *
  * @param points Vector of point2f points.
  * @return float Average X of the vector
- */
+ **/
 inline float averageX(std::vector<cv::Point2f> points) {
 	int pointsCounter = 0;
 	double total = 0;
@@ -200,7 +200,7 @@ inline float averageX(std::vector<cv::Point2f> points) {
  *
  * @param points Vector of point2f points.
  * @return float Average Y of the vector
- */
+ **/
 inline float averageY(std::vector<cv::Point2f> points) {
 	int pointsCounter = 0;
 	double total = 0;
@@ -213,7 +213,7 @@ inline float averageY(std::vector<cv::Point2f> points) {
 /**
  * Starts the calibration procedure
  *
- */
+ **/
 bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErrors) {
 	ROS_INFO("Updating calibration markers...");
 
@@ -264,7 +264,7 @@ bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErro
 /**
  * Callback function for the calibration procedure.
  * Receives an image of the image topic and tries to detect all fiducials that are present.
- */
+ **/
 void CrateLocatorNode::calibrateCallback(const sensor_msgs::ImageConstPtr& msg) {
 	// Receive image
 	cv_bridge::CvImagePtr cv_ptr;
@@ -313,7 +313,7 @@ void CrateLocatorNode::calibrateCallback(const sensor_msgs::ImageConstPtr& msg) 
  * Callback function for the crate location.
  * Main steps in the callback are: receive a frame, detect all crates and send event(s).
  * Detects
- */
+ **/
 void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg) {
 	// Receive image
 	cv_bridge::CvImagePtr cv_ptr;
@@ -388,7 +388,7 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
  * Blocking function that contains the main loop.
  * Spins in ROS to receive frames. These will execute the callbacks.
  * This function ends when ros receives a ^c
- */
+ **/
 void CrateLocatorNode::run( ) {
 	//run initial calibration. If that fails, this node will shut down.
 	if (!calibrate()) {
@@ -412,7 +412,7 @@ void CrateLocatorNode::run( ) {
 
 /**
  * Main methods that starts the cratelocator node.
- */
+ **/
 int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "crateLocator");
 	CrateLocatorNode crateLocatorNode;
