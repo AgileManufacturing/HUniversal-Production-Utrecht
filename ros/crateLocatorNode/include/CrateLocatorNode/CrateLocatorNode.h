@@ -53,69 +53,112 @@
 #include <crateLocatorNode/getAllCrates.h>
 #include <crateLocatorNode/CrateEventMsg.h>
 
-/*#include <vision/CrateEventMsg.h>
-#include <vision/error.h>
-#include <vision/registerNode.h>
-#include <vision/getCrate.h>
-#include <vision/getAllCrates.h>
-*/#include <std_srvs/Empty.h>
-
 class CrateLocatorNode{
 public:
 
-	/**
-	 * the constructor
-	 */
 	CrateLocatorNode();
-	/**
-	 * the destructor
-	 */
 	~CrateLocatorNode();
 
-	/**
-	 * blocking function that contains the main loop: take frame, detect crates, send event. this function ends when ros receives a ^c
-	 */
 	void run();
-
-	/**
-	 * callback function for the getCrate services of ROS
-	 * @param req the request object
-	 * @param res the response object
-	 * @return
-	 */
 	bool getCrate(crateLocatorNode::getCrate::Request &req,crateLocatorNode::getCrate::Response &res);
-	/**
-	 * callback function for the getAllCrates services of ROS
-	 * @param req the request object
-	 * @param res the response object
-	 * @return
-	 */
 	bool getAllCrates(crateLocatorNode::getAllCrates::Request &req,crateLocatorNode::getAllCrates::Response &res);
 
 private:
+	/**
+	 * @var fidDetector
+	 * The fiducials detector that localizes markers on the working area.
+	 */
 	Vision::FiducialDetector * fidDetector;
+
+	/**
+	 * @var qrDetector
+	 * The QR detector that detects all QR codes within the camera frame.
+	 */
 	Vision::QRCodeDetector * qrDetector;
+
+	/**
+	 * @var cordTransformer
+	 * Coordinate transformer that transform pixel (camera) coordinates into real life (deltarobot) coordinates.
+	 * Uses three marked points relative to the robot to determine the orientation and scale.
+	 */
 	Vision::PixelToRealCoordinateTransformer * cordTransformer;
+
+	/**
+	 * @var crateTracker
+	 * The CrateTracker follows all movements of the crates. It sends events if a crate is new, moving, moved or removed.
+	 */
 	Vision::CrateTracker * crateTracker;
+
+	/**
+	 * @var markers
+	 * Vector containing the locations of the three fiducial markers.
+	 */
 	std::vector<DataTypes::Point2D> markers;
 
+	/**
+	 * @var node
+	 * The nodeHandle used by ros services and topics
+	 */
 	ros::NodeHandle node;
+
+	/**
+	 * @var crateEventPublisher
+	 */
 	ros::Publisher crateEventPublisher;
-	ros::Publisher ErrorPublisher;
-	ros::Publisher nodeRegistrationPublisher;
 	ros::ServiceServer getCrateService;
 	ros::ServiceServer getAllCratesService;
 
 	// For calibration
+	/**
+	 * @var fid1_buffer
+	 * The point buffer for fiducial 1.
+	 * This buffer is averaged before used as a definitive point.
+	 */
 	std::vector<cv::Point2f> fid1_buffer;
+
+	/**
+	 * @var fid2_buffer
+	 * The point buffer for fiducial 12
+	 * This buffer is averaged before used as a definitive point.
+	 */
 	std::vector<cv::Point2f> fid2_buffer;
+
+	/**
+	 * @var fid3_buffer
+	 * The point buffer for fiducial 3.
+	 * This buffer is averaged before used as a definitive point.
+	 */
 	std::vector<cv::Point2f> fid3_buffer;
+
+	/**
+	 * @var measurementCount
+	 * Amount of measurements that were successful.
+	 */
 	unsigned int measurementCount;
+
+	/**
+	 * @var measurements
+	 * Number of measurements to be done.
+	 */
 	unsigned int measurements;
+
+	/**
+	 * @var failCount
+	 * Number of failed measurements.
+	 */
 	unsigned int failCount;
 
+	/**
+	 * @var imageTransport
+	 * ImageTransport is used to transport camera frames over a ros topic.
+	 */
 	image_transport::ImageTransport imageTransport;
-	image_transport::Subscriber sub;
+
+	/**
+	 * @var cameraSubscriber
+	 * Subscription to the camera topic for receiving frames.
+	 */
+	image_transport::Subscriber cameraSubscriber;
 
 	bool calibrate(unsigned int measurements = 100, unsigned int maxErrors = 100);
 	void calibrateCallback(const sensor_msgs::ImageConstPtr& msg);

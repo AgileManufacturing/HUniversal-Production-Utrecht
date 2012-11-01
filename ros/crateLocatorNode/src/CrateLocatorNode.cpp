@@ -32,20 +32,29 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <CrateLocatorNode/CrateLocatorNode.h>
-#include <DataTypes/Crate.h>
-
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
 
-#include <CrateLocatorNode/Topics.h>
+#include <CrateLocatorNode/CrateLocatorNode.h>
 #include <CrateLocatorNode/Services.h>
+#include <CrateLocatorNode/Topics.h>
+#include <DataTypes/Crate.h>
 
+/**
+ * @var WINDOW_NAME
+ * Name for the opencv image window.
+ */
 static const char WINDOW_NAME[] = "Image window";
 
-//on mouse click event, print the real life coordinate at the clicked pixel
+/**
+ * On mouse click event. Prints the real life (Deltarobot) and pixel coordinate of the clicked pixel.
+ *
+ * @param int event CV_EVENT (eg. CV_EVENT_LBUTTONDOWN)
+ * @param int x X coordinate of the click
+ * @param int y Y coordinate of the click
+ * @param int flags CV_EVENT_FLAG
+ * @param Vision::PixelToRealCoordinateTransformer * param Pointer to the PixelToRealCoordinateTransformer used to conversion.
+ */
 void on_mouse(int event, int x, int y, int flags, void* param) {
 	if (event == CV_EVENT_LBUTTONDOWN) {
 		Vision::PixelToRealCoordinateTransformer* cordTransformer = (Vision::PixelToRealCoordinateTransformer*) param;
@@ -62,25 +71,25 @@ void on_mouse(int event, int x, int y, int flags, void* param) {
 CrateLocatorNode::CrateLocatorNode( ) :
 		measurementCount(0), measurements(0), failCount(0), imageTransport(node) {
 
-	//setup the QR detector
+	// Setup the QR detector
 	qrDetector = new Vision::QRCodeDetector();
 
-	//setup the fiducial detector
+	// Setup the fiducial detector
 	fidDetector = new Vision::FiducialDetector();
-	// minimum for the radius of the circle = 10, so a diameter of 20 pixels
+	// Minimum for the radius of the circle = 10, so a diameter of 20 pixels
 	fidDetector->minRad = 10;
-	// maximum for the radius of the circle = 40, so a diameter of 80 pixels
+	// Maximum for the radius of the circle = 40, so a diameter of 80 pixels
 	fidDetector->maxRad = 40;
-	// minimum distance between two circles, 30 pixels
+	// Minimum distance between two circles, 30 pixels
 	fidDetector->distance = 30;
 	fidDetector->minDist = 2.0f;
 	fidDetector->maxDist = 5.0f;
 	fidDetector->verbose = true;
 	fidDetector->circleVotes = 60;
 
-	//setup the coordinate transformation(from pixel to real life)
-	//The real-life coordinates of the fiducials in mm.
-	//0,0 is center of the delta robot
+	// Setup the coordinate transformation(from pixel to real life)
+	// The real-life coordinates of the fiducials in mm.
+	// 0,0 is center of the delta robot, all coordinates are relative.
 	std::vector<DataTypes::Point2D> rc;
 	rc.push_back(DataTypes::Point2D(-75, 115));
 	rc.push_back(DataTypes::Point2D(25, 115));
@@ -88,24 +97,27 @@ CrateLocatorNode::CrateLocatorNode( ) :
 
 	cordTransformer = new Vision::PixelToRealCoordinateTransformer(rc, rc);
 
-	//crate tracking configuration
-	//the amount of mm a point has to move before we mark it as moving.
-	// When not moving we found a deviation of ~0.5 pixel.
+	// Crate tracking configuration
+	// The amount of mm a point has to move before we mark it as moving. When not moving we found a deviation of ~0.5 pixel.
 	double crateMovementThreshold = 0.75;
-	//the number of frames before a change is marked definite.
-	int numberOfStableFrames = 10;
+	// The number of frames before a change is marked definite.
+	int numberOfStableFrames = 5;
 	crateTracker = new Vision::CrateTracker(numberOfStableFrames, crateMovementThreshold);
 
-	//ROS things
+	// ROS services and topics
 	crateEventPublisher = node.advertise<crateLocatorNode::CrateEventMsg>(CrateLocatorNodeTopics::CRATE_EVENT, 100);
 	getCrateService = node.advertiseService(CrateLocatorNodeServices::GET_CRATE, &CrateLocatorNode::getCrate, this);
-	getAllCratesService = node.advertiseService(CrateLocatorNodeServices::GET_ALL_CRATES, &CrateLocatorNode::getAllCrates, this);
+	getAllCratesService = node.advertiseService(CrateLocatorNodeServices::GET_ALL_CRATES,
+	        &CrateLocatorNode::getAllCrates, this);
 
-	//GUI stuff
+	// Opencv GUI
 	cv::namedWindow(WINDOW_NAME);
 	cvSetMouseCallback(WINDOW_NAME, &on_mouse, cordTransformer);
 }
 
+/**
+ * Destructor for the CrateLocator. Removes the QR detector, fiducial detector, crate tracker and coordinate transformer.
+ */
 CrateLocatorNode::~CrateLocatorNode( ) {
 	delete qrDetector;
 	delete fidDetector;
@@ -114,6 +126,14 @@ CrateLocatorNode::~CrateLocatorNode( ) {
 	cv::destroyWindow(WINDOW_NAME);
 }
 
+/**
+ * Get crate service.
+ * Looks up a crate in the known crates and returns it if found. If the crate does not exists it will return an empty crate and DataTypes::Crate::state_non_existing
+ *
+ * @param req Request arguments for the service. Should include the name of the crate
+ * @param res Reponse for the caller. Contains a crate message and crate state.
+ * @return true if the service is handled.
+ */
 bool CrateLocatorNode::getCrate(crateLocatorNode::getCrate::Request &req, crateLocatorNode::getCrate::Response &res) {
 	DataTypes::Crate crate;
 	bool succeeded = crateTracker->getCrate(req.name, crate);
@@ -137,6 +157,14 @@ bool CrateLocatorNode::getCrate(crateLocatorNode::getCrate::Request &req, crateL
 	return true;
 }
 
+/**
+ * Get all crates service.
+ * Puts all known and located crates into the crates vector.
+ *
+ * @param req Request arguments for the service. Empty as unused.
+ * @param res Reponse for the caller. Contains a crate message and crate state for each crate.
+ * @return true if the service is handled.
+ */
 bool CrateLocatorNode::getAllCrates(crateLocatorNode::getAllCrates::Request &req,
         crateLocatorNode::getAllCrates::Response &res) {
 	std::vector<DataTypes::Crate> allCrates = crateTracker->getAllCrates();
@@ -152,14 +180,12 @@ bool CrateLocatorNode::getAllCrates(crateLocatorNode::getAllCrates::Request &req
 	return true;
 }
 
-bool xComp(cv::Point2f a, cv::Point2f b) {
-	return (a.x < b.x);
-}
-
-bool yComp(cv::Point2f a, cv::Point2f b) {
-	return (a.y < b.y);
-}
-
+/**
+ * Determines the average X of a std::vector<cv::Point2f>
+ *
+ * @param points Vector of point2f points.
+ * @return float Average X of the vector
+ */
 inline float averageX(std::vector<cv::Point2f> points) {
 	int pointsCounter = 0;
 	double total = 0;
@@ -169,6 +195,12 @@ inline float averageX(std::vector<cv::Point2f> points) {
 	return total / pointsCounter;
 }
 
+/**
+ * Determines the average Y of a std::vector<cv::Point2f>
+ *
+ * @param points Vector of point2f points.
+ * @return float Average Y of the vector
+ */
 inline float averageY(std::vector<cv::Point2f> points) {
 	int pointsCounter = 0;
 	double total = 0;
@@ -178,9 +210,14 @@ inline float averageY(std::vector<cv::Point2f> points) {
 	return total / pointsCounter;
 }
 
+/**
+ * Starts the calibration procedure
+ *
+ */
 bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErrors) {
 	ROS_INFO("Updating calibration markers...");
 
+	// Clear all buffers and settings for the new calibration
 	fid1_buffer.clear();
 	fid2_buffer.clear();
 	fid3_buffer.clear();
@@ -195,49 +232,25 @@ bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErro
 		std::cout << "[DEBUG] Starting calibration" << std::endl;
 		image_transport::Subscriber subscriber = imageTransport.subscribe("camera/image", 1,
 		        &CrateLocatorNode::calibrateCallback, this, image_transport::TransportHints("compressed"));
+
 		while (ros::ok() && (measurementCount < measurements && failCount < maxErrors)) {
 			ros::spinOnce();
 		}
 		std::cout << "[DEBUG] Done calibrating, removing subscription." << std::endl;
 	}
 
+	// If it was a successful capture of all fiducials process the results
 	if (measurementCount >= measurements) {
 		std::cout << "[DEBUG] Computing average X and Y coordinate for each marker." << std::endl;
 		DataTypes::Point2D fid1(averageX(fid1_buffer), averageY(fid1_buffer));
 		DataTypes::Point2D fid2(averageX(fid2_buffer), averageY(fid2_buffer));
 		DataTypes::Point2D fid3(averageX(fid3_buffer), averageY(fid3_buffer));
 
-		double maxDeviation = 0.0;
-		double minDeviation = 0.0;
-		for (std::vector<cv::Point2f>::iterator it = fid1_buffer.begin(); it != fid1_buffer.end(); ++it) {
-			std::cout << (*it).x << std::endl;
-			if(fid1.x - (*it).x > maxDeviation){
-				maxDeviation = fid1.x - (*it).x;
-			}
-			if(fid1.x - (*it).x < minDeviation){
-				minDeviation = fid1.x - (*it).x;
-			}
-		}
-
-		std::cout << "deviation " << fabs(maxDeviation - minDeviation) << std::endl;
-
+		// Put new marked locations into the cordinate transformer
 		markers.push_back(DataTypes::Point2D(fid1.x, fid1.y));
 		markers.push_back(DataTypes::Point2D(fid2.x, fid2.y));
 		markers.push_back(DataTypes::Point2D(fid3.x, fid3.y));
 		cordTransformer->set_fiducials_pixel_coordinates(markers);
-
-		// TODO: Determine usefulness?
-		// It was used in the ROS_INFO below..
-		/*
-		 // Determine mean deviation
-		 double totalDistance = 0;
-		 for (std::vector<DataTypes::Point2D>::iterator it = fid1_buffer.begin(); it != fid1_buffer.end(); ++it)
-		 totalDistance += fid1.distance(*it);
-		 for (std::vector<DataTypes::Point2D>::iterator it = fid2_buffer.begin(); it != fid2_buffer.end(); ++it)
-		 totalDistance += fid2.distance(*it);
-		 for (std::vector<DataTypes::Point2D>::iterator it = fid3_buffer.begin(); it != fid3_buffer.end(); ++it)
-		 totalDistance += fid3.distance(*it);
-		 float meanDeviation = totalDistance / double(fid1_buffer.size() + fid2_buffer.size() + fid3_buffer.size());*/
 
 		ROS_INFO( "Calibration markers updated.\nMeasured: %d Failed: %d", measurements, failCount);
 		return true;
@@ -248,6 +261,10 @@ bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErro
 	return false;
 }
 
+/**
+ * Callback function for the calibration procedure.
+ * Receives an image of the image topic and tries to detect all fiducials that are present.
+ */
 void CrateLocatorNode::calibrateCallback(const sensor_msgs::ImageConstPtr& msg) {
 	// Receive image
 	cv_bridge::CvImagePtr cv_ptr;
@@ -292,6 +309,11 @@ void CrateLocatorNode::calibrateCallback(const sensor_msgs::ImageConstPtr& msg) 
 	std::cout.flush();
 }
 
+/**
+ * Callback function for the crate location.
+ * Main steps in the callback are: receive a frame, detect all crates and send event(s).
+ * Detects
+ */
 void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg) {
 	// Receive image
 	cv_bridge::CvImagePtr cv_ptr;
@@ -307,11 +329,10 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 	cv::cvtColor(cv_ptr->image, gray, CV_BGR2GRAY);
 
 	// Draw the calibration points for visual debugging.
-	for (std::vector<DataTypes::Point2D>::iterator it = markers.begin(); it != markers.end(); ++it)
+	for (std::vector<DataTypes::Point2D>::iterator it = markers.begin(); it != markers.end(); ++it) {
 		cv::circle(cv_ptr->image, cv::Point(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)), 1,
 		        cv::Scalar(0, 0, 255), 2);
 
-	for (std::vector<DataTypes::Point2D>::iterator it = markers.begin(); it != markers.end(); ++it) {
 		cv::circle(cv_ptr->image,
 		        cv::Point(
 		                cordTransformer->to_pc(
@@ -338,15 +359,14 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 			coordinate = cordTransformer->to_rc(coordinate);
 			points[n].x = coordinate.x;
 			points[n].y = coordinate.y;
-			//std::cout << "[DEBUG] " << it->name << " " << points[n].x << ", " << points[n].y << std::endl;
 		}
 		it->setPoints(points);
 	}
 
-	//inform the crate tracker about the seen crates
+	// Inform the crate tracker about the located crates
 	std::vector<Vision::CrateEvent> events = crateTracker->update(crates);
 
-	//publish events
+	// Publish events to event topic
 	for (std::vector<Vision::CrateEvent>::iterator it = events.begin(); it != events.end(); ++it) {
 		crateLocatorNode::CrateEventMsg msg;
 		msg.event = it->type;
@@ -359,21 +379,28 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 		crateEventPublisher.publish(msg);
 	}
 
+	// Show the camera frame in a opencv window
 	cv::imshow(WINDOW_NAME, cv_ptr->image);
 	cv::waitKey(3);
 }
 
+/**
+ * Blocking function that contains the main loop.
+ * Spins in ROS to receive frames. These will execute the callbacks.
+ * This function ends when ros receives a ^c
+ */
 void CrateLocatorNode::run( ) {
 	//run initial calibration. If that fails, this node will shut down.
 	if (!calibrate()) {
 		ros::shutdown();
 	} else {
+		// Shutdown is not immediately exiting the program. This caused to run the these statements if they were not in the else...
 
 		std::cout << "[DEBUG] Waiting for subscription" << std::endl;
 		// subscribe example: (poorly documented on ros wiki)
 		// Images are transported in JPEG format to decrease tranfer time per image.
 		// imageTransport.subscribe(<base image topic>, <queue_size>, <callback>, <tracked object>, <TransportHints(<transport type>)>)
-		sub = imageTransport.subscribe("camera/image", 1, &CrateLocatorNode::crateLocateCallback, this,
+		cameraSubscriber = imageTransport.subscribe("camera/image", 1, &CrateLocatorNode::crateLocateCallback, this,
 		        image_transport::TransportHints("compressed"));
 		std::cout << "[DEBUG] Starting crateLocateCallback loop" << std::endl;
 
@@ -383,6 +410,9 @@ void CrateLocatorNode::run( ) {
 	}
 }
 
+/**
+ * Main methods that starts the cratelocator node.
+ */
 int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "crateLocator");
 	CrateLocatorNode crateLocatorNode;
