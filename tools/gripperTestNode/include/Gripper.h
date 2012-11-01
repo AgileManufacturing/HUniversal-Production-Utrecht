@@ -115,10 +115,46 @@ class Gripper {
 	 **/
 	bool watchdogRunning;
 
-	bool state, previousState, warned, overheated;
+	/**
+	 * @var bool state
+	 * The current state of the gripper
+	 * True is enabled
+	 * False is disabled
+	 **/
+	bool state;
 
+	/**
+	 * @var bool state
+	 * The state of the gripper in the past
+	 * True is enabled
+	 * False is disabled
+	 **/
+	bool previousState;
+
+	/**
+	 * @var bool warned
+	 * Flag whether the warning function has been called after the last warning timeout
+	 **/
+	bool warned;
+
+	/**
+	 * @var bool overheated
+	 * Flag whether the valve of the gripper is overheated. This occurs when the enabled max timeout is reached.
+	 **/
+	bool overheated;
+
+	/**
+	 * @var unsigned long timeEnabled
+	 * Timestamp of the moment when the gripper was enabled.
+	 */
 	unsigned long timeEnabled;
+
+	/**
+	 * @var unsigned long timeCooldownStarted
+	 * Timestamp of the moment when cooldown period has started.
+	 */
 	unsigned long timeCooldownStarted;
+
 
 	static void watchdogFunction(Gripper* device);
 };
