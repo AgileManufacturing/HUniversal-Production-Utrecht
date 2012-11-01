@@ -37,6 +37,7 @@
 #include <crateLocatorNode/CrateEventMsg.h>
 #include <boost/thread.hpp>
 #include <deltaRobotNode/MoveToPoint.h>
+#include <crateLocatorNode/getCrate.h>
 
 class FollowNode{
 public:
@@ -69,4 +70,7 @@ private:
 
 	ros::ServiceClient deltaRobotClient;
 	deltaRobotNode::MoveToPoint moveToPointService;
+
+	ros::ServiceClient crateLocatorClient;
+	crateLocatorNode::getCrate getCrateService;
 };
