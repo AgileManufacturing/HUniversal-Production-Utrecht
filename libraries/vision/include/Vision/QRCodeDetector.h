@@ -47,10 +47,12 @@ namespace Vision{
      */
     class QRCodeDetector{
         private:
-    	///@brief the scanner which scans the code from an image
+            /**
+             * @var zbar::ImageScanner scanner
+             * The QR-/barcode detector from the zbar library
+             **/
             zbar::ImageScanner scanner;
         public:
-            ///@brief constructor sets the values for the scanner
             QRCodeDetector();
         
             void detectQRCodes(cv::Mat& image, std::vector<DataTypes::Crate>& crates, cv::TermCriteria criteria =

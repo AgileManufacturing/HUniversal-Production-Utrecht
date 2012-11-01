@@ -1,6 +1,6 @@
 /**
  * @file Crate.cpp
- * @brief Container class for a single productcrate
+ * @brief Container class for a single product crate.
  * @date Created: 2011-11-11
  * @date Revisioned: 2012-10-22
  *
@@ -36,29 +36,51 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 namespace DataTypes {
-	Crate::Crate( ) :
-			points(3) {
+	/**
+	 * Constructs a crate without specific location.
+	 **/
+	 Crate::Crate( ) : points(3) {
 	}
 
-	Crate::Crate(const std::vector<cv::Point2f>& points) : oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(
-	        0){
+	/**
+	 * Constructs a crate with a specific location
+	 *
+	 * @param points The QR code points, ordering must be left-handed.
+	 */
+	Crate::Crate(const std::vector<cv::Point2f>& points) : oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(0) {
 		this->points.assign(points.begin(), points.begin() + 3);
 	}
 
-	Crate::Crate(std::string name, const std::vector<cv::Point2f>& points) : oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(
-	        0){
+	/**
+	 * Constructs a crate with a specific location.
+	 *
+	 * @param name The crate identifier.
+	 * @param points The QR code points, ordering must be left-handed.
+	 */
+	Crate::Crate(std::string name, const std::vector<cv::Point2f>& points) : oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(0) {
 		this->points.assign(points.begin(), points.begin() + 3);
 		this->name = name;
 	}
 
-	Crate::Crate(const Crate& crate) :
-			name(crate.name), oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(
-			        0), bounds(crate.bounds), points(crate.points) {
+	/**
+	 * Copy constructor for a crate.
+	 *
+	 * @param crate The crate to be copied.
+	 **/
+	Crate::Crate(const Crate& crate) : name(crate.name), oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(0), bounds(crate.bounds), points(crate.points) {
 	}
 
+	/**
+	 * The crate destructor.
+	 **/
 	Crate::~Crate( ) {
 	}
 
+	/**
+	 * Generate a rotated bounding rectangle, RotatedRect, that represents the crate. This rectangle is cached for subsequent calls to rect().
+	 *
+	 * @return The RotatedRect bounds.
+	 **/
 	cv::RotatedRect Crate::rect( ) {
 		if (bounds.size.area() != 0.0f)
 			return bounds;
@@ -82,6 +104,32 @@ namespace DataTypes {
 		return bounds;
 	}
 
+	/**
+	 * Get the fiducial points that represent the crate location.
+	 *
+	 * @return A copy of the fiducial points.
+	 **/
+	std::vector<cv::Point2f> Crate::getPoints( ) const {
+		std::vector<cv::Point2f> copy;
+		copy.assign(points.begin(), points.begin() + 3);
+		return copy;
+	}
+
+	/**
+	 * Sets the new QR code points and resets the bounding rectangle.
+	 *
+	 * @param newPoints The new QR code points.
+	 **/
+	void Crate::setPoints(std::vector<cv::Point2f>& newPoints) {
+		this->bounds.size = cv::Size(0, 0); // This is enough to force a regeneration
+		this->points.assign(newPoints.begin(), newPoints.begin() + 3);
+	}
+
+	/**
+	 * Draws the rectangle in the image including the QR code points, angle and bounding rectangle.
+	 *
+	 * @param image The image to draw on.
+	 **/
 	void Crate::draw(cv::Mat& image) {
 		// Draw the fiducial points
 		cv::circle(image, points[0], 1, cv::Scalar(255, 0, 0), 2);
@@ -141,17 +189,11 @@ namespace DataTypes {
 		}
 	}
 
-	void Crate::setPoints(std::vector<cv::Point2f>& newPoints) {
-		this->bounds.size = cv::Size(0, 0); // This is enough to force a regeneration
-		this->points.assign(newPoints.begin(), newPoints.begin() + 3);
-	}
-
-	std::vector<cv::Point2f> Crate::getPoints( ) const {
-		std::vector<cv::Point2f> ret;
-		ret.assign(points.begin(), points.begin() + 3);
-		return ret;
-	}
-
+	/**
+	 * Function determines the last known state.
+	 *
+	 * @return The crate_state value.
+	 **/
 	Crate::crate_state Crate::getState( ) {
 			if (oldSituation) {
 				if (stable) {

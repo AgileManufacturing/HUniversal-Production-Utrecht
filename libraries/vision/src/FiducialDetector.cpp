@@ -414,10 +414,7 @@ namespace Vision {
 		cv::Point2f extra;
 		// check fiducial 0 against 1 and 2 and fiducial 1 against 2
 		for (int i = 0; i < 2; i++) {
-			for (int j = 1; j < 3; j++) {
-				if (i == j) {
-					continue;
-				}
+			for (int j = i + 1; j < 3; j++) {
 				//find the maximum distance
 				float dist = fiducialDistance(points[i], points[j]);
 				if (dist > distance) {

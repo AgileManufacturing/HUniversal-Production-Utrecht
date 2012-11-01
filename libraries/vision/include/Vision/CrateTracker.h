@@ -38,8 +38,14 @@
 #include <string>
 
 namespace Vision {
+	/**
+	 * CrateEvent in which a crate changes state and gives new x and y coordinates and angle when possible.
+	 **/
 	class CrateEvent {
 	public:
+		/**
+		 * Indicates the type of event received for a crate, namely found, moving, moved and removed.
+		 **/
 		enum crate_event_type {
 			type_in = 1, type_out = 2, type_moving = 3, type_moved = 4
 		};

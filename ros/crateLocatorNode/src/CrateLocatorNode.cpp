@@ -48,8 +48,8 @@ static const char WINDOW_NAME[] = "Image window";
 //on mouse click event, print the real life coordinate at the clicked pixel
 void on_mouse(int event, int x, int y, int flags, void* param) {
 	if (event == CV_EVENT_LBUTTONDOWN) {
-		Vision::PixelToRealCoordinateTransformer* cordTransformer = (Vision::PixelToRealCoordinateTransformer*) param;
-		DataTypes::Point2D result = cordTransformer->to_rc(DataTypes::Point2D(x, y));
+		Vision::PixelAndRealCoordinateTransformer* cordTransformer = (Vision::PixelAndRealCoordinateTransformer*) param;
+		DataTypes::Point2D result = cordTransformer->pixelToRealCoordinate(DataTypes::Point2D(x, y));
 		ROS_INFO("RX: %f, RY:%f", result.x, result.y);
 		ROS_INFO("PX: %d, PY:%d", x, y);
 		std::cout.flush();
@@ -86,7 +86,7 @@ CrateLocatorNode::CrateLocatorNode( ) :
 	rc.push_back(DataTypes::Point2D(25, 115));
 	rc.push_back(DataTypes::Point2D(25, 65));
 
-	cordTransformer = new Vision::PixelToRealCoordinateTransformer(rc, rc);
+	cordTransformer = new Vision::PixelAndRealCoordinateTransformer(rc, rc);
 
 	//crate tracking configuration
 	//the amount of mm a point has to move before we mark it as moving.
@@ -224,7 +224,7 @@ bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErro
 		markers.push_back(DataTypes::Point2D(fid1.x, fid1.y));
 		markers.push_back(DataTypes::Point2D(fid2.x, fid2.y));
 		markers.push_back(DataTypes::Point2D(fid3.x, fid3.y));
-		cordTransformer->set_fiducials_pixel_coordinates(markers);
+		cordTransformer->setFiducialPixelCoordinates(markers);
 
 		// TODO: Determine usefulness?
 		// It was used in the ROS_INFO below..
@@ -314,12 +314,12 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 	for (std::vector<DataTypes::Point2D>::iterator it = markers.begin(); it != markers.end(); ++it) {
 		cv::circle(cv_ptr->image,
 		        cv::Point(
-		                cordTransformer->to_pc(
-		                        cordTransformer->to_rc(
+		                cordTransformer->realToPixelCoordinate(
+		                        cordTransformer->pixelToRealCoordinate(
 		                                DataTypes::Point2D(cv::saturate_cast<int>(it->x),
 		                                        cv::saturate_cast<int>(it->y)))).x,
-		                cordTransformer->to_pc(
-		                        cordTransformer->to_rc(
+		                cordTransformer->realToPixelCoordinate(
+		                        cordTransformer->pixelToRealCoordinate(
 		                                DataTypes::Point2D(cv::saturate_cast<int>(it->x),
 		                                        cv::saturate_cast<int>(it->y)))).y), 7, cv::Scalar(255, 0, 255), 1);
 	}
@@ -335,7 +335,7 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 		std::vector<cv::Point2f> points = it->getPoints();
 		for (int n = 0; n < 3; n++) {
 			DataTypes::Point2D coordinate(points[n].x, points[n].y);
-			coordinate = cordTransformer->to_rc(coordinate);
+			coordinate = cordTransformer->pixelToRealCoordinate(coordinate);
 			points[n].x = coordinate.x;
 			points[n].y = coordinate.y;
 			//std::cout << "[DEBUG] " << it->name << " " << points[n].x << ", " << points[n].y << std::endl;

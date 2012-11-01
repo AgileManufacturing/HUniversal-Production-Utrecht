@@ -46,7 +46,7 @@
 #include <DataTypes/Point2D.h>
 #include <Vision/QRCodeDetector.h>
 #include <Vision/FiducialDetector.h>
-#include <Vision/PixelToRealCoordinateTransformer.h>
+#include <Vision/PixelAndRealCoordinateTransformer.h>
 #include <Vision/CrateTracker.h>
 
 #include <crateLocatorNode/getCrate.h>
@@ -95,7 +95,7 @@ public:
 private:
 	Vision::FiducialDetector * fidDetector;
 	Vision::QRCodeDetector * qrDetector;
-	Vision::PixelToRealCoordinateTransformer * cordTransformer;
+	Vision::PixelAndRealCoordinateTransformer * cordTransformer;
 	Vision::CrateTracker * crateTracker;
 	std::vector<DataTypes::Point2D> markers;
 
