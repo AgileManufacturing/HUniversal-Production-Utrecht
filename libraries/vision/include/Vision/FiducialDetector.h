@@ -48,75 +48,75 @@ namespace Vision {
 		bool detectCenterLine(cv::Vec2f& centerLine, std::vector<cv::Vec2f> lines, cv::Mat* debugImage = NULL);
 	public:
 		/**
-		 * var bool verbose
+		 * @var bool verbose
 		 * Turn on and off console messages.
 		 **/
 		bool verbose;
 
 		/**
-		 * var int blur
+		 * @var int blur
 		 * The size of a gaussian blur.
 		 **/
 		int blur;
 		/**
-		 * var double sigma
+		 * @var double sigma
 		 * The sigma of a gaussian blur.
 		 **/
 		double sigma;
 		
 		/**
-		 * var int circleVotes
+		 * @var int circleVotes
 		 * The minimum number of votes needed for an object to be detected as a circle.
 		 **/
 		int circleVotes;
 		/**
-		 * var double distance
+		 * @var double distance
 		 * The minimum distance between circles in pixels.
 		 **/
 		double distance;
 		/**
-		 * var int minRad
+		 * @var int minRad
 		 * The minimum radius in pixels of a circle.
 		 **/
 		int minRad;
 		/**
-		 * var int maxRad
+		 * @var int maxRad
 		 * The maximum radius in pixels of a circle.
 		 **/
 		int maxRad;
 		/**
-		 * var double circleThreshold
+		 * @var double circleThreshold
 		 * High canny threshold for circle detection (low threshold is twice smaller).
 		 **/
 		double circleThreshold;
 
 		/**
-		 * var int lineVotes
+		 * @var int lineVotes
 		 * Starting vote threshold for lines, thinner lines get less votes.
 		 **/
 		int lineVotes;
 		/**
-		 * var unsigned int maxlines
+		 * @var unsigned int maxlines
 		 * Maximum amount of lines that can be found.
 		 **/
 		unsigned int maxLines;
 		/**
-		 * var float minDist
+		 * @var float minDist
 		 * Minimum distance between lines to use for the center line.
 		 **/
 		float minDist;
 		/**
-		 * var float maxDist
+		 * @var float maxDist
 		 * Maximum distance between lines to use for the center line.
 		 **/
 		float maxDist;
 		/**
-		 * var double lowThreshold
+		 * @var double lowThreshold
 		 * Low canny threshold for line detection.
 		 **/
 		double lowThreshold;
 		/**
-		 * var double highThreshold
+		 * @var double highThreshold
 		 * High canny threshold for line detection.
 		 **/
 		double highThreshold;

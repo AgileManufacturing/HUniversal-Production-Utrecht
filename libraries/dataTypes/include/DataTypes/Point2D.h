@@ -1,7 +1,7 @@
 /**
  * @file Point2D.h
  * @brief A object used for storing a coordinated as 2 doubles and useful math methods.
- * @date Created: 2012-01-??  TODO: Date
+ * @date Created: 2011-11-11
  *
  * @author Kasper van Nieuwland
  * @author Zep Mouris
@@ -34,39 +34,39 @@
 
 namespace DataTypes {
 	/**
-	 * class that represents a 2 dimensional point.
-	 * Has utilities to transform the point.
-	 */
+	 * Class that represents a 2 dimensional point. Has utilities to transform the point.
+	 **/
 	class Point2D {
 	public:
 		/**
 		 * @var double x
-		 * contains the x value of the point
-		 */
+		 * Contains the x value of the point.
+		 **/
 		double x;
 		/**
 		 * @var double y
-		 * contains the y value of the point
-		 */
+		 * Contains the y value of the point.
+		 **/
 		double y;
 
 		/**
-		 * constructor to make a point to 0,0
-		 */
+		 * Constructor to make a point to (0,0).
+		 **/
 		Point2D( ) :
 				x(0), y(0) {
 		}
 		/**
-		 * constructor to make a point at a specific location
+		 * Constructor to make a point at a specific location.
+		 * 
 		 * @param x the x value of the point
 		 * @param y the y value of the point
-		 */
+		 **/
 		Point2D(double x, double y) :
 				x(x), y(y) {
 		}
 		/**
-		 * destructor
-		 */
+		 * Destructor.
+		 **/
 		~Point2D( ) {
 		}
 
@@ -110,32 +110,38 @@ namespace DataTypes {
 			return res;
 		}
 		/**
-		 * calculates the distance between two points
-		 * @param p the second point
-		 * @return the distance between the points
-		 */
-		inline double distance(const Point2D& p) const {
-			double dx = x - p.x;
-			double dy = y - p.y;
-			return sqrt(dx * dx + dy * dy);
+		 * calculates the distance between this point and another points
+		 *
+		 * @param point The other point.
+		 *
+		 * @return The distance between the points.
+		 **/
+		inline double distance(const Point2D& point) const {
+			double deltaX = x - point.x;
+			double deltaY = y - point.y;
+			return sqrt(deltaX * deltaX + deltaY * deltaY);
 		}
 		/**
-		 * Calculate the center of two points
-		 * @param p the second point
-		 * @return returns a point2f with the location of the center
-		 */
-		inline Point2D mean(const Point2D& p) const {
+		 * Calculate the center between this point and another points.
+		 *
+		 * @param point The other point.
+		 *
+		 * @return Returns a Point2D with the location of the center.
+		 **/
+		inline Point2D mean(const Point2D& point) const {
 			Point2D result;
-			result = *this + p;
+			result = *this + point;
 			result.x /= 2;
 			result.y /= 2;
 			return result;
 		}
 		/**
-		 * rotates the point around 0,0
-		 * @param angle the angle to rotate (radians)
-		 * @return returns a point2f with the new location
-		 */
+		 * Rotates the point around 0,0
+		 *
+		 * @param angle The angle to rotate in radians.
+		 *
+		 * @return Returns a Point2D with the new location.
+		 **/
 		inline Point2D rotate(double angle) const {
 			return Point2D(x * cos(angle) - y * sin(angle), x * sin(angle) + y * cos(angle));
 		}

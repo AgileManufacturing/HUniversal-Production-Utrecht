@@ -44,7 +44,7 @@
 namespace Vision{
     /**
      * This class can detect QR-/barcodes from a Mat object
-     */
+     **/
     class QRCodeDetector{
         private:
             /**

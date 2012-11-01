@@ -46,7 +46,7 @@ namespace DataTypes {
 	 * Constructs a crate with a specific location
 	 *
 	 * @param points The QR code points, ordering must be left-handed.
-	 */
+	 **/
 	Crate::Crate(const std::vector<cv::Point2f>& points) : oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(0) {
 		this->points.assign(points.begin(), points.begin() + 3);
 	}
@@ -56,7 +56,7 @@ namespace DataTypes {
 	 *
 	 * @param name The crate identifier.
 	 * @param points The QR code points, ordering must be left-handed.
-	 */
+	 **/
 	Crate::Crate(std::string name, const std::vector<cv::Point2f>& points) : oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(0) {
 		this->points.assign(points.begin(), points.begin() + 3);
 		this->name = name;

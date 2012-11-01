@@ -405,7 +405,7 @@ namespace Vision {
 	 * points[2] = point where the shortest and longest lines meet
 	 *
 	 * @param points The points to be ordered.
-	 */
+	 **/
 	void FiducialDetector::order(std::vector<cv::Point2f>& points) {
 		// Find the two diagonal opposite points
 		float distance = 0;

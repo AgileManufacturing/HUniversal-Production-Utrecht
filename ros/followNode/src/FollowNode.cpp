@@ -59,7 +59,8 @@ FollowNode::~FollowNode( ) {
 /**
  * Function to act on received Crate Event messages
  *
- */
+ * @param msg CrateEventMsg pointer.
+ **/
 void FollowNode::callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg) {
 	switch (msg->event) {
 	case Vision::CrateEvent::type_in:

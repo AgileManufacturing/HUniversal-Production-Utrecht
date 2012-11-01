@@ -57,7 +57,7 @@ namespace Vision {
 		 * @param x The x coordinate.
 		 * @param y The y coordinate.
 		 * @param angle The angle of the crate.
-		 */
+		 **/
 		CrateEvent(crate_event_type type = type_moving, std::string name = "", float x = 0, float y = 0, float angle = 0) :
 				type(type), name(name), x(x), y(y), angle(angle) {
 		}
@@ -66,7 +66,7 @@ namespace Vision {
 		 * Returns a string with the information about the event.
 		 *
 		 * @return String with the information about the event, namely type, name, x and y coordinates and angle.
-		 */
+		 **/
 		std::string toString( ) {
 			std::stringstream ss;
 			std::string typeString;

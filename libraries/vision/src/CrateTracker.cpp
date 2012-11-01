@@ -41,7 +41,7 @@ namespace Vision {
 	 *
 	 * @param stableFrames The number of frames a change has to be observed before a change is definite.
 	 * @param movementThreshold The amount of mm a point has to move on the camera image before it is marked as moving.
-	 */
+	 **/
 	CrateTracker::CrateTracker(int stableFrames, double movementThreshold) :
 			stableFrames(stableFrames), movementThreshold(movementThreshold) {
 	}
@@ -52,7 +52,7 @@ namespace Vision {
 	 * @param updatedCrates List of seen crates.
 	 *
 	 * @return Vector list of CrateEvent messages.
-	 */
+	 **/
 	std::vector<CrateEvent> CrateTracker::update(std::vector<DataTypes::Crate> updatedCrates) {
 		std::vector<CrateEvent> events;
 
@@ -162,7 +162,7 @@ namespace Vision {
 	 * @param result The last stable info of the crate.
 	 *
 	 * @return True if crates exists, false otherwise.
-	 */
+	 **/
 	bool CrateTracker::getCrate(const std::string& name, DataTypes::Crate& result) {
 		std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.find(name);
 		if (it != knownCrates.end() && it->second.getState() != DataTypes::Crate::state_non_existing) {
@@ -177,7 +177,7 @@ namespace Vision {
 	 * Returns a list of crates with their last stable state.
 	 *
 	 * @return Vector with crates with their last stable state.
-	 */
+	 **/
 	std::vector<DataTypes::Crate> CrateTracker::getAllCrates( ) {
 		std::vector<DataTypes::Crate> allCrates;
 		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it) {
@@ -195,7 +195,7 @@ namespace Vision {
 	 * @param oldCrate The values of the crate for comparison.
 	 *
 	 * @return True if the crate has moved or rotated, false otherwise.
-	 */
+	 **/
 	bool CrateTracker::hasChanged(const DataTypes::Crate& newCrate, const DataTypes::Crate& oldCrate) {
 		const std::vector<cv::Point2f>& oldPoints = oldCrate.getPoints();
 		const std::vector<cv::Point2f>& newPoints = newCrate.getPoints();
