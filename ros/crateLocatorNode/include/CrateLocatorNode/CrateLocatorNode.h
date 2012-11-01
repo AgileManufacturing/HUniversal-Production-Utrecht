@@ -81,7 +81,7 @@ private:
 	 * Coordinate transformer that transform pixel (camera) coordinates into real life (deltarobot) coordinates.
 	 * Uses three marked points relative to the robot to determine the orientation and scale.
 	 */
-	Vision::PixelToRealCoordinateTransformer * cordTransformer;
+	Vision::PixelAndRealCoordinateTransformer * cordTransformer;
 
 	/**
 	 * @var crateTracker
