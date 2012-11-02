@@ -136,7 +136,7 @@ int main(int argc, char** argv){
 	ros::init(argc, argv, NODE_NAME);
 	int equipletID = 0;
 	int moduleID = 0;
-	if(argc != 2 || (Utilities::str2int(equipletID, argv[1]) != 0 && Utilities::str2int(moduleID, argv[2]) != 0))
+	if(argc != 2 || (Utilities::stringToInt(equipletID, argv[1]) != 0 && Utilities::stringToInt(moduleID, argv[2]) != 0))
 	{ 	 	
     	std::cerr << "Cannot read equiplet id and/or moduleId from commandline please use correct values." <<std::endl;
  		return 0;

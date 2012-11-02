@@ -72,10 +72,10 @@ void EquipletNode::stateChanged(const rosMast::StateChangedPtr &msg) {
  * @param msg Contains a errorCode and the ID of the module were the error occured
  **/
 void EquipletNode::moduleErrorCallback(const rosMast::ModuleErrorPtr &msg) {
-	//int errorCode = msg->errorCode;
 	int moduleID = msg->moduleID;
+	//int errorCode = msg->errorCode;
 
-	// Lookup errorcode in the DB and decide accordingly
+	// TODO: Lookup errorcode in the DB and decide accordingly
 	
 	// Lookup current state of the module
 	rosMast::StateType currentModuleState = getModuleState(moduleID);
@@ -124,21 +124,17 @@ void EquipletNode::updateOperationState() {
 	rosMast::StateType newOperationState = rosMast::normal;
 
 	for(it = moduleTable.begin(); it < moduleTable.end(); it++) {
-		/**
-		 * Set the new operation state if the hardware module is an actor, required for
-		 * the current service and if its state is lower than the new operation state as
-		 * initialized above.
-		 **/
+		 // Set the new operation state if the hardware module is an actor, required for
+		 // the current service and if its state is lower than the new operation state as
+		 // Initialized above.
 		if((*it).actuator && (*it).needed) {
 			newOperationState = std::min((*it).currentState, newOperationState);
 			operationStateSet = true;
 		}
 	}
-	/**
-	 * If the operation state is not set, it means that there are no actor modules suited
-	 * for the current service and so the operation state is equal to the lowest state possible
-	 * the safe state.
-	 **/
+	// If the operation state is not set, it means that there are no actor modules suited
+	// for the current service and so the operation state is equal to the lowest state possible
+	// the safe state.
 	if(!operationStateSet) {
 		newOperationState = rosMast::safe;
 	}
@@ -153,9 +149,7 @@ void EquipletNode::updateOperationState() {
  * @return true if the module has a unique id, otherwise false
  **/
 bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
-	/**
-	 * First check if the module already exists
-	 **/
+	// First check if the module already exists
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
 	for(it = moduleTable.begin(); it < moduleTable.end(); it++) {
 		if(module.id == (*it).id) {
@@ -163,9 +157,7 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 		}
 	}
 
-	/**
-	 * Create the string that is used to start another ROS node
-	 **/ 
+    // Create the string that is used to start another ROS node	 
 	std::pair< std::string, std::string > packageNodeName = modulePackageNodeMap[module.type];
 	std::stringstream ss(std::stringstream::in | std::stringstream::out);
 	ss << "rosrun " << packageNodeName.first << " " << packageNodeName.second << " " << equipletId << " " << module.id;
@@ -184,9 +176,8 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 			break; 
 	}
 
-	/**
-	 * Add the module to the table and update the safety state and operation state	
-	 **/
+	
+	// Add the module to the table and update the safety state and operation state	
 	moduleTable.push_back(module);
 	updateSafetyState();
 	updateOperationState(); 

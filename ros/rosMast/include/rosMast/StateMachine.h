@@ -35,6 +35,9 @@
 #include "rosMast/ModuleError.h"
 #include "rosMast/States.h"
 
+/**
+ * The size of the Transition table
+ **/
 #define TRANSITION_TABLE_SIZE 4
 
 namespace rosMast {
@@ -50,10 +53,12 @@ namespace rosMast {
 			destinationState = des;
 		}
 		/**
+		 * @var StateType sourceState
 		 * The original state
 		 **/
 		StateType sourceState;
 		/**
+		 * @var StateType destinationState
 		 * Destination state for transition
 		 **/
 		StateType destinationState;
@@ -100,8 +105,12 @@ namespace rosMast {
 			 * @return 0 if everything when succesfull
 			 **/			
 			virtual int transitionStop() = 0;
-
+			/**
+			 * Get the state of the statemachine
+			 * @return the currentState of the machine
+			 **/
 			StateType getState() { return currentState; }	
+			
 			void setState( StateType newState );				
 			void changeState(const rosMast::StateChangedPtr &msg);			
 			

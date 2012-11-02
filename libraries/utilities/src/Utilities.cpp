@@ -87,12 +87,12 @@ namespace Utilities
      * @param base A value between 2 and 36 inclusive, which determines the base of the value in the string. Special value is 0, which takes the value as base 10 unless a prefix of 0x (hexadecimal) or 0 (octal).
      *
      * @return error code
-     *  0 is normal
-     *  1 is overflow
-     *  2 is underflow
-     *  3 is inconvertible
+     *  - 0 is normal
+     *  - 1 is overflow
+     *  - 2 is underflow
+     *  - 3 is inconvertible
      **/
-    int str2int(int &i, char const *s, int base) {
+    int stringToInt(int &i, char const *s, int base) {
         char *end;
         long  l;
         errno = 0;

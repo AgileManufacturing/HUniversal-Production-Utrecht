@@ -34,14 +34,17 @@
 #include "rosMast/StateMachine.h"
 
 namespace Mast {
+	/** 
+	 * HardwareModuleProperties defines the the data that is for a module
+	 **/
 	class HardwareModuleProperties {
 	public:
 		HardwareModuleProperties();
 		/**
 		 * Create a new hardware module
 		 * 
-		 * @param id unique identifier of the module
-		 * @param type type of the module
+		 * @param id Unique identifier of the module
+		 * @param type Defines the type of the module
 		 * @param state The current state of this module
 		 * @param actuator Is this module an actor
 		 * @param needed Is this module needed for the current service
@@ -49,30 +52,36 @@ namespace Mast {
 		HardwareModuleProperties(int id, int type, rosMast::StateType state, bool actuator, bool needed):
 			id(id), type(type), currentState(state), actuator(actuator), needed(needed), error(false){}
 		/**
+		 * @var int id
 		 * The id of the module
 		 **/
 		int id;
 		/** 
+		 * @var int type
 		 * The type of the module 
-		 *
 		 **/
 		int type;
 		/**
+		 * @var rosMast::StateType currentState
 		 *  The currentState of the module
 		 **/
 		rosMast::StateType currentState;
 		/**
+		 * @var bool actuator
 		 * Defines if the hardware module is an actuator
 		 **/
 		bool actuator;		
 		/**
+		 * @var bool needed
 		 * defines if the hardware module is needed for the current service
 		 **/
 		bool needed;
 		/**
+		 * @var bool error
 		 * shows if the modules is in an error state
 		 **/
 		bool error;
+		
 		friend std::ostream& operator<<(std::ostream& stream, HardwareModuleProperties &module) {
 			stream << "Id: " << module.id << ", current state: " << module.currentState << " actuator " << module.actuator << " Required for current service " << module.needed;
 			return stream;

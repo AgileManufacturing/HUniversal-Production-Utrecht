@@ -329,6 +329,7 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
     deltaRobot->generateBoundaries(2);
 	// Power on the deltarobot and calibrate the motors.
     deltaRobot->powerOn();
+    // Calibrate the motors
     if(!deltaRobot->calibrateMotors()){
     	ROS_ERROR("Calibration FAILED. EXITING.");
     	return 1;
@@ -355,9 +356,9 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
  **/
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
 	ROS_INFO("Start transition called");   
-
 	// Set currentState to start
 	setState(rosMast::start);	
+	// Could calibrate here
 	return 0;
 }
 /**

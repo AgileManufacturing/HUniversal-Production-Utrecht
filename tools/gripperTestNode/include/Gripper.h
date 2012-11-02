@@ -32,7 +32,7 @@
 
 /**
  * Gripper device
- * Gripper valve could be overheated. A watchdog is running to check the valve is not opened for too long.
+ * Gripper valve could overheat, a watchdog is running to check the valve is not opened for too long so it won't heat.
  **/
 class Gripper {
 	/**
@@ -46,15 +46,15 @@ class Gripper {
 	/**
 	 * @var static int GRIPPER_MODBUS_ADRESS
 	 * Register containing the bit (port) for the gripper device
-	 * TODO: Should be moved into a dynamic location? QRCODE / Database?
 	 **/
+	// TODO: Should be moved into a dynamic location? QRCODE / Database?
 	const static int GRIPPER_MODBUS_ADRESS = 8001;
 
 	/**
 	 * @var static int GRIPPER_DEVICE_PIN
 	 * Pin (port / bit) of the gripper device
-	 * TODO: Should be moved into a dynamic location? QRCODE / Database?
 	 **/
+	// TODO: Should be moved into a dynamic location? QRCODE / Database?
 	const static int GRIPPER_DEVICE_PIN = 1;
 
 	/**
@@ -78,8 +78,8 @@ class Gripper {
 	/**
 	 * @var static int GRIPPER_TIME_WATCHDOG_INTERVAL
 	 * Watchdog loop interval.
-	 * TODO: tune for optimal performance?
 	 **/
+	// TODO: tune for optimal performance?
 	const static int GRIPPER_TIME_WATCHDOG_INTERVAL = 100;
 
 	Gripper(void* GripperNode, watchdogWarningHandler warningHandler);

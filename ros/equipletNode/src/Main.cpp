@@ -28,23 +28,19 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <EquipletNode/EquipletNode.h>
 #include "ros/ros.h"
+#include <EquipletNode/EquipletNode.h>
 #include <Utilities/Utilities.h>
 
 int main(int argc, char **argv) {
 
-	/**
-	 * Check if an equiplet id is given at the command 	line
-	 **/
+	// Check if an equiplet id is given at the command line	 
 	int equipletId = 1;
-	if(argc != 2 || Utilities::str2int(equipletId, argv[1]) != 0) {
+	if(argc != 2 || Utilities::stringToInt(equipletId, argv[1]) != 0) {
 		std::cerr << "Cannot read equiplet id from commandline. Assuming equiplet id is 1" <<std::endl;
-	} 
-
-	/**
-	 * Set the id of the Equiplet
-	 **/
+	}
+	 	
+	// Set the id of the Equiplet
 	std::ostringstream ss;
 	ss << "Equiplet" << equipletId;
 	const char* equipletName = ss.str().c_str();
@@ -52,18 +48,15 @@ int main(int argc, char **argv) {
 	ros::init(argc, argv, equipletName);
 	EquipletNode * equipletNode = new EquipletNode(equipletId);
 
-	/**
-	 * Add some hardware modules to this equiplet
-	 * This should change to modules being created in the Node itself after commands on blackboard
-	 **/
+	// Add some hardware modules to this equiplet
+	// This should change to modules being created in the Node itself after commands on blackboard
 	Mast::HardwareModuleProperties deltaRobot(1, 1, rosMast::safe, true, true);
 	Mast::HardwareModuleProperties gripper(2, 2, rosMast::safe, true, true);
 	equipletNode->addHardwareModule(deltaRobot);
 	equipletNode->addHardwareModule(gripper);
 
-	/**
-	 * print the hardware modules that are currently added to the Equiplet
-	 **/
+	
+	// print the hardware modules that are currently added to the Equiplet
 	equipletNode->printHardwareModules();
 	
 	ros::Rate poll_rate(10);
@@ -72,9 +65,7 @@ int main(int argc, char **argv) {
 		ros::spinOnce();	
 	}
 
-	/**
-	 * Delete the EquipletNode pointer
-	 **/
+	// Delete the EquipletNode pointer	
 	delete equipletNode;
 
 	return 0;
