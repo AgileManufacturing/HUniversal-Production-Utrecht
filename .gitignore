@@ -18,6 +18,8 @@ dist/
 srv_gen/
 msg_gen/
 ros/deltaRobotNode/src/deltaRobotNode/
+ros/rosMast/src/rosMast/
+tools/gripperTestNode/src/gripperTestNode/
 build/
 
 # Ignore project file, cmake text file and editor temporary files

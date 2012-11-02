@@ -41,6 +41,7 @@ namespace Utilities{
     void sleep(long milliseconds);
     double radiansToDegrees(double radians);
     double degreesToRadians(double degrees);
+    int stringToInt(int &i, char const *s, int base = 0);
 
     /**
      * Utility class to time stuff.
