@@ -31,8 +31,8 @@
 #include <boost/thread.hpp>
 
 /**
- * Gripper device
- * Gripper valve could overheat, a watchdog is running to check the valve is not opened for too long so it won't heat.
+ * Interface to the hardware, so the gripper can go on and off
+ * Gripper valve could overheat, a watchdog is running to check the valve is not opened for too long so it won't overheat.
  **/
 class Gripper {
 	/**

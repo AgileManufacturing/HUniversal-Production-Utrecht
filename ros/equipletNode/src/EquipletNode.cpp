@@ -36,7 +36,7 @@
 
 /**
  * Create a new EquipletNode
- * @var id The unique identifier of the Equiplet
+ * @param id The unique identifier of the Equiplet
  **/
 EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
 	// Create the map with moduleType mapped to package name and node name
