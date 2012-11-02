@@ -37,58 +37,87 @@
 
 namespace Vision {
 	/**
-	 * @brief object that transforms pixel coordinates to real life coordinates \
-	   using a number of fiducials of which the real life and pixel positions are known.
+	 * Object that transforms pixel coordinates to real life coordinates and vice versa using a number of fiducials of which the real life and pixel positions are known.
 	 **/
 	class PixelAndRealCoordinateTransformer {
 		public:
 			PixelAndRealCoordinateTransformer(const std::vector<DataTypes::Point2D>& fiducialsRealCoordinates, const std::vector<DataTypes::Point2D>& fiducialsPixelCoordinates);
 			virtual ~PixelAndRealCoordinateTransformer( );
-
-			void setFiducialPixelCoordinates(const std::vector<DataTypes::Point2D>& fiducialsPixelCoordinates);
-
-			//TODO pixelToRealCoordinate en realToPixelCoordinate zijn qua structuur hetzelfde, er zou een template functie moeten komen die gebruikt kan worden voor deze 2 functies
-
-			//TODO bij pixelToRealCoordinate en realToPixelCoordinate mischien nog functies maken of aanpassen met out-parameters ipv een punt returnen over de stack. bijv: void pixelToRealCoordinate(const point2f& in, point2f& out)
-
-			/**
-			 * convert pixel coordinate to a real world coordinate.
-			 *
-			 * @param pixelCoordinate the pixel coordinate
-			 *
-			 * @return the real world location of the point.
-			 **/
-			DataTypes::Point2D pixelToRealCoordinate(const DataTypes::Point2D& pixelCoordinate) const;
-
-			/**
-			 * convert real world coordinate to a pixel coordinate.
-			 *
-			 * @param realCoordinate coordinate the real world coordinate
-			 *
-			 * @return the pixel location of the point.
-			 **/
-			DataTypes::Point2D realToPixelCoordinate(const DataTypes::Point2D& realCoordinate) const;
-
-			double realToPixelCoordinateScale;
-			double pixelToRealCoordinateScale;
-			double scale;
 			
+			void setFiducialPixelCoordinates(const std::vector<DataTypes::Point2D>& fiducialsPixelCoordinates);
+			DataTypes::Point2D pixelToRealCoordinate(const DataTypes::Point2D& pixelCoordinate) const;
+			DataTypes::Point2D realToPixelCoordinate(const DataTypes::Point2D& realCoordinate) const;
+		private:
+			/**
+			 * @var double realToPixelCoordinateScale
+			 * Scale to convert from a real coordinate to a pixel coordinate.
+			 **/
+			double realToPixelCoordinateScale;
+			/**
+			 * @var double pixelToRealCoordinateScale
+			 * Scale to convert from a pixel coordinate to a real coordinate.
+			 **/
+			double pixelToRealCoordinateScale;
+
+			/**
+			 * @var double realAlpha
+			 * Angle between two fiducial points real life coordinates. Should be the same two points as pixelAlpha.
+			 **/			
 			double realAlpha;
+			/**
+			 * @var double pixelAlpha
+			 * Angle between two fiducial points pixel coordinates. Should be the same two points as realAlpha.
+			 **/
 			double pixelAlpha;
+			/**
+			 * @var double realToPixelCoordinateAlpha
+			 * Conversion in angle from real life coordinates to the pixel coordinate.
+			 **/
 			double realToPixelCoordinateAlpha;
+			/**
+			 * @var double pixelToRealCoordinateAlpha
+			 * Conversion in angle from pixel coordinates to the real life coordinate.
+			 **/
 			double pixelToRealCoordinateAlpha;
 
-			//double realToPixelCoordinateA;
-			double realToPixelCoordinateA;
-			//double realToPixelCoordinateC;
+			/**
+			 * @var double realToPixelCoordinateA
+			 * Variable calculated in updateTransformationParameters for use in conversions.
+			 **/
+			double realToPixelCoordinateA; 
+			/**
+			 * @var double realToPixelCoordinateB
+			 * Variable calculated in updateTransformationParameters for use in conversions.
+			 **/
+			double realToPixelCoordinateB;
+			/**
+			 * @var double pixelToRealCoordinateA
+			 * Variable calculated in updateTransformationParameters for use in conversions.
+			 **/
 			double pixelToRealCoordinateA;
+			/**
+			 * @var double pixelToRealCoordinateB
+			 * Variable calculated in updateTransformationParameters for use in conversions.
+			 **/
 			double pixelToRealCoordinateB;
-			//double pixelToRealCoordinateC;
 
+			/**
+			 * @var double mirrored
+			 * Indicator whether the fiducials are seen from above or from below.
+			 **/
 			bool mirrored;
-		private:
+
+			/**
+			 * @var std::vector<DataTypes::Point2D> fiducialsRealCoordinates
+			 * The real coordinates for the fiducial points. Should be in the same order as the fiducialsPixelCoordinates.
+			 **/
 			std::vector<DataTypes::Point2D> fiducialsRealCoordinates;
+			/**
+			 * @var std::vector<DataTypes::Point2D> fiducialsPixelCoordinates
+			 * The pixel coordinates for the fiducial points. Should be in the same order as the fiducialsPixelCoordinates.
+			 **/
 			std::vector<DataTypes::Point2D> fiducialsPixelCoordinates;
+
 
 			void updateTransformationParameters( );
 	};

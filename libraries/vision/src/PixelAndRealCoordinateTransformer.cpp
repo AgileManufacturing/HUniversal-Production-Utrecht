@@ -95,7 +95,8 @@ namespace Vision {
 	 * @return The pixel coordinate.
 	 **/
 	DataTypes::Point2D PixelAndRealCoordinateTransformer::realToPixelCoordinate(const DataTypes::Point2D& realCoordinate) const {
-		DataTypes::Point2D pixelCoordinate = realCoordinate;	
+		DataTypes::Point2D pixelCoordinate;
+		pixelCoordinate = realCoordinate;	
 		double temporaryX;
 		
 		if(mirrored){
@@ -104,8 +105,8 @@ namespace Vision {
 			pixelCoordinate.x = temporaryX;
 		}
 
-		temporaryX = realToPixelCoordinateScale * (cos(realToPixelCoordinateAlpha) * (pixelCoordinate.x - pixelToRealCoordinateA) + sin(realToPixelCoordinateAlpha) * (pixelCoordinate.y - realToPixelCoordinateA));
-		pixelCoordinate.y = realToPixelCoordinateScale * (-sin(realToPixelCoordinateAlpha) * (pixelCoordinate.x - pixelToRealCoordinateA) + cos(realToPixelCoordinateAlpha) * (pixelCoordinate.y - realToPixelCoordinateA));
+		temporaryX = realToPixelCoordinateScale * (cos(realToPixelCoordinateAlpha) * (pixelCoordinate.x - realToPixelCoordinateA) + sin(realToPixelCoordinateAlpha) * (pixelCoordinate.y - realToPixelCoordinateB));
+		pixelCoordinate.y = realToPixelCoordinateScale * (-sin(realToPixelCoordinateAlpha) * (pixelCoordinate.x - realToPixelCoordinateA) + cos(realToPixelCoordinateAlpha) * (pixelCoordinate.y - realToPixelCoordinateB));
 		pixelCoordinate.x = temporaryX;
 		pixelCoordinate.y *= -1;
 		
@@ -143,7 +144,7 @@ namespace Vision {
 		double realDeltaX = fiducialsRealCoordinates[2].x - realX;
 		double realDeltaY = fiducialsRealCoordinates[2].y - realY;
 		
-		realAlpha = atan2(realDeltaY, realDeltaX);
+		realAlpha = atan2(realDeltaY, realDeltaX);   
 		pixelAlpha = atan2(pixelDeltaY, pixelDeltaX);
 		realToPixelCoordinateAlpha = realAlpha - pixelAlpha;
 		pixelToRealCoordinateAlpha = pixelAlpha - realAlpha;
@@ -154,8 +155,8 @@ namespace Vision {
 		double rsin2 = pow(rsin, 2);
 		double rtan = tan(realToPixelCoordinateAlpha);
 		
-		pixelToRealCoordinateA =  realX - (rcos * pixelX - rsin * pixelY) / (realToPixelCoordinateScale * (rcos2 + rsin2));	
-		realToPixelCoordinateA = realY - pixelY / (realToPixelCoordinateScale * rcos) - rtan * (realX - pixelToRealCoordinateA);
+		realToPixelCoordinateA =  realX - (rcos * pixelX - rsin * pixelY) / (realToPixelCoordinateScale * (rcos2 + rsin2));	
+		realToPixelCoordinateB = realY - pixelY / (realToPixelCoordinateScale * rcos) - rtan * (realX - realToPixelCoordinateA);
 		
 		rcos = cos(pixelToRealCoordinateAlpha);
 		rcos2 = pow(rcos, 2);
