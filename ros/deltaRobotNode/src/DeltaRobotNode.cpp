@@ -344,6 +344,7 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {	
 	ROS_INFO("Shutdown transition called");	
 	setState(rosMast::shutdown);
+	// Should have information about the workspace, calculate a safe spot and move towards it
 	deltaRobot->powerOff();
 	return 0;
 }
@@ -364,10 +365,10 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
  * @return will be 0 if everything went ok else error
  **/
 int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
-	ROS_INFO("Stop transition called");
-	
+	ROS_INFO("Stop transition called");	
 	// Set currentState to stop
 	setState(rosMast::stop);
+	// Go to base (Motors on 0 degrees)
 	return 0;
 }
 

@@ -168,7 +168,7 @@ bool EquipletNode::addHardwareModule(Mast::HardwareModuleProperties module) {
 	 **/ 
 	std::pair< std::string, std::string > packageNodeName = modulePackageNodeMap[module.type];
 	std::stringstream ss(std::stringstream::in | std::stringstream::out);
-	ss << "rosrun " << packageNodeName.first << " " << packageNodeName.second << " " << equipletId << " " << module.id; // << " __name:=" << packageNodeName.second;
+	ss << "rosrun " << packageNodeName.first << " " << packageNodeName.second << " " << equipletId << " " << module.id;
 	std::cout << ss.str() << std::endl;
 	int pid = -1;
 	switch(pid = fork()) {
