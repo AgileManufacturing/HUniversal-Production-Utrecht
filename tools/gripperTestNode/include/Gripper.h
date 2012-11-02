@@ -85,10 +85,15 @@ class Gripper {
 	Gripper(void* GripperNode, watchdogWarningHandler warningHandler);
 	virtual ~Gripper();
 
+	/** 
+	 * Turn the gripper on
+	 **/
 	void grab(){
 		state = true;
 	}
-
+	/** 
+	 * Turn the gripper off
+	 **/
 	void release(){
 		state = false;
 	}
