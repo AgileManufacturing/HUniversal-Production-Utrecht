@@ -1,4 +1,5 @@
 #include "GripperTestNode.h"
+#include <Utilities/Utilities.h>
 
 #define NODE_NAME "GripperTestNode"
 
@@ -80,6 +81,14 @@ int GripperTestNode::transitionStop() {
 	return 0;
 }
 
+/**
+ * Set gripper on
+ *
+ * @param req The request for this service as defined in Grip.srv 
+ * @param res The response for this service as defined in Grip.srv
+ *
+ * @return true if gripper is put on else return false.
+ **/
 bool GripperTestNode::grip(gripperTestNode::Grip::Request &req, gripperTestNode::Grip::Response &res)
 {
 	res.succeeded = false;
@@ -95,6 +104,14 @@ bool GripperTestNode::grip(gripperTestNode::Grip::Request &req, gripperTestNode:
 	return true;
 }	
 
+/**
+ * Set gripper off
+ *
+ * @param req The request for this service as defined in Grip.srv 
+ * @param res The response for this service as defined in Grip.srv
+ *
+* @return true if gripper is put off else return false.
+ **/
 bool GripperTestNode::release(gripperTestNode::Release::Request &req, gripperTestNode::Release::Response &res)
 {
 	res.succeeded = false;
@@ -117,9 +134,14 @@ bool GripperTestNode::release(gripperTestNode::Release::Request &req, gripperTes
 int main(int argc, char** argv){
 	
 	ros::init(argc, argv, NODE_NAME);
-
-	int equipletID = atoi(argv[1]);
-	int moduleID = atoi(argv[2]);
+	int equipletID = 0;
+	int moduleID = 0;
+	if(argc != 2 || (Utilities::str2int(equipletID, argv[1]) != 0 && Utilities::str2int(moduleID, argv[2]) != 0))
+	{ 	 	
+    	std::cerr << "Cannot read equiplet id and/or moduleId from commandline please use correct values." <<std::endl;
+ 		return 0;
+  	} 
+	
 
 	GripperTestNode gripperTestNode(equipletID, moduleID);    
 
