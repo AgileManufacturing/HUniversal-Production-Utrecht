@@ -107,8 +107,7 @@ CrateLocatorNode::CrateLocatorNode( ) :
 	// ROS services and topics
 	crateEventPublisher = node.advertise<crateLocatorNode::CrateEventMsg>(CrateLocatorNodeTopics::CRATE_EVENT, 100);
 	getCrateService = node.advertiseService(CrateLocatorNodeServices::GET_CRATE, &CrateLocatorNode::getCrate, this);
-	getAllCratesService = node.advertiseService(CrateLocatorNodeServices::GET_ALL_CRATES,
-	        &CrateLocatorNode::getAllCrates, this);
+	getAllCratesService = node.advertiseService(CrateLocatorNodeServices::GET_ALL_CRATES, &CrateLocatorNode::getAllCrates, this);
 
 	// Opencv GUI
 	cv::namedWindow(WINDOW_NAME);
@@ -165,8 +164,7 @@ bool CrateLocatorNode::getCrate(crateLocatorNode::getCrate::Request &req, crateL
  * @param res Reponse for the caller. Contains a crate message and crate state for each crate.
  * @return true if the service is handled.
  **/
-bool CrateLocatorNode::getAllCrates(crateLocatorNode::getAllCrates::Request &req,
-        crateLocatorNode::getAllCrates::Response &res) {
+bool CrateLocatorNode::getAllCrates(crateLocatorNode::getAllCrates::Request &req, crateLocatorNode::getAllCrates::Response &res) {
 	std::vector<DataTypes::Crate> allCrates = crateTracker->getAllCrates();
 	for (std::vector<DataTypes::Crate>::iterator it = allCrates.begin(); it != allCrates.end(); ++it) {
 		res.states.push_back(it->getState());
@@ -230,8 +228,7 @@ bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErro
 	// This allows us to use a temporary callback handler.
 	{
 		std::cout << "[DEBUG] Starting calibration" << std::endl;
-		image_transport::Subscriber subscriber = imageTransport.subscribe("camera/image", 1,
-		        &CrateLocatorNode::calibrateCallback, this, image_transport::TransportHints("compressed"));
+		image_transport::Subscriber subscriber = imageTransport.subscribe("camera/image", 1, &CrateLocatorNode::calibrateCallback, this, image_transport::TransportHints("compressed"));
 
 		while (ros::ok() && (measurementCount < measurements && failCount < maxErrors)) {
 			ros::spinOnce();
@@ -256,8 +253,7 @@ bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErro
 		return true;
 	}
 
-	ROS_INFO(
-	        "Calibration timed out, too many failed attempts. Measurements needed: %d Measured: %d", measurements, measurementCount);
+	ROS_INFO( "Calibration timed out, too many failed attempts. Measurements needed: %d Measured: %d", measurements, measurementCount);
 	return false;
 }
 
@@ -330,19 +326,9 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 
 	// Draw the calibration points for visual debugging.
 	for (std::vector<DataTypes::Point2D>::iterator it = markers.begin(); it != markers.end(); ++it) {
-		cv::circle(cv_ptr->image, cv::Point(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)), 1,
-		        cv::Scalar(0, 0, 255), 2);
+		cv::circle(cv_ptr->image, cv::Point(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)), 1, cv::Scalar(0, 0, 255), 2);
 
-		cv::circle(cv_ptr->image,
-		        cv::Point(
-		                cordTransformer->realToPixelCoordinate(
-		                        cordTransformer->pixelToRealCoordinate(
-		                                DataTypes::Point2D(cv::saturate_cast<int>(it->x),
-		                                        cv::saturate_cast<int>(it->y)))).x,
-		                cordTransformer->realToPixelCoordinate(
-		                        cordTransformer->pixelToRealCoordinate(
-		                                DataTypes::Point2D(cv::saturate_cast<int>(it->x),
-		                                        cv::saturate_cast<int>(it->y)))).y), 7, cv::Scalar(255, 0, 255), 1);
+		cv::circle(cv_ptr->image, cv::Point(cordTransformer->realToPixelCoordinate(cordTransformer->pixelToRealCoordinate(DataTypes::Point2D(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)))).x, cordTransformer->realToPixelCoordinate(cordTransformer->pixelToRealCoordinate(DataTypes::Point2D(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)))).y), 7, cv::Scalar(255, 0, 255), 1);
 	}
 
 	// Detect all QR crates in the image.
@@ -400,8 +386,7 @@ void CrateLocatorNode::run( ) {
 		// subscribe example: (poorly documented on ros wiki)
 		// Images are transported in JPEG format to decrease tranfer time per image.
 		// imageTransport.subscribe(<base image topic>, <queue_size>, <callback>, <tracked object>, <TransportHints(<transport type>)>)
-		cameraSubscriber = imageTransport.subscribe("camera/image", 1, &CrateLocatorNode::crateLocateCallback, this,
-		        image_transport::TransportHints("compressed"));
+		cameraSubscriber = imageTransport.subscribe("camera/image", 1, &CrateLocatorNode::crateLocateCallback, this, image_transport::TransportHints("compressed"));
 		std::cout << "[DEBUG] Starting crateLocateCallback loop" << std::endl;
 
 		while (ros::ok()) {

@@ -131,41 +131,12 @@ namespace DataTypes {
 	 * @param image The image to draw on.
 	 **/
 	void Crate::draw(cv::Mat& image) {
-		// Draw the fiducial points
+		// Draw the QR marker points
 		cv::circle(image, points[0], 1, cv::Scalar(255, 0, 0), 2);
 		cv::circle(image, points[1], 1, cv::Scalar(0, 255, 0), 2);
 		cv::circle(image, points[2], 1, cv::Scalar(0, 0, 255), 2);
 
 		cv::RotatedRect rect = this->rect();
-
-		// Draw rect
-		{
-			cv::Point2f pt1(
-			        rect.center.x + (rect.size.width / 2.0) * cos(-rect.angle)
-			                - (rect.size.height / 2.0) * sin(-rect.angle),
-			        rect.center.y + (rect.size.height / 2.0) * cos(-rect.angle)
-			                + (rect.size.width / 2.0) * sin(-rect.angle));
-			cv::Point2f pt2(
-			        rect.center.x - (rect.size.width / 2.0) * cos(-rect.angle)
-			                - (rect.size.height / 2.0) * sin(-rect.angle),
-			        rect.center.y + (rect.size.height / 2.0) * cos(-rect.angle)
-			                - (rect.size.width / 2.0) * sin(-rect.angle));
-			cv::Point2f pt3(
-			        rect.center.x - (rect.size.width / 2.0) * cos(-rect.angle)
-			                + (rect.size.height / 2.0) * sin(-rect.angle),
-			        rect.center.y - (rect.size.height / 2.0) * cos(-rect.angle)
-			                - (rect.size.width / 2.0) * sin(-rect.angle));
-			cv::Point2f pt4(
-			        rect.center.x + (rect.size.width / 2.0) * cos(-rect.angle)
-			                + (rect.size.height / 2.0) * sin(-rect.angle),
-			        rect.center.y - (rect.size.height / 2.0) * cos(-rect.angle)
-			                + (rect.size.width / 2.0) * sin(-rect.angle));
-
-			cv::line(image, pt1, pt2, cv::Scalar(0, 255, 0), 2);
-			cv::line(image, pt2, pt3, cv::Scalar(0, 255, 0), 2);
-			cv::line(image, pt3, pt4, cv::Scalar(0, 255, 0), 2);
-			cv::line(image, pt4, pt1, cv::Scalar(0, 255, 0), 2);
-		}
 
 		// Draw arrow
 		{
