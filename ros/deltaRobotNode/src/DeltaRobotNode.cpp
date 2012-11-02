@@ -374,10 +374,15 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
 }
 
 int main(int argc, char **argv) {
-	ros::init(argc, argv, NODE_NAME);
+	int equipletID;
+	int moduleID;
+	
+	if(argc < 3 || 	(Utilities::stringToInt(equipletID, argv[1])!= 0 && Utilities::stringToInt(moduleID, argv[2]) != 0)) 
+	{
+		return -1;
+	}
 
-	int equipletID = atoi(argv[1]);
-	int moduleID = atoi(argv[2]);
+	ros::init(argc, argv, NODE_NAME);
 
 	ROS_INFO("Creating DeltaRobotNode"); 	
 
