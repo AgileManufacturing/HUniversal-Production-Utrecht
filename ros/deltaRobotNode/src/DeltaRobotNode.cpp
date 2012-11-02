@@ -382,7 +382,7 @@ int main(int argc, char **argv) {
 	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID);    
 	
 	ROS_INFO("Running StateEngine"); 	
-    drn.StateEngine();	
+    drn.startStateMachine();	
 	return 0;
 }
 

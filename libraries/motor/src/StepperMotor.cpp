@@ -67,9 +67,8 @@ namespace Motor
             modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SEQ_MODE + 1, /*1*/
             0);
             modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
-            //set motors limits
 
-            std::cout << "[DEBUG] poweron " << (uint32_t)((minAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE) << "  " << minAngle << "  " << deviation << std::endl;
+            //set motors limits
             modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((maxAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
             modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((minAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
             modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_START_SPEED, 1);
@@ -217,7 +216,6 @@ namespace Motor
     {
     	this->minAngle = minAngle;
         modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((minAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
-        std::cout << "[DEBUG] setMinAngle " << (uint32_t)((minAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE) << "  " << minAngle << std::endl;
         anglesLimited = true;
     }
 

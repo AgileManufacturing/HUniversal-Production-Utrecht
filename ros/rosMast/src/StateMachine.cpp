@@ -144,7 +144,7 @@ void rosMast::StateMachine::sendErrorMessage(int errorCode) {
 /** 
  * The run part of the state machine
  **/
-void rosMast::StateMachine::StateEngine() {
+void rosMast::StateMachine::startStateMachine() {
 	while(ros::ok()) { 
 		ros::spinOnce();
 	}

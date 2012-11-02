@@ -4,8 +4,6 @@
 
 /**
  * Constructor 
- *
- *
  **/
 GripperTestNode::GripperTestNode(int equipletID, int moduleID): rosMast::StateMachine(equipletID, moduleID)
 {
@@ -21,11 +19,18 @@ GripperTestNode::~GripperTestNode()
 	delete gripper;
 }
 
+/** 
+ * A wrapper for the gripper error handler so that we can use a member function
+ * @param Pointer to the gripperTestNode object
+ **/
 void GripperTestNode::WrapperForGripperError(void* gripperNodeObject) {
 	GripperTestNode* myself = (GripperTestNode*) gripperNodeObject;
 	myself->error();
 }
 
+/** 
+ * Sends error message to equipletNode with an errorcode
+ **/
 void GripperTestNode::error(){
 	sendErrorMessage(-1);
 }
@@ -36,15 +41,14 @@ void GripperTestNode::error(){
  **/
 int GripperTestNode::transitionSetup() {
 	ROS_INFO("Setup transition called");
-	setState(rosMast::setup);
-   
+	
+	setState(rosMast::setup); 
 	return 0; 
 }
 
 /**
  * Transition from Standby to Safe state
- * Will turn power off the motor 
- * @return will be 0 if everything went ok else error
+ * @return 0 if everything went OK else error
  **/
 int GripperTestNode::transitionShutdown() {	
 	ROS_INFO("Shutdown transition called");	
@@ -55,7 +59,7 @@ int GripperTestNode::transitionShutdown() {
 
 /**
  * Transition from Standby to Normal state
- * @return will be 0 if everything went ok else error 
+ * @return 0 if everything went OK else error
  **/
 int GripperTestNode::transitionStart() {
 	ROS_INFO("Start transition called");   
@@ -66,7 +70,7 @@ int GripperTestNode::transitionStart() {
 }
 /**
  * Transition from Normal to Standby state
- * @return will be 0 if everything went ok else error
+ * @return 0 if everything went OK else error
  **/
 int GripperTestNode::transitionStop() {
 	ROS_INFO("Stop transition called");
@@ -119,6 +123,6 @@ int main(int argc, char** argv){
 
 	GripperTestNode gripperTestNode(equipletID, moduleID);    
 
-	gripperTestNode.StateEngine();
+	gripperTestNode.startStateMachine();
 	return 0;
 }

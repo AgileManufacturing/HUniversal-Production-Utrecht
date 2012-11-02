@@ -26,6 +26,9 @@
 * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
+#ifndef HWMODULEPROPERTIES_H
+#define HWMODULEPROPERTIES_H
+
 #include <string>
 #include <iostream>
 #include "rosMast/StateMachine.h"
@@ -46,17 +49,29 @@ namespace Mast {
 		HardwareModuleProperties(int id, int type, rosMast::StateType state, bool actuator, bool needed):
 			id(id), type(type), currentState(state), actuator(actuator), needed(needed), error(false){}
 		/**
-		 * The use of a name for a module is a temporary solution. 
-		 * This will probably be changed when the module database is implemented.
+		 * The id of the module
 		 **/
 		int id;
+		/** 
+		 * The type of the module 
+		 *
+		 **/
 		int type;
+		/**
+		 *  The currentState of the module
+		 **/
 		rosMast::StateType currentState;
+		/**
+		 * Defines if the hardware module is an actuator
+		 **/
 		bool actuator;		
 		/**
 		 * defines if the hardware module is needed for the current service
 		 **/
 		bool needed;
+		/**
+		 * shows if the modules is in an error state
+		 **/
 		bool error;
 		friend std::ostream& operator<<(std::ostream& stream, HardwareModuleProperties &module) {
 			stream << "Id: " << module.id << ", current state: " << module.currentState << " actuator " << module.actuator << " Required for current service " << module.needed;
@@ -64,3 +79,5 @@ namespace Mast {
 		}
 	};
 }
+
+#endif

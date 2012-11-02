@@ -80,9 +80,25 @@ namespace rosMast {
 		public:
 			StateMachine(int equipletID, int moduleID);	
 		
+			/**
+			 * Transition from Safe to Standby
+			 * @return 0 if everything when succesfull
+			 **/
 			virtual int transitionSetup() = 0;
+			/**
+			 * Transition from Standby to Ssafe
+			 * @return 0 if everything when succesfull
+			 **/
 			virtual int transitionShutdown() = 0;
+			/**
+			 * Transition from Standby to Normal
+			 * @return 0 if everything when succesfull
+			 **/			
 			virtual int transitionStart() = 0;
+			/**
+			 * Transition from Normal to Standby
+			 * @return 0 if everything when succesfull
+			 **/			
 			virtual int transitionStop() = 0;
 
 			StateType getState() { return currentState; }	
@@ -92,7 +108,7 @@ namespace rosMast {
 			stateFunctionPtr lookupTransition(StateType currentState, StateType desiredState);
 			void sendErrorMessage(int errorCode);
 			
-			void StateEngine();			
+			void startStateMachine();			
 		private:
 			/**
 			 * @var std::map<StateTransition, stateFunctionPtr> transitionMap;
