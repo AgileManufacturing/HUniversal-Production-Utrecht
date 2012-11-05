@@ -142,11 +142,6 @@ int main(int argc, char** argv){
  		return -1;
   	} 
 
-  	ROS_INFO("argv1 is %s", argv[1]);
-	ROS_INFO("argv2 is %s", argv[2]);	
-	ROS_INFO("equipletID is %d", equipletID);
-	ROS_INFO("moduleID is %d", moduleID);	
-
 	GripperTestNode gripperTestNode(equipletID, moduleID);    
 
 	gripperTestNode.startStateMachine();
