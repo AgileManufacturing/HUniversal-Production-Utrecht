@@ -383,10 +383,10 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
 	return 0;
 }
 int main(int argc, char **argv) {
-	int equipletID;
-	int moduleID;
+	int equipletID = 0;
+	int moduleID = 0;
 	
-	if(argc < 3 || 	(Utilities::stringToInt(equipletID, argv[1])!= 0 && Utilities::stringToInt(moduleID, argv[2]) != 0)) 
+	if(argc >= 2 || 	(Utilities::stringToInt(equipletID, argv[1])!= 0 && Utilities::stringToInt(moduleID, argv[2]) != 0)) 
 	{
 		return -1;
 	}
