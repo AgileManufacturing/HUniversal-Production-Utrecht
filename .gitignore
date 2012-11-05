@@ -20,6 +20,7 @@ msg_gen/
 ros/deltaRobotNode/src/deltaRobotNode/
 ros/rosMast/src/rosMast/
 ros/crateLocatorNode/src/crateLocatorNode/
+ros/gripperNode/src/gripperNode/
 tools/gripperTestNode/src/gripperTestNode/
 build/
 
