@@ -37,7 +37,7 @@ namespace InputOutput
 	class InputOutputController {
 		
 	public:
-		InputOutputController(ModbusController::ModbusController& modbus);
+		InputOutputController(ModbusController::ModbusController* modbus);
 
 		void pinHigh(uint32_t address, uint8_t pin);
 		void pinLow(uint32_t address, uint8_t pin);
@@ -47,6 +47,6 @@ namespace InputOutput
 		 * @var ModbusController::ModbusController* modbus
 		 * Pointer to an established modbus connection.
 		 **/
-		ModbusController::ModbusController& modbus;
+		ModbusController::ModbusController* modbus;
 	};
 }

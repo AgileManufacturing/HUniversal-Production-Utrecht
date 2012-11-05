@@ -1,5 +1,5 @@
 ## Add all ROS packages here ##
-set(TOOLSPACKS keyboardControlNode deltaRobotTest watchdogTester)
+set(TOOLSPACKS keyboardControlNode deltaRobotTest)
 
 ### Don't change anything below, the part below checks if ROS is installed and configured correctly. 
 ######
