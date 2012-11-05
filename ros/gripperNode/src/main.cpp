@@ -1,151 +1,182 @@
-//******************************************************************************
-//
-//                 Low Cost Vision
-//
-//******************************************************************************
-// Project:        grippernode
-// File:           main.cpp
-// Description:    Contains the gripper ROSnode
-// Author:         Martijn Beek
-// Notes:          ...
-//
-// License:        GNU GPL v3
-//
-// This file is part of grippernode.
-//
-// grippernode is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// grippernode is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with grippernode.  If not, see <http://www.gnu.org/licenses/>.
-//******************************************************************************
+#include "GripperNode/GripperNode.h"
+#include "Utilities/Utilities.h"
 
-#include <gripper/gripper.h>
-#include "ros/ros.h"
-#include "grippernode/grippersrv.h"
-#include "grippernode/error.h"
-#include "grippernode/registerNode.h"
+#define NODE_NAME "GripperNode"
 
-using namespace std;
+/**
+ * The IP of the modbus we are connecting to
+ **/
+#define MODBUS_IP "192.168.0.2"
+/**
+ * The port we are connecting to
+ **/
+#define MODBUS_PORT 502
 
-
-static gripper * grip;
-static ros::Publisher * pub;
-
-static bool gripper_status = false;
-static bool overheated = false;
-bool enableGripper(grippernode::grippersrv::Request &req,
-		grippernode::grippersrv::Response &res)
+/**
+ * Constructor
+ **/
+GripperNode::GripperNode(int equipletID, int moduleID): rosMast::StateMachine(equipletID, moduleID)
 {
-	try
-	{
-		res.succeeded = true;
-		if(req.enabled)
-		{
-			if(!overheated)
-			{
-				gripper_status = true;
-				//grip->grab();
-			}
-			else
-			{
-				ROS_WARN("Tried to turn on gripper, but it's valve is currently overheated. Ignoring request");
-				res.succeeded = false;
-			}
-		} else {
-			gripper_status = false;
-			//grip->release();
-		}
 
+	// Initialize modbus for IO controller
+	std::cout << "[DEBUG] Opening modbus connection" << std::endl;
+	modbusContext = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
+
+	if (modbusContext == NULL) {
+		throw std::runtime_error("Unable to allocate libmodbus context");
 	}
-	catch(std::runtime_error& ex)
+
+	if (modbus_connect(modbusContext) == -1) {
+		throw std::runtime_error("Modbus connection to IO controller failed");
+	}
+	assert(modbusContext != NULL);
+
+	modbus = new ModbusController::ModbusController(modbusContext);
+
+	std::cout << "[DEBUG] Opening IO Controller" << std::endl;
+	InputOutput::InputOutputController controller(modbus);
+
+	std::cout << "[DEBUG] Starting gripper" << std::endl;
+	gripper = new InputOutput::OutputDevices::Gripper(controller, this, wrapperForGripperError);
+	ros::NodeHandle nodeHandle;
+	// Advertise the services
+	gripService = nodeHandle.advertiseService(GripperNodeServices::GRIP, &GripperNode::grip, this);
+	releaseService = nodeHandle.advertiseService(GripperNodeServices::RELEASE, &GripperNode::release, this);
+}
+
+GripperNode::~GripperNode()
+{
+	delete gripper;
+	delete modbus;
+    modbus_close(modbusContext);
+    modbus_free(modbusContext);
+}
+
+/**
+ * A wrapper for the gripper error handler so that we can use a member function
+ * @param Pointer to the gripperTestNode object
+ **/
+void GripperNode::wrapperForGripperError(void* gripperNodeObject) {
+	GripperNode* myself = (GripperNode*) gripperNodeObject;
+	myself->error();
+}
+
+/**
+ * Sends error message to equipletNode with an errorcode
+ **/
+void GripperNode::error(){
+	sendErrorMessage(-1);
+}
+
+/**
+ * Transition from Safe to Standby state
+ * @return 0 if everything went OK else error
+ **/
+int GripperNode::transitionSetup() {
+	ROS_INFO("Setup transition called");
+
+	setState(rosMast::setup);
+	return 0;
+}
+
+/**
+ * Transition from Standby to Safe state
+ * @return 0 if everything went OK else error
+ **/
+int GripperNode::transitionShutdown() {
+	ROS_INFO("Shutdown transition called");
+
+	setState(rosMast::shutdown);
+	return 0;
+}
+
+/**
+ * Transition from Standby to Normal state
+ * @return 0 if everything went OK else error
+ **/
+int GripperNode::transitionStart() {
+	ROS_INFO("Start transition called");
+
+	// Set currentState to start
+	setState(rosMast::start);
+	return 0;
+}
+/**
+ * Transition from Normal to Standby state
+ * @return 0 if everything went OK else error
+ **/
+int GripperNode::transitionStop() {
+	ROS_INFO("Stop transition called");
+	gripper->release();
+	// Set currentState to stop
+	setState(rosMast::stop);
+	return 0;
+}
+
+/**
+ * Set gripper on
+ *
+ * @param req The request for this service as defined in Grip.srv
+ * @param res The response for this service as defined in Grip.srv
+ *
+ * @return true if gripper is put on else return false.
+ **/
+bool GripperNode::grip(gripperNode::Grip::Request &req, gripperNode::Grip::Response &res)
+{
+	res.succeeded = false;
+	if(getState() == rosMast::normal)
+	{
+		gripper->grab();
+		res.succeeded = true;
+	}
+	else
 	{
 		res.succeeded = false;
-		grippernode::error msg;
-		std::stringstream ss;
-		ss << "runtime error of type "<< typeid(ex).name()<<" in delta robot" << std::endl;
-		ss <<"what(): " << ex.what()<<std::endl;
-		msg.errorMsg = ss.str();
-		msg.errorType = 3;
-		pub->publish(msg);
+	}
+	return true;
+}
+
+/**
+ * Set gripper off
+ *
+ * @param req The request for this service as defined in Grip.srv
+ * @param res The response for this service as defined in Grip.srv
+ *
+* @return true if gripper is put off else return false.
+ **/
+bool GripperNode::release(gripperNode::Release::Request &req, gripperNode::Release::Response &res)
+{
+	res.succeeded = false;
+	if(getState() == rosMast::normal)
+	{
+		gripper->release();
+		res.succeeded = true;
+		ROS_INFO("Gripper released");
+	}
+	else
+	{
+		res.succeeded = false;
+		ROS_INFO("Gripper not released, state was not normal");
 	}
 	return true;
 }
 
 
-int main(int argc, char** argv)
-{
-	grip = new gripper("192.168.0.2", 502);
-	grip->connect();
 
-	ros::init(argc, argv, "Gripper");
-	ros::NodeHandle n;
-	ros::ServiceServer service2 = n.advertiseService("enableGripper", enableGripper);
-	ros::Publisher pub = n.advertise<grippernode::registerNode>("NodeRegistration", 1000);
-	
-	ros::Rate loop_rate(1000);
+int main(int argc, char** argv){
 
-	
-	ros::Time gripper_went_on;
-	ros::Time got_overheated;
-	bool previous_gripper_status = gripper_status;
-	static const int MAX_GRIPPER_ON = 60; //sec
-	static const int COOLDOWN_DURATION = 3*60; //sec
-	
-	while(pub.getNumSubscribers()==0)
+	ros::init(argc, argv, NODE_NAME);
+	int equipletID = 0;
+	int moduleID = 0;
+	if(argc != 2 || (Utilities::stringToInt(equipletID, argv[1]) != 0 && Utilities::stringToInt(moduleID, argv[2]) != 0))
 	{
-	   ROS_ERROR("Waiting for subscibers");
-	   sleep(10);
-	}
-		
-	grippernode::registerNode rn;
-	rn.action = "GRIPPER";
-	rn.form = "enableGripper";
-	pub.publish(rn);	
-	ros::spinOnce();
-	loop_rate.sleep();
-	
+    	std::cerr << "Cannot read equiplet id and/or moduleId from commandline please use correct values." <<std::endl;
+ 		return 0;
+  	}
 
-	while(ros::ok())
-	{
-		//prevent the watchdog to trigger by sending the same command again
-		if(gripper_status)
-			grip->grab();
-		else
-			grip->release();
 
-		if(!previous_gripper_status && gripper_status)
-		{
-			gripper_went_on = ros::Time::now();
-		}
-		else if(previous_gripper_status && gripper_status && (ros::Time::now() - gripper_went_on).toSec() > MAX_GRIPPER_ON)
-		{
-			ROS_WARN("Gripper valve was turned on for longer than %d seconds. Gripper will be forced to turn off now to prevent overheating", MAX_GRIPPER_ON);
-			overheated = true;
-			got_overheated = ros::Time::now();
-			grip->release();
-			previous_gripper_status = gripper_status = false;
-		}
-		else if(overheated && (ros::Time::now() - got_overheated).toSec() > COOLDOWN_DURATION)
-		{
-			ROS_WARN("Gripper valve cooled down");
-			overheated = false;
-		}
+	GripperNode gripperNode(equipletID, moduleID);
 
-		previous_gripper_status = gripper_status;
-		ros::spinOnce();
-
-	}
-
-	grip->release();
-	grip->disconnect();
-
-	
+	gripperNode.startStateMachine();
+	return 0;
 }

@@ -1,11 +1,12 @@
 /**
-* @file InputOutputController.h
-* @brief Manager for the IO ports
-* @date Created: 2012-10-16
+* @file Services.h
+* @brief Names for the Gripper services.
+* @date Created: 2012-10-04
 *
-* @author Koen Braham
+* @author Dick van der Steen
 *
 * @section LICENSE
+* License: newBSD
 * Copyright © 2012, HU University of Applied Sciences Utrecht.
 * All rights reserved.
 *
@@ -26,27 +27,12 @@
 * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#include <ModbusController/ModbusController.h>
+#pragma once
 
-namespace InputOutput
+#include <string>
+
+namespace GripperNodeServices
 {
-	/**
-	 * Input output modbus communication interface
-	 * In the near future a dummy interface could replace this interface and simulate io devices.
-	 **/
-	class InputOutputController {
-		
-	public:
-		InputOutputController(ModbusController::ModbusController* modbus);
-
-		void pinHigh(uint32_t address, uint8_t pin);
-		void pinLow(uint32_t address, uint8_t pin);
-
-	private:
-		/**
-		 * @var ModbusController::ModbusController* modbus
-		 * Pointer to an established modbus connection.
-		 **/
-		ModbusController::ModbusController* modbus;
-	};
+	const std::string GRIP = "grip";
+	const std::string RELEASE = "release";
 }

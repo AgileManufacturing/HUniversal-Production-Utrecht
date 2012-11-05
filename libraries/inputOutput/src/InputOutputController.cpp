@@ -34,7 +34,7 @@ namespace InputOutput {
 	 *
 	 * @param modbus Pointer to an established modbus connection.
 	 */
-	InputOutputController::InputOutputController(ModbusController::ModbusController& modbus) :
+	InputOutputController::InputOutputController(ModbusController::ModbusController* modbus) :
 			modbus(modbus) {
 	}
 
@@ -45,9 +45,9 @@ namespace InputOutput {
 	 * @param pin The pin to be set
 	 **/
 	void InputOutputController::pinHigh(uint32_t address, uint8_t pin) {
-		uint16_t value = modbus.readU16(MODBUS_TCP_SLAVE, address);
+		uint16_t value = modbus->readU16(MODBUS_TCP_SLAVE, address);
 		value |= (1 << pin);
-		modbus.writeU16(MODBUS_TCP_SLAVE, address, value, false);
+		modbus->writeU16(MODBUS_TCP_SLAVE, address, value, false);
 
 		std::cout << "[DEBUG] pinHigh " << address << " " << pin << "\r";
 	}
@@ -59,9 +59,9 @@ namespace InputOutput {
 	 * @param pin The pin to be cleared
 	 **/
 	void InputOutputController::pinLow(uint32_t address, uint8_t pin) {
-		uint16_t value = modbus.readU16(MODBUS_TCP_SLAVE, address);
+		uint16_t value = modbus->readU16(MODBUS_TCP_SLAVE, address);
 		value &= (0xFFFF ^ (1 << (pin)));
-		modbus.writeU16(MODBUS_TCP_SLAVE, address, value, false);
+		modbus->writeU16(MODBUS_TCP_SLAVE, address, value, false);
 		std::cout << "[DEBUG] pinLow " << address << " " << pin << "\r";
 	}
 

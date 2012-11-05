@@ -1,5 +1,5 @@
 ####### Add all ROS packages here
-set(ROSPACKS rosMast deltaRobotNode equipletNode crateLocatorNode followNode)
+set(ROSPACKS rosMast deltaRobotNode equipletNode crateLocatorNode followNode gripperNode)
 
 ### Don't change anything below, the part below checks if ROS is installed and configured correctly. 
 ######
