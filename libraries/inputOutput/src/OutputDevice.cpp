@@ -35,9 +35,17 @@ namespace InputOutput {
 	 * @param modbus Pointer to an established modbus connection.
 	 * @param address Register address that contains the device boolean.
 	 * @param pin The pin (bit) that is connected to the device.
-	 */
+	 **/
 	OutputDevice::OutputDevice(InputOutputController& ioController, uint32_t address, uint8_t pin) : 
 		ioController(ioController), address(address), pin(pin) {}
+
+
+	/**
+	 * Virtual destructor for extensions of OutputDevice.
+	 */
+	OutputDevice::~OutputDevice(){
+
+	}
 
 	/**
 	 * Turns on the pin of the output device

@@ -38,6 +38,7 @@ namespace InputOutput
 	
 	public:
 		OutputDevice(InputOutputController& ioController, uint32_t address, uint8_t pin);
+		virtual ~OutputDevice();
 
 		virtual void enable();
 		virtual void disable();

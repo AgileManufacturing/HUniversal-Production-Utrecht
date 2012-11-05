@@ -58,7 +58,7 @@ namespace InputOutput{
  			 * Pin (port / bit) of the gripper device
  			 * TODO: Should be moved into a dynamic location? QRCODE / Database?
  			 **/
-			const static int GRIPPER_DEVICE_PIN = 1;
+			const static int GRIPPER_DEVICE_PIN = 0;
 
 			/**
 			 * @section time
