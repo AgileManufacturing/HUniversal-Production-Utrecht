@@ -385,14 +385,21 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
 int main(int argc, char **argv) {
 	int equipletID = 0;
 	int moduleID = 0;
-	
-	if(argc >= 2 || 	(Utilities::stringToInt(equipletID, argv[1])!= 0 && Utilities::stringToInt(moduleID, argv[2]) != 0)) 
-	{
-		return -1;
-	}
+
+	ROS_INFO("Reading info for DeltaRobotNode"); 
+
+	if(argc < 3 || !(Utilities::stringToInt(equipletID, argv[1]) == 0 && Utilities::stringToInt(moduleID, argv[2]) == 0))
+	{ 	 	
+    	std::cerr << "Cannot read equiplet id and/or moduleId from commandline please use correct values." << std::endl;
+ 		return -1;
+  	} 
 
 	ros::init(argc, argv, NODE_NAME);
-
+	ROS_INFO("argv1 is %s", argv[1]);
+	ROS_INFO("argv2 is %s", argv[2]);	
+	ROS_INFO("equipletID is %d", equipletID);
+	ROS_INFO("moduleID is %d", moduleID);
+	
 	ROS_INFO("Creating DeltaRobotNode"); 	
 
 	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID);    
