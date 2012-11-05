@@ -88,7 +88,6 @@ namespace Utilities{
     int stringToInt(int &i, char const *s, int base) {
         char *end;
         long  l;
-        std::cout << "string to int called" << std::endl;
         errno = 0;
         l = strtol(s, &end, base);
         if ((errno == ERANGE && l == LONG_MAX) || l > INT_MAX) {
@@ -100,7 +99,6 @@ namespace Utilities{
         if (*s == '\0' || *end != '\0') {
             return 3;
         }
-        std::cout << "long value is " << l << std::endl;
         i = l;
 
         return 0;
