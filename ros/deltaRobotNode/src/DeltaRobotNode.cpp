@@ -85,7 +85,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
     drm.ankle = DeltaRobot::Measures::ANKLE;
     drm.maxAngleHipAnkle = DeltaRobot::Measures::HIP_ANKLE_ANGLE_MAX;
 
-    ModbusController::ModbusController* modbus = new ModbusController::ModbusController(modbus_new_rtu(
+    modbus = new ModbusController::ModbusController(modbus_new_rtu(
         "/dev/ttyS0",
         Motor::CRD514KD::RtuConfig::BAUDRATE,
         Motor::CRD514KD::RtuConfig::PARITY,
@@ -97,15 +97,19 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
     motors[1] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_1, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
     motors[2] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_2, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
 
-    Motor::MotorManager* motorManager = new Motor::MotorManager(modbus, motors, 3);
+    motorManager = new Motor::MotorManager(modbus, motors, 3);
 
 	// Create a deltarobot	
     deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO); 
 }
 
 deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
-	//delete motors;
-	//delete deltaRobot;
+	delete motors[0];
+	delete motors[1];
+	delete motors[2];	
+	delete deltaRobot;
+	delete motorManager;
+	delete modbus;
 }
 
 /**

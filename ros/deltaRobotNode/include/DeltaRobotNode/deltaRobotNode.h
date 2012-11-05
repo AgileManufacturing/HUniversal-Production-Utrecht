@@ -78,6 +78,17 @@ namespace deltaRobotNodeNamespace {
 			 **/
 			Motor::StepperMotor* motors[3];
 			/**
+			 *
+			 * @var ModbusController::ModbusController* modbus
+			 * the modbuscontroller
+			 **/
+			ModbusController::ModbusController* modbus;
+			/**
+			 * Motor::MotorManager* motorManager
+			 * The motor manager
+			 **/
+			Motor::MotorManager* motorManager;
+			/**
 			 * @var ros::ServiceServer moveToPointService;	
 			 * Service for receiving move to point commands
 			 **/
