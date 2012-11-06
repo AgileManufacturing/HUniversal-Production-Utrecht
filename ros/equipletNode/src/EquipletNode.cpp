@@ -47,7 +47,7 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
 	ros::NodeHandle nodeHandle;
 	moduleErrorService = nodeHandle.advertiseService("ModuleError", &EquipletNode::moduleError, this); 
 	stateUpdateService = nodeHandle.advertiseService("StateUpdate", &EquipletNode::stateChanged, this);
-	//stateChangeRequestClient = nodeHandle.serviceClient<rosMast::StateChanged>("RequestStateChange", true);
+	stateChangeRequestClient = nodeHandle.serviceClient<rosMast::StateChange>("RequestStateChange");
 }; 
 
 /**
