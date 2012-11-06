@@ -39,18 +39,38 @@ namespace InputOutput {
 		 * @param warningHandler Handler to warn when the valve is almost opened for too long.
 		 */
 		Gripper::Gripper(InputOutputController& ioController, void* gripperNodeObject, watchdogWarningHandler warningHandler) :
-				OutputDevice(ioController, GRIPPER_MODBUS_ADRESS, GRIPPER_DEVICE_PIN), warningHandler(warningHandler), gripperNode(gripperNodeObject), watchdogRunning(true), state(false), previousState(false), warned(false), overheated(false) {
-
-			//start watchdog thread
-			watchdogThread = new boost::thread(watchdogFunction, this);
+				OutputDevice(ioController, GRIPPER_MODBUS_ADRESS, GRIPPER_DEVICE_PIN), warningHandler(warningHandler), gripperNode(gripperNodeObject), watchdogRunning(false), state(false), previousState(false), warned(false), overheated(false) {
 		}
 
 		/**
 		 * Destructor to interrupt the watchdogThread
 		 **/
 		Gripper::~Gripper( ) {
+			if (watchdogRunning) {
+				stopWatchdog();
+			}
+		}
+
+		/**
+		 * Starts the watchdog thread
+		 **/
+		void Gripper::startWatchdog(){
+			//start watchdog thread
+			watchdogRunning = true;
+			watchdogThread = new boost::thread(watchdogFunction, this);
+		}
+
+		/**
+		 * Stops the watchdog thread
+		 * Blocks untill thread is stopped
+		 **/
+		void Gripper::stopWatchdog(){
+			//stop watchdog thread
 			watchdogRunning = false;
 			watchdogThread->interrupt();
+			watchdogThread->join();
+			delete watchdogThread;
+			watchdogThread = NULL;
 		}
 
 		/**
@@ -112,6 +132,7 @@ namespace InputOutput {
 			} catch (boost::thread_interrupted& ignored) {
 				// Ignore interrupt and exit thread.
 			}
+			std::cout << "[GRIPPER WATCHDOG] Watchdog stopped" << std::endl;
 		}
 
 	}

@@ -90,6 +90,9 @@ namespace InputOutput {
 			Gripper(InputOutputController& ioController, void* GripperNode, watchdogWarningHandler warningHandler);
 			virtual ~Gripper( );
 
+			void startWatchdog();
+			void stopWatchdog();
+
 			/**
 			 * Turn the gripper on
 			 **/

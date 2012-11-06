@@ -44,8 +44,8 @@
 /**
  * Constructor
  **/
-GripperNode::GripperNode(int equipletID, int moduleID): rosMast::StateMachine(equipletID, moduleID)
-{
+GripperNode::GripperNode(int equipletID, int moduleID) :
+		rosMast::StateMachine(equipletID, moduleID) {
 
 	// Initialize modbus for IO controller
 	std::cout << "[DEBUG] Opening modbus connection" << std::endl;
@@ -67,18 +67,18 @@ GripperNode::GripperNode(int equipletID, int moduleID): rosMast::StateMachine(eq
 
 	std::cout << "[DEBUG] Starting gripper" << std::endl;
 	gripper = new InputOutput::OutputDevices::Gripper(controller, this, wrapperForGripperError);
-	ros::NodeHandle nodeHandle;
+
 	// Advertise the services
+	std::cout << "[DEBUG] Advertising the services" << std::endl;
+	ros::NodeHandle nodeHandle;
 	gripService = nodeHandle.advertiseService(GripperNodeServices::GRIP, &GripperNode::grip, this);
 	releaseService = nodeHandle.advertiseService(GripperNodeServices::RELEASE, &GripperNode::release, this);
 }
 
-GripperNode::~GripperNode()
-{
+GripperNode::~GripperNode( ) {
 	delete gripper;
+	// Destructor of modbus will close the modbus connection!
 	delete modbus;
-    modbus_close(modbusContext);
-    modbus_free(modbusContext);
 }
 
 /**
@@ -93,7 +93,7 @@ void GripperNode::wrapperForGripperError(void* gripperNodeObject) {
 /**
  * Sends error message to equipletNode with an errorcode
  **/
-void GripperNode::error(){
+void GripperNode::error( ) {
 	sendErrorMessage(-1);
 }
 
@@ -101,7 +101,7 @@ void GripperNode::error(){
  * Transition from Safe to Standby state
  * @return 0 if everything went OK else error
  **/
-int GripperNode::transitionSetup() {
+int GripperNode::transitionSetup( ) {
 	ROS_INFO("Setup transition called");
 
 	setState(rosMast::setup);
@@ -112,7 +112,7 @@ int GripperNode::transitionSetup() {
  * Transition from Standby to Safe state
  * @return 0 if everything went OK else error
  **/
-int GripperNode::transitionShutdown() {
+int GripperNode::transitionShutdown( ) {
 	ROS_INFO("Shutdown transition called");
 
 	setState(rosMast::shutdown);
@@ -123,22 +123,26 @@ int GripperNode::transitionShutdown() {
  * Transition from Standby to Normal state
  * @return 0 if everything went OK else error
  **/
-int GripperNode::transitionStart() {
+int GripperNode::transitionStart( ) {
 	ROS_INFO("Start transition called");
 
 	// Set currentState to start
 	setState(rosMast::start);
+	gripper->startWatchdog();
 	return 0;
 }
 /**
  * Transition from Normal to Standby state
  * @return 0 if everything went OK else error
  **/
-int GripperNode::transitionStop() {
+int GripperNode::transitionStop( ) {
 	ROS_INFO("Stop transition called");
-	gripper->release();
+
 	// Set currentState to stop
 	setState(rosMast::stop);
+	gripper->stopWatchdog();
+	gripper->release();
+	gripper->disable();
 	return 0;
 }
 
@@ -150,16 +154,12 @@ int GripperNode::transitionStop() {
  *
  * @return true if gripper is put on else return false.
  **/
-bool GripperNode::grip(gripperNode::Grip::Request &req, gripperNode::Grip::Response &res)
-{
+bool GripperNode::grip(gripperNode::Grip::Request &req, gripperNode::Grip::Response &res) {
 	res.succeeded = false;
-	if(getState() == rosMast::normal)
-	{
+	if (getState() == rosMast::normal) {
 		gripper->grab();
 		res.succeeded = true;
-	}
-	else
-	{
+	} else {
 		res.succeeded = false;
 	}
 	return true;
@@ -171,41 +171,39 @@ bool GripperNode::grip(gripperNode::Grip::Request &req, gripperNode::Grip::Respo
  * @param req The request for this service as defined in Grip.srv
  * @param res The response for this service as defined in Grip.srv
  *
-* @return true if gripper is put off else return false.
+ * @return true if gripper is put off else return false.
  **/
-bool GripperNode::release(gripperNode::Release::Request &req, gripperNode::Release::Response &res)
-{
+bool GripperNode::release(gripperNode::Release::Request &req, gripperNode::Release::Response &res) {
 	res.succeeded = false;
-	if(getState() == rosMast::normal)
-	{
+	if (getState() == rosMast::normal) {
 		gripper->release();
 		res.succeeded = true;
 		ROS_INFO("Gripper released");
-	}
-	else
-	{
+	} else {
 		res.succeeded = false;
 		ROS_INFO("Gripper not released, state was not normal");
 	}
 	return true;
 }
 
-
-
-int main(int argc, char** argv){
+int main(int argc, char** argv) {
 
 	ros::init(argc, argv, NODE_NAME);
 	int equipletID = 0;
 	int moduleID = 0;
-	if(argc < 3 || !(Utilities::stringToInt(equipletID, argv[1]) == 0 && Utilities::stringToInt(moduleID, argv[2]) == 0))
-	{
-    	std::cerr << "Cannot read equiplet id and/or moduleId from commandline please use correct values." << std::endl;
- 		return -1;
-  	}
+	if (argc < 3 || !(Utilities::stringToInt(equipletID, argv[1]) == 0 && Utilities::stringToInt(moduleID, argv[2]) == 0)) {
+		std::cerr << "Cannot read equiplet id and/or moduleId from commandline please use correct values." << std::endl;
+		return -1;
+	}
 
+	std::cout << "Starting gripper node" << std::endl;
 
 	GripperNode gripperNode(equipletID, moduleID);
 
+	std::cout << "Starting statemachine" << std::endl;
+
 	gripperNode.startStateMachine();
+
+	std::cout << "Stopped GripperNode" << std::endl;
 	return 0;
 }
