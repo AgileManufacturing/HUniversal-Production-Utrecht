@@ -56,14 +56,14 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
 	ros::NodeHandle nodeHandle;
 	stateUpdateServer = nodeHandle.serviceClient<rosMast::StateUpdate>("StateUpdate");
 	moduleErrorServer = nodeHandle.serviceClient<rosMast::ErrorInModule>("ModuleError");
-	stateChangeRequestClient = 
-		nodeHandle.advertiseService(rosMast::stateChangeService, &StateMachine::changeState, this);
+	stateChangeRequestClient = nodeHandle.advertiseService(RequestStateChange, &StateMachine::changeState, this);
 }
 
 /**
  * Callback for the requestStateChange topic
  * Will lookup the transition function and execute it
- * @param Message that contains the data with the requested new state
+ * @param request Contains the params for the state change
+ * @param response Will tell if the state transition was succesfull for the state change
  **/
 bool rosMast::StateMachine::changeState(rosMast::StateChange::Request &request, rosMast::StateChange::Response &response) {
 	// save the old state

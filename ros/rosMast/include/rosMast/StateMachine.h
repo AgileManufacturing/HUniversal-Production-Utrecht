@@ -45,7 +45,6 @@
 #define TRANSITION_TABLE_SIZE 4
 
 namespace rosMast {
-	const std::string stateChangeService = "RequestStateChange";
 	/**
 	 * Struct for a StateTransition
 	 * Used to build a array of transitions so they can be mapped to function pointers

@@ -54,8 +54,8 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
  * Callback function that is called when a message is received on the equiplet_statechanged topic
  * It updates the state of a hardware module.
  * 
- * @param msg Contains the data required for a state transition
- * 
+ * @param request Contains the data required for a state transition
+ * @param response Says if update was succesfull
  **/
 bool EquipletNode::stateChanged(rosMast::StateUpdate::Request &request, rosMast::StateUpdate::Response &response) {
 	ROS_INFO("State changed message received");
@@ -72,7 +72,8 @@ bool EquipletNode::stateChanged(rosMast::StateUpdate::Request &request, rosMast:
 /**
  * Callback for when a error occurs in a module
  *
- * @param msg Contains a errorCode and the ID of the module were the error occured
+ * @param request Contains the errorCode and the ID of the module were the error occured
+ * @param response Will contain the new state after error occured
  **/
 bool EquipletNode::moduleError(rosMast::ErrorInModule::Request &request, rosMast::ErrorInModule::Response &response) {
 	int moduleID = request.moduleError.moduleID;
