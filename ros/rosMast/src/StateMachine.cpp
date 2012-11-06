@@ -30,51 +30,6 @@
 #include "rosMast/StateMachine.h"
 
 /**
- * Callback for the requestStateChange topic
- * Will lookup the transition function and execute it
- * @param Message that contains the data with the requested new state
- **/
-void rosMast::StateMachine::changeState(const rosMast::StateChangedPtr &msg) {
-	// save the old state
-	StateType oldState = currentState;
-	
-	// decode msg and read variables
-	ROS_INFO("Request Statechange message received");
-	int equipletID = msg->equipletID;
-	int moduleID = msg->moduleID;
-	StateType desiredState = StateType(msg->state);
-	
-	// Check if the message is meant for this StateMachine
-	if( this->equipletID == equipletID && this->moduleID == moduleID ) {
-		// Lookup transition function ptr
-		stateFunctionPtr fptr = lookupTransition(currentState, desiredState);
-		if(fptr != NULL) {
-			if( ( (this->*fptr) () ) == 0 ) {
-				setState(desiredState);
-				ROS_INFO("Function pointer executed successfully");
-			} 
-			else {
-				ROS_INFO("Error in transitioning to new state");
-				stateFunctionPtr fptr = lookupTransition(desiredState, oldState);
-				if( ( (this->*fptr) () ) == 0 ) {
-					ROS_INFO("Transition back to previous state successful");
-					setState(oldState);
-				}
-				else {
-					ROS_INFO("Error in transition to old state afer failure in transition");
-				}
-			}
-		} else {
-			ROS_INFO("Function pointer NULL, no function found in lookup table");
-		}
-	} else {
-		ROS_INFO("State changerequest not meant for this statemachine");
-		ROS_INFO("Statemachine equipletID = %d", this->equipletID);
-		ROS_INFO("Statemachine moduleID = %d", this->moduleID);
-	}	
-}
-
-/**
  * Create a stateMachine
  * @param the unique identifier for the equiplet
  * @param the unique identifier for the module that implements the statemachine
@@ -98,10 +53,60 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
 	transitionMap[transitionTable[3]] = &StateMachine::transitionStop;
 
 	// Initialize publisher and subcriber
-	ros::NodeHandle nh;
-	stateChangedPublisher = nh.advertise<rosMast::StateChanged>("equiplet_stateChanged", 5);
-	moduleErrorPublisher = nh.advertise<rosMast::ModuleError>("equiplet_moduleError", 5);
-	requestStateChangeSubscriber = nh.subscribe("requestStateChange", 5, &StateMachine::changeState, this);
+	ros::NodeHandle nodeHandle;
+	//stateUpdateServer = nodeHandle.serviceClient<rosMast::StateUpdate>("StateUpdate", true);
+	//moduleErrorServer = nodeHandle.serviceClient<rosMast::ModuleError>("ModuleError", true);
+	stateChangeRequestClient = 
+		nodeHandle.advertiseService(rosMast::stateChangeService, &StateMachine::changeState, this);
+}
+
+/**
+ * Callback for the requestStateChange topic
+ * Will lookup the transition function and execute it
+ * @param Message that contains the data with the requested new state
+ **/
+bool rosMast::StateMachine::changeState(rosMast::StateChange::Request &request, rosMast::StateChange::Response &response) {
+	// save the old state
+	StateType oldState = currentState;
+	
+	// decode msg and read variables
+	ROS_INFO("Request Statechange message received");
+	int equipletID = request.state.equipletID;
+	int moduleID = request.state.moduleID;
+	StateType desiredState = StateType(request.state.newState);
+	
+	// Check if the message is meant for this StateMachine
+	if( this->equipletID == equipletID && this->moduleID == moduleID ) {
+		// Lookup transition function ptr
+		stateFunctionPtr fptr = lookupTransition(currentState, desiredState);
+		if(fptr != NULL) {
+			if( ( (this->*fptr) () ) == 0 ) {
+				setState(desiredState);
+				ROS_INFO("Function pointer executed successfully");
+				response.executed = true;
+				return true;
+			} 
+			else {
+				ROS_INFO("Error in transitioning to new state");
+				stateFunctionPtr fptr = lookupTransition(desiredState, oldState);
+				if( ( (this->*fptr) () ) == 0 ) {
+					ROS_INFO("Transition back to previous state successful");
+					setState(oldState);
+				}
+				else {
+					ROS_INFO("Error in transition to old state afer failure in transition");
+				}
+			}
+		} else {
+			ROS_INFO("Function pointer NULL, no function found in lookup table");
+		}
+	} else {
+		ROS_INFO("State changerequest not meant for this statemachine");
+		ROS_INFO("Statemachine equipletID = %d", this->equipletID);
+		ROS_INFO("Statemachine moduleID = %d", this->moduleID);
+	}
+	response.executed = false;		
+	return true;
 }
 
 
@@ -123,11 +128,11 @@ rosMast::StateMachine::stateFunctionPtr rosMast::StateMachine::lookupTransition(
 void rosMast::StateMachine::setState(StateType newState) {
 	ROS_INFO("Setting state to: %d", newState);
 	currentState = newState;
-	rosMast::StateChanged msg;
-	msg.equipletID = this->equipletID;
-	msg.moduleID = this->moduleID;
-	msg.state = currentState;
-	stateChangedPublisher.publish(msg);
+	rosMast::StateUpdate msg;
+	msg.request.state.equipletID = this->equipletID;
+	msg.request.state.moduleID = this->moduleID;
+	msg.request.state.newState = currentState;
+	stateUpdateServer.call(msg);
 }
 
 /**
@@ -135,10 +140,10 @@ void rosMast::StateMachine::setState(StateType newState) {
  * @param represents an error code that can be looked up in the database
  **/
 void rosMast::StateMachine::sendErrorMessage(int errorCode) {
-	rosMast::ModuleError msg;
-	msg.moduleID = this->moduleID;
-	msg.errorCode = errorCode;
-	moduleErrorPublisher.publish(msg);
+	rosMast::ErrorInModule msg;
+	msg.request.moduleError.moduleID = this->moduleID;
+	msg.request.moduleError.errorCode = errorCode;
+	moduleErrorServer.call(msg);
 }
 
 /** 
