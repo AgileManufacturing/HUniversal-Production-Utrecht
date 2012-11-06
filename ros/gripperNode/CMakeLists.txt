@@ -16,7 +16,7 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 rexos_rospack_init("gripperNode" false true)
 
 # Add executables as documented by ROS
-rosbuild_add_executable(gripperNode src/main.cpp)
+rosbuild_add_executable(gripperNode src/gripperNode.cpp)
 
 # Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
 
