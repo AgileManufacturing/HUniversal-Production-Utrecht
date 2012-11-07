@@ -36,7 +36,7 @@ namespace InputOutput {
 	 * @param address Register address that contains the device boolean.
 	 * @param pin The pin (bit) that is connected to the device.
 	 **/
-	OutputDevice::OutputDevice(InputOutputController& ioController, uint32_t address, uint8_t pin) : 
+	OutputDevice::OutputDevice(InputOutputController* ioController, uint32_t address, uint8_t pin) :
 		ioController(ioController), address(address), pin(pin) {}
 
 
@@ -51,13 +51,13 @@ namespace InputOutput {
 	 * Turns on the pin of the output device
 	 **/
 	void OutputDevice::enable(){
-		ioController.pinHigh(address, pin);
+		ioController->pinHigh(address, pin);
 	}
 
 	/**
 	 * Turns off the pin of the output device
 	 **/
 	void OutputDevice::disable(){
-		ioController.pinLow(address, pin);
+		ioController->pinLow(address, pin);
 	}
 }

@@ -142,7 +142,7 @@ namespace ModbusController{
             std::ofstream logFile;
         #endif
 
-        void wait(void);
+        void wait();
 
         uint64_t getShadowAddress(uint16_t slave, uint16_t address);
         bool getShadow(uint16_t slave, uint32_t address, uint16_t& outValue);

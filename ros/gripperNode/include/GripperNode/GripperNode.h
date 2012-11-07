@@ -50,15 +50,18 @@ public:
 	static void wrapperForGripperError(void* gripperNodeObject);
 	bool grip(gripperNode::Grip::Request &req, gripperNode::Grip::Response &res);
 	bool release(gripperNode::Release::Request &req, gripperNode::Release::Response &res);
+
 private:
 	modbus_t* modbusContext;
+	InputOutput::OutputDevices::Gripper* gripper;
 	ModbusController::ModbusController* modbus;
+	InputOutput::InputOutputController* controller;
 
 	/**
 	 * @var Gripper gripper
 	 * The gripper device
 	 **/
-	InputOutput::OutputDevices::Gripper* gripper;
+
 	/**
 	 * @var ros::ServiceServer gripService
 	 * The service for enabling the gripper

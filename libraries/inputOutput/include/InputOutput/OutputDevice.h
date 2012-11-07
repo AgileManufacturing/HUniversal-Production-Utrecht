@@ -37,7 +37,7 @@ namespace InputOutput
 	class OutputDevice {
 	
 	public:
-		OutputDevice(InputOutputController& ioController, uint32_t address, uint8_t pin);
+		OutputDevice(InputOutputController* ioController, uint32_t address, uint8_t pin);
 		virtual ~OutputDevice();
 
 		virtual void enable();
@@ -48,7 +48,7 @@ namespace InputOutput
 		 * @var InputOutputController& ioController
 		 * The InputOutput interface
 		 **/
-		InputOutputController& ioController;
+		InputOutputController* ioController;
 
 		/**
 		 * @var uint32_t address;

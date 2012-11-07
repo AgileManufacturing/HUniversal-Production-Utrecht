@@ -48,8 +48,6 @@ namespace InputOutput {
 		uint16_t value = modbus->readU16(MODBUS_TCP_SLAVE, address);
 		value |= (1 << pin);
 		modbus->writeU16(MODBUS_TCP_SLAVE, address, value, false);
-
-		std::cout << "[DEBUG] pinHigh " << address << " " << pin << "\r";
 	}
 
 	/**
@@ -62,6 +60,5 @@ namespace InputOutput {
 		uint16_t value = modbus->readU16(MODBUS_TCP_SLAVE, address);
 		value &= (0xFFFF ^ (1 << (pin)));
 		modbus->writeU16(MODBUS_TCP_SLAVE, address, value, false);
-		std::cout << "[DEBUG] pinLow " << address << " " << pin << "\r";
 	}
 }

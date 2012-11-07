@@ -87,17 +87,20 @@ namespace InputOutput {
 			 **/
 			const static int GRIPPER_TIME_WATCHDOG_INTERVAL = 100;
 
-			Gripper(InputOutputController& ioController, void* GripperNode, watchdogWarningHandler warningHandler);
+			Gripper(InputOutputController* ioController, void* GripperNode, watchdogWarningHandler warningHandler);
 			virtual ~Gripper( );
 
-			void startWatchdog();
-			void stopWatchdog();
+			void startWatchdog( );
+			void stopWatchdog( );
 
 			/**
 			 * Turn the gripper on
 			 **/
-			void grab( ) {
-				state = true;
+			bool grab( ) {
+				if (!overheated) {
+					state = true;
+				}
+				return state;
 			}
 			/**
 			 * Turn the gripper off

@@ -63,7 +63,7 @@ GripperNode::GripperNode(int equipletID, int moduleID) :
 	modbus = new ModbusController::ModbusController(modbusContext);
 
 	std::cout << "[DEBUG] Opening IO Controller" << std::endl;
-	InputOutput::InputOutputController controller(modbus);
+	controller = new InputOutput::InputOutputController(modbus);
 
 	std::cout << "[DEBUG] Starting gripper" << std::endl;
 	gripper = new InputOutput::OutputDevices::Gripper(controller, this, wrapperForGripperError);
@@ -76,6 +76,7 @@ GripperNode::GripperNode(int equipletID, int moduleID) :
 }
 
 GripperNode::~GripperNode( ) {
+	std::cout << "~GripperNode" << std::endl;
 	delete gripper;
 	// Destructor of modbus will close the modbus connection!
 	delete modbus;
@@ -157,8 +158,7 @@ int GripperNode::transitionStop( ) {
 bool GripperNode::grip(gripperNode::Grip::Request &req, gripperNode::Grip::Response &res) {
 	res.succeeded = false;
 	if (getState() == rosMast::normal) {
-		gripper->grab();
-		res.succeeded = true;
+		res.succeeded = gripper->grab();
 	} else {
 		res.succeeded = false;
 	}
