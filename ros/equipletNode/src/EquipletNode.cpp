@@ -45,34 +45,41 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
 	modulePackageNodeMap[2] = std::pair< std::string, std::string > ("gripperTestNode", "GripperTestNode");
 
 	ros::NodeHandle nodeHandle;
-	errorModuleSubscriber = nodeHandle.subscribe("equiplet_moduleError", 5, &EquipletNode::moduleErrorCallback, this); 
-	stateChangedSubscriber = nodeHandle.subscribe("equiplet_stateChanged", 5 , &EquipletNode::stateChanged, this);
-	requestStateChangePublisher = nodeHandle.advertise<rosMast::StateChanged>("requestStateChange", 5);
+	std::stringstream stringStream;
+	stringStream << equipletID;
+	std::string str = stringStream.str();
+	moduleErrorService = nodeHandle.advertiseService("ModuleError_" + str, &EquipletNode::moduleError, this); 
+	stateUpdateService = nodeHandle.advertiseService("StateUpdate_" + str, &EquipletNode::stateChanged, this);
+	stateChangeRequestClient = nodeHandle.serviceClient<rosMast::StateChange>("RequestStateChange_" + str);
 }; 
 
 /**
  * Callback function that is called when a message is received on the equiplet_statechanged topic
  * It updates the state of a hardware module.
  * 
- * @param msg Contains the data required for a state transition
- * 
+ * @param request Contains the data required for a state transition
+ * @param response Says if update was succesfull
  **/
-void EquipletNode::stateChanged(const rosMast::StateChangedPtr &msg) {
+bool EquipletNode::stateChanged(rosMast::StateUpdate::Request &request, rosMast::StateUpdate::Response &response) {
 	ROS_INFO("State changed message received");
-	if(updateModuleState(msg->moduleID, rosMast::StateType(msg->state))) {
-		std::cout << "The state of module " << msg->moduleID << " has been changed to " << rosMast::state_txt[msg->state] << std::endl; 
+	if(updateModuleState(request.state.moduleID, rosMast::StateType(request.state.newState))) {
+		//std::cout << "The state of module " << msg->moduleID << " has been changed to " << rosMast::state_txt[msg->state] << std::endl; 
+		response.succeeded = true;
 	} else{
-		std::cerr << "Cannot update the state of the module " << msg->moduleID << " run for your life!" << std::endl;
+		//std::cerr << "Cannot update the state of the module " << msg->moduleID << " run for your life!" << std::endl;
+		response.succeeded = false;
 	}	
+	return true;
 }
 
 /**
  * Callback for when a error occurs in a module
  *
- * @param msg Contains a errorCode and the ID of the module were the error occured
+ * @param request Contains the errorCode and the ID of the module were the error occured
+ * @param response Will contain the new state after error occured
  **/
-void EquipletNode::moduleErrorCallback(const rosMast::ModuleErrorPtr &msg) {
-	int moduleID = msg->moduleID;
+bool EquipletNode::moduleError(rosMast::ErrorInModule::Request &request, rosMast::ErrorInModule::Response &response) {
+	int moduleID = request.moduleError.moduleID;
 	//int errorCode = msg->errorCode;
 
 	// TODO: Lookup errorcode in the DB and decide accordingly
@@ -81,8 +88,9 @@ void EquipletNode::moduleErrorCallback(const rosMast::ModuleErrorPtr &msg) {
 	rosMast::StateType currentModuleState = getModuleState(moduleID);
 
 	// This will be changed to a proper way to decide what state should be entered on error
-	rosMast::StateType newState = rosMast::StateType(currentModuleState - 3); 
-	sendStateChangeRequest(moduleID, newState);
+	response.state.moduleID = moduleID;
+	response.state.newState = rosMast::StateType(currentModuleState - 3); 
+	return true;
 }
 
 /**
@@ -92,12 +100,11 @@ void EquipletNode::moduleErrorCallback(const rosMast::ModuleErrorPtr &msg) {
  * @param newState the new state for the module
  **/
 void EquipletNode::sendStateChangeRequest(int moduleID, rosMast::StateType newState) {
-	rosMast::StateChanged msg;	
-	msg.equipletID = equipletId;
-	msg.moduleID = moduleID;
-	msg.state = newState;
+	rosMast::StateChange msg;	
+	msg.request.state.moduleID = moduleID;
+	msg.request.state.newState = newState;
 
-	requestStateChangePublisher.publish(msg);
+	stateChangeRequestClient.call(msg);
 }
 
 /**

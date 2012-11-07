@@ -34,7 +34,7 @@
 #include <vector>
 #include <Mast/HardwareModuleProperties.h>
 #include "rosMast/States.h"
-#include "rosMast/StateChanged.h"
+#include "rosMast/State.h"
 #include "rosMast/ModuleError.h"
 
 class EquipletNode {
@@ -47,8 +47,8 @@ class EquipletNode {
 		void updateSafetyState();
 		bool updateModuleState(int moduleID, rosMast::StateType state);
 		void printHardwareModules();
-		void stateChanged(const rosMast::StateChangedPtr &msg);
-		void moduleErrorCallback(const rosMast::ModuleErrorPtr &msg);
+		bool stateChanged(rosMast::StateUpdate::Request &request, rosMast::StateUpdate::Response &response);
+		bool moduleError(rosMast::ErrorInModule::Request &request, rosMast::ErrorInModule::Response &response);
 		void sendStateChangeRequest(int moduleID, rosMast::StateType newState);
 		rosMast::StateType getModuleState(int moduleID);
 	private:
@@ -73,20 +73,20 @@ class EquipletNode {
 		 **/
 		std::vector<Mast::HardwareModuleProperties> moduleTable;
 		/**
-		 * @var ros::Subscriber errorModuleSubscriber
-		 * The subscriber that will read when a error occurs inside a module
+		 * @var ros::ServiceServer moduleErrorService
+		 * Decides what needs to happen when a error occurs inside a module
 		 **/
-		ros::Subscriber errorModuleSubscriber; 
+		ros::ServiceServer moduleErrorService; 
 		/**
-		 * @var ros::Subscriber stateChangedSubscriber
-		 * The subscriber that will receive messages about state changes from modules
+		 * @var ros::ServiceServer stateUpdateService;
+		 * Will receive state changed messages from modules
 		 **/
-		ros::Subscriber stateChangedSubscriber;
+		ros::ServiceServer stateUpdateService;
 		/**
-		 * @var ros::Publisher requestStateChangePublisher
-		 * The publisher that can request state changes for a specific module
+		 * @var ros::ServiceClient stateChangeRequestClient
+		 * Requests state changes for a specific module
 		 **/
-		ros::Publisher requestStateChangePublisher; 
+		ros::ServiceClient stateChangeRequestClient; 
 
 		/**
 		 * @var std::map<int, pair> modulePackageNodeMap
