@@ -50,7 +50,6 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
 	std::string str = stringStream.str();
 	moduleErrorService = nodeHandle.advertiseService("ModuleError_" + str, &EquipletNode::moduleError, this); 
 	stateUpdateService = nodeHandle.advertiseService("StateUpdate_" + str, &EquipletNode::stateChanged, this);
-	stateChangeRequestClient = nodeHandle.serviceClient<rosMast::StateChange>("RequestStateChange_" + str);
 }; 
 
 /**
@@ -102,9 +101,14 @@ bool EquipletNode::moduleError(rosMast::ErrorInModule::Request &request, rosMast
  **/
 void EquipletNode::sendStateChangeRequest(int moduleID, rosMast::StateType newState) {
 	rosMast::StateChange msg;	
-	msg.request.state.moduleID = moduleID;
-	msg.request.state.newState = newState;
+	msg.request.desiredState = newState;
 
+	ros::NodeHandle nodeHandle;
+	std::stringstream stringStream;
+	stringStream << equipletId + "_" << moduleID;
+	std::string str = stringStream.str();
+	ros::ServiceClient stateChangeRequestClient = nodeHandle.serviceClient<rosMast::StateChange>("RequestStateChange_" + str);
+	
 	stateChangeRequestClient.call(msg);
 }
 

@@ -83,12 +83,6 @@ class EquipletNode {
 		 **/
 		ros::ServiceServer stateUpdateService;
 		/**
-		 * @var ros::ServiceClient stateChangeRequestClient
-		 * Requests state changes for a specific module
-		 **/
-		ros::ServiceClient stateChangeRequestClient; 
-
-		/**
 		 * @var std::map<int, pair> modulePackageNodeMap
 		 * A map with the moduleType as key and a pair of package name and node name as value.
 		 * This is used to find the name of the node that has to be started when a

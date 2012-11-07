@@ -59,6 +59,8 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
 	std::string str = stringStream.str();
 	stateUpdateServer = nodeHandle.serviceClient<rosMast::StateUpdate>("StateUpdate_" + str);
 	moduleErrorServer = nodeHandle.serviceClient<rosMast::ErrorInModule>("ModuleError_" + str);
+	stringStream << "_" << moduleID;
+	str = stringStream.str();
 	stateChangeRequestClient = nodeHandle.advertiseService("RequestStateChange_" + str, &StateMachine::changeState, this);
 }
 
@@ -71,22 +73,13 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
 bool rosMast::StateMachine::changeState(rosMast::StateChange::Request &request, rosMast::StateChange::Response &response) {	
 	// decode msg and read variables
 	ROS_INFO("Request Statechange message received");
-	int moduleID = request.state.moduleID;
-	StateType desiredState = StateType(request.state.newState);
+	StateType desiredState = StateType(request.desiredState);
 	
-	// Check if the message is meant for this StateMachine
-	if(this->moduleID == moduleID ) {
-		if(executeTransition(desiredState) == 0) {
-			response.executed = true;
-		} else {
-			response.executed = false;	
-		}
+	if(executeTransition(desiredState) == 0) {
+		response.executed = true;
 	} else {
-		ROS_INFO("State changerequest not meant for this statemachine");
-		ROS_INFO("Statemachine equipletID = %d", this->equipletID);
-		ROS_INFO("Statemachine moduleID = %d", this->moduleID);
 		response.executed = false;	
-	}	
+	}
 	return true;
 }
 
