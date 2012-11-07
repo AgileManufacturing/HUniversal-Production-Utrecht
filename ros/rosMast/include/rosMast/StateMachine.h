@@ -31,7 +31,11 @@
 #define STATEMACHINE_H
 
 #include "ros/ros.h"
-#include "rosMast/StateChanged.h"
+#include "rosMast/State.h"
+#include "rosMast/ModuleError.h"
+#include "rosMast/ErrorInModule.h"
+#include "rosMast/StateChange.h"
+#include "rosMast/StateUpdate.h"
 #include "rosMast/ModuleError.h"
 #include "rosMast/States.h"
 
@@ -75,7 +79,7 @@ namespace rosMast {
 		}
 	};
 	
-	class StateMachine {
+	class StateMachine {		
 		/** 
 		 * @var typedef int (StateMachine::*stateFunctionPtr)()
 		 * Function pointer definition for a state transition function
@@ -83,8 +87,7 @@ namespace rosMast {
 		typedef int (StateMachine::*stateFunctionPtr)();
 		
 		public:
-			StateMachine(int equipletID, int moduleID);	
-		
+			StateMachine(int equipletID, int moduleID);			
 			/**
 			 * Transition from Safe to Standby
 			 * @return 0 if everything when succesfull
@@ -112,7 +115,7 @@ namespace rosMast {
 			StateType getState() { return currentState; }	
 			
 			void setState( StateType newState );				
-			void changeState(const rosMast::StateChangedPtr &msg);			
+			bool changeState(rosMast::StateChange::Request &request, rosMast::StateChange::Response &response);	
 			
 			stateFunctionPtr lookupTransition(StateType currentState, StateType desiredState);
 			void sendErrorMessage(int errorCode);
@@ -125,21 +128,20 @@ namespace rosMast {
 			 **/
 			std::map<StateTransition, stateFunctionPtr> transitionMap;
 			/**
-			 * @var ros::Publisher stateChangedPublisher
+			 * @var ros::ServiceClient stateUpdateServer
 			 * The publisher for posting updated state messages
 			 **/
-			ros::Publisher stateChangedPublisher;
+			ros::ServiceClient stateUpdateServer;
 			/**
-			 * @var ros::Publisher moduleErrorPublisher
+			 * @var ros::ServiceClient moduleErrorServer
 			 * The publisher for posting error messages
 			 **/
-			ros::Publisher moduleErrorPublisher;
+			ros::ServiceClient moduleErrorServer;
 			/**
-			 * @var ros::Subscriber requestStateChangeSubscriber
+			 * @var ros::ServiceServer stateChangeRequestClient
 			 * The subscriber for request for state change messages
 			 **/
-			ros::Subscriber requestStateChangeSubscriber;
-
+			ros::ServiceServer stateChangeRequestClient;
 			/**
 			 * @var StateType currentState
 			 * The current state of the the state machine
