@@ -46,7 +46,7 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
 
 	ros::NodeHandle nodeHandle;
 	std::stringstream stringStream;
-	stringStream << equipletID;
+	stringStream << equipletId;
 	std::string str = stringStream.str();
 	moduleErrorService = nodeHandle.advertiseService("ModuleError_" + str, &EquipletNode::moduleError, this); 
 	stateUpdateService = nodeHandle.advertiseService("StateUpdate_" + str, &EquipletNode::stateChanged, this);
