@@ -116,6 +116,7 @@ namespace rosMast {
 			
 			void setState( StateType newState );				
 			bool changeState(rosMast::StateChange::Request &request, rosMast::StateChange::Response &response);	
+			int executeTransition(StateType desiredState);
 			
 			stateFunctionPtr lookupTransition(StateType currentState, StateType desiredState);
 			void sendErrorMessage(int errorCode);

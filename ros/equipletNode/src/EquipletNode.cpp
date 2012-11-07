@@ -80,6 +80,7 @@ bool EquipletNode::stateChanged(rosMast::StateUpdate::Request &request, rosMast:
  **/
 bool EquipletNode::moduleError(rosMast::ErrorInModule::Request &request, rosMast::ErrorInModule::Response &response) {
 	int moduleID = request.moduleError.moduleID;
+	ROS_INFO("Error message received from module %d", moduleID);
 	//int errorCode = msg->errorCode;
 
 	// TODO: Lookup errorcode in the DB and decide accordingly
