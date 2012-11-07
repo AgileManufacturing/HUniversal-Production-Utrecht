@@ -79,8 +79,7 @@ namespace rosMast {
 		}
 	};
 	
-	class StateMachine {
-		
+	class StateMachine {		
 		/** 
 		 * @var typedef int (StateMachine::*stateFunctionPtr)()
 		 * Function pointer definition for a state transition function

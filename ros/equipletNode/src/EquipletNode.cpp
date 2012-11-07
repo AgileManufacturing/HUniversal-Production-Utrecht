@@ -45,9 +45,12 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
 	modulePackageNodeMap[2] = std::pair< std::string, std::string > ("gripperTestNode", "GripperTestNode");
 
 	ros::NodeHandle nodeHandle;
-	moduleErrorService = nodeHandle.advertiseService("ModuleError", &EquipletNode::moduleError, this); 
-	stateUpdateService = nodeHandle.advertiseService("StateUpdate", &EquipletNode::stateChanged, this);
-	stateChangeRequestClient = nodeHandle.serviceClient<rosMast::StateChange>("RequestStateChange");
+	std::stringstream s;
+	s << equipletId;
+	std::string str = s.str();
+	moduleErrorService = nodeHandle.advertiseService("ModuleError_" + str, &EquipletNode::moduleError, this); 
+	stateUpdateService = nodeHandle.advertiseService("StateUpdate_" + str, &EquipletNode::stateChanged, this);
+	stateChangeRequestClient = nodeHandle.serviceClient<rosMast::StateChange>("RequestStateChange_" + str);
 }; 
 
 /**

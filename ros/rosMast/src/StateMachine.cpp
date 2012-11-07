@@ -54,9 +54,12 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
 
 	// Initialize publisher and subcriber
 	ros::NodeHandle nodeHandle;
-	stateUpdateServer = nodeHandle.serviceClient<rosMast::StateUpdate>("StateUpdate");
-	moduleErrorServer = nodeHandle.serviceClient<rosMast::ErrorInModule>("ModuleError");
-	stateChangeRequestClient = nodeHandle.advertiseService(RequestStateChange, &StateMachine::changeState, this);
+	std::stringstream s;
+	s << equipletID;
+	std::string str = s.str();
+	stateUpdateServer = nodeHandle.serviceClient<rosMast::StateUpdate>("StateUpdate_" + str);
+	moduleErrorServer = nodeHandle.serviceClient<rosMast::ErrorInModule>("ModuleError_" + str);
+	stateChangeRequestClient = nodeHandle.advertiseService("RequestStateChange_" + str, &StateMachine::changeState, this);
 }
 
 /**
