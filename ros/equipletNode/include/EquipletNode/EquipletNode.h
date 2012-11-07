@@ -73,17 +73,17 @@ class EquipletNode {
 		 **/
 		std::vector<Mast::HardwareModuleProperties> moduleTable;
 		/**
-		 * @var ros::Subscriber moduleErrorService
+		 * @var ros::ServiceServer moduleErrorService
 		 * Decides what needs to happen when a error occurs inside a module
 		 **/
 		ros::ServiceServer moduleErrorService; 
 		/**
-		 * @var ros::Subscriber stateUpdateService
+		 * @var ros::ServiceServer stateUpdateService;
 		 * Will receive state changed messages from modules
 		 **/
 		ros::ServiceServer stateUpdateService;
 		/**
-		 * @var ros::Publisher stateChangeRequestClient
+		 * @var ros::ServiceClient stateChangeRequestClient
 		 * Requests state changes for a specific module
 		 **/
 		ros::ServiceClient stateChangeRequestClient; 

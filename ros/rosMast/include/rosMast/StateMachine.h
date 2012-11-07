@@ -129,17 +129,17 @@ namespace rosMast {
 			 **/
 			std::map<StateTransition, stateFunctionPtr> transitionMap;
 			/**
-			 * @var ros::Publisher stateUpdateServer
+			 * @var ros::ServiceClient stateUpdateServer
 			 * The publisher for posting updated state messages
 			 **/
 			ros::ServiceClient stateUpdateServer;
 			/**
-			 * @var ros::Publisher moduleErrorServer
+			 * @var ros::ServiceClient moduleErrorServer
 			 * The publisher for posting error messages
 			 **/
 			ros::ServiceClient moduleErrorServer;
 			/**
-			 * @var ros::Subscriber stateChangeRequestClient
+			 * @var ros::ServiceServer stateChangeRequestClient
 			 * The subscriber for request for state change messages
 			 **/
 			ros::ServiceServer stateChangeRequestClient;
