@@ -74,12 +74,11 @@ bool rosMast::StateMachine::changeState(rosMast::StateChange::Request &request, 
 	
 	// decode msg and read variables
 	ROS_INFO("Request Statechange message received");
-	int equipletID = request.state.equipletID;
 	int moduleID = request.state.moduleID;
 	StateType desiredState = StateType(request.state.newState);
 	
 	// Check if the message is meant for this StateMachine
-	if( this->equipletID == equipletID && this->moduleID == moduleID ) {
+	if(this->moduleID == moduleID ) {
 		// Lookup transition function ptr
 		stateFunctionPtr fptr = lookupTransition(currentState, desiredState);
 		if(fptr != NULL) {
@@ -132,7 +131,6 @@ void rosMast::StateMachine::setState(StateType newState) {
 	ROS_INFO("Setting state to: %d", newState);
 	currentState = newState;
 	rosMast::StateUpdate msg;
-	msg.request.state.equipletID = this->equipletID;
 	msg.request.state.moduleID = this->moduleID;
 	msg.request.state.newState = currentState;
 	stateUpdateServer.call(msg);

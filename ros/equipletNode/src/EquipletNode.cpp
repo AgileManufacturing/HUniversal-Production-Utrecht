@@ -88,7 +88,6 @@ bool EquipletNode::moduleError(rosMast::ErrorInModule::Request &request, rosMast
 	rosMast::StateType currentModuleState = getModuleState(moduleID);
 
 	// This will be changed to a proper way to decide what state should be entered on error
-	response.state.equipletID = this->equipletId;
 	response.state.moduleID = moduleID;
 	response.state.newState = rosMast::StateType(currentModuleState - 3); 
 	return true;
@@ -102,7 +101,6 @@ bool EquipletNode::moduleError(rosMast::ErrorInModule::Request &request, rosMast
  **/
 void EquipletNode::sendStateChangeRequest(int moduleID, rosMast::StateType newState) {
 	rosMast::StateChange msg;	
-	msg.request.state.equipletID = equipletId;
 	msg.request.state.moduleID = moduleID;
 	msg.request.state.newState = newState;
 
