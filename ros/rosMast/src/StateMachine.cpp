@@ -141,9 +141,7 @@ void rosMast::StateMachine::setState(StateType newState) {
 	rosMast::StateUpdate msg;
 	msg.request.state.moduleID = this->moduleID;
 	msg.request.state.newState = currentState;
-	ROS_INFO("Sending state update");
 	stateUpdateServer.call(msg);
-	ROS_INFO("Finished state update message");
 }
 
 /**
