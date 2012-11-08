@@ -1,30 +1,31 @@
+##############################################################
+# CMakeLists.txt for a ROS package within the low-cost-vision
+# build system.
+#
+# Created by Pascal Muller <pascalmuller@gmail.com>, 09-02-2012
+#
+# 09-02-2012 Initial version
+#
+#############################################################
+
 cmake_minimum_required(VERSION 2.4.6)
+# Include all rosbuild macros
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-#set(ROS_BUILD_TYPE RelWithDebInfo)
+# Initialize ROS package to be in our build system.
+rexos_rospack_init("environmentCache" false false)
 
-rosbuild_init()
+# Add executables as documented by ROS
+rosbuild_add_executable(EnvironmentCache src/Main.cpp)
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+# Add dependencies to our libraries and other ROS packages in the same directory as this one.
+#add_dependencies(DeltaRobotNode deltaRobot)
 
-#uncomment if you have defined messages
-#rosbuild_genmsg()
-#uncomment if you have defined services
-#rosbuild_gensrv()
+# Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
+#include_directories(${LIB_DATATYPES_INCLUDE} ${LIB_DATATYPES_INCLUDE} ${LIB_UTILITIES_INCLUDE} ${LIB_DELTAROBOT_INCLUDE} ${LIB_MOTOR_INCLUDE} ${LIB_MODBUS_CONTROLLER_INCLUDE})
 
-#common commands for building c++ executables and libraries
-#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
-#target_link_libraries(${PROJECT_NAME} another_library)
-#rosbuild_add_boost_directories()
-#rosbuild_link_boost(${PROJECT_NAME} thread)
-#rosbuild_add_executable(example examples/example.cpp)
-#target_link_libraries(example ${PROJECT_NAME})
+# Link target to our libraries
+#target_link_libraries(DeltaRobotNode deltaRobot modbusController motor utilities)
+
+# MUST be called after lcv_rospack_init to clean up after ROSBUILD!
+rexos_rospack_end()
