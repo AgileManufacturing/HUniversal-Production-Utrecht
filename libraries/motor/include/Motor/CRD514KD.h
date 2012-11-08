@@ -54,13 +54,31 @@ namespace Motor{
          * @var double MOTOR_MIN_ACCELERATION
          * The minimum acceleration in radians per second per second. This same value counts for the minimum deceleration.
          **/
-        const double MOTOR_MIN_ACCELERATION = 1.256637061;
+        const double MOTOR_MIN_ACCELERATION = MOTOR_STEP_ANGLE * 1000;
 
         /**
          * @var double MOTOR_MAX_ACCELERATION
          * The maximum acceleration in radians per second per second. This same value counts for the maximum deceleration.
          **/
-        const double MOTOR_MAX_ACCELERATION = 1256637.061;        
+        const double MOTOR_MAX_ACCELERATION = MOTOR_STEP_ANGLE * 1000000;
+
+        /**
+         * @var double MOTOR_MIN_SPEED
+         * The minimum speed in radians per second that the motor can travel at, based on the minimum value in the CRD514KD speed register.
+         **/        
+        const double MOTOR_MIN_SPEED = MOTOR_STEP_ANGLE * 1;
+
+        /**
+         * @var double MOTOR_MAX_SPEED
+         * The maximum speed in radians per second that the motor can travel at, based on the maximum value in the CRD514KD speed register.
+         **/
+        const double MOTOR_MAX_SPEED = MOTOR_STEP_ANGLE * 500000;
+
+        /**
+         * @var int MOTION_SLOTS_USED
+         * The amount of motion slots being used.
+         **/
+        const int MOTION_SLOTS_USED = 2;
 
         namespace Slaves{
             /**

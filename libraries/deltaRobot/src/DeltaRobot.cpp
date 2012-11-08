@@ -58,7 +58,8 @@ namespace DeltaRobot{
         motors(motors),
         effectorLocation(DataTypes::Point3D<double>(0, 0, 0)), 
         boundariesGenerated(false),
-        modbusIO(modbusIO){
+        modbusIO(modbusIO),
+        currentMotionSlot(Motor::CRD514KD::MOTION_SLOTS_USED){
 
         if(modbusIO == NULL){
             throw std::runtime_error("Unable to open modbusIO");
@@ -117,26 +118,61 @@ namespace DeltaRobot{
     }
 
     /**
+     * Gets the acceleration in radians/s² for a motor rotation with a certain relative angle and time, which is half acceleration and half deceleration (there is no period of constant speed).
+     * 
+     * @param relativeAngle The relative angle
+     * @param moveTime the move time.
+     *
+     * @return the acceleration in radians/s²
+     **/
+    double DeltaRobot::getAccelerationForRotation(double relativeAngle, double moveTime){
+        return (4 * relativeAngle) / (moveTime * moveTime);
+    }
+
+    /**
+     * Gets the top speed in radians/s for a motor rotation with a certain relative angle, time and acceleration.
+     * 
+     * @param relativeAngle The relative angle
+     * @param moveTime the move time.
+     *
+     * @return the acceleration in radians/s²
+     **/
+    double DeltaRobot::getSpeedForRotation(double relativeAngle, double moveTime, double acceleration){
+        return (acceleration/2) * (moveTime - sqrt((moveTime * moveTime) - (4 * relativeAngle / acceleration)));
+    }
+
+    /**
      * Makes the deltarobot move to a point.
      * 
      * @param point 3-dimensional point to move to.
-     * @param speed Movement speed in millimeters per second.
+     * @param maxAcceleration the acceleration in radians/s² that the motor with the biggest motion will accelerate at.
      **/
-    void DeltaRobot::moveTo(const DataTypes::Point3D<double>& point, double speed){
-        // TODO: Some comments in this function would be nice.
+    void DeltaRobot::moveTo(const DataTypes::Point3D<double>& point, double maxAcceleration){
+        // check whether the motors are powered on.
         if(!motorManager->isPoweredOn()){
             throw Motor::MotorException("motor drivers are not powered on");
         }
 
+        if(effectorLocation == point){
+            // The effector is already at the requested location, the method can be cut short.
+            return;
+        }
+
+        if(maxAcceleration > Motor::CRD514KD::MOTOR_MAX_ACCELERATION){
+            // The acceleration is too high, putting it down to the maximum CRD514KD acceleration.
+            maxAcceleration = Motor::CRD514KD::MOTOR_MAX_ACCELERATION;
+        } else if(maxAcceleration < Motor::CRD514KD::MOTOR_MIN_ACCELERATION){
+            // The acceleration is too low, pulling it up to the minimum CRD514KD acceleration.
+            maxAcceleration = Motor::CRD514KD::MOTOR_MIN_ACCELERATION;
+        }
+
+        // Create MotorRotation objects.
         DataTypes::MotorRotation* rotations[3];
         rotations[0] = new DataTypes::MotorRotation();
         rotations[1] = new DataTypes::MotorRotation();
         rotations[2] = new DataTypes::MotorRotation();
 
-        rotations[0]->speed = speed;
-        rotations[1]->speed = speed;
-        rotations[2]->speed = speed;
-
+        // Get the motor angles from the kinematics model
         try{
             kinematics->destinationPointToMotorRotations(point, rotations);
         } catch(InverseKinematicsException& ex){
@@ -146,6 +182,7 @@ namespace DeltaRobot{
             throw ex;
         }
 
+        // Check if the angles fit within the boundaries
         if(!isValidAngle(0, rotations[0]->angle) || !isValidAngle(1, rotations[1]->angle) || !isValidAngle(2, rotations[2]->angle)){
             delete rotations[0];
             delete rotations[1];
@@ -153,6 +190,7 @@ namespace DeltaRobot{
             throw InverseKinematicsException("motion angles outside of valid range", point);
         }
 
+        // Check if the path fits within the boundaries
         if(!boundaries->checkPath(effectorLocation, point)){
             delete rotations[0];
             delete rotations[1];
@@ -160,12 +198,76 @@ namespace DeltaRobot{
             throw InverseKinematicsException("invalid path", point);
         }
 
-        double moveTime = point.distance(effectorLocation) / speed;
         try{
-            motors[0]->moveToWithin(*rotations[0], moveTime, false);
-            motors[1]->moveToWithin(*rotations[1], moveTime, false);
-            motors[2]->moveToWithin(*rotations[2], moveTime, false);
-            motorManager->startMovement();
+            // switch currentMotionSlot
+            currentMotionSlot++;
+            if(currentMotionSlot > Motor::CRD514KD::MOTION_SLOTS_USED){
+                currentMotionSlot = 1;
+            }
+
+            // An array to hold the relative angles for the motors
+            double relativeAngles[3] = {0.0,0.0,0.0};
+
+            // An array that indicates for each motor whether it moves in this motion or not.
+            bool motorIsMoved[3] = {true, true, true};
+
+            // Index for the motor with the biggest motion
+            int motorWithBiggestMotion = 0;
+
+            for(int i = 0; i < 3; i++){
+                relativeAngles[i] = fabs(rotations[i]->angle - motors[i]->getCurrentAngle());
+                if (relativeAngles[i] > relativeAngles[motorWithBiggestMotion]){
+                    motorWithBiggestMotion = i;
+                }
+
+                if(relativeAngles[i] < Motor::CRD514KD::MOTOR_STEP_ANGLE){
+                    // motor does not have to move at all
+                    motorIsMoved[i] = false;
+                }
+            }
+
+            if(!(motorIsMoved[0] || motorIsMoved[1] || motorIsMoved[2])){
+                // none of the motors have to move, method can be cut short
+                delete rotations[0];
+                delete rotations[1];
+                delete rotations[2];
+                return;
+            }
+
+            // Set the acceleration of the motor with the biggest motion to the given maximum.
+            rotations[motorWithBiggestMotion]->acceleration = maxAcceleration;
+            rotations[motorWithBiggestMotion]->deceleration = maxAcceleration;
+
+            // Calculate the time the motion will take.
+            double moveTime = 2 * sqrt(relativeAngles[motorWithBiggestMotion] / rotations[motorWithBiggestMotion]->acceleration);
+
+            // Set speed, and also the acceleration for the smaller motion motors
+            for(int i = 0; i < 3; i++){
+                rotations[i]->speed = Motor::CRD514KD::MOTOR_MAX_SPEED;
+
+                if(i != motorWithBiggestMotion){
+                    if(motorIsMoved[i]){
+                        rotations[i]->acceleration = getAccelerationForRotation(relativeAngles[i], moveTime);
+                        rotations[i]->deceleration = rotations[i]->acceleration;  
+                        if(rotations[i]->acceleration < Motor::CRD514KD::MOTOR_MIN_ACCELERATION){
+                            // The acceleration comes out too low, this means the motion cannot be half acceleration and half deceleration (without a consant speed phase).
+                            // To make it comply with the move time, as well as the minimum acceleration requirements, we have to add a top speed.
+                            rotations[i]->acceleration = Motor::CRD514KD::MOTOR_MIN_ACCELERATION;
+                            rotations[i]->deceleration = Motor::CRD514KD::MOTOR_MIN_ACCELERATION;
+                            rotations[i]->speed = getSpeedForRotation(relativeAngles[i], moveTime, rotations[i]->acceleration);
+                        } else if(rotations[i]->acceleration > Motor::CRD514KD::MOTOR_MAX_ACCELERATION){
+                            throw std::out_of_range("acceleration too high");
+                        }
+                    } else {
+                        rotations[i]->acceleration = Motor::CRD514KD::MOTOR_MIN_ACCELERATION;
+                        rotations[i]->deceleration = Motor::CRD514KD::MOTOR_MIN_ACCELERATION;
+                        rotations[i]->angle = motors[i]->getCurrentAngle();
+                    }
+                }
+                motors[i]->writeRotationData(*rotations[i], currentMotionSlot);
+            }
+
+            motorManager->startMovement(currentMotionSlot);
         } catch(std::out_of_range& ex){
             delete rotations[0];
             delete rotations[1];
@@ -210,11 +312,11 @@ namespace DeltaRobot{
      * @return The amount of motor steps the motor has moved.
      **/
     int DeltaRobot::moveMotorUntilSensorIsOfValue(int motorIndex, DataTypes::MotorRotation motorRotation, bool sensorValue){
-        motors[motorIndex]->writeRotationData(motorRotation, false);
+        motors[motorIndex]->writeRotationData(motorRotation, 1, false);
 
         int steps = 0;
         do {
-            motors[motorIndex]->startMovement();
+            motors[motorIndex]->startMovement(1);
             steps += (motorRotation.angle / Motor::CRD514KD::MOTOR_STEP_ANGLE);  
         } while(checkSensor(motorIndex) != sensorValue);
 
@@ -232,9 +334,9 @@ namespace DeltaRobot{
     **/
     void DeltaRobot::calibrateMotor(int motorIndex){
         std::cout << "[DEBUG] Calibrating motor number " << motorIndex << std::endl;
-        
+
         // Setup for incremental motion in big steps, to get to the sensor quickly.
-        motors[motorIndex]->setIncrementalMode();
+        motors[motorIndex]->setIncrementalMode(1);
         DataTypes::MotorRotation motorRotation;
         motorRotation.angle = -Measures::CALIBRATION_STEP_BIG;
         
@@ -255,9 +357,9 @@ namespace DeltaRobot{
         motors[motorIndex]->setDeviation(deviation);
         
         // Move back to the new 0.
-        motors[motorIndex]->setAbsoluteMode();
+        motors[motorIndex]->setAbsoluteMode(1);
         motorRotation.angle = 0;
-        motors[motorIndex]->moveTo(motorRotation);
+        motors[motorIndex]->moveTo(motorRotation, 1);
 
         motors[motorIndex]->waitTillReady();
     }
@@ -269,7 +371,7 @@ namespace DeltaRobot{
     * 
     * @return true if the calibration was succesful. False otherwise (e.g. failure on sensors.)
     **/
-    bool DeltaRobot::calibrateMotors(){
+    bool DeltaRobot::calibrateMotors(){       
         // Check the availability of the sensors
         bool sensorFailure = false;
         if(checkSensor(0)){
@@ -300,10 +402,10 @@ namespace DeltaRobot{
         motors[1]->setDeviation(0);
         motors[2]->setDeviation(0);
 
-        motors[0]->writeRotationData(motorRotation);
-        motors[1]->writeRotationData(motorRotation);
-        motors[2]->writeRotationData(motorRotation);
-        motorManager->startMovement();
+        motors[0]->writeRotationData(motorRotation, 1);
+        motors[1]->writeRotationData(motorRotation, 1);
+        motors[2]->writeRotationData(motorRotation, 1);
+        motorManager->startMovement(1);
 
         motors[0]->waitTillReady();
         motors[1]->waitTillReady();

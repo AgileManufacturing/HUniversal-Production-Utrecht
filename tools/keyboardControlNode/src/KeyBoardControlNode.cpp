@@ -103,10 +103,10 @@ namespace KeyBoardControlNodeNamespace {
 	int keyboardNumber = 0;
 
 	/**
-	 * @var double speed
-	 * The speed of the effector in millimeters per second.
+	 * @var double maxAcceleration
+	 * The maxAcceleration of the effector in millimeters per second.
 	 **/
-	double speed = 100.0;
+	double maxAcceleration = 50.0;
 
 	/**
 	 * @var double step
@@ -179,7 +179,7 @@ int main(int argc, char** argv){
 		moveToRelativePointService.request.motion.x = 0;
 		moveToRelativePointService.request.motion.y = 0;
 		moveToRelativePointService.request.motion.z = 0;
-		moveToRelativePointService.request.motion.speed = speed;
+		moveToRelativePointService.request.motion.maxAcceleration = maxAcceleration;
 
 		// Check which key was pressed.
 		switch(inputCharacter){

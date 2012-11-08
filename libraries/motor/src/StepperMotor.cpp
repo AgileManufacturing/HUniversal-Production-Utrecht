@@ -76,10 +76,15 @@ namespace Motor{
 
 			// Set operating modes
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, 0);
-			modbus->writeU16(motorIndex, CRD514KD::Registers::OP_POSMODE, 1);
-			modbus->writeU16(motorIndex, CRD514KD::Registers::OP_OPMODE, 0);
-			modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SEQ_MODE + 0, 1);
-			modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SEQ_MODE + 1, /*1*/ 0);
+
+			// set modes for all used motion slots
+			for(int i = 0; i < CRD514KD::MOTION_SLOTS_USED; i++){
+				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_POSMODE + i, 1);
+				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_OPMODE + i, 0);
+				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SEQ_MODE + i, 1);
+			}
+
+			// Excite motor
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 			
 			// Set motor limits
@@ -157,10 +162,22 @@ namespace Motor{
 	 * Moves the motor to the given position.
 	 *
 	 * @param motorRotation The rotational data for the motor.
+	 * @param motionSlot the motion slot to be used.
+	 **/
+	void StepperMotor::moveTo(const DataTypes::MotorRotation& motorRotation, int motionSlot){
+		checkMotionSlot(motionSlot);
+
+		writeRotationData(motorRotation, motionSlot);
+		startMovement(motionSlot);
+	}
+
+	/**
+	 * Moves the motor to the given position. Uses motion slot 1.
+	 *
+	 * @param motorRotation The rotational data for the motor.
 	 **/
 	void StepperMotor::moveTo(const DataTypes::MotorRotation& motorRotation){
-		writeRotationData(motorRotation);
-		startMovement();
+		moveTo(motorRotation, 1);
 	}
 
 	/**
@@ -169,10 +186,12 @@ namespace Motor{
 	 * @param motorRotation A MotorRotation.
 	 * @param useDeviation Sets whether or not to use the deviation. Defaults to true.
 	 **/
-	void StepperMotor::writeRotationData(const DataTypes::MotorRotation& motorRotation, bool useDeviation){
+	void StepperMotor::writeRotationData(const DataTypes::MotorRotation& motorRotation, int motionSlot, bool useDeviation){
 		if(!poweredOn){
 			throw MotorException("motor drivers are not powered on");
 		}
+
+		checkMotionSlot(motionSlot);
 
 		if(anglesLimited && (motorRotation.angle <= minAngle || motorRotation.angle >= maxAngle)){
 			throw std::out_of_range("one or more angles out of range");
@@ -198,17 +217,21 @@ namespace Motor{
 		uint32_t motorAcceleration = (uint32_t)((1000000/(motorRotation.acceleration/(CRD514KD::MOTOR_STEP_ANGLE * 1000))));
 		uint32_t motorDeceleration = (uint32_t)((1000000/(motorRotation.deceleration/(CRD514KD::MOTOR_STEP_ANGLE * 1000))));
 
-		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_SPEED, motorSpeed, true);
-		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_POS, motorSteps, true);
-		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_ACC, motorAcceleration, true);
-		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_DEC, motorDeceleration, true);
+		// offset for the motion slot, * 2 for 32 bit registers.
+		int motionSlotOffset = (motionSlot - 1) * 2;
+
+		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_SPEED + motionSlotOffset, motorSpeed, true);
+		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_POS + motionSlotOffset, motorSteps, true);
+		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_ACC + motionSlotOffset, motorAcceleration, true);
+		modbus->writeU32(motorIndex, CRD514KD::Registers::OP_DEC + motionSlotOffset, motorDeceleration, true);
 		setAngle = motorRotation.angle;
 	}
 
 	/**
 	 * Start the motor to move according to the set registers. Will wait for the motor to be ready before moving.
 	 **/
-	void StepperMotor::startMovement(void){
+	void StepperMotor::startMovement(int motionSlot){
+		checkMotionSlot(motionSlot);
 		if(!poweredOn){
 			throw MotorException("motor drivers are not powered on");
 		}
@@ -216,28 +239,9 @@ namespace Motor{
 		// Execute motion.
 		waitTillReady();
 
-		modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
-		modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
+		modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
 		modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 		updateAngle();
-	}
-
-
-	/**
-	 * Same as moveTo, but rotates to an angle within a certain time.
-	 * 
-	 * @param motorRotation The rotational data for the motor.
-	 * @param time Time in seconds that the motors will take to rotate to the given angle. Speed member of given motion is ignored.
-	 * @param start If the movement should start immediately.
-	 **/
-	void StepperMotor::moveToWithin(const DataTypes::MotorRotation& motorRotation, double time, bool start){
-		DataTypes::MotorRotation newMotorRotation = motorRotation;
-		newMotorRotation.speed = fabs(currentAngle - motorRotation.angle) / time;
-		if(start){
-			moveTo(newMotorRotation);
-		} else{
-			writeRotationData(newMotorRotation);
-		}
 	}
 
 	/**
@@ -296,14 +300,27 @@ namespace Motor{
 	/**
 	 * Sets the motor controller to incremental mode.
 	 **/
-	 void StepperMotor::setIncrementalMode(){
-	 	modbus->writeU16(motorIndex, Motor::CRD514KD::Registers::OP_POSMODE, 0);
-	 }
+	void StepperMotor::setIncrementalMode(int motionSlot){
+		checkMotionSlot(motionSlot);
+	 	modbus->writeU16(motorIndex, Motor::CRD514KD::Registers::OP_POSMODE + motionSlot - 1, 0);
+	}
 
 	/**
 	 * Sets the motor controller to absolute mode.
 	 **/
-	 void StepperMotor::setAbsoluteMode(){
-	 	modbus->writeU16(motorIndex, Motor::CRD514KD::Registers::OP_POSMODE, 1);
-	 }
+	void StepperMotor::setAbsoluteMode(int motionSlot){
+		checkMotionSlot(motionSlot);
+		modbus->writeU16(motorIndex, Motor::CRD514KD::Registers::OP_POSMODE + motionSlot - 1, 1);
+	}
+
+	/**
+	 * Checks whether the motion slot is used. Throws an std::out_of_range exception if not.
+	 **/
+	void StepperMotor::checkMotionSlot(int motionSlot){
+		if(motionSlot < 1 || motionSlot > CRD514KD::MOTION_SLOTS_USED){
+			std::cerr << "Motion slot: " << motionSlot << std::endl;
+			throw std::out_of_range("Motion slot out of range.");
+		}
+	}
+
 }

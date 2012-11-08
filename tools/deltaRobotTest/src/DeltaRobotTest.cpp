@@ -44,10 +44,10 @@
 
 namespace DeltaRobotTestNamespace {
 	/**
-	 * @var const double speed
-	 * The speed in milimeters the deltarobot moves per second.
+	 * @var const double maxAcceleration
+	 * The maxAcceleration in milimeters the deltarobot moves per second.
 	 **/
-	const double speed = 100.0;
+	const double maxAcceleration = 50.0;
 
 	/**
 	 * @var char keyPress
@@ -75,7 +75,7 @@ namespace DeltaRobotTestNamespace {
 		moveToPointService.request.motion.x = 0;
 		moveToPointService.request.motion.y = 0;
 		moveToPointService.request.motion.z = -196.063;	
-		moveToPointService.request.motion.speed = speed;
+		moveToPointService.request.motion.maxAcceleration = maxAcceleration;
 		moveToPointClient.call(moveToPointService);
 	}
 }
@@ -124,10 +124,30 @@ int main(int argc, char **argv){
 	moveToPointService.request.motion.x = 10;
 	moveToPointService.request.motion.y = 10;
 	moveToPointService.request.motion.z = -210;	
-	moveToPointService.request.motion.speed = speed;
+	moveToPointService.request.motion.maxAcceleration = maxAcceleration;
 	moveToPointClient.call(moveToPointService);
 
 	moveToStartPoint();
+
+	// MoveToPoint speed benchmark
+	std::cout << "Press any key to start the MoveToPoint speed benchmark" << std::endl;
+	std::cin >> keyPress;
+	for(int acc = 25; acc <= 200; acc += 25){
+		std::cout << "max acceleration: " << acc << std::endl;
+		for(int i = 10; i <= 40; i += 10){
+			moveToPointService.request.motion.x = i;
+			moveToPointService.request.motion.y = i;
+			moveToPointService.request.motion.z = -210;	
+			moveToPointService.request.motion.maxAcceleration = acc;
+			moveToPointClient.call(moveToPointService);
+
+			moveToPointService.request.motion.x = -i;
+			moveToPointService.request.motion.y = -i;
+			moveToPointService.request.motion.z = -210;	
+			moveToPointService.request.motion.maxAcceleration = acc;
+			moveToPointClient.call(moveToPointService);		
+		}
+	}
 
 	// Test MoveToRelativePoint Service.
 	std:: cout << "Press any key to start the MoveToRelativePoint" << std::endl;
@@ -135,7 +155,7 @@ int main(int argc, char **argv){
 	moveToRelativePointService.request.motion.x = -1;
 	moveToRelativePointService.request.motion.y = -1;
 	moveToRelativePointService.request.motion.z = -1;	
-	moveToRelativePointService.request.motion.speed = speed;
+	moveToRelativePointService.request.motion.maxAcceleration = maxAcceleration;
 	moveToRelativePointClient.call(moveToRelativePointService);
 
 	moveToStartPoint();
@@ -150,22 +170,22 @@ int main(int argc, char **argv){
 	point1.x = 10;
 	point1.y = 10;
 	point1.z = -210;
-	point1.speed = speed;
+	point1.maxAcceleration = maxAcceleration;
 
 	point2.x = -10;
 	point2.y = -10;
 	point2.z = -210;
-	point2.speed = speed;
+	point2.maxAcceleration = maxAcceleration;
 
 	point3.x = 30;
 	point3.y = 30;
 	point3.z = -190;
-	point3.speed = speed;
+	point3.maxAcceleration = maxAcceleration;
 
 	point4.x = -20;
 	point4.y = 20;
 	point4.z = -210;
-	point4.speed = speed;
+	point4.maxAcceleration = maxAcceleration;
 	
 	movePathService.request.motion.push_back(point1);
 	movePathService.request.motion.push_back(point2);
@@ -187,27 +207,27 @@ int main(int argc, char **argv){
 		point1.x = 0;
 		point1.y = 0;
 		point1.z = -5;
-		point1.speed = speed;
+		point1.maxAcceleration = maxAcceleration;
 
 		point2.x = 20;
 		point2.y = 0;
 		point2.z = 0;
-		point2.speed = speed;
+		point2.maxAcceleration = maxAcceleration;
 
 		point3.x = 0;
 		point3.y = 20;
 		point3.z = 0;
-		point3.speed = speed;
+		point3.maxAcceleration = maxAcceleration;
 
 		point4.x = -20;
 		point4.y = 0;
 		point4.z = 0;
-		point4.speed = speed;
+		point4.maxAcceleration = maxAcceleration;
 
 		point5.x = 0;
 		point5.y = -20;
 		point5.z = 0;
-		point5.speed = speed;
+		point5.maxAcceleration = maxAcceleration;
 		moveRelativePathService.request.motion.push_back(point1);
 		moveRelativePathService.request.motion.push_back(point2);
 		moveRelativePathService.request.motion.push_back(point3);
