@@ -46,7 +46,6 @@ namespace EnvironmentCommunication {
 			LookupHandler();
 		private:		
 			bool lookupServiceCallback(lookupHandler::LookupServer::Request &req, lookupHandler::LookupServer::Response &rep);
-
 			/**
 			 * @var ros::ServiceClient lookupClient
 			 * the client that will call the service in environmentCache
@@ -57,7 +56,6 @@ namespace EnvironmentCommunication {
 			 * the service for the equipletNode
 			 **/				
 			ros::ServiceServer lookupServer;
-
 	};
 }
 
