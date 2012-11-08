@@ -31,6 +31,11 @@
 #define LOOKUPHANDLER_H
 
 #include "ros/ros.h"
+#include "environmentCommunicationMessages/KeyValuePair.h"
+#include "environmentCommunicationMessages/Map.h"
+#include "lookupHandler/LookupServer.h"
+#include "lookupHandler/LookupMessage.h"
+#include "lookupHandler/temp.h"
 
 namespace EnvironmentCommunication {
 	class LookupHandler {
@@ -40,7 +45,8 @@ namespace EnvironmentCommunication {
 			ros::ServiceClient lookupClient;
 			ros::ServiceServer lookupServer;
 			void lookupMessage(int messageID);
-			bool lookupServiceCallback();
+			bool lookupServiceCallback(lookupHandler::LookupServer::Request &req, lookupHandler::LookupServer::Response &rep);
 	};
 }
+
 #endif
