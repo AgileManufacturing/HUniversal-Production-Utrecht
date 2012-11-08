@@ -19,6 +19,9 @@ srv_gen/
 msg_gen/
 ros/deltaRobotNode/src/deltaRobotNode/
 ros/rosMast/src/rosMast/
+ros/environmentCommunicationMessages/src
+ros/lookupHandler/src/lookupHandler
+ros/environmentCache/src/environmentCache
 tools/gripperTestNode/src/gripperTestNode/
 build/
 
