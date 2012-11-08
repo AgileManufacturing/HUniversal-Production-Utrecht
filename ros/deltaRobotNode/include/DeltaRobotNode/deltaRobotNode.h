@@ -1,5 +1,5 @@
 /**
- * @file Services.h
+ * @file deltaRobotNode.h
  * @brief Names for the DeltaRobot services.
  * @date Created: 2012-10-17
  *
@@ -46,6 +46,9 @@
 #include <rosMast/StateMachine.h>
 
 namespace deltaRobotNodeNamespace {
+	/**
+	 * the DeltaRobotNode which is a StateMachine
+	 **/
 	class DeltaRobotNode : public rosMast::StateMachine {
 		public:			
 			DeltaRobotNode(int equipletID, int moduleID);

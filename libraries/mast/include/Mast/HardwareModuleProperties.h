@@ -1,5 +1,5 @@
 /**
-* @file ModuleProperties.cpp
+* @file HardwareModuleProperties.h
 * @brief Holds all properties of a hardware module. 
 * @date Created: 2012-10-09
 *
@@ -82,6 +82,9 @@ namespace Mast {
 		 **/
 		bool error;
 		
+		/** 
+		 * Print function for a module
+		 **/
 		friend std::ostream& operator<<(std::ostream& stream, HardwareModuleProperties &module) {
 			stream << "Id: " << module.id << ", current state: " << module.currentState << " actuator " << module.actuator << " Required for current service " << module.needed;
 			return stream;

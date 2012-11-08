@@ -9,6 +9,9 @@
 #include "iostream"
 #include "Gripper.h"
 
+/**
+ * Test node that represents a virtual GripperNode
+ **/
 class GripperTestNode: public rosMast::StateMachine
 {
 	public:

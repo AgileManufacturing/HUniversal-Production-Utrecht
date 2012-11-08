@@ -33,7 +33,7 @@
 /**
  * Constructor for Gripper
  *
- * @param ioController Output controller for the ouput device (controller contains the registers)
+ * @param gripperNodeObject Output controller for the ouput device (controller contains the registers)
  * @param warningHandler Handler to warn when the valve is almost opened for too long.
  */
 Gripper::Gripper(void* gripperNodeObject, watchdogWarningHandler warningHandler) :

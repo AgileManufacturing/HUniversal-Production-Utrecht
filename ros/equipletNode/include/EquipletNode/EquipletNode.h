@@ -37,6 +37,9 @@
 #include "rosMast/State.h"
 #include "rosMast/ModuleError.h"
 
+/**
+ * The equipletNode, will manage all modules and keep track of their states
+ **/
 class EquipletNode {
 	public:
 		EquipletNode(int id = 1);
