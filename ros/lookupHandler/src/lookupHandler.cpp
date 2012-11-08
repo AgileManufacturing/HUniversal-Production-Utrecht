@@ -29,12 +29,21 @@
 
  #include "LookupHandler/lookupHandler.h"
 
+/**
+ * Create a LookupHandler
+ **/
 EnvironmentCommunication::LookupHandler::LookupHandler() {
 	ros::NodeHandle nodeHandle;
 	lookupClient = nodeHandle.serviceClient<lookupHandler::temp>("EnvironmentCache/lookup");
-	lookupServer = nodeHandle.advertiseService("LookkupHandler/lookup", &LookupHandler::lookupServiceCallback, this);
+	lookupServer = nodeHandle.advertiseService("LookupHandler/lookup", &LookupHandler::lookupServiceCallback, this);
 }
 
+/**
+ * Call back for lookupHandler/lookup service
+ * Will lookup data in environmentcache and use payload of request.msg on the data
+ * @param request Contains the params for the state change
+ * @param response Will tell if the state transition was succesfull for the state change
+ **/
 bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookupHandler::LookupServer::Request &req, lookupHandler::LookupServer::Response &rep) {
 	std::string id = req.lookupMsg.lookupid;
 	// Call service in enviroment cache
@@ -43,8 +52,8 @@ bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookupHandle
 	return true;
 }
 
-
-int main(int argc, char **argv) {
+int main(int argc, char **argv) {		
+	ros::init(argc, argv, "lookupHandlerNode");
 	EnvironmentCommunication::LookupHandler lh;
 	ros::spin();
 	return 0;

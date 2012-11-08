@@ -33,7 +33,6 @@
 #include <Utilities/Utilities.h>
 
 int main(int argc, char **argv) {
-
 	// Check if an equiplet id is given at the command line	 
 	int equipletId = 1;
 	if(argc != 2 || Utilities::stringToInt(equipletId, argv[1]) != 0) {
