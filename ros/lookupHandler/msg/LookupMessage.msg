@@ -1,0 +1,3 @@
+string lookuptype
+string lookupid
+environmentCommunicationMessages/Map payload
