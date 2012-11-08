@@ -1,5 +1,5 @@
 /**
- * @file Main.cpp
+ * @file EnvironmentCache.h
  * @brief The EnvironmentCache definition
  * @date Created: 2012-11-07
  *
@@ -31,14 +31,23 @@
 #ifndef ENVIRONMENTCACHE_H
 #define ENVIRONMENTCACHE_H
 
+#include <environmentCache/UpdateEnvironmentCache.h>
+#include <string>
+#include <map>
+
 /**
  * This class represents the environment cache
  **/
 class EnvironmentCache{
 public:
 	EnvironmentCache();
-	void updateEnvironmentCache();
+	bool updateEnvironmentCache(environmentCache::UpdateEnvironmentCache &req, environmentCache::UpdateEnvironmentCache &res);
 	virtual ~EnvironmentCache();
 private:
+	// The environemt cache
+	std::map<string, std::map<string, string>> cache;
+
+	// UpdateEnvironmentCacheService
+	ros::ServiceServer updateEnvironmentCacheService;
 };
 #endif

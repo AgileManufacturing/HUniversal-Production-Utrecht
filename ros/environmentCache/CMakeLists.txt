@@ -19,7 +19,7 @@ rexos_rospack_init("environmentCache" true true)
 rosbuild_add_executable(EnvironmentCache src/Main.cpp)
 
 # Add dependencies to our libraries and other ROS packages in the same directory as this one.
-#add_dependencies(DeltaRobotNode deltaRobot)
+#add_dependencies(EnvironmentCache environmentCommunicationMessages)
 
 # Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
 #include_directories(${LIB_DATATYPES_INCLUDE} ${LIB_DATATYPES_INCLUDE} ${LIB_UTILITIES_INCLUDE} ${LIB_DELTAROBOT_INCLUDE} ${LIB_MOTOR_INCLUDE} ${LIB_MODBUS_CONTROLLER_INCLUDE})

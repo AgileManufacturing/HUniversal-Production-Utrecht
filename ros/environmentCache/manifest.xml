@@ -10,6 +10,7 @@
   <url>http://ros.org/wiki/environmentCache</url>
   <depend package="roscpp"/>
   <depend package="std_msgs"/>
+  <depend package="environmentCommunicationMessages"/>
 
 </package>
 
