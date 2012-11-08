@@ -1,5 +1,5 @@
 /**
- * @file Main.cpp
+ * @file equipletNode/src/Main.cpp
  * @brief Symbolizes an entire Equiplet.
  * @date Created: 2012-10-09
  *

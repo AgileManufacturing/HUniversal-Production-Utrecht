@@ -1,5 +1,5 @@
 /**
- * @file Main.cpp
+ * @file environmentCache/src/Main.cpp
  * @brief The main file for the Environment Cache
  * @date Created: 2012-11-07
  *
@@ -30,6 +30,9 @@
 
 #include <iostream>
 
+/** 
+ * Main function for Envoronment Cache
+ **/
 int main(int argc, char **argv) {
 	return 0;	
 }
