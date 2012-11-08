@@ -45,7 +45,7 @@ public:
 	virtual ~EnvironmentCache();
 private:
 	// The environemt cache
-	std::map<string, std::map<string, string>> cache;
+	std::map< std::string, std::map<std::string, std::string> > cache;
 
 	// UpdateEnvironmentCacheService
 	ros::ServiceServer updateEnvironmentCacheService;

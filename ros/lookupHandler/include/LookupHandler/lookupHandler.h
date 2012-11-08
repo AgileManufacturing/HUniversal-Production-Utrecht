@@ -31,8 +31,8 @@
 #define LOOKUPHANDLER_H
 
 #include "ros/ros.h"
-#include "environmentCommunicationMessages/KeyValuePair.h"
-#include "environmentCommunicationMessages/Map.h"
+#include <environmentCommunicationMessages/KeyValuePair.h>
+#include <environmentCommunicationMessages/Map.h>
 #include "lookupHandler/LookupServer.h"
 #include "lookupHandler/LookupMessage.h"
 #include "lookupHandler/temp.h"

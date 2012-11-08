@@ -22,6 +22,7 @@ ros/rosMast/src/rosMast/
 ros/environmentCommunicationMessages/src
 ros/lookupHandler/src/lookupHandler
 ros/environmentCache/src/environmentCache
+ros/environmentCache/src/environmentCache
 tools/gripperTestNode/src/gripperTestNode/
 build/
 

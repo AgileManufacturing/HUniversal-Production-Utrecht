@@ -36,7 +36,7 @@
  **/
 EnvironmentCache::EnvironmentCache(): cache() {
 	// Initialise services
-	ros::nodeHandle nh;
+	ros::NodeHandle nh;
 	updateEnvironmentCacheService = nh.advertiseService("UpdateEnvironmentCache", &EnvironmentCache::updateEnvironmentCache, this);
 }
 
@@ -57,9 +57,9 @@ bool EnvironmentCache::updateEnvironmentCache(environmentCache::UpdateEnvironmen
 		case 0: // Item is added to the environment
 			if(cache.count(req.id) == 0) {
 				// Insert all properties into a map
-				map<string, string> properties;
+				std::map<std::string, std::string> properties;
 				for(int i = 0; i < req.properties.size(); i++) {
-					properties.insert(pair<string, string>(properties[i].key, properties[i].value));
+					cache.insert(std::pair<std::string, std::string>(properties[i].key, properties[i].value));
 				}
 				cache.insert(req.id, properties);
 				std::cout << "New item added to environment cache" << std::endl;
@@ -74,4 +74,9 @@ bool EnvironmentCache::updateEnvironmentCache(environmentCache::UpdateEnvironmen
 		default:
 			break;
 	}
+}
+
+int main(int argc, char **argv) {
+	EnvironmentCache envCache();
+	return 0;	
 }
