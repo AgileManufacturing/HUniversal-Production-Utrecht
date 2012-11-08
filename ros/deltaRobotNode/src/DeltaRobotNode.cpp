@@ -123,7 +123,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate(deltaRobotNode::Calibrat
 	deltaRobotNode::Calibrate::Response &res) {
 	res.succeeded = false;
 	if(getState() != rosMast::normal) {
-		res.message="Cannot calibrate, mast state="+ getState();
+		res.message="Cannot calibrate, mast state=" + std::string(rosMast::state_txt[getState()]);
 		return true;
 	}
     // Calibrate the motors
@@ -148,7 +148,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(deltaRobotNode::MoveTo
 	ROS_INFO("moveToPoint called");
 	res.succeeded = false;
 	if(getState() != rosMast::normal) {
-		res.message="Cannot move to point, mast state="+ getState();
+		res.message="Cannot move to point, mast state="+ std::string(rosMast::state_txt[getState()]);
 		return true;
 	}
 
@@ -184,7 +184,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath(deltaRobotNode::MovePath:
 	ROS_INFO("movePath called");
 	res.succeeded = false;
 	if(getState() != rosMast::normal) {
-		res.message="Cannot move path, mast state="+ getState();
+		res.message="Cannot move path, mast state="+ std::string(rosMast::state_txt[getState()]);
 		return true;
 	}
 
@@ -237,7 +237,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(deltaRobotNode
 	ROS_INFO("moveToRelativePoint called");
 	res.succeeded = false;
 	if(getState() != rosMast::normal) {
-		res.message="Cannot move to relative point, mast state="+ getState();
+		res.message="Cannot move to relative point, mast state="+ std::string(rosMast::state_txt[getState()]);
 		return true;
 	}
 
@@ -285,7 +285,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::M
 	ROS_INFO("moveRelativePath called");
     res.succeeded = false;
 	if(getState() != rosMast::normal) {
-		res.message="Cannot move to relative path, mast state="+ getState();
+		res.message="Cannot move to relative path, mast state="+ std::string(rosMast::state_txt[getState()]);
 		return true;
 	}
 
@@ -337,7 +337,6 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::M
 	}
 	res.succeeded = true;
 	return res.succeeded;
-
 }
 /**
  * Transition from Safe to Standby state
