@@ -44,14 +44,17 @@ EnvironmentCommunication::LookupHandler::LookupHandler() {
  * @param request Contains the params for the state change
  * @param response Will tell if the state transition was succesfull for the state change
  **/
-bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookupHandler::LookupServer::Request &req, lookupHandler::LookupServer::Response &rep) {
-	std::string id = req.lookupMsg.lookupid;
+bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookupHandler::LookupServer::Request &request, lookupHandler::LookupServer::Response &response) {
+	std::string id = request.lookupMsg.lookupid;
 	// Call service in enviroment cache
 	// Combine payload of request and enviroment data
 	// Build response
 	return true;
 }
 
+/**
+ * Main function for the lookupHandler
+ **/
 int main(int argc, char **argv) {		
 	ros::init(argc, argv, "lookupHandlerNode");
 	EnvironmentCommunication::LookupHandler lh;

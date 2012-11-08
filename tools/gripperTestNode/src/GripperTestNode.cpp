@@ -5,6 +5,8 @@
 
 /**
  * Constructor 
+ * @param equipletID identifier for the equiplet
+ * @param moduleID identifier for the gripper
  **/
 GripperTestNode::GripperTestNode(int equipletID, int moduleID): rosMast::StateMachine(equipletID, moduleID)
 {
@@ -22,7 +24,7 @@ GripperTestNode::~GripperTestNode()
 
 /** 
  * A wrapper for the gripper error handler so that we can use a member function
- * @param Pointer to the gripperTestNode object
+ * @param gripperNodeObject pointer to the gripperTestNode object
  **/
 void GripperTestNode::WrapperForGripperError(void* gripperNodeObject) {
 	GripperTestNode* myself = (GripperTestNode*) gripperNodeObject;

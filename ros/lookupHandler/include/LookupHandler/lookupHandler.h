@@ -38,14 +38,24 @@
 #include "lookupHandler/temp.h"
 
 namespace EnvironmentCommunication {
+	/** 
+	 * Will request data from environmentcache, do something cool with the data and send it back to equipletNode
+	 **/
 	class LookupHandler {
 		public:
 			LookupHandler();
 		private:		
-			ros::ServiceClient lookupClient;
-			ros::ServiceServer lookupServer;
-			void lookupMessage(int messageID);
 			bool lookupServiceCallback(lookupHandler::LookupServer::Request &req, lookupHandler::LookupServer::Response &rep);
+			/**
+			 * @var ros::ServiceClient lookupClient
+			 * the client that will call the service in environmentCache
+			 **/			
+			ros::ServiceClient lookupClient;
+			/**
+			 * @var ros::ServiceServer lookupServer
+			 * the service for the equipletNode
+			 **/				
+			ros::ServiceServer lookupServer;
 	};
 }
 

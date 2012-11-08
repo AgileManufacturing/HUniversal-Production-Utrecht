@@ -52,6 +52,9 @@ namespace rosMast {
 	struct StateTransition 
 	{
 		StateTransition() { }
+		/** 
+		 * Constructor for StateTransition
+		 **/
 		StateTransition(StateType src, StateType des) {
 			sourceState = src;
 			destinationState = des;
@@ -78,7 +81,9 @@ namespace rosMast {
 			return id1.sourceState < other.sourceState;
 		}
 	};
-	
+	/** 
+	 * The StateMachine
+	 **/
 	class StateMachine {		
 		/** 
 		 * @var typedef int (StateMachine::*stateFunctionPtr)()

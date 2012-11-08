@@ -31,8 +31,8 @@
 
 /**
  * Create a stateMachine
- * @param the unique identifier for the equiplet
- * @param the unique identifier for the module that implements the statemachine
+ * @param equipletID the unique identifier for the equiplet
+ * @param moduleID the unique identifier for the module that implements the statemachine
  **/
 rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
 	this->equipletID = equipletID;
@@ -83,6 +83,10 @@ bool rosMast::StateMachine::changeState(rosMast::StateChange::Request &request, 
 	return true;
 }
 
+/** 
+ * Will lookup the function pointer for a transition and execute the transition function
+ * @param desiredState State you want to transition too
+ **/
 int rosMast::StateMachine::executeTransition(rosMast::StateType desiredState) {
 	// save the old state
 	StateType oldState = currentState;
@@ -115,18 +119,18 @@ int rosMast::StateMachine::executeTransition(rosMast::StateType desiredState) {
 
 /**
  * Lookup function for the function pointer to the transition function	
- * @param the currentState of the equiplet
- * @param the desired state
+ * @param currentState the currentState of the equiplet
+ * @param desiredState the desired state
  * @return The pointer to the transition function, will be NULL when there is no function in lookup table
  **/
-rosMast::StateMachine::stateFunctionPtr rosMast::StateMachine::lookupTransition(StateType curState, StateType desiredState) {
-	StateTransition st(curState, desiredState);
+rosMast::StateMachine::stateFunctionPtr rosMast::StateMachine::lookupTransition(StateType currentState, StateType desiredState) {
+	StateTransition st(currentState, desiredState);
 	return transitionMap[st];
 }
 
 /**
  * Sets the private variable currentState and will send a message over the stateChanged topic
- * @param the new state of the machine
+ * @param newState the new state of the machine
  **/
 void rosMast::StateMachine::setState(StateType newState) {
 	ROS_INFO("Setting state to: %d", newState);
@@ -139,7 +143,7 @@ void rosMast::StateMachine::setState(StateType newState) {
 
 /**
  * Send an error message over equiplet_modulerror topic
- * @param represents an error code that can be looked up in the database
+ * @param errorCode represents an error code that can be looked up in the database
  **/
 void rosMast::StateMachine::sendErrorMessage(int errorCode) {
 	rosMast::ErrorInModule msg;
