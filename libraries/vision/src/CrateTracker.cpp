@@ -122,7 +122,16 @@ namespace Vision {
 				}
 			}
 		}
+		removeUntrackedCrates(events);
+		return events;
+	}
 
+	/**
+	 * Removes all crates that were not found in the update loop.
+	 *
+	 * @param events List of CrateEvent messages.
+	 **/
+	void CrateTracker::removeUntrackedCrates(std::vector<CrateEvent> &events) {
 		// Remove all crate that were not found in the update loop. These have been marked as non existing.
 		std::vector<std::string> cratesToBeRemoved;
 		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end();
@@ -156,7 +165,7 @@ namespace Vision {
 		for (std::vector<std::string>::iterator it = cratesToBeRemoved.begin(); it != cratesToBeRemoved.end(); it++) {
 			knownCrates.erase(*it);
 		}
-		return events;
+
 	}
 
 	/**

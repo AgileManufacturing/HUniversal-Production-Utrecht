@@ -46,20 +46,30 @@ namespace Vision {
 	 **/
 	FiducialDetector::FiducialDetector(int minRad, int maxRad) {
 		this->verbose = false;
+		//Canny high for circle detection
+		this->circleThreshold = 300;
+		//Blur size for circle detection
+		this->blur = 3;
+		//Sigma for the blur
+		this->sigma = 2.0;
 		this->minRad = minRad;
 		this->maxRad = maxRad;
+		//distance between the recognized circles in pixels.
 		this->distance = 70;
+		//quality of the circle needed for it to be detected, higher is more perfect circle.
 		this->circleVotes = 100;
+
+		//center lines detection of fiducial min and max distance
 		this->minDist = 1.5f;
 		this->maxDist = 5.0f;
+		//quality of the line
 		this->lineVotes = 10;
+		//maximum number of lines in the center line detection
 		this->maxLines = 10;
+		//Canny low threshold for line detection
 		this->lowThreshold = 125;
+		//Canny high threshold for line detection
 		this->highThreshold = 300;
-		this->circleThreshold = 300;
-		this->lineVotes = 10;
-		this->blur = 3;
-		this->sigma = 2.0;
 	}
 
 	/**
@@ -77,7 +87,7 @@ namespace Vision {
 	 * @param color The color to draw the line with.
 	 * @param thickness The thickness of the line.
 	 **/
-	inline void FiducialDetector::polarLine(cv::Mat& image, float rho, float theta, cv::Scalar color, int thickness) {
+	inline void FiducialDetector::drawPolarLine(cv::Mat& image, float rho, float theta, cv::Scalar color, int thickness) {
 		if (theta < M_PI / 4. || theta > 3. * M_PI / 4.) { // ~vertical line
 		// point of intersection of the line with first row
 			cv::Point pt1(rho / cos(theta), 0);
@@ -265,13 +275,13 @@ namespace Vision {
 
 				// Draw a blue line
 				if (debugImage != NULL)
-					polarLine(*debugImage, (*it)[0], (*it)[1], cv::Scalar(255, 0, 0), 1);
+					drawPolarLine(*debugImage, (*it)[0], (*it)[1], cv::Scalar(255, 0, 0), 1);
 			} else {
 				lines2.push_back(*it);
 
 				// Draw a green line
 				if (debugImage != NULL)
-					polarLine(*debugImage, (*it)[0], (*it)[1], cv::Scalar(0, 255, 0), 1);
+					drawPolarLine(*debugImage, (*it)[0], (*it)[1], cv::Scalar(0, 255, 0), 1);
 			}
 		}
 
@@ -393,7 +403,7 @@ namespace Vision {
 
 		// Draw a red line on the debug image
 		if (debugImage != NULL)
-			polarLine(*debugImage, rho, theta, cv::Scalar(0, 0, 255), 1);
+			drawPolarLine(*debugImage, rho, theta, cv::Scalar(0, 0, 255), 1);
 
 		return true;
 	}

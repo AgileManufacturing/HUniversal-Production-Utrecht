@@ -44,14 +44,8 @@ namespace Vision {
 	 **/
 	class FiducialDetector {
 	private:
-		void polarLine(cv::Mat& image, float rho, float theta, cv::Scalar color, int thickness);
+		void drawPolarLine(cv::Mat& image, float rho, float theta, cv::Scalar color, int thickness);
 		bool detectCenterLine(cv::Vec2f& centerLine, std::vector<cv::Vec2f> lines, cv::Mat* debugImage = NULL);
-	public:
-		/**
-		 * @var bool verbose
-		 * Turn on and off console messages.
-		 **/
-		bool verbose;
 
 		/**
 		 * @var int blur
@@ -120,6 +114,12 @@ namespace Vision {
 		 * High canny threshold for line detection.
 		 **/
 		double highThreshold;
+	public:
+		/**
+		 * @var bool verbose
+		 * Turn on and off console messages.
+		 **/
+		bool verbose;
 
 		FiducialDetector(int minRad = 20, int maxRad = 40);
 		virtual ~FiducialDetector( );
@@ -128,6 +128,42 @@ namespace Vision {
 		bool detectCrosshair(cv::Mat& image, cv::Point2f& center, const cv::Mat& mask = cv::Mat(), cv::Mat* debugImage = NULL);
 		static void order(std::vector<cv::Point2f>& points);
 
+		/**
+		 * Set minRad.
+		 *
+		 * @param minRad The minimum radius in pixels of a circle.
+		 **/
+		void setMinRad(int minRad) {this->minRad = minRad;}
+		/**
+		 * Set maxRad.
+		 *
+		 * @param maxRad The maximum radius in pixels of a circle.
+		 **/
+		void setMaxRad(int maxRad) {this->maxRad = maxRad;}
+		/**
+		 * Set distance.
+		 *
+		 * @param The minimum distance between circles in pixels.
+		 **/
+		void setDistance(int distance) {this->distance = distance;}
+		/**
+		 * Set minDist.
+		 *
+		 * @param Minimum distance between lines to use for the center line.
+		 **/
+		void setMinDist(int minDist) {this->minDist = minDist;}
+		/**
+		 * Set maxDist.
+		 *
+		 * @param Maximum distance between lines to use for the center line.
+		 **/
+		void setMaxDist(int maxDist) {this->maxDist = maxDist;}
+		/**
+		 * Set circleVotes.
+		 *
+		 * @param The minimum number of votes needed for an object to be detected as a circle.
+		 **/
+		void setCircleVotes(int circleVotes) {this->circleVotes = circleVotes;}
 		/**
 		 * Calculate distance between two fiducial points
 		 *

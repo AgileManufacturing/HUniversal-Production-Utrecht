@@ -77,15 +77,15 @@ CrateLocatorNode::CrateLocatorNode( ) :
 	// Setup the fiducial detector
 	fidDetector = new Vision::FiducialDetector();
 	// Minimum for the radius of the circle = 10, so a diameter of 20 pixels
-	fidDetector->minRad = 10;
+	fidDetector->setMinRad(10);
 	// Maximum for the radius of the circle = 40, so a diameter of 80 pixels
-	fidDetector->maxRad = 40;
+	fidDetector->setMaxRad(40);
 	// Minimum distance between two circles, 30 pixels
-	fidDetector->distance = 30;
-	fidDetector->minDist = 2.0f;
-	fidDetector->maxDist = 5.0f;
+	fidDetector->setDistance(30);
+	fidDetector->setMinDist(2.0f);
+	fidDetector->setMaxDist(5.0f);
 	fidDetector->verbose = true;
-	fidDetector->circleVotes = 60;
+	fidDetector->setCircleVotes(60);
 
 	// Setup the coordinate transformation(from pixel to real life)
 	// The real-life coordinates of the fiducials in mm.

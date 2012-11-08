@@ -136,6 +136,7 @@ namespace Vision {
 		double movementThreshold;
 	private:
 		bool hasChanged(const DataTypes::Crate& newCrate, const DataTypes::Crate& oldCrate);
+		void removeUntrackedCrates(std::vector<CrateEvent> &events);
 		
 		std::map<std::string, DataTypes::Crate> knownCrates;
 	};
