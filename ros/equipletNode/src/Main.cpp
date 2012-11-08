@@ -32,6 +32,9 @@
 #include <EquipletNode/EquipletNode.h>
 #include <Utilities/Utilities.h>
 
+/** 
+ * Main that creates the equipletNode and adds hardware modules
+ **/
 int main(int argc, char **argv) {
 
 	// Check if an equiplet id is given at the command line	 

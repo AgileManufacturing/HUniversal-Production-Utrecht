@@ -1,5 +1,5 @@
 /**
-* @file Services.h
+* @file gripperTestNode/include/Services.h
 * @brief Names for the DeltaRobot services.
 * @date Created: 2012-10-04
 *
@@ -33,6 +33,12 @@
 
 namespace GripperTestNodeServices
 {
+	/**
+	 * @param std::string GRIP Name for the grip service
+	 **/
 	const std::string GRIP = "grip";
+	/**
+	 * @param std::string RELEASE Name for the release service
+	 **/	
 	const std::string RELEASE = "release";
 }

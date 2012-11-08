@@ -44,6 +44,11 @@
  **/
 #define MODBUS_PORT 502
 
+/**
+ * Constructor 
+ * @param equipletID identifier for the equiplet
+ * @param moduleID identifier for the deltarobot
+ **/
 deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) : rosMast::StateMachine(equipletID, moduleID)
 {	
 	ROS_INFO("DeltaRobotnode Constructor entering..."); 
@@ -386,6 +391,10 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
 	// Go to base (Motors on 0 degrees)
 	return 0;
 }
+
+/** 
+ * Main that creates the deltaRobotNode and starts the statemachine
+ **/
 int main(int argc, char **argv) {
 	int equipletID = 0;
 	int moduleID = 0;

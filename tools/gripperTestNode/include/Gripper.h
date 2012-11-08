@@ -1,5 +1,5 @@
 /**
-* @file OutputDevice.h
+* @file Gripper.h
 * @brief Output device interface
 * @date Created: 2012-10-16
 *
@@ -129,7 +129,7 @@ class Gripper {
 	bool state;
 
 	/**
-	 * @var bool state
+	 * @var bool previousState
 	 * The state of the gripper in the past
 	 * True is enabled
 	 * False is disabled

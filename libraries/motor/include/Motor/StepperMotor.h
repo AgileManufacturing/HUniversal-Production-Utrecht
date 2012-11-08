@@ -42,6 +42,9 @@
 
 namespace Motor
 {
+    /** 
+     * Steppermotor driver
+     **/
     class StepperMotor : public MotorInterface
     {
         public:
