@@ -138,7 +138,7 @@ namespace ModbusController{
             /**
              * @var std::ofstream logFile
              * Logfile used for debugging the modbus communication.
-             */
+             **/
             std::ofstream logFile;
         #endif
 
