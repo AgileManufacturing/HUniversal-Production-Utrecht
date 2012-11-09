@@ -59,7 +59,7 @@ namespace DeltaRobot{
         effectorLocation(DataTypes::Point3D<double>(0, 0, 0)), 
         boundariesGenerated(false),
         modbusIO(modbusIO),
-        currentMotionSlot(Motor::CRD514KD::MOTION_SLOTS_USED){
+        currentMotionSlot(1){
 
         if(modbusIO == NULL){
             throw std::runtime_error("Unable to open modbusIO");
@@ -126,7 +126,7 @@ namespace DeltaRobot{
      * @return the acceleration in radians/s²
      **/
     double DeltaRobot::getAccelerationForRotation(double relativeAngle, double moveTime){
-        return (4 * relativeAngle) / (moveTime * moveTime);
+        return (4 * fabs(relativeAngle)) / (moveTime * moveTime);
     }
 
     /**
@@ -139,7 +139,7 @@ namespace DeltaRobot{
      * @return the speed in radians/s
      **/
     double DeltaRobot::getSpeedForRotation(double relativeAngle, double moveTime, double acceleration){
-        return (acceleration/2) * (moveTime - sqrt((moveTime * moveTime) - (4 * relativeAngle / acceleration)));
+        return (acceleration/2) * (moveTime - sqrt((moveTime * moveTime) - (4 * fabs(relativeAngle) / acceleration)));
     }
 
     /**
@@ -163,8 +163,8 @@ namespace DeltaRobot{
             // The acceleration is too high, putting it down to the maximum CRD514KD acceleration.
             maxAcceleration = Motor::CRD514KD::MOTOR_MAX_ACCELERATION;
         } else if(maxAcceleration < Motor::CRD514KD::MOTOR_MIN_ACCELERATION){
-            // The acceleration is too low, pulling it up to the minimum CRD514KD acceleration.
-            maxAcceleration = Motor::CRD514KD::MOTOR_MIN_ACCELERATION;
+            // The acceleration is too low, throwing an exception.
+            throw std::out_of_range("maxAcceleration too low");            
         }
 
         // Create MotorRotation objects.
@@ -200,12 +200,6 @@ namespace DeltaRobot{
         }
 
         try{
-            // switch currentMotionSlot
-            currentMotionSlot++;
-            if(currentMotionSlot > Motor::CRD514KD::MOTION_SLOTS_USED){
-                currentMotionSlot = 1;
-            }
-
             // An array to hold the relative angles for the motors
             double relativeAngles[3] = {0.0,0.0,0.0};
 
@@ -233,6 +227,12 @@ namespace DeltaRobot{
                 delete rotations[1];
                 delete rotations[2];
                 return;
+            }
+
+             // switch currentMotionSlot
+            currentMotionSlot++;
+            if(currentMotionSlot > Motor::CRD514KD::MOTION_SLOTS_USED){
+                currentMotionSlot = 1;
             }
 
             // Set the acceleration of the motor with the biggest motion to the given maximum.
