@@ -31,6 +31,7 @@
 #ifndef ENVIRONMENTCACHE_H
 #define ENVIRONMENTCACHE_H
 
+#include "ros/ros.h"
 #include <environmentCache/UpdateEnvironmentCache.h>
 #include <string>
 #include <map>
@@ -41,7 +42,7 @@
 class EnvironmentCache{
 public:
 	EnvironmentCache();
-	bool updateEnvironmentCache(environmentCache::UpdateEnvironmentCache &req, environmentCache::UpdateEnvironmentCache &res);
+	bool updateEnvironmentCache(environmentCache::UpdateEnvironmentCache::Request &req, environmentCache::UpdateEnvironmentCache::Response &res);
 	virtual ~EnvironmentCache();
 private:
 	// The environemt cache
@@ -50,4 +51,5 @@ private:
 	// UpdateEnvironmentCacheService
 	ros::ServiceServer updateEnvironmentCacheService;
 };
+
 #endif

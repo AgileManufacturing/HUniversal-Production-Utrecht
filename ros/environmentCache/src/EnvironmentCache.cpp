@@ -28,7 +28,6 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include "ros/ros.h"
 #include <environmentCache/EnvironmentCache.h>
 
 /**
@@ -37,7 +36,7 @@
 EnvironmentCache::EnvironmentCache(): cache() {
 	// Initialise services
 	ros::NodeHandle nh;
-	updateEnvironmentCacheService = nh.advertiseService("UpdateEnvironmentCache", &EnvironmentCache::updateEnvironmentCache, this);
+	updateEnvironmentCacheService = nh.advertiseService("updateEnvironmentCache", &EnvironmentCache::updateEnvironmentCache, this);
 }
 
 /**
@@ -50,18 +49,18 @@ EnvironmentCache::~EnvironmentCache() {
 /**
  * The Service that updates the environment cache
  **/
-bool EnvironmentCache::updateEnvironmentCache(environmentCache::UpdateEnvironmentCache &req, environmentCache::UpdateEnvironmentCache &res) {
-	int32_t event = req.event;
+bool EnvironmentCache::updateEnvironmentCache(environmentCache::UpdateEnvironmentCache::Request &req, environmentCache::UpdateEnvironmentCache::Response &res) {
+	int32_t event = req.cacheUpdate.event;
 	// Check which event has occured and execute correct action
 	switch(event) {
 		case 0: // Item is added to the environment
-			if(cache.count(req.id) == 0) {
+			if(cache.count(req.cacheUpdate.id) == 0) {
 				// Insert all properties into a map
-				std::map<std::string, std::string> properties;
-				for(int i = 0; i < req.properties.size(); i++) {
-					cache.insert(std::pair<std::string, std::string>(properties[i].key, properties[i].value));
+				std::map<std::string, std::string> options;
+				for(int i = 0; i < (int)req.cacheUpdate.properties.map.size(); i++) {
+					options.insert(std::pair<std::string, std::string>(req.cacheUpdate.properties.map[i].key, req.cacheUpdate.properties.map[i].value));
 				}
-				cache.insert(req.id, properties);
+				cache.insert(std::pair<std::string, std::map<std::string, std::string> >(req.cacheUpdate.id, options));
 				std::cout << "New item added to environment cache" << std::endl;
 			} else {
 				std::cerr << "Item already in cache" << std::endl;
@@ -74,6 +73,7 @@ bool EnvironmentCache::updateEnvironmentCache(environmentCache::UpdateEnvironmen
 		default:
 			break;
 	}
+	return true;
 }
 
 int main(int argc, char **argv) {
