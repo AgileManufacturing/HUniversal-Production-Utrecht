@@ -53,16 +53,18 @@ EnvironmentCache::~EnvironmentCache() {
  **/
 bool EnvironmentCache::updateEnvironmentCache(environmentCache::UpdateEnvironmentCache::Request &req, environmentCache::UpdateEnvironmentCache::Response &res) {
 	int32_t event = req.cacheUpdate.event;
+	std::string id = req.cacheUpdate.id;
+
 	// Check which event has occured and execute correct action
 	switch(event) {
 		case 0: // Item is added to the environment
-			if(cache.count(req.cacheUpdate.id) == 0) {
+			if(cache.count(id) == 0) {
+				
 				// Insert all properties into a map
 				std::map<std::string, std::string> options;
-				for(int i = 0; i < (int)req.cacheUpdate.properties.map.size(); i++) {
-					options.insert(std::pair<std::string, std::string>(req.cacheUpdate.properties.map[i].key, req.cacheUpdate.properties.map[i].value));
-				}
-				cache.insert(std::pair<std::string, std::map<std::string, std::string> >(req.cacheUpdate.id, options));
+				createMapFromVector(req.cacheUpdate.properties.map, options);
+
+				cache.insert(std::pair<std::string, std::map<std::string, std::string> >(id, options));
 				std::cout << "New item added to environment cache" << std::endl;
 			} else {
 				std::cerr << "Item already in cache" << std::endl;
@@ -71,7 +73,7 @@ bool EnvironmentCache::updateEnvironmentCache(environmentCache::UpdateEnvironmen
 		case 1: // Item is updated in workspace
 			if(cache.count(req.cacheUpdate.id) == 1) {
 				std::map< std::string, std::map<std::string, std::string> >::iterator cacheIt;
-				cacheIt = cache.find(req.cacheUpdate.id);
+				cacheIt = cache.find(id);
 				
 				// Insert properties from message into a map
 				std::map<std::string, std::string> options;
@@ -99,11 +101,11 @@ bool EnvironmentCache::updateEnvironmentCache(environmentCache::UpdateEnvironmen
 			}
 			break;
 		case 2:
-			if(cache.count(req.cacheUpdate.id) == 1) {
-				cache.erase(req.cacheUpdate.id);
+			if(cache.count(id) == 1) {
+				cache.erase(id);
 				std::cout << "Item deleted from environment cache" << std::endl;
 			} else {
-				std::cerr << "Item with id " << req.cacheUpdate.id << " cannot be deleted because it is not found in the cache" << std::endl;
+				std::cerr << "Item with id " << id << " cannot be deleted because it is not found in the cache" << std::endl;
 			}
 			break; // Item is removed from the environment
 		default:
@@ -123,6 +125,25 @@ void EnvironmentCache::printEnvironmentCache(){
 		}
 	}
 }
+
+bool EnvironmentCache::addItemToCache() {
+	return true;
+}
+
+bool EnvironmentCache::updateItemInCache() {
+	return true;
+}
+
+bool EnvironmentCache::removeItemFromCache() {
+	return true;
+}
+
+void EnvironmentCache::createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &properties, std::map<std::string, std::string> &optionsMap) {
+	for(int i = 0; i < (int)properties.size(); i++) {
+		optionsMap.insert(std::pair<std::string, std::string>(properties[i].key, properties[i].value));
+	}
+}
+
 
 int main(int argc, char **argv) {
 	ros::init(argc, argv, "EnvironmentCache");
