@@ -134,8 +134,9 @@ namespace DeltaRobot{
      * 
      * @param relativeAngle The relative angle
      * @param moveTime the move time.
+     * @param acceleration the acceleration
      *
-     * @return the acceleration in radians/s²
+     * @return the speed in radians/s
      **/
     double DeltaRobot::getSpeedForRotation(double relativeAngle, double moveTime, double acceleration){
         return (acceleration/2) * (moveTime - sqrt((moveTime * moveTime) - (4 * relativeAngle / acceleration)));
