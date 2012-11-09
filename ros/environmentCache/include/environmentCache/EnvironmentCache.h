@@ -43,6 +43,7 @@ class EnvironmentCache{
 public:
 	EnvironmentCache();
 	bool updateEnvironmentCache(environmentCache::UpdateEnvironmentCache::Request &req, environmentCache::UpdateEnvironmentCache::Response &res);
+	void printEnvironmentCache();
 	virtual ~EnvironmentCache();
 private:
 	// The environemt cache
