@@ -29,6 +29,7 @@
  **/
 
 #include <environmentCache/EnvironmentCache.h>
+#include <iostream>
 
 /**
  * The constructor of the EnvironmentCache class
@@ -37,6 +38,7 @@ EnvironmentCache::EnvironmentCache(): cache() {
 	// Initialise services
 	ros::NodeHandle nh;
 	updateEnvironmentCacheService = nh.advertiseService("updateEnvironmentCache", &EnvironmentCache::updateEnvironmentCache, this);
+	std::cout << "Constructor called" << std::endl;
 }
 
 /**
@@ -67,16 +69,64 @@ bool EnvironmentCache::updateEnvironmentCache(environmentCache::UpdateEnvironmen
 			}
 			break;
 		case 1: // Item is updated in workspace
+			if(cache.count(req.cacheUpdate.id) == 1) {
+				std::map< std::string, std::map<std::string, std::string> >::iterator cacheIt;
+				cacheIt = cache.find(req.cacheUpdate.id);
+				
+				// Insert properties from message into a map
+				std::map<std::string, std::string> options;
+				for(int i = 0; i < (int)req.cacheUpdate.properties.map.size(); i++) {
+					options.insert(std::pair<std::string, std::string>(req.cacheUpdate.properties.map[i].key, req.cacheUpdate.properties.map[i].value));
+				}
+
+				// Check if the option already exists. When it does update it, else add it
+				std::map<std::string, std::string>::iterator optionsIt;
+				std::map<std::string, std::string>::iterator propertyIt;
+				for(optionsIt = options.begin(); optionsIt != options.end(); optionsIt++) {
+					if((*cacheIt).second.count((*optionsIt).first) == 1) {
+						propertyIt = (*cacheIt).second.find((*optionsIt).first);
+						(*propertyIt).second = (*optionsIt).second;
+					} else {
+						(*cacheIt).second.insert(std::pair<std::string, std::string>((*optionsIt).first, (*optionsIt).second ));
+						std::cout << "Property with key " << (*optionsIt).first << " added to cache" << std::endl;
+					}
+				}
+
+
+				std::cout << "Item with id " << req.cacheUpdate.id << " updated" << std::endl;
+			} else {
+				std::cerr << "Cannot update " << std::endl;
+			}
 			break;
-		case 2: 
+		case 2:
+			if(cache.count(req.cacheUpdate.id) == 1) {
+				cache.erase(req.cacheUpdate.id);
+				std::cout << "Item deleted from environment cache" << std::endl;
+			} else {
+				std::cerr << "Item with id " << req.cacheUpdate.id << " cannot be deleted because it is not found in the cache" << std::endl;
+			}
 			break; // Item is removed from the environment
 		default:
 			break;
 	}
+	printEnvironmentCache(); // debug
 	return true;
 }
 
+void EnvironmentCache::printEnvironmentCache(){
+	std::map< std::string, std::map<std::string, std::string> >::iterator cacheIt;
+	std::map<std::string, std::string>::iterator propertiesIt;
+	for(cacheIt = cache.begin(); cacheIt != cache.end(); cacheIt++) {
+		std::cout << (*cacheIt).first << " :" << std::endl;
+		for(propertiesIt = (*cacheIt).second.begin(); propertiesIt != (*cacheIt).second.end(); propertiesIt++) {
+			std::cout << "\t" << (*propertiesIt).first << " : " << (*propertiesIt).second << std::endl;
+		}
+	}
+}
+
 int main(int argc, char **argv) {
-	EnvironmentCache envCache();
+	ros::init(argc, argv, "EnvironmentCache");
+	EnvironmentCache envCache;
+	ros::spin();
 	return 0;	
 }
