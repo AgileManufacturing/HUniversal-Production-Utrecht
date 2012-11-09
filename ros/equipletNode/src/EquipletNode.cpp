@@ -234,7 +234,6 @@ void EquipletNode::printHardwareModules() {
  *
  * @return the State of the module
  **/
-
 rosMast::StateType EquipletNode::getModuleState(int moduleID) {
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
 	for(it = moduleTable.begin(); it < moduleTable.end(); it++) {
@@ -265,4 +264,19 @@ bool EquipletNode::updateModuleState(int moduleID, rosMast::StateType state) {
 		}
 	}
 	return false;
+}
+
+void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupID, environmentCommunicationMessages::Map payload) {
+ 	lookupHandler::LookupServer msg;	
+	msg.request.lookupMsg.lookupType = lookupType;
+	msg.request.lookupMsg.lookupID = lookupID;
+	msg.request.lookupMsg.payLoad = payload;
+
+	ros::NodeHandle nodeHandle;
+	ros::ServiceClient lookupClient = nodeHandle.serviceClient<lookupHandler::LookupServer>("LookupHandler/lookup");
+	if(lookupClient.call(msg)) {
+		//Read response
+	} else {
+		ROS_ERROR("Error in calling lookupHandler/lookup service");
+	}
 }

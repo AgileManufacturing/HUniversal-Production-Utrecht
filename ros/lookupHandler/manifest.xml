@@ -9,6 +9,7 @@
   <review status="unreviewed" notes=""/>
 
   <depend package="environmentCommunicationMessages" />  
+  <depend package="environmentCache"/> 
   <depend package="roscpp" />  
 </package>
 

@@ -34,7 +34,7 @@
  **/
 EnvironmentCommunication::LookupHandler::LookupHandler() {
 	ros::NodeHandle nodeHandle;
-	lookupClient = nodeHandle.serviceClient<lookupHandler::temp>("EnvironmentCache/lookup");
+	lookupClient = nodeHandle.serviceClient<environmentCache::LookupEnvironmentObject>("EnvironmentCache/lookup");
 	lookupServer = nodeHandle.advertiseService("LookupHandler/lookup", &LookupHandler::lookupServiceCallback, this);
 }
 
@@ -45,8 +45,14 @@ EnvironmentCommunication::LookupHandler::LookupHandler() {
  * @param response Will tell if the state transition was succesfull for the state change
  **/
 bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookupHandler::LookupServer::Request &request, lookupHandler::LookupServer::Response &response) {
-	std::string id = request.lookupMsg.lookupid;
-	// Call service in enviroment cache
+	environmentCache::LookupEnvironmentObject msg;
+	msg.request.lookupID = request.lookupMsg.lookupID;
+	if(lookupClient.call(msg)) {
+		// Do the cool stuff with the payload
+		// Should transform payload coordinates to relative coordinates to workspace
+	} else {
+		ROS_ERROR("Error in calling environmentCache/lookup");
+	}
 	// Combine payload of request and enviroment data
 	// Build response
 	return true;

@@ -36,6 +36,7 @@
 #include "rosMast/States.h"
 #include "rosMast/State.h"
 #include "rosMast/ModuleError.h"
+#include "lookupHandler/LookupServer.h"
 
 /**
  * The equipletNode, will manage all modules and keep track of their states
@@ -54,6 +55,7 @@ class EquipletNode {
 		bool moduleError(rosMast::ErrorInModule::Request &request, rosMast::ErrorInModule::Response &response);
 		void sendStateChangeRequest(int moduleID, rosMast::StateType newState);
 		rosMast::StateType getModuleState(int moduleID);
+		void callLookupHandler(std::string lookupType, std::string lookupID, environmentCommunicationMessages::Map payload);
 	private:
 		/**
 		 * @var int equipletId

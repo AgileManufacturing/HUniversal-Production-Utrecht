@@ -1,17 +1,15 @@
 <package>
   <description brief="equipletNode">
-
      equipletNode
-
   </description>
   <author>Dennis Koole</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/equipletNode</url>
+
   <depend package="roscpp"/>
   <depend package="std_msgs"/>
   <depend package="rosMast"/>
-
+  <depend package="lookupHandler"/>
 </package>
 
 
