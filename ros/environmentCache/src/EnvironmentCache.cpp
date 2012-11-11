@@ -65,6 +65,8 @@ bool EnvironmentCache::lookupEnvironmentObject(environmentCache::LookupEnvironme
 		res.object = createMapMessageFromProperties(properties);
 		res.found = true;
 	} else{
+		environmentCommunicationMessages::Map map;
+		res.object = map;
 		res.found = false;
 	}
 	return true;
