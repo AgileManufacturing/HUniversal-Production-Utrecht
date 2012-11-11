@@ -33,6 +33,7 @@
 
 #include "ros/ros.h"
 #include <environmentCache/UpdateEnvironmentCache.h>
+ #include <environmentCache/LookupEnvironmentObject.h>
 #include <string>
 #include <map>
 
@@ -42,6 +43,7 @@
 class EnvironmentCache{
 public:
 	EnvironmentCache();
+	bool lookupEnvironmentObject(environmentCache::LookupEnvironmentObject::Request &req, environmentCache::LookupEnvironmentObject::Response &res);
 	bool updateEnvironmentCache(environmentCache::UpdateEnvironmentCache::Request &req, environmentCache::UpdateEnvironmentCache::Response &res);
 	void printEnvironmentCache();
 	virtual ~EnvironmentCache();
@@ -50,9 +52,13 @@ private:
 	bool updateItemInCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties);
 	bool removeItemFromCache(std::string id);
 	void createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap);
+	environmentCommunicationMessages::Map createMapMessageFromProperties(std::map<std::string, std::string> &properties);
 
 	// The environemt cache
 	std::map< std::string, std::map<std::string, std::string> > cache;
+
+	// LookupEnvironmentObjectService
+	ros::ServiceServer lookupEnvironmentObjectService;
 
 	// UpdateEnvironmentCacheService
 	ros::ServiceServer updateEnvironmentCacheService;

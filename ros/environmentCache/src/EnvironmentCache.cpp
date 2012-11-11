@@ -37,6 +37,7 @@
 EnvironmentCache::EnvironmentCache(): cache() {
 	// Initialise services
 	ros::NodeHandle nh;
+	lookupEnvironmentObjectService = nh.advertiseService("LookupEnvironmentObject", &EnvironmentCache::lookupEnvironmentObject, this);
 	updateEnvironmentCacheService = nh.advertiseService("updateEnvironmentCache", &EnvironmentCache::updateEnvironmentCache, this);
 	std::cout << "Constructor called" << std::endl;
 }
@@ -46,6 +47,27 @@ EnvironmentCache::EnvironmentCache(): cache() {
  **/
 EnvironmentCache::~EnvironmentCache() {
 
+}
+
+/**
+ * Get the properties of an item in the cache
+ *
+ * @param req the request object. Contains the id of the item to get the properties from
+ * @param res The response object. Contains a boolean that is true when item was found, else false.
+ * Contains also the Map object with the properties of the item. Empty when there is not an item found with the id
+ **/
+bool EnvironmentCache::lookupEnvironmentObject(environmentCache::LookupEnvironmentObject::Request &req, environmentCache::LookupEnvironmentObject::Response &res) {
+	std::string id = req.lookupID;
+	if(cache.count(id)) {
+		std::map< std::string, std::map<std::string, std::string> >::iterator cacheIt;
+		cacheIt = cache.find(id);
+		std::map<std::string, std::string> properties = (*cacheIt).second;
+		res.object = createMapMessageFromProperties(properties);
+		res.found = true;
+	} else{
+		res.found = false;
+	}
+	return true;
 }
 
 /**
@@ -185,6 +207,25 @@ void EnvironmentCache::createMapFromVector(const std::vector<environmentCommunic
 	for(int i = 0; i < (int)propertiesVector.size(); i++) {
 		propertiesMap.insert(std::pair<std::string, std::string>(propertiesVector[i].key, propertiesVector[i].value));
 	}
+}
+
+/**
+ * Create a Map message from a map with strings as key and strings as value
+ *
+ * @param properties the map to convert
+ *
+ * @return environmentCommunicationMessages::Map The Map message object
+ **/
+environmentCommunicationMessages::Map EnvironmentCache::createMapMessageFromProperties(std::map<std::string, std::string> &properties){
+	std::map<std::string, std::string>::iterator propertiesIt;
+	environmentCommunicationMessages::Map map;
+	environmentCommunicationMessages::KeyValuePair prop;
+	for(propertiesIt = properties.begin(); propertiesIt != properties.end(); propertiesIt++) {
+		prop.key = (*propertiesIt).first;
+		prop.value = (*propertiesIt).second;
+		map.map.push_back(prop);
+	}
+	return map;
 }
 
 
