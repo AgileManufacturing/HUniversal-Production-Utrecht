@@ -46,11 +46,10 @@ public:
 	void printEnvironmentCache();
 	virtual ~EnvironmentCache();
 private:
-	bool addItemToCache();
-	bool removeItemFromCache();
-	bool updateItemInCache();
-
-	void createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &properties, std::map<std::string, std::string> &optionsMap);
+	bool addItemToCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties);
+	bool updateItemInCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties);
+	bool removeItemFromCache(std::string id);
+	void createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap);
 
 	// The environemt cache
 	std::map< std::string, std::map<std::string, std::string> > cache;
