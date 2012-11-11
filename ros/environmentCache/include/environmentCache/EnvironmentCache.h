@@ -33,7 +33,7 @@
 
 #include "ros/ros.h"
 #include <environmentCache/UpdateEnvironmentCache.h>
- #include <environmentCache/LookupEnvironmentObject.h>
+#include <environmentCache/LookupEnvironmentObject.h>
 #include <string>
 #include <map>
 
