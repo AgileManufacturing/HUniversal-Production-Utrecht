@@ -10,7 +10,6 @@
 
   <depend package="environmentCommunicationMessages" />
   <depend package="environmentCache" />  
-  <depend package="environmentCache"/> 
   <depend package="roscpp" />  
 </package>
 

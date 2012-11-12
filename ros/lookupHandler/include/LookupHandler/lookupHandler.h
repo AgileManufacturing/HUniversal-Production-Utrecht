@@ -56,6 +56,8 @@ namespace EnvironmentCommunication {
 			 * the service for the equipletNode
 			 **/				
 			ros::ServiceServer lookupServer;
+
+			void createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &vector, std::map<std::string, std::string> &map);
 	};
 }
 

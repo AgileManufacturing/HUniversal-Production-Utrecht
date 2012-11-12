@@ -34,28 +34,52 @@
  **/
 EnvironmentCommunication::LookupHandler::LookupHandler() {
 	ros::NodeHandle nodeHandle;
-	lookupClient = nodeHandle.serviceClient<environmentCache::LookupEnvironmentObject>("EnvironmentCache/lookup");
+	lookupClient = nodeHandle.serviceClient<environmentCache::LookupEnvironmentObject>("LookupEnvironmentObject");
 	lookupServer = nodeHandle.advertiseService("LookupHandler/lookup", &LookupHandler::lookupServiceCallback, this);
 }
 
 /**
  * Call back for lookupHandler/lookup service
- * Will lookup data in environmentcache and use payload of request.msg on the data
- * @param request Contains the params for the state change
- * @param response Will tell if the state transition was succesfull for the state change
+ * Will lookup data in environmentcache and use the payload of request on the data
+ * @param request Contains the data for the lookup in the cache
+ * @param response Will contain the data from the cache, if it was found
  **/
 bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookupHandler::LookupServer::Request &request, lookupHandler::LookupServer::Response &response) {
+	// Construct a message for LookupEnvironmentObject service
 	environmentCache::LookupEnvironmentObject msg;
 	msg.request.lookupID = request.lookupMsg.lookupID;
+	std::map<std::string, std::string> payLoadMap;
+	std::map<std::string, std::string>::iterator it;
+	createMapFromVector(request.lookupMsg.payLoad.map, payLoadMap);
 	if(lookupClient.call(msg)) {
-		// Do the cool stuff with the payload
-		// Should transform payload coordinates to relative coordinates to workspace
+		if(msg.response.found) {
+			for(int i = 0; i < (int)(msg.response.object.map.size()); i++) {	
+				it = payLoadMap.find(msg.response.object.map[i].key);
+			 	std::string valueObject =  (*it).second;
+			 	std::string valuePayload = msg.response.object.map[i].value;
+
+			 	std::cout << "valueObject " << valueObject << " valuePayload " << valuePayload << std::endl;
+			}
+			response.succeeded = true;
+		} else 
+			response.succeeded = false;				
 	} else {
-		ROS_ERROR("Error in calling environmentCache/lookup");
+		response.succeeded = false;
+		ROS_ERROR("Error in calling LookupEnvironmentObject");
 	}
-	// Combine payload of request and enviroment data
-	// Build response
 	return true;
+}
+
+/**
+ * Convert a vector to a map
+ *
+ * @param vector The vector with KeyValuePair objects
+ * @param map The map where the keys and values of the objects in the vector is inserted to
+ **/
+void EnvironmentCommunication::LookupHandler::createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &vector, std::map<std::string, std::string> &map) {
+	for(int i = 0; i < (int)vector.size(); i++) {
+		map.insert(std::pair<std::string, std::string>(vector[i].key, vector[i].value));
+	}
 }
 
 /**

@@ -56,11 +56,10 @@ int main(int argc, char **argv) {
 	Mast::HardwareModuleProperties gripper(2, 2, rosMast::safe, true, true);
 	equipletNode->addHardwareModule(deltaRobot);
 	equipletNode->addHardwareModule(gripper);
-
 	
 	// print the hardware modules that are currently added to the Equiplet
 	equipletNode->printHardwareModules();
-	
+
 	ros::Rate poll_rate(10);
 	while(ros::ok()) {
 		poll_rate.sleep();
