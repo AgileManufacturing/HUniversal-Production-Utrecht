@@ -1,0 +1,75 @@
+file /home/dennis/programming/ros_workspace/HUniversal-Production-Utrecht/libraries/mongo-cxx-driver/SConstruct,line 70:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread-mt... 
+scons: Configure: ".sconf_temp/conftest_0.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_0.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_0.o" is up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_0.o -c -O3 -pthread -D_SCONS -DMONGO_EXPOSE_MACROS -Ibuild -Ibuild/mongo .sconf_temp/conftest_0.cpp
+  |
+scons: Configure: ".sconf_temp/conftest_0" is up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_0 -Wl,--as-needed -Wl,-zdefs -pthread .sconf_temp/conftest_0.o -lboost_thread-mt
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_filesystem-mt... 
+scons: Configure: ".sconf_temp/conftest_1.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_1.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_1.o" is up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_1.o -c -O3 -pthread -D_SCONS -DMONGO_EXPOSE_MACROS -Ibuild -Ibuild/mongo .sconf_temp/conftest_1.cpp
+  |
+scons: Configure: ".sconf_temp/conftest_1" is up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_1 -Wl,--as-needed -Wl,-zdefs -pthread .sconf_temp/conftest_1.o -lboost_thread-mt -lboost_filesystem-mt
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system-mt... 
+scons: Configure: ".sconf_temp/conftest_2.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_2.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_2.o" is up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_2.o -c -O3 -pthread -D_SCONS -DMONGO_EXPOSE_MACROS -Ibuild -Ibuild/mongo .sconf_temp/conftest_2.cpp
+  |
+scons: Configure: ".sconf_temp/conftest_2" is up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_2 -Wl,--as-needed -Wl,-zdefs -pthread .sconf_temp/conftest_2.o -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt
+  |
+scons: Configure: (cached) yes
+
+
