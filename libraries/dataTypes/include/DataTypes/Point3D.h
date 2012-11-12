@@ -102,6 +102,17 @@ namespace DataTypes{
 		}
 
 		/**
+		 * Compare the point to another point.
+		 *
+		 * @param rhs point with which to compare
+		 *
+		 * @return true if the points are equal, false if not equal.
+		 **/
+		 inline bool operator==(const Point3D<T>& rhs) const{
+		 	return this->x == rhs.x && this->y == rhs.y && this->z == rhs.z;
+		 }
+
+		/**
 		 * Calculates the euclidean distance between *this and the given point.
 		 *
 		 * @param point The point to calculate the euclidean distance to from *this.
