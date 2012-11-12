@@ -31,17 +31,26 @@
 #include <iostream>
 #include <blackboardCppClient/BlackboardCppClient.h>
 
-BlackboardCppClient::BlackboardCppClient(const std::string &hostname) {
+/**
+ * Constructor for the BlackboardCppClient
+ *
+ * @param hostname the name of the host where the mongo database can be found
+ **/
+BlackboardCppClient::BlackboardCppClient(const std::string &hostname): database(), collection() {
   try {
+    connection.connect(hostname);
     std::cout << "connected to database" << std::endl;
-  	connection.connect(hostname);
   } catch( const mongo::DBException &e ) {
     std::cout << "caught " << e.what() << std::endl;
   }
 }
 
-
-BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port) {
+/**
+ * Constructor for the BlackboardCppClient
+ *
+ * @param hostname the name of the host where the mongo database can be found
+ **/
+BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port): database(), collection() {
   try {
     std::cout << "connected to database" << std::endl;
   	connection.connect(mongo::HostAndPort(hostname, port));
@@ -50,30 +59,68 @@ BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port) 
   }	
 }
 
+/**
+ * destructor for the BlackboardCppClient
+ *
+ **/
+BlackboardCppClient::~BlackboardCppClient() {
+	delete readMessageThread;
+}
+
+/**
+ * Set the name of the database to use
+ * 
+ * @param db the name of the database to use
+ **/
 void BlackboardCppClient::setDatabase(const std::string &db) {
 	database = db;
 }
 
+/**
+ * Set the name of the collection to use
+ *
+ * @param col the name of the collection to use
+ **/
 void BlackboardCppClient::setCollection(const std::string &col) {
 	collection = col;
 }
 
+/**
+ * Subscribe to a blackboard topic
+ *
+ * Subscribe to a blackboard topic. When the first subscription is added, 
+ * a thread will be started to handle the messages from the blackboard 
+ *
+ * @param topic the name of the topic to subscribe to
+ **/
 void BlackboardCppClient::subscribe(const std::string &topic) {
 	if(collection.empty()) {
 
 	} else if(database.empty()) {
 
 	}
-	subscriptions.insert( std::pair<std::string, mongo::BSONObj>(topic, BSON("topic" << topic)) );	
+	subscriptions.insert( std::pair<std::string, mongo::BSONObj>(topic, BSON("topic" << topic)) );
+	// Start thread to read from blackboard	
 	if(subscriptions.size() == 1) {
 		readMessageThread = new boost::thread(run, this);
 	}
 }
 
+/**
+ * Unsubscribe from a blackboard topic
+ *
+ * Unsubscribe from a blackboard topic, 
+ * when there are no subscriptions to topics anymore, the thread
+ * that reads the messages from the blackboard will be interrupted
+ *
+ * @param topic the name of the topic 
+ **/
 void BlackboardCppClient::unsubscribe(const std::string &topic) { 
-	readMessageThread.interrup();
+	subscriptions.erase(topic);
+	if(subscriptions.size() == 0) {
+		readMessageThread->interrupt();	
+	}
 }
-
 
 void BlackboardCppClient::run() {
 	// Create namespace string

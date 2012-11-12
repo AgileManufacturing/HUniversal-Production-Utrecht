@@ -33,12 +33,14 @@
 
 #include <string>
 #include <map>
+#include <boost/thread.hpp>
 #include "mongo/client/dbclient.h"
 
 class BlackboardCppClient {
 public:
 	BlackboardCppClient(const std::string &hostname);
 	BlackboardCppClient(const std::string &hostname, int port);
+	virtual ~BlackboardCppClient();
 	void setDatabase(const std::string &db);
 	void setCollection(const std::string &col);
 	void subscribe(const std::string &topic);
