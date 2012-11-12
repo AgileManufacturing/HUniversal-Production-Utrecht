@@ -300,6 +300,7 @@ namespace Motor{
 
 	/**
 	 * Sets the motor controller to incremental mode.
+	 * @param motionSlot The motion slot to be set to incremental.
 	 **/
 	void StepperMotor::setIncrementalMode(int motionSlot){
 		checkMotionSlot(motionSlot);
@@ -308,6 +309,7 @@ namespace Motor{
 
 	/**
 	 * Sets the motor controller to absolute mode.
+	 * @param motionSlot The motion slot to be set to absolute.
 	 **/
 	void StepperMotor::setAbsoluteMode(int motionSlot){
 		checkMotionSlot(motionSlot);
@@ -316,6 +318,7 @@ namespace Motor{
 
 	/**
 	 * Checks whether the motion slot is used. Throws an std::out_of_range exception if not.
+	 * @param motionSlot the motion slot to be checked.
 	 **/
 	void StepperMotor::checkMotionSlot(int motionSlot){
 		if(motionSlot < 1 || motionSlot > CRD514KD::MOTION_SLOTS_USED){

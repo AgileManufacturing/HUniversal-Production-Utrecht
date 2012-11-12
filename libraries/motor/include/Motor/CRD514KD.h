@@ -76,7 +76,7 @@ namespace Motor{
 
         /**
          * @var int MOTION_SLOTS_USED
-         * The amount of motion slots being used.
+         * The amount of motion slots being used. This value can be anywhere from 1 to 63. However, there is currently no use for it being any more than 2. 
          **/
         const int MOTION_SLOTS_USED = 2;
 

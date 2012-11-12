@@ -239,7 +239,8 @@ namespace DeltaRobot{
             rotations[motorWithBiggestMotion]->acceleration = maxAcceleration;
             rotations[motorWithBiggestMotion]->deceleration = maxAcceleration;
 
-            // Calculate the time the motion will take.
+            // Calculate the time the motion will take, based on the assumption that the motion is two-phase (half acceleration and half deceleration).
+            // TODO: Take the motor's maximum speed into account.
             double moveTime = 2 * sqrt(relativeAngles[motorWithBiggestMotion] / rotations[motorWithBiggestMotion]->acceleration);
 
             // Set speed, and also the acceleration for the smaller motion motors
