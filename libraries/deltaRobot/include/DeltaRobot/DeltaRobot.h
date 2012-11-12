@@ -65,7 +65,8 @@ namespace DeltaRobot{
 
             void generateBoundaries(double voxelSize);
             bool checkPath(const DataTypes::Point3D<double>& begin, const DataTypes::Point3D<double>& end);
-            void moveTo(const DataTypes::Point3D<double>& point, double speed);
+
+            void moveTo(const DataTypes::Point3D<double>& point, double maxAcceleration);
             void calibrateMotor(int motorIndex);
             bool checkSensor(int sensorIndex);
             bool calibrateMotors();
@@ -116,8 +117,15 @@ namespace DeltaRobot{
              **/
             modbus_t* modbusIO;
 
+            /**
+             * @var int currentMotionSlot
+             * The motion slot currently in use. The deltarobot switches between these slots when moving.
+             **/
+            int currentMotionSlot;
 
             bool isValidAngle(int motorIndex, double angle);
             int moveMotorUntilSensorIsOfValue(int motorIndex, DataTypes::MotorRotation motorRotation, bool sensorValue);
+            double getSpeedForRotation(double relativeAngle, double moveTime, double acceleration);
+            double getAccelerationForRotation(double relativeAngle, double moveTime);
       };
 }
