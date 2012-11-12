@@ -36,6 +36,7 @@ EnvironmentCommunication::LookupHandler::LookupHandler() {
 	ros::NodeHandle nodeHandle;
 	lookupClient = nodeHandle.serviceClient<environmentCache::LookupEnvironmentObject>("LookupEnvironmentObject");
 	lookupServer = nodeHandle.advertiseService("LookupHandler/lookup", &LookupHandler::lookupServiceCallback, this);
+	ROS_INFO("LookupHandler constructor called");
 }
 
 /**
@@ -57,6 +58,8 @@ bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookupHandle
 				it = payLoadMap.find(msg.response.object.map[i].key);
 			 	std::string valueObject =  (*it).second;
 			 	std::string valuePayload = msg.response.object.map[i].value;
+
+			 	// should do usefull things with the data
 
 			 	std::cout << "valueObject " << valueObject << " valuePayload " << valuePayload << std::endl;
 			}
