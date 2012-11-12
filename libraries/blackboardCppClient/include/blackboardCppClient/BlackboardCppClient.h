@@ -32,6 +32,8 @@
 #define BLACKBOARD_CPP_CLIENT_H_
 
 #include <string>
+#include <map>
+#include "mongo/client/dbclient.h"
 
 class BlackboardCppClient {
 public:
@@ -41,11 +43,13 @@ public:
 	void setCollection(const std::string &col);
 	void subscribe(const std::string &topic);
 	void setCallback();	
+	void run();
 	void unsubscribe(const std::string &topic);
 private:
-	mongo::DDClientConnection connection;
+	mongo::DBClientConnection connection;
 	std::string database;
 	std::string collection;
-	std::Map<std::string, mongo::BSONObj> subscriptions;
+	std::map<std::string, mongo::BSONObj> subscriptions;
+	boost::thread *readMessageThread;
 };
 #endif

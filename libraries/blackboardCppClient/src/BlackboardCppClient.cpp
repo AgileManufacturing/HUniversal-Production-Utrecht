@@ -28,7 +28,8 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include "blackboardCppClient.h"
+#include <iostream>
+#include <blackboardCppClient/BlackboardCppClient.h>
 
 BlackboardCppClient::BlackboardCppClient(const std::string &hostname) {
   try {
@@ -58,8 +59,25 @@ void BlackboardCppClient::setCollection(const std::string &col) {
 }
 
 void BlackboardCppClient::subscribe(const std::string &topic) {
+	if(collection.empty()) {
+
+	} else if(database.empty()) {
+
+	}
+	subscriptions.insert( std::pair<std::string, mongo::BSONObj>(topic, BSON("topic" << topic)) );	
+	if(subscriptions.size() == 1) {
+		readMessageThread = new boost::thread(run, this);
+	}
+}
+
+void BlackboardCppClient::unsubscribe(const std::string &topic) { 
+	readMessageThread.interrup();
+}
+
+
+void BlackboardCppClient::run() {
 	// Create namespace string
-	std::string namespace(database);
+	/*std::string namespace(database);
 	namespace.append(".");
 	namespace.append(collection);
 	std::cout << bla << std::endl;
@@ -90,10 +108,6 @@ void BlackboardCppClient::subscribe(const std::string &topic) {
 
 			lastId = object["_id"];
 		}
-	}
-
+	}*/
 }
 
-void BlackboardCppClient::unsubscribe(const std::string &topic) { 
-
-}
