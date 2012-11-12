@@ -170,8 +170,8 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(deltaRobotNode::MoveTo
 		res.message="Cannot move to point, path is illegal";
 		return true;
 	}
-	ROS_INFO("moveTo: (%f, %f, %f) speed=%f", motion.x, motion.y,motion.z, motion.speed);
-	deltaRobot->moveTo(DataTypes::Point3D<double>(motion.x, motion.y, motion.z),motion.speed);
+	ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", motion.x, motion.y,motion.z, motion.maxAcceleration);
+	deltaRobot->moveTo(DataTypes::Point3D<double>(motion.x, motion.y, motion.z),motion.maxAcceleration);
 	res.succeeded = true;
 	return true;
 }
@@ -213,8 +213,8 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath(deltaRobotNode::MovePath:
 		for(n = 0; n < req.motion.size(); n++)
 		{	
 			currentMotion = req.motion[n];
-			ROS_INFO("moveTo: (%f, %f, %f) speed=%f", currentMotion.x, currentMotion.y,currentMotion.z, currentMotion.speed);
-			deltaRobot->moveTo(DataTypes::Point3D<double>(currentMotion.x, currentMotion.y, currentMotion.z),currentMotion.speed);
+			ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", currentMotion.x, currentMotion.y,currentMotion.z, currentMotion.maxAcceleration);
+			deltaRobot->moveTo(DataTypes::Point3D<double>(currentMotion.x, currentMotion.y, currentMotion.z),currentMotion.maxAcceleration);
 		}
 	}
 	catch(std::runtime_error& ex)
@@ -263,7 +263,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(deltaRobotNode
 			res.message="Cannot move to relative point, path is illegal";
 			return true;
 		}
-		deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ), currentMotion.speed);
+		deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ), currentMotion.maxAcceleration);
 
 	} catch(std::runtime_error& ex) {
 		std::stringstream ss;
@@ -328,8 +328,8 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::M
 			relativeX = effectorLocation.x + currentMotion.x;
 			relativeY = effectorLocation.y + currentMotion.y;
 			relativeZ = effectorLocation.z + currentMotion.z;
-			ROS_INFO("moveTo: (%f, %f, %f) speed=%f", relativeX, relativeY,relativeZ, currentMotion.speed);
-			deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ),currentMotion.speed);
+			ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", relativeX, relativeY,relativeZ, currentMotion.maxAcceleration);
+			deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ),currentMotion.maxAcceleration);
 		}
 	}
 	catch(std::runtime_error& ex)

@@ -59,11 +59,12 @@ namespace Motor
         void resetCounter(void);
         void setMotorLimits(double minAngle, double maxAngle);
 
+        void moveTo(const DataTypes::MotorRotation& motorRotation, int motionSlot);
         void moveTo(const DataTypes::MotorRotation& motorRotation);
-        void writeRotationData(const DataTypes::MotorRotation& motorRotation, bool useDeviation = true);
 
-        void startMovement(void);
-        void moveToWithin(const DataTypes::MotorRotation& motorRotation, double time, bool start);
+        void writeRotationData(const DataTypes::MotorRotation& motorRotation, int motionSlot, bool useDeviation = true);
+
+        void startMovement(int motionSlot);
         void waitTillReady(void);
 
         bool isPoweredOn(void){ return poweredOn; }
@@ -81,6 +82,14 @@ namespace Motor
          * @return The maximum angle, in radians, the StepperMotor can travel on the theoretical plane. 
          **/
         inline double getMaxAngle(void) const{ return maxAngle; }
+
+        /**
+         * Gets the current angle of the motor in radians.
+         *
+         * @return the current angle of the motor in radians.
+         **/
+        inline double getCurrentAngle(void) const{ return currentAngle; }
+
         void setMinAngle(double minAngle);
         void setMaxAngle(double maxAngle);
         
@@ -108,8 +117,8 @@ namespace Motor
         void disableAngleLimitations(void);
         void updateAngle(void);
 
-        void setIncrementalMode();
-        void setAbsoluteMode();
+        void setIncrementalMode(int motionSlot);
+        void setAbsoluteMode(int motionSlot);
 
     private:
         /**
@@ -165,5 +174,7 @@ namespace Motor
          * If the motor is already powered on.
          **/
         volatile bool poweredOn;
+
+        void checkMotionSlot(int motionSlot);
     };
 }

@@ -65,7 +65,7 @@ namespace Motor{
 	/**
 	 * Start simultaneously movement of all motors
 	 **/
-	void MotorManager::startMovement(void){
+	void MotorManager::startMovement(int motionSlot){
 		if(!poweredOn){
             throw MotorException("motor manager is not powered on");
         }
@@ -75,8 +75,7 @@ namespace Motor{
         motors[1]->waitTillReady();
         motors[2]->waitTillReady();
 
-        modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
-        modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
+        modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
         modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 
         motors[0]->updateAngle();

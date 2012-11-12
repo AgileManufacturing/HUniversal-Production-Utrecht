@@ -59,7 +59,7 @@ namespace Motor {
 	     * @return bool PowerOn state.
 	     **/
 	    bool isPoweredOn(void){ return poweredOn; }
-	    void startMovement(void);
+	    void startMovement(int motionSlot);
 
 	private:
 		/**
