@@ -1,6 +1,6 @@
 /**
  * @file BlackboardCppClient.h
- * @brief the cpp client for the blackboard
+ * @brief Test node for blackboard client
  * @date Created: 2012-10-12
  *
  * @author Dennis Koole
@@ -28,31 +28,12 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef BLACKBOARD_CPP_CLIENT_H_
-#define BLACKBOARD_CPP_CLIENT_H_
+#include "ros/ros.h"
+#include <blackboardCppClient/BlackboardCppClient.h>
 
-#include <string>
-#include <map>
-#include <boost/thread.hpp>
-#include "mongo/client/dbclient.h"
-
-class BlackboardCppClient {
-public:
-	BlackboardCppClient(const std::string &hostname);
-	BlackboardCppClient(const std::string &hostname, int port);
-	virtual ~BlackboardCppClient();
-	void setDatabase(const std::string &db);
-	void setCollection(const std::string &col);
-	void subscribe(const std::string &topic);
-	void setCallback();	
-	void unsubscribe(const std::string &topic);
-private:
-	static void run(BlackboardCppClient* client);
-	mongo::DBClientConnection connection;
-	std::string database;
-	std::string collection;
-	std::map<std::string, mongo::BSONObj> subscriptions;
-	boost::thread *readMessageThread;
-};
-
-#endif
+int main(int argc, char **argv) {
+	BlackboardCppClient("localhost") bc;
+	bc.subscribe("hoi");
+	ros::spin();
+	return 0;
+}

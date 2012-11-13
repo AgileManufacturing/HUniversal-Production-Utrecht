@@ -30,6 +30,7 @@
 
 #include <iostream>
 #include <blackboardCppClient/BlackboardCppClient.h>
+#include <unistd.h>
 
 /**
  * Constructor for the BlackboardCppClient
@@ -64,6 +65,7 @@ BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port):
  *
  **/
 BlackboardCppClient::~BlackboardCppClient() {
+	readMessageThread->interrupt();
 	delete readMessageThread;
 }
 
@@ -95,14 +97,15 @@ void BlackboardCppClient::setCollection(const std::string &col) {
  **/
 void BlackboardCppClient::subscribe(const std::string &topic) {
 	if(collection.empty()) {
-
-	} else if(database.empty()) {
-
+		std::cerr << "Collection is empty" << std::endl;
+	}
+	if(database.empty()) {
+		std::cerr << "Database is empty" << std::endl;
 	}
 	subscriptions.insert( std::pair<std::string, mongo::BSONObj>(topic, BSON("topic" << topic)) );
 	// Start thread to read from blackboard	
 	if(subscriptions.size() == 1) {
-		readMessageThread = new boost::thread(run, this);
+		readMessageThread = new boost::thread(run, this);	
 	}
 }
 
@@ -122,7 +125,12 @@ void BlackboardCppClient::unsubscribe(const std::string &topic) {
 	}
 }
 
-void BlackboardCppClient::run() {
+void BlackboardCppClient::run(BlackboardCppClient* client) {
+	while(true) {
+		std::cout << "Hello from thread! " <<std::endl;
+		sleep(5);	
+	}
+	
 	// Create namespace string
 	/*std::string namespace(database);
 	namespace.append(".");
