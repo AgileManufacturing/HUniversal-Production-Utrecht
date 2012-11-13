@@ -47,6 +47,15 @@ namespace Vision {
 			void setFiducialPixelCoordinates(const std::vector<DataTypes::Point2D>& fiducialsPixelCoordinates);
 			DataTypes::Point2D pixelToRealCoordinate(const DataTypes::Point2D& pixelCoordinate) const;
 			DataTypes::Point2D realToPixelCoordinate(const DataTypes::Point2D& realCoordinate) const;
+
+			/**
+			 * Gets the rotation.
+			 *
+			 * return How much the pixels should be rotated to coincide with the real situation, such that different camera orientations can be used.
+			 **/
+			double getRotation(){
+				return rotation;
+			}
 		private:
 			/**
 			 * @var double realToPixelCoordinateScale
@@ -106,6 +115,12 @@ namespace Vision {
 			 * Indicator whether the fiducials are seen from above or from below.
 			 **/
 			bool mirrored;
+
+			/**
+			 * @var double rotation
+			 * How much the pixels should be rotated to coincide with the real situation, such that different camera orientations can be used.
+			 **/
+			double rotation;
 
 			/**
 			 * @var std::vector<DataTypes::Point2D> fiducialsRealCoordinates

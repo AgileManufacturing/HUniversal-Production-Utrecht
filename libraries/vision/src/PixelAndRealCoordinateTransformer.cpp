@@ -135,30 +135,25 @@ namespace Vision {
 		
 		double pixelX = fiducialsPixelCoordinates[0].x;
 		double pixelY = -fiducialsPixelCoordinates[0].y;
+		double unchangedPixelY = fiducialsPixelCoordinates[0].y;
 		double realX = fiducialsRealCoordinates[0].x;
 		double realY = fiducialsRealCoordinates[0].y;
 		
 		double pixelDeltaX = fiducialsPixelCoordinates[2].x - pixelX;
 		double pixelDeltaY = -fiducialsPixelCoordinates[2].y - pixelY;
-		
+		double unchangedPixelDeltaY = fiducialsPixelCoordinates[2].y - unchangedPixelY;
 		double realDeltaX = fiducialsRealCoordinates[2].x - realX;
 		double realDeltaY = fiducialsRealCoordinates[2].y - realY;
-		
-		realAlpha = atan2(realDeltaY, realDeltaX);   
+
 		pixelAlpha = atan2(pixelDeltaY, pixelDeltaX);
-
-		std::cout << "realAlpha " << realAlpha << std::endl;
-		std::cout << "realDeltaY " << realDeltaY << std::endl;
-		std::cout << "realDeltaX " << realDeltaX << std::endl;
-
-		std::cout << "pixelAlpha " << pixelAlpha << std::endl;
-		std::cout << "pixelDeltaY " << pixelDeltaY << std::endl;
-		std::cout << "pixelDeltaX " << pixelDeltaX << std::endl;
-
+		double unchangedPixelAlpha = atan2(unchangedPixelDeltaY, pixelDeltaX);
+		realAlpha = atan2(realDeltaY, realDeltaX);
 
 		realToPixelCoordinateAlpha = realAlpha - pixelAlpha;
 		pixelToRealCoordinateAlpha = pixelAlpha - realAlpha;
-
+		//TODO: determine whether this should be reversed
+		rotation = unchangedPixelAlpha - realAlpha;
+		
 		double rcos = cos(realToPixelCoordinateAlpha);
 		double rcos2 = pow(rcos, 2);
 		double rsin = sin(realToPixelCoordinateAlpha);
@@ -190,7 +185,5 @@ namespace Vision {
 				mirrored = false;
 			}
 		}	
-
-		std::cout << "mirrored: " << mirrored << std::endl;
 	}
 }
