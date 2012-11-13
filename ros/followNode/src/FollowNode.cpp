@@ -47,7 +47,7 @@ FollowNode::FollowNode( ) :
 	moveToPointService.request.motion.x = 0;
 	moveToPointService.request.motion.y = 0;
 	moveToPointService.request.motion.z = -230;
-	moveToPointService.request.motion.speed = 300;
+	moveToPointService.request.motion.maxAcceleration = 75;
 }
 
 FollowNode::~FollowNode( ) {
