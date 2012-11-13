@@ -146,9 +146,19 @@ namespace Vision {
 		
 		realAlpha = atan2(realDeltaY, realDeltaX);   
 		pixelAlpha = atan2(pixelDeltaY, pixelDeltaX);
+
+		std::cout << "realAlpha " << realAlpha << std::endl;
+		std::cout << "realDeltaY " << realDeltaY << std::endl;
+		std::cout << "realDeltaX " << realDeltaX << std::endl;
+
+		std::cout << "pixelAlpha " << pixelAlpha << std::endl;
+		std::cout << "pixelDeltaY " << pixelDeltaY << std::endl;
+		std::cout << "pixelDeltaX " << pixelDeltaX << std::endl;
+
+
 		realToPixelCoordinateAlpha = realAlpha - pixelAlpha;
 		pixelToRealCoordinateAlpha = pixelAlpha - realAlpha;
-		
+
 		double rcos = cos(realToPixelCoordinateAlpha);
 		double rcos2 = pow(rcos, 2);
 		double rsin = sin(realToPixelCoordinateAlpha);
@@ -180,5 +190,7 @@ namespace Vision {
 				mirrored = false;
 			}
 		}	
+
+		std::cout << "mirrored: " << mirrored << std::endl;
 	}
 }
