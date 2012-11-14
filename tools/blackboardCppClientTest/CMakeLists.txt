@@ -16,7 +16,7 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 rexos_rospack_init("blackboardCppClientTest" true true)
 
 # Add executables as documented by ROS
-link_directories(${CMAKE_SOURCE_DIR}/libraries/mongo-cxx-driver/src)
+link_directories(${CMAKE_SOURCE_DIR}/libraries/mongo-cxx-driver)
 rosbuild_add_executable(BlackboardCppClientTest src/BlackboardCppClientTest.cpp)
 
 # Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
