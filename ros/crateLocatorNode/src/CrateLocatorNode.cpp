@@ -324,11 +324,15 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 	cv::Mat gray;
 	cv::cvtColor(cv_ptr->image, gray, CV_BGR2GRAY);
 
-	// Draw the calibration points for visual debugging.
+	// Draw the calibration points for visual debugging
+int markerNumber = 0;
 	for (std::vector<DataTypes::Point2D>::iterator it = markers.begin(); it != markers.end(); ++it) {
 		cv::circle(cv_ptr->image, cv::Point(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)), 1, cv::Scalar(0, 0, 255), 2);
-
 		cv::circle(cv_ptr->image, cv::Point(cordTransformer->realToPixelCoordinate(cordTransformer->pixelToRealCoordinate(DataTypes::Point2D(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)))).x, cordTransformer->realToPixelCoordinate(cordTransformer->pixelToRealCoordinate(DataTypes::Point2D(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)))).y), 7, cv::Scalar(255, 0, 255), 1);
+		std::stringstream ss;
+					ss << markerNumber;
+		cv::putText(cv_ptr->image, ss.str(), cv::Point(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)), CV_FONT_HERSHEY_SIMPLEX, .5, cv::Scalar(255, 0, 0), 2);
+		markerNumber++;
 	}
 
 	// Detect all QR crates in the image.
