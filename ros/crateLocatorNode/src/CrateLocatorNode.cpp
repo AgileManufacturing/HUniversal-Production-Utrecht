@@ -110,7 +110,7 @@ CrateLocatorNode::CrateLocatorNode( ) :
 	getAllCratesService = node.advertiseService(CrateLocatorNodeServices::GET_ALL_CRATES, &CrateLocatorNode::getAllCrates, this);
 
 	// Opencv GUI
-	cv::namedWindow(WINDOW_NAME);
+	cv::namedWindow(WINDOW_NAME, CV_WINDOW_KEEPRATIO);
 	cvSetMouseCallback(WINDOW_NAME, &on_mouse, cordTransformer);
 }
 
