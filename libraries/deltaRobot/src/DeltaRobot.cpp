@@ -241,8 +241,17 @@ namespace DeltaRobot{
 
             // Calculate the time the motion will take, based on the assumption that the motion is two-phase (half acceleration and half deceleration).
             // TODO: Take the motor's maximum speed into account.
-            double moveTime = 2 * sqrt(relativeAngles[motorWithBiggestMotion] / rotations[motorWithBiggestMotion]->acceleration);
+            double moveTime;
 
+            if(sqrt(relativeAngles[motorWithBiggestMotion] * rotations[motorWithBiggestMotion]->acceleration) > Motor::CRD514KD::MOTOR_MAX_SPEED){
+                // In case of a two-phase motion, the top speed would come out above the motor's maximum, so a three-phase motion must be made.
+                rotations[motorWithBiggestMotion]->speed = Motor::CRD514KD::MOTOR_MAX_SPEED;
+                moveTime = (relativeAngles[motorWithBiggestMotion] / rotations[motorWithBiggestMotion]->speed) + (rotations[motorWithBiggestMotion]->speed / rotations[motorWithBiggestMotion]->acceleration);  
+            } else {
+                // The motion is fine as a two-phase motion.
+                moveTime = 2 * sqrt(relativeAngles[motorWithBiggestMotion] / rotations[motorWithBiggestMotion]->acceleration);
+            }
+            
             // Set speed, and also the acceleration for the smaller motion motors
             for(int i = 0; i < 3; i++){
                 rotations[i]->speed = Motor::CRD514KD::MOTOR_MAX_SPEED;
