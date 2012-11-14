@@ -56,7 +56,19 @@ namespace Vision {
 			double getRotation(){
 				return rotation;
 			}
+
+			DataTypes::Point2D pixelToRealCoordinate2(const DataTypes::Point2D& pixelCoordinate) const;
+			DataTypes::Point2D realToPixelCoordinate2(const DataTypes::Point2D& realCoordinate) const;
 		private:
+
+			double alpha, scale, offsetX, offsetY;
+			/**
+			 * @var double mirrored
+			 * Indicator whether the fiducials are seen from above or from below.
+			 **/
+			bool mirrored;
+
+
 			/**
 			 * @var double realToPixelCoordinateScale
 			 * Scale to convert from a real coordinate to a pixel coordinate.
@@ -110,11 +122,7 @@ namespace Vision {
 			 **/
 			double pixelToRealCoordinateB;
 
-			/**
-			 * @var double mirrored
-			 * Indicator whether the fiducials are seen from above or from below.
-			 **/
-			bool mirrored;
+
 
 			/**
 			 * @var double rotation
