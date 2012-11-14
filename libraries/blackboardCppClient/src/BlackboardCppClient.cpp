@@ -163,6 +163,7 @@ void BlackboardCppClient::run(BlackboardCppClient* client) {
 		//std::cout << "Begin of while" << std::endl;
 		std::auto_ptr<mongo::DBClientCursor> tailedCursor = client->connection.query("local.oplog.rs", where, 0, 0, 0, 
 			mongo::QueryOption_CursorTailable | mongo::QueryOption_AwaitData );
+		std::cout << "Number of messages skipped " << tailedCursor->itcount() << std::endl;
 		//std::cout << "Tailable cursor size: " << tailedCursor->itcount();
 		while(true) {
 			//std::cout << "Begin of while2" << std::endl;
