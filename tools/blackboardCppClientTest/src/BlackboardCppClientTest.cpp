@@ -34,6 +34,8 @@
 int main(int argc, char **argv) {
 	ros::init(argc, argv, "BlackboardCppClientTest");
 	BlackboardCppClient bc("localhost");
+	bc.setDatabase("REXOS");
+	bc.setCollection("blackboard");
 	bc.subscribe("hoi");
 	ros::spin();
 	return 0;

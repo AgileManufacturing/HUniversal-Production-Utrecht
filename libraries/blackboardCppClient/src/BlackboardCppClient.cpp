@@ -30,6 +30,8 @@
 
 #include <iostream>
 #include <blackboardCppClient/BlackboardCppClient.h>
+#include <Utilities/Utilities.h>
+#include <memory>
 #include <unistd.h>
 
 /**
@@ -125,44 +127,85 @@ void BlackboardCppClient::unsubscribe(const std::string &topic) {
 	}
 }
 
+/**
+ * Create a vector of all the values in a map
+ *
+ * @param m The map with key type K and value type V
+ * @param v The vector with that contains objects of the same type V as the map values
+ *
+ **/
+template<typename K, typename V>
+void createVectorOfMapValues(const std::map<K, V> &m, std::vector<V> &v) {
+    for(typename std::map<K, V>::iterator it = m.begin(); it != m.end(); it++) {
+        v.push_back(it->second);
+    }
+}
+
+
 void BlackboardCppClient::run(BlackboardCppClient* client) {
-	while(true) {
+	/*while(true) {
 		std::cout << "Hello from thread! " <<std::endl;
 		sleep(5);	
-	}
-	
+	}*/
 	// Create namespace string
-	std::string namespace(database);
-	namespace.append(".");
-	namespace.append(collection);
-	std::cout << bla << std::endl;
+	std::string name = client->database;
+	name.append(".");
+	name.append(client->collection);
+	//mongo::BSONElement lastId = mongo::maxKey.firstElement();
+	mongo::Query where = QUERY("ns" << name);
+	std::cout << "where: " << where.toString() << std::endl;
 	
-	Query query = Query().sort("$natural");
+	//mongo::Query query = mongo::Query().sort("$natural");
 	std::string id = "";
 	std::string operation = "";
 
 	while(true) {
-		auto_ptr<DBClientCursor> tailedCursor = connection.query(namespace.c_str(), query, 0, 0, 0, 
-			QueryOption_CursorTailable | QueryOption_AwaitData );
+		//std::cout << "Begin of while" << std::endl;
+		std::auto_ptr<mongo::DBClientCursor> tailedCursor = client->connection.query("local.oplog.rs", where, 0, 0, 0, 
+			mongo::QueryOption_CursorTailable | mongo::QueryOption_AwaitData );
+		//std::cout << "Tailable cursor size: " << tailedCursor->itcount();
 		while(true) {
+			//std::cout << "Begin of while2" << std::endl;
 			if(!tailedCursor->more()) {
 				if(tailedCursor->isDead()) {
 					break;
 				}
 				continue;
 			}
-			BSONObj addedObject = tailedCursor->next();
+			//std::cout << "Before addedObject" << std::endl;
+			mongo::BSONObj addedObject = tailedCursor->next();
+			mongo::BSONElement out;
+			
+			std::cout << "Added object " << addedObject.toString() << std::endl;
 			if(addedObject.hasField("o")) {
-				id = addedObject.getObjectField("o").getStringField("_id");
+				addedObject.getObjectField("o").getObjectID(out);
+				id = out.OID().toString();
 			}
-			if(addedObject.hasField("o2") && id == null || id.empty()) {
-				id = addedObject.getObjectField("o2").getStringField("_id");
+			if(addedObject.hasField("o2") && id.empty()) {
+				addedObject.getObjectField("o2").getObjectID(out);
+				id = out.OID().toString();
 			}
+			std::cout << "After ifjes" << std::endl;
 			operation = addedObject.getStringField("op");
-			mongo::BSONObj messageCheckObject(BSON("_id" << mongo::OID(id) << "$or" << )); 
-
-			lastId = object["_id"];
+			std::vector<mongo::BSONObj> values;
+		    for(std::map<std::string, mongo::BSONObj>::iterator it = client->subscriptions.begin(); it != client->subscriptions.end(); it++) {
+        		values.push_back(it->second);
+    		}
+    		//std::cout << "After create vector from map" << std::endl;
+			//client->createVectorOfMapValues <std::string, mongo::BSONObj> (client->subscriptions, values);
+			std::cout << "Id: " << id << std::endl;
+			std::cout << "Operation: " << operation << std::endl;
+			mongo::BSONObj messageCheckObject(BSON("_id" << mongo::OID(id) << "$or" << values)); 
+			mongo::BSONObj message = client->connection.findOne(name, messageCheckObject);
+			if(operation.compare("i") == 0) {
+				std::cout << "Message added" << std::endl;
+			} else if(operation.compare("u") == 0) {
+				std::cout << "Message updated" << std::endl;
+			} else if(operation.compare("r") == 0) {
+				std::cout << "Message removed" << std::endl;
+			}
 		}
-	}	
+		//std::cout << " Your query is dead!" << std::endl;
+	}
 }
 

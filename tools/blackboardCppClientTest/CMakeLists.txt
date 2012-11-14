@@ -21,9 +21,9 @@ rosbuild_add_executable(BlackboardCppClientTest src/BlackboardCppClientTest.cpp)
 
 # Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
 
-include_directories(${Boost_INCLUDE_DIRS} ${BLACKBOARD_CPP_CLIENT} ${MONGO_CXX_DRIVER})
+include_directories(${Boost_INCLUDE_DIRS} ${BLACKBOARD_CPP_CLIENT} ${MONGO_CXX_DRIVER} ${LIB_UTILITIES_INCLUDE})
 
-target_link_libraries(BlackboardCppClientTest mongoclient boost_thread-mt boost_filesystem boost_program_options boost_system ${Boost_SYSTEM_LIBRARY} blackboardCppClient)
+target_link_libraries(BlackboardCppClientTest utilities mongoclient boost_thread-mt boost_filesystem boost_program_options boost_system ${Boost_SYSTEM_LIBRARY} blackboardCppClient)
 
 # MUST be called after lcv_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()

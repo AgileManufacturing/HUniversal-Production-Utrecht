@@ -33,11 +33,13 @@
 
 #include <string>
 #include <map>
+#include <vector>
 #include <boost/thread.hpp>
 #include "mongo/client/dbclient.h"
 
 class BlackboardCppClient {
 public:
+
 	BlackboardCppClient(const std::string &hostname);
 	BlackboardCppClient(const std::string &hostname, int port);
 	virtual ~BlackboardCppClient();
@@ -46,6 +48,9 @@ public:
 	void subscribe(const std::string &topic);
 	void setCallback();	
 	void unsubscribe(const std::string &topic);
+	enum BlackboardEvent {UNKNOWN, ADD, UPDATE, REMOVE};
+    template<typename K, typename V>
+	void createVectorOfMapValues(const std::map<K, V> &m, std::vector<V> &v);
 private:
 	static void run(BlackboardCppClient* client);
 	mongo::DBClientConnection connection;
