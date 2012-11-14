@@ -32,7 +32,8 @@
 #include <blackboardCppClient/BlackboardCppClient.h>
 
 int main(int argc, char **argv) {
-	BlackboardCppClient("localhost") bc;
+	ros::init(argc, argv, "BlackboardCppClientTest");
+	BlackboardCppClient bc("localhost");
 	bc.subscribe("hoi");
 	ros::spin();
 	return 0;

@@ -132,7 +132,7 @@ void BlackboardCppClient::run(BlackboardCppClient* client) {
 	}
 	
 	// Create namespace string
-	/*std::string namespace(database);
+	std::string namespace(database);
 	namespace.append(".");
 	namespace.append(collection);
 	std::cout << bla << std::endl;
@@ -163,6 +163,6 @@ void BlackboardCppClient::run(BlackboardCppClient* client) {
 
 			lastId = object["_id"];
 		}
-	}*/
+	}	
 }
 

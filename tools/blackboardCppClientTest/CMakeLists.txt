@@ -21,7 +21,7 @@ rosbuild_add_executable(BlackboardCppClientTest src/BlackboardCppClientTest.cpp)
 
 # Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
 
-include_directories(${Boost_INCLUDE_DIRS} ${BLACKBOARD_CPP_CLIENT})
+include_directories(${Boost_INCLUDE_DIRS} ${BLACKBOARD_CPP_CLIENT} ${MONGO_CXX_DRIVER})
 
 target_link_libraries(BlackboardCppClientTest mongoclient boost_thread-mt boost_filesystem boost_program_options boost_system ${Boost_SYSTEM_LIBRARY} blackboardCppClient)
 
