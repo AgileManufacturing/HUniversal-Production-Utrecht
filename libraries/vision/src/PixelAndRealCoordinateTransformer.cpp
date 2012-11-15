@@ -38,7 +38,6 @@
 #include <float.h>
 #include <list>
 #include <iostream>
-#include <Utilities/Utilities.h>
 
 namespace Vision {
 	/**
@@ -126,25 +125,25 @@ namespace Vision {
 		
 		// Determine mirroring by rotating an outlying pixel point (0) around the midpoint (1) with 90 degrees both ways, then checking which rotation is closest to the other outlying pixel point (2).
 		DataTypes::Point2D offset = fiducialsPixelCoordinates[0] - fiducialsPixelCoordinates[1];
-		DataTypes::Point2D mirroredPoint = offset.rotate(Utilities::degreesToRadians(90));
-		DataTypes::Point2D nonmirroredPoint = offset.rotate(Utilities::degreesToRadians(-90));
+		// Rotate 90 degrees clockwise
+		DataTypes::Point2D mirroredPoint = offset.rotate(Utilities::degreesToRadians(-90));
+		// Rotate 90 degrees counter clockwise
+		DataTypes::Point2D nonmirroredPoint = offset.rotate(Utilities::degreesToRadians(+90));
 		mirroredPoint += fiducialsPixelCoordinates[1];
 		nonmirroredPoint += fiducialsPixelCoordinates[1];
 		// Check if the image is mirrored by determining which rotation is closest to the actual point 2.
 		if (mirroredPoint.distance(fiducialsPixelCoordinates[2]) < nonmirroredPoint.distance(fiducialsPixelCoordinates[2])) {
-std::cout << "mirrored" << std::endl;
 			mirrored = true;
 		} else {
-std::cout << "non mirrored" << std::endl;
 			mirrored = false;
 		}
 
 		// Find out the angle of the line between point 1 and 2 (this is the shortest line between the three fiducials)
-		double pixelDeltaX = fiducialsPixelCoordinates[2].x - fiducialsPixelCoordinates[1].x;
-		double pixelDeltaY = fiducialsPixelCoordinates[2].y - fiducialsPixelCoordinates[1].y;
-		// Independant of mirroring, if the line between point 1 and 2 is at 90 degrees, the rotation of the image is 0 degrees
-		alpha = atan2(pixelDeltaY, pixelDeltaX) + Utilities::degreesToRadians(-90);
-std::cout << "Rotation is: " << alpha << " radians, which is " << Utilities::radiansToDegrees(alpha) << "degrees" << std::endl;
+		double pixelDeltaX = fiducialsPixelCoordinates[1].x - fiducialsPixelCoordinates[2].x;
+		double pixelDeltaY = fiducialsPixelCoordinates[1].y - fiducialsPixelCoordinates[2].y;
+		// Independent of mirroring, if the line between point 1 and 2 is at 90 degrees, the rotation of the image is 0 degrees
+		alpha = atan2(pixelDeltaY, pixelDeltaX) + Utilities::degreesToRadians(-270);
+		std::cout << "alpha: " << alpha << ", " << Utilities::radiansToDegrees(alpha) << std::endl;
 
 		// Determine the scale.
 		scale = 0;
@@ -157,34 +156,34 @@ std::cout << "Rotation is: " << alpha << " radians, which is " << Utilities::rad
 		}
 		scale /= distancesCount;
 
+		offsetX = offsetY = 0;
 		DataTypes::Point2D realpoint0 = pixelToRealCoordinate2(fiducialsPixelCoordinates[0]);
 		DataTypes::Point2D realpoint1 = pixelToRealCoordinate2(fiducialsPixelCoordinates[1]);
 		DataTypes::Point2D realpoint2 = pixelToRealCoordinate2(fiducialsPixelCoordinates[2]);
-std::cout << "x offsets: " << realpoint0.x - fiducialsRealCoordinates[0].x << ", " << realpoint1.x - fiducialsRealCoordinates[1].x << ", " << realpoint2.x - fiducialsRealCoordinates[2].x << std::endl;
-std::cout << "y offsets: " << realpoint0.y - fiducialsRealCoordinates[0].y << ", " << realpoint1.y - fiducialsRealCoordinates[1].y << ", " << realpoint2.y - fiducialsRealCoordinates[2].y << std::endl;
+		offsetX = fiducialsRealCoordinates[0].x - realpoint0.x + fiducialsRealCoordinates[1].x - realpoint1.x + fiducialsRealCoordinates[2].x - realpoint2.x;
+		offsetY = fiducialsRealCoordinates[0].y - realpoint0.y + fiducialsRealCoordinates[1].y - realpoint1.y + fiducialsRealCoordinates[2].y - realpoint2.y;
+		offsetX /= 3;
+		offsetY /= 3;
 	}
 
 	/**
 	 * Applies a rotation matrix, potential mirroring on y axis, scaling and offsetting.
 	 */
 	DataTypes::Point2D PixelAndRealCoordinateTransformer::pixelToRealCoordinate2(const DataTypes::Point2D& pixelCoordinate) const {
-std::cout << "Converting pixel coordinate (" << pixelCoordinate.x << ", " << pixelCoordinate.y << ")" << std::endl;
-		DataTypes::Point2D result;
+		DataTypes::Point2D result = pixelCoordinate.rotate(alpha);
 		// Worked out rotation matrix
 		result.x = pixelCoordinate.x * cos(alpha) + pixelCoordinate.y * sin(alpha);
-		result.y = pixelCoordinate.x * -sin(alpha) + pixelCoordinate.y * cos(alpha);
-std::cout << "(" << result.x << ", " << result.y << ") after rotation" << std::endl;
+		result.y = pixelCoordinate.x * (-sin(alpha)) + pixelCoordinate.y * cos(alpha);
 		// Mirror on the y axis, which after rotation is always the mirror axis.
 		if (mirrored) {
 			result.x *= -1;
 		}
-std::cout << "(" << result.x << ", " << result.y << ") after mirroring" << std::endl;
+		//invert y axis because of 0,0 being topleft of a picture and 0,0 being bottomleft of the workspace
+		result.y *= -1;
 		result.x *= scale;
 		result.y *= scale;
-std::cout << "(" << result.x << ", " << result.y << ") after scaling" << std::endl;
 		result.x += offsetX;
 		result.y += offsetY;
-std::cout << "(" << result.x << ", " << result.y << ") after offsetting, the result" << std::endl;
 
 		return result;
 	}
