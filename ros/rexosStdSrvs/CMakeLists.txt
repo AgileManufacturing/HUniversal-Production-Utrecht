@@ -1,10 +1,10 @@
 ##############################################################
-# CMakeLists.txt for a ROS package within the low-cost-vision
+# CMakeLists.txt for a ROS package within the rexos
 # build system.
 #
-# Created by Pascal Muller <pascalmuller@gmail.com>, 09-02-2012
+# Created by Dick van der Steen <dickvandersteen@gmail.com>, 15-11-2012
 #
-# 09-02-2012 Initial version
+# 15-11-2012 Initial version
 #
 #############################################################
 
@@ -15,5 +15,5 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 # Initialize ROS package to be in our build system.
 rexos_rospack_init("rexosStdSrvs" false true)
 
-# MUST be called after lcv_rospack_init to clean up after ROSBUILD!
+# MUST be called after rexos_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()

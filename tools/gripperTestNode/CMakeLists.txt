@@ -1,10 +1,8 @@
 ##############################################################
-# CMakeLists.txt for a ROS package within the low-cost-vision
+# CMakeLists.txt for a ROS package within the rexos
 # build system.
 #
-# Created by Pascal Muller <pascalmuller@gmail.com>, 09-02-2012
-#
-# 09-02-2012 Initial version
+# Created by Dick van der Steen <dickvandersteen@gmail.com>
 #
 #############################################################
 
@@ -24,5 +22,5 @@ include_directories(${LIB_UTILITIES_INCLUDE} ${Boost_INCLUDE_DIRS})
 
 target_link_libraries(GripperTestNode utilities ${Boost_SYSTEM_LIBRARY})
 
-# MUST be called after lcv_rospack_init to clean up after ROSBUILD!
+# MUST be called after rexos_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()

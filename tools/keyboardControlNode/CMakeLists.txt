@@ -1,5 +1,5 @@
 ##############################################################
-# CMakeLists.txt for a ROS package within the low-cost-vision
+# CMakeLists.txt for a ROS package within the rexos
 # build system.
 #
 # Created by Pascal Muller <pascalmuller@gmail.com>, 09-02-2012
@@ -24,5 +24,5 @@ include_directories("${NODE_DELTA_ROBOT}")
 # Link target to our libraries
 #target_link_libraries(deltarobot huniplacer)
 
-# MUST be called after lcv_rospack_init to clean up after ROSBUILD!
+# MUST be called after rexos_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()

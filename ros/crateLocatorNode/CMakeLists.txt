@@ -26,5 +26,5 @@ include_directories(${LIB_DATATYPES_INCLUDE} ${LIB_UTILITIES_INCLUDE} ${LIB_VISI
 # Link target to our libraries
 target_link_libraries(crateLocatorNode vision dataTypes)
 
-# MUST be called after lcv_rospack_init to clean up after ROSBUILD!
+# MUST be called after rexos_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()
