@@ -1,10 +1,8 @@
 ##############################################################
-# CMakeLists.txt for a ROS package within the low-cost-vision
+# CMakeLists.txt for a ROS package within the rexos
 # build system.
 #
-# Created by Pascal Muller <pascalmuller@gmail.com>, 09-02-2012
-#
-# 09-02-2012 Initial version
+# Created by Arjan Groenewegen <arjanhgroen@gmail.com>
 #
 #############################################################
 
@@ -17,5 +15,5 @@ rexos_rospack_init("rosMast" true true)
 
 rosbuild_add_library(rosMast src/StateMachine.cpp)
 
-# MUST be called after lcv_rospack_init to clean up after ROSBUILD!
+# MUST be called after rexos_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()

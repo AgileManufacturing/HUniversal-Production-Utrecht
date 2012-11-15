@@ -102,7 +102,7 @@ endmacro(rexos_rospack_init)
  # rexos_rospack_end()
  # 
  # == Description == 
- # This macro MUST be called after lcv_rospack_init, after everything is done. 
+ # This macro MUST be called after rexos_rospack_init, after everything is done. 
 ##############################################################################
 macro(rexos_rospack_end)
 	set(PROJECT_SOURCE_DIR ${TEMPORARY_PROJECT_SOURCE_DIR})
@@ -160,7 +160,7 @@ macro(rexos_check_ros_path)
 	# In the list should be at least two directories, one with all packages need for ROS itself and one for us. 
 	# I'm not sure if I can check if the ROS directory is set correctly, as the location might change between versions of ROS. 
 	if(NOT ${listlen} GREATER 1) 
-		message(WARNING "ROS_PACKAGE_PATH needs to contain both the packages in the rexos repository and the default paths. It should be configured in .bashrc after including ROS ssetup.bash. The rule should look like this: \n export ROS_PACKAGE_PATH=/home/username/gitrepos/low-cost-vision-2012/ROS:$ROS_PACKAGE_PATH\n")
+		message(WARNING "ROS_PACKAGE_PATH needs to contain both the packages in the rexos repository and the default paths. It should be configured in .bashrc after including ROS ssetup.bash. The rule should look like this: \n export ROS_PACKAGE_PATH=/home/username/gitrepos/HUniversal-Production-Utrecht:$ROS_PACKAGE_PATH\n")
 		break()
 	endif(NOT ${listlen} GREATER 1) 
 	foreach(SINGLE_PACKDIR "${ROS_PACKPATHS_LIST}")

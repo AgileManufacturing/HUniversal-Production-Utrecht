@@ -1,10 +1,8 @@
 ##############################################################
-# CMakeLists.txt for a ROS package within the low-cost-vision
+# CMakeLists.txt for a ROS package within the rexos
 # build system.
 #
-# Created by Pascal Muller <pascalmuller@gmail.com>, 09-02-2012
-#
-# 09-02-2012 Initial version
+# Created by Dick van der Steen <dickvandersteen@gmail.com>
 #
 #############################################################
 
@@ -21,5 +19,5 @@ rosbuild_add_executable(DeltaRobotTest src/DeltaRobotTest.cpp)
 # Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
 include_directories("${NODE_DELTA_ROBOT}")
 
-# MUST be called after lcv_rospack_init to clean up after ROSBUILD!
+# MUST be called after rexos_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()
