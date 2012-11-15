@@ -20,6 +20,8 @@ msg_gen/
 ros/deltaRobotNode/src/deltaRobotNode/
 ros/rosMast/src/rosMast/
 ros/crateLocatorNode/src/crateLocatorNode/
+ros/rexosStdMsgs/src/rexosStdMsgs/
+ros/rexosStdSrvs/src/rexosStdSrvs/
 tools/gripperTestNode/src/gripperTestNode/
 build/
 

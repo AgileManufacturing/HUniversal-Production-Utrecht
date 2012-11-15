@@ -1,0 +1,15 @@
+<package>
+  <description brief="rexosStdMsgs">
+
+     rexosStdMsgs
+
+  </description>
+  <author>Dick van der Steen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/rexosStdMsgs</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+</package>
+
+
