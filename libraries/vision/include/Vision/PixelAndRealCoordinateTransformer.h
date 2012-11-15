@@ -34,6 +34,7 @@
 #pragma once
 #include <DataTypes/Point2D.h>
 #include <vector>
+#include <Utilities/Utilities.h>
 
 namespace Vision {
 	/**
@@ -54,7 +55,7 @@ namespace Vision {
 			 * return How much the pixels should be rotated to coincide with the real situation, such that different camera orientations can be used.
 			 **/
 			double getRotation(){
-				return rotation;
+				return alpha + Utilities::degreesToRadians(180);
 			}
 
 			DataTypes::Point2D pixelToRealCoordinate2(const DataTypes::Point2D& pixelCoordinate) const;
