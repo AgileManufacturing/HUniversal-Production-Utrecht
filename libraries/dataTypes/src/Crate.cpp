@@ -97,7 +97,7 @@ namespace DataTypes {
 		bounds.center = cv::Point2f(points[0].x + (length / 2.0) * cos(-alpha),
 		        points[0].y + (length / 2.0) * sin(-alpha));
 		bounds.size = cv::Size(distance1, distance2);
-		bounds.angle = alpha - M_PI / 4.0;
+		bounds.angle = alpha + M_PI / 4.0;
 		if (bounds.angle < -M_PI)
 			bounds.angle += 2 * M_PI;
 
