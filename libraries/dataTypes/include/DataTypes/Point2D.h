@@ -138,12 +138,12 @@ namespace DataTypes {
 		/**
 		 * Rotates the point around 0,0
 		 *
-		 * @param angle The angle to rotate in radians.
+		 * @param alpha The angle to rotate in radians.
 		 *
 		 * @return Returns a Point2D with the new location.
 		 **/
-		inline Point2D rotate(double angle) const {
-			return Point2D(x * cos(angle) - y * sin(angle), x * sin(angle) + y * cos(angle));
+		inline Point2D rotate(double alpha) const {
+			return Point2D(x * cos(alpha) + y * sin(alpha), x * (-sin(alpha)) + y * cos(alpha));
 		}
 	};
 }
