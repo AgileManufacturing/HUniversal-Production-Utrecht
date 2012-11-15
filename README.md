@@ -13,7 +13,7 @@ is used to create a stable and performant platform that interacts with the hardw
 * Distributed control system – which limits complexity
 * Dynamic product manufacturing
 * Easy prototyping
-* Automatic scheduling of manufacturing 
+* Automatic scheduling of manufacturing (products negotiate directly when they are manufactured with the manufacturing systems)
 * Automatic calibration of production system
 * Automatic scalability (from single product batches to large batches)
 
