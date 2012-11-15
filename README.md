@@ -10,11 +10,11 @@ is used to create a stable and performant platform that interacts with the hardw
 
 *REXOS specifications*
 
-	* Distributed control system – which limits complexity
-    * Dynamic product manufacturing
-    * Easy prototyping
-    * Automatic scheduling of manufacturing 
-    * Automatic calibration of production system
-    * Automatic scalability (from single product batches to large batches)
+* Distributed control system – which limits complexity
+* Dynamic product manufacturing
+* Easy prototyping
+* Automatic scheduling of manufacturing 
+* Automatic calibration of production system
+* Automatic scalability (from single product batches to large batches)
 
 for more information visit the website http://agilemanufacturing.nl/
