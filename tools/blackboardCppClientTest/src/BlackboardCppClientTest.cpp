@@ -31,12 +31,32 @@
 #include "ros/ros.h"
 #include <blackboardCppClient/BlackboardCppClient.h>
 
+void blackboardCallback(BlackboardCppClient::BlackboardEvent event, std::map<std::string, std::string> map) {
+	switch(event) {
+		case BlackboardCppClient::UNKNOWN:
+			std::cout << "Received UNKNOWN event in BlackboardCppClientTest" << std::endl;
+			break;
+		case BlackboardCppClient::ADD:
+			std::cout << "Received ADD event in BlackboardCppClientTest" << std::endl;
+			break;
+		case BlackboardCppClient::UPDATE:
+			std::cout << "Received UPDATE event in BlackboardCppClientTest" << std::endl;
+			break;
+		case BlackboardCppClient::REMOVE:
+			std::cout << "Received REMOVE event in BlackboardCppClientTest" << std::endl;
+			break;
+		default:
+			std::cout << "Received bbb" << std::endl;
+			break;
+	}
+}
+
 int main(int argc, char **argv) {
 	ros::init(argc, argv, "BlackboardCppClientTest");
-	BlackboardCppClient bc("localhost");
-	bc.setDatabase("REXOS");
-	bc.setCollection("blackboard");
-	bc.subscribe("hoi");
+	BlackboardCppClient bc("localhost", "REXOS", "blackboard", &blackboardCallback);
+	//bc.subscribe("hoi");
+	BlackboardCppClient bc2("localhost", "REXOS", "blackboard", &blackboardCallback);
+	bc2.subscribe("bla");
 	ros::spin();
 	return 0;
 }
