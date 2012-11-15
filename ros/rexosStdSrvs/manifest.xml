@@ -1,0 +1,14 @@
+<package>
+  <description brief="rexosStdSrvs">
+
+     rexosStdSrvs
+
+  </description>
+  <author>Dick van der Steen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <depend package="std_msgs"/>
+  <depend package="rexosStdMsgs"/>
+</package>
+
+

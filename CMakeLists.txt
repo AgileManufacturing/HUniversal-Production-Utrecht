@@ -1,5 +1,5 @@
 ##############################################################################
- # CMakeLists for the LCV project. 
+ # CMakeLists for the REXOS project. 
  # 
  # Created by Pascal Muller <pascalmuller@gmail.com>, 07-02-2012
  # 
@@ -29,7 +29,7 @@ set(REXOS_PARTS libraries ros tools) # TODO: Agents Libraries ROS
 # Ubuntu installed, so just to be sure it'll work. 
 cmake_minimum_required (VERSION 2.8)
 
-# Set the name of our project to LCV and require a C and C++ compiler. 
+# Set the name of our project to REXOS and require a C and C++ compiler. 
 project (REXOS CXX C Java)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")

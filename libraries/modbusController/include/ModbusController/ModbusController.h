@@ -51,7 +51,7 @@ extern "C"{
  * Turn on for modbus logging
  * Parameter is the logfile location. Change before enabling the log!
  *
- * #define MODBUS_LOGGING "/home/lcv/modbus.log"
+ * #define MODBUS_LOGGING "/home/agileman/modbus.log"
  * @endcond
  **/
 
