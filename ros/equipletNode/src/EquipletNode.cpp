@@ -60,13 +60,14 @@ EquipletNode::~EquipletNode() {
 	delete blackboardClient;
 }
 
-void EquipletNode::blackboardReadCallback(BlackboardSubscriber::BlackboardEvent event, std::map<std::string, std::string> map) {
+void EquipletNode::blackboardReadCallback(BlackboardSubscriber::BlackboardEvent event, std::string json) {
 	switch(event) {
 		case BlackboardSubscriber::UNKNOWN:
 			std::cout << "Received UNKNOWN event" << std::endl;
 			break;
 		case BlackboardSubscriber::ADD:
 			std::cout << "Received ADD event" << std::endl;
+			std::cout << "json string: " << json << std::endl;
 			break;
 		case BlackboardSubscriber::UPDATE:
 			std::cout << "Received UPDATE event" << std::endl;

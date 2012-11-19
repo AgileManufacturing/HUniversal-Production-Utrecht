@@ -31,10 +31,12 @@
 #ifndef BLACKBOARD_SUBSCRIBER_H_
 #define BLACKBOARD_SUBSCRIBER_H_
 
+#include <string>
+
 class BlackboardSubscriber{
 public:
 	enum BlackboardEvent {UNKNOWN, ADD, UPDATE, REMOVE};
-	virtual void blackboardReadCallback(BlackboardEvent event, std::map<std::string, std::string> map) = 0;
+	virtual void blackboardReadCallback(BlackboardEvent event, std::string json) = 0;
 };
 
 #endif

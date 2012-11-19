@@ -32,6 +32,7 @@
 #include <blackboardCppClient/BlackboardCppClient.h>
 #include <Utilities/Utilities.h>
 #include <memory>
+#include <set>
 #include <unistd.h>
 
 /**
@@ -164,10 +165,12 @@ void BlackboardCppClient::run(BlackboardCppClient* client) {
 			if(addedObject.hasField("o")) {
 				addedObject.getObjectField("o").getObjectID(out);
 				id = out.OID().toString();
+				std::cout << id << std::endl;
 			}
 			if(addedObject.hasField("o2") && id.empty()) {
 				addedObject.getObjectField("o2").getObjectID(out);
 				id = out.OID().toString();
+				std::cout << id << std::endl;
 			}
 			operation = addedObject.getStringField("op");
 			std::vector<mongo::BSONObj> values;
@@ -187,7 +190,7 @@ void BlackboardCppClient::run(BlackboardCppClient* client) {
 				} else if(operation.compare("r") == 0) {
 					event = BlackboardSubscriber::REMOVE;
 				}
-				client->callback->blackboardReadCallback(event, std::map<std::string, std::string>());
+				client->callback->blackboardReadCallback(event, message.jsonString());
 			}
 		}
 	}

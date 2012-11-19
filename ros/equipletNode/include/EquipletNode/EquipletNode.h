@@ -46,7 +46,7 @@ class EquipletNode: BlackboardSubscriber {
 	public:
 		EquipletNode(int id = 1);
 		virtual ~EquipletNode();
-		void blackboardReadCallback(BlackboardSubscriber::BlackboardEvent event, std::map<std::string, std::string> map);
+		void blackboardReadCallback(BlackboardSubscriber::BlackboardEvent event, std::string json);
 		bool addHardwareModule(Mast::HardwareModuleProperties module);
 		bool removeHardwareModule(int id);
 		void updateOperationState();
