@@ -1,0 +1,15 @@
+<package>
+  <description brief="imageTransformationNode">imageTransformationNode</description>
+  <author>Daan</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/imageTransformationNode</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="image_transport" />
+  <depend package="cv_bridge" />
+  <depend package="opencv2" />
+  <depend package="sensor_msgs" /> 
+</package>
+
+

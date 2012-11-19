@@ -77,7 +77,7 @@ namespace DeltaRobot{
 		 * @var double MOTOR_ROT_MAX
 		 * Mathematical maximum angle the motor is allowed to move to in radians.
 		 **/
-		const double MOTOR_ROT_MAX = Utilities::degreesToRadians(55);
+		const double MOTOR_ROT_MAX = Utilities::degreesToRadians(90);
 		
 		/**
 		 * @var double MOTORS_FROM_ZERO_TO_TOP_POSITION
@@ -113,7 +113,7 @@ namespace DeltaRobot{
 		 * @var double BOUNDARY_BOX_MIN_Z
 		 * The min z-coordinate of the effector boundary box in millimeters.
 		 **/
-		const double BOUNDARY_BOX_MIN_Z = -250;
+		const double BOUNDARY_BOX_MIN_Z = -266;
 
 		/**
 		 * @var double BOUNDARY_BOX_MAX_Z
