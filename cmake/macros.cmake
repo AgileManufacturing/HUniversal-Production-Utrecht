@@ -223,9 +223,3 @@ macro(add_classpaths sub_dirs)
 		add_classpath(${CMAKE_CURRENT_SOURCE_DIR}/${dir}/src)
 	endforeach(dir)
 endmacro(add_classpaths)
-
-macro(generate_config_file)
-	  file(APPEND ${CMAKE_SOURCE_DIR}/.rexosconfig "export CLASSPATH=${CLASSPATH}:${CP}")
-endmacro(generate_config_file)
-
-

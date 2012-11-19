@@ -73,5 +73,3 @@ if(JAVA_FOUND)
 	endif()
 endif()
 rexos_add_doc(REXOS)
-generate_config_file()
-
