@@ -212,3 +212,20 @@ macro(rexos_add_scons_library scons_target_name)
 		)
 	endif()
 endmacro(rexos_add_scons_library)
+
+macro(add_classpath path)
+  set(CP "${CP}:${path}" PARENT_SCOPE)
+endmacro(add_classpath)
+
+macro(add_classpaths sub_dirs)
+	foreach(dir ${sub_dirs})
+		message("Added dir ${CMAKE_CURRENT_SOURCE_DIR}/${dir}")
+		add_classpath(${CMAKE_CURRENT_SOURCE_DIR}/${dir}/src)
+	endforeach(dir)
+endmacro(add_classpaths)
+
+macro(generate_config_file)
+	  file(APPEND ${CMAKE_SOURCE_DIR}/.rexosconfig "export CLASSPATH=${CLASSPATH}:${CP}")
+endmacro(generate_config_file)
+
+

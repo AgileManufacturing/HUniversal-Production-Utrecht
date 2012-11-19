@@ -18,6 +18,7 @@ find_package(Doxygen)
 # == Find Java  == #
 #      Sets Java_JAVAC_EXECUTABLE, Java_JAVA_EXECUTABLE, Java_JAR_EXECUTABLE and Java_VERSION_MINOR
 find_package(Java)
+find_program (BASH_EXECUTABLE bash)
 
 # == Find ANT  == #
 #      Sets ANT_EXECUTABLE and ANT_FOUND
