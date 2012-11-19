@@ -58,7 +58,7 @@ static const char WINDOW_NAME[] = "Image window";
 void on_mouse(int event, int x, int y, int flags, void* param) {
 	if (event == CV_EVENT_LBUTTONDOWN) {
 		Vision::PixelAndRealCoordinateTransformer* cordTransformer = (Vision::PixelAndRealCoordinateTransformer*) param;
-		DataTypes::Point2D result = cordTransformer->pixelToRealCoordinate2(DataTypes::Point2D(x, y));
+		DataTypes::Point2D result = cordTransformer->pixelToRealCoordinate(DataTypes::Point2D(x, y));
 		ROS_INFO("RX: %f, RY:%f", result.x, result.y);
 		ROS_INFO("PX: %d, PY:%d", x, y);
 		std::cout.flush();
