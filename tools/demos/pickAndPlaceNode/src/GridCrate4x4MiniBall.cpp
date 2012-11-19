@@ -65,8 +65,8 @@ const std::string& GridCrate4x4MiniBall::getName(void) const {
 }
 
 DataTypes::Point2D GridCrate4x4MiniBall::getLocation(int index) const {
-	if(crate == NULL){
-		throw std::exception("No crate in GridCrate4x4MiniBall");
+	if(index >= COLS * ROWS) {
+		throw std::exception("Index out of range in GridCrate4x4MiniBall");
 	}
 
 	// Calculate the offset in which 
@@ -74,8 +74,9 @@ DataTypes::Point2D GridCrate4x4MiniBall::getLocation(int index) const {
 	offset.x = (index % COLS - (COLS / 2 - 0.5)) * (DISTANCE_BETWEEN_CONTAINERS + RADIUS_OF_CONTAINER);
 	offset.y = (index / ROWS - (ROWS / 2 - 0.5)) * (DISTANCE_BETWEEN_CONTAINERS + RADIUS_OF_CONTAINER);
 
-	DataTypes::Point2D result = offset.rotate(crate->getAngle());
-	result += crate->getCenter();
+	DataTypes::Point2D result = offset.rotate(angle);
+	result.x += x;
+	result.y += y;
 	return result;
 }
 

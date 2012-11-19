@@ -39,13 +39,12 @@
 class GridCrate4x4MiniBall {
 public:
 	GridCrate4x4MiniBall(std::string name) :
-		name(name) {
+		name(name), x(0), y(0), angle(0) {
 	}
-	void setCrate(DataTypes::Crate crate){
-		this->crate = crate;
-	}
-	DataTypes::Crate getCrate(void){
-		return crate;
+	void setCrate(double x, double y, double angle){
+		this->x = x;
+		this->y = y;
+		this->angle = angle;
 	}
 	void put(size_t index, MiniBall* crateContent);
 	MiniBall* get(size_t index) const;
@@ -61,6 +60,8 @@ private:
 	static const int ROWS = 4;
 	static const int COLS = 4;
 	//static const double BOTTOM_THICKNESS = 5.3; 
+
+	double x, y, angle;
 
 	DataTypes::Crate* crate;
 	std::string name;
