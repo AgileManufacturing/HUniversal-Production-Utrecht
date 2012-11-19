@@ -38,11 +38,15 @@
 #include "deltaRobotNode/Motion.h"
 #include "deltaRobotNode/Calibrate.h"
 
+
+#include "rexosStdSrvs/Module.h"
+
 #include <DataTypes/Point3D.h>
 #include <DeltaRobot/DeltaRobot.h>
 #include <Motor/StepperMotor.h>
 #include <DeltaRobotNode/Services.h>
 #include <rosMast/StateMachine.h>
+
 
 namespace deltaRobotNodeNamespace {
 	/**
@@ -68,6 +72,13 @@ namespace deltaRobotNodeNamespace {
 				deltaRobotNode::MoveToRelativePoint::Response &res);
 			bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
 				deltaRobotNode::MoveRelativePath::Response &res);
+
+			bool calibrateNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+			bool moveToPointNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+			bool movePathNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+			bool moveToRelativePointNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+			bool moveRelativePathNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+
 		private:
 			/**
 			 * @var DeltaRobot::DeltaRobot * deltaRobot
@@ -94,7 +105,7 @@ namespace deltaRobotNodeNamespace {
 			 * @var ros::ServiceServer moveToPointService;	
 			 * Service for receiving move to point commands
 			 **/
-			ros::ServiceServer moveToPointService;	
+			ros::ServiceServer moveToPointService;
 			/**
 			 * @var ros::ServiceServer movePathService;	
 			 * Service for receiving movePath commands
@@ -115,6 +126,8 @@ namespace deltaRobotNodeNamespace {
 			 * Service for receiving calibrate commands
 			 **/
 			ros::ServiceServer calibrateService;
+
+		
 
 	};
 }

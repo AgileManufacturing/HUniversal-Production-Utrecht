@@ -56,22 +56,15 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 	ros::NodeHandle nodeHandle;
 
 	// Advertise the services
-	moveToPointService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint, this);
+	moveToPointService = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToPointNew, this);
+	movePathService =	nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::movePathNew, this);
 
-	movePathService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::movePath, this);
+	moveToRelativePointService = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePointNew, this);
+	moveRelativePathService = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_RELATIVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePathNew, this);
 
-	moveToRelativePointService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint, this);
+	calibrateService = nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrateNew, this); 
 
-	moveRelativePathService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_RELATIVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath, this);
-
-	calibrateService =
-		nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate, this); 
-
-	ROS_INFO("Configuring Modbus..."); 	
+	/*ROS_INFO("Configuring Modbus..."); 	
 
 	// Initialize modbus for IO controller
     modbus_t* modbusIO = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
@@ -105,7 +98,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
     motorManager = new Motor::MotorManager(modbus, motors, 3);
 
 	// Create a deltarobot	
-    deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO); 
+    deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO); */
 }
 
 deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
@@ -343,6 +336,35 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(deltaRobotNode::M
 	res.succeeded = true;
 	return res.succeeded;
 }
+
+
+bool deltaRobotNodeNamespace::DeltaRobotNode::calibrateNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res)
+{
+	return true;
+}
+
+bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPointNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res)
+{
+	return true;
+}
+
+bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePointNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res)
+{
+	return true;
+}
+
+
+bool deltaRobotNodeNamespace::DeltaRobotNode::movePathNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res)
+{
+	return true;
+}
+
+
+bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePathNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res)
+{
+	return true;
+}
+
 /**
  * Transition from Safe to Standby state
  * @return 0 if everything went OK else error
