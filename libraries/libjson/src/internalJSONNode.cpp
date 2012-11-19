@@ -1,8 +1,8 @@
-#include "internalJSONNode.h"
-#include "NumberToString.h"  //So that I can convert numbers into strings
-#include "JSONNode.h"  //To fill in the foreward declaration
-#include "JSONWorker.h"  //For fetching and parsing and such
-#include "JSONGlobals.h"
+#include "Libjson/internalJSONNode.h"
+#include "Libjson/NumberToString.h"  //So that I can convert numbers into strings
+#include "Libjson/JSONNode.h"  //To fill in the foreward declaration
+#include "Libjson/JSONWorker.h"  //For fetching and parsing and such
+#include "Libjson/JSONGlobals.h"
 
 internalJSONNode::internalJSONNode(const internalJSONNode & orig) json_nothrow :
     _type(orig._type), _name(orig._name), _name_encoded(orig._name_encoded),

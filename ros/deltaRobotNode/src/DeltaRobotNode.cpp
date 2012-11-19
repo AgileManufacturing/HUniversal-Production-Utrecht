@@ -31,6 +31,7 @@
 
 
 #include "DeltaRobotNode/deltaRobotNode.h"
+#include "DeltaRobotNode/Point.h"
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "DeltaRobotNode"
@@ -40,7 +41,7 @@
  **/
 #define MODBUS_IP "192.168.0.2"
 /** 
- * The port we are connecting to
+ * The port we are connecting to	
  **/
 #define MODBUS_PORT 502
 
@@ -52,7 +53,7 @@
 deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) : rosMast::StateMachine(equipletID, moduleID) {	
 	ROS_INFO("DeltaRobotnode Constructor entering..."); 
 	
-	ros::NodeHandle nodeHandle;
+	/*ros::NodeHandle nodeHandle;
 
 	// Advertise the services
 	moveToPointService = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToPointNew, this);
@@ -61,7 +62,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 	moveToRelativePointService = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePointNew, this);
 	moveRelativePathService = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_RELATIVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePathNew, this);
 
-	calibrateService = nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrateNew, this); 
+	calibrateService = nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrateNew, this);*/ 
 
 	/*ROS_INFO("Configuring Modbus..."); 	
 
@@ -343,7 +344,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPointNew(rexosStdSrvs::Modul
 
 	DataTypes::Point3D<double>& effectorLocation = deltaRobot->getEffectorLocation();
 	
-	MsgObject msgObject = convertJsonPoint(req.json);
+	Point p = parsePoint(req.json);
 
 	/**
 	 * Check if the DeltaRobot can move from the current effector location
@@ -351,13 +352,13 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPointNew(rexosStdSrvs::Modul
 	 **/
 	if(!deltaRobot->checkPath(
 		DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
-		DataTypes::Point3D<double>(msgObject.x, msgObject.y, msgObject.z))) {
+		DataTypes::Point3D<double>(p.x, p.y, p.z))) {
 		res.message = "Cannot move to point, path is illegal";
 		return true;
 	}
 
-	ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", msgObject.x, msgObject.y, msgObject.z, msgObject.maxAcceleration);
-	deltaRobot->moveTo(DataTypes::Point3D<double>(msgObject.x, msgObject.y, msgObject.z), msgObject.maxAcceleration);
+	ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", p.x, p.y, p.z, p.maxAcceleration);
+	deltaRobot->moveTo(DataTypes::Point3D<double>(p.x, p.y, p.z), p.maxAcceleration);
 	res.succeeded = true;
 	return true;
 }
@@ -370,14 +371,15 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePointNew(rexosStdSrv
 		return true;
 	}
 
-	MsgObject msgObject = convertJsonPoint(req.json);
+	Point p = parsePoint(req.json);
+	
 	try {
 		DataTypes::Point3D<double>& effectorLocation = deltaRobot->getEffectorLocation();
 		ROS_INFO("Current effector location: x: %f y: %f z: %f", effectorLocation.x, effectorLocation.y, effectorLocation.z);
-		double relativeX = effectorLocation.x + msgObject.x;
-		double relativeY = effectorLocation.y + msgObject.y;
-		double relativeZ = effectorLocation.z + msgObject.z;
-		ROS_INFO("Current motion z: %f", msgObject.z);
+		double relativeX = effectorLocation.x + p.x;
+		double relativeY = effectorLocation.y + p.y;
+		double relativeZ = effectorLocation.z + p.z;
+		ROS_INFO("Current motion z: %f", p.z);
 
 		if(!deltaRobot->checkPath(
 				DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
@@ -385,7 +387,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePointNew(rexosStdSrv
 			res.message = "Cannot move to relative point, path is illegal";
 			return true;
 		}
-		deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ), msgObject.maxAcceleration);
+		deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ), p.maxAcceleration);
 
 	} catch(std::runtime_error& ex) {
 		std::stringstream ss;
@@ -410,13 +412,14 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePathNew(rexosStdSrvs::Module::
 
 	Point currentPoint;
 	Point nextPoint;
-	MsgObject msgObject = convertJsonPath(req.json);
+	int size = 0;
+	Point * path = parsePointArray(req.json, size);
 
 	try {
 		unsigned int n;
-		for(n = 0; n < msgObject.path.size() - 1; n++) {
-			currentPoint = msgObject.path[n];			
-			nextPoint = msgObject.path[n + 1];
+		for(n = 0; n < size- 1; n++) {
+			currentPoint = path[n];			
+			nextPoint = path[n + 1];
 			if(!deltaRobot->checkPath(
 				DataTypes::Point3D<double>(currentPoint.x, currentPoint.y, currentPoint.z),
 				DataTypes::Point3D<double>(nextPoint.x, nextPoint.y, nextPoint.z))) {
@@ -424,8 +427,8 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePathNew(rexosStdSrvs::Module::
 				return true;
 			}
 		}
-		for(n = 0; n < msgObject.path.size(); n++) {	
-			currentPoint = msgObject.path[n];
+		for(n = 0; n < size; n++) {	
+			currentPoint = path[n];
 			ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", currentPoint.x, currentPoint.y, currentPoint.z, currentPoint.maxAcceleration);
 			deltaRobot->moveTo(DataTypes::Point3D<double>(currentPoint.x, currentPoint.y, currentPoint.z), currentPoint.maxAcceleration);
 		}
@@ -449,7 +452,9 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePathNew(rexosStdSrvs::
 		return true;
 	}
 
-	MsgObject msgObject = convertJsonPath(req.json);
+	int size = 0;
+	Point * path = parsePointArray(req.json, size);
+	
 
 	Point currentPoint;
 	double relativeX;
@@ -460,8 +465,8 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePathNew(rexosStdSrvs::
 	try {
 		effectorLocation = deltaRobot->getEffectorLocation();
 		unsigned int n;
-		for(n = 0; n < msgObject.path.size(); n++) {
-			currentPoint = msgObject.path[n];			
+		for(n = 0; n < size; n++) {
+			currentPoint = path[n];			
 			relativeX = effectorLocation.x + currentPoint.x;
 			relativeY = effectorLocation.y + currentPoint.y;
 			relativeZ = effectorLocation.z + currentPoint.z;
@@ -476,8 +481,8 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePathNew(rexosStdSrvs::
 			effectorLocation.y = relativeY;
 			effectorLocation.z = relativeZ;
 		}
-		for(n = 0; n < msgObject.path.size(); n++) {	
-			currentPoint = msgObject.path[n];			
+		for(n = 0; n < size; n++) {	
+			currentPoint = path[n];			
 			effectorLocation = deltaRobot->getEffectorLocation();
 			relativeX = effectorLocation.x + currentPoint.x;
 			relativeY = effectorLocation.y + currentPoint.y;
@@ -553,6 +558,54 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
 	return 0;
 }
 
+deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoint(std::string json) {
+	ROS_INFO("Parsing JSON"); 	
+	JSONNode n = libjson::parse(json);
+ 	JSONNode::const_iterator i = n.begin();
+	Point p;
+	while(i != n.end()) {
+ 		// get the node name and value as a string
+        std::string node_name = i -> name();	
+
+		if(node_name == "x") {
+			ROS_INFO("Found x"); 			
+			p.x = i -> as_int();
+		}
+		else if(node_name == "y") {
+			p.y = i -> as_int();
+		}
+		else if(node_name == "z") {
+			p.z = i -> as_int();
+		}
+		else if(node_name == "maxAcceleration") {
+			p.maxAcceleration = i -> as_int();
+		}
+
+		++i;
+	}
+	std::cout << p.x << std::endl;	
+	return p;
+}
+
+deltaRobotNodeNamespace::Point* deltaRobotNodeNamespace::DeltaRobotNode::parsePointArray(std::string json, int &size) {
+	ROS_INFO("Parsing JSON Array"); 	
+	JSONNode n = libjson::parse(json);
+	JSONNode pathArray = n["Path"];
+	Point * path = new Point[pathArray.size()];
+	int counter = 0;
+	
+	JSONNode::const_iterator i = pathArray.begin();
+	while(i != pathArray.end()) {
+ 		Point p = parsePoint(i -> write());
+ 		path[counter++] = p;
+ 		++i; 
+	}
+	std::cout << path[0].x << std::endl;	
+	std::cout << path[1].x << std::endl;
+	size =  pathArray.size();;		
+	return path;
+} 
+
 /** 
  * Main that creates the deltaRobotNode and starts the statemachine
  **/
@@ -571,7 +624,7 @@ int main(int argc, char **argv) {
 	ROS_INFO("Creating DeltaRobotNode"); 	
 
 	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID);    
-	
+
 	ROS_INFO("Running StateEngine"); 	
     drn.startStateMachine();	
 	return 0;

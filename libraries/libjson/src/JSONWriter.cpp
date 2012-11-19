@@ -1,7 +1,7 @@
-#include "JSONNode.h"
+#include "Libjson/JSONNode.h"
 #ifdef JSON_WRITE_PRIORITY
-#include "JSONWorker.h"
-#include "JSONGlobals.h"
+#include "Libjson/JSONWorker.h"
+#include "Libjson/JSONGlobals.h"
 
 extern bool used_ascii_one;
 

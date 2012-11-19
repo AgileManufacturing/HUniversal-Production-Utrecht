@@ -5,14 +5,14 @@
     only reason JSON_LIBRARY should be defined is when compiling libjson
     as a library
 */
-#include "libjson.h"
+#include "Libjson/libjson.h"
 #ifdef JSON_LIBRARY
 
-    #include "JSONNode.h"
-    #include "JSONWorker.h"
-    #include "JSONValidator.h"
-    #include "JSONStream.h"
-	#include "JSONGlobals.h"
+    #include "Libjson/JSONNode.h"
+    #include "Libjson/JSONWorker.h"
+    #include "Libjson/JSONValidator.h"
+    #include "Libjson/JSONStream.h"
+	#include "Libjson/JSONGlobals.h"
     #include <stdexcept>  //some methods throw exceptions
     #ifdef JSON_MEMORY_MANAGE
 	   #define MANAGER_INSERT(x) json_global(NODE_HANDLER).insert(x)
@@ -25,7 +25,7 @@
     static const json_char * EMPTY_CSTRING(JSON_TEXT(""));
 
 	#ifdef JSON_MEMORY_POOL
-		#include "JSONMemoryPool.h"
+		#include "Libjson/JSONMemoryPool.h"
 		extern memory_pool<NODEPOOL> json_node_mempool;
 	#endif
 

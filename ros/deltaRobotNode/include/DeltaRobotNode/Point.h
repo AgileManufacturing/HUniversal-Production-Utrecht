@@ -30,20 +30,18 @@
 #ifndef POINT_H
 #define POINT_H
 
-#include "ros/ros.h"
-
 namespace deltaRobotNodeNamespace {
 	class Point {
 	public:
-		int x, y, z, maxAcceleration;
-
-		Point(int xValue, int yValue, int zValue, int speed) {
+		double x, y, z, maxAcceleration;
+		Point() {}
+		Point(double xValue, double yValue, double zValue, double maxAccelerationValue) {
 			x = xValue;
 			y = yValue;
 			z = zValue;
-			maxAcceleration = speed;
+			maxAcceleration = maxAccelerationValue;
 		}
-		virtual ~Point();
+		//virtual ~Point();
 	};
 }
 

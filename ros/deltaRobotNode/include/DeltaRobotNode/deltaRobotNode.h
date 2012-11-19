@@ -47,8 +47,7 @@
 #include <DeltaRobotNode/Services.h>
 #include <DeltaRobotNode/Point.h>
 #include <rosMast/StateMachine.h>
-#include <libjson/libjson.h>
-
+#include <Libjson/libjson.h>
 
 namespace deltaRobotNodeNamespace {
 	/**
@@ -80,6 +79,9 @@ namespace deltaRobotNodeNamespace {
 			bool movePathNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
 			bool moveToRelativePointNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
 			bool moveRelativePathNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+
+			Point parsePoint(std::string json);
+			Point * parsePointArray(std::string json, int & size);
 
 		private:
 			/**
