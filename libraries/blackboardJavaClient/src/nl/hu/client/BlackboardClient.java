@@ -97,12 +97,12 @@ public class BlackboardClient extends Thread {
 		}
 		if(set == null){set= new HashMap();}
 		if(unset == null){unset= new HashMap();}	
-		BasicDBObject shizzle = new BasicDBObject();
-		shizzle.put("$set", set);
-		shizzle.put("$unset", unset);
+		BasicDBObject setObject = new BasicDBObject();
+		setObject.put("$set", set);
+		setObject.put("$unset", unset);
 		System.out.println(new BasicDBObject(query));
-		System.out.println(shizzle);		
-		mongo.getDB(database).getCollection(collection).findAndModify(new BasicDBObject(query), shizzle);
+		System.out.println(setObject);		
+		mongo.getDB(database).getCollection(collection).findAndModify(new BasicDBObject(query), setObject);
 	}
 	
 
