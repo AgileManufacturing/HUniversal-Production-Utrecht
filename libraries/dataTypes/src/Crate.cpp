@@ -48,7 +48,7 @@ namespace DataTypes {
 	 * @param points The QR code points, ordering must be left-handed.
 	 **/
 	Crate::Crate(const std::vector<cv::Point2f>& points) : oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(0) {
-		this->points.assign(points.begin(), points.begin() + 3);
+		this->setPoints(points);
 	}
 
 	/**
@@ -58,7 +58,7 @@ namespace DataTypes {
 	 * @param points The QR code points, ordering must be left-handed.
 	 **/
 	Crate::Crate(std::string name, const std::vector<cv::Point2f>& points) : oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(0) {
-		this->points.assign(points.begin(), points.begin() + 3);
+		this->setPoints(points);
 		this->name = name;
 	}
 
@@ -91,7 +91,6 @@ namespace DataTypes {
 
 		// Distance and angle between the diagonal points
 		float length = sqrt(distance1 * distance1 + distance2 * distance2);
-		float alpha = atan2(points[0].y - points[2].y, points[2].x - points[0].x);
 
 		// Determine the center, size and angle
 		bounds.center = cv::Point2f(points[0].x + (length / 2.0) * cos(-alpha),
@@ -120,7 +119,9 @@ namespace DataTypes {
 	 *
 	 * @param newPoints The new QR code points.
 	 **/
-	void Crate::setPoints(std::vector<cv::Point2f>& newPoints) {
+	void Crate::setPoints(const std::vector<cv::Point2f>& newPoints) {
+		alpha = atan2(points[0].y - points[2].y, points[2].x - points[0].x);
+
 		this->bounds.size = cv::Size(0, 0); // This is enough to force a regeneration
 		this->points.assign(newPoints.begin(), newPoints.begin() + 3);
 	}

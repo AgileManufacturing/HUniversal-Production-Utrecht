@@ -39,18 +39,30 @@
 class GridCrate4x4MiniBall {
 public:
 	GridCrate4x4MiniBall(std::string name) :
-			name(name) {
+		name(name) {
 	}
-
-	void GridCrate4x4MiniBall::put(size_t index, MiniBall* crateContent);
-	MiniBall* GridCrate4x4MiniBall::get(size_t index) const;
+	void setCrate(DataTypes::Crate crate){
+		this->crate = crate;
+	}
+	DataTypes::Crate getCrate(void){
+		return crate;
+	}
+	void put(size_t index, MiniBall* crateContent);
+	MiniBall* get(size_t index) const;
 	const std::string& getName(void) const;
-	void GridCrate4x4MiniBall::remove(size_t index);
-	bool GridCrate4x4MiniBall::isEmpty( ) const;
+	void remove(size_t index);
+	bool isEmpty( ) const;
 
 	friend std::ostream & operator<<(std::ostream & os, const GridCrate4x4MiniBall & crate);
 
 private:
+	static const double DISTANCE_BETWEEN_CONTAINERS = 0.5;
+	static const double RADIUS_OF_CONTAINER = 5.25;
+	static const int ROWS = 4;
+	static const int COLS = 4;
+	//static const double BOTTOM_THICKNESS = 5.3; 
+
+	DataTypes::Crate* crate;
 	std::string name;
 	std::vector<MiniBall*>& crateContents;
 };

@@ -106,10 +106,16 @@ namespace DataTypes {
 
 		cv::RotatedRect rect( );
 		std::vector<cv::Point2f> getPoints( ) const;
-		void setPoints(std::vector<cv::Point2f>& points);
+		void setPoints(const std::vector<cv::Point2f>& points);
 		void draw(cv::Mat& image);
 
 		crate_state getState( );
+		double getAngle( ) {
+			return alpha;
+		}
+		DataTypes::Point2D getCenter( ) {
+			return DataTypes::Point2D(bounds.center.x, bounds.center.y);
+		}
 
 	private:
 		/**
@@ -122,6 +128,8 @@ namespace DataTypes {
 		 * Fiducial points belonging to the crate.
 		 **/
 		std::vector<cv::Point2f> points;
+
+		double alpha;
 	};
 }
 #endif /* CRATE_H_ */
