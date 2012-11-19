@@ -66,52 +66,56 @@ namespace Vision {
 	}
 
 	/**
-	 * Converts pixel coordinates to real coordinates. The math is just a worked out version of a conversion matrix (translation, rotation, scaling and mirroring). Mirroring is available because one camera is on the bottom and one is on the top.
+	 * Applies a rotation matrix, potential mirroring on y axis, scaling and offsetting.
 	 *
 	 * @param pixelCoordinate The input coordinate that will be converted.
 	 *
 	 * @return The real coordinate.
 	 **/
 	DataTypes::Point2D PixelAndRealCoordinateTransformer::pixelToRealCoordinate(const DataTypes::Point2D & pixelCoordinate) const {
-		int pixelCoordinateY = pixelCoordinate.y * -1;
+		DataTypes::Point2D result = pixelCoordinate.rotate(alpha);
 
-		DataTypes::Point2D realCoordinate;
-
-		realCoordinate.x = pixelToRealCoordinateScale * (cos(pixelToRealCoordinateAlpha) * (pixelCoordinate.x - pixelToRealCoordinateA) + sin(pixelToRealCoordinateAlpha) * (pixelCoordinateY - pixelToRealCoordinateB));
-		realCoordinate.y = pixelToRealCoordinateScale * (-sin(pixelToRealCoordinateAlpha) * (pixelCoordinate.x - pixelToRealCoordinateA) + cos(pixelToRealCoordinateAlpha) * (pixelCoordinateY - pixelToRealCoordinateB));
-
+		// Mirror on the y axis, which after rotation is always the mirror axis.
 		if (mirrored) {
-			double temporaryX = fiducialsRealCoordinates[0].x - fiducialsRealCoordinates[0].x * cos(2 * realAlpha) + realCoordinate.x * cos(2 * realAlpha) - fiducialsRealCoordinates[0].y * sin(2 * realAlpha) + realCoordinate.y * sin(2 * realAlpha);
-			realCoordinate.y = fiducialsRealCoordinates[0].y + fiducialsRealCoordinates[0].y * cos(2 * realAlpha) - realCoordinate.y * cos(2 * realAlpha) - fiducialsRealCoordinates[0].x * sin(2 * realAlpha) + realCoordinate.x * sin(2 * realAlpha);
-			realCoordinate.x = temporaryX;
+			result.x *= -1;
 		}
-		return realCoordinate;
+
+		//invert y axis because of 0,0 being topleft of a picture and 0,0 being bottomleft of the workspace
+		result.y *= -1;
+
+		result.x *= scale;
+		result.y *= scale;
+
+		result.x += offsetX;
+		result.y += offsetY;
+
+		return result;
 	}
 
 	/**
-	 * Converts real coordinates to pixel coordinates. The math is just a worked out version of a conversion matrix (translation, rotation, scaling and mirroring). Mirroring is available because one camera is on the bottom and one is on the top.
+	 * Applies a offset, scaling, potential mirroring on y axis and rotation matrix.
 	 *
 	 * @param realCoordinate The input coordinate that will be converted.
 	 *
 	 * @return The pixel coordinate.
 	 **/
 	DataTypes::Point2D PixelAndRealCoordinateTransformer::realToPixelCoordinate(const DataTypes::Point2D& realCoordinate) const {
-		DataTypes::Point2D pixelCoordinate;
-		pixelCoordinate = realCoordinate;
-		double temporaryX;
+		DataTypes::Point2D result(realCoordinate);
+
+		result.x -= offsetX;
+		result.y -= offsetY;
+
+		result.x /= scale;
+		result.y /= scale;
+
+		//invert y axis because of 0,0 being topleft of a picture and 0,0 being bottomleft of the workspace
+		result.y *= -1;
 
 		if (mirrored) {
-			temporaryX = fiducialsRealCoordinates[0].x - fiducialsRealCoordinates[0].x * cos(2 * realAlpha) + pixelCoordinate.x * cos(2 * realAlpha) - fiducialsRealCoordinates[0].y * sin(2 * realAlpha) + pixelCoordinate.y * sin(2 * realAlpha);
-			pixelCoordinate.y = fiducialsRealCoordinates[0].y + fiducialsRealCoordinates[0].y * cos(2 * realAlpha) - pixelCoordinate.y * cos(2 * realAlpha) - fiducialsRealCoordinates[0].x * sin(2 * realAlpha) + pixelCoordinate.x * sin(2 * realAlpha);
-			pixelCoordinate.x = temporaryX;
+			result.x *= -1;
 		}
 
-		temporaryX = realToPixelCoordinateScale * (cos(realToPixelCoordinateAlpha) * (pixelCoordinate.x - realToPixelCoordinateA) + sin(realToPixelCoordinateAlpha) * (pixelCoordinate.y - realToPixelCoordinateB));
-		pixelCoordinate.y = realToPixelCoordinateScale * (-sin(realToPixelCoordinateAlpha) * (pixelCoordinate.x - realToPixelCoordinateA) + cos(realToPixelCoordinateAlpha) * (pixelCoordinate.y - realToPixelCoordinateB));
-		pixelCoordinate.x = temporaryX;
-		pixelCoordinate.y *= -1;
-
-		return pixelCoordinate;
+		return result.rotate(-alpha);
 	}
 
 	/**
@@ -157,53 +161,12 @@ namespace Vision {
 		scale /= distancesCount;
 
 		offsetX = offsetY = 0;
-		DataTypes::Point2D realpoint0 = pixelToRealCoordinate2(fiducialsPixelCoordinates[0]);
-		DataTypes::Point2D realpoint1 = pixelToRealCoordinate2(fiducialsPixelCoordinates[1]);
-		DataTypes::Point2D realpoint2 = pixelToRealCoordinate2(fiducialsPixelCoordinates[2]);
+		DataTypes::Point2D realpoint0 = pixelToRealCoordinate(fiducialsPixelCoordinates[0]);
+		DataTypes::Point2D realpoint1 = pixelToRealCoordinate(fiducialsPixelCoordinates[1]);
+		DataTypes::Point2D realpoint2 = pixelToRealCoordinate(fiducialsPixelCoordinates[2]);
 		offsetX = fiducialsRealCoordinates[0].x - realpoint0.x + fiducialsRealCoordinates[1].x - realpoint1.x + fiducialsRealCoordinates[2].x - realpoint2.x;
 		offsetY = fiducialsRealCoordinates[0].y - realpoint0.y + fiducialsRealCoordinates[1].y - realpoint1.y + fiducialsRealCoordinates[2].y - realpoint2.y;
 		offsetX /= 3;
 		offsetY /= 3;
-	}
-
-	/**
-	 * Applies a rotation matrix, potential mirroring on y axis, scaling and offsetting.
-	 */
-	DataTypes::Point2D PixelAndRealCoordinateTransformer::pixelToRealCoordinate2(const DataTypes::Point2D& pixelCoordinate) const {
-		DataTypes::Point2D result = pixelCoordinate.rotate(alpha);
-		// Worked out rotation matrix
-		result.x = pixelCoordinate.x * cos(alpha) + pixelCoordinate.y * sin(alpha);
-		result.y = pixelCoordinate.x * (-sin(alpha)) + pixelCoordinate.y * cos(alpha);
-		// Mirror on the y axis, which after rotation is always the mirror axis.
-		if (mirrored) {
-			result.x *= -1;
-		}
-		//invert y axis because of 0,0 being topleft of a picture and 0,0 being bottomleft of the workspace
-		result.y *= -1;
-		result.x *= scale;
-		result.y *= scale;
-		result.x += offsetX;
-		result.y += offsetY;
-
-		return result;
-	}
-
-	/**
-	 *  Inverse from pixelToRealCoordinate2
-	 */
-	DataTypes::Point2D PixelAndRealCoordinateTransformer::realToPixelCoordinate2(const DataTypes::Point2D& realCoordinate) const {
-		DataTypes::Point2D result;
-		result.x -= offsetX;
-		result.y -= offsetY;
-		result.x /= scale;
-		result.y /= scale;
-		if (mirrored) {
-			result.x *= -1;
-		}
-		double inverseDeterminant = 1 / (cos(alpha) * cos(alpha) - sin(alpha) * -sin(alpha));
-		result.x = realCoordinate.x * inverseDeterminant * cos(alpha) + realCoordinate.y * inverseDeterminant * -sin(alpha);
-		result.y = realCoordinate.x * inverseDeterminant * sin(alpha) + realCoordinate.y * inverseDeterminant * cos(alpha);
-
-		return result;
 	}
 }

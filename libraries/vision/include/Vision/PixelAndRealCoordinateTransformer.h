@@ -58,8 +58,6 @@ namespace Vision {
 				return alpha + Utilities::degreesToRadians(180);
 			}
 
-			DataTypes::Point2D pixelToRealCoordinate2(const DataTypes::Point2D& pixelCoordinate) const;
-			DataTypes::Point2D realToPixelCoordinate2(const DataTypes::Point2D& realCoordinate) const;
 		private:
 
 			double alpha, scale, offsetX, offsetY;
