@@ -42,6 +42,7 @@
  **/
 class EnvironmentCache{
 public:
+	enum environmentAction {ADD, UPDATE, REMOVE};
 	EnvironmentCache();
 	bool lookupEnvironmentObject(environmentCache::LookupEnvironmentObject::Request &req, environmentCache::LookupEnvironmentObject::Response &res);
 	bool updateEnvironmentCache(environmentCache::UpdateEnvironmentCache::Request &req, environmentCache::UpdateEnvironmentCache::Response &res);

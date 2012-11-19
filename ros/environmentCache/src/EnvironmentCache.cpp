@@ -39,7 +39,6 @@ EnvironmentCache::EnvironmentCache(): cache() {
 	ros::NodeHandle nh;
 	lookupEnvironmentObjectService = nh.advertiseService("LookupEnvironmentObject", &EnvironmentCache::lookupEnvironmentObject, this);
 	updateEnvironmentCacheService = nh.advertiseService("updateEnvironmentCache", &EnvironmentCache::updateEnvironmentCache, this);
-	std::cout << "Constructor called" << std::endl;
 }
 
 /**
@@ -87,17 +86,17 @@ bool EnvironmentCache::updateEnvironmentCache(environmentCache::UpdateEnvironmen
 
 	// Check which event has occured and perform correct action
 	switch(event) {
-		case 0: // Item is added to the cache
+		case ADD: // Item is added to the cache
 			if(addItemToCache(id, req.cacheUpdate.properties.map)) {
 				success = true;
 			}
 			break;
-		case 1: // Item is updated in cache
+		case UPDATE: // Item is updated in cache
 			if(updateItemInCache(id, req.cacheUpdate.properties.map)) {
 				success = true;
 			}
 			break;
-		case 2: // Remove item from cache
+		case REMOVE: // Remove item from cache
 			if(removeItemFromCache(id)) {
 				success = true;
 			}
