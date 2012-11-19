@@ -179,6 +179,7 @@ void BlackboardCppClient::run(BlackboardCppClient* client) {
     		}
 			mongo::BSONObj messageCheckObject(BSON("_id" << mongo::OID(id) << "$or" << values)); 
 			mongo::BSONObj message = client->connection.findOne(name, messageCheckObject);
+			std::cout << "message" << message.toString() << std::endl;
 			/* If the message is not empty, it means something has changed on the topics
 				subscribed to */
 			if(!message.isEmpty()) {

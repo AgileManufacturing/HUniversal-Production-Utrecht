@@ -35,5 +35,5 @@ sync.sh
 *~
 *.class
 libraries/mongo-cxx-driver/.sconsign.dblite
-
+libraries/mongo-cxx-driver/config.log
 
