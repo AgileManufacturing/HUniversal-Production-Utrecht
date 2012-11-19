@@ -53,6 +53,15 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
 
+#if(JAVA_FOUND)
+#	if(ANT_FOUND)
+#		ADD_CUSTOM_TARGET(LIBS ALL
+#			${ANT_EXECUTABLE} -buildfile ${CMAKE_SOURCE_DIR}/build.xml build
+#			COMMENT "Building the java libraries"
+#		)
+#	endif()
+#endif()
+
 # Recursively add CMakeLists.txt rules for all REXOS_PARTS (directories)
 add_subdirectories("${REXOS_PARTS}")
 rexos_add_doc(REXOS)
