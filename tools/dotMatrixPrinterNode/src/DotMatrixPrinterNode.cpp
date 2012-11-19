@@ -144,8 +144,8 @@ void DotMatrixPrinterNode::imageCallback(const sensor_msgs::ImageConstPtr& msg) 
 	// =---------=	o = Offset starting point of the deltaRobot (drawX, drawY)
 	// =---------=
 	// ===========
-	double offsetX = -(cols / 2);
-	double offsetY = rows / 2;
+	double offsetX = -(cols * DotMatrixPrinterNodeSettings::DRAW_FIELD_MM_PER_DOT / 2);
+	double offsetY = rows  * DotMatrixPrinterNodeSettings::DRAW_FIELD_MM_PER_DOT / 2;
 
 	// Clear the old path.
 	if (pathDrawing) {
@@ -210,19 +210,66 @@ void DotMatrixPrinterNode::imageCallback(const sensor_msgs::ImageConstPtr& msg) 
 	deltaRobotClient.call(moveToPointService);
 }
 
+void DotMatrixPrinterNode::calibratePencilHeight(){
+
+	point.maxAcceleration = 2.5;
+	bool calibrated = false;
+
+	while(ros::ok() && !calibrated){
+		std::string input;
+
+		std::cout << "Calibrating pencil Z-axis. Enter desired coordinate:" << std::endl;
+		std::cin >> input;
+
+		
+		Z_LOW = Utilities::stringToDouble(input);
+		Z_HIGH = Z_LOW + 10;
+
+
+		while(true){
+			std::cout << "Trying " << Z_LOW << std::endl;
+
+			movePathService.request.motion.clear();
+			point.z = Z_HIGH;
+			drawDotToPath(0,0);
+
+			deltaRobotPathClient.call(movePathService); //path drawing
+			if (movePathService.response.message.compare("") != 0) {
+				std::cout << "[ERROR]" << movePathService.response.message << std::endl;
+				break;
+			}
+
+			char correct;
+
+			std::cout << "Enter R to repeat current, Y to accept, or anything else to try a new coordinate." << std::endl;
+			std::cin >> correct;
+
+			if(correct == 'R' || correct == 'r'){
+				continue;
+			} else if(correct == 'Y' || correct == 'y'){
+				Z_HIGH = Z_LOW + 10;
+				calibrated = true;
+			}
+			break;
+		}
+	}
+	point.maxAcceleration = DotMatrixPrinterNodeSettings::ACCELERATION;
+}
+
 /**
  * Blocking function that contains the main loop.
  * Spins in ROS to receive frames. These will execute the callbacks.
  * This function ends when ros receives a ^c
  **/
 void DotMatrixPrinterNode::run( ) {
-	std::cout << "Calibrating pencil thingy" << std::endl;
 
-	Z_LOW = -196.063;
+	calibratePencilHeight();
 
-	// TODO remove hacks!
-	Z_LOW = -265.25;
-	Z_HIGH = Z_LOW + 3;
+	// Z_LOW = -196.063;
+
+	// // TODO remove hacks!
+	// Z_LOW = -265.25;
+	// Z_HIGH = Z_LOW + 3;
 
 	// Move back to its starting point.
 	moveToPointService.request.motion.x = 0;

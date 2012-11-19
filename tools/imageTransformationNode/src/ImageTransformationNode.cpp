@@ -126,12 +126,13 @@ void ImageTransformationNode::transformCallback(const sensor_msgs::ImageConstPtr
 	}
 
 	//cv_ptr->image = cv::imread("/home/kbraham/Pictures/daniel.png");
-	//cv_ptr->image = cv::imread("/home/arjen/Desktop/rexoslogo.png");
-	cv_ptr->image = cv::imread("/home/arjen/Desktop/corners.png");
+	cv_ptr->image = cv::imread("/home/arjen/Desktop/rexoslogo_no_fill.png");
+	//cv_ptr->image = cv::imread("/home/arjen/Desktop/corners.png");
 	if(cv_ptr->image.data == NULL){
 		std::cerr << "Invalid image" << std::endl;
 		exit(1);
 	}
+
 
 	//calculating scale such that the entire picture will fit, with respect to aspect ratio, on the draw field.
 	double scale = std::max(
@@ -147,11 +148,15 @@ void ImageTransformationNode::transformCallback(const sensor_msgs::ImageConstPtr
 
 	cv::Mat grayImage;
 	cv::cvtColor(resizedImage, grayImage, CV_BGR2GRAY);
+
+	outputImage = grayImage > 150;
 	
-	//Threshold the image, note that blocksize has to be a multiple of 3 and >= 3.
-	cv::Mat thresholdedImage;
-	cv::adaptiveThreshold(grayImage, outputImage, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, blockSize < 3 ? 3 : blockSize | 1, subtract);
+
+	// //Threshold the image, note that blocksize has to be a multiple of 3 and >= 3.
+	// cv::Mat thresholdedImage;
+	// cv::adaptiveThreshold(grayImage, outputImage, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, blockSize < 3 ? 3 : blockSize | 1, subtract);
 	//TODO determine if output is a safe image to use for sending onwards
+
 	cv::imshow(WINDOW_NAME, outputImage);
 	cv::waitKey(3);
 }

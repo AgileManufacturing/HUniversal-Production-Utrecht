@@ -69,6 +69,6 @@
 	 * @var static const double ACCELERATION
 	 * The acceleration for the delta robot.
 	 **/
-	static const double ACCELERATION = 100;
+	static const double ACCELERATION = 50;
 
 }
