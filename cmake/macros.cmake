@@ -196,3 +196,19 @@ macro(rexos_add_doc doc_name)
                )
        endif(DOXYGEN_FOUND)
 endmacro(rexos_add_doc)
+
+##############################################################################
+# rexos_add_scons_library(<scons_target_name>)
+# 
+# == Description == 
+# Add a target for the scons buildsystem
+##############################################################################
+macro(rexos_add_scons_library scons_target_name)
+	if(SCONS_FOUND)
+		add_custom_target("${scons_target_name}"
+			${SCONS_EXECUTABLE}
+			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/libraries/${scons_target_name}
+			COMMENT "Running the scons build system for target ${scons_target_name}"
+		)
+	endif(SCONS_FOUND)
+endmacro(rexos_add_scons_library)

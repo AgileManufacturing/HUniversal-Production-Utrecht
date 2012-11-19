@@ -42,6 +42,9 @@ namespace Utilities{
     double radiansToDegrees(double radians);
     double degreesToRadians(double degrees);
     int stringToInt(int &i, char const *s, int base = 0);
+    template<typename M, typename V>
+    void createVectorOfMapValues(const M &m, V &v);
+
 
     /**
      * Utility class to time stuff.
