@@ -204,11 +204,11 @@ endmacro(rexos_add_doc)
 # Add a target for the scons buildsystem
 ##############################################################################
 macro(rexos_add_scons_library scons_target_name)
-	if(SCONS_FOUND)
-		add_custom_target("${scons_target_name}"
+	if(${SCONS_FOUND})
+		add_custom_target("${scons_target_name}" ALL
 			${SCONS_EXECUTABLE}
 			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/libraries/${scons_target_name}
 			COMMENT "Running the scons build system for target ${scons_target_name}"
 		)
-	endif(SCONS_FOUND)
+	endif()
 endmacro(rexos_add_scons_library)
