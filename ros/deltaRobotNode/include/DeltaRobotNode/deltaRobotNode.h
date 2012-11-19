@@ -37,7 +37,6 @@
 #include "deltaRobotNode/MoveRelativePath.h"
 #include "deltaRobotNode/Motion.h"
 #include "deltaRobotNode/Calibrate.h"
-#include "deltaRobotNode/Calibration.h"
 
 #include <DataTypes/Point3D.h>
 #include <DeltaRobot/DeltaRobot.h>
