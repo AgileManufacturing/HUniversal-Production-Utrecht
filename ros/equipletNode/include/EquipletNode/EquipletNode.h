@@ -33,6 +33,8 @@
 #include <string>
 #include <vector>
 #include <Mast/HardwareModuleProperties.h>
+#include <blackboardCppClient/BlackboardCppClient.h>
+#include <blackboardCppClient/BlackboardSubscriber.h>
 #include "rosMast/States.h"
 #include "rosMast/State.h"
 #include "rosMast/ModuleError.h"
@@ -40,10 +42,11 @@
 /**
  * The equipletNode, will manage all modules and keep track of their states
  **/
-class EquipletNode {
+class EquipletNode: BlackboardSubscriber {
 	public:
 		EquipletNode(int id = 1);
-
+		virtual ~EquipletNode();
+		void blackboardReadCallback(BlackboardSubscriber::BlackboardEvent event, std::map<std::string, std::string> map);
 		bool addHardwareModule(Mast::HardwareModuleProperties module);
 		bool removeHardwareModule(int id);
 		void updateOperationState();
@@ -93,4 +96,8 @@ class EquipletNode {
 		 * solution. Better is to store this in some kind of database.
 		 **/
 		std::map<int, std::pair< std::string, std::string> > modulePackageNodeMap;
+		/**
+		 * Client to read from blackboard
+		 **/
+		BlackboardCppClient  *blackboardClient;
 };

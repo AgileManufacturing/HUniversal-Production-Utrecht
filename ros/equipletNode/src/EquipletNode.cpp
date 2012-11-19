@@ -29,6 +29,7 @@
  **/
 
 #include <EquipletNode/EquipletNode.h>
+#include <iostream>
 #include <sstream>
 #include <cstdio>
 #include <unistd.h>
@@ -44,13 +45,40 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
 	modulePackageNodeMap[1] = std::pair< std::string, std::string > ("deltaRobotNode", "DeltaRobotNode");
 	modulePackageNodeMap[2] = std::pair< std::string, std::string > ("gripperTestNode", "GripperTestNode");
 
+	blackboardClient = new BlackboardCppClient("localhost", "REXOS", "blackboard", this);
+	blackboardClient->subscribe("hoi");
+	
 	ros::NodeHandle nodeHandle;
 	std::stringstream stringStream;
 	stringStream << equipletId;
 	std::string str = stringStream.str();
 	moduleErrorService = nodeHandle.advertiseService("ModuleError_" + str, &EquipletNode::moduleError, this); 
 	stateUpdateService = nodeHandle.advertiseService("StateUpdate_" + str, &EquipletNode::stateChanged, this);
-}; 
+} 
+
+EquipletNode::~EquipletNode() {
+	delete blackboardClient;
+}
+
+void EquipletNode::blackboardReadCallback(BlackboardSubscriber::BlackboardEvent event, std::map<std::string, std::string> map) {
+	switch(event) {
+		case BlackboardSubscriber::UNKNOWN:
+			std::cout << "Received UNKNOWN event" << std::endl;
+			break;
+		case BlackboardSubscriber::ADD:
+			std::cout << "Received ADD event" << std::endl;
+			break;
+		case BlackboardSubscriber::UPDATE:
+			std::cout << "Received UPDATE event" << std::endl;
+			break;
+		case BlackboardSubscriber::REMOVE:
+			std::cout << "Received REMOVE event" << std::endl;
+			break;
+		default:
+			std::cout << "Received bbb" << std::endl;
+			break;
+	}
+}
 
 /**
  * Callback function that is called when a message is received on the equiplet_statechanged topic

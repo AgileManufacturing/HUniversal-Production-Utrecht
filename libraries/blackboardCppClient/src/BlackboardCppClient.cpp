@@ -39,7 +39,7 @@
  *
  * @param hostname the name of the host where the mongo database can be found
  **/
-BlackboardCppClient::BlackboardCppClient(const std::string &hostname, std::string db, std::string coll, CallbackFunc func): database(db), collection(coll), callback(func) {
+BlackboardCppClient::BlackboardCppClient(const std::string &hostname, const std::string db, const std::string coll, BlackboardSubscriber *func): database(db), collection(coll), callback(func) {
   try {
     connection.connect(hostname);
     std::cout << "connected to database" << std::endl;
@@ -53,14 +53,14 @@ BlackboardCppClient::BlackboardCppClient(const std::string &hostname, std::strin
  *
  * @param hostname the name of the host where the mongo database can be found
  **/
-BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port, std::string db, std::string coll, CallbackFunc func): database(db), collection(coll), callback(func){
+/*BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll, CallbackFunc func): database(db), collection(coll), callback(func){
   try {
   	connection.connect(mongo::HostAndPort(hostname, port));
   	std::cout << "connected to database" << std::endl;
   } catch( const mongo::DBException &e ) {
     std::cout << "caught " << e.what() << std::endl;
   }	
-}
+}*/
 
 /**
  * destructor for the BlackboardCppClient
@@ -129,7 +129,7 @@ void BlackboardCppClient::unsubscribe(const std::string &topic) {
 /**
  * Set the callback function
  **/
-void BlackboardCppClient::setCallback(CallbackFunc func) {
+void BlackboardCppClient::setCallback(BlackboardSubscriber *func) {
 	callback = func;
 }
 
@@ -179,15 +179,15 @@ void BlackboardCppClient::run(BlackboardCppClient* client) {
 			/* If the message is not empty, it means something has changed on the topics
 				subscribed to */
 			if(!message.isEmpty()) {
-				BlackboardEvent event = UNKNOWN;
+				BlackboardSubscriber::BlackboardEvent event = BlackboardSubscriber::UNKNOWN;
 				if(operation.compare("i") == 0) {
-					event = ADD;
+					event = BlackboardSubscriber::ADD;
 				} else if(operation.compare("u") == 0) {
-					event = UPDATE;
+					event = BlackboardSubscriber::UPDATE;
 				} else if(operation.compare("r") == 0) {
-					event = REMOVE;
+					event = BlackboardSubscriber::REMOVE;
 				}
-				client->callback(event, std::map<std::string, std::string>());
+				client->callback->blackboardReadCallback(event, std::map<std::string, std::string>());
 			}
 		}
 	}

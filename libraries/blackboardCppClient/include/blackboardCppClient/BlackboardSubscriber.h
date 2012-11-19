@@ -1,7 +1,7 @@
 /**
- * @file BlackboardCppClient.h
+ * @file BlackboardSubscriber.h
  * @brief the cpp client for the blackboard
- * @date Created: 2012-10-12
+ * @date Created: 2012-11-19
  *
  * @author Dennis Koole
  *
@@ -28,60 +28,13 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef BLACKBOARD_CPP_CLIENT_H_
-#define BLACKBOARD_CPP_CLIENT_H_
+#ifndef BLACKBOARD_SUBSCRIBER_H_
+#define BLACKBOARD_SUBSCRIBER_H_
 
-#include <string>
-#include <map>
-#include <vector>
-#include <boost/thread.hpp>
-#include <blackboardCppClient/BlackboardSubscriber.h>
-#include "mongo/client/dbclient.h"
-
-class BlackboardCppClient {
+class BlackboardSubscriber{
 public:
-	//typedef void (BlackboardSubscriber::*CallbackFunc)(BlackboardSubscriber::BlackboardEvent, std::map<std::string, std::string>);
-	BlackboardCppClient(const std::string &hostname, const std::string db, const std::string coll, BlackboardSubscriber *func);
-	//BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll, CallbackFunc func);
-	virtual ~BlackboardCppClient();
-	void setDatabase(const std::string &db);
-	void setCollection(const std::string &col);
-	void subscribe(const std::string &topic);
-	void setCallback(BlackboardSubscriber *func);	
-	void unsubscribe(const std::string &topic);
-private:
-	static void run(BlackboardCppClient* client);
-	/**
-	 * The connection to the mongodb database
-	 **/
-	mongo::DBClientConnection connection;
-
-	/**
-	 * The name of the database
-	 **/
-	std::string database;
-
-	/**
-	 * The name of the collection
-	 **/
-	std::string collection;
-
-	/**
-	 * map of the subscriptions top topics. The key is the topic name, 
-	 * A bson object is stored as value to get the messages of the subscribed topic
-	 * from the database.
-	 **/
-	std::map<std::string, mongo::BSONObj> subscriptions;
-
-	/**
-	 * Pointer to the thread that is created when there is one subscription
-	 **/
-	boost::thread *readMessageThread;
-
-	/**
-	 * Pointer to the callback function that is called by the thread in the run function
-	 **/
-	BlackboardSubscriber *callback;
+	enum BlackboardEvent {UNKNOWN, ADD, UPDATE, REMOVE};
+	virtual void blackboardReadCallback(BlackboardEvent event, std::map<std::string, std::string> map) = 0;
 };
 
 #endif
