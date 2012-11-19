@@ -33,6 +33,7 @@ sync.sh
 *.sublime-project
 *.sublime-workspace
 *~
+*.class
 libraries/mongo-cxx-driver/.sconsign.dblite
 
 

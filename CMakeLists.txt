@@ -16,7 +16,7 @@
 
 ######## Configuration ##########
 
-set(REXOS_PARTS libraries ros tools) # TODO: Agents Libraries ROS
+set(REXOS_PARTS libraries ros tools mas) # TODO: Agents Libraries ROS
 
 # Note: Set buildtype with cmake -D CMAKE_BUILD_TYPE=<Debug|Release> <source>
 # It might be a smart idea to make two out-of-source build directories, 
@@ -35,7 +35,7 @@ project (REXOS CXX C Java)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 #set true for building java sources
-set(BUILD_JAVA FALSE)
+set(BUILD_JAVA TRUE)
 
 # Include so that JAVA can be used
 include (UseJava)
@@ -56,18 +56,20 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
 
+
+
+# Recursively add CMakeLists.txt rules for all REXOS_PARTS (directories)
+add_subdirectories("${REXOS_PARTS}")
+
 if(JAVA_FOUND)
 	if(ANT_FOUND)
 		if(BUILD_JAVA)
+			message("building java using extra classpath: ${CP}")
 			ADD_CUSTOM_TARGET(LIBS ALL
-				${ANT_EXECUTABLE} -buildfile ${CMAKE_SOURCE_DIR}/build.xml build
+				${ANT_EXECUTABLE} -lib ${CP} -buildfile ${CMAKE_SOURCE_DIR}/build.xml build
 				COMMENT "Building the java libraries"
 			)
 		endif()
 	endif()
 endif()
-
-# Recursively add CMakeLists.txt rules for all REXOS_PARTS (directories)
-add_subdirectories("${REXOS_PARTS}")
 rexos_add_doc(REXOS)
-
