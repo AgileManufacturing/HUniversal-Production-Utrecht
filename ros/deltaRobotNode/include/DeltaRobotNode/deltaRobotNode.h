@@ -46,6 +46,7 @@
 #include <Motor/StepperMotor.h>
 #include <DeltaRobotNode/Services.h>
 #include <rosMast/StateMachine.h>
+#include <libjson/libjson.h>
 
 
 namespace deltaRobotNodeNamespace {
