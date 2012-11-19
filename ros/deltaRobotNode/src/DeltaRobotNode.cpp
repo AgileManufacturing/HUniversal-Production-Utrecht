@@ -401,7 +401,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePointNew(rexosStdSrv
 
 
 bool deltaRobotNodeNamespace::DeltaRobotNode::movePathNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res) {
-	ROS_INFO("movePath called");
+	ROS_INFO("movePathNew called");
 	res.succeeded = false;
 	if(getState() != rosMast::normal) {
 		res.message = "Cannot move path, mast state=" + std::string(rosMast::state_txt[getState()]);
@@ -442,56 +442,54 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePathNew(rexosStdSrvs::Module::
 
 
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePathNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res) {
-	ROS_INFO("moveRelativePath called");
+	ROS_INFO("moveRelativePathNew called");
     res.succeeded = false;
 	if(getState() != rosMast::normal) {
-		res.message="Cannot move to relative path, mast state="+ std::string(rosMast::state_txt[getState()]);
+		res.message = "Cannot move to relative path, mast state=" + std::string(rosMast::state_txt[getState()]);
 		return true;
 	}
 
-	deltaRobotNode::Motion currentMotion;
+	MsgObject msgObject = convertJsonPath(req.json);
+
+	Point currentPoint;
 	double relativeX;
 	double relativeY;
 	double relativeZ;
 	DataTypes::Point3D<double> effectorLocation;
-	try
-	{
+
+	try {
 		effectorLocation = deltaRobot->getEffectorLocation();
 		unsigned int n;
-		for(n = 0; n < req.motion.size(); n++)
-		{
-			currentMotion = req.motion[n];			
-			relativeX = effectorLocation.x + currentMotion.x;
-			relativeY = effectorLocation.y + currentMotion.y;
-			relativeZ = effectorLocation.z + currentMotion.z;
+		for(n = 0; n < msgObject.path.size(); n++) {
+			currentPoint = msgObject.path[n];			
+			relativeX = effectorLocation.x + currentPoint.x;
+			relativeY = effectorLocation.y + currentPoint.y;
+			relativeZ = effectorLocation.z + currentPoint.z;
 			if(!deltaRobot->checkPath(
-				DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
-				DataTypes::Point3D<double>(relativeX, relativeY, relativeZ)))
-			{
-				res.message="Cannot move to relative path, path is illegal";
-				ROS_INFO("FROM %f, %f, %f TO %f, %f, %f Not allowed",effectorLocation.x,effectorLocation.z,effectorLocation.y,relativeX,relativeY,relativeZ );
+					DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
+					DataTypes::Point3D<double>(relativeX, relativeY, relativeZ))) {
+				res.message = "Cannot move to relative path, path is illegal";
+				ROS_INFO("FROM %f, %f, %f TO %f, %f, %f Not allowed", effectorLocation.x, effectorLocation.z, effectorLocation.y, relativeX, relativeY, relativeZ);
 				return true;
 			}
 			effectorLocation.x = relativeX;
 			effectorLocation.y = relativeY;
 			effectorLocation.z = relativeZ;
 		}
-		for(n = 0; n < req.motion.size(); n++)
-		{	
-			currentMotion = req.motion[n];			
+		for(n = 0; n < msgObject.path.size(); n++) {	
+			currentPoint = msgObject.path[n];			
 			effectorLocation = deltaRobot->getEffectorLocation();
-			relativeX = effectorLocation.x + currentMotion.x;
-			relativeY = effectorLocation.y + currentMotion.y;
-			relativeZ = effectorLocation.z + currentMotion.z;
-			ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", relativeX, relativeY,relativeZ, currentMotion.maxAcceleration);
-			deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ),currentMotion.maxAcceleration);
+			relativeX = effectorLocation.x + currentPoint.x;
+			relativeY = effectorLocation.y + currentPoint.y;
+			relativeZ = effectorLocation.z + currentPoint.z;
+			ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", relativeX, relativeY,relativeZ, currentPoint.maxAcceleration);
+			deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ), currentPoint.maxAcceleration);
 		}
 	}
-	catch(std::runtime_error& ex)
-	{
+	catch(std::runtime_error& ex) {
 		std::stringstream ss;
-		ss << "runtime error of type "<< typeid(ex).name()<<" in delta robot" << std::endl;
-		ss <<"what(): " << ex.what()<<std::endl;
+		ss << "runtime error of type " << typeid(ex).name() << " in delta robot" << std::endl;
+		ss << "what(): " << ex.what() << std::endl;
 		ROS_ERROR("moveTo: %s", ss.str().c_str());
 		return true;
 	}

@@ -45,6 +45,7 @@
 #include <DeltaRobot/DeltaRobot.h>
 #include <Motor/StepperMotor.h>
 #include <DeltaRobotNode/Services.h>
+#include <DeltaRobotNode/Point.h>
 #include <rosMast/StateMachine.h>
 #include <libjson/libjson.h>
 
