@@ -8,7 +8,7 @@
 #############################################################
 
 ## Add all ROS packages here ##
-set(TOOLSPACKS keyboardControlNode deltaRobotTest gripperTestNode)
+set(TOOLSPACKS keyboardControlNode deltaRobotTest gripperTestNode blackboardCppClientTest)
 
 ### Don't change anything below, the part below checks if ROS is installed and configured correctly. 
 rexos_check_ros()

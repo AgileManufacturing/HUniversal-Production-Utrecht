@@ -24,6 +24,10 @@ find_package(Java)
 #	Maybe we should skip this if java is not available
 find_package(ANT)
 
+# == Find Scons  == #
+# Sets SCONS_EXECUTABLE and SCONS_FOUND
+find_package(Scons)
+
 # == Find Protobuf  == #
 #      Sets PROTOBUF_INCLUDE_DIRS and PROTOBUF_LIBRARIES and PROTOBUF_FOUND
 #	Maybe we should add protoc compiling to the build system. 
