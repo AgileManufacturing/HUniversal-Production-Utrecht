@@ -90,32 +90,32 @@ namespace deltaRobotNodeNamespace {
 			 **/
 			ModbusController::ModbusController* modbus;
 			/**
-			 * Motor::MotorManager* motorManager
+			 * @var Motor::MotorManager* motorManager
 			 * The motor manager
 			 **/
 			Motor::MotorManager* motorManager;
 			/**
-			 * @var ros::ServiceServer moveToPointService;	
+			 * @var ros::ServiceServer moveToPointService
 			 * Service for receiving move to point commands
 			 **/
 			ros::ServiceServer moveToPointService;
 			/**
-			 * @var ros::ServiceServer movePathService;	
+			 * @var ros::ServiceServer movePathService
 			 * Service for receiving movePath commands
 			 **/			
 			ros::ServiceServer movePathService;
 			/**
-			 * @var ros::ServiceServer moveToRelativePointService;	
+			 * @var ros::ServiceServer moveToRelativePointService
 			 * Service for receiving move to relative point commands
 			 **/
 			ros::ServiceServer moveToRelativePointService;
 			/**
-			 * @var ros::ServiceServer moveRelativePathService;	
+			 * @var ros::ServiceServer moveRelativePathService
 			 * Service for receiving move relative path commands
 			 **/			
 			ros::ServiceServer moveRelativePathService;
 			/**
-			 * @var ros::ServiceServer calibrateService;	
+			 * @var ros::ServiceServer calibrateService
 			 * Service for receiving calibrate commands
 			 **/
 			ros::ServiceServer calibrateService;

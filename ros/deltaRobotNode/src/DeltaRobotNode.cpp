@@ -315,11 +315,10 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(rexosStdSrvs::Mod
 			relativeX = effectorLocation.x + currentPoint.x;
 			relativeY = effectorLocation.y + currentPoint.y;
 			relativeZ = effectorLocation.z + currentPoint.z;
-			ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", relativeX, relativeY,relativeZ, currentPoint.maxAcceleration);
+			ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", relativeX, relativeY, relativeZ, currentPoint.maxAcceleration);
 			deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ), currentPoint.maxAcceleration);
 		}
-	}
-	catch(std::runtime_error& ex) {
+	}	catch(std::runtime_error& ex) {
 		std::stringstream ss;
 		ss << "runtime error of type " << typeid(ex).name() << " in delta robot" << std::endl;
 		ss << "what(): " << ex.what() << std::endl;

@@ -33,7 +33,26 @@
 namespace deltaRobotNodeNamespace {
 	class Point {
 	public:
-		double x, y, z, maxAcceleration;
+		/*
+		 * @var double x 
+		 * The x coordinate of the point
+		 **/
+		double x;
+		/*
+		 * @var double y 
+		 * The y coordinate of the point
+		 **/		
+		double y;
+		/*
+		 * @var double z
+		 * The z coordinate of the point
+		 **/
+		double z;
+		/*
+		 * @var double maxAcceleration 
+		 * The maximum accelartion 
+		 **/
+		double maxAcceleration;
 		Point() {}
 		Point(double xValue, double yValue, double zValue, double maxAccelerationValue) {
 			x = xValue;
@@ -41,7 +60,6 @@ namespace deltaRobotNodeNamespace {
 			z = zValue;
 			maxAcceleration = maxAccelerationValue;
 		}
-		//virtual ~Point();
 	};
 }
 
