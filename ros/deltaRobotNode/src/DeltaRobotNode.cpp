@@ -237,8 +237,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath(rexosStdSrvs::Module::Req
 	Point * path = parsePointArray(req.json, size);
 
 	try {
-		unsigned int n;
-		for(n = 0; n < size- 1; n++) {
+		for(int n = 0; n < (size - 1); n++) {
 			currentPoint = path[n];			
 			nextPoint = path[n + 1];
 			if(!deltaRobot->checkPath(
@@ -248,7 +247,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath(rexosStdSrvs::Module::Req
 				return true;
 			}
 		}
-		for(n = 0; n < size; n++) {	
+		for(int n = 0; n < (int)size; n++) {	
 			currentPoint = path[n];
 			ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", currentPoint.x, currentPoint.y, currentPoint.z, currentPoint.maxAcceleration);
 			deltaRobot->moveTo(DataTypes::Point3D<double>(currentPoint.x, currentPoint.y, currentPoint.z), currentPoint.maxAcceleration);
@@ -292,8 +291,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(rexosStdSrvs::Mod
 
 	try {
 		effectorLocation = deltaRobot->getEffectorLocation();
-		unsigned int n;
-		for(n = 0; n < size; n++) {
+		for(int n = 0; n < size; n++) {
 			currentPoint = path[n];			
 			relativeX = effectorLocation.x + currentPoint.x;
 			relativeY = effectorLocation.y + currentPoint.y;
@@ -309,7 +307,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(rexosStdSrvs::Mod
 			effectorLocation.y = relativeY;
 			effectorLocation.z = relativeZ;
 		}
-		for(n = 0; n < size; n++) {	
+		for(int n = 0; n < (int)size; n++) {	
 			currentPoint = path[n];			
 			effectorLocation = deltaRobot->getEffectorLocation();
 			relativeX = effectorLocation.x + currentPoint.x;

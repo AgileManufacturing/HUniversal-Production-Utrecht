@@ -39,6 +39,8 @@
 #include <DeltaRobotNode/Services.h>
 #include <DeltaRobotNode/Point.h>
 #include <rosMast/StateMachine.h>
+
+#pragma GCC system_header
 #include <Libjson/libjson.h>
 
 namespace deltaRobotNodeNamespace {

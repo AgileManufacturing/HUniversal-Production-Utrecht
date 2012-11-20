@@ -36,6 +36,7 @@
 #include <vector>
 #include <boost/thread.hpp>
 #include <blackboardCppClient/BlackboardSubscriber.h>
+#pragma GCC system_header
 #include "mongo/client/dbclient.h"
 
 class BlackboardCppClient {
