@@ -63,22 +63,11 @@ namespace deltaRobotNodeNamespace {
 			int transitionStart();
 			int transitionStop();
 						
-			bool calibrate(deltaRobotNode::Calibrate::Request &req, 
-				deltaRobotNode::Calibrate::Response &res);
-			bool moveToPoint(deltaRobotNode::MoveToPoint::Request &req,
-				deltaRobotNode::MoveToPoint::Response &res);
-			bool movePath(deltaRobotNode::MovePath::Request &req,
-				deltaRobotNode::MovePath::Response &res);
-			bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
-				deltaRobotNode::MoveToRelativePoint::Response &res);
-			bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
-				deltaRobotNode::MoveRelativePath::Response &res);
-
-			bool calibrateNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
-			bool moveToPointNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
-			bool movePathNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
-			bool moveToRelativePointNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
-			bool moveRelativePathNew(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+			bool calibrate(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+			bool moveToPoint(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+			bool movePath(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+			bool moveToRelativePoint(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+			bool moveRelativePath(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
 
 			Point parsePoint(std::string json);
 			Point * parsePointArray(std::string json, int & size);
