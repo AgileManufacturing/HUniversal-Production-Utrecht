@@ -7,11 +7,11 @@
 # template: set(libraryname "${REXOS_SOURCE_DIR}library directory")
 
 # Want to use the virtual ones for now
-set(LIB_DELTAROBOT_INCLUDE "${REXOS_SOURCE_DIR}/libraries/deltaRobot/include")
-set(LIB_MODBUS_CONTROLLER_INCLUDE "${REXOS_SOURCE_DIR}/libraries/modbusController/include")
+#set(LIB_DELTAROBOT_INCLUDE "${REXOS_SOURCE_DIR}/libraries/deltaRobot/include")
+#set(LIB_MODBUS_CONTROLLER_INCLUDE "${REXOS_SOURCE_DIR}/libraries/modbusController/include")
 
-# set(LIB_DELTAROBOT_INCLUDE "${REXOS_SOURCE_DIR}/libraries/virtualDeltaRobot/include")
-# set(LIB_MODBUS_CONTROLLER_INCLUDE "${REXOS_SOURCE_DIR}/libraries/virtualModbusController/include")
+set(LIB_DELTAROBOT_INCLUDE "${REXOS_SOURCE_DIR}/libraries/virtualDeltaRobot/include")
+set(LIB_MODBUS_CONTROLLER_INCLUDE "${REXOS_SOURCE_DIR}/libraries/virtualModbusController/include")
 
 set(LIB_DATATYPES_INCLUDE "${REXOS_SOURCE_DIR}/libraries/dataTypes/include")
 set(LIB_MAST_INCLUDE "${REXOS_SOURCE_DIR}/libraries/mast/include")

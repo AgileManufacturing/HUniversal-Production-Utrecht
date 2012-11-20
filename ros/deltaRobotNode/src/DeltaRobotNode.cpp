@@ -71,9 +71,9 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
     if(modbusIO == NULL) {
         throw std::runtime_error("Unable to allocate libmodbus context");
     }
-    if(modbus_connect(modbusIO) == -1) {
+    /*if(modbus_connect(modbusIO) == -1) {
    		throw std::runtime_error("Modbus connection to IO controller failed");
-    } 
+    } */
     assert(modbusIO != NULL);
 
     DataTypes::DeltaRobotMeasures drm;
