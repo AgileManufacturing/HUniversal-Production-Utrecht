@@ -13,7 +13,7 @@ cmake_minimum_required(VERSION 2.4.6)
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
 # Initialize ROS package to be in our build system.
-rexos_rospack_init("deltaRobotNode" true true)
+rexos_rospack_init("deltaRobotNode" false false)
 
 # Add executables as documented by ROS
 rosbuild_add_executable(DeltaRobotNode src/DeltaRobotNode.cpp)

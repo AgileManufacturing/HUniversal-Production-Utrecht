@@ -11,6 +11,8 @@
   <depend package="roscpp"/>
   <depend package="deltaRobotNode"/>
   <depend package="crateLocatorNode"/>
+  <depend package="rexosStdMsgs"/>
+  <depend package="rexosStdSrvs"/>
 
 </package>
 

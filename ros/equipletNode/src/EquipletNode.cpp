@@ -68,6 +68,7 @@ void EquipletNode::blackboardReadCallback(BlackboardSubscriber::BlackboardEvent 
 		case BlackboardSubscriber::ADD:
 			std::cout << "Received ADD event" << std::endl;
 			std::cout << "json string: " << json << std::endl;
+			
 			break;
 		case BlackboardSubscriber::UPDATE:
 			std::cout << "Received UPDATE event" << std::endl;

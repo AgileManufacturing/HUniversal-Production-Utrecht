@@ -31,14 +31,6 @@
 #define DELTAROBOTNODE_H
 
 #include "ros/ros.h"
-#include "deltaRobotNode/MoveToPoint.h"
-#include "deltaRobotNode/MovePath.h"
-#include "deltaRobotNode/MoveToRelativePoint.h"
-#include "deltaRobotNode/MoveRelativePath.h"
-#include "deltaRobotNode/Motion.h"
-#include "deltaRobotNode/Calibrate.h"
-
-
 #include "rexosStdSrvs/Module.h"
 
 #include <DataTypes/Point3D.h>

@@ -36,12 +36,6 @@
 #include <string.h>
 #include <cstdlib>
 #include "ros/ros.h"
-#include "deltaRobotNode/MovePath.h"
-#include "deltaRobotNode/MoveToRelativePoint.h"
-#include "deltaRobotNode/Motion.h"
-#include "deltaRobotNode/Calibrate.h"
-#include "DeltaRobotNode/Services.h"
-
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "KeyBoardControlNode"

@@ -32,11 +32,11 @@
 #pragma once
 
 #include "ros/ros.h"
+#include "rexosStdSrvs/Module.h"
 #include <iostream>
 #include <sstream>
 #include <crateLocatorNode/CrateEventMsg.h>
 #include <boost/thread.hpp>
-#include <deltaRobotNode/MoveToPoint.h>
 #include <crateLocatorNode/getCrate.h>
 
 class FollowNode{
@@ -69,7 +69,6 @@ private:
 	boost::thread* inputThread;
 
 	ros::ServiceClient deltaRobotClient;
-	deltaRobotNode::MoveToPoint moveToPointService;
 
 	ros::ServiceClient crateLocatorClient;
 	crateLocatorNode::getCrate getCrateService;
