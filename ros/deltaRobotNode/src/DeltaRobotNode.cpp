@@ -438,7 +438,12 @@ deltaRobotNodeNamespace::Point* deltaRobotNodeNamespace::DeltaRobotNode::parsePo
  		path[counter++] = p;
  		++i; 
 	}
-	size =  pathArray.size();;		
+
+	size =  pathArray.size();;	
+	ROS_INFO("The size of the array %d", size);	
+	for(int i = 0; i < size; i++) {
+		ROS_INFO("X value of item %d in array on position %d", (int)path[0].x, size);
+	}	
 	return path;
 } 
 
