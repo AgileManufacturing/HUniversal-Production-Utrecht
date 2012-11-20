@@ -60,74 +60,33 @@ namespace Vision {
 
 		private:
 
-			double alpha, scale, offsetX, offsetY;
+			/**
+			 * @var double alpha
+			 * The angle of the line between point 1 and 2 (this is the shortest line between the three fiducials)
+			 */
+			double alpha;
+
+			/**
+			 * @var double scale
+			 * The scale of pixel to real coordinates
+			 */
+			double scale;
+
+			/**
+			 * @var double offsetX
+			 */
+			double offsetX;
+
+			/**
+			 * @var double offsetY
+			 */
+			double offsetY;
+
 			/**
 			 * @var double mirrored
 			 * Indicator whether the fiducials are seen from above or from below.
 			 **/
 			bool mirrored;
-
-
-			/**
-			 * @var double realToPixelCoordinateScale
-			 * Scale to convert from a real coordinate to a pixel coordinate.
-			 **/
-			double realToPixelCoordinateScale;
-			/**
-			 * @var double pixelToRealCoordinateScale
-			 * Scale to convert from a pixel coordinate to a real coordinate.
-			 **/
-			double pixelToRealCoordinateScale;
-
-			/**
-			 * @var double realAlpha
-			 * Angle between two fiducial points real life coordinates. Should be the same two points as pixelAlpha.
-			 **/			
-			double realAlpha;
-			/**
-			 * @var double pixelAlpha
-			 * Angle between two fiducial points pixel coordinates. Should be the same two points as realAlpha.
-			 **/
-			double pixelAlpha;
-			/**
-			 * @var double realToPixelCoordinateAlpha
-			 * Conversion in angle from real life coordinates to the pixel coordinate.
-			 **/
-			double realToPixelCoordinateAlpha;
-			/**
-			 * @var double pixelToRealCoordinateAlpha
-			 * Conversion in angle from pixel coordinates to the real life coordinate.
-			 **/
-			double pixelToRealCoordinateAlpha;
-
-			/**
-			 * @var double realToPixelCoordinateA
-			 * Variable calculated in updateTransformationParameters for use in conversions.
-			 **/
-			double realToPixelCoordinateA; 
-			/**
-			 * @var double realToPixelCoordinateB
-			 * Variable calculated in updateTransformationParameters for use in conversions.
-			 **/
-			double realToPixelCoordinateB;
-			/**
-			 * @var double pixelToRealCoordinateA
-			 * Variable calculated in updateTransformationParameters for use in conversions.
-			 **/
-			double pixelToRealCoordinateA;
-			/**
-			 * @var double pixelToRealCoordinateB
-			 * Variable calculated in updateTransformationParameters for use in conversions.
-			 **/
-			double pixelToRealCoordinateB;
-
-
-
-			/**
-			 * @var double rotation
-			 * How much the pixels should be rotated to coincide with the real situation, such that different camera orientations can be used.
-			 **/
-			double rotation;
 
 			/**
 			 * @var std::vector<DataTypes::Point2D> fiducialsRealCoordinates
