@@ -32,6 +32,7 @@ public class DummyAgent extends Agent
 		builder.add("message.payload.x", 5);
 		builder.add("message.payload.y", 5);
 		builder.add("message.payload.z", 5);
+		builder.add("message.payload.maxAcceleration", 5);
 		try{
 		client.insert(builder.buildMessage(MessageBuilder.MessageType.GET));
 		}catch(Exception e){

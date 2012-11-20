@@ -91,8 +91,8 @@ void EquipletNode::blackboardReadCallback(BlackboardSubscriber::BlackboardEvent 
 				std::string serviceToCall = ss.str();
 				std::cout << "Service to call: " << serviceToCall << std::endl;
 
-				ros::NodeHandle n;
-				ros::ServiceClient client = n.serviceClient<rexosStdSrvs::Module>(serviceToCall);
+				ros::NodeHandle nodeHandle;
+				ros::ServiceClient client = nodeHandle.serviceClient<rexosStdSrvs::Module>(serviceToCall);
 				rexosStdSrvs::Module srv;
 				srv.request.json = payload;
 				client.call(srv);
