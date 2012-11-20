@@ -27,13 +27,15 @@ public class DummyAgent extends Agent
 		client.setCollection("blackboard");
 		MessageBuilder builder = new MessageBuilder();
 		builder.add("topic", "instruction");
+		builder.add("message.destination", "DeltaRobotNode");
+		builder.add("command", "moveToPoint");
 		builder.add("message.payload.x", 5);
 		builder.add("message.payload.y", 5);
 		builder.add("message.payload.z", 5);
 		try{
 		client.insert(builder.buildMessage(MessageBuilder.MessageType.GET));
 		}catch(Exception e){
-			    e.printStackTrace();
+		    e.printStackTrace();
 		}
 	}
 
