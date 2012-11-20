@@ -18,10 +18,10 @@ rexos_rospack_init("pickAndPlaceNode" false false)
 rosbuild_add_executable(PickAndPlaceNode src/PickAndPlaceNode.cpp)
 
 # Add dependencies to our libraries and other ROS packages in the same directory as this one.
-add_dependencies(PickAndPlaceNode deltaRobotNode crateLocatorNode)
+add_dependencies(PickAndPlaceNode deltaRobotNode crateLocatorNode gripperNode dataTypes)
 
 # Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
-include_directories(${LIB_DATATYPES_INCLUDE} ${LIB_UTILITIES_INCLUDE} ${LIB_VISION_INCLUDE} ${NODE_CRATE_LOCATOR} ${NODE_DELTA_ROBOT})
+include_directories(${LIB_DATATYPES_INCLUDE} ${LIB_UTILITIES_INCLUDE} ${LIB_VISION_INCLUDE} ${NODE_CRATE_LOCATOR} ${NODE_DELTA_ROBOT} ${NODE_GRIPPER})
 
 # Link target to our libraries
 target_link_libraries(PickAndPlaceNode vision dataTypes)

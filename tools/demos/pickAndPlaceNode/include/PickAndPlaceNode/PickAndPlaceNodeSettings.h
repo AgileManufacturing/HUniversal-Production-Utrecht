@@ -1,14 +1,14 @@
 /**
- * @file PickAndPlaceNode.cpp
- * @brief Listens to the crateEvent topic and guides the deltarobot and gripperrrrrrr :)
- * @date Created: 2012-11-13
+ * @file PickAndPlaceNodeSettings.h
+ * @brief Settings for the pick and place demonstration
+ * @date 2012-11-19
  *
  * @author Koen Braham
  * @author Daan Veltman
  *
  * @section LICENSE
  * License: newBSD
- *
+ * 
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
@@ -29,64 +29,12 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#pragma once
-
-#include "ros/ros.h"
-#include <iostream>
-#include <sstream>
-#include <crateLocatorNode/CrateEventMsg.h>
-#include <boost/thread.hpp>
-#include <deltaRobotNode/MoveToPoint.h>
-#include <deltaRobotNode/MovePath.h>
-#include <crateLocatorNode/getCrate.h>
-#include <gripperNode/Grip.h>
-#include <gripperNode/Release.h>
-#include <DataTypes/Point2D.h>
-
-class PickAndPlaceNode {
-public:
+ namespace PickAndPlaceNodeSettings {
 
 	/**
-	 * the constructor
-	 * @param argc use the parameters form main
-	 * @param argv use the parameters form main
-	 */
-	PickAndPlaceNode( );
-	/**
-	 * the destructor
-	 */
-	~PickAndPlaceNode( );
+	 * @var static const double ACCELERATION
+	 * The acceleration for the delta robot.
+	 **/
+	static const double ACCELERATION = 50;
 
-	/**
-	 * blocking function that contains the main loop: take frame, detect crates, send event. this function ends when ros receives a ^c
-	 */
-	void run( );
-
-	void callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg);
-	static void inputThreadMethod(PickAndPlaceNode* that);
-
-	void grabBall(DataTypes::Point2D sourceLocation, DataTypes::Point2D destinationLocation);
-
-private:
-
-	ros::NodeHandle nodeHandle;
-	std::string crateID;
-	bool updateCrateIDFlag, inputRunning, topicRunning;
-	boost::thread* inputThread;
-
-	/**
-	 * @var ros::ServiceClient deltaRobotClient
-	 * Service client to call the delta robot movetoPoint service
-	 */
-	ros::ServiceClient deltaRobotClient;
-
-	/**
-	 * @var ros::ServiceClient crateLocatorClient
-	 * Service client to call the getCrateService
-	 */
-	ros::ServiceClient crateLocatorClient;
-
-	ros::ServiceClient gripperGripClient;
-
-	ros::ServiceClient gripperReleaseClient;
-};
+}

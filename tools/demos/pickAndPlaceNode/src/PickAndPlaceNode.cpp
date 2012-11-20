@@ -1,5 +1,5 @@
 /**
- * @file Follow.cpp
+ * @file PickAndPlaceNode.cpp
  * @brief Listens to the crateEvent topic and guides the deltarobot
  * @date Created: 2012-10-30
  *
@@ -30,30 +30,70 @@
  **/
 
 #include <PickAndPlaceNode/PickAndPlaceNode.h>
+#include <PickAndPlaceNode/PickAndPlaceNodeSettings.h>
 #include <DataTypes/Crate.h>
 #include <CrateLocatorNode/Topics.h>
 #include <CrateLocatorNode/Services.h>
 #include <Vision/CrateTracker.h>
 #include <DeltaRobotNode/Services.h>
+#include <Utilities/Utilities.h>
 
 PickAndPlaceNode::PickAndPlaceNode( ) :
-		crateID(""), updateCrateIDFlag(false), inputRunning(true), topicRunning(true), deltaRobotClient(
-		        nodeHandle.serviceClient<deltaRobotNode::MoveToPoint>(DeltaRobotNodeServices::MOVE_TO_POINT)), crateLocatorClient(
-		        nodeHandle.serviceClient<crateLocatorNode::getCrate>(CrateLocatorNodeServices::GET_CRATE)) {
+		crateID(""), updateCrateIDFlag(false), inputRunning(true), topicRunning(true),
+		deltaRobotClient(nodeHandle.serviceClient<deltaRobotNode::MoveToPoint>(DeltaRobotNodeServices::MOVE_TO_POINT)),
+		crateLocatorClient(nodeHandle.serviceClient<crateLocatorNode::getCrate>(CrateLocatorNodeServices::GET_CRATE)),
+		gripperGripClient(nodeHandle.serviceClient<gripperNode::Grip>(GripperNodeServices::GRIP)),
+		gripperReleaseClient(nodeHandle.serviceClient<gripperNode::Release>(GripperNodeServices::RELEASE))
+		{
 	inputThread = new boost::thread(inputThreadMethod, this);
 
-	getCrateService.request.name = "";
-
-	moveToPointService.request.motion.x = 0;
-	moveToPointService.request.motion.y = 0;
-	moveToPointService.request.motion.z = -270;
-	moveToPointService.request.motion.maxAcceleration = 50;
+	// Z -281 voor de bal
 }
 
 PickAndPlaceNode::~PickAndPlaceNode( ) {
 	inputRunning = false;
 	topicRunning = false;
 	inputThread->interrupt();
+}
+
+/**
+ * Initial test function. Moves to a ball, grabs it, lifts it, puts it back into the crate and releases it.
+ */
+void PickAndPlaceNode::grabBall(DataTypes::Point2D sourceLocation, DataTypes::Point2D destinationLocation) {
+	deltaRobotNode::MoveToPoint moveToPointService;
+	moveToPointService.request.motion.maxAcceleration = PickAndPlaceNodeSettings::ACCELERATION;
+
+	// Move to location of the ball
+	moveToPointService.request.motion.x = sourceLocation.x;
+	moveToPointService.request.motion.y = sourceLocation.y;
+	moveToPointService.request.motion.z = -270;
+	//deltaRobotClient.call(moveToPointService);
+
+	// Move down to touch the ball
+	moveToPointService.request.motion.z = -275;
+
+	// Grab the ball by enabling the gripper and wait 200ms for the vacuum to build up.
+	gripperNode::Grip gripService;
+	gripperGripClient.call(gripService);
+	gripService.response.succeeded;
+	Utilities::sleep(200);
+
+	// Move up get the ball out of the crate
+	moveToPointService.request.motion.z = -270;
+
+	// Move to the drop point
+	moveToPointService.request.motion.x = destinationLocation.x;
+	moveToPointService.request.motion.y = destinationLocation.y;
+
+	// Move down to release the ball
+	moveToPointService.request.motion.z = -275;
+
+	// Release the ball by releasing the gripper
+	gripperNode::Release releaseService;
+	gripperReleaseClient.call(releaseService);
+
+	// Move up to get into the start position
+	moveToPointService.request.motion.z = -270;
 }
 
 /**
@@ -67,7 +107,6 @@ void PickAndPlaceNode::callback(const crateLocatorNode::CrateEventMsg::ConstPtr&
 		std::cout << "[DEBUG] New crate " << msg->crate.name << "found!" << std::endl;
 		if (updateCrateIDFlag) {
 			crateID = msg->crate.name;
-			getCrateService.request.name = crateID;
 			std::cout << "[DEBUG] Tracking new crate " << crateID << std::endl;
 			updateCrateIDFlag = false;
 		}
@@ -98,31 +137,31 @@ void PickAndPlaceNode::callback(const crateLocatorNode::CrateEventMsg::ConstPtr&
 		break;
 	case Vision::CrateEvent::type_moved:
 		std::cout << "[DEBUG] Moved crate " << msg->crate.name << std::endl;
-		/*if (crateID.compare(msg->crate.name) == 0) {
-		 std::cout << "[DEBUG] Moving to new coordinate " << msg->crate.x << "," << msg->crate.y << std::endl;
-		 moveToPointService.request.motion.x = msg->crate.x;
-		 moveToPointService.request.motion.y = msg->crate.y;
-		 deltaRobotClient.call(moveToPointService);
-		 }*/
+		if (crateID.compare(msg->crate.name) == 0) {
+			std::cout << "[DEBUG] Crate '" << msg->crate.name << "' stopped moving" << std::endl;
+			deltaRobotNode::MoveToPoint moveToPointService;
+			moveToPointService.request.motion.x = msg->crate.x;
+			moveToPointService.request.motion.y = msg->crate.y;
+			deltaRobotClient.call(moveToPointService);
+		}
 		break;
 	}
 }
 
 void PickAndPlaceNode::run( ) {
 
-	std::cout << "Welcome to the followNode. This tool will try to follow a crate that has been scanned before. :)."
-	        << std::endl << "A\tAssign crate name to tracker ID" << std::endl << "S\tStop following a crate"
-	        << std::endl << "Q\tQuit program" << std::endl << "Enter a key and press the \"Enter\" button" << std::endl;
+	std::cout << "Welcome to the followNode. This tool will try to follow a crate that has been scanned before. :)." << std::endl << "A\tAssign crate name to tracker ID" << std::endl << "S\tStop following a crate" << std::endl << "Q\tQuit program" << std::endl << "Enter a key and press the \"Enter\" button" << std::endl;
 
-	ros::Subscriber subscriber = nodeHandle.subscribe(CrateLocatorNodeTopics::CRATE_EVENT, 1000, &PickAndPlaceNode::callback,
-	        this);
+	ros::Subscriber subscriber = nodeHandle.subscribe(CrateLocatorNodeTopics::CRATE_EVENT, 1000, &PickAndPlaceNode::callback, this);
 
 	while (ros::ok() && topicRunning) {
 		ros::spinOnce();
 
-		if (crateLocatorClient.call(getCrateService)
-		        && getCrateService.response.state != DataTypes::Crate::state_non_existing) {
+		crateLocatorNode::getCrate getCrateService;
+		getCrateService.request.name = crateID;
+		if (crateLocatorClient.call(getCrateService) && getCrateService.response.state != DataTypes::Crate::state_non_existing) {
 			std::cout << getCrateService.response.crate.x << " " << getCrateService.response.crate.y << std::endl;
+			deltaRobotNode::MoveToPoint moveToPointService;
 			moveToPointService.request.motion.x = getCrateService.response.crate.x;
 			moveToPointService.request.motion.y = getCrateService.response.crate.y;
 			deltaRobotClient.call(moveToPointService);
@@ -141,7 +180,6 @@ void PickAndPlaceNode::inputThreadMethod(PickAndPlaceNode* that) {
 				that->updateCrateIDFlag = true;
 			} else if (key == 's' || key == 'S') {
 				that->crateID = "";
-				that->getCrateService.request.name = that->crateID;
 				std::cout << "[DEBUG] Deleted crateID. Stopped following." << std::endl;
 			} else if (key == 'q' || key == 'Q') {
 				that->inputRunning = false;
@@ -159,8 +197,8 @@ void PickAndPlaceNode::inputThreadMethod(PickAndPlaceNode* that) {
 
 int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "PickAndPlaceNode");
-	PickAndPlaceNode crateLocatorNode;
-	crateLocatorNode.run();
+	PickAndPlaceNode pickAndPlaceNode;
+	pickAndPlaceNode.run();
 
 	return 0;
 }

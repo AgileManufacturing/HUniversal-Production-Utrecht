@@ -11,6 +11,7 @@
   <depend package="roscpp"/>
   <depend package="deltaRobotNode"/>
   <depend package="crateLocatorNode"/>
+  <depend package="gripperNode"/>
 
 </package>
 

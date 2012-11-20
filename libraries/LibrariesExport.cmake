@@ -23,3 +23,4 @@ set(LIB_INPUT_OUTPUT_INCLUDE  "${REXOS_SOURCE_DIR}/libraries/inputOutput/include
 set(NODE_DELTA_ROBOT "${REXOS_SOURCE_DIR}/ros/deltaRobotNode/include")
 set(NODE_CRATE_LOCATOR "${REXOS_SOURCE_DIR}/ros/crateLocatorNode/include")
 set(NODE_FOLLOW "${REXOS_SOURCE_DIR}/ros/followNode/include")
+set(NODE_GRIPPER "${REXOS_SOURCE_DIR}/ros/gripperNode/include")
