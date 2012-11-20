@@ -1,3 +1,4 @@
 string json
 ---
-rexosStdMsgs/StdReturn return
+bool succeeded
+string message

@@ -22,10 +22,10 @@ rosbuild_add_executable(DeltaRobotNode src/DeltaRobotNode.cpp)
 add_dependencies(DeltaRobotNode deltaRobot)
 
 # Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
-include_directories(${LIB_DATATYPES_INCLUDE} ${LIB_DATATYPES_INCLUDE} ${LIB_UTILITIES_INCLUDE} ${LIB_DELTAROBOT_INCLUDE} ${LIB_MOTOR_INCLUDE} ${LIB_MODBUS_CONTROLLER_INCLUDE})
+include_directories(${LIB_DATATYPES_INCLUDE} ${LIB_JSON_INCLUDE} ${LIB_UTILITIES_INCLUDE} ${LIB_DELTAROBOT_INCLUDE} ${LIB_MOTOR_INCLUDE} ${LIB_MODBUS_CONTROLLER_INCLUDE} )
 
 # Link target to our libraries
-target_link_libraries(DeltaRobotNode deltaRobot modbusController motor utilities)
-
+target_link_libraries(DeltaRobotNode deltaRobot modbusController motor utilities json)
+ 
 # MUST be called after rexos_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()

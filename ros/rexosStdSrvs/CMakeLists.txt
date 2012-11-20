@@ -15,5 +15,7 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 # Initialize ROS package to be in our build system.
 rexos_rospack_init("rexosStdSrvs" false true)
 
+
+
 # MUST be called after rexos_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()

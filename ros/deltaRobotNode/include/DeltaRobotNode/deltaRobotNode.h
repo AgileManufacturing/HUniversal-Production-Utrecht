@@ -38,11 +38,16 @@
 #include "deltaRobotNode/Motion.h"
 #include "deltaRobotNode/Calibrate.h"
 
+
+#include "rexosStdSrvs/Module.h"
+
 #include <DataTypes/Point3D.h>
 #include <DeltaRobot/DeltaRobot.h>
 #include <Motor/StepperMotor.h>
 #include <DeltaRobotNode/Services.h>
+#include <DeltaRobotNode/Point.h>
 #include <rosMast/StateMachine.h>
+#include <Libjson/libjson.h>
 
 namespace deltaRobotNodeNamespace {
 	/**
@@ -58,16 +63,15 @@ namespace deltaRobotNodeNamespace {
 			int transitionStart();
 			int transitionStop();
 						
-			bool calibrate(deltaRobotNode::Calibrate::Request &req, 
-				deltaRobotNode::Calibrate::Response &res);
-			bool moveToPoint(deltaRobotNode::MoveToPoint::Request &req,
-				deltaRobotNode::MoveToPoint::Response &res);
-			bool movePath(deltaRobotNode::MovePath::Request &req,
-				deltaRobotNode::MovePath::Response &res);
-			bool moveToRelativePoint(deltaRobotNode::MoveToRelativePoint::Request &req,
-				deltaRobotNode::MoveToRelativePoint::Response &res);
-			bool moveRelativePath(deltaRobotNode::MoveRelativePath::Request &req,
-				deltaRobotNode::MoveRelativePath::Response &res);
+			bool calibrate(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+			bool moveToPoint(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+			bool movePath(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+			bool moveToRelativePoint(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+			bool moveRelativePath(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+
+			Point parsePoint(std::string json);
+			Point * parsePointArray(std::string json, int & size);
+
 		private:
 			/**
 			 * @var DeltaRobot::DeltaRobot * deltaRobot
@@ -86,35 +90,37 @@ namespace deltaRobotNodeNamespace {
 			 **/
 			ModbusController::ModbusController* modbus;
 			/**
-			 * Motor::MotorManager* motorManager
+			 * @var Motor::MotorManager* motorManager
 			 * The motor manager
 			 **/
 			Motor::MotorManager* motorManager;
 			/**
-			 * @var ros::ServiceServer moveToPointService;	
+			 * @var ros::ServiceServer moveToPointService
 			 * Service for receiving move to point commands
 			 **/
-			ros::ServiceServer moveToPointService;	
+			ros::ServiceServer moveToPointService;
 			/**
-			 * @var ros::ServiceServer movePathService;	
+			 * @var ros::ServiceServer movePathService
 			 * Service for receiving movePath commands
 			 **/			
 			ros::ServiceServer movePathService;
 			/**
-			 * @var ros::ServiceServer moveToRelativePointService;	
+			 * @var ros::ServiceServer moveToRelativePointService
 			 * Service for receiving move to relative point commands
 			 **/
 			ros::ServiceServer moveToRelativePointService;
 			/**
-			 * @var ros::ServiceServer moveRelativePathService;	
+			 * @var ros::ServiceServer moveRelativePathService
 			 * Service for receiving move relative path commands
 			 **/			
 			ros::ServiceServer moveRelativePathService;
 			/**
-			 * @var ros::ServiceServer calibrateService;	
+			 * @var ros::ServiceServer calibrateService
 			 * Service for receiving calibrate commands
 			 **/
 			ros::ServiceServer calibrateService;
+
+		
 
 	};
 }

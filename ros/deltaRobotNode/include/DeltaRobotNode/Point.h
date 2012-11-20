@@ -1,13 +1,12 @@
 /**
- * @file DeltaRobotNode/Services.h
- * @brief Names for the DeltaRobot services.
- * @date Created: 2012-10-04
+ * @file Point.h
+ * @brief Data class for point objects.
+ * @date Created: 2012-11-19
  *
- * @author Dick van der Steen
+ * @author Patrick de Wit
  *
  * @section LICENSE
  * License: newBSD
- * 
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
@@ -28,39 +27,40 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#pragma once
+#ifndef POINT_H
+#define POINT_H
 
-#include <string>
-
-namespace DeltaRobotNodeServices{
-	
-	/**
-	 * @var const std::string MOVE_TO_POINT
-	 * Name for the service in which a deltarobot moves to a specific coordinate.
-	 **/
-	const std::string MOVE_TO_POINT = "deltaRobotNode/moveToPoint";
-	
-	/**
-	 * @var const std::string MOVE_PATH
-	 * Name for the service in which a deltarobot moves along a path of specific coordinates.
-	 **/
-	const std::string MOVE_PATH = "deltaRobotNode/movePath";
-	
-	/**
-	 * @var const std::string MOVE_TO_RELATIVE_POINT
-	 * Name for the service in which a deltarobot moves to a coordinate relative to the current coordinate.
-	 **/
-	const std::string MOVE_TO_RELATIVE_POINT = "deltaRobotNode/moveToRelativePoint";
-	
-	/**
-	 * @var const std::string MOVE_RELATIVE_PATH
-	 * Name for the service in which a deltarobot moves along a path of coordinates relative to the preceding coordinate.
-	 **/
-	const std::string MOVE_RELATIVE_PATH = "deltaRobotNode/moveRelativePath";
-	
-	/**
-	 * @var const std::string CALIBRATE
-	 * Name for the service in which a deltarobot calibrates itself.
-	 **/
-	const std::string CALIBRATE = "deltaRobotNode/calibrate";
+namespace deltaRobotNodeNamespace {
+	class Point {
+	public:
+		/*
+		 * @var double x 
+		 * The x coordinate of the point
+		 **/
+		double x;
+		/*
+		 * @var double y 
+		 * The y coordinate of the point
+		 **/		
+		double y;
+		/*
+		 * @var double z
+		 * The z coordinate of the point
+		 **/
+		double z;
+		/*
+		 * @var double maxAcceleration 
+		 * The maximum accelartion 
+		 **/
+		double maxAcceleration;
+		Point() {}
+		Point(double xValue, double yValue, double zValue, double maxAccelerationValue) {
+			x = xValue;
+			y = yValue;
+			z = zValue;
+			maxAcceleration = maxAccelerationValue;
+		}
+	};
 }
+
+#endif
