@@ -28,14 +28,9 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <Libjson/libjson.h>
+
 #include <EquipletNode/EquipletNode.h>
-#include <rexosStdSrvs/Module.h>
-#include <iostream>
-#include <sstream>
-#include <cstdio>
-#include <unistd.h>
-#include <algorithm>
+
 
 /**
  * Create a new EquipletNode

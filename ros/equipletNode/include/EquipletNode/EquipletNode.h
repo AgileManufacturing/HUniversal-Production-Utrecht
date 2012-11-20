@@ -31,14 +31,24 @@
 #pragma once
 
 #include "ros/ros.h"
-#include <string>
-#include <vector>
-#include <Mast/HardwareModuleProperties.h>
-#include <blackboardCppClient/BlackboardCppClient.h>
-#include <blackboardCppClient/BlackboardSubscriber.h>
 #include "rosMast/States.h"
 #include "rosMast/State.h"
 #include "rosMast/ModuleError.h"
+
+#include <string>
+#include <vector>
+#include <iostream>
+#include <sstream>
+#include <cstdio>
+#include <unistd.h>
+#include <algorithm> 
+#include <Mast/HardwareModuleProperties.h>
+#include <blackboardCppClient/BlackboardCppClient.h>
+#include <blackboardCppClient/BlackboardSubscriber.h>
+#include <rexosStdSrvs/Module.h>
+ 
+#pragma GCC system_header
+#include <Libjson/libjson.h>
 
 /**
  * The equipletNode, will manage all modules and keep track of their states
