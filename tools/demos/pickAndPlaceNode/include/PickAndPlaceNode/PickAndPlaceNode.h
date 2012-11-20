@@ -65,7 +65,7 @@ public:
 	void callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg);
 	static void inputThreadMethod(PickAndPlaceNode* that);
 
-	void grabBall(DataTypes::Point2D sourceLocation, DataTypes::Point2D destinationLocation);
+	bool grabBall(DataTypes::Point2D sourceLocation, DataTypes::Point2D destinationLocation);
 
 private:
 

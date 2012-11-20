@@ -31,11 +31,12 @@
 
 #include <PickAndPlaceNode/PickAndPlaceNode.h>
 #include <PickAndPlaceNode/PickAndPlaceNodeSettings.h>
-#include <DataTypes/Crate.h>
 #include <CrateLocatorNode/Topics.h>
 #include <CrateLocatorNode/Services.h>
-#include <Vision/CrateTracker.h>
+#include <DataTypes/Crate.h>
 #include <DeltaRobotNode/Services.h>
+#include <Vision/CrateTracker.h>
+#include <GripperNode/Services.h>
 #include <Utilities/Utilities.h>
 
 PickAndPlaceNode::PickAndPlaceNode( ) :
@@ -59,7 +60,7 @@ PickAndPlaceNode::~PickAndPlaceNode( ) {
 /**
  * Initial test function. Moves to a ball, grabs it, lifts it, puts it back into the crate and releases it.
  */
-void PickAndPlaceNode::grabBall(DataTypes::Point2D sourceLocation, DataTypes::Point2D destinationLocation) {
+bool PickAndPlaceNode::grabBall(DataTypes::Point2D sourceLocation, DataTypes::Point2D destinationLocation) {
 	deltaRobotNode::MoveToPoint moveToPointService;
 	moveToPointService.request.motion.maxAcceleration = PickAndPlaceNodeSettings::ACCELERATION;
 
@@ -67,26 +68,40 @@ void PickAndPlaceNode::grabBall(DataTypes::Point2D sourceLocation, DataTypes::Po
 	moveToPointService.request.motion.x = sourceLocation.x;
 	moveToPointService.request.motion.y = sourceLocation.y;
 	moveToPointService.request.motion.z = -270;
-	//deltaRobotClient.call(moveToPointService);
+	deltaRobotClient.call(moveToPointService);
+
+	if(!moveToPointService.response.succeeded){
+		ROS_WARN("[PICK AND PLACE] Delta robot moveTo failed.");
+		return false;
+	}
 
 	// Move down to touch the ball
 	moveToPointService.request.motion.z = -275;
+	deltaRobotClient.call(moveToPointService);
 
 	// Grab the ball by enabling the gripper and wait 200ms for the vacuum to build up.
 	gripperNode::Grip gripService;
 	gripperGripClient.call(gripService);
-	gripService.response.succeeded;
 	Utilities::sleep(200);
 
 	// Move up get the ball out of the crate
 	moveToPointService.request.motion.z = -270;
+	deltaRobotClient.call(moveToPointService);
+
+	if(!gripService.response.succeeded){
+		// Gripper failed... stop the action for now.
+		ROS_WARN("[PICK AND PLACE] Gripper grab failed.");
+		return false;
+	}
 
 	// Move to the drop point
 	moveToPointService.request.motion.x = destinationLocation.x;
 	moveToPointService.request.motion.y = destinationLocation.y;
+	deltaRobotClient.call(moveToPointService);
 
 	// Move down to release the ball
 	moveToPointService.request.motion.z = -275;
+	deltaRobotClient.call(moveToPointService);
 
 	// Release the ball by releasing the gripper
 	gripperNode::Release releaseService;
@@ -94,6 +109,15 @@ void PickAndPlaceNode::grabBall(DataTypes::Point2D sourceLocation, DataTypes::Po
 
 	// Move up to get into the start position
 	moveToPointService.request.motion.z = -270;
+	deltaRobotClient.call(moveToPointService);
+
+	if(!releaseService.response.succeeded){
+		// Gripper failed... stop the action for now.
+		ROS_ERROR("[PICK AND PLACE] Gripper release failed.");
+		return false;
+	}
+
+	return true;
 }
 
 /**
