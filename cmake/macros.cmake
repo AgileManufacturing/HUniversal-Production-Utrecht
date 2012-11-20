@@ -24,12 +24,17 @@
  # This macro is made for our file structure, code is in <library_name>/src, 
  # headers in <library_name>/include
 ##############################################################################
-macro(rexos_add_library library_name)
+macro(rexos_add_library library_name suppress_warnings)
+	if(${suppress_warnings})
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+	endif()
 	set(library_directory ${library_name})
 	file(GLOB sources "src/*.cpp" "src/*.c")
 	add_library(${library_name} STATIC ${sources})
 	include_directories(BEFORE "include")
-endmacro(rexos_add_library)
+	
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+	endmacro(rexos_add_library)
 
 ##############################################################################
  # add_rexos_executable(<executable_name>, [<path>])
@@ -214,24 +219,37 @@ macro(rexos_add_scons_library scons_target_name)
 endmacro(rexos_add_scons_library)
 
 ##############################################################################
-# add_classpath(<path>)
+# rexos_add_classpath(<path>)
 # 
 # == Description == 
 # Sets path to the CP variable
 ##############################################################################
-macro(add_classpath path)
-  set(CP "${CP}:${path}" PARENT_SCOPE)
-endmacro(add_classpath)
+macro(rexos_add_classpath path)
+  set(CP "${CP}:${path}" CACHE STRING "" FORCE )  
+endmacro(rexos_add_classpath)
 
 ##############################################################################
-# add_classpaths(<sub_dirs>)
+# rexos_add_classpaths(<sub_dirs>)
 # 
 # == Description == 
 # Set all paths in sub_dirs to the CP variable
 ##############################################################################
-macro(add_classpaths sub_dirs)
+macro(rexos_add_classpaths sub_dirs)
 	foreach(dir ${sub_dirs})
-		message("Added dir ${CMAKE_CURRENT_SOURCE_DIR}/${dir}")
-		add_classpath(${CMAKE_CURRENT_SOURCE_DIR}/${dir}/src)
+		#message("Added dir ${CMAKE_CURRENT_SOURCE_DIR}/${dir}")
+		rexos_add_classpath(${CMAKE_CURRENT_SOURCE_DIR}/${dir})
 	endforeach(dir)
-endmacro(add_classpaths)
+endmacro(rexos_add_classpaths)
+
+##############################################################################
+# rexos_add_agents(<sub_dirs>)
+# 
+# == Description == 
+# Set all paths in sub_dirs to the CP variable
+##############################################################################
+macro(rexos_add_agents sub_dirs)
+	foreach(dir ${sub_dirs})
+		#message("Added dir ${CMAKE_CURRENT_SOURCE_DIR}/${dir}/src")
+		rexos_add_classpath(${CMAKE_CURRENT_SOURCE_DIR}/${dir}/src)
+	endforeach(dir)
+endmacro(rexos_add_agents)

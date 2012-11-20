@@ -12,4 +12,4 @@
 set(AGENTS dummyAgent)
 
 # add classpaths for all the agents
-add_classpaths("${AGENTS}")
+rexos_add_agents("${AGENTS}")

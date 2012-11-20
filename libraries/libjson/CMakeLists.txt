@@ -1,2 +1,2 @@
 # libjson # 
-rexos_add_library(json)
+rexos_add_library(json false)

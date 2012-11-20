@@ -19,25 +19,65 @@ import nl.hu.message.MessageBuilder;
 
 public class DummyAgent extends Agent 
 {
+    private BlackboardClient client = new BlackboardClient("localhost");	
+	private MessageBuilder builder = new MessageBuilder();
+	private String database = "REXOS";
+	private String topic = "instruction"; 
+	private String collection = "blackboard";
 
 	public void setup()
 	{
-		BlackboardClient client = new BlackboardClient("localhost");	
-		client.setDatabase("REXOS");	
-		client.setCollection("blackboard");
-		MessageBuilder builder = new MessageBuilder();
-		builder.add("topic", "instruction");
-		builder.add("message.destination", "DeltaRobotNode");
-		builder.add("command", "moveToPoint");
-		builder.add("message.payload.x", 5);
-		builder.add("message.payload.y", 5);
-		builder.add("message.payload.z", 5);
+		
+		builder.add("message.payload.maxAcceleration", 5);
 		try{
-		client.insert(builder.buildMessage(MessageBuilder.MessageType.GET));
+		//client.insert(builder.buildMessage(MessageBuilder.MessageType.GET));
 		}catch(Exception e){
 		    e.printStackTrace();
 		}
+		System.out.println("Send a message to this agent to move the DeltaRobotNode to relative points using content:");
+		System.out.println("x@y@z");
+		this.addBehaviour(new CyclicBehaviour()
+		{
+			@Override
+			public void action() 
+			{
+				ACLMessage message = myAgent.blockingReceive();
+				String content = message.getContent();
+				System.out.println(content);
+				String [] split = content.split("@");
+
+				if(split.length == 3)
+				{
+					try
+					{
+						client.setDatabase(database);	
+						client.setCollection(collection);
+						builder.flush();
+						builder.add("topic", topic);
+						builder.add("message.command", "moveToRelativePoint");
+						builder.add("message.destination","deltaRobotNode");				
+						builder.add("message.payload.x", Integer.parseInt(split[0]));
+						builder.add("message.payload.y", Integer.parseInt(split[1]));
+						builder.add("message.payload.z", Integer.parseInt(split[2]));
+						System.out.println(builder.buildMessage(MessageBuilder.MessageType.GET));
+					
+						client.insert(builder.buildMessage(MessageBuilder.MessageType.GET));
+					}
+					catch(Exception e){
+						System.out.println("Wrong number filled in for x,y or z value");
+					}
+				}
+				else
+				{
+					System.out.println("wrong string has been sent! please use the following syntax:");
+					System.out.println("x@y@z");
+				}
+			}
+		});
+
 	}
+
+
 
 
 }
