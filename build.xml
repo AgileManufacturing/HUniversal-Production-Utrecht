@@ -30,7 +30,6 @@
     <mkdir dir="${distdir}/dummyAgent"/>
     <javac 
       srcdir="mas/dummyAgent/src" 
-      classpath="dist/${BlackboardJavaClientLib}"
       includeantruntime="true">
     </javac>
   </target>
