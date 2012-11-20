@@ -261,6 +261,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath(rexosStdSrvs::Module::Req
 		return true;
 	}
 	res.succeeded = true;
+	delete path;
 	return res.succeeded;
 }
 
@@ -326,6 +327,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(rexosStdSrvs::Mod
 		return true;
 	}
 	res.succeeded = true;
+	delete path;
 	return res.succeeded;
 }
 
@@ -398,7 +400,7 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
  	JSONNode::const_iterator i = n.begin();
 	Point p;
 	while(i != n.end()) {
- 		// get the node name and value as a string
+ 		// get the JSON node name and value as a string
         std::string node_name = i -> name();	
 
 		if(node_name == "x") {	
@@ -439,8 +441,6 @@ deltaRobotNodeNamespace::Point* deltaRobotNodeNamespace::DeltaRobotNode::parsePo
  		path[counter++] = p;
  		++i; 
 	}
-	std::cout << path[0].x << std::endl;	
-	std::cout << path[1].x << std::endl;
 	size =  pathArray.size();;		
 	return path;
 } 
