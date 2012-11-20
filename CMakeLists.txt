@@ -37,6 +37,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 #set true for building java sources
 set(BUILD_JAVA TRUE)
 
+# Set CP variable to empty string because it still exists in CMakeCache.txt
+# TODO: find a non hackish way to handle this.
+set(CP "" CACHE STRING "" FORCE )  
+
 # Include so that JAVA can be used
 include (UseJava)
 
@@ -57,17 +61,16 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 
-
 # Recursively add CMakeLists.txt rules for all REXOS_PARTS (directories)
 add_subdirectories("${REXOS_PARTS}")
 
 if(JAVA_FOUND)
 	if(ANT_FOUND)
 		if(BUILD_JAVA)
-			message("building java using extra classpath: ${CP}")
+			rexos_add_classpath(${CMAKE_SOURCE_DIR}/dist)
 			ADD_CUSTOM_TARGET(LIBS ALL
 				${ANT_EXECUTABLE} -lib ${CP} -buildfile ${CMAKE_SOURCE_DIR}/build.xml build
-				COMMENT "Building the java libraries"
+				COMMENT "Building the java libraries with classpath: ${CP}"
 			)
 		endif()
 	endif()
