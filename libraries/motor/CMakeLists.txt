@@ -1,6 +1,6 @@
 # Motor # 
 if(${MODBUS_FOUND})
-	rexos_add_library(motor)
+	rexos_add_library(motor false)
 	add_dependencies(motor modbusController utilities)
 	include_directories(${MODBUS_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${LIB_MODBUS_CONTROLLER_INCLUDE} ${LIB_DATATYPES_INCLUDE} ${LIB_UTILITIES_INCLUDE})
 	target_link_libraries(motor ${MODBUS_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY} modbusController utilities)	

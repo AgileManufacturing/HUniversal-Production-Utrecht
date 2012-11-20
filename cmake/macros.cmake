@@ -24,12 +24,17 @@
  # This macro is made for our file structure, code is in <library_name>/src, 
  # headers in <library_name>/include
 ##############################################################################
-macro(rexos_add_library library_name)
+macro(rexos_add_library library_name suppress_warnings)
+	if(${suppress_warnings})
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+	endif()
 	set(library_directory ${library_name})
 	file(GLOB sources "src/*.cpp" "src/*.c")
 	add_library(${library_name} STATIC ${sources})
 	include_directories(BEFORE "include")
-endmacro(rexos_add_library)
+	
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+	endmacro(rexos_add_library)
 
 ##############################################################################
  # add_rexos_executable(<executable_name>, [<path>])
