@@ -28,7 +28,9 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
+#include <Libjson/libjson.h>
 #include <EquipletNode/EquipletNode.h>
+#include <rexosStdSrvs/Module.h>
 #include <iostream>
 #include <sstream>
 #include <cstdio>
@@ -66,9 +68,35 @@ void EquipletNode::blackboardReadCallback(BlackboardSubscriber::BlackboardEvent 
 			std::cout << "Received UNKNOWN event" << std::endl;
 			break;
 		case BlackboardSubscriber::ADD:
-			std::cout << "Received ADD event" << std::endl;
-			std::cout << "json string: " << json << std::endl;
-			
+			{
+				std::cout << "Received ADD event" << std::endl;
+				//std::cout << "json string: " << json << std::endl;
+				JSONNode n = libjson::parse(json);
+				JSONNode message = n["message"];
+				//JSONNode::const_iterator messageIt;
+				std::string destination = message["destination"].as_string();
+				std::cout << "Destination " << destination << std::endl;
+
+				std::string command = message["command"].as_string();
+				std::cout << "Command " << command << std::endl;
+
+				std::string payload = message["payload"].write();
+				std::cout << "Payload " << payload << std::endl;
+
+				// Create the string for the service to call
+				std::stringstream ss;
+				ss << destination;
+				ss << "/";
+				ss << command;
+				std::string serviceToCall = ss.str();
+				std::cout << "Service to call: " << serviceToCall << std::endl;
+
+				ros::NodeHandle n;
+				ros::ServiceClient client = n.serviceClient<rexosStdSrvs::Module>(serviceToCall);
+				rexosStdSrvs::Module srv;
+				srv.request.json = payload;
+				client.call(srv);
+			}
 			break;
 		case BlackboardSubscriber::UPDATE:
 			std::cout << "Received UPDATE event" << std::endl;
