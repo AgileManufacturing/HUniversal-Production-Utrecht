@@ -105,14 +105,13 @@ namespace DataTypes {
 		void draw(cv::Mat& image);
 
 	private:
-		DataTypes::Point2D center;
-
 		/**
 		 * @var std::vector<cv::Point2f> points
 		 * Fiducial points belonging to the crate.
 		 **/
 		std::vector<cv::Point2f> points;
 
+		DataTypes::Point2D center;
 		double alpha;
 	};
 }
