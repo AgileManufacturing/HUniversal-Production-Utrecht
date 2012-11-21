@@ -57,8 +57,7 @@ namespace Vision {
 		std::vector<CrateEvent> events;
 
 		// Disable all crates (mark for removal).
-		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end();
-		        ++it) {
+		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it) {
 			it->second.exists = false;
 		}
 
@@ -69,8 +68,7 @@ namespace Vision {
 				newCrate.exists = true;
 				newCrate.oldSituation = false;
 				newCrate.newSituation = true;
-				// TODO: hacked to true to determine behavior when framesLeft/stableFrames is irrelevant
-				newCrate.stable = true;
+				newCrate.stable = false;
 				newCrate.framesLeft = stableFrames;
 
 				knownCrates.insert(std::pair<std::string, DataTypes::Crate>(it->name, newCrate));
@@ -83,8 +81,7 @@ namespace Vision {
 				if (hasChanged(crate, (*it))) {
 					if (crate.stable) {
 						//crate began to move as old state was stable. Push moving event
-						cv::RotatedRect crateRect = it->rect();
-						events.push_back(CrateEvent(CrateEvent::type_moving, crate.name, crateRect.center.x, crateRect.center.y, crateRect.angle));
+						events.push_back(CrateEvent(CrateEvent::type_moving, crate.name, it->getCenter().x, it->getCenter().y, it->getAngle()));
 					}
 
 					//reset timer
@@ -104,18 +101,14 @@ namespace Vision {
 						//add event
 						if (crate.oldSituation) {
 							//crate moved
-							events.push_back(
-							        CrateEvent(CrateEvent::type_moved, crate.name, crate.rect().center.x,
-							                crate.rect().center.y, crate.rect().angle));
+							events.push_back(CrateEvent(CrateEvent::type_moved, crate.name, it->getCenter().x, it->getCenter().y, it->getAngle()));
 							//store new location in knownCrates
 							std::vector<cv::Point2f> tempPoints = it->getPoints();
 							crate.setPoints(tempPoints);
 							crate.newSituation = true;
 						} else if (!crate.oldSituation && crate.newSituation) {
 							//crate entered
-							events.push_back(
-							        CrateEvent(CrateEvent::type_in, crate.name, crate.rect().center.x,
-							                crate.rect().center.y, crate.rect().angle));
+							events.push_back(CrateEvent(CrateEvent::type_in, crate.name, it->getCenter().x, it->getCenter().y, it->getAngle()));
 							crate.oldSituation = true;
 						}
 					}
@@ -134,8 +127,7 @@ namespace Vision {
 	void CrateTracker::removeUntrackedCrates(std::vector<CrateEvent> &events) {
 		// Remove all crate that were not found in the update loop. These have been marked as non existing.
 		std::vector<std::string> cratesToBeRemoved;
-		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end();
-		        ++it) {
+		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it) {
 			if (!it->second.exists) {
 				DataTypes::Crate& crate = it->second;
 				if (crate.stable) {
@@ -193,8 +185,7 @@ namespace Vision {
 	 **/
 	std::vector<DataTypes::Crate> CrateTracker::getAllCrates( ) {
 		std::vector<DataTypes::Crate> allCrates;
-		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end();
-		        ++it) {
+		for (std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it) {
 			if (it->second.getState() != DataTypes::Crate::state_non_existing) {
 				allCrates.push_back(it->second);
 			}
