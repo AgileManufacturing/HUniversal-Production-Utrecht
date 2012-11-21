@@ -67,38 +67,38 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 	ROS_INFO("Configuring Modbus...");
 
 	// Initialize modbus for IO controller
-    modbus_t *modbusIO = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
-    if(modbusIO == NULL) {
-        throw std::runtime_error("Unable to allocate libmodbus context");
-    }
-    /*if(modbus_connect(modbusIO) == -1) {
-   		throw std::runtime_error("Modbus connection to IO controller failed");
-    } */
-    assert(modbusIO != NULL);
+	modbus_t *modbusIO = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
+	if(modbusIO == NULL) {
+		throw std::runtime_error("Unable to allocate libmodbus context");
+	}
+	/*if(modbus_connect(modbusIO) == -1) {
+		throw std::runtime_error("Modbus connection to IO controller failed");
+	} */
+	assert(modbusIO != NULL);
 
-    DataTypes::DeltaRobotMeasures drm;
-    drm.base = DeltaRobot::Measures::BASE;
-    drm.hip = DeltaRobot::Measures::HIP;
-    drm.effector = DeltaRobot::Measures::EFFECTOR;
-    drm.ankle = DeltaRobot::Measures::ANKLE;
-    drm.maxAngleHipAnkle = DeltaRobot::Measures::HIP_ANKLE_ANGLE_MAX;
+	DataTypes::DeltaRobotMeasures drm;
+	drm.base = DeltaRobot::Measures::BASE;
+	drm.hip = DeltaRobot::Measures::HIP;
+	drm.effector = DeltaRobot::Measures::EFFECTOR;
+	drm.ankle = DeltaRobot::Measures::ANKLE;
+	drm.maxAngleHipAnkle = DeltaRobot::Measures::HIP_ANKLE_ANGLE_MAX;
 
-    modbus = new ModbusController::ModbusController(modbus_new_rtu(
-        "/dev/ttyS0",
-        Motor::CRD514KD::RtuConfig::BAUDRATE,
-        Motor::CRD514KD::RtuConfig::PARITY,
-        Motor::CRD514KD::RtuConfig::DATA_BITS,
-        Motor::CRD514KD::RtuConfig::STOP_BITS));
+	modbus = new ModbusController::ModbusController(modbus_new_rtu(
+		"/dev/ttyS0",
+		Motor::CRD514KD::RtuConfig::BAUDRATE,
+		Motor::CRD514KD::RtuConfig::PARITY,
+		Motor::CRD514KD::RtuConfig::DATA_BITS,
+		Motor::CRD514KD::RtuConfig::STOP_BITS));
 
-    //Motors is declared in the header file, size = 3
-    motors[0] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_0, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
-    motors[1] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_1, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
-    motors[2] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_2, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
+	//Motors is declared in the header file, size = 3
+	motors[0] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_0, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
+	motors[1] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_1, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
+	motors[2] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_2, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
 
-    motorManager = new Motor::MotorManager(modbus, motors, 3);
+	motorManager = new Motor::MotorManager(modbus, motors, 3);
 
 	// Create a deltarobot
-    deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO);
+	deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO);
 }
 
 deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
@@ -123,12 +123,12 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate(rexosStdSrvs::Module::Re
 		res.message = "Cannot calibrate, mast state=" + std::string(rosMast::state_txt[getState()]);
 		return true;
 	}
-    // Calibrate the motors
-    if(!deltaRobot->calibrateMotors()) {
-    	ROS_ERROR("Calibration FAILED. EXITING.");
-    	res.message = "Calibration FAILED. EXITING.";
-    }
-    res.succeeded = true;
+	// Calibrate the motors
+	if(!deltaRobot->calibrateMotors()) {
+		ROS_ERROR("Calibration FAILED. EXITING.");
+		res.message = "Calibration FAILED. EXITING.";
+	}
+	res.succeeded = true;
 	return true;
 }
 
@@ -210,7 +210,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(rexosStdSrvs::
 		return true;
 	}
 
-    res.succeeded = true;
+	res.succeeded = true;
 	return res.succeeded;
 }
 
@@ -273,7 +273,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath(rexosStdSrvs::Module::Req
  **/
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res) {
 	ROS_INFO("moveRelativePathNew called");
-    res.succeeded = false;
+	res.succeeded = false;
 	if(getState() != rosMast::normal) {
 		res.message = "Cannot move to relative path, mast state=" + std::string(rosMast::state_txt[getState()]);
 		return true;
@@ -335,15 +335,15 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 	ROS_INFO("Setup transition called");
 	setState(rosMast::setup);
 
-    // Generate the effector boundaries with voxel size 2
-    deltaRobot->generateBoundaries(2);
+	// Generate the effector boundaries with voxel size 2
+	deltaRobot->generateBoundaries(2);
 	// Power on the deltarobot and calibrate the motors.
-    deltaRobot->powerOn();
-    // Calibrate the motors
-    if(!deltaRobot->calibrateMotors()) {
-    	ROS_ERROR("Calibration FAILED. EXITING.");
-    	return 1;
-    } 
+	deltaRobot->powerOn();
+	// Calibrate the motors
+	if(!deltaRobot->calibrateMotors()) {
+		ROS_ERROR("Calibration FAILED. EXITING.");
+		return 1;
+	} 
 	return 0;
 }
 
@@ -397,7 +397,7 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
 	Point p;
 	while(i != n.end()) {
  		// get the JSON node name and value as a string
-        std::string node_name = i->name();
+		std::string node_name = i->name();
 
 		if(node_name == "x") {
 			p.x = i->as_int();
@@ -435,7 +435,7 @@ deltaRobotNodeNamespace::Point* deltaRobotNodeNamespace::DeltaRobotNode::parsePo
  		++i;
 	}
 
-	size =  pathArray.size();
+	size = pathArray.size();
 	ROS_INFO("The size of the array %d", size);
 	for(int i = 0; i < (int)size; i++) {
 		ROS_INFO("X value of item %d in array on position %d", (int)path[0].x, size);
@@ -451,9 +451,9 @@ int main(int argc, char **argv) {
 	int moduleID = 0;
 
 	if(argc < 3 || !(Utilities::stringToInt(equipletID, argv[1]) == 0 && Utilities::stringToInt(moduleID, argv[2]) == 0)) { 	 	
-    	ROS_INFO("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
-    	return -1;
-  	}
+		ROS_INFO("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
+		return -1;
+	}
 
 	ros::init(argc, argv, NODE_NAME);
 	
@@ -462,6 +462,6 @@ int main(int argc, char **argv) {
 	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID);
 
 	ROS_INFO("Running StateEngine");
-    drn.startStateMachine();
+	drn.startStateMachine();
 	return 0;
 }
