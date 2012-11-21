@@ -28,7 +28,7 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-
+ 
 #include <PickAndPlaceNode/PickAndPlaceNode.h>
 #include <PickAndPlaceNode/PickAndPlaceNodeSettings.h>
 #include <CrateLocatorNode/Topics.h>
@@ -76,7 +76,7 @@ bool PickAndPlaceNode::grabBall(DataTypes::Point2D sourceLocation, DataTypes::Po
 	}
 
 	// Move down to touch the ball
-	moveToPointService.request.motion.z = -275;
+	moveToPointService.request.motion.z = -281;
 	deltaRobotClient.call(moveToPointService);
 
 	// Grab the ball by enabling the gripper and wait 200ms for the vacuum to build up.
@@ -85,7 +85,7 @@ bool PickAndPlaceNode::grabBall(DataTypes::Point2D sourceLocation, DataTypes::Po
 	Utilities::sleep(200);
 
 	// Move up get the ball out of the crate
-	moveToPointService.request.motion.z = -270;
+	moveToPointService.request.motion.z = -260;
 	deltaRobotClient.call(moveToPointService);
 
 	if(!gripService.response.succeeded){
@@ -178,7 +178,12 @@ void PickAndPlaceNode::run( ) {
 
 	ros::Subscriber subscriber = nodeHandle.subscribe(CrateLocatorNodeTopics::CRATE_EVENT, 1000, &PickAndPlaceNode::callback, this);
 
-	while (ros::ok() && topicRunning) {
+	DataTypes::Point2D sourceLocation(0.0, 0.0);
+	DataTypes::Point2D destinationLocation(30.0, 30.0);
+
+	grabBall(sourceLocation, destinationLocation);
+
+	/*while (ros::ok() && topicRunning) {
 		ros::spinOnce();
 
 		crateLocatorNode::getCrate getCrateService;
@@ -190,7 +195,7 @@ void PickAndPlaceNode::run( ) {
 			moveToPointService.request.motion.y = getCrateService.response.crate.y;
 			deltaRobotClient.call(moveToPointService);
 		}
-	}
+	}*/
 }
 
 void PickAndPlaceNode::inputThreadMethod(PickAndPlaceNode* that) {
