@@ -43,8 +43,12 @@
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
 
+#include <DataTypes/Point3D.h>
+
 #include <deltaRobotNode/MoveToPoint.h>
 #include <deltaRobotNode/MovePath.h>
+
+#include <DotMatrixPrinterNode/DotMatrixPrinterNodeSettings.h>
 
 class DotMatrixPrinterNode {
 public:
@@ -52,13 +56,7 @@ public:
 	DotMatrixPrinterNode( );
 	virtual ~DotMatrixPrinterNode( );
 
-	void drawDot(double x, double y);
-	void drawDotToPath(double x, double y);
-
-	void imageCallback(const sensor_msgs::ImageConstPtr& msg);
 	void run( );
-
-	void calibratePencilHeight();
 private:
 
 	/**
@@ -81,11 +79,6 @@ private:
 
 	ros::ServiceClient deltaRobotClient;
 	ros::ServiceClient deltaRobotPathClient;
-	/**
-	 * @var deltaRobotNode::MoveToPoint moveToPointService
-	 * Service to move the deltaRobot to a specific point.
-	 **/
-	deltaRobotNode::MoveToPoint moveToPointService;
 
 	/**
 	 * @var deltaRobotNode::MovePath movePathService
@@ -94,12 +87,16 @@ private:
 	deltaRobotNode::MovePath movePathService;
 
 	/**
-	 * @var deltaRobotNode::Motion point
+	 * @var deltaRobotNode::Motion effectorLocation
 	 * Point for the movePathService.
 	 **/
-	deltaRobotNode::Motion point;
+	DataTypes::Point3D<double> effectorLocation;
 
-	std::ofstream logFile;
+	double zDrawingSurface;
 
-	double Z_LOW, Z_HIGH;
+	void moveToStartPoint();
+	void deltaRobotMoveToPoint(double x, double y, double z, double maxAcceleration = DotMatrixPrinterNodeSettings::ACCELERATION);
+	void calibrateDrawingHeight();
+	void drawDotToPath(double x, double y);
+	void imageCallback(const sensor_msgs::ImageConstPtr& msg);
 };

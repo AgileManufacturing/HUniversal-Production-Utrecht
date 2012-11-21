@@ -33,15 +33,15 @@
 
 	/**
 	 * @var static const unsigned int DRAW_FIELD_HEIGHT
-	 * Height of the field (in millimeters) that is drawable by the deltarobot.
+	 * Height of the field in millimeters that is drawable by the deltarobot.
 	 */
-	static const unsigned int DRAW_FIELD_HEIGHT = 155;
+	static const double DRAW_FIELD_HEIGHT = 155;
 
 	/**
 	 * @var static const unsigned int DRAW_FIELD_WIDTH
-	 * Width of the field (in millimeters) that is drawable by the deltarobot.
+	 * Width of the field in millimeters that is drawable by the deltarobot.
 	 */
-	static const unsigned int DRAW_FIELD_WIDTH = 90;
+	static const double DRAW_FIELD_WIDTH = 90;
 
 	/**
 	 * @var static const double DRAW_FIELD_DOTS_PER_MM
@@ -55,20 +55,34 @@
 	static const double DRAW_FIELD_MM_PER_DOT = 1 / DRAW_FIELD_DOTS_PER_MM;
 
 	/**
-	 * @var static const double DRAW_FIELD_Z_LOW
-	 * The z position where the pen reaches the paper.
+	 * @var static const double MOVEMENT_THRESHOLD
+	 * The threshold for the distance between two consecutive drawing points, below which the effector will be raised a small amount and above which the effector will be moved a large amount.
 	 **/
-	static const double DRAW_FIELD_Z_LOW = 300;//TODO: ?
+	static const double MOVEMENT_THRESHOLD = 20;
+
 	/**
-	 * @var static const double DRAW_FIELD_Z_HIGH
-	 * The z position where the pen doesn't reach the paper, and is just safe for movement.
+	 * @var static const double ELEVATION_SMALL
+	 * The distance (in millimeters) that the effector will be raised above the drawing surface when the distance between the drawn dots is below the movement threshold.  
 	 **/
-	static const double DRAW_FIELD_Z_HIGH = 280;//TODO: ?
+	static const double ELEVATION_SMALL = 5;
+
+	/**
+	 * @var static const double ELEVATION_BIG
+	 * The distance (in millimeters) the effector will be raised above the drawing surface when the distance between the drawn dots is above the movement threshold.  
+	 **/
+	static const double ELEVATION_BIG = 20;
 
 	/**
 	 * @var static const double ACCELERATION
 	 * The acceleration for the delta robot.
 	 **/
 	static const double ACCELERATION = 50;
+
+	/**
+	 * @var static const double CALIBRATION_ACCELERATION
+	 * The acceleration for the delta robot during the calibration.
+	 **/
+	static const double CALIBRATION_ACCELERATION = 50;
+	
 
 }

@@ -29,70 +29,47 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <assert.h>
 #include <DotMatrixPrinterNode/DotMatrixPrinterNode.h>
-#include <DotMatrixPrinterNode/DotMatrixPrinterNodeSettings.h>
 #include <DeltaRobotNode/Services.h>
 #include <ImageTransformationNode/Topics.h>
 #include <Utilities/Utilities.h>
 
+// @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "DotMatrixPrinterNode"
+// @endcond
 
 DotMatrixPrinterNode::DotMatrixPrinterNode( ) :
-		imageTransport(nodeHandle), deltaRobotClient(nodeHandle.serviceClient<deltaRobotNode::MoveToPoint>(DeltaRobotNodeServices::MOVE_TO_POINT)), deltaRobotPathClient(nodeHandle.serviceClient<deltaRobotNode::MovePath>(DeltaRobotNodeServices::MOVE_PATH)), Z_LOW(0), Z_HIGH(0) {
-	moveToPointService.request.motion.x = 0;
-	moveToPointService.request.motion.y = 0;
-	moveToPointService.request.motion.z = DotMatrixPrinterNodeSettings::DRAW_FIELD_Z_HIGH;
-	moveToPointService.request.motion.maxAcceleration = DotMatrixPrinterNodeSettings::ACCELERATION;
-
-	point.x = 0;
-	point.y = 0;
-	point.z = DotMatrixPrinterNodeSettings::DRAW_FIELD_Z_HIGH;
-	point.maxAcceleration = DotMatrixPrinterNodeSettings::ACCELERATION;
-}
+	imageTransport(nodeHandle), 
+	deltaRobotClient(nodeHandle.serviceClient<deltaRobotNode::MoveToPoint>(DeltaRobotNodeServices::MOVE_TO_POINT)), 
+	deltaRobotPathClient(nodeHandle.serviceClient<deltaRobotNode::MovePath>(DeltaRobotNodeServices::MOVE_PATH)), 
+	zDrawingSurface(0)
+{ }
 
 DotMatrixPrinterNode::~DotMatrixPrinterNode( ) {
 
 }
 
 /**
- * Draws a dot at coordinate x, y.
- * @param x X coordinate of the dotted pixel
- * @param y Y coordinate of the dotted pixel
+ * Moves the deltarobot to the starting position.
  **/
-void DotMatrixPrinterNode::drawDot(double x, double y) {
-	// Dotting location
-	std::cout << "[DEBUG] Next dot at: " << x << " " << y << std::endl;
+void DotMatrixPrinterNode::moveToStartPoint() {
+	effectorLocation.x = 0;
+	effectorLocation.y = 0;
+	effectorLocation.z = -196.063;
 
-	// Move to X, Y, Zhigh
+	deltaRobotMoveToPoint(effectorLocation.x, effectorLocation.y, effectorLocation.z);
+}
+
+void DotMatrixPrinterNode::deltaRobotMoveToPoint(double x, double y, double z, double maxAcceleration){
+	deltaRobotNode::MoveToPoint moveToPointService;
 	moveToPointService.request.motion.x = x;
 	moveToPointService.request.motion.y = y;
-	moveToPointService.request.motion.z = Z_HIGH;
+	moveToPointService.request.motion.z = z;
+	moveToPointService.request.motion.maxAcceleration = maxAcceleration;
+
 	deltaRobotClient.call(moveToPointService);
-
 	if (!moveToPointService.response.succeeded) {
-		std::cerr << "[ERROR] Moving to (X,Y,Z) (" << x << ", " << y << ", " << Z_HIGH << ") " << moveToPointService.response.message << std::endl;
-	}
-
-	// Move to X, Y, Zlow
-	// TODO: find the Z for drawing
-	moveToPointService.request.motion.x = x;
-	moveToPointService.request.motion.y = y;
-	moveToPointService.request.motion.z = Z_LOW;
-	deltaRobotClient.call(moveToPointService);
-
-	if (!moveToPointService.response.succeeded) {
-		std::cerr << "[ERROR] Moving to (X,Y,Z) (" << x << ", " << y << ", " << Z_HIGH << ") " << moveToPointService.response.message << std::endl;
-	}
-
-	// Move to X, Y, Zhigh
-	moveToPointService.request.motion.x = x;
-	moveToPointService.request.motion.y = y;
-	moveToPointService.request.motion.z = Z_HIGH;
-	deltaRobotClient.call(moveToPointService);
-
-	if (!moveToPointService.response.succeeded) {
-		std::cerr << "[ERROR] Moving to (X,Y,Z) (" << x << ", " << y << ", " << Z_HIGH << ") " << moveToPointService.response.message << std::endl;
+		std::cerr << "[ERROR] Moving to point (" << x << "," << y << "," << z << "," << maxAcceleration << ")" << moveToPointService.response.message << std::endl;
 	}
 }
 
@@ -102,13 +79,32 @@ void DotMatrixPrinterNode::drawDot(double x, double y) {
  * @param y Y coordinate of the dotted pixel
  **/
 void DotMatrixPrinterNode::drawDotToPath(double x, double y) {
-	point.x = x;
-	point.y = y;
-	movePathService.request.motion.push_back(point);
-	point.z = Z_LOW;
-	movePathService.request.motion.push_back(point);
-	point.z = Z_HIGH;
-	movePathService.request.motion.push_back(point);
+	DataTypes::Point3D<double> oldLocation(effectorLocation);
+
+	effectorLocation.x = x;
+	effectorLocation.y = y;
+
+	double elevation;
+	if(oldLocation.distance(effectorLocation) > DotMatrixPrinterNodeSettings::MOVEMENT_THRESHOLD){
+		elevation = DotMatrixPrinterNodeSettings::ELEVATION_BIG;
+	} else {
+		elevation = DotMatrixPrinterNodeSettings::ELEVATION_SMALL;
+	}
+
+	deltaRobotNode::Motion motion;
+	motion.maxAcceleration = DotMatrixPrinterNodeSettings::ACCELERATION;
+
+	motion.x = x;
+	motion.y = y;
+	
+	motion.z = zDrawingSurface + elevation;
+	movePathService.request.motion.push_back(motion);
+	
+	motion.z = zDrawingSurface;
+	movePathService.request.motion.push_back(motion);
+	
+	motion.z = zDrawingSurface + elevation;
+	movePathService.request.motion.push_back(motion);
 }
 
 /**
@@ -117,7 +113,6 @@ void DotMatrixPrinterNode::drawDotToPath(double x, double y) {
  * @param msg The pointer to the message that contains the camera image.
  **/
 void DotMatrixPrinterNode::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
-
 	// Receive image
 	cv_bridge::CvImagePtr cv_ptr;
 	try {
@@ -132,41 +127,37 @@ void DotMatrixPrinterNode::imageCallback(const sensor_msgs::ImageConstPtr& msg) 
 	int cols = cv_ptr->image.cols;
 	int rows = cv_ptr->image.rows;
 
-	assert(cols <= DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH * DotMatrixPrinterNodeSettings::DRAW_FIELD_DOTS_PER_MM);
-	assert(rows <= DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT * DotMatrixPrinterNodeSettings::DRAW_FIELD_DOTS_PER_MM);
+	if(cols > DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH * DotMatrixPrinterNodeSettings::DRAW_FIELD_DOTS_PER_MM 
+		|| rows > DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT * DotMatrixPrinterNodeSettings::DRAW_FIELD_DOTS_PER_MM){
+		throw std::out_of_range("Invalid image size");
+	}
 
-	// Calculate X,Y by converting X,Y in pixels to X,Y in mm
-	// ===========
-	// =+--------=  + = Startpoint of the drawing (0,0)
-	// =--o------=	x = endpoint of the drawing
-	// =----x----=  x = Startpoint of deltarobot (0,0)
-	// =---------=	o = Offset starting point of the deltaRobot (drawX, drawY)
-	// =---------=
-	// ===========
+	// Calculate offsets
 	double offsetX = -(cols * DotMatrixPrinterNodeSettings::DRAW_FIELD_MM_PER_DOT / 2);
 	double offsetY = rows  * DotMatrixPrinterNodeSettings::DRAW_FIELD_MM_PER_DOT / 2;
 
+	moveToStartPoint();
+
 	// Clear the old path.
 	movePathService.request.motion.clear();
-	point.z = Z_HIGH;
 
-	double drawX, drawY;
+	double dotX, dotY;
 
 	// moves left to right, right to left
 	for(int row = 0; row < rows; row++){
-		drawY = (-row + offsetY) * DotMatrixPrinterNodeSettings::DRAW_FIELD_MM_PER_DOT;
+		dotY = (-row + offsetY) * DotMatrixPrinterNodeSettings::DRAW_FIELD_MM_PER_DOT;
 		if(row % 2 == 0){
 			for(int col = 0; col < cols; col++){
 				if (cv_ptr->image.data[row * cols + col] == 0) {
-					drawX = (col + offsetX) * DotMatrixPrinterNodeSettings::DRAW_FIELD_MM_PER_DOT;
-					drawDotToPath(drawX, drawY);
+					dotX = (col + offsetX) * DotMatrixPrinterNodeSettings::DRAW_FIELD_MM_PER_DOT;
+					drawDotToPath(dotX, dotY);
 				}
 			}
 		} else {
 			for(int col = cols - 1; col >= 0; col--){
 				if (cv_ptr->image.data[row * cols + col] == 0) {
-					drawX = (col + offsetX) * DotMatrixPrinterNodeSettings::DRAW_FIELD_MM_PER_DOT;
-					drawDotToPath(drawX, drawY);
+					dotX = (col + offsetX) * DotMatrixPrinterNodeSettings::DRAW_FIELD_MM_PER_DOT;
+					drawDotToPath(dotX, dotY);
 				}
 			}
 		}
@@ -174,104 +165,92 @@ void DotMatrixPrinterNode::imageCallback(const sensor_msgs::ImageConstPtr& msg) 
 
 	Utilities::StopWatch stopwatch("PathTimer", true);
 	movePathService.response.message = "";
-	deltaRobotPathClient.call(movePathService); //path drawing
+	deltaRobotPathClient.call(movePathService);
 	if (movePathService.response.message.compare("") != 0) {
 		std::cout << "[ERROR]" << movePathService.response.message << std::endl;
 	}
 	stopwatch.stopAndPrint(stdout);
 
-	// Move back to its starting point.
-	moveToPointService.request.motion.x = 0;
-	moveToPointService.request.motion.y = 0;
-	moveToPointService.request.motion.z = -196.063;
-	deltaRobotClient.call(moveToPointService);
+	moveToStartPoint();
 }
 
-void DotMatrixPrinterNode::calibratePencilHeight(){
-
-	point.maxAcceleration = 2.5;
+void DotMatrixPrinterNode::calibrateDrawingHeight(){
+	moveToStartPoint();
 	
-	bool lowCalibrated = false;
+	enum CalibrationStep{
+		PICK_COORDINATE = 0,
+		TEST_CENTER = 1,
+		TEST_CORNERS = 2
+	};
 
-	while(ros::ok() && !lowCalibrated){
-		std::string input;
+	CalibrationStep step = PICK_COORDINATE;
+	bool calibrated = false;
 
-		std::cout << "Calibrating pencil Z-axis. Enter desired coordinate:" << std::endl;
-		std::cin >> input;
+	while(ros::ok() && !calibrated){
+		switch(step) {
+			case PICK_COORDINATE: 
+			{
+				std::cout << "Calibrating pencil Z-axis. Enter desired coordinate:" << std::endl;
+				std::string input;
+				std::cin >> input;
+				
+				zDrawingSurface = Utilities::stringToDouble(input);
 
-		
-		Z_LOW = Utilities::stringToDouble(input);
-		Z_HIGH = Z_LOW + 10;
-
-
-		while(ros::ok()){
-			std::cout << "Trying " << Z_LOW << std::endl;
-
-			movePathService.request.motion.clear();
-			point.z = Z_HIGH;
-			drawDotToPath(0,0);
-			deltaRobotPathClient.call(movePathService);
-
-			if (movePathService.response.message.compare("") != 0) {
-				std::cout << "[ERROR]" << movePathService.response.message << std::endl;
+				step = TEST_CENTER;
 				break;
 			}
+			case TEST_CENTER:
+			{		
+				std::cout << "Testing center: " << zDrawingSurface << std::endl;
 
-			char correct;
+				deltaRobotMoveToPoint(0, 0, zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
+				deltaRobotMoveToPoint(0, 0, zDrawingSurface, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
+				deltaRobotMoveToPoint(0, 0, zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
 
-			std::cout << "Enter R to repeat current, Y to accept, or anything else to try a new coordinate." << std::endl;
-			std::cin >> correct;
+				std::cout << "Enter R to repeat current, Y to accept, or anything else to try a new coordinate:" << std::endl;
+				std::string input;
+				std::cin >> input;
 
-			if(correct == 'R' || correct == 'r'){
-				continue;
-			} else if(correct == 'Y' || correct == 'y'){
-				Z_HIGH = Z_LOW + 10;
-				lowCalibrated = true;
-			}
-			break;
-		}
-	}
-
-	bool highCalibrated = false;
-
-	while(ros::ok() && !highCalibrated){
-		std::string offset = "";
-		std::cout << "Testing top height. Enter desired offset." << std::endl;
-		std::cin >> offset;
-
-		Z_HIGH = Z_LOW + Utilities::stringToDouble(offset);
-		
-		while(ros::ok()){
-			std::cout << "Trying " << Z_HIGH << std::endl;
-			
-			movePathService.request.motion.clear();
-			
-			point.z = Z_HIGH;
-			
-			drawDotToPath(DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2, DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2);
-			drawDotToPath(-DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2, -DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2);
-			
-			deltaRobotPathClient.call(movePathService);
-			
-			if (movePathService.response.message.compare("") != 0) {
-				std::cout << "[ERROR]" << movePathService.response.message << std::endl;
+				if(input[0] == 'Y' || input[0] == 'y'){
+					step = TEST_CORNERS;
+				} else if(!(input[0] == 'R' || input[0] == 'r')){
+					step = PICK_COORDINATE;
+				}
 				break;
 			}
+			case TEST_CORNERS:
+			{
+				std::cout << "Testing corners: " << zDrawingSurface << std::endl;
+				
+				deltaRobotMoveToPoint(-((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2), -((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2), zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
+				deltaRobotMoveToPoint(-((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2), -((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2), zDrawingSurface, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
+				deltaRobotMoveToPoint(-((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2), -((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2), zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
 
-			char correct;
+				deltaRobotMoveToPoint((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2, (double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2, zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
+				deltaRobotMoveToPoint((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2, (double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2, zDrawingSurface, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
+				deltaRobotMoveToPoint((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2, (double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2, zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
 
-			std::cout << "Enter R to repeat current, Y to accept, or anything else to try a new offset." << std::endl;
-			std::cin >> correct;
+				deltaRobotMoveToPoint((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2, -((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2), zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
+				deltaRobotMoveToPoint((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2, -((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2), zDrawingSurface, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
+				deltaRobotMoveToPoint((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2, -((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2), zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
 
-			if(correct == 'R' || correct == 'r'){
-				continue;
-			} else if(correct == 'Y' || correct == 'y'){
-				highCalibrated = true;
+				deltaRobotMoveToPoint(-((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2), (double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2, zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
+				deltaRobotMoveToPoint(-((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2), (double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2, zDrawingSurface, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
+				deltaRobotMoveToPoint(-((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2), (double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2, zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
+
+				std::cout << "Enter R to repeat current, Y to accept, or anything else to try a new coordinate:" << std::endl;
+				std::string input;
+				std::cin >> input;
+
+				if(input[0] == 'Y' || input[0] == 'y'){
+					calibrated = true;
+				} else if(!(input[0] == 'R' || input[0] == 'r')) {
+					step = PICK_COORDINATE;
+				} 
+				break;
 			}
-			break;
 		}
 	}
-	point.maxAcceleration = DotMatrixPrinterNodeSettings::ACCELERATION;
 }
 
 /**
@@ -280,25 +259,13 @@ void DotMatrixPrinterNode::calibratePencilHeight(){
  * This function ends when ros receives a ^c
  **/
 void DotMatrixPrinterNode::run( ) {
+	calibrateDrawingHeight();
 
-	calibratePencilHeight();
+	moveToStartPoint();
 
-	// Z_LOW = -196.063;
-
-	// // TODO remove hacks!
-	// Z_LOW = -265.25;
-	// Z_HIGH = Z_LOW + 3;
-
-	// Move back to its starting point.
-	moveToPointService.request.motion.x = 0;
-	moveToPointService.request.motion.y = 0;
-	moveToPointService.request.motion.z = -196.063;
-	deltaRobotClient.call(moveToPointService);
-
-	imageSubscriber = imageTransport.subscribe(ImageTransformationNodeTopics::TRANSFORMED_IMAGE, 1, &DotMatrixPrinterNode::imageCallback, this);//, image_transport::TransportHints("compressed"));
+	imageSubscriber = imageTransport.subscribe(ImageTransformationNodeTopics::TRANSFORMED_IMAGE, 1, &DotMatrixPrinterNode::imageCallback, this);
+	std::cout << "DotMatrixPrinter started. Waiting for image on " << ImageTransformationNodeTopics::TRANSFORMED_IMAGE << std::endl;
 	
-		std::cout << "DotMatrixPrinter started. Waiting for image on " << ImageTransformationNodeTopics::TRANSFORMED_IMAGE << std::endl;
-
 	ros::Rate loopRate(1);
 
 	while (ros::ok()) {
@@ -308,11 +275,10 @@ void DotMatrixPrinterNode::run( ) {
 }
 
 int main(int argc, char** argv) {
-
 	ros::init(argc, argv, NODE_NAME);
 
-	DotMatrixPrinterNode dotMatrixNode;
-	dotMatrixNode.run();
+	DotMatrixPrinterNode dotMatrixPrinterNode;
+	dotMatrixPrinterNode.run();
 
 	return 0;
 }
