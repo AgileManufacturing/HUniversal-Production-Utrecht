@@ -72,7 +72,7 @@ namespace DataTypes {
 	 * @param crate The crate to be copied.
 	 **/
 	Crate::Crate(const Crate& crate) :
-			name(crate.name), oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(0), points(crate.points) {
+			name(crate.name), oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(0), points(crate.points), center(crate.center), alpha(crate.alpha) {
 	}
 
 	/**
@@ -100,8 +100,7 @@ namespace DataTypes {
 	void Crate::setPoints(const std::vector<cv::Point2f>& newPoints) {
 		points.assign(newPoints.begin(), newPoints.begin() + 4);
 		center = DataTypes::Point2D(points[0]).mean(DataTypes::Point2D(points[2]));
-		alpha = atan2(points[0].y - points[1].y, points[1].x - points[0].x);
-		std::cout << "alpha setPoints\t" << alpha << std::endl;
+		alpha = atan2(points[1].y - points[0].y, points[0].x - points[1].x);
 	}
 
 	/**
@@ -116,25 +115,23 @@ namespace DataTypes {
 		cv::circle(image, points[2], 1, cv::Scalar(0, 0, 255), 2);
 		cv::circle(image, points[3], 1, cv::Scalar(0, 255, 255), 2);
 
-		// Draw arrow
-
+		// Calculate arrow endpoints
 		cv::Point2f centerPoint = center.toCVPoint();
-		std::cout << centerPoint << std::endl;
-		cv::Point2f pt2 = (center + DataTypes::Point2D(10.5,10)).rotate(alpha).toCVPoint();
-		//cv::Point pt2(centerPoint.x - 50 * cos(alpha), centerPoint.y - 50 * sin(alpha));
+		cv::Point2f endPoint = (center + (DataTypes::Point2D(0,-30)).rotate(alpha + M_PI / 2)).toCVPoint();
 
-		std::cout << "Center " << centerPoint << " pt2 " << pt2 << std::endl;
-
-		cv::line(image, centerPoint, pt2, cv::Scalar(0, 0, 0), 2);
+		// Draw arrow
+		cv::line(image, centerPoint, endPoint, cv::Scalar(255, 0, 0), 2);
+		// Draw arrow head
 		//cv::line(image, pt2,
 		//        cv::Point(pt2.x + 10 * cos(angle + 3 * M_PI / 4.0),
 		//                pt2.y + 10 * sin(-rect.angle + 3 * M_PI / 4.0)), cv::Scalar(0, 0, 0), 2);
 		//cv::line(image, pt2,
 		//        cv::Point(pt2.x + 10 * cos(-rect.angle + M_PI / 4.0), pt2.y + 10 * sin(-rect.angle + M_PI / 4.0)),
 		//        cv::Scalar(0, 0, 0), 2);
+
 		std::stringstream ss;
 		ss << cv::saturate_cast<int>(alpha);
-		cv::putText(image, ss.str(), centerPoint - cv::Point2f(15, 0), CV_FONT_HERSHEY_SIMPLEX, .5, cv::Scalar(255, 0, 0), 2);
+		cv::putText(image, ss.str(), centerPoint - cv::Point2f(15 * ss.str().length(), 0), CV_FONT_HERSHEY_SIMPLEX, .5, cv::Scalar(255, 0, 0), 2);
 
 		if (!name.empty()) {
 			cv::putText(image, name, cv::Point(centerPoint.x, centerPoint.y - 20), CV_FONT_HERSHEY_COMPLEX, 1, cv::Scalar(0, 0, 255), 2);

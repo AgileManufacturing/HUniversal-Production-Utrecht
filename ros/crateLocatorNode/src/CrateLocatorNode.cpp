@@ -39,8 +39,7 @@
 #include <CrateLocatorNode/Services.h>
 #include <CrateLocatorNode/Topics.h>
 #include <DataTypes/Crate.h>
-
-#include <CrateLocatorNode/GridCrate4x4MiniBall.h>
+#include <DataTypes/GridCrate4x4MiniBall.h>
 
 /**
  * @var WINDOW_NAME
@@ -75,7 +74,6 @@ CrateLocatorNode::CrateLocatorNode( ) :
 
 	// Setup the QR detector
 	qrDetector = new Vision::QRCodeDetector();
-	std::cout << "Pointer " << qrDetector << std::endl;
 
 	// Setup the fiducial detector
 	fidDetector = new Vision::FiducialDetector();
@@ -371,22 +369,19 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 
 		// TODO remove
 		// Test code
+
 		GridCrate4x4MiniBall gc("Melon");
 		gc.setCrate(it->getCenter().x, it->getCenter().y, it->getAngle());
 
-		DataTypes::Point2D temp;
-		temp = cordTransformer->realToPixelCoordinate(gc.getLocation(0));
-		cv::circle(cv_ptr->image, cv::Point(temp.x, temp.y), 1, cv::Scalar(0, 255, 0), 2);
-		std::cout << "X: " << temp.x << " Y: " << temp.y << std::endl;
-		temp = cordTransformer->realToPixelCoordinate(gc.getLocation(3));
-		cv::circle(cv_ptr->image, cv::Point(temp.x, temp.y), 1, cv::Scalar(0, 255, 0), 2);
-		temp = cordTransformer->realToPixelCoordinate(gc.getLocation(12));
-		cv::circle(cv_ptr->image, cv::Point(temp.x, temp.y), 1, cv::Scalar(0, 255, 0), 2);
-		temp = cordTransformer->realToPixelCoordinate(gc.getLocation(15));
-		cv::circle(cv_ptr->image, cv::Point(temp.x, temp.y), 1, cv::Scalar(0, 255, 0), 2);
-		temp = cordTransformer->realToPixelCoordinate(gc.getLocation(11));
-		cv::circle(cv_ptr->image, cv::Point(temp.x, temp.y), 1, cv::Scalar(0, 255, 225), 2);
+		// Draw corner points
+		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(0)).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
+		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(3)).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
+		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(12)).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
+		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(15)).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
 
+		// Draw extra points
+		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(11)).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
+		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(8)).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
 	}
 
 	// Inform the crate tracker about the located crates

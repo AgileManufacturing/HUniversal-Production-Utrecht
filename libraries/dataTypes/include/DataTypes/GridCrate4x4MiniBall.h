@@ -1,5 +1,5 @@
 /**
- * @file GridCrate4x4MiniBall.cpp
+ * @file GridCrate4x4MiniBall.h
  * @brief Entity for a crate containing 4x4 mini balls
  * @date Created: 2012-11-19
  *
@@ -29,65 +29,41 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <CrateLocatorNode/GridCrate4x4MiniBall.h>
-#include <CrateLocatorNode/MiniBall.h>
-#include <CrateLocatorNode/PickAndPlaceExceptions.h>
-#include <stdexcept>
+#pragma once
 
-std::ostream & operator<<(std::ostream & os, const GridCrate4x4MiniBall & crate) {
+#include <iostream>
+#include <sstream>
+#include <DataTypes/MiniBall.h>
+#include <DataTypes/Point2D.h>
 
-	return os;
-}
-
-void GridCrate4x4MiniBall::put(size_t index, MiniBall* crateContent) {
-	if (crateContents.at(index) != NULL) {
-		throw PickAndPlaceExceptions::CrateLocationIsFullException();
+class GridCrate4x4MiniBall {
+public:
+	GridCrate4x4MiniBall(std::string name) :
+		x(0), y(0), angle(0), name(name) {
 	}
-	crateContents[index] = crateContent;
-}
-
-MiniBall* GridCrate4x4MiniBall::get(size_t index) const {
-	MiniBall* content = crateContents.at(index);
-	if (content == NULL) {
-		throw PickAndPlaceExceptions::CrateLocationIsEmptyException();
+	void setCrate(double x, double y, double angle){
+		this->x = x;
+		this->y = y;
+		this->angle = angle;
 	}
-	return content;
-}
+	void put(size_t index, MiniBall* crateContent);
+	MiniBall* get(size_t index) const;
+	const std::string& getName(void) const;
+	DataTypes::Point2D getLocation(int index) const;
+	void remove(size_t index);
+	bool isEmpty( ) const;
 
-void GridCrate4x4MiniBall::remove(size_t index) {
-	if (crateContents.at(index) == NULL) {
-		throw PickAndPlaceExceptions::CrateLocationIsEmptyException();
-	}
-	crateContents[index] = NULL;
-}
+	friend std::ostream & operator<<(std::ostream & os, const GridCrate4x4MiniBall & crate);
 
-const std::string& GridCrate4x4MiniBall::getName(void) const {
-	return name;
-}
+private:
+	static const double DISTANCE_BETWEEN_CONTAINERS = 0.5;
+	static const double RADIUS_OF_CONTAINER = 10.5;
+	static const int ROWS = 4;
+	static const int COLS = 4;
+	//static const double BOTTOM_THICKNESS = 5.3; 
 
-DataTypes::Point2D GridCrate4x4MiniBall::getLocation(int index) const {
-	if(index >= COLS * ROWS) {
-		throw std::out_of_range ("Index out of range in GridCrate4x4MiniBall");
-	}
+	double x, y, angle;
 
-	// Calculate the offset in which 
-	DataTypes::Point2D offset;
-	offset.x = (index % COLS - (COLS / 2 - 0.5)) * (DISTANCE_BETWEEN_CONTAINERS + RADIUS_OF_CONTAINER);
-	offset.y = (index / ROWS - (ROWS / 2 - 0.5)) * (DISTANCE_BETWEEN_CONTAINERS + RADIUS_OF_CONTAINER);
-
-	DataTypes::Point2D result = offset.rotate(angle);
-	result.x += x;
-	result.y += y;
-	return result;
-}
-
-// TODO: fix!
-/*bool GridCrate4x4MiniBall::isEmpty( ) const {
-	for (std::vector<MiniBall*>::iterator it = crateContents.begin(); it != crateContents.end(); ++it) {
-		if (*it != NULL) {
-			return false;
-		}
-	}
-	return true;
-}*/
-
+	std::string name;
+	std::vector<MiniBall*> crateContents;
+};

@@ -15,7 +15,7 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 rexos_rospack_init("crateLocatorNode" true true)
 
 # Add executables as documented by ROS
-rosbuild_add_executable(crateLocatorNode src/CrateLocatorNode.cpp src/GridCrate4x4MiniBall.cpp)
+rosbuild_add_executable(crateLocatorNode src/CrateLocatorNode.cpp)
 
 # Add dependencies to our libraries and other ROS packages in the same directory as this one.
 add_dependencies(crateLocatorNode vision)
