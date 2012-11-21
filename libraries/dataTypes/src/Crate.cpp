@@ -34,12 +34,14 @@
 #include "DataTypes/Crate.h"
 #include <vector>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <iostream>
 
 namespace DataTypes {
 	/**
 	 * Constructs a crate without specific location.
 	 **/
-	 Crate::Crate( ) : points(3) {
+	Crate::Crate( ) :
+			points(4) {
 	}
 
 	/**
@@ -47,7 +49,8 @@ namespace DataTypes {
 	 *
 	 * @param points The QR code points, ordering must be left-handed.
 	 **/
-	Crate::Crate(const std::vector<cv::Point2f>& points) : oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(0) {
+	Crate::Crate(const std::vector<cv::Point2f>& points) :
+			oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(0) {
 		this->setPoints(points);
 	}
 
@@ -57,7 +60,8 @@ namespace DataTypes {
 	 * @param name The crate identifier.
 	 * @param points The QR code points, ordering must be left-handed.
 	 **/
-	Crate::Crate(std::string name, const std::vector<cv::Point2f>& points) : oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(0) {
+	Crate::Crate(std::string name, const std::vector<cv::Point2f>& points) :
+			oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(0) {
 		this->setPoints(points);
 		this->name = name;
 	}
@@ -67,7 +71,8 @@ namespace DataTypes {
 	 *
 	 * @param crate The crate to be copied.
 	 **/
-	Crate::Crate(const Crate& crate) : name(crate.name), oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(0), bounds(crate.bounds), points(crate.points) {
+	Crate::Crate(const Crate& crate) :
+			name(crate.name), oldSituation(false), newSituation(true), exists(true), stable(false), framesLeft(0), points(crate.points) {
 	}
 
 	/**
@@ -77,40 +82,13 @@ namespace DataTypes {
 	}
 
 	/**
-	 * Generate a rotated bounding rectangle, RotatedRect, that represents the crate. This rectangle is cached for subsequent calls to rect().
-	 *
-	 * @return The RotatedRect bounds.
-	 **/
-	cv::RotatedRect Crate::rect( ) {
-		if (bounds.size.area() != 0.0f)
-			return bounds;
-
-		// Determine the distance between the fiducial points
-		float distance1 = sqrt(pow(points[0].x - points[1].x, 2) + pow(points[0].y - points[1].y, 2));
-		float distance2 = sqrt(pow(points[2].x - points[1].x, 2) + pow(points[2].y - points[1].y, 2));
-
-		// Distance and angle between the diagonal points
-		float length = sqrt(distance1 * distance1 + distance2 * distance2);
-
-		// Determine the center, size and angle
-		bounds.center = cv::Point2f(points[0].x + (length / 2.0) * cos(-alpha),
-		        points[0].y + (length / 2.0) * sin(-alpha));
-		bounds.size = cv::Size(distance1, distance2);
-		bounds.angle = alpha + M_PI / 4.0;
-		if (bounds.angle < -M_PI)
-			bounds.angle += 2 * M_PI;
-
-		return bounds;
-	}
-
-	/**
 	 * Get the fiducial points that represent the crate location.
 	 *
 	 * @return A copy of the fiducial points.
 	 **/
 	std::vector<cv::Point2f> Crate::getPoints( ) const {
 		std::vector<cv::Point2f> copy;
-		copy.assign(points.begin(), points.begin() + 3);
+		copy.assign(points.begin(), points.begin() + 4);
 		return copy;
 	}
 
@@ -120,10 +98,10 @@ namespace DataTypes {
 	 * @param newPoints The new QR code points.
 	 **/
 	void Crate::setPoints(const std::vector<cv::Point2f>& newPoints) {
-		alpha = atan2(points[0].y - points[2].y, points[2].x - points[0].x);
-
-		this->bounds.size = cv::Size(0, 0); // This is enough to force a regeneration
-		this->points.assign(newPoints.begin(), newPoints.begin() + 3);
+		points.assign(newPoints.begin(), newPoints.begin() + 4);
+		center = DataTypes::Point2D(points[0]).mean(DataTypes::Point2D(points[2]));
+		alpha = atan2(points[0].y - points[1].y, points[1].x - points[0].x);
+		std::cout << "alpha setPoints\t" << alpha << std::endl;
 	}
 
 	/**
@@ -136,28 +114,30 @@ namespace DataTypes {
 		cv::circle(image, points[0], 1, cv::Scalar(255, 0, 0), 2);
 		cv::circle(image, points[1], 1, cv::Scalar(0, 255, 0), 2);
 		cv::circle(image, points[2], 1, cv::Scalar(0, 0, 255), 2);
-
-		cv::RotatedRect rect = this->rect();
+		cv::circle(image, points[3], 1, cv::Scalar(0, 255, 255), 2);
 
 		// Draw arrow
-		{
-			cv::Point pt1 = rect.center;
-			cv::Point pt2(pt1.x - 50 * cos(-rect.angle + M_PI / 2.0), pt1.y - 50 * sin(-rect.angle + M_PI / 2.0));
-			cv::line(image, pt1, pt2, cv::Scalar(0, 0, 0), 2);
-			cv::line(image, pt2,
-			        cv::Point(pt2.x + 10 * cos(-rect.angle + 3 * M_PI / 4.0),
-			                pt2.y + 10 * sin(-rect.angle + 3 * M_PI / 4.0)), cv::Scalar(0, 0, 0), 2);
-			cv::line(image, pt2,
-			        cv::Point(pt2.x + 10 * cos(-rect.angle + M_PI / 4.0), pt2.y + 10 * sin(-rect.angle + M_PI / 4.0)),
-			        cv::Scalar(0, 0, 0), 2);
-			std::stringstream ss;
-			ss << cv::saturate_cast<int>(rect.angle / (M_PI / 180.0));
-			cv::putText(image, ss.str(), pt1 - cv::Point(15, 0), CV_FONT_HERSHEY_SIMPLEX, .5, cv::Scalar(255, 0, 0), 2);
-		}
+
+		cv::Point2f centerPoint = center.toCVPoint();
+		std::cout << centerPoint << std::endl;
+		cv::Point2f pt2 = (center + DataTypes::Point2D(10.5,10)).rotate(alpha).toCVPoint();
+		//cv::Point pt2(centerPoint.x - 50 * cos(alpha), centerPoint.y - 50 * sin(alpha));
+
+		std::cout << "Center " << centerPoint << " pt2 " << pt2 << std::endl;
+
+		cv::line(image, centerPoint, pt2, cv::Scalar(0, 0, 0), 2);
+		//cv::line(image, pt2,
+		//        cv::Point(pt2.x + 10 * cos(angle + 3 * M_PI / 4.0),
+		//                pt2.y + 10 * sin(-rect.angle + 3 * M_PI / 4.0)), cv::Scalar(0, 0, 0), 2);
+		//cv::line(image, pt2,
+		//        cv::Point(pt2.x + 10 * cos(-rect.angle + M_PI / 4.0), pt2.y + 10 * sin(-rect.angle + M_PI / 4.0)),
+		//        cv::Scalar(0, 0, 0), 2);
+		std::stringstream ss;
+		ss << cv::saturate_cast<int>(alpha);
+		cv::putText(image, ss.str(), centerPoint - cv::Point2f(15, 0), CV_FONT_HERSHEY_SIMPLEX, .5, cv::Scalar(255, 0, 0), 2);
 
 		if (!name.empty()) {
-			cv::putText(image, name, cv::Point(rect.center.x, rect.center.y - 20), CV_FONT_HERSHEY_COMPLEX, 1,
-			        cv::Scalar(0, 0, 255), 2);
+			cv::putText(image, name, cv::Point(centerPoint.x, centerPoint.y - 20), CV_FONT_HERSHEY_COMPLEX, 1, cv::Scalar(0, 0, 255), 2);
 		}
 	}
 
@@ -167,13 +147,13 @@ namespace DataTypes {
 	 * @return The crate_state value.
 	 **/
 	Crate::crate_state Crate::getState( ) {
-			if (oldSituation) {
-				if (stable) {
-					return state_stable;
-				} else {
-					return state_moving;
-				}
+		if (oldSituation) {
+			if (stable) {
+				return state_stable;
+			} else {
+				return state_moving;
 			}
-			return state_non_existing;
 		}
+		return state_non_existing;
+	}
 }

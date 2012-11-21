@@ -90,39 +90,23 @@ namespace DataTypes {
 
 		virtual ~Crate( );
 
-		/**
-		 * Calculate distance between two fiducial points.
-		 *
-		 * @param point1 A fiducial point.
-		 * @param point2 A fiducial point.
-		 * 
-		 * @return The distance between the two points.
-		 */
-		static inline float distance(const cv::Point2f& point1, const cv::Point2f& point2) {
-			float deltaX = point1.x - point2.x;
-			float deltaY = point1.y - point2.y;
-			return sqrt(deltaX * deltaX + deltaY * deltaY);
-		}
-
-		cv::RotatedRect rect( );
 		std::vector<cv::Point2f> getPoints( ) const;
 		void setPoints(const std::vector<cv::Point2f>& points);
-		void draw(cv::Mat& image);
 
-		crate_state getState( );
 		double getAngle( ) {
 			return alpha;
 		}
 		DataTypes::Point2D getCenter( ) {
-			return DataTypes::Point2D(bounds.center.x, bounds.center.y);
+			return center;
 		}
 
+		crate_state getState( );
+
+		void draw(cv::Mat& image);
+
 	private:
-		/**
-		 * @var cv::RotatedRect bounds
-		 * Bounding rectangle saved after calling rect().
-		 **/
-		cv::RotatedRect bounds;
+		DataTypes::Point2D center;
+
 		/**
 		 * @var std::vector<cv::Point2f> points
 		 * Fiducial points belonging to the crate.
