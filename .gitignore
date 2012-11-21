@@ -25,6 +25,9 @@ ros/rexosStdSrvs/src/rexosStdSrvs/
 tools/gripperTestNode/src/gripperTestNode/
 libraries/mongo-cxx-driver/.sconf_temp/
 build/
+libraries/blackboardJavaClient/*.jar
+.rexos-export
+
 
 # Ignore project file, cmake text file and editor temporary files
 

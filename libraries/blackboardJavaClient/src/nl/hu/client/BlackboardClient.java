@@ -17,6 +17,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoInterruptedException;
+import com.mongodb.util.JSON;
 
 public class BlackboardClient extends Thread {
 
@@ -56,8 +57,18 @@ public class BlackboardClient extends Thread {
 		} else if (database.isEmpty() || database == null) {
 			throw new Exception("No collection selected");
 		}
+		System.out.println(map);
 		mongo.getDB(database).getCollection(collection).insert(new BasicDBObject(map));
 	}
+
+	public void insertJson(String json) throws Exception {
+		if (collection.isEmpty() || collection == null) {
+			throw new Exception("No collection selected");
+		} else if (database.isEmpty() || database == null) {
+			throw new Exception("No collection selected");
+		}
+		mongo.getDB(database).getCollection(collection).insert((DBObject)JSON.parse(json));
+	}	
 	
 	public void remove(Map map) throws Exception
 	{
@@ -68,6 +79,16 @@ public class BlackboardClient extends Thread {
 		}
 		mongo.getDB(database).getCollection(collection).remove(new BasicDBObject(map));
 	}
+
+
+	public void removeJson(String json) throws Exception {
+		if (collection.isEmpty() || collection == null) {
+			throw new Exception("No collection selected");
+		} else if (database.isEmpty() || database == null) {
+			throw new Exception("No collection selected");
+		}
+		mongo.getDB(database).getCollection(collection).remove((DBObject)JSON.parse(json));
+	}	
 	
 	public ArrayList<Map> get(Map query) throws Exception
 	{
@@ -86,7 +107,23 @@ public class BlackboardClient extends Thread {
 				maps.add(obj.toMap());
 			}	
 			return maps;
+	}
+
+
+	public ArrayList<String> getJson(String json) throws Exception {
+		if (collection.isEmpty() || collection == null) {
+			throw new Exception("No collection selected");
+		} else if (database.isEmpty() || database == null) {
+			throw new Exception("No collection selected");
 		}
+		ArrayList<String> jsons  = new ArrayList<String>();
+		List<DBObject> found =  mongo.getDB(database).getCollection(collection).find((DBObject)JSON.parse(json)).toArray();
+		for (DBObject obj: found) 
+		{
+				jsons.add(obj.toString());
+		}	
+		return jsons;
+	}	
 		
 			
 	public void update(Map query, Map set, Map unset) throws Exception {
@@ -103,6 +140,23 @@ public class BlackboardClient extends Thread {
 		System.out.println(new BasicDBObject(query));
 		System.out.println(setObject);		
 		mongo.getDB(database).getCollection(collection).findAndModify(new BasicDBObject(query), setObject);
+	}
+
+
+	public void updateJson(String query, String set, String unset) throws Exception {
+		if (collection.isEmpty() || collection == null) {
+			throw new Exception("No collection selected");
+		} else if (database.isEmpty() || database == null) {
+			throw new Exception("No collection selected");
+		}
+		if(set == null){set="";}
+		if(unset == null){unset="";}	
+		BasicDBObject setObject = new BasicDBObject();
+		setObject.put("$set", (DBObject)JSON.parse(set));
+		setObject.put("$unset",(DBObject)JSON.parse(unset));
+		System.out.println(query);
+		System.out.println(setObject);		
+		mongo.getDB(database).getCollection(collection).findAndModify((DBObject)JSON.parse(query), setObject);
 	}
 	
 

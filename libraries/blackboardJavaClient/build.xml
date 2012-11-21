@@ -1,0 +1,17 @@
+<project name="REXOS" default="build">
+
+	<property name="output" value="blackboardJavaClient.jar"/>
+
+	<target name="build"> 	
+		<!-- defined in the root build.xml -->
+		 <buildjava dir="${basedir}"/>   
+		<!-- add newly build code to the classpath-->
+        <propertyreset name="classpath" value="${classpath}:${basedir}/bin"/>
+        
+	</target>
+
+	<target name="clean">
+		 <cleanjava dir="${basedir}"/>
+	</target>
+
+</project>

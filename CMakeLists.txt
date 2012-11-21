@@ -16,7 +16,7 @@
 
 ######## Configuration ##########
 
-set(REXOS_PARTS libraries ros tools mas) # TODO: Agents Libraries ROS
+set(REXOS_PARTS libraries ros tools) # TODO: Agents Libraries ROS
 
 # Note: Set buildtype with cmake -D CMAKE_BUILD_TYPE=<Debug|Release> <source>
 # It might be a smart idea to make two out-of-source build directories, 
@@ -67,10 +67,20 @@ add_subdirectories("${REXOS_PARTS}")
 if(JAVA_FOUND)
 	if(ANT_FOUND)
 		if(BUILD_JAVA)
-			rexos_add_classpath(${CMAKE_SOURCE_DIR}/dist)
-			ADD_CUSTOM_TARGET(LIBS ALL
-				${ANT_EXECUTABLE} -lib ${CP} -buildfile ${CMAKE_SOURCE_DIR}/build.xml build
-				COMMENT "Building the java libraries with classpath: ${CP}"
+
+			#rexos_add_classpath(${CMAKE_SOURCE_DIR}/dist)
+			#ADD_CUSTOM_TARGET(LIBS ALL
+			#	${ANT_EXECUTABLE} -lib ${CP} -buildfile ${CMAKE_SOURCE_DIR}/build.xml build
+			#	COMMENT "Building the java libraries with classpath: ${CP}"
+			#)
+
+			ADD_CUSTOM_TARGET(java-build ALL
+				${ANT_EXECUTABLE} -buildfile ${CMAKE_SOURCE_DIR}/build-new.xml -quiet
+				COMMENT "Building the java libraries"
+			)
+			ADD_CUSTOM_TARGET(java-clean
+				${ANT_EXECUTABLE} -buildfile ${CMAKE_SOURCE_DIR}/build-new.xml -quiet clean
+				COMMENT "Cleaning java"
 			)
 		endif()
 	endif()
