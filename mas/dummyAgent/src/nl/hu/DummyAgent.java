@@ -20,7 +20,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList; 
 import nl.hu.client.BlackboardClient;
 import nl.hu.message.MessageBuilder;
-
+import java.util.HashMap; 
 
 public class DummyAgent extends Agent 
 {
@@ -51,6 +51,23 @@ public class DummyAgent extends Agent
 			
 				Gson gson = new Gson();
 
+				ArrayList<Point> points = new ArrayList<Point>();
+				points.add(new Point(0,0,10, 50));
+				points.add(new Point(0,0,-10 , 50));
+				InstructionMessage a = new InstructionMessage("moveRelativePath", "DeltaRobotNode", "FIND_ID", null ,points);
+				BlackboardMessage mes = new BlackboardMessage(topic,a);
+				try
+				{
+					System.out.println(gson.toJson(mes));
+					client.insertJson(gson.toJson(mes));
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+					
+								
+				while(true){}
 			}
 		});
 
