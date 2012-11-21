@@ -48,7 +48,7 @@ namespace deltaRobotNodeNamespace {
 	 * the DeltaRobotNode which is a StateMachine
 	 **/
 	class DeltaRobotNode : public rosMast::StateMachine {
-		public:			
+		public:
 			DeltaRobotNode(int equipletID, int moduleID);
 			virtual ~DeltaRobotNode();
 			
@@ -64,7 +64,7 @@ namespace deltaRobotNodeNamespace {
 			bool moveRelativePath(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
 
 			Point parsePoint(std::string json);
-			Point * parsePointArray(std::string json, int & size);
+			Point *parsePointArray(std::string json, int & size);
 
 		private:
 			/**
@@ -96,7 +96,7 @@ namespace deltaRobotNodeNamespace {
 			/**
 			 * @var ros::ServiceServer movePathService
 			 * Service for receiving movePath commands
-			 **/			
+			 **/
 			ros::ServiceServer movePathService;
 			/**
 			 * @var ros::ServiceServer moveToRelativePointService
@@ -106,16 +106,13 @@ namespace deltaRobotNodeNamespace {
 			/**
 			 * @var ros::ServiceServer moveRelativePathService
 			 * Service for receiving move relative path commands
-			 **/			
+			 **/
 			ros::ServiceServer moveRelativePathService;
 			/**
 			 * @var ros::ServiceServer calibrateService
 			 * Service for receiving calibrate commands
 			 **/
 			ros::ServiceServer calibrateService;
-
-		
-
 	};
 }
 
