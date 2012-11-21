@@ -35,6 +35,7 @@
 #include <vector>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
+#include <Utilities/Utilities.h>
 
 namespace DataTypes {
 	/**
@@ -130,7 +131,7 @@ namespace DataTypes {
 		//        cv::Scalar(0, 0, 0), 2);
 
 		std::stringstream ss;
-		ss << cv::saturate_cast<int>(alpha);
+		ss << cv::saturate_cast<int>(Utilities::radiansToDegrees(alpha));
 		cv::putText(image, ss.str(), centerPoint - cv::Point2f(15 * ss.str().length(), 0), CV_FONT_HERSHEY_SIMPLEX, .5, cv::Scalar(255, 0, 0), 2);
 
 		if (!name.empty()) {
