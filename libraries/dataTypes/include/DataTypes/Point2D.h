@@ -159,5 +159,10 @@ namespace DataTypes {
 		cv::Point2f toCVPoint(){
 			return cv::Point2f(x,y);
 		}
+
+		friend std::ostream & operator<<(std::ostream & os, const Point2D & point) {
+			os << "[" << point.x << ", " << point.y << "]";
+			return os;
+		}
 	};
 }
