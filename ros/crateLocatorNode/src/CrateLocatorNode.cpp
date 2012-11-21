@@ -272,11 +272,13 @@ void CrateLocatorNode::calibrateCallback(const sensor_msgs::ImageConstPtr& msg) 
 		return;
 	}
 
+	// TODO: remove
+	/*
 	cv_ptr->image = cv::imread("/home/kbraham/Pictures/Image038195248_calibration_shot.jpg");
 	if (cv_ptr->image.data == NULL) {
 		std::cerr << "[ERROR] invalid image in calibrate callback" << std::endl;
 		exit(1);
-	}
+	}*/
 
 	// First copy the image to a gray scale image.
 	cv::Mat gray;
@@ -327,11 +329,12 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 		return;
 	}
 
-	cv_ptr->image = cv::imread("/home/kbraham/Pictures/rexos/crates/Image034546779_tekst.jpg");
+	// TODO: remove
+	/*cv_ptr->image = cv::imread("/home/kbraham/Pictures/rexos/crates/Image034546779_tekst.jpg");
 	if (cv_ptr->image.data == NULL) {
 		std::cerr << "[ERROR] invalid image in crateLocateCallback" << std::endl;
 		exit(1);
-	}
+	}*/
 
 	// First copy the image to a gray scale image.
 	cv::Mat gray;
@@ -341,7 +344,12 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 	int markerNumber = 0;
 	for (std::vector<DataTypes::Point2D>::iterator it = markers.begin(); it != markers.end(); ++it) {
 		cv::circle(cv_ptr->image, cv::Point(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)), 1, cv::Scalar(0, 0, 255), 2);
-		cv::circle(cv_ptr->image, cv::Point(cordTransformer->realToPixelCoordinate(cordTransformer->pixelToRealCoordinate(DataTypes::Point2D(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)))).x, cordTransformer->realToPixelCoordinate(cordTransformer->pixelToRealCoordinate(DataTypes::Point2D(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)))).y), 7, cv::Scalar(255, 0, 255), 1);
+
+
+
+		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(cordTransformer->pixelToRealCoordinate(DataTypes::Point2D(cv::saturate_cast<int>(it->x),cv::saturate_cast<int>(it->y)))).toCVPoint(), 7, cv::Scalar(255, 0, 255), 1);
+
+
 		std::stringstream ss;
 		ss << markerNumber;
 		cv::putText(cv_ptr->image, ss.str(), cv::Point(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)), CV_FONT_HERSHEY_SIMPLEX, .5, cv::Scalar(255, 0, 0), 2);
@@ -374,7 +382,9 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 		gc.setCrate(it->getCenter().x, it->getCenter().y, it->getAngle());
 
 		// Draw corner points
+		std::cout << "Location 1" << gc.getLocation(1) << std::endl;
 		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(0)).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
+		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(1)).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
 		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(3)).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
 		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(12)).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
 		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(15)).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
@@ -416,6 +426,9 @@ void CrateLocatorNode::run( ) {
 		ros::shutdown();
 	} else {
 		// Shutdown is not immediately exiting the program. This caused to run the these statements if they were not in the else...
+		DataTypes::Point2D pointPixel = cordTransformer->realToPixelCoordinate(DataTypes::Point2D(100,100));
+		DataTypes::Point2D pointReal = cordTransformer->pixelToRealCoordinate(pointPixel);
+		std::cout << "PointReal" << pointReal << std::endl;
 
 		std::cout << "[DEBUG] Waiting for subscription" << std::endl;
 		// subscribe example: (poorly documented on ros wiki)
