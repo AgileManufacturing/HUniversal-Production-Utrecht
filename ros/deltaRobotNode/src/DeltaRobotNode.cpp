@@ -280,7 +280,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(rexosStdSrvs::Mod
 	}
 
 	int size = 0;
-	Point *path = parsePointArray(req.json, size);
+	Point * path = parsePointArray(req.json, size);
 
 	Point currentPoint;
 	double relativeX;
@@ -423,8 +423,7 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
  **/
 deltaRobotNodeNamespace::Point* deltaRobotNodeNamespace::DeltaRobotNode::parsePointArray(std::string json, int &size) {
 	ROS_INFO("Parsing JSON Array");
-	JSONNode n = libjson::parse(json);
-	JSONNode pathArray = n["Path"];
+	JSONNode pathArray = libjson::parse(json);
 	Point *path = new Point[pathArray.size()];
 	int counter = 0;
 	
@@ -438,8 +437,9 @@ deltaRobotNodeNamespace::Point* deltaRobotNodeNamespace::DeltaRobotNode::parsePo
 	size = pathArray.size();
 	ROS_INFO("The size of the array %d", size);
 	for(int i = 0; i < (int)size; i++) {
-		ROS_INFO("X value of item %d in array on position %d", (int)path[0].x, size);
+		ROS_INFO("z value of item %d in array on position %d", (int)path[0].z, size);
 	}
+	ROS_INFO("Done parsing JSON Array");	
 	return path;
 }
 
