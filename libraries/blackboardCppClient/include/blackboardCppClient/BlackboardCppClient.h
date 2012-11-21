@@ -39,11 +39,13 @@
 #pragma GCC system_header
 #include "mongo/client/dbclient.h"
 
+/**
+ * This class represents the C++ client for the blackboard system
+ **/
 class BlackboardCppClient {
 public:
-	//typedef void (BlackboardSubscriber::*CallbackFunc)(BlackboardSubscriber::BlackboardEvent, std::map<std::string, std::string>);
 	BlackboardCppClient(const std::string &hostname, const std::string db, const std::string coll, BlackboardSubscriber *func);
-	//BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll, CallbackFunc func);
+	BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll,  BlackboardSubscriber *func);
 	virtual ~BlackboardCppClient();
 	void setDatabase(const std::string &db);
 	void setCollection(const std::string &col);
@@ -53,21 +55,25 @@ public:
 private:
 	static void run(BlackboardCppClient* client);
 	/**
+	 * @var mongo::DBClientConnection connection
 	 * The connection to the mongodb database
 	 **/
 	mongo::DBClientConnection connection;
 
 	/**
+	 * @var std::string database
 	 * The name of the database
 	 **/
 	std::string database;
 
 	/**
+	 * @var std::string collection
 	 * The name of the collection
 	 **/
 	std::string collection;
 
 	/**
+	 * @var std::map<std::string, mongo::BSONObj> subscriptions
 	 * map of the subscriptions top topics. The key is the topic name, 
 	 * A bson object is stored as value to get the messages of the subscribed topic
 	 * from the database.
@@ -75,11 +81,13 @@ private:
 	std::map<std::string, mongo::BSONObj> subscriptions;
 
 	/**
+	 * @var boost::thread *readMessageThread
 	 * Pointer to the thread that is created when there is one subscription
 	 **/
 	boost::thread *readMessageThread;
 
 	/**
+	 * @var BlackboardSubscriber *callback
 	 * Pointer to the callback function that is called by the thread in the run function
 	 **/
 	BlackboardSubscriber *callback;

@@ -108,6 +108,7 @@ class EquipletNode: BlackboardSubscriber {
 		 **/
 		std::map<int, std::pair< std::string, std::string> > modulePackageNodeMap;
 		/**
+		 * @var BlackboardCppClient  *blackboardClient
 		 * Client to read from blackboard
 		 **/
 		BlackboardCppClient  *blackboardClient;

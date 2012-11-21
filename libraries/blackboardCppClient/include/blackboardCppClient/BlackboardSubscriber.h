@@ -33,9 +33,22 @@
 
 #include <string>
 
+/**
+ * This class is an interface that provides a callback 
+ * function for the blackboard clients.
+ **/
 class BlackboardSubscriber{
 public:
+	/**
+	 * enum that defines the blackboard events
+	 **/ 
 	enum BlackboardEvent {UNKNOWN, ADD, UPDATE, REMOVE};
+	/**
+	 * Callback function that is called when something happened on the blackboard
+	 *
+	 * @param event The blackboard event occured: Message added, updated, deleted
+	 * @param json The message parsed in the json format
+	 **/
 	virtual void blackboardReadCallback(BlackboardEvent event, std::string json) = 0;
 };
 
