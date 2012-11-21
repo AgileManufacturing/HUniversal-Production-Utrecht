@@ -31,6 +31,7 @@
 
 #include <cmath>
 #include <vector>
+#include <opencv2/core/core.hpp>
 
 namespace DataTypes {
 	/**
@@ -55,6 +56,7 @@ namespace DataTypes {
 		Point2D( ) :
 				x(0), y(0) {
 		}
+
 		/**
 		 * Constructor to make a point at a specific location.
 		 * 
@@ -64,6 +66,14 @@ namespace DataTypes {
 		Point2D(double x, double y) :
 				x(x), y(y) {
 		}
+
+		/**
+		 * Constructor that converts a cv::Point2f into a DataType::Point2D
+		 */
+		Point2D(cv::Point2f point) : x(point.x), y(point.y){
+
+		}
+
 		/**
 		 * Destructor.
 		 **/
@@ -144,6 +154,10 @@ namespace DataTypes {
 		 **/
 		inline Point2D rotate(double alpha) const {
 			return Point2D(x * cos(alpha) + y * sin(alpha), x * (-sin(alpha)) + y * cos(alpha));
+		}
+
+		cv::Point2f toCVPoint(){
+			return cv::Point2f(x,y);
 		}
 	};
 }
