@@ -41,7 +41,7 @@ namespace deltaRobotNodeNamespace {
 		/*
 		 * @var double y 
 		 * The y coordinate of the point
-		 **/		
+		 **/
 		double y;
 		/*
 		 * @var double z
