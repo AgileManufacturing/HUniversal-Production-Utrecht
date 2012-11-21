@@ -40,6 +40,8 @@
 #include <CrateLocatorNode/Topics.h>
 #include <DataTypes/Crate.h>
 
+#include <CrateLocatorNode/GridCrate4x4MiniBall.h>
+
 /**
  * @var WINDOW_NAME
  * Name for the opencv image window.
@@ -73,6 +75,7 @@ CrateLocatorNode::CrateLocatorNode( ) :
 
 	// Setup the QR detector
 	qrDetector = new Vision::QRCodeDetector();
+	std::cout << "Pointer " << qrDetector << std::endl;
 
 	// Setup the fiducial detector
 	fidDetector = new Vision::FiducialDetector();
@@ -140,9 +143,9 @@ bool CrateLocatorNode::getCrate(crateLocatorNode::getCrate::Request &req, crateL
 		res.state = crate.getState();
 		crateLocatorNode::CrateMsg msg;
 		msg.name = crate.name;
-		msg.x = crate.rect().center.x;
-		msg.y = crate.rect().center.y;
-		msg.angle = crate.rect().angle;
+		msg.x = crate.getCenter().x;
+		msg.y = crate.getCenter().y;
+		msg.angle = crate.getAngle();
 		res.crate = msg;
 	} else {
 		res.state = DataTypes::Crate::state_non_existing;
@@ -170,9 +173,9 @@ bool CrateLocatorNode::getAllCrates(crateLocatorNode::getAllCrates::Request &req
 		res.states.push_back(it->getState());
 		crateLocatorNode::CrateMsg msg;
 		msg.name = it->name;
-		msg.x = it->rect().center.x;
-		msg.y = it->rect().center.y;
-		msg.angle = it->rect().angle;
+		msg.x = it->getCenter().x;
+		msg.y = it->getCenter().y;
+		msg.angle = it->getAngle();
 		res.crates.push_back(msg);
 	}
 	return true;
@@ -271,6 +274,12 @@ void CrateLocatorNode::calibrateCallback(const sensor_msgs::ImageConstPtr& msg) 
 		return;
 	}
 
+	cv_ptr->image = cv::imread("/home/kbraham/Pictures/Image038195248_calibration_shot.jpg");
+	if (cv_ptr->image.data == NULL) {
+		std::cerr << "[ERROR] invalid image in calibrate callback" << std::endl;
+		exit(1);
+	}
+
 	// First copy the image to a gray scale image.
 	cv::Mat gray;
 	cv::cvtColor(cv_ptr->image, gray, CV_BGR2GRAY);
@@ -320,17 +329,23 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 		return;
 	}
 
+	cv_ptr->image = cv::imread("/home/kbraham/Pictures/rexos/crates/Image034546779_tekst.jpg");
+	if (cv_ptr->image.data == NULL) {
+		std::cerr << "[ERROR] invalid image in crateLocateCallback" << std::endl;
+		exit(1);
+	}
+
 	// First copy the image to a gray scale image.
 	cv::Mat gray;
 	cv::cvtColor(cv_ptr->image, gray, CV_BGR2GRAY);
 
 	// Draw the calibration points for visual debugging
-int markerNumber = 0;
+	int markerNumber = 0;
 	for (std::vector<DataTypes::Point2D>::iterator it = markers.begin(); it != markers.end(); ++it) {
 		cv::circle(cv_ptr->image, cv::Point(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)), 1, cv::Scalar(0, 0, 255), 2);
 		cv::circle(cv_ptr->image, cv::Point(cordTransformer->realToPixelCoordinate(cordTransformer->pixelToRealCoordinate(DataTypes::Point2D(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)))).x, cordTransformer->realToPixelCoordinate(cordTransformer->pixelToRealCoordinate(DataTypes::Point2D(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)))).y), 7, cv::Scalar(255, 0, 255), 1);
 		std::stringstream ss;
-					ss << markerNumber;
+		ss << markerNumber;
 		cv::putText(cv_ptr->image, ss.str(), cv::Point(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)), CV_FONT_HERSHEY_SIMPLEX, .5, cv::Scalar(255, 0, 0), 2);
 		markerNumber++;
 	}
@@ -351,6 +366,27 @@ int markerNumber = 0;
 			points[n].y = coordinate.y;
 		}
 		it->setPoints(points);
+
+		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(it->getCenter()).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
+
+		// TODO remove
+		// Test code
+		GridCrate4x4MiniBall gc("Melon");
+		gc.setCrate(it->getCenter().x, it->getCenter().y, it->getAngle());
+
+		DataTypes::Point2D temp;
+		temp = cordTransformer->realToPixelCoordinate(gc.getLocation(0));
+		cv::circle(cv_ptr->image, cv::Point(temp.x, temp.y), 1, cv::Scalar(0, 255, 0), 2);
+		std::cout << "X: " << temp.x << " Y: " << temp.y << std::endl;
+		temp = cordTransformer->realToPixelCoordinate(gc.getLocation(3));
+		cv::circle(cv_ptr->image, cv::Point(temp.x, temp.y), 1, cv::Scalar(0, 255, 0), 2);
+		temp = cordTransformer->realToPixelCoordinate(gc.getLocation(12));
+		cv::circle(cv_ptr->image, cv::Point(temp.x, temp.y), 1, cv::Scalar(0, 255, 0), 2);
+		temp = cordTransformer->realToPixelCoordinate(gc.getLocation(15));
+		cv::circle(cv_ptr->image, cv::Point(temp.x, temp.y), 1, cv::Scalar(0, 255, 0), 2);
+		temp = cordTransformer->realToPixelCoordinate(gc.getLocation(11));
+		cv::circle(cv_ptr->image, cv::Point(temp.x, temp.y), 1, cv::Scalar(0, 255, 225), 2);
+
 	}
 
 	// Inform the crate tracker about the located crates
