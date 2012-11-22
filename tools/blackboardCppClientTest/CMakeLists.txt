@@ -13,7 +13,7 @@ cmake_minimum_required(VERSION 2.4.6)
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
 # Initialize ROS package to be in our build system.
-rexos_rospack_init("blackboardCppClientTest" true true)
+rexos_rospack_init("blackboardCppClientTest" false false)
 
 # Add executables as documented by ROS
 link_directories(${CMAKE_SOURCE_DIR}/libraries/mongo-cxx-driver)
