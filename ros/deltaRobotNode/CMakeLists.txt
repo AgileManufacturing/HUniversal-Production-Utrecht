@@ -12,6 +12,8 @@ cmake_minimum_required(VERSION 2.4.6)
 # Include all rosbuild macros
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
+set(ROS_BUILD_TYPE Debug)
+
 # Initialize ROS package to be in our build system.
 rexos_rospack_init("deltaRobotNode" false false)
 

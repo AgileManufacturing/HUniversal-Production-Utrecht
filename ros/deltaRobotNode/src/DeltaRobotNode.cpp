@@ -32,6 +32,8 @@
 
 #include "DeltaRobotNode/deltaRobotNode.h"
 #include "DeltaRobotNode/Point.h"
+#include <execinfo.h>
+ #include <signal.h>
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "DeltaRobotNode"
@@ -102,12 +104,12 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 }
 
 deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
+	delete deltaRobot;
 	delete motors[0];
 	delete motors[1];
 	delete motors[2];
-	delete deltaRobot;
-	delete motorManager;
 	delete modbus;
+	delete motorManager;	
 }
 
 /**
@@ -443,10 +445,24 @@ deltaRobotNodeNamespace::Point* deltaRobotNodeNamespace::DeltaRobotNode::parsePo
 	return path;
 }
 
+void handler(int sig) {
+  void *array[10];
+  size_t size;
+
+  // get void*'s for all entries on the stack
+  size = backtrace(array, 10);
+
+  // print out all the frames to stderr
+  fprintf(stderr, "Error: signal %d:\n", sig);
+  backtrace_symbols_fd(array, size, 2);
+  exit(1);
+}
+
 /** 
  * Main that creates the deltaRobotNode and starts the statemachine
  **/
 int main(int argc, char **argv) {
+ 	signal(SIGSEGV, handler); 	
 	int equipletID = 0;
 	int moduleID = 0;
 

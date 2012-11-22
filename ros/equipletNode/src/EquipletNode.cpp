@@ -53,10 +53,21 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
 	stateUpdateService = nodeHandle.advertiseService("StateUpdate_" + str, &EquipletNode::stateChanged, this);
 } 
 
+/**
+ * Destructor for the EquipletNode
+ **/
 EquipletNode::~EquipletNode() {
 	delete blackboardClient;
 }
 
+/**
+ * This function is called when a new message on the Blackboard is received,
+ * The command, destination and payload are read from the message, and the 
+ * service specified in the message is called
+ *
+ * @param event The blackboard event that occured: added, updated, deleted
+ * @param json The message parsed in the json format
+ **/
 void EquipletNode::blackboardReadCallback(BlackboardSubscriber::BlackboardEvent event, std::string json) {
 	switch(event) {
 		case BlackboardSubscriber::UNKNOWN:

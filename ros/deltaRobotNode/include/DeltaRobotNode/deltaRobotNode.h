@@ -32,6 +32,7 @@
 
 #include "ros/ros.h"
 #include "rexosStdSrvs/Module.h"
+#include "DeltaRobotNode/Point.h"
 
 #include <DataTypes/Point3D.h>
 #include <DeltaRobot/DeltaRobot.h>

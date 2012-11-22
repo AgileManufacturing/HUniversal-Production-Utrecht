@@ -38,7 +38,10 @@
 /**
  * Constructor for the BlackboardCppClient
  *
- * @param hostname the name of the host where the mongo database can be found
+ * @param hostname of the mongodb server
+ * @param db The name of the database
+ * @param coll The name of the database collection
+ * @param func The address of the callback function
  **/
 BlackboardCppClient::BlackboardCppClient(const std::string &hostname, const std::string db, const std::string coll, BlackboardSubscriber *func): database(db), collection(coll), callback(func) {
   try {
@@ -52,16 +55,20 @@ BlackboardCppClient::BlackboardCppClient(const std::string &hostname, const std:
 /**
  * Constructor for the BlackboardCppClient
  *
- * @param hostname the name of the host where the mongo database can be found
+ * @param hostname of the mongodb server
+ * @param port the port number for the mongodb server
+ * @param db The name of the database
+ * @param coll The name of the database collection
+ * @param func The address of the callback function
  **/
-/*BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll, CallbackFunc func): database(db), collection(coll), callback(func){
+BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll,  BlackboardSubscriber *func): database(db), collection(coll), callback(func){
   try {
   	connection.connect(mongo::HostAndPort(hostname, port));
   	std::cout << "connected to database" << std::endl;
   } catch( const mongo::DBException &e ) {
     std::cout << "caught " << e.what() << std::endl;
   }	
-}*/
+}
 
 /**
  * destructor for the BlackboardCppClient
@@ -129,6 +136,8 @@ void BlackboardCppClient::unsubscribe(const std::string &topic) {
 
 /**
  * Set the callback function
+ *
+ * @param func The address of the callback function
  **/
 void BlackboardCppClient::setCallback(BlackboardSubscriber *func) {
 	callback = func;
@@ -137,6 +146,7 @@ void BlackboardCppClient::setCallback(BlackboardSubscriber *func) {
 /**
  * Function is executed by all the threads to find out if there 
  * happened something for the topics subscribed to.
+ *
  * @param client The instance of the BlackboardCppClient
  **/
 void BlackboardCppClient::run(BlackboardCppClient* client) {
