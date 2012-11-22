@@ -42,7 +42,7 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
 	modulePackageNodeMap[1] = std::pair< std::string, std::string > ("deltaRobotNode", "DeltaRobotNode");
 	modulePackageNodeMap[2] = std::pair< std::string, std::string > ("gripperTestNode", "GripperTestNode");
 
-	blackboardClient = new BlackboardCppClient("localhost", "REXOS", "blackboard", this);
+	blackboardClient = new BlackboardCppClient("192.168.0.123", "REXOS", "blackboard", this);
 	blackboardClient->subscribe("instruction");
 	
 	ros::NodeHandle nodeHandle;
