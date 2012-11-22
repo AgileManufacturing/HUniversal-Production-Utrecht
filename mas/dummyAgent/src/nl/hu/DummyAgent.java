@@ -48,8 +48,13 @@ public class DummyAgent extends Agent
 			{
 				client.setDatabase(database);	
 				client.setCollection(collection);
-			
-				Gson gson = new Gson();
+				
+				for(int i = 0; i < 1000; i++) {
+					builder.add("topic", topic);
+					builder.add("message.payload.x", i);]
+				}
+
+				/*Gson gson = new Gson();
 
 				ArrayList<Point> points = new ArrayList<Point>();
 				points.add(new Point(0,0,10, 50));
@@ -64,7 +69,7 @@ public class DummyAgent extends Agent
 				catch(Exception e)
 				{
 					e.printStackTrace();
-				}
+				}*/
 					
 								
 				while(true){}

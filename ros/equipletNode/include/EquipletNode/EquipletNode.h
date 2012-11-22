@@ -46,6 +46,7 @@
 #include <blackboardCppClient/BlackboardCppClient.h>
 #include <blackboardCppClient/BlackboardSubscriber.h>
 #include <rexosStdSrvs/Module.h>
+#include <Utilities/Utilities.h>
  
 #pragma GCC system_header
 #include <Libjson/libjson.h>
@@ -67,6 +68,8 @@ class EquipletNode: BlackboardSubscriber {
 		bool stateChanged(rosMast::StateUpdate::Request &request, rosMast::StateUpdate::Response &response);
 		bool moduleError(rosMast::ErrorInModule::Request &request, rosMast::ErrorInModule::Response &response);
 		void sendStateChangeRequest(int moduleID, rosMast::StateType newState);
+		void readFromBlackboard();
+		void processMessage();
 		rosMast::StateType getModuleState(int moduleID);
 	private:
 		/**
@@ -112,4 +115,16 @@ class EquipletNode: BlackboardSubscriber {
 		 * Client to read from blackboard
 		 **/
 		BlackboardCppClient  *blackboardClient;
+		/**
+		 * @var bool messageAvailable
+		 **/
+		bool messageAvailable;
+		/**
+		 * @var boost::conditional_variable condition
+		 **/
+		boost::condition_variable cond;
+		/**
+		 * @var boost::mutex mutex
+		 **/
+		boost::mutex mutex;
 };

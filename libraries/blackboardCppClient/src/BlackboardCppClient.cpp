@@ -143,6 +143,14 @@ void BlackboardCppClient::setCallback(BlackboardSubscriber *func) {
 	callback = func;
 }
 
+std::string BlackboardCppClient::readOldestMessage() {
+	std::string name = database;
+	name.append(".");
+	name.append(collection);
+	mongo::BSONObj object = connection.findOne(name.c_str(), mongo::Query());
+	return object.jsonString();
+}
+
 /**
  * Function is executed by all the threads to find out if there 
  * happened something for the topics subscribed to.

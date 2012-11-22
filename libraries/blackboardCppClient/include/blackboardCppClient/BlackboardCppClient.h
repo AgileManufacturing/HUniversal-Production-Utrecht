@@ -52,6 +52,7 @@ public:
 	void subscribe(const std::string &topic);
 	void setCallback(BlackboardSubscriber *func);	
 	void unsubscribe(const std::string &topic);
+	std::string readOldestMessage();
 private:
 	static void run(BlackboardCppClient* client);
 	/**

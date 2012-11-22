@@ -15,8 +15,7 @@ rexos_rospack_init("equipletNode" false false)
 
 # Add executables as documented by ROS
 link_directories(${CMAKE_SOURCE_DIR}/libraries/mongo-cxx-driver)
-file(GLOB sources src/*.cpp)
-rosbuild_add_executable(EquipletNode ${sources})
+rosbuild_add_executable(EquipletNode src/EquipletNode.cpp)
 
 # Link target to our libraries
 target_link_libraries(EquipletNode utilities mongoclient boost_thread-mt boost_filesystem boost_program_options boost_system ${Boost_SYSTEM_LIBRARY} blackboardCppClient json)
