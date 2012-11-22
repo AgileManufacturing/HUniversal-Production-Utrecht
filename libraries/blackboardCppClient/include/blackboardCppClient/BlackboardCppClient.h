@@ -37,9 +37,18 @@
 #include <boost/thread.hpp>
 #include "mongo/client/dbclient.h"
 
+/** 
+ * Blackboard client that reads messages from the mongo database
+ **/
 class BlackboardCppClient {
 public:
+	/**
+	 * Enum to clarify what actions happened on the mongo
+	 **/
 	enum BlackboardEvent {UNKNOWN, ADD, UPDATE, REMOVE};
+	/**
+	 * Function pointer for callback
+	 **/
 	typedef void (*CallbackFunc)(BlackboardEvent, std::map<std::string, std::string>);
 	BlackboardCppClient(const std::string &hostname, std::string db, std::string coll, CallbackFunc func);
 	BlackboardCppClient(const std::string &hostname, int port, std::string db, std::string coll, CallbackFunc func);

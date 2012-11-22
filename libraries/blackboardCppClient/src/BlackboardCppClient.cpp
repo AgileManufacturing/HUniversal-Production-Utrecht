@@ -38,6 +38,9 @@
  * Constructor for the BlackboardCppClient
  *
  * @param hostname the name of the host where the mongo database can be found
+ * @param db the name of the database
+ * @param coll the collection you want to receive updates from
+ * @param func the callback to call when updates occur in the db
  **/
 BlackboardCppClient::BlackboardCppClient(const std::string &hostname, std::string db, std::string coll, CallbackFunc func): database(db), collection(coll), callback(func) {
   try {
@@ -52,6 +55,10 @@ BlackboardCppClient::BlackboardCppClient(const std::string &hostname, std::strin
  * Constructor for the BlackboardCppClient
  *
  * @param hostname the name of the host where the mongo database can be found
+ * @param port the port on the host where the database can be found
+ * @param db the name of the database
+ * @param coll the collection you want to receive updates from
+ * @param func the callback to call when updates occur in the db
  **/
 BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port, std::string db, std::string coll, CallbackFunc func): database(db), collection(coll), callback(func){
   try {

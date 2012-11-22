@@ -1,4 +1,4 @@
-file /home/dick/git/HUniversal-Production-Utrecht/libraries/mongo-cxx-driver/SConstruct,line 70:
+file /home/arjan/Development/HUniversal-Production-Utrecht/libraries/mongo-cxx-driver/SConstruct,line 70:
 	Configure(confdir = .sconf_temp)
 scons: Configure: Checking for C++ library boost_thread-mt... 
 scons: Configure: ".sconf_temp/conftest_0.cpp" is up to date.
