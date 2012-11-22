@@ -24,6 +24,8 @@ ros/rexosStdMsgs/src/rexosStdMsgs/
 ros/rexosStdSrvs/src/rexosStdSrvs/
 tools/gripperTestNode/src/gripperTestNode/
 libraries/mongo-cxx-driver/.sconf_temp/
+libraries/mongo-cxx-driver/.sconsign.dblite
+libraries/mongo-cxx-driver/config.log
 build/
 
 # Ignore project file, cmake text file and editor temporary files
