@@ -93,7 +93,7 @@ namespace rosMast {
 		
 		public:
 			StateMachine(int equipletID, int moduleID);		
-			~StateMachine();	
+
 			/**
 			 * Transition from Safe to Standby
 			 * @return 0 if everything when succesfull
