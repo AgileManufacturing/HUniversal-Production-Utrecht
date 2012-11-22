@@ -61,14 +61,14 @@ BlackboardCppClient::BlackboardCppClient(const std::string &hostname, const std:
  * @param coll The name of the database collection
  * @param func The address of the callback function
  **/
-BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll,  BlackboardSubscriber *func): database(db), collection(coll), callback(func){
+/*BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll,  BlackboardSubscriber *func): database(db), collection(coll), callback(func){
   try {
   	connection.connect(mongo::HostAndPort(hostname, port));
   	std::cout << "connected to database" << std::endl;
   } catch( const mongo::DBException &e ) {
     std::cout << "caught " << e.what() << std::endl;
   }	
-}
+}*/
 
 /**
  * destructor for the BlackboardCppClient
@@ -158,6 +158,7 @@ std::string BlackboardCppClient::readOldestMessage() {
  * @param client The instance of the BlackboardCppClient
  **/
 void BlackboardCppClient::run(BlackboardCppClient* client) {
+	std::cout << "Blackboard client run called" << std::endl;
 	// Create namespace string
 	std::string name = client->database;
 	name.append(".");
@@ -178,6 +179,7 @@ void BlackboardCppClient::run(BlackboardCppClient* client) {
 				}
 				continue;
 			}
+			std::cout << "More messages" << std::endl;
 			mongo::BSONObj addedObject = tailedCursor->next();
 			mongo::BSONElement out;
 			if(addedObject.hasField("o")) {
@@ -201,6 +203,7 @@ void BlackboardCppClient::run(BlackboardCppClient* client) {
 			/* If the message is not empty, it means something has changed on the topics
 				subscribed to */
 			if(!message.isEmpty()) {
+				std::cout << "message not empty" << std::endl;
 				BlackboardSubscriber::BlackboardEvent event = BlackboardSubscriber::UNKNOWN;
 				if(operation.compare("i") == 0) {
 					event = BlackboardSubscriber::ADD;

@@ -42,8 +42,10 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
 	modulePackageNodeMap[1] = std::pair< std::string, std::string > ("deltaRobotNode", "DeltaRobotNode");
 	modulePackageNodeMap[2] = std::pair< std::string, std::string > ("gripperTestNode", "GripperTestNode");
 
-	blackboardClient = new BlackboardCppClient("192.168.0.123", "REXOS", "blackboard", this);
+	blackboardClient = new BlackboardCppClient("localhost", "REXOS", "blackboard", this);
 	blackboardClient->subscribe("instruction");
+
+	std::cout << "Connected!" << std::endl;
 	
 	ros::NodeHandle nodeHandle;
 	std::stringstream stringStream;
@@ -51,6 +53,8 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
 	std::string str = stringStream.str();
 	moduleErrorService = nodeHandle.advertiseService("ModuleError_" + str, &EquipletNode::moduleError, this); 
 	stateUpdateService = nodeHandle.advertiseService("StateUpdate_" + str, &EquipletNode::stateChanged, this);
+
+	messageAvailable = false;
 } 
 
 /**
@@ -77,7 +81,9 @@ void EquipletNode::blackboardReadCallback(BlackboardSubscriber::BlackboardEvent 
 			{
 				std::cout << "Received ADD event" << std::endl;
 				//std::cout << "json string: " << json << std::endl;
-				
+				 boost::lock_guard<boost::mutex> lock(mutex);
+				 messageAvailable = true;
+				 cond.notify_one();
 			}
 			break;
 		case BlackboardSubscriber::UPDATE:
@@ -308,6 +314,7 @@ bool EquipletNode::updateModuleState(int moduleID, rosMast::StateType state) {
 }
 
 void EquipletNode::processMessage() {
+	std::cout << "processMessage" << std::endl;
 	std::string json = blackboardClient->readOldestMessage();
 	JSONNode n = libjson::parse(json);
 	JSONNode message = n["message"];
@@ -337,12 +344,14 @@ void EquipletNode::processMessage() {
 }
 
 void EquipletNode::readFromBlackboard() {
+	std::cout << "readFromBlackboard" << std::endl;
 	while(true){
 		boost::unique_lock<boost::mutex> lock(mutex);
 		while(!messageAvailable) {
 			cond.wait(lock);
 		}
 		processMessage();
+		ros::spinOnce();
 	}
 }
 
@@ -367,16 +376,17 @@ int main(int argc, char **argv) {
 
 	// Add some hardware modules to this equiplet
 	// This should change to modules being created in the Node itself after commands on blackboard
-	Mast::HardwareModuleProperties deltaRobot(1, 1, rosMast::safe, true, true);
+	//Mast::HardwareModuleProperties deltaRobot(1, 1, rosMast::safe, true, true);
 	//Mast::HardwareModuleProperties gripper(2, 2, rosMast::safe, true, true);
-	equipletNode.addHardwareModule(deltaRobot);
+	//equipletNode.addHardwareModule(deltaRobot);
 	//equipletNode->sendStateChangeRequest(1, rosMast::standby);
 	//equipletNode->sendStateChangeRequest(1, rosMast::normal);
 	//std::cout << "DeltaRobot State: " << equipletNode->getModuleState(1);
 	//equipletNode->addHardwareModule(gripper);
 	
 	// print the hardware modules that are currently added to the Equiplet
-	equipletNode.printHardwareModules();
+	//equipletNode.printHardwareModules();
+	sleep(10);
 	equipletNode.readFromBlackboard();
 
 	/*ros::Rate poll_rate(10);

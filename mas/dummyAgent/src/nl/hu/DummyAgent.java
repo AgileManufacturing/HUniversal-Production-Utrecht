@@ -48,28 +48,24 @@ public class DummyAgent extends Agent
 			{
 				client.setDatabase(database);	
 				client.setCollection(collection);
-				
-				for(int i = 0; i < 1000; i++) {
-					builder.add("topic", topic);
-					builder.add("message.payload.x", i);]
-				}
 
-				/*Gson gson = new Gson();
+				Gson gson = new Gson();
 
-				for(int i =0; i< 1000; i++)
+				for(int i =0; i< 10; i++)
 				{
 					InstructionMessage a = new InstructionMessage("moveRelativePoint", "DeltaRobotNode", "FIND_ID", null ,new Point(i,0,0,50));
 					BlackboardMessage mes = new BlackboardMessage(topic,a);
-				try
-				{
-					System.out.println(gson.toJson(mes));
-					client.insertJson(gson.toJson(mes));
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				
-				}
+					try
+					{
+						System.out.println(gson.toJson(mes));
+						client.insertJson(gson.toJson(mes));
+						System.out.println("Message Added");
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					
+					}
 
 
 				/*
@@ -99,15 +95,15 @@ public class DummyAgent extends Agent
 
 
 
-                public static int rand(int lo, int hi)
-                {
-                	Random randomGenerator = new Random();
-                        int n = hi - lo + 1;
-                        int i = randomGenerator.nextInt() % n;
-                        if (i < 0)
-                                i = -i;
-                        return lo + i;
-                }
+    public static int rand(int lo, int hi)
+    {
+    	Random randomGenerator = new Random();
+            int n = hi - lo + 1;
+            int i = randomGenerator.nextInt() % n;
+            if (i < 0)
+                    i = -i;
+            return lo + i;
+    }
 
 
 
