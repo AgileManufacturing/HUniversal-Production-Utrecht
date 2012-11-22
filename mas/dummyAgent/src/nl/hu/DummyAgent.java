@@ -1,5 +1,5 @@
 package nl.hu;
-
+import java.util.Random;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
@@ -29,7 +29,7 @@ public class DummyAgent extends Agent
 	private String database = "REXOS";
 	private String topic = "instruction"; 
 	private String collection = "blackboard";
-
+	
 	public void setup()
 	{
 		
@@ -57,8 +57,8 @@ public class DummyAgent extends Agent
 				/*Gson gson = new Gson();
 
 				ArrayList<Point> points = new ArrayList<Point>();
-				points.add(new Point(0,0,10, 50));
-				points.add(new Point(0,0,-10 , 50));
+				points.add(new Point(rand(-10,10),rand(-10,10),rand(-10,10), 50));
+				points.add(new Point(rand(-10,10),rand(-10,10),rand(-10,10) , 50));
 				InstructionMessage a = new InstructionMessage("moveRelativePath", "DeltaRobotNode", "FIND_ID", null ,points);
 				BlackboardMessage mes = new BlackboardMessage(topic,a);
 				try
@@ -72,12 +72,23 @@ public class DummyAgent extends Agent
 				}*/
 					
 								
-				while(true){}
+				
 			}
 		});
 
 	}
 
+
+
+                public static int rand(int lo, int hi)
+                {
+                	Random randomGenerator = new Random();
+                        int n = hi - lo + 1;
+                        int i = randomGenerator.nextInt() % n;
+                        if (i < 0)
+                                i = -i;
+                        return lo + i;
+                }
 
 
 

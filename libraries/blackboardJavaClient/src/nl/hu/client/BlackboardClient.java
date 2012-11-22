@@ -25,6 +25,8 @@ public class BlackboardClient extends Thread {
 	private HashMap<String, BasicDBObject> subscriptions = new HashMap<String, BasicDBObject>();
 	private String collection;
 	private String database;
+	private int newMessageCount =0;
+	private boolean newMessage = false;
 	private ISubscriber callback;
 
 	public BlackboardClient(String ip) {
@@ -41,6 +43,11 @@ public class BlackboardClient extends Thread {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public boolean hasNewMessage()
+	{
+		return newMessage;
 	}
 
 	public void setDatabase(String database) {
@@ -211,11 +218,12 @@ public class BlackboardClient extends Thread {
 				BasicDBObject messageCheckObject = new BasicDBObject();
 				messageCheckObject.put("_id", new ObjectId(id));
 				messageCheckObject.put("$or", subscriptions.values());
-				BasicDBObject message = (BasicDBObject) mongo.getDB(database)
-						.getCollection(collection).findOne(messageCheckObject);
+				BasicDBObject message = (BasicDBObject) mongo.getDB(database).getCollection(collection).findOne(messageCheckObject);
 				BlackboardEvent event = BlackboardEvent.UNKNOWN;
 				if (message != null)
 				{
+					newMessage = true;
+					newMessageCount++;
 					if(operation.equals("i"))
 					{
 						event = BlackboardEvent.ADD;
@@ -228,15 +236,14 @@ public class BlackboardClient extends Thread {
 					{
 						event = BlackboardEvent.REMOVE;
 					}
-					this.callback.onMessage(event, message.toMap());
-					
+					this.callback.onMessage(event, message.getString("topic"));					
 				}
 				else
 				{
 					if(operation.equals("d"))
 					{
 						event = BlackboardEvent.REMOVE;
-						this.callback.onMessage(event, addedObject.toMap());
+						this.callback.onMessage(event, "");
 					}
 				}
 				

@@ -11,5 +11,5 @@ public interface ISubscriber {
 		REMOVE
 	}
 	
-	public void onMessage(BlackboardEvent event, Map map);
+	public void onMessage(BlackboardEvent event, String topic);
 }
