@@ -56,6 +56,23 @@ public class DummyAgent extends Agent
 
 				/*Gson gson = new Gson();
 
+				for(int i =0; i< 1000; i++)
+				{
+					InstructionMessage a = new InstructionMessage("moveRelativePoint", "DeltaRobotNode", "FIND_ID", null ,new Point(i,0,0,50));
+					BlackboardMessage mes = new BlackboardMessage(topic,a);
+				try
+				{
+					System.out.println(gson.toJson(mes));
+					client.insertJson(gson.toJson(mes));
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				
+				}
+
+
+				/*
 				ArrayList<Point> points = new ArrayList<Point>();
 				points.add(new Point(rand(-10,10),rand(-10,10),rand(-10,10), 50));
 				points.add(new Point(rand(-10,10),rand(-10,10),rand(-10,10) , 50));
@@ -73,6 +90,8 @@ public class DummyAgent extends Agent
 					
 								
 				
+				}
+				while(true){}
 			}
 		});
 
