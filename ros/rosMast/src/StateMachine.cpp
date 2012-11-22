@@ -64,10 +64,6 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
 	stateChangeRequestClient = nodeHandle.advertiseService("RequestStateChange_" + str, &StateMachine::changeState, this);
 }
 
-rosMast::StateMachine::~StateMachine() {
-	ROS_INFO("Statemachine destructor");
-}
-
 /**
  * Callback for the requestStateChange topic
  * Will lookup the transition function and execute it
