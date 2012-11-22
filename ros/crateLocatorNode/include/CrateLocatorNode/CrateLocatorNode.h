@@ -53,6 +53,9 @@
 #include <crateLocatorNode/getAllCrates.h>
 #include <crateLocatorNode/CrateEventMsg.h>
 
+/** 
+ * Locates the crate
+ **/
 class CrateLocatorNode{
 public:
 

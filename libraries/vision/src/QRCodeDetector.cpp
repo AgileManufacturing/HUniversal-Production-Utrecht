@@ -51,7 +51,7 @@ namespace Vision{
 	 * Detects zero to multiple crate QR codes and returns their QR code data and position as a crate object.
 	 *
 	 * @param image The image to detect the QR codes on.
-	 * @param reconfigureCommands Vector where the QR code data can be stored on.
+	 * @param crates Vector that contains the crate
 	 * @param criteria Criteria (with a default value) for the refinement of corner pixels on the detected QR codes. OpenCV termcriteria: "Criteria for termination of the iterative process of corner refinement. That is, the process of corner position refinement stops either after a certain number of iterations or when a required accuracy is achieved. The criteria may specify either of or both the maximum number of iteration and the required accuracy."
 	 **/
 	void QRCodeDetector::detectQRCodes(cv::Mat& image, std::vector<DataTypes::Crate> &crates, cv::TermCriteria criteria) {

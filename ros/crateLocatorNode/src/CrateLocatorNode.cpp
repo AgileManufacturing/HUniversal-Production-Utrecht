@@ -49,11 +49,11 @@ static const char WINDOW_NAME[] = "Image window";
 /**
  * On mouse click event. Prints the real life (Deltarobot) and pixel coordinate of the clicked pixel.
  *
- * @param int event CV_EVENT (eg. CV_EVENT_LBUTTONDOWN)
- * @param int x X coordinate of the click
- * @param int y Y coordinate of the click
- * @param int flags CV_EVENT_FLAG
- * @param Vision::PixelToRealCoordinateTransformer * param Pointer to the PixelToRealCoordinateTransformer used to conversion.
+ * @param event CV_EVENT (eg. CV_EVENT_LBUTTONDOWN)
+ * @param x X coordinate of the click
+ * @param y Y coordinate of the click
+ * @param flags CV_EVENT_FLAG
+ * @param param Vision::PixelToRealCoordinateTransformer * param Pointer to the PixelToRealCoordinateTransformer used to conversion.
  **/
 void on_mouse(int event, int x, int y, int flags, void* param) {
 	if (event == CV_EVENT_LBUTTONDOWN) {

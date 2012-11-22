@@ -90,7 +90,7 @@ namespace Vision {
 		 **/
 		int lineVotes;
 		/**
-		 * @var unsigned int maxlines
+		 * @var unsigned int maxLines
 		 * Maximum amount of lines that can be found.
 		 **/
 		unsigned int maxLines;
@@ -143,25 +143,25 @@ namespace Vision {
 		/**
 		 * Set distance.
 		 *
-		 * @param The minimum distance between circles in pixels.
+		 * @param distance The minimum distance between circles in pixels.
 		 **/
 		void setDistance(int distance) {this->distance = distance;}
 		/**
 		 * Set minDist.
 		 *
-		 * @param Minimum distance between lines to use for the center line.
+		 * @param minDist Minimum distance between lines to use for the center line.
 		 **/
 		void setMinDist(int minDist) {this->minDist = minDist;}
 		/**
 		 * Set maxDist.
 		 *
-		 * @param Maximum distance between lines to use for the center line.
+		 * @param maxDist Maximum distance between lines to use for the center line.
 		 **/
 		void setMaxDist(int maxDist) {this->maxDist = maxDist;}
 		/**
 		 * Set circleVotes.
 		 *
-		 * @param The minimum number of votes needed for an object to be detected as a circle.
+		 * @param circleVotes The minimum number of votes needed for an object to be detected as a circle.
 		 **/
 		void setCircleVotes(int circleVotes) {this->circleVotes = circleVotes;}
 		/**

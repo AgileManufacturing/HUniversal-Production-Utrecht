@@ -116,6 +116,9 @@ namespace Vision {
 		float angle;
 	};
 
+	/**
+	 * Contains the vision algorithems for tracking a crate
+	 **/
 	class CrateTracker {
 	public:
 		CrateTracker(int stableFrames, double movementThreshold);
@@ -138,6 +141,9 @@ namespace Vision {
 		bool hasChanged(const DataTypes::Crate& newCrate, const DataTypes::Crate& oldCrate);
 		void removeUntrackedCrates(std::vector<CrateEvent> &events);
 		
+		/**
+		 * Map of known crates
+		 **/
 		std::map<std::string, DataTypes::Crate> knownCrates;
 	};
 }

@@ -46,7 +46,8 @@ namespace Vision {
 	 * @param fiducialsRealCoordinates A vector with the real world coordinates of the fiducials in the same order as fiducialsPixelCoordinates.
 	 * @param fiducialsPixelCoordinates A vector with the pixel coordinates of the fiducials in the same order as fiducialsRealCoordinates.
 	 **/
-	PixelAndRealCoordinateTransformer::PixelAndRealCoordinateTransformer(const std::vector<DataTypes::Point2D>& fiducialsRealCoordinates, const std::vector<DataTypes::Point2D>& fiducialsPixelCoordinates ) : fiducialsRealCoordinates(fiducialsRealCoordinates), fiducialsPixelCoordinates(fiducialsPixelCoordinates) {
+	PixelAndRealCoordinateTransformer::PixelAndRealCoordinateTransformer(const std::vector<DataTypes::Point2D>& fiducialsRealCoordinates, 
+		const std::vector<DataTypes::Point2D>& fiducialsPixelCoordinates ) : fiducialsRealCoordinates(fiducialsRealCoordinates), fiducialsPixelCoordinates(fiducialsPixelCoordinates) {
 		updateTransformationParameters();
 	}
 	/**
@@ -57,7 +58,7 @@ namespace Vision {
 	/**
 	 * Function for updating the pixel coordinates of the fiducials.
 	 * 
-	 * @param fiducialsPixelCoordinates The new pixel coordinates for the fiducials in a vector.
+	 * @param fiducialsRealCoordinates The new pixel coordinates for the fiducials in a vector.
 	 **/
 	void PixelAndRealCoordinateTransformer::setFiducialPixelCoordinates(const std::vector<DataTypes::Point2D>& fiducialsRealCoordinates) {
 		this->fiducialsPixelCoordinates = fiducialsRealCoordinates;

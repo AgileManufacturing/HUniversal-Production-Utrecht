@@ -69,41 +69,55 @@ namespace DataTypes {
 		 **/
 		~Point2D( ) {
 		}
-
+		/**
+		 * Compare operator for Point 2D
+		 **/
 		inline bool operator==(const Point2D& rhs) const {
 			return this->x == rhs.x && this->y == rhs.y;
 		}
-
+		/** 
+		 * Addition assignment
+		 **/
 		inline Point2D& operator+=(const Point2D& rhs) {
 			x += rhs.x;
 			y += rhs.y;
 			return *this;
 		}
-
+		/**
+		 * Substract assignment
+		 **/
 		inline Point2D& operator-=(const Point2D& rhs) {
 			x -= rhs.x;
 			y -= rhs.y;
 			return *this;
 		}
-
+		/**
+		 * Multiplication assignment
+		 **/
 		inline Point2D& operator*=(const Point2D& rhs) {
 			x *= rhs.x;
 			y *= rhs.y;
 			return *this;
 		}
-
+		/** 
+		 * Addition of points
+		 **/
 		inline Point2D operator+(const Point2D& rhs) const {
 			Point2D res = *this;
 			res += rhs;
 			return res;
 		}
-
+		/**
+		 * Substract of points
+		 **/
 		inline Point2D operator-(const Point2D& rhs) const {
 			Point2D res = *this;
 			res -= rhs;
 			return res;
 		}
-
+		/**
+		 * Multiplication operator
+		 **/
 		inline Point2D operator*(const Point2D& rhs) const {
 			Point2D res = *this;
 			res *= rhs;

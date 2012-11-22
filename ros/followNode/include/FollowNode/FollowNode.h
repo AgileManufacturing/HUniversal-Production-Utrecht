@@ -1,5 +1,5 @@
 /**
- * @file Follow.cpp
+ * @file FollowNode.h
  * @brief Listens to the crateEvent topic and guides the deltarobot
  * @date Created: 2012-10-30
  *
@@ -39,13 +39,14 @@
 #include <deltaRobotNode/MoveToPoint.h>
 #include <crateLocatorNode/getCrate.h>
 
+/**
+ * Followes a crate with the deltarobot
+ **/
 class FollowNode{
 public:
 
 	/**
 	 * the constructor
-	 * @param argc use the parameters form main
-	 * @param argv use the parameters form main
 	 */
 	FollowNode();
 	/**
@@ -58,19 +59,55 @@ public:
 	 */
 	void run();
 
+	/**
+	 * Callback for when the cratelocated finds a crate
+	 **/
 	void callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg);
+	
+	/**
+	 * Thread that accepts input from the keyboard
+	 **/
 	static void inputThreadMethod(FollowNode* that);
 
 private:
-
+	/** 
+	 * the nodehandle, used to create subscribers and publishers
+	 **/
 	ros::NodeHandle nodeHandle;
+	/**
+	 * Identifier for the crate
+	 **/
 	std::string crateID;
-	bool updateCrateIDFlag, inputRunning, topicRunning;
+	/**
+	 * Flag used to indicate that the crate needs and update
+	 **/
+	bool updateCrateIDFlag;
+	/**
+	 * If the input thread is running
+	 **/ 
+	 bool inputRunning;
+	/**
+	 * If the topic is running
+	 **/
+	 bool topicRunning;
+	/**
+	 * Thread for the keyboard input
+	 **/
 	boost::thread* inputThread;
-
+	/**
+	 * Client for calling the deltarobot
+	 **/
 	ros::ServiceClient deltaRobotClient;
+	/**
+	 * Service definition for move to point, used to send request
+	 **/
 	deltaRobotNode::MoveToPoint moveToPointService;
-
+	/**
+	 * Client for the crate located
+	 **/
 	ros::ServiceClient crateLocatorClient;
+	/**
+	 * Contains the request and response for the crateLocator
+	 **/
 	crateLocatorNode::getCrate getCrateService;
 };

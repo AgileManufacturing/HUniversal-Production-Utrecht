@@ -1,5 +1,5 @@
 /**
- * @file Follow.cpp
+ * @file FollowNode.cpp
  * @brief Listens to the crateEvent topic and guides the deltarobot
  * @date Created: 2012-10-30
  *
@@ -157,6 +157,9 @@ void FollowNode::inputThreadMethod(FollowNode* that) {
 	}
 }
 
+/**
+ * Main function for the followNode, will start it
+ **/
 int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "follow");
 	FollowNode crateLocatorNode;
