@@ -23,6 +23,7 @@ ros/crateLocatorNode/src/crateLocatorNode/
 ros/rexosStdMsgs/src/rexosStdMsgs/
 ros/rexosStdSrvs/src/rexosStdSrvs/
 tools/gripperTestNode/src/gripperTestNode/
+libraries/mongo-cxx-driver/.sconf_temp/
 build/
 
 # Ignore project file, cmake text file and editor temporary files

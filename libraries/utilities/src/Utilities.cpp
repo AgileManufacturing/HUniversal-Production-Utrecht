@@ -103,4 +103,17 @@ namespace Utilities{
 
         return 0;
     }
+
+    /**
+     * Create a vector of all the values in a map
+     *
+     * @param m The map with key type K and value type V
+     * @param v The vector with that contains objects of the same type V as the map values
+     **/
+    template<typename M, typename V>
+    void createVectorOfMapValues(const M &m, V &v) {
+        for(typename M::iterator it = m.begin(); it != m.end(); it++) {
+            v.push_back(it->second);
+        }
+    }
 }
