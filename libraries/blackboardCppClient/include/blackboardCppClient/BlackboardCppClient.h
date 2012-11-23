@@ -35,6 +35,7 @@
 #include <map>
 #include <vector>
 #include <boost/thread.hpp>
+#include <boost/bind.hpp>
 #include <blackboardCppClient/BlackboardSubscriber.h>
 
 #pragma GCC system_header
@@ -58,7 +59,7 @@ public:
 	void removeFirst();
 
 private:
-	static void run(BlackboardCppClient* client, bool blocked);
+	void run(bool blocked);
 	/**
 	 * @var mongo::DBClientConnection connection
 	 * The connection to the mongodb database

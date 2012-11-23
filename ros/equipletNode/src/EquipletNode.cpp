@@ -344,13 +344,13 @@ int main(int argc, char **argv) {
 
 	// Add some hardware modules to this equiplet
 	// This should change to modules being created in the Node itself after commands on blackboard
-	//Mast::HardwareModuleProperties deltaRobot(1, 1, rosMast::safe, true, true);
-	//Mast::HardwareModuleProperties gripper(2, 2, rosMast::safe, true, true);
-	//equipletNode.addHardwareModule(deltaRobot);
+	Mast::HardwareModuleProperties deltaRobot(1, 1, rosMast::safe, true, true);
+	Mast::HardwareModuleProperties gripper(2, 2, rosMast::safe, true, true);
+	equipletNode.addHardwareModule(deltaRobot);
 	//equipletNode->sendStateChangeRequest(1, rosMast::standby);
 	//equipletNode->sendStateChangeRequest(1, rosMast::normal);
 	//std::cout << "DeltaRobot State: " << equipletNode->getModuleState(1);
-	//equipletNode->addHardwareModule(gripper);
+	equipletNode.addHardwareModule(gripper);
 	
 	// print the hardware modules that are currently added to the Equiplet
 	//equipletNode.printHardwareModules();
@@ -361,7 +361,7 @@ int main(int argc, char **argv) {
 	while(ros::ok()) {
 		poll_rate.sleep();
 		ros::spinOnce();	
-	}
+	} 
 
 	return 0;
 }
