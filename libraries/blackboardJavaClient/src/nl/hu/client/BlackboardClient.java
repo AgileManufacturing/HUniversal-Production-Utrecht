@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nl.hu.client.ISubscriber.BlackboardEvent;
-
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
@@ -21,33 +19,35 @@ import com.mongodb.util.JSON;
 
 public class BlackboardClient extends Thread {
 
+	private final String OPLOG = "oplog.rs";
+	private final String LOCAL = "local";
+	private final String OR_OPERAND = "$or";
+	private final String AND_OPERAND = "$and";
+
+
 	private Mongo mongo;
 	private HashMap<String, BasicDBObject> subscriptions = new HashMap<String, BasicDBObject>();
 	private String collection;
 	private String database;
-	private int newMessageCount =0;
-	private boolean newMessage = false;
 	private ISubscriber callback;
 
-	public BlackboardClient(String ip) {
+
+	public BlackboardClient(String ip, ISubscriber callback) {
 		try {
 			this.mongo = new Mongo(ip);
+			this.callback = callback;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public BlackboardClient(String ip, int port) {
+	public BlackboardClient(String ip, int port, ISubscriber callback ) {
 		try {
 			this.mongo = new Mongo(ip, port);
+			this.callback = callback;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	public boolean hasNewMessage()
-	{
-		return newMessage;
 	}
 
 	public void setDatabase(String database) {
@@ -58,54 +58,32 @@ public class BlackboardClient extends Thread {
 		this.collection = collection;
 	}
 
-	public void insert(Map map) throws Exception {
-		if (collection.isEmpty() || collection == null) {
-			throw new Exception("No collection selected");
-		} else if (database.isEmpty() || database == null) {
-			throw new Exception("No collection selected");
-		}
-		System.out.println(map);
-		mongo.getDB(database).getCollection(collection).insert(new BasicDBObject(map));
-	}
-
 	public void insertJson(String json) throws Exception {
-		if (collection.isEmpty() || collection == null) {
+		if(collection.isEmpty() || collection == null) {
 			throw new Exception("No collection selected");
 		} else if (database.isEmpty() || database == null) {
-			throw new Exception("No collection selected");
+			throw new Exception("No database selected");
 		}
 		mongo.getDB(database).getCollection(collection).insert((DBObject)JSON.parse(json));
 	}	
 	
-	public void remove(Map map) throws Exception
-	{
-		if (collection.isEmpty() || collection == null) {
-			throw new Exception("No collection selected");
-		} else if (database.isEmpty() || database == null) {
-			throw new Exception("No collection selected");
-		}
-		mongo.getDB(database).getCollection(collection).remove(new BasicDBObject(map));
-	}
-
-
 	public void removeJson(String json) throws Exception {
-		if (collection.isEmpty() || collection == null) {
+		if(collection.isEmpty() || collection == null) {
 			throw new Exception("No collection selected");
 		} else if (database.isEmpty() || database == null) {
-			throw new Exception("No collection selected");
+			throw new Exception("No database selected");
 		}
 		mongo.getDB(database).getCollection(collection).remove((DBObject)JSON.parse(json));
 	}	
 	
-	public ArrayList<Map> get(Map query) throws Exception
-	{
-		if (collection.isEmpty() || collection == null) {
+	public ArrayList<Map> get(Map query) throws Exception {
+		if(collection.isEmpty() || collection == null) {
 			throw new Exception("No collection selected");
 		} else if (database.isEmpty() || database == null) {
-			throw new Exception("No collection selected");
+			throw new Exception("No database selected");
 		}	
 			BasicDBObject object = new BasicDBObject();
-			object.put("$and", query);
+			object.put(AND_OPERAND, query);
 			List<DBObject> found = mongo.getDB(database).getCollection(collection).find(object).toArray();
 			ArrayList<Map> maps  = new ArrayList<Map>();
 			
@@ -121,43 +99,64 @@ public class BlackboardClient extends Thread {
 		if (collection.isEmpty() || collection == null) {
 			throw new Exception("No collection selected");
 		} else if (database.isEmpty() || database == null) {
-			throw new Exception("No collection selected");
+			throw new Exception("No database selected");
 		}
-		ArrayList<String> jsons  = new ArrayList<String>();
-		List<DBObject> found =  mongo.getDB(database).getCollection(collection).find((DBObject)JSON.parse(json)).toArray();
-		for (DBObject obj: found) 
+		ArrayList<String> jsons = new ArrayList<String>();
+		List<DBObject> found = mongo.getDB(database).getCollection(collection).find((DBObject)JSON.parse(json)).toArray();
+		for (DBObject obj : found) 
 		{
 				jsons.add(obj.toString());
 		}	
 		return jsons;
 	}	
-		
-			
-	public void update(Map query, Map set, Map unset) throws Exception {
+
+	
+	public void read(boolean blocked) throws Exception {
 		if (collection.isEmpty() || collection == null) {
 			throw new Exception("No collection selected");
 		} else if (database.isEmpty() || database == null) {
-			throw new Exception("No collection selected");
+			throw new Exception("No database selected");
+		} else if(subscriptions.size() == 0) {
+			throw new Exception("No subscribtions has been found");
 		}
-		if(set == null){set= new HashMap();}
-		if(unset == null){unset= new HashMap();}	
-		BasicDBObject setObject = new BasicDBObject();
-		setObject.put("$set", set);
-		setObject.put("$unset", unset);
-		System.out.println(new BasicDBObject(query));
-		System.out.println(setObject);		
-		mongo.getDB(database).getCollection(collection).findAndModify(new BasicDBObject(query), setObject);
+
+		BasicDBObject messageCheckObject = new BasicDBObject();
+		messageCheckObject.put(OR_OPERAND, subscriptions.values());
+		BasicDBObject message = (BasicDBObject) mongo.getDB(database).getCollection(collection).findOne(messageCheckObject);
+		if(message!= null) {
+			callback.onMessage(message.toString());
+		} else if(blocked && subscriptions.size() > 0) {
+			BasicDBObject where = new BasicDBObject();
+			where.put("ns", database + "." + collection);
+			
+			DBCursor tailedCursor = mongo.getDB(LOCAL).getCollection(OPLOG)
+					.find().addOption(Bytes.QUERYOPTION_TAILABLE)
+					.addOption(Bytes.QUERYOPTION_AWAITDATA);
+
+			tailedCursor.skip(tailedCursor.size());
+			tailedCursor.hasNext();
+			message = (BasicDBObject) mongo.getDB(database).getCollection(collection).findOne(messageCheckObject);
+			
+			if(message!= null) {
+				callback.onMessage(message.toString());
+			}
+		}
+	}		
+
+	public void removeFirst() {
+		BasicDBObject messageCheckObject = new BasicDBObject();
+		BasicDBObject message = (BasicDBObject) mongo.getDB(database).getCollection(collection).findOne();
+		mongo.getDB(database).getCollection(collection).remove(message);
 	}
 
-
 	public void updateJson(String query, String set, String unset) throws Exception {
-		if (collection.isEmpty() || collection == null) {
+		if(collection.isEmpty() || collection == null) {
 			throw new Exception("No collection selected");
 		} else if (database.isEmpty() || database == null) {
-			throw new Exception("No collection selected");
+			throw new Exception("No database selected");
 		}
-		if(set == null){set="";}
-		if(unset == null){unset="";}	
+		if(set == null) { set = ""; }
+		if(unset == null) { unset = ""; }	
 		BasicDBObject setObject = new BasicDBObject();
 		setObject.put("$set", (DBObject)JSON.parse(set));
 		setObject.put("$unset",(DBObject)JSON.parse(unset));
@@ -166,93 +165,16 @@ public class BlackboardClient extends Thread {
 		mongo.getDB(database).getCollection(collection).findAndModify((DBObject)JSON.parse(query), setObject);
 	}
 	
-
-
 	public void subscribe(String topic) throws Exception {
-		if (collection.isEmpty() || collection == null) {
+		if(collection.isEmpty() || collection == null) {
 			throw new Exception("No collection selected");
 		} else if (database.isEmpty() || database == null) {
-			throw new Exception("No collection selected");
+			throw new Exception("No database selected");
 		}
 		subscriptions.put(topic, new BasicDBObject("topic", topic));
-		if (subscriptions.size() == 1) {
-			this.start();
-		}
 	}
 
 	public void unsubscribe(String topic) {
 		subscriptions.remove(topic);
-		if (subscriptions.size() == 0) {
-			this.interrupt();
-		}
-	}
-	
-	public void setCallBack(ISubscriber callback)
-	{
-		this.callback = callback;
-	}
-
-	public void run() {
-		BasicDBObject where = new BasicDBObject();
-		where.put("ns", database + "." + collection);
-
-		DBCursor tailedCursor = mongo.getDB("local").getCollection("oplog.rs")
-				.find(where).addOption(Bytes.QUERYOPTION_TAILABLE)
-				.addOption(Bytes.QUERYOPTION_AWAITDATA);
-		tailedCursor.skip(tailedCursor.size());
-		String id = "";
-		String operation = "";
-		try {
-			while (tailedCursor.hasNext()) {
-				BasicDBObject addedObject = (BasicDBObject) tailedCursor.next();
-				if (addedObject.containsField("o")) {
-					id = ((BasicDBObject) addedObject.get("o"))
-							.getString("_id");
-				}
-				if (addedObject.containsField("o2")
-						&& (id == null || id.isEmpty())) {
-					id = ((BasicDBObject) addedObject.get("o2"))
-							.getString("_id");
-				}
-				operation = addedObject.getString("op");
-				BasicDBObject messageCheckObject = new BasicDBObject();
-				messageCheckObject.put("_id", new ObjectId(id));
-				messageCheckObject.put("$or", subscriptions.values());
-				BasicDBObject message = (BasicDBObject) mongo.getDB(database).getCollection(collection).findOne(messageCheckObject);
-				BlackboardEvent event = BlackboardEvent.UNKNOWN;
-				if (message != null)
-				{
-					newMessage = true;
-					newMessageCount++;
-					if(operation.equals("i"))
-					{
-						event = BlackboardEvent.ADD;
-					}
-					else if(operation.equals("u"))
-					{
-						event = BlackboardEvent.UPDATE;
-					}
-					else if(operation.equals("d"))
-					{
-						event = BlackboardEvent.REMOVE;
-					}
-					this.callback.onMessage(event, message.getString("topic"));					
-				}
-				else
-				{
-					if(operation.equals("d"))
-					{
-						event = BlackboardEvent.REMOVE;
-						this.callback.onMessage(event, "");
-					}
-				}
-				
-			}
-		}
-
-		catch (MongoInterruptedException exception) {
-			System.out.println("Mongodriver interrupted because subscriptions count is zero");
-		}
-
 	}
 }

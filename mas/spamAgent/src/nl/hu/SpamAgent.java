@@ -25,14 +25,14 @@ import java.util.Scanner;
 import nl.hu.client.ISubscriber;
 import java.util.Date;
 
-public class DummyAgent extends Agent implements ISubscriber
+public class SpamAgent extends Agent implements ISubscriber
 {
     private BlackboardClient client;
 	private MessageBuilder builder = new MessageBuilder();
 	private String database = "REXOS";
 	private String topic = "instruction"; 
 	private String collection = "blackboard";
-	
+	private int i =0;
 	public void setup()
 	{
 		
@@ -43,47 +43,35 @@ public class DummyAgent extends Agent implements ISubscriber
 		client.subscribe(topic);
 		}catch(Exception e){}	
 
+
+		
 		this.addBehaviour(new CyclicBehaviour()
 		{
 			@Override
 			public void action() 
 			{
-				try
-				{
-					while(true)
-					{
-						client.read(true);
-					}
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}					
 
-			}
-		});
-
-		this.addBehaviour(new CyclicBehaviour()
-		{
-			@Override
-			public void action() 
-			{
 
 				Gson gson = new Gson();
 				
 				ArrayList<Point> points = new ArrayList<Point>();
-				points.add(new Point(rand(-10,10),rand(-10,10),rand(-10,10), 50));
-				points.add(new Point(rand(-10,10),rand(-10,10),rand(-10,10) , 50));
+				points.add(new Point(i,i,i,i));
+				
+				i++;
 				InstructionMessage a = new InstructionMessage("moveRelativePath", "DeltaRobotNode", "FIND_ID", null ,points);
 				BlackboardMessage mes = new BlackboardMessage(topic,a);
 				try
 				{
+				
+					ACLMessage m = blockingReceive();
+					System.out.println("sen:"+System.currentTimeMillis());
 					client.insertJson(gson.toJson(mes));
 				}
 				catch(Exception e)
 				{
 					e.printStackTrace();
 				}	
+				
 					
 			}
 		});
@@ -95,7 +83,6 @@ public class DummyAgent extends Agent implements ISubscriber
 	public void onMessage(String json)
 	{
 		client.removeFirst();
-		System.out.println("rec:"+System.currentTimeMillis());
 		System.out.println(json);
 	}
 
