@@ -1,10 +1,11 @@
 /**
- * @file DotMatrixNode.h
+ * @file DotMatrixPrinterNode.h
  * @brief Semi dot matrix printer for grayscale image files.
  * @date Created: 2012-11-06
  *
  * @author Koen Braham
  * @author Daan Veltman
+ * @author Arjen van Zanten
  *
  * @section LICENSE
  * License: newBSD
@@ -33,32 +34,22 @@
 
 #include <iostream>
 #include <sstream>
-#include <fstream>
 
 #include "ros/ros.h"
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
-
 #include <DataTypes/Point3D.h>
-
 #include <deltaRobotNode/MoveToPoint.h>
 #include <deltaRobotNode/MovePath.h>
-
 #include <DotMatrixPrinterNode/DotMatrixPrinterNodeSettings.h>
 
 class DotMatrixPrinterNode {
 public:
-
-	DotMatrixPrinterNode( );
-	virtual ~DotMatrixPrinterNode( );
-
-	void run( );
+	DotMatrixPrinterNode();
+	virtual ~DotMatrixPrinterNode();
+	void run();
 private:
-
 	/**
 	 * @var ros::NodeHandle node
 	 * The nodeHandle used by ros services and topics
@@ -77,7 +68,16 @@ private:
 	 **/
 	image_transport::Subscriber imageSubscriber;
 
+	/**
+	 * @var ros::ServiceClient deltaRobotClient
+	 * Ros service client for calling the deltarobot's moveToPoint service.
+	 **/
 	ros::ServiceClient deltaRobotClient;
+
+	/**
+	 * @var ros::Serviceclient deltaRobotPathClient
+	 * Ros service client for calling the deltarobot's movePath service. 
+	 **/
 	ros::ServiceClient deltaRobotPathClient;
 
 	/**
@@ -87,16 +87,21 @@ private:
 	deltaRobotNode::MovePath movePathService;
 
 	/**
-	 * @var deltaRobotNode::Motion effectorLocation
-	 * Point for the movePathService.
+	 * @var Point3D effectorLocation
+	 * 3D Point of the deltarobot effector location. used in various movements.
 	 **/
 	DataTypes::Point3D<double> effectorLocation;
 
+	/**
+	 * @var double zDrawingSurface
+	 * The Z coordinate of the drawing surface.
+	 **/
 	double zDrawingSurface;
 
-	void moveToStartPoint();
 	void deltaRobotMoveToPoint(double x, double y, double z, double maxAcceleration = DotMatrixPrinterNodeSettings::ACCELERATION);
+	void imageCallback(const sensor_msgs::ImageConstPtr& msg);
 	void calibrateDrawingHeight();
 	void drawDotToPath(double x, double y);
-	void imageCallback(const sensor_msgs::ImageConstPtr& msg);
+	void moveToStartPoint();
+	void deltaRobotStartPath();
 };

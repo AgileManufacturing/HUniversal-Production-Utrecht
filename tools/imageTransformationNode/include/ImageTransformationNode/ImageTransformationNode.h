@@ -56,8 +56,9 @@ class ImageTransformationNode
 
 		void publishImage();
 		void run();
+		void transformCallback();
 	private:
-		void transformCallback(const sensor_msgs::ImageConstPtr& msg);
+		//void transformCallback();//const sensor_msgs::ImageConstPtr& msg);
 
 		/**
 		 * @var int blockSize

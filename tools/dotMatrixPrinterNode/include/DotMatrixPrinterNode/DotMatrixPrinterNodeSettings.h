@@ -1,10 +1,11 @@
 /**
- * @file DotMatrixNodeSettings.h
- * @brief Settings for the environment for the DotMatrixNode.
- * @date 2012-11-06
+ * @file DotMatrixPrinterNodeSettings.h
+ * @brief Settings for the environment for the DotMatrixPrinterNode.
+ * @date Created: 2012-11-06
  *
  * @author Koen Braham
  * @author Daan Veltman
+ * @author Arjen van Zanten
  *
  * @section LICENSE
  * License: newBSD

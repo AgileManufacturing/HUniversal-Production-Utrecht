@@ -115,20 +115,20 @@ void ImageTransformationNode::publishImage(){
  *
  * @param msg The pointer to the message that contains the camera image.
  **/
-void ImageTransformationNode::transformCallback(const sensor_msgs::ImageConstPtr& msg) {
+void ImageTransformationNode::transformCallback() {//const sensor_msgs::ImageConstPtr& msg) {
 	// Receive image
-	cv_bridge::CvImagePtr cv_ptr;
-	try {
-		cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-	} catch (cv_bridge::Exception& e) {
-		ROS_ERROR("cv_bridge exception: %s", e.what());
-		return;
-	}
+	//cv_bridge::CvImagePtr cv_ptr;
+	// try {
+	// 	cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+	// } catch (cv_bridge::Exception& e) {
+	// 	ROS_ERROR("cv_bridge exception: %s", e.what());
+	// 	return;
+	// }
 
 	//cv_ptr->image = cv::imread("/home/kbraham/Pictures/daniel.png");
-	cv_ptr->image = cv::imread("/home/arjen/Desktop/rexoslogo_no_fill.png");
+	cv::Mat image = cv::imread("/home/arjen/Desktop/rexoslogo_no_fill.png");
 	//cv_ptr->image = cv::imread("/home/arjen/Desktop/corners.png");
-	if(cv_ptr->image.data == NULL){
+	if(image.data == NULL){
 		std::cerr << "Invalid image" << std::endl;
 		exit(1);
 	}
@@ -136,15 +136,15 @@ void ImageTransformationNode::transformCallback(const sensor_msgs::ImageConstPtr
 
 	//calculating scale such that the entire picture will fit, with respect to aspect ratio, on the draw field.
 	double scale = std::max(
-		cv_ptr->image.rows / (DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT * DotMatrixPrinterNodeSettings::DRAW_FIELD_DOTS_PER_MM), 
-		cv_ptr->image.cols / (DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH * DotMatrixPrinterNodeSettings::DRAW_FIELD_DOTS_PER_MM));
+		image.rows / (DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT * DotMatrixPrinterNodeSettings::DRAW_FIELD_DOTS_PER_MM), 
+		image.cols / (DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH * DotMatrixPrinterNodeSettings::DRAW_FIELD_DOTS_PER_MM));
 	//size should not be at least 1 pixel in height and 1 pixel in width
 	cv::Size outputSize = cv::Size(
-		cv_ptr->image.cols / scale < 1 ? 1 : cv_ptr->image.cols / scale, 
-		cv_ptr->image.rows / scale < 1 ? 1 : cv_ptr->image.rows / scale);
+		image.cols / scale < 1 ? 1 : image.cols / scale, 
+		image.rows / scale < 1 ? 1 : image.rows / scale);
 
 	cv::Mat resizedImage;
-	cv::resize(cv_ptr->image, resizedImage, outputSize);
+	cv::resize(image, resizedImage, outputSize);
 
 	cv::Mat grayImage;
 	cv::cvtColor(resizedImage, grayImage, CV_BGR2GRAY);
@@ -158,7 +158,7 @@ void ImageTransformationNode::transformCallback(const sensor_msgs::ImageConstPtr
 	//TODO determine if output is a safe image to use for sending onwards
 
 	cv::imshow(WINDOW_NAME, outputImage);
-	cv::waitKey(3);
+	cv::waitKey(60000);
 }
 
 /**
@@ -167,7 +167,7 @@ void ImageTransformationNode::transformCallback(const sensor_msgs::ImageConstPtr
  * This function ends when ros receives a ^c
  **/
 void ImageTransformationNode::run( ) {
-	cameraSubscriber = imageTransport.subscribe("camera/image", 1, &ImageTransformationNode::transformCallback, this, image_transport::TransportHints("compressed"));
+	//cameraSubscriber = imageTransport.subscribe("camera/image", 1, &ImageTransformationNode::transformCallback, this, image_transport::TransportHints("compressed"));
 
 	while(ros::ok()) {
 		ros::spinOnce();
@@ -199,6 +199,8 @@ int main(int argc, char** argv){
 
 	ImageTransformationNode imageTransformationNode(equipletID, moduleID);
 
-	imageTransformationNode.run();
+	imageTransformationNode.transformCallback();
+
+	//imageTransformationNode.run();
 	return 0;
 }

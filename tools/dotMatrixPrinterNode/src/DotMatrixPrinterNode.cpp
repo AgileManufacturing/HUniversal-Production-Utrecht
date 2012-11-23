@@ -1,10 +1,11 @@
 /**
- * @file DotMatrixNode.cpp
+ * @file DotMatrixPrinterNode.cpp
  * @brief Semi dot matrix printer for grayscale image files.
  * @date Created: 2012-11-06
  *
  * @author Koen Braham
  * @author Daan Veltman
+ * @author Arjen van Zanten
  *
  * @section LICENSE
  * License: newBSD
@@ -45,9 +46,7 @@ DotMatrixPrinterNode::DotMatrixPrinterNode( ) :
 	zDrawingSurface(0)
 { }
 
-DotMatrixPrinterNode::~DotMatrixPrinterNode( ) {
-
-}
+DotMatrixPrinterNode::~DotMatrixPrinterNode( ) { }
 
 /**
  * Moves the deltarobot to the starting position.
@@ -56,10 +55,16 @@ void DotMatrixPrinterNode::moveToStartPoint() {
 	effectorLocation.x = 0;
 	effectorLocation.y = 0;
 	effectorLocation.z = -196.063;
-
 	deltaRobotMoveToPoint(effectorLocation.x, effectorLocation.y, effectorLocation.z);
 }
 
+/**
+ * Moves the deltarobot to the given coordinates, using the moveToPoint service.
+ * @param x X coordinate
+ * @param y Y coordinate
+ * @param z Z coordinate
+ * @param maxAcceleration The maximum acceleration. Defaults to DotMatrixPrinterNodeSettings::ACCELERATION;
+ **/
 void DotMatrixPrinterNode::deltaRobotMoveToPoint(double x, double y, double z, double maxAcceleration){
 	deltaRobotNode::MoveToPoint moveToPointService;
 	moveToPointService.request.motion.x = x;
@@ -74,18 +79,31 @@ void DotMatrixPrinterNode::deltaRobotMoveToPoint(double x, double y, double z, d
 }
 
 /**
+ * Calls on the DeltaRobot to start its path. Uses movePathService.
+ **/
+void DotMatrixPrinterNode::deltaRobotStartPath(){
+	movePathService.response.message = "";
+	deltaRobotPathClient.call(movePathService);
+	if (movePathService.response.message.compare("") != 0) {
+		std::cout << "[ERROR]" << movePathService.response.message << std::endl;
+	}
+	// Clear the path
+	movePathService.request.motion.clear();
+}
+
+/**
  * Draws a dot at coordinate x, y.
  * @param x X coordinate of the dotted pixel
  * @param y Y coordinate of the dotted pixel
  **/
 void DotMatrixPrinterNode::drawDotToPath(double x, double y) {
-	DataTypes::Point3D<double> oldLocation(effectorLocation);
+	DataTypes::Point3D<double> newLocation(effectorLocation);
 
-	effectorLocation.x = x;
-	effectorLocation.y = y;
+	newLocation.x = x;
+	newLocation.y = y;
 
 	double elevation;
-	if(oldLocation.distance(effectorLocation) > DotMatrixPrinterNodeSettings::MOVEMENT_THRESHOLD){
+	if(effectorLocation.distance(newLocation) > DotMatrixPrinterNodeSettings::MOVEMENT_THRESHOLD){
 		elevation = DotMatrixPrinterNodeSettings::ELEVATION_BIG;
 	} else {
 		elevation = DotMatrixPrinterNodeSettings::ELEVATION_SMALL;
@@ -94,17 +112,22 @@ void DotMatrixPrinterNode::drawDotToPath(double x, double y) {
 	deltaRobotNode::Motion motion;
 	motion.maxAcceleration = DotMatrixPrinterNodeSettings::ACCELERATION;
 
+	motion.x = effectorLocation.x;
+	motion.y = effectorLocation.y;
+	motion.z = zDrawingSurface + elevation;
+	movePathService.request.motion.push_back(motion);
+	
 	motion.x = x;
 	motion.y = y;
-	
 	motion.z = zDrawingSurface + elevation;
 	movePathService.request.motion.push_back(motion);
-	
+
 	motion.z = zDrawingSurface;
 	movePathService.request.motion.push_back(motion);
-	
-	motion.z = zDrawingSurface + elevation;
-	movePathService.request.motion.push_back(motion);
+
+	effectorLocation.x = x;
+	effectorLocation.y = y;
+	effectorLocation.z = zDrawingSurface;
 }
 
 /**
@@ -138,9 +161,6 @@ void DotMatrixPrinterNode::imageCallback(const sensor_msgs::ImageConstPtr& msg) 
 
 	moveToStartPoint();
 
-	// Clear the old path.
-	movePathService.request.motion.clear();
-
 	double dotX, dotY;
 
 	// moves left to right, right to left
@@ -164,11 +184,7 @@ void DotMatrixPrinterNode::imageCallback(const sensor_msgs::ImageConstPtr& msg) 
 	}
 
 	Utilities::StopWatch stopwatch("PathTimer", true);
-	movePathService.response.message = "";
-	deltaRobotPathClient.call(movePathService);
-	if (movePathService.response.message.compare("") != 0) {
-		std::cout << "[ERROR]" << movePathService.response.message << std::endl;
-	}
+	deltaRobotStartPath();
 	stopwatch.stopAndPrint(stdout);
 
 	moveToStartPoint();
@@ -222,18 +238,22 @@ void DotMatrixPrinterNode::calibrateDrawingHeight(){
 			{
 				std::cout << "Testing corners: " << zDrawingSurface << std::endl;
 				
+				// lower-left corner
 				deltaRobotMoveToPoint(-((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2), -((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2), zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
 				deltaRobotMoveToPoint(-((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2), -((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2), zDrawingSurface, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
 				deltaRobotMoveToPoint(-((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2), -((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2), zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
 
+				// upper-right corner
 				deltaRobotMoveToPoint((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2, (double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2, zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
 				deltaRobotMoveToPoint((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2, (double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2, zDrawingSurface, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
 				deltaRobotMoveToPoint((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2, (double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2, zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
 
+				// lower-right corner
 				deltaRobotMoveToPoint((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2, -((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2), zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
 				deltaRobotMoveToPoint((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2, -((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2), zDrawingSurface, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
 				deltaRobotMoveToPoint((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2, -((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2), zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
 
+				// upper-left corner
 				deltaRobotMoveToPoint(-((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2), (double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2, zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
 				deltaRobotMoveToPoint(-((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2), (double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2, zDrawingSurface, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
 				deltaRobotMoveToPoint(-((double)DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH / 2), (double)DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT / 2, zDrawingSurface + DotMatrixPrinterNodeSettings::ELEVATION_BIG, DotMatrixPrinterNodeSettings::CALIBRATION_ACCELERATION);
