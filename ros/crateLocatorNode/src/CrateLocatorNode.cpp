@@ -273,7 +273,7 @@ void CrateLocatorNode::calibrateCallback(const sensor_msgs::ImageConstPtr& msg) 
 	}
 
 	// TODO: remove
-	/*
+/*
 	cv_ptr->image = cv::imread("/home/kbraham/Pictures/Image038195248_calibration_shot.jpg");
 	if (cv_ptr->image.data == NULL) {
 		std::cerr << "[ERROR] invalid image in calibrate callback" << std::endl;
@@ -344,11 +344,7 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 	int markerNumber = 0;
 	for (std::vector<DataTypes::Point2D>::iterator it = markers.begin(); it != markers.end(); ++it) {
 		cv::circle(cv_ptr->image, cv::Point(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)), 1, cv::Scalar(0, 0, 255), 2);
-
-
-
 		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(cordTransformer->pixelToRealCoordinate(DataTypes::Point2D(cv::saturate_cast<int>(it->x),cv::saturate_cast<int>(it->y)))).toCVPoint(), 7, cv::Scalar(255, 0, 255), 1);
-
 
 		std::stringstream ss;
 		ss << markerNumber;
@@ -383,9 +379,11 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 
 		// Draw corner points
 		std::cout << "Location 1" << gc.getLocation(1) << std::endl;
-		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(0)).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
+		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(0)).toCVPoint(), 1, cv::Scalar(0, 0, 255), 2);
 		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(1)).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
-		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(3)).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
+		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(2)).toCVPoint(), 1, cv::Scalar(255, 0, 0), 2);
+		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(3)).toCVPoint(), 1, cv::Scalar(100, 255, 100), 2);
+		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(6)).toCVPoint(), 1, cv::Scalar(123, 211, 99), 2);
 		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(12)).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
 		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(15)).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
 
