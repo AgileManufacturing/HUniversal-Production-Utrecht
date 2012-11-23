@@ -9,7 +9,7 @@
 #############################################################
 
 ####### Add all ROS packages here
-set(AGENTS dummyAgent)
+set(AGENTS dummyAgent spamAgent)
 
 # add classpaths for all the agents
 rexos_add_agents("${AGENTS}")
