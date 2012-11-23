@@ -56,23 +56,49 @@ PickAndPlaceNode::~PickAndPlaceNode( ) {
 /**
  * Initial test function. Moves to a ball, grabs it, lifts it, puts it back into the crate and releases it.
  */
-bool PickAndPlaceNode::grabBall(DataTypes::Point2D sourceLocation, DataTypes::Point2D destinationLocation) {
+bool PickAndPlaceNode::relocateBall(std::string sourceName, int sourceIndex, std::string destinationName, int destinationIndex) {
 	deltaRobotNode::MoveToPoint moveToPointService;
 	moveToPointService.request.motion.maxAcceleration = PickAndPlaceNodeSettings::ACCELERATION;
+	crateLocatorNode::getCrate getCrateService;
 
-	// Move to location of the ball
-	moveToPointService.request.motion.x = sourceLocation.x;
-	moveToPointService.request.motion.y = sourceLocation.y;
-	moveToPointService.request.motion.z = -270;
-	deltaRobotClient.call(moveToPointService);
-
-	if (!moveToPointService.response.succeeded) {
-		ROS_WARN("[PICK AND PLACE] Delta robot moveTo failed.");
+	// Find location of the index in the crate
+	GridCrate4x4MiniBall sourceCrate(sourceName);
+	getCrateService.request.name = sourceName;
+	if (crateLocatorClient.call(getCrateService) && getCrateService.response.state != DataTypes::Crate::state_non_existing) {
+		sourceCrate.setCrate(getCrateService.response.crate.x, getCrateService.response.crate.y, getCrateService.response.crate.angle);
+	} else {
+		std::cerr << "[ERROR] Failed to call getCrateService for crate " << sourceName << std::endl;
 		return false;
 	}
 
+	DataTypes::Point2D sourceLocation = sourceCrate.getLocation(sourceIndex);
+	// Move to the grip point
+	DataTypes::Point2D sourceCurrentLocation;
+	while (sourceCurrentLocation.distance(sourceLocation) > 0.5) {
+
+		if (crateLocatorClient.call(getCrateService) && getCrateService.response.state != DataTypes::Crate::state_non_existing) {
+			sourceCrate.setCrate(getCrateService.response.crate.x, getCrateService.response.crate.y, getCrateService.response.crate.angle);
+		} else {
+			std::cerr << "[ERROR] Failed to call getCrateService for crate " << sourceName << std::endl;
+			return false;
+		}
+		sourceCurrentLocation = sourceCrate.getLocation(sourceIndex);
+
+		// Move to location of the ball
+		moveToPointService.request.motion.x = sourceCurrentLocation.x;
+		moveToPointService.request.motion.y = sourceCurrentLocation.y;
+		moveToPointService.request.motion.z = -270;
+		deltaRobotClient.call(moveToPointService);
+
+		if (!moveToPointService.response.succeeded) {
+			ROS_WARN("[PICK AND PLACE] Delta robot moveTo failed.");
+			return false;
+		}
+		sourceLocation = sourceCurrentLocation;
+	}
+
 	// Move down to touch the ball
-	moveToPointService.request.motion.z = -281;
+	moveToPointService.request.motion.z = -281.5;
 	deltaRobotClient.call(moveToPointService);
 
 	// Grab the ball by enabling the gripper and wait 200ms for the vacuum to build up.
@@ -90,7 +116,42 @@ bool PickAndPlaceNode::grabBall(DataTypes::Point2D sourceLocation, DataTypes::Po
 		return false;
 	}
 
+	// Find location of the index in the destination crate
+	GridCrate4x4MiniBall destinationCrate(destinationName);
+	getCrateService.request.name = destinationName;
+	if (crateLocatorClient.call(getCrateService) && getCrateService.response.state != DataTypes::Crate::state_non_existing) {
+		destinationCrate.setCrate(getCrateService.response.crate.x, getCrateService.response.crate.y, getCrateService.response.crate.angle);
+	} else {
+		std::cerr << "[ERROR] Failed to call getCrateService for crate " << destinationName << std::endl;
+		return false;
+	}
+	DataTypes::Point2D destinationLocation = destinationCrate.getLocation(destinationIndex);
+
 	// Move to the drop point
+	DataTypes::Point2D destinationCurrentLocation;
+	while (destinationCurrentLocation.distance(destinationLocation) > 0.5) {
+
+		if (crateLocatorClient.call(getCrateService) && getCrateService.response.state != DataTypes::Crate::state_non_existing) {
+			destinationCrate.setCrate(getCrateService.response.crate.x, getCrateService.response.crate.y, getCrateService.response.crate.angle);
+		} else {
+			std::cerr << "[ERROR] Failed to call getCrateService for crate " << destinationName << std::endl;
+			return false;
+		}
+		destinationCurrentLocation = destinationCrate.getLocation(destinationIndex);
+
+		// Move to location of the ball
+		moveToPointService.request.motion.x = destinationCurrentLocation.x;
+		moveToPointService.request.motion.y = destinationCurrentLocation.y;
+		moveToPointService.request.motion.z = -270;
+		deltaRobotClient.call(moveToPointService);
+
+		if (!moveToPointService.response.succeeded) {
+			ROS_WARN("[PICK AND PLACE] Delta robot moveTo failed.");
+			return false;
+		}
+		destinationLocation = destinationCurrentLocation;
+	}
+
 	moveToPointService.request.motion.x = destinationLocation.x;
 	moveToPointService.request.motion.y = destinationLocation.y;
 	deltaRobotClient.call(moveToPointService);
@@ -179,9 +240,10 @@ void PickAndPlaceNode::run( ) {
 
 	//grabBall(sourceLocation, destinationLocation);
 
+	bool direction = false;
+
 	while (ros::ok() && topicRunning) {
 		ros::spinOnce();
-
 		crateLocatorNode::getCrate getCrateService;
 
 		GridCrate4x4MiniBall crateSource("GC4x4MB_3");
@@ -195,8 +257,17 @@ void PickAndPlaceNode::run( ) {
 			std::cout << "Location 1" << crateSource.getLocation(1) << std::endl;
 		} else {
 			std::cerr << "[ERROR] Failed to call getCrateService!" << std::endl;
-			exit(1);
+			continue; //exit(1);
 		}
+
+		// TODO: remove
+		DataTypes::Point2D center(getCrateService.response.crate.x, getCrateService.response.crate.y);
+		DataTypes::Point2D bead1 = crateSource.getLocation(6);
+		std::cout << "center\t" << center << std::endl;
+		std::cout << "Location 1\t" << bead1 << std::endl;
+		std::cout << "Distance\t" << center.distance(crateSource.getLocation(1)) << std::endl;
+		std::cout << "Diff\t" << (center - crateSource.getLocation(1)) << std::endl;
+		// ENDTODO
 
 		getCrateService.request.name = "GC4x4MB_4";
 		if (crateLocatorClient.call(getCrateService) && getCrateService.response.state != DataTypes::Crate::state_non_existing) {
@@ -204,23 +275,34 @@ void PickAndPlaceNode::run( ) {
 			crateDestination.setCrate(getCrateService.response.crate.x, getCrateService.response.crate.y, getCrateService.response.crate.angle);
 		} else {
 			std::cerr << "[ERROR] Failed to call getCrateService!" << std::endl;
-			exit(1);
+			continue; //exit(1);
 		}
 
 		// Move to location of the ball
 		deltaRobotNode::MoveToPoint moveToPointService;
 		moveToPointService.request.motion.maxAcceleration = PickAndPlaceNodeSettings::ACCELERATION;
-		moveToPointService.request.motion.x = crateSource.getLocation(1).x;
-		moveToPointService.request.motion.y = crateSource.getLocation(1).y;
+		std::cout << "bead1\t" << bead1 << std::endl;
+		moveToPointService.request.motion.x = bead1.x;
+		moveToPointService.request.motion.y = bead1.y;
 		moveToPointService.request.motion.z = -270;
-		deltaRobotClient.call(moveToPointService);
+		//deltaRobotClient.call(moveToPointService);
 
-		//grabBall(crateSource.getLocation(1), crateDestination.getLocation(1));
-		//grabBall(crateDestination.getLocation(1), crateSource.getLocation(1));
+		moveToPointService.request.motion.x = bead1.x;
+		moveToPointService.request.motion.y = bead1.y;
+		moveToPointService.request.motion.z = -281.5;
+		//deltaRobotClient.call(moveToPointService);
+		if (!direction) {
+			relocateBall(crateSource.getName(),1, crateDestination.getName(),1);
+		} else {
+			relocateBall(crateDestination.getName(),1, crateSource.getName(),1);
+		}
 
-		std::cout << "Done! for now." << std::endl;
-		exit(0);
+		direction = !direction;
 	}
+
+	// Release the ball by releasing the gripper
+	gripperNode::Release releaseService;
+	gripperReleaseClient.call(releaseService);
 }
 
 void PickAndPlaceNode::inputThreadMethod(PickAndPlaceNode* that) {

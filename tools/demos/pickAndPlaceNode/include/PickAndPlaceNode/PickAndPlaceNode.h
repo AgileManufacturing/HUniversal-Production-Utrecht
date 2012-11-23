@@ -65,8 +65,7 @@ public:
 	void callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg);
 	static void inputThreadMethod(PickAndPlaceNode* that);
 
-	bool grabBall(DataTypes::Point2D sourceLocation, DataTypes::Point2D destinationLocation);
-
+	bool relocateBall(std::string sourceName, int sourceIndex, std::string destinationName, int destinationIndex);
 private:
 
 	ros::NodeHandle nodeHandle;
