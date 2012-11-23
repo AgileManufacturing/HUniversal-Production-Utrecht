@@ -67,6 +67,11 @@ public:
 
 	bool relocateBall(std::string sourceName, int sourceIndex, std::string destinationName, int destinationIndex);
 private:
+	void switchInnerOuterBalls(std::string crateA);
+	void switchInnerOuterBalls2(std::string crateA);
+	void switchInnerOuterBalls3(std::string crateA);
+	void switchInnerOuterBalls4(std::string crateA);
+	void switchDiagonalsWithNonDiagonals(std::string crateA, std::string crateB);
 
 	ros::NodeHandle nodeHandle;
 	std::string crateID;

@@ -292,7 +292,7 @@ void PickAndPlaceNode::run( ) {
 		moveToPointService.request.motion.z = -281.5;
 		//deltaRobotClient.call(moveToPointService);
 		if (!direction) {
-			relocateBall(crateSource.getName(),1, crateDestination.getName(),1);
+			relocateBall("GC4x4MB_3",1, "GC4x4MB_4",1);
 		} else {
 			relocateBall(crateDestination.getName(),1, crateSource.getName(),1);
 		}
@@ -337,4 +337,94 @@ int main(int argc, char* argv[]) {
 	pickAndPlaceNode.run();
 
 	return 0;
+}
+
+void PickAndPlaceNode::switchInnerOuterBalls(std::string crateA) {
+	relocateBall(crateA, 6, crateA, 2);
+	relocateBall(crateA, 10, crateA, 11);
+	relocateBall(crateA, 9, crateA, 13);
+	relocateBall(crateA, 5, crateA, 4);
+
+	relocateBall(crateA, 0, crateA, 5);
+	relocateBall(crateA, 3, crateA, 6);
+	relocateBall(crateA, 15, crateA, 10);
+	relocateBall(crateA, 12, crateA, 9);
+
+	relocateBall(crateA, 13, crateA, 12);
+	relocateBall(crateA, 4, crateA, 0);
+	relocateBall(crateA, 2, crateA, 3);
+	relocateBall(crateA, 11, crateA, 15);
+}
+
+void PickAndPlaceNode::switchInnerOuterBalls2(std::string crateA) {
+	relocateBall(crateA, 15, crateA, 14);
+	relocateBall(crateA, 12, crateA, 8);
+	relocateBall(crateA, 0, crateA, 1);
+	relocateBall(crateA, 3, crateA, 7);
+
+	relocateBall(crateA, 6, crateA, 3);
+	relocateBall(crateA, 10, crateA, 15);
+	relocateBall(crateA, 9, crateA, 12);
+	relocateBall(crateA, 5, crateA, 0);
+
+	relocateBall(crateA, 1, crateA, 5);
+	relocateBall(crateA, 7, crateA, 6);
+	relocateBall(crateA, 14, crateA, 10);
+	relocateBall(crateA, 8, crateA, 9);
+}
+
+void PickAndPlaceNode::switchInnerOuterBalls3(std::string crateA) {
+	relocateBall(crateA, 9, crateA, 13);
+	relocateBall(crateA, 12, crateA, 9);
+	relocateBall(crateA, 13, crateA, 12);
+
+	relocateBall(crateA, 5, crateA, 4);
+	relocateBall(crateA, 0, crateA, 5);
+	relocateBall(crateA, 4, crateA, 0);
+
+	relocateBall(crateA, 6, crateA, 2);
+	relocateBall(crateA, 3, crateA, 6);
+	relocateBall(crateA, 2, crateA, 3);
+
+	relocateBall(crateA, 10, crateA, 11);
+	relocateBall(crateA, 15, crateA, 10);
+	relocateBall(crateA, 11, crateA, 15);
+}
+
+void PickAndPlaceNode::switchInnerOuterBalls4(std::string crateA) {
+	relocateBall(crateA, 15, crateA, 14);
+	relocateBall(crateA, 10, crateA, 15);
+	relocateBall(crateA, 14, crateA, 10);
+
+	relocateBall(crateA, 3, crateA, 7);
+	relocateBall(crateA, 6, crateA, 3);
+	relocateBall(crateA, 7, crateA, 6);
+
+	relocateBall(crateA, 0, crateA, 1);
+	relocateBall(crateA, 5, crateA, 0);
+	relocateBall(crateA, 1, crateA, 5);
+
+	relocateBall(crateA, 12, crateA, 8);
+	relocateBall(crateA, 9, crateA, 12);
+	relocateBall(crateA, 8, crateA, 9);
+}
+
+void PickAndPlaceNode::switchDiagonalsWithNonDiagonals(std::string crateA, std::string crateB){
+	relocateBall(crateA, 0, crateB, 0);
+	relocateBall(crateA, 5, crateB, 5);
+	relocateBall(crateA, 6, crateB, 6);
+	relocateBall(crateA, 10, crateB, 10);
+	relocateBall(crateA, 9, crateB, 9);
+	relocateBall(crateA, 12, crateB, 12);
+	relocateBall(crateA, 15, crateB, 15);
+	relocateBall(crateA, 3, crateB, 3);
+
+	relocateBall(crateB, 2, crateA, 2);
+	relocateBall(crateB, 1, crateA, 1);
+	relocateBall(crateB, 4, crateA, 4);
+	relocateBall(crateB, 8, crateA, 8);
+	relocateBall(crateB, 13, crateA, 13);
+	relocateBall(crateB, 14, crateA, 14);
+	relocateBall(crateB, 11, crateA, 11);
+	relocateBall(crateB, 7, crateA, 7);
 }
