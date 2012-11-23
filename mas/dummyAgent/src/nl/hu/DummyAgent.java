@@ -51,12 +51,14 @@ public class DummyAgent extends Agent
 
 				Gson gson = new Gson();
 
-				for(int i =0; i< 10; i++)
+				for(int i =0; i< 100; i++)
 				{
+
 					InstructionMessage a = new InstructionMessage("moveRelativePoint", "DeltaRobotNode", "FIND_ID", null ,new Point(i,0,0,50));
 					BlackboardMessage mes = new BlackboardMessage(topic,a);
 					try
 					{
+						//Thread.sleep(100);
 						System.out.println(gson.toJson(mes));
 						client.insertJson(gson.toJson(mes));
 						System.out.println("Message Added");
@@ -64,7 +66,6 @@ public class DummyAgent extends Agent
 					catch(Exception e)
 					{
 						e.printStackTrace();
-					
 					}
 
 

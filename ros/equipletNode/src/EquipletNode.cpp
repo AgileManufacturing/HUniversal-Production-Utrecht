@@ -53,8 +53,6 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
 	std::string str = stringStream.str();
 	moduleErrorService = nodeHandle.advertiseService("ModuleError_" + str, &EquipletNode::moduleError, this); 
 	stateUpdateService = nodeHandle.advertiseService("StateUpdate_" + str, &EquipletNode::stateChanged, this);
-
-	messageAvailable = false;
 } 
 
 /**
@@ -72,30 +70,34 @@ EquipletNode::~EquipletNode() {
  * @param event The blackboard event that occured: added, updated, deleted
  * @param json The message parsed in the json format
  **/
-void EquipletNode::blackboardReadCallback(BlackboardSubscriber::BlackboardEvent event, std::string json) {
-	switch(event) {
-		case BlackboardSubscriber::UNKNOWN:
-			std::cout << "Received UNKNOWN event" << std::endl;
-			break;
-		case BlackboardSubscriber::ADD:
-			{
-				std::cout << "Received ADD event" << std::endl;
-				//std::cout << "json string: " << json << std::endl;
-				 boost::lock_guard<boost::mutex> lock(mutex);
-				 messageAvailable = true;
-				 cond.notify_one();
-			}
-			break;
-		case BlackboardSubscriber::UPDATE:
-			std::cout << "Received UPDATE event" << std::endl;
-			break;
-		case BlackboardSubscriber::REMOVE:
-			std::cout << "Received REMOVE event" << std::endl;
-			break;
-		default:
-			std::cout << "Received bbb" << std::endl;
-			break;
-	}
+void EquipletNode::blackboardReadCallback(std::string json) {
+	std::cout << "processMessage" << std::endl;
+	JSONNode n = libjson::parse(json);
+	JSONNode message = n["message"];
+	//JSONNode::const_iterator messageIt;
+	std::string destination = message["destination"].as_string();
+	//std::cout << "Destination " << destination << std::endl;
+
+	std::string command = message["command"].as_string();
+	//std::cout << "Command " << command << std::endl;
+
+	std::string payload = message["payload"].write();
+	std::cout << "Payload " << payload << std::endl;
+
+	// Create the string for the service to call
+	std::stringstream ss;
+	ss << destination;
+	ss << "/";
+	ss << command;
+	blackboardClient->removeFirst();
+	//std::string serviceToCall = ss.str();
+	//std::cout << "Service to call: " << serviceToCall << std::endl;
+
+	/*ros::NodeHandle nodeHandle;
+	ros::ServiceClient client = nodeHandle.serviceClient<rexosStdSrvs::Module>(serviceToCall);
+	rexosStdSrvs::Module srv;
+	srv.request.json = payload;
+	client.call(srv);*/
 }
 
 /**
@@ -313,44 +315,10 @@ bool EquipletNode::updateModuleState(int moduleID, rosMast::StateType state) {
 	return false;
 }
 
-void EquipletNode::processMessage() {
-	std::cout << "processMessage" << std::endl;
-	std::string json = blackboardClient->readOldestMessage();
-	JSONNode n = libjson::parse(json);
-	JSONNode message = n["message"];
-	//JSONNode::const_iterator messageIt;
-	std::string destination = message["destination"].as_string();
-	//std::cout << "Destination " << destination << std::endl;
-
-	std::string command = message["command"].as_string();
-	//std::cout << "Command " << command << std::endl;
-
-	std::string payload = message["payload"].write();
-	std::cout << "Payload " << payload << std::endl;
-
-	// Create the string for the service to call
-	std::stringstream ss;
-	ss << destination;
-	ss << "/";
-	ss << command;
-	std::string serviceToCall = ss.str();
-	//std::cout << "Service to call: " << serviceToCall << std::endl;
-
-	/*ros::NodeHandle nodeHandle;
-	ros::ServiceClient client = nodeHandle.serviceClient<rexosStdSrvs::Module>(serviceToCall);
-	rexosStdSrvs::Module srv;
-	srv.request.json = payload;
-	client.call(srv);*/
-}
-
 void EquipletNode::readFromBlackboard() {
 	std::cout << "readFromBlackboard" << std::endl;
-	while(true){
-		boost::unique_lock<boost::mutex> lock(mutex);
-		while(!messageAvailable) {
-			cond.wait(lock);
-		}
-		processMessage();
+
+	while(ros::ok()){
 		ros::spinOnce();
 	}
 }
@@ -386,14 +354,14 @@ int main(int argc, char **argv) {
 	
 	// print the hardware modules that are currently added to the Equiplet
 	//equipletNode.printHardwareModules();
-	sleep(10);
-	equipletNode.readFromBlackboard();
+	//sleep(10);
+	//equipletNode.readFromBlackboard();
 
-	/*ros::Rate poll_rate(10);
+	ros::Rate poll_rate(10);
 	while(ros::ok()) {
 		poll_rate.sleep();
 		ros::spinOnce();	
-	}*/
+	}
 
 	return 0;
 }

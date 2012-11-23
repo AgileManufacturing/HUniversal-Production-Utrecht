@@ -61,14 +61,14 @@ BlackboardCppClient::BlackboardCppClient(const std::string &hostname, const std:
  * @param coll The name of the database collection
  * @param func The address of the callback function
  **/
-/*BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll,  BlackboardSubscriber *func): database(db), collection(coll), callback(func){
+BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll,  BlackboardSubscriber *func): database(db), collection(coll), callback(func){
   try {
   	connection.connect(mongo::HostAndPort(hostname, port));
   	std::cout << "connected to database" << std::endl;
   } catch( const mongo::DBException &e ) {
     std::cout << "caught " << e.what() << std::endl;
-  }	
-}*/
+  }
+}
 
 /**
  * destructor for the BlackboardCppClient
@@ -114,7 +114,7 @@ void BlackboardCppClient::subscribe(const std::string &topic) {
 	subscriptions.insert( std::pair<std::string, mongo::BSONObj>(topic, BSON("topic" << topic)) );
 	// Start thread to read from blackboard	
 	if(subscriptions.size() == 1) {
-		readMessageThread = new boost::thread(run, this);	
+		readMessageThread = new boost::thread(run, this, true);	
 	}	
 }
 
@@ -151,69 +151,61 @@ std::string BlackboardCppClient::readOldestMessage() {
 	return object.jsonString();
 }
 
+std::string BlackboardCppClient::read(bool blocked) {
+	
+	return "";
+}
+
+void BlackboardCppClient::removeFirst()
+{
+	std::string name = database;
+	name.append(".");
+	name.append(collection);
+	mongo::Query nop;
+	mongo::BSONObj message = connection.findOne(name, nop);
+	connection.remove(name,message);
+}
+
 /**
  * Function is executed by all the threads to find out if there 
  * happened something for the topics subscribed to.
  *
  * @param client The instance of the BlackboardCppClient
  **/
-void BlackboardCppClient::run(BlackboardCppClient* client) {
-	std::cout << "Blackboard client run called" << std::endl;
-	// Create namespace string
-	std::string name = client->database;
-	name.append(".");
-	name.append(client->collection);
-	mongo::Query where = QUERY("ns" << name);
-	std::string id = "";
-	std::string operation = "";
-
+void BlackboardCppClient::run(BlackboardCppClient* client, bool blocked) {
 	while(true) {
-		std::auto_ptr<mongo::DBClientCursor> tailedCursor = client->connection.query("local.oplog.rs", where, 0, 0, 0, 
-			mongo::QueryOption_CursorTailable | mongo::QueryOption_AwaitData );
-		// Iterate over all messages already in the collection, so that only new messages will be processed
-		std::cout << "Number of messages skipped " << tailedCursor->itcount() << std::endl;
-		while(true) {
-			if(!tailedCursor->more()) {
-				if(tailedCursor->isDead()) {
-					break;
-				}
-				continue;
+		std::string name = client->database;
+		name.append(".");
+		name.append(client->collection);
+		std::vector<mongo::BSONObj> values;
+		mongo::Query where = QUERY("ns" << name);
+		for(std::map<std::string, mongo::BSONObj>::iterator it = client->subscriptions.begin(); it != client->subscriptions.end(); it++) {
+			values.push_back(it->second);
+	    }
+		mongo::BSONObj messageCheckObject(BSON("$or" << values)); 	
+		mongo::BSONObj message = client->connection.findOne(name, messageCheckObject);
+		if(!message.isEmpty())
+		{
+			client->callback->blackboardReadCallback(message.jsonString());
+		}
+		else if(blocked)
+		{
+			mongo::BSONObj ret;
+			mongo::BSONObj bsonQry = BSON("collStats" << "oplog.rs");
+			client->connection.runCommand( "local", bsonQry, ret);  
+
+			std::auto_ptr<mongo::DBClientCursor> tailedCursor = client->connection.query("local.oplog.rs", where, 0,
+			ret.getIntField("count"), 0, 0, 
+			mongo::QueryOption_CursorTailable & mongo::QueryOption_AwaitData );
+			tailedCursor->itcount();
+			tailedCursor->more();
+
+			message = client->connection.findOne(name, messageCheckObject);
+			if(!message.isEmpty())
+			{
+				client->callback->blackboardReadCallback(message.jsonString());
 			}
-			std::cout << "More messages" << std::endl;
-			mongo::BSONObj addedObject = tailedCursor->next();
-			mongo::BSONElement out;
-			if(addedObject.hasField("o")) {
-				addedObject.getObjectField("o").getObjectID(out);
-				id = out.OID().toString();
-				std::cout << id << std::endl;
-			}
-			if(addedObject.hasField("o2") && id.empty()) {
-				addedObject.getObjectField("o2").getObjectID(out);
-				id = out.OID().toString();
-				std::cout << id << std::endl;
-			}
-			operation = addedObject.getStringField("op");
-			std::vector<mongo::BSONObj> values;
-		    for(std::map<std::string, mongo::BSONObj>::iterator it = client->subscriptions.begin(); it != client->subscriptions.end(); it++) {
-        		values.push_back(it->second);
-    		}
-			mongo::BSONObj messageCheckObject(BSON("_id" << mongo::OID(id) << "$or" << values)); 
-			mongo::BSONObj message = client->connection.findOne(name, messageCheckObject);
-			std::cout << "message" << message.toString() << std::endl;
-			/* If the message is not empty, it means something has changed on the topics
-				subscribed to */
-			if(!message.isEmpty()) {
-				std::cout << "message not empty" << std::endl;
-				BlackboardSubscriber::BlackboardEvent event = BlackboardSubscriber::UNKNOWN;
-				if(operation.compare("i") == 0) {
-					event = BlackboardSubscriber::ADD;
-				} else if(operation.compare("u") == 0) {
-					event = BlackboardSubscriber::UPDATE;
-				} else if(operation.compare("r") == 0) {
-					event = BlackboardSubscriber::REMOVE;
-				}
-				client->callback->blackboardReadCallback(event, message.jsonString());
-			}
+
 		}
 	}
 }

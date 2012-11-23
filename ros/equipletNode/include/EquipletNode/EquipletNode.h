@@ -58,7 +58,7 @@ class EquipletNode: BlackboardSubscriber {
 	public:
 		EquipletNode(int id = 1);
 		virtual ~EquipletNode();
-		void blackboardReadCallback(BlackboardSubscriber::BlackboardEvent event, std::string json);
+		void blackboardReadCallback(std::string json);
 		bool addHardwareModule(Mast::HardwareModuleProperties module);
 		bool removeHardwareModule(int id);
 		void updateOperationState();
@@ -69,7 +69,6 @@ class EquipletNode: BlackboardSubscriber {
 		bool moduleError(rosMast::ErrorInModule::Request &request, rosMast::ErrorInModule::Response &response);
 		void sendStateChangeRequest(int moduleID, rosMast::StateType newState);
 		void readFromBlackboard();
-		void processMessage();
 		rosMast::StateType getModuleState(int moduleID);
 	private:
 		/**
@@ -115,16 +114,4 @@ class EquipletNode: BlackboardSubscriber {
 		 * Client to read from blackboard
 		 **/
 		BlackboardCppClient  *blackboardClient;
-		/**
-		 * @var bool messageAvailable
-		 **/
-		bool messageAvailable;
-		/**
-		 * @var boost::conditional_variable condition
-		 **/
-		boost::condition_variable cond;
-		/**
-		 * @var boost::mutex mutex
-		 **/
-		boost::mutex mutex;
 };
