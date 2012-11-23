@@ -72,7 +72,7 @@ DataTypes::Point2D GridCrate4x4MiniBall::getLocation(int index) const {
 
 	// Calculate the offset in which 
 	DataTypes::Point2D offset;
-	offset.x = (index % COLS - (COLS / 2 - 0.5)) * (DISTANCE_BETWEEN_CONTAINERS + RADIUS_OF_CONTAINER);
+	offset.x = -((index % COLS - (COLS / 2 - 0.5)) * (DISTANCE_BETWEEN_CONTAINERS + RADIUS_OF_CONTAINER));
 	offset.y = (index / ROWS - (ROWS / 2 - 0.5)) * (DISTANCE_BETWEEN_CONTAINERS + RADIUS_OF_CONTAINER);
 
 	DataTypes::Point2D result = offset.rotate(angle);
