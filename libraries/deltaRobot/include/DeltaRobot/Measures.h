@@ -77,7 +77,7 @@ namespace DeltaRobot{
 		 * @var double MOTOR_ROT_MAX
 		 * Mathematical maximum angle the motor is allowed to move to in radians.
 		 **/
-		const double MOTOR_ROT_MAX = Utilities::degreesToRadians(55);
+		const double MOTOR_ROT_MAX = Utilities::degreesToRadians(90);
 		
 		/**
 		 * @var double MOTORS_FROM_ZERO_TO_TOP_POSITION
