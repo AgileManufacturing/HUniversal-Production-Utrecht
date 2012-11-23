@@ -46,6 +46,7 @@
 #include <blackboardCppClient/BlackboardCppClient.h>
 #include <blackboardCppClient/BlackboardSubscriber.h>
 #include <rexosStdSrvs/Module.h>
+#include <Utilities/Utilities.h>
  
 #pragma GCC system_header
 #include <Libjson/libjson.h>
@@ -57,7 +58,7 @@ class EquipletNode: BlackboardSubscriber {
 	public:
 		EquipletNode(int id = 1);
 		virtual ~EquipletNode();
-		void blackboardReadCallback(BlackboardSubscriber::BlackboardEvent event, std::string json);
+		void blackboardReadCallback(std::string json);
 		bool addHardwareModule(Mast::HardwareModuleProperties module);
 		bool removeHardwareModule(int id);
 		void updateOperationState();
@@ -67,6 +68,7 @@ class EquipletNode: BlackboardSubscriber {
 		bool stateChanged(rosMast::StateUpdate::Request &request, rosMast::StateUpdate::Response &response);
 		bool moduleError(rosMast::ErrorInModule::Request &request, rosMast::ErrorInModule::Response &response);
 		void sendStateChangeRequest(int moduleID, rosMast::StateType newState);
+		void readFromBlackboard();
 		rosMast::StateType getModuleState(int moduleID);
 	private:
 		/**

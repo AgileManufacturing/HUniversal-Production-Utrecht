@@ -36,6 +36,7 @@
 #include <vector>
 #include <boost/thread.hpp>
 #include <blackboardCppClient/BlackboardSubscriber.h>
+
 #pragma GCC system_header
 #include "mongo/client/dbclient.h"
 
@@ -52,8 +53,12 @@ public:
 	void subscribe(const std::string &topic);
 	void setCallback(BlackboardSubscriber *func);	
 	void unsubscribe(const std::string &topic);
+	std::string readOldestMessage();
+	std::string read(bool blocked);
+	void removeFirst();
+
 private:
-	static void run(BlackboardCppClient* client);
+	static void run(BlackboardCppClient* client, bool blocked);
 	/**
 	 * @var mongo::DBClientConnection connection
 	 * The connection to the mongodb database

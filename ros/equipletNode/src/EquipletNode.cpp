@@ -42,8 +42,10 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
 	modulePackageNodeMap[1] = std::pair< std::string, std::string > ("deltaRobotNode", "DeltaRobotNode");
 	modulePackageNodeMap[2] = std::pair< std::string, std::string > ("gripperTestNode", "GripperTestNode");
 
-	blackboardClient = new BlackboardCppClient("192.168.0.123", "REXOS", "blackboard", this);
+	blackboardClient = new BlackboardCppClient("localhost", "REXOS", "blackboard", this);
 	blackboardClient->subscribe("instruction");
+
+	std::cout << "Connected!" << std::endl;
 	
 	ros::NodeHandle nodeHandle;
 	std::stringstream stringStream;
@@ -68,52 +70,34 @@ EquipletNode::~EquipletNode() {
  * @param event The blackboard event that occured: added, updated, deleted
  * @param json The message parsed in the json format
  **/
-void EquipletNode::blackboardReadCallback(BlackboardSubscriber::BlackboardEvent event, std::string json) {
-	switch(event) {
-		case BlackboardSubscriber::UNKNOWN:
-			std::cout << "Received UNKNOWN event" << std::endl;
-			break;
-		case BlackboardSubscriber::ADD:
-			{
-				std::cout << "Received ADD event" << std::endl;
-				//std::cout << "json string: " << json << std::endl;
-				JSONNode n = libjson::parse(json);
-				JSONNode message = n["message"];
-				//JSONNode::const_iterator messageIt;
-				std::string destination = message["destination"].as_string();
-				std::cout << "Destination " << destination << std::endl;
+void EquipletNode::blackboardReadCallback(std::string json) {
+	std::cout << "processMessage" << std::endl;
+	JSONNode n = libjson::parse(json);
+	JSONNode message = n["message"];
+	//JSONNode::const_iterator messageIt;
+	std::string destination = message["destination"].as_string();
+	//std::cout << "Destination " << destination << std::endl;
 
-				std::string command = message["command"].as_string();
-				std::cout << "Command " << command << std::endl;
+	std::string command = message["command"].as_string();
+	//std::cout << "Command " << command << std::endl;
 
-				std::string payload = message["payload"].write();
-				std::cout << "Payload " << payload << std::endl;
+	std::string payload = message["payload"].write();
+	std::cout << "Payload " << payload << std::endl;
 
-				// Create the string for the service to call
-				std::stringstream ss;
-				ss << destination;
-				ss << "/";
-				ss << command;
-				std::string serviceToCall = ss.str();
-				std::cout << "Service to call: " << serviceToCall << std::endl;
+	// Create the string for the service to call
+	std::stringstream ss;
+	ss << destination;
+	ss << "/";
+	ss << command;
+	blackboardClient->removeFirst();
+	//std::string serviceToCall = ss.str();
+	//std::cout << "Service to call: " << serviceToCall << std::endl;
 
-				ros::NodeHandle nodeHandle;
-				ros::ServiceClient client = nodeHandle.serviceClient<rexosStdSrvs::Module>(serviceToCall);
-				rexosStdSrvs::Module srv;
-				srv.request.json = payload;
-				client.call(srv);
-			}
-			break;
-		case BlackboardSubscriber::UPDATE:
-			std::cout << "Received UPDATE event" << std::endl;
-			break;
-		case BlackboardSubscriber::REMOVE:
-			std::cout << "Received REMOVE event" << std::endl;
-			break;
-		default:
-			std::cout << "Received bbb" << std::endl;
-			break;
-	}
+	/*ros::NodeHandle nodeHandle;
+	ros::ServiceClient client = nodeHandle.serviceClient<rexosStdSrvs::Module>(serviceToCall);
+	rexosStdSrvs::Module srv;
+	srv.request.json = payload;
+	client.call(srv);*/
 }
 
 /**
@@ -329,4 +313,55 @@ bool EquipletNode::updateModuleState(int moduleID, rosMast::StateType state) {
 		}
 	}
 	return false;
+}
+
+void EquipletNode::readFromBlackboard() {
+	std::cout << "readFromBlackboard" << std::endl;
+
+	while(ros::ok()){
+		ros::spinOnce();
+	}
+}
+
+/** 
+ * Main that creates the equipletNode and adds hardware modules
+ **/
+int main(int argc, char **argv) {
+
+	// Check if an equiplet id is given at the command line	 
+	int equipletId = 1;
+	if(argc != 2 || Utilities::stringToInt(equipletId, argv[1]) != 0) {
+		std::cerr << "Cannot read equiplet id from commandline. Assuming equiplet id is 1" <<std::endl;
+	}
+	 	
+	// Set the id of the Equiplet
+	std::ostringstream ss;
+	ss << "Equiplet" << equipletId;
+	const char* equipletName = ss.str().c_str();
+	
+	ros::init(argc, argv, equipletName);
+	EquipletNode equipletNode(equipletId);
+
+	// Add some hardware modules to this equiplet
+	// This should change to modules being created in the Node itself after commands on blackboard
+	//Mast::HardwareModuleProperties deltaRobot(1, 1, rosMast::safe, true, true);
+	//Mast::HardwareModuleProperties gripper(2, 2, rosMast::safe, true, true);
+	//equipletNode.addHardwareModule(deltaRobot);
+	//equipletNode->sendStateChangeRequest(1, rosMast::standby);
+	//equipletNode->sendStateChangeRequest(1, rosMast::normal);
+	//std::cout << "DeltaRobot State: " << equipletNode->getModuleState(1);
+	//equipletNode->addHardwareModule(gripper);
+	
+	// print the hardware modules that are currently added to the Equiplet
+	//equipletNode.printHardwareModules();
+	//sleep(10);
+	//equipletNode.readFromBlackboard();
+
+	ros::Rate poll_rate(10);
+	while(ros::ok()) {
+		poll_rate.sleep();
+		ros::spinOnce();	
+	}
+
+	return 0;
 }
