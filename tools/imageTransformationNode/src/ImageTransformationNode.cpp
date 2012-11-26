@@ -4,6 +4,7 @@
  * @date 2012-11-06
  *
  * @author Daan Veltman
+ * @author Arjen van Zanten
  *
  * @section LICENSE
  * License: newBSD
