@@ -103,4 +103,16 @@ namespace Utilities{
 
         return 0;
     }
+
+    /**
+     * 
+     * 
+     **/
+    double stringToDouble(const std::string& s){
+        std::istringstream i(s);
+        double x;
+        if (!(i >> x))
+            return 0;
+        return x;
+    }
 }

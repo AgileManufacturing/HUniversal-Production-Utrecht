@@ -35,6 +35,7 @@
 #include <cstdio>
 #include <algorithm>
 #include <vector>
+#include <sstream>
 
 namespace Utilities{
     long timeNow(void);
@@ -42,6 +43,7 @@ namespace Utilities{
     double radiansToDegrees(double radians);
     double degreesToRadians(double degrees);
     int stringToInt(int &i, char const *s, int base = 0);
+    double stringToDouble(const std::string& s);
 
     /**
      * Utility class to time stuff.
