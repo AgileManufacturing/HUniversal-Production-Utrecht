@@ -17,12 +17,12 @@ find_package(Doxygen)
 
 # == Find Java  == #
 #      Sets Java_JAVAC_EXECUTABLE, Java_JAVA_EXECUTABLE, Java_JAR_EXECUTABLE and Java_VERSION_MINOR
-find_package(Java)
+# find_package(Java)
 
 # == Find ANT  == #
 #      Sets ANT_EXECUTABLE and ANT_FOUND
 #	Maybe we should skip this if java is not available
-find_package(ANT)
+# find_package(ANT)
 
 # == Find Protobuf  == #
 #      Sets PROTOBUF_INCLUDE_DIRS and PROTOBUF_LIBRARIES and PROTOBUF_FOUND
@@ -43,7 +43,7 @@ find_package(ZBar0)
 
 # == Find Unicap  == #
 # Sets UNICAP_FOUND, UNICAP_INCLUDE_DIRS, UNICAP_LIBRARIES
-find_package(Unicap)
+# find_package(Unicap)
 
 # == Find OpenCV  == #
 #sets OpenCV_FOUND, OpenCV_INCLUDE_DIRS, OpenCV_LIBS
