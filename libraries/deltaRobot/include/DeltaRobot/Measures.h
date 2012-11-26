@@ -83,7 +83,7 @@ namespace DeltaRobot{
 		 * @var double MOTORS_FROM_ZERO_TO_TOP_POSITION
 		 * The angle from zero (horizontal) to the top position in radians.
 		 **/
-		const double MOTORS_FROM_ZERO_TO_TOP_POSITION = Utilities::degreesToRadians(42.5); 
+		const double MOTORS_FROM_ZERO_TO_TOP_POSITION = Utilities::degreesToRadians(20); 
 
 		/**
 		 * @var double BOUNDARY_BOX_MAX_X

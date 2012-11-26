@@ -38,7 +38,7 @@
 /** 
  * The IP of the modbus we are connecting to
  **/
-#define MODBUS_IP "192.168.0.2"
+#define MODBUS_IP "192.168.0.22"
 /** 
  * The port we are connecting to
  **/
