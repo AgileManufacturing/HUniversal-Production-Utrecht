@@ -33,6 +33,7 @@ public class SpamAgent extends Agent implements ISubscriber
 	private String topic = "instruction"; 
 	private String collection = "blackboard";
 	private int i =0;
+
 	public void setup()
 	{
 		
@@ -66,6 +67,7 @@ public class SpamAgent extends Agent implements ISubscriber
 					ACLMessage m = blockingReceive();
 					System.out.println("sen:"+System.currentTimeMillis());
 					client.insertJson(gson.toJson(mes));
+				
 				}
 				catch(Exception e)
 				{
