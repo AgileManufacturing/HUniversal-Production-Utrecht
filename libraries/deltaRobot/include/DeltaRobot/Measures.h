@@ -129,8 +129,8 @@ namespace DeltaRobot{
 		
 		/**
 		 * @var double CALIBRATION_STEP_BIG
-		 * The size of the big calibration steps in radians. Currently equal to 20 small calibration steps.
+		 * The size of the big calibration steps in radians. Currently equal to 5 small calibration steps.
 		 **/
-		 const double CALIBRATION_STEP_BIG = CALIBRATION_STEP_SMALL * 20;
+		 const double CALIBRATION_STEP_BIG = CALIBRATION_STEP_SMALL * 5;
 	}
 }
