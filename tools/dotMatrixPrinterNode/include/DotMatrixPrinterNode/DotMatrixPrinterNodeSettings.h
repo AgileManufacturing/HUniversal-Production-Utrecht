@@ -31,19 +31,6 @@
  **/
 
  namespace DotMatrixPrinterNodeSettings {
-
-	/**
-	 * @var static const unsigned int DRAW_FIELD_HEIGHT
-	 * Height of the field in millimeters that is drawable by the deltarobot.
-	 */
-	static const double DRAW_FIELD_HEIGHT = 155;
-
-	/**
-	 * @var static const unsigned int DRAW_FIELD_WIDTH
-	 * Width of the field in millimeters that is drawable by the deltarobot.
-	 */
-	static const double DRAW_FIELD_WIDTH = 90;
-
 	/**
 	 * @var static const double DRAW_FIELD_DOTS_PER_MM
 	 * Number of dots per millimeter on the drawing field.
@@ -54,6 +41,30 @@
 	 * Number of millimeters per dot on the drawing field.
 	 **/
 	static const double DRAW_FIELD_MM_PER_DOT = 1 / DRAW_FIELD_DOTS_PER_MM;
+
+	/**
+	 * @var static const double DRAW_FIELD_WIDTH
+	 * Width of the field in millimeters that is drawable by the deltarobot.
+	 */
+	static const double DRAW_FIELD_WIDTH = 90;
+
+	/**
+	 * @var static const double DRAW_FIELD_HEIGHT
+	 * Height of the field in millimeters that is drawable by the deltarobot.
+	 */
+	static const double DRAW_FIELD_HEIGHT = 155;
+
+	/**
+	 * @var static const double DRAW_FIELD_WIDTH_DOTS
+	 * Width of the field in dots
+	 **/
+	static const double DRAW_FIELD_WIDTH_DOTS = DRAW_FIELD_WIDTH * DRAW_FIELD_DOTS_PER_MM;
+
+	/**
+	 * @var static const double DRAW_FIELD_HEIGHT_DOTS
+	 * Height of the field in dots
+	 **/
+	static const double DRAW_FIELD_HEIGHT_DOTS = DRAW_FIELD_HEIGHT * DRAW_FIELD_DOTS_PER_MM;
 
 	/**
 	 * @var static const double MOVEMENT_THRESHOLD

@@ -150,8 +150,8 @@ void DotMatrixPrinterNode::imageCallback(const sensor_msgs::ImageConstPtr& msg) 
 	int cols = cv_ptr->image.cols;
 	int rows = cv_ptr->image.rows;
 
-	if(cols > DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH * DotMatrixPrinterNodeSettings::DRAW_FIELD_DOTS_PER_MM 
-		|| rows > DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT * DotMatrixPrinterNodeSettings::DRAW_FIELD_DOTS_PER_MM){
+	if(cols > DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH_DOTS
+		|| rows > DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT_DOTS){
 		throw std::out_of_range("Invalid image size");
 	}
 

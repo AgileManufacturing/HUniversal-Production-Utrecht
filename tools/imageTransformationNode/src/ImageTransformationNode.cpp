@@ -70,9 +70,6 @@ ImageTransformationNode::ImageTransformationNode(int equipletID, int moduleID) :
 
 	// OpenCV GUI
 	cv::namedWindow(WINDOW_NAME, CV_WINDOW_NORMAL | CV_WINDOW_KEEPRATIO);
-	cv::createTrackbar("blockSize:", WINDOW_NAME, &blockSize, maximum );
-	cv::createTrackbar("subtract :", WINDOW_NAME, &subtract, maximum );
-
 	cvSetMouseCallback(WINDOW_NAME, &on_mouse, this);
 }
 
@@ -85,27 +82,6 @@ void ImageTransformationNode::publishImage(){
 	cvi.header.stamp = time;
 	cvi.header.frame_id = "image";
 	cvi.encoding = sensor_msgs::image_encodings::MONO8;
-
-	// cv::Mat outputImage(25,25,CV_8U);
-
-
-	// int length = outputImage.cols * outputImage.rows;
-	// for(int i = 0; i < length; i++){
-	// 	outputImage.data[i] = 255;	
-	// }
-
-	// for(int x = 0; x < outputImage.cols; x += 5){
-	// 	for(int y = 0; y < outputImage.rows; y++){
-	// 		outputImage.data[y * outputImage.rows + x] = 0;
-	// 	}
-	// }
-
-	// for(int x = 0; x < outputImage.cols; x++){
-	// 	for(int y = 0; y < outputImage.rows; y += 5){
-	// 		outputImage.data[y * outputImage.rows + x] = 0;
-	// 	}
-	// }
-
 	cvi.image = outputImage;
 	pub.publish(cvi.toImageMsg());
 	std::cout << "Published image to " << pub.getTopic() << ". Listeners: " << pub.getNumSubscribers() << std::endl;
@@ -116,42 +92,35 @@ void ImageTransformationNode::publishImage(){
  *
  * @param msg The pointer to the message that contains the camera image.
  **/
-void ImageTransformationNode::transformCallback() {//const sensor_msgs::ImageConstPtr& msg) {
-	// Receive image
-	//cv_bridge::CvImagePtr cv_ptr;
-	// try {
-	// 	cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-	// } catch (cv_bridge::Exception& e) {
-	// 	ROS_ERROR("cv_bridge exception: %s", e.what());
-	// 	return;
-	// }
-
-	//cv_ptr->image = cv::imread("/home/kbraham/Pictures/daniel.png");
+void ImageTransformationNode::transformCallback() {
 	cv::Mat image = cv::imread("/home/arjen/Desktop/rexoslogo_no_fill.png");
+	//cv::Mat image = cv::imread("/home/arjen/Desktop/black.png");
 	//cv_ptr->image = cv::imread("/home/arjen/Desktop/corners.png");
 	if(image.data == NULL){
 		std::cerr << "Invalid image" << std::endl;
 		exit(1);
 	}
 
+	cv::Mat sizedImage(image);
 
-	//calculating scale such that the entire picture will fit, with respect to aspect ratio, on the draw field.
-	double scale = std::max(
-		image.rows / (DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT * DotMatrixPrinterNodeSettings::DRAW_FIELD_DOTS_PER_MM), 
-		image.cols / (DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH * DotMatrixPrinterNodeSettings::DRAW_FIELD_DOTS_PER_MM));
-	//size should not be at least 1 pixel in height and 1 pixel in width
-	cv::Size outputSize = cv::Size(
-		image.cols / scale < 1 ? 1 : image.cols / scale, 
-		image.rows / scale < 1 ? 1 : image.rows / scale);
+	if(!(image.cols == DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH || image.rows == DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT)){
+		//calculating scale such that the entire picture will fit, with respect to aspect ratio, on the draw field.
+		double scale = std::max(
+			image.rows / (DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT_DOTS), 
+			image.cols / (DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH_DOTS));
 
-	cv::Mat resizedImage;
-	cv::resize(image, resizedImage, outputSize);
+		//size should not be at least 1 pixel in height and 1 pixel in width
+		cv::Size outputSize = cv::Size(
+			image.cols / scale < 1 ? 1 : image.cols / scale, 
+			image.rows / scale < 1 ? 1 : image.rows / scale);
+
+		cv::resize(image, sizedImage, outputSize);
+	}
 
 	cv::Mat grayImage;
-	cv::cvtColor(resizedImage, grayImage, CV_BGR2GRAY);
+	cv::cvtColor(sizedImage, grayImage, CV_BGR2GRAY);
 
 	outputImage = grayImage > 150;
-	
 
 	// //Threshold the image, note that blocksize has to be a multiple of 3 and >= 3.
 	// cv::Mat thresholdedImage;
