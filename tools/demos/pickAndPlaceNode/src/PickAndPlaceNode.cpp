@@ -40,6 +40,8 @@
 #include <Utilities/Utilities.h>
 #include <DataTypes/GridCrate4x4MiniBall.h>
 
+
+
 PickAndPlaceNode::PickAndPlaceNode( ) :
 		crateID(""), updateCrateIDFlag(false), inputRunning(true), topicRunning(true), deltaRobotClient(nodeHandle.serviceClient<deltaRobotNode::MoveToPoint>(DeltaRobotNodeServices::MOVE_TO_POINT)), crateLocatorClient(nodeHandle.serviceClient<crateLocatorNode::getCrate>(CrateLocatorNodeServices::GET_CRATE)), gripperGripClient(nodeHandle.serviceClient<gripperNode::Grip>(GripperNodeServices::GRIP)), gripperReleaseClient(nodeHandle.serviceClient<gripperNode::Release>(GripperNodeServices::RELEASE)) {
 	inputThread = new boost::thread(inputThreadMethod, this);
@@ -87,7 +89,7 @@ bool PickAndPlaceNode::relocateBall(std::string sourceName, int sourceIndex, std
 		// Move to location of the ball
 		moveToPointService.request.motion.x = sourceCurrentLocation.x;
 		moveToPointService.request.motion.y = sourceCurrentLocation.y;
-		moveToPointService.request.motion.z = -270;
+		moveToPointService.request.motion.z = PickAndPlaceNodeSettings::Z_MOVING;
 		deltaRobotClient.call(moveToPointService);
 
 		if (!moveToPointService.response.succeeded) {
@@ -98,7 +100,7 @@ bool PickAndPlaceNode::relocateBall(std::string sourceName, int sourceIndex, std
 	}
 
 	// Move down to touch the ball
-	moveToPointService.request.motion.z = -281.5;
+	moveToPointService.request.motion.z = PickAndPlaceNodeSettings::Z_GRAB;
 	deltaRobotClient.call(moveToPointService);
 
 	// Grab the ball by enabling the gripper and wait 200ms for the vacuum to build up.
@@ -106,15 +108,20 @@ bool PickAndPlaceNode::relocateBall(std::string sourceName, int sourceIndex, std
 	gripperGripClient.call(gripService);
 	Utilities::sleep(200);
 
-	// Move up get the ball out of the crate
-	moveToPointService.request.motion.z = -260;
-	deltaRobotClient.call(moveToPointService);
-
-	if (!gripService.response.succeeded) {
-		// Gripper failed... stop the action for now.
+	if(!gripService.response.succeeded){
+		// Warn only once
 		ROS_WARN("[PICK AND PLACE] Gripper grab failed.");
-		return false;
 	}
+
+	while (!gripService.response.succeeded) {
+		// Gripper failed... stop the action for now.
+		gripperGripClient.call(gripService);
+		Utilities::sleep(200);
+	}
+
+	// Move up get the ball out of the crate
+	moveToPointService.request.motion.z = PickAndPlaceNodeSettings::Z_MOVING;
+	deltaRobotClient.call(moveToPointService);
 
 	// Find location of the index in the destination crate
 	GridCrate4x4MiniBall destinationCrate(destinationName);
@@ -157,22 +164,27 @@ bool PickAndPlaceNode::relocateBall(std::string sourceName, int sourceIndex, std
 	deltaRobotClient.call(moveToPointService);
 
 	// Move down to release the ball
-	moveToPointService.request.motion.z = -275;
+	moveToPointService.request.motion.z = PickAndPlaceNodeSettings::Z_RELEASE;
 	deltaRobotClient.call(moveToPointService);
 
 	// Release the ball by releasing the gripper
 	gripperNode::Release releaseService;
 	gripperReleaseClient.call(releaseService);
 
-	// Move up to get into the start position
-	moveToPointService.request.motion.z = -270;
-	deltaRobotClient.call(moveToPointService);
-
-	if (!releaseService.response.succeeded) {
-		// Gripper failed... stop the action for now.
-		ROS_ERROR("[PICK AND PLACE] Gripper release failed.");
-		return false;
+	if(!releaseService.response.succeeded){
+		// Warn only once
+		ROS_WARN("[PICK AND PLACE] Gripper release failed.");
 	}
+
+	while (!releaseService.response.succeeded) {
+		// Gripper failed... stop the action for now.
+		gripperReleaseClient.call(releaseService);
+		Utilities::sleep(200);
+	}
+
+	// Move up to get into the start position
+	moveToPointService.request.motion.z = PickAndPlaceNodeSettings::Z_MOVING;
+	deltaRobotClient.call(moveToPointService);
 
 	return true;
 }

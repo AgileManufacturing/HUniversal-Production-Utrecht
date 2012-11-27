@@ -37,4 +37,8 @@
 	 **/
 	static const double ACCELERATION = 50;
 
+	static const double Z_GRAB = -290;
+	static const double Z_RELEASE = -285;
+	static const double Z_MOVING = -270;
+
 }
