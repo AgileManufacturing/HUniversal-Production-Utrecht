@@ -136,6 +136,19 @@ void DotMatrixPrinterNode::drawDotToPath(double x, double y) {
  * @param msg The pointer to the message that contains the camera image.
  **/
 void DotMatrixPrinterNode::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
+	
+	while(ros::ok()){
+		std::cout << "Receiving image. Start? Y/N" << std::endl;
+		std::string input;
+		std::cin >> input;
+
+		if(input[0] == 'Y' || input[0] == 'y'){
+			break;
+		} else if(input[0] == 'N' || input[0] == 'n'){
+			return;
+		}
+	}
+
 	// Receive image
 	cv_bridge::CvImagePtr cv_ptr;
 	try {
@@ -152,6 +165,7 @@ void DotMatrixPrinterNode::imageCallback(const sensor_msgs::ImageConstPtr& msg) 
 
 	if(cols > DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH_DOTS
 		|| rows > DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT_DOTS){
+		std::cerr << "cols: " << cols << " rows: " << rows << std::endl;
 		throw std::out_of_range("Invalid image size");
 	}
 

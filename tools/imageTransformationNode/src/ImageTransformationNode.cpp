@@ -93,8 +93,8 @@ void ImageTransformationNode::publishImage(){
  * @param msg The pointer to the message that contains the camera image.
  **/
 void ImageTransformationNode::transformCallback() {
-	cv::Mat image = cv::imread("/home/arjen/Desktop/rexoslogo_no_fill.png");
-	//cv::Mat image = cv::imread("/home/arjen/Desktop/black.png");
+	//cv::Mat image = cv::imread("/home/arjen/Desktop/rexoslogo_no_fill.png");
+	cv::Mat image = cv::imread("/home/arjen/Desktop/deltarobot.png");
 	//cv_ptr->image = cv::imread("/home/arjen/Desktop/corners.png");
 	if(image.data == NULL){
 		std::cerr << "Invalid image" << std::endl;
@@ -103,7 +103,10 @@ void ImageTransformationNode::transformCallback() {
 
 	cv::Mat sizedImage(image);
 
-	if(!(image.cols == DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH || image.rows == DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT)){
+	if(image.cols < DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH 
+		|| image.rows < DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT
+		|| image.cols > DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH 
+		|| image.rows > DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT){
 		//calculating scale such that the entire picture will fit, with respect to aspect ratio, on the draw field.
 		double scale = std::max(
 			image.rows / (DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT_DOTS), 
