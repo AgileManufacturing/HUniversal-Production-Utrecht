@@ -58,6 +58,22 @@ namespace Vision {
 				return alpha + Utilities::degreesToRadians(180);
 			}
 
+			double getOffsetX(){
+				return offsetX;
+			}
+
+			double getOffsetY(){
+				return offsetY;
+			}
+
+			void setOffsetX(double offset){
+				offsetX = offset;
+			}
+
+			void setOffsetY(double offset){
+				offsetY = offset;
+			}
+
 		private:
 
 			/**
