@@ -70,7 +70,7 @@ void on_mouse(int event, int x, int y, int flags, void* param) {
  * Subscribes to the camera node, starts the QR detector and opens a window to show the output.
  **/
 CrateLocatorNode::CrateLocatorNode( ) :
-		measurementCount(0), measurements(0), failCount(0), imageTransport(node) {
+		measurementCount(0), measurements(0), failCount(0), imageTransport(node), inputRunning(true) {
 
 	// Setup the QR detector
 	qrDetector = new Vision::QRCodeDetector();
@@ -110,6 +110,8 @@ CrateLocatorNode::CrateLocatorNode( ) :
 	getCrateService = node.advertiseService(CrateLocatorNodeServices::GET_CRATE, &CrateLocatorNode::getCrate, this);
 	getAllCratesService = node.advertiseService(CrateLocatorNodeServices::GET_ALL_CRATES, &CrateLocatorNode::getAllCrates, this);
 
+	inputThread = new boost::thread(inputThreadMethod, this);
+
 	// Opencv GUI
 	cv::namedWindow(WINDOW_NAME, CV_WINDOW_KEEPRATIO);
 	cvSetMouseCallback(WINDOW_NAME, &on_mouse, cordTransformer);
@@ -119,6 +121,8 @@ CrateLocatorNode::CrateLocatorNode( ) :
  * Destructor for the CrateLocator. Removes the QR detector, fiducial detector, crate tracker and coordinate transformer.
  **/
 CrateLocatorNode::~CrateLocatorNode( ) {
+	inputRunning = false;
+	inputThread->interrupt();
 	delete qrDetector;
 	delete fidDetector;
 	delete cordTransformer;
@@ -273,12 +277,12 @@ void CrateLocatorNode::calibrateCallback(const sensor_msgs::ImageConstPtr& msg) 
 	}
 
 	// TODO: remove
-/*
-	cv_ptr->image = cv::imread("/home/kbraham/Pictures/Image038195248_calibration_shot.jpg");
-	if (cv_ptr->image.data == NULL) {
-		std::cerr << "[ERROR] invalid image in calibrate callback" << std::endl;
-		exit(1);
-	}*/
+	/*
+	 cv_ptr->image = cv::imread("/home/kbraham/Pictures/Image038195248_calibration_shot.jpg");
+	 if (cv_ptr->image.data == NULL) {
+	 std::cerr << "[ERROR] invalid image in calibrate callback" << std::endl;
+	 exit(1);
+	 }*/
 
 	// First copy the image to a gray scale image.
 	cv::Mat gray;
@@ -331,10 +335,10 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 
 	// TODO: remove
 	/*cv_ptr->image = cv::imread("/home/kbraham/Pictures/rexos/crates/Image034546779_tekst.jpg");
-	if (cv_ptr->image.data == NULL) {
-		std::cerr << "[ERROR] invalid image in crateLocateCallback" << std::endl;
-		exit(1);
-	}*/
+	 if (cv_ptr->image.data == NULL) {
+	 std::cerr << "[ERROR] invalid image in crateLocateCallback" << std::endl;
+	 exit(1);
+	 }*/
 
 	// First copy the image to a gray scale image.
 	cv::Mat gray;
@@ -344,7 +348,7 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 	int markerNumber = 0;
 	for (std::vector<DataTypes::Point2D>::iterator it = markers.begin(); it != markers.end(); ++it) {
 		cv::circle(cv_ptr->image, cv::Point(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)), 1, cv::Scalar(0, 0, 255), 2);
-		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(cordTransformer->pixelToRealCoordinate(DataTypes::Point2D(cv::saturate_cast<int>(it->x),cv::saturate_cast<int>(it->y)))).toCVPoint(), 7, cv::Scalar(255, 0, 255), 1);
+		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(cordTransformer->pixelToRealCoordinate(DataTypes::Point2D(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)))).toCVPoint(), 7, cv::Scalar(255, 0, 255), 1);
 
 		std::stringstream ss;
 		ss << markerNumber;
@@ -378,7 +382,6 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 		gc.setCrate(it->getCenter().x, it->getCenter().y, it->getAngle());
 
 		// Draw corner points
-		std::cout << "Location 1" << gc.getLocation(1) << std::endl;
 		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(0)).toCVPoint(), 1, cv::Scalar(0, 0, 255), 2);
 		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(1)).toCVPoint(), 1, cv::Scalar(0, 255, 0), 2);
 		cv::circle(cv_ptr->image, cordTransformer->realToPixelCoordinate(gc.getLocation(2)).toCVPoint(), 1, cv::Scalar(255, 0, 0), 2);
@@ -424,7 +427,7 @@ void CrateLocatorNode::run( ) {
 		ros::shutdown();
 	} else {
 		// Shutdown is not immediately exiting the program. This caused to run the these statements if they were not in the else...
-		DataTypes::Point2D pointPixel = cordTransformer->realToPixelCoordinate(DataTypes::Point2D(100,100));
+		DataTypes::Point2D pointPixel = cordTransformer->realToPixelCoordinate(DataTypes::Point2D(100, 100));
 		DataTypes::Point2D pointReal = cordTransformer->pixelToRealCoordinate(pointPixel);
 		std::cout << "PointReal" << pointReal << std::endl;
 
@@ -438,6 +441,33 @@ void CrateLocatorNode::run( ) {
 		while (ros::ok()) {
 			ros::spinOnce();
 		}
+	}
+}
+
+void CrateLocatorNode::inputThreadMethod(CrateLocatorNode* that) {
+	try {
+		char key;
+
+		while (that->inputRunning) {
+			std::cin >> key;
+			if (key == 'x' || key == 'X') {
+				std::cout << "Enter the new relative offsetX: ";
+				double offset;
+				std::cin >> offset;
+				double currentOffset = that->cordTransformer->getOffsetX();
+				that->cordTransformer->setOffsetX(currentOffset + offset);
+				std::cout << "New offsetX is " << (currentOffset + offset) << std::endl;
+			} else if (key == 'y' || key == 'Y') {
+				std::cout << "Enter the new relative offsetY: ";
+				double offset;
+				std::cin >> offset;
+				double currentOffset = that->cordTransformer->getOffsetY();
+				that->cordTransformer->setOffsetY(currentOffset + offset);
+				std::cout << "New offsetY is " << (currentOffset + offset) << std::endl;
+			}
+		}
+	} catch (boost::thread_interrupted& ignored) {
+		// Ignore interrupt and exit thread.
 	}
 }
 
