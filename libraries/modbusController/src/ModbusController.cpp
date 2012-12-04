@@ -184,8 +184,9 @@ namespace ModbusController{
             if(slave == 0 && errno == MODBUS_ERRNO_TIMEOUT){
                 return;
             }
-            
-            throw ModbusException("Error writing u16");
+            std::stringstream stream;
+            stream << "Error writing u16 " << data << " to 0x" << std::hex << address << std::endl;
+            throw ModbusException(stream.str());
         }
         
         if(useShadow){
@@ -227,7 +228,9 @@ namespace ModbusController{
                 return;
             }
             
-            throw ModbusException("Error writing u16 array");
+            std::stringstream stream;
+            stream << "Error writing u16 array " << data << " to 0x" << std::hex << firstAddress << " or 0x" << std::hex << firstAddress + 1 << std::endl;
+            throw ModbusException(stream.str());
         }
     }
 

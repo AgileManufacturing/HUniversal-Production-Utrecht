@@ -134,13 +134,13 @@ namespace Motor{
                 PRESENT_ALARM           = 0x100,
 
                 // 32-bit Preset position value argument.
-                CFG_PRESET_POSITION = 0x214,
+                CFG_PRESET_POSITION     = 0x214,
 
                 // 16-bit Set the preset position to the preset position value argument.
-                OP_PRESET_POSITION = 0x048, 
+                OP_PRESET_POSITION      = 0x048, 
 
                 // 16-bit Sets the software motor limitation (in the motor controller).
-                OP_SOFTWARE_OVERTRAVEL = 0x252 
+                OP_SOFTWARE_OVERTRAVEL  = 0x252 
             };
         }
 
@@ -180,7 +180,7 @@ namespace Motor{
              **/
             enum _rtu_config{
                 BAUDRATE = 115200,
-                PARITY   = 'N',
+                PARITY   = 'E',
                 DATA_BITS = 8,
                 STOP_BITS = 1
             };

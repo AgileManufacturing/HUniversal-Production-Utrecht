@@ -89,13 +89,9 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
     drm.effector = DeltaRobot::Measures::EFFECTOR;
     drm.ankle = DeltaRobot::Measures::ANKLE;
     drm.maxAngleHipAnkle = DeltaRobot::Measures::HIP_ANKLE_ANGLE_MAX;
-
-    modbus = new ModbusController::ModbusController(modbus_new_rtu(
-        "/dev/ttyS0",
-        Motor::CRD514KD::RtuConfig::BAUDRATE,
-        Motor::CRD514KD::RtuConfig::PARITY,
-        Motor::CRD514KD::RtuConfig::DATA_BITS,
-        Motor::CRD514KD::RtuConfig::STOP_BITS));
+    modbus = new ModbusController::ModbusController(modbus_new_tcp(
+        "192.168.0.4",
+        502));
 
     //Motors is declared in the header file, size = 3
     motors[0] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_0, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);

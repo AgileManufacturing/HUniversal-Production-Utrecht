@@ -18,4 +18,11 @@ else(ROS_OK)
 	message("ROS packages cannot be build")
 endif(ROS_OK)
 
-
+# mcRegisterSave # 
+if(${MODBUS_FOUND})
+	rexos_add_executable(mcRegisterSave)
+	include_directories(${MODBUS_INCLUDE_DIRS} ${LIB_MOTOR_INCLUDE} ${LIB_MODBUS_CONTROLLER_INCLUDE})
+	target_link_libraries(mcRegisterSave ${MODBUS_LIBRARIES} modbusController motor)
+else(${MODBUS_FOUND})
+	rexos_cannot_build(mcRegisterSave "tools/mcRegisterSave")
+endif(${MODBUS_FOUND})
