@@ -36,12 +36,14 @@ public class DummyAgent extends Agent implements ISubscriber
 	public void setup()
 	{
 		
-		client = new BlackboardClient("localhost",this);
+		client = new BlackboardClient("localhost");
+		
+		try{
 		client.setDatabase(database);	
 		client.setCollection(collection);
-		try{
 		client.subscribe(topic);
-		}catch(Exception e){}	
+		client.setCallback(this);
+		}catch(Exception e){e.printStackTrace();}	
 
 		this.addBehaviour(new CyclicBehaviour()
 		{
@@ -63,53 +65,12 @@ public class DummyAgent extends Agent implements ISubscriber
 			}
 		});
 
-		this.addBehaviour(new CyclicBehaviour()
-		{
-			@Override
-			public void action() 
-			{
-
-				Gson gson = new Gson();
-				
-				ArrayList<Point> points = new ArrayList<Point>();
-				points.add(new Point(rand(-10,10),rand(-10,10),rand(-10,10), 50));
-				points.add(new Point(rand(-10,10),rand(-10,10),rand(-10,10) , 50));
-				InstructionMessage a = new InstructionMessage("moveRelativePath", "DeltaRobotNode", "FIND_ID", null ,points);
-				BlackboardMessage mes = new BlackboardMessage(topic,a);
-				try
-				{
-					client.insertJson(gson.toJson(mes));
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}	
-					
-			}
-		});
-
-
-
 	}
 
 	public void onMessage(String json)
 	{
 		client.removeFirst();
-		System.out.println("rec:"+System.currentTimeMillis());
-		System.out.println(json);
+		System.out.print(" "+System.nanoTime() + "\n");
+	//	System.out.println(json);
 	}
-
-
-                public static int rand(int lo, int hi)
-                {
-                	Random randomGenerator = new Random();
-                        int n = hi - lo + 1;
-                        int i = randomGenerator.nextInt() % n;
-                        if (i < 0)
-                                i = -i;
-                        return lo + i;
-                }
-
-
-
 }
