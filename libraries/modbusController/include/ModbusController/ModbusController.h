@@ -88,12 +88,12 @@ namespace ModbusController{
             /**
              * The interval between writing on the modbus in unicast mode milliseconds.
              **/
-            WRITE_INTERVAL_UNICAST   = 8,
+            WRITE_INTERVAL_UNICAST   = 80,
 
             /**
              * The interval between writing on the modbus in broadcast mode in milliseconds.
              **/
-            WRITE_INTERVAL_BROADCAST = 16,
+            WRITE_INTERVAL_BROADCAST = 80,
             
             /**
              * Timeout for bytes in a response. This timeout will occur when a message is delayed while being send.
