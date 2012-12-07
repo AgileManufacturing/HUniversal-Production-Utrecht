@@ -90,14 +90,6 @@ void EquipletNode::blackboardReadCallback(std::string json) {
 	ss << "/";
 	ss << command;
 	blackboardClient->removeFirst();
-	//std::string serviceToCall = ss.str();
-	//std::cout << "Service to call: " << serviceToCall << std::endl;
-
-	/*ros::NodeHandle nodeHandle;
-	ros::ServiceClient client = nodeHandle.serviceClient<rexosStdSrvs::Module>(serviceToCall);
-	rexosStdSrvs::Module srv;
-	srv.request.json = payload;
-	client.call(srv);*/
 }
 
 /**
@@ -110,10 +102,8 @@ void EquipletNode::blackboardReadCallback(std::string json) {
 bool EquipletNode::stateChanged(rosMast::StateUpdate::Request &request, rosMast::StateUpdate::Response &response) {
 	ROS_INFO("State changed message received");
 	if(updateModuleState(request.state.moduleID, rosMast::StateType(request.state.newState))) {
-		//std::cout << "The state of module " << msg->moduleID << " has been changed to " << rosMast::state_txt[msg->state] << std::endl; 
 		response.succeeded = true;
 	} else{
-		//std::cerr << "Cannot update the state of the module " << msg->moduleID << " run for your life!" << std::endl;
 		response.succeeded = false;
 	}	
 	return true;
@@ -128,7 +118,6 @@ bool EquipletNode::stateChanged(rosMast::StateUpdate::Request &request, rosMast:
 bool EquipletNode::moduleError(rosMast::ErrorInModule::Request &request, rosMast::ErrorInModule::Response &response) {
 	int moduleID = request.moduleError.moduleID;
 	ROS_INFO("Error message received from module %d", moduleID);
-	//int errorCode = msg->errorCode;
 
 	// TODO: Lookup errorcode in the DB and decide accordingly
 	
