@@ -92,9 +92,9 @@ CrateLocatorNode::CrateLocatorNode( ) :
 	// The real-life coordinates of the fiducials in mm.
 	// 0,0 is center of the delta robot, all coordinates are relative.
 	std::vector<DataTypes::Point2D> rc;
-	rc.push_back(DataTypes::Point2D(-75, 115));
-	rc.push_back(DataTypes::Point2D(25, 115));
-	rc.push_back(DataTypes::Point2D(25, 65));
+	rc.push_back(DataTypes::Point2D(-68, 110));
+	rc.push_back(DataTypes::Point2D(32, 110));
+	rc.push_back(DataTypes::Point2D(32, 60));
 
 	cordTransformer = new Vision::PixelAndRealCoordinateTransformer(rc, rc);
 
