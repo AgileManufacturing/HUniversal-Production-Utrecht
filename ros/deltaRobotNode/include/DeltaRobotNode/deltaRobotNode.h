@@ -86,7 +86,7 @@ namespace deltaRobotNodeNamespace {
 			 **/
 			ModbusController::ModbusController* modbus;
 			/**
-			 * Motor::MotorManager* motorManager
+			 * @var Motor::MotorManager* motorManager
 			 * The motor manager
 			 **/
 			Motor::MotorManager* motorManager;

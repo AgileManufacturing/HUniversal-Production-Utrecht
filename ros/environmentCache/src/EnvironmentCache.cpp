@@ -74,8 +74,8 @@ bool EnvironmentCache::lookupEnvironmentObject(environmentCache::LookupEnvironme
 /**
  * The Service that updates the environment cache
  *
- * @param environmentCache::UpdateEnvironmentCache::Request &req The request for this service with an EnvironmentCacheUpdate message
- * @param environmentCache::UpdateEnvironmentCache::Response &res with a bool. True if success else false
+ * @param req The request for this service with an EnvironmentCacheUpdate message
+ * @param res with a bool. True if success else false
  *
  * @return true if success else false
  **/
@@ -201,8 +201,8 @@ bool EnvironmentCache::removeItemFromCache(std::string id) {
 /**
  * Convert a vector to a map
  *
- * @param properties the vector with KeyValuePair objects
- * @param the map where the keys and values of the objects in the vector is inserted to
+ * @param propertiesVector the vector with KeyValuePair objects
+ * @param propertiesMap the map where the keys and values of the objects in the vector is inserted to
  **/
 void EnvironmentCache::createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap) {
 	for(int i = 0; i < (int)propertiesVector.size(); i++) {
@@ -229,7 +229,9 @@ environmentCommunicationMessages::Map EnvironmentCache::createMapMessageFromProp
 	return map;
 }
 
-
+/** 
+ * Main that creates the environment cache
+ **/
 int main(int argc, char **argv) {
 	ros::init(argc, argv, "EnvironmentCache");
 	EnvironmentCache envCache;

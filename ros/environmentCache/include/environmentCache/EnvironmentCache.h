@@ -42,6 +42,10 @@
  **/
 class EnvironmentCache{
 public:
+	/**
+	 * @var environmentAction
+	 * The enum for environment actions that are possible
+	 **/
 	enum environmentAction {ADD, UPDATE, REMOVE};
 	EnvironmentCache();
 	bool lookupEnvironmentObject(environmentCache::LookupEnvironmentObject::Request &req, environmentCache::LookupEnvironmentObject::Response &res);
@@ -55,13 +59,22 @@ private:
 	void createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap);
 	environmentCommunicationMessages::Map createMapMessageFromProperties(std::map<std::string, std::string> &properties);
 
-	// The environemt cache
+	/**
+	 * @var std::map< std::string, std::map<std::string, std::string> > cache
+	 * Map that is used for caching the data
+	 **/
 	std::map< std::string, std::map<std::string, std::string> > cache;
 
-	// LookupEnvironmentObjectService
+	/**
+	 * @var ros::ServiceServer lookupEnvironmentObjectService
+	 * The service object for calling the lookup environment 
+	 **/
 	ros::ServiceServer lookupEnvironmentObjectService;
 
-	// UpdateEnvironmentCacheService
+	/**
+	 * @var ros::ServiceServer updateEnvironmentCacheService
+	 * Server thats gets called to update the data in the update environment cache
+	 **/
 	ros::ServiceServer updateEnvironmentCacheService;
 };
 
