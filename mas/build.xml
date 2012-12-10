@@ -2,7 +2,7 @@
 
 
 
-	<target name="all" depends="dummyAgent, spamAgent, commAgent, receiverAgent">
+	<target name="all" depends="dummyAgent, spamAgent">
 		
 	</target>
 
@@ -17,24 +17,9 @@
 		</ant> 
 	</target>
 
-	<target name="commAgent">
-		<ant antfile="build.xml" target="build" dir="commAgent" inheritRefs="true" useNativeBasedir="true"> 
-			
-		</ant> 
-	</target>
-
-	<target name="receiverAgent">
-		<ant antfile="build.xml" target="build" dir="receiverAgent" inheritRefs="true" useNativeBasedir="true"> 
-			
-		</ant> 
-	</target>
-
-
 	<target name="clean">
 		<ant antfile="build.xml" target="clean" dir="dummyAgent" inheritRefs="true" useNativeBasedir="true"/>  
-		<ant antfile="build.xml" target="clean" dir="spamAgent" inheritRefs="true" useNativeBasedir="true"/> 
-		<ant antfile="build.xml" target="clean" dir="commAgent" inheritRefs="true" useNativeBasedir="true"/>  
-		<ant antfile="build.xml" target="clean" dir="receiverAgent" inheritRefs="true" useNativeBasedir="true"/>  		 
+		<ant antfile="build.xml" target="clean" dir="spamAgent" inheritRefs="true" useNativeBasedir="true"/> 	 
 	</target>
 	
 </project>
