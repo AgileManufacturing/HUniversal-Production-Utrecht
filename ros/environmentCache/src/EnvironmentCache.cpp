@@ -42,13 +42,6 @@ EnvironmentCache::EnvironmentCache(): cache() {
 }
 
 /**
- * The destructor for the EnvironmentCache class
- **/
-EnvironmentCache::~EnvironmentCache() {
-
-}
-
-/**
  * Get the properties of an item in the cache
  *
  * @param req the request object. Contains the id of the item to get the properties from

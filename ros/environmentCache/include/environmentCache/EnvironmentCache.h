@@ -41,41 +41,40 @@
  * This class represents the environment cache
  **/
 class EnvironmentCache{
-public:
-	/**
-	 * @var environmentAction
-	 * The enum for environment actions that are possible
-	 **/
-	enum environmentAction {ADD, UPDATE, REMOVE};
-	EnvironmentCache();
-	bool lookupEnvironmentObject(environmentCache::LookupEnvironmentObject::Request &req, environmentCache::LookupEnvironmentObject::Response &res);
-	bool updateEnvironmentCache(environmentCache::UpdateEnvironmentCache::Request &req, environmentCache::UpdateEnvironmentCache::Response &res);
-	void printEnvironmentCache();
-	virtual ~EnvironmentCache();
-private:
-	bool addItemToCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties);
-	bool updateItemInCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties);
-	bool removeItemFromCache(std::string id);
-	void createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap);
-	environmentCommunicationMessages::Map createMapMessageFromProperties(std::map<std::string, std::string> &properties);
+	public:
+		/**
+		 * @var environmentAction
+		 * The enum for environment actions that are possible
+		 **/
+		enum environmentAction {ADD, UPDATE, REMOVE};
+		EnvironmentCache();
+		bool lookupEnvironmentObject(environmentCache::LookupEnvironmentObject::Request &req, environmentCache::LookupEnvironmentObject::Response &res);
+		bool updateEnvironmentCache(environmentCache::UpdateEnvironmentCache::Request &req, environmentCache::UpdateEnvironmentCache::Response &res);
+		void printEnvironmentCache();
+	private:
+		bool addItemToCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties);
+		bool updateItemInCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties);
+		bool removeItemFromCache(std::string id);
+		void createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap);
+		environmentCommunicationMessages::Map createMapMessageFromProperties(std::map<std::string, std::string> &properties);
 
-	/**
-	 * @var std::map< std::string, std::map<std::string, std::string> > cache
-	 * Map that is used for caching the data
-	 **/
-	std::map< std::string, std::map<std::string, std::string> > cache;
+		/**
+		 * @var std::map< std::string, std::map<std::string, std::string> > cache
+		 * Map that is used for caching the data
+		 **/
+		std::map< std::string, std::map<std::string, std::string> > cache;
 
-	/**
-	 * @var ros::ServiceServer lookupEnvironmentObjectService
-	 * The service object for calling the lookup environment 
-	 **/
-	ros::ServiceServer lookupEnvironmentObjectService;
+		/**
+		 * @var ros::ServiceServer lookupEnvironmentObjectService
+		 * The service object for calling the lookup environment 
+		 **/
+		ros::ServiceServer lookupEnvironmentObjectService;
 
-	/**
-	 * @var ros::ServiceServer updateEnvironmentCacheService
-	 * Server thats gets called to update the data in the update environment cache
-	 **/
-	ros::ServiceServer updateEnvironmentCacheService;
+		/**
+		 * @var ros::ServiceServer updateEnvironmentCacheService
+		 * Server thats gets called to update the data in the update environment cache
+		 **/
+		ros::ServiceServer updateEnvironmentCacheService;
 };
 
 #endif

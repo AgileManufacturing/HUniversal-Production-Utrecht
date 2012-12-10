@@ -282,7 +282,8 @@ void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupI
 	ros::NodeHandle nodeHandle;
 	ros::ServiceClient lookupClient = nodeHandle.serviceClient<lookupHandler::LookupServer>("LookupHandler/lookup");
 	if(lookupClient.call(msg)) {
-		//Read response
+		// TODO
+		// Read message
 	} else {
 		ROS_ERROR("Error in calling lookupHandler/lookup service");
 	}
