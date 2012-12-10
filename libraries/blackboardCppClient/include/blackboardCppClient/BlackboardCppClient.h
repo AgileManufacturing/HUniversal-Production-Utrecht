@@ -55,7 +55,6 @@ public:
 	void setCallback(BlackboardSubscriber *func);	
 	void unsubscribe(const std::string &topic);
 	std::string readOldestMessage();
-	std::string read(bool blocked);
 	void removeFirst();
 
 private:

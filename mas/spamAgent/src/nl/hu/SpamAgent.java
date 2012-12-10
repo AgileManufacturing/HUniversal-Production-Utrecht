@@ -24,8 +24,10 @@ import java.util.HashMap;
 import java.util.Scanner;
 import nl.hu.client.ISubscriber;
 import java.util.Date;
+import java.io.*;
+import java.util.concurrent.*; 
 
-public class SpamAgent extends Agent implements ISubscriber
+public class SpamAgent extends Agent
 {
     private BlackboardClient client;
 	private MessageBuilder builder = new MessageBuilder();
@@ -37,12 +39,13 @@ public class SpamAgent extends Agent implements ISubscriber
 	public void setup()
 	{
 		
-		client = new BlackboardClient("localhost",this);
+		client = new BlackboardClient("localhost");
+		
+		try{
 		client.setDatabase(database);	
 		client.setCollection(collection);
-		try{
 		client.subscribe(topic);
-		}catch(Exception e){}	
+		}catch(Exception e){e.printStackTrace();}	
 
 
 		
@@ -63,11 +66,16 @@ public class SpamAgent extends Agent implements ISubscriber
 				BlackboardMessage mes = new BlackboardMessage(topic,a);
 				try
 				{
-				
-					ACLMessage m = blockingReceive();
-					System.out.println("sen:"+System.currentTimeMillis());
+	
+					System.out.print(System.nanoTime());
 					client.insertJson(gson.toJson(mes));
-				
+					Thread.sleep(30);
+					
+					if(i == 500)
+					{
+							System.out.println("done!");
+						blockingReceive();
+					}
 				}
 				catch(Exception e)
 				{
@@ -81,24 +89,4 @@ public class SpamAgent extends Agent implements ISubscriber
 
 
 	}
-
-	public void onMessage(String json)
-	{
-		client.removeFirst();
-		System.out.println(json);
-	}
-
-
-                public static int rand(int lo, int hi)
-                {
-                	Random randomGenerator = new Random();
-                        int n = hi - lo + 1;
-                        int i = randomGenerator.nextInt() % n;
-                        if (i < 0)
-                                i = -i;
-                        return lo + i;
-                }
-
-
-
 }

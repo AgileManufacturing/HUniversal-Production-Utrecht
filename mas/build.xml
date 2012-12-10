@@ -13,8 +13,7 @@
 	</target>
 
 	<target name="spamAgent">
-		<ant antfile="build.xml" target="build" dir="spamAgent" inheritRefs="true" useNativeBasedir="true"> 
-			
+		<ant antfile="build.xml" target="build" dir="spamAgent" inheritRefs="true" useNativeBasedir="true"> 		
 		</ant> 
 	</target>
 

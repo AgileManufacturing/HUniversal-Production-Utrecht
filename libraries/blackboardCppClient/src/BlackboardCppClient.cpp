@@ -143,6 +143,9 @@ void BlackboardCppClient::setCallback(BlackboardSubscriber *func) {
 	callback = func;
 }
 
+/**
+ * Read oldest message from the blackboard
+ **/
 std::string BlackboardCppClient::readOldestMessage() {
 	std::string name = database;
 	name.append(".");
@@ -151,11 +154,10 @@ std::string BlackboardCppClient::readOldestMessage() {
 	return object.jsonString();
 }
 
-std::string BlackboardCppClient::read(bool blocked) {
-	
-	return "";
-}
-
+/**
+ * Remove the oldest message from the blackboard
+ *
+ **/
 void BlackboardCppClient::removeFirst()
 {
 	std::string name = database;
