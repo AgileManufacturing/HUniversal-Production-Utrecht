@@ -1,5 +1,5 @@
 ####### Add all ROS packages here
-set(ROSPACKS rosMast deltaRobotNode equipletNode environmentCommunicationMessages lookupHandler environmentCache)
+set(ROSPACKS environmentCommunicationMessages environmentCache lookupHandler deltaRobotNode equipletNode)
 
 ### Don't change anything below, the part below checks if ROS is installed and configured correctly. 
 ######
