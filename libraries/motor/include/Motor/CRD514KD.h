@@ -95,8 +95,44 @@ namespace Motor{
         namespace Registers{
             /**
              * CRD514KD registers.
+             * See 12.10 Register address list on pages 78 - 87 of Motorcontroller_HM-40112-3E.pdf (the CRD514KD manual)
              **/
             enum _registers{
+            	// 16-bit
+                CMD_1                   = 0x01E,
+                STATUS_1                = 0x020,
+                CLEAR_COUNTER           = 0x04b,
+                RESET_ALARM             = 0x040,
+                OP_PRESET_POSITION		= 0x048,
+                PRESENT_ALARM           = 0x100,
+                CFG_STOP_ACTION         = 0x202,
+
+                // 32-bit
+                CFG_PRESET_POSITION 	= 0x214,
+                CFG_COMMON_ACCELERATION = 0x224,
+                CFG_COMMON_DECELERATION = 0x226,
+                CFG_START_SPEED         = 0x228,
+                CFG_JOG_OPERATION_SPEED = 0x230,
+                CFG_JOG_ACCELERATION	= 0x232,
+                
+                // 16-bit
+                CFG_ACCELERATION_TYPE	= 0x236,
+
+                // 32-bit
+                CFG_HOME_SEEKING_SPEED	= 0x23A,
+                CFG_HOME_SEEKING_ACCELERATION = 0x23C,
+
+                // 16-bit
+                OP_SOFTWARE_OVERTRAVEL = 0x252,
+
+                // 32-bit
+                CFG_POSLIMIT_POSITIVE   = 0x254,
+                CFG_POSLIMIT_NEGATIVE   = 0x256,
+
+                // 16-bit
+                CFG_MOTOR_STEP_ANGLE 	= 0x311,
+                CFG_TRANSMISSION_WAIT_TIME = 0x31A,
+
                 // 32-bit.
                 OP_POS                  = 0x402,
                 OP_SPEED                = 0x502,
@@ -112,35 +148,6 @@ namespace Motor{
 
                 // 16-bit.
                 OP_DWELL                = 0xC01,
-                
-                // 32-bit.
-                CFG_POSLIMIT_POSITIVE   = 0x254,
-                CFG_POSLIMIT_NEGATIVE   = 0x256,
-
-                // 16-bit.
-                CFG_STOP_ACTION         = 0x202,
-
-                // 32-bit.
-                CFG_START_SPEED         = 0x228,
-                
-                // 16-bit.
-                CLEAR_COUNTER           = 0x04b,
-                RESET_ALARM             = 0x040,
-                
-                CMD_1                   = 0x01E,
-                STATUS_1                = 0x020,
-
-                // 16-bit current alarm code.
-                PRESENT_ALARM           = 0x100,
-
-                // 32-bit Preset position value argument.
-                CFG_PRESET_POSITION = 0x214,
-
-                // 16-bit Set the preset position to the preset position value argument.
-                OP_PRESET_POSITION = 0x048, 
-
-                // 16-bit Sets the software motor limitation (in the motor controller).
-                OP_SOFTWARE_OVERTRAVEL = 0x252 
             };
         }
 
@@ -180,7 +187,7 @@ namespace Motor{
              **/
             enum _rtu_config{
                 BAUDRATE = 115200,
-                PARITY   = 'N',
+                PARITY   = 'E',
                 DATA_BITS = 8,
                 STOP_BITS = 1
             };
