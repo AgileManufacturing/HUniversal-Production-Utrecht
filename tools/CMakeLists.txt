@@ -18,4 +18,11 @@ else(ROS_OK)
 	message("ROS packages cannot be build")
 endif(ROS_OK)
 
-
+# modbusConnectionTester # 
+if(${MODBUS_FOUND})
+	rexos_add_executable(modbusConnectionTester)
+	include_directories(${MODBUS_INCLUDE_DIRS} ${LIB_MOTOR_INCLUDE} ${LIB_MODBUS_CONTROLLER_INCLUDE} ${LIB_UTILITIES_INCLUDE})
+	target_link_libraries(modbusConnectionTester ${MODBUS_LIBRARIES} modbusController motor utilities)
+else(${MODBUS_FOUND})
+	rexos_cannot_build(modbusConnectionTester "tools/modbusConnectionTester")
+endif(${MODBUS_FOUND})
