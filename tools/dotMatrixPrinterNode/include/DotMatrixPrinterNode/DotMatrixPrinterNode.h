@@ -1,6 +1,6 @@
 /**
  * @file DotMatrixPrinterNode.h
- * @brief Semi dot matrix printer for grayscale image files.
+ * @brief A node that can use the deltarobot to print black/white images somewhat similar to a dot matrix printer.
  * @date Created: 2012-11-06
  *
  * @author Koen Braham
@@ -44,6 +44,9 @@
 #include <deltaRobotNode/MovePath.h>
 #include <DotMatrixPrinterNode/DotMatrixPrinterNodeSettings.h>
 
+/**
+ * A node that can use the deltarobot to print black/white images somewhat similar to a dot matrix printer.
+ **/
 class DotMatrixPrinterNode {
 public:
 	DotMatrixPrinterNode();
@@ -51,20 +54,20 @@ public:
 	void run();
 private:
 	/**
-	 * @var ros::NodeHandle node
+	 * @var ros::NodeHandle nodeHandle
 	 * The nodeHandle used by ros services and topics
 	 **/
 	ros::NodeHandle nodeHandle;
 
 	/**
 	 * @var image_transport::ImageTransport imageTransport
-	 * ImageTransport is used to transport camera frames over a ros topic.
+	 * ImageTransport is used to read images from the topic.
 	 **/
 	image_transport::ImageTransport imageTransport;
 
 	/**
-	 * @var image_transport::Subscriber cameraSubscriber
-	 * Subscription to the camera topic for receiving frames.
+	 * @var image_transport::Subscriber imageSubscriber
+	 * Subscription to the image topic for receiving frames.
 	 **/
 	image_transport::Subscriber imageSubscriber;
 

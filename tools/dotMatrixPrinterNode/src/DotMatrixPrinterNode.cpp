@@ -1,6 +1,6 @@
 /**
  * @file DotMatrixPrinterNode.cpp
- * @brief Semi dot matrix printer for grayscale image files.
+ * @brief A node that can use the deltarobot to print black/white images somewhat similar to a dot matrix printer.
  * @date Created: 2012-11-06
  *
  * @author Koen Braham
@@ -52,14 +52,12 @@ DotMatrixPrinterNode::~DotMatrixPrinterNode( ) { }
  * Moves the deltarobot to the starting position.
  **/
 void DotMatrixPrinterNode::moveToStartPoint() {
-	effectorLocation.x = 0;
-	effectorLocation.y = 0;
-	effectorLocation.z = -196.063;
-	deltaRobotMoveToPoint(effectorLocation.x, effectorLocation.y, effectorLocation.z);
+	deltaRobotMoveToPoint(0,0,-196.063);
 }
 
 /**
  * Moves the deltarobot to the given coordinates, using the moveToPoint service.
+ * If the movement is succesful, effectorLocation is also set to the new location.
  * @param x X coordinate
  * @param y Y coordinate
  * @param z Z coordinate
@@ -75,6 +73,10 @@ void DotMatrixPrinterNode::deltaRobotMoveToPoint(double x, double y, double z, d
 	deltaRobotClient.call(moveToPointService);
 	if (!moveToPointService.response.succeeded) {
 		std::cerr << "[ERROR] Moving to point (" << x << "," << y << "," << z << "," << maxAcceleration << ")" << moveToPointService.response.message << std::endl;
+	} else {
+		effectorLocation.x = x;
+		effectorLocation.y = y;
+		effectorLocation.z = z;
 	}
 }
 
@@ -131,9 +133,9 @@ void DotMatrixPrinterNode::drawDotToPath(double x, double y) {
 }
 
 /**
- * Transforms the image on the topic to the correct size and format and publishes to a new topic.
+ * Receives the image pointer and handles the printing after a prompt. Moves the deltarobot back to the startpoint when finished printing.
  *
- * @param msg The pointer to the message that contains the camera image.
+ * @param msg the message containing the image pointer.
  **/
 void DotMatrixPrinterNode::imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 	
@@ -204,6 +206,9 @@ void DotMatrixPrinterNode::imageCallback(const sensor_msgs::ImageConstPtr& msg) 
 	moveToStartPoint();
 }
 
+/**
+ * Leads the user through the process of calibrating the drawing height. 
+ **/
 void DotMatrixPrinterNode::calibrateDrawingHeight(){
 	moveToStartPoint();
 	
@@ -289,7 +294,7 @@ void DotMatrixPrinterNode::calibrateDrawingHeight(){
 
 /**
  * Blocking function that contains the main loop.
- * Spins in ROS to receive frames. These will execute the callbacks.
+ * Spins in ROS to receive image. This will execute the callbacks.
  * This function ends when ros receives a ^c
  **/
 void DotMatrixPrinterNode::run( ) {
@@ -308,6 +313,14 @@ void DotMatrixPrinterNode::run( ) {
 	}
 }
 
+/**
+ * Creates a dotMatrixPrinterNode object and then calls its run().
+ * 
+ * @param argc amount of arguments
+ * @param argv argument(s): nodename
+ * 
+ * @return 0
+ **/
 int main(int argc, char** argv) {
 	ros::init(argc, argv, NODE_NAME);
 

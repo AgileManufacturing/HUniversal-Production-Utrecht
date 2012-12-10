@@ -105,8 +105,10 @@ namespace Utilities{
     }
 
     /**
+     * Converts a string to a double.
+     * @param s the string to be converted
      * 
-     * 
+     * @return The converted double. Returns a 0 if the given string is not convertable.
      **/
     double stringToDouble(const std::string& s){
         std::istringstream i(s);

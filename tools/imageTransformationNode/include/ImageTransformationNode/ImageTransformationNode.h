@@ -47,66 +47,45 @@
 #include "DotMatrixPrinterNode/DotMatrixPrinterNodeSettings.h"
 
 /**
- * Transforms an image to the correct pixel size and a black and white format so it can be printed by the deltaRobot.
+ * Transforms an image to the correct pixel size and a black and white format so it can be printed by the DotMatrixPrinterNode.
  **/
 class ImageTransformationNode
 {
 	public:
-		ImageTransformationNode(int equipletID, int moduleID);
-
+		ImageTransformationNode(int equipletID, int moduleID, std::string path);
+		cv::Mat transformImage();
 		void publishImage();
 		void run();
-		void transformCallback();
 	private:
-		//void transformCallback();//const sensor_msgs::ImageConstPtr& msg);
-
-		/**
-		 * @var int blockSize
-		 * blockSize for the cv::adaptiveThreshold: "The size of a pixel neighborhood that is used to calculate a threshold value for the pixel: 3, 5, 7, and so on".
-		 **/
-		int blockSize;
-		/**
-		 * @var int maximum
-		 * Maximum for blockSize and subtract.
-		 **/
-		int maximum;
-		/**
-		 * @var int subtract
-		 * C for the cv::adaptiveThreshold: "The constant subtracted from the mean or weighted mean (see the discussion); normally, it’s positive, but may be zero or negative as well".
-		 **/
-		int subtract;
-
 		/**
 		 * @var cv::Mat inputImage
-		 * The image received from the camera.
+		 * The image to be transformed.
 		 **/
 		cv::Mat inputImage;
+
 		/**
 		 * @var cv::Mat outputImage
-		 * The image send out after transformation.
+		 * The image sent out after transformation.
 		 **/
 		cv::Mat outputImage;
-
+		
 		/**
 		 * @var ros::NodeHandle nodeHandle
 		 * roscpp's interface for creating subscribers, publishers, etc. 
 		 **/
 		ros::NodeHandle nodeHandle;
+		
 		/**
 		 * @var image_transport::ImageTransport imageTransport
 		 * Prepares the image for transport.
 		 **/
 		image_transport::ImageTransport imageTransport;
+		
 		/**
 		 * @var image_transport::Publisher pub
 		 * Publisher that publishes the image.
 		 **/
 		image_transport::Publisher pub;
-		/**
-		 * @var image_transport::Subscriber cameraSubscriber
-		 * Subscribes to the input camera topic.
-		 **/
-		image_transport::Subscriber cameraSubscriber;
 };
 
 #endif

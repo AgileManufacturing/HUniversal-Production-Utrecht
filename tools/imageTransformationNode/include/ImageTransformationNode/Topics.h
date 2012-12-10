@@ -1,6 +1,6 @@
 /**
 * @file Topics.h
-* @brief Names for the ImageTransformation topics.
+* @brief Names for the ImageTransformationNode topics.
 * @date Created: 2012-11-06
 *
 * @author Daan Veltman

@@ -1,6 +1,6 @@
 /**
  * @file ImageTransformationNode.cpp
- * @brief Transforms the image from the camera with a GUI and adjustable adaptive threshold. It sends out the image on a topic.
+ * @brief Transforms an image passed in an argument so that it can be used by the DotMatrixPrinterNode. It sends out the image on a topic.
  * @date 2012-11-06
  *
  * @author Daan Veltman
@@ -31,7 +31,9 @@
 
 #include "ImageTransformationNode/ImageTransformationNode.h"
 
+// @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "ImageTransformationNode"
+// @endcond
 
 /**
  * @var WINDOW_NAME
@@ -59,11 +61,9 @@ void on_mouse(int event, int x, int y, int flags, void* param) {
  *
  * @param equipletID Equiplet identifier.
  * @param moduleID Module identifier.
+ * @param path Input image path.
  **/
-ImageTransformationNode::ImageTransformationNode(int equipletID, int moduleID) : imageTransport(nodeHandle) {
-	blockSize = 15;
-	maximum = 255;
-	subtract = 15;
+ImageTransformationNode::ImageTransformationNode(int equipletID, int moduleID, std::string path) : imageTransport(nodeHandle) {
 
 	// Advertise the services
 	pub = imageTransport.advertise(ImageTransformationNodeTopics::TRANSFORMED_IMAGE, 1);
@@ -71,6 +71,43 @@ ImageTransformationNode::ImageTransformationNode(int equipletID, int moduleID) :
 	// OpenCV GUI
 	cv::namedWindow(WINDOW_NAME, CV_WINDOW_NORMAL | CV_WINDOW_KEEPRATIO);
 	cvSetMouseCallback(WINDOW_NAME, &on_mouse, this);
+
+	// input image
+	inputImage = cv::imread(path);
+
+	if(inputImage.data == NULL){
+		std::cerr << "Invalid input image, shutting down." << std::endl;
+		exit(-1);
+	}
+}
+
+/**
+ * Thresholds inputImage and also resizes it if necessary.
+ **/
+cv::Mat ImageTransformationNode::transformImage(){
+	cv::Mat sizedImage(inputImage);
+
+	if(inputImage.cols < DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH 
+		|| inputImage.rows < DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT
+		|| inputImage.cols > DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH 
+		|| inputImage.rows > DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT){
+		//calculating scale such that the entire picture will fit, with respect to aspect ratio, on the draw field.
+		double scale = std::max(
+			inputImage.rows / (DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT_DOTS), 
+			inputImage.cols / (DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH_DOTS));
+
+		//size should not be at least 1 pixel in height and 1 pixel in width
+		cv::Size outputSize = cv::Size(
+			inputImage.cols / scale < 1 ? 1 : inputImage.cols / scale, 
+			inputImage.rows / scale < 1 ? 1 : inputImage.rows / scale);
+
+		cv::resize(inputImage, sizedImage, outputSize);
+	}
+
+	cv::Mat grayImage;
+	cv::cvtColor(sizedImage, grayImage, CV_BGR2GRAY);
+
+	return grayImage > 150;
 }
 
 /**
@@ -88,62 +125,17 @@ void ImageTransformationNode::publishImage(){
 }
 
 /**
- * Transforms the image on the topic to the correct size and format and publishes to a new topic.
- *
- * @param msg The pointer to the message that contains the camera image.
+ * Calls transformImage(), and starts the gui for sending with the results. 
  **/
-void ImageTransformationNode::transformCallback() {
-	//cv::Mat image = cv::imread("/home/arjen/Desktop/rexoslogo_no_fill.png");
-	cv::Mat image = cv::imread("/home/arjen/Desktop/deltarobot.png");
-	//cv_ptr->image = cv::imread("/home/arjen/Desktop/corners.png");
-	if(image.data == NULL){
-		std::cerr << "Invalid image" << std::endl;
-		exit(1);
-	}
+void ImageTransformationNode::run(){
+	std::cout << "Transforming.." << std::endl;
+	outputImage = transformImage();
 
-	cv::Mat sizedImage(image);
-
-	if(image.cols < DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH 
-		|| image.rows < DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT
-		|| image.cols > DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH 
-		|| image.rows > DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT){
-		//calculating scale such that the entire picture will fit, with respect to aspect ratio, on the draw field.
-		double scale = std::max(
-			image.rows / (DotMatrixPrinterNodeSettings::DRAW_FIELD_HEIGHT_DOTS), 
-			image.cols / (DotMatrixPrinterNodeSettings::DRAW_FIELD_WIDTH_DOTS));
-
-		//size should not be at least 1 pixel in height and 1 pixel in width
-		cv::Size outputSize = cv::Size(
-			image.cols / scale < 1 ? 1 : image.cols / scale, 
-			image.rows / scale < 1 ? 1 : image.rows / scale);
-
-		cv::resize(image, sizedImage, outputSize);
-	}
-
-	cv::Mat grayImage;
-	cv::cvtColor(sizedImage, grayImage, CV_BGR2GRAY);
-
-	outputImage = grayImage > 150;
-
-	// //Threshold the image, note that blocksize has to be a multiple of 3 and >= 3.
-	// cv::Mat thresholdedImage;
-	// cv::adaptiveThreshold(grayImage, outputImage, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, blockSize < 3 ? 3 : blockSize | 1, subtract);
-	//TODO determine if output is a safe image to use for sending onwards
+	std::cout << "Starting GUI.." << std::endl;
 
 	cv::imshow(WINDOW_NAME, outputImage);
-	cv::waitKey(60000);
-}
-
-/**
- * Blocking function that contains the main loop.
- * Spins in ROS to receive frames. These will execute the callbacks.
- * This function ends when ros receives a ^c
- **/
-void ImageTransformationNode::run( ) {
-	//cameraSubscriber = imageTransport.subscribe("camera/image", 1, &ImageTransformationNode::transformCallback, this, image_transport::TransportHints("compressed"));
-
-	while(ros::ok()) {
-		ros::spinOnce();
+	while(ros::ok()){
+		cv::waitKey(1);
 	}
 }
 
@@ -151,7 +143,7 @@ void ImageTransformationNode::run( ) {
  * Main
  *
  * @param argc Argument count.
- * @param argv Node name, equipletID, moduleID.
+ * @param argv Node name, equipletID, moduleID, inputImage path
  *
  * @return 0 if succesful, -1 if command line arguments are incorrect
  **/
@@ -159,21 +151,21 @@ int main(int argc, char** argv){
 	std::cout << "Starting ros node" << std::endl;
 	ros::init(argc, argv, NODE_NAME);
 
-
 	int equipletID = 0;
 	int moduleID = 0;
-	if(argc < 3 || !(Utilities::stringToInt(equipletID, argv[1]) == 0 && Utilities::stringToInt(moduleID, argv[2]) == 0))
+	if(argc != 4 || !(Utilities::stringToInt(equipletID, argv[1]) == 0 && Utilities::stringToInt(moduleID, argv[2]) == 0))
 	{ 	 	
-    	std::cerr << "Cannot read equiplet id and/or moduleId from commandline please use correct values." << std::endl;
+    	std::cerr << "Arguments missing or incorrect. Needed: EquipletID ModuleID InputImage" << std::endl;
  		return -1;
   	} 
 
+  	std::string path = argv[3];
+
 	std::cout << "Starting imageTransformationNode" << std::endl;
 
-	ImageTransformationNode imageTransformationNode(equipletID, moduleID);
+	ImageTransformationNode imageTransformationNode(equipletID, moduleID, path);
 
-	imageTransformationNode.transformCallback();
+	imageTransformationNode.run();
 
-	//imageTransformationNode.run();
 	return 0;
 }

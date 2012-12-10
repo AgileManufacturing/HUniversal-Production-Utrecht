@@ -88,13 +88,13 @@
 	 * @var static const double ACCELERATION
 	 * The acceleration for the delta robot.
 	 **/
-	static const double ACCELERATION = 50;
+	static const double ACCELERATION = 25;
 
 	/**
 	 * @var static const double CALIBRATION_ACCELERATION
 	 * The acceleration for the delta robot during the calibration.
 	 **/
-	static const double CALIBRATION_ACCELERATION = 50;
+	static const double CALIBRATION_ACCELERATION = 25;
 	
 
 }
