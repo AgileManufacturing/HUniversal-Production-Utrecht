@@ -37,13 +37,17 @@ namespace PickAndPlaceExceptions {
 
 	/**
 	 * Exception which can be thrown when a location in a crate is (unexpectedly) empty.
-	 */
+	 **/
 	class CrateLocationIsEmptyException: public std::exception {
 	public:
 		CrateLocationIsEmptyException( ) throw () {
 		}
 		virtual ~CrateLocationIsEmptyException( ) throw () {
 		}
+
+		/**
+		 * Returns error message
+		 */
 		virtual const char* what( ) const throw () {
 			return "Location Is Empty";
 		}
@@ -51,13 +55,17 @@ namespace PickAndPlaceExceptions {
 
 	/**
 	 * Exception which can be thrown when a location in a crate is (unexpectedly) full.
-	 */
+	 **/
 	class CrateLocationIsFullException: public std::exception {
 	public:
 		CrateLocationIsFullException( ) throw () {
 		}
 		virtual ~CrateLocationIsFullException( ) throw () {
 		}
+
+		/**
+		 * Returns error message
+		 */
 		virtual const char* what( ) const throw () {
 			return "Location Is Full";
 		}

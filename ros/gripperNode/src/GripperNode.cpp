@@ -30,7 +30,9 @@
 #include "GripperNode/GripperNode.h"
 #include "Utilities/Utilities.h"
 
+// @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "GripperNode"
+// @endcond
 
 /**
  * The IP of the modbus we are connecting to
@@ -84,7 +86,7 @@ GripperNode::~GripperNode( ) {
 
 /**
  * A wrapper for the gripper error handler so that we can use a member function
- * @param Pointer to the gripperTestNode object
+ * @param gripperNodeObject Pointer to the gripperTestNode object
  **/
 void GripperNode::wrapperForGripperError(void* gripperNodeObject) {
 	GripperNode* myself = (GripperNode*) gripperNodeObject;
@@ -186,6 +188,10 @@ bool GripperNode::release(gripperNode::Release::Request &req, gripperNode::Relea
 	return true;
 }
 
+
+/**
+ * Main that starts the gripper node and its statemachine.
+ **/
 int main(int argc, char** argv) {
 
 	ros::init(argc, argv, NODE_NAME);

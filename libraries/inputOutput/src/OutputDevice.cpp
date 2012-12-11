@@ -32,7 +32,7 @@ namespace InputOutput {
 	/**
 	 * Constructor for OutputDevice
 	 *
-	 * @param modbus Pointer to an established modbus connection.
+	 * @param ioController Pointer to an established modbus connection.
 	 * @param address Register address that contains the device boolean.
 	 * @param pin The pin (bit) that is connected to the device.
 	 **/

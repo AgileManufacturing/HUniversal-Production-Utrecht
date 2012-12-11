@@ -38,6 +38,9 @@
 #include "iostream"
 #include <InputOutput/OutputDevices/Gripper.h>
 
+/**
+ * Gripper node that provides services to control the gripper valve
+ **/
 class GripperNode: public rosMast::StateMachine {
 public:
 	GripperNode(int equipletID, int moduleID);
@@ -52,21 +55,36 @@ public:
 	bool release(gripperNode::Release::Request &req, gripperNode::Release::Response &res);
 
 private:
+	/**
+	 * @var modbus_t* modbusContext
+	 * Connection to the IO modbus
+	 **/
 	modbus_t* modbusContext;
-	InputOutput::OutputDevices::Gripper* gripper;
-	ModbusController::ModbusController* modbus;
-	InputOutput::InputOutputController* controller;
 
 	/**
-	 * @var Gripper gripper
+	 * @var InputOutput::OutputDevices::Gripper* gripper
 	 * The gripper device
 	 **/
+	InputOutput::OutputDevices::Gripper* gripper;
+
+	/**
+	 * @var ModbusController::ModbusController* modbus
+	 * Connection to the IO modbus controller
+	 **/
+	ModbusController::ModbusController* modbus;
+
+	/**
+	 * @var InputOutput::InputOutputController* controller;
+	 * Input output controller that contains the logic to switch devices
+	 */
+	InputOutput::InputOutputController* controller;
 
 	/**
 	 * @var ros::ServiceServer gripService
 	 * The service for enabling the gripper
 	 **/
 	ros::ServiceServer gripService;
+
 	/**
 	 * @var ros::ServiceServer releaseService
 	 * The service for releasing the gripper

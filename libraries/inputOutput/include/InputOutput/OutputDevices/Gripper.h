@@ -41,7 +41,7 @@ namespace InputOutput {
 		class Gripper: public OutputDevice {
 
 			/**
-			 * @typedef
+			 * @typedef void (*watchdogWarningHandler)(void* object);
 			 * Notifies the handler when valve open time > GRIPPER_TIME_ENABLED_WARNING
 			 **/
 			typedef void (*watchdogWarningHandler)(void* object);
@@ -165,13 +165,13 @@ namespace InputOutput {
 			/**
 			 * @var unsigned long timeEnabled
 			 * Timestamp of the moment when the gripper was enabled.
-			 */
+			 **/
 			unsigned long timeEnabled;
 
 			/**
 			 * @var unsigned long timeCooldownStarted
 			 * Timestamp of the moment when cooldown period has started.
-			 */
+			 **/
 			unsigned long timeCooldownStarted;
 
 			static void watchdogFunction(Gripper* device);

@@ -1,7 +1,7 @@
 /**
  * @file PickAndPlaceNode.cpp
- * @brief Listens to the crateEvent topic and guides the deltarobot
- * @date Created: 2012-10-30
+ * @brief Listens to the crateEvent topic and guides the deltarobot and gripper
+ * @date Created: 2012-11-13
  *
  * @author Koen Braham
  * @author Daan Veltman
@@ -40,25 +40,23 @@
 #include <Utilities/Utilities.h>
 #include <DataTypes/GridCrate4x4MiniBall.h>
 
-
-
+/**
+ * The constructor
+ **/
 PickAndPlaceNode::PickAndPlaceNode( ) :
-		crateID(""), updateCrateIDFlag(false), inputRunning(true), topicRunning(true), deltaRobotClient(nodeHandle.serviceClient<deltaRobotNode::MoveToPoint>(DeltaRobotNodeServices::MOVE_TO_POINT)), crateLocatorClient(nodeHandle.serviceClient<crateLocatorNode::getCrate>(CrateLocatorNodeServices::GET_CRATE)), gripperGripClient(nodeHandle.serviceClient<gripperNode::Grip>(GripperNodeServices::GRIP)), gripperReleaseClient(nodeHandle.serviceClient<gripperNode::Release>(GripperNodeServices::RELEASE)) {
-	inputThread = new boost::thread(inputThreadMethod, this);
-
-	// Z -281 voor de bal
-}
-
-PickAndPlaceNode::~PickAndPlaceNode( ) {
-	inputRunning = false;
-	topicRunning = false;
-	inputThread->interrupt();
+		deltaRobotClient(nodeHandle.serviceClient<deltaRobotNode::MoveToPoint>(DeltaRobotNodeServices::MOVE_TO_POINT)), crateLocatorClient(nodeHandle.serviceClient<crateLocatorNode::getCrate>(CrateLocatorNodeServices::GET_CRATE)), gripperGripClient(nodeHandle.serviceClient<gripperNode::Grip>(GripperNodeServices::GRIP)), gripperReleaseClient(nodeHandle.serviceClient<gripperNode::Release>(GripperNodeServices::RELEASE)) {
 }
 
 /**
- * Initial test function. Moves to a ball, grabs it, lifts it, puts it back into the crate and releases it.
- */
+ * Moves to a source crate, grabs a ball, lifts it, puts it back into the destination crate and releases the ball
+ *
+ * @param sourceName Name of the crate containing the ball to move
+ * @param sourceIndex Number of the ball in the crate as specified in the technical design
+ * @param destinationName Name of the destination crate
+ * @param destinationIndex Number of the ball in the crate as specified in the technical design
+ **/
 bool PickAndPlaceNode::relocateBall(std::string sourceName, int sourceIndex, std::string destinationName, int destinationIndex) {
+	// Setup the move to point service
 	deltaRobotNode::MoveToPoint moveToPointService;
 	moveToPointService.request.motion.maxAcceleration = PickAndPlaceNodeSettings::ACCELERATION;
 	crateLocatorNode::getCrate getCrateService;
@@ -69,8 +67,8 @@ bool PickAndPlaceNode::relocateBall(std::string sourceName, int sourceIndex, std
 	if (crateLocatorClient.call(getCrateService) && getCrateService.response.state != DataTypes::Crate::state_non_existing) {
 		sourceCrate.setCrate(getCrateService.response.crate.x, getCrateService.response.crate.y, getCrateService.response.crate.angle);
 	} else {
-		// Starts the while loop and locates the crate agian.
-		sourceCrate.setCrate(1000,1000,0);
+		// Starts the while loop and locates the crate again.
+		sourceCrate.setCrate(1000, 1000, 0);
 		std::cerr << "[ERROR] Failed to call getCrateService for crate " << sourceName << std::endl;
 	}
 
@@ -111,7 +109,7 @@ bool PickAndPlaceNode::relocateBall(std::string sourceName, int sourceIndex, std
 	gripperGripClient.call(gripService);
 	Utilities::sleep(200);
 
-	if(!gripService.response.succeeded){
+	if (!gripService.response.succeeded) {
 		// Warn only once
 		ROS_WARN("[PICK AND PLACE] Gripper grab failed.");
 	}
@@ -134,7 +132,7 @@ bool PickAndPlaceNode::relocateBall(std::string sourceName, int sourceIndex, std
 	} else {
 		std::cerr << "[ERROR] Failed to call getCrateService for crate " << destinationName << std::endl;
 		// Looks for the crate in while loop
-		destinationCrate.setCrate(1000,1000,0);
+		destinationCrate.setCrate(1000, 1000, 0);
 	}
 	DataTypes::Point2D destinationLocation = destinationCrate.getLocation(destinationIndex);
 
@@ -173,7 +171,7 @@ bool PickAndPlaceNode::relocateBall(std::string sourceName, int sourceIndex, std
 	gripperNode::Release releaseService;
 	gripperReleaseClient.call(releaseService);
 
-	if(!releaseService.response.succeeded){
+	if (!releaseService.response.succeeded) {
 		// Warn only once
 		ROS_WARN("[PICK AND PLACE] Gripper release failed.");
 	}
@@ -192,167 +190,28 @@ bool PickAndPlaceNode::relocateBall(std::string sourceName, int sourceIndex, std
 }
 
 /**
- * Function to act on received Crate Event messages
- *
- * @param msg CrateEventMsg pointer.
+ * blocking function that contains the main loop: moves beads from one crate to another
  **/
-void PickAndPlaceNode::callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg) {
-	switch (msg->event) {
-	case Vision::CrateEvent::type_in:
-		std::cout << "[DEBUG] New crate " << msg->crate.name << "found!" << std::endl;
-		if (updateCrateIDFlag) {
-			crateID = msg->crate.name;
-			std::cout << "[DEBUG] Tracking new crate " << crateID << std::endl;
-			updateCrateIDFlag = false;
-		}
-
-		// Move to the crate!
-		/*if (crateID.compare(msg->crate.name) == 0) {
-		 std::cout << "[DEBUG] Moving to new coordinate " << msg->crate.x << "," << msg->crate.y << std::endl;
-		 moveToPointService.request.motion.x = msg->crate.x;
-		 moveToPointService.request.motion.y = msg->crate.y;
-		 deltaRobotClient.call(moveToPointService);
-		 }*/
-		break;
-	case Vision::CrateEvent::type_out:
-		std::cout << "[DEBUG] Deleted crate " << msg->crate.name << std::endl;
-		//if (crateID.compare(msg->crate.name) == 0) {
-		//	crateID = "";
-		//	std::cout << "[DEBUG] Lost crate " << msg->crate.name << ". Stopped the follow process " << std::endl;
-		//}
-		break;
-	case Vision::CrateEvent::type_moving:
-		std::cout << "[DEBUG] Start moving crate " << msg->crate.name << std::endl;
-		/*if (crateID.compare(msg->crate.name) == 0) {
-		 std::cout << "[DEBUG] Moving to new coordinate " << msg->crate.x << "," << msg->crate.y << std::endl;
-		 moveToPointService.request.motion.x = msg->crate.x;
-		 moveToPointService.request.motion.y = msg->crate.y;
-		 deltaRobotClient.call(moveToPointService);
-		 }*/
-		break;
-	case Vision::CrateEvent::type_moved:
-		std::cout << "[DEBUG] Moved crate " << msg->crate.name << std::endl;
-		if (crateID.compare(msg->crate.name) == 0) {
-			std::cout << "[DEBUG] Crate '" << msg->crate.name << "' stopped moving" << std::endl;
-			deltaRobotNode::MoveToPoint moveToPointService;
-			moveToPointService.request.motion.x = msg->crate.x;
-			moveToPointService.request.motion.y = msg->crate.y;
-			deltaRobotClient.call(moveToPointService);
-		}
-		break;
-	}
-}
-
 void PickAndPlaceNode::run( ) {
+	std::cout << "Welcome to the pick and place demo." << std::endl;
 
-	std::cout << "Welcome to the followNode. This tool will try to follow a crate that has been scanned before. :)." << std::endl << "A\tAssign crate name to tracker ID" << std::endl << "S\tStop following a crate" << std::endl << "Q\tQuit program" << std::endl << "Enter a key and press the \"Enter\" button" << std::endl;
-
-	ros::Subscriber subscriber = nodeHandle.subscribe(CrateLocatorNodeTopics::CRATE_EVENT, 1000, &PickAndPlaceNode::callback, this);
-
-	//DataTypes::Point2D sourceLocation(0.0, 0.0);
-	//DataTypes::Point2D destinationLocation(30.0, 30.0);
-
-	//grabBall(sourceLocation, destinationLocation);
-
-	bool direction = false;
-	for(int i = 0; i < 16; i++){
-		relocateBall("GC4x4MB_1",i, "GC4x4MB_5",i);
-	}
-	for(int i = 0; i < 16; i++){
-		relocateBall("GC4x4MB_5",i, "GC4x4MB_1",i);
-	}
-	std::cout << "Done" << std::endl;
-	exit(0);
-
-	while (ros::ok() && topicRunning) {
-		ros::spinOnce();
-		crateLocatorNode::getCrate getCrateService;
-
-		GridCrate4x4MiniBall crateSource("GC4x4MB_3");
-		GridCrate4x4MiniBall crateDestination("GC4x4MB_4");
-
-		getCrateService.request.name = "GC4x4MB_3";
-		if (crateLocatorClient.call(getCrateService) && getCrateService.response.state != DataTypes::Crate::state_non_existing) {
-			std::cout << getCrateService.response.crate.x << " " << getCrateService.response.crate.y << std::endl;
-			crateSource.setCrate(getCrateService.response.crate.x, getCrateService.response.crate.y, getCrateService.response.crate.angle);
-
-			std::cout << "Location 1" << crateSource.getLocation(1) << std::endl;
-		} else {
-			std::cerr << "[ERROR] Failed to call getCrateService!" << std::endl;
-			continue; //exit(1);
+	// Run the demo.
+	while (ros::ok()) {
+		// Move crate "GC4x4MB_1" to "GC4x4MB_5"
+		for (int i = 0; i < 16; i++) {
+			relocateBall("GC4x4MB_1", i, "GC4x4MB_5", i);
 		}
 
-		// TODO: remove
-		DataTypes::Point2D center(getCrateService.response.crate.x, getCrateService.response.crate.y);
-		DataTypes::Point2D bead1 = crateSource.getLocation(6);
-		std::cout << "center\t" << center << std::endl;
-		std::cout << "Location 1\t" << bead1 << std::endl;
-		std::cout << "Distance\t" << center.distance(crateSource.getLocation(1)) << std::endl;
-		std::cout << "Diff\t" << (center - crateSource.getLocation(1)) << std::endl;
-		// ENDTODO
-
-		getCrateService.request.name = "GC4x4MB_4";
-		if (crateLocatorClient.call(getCrateService) && getCrateService.response.state != DataTypes::Crate::state_non_existing) {
-			std::cout << getCrateService.response.crate.x << " " << getCrateService.response.crate.y << std::endl;
-			crateDestination.setCrate(getCrateService.response.crate.x, getCrateService.response.crate.y, getCrateService.response.crate.angle);
-		} else {
-			std::cerr << "[ERROR] Failed to call getCrateService!" << std::endl;
-			continue; //exit(1);
+		// Move crate "GC4x4MB_5" to "GC4x4MB_1"
+		for (int i = 0; i < 16; i++) {
+			relocateBall("GC4x4MB_5", i, "GC4x4MB_1", i);
 		}
-
-		// Move to location of the ball
-		deltaRobotNode::MoveToPoint moveToPointService;
-		moveToPointService.request.motion.maxAcceleration = PickAndPlaceNodeSettings::ACCELERATION;
-		std::cout << "bead1\t" << bead1 << std::endl;
-		moveToPointService.request.motion.x = bead1.x;
-		moveToPointService.request.motion.y = bead1.y;
-		moveToPointService.request.motion.z = -270;
-		//deltaRobotClient.call(moveToPointService);
-
-		moveToPointService.request.motion.x = bead1.x;
-		moveToPointService.request.motion.y = bead1.y;
-		moveToPointService.request.motion.z = -281.5;
-		//deltaRobotClient.call(moveToPointService);
-		if (!direction) {
-			relocateBall("GC4x4MB_3",1, "GC4x4MB_4",1);
-		} else {
-			relocateBall(crateDestination.getName(),1, crateSource.getName(),1);
-		}
-
-		direction = !direction;
-	}
-
-	// Release the ball by releasing the gripper
-	gripperNode::Release releaseService;
-	gripperReleaseClient.call(releaseService);
-}
-
-void PickAndPlaceNode::inputThreadMethod(PickAndPlaceNode* that) {
-	try {
-		char key;
-
-		while (that->inputRunning) {
-			std::cin >> key;
-			if (key == 'a' || key == 'A') {
-				std::cout << "[DEBUG] Looking for a new crate (first new crate is assigned!)" << std::endl;
-				that->updateCrateIDFlag = true;
-			} else if (key == 's' || key == 'S') {
-				that->crateID = "";
-				std::cout << "[DEBUG] Deleted crateID. Stopped following." << std::endl;
-			} else if (key == 'q' || key == 'Q') {
-				that->inputRunning = false;
-				that->topicRunning = false;
-			}
-
-			std::cout.flush();
-			ros::spinOnce();
-		}
-
-	} catch (boost::thread_interrupted& ignored) {
-		// Ignore interrupt and exit thread.
 	}
 }
 
+/**
+ * Main that starts the pick and place demo
+ **/
 int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "PickAndPlaceNode");
 	PickAndPlaceNode pickAndPlaceNode;
@@ -361,6 +220,9 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 
+/**
+ * Switches all inner and outer balls.
+ **/
 void PickAndPlaceNode::switchInnerOuterBalls(std::string crateA) {
 	relocateBall(crateA, 6, crateA, 2);
 	relocateBall(crateA, 10, crateA, 11);
@@ -378,6 +240,9 @@ void PickAndPlaceNode::switchInnerOuterBalls(std::string crateA) {
 	relocateBall(crateA, 11, crateA, 15);
 }
 
+/**
+ * Switches all inner and outer balls.
+ **/
 void PickAndPlaceNode::switchInnerOuterBalls2(std::string crateA) {
 	relocateBall(crateA, 15, crateA, 14);
 	relocateBall(crateA, 12, crateA, 8);
@@ -395,6 +260,9 @@ void PickAndPlaceNode::switchInnerOuterBalls2(std::string crateA) {
 	relocateBall(crateA, 8, crateA, 9);
 }
 
+/**
+ * Switches all inner and outer balls.
+ **/
 void PickAndPlaceNode::switchInnerOuterBalls3(std::string crateA) {
 	relocateBall(crateA, 9, crateA, 13);
 	relocateBall(crateA, 12, crateA, 9);
@@ -413,6 +281,9 @@ void PickAndPlaceNode::switchInnerOuterBalls3(std::string crateA) {
 	relocateBall(crateA, 11, crateA, 15);
 }
 
+/**
+ * Switches all inner and outer balls.
+ **/
 void PickAndPlaceNode::switchInnerOuterBalls4(std::string crateA) {
 	relocateBall(crateA, 15, crateA, 14);
 	relocateBall(crateA, 10, crateA, 15);
@@ -431,7 +302,10 @@ void PickAndPlaceNode::switchInnerOuterBalls4(std::string crateA) {
 	relocateBall(crateA, 8, crateA, 9);
 }
 
-void PickAndPlaceNode::switchDiagonalsWithNonDiagonals(std::string crateA, std::string crateB){
+/**
+ * Switches all inner and outer balls.
+ **/
+void PickAndPlaceNode::switchDiagonalsWithNonDiagonals(std::string crateA, std::string crateB) {
 	relocateBall(crateA, 0, crateB, 0);
 	relocateBall(crateA, 5, crateB, 5);
 	relocateBall(crateA, 6, crateB, 6);

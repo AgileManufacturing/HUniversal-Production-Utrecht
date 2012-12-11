@@ -34,11 +34,12 @@
 #include <DataTypes/PickAndPlaceExceptions.h>
 #include <stdexcept>
 
-std::ostream & operator<<(std::ostream & os, const GridCrate4x4MiniBall & crate) {
-
-	return os;
-}
-
+/**
+ * Puts a ball into the crate at a given location.
+ *
+ * @param index ID of the ball in the crate
+ * @param crateContent Pointer to a  miniball
+ **/
 void GridCrate4x4MiniBall::put(size_t index, MiniBall* crateContent) {
 	if (crateContents.at(index) != NULL) {
 		throw PickAndPlaceExceptions::CrateLocationIsFullException();
@@ -46,6 +47,11 @@ void GridCrate4x4MiniBall::put(size_t index, MiniBall* crateContent) {
 	crateContents[index] = crateContent;
 }
 
+/**
+ * Gets a ball at a given location.
+ *
+ * @param index ID of the ball in the crate
+ **/
 MiniBall* GridCrate4x4MiniBall::get(size_t index) const {
 	MiniBall* content = crateContents.at(index);
 	if (content == NULL) {
@@ -54,6 +60,9 @@ MiniBall* GridCrate4x4MiniBall::get(size_t index) const {
 	return content;
 }
 
+/**
+ * Removes a ball at the given index
+ **/
 void GridCrate4x4MiniBall::remove(size_t index) {
 	if (crateContents.at(index) == NULL) {
 		throw PickAndPlaceExceptions::CrateLocationIsEmptyException();
@@ -61,10 +70,20 @@ void GridCrate4x4MiniBall::remove(size_t index) {
 	crateContents[index] = NULL;
 }
 
+/**
+ * Gets the name of the crate
+ *
+ * @return const std::string&
+ **/
 const std::string& GridCrate4x4MiniBall::getName(void) const {
 	return name;
 }
 
+/**
+ * Get the real (not relative) location of a ball in a gridcrate4x4.
+ *
+ * @param index ID of the ball in the crate
+ **/
 DataTypes::Point2D GridCrate4x4MiniBall::getLocation(int index) const {
 	if(index >= COLS * ROWS) {
 		throw std::out_of_range ("Index out of range in GridCrate4x4MiniBall");
@@ -75,19 +94,24 @@ DataTypes::Point2D GridCrate4x4MiniBall::getLocation(int index) const {
 	offset.x = -((index % COLS - (COLS / 2 - 0.5)) * (DISTANCE_BETWEEN_CONTAINERS + RADIUS_OF_CONTAINER));
 	offset.y = (index / ROWS - (ROWS / 2 - 0.5)) * (DISTANCE_BETWEEN_CONTAINERS + RADIUS_OF_CONTAINER);
 
+	// Rotate the location to match the rotation of the crate
 	DataTypes::Point2D result = offset.rotate(angle);
+
+	// Add the real coordinates
 	result.x += x;
 	result.y += y;
 	return result;
 }
 
-// TODO: fix!
-/*bool GridCrate4x4MiniBall::isEmpty( ) const {
+// FIXME
+/*
+bool GridCrate4x4MiniBall::isEmpty( ) const {
 	for (std::vector<MiniBall*>::iterator it = crateContents.begin(); it != crateContents.end(); ++it) {
 		if (*it != NULL) {
 			return false;
 		}
 	}
 	return true;
-}*/
+}
+*/
 

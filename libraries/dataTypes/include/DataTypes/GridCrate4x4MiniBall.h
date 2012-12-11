@@ -36,34 +36,94 @@
 #include <DataTypes/MiniBall.h>
 #include <DataTypes/Point2D.h>
 
+/**
+ * Class for storages of miniballs in a crate container
+ **/
 class GridCrate4x4MiniBall {
 public:
+
+	/**
+	 * GridCrate4x4 constructor
+	 *
+	 * @param name Name of the crate.
+	 **/
 	GridCrate4x4MiniBall(std::string name) :
 		x(0), y(0), angle(0), name(name) {
 	}
+
+	/**
+	 * Set the crate location
+	 *
+	 * @param x X coordinate of the crate
+	 * @param y Y coordinate of the crate
+	 * @param angle Rotation of the crate
+	 **/
 	void setCrate(double x, double y, double angle){
 		this->x = x;
 		this->y = y;
 		this->angle = angle;
 	}
+
 	void put(size_t index, MiniBall* crateContent);
 	MiniBall* get(size_t index) const;
 	const std::string& getName(void) const;
 	DataTypes::Point2D getLocation(int index) const;
 	void remove(size_t index);
-	bool isEmpty( ) const;
 
-	friend std::ostream & operator<<(std::ostream & os, const GridCrate4x4MiniBall & crate);
+	// FIXME bool isEmpty( ) const;
 
 private:
+	/**
+	 * @var static const double DISTANCE_BETWEEN_CONTAINERS
+	 * Distance between ball containers (constainers as a square)\
+	 **/
 	static const double DISTANCE_BETWEEN_CONTAINERS = 0.5;
+
+	/**
+	 * @var static const double RADIUS_OF_CONTAINER
+	 * Radius of the ball container
+	 **/
 	static const double RADIUS_OF_CONTAINER = 10.5;
+
+	/**
+	 * @var static const int ROWS
+	 * Number of balls in a row
+	 **/
 	static const int ROWS = 4;
+
+	/**
+	 * @var static const int COLS
+	 * Number of balls in a column
+	 **/
 	static const int COLS = 4;
-	//static const double BOTTOM_THICKNESS = 5.3; 
 
-	double x, y, angle;
+	/**
+	 * @var double x
+	 * X coordinate of the crate
+	 **/
+	double x;
 
+	/**
+	 * @var double y
+	 * Y coordinate of the crate
+	 **/
+	double y;
+
+	/**
+	 * @var double angle
+	 * Angle coordinate of the crate
+	 **/
+	double angle;
+
+	/**
+	 * @var std::string name
+	 * Name of the crate
+	 **/
 	std::string name;
+
+	/**
+	 * @var std::vector<MiniBall*> crateContents
+	 * Vector that contains all the miniball pointers
+	 **/
 	std::vector<MiniBall*> crateContents;
 };

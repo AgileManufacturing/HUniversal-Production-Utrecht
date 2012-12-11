@@ -36,8 +36,9 @@ namespace InputOutput {
 		 * Constructor for Gripper
 		 *
 		 * @param ioController Output controller for the ouput device (controller contains the registers)
+		 * @param gripperNodeObject ROS node that will receive the gripper overheat warning
 		 * @param warningHandler Handler to warn when the valve is almost opened for too long.
-		 */
+		 **/
 		Gripper::Gripper(InputOutputController* ioController, void* gripperNodeObject, watchdogWarningHandler warningHandler) :
 				OutputDevice(ioController, GRIPPER_MODBUS_ADRESS, GRIPPER_DEVICE_PIN), warningHandler(warningHandler), gripperNode(gripperNodeObject), watchdogRunning(false), state(false), previousState(false), warned(false), overheated(false) {
 		}

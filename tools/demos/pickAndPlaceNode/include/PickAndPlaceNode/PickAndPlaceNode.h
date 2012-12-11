@@ -1,6 +1,6 @@
 /**
- * @file PickAndPlaceNode.cpp
- * @brief Listens to the crateEvent topic and guides the deltarobot and gripperrrrrrr :)
+ * @file PickAndPlaceNode.h
+ * @brief Listens to the crateEvent topic and guides the deltarobot and gripper
  * @date Created: 2012-11-13
  *
  * @author Koen Braham
@@ -43,29 +43,16 @@
 #include <gripperNode/Release.h>
 #include <DataTypes/Point2D.h>
 
+/**
+ * The PickAndPlaceNode is a demonstrator for basic pick and place actions.
+ **/
 class PickAndPlaceNode {
 public:
 
-	/**
-	 * the constructor
-	 * @param argc use the parameters form main
-	 * @param argv use the parameters form main
-	 */
 	PickAndPlaceNode( );
-	/**
-	 * the destructor
-	 */
-	~PickAndPlaceNode( );
-
-	/**
-	 * blocking function that contains the main loop: take frame, detect crates, send event. this function ends when ros receives a ^c
-	 */
 	void run( );
-
-	void callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg);
-	static void inputThreadMethod(PickAndPlaceNode* that);
-
 	bool relocateBall(std::string sourceName, int sourceIndex, std::string destinationName, int destinationIndex);
+
 private:
 	void switchInnerOuterBalls(std::string crateA);
 	void switchInnerOuterBalls2(std::string crateA);
@@ -73,24 +60,33 @@ private:
 	void switchInnerOuterBalls4(std::string crateA);
 	void switchDiagonalsWithNonDiagonals(std::string crateA, std::string crateB);
 
+	/**
+	 * @var ros::NodeHandle nodeHandle
+	 * Node handle used for communication with other nodes
+	 **/
 	ros::NodeHandle nodeHandle;
-	std::string crateID;
-	bool updateCrateIDFlag, inputRunning, topicRunning;
-	boost::thread* inputThread;
 
 	/**
 	 * @var ros::ServiceClient deltaRobotClient
 	 * Service client to call the delta robot movetoPoint service
-	 */
+	 **/
 	ros::ServiceClient deltaRobotClient;
 
 	/**
 	 * @var ros::ServiceClient crateLocatorClient
 	 * Service client to call the getCrateService
-	 */
+	 **/
 	ros::ServiceClient crateLocatorClient;
 
+	/**
+	 * @var ros::ServiceClient gripperGripClient
+	 * Service client to call the grip service
+	 **/
 	ros::ServiceClient gripperGripClient;
 
+	/**
+	 * @var ros::ServiceClient gripperReleaseClient
+	 * Service client to call the release service
+	 **/
 	ros::ServiceClient gripperReleaseClient;
 };

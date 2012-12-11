@@ -34,25 +34,49 @@
 #include <iostream>
 #include <sstream>
 
+/**
+ * Miniball class to store the color of the ball
+ **/
 class MiniBall {
 public:
 
+	/**
+	 * @enum Colors
+	 * All colors of the miniballs
+	 **/
 	enum Colors {
 		BLACK, RED, ORANGE, YELLOW, GREEN, BLUE, INDIGO, VIOLET, WHITE
 	};
 
+	/**
+	 * Sets the color of the miniball
+	 *
+	 * @param color The color of the miniball
+	 **/
 	void SetColor(MiniBall::Colors color) {
 		this->color = color;
 	}
 
+	/**
+	 * Get the color of the miniball
+	 * @return MiniBall::Colors
+	 **/
 	MiniBall::Colors GetColor( ) const {
 		return color;
 	}
 
+	/**
+	 * Prints the miniball color
+	 **/
 	friend std::ostream & operator<<(std::ostream & os, const MiniBall & miniBall) {
 		os << "[MiniBall]" << std::endl << "\tColor: " << miniBall.color << std::endl;
 		return os;
 	}
 private:
+
+	/**
+	 * @var Colors color
+	 * Color of the ball
+	 */
 	Colors color;
 };
