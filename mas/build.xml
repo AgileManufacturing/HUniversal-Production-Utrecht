@@ -2,7 +2,7 @@
 
 
 
-	<target name="all" depends="dummyAgent, spamAgent">
+	<target name="all" depends="dummyAgent, spamAgent, jadeReceiveAgent, jadeSendAgent">
 		
 	</target>
 
@@ -13,13 +13,25 @@
 	</target>
 
 	<target name="spamAgent">
+		<ant antfile="build.xml" target="build" dir="jadeReceiveAgent" inheritRefs="true" useNativeBasedir="true"> 		
+		</ant> 
+	</target>
+
+	<target name="jadeReceiveAgent">
 		<ant antfile="build.xml" target="build" dir="spamAgent" inheritRefs="true" useNativeBasedir="true"> 		
+		</ant> 
+	</target>
+
+	<target name="jadeSendAgent">
+		<ant antfile="build.xml" target="build" dir="jadeSendAgent" inheritRefs="true" useNativeBasedir="true"> 		
 		</ant> 
 	</target>
 
 	<target name="clean">
 		<ant antfile="build.xml" target="clean" dir="dummyAgent" inheritRefs="true" useNativeBasedir="true"/>  
 		<ant antfile="build.xml" target="clean" dir="spamAgent" inheritRefs="true" useNativeBasedir="true"/> 	 
+		<ant antfile="build.xml" target="clean" dir="jadeReceiveAgent" inheritRefs="true" useNativeBasedir="true"/> 
+		<ant antfile="build.xml" target="clean" dir="jadeSendAgent" inheritRefs="true" useNativeBasedir="true"/> 
 	</target>
 	
 </project>
