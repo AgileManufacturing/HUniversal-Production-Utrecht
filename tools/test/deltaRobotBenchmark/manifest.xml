@@ -1,0 +1,17 @@
+<package>
+  <description brief="deltaRobotBenchmark">
+
+     deltaRobotBenchmark
+
+  </description>
+  <author>Dennis Koole</author>
+  <author>Koen Braham</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url></url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="deltaRobotNode"/>
+</package>
+
+
