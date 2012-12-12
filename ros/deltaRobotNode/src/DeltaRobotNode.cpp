@@ -29,7 +29,29 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
+#include <sys/time.h>
+timespec diff(timespec start, timespec end)
+{
+	timespec temp;
+	if ((end.tv_nsec-start.tv_nsec)<0) {
+		temp.tv_sec = end.tv_sec-start.tv_sec-1;
+		temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
+	} else {
+		temp.tv_sec = end.tv_sec-start.tv_sec;
+		temp.tv_nsec = end.tv_nsec-start.tv_nsec;
+	}
+	return temp;
+}
 
+timespec divideTime(timespec time, int divider){
+	long long nanoseconds = time.tv_sec * 1000000000 + time.tv_nsec;
+	nanoseconds /= divider;
+
+	timespec temp;
+	temp.tv_sec = nanoseconds / 1000000000;
+	temp.tv_nsec = nanoseconds % 1000000000;
+	return temp;
+}
 #include "DeltaRobotNode/deltaRobotNode.h"
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
@@ -150,6 +172,10 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate(deltaRobotNode::Calibrat
  **/
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(deltaRobotNode::MoveToPoint::Request &req,
 	deltaRobotNode::MoveToPoint::Response &res) {
+	timespec time1, time2, time3;
+	timespec timeA, timeB, timeC;
+	clock_gettime(CLOCK_REALTIME, &time1);
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &timeA);
 	ROS_INFO("moveToPoint called");
 	res.succeeded = false;
 	if(getState() != rosMast::normal) {
@@ -171,8 +197,23 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(deltaRobotNode::MoveTo
 		return true;
 	}
 	ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", motion.x, motion.y,motion.z, motion.maxAcceleration);
+	clock_gettime(CLOCK_REALTIME, &time2);
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &timeB);
 	deltaRobot->moveTo(DataTypes::Point3D<double>(motion.x, motion.y, motion.z),motion.maxAcceleration);
+	clock_gettime(CLOCK_REALTIME, &time3);
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &timeC);
 	res.succeeded = true;
+
+	timespec time = diff(time1,time2);
+	std::cout<<time.tv_sec<<":"<<time.tv_nsec<<" REAL time for kinematics"<<std::endl;
+	time = diff(time2, time3);
+	std::cout<<time.tv_sec<<":"<<time.tv_nsec<<" REAL time for deltarobot moveToPoint"<<std::endl<<std::endl;
+
+	time = diff(timeA,timeB);
+	std::cout<<time.tv_sec<<":"<<time.tv_nsec<<" CPU time for kinematics"<<std::endl;
+	time = diff(timeB, timeC);
+	std::cout<<time.tv_sec<<":"<<time.tv_nsec<<" CPU time for deltarobot moveToPoint"<<std::endl;
+
 	return true;
 }
 
