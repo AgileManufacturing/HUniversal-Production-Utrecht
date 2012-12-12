@@ -99,6 +99,16 @@ timespec diff(timespec start, timespec end)
 	return temp;
 }
 
+timespec divideTime(timespec time, int divider){
+	long long nanoseconds = time.tv_sec * 1000000000 + time.tv_nsec;
+	nanoseconds /= divider;
+
+	timespec temp;
+	temp.tv_sec = nanoseconds / 1000000000;
+	temp.tv_nsec = nanoseconds % 1000000000;
+	return temp;
+}
+
 /**
  * Starting method for the DeltaRobotTest.
  *
@@ -109,24 +119,12 @@ timespec diff(timespec start, timespec end)
  **/
 int main(int argc, char **argv){
 	using namespace std;
-
-	timespec time1, time2;
-	Utilities::StopWatch watch("banaan1");
-	int temp=1;
-	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time1);
-	watch.start();
-	for (int i = 0; i< 121000000; i++)
-		temp+=temp;
-	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time2);
-	watch.stopAndPrint(stdout);
-	cout<<temp;
-	cout<<diff(time1,time2).tv_sec<<":"<<diff(time1,time2).tv_nsec<<endl;
-
-	           exit(0);
-
 	// Ros init.
 	ros::init(argc, argv, NODE_NAME);
 	ros::NodeHandle nodeHandle;
+
+
+
 
 	// Getting Calibrate Services.
 	ros::ServiceClient calibrateClient = nodeHandle.serviceClient<deltaRobotNode::Calibrate>(DeltaRobotNodeServices::CALIBRATE);
@@ -145,6 +143,49 @@ int main(int argc, char **argv){
 	// Getting MoveRelativePath Service.
 	ros::ServiceClient moveRelativePathClient = nodeHandle.serviceClient<deltaRobotNode::MoveRelativePath>(DeltaRobotNodeServices::MOVE_RELATIVE_PATH);
 	deltaRobotNode::MoveRelativePath moveRelativePathService;
+
+	timespec time1, time2;
+	Utilities::StopWatch watch("banaan1");
+	clock_gettime(CLOCK_REALTIME, &time1);
+	watch.start();
+
+	int moves = 0;
+	for(int acc = 25; acc <= 200; acc += 25){
+		std::cout << "max acceleration: " << acc << std::endl;
+		for(int i = 10; i <= 40; i += 10){
+			moveToPointService.request.motion.x = i;
+			moveToPointService.request.motion.y = i;
+			moveToPointService.request.motion.z = -210;
+			moveToPointService.request.motion.maxAcceleration = acc;
+			moveToPointClient.call(moveToPointService);
+			++moves;
+
+			moveToPointService.request.motion.x = -i;
+			moveToPointService.request.motion.y = -i;
+			moveToPointService.request.motion.z = -210;
+			moveToPointService.request.motion.maxAcceleration = acc;
+			moveToPointClient.call(moveToPointService);
+			++moves;
+		}
+	}
+
+	// Stop the stopwatch
+	clock_gettime(CLOCK_REALTIME, &time2);
+	watch.stopAndPrint(stdout);
+
+
+
+	timespec time = diff(time1,time2);
+	timespec avgTime =  divideTime(time, moves);
+	std::cout<<time.tv_sec<<":"<<time.tv_nsec<<endl;
+
+
+	std::cout << "Moves " << moves << std::endl;
+	std::cout << "Avg: " <<avgTime.tv_sec<<":"<<avgTime.tv_nsec<<endl;
+
+	           exit(0);
+
+
 	
 	// Test Calibrate Service.
 	std:: cout << "Press any key to start the Calibrate" << std::endl;
