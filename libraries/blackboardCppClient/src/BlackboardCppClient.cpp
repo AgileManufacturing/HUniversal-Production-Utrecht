@@ -158,7 +158,7 @@ std::string BlackboardCppClient::readOldestMessage() {
  * Remove the oldest message from the blackboard
  *
  **/
-void BlackboardCppClient::removeFirst()
+void BlackboardCppClient::removeOldestMessage()
 {
 	std::string name = database;
 	name.append(".");

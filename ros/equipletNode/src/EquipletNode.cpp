@@ -89,7 +89,7 @@ void EquipletNode::blackboardReadCallback(std::string json) {
 	ss << destination;
 	ss << "/";
 	ss << command;
-	blackboardClient->removeFirst();
+	blackboardClient->removeOldestMessage();
 }
 
 /**
