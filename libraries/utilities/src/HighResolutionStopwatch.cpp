@@ -46,7 +46,6 @@ namespace Utilities {
 	 **/
 	HighResolutionStopwatch::HighResolutionStopwatch(clockid_t clk_id) :
 			clk_id(clk_id) {
-
 	}
 
 	/**
@@ -97,6 +96,8 @@ namespace Utilities {
 	 * stopwatch.stop
 	 * time = stopwatch.divide(1000)
 	 * stopwatch.print(time)
+	 *
+	 * @param divider The divider used on the time
 	 **/
 	timespec HighResolutionStopwatch::divideTime(int divider) {
 		timespec temp = getTime();
@@ -109,13 +110,17 @@ namespace Utilities {
 		return temp;
 	}
 
+	/**
+	 * Prints the given time to a std::ostream
+	 **/
 	std::ostream & HighResolutionStopwatch::print(std::ostream & os, const timespec & time) {
 		os << time.tv_sec << "." << time.tv_nsec << std::endl;
 		return os;
 	}
+
 	/**
 	 * Prints the given time to std::cout
-	 */
+	 **/
 	void HighResolutionStopwatch::print(const timespec & time) {
 		print(std::cout, time);
 	}
