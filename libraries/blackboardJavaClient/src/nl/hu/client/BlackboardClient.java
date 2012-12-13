@@ -21,22 +21,20 @@ import com.mongodb.util.JSON;
 import java.util.concurrent.atomic.AtomicBoolean;
 public class BlackboardClient
 {
-
 	private final String OR_OPERAND = "$or";
 	private final String AND_OPERAND = "$and";
-	
-	
+	private final String OPLOG = "oplog.rs";
+	private final String LOCAL = "local";
+		
 	private Mongo mongo;
-	private HashMap<String, BasicDBObject> subscriptions = new HashMap<String, BasicDBObject>();
+	private HashMap<String, BasicDBObject> subscriptions;
 	private String collection;
 	private String database;
 	private ISubscriber callback;
 	private DB currentDatabase;
 	private DBCollection currentCollection;
-	public AtomicBoolean lock;
+	private AtomicBoolean lock;
 	private TailedCursorThread tailableCursorThread;
-	private final String OPLOG = "oplog.rs";
-	private final String LOCAL = "local";
 	private DBCursor tailedCursor;
 	private DB OPLOG_DATABASE;
 	private DBCollection OPLOG_COLLECTION;
@@ -44,11 +42,8 @@ public class BlackboardClient
 
 	public class TailedCursorThread extends Thread
 	{
-
-
 		public TailedCursorThread()
 		{					
-		
 			OPLOG_DATABASE = mongo.getDB(LOCAL);
 			OPLOG_COLLECTION = OPLOG_DATABASE.getCollection(OPLOG);
 		
@@ -86,6 +81,7 @@ public class BlackboardClient
 
 	public BlackboardClient(String ip) {
 		try {
+			this.subscriptions = new HashMap<String, BasicDBObject>();
 			this.mongo = new Mongo(ip);
 			this.callback = callback;
 			this.lock = new AtomicBoolean(false);
@@ -96,6 +92,7 @@ public class BlackboardClient
 
 	public BlackboardClient(String ip, int port) {
 		try {
+			this.subscriptions = new HashMap<String, BasicDBObject>();
 			this.mongo = new Mongo(ip, port);
 			this.callback = callback;
 			this.lock = new AtomicBoolean(false);
