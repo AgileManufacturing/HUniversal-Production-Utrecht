@@ -35,13 +35,16 @@
 
 namespace Utilities {
 
+	/**
+	 * Class used for high resolution timings. Measures in nanoseconds.
+	 **/
 	class HighResolutionStopwatch {
 	public:
 
-		HighResolutionStopwatch( clockid_t clk_id );
+		HighResolutionStopwatch(clockid_t clk_id);
 		virtual ~HighResolutionStopwatch( );
-		void start();
-		void stop();
+		void start( );
+		void stop( );
 		timespec getTime( );
 		timespec divideTime(int divider);
 		static std::ostream & print(std::ostream & os, const timespec & time);
