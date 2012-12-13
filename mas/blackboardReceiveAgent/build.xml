@@ -1,0 +1,12 @@
+<project name="REXOS" default="build" basedir=".">
+
+	<target name="build"> 			
+		<!-- defined in the root build.xml -->
+		<buildjava dir="${basedir}"/>  
+	</target>
+
+	<target name="clean">
+		 <cleanjava dir="${basedir}"/>
+	</target>
+
+</project>
