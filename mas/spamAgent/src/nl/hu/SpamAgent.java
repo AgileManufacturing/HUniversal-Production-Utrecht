@@ -69,7 +69,7 @@ public class SpamAgent extends Agent
 	
 					System.out.print(System.nanoTime());
 					client.insertJson(gson.toJson(mes));
-					Thread.sleep(30);
+			
 					
 					if(i == 500)
 					{

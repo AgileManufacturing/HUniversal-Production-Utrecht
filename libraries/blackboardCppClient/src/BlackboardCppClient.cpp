@@ -168,22 +168,43 @@ void BlackboardCppClient::removeOldestMessage()
 	connection.remove(name,message);
 }
 
+void BlackboardCppClient::insertJson(std::string json) 
+{
+	std::string name = database;
+	name.append(".");
+	name.append(collection);
+	mongo::BSONObj bobj = mongo::fromjson(json); 
+	connection.insert(name, bobj);
+}
+
 /**
  * Function is executed by all the threads to find out if there 
  * happened something for the topics subscribed to.
  *
  * @param client The instance of the BlackboardCppClient
  **/
-void BlackboardCppClient::run(bool blocked) {
-	while(true) {
-		std::string name = database;
-		name.append(".");
-		name.append(collection);
-		std::vector<mongo::BSONObj> values;
-		mongo::Query where = QUERY("ns" << name);
+void BlackboardCppClient::run(bool blocked) 
+{
+	std::string name = database;
+	name.append(".");
+	name.append(collection);
+	std::vector<mongo::BSONObj> values;
+	mongo::Query where = QUERY("ns" << name);
+	mongo::BSONObj ret;
+	mongo::BSONObj bsonQry = BSON("collStats" << "oplog.rs");
+	connection.runCommand( "local", bsonQry, ret);  
+
+	std::auto_ptr<mongo::DBClientCursor> tailedCursor = connection.query("local.oplog.rs", where, 0,
+	ret.getIntField("count"), 0, 0, 
+	mongo::QueryOption_CursorTailable & mongo::QueryOption_AwaitData );
+	tailedCursor->itcount();	
+	while(true) 
+	{
+		
+
 		for(std::map<std::string, mongo::BSONObj>::iterator it = subscriptions.begin(); it != subscriptions.end(); it++) {
 			values.push_back(it->second);
-	    }
+		}
 		mongo::BSONObj messageCheckObject(BSON("$or" << values)); 	
 		mongo::BSONObj message = connection.findOne(name, messageCheckObject);
 		if(!message.isEmpty())
@@ -192,14 +213,7 @@ void BlackboardCppClient::run(bool blocked) {
 		}
 		else if(blocked)
 		{
-			mongo::BSONObj ret;
-			mongo::BSONObj bsonQry = BSON("collStats" << "oplog.rs");
-			connection.runCommand( "local", bsonQry, ret);  
-
-			std::auto_ptr<mongo::DBClientCursor> tailedCursor = connection.query("local.oplog.rs", where, 0,
-			ret.getIntField("count"), 0, 0, 
-			mongo::QueryOption_CursorTailable & mongo::QueryOption_AwaitData );
-			tailedCursor->itcount();
+		
 			tailedCursor->more();
 
 			message = connection.findOne(name, messageCheckObject);

@@ -2,7 +2,7 @@
 
 
 
-	<target name="all" depends="jadeReceiveAgent, jadeSendAgent, jadeInterPlatformSendAgent, blackboardSendAgent , blackboardReceiveAgent">
+	<target name="all" depends="spamAgent, jadeReceiveAgent, jadeSendAgent, jadeInterPlatformSendAgent, blackboardSendAgent , blackboardReceiveAgent">
 		
 	</target>
 

@@ -56,8 +56,11 @@ public:
 	void unsubscribe(const std::string &topic);
 	std::string readOldestMessage();
 	void removeOldestMessage();
+	void insertJson(std::string json);
+
 
 private:
+	
 	void run(bool blocked);
 	/**
 	 * @var mongo::DBClientConnection connection
