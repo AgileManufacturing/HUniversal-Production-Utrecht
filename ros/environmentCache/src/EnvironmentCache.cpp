@@ -47,6 +47,8 @@ EnvironmentCache::EnvironmentCache(): cache() {
  * @param req the request object. Contains the id of the item to get the properties from
  * @param res The response object. Contains a boolean that is true when item was found, else false.
  * Contains also the Map object with the properties of the item. Empty when there is not an item found with the id
+ *
+ * @return returns true as it's a service
  **/
 bool EnvironmentCache::lookupEnvironmentObject(environmentCache::LookupEnvironmentObject::Request &req, environmentCache::LookupEnvironmentObject::Response &res) {
 	std::string id = req.lookupID;
