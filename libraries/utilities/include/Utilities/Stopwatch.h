@@ -1,6 +1,6 @@
 /**
- * @file Utilities.h
- * @brief Miscellaneous utilities.
+ * @file Stopwatch.h
+ * @brief Stopwatch class for timings
  *
  * @author Lukas Vermond
  * @author Kasper van Nieuwland
@@ -37,24 +37,68 @@
 #include <vector>
 
 namespace Utilities{
-    long timeNow(void);
-    void sleep(long milliseconds);
-    double radiansToDegrees(double radians);
-    double degreesToRadians(double degrees);
-    int stringToInt(int &i, char const *s, int base = 0);
-    template<typename M, typename V>
-    void createVectorOfMapValues(const M &m, V &v);
-
-    template<typename T>
     /**
-     * Checks if the vector contains the element.
-     *
-     * @param vector The vector of elements.
-     * @param element The element to check for in the vector.
-     *
-     * @return If the element is found return true, else return false.
+     * Stopwatch class to time stuff.
+     * Millisecond resolution
      **/
-    bool vectorContains(const std::vector<T>& vector, const T& element){
-    	return std::find(vector.begin(), vector.end(), element) != vector.end();
-    }
+    class StopWatch{
+	private:
+		/**
+		 * @var const char* name
+		 * Stopwatch name.
+		 **/
+		const char* name;
+
+		/**
+		 * @var long timeOfStart
+		 * Starting time of the stopwatch.
+		 **/
+		long timeOfStart;
+
+		/**
+		 * @var long timeOfStop
+		 * Time at which the stopwatch is stopped.
+		 **/
+		long timeOfStop;
+
+	public:
+		/**
+		 * Constructor of a stopwatch, keeps start and stop time to measure the elapsed time in between.
+		 *
+		 * @param name Name of the stopwatch, useful for clarity when printing the stopwatch.
+		 * @param autoStart Optional flag (defaults to false) to start the stopwatch when it is created.
+		 **/
+		StopWatch(const char* name, bool autoStart = false) : name(name){
+			if(autoStart){ start(); }
+		}
+
+		/**
+		 * Start method of the stopwatch, sets the starting time to the current time.
+		 **/
+		void start(void){ timeOfStart = timeNow(); }
+
+		/**
+		 * Stop method of the stopwatch, sets the stop time to the current time.
+		 **/
+		void stop(void){ timeOfStop = timeNow(); }
+		
+		/**
+		 * Prints name of the stopwatch and the time elapsed between start and stop time to the stream.
+	 	 *
+		 * @param stream Pointer to the stream (file or cout) to print to.
+		 **/
+        void print(FILE* stream){
+			fprintf(stream, "%s: %ld ms\n", name, timeOfStop - timeOfStart);
+		}
+
+		/**
+		 * Stops the stopwatch and prints the name of the stopwatch and the time elapsed between start and stop (now) time to the stream.
+		 *
+		 * @param stream Pointer to the stream (file or cout) to print to.
+		 **/
+		void stopAndPrint(FILE* stream){
+			stop();
+			print(stream);
+		}
+    };
 }
