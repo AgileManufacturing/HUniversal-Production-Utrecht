@@ -63,6 +63,8 @@ public:
 	bool getCrate(crateLocatorNode::getCrate::Request &req,crateLocatorNode::getCrate::Response &res);
 	bool getAllCrates(crateLocatorNode::getAllCrates::Request &req,crateLocatorNode::getAllCrates::Response &res);
 
+	static void inputThreadMethod(CrateLocatorNode* that);
+
 private:
 	/**
 	 * @var Vision::FiducialDetector * fidDetector
@@ -170,6 +172,9 @@ private:
 	 * Subscription to the camera topic for receiving frames.
 	 **/
 	image_transport::Subscriber cameraSubscriber;
+
+	bool inputRunning;
+	boost::thread* inputThread;
 
 	bool calibrate(unsigned int measurements = 100, unsigned int maxErrors = 100);
 	void calibrateCallback(const sensor_msgs::ImageConstPtr& msg);

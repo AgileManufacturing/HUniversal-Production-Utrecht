@@ -34,6 +34,7 @@
 #pragma once
 #include <DataTypes/Point2D.h>
 #include <vector>
+#include <Utilities/Utilities.h>
 
 namespace Vision {
 	/**
@@ -47,59 +48,55 @@ namespace Vision {
 			void setFiducialPixelCoordinates(const std::vector<DataTypes::Point2D>& fiducialsPixelCoordinates);
 			DataTypes::Point2D pixelToRealCoordinate(const DataTypes::Point2D& pixelCoordinate) const;
 			DataTypes::Point2D realToPixelCoordinate(const DataTypes::Point2D& realCoordinate) const;
+
+			/**
+			 * Gets the rotation.
+			 *
+			 * return How much the pixels should be rotated to coincide with the real situation, such that different camera orientations can be used.
+			 **/
+			double getRotation(){
+				return alpha + Utilities::degreesToRadians(180);
+			}
+
+			double getOffsetX(){
+				return offsetX;
+			}
+
+			double getOffsetY(){
+				return offsetY;
+			}
+
+			void setOffsetX(double offset){
+				offsetX = offset;
+			}
+
+			void setOffsetY(double offset){
+				offsetY = offset;
+			}
+
 		private:
-			/**
-			 * @var double realToPixelCoordinateScale
-			 * Scale to convert from a real coordinate to a pixel coordinate.
-			 **/
-			double realToPixelCoordinateScale;
-			/**
-			 * @var double pixelToRealCoordinateScale
-			 * Scale to convert from a pixel coordinate to a real coordinate.
-			 **/
-			double pixelToRealCoordinateScale;
 
 			/**
-			 * @var double realAlpha
-			 * Angle between two fiducial points real life coordinates. Should be the same two points as pixelAlpha.
-			 **/			
-			double realAlpha;
-			/**
-			 * @var double pixelAlpha
-			 * Angle between two fiducial points pixel coordinates. Should be the same two points as realAlpha.
-			 **/
-			double pixelAlpha;
-			/**
-			 * @var double realToPixelCoordinateAlpha
-			 * Conversion in angle from real life coordinates to the pixel coordinate.
-			 **/
-			double realToPixelCoordinateAlpha;
-			/**
-			 * @var double pixelToRealCoordinateAlpha
-			 * Conversion in angle from pixel coordinates to the real life coordinate.
-			 **/
-			double pixelToRealCoordinateAlpha;
+			 * @var double alpha
+			 * The angle of the line between point 1 and 2 (this is the shortest line between the three fiducials)
+			 */
+			double alpha;
 
 			/**
-			 * @var double realToPixelCoordinateA
-			 * Variable calculated in updateTransformationParameters for use in conversions.
-			 **/
-			double realToPixelCoordinateA; 
+			 * @var double scale
+			 * The scale of pixel to real coordinates
+			 */
+			double scale;
+
 			/**
-			 * @var double realToPixelCoordinateB
-			 * Variable calculated in updateTransformationParameters for use in conversions.
-			 **/
-			double realToPixelCoordinateB;
+			 * @var double offsetX
+			 */
+			double offsetX;
+
 			/**
-			 * @var double pixelToRealCoordinateA
-			 * Variable calculated in updateTransformationParameters for use in conversions.
-			 **/
-			double pixelToRealCoordinateA;
-			/**
-			 * @var double pixelToRealCoordinateB
-			 * Variable calculated in updateTransformationParameters for use in conversions.
-			 **/
-			double pixelToRealCoordinateB;
+			 * @var double offsetY
+			 */
+			double offsetY;
 
 			/**
 			 * @var double mirrored

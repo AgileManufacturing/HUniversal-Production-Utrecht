@@ -46,13 +46,14 @@ namespace Vision {
 	 * @param fiducialsRealCoordinates A vector with the real world coordinates of the fiducials in the same order as fiducialsPixelCoordinates.
 	 * @param fiducialsPixelCoordinates A vector with the pixel coordinates of the fiducials in the same order as fiducialsRealCoordinates.
 	 **/
-	PixelAndRealCoordinateTransformer::PixelAndRealCoordinateTransformer(const std::vector<DataTypes::Point2D>& fiducialsRealCoordinates, const std::vector<DataTypes::Point2D>& fiducialsPixelCoordinates ) : fiducialsRealCoordinates(fiducialsRealCoordinates), fiducialsPixelCoordinates(fiducialsPixelCoordinates) {
+	PixelAndRealCoordinateTransformer::PixelAndRealCoordinateTransformer(const std::vector<DataTypes::Point2D>& fiducialsRealCoordinates, const std::vector<DataTypes::Point2D>& fiducialsPixelCoordinates) :
+			alpha(0), scale(0), offsetX(0), offsetY(0), mirrored(false), fiducialsRealCoordinates(fiducialsRealCoordinates), fiducialsPixelCoordinates(fiducialsPixelCoordinates) {
 		updateTransformationParameters();
 	}
 	/**
 	 * Destructor.
 	 **/
-	PixelAndRealCoordinateTransformer::~PixelAndRealCoordinateTransformer() {
+	PixelAndRealCoordinateTransformer::~PixelAndRealCoordinateTransformer( ) {
 	}
 	/**
 	 * Function for updating the pixel coordinates of the fiducials.
@@ -65,120 +66,107 @@ namespace Vision {
 	}
 
 	/**
-	 * Converts pixel coordinates to real coordinates. The math is just a worked out version of a conversion matrix (translation, rotation, scaling and mirroring). Mirroring is available because one camera is on the bottom and one is on the top.
+	 * Applies a rotation matrix, potential mirroring on y axis, scaling and offsetting.
 	 *
 	 * @param pixelCoordinate The input coordinate that will be converted.
 	 *
 	 * @return The real coordinate.
 	 **/
 	DataTypes::Point2D PixelAndRealCoordinateTransformer::pixelToRealCoordinate(const DataTypes::Point2D & pixelCoordinate) const {
-		int pixelCoordinateY = pixelCoordinate.y * -1;		
+		DataTypes::Point2D result = pixelCoordinate.rotate(alpha);
 
-		DataTypes::Point2D realCoordinate;
-		
-		realCoordinate.x = pixelToRealCoordinateScale * (cos(pixelToRealCoordinateAlpha) * (pixelCoordinate.x - pixelToRealCoordinateA) + sin(pixelToRealCoordinateAlpha) * (pixelCoordinateY - pixelToRealCoordinateB));
-		realCoordinate.y = pixelToRealCoordinateScale * (-sin(pixelToRealCoordinateAlpha) * (pixelCoordinate.x - pixelToRealCoordinateA) + cos(pixelToRealCoordinateAlpha) * (pixelCoordinateY - pixelToRealCoordinateB));
-		
-		if(mirrored){		
-			double temporaryX = fiducialsRealCoordinates[0].x - fiducialsRealCoordinates[0].x * cos(2 * realAlpha) + realCoordinate.x * cos(2 * realAlpha) - fiducialsRealCoordinates[0].y * sin(2 * realAlpha) + realCoordinate.y * sin(2 * realAlpha);
-			realCoordinate.y = fiducialsRealCoordinates[0].y + fiducialsRealCoordinates[0].y * cos(2 * realAlpha) - realCoordinate.y * cos(2 * realAlpha) - fiducialsRealCoordinates[0].x * sin(2 * realAlpha) + realCoordinate.x * sin(2 * realAlpha);	
-			realCoordinate.x = temporaryX;
+		// Mirror on the y axis, which after rotation is always the mirror axis.
+		if (mirrored) {
+			result.x *= -1;
 		}
-		return realCoordinate;
+
+		//invert y axis because of 0,0 being topleft of a picture and 0,0 being bottomleft of the workspace
+		result.y *= -1;
+
+		result.x *= scale;
+		result.y *= scale;
+
+		result.x += offsetX;
+		result.y += offsetY;
+
+		return result;
 	}
-	
+
 	/**
-	 * Converts real coordinates to pixel coordinates. The math is just a worked out version of a conversion matrix (translation, rotation, scaling and mirroring). Mirroring is available because one camera is on the bottom and one is on the top.
+	 * Applies a offset, scaling, potential mirroring on y axis and rotation matrix.
 	 *
 	 * @param realCoordinate The input coordinate that will be converted.
 	 *
 	 * @return The pixel coordinate.
 	 **/
 	DataTypes::Point2D PixelAndRealCoordinateTransformer::realToPixelCoordinate(const DataTypes::Point2D& realCoordinate) const {
-		DataTypes::Point2D pixelCoordinate;
-		pixelCoordinate = realCoordinate;	
-		double temporaryX;
-		
-		if(mirrored){
-			temporaryX = fiducialsRealCoordinates[0].x - fiducialsRealCoordinates[0].x * cos(2 * realAlpha) + pixelCoordinate.x * cos(2 * realAlpha) - fiducialsRealCoordinates[0].y * sin(2 * realAlpha) + pixelCoordinate.y * sin(2 * realAlpha);
-			pixelCoordinate.y = fiducialsRealCoordinates[0].y + fiducialsRealCoordinates[0].y * cos(2 * realAlpha) - pixelCoordinate.y * cos(2 * realAlpha) - fiducialsRealCoordinates[0].x * sin(2 * realAlpha) + pixelCoordinate.x * sin(2 * realAlpha);
-			pixelCoordinate.x = temporaryX;
+		DataTypes::Point2D result(realCoordinate);
+
+		result.x -= offsetX;
+		result.y -= offsetY;
+
+		result.x /= scale;
+		result.y /= scale;
+
+		//invert y axis because of 0,0 being topleft of a picture and 0,0 being bottomleft of the workspace
+		result.y *= -1;
+
+		if (mirrored) {
+			result.x *= -1;
 		}
 
-		temporaryX = realToPixelCoordinateScale * (cos(realToPixelCoordinateAlpha) * (pixelCoordinate.x - realToPixelCoordinateA) + sin(realToPixelCoordinateAlpha) * (pixelCoordinate.y - realToPixelCoordinateB));
-		pixelCoordinate.y = realToPixelCoordinateScale * (-sin(realToPixelCoordinateAlpha) * (pixelCoordinate.x - realToPixelCoordinateA) + cos(realToPixelCoordinateAlpha) * (pixelCoordinate.y - realToPixelCoordinateB));
-		pixelCoordinate.x = temporaryX;
-		pixelCoordinate.y *= -1;
-		
-		return pixelCoordinate;
+		return result.rotate(-alpha);
 	}
-	
+
 	/**
-	 * 	Updates realToPixelCoordinateScale, pixelToRealCoordinateScale, realAlpha, pixelAlpha, realToPixelCoordinateAlpha, pixelToRealCoordinateAlpha and mirrored.
+	 * Updates scale, mirrored, alpha.
+	 * TODO update offsetX and offsetY.
 	 **/
-	void PixelAndRealCoordinateTransformer::updateTransformationParameters() {
-		if(fiducialsRealCoordinates.size() != fiducialsPixelCoordinates.size())
+	void PixelAndRealCoordinateTransformer::updateTransformationParameters( ) {
+		if (fiducialsRealCoordinates.size() != fiducialsPixelCoordinates.size()) {
 			throw std::runtime_error("Number of real fiducial coordinates does not match number of pixel fiducials coordinates");
-		double scale = 0;
+		}
+		
+		// Determine mirroring by rotating an outlying pixel point (0) around the midpoint (1) with 90 degrees both ways, then checking which rotation is closest to the other outlying pixel point (2).
+		DataTypes::Point2D offset = fiducialsPixelCoordinates[0] - fiducialsPixelCoordinates[1];
+		// Rotate 90 degrees clockwise
+		DataTypes::Point2D mirroredPoint = offset.rotate(Utilities::degreesToRadians(-90));
+		// Rotate 90 degrees counter clockwise
+		DataTypes::Point2D nonmirroredPoint = offset.rotate(Utilities::degreesToRadians(+90));
+		mirroredPoint += fiducialsPixelCoordinates[1];
+		nonmirroredPoint += fiducialsPixelCoordinates[1];
+		// Check if the image is mirrored by determining which rotation is closest to the actual point 2.
+		if (mirroredPoint.distance(fiducialsPixelCoordinates[2]) < nonmirroredPoint.distance(fiducialsPixelCoordinates[2])) {
+			mirrored = true;
+		} else {
+			mirrored = false;
+		}
+
+		// Find out the angle of the line between point 1 and 2 (this is the shortest line between the three fiducials)
+		double pixelDeltaX = fiducialsPixelCoordinates[1].x - fiducialsPixelCoordinates[2].x;
+		double pixelDeltaY = fiducialsPixelCoordinates[1].y - fiducialsPixelCoordinates[2].y;
+		// Independent of mirroring, if the line between point 1 and 2 is at 90 degrees, the rotation of the image is 0 degrees
+		alpha = atan2(pixelDeltaY, pixelDeltaX) + Utilities::degreesToRadians(-270);
+		std::cout << "alpha: " << alpha << ", " << Utilities::radiansToDegrees(alpha) << std::endl;
+
+		// Determine the scale.
+		scale = 0;
 		int distancesCount = 0;
-		for(unsigned int n = 0; n < fiducialsRealCoordinates.size(); n++)
-		{
-			for(unsigned int m = n + 1; m < fiducialsRealCoordinates.size(); m++)
-			{
+		for (unsigned int n = 0; n < fiducialsRealCoordinates.size(); n++) {
+			for (unsigned int m = n + 1; m < fiducialsRealCoordinates.size(); m++) {
 				scale += fiducialsRealCoordinates[n].distance(fiducialsRealCoordinates[m]) / fiducialsPixelCoordinates[n].distance(fiducialsPixelCoordinates[m]);
 				distancesCount++;
 			}
 		}
 		scale /= distancesCount;
-		realToPixelCoordinateScale = 1 / scale;
-		pixelToRealCoordinateScale = scale;
-		
-		double pixelX = fiducialsPixelCoordinates[0].x;
-		double pixelY = -fiducialsPixelCoordinates[0].y;
-		double realX = fiducialsRealCoordinates[0].x;
-		double realY = fiducialsRealCoordinates[0].y;
-		
-		double pixelDeltaX = fiducialsPixelCoordinates[2].x - pixelX;
-		double pixelDeltaY = -fiducialsPixelCoordinates[2].y - pixelY;
-		
-		double realDeltaX = fiducialsRealCoordinates[2].x - realX;
-		double realDeltaY = fiducialsRealCoordinates[2].y - realY;
-		
-		realAlpha = atan2(realDeltaY, realDeltaX);   
-		pixelAlpha = atan2(pixelDeltaY, pixelDeltaX);
-		realToPixelCoordinateAlpha = realAlpha - pixelAlpha;
-		pixelToRealCoordinateAlpha = pixelAlpha - realAlpha;
-		
-		double rcos = cos(realToPixelCoordinateAlpha);
-		double rcos2 = pow(rcos, 2);
-		double rsin = sin(realToPixelCoordinateAlpha);
-		double rsin2 = pow(rsin, 2);
-		double rtan = tan(realToPixelCoordinateAlpha);
-		
-		realToPixelCoordinateA =  realX - (rcos * pixelX - rsin * pixelY) / (realToPixelCoordinateScale * (rcos2 + rsin2));	
-		realToPixelCoordinateB = realY - pixelY / (realToPixelCoordinateScale * rcos) - rtan * (realX - realToPixelCoordinateA);
-		
-		rcos = cos(pixelToRealCoordinateAlpha);
-		rcos2 = pow(rcos, 2);
-		rsin = sin(pixelToRealCoordinateAlpha);
-		rsin2 = pow(rsin, 2);
-		rtan = tan(pixelToRealCoordinateAlpha);
-		
-		pixelToRealCoordinateA =  pixelX - (rcos * realX - rsin * realY) / (pixelToRealCoordinateScale * (rcos2 + rsin2));	
-		pixelToRealCoordinateB = pixelY - realY / (pixelToRealCoordinateScale * rcos) - rtan * (pixelX - pixelToRealCoordinateA);
-		
-		mirrored = false;
-		DataTypes::Point2D test = pixelToRealCoordinate(fiducialsPixelCoordinates[1]);
-		
-		//check to see if the 3rd fiducial is within 1 cm of the calculated point, if not so the image is mirrored
-		if(!(test.x > fiducialsRealCoordinates[1].x - 10 && test.x < fiducialsRealCoordinates[1].x + 10)) {
-			mirrored = true;
-		} else {
-			if(!(test.y > fiducialsRealCoordinates[1].y - 10 && test.y < fiducialsRealCoordinates[1].y + 10)) {
-				mirrored = true;
-			} else {
-				mirrored = false;
-			}
-		}	
+
+		offsetX = offsetY = 0;
+		DataTypes::Point2D realpoint0 = pixelToRealCoordinate(fiducialsPixelCoordinates[0]);
+		DataTypes::Point2D realpoint1 = pixelToRealCoordinate(fiducialsPixelCoordinates[1]);
+		DataTypes::Point2D realpoint2 = pixelToRealCoordinate(fiducialsPixelCoordinates[2]);
+		offsetX = fiducialsRealCoordinates[0].x - realpoint0.x + fiducialsRealCoordinates[1].x - realpoint1.x + fiducialsRealCoordinates[2].x - realpoint2.x;
+		offsetY = fiducialsRealCoordinates[0].y - realpoint0.y + fiducialsRealCoordinates[1].y - realpoint1.y + fiducialsRealCoordinates[2].y - realpoint2.y;
+		offsetX /= 3;
+		offsetY /= 3;
 	}
 }

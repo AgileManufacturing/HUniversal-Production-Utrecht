@@ -39,11 +39,11 @@
 #include "Vision/QRCodeDetector.h"
 #include "DataTypes/Crate.h"
 
-namespace Vision{
+namespace Vision {
 	/**
 	 * Constructor which sets the values for the scanner.
 	 **/
-	QRCodeDetector::QRCodeDetector() {
+	QRCodeDetector::QRCodeDetector( ) {
 		scanner.set_config(zbar::ZBAR_QRCODE, zbar::ZBAR_CFG_ENABLE, 1);
 	}
 
@@ -62,18 +62,19 @@ namespace Vision{
 			// fourcc format "y800" (simple, single y plane for monchrome images)
 			// pointer to image.data
 			// area of the image
-			zbar::Image zbarImage(image.cols, image.rows, "Y800", (void*)image.data, image.cols * image.rows);
+			zbar::Image zbarImage(image.cols, image.rows, "Y800", (void*) image.data, image.cols * image.rows);
 
 			int amountOfScannedResults = scanner.scan(zbarImage);
 
 			if (amountOfScannedResults > 0) {
 
 				zbar::Image::SymbolIterator it = zbarImage.symbol_begin();
-				for(; it!=zbarImage.symbol_end(); ++it) {
+				for (; it != zbarImage.symbol_end(); ++it) {
 					// add all "position" corners of a qr code to a vector
 					std::vector<cv::Point2f> corners;
-					corners.push_back(cv::Point2f(it->get_location_x(1), it->get_location_y(1)));
 					corners.push_back(cv::Point2f(it->get_location_x(0), it->get_location_y(0)));
+					corners.push_back(cv::Point2f(it->get_location_x(1), it->get_location_y(1)));
+					corners.push_back(cv::Point2f(it->get_location_x(2), it->get_location_y(2)));
 					corners.push_back(cv::Point2f(it->get_location_x(3), it->get_location_y(3)));
 
 					// windowsSize is half of the sidelength of the window around every coordinate to check by cornerSubPix.
@@ -87,15 +88,17 @@ namespace Vision{
 					// 455 px distance = (7 x 7) windowsSize > (15 x 15) window
 					// 520 px distance = (8 x 8) windowsSize > (17 x 17) window
 					// etc...
-					 float windowsSize = 2.0 * (DataTypes::Crate::distance(corners[0], corners[2]) / 130.0);
+					double distance = DataTypes::Point2D(corners[0]).distance(DataTypes::Point2D(corners[2]));
+					float windowsSize = 2.0 * distance / 130.0;
 
 					// The cornerSubPix function iterates to find the sub-pixel accurate location of corners or radial saddle points. Corners is now updated!
-					cv::cornerSubPix(image, corners, cv::Size(windowsSize,windowsSize), cv::Size(-1,-1), criteria);
+					cv::cornerSubPix(image, corners, cv::Size(windowsSize, windowsSize), cv::Size(-1, -1), criteria);
 
 					crates.push_back(DataTypes::Crate(it->get_data(), corners));
 				}
 			}
 		} catch (std::exception &e) {
+			std::cerr << "Error!" << std::endl;
 			return;
 		}
 	}
@@ -114,15 +117,15 @@ namespace Vision{
 			// fourcc format "y800" (simple, single y plane for monchrome images)
 			// pointer to image.data
 			// area of the image
-			zbar::Image zbarImage(image.cols, image.rows, "Y800", (void*)image.data, image.cols * image.rows);
+			zbar::Image zbarImage(image.cols, image.rows, "Y800", (void*) image.data, image.cols * image.rows);
 
 			int amountOfScannedResults = scanner.scan(zbarImage);
 
 			if (amountOfScannedResults > 0) {
 
 				zbar::Image::SymbolIterator it = zbarImage.symbol_begin();
-				for(; it!=zbarImage.symbol_end(); ++it) {
-					if(boost::starts_with(it->get_data(), "RC")) {
+				for (; it != zbarImage.symbol_end(); ++it) {
+					if (boost::starts_with(it->get_data(), "RC")) {
 						reconfigureCommands.push_back(it->get_data());
 					}
 				}

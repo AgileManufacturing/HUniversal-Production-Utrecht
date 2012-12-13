@@ -21,6 +21,7 @@ ros/deltaRobotNode/src/deltaRobotNode/
 ros/rosMast/src/rosMast/
 ros/crateLocatorNode/src/crateLocatorNode/
 ros/rexosStdMsgs/src/rexosStdMsgs/
+ros/gripperNode/src/gripperNode/
 ros/rexosStdSrvs/src/rexosStdSrvs/
 tools/gripperTestNode/src/gripperTestNode/
 build/
