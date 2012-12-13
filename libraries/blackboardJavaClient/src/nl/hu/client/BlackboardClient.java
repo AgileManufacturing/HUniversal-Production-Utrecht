@@ -18,17 +18,14 @@ import com.mongodb.DBCollection;
 import com.mongodb.Mongo;
 import com.mongodb.MongoInterruptedException;
 import com.mongodb.util.JSON;
+import java.util.concurrent.atomic.AtomicBoolean;
+public class BlackboardClient
+{
 
-public class BlackboardClient extends Thread {
-
-	private final String OPLOG = "oplog.rs";
-	private final String LOCAL = "local";
 	private final String OR_OPERAND = "$or";
 	private final String AND_OPERAND = "$and";
-
-	private DB OPLOG_DATABASE;
-	private DBCollection OPLOG_COLLECTION;
-
+	
+	
 	private Mongo mongo;
 	private HashMap<String, BasicDBObject> subscriptions = new HashMap<String, BasicDBObject>();
 	private String collection;
@@ -36,16 +33,63 @@ public class BlackboardClient extends Thread {
 	private ISubscriber callback;
 	private DB currentDatabase;
 	private DBCollection currentCollection;
+	public AtomicBoolean lock;
+	private TailedCursorThread tailableCursorThread;
+	private final String OPLOG = "oplog.rs";
+	private final String LOCAL = "local";
+	private DBCursor tailedCursor;
+	private DB OPLOG_DATABASE;
+	private DBCollection OPLOG_COLLECTION;
 
+
+	public class TailedCursorThread extends Thread
+	{
+
+
+		public TailedCursorThread()
+		{					
+		
+			OPLOG_DATABASE = mongo.getDB(LOCAL);
+			OPLOG_COLLECTION = OPLOG_DATABASE.getCollection(OPLOG);
+		
+			BasicDBObject where = new BasicDBObject();
+			where.put("ns", database + "." + collection);
+			tailedCursor = OPLOG_COLLECTION.find(where).addOption(Bytes.QUERYOPTION_TAILABLE).addOption	(Bytes.QUERYOPTION_AWAITDATA);
+			tailedCursor.skip(tailedCursor.size());					
+		}
+
+		@Override 	
+		public void run()
+		{
+			String operation;
+			while(true)
+			{
+				while(tailedCursor.hasNext())
+				{	
+					DBObject object = (DBObject)tailedCursor.next();
+					operation = object.get("op").toString();
+					switch(operation)
+					{
+						case "i":
+							lock.set(true);	
+							synchronized (lock) 
+					 		{
+            							lock.notify();
+      					 		}
+							break;
+					}			
+				}
+			}
+		}
+	}
 
 
 	public BlackboardClient(String ip) {
 		try {
 			this.mongo = new Mongo(ip);
 			this.callback = callback;
-			this.OPLOG_DATABASE = mongo.getDB(LOCAL);
-			this.OPLOG_COLLECTION = OPLOG_DATABASE.getCollection(OPLOG);
-		} catch (Exception e) {
+			this.lock = new AtomicBoolean(false);
+			} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -54,8 +98,7 @@ public class BlackboardClient extends Thread {
 		try {
 			this.mongo = new Mongo(ip, port);
 			this.callback = callback;
-			this.OPLOG_DATABASE = mongo.getDB(LOCAL);
-			this.OPLOG_COLLECTION = OPLOG_DATABASE.getCollection(OPLOG);
+			this.lock = new AtomicBoolean(false);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -80,6 +123,9 @@ public class BlackboardClient extends Thread {
 		}
 		this.collection = collection;
 		currentCollection = currentDatabase.getCollection(this.collection);
+		this.tailableCursorThread = new TailedCursorThread();
+		this.tailableCursorThread.start();
+		
 	}
 
 	public void insertJson(String json) throws Exception {
@@ -120,6 +166,7 @@ public class BlackboardClient extends Thread {
 
 
 	public ArrayList<String> getJson(String json) throws Exception {
+		int size =0;		
 		if (collection.isEmpty() || collection == null) {
 			throw new Exception("No collection selected");
 		} else if (database.isEmpty() || database == null) {
@@ -135,36 +182,56 @@ public class BlackboardClient extends Thread {
 	}	
 
 	
-	public void read(boolean blocked) throws Exception {
+	public void read(boolean blocked, String client) throws Exception {
 		if (collection.isEmpty() || collection == null) {
 			throw new Exception("No collection selected");
 		} else if (database.isEmpty() || database == null) {
 			throw new Exception("No database selected");
 		} else if(subscriptions.size() == 0) {
-			throw new Exception("No subscribtions has been found");
-		}
-
+			throw new Exception("No subscriptions has been found");
+		}		 	 					
+		
 		BasicDBObject messageCheckObject = new BasicDBObject();
 		messageCheckObject.put(OR_OPERAND, subscriptions.values());
 		BasicDBObject message = (BasicDBObject) currentCollection.findOne(messageCheckObject);
-		if(message!= null) {
+		if(message!= null) 
+		{
 			callback.onMessage(message.toString());
-		} else if(blocked && subscriptions.size() > 0) {
-			BasicDBObject where = new BasicDBObject();
-			where.put("ns", database + "." + collection);
-			
-			DBCursor tailedCursor = OPLOG_COLLECTION.find().addOption(Bytes.QUERYOPTION_TAILABLE)
-					.addOption(Bytes.QUERYOPTION_AWAITDATA);
+		} else if(blocked && subscriptions.size() > 0) {			
+			 while(true)
+			 {
+				if(!lock.compareAndSet(true, false))
+				{
+					 synchronized (lock) 
+					 {
+            					lock.wait();
+      					 }
+				}
 
-			tailedCursor.skip(tailedCursor.size());
-			tailedCursor.hasNext();
-			message = (BasicDBObject) currentCollection.findOne(messageCheckObject);
-			
-			if(message!= null) {
-				callback.onMessage(message.toString());
+			 	try
+				{
+					message = (BasicDBObject) currentCollection.findOne(messageCheckObject);
+					if(message != null)
+					{	
+						callback.onMessage(message.toString());
+						break;
+					}
+        			}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+
+			            //error handling
+			        }
+				finally
+				{
+			          
+			        }		
 			}
 		}
-	}		
+	}
+
+		
 
 	public void removeFirst() {
 		BasicDBObject messageCheckObject = new BasicDBObject();
