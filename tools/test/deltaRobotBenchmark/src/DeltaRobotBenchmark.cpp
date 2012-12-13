@@ -39,8 +39,7 @@
 #include "DeltaRobotNode/Services.h"
 
 #include "Utilities/Utilities.h"
-
-#include <sys/time.h>
+#include "Utilities/HighResolutionStopwatch.h"
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "DeltaRobotTest"
@@ -86,28 +85,7 @@ namespace DeltaRobotTestNamespace {
 
 using namespace DeltaRobotTestNamespace;
 
-timespec diff(timespec start, timespec end)
-{
-	timespec temp;
-	if ((end.tv_nsec-start.tv_nsec)<0) {
-		temp.tv_sec = end.tv_sec-start.tv_sec-1;
-		temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
-	} else {
-		temp.tv_sec = end.tv_sec-start.tv_sec;
-		temp.tv_nsec = end.tv_nsec-start.tv_nsec;
-	}
-	return temp;
-}
 
-timespec divideTime(timespec time, int divider){
-	long long nanoseconds = time.tv_sec * 1000000000 + time.tv_nsec;
-	nanoseconds /= divider;
-
-	timespec temp;
-	temp.tv_sec = nanoseconds / 1000000000;
-	temp.tv_nsec = nanoseconds % 1000000000;
-	return temp;
-}
 
 /**
  * Starting method for the DeltaRobotTest.
@@ -122,9 +100,6 @@ int main(int argc, char **argv){
 	// Ros init.
 	ros::init(argc, argv, NODE_NAME);
 	ros::NodeHandle nodeHandle;
-
-
-
 
 	// Getting Calibrate Services.
 	ros::ServiceClient calibrateClient = nodeHandle.serviceClient<deltaRobotNode::Calibrate>(DeltaRobotNodeServices::CALIBRATE);
@@ -144,10 +119,12 @@ int main(int argc, char **argv){
 	ros::ServiceClient moveRelativePathClient = nodeHandle.serviceClient<deltaRobotNode::MoveRelativePath>(DeltaRobotNodeServices::MOVE_RELATIVE_PATH);
 	deltaRobotNode::MoveRelativePath moveRelativePathService;
 
-	timespec time1, time2;
-	Utilities::StopWatch watch("banaan1");
-	clock_gettime(CLOCK_REALTIME, &time1);
-	watch.start();
+	//Utilities::StopWatch watch("banaan1");
+	Utilities::HighResolutionStopwatch realWatch(CLOCK_REALTIME);
+
+
+	//watch.start();
+	realWatch.start();
 
 	int moves = 0;
 	for(int acc = 25; acc <= 200; acc += 25){
@@ -170,19 +147,24 @@ int main(int argc, char **argv){
 	}
 
 	// Stop the stopwatch
-	clock_gettime(CLOCK_REALTIME, &time2);
-	watch.stopAndPrint(stdout);
+	realWatch.stop();
+	//watch.stopAndPrint(stdout);
+
+	std::cout << "Realtime: ";
+	realWatch.print(realWatch.getTime());
+	std::cout << std::endl;
 
 
 
-	timespec time = diff(time1,time2);
+
+	/*timespec time = diff(time1,time2);
 	timespec avgTime =  divideTime(time, moves);
 	std::cout<<time.tv_sec<<":"<<time.tv_nsec<<endl;
 
 
 	std::cout << "Moves " << moves << std::endl;
 	std::cout << "Avg: " <<avgTime.tv_sec<<":"<<avgTime.tv_nsec<<endl;
-
+*/
 	           exit(0);
 
 
