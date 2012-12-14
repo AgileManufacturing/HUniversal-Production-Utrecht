@@ -31,15 +31,35 @@
 
 #include "ros/ros.h"
 #include "rosCommunicationBenchmark/TestServiceEmpty.h"
+#include "rosCommunicationBenchmark/TestServiceFilled.h"
+#include "rosCommunicationBenchmark/SignalTestEnd.h"
 #include <cstdio>
 #include <iostream>
+#include <vector>
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "RosComBenchmarkServer"
 // @endcond
 
+std::vector<uint64_t> rcvTimes (0,1000);
+
 bool testServiceEmpty(rosCommunicationBenchmark::TestServiceEmpty::Request &req, rosCommunicationBenchmark::TestServiceEmpty::Response &res) {
-	std::cout << "RCV;" << ros::Time::now().toNSec() << std::endl;
+	rcvTimes.push_back(ros::Time::now().toNSec());
+
+	return true;
+}
+
+bool testServiceFilled(rosCommunicationBenchmark::TestServiceFilled::Request &req, rosCommunicationBenchmark::TestServiceFilled::Response &res) {
+	rcvTimes.push_back(ros::Time::now().toNSec());
+
+	return true;
+}
+
+bool signalTestEnd(rosCommunicationBenchmark::SignalTestEnd::Request &req, rosCommunicationBenchmark::SignalTestEnd::Response &end){
+	for(uint i = 0; i < rcvTimes.size() && rcvTimes[i] != 0; i++){
+		std::cout << "RCV;" << rcvTimes[i] << std::endl;
+		rcvTimes[i] = 0;
+	}
 
 	return true;
 }
@@ -49,6 +69,8 @@ int main(int argc, char **argv){
 
 	ros::NodeHandle n;
 	ros::ServiceServer emptyService = n.advertiseService("testServiceEmpty", testServiceEmpty);
+	ros::ServiceServer filledService = n.advertiseService("testServiceFilled", testServiceFilled);
+	ros::ServiceServer testEnd = n.advertiseService("signalTestEnd", signalTestEnd);
 
 	ros::spin();
 	return 0;

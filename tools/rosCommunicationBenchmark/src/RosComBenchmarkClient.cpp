@@ -31,8 +31,11 @@
 
 #include "ros/ros.h"
 #include "rosCommunicationBenchmark/TestServiceEmpty.h"
-#include <cstdlib>
+#include "rosCommunicationBenchmark/TestServiceFilled.h"
+#include "rosCommunicationBenchmark/SignalTestEnd.h"
 #include <iostream>
+#include <cstdlib>
+#include <time.h>
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "RosComBenchmarkClient"
@@ -43,22 +46,49 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, NODE_NAME);
 
 	ros::NodeHandle n;
-	ros::ServiceClient client = n.serviceClient<rosCommunicationBenchmark::TestServiceEmpty>("testServiceEmpty");
+	ros::ServiceClient testEmptyClient = n.serviceClient<rosCommunicationBenchmark::TestServiceEmpty>("testServiceEmpty");
 
-	rosCommunicationBenchmark::TestServiceEmpty srv;
+	rosCommunicationBenchmark::TestServiceEmpty emptySrv;
 
 	uint64_t send, returned;
 
-	for(int i = 0; i < 1000; i++){
+	// for(int i = 0; i < 1000; i++){
+	// 	send = ros::Time::now().toNSec();
+	// 	testEmptyClient.call(emptySrv);
+	// 	returned = ros::Time::now().toNSec();
+
+	// 	std::cout << "SND;" << send << std::endl
+	// 		<< "RTN;" << returned << std::endl;
+	// }
+
+	// Test filled service
+	ros::ServiceClient testFilledClient = n.serviceClient<rosCommunicationBenchmark::TestServiceFilled>("testServiceFilled");
+
+	rosCommunicationBenchmark::TestServiceFilled filledSrv;
+
+	srand(time(NULL));
+
+	for(int i = 1000; i < 2000 && ros::ok(); i++){
+		for(int i2 = 0; i2 < 10 && ros::ok(); i2++){
+			rosCommunicationBenchmark::TestMsg msg;
+			msg.testFloat = (double)((rand() % 1000) / (rand() % 1000 + 1));
+			filledSrv.request.msgs.push_back(msg);
+		}
+
+		filledSrv.request.id.id = i;
 		send = ros::Time::now().toNSec();
-		client.call(srv);
+		testFilledClient.call(filledSrv);
 		returned = ros::Time::now().toNSec();
 
 		std::cout << "SND;" << send << std::endl
-			<< "RTN;" << returned << std::endl;
+			<< "RTN;" << returned << std::endl;	
 	}
 
-	//ROS_INFO("Service send <-> receive : " + serviceTime);
+	ros::ServiceClient testEndClient = n.serviceClient<rosCommunicationBenchmark::SignalTestEnd>("signalTestEnd");
+
+	rosCommunicationBenchmark::SignalTestEnd testEnd;
+
+	testEndClient.call(testEnd);
 
 	return 0;
 }
