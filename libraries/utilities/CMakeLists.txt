@@ -7,4 +7,4 @@
 # Utilities # 
 rexos_add_library(utilities)
 include_directories(${Boost_INCLUDE_DIRS})
-target_link_libraries(utilities ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
+target_link_libraries(utilities rt ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
