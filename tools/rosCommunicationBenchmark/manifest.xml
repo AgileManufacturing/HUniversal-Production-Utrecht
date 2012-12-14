@@ -1,0 +1,16 @@
+<package>
+  <description brief="rosCommunicationBenchmark">
+
+     rosCommunicationBenchmark
+
+  </description>
+  <author>Arjen van Zanten</author>
+  <license>newBSD</license>
+  <review status="unreviewed" notes=""/>
+   
+	<depend package="roscpp"/>
+  	<depend package="std_msgs"/>
+
+</package>
+
+
