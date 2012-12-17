@@ -114,7 +114,7 @@ void BlackboardCppClient::subscribe(const std::string &topic) {
 	subscriptions.insert( std::pair<std::string, mongo::BSONObj>(topic, BSON("topic" << topic)) );
 	// Start thread to read from blackboard	
 	if(subscriptions.size() == 1) {
-		readMessageThread = new boost::thread(boost::bind(&BlackboardCppClient::run, this, true) );
+		readMessageThread = new boost::thread(boost::bind(&BlackboardCppClient::run, this) );
 	}	
 }
 
@@ -183,46 +183,51 @@ void BlackboardCppClient::insertJson(std::string json)
  *
  * @param client The instance of the BlackboardCppClient
  **/
-void BlackboardCppClient::run(bool blocked) 
+void BlackboardCppClient::run() 
 {
+	// building name of database
 	std::string name = database;
 	name.append(".");
 	name.append(collection);
 	std::vector<mongo::BSONObj> values;
+	
+	// creating tailable cursor query
 	mongo::Query where = QUERY("ns" << name);
+	
+	// getting number of documents to skip
 	mongo::BSONObj ret;
 	mongo::BSONObj bsonQry = BSON("collStats" << "oplog.rs");
 	connection.runCommand( "local", bsonQry, ret);  
-
+	
+	// creating tailable cursor and skipping documents
 	std::auto_ptr<mongo::DBClientCursor> tailedCursor = connection.query("local.oplog.rs", where, 0,
-	ret.getIntField("count"), 0, 0, 
-	mongo::QueryOption_CursorTailable & mongo::QueryOption_AwaitData );
-	tailedCursor->itcount();	
-	while(true) 
+	ret.getIntField("count"), 0, mongo::QueryOption_CursorTailable | mongo::QueryOption_AwaitData, 
+	0 );
+				
+	while(true)
 	{
+		// reseet the subscription values
+		//values.clear();
+		//std::transform( subscriptions.begin(), subscriptions.end(), std::back_inserter( values ), second(subscriptions) );
 		
-
-		for(std::map<std::string, mongo::BSONObj>::iterator it = subscriptions.begin(); it != subscriptions.end(); it++) {
-			values.push_back(it->second);
-		}
-		mongo::BSONObj messageCheckObject(BSON("$or" << values)); 	
-		mongo::BSONObj message = connection.findOne(name, messageCheckObject);
-		if(!message.isEmpty())
+		// Continue while the cursor has more
+		while(tailedCursor->more())
 		{
-			callback->blackboardReadCallback(message.jsonString());
-		}
-		else if(blocked)
-		{
-		
-			tailedCursor->more();
-
-			message = connection.findOne(name, messageCheckObject);
-			if(!message.isEmpty())
-			{
-				callback->blackboardReadCallback(message.jsonString());
+			// get the operation performed on the database			
+			const mongo::BSONObj & object = tailedCursor->next();
+			std::string operation = object["op"].toString();
+			
+			// check if an insert is performed
+			if(operation.compare("i"))
+			{					
+				std::string topic =object.getObjectField("o").getStringField("topic");
+				if(subscriptions.count(topic))
+				{				
+					callback->blackboardReadCallback(object.getObjectField("o").toString());
+				}
 			}
-
-		}
+			
+		}	
 	}
 }
 

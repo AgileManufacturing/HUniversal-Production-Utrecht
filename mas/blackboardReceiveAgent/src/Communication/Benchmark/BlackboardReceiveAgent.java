@@ -36,6 +36,7 @@ public class BlackboardReceiveAgent extends Agent implements ISubscriber
 	
 	private String collection = "blackboard";
 	
+
 	public void setup()
 	{
 		
@@ -48,27 +49,6 @@ public class BlackboardReceiveAgent extends Agent implements ISubscriber
 		client.setCallback(this);
 		}
 		catch(Exception e){e.printStackTrace();}	
-
-
-		
-		this.addBehaviour(new CyclicBehaviour()
-		{
-			@Override
-			public void action() 
-			{
-				try
-				{		
-			
-					client.read(true,"rec");
-					
-				}
-				catch(Exception e){e.printStackTrace();}
-					
-			}
-		});
-
-
-
 	}
 
 	public void onMessage(String json)

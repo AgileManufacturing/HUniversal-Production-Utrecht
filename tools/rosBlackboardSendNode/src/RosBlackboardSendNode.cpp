@@ -36,8 +36,9 @@
  * Create a new EquipletNode
  * @param id The unique identifier of the Equiplet
  **/
-RosBlackboardSendNode::RosBlackboardSendNode(): response(false)
+RosBlackboardSendNode::RosBlackboardSendNode(int messages): messageCount(0),messages(messages)
 {
+	ROS_INFO("SENDING %d",messages);
 	blackboardClient = new BlackboardCppClient("localhost", "REXOS", "blackboard", this);
 	blackboardClient->subscribe("receive");
 } 
@@ -58,29 +59,86 @@ RosBlackboardSendNode::~RosBlackboardSendNode() {
  * @param json The message parsed in the json format
  **/
 void RosBlackboardSendNode::blackboardReadCallback(std::string json) {
-	ros::Time receiveTime = ros::Time::now();
+	timespec receiveTime;
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &receiveTime);
 	blackboardClient->removeOldestMessage();
-	response = true;	
-	std::cout << receiveTime - sendTime << std::endl;	
-		// timeing
+		
+		
+	// timeing
+	if(receiveTime.tv_nsec - sendTime.tv_nsec >= 0)
+	{
+		messageCount++;
+		times.push_back(receiveTime.tv_nsec - sendTime.tv_nsec);
+	}
+	if(messageCount < messages)
+	{
+		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &sendTime);
+		blackboardClient->insertJson("{ topic:\"send\", data:\"................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................\" }");
+	}
+	else
+	{
+		std::ofstream outputFile("data.txt");
+		for(std::vector<float>::iterator it = times.begin(); it != times.end(); ++it)
+		{
+			 outputFile <<  boost::lexical_cast<std::string>( *it);
+			 outputFile << "\n";
+		}
+		std::cout << "done!" << std::endl;	
+	}
 }
 
 int main(int argc, char **argv) {
 
 	ros::init(argc, argv, "ROS_BLACKBOARD_SEND_NODE");
 	ros::NodeHandle handle;
-	RosBlackboardSendNode RosBlackboardSendNode;
-	for(int i =0; i < 100; i++)
+	RosBlackboardSendNode RosBlackboardSendNode(atoi(argv[1]));
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &RosBlackboardSendNode.sendTime);
+	sleep(1);
+	ROS_INFO("SENDING STARTED! OMGS");
+	RosBlackboardSendNode.blackboardClient->insertJson("{ topic:\"send\", data:\"................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................\" }");
+	mongo::DBClientConnection connection;
+	connection.connect("localhost");
+	while(ros::ok())
 	{
-		RosBlackboardSendNode.sendTime = ros::Time::now();
-		RosBlackboardSendNode.blackboardClient->insertJson("{ topic:\"send\", data:\"................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................\" }");
-		while(ros::ok() && !RosBlackboardSendNode.response)
-		{
+		
+		/*mongo::Query where = QUERY("ns" << "REXOS.blackboard");
+		//mongo::BSONObj last_element = connection.findOne("local.oplog.rs", where.sort("$natural", -1)); 
+		
+		//mongo::BSONElement o = last_element["o"];
+		//std::cout << o["_id"];
+		mongo::BSONObj ret;
+		mongo::BSONObj bsonQry = BSON("collStats" << "oplog.rs");
+		connection.runCommand( "local", bsonQry, ret);  
+		std::cout << "skipping " << ret.getIntField("count") << "entries" << std::endl; 
+
+		//where = QUERY("ns" << "REXOS.blackboard" << "o._id" << mongo::GTE << o["_id"]).sort("$natural");
+		//std::cout << where << std::endl;
+		mongo::auto_ptr<mongo::DBClientCursor> tailedCursor = connection.query("local.oplog.rs", where, 0,
+		ret.getIntField("count"), 0, mongo::QueryOption_CursorTailable | mongo::QueryOption_NoCursorTimeout |mongo::QueryOption_SlaveOk | mongo::QueryOption_AwaitData, 0
+
+);		
+		std::cout << "cursor is tailable: " << tailedCursor->tailable() << std::endl;
+		int i =0;
+		while(true){
+		std::cout << tailedCursor->isDead() << std::endl;
+		sleep(1);
+		
+			while(tailedCursor->more())
+			{
 			
+				i++;
+tailedCursor->next(); 
+				//std::cout << tailedCursor->next() << std::endl;
+			}	
+		std::cout << "found  " << i << " records";
 		}
-		RosBlackboardSendNode.response = false;
+		*/
+		
 		
 	}
+	
+		
+	
 	
 
 	return 0;

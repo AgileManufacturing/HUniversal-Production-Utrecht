@@ -38,7 +38,8 @@ public class BlackboardSendAgent extends Agent implements ISubscriber
 	private Long sendingTime; 
 
 	private String collection = "blackboard";
-	
+	int messageCount =0;
+	int messages =0;
 	public void setup()
 	{
 		
@@ -58,23 +59,36 @@ public class BlackboardSendAgent extends Agent implements ISubscriber
 			@Override
 			public void action() 
 			{
-	
-				ACLMessage temp = blockingReceive();   
-				int x = Integer.parseInt(temp.getContent());
-				for(int i=0; i < x; i++)
+				try
 				{
-					try{
-					sendingTime = System.nanoTime();				
-					client.insertJson("{ topic:\""+writetopic+"\", data:\"................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................\" }");            
-					
-			
-					// read blackboard
-					
-					client.read(true, "send");
-					}
-					catch(Exception e){e.printStackTrace();}
-			 
+				ACLMessage temp = blockingReceive();   
+				messages = Integer.parseInt(temp.getContent());
+				sendingTime = System.nanoTime();				
+				client.insertJson("{ topic:\""+writetopic+"\", data:\"................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................\" }");  }catch(Exception e){e.printStackTrace();}
+				
 				}
+		});
+
+
+
+	}
+
+	public void onMessage(String json)
+	{	
+		client.removeFirst();						
+		long receivingTime = System.nanoTime();
+		times.add((receivingTime - sendingTime));
+		messageCount++;
+		if(messageCount < messages)
+		{
+			try{
+			sendingTime = System.nanoTime();				
+			client.insertJson("{ topic:\""+writetopic+"\", data:\"................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................\" }");  
+}catch(Exception e){e.printStackTrace();}
+			// send new message
+		}	
+		else
+		{			
 				try
 				{	
 					File yourFile = new File("out.txt");
@@ -93,22 +107,15 @@ public class BlackboardSendAgent extends Agent implements ISubscriber
 			  		out.close();
 					System.out.println("done!");
 					times.clear();
+					messageCount = 0;
 		  		}
 				catch (Exception e) 	
 					{//Catch exception if any
 		  			System.err.println("Error: " + e.getMessage());
 		  		}
-			}
-		});
 
-
-
-	}
-
-	public void onMessage(String json)
-	{	
-		client.removeFirst();						
-		long receivingTime = System.nanoTime();
-		times.add((receivingTime - sendingTime));
+		}
+		
+		
 	}	
 }

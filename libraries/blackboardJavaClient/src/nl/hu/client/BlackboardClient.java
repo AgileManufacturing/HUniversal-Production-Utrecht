@@ -43,7 +43,8 @@ public class BlackboardClient
 	public class TailedCursorThread extends Thread
 	{
 		public TailedCursorThread()
-		{					
+		{		
+						
 			OPLOG_DATABASE = mongo.getDB(LOCAL);
 			OPLOG_COLLECTION = OPLOG_DATABASE.getCollection(OPLOG);
 		
@@ -57,6 +58,7 @@ public class BlackboardClient
 		public void run()
 		{
 			String operation;
+			BasicDBObject message;
 			while(true)
 			{
 				while(tailedCursor.hasNext())
@@ -66,11 +68,13 @@ public class BlackboardClient
 					switch(operation)
 					{
 						case "i":
-							lock.set(true);	
-							synchronized (lock) 
-					 		{
-            							lock.notify();
-      					 		}
+							BasicDBObject messageCheckObject = new BasicDBObject();
+							messageCheckObject.put(OR_OPERAND, subscriptions.values());
+							message = (BasicDBObject) currentCollection.findOne(messageCheckObject);
+							if(message != null)
+							{	
+								callback.onMessage(message.toString());
+							}
 							break;
 					}			
 				}
@@ -179,7 +183,7 @@ public class BlackboardClient
 	}	
 
 	
-	public void read(boolean blocked, String client) throws Exception {
+	public String read(boolean blocked, String client) throws Exception {
 		if (collection.isEmpty() || collection == null) {
 			throw new Exception("No collection selected");
 		} else if (database.isEmpty() || database == null) {
@@ -193,39 +197,9 @@ public class BlackboardClient
 		BasicDBObject message = (BasicDBObject) currentCollection.findOne(messageCheckObject);
 		if(message!= null) 
 		{
-			callback.onMessage(message.toString());
-		} else if(blocked && subscriptions.size() > 0) {			
-			 while(true)
-			 {
-				if(!lock.compareAndSet(true, false))
-				{
-					 synchronized (lock) 
-					 {
-            					lock.wait();
-      					 }
-				}
-
-			 	try
-				{
-					message = (BasicDBObject) currentCollection.findOne(messageCheckObject);
-					if(message != null)
-					{	
-						callback.onMessage(message.toString());
-						break;
-					}
-        			}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-
-			            //error handling
-			        }
-				finally
-				{
-			          
-			        }		
-			}
-		}
+			return message.toString();
+		} 
+		return null;		
 	}
 
 		

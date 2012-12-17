@@ -34,11 +34,13 @@
 #include "rosMast/States.h"
 #include "rosMast/State.h"
 #include "rosMast/ModuleError.h"
-
+#include <boost/lexical_cast.hpp>
 #include <string>
 #include <vector>
 #include <iostream>
 #include <sstream>
+
+#include <fstream>
 #include <cstdio>
 #include <unistd.h>
 #include <algorithm> 
@@ -47,7 +49,8 @@
 #include <blackboardCppClient/BlackboardSubscriber.h>
 #include <rexosStdSrvs/Module.h>
 #include <Utilities/Utilities.h>
- 
+ #include <sys/time.h>
+
 #pragma GCC system_header
 #include <Libjson/libjson.h>
 
@@ -56,13 +59,15 @@
  **/
 class RosBlackboardSendNode: BlackboardSubscriber {
 	public:
-		RosBlackboardSendNode();
+		RosBlackboardSendNode(int messages);
 		virtual ~RosBlackboardSendNode();
 		void blackboardReadCallback(std::string json);
 		BlackboardCppClient  *blackboardClient;
-		bool response;
-		std::vector<long> times;
-		ros::Time sendTime;
+		std::vector<float> times;
+		timespec sendTime;
+		int messageCount;
+		int messages;
+		
 	private:
 	
 };

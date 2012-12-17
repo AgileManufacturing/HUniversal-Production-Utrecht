@@ -37,6 +37,8 @@
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <blackboardCppClient/BlackboardSubscriber.h>
+#include <algorithm>
+#include <iostream>
 
 #pragma GCC system_header
 #include "mongo/client/dbclient.h"
@@ -57,11 +59,18 @@ public:
 	std::string readOldestMessage();
 	void removeOldestMessage();
 	void insertJson(std::string json);
+	template< typename tPair >
+struct second_t {
+    typename tPair::second_type operator()( const tPair& p ) const { return p.second; }
+	
+		
+};
 
-
+template< typename tMap > 
+second_t< typename tMap::value_type > second( const tMap& m ) { return second_t<typename tMap::value_type >(); }
 private:
 	
-	void run(bool blocked);
+	void run();
 	/**
 	 * @var mongo::DBClientConnection connection
 	 * The connection to the mongodb database
