@@ -28,6 +28,7 @@
  **/
 
 #include <Utilities/HighResolutionStopwatch.h>
+#include <iomanip>
 
 namespace Utilities {
 	/**
@@ -114,7 +115,7 @@ namespace Utilities {
 	 * Prints the given time to a std::ostream
 	 **/
 	std::ostream & HighResolutionStopwatch::print(std::ostream & os, const timespec & time) {
-		os << time.tv_sec << "." << time.tv_nsec << std::endl;
+		os << time.tv_sec << ":" << std::setw(9) << std::setfill('0') << time.tv_nsec << std::endl;
 		return os;
 	}
 
