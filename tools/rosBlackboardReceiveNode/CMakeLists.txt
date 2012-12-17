@@ -11,14 +11,14 @@ cmake_minimum_required(VERSION 2.4.6)
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
 # Initialize ROS package to be in our build system.
-rexos_rospack_init("rosBlackboardSendNode" false false)
+rexos_rospack_init("rosBlackboardReceiveNode" false false)
 
 # Add executables as documented by ROS
 link_directories(${CMAKE_SOURCE_DIR}/libraries/mongo-cxx-driver)
-rosbuild_add_executable(RosBlackboardSendNode src/RosBlackboardSendNode.cpp)
+rosbuild_add_executable(RosBlackboardReceiveNode src/rosBlackboardReceiveNode.cpp)
 
 # Link target to our libraries
-target_link_libraries(RosBlackboardSendNode utilities mongoclient boost_thread-mt boost_filesystem boost_program_options boost_system ${Boost_SYSTEM_LIBRARY} blackboardCppClient json rt)
+target_link_libraries(RosBlackboardReceiveNode utilities mongoclient boost_thread-mt boost_filesystem boost_program_options boost_system ${Boost_SYSTEM_LIBRARY} blackboardCppClient json)
 
 # Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
 include_directories(${LIB_MAST_INCLUDE} ${LIB_UTILITIES_INCLUDE} ${Boost_INCLUDE_DIRS} ${BLACKBOARD_CPP_CLIENT} ${MONGO_CXX_DRIVER} ${LIB_JSON_INCLUDE})

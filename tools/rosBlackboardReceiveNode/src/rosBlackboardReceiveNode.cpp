@@ -1,9 +1,9 @@
 /**
- * @file EquipletNode.h
+ * @file rosBlackBoardReceiveNode.cpp
  * @brief Symbolizes an entire EquipletNode.
  * @date Created: 2012-10-12
  *
- * @author Dennis Koole
+ * @author Arjan Groenewegen
  *
  * @section LICENSE
  * License: newBSD
@@ -28,43 +28,29 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#pragma once
+#include "RosBlackboardReceiveNode/rosBlackboardReceiveNode.h"
 
-#include "ros/ros.h"
-#include "rosMast/States.h"
-#include "rosMast/State.h"
-#include "rosMast/ModuleError.h"
-#include <boost/lexical_cast.hpp>
-#include <string>
-#include <vector>
-#include <iostream>
-#include <sstream>
+RosBlackboardReceiveNode::RosBlackboardReceiveNode() {
+	blackboardClient = new BlackboardCppClient("localhost", "REXOS", "blackboard", this);
+	blackboardClient->subscribe("send");
+}
 
-#include <fstream>
-#include <cstdio>
-#include <unistd.h>
-#include <algorithm> 
-#include <Mast/HardwareModuleProperties.h>
-#include <blackboardCppClient/BlackboardCppClient.h>
-#include <blackboardCppClient/BlackboardSubscriber.h>
-#include <rexosStdSrvs/Module.h>
-#include <Utilities/Utilities.h>
-#include <sys/time.h>
+RosBlackboardReceiveNode::~RosBlackboardReceiveNode() {
+	delete blackboardClient;
+}
 
-#pragma GCC system_header
-#include <Libjson/libjson.h>
+void RosBlackboardReceiveNode::blackboardReadCallback(std::string json) {
+	blackboardClient->removeOldestMessage();
+	blackboardClient->insertJson("{ topic:\"receive\", data:\"................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................\" }");	
+}
 
-/**
- * The equipletNode, will manage all modules and keep track of their states
- **/
-class RosBlackboardSendNode: BlackboardSubscriber {
-	public:
-		RosBlackboardSendNode(int messages);
-		virtual ~RosBlackboardSendNode();
-		void blackboardReadCallback(std::string json);
-		BlackboardCppClient  *blackboardClient;
-		std::vector<float> times;
-		timespec sendTime;
-		int messageCount;
-		int messages;
-};
+int main(int argc, char **argv) {
+	ros::init(argc, argv, "ROS_BLACKBOARD_RECEIVE_NODE");
+	ros::NodeHandle handle;
+	RosBlackboardReceiveNode RosBlackboardReceiveNode;
+	while(ros::ok())
+	{		
+	}
+	return 0;
+}
+

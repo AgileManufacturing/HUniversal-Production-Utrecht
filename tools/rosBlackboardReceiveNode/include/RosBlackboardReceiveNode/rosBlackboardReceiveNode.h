@@ -1,6 +1,6 @@
 /**
- * @file EquipletNode.h
- * @brief Symbolizes an entire EquipletNode.
+ * @file rosBlackBoardReceiveNode.h
+ * @brief class for benchmarking the blackboard rosBlackBoardReceiveNode.
  * @date Created: 2012-10-12
  *
  * @author Dennis Koole
@@ -55,16 +55,15 @@
 #include <Libjson/libjson.h>
 
 /**
- * The equipletNode, will manage all modules and keep track of their states
+ * The Rosblacckboardreceive node, will read a message and write it again
  **/
-class RosBlackboardSendNode: BlackboardSubscriber {
+class RosBlackboardReceiveNode: BlackboardSubscriber
+{
 	public:
-		RosBlackboardSendNode(int messages);
-		virtual ~RosBlackboardSendNode();
+		RosBlackboardReceiveNode();
+		virtual ~RosBlackboardReceiveNode();
 		void blackboardReadCallback(std::string json);
-		BlackboardCppClient  *blackboardClient;
-		std::vector<float> times;
-		timespec sendTime;
-		int messageCount;
-		int messages;
+		BlackboardCppClient  * blackboardClient;
+	private:
+		
 };
