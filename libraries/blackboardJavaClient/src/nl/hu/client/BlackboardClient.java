@@ -183,12 +183,19 @@ public class BlackboardClient
 					switch(operation)
 					{
 						case "i":
-							BasicDBObject messageCheckObject = new BasicDBObject();
-							messageCheckObject.put(OR_OPERAND, subscriptions.values());
-							message = (BasicDBObject) currentCollection.findOne(messageCheckObject);
-							if(message != null)
-							{	
-								callback.onMessage(message.toString());
+									
+							//BasicDBObject messageCheckObject = new BasicDBObject();
+							//messageCheckObject.put(OR_OPERAND, subscriptions.values());
+							//message = (BasicDBObject) currentCollection.findOne(messageCheckObject);
+							//if(message != null)
+							//{	
+							
+							BasicDBObject o = (BasicDBObject)object.get("o");
+							String topic = o.get("topic").toString();
+							if(subscriptions.get(topic) != null)
+							{
+								callback.onMessage(o.toString());
+							//}
 							}
 							break;
 					}			
