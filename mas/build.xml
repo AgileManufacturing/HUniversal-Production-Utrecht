@@ -2,7 +2,7 @@
 
 
 
-	<target name="all" depends="spamAgent, jadeReceiveAgent, jadeSendAgent, jadeInterPlatformSendAgent, blackboardSendAgent , blackboardReceiveAgent">
+	<target name="all" depends="dummyAgent, spamAgent, jadeReceiveAgent, jadeSendAgent, jadeInterPlatformSendAgent, blackboardSendAgent , blackboardReceiveAgent">
 		
 	</target>
 
@@ -50,6 +50,9 @@
 		<ant antfile="build.xml" target="clean" dir="spamAgent" inheritRefs="true" useNativeBasedir="true"/> 	 
 		<ant antfile="build.xml" target="clean" dir="jadeReceiveAgent" inheritRefs="true" useNativeBasedir="true"/> 
 		<ant antfile="build.xml" target="clean" dir="jadeSendAgent" inheritRefs="true" useNativeBasedir="true"/> 
+		<ant antfile="build.xml" target="clean" dir="blackboardSendAgent" inheritRefs="true" useNativeBasedir="true"/>
+		<ant antfile="build.xml" target="clean" dir="blackboardReceiveAgent" inheritRefs="true" useNativeBasedir="true"/> 
+		<ant antfile="build.xml" target="clean" dir="jadeInterPlatformSendAgent" inheritRefs="true" useNativeBasedir="true"/> 	 
 	</target>
 	
 </project>

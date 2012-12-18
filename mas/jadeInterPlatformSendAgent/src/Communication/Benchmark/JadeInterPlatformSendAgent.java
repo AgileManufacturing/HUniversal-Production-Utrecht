@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStreamReader; 
 import java.util.ArrayList; 
 import nl.hu.client.BlackboardClient;
-import nl.hu.message.MessageBuilder;
+
 import java.util.HashMap; 
 import java.util.Scanner;
 import nl.hu.client.ISubscriber;

@@ -349,7 +349,7 @@ public class BlackboardClient
 	 *
 	 * @param TODO 
      	 **/
-	public String read(boolean blocked, String client) throws Exception {
+	public String read() throws Exception {
 		if (collection.isEmpty() || collection == null) {
 			throw new Exception("No collection selected");
 		} else if (database.isEmpty() || database == null) {

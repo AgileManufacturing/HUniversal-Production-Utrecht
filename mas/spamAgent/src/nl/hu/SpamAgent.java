@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStreamReader; 
 import java.util.ArrayList; 
 import nl.hu.client.BlackboardClient;
-import nl.hu.message.MessageBuilder;
 import java.util.HashMap; 
 import java.util.Scanner;
 import nl.hu.client.ISubscriber;
@@ -30,7 +29,6 @@ import java.util.concurrent.*;
 public class SpamAgent extends Agent
 {
     private BlackboardClient client;
-	private MessageBuilder builder = new MessageBuilder();
 	private String database = "REXOS";
 	private String topic = "instruction"; 
 	private String collection = "blackboard";

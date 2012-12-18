@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStreamReader; 
 import java.util.ArrayList; 
 import nl.hu.client.BlackboardClient;
-import nl.hu.message.MessageBuilder;
 import java.util.HashMap; 
 import java.util.Scanner;
 import nl.hu.client.ISubscriber;
@@ -31,7 +30,6 @@ public class BlackboardSendAgent extends Agent implements ISubscriber
 {
   	private BlackboardClient client;
 	ArrayList<Long> times = new ArrayList<Long>();
-	private MessageBuilder builder = new MessageBuilder();
 	private String database = "REXOS";
 	private String writetopic = "send"; 
 	private String readtopic = "receive";
