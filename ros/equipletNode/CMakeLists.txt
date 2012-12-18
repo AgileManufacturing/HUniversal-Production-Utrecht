@@ -14,14 +14,14 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 rexos_rospack_init("equipletNode" false false)
 
 # Add executables as documented by ROS
-file(GLOB sources src/*.cpp)
-rosbuild_add_executable(EquipletNode ${sources})
+link_directories(${CMAKE_SOURCE_DIR}/libraries/mongo-cxx-driver)
+rosbuild_add_executable(EquipletNode src/EquipletNode.cpp)
 
 # Link target to our libraries
-target_link_libraries(EquipletNode utilities)
+target_link_libraries(EquipletNode utilities mongoclient boost_thread-mt boost_filesystem boost_program_options boost_system ${Boost_SYSTEM_LIBRARY} blackboardCppClient json)
 
 # Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
-include_directories(${LIB_MAST_INCLUDE} ${LIB_UTILITIES_INCLUDE})
+include_directories(${LIB_MAST_INCLUDE} ${LIB_UTILITIES_INCLUDE} ${Boost_INCLUDE_DIRS} ${BLACKBOARD_CPP_CLIENT} ${MONGO_CXX_DRIVER} ${LIB_JSON_INCLUDE})
 
 # MUST be called after rexos_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()

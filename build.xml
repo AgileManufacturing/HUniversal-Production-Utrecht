@@ -19,15 +19,23 @@
      <mkdir dir="${builddir}/${BlackboardJavaClientFolder}"/>
     <javac
       srcdir="libraries/blackboardJavaClient/src" 
-      classpath="libraries/mongo-2.9.3.jar" 
       destdir="${builddir}/${BlackboardJavaClientFolder}" 
       includeantruntime="true">
     </javac>
-    <jar jarfile="dist/{BlackboardJavaClientLib}" basedir="${builddir}/${BlackboardJavaClientFolder}"/>
+    <jar jarfile="dist/${BlackboardJavaClientLib}" basedir="${builddir}/${BlackboardJavaClientFolder}"/>
   </target>  
 
+   <!-- Dummy Agent-->
+  <target name="DummyAgent" depends="BlackboardJavaClient">
+    <mkdir dir="${distdir}/dummyAgent"/>
+    <javac 
+      srcdir="mas/dummyAgent/src" 
+      includeantruntime="true">
+    </javac>
+  </target>
+
   <!-- ADD ALL LIBRARIES HERE-->
-  <target name="build"  depends="init, BlackboardJavaClient">
+  <target name="build"  depends="init, BlackboardJavaClient, DummyAgent">
       <delete dir="${builddir}"/>
   </target>
 

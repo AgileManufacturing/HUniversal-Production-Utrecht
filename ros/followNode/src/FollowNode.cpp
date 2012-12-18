@@ -38,16 +38,18 @@
 
 FollowNode::FollowNode( ) :
 		crateID(""), updateCrateIDFlag(false), inputRunning(true), topicRunning(true), deltaRobotClient(
-		        nodeHandle.serviceClient<deltaRobotNode::MoveToPoint>(DeltaRobotNodeServices::MOVE_TO_POINT)), crateLocatorClient(
+		        nodeHandle.serviceClient<rexosStdSrvs::Module>(DeltaRobotNodeServices::MOVE_TO_POINT)), crateLocatorClient(
 		        nodeHandle.serviceClient<crateLocatorNode::getCrate>(CrateLocatorNodeServices::GET_CRATE)) {
 	inputThread = new boost::thread(inputThreadMethod, this);
 
 	getCrateService.request.name = "";
 
+	/*
 	moveToPointService.request.motion.x = 0;
 	moveToPointService.request.motion.y = 0;
 	moveToPointService.request.motion.z = -230;
 	moveToPointService.request.motion.maxAcceleration = 75;
+	*/
 }
 
 FollowNode::~FollowNode( ) {
@@ -123,9 +125,9 @@ void FollowNode::run( ) {
 		if (crateLocatorClient.call(getCrateService)
 		        && getCrateService.response.state != DataTypes::Crate::state_non_existing) {
 			std::cout << getCrateService.response.crate.x << " " << getCrateService.response.crate.y << std::endl;
-			moveToPointService.request.motion.x = getCrateService.response.crate.x;
-			moveToPointService.request.motion.y = getCrateService.response.crate.y;
-			deltaRobotClient.call(moveToPointService);
+			//moveToPointService.request.motion.x = getCrateService.response.crate.x;
+			//moveToPointService.request.motion.y = getCrateService.response.crate.y;
+			//deltaRobotClient.call(moveToPointService);
 		}
 	}
 }

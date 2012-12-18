@@ -28,11 +28,9 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
+
 #include <EquipletNode/EquipletNode.h>
-#include <sstream>
-#include <cstdio>
-#include <unistd.h>
-#include <algorithm>
+
 
 /**
  * Create a new EquipletNode
@@ -44,13 +42,54 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
 	modulePackageNodeMap[1] = std::pair< std::string, std::string > ("deltaRobotNode", "DeltaRobotNode");
 	modulePackageNodeMap[2] = std::pair< std::string, std::string > ("gripperTestNode", "GripperTestNode");
 
+	blackboardClient = new BlackboardCppClient("localhost", "REXOS", "blackboard", this);
+	blackboardClient->subscribe("instruction");
+
+	std::cout << "Connected!" << std::endl;
+	
 	ros::NodeHandle nodeHandle;
 	std::stringstream stringStream;
 	stringStream << equipletId;
 	std::string str = stringStream.str();
 	moduleErrorService = nodeHandle.advertiseService("ModuleError_" + str, &EquipletNode::moduleError, this); 
 	stateUpdateService = nodeHandle.advertiseService("StateUpdate_" + str, &EquipletNode::stateChanged, this);
-}; 
+} 
+
+/**
+ * Destructor for the EquipletNode
+ **/
+EquipletNode::~EquipletNode() {
+	delete blackboardClient;
+}
+
+/**
+ * This function is called when a new message on the Blackboard is received,
+ * The command, destination and payload are read from the message, and the 
+ * service specified in the message is called
+ *
+ * @param json The message parsed in the json format
+ **/
+void EquipletNode::blackboardReadCallback(std::string json) {
+	std::cout << "processMessage" << std::endl;
+	JSONNode n = libjson::parse(json);
+	JSONNode message = n["message"];
+	//JSONNode::const_iterator messageIt;
+	std::string destination = message["destination"].as_string();
+	//std::cout << "Destination " << destination << std::endl;
+
+	std::string command = message["command"].as_string();
+	//std::cout << "Command " << command << std::endl;
+
+	std::string payload = message["payload"].write();
+	std::cout << "Payload " << payload << std::endl;
+
+	// Create the string for the service to call
+	std::stringstream ss;
+	ss << destination;
+	ss << "/";
+	ss << command;
+	blackboardClient->removeOldestMessage();
+}
 
 /**
  * Callback function that is called when a message is received on the equiplet_statechanged topic
@@ -62,10 +101,8 @@ EquipletNode::EquipletNode(int id): equipletId(id), moduleTable() {
 bool EquipletNode::stateChanged(rosMast::StateUpdate::Request &request, rosMast::StateUpdate::Response &response) {
 	ROS_INFO("State changed message received");
 	if(updateModuleState(request.state.moduleID, rosMast::StateType(request.state.newState))) {
-		//std::cout << "The state of module " << msg->moduleID << " has been changed to " << rosMast::state_txt[msg->state] << std::endl; 
 		response.succeeded = true;
 	} else{
-		//std::cerr << "Cannot update the state of the module " << msg->moduleID << " run for your life!" << std::endl;
 		response.succeeded = false;
 	}	
 	return true;
@@ -80,7 +117,6 @@ bool EquipletNode::stateChanged(rosMast::StateUpdate::Request &request, rosMast:
 bool EquipletNode::moduleError(rosMast::ErrorInModule::Request &request, rosMast::ErrorInModule::Response &response) {
 	int moduleID = request.moduleError.moduleID;
 	ROS_INFO("Error message received from module %d", moduleID);
-	//int errorCode = msg->errorCode;
 
 	// TODO: Lookup errorcode in the DB and decide accordingly
 	
@@ -265,4 +301,42 @@ bool EquipletNode::updateModuleState(int moduleID, rosMast::StateType state) {
 		}
 	}
 	return false;
+}
+
+/** 
+ * Main that creates the equipletNode and adds hardware modules
+ **/
+int main(int argc, char **argv) {
+
+	// Check if an equiplet id is given at the command line	 
+	int equipletId = 1;
+	if(argc != 2 || Utilities::stringToInt(equipletId, argv[1]) != 0) {
+		std::cerr << "Cannot read equiplet id from commandline. Assuming equiplet id is 1" <<std::endl;
+	}
+	 	
+	// Set the id of the Equiplet
+	std::ostringstream ss;
+	ss << "Equiplet" << equipletId;
+	const char* equipletName = ss.str().c_str();
+	
+	ros::init(argc, argv, equipletName);
+	EquipletNode equipletNode(equipletId);
+
+	// Add some hardware modules to this equiplet
+	// This should change to modules being created in the Node itself after commands on blackboard
+	Mast::HardwareModuleProperties deltaRobot(1, 1, rosMast::safe, true, true);
+	Mast::HardwareModuleProperties gripper(2, 2, rosMast::safe, true, true);
+	equipletNode.addHardwareModule(deltaRobot);
+	equipletNode.addHardwareModule(gripper);	
+
+	// print the hardware modules that are currently added to the Equiplet
+	equipletNode.printHardwareModules();
+
+	ros::Rate poll_rate(10);
+	while(ros::ok()) {
+		poll_rate.sleep();
+		ros::spinOnce();	
+	} 
+
+	return 0;
 }

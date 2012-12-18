@@ -32,11 +32,11 @@
 #pragma once
 
 #include "ros/ros.h"
+#include "rexosStdSrvs/Module.h"
 #include <iostream>
 #include <sstream>
 #include <crateLocatorNode/CrateEventMsg.h>
 #include <boost/thread.hpp>
-#include <deltaRobotNode/MoveToPoint.h>
 #include <crateLocatorNode/getCrate.h>
 
 /**
@@ -101,7 +101,6 @@ private:
 	/**
 	 * Service definition for move to point, used to send request
 	 **/
-	deltaRobotNode::MoveToPoint moveToPointService;
 	/**
 	 * Client for the crate located
 	 **/

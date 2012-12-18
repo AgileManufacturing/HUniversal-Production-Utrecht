@@ -27,6 +27,9 @@ libraries/mongo-cxx-driver/.sconf_temp/
 libraries/mongo-cxx-driver/.sconsign.dblite
 libraries/mongo-cxx-driver/config.log
 build/
+libraries/blackboardJavaClient/*.jar
+.rexos-export
+
 
 # Ignore project file, cmake text file and editor temporary files
 
@@ -35,3 +38,8 @@ sync.sh
 *.sublime-project
 *.sublime-workspace
 *~
+*.class
+libraries/mongo-cxx-driver/.sconsign.dblite
+libraries/mongo-cxx-driver/config.log
+APDescription.txt
+MTPs-Main-Container.txt

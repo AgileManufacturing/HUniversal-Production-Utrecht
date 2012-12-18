@@ -1,4 +1,4 @@
-/**
+	/**
  * @file StateMachine.h
  * @brief Interface for MAST in module
  * @date Created: 2012-10-12
@@ -92,7 +92,8 @@ namespace rosMast {
 		typedef int (StateMachine::*stateFunctionPtr)();
 		
 		public:
-			StateMachine(int equipletID, int moduleID);			
+			StateMachine(int equipletID, int moduleID);		
+
 			/**
 			 * Transition from Safe to Standby
 			 * @return 0 if everything when succesfull
