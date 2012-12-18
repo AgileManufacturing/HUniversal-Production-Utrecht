@@ -30,7 +30,8 @@ set(REXOS_PARTS libraries ros tools) # TODO: Agents Libraries ROS
 cmake_minimum_required (VERSION 2.8)
 
 # Set the name of our project to REXOS and require a C and C++ compiler. 
-project (REXOS CXX C Java)
+project (REXOS CXX C)
+#Java)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
@@ -38,13 +39,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 set(BUILD_JAVA FALSE)
 
 # Include so that JAVA can be used
-include (UseJava)
+#include (UseJava)
 
 # Include our own macros
 include(cmake/macros.cmake) 
 
 # Include support for executable jars
-include(cmake/jar.cmake)
+#include(cmake/jar.cmake)
 
 # Check for all external libraries and export our own library includes
 include(cmake/ExternalLibraries.cmake)
