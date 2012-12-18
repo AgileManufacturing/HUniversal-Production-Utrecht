@@ -23,14 +23,17 @@ import java.util.HashMap;
 import java.util.Scanner;
 import nl.hu.client.ISubscriber;
 import java.util.Date;
+import java.io.*;
+import java.util.concurrent.*; 
 
-public class DummyAgent extends Agent implements ISubscriber
+public class DummyAgent extends Agent
 {
     private BlackboardClient client;
 	private String database = "REXOS";
 	private String topic = "instruction"; 
 	private String collection = "blackboard";
-	
+	private int i =0;
+
 	public void setup()
 	{
 		
@@ -40,35 +43,48 @@ public class DummyAgent extends Agent implements ISubscriber
 		client.setDatabase(database);	
 		client.setCollection(collection);
 		client.subscribe(topic);
-		client.setCallback(this);
 		}catch(Exception e){e.printStackTrace();}	
 
+
+		
 		this.addBehaviour(new CyclicBehaviour()
 		{
 			@Override
 			public void action() 
 			{
+
+
+				Gson gson = new Gson();
+				
+				ArrayList<Point> points = new ArrayList<Point>();
+				points.add(new Point(i,i,i,i));
+				
+				i++;
+				InstructionMessage a = new InstructionMessage("moveRelativePath", "DeltaRobotNode", "FIND_ID", null ,points);
+				BlackboardMessage mes = new BlackboardMessage(topic,a);
 				try
 				{
-					while(true)
+	
+					System.out.print(System.nanoTime());
+					client.insertJson(gson.toJson(mes));
+			
+					
+					if(i == 500)
 					{
-						client.read();
+							System.out.println("done!");
+						blockingReceive();
 					}
 				}
 				catch(Exception e)
 				{
 					e.printStackTrace();
-				}					
-
+				}	
+				
+					
 			}
 		});
 
-	}
 
-	public void onMessage(String json)
-	{
-		client.removeFirst();
-		System.out.print(" "+System.nanoTime() + "\n");
-	//	System.out.println(json);
+
 	}
 }
