@@ -1,6 +1,8 @@
 <package>
-  <description brief="equipletNode">
-     equipletNode
+  <description brief="environmentCache">
+
+     environmentCache
+
   </description>
   <author>Dennis Koole</author>
   <license>BSD</license>
@@ -8,10 +10,8 @@
 
   <depend package="roscpp"/>
   <depend package="std_msgs"/>
-  <depend package="rosMast"/>
-  <depend package="lookupHandler"/>
-  <depend package="rexosStdMsgs"/>
-  <depend package="rexosStdSrvs"/>
+  <depend package="environmentCommunicationMessages"/>
+
 </package>
 
 

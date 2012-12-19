@@ -34,6 +34,7 @@
 #include "rosMast/States.h"
 #include "rosMast/State.h"
 #include "rosMast/ModuleError.h"
+#include "lookupHandler/LookupServer.h"
 
 #include <string>
 #include <vector>
@@ -69,6 +70,7 @@ class EquipletNode: BlackboardSubscriber {
 		bool moduleError(rosMast::ErrorInModule::Request &request, rosMast::ErrorInModule::Response &response);
 		void sendStateChangeRequest(int moduleID, rosMast::StateType newState);
 		rosMast::StateType getModuleState(int moduleID);
+		void callLookupHandler(std::string lookupType, std::string lookupID, environmentCommunicationMessages::Map payload);
 	private:
 		/**
 		 * @var int equipletId

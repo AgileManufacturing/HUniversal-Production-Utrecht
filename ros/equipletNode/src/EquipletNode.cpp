@@ -270,7 +270,6 @@ void EquipletNode::printHardwareModules() {
  *
  * @return the State of the module
  **/
-
 rosMast::StateType EquipletNode::getModuleState(int moduleID) {
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
 	for(it = moduleTable.begin(); it < moduleTable.end(); it++) {
@@ -303,6 +302,28 @@ bool EquipletNode::updateModuleState(int moduleID, rosMast::StateType state) {
 	return false;
 }
 
+/**
+ * Call the lookuphandler with the data from the blackboard to get data
+ *
+ * @param lookupType the type of the lookup
+ * @param lookupID the ID of the lookup
+ * @param payload the payload, contains data that will get combined with environmentcache data
+ **/
+void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupID, environmentCommunicationMessages::Map payload) {
+ 	lookupHandler::LookupServer msg;	
+	msg.request.lookupMsg.lookupType = lookupType;
+	msg.request.lookupMsg.lookupID = lookupID;
+	msg.request.lookupMsg.payLoad = payload;
+
+	ros::NodeHandle nodeHandle;
+	ros::ServiceClient lookupClient = nodeHandle.serviceClient<lookupHandler::LookupServer>("LookupHandler/lookup");
+	if(lookupClient.call(msg)) {
+		// TODO
+		// Read message
+	} else {
+		ROS_ERROR("Error in calling lookupHandler/lookup service");
+	}
+}
 /** 
  * Main that creates the equipletNode and adds hardware modules
  **/

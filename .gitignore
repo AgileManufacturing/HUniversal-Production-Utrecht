@@ -19,9 +19,13 @@ srv_gen/
 msg_gen/
 ros/deltaRobotNode/src/deltaRobotNode/
 ros/rosMast/src/rosMast/
+ros/environmentCommunicationMessages/src
+ros/lookupHandler/src/lookupHandler
+ros/environmentCache/src/environmentCache
 ros/crateLocatorNode/src/crateLocatorNode/
 ros/rexosStdMsgs/src/rexosStdMsgs/
 ros/rexosStdSrvs/src/rexosStdSrvs/
+ros/environmentCache/src/environmentCache
 tools/gripperTestNode/src/gripperTestNode/
 libraries/mongo-cxx-driver/.sconf_temp/
 libraries/mongo-cxx-driver/.sconsign.dblite

@@ -9,7 +9,7 @@
 #############################################################
 
 ####### Add all ROS packages here
-set(ROSPACKS rosMast rexosStdMsgs rexosStdSrvs deltaRobotNode equipletNode crateLocatorNode followNode )
+set(ROSPACKS rosMast environmentCommunicationMessages environmentCache lookupHandler rexosStdMsgs rexosStdSrvs deltaRobotNode equipletNode crateLocatorNode followNode)
 
 ### Don't change anything below, the part below checks if ROS is installed and configured correctly. 
 rexos_check_ros()

@@ -1,8 +1,10 @@
 ##############################################################
-# CMakeLists.txt for a ROS package within the rexos
+# CMakeLists.txt for a ROS package within the REXOS
 # build system.
 #
-# Created by Dennis Koole <dennis.koole@gmail.com>
+# Created by Dennis Koole, 10-10-2012
+#
+# 10-10-2012 Initial version
 #
 #############################################################
 
