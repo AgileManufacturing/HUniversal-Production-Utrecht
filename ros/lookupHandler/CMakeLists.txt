@@ -16,7 +16,7 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 rexos_rospack_init("lookupHandler" true true)
 
 # Add executables as documented by ROS
-rosbuild_add_executable(lookupHandler src/lookupHandler.cpp)
+rosbuild_add_executable(lookupHandler src/LookupHandler.cpp)
 
 # MUST be called after lcv_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()
