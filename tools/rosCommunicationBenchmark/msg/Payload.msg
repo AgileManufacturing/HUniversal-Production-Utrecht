@@ -1,1 +1,1 @@
-float64 testFloat
+string testString

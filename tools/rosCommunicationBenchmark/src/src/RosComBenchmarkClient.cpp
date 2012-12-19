@@ -66,13 +66,18 @@ namespace rosComBenchmarkClient {
 
 	void executeBenchmark(){
 		benchmarkService.request.id.client = clientID;
-		rosCommunicationBenchmark::Payload payloadMsg;
-		payloadMsg.testString = "F";
+		benchmarkService.request.payload.testString = "";
+		//std::string appendString = "01234567890123456789";
 			
+		
+		for(int i = 0; i < 64; i++){
+			benchmarkService.request.payload.testString.append("F");
+		}
+
 		for(int i = 0; i < messageCount; i++){
-			if(i % 100 == 0) {
-				payloadMsg.testString.append(payloadMsg.testString);
-			}
+			//if(i % 500 == 0) {
+			//benchmarkService.request.payload.testString.append(appendString);
+		 	//}
 
 			benchmarkService.request.id.messageNr = i;
 			(*sendTimes)[i] = ros::Time::now().toNSec();
@@ -113,8 +118,9 @@ namespace rosComBenchmarkClient {
 	  		ss << "CLINT:" << clientID << ":" << messageCount;
 	  		publishToControlTopic(ss.str());
 	  	} else if(message.compare(0,5,"STORE") == 0){
-            storeResults();
-        }
+            		storeResults();
+			std::cout << "stored" << std::endl;
+        	}
 	}
 }
 
@@ -141,12 +147,12 @@ int main(int argc, char **argv)
 	ros::Subscriber controlTopicSub = nodeHandle.subscribe("controlTopic", 1000, controlCallback);
 	controlTopicPub = nodeHandle.advertise<std_msgs::String>("controlTopic", 1000);
 
-	testFilledClient = nodeHandle.serviceClient<rosCommunicationBenchmark::TestServiceFilled>("testServiceFilled");
+	testFilledClient = nodeHandle.serviceClient<rosCommunicationBenchmark::TestServiceFilled>("testServiceFilled",true);
 
 	sendTimes = new std::vector<uint64_t>(messageCount,0);
 	returnedTimes = new std::vector<uint64_t>(messageCount,0);
 
-	outputPathBase = "/home/arjen/benchmark/";
+	outputPathBase = "/home/agileman/benchmark/";
 
 	ros::spin();
 
