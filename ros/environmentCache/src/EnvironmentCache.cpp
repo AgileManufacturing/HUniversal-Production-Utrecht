@@ -44,7 +44,7 @@ EnvironmentCache::EnvironmentCache(): cache() {
 /**
  * Get the properties of an item in the cache
  *
- * @param req the request object. Contains the id of the item that is in the cache
+ * @param req The request object. Contains the id of the item that is in the cache
  * @param res The response object. Contains a boolean that is true when item was found, else false.
  * Also contains the Map object with the properties of the item. Empty when there is not an item found with the id
  *
@@ -70,7 +70,7 @@ bool EnvironmentCache::lookupEnvironmentObject(environmentCache::LookupEnvironme
  * The Service that updates the environment cache
  *
  * @param req The request for this service with an EnvironmentCacheUpdate message
- * @param res with a bool. True if success else false
+ * @param res The reponse, contains a boolean success. True if success else false
  *
  * @return true
  **/
@@ -125,7 +125,7 @@ void EnvironmentCache::printEnvironmentCache(){
  * @param id The id of the item to add
  * @param properties The vector of properties
  *
- * @return true if item is added, false if there is already an item in the cache with the same id of the item to add
+ * @return True if item is added, false if there is already an item in the cache with the same id of the item to add
  **/
 bool EnvironmentCache::addItemToCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties) {
 	if(cache.count(id) == 0) {
@@ -143,10 +143,10 @@ bool EnvironmentCache::addItemToCache(std::string id, const std::vector<environm
  * Update an item in the cache.
  *
  * @param id The id of the item to update
- * @param properties the vector with properties to update. If a property in this vector already exists in property list of the item it 
+ * @param properties The vector with properties to update. If a property in this vector already exists in property list of the item it 
  * will be updated, else it will be added to the list of properties
  *
- * @return true if an item with the id is found in the cache, else false
+ * @return True if an item with the id is found in the cache, else false
  **/
 bool EnvironmentCache::updateItemInCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties) {
 	if(cache.count(id) == 1) {
@@ -166,7 +166,7 @@ bool EnvironmentCache::updateItemInCache(std::string id, const std::vector<envir
 			// If the property is found update it, else add it to the list of properties
 			if((*cacheIterator).second.count((*optionsIterator).first) == 1) {
 				propertyIterator = (*cacheIterator).second.find((*optionsIterator).first); // Create iterator to the property found
-				(*propertyIterator).second = (*optionsIterator).second; // update it's value
+				(*propertyIterator).second = (*optionsIterator).second; // update its value
 				std::cout << "Property with key " << (*propertyIterator).first << " in item with id " << (*cacheIterator).first << " updated" << std::endl;
 			} else {			
 				(*cacheIterator).second.insert(std::pair<std::string, std::string>((*optionsIterator).first, (*optionsIterator).second ));
@@ -181,9 +181,9 @@ bool EnvironmentCache::updateItemInCache(std::string id, const std::vector<envir
 /**
  * Remove an item from the cache
  *
- * @param id the id of the item to delete
+ * @param id The id of the item to delete
  *
- * @return true if item is deleted, false if no item with the id specified found
+ * @return True if item is deleted, false if no item with the id specified is found
  **/
 bool EnvironmentCache::removeItemFromCache(std::string id) {
 	if(cache.count(id) == 1) {
@@ -197,8 +197,8 @@ bool EnvironmentCache::removeItemFromCache(std::string id) {
 /**
  * Convert a vector to a map
  *
- * @param propertiesVector the vector with KeyValuePair objects
- * @param propertiesMap the map where the keys and values of the objects in the vector is inserted to
+ * @param propertiesVector The vector with KeyValuePair objects
+ * @param propertiesMap The map where the keys and values of the objects in the vector are inserted to
  **/
 void EnvironmentCache::createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap) {
 	for(int i = 0; i < (int)propertiesVector.size(); i++) {
@@ -207,11 +207,11 @@ void EnvironmentCache::createMapFromVector(const std::vector<environmentCommunic
 }
 
 /**
- * Create a Map message from a map with strings as key and strings as value
+ * Create a Map message from a map with strings as keys and strings as values
  *
- * @param properties the map to convert
+ * @param properties The map to convert
  *
- * @return environmentCommunicationMessages::Map The Map message object
+ * @return environmentCommunicationMessages::Map The map message object
  **/
 environmentCommunicationMessages::Map EnvironmentCache::createMapMessageFromProperties(std::map<std::string, std::string> &properties){
 	std::map<std::string, std::string>::iterator propertiesIterator;
