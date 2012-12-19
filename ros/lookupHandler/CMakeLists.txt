@@ -1,10 +1,10 @@
 ##############################################################
-# CMakeLists.txt for a ROS package within the low-cost-vision
+# CMakeLists.txt for a ROS package within the REXOS
 # build system.
 #
-# Created by Pascal Muller <pascalmuller@gmail.com>, 09-02-2012
+# Created by Arjan Groenewegen, 10-11-2012
 #
-# 09-02-2012 Initial version
+# 10-11-2012 Initial version
 #
 #############################################################
 

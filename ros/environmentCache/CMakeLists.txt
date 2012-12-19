@@ -1,10 +1,10 @@
 ##############################################################
-# CMakeLists.txt for a ROS package within the low-cost-vision
+# CMakeLists.txt for a ROS package within the REXOS
 # build system.
 #
-# Created by Dennis Koole, 10-10-2012
+# Created by Dennis Koole, 10-11-2012
 #
-# 10-10-2012 Initial version
+# 10-11-2012 Initial version
 #
 #############################################################
 
