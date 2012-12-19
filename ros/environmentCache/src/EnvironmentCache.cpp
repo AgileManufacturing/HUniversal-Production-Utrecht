@@ -215,14 +215,14 @@ void EnvironmentCache::createMapFromVector(const std::vector<environmentCommunic
  **/
 environmentCommunicationMessages::Map EnvironmentCache::createMapMessageFromProperties(std::map<std::string, std::string> &properties){
 	std::map<std::string, std::string>::iterator propertiesIterator;
-	environmentCommunicationMessages::Map map;
+	environmentCommunicationMessages::Map mapMsg;
 	environmentCommunicationMessages::KeyValuePair prop;
 	for(propertiesIterator = properties.begin(); propertiesIterator != properties.end(); propertiesIterator++) {
 		prop.key = (*propertiesIterator).first;
 		prop.value = (*propertiesIterator).second;
-		map.map.push_back(prop);
+		mapMsg.map.push_back(prop);
 	}
-	return map;
+	return mapMsg;
 }
 
 /** 
