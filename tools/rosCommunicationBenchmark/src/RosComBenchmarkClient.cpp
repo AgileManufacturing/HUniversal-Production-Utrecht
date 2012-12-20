@@ -66,14 +66,13 @@ namespace rosComBenchmarkClient {
 
 	void executeBenchmark(){
 		benchmarkService.request.id.client = clientID;
-		rosCommunicationBenchmark::Payload payloadMsg;
-		payloadMsg.testString = "F";
-			
-		for(int i = 0; i < messageCount; i++){
-			if(i % 100 == 0) {
-				payloadMsg.testString.append(payloadMsg.testString);
-			}
+		benchmarkService.request.payload.testString = "";
+		
+		for(int i = 0; i < 64; i++){
+			benchmarkService.request.payload.testString.append("F");
+		}	
 
+		for(int i = 0; i < messageCount; i++){				
 			benchmarkService.request.id.messageNr = i;
 			(*sendTimes)[i] = ros::Time::now().toNSec();
 			testFilledClient.call(benchmarkService);
@@ -83,7 +82,6 @@ namespace rosComBenchmarkClient {
 	}
 
 	void storeResults(){
-		outputFile.open((outputPathBase + clientID + "_client.log").c_str());
 		std::cout << "Storing results" << std::endl;
 		for(uint i = 0; i < sendTimes->size(); i++){
 			outputFile << i << ":" << (*sendTimes)[i] << ":" << (*returnedTimes)[i] << std::endl;
@@ -113,15 +111,16 @@ namespace rosComBenchmarkClient {
 	  		ss << "CLINT:" << clientID << ":" << messageCount;
 	  		publishToControlTopic(ss.str());
 	  	} else if(message.compare(0,5,"STORE") == 0){
-            storeResults();
-        }
+    		storeResults();
+			std::cout << "stored" << std::endl;
+    	}
 	}
 }
 
 using namespace rosComBenchmarkClient;
 int main(int argc, char **argv)
 {
-	if(argc != 3 || Utilities::stringToInt(messageCount,argv[2]) != 0){
+	if(argc != 4 || Utilities::stringToInt(messageCount,argv[2]) != 0){
 		std::cerr << "Bad arguments!" << std::endl;
 		return 1;
 	}
@@ -133,6 +132,8 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	outputPathBase = argv[3];
+
 	std::stringstream nodeNameStream;
 	nodeNameStream << NODE_NAME_BASE << clientID;
 	ros::init(argc, argv, nodeNameStream.str());
@@ -141,12 +142,17 @@ int main(int argc, char **argv)
 	ros::Subscriber controlTopicSub = nodeHandle.subscribe("controlTopic", 1000, controlCallback);
 	controlTopicPub = nodeHandle.advertise<std_msgs::String>("controlTopic", 1000);
 
-	testFilledClient = nodeHandle.serviceClient<rosCommunicationBenchmark::TestServiceFilled>("testServiceFilled");
+	testFilledClient = nodeHandle.serviceClient<rosCommunicationBenchmark::TestServiceFilled>("testServiceFilled",true);
 
 	sendTimes = new std::vector<uint64_t>(messageCount,0);
 	returnedTimes = new std::vector<uint64_t>(messageCount,0);
 
-	outputPathBase = "/home/arjen/benchmark/";
+	outputFile.open((outputPathBase + clientID + "_client.log").c_str());
+	if(!outputFile.is_open()){
+		std::cerr << "Failed to open file" << std::endl;
+		return 1;
+	}
+
 
 	ros::spin();
 

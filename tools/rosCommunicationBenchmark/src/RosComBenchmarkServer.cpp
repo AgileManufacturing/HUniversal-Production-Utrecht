@@ -81,8 +81,10 @@ namespace rosComBenchmarkServer {
     }
 
     bool testServiceFilled(rosCommunicationBenchmark::TestServiceFilled::Request &req, rosCommunicationBenchmark::TestServiceFilled::Response &res) {
-        results[req.id.client][req.id.messageNr] = ros::Time::now().toNSec();
-    	
+    	// results[req.id.client][req.id.messageNr] = ros::Time::now().toNSec();
+
+        res.returnPayload.testString = req.payload.testString; 
+
         return true;
     }
 
@@ -110,6 +112,7 @@ namespace rosComBenchmarkServer {
 			results.insert(std::make_pair(clientName,*clientResults));
       	} else if(message.compare(0,5,"STORE") == 0){
             storeResults();
+		std::cout << "stored" << std::endl;
         }
     }
 }
@@ -127,7 +130,7 @@ int main(int argc, char **argv){
 
 	controlTopicPub = n.advertise<std_msgs::String>("controlTopic", 1000);
 
-    outputPathBase = "/home/arjen/benchmark/";
+    outputPathBase = "/home/agileman/benchmark/";
 
 	ros::spin();
 	return 0;
