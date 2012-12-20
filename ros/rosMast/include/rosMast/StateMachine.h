@@ -125,9 +125,7 @@ namespace rosMast {
 			int executeTransition(StateType desiredState);
 			
 			stateFunctionPtr lookupTransition(StateType currentState, StateType desiredState);
-			void sendErrorMessage(int errorCode);
-			
-			void startStateMachine();			
+			void sendErrorMessage(int errorCode);	
 		private:
 			/**
 			 * @var std::map<StateTransition, stateFunctionPtr> transitionMap;
