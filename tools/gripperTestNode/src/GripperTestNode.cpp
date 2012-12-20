@@ -146,6 +146,6 @@ int main(int argc, char** argv){
 
 	GripperTestNode gripperTestNode(equipletID, moduleID);    
 
-	gripperTestNode.startStateMachine();
+	ros::spin();
 	return 0;
 }

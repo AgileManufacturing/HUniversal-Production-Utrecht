@@ -153,12 +153,3 @@ void rosMast::StateMachine::sendErrorMessage(int errorCode) {
 		executeTransition(rosMast::StateType(msg.response.state.newState));
 	}
 }
-
-/** 
- * The run part of the state machine
- **/
-void rosMast::StateMachine::startStateMachine() {
-	while(ros::ok()) { 
-		ros::spinOnce();
-	}
-}
