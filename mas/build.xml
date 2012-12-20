@@ -1,15 +1,9 @@
 <project name="REXOS" default="all">
 
-
-
-	<target name="all" depends="dummyAgent">
-		
-	</target>
-
+	<target name="all" depends="dummyAgent" />
+	
 	<target name="dummyAgent">
-		<ant antfile="build.xml" target="build" dir="dummyAgent" inheritRefs="true" useNativeBasedir="true">
-
-		</ant>  
+		<ant antfile="build.xml" target="build" dir="dummyAgent" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
 
 	<target name="clean">
