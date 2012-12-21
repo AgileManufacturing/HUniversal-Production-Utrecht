@@ -203,6 +203,60 @@ macro(rexos_add_doc doc_name)
 endmacro(rexos_add_doc)
 
 ##############################################################################
+# rexos_add_doc_BB(<doc_name>)
+# 
+# == Description == 
+# This macro generates a documentation target for Blackboard
+##############################################################################
+macro(rexos_add_doc_BB doc_name)
+       if(DOXYGEN_FOUND)
+               set(DOCS_PATH "${CMAKE_SOURCE_DIR}")
+               configure_file(${CMAKE_SOURCE_DIR}/cmake/DoxyfileBB.in ${CMAKE_BINARY_DIR}/doc/${doc_name}_BB/Doxyfile @ONLY)
+               add_custom_target("doc-${doc_name}_BB"
+                       ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/doc/${doc_name}_BB/Doxyfile
+                       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/${doc_name}_BB
+                       COMMENT "Generating documentation for target ${doc_name}_BB with Doxygen" VERBATIM
+               )
+       endif(DOXYGEN_FOUND)
+endmacro(rexos_add_doc_BB)
+
+##############################################################################
+# rexos_add_doc_MAS(<doc_name>)
+# 
+# == Description == 
+# This macro generates a documentation target for MAS
+##############################################################################
+macro(rexos_add_doc_MAS doc_name)
+       if(DOXYGEN_FOUND)
+               set(DOCS_PATH "${CMAKE_SOURCE_DIR}")
+               configure_file(${CMAKE_SOURCE_DIR}/cmake/DoxyfileMAS.in ${CMAKE_BINARY_DIR}/doc/${doc_name}_MAS/Doxyfile @ONLY)
+               add_custom_target("doc-${doc_name}_MAS"
+                       ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/doc/${doc_name}_MAS/Doxyfile
+                       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/${doc_name}_MAS
+                       COMMENT "Generating documentation for target ${doc_name}_MAS with Doxygen" VERBATIM
+               )
+       endif(DOXYGEN_FOUND)
+endmacro(rexos_add_doc_MAS)
+
+##############################################################################
+# rexos_add_doc_ROS(<doc_name>)
+# 
+# == Description == 
+# This macro generates a documentation target for ROS
+##############################################################################
+macro(rexos_add_doc_ROS doc_name)
+       if(DOXYGEN_FOUND)
+               set(DOCS_PATH "${CMAKE_SOURCE_DIR}")
+               configure_file(${CMAKE_SOURCE_DIR}/cmake/DoxyfileROS.in ${CMAKE_BINARY_DIR}/doc/${doc_name}_ROS/Doxyfile @ONLY)
+               add_custom_target("doc-${doc_name}_ROS"
+                       ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/doc/${doc_name}_ROS/Doxyfile
+                       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/${doc_name}_ROS
+                       COMMENT "Generating documentation for target ${doc_name}_ROS with Doxygen" VERBATIM
+               )
+       endif(DOXYGEN_FOUND)
+endmacro(rexos_add_doc_ROS)
+
+##############################################################################
 # rexos_add_scons_library(<scons_target_name>)
 # 
 # == Description == 
