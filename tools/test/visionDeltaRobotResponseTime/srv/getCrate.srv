@@ -1,0 +1,5 @@
+string name
+---
+int32 state
+CrateMsg crate
+int32 seq

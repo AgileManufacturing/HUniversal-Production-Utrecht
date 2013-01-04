@@ -1,0 +1,6 @@
+Copy of source dec 2012
+
+Modified to measure the reaction time of the system.
+All camera frames are tagged. All communication services and data stores have been adjusted to allow the system to pass on these tags.
+
+Moved the crate.cpp to the ros package. CrateLocatorNode is linked to the local crate.cpp

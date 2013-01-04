@@ -1,0 +1,5 @@
+Motion motion
+int32 seq
+---
+bool succeeded
+string message
