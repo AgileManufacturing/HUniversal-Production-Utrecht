@@ -23,6 +23,7 @@ ros/crateLocatorNode/src/crateLocatorNode/
 ros/rexosStdMsgs/src/rexosStdMsgs/
 ros/rexosStdSrvs/src/rexosStdSrvs/
 tools/gripperTestNode/src/gripperTestNode/
+tools/test/visionDeltaRobotResponseTime/src/visionDeltaRobotResponseTime/
 libraries/mongo-cxx-driver/.sconf_temp/
 libraries/mongo-cxx-driver/.sconsign.dblite
 libraries/mongo-cxx-driver/config.log
