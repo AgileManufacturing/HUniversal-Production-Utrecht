@@ -59,11 +59,9 @@ void on_mouse(int event, int x, int y, int flags, void* param) {
 /**
  * Constructor.
  *
- * @param equipletID Equiplet identifier.
- * @param moduleID Module identifier.
  * @param path Input image path.
  **/
-ImageTransformationNode::ImageTransformationNode(int equipletID, int moduleID, std::string path) : imageTransport(nodeHandle) {
+ImageTransformationNode::ImageTransformationNode(std::string path) : imageTransport(nodeHandle) {
 
 	// Advertise the services
 	pub = imageTransport.advertise(ImageTransformationNodeTopics::TRANSFORMED_IMAGE, 1);
@@ -143,7 +141,7 @@ void ImageTransformationNode::run(){
  * Main
  *
  * @param argc Argument count.
- * @param argv Node name, equipletID, moduleID, inputImage path
+ * @param argv Node name, inputImage path
  *
  * @return 0 if succesful, -1 if command line arguments are incorrect
  **/
@@ -151,19 +149,17 @@ int main(int argc, char** argv){
 	std::cout << "Starting ros node" << std::endl;
 	ros::init(argc, argv, NODE_NAME);
 
-	int equipletID = 0;
-	int moduleID = 0;
-	if(argc != 4 || !(Utilities::stringToInt(equipletID, argv[1]) == 0 && Utilities::stringToInt(moduleID, argv[2]) == 0))
+	if(argc != 2)
 	{ 	 	
-    	std::cerr << "Arguments missing or incorrect. Needed: EquipletID ModuleID InputImage" << std::endl;
+    	std::cerr << "Arguments missing or incorrect. Needed: Path to InputImage" << std::endl;
  		return -1;
   	} 
 
-  	std::string path = argv[3];
+  	std::string path = argv[1];
 
 	std::cout << "Starting imageTransformationNode" << std::endl;
 
-	ImageTransformationNode imageTransformationNode(equipletID, moduleID, path);
+	ImageTransformationNode imageTransformationNode(path);
 
 	imageTransformationNode.run();
 
