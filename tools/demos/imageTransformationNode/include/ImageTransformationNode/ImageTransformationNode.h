@@ -52,7 +52,7 @@
 class ImageTransformationNode
 {
 	public:
-		ImageTransformationNode(int equipletID, int moduleID, std::string path);
+		ImageTransformationNode(std::string path);
 		cv::Mat transformImage();
 		void publishImage();
 		void run();
