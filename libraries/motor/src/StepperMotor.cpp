@@ -74,13 +74,25 @@ namespace Motor{
 			modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 1);
 			modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 0);
 
+			// Set config values
+			std::cout << "configuring motors" << std::endl;
+			modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_ACCELERATION_TYPE, 1);
+			modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_MOTOR_STEP_ANGLE, 6);
+			modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_TRANSMISSION_WAIT_TIME, 55);
+
+			modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_START_INPUT, 0);
+        	modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_IO_STOP_INPUT, 0);
+        	modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_MOTOR_EXCITATION, 0);
+        	modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_HOME_FWD_RVS_INPUT, 0);
+        	modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_DATA_NUM_INPUT, 0);
+
 			// Set operating modes
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, 0);
 
 			// set modes for all used motion slots
 			for(int i = 0; i < CRD514KD::MOTION_SLOTS_USED; i++){
-				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_POSMODE + i, 1);
-				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_OPMODE + i, 0);
+				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_POSMODE +  i, 1);
+				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_OPMODE +   i, 0);
 				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SEQ_MODE + i, 1);
 			}
 
