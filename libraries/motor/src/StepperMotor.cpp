@@ -51,7 +51,7 @@ namespace Motor{
 	 * @param maxAngle Maximum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
 	 **/
 	StepperMotor::StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle):
-		MotorInterface(), deviation(0), minAngle(minAngle), maxAngle(maxAngle), modbus(modbusController), motorIndex(motorIndex), anglesLimited(true), poweredOn(false){}
+		MotorInterface(), currentAngle(0), setAngle(0), deviation(0), minAngle(minAngle), maxAngle(maxAngle), modbus(modbusController), motorIndex(motorIndex), anglesLimited(true), poweredOn(false){}
 
 	/**
 	 * Deconstructor of StepperMotor. Tries to turn to power off.

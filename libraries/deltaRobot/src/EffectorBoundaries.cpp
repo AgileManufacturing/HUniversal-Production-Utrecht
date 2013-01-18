@@ -115,8 +115,14 @@ namespace DeltaRobot{
 	 * @param motors Used for the minimum and maximum angle of the motors.
 	 * @param voxelSize The size of the voxels.
 	 **/
-    EffectorBoundaries::EffectorBoundaries(const InverseKinematicsModel& model,  Motor::StepperMotor* (&motors)[3], double voxelSize)
-    	: kinematics(model), motors(motors), voxelSize(voxelSize){}
+    EffectorBoundaries::EffectorBoundaries(const InverseKinematicsModel& model,  Motor::StepperMotor* (&motors)[3], double voxelSize) : 
+    	width(0), 
+    	height(0), 
+    	depth(0), 
+    	boundariesBitmap(NULL), 
+    	kinematics(model), 
+    	motors(motors), 
+    	voxelSize(voxelSize) {}
 
     EffectorBoundaries::~EffectorBoundaries(){
     	delete[] boundariesBitmap;

@@ -55,11 +55,15 @@ namespace DeltaRobot{
      * @param modbusIO The TCP modbus connection for the IO controller.
      **/
     DeltaRobot::DeltaRobot(DataTypes::DeltaRobotMeasures& deltaRobotMeasures, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3], modbus_t* modbusIO) :
+        kinematics(NULL),
         motors(motors),
+        motorManager(NULL),
+        boundaries(NULL),
         effectorLocation(DataTypes::Point3D<double>(0, 0, 0)), 
         boundariesGenerated(false),
         modbusIO(modbusIO),
-        currentMotionSlot(1){
+        currentMotionSlot(1)
+        {
 
         if(modbusIO == NULL){
             throw std::runtime_error("Unable to open modbusIO");

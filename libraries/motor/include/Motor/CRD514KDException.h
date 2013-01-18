@@ -81,7 +81,7 @@ namespace Motor{
 		 * @param alarm Boolean that indicates whether there is an alarm.
 		 **/
 		CRD514KDException(const CRD514KD::Slaves::t slave, const bool warning, const bool alarm) :
-				std::runtime_error(""), slave(slave), warning(warning), alarm(alarm){
+				std::runtime_error(""), slave(slave), warning(warning), alarm(alarm), message(""){
 			std::stringstream stream;
 			stream << "slave: " << (int)slave << ": warning=" << (int)warning << " alarm=" << (int)alarm;
 			message = stream.str();
