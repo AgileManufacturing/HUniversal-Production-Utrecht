@@ -67,8 +67,6 @@ namespace Motor{
 	 **/
 	void StepperMotor::powerOn(void){
 		if(!poweredOn){
-			boost::lock_guard<boost::mutex> lock(modbus->modbusMutex);
-
 			//Reset alarm
 			modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 0);
 			modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 1);
@@ -107,7 +105,6 @@ namespace Motor{
 	void StepperMotor::powerOff(void){
 		if(poweredOn){
 			stop();
-			boost::lock_guard<boost::mutex> lock(modbus->modbusMutex);
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, 0);
 			poweredOn = false;
 		}
