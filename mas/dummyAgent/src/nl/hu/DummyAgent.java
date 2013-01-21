@@ -58,7 +58,7 @@ import java.util.concurrent.*;
 
 /**
  * DummyAgent that let the deltarobot move
- */
+ **/
 public class DummyAgent extends Agent
 {
     private BlackboardClient client;
@@ -79,7 +79,7 @@ public class DummyAgent extends Agent
 			e.printStackTrace();
 		}
 
-		// Add a new cyclic behaviour that moves the deltarobot 500 time
+		// Add a new cyclic behaviour that moves the deltarobot 500 times
 		this.addBehaviour(new CyclicBehaviour()
 		{
 			@Override
