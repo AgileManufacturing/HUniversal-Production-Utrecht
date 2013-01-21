@@ -51,14 +51,12 @@ namespace rosMast {
 	 **/
 	struct StateTransition 
 	{
-		StateTransition() { }
 		/** 
 		 * Constructor for StateTransition
 		 **/
-		StateTransition(StateType src, StateType des) {
-			sourceState = src;
-			destinationState = des;
-		}
+		StateTransition(StateType src, StateType des) :
+			sourceState(src),
+			destinationState(des) { }
 		/**
 		 * @var StateType sourceState
 		 * The original state
@@ -93,6 +91,8 @@ namespace rosMast {
 		
 		public:
 			StateMachine(int equipletID, int moduleID);		
+
+			virtual ~StateMachine(){ };
 
 			/**
 			 * Transition from Safe to Standby
