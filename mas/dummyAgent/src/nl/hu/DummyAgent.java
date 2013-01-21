@@ -57,7 +57,7 @@ import java.io.*;
 import java.util.concurrent.*;
 
 /**
- * DummyAgent that let the deltarobot move
+ * DummyAgent that makes the deltarobot move
  **/
 public class DummyAgent extends Agent
 {
