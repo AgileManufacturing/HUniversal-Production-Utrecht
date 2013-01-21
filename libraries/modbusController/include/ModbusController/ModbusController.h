@@ -70,12 +70,6 @@ namespace ModbusController{
 		void readU16(uint16_t slave, uint16_t firstAddress, uint16_t* data, unsigned int length);
 		uint32_t readU32(uint16_t slave, uint16_t address);
 
-		/**
-		 * @var mutex modbusMutex
-		 * A mutex for locking the modbus.
-		 **/
-		boost::mutex modbusMutex;
-
 	private:
 		enum{
 			/**
@@ -86,7 +80,7 @@ namespace ModbusController{
 			/**
 			 * The interval between writing on the modbus in unicast mode milliseconds.
 			 **/
-			WRITE_INTERVAL_UNICAST   = 8,
+			WRITE_INTERVAL_UNICAST = 8,
 
 			/**
 			 * The interval between writing on the modbus in broadcast mode in milliseconds.
@@ -97,7 +91,7 @@ namespace ModbusController{
 			 * Timeout for bytes in a response. This timeout will occur when a message is delayed while being send.
 			 * Value in microseconds.
 			 **/
-			TIMEOUT_BYTE    = 150000,
+			TIMEOUT_BYTE = 150000,
 
 			/**
 			 * Timeout for responses. This timeout will occur before a message is send.
@@ -109,7 +103,7 @@ namespace ModbusController{
 		/**
 		 * @var modbus_t* context
 		 * A pointer to the modbus interface.
-		 **/    
+		 **/
 		modbus_t* context;
 
 		/**
