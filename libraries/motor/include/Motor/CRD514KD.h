@@ -100,16 +100,18 @@ namespace Motor{
         	// 16-bit
         	CMD_1                   = 0x01E,
         	STATUS_1                = 0x020,
+        	STATUS_2		= 0x021,
         	CLEAR_COUNTER           = 0x04b,
         	RESET_ALARM             = 0x040,
-        	OP_PRESET_POSITION		= 0x048,
+		OP_BATCH_NV_MEMORY_WRITE= 0x045,
+        	OP_PRESET_POSITION	= 0x048,
         	PRESENT_ALARM           = 0x100,
-        	CFG_START_INPUT			= 0x200,
-        	CFG_IO_STOP_INPUT		= 0x201,
+        	CFG_START_INPUT		= 0x200,
+        	CFG_IO_STOP_INPUT	= 0x201,
         	CFG_STOP_ACTION         = 0x202,
         	CFG_MOTOR_EXCITATION	= 0x20B,
         	CFG_HOME_FWD_RVS_INPUT  = 0x20C,
-        	CFG_DATA_NUM_INPUT		= 0x20D,
+        	CFG_DATA_NUM_INPUT	= 0x20D,
 
         	// 32-bit
         	CFG_PRESET_POSITION 	= 0x214,
@@ -127,7 +129,7 @@ namespace Motor{
         	CFG_HOME_SEEKING_ACCELERATION = 0x23C,
 
         	// 16-bit
-        	OP_SOFTWARE_OVERTRAVEL = 0x252,
+        	OP_SOFTWARE_OVERTRAVEL	= 0x252,
 
         	// 32-bit
         	CFG_POSLIMIT_POSITIVE   = 0x254,
@@ -175,6 +177,16 @@ namespace Motor{
                 ALARM   = (1 << 7),
                 MOVE    = (1 << 10),
                 READY   = (1 << 13)
+            };
+        }
+
+        namespace Status2Bits{
+            /**
+             * Bits of value at address STATUS_2.
+             **/
+            enum _status2_bits{
+                SBSY	= (1),
+                ENABLE  = (1 << 1)
             };
         }
 

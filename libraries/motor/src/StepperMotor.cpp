@@ -75,16 +75,28 @@ namespace Motor{
 			modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 0);
 
 			// Set config values
+			// TODO: remove after code has been tested
 			std::cout << "configuring motors" << std::endl;
+			// Check whether the motor controller is new (factory defaults) or not. NV register has max write of 100.000
+			int firstRun = modbus->readU16(motorIndex, CRD514KD::Registers::CFG_START_INPUT); // Register will be 1 by default (factory settings)
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_ACCELERATION_TYPE, 1);
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_MOTOR_STEP_ANGLE, 6);
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_TRANSMISSION_WAIT_TIME, 55);
 
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_START_INPUT, 0);
-        	modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_IO_STOP_INPUT, 0);
-        	modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_MOTOR_EXCITATION, 0);
-        	modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_HOME_FWD_RVS_INPUT, 0);
-        	modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_DATA_NUM_INPUT, 0);
+        		modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_IO_STOP_INPUT, 0);
+        		modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_MOTOR_EXCITATION, 0);
+        		modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_HOME_FWD_RVS_INPUT, 0);
+        		modbus->writeU16(motorIndex, CRD514KD::Registers::CFG_DATA_NUM_INPUT, 0);
+
+			if(firstRun){
+				// Save config values
+				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_BATCH_NV_MEMORY_WRITE, 1);
+				// Wait for completion
+				while(modbus->readU16(motorIndex, CRD514KD::Registers::STATUS_2) & CRD514KD::Status2Bits::SBSY){	
+				}
+				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_BATCH_NV_MEMORY_WRITE, 0);
+			}
 
 			// Set operating modes
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, 0);
