@@ -72,12 +72,6 @@ namespace ModbusController{
         void readU16(uint16_t slave, uint16_t firstAddress, uint16_t* data, unsigned int length);
         uint32_t readU32(uint16_t slave, uint16_t address);
 
-        /**
-         * @var mutex modbusMutex
-         * A mutex for locking the modbus.
-         **/
-        boost::mutex modbusMutex;
-
     private:
         enum{
             /**
