@@ -44,7 +44,6 @@
  **/
 class FollowNode{
 public:
-
 	/**
 	 * the constructor
 	 */
@@ -63,7 +62,7 @@ public:
 	 * Callback for when the cratelocated finds a crate
 	 **/
 	void callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg);
-	
+
 	/**
 	 * Thread that accepts input from the keyboard
 	 **/
@@ -74,37 +73,42 @@ private:
 	 * the nodehandle, used to create subscribers and publishers
 	 **/
 	ros::NodeHandle nodeHandle;
+
 	/**
 	 * Identifier for the crate
 	 **/
 	std::string crateID;
+
 	/**
 	 * Flag used to indicate that the crate needs and update
 	 **/
 	bool updateCrateIDFlag;
+
 	/**
 	 * If the input thread is running
 	 **/ 
-	 bool inputRunning;
+	bool inputRunning;
+
 	/**
 	 * If the topic is running
 	 **/
-	 bool topicRunning;
+	bool topicRunning;
+
 	/**
 	 * Thread for the keyboard input
 	 **/
 	boost::thread* inputThread;
+
 	/**
 	 * Client for calling the deltarobot
 	 **/
 	ros::ServiceClient deltaRobotClient;
-	/**
-	 * Service definition for move to point, used to send request
-	 **/
+
 	/**
 	 * Client for the crate located
 	 **/
 	ros::ServiceClient crateLocatorClient;
+
 	/**
 	 * Contains the request and response for the crateLocator
 	 **/

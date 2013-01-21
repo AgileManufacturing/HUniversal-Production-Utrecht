@@ -43,7 +43,7 @@ namespace Vision{
 	/**
 	 * Constructor which sets the values for the scanner.
 	 **/
-	QRCodeDetector::QRCodeDetector() {
+	QRCodeDetector::QRCodeDetector(){
 		scanner.set_config(zbar::ZBAR_QRCODE, zbar::ZBAR_CFG_ENABLE, 1);
 	}
 
@@ -54,8 +54,8 @@ namespace Vision{
 	 * @param crates Vector that contains the crate
 	 * @param criteria Criteria (with a default value) for the refinement of corner pixels on the detected QR codes. OpenCV termcriteria: "Criteria for termination of the iterative process of corner refinement. That is, the process of corner position refinement stops either after a certain number of iterations or when a required accuracy is achieved. The criteria may specify either of or both the maximum number of iteration and the required accuracy."
 	 **/
-	void QRCodeDetector::detectQRCodes(cv::Mat& image, std::vector<DataTypes::Crate> &crates, cv::TermCriteria criteria) {
-		try {
+	void QRCodeDetector::detectQRCodes(cv::Mat& image, std::vector<DataTypes::Crate> &crates, cv::TermCriteria criteria){
+		try{
 			// create an image in zbar with:
 			// width
 			// height
@@ -66,11 +66,11 @@ namespace Vision{
 
 			int amountOfScannedResults = scanner.scan(zbarImage);
 
-			if (amountOfScannedResults > 0) {
+			if(amountOfScannedResults > 0){
 
 				zbar::Image::SymbolIterator it = zbarImage.symbol_begin();
-				for(; it!=zbarImage.symbol_end(); ++it) {
-					// add all "position" corners of a qr code to a vector
+				for(; it!=zbarImage.symbol_end(); ++it){
+					// Add all "position" corners of a qr code to a vector
 					std::vector<cv::Point2f> corners;
 					corners.push_back(cv::Point2f(it->get_location_x(1), it->get_location_y(1)));
 					corners.push_back(cv::Point2f(it->get_location_x(0), it->get_location_y(0)));
@@ -95,7 +95,7 @@ namespace Vision{
 					crates.push_back(DataTypes::Crate(it->get_data(), corners));
 				}
 			}
-		} catch (std::exception &e) {
+		} catch (std::exception &e){
 			return;
 		}
 	}
@@ -106,9 +106,9 @@ namespace Vision{
 	 * @param image The image to detect the QR codes on.
 	 * @param reconfigureCommands Vector where the QR code data can be stored on.
 	 **/
-	void QRCodeDetector::detectQRCodes(cv::Mat& image, std::vector<std::string> &reconfigureCommands) {
-		try {
-			// create an image in zbar with:
+	void QRCodeDetector::detectQRCodes(cv::Mat& image, std::vector<std::string> &reconfigureCommands){
+		try{
+			// Create an image in zbar with:
 			// width
 			// height
 			// fourcc format "y800" (simple, single y plane for monchrome images)
@@ -118,16 +118,16 @@ namespace Vision{
 
 			int amountOfScannedResults = scanner.scan(zbarImage);
 
-			if (amountOfScannedResults > 0) {
+			if(amountOfScannedResults > 0){
 
 				zbar::Image::SymbolIterator it = zbarImage.symbol_begin();
-				for(; it!=zbarImage.symbol_end(); ++it) {
-					if(boost::starts_with(it->get_data(), "RC")) {
+				for(; it!=zbarImage.symbol_end(); ++it){
+					if(boost::starts_with(it->get_data(), "RC")){
 						reconfigureCommands.push_back(it->get_data());
 					}
 				}
 			}
-		} catch (std::exception &e) {
+		} catch(std::exception &e){
 			return;
 		}
 	}

@@ -55,8 +55,8 @@ static const char WINDOW_NAME[] = "Image window";
  * @param flags CV_EVENT_FLAG
  * @param param Vision::PixelToRealCoordinateTransformer * param Pointer to the PixelToRealCoordinateTransformer used to conversion.
  **/
-void on_mouse(int event, int x, int y, int flags, void* param) {
-	if (event == CV_EVENT_LBUTTONDOWN) {
+void on_mouse(int event, int x, int y, int flags, void* param){
+	if(event == CV_EVENT_LBUTTONDOWN){
 		Vision::PixelAndRealCoordinateTransformer* cordTransformer = (Vision::PixelAndRealCoordinateTransformer*) param;
 		DataTypes::Point2D result = cordTransformer->pixelToRealCoordinate(DataTypes::Point2D(x, y));
 		ROS_INFO("RX: %f, RY:%f", result.x, result.y);
@@ -68,9 +68,7 @@ void on_mouse(int event, int x, int y, int flags, void* param) {
 /**
  * Subscribes to the camera node, starts the QR detector and opens a window to show the output.
  **/
-CrateLocatorNode::CrateLocatorNode( ) :
-		measurementCount(0), measurements(0), failCount(0), imageTransport(node) {
-
+CrateLocatorNode::CrateLocatorNode() : measurementCount(0), measurements(0), failCount(0), imageTransport(node){
 	// Setup the QR detector
 	qrDetector = new Vision::QRCodeDetector();
 
@@ -100,6 +98,7 @@ CrateLocatorNode::CrateLocatorNode( ) :
 	// Crate tracking configuration
 	// The amount of mm a point has to move before we mark it as moving. When not moving we found a deviation of ~0.5 pixel.
 	double crateMovementThreshold = 0.75;
+
 	// The number of frames before a change is marked definite.
 	int numberOfStableFrames = 5;
 	crateTracker = new Vision::CrateTracker(numberOfStableFrames, crateMovementThreshold);
@@ -117,7 +116,7 @@ CrateLocatorNode::CrateLocatorNode( ) :
 /**
  * Destructor for the CrateLocator. Removes the QR detector, fiducial detector, crate tracker and coordinate transformer.
  **/
-CrateLocatorNode::~CrateLocatorNode( ) {
+CrateLocatorNode::~CrateLocatorNode(){
 	delete qrDetector;
 	delete fidDetector;
 	delete cordTransformer;
@@ -133,10 +132,10 @@ CrateLocatorNode::~CrateLocatorNode( ) {
  * @param res Reponse for the caller. Contains a crate message and crate state.
  * @return true if the service is handled.
  **/
-bool CrateLocatorNode::getCrate(crateLocatorNode::getCrate::Request &req, crateLocatorNode::getCrate::Response &res) {
+bool CrateLocatorNode::getCrate(crateLocatorNode::getCrate::Request &req, crateLocatorNode::getCrate::Response &res){
 	DataTypes::Crate crate;
 	bool succeeded = crateTracker->getCrate(req.name, crate);
-	if (succeeded) {
+	if(succeeded){
 		res.state = crate.getState();
 		crateLocatorNode::CrateMsg msg;
 		msg.name = crate.name;
@@ -144,7 +143,7 @@ bool CrateLocatorNode::getCrate(crateLocatorNode::getCrate::Request &req, crateL
 		msg.y = crate.rect().center.y;
 		msg.angle = crate.rect().angle;
 		res.crate = msg;
-	} else {
+	} else{
 		res.state = DataTypes::Crate::state_non_existing;
 		crateLocatorNode::CrateMsg msg;
 		msg.name = "";
@@ -164,9 +163,9 @@ bool CrateLocatorNode::getCrate(crateLocatorNode::getCrate::Request &req, crateL
  * @param res Reponse for the caller. Contains a crate message and crate state for each crate.
  * @return true if the service is handled.
  **/
-bool CrateLocatorNode::getAllCrates(crateLocatorNode::getAllCrates::Request &req, crateLocatorNode::getAllCrates::Response &res) {
+bool CrateLocatorNode::getAllCrates(crateLocatorNode::getAllCrates::Request &req, crateLocatorNode::getAllCrates::Response &res){
 	std::vector<DataTypes::Crate> allCrates = crateTracker->getAllCrates();
-	for (std::vector<DataTypes::Crate>::iterator it = allCrates.begin(); it != allCrates.end(); ++it) {
+	for(std::vector<DataTypes::Crate>::iterator it = allCrates.begin(); it != allCrates.end(); ++it){
 		res.states.push_back(it->getState());
 		crateLocatorNode::CrateMsg msg;
 		msg.name = it->name;
@@ -184,10 +183,10 @@ bool CrateLocatorNode::getAllCrates(crateLocatorNode::getAllCrates::Request &req
  * @param points Vector of point2f points.
  * @return float Average X of the vector
  **/
-inline float averageX(std::vector<cv::Point2f> points) {
+inline float averageX(std::vector<cv::Point2f> points){
 	int pointsCounter = 0;
 	double total = 0;
-	for (std::vector<cv::Point2f>::iterator it = points.begin(); it != points.end(); ++it, ++pointsCounter) {
+	for(std::vector<cv::Point2f>::iterator it = points.begin(); it != points.end(); ++it, ++pointsCounter){
 		total += (*it).x;
 	}
 	return total / pointsCounter;
@@ -199,10 +198,10 @@ inline float averageX(std::vector<cv::Point2f> points) {
  * @param points Vector of point2f points.
  * @return float Average Y of the vector
  **/
-inline float averageY(std::vector<cv::Point2f> points) {
+inline float averageY(std::vector<cv::Point2f> points){
 	int pointsCounter = 0;
 	double total = 0;
-	for (std::vector<cv::Point2f>::iterator it = points.begin(); it != points.end(); ++it, ++pointsCounter) {
+	for(std::vector<cv::Point2f>::iterator it = points.begin(); it != points.end(); ++it, ++pointsCounter){
 		total += (*it).y;
 	}
 	return total / pointsCounter;
@@ -210,9 +209,8 @@ inline float averageY(std::vector<cv::Point2f> points) {
 
 /**
  * Starts the calibration procedure
- *
  **/
-bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErrors) {
+bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErrors){
 	ROS_INFO("Updating calibration markers...");
 
 	// Clear all buffers and settings for the new calibration
@@ -230,14 +228,14 @@ bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErro
 		std::cout << "[DEBUG] Starting calibration" << std::endl;
 		image_transport::Subscriber subscriber = imageTransport.subscribe("camera/image", 1, &CrateLocatorNode::calibrateCallback, this, image_transport::TransportHints("compressed"));
 
-		while (ros::ok() && (measurementCount < measurements && failCount < maxErrors)) {
+		while(ros::ok() && (measurementCount < measurements && failCount < maxErrors)){
 			ros::spinOnce();
 		}
 		std::cout << "[DEBUG] Done calibrating, removing subscription." << std::endl;
 	}
 
 	// If it was a successful capture of all fiducials process the results
-	if (measurementCount >= measurements) {
+	if(measurementCount >= measurements){
 		std::cout << "[DEBUG] Computing average X and Y coordinate for each marker." << std::endl;
 		DataTypes::Point2D fid1(averageX(fid1_buffer), averageY(fid1_buffer));
 		DataTypes::Point2D fid2(averageX(fid2_buffer), averageY(fid2_buffer));
@@ -261,12 +259,12 @@ bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErro
  * Callback function for the calibration procedure.
  * Receives an image of the image topic and tries to detect all fiducials that are present.
  **/
-void CrateLocatorNode::calibrateCallback(const sensor_msgs::ImageConstPtr& msg) {
+void CrateLocatorNode::calibrateCallback(const sensor_msgs::ImageConstPtr& msg){
 	// Receive image
 	cv_bridge::CvImagePtr cv_ptr;
-	try {
+	try{
 		cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-	} catch (cv_bridge::Exception& e) {
+	} catch(cv_bridge::Exception& e){
 		ROS_ERROR("cv_bridge exception: %s", e.what());
 		return;
 	}
@@ -281,13 +279,13 @@ void CrateLocatorNode::calibrateCallback(const sensor_msgs::ImageConstPtr& msg) 
 
 	// If three fiducials (all on the workin area) have been found, sort them on distance.
 	// The fiducials are put into their own buffer as they are sorted.
-	if (fiducialPoints.size() == 3) {
+	if(fiducialPoints.size() == 3){
 		measurementCount++;
 		Vision::FiducialDetector::order(fiducialPoints);
 		fid1_buffer.push_back(fiducialPoints[0]);
 		fid2_buffer.push_back(fiducialPoints[1]);
 		fid3_buffer.push_back(fiducialPoints[2]);
-	} else {
+	} else{
 		failCount++;
 //size() on a vector returns a size_type, which has a different size on a 64-bit platform
 #if defined(__LP64__) || defined(_LP64)
@@ -295,7 +293,6 @@ void CrateLocatorNode::calibrateCallback(const sensor_msgs::ImageConstPtr& msg) 
 #else
 		ROS_WARN("Incorrect number of markers. Needed: 3 Saw: %u", fiducialPoints.size());
 #endif
-
 	}
 
 	// Show the debug image and progress status.
@@ -310,12 +307,12 @@ void CrateLocatorNode::calibrateCallback(const sensor_msgs::ImageConstPtr& msg) 
  * Main steps in the callback are: receive a frame, detect all crates and send event(s).
  * Detects
  **/
-void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg) {
+void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg){
 	// Receive image
 	cv_bridge::CvImagePtr cv_ptr;
-	try {
+	try{
 		cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-	} catch (cv_bridge::Exception& e) {
+	} catch(cv_bridge::Exception& e){
 		ROS_ERROR("cv_bridge exception: %s", e.what());
 		return;
 	}
@@ -325,7 +322,7 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 	cv::cvtColor(cv_ptr->image, gray, CV_BGR2GRAY);
 
 	// Draw the calibration points for visual debugging.
-	for (std::vector<DataTypes::Point2D>::iterator it = markers.begin(); it != markers.end(); ++it) {
+	for(std::vector<DataTypes::Point2D>::iterator it = markers.begin(); it != markers.end(); ++it){
 		cv::circle(cv_ptr->image, cv::Point(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)), 1, cv::Scalar(0, 0, 255), 2);
 
 		cv::circle(cv_ptr->image, cv::Point(cordTransformer->realToPixelCoordinate(cordTransformer->pixelToRealCoordinate(DataTypes::Point2D(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)))).x, cordTransformer->realToPixelCoordinate(cordTransformer->pixelToRealCoordinate(DataTypes::Point2D(cv::saturate_cast<int>(it->x), cv::saturate_cast<int>(it->y)))).y), 7, cv::Scalar(255, 0, 255), 1);
@@ -336,11 +333,11 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 	qrDetector->detectQRCodes(gray, crates);
 
 	// Transform crate coordinates
-	for (std::vector<DataTypes::Crate>::iterator it = crates.begin(); it != crates.end(); ++it) {
+	for(std::vector<DataTypes::Crate>::iterator it = crates.begin(); it != crates.end(); ++it){
 		it->draw(cv_ptr->image);
 
 		std::vector<cv::Point2f> points = it->getPoints();
-		for (int n = 0; n < 3; n++) {
+		for(int n = 0; n < 3; n++){
 			DataTypes::Point2D coordinate(points[n].x, points[n].y);
 			coordinate = cordTransformer->pixelToRealCoordinate(coordinate);
 			points[n].x = coordinate.x;
@@ -353,7 +350,7 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 	std::vector<Vision::CrateEvent> events = crateTracker->update(crates);
 
 	// Publish events to event topic
-	for (std::vector<Vision::CrateEvent>::iterator it = events.begin(); it != events.end(); ++it) {
+	for(std::vector<Vision::CrateEvent>::iterator it = events.begin(); it != events.end(); ++it){
 		crateLocatorNode::CrateEventMsg msg;
 		msg.event = it->type;
 		msg.crate.name = it->name;
@@ -375,21 +372,21 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
  * Spins in ROS to receive frames. These will execute the callbacks.
  * This function ends when ros receives a ^c
  **/
-void CrateLocatorNode::run( ) {
-	//run initial calibration. If that fails, this node will shut down.
-	if (!calibrate()) {
+void CrateLocatorNode::run(){
+	// Run initial calibration. If that fails, this node will shut down.
+	if(!calibrate()){
 		ros::shutdown();
-	} else {
+	} else{
 		// Shutdown is not immediately exiting the program. This caused to run the these statements if they were not in the else...
 
 		std::cout << "[DEBUG] Waiting for subscription" << std::endl;
-		// subscribe example: (poorly documented on ros wiki)
+		// Subscribe example: (poorly documented on ros wiki)
 		// Images are transported in JPEG format to decrease tranfer time per image.
 		// imageTransport.subscribe(<base image topic>, <queue_size>, <callback>, <tracked object>, <TransportHints(<transport type>)>)
 		cameraSubscriber = imageTransport.subscribe("camera/image", 1, &CrateLocatorNode::crateLocateCallback, this, image_transport::TransportHints("compressed"));
 		std::cout << "[DEBUG] Starting crateLocateCallback loop" << std::endl;
 
-		while (ros::ok()) {
+		while(ros::ok()){
 			ros::spinOnce();
 		}
 	}
@@ -398,7 +395,7 @@ void CrateLocatorNode::run( ) {
 /**
  * Main methods that starts the cratelocator node.
  **/
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]){
 	ros::init(argc, argv, "crateLocator");
 	CrateLocatorNode crateLocatorNode;
 	crateLocatorNode.run();

@@ -36,10 +36,10 @@
 #include <Vision/CrateTracker.h>
 #include <DeltaRobotNode/Services.h>
 
-FollowNode::FollowNode( ) :
+FollowNode::FollowNode() :
 		crateID(""), updateCrateIDFlag(false), inputRunning(true), topicRunning(true), deltaRobotClient(
-		        nodeHandle.serviceClient<rexosStdSrvs::Module>(DeltaRobotNodeServices::MOVE_TO_POINT)), crateLocatorClient(
-		        nodeHandle.serviceClient<crateLocatorNode::getCrate>(CrateLocatorNodeServices::GET_CRATE)) {
+				nodeHandle.serviceClient<rexosStdSrvs::Module>(DeltaRobotNodeServices::MOVE_TO_POINT)), crateLocatorClient(
+				nodeHandle.serviceClient<crateLocatorNode::getCrate>(CrateLocatorNodeServices::GET_CRATE)){
 	inputThread = new boost::thread(inputThreadMethod, this);
 
 	getCrateService.request.name = "";
@@ -52,7 +52,7 @@ FollowNode::FollowNode( ) :
 	*/
 }
 
-FollowNode::~FollowNode( ) {
+FollowNode::~FollowNode(){
 	inputRunning = false;
 	topicRunning = false;
 	inputThread->interrupt();
@@ -63,11 +63,11 @@ FollowNode::~FollowNode( ) {
  *
  * @param msg CrateEventMsg pointer.
  **/
-void FollowNode::callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg) {
-	switch (msg->event) {
+void FollowNode::callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg){
+	switch(msg->event){
 	case Vision::CrateEvent::type_in:
 		std::cout << "[DEBUG] New crate " << msg->crate.name << "found!" << std::endl;
-		if (updateCrateIDFlag) {
+		if(updateCrateIDFlag){
 			crateID = msg->crate.name;
 			getCrateService.request.name = crateID;
 			std::cout << "[DEBUG] Tracking new crate " << crateID << std::endl;
@@ -75,7 +75,7 @@ void FollowNode::callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg) 
 		}
 
 		// Move to the crate!
-		/*if (crateID.compare(msg->crate.name) == 0) {
+		/*if(crateID.compare(msg->crate.name) == 0){
 		 std::cout << "[DEBUG] Moving to new coordinate " << msg->crate.x << "," << msg->crate.y << std::endl;
 		 moveToPointService.request.motion.x = msg->crate.x;
 		 moveToPointService.request.motion.y = msg->crate.y;
@@ -84,14 +84,14 @@ void FollowNode::callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg) 
 		break;
 	case Vision::CrateEvent::type_out:
 		std::cout << "[DEBUG] Deleted crate " << msg->crate.name << std::endl;
-		//if (crateID.compare(msg->crate.name) == 0) {
+		//if(crateID.compare(msg->crate.name) == 0){
 		//	crateID = "";
 		//	std::cout << "[DEBUG] Lost crate " << msg->crate.name << ". Stopped the follow process " << std::endl;
 		//}
 		break;
 	case Vision::CrateEvent::type_moving:
 		std::cout << "[DEBUG] Start moving crate " << msg->crate.name << std::endl;
-		/*if (crateID.compare(msg->crate.name) == 0) {
+		/*if(crateID.compare(msg->crate.name) == 0){
 		 std::cout << "[DEBUG] Moving to new coordinate " << msg->crate.x << "," << msg->crate.y << std::endl;
 		 moveToPointService.request.motion.x = msg->crate.x;
 		 moveToPointService.request.motion.y = msg->crate.y;
@@ -100,7 +100,7 @@ void FollowNode::callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg) 
 		break;
 	case Vision::CrateEvent::type_moved:
 		std::cout << "[DEBUG] Moved crate " << msg->crate.name << std::endl;
-		/*if (crateID.compare(msg->crate.name) == 0) {
+		/*if(crateID.compare(msg->crate.name) == 0){
 		 std::cout << "[DEBUG] Moving to new coordinate " << msg->crate.x << "," << msg->crate.y << std::endl;
 		 moveToPointService.request.motion.x = msg->crate.x;
 		 moveToPointService.request.motion.y = msg->crate.y;
@@ -110,20 +110,20 @@ void FollowNode::callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg) 
 	}
 }
 
-void FollowNode::run( ) {
+void FollowNode::run( ){
 
 	std::cout << "Welcome to the followNode. This tool will try to follow a crate that has been scanned before. :)."
-	        << std::endl << "A\tAssign crate name to tracker ID" << std::endl << "S\tStop following a crate"
-	        << std::endl << "Q\tQuit program" << std::endl << "Enter a key and press the \"Enter\" button" << std::endl;
+			<< std::endl << "A\tAssign crate name to tracker ID" << std::endl << "S\tStop following a crate"
+			<< std::endl << "Q\tQuit program" << std::endl << "Enter a key and press the \"Enter\" button" << std::endl;
 
 	ros::Subscriber subscriber = nodeHandle.subscribe(CrateLocatorNodeTopics::CRATE_EVENT, 1000, &FollowNode::callback,
-	        this);
+			this);
 
-	while (ros::ok() && topicRunning) {
+	while(ros::ok() && topicRunning){
 		ros::spinOnce();
 
-		if (crateLocatorClient.call(getCrateService)
-		        && getCrateService.response.state != DataTypes::Crate::state_non_existing) {
+		if(crateLocatorClient.call(getCrateService)
+				&& getCrateService.response.state != DataTypes::Crate::state_non_existing){
 			std::cout << getCrateService.response.crate.x << " " << getCrateService.response.crate.y << std::endl;
 			//moveToPointService.request.motion.x = getCrateService.response.crate.x;
 			//moveToPointService.request.motion.y = getCrateService.response.crate.y;
@@ -132,20 +132,20 @@ void FollowNode::run( ) {
 	}
 }
 
-void FollowNode::inputThreadMethod(FollowNode* that) {
-	try {
+void FollowNode::inputThreadMethod(FollowNode* that){
+	try{
 		char key;
 
-		while (that->inputRunning) {
+		while(that->inputRunning){
 			std::cin >> key;
-			if (key == 'a' || key == 'A') {
+			if(key == 'a' || key == 'A'){
 				std::cout << "[DEBUG] Looking for a new crate (first new crate is assigned!)" << std::endl;
 				that->updateCrateIDFlag = true;
-			} else if (key == 's' || key == 'S') {
+			} else if(key == 's' || key == 'S'){
 				that->crateID = "";
 				that->getCrateService.request.name = that->crateID;
 				std::cout << "[DEBUG] Deleted crateID. Stopped following." << std::endl;
-			} else if (key == 'q' || key == 'Q') {
+			} else if(key == 'q' || key == 'Q'){
 				that->inputRunning = false;
 				that->topicRunning = false;
 			}
@@ -154,7 +154,7 @@ void FollowNode::inputThreadMethod(FollowNode* that) {
 			ros::spinOnce();
 		}
 
-	} catch (boost::thread_interrupted& ignored) {
+	} catch(boost::thread_interrupted& ignored){
 		// Ignore interrupt and exit thread.
 	}
 }
@@ -162,7 +162,7 @@ void FollowNode::inputThreadMethod(FollowNode* that) {
 /**
  * Main function for the followNode, will start it
  **/
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]){
 	ros::init(argc, argv, "follow");
 	FollowNode crateLocatorNode;
 	crateLocatorNode.run();

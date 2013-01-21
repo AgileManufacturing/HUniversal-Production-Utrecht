@@ -46,22 +46,21 @@
 /**
  * This class represents the C++ client for the blackboard system
  **/
-class BlackboardCppClient {
+class BlackboardCppClient{
 public:
 	BlackboardCppClient(const std::string &hostname, const std::string db, const std::string coll, BlackboardSubscriber *func);
-	BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll,  BlackboardSubscriber *func);
+	BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll, BlackboardSubscriber *func);
 	virtual ~BlackboardCppClient();
 	void setDatabase(const std::string &db);
 	void setCollection(const std::string &col);
 	void subscribe(const std::string &topic);
-	void setCallback(BlackboardSubscriber *func);	
+	void setCallback(BlackboardSubscriber *func);
 	void unsubscribe(const std::string &topic);
 	std::string readOldestMessage();
 	void removeOldestMessage();
 	void insertJson(std::string json);
 	
 private:
-	
 	void run();
 	/**
 	 * @var mongo::DBClientConnection connection
@@ -83,7 +82,7 @@ private:
 
 	/**
 	 * @var std::map<std::string, mongo::BSONObj> subscriptions
-	 * map of the subscriptions top topics. The key is the topic name, 
+	 * map of the subscriptions top topics. The key is the topic name,
 	 * A bson object is stored as value to get the messages of the subscribed topic
 	 * from the database.
 	 **/

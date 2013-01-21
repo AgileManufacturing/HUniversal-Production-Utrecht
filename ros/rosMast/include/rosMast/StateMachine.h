@@ -1,4 +1,4 @@
-	/**
+/**
  * @file StateMachine.h
  * @brief Interface for MAST in module
  * @date Created: 2012-10-12
@@ -44,26 +44,28 @@
  **/
 #define TRANSITION_TABLE_SIZE 4
 
-namespace rosMast {
+namespace rosMast{
 	/**
 	 * Struct for a StateTransition
 	 * Used to build a array of transitions so they can be mapped to function pointers
 	 **/
-	struct StateTransition 
-	{
-		StateTransition() { }
-		/** 
+	struct StateTransition{
+		StateTransition(){}
+
+		/**
 		 * Constructor for StateTransition
 		 **/
-		StateTransition(StateType src, StateType des) {
+		StateTransition(StateType src, StateType des){
 			sourceState = src;
 			destinationState = des;
 		}
+
 		/**
 		 * @var StateType sourceState
 		 * The original state
 		 **/
 		StateType sourceState;
+
 		/**
 		 * @var StateType destinationState
 		 * Destination state for transition
@@ -73,96 +75,106 @@ namespace rosMast {
 		/**
 		 * Required for building a map, as thats a sorted data structure
 		 **/
-		friend bool operator < (const StateTransition& id1, const StateTransition &other) 
-		{
-			if(id1.sourceState == other.sourceState) {
+		friend bool operator < (const StateTransition& id1, const StateTransition &other){
+			if(id1.sourceState == other.sourceState){
 				return id1.destinationState < other.destinationState;
-			}				
+			}
 			return id1.sourceState < other.sourceState;
 		}
 	};
-	/** 
+
+	/**
 	 * The StateMachine
 	 **/
-	class StateMachine {		
-		/** 
+	class StateMachine{
+		/**
 		 * @var typedef int (StateMachine::*stateFunctionPtr)()
 		 * Function pointer definition for a state transition function
 		 **/
 		typedef int (StateMachine::*stateFunctionPtr)();
+
+	public:
+		StateMachine(int equipletID, int moduleID);
+
+		/**
+		 * Transition from Safe to Standby
+		 * @return 0 if everything when succesfull
+		 **/
+		virtual int transitionSetup() = 0;
+
+		/**
+		 * Transition from Standby to Ssafe
+		 * @return 0 if everything when succesfull
+		 **/
+		virtual int transitionShutdown() = 0;
+
+		/**
+		 * Transition from Standby to Normal
+		 * @return 0 if everything when succesfull
+		 **/
+		virtual int transitionStart() = 0;
+
+		/**
+		 * Transition from Normal to Standby
+		 * @return 0 if everything when succesfull
+		 **/
+		virtual int transitionStop() = 0;
+
+		/**
+		 * Get the state of the statemachine
+		 * @return the currentState of the machine
+		 **/
+		StateType getState(){ return currentState; }
+
+		void setState(StateType newState);
+		bool changeState(rosMast::StateChange::Request &request, rosMast::StateChange::Response &response);
+		int executeTransition(StateType desiredState);
 		
-		public:
-			StateMachine(int equipletID, int moduleID);		
+		stateFunctionPtr lookupTransition(StateType currentState, StateType desiredState);
+		void sendErrorMessage(int errorCode);
 
-			/**
-			 * Transition from Safe to Standby
-			 * @return 0 if everything when succesfull
-			 **/
-			virtual int transitionSetup() = 0;
-			/**
-			 * Transition from Standby to Ssafe
-			 * @return 0 if everything when succesfull
-			 **/
-			virtual int transitionShutdown() = 0;
-			/**
-			 * Transition from Standby to Normal
-			 * @return 0 if everything when succesfull
-			 **/			
-			virtual int transitionStart() = 0;
-			/**
-			 * Transition from Normal to Standby
-			 * @return 0 if everything when succesfull
-			 **/			
-			virtual int transitionStop() = 0;
-			/**
-			 * Get the state of the statemachine
-			 * @return the currentState of the machine
-			 **/
-			StateType getState() { return currentState; }	
-			
-			void setState( StateType newState );				
-			bool changeState(rosMast::StateChange::Request &request, rosMast::StateChange::Response &response);	
-			int executeTransition(StateType desiredState);
-			
-			stateFunctionPtr lookupTransition(StateType currentState, StateType desiredState);
-			void sendErrorMessage(int errorCode);	
-		private:
-			/**
-			 * @var std::map<StateTransition, stateFunctionPtr> transitionMap;
-			 * The map that links a StateTransition struct to a function pointer
-			 **/
-			std::map<StateTransition, stateFunctionPtr> transitionMap;
-			/**
-			 * @var ros::ServiceClient stateUpdateServer
-			 * The publisher for posting updated state messages
-			 **/
-			ros::ServiceClient stateUpdateServer;
-			/**
-			 * @var ros::ServiceClient moduleErrorServer
-			 * The publisher for posting error messages
-			 **/
-			ros::ServiceClient moduleErrorServer;
-			/**
-			 * @var ros::ServiceServer stateChangeRequestClient
-			 * The subscriber for request for state change messages
-			 **/
-			ros::ServiceServer stateChangeRequestClient;
-			/**
-			 * @var StateType currentState
-			 * The current state of the the state machine
-			 **/
-			StateType currentState;	
-			/**
-			 * @var int equipletID
-			 * The identifier for the equiplet the module (and so the statemachine) belongs to
-			 **/
-			int equipletID;
-			/**
-			 * @var int moduleID
-			 * The identifier for the module the state machine belongs to
-			 **/
-			int moduleID;		
+	private:
+		/**
+		 * @var std::map<StateTransition, stateFunctionPtr> transitionMap;
+		 * The map that links a StateTransition struct to a function pointer
+		 **/
+		std::map<StateTransition, stateFunctionPtr> transitionMap;
+
+		/**
+		 * @var ros::ServiceClient stateUpdateServer
+		 * The publisher for posting updated state messages
+		 **/
+		ros::ServiceClient stateUpdateServer;
+
+		/**
+		 * @var ros::ServiceClient moduleErrorServer
+		 * The publisher for posting error messages
+		 **/
+		ros::ServiceClient moduleErrorServer;
+
+		/**
+		 * @var ros::ServiceServer stateChangeRequestClient
+		 * The subscriber for request for state change messages
+		 **/
+		ros::ServiceServer stateChangeRequestClient;
+
+		/**
+		 * @var StateType currentState
+		 * The current state of the the state machine
+		 **/
+		StateType currentState;
+
+		/**
+		 * @var int equipletID
+		 * The identifier for the equiplet the module (and so the statemachine) belongs to
+		 **/
+		int equipletID;
+
+		/**
+		 * @var int moduleID
+		 * The identifier for the module the state machine belongs to
+		 **/
+		int moduleID;
 	};
-
 }
-#endif 
+#endif

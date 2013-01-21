@@ -35,7 +35,6 @@
 #include <DataTypes/MotorRotation.h>
 
 namespace Motor{
-
 	/**
 	 * Interface for the deltaronot motors.
 	 **/
@@ -64,14 +63,14 @@ namespace Motor{
 		/**
 		 * Sets the minimum and maximum angle for the motor.
 		 **/
-	 	virtual void setMotorLimits(double minAngle, double maxAngle) = 0;
+		virtual void setMotorLimits(double minAngle, double maxAngle) = 0;
 
-	 	/**
+		/**
 		 * Rotate the motors.
 		 * 
 		 * @param motorRotation Defines the angles, speed, acceleration and deceleration of the motors.
 		 **/
-	 	virtual void moveTo(const DataTypes::MotorRotation& motorRotation) = 0;
+		virtual void moveTo(const DataTypes::MotorRotation& motorRotation) = 0;
 
 		/**
 		 * Wait till the motor has finished any rotations.
@@ -86,7 +85,7 @@ namespace Motor{
 		virtual double getMinAngle(void) const = 0;
 
 		/**
-	 	 * Get the maximum angle the motors can move to.
+		 * Get the maximum angle the motors can move to.
 		 * 
 		 * @return angle in radians.
 		 **/

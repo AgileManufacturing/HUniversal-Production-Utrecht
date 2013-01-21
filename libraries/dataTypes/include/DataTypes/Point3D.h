@@ -44,7 +44,6 @@ namespace DataTypes{
 	 **/
 	class Point3D{
 	public:
-		
 		/**
 		 * @var T x
 		 * X-coordinate, from left to right
@@ -108,9 +107,9 @@ namespace DataTypes{
 		 *
 		 * @return true if the points are equal, false if not equal.
 		 **/
-		 inline bool operator==(const Point3D<T>& rhs) const{
-		 	return this->x == rhs.x && this->y == rhs.y && this->z == rhs.z;
-		 }
+		inline bool operator==(const Point3D<T>& rhs) const{
+			return this->x == rhs.x && this->y == rhs.y && this->z == rhs.z;
+		}
 
 		/**
 		 * Calculates the euclidean distance between *this and the given point.

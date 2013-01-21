@@ -32,11 +32,11 @@
 #include <cmath>
 #include <vector>
 
-namespace DataTypes {
+namespace DataTypes{
 	/**
 	 * Class that represents a 2 dimensional point. Has utilities to transform the point.
 	 **/
-	class Point2D {
+	class Point2D{
 	public:
 		/**
 		 * @var double x
@@ -52,89 +52,95 @@ namespace DataTypes {
 		/**
 		 * Constructor to make a point to (0,0).
 		 **/
-		Point2D( ) :
-				x(0), y(0) {
-		}
+		Point2D( ) : x(0), y(0){}
+
 		/**
 		 * Constructor to make a point at a specific location.
 		 * 
 		 * @param x the x value of the point
 		 * @param y the y value of the point
 		 **/
-		Point2D(double x, double y) :
-				x(x), y(y) {
-		}
+		Point2D(double x, double y) : x(x), y(y){}
+
 		/**
 		 * Destructor.
 		 **/
-		~Point2D( ) {
-		}
+		~Point2D(){}
+
 		/**
 		 * Compare operator for Point 2D
 		 **/
-		inline bool operator==(const Point2D& rhs) const {
+		inline bool operator==(const Point2D& rhs) const{
 			return this->x == rhs.x && this->y == rhs.y;
 		}
+
 		/** 
 		 * Addition assignment
 		 **/
-		inline Point2D& operator+=(const Point2D& rhs) {
+		inline Point2D& operator+=(const Point2D& rhs){
 			x += rhs.x;
 			y += rhs.y;
 			return *this;
 		}
+
 		/**
 		 * Substract assignment
 		 **/
-		inline Point2D& operator-=(const Point2D& rhs) {
+		inline Point2D& operator-=(const Point2D& rhs){
 			x -= rhs.x;
 			y -= rhs.y;
 			return *this;
 		}
+
 		/**
 		 * Multiplication assignment
 		 **/
-		inline Point2D& operator*=(const Point2D& rhs) {
+		inline Point2D& operator*=(const Point2D& rhs){
 			x *= rhs.x;
 			y *= rhs.y;
 			return *this;
 		}
+
 		/** 
 		 * Addition of points
 		 **/
-		inline Point2D operator+(const Point2D& rhs) const {
+		inline Point2D operator+(const Point2D& rhs) const{
 			Point2D res = *this;
 			res += rhs;
 			return res;
 		}
+
 		/**
 		 * Substract of points
 		 **/
-		inline Point2D operator-(const Point2D& rhs) const {
+		inline Point2D operator-(const Point2D& rhs) const{
 			Point2D res = *this;
 			res -= rhs;
 			return res;
 		}
+
 		/**
 		 * Multiplication operator
 		 **/
-		inline Point2D operator*(const Point2D& rhs) const {
+		inline Point2D operator*(const Point2D& rhs) const{
 			Point2D res = *this;
 			res *= rhs;
 			return res;
 		}
+
 		/**
-		 * calculates the distance between this point and another points
+		 * Calculates the distance between this point and another points
 		 *
 		 * @param point The other point.
 		 *
 		 * @return The distance between the points.
 		 **/
-		inline double distance(const Point2D& point) const {
+		inline double distance(const Point2D& point) const{
 			double deltaX = x - point.x;
 			double deltaY = y - point.y;
 			return sqrt(deltaX * deltaX + deltaY * deltaY);
 		}
+
 		/**
 		 * Calculate the center between this point and another points.
 		 *
@@ -142,13 +148,14 @@ namespace DataTypes {
 		 *
 		 * @return Returns a Point2D with the location of the center.
 		 **/
-		inline Point2D mean(const Point2D& point) const {
+		inline Point2D mean(const Point2D& point) const{
 			Point2D result;
 			result = *this + point;
 			result.x /= 2;
 			result.y /= 2;
 			return result;
 		}
+
 		/**
 		 * Rotates the point around 0,0
 		 *
@@ -156,7 +163,7 @@ namespace DataTypes {
 		 *
 		 * @return Returns a Point2D with the new location.
 		 **/
-		inline Point2D rotate(double angle) const {
+		inline Point2D rotate(double angle) const{
 			return Point2D(x * cos(angle) - y * sin(angle), x * sin(angle) + y * cos(angle));
 		}
 	};

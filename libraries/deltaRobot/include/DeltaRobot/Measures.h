@@ -36,7 +36,6 @@
 
 namespace DeltaRobot{
 	namespace Measures{
-		
 		/**
     	 * @var double BASE
     	 * Radius of the base in millimeters.
@@ -56,15 +55,15 @@ namespace DeltaRobot{
 		const double EFFECTOR	= 46.19;
 
 		/**
-         * @var double ANKLE
-         * Length of the ankle in millimeters.
-         **/
+		 * @var double ANKLE
+		 * Length of the ankle in millimeters.
+		 **/
 		const double ANKLE		= 250;
 		
 		/**
-         * @var double HIP_ANKLE_ANGLE_MAX
-         * Maximum angle between hip and ankle when moving the ankle sideways in radians.
-         **/
+		 * @var double HIP_ANKLE_ANGLE_MAX
+		 * Maximum angle between hip and ankle when moving the ankle sideways in radians.
+		 **/
 		const double HIP_ANKLE_ANGLE_MAX = Utilities::degreesToRadians(22);
 
 		/**

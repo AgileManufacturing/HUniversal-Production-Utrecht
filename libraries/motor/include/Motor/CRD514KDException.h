@@ -31,7 +31,6 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-
 #pragma once
 
 #include <Motor/CRD514KD.h>
@@ -41,13 +40,11 @@
 #include <sstream>
 
 namespace Motor{
-	
 	/**
 	 * Exception thrown if the motorcontroller alarm flag is set.
 	 **/
 	class CRD514KDException : public std::runtime_error{
 	private:
-
 		/**
 		 * @var t slave
 		 * The modbus slave which set the alarm flag.
@@ -59,7 +56,7 @@ namespace Motor{
 		 * Boolean that is set if there is a warning.
 		 **/
 		const bool warning;
-		
+
 		/**
 		 * @var bool alarm
 		 * Boolean that is set if there is an alarm.

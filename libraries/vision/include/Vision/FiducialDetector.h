@@ -37,12 +37,12 @@
 #include <opencv2/core/core.hpp>
 #include <vector>
 
-namespace Vision {
+namespace Vision{
 
 	/**
 	 * Detects fiducial markers in an image.
 	 **/
-	class FiducialDetector {
+	class FiducialDetector{
 	private:
 		void drawPolarLine(cv::Mat& image, float rho, float theta, cv::Scalar color, int thickness);
 		bool detectCenterLine(cv::Vec2f& centerLine, std::vector<cv::Vec2f> lines, cv::Mat* debugImage = NULL);
@@ -122,7 +122,7 @@ namespace Vision {
 		bool verbose;
 
 		FiducialDetector(int minRad = 20, int maxRad = 40);
-		virtual ~FiducialDetector( );
+		virtual ~FiducialDetector();
 
 		void detect(cv::Mat& image, std::vector<cv::Point2f>& points, cv::Mat* debugImage = NULL);
 		bool detectCrosshair(cv::Mat& image, cv::Point2f& center, const cv::Mat& mask = cv::Mat(), cv::Mat* debugImage = NULL);
@@ -133,37 +133,43 @@ namespace Vision {
 		 *
 		 * @param minRad The minimum radius in pixels of a circle.
 		 **/
-		void setMinRad(int minRad) {this->minRad = minRad;}
+		void setMinRad(int minRad){ this->minRad = minRad; }
+
 		/**
 		 * Set maxRad.
 		 *
 		 * @param maxRad The maximum radius in pixels of a circle.
 		 **/
-		void setMaxRad(int maxRad) {this->maxRad = maxRad;}
+		void setMaxRad(int maxRad){ this->maxRad = maxRad; }
+
 		/**
 		 * Set distance.
 		 *
 		 * @param distance The minimum distance between circles in pixels.
 		 **/
-		void setDistance(int distance) {this->distance = distance;}
+		void setDistance(int distance){ this->distance = distance; }
+
 		/**
 		 * Set minDist.
 		 *
 		 * @param minDist Minimum distance between lines to use for the center line.
 		 **/
-		void setMinDist(int minDist) {this->minDist = minDist;}
+		void setMinDist(int minDist){ this->minDist = minDist; }
+
 		/**
 		 * Set maxDist.
 		 *
 		 * @param maxDist Maximum distance between lines to use for the center line.
 		 **/
-		void setMaxDist(int maxDist) {this->maxDist = maxDist;}
+		void setMaxDist(int maxDist){ this->maxDist = maxDist; }
+
 		/**
 		 * Set circleVotes.
 		 *
 		 * @param circleVotes The minimum number of votes needed for an object to be detected as a circle.
 		 **/
-		void setCircleVotes(int circleVotes) {this->circleVotes = circleVotes;}
+		void setCircleVotes(int circleVotes){ this->circleVotes = circleVotes; }
+
 		/**
 		 * Calculate distance between two fiducial points
 		 *
@@ -172,12 +178,11 @@ namespace Vision {
 		 *
 		 * @return The distance between the two points in pixels.
 		 **/
-		static inline float fiducialDistance(const cv::Point2f& pt1, const cv::Point2f& pt2) {
+		static inline float fiducialDistance(const cv::Point2f& pt1, const cv::Point2f& pt2){
 			float dx = pt1.x-pt2.x;
 			float dy = pt1.y-pt2.y;
 			return sqrt(dx*dx+dy*dy);
 		}
 	};
-
 }
 #endif /* FIDUCIALDETECTOR_H_ */

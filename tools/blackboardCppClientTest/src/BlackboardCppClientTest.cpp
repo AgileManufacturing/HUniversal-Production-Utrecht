@@ -31,8 +31,8 @@
 #include "ros/ros.h"
 #include <blackboardCppClient/BlackboardCppClient.h>
 
-/*void blackboardCallback(BlackboardCppClient::BlackboardEvent event, std::map<std::string, std::string> map) {
-	switch(event) {
+/*void blackboardCallback(BlackboardCppClient::BlackboardEvent event, std::map<std::string, std::string> map){
+	switch(event){
 		case BlackboardCppClient::UNKNOWN:
 			std::cout << "Received UNKNOWN event in BlackboardCppClientTest" << std::endl;
 			break;
@@ -51,7 +51,7 @@
 	}
 }*/
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv){
 	ros::init(argc, argv, "BlackboardCppClientTest");
 	//BlackboardCppClient bc("localhost", "REXOS", "blackboard", &blackboardCallback);
 	//bc.subscribe("hoi");

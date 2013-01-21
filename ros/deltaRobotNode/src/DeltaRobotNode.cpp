@@ -29,16 +29,15 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-
 #include "DeltaRobotNode/deltaRobotNode.h"
 #include "DeltaRobotNode/Point.h"
 #include <execinfo.h>
- #include <signal.h>
+#include <signal.h>
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "DeltaRobotNode"
 // @endcond
-/** 
+/**
  * The IP of the modbus we are connecting to
  **/
 #define MODBUS_IP "192.168.0.2"
@@ -52,7 +51,7 @@
  * @param equipletID identifier for the equiplet
  * @param moduleID identifier for the deltarobot
  **/
-deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) : rosMast::StateMachine(equipletID, moduleID) {
+deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) : rosMast::StateMachine(equipletID, moduleID){
 	ROS_INFO("DeltaRobotnode Constructor entering...");
 	
 	ros::NodeHandle nodeHandle;
@@ -70,10 +69,10 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 
 	// Initialize modbus for IO controller
 	modbus_t *modbusIO = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
-	if(modbusIO == NULL) {
+	if(modbusIO == NULL){
 		throw std::runtime_error("Unable to allocate libmodbus context");
 	}
-	/* if(modbus_connect(modbusIO) == -1) {
+	/* if(modbus_connect(modbusIO) == -1){
 		throw std::runtime_error("Modbus connection to IO controller failed");
 	} */ 
 	assert(modbusIO != NULL);
@@ -92,7 +91,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 		Motor::CRD514KD::RtuConfig::DATA_BITS,
 		Motor::CRD514KD::RtuConfig::STOP_BITS));
 
-	//Motors is declared in the header file, size = 3
+	// Motors is declared in the header file, size = 3
 	motors[0] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_0, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
 	motors[1] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_1, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
 	motors[2] = new Motor::StepperMotor(modbus, Motor::CRD514KD::Slaves::MOTOR_2, DeltaRobot::Measures::MOTOR_ROT_MIN, DeltaRobot::Measures::MOTOR_ROT_MAX);
@@ -103,7 +102,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 	deltaRobot = new DeltaRobot::DeltaRobot(drm, motorManager, motors, modbusIO);
 }
 
-deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
+deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode(){
 	delete deltaRobot;
 	delete motors[0];
 	delete motors[1];
@@ -119,14 +118,14 @@ deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
  * 
  * @return true if the calibration was successful else false
  **/
-bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res) {
+bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res){
 	res.succeeded = false;
-	if(getState() != rosMast::normal) {
+	if(getState() != rosMast::normal){
 		res.message = "Cannot calibrate, mast state=" + std::string(rosMast::state_txt[getState()]);
 		return true;
 	}
 	// Calibrate the motors
-	if(!deltaRobot->calibrateMotors()) {
+	if(!deltaRobot->calibrateMotors()){
 		ROS_ERROR("Calibration FAILED. EXITING.");
 		res.message = "Calibration FAILED. EXITING.";
 	}
@@ -142,16 +141,15 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate(rexosStdSrvs::Module::Re
  * 
  * @return true when the moveToPoint was successful, else false
  **/
-bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res) {
+bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res){
 	ROS_INFO("moveToPointNew called");
 	res.succeeded = false;
-	if(getState() != rosMast::normal) {
+	if(getState() != rosMast::normal){
 		res.message = "Cannot move to point, mast state=" + std::string(rosMast::state_txt[getState()]);
 		return true;
 	}
 
 	DataTypes::Point3D<double> &effectorLocation = deltaRobot->getEffectorLocation();
-	
 	Point p = parsePoint(req.json);
 
 	/**
@@ -160,7 +158,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(rexosStdSrvs::Module::
 	 **/
 	if(!deltaRobot->checkPath(
 			DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
-			DataTypes::Point3D<double>(p.x, p.y, p.z))) {
+			DataTypes::Point3D<double>(p.x, p.y, p.z))){
 		res.message = "Cannot move to point, path is illegal";
 		return true;
 	}
@@ -179,17 +177,17 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(rexosStdSrvs::Module::
  * 
  * @return true when the moveToRelativePoint was successful, else false
  **/
-bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res) {
+bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res){
 	ROS_INFO("moveToRelativePointNew called");
 	res.succeeded = false;
-	if(getState() != rosMast::normal) {
+	if(getState() != rosMast::normal){
 		res.message = "Cannot move to relative point, mast state=" + std::string(rosMast::state_txt[getState()]);
 		return true;
 	}
 
 	Point p = parsePoint(req.json);
-	
-	try {
+
+	try{
 		DataTypes::Point3D<double>& effectorLocation = deltaRobot->getEffectorLocation();
 		ROS_INFO("Current effector location: x: %f y: %f z: %f", effectorLocation.x, effectorLocation.y, effectorLocation.z);
 		double relativeX = effectorLocation.x + p.x;
@@ -199,12 +197,12 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(rexosStdSrvs::
 
 		if(!deltaRobot->checkPath(
 				DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
-				DataTypes::Point3D<double>(relativeX, relativeY, relativeZ))) {
+				DataTypes::Point3D<double>(relativeX, relativeY, relativeZ))){
 			res.message = "Cannot move to relative point, path is illegal";
 			return true;
 		}
 		deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ), p.maxAcceleration);
-	} catch(std::runtime_error& ex) {
+	} catch(std::runtime_error& ex){
 		std::stringstream ss;
 		ss << "runtime error of type " << typeid(ex).name() << " in delta robot" << std::endl;
 		ss << "what(): " << ex.what() << std::endl;
@@ -224,10 +222,10 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(rexosStdSrvs::
  * 
  * @return true when movePath was successful else false
  **/
-bool deltaRobotNodeNamespace::DeltaRobotNode::movePath(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res) {
+bool deltaRobotNodeNamespace::DeltaRobotNode::movePath(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res){
 	ROS_INFO("movePathNew called");
 	res.succeeded = false;
-	if(getState() != rosMast::normal) {
+	if(getState() != rosMast::normal){
 		res.message = "Cannot move path, mast state=" + std::string(rosMast::state_txt[getState()]);
 		return true;
 	}
@@ -237,23 +235,23 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath(rexosStdSrvs::Module::Req
 	int size = 0;
 	Point * path = parsePointArray(req.json, size);
 
-	try {
-		for(int n = 0; n < (int)(size - 1); n++) {
+	try{
+		for(int n = 0; n < (int)(size - 1); n++){
 			currentPoint = path[n];
 			nextPoint = path[n + 1];
 			if(!deltaRobot->checkPath(
 					DataTypes::Point3D<double>(currentPoint.x, currentPoint.y, currentPoint.z),
-					DataTypes::Point3D<double>(nextPoint.x, nextPoint.y, nextPoint.z))) {
+					DataTypes::Point3D<double>(nextPoint.x, nextPoint.y, nextPoint.z))){
 				res.message = "Cannot move path, path is illegal";
 				return true;
 			}
 		}
-		for(int n = 0; n < (int)size; n++) {
+		for(int n = 0; n < (int)size; n++){
 			currentPoint = path[n];
 			ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", currentPoint.x, currentPoint.y, currentPoint.z, currentPoint.maxAcceleration);
 			deltaRobot->moveTo(DataTypes::Point3D<double>(currentPoint.x, currentPoint.y, currentPoint.z), currentPoint.maxAcceleration);
 		}
-	} catch(std::runtime_error& ex) {
+	} catch(std::runtime_error& ex){
 		std::stringstream ss;
 		ss << "runtime error of type " << typeid(ex).name() << " in delta robot" << std::endl;
 		ss << "what(): " << ex.what() << std::endl;
@@ -273,10 +271,10 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath(rexosStdSrvs::Module::Req
  *
  * @return true if path is allowed else return false.
  **/
-bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res) {
+bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res){
 	ROS_INFO("moveRelativePathNew called");
 	res.succeeded = false;
-	if(getState() != rosMast::normal) {
+	if(getState() != rosMast::normal){
 		res.message = "Cannot move to relative path, mast state=" + std::string(rosMast::state_txt[getState()]);
 		return true;
 	}
@@ -290,16 +288,16 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(rexosStdSrvs::Mod
 	double relativeZ;
 	DataTypes::Point3D<double> effectorLocation;
 
-	try {
+	try{
 		effectorLocation = deltaRobot->getEffectorLocation();
-		for(int n = 0; n < (int)size; n++) {
+		for(int n = 0; n < (int)size; n++){
 			currentPoint = path[n];
 			relativeX = effectorLocation.x + currentPoint.x;
 			relativeY = effectorLocation.y + currentPoint.y;
 			relativeZ = effectorLocation.z + currentPoint.z;
 			if(!deltaRobot->checkPath(
 					DataTypes::Point3D<double>(effectorLocation.x, effectorLocation.y, effectorLocation.z),
-					DataTypes::Point3D<double>(relativeX, relativeY, relativeZ))) {
+					DataTypes::Point3D<double>(relativeX, relativeY, relativeZ))){
 				res.message = "Cannot move to relative path, path is illegal";
 				ROS_INFO("FROM %f, %f, %f TO %f, %f, %f Not allowed", effectorLocation.x, effectorLocation.z, effectorLocation.y, relativeX, relativeY, relativeZ);
 				return true;
@@ -308,7 +306,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(rexosStdSrvs::Mod
 			effectorLocation.y = relativeY;
 			effectorLocation.z = relativeZ;
 		}
-		for(int n = 0; n < (int)size; n++) {
+		for(int n = 0; n < (int)size; n++){
 			currentPoint = path[n];
 			effectorLocation = deltaRobot->getEffectorLocation();
 			relativeX = effectorLocation.x + currentPoint.x;
@@ -317,7 +315,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(rexosStdSrvs::Mod
 			ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", relativeX, relativeY, relativeZ, currentPoint.maxAcceleration);
 			deltaRobot->moveTo(DataTypes::Point3D<double>(relativeX, relativeY, relativeZ), currentPoint.maxAcceleration);
 		}
-	} catch(std::runtime_error& ex) {
+	} catch(std::runtime_error& ex){
 		std::stringstream ss;
 		ss << "runtime error of type " << typeid(ex).name() << " in delta robot" << std::endl;
 		ss << "what(): " << ex.what() << std::endl;
@@ -333,7 +331,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath(rexosStdSrvs::Mod
  * Transition from Safe to Standby state
  * @return 0 if everything went OK else error
  **/
-int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
+int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(){
 	ROS_INFO("Setup transition called");
 	setState(rosMast::setup);
 
@@ -342,10 +340,10 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
 	// Power on the deltarobot and calibrate the motors.
 	deltaRobot->powerOn();
 	// Calibrate the motors
-	if(!deltaRobot->calibrateMotors()) {
+	if(!deltaRobot->calibrateMotors()){
 		ROS_ERROR("Calibration FAILED. EXITING.");
 		return 1;
-	} 
+	}
 	return 0;
 }
 
@@ -354,7 +352,7 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
  * Will turn power off the motor 
  * @return will be 0 if everything went ok else error
  **/
-int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
+int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown(){
 	ROS_INFO("Shutdown transition called");
 	setState(rosMast::shutdown);
 	// Should have information about the workspace, calculate a safe spot and move towards it
@@ -366,7 +364,7 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
  * Transition from Standby to Normal state
  * @return will be 0 if everything went ok else error 
  **/
-int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
+int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart(){
 	ROS_INFO("Start transition called");
 	// Set currentState to start
 	setState(rosMast::start);
@@ -377,7 +375,7 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
  * Transition from Normal to Standby state
  * @return will be 0 if everything went ok else error
  **/
-int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
+int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop(){
 	ROS_INFO("Stop transition called");
 	// Set currentState to stop
 	setState(rosMast::stop);
@@ -392,22 +390,22 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
  *
  * @return Point object that is initialized from the data in the JSON
  **/
-deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoint(std::string json) {
+deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoint(std::string json){
 	ROS_INFO("Parsing JSON");
 	JSONNode n = libjson::parse(json);
- 	JSONNode::const_iterator i = n.begin();
+	JSONNode::const_iterator i = n.begin();
 	Point p;
-	while(i != n.end()) {
- 		// get the JSON node name and value as a string
+	while(i != n.end()){
+		// get the JSON node name and value as a string
 		std::string node_name = i->name();
 
-		if(node_name == "x") {
+		if(node_name == "x"){
 			p.x = i->as_int();
-		} else if(node_name == "y") {
+		} else if(node_name == "y"){
 			p.y = i->as_int();
-		} else if(node_name == "z") {
+		} else if(node_name == "z"){
 			p.z = i->as_int();
-		} else if(node_name == "maxAcceleration") {
+		} else if(node_name == "maxAcceleration"){
 			p.maxAcceleration = i->as_int();
 		}
 
@@ -415,6 +413,7 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
 	}
 	return p;
 }
+
 /**
  * Parse a JSON string to a Point object
  *
@@ -423,36 +422,36 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
  *
  * @return Point object that is initialized from the data in the JSON
  **/
-deltaRobotNodeNamespace::Point* deltaRobotNodeNamespace::DeltaRobotNode::parsePointArray(std::string json, int &size) {
+deltaRobotNodeNamespace::Point* deltaRobotNodeNamespace::DeltaRobotNode::parsePointArray(std::string json, int &size){
 	ROS_INFO("Parsing JSON Array");
 	JSONNode pathArray = libjson::parse(json);
 	Point *path = new Point[pathArray.size()];
 	int counter = 0;
 	
 	JSONNode::const_iterator i = pathArray.begin();
-	while(i != pathArray.end()) {
- 		Point p = parsePoint(i->write());
- 		path[counter++] = p;
- 		++i;
+	while(i != pathArray.end()){
+		Point p = parsePoint(i->write());
+		path[counter++] = p;
+		++i;
 	}
 
 	size = pathArray.size();
 	ROS_INFO("The size of the array %d", size);
-	for(int i = 0; i < (int)size; i++) {
+	for(int i = 0; i < (int)size; i++){
 		ROS_INFO("z value of item %d in array on position %d", (int)path[0].z, size);
 	}
-	ROS_INFO("Done parsing JSON Array");	
+	ROS_INFO("Done parsing JSON Array");
 	return path;
 }
 
-/** 
+/**
  * Main that creates the deltaRobotNode and starts the statemachine
  **/
-int main(int argc, char **argv) {
+int main(int argc, char **argv){
 	int equipletID = 0;
 	int moduleID = 0;
 
-	if(argc < 3 || !(Utilities::stringToInt(equipletID, argv[1]) == 0 && Utilities::stringToInt(moduleID, argv[2]) == 0)) { 	 	
+	if(argc < 3 || !(Utilities::stringToInt(equipletID, argv[1]) == 0 && Utilities::stringToInt(moduleID, argv[2]) == 0)){ 	 	
 		ROS_INFO("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
 		return -1;
 	}

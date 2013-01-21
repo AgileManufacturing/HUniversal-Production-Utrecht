@@ -36,154 +36,152 @@
 #include <cmath>
 
 namespace Motor{
-    namespace CRD514KD{
+	namespace CRD514KD{
+		/**
+		 * @var double MOTOR_STEP_ANGLE
+		 * The angle of a single motor microstep in radians
+		 **/
+		const double MOTOR_STEP_ANGLE = (0.072 / 180.) * M_PI;
 
-        /**
-         * @var double MOTOR_STEP_ANGLE
-         * The angle of a single motor microstep in radians
-         **/
-        const double MOTOR_STEP_ANGLE = (0.072 / 180.) * M_PI;
+		/**
+		 * @var double MOTOR_FULL_STEP_IN_DEGREES
+		 * The angle of a single motor full step in degrees
+		 **/
+		const double MOTOR_FULL_STEP_IN_DEGREES = 1.8;
 
-        /**
-         * @var double MOTOR_FULL_STEP_IN_DEGREES
-         * The angle of a single motor full step in degrees
-         **/
-        const double MOTOR_FULL_STEP_IN_DEGREES = 1.8;
+		/**
+		 * @var double MOTOR_MIN_ACCELERATION
+		 * The minimum acceleration in radians per second per second. This same value counts for the minimum deceleration.
+		 **/
+		const double MOTOR_MIN_ACCELERATION = MOTOR_STEP_ANGLE * 1000;
 
-        /**
-         * @var double MOTOR_MIN_ACCELERATION
-         * The minimum acceleration in radians per second per second. This same value counts for the minimum deceleration.
-         **/
-        const double MOTOR_MIN_ACCELERATION = MOTOR_STEP_ANGLE * 1000;
+		/**
+		 * @var double MOTOR_MAX_ACCELERATION
+		 * The maximum acceleration in radians per second per second. This same value counts for the maximum deceleration.
+		 **/
+		const double MOTOR_MAX_ACCELERATION = MOTOR_STEP_ANGLE * 1000000;
 
-        /**
-         * @var double MOTOR_MAX_ACCELERATION
-         * The maximum acceleration in radians per second per second. This same value counts for the maximum deceleration.
-         **/
-        const double MOTOR_MAX_ACCELERATION = MOTOR_STEP_ANGLE * 1000000;
+		/**
+		 * @var double MOTOR_MIN_SPEED
+		 * The minimum speed in radians per second that the motor can travel at, based on the minimum value in the CRD514KD speed register.
+		 **/		
+		const double MOTOR_MIN_SPEED = MOTOR_STEP_ANGLE * 1;
 
-        /**
-         * @var double MOTOR_MIN_SPEED
-         * The minimum speed in radians per second that the motor can travel at, based on the minimum value in the CRD514KD speed register.
-         **/        
-        const double MOTOR_MIN_SPEED = MOTOR_STEP_ANGLE * 1;
+		/**
+		 * @var double MOTOR_MAX_SPEED
+		 * The maximum speed in radians per second that the motor can travel at, based on the maximum value in the CRD514KD speed register.
+		 **/
+		const double MOTOR_MAX_SPEED = MOTOR_STEP_ANGLE * 500000;
 
-        /**
-         * @var double MOTOR_MAX_SPEED
-         * The maximum speed in radians per second that the motor can travel at, based on the maximum value in the CRD514KD speed register.
-         **/
-        const double MOTOR_MAX_SPEED = MOTOR_STEP_ANGLE * 500000;
+		/**
+		 * @var int MOTION_SLOTS_USED
+		 * The amount of motion slots being used. This value can be anywhere from 1 to 63. However, there is currently no use for it being any more than 2. 
+		 **/
+		const int MOTION_SLOTS_USED = 2;
 
-        /**
-         * @var int MOTION_SLOTS_USED
-         * The amount of motion slots being used. This value can be anywhere from 1 to 63. However, there is currently no use for it being any more than 2. 
-         **/
-        const int MOTION_SLOTS_USED = 2;
+		namespace Slaves{
+			/**
+			 * CRD514KD slave addresses.
+			 **/
+			typedef enum _t{
+				BROADCAST = 0,
+				MOTOR_0 = 1,
+				MOTOR_1 = 2,
+				MOTOR_2 = 3
+			} t;
+		}
 
-        namespace Slaves{
-            /**
-             * CRD514KD slave addresses.
-             **/
-            typedef enum _t{
-                BROADCAST = 0,
-                MOTOR_0 = 1,
-                MOTOR_1 = 2,
-                MOTOR_2 = 3
-            } t;
-        }
+		namespace Registers{
+			/**
+			 * CRD514KD registers.
+			 **/
+			enum _registers{
+				// 32-bit.
+				OP_POS					= 0x402,
+				OP_SPEED				= 0x502,
 
-        namespace Registers{
-            /**
-             * CRD514KD registers.
-             **/
-            enum _registers{
-                // 32-bit.
-                OP_POS                  = 0x402,
-                OP_SPEED                = 0x502,
+				// 16-bit.
+				OP_POSMODE				= 0x601,
+				OP_OPMODE				= 0x701,
+				OP_SEQ_MODE				= 0x801,
 
-                // 16-bit.
-                OP_POSMODE              = 0x601,
-                OP_OPMODE               = 0x701,
-                OP_SEQ_MODE             = 0x801,
+				// 32-bit.
+				OP_ACC					= 0x902,
+				OP_DEC					= 0xA02,
 
-                // 32-bit.
-                OP_ACC                  = 0x902,
-                OP_DEC                  = 0xA02,
+				// 16-bit.
+				OP_DWELL				= 0xC01,
 
-                // 16-bit.
-                OP_DWELL                = 0xC01,
-                
-                // 32-bit.
-                CFG_POSLIMIT_POSITIVE   = 0x254,
-                CFG_POSLIMIT_NEGATIVE   = 0x256,
+				// 32-bit.
+				CFG_POSLIMIT_POSITIVE	= 0x254,
+				CFG_POSLIMIT_NEGATIVE	= 0x256,
 
-                // 16-bit.
-                CFG_STOP_ACTION         = 0x202,
+				// 16-bit.
+				CFG_STOP_ACTION			= 0x202,
 
-                // 32-bit.
-                CFG_START_SPEED         = 0x228,
-                
-                // 16-bit.
-                CLEAR_COUNTER           = 0x04b,
-                RESET_ALARM             = 0x040,
-                
-                CMD_1                   = 0x01E,
-                STATUS_1                = 0x020,
+				// 32-bit.
+				CFG_START_SPEED			= 0x228,
 
-                // 16-bit current alarm code.
-                PRESENT_ALARM           = 0x100,
+				// 16-bit.
+				CLEAR_COUNTER			= 0x04b,
+				RESET_ALARM				= 0x040,
 
-                // 32-bit Preset position value argument.
-                CFG_PRESET_POSITION = 0x214,
+				CMD_1					= 0x01E,
+				STATUS_1				= 0x020,
 
-                // 16-bit Set the preset position to the preset position value argument.
-                OP_PRESET_POSITION = 0x048, 
+				// 16-bit current alarm code.
+				PRESENT_ALARM			= 0x100,
 
-                // 16-bit Sets the software motor limitation (in the motor controller).
-                OP_SOFTWARE_OVERTRAVEL = 0x252 
-            };
-        }
+				// 32-bit Preset position value argument.
+				CFG_PRESET_POSITION		= 0x214,
 
-        namespace CMD1Bits{
-            /**
-             * Bits of value at address CMD_1.
-             **/
-            enum _cmd1_bits{
-                START         = (1 << 8),
-                STOP          = (1 << 11),
-                EXCITEMENT_ON = (1 << 13)
-            };
-        }
+				// 16-bit Set the preset position to the preset position value argument.
+				OP_PRESET_POSITION		= 0x048,
 
-        namespace Status1Bits{
-            /**
-             * Bits of value at address STATUS_1.
-             **/
-            enum _status1_bits{
-                WARNING = (1 << 6),
-                ALARM   = (1 << 7),
-                MOVE    = (1 << 10),
-                READY   = (1 << 13)
-            };
-        }
+				// 16-bit Sets the software motor limitation (in the motor controller).
+				OP_SOFTWARE_OVERTRAVEL	= 0x252
+			};
+		}
 
-        
-        namespace RtuConfig{
-            /**
-             * @var char DEVICE[]
-             * A char array (c string) holding the address of the modbus rtu.
-             **/
-            const char DEVICE[] = "/dev/ttyS0";
-            
-            /** 
-             * Constants used when constructing a modbus rtu (using modbus_new_rtu).
-             **/
-            enum _rtu_config{
-                BAUDRATE = 115200,
-                PARITY   = 'N',
-                DATA_BITS = 8,
-                STOP_BITS = 1
-            };
-        }
-    }
+		namespace CMD1Bits{
+			/**
+			 * Bits of value at address CMD_1.
+			 **/
+			enum _cmd1_bits{
+				START			= (1 << 8),
+				STOP			= (1 << 11),
+				EXCITEMENT_ON	= (1 << 13)
+			};
+		}
+
+		namespace Status1Bits{
+			/**
+			 * Bits of value at address STATUS_1.
+			 **/
+			enum _status1_bits{
+				WARNING	= (1 << 6),
+				ALARM	= (1 << 7),
+				MOVE	= (1 << 10),
+				READY	= (1 << 13)
+			};
+		}
+
+		namespace RtuConfig{
+			/**
+			 * @var char DEVICE[]
+			 * A char array (c string) holding the address of the modbus rtu.
+			 **/
+			const char DEVICE[] = "/dev/ttyS0";
+
+			/**
+			 * Constants used when constructing a modbus rtu (using modbus_new_rtu).
+			 **/
+			enum _rtu_config{
+				BAUDRATE	= 115200,
+				PARITY		= 'N',
+				DATA_BITS	= 8,
+				STOP_BITS	= 1
+			};
+		}
+	}
 }

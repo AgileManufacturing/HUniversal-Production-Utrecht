@@ -206,12 +206,12 @@ namespace Motor{
 		}
 
 		uint32_t motorSteps = (uint32_t)(motorRotation.angle / CRD514KD::MOTOR_STEP_ANGLE);
-		if(useDeviation) {
+		if(useDeviation){
 			motorSteps += (uint32_t)(deviation / CRD514KD::MOTOR_STEP_ANGLE);
 		}
 
 		uint32_t motorSpeed = (uint32_t)(motorRotation.speed / CRD514KD::MOTOR_STEP_ANGLE);
-		
+
 		// Formula to turn rad/s² into µs/kHz
 		// 1000000 is for amount of microseconds in a second
 		// 1000 is for amount of steps/s in a kHz
@@ -249,14 +249,12 @@ namespace Motor{
 	 * Wait till the motor indicates that the end location is reached.
 	 **/
 	void StepperMotor::waitTillReady(void){
-	   uint16_t status_1;
-	   while(!((status_1 = modbus->readU16(motorIndex, CRD514KD::Registers::STATUS_1)) & CRD514KD::Status1Bits::READY)){
+		uint16_t status_1;
+		while(!((status_1 = modbus->readU16(motorIndex, CRD514KD::Registers::STATUS_1)) & CRD514KD::Status1Bits::READY)){
 			if((status_1 & CRD514KD::Status1Bits::ALARM) || (status_1 & CRD514KD::Status1Bits::WARNING)){
 				std::cerr << "Motor: " << motorIndex << " Alarm code: " << std::hex << modbus->readU16(motorIndex, CRD514KD::Registers::PRESENT_ALARM) << "h" << std::endl;
-				
-				throw CRD514KDException(
-					motorIndex, status_1 & CRD514KD::Status1Bits::WARNING,
-					status_1 & CRD514KD::Status1Bits::ALARM);
+
+				throw CRD514KDException(motorIndex, status_1 & CRD514KD::Status1Bits::WARNING, status_1 & CRD514KD::Status1Bits::ALARM);
 			}
 		}
 	}
@@ -306,7 +304,7 @@ namespace Motor{
 	 **/
 	void StepperMotor::setIncrementalMode(int motionSlot){
 		checkMotionSlot(motionSlot);
-	 	modbus->writeU16(motorIndex, Motor::CRD514KD::Registers::OP_POSMODE + motionSlot - 1, 0);
+		modbus->writeU16(motorIndex, Motor::CRD514KD::Registers::OP_POSMODE + motionSlot - 1, 0);
 	}
 
 	/**
@@ -328,5 +326,4 @@ namespace Motor{
 			throw std::out_of_range("Motion slot out of range.");
 		}
 	}
-
 }

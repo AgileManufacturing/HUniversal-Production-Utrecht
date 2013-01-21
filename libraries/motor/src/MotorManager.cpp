@@ -34,7 +34,7 @@
 #include <Motor/MotorException.h>
 
 extern "C"{
-    #include <modbus/modbus.h>
+	#include <modbus/modbus.h>
 }
 
 namespace Motor{
@@ -67,19 +67,19 @@ namespace Motor{
 	 **/
 	void MotorManager::startMovement(int motionSlot){
 		if(!poweredOn){
-            throw MotorException("motor manager is not powered on");
-        }
+			throw MotorException("motor manager is not powered on");
+		}
 
-        // Execute motion.
-        motors[0]->waitTillReady();
-        motors[1]->waitTillReady();
-        motors[2]->waitTillReady();
+		// Execute motion.
+		motors[0]->waitTillReady();
+		motors[1]->waitTillReady();
+		motors[2]->waitTillReady();
 
-        modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
-        modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
+		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
+		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 
-        motors[0]->updateAngle();
-        motors[1]->updateAngle();
-        motors[2]->updateAngle();
+		motors[0]->updateAngle();
+		motors[1]->updateAngle();
+		motors[2]->updateAngle();
 	}
 }

@@ -48,71 +48,71 @@
 #include <blackboardCppClient/BlackboardSubscriber.h>
 #include <rexosStdSrvs/Module.h>
 #include <Utilities/Utilities.h>
- 
+
 #pragma GCC system_header
 #include <Libjson/libjson.h>
 
 /**
  * The equipletNode, will manage all modules and keep track of their states
  **/
-class EquipletNode: BlackboardSubscriber {
-	public:
-		EquipletNode(int id = 1);
-		virtual ~EquipletNode();
-		void blackboardReadCallback(std::string json);
-		bool addHardwareModule(Mast::HardwareModuleProperties module);
-		bool removeHardwareModule(int id);
-		void updateOperationState();
-		void updateSafetyState();
-		bool updateModuleState(int moduleID, rosMast::StateType state);
-		void printHardwareModules();
-		bool stateChanged(rosMast::StateUpdate::Request &request, rosMast::StateUpdate::Response &response);
-		bool moduleError(rosMast::ErrorInModule::Request &request, rosMast::ErrorInModule::Response &response);
-		void sendStateChangeRequest(int moduleID, rosMast::StateType newState);
-		rosMast::StateType getModuleState(int moduleID);
-		void callLookupHandler(std::string lookupType, std::string lookupID, environmentCommunicationMessages::Map payload);
-	private:
-		/**
-		 * @var int equipletId
-		 * The id of the equiplet
-		 **/
-		int equipletId;
-		/**
-		 * @var Mast::state operationState
-		 * The minimal operation state is equal to the lowest state of all modules that are actors
-		 **/
-		rosMast::StateType operationState;
-		/**
-		 * @var Mast::state safetyState
-		 * The safety state of the Equiplet. This is equal to the highest state of the actor modules
-		 **/
-		rosMast::StateType safetyState;
-		/**
-		 * @var std::vector<Mast::HardwareModuleProperties> moduleTable
-		 * The table that holds all information about the modules currently attached to this Equiplet  
-		 **/
-		std::vector<Mast::HardwareModuleProperties> moduleTable;
-		/**
-		 * @var ros::ServiceServer moduleErrorService
-		 * Decides what needs to happen when a error occurs inside a module
-		 **/
-		ros::ServiceServer moduleErrorService; 
-		/**
-		 * @var ros::ServiceServer stateUpdateService;
-		 * Will receive state changed messages from modules
-		 **/
-		ros::ServiceServer stateUpdateService;
-		/**
-		 * @var std::map<int, pair> modulePackageNodeMap
-		 * A map with the moduleType as key and a pair of package name and node name as value.
-		 * This is used to find the name of the node that has to be started when a
-		 * module is added, and the package name where the node can be find. This is a TEMPORARY!!
-		 * solution. Better is to store this in some kind of database.
-		 **/
-		std::map<int, std::pair< std::string, std::string> > modulePackageNodeMap;
-		/**
-		 * @var BlackboardCppClient  *blackboardClient
-		 * Client to read from blackboard
-		 **/
-		BlackboardCppClient  *blackboardClient;
+class EquipletNode: BlackboardSubscriber{
+public:
+	EquipletNode(int id = 1);
+	virtual ~EquipletNode();
+	void blackboardReadCallback(std::string json);
+	bool addHardwareModule(Mast::HardwareModuleProperties module);
+	bool removeHardwareModule(int id);
+	void updateOperationState();
+	void updateSafetyState();
+	bool updateModuleState(int moduleID, rosMast::StateType state);
+	void printHardwareModules();
+	bool stateChanged(rosMast::StateUpdate::Request &request, rosMast::StateUpdate::Response &response);
+	bool moduleError(rosMast::ErrorInModule::Request &request, rosMast::ErrorInModule::Response &response);
+	void sendStateChangeRequest(int moduleID, rosMast::StateType newState);
+	rosMast::StateType getModuleState(int moduleID);
+	void callLookupHandler(std::string lookupType, std::string lookupID, environmentCommunicationMessages::Map payload);
+private:
+	/**
+	 * @var int equipletId
+	 * The id of the equiplet
+	 **/
+	int equipletId;
+	/**
+	 * @var Mast::state operationState
+	 * The minimal operation state is equal to the lowest state of all modules that are actors
+	 **/
+	rosMast::StateType operationState;
+	/**
+	 * @var Mast::state safetyState
+	 * The safety state of the Equiplet. This is equal to the highest state of the actor modules
+	 **/
+	rosMast::StateType safetyState;
+	/**
+	 * @var std::vector<Mast::HardwareModuleProperties> moduleTable
+	 * The table that holds all information about the modules currently attached to this Equiplet
+	 **/
+	std::vector<Mast::HardwareModuleProperties> moduleTable;
+	/**
+	 * @var ros::ServiceServer moduleErrorService
+	 * Decides what needs to happen when a error occurs inside a module
+	 **/
+	ros::ServiceServer moduleErrorService; 
+	/**
+	 * @var ros::ServiceServer stateUpdateService;
+	 * Will receive state changed messages from modules
+	 **/
+	ros::ServiceServer stateUpdateService;
+	/**
+	 * @var std::map<int, pair> modulePackageNodeMap
+	 * A map with the moduleType as key and a pair of package name and node name as value.
+	 * This is used to find the name of the node that has to be started when a
+	 * module is added, and the package name where the node can be find. This is a TEMPORARY!!
+	 * solution. Better is to store this in some kind of database.
+	 **/
+	std::map<int, std::pair< std::string, std::string> > modulePackageNodeMap;
+	/**
+	 * @var BlackboardCppClient  *blackboardClient
+	 * Client to read from blackboard
+	 **/
+	BlackboardCppClient  *blackboardClient;
 };

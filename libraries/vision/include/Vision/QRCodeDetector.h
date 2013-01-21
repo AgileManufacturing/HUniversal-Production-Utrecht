@@ -42,24 +42,23 @@
 #include "DataTypes/Crate.h"
 
 namespace Vision{
-    /**
-     * This class can detect QR-/barcodes from a Mat object
-     **/
-    class QRCodeDetector{
-        private:
-            /**
-             * @var zbar::ImageScanner scanner
-             * The QR-/barcode detector from the zbar library
-             **/
-            zbar::ImageScanner scanner;
-        public:
-            QRCodeDetector();
-        
-            void detectQRCodes(cv::Mat& image, std::vector<DataTypes::Crate>& crates, cv::TermCriteria criteria =
-            cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 15, 0.1));
-            void detectQRCodes(cv::Mat& image, std::vector<std::string>& reconfigureCommands);
-        };
+	/**
+	 * This class can detect QR-/barcodes from a Mat object
+	 **/
+	class QRCodeDetector{
+	private:
+		/**
+		 * @var zbar::ImageScanner scanner
+		 * The QR-/barcode detector from the zbar library
+		 **/
+		zbar::ImageScanner scanner;
+
+	public:
+		QRCodeDetector();
+
+		void detectQRCodes(cv::Mat& image, std::vector<DataTypes::Crate>& crates, cv::TermCriteria criteria =
+				cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 15, 0.1));
+		void detectQRCodes(cv::Mat& image, std::vector<std::string>& reconfigureCommands);
+	};
 }
-
-
 #endif /* QRCodeDetector_h */

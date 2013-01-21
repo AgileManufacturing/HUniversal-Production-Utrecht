@@ -43,13 +43,13 @@ namespace DeltaRobot{
 	 *
 	 * ModbusController can throw this exception whenever a modbus related error occurs.
 	 **/
-    class EffectorBoundariesException : public std::runtime_error{
-    public:
-        /**
-         * Constructor for the exception for effector boundaries.
-         *
-         * @param msg The message when the error is thrown.
-         **/
-        EffectorBoundariesException(const std::string& msg) : std::runtime_error(msg){}
-    };
+	class EffectorBoundariesException : public std::runtime_error{
+	public:
+		/**
+		 * Constructor for the exception for effector boundaries.
+		 *
+		 * @param msg The message when the error is thrown.
+		 **/
+		EffectorBoundariesException(const std::string& msg) : std::runtime_error(msg){}
+	};
 }

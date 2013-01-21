@@ -34,21 +34,21 @@
  * @param equipletID the unique identifier for the equiplet
  * @param moduleID the unique identifier for the module that implements the statemachine
  **/
-rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
+rosMast::StateMachine::StateMachine(int equipletID, int moduleID){
 	this->equipletID = equipletID;
 	this->moduleID = moduleID;
 	currentState = safe;
 
 	// Initialized this way because the other way wont work on older compilers
 	StateTransition transitionTable[TRANSITION_TABLE_SIZE];
-	transitionTable[0] = StateTransition(safe, standby);	
-	transitionTable[1] = StateTransition(standby, safe);	
-	transitionTable[2] = StateTransition(standby, normal);		
-	transitionTable[3] = StateTransition(normal, standby);		
+	transitionTable[0] = StateTransition(safe, standby);
+	transitionTable[1] = StateTransition(standby, safe);
+	transitionTable[2] = StateTransition(standby, normal);
+	transitionTable[3] = StateTransition(normal, standby);
 
 	// Must be in sync with transitionTable!
 	transitionMap[transitionTable[0]] = &StateMachine::transitionSetup;
-	transitionMap[transitionTable[1]] = &StateMachine::transitionShutdown; 
+	transitionMap[transitionTable[1]] = &StateMachine::transitionShutdown;
 	transitionMap[transitionTable[2]] = &StateMachine::transitionStart;
 	transitionMap[transitionTable[3]] = &StateMachine::transitionStop;
 
@@ -70,15 +70,15 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) {
  * @param request Contains the params for the state change
  * @param response Will tell if the state transition was succesfull for the state change
  **/
-bool rosMast::StateMachine::changeState(rosMast::StateChange::Request &request, rosMast::StateChange::Response &response) {	
+bool rosMast::StateMachine::changeState(rosMast::StateChange::Request &request, rosMast::StateChange::Response &response){
 	// decode msg and read variables
 	ROS_INFO("Request Statechange message received");
 	StateType desiredState = StateType(request.desiredState);
 	
-	if(executeTransition(desiredState) == 0) {
+	if(executeTransition(desiredState) == 0){
 		response.executed = true;
-	} else {
-		response.executed = false;	
+	} else{
+		response.executed = false;
 	}
 	return true;
 }
@@ -87,43 +87,40 @@ bool rosMast::StateMachine::changeState(rosMast::StateChange::Request &request, 
  * Will lookup the function pointer for a transition and execute the transition function
  * @param desiredState State you want to transition too
  **/
-int rosMast::StateMachine::executeTransition(rosMast::StateType desiredState) {
+int rosMast::StateMachine::executeTransition(rosMast::StateType desiredState){
 	// save the old state
 	StateType oldState = currentState;
 	// Lookup transition function ptr
 	stateFunctionPtr fptr = lookupTransition(currentState, desiredState);
-	if(fptr != NULL) {
-		if( ( (this->*fptr) () ) == 0 ) {
+	if(fptr != NULL){
+		if(((this->*fptr)()) == 0 ){
 			ROS_INFO("Function pointer executed successfully");
 			setState(desiredState);
 			ROS_INFO("State update successfully");
 			return 0;
-		} 
-		else {
+		} else{
 			ROS_INFO("Error in transitioning to new state");
 			stateFunctionPtr fptr = lookupTransition(desiredState, oldState);
-			if( ( (this->*fptr) () ) == 0 ) {
+			if(((this->*fptr)()) == 0 ){
 				ROS_INFO("Transition back to previous state successful");
 				setState(oldState);
-			}
-			else {
+			} else{
 				ROS_INFO("Error in transition to old state afer failure in transition");
 			}
 		}
-	} else {
+	} else{
 		ROS_INFO("Function pointer NULL, no function found in lookup table");
 	}
 	return -1;
 }
 
-
 /**
- * Lookup function for the function pointer to the transition function	
+ * Lookup function for the function pointer to the transition function
  * @param currentState the currentState of the equiplet
  * @param desiredState the desired state
  * @return The pointer to the transition function, will be NULL when there is no function in lookup table
  **/
-rosMast::StateMachine::stateFunctionPtr rosMast::StateMachine::lookupTransition(StateType currentState, StateType desiredState) {
+rosMast::StateMachine::stateFunctionPtr rosMast::StateMachine::lookupTransition(StateType currentState, StateType desiredState){
 	StateTransition st(currentState, desiredState);
 	return transitionMap[st];
 }
@@ -132,7 +129,7 @@ rosMast::StateMachine::stateFunctionPtr rosMast::StateMachine::lookupTransition(
  * Sets the private variable currentState and will send a message over the stateChanged topic
  * @param newState the new state of the machine
  **/
-void rosMast::StateMachine::setState(StateType newState) {
+void rosMast::StateMachine::setState(StateType newState){
 	ROS_INFO("Setting state to: %d", newState);
 	currentState = newState;
 	rosMast::StateUpdate msg;
@@ -145,11 +142,11 @@ void rosMast::StateMachine::setState(StateType newState) {
  * Send an error message over equiplet_modulerror topic
  * @param errorCode represents an error code that can be looked up in the database
  **/
-void rosMast::StateMachine::sendErrorMessage(int errorCode) {
+void rosMast::StateMachine::sendErrorMessage(int errorCode){
 	rosMast::ErrorInModule msg;
 	msg.request.moduleError.moduleID = this->moduleID;
 	msg.request.moduleError.errorCode = errorCode;
-	if(moduleErrorServer.call(msg)) {
+	if(moduleErrorServer.call(msg)){
 		executeTransition(rosMast::StateType(msg.response.state.newState));
 	}
 }

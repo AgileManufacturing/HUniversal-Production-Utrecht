@@ -44,77 +44,76 @@
 #pragma GCC system_header
 #include <Libjson/libjson.h>
 
-namespace deltaRobotNodeNamespace {
+namespace deltaRobotNodeNamespace{
 	/**
 	 * the DeltaRobotNode which is a StateMachine
 	 **/
-	class DeltaRobotNode : public rosMast::StateMachine {
-		public:
-			DeltaRobotNode(int equipletID, int moduleID);
-			virtual ~DeltaRobotNode();
-			
-			int transitionSetup();
-			int transitionShutdown();
-			int transitionStart();
-			int transitionStop();
-						
-			bool calibrate(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
-			bool moveToPoint(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
-			bool movePath(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
-			bool moveToRelativePoint(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
-			bool moveRelativePath(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+	class DeltaRobotNode : public rosMast::StateMachine{
+	public:
+		DeltaRobotNode(int equipletID, int moduleID);
+		virtual ~DeltaRobotNode();
+		
+		int transitionSetup();
+		int transitionShutdown();
+		int transitionStart();
+		int transitionStop();
+					
+		bool calibrate(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+		bool moveToPoint(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+		bool movePath(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+		bool moveToRelativePoint(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+		bool moveRelativePath(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
 
-			Point parsePoint(std::string json);
-			Point *parsePointArray(std::string json, int & size);
+		Point parsePoint(std::string json);
+		Point *parsePointArray(std::string json, int & size);
 
-		private:
-			/**
-			 * @var DeltaRobot::DeltaRobot * deltaRobot
-			 * the deltaRobot
-			 **/
-			DeltaRobot::DeltaRobot * deltaRobot;
-			/**
-			 * @var Motor::StepperMotor* motors[3]
-			 * the collection of motors
-			 **/
-			Motor::StepperMotor* motors[3];
-			/**
-			 *
-			 * @var ModbusController::ModbusController* modbus
-			 * the modbuscontroller
-			 **/
-			ModbusController::ModbusController* modbus;
-			/**
-			 * @var Motor::MotorManager* motorManager
-			 * The motor manager
-			 **/
-			Motor::MotorManager* motorManager;
-			/**
-			 * @var ros::ServiceServer moveToPointService
-			 * Service for receiving move to point commands
-			 **/
-			ros::ServiceServer moveToPointService;
-			/**
-			 * @var ros::ServiceServer movePathService
-			 * Service for receiving movePath commands
-			 **/
-			ros::ServiceServer movePathService;
-			/**
-			 * @var ros::ServiceServer moveToRelativePointService
-			 * Service for receiving move to relative point commands
-			 **/
-			ros::ServiceServer moveToRelativePointService;
-			/**
-			 * @var ros::ServiceServer moveRelativePathService
-			 * Service for receiving move relative path commands
-			 **/
-			ros::ServiceServer moveRelativePathService;
-			/**
-			 * @var ros::ServiceServer calibrateService
-			 * Service for receiving calibrate commands
-			 **/
-			ros::ServiceServer calibrateService;
+	private:
+		/**
+		 * @var DeltaRobot::DeltaRobot * deltaRobot
+		 * the deltaRobot
+		 **/
+		DeltaRobot::DeltaRobot * deltaRobot;
+		/**
+		 * @var Motor::StepperMotor* motors[3]
+		 * the collection of motors
+		 **/
+		Motor::StepperMotor* motors[3];
+		/**
+		 *
+		 * @var ModbusController::ModbusController* modbus
+		 * the modbuscontroller
+		 **/
+		ModbusController::ModbusController* modbus;
+		/**
+		 * @var Motor::MotorManager* motorManager
+		 * The motor manager
+		 **/
+		Motor::MotorManager* motorManager;
+		/**
+		 * @var ros::ServiceServer moveToPointService
+		 * Service for receiving move to point commands
+		 **/
+		ros::ServiceServer moveToPointService;
+		/**
+		 * @var ros::ServiceServer movePathService
+		 * Service for receiving movePath commands
+		 **/
+		ros::ServiceServer movePathService;
+		/**
+		 * @var ros::ServiceServer moveToRelativePointService
+		 * Service for receiving move to relative point commands
+		 **/
+		ros::ServiceServer moveToRelativePointService;
+		/**
+		 * @var ros::ServiceServer moveRelativePathService
+		 * Service for receiving move relative path commands
+		 **/
+		ros::ServiceServer moveRelativePathService;
+		/**
+		 * @var ros::ServiceServer calibrateService
+		 * Service for receiving calibrate commands
+		 **/
+		ros::ServiceServer calibrateService;
 	};
 }
-
 #endif

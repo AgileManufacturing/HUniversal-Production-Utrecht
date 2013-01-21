@@ -42,90 +42,89 @@
 
 namespace DeltaRobot{
 	class InverseKinematicsModel;
-	
-      /**
-       * A class that symbolizes an entire deltarobot.
-       **/
-      class DeltaRobot{
-      public:
-            DeltaRobot(DataTypes::DeltaRobotMeasures& deltaRobotMeasures, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3], modbus_t* modbusIO);
-            ~DeltaRobot();
+	/**
+	 * A class that symbolizes an entire deltarobot.
+	 **/
+	class DeltaRobot{
+	public:
+		DeltaRobot(DataTypes::DeltaRobotMeasures& deltaRobotMeasures, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3], modbus_t* modbusIO);
+		~DeltaRobot();
 
-            /**
-             * Gets the EffectorBoundaries of the deltarobot.
-             * @return The EffectorBoundaries of the deltarobot.
-             **/
-            inline EffectorBoundaries* getBoundaries(){ return boundaries; }
+		/**
+		 * Gets the EffectorBoundaries of the deltarobot.
+		 * @return The EffectorBoundaries of the deltarobot.
+		 **/
+		inline EffectorBoundaries* getBoundaries(){ return boundaries; }
 
-            /**
-             * Checks whether the EffectorBoundaries have been generated, via the boundariesGenerated boolean.
-             * @return True if the EffectorBoundaries have been generated.
-             **/
-            inline bool hasBoundaries(){ return boundariesGenerated; }
+		/**
+		 * Checks whether the EffectorBoundaries have been generated, via the boundariesGenerated boolean.
+		 * @return True if the EffectorBoundaries have been generated.
+		 **/
+		inline bool hasBoundaries(){ return boundariesGenerated; }
 
-            void generateBoundaries(double voxelSize);
-            bool checkPath(const DataTypes::Point3D<double>& begin, const DataTypes::Point3D<double>& end);
+		void generateBoundaries(double voxelSize);
+		bool checkPath(const DataTypes::Point3D<double>& begin, const DataTypes::Point3D<double>& end);
 
-            void moveTo(const DataTypes::Point3D<double>& point, double maxAcceleration);
-            void calibrateMotor(int motorIndex);
-            bool checkSensor(int sensorIndex);
-            bool calibrateMotors();
-            void powerOff();
-            void powerOn();
-            DataTypes::Point3D<double>& getEffectorLocation();
+		void moveTo(const DataTypes::Point3D<double>& point, double maxAcceleration);
+		void calibrateMotor(int motorIndex);
+		bool checkSensor(int sensorIndex);
+		bool calibrateMotors();
+		void powerOff();
+		void powerOn();
+		DataTypes::Point3D<double>& getEffectorLocation();
 
-      private:
-            /**
-             * @var InverseKinematicsModel* kinematics
-             * A pointer to the kinematics model used by the DeltaRobot.
-             **/
-            InverseKinematicsModel* kinematics;
+	private:
+		/**
+		 * @var InverseKinematicsModel* kinematics
+		 * A pointer to the kinematics model used by the DeltaRobot.
+		 **/
+		InverseKinematicsModel* kinematics;
 
-            /**
-             * @var StepperMotor* motors
-             * An array holding pointers to the three StepperMotors that are connected to the DeltaRobot. This array HAS to be of size 3.
-             **/
-            Motor::StepperMotor* (&motors)[3];
+		/**
+		 * @var StepperMotor* motors
+		 * An array holding pointers to the three StepperMotors that are connected to the DeltaRobot. This array HAS to be of size 3.
+		 **/
+		Motor::StepperMotor* (&motors)[3];
 
-            /**
-             * @var MotorManager* motorManager
-             * A pointer to the MotorManager that handles the movement for the DeltaRobot.
-             **/
-            Motor::MotorManager* motorManager;
+		/**
+		 * @var MotorManager* motorManager
+		 * A pointer to the MotorManager that handles the movement for the DeltaRobot.
+		 **/
+		Motor::MotorManager* motorManager;
 
-            /**
-             * @var EffectorBoundaries* boundaries
-             * A pointer to the EffectorBoundaries of the DeltaRobot.
-             **/
-            EffectorBoundaries* boundaries;
+		/**
+		 * @var EffectorBoundaries* boundaries
+		 * A pointer to the EffectorBoundaries of the DeltaRobot.
+		 **/
+		EffectorBoundaries* boundaries;
 
-            /**
-             * @var Point3D<double> effectorLocation
-             * A 3D point in doubles that points to the location of the effector.
-             **/
-            DataTypes::Point3D<double> effectorLocation;
+		/**
+		 * @var Point3D<double> effectorLocation
+		 * A 3D point in doubles that points to the location of the effector.
+		 **/
+		DataTypes::Point3D<double> effectorLocation;
 
-            /**
-             * @var bool boundariesGenerated
-             * A boolean indicating whether the EffectorBoundaries have been generated or not.
-             **/
-            bool boundariesGenerated;
+		/**
+		 * @var bool boundariesGenerated
+		 * A boolean indicating whether the EffectorBoundaries have been generated or not.
+		 **/
+		bool boundariesGenerated;
 
-            /**
-             * @var modbus_t* modbusIO
-             * A pointer to the TCP modbus connection for the IO controller.
-             **/
-            modbus_t* modbusIO;
+		/**
+		 * @var modbus_t* modbusIO
+		 * A pointer to the TCP modbus connection for the IO controller.
+		 **/
+		modbus_t* modbusIO;
 
-            /**
-             * @var int currentMotionSlot
-             * The motion slot currently in use. The deltarobot switches between these slots when moving.
-             **/
-            int currentMotionSlot;
+		/**
+		 * @var int currentMotionSlot
+		 * The motion slot currently in use. The deltarobot switches between these slots when moving.
+		 **/
+		int currentMotionSlot;
 
-            bool isValidAngle(int motorIndex, double angle);
-            int moveMotorUntilSensorIsOfValue(int motorIndex, DataTypes::MotorRotation motorRotation, bool sensorValue);
-            double getSpeedForRotation(double relativeAngle, double moveTime, double acceleration);
-            double getAccelerationForRotation(double relativeAngle, double moveTime);
-      };
+		bool isValidAngle(int motorIndex, double angle);
+		int moveMotorUntilSensorIsOfValue(int motorIndex, DataTypes::MotorRotation motorRotation, bool sensorValue);
+		double getSpeedForRotation(double relativeAngle, double moveTime, double acceleration);
+		double getAccelerationForRotation(double relativeAngle, double moveTime);
+	};
 }

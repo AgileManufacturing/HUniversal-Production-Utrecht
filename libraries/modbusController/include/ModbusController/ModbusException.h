@@ -30,7 +30,6 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-
 #pragma once
 
 #include <stdexcept>
@@ -41,67 +40,66 @@
 #include <modbus/modbus.h>
 
 namespace ModbusController{
+	/** 
+	 * Exception calss for modbus communication.
+	 **/
+	class ModbusException : public std::runtime_error{
+	private:
+		/**
+		 * @var int errorCode
+		 * The error code is set by libmodbus5.
+		 **/
+		const int errorCode;
 
-    /** 
-     * Exception calss for modbus communication.
-     **/
-    class ModbusException : public std::runtime_error{
-    private:
-        /**
-         * @var int errorCode
-         * The error code is set by libmodbus5.
-         **/
-        const int errorCode;
-        
-        /**
-         * @var std::string message
-         * Modbus error string (obtained using modbus_strerror).
-         */
-        std::string message;
-        
-    public:
-        /**
-         * Constructor of the modbus exception
-         * Retrieves an error string from the modbus library.
-         **/
-        ModbusException(void) : std::runtime_error(""), errorCode(errno){
-            std::stringstream stream;
-            stream << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
-            message = stream.str();
-        }
+		/**
+		 * @var std::string message
+		 * Modbus error string (obtained using modbus_strerror).
+		 */
+		std::string message;
 
-        /**
-         * Constructor of the modbus exception
-         * Adds a user specified message
-         * @see ModbusException
-         **/
-        ModbusException(const std::string msg) : std::runtime_error(""), errorCode(errno){
-            std::stringstream stream;
-            stream << msg << std::endl;
-            stream << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
-            message = stream.str();
-        }
-        
-        /**
-         * Deconstructor
-         * Use for modbus error extends
-         **/
-        virtual ~ModbusException(void) throw(){}
-        
-        /**
-         * what getter
-         * @return const char* The error message
-         **/
-        virtual const char* what(void) const throw(){
+	public:
+		/**
+		 * Constructor of the modbus exception
+		 * Retrieves an error string from the modbus library.
+		 **/
+		ModbusException(void) : std::runtime_error(""), errorCode(errno){
+			std::stringstream stream;
+			stream << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
+			message = stream.str();
+		}
+
+		/**
+		 * Constructor of the modbus exception
+		 * Adds a user specified message
+		 * @see ModbusException
+		 **/
+		ModbusException(const std::string msg) : std::runtime_error(""), errorCode(errno){
+			std::stringstream stream;
+			stream << msg << std::endl;
+			stream << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
+			message = stream.str();
+		}
+
+		/**
+		 * Deconstructor
+		 * Use for modbus error extends
+		 **/
+		virtual ~ModbusException(void) throw(){}
+
+		/**
+		 * what getter
+		 * @return const char* The error message
+		 **/
+		virtual const char* what(void) const throw(){
 			return message.c_str();
 		}
 
-        /**
-         * Error code getter
-         * @return int The modbus error code
-         **/
-        int getErrorCode(void){
-            return errorCode;
-        }
-    };
+		/**
+		 * Error code getter
+		 * @return int The modbus error code
+		 **/
+		int getErrorCode(void){
+			return errorCode;
+		}
+	};
 }

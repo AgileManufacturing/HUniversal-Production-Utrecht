@@ -37,16 +37,16 @@
 #include <vector>
 #include <string>
 
-namespace Vision {
+namespace Vision{
 	/**
 	 * CrateEvent in which a crate changes state and gives new x and y coordinates and angle when possible.
 	 **/
-	class CrateEvent {
+	class CrateEvent{
 	public:
 		/**
 		 * Indicates the type of event received for a crate, namely found, moving, moved and removed.
 		 **/
-		enum crate_event_type {
+		enum crate_event_type{
 			type_in = 1, type_out = 2, type_moving = 3, type_moved = 4
 		};
 		/**
@@ -59,7 +59,7 @@ namespace Vision {
 		 * @param angle The angle of the crate.
 		 **/
 		CrateEvent(crate_event_type type = type_moving, std::string name = "", float x = 0, float y = 0, float angle = 0) :
-				type(type), name(name), x(x), y(y), angle(angle) {
+				type(type), name(name), x(x), y(y), angle(angle){
 		}
 
 		/**
@@ -67,10 +67,10 @@ namespace Vision {
 		 *
 		 * @return String with the information about the event, namely type, name, x and y coordinates and angle.
 		 **/
-		std::string toString( ) {
+		std::string toString(){
 			std::stringstream ss;
 			std::string typeString;
-			switch (type) {
+			switch (type){
 			case type_in:
 				typeString = "In";
 				break;
@@ -85,7 +85,7 @@ namespace Vision {
 				break;
 			}
 			ss << "CrateEvent: \n\ttype: " << typeString << "\n\tName: " << name << "\n\tX: " << x << "\n\tY: " << y
-			        << "\n\tAngle: " << angle;
+					<< "\n\tAngle: " << angle;
 			return ss.str();
 		}
 
@@ -119,12 +119,12 @@ namespace Vision {
 	/**
 	 * Contains the vision algorithems for tracking a crate
 	 **/
-	class CrateTracker {
+	class CrateTracker{
 	public:
 		CrateTracker(int stableFrames, double movementThreshold);
 
 		std::vector<CrateEvent> update(std::vector<DataTypes::Crate> crates);
-		std::vector<DataTypes::Crate> getAllCrates( );
+		std::vector<DataTypes::Crate> getAllCrates();
 		bool getCrate(const std::string& name, DataTypes::Crate& result);
 
 		/**
@@ -140,7 +140,7 @@ namespace Vision {
 	private:
 		bool hasChanged(const DataTypes::Crate& newCrate, const DataTypes::Crate& oldCrate);
 		void removeUntrackedCrates(std::vector<CrateEvent> &events);
-		
+
 		/**
 		 * Map of known crates
 		 **/

@@ -35,14 +35,14 @@
 #include <DataTypes/Point2D.h>
 #include <vector>
 
-namespace Vision {
+namespace Vision{
 	/**
 	 * Object that transforms pixel coordinates to real life coordinates and vice versa using a number of fiducials of which the real life and pixel positions are known.
 	 **/
-	class PixelAndRealCoordinateTransformer {
+	class PixelAndRealCoordinateTransformer{
 		public:
 			PixelAndRealCoordinateTransformer(const std::vector<DataTypes::Point2D>& fiducialsRealCoordinates, const std::vector<DataTypes::Point2D>& fiducialsPixelCoordinates);
-			virtual ~PixelAndRealCoordinateTransformer( );
+			virtual ~PixelAndRealCoordinateTransformer();
 			
 			void setFiducialPixelCoordinates(const std::vector<DataTypes::Point2D>& fiducialsPixelCoordinates);
 			DataTypes::Point2D pixelToRealCoordinate(const DataTypes::Point2D& pixelCoordinate) const;
@@ -53,6 +53,7 @@ namespace Vision {
 			 * Scale to convert from a real coordinate to a pixel coordinate.
 			 **/
 			double realToPixelCoordinateScale;
+
 			/**
 			 * @var double pixelToRealCoordinateScale
 			 * Scale to convert from a pixel coordinate to a real coordinate.
@@ -62,18 +63,21 @@ namespace Vision {
 			/**
 			 * @var double realAlpha
 			 * Angle between two fiducial points real life coordinates. Should be the same two points as pixelAlpha.
-			 **/			
+			 **/
 			double realAlpha;
+
 			/**
 			 * @var double pixelAlpha
 			 * Angle between two fiducial points pixel coordinates. Should be the same two points as realAlpha.
 			 **/
 			double pixelAlpha;
+
 			/**
 			 * @var double realToPixelCoordinateAlpha
 			 * Conversion in angle from real life coordinates to the pixel coordinate.
 			 **/
 			double realToPixelCoordinateAlpha;
+
 			/**
 			 * @var double pixelToRealCoordinateAlpha
 			 * Conversion in angle from pixel coordinates to the real life coordinate.
@@ -84,17 +88,20 @@ namespace Vision {
 			 * @var double realToPixelCoordinateA
 			 * Variable calculated in updateTransformationParameters for use in conversions.
 			 **/
-			double realToPixelCoordinateA; 
+			double realToPixelCoordinateA;
+
 			/**
 			 * @var double realToPixelCoordinateB
 			 * Variable calculated in updateTransformationParameters for use in conversions.
 			 **/
 			double realToPixelCoordinateB;
+
 			/**
 			 * @var double pixelToRealCoordinateA
 			 * Variable calculated in updateTransformationParameters for use in conversions.
 			 **/
 			double pixelToRealCoordinateA;
+
 			/**
 			 * @var double pixelToRealCoordinateB
 			 * Variable calculated in updateTransformationParameters for use in conversions.
@@ -112,14 +119,13 @@ namespace Vision {
 			 * The real coordinates for the fiducial points. Should be in the same order as the fiducialsPixelCoordinates.
 			 **/
 			std::vector<DataTypes::Point2D> fiducialsRealCoordinates;
+
 			/**
 			 * @var std::vector<DataTypes::Point2D> fiducialsPixelCoordinates
 			 * The pixel coordinates for the fiducial points. Should be in the same order as the fiducialsPixelCoordinates.
 			 **/
 			std::vector<DataTypes::Point2D> fiducialsPixelCoordinates;
 
-
-			void updateTransformationParameters( );
+			void updateTransformationParameters();
 	};
-
 }

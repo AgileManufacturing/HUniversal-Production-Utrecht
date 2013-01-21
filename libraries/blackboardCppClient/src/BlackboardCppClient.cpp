@@ -43,13 +43,13 @@
  * @param coll The name of the database collection
  * @param func The address of the callback function
  **/
-BlackboardCppClient::BlackboardCppClient(const std::string &hostname, const std::string db, const std::string coll, BlackboardSubscriber *func): database(db), collection(coll), callback(func) {
-  try {
-    connection.connect(hostname);
-    std::cout << "connected to database" << std::endl;
-  } catch( const mongo::DBException &e ) {
-    std::cout << "caught " << e.what() << std::endl;
-  }
+BlackboardCppClient::BlackboardCppClient(const std::string &hostname, const std::string db, const std::string coll, BlackboardSubscriber *func): database(db), collection(coll), callback(func){
+	try{
+		connection.connect(hostname);
+		std::cout << "connected to database" << std::endl;
+	} catch(const mongo::DBException &e){
+		std::cout << "caught " << e.what() << std::endl;
+	}
 }
 
 /**
@@ -61,19 +61,19 @@ BlackboardCppClient::BlackboardCppClient(const std::string &hostname, const std:
  * @param coll The name of the database collection
  * @param func The address of the callback function
  **/
-BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll,  BlackboardSubscriber *func): database(db), collection(coll), callback(func){
-  try {
-  	connection.connect(mongo::HostAndPort(hostname, port));
-  	std::cout << "connected to database" << std::endl;
-  } catch( const mongo::DBException &e ) {
-    std::cout << "caught " << e.what() << std::endl;
-  }
+BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll, BlackboardSubscriber *func): database(db), collection(coll), callback(func){
+	try{
+		connection.connect(mongo::HostAndPort(hostname, port));
+		std::cout << "connected to database" << std::endl;
+	} catch(const mongo::DBException &e){
+		std::cout << "caught " << e.what() << std::endl;
+	}
 }
 
 /**
- * destructor for the BlackboardCppClient
+ * Destructor for the BlackboardCppClient
  **/
-BlackboardCppClient::~BlackboardCppClient() {
+BlackboardCppClient::~BlackboardCppClient(){
 	readMessageThread->interrupt();
 	delete readMessageThread;
 }
@@ -83,7 +83,7 @@ BlackboardCppClient::~BlackboardCppClient() {
  * 
  * @param db the name of the database to use
  **/
-void BlackboardCppClient::setDatabase(const std::string &db) {
+void BlackboardCppClient::setDatabase(const std::string &db){
 	database = db;
 }
 
@@ -92,45 +92,45 @@ void BlackboardCppClient::setDatabase(const std::string &db) {
  *
  * @param col the name of the collection to use
  **/
-void BlackboardCppClient::setCollection(const std::string &col) {
+void BlackboardCppClient::setCollection(const std::string &col){
 	collection = col;
 }
 
 /**
  * Subscribe to a blackboard topic
  *
- * Subscribe to a blackboard topic. When the first subscription is added, 
- * a thread will be started to handle the messages from the blackboard 
+ * Subscribe to a blackboard topic. When the first subscription is added,
+ * a thread will be started to handle the messages from the blackboard
  *
  * @param topic the name of the topic to subscribe to
  **/
-void BlackboardCppClient::subscribe(const std::string &topic) {
-	if(collection.empty()) {
+void BlackboardCppClient::subscribe(const std::string &topic){
+	if(collection.empty()){
 		std::cerr << "Collection is empty" << std::endl;
 	}
-	if(database.empty()) {
+	if(database.empty()){
 		std::cerr << "Database is empty" << std::endl;
 	}
-	subscriptions.insert( std::pair<std::string, mongo::BSONObj>(topic, BSON("topic" << topic)) );
-	// Start thread to read from blackboard	
-	if(subscriptions.size() == 1) {
-		readMessageThread = new boost::thread(boost::bind(&BlackboardCppClient::run, this) );
-	}	
+	subscriptions.insert(std::pair<std::string, mongo::BSONObj>(topic, BSON("topic" << topic)));
+	// Start thread to read from blackboard
+	if(subscriptions.size() == 1){
+		readMessageThread = new boost::thread(boost::bind(&BlackboardCppClient::run, this));
+	}
 }
 
 /**
  * Unsubscribe from a blackboard topic
  *
- * Unsubscribe from a blackboard topic, 
+ * Unsubscribe from a blackboard topic,
  * when there are no subscriptions to topics anymore, the thread
  * that reads the messages from the blackboard will be interrupted
  *
- * @param topic the name of the topic 
+ * @param topic the name of the topic
  **/
-void BlackboardCppClient::unsubscribe(const std::string &topic) { 
+void BlackboardCppClient::unsubscribe(const std::string &topic){
 	subscriptions.erase(topic);
-	if(subscriptions.size() == 0) {
-		readMessageThread->interrupt();	
+	if(subscriptions.size() == 0){
+		readMessageThread->interrupt();
 	}
 }
 
@@ -139,14 +139,14 @@ void BlackboardCppClient::unsubscribe(const std::string &topic) {
  *
  * @param func The address of the callback function
  **/
-void BlackboardCppClient::setCallback(BlackboardSubscriber *func) {
+void BlackboardCppClient::setCallback(BlackboardSubscriber *func){
 	callback = func;
 }
 
 /**
  * Read oldest message from the blackboard
  **/
-std::string BlackboardCppClient::readOldestMessage() {
+std::string BlackboardCppClient::readOldestMessage(){
 	std::string name = database;
 	name.append(".");
 	name.append(collection);
@@ -156,78 +156,66 @@ std::string BlackboardCppClient::readOldestMessage() {
 
 /**
  * Remove the oldest message from the blackboard
- *
  **/
-void BlackboardCppClient::removeOldestMessage()
-{
+void BlackboardCppClient::removeOldestMessage(){
 	std::string name = database;
 	name.append(".");
 	name.append(collection);
 	mongo::Query nop;
 	mongo::BSONObj message = connection.findOne(name, nop);
-	connection.remove(name,message);
+	connection.remove(name, message);
 }
 
-/** 
+/**
+ * Inserts json string into the database
+ *
  * @param json
- * Inserts json string into the database 
  **/
-void BlackboardCppClient::insertJson(std::string json) 
-{
+void BlackboardCppClient::insertJson(std::string json){
 	std::string name = database;
 	name.append(".");
 	name.append(collection);
-	mongo::BSONObj bobj = mongo::fromjson(json); 
+	mongo::BSONObj bobj = mongo::fromjson(json);
 	connection.insert(name, bobj);
 }
 
 /**
  * Function is executed by all the threads to find out if there 
  **/
-void BlackboardCppClient::run() 
-{
-	// building name of database
+void BlackboardCppClient::run(){
+	// Building name of database
 	std::string name = database;
 	name.append(".");
 	name.append(collection);
 	std::vector<mongo::BSONObj> values;
-	
-	// creating tailable cursor query
+
+	// Creating tailable cursor query
 	mongo::Query where = QUERY("ns" << name);
-	
-	// getting number of documents to skip
+
+	// Getting number of documents to skip
 	mongo::BSONObj ret;
 	mongo::BSONObj bsonQry = BSON("collStats" << "oplog.rs");
-	connection.runCommand( "local", bsonQry, ret);  
-	
-	// creating tailable cursor and skipping documents
+	connection.runCommand( "local", bsonQry, ret);
+
+	// Creating tailable cursor and skipping documents
 	std::auto_ptr<mongo::DBClientCursor> tailedCursor = connection.query("local.oplog.rs", where, 0,
-	ret.getIntField("count"), 0, mongo::QueryOption_CursorTailable | mongo::QueryOption_AwaitData, 
-	0 );
-				
-	while(true)
-	{
-		// reseet the subscription values
-	
-		
+	ret.getIntField("count"), 0, mongo::QueryOption_CursorTailable | mongo::QueryOption_AwaitData, 0);
+
+	while(true){
+		// Reset the subscription values
 		// Continue while the cursor has more
-		while(tailedCursor->more())
-		{
-			// get the operation performed on the database			
+		while(tailedCursor->more()){
+			// Get the operation performed on the database
 			const mongo::BSONObj & object = tailedCursor->next();
 			std::string operation = object["op"].toString();
 			
-			// check if an insert is performed
-			if(operation.compare("i"))
-			{					
-				std::string topic =object.getObjectField("o").getStringField("topic");
-				if(subscriptions.count(topic))
-				{				
+			// Check if an insert is performed
+			if(operation.compare("i")){
+				std::string topic = object.getObjectField("o").getStringField("topic");
+				if(subscriptions.count(topic)){
 					callback->blackboardReadCallback(object.getObjectField("o").toString());
 				}
 			}
-			
-		}	
+		}
 	}
 }
-

@@ -40,7 +40,6 @@
 #include <DataTypes/MotorRotation.h>
 
 namespace DeltaRobot{
-	
 	/**
 	 * Abstract inverse kinematics model class. Based on work from Viacheslav Slavinsky.\n
 	 * conventions sitting in front of delta robot:\n
@@ -87,9 +86,7 @@ namespace DeltaRobot{
 		InverseKinematicsModel(const double base, const double hip,
 				const double effector, const double ankle,
 				const double maxAngleHipAnkle) :
-				base(base), hip(hip), effector(effector), ankle(ankle), maxAngleHipAnkle(
-						maxAngleHipAnkle){
-		}
+				base(base), hip(hip), effector(effector), ankle(ankle), maxAngleHipAnkle(maxAngleHipAnkle){}
 
 	public:
 		virtual ~InverseKinematicsModel(void){}

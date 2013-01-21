@@ -33,31 +33,30 @@
 #include <string>
 
 namespace DeltaRobotNodeServices{
-	
 	/**
 	 * @var const std::string MOVE_TO_POINT
 	 * Name for the service in which a deltarobot moves to a specific coordinate.
 	 **/
 	const std::string MOVE_TO_POINT = "DeltaRobotNode/moveToPoint";
-	
+
 	/**
 	 * @var const std::string MOVE_PATH
 	 * Name for the service in which a deltarobot moves along a path of specific coordinates.
 	 **/
 	const std::string MOVE_PATH = "DeltaRobotNode/movePath";
-	
+
 	/**
 	 * @var const std::string MOVE_TO_RELATIVE_POINT
 	 * Name for the service in which a deltarobot moves to a coordinate relative to the current coordinate.
 	 **/
 	const std::string MOVE_TO_RELATIVE_POINT = "DeltaRobotNode/moveToRelativePoint";
-	
+
 	/**
 	 * @var const std::string MOVE_RELATIVE_PATH
 	 * Name for the service in which a deltarobot moves along a path of coordinates relative to the preceding coordinate.
 	 **/
 	const std::string MOVE_RELATIVE_PATH = "DeltaRobotNode/moveRelativePath";
-	
+
 	/**
 	 * @var const std::string CALIBRATE
 	 * Name for the service in which a deltarobot calibrates itself.

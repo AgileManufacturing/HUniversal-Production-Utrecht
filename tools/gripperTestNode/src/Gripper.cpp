@@ -37,16 +37,16 @@
  * @param warningHandler Handler to warn when the valve is almost opened for too long.
  */
 Gripper::Gripper(void* gripperNodeObject, watchdogWarningHandler warningHandler) :
-		warningHandler(warningHandler), gripperNode(gripperNodeObject), watchdogRunning(true), state(false), previousState(false), warned(false), overheated(false) {
+		warningHandler(warningHandler), gripperNode(gripperNodeObject), watchdogRunning(true), state(false), previousState(false), warned(false), overheated(false){
 
-	//start watchdog thread
+	// Start watchdog thread
 	watchdogThread = new boost::thread(watchdogFunction, this);
 }
 
 /**
  * Destructor to interrupt the watchdogThread
  **/
-Gripper::~Gripper( ) {
+Gripper::~Gripper(){
 	watchdogRunning = false;
 	watchdogThread->interrupt();
 }
@@ -56,25 +56,25 @@ Gripper::~Gripper( ) {
  *
  * @param device The device to be monitored.
  **/
-void Gripper::watchdogFunction(Gripper* device) {
-	try {
-		while (device->watchdogRunning) {
-			//TODO: update watchdog in IO controller? Should be set or the valve will close automagically :)
+void Gripper::watchdogFunction(Gripper* device){
+	try{
+		while(device->watchdogRunning){
+			// TODO: update watchdog in IO controller? Should be set or the valve will close automagically :)
 
 			// Semi correcting the loop time by calculating the run time of the loop.
 			long nextRunTime = Utilities::timeNow() + GRIPPER_TIME_WATCHDOG_INTERVAL;
 
 			// The device has been turned on
-			if (!device->previousState && device->state) {
+			if(!device->previousState && device->state){
 				device->timeEnabled = Utilities::timeNow();
 				device->warned = false;
 
 				// If devices stays on
-			} else if (device->previousState && device->state) {
+			} else if(device->previousState && device->state){
 				long timeEnabled = Utilities::timeNow() - device->timeEnabled;
 
 				// Test for max time, and close valve when reached.
-				if (timeEnabled > GRIPPER_TIME_ENABLED_MAX) {
+				if(timeEnabled > GRIPPER_TIME_ENABLED_MAX){
 					std::cerr << "[GRIPPER WATCHDOG] Valve open time has reached the limit of " << GRIPPER_TIME_ENABLED_MAX << " milliseconds. Gripper will go in cooldown mode now." << std::endl;
 					device->overheated = true;
 					device->timeCooldownStarted = Utilities::timeNow();
@@ -82,14 +82,14 @@ void Gripper::watchdogFunction(Gripper* device) {
 					device->previousState = device->state = false;
 
 					// Test for warning time. Send warning to the warning handler.
-				} else if (!device->warned && timeEnabled > GRIPPER_TIME_ENABLED_WARNING) {
+				} else if(!device->warned && timeEnabled > GRIPPER_TIME_ENABLED_WARNING){
 					std::cerr << "[GRIPPER WATCHDOG] Valve open time has reached the warning limit of " << GRIPPER_TIME_ENABLED_WARNING << " milliseconds." << std::endl;
 					device->warningHandler(device->gripperNode);
 					device->warned = true;
 				}
 
 				// If device was cooling down, check if the time has been passed.
-			} else if (device->overheated && ((Utilities::timeNow() - device->timeCooldownStarted) > GRIPPER_TIME_COOLDOWN)) {
+			} else if(device->overheated && ((Utilities::timeNow() - device->timeCooldownStarted) > GRIPPER_TIME_COOLDOWN)){
 				std::cerr << "[GRIPPER WATCHDOG] Valve cooled down. Returning to normal mode." << std::endl;
 				device->overheated = false;
 			}
@@ -98,7 +98,7 @@ void Gripper::watchdogFunction(Gripper* device) {
 			device->previousState = device->state;
 			Utilities::sleep(nextRunTime - Utilities::timeNow());
 		}
-	} catch (boost::thread_interrupted& ignored) {
+	} catch(boost::thread_interrupted& ignored){
 		// Ignore interrupt and exit thread.
 	}
 }

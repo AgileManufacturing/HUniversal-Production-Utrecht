@@ -37,19 +37,19 @@
 #include <vector>
 
 namespace Utilities{
-    long timeNow(void);
-    void sleep(long milliseconds);
-    double radiansToDegrees(double radians);
-    double degreesToRadians(double degrees);
-    int stringToInt(int &i, char const *s, int base = 0);
-    template<typename M, typename V>
-    void createVectorOfMapValues(const M &m, V &v);
+	long timeNow(void);
+	void sleep(long milliseconds);
+	double radiansToDegrees(double radians);
+	double degreesToRadians(double degrees);
+	int stringToInt(int &i, char const *s, int base = 0);
+	template<typename M, typename V>
+	void createVectorOfMapValues(const M &m, V &v);
 
 
-    /**
-     * Utility class to time stuff.
-     **/
-    class StopWatch{
+	/**
+	 * Utility class to time stuff.
+	 **/
+	class StopWatch{
 	private:
 		/**
 		 * @var const char* name
@@ -95,7 +95,7 @@ namespace Utilities{
 	 	 *
 		 * @param stream Pointer to the stream (file or cout) to print to.
 		 **/
-        void print(FILE* stream){
+		void print(FILE* stream){
 			fprintf(stream, "%s: %ld ms\n", name, timeOfStop - timeOfStart);
 		}
 
@@ -108,18 +108,18 @@ namespace Utilities{
 			stop();
 			print(stream);
 		}
-    };
+	};
 
-    template<typename T>
-    /**
-     * Checks if the vector contains the element.
-     *
-     * @param vector The vector of elements.
-     * @param element The element to check for in the vector.
-     *
-     * @return If the element is found return true, else return false.
-     **/
-    bool vectorContains(const std::vector<T>& vector, const T& element){
-    	return std::find(vector.begin(), vector.end(), element) != vector.end();
-    }
+	template<typename T>
+	/**
+	 * Checks if the vector contains the element.
+	 *
+	 * @param vector The vector of elements.
+	 * @param element The element to check for in the vector.
+	 *
+	 * @return If the element is found return true, else return false.
+	 **/
+	bool vectorContains(const std::vector<T>& vector, const T& element){
+		return std::find(vector.begin(), vector.end(), element) != vector.end();
+	}
 }

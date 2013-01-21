@@ -32,7 +32,6 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-
 #pragma once
 
 #include "ros/ros.h"
@@ -53,12 +52,11 @@
 #include <crateLocatorNode/getAllCrates.h>
 #include <crateLocatorNode/CrateEventMsg.h>
 
-/** 
+/**
  * Locates the crate
  **/
 class CrateLocatorNode{
 public:
-
 	CrateLocatorNode();
 	~CrateLocatorNode();
 

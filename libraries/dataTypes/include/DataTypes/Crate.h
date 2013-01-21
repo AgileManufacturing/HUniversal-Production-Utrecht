@@ -39,11 +39,11 @@
 #include <vector>
 #include <DataTypes/Point2D.h>
 
-namespace DataTypes {
+namespace DataTypes{
 	/**
 	 * A crate, with name, location and status.
 	 **/
-	class Crate {
+	class Crate{
 	public:
 		/**
 		 * @var std::string name
@@ -79,16 +79,16 @@ namespace DataTypes {
 		/**
 		 * Indicates whether the crate is on the current cameraFrame, and if whether it is moving or stable.
 		 **/
-		enum crate_state {
+		enum crate_state{
 			state_stable = 1, state_moving = 2, state_non_existing = 3
 		};
 
-		Crate( );
+		Crate();
 		Crate(const std::vector<cv::Point2f>& points);
 		Crate(std::string name, const std::vector<cv::Point2f>& points);
 		Crate(const Crate& crate);
 
-		virtual ~Crate( );
+		virtual ~Crate();
 
 		/**
 		 * Calculate distance between two fiducial points.
@@ -98,18 +98,18 @@ namespace DataTypes {
 		 * 
 		 * @return The distance between the two points.
 		 */
-		static inline float distance(const cv::Point2f& point1, const cv::Point2f& point2) {
+		static inline float distance(const cv::Point2f& point1, const cv::Point2f& point2){
 			float deltaX = point1.x - point2.x;
 			float deltaY = point1.y - point2.y;
 			return sqrt(deltaX * deltaX + deltaY * deltaY);
 		}
 
-		cv::RotatedRect rect( );
-		std::vector<cv::Point2f> getPoints( ) const;
+		cv::RotatedRect rect();
+		std::vector<cv::Point2f> getPoints() const;
 		void setPoints(std::vector<cv::Point2f>& points);
 		void draw(cv::Mat& image);
 
-		crate_state getState( );
+		crate_state getState();
 
 	private:
 		/**

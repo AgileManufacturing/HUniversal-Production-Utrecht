@@ -5,9 +5,9 @@
  *
  * @author Koen Braham
  *
- * @section LICENSE 
+ * @section LICENSE
  * License: newBSD
- *  
+ * 
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
@@ -31,39 +31,39 @@
 #pragma once
 
 namespace DataTypes{
-    /**
-     * A class that holds all measures for the DeltaRobot.
-     **/
-    class DeltaRobotMeasures{
-    public:
-    	/**
-    	 * @var double base
-    	 * Radius of the base in millimeters.
-    	 **/
-        double base;
+	/**
+	 * A class that holds all measures for the DeltaRobot.
+	 **/
+	class DeltaRobotMeasures{
+	public:
+		/**
+		 * @var double base
+		 * Radius of the base in millimeters.
+		 **/
+		double base;
 
-        /**
-         * @var double hip
-         * Length of the hip in millimeters.
-         **/
-        double hip;
+		/**
+		 * @var double hip
+		 * Length of the hip in millimeters.
+		 **/
+		double hip;
 
-        /**
-         * @var double effector
-         * Radius of the effector in millimeters.
-         **/
-        double effector; 
+		/**
+		 * @var double effector
+		 * Radius of the effector in millimeters.
+		 **/
+		double effector; 
 
-        /**
-         * @var double ankle
-         * Length of the ankle in millimeters.
-         **/
-        double ankle; 
+		/**
+		 * @var double ankle
+		 * Length of the ankle in millimeters.
+		 **/
+		double ankle; 
 
-        /**
-         * @var double maxAngleHipAnkle
-         * Maximum angle between hip and ankle when moving the ankle sideways.
-         **/
-        double maxAngleHipAnkle;
-    };
+		/**
+		 * @var double maxAngleHipAnkle
+		 * Maximum angle between hip and ankle when moving the ankle sideways.
+		 **/
+		double maxAngleHipAnkle;
+	};
 }

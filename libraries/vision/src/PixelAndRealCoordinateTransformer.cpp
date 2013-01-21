@@ -39,28 +39,28 @@
 #include <list>
 #include <iostream>
 
-namespace Vision {
+namespace Vision{
 	/**
 	 * constructor for a PixelAndRealCoordinateTransformer
 	 *
 	 * @param fiducialsRealCoordinates A vector with the real world coordinates of the fiducials in the same order as fiducialsPixelCoordinates.
 	 * @param fiducialsPixelCoordinates A vector with the pixel coordinates of the fiducials in the same order as fiducialsRealCoordinates.
 	 **/
-	PixelAndRealCoordinateTransformer::PixelAndRealCoordinateTransformer(const std::vector<DataTypes::Point2D>& fiducialsRealCoordinates, 
-		const std::vector<DataTypes::Point2D>& fiducialsPixelCoordinates ) : fiducialsRealCoordinates(fiducialsRealCoordinates), fiducialsPixelCoordinates(fiducialsPixelCoordinates) {
+	PixelAndRealCoordinateTransformer::PixelAndRealCoordinateTransformer(const std::vector<DataTypes::Point2D>& fiducialsRealCoordinates,
+		const std::vector<DataTypes::Point2D>& fiducialsPixelCoordinates) : fiducialsRealCoordinates(fiducialsRealCoordinates), fiducialsPixelCoordinates(fiducialsPixelCoordinates){
 		updateTransformationParameters();
 	}
 	/**
 	 * Destructor.
 	 **/
-	PixelAndRealCoordinateTransformer::~PixelAndRealCoordinateTransformer() {
+	PixelAndRealCoordinateTransformer::~PixelAndRealCoordinateTransformer(){
 	}
 	/**
 	 * Function for updating the pixel coordinates of the fiducials.
 	 * 
 	 * @param fiducialsRealCoordinates The new pixel coordinates for the fiducials in a vector.
 	 **/
-	void PixelAndRealCoordinateTransformer::setFiducialPixelCoordinates(const std::vector<DataTypes::Point2D>& fiducialsRealCoordinates) {
+	void PixelAndRealCoordinateTransformer::setFiducialPixelCoordinates(const std::vector<DataTypes::Point2D>& fiducialsRealCoordinates){
 		this->fiducialsPixelCoordinates = fiducialsRealCoordinates;
 		updateTransformationParameters();
 	}
@@ -72,17 +72,17 @@ namespace Vision {
 	 *
 	 * @return The real coordinate.
 	 **/
-	DataTypes::Point2D PixelAndRealCoordinateTransformer::pixelToRealCoordinate(const DataTypes::Point2D & pixelCoordinate) const {
-		int pixelCoordinateY = pixelCoordinate.y * -1;		
+	DataTypes::Point2D PixelAndRealCoordinateTransformer::pixelToRealCoordinate(const DataTypes::Point2D & pixelCoordinate) const{
+		int pixelCoordinateY = pixelCoordinate.y * -1;
 
 		DataTypes::Point2D realCoordinate;
 		
 		realCoordinate.x = pixelToRealCoordinateScale * (cos(pixelToRealCoordinateAlpha) * (pixelCoordinate.x - pixelToRealCoordinateA) + sin(pixelToRealCoordinateAlpha) * (pixelCoordinateY - pixelToRealCoordinateB));
 		realCoordinate.y = pixelToRealCoordinateScale * (-sin(pixelToRealCoordinateAlpha) * (pixelCoordinate.x - pixelToRealCoordinateA) + cos(pixelToRealCoordinateAlpha) * (pixelCoordinateY - pixelToRealCoordinateB));
 		
-		if(mirrored){		
+		if(mirrored){
 			double temporaryX = fiducialsRealCoordinates[0].x - fiducialsRealCoordinates[0].x * cos(2 * realAlpha) + realCoordinate.x * cos(2 * realAlpha) - fiducialsRealCoordinates[0].y * sin(2 * realAlpha) + realCoordinate.y * sin(2 * realAlpha);
-			realCoordinate.y = fiducialsRealCoordinates[0].y + fiducialsRealCoordinates[0].y * cos(2 * realAlpha) - realCoordinate.y * cos(2 * realAlpha) - fiducialsRealCoordinates[0].x * sin(2 * realAlpha) + realCoordinate.x * sin(2 * realAlpha);	
+			realCoordinate.y = fiducialsRealCoordinates[0].y + fiducialsRealCoordinates[0].y * cos(2 * realAlpha) - realCoordinate.y * cos(2 * realAlpha) - fiducialsRealCoordinates[0].x * sin(2 * realAlpha) + realCoordinate.x * sin(2 * realAlpha);
 			realCoordinate.x = temporaryX;
 		}
 		return realCoordinate;
@@ -95,9 +95,9 @@ namespace Vision {
 	 *
 	 * @return The pixel coordinate.
 	 **/
-	DataTypes::Point2D PixelAndRealCoordinateTransformer::realToPixelCoordinate(const DataTypes::Point2D& realCoordinate) const {
+	DataTypes::Point2D PixelAndRealCoordinateTransformer::realToPixelCoordinate(const DataTypes::Point2D& realCoordinate) const{
 		DataTypes::Point2D pixelCoordinate;
-		pixelCoordinate = realCoordinate;	
+		pixelCoordinate = realCoordinate;
 		double temporaryX;
 		
 		if(mirrored){
@@ -115,9 +115,9 @@ namespace Vision {
 	}
 	
 	/**
-	 * 	Updates realToPixelCoordinateScale, pixelToRealCoordinateScale, realAlpha, pixelAlpha, realToPixelCoordinateAlpha, pixelToRealCoordinateAlpha and mirrored.
+	 * Updates realToPixelCoordinateScale, pixelToRealCoordinateScale, realAlpha, pixelAlpha, realToPixelCoordinateAlpha, pixelToRealCoordinateAlpha and mirrored.
 	 **/
-	void PixelAndRealCoordinateTransformer::updateTransformationParameters() {
+	void PixelAndRealCoordinateTransformer::updateTransformationParameters(){
 		if(fiducialsRealCoordinates.size() != fiducialsPixelCoordinates.size())
 			throw std::runtime_error("Number of real fiducial coordinates does not match number of pixel fiducials coordinates");
 		double scale = 0;
@@ -145,7 +145,7 @@ namespace Vision {
 		double realDeltaX = fiducialsRealCoordinates[2].x - realX;
 		double realDeltaY = fiducialsRealCoordinates[2].y - realY;
 		
-		realAlpha = atan2(realDeltaY, realDeltaX);   
+		realAlpha = atan2(realDeltaY, realDeltaX);
 		pixelAlpha = atan2(pixelDeltaY, pixelDeltaX);
 		realToPixelCoordinateAlpha = realAlpha - pixelAlpha;
 		pixelToRealCoordinateAlpha = pixelAlpha - realAlpha;
@@ -156,7 +156,7 @@ namespace Vision {
 		double rsin2 = pow(rsin, 2);
 		double rtan = tan(realToPixelCoordinateAlpha);
 		
-		realToPixelCoordinateA =  realX - (rcos * pixelX - rsin * pixelY) / (realToPixelCoordinateScale * (rcos2 + rsin2));	
+		realToPixelCoordinateA = realX - (rcos * pixelX - rsin * pixelY) / (realToPixelCoordinateScale * (rcos2 + rsin2));
 		realToPixelCoordinateB = realY - pixelY / (realToPixelCoordinateScale * rcos) - rtan * (realX - realToPixelCoordinateA);
 		
 		rcos = cos(pixelToRealCoordinateAlpha);
@@ -165,21 +165,21 @@ namespace Vision {
 		rsin2 = pow(rsin, 2);
 		rtan = tan(pixelToRealCoordinateAlpha);
 		
-		pixelToRealCoordinateA =  pixelX - (rcos * realX - rsin * realY) / (pixelToRealCoordinateScale * (rcos2 + rsin2));	
+		pixelToRealCoordinateA = pixelX - (rcos * realX - rsin * realY) / (pixelToRealCoordinateScale * (rcos2 + rsin2));
 		pixelToRealCoordinateB = pixelY - realY / (pixelToRealCoordinateScale * rcos) - rtan * (pixelX - pixelToRealCoordinateA);
 		
 		mirrored = false;
 		DataTypes::Point2D test = pixelToRealCoordinate(fiducialsPixelCoordinates[1]);
 		
-		//check to see if the 3rd fiducial is within 1 cm of the calculated point, if not so the image is mirrored
-		if(!(test.x > fiducialsRealCoordinates[1].x - 10 && test.x < fiducialsRealCoordinates[1].x + 10)) {
+		// Check to see if the 3rd fiducial is within 1 cm of the calculated point, if not so the image is mirrored
+		if(!(test.x > fiducialsRealCoordinates[1].x - 10 && test.x < fiducialsRealCoordinates[1].x + 10)){
 			mirrored = true;
-		} else {
-			if(!(test.y > fiducialsRealCoordinates[1].y - 10 && test.y < fiducialsRealCoordinates[1].y + 10)) {
+		} else{
+			if(!(test.y > fiducialsRealCoordinates[1].y - 10 && test.y < fiducialsRealCoordinates[1].y + 10)){
 				mirrored = true;
-			} else {
+			} else{
 				mirrored = false;
 			}
-		}	
+		}
 	}
 }

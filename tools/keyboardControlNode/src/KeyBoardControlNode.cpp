@@ -41,50 +41,50 @@
 #define NODE_NAME "KeyBoardControlNode"
 // @endcond
 
-namespace KeyBoardControlNodeNamespace {
+namespace KeyBoardControlNodeNamespace{
 	/**
 	 * @var char KEYCODE_UP
 	 * The ascii representation of the up key on the keyboard.
 	 **/
 	const char KEYCODE_UP = 0x41;
 
-	 /**
+	/**
 	 * @var char KEYCODE_DOWN
 	 * The ascii representation of the down key on the keyboard.
 	 **/
 	const char KEYCODE_DOWN = 0x42;
 
-	 /**
+	/**
 	 * @var char KEYCODE_Q
 	 * The ascii representation of the Q key on the keyboard.
 	 **/
 	const char KEYCODE_Q = 0x71;
 
-	 /**
+	/**
 	 * @var char KEYCODE_W
 	 * The ascii representation of the W key on the keyboard.
 	 **/
 	const char KEYCODE_W = 0x77;
 
-	 /**
+	/**
 	 * @var char KEYCODE_A
 	 * The ascii representation of the A key on the keyboard.
 	 **/
 	const char KEYCODE_A = 0x61;
 
-	 /**
+	/**
 	 * @var char KEYCODE_S
 	 * The ascii representation of the S key on the keyboard.
 	 **/
 	const char KEYCODE_S = 0x73;
 
-	 /**
+	/**
 	 * @var char KEYCODE_D
 	 * The ascii representation of the D key on the keyboard.
 	 **/
 	const char KEYCODE_D = 0x64;
 
-	 /**
+	/**
 	 * @var char KEYCODE_C
 	 * The ascii representation of the C key on the keyboard.
 	 **/
@@ -119,8 +119,8 @@ namespace KeyBoardControlNodeNamespace {
 	 * @param sig The signal received from the Linux OS.
 	 **/
 	void quit(int sig){
-	    tcsetattr(keyboardNumber, TCSANOW, &oldTerminalSettings);
-	 	exit(0);
+		tcsetattr(keyboardNumber, TCSANOW, &oldTerminalSettings);
+		exit(0);
 	}
 }
 
@@ -163,11 +163,11 @@ int main(int argc, char** argv){
 	ROS_INFO("Start controlling the robot by pressing WASD keys and Up and Down keys");
 
 	deltaRobotNode::Motion motion;
-	for(;;) {
+	for(;;){
 		// Get the next event from the keyboard.
 		if(read(keyboardNumber, &inputCharacter, 1) < 0){
-		  perror("read():");
-		  exit(1);
+			perror("read():");
+			exit(1);
 		}
 
 		moveToRelativePointService.request.motion.x = 0;
@@ -193,18 +193,18 @@ int main(int argc, char** argv){
 				deltaRobotClient.call(moveToRelativePointService);
 				break;
 			case KEYCODE_A:
-			  	ROS_INFO("PRESSED A");
+				ROS_INFO("PRESSED A");
 				moveToRelativePointService.request.motion.x = -step;
 				deltaRobotClient.call(moveToRelativePointService);
-			  	break;
+				break;
 			case KEYCODE_S:
 				ROS_INFO("PRESSED S");
 				moveToRelativePointService.request.motion.y = -step;
 				deltaRobotClient.call(moveToRelativePointService);
-			  	break;
+				break;
 			case KEYCODE_D:
-			  	ROS_INFO("PRESSED D");
-			  	moveToRelativePointService.request.motion.x = step;
+				ROS_INFO("PRESSED D");
+				moveToRelativePointService.request.motion.x = step;
 				deltaRobotClient.call(moveToRelativePointService);
 				break;
 			case KEYCODE_C:

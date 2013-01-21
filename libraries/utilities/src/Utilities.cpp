@@ -31,89 +31,89 @@
 #include <Utilities/Utilities.h>
 
 namespace Utilities{
-    /**
-     * Get the current time in milliseconds.
-     *
-     * @return time in milliseconds.
-     **/
-    long timeNow(void){
-        boost::posix_time::ptime time = boost::posix_time::microsec_clock::local_time();
-        boost::posix_time::time_duration duration(time.time_of_day());
-        return duration.total_milliseconds();
-    }
-    
-    /**
-     * Sleep the current thread for a specific time. Then resume the thread.
-     *
-     * @param milliseconds time in milliseconds.
-     **/
-    void sleep(long milliseconds){
-        boost::this_thread::sleep(boost::posix_time::milliseconds(milliseconds));
-    }
+	/**
+	 * Get the current time in milliseconds.
+	 *
+	 * @return time in milliseconds.
+	 **/
+	long timeNow(void){
+		boost::posix_time::ptime time = boost::posix_time::microsec_clock::local_time();
+		boost::posix_time::time_duration duration(time.time_of_day());
+		return duration.total_milliseconds();
+	}
 
-    /**
-     * Converts radians to degrees.
-     *
-     * @param rad Amount of radians.
-     *
-     * @return An Amount of degrees.
-     **/
-    double radiansToDegrees(double radians){
+	/**
+	 * Sleep the current thread for a specific time. Then resume the thread.
+	 *
+	 * @param milliseconds time in milliseconds.
+	 **/
+	void sleep(long milliseconds){
+		boost::this_thread::sleep(boost::posix_time::milliseconds(milliseconds));
+	}
+
+	/**
+	 * Converts radians to degrees.
+	 *
+	 * @param rad Amount of radians.
+	 *
+	 * @return An Amount of degrees.
+	 **/
+	double radiansToDegrees(double radians){
 		return (radians / M_PI) * 180;
 	}
 
-    /**
-     * Converts degrees to radians.
-     *
-     * @param deg Amount of degrees.
-     *
-     * @return An amount of radians.
-     **/
+	/**
+	 * Converts degrees to radians.
+	 *
+	 * @param deg Amount of degrees.
+	 *
+	 * @return An amount of radians.
+	 **/
 	double degreesToRadians(double degrees){
 		return (degrees / 180) * M_PI;
 	}
 
-    /**
-     * Converts a string to integer
-     * @param i Reference to integer to be assigned
-     * @param s String that contains the value
-     * @param base A value between 2 and 36 inclusive, which determines the base of the value in the string. Special value is 0, which takes the value as base 10 unless a prefix of 0x (hexadecimal) or 0 (octal).
-     *
-     * @return error code
-     *  - 0 is normal
-     *  - 1 is overflow
-     *  - 2 is underflow
-     *  - 3 is inconvertible
-     **/
-    int stringToInt(int &i, char const *s, int base) {
-        char *end;
-        long  l;
-        errno = 0;
-        l = strtol(s, &end, base);
-        if ((errno == ERANGE && l == LONG_MAX) || l > INT_MAX) {
-            return 1;
-        }
-        if ((errno == ERANGE && l == LONG_MIN) || l < INT_MIN) {
-            return 2;
-        }
-        if (*s == '\0' || *end != '\0') {
-            return 3;
-        }
-        i = l;
+	/**
+	 * Converts a string to integer
+	 * @param i Reference to integer to be assigned
+	 * @param s String that contains the value
+	 * @param base A value between 2 and 36 inclusive, which determines the base of the value in the string. Special value is 0, which takes the value as base 10 unless a prefix of 0x (hexadecimal) or 0 (octal).
+	 *
+	 * @return error code
+	 *  - 0 is normal
+	 *  - 1 is overflow
+	 *  - 2 is underflow
+	 *  - 3 is inconvertible
+	 **/
+	int stringToInt(int &i, char const *s, int base){
+		char *end;
+		long l;
+		errno = 0;
+		l = strtol(s, &end, base);
+		if ((errno == ERANGE && l == LONG_MAX) || l > INT_MAX){
+			return 1;
+		}
+		if ((errno == ERANGE && l == LONG_MIN) || l < INT_MIN){
+			return 2;
+		}
+		if (*s == '\0' || *end != '\0'){
+			return 3;
+		}
+		i = l;
 
-        return 0;
-    }
+		return 0;
+	}
 
-    /**
-     * Create a vector of all the values in a map
-     *
-     * @param m The map with key type K and value type V
-     * @param v The vector with that contains objects of the same type V as the map values
-     **/
-    template<typename M, typename V>
-    void createVectorOfMapValues(const M &m, V &v) {
-        for(typename M::iterator it = m.begin(); it != m.end(); it++) {
-            v.push_back(it->second);
-        }
-    }
+	/**
+	 * Create a vector of all the values in a map
+	 *
+	 * @param m The map with key type K and value type V
+	 * @param v The vector with that contains objects of the same type V as the map values
+	 **/
+	template<typename M, typename V>
+	void createVectorOfMapValues(const M &m, V &v){
+		for(typename M::iterator it = m.begin(); it != m.end(); it++){
+			v.push_back(it->second);
+		}
+	}
 }

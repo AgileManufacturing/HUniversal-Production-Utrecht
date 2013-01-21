@@ -34,7 +34,7 @@
 /**
  * The constructor of the EnvironmentCache class
  **/
-EnvironmentCache::EnvironmentCache(): cache() {
+EnvironmentCache::EnvironmentCache() : cache(){
 	// Initialise services
 	ros::NodeHandle nh;
 	lookupEnvironmentObjectService = nh.advertiseService("LookupEnvironmentObject", &EnvironmentCache::lookupEnvironmentObject, this);
@@ -50,9 +50,9 @@ EnvironmentCache::EnvironmentCache(): cache() {
  *
  * @return returns true
  **/
-bool EnvironmentCache::lookupEnvironmentObject(environmentCache::LookupEnvironmentObject::Request &req, environmentCache::LookupEnvironmentObject::Response &res) {
+bool EnvironmentCache::lookupEnvironmentObject(environmentCache::LookupEnvironmentObject::Request &req, environmentCache::LookupEnvironmentObject::Response &res){
 	std::string id = req.lookupID;
-	if(cache.count(id)) {
+	if(cache.count(id)){
 		std::map< std::string, std::map<std::string, std::string> >::iterator cacheIterator;
 		cacheIterator = cache.find(id);
 		std::map<std::string, std::string> properties = (*cacheIterator).second;
@@ -74,32 +74,35 @@ bool EnvironmentCache::lookupEnvironmentObject(environmentCache::LookupEnvironme
  *
  * @return true
  **/
-bool EnvironmentCache::updateEnvironmentCache(environmentCache::UpdateEnvironmentCache::Request &req, environmentCache::UpdateEnvironmentCache::Response &res) {
+bool EnvironmentCache::updateEnvironmentCache(environmentCache::UpdateEnvironmentCache::Request &req, environmentCache::UpdateEnvironmentCache::Response &res){
 	int32_t event = req.cacheUpdate.event;
 	std::string id = req.cacheUpdate.id;
 	bool success = false;
 
 	// Check which event has occured and perform correct action
-	switch(event) {
-		case ADD: // Item is added to the cache
-			if(addItemToCache(id, req.cacheUpdate.properties.map)) {
+	switch(event){
+		case ADD:
+			// Item is added to the cache
+			if(addItemToCache(id, req.cacheUpdate.properties.map)){
 				success = true;
 			}
 			break;
-		case UPDATE: // Item is updated in cache
-			if(updateItemInCache(id, req.cacheUpdate.properties.map)) {
+		case UPDATE:
+			// Item is updated in cache
+			if(updateItemInCache(id, req.cacheUpdate.properties.map)){
 				success = true;
 			}
 			break;
-		case REMOVE: // Remove item from cache
-			if(removeItemFromCache(id)) {
+		case REMOVE:
+			// Remove item from cache
+			if(removeItemFromCache(id)){
 				success = true;
 			}
 			break;
 		default:
 			break;
 	}
-	// Print the cache, for debugging properties	
+	// Print the cache, for debugging properties
 	printEnvironmentCache();
 	res.success = success;
 	return true;
@@ -111,9 +114,9 @@ bool EnvironmentCache::updateEnvironmentCache(environmentCache::UpdateEnvironmen
 void EnvironmentCache::printEnvironmentCache(){
 	std::map< std::string, std::map<std::string, std::string> >::iterator cacheIterator;
 	std::map<std::string, std::string>::iterator propertiesIterator;
-	for(cacheIterator = cache.begin(); cacheIterator != cache.end(); cacheIterator++) {
+	for(cacheIterator = cache.begin(); cacheIterator != cache.end(); cacheIterator++){
 		std::cout << (*cacheIterator).first << " :" << std::endl;
-		for(propertiesIterator = (*cacheIterator).second.begin(); propertiesIterator != (*cacheIterator).second.end(); propertiesIterator++) {
+		for(propertiesIterator = (*cacheIterator).second.begin(); propertiesIterator != (*cacheIterator).second.end(); propertiesIterator++){
 			std::cout << "\t" << (*propertiesIterator).first << " : " << (*propertiesIterator).second << std::endl;
 		}
 	}
@@ -127,8 +130,8 @@ void EnvironmentCache::printEnvironmentCache(){
  *
  * @return True if item is added, false if there is already an item in the cache with the same id of the item to add
  **/
-bool EnvironmentCache::addItemToCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties) {
-	if(cache.count(id) == 0) {
+bool EnvironmentCache::addItemToCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties){
+	if(cache.count(id) == 0){
 		std::map<std::string, std::string> options;
 		// Convert the vector with properties to a map
 		createMapFromVector(properties, options);
@@ -148,8 +151,8 @@ bool EnvironmentCache::addItemToCache(std::string id, const std::vector<environm
  *
  * @return True if an item with the id is found in the cache, else false
  **/
-bool EnvironmentCache::updateItemInCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties) {
-	if(cache.count(id) == 1) {
+bool EnvironmentCache::updateItemInCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties){
+	if(cache.count(id) == 1){
 		// Create iterator for the cache
 		std::map< std::string, std::map<std::string, std::string> >::iterator cacheIterator;
 		// Let the iterator point to the Item with the id specified in the update
@@ -162,18 +165,18 @@ bool EnvironmentCache::updateItemInCache(std::string id, const std::vector<envir
 		// Loop through all the properties that are specified in the update
 		std::map<std::string, std::string>::iterator optionsIterator;
 		std::map<std::string, std::string>::iterator propertyIterator;
-		for(optionsIterator = propertiesMap.begin(); optionsIterator != propertiesMap.end(); optionsIterator++) {
+		for(optionsIterator = propertiesMap.begin(); optionsIterator != propertiesMap.end(); optionsIterator++){
 			// If the property is found update it, else add it to the list of properties
-			if((*cacheIterator).second.count((*optionsIterator).first) == 1) {
+			if((*cacheIterator).second.count((*optionsIterator).first) == 1){
 				propertyIterator = (*cacheIterator).second.find((*optionsIterator).first); // Create iterator to the property found
 				(*propertyIterator).second = (*optionsIterator).second; // update its value
 				std::cout << "Property with key " << (*propertyIterator).first << " in item with id " << (*cacheIterator).first << " updated" << std::endl;
-			} else {			
+			} else{
 				(*cacheIterator).second.insert(std::pair<std::string, std::string>((*optionsIterator).first, (*optionsIterator).second ));
 				std::cout << "Property with key " << (*optionsIterator).first << " added to item with id " << id << std::endl;
 			}
 		}
-		return true;	
+		return true;
 	}
 	return false;
 }
@@ -185,9 +188,9 @@ bool EnvironmentCache::updateItemInCache(std::string id, const std::vector<envir
  *
  * @return True if item is deleted, false if no item with the id specified is found
  **/
-bool EnvironmentCache::removeItemFromCache(std::string id) {
-	if(cache.count(id) == 1) {
-		cache.erase(id);	
+bool EnvironmentCache::removeItemFromCache(std::string id){
+	if(cache.count(id) == 1){
+		cache.erase(id);
 		std::cout << "Item with id " << id << " deleted from cache" << std::endl;
 		return true;
 	}
@@ -200,8 +203,8 @@ bool EnvironmentCache::removeItemFromCache(std::string id) {
  * @param propertiesVector The vector with KeyValuePair objects
  * @param propertiesMap The map where the keys and values of the objects in the vector are inserted to
  **/
-void EnvironmentCache::createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap) {
-	for(int i = 0; i < (int)propertiesVector.size(); i++) {
+void EnvironmentCache::createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap){
+	for(int i = 0; i < (int)propertiesVector.size(); i++){
 		propertiesMap.insert(std::pair<std::string, std::string>(propertiesVector[i].key, propertiesVector[i].value));
 	}
 }
@@ -217,7 +220,7 @@ environmentCommunicationMessages::Map EnvironmentCache::createMapMessageFromProp
 	std::map<std::string, std::string>::iterator propertiesIterator;
 	environmentCommunicationMessages::Map mapMsg;
 	environmentCommunicationMessages::KeyValuePair prop;
-	for(propertiesIterator = properties.begin(); propertiesIterator != properties.end(); propertiesIterator++) {
+	for(propertiesIterator = properties.begin(); propertiesIterator != properties.end(); propertiesIterator++){
 		prop.key = (*propertiesIterator).first;
 		prop.value = (*propertiesIterator).second;
 		mapMsg.map.push_back(prop);
@@ -228,9 +231,9 @@ environmentCommunicationMessages::Map EnvironmentCache::createMapMessageFromProp
 /** 
  * Main that creates the environment cache
  **/
-int main(int argc, char **argv) {
+int main(int argc, char **argv){
 	ros::init(argc, argv, "EnvironmentCache");
 	EnvironmentCache envCache;
 	ros::spin();
-	return 0;	
+	return 0;
 }

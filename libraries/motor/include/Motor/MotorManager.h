@@ -34,32 +34,32 @@
 #include <ModbusController/ModbusController.h>
 #include <Motor/StepperMotor.h>
 
-namespace Motor {
+namespace Motor{
 
 	/**
 	 * Motor management for concurrent movement.
 	 **/
-	class MotorManager {
+	class MotorManager{
 	public:
-	    /**
-	     * Constructor for the motor manager
-	     *
-	     * @param modbus Pointer to an established modbus connection.
-	     * @param motors Pointer array containing all motors for this manager.
-	     * @param numberOfMotors Number of motors in the pointer array.
-	     **/
-	    MotorManager(ModbusController::ModbusController* modbus, StepperMotor** motors, int numberOfMotors) : 
-	        modbus(modbus), motors(motors), numberOfMotors(numberOfMotors), poweredOn(false){}
+		/**
+		 * Constructor for the motor manager
+		 *
+		 * @param modbus Pointer to an established modbus connection.
+		 * @param motors Pointer array containing all motors for this manager.
+		 * @param numberOfMotors Number of motors in the pointer array.
+		 **/
+		MotorManager(ModbusController::ModbusController* modbus, StepperMotor** motors, int numberOfMotors) :
+			modbus(modbus), motors(motors), numberOfMotors(numberOfMotors), poweredOn(false){}
 
-	    void powerOn(void);
-	    void powerOff(void);
+		void powerOn(void);
+		void powerOff(void);
 
-	    /**
-	     * Check whether the motormanager has been initiated.
-	     * @return bool PowerOn state.
-	     **/
-	    bool isPoweredOn(void){ return poweredOn; }
-	    void startMovement(int motionSlot);
+		/**
+		 * Check whether the motormanager has been initiated.
+		 * @return bool PowerOn state.
+		 **/
+		bool isPoweredOn(void){ return poweredOn; }
+		void startMovement(int motionSlot);
 
 	private:
 		/**

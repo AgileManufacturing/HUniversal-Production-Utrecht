@@ -37,45 +37,45 @@
 #include <iostream>
 #include <math.h>
 
-namespace Vision {
+namespace Vision{
 	/**
 	 * Constructs the fiducial detector with default properties. The minimum and maximum radius can be changed in the constructor, all other properties can be changed after construction.
 	 * 
 	 * @param minRad The minimum radius in pixels of a circle.
 	 * @param maxRad The maximum radius in pixels of a circle.
 	 **/
-	FiducialDetector::FiducialDetector(int minRad, int maxRad) {
+	FiducialDetector::FiducialDetector(int minRad, int maxRad){
 		this->verbose = false;
-		//Canny high for circle detection
+		// Canny high for circle detection
 		this->circleThreshold = 300;
-		//Blur size for circle detection
+		// Blur size for circle detection
 		this->blur = 3;
-		//Sigma for the blur
+		// Sigma for the blur
 		this->sigma = 2.0;
 		this->minRad = minRad;
 		this->maxRad = maxRad;
-		//distance between the recognized circles in pixels.
+		// Distance between the recognized circles in pixels.
 		this->distance = 70;
-		//quality of the circle needed for it to be detected, higher is more perfect circle.
+		// Quality of the circle needed for it to be detected, higher is more perfect circle.
 		this->circleVotes = 100;
 
-		//center lines detection of fiducial min and max distance
+		// Center lines detection of fiducial min and max distance
 		this->minDist = 1.5f;
 		this->maxDist = 5.0f;
-		//quality of the line
+		// Quality of the line
 		this->lineVotes = 10;
-		//maximum number of lines in the center line detection
+		// Maximum number of lines in the center line detection
 		this->maxLines = 10;
-		//Canny low threshold for line detection
+		// Canny low threshold for line detection
 		this->lowThreshold = 125;
-		//Canny high threshold for line detection
+		// Canny high threshold for line detection
 		this->highThreshold = 300;
 	}
 
 	/**
 	 * Virtual function to destruct the fiducial detector.
 	 **/
-	FiducialDetector::~FiducialDetector( ) {
+	FiducialDetector::~FiducialDetector(){
 	}
 
 	/**
@@ -87,20 +87,20 @@ namespace Vision {
 	 * @param color The color to draw the line with.
 	 * @param thickness The thickness of the line.
 	 **/
-	inline void FiducialDetector::drawPolarLine(cv::Mat& image, float rho, float theta, cv::Scalar color, int thickness) {
-		if (theta < M_PI / 4. || theta > 3. * M_PI / 4.) { // ~vertical line
-		// point of intersection of the line with first row
+	inline void FiducialDetector::drawPolarLine(cv::Mat& image, float rho, float theta, cv::Scalar color, int thickness){
+		if(theta < M_PI / 4. || theta > 3. * M_PI / 4.){ // ~vertical line
+		// Point of intersection of the line with first row
 			cv::Point pt1(rho / cos(theta), 0);
-			// point of intersection of the line with last row
+			// Point of intersection of the line with last row
 			cv::Point pt2((rho - image.rows * sin(theta)) / cos(theta), image.rows);
-			// draw the line
+			// Draw the line
 			cv::line(image, pt1, pt2, color, thickness);
-		} else { // ~horizontal line
-			// point of intersection of the line with first column
+		} else{ // ~horizontal line
+			// Point of intersection of the line with first column
 			cv::Point pt1(0, rho / sin(theta));
-			// point of intersection of the line with last column
+			// Point of intersection of the line with last column
 			cv::Point pt2(image.cols, (rho - image.cols * cos(theta)) / sin(theta));
-			// draw the line
+			// Draw the line
 			cv::line(image, pt1, pt2, color, thickness);
 		}
 	}
@@ -112,7 +112,7 @@ namespace Vision {
 	 *  @param points Output vector that will contain the center points
 	 *  @param debugImage Output image where debug information will be drawn on, set to NULL for no debug information
 	 */
-	void FiducialDetector::detect(cv::Mat& image, std::vector<cv::Point2f>& points, cv::Mat* debugImage) {
+	void FiducialDetector::detect(cv::Mat& image, std::vector<cv::Point2f>& points, cv::Mat* debugImage){
 		// Apply gaussian blur
 		cv::Mat blur;
 
@@ -120,19 +120,19 @@ namespace Vision {
 
 		// Detect circles
 		std::vector<cv::Vec3f> circles;
-		cv::HoughCircles(blur, circles, CV_HOUGH_GRADIENT, 2, // accumulator resolution divisor
-		        distance, // minimum distance between circles
-		        circleThreshold, // Canny high threshold
-		        circleVotes, // minimum number of votes
-		        minRad, maxRad); // min and max radius
+		cv::HoughCircles(blur, circles, CV_HOUGH_GRADIENT, 2, // Accumulator resolution divisor
+				distance, // Minimum distance between circles
+				circleThreshold, // Canny high threshold
+				circleVotes, // Minimum number of votes
+				minRad, maxRad); // Min and max radius
 
 		// Accurately detect the center for every circle with sub-pixel precision
-		for (std::vector<cv::Vec3f>::const_iterator it = circles.begin(); it != circles.end(); it++) {
+		for(std::vector<cv::Vec3f>::const_iterator it = circles.begin(); it != circles.end(); it++){
 			// Draw the detected circles
-			if (debugImage != NULL) {
+			if(debugImage != NULL){
 				cv::circle(*debugImage, cv::Point((*it)[0], (*it)[1]), (*it)[2], cv::Scalar(0, 255, 0), 2);
 				cv::Point center(cvRound((*it)[0]), cvRound((*it)[1]));
-				// circle center
+				// Circle center
 				cv::circle(*debugImage, center, 3, cv::Scalar(0, 255, 255), -1, 8, 0);
 			}
 
@@ -140,8 +140,8 @@ namespace Vision {
 			cv::Point center((*it)[0], (*it)[1]);
 			float rad = (*it)[2];
 			cv::Rect bounds(MAX(center.x - rad, 0), MAX(center.y - rad, 0),
-			        center.x + rad < image.cols ? rad * 2 : (image.cols - center.x) * 2,
-			        center.y + rad < image.rows ? rad * 2 : (image.rows - center.y) * 2);
+					center.x + rad < image.cols ? rad * 2 : (image.cols - center.x) * 2,
+					center.y + rad < image.rows ? rad * 2 : (image.rows - center.y) * 2);
 			cv::Mat roi = image(bounds);
 
 			// Generate inverted circle mask
@@ -152,18 +152,18 @@ namespace Vision {
 			// If lines were found
 			cv::Point2f roiPoint;
 			bool ret = false;
-			if (debugImage != NULL) {
+			if(debugImage != NULL){
 				cv::Mat roiDebug = (*debugImage)(bounds);
 				ret = detectCrosshair(roi, roiPoint, cv::Mat(), &roiDebug);
-			} else {
+			} else{
 				ret = detectCrosshair(roi, roiPoint, cv::Mat());
 			}
 
-			if (ret) {
+			if(ret){
 				cv::Point2f point(bounds.x + roiPoint.x, bounds.y + roiPoint.y);
-				if (bounds.contains(point))
+				if(bounds.contains(point))
 					points.push_back(point);
-				else if (verbose)
+				else if(verbose)
 					std::cout << "Center: " << center << " outside ROI!" << std::endl;
 			}
 
@@ -178,7 +178,7 @@ namespace Vision {
 	 *
 	 * @return True if first vector's rho is smaller than the second vector's rho, false otherwise.
 	 **/
-	bool rhoComp(cv::Vec2f i, cv::Vec2f j) {
+	bool rhoComp(cv::Vec2f i, cv::Vec2f j){
 		return (i[0] < j[0]);
 	}
 
@@ -190,7 +190,7 @@ namespace Vision {
 	 *
 	 * @return The median line location.
 	 **/
-	inline cv::Vec2f medoidRho(std::vector<cv::Vec2f>::iterator first, std::vector<cv::Vec2f>::iterator last) {
+	inline cv::Vec2f medoidRho(std::vector<cv::Vec2f>::iterator first, std::vector<cv::Vec2f>::iterator last){
 		std::vector<cv::Vec2f>::iterator n = first + std::distance(first, last) / 2;
 		nth_element(first, n, last, rhoComp);
 		return *n;
@@ -203,7 +203,7 @@ namespace Vision {
 	 *
 	 * @return True if first vector's theta is smaller than the second vector's theta, false otherwise.
 	 **/
-	bool thetaComp(cv::Vec2f i, cv::Vec2f j) {
+	bool thetaComp(cv::Vec2f i, cv::Vec2f j){
 		return (i[1] < j[1]);
 	}
 
@@ -215,7 +215,7 @@ namespace Vision {
 	 *
 	 * @return The median line location in the iterator.
 	 **/
-	inline cv::Vec2f medoidTheta(std::vector<cv::Vec2f>::iterator first, std::vector<cv::Vec2f>::iterator last) {
+	inline cv::Vec2f medoidTheta(std::vector<cv::Vec2f>::iterator first, std::vector<cv::Vec2f>::iterator last){
 		std::vector<cv::Vec2f>::iterator n = first + std::distance(first, last) / 2;
 		nth_element(first, n, last, thetaComp);
 		return *n;
@@ -231,15 +231,14 @@ namespace Vision {
 	 *
 	 * @return True if center point was detected, false if detection failed.
 	 **/
-	bool FiducialDetector::detectCrosshair(cv::Mat& image, cv::Point2f& center, const cv::Mat& mask,
-	        cv::Mat* debugImage) {
+	bool FiducialDetector::detectCrosshair(cv::Mat& image, cv::Point2f& center, const cv::Mat& mask, cv::Mat* debugImage){
 		cv::Mat filtered;
 		cv::bilateralFilter(image, filtered, 5, 50, 50);
 
 		cv::Mat canny;
 		cv::Canny(filtered, canny, lowThreshold, highThreshold);
 
-		if (!mask.empty()) {
+		if(!mask.empty()){
 			cv::Mat invMask;
 			cv::threshold(mask, invMask, 128, 255, CV_THRESH_BINARY_INV);
 			canny.setTo(cv::Scalar(0), invMask);
@@ -249,16 +248,16 @@ namespace Vision {
 		int votes = lineVotes;
 		std::vector<cv::Vec2f> lines;
 		std::vector<cv::Vec2f> newLines;
-		do {
-			cv::HoughLines(canny, newLines, 1, M_PI / 180.0, // step size
-			votes); // minimum number of votes
-			if (newLines.size() > maxLines) {
+		do{
+			cv::HoughLines(canny, newLines, 1, M_PI / 180.0, // Step size
+			votes); // Minimum number of votes
+			if(newLines.size() > maxLines){
 				lines = newLines;
 				votes++;
 			}
-		} while (newLines.size() > maxLines);
+		} while(newLines.size() > maxLines);
 
-		if (lines.empty())
+		if(lines.empty())
 			return false;
 
 		// Segment perpendicular lines along the mean angle for center detection
@@ -267,20 +266,20 @@ namespace Vision {
 		float refAngle = medoidTheta(lines.begin(), lines.end())[1];
 
 		// Segment the lines
-		for (std::vector<cv::Vec2f>::iterator it = lines.begin(); it != lines.end(); it++) {
+		for(std::vector<cv::Vec2f>::iterator it = lines.begin(); it != lines.end(); it++){
 			float angle = (*it)[1];
 			float dist = abs(refAngle - angle);
-			if (dist < M_PI / 8.0) {
+			if(dist < M_PI / 8.0){
 				lines1.push_back(*it);
 
 				// Draw a blue line
-				if (debugImage != NULL)
+				if(debugImage != NULL)
 					drawPolarLine(*debugImage, (*it)[0], (*it)[1], cv::Scalar(255, 0, 0), 1);
-			} else {
+			} else{
 				lines2.push_back(*it);
 
 				// Draw a green line
-				if (debugImage != NULL)
+				if(debugImage != NULL)
 					drawPolarLine(*debugImage, (*it)[0], (*it)[1], cv::Scalar(0, 255, 0), 1);
 			}
 		}
@@ -292,53 +291,53 @@ namespace Vision {
 		bool found1 = detectCenterLine(center1, lines1, debugImage);
 		bool found2 = detectCenterLine(center2, lines2, debugImage);
 
-		if (verbose && !found1)
+		if(verbose && !found1)
 			std::cout << "Primary center line not found" << std::endl;
-		if (verbose && !found2)
+		if(verbose && !found2)
 			std::cout << "Secondary center line not found" << std::endl;
 
 		// If both have lines on opposing sides we can intersect them and find the center
-		if (found1 && found2) {
+		if(found1 && found2){
 			float rho1 = center1[0];
 			float rho2 = center2[0];
 			float omega1 = center1[1];
 			float omega2 = center2[1];
 
-			if (rho1 != 0 && rho2 != 0) {
+			if(rho1 != 0 && rho2 != 0){
 				float theta = atan(
 				        (cos(omega1) - (rho1 / rho2) * cos(omega2)) / -(sin(omega1) - (rho1 / rho2) * sin(omega2)));
 				float r = rho1 / cos(theta - omega1);
 				center = cv::Point2f(r * cos(theta), r * sin(theta));
-			} else if (rho1 != 0) {
+			} else if(rho1 != 0){
 				// Line 2 is through the origin
 				omega2 -= M_PI / 2.0;
-				if (omega1 < M_PI / 4. || omega1 > 3. * M_PI / 4.) {
+				if(omega1 < M_PI / 4. || omega1 > 3. * M_PI / 4.){
 					float y = rho1 * (sin(omega2) / cos(omega1 - omega2));
 					float x = (rho1 - y * sin(omega1)) / cos(omega1);
 					center = cv::Point2f(x, y);
-				} else { // ~horizontal line
+				} else{ // ~Horizontal line
 					float x = rho1 * (cos(omega2) / cos(omega1 - omega2));
 					float y = (rho1 - x * cos(omega1)) / sin(omega1);
 					center = cv::Point2f(x, y);
 				}
-			} else if (rho2 != 0) {
+			} else if(rho2 != 0){
 				// Line 1 is through the origin
 				omega1 -= M_PI / 2.0;
-				if (omega2 < M_PI / 4. || omega2 > 3. * M_PI / 4.) {
+				if(omega2 < M_PI / 4. || omega2 > 3. * M_PI / 4.){
 					float y = rho2 * (sin(omega1) / cos(omega2 - omega1));
 					float x = (rho2 - y * sin(omega2)) / cos(omega2);
 					center = cv::Point2f(x, y);
-				} else { // ~horizontal line
+				} else{ // ~Horizontal line
 					float x = rho2 * (cos(omega1) / cos(omega2 - omega1));
 					float y = (rho2 - x * cos(omega2)) / sin(omega2);
 					center = cv::Point2f(x, y);
 				}
-			} else {
+			} else{
 				// Both lines are through the origin
 				center = cv::Point2f(0, 0);
 			}
 
-			if (debugImage != NULL)
+			if(debugImage != NULL)
 				cv::circle(*debugImage, center, 1, cv::Scalar(0, 0, 255), 2);
 
 			return true;
@@ -355,9 +354,9 @@ namespace Vision {
 	 *
 	 * @return True if a center line could be detected, false otherwise.
 	 **/
-	bool FiducialDetector::detectCenterLine(cv::Vec2f& centerLine, std::vector<cv::Vec2f> lines, cv::Mat* debugImage) {
-		if (lines.size() < 2) {
-			if (verbose)
+	bool FiducialDetector::detectCenterLine(cv::Vec2f& centerLine, std::vector<cv::Vec2f> lines, cv::Mat* debugImage){
+		if(lines.size() < 2){
+			if(verbose)
 				std::cout << "Not enough lines" << std::endl;
 			return false;
 		}
@@ -368,18 +367,18 @@ namespace Vision {
 		// Ignore all lines too close or too far from the first line
 		std::sort(lines.begin(), lines.end(), rhoComp);
 		cv::Vec2f refLine = medoidTheta(lines.begin(), lines.end());
-		for (std::vector<cv::Vec2f>::iterator it = lines.begin(); it != lines.end(); ++it) {
+		for(std::vector<cv::Vec2f>::iterator it = lines.begin(); it != lines.end(); ++it){
 			float dist = abs(refLine[0] - (*it)[0]);
-			if (dist <= maxDist) {
-				if (dist >= minDist)
+			if(dist <= maxDist){
+				if(dist >= minDist)
 					lines2.push_back(*it);
 				else
 					lines1.push_back(*it);
 			}
 		}
 
-		if (lines1.empty()) {
-			if (verbose)
+		if(lines1.empty()){
+			if(verbose)
 				std::cout << "Primary line not found" << std::endl;
 			return false;
 		}
@@ -387,8 +386,8 @@ namespace Vision {
 		// Select the first medoid line
 		cv::Vec2f line1 = medoidRho(lines1.begin(), lines1.end());
 
-		if (lines2.empty()) {
-			if (verbose)
+		if(lines2.empty()){
+			if(verbose)
 				std::cout << "Secondary line not found" << std::endl;
 			return false;
 		}
@@ -402,7 +401,7 @@ namespace Vision {
 		centerLine = cv::Vec2f(rho, theta);
 
 		// Draw a red line on the debug image
-		if (debugImage != NULL)
+		if(debugImage != NULL)
 			drawPolarLine(*debugImage, rho, theta, cv::Scalar(0, 0, 255), 1);
 
 		return true;
@@ -416,18 +415,18 @@ namespace Vision {
 	 *
 	 * @param points The points to be ordered.
 	 **/
-	void FiducialDetector::order(std::vector<cv::Point2f>& points) {
+	void FiducialDetector::order(std::vector<cv::Point2f>& points){
 		// Find the two diagonal opposite points
 		float distance = 0;
 		cv::Point2f maxLinePoint1;
 		cv::Point2f maxLinePoint2;
 		cv::Point2f extra;
-		// check fiducial 0 against 1 and 2 and fiducial 1 against 2
-		for (int i = 0; i < 2; i++) {
-			for (int j = i + 1; j < 3; j++) {
-				//find the maximum distance
+		// Check fiducial 0 against 1 and 2 and fiducial 1 against 2
+		for(int i = 0; i < 2; i++){
+			for(int j = i + 1; j < 3; j++){
+				// Find the maximum distance
 				float dist = fiducialDistance(points[i], points[j]);
-				if (dist > distance) {
+				if(dist > distance){
 					distance = dist;
 					maxLinePoint1 = points[i];
 					maxLinePoint2 = points[j];
@@ -435,18 +434,18 @@ namespace Vision {
 			}
 		}
 
-		for (int i = 0; i < 3; i++) {
-			if (points[i] != maxLinePoint1 && points[i] != maxLinePoint2) {
+		for(int i = 0; i < 3; i++){
+			if(points[i] != maxLinePoint1 && points[i] != maxLinePoint2){
 				extra = points[i];
 				break;
 			}
 		}
 
-		if (fiducialDistance(maxLinePoint1, extra) > fiducialDistance(maxLinePoint2, extra)) {
+		if(fiducialDistance(maxLinePoint1, extra) > fiducialDistance(maxLinePoint2, extra)){
 			points[0] = maxLinePoint1;
 			points[1] = extra;
 			points[2] = maxLinePoint2;
-		} else {
+		} else{
 			points[0] = maxLinePoint2;
 			points[1] = extra;
 			points[2] = maxLinePoint1;

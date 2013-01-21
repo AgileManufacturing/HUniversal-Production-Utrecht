@@ -33,7 +33,7 @@
 #pragma once
 
 extern "C"{
-    #include <modbus/modbus.h>
+	#include <modbus/modbus.h>
 }
 
 #include <stdint.h>
@@ -45,7 +45,6 @@ extern "C"{
 #include <iostream>
 #include <string>
 
-
 /**
  * @cond HIDE_FROM_DOXYGEN
  * Turn on for modbus logging
@@ -56,97 +55,96 @@ extern "C"{
  **/
 
 namespace ModbusController{
+	/**
+	 * Wrapper class for libmodbus with some extra functionality.
+	 **/
+	class ModbusController{
+	public:
+		ModbusController(modbus_t* context);
+		~ModbusController(void);
 
-    /**
-     * Wrapper class for libmodbus with some extra functionality.
-     **/
-    class ModbusController{
-    public:
-        ModbusController(modbus_t* context);
-        ~ModbusController(void);
+		void writeU16(uint16_t slave, uint16_t address, uint16_t data, bool useShadow = false);
+		void writeU16(uint16_t slave, uint16_t firstAddress, uint16_t* data, unsigned int length);
+		void writeU32(uint16_t slave, uint16_t address, uint32_t data, bool useShadow = false);
+		uint16_t readU16(uint16_t slave, uint16_t address);
+		void readU16(uint16_t slave, uint16_t firstAddress, uint16_t* data, unsigned int length);
+		uint32_t readU32(uint16_t slave, uint16_t address);
 
-        void writeU16(uint16_t slave, uint16_t address, uint16_t data, bool useShadow = false);
-        void writeU16(uint16_t slave, uint16_t firstAddress, uint16_t* data, unsigned int length);
-        void writeU32(uint16_t slave, uint16_t address, uint32_t data, bool useShadow = false);
-        uint16_t readU16(uint16_t slave, uint16_t address);
-        void readU16(uint16_t slave, uint16_t firstAddress, uint16_t* data, unsigned int length);
-        uint32_t readU32(uint16_t slave, uint16_t address);
+		/**
+		 * @var mutex modbusMutex
+		 * A mutex for locking the modbus.
+		 **/
+		boost::mutex modbusMutex;
 
-        /**
-         * @var mutex modbusMutex
-         * A mutex for locking the modbus.
-         **/
-        boost::mutex modbusMutex;
+	private:
+		enum{
+			/**
+			 * modbus timeout error code
+			 **/
+			MODBUS_ERRNO_TIMEOUT = 0x6E,
 
-    private:
-        enum{
-            /**
-             * modbus timeout error code
-             **/
-            MODBUS_ERRNO_TIMEOUT = 0x6E,
+			/**
+			 * The interval between writing on the modbus in unicast mode milliseconds.
+			 **/
+			WRITE_INTERVAL_UNICAST   = 8,
 
-            /**
-             * The interval between writing on the modbus in unicast mode milliseconds.
-             **/
-            WRITE_INTERVAL_UNICAST   = 8,
+			/**
+			 * The interval between writing on the modbus in broadcast mode in milliseconds.
+			 **/
+			WRITE_INTERVAL_BROADCAST = 16,
 
-            /**
-             * The interval between writing on the modbus in broadcast mode in milliseconds.
-             **/
-            WRITE_INTERVAL_BROADCAST = 16,
-            
-            /**
-             * Timeout for bytes in a response. This timeout will occur when a message is delayed while being send.
-             * Value in microseconds.
-             **/
-            TIMEOUT_BYTE    = 150000,
+			/**
+			 * Timeout for bytes in a response. This timeout will occur when a message is delayed while being send.
+			 * Value in microseconds.
+			 **/
+			TIMEOUT_BYTE    = 150000,
 
-            /**
-             * Timeout for responses. This timeout will occur before a message is send.
-             * Value in microseconds.
-             **/
-            TIMEOUT_RESPONE = 150000,
-        };
-        
-        /**
-         * @var modbus_t* context
-         * A pointer to the modbus interface.
-         **/    
-        modbus_t* context;
+			/**
+			 * Timeout for responses. This timeout will occur before a message is send.
+			 * Value in microseconds.
+			 **/
+			TIMEOUT_RESPONE = 150000,
+		};
 
-        /**
-         * @var long nextWriteTime
-         * Next time is used for synchronisation on the modbus interface.
-         * Some devices require a certain wait time before a next request can be processed.
-         **/
-        long nextWriteTime;
+		/**
+		 * @var modbus_t* context
+		 * A pointer to the modbus interface.
+		 **/    
+		modbus_t* context;
 
-        /**
-         * Typedef for a shadowMap registers spread over multiple slaves.
-         * Key is slave address. 64bit for multiple slaves.
-         **/
-        typedef std::map<uint64_t, uint16_t> ShadowMap;
+		/**
+		 * @var long nextWriteTime
+		 * Next time is used for synchronisation on the modbus interface.
+		 * Some devices require a certain wait time before a next request can be processed.
+		 **/
+		long nextWriteTime;
 
-        /**
-         * @var ShadowMap shadowRegisters
-         * Actual shadowmap instance.
-         * @see ShadowMap
-         **/
-        ShadowMap shadowRegisters;
+		/**
+		 * Typedef for a shadowMap registers spread over multiple slaves.
+		 * Key is slave address. 64bit for multiple slaves.
+		 **/
+		typedef std::map<uint64_t, uint16_t> ShadowMap;
 
-        #ifdef MODBUS_LOGGING
-            /**
-             * @var std::ofstream logFile
-             * Logfile used for debugging the modbus communication.
-             **/
-            std::ofstream logFile;
-        #endif
+		/**
+		 * @var ShadowMap shadowRegisters
+		 * Actual shadowmap instance.
+		 * @see ShadowMap
+		 **/
+		ShadowMap shadowRegisters;
 
-        void wait(void);
+		#ifdef MODBUS_LOGGING
+			/**
+			 * @var std::ofstream logFile
+			 * Logfile used for debugging the modbus communication.
+			 **/
+			std::ofstream logFile;
+		#endif
 
-        uint64_t getShadowAddress(uint16_t slave, uint16_t address);
-        bool getShadow(uint16_t slave, uint32_t address, uint16_t& outValue);
-        void setShadow(uint16_t slave, uint32_t address, uint16_t value);
-        void setShadow32(uint16_t slave, uint32_t address, uint32_t value);
-    };
+		void wait(void);
+
+		uint64_t getShadowAddress(uint16_t slave, uint16_t address);
+		bool getShadow(uint16_t slave, uint32_t address, uint16_t& outValue);
+		void setShadow(uint16_t slave, uint32_t address, uint16_t value);
+		void setShadow32(uint16_t slave, uint32_t address, uint32_t value);
+	};
 }

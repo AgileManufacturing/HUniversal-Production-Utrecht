@@ -50,17 +50,17 @@ namespace DeltaRobot{
 		~EffectorBoundaries();
 
 		// TODO: change Motor::StepperMotor to two doubles for max and min angle
-		static EffectorBoundaries* generateEffectorBoundaries(const InverseKinematicsModel& model,  Motor::StepperMotor* (&motors)[3], double voxelSize);
-		
+		static EffectorBoundaries* generateEffectorBoundaries(const InverseKinematicsModel& model, Motor::StepperMotor* (&motors)[3], double voxelSize);
+
 		bool checkPath(const DataTypes::Point3D<double>& from, const DataTypes::Point3D<double>& to) const;
-		
+
 		/**
 		 * Gets the boundariesBitmap. This bitmap is a one dimensional array of booleans, defaulted to false, where voxels are checked and set to true if they are reachable.
 		 *
 		 * @return A const bool pointer to the voxel bitmap. This bitmap is a one dimensional array of booleans, defaulted to false, where voxels are checked and set to true if they are reachable.
 		 **/
 		inline const bool* getBitmap() const{ return boundariesBitmap; }
-		
+
 		/**
 		 * Gets the depth used to make the boundaries bitmap.
 		 *
@@ -74,7 +74,7 @@ namespace DeltaRobot{
 		 * @return The height in voxels.
 		 **/
 		inline int getHeight() const{ return height; }
-		
+
 		/**
 		 * Gets the width used to make the boundaries bitmap.
 		 *
@@ -90,7 +90,7 @@ namespace DeltaRobot{
 		inline double getVoxelSize() const{ return voxelSize; }
 
 	private:
-		EffectorBoundaries(const InverseKinematicsModel& model,  Motor::StepperMotor* (&motors)[3], double voxelSize);
+		EffectorBoundaries(const InverseKinematicsModel& model, Motor::StepperMotor* (&motors)[3], double voxelSize);
 
 		/**
 		 * Represents a 3-dimensional point in the 3D voxel array.

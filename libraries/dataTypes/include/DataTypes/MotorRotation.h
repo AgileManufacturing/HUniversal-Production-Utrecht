@@ -32,48 +32,47 @@
 #pragma once
 
 namespace DataTypes{
-    
-    /**
-     * Data entity for rotation data for the motor.
-     **/
-    class MotorRotation{
-    public:
-        /**
-         * @var double angle
-         * The angle in radians the motor has to travel towards
-         **/
-        double angle;
+	/**
+	 * Data entity for rotation data for the motor.
+	 **/
+	class MotorRotation{
+	public:
+		/**
+		 * @var double angle
+		 * The angle in radians the motor has to travel towards
+		 **/
+		double angle;
 
-        /**
-         * @var double speed
-         * The speed in radians per second.
-         **/
-        double speed;
+		/**
+		 * @var double speed
+		 * The speed in radians per second.
+		 **/
+		double speed;
 
-        /**
-         * @var double acceleration
-         * The acceleration in radians per second per second.\n 
-         * Minimum: 1.256637061 rad\n
-         * Maximum: 1256637.061 rad
-         **/
-        double acceleration;
+		/**
+		 * @var double acceleration
+		 * The acceleration in radians per second per second.\n 
+		 * Minimum: 1.256637061 rad\n
+		 * Maximum: 1256637.061 rad
+		 **/
+		double acceleration;
 
-        /**
-         * @var double deceleration
-         * The deceleration in radians per second per second.\n 
-         * Minimum: 1.256637061 rad\n
-         * Maximum: 1256637.061 rad
-         **/
-        double deceleration;
-        
-        /**
-         * Instantiation of rotation data for the motor.
-         *
-         * @param angle The angle in radians the motor has to travel towards. Defaults to 0.
-         * @param speed The speed in radians per second. Defaults to 1.
-         * @param acceleration The acceleration in radians per second per second. Defaults to 10.
-         * @param deceleration The deceleration in radians per second per second. Defaults to 10.
-         **/
-        MotorRotation(double angle = 0, double speed = 1, double acceleration = 10, double deceleration = 10) : angle(angle), speed(speed), acceleration(acceleration), deceleration(deceleration){}
-    };
+		/**
+		 * @var double deceleration
+		 * The deceleration in radians per second per second.\n 
+		 * Minimum: 1.256637061 rad\n
+		 * Maximum: 1256637.061 rad
+		 **/
+		double deceleration;
+
+		/**
+		 * Instantiation of rotation data for the motor.
+		 *
+		 * @param angle The angle in radians the motor has to travel towards. Defaults to 0.
+		 * @param speed The speed in radians per second. Defaults to 1.
+		 * @param acceleration The acceleration in radians per second per second. Defaults to 10.
+		 * @param deceleration The deceleration in radians per second per second. Defaults to 10.
+		 **/
+		MotorRotation(double angle = 0, double speed = 1, double acceleration = 10, double deceleration = 10) : angle(angle), speed(speed), acceleration(acceleration), deceleration(deceleration){}
+	};
 }
