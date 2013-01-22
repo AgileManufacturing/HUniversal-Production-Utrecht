@@ -30,7 +30,7 @@
 
 #pragma once
 
-namespace DataTypes{
+namespace rexos_datatypes{
 	/**
 	 * A class that holds all measures for the DeltaRobot.
 	 **/

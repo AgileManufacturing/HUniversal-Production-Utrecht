@@ -30,14 +30,14 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include "Vision/FiducialDetector.h"
+#include "rexos_vision/FiducialDetector.h"
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
 #include <iostream>
 #include <math.h>
 
-namespace Vision{
+namespace rexos_vision{
 	/**
 	 * Constructs the fiducial detector with default properties. The minimum and maximum radius can be changed in the constructor, all other properties can be changed after construction.
 	 * 

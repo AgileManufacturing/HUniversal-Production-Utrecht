@@ -32,7 +32,7 @@
 #include <cmath>
 #include <vector>
 
-namespace DataTypes{
+namespace rexos_datatypes{
 	/**
 	 * Class that represents a 2 dimensional point. Has utilities to transform the point.
 	 **/

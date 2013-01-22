@@ -31,11 +31,11 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include "DataTypes/Crate.h"
+#include "rexos_datatypes/Crate.h"
 #include <vector>
 #include <opencv2/imgproc/imgproc.hpp>
 
-namespace DataTypes{
+namespace rexos_datatypes{
 	/**
 	 * Constructs a crate without specific location.
 	 **/

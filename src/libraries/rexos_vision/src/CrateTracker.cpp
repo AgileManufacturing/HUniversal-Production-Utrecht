@@ -31,11 +31,11 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <Vision/CrateTracker.h>
-#include <DataTypes/Crate.h>
+#include <rexos_vision/CrateTracker.h>
+#include <rexos_datatypes/Crate.h>
 #include <map>
 
-namespace Vision{
+namespace rexos_vision{
 	/**
 	 * Constructor
 	 *
@@ -53,18 +53,18 @@ namespace Vision{
 	 *
 	 * @return Vector list of CrateEvent messages.
 	 **/
-	std::vector<CrateEvent> CrateTracker::update(std::vector<DataTypes::Crate> updatedCrates){
+	std::vector<CrateEvent> CrateTracker::update(std::vector<rexos_datatypes::Crate> updatedCrates){
 		std::vector<CrateEvent> events;
 
 		// Disable all crates (mark for removal).
-		for(std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it){
+		for(std::map<std::string, rexos_datatypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it){
 			it->second.exists = false;
 		}
 
-		for(std::vector<DataTypes::Crate>::iterator it = updatedCrates.begin(); it != updatedCrates.end(); ++it){
+		for(std::vector<rexos_datatypes::Crate>::iterator it = updatedCrates.begin(); it != updatedCrates.end(); ++it){
 			if(knownCrates.find(it->name) == knownCrates.end()){
 				// Crate does not exists in knownCrates yet, add the crate
-				DataTypes::Crate newCrate = DataTypes::Crate(*it);
+				rexos_datatypes::Crate newCrate = rexos_datatypes::Crate(*it);
 				newCrate.exists = true;
 				newCrate.oldSituation = false;
 				newCrate.newSituation = true;
@@ -72,10 +72,10 @@ namespace Vision{
 				newCrate.stable = true;
 				newCrate.framesLeft = stableFrames;
 
-				knownCrates.insert(std::pair<std::string, DataTypes::Crate>(it->name, newCrate));
+				knownCrates.insert(std::pair<std::string, rexos_datatypes::Crate>(it->name, newCrate));
 			} else{
 				// Crate already exists, update location
-				DataTypes::Crate& crate = knownCrates.find(it->name)->second;
+				rexos_datatypes::Crate& crate = knownCrates.find(it->name)->second;
 				crate.exists = true;
 
 				// Check for movement
@@ -133,9 +133,9 @@ namespace Vision{
 	void CrateTracker::removeUntrackedCrates(std::vector<CrateEvent> &events){
 		// Remove all crate that were not found in the update loop. These have been marked as non existing.
 		std::vector<std::string> cratesToBeRemoved;
-		for(std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it){
+		for(std::map<std::string, rexos_datatypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it){
 			if(!it->second.exists){
-				DataTypes::Crate& crate = it->second;
+				rexos_datatypes::Crate& crate = it->second;
 				if(crate.stable){
 					events.push_back(CrateEvent(CrateEvent::type_moving, crate.name));
 					// Reset timer
@@ -172,9 +172,9 @@ namespace Vision{
 	 *
 	 * @return True if crates exists, false otherwise.
 	 **/
-	bool CrateTracker::getCrate(const std::string& name, DataTypes::Crate& result){
-		std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.find(name);
-		if(it != knownCrates.end() && it->second.getState() != DataTypes::Crate::state_non_existing){
+	bool CrateTracker::getCrate(const std::string& name, rexos_datatypes::Crate& result){
+		std::map<std::string, rexos_datatypes::Crate>::iterator it = knownCrates.find(name);
+		if(it != knownCrates.end() && it->second.getState() != rexos_datatypes::Crate::state_non_existing){
 			result = it->second;
 			return true;
 		} else{
@@ -187,10 +187,10 @@ namespace Vision{
 	 *
 	 * @return Vector with crates with their last stable state.
 	 **/
-	std::vector<DataTypes::Crate> CrateTracker::getAllCrates( ){
-		std::vector<DataTypes::Crate> allCrates;
-		for(std::map<std::string, DataTypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it){
-			if(it->second.getState() != DataTypes::Crate::state_non_existing){
+	std::vector<rexos_datatypes::Crate> CrateTracker::getAllCrates( ){
+		std::vector<rexos_datatypes::Crate> allCrates;
+		for(std::map<std::string, rexos_datatypes::Crate>::iterator it = knownCrates.begin(); it != knownCrates.end(); ++it){
+			if(it->second.getState() != rexos_datatypes::Crate::state_non_existing){
 				allCrates.push_back(it->second);
 			}
 		}
@@ -205,7 +205,7 @@ namespace Vision{
 	 *
 	 * @return True if the crate has moved or rotated, false otherwise.
 	 **/
-	bool CrateTracker::hasChanged(const DataTypes::Crate& newCrate, const DataTypes::Crate& oldCrate){
+	bool CrateTracker::hasChanged(const rexos_datatypes::Crate& newCrate, const rexos_datatypes::Crate& oldCrate){
 		const std::vector<cv::Point2f>& oldPoints = oldCrate.getPoints();
 		const std::vector<cv::Point2f>& newPoints = newCrate.getPoints();
 		for(int point = 0; point < 3; point++){

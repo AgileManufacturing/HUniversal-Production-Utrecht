@@ -1,19 +1,17 @@
 /**
- * @file QRCodeDetector.h
- * @brief Detects QR codes and extract their values. If the QR code belongs to a crate, also give positionary data.
- * @date Created: 2012-10-02
+ * @file MotorRotation.h
+ * @brief Template class for rotation data for the motor.
+ * @date Created: 2012-10-03
  *
- * @author Glenn Meerstra
- * @author Zep Mouris
  * @author Koen Braham
- * @author Daan Veltman
+ * @author Dennis Koole
  *
  * @section LICENSE
  * License: newBSD
- * 
+ *  
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
  * - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
  * - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
@@ -31,34 +29,50 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef QRCodeDetector_h
-#define QRCodeDetector_h
+#pragma once
 
-#include <stdlib.h>
-#include <zbar.h>
-#include <iostream>
-#include <vector>
-#include <opencv2/core/core.hpp>
-#include "DataTypes/Crate.h"
-
-namespace Vision{
+namespace rexos_datatypes{
 	/**
-	 * This class can detect QR-/barcodes from a Mat object
+	 * Data entity for rotation data for the motor.
 	 **/
-	class QRCodeDetector{
-	private:
-		/**
-		 * @var zbar::ImageScanner scanner
-		 * The QR-/barcode detector from the zbar library
-		 **/
-		zbar::ImageScanner scanner;
-
+	class MotorRotation{
 	public:
-		QRCodeDetector();
+		/**
+		 * @var double angle
+		 * The angle in radians the motor has to travel towards
+		 **/
+		double angle;
 
-		void detectQRCodes(cv::Mat& image, std::vector<DataTypes::Crate>& crates, cv::TermCriteria criteria =
-				cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 15, 0.1));
-		void detectQRCodes(cv::Mat& image, std::vector<std::string>& reconfigureCommands);
+		/**
+		 * @var double speed
+		 * The speed in radians per second.
+		 **/
+		double speed;
+
+		/**
+		 * @var double acceleration
+		 * The acceleration in radians per second per second.\n 
+		 * Minimum: 1.256637061 rad\n
+		 * Maximum: 1256637.061 rad
+		 **/
+		double acceleration;
+
+		/**
+		 * @var double deceleration
+		 * The deceleration in radians per second per second.\n 
+		 * Minimum: 1.256637061 rad\n
+		 * Maximum: 1256637.061 rad
+		 **/
+		double deceleration;
+
+		/**
+		 * Instantiation of rotation data for the motor.
+		 *
+		 * @param angle The angle in radians the motor has to travel towards. Defaults to 0.
+		 * @param speed The speed in radians per second. Defaults to 1.
+		 * @param acceleration The acceleration in radians per second per second. Defaults to 10.
+		 * @param deceleration The deceleration in radians per second per second. Defaults to 10.
+		 **/
+		MotorRotation(double angle = 0, double speed = 1, double acceleration = 10, double deceleration = 10) : angle(angle), speed(speed), acceleration(acceleration), deceleration(deceleration){}
 	};
 }
-#endif /* QRCodeDetector_h */

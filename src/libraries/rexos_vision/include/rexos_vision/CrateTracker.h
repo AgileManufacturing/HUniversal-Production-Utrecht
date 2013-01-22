@@ -32,12 +32,12 @@
  **/
 
 #pragma once
-#include <DataTypes/Crate.h>
+#include <rexos_datatypes/Crate.h>
 #include <map>
 #include <vector>
 #include <string>
 
-namespace Vision{
+namespace rexos_vision{
 	/**
 	 * CrateEvent in which a crate changes state and gives new x and y coordinates and angle when possible.
 	 **/
@@ -117,15 +117,15 @@ namespace Vision{
 	};
 
 	/**
-	 * Contains the vision algorithems for tracking a crate
+	 * Contains the rexos_vision algorithems for tracking a crate
 	 **/
 	class CrateTracker{
 	public:
 		CrateTracker(int stableFrames, double movementThreshold);
 
-		std::vector<CrateEvent> update(std::vector<DataTypes::Crate> crates);
-		std::vector<DataTypes::Crate> getAllCrates();
-		bool getCrate(const std::string& name, DataTypes::Crate& result);
+		std::vector<CrateEvent> update(std::vector<rexos_datatypes::Crate> crates);
+		std::vector<rexos_datatypes::Crate> getAllCrates();
+		bool getCrate(const std::string& name, rexos_datatypes::Crate& result);
 
 		/**
 		 * @var int stableFrames
@@ -138,12 +138,12 @@ namespace Vision{
 		 **/
 		double movementThreshold;
 	private:
-		bool hasChanged(const DataTypes::Crate& newCrate, const DataTypes::Crate& oldCrate);
+		bool hasChanged(const rexos_datatypes::Crate& newCrate, const rexos_datatypes::Crate& oldCrate);
 		void removeUntrackedCrates(std::vector<CrateEvent> &events);
 
 		/**
 		 * Map of known crates
 		 **/
-		std::map<std::string, DataTypes::Crate> knownCrates;
+		std::map<std::string, rexos_datatypes::Crate> knownCrates;
 	};
 }

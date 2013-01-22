@@ -37,9 +37,9 @@
 #include <stdlib.h>
 #include <opencv2/core/core.hpp>
 #include <vector>
-#include <DataTypes/Point2D.h>
+#include <rexos_datatypes/Point2D.h>
 
-namespace DataTypes{
+namespace rexos_datatypes{
 	/**
 	 * A crate, with name, location and status.
 	 **/

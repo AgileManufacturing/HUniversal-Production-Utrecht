@@ -32,21 +32,21 @@
  **/
 
 #pragma once
-#include <DataTypes/Point2D.h>
+#include <rexos_datatypes/Point2D.h>
 #include <vector>
 
-namespace Vision{
+namespace rexos_vision{
 	/**
 	 * Object that transforms pixel coordinates to real life coordinates and vice versa using a number of fiducials of which the real life and pixel positions are known.
 	 **/
 	class PixelAndRealCoordinateTransformer{
 		public:
-			PixelAndRealCoordinateTransformer(const std::vector<DataTypes::Point2D>& fiducialsRealCoordinates, const std::vector<DataTypes::Point2D>& fiducialsPixelCoordinates);
+			PixelAndRealCoordinateTransformer(const std::vector<rexos_datatypes::Point2D>& fiducialsRealCoordinates, const std::vector<rexos_datatypes::Point2D>& fiducialsPixelCoordinates);
 			virtual ~PixelAndRealCoordinateTransformer();
 			
-			void setFiducialPixelCoordinates(const std::vector<DataTypes::Point2D>& fiducialsPixelCoordinates);
-			DataTypes::Point2D pixelToRealCoordinate(const DataTypes::Point2D& pixelCoordinate) const;
-			DataTypes::Point2D realToPixelCoordinate(const DataTypes::Point2D& realCoordinate) const;
+			void setFiducialPixelCoordinates(const std::vector<rexos_datatypes::Point2D>& fiducialsPixelCoordinates);
+			rexos_datatypes::Point2D pixelToRealCoordinate(const rexos_datatypes::Point2D& pixelCoordinate) const;
+			rexos_datatypes::Point2D realToPixelCoordinate(const rexos_datatypes::Point2D& realCoordinate) const;
 		private:
 			/**
 			 * @var double realToPixelCoordinateScale
@@ -115,16 +115,16 @@ namespace Vision{
 			bool mirrored;
 
 			/**
-			 * @var std::vector<DataTypes::Point2D> fiducialsRealCoordinates
+			 * @var std::vector<rexos_datatypes::Point2D> fiducialsRealCoordinates
 			 * The real coordinates for the fiducial points. Should be in the same order as the fiducialsPixelCoordinates.
 			 **/
-			std::vector<DataTypes::Point2D> fiducialsRealCoordinates;
+			std::vector<rexos_datatypes::Point2D> fiducialsRealCoordinates;
 
 			/**
-			 * @var std::vector<DataTypes::Point2D> fiducialsPixelCoordinates
+			 * @var std::vector<rexos_datatypes::Point2D> fiducialsPixelCoordinates
 			 * The pixel coordinates for the fiducial points. Should be in the same order as the fiducialsPixelCoordinates.
 			 **/
-			std::vector<DataTypes::Point2D> fiducialsPixelCoordinates;
+			std::vector<rexos_datatypes::Point2D> fiducialsPixelCoordinates;
 
 			void updateTransformationParameters();
 	};

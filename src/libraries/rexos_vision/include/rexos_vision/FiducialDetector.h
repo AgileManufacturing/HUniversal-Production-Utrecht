@@ -37,7 +37,7 @@
 #include <opencv2/core/core.hpp>
 #include <vector>
 
-namespace Vision{
+namespace rexos_vision{
 
 	/**
 	 * Detects fiducial markers in an image.

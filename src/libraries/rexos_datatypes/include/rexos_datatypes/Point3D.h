@@ -37,7 +37,7 @@
 
 #include <cmath>
 
-namespace DataTypes{
+namespace rexos_datatypes{
 	template<typename T>
 	/**
 	 * 3 dimensional point class.

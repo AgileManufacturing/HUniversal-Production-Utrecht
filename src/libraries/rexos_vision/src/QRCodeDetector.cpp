@@ -36,10 +36,10 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/lexical_cast.hpp>
-#include "Vision/QRCodeDetector.h"
-#include "DataTypes/Crate.h"
+#include "rexos_vision/QRCodeDetector.h"
+#include "rexos_datatypes/Crate.h"
 
-namespace Vision{
+namespace rexos_vision{
 	/**
 	 * Constructor which sets the values for the scanner.
 	 **/
@@ -54,7 +54,7 @@ namespace Vision{
 	 * @param crates Vector that contains the crate
 	 * @param criteria Criteria (with a default value) for the refinement of corner pixels on the detected QR codes. OpenCV termcriteria: "Criteria for termination of the iterative process of corner refinement. That is, the process of corner position refinement stops either after a certain number of iterations or when a required accuracy is achieved. The criteria may specify either of or both the maximum number of iteration and the required accuracy."
 	 **/
-	void QRCodeDetector::detectQRCodes(cv::Mat& image, std::vector<DataTypes::Crate> &crates, cv::TermCriteria criteria){
+	void QRCodeDetector::detectQRCodes(cv::Mat& image, std::vector<rexos_datatypes::Crate> &crates, cv::TermCriteria criteria){
 		try{
 			// create an image in zbar with:
 			// width
@@ -87,12 +87,12 @@ namespace Vision{
 					// 455 px distance = (7 x 7) windowsSize > (15 x 15) window
 					// 520 px distance = (8 x 8) windowsSize > (17 x 17) window
 					// etc...
-					 float windowsSize = 2.0 * (DataTypes::Crate::distance(corners[0], corners[2]) / 130.0);
+					 float windowsSize = 2.0 * (rexos_datatypes::Crate::distance(corners[0], corners[2]) / 130.0);
 
 					// The cornerSubPix function iterates to find the sub-pixel accurate location of corners or radial saddle points. Corners is now updated!
 					cv::cornerSubPix(image, corners, cv::Size(windowsSize,windowsSize), cv::Size(-1,-1), criteria);
 
-					crates.push_back(DataTypes::Crate(it->get_data(), corners));
+					crates.push_back(rexos_datatypes::Crate(it->get_data(), corners));
 				}
 			}
 		} catch (std::exception &e){
