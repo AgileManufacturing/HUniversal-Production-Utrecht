@@ -33,6 +33,8 @@ libraries/mongo-cxx-driver/config.log
 build/
 libraries/blackboardJavaClient/*.jar
 .rexos-export
+build/
+devel/
 
 
 # Ignore project file, cmake text file and editor temporary files
