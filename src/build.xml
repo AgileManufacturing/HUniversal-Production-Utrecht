@@ -1,0 +1,47 @@
+<project name="REXOS" default="dist" basedir=".">
+
+  <property name="distdir" value="dist" />
+  <property name="builddir" value="build~" />
+
+  <!-- Target properties -->
+  <property name="BlackboardJavaClientLib" value="blackboardJavaClient.jar" />
+  <property name="BlackboardJavaClientFolder" value="blackboardJavaClient" />
+
+  <target name="init">
+    <delete dir="${distdir}"/>
+    <mkdir dir="${distdir}"/>
+    <delete dir="${builddir}"/>
+    <mkdir dir="${builddir}"/>
+  </target>
+
+ <!-- BlackboardJavaClient TARGET-->
+  <target name="BlackboardJavaClient">
+     <mkdir dir="${builddir}/${BlackboardJavaClientFolder}"/>
+    <javac
+      srcdir="libraries/blackboardJavaClient/src" 
+      destdir="${builddir}/${BlackboardJavaClientFolder}" 
+      includeantruntime="true">
+    </javac>
+    <jar jarfile="dist/${BlackboardJavaClientLib}" basedir="${builddir}/${BlackboardJavaClientFolder}"/>
+  </target>  
+
+   <!-- Dummy Agent-->
+  <target name="DummyAgent" depends="BlackboardJavaClient">
+    <mkdir dir="${distdir}/dummyAgent"/>
+    <javac 
+      srcdir="mas/dummyAgent/src" 
+      includeantruntime="true">
+    </javac>
+  </target>
+
+  <!-- ADD ALL LIBRARIES HERE-->
+  <target name="build"  depends="init, BlackboardJavaClient, DummyAgent">
+      <delete dir="${builddir}"/>
+  </target>
+
+  <target name="clean"  description="clean up" >
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <delete dir="${distdir}"/>
+    <delete dir="${builddir}"/>
+  </target>
+</project>

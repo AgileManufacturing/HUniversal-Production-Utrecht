@@ -1,0 +1,13 @@
+<package>
+  <description brief="environmentCommunicationMessages">
+
+     environmentCommunicationMessages
+
+  </description>
+  <author>Arjan Groenewegen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <depend package="roscpp"/>
+</package>
+
+

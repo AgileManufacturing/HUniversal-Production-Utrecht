@@ -1,0 +1,17 @@
+<package>
+  <description brief="deltaRobotNode">
+
+     deltaRobotNode
+
+  </description>
+  <author>Dennis Koole</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <depend package="std_msgs"/>
+  <depend package="roscpp"/>
+  <depend package="rosMast"/>
+  <depend package="rexosStdMsgs"/>
+  <depend package="rexosStdSrvs"/>
+</package>
+
+

@@ -1,0 +1,16 @@
+<package>
+  <description brief="lookupHandler">
+
+     lookupHandler
+
+  </description>
+  <author>Arjan Groenewegen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+
+  <depend package="environmentCommunicationMessages" />
+  <depend package="environmentCache" />  
+  <depend package="roscpp" />  
+</package>
+
+
