@@ -2,6 +2,7 @@
 # catkin/cmake/toplevel.cmake
 
 cmake_minimum_required(VERSION 2.8.3)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 # optionally provide a cmake file in the workspace to override arbitrary stuff
 include(workspace.cmake OPTIONAL)
@@ -9,7 +10,7 @@ include(workspace.cmake OPTIONAL)
 set(CATKIN_TOPLEVEL TRUE)
 
 # Include our own macros
-include(cmake/macros.cmake) 
+include(cmake/macros.cmake)
 
 # include catkin directly or via find_package()
 if(EXISTS "${CMAKE_SOURCE_DIR}/catkin/cmake/all.cmake" AND EXISTS "${CMAKE_SOURCE_DIR}/catkin/CMakeLists.txt")
