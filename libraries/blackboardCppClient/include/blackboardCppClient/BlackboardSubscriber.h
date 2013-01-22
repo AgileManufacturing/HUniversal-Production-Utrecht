@@ -45,6 +45,8 @@ public:
 	 * @param json The message parsed in the json format
 	 **/
 	virtual void blackboardReadCallback(std::string json) = 0;
+
+	virtual ~BlackboardSubscriber(){}
 };
 
 #endif

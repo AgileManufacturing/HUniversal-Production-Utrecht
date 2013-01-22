@@ -52,7 +52,17 @@
  * @param equipletID identifier for the equiplet
  * @param moduleID identifier for the deltarobot
  **/
-deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) : rosMast::StateMachine(equipletID, moduleID) {
+deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) : 
+	rosMast::StateMachine(equipletID, moduleID),
+	deltaRobot(NULL),
+	modbus(NULL),
+	motorManager(NULL),
+	moveToPointService(),
+	movePathService(),
+	moveToRelativePointService(),
+	moveRelativePathService(),
+	calibrateService()
+{
 	ROS_INFO("DeltaRobotnode Constructor entering...");
 	
 	ros::NodeHandle nodeHandle;

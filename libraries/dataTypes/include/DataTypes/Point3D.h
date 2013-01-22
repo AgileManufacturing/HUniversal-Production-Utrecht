@@ -66,7 +66,7 @@ namespace DataTypes{
 		/**
 		 * 3 dimensional point class constructor.
 		 **/
-		Point3D(){}
+		Point3D() : x(0), y(0), z(0){}
 		/**
 		 * 3 dimensional point class constructor.
 		 * 
