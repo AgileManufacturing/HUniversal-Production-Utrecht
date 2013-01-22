@@ -37,7 +37,7 @@
 #include <vector>
 #include <sstream>
 
-namespace Utilities{
+namespace rexos_utilities{
     long timeNow(void);
     void sleep(long milliseconds);
     double radiansToDegrees(double radians);

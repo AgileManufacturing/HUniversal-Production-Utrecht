@@ -34,19 +34,19 @@
 #include <queue>
 #include <boost/thread.hpp>
 
-#include <DataTypes/MotorRotation.h>
-#include <ModbusController/ModbusException.h>
-#include <ModbusController/ModbusController.h>
-#include <Motor/CRD514KD.h>
-#include <Motor/MotorInterface.h>
+#include <rexos_datatypes/MotorRotation.h>
+#include <rexos_modbus/ModbusException.h>
+#include <rexos_modbus/ModbusController.h>
+#include <rexos_motor/CRD514KD.h>
+#include <rexos_motor/MotorInterface.h>
 
-namespace Motor{
+namespace rexos_motor{
 	/**
 	 * Steppermotor driver
 	 **/
 	class StepperMotor : public MotorInterface{
 	public:
-		StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle);
+		StepperMotor(rexos_modbus::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle);
 
 		virtual ~StepperMotor(void);
 
@@ -57,10 +57,10 @@ namespace Motor{
 		void resetCounter(void);
 		void setMotorLimits(double minAngle, double maxAngle);
 
-		void moveTo(const DataTypes::MotorRotation& motorRotation, int motionSlot);
-		void moveTo(const DataTypes::MotorRotation& motorRotation);
+		void moveTo(const rexos_datatypes::MotorRotation& motorRotation, int motionSlot);
+		void moveTo(const rexos_datatypes::MotorRotation& motorRotation);
 
-		void writeRotationData(const DataTypes::MotorRotation& motorRotation, int motionSlot, bool useDeviation = true);
+		void writeRotationData(const rexos_datatypes::MotorRotation& motorRotation, int motionSlot, bool useDeviation = true);
 
 		void startMovement(int motionSlot);
 		void waitTillReady(void);
@@ -153,7 +153,7 @@ namespace Motor{
 		 * @var ModbusController* modbus
 		 * Controller for the modbus communication.
 		 **/
-		ModbusController::ModbusController* modbus;
+		rexos_modbus::ModbusController* modbus;
 
 		/**
 		 * @var Slaves::t motorIndex

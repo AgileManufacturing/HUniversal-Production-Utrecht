@@ -1,11 +1,11 @@
 /**
- * @file ModbusException.h
- * @brief Exception thrown if an error ocures during modbus actions.
- * @date Created: 2012-10-01
+ * @file MotorInterface.h
+ * @brief DeltaRobot motor interface.
  *
  * @author 1.0 Lukas Vermond
  * @author 1.0 Kasper van Nieuwland
  * @author 1.1 Koen Braham
+ * @author 1.1 Dennis Koole
  *
  * @section LICENSE
  * License: newBSD
@@ -32,74 +32,75 @@
 
 #pragma once
 
-#include <stdexcept>
-#include <string>
-#include <sstream>
-#include <cerrno>
+#include <rexos_datatypes/MotorRotation.h>
 
-#include <modbus/modbus.h>
-
-namespace ModbusController{
-	/** 
-	 * Exception calss for modbus communication.
+namespace rexos_motor{
+	/**
+	 * Interface for the deltaronot motors.
 	 **/
-	class ModbusException : public std::runtime_error{
-	private:
-		/**
-		 * @var int errorCode
-		 * The error code is set by libmodbus5.
-		 **/
-		const int errorCode;
-
-		/**
-		 * @var std::string message
-		 * Modbus error string (obtained using modbus_strerror).
-		 */
-		std::string message;
-
+	class MotorInterface{
+	protected:
+		MotorInterface(void){}
+			 
 	public:
-		/**
-		 * Constructor of the modbus exception
-		 * Retrieves an error string from the modbus library.
-		 **/
-		ModbusException(void) : std::runtime_error(""), errorCode(errno){
-			std::stringstream stream;
-			stream << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
-			message = stream.str();
-		}
+		virtual ~MotorInterface(void){}
 
 		/**
-		 * Constructor of the modbus exception
-		 * Adds a user specified message
-		 * @see ModbusException
+		 * Turns on the motors.
 		 **/
-		ModbusException(const std::string msg) : std::runtime_error(""), errorCode(errno){
-			std::stringstream stream;
-			stream << msg << std::endl;
-			stream << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
-			message = stream.str();
-		}
+		virtual void powerOn(void) = 0;
 
 		/**
-		 * Deconstructor
-		 * Use for modbus error extends
+		 * Shuts down the motors.
 		 **/
-		virtual ~ModbusException(void) throw(){}
+		virtual void powerOff(void) = 0;
 
 		/**
-		 * what getter
-		 * @return const char* The error message
+		 * Stops the motors.
 		 **/
-		virtual const char* what(void) const throw(){
-			return message.c_str();
-		}
+		virtual void stop(void) = 0;
 
 		/**
-		 * Error code getter
-		 * @return int The modbus error code
+		 * Sets the minimum and maximum angle for the motor.
 		 **/
-		int getErrorCode(void){
-			return errorCode;
-		}
+		virtual void setMotorLimits(double minAngle, double maxAngle) = 0;
+
+		/**
+		 * Rotate the motors.
+		 * 
+		 * @param motorRotation Defines the angles, speed, acceleration and deceleration of the motors.
+		 **/
+		virtual void moveTo(const rexos_datatypes::MotorRotation& motorRotation) = 0;
+
+		/**
+		 * Wait till the motor has finished any rotations.
+		 **/
+		void waitTillReady(void);
+
+		/**
+		 * Get the minimal angle the motors can move to.
+		 * 
+		 * @return angle in radians.
+		 **/
+		virtual double getMinAngle(void) const = 0;
+
+		/**
+		 * Get the maximum angle the motors can move to.
+		 * 
+		 * @return angle in radians.
+		 **/
+		virtual double getMaxAngle(void) const = 0;
+
+		/**
+		 * Sets the current angle.
+		 **/
+		virtual void setCurrentAngle(double angle) = 0;
+
+		/**
+		 * Determine if the motor driver(s) are powered on.
+		 * 
+		 * @return true of powered on, false otherwise.
+		 **/
+		virtual bool isPoweredOn(void) = 0;
 	};
 }

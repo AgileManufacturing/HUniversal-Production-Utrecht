@@ -1,10 +1,9 @@
 /**
- * @file MotorManager.cpp
- * @brief Motor management for concurrent movement.
- * @date Created: 2012-10-02
+ * @file MotorException.h
+ * @brief Exception thrown if an error occures when the motor controllers fail.
  *
- * @author Koen Braham
- * @author Dennis Koole
+ * @author Lukas Vermond
+ * @author Kasper van Nieuwland
  *
  * @section LICENSE
  * License: newBSD
@@ -29,57 +28,28 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <Motor/MotorManager.h>
-#include <Motor/CRD514KD.h>
-#include <Motor/MotorException.h>
+#pragma once
 
-extern "C"{
-	#include <modbus/modbus.h>
-}
+#include <stdexcept>
+#include <string>
 
-namespace Motor{
+namespace rexos_motor{
 	/**
-	 * Powers on all motors by doing a broadcast to turn on all excitement for the motors.
+	 * Exception thrown if an error occures when the motor controllers fail.
 	 **/
-	void MotorManager::powerOn(void){
-		if(!poweredOn){
-			for(int i = 0; i < numberOfMotors; ++i){
-				motors[i]->powerOn();
-			}
-		}
-		poweredOn = true;
-	}
+	class MotorException : public std::runtime_error{
+	public:
 
-	/**
-	 * Powers off all motors by broadcasting a clear for the excitement.
-	 **/
-	void MotorManager::powerOff(void){
-		if(poweredOn){
-			for(int i = 0; i < numberOfMotors; ++i){
-				motors[i]->powerOff();
-			}
-		}
-		poweredOn = false;
-	}
+		/**
+		 * Constructor of MotorException.
+		 * 
+		 * @param message Error message.
+		 **/
+		MotorException(const std::string& message = std::string()) : std::runtime_error(message){}
 
-	/**
-	 * Start simultaneously movement of all motors
-	 **/
-	void MotorManager::startMovement(int motionSlot){
-		if(!poweredOn){
-			throw MotorException("motor manager is not powered on");
-		}
-
-		// Execute motion.
-		motors[0]->waitTillReady();
-		motors[1]->waitTillReady();
-		motors[2]->waitTillReady();
-
-		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
-		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
-
-		motors[0]->updateAngle();
-		motors[1]->updateAngle();
-		motors[2]->updateAngle();
-	}
+		/**
+		 * Destructor of MotorException.
+		 **/
+		virtual ~MotorException(void) throw(){}
+	};
 }

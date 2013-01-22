@@ -1,12 +1,11 @@
 /**
- * @file CRD514KDException.h
- * @brief Exception thrown if the motorcontroller alarm flag is set.
+ * @file ModbusException.h
+ * @brief Exception thrown if an error ocures during modbus actions.
  * @date Created: 2012-10-01
  *
  * @author 1.0 Lukas Vermond
  * @author 1.0 Kasper van Nieuwland
  * @author 1.1 Koen Braham
- * @author 1.1 Dennis Koole
  *
  * @section LICENSE
  * License: newBSD
@@ -33,96 +32,74 @@
 
 #pragma once
 
-#include <Motor/CRD514KD.h>
-
 #include <stdexcept>
 #include <string>
 #include <sstream>
+#include <cerrno>
 
-namespace Motor{
-	/**
-	 * Exception thrown if the motorcontroller alarm flag is set.
+#include <modbus/modbus.h>
+
+namespace rexos_modbus{
+	/** 
+	 * Exception calss for modbus communication.
 	 **/
-	class CRD514KDException : public std::runtime_error{
+	class ModbusException : public std::runtime_error{
 	private:
 		/**
-		 * @var t slave
-		 * The modbus slave which set the alarm flag.
+		 * @var int errorCode
+		 * The error code is set by libmodbus5.
 		 **/
-		const CRD514KD::Slaves::t slave;
+		const int errorCode;
 
 		/**
-		 * @var bool warning
-		 * Boolean that is set if there is a warning.
-		 **/
-		const bool warning;
-
-		/**
-		 * @var bool alarm
-		 * Boolean that is set if there is an alarm.
-		 **/
-		const bool alarm;
-
-		/**
-		 * @var string message
-		 * The exception message.
-		 **/
+		 * @var std::string message
+		 * Modbus error string (obtained using modbus_strerror).
+		 */
 		std::string message;
 
 	public:
 		/**
-		 * Constructor for the CRD514KDException.
-		 *
-		 * @param slave The modbus slave which set the alarm flag.
-		 * @param warning Boolean that indicates whether there is a warning.
-		 * @param alarm Boolean that indicates whether there is an alarm.
+		 * Constructor of the modbus exception
+		 * Retrieves an error string from the modbus library.
 		 **/
-		CRD514KDException(const CRD514KD::Slaves::t slave, const bool warning, const bool alarm) :
-				std::runtime_error(""), slave(slave), warning(warning), alarm(alarm){
+		ModbusException(void) : std::runtime_error(""), errorCode(errno){
 			std::stringstream stream;
-			stream << "slave: " << (int)slave << ": warning=" << (int)warning << " alarm=" << (int)alarm;
+			stream << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
 			message = stream.str();
 		}
 
 		/**
-		 * Destructor for the CRD514KDException.
+		 * Constructor of the modbus exception
+		 * Adds a user specified message
+		 * @see ModbusException
 		 **/
-		virtual ~CRD514KDException() throw(){}
+		ModbusException(const std::string msg) : std::runtime_error(""), errorCode(errno){
+			std::stringstream stream;
+			stream << msg << std::endl;
+			stream << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
+			message = stream.str();
+		}
 
 		/**
-		 * Virtual method returning the exception message.
-		 * 
-		 * @return A C string containing the exception message.
+		 * Deconstructor
+		 * Use for modbus error extends
 		 **/
-		virtual const char* what() const throw(){
+		virtual ~ModbusException(void) throw(){}
+
+		/**
+		 * what getter
+		 * @return const char* The error message
+		 **/
+		virtual const char* what(void) const throw(){
 			return message.c_str();
 		}
 
 		/**
-		 * Gets the slave.
-		 * 
-		 * @return The slave
+		 * Error code getter
+		 * @return int The modbus error code
 		 **/
-		CRD514KD::Slaves::t getSlave(void){
-			return slave;
-		}
-
-		/**
-		 * Check if there is a warning.
-		 * 
-		 * @return true if there is a warning.
-		 **/
-		bool isWarning(void){
-			return warning;
-		}
-
-		/**
-		 * Check if there is an alarm.
-		 * 
-		 * @return true when there is an alarm.
-		 **/
-		bool isAlarm(void){
-			return alarm;
+		int getErrorCode(void){
+			return errorCode;
 		}
 	};
 }

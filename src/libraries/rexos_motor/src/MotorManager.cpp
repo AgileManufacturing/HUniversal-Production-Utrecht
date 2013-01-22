@@ -1,5 +1,5 @@
 /**
- * @file MotorManager.h
+ * @file MotorManager.cpp
  * @brief Motor management for concurrent movement.
  * @date Created: 2012-10-02
  *
@@ -29,61 +29,57 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#pragma once
+#include <rexos_motor/MotorManager.h>
+#include <rexos_motor/CRD514KD.h>
+#include <rexos_motor/MotorException.h>
 
-#include <ModbusController/ModbusController.h>
-#include <Motor/StepperMotor.h>
+extern "C"{
+	#include <modbus/modbus.h>
+}
 
-namespace Motor{
+namespace rexos_motor{
+	/**
+	 * Powers on all motors by doing a broadcast to turn on all excitement for the motors.
+	 **/
+	void MotorManager::powerOn(void){
+		if(!poweredOn){
+			for(int i = 0; i < numberOfMotors; ++i){
+				motors[i]->powerOn();
+			}
+		}
+		poweredOn = true;
+	}
 
 	/**
-	 * Motor management for concurrent movement.
+	 * Powers off all motors by broadcasting a clear for the excitement.
 	 **/
-	class MotorManager{
-	public:
-		/**
-		 * Constructor for the motor manager
-		 *
-		 * @param modbus Pointer to an established modbus connection.
-		 * @param motors Pointer array containing all motors for this manager.
-		 * @param numberOfMotors Number of motors in the pointer array.
-		 **/
-		MotorManager(ModbusController::ModbusController* modbus, StepperMotor** motors, int numberOfMotors) :
-			modbus(modbus), motors(motors), numberOfMotors(numberOfMotors), poweredOn(false){}
+	void MotorManager::powerOff(void){
+		if(poweredOn){
+			for(int i = 0; i < numberOfMotors; ++i){
+				motors[i]->powerOff();
+			}
+		}
+		poweredOn = false;
+	}
 
-		void powerOn(void);
-		void powerOff(void);
+	/**
+	 * Start simultaneously movement of all motors
+	 **/
+	void MotorManager::startMovement(int motionSlot){
+		if(!poweredOn){
+			throw MotorException("motor manager is not powered on");
+		}
 
-		/**
-		 * Check whether the motormanager has been initiated.
-		 * @return bool PowerOn state.
-		 **/
-		bool isPoweredOn(void){ return poweredOn; }
-		void startMovement(int motionSlot);
+		// Execute motion.
+		motors[0]->waitTillReady();
+		motors[1]->waitTillReady();
+		motors[2]->waitTillReady();
 
-	private:
-		/**
-		 * @var ModbusController::ModbusController* modbus
-		 * Pointer to an established modbus connection.
-		 **/
-		ModbusController::ModbusController* modbus;
+		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
+		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 
-		/**
-		 * @var StepperMotor** motors
-		 * Pointer array containing all motors for this manager.
-		 **/
-		StepperMotor** motors;
-
-		/**
-		 * @var int numberOfMotors
-		 * Number of motors in the pointer array.
-		 **/
-		int numberOfMotors;
-
-		/**
-		 * @var bool poweredOn
-		 * Stores whether the motor manager has been turned on.
-		 **/
-		bool poweredOn;
-	};
+		motors[0]->updateAngle();
+		motors[1]->updateAngle();
+		motors[2]->updateAngle();
+	}
 }

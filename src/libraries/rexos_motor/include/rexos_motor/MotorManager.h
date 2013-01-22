@@ -1,9 +1,10 @@
 /**
- * @file MotorException.h
- * @brief Exception thrown if an error occures when the motor controllers fail.
+ * @file MotorManager.h
+ * @brief Motor management for concurrent movement.
+ * @date Created: 2012-10-02
  *
- * @author Lukas Vermond
- * @author Kasper van Nieuwland
+ * @author Koen Braham
+ * @author Dennis Koole
  *
  * @section LICENSE
  * License: newBSD
@@ -30,26 +31,59 @@
 
 #pragma once
 
-#include <stdexcept>
-#include <string>
+#include <rexos_modbus/ModbusController.h>
+#include <rexos_motor/StepperMotor.h>
 
-namespace Motor{
+namespace rexos_motor{
+
 	/**
-	 * Exception thrown if an error occures when the motor controllers fail.
+	 * Motor management for concurrent movement.
 	 **/
-	class MotorException : public std::runtime_error{
+	class MotorManager{
 	public:
+		/**
+		 * Constructor for the motor manager
+		 *
+		 * @param modbus Pointer to an established modbus connection.
+		 * @param motors Pointer array containing all motors for this manager.
+		 * @param numberOfMotors Number of motors in the pointer array.
+		 **/
+		MotorManager(rexos_modbus::ModbusController* modbus, StepperMotor** motors, int numberOfMotors) :
+			modbus(modbus), motors(motors), numberOfMotors(numberOfMotors), poweredOn(false){}
+
+		void powerOn(void);
+		void powerOff(void);
 
 		/**
-		 * Constructor of MotorException.
-		 * 
-		 * @param message Error message.
+		 * Check whether the motormanager has been initiated.
+		 * @return bool PowerOn state.
 		 **/
-		MotorException(const std::string& message = std::string()) : std::runtime_error(message){}
+		bool isPoweredOn(void){ return poweredOn; }
+		void startMovement(int motionSlot);
+
+	private:
+		/**
+		 * @var ModbusController::ModbusController* modbus
+		 * Pointer to an established modbus connection.
+		 **/
+		rexos_modbus::ModbusController* modbus;
 
 		/**
-		 * Destructor of MotorException.
+		 * @var StepperMotor** motors
+		 * Pointer array containing all motors for this manager.
 		 **/
-		virtual ~MotorException(void) throw(){}
+		StepperMotor** motors;
+
+		/**
+		 * @var int numberOfMotors
+		 * Number of motors in the pointer array.
+		 **/
+		int numberOfMotors;
+
+		/**
+		 * @var bool poweredOn
+		 * Stores whether the motor manager has been turned on.
+		 **/
+		bool poweredOn;
 	};
 }

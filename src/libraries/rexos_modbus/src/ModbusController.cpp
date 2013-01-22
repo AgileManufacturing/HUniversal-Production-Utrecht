@@ -30,9 +30,9 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <ModbusController/ModbusController.h>
-#include <ModbusController/ModbusException.h>
-#include <Utilities/Utilities.h>
+#include <rexos_modbus/ModbusController.h>
+#include <rexos_modbus/ModbusException.h>
+#include <rexos_utilities/Utilities.h>
 
 #include <sstream>
 #include <string>
@@ -41,7 +41,7 @@
 #include <cstdio>
 #include <iostream>
 
-namespace ModbusController{
+namespace rexos_modbus{
 	/**
 	 * Constructor of a modbuscontroller.
 	 * 
@@ -93,9 +93,9 @@ namespace ModbusController{
 	* Utility function. used to wait the remaining time till nextWriteTime.
 	**/
 	void ModbusController::wait(void){
-		long delta = nextWriteTime - Utilities::timeNow();
+		long delta = nextWriteTime - rexos_utilities::timeNow();
 		if(delta > 0){
-			Utilities::sleep(delta);
+			rexos_utilities::sleep(delta);
 		}
 	}
 
@@ -177,7 +177,7 @@ namespace ModbusController{
 		int r = modbus_write_register(context, (int)address, (int)data);
 
 		// TODO: fix the broadcast issue slave == crd514_kd::slaves::BROADCAST temporary == 0
-		nextWriteTime = Utilities::timeNow() + (slave == 0 ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
+		nextWriteTime = rexos_utilities::timeNow() + (slave == 0 ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
 
 		if(r == -1){
 			// When broadcasting; ignore timeout errors.
@@ -218,7 +218,7 @@ namespace ModbusController{
 		int r = modbus_write_registers(context, firstAddress, length, data);
 
 		// TODO: fix the broadcast issue slave == crd514_kd::slaves::BROADCAST temporary == 0
-		nextWriteTime = Utilities::timeNow() + (slave == 0 ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
+		nextWriteTime = rexos_utilities::timeNow() + (slave == 0 ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
 
 		if(r == -1){
 			// When broadcasting; ignore timeout errors
@@ -294,7 +294,7 @@ namespace ModbusController{
 		int r = modbus_read_registers(context, (int)address, 1, &data);
 
 		// TODO: fix the broadcast issue slave == crd514_kd::slaves::BROADCAST temporary == 0
-		nextWriteTime = Utilities::timeNow() + (slave == 0 ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
+		nextWriteTime = rexos_utilities::timeNow() + (slave == 0 ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
 
 		if(r == -1){
 			throw ModbusException("Error reading u16");
@@ -320,7 +320,7 @@ namespace ModbusController{
 		int r = modbus_read_registers(context, (int)firstAddress, length, data);
 
 		// TODO: fix the broadcast issue slave == crd514_kd::slaves::BROADCAST temporary == 0
-		nextWriteTime = Utilities::timeNow() + (slave == 0 ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
+		nextWriteTime = rexos_utilities::timeNow() + (slave == 0 ? WRITE_INTERVAL_BROADCAST : WRITE_INTERVAL_UNICAST);
 
 		if(r == -1){
 			throw ModbusException("Error reading u16 array");

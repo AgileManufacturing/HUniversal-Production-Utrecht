@@ -54,7 +54,7 @@ extern "C"{
  * @endcond
  **/
 
-namespace ModbusController{
+namespace rexos_modbus{
 	/**
 	 * Wrapper class for libmodbus with some extra functionality.
 	 **/

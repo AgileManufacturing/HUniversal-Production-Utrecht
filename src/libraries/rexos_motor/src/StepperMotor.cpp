@@ -29,19 +29,19 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <Motor/StepperMotor.h>
+#include <rexos_motor/StepperMotor.h>
 
 #include <cstdio>
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
 
-#include <Utilities/Utilities.h>
-#include <Motor/CRD514KD.h>
-#include <Motor/CRD514KDException.h>
-#include <Motor/MotorException.h>
+#include <rexos_utilities/Utilities.h>
+#include <rexos_motor/CRD514KD.h>
+#include <rexos_motor/CRD514KDException.h>
+#include <rexos_motor/MotorException.h>
 
-namespace Motor{
+namespace rexos_motor {
 	/**
 	 * Constructor of StepperMotor. Sets angles to unlimited.
 	 *
@@ -50,7 +50,7 @@ namespace Motor{
 	 * @param minAngle Minimum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
 	 * @param maxAngle Maximum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
 	 **/
-	StepperMotor::StepperMotor(ModbusController::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle):
+	StepperMotor::StepperMotor(rexos_modbus::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle):
 		MotorInterface(), deviation(0), minAngle(minAngle), maxAngle(maxAngle), modbus(modbusController), motorIndex(motorIndex), anglesLimited(true), poweredOn(false){}
 
 	/**
@@ -123,7 +123,7 @@ namespace Motor{
 		try{
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::STOP);
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
-		} catch(ModbusController::ModbusException& exception){
+		} catch(rexos_modbus::ModbusException& exception){
 			std::cerr << "steppermotor::stop failed: " << std::endl << "what(): " << exception.what() << std::endl;
 		}
 	}
@@ -161,7 +161,7 @@ namespace Motor{
 	 * @param motorRotation The rotational data for the motor.
 	 * @param motionSlot the motion slot to be used.
 	 **/
-	void StepperMotor::moveTo(const DataTypes::MotorRotation& motorRotation, int motionSlot){
+	void StepperMotor::moveTo(const rexos_datatypes::MotorRotation& motorRotation, int motionSlot){
 		checkMotionSlot(motionSlot);
 
 		writeRotationData(motorRotation, motionSlot);
@@ -173,7 +173,7 @@ namespace Motor{
 	 *
 	 * @param motorRotation The rotational data for the motor.
 	 **/
-	void StepperMotor::moveTo(const DataTypes::MotorRotation& motorRotation){
+	void StepperMotor::moveTo(const rexos_datatypes::MotorRotation& motorRotation){
 		moveTo(motorRotation, 1);
 	}
 
@@ -184,7 +184,7 @@ namespace Motor{
 	 * @param motionSlot the motion slot to be written to
 	 * @param useDeviation Sets whether or not to use the deviation. Defaults to true.
 	 **/
-	void StepperMotor::writeRotationData(const DataTypes::MotorRotation& motorRotation, int motionSlot, bool useDeviation){
+	void StepperMotor::writeRotationData(const rexos_datatypes::MotorRotation& motorRotation, int motionSlot, bool useDeviation){
 		if(!poweredOn){
 			throw MotorException("motor drivers are not powered on");
 		}
@@ -301,7 +301,7 @@ namespace Motor{
 	 **/
 	void StepperMotor::setIncrementalMode(int motionSlot){
 		checkMotionSlot(motionSlot);
-		modbus->writeU16(motorIndex, Motor::CRD514KD::Registers::OP_POSMODE + motionSlot - 1, 0);
+		modbus->writeU16(motorIndex, rexos_motor::CRD514KD::Registers::OP_POSMODE + motionSlot - 1, 0);
 	}
 
 	/**
@@ -310,7 +310,7 @@ namespace Motor{
 	 **/
 	void StepperMotor::setAbsoluteMode(int motionSlot){
 		checkMotionSlot(motionSlot);
-		modbus->writeU16(motorIndex, Motor::CRD514KD::Registers::OP_POSMODE + motionSlot - 1, 1);
+		modbus->writeU16(motorIndex, rexos_motor::CRD514KD::Registers::OP_POSMODE + motionSlot - 1, 1);
 	}
 
 	/**

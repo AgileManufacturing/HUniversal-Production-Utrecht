@@ -28,9 +28,9 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <Utilities/Utilities.h>
+#include <rexos_utilities/Utilities.h>
 
-namespace Utilities{
+namespace rexos_utilities{
     /**
      * Get the current time in milliseconds.
      *

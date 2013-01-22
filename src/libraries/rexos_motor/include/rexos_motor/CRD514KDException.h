@@ -1,6 +1,7 @@
 /**
- * @file MotorInterface.h
- * @brief DeltaRobot motor interface.
+ * @file CRD514KDException.h
+ * @brief Exception thrown if the motorcontroller alarm flag is set.
+ * @date Created: 2012-10-01
  *
  * @author 1.0 Lukas Vermond
  * @author 1.0 Kasper van Nieuwland
@@ -32,75 +33,96 @@
 
 #pragma once
 
-#include <DataTypes/MotorRotation.h>
+#include <rexos_motor/CRD514KD.h>
 
-namespace Motor{
+#include <stdexcept>
+#include <string>
+#include <sstream>
+
+namespace rexos_motor{
 	/**
-	 * Interface for the deltaronot motors.
+	 * Exception thrown if the motorcontroller alarm flag is set.
 	 **/
-	class MotorInterface{
-	protected:
-		MotorInterface(void){}
-			 
+	class CRD514KDException : public std::runtime_error{
+	private:
+		/**
+		 * @var t slave
+		 * The modbus slave which set the alarm flag.
+		 **/
+		const CRD514KD::Slaves::t slave;
+
+		/**
+		 * @var bool warning
+		 * Boolean that is set if there is a warning.
+		 **/
+		const bool warning;
+
+		/**
+		 * @var bool alarm
+		 * Boolean that is set if there is an alarm.
+		 **/
+		const bool alarm;
+
+		/**
+		 * @var string message
+		 * The exception message.
+		 **/
+		std::string message;
+
 	public:
-		virtual ~MotorInterface(void){}
-
 		/**
-		 * Turns on the motors.
+		 * Constructor for the CRD514KDException.
+		 *
+		 * @param slave The modbus slave which set the alarm flag.
+		 * @param warning Boolean that indicates whether there is a warning.
+		 * @param alarm Boolean that indicates whether there is an alarm.
 		 **/
-		virtual void powerOn(void) = 0;
+		CRD514KDException(const CRD514KD::Slaves::t slave, const bool warning, const bool alarm) :
+				std::runtime_error(""), slave(slave), warning(warning), alarm(alarm){
+			std::stringstream stream;
+			stream << "slave: " << (int)slave << ": warning=" << (int)warning << " alarm=" << (int)alarm;
+			message = stream.str();
+		}
 
 		/**
-		 * Shuts down the motors.
+		 * Destructor for the CRD514KDException.
 		 **/
-		virtual void powerOff(void) = 0;
+		virtual ~CRD514KDException() throw(){}
 
 		/**
-		 * Stops the motors.
-		 **/
-		virtual void stop(void) = 0;
-
-		/**
-		 * Sets the minimum and maximum angle for the motor.
-		 **/
-		virtual void setMotorLimits(double minAngle, double maxAngle) = 0;
-
-		/**
-		 * Rotate the motors.
+		 * Virtual method returning the exception message.
 		 * 
-		 * @param motorRotation Defines the angles, speed, acceleration and deceleration of the motors.
+		 * @return A C string containing the exception message.
 		 **/
-		virtual void moveTo(const DataTypes::MotorRotation& motorRotation) = 0;
+		virtual const char* what() const throw(){
+			return message.c_str();
+		}
 
 		/**
-		 * Wait till the motor has finished any rotations.
-		 **/
-		void waitTillReady(void);
-
-		/**
-		 * Get the minimal angle the motors can move to.
+		 * Gets the slave.
 		 * 
-		 * @return angle in radians.
+		 * @return The slave
 		 **/
-		virtual double getMinAngle(void) const = 0;
+		CRD514KD::Slaves::t getSlave(void){
+			return slave;
+		}
 
 		/**
-		 * Get the maximum angle the motors can move to.
+		 * Check if there is a warning.
 		 * 
-		 * @return angle in radians.
+		 * @return true if there is a warning.
 		 **/
-		virtual double getMaxAngle(void) const = 0;
+		bool isWarning(void){
+			return warning;
+		}
 
 		/**
-		 * Sets the current angle.
-		 **/
-		virtual void setCurrentAngle(double angle) = 0;
-
-		/**
-		 * Determine if the motor driver(s) are powered on.
+		 * Check if there is an alarm.
 		 * 
-		 * @return true of powered on, false otherwise.
+		 * @return true when there is an alarm.
 		 **/
-		virtual bool isPoweredOn(void) = 0;
+		bool isAlarm(void){
+			return alarm;
+		}
 	};
 }

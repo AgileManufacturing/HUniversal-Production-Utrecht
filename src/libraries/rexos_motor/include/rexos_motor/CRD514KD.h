@@ -32,10 +32,10 @@
  **/
 
 #pragma once
-#include <ModbusController/ModbusController.h>
+#include <rexos_modbus/ModbusController.h>
 #include <cmath>
 
-namespace Motor{
+namespace rexos_motor{
 	namespace CRD514KD{
 		/**
 		 * @var double MOTOR_STEP_ANGLE

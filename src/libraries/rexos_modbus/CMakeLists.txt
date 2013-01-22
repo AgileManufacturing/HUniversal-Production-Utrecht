@@ -1,11 +1,42 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(rexos_utilities)
+project(rexos_modbus)
 
 ## Find catkin macros and libraries
-find_package(catkin REQUIRED)
+## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
+## is used, also find other catkin packages
+find_package(catkin REQUIRED COMPONENTS rexos_utilities)
+find_package(Modbus)
 
 ## System dependencies are found with CMake's conventions
- find_package(Boost REQUIRED COMPONENTS system)
+# find_package(Boost REQUIRED COMPONENTS system)
+
+## Uncomment this if the package has a setup.py. This macro ensures
+## modules and scripts declared therein get installed
+# catkin_python_setup()
+
+#######################################
+## Declare ROS messages and services ##
+#######################################
+
+## Generate messages in the 'msg' folder
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
+# )
+
+## Generate services in the 'srv' folder
+# add_service_files(
+#   FILES
+#   Service1.srv
+#   Service2.srv
+# )
+
+## Generate added messages and services with any dependencies listed here
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
+# )
 
 ###################################################
 ## Declare things to be passed to other projects ##
@@ -16,7 +47,9 @@ find_package(catkin REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES rexos_utilities
+  LIBRARIES rexos_modbus
+  CATKIN_DEPENDS rexos_utilities
+#  DEPENDS system_lib
 )
 
 ###########
@@ -24,19 +57,26 @@ catkin_package(
 ###########
 
 ## Specify additional locations of header files
-include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+# include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 ## Declare a cpp library
-crexos_add_library(rexos_utilities false)
+# ModbusController # 
+if(${MODBUS_FOUND})
+	crexos_add_library(rexos_modbus false)
+	include_directories(${MODBUS_INCLUDE_DIRS} ${rexos_utilities_INCLUDE_DIRS})
+	target_link_libraries(rexos_modbus ${MODBUS_LIBRARIES} ${rexos_utilities_LIBRARIES})	
+else(${MODBUS_FOUND})
+	rexos_cannot_build(rexos_modbus, "libraries/rexos_modbus")
+endif()
 
 ## Declare a cpp executable
-# add_executable(rexos_utilities_node src/rexos_utilities_node.cpp)
+# add_executable(rexos_modbus_node src/rexos_modbus_node.cpp)
 
 ## Add dependencies to the executable
-# add_dependencies(rexos_utilities_node ${PROJECT_NAME})
+# add_dependencies(rexos_modbus_node ${PROJECT_NAME})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(rexos_utilities_node
+# target_link_libraries(rexos_modbus_node
 #   ${catkin_LIBRARIES}
 # )
 
@@ -52,7 +92,7 @@ crexos_add_library(rexos_utilities false)
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS rexos_utilities rexos_utilities_node
+# install(TARGETS rexos_modbus rexos_modbus_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -77,7 +117,7 @@ crexos_add_library(rexos_utilities false)
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_rexos_utilities.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_rexos_modbus.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
