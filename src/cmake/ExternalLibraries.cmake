@@ -62,16 +62,4 @@ endif(NOT OpenCV_DIR)
 # Finally, try finding the package
 find_package(OpenCV)
 
-# == Find wxWidgets  == #
-# Sets wxWidgets_FOUND, wxWidgets_LIBRARIES
-find_package(wxWidgets COMPONENTS core base)
-include("${wxWidgets_USE_FILE}")
-
-# == Find GLUT  == #
-# Sets GLUT_FOUND, GLUT_INCLUDE_DIR, GLUT_LIBRARIES
-find_package(GLUT)
-
-# == Find OpenGL  == #
-# Sets OPENGL_FOUND, OPENGL_XMESA_FOUND, OPENGL_GLU_FOUND, OPENGL_INCLUDE_DIR, OPENGL_LIBRARIES
-find_package(OpenGL)
 find_package(Mongo)
