@@ -38,6 +38,9 @@
 #include <CrateLocatorNode/CrateLocatorNode.h>
 #include <CrateLocatorNode/Services.h>
 #include <CrateLocatorNode/Topics.h>
+#include <environmentCache/EnvironmentCacheUpdate.h>
+#include <environmentCache/EnvironmentCache.h>
+#include <rexosStdMsgs/KeyValuePair.h>
 #include <DataTypes/Crate.h>
 
 /**
@@ -103,8 +106,9 @@ CrateLocatorNode::CrateLocatorNode() : measurementCount(0), measurements(0), fai
 	int numberOfStableFrames = 5;
 	crateTracker = new Vision::CrateTracker(numberOfStableFrames, crateMovementThreshold);
 
-	// ROS services and topics
+	// ROS clients, services and topics
 	crateEventPublisher = node.advertise<crateLocatorNode::CrateEventMsg>(CrateLocatorNodeTopics::CRATE_EVENT, 100);
+	updateEnvironmentCacheClient = node.serviceClient<environmentCache::UpdateEnvironmentCache>("updateEnvironmentCache");
 	getCrateService = node.advertiseService(CrateLocatorNodeServices::GET_CRATE, &CrateLocatorNode::getCrate, this);
 	getAllCratesService = node.advertiseService(CrateLocatorNodeServices::GET_ALL_CRATES, &CrateLocatorNode::getAllCrates, this);
 
@@ -330,6 +334,7 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 
 	// Detect all QR crates in the image.
 	std::vector<DataTypes::Crate> crates;
+	crates.push_back(Crate())
 	qrDetector->detectQRCodes(gray, crates);
 
 	// Transform crate coordinates
@@ -360,6 +365,39 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 
 		ROS_INFO("%s", it->toString().c_str());
 		crateEventPublisher.publish(msg);
+
+		// update the environment cache
+		if(it->type != Vision::CrateEvent::type_moving) {
+			environmentCache::EnvironmentCacheUpdate envMsg;
+			if(it->type == Vision::CrateEvent::type_in ) {
+				envMsg.event = EnvironmentCache::ADD;
+			} else if(it->type == Vision::CrateEvent::type_out){
+				envMsg.event = EnvironmentCache::REMOVE;
+			} else if(it->type == Vision::CrateEvent::type_moved) {
+				envMsg.event = EnvironmentCache::UPDATE;
+			}
+			// Initialize parameters
+			envMsg.id = it->name;
+			rexosStdMsgs::KeyValuePair xParameter;
+			xParameter.key = "x";
+			xParameter.value = it->x;
+			rexosStdMsgs::KeyValuePair yParameter;
+			yParameter.key = "y";
+			yParameter.value = it->y;
+			rexosStdMsgs::KeyValuePair angleParameter;
+			angleParameter.key = "angle";
+			angleParameter.value = it->angle;
+			rexosStdMsgs::Map properties;
+			properties.KeyValuePairSet.push_back(xParameter);
+			properties.KeyValuePairSet.push_back(yParameter);
+			properties.KeyValuePairSet.push_back(angleParameter);
+			envMsg.properties = properties;
+			updateCacheSrv.request.cacheUpdate = envMsg;
+			if (updateEnvironmentCacheClient.call(updateCacheSrv))
+			{
+				std::cout << "Environment Cache updated" << std::endl;
+			}
+		}
 	}
 
 	// Show the camera frame in a opencv window

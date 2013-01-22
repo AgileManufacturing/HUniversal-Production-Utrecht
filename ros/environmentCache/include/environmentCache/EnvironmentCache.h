@@ -7,7 +7,7 @@
  *
  * @section LICENSE
  * License: newBSD
- * 
+ *
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
@@ -53,11 +53,11 @@ public:
 	void printEnvironmentCache();
 
 private:
-	bool addItemToCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties);
-	bool updateItemInCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties);
+	bool addItemToCache(std::string id, const std::vector<rexosStdMsgs::KeyValuePair> &properties);
+	bool updateItemInCache(std::string id, const std::vector<rexosStdMsgs::KeyValuePair> &properties);
 	bool removeItemFromCache(std::string id);
-	void createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap);
-	environmentCommunicationMessages::Map createMapMessageFromProperties(std::map<std::string, std::string> &properties);
+	void createMapFromVector(const std::vector<rexosStdMsgs::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap);
+	rexosStdMsgs::Map createMapMessageFromProperties(std::map<std::string, std::string> &properties);
 
 	/**
 	 * @var std::map< std::string, std::map<std::string, std::string> > cache

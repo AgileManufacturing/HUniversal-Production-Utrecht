@@ -1,4 +1,4 @@
 string lookupID
 ---
-environmentCommunicationMessages/Map object
+rexosStdMsgs/Map object
 bool found

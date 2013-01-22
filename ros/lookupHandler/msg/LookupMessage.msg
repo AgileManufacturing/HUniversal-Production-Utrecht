@@ -1,3 +1,3 @@
 string lookupType
 string lookupID
-environmentCommunicationMessages/Map payLoad
+rexosStdMsgs/Map payLoad

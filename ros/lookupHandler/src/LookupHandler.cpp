@@ -51,13 +51,13 @@ bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookupHandle
 	msg.request.lookupID = request.lookupMsg.lookupID;
 	std::map<std::string, std::string> payLoadMap;
 	std::map<std::string, std::string>::iterator it;
-	createMapFromVector(request.lookupMsg.payLoad.map, payLoadMap);
+	createMapFromVector(request.lookupMsg.payLoad.KeyValuePairSet, payLoadMap);
 	if(lookupClient.call(msg)){
 		if(msg.response.found){
-			for(int i = 0; i < (int)(msg.response.object.map.size()); i++){
-				it = payLoadMap.find(msg.response.object.map[i].key);
+			for(int i = 0; i < (int)(msg.response.object.KeyValuePairSet.size()); i++){
+				it = payLoadMap.find(msg.response.object.KeyValuePairSet[i].key);
 				std::string valueObject =  (*it).second;
-				std::string valuePayload = msg.response.object.map[i].value;
+				std::string valuePayload = msg.response.object.KeyValuePairSet[i].value;
 
 				// TODO should do something cool with the data
 
@@ -79,7 +79,7 @@ bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookupHandle
  * @param vector The vector with KeyValuePair objects
  * @param map The map where the keys and values of the objects in the vector are inserted to
  **/
-void EnvironmentCommunication::LookupHandler::createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &vector, std::map<std::string, std::string> &map){
+void EnvironmentCommunication::LookupHandler::createMapFromVector(const std::vector<rexosStdMsgs::KeyValuePair> &vector, std::map<std::string, std::string> &map){
 	for(int i = 0; i < (int)vector.size(); i++){
 		map.insert(std::pair<std::string, std::string>(vector[i].key, vector[i].value));
 	}

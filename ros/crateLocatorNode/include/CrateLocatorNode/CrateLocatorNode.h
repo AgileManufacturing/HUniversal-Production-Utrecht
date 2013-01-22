@@ -52,6 +52,8 @@
 #include <crateLocatorNode/getAllCrates.h>
 #include <crateLocatorNode/CrateEventMsg.h>
 
+#include <environmentCache/UpdateEnvironmentCache.h>
+
 /**
  * Locates the crate
  **/
@@ -109,6 +111,12 @@ private:
 	ros::Publisher crateEventPublisher;
 
 	/**
+	 * @var ros::ServiceClient updateEnvironmentCacheClient
+	 * Client for the updateEnvironmentCache service to store the parameters of the crates in the EnvironmentCache
+	 **/
+	ros::ServiceClient updateEnvironmentCacheClient;
+
+	/**
 	 * @var ros::ServiceServer getCrateService
 	 * Service server for the getCrateService. As long as the service server is "running" the service is provided.
 	 **/
@@ -119,6 +127,12 @@ private:
 	 * Service server for the getAllCratesService. As long as the service server is "running" the service is provided.
 	 **/
 	ros::ServiceServer getAllCratesService;
+
+	/**
+	 * @var environmentCache::UpdateEnvironmentCache updateCacheSrv;
+	 * The UpdateEnvironmentCacheService
+	 **/
+	environmentCache::UpdateEnvironmentCache updateCacheSrv;
 
 	// For calibration
 	/**

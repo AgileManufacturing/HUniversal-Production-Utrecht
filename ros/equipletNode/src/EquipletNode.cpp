@@ -307,7 +307,7 @@ bool EquipletNode::updateModuleState(int moduleID, rosMast::StateType state){
  * @param lookupID the ID of the lookup
  * @param payload the payload, contains data that will get combined with environmentcache data
  **/
-void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupID, environmentCommunicationMessages::Map payload){
+void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupID, rexosStdMsgs::Map payload){
  	lookupHandler::LookupServer msg;
 	msg.request.lookupMsg.lookupType = lookupType;
 	msg.request.lookupMsg.lookupID = lookupID;

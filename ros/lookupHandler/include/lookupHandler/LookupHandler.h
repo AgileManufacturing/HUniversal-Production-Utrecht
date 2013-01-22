@@ -31,8 +31,8 @@
 #define LOOKUPHANDLER_H
 
 #include "ros/ros.h"
-#include <environmentCommunicationMessages/KeyValuePair.h>
-#include <environmentCommunicationMessages/Map.h>
+#include <rexosStdMsgs/KeyValuePair.h>
+#include <rexosStdMsgs/Map.h>
 #include <environmentCache/LookupEnvironmentObject.h>
 #include "lookupHandler/LookupServer.h"
 #include "lookupHandler/LookupMessage.h"
@@ -57,7 +57,7 @@ namespace EnvironmentCommunication{
 			 **/
 			ros::ServiceServer lookupServer;
 
-			void createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &vector, std::map<std::string, std::string> &map);
+			void createMapFromVector(const std::vector<rexosStdMsgs::KeyValuePair> &vector, std::map<std::string, std::string> &map);
 	};
 }
 #endif

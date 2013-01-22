@@ -59,7 +59,7 @@ bool EnvironmentCache::lookupEnvironmentObject(environmentCache::LookupEnvironme
 		res.object = createMapMessageFromProperties(properties);
 		res.found = true;
 	} else{
-		environmentCommunicationMessages::Map map;
+		rexosStdMsgs::Map map;
 		res.object = map;
 		res.found = false;
 	}
@@ -83,13 +83,13 @@ bool EnvironmentCache::updateEnvironmentCache(environmentCache::UpdateEnvironmen
 	switch(event){
 		case ADD:
 			// Item is added to the cache
-			if(addItemToCache(id, req.cacheUpdate.properties.map)){
+			if(addItemToCache(id, req.cacheUpdate.properties.KeyValuePairSet)){
 				success = true;
 			}
 			break;
 		case UPDATE:
 			// Item is updated in cache
-			if(updateItemInCache(id, req.cacheUpdate.properties.map)){
+			if(updateItemInCache(id, req.cacheUpdate.properties.KeyValuePairSet)){
 				success = true;
 			}
 			break;
@@ -130,7 +130,7 @@ void EnvironmentCache::printEnvironmentCache(){
  *
  * @return True if item is added, false if there is already an item in the cache with the same id of the item to add
  **/
-bool EnvironmentCache::addItemToCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties){
+bool EnvironmentCache::addItemToCache(std::string id, const std::vector<rexosStdMsgs::KeyValuePair> &properties){
 	if(cache.count(id) == 0){
 		std::map<std::string, std::string> options;
 		// Convert the vector with properties to a map
@@ -151,7 +151,7 @@ bool EnvironmentCache::addItemToCache(std::string id, const std::vector<environm
  *
  * @return True if an item with the id is found in the cache, else false
  **/
-bool EnvironmentCache::updateItemInCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties){
+bool EnvironmentCache::updateItemInCache(std::string id, const std::vector<rexosStdMsgs::KeyValuePair> &properties){
 	if(cache.count(id) == 1){
 		// Create iterator for the cache
 		std::map< std::string, std::map<std::string, std::string> >::iterator cacheIterator;
@@ -203,7 +203,7 @@ bool EnvironmentCache::removeItemFromCache(std::string id){
  * @param propertiesVector The vector with KeyValuePair objects
  * @param propertiesMap The map where the keys and values of the objects in the vector are inserted to
  **/
-void EnvironmentCache::createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap){
+void EnvironmentCache::createMapFromVector(const std::vector<rexosStdMsgs::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap){
 	for(int i = 0; i < (int)propertiesVector.size(); i++){
 		propertiesMap.insert(std::pair<std::string, std::string>(propertiesVector[i].key, propertiesVector[i].value));
 	}
@@ -214,16 +214,16 @@ void EnvironmentCache::createMapFromVector(const std::vector<environmentCommunic
  *
  * @param properties The map to convert
  *
- * @return environmentCommunicationMessages::Map The map message object
+ * @return rexosStdMsgs::Map The map message object
  **/
-environmentCommunicationMessages::Map EnvironmentCache::createMapMessageFromProperties(std::map<std::string, std::string> &properties){
+rexosStdMsgs::Map EnvironmentCache::createMapMessageFromProperties(std::map<std::string, std::string> &properties){
 	std::map<std::string, std::string>::iterator propertiesIterator;
-	environmentCommunicationMessages::Map mapMsg;
-	environmentCommunicationMessages::KeyValuePair prop;
+	rexosStdMsgs::Map mapMsg;
+	rexosStdMsgs::KeyValuePair prop;
 	for(propertiesIterator = properties.begin(); propertiesIterator != properties.end(); propertiesIterator++){
 		prop.key = (*propertiesIterator).first;
 		prop.value = (*propertiesIterator).second;
-		mapMsg.map.push_back(prop);
+		mapMsg.KeyValuePairSet.push_back(prop);
 	}
 	return mapMsg;
 }

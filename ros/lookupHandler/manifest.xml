@@ -8,9 +8,9 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
 
-  <depend package="environmentCommunicationMessages" />
-  <depend package="environmentCache" />  
-  <depend package="roscpp" />  
+  <depend package="rexosStdMsgs" />
+  <depend package="environmentCache" />
+  <depend package="roscpp" />
 </package>
 
 

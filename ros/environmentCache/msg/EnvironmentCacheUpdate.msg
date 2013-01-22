@@ -1,3 +1,3 @@
 int32 event
 string id
-environmentCommunicationMessages/Map properties
+rexosStdMsgs/Map properties

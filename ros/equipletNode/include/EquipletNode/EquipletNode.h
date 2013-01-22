@@ -70,7 +70,7 @@ public:
 	bool moduleError(rosMast::ErrorInModule::Request &request, rosMast::ErrorInModule::Response &response);
 	void sendStateChangeRequest(int moduleID, rosMast::StateType newState);
 	rosMast::StateType getModuleState(int moduleID);
-	void callLookupHandler(std::string lookupType, std::string lookupID, environmentCommunicationMessages::Map payload);
+	void callLookupHandler(std::string lookupType, std::string lookupID, rexosStdMsgs::Map payload);
 private:
 	/**
 	 * @var int equipletId
