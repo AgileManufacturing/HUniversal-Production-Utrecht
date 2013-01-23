@@ -43,9 +43,8 @@ FollowNode::FollowNode( ) :
 	inputRunning(true), 
 	topicRunning(true),
 	inputThread(NULL), 
-	deltaRobotClient(
-    nodeHandle.serviceClient<rexosStdSrvs::Module>(DeltaRobotNodeServices::MOVE_TO_POINT)),
-    crateLocatorClient(nodeHandle.serviceClient<crateLocatorNode::getCrate>(CrateLocatorNodeServices::GET_CRATE)),
+	deltaRobotClient(nodeHandle.serviceClient<rexosStdSrvs::Module>(DeltaRobotNodeServices::MOVE_TO_POINT)),
+	crateLocatorClient(nodeHandle.serviceClient<crateLocatorNode::getCrate>(CrateLocatorNodeServices::GET_CRATE)),
 	getCrateService() 
 {
 	inputThread = new boost::thread(inputThreadMethod, this);
