@@ -36,7 +36,6 @@ macro(rexos_add_library library_name suppress_warnings)
 
 
 macro(crexos_add_library library_name suppress_warnings catkin_depends system_depends)
-
 	if(${suppress_warnings})
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 	endif()
@@ -99,6 +98,136 @@ macro(crexos_add_library library_name suppress_warnings catkin_depends system_de
 		
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endmacro(crexos_add_library)
+
+
+macro(crexos_add_library library_name suppress_warnings catkin_depends system_depends)
+	if(${suppress_warnings})
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+	endif()
+	set(build TRUE)
+	foreach(dep ${catkin_depends})	
+		if(NOT ${${dep}_BUILD})
+			set(build FALSE)
+			list(APPEND missing_dependencies ${dep})
+		else()
+			find_package(catkin REQUIRED ${dep})
+		endif()
+	endforeach(dep)
+
+	foreach(dep ${system_depends})	
+		find_package(${dep})
+		string(TOUPPER ${dep} upper_dep)
+		if(NOT ${${upper_dep}_FOUND})
+			set(build FALSE)
+			list(APPEND missing_dependencies ${dep})
+		elseif(NOT ${${dep}_FOUND})
+			set(build FALSE)
+			list(APPEND missing_dependencies ${dep})
+		endif()
+	endforeach(dep)
+	
+	# create a list of include dirs
+	foreach(dep ${catkin_depends})
+		list(APPEND include_dirs  ${${dep}_INCLUDE_DIRS} ${${dep}_INCLUDE_DIR})
+	endforeach(dep)
+	foreach(dep ${system_depends})
+		list(APPEND include_dirs  ${${dep}_INCLUDE_DIRS} ${${dep}_INCLUDE_DIR})
+	endforeach(dep)
+	# create a list of libraries
+	foreach(dep ${catkin_depends})
+		list(APPEND libraries ${${dep}_LIBRARIES} ${${dep}_LIBS})
+	endforeach(dep)
+	foreach(dep ${system_depends})
+		list(APPEND libraries  ${${dep}_LIBRARIES} ${${dep}_LIBS})
+	endforeach(dep)
+
+	if(build)
+		catkin_package(
+		INCLUDE_DIRS include
+		LIBRARIES ${library_name}
+		CATKIN_DEPENDS ${catkin_depends}
+		DEPENDS ${system_depends}
+		)
+
+		SET(${library_name}_BUILD "TRUE" CACHE INTERNAL "")
+		file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
+		add_library(${library_name} STATIC ${sources})
+		include_directories(BEFORE "include")
+
+		include_directories(${include_dirs})
+		target_link_libraries(${library_name} ${libraries})
+	else()
+		message(WARNING "${library_name} can't be build because dependencies to ${missing_dependencies} are missing. ") 
+		SET(${library_name}_BUILD "FALSE" CACHE INTERNAL "")
+	endif()
+		
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+endmacro(crexos_add_library)
+
+
+macro(crexos_add_executable library_name suppress_warnings catkin_depends system_depends)
+	if(${suppress_warnings})
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+	endif()
+	set(build TRUE)
+	foreach(dep ${catkin_depends})	
+		if(NOT ${${dep}_BUILD})
+			set(build FALSE)
+			list(APPEND missing_dependencies ${dep})
+		else()
+			find_package(catkin REQUIRED ${dep})
+		endif()
+	endforeach(dep)
+
+	foreach(dep ${system_depends})	
+		find_package(${dep})
+		string(TOUPPER ${dep} upper_dep)
+		if(NOT ${${upper_dep}_FOUND})
+			set(build FALSE)
+			list(APPEND missing_dependencies ${dep})
+		elseif(NOT ${${dep}_FOUND})
+			set(build FALSE)
+			list(APPEND missing_dependencies ${dep})
+		endif()
+	endforeach(dep)
+	
+	# create a list of include dirs
+	foreach(dep ${catkin_depends})
+		list(APPEND include_dirs  ${${dep}_INCLUDE_DIRS} ${${dep}_INCLUDE_DIR})
+	endforeach(dep)
+	foreach(dep ${system_depends})
+		list(APPEND include_dirs  ${${dep}_INCLUDE_DIRS} ${${dep}_INCLUDE_DIR})
+	endforeach(dep)
+	# create a list of libraries
+	foreach(dep ${catkin_depends})
+		list(APPEND libraries ${${dep}_LIBRARIES} ${${dep}_LIBS})
+	endforeach(dep)
+	foreach(dep ${system_depends})
+		list(APPEND libraries  ${${dep}_LIBRARIES} ${${dep}_LIBS})
+	endforeach(dep)
+
+	if(build)
+		catkin_package(
+		INCLUDE_DIRS include
+		LIBRARIES ${library_name}
+		CATKIN_DEPENDS ${catkin_depends}
+		DEPENDS ${system_depends}
+		)
+
+		SET(${library_name}_BUILD "TRUE" CACHE INTERNAL "")
+		file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
+		add_executable(${library_name} ${sources})
+		include_directories(BEFORE "include")
+
+		include_directories(${include_dirs})
+		target_link_libraries(${library_name} ${libraries})
+	else()
+		message(WARNING "${library_name} can't be build because dependencies to ${missing_dependencies} are missing. ") 
+		SET(${library_name}_BUILD "FALSE" CACHE INTERNAL "")
+	endif()
+		
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+endmacro(crexos_add_executable)
 
 ##############################################################################
  # add_rexos_executable(<executable_name>, [<path>])

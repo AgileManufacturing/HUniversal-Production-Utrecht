@@ -29,8 +29,8 @@
  **/
 
 #include <iostream>
-#include <blackboardCppClient/BlackboardCppClient.h>
-#include <Utilities/Utilities.h>
+#include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
+#include <rexos_utilities/Utilities.h>
 #include <memory>
 #include <set>
 #include <unistd.h>

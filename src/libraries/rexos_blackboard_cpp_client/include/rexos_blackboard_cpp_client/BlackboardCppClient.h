@@ -36,7 +36,7 @@
 #include <vector>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
-#include <blackboardCppClient/BlackboardSubscriber.h>
+#include <rexos_blackboard_cpp_client/BlackboardSubscriber.h>
 #include <algorithm>
 #include <iostream>
 
