@@ -34,7 +34,15 @@
  * Create a new EquipletNode
  * @param id The unique identifier of the Equiplet
  **/
-EquipletNode::EquipletNode(int id): equipletId(id), moduleTable(){
+EquipletNode::EquipletNode(int id): 
+	equipletId(id),
+	operationState(),
+	safetyState(), 
+	moduleTable(),
+	moduleErrorService(),
+	stateUpdateService(),
+	modulePackageNodeMap(),
+	blackboardClient(NULL){
 	// Create the map with moduleType mapped to package name and node name
 	modulePackageNodeMap = std::map< int, std::pair<std::string, std::string> >();
 	modulePackageNodeMap[1] = std::pair< std::string, std::string > ("deltaRobotNode", "DeltaRobotNode");

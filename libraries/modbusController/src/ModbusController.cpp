@@ -47,8 +47,10 @@ namespace ModbusController{
 	 * 
 	 * @param context Initialized modbus_t.
 	 **/
-	ModbusController::ModbusController(modbus_t* context) : nextWriteTime(0), shadowRegisters(){
-		this->context = context;
+    ModbusController::ModbusController(modbus_t* context) : 
+    context(context),
+    nextWriteTime(0), 
+    shadowRegisters(){
 		if(context == NULL){
 			throw ModbusException("Error uninitialized connection");
 		}

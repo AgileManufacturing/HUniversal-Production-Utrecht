@@ -76,7 +76,7 @@ namespace Utilities{
 		 * @param name Name of the stopwatch, useful for clarity when printing the stopwatch.
 		 * @param autoStart Optional flag (defaults to false) to start the stopwatch when it is created.
 		 **/
-		StopWatch(const char* name, bool autoStart = false) : name(name){
+		StopWatch(const char* name, bool autoStart = false) : name(name), timeOfStart(0), timeOfStop(0){
 			if(autoStart){ start(); }
 		}
 

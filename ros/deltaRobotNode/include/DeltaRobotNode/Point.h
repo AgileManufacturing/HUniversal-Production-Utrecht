@@ -30,53 +30,44 @@
 #ifndef POINT_H
 #define POINT_H
 
-namespace deltaRobotNodeNamespace{
+namespace deltaRobotNodeNamespace {
 	/**
 	 * The entity object for a Point
 	 **/
-	class Point{
+	class Point {
 	public:
 		/**
 		 * @var double x 
 		 * The x coordinate of the point
 		 **/
 		double x;
-
 		/**
 		 * @var double y 
 		 * The y coordinate of the point
 		 **/
 		double y;
-
 		/**
 		 * @var double z
 		 * The z coordinate of the point
 		 **/
 		double z;
-
 		/**
 		 * @var double maxAcceleration 
 		 * The maximum accelartion 
 		 **/
 		double maxAcceleration;
-
 		/**
 		 * Default constructor
 		 **/
-		Point(){}
-
+		Point() : x(0), y(0), z(0), maxAcceleration(0) {}
 		/**
-		 * @param xValue the x value for the point object
-		 * @param yValue the y value for the point object
-		 * @param zValue the z value for the point object
-		 * @param maxAccelerationValue the max acceleration value for the point object
+		 * @param x the x value for the point object
+		 * @param y the y value for the point object
+		 * @param z the z value for the point object
+		 * @param maxAcceleration the max acceleration value for the point object
 		 **/
-		Point(double xValue, double yValue, double zValue, double maxAccelerationValue){
-			x = xValue;
-			y = yValue;
-			z = zValue;
-			maxAcceleration = maxAccelerationValue;
-		}
+		Point(double x, double y, double z, double maxAcceleration) : x(x), y(y), z(z), maxAcceleration(maxAcceleration){}
 	};
 }
+
 #endif

@@ -50,15 +50,13 @@ namespace rosMast{
 	 * Used to build a array of transitions so they can be mapped to function pointers
 	 **/
 	struct StateTransition{
-		StateTransition(){}
 
 		/**
 		 * Constructor for StateTransition
 		 **/
-		StateTransition(StateType src, StateType des){
-			sourceState = src;
-			destinationState = des;
-		}
+		StateTransition(StateType src, StateType des) :
+			sourceState(src),
+			destinationState(des){}
 
 		/**
 		 * @var StateType sourceState
@@ -95,6 +93,8 @@ namespace rosMast{
 
 	public:
 		StateMachine(int equipletID, int moduleID);
+
+			virtual ~StateMachine(){ };
 
 		/**
 		 * Transition from Safe to Standby

@@ -62,7 +62,7 @@ namespace ModbusController{
 		 * Constructor of the modbus exception
 		 * Retrieves an error string from the modbus library.
 		 **/
-		ModbusException(void) : std::runtime_error(""), errorCode(errno){
+        ModbusException(void) : std::runtime_error(""), errorCode(errno), message(""){
 			std::stringstream stream;
 			stream << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
 			message = stream.str();
@@ -73,7 +73,7 @@ namespace ModbusController{
 		 * Adds a user specified message
 		 * @see ModbusException
 		 **/
-		ModbusException(const std::string msg) : std::runtime_error(""), errorCode(errno){
+        ModbusException(const std::string msg) : std::runtime_error(""), errorCode(errno), message(""){
 			std::stringstream stream;
 			stream << msg << std::endl;
 			stream << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);

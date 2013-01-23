@@ -178,7 +178,7 @@ namespace Motor{
 			 **/
 			enum _rtu_config{
 				BAUDRATE	= 115200,
-				PARITY		= 'N',
+                PARITY   = 'E',
 				DATA_BITS	= 8,
 				STOP_BITS	= 1
 			};
