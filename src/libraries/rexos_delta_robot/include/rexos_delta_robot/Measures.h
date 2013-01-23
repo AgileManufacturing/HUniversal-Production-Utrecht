@@ -31,10 +31,10 @@
  **/
 
 #pragma once
-#include <Utilities/Utilities.h>
-#include <Motor/CRD514KD.h>
+#include <rexos_utilities/Utilities.h>
+#include <rexos_motor/CRD514KD.h>
 
-namespace DeltaRobot{
+namespace rexos_delta_robot{
 	namespace Measures{
 		/**
     	 * @var double BASE
@@ -64,25 +64,25 @@ namespace DeltaRobot{
 		 * @var double HIP_ANKLE_ANGLE_MAX
 		 * Maximum angle between hip and ankle when moving the ankle sideways in radians.
 		 **/
-		const double HIP_ANKLE_ANGLE_MAX = Utilities::degreesToRadians(22);
+		const double HIP_ANKLE_ANGLE_MAX = rexos_utilities::degreesToRadians(22);
 
 		/**
 		 * @var double MOTOR_ROT_MIN
 		 * Mathematical minimum angle the motor is allowed to move to in radians.
 		 **/
-		const double MOTOR_ROT_MIN = Utilities::degreesToRadians(-42);
+		const double MOTOR_ROT_MIN = rexos_utilities::degreesToRadians(-42);
 
 		/**
 		 * @var double MOTOR_ROT_MAX
 		 * Mathematical maximum angle the motor is allowed to move to in radians.
 		 **/
-		const double MOTOR_ROT_MAX = Utilities::degreesToRadians(55);
+		const double MOTOR_ROT_MAX = rexos_utilities::degreesToRadians(55);
 		
 		/**
 		 * @var double MOTORS_FROM_ZERO_TO_TOP_POSITION
 		 * The angle from zero (horizontal) to the top position in radians.
 		 **/
-		const double MOTORS_FROM_ZERO_TO_TOP_POSITION = Utilities::degreesToRadians(42.5); 
+		const double MOTORS_FROM_ZERO_TO_TOP_POSITION = rexos_utilities::degreesToRadians(42.5); 
 
 		/**
 		 * @var double BOUNDARY_BOX_MAX_X
@@ -124,7 +124,7 @@ namespace DeltaRobot{
 		 * @var double CALIBRATION_STEP_SMALL
 		 * The size of the small steps in the calibration in radians.
 		 **/
-		const double CALIBRATION_STEP_SMALL = Motor::CRD514KD::MOTOR_STEP_ANGLE;
+		const double CALIBRATION_STEP_SMALL = rexos_motor::CRD514KD::MOTOR_STEP_ANGLE;
 		
 		/**
 		 * @var double CALIBRATION_STEP_BIG

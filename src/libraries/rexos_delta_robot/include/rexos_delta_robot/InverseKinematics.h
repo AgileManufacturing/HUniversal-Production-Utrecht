@@ -1,6 +1,11 @@
 /**
- * @file InverseKinematicsException.h
- * @brief Exception thrown if an invalid value is calculated during inverse kinematics.
+ * @file InverseKinematics.h
+ * @brief Inverse kinematics implementation. Based on work from Viacheslav Slavinsky.\n
+ * conventions sitting in front of delta robot:\n
+ * x-axis goes from left to right\n
+ * y-axis goes from front to back\n
+ * z-axis goes from bottom to top\n
+ * point (0,0,0) lies in the middle of all the motors at the motor's height
  *
  * @author 1.0 Lukas Vermond
  * @author 1.0 Kasper van Nieuwland
@@ -31,43 +36,35 @@
 
 #pragma once
 
-#include <stdexcept>
+#include <rexos_datatypes/Point3D.h>
+#include <rexos_datatypes/MotorRotation.h>
+#include <rexos_datatypes/DeltaRobotMeasures.h>
+#include <rexos_delta_robot/InverseKinematicsModel.h>
 
-#include <DataTypes/MotorRotation.h>
-#include <DataTypes/Point3D.h>
-
-namespace DeltaRobot{
+namespace rexos_delta_robot{
 	/**
-	 * Exception thrown if an invalid value is calculated during inverse kinematics.
+	 * Inverse kinematics implementation. Based on work from Viacheslav Slavinsky\n
+	 * Conventions sitting in front of delta robot:\n
+	 * x-axis goes from left to right\n
+	 * y-axis goes from front to back\n
+	 * z-axis goes from bottom to top\n
+	 * point (0,0,0) lies in the middle of all the motors at the motor's height
 	 **/
-	class InverseKinematicsException: public std::runtime_error{
+	class InverseKinematics : public InverseKinematicsModel{
 	private:
-		/**
-		 * @var Point3D<double> notConvertablePoint
-		 * Point that could not be converted into angles for the motors.
-		 **/
-		DataTypes::Point3D<double> notConvertablePoint;
+		double motorAngle(const rexos_datatypes::Point3D<double>& destinationPoint,
+				double motorLocation) const;
 
 	public:
-		/**
-		 * Constructor for InverseKinematicsException.
-		 * @param exceptionMessage The exception message
-		 * @param destinationPoint The point of the destination.
-		 **/
-		InverseKinematicsException(const char* exceptionMessage, DataTypes::Point3D<double> destinationPoint) :
-				std::runtime_error(exceptionMessage), notConvertablePoint(destinationPoint){}
+		InverseKinematics(const double base, const double hip,
+			const double effector, const double ankle,
+			const double maxAngleHipAnkle);
 
-		/**
-		 * Destructor for InverseKinematicsException.
-		 **/
-		virtual ~InverseKinematicsException(void) throw(){}
+		InverseKinematics(rexos_datatypes::DeltaRobotMeasures& deltaRobotMeasures);
 
-		/**
-		 * Used to access the point that could not be converted.
-		 * @return A point3D<double> of the point that could not be converted.
-		 **/
-		DataTypes::Point3D<double> getNotConvertablePoint(void){
-			return notConvertablePoint;
-		}
+		virtual ~InverseKinematics(void);
+		
+		void destinationPointToMotorRotations(const rexos_datatypes::Point3D<double>& destinationPoint,
+				rexos_datatypes::MotorRotation* (&rotations)[3]) const;
 	};
 }

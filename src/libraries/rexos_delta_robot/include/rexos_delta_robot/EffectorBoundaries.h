@@ -33,13 +33,13 @@
 #pragma once
 
 #include <iostream>
-#include <DataTypes/Point3D.h>
-#include <Motor/StepperMotor.h>
-#include <DeltaRobot/Measures.h>
-#include <DeltaRobot/InverseKinematicsModel.h>
+#include <rexos_datatypes/Point3D.h>
+#include <rexos_motor/StepperMotor.h>
+#include <rexos_delta_robot/Measures.h>
+#include <rexos_delta_robot/InverseKinematicsModel.h>
 #include <vector>
 
-namespace DeltaRobot{
+namespace rexos_delta_robot{
 	/**
 	 * This class represents a delta robot's effector work field.
 	 * This work field is stored as a 3D bitmap (bool array).
@@ -49,10 +49,10 @@ namespace DeltaRobot{
 	public:
 		~EffectorBoundaries();
 
-		// TODO: change Motor::StepperMotor to two doubles for max and min angle
-		static EffectorBoundaries* generateEffectorBoundaries(const InverseKinematicsModel& model, Motor::StepperMotor* (&motors)[3], double voxelSize);
+		// TODO: change rexos_motor::StepperMotor to two doubles for max and min angle
+		static EffectorBoundaries* generateEffectorBoundaries(const InverseKinematicsModel& model, rexos_motor::StepperMotor* (&motors)[3], double voxelSize);
 
-		bool checkPath(const DataTypes::Point3D<double>& from, const DataTypes::Point3D<double>& to) const;
+		bool checkPath(const rexos_datatypes::Point3D<double>& from, const rexos_datatypes::Point3D<double>& to) const;
 
 		/**
 		 * Gets the boundariesBitmap. This bitmap is a one dimensional array of booleans, defaulted to false, where voxels are checked and set to true if they are reachable.
@@ -90,7 +90,7 @@ namespace DeltaRobot{
 		inline double getVoxelSize() const{ return voxelSize; }
 
 	private:
-		EffectorBoundaries(const InverseKinematicsModel& model, Motor::StepperMotor* (&motors)[3], double voxelSize);
+		EffectorBoundaries(const InverseKinematicsModel& model, rexos_motor::StepperMotor* (&motors)[3], double voxelSize);
 
 		/**
 		 * Represents a 3-dimensional point in the 3D voxel array.
@@ -133,8 +133,8 @@ namespace DeltaRobot{
 		 * 
 		 * @param coordinate The bitmap coordinate.
 		 **/
-		inline DataTypes::Point3D<double> fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const{
-			return DataTypes::Point3D<double>(
+		inline rexos_datatypes::Point3D<double> fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const{
+			return rexos_datatypes::Point3D<double>(
 					(double) coordinate.x * voxelSize + Measures::BOUNDARY_BOX_MIN_X,
 					(double) coordinate.y * voxelSize + Measures::BOUNDARY_BOX_MIN_Y,
 					(double) coordinate.z * voxelSize + Measures::BOUNDARY_BOX_MIN_Z);
@@ -145,7 +145,7 @@ namespace DeltaRobot{
 		 * 
 		 * @param coordinate The real life coordinate.
 		 **/
-		inline EffectorBoundaries::BitmapCoordinate fromRealCoordinate(DataTypes::Point3D<double> coordinate) const{
+		inline EffectorBoundaries::BitmapCoordinate fromRealCoordinate(rexos_datatypes::Point3D<double> coordinate) const{
 			return EffectorBoundaries::BitmapCoordinate(
 				(coordinate.x - Measures::BOUNDARY_BOX_MIN_X) / voxelSize,
 				(coordinate.y - Measures::BOUNDARY_BOX_MIN_Y) / voxelSize,
@@ -195,7 +195,7 @@ namespace DeltaRobot{
 		 * @var StepperMotor* motors
 		 * An array holding pointers to the three StepperMotors that are connected to the DeltaRobot. This array HAS to be of size 3. The EffectorBoundaries needs to know the motors to find out their max and min angles.
 		 **/
-		Motor::StepperMotor* (&motors)[3];
+		rexos_motor::StepperMotor* (&motors)[3];
 
 		/**
 		 * @var double voxelSize

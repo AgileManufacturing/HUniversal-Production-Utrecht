@@ -33,21 +33,21 @@
 #pragma once
 
 #include <modbus/modbus.h>
-#include <DataTypes/Point3D.h>
-#include <DataTypes/DeltaRobotMeasures.h>
-#include <Motor/MotorInterface.h>
-#include <Motor/StepperMotor.h>
-#include <Motor/MotorManager.h>
-#include <DeltaRobot/EffectorBoundaries.h>
+#include <rexos_datatypes/Point3D.h>
+#include <rexos_datatypes/DeltaRobotMeasures.h>
+#include <rexos_motor/MotorInterface.h>
+#include <rexos_motor/StepperMotor.h>
+#include <rexos_motor/MotorManager.h>
+#include <rexos_delta_robot/EffectorBoundaries.h>
 
-namespace DeltaRobot{
+namespace rexos_delta_robot{
 	class InverseKinematicsModel;
 	/**
 	 * A class that symbolizes an entire deltarobot.
 	 **/
 	class DeltaRobot{
 	public:
-		DeltaRobot(DataTypes::DeltaRobotMeasures& deltaRobotMeasures, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3], modbus_t* modbusIO);
+		DeltaRobot(rexos_datatypes::DeltaRobotMeasures& deltaRobotMeasures, rexos_motor::MotorManager* motorManager, rexos_motor::StepperMotor* (&motors)[3], modbus_t* modbusIO);
 		~DeltaRobot();
 
 		/**
@@ -63,15 +63,15 @@ namespace DeltaRobot{
 		inline bool hasBoundaries(){ return boundariesGenerated; }
 
 		void generateBoundaries(double voxelSize);
-		bool checkPath(const DataTypes::Point3D<double>& begin, const DataTypes::Point3D<double>& end);
+		bool checkPath(const rexos_datatypes::Point3D<double>& begin, const rexos_datatypes::Point3D<double>& end);
 
-		void moveTo(const DataTypes::Point3D<double>& point, double maxAcceleration);
+		void moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration);
 		void calibrateMotor(int motorIndex);
 		bool checkSensor(int sensorIndex);
 		bool calibrateMotors();
 		void powerOff();
 		void powerOn();
-		DataTypes::Point3D<double>& getEffectorLocation();
+		rexos_datatypes::Point3D<double>& getEffectorLocation();
 
 	private:
 		/**
@@ -84,13 +84,13 @@ namespace DeltaRobot{
 		 * @var StepperMotor* motors
 		 * An array holding pointers to the three StepperMotors that are connected to the DeltaRobot. This array HAS to be of size 3.
 		 **/
-		Motor::StepperMotor* (&motors)[3];
+		rexos_motor::StepperMotor* (&motors)[3];
 
 		/**
 		 * @var MotorManager* motorManager
 		 * A pointer to the MotorManager that handles the movement for the DeltaRobot.
 		 **/
-		Motor::MotorManager* motorManager;
+		rexos_motor::MotorManager* motorManager;
 
 		/**
 		 * @var EffectorBoundaries* boundaries
@@ -102,7 +102,7 @@ namespace DeltaRobot{
 		 * @var Point3D<double> effectorLocation
 		 * A 3D point in doubles that points to the location of the effector.
 		 **/
-		DataTypes::Point3D<double> effectorLocation;
+		rexos_datatypes::Point3D<double> effectorLocation;
 
 		/**
 		 * @var bool boundariesGenerated
@@ -123,7 +123,7 @@ namespace DeltaRobot{
 		int currentMotionSlot;
 
 		bool isValidAngle(int motorIndex, double angle);
-		int moveMotorUntilSensorIsOfValue(int motorIndex, DataTypes::MotorRotation motorRotation, bool sensorValue);
+		int moveMotorUntilSensorIsOfValue(int motorIndex, rexos_datatypes::MotorRotation motorRotation, bool sensorValue);
 		double getSpeedForRotation(double relativeAngle, double moveTime, double acceleration);
 		double getAccelerationForRotation(double relativeAngle, double moveTime);
 	};

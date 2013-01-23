@@ -45,6 +45,7 @@ sync.sh
 *.sublime-workspace
 *~
 *.class
+*.orig
 libraries/mongo-cxx-driver/.sconsign.dblite
 libraries/mongo-cxx-driver/config.log
 APDescription.txt

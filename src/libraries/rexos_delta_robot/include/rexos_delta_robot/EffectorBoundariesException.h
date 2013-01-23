@@ -1,15 +1,10 @@
 /**
- * @file InverseKinematics.h
- * @brief Inverse kinematics implementation. Based on work from Viacheslav Slavinsky.\n
- * conventions sitting in front of delta robot:\n
- * x-axis goes from left to right\n
- * y-axis goes from front to back\n
- * z-axis goes from bottom to top\n
- * point (0,0,0) lies in the middle of all the motors at the motor's height
+ * @file EffectorBoundariesException.h
+ * @brief Exception thrown if effector boundaries cannot be determined.
+ * @date Created: 2012-09-20
  *
- * @author 1.0 Lukas Vermond
- * @author 1.0 Kasper van Nieuwland
- * @author 1.1 Daan Veltman
+ * @author Koen Braham
+ * @author Daan Veltman
  *
  * @section LICENSE
  * License: newBSD
@@ -36,35 +31,25 @@
 
 #pragma once
 
-#include <DataTypes/Point3D.h>
-#include <DataTypes/MotorRotation.h>
-#include <DataTypes/DeltaRobotMeasures.h>
-#include <DeltaRobot/InverseKinematicsModel.h>
+#include <rexos_delta_robot/EffectorBoundaries.h>
 
-namespace DeltaRobot{
+#include <stdexcept>
+#include <string>
+#include <sstream>
+
+namespace rexos_delta_robot{
 	/**
-	 * Inverse kinematics implementation. Based on work from Viacheslav Slavinsky\n
-	 * Conventions sitting in front of delta robot:\n
-	 * x-axis goes from left to right\n
-	 * y-axis goes from front to back\n
-	 * z-axis goes from bottom to top\n
-	 * point (0,0,0) lies in the middle of all the motors at the motor's height
+	 * Exception to indicate modbus errors.
+	 *
+	 * ModbusController can throw this exception whenever a modbus related error occurs.
 	 **/
-	class InverseKinematics : public InverseKinematicsModel{
-	private:
-		double motorAngle(const DataTypes::Point3D<double>& destinationPoint,
-				double motorLocation) const;
-
+	class EffectorBoundariesException : public std::runtime_error{
 	public:
-		InverseKinematics(const double base, const double hip,
-			const double effector, const double ankle,
-			const double maxAngleHipAnkle);
-
-		InverseKinematics(DataTypes::DeltaRobotMeasures& deltaRobotMeasures);
-
-		virtual ~InverseKinematics(void);
-		
-		void destinationPointToMotorRotations(const DataTypes::Point3D<double>& destinationPoint,
-				DataTypes::MotorRotation* (&rotations)[3]) const;
+		/**
+		 * Constructor for the exception for effector boundaries.
+		 *
+		 * @param msg The message when the error is thrown.
+		 **/
+		EffectorBoundariesException(const std::string& msg) : std::runtime_error(msg){}
 	};
 }

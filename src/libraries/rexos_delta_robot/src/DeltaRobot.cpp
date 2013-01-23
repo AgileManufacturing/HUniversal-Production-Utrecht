@@ -36,16 +36,16 @@
 #include <stdexcept>
 #include <cmath>
 
-#include <DataTypes/Point3D.h>
-#include <Motor/MotorInterface.h>
-#include <DeltaRobot/EffectorBoundaries.h>
-#include <DeltaRobot/InverseKinematics.h>
-#include <DeltaRobot/InverseKinematicsException.h>
-#include <DeltaRobot/DeltaRobot.h>
-#include <Motor/MotorException.h>
-#include <Utilities/Utilities.h>
+#include <rexos_datatypes/Point3D.h>
+#include <rexos_delta_robot/EffectorBoundaries.h>
+#include <rexos_delta_robot/InverseKinematics.h>
+#include <rexos_delta_robot/InverseKinematicsException.h>
+#include <rexos_delta_robot/DeltaRobot.h>
+#include <rexos_motor/MotorException.h>
+#include <rexos_motor/MotorInterface.h>
+#include <rexos_utilities/Utilities.h>
 
-namespace DeltaRobot{
+namespace rexos_delta_robot{
     /**
      * Constructor of a deltarobot.
      * 
@@ -54,9 +54,9 @@ namespace DeltaRobot{
      * @param motors The motor array with the three motor objects.
      * @param modbusIO The TCP modbus connection for the IO controller.
      **/
-    DeltaRobot::DeltaRobot(DataTypes::DeltaRobotMeasures& deltaRobotMeasures, Motor::MotorManager* motorManager, Motor::StepperMotor* (&motors)[3], modbus_t* modbusIO) :
+    DeltaRobot::DeltaRobot(rexos_datatypes::DeltaRobotMeasures& deltaRobotMeasures, rexos_motor::MotorManager* motorManager, rexos_motor::StepperMotor* (&motors)[3], modbus_t* modbusIO) :
         motors(motors),
-        effectorLocation(DataTypes::Point3D<double>(0, 0, 0)), 
+        effectorLocation(rexos_datatypes::Point3D<double>(0, 0, 0)), 
         boundariesGenerated(false),
         modbusIO(modbusIO),
         currentMotionSlot(1){
@@ -113,7 +113,7 @@ namespace DeltaRobot{
      * 
      * @return if the path between two points is valid.
      **/
-    bool DeltaRobot::checkPath(const DataTypes::Point3D<double>& begin, const DataTypes::Point3D<double>& end){
+    bool DeltaRobot::checkPath(const rexos_datatypes::Point3D<double>& begin, const rexos_datatypes::Point3D<double>& end){
         return boundaries->checkPath(begin, end);
     }
 
@@ -148,10 +148,10 @@ namespace DeltaRobot{
      * @param point 3-dimensional point to move to.
      * @param maxAcceleration the acceleration in radians/s² that the motor with the biggest motion will accelerate at.
      **/
-    void DeltaRobot::moveTo(const DataTypes::Point3D<double>& point, double maxAcceleration){
+    void DeltaRobot::moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration){
         // check whether the motors are powered on.
         if(!motorManager->isPoweredOn()){
-            throw Motor::MotorException("motor drivers are not powered on");
+            throw rexos_motor::MotorException("motor drivers are not powered on");
         }
 
         if(effectorLocation == point){
@@ -159,19 +159,19 @@ namespace DeltaRobot{
             return;
         }
 
-        if(maxAcceleration > Motor::CRD514KD::MOTOR_MAX_ACCELERATION){
+        if(maxAcceleration > rexos_motor::CRD514KD::MOTOR_MAX_ACCELERATION){
             // The acceleration is too high, putting it down to the maximum CRD514KD acceleration.
-            maxAcceleration = Motor::CRD514KD::MOTOR_MAX_ACCELERATION;
-        } else if(maxAcceleration < Motor::CRD514KD::MOTOR_MIN_ACCELERATION){
+            maxAcceleration = rexos_motor::CRD514KD::MOTOR_MAX_ACCELERATION;
+        } else if(maxAcceleration < rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION){
             // The acceleration is too low, throwing an exception.
             throw std::out_of_range("maxAcceleration too low");            
         }
 
         // Create MotorRotation objects.
-        DataTypes::MotorRotation* rotations[3];
-        rotations[0] = new DataTypes::MotorRotation();
-        rotations[1] = new DataTypes::MotorRotation();
-        rotations[2] = new DataTypes::MotorRotation();
+        rexos_datatypes::MotorRotation* rotations[3];
+        rotations[0] = new rexos_datatypes::MotorRotation();
+        rotations[1] = new rexos_datatypes::MotorRotation();
+        rotations[2] = new rexos_datatypes::MotorRotation();
 
         // Get the motor angles from the kinematics model
         try{
@@ -215,7 +215,7 @@ namespace DeltaRobot{
                     motorWithBiggestMotion = i;
                 }
 
-                if(relativeAngles[i] < Motor::CRD514KD::MOTOR_STEP_ANGLE){
+                if(relativeAngles[i] < rexos_motor::CRD514KD::MOTOR_STEP_ANGLE){
                     // motor does not have to move at all
                     motorIsMoved[i] = false;
                 }
@@ -231,7 +231,7 @@ namespace DeltaRobot{
 
              // switch currentMotionSlot
             currentMotionSlot++;
-            if(currentMotionSlot > Motor::CRD514KD::MOTION_SLOTS_USED){
+            if(currentMotionSlot > rexos_motor::CRD514KD::MOTION_SLOTS_USED){
                 currentMotionSlot = 1;
             }
 
@@ -243,9 +243,9 @@ namespace DeltaRobot{
             // TODO: Take the motor's maximum speed into account.
             double moveTime;
 
-            if(sqrt(relativeAngles[motorWithBiggestMotion] * rotations[motorWithBiggestMotion]->acceleration) > Motor::CRD514KD::MOTOR_MAX_SPEED){
+            if(sqrt(relativeAngles[motorWithBiggestMotion] * rotations[motorWithBiggestMotion]->acceleration) > rexos_motor::CRD514KD::MOTOR_MAX_SPEED){
                 // In case of a two-phase motion, the top speed would come out above the motor's maximum, so a three-phase motion must be made.
-                rotations[motorWithBiggestMotion]->speed = Motor::CRD514KD::MOTOR_MAX_SPEED;
+                rotations[motorWithBiggestMotion]->speed = rexos_motor::CRD514KD::MOTOR_MAX_SPEED;
                 moveTime = (relativeAngles[motorWithBiggestMotion] / rotations[motorWithBiggestMotion]->speed) + (rotations[motorWithBiggestMotion]->speed / rotations[motorWithBiggestMotion]->acceleration);  
             } else {
                 // The motion is fine as a two-phase motion.
@@ -254,24 +254,24 @@ namespace DeltaRobot{
             
             // Set speed, and also the acceleration for the smaller motion motors
             for(int i = 0; i < 3; i++){
-                rotations[i]->speed = Motor::CRD514KD::MOTOR_MAX_SPEED;
+                rotations[i]->speed = rexos_motor::CRD514KD::MOTOR_MAX_SPEED;
 
                 if(i != motorWithBiggestMotion){
                     if(motorIsMoved[i]){
                         rotations[i]->acceleration = getAccelerationForRotation(relativeAngles[i], moveTime);
                         rotations[i]->deceleration = rotations[i]->acceleration;  
-                        if(rotations[i]->acceleration < Motor::CRD514KD::MOTOR_MIN_ACCELERATION){
+                        if(rotations[i]->acceleration < rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION){
                             // The acceleration comes out too low, this means the motion cannot be half acceleration and half deceleration (without a consant speed phase).
                             // To make it comply with the move time, as well as the minimum acceleration requirements, we have to add a top speed.
-                            rotations[i]->acceleration = Motor::CRD514KD::MOTOR_MIN_ACCELERATION;
-                            rotations[i]->deceleration = Motor::CRD514KD::MOTOR_MIN_ACCELERATION;
+                            rotations[i]->acceleration = rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION;
+                            rotations[i]->deceleration = rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION;
                             rotations[i]->speed = getSpeedForRotation(relativeAngles[i], moveTime, rotations[i]->acceleration);
-                        } else if(rotations[i]->acceleration > Motor::CRD514KD::MOTOR_MAX_ACCELERATION){
+                        } else if(rotations[i]->acceleration > rexos_motor::CRD514KD::MOTOR_MAX_ACCELERATION){
                             throw std::out_of_range("acceleration too high");
                         }
                     } else {
-                        rotations[i]->acceleration = Motor::CRD514KD::MOTOR_MIN_ACCELERATION;
-                        rotations[i]->deceleration = Motor::CRD514KD::MOTOR_MIN_ACCELERATION;
+                        rotations[i]->acceleration = rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION;
+                        rotations[i]->deceleration = rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION;
                         rotations[i]->angle = motors[i]->getCurrentAngle();
                     }
                 }
@@ -322,13 +322,13 @@ namespace DeltaRobot{
      *
      * @return The amount of motor steps the motor has moved.
      **/
-    int DeltaRobot::moveMotorUntilSensorIsOfValue(int motorIndex, DataTypes::MotorRotation motorRotation, bool sensorValue){
+    int DeltaRobot::moveMotorUntilSensorIsOfValue(int motorIndex, rexos_datatypes::MotorRotation motorRotation, bool sensorValue){
         motors[motorIndex]->writeRotationData(motorRotation, 1, false);
 
         int steps = 0;
         do {
             motors[motorIndex]->startMovement(1);
-            steps += (motorRotation.angle / Motor::CRD514KD::MOTOR_STEP_ANGLE);  
+            steps += (motorRotation.angle / rexos_motor::CRD514KD::MOTOR_STEP_ANGLE);  
         } while(checkSensor(motorIndex) != sensorValue);
 
         return steps;
@@ -348,7 +348,7 @@ namespace DeltaRobot{
 
         // Setup for incremental motion in big steps, to get to the sensor quickly.
         motors[motorIndex]->setIncrementalMode(1);
-        DataTypes::MotorRotation motorRotation;
+        rexos_datatypes::MotorRotation motorRotation;
         motorRotation.angle = -Measures::CALIBRATION_STEP_BIG;
         
         // Move to the sensor in large steps until it is pushed
@@ -364,7 +364,7 @@ namespace DeltaRobot{
         actualAngleInSteps += moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, true);
 
         // calculate and set the deviation.
-        double deviation = (actualAngleInSteps * Motor::CRD514KD::MOTOR_STEP_ANGLE) + Measures::MOTORS_FROM_ZERO_TO_TOP_POSITION;
+        double deviation = (actualAngleInSteps * rexos_motor::CRD514KD::MOTOR_STEP_ANGLE) + Measures::MOTORS_FROM_ZERO_TO_TOP_POSITION;
         motors[motorIndex]->setDeviation(deviation);
         
         // Move back to the new 0.
@@ -405,7 +405,7 @@ namespace DeltaRobot{
         }
 
         // Return to base! Remove the deviation, we have to find the controller 0 point.
-        DataTypes::MotorRotation motorRotation;
+        rexos_datatypes::MotorRotation motorRotation;
         motorRotation.speed = 0.1;
         motorRotation.angle = 0;
 
@@ -471,7 +471,7 @@ namespace DeltaRobot{
      *
      * @return The coordinate for the midpoint of the effector.
      **/
-    DataTypes::Point3D<double>& DeltaRobot::getEffectorLocation(){
+    rexos_datatypes::Point3D<double>& DeltaRobot::getEffectorLocation(){
         return effectorLocation;
     }
 }

@@ -36,10 +36,10 @@
 
 #pragma once
 
-#include <DataTypes/Point3D.h>
-#include <DataTypes/MotorRotation.h>
+#include <rexos_datatypes/Point3D.h>
+#include <rexos_datatypes/MotorRotation.h>
 
-namespace DeltaRobot{
+namespace rexos_delta_robot{
 	/**
 	 * Abstract inverse kinematics model class. Based on work from Viacheslav Slavinsky.\n
 	 * conventions sitting in front of delta robot:\n
@@ -103,7 +103,7 @@ namespace DeltaRobot{
 		 * @param destinationPoint The destination point.
 		 * @param rotations Array of MotorRotation objects, will be adjusted by the function to the correct rotations per motor.
 		 **/
-		virtual void destinationPointToMotorRotations(const DataTypes::Point3D<double>& destinationPoint,
-				DataTypes::MotorRotation* (&rotations)[3]) const = 0;
+		virtual void destinationPointToMotorRotations(const rexos_datatypes::Point3D<double>& destinationPoint,
+				rexos_datatypes::MotorRotation* (&rotations)[3]) const = 0;
 	};
 }

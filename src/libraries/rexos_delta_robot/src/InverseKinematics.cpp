@@ -35,18 +35,16 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <DeltaRobot/InverseKinematics.h>
-
 #include <cassert>
 #include <cmath>
 #include <cstdio>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <DeltaRobot/InverseKinematicsException.h>
-#include <DataTypes/MotorRotation.h>
+#include <rexos_datatypes/MotorRotation.h>
+#include <rexos_delta_robot/InverseKinematics.h>
+#include <rexos_delta_robot/InverseKinematicsException.h>
+#include <rexos_utilities/Utilities.h>
 
-#include <Utilities/Utilities.h>
-
-namespace DeltaRobot {
+namespace rexos_delta_robot {
 	/**
 	 * Constructor for inverse kinematics.
 	 *
@@ -67,7 +65,7 @@ namespace DeltaRobot {
 	 * 
 	 * @param deltaRobotMeasures The measures of the deltarobot configuration.
 	 **/
-	InverseKinematics::InverseKinematics(DataTypes::DeltaRobotMeasures & deltaRobotMeasures) :
+	InverseKinematics::InverseKinematics(rexos_datatypes::DeltaRobotMeasures & deltaRobotMeasures) :
 			InverseKinematicsModel(deltaRobotMeasures.base, deltaRobotMeasures.hip, deltaRobotMeasures.effector, deltaRobotMeasures.ankle, deltaRobotMeasures.maxAngleHipAnkle){
 	}	
 
@@ -82,11 +80,11 @@ namespace DeltaRobot {
 	 * 
 	 * @return The angle, in radians, the motor should move to.
 	 **/
-	double InverseKinematics::motorAngle(const DataTypes::Point3D<double>& destinationPoint, double motorLocation) const{
+	double InverseKinematics::motorAngle(const rexos_datatypes::Point3D<double>& destinationPoint, double motorLocation) const{
 		// Rotate the destination point so calculations can be made as if the motor is always in front
 		// (rotating the point places it in the same position relative to the front motor
 		// as it would be relative to the motor indicated by motor_angle).
-		DataTypes::Point3D<double> destinationPointRotatedAroundZAxis =
+		rexos_datatypes::Point3D<double> destinationPointRotatedAroundZAxis =
 				destinationPoint.rotateAroundZAxis(-motorLocation);
 
 		// Places the point towards the "ankle to effector connection".
@@ -140,14 +138,14 @@ namespace DeltaRobot {
 	 * @param destinationPoint The destination point.
 	 * @param rotations Array of MotorRotation objects, will be adjusted by the function to the correct rotations per motor.
 	 **/
-	void InverseKinematics::destinationPointToMotorRotations(const DataTypes::Point3D<double>& destinationPoint, DataTypes::MotorRotation* (&rotations)[3]) const{
+	void InverseKinematics::destinationPointToMotorRotations(const rexos_datatypes::Point3D<double>& destinationPoint, rexos_datatypes::MotorRotation* (&rotations)[3]) const{
 		// Adding 180 degrees switches 0 degrees for the motor from the midpoint of the engines to directly opposite.
 		// When determining motorAngle the degrees determine the position of the engines:
 		// 	  0 degrees: the hip from this motor moves on the yz plane
 		//  120 degrees: this motor is located 120 degrees counter clockwise of the 0 degrees motor when looking at the side the effector is not located
 		//  240 degrees: this motor is located 240 degrees counter clockwise of the 0 degrees motor when looking at the side the effector is not located
-		rotations[0]->angle = Utilities::degreesToRadians(180) + motorAngle(destinationPoint, Utilities::degreesToRadians(1 * 120));
-		rotations[1]->angle = Utilities::degreesToRadians(180) + motorAngle(destinationPoint, Utilities::degreesToRadians(0 * 120));
-		rotations[2]->angle = Utilities::degreesToRadians(180) + motorAngle(destinationPoint, Utilities::degreesToRadians(2 * 120));
+		rotations[0]->angle = rexos_utilities::degreesToRadians(180) + motorAngle(destinationPoint, rexos_utilities::degreesToRadians(1 * 120));
+		rotations[1]->angle = rexos_utilities::degreesToRadians(180) + motorAngle(destinationPoint, rexos_utilities::degreesToRadians(0 * 120));
+		rotations[2]->angle = rexos_utilities::degreesToRadians(180) + motorAngle(destinationPoint, rexos_utilities::degreesToRadians(2 * 120));
 	}
 }
