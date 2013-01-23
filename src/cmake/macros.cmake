@@ -40,7 +40,19 @@ macro(crexos_add_library library_name suppress_warnings catkin_depends system_de
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 	endif()
 	set(build TRUE)
-	find_package(catkin REQUIRED ${catkin_depends})
+	foreach(dep ${catkin_depends})	
+		find_package(catkin REQUIRED ${dep})
+		string(TOUPPER ${dep} upper_dep)
+		if(NOT ${${upper_dep}_FOUND})
+			set(build FALSE)
+		elseif(NOT  ${${dep}_FOUND})
+			set(build FALSE)
+		endif()
+	endforeach(dep)
+
+
+
+
 	foreach(dep ${system_depends})	
 		find_package(${dep})
 		string(TOUPPER ${dep} upper_dep)
