@@ -18,5 +18,11 @@ rexos_rospack_init("environmentCache" true true)
 # Add executables as documented by ROS
 rosbuild_add_executable(EnvironmentCache src/EnvironmentCache.cpp)
 
+# Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
+include_directories(${LIB_JSON_INCLUDE})
+
+# Link target to our libraries
+target_link_libraries(EnvironmentCache json)
+
 # MUST be called after lcv_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()

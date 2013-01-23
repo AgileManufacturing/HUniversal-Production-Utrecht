@@ -54,6 +54,9 @@
 
 #include <environmentCache/UpdateEnvironmentCache.h>
 
+#pragma GCC system_header
+#include <Libjson/libjson.h>
+
 /**
  * Locates the crate
  **/

@@ -21,10 +21,10 @@ rosbuild_add_executable(crateLocatorNode src/CrateLocatorNode.cpp)
 add_dependencies(crateLocatorNode vision)
 
 # Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
-include_directories(${LIB_DATATYPES_INCLUDE} ${LIB_UTILITIES_INCLUDE} ${LIB_VISION_INCLUDE})
+include_directories(${LIB_DATATYPES_INCLUDE} ${LIB_UTILITIES_INCLUDE} ${LIB_VISION_INCLUDE} ${LIB_JSON_INCLUDE})
 
 # Link target to our libraries
-target_link_libraries(crateLocatorNode vision dataTypes)
+target_link_libraries(crateLocatorNode vision dataTypes json)
 
 # MUST be called after rexos_rospack_init to clean up after ROSBUILD!
 rexos_rospack_end()

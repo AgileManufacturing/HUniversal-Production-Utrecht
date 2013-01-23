@@ -37,6 +37,10 @@
 #include <string>
 #include <map>
 
+#pragma GCC system_header
+#include <Libjson/libjson.h>
+
+
 /**
  * This class represents the environment cache
  **/
@@ -53,17 +57,21 @@ public:
 	void printEnvironmentCache();
 
 private:
-	bool addItemToCache(std::string id, const std::vector<rexosStdMsgs::KeyValuePair> &properties);
-	bool updateItemInCache(std::string id, const std::vector<rexosStdMsgs::KeyValuePair> &properties);
-	bool removeItemFromCache(std::string id);
-	void createMapFromVector(const std::vector<rexosStdMsgs::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap);
-	rexosStdMsgs::Map createMapMessageFromProperties(std::map<std::string, std::string> &properties);
+	bool addItemToCache(const std::string &id, const std::string &properties);
+	bool updateItemInCache(const std::string &id, const std::string &properties);
+	bool removeItemFromCache(const std::string &id);
 
 	/**
-	 * @var std::map< std::string, std::map<std::string, std::string> > cache
+	 * @var std::map< std::string, std::string > cache
 	 * Map that is used for caching the data
 	 **/
-	std::map< std::string, std::map<std::string, std::string> > cache;
+	std::map< std::string, std::string > cache;
+
+	/**
+	 * @var ros::NodeHandle nodeHandle
+	 * The nodeHandle used by the services of this node
+	 **/
+	ros::NodeHandle nodeHandle;
 
 	/**
 	 * @var ros::ServiceServer lookupEnvironmentObjectService

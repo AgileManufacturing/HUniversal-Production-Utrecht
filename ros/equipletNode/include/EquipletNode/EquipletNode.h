@@ -42,7 +42,7 @@
 #include <sstream>
 #include <cstdio>
 #include <unistd.h>
-#include <algorithm> 
+#include <algorithm>
 #include <Mast/HardwareModuleProperties.h>
 #include <blackboardCppClient/BlackboardCppClient.h>
 #include <blackboardCppClient/BlackboardSubscriber.h>

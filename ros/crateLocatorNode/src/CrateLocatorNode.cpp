@@ -1,7 +1,6 @@
 /**
  * @file CrateLocatorNode.cpp
  * @brief Detects the crates and publishes events on the crateEvent topic.
- * @date Created: 2011-11-11
  * @date Revisioned: 2012-10-22
  *
  * @author Kasper van Nieuwland
@@ -368,6 +367,7 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 		// update the environment cache
 		if(it->type != Vision::CrateEvent::type_moving) {
 			environmentCache::EnvironmentCacheUpdate envMsg;
+			JSONNode properties(JSON_NODE);
 			if(it->type == Vision::CrateEvent::type_in ) {
 				envMsg.event = EnvironmentCache::ADD;
 			} else if(it->type == Vision::CrateEvent::type_out){
@@ -375,22 +375,11 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 			} else if(it->type == Vision::CrateEvent::type_moved) {
 				envMsg.event = EnvironmentCache::UPDATE;
 			}
-			// Initialize parameters
 			envMsg.id = it->name;
-			rexosStdMsgs::KeyValuePair xParameter;
-			xParameter.key = "x";
-			xParameter.value = it->x;
-			rexosStdMsgs::KeyValuePair yParameter;
-			yParameter.key = "y";
-			yParameter.value = it->y;
-			rexosStdMsgs::KeyValuePair angleParameter;
-			angleParameter.key = "angle";
-			angleParameter.value = it->angle;
-			rexosStdMsgs::Map properties;
-			properties.KeyValuePairSet.push_back(xParameter);
-			properties.KeyValuePairSet.push_back(yParameter);
-			properties.KeyValuePairSet.push_back(angleParameter);
-			envMsg.properties = properties;
+			properties.push_back(JSONNode("x", it->x));
+			properties.push_back(JSONNode("y", it->y));
+			properties.push_back(JSONNode("angle", it->angle));
+			envMsg.properties = properties.write();
 			updateCacheSrv.request.cacheUpdate = envMsg;
 			if (updateEnvironmentCacheClient.call(updateCacheSrv))
 			{
