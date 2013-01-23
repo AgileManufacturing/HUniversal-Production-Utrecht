@@ -36,13 +36,16 @@ macro(rexos_add_library library_name suppress_warnings)
 
 
 macro(crexos_add_library library_name suppress_warnings catkin_depends system_depends)
+
 	if(${suppress_warnings})
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 	endif()
 	set(build TRUE)
 	foreach(dep ${catkin_depends})	
 		find_package(catkin REQUIRED ${dep})
+		message("message ${${dep}_BUILD}")
 		if(NOT ${${dep}_BUILD})
+			
 			set(build FALSE)
 		endif()
 	endforeach(dep)
