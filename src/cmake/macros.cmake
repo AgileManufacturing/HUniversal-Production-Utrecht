@@ -154,7 +154,7 @@ macro(crexos_add_library library_name suppress_warnings catkin_depends system_de
 		add_library(${library_name} STATIC ${sources})
 		include_directories(BEFORE "include")
 
-		include_directories(${include_dirs})
+		include_directories(${include_dirs}  ${catkin_INCLUDE_DIRS})
 		target_link_libraries(${library_name} ${libraries})
 	else()
 		message(WARNING "${library_name} can't be build because dependencies to ${missing_dependencies} are missing. ") 
@@ -165,7 +165,7 @@ macro(crexos_add_library library_name suppress_warnings catkin_depends system_de
 endmacro(crexos_add_library)
 
 
-macro(crexos_add_executable library_name suppress_warnings catkin_depends system_depends)
+macro(crexos_add_executable library_name main_file suppress_warnings catkin_depends system_depends)
 	if(${suppress_warnings})
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 	endif()
@@ -215,11 +215,10 @@ macro(crexos_add_executable library_name suppress_warnings catkin_depends system
 		)
 
 		SET(${library_name}_BUILD "TRUE" CACHE INTERNAL "")
-		file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
-		add_executable(${library_name} ${sources})
+		add_executable(${library_name} ${main_file})
 		include_directories(BEFORE "include")
 
-		include_directories(${include_dirs})
+		include_directories(${include_dirs}  ${catkin_INCLUDE_DIRS} )
 		target_link_libraries(${library_name} ${libraries})
 	else()
 		message(WARNING "${library_name} can't be build because dependencies to ${missing_dependencies} are missing. ") 
