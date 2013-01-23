@@ -25,9 +25,7 @@
  # headers in <library_name>/include
 ##############################################################################
 macro(rexos_add_library library_name suppress_warnings)
-	if(${suppress_warnings})
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
-	endif()
+
 	set(library_directory ${library_name})
 	file(GLOB sources "src/*.cpp" "src/*.c")
 	add_library(${library_name} STATIC ${sources})
@@ -36,13 +34,46 @@ macro(rexos_add_library library_name suppress_warnings)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 	endmacro(rexos_add_library)
 
-macro(crexos_add_library library_name suppress_warnings)
+
+macro(crexos_add_library library_name suppress_warnings catkin_depends system_depends)
 	if(${suppress_warnings})
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 	endif()
+
+	find_package(catkin REQUIRED ${catkin_depends})
+	foreach(dep ${system_depends})	
+		find_package(${dep})
+	endforeach(dep)
+	
+
+	# create a list of include dirs
+	foreach(dep ${catkin_depends})
+		list(APPEND include_dirs  ${${dep}_INCLUDE_DIRS} ${${dep}_INCLUDE_DIR})
+	endforeach(dep)
+	foreach(dep ${system_depends})
+		list(APPEND include_dirs  ${${dep}_INCLUDE_DIRS} ${${dep}_INCLUDE_DIR})
+	endforeach(dep)
+	# create a list of libraries
+	foreach(dep ${catkin_depends})
+		list(APPEND libraries ${${dep}_LIBRARIES} ${${dep}_LIBS})
+	endforeach(dep)
+	foreach(dep ${system_depends})
+		list(APPEND libraries  ${${dep}_LIBRARIES} ${${dep}_LIBS})
+	endforeach(dep)
+
+	catkin_package(
+	INCLUDE_DIRS include
+   	LIBRARIES ${library_name}
+	CATKIN_DEPENDS ${catkin_depends}
+	DEPENDS ${system_depends}
+	)
+
 	file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 	add_library(${library_name} STATIC ${sources})
 	include_directories(BEFORE "include")
+
+	include_directories(${include_dirs})
+	target_link_libraries(${library_name} ${libraries})
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endmacro(crexos_add_library)
 

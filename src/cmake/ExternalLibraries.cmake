@@ -44,7 +44,7 @@ find_package(Boost COMPONENTS system filesystem thread)
 
 # == Find ZBar  == #
 # Sets ZBAR_FOUND, ZBAR_INCLUDE_DIR, ZBAR_LIBRARIES
-find_package(ZBar0)
+find_package(ZBAR)
 
 # == Find Unicap  == #
 # Sets UNICAP_FOUND, UNICAP_INCLUDE_DIRS, UNICAP_LIBRARIES
