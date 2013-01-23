@@ -42,10 +42,8 @@ macro(crexos_add_library library_name suppress_warnings catkin_depends system_de
 	endif()
 	set(build TRUE)
 	foreach(dep ${catkin_depends})	
-		find_package(catkin REQUIRED ${dep})
-		message("message ${${dep}_BUILD}")
 		if(NOT ${${dep}_BUILD})
-			
+			find_package(catkin REQUIRED ${dep})
 			set(build FALSE)
 		endif()
 	endforeach(dep)
