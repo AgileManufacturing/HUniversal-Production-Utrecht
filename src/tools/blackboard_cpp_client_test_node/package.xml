@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>BlackboardCppClientTest</name>
+  <name>blackboard_cpp_client_test_node</name>
   <version>0.0.0</version>
   <description>The rexosStdMsgs package</description>
 
