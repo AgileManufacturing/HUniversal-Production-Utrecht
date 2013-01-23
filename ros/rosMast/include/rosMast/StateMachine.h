@@ -56,7 +56,7 @@ namespace rosMast {
 		 **/
 		StateTransition(StateType src, StateType des) :
 			sourceState(src),
-			destinationState(des) { }
+			destinationState(des){}
 		/**
 		 * @var StateType sourceState
 		 * The original state

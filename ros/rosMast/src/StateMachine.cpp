@@ -41,8 +41,7 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) :
 	stateChangeRequestClient(),
 	currentState(safe),
 	equipletID(equipletID),
-	moduleID(moduleID)
-	{
+	moduleID(moduleID){
 
 	StateTransition transitionTable[] = {StateTransition(safe, standby), StateTransition(standby, safe), StateTransition(standby, normal), StateTransition(normal,standby)};
 

@@ -61,8 +61,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 	movePathService(),
 	moveToRelativePointService(),
 	moveRelativePathService(),
-	calibrateService()
-{
+	calibrateService(){
 	ROS_INFO("DeltaRobotnode Constructor entering...");
 	
 	ros::NodeHandle nodeHandle;

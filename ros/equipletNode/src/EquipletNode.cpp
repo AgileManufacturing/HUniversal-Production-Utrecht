@@ -44,7 +44,7 @@ EquipletNode::EquipletNode(int id):
 	moduleErrorService(),
 	stateUpdateService(),
 	modulePackageNodeMap(),
-	blackboardClient(NULL) {
+	blackboardClient(NULL){
 	// Create the map with moduleType mapped to package name and node name
 	modulePackageNodeMap = std::map< int, std::pair<std::string, std::string> >();
 	modulePackageNodeMap[1] = std::pair< std::string, std::string > ("deltaRobotNode", "DeltaRobotNode");

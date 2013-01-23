@@ -62,8 +62,7 @@ namespace DeltaRobot{
         effectorLocation(DataTypes::Point3D<double>(0, 0, 0)), 
         boundariesGenerated(false),
         modbusIO(modbusIO),
-        currentMotionSlot(1)
-        {
+        currentMotionSlot(1){
 
         if(modbusIO == NULL){
             throw std::runtime_error("Unable to open modbusIO");
