@@ -51,7 +51,6 @@ namespace ModbusController{
     context(context),
     nextWriteTime(0), 
     shadowRegisters(){
-        //this->context = context;
         if(context == NULL){
             throw ModbusException("Error uninitialized connection");
         }

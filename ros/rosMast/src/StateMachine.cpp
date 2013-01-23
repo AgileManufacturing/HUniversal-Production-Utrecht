@@ -44,13 +44,6 @@ rosMast::StateMachine::StateMachine(int equipletID, int moduleID) :
 	moduleID(moduleID)
 	{
 
-	// Initialized this way because the other way wont work on older compilers
-	// StateTransition transitionTable[TRANSITION_TABLE_SIZE];
-	// transitionTable[0] = StateTransition(safe, standby);	
-	// transitionTable[1] = StateTransition(standby, safe);	
-	// transitionTable[2] = StateTransition(standby, normal);		
-	// transitionTable[3] = StateTransition(normal, standby);		
-
 	StateTransition transitionTable[] = {StateTransition(safe, standby), StateTransition(standby, safe), StateTransition(standby, normal), StateTransition(normal,standby)};
 
 	// Must be in sync with transitionTable!
