@@ -29,7 +29,7 @@
  **/
 
 #include "ros/ros.h"
-#include <blackboardCppClient/BlackboardCppClient.h>
+#include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
 
 /*void blackboardCallback(BlackboardCppClient::BlackboardEvent event, std::map<std::string, std::string> map){
 	switch(event){

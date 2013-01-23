@@ -8,22 +8,10 @@
 #
 #############################################################
 
-cmake_minimum_required(VERSION 2.4.6)
-# Include all rosbuild macros
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
-# Initialize ROS package to be in our build system.
-rexos_rospack_init("blackboardCppClientTest" false false)
+cmake_minimum_required(VERSION 2.8.3)
+project(BlackboardCppClientTest)
 
-# Add executables as documented by ROS
-link_directories(${CMAKE_SOURCE_DIR}/libraries/mongo-cxx-driver)
-rosbuild_add_executable(BlackboardCppClientTest src/BlackboardCppClientTest.cpp)
 
-# Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
+crexos_add_executable(BlackboardCppClientTest true "rexos_utilities;rexos_blackboard_cpp_client;roscpp;" "Boost")
 
-include_directories(${Boost_INCLUDE_DIRS} ${BLACKBOARD_CPP_CLIENT} ${MONGO_CXX_DRIVER} ${LIB_UTILITIES_INCLUDE})
-
-target_link_libraries(BlackboardCppClientTest utilities mongoclient boost_thread-mt boost_filesystem boost_program_options boost_system ${Boost_SYSTEM_LIBRARY} blackboardCppClient)
-
-# MUST be called after lcv_rospack_init to clean up after ROSBUILD!
-rexos_rospack_end()
