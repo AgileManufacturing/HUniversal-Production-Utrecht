@@ -42,16 +42,10 @@ macro(crexos_add_library library_name suppress_warnings catkin_depends system_de
 	set(build TRUE)
 	foreach(dep ${catkin_depends})	
 		find_package(catkin REQUIRED ${dep})
-		string(TOUPPER ${dep} upper_dep)
-		if(NOT ${${upper_dep}_FOUND})
-			set(build FALSE)
-		elseif(NOT  ${${dep}_FOUND})
+		if(NOT ${${dep}_BUILD})
 			set(build FALSE)
 		endif()
 	endforeach(dep)
-
-
-
 
 	foreach(dep ${system_depends})	
 		find_package(${dep})
@@ -84,7 +78,9 @@ macro(crexos_add_library library_name suppress_warnings catkin_depends system_de
 	CATKIN_DEPENDS ${catkin_depends}
 	DEPENDS ${system_depends}
 	)
+
 	if(build)
+		SET(${library_name}_BUILD "TRUE" CACHE INTERNAL "")
 		file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 		add_library(${library_name} STATIC ${sources})
 		include_directories(BEFORE "include")
@@ -92,7 +88,8 @@ macro(crexos_add_library library_name suppress_warnings catkin_depends system_de
 		include_directories(${include_dirs})
 		target_link_libraries(${library_name} ${libraries})
 	else()
-		message(STATUS "ERROR ${library_name} can't be build because dependency or dependencies are missing. ") 
+		message(WARNING "${library_name} can't be build because dependency or dependencies are missing. ") 
+		SET(${library_name}_BUILD "FALSE" CACHE INTERNAL "")
 	endif()
 		
 
