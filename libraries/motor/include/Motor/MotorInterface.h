@@ -61,11 +61,6 @@ namespace Motor{
 		virtual void stop(void) = 0;
 
 		/**
-		 * Sets the minimum and maximum angle for the motor.
-		 **/
-		virtual void setMotorLimits(double minAngle, double maxAngle) = 0;
-
-		/**
 		 * Rotate the motors.
 		 * 
 		 * @param motorRotation Defines the angles, speed, acceleration and deceleration of the motors.

@@ -55,7 +55,6 @@ namespace Motor{
 		void stop(void);
 
 		void resetCounter(void);
-		void setMotorLimits(double minAngle, double maxAngle);
 
 		void moveTo(const DataTypes::MotorRotation& motorRotation, int motionSlot);
 		void moveTo(const DataTypes::MotorRotation& motorRotation);
@@ -88,9 +87,6 @@ namespace Motor{
 		 **/
 		inline double getCurrentAngle(void) const{ return currentAngle; }
 
-		void setMinAngle(double minAngle);
-		void setMaxAngle(double maxAngle);
-
 		/**
 		 * Stores the angle that was given to the motor in the local variable currentAngle.
 		 *
@@ -105,13 +101,9 @@ namespace Motor{
 		 **/
 		double getDeviation(void){ return deviation; }
 
-		/**
-		 * Sets the deviation between the motors 0 degrees and the horizontal 0 degrees.
-		 *
-		 * @param deviation The deviation between the hardware and theoretical 0 degrees.
-		 **/
-		void setDeviation(double deviation){ this->deviation = deviation; }
+		void setDeviationAndWriteMotorLimits(double deviation);
 
+		void enableAngleLimitations(void);
 		void disableAngleLimitations(void);
 		void updateAngle(void);
 

@@ -48,49 +48,13 @@ namespace DeltaRobot{
 	class EffectorBoundaries{
 	public:
 		~EffectorBoundaries();
-
-		// TODO: change Motor::StepperMotor to two doubles for max and min angle
-		static EffectorBoundaries* generateEffectorBoundaries(const InverseKinematicsModel& model, Motor::StepperMotor* (&motors)[3], double voxelSize);
+		
+		static EffectorBoundaries* generateEffectorBoundaries(const InverseKinematicsModel& model, double motorMinAngles[3], double motorMaxAngles[3], double voxelSize);
 
 		bool checkPath(const DataTypes::Point3D<double>& from, const DataTypes::Point3D<double>& to) const;
 
-		/**
-		 * Gets the boundariesBitmap. This bitmap is a one dimensional array of booleans, defaulted to false, where voxels are checked and set to true if they are reachable.
-		 *
-		 * @return A const bool pointer to the voxel bitmap. This bitmap is a one dimensional array of booleans, defaulted to false, where voxels are checked and set to true if they are reachable.
-		 **/
-		inline const bool* getBitmap() const{ return boundariesBitmap; }
-
-		/**
-		 * Gets the depth used to make the boundaries bitmap.
-		 *
-		 * @return The depth in voxels.
-		 **/
-		inline int getDepth() const{ return depth; }
-
-		/**
-		 * Gets the height used to make the boundaries bitmap.
-		 *
-		 * @return The height in voxels.
-		 **/
-		inline int getHeight() const{ return height; }
-
-		/**
-		 * Gets the width used to make the boundaries bitmap.
-		 *
-		 * @return The width in voxels.
-		 **/
-		inline int getWidth() const{ return width; }
-
-		/**
-		 * Gets the size of a side of a voxel.
-		 *
-		 * @return Voxel size in millimeters.
-		 **/
-		inline double getVoxelSize() const{ return voxelSize; }
-
 	private:
-		EffectorBoundaries(const InverseKinematicsModel& model, Motor::StepperMotor* (&motors)[3], double voxelSize);
+		EffectorBoundaries(const InverseKinematicsModel& model, double motorMinAngles[3], double motormaxAngles[3], double voxelSize);
 
 		/**
 		 * Represents a 3-dimensional point in the 3D voxel array.
@@ -192,10 +156,16 @@ namespace DeltaRobot{
 		const InverseKinematicsModel &kinematics;
 
 		/**
-		 * @var StepperMotor* motors
-		 * An array holding pointers to the three StepperMotors that are connected to the DeltaRobot. This array HAS to be of size 3. The EffectorBoundaries needs to know the motors to find out their max and min angles.
+		 * @var double motorMinAngles 
+		 * Holds the minimum angles of the motors.
 		 **/
-		Motor::StepperMotor* (&motors)[3];
+		double motorMinAngles[3];
+
+		/**
+		 * @var double motorMaxAngles 
+		 * Holds the maximum angles of the motors.
+		 **/
+		double motorMaxAngles[3];
 
 		/**
 		 * @var double voxelSize
