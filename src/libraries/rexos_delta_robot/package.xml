@@ -1,18 +1,20 @@
 <?xml version="1.0"?>
 <package>
-  <name>rexos_motor</name>
+  <name>rexos_delta_robot</name>
   <version>0.0.0</version>
-  <description>The rexos_motor package</description>
+  <description>The rexos_delta_robot package</description>
   <maintainer email="lowcostvision@gmail.com">Leau Caust</maintainer>
   <license>newBSD</license>
   <url type="website">https://github.com/AgileManufacturing/HUniversal-Production-Utrecht</url>
   <author email="koenbraham@gmail.com">KBraham</author>
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>rexos_modbus</build_depend>
-  <run_depend>rexos_modbus</run_depend>
   <build_depend>rexos_datatypes</build_depend>
-  <run_depend>rexos_datatypes</run_depend>
+  <build_depend>rexos_modbus</build_depend>
+  <build_depend>rexos_motor</build_depend>
   <build_depend>rexos_utilities</build_depend>
+  <run_depend>rexos_datatypes</run_depend>
+  <run_depend>rexos_modbus</run_depend>
+  <run_depend>rexos_motor</run_depend>
   <run_depend>rexos_utilities</run_depend>
   <export>
   </export>

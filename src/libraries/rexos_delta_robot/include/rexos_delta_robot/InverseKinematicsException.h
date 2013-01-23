@@ -1,10 +1,10 @@
 /**
- * @file EffectorBoundariesException.h
- * @brief Exception thrown if effector boundaries cannot be determined.
- * @date Created: 2012-09-20
+ * @file InverseKinematicsException.h
+ * @brief Exception thrown if an invalid value is calculated during inverse kinematics.
  *
- * @author Koen Braham
- * @author Daan Veltman
+ * @author 1.0 Lukas Vermond
+ * @author 1.0 Kasper van Nieuwland
+ * @author 1.1 Daan Veltman
  *
  * @section LICENSE
  * License: newBSD
@@ -31,25 +31,43 @@
 
 #pragma once
 
-#include <DeltaRobot/EffectorBoundaries.h>
-
 #include <stdexcept>
-#include <string>
-#include <sstream>
 
-namespace DeltaRobot{
+#include <rexos_datatypes/MotorRotation.h>
+#include <rexos_datatypes/Point3D.h>
+
+namespace rexos_delta_robot{
 	/**
-	 * Exception to indicate modbus errors.
-	 *
-	 * ModbusController can throw this exception whenever a modbus related error occurs.
+	 * Exception thrown if an invalid value is calculated during inverse kinematics.
 	 **/
-	class EffectorBoundariesException : public std::runtime_error{
+	class InverseKinematicsException: public std::runtime_error{
+	private:
+		/**
+		 * @var Point3D<double> notConvertablePoint
+		 * Point that could not be converted into angles for the motors.
+		 **/
+		rexos_datatypes::Point3D<double> notConvertablePoint;
+
 	public:
 		/**
-		 * Constructor for the exception for effector boundaries.
-		 *
-		 * @param msg The message when the error is thrown.
+		 * Constructor for InverseKinematicsException.
+		 * @param exceptionMessage The exception message
+		 * @param destinationPoint The point of the destination.
 		 **/
-		EffectorBoundariesException(const std::string& msg) : std::runtime_error(msg){}
+		InverseKinematicsException(const char* exceptionMessage, rexos_datatypes::Point3D<double> destinationPoint) :
+				std::runtime_error(exceptionMessage), notConvertablePoint(destinationPoint){}
+
+		/**
+		 * Destructor for InverseKinematicsException.
+		 **/
+		virtual ~InverseKinematicsException(void) throw(){}
+
+		/**
+		 * Used to access the point that could not be converted.
+		 * @return A point3D<double> of the point that could not be converted.
+		 **/
+		rexos_datatypes::Point3D<double> getNotConvertablePoint(void){
+			return notConvertablePoint;
+		}
 	};
 }

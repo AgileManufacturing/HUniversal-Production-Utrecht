@@ -45,9 +45,9 @@ find_package(catkin REQUIRED COMPONENTS rexos_modbus rexos_datatypes rexos_utili
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES rexos_motor
-#  CATKIN_DEPENDS rexos_modbus
+  INCLUDE_DIRS include
+  LIBRARIES rexos_motor
+  CATKIN_DEPENDS rexos_modbus
 #  DEPENDS system_lib
 )
 
@@ -56,24 +56,8 @@ catkin_package(
 ###########
 
 ## Specify additional locations of header files
-include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${rexos_modbus_INCLUDE_DIRS} ${rexos_datatypes_INCLUDE_DIRS})
-
+include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 crexos_add_library(rexos_motor false)
-## Declare a cpp library
-# add_library(rexos_motor
-#   src/${PROJECT_NAME}/rexos_motor.cpp
-# )
-
-## Declare a cpp executable
-# add_executable(rexos_motor_node src/rexos_motor_node.cpp)
-
-## Add dependencies to the executable
-# add_dependencies(rexos_motor_node ${PROJECT_NAME})
-
-## Specify libraries to link a library or executable target against
-# target_link_libraries(rexos_motor_node
-#   ${catkin_LIBRARIES}
-# )
 
 #############
 ## Install ##

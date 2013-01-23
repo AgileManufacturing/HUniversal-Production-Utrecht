@@ -31,16 +31,16 @@
  **/
 
 #include <iostream>
-#include <DeltaRobot/Measures.h>
-#include <DeltaRobot/EffectorBoundaries.h>
-#include <DeltaRobot/InverseKinematicsException.h>
-#include <DeltaRobot/EffectorBoundariesException.h>
+#include <rexos_delta_robot/Measures.h>
+#include <rexos_delta_robot/EffectorBoundaries.h>
+#include <rexos_delta_robot/InverseKinematicsException.h>
+#include <rexos_delta_robot/EffectorBoundariesException.h>
 #include <stack>
 #include <vector>
 #include <set>
 #include <cstring>
 
-namespace DeltaRobot{
+namespace rexos_delta_robot{
 	/**
 	 * Function to generate the boundaries and returns a pointer to the object.
 	 * 
@@ -50,7 +50,7 @@ namespace DeltaRobot{
 	 * 
 	 * @return Pointer to the object.
 	 **/
-	EffectorBoundaries* EffectorBoundaries::generateEffectorBoundaries(const InverseKinematicsModel& model, Motor::StepperMotor* (&motors)[3], double voxelSize){
+	EffectorBoundaries* EffectorBoundaries::generateEffectorBoundaries(const InverseKinematicsModel& model, rexos_motor::StepperMotor* (&motors)[3], double voxelSize){
 		EffectorBoundaries* boundaries = new EffectorBoundaries(model, motors, voxelSize);
 		
 		// Create boundaries variables in voxel space by dividing real space variables with the voxel size
@@ -76,7 +76,7 @@ namespace DeltaRobot{
 	 *
 	 * @return true if a straight path from parameter 'from' to parameter 'to' is valid.
 	 **/
-    bool EffectorBoundaries::checkPath(const DataTypes::Point3D<double>& from, const DataTypes::Point3D<double>& to) const{
+    bool EffectorBoundaries::checkPath(const rexos_datatypes::Point3D<double>& from, const rexos_datatypes::Point3D<double>& to) const{
     	double x_length = to.x - from.x;
     	double y_length = to.y - from.y;
     	double z_length = to.z - from.z;
@@ -92,7 +92,7 @@ namespace DeltaRobot{
 			int x = (from.x + x_length * i);
 			int y = (from.y + y_length * i);
 			int z = (from.z + z_length * i);
-			BitmapCoordinate temp = fromRealCoordinate(DataTypes::Point3D<double>(x, y, z));
+			BitmapCoordinate temp = fromRealCoordinate(rexos_datatypes::Point3D<double>(x, y, z));
 			int index = temp.x + temp.y * width + temp.z * width * depth;
 
 			if(temp.x < 0
@@ -115,7 +115,7 @@ namespace DeltaRobot{
 	 * @param motors Used for the minimum and maximum angle of the motors.
 	 * @param voxelSize The size of the voxels.
 	 **/
-    EffectorBoundaries::EffectorBoundaries(const InverseKinematicsModel& model,  Motor::StepperMotor* (&motors)[3], double voxelSize)
+    EffectorBoundaries::EffectorBoundaries(const InverseKinematicsModel& model,  rexos_motor::StepperMotor* (&motors)[3], double voxelSize)
     	: kinematics(model), motors(motors), voxelSize(voxelSize){}
 
     EffectorBoundaries::~EffectorBoundaries(){
@@ -173,14 +173,14 @@ namespace DeltaRobot{
     	}
 
     	if(*fromCache == UNKNOWN){
-    		DataTypes::MotorRotation* rotations[3];
-    		rotations[0] = new DataTypes::MotorRotation();
-    		rotations[1] = new DataTypes::MotorRotation();
-    		rotations[2] = new DataTypes::MotorRotation();
+    		rexos_datatypes::MotorRotation* rotations[3];
+    		rotations[0] = new rexos_datatypes::MotorRotation();
+    		rotations[1] = new rexos_datatypes::MotorRotation();
+    		rotations[2] = new rexos_datatypes::MotorRotation();
 
 			try{
 				kinematics.destinationPointToMotorRotations(fromBitmapCoordinate(coordinate), rotations);
-			} catch(DeltaRobot::InverseKinematicsException & exception){
+			} catch(rexos_delta_robot::InverseKinematicsException & exception){
 				*fromCache = INVALID;
 				delete rotations[0];
 				delete rotations[1];
@@ -219,7 +219,7 @@ namespace DeltaRobot{
     	std::stack<BitmapCoordinate> cstack;
 
     	// Determine the center of the box.
-    	DataTypes::Point3D<double> point (0, 0, Measures::BOUNDARY_BOX_MIN_Z + (Measures::BOUNDARY_BOX_MAX_Z - Measures::BOUNDARY_BOX_MIN_Z) / 2);
+    	rexos_datatypes::Point3D<double> point (0, 0, Measures::BOUNDARY_BOX_MIN_Z + (Measures::BOUNDARY_BOX_MAX_Z - Measures::BOUNDARY_BOX_MIN_Z) / 2);
     	
     	// If point pixel is not part of a valid voxel the box dimensions are incorrect.
     	if(!isValid(fromRealCoordinate(point), pointValidityCache)){
@@ -282,7 +282,7 @@ namespace DeltaRobot{
 		pointValidityCache = NULL;
 		
 		// Adds all the points within the boundaries.
-		cstack.push(fromRealCoordinate(DataTypes::Point3D<double>(0, 0, Measures::BOUNDARY_BOX_MIN_Z + (Measures::BOUNDARY_BOX_MAX_Z - Measures::BOUNDARY_BOX_MIN_Z) / 2)));
+		cstack.push(fromRealCoordinate(rexos_datatypes::Point3D<double>(0, 0, Measures::BOUNDARY_BOX_MIN_Z + (Measures::BOUNDARY_BOX_MAX_Z - Measures::BOUNDARY_BOX_MIN_Z) / 2)));
 		while(!cstack.empty()){
 			BitmapCoordinate validVoxel = cstack.top();
 			cstack.pop();

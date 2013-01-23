@@ -57,14 +57,12 @@ catkin_package(
 ###########
 
 ## Specify additional locations of header files
-# include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${MODBUS_INCLUDE_DIRS})
 
 ## Declare a cpp library
 # ModbusController # 
 if(${MODBUS_FOUND})
-	crexos_add_library(rexos_modbus false)
-	include_directories(${MODBUS_INCLUDE_DIRS} ${rexos_utilities_INCLUDE_DIRS})
-	target_link_libraries(rexos_modbus ${MODBUS_LIBRARIES} ${rexos_utilities_LIBRARIES})	
+	crexos_add_library(rexos_modbus false)	
 else(${MODBUS_FOUND})
 	rexos_cannot_build(rexos_modbus, "libraries/rexos_modbus")
 endif()
