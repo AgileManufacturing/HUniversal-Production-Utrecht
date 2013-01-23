@@ -6,7 +6,7 @@
  # 07-02-2012 Initial CMake support
  # 09-02-2012 Added functionality for building ROS packages as part of the whole. 
  # 01-10-2012 Dick vd Steen & Koen Braham - Changed buildsystem for the new REXOS achitecture.
- # 
+ # 01-23-2013 Dick vd Steen - Changed for supporting Catkin 
  # == Description == 
  # This file adds macros we use in several CMakeLists. 
  # 
@@ -44,6 +44,7 @@ macro(crexos_add_library library_name suppress_warnings catkin_depends system_de
 	foreach(dep ${catkin_depends})	
 		if(NOT ${${dep}_BUILD})
 			set(build FALSE)
+			list(APPEND missing_dependencies ${dep})
 		else()
 			find_package(catkin REQUIRED ${dep})
 		endif()
@@ -54,8 +55,10 @@ macro(crexos_add_library library_name suppress_warnings catkin_depends system_de
 		string(TOUPPER ${dep} upper_dep)
 		if(NOT ${${upper_dep}_FOUND})
 			set(build FALSE)
-		elseif(NOT  ${${dep}_FOUND})
+			list(APPEND missing_dependencies ${dep})
+		elseif(NOT ${${dep}_FOUND})
 			set(build FALSE)
+			list(APPEND missing_dependencies ${dep})
 		endif()
 	endforeach(dep)
 	
@@ -74,14 +77,14 @@ macro(crexos_add_library library_name suppress_warnings catkin_depends system_de
 		list(APPEND libraries  ${${dep}_LIBRARIES} ${${dep}_LIBS})
 	endforeach(dep)
 
-	catkin_package(
-	INCLUDE_DIRS include
-   	LIBRARIES ${library_name}
-	CATKIN_DEPENDS ${catkin_depends}
-	DEPENDS ${system_depends}
-	)
-
 	if(build)
+		catkin_package(
+		INCLUDE_DIRS include
+		LIBRARIES ${library_name}
+		CATKIN_DEPENDS ${catkin_depends}
+		DEPENDS ${system_depends}
+		)
+
 		SET(${library_name}_BUILD "TRUE" CACHE INTERNAL "")
 		file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 		add_library(${library_name} STATIC ${sources})
@@ -90,11 +93,10 @@ macro(crexos_add_library library_name suppress_warnings catkin_depends system_de
 		include_directories(${include_dirs})
 		target_link_libraries(${library_name} ${libraries})
 	else()
-		message(WARNING "${library_name} can't be build because dependency or dependencies are missing. ") 
+		message(WARNING "${library_name} can't be build because dependencies to ${missing_dependencies} are missing. ") 
 		SET(${library_name}_BUILD "FALSE" CACHE INTERNAL "")
 	endif()
 		
-
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endmacro(crexos_add_library)
 
