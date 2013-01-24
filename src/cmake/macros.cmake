@@ -99,6 +99,40 @@ macro(crexos_add_library library_name suppress_warnings catkin_depends system_de
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endmacro(crexos_add_library)
 
+macro(crexos_generate_messages dependencies)
+	find_package(catkin REQUIRED COMPONENTS  std_msgs message_generation ${dependencies})
+	file(GLOB_RECURSE msgs "msg" "*.msg")
+	add_message_files(
+   	DIRECTORY msg
+  	FILES ${msgs} )
+
+	generate_messages (
+	DEPENDENCIES ${dependencies}
+	)
+
+	catkin_package(
+  	CATKIN_DEPENDS std_msgs message_generation ${dependencies}
+   	DEPENDS 
+	)
+endmacro(crexos_generate_messages)
+
+macro(crexos_generate_services dependencies)
+	find_package(catkin REQUIRED COMPONENTS message_generation ${dependencies})
+	file(GLOB_RECURSE srvs "srv" "*.srv")
+	add_service_files(
+   	DIRECTORY srv
+  	FILES ${srvs} )
+
+	generate_messages (
+	DEPENDENCIES ${dependencies}
+	)
+
+	catkin_package(
+  	CATKIN_DEPENDS ${dependencies}
+   	DEPENDS 
+	)
+endmacro(crexos_generate_services)
+
 
 macro(crexos_add_library library_name suppress_warnings catkin_depends system_depends)
 	if(${suppress_warnings})
