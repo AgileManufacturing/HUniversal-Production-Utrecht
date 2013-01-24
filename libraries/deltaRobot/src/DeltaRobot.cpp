@@ -91,7 +91,9 @@ namespace DeltaRobot{
      * @param voxelSize The size in millimeters of a side of a voxel in the boundaries.
      **/
     void DeltaRobot::generateBoundaries(double voxelSize){
-        boundaries = EffectorBoundaries::generateEffectorBoundaries((*kinematics), motors, voxelSize);
+        double motorMinAngles[3] = {Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MIN};
+        double motorMaxAngles[3] = {Measures::MOTOR_ROT_MAX, Measures::MOTOR_ROT_MAX, Measures::MOTOR_ROT_MAX};
+        boundaries = EffectorBoundaries::generateEffectorBoundaries((*kinematics), motorMinAngles, motorMaxAngles, voxelSize);
         boundariesGenerated = true;
     }
 
@@ -368,7 +370,7 @@ namespace DeltaRobot{
 
         // calculate and set the deviation.
         double deviation = (actualAngleInSteps * Motor::CRD514KD::MOTOR_STEP_ANGLE) + Measures::MOTORS_FROM_ZERO_TO_TOP_POSITION;
-        motors[motorIndex]->setDeviation(deviation);
+        motors[motorIndex]->setDeviationAndWriteMotorLimits(deviation);
         
         // Move back to the new 0.
         motors[motorIndex]->setAbsoluteMode(1);
@@ -412,9 +414,9 @@ namespace DeltaRobot{
         motorRotation.speed = 0.1;
         motorRotation.angle = 0;
 
-        motors[0]->setDeviation(0);
-        motors[1]->setDeviation(0);
-        motors[2]->setDeviation(0);
+        motors[0]->setDeviationAndWriteMotorLimits(0);
+        motors[1]->setDeviationAndWriteMotorLimits(0);
+        motors[2]->setDeviationAndWriteMotorLimits(0);
 
         motors[0]->writeRotationData(motorRotation, 1);
         motors[1]->writeRotationData(motorRotation, 1);
@@ -435,10 +437,10 @@ namespace DeltaRobot{
         calibrateMotor(1);
         calibrateMotor(2);
 
-        // Set limitations
-        motors[0]->setMotorLimits(Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MAX);
-        motors[1]->setMotorLimits(Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MAX);
-        motors[2]->setMotorLimits(Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MAX);
+        // Enable angle limitations
+        motors[0]->enableAngleLimitations();
+        motors[1]->enableAngleLimitations();
+        motors[2]->enableAngleLimitations();
 
         effectorLocation.x = 0;
         effectorLocation.y = 0;

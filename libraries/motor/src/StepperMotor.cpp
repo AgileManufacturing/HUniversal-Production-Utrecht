@@ -144,18 +144,6 @@ namespace Motor{
 	}
 
 	/**
-	 * Set the motor limits in the motor hardware.
-	 *
-	 * @param minAngle Minimum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
-	 * @param maxAngle Maximum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
-	 **/
-	void StepperMotor::setMotorLimits(double minAngle, double maxAngle){
-		// Set motors limits.
-		setMinAngle(minAngle);
-		setMaxAngle(maxAngle);
-	}
-
-	/**
 	 * Moves the motor to the given position.
 	 *
 	 * @param motorRotation The rotational data for the motor.
@@ -257,27 +245,14 @@ namespace Motor{
 	}
 
 	/**
-	 * Sets the angle limitations for the minimum the motor can travel in the motor hardware.
+	 * Sets the deviation between the motors 0 degrees and the horizontal 0 degrees, then writes the new motor limits to the motor controllers.
 	 *
-	 * @param minAngle Minimum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
+	 * @param deviation The deviation between the hardware and theoretical 0 degrees.
 	 **/
-	void StepperMotor::setMinAngle(double minAngle){
-		this->minAngle = minAngle;
+	void StepperMotor::setDeviationAndWriteMotorLimits(double deviation){
+		this->deviation = deviation;
 		modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((minAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
-		modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SOFTWARE_OVERTRAVEL, 1);
-		anglesLimited = true;
-	}
-
-	/**
-	 * Sets the angle limitations for the maximum the motor can travel in the motor hardware.
-	 *
-	 * @param maxAngle Maximum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
-	 **/
-	void StepperMotor::setMaxAngle(double maxAngle){
-		this->maxAngle = maxAngle;
 		modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((maxAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
-		modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SOFTWARE_OVERTRAVEL, 1);
-		anglesLimited = true;
 	}
 
 	/**
@@ -286,6 +261,14 @@ namespace Motor{
 	void StepperMotor::disableAngleLimitations(void){
 		modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SOFTWARE_OVERTRAVEL, 0);
 		anglesLimited = false;
+	}
+
+	/**
+	 * Enables the limitations on the angles the motor can travel to in the motor hardware.
+	 **/
+	void StepperMotor::enableAngleLimitations(void){
+		modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SOFTWARE_OVERTRAVEL, 1);
+		anglesLimited = true;	
 	}
 
 	/**
