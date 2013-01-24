@@ -3,3 +3,4 @@ project(rexos_std_srvs)
 
 
 crexos_generate_services("rexos_std_msgs")
+crexos_catkin_package()

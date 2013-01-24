@@ -3,3 +3,4 @@ project(libjson)
 
 
 crexos_add_library(libjson true "" "Boost")
+crexos_catkin_package()

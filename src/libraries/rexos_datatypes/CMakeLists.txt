@@ -3,7 +3,4 @@ project(rexos_datatypes)
 
 crexos_add_library(rexos_datatypes false "" "Boost;OpenCV")
 
-
-
-
-
+crexos_catkin_package()
