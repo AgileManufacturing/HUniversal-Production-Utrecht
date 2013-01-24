@@ -49,9 +49,11 @@ macro(crexos_generate_messages_and_services dependencies)
 		add_service_files(
 	   	DIRECTORY srv
 	  	FILES ${srvs} )
+
 	generate_messages (
 	DEPENDENCIES ${dependencies}
 	)
+
 
 endmacro(crexos_generate_messages_and_services)
 
@@ -108,6 +110,7 @@ macro(crexos_add_library library_name suppress_warnings catkin_depends system_de
 		add_library(${library_name} STATIC ${sources})
 		include_directories(BEFORE "include" ${include_dirs}  ${catkin_INCLUDE_DIRS})
 		target_link_libraries(${library_name} ${libraries})
+		add_dependencies(${library_name} ${library_name}_gencpp)
 	else()
 		message(WARNING "${library_name} can't be build because dependencies to ${missing_dependencies} are missing. ") 
 		SET(${library_name}_BUILD "FALSE" CACHE INTERNAL "")
@@ -172,6 +175,7 @@ macro(crexos_add_executable library_name main_file suppress_warnings catkin_depe
 
 		include_directories(${include_dirs})
 		target_link_libraries(${library_name} ${libraries})
+		add_dependencies(${library_name} ${library_name}_gencpp)
 	else()
 		message(WARNING "${library_name} can't be build because dependencies to ${missing_dependencies} are missing. ") 
 		SET(${library_name}_BUILD "FALSE" CACHE INTERNAL "")
