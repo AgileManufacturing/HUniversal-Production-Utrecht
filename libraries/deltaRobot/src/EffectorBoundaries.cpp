@@ -148,7 +148,7 @@ namespace DeltaRobot{
     	// Check if the voxel is valid and on the edge of the box.
     	if(isValid(BitmapCoordinate(coordinate.x, coordinate.y, coordinate.z), pointValidityCache)){
     		// Voxel is on the edge of the box, automatically boardering invalid territory.
-    		if(coordinate.x == 0 || coordinate.x == width || coordinate.y == 0 || coordinate.y == depth || coordinate.z == 0 || coordinate.z == height){
+    		if(coordinate.x == 0 || coordinate.x == width - 1 || coordinate.y == 0 || coordinate.y == depth - 1 || coordinate.z == 0 || coordinate.z == height - 1){
     			return true;
     		}
 
