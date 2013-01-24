@@ -29,7 +29,6 @@
  **/
 
 #include <environmentCache/EnvironmentCache.h>
-#include <iostream>
 
 /**
  * The constructor of the EnvironmentCache class
@@ -50,18 +49,14 @@ EnvironmentCache::EnvironmentCache() : cache(), nodeHandle(){
  * @return returns true
  **/
 bool EnvironmentCache::lookupEnvironmentObject(environmentCache::LookupEnvironmentObject::Request &req, environmentCache::LookupEnvironmentObject::Response &res){
-	/*std::string id = req.lookupID;
-	if(cache.count(id)){
-		std::map< std::string, std::map<std::string, std::string> >::iterator cacheIterator;
-		cacheIterator = cache.find(id);
-		std::map<std::string, std::string> properties = (*cacheIterator).second;
-		res.object = createMapMessageFromProperties(properties);
+	std::map<std::string, std::string>::iterator it = cache.find(req.lookupID);
+	if(it != cache.end()){
+		res.properties = it->second;
 		res.found = true;
 	} else{
-		rexosStdMsgs::Map map;
-		res.object = map;
+		res.properties = "";
 		res.found = false;
-	}*/
+	}
 	return true;
 }
 
@@ -101,18 +96,7 @@ bool EnvironmentCache::updateEnvironmentCache(environmentCache::UpdateEnvironmen
 	}
 	// Print the cache, for debugging properties
 	res.success = success;
-	//printEnvironmentCache();
 	return true;
-}
-
-/**
- * Print all the items in the cache to standard output
- **/
-void EnvironmentCache::printEnvironmentCache(){
-	std::map< std::string, std::string >::iterator cacheIterator;
-	for(cacheIterator = cache.begin(); cacheIterator != cache.end(); cacheIterator++){
-		ROS_INFO("%s : %s", cacheIterator->first.c_str(), cacheIterator->second.c_str());
-	}
 }
 
 /**
@@ -126,7 +110,7 @@ void EnvironmentCache::printEnvironmentCache(){
 bool EnvironmentCache::addItemToCache(const std::string &id, const std::string &properties){
 	if(cache.count(id) == 0){
 		cache.insert(std::pair<std::string, std::string >(id, properties));
-		ROS_INFO("Item with id %s added to environment cache: %s", id.c_str(), properties.c_str());
+		ROS_INFO("Item with id %s added: %s", id.c_str(), properties.c_str());
 		return true;
 	}
 	return false;
@@ -145,7 +129,7 @@ bool EnvironmentCache::updateItemInCache(const std::string &id, const std::strin
 	std::map<std::string, std::string>::iterator it = cache.find(id);
 	if(it != cache.end()) {
 		it->second = properties;
-		ROS_INFO("Properties of item with id %s updated: %s", it->first.c_str(), it->second.c_str());
+		ROS_INFO("Item with id %s updated: %s", it->first.c_str(), it->second.c_str());
 		return true;
 	}
 	return false;
@@ -161,14 +145,14 @@ bool EnvironmentCache::updateItemInCache(const std::string &id, const std::strin
 bool EnvironmentCache::removeItemFromCache(const std::string &id){
 	if(cache.count(id) == 1){
 		cache.erase(id);
-		ROS_INFO("Item with id %s removed from cache", id.c_str());
+		ROS_INFO("Item with id %s removed", id.c_str());
 		return true;
 	}
 	return false;
 }
 
 /**
- * Main that creates the environment cache
+ * Create the environment cache
  **/
 int main(int argc, char **argv){
 	ros::init(argc, argv, "EnvironmentCache");

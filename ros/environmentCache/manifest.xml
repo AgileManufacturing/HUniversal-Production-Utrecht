@@ -10,7 +10,6 @@
 
   <depend package="roscpp"/>
   <depend package="std_msgs"/>
-  <depend package="rexosStdMsgs"/>
   <export>
   	   <cpp cflags="-I${prefix}/include"/>
   </export>

@@ -54,7 +54,7 @@ bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookupHandle
 	createMapFromVector(request.lookupMsg.payLoad.KeyValuePairSet, payLoadMap);
 	if(lookupClient.call(msg)){
 		if(msg.response.found){
-			for(int i = 0; i < (int)(msg.response.object.KeyValuePairSet.size()); i++){
+			/*for(int i = 0; i < (int)(msg.response.object.KeyValuePairSet.size()); i++){
 				it = payLoadMap.find(msg.response.object.KeyValuePairSet[i].key);
 				std::string valueObject =  (*it).second;
 				std::string valuePayload = msg.response.object.KeyValuePairSet[i].value;
@@ -62,7 +62,7 @@ bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookupHandle
 				// TODO should do something cool with the data
 
 				std::cout << "valueObject " << valueObject << " valuePayload " << valuePayload << std::endl;
-			}
+			}*/
 			response.succeeded = true;
 		} else
 			response.succeeded = false;

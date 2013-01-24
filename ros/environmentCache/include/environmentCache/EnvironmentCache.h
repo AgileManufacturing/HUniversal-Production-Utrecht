@@ -54,7 +54,6 @@ public:
 	EnvironmentCache();
 	bool lookupEnvironmentObject(environmentCache::LookupEnvironmentObject::Request &req, environmentCache::LookupEnvironmentObject::Response &res);
 	bool updateEnvironmentCache(environmentCache::UpdateEnvironmentCache::Request &req, environmentCache::UpdateEnvironmentCache::Response &res);
-	void printEnvironmentCache();
 
 private:
 	bool addItemToCache(const std::string &id, const std::string &properties);
