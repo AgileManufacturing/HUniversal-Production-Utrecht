@@ -45,13 +45,14 @@ namespace DeltaRobot{
 	 * Function to generate the boundaries and returns a pointer to the object.
 	 * 
 	 * @param model Used to calculate the boundaries.
-	 * @param motors Used for the minimum and maximum angle of the motors.
+	 * @param motorMinAngles An array holding the minimum angle of each of the three motors.
+	 * @param motorMaxAngles An array holding the maximum angle of each of the three motors.
 	 * @param voxelSize The size of the voxels in millimeters.
 	 * 
 	 * @return Pointer to the object.
 	 **/
-	EffectorBoundaries* EffectorBoundaries::generateEffectorBoundaries(const InverseKinematicsModel& model, Motor::StepperMotor* (&motors)[3], double voxelSize){
-		EffectorBoundaries* boundaries = new EffectorBoundaries(model, motors, voxelSize);
+	EffectorBoundaries* EffectorBoundaries::generateEffectorBoundaries(const InverseKinematicsModel& model, double motorMinAngles[3], double motorMaxAngles[3], double voxelSize){
+		EffectorBoundaries* boundaries = new EffectorBoundaries(model, motorMinAngles, motorMaxAngles, voxelSize);
 		
 		// Create boundaries variables in voxel space by dividing real space variables with the voxel size
 		boundaries->width = (Measures::BOUNDARY_BOX_MAX_X  - Measures::BOUNDARY_BOX_MIN_X) / voxelSize;
@@ -112,17 +113,22 @@ namespace DeltaRobot{
 	 * Private constructor, it also initializes the voxel array.
 	 * 
 	 * @param model Used to calculate the boundaries.
-	 * @param motors Used for the minimum and maximum angle of the motors.
+	 * @param motorMinAngles An array holding the minimum angle of each of the three motors.
+	 * @param motorMaxAngles An array holding the maximum angle of each of the three motors.
 	 * @param voxelSize The size of the voxels.
 	 **/
-    EffectorBoundaries::EffectorBoundaries(const InverseKinematicsModel& model,  Motor::StepperMotor* (&motors)[3], double voxelSize) : 
+    EffectorBoundaries::EffectorBoundaries(const InverseKinematicsModel& model, double motorMinAngles[3], double motorMaxAngles[3], double voxelSize) : 
     	width(0), 
     	height(0), 
     	depth(0), 
     	boundariesBitmap(NULL), 
-    	kinematics(model), 
-    	motors(motors), 
-    	voxelSize(voxelSize) {}
+    	kinematics(model),  
+    	voxelSize(voxelSize) {
+    		for(int i = 0; i < 3; i++){
+    			this->motorMinAngles[i] = motorMinAngles[i];
+    			this->motorMaxAngles[i] = motorMaxAngles[i];
+    		}
+    	}
 
     EffectorBoundaries::~EffectorBoundaries(){
     	delete[] boundariesBitmap;
@@ -195,9 +201,9 @@ namespace DeltaRobot{
 			}
 
 			// Check motor angles.
-			if(rotations[0]->angle <= motors[0]->getMinAngle() || rotations[0]->angle >= motors[0]->getMaxAngle() ||
-			  rotations[1]->angle <= motors[1]->getMinAngle() || rotations[1]->angle >= motors[1]->getMaxAngle()  ||
-			  rotations[2]->angle <= motors[2]->getMinAngle() || rotations[2]->angle >= motors[2]->getMaxAngle()  ){
+			if(rotations[0]->angle <= motorMinAngles[0] || rotations[0]->angle >= motorMaxAngles[0] 
+			|| rotations[1]->angle <= motorMinAngles[1] || rotations[1]->angle >= motorMaxAngles[1] 
+			|| rotations[2]->angle <= motorMinAngles[2] || rotations[2]->angle >= motorMaxAngles[2]){
 			  	*fromCache = INVALID;
 				delete rotations[0];
 				delete rotations[1];
