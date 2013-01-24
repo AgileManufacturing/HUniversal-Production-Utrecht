@@ -34,42 +34,26 @@ macro(rexos_add_library library_name suppress_warnings)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 	endmacro(rexos_add_library)
 
-macro(crexos_generate_messages dependencies)
+macro(crexos_generate_messages_and_services dependencies)
 	find_package(catkin REQUIRED COMPONENTS  std_msgs message_generation ${dependencies})
 	foreach(dep ${dependencies})
 		list(APPEND ${PROJECT_NAME}_PACKAGE_CATKIN_DEPENDS ${dep})	
 	endforeach(dep)
+	
 	file(GLOB_RECURSE msgs "msg" "*.msg")
-	add_message_files(
-   	DIRECTORY msg
-  	FILES ${msgs} )
-
+		add_message_files(
+   		DIRECTORY msg
+  		FILES ${msgs} )
+  	
+	  	file(GLOB_RECURSE srvs "srv" "*.srv")
+		add_service_files(
+	   	DIRECTORY srv
+	  	FILES ${srvs} )
 	generate_messages (
 	DEPENDENCIES ${dependencies}
 	)
 
-
-
-endmacro(crexos_generate_messages)
-
-macro(crexos_generate_services dependencies)
-	find_package(catkin REQUIRED COMPONENTS message_generation ${dependencies})
-		
-	foreach(dep ${dependencies})
-		list(APPEND ${PROJECT_NAME}_PACKAGE_CATKIN_DEPENDS ${dep})	
-	endforeach(dep)
-	file(GLOB_RECURSE srvs "srv" "*.srv")
-	add_service_files(
-   	DIRECTORY srv
-  	FILES ${srvs} )
-
-	generate_messages (
-	DEPENDENCIES ${dependencies}
-	)
-
-
-endmacro(crexos_generate_services)
-
+endmacro(crexos_generate_messages_and_services)
 
 macro(crexos_add_library library_name suppress_warnings catkin_depends system_depends)
 	if(${suppress_warnings})
@@ -119,14 +103,10 @@ macro(crexos_add_library library_name suppress_warnings catkin_depends system_de
 	if(build)
 
 		message("${${PROJECT_NAME}_PACKAGE_CATKIN_DEPENDS}")
-		
-
 		SET(${library_name}_BUILD "TRUE" CACHE INTERNAL "")
 		file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 		add_library(${library_name} STATIC ${sources})
-		include_directories(BEFORE "include")
-
-		include_directories(${include_dirs}  ${catkin_INCLUDE_DIRS})
+		include_directories(BEFORE "include" ${include_dirs}  ${catkin_INCLUDE_DIRS})
 		target_link_libraries(${library_name} ${libraries})
 	else()
 		message(WARNING "${library_name} can't be build because dependencies to ${missing_dependencies} are missing. ") 

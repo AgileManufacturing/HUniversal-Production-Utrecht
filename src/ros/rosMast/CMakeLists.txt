@@ -1,21 +1,6 @@
-##############################################################
-# CMakeLists.txt for a ROS package within the REXOS
-# build system.
-#
-# Created by Arjan Groenewegen, 10-10-2012
-#
-# 10-10-2012 Initial version
-#
-#############################################################
+cmake_minimum_required(VERSION 2.8.3)
+project(rosMast)
 
-cmake_minimum_required(VERSION 2.4.6)
-# Include all rosbuild macros
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
-
-# Initialize ROS package to be in our build system.
-rexos_rospack_init("rosMast" true true)
-
-rosbuild_add_library(rosMast src/StateMachine.cpp)
-
-# MUST be called after rexos_rospack_init to clean up after ROSBUILD!
-rexos_rospack_end()
+crexos_generate_messages_and_services("")
+crexos_add_library(rosMast false "roscpp" "")
+crexos_catkin_package()
