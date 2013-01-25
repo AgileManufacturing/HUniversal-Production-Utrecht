@@ -9,5 +9,6 @@
   <author email="koenbraham@gmail.com">KBraham</author>
   <buildtool_depend>catkin</buildtool_depend>
   <export>
+     <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lrexos_utilities"/>
   </export>
 </package>
