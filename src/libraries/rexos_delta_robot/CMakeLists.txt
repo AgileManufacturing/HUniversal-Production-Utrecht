@@ -16,8 +16,7 @@ file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 include_directories(include ${catkin_INCLUDE_DIRS})
 add_library(rexos_delta_robot ${sources})
 
-target_link_libraries(rexos_delta_robot ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBRARIES} ${rexos_datatypes_LIBRARIES} ${rexos_modbus_LIBRARIES} ${rexos_motor_LIBRARIES} ${rexos_utilities_LIBRARIES} )
-
+target_link_libraries(rexos_delta_robot ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 
 

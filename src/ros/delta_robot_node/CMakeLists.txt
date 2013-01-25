@@ -17,6 +17,6 @@ add_executable(delta_robot_node src/DeltaRobotNode.cpp)
 
 
 target_link_libraries(delta_robot_node ${catkin_LIBRARIES})
-add_dependencies(delta_robot_node crate_locator_node_gencpp)
+add_dependencies(delta_robot_node delta_robot_node_gencpp)
 
 
