@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package>
+  <name>rexos_blackboard_cpp_client</name>
+  <version>0.0.0</version>
+  <description>The rexos_blackboard_cpp_client package</description>
+  <maintainer email="lowcostvision@gmail.com">Leau Caust</maintainer>
+  <license>newBSD</license>
+  <url type="website">https://github.com/AgileManufacturing/HUniversal-Production-Utrecht</url>
+  <author email="koenbraham@gmail.com">KBraham</author>
+  <buildtool_depend>catkin</buildtool_depend>
+ 
+  <build_depend>rexos_utilities</build_depend>
+  <run_depend>rexos_utilities</run_depend>
+
+
+
+  <export>
+
+    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lrexos_blackboard_cpp_client"/>
+  </export>
+</package>
