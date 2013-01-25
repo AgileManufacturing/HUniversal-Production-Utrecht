@@ -15,7 +15,7 @@ CATKIN_DEPENDS rexos_utilities
 DEPENDS Boost Mongo)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
-include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${MONGO_INCLUDE_DIRS})
 add_library(rexos_blackboard_cpp_client ${sources})
-target_link_libraries(rexos_blackboard_cpp_client ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${Mongo_LIBRARIES})
+target_link_libraries(rexos_blackboard_cpp_client ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${MONGO_LIBRARIES})
 

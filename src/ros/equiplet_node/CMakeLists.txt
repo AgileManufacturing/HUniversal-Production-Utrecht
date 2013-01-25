@@ -1,29 +1,24 @@
-##############################################################
-# CMakeLists.txt for a ROS package within the REXOS
-# build system.
-#
-# Created by Dennis Koole, 10-10-2012
-#
-# 10-10-2012 Initial version
-#
-#############################################################
+cmake_minimum_required(VERSION 2.8.3)
+project(equiplet_node)
 
-cmake_minimum_required(VERSION 2.4.6)
-# Include all rosbuild macros
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+## Find catkin and any catkin packages
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs rexos_mast lookup_handler rexos_std_msgs rexos_std_srvs rexos_blackboard_cpp_client Libjson environment_communication_msgs)
+find_package(Mongo)
 
-# Initialize ROS package to be in our build system.
-rexos_rospack_init("equipletNode" false false)
 
-# Add executables as documented by ROS
-link_directories(${CMAKE_SOURCE_DIR}/libraries/mongo-cxx-driver)
-rosbuild_add_executable(EquipletNode src/EquipletNode.cpp)
+## Declare a catkin package
+catkin_package(
+INCLUDE_DIRS include 
+LIBRARIES  
+CATKIN_DEPENDS roscpp std_msgs rexos_mast lookup_handler rexos_std_msgs rexos_std_srvs rexos_blackboard_cpp_client Libjson environment_communication_msgs
+DEPENDS)
 
-# Link target to our libraries
-target_link_libraries(EquipletNode utilities mongoclient boost_thread-mt boost_filesystem boost_program_options boost_system ${Boost_SYSTEM_LIBRARY} blackboardCppClient json)
+file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
+include_directories(include ${catkin_INCLUDE_DIRS})
+add_executable(equiplet_node src/EquipletNode.cpp)
 
-# Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
-include_directories(${LIB_MAST_INCLUDE} ${LIB_UTILITIES_INCLUDE} ${Boost_INCLUDE_DIRS} ${BLACKBOARD_CPP_CLIENT} ${MONGO_CXX_DRIVER} ${LIB_JSON_INCLUDE})
 
-# MUST be called after rexos_rospack_init to clean up after ROSBUILD!
-rexos_rospack_end()
+target_link_libraries(equiplet_node ${catkin_LIBRARIES})
+
+
+

@@ -31,10 +31,10 @@
 #pragma once
 
 #include "ros/ros.h"
-#include "rosMast/States.h"
-#include "rosMast/State.h"
-#include "rosMast/ModuleError.h"
-#include "lookupHandler/LookupServer.h"
+#include "rexos_mast/States.h"
+#include "rexos_mast/State.h"
+#include "rexos_mast/ModuleError.h"
+#include "lookup_handler/LookupServer.h"
 
 #include <string>
 #include <vector>
@@ -43,11 +43,11 @@
 #include <cstdio>
 #include <unistd.h>
 #include <algorithm> 
-#include <Mast/HardwareModuleProperties.h>
-#include <blackboardCppClient/BlackboardCppClient.h>
-#include <blackboardCppClient/BlackboardSubscriber.h>
-#include <rexosStdSrvs/Module.h>
-#include <Utilities/Utilities.h>
+#include <equiplet_node/HardwareModuleProperties.h>
+#include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
+#include <rexos_blackboard_cpp_client/BlackboardSubscriber.h>
+#include <rexos_std_srvs/Module.h>
+#include <rexos_utilities/Utilities.h>
 
 #pragma GCC system_header
 #include <Libjson/libjson.h>
@@ -60,17 +60,17 @@ public:
 	EquipletNode(int id = 1);
 	virtual ~EquipletNode();
 	void blackboardReadCallback(std::string json);
-	bool addHardwareModule(Mast::HardwareModuleProperties module);
+	bool addHardwareModule(HardwareModuleProperties module);
 	bool removeHardwareModule(int id);
 	void updateOperationState();
 	void updateSafetyState();
-	bool updateModuleState(int moduleID, rosMast::StateType state);
+	bool updateModuleState(int moduleID, rexos_mast::StateType state);
 	void printHardwareModules();
-	bool stateChanged(rosMast::StateUpdate::Request &request, rosMast::StateUpdate::Response &response);
-	bool moduleError(rosMast::ErrorInModule::Request &request, rosMast::ErrorInModule::Response &response);
-	void sendStateChangeRequest(int moduleID, rosMast::StateType newState);
-	rosMast::StateType getModuleState(int moduleID);
-	void callLookupHandler(std::string lookupType, std::string lookupID, environmentCommunicationMessages::Map payload);
+	bool stateChanged(rexos_mast::StateUpdate::Request &request, rexos_mast::StateUpdate::Response &response);
+	bool moduleError(rexos_mast::ErrorInModule::Request &request, rexos_mast::ErrorInModule::Response &response);
+	void sendStateChangeRequest(int moduleID, rexos_mast::StateType newState);
+	rexos_mast::StateType getModuleState(int moduleID);
+	void callLookupHandler(std::string lookupType, std::string lookupID, environment_communication_msgs::Map payload);
 private:
 	/**
 	 * @var int equipletId
@@ -81,17 +81,17 @@ private:
 	 * @var Mast::state operationState
 	 * The minimal operation state is equal to the lowest state of all modules that are actors
 	 **/
-	rosMast::StateType operationState;
+	rexos_mast::StateType operationState;
 	/**
 	 * @var Mast::state safetyState
 	 * The safety state of the Equiplet. This is equal to the highest state of the actor modules
 	 **/
-	rosMast::StateType safetyState;
+	rexos_mast::StateType safetyState;
 	/**
 	 * @var std::vector<Mast::HardwareModuleProperties> moduleTable
 	 * The table that holds all information about the modules currently attached to this Equiplet
 	 **/
-	std::vector<Mast::HardwareModuleProperties> moduleTable;
+	std::vector<HardwareModuleProperties> moduleTable;
 	/**
 	 * @var ros::ServiceServer moduleErrorService
 	 * Decides what needs to happen when a error occurs inside a module
