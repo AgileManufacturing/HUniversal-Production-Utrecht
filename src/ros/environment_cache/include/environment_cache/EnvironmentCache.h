@@ -32,8 +32,8 @@
 #define ENVIRONMENTCACHE_H
 
 #include "ros/ros.h"
-#include <environmentCache/UpdateEnvironmentCache.h>
-#include <environmentCache/LookupEnvironmentObject.h>
+#include <environment_cache/UpdateEnvironmentCache.h>
+#include <environment_cache/LookupEnvironmentObject.h>
 #include <string>
 #include <map>
 
@@ -48,16 +48,16 @@ public:
 	 **/
 	enum environmentAction {ADD, UPDATE, REMOVE};
 	EnvironmentCache();
-	bool lookupEnvironmentObject(environmentCache::LookupEnvironmentObject::Request &req, environmentCache::LookupEnvironmentObject::Response &res);
-	bool updateEnvironmentCache(environmentCache::UpdateEnvironmentCache::Request &req, environmentCache::UpdateEnvironmentCache::Response &res);
+	bool lookupEnvironmentObject(environment_cache::LookupEnvironmentObject::Request &req, environment_cache::LookupEnvironmentObject::Response &res);
+	bool updateEnvironmentCache(environment_cache::UpdateEnvironmentCache::Request &req, environment_cache::UpdateEnvironmentCache::Response &res);
 	void printEnvironmentCache();
 
 private:
-	bool addItemToCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties);
-	bool updateItemInCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties);
+	bool addItemToCache(std::string id, const std::vector<environment_communication_msgs::KeyValuePair> &properties);
+	bool updateItemInCache(std::string id, const std::vector<environment_communication_msgs::KeyValuePair> &properties);
 	bool removeItemFromCache(std::string id);
-	void createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap);
-	environmentCommunicationMessages::Map createMapMessageFromProperties(std::map<std::string, std::string> &properties);
+	void createMapFromVector(const std::vector<environment_communication_msgs::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap);
+	environment_communication_msgs::Map createMapMessageFromProperties(std::map<std::string, std::string> &properties);
 
 	/**
 	 * @var std::map< std::string, std::map<std::string, std::string> > cache

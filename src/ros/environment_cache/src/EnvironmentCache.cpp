@@ -28,7 +28,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <environmentCache/EnvironmentCache.h>
+#include <environment_cache/EnvironmentCache.h>
 #include <iostream>
 
 /**
@@ -50,7 +50,7 @@ EnvironmentCache::EnvironmentCache() : cache(){
  *
  * @return returns true
  **/
-bool EnvironmentCache::lookupEnvironmentObject(environmentCache::LookupEnvironmentObject::Request &req, environmentCache::LookupEnvironmentObject::Response &res){
+bool EnvironmentCache::lookupEnvironmentObject(environment_cache::LookupEnvironmentObject::Request &req, environment_cache::LookupEnvironmentObject::Response &res){
 	std::string id = req.lookupID;
 	if(cache.count(id)){
 		std::map< std::string, std::map<std::string, std::string> >::iterator cacheIterator;
@@ -59,7 +59,7 @@ bool EnvironmentCache::lookupEnvironmentObject(environmentCache::LookupEnvironme
 		res.object = createMapMessageFromProperties(properties);
 		res.found = true;
 	} else{
-		environmentCommunicationMessages::Map map;
+		environment_communication_msgs::Map map;
 		res.object = map;
 		res.found = false;
 	}
@@ -74,7 +74,7 @@ bool EnvironmentCache::lookupEnvironmentObject(environmentCache::LookupEnvironme
  *
  * @return true
  **/
-bool EnvironmentCache::updateEnvironmentCache(environmentCache::UpdateEnvironmentCache::Request &req, environmentCache::UpdateEnvironmentCache::Response &res){
+bool EnvironmentCache::updateEnvironmentCache(environment_cache::UpdateEnvironmentCache::Request &req, environment_cache::UpdateEnvironmentCache::Response &res){
 	int32_t event = req.cacheUpdate.event;
 	std::string id = req.cacheUpdate.id;
 	bool success = false;
@@ -130,7 +130,7 @@ void EnvironmentCache::printEnvironmentCache(){
  *
  * @return True if item is added, false if there is already an item in the cache with the same id of the item to add
  **/
-bool EnvironmentCache::addItemToCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties){
+bool EnvironmentCache::addItemToCache(std::string id, const std::vector<environment_communication_msgs::KeyValuePair> &properties){
 	if(cache.count(id) == 0){
 		std::map<std::string, std::string> options;
 		// Convert the vector with properties to a map
@@ -151,7 +151,7 @@ bool EnvironmentCache::addItemToCache(std::string id, const std::vector<environm
  *
  * @return True if an item with the id is found in the cache, else false
  **/
-bool EnvironmentCache::updateItemInCache(std::string id, const std::vector<environmentCommunicationMessages::KeyValuePair> &properties){
+bool EnvironmentCache::updateItemInCache(std::string id, const std::vector<environment_communication_msgs::KeyValuePair> &properties){
 	if(cache.count(id) == 1){
 		// Create iterator for the cache
 		std::map< std::string, std::map<std::string, std::string> >::iterator cacheIterator;
@@ -203,7 +203,7 @@ bool EnvironmentCache::removeItemFromCache(std::string id){
  * @param propertiesVector The vector with KeyValuePair objects
  * @param propertiesMap The map where the keys and values of the objects in the vector are inserted to
  **/
-void EnvironmentCache::createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap){
+void EnvironmentCache::createMapFromVector(const std::vector<environment_communication_msgs::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap){
 	for(int i = 0; i < (int)propertiesVector.size(); i++){
 		propertiesMap.insert(std::pair<std::string, std::string>(propertiesVector[i].key, propertiesVector[i].value));
 	}
@@ -214,12 +214,12 @@ void EnvironmentCache::createMapFromVector(const std::vector<environmentCommunic
  *
  * @param properties The map to convert
  *
- * @return environmentCommunicationMessages::Map The map message object
+ * @return environment_communication_msgs::Map The map message object
  **/
-environmentCommunicationMessages::Map EnvironmentCache::createMapMessageFromProperties(std::map<std::string, std::string> &properties){
+environment_communication_msgs::Map EnvironmentCache::createMapMessageFromProperties(std::map<std::string, std::string> &properties){
 	std::map<std::string, std::string>::iterator propertiesIterator;
-	environmentCommunicationMessages::Map mapMsg;
-	environmentCommunicationMessages::KeyValuePair prop;
+	environment_communication_msgs::Map mapMsg;
+	environment_communication_msgs::KeyValuePair prop;
 	for(propertiesIterator = properties.begin(); propertiesIterator != properties.end(); propertiesIterator++){
 		prop.key = (*propertiesIterator).first;
 		prop.value = (*propertiesIterator).second;
