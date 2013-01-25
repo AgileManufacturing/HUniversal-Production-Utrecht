@@ -32,12 +32,12 @@
 #pragma once
 
 #include "ros/ros.h"
-#include "rexosStdSrvs/Module.h"
 #include <iostream>
 #include <sstream>
-#include <crateLocatorNode/CrateEventMsg.h>
 #include <boost/thread.hpp>
-#include <crateLocatorNode/getCrate.h>
+
+#include <crate_locator_node/CrateEventMsg.h>
+#include <crate_locator_node/getCrate.h>
 
 /**
  * Followes a crate with the deltarobot
@@ -61,7 +61,7 @@ public:
 	/**
 	 * Callback for when the cratelocated finds a crate
 	 **/
-	void callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg);
+	void callback(const crate_locator_node::CrateEventMsg::ConstPtr& msg);
 
 	/**
 	 * Thread that accepts input from the keyboard
@@ -112,5 +112,5 @@ private:
 	/**
 	 * Contains the request and response for the crateLocator
 	 **/
-	crateLocatorNode::getCrate getCrateService;
+	crate_locator_node::getCrate getCrateService;
 };

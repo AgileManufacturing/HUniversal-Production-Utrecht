@@ -30,11 +30,12 @@
  **/
 
 #include <FollowNode/FollowNode.h>
-#include <DataTypes/Crate.h>
-#include <CrateLocatorNode/Topics.h>
-#include <CrateLocatorNode/Services.h>
-#include <Vision/CrateTracker.h>
-#include <DeltaRobotNode/Services.h>
+
+#include <crate_locator_node/Topics.h>
+#include <crate_locator_node/Services.h>
+#include <delta_robot_node/Services.h>
+#include <rexos_datatypes/Crate.h>
+#include <rexos_vision/CrateTracker.h>
 
 FollowNode::FollowNode() :
 		crateID(""), updateCrateIDFlag(false), inputRunning(true), topicRunning(true), deltaRobotClient(
