@@ -41,26 +41,31 @@
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>std_msgs</build_depend>
-  <run_depend>std_msgs</run_depend>
 
   <build_depend>roscpp</build_depend>
-  <run_depend>roscpp</run_depend>
-
   <build_depend>rexos_mast</build_depend>
-  <run_depend>rexos_mast</run_depend>
   <build_depend>rexos_std_msgs</build_depend>
-  <run_depend>rexos_std_msgs</run_depend>
   <build_depend>rexos_std_srvs</build_depend>
-  <run_depend>rexos_std_srvs</run_depend>
 
   <build_depend>rexos_datatypes</build_depend>
-  <run_depend>rexos_datatypes</run_depend>
-
+  <build_depend>rexos_utilities</build_depend>
   <build_depend>rexos_delta_robot</build_depend>
-  <run_depend>rexos_delta_robot</run_depend>
-
+  <build_depend>rexos_modbus</build_depend>
   <build_depend>Libjson</build_depend>
+ <build_depend>rexos_motor</build_depend>
+
+ <run_depend>rexos_motor</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>rexos_mast</run_depend>
+  <run_depend>rexos_std_msgs</run_depend>
+  <run_depend>rexos_std_srvs</run_depend>
+  <run_depend>rexos_datatypes</run_depend>
+  <run_depend>rexos_utilities</run_depend>
+  <run_depend>rexos_delta_robot</run_depend>
+  <run_depend>rexos_modbus</run_depend>
   <run_depend>Libjson</run_depend>
+
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- You can specify that this package is a metapackage here: -->
@@ -68,7 +73,7 @@
 
     <!-- Other tools can request additional information be placed here -->
 
-    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lrosMast"/>
+    <cpp cflags="-I${prefix}/include"/>
 
   </export>
 </package>

@@ -54,7 +54,7 @@
 
     <!-- Other tools can request additional information be placed here -->
 
-    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lrosMast"/>
+    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lrexos_mast"/>
 
   </export>
 </package>

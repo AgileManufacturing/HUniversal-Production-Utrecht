@@ -13,5 +13,6 @@
   <run_depend>modbus</run_depend>
   <run_depend>rexos_utilities</run_depend>
   <export>
+    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lrexos_modbus"/>
   </export>
 </package>
