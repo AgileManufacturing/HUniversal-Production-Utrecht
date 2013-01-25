@@ -1,0 +1,32 @@
+cmake_minimum_required(VERSION 2.8.3)
+project(lookup_handler)
+
+## Find catkin and any catkin packages
+find_package(catkin REQUIRED COMPONENTS roscpp environment_communication_msgs environment_cache std_msgs message_generation)
+
+file(GLOB_RECURSE msgs "msg" "*.msg")
+add_message_files(
+DIRECTORY msg
+FILES ${msgs} )
+  	
+file(GLOB_RECURSE srvs "srv" "*.srv")
+add_service_files(
+DIRECTORY srv
+FILES ${srvs} )
+
+generate_messages (
+	DEPENDENCIES std_msgs environment_communication_msgs
+)
+
+## Declare a catkin package
+catkin_package(
+INCLUDE_DIRS include 
+LIBRARIES  
+CATKIN_DEPENDS roscpp environment_communication_msgs environment_cache std_msgs 
+DEPENDS)
+
+file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
+include_directories(include ${catkin_INCLUDE_DIRS})
+add_executable(lookup_handler src/LookupHandler.cpp)
+target_link_libraries(lookup_handler ${catkin_LIBRARIES})
+add_dependencies(lookup_handler lookup_handler_gencpp)

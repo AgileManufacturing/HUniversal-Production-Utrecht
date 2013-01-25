@@ -27,14 +27,14 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include "lookupHandler/LookupHandler.h"
+#include "lookup_handler/LookupHandler.h"
 
 /**
  * Create a LookupHandler
  **/
 EnvironmentCommunication::LookupHandler::LookupHandler(){
 	ros::NodeHandle nodeHandle;
-	lookupClient = nodeHandle.serviceClient<environmentCache::LookupEnvironmentObject>("LookupEnvironmentObject");
+	lookupClient = nodeHandle.serviceClient<environment_cache::LookupEnvironmentObject>("LookupEnvironmentObject");
 	lookupServer = nodeHandle.advertiseService("LookupHandler/lookup", &LookupHandler::lookupServiceCallback, this);
 	ROS_INFO("LookupHandler constructor called");
 }
@@ -45,9 +45,9 @@ EnvironmentCommunication::LookupHandler::LookupHandler(){
  * @param request Contains the data for the lookup in the cache
  * @param response Will contain the data from the cache, if it was found
  **/
-bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookupHandler::LookupServer::Request &request, lookupHandler::LookupServer::Response &response){
+bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookup_handler::LookupServer::Request &request, lookup_handler::LookupServer::Response &response){
 	// Construct a message for LookupEnvironmentObject service
-	environmentCache::LookupEnvironmentObject msg;
+	environment_cache::LookupEnvironmentObject msg;
 	msg.request.lookupID = request.lookupMsg.lookupID;
 	std::map<std::string, std::string> payLoadMap;
 	std::map<std::string, std::string>::iterator it;
@@ -79,7 +79,7 @@ bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookupHandle
  * @param vector The vector with KeyValuePair objects
  * @param map The map where the keys and values of the objects in the vector are inserted to
  **/
-void EnvironmentCommunication::LookupHandler::createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &vector, std::map<std::string, std::string> &map){
+void EnvironmentCommunication::LookupHandler::createMapFromVector(const std::vector<environment_communication_msgs::KeyValuePair> &vector, std::map<std::string, std::string> &map){
 	for(int i = 0; i < (int)vector.size(); i++){
 		map.insert(std::pair<std::string, std::string>(vector[i].key, vector[i].value));
 	}
