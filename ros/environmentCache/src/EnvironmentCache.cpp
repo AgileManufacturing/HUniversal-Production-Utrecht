@@ -51,7 +51,7 @@ EnvironmentCache::EnvironmentCache() : cache(), nodeHandle(){
 bool EnvironmentCache::lookupEnvironmentObject(environmentCache::LookupEnvironmentObject::Request &req, environmentCache::LookupEnvironmentObject::Response &res){
 	std::map<std::string, std::string>::iterator it = cache.find(req.lookupID);
 	if(it != cache.end()){
-		res.properties = it->secondcd;
+		res.properties = it->second;
 		res.found = true;
 	} else{
 		res.properties = "";

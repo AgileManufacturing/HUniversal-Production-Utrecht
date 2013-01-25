@@ -36,6 +36,10 @@
 #include <string>
 
 namespace CrateLocatorNodeTopics{
+	/** 
+	 * @var CRATE_EVENT
+	 * The name of the get crate event topic
+	 **/
 	const std::string CRATE_EVENT = "crateEvent";
 }
 

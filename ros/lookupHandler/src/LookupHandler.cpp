@@ -43,46 +43,83 @@ EnvironmentCommunication::LookupHandler::LookupHandler(){
  * Call back for lookupHandler/lookup service
  * Will lookup data in environmentcache and use the payload of request on the data
  * @param request Contains the data for the lookup in the cache
- * @param response Will contain the data from the cache, if it was found
+ * @param response Will contain the data from the environment cache, if it was found
+ * @return returns always true
  **/
 bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookupHandler::LookupServer::Request &request, lookupHandler::LookupServer::Response &response){
 	// Construct a message for LookupEnvironmentObject service
-	environmentCache::LookupEnvironmentObject msg;
+	environmentCache::LookupEnvironmentObject msg;	
 	msg.request.lookupID = request.lookupMsg.lookupID;
-	std::map<std::string, std::string> payLoadMap;
-	std::map<std::string, std::string>::iterator it;
-	createMapFromVector(request.lookupMsg.payLoad.KeyValuePairSet, payLoadMap);
-	if(lookupClient.call(msg)){
-		if(msg.response.found){
-			/*for(int i = 0; i < (int)(msg.response.object.KeyValuePairSet.size()); i++){
-				it = payLoadMap.find(msg.response.object.KeyValuePairSet[i].key);
-				std::string valueObject =  (*it).second;
-				std::string valuePayload = msg.response.object.KeyValuePairSet[i].value;
+	std::string payloadRequest = request.lookupMsg.payLoad;
 
-				// TODO should do something cool with the data
+	if(lookupClient.call(msg)) {
+		if(msg.response.found) {
+			JSONNode payload = libjson::parse(payloadRequest);
+			JSONNode envCache = libjson::parse(msg.response.properties);
 
-				std::cout << "valueObject " << valueObject << " valuePayload " << valuePayload << std::endl;
-			}*/
+			// First rotate the position inside the crate around the middlepoint (0, 0)
+			JSONNode rotatedPoint = rotate(payload, envCache);
+			// Then translate the point to the workspace coordinate system by adding it to the envCache pos
+			JSONNode translatedPoint = translateObjects(rotatedPoint, envCache);
+
 			response.succeeded = true;
-		} else
+		} else {
 			response.succeeded = false;
-	} else{
-		response.succeeded = false;
-		ROS_ERROR("Error in calling LookupEnvironmentObject");
-	}
+		}
+	} 
 	return true;
 }
 
-/**
- * Convert a vector to a map
- *
- * @param vector The vector with KeyValuePair objects
- * @param map The map where the keys and values of the objects in the vector are inserted to
+/** 
+ * Will rotate the point in the payload with the angle saved in the environmentCache
+ * @param payload Contains the data of a point in the object space
+ * @param envCache Contains the data saved about the object in the environmentcache
+ * @return returns always true
  **/
-void EnvironmentCommunication::LookupHandler::createMapFromVector(const std::vector<rexosStdMsgs::KeyValuePair> &vector, std::map<std::string, std::string> &map){
-	for(int i = 0; i < (int)vector.size(); i++){
-		map.insert(std::pair<std::string, std::string>(vector[i].key, vector[i].value));
+JSONNode EnvironmentCommunication::LookupHandler::rotate(JSONNode payload, JSONNode envCache) {
+	float angle = payload["angle"].as_float();
+	float radians = (angle * M_PI) / 180.0;
+	float x = payload["x"].as_float();
+	float y = payload["y"].as_float();
+	float newX = (x * cos(radians)) - (y * sin(radians));
+	float newY = (x * sin(radians)) + (y * cos(radians));
+
+	JSONNode result(JSON_NODE);
+	result.push_back(JSONNode("x", newX));
+	result.push_back(JSONNode("y", newY));
+	return result;
+}
+
+/** 
+ * Will translate the point in the payload with the point saved in the environmentCache
+ * @param payload Contains the data of a point in the object space
+ * @param envCache Contains the data saved about the object in the environmentcache
+ * @return returns always true
+ **/
+JSONNode EnvironmentCommunication::LookupHandler::translateObjects(JSONNode payload, JSONNode envCache) {
+	JSONNode::const_iterator payloadInterator = payload.begin();
+	JSONNode result(JSON_NODE);
+	while(payloadInterator != payload.end()) {
+		std::string node_name = payloadInterator -> name();
+		 // recursively call ourselves to dig deeper into the tree
+        if (payloadInterator -> type() == JSON_ARRAY || payloadInterator -> type() == JSON_NODE){
+            translateObjects(*payloadInterator, envCache[node_name]);
+        }
+
+        bool envResult = false;
+		if(envCache.find(node_name) != envCache.end() ) {
+			envResult = true;
+		}
+
+    	int payloadVar = payloadInterator -> as_float();
+    	if(envResult) { 
+        	int envCacheVar = envCache[node_name].as_float();
+        	int translationResult = payloadVar + envCacheVar;
+        	result.push_back(JSONNode(node_name, translationResult));
+    	} 
+		++payloadInterator;
 	}
+	return result;
 }
 
 /**

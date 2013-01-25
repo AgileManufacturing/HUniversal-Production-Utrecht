@@ -1,5 +1,5 @@
 /**
- * @file Services.h
+ * @file CrateLocatorNode/Services.h
  * @brief Constants for the crate locator node
  * @date Created: 2012-10-30
  * @date Revisioned: 2013-01-21
@@ -36,7 +36,15 @@
 #include <string>
 
 namespace CrateLocatorNodeServices{
+	/** 
+	 * @var GET_CRATE
+	 * The name of the get crate service
+	 **/
 	const std::string GET_CRATE = "getCrate";
+	/** 
+	 * @var GET_ALL_CRATES
+	 * The name of the get all crates services
+	 **/	
 	const std::string GET_ALL_CRATES = "getAllCrates";
 }
 

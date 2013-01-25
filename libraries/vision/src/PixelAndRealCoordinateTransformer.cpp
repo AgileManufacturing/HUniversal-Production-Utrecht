@@ -113,7 +113,7 @@ namespace Vision{
 		
 		return pixelCoordinate;
 	}
-	
+
 	/**
 	 * Updates realToPixelCoordinateScale, pixelToRealCoordinateScale, realAlpha, pixelAlpha, realToPixelCoordinateAlpha, pixelToRealCoordinateAlpha and mirrored.
 	 **/

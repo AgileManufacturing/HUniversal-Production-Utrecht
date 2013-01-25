@@ -36,6 +36,10 @@
 #include <environmentCache/LookupEnvironmentObject.h>
 #include "lookupHandler/LookupServer.h"
 #include "lookupHandler/LookupMessage.h"
+#include "math.h"
+
+#pragma GCC system_header
+#include <Libjson/libjson.h>
 
 namespace EnvironmentCommunication{
 	/** 
@@ -46,6 +50,9 @@ namespace EnvironmentCommunication{
 			LookupHandler();
 		private:
 			bool lookupServiceCallback(lookupHandler::LookupServer::Request &req, lookupHandler::LookupServer::Response &rep);
+			JSONNode translateObjects(JSONNode payload, JSONNode envCache);
+			JSONNode rotate(JSONNode payload, JSONNode envCache);
+			
 			/**
 			 * @var ros::ServiceClient lookupClient
 			 * the client that will call the service in environmentCache
@@ -56,8 +63,6 @@ namespace EnvironmentCommunication{
 			 * the service for the equipletNode
 			 **/
 			ros::ServiceServer lookupServer;
-
-			void createMapFromVector(const std::vector<rexosStdMsgs::KeyValuePair> &vector, std::map<std::string, std::string> &map);
 	};
 }
 #endif

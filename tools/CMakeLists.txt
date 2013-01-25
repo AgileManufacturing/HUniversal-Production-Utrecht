@@ -8,7 +8,7 @@
 #############################################################
 
 ## Add all ROS packages here ##
-set(TOOLSPACKS gripperTestNode blackboardCppClientTest)
+set(TOOLSPACKS gripperTestNode)
 
 ### Don't change anything below, the part below checks if ROS is installed and configured correctly. 
 rexos_check_ros()

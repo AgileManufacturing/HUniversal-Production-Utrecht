@@ -305,19 +305,20 @@ bool EquipletNode::updateModuleState(int moduleID, rosMast::StateType state){
  *
  * @param lookupType the type of the lookup
  * @param lookupID the ID of the lookup
- * @param payload the payload, contains data that will get combined with environmentcache data
+ * @param payLoad The JSON string with a point in the object space
  **/
-void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupID, rexosStdMsgs::Map payload){
+void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupID, std::string payLoad){
  	lookupHandler::LookupServer msg;
+
 	msg.request.lookupMsg.lookupType = lookupType;
 	msg.request.lookupMsg.lookupID = lookupID;
-	msg.request.lookupMsg.payLoad = payload;
+	msg.request.lookupMsg.payLoad = payLoad;
 
 	ros::NodeHandle nodeHandle;
 	ros::ServiceClient lookupClient = nodeHandle.serviceClient<lookupHandler::LookupServer>("LookupHandler/lookup");
 	if(lookupClient.call(msg)){
-		// TODO
-		// Read message
+			// TODO
+			// Read message
 	} else{
 		ROS_ERROR("Error in calling lookupHandler/lookup service");
 	}
