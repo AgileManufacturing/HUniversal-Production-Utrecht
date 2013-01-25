@@ -54,14 +54,15 @@ macro(crexos_generate_messages_and_services dependencies)
 	DEPENDENCIES ${dependencies}
 	)
 
-
 endmacro(crexos_generate_messages_and_services)
 
 macro(crexos_add_library library_name suppress_warnings catkin_depends system_depends)
+	set(build TRUE)
+
 	if(${suppress_warnings})
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 	endif()
-	set(build TRUE)
+
 	foreach(dep ${catkin_depends})	
 		if(NOT ${${dep}_BUILD})
 			set(build FALSE)
@@ -69,7 +70,8 @@ macro(crexos_add_library library_name suppress_warnings catkin_depends system_de
 		else()
 			find_package(${dep})
 			list(APPEND ${PROJECT_NAME}_PACKAGE_CATKIN_DEPENDS ${dep})
-	
+			list(APPEND include_dirs  ${${dep}_INCLUDE_DIRS} ${${dep}_INCLUDE_DIR})
+			list(APPEND libraries ${${dep}_LIBRARIES} ${${dep}_LIBS})
 		endif()
 	endforeach(dep)
 
@@ -84,33 +86,18 @@ macro(crexos_add_library library_name suppress_warnings catkin_depends system_de
 			list(APPEND missing_dependencies ${dep})
 		else()
 			list(APPEND ${PROJECT_NAME}_PACKAGE_SYSTEM_DEPENDS ${dep})
+			list(APPEND include_dirs  ${${dep}_INCLUDE_DIRS} ${${dep}_INCLUDE_DIR})
+			list(APPEND libraries  ${${dep}_LIBRARIES} ${${dep}_LIBS})
 		endif()
 	endforeach(dep)
 	
-	# create a list of include dirs
-	foreach(dep ${catkin_depends})
-		list(APPEND include_dirs  ${${dep}_INCLUDE_DIRS} ${${dep}_INCLUDE_DIR})
-	endforeach(dep)
-	foreach(dep ${system_depends})
-		list(APPEND include_dirs  ${${dep}_INCLUDE_DIRS} ${${dep}_INCLUDE_DIR})
-	endforeach(dep)
-	# create a list of libraries
-	foreach(dep ${catkin_depends})
-		list(APPEND libraries ${${dep}_LIBRARIES} ${${dep}_LIBS})
-	endforeach(dep)
-	foreach(dep ${system_depends})
-		list(APPEND libraries  ${${dep}_LIBRARIES} ${${dep}_LIBS})
-	endforeach(dep)
-
 	if(build)
-
-		message("${${PROJECT_NAME}_PACKAGE_CATKIN_DEPENDS}")
 		SET(${library_name}_BUILD "TRUE" CACHE INTERNAL "")
 		file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 		add_library(${library_name} STATIC ${sources})
 		include_directories(BEFORE "include" ${include_dirs}  ${catkin_INCLUDE_DIRS})
 		target_link_libraries(${library_name} ${libraries})
-		add_dependencies(${library_name} ${library_name}_gencpp)
+		add_dependencies(${library_name} ${library_name}_gencpp ${catkin_depends})
 	else()
 		message(WARNING "${library_name} can't be build because dependencies to ${missing_dependencies} are missing. ") 
 		SET(${library_name}_BUILD "FALSE" CACHE INTERNAL "")
@@ -121,13 +108,14 @@ endmacro(crexos_add_library)
 
 
 macro(crexos_add_executable library_name main_file suppress_warnings catkin_depends system_depends)
-	list(APPEND ${PROJECT_NAME}_PACKAGE_LIBRARIES ${PROJECT_NAME})
+	set(build TRUE)
+	
 	find_package(catkin REQUIRED roscpp)
 	
 	if(${suppress_warnings})
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 	endif()
-	set(build TRUE)
+
 	foreach(dep ${catkin_depends})	
 		if(NOT ${${dep}_BUILD})
 			set(build FALSE)
@@ -135,6 +123,8 @@ macro(crexos_add_executable library_name main_file suppress_warnings catkin_depe
 		else()
 			find_package(${dep})
 			list(APPEND ${PROJECT_NAME}_PACKAGE_CATKIN_DEPENDS ${dep})
+			list(APPEND include_dirs  ${${dep}_INCLUDE_DIRS} ${${dep}_INCLUDE_DIR})
+			list(APPEND libraries ${${dep}_LIBRARIES} ${${dep}_LIBS})
 		endif()
 	endforeach(dep)
 
@@ -149,33 +139,19 @@ macro(crexos_add_executable library_name main_file suppress_warnings catkin_depe
 			list(APPEND missing_dependencies ${dep})
 		else()
 			list(APPEND ${PROJECT_NAME}_PACKAGE_SYSTEM_DEPENDS ${dep})
+			list(APPEND include_dirs  ${${dep}_INCLUDE_DIRS} ${${dep}_INCLUDE_DIR})
+			list(APPEND libraries  ${${dep}_LIBRARIES} ${${dep}_LIBS})
 		endif()
 	endforeach(dep)
 	
-	# create a list of include dirs
-	foreach(dep ${catkin_depends})
-		list(APPEND include_dirs  ${${dep}_INCLUDE_DIRS} ${${dep}_INCLUDE_DIR})
-	endforeach(dep)
-	foreach(dep ${system_depends})
-		list(APPEND include_dirs  ${${dep}_INCLUDE_DIRS} ${${dep}_INCLUDE_DIR})
-	endforeach(dep)
-	# create a list of libraries
-	foreach(dep ${catkin_depends})
-		list(APPEND libraries ${${dep}_LIBRARIES} ${${dep}_LIBS})
-	endforeach(dep)
-	foreach(dep ${system_depends})
-		list(APPEND libraries  ${${dep}_LIBRARIES} ${${dep}_LIBS})
-	endforeach(dep)
-
 	if(build)
-
 		SET(${library_name}_BUILD "TRUE" CACHE INTERNAL "")
 		add_executable(${library_name} ${main_file})
 		include_directories(BEFORE "include")
 
 		include_directories(${include_dirs})
 		target_link_libraries(${library_name} ${libraries})
-		add_dependencies(${library_name} ${library_name}_gencpp)
+		add_dependencies(${library_name} ${library_name}_gencpp ${catkin_depends})
 	else()
 		message(WARNING "${library_name} can't be build because dependencies to ${missing_dependencies} are missing. ") 
 		SET(${library_name}_BUILD "FALSE" CACHE INTERNAL "")
