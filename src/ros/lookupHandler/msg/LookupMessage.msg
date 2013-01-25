@@ -1,3 +1,0 @@
-string lookupType
-string lookupID
-environmentCommunicationMessages/Map payLoad

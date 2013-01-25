@@ -1,5 +1,5 @@
 /**
- * @file LookupHandler.h
+ * @file lookup_handler.h
  * @brief Names for the DeltaRobot services.
  * @date Created: 2012-11-07
  *
@@ -31,11 +31,11 @@
 #define LOOKUPHANDLER_H
 
 #include "ros/ros.h"
-#include <environmentCommunicationMessages/KeyValuePair.h>
-#include <environmentCommunicationMessages/Map.h>
-#include <environmentCache/LookupEnvironmentObject.h>
-#include "lookupHandler/LookupServer.h"
-#include "lookupHandler/LookupMessage.h"
+#include <environment_communication_msgs/KeyValuePair.h>
+#include <environment_communication_msgs/Map.h>
+#include <environment_cache/LookupEnvironmentObject.h>
+#include "lookup_handler/LookupServer.h"
+#include "lookup_handler/LookupMessage.h"
 
 namespace EnvironmentCommunication{
 	/** 
@@ -45,7 +45,7 @@ namespace EnvironmentCommunication{
 		public:
 			LookupHandler();
 		private:
-			bool lookupServiceCallback(lookupHandler::LookupServer::Request &req, lookupHandler::LookupServer::Response &rep);
+			bool lookupServiceCallback(lookup_handler::LookupServer::Request &req, lookup_handler::LookupServer::Response &rep);
 			/**
 			 * @var ros::ServiceClient lookupClient
 			 * the client that will call the service in environmentCache
@@ -57,7 +57,7 @@ namespace EnvironmentCommunication{
 			 **/
 			ros::ServiceServer lookupServer;
 
-			void createMapFromVector(const std::vector<environmentCommunicationMessages::KeyValuePair> &vector, std::map<std::string, std::string> &map);
+			void createMapFromVector(const std::vector<environment_communication_msgs::KeyValuePair> &vector, std::map<std::string, std::string> &map);
 	};
 }
 #endif
