@@ -140,12 +140,12 @@ int main(int argc, char** argv){
 	ros::NodeHandle nodeHandle;
 
 	// Getting MovePath Services.
-	ros::ServiceClient deltaRobotClient = nodeHandle.serviceClient<deltaRobotNode::MoveToRelativePoint>(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT);
-	deltaRobotNode::MoveToRelativePoint moveToRelativePointService;
+	ros::ServiceClient deltaRobotClient = nodeHandle.serviceClient<delta_robot_node::MoveToRelativePoint>(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT);
+	delta_robot_node::MoveToRelativePoint moveToRelativePointService;
 
 	// Getting Calibrate Services.
-	ros::ServiceClient calibrateClient = nodeHandle.serviceClient<deltaRobotNode::Calibrate>(DeltaRobotNodeServices::CALIBRATE);
-	deltaRobotNode::Calibrate calibrateService;
+	ros::ServiceClient calibrateClient = nodeHandle.serviceClient<delta_robot_node::Calibrate>(DeltaRobotNodeServices::CALIBRATE);
+	delta_robot_node::Calibrate calibrateService;
 
 	// Initing the keyboard read and setting up clean shutdown.
 	signal(SIGINT, quit);
@@ -162,7 +162,7 @@ int main(int argc, char** argv){
 	ROS_INFO("Reading from keyboard");
 	ROS_INFO("Start controlling the robot by pressing WASD keys and Up and Down keys");
 
-	deltaRobotNode::Motion motion;
+	delta_robot_node::Motion motion;
 	for(;;){
 		// Get the next event from the keyboard.
 		if(read(keyboardNumber, &inputCharacter, 1) < 0){
