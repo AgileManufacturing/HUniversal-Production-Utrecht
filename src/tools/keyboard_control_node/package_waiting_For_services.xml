@@ -40,8 +40,8 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>rexos_delta_robot_node</build_depend>
-  <run_depend>rexos_delta_robot_node</run_depend>
+  <build_depend>delta_robot_node</build_depend>
+  <run_depend>delta_robot_node</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
