@@ -33,33 +33,66 @@
 #include <string>
 
 namespace DeltaRobotNodeServices{
+
+	// Old, deprecated services -----------------------------------------------
 	/**
 	 * @var const std::string MOVE_TO_POINT
 	 * Name for the service in which a deltarobot moves to a specific coordinate.
 	 **/
-	const std::string MOVE_TO_POINT = "DeltaRobotNode/moveToPoint";
+	const std::string MOVE_TO_POINT = "moveToPoint";
+	
+	/**
+	 * @var const std::string MOVE_PATH
+	 * Name for the service in which a deltarobot moves along a path of specific coordinates.
+	 **/
+	const std::string MOVE_PATH = "movePath";
+	
+	/**
+	 * @var const std::string MOVE_TO_RELATIVE_POINT
+	 * Name for the service in which a deltarobot moves to a coordinate relative to the current coordinate.
+	 **/
+	const std::string MOVE_TO_RELATIVE_POINT = "moveToRelativePoint";
+	
+	/**
+	 * @var const std::string MOVE_RELATIVE_PATH
+	 * Name for the service in which a deltarobot moves along a path of coordinates relative to the preceding coordinate.
+	 **/
+	const std::string MOVE_RELATIVE_PATH = "moveRelativePath";
+	
+	/**
+	 * @var const std::string CALIBRATE
+	 * Name for the service in which a deltarobot calibrates itself.
+	 **/
+	const std::string CALIBRATE = "calibrate";
+
+	// json services ----------------------------------------------------------
+	/**
+	 * @var const std::string MOVE_TO_POINT
+	 * Name for the service in which a deltarobot moves to a specific coordinate.
+	 **/
+	const std::string MOVE_TO_POINT_JSON = "DeltaRobotNode/moveToPoint";
 
 	/**
 	 * @var const std::string MOVE_PATH
 	 * Name for the service in which a deltarobot moves along a path of specific coordinates.
 	 **/
-	const std::string MOVE_PATH = "DeltaRobotNode/movePath";
+	const std::string MOVE_PATH_JSON = "DeltaRobotNode/movePath";
 
 	/**
 	 * @var const std::string MOVE_TO_RELATIVE_POINT
 	 * Name for the service in which a deltarobot moves to a coordinate relative to the current coordinate.
 	 **/
-	const std::string MOVE_TO_RELATIVE_POINT = "DeltaRobotNode/moveToRelativePoint";
+	const std::string MOVE_TO_RELATIVE_POINT_JSON = "DeltaRobotNode/moveToRelativePoint";
 
 	/**
 	 * @var const std::string MOVE_RELATIVE_PATH
 	 * Name for the service in which a deltarobot moves along a path of coordinates relative to the preceding coordinate.
 	 **/
-	const std::string MOVE_RELATIVE_PATH = "DeltaRobotNode/moveRelativePath";
+	const std::string MOVE_RELATIVE_PATH_JSON = "DeltaRobotNode/moveRelativePath";
 
 	/**
 	 * @var const std::string CALIBRATE
 	 * Name for the service in which a deltarobot calibrates itself.
 	 **/
-	const std::string CALIBRATE = "DeltaRobotNode/calibrate";
+	const std::string CALIBRATE_JSON = "DeltaRobotNode/calibrate";
 }
