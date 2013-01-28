@@ -112,7 +112,7 @@ namespace deltaRobotNodeNamespace{
 		 **/
 		Motor::MotorManager* motorManager;
 		/**
-		 * @var ros::ServiceServer moveToPointService_old_old
+		 * @var ros::ServiceServer moveToPointService_old
 		 * Service for receiving move to point commands
 		 **/
 		ros::ServiceServer moveToPointService_old;

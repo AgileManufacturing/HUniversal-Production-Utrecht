@@ -67,31 +67,31 @@ namespace DeltaRobotNodeServices{
 
 	// json services ----------------------------------------------------------
 	/**
-	 * @var const std::string MOVE_TO_POINT
+	 * @var const std::string MOVE_TO_POINT_JSON
 	 * Name for the service in which a deltarobot moves to a specific coordinate.
 	 **/
 	const std::string MOVE_TO_POINT_JSON = "DeltaRobotNode/moveToPoint";
 
 	/**
-	 * @var const std::string MOVE_PATH
+	 * @var const std::string MOVE_PATH_JSON
 	 * Name for the service in which a deltarobot moves along a path of specific coordinates.
 	 **/
 	const std::string MOVE_PATH_JSON = "DeltaRobotNode/movePath";
 
 	/**
-	 * @var const std::string MOVE_TO_RELATIVE_POINT
+	 * @var const std::string MOVE_TO_RELATIVE_POINT_JSON
 	 * Name for the service in which a deltarobot moves to a coordinate relative to the current coordinate.
 	 **/
 	const std::string MOVE_TO_RELATIVE_POINT_JSON = "DeltaRobotNode/moveToRelativePoint";
 
 	/**
-	 * @var const std::string MOVE_RELATIVE_PATH
+	 * @var const std::string MOVE_RELATIVE_PATH_JSON
 	 * Name for the service in which a deltarobot moves along a path of coordinates relative to the preceding coordinate.
 	 **/
 	const std::string MOVE_RELATIVE_PATH_JSON = "DeltaRobotNode/moveRelativePath";
 
 	/**
-	 * @var const std::string CALIBRATE
+	 * @var const std::string CALIBRATE_JSON
 	 * Name for the service in which a deltarobot calibrates itself.
 	 **/
 	const std::string CALIBRATE_JSON = "DeltaRobotNode/calibrate";

@@ -361,6 +361,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath_old(deltaRobotNode::MoveP
 			ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", req.motion[i].x, req.motion[i].y, req.motion[i].z, req.motion[i].maxAcceleration);
 			deltaRobot->moveTo(DataTypes::Point3D<double>(req.motion[i].x, req.motion[i].y, req.motion[i].z), req.motion[i].maxAcceleration);
 		}
+		res.succeeded = true;
 	}
 	return true;
 }
