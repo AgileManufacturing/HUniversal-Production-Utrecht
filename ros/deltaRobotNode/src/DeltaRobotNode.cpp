@@ -426,8 +426,9 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath_old(deltaRobotNod
 		DataTypes::Point3D<double> newLocation(req.motion[0].x, req.motion[0].y, req.motion[0].z);
 		newLocation += oldLocation;
 
-		if(deltaRobot->checkPath(oldLocation, newLocation)){
+		if(!deltaRobot->checkPath(oldLocation, newLocation)){
 			res.message = "Cannot move relative path, path is illegal";
+			ROS_INFO("FROM %f, %f, %f TO %f, %f, %f Not allowed", oldLocation.x, oldLocation.y, oldLocation.z, newLocation.x, newLocation.y, newLocation.z);
 			return true;
 		}
 
