@@ -3,6 +3,7 @@ project(crate_locator_node)
 
 ## Find catkin and any catkin packages
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation image_transport cv_bridge opencv2 sensor_msgs rexos_datatypes rexos_utilities rexos_vision)
+find_package(Log4cxx)
 
 file(GLOB_RECURSE msgs "msg" "*.msg")
 add_message_files(
@@ -26,7 +27,7 @@ CATKIN_DEPENDS roscpp image_transport cv_bridge opencv2 sensor_msgs rexos_dataty
 DEPENDS)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
-include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS} ${LOG4CXX_INCLUDE_DIR})
 add_executable(crate_locator_node src/CrateLocatorNode.cpp)
-target_link_libraries(crate_locator_node ${catkin_LIBRARIES})
+target_link_libraries(crate_locator_node ${catkin_LIBRARIES} ${LOG4CXX_LIBRARIES})
 add_dependencies(crate_locator_node crate_locator_node_gencpp)
