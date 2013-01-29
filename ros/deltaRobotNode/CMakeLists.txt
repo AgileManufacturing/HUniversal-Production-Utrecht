@@ -15,7 +15,7 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 set(ROS_BUILD_TYPE Debug)
 
 # Initialize ROS package to be in our build system.
-rexos_rospack_init("deltaRobotNode" false false)
+rexos_rospack_init("deltaRobotNode" true true)
 
 # Add executables as documented by ROS
 rosbuild_add_executable(DeltaRobotNode src/DeltaRobotNode.cpp)
