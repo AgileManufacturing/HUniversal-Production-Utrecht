@@ -46,11 +46,11 @@ namespace Mast{
 		 * @param id Unique identifier of the module
 		 * @param type Defines the type of the module
 		 * @param state The current state of this module
-		 * @param actuator Is this module an actor
+		 * @param actor Is this module an actor
 		 * @param needed Is this module needed for the current service
 		 **/
-		HardwareModuleProperties(int id, int type, rosMast::StateType state, bool actuator, bool needed):
-			id(id), type(type), currentState(state), actuator(actuator), needed(needed), error(false){}
+		HardwareModuleProperties(int id, int type, rosMast::StateType state, bool actor, bool needed):
+			id(id), type(type), currentState(state), actor(actor), needed(needed), error(false){}
 		/**
 		 * @var int id
 		 * The id of the module
@@ -70,10 +70,10 @@ namespace Mast{
 		rosMast::StateType currentState;
 
 		/**
-		 * @var bool actuator
-		 * Defines if the hardware module is an actuator
+		 * @var bool actor
+		 * Defines if the hardware module is an actor
 		 **/
-		bool actuator;
+		bool actor;
 
 		/**
 		 * @var bool needed
@@ -91,7 +91,7 @@ namespace Mast{
 		 * Print function for a module
 		 **/
 		friend std::ostream& operator<<(std::ostream& stream, HardwareModuleProperties &module){
-			stream << "Id: " << module.id << ", current state: " << module.currentState << " actuator " << module.actuator << " Required for current service " << module.needed;
+			stream << "Id: " << module.id << ", current state: " << module.currentState << " actor " << module.actor << " Required for current service " << module.needed;
 			return stream;
 		}
 	};

@@ -161,7 +161,7 @@ void EquipletNode::updateSafetyState(){
 	std::vector<Mast::HardwareModuleProperties>::iterator it;
 	rosMast::StateType newSafetyState = rosMast::safe;
 	for(it = moduleTable.begin(); it < moduleTable.end(); it++){
-		if((*it).actuator && (*it).currentState > newSafetyState){
+		if((*it).actor && (*it).currentState > newSafetyState){
 			newSafetyState = (*it).currentState;
 		}
 	}
@@ -181,7 +181,7 @@ void EquipletNode::updateOperationState(){
 		// Set the new operation state if the hardware module is an actor, required for
 		// the current service and if its state is lower than the new operation state as
 		// Initialized above.
-		if((*it).actuator && (*it).needed){
+		if((*it).actor && (*it).needed){
 			newOperationState = std::min((*it).currentState, newOperationState);
 			operationStateSet = true;
 		}
