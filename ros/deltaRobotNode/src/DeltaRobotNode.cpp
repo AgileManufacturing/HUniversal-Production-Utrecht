@@ -595,13 +595,13 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
 		std::string node_name = i->name();
 
 		if(node_name == "x"){
-			p.x = i->as_int();
+			p.x = i->as_float();
 		} else if(node_name == "y"){
-			p.y = i->as_int();
+			p.y = i->as_float();
 		} else if(node_name == "z"){
-			p.z = i->as_int();
+			p.z = i->as_float();
 		} else if(node_name == "maxAcceleration"){
-			p.maxAcceleration = i->as_int();
+			p.maxAcceleration = i->as_float();
 		}
 
 		++i;
