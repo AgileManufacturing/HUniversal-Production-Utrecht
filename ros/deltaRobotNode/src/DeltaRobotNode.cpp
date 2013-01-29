@@ -155,6 +155,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate_old(deltaRobotNode::Cali
 	if(getState() != rosMast::normal){
 		res.succeeded = false;
 		res.message = "Cannot calibrate, mast state=" + std::string(rosMast::state_txt[getState()]);
+		ROS_INFO("%s",res.message.c_str());
 	} else {
 		res.succeeded = calibrate();
 	}
@@ -172,6 +173,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate_json(rexosStdSrvs::Modul
 	if(getState() != rosMast::normal){
 		res.succeeded = false;
 		res.message = "Cannot calibrate, mast state=" + std::string(rosMast::state_txt[getState()]);
+		ROS_INFO("%s",res.message.c_str());
 	} else {
 		res.succeeded = calibrate();
 	}
@@ -217,11 +219,13 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint_old(deltaRobotNode::Mo
 	if(getState() != rosMast::normal) {
 		res.succeeded = false;
 		res.message="Cannot move to point, mast state="+ std::string(rosMast::state_txt[getState()]);
+		ROS_INFO("%s",res.message.c_str());
 	} else {
 		res.succeeded = moveToPoint(req.motion.x, req.motion.y, req.motion.z, req.motion.maxAcceleration);
 
 		if(!res.succeeded){
 			res.message = "Cannot move to point, path is illegal";
+			ROS_INFO("%s",res.message.c_str());
 		}
 	}
 	return true;
@@ -241,12 +245,14 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint_json(rexosStdSrvs::Mod
 	if(getState() != rosMast::normal){
 		res.succeeded = false;
 		res.message = "Cannot move to point, mast state=" + std::string(rosMast::state_txt[getState()]);
+		ROS_INFO("%s",res.message.c_str());
 	} else {
 		Point p = parsePoint(req.json);
 		res.succeeded = moveToPoint(p.x, p.y, p.z, p.maxAcceleration);
 
 		if(!res.succeeded){
 			res.message = "Cannot move to point, path is illegal";
+			ROS_INFO("%s",res.message.c_str());
 		}
 	}
 	return true;
@@ -292,11 +298,13 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint_old(deltaRobot
 	if(getState() != rosMast::normal){
 		res.succeeded = false;
 		res.message = "Cannot move to relative point, mast state=" + std::string(rosMast::state_txt[getState()]);
+		ROS_INFO("%s",res.message.c_str());
 	} else {
 		res.succeeded = moveToPoint(req.motion.x, req.motion.y, req.motion.z, req.motion.maxAcceleration);
 
 		if(!res.succeeded){
 			res.message = "Cannot move to relative point, path is illegal";
+			ROS_INFO("%s",res.message.c_str());
 		}
 	}
 	return true;
@@ -316,12 +324,14 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint_json(rexosStdS
 	if(getState() != rosMast::normal){
 		res.succeeded = false;
 		res.message = "Cannot move to relative point, mast state=" + std::string(rosMast::state_txt[getState()]);
+		ROS_INFO("%s",res.message.c_str());
 	} else {
 		Point p = parsePoint(req.json);
 		res.succeeded = moveToPoint(p.x, p.y, p.z, p.maxAcceleration);
 
 		if(!res.succeeded){
 			res.message = "Cannot move to relative point, path is illegal";
+			ROS_INFO("%s",res.message.c_str());
 		}
 	}
 	return true;
@@ -342,9 +352,11 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath_old(deltaRobotNode::MoveP
 	res.succeeded = false;
 	if(getState() != rosMast::normal) {
 		res.message="Cannot move path, mast state="+ std::string(rosMast::state_txt[getState()]);
+		ROS_INFO("%s",res.message.c_str());
 	} else {
 		if(!deltaRobot->checkPath(deltaRobot->getEffectorLocation(),DataTypes::Point3D<double>(req.motion[0].x, req.motion[0].y, req.motion[0].z))){
 			res.message = "Cannot move path, path is illegal";
+			ROS_INFO("%s",res.message.c_str());
 			return true;
 		}
 		
@@ -353,6 +365,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath_old(deltaRobotNode::MoveP
 					DataTypes::Point3D<double>(req.motion[i].x, req.motion[i].y, req.motion[i].z),
 					DataTypes::Point3D<double>(req.motion[i+1].x, req.motion[i+1].y, req.motion[i+1].z))){
 				res.message="Cannot move path, path is illegal";
+				ROS_INFO("%s",res.message.c_str());
 				return true;
 			}
 		}
@@ -380,12 +393,14 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath_json(rexosStdSrvs::Module
 	res.succeeded = false;
 	if(getState() != rosMast::normal){
 		res.message = "Cannot move path, mast state=" + std::string(rosMast::state_txt[getState()]);
+		ROS_INFO("%s",res.message.c_str());
 	} else {
 		int size = 0;
 		Point * path = parsePointArray(req.json, size);
 
 		if(!deltaRobot->checkPath(deltaRobot->getEffectorLocation(),DataTypes::Point3D<double>(path[0].x, path[0].y, path[0].z))){
 			res.message = "Cannot move path, path is illegal";
+			ROS_INFO("%s",res.message.c_str());
 			return true;
 		}
 
@@ -394,6 +409,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath_json(rexosStdSrvs::Module
 					DataTypes::Point3D<double>(path[i].x, path[i].y, path[i].z),
 					DataTypes::Point3D<double>(path[i + 1].x, path[i + 1].y, path[i + 1].z))){
 				res.message = "Cannot move path, path is illegal";
+				ROS_INFO("%s",res.message.c_str());
 				return true;
 			}
 		}
@@ -422,6 +438,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath_old(deltaRobotNod
     res.succeeded = false;
 	if(getState() != rosMast::normal) {
 		res.message = "Cannot move to relative path, mast state= " + std::string(rosMast::state_txt[getState()]);
+		ROS_INFO("%s",res.message.c_str());
 	} else {
 		DataTypes::Point3D<double> oldLocation(deltaRobot->getEffectorLocation());
 		DataTypes::Point3D<double> newLocation(req.motion[0].x, req.motion[0].y, req.motion[0].z);
@@ -468,6 +485,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath_json(rexosStdSrvs
 	res.succeeded = false;
 	if(getState() != rosMast::normal){
 		res.message = "Cannot move to relative path, mast state=" + std::string(rosMast::state_txt[getState()]);
+		ROS_INFO("%s",res.message.c_str());
 	} else {
 		int size = 0;
 		Point * path = parsePointArray(req.json, size);
@@ -478,6 +496,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath_json(rexosStdSrvs
 		
 		if(deltaRobot->checkPath(oldLocation, newLocation)){
 			res.message = "Cannot move path, path is illegal";
+			ROS_INFO("%s",res.message.c_str());
 			return true;
 		}
 		
