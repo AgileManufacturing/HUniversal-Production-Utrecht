@@ -41,8 +41,17 @@
 #include <DeltaRobotNode/Point.h>
 #include <rosMast/StateMachine.h>
 
+#include "deltaRobotNode/MoveToPoint.h"
+#include "deltaRobotNode/MovePath.h"
+#include "deltaRobotNode/MoveToRelativePoint.h"
+#include "deltaRobotNode/MoveRelativePath.h"
+#include "deltaRobotNode/Motion.h"
+#include "deltaRobotNode/Calibrate.h"
+
+// GCC system header to suppress libjson warnings
 #pragma GCC system_header
 #include <Libjson/libjson.h>
+// ---------------------------------------------
 
 namespace deltaRobotNodeNamespace{
 	/**
@@ -57,12 +66,25 @@ namespace deltaRobotNodeNamespace{
 		int transitionShutdown();
 		int transitionStart();
 		int transitionStop();
-					
-		bool calibrate(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
-		bool moveToPoint(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
-		bool movePath(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
-		bool moveToRelativePoint(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
-		bool moveRelativePath(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+			
+		// Main functions to be called from the services
+		bool calibrate();
+		bool moveToPoint(double x, double y, double z, double maxAcceleration);
+		bool moveToRelativePoint(double x, double y, double z, double maxAcceleration);
+
+		// old, deprecated services
+		bool calibrate_old(deltaRobotNode::Calibrate::Request &req, deltaRobotNode::Calibrate::Response &res);
+		bool moveToPoint_old(deltaRobotNode::MoveToPoint::Request &req, deltaRobotNode::MoveToPoint::Response &res);
+		bool movePath_old(deltaRobotNode::MovePath::Request &req, deltaRobotNode::MovePath::Response &res);
+		bool moveToRelativePoint_old(deltaRobotNode::MoveToRelativePoint::Request &req, deltaRobotNode::MoveToRelativePoint::Response &res);
+		bool moveRelativePath_old(deltaRobotNode::MoveRelativePath::Request &req, deltaRobotNode::MoveRelativePath::Response &res);
+
+		// json services
+		bool calibrate_json(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+		bool moveToPoint_json(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+		bool movePath_json(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+		bool moveToRelativePoint_json(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
+		bool moveRelativePath_json(rexosStdSrvs::Module::Request &req, rexosStdSrvs::Module::Response &res);
 
 		Point parsePoint(std::string json);
 		Point *parsePointArray(std::string json, int & size);
@@ -90,30 +112,56 @@ namespace deltaRobotNodeNamespace{
 		 **/
 		Motor::MotorManager* motorManager;
 		/**
-		 * @var ros::ServiceServer moveToPointService
+		 * @var ros::ServiceServer moveToPointService_old
 		 * Service for receiving move to point commands
 		 **/
-		ros::ServiceServer moveToPointService;
+		ros::ServiceServer moveToPointService_old;
 		/**
-		 * @var ros::ServiceServer movePathService
+		 * @var ros::ServiceServer movePathService_old
 		 * Service for receiving movePath commands
 		 **/
-		ros::ServiceServer movePathService;
+		ros::ServiceServer movePathService_old;
 		/**
-		 * @var ros::ServiceServer moveToRelativePointService
+		 * @var ros::ServiceServer moveToRelativePointService_old
 		 * Service for receiving move to relative point commands
 		 **/
-		ros::ServiceServer moveToRelativePointService;
+		ros::ServiceServer moveToRelativePointService_old;
 		/**
-		 * @var ros::ServiceServer moveRelativePathService
+		 * @var ros::ServiceServer moveRelativePathService_old
 		 * Service for receiving move relative path commands
 		 **/
-		ros::ServiceServer moveRelativePathService;
+		ros::ServiceServer moveRelativePathService_old;
 		/**
-		 * @var ros::ServiceServer calibrateService
+		 * @var ros::ServiceServer calibrateService_old
 		 * Service for receiving calibrate commands
 		 **/
-		ros::ServiceServer calibrateService;
+		ros::ServiceServer calibrateService_old;
+
+		/**
+		 * @var ros::ServiceServer moveToPointService_json
+		 * Service for receiving move to point commands
+		 **/
+		ros::ServiceServer moveToPointService_json;
+		/**
+		 * @var ros::ServiceServer movePathService_json
+		 * Service for receiving movePath commands
+		 **/
+		ros::ServiceServer movePathService_json;
+		/**
+		 * @var ros::ServiceServer moveToRelativePointService_json
+		 * Service for receiving move to relative point commands
+		 **/
+		ros::ServiceServer moveToRelativePointService_json;
+		/**
+		 * @var ros::ServiceServer moveRelativePathService_json
+		 * Service for receiving move relative path commands
+		 **/
+		ros::ServiceServer moveRelativePathService_json;
+		/**
+		 * @var ros::ServiceServer calibrateService_json
+		 * Service for receiving calibrate commands
+		 **/
+		ros::ServiceServer calibrateService_json;
 	};
 }
 #endif
