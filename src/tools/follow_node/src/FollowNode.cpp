@@ -36,6 +36,7 @@
 #include <delta_robot_node/Services.h>
 #include <rexos_datatypes/Crate.h>
 #include <rexos_vision/CrateTracker.h>
+#include "delta_robot_node/MoveToPoint.h"
 
 FollowNode::FollowNode() :
 	nodeHandle(),
@@ -44,8 +45,8 @@ FollowNode::FollowNode() :
 	inputRunning(true), 
 	topicRunning(true),
 	inputThread(NULL), 
-	deltaRobotClient(nodeHandle.serviceClient<rexosStdSrvs::Module>(DeltaRobotNodeServices::MOVE_TO_POINT)),
-	crateLocatorClient(nodeHandle.serviceClient<crateLocatorNode::getCrate>(CrateLocatorNodeServices::GET_CRATE)),
+	deltaRobotClient(nodeHandle.serviceClient<delta_robot_node::MoveToPoint>(DeltaRobotNodeServices::MOVE_TO_POINT)),
+	crateLocatorClient(nodeHandle.serviceClient<crate_locator_node::getCrate>(CrateLocatorNodeServices::GET_CRATE)),
 	getCrateService(){
 	inputThread = new boost::thread(inputThreadMethod, this);
 
@@ -70,9 +71,9 @@ FollowNode::~FollowNode(){
  *
  * @param msg CrateEventMsg pointer.
  **/
-void FollowNode::callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg){
+void FollowNode::callback(const crate_locator_node::CrateEventMsg::ConstPtr& msg){
 	switch(msg->event){
-	case Vision::CrateEvent::type_in:
+	case rexos_vision::CrateEvent::type_in:
 		std::cout << "[DEBUG] New crate " << msg->crate.name << "found!" << std::endl;
 		if(updateCrateIDFlag){
 			crateID = msg->crate.name;
@@ -89,14 +90,14 @@ void FollowNode::callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg){
 		 deltaRobotClient.call(moveToPointService);
 		 }*/
 		break;
-	case Vision::CrateEvent::type_out:
+	case rexos_vision::CrateEvent::type_out:
 		std::cout << "[DEBUG] Deleted crate " << msg->crate.name << std::endl;
 		//if(crateID.compare(msg->crate.name) == 0){
 		//	crateID = "";
 		//	std::cout << "[DEBUG] Lost crate " << msg->crate.name << ". Stopped the follow process " << std::endl;
 		//}
 		break;
-	case Vision::CrateEvent::type_moving:
+	case rexos_vision::CrateEvent::type_moving:
 		std::cout << "[DEBUG] Start moving crate " << msg->crate.name << std::endl;
 		/*if(crateID.compare(msg->crate.name) == 0){
 		 std::cout << "[DEBUG] Moving to new coordinate " << msg->crate.x << "," << msg->crate.y << std::endl;
@@ -105,7 +106,7 @@ void FollowNode::callback(const crateLocatorNode::CrateEventMsg::ConstPtr& msg){
 		 deltaRobotClient.call(moveToPointService);
 		 }*/
 		break;
-	case Vision::CrateEvent::type_moved:
+	case rexos_vision::CrateEvent::type_moved:
 		std::cout << "[DEBUG] Moved crate " << msg->crate.name << std::endl;
 		/*if(crateID.compare(msg->crate.name) == 0){
 		 std::cout << "[DEBUG] Moving to new coordinate " << msg->crate.x << "," << msg->crate.y << std::endl;
@@ -130,7 +131,7 @@ void FollowNode::run( ){
 		ros::spinOnce();
 
 		if(crateLocatorClient.call(getCrateService)
-				&& getCrateService.response.state != DataTypes::Crate::state_non_existing){
+				&& getCrateService.response.state != rexos_datatypes::Crate::state_non_existing){
 			std::cout << getCrateService.response.crate.x << " " << getCrateService.response.crate.y << std::endl;
 			//moveToPointService.request.motion.x = getCrateService.response.crate.x;
 			//moveToPointService.request.motion.y = getCrateService.response.crate.y;
