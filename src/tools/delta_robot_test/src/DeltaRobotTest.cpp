@@ -30,13 +30,13 @@
  **/
 
 #include "ros/ros.h"
-#include "deltaRobotNode/MovePath.h"
-#include "deltaRobotNode/MoveRelativePath.h"
-#include "deltaRobotNode/MoveToRelativePoint.h"
-#include "deltaRobotNode/MoveToPoint.h"
-#include "deltaRobotNode/Motion.h"
-#include "deltaRobotNode/Calibrate.h"
-#include "DeltaRobotNode/Services.h"
+#include "delta_robot_node/MovePath.h"
+#include "delta_robot_node/MoveRelativePath.h"
+#include "delta_robot_node/MoveToRelativePoint.h"
+#include "delta_robot_node/MoveToPoint.h"
+#include "delta_robot_node/Motion.h"
+#include "delta_robot_node/Calibrate.h"
+#include "delta_robot_node/Services.h"
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "DeltaRobotTest"
@@ -65,7 +65,7 @@ namespace DeltaRobotTestNamespace{
 	 * @var MoveToPoint moveToPointService
 	 * Service to move the deltaRobot to a specific point.
 	 **/
-	deltaRobotNode::MoveToPoint moveToPointService;
+	delta_robot_node::MoveToPoint moveToPointService;
 
 	/**
 	 * Moves the deltaRobot effector to the starting point, with all the hips horizontal.
@@ -97,22 +97,22 @@ int main(int argc, char **argv){
 	ros::NodeHandle nodeHandle;
 
 	// Getting Calibrate Services.
-	ros::ServiceClient calibrateClient = nodeHandle.serviceClient<deltaRobotNode::Calibrate>(DeltaRobotNodeServices::CALIBRATE);
-	deltaRobotNode::Calibrate calibrateService;
+	ros::ServiceClient calibrateClient = nodeHandle.serviceClient<delta_robot_node::Calibrate>(DeltaRobotNodeServices::CALIBRATE);
+	delta_robot_node::Calibrate calibrateService;
 
-	moveToPointClient = nodeHandle.serviceClient<deltaRobotNode::MoveToPoint>(DeltaRobotNodeServices::MOVE_TO_POINT);
+	moveToPointClient = nodeHandle.serviceClient<delta_robot_node::MoveToPoint>(DeltaRobotNodeServices::MOVE_TO_POINT);
 
 	// Getting MoveToRelativePoint Services.
-	ros::ServiceClient moveToRelativePointClient = nodeHandle.serviceClient<deltaRobotNode::MoveToRelativePoint>(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT);
-	deltaRobotNode::MoveToRelativePoint moveToRelativePointService;
+	ros::ServiceClient moveToRelativePointClient = nodeHandle.serviceClient<delta_robot_node::MoveToRelativePoint>(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT);
+	delta_robot_node::MoveToRelativePoint moveToRelativePointService;
 
 	// Getting MovePath Service.
-	ros::ServiceClient movePathClient = nodeHandle.serviceClient<deltaRobotNode::MovePath>(DeltaRobotNodeServices::MOVE_PATH);
-	deltaRobotNode::MovePath movePathService;
+	ros::ServiceClient movePathClient = nodeHandle.serviceClient<delta_robot_node::MovePath>(DeltaRobotNodeServices::MOVE_PATH);
+	delta_robot_node::MovePath movePathService;
 
 	// Getting MoveRelativePath Service.
-	ros::ServiceClient moveRelativePathClient = nodeHandle.serviceClient<deltaRobotNode::MoveRelativePath>(DeltaRobotNodeServices::MOVE_RELATIVE_PATH);
-	deltaRobotNode::MoveRelativePath moveRelativePathService;
+	ros::ServiceClient moveRelativePathClient = nodeHandle.serviceClient<delta_robot_node::MoveRelativePath>(DeltaRobotNodeServices::MOVE_RELATIVE_PATH);
+	delta_robot_node::MoveRelativePath moveRelativePathService;
 	
 	// Test Calibrate Service.
 	std:: cout << "Press any key to start the Calibrate" << std::endl;
@@ -164,10 +164,10 @@ int main(int argc, char **argv){
 	// Test MovePath Service.
 	std:: cout << "Press any key to start the MovePathService" << std::endl;
 	std:: cin >> keyPress;
-	deltaRobotNode::Motion point1;
-	deltaRobotNode::Motion point2;
-	deltaRobotNode::Motion point3;
-	deltaRobotNode::Motion point4;
+	delta_robot_node::Motion point1;
+	delta_robot_node::Motion point2;
+	delta_robot_node::Motion point3;
+	delta_robot_node::Motion point4;
 	point1.x = 10;
 	point1.y = 10;
 	point1.z = -210;
@@ -200,11 +200,11 @@ int main(int argc, char **argv){
 	std:: cout << "Press any key to start the MoveRelativePath" << std::endl;
 	std:: cin >> keyPress;
 	for(double z = 0; z < 10; z++){
-		deltaRobotNode::Motion point1;
-		deltaRobotNode::Motion point2;
-		deltaRobotNode::Motion point3;
-		deltaRobotNode::Motion point4;
-		deltaRobotNode::Motion point5;
+		delta_robot_node::Motion point1;
+		delta_robot_node::Motion point2;
+		delta_robot_node::Motion point3;
+		delta_robot_node::Motion point4;
+		delta_robot_node::Motion point5;
 		point1.x = 0;
 		point1.y = 0;
 		point1.z = -5;
