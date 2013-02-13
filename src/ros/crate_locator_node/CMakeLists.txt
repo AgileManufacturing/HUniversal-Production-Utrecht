@@ -5,12 +5,12 @@ project(crate_locator_node)
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation image_transport cv_bridge opencv2 sensor_msgs rexos_datatypes rexos_utilities rexos_vision)
 find_package(Log4cxx)
 
-file(GLOB_RECURSE msgs "msg" "*.msg")
+file(GLOB_RECURSE msgs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/msg" "*.msg")
 add_message_files(
 DIRECTORY msg
 FILES ${msgs} )
   	
-file(GLOB_RECURSE srvs "srv" "*.srv")
+file(GLOB_RECURSE srvs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/srv" "*.srv")
 add_service_files(
 DIRECTORY srv
 FILES ${srvs} )

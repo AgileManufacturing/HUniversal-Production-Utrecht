@@ -5,12 +5,12 @@ project(delta_robot_node)
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation rexos_mast rexos_modbus rexos_std_msgs rexos_std_srvs rexos_utilities rexos_datatypes rexos_delta_robot Libjson)
 find_package(Log4cxx)
 
-file(GLOB_RECURSE msgs "msg" "*.msg")
+file(GLOB_RECURSE msgs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/msg" "*.msg")
 add_message_files(
 DIRECTORY msg
 FILES ${msgs} )
   	
-file(GLOB_RECURSE srvs "srv" "*.srv")
+file(GLOB_RECURSE srvs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/srv" "*.srv")
 add_service_files(
 DIRECTORY srv
 FILES ${srvs} )

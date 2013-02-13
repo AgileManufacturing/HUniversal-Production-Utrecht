@@ -5,7 +5,7 @@ project(rexos_std_msgs)
 ## Find catkin and any catkin packages
 find_package(catkin REQUIRED COMPONENTS std_msgs message_generation )
 
-file(GLOB_RECURSE msgs "msg" "*.msg")
+file(GLOB_RECURSE msgs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/msg" "*.msg")
 add_message_files(
 DIRECTORY msg
 FILES ${msgs} )

@@ -5,12 +5,12 @@ project(lookup_handler)
 find_package(catkin REQUIRED COMPONENTS roscpp environment_communication_msgs environment_cache std_msgs message_generation )
 find_package(Log4cxx)
 
-file(GLOB_RECURSE msgs "msg" "*.msg")
+file(GLOB_RECURSE msgs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/msg" "*.msg")
 add_message_files(
 DIRECTORY msg
 FILES ${msgs} )
   	
-file(GLOB_RECURSE srvs "srv" "*.srv")
+file(GLOB_RECURSE srvs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/srv" "*.srv")
 add_service_files(
 DIRECTORY srv
 FILES ${srvs} )

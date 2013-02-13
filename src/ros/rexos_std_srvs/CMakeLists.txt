@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rexos_std_srvs)
 find_package(catkin REQUIRED COMPONENTS std_msgs message_generation )
   	
-file(GLOB_RECURSE srvs "srv" "*.srv")
+file(GLOB_RECURSE srvs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/srv" "*.srv")
 add_service_files(
 DIRECTORY srv
 FILES ${srvs} )
