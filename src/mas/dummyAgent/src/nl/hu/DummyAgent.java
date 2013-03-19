@@ -94,7 +94,7 @@ public class DummyAgent extends Agent
 				InstructionMessage a = new InstructionMessage("moveRelativePath", "DeltaRobotNode", "FIND_ID", null ,points);
 				BlackboardMessage mes = new BlackboardMessage(topic,a);
 				try{
-					System.out.print(System.nanoTime());
+					//System.out.print(System.nanoTime());
 					client.insertJson(gson.toJson(mes));
 
 					if(i == 500)
