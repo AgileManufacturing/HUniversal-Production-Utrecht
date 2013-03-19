@@ -55,9 +55,9 @@ find_package(Unicap)
 
 # OpenCV should automatically work because of ROS, but on some Ubuntu configurations
 # it seems necessary to set OpenCV_DIR correctly. The next statement will try to 
-# automatically guess this seting for ROS fuerte. 
+# automatically guess this setting for ROS Groovy. 
 if(NOT OpenCV_DIR)
-	find_path(OpenCV_DIR "OpenCVConfig.cmake" DOC "Root directory of OpenCV" HINTS "/opt/ros/fuerte/share/OpenCV/")
+	find_path(OpenCV_DIR "OpenCVConfig.cmake" DOC "Root directory of OpenCV" HINTS "/opt/ros/groovy/share/OpenCV/")
 endif(NOT OpenCV_DIR)
 # Finally, try finding the package
 find_package(OpenCV)
