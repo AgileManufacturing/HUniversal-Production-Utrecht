@@ -29,25 +29,19 @@
 
 package nl.hu.client;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bson.types.ObjectId;
-
 import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.Bytes;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.Mongo;
-import com.mongodb.MongoInterruptedException;
 import com.mongodb.util.JSON;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Client class for a mongodb blackboard.
@@ -168,40 +162,39 @@ public class BlackboardClient{
 		public void run(){
 			String operation;
 			BasicDBObject message;
-			while(true){
-				while(tailedCursor.hasNext()){
-					DBObject object = (DBObject)tailedCursor.next();
-					operation = object.get("op").toString();
-					switch(operation){
-						case "i":
-							//BasicDBObject messageCheckObject = new BasicDBObject();
-							//messageCheckObject.put(OR_OPERAND, subscriptions.values());
-							//message = (BasicDBObject) currentCollection.findOne(messageCheckObject);
-							//if(message != null){
-							
-							BasicDBObject o = (BasicDBObject)object.get("o");
-							String topic = o.get("topic").toString();
-							if(subscriptions.get(topic) != null){
-								callback.onMessage(o.toString());
-							//}
-							}
-							break;
-					}
-				}
-			}
+			while(true) {
+                while (tailedCursor.hasNext()) {
+                    DBObject object = (DBObject) tailedCursor.next();
+                    operation = object.get("op").toString();
+                    if (operation.equals("i")) {//BasicDBObject messageCheckObject = new BasicDBObject();
+                        //messageCheckObject.put(OR_OPERAND, subscriptions.values());
+                        //message = (BasicDBObject) currentCollection.findOne(messageCheckObject);
+                        //if(message != null){
+
+                        BasicDBObject o = (BasicDBObject) object.get("o");
+                        String topic = o.get("topic").toString();
+                        if (subscriptions.get(topic) != null) {
+                            callback.onMessage(topic, o.get("message"));
+                            //}
+                        }
+
+                    }
+                }
+            }
 		}
 	}
 
 	/**
 	 * Constructor of BlackboardClient.
 	 *
-	 * @param ip The ip of the MongoDB host.
-	 **/
-	public BlackboardClient(String ip){
+     * @param host The mongoDB host
+     * @param subscriber
+     **/
+	public BlackboardClient(String host, ISubscriber subscriber){
 		try{
 			this.subscriptions = new HashMap<String, BasicDBObject>();
-			this.mongo = new Mongo(ip);
-			this.callback = callback;
+			this.mongo = new Mongo(host);
+			this.callback = subscriber;
 		} catch (Exception e){
 			e.printStackTrace();
 		}
@@ -210,26 +203,18 @@ public class BlackboardClient{
 	/**
 	 * Constructor of BlackboardClient.
 	 *
-	 * @param ip The ip of the MongoDB host.
-	 * @param port The port of the MongoDB host.
-	 **/
-	public BlackboardClient(String ip, int port){
+     * @param host The ip of the MongoDB host.
+     * @param port The port of the MongoDB host.
+     * @param subscriber
+     **/
+	public BlackboardClient(String host, int port, ISubscriber subscriber){
 		try{
 			this.subscriptions = new HashMap<String, BasicDBObject>();
-			this.mongo = new Mongo(ip, port);
-			this.callback = callback;
+			this.mongo = new Mongo(host, port);
+			this.callback = subscriber;
 		} catch (Exception e){
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Sets the callback object.
-	 *
-	 * @param callback The ISubscriber object to call onMessage on.
-	 **/
-	public void setCallback(ISubscriber callback){
-		this.callback = callback;
 	}
 
 	/**
@@ -400,6 +385,6 @@ public class BlackboardClient{
 	 * @param topic The topic to unsubscribe to.
 	 **/
 	public void unsubscribe(String topic){
-		subscriptions.remove(topic);
+        subscriptions.remove(topic);
 	}
 }
