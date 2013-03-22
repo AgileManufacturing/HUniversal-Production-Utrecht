@@ -86,6 +86,8 @@ public class BlackboardReader implements ISubscriber {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else {
+	        System.out.println("Usage: <host> <database> <collection> <topics>[ <topics>...]");
         }
     }
 

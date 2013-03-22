@@ -59,6 +59,8 @@ public class DummyAgent extends Agent implements ISubscriber {
             e.printStackTrace();
         }
 
+	    System.out.println("Hello, I'm a dummy agent!");
+
         // Add a new cyclic behaviour that moves the deltarobot 500 times
         this.addBehaviour(new CyclicBehaviour() {
             @Override
@@ -78,6 +80,7 @@ public class DummyAgent extends Agent implements ISubscriber {
 
                     if (i == 500) {
                         System.out.println("done!");
+	                    i = 0;
                         blockingReceive();
                     }
                 } catch (Exception e) {
