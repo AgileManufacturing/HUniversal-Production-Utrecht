@@ -53,3 +53,8 @@ else()
 endif()
 
 catkin_workspace()
+
+rexos_add_doc(REXOS)
+rexos_add_doc_BB(REXOS)
+rexos_add_doc_MAS(REXOS)
+rexos_add_doc_ROS(REXOS)
