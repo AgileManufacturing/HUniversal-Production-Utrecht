@@ -35,8 +35,8 @@
 
 namespace DummyModuleNodeServices{
 	/**
-	 * @var const std::string OUTPUTCOORDS
-	 * Name for the service for outputting coordinates
+	 * @var const std::string OUTPUTJSON
+	 * Name base for the service for outputting a json string (unparsed), will be prepended by the node name in the actual advertised service name.
 	 **/
-	const std::string OUTPUTCOORDS = "DummyModuleNode/outputCoords";
+	const std::string OUTPUTJSON = "outputJSON";
 }

@@ -53,14 +53,20 @@ public:
 	int transitionStop();
 
 	// services
-	bool outputCoords(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res);
+	bool outputJSON(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res);
 
 private:
 	/**
-	 * @var ros::ServiceServer outputCoords
+	 * @var std::string nodeName
+	 * The node's name.
+	 **/
+	 std::string nodeName;
+
+	/**
+	 * @var ros::ServiceServer outputJSON
 	 * Service for outputting coordinates
 	 **/
-	ros::ServiceServer outputCoordsService;
+	ros::ServiceServer outputJSONService;
 };
 
 #endif

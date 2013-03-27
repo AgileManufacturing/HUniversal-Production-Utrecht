@@ -31,21 +31,33 @@
  #include "dummy_module_node/DummyModuleNode.h"
  #include "dummy_module_node/Services.h"
 
- // @cond HIDE_NODE_NAME_FROM_DOXYGEN
-#define NODE_NAME "DummyModuleNode"
+ // @cond HIDE_NODE_NAME_BASE_FROM_DOXYGEN
+#define NODE_NAME_BASE "dummy_module_node"
 // @endcond
 
 DummyModuleNode::DummyModuleNode(int equipletID, int moduleID) : rexos_mast::StateMachine(equipletID, moduleID) {
-	std::cout << "Constructing DummyModuleNode. EquipletID: " << equipletID << "ModuleID: " << moduleID << std::endl;
+
+	std::stringstream stringStream;
+	stringStream <<  NODE_NAME_BASE << "_" << equipletID << "_" << moduleID;
+	nodeName = stringStream.str();
+
+	std::cout << "Constructing " << nodeName << std::endl;
 
 	ros::NodeHandle nodeHandle;
 
-	outputCoordsService = nodeHandle.advertiseService(DummyModuleNodeServices::OUTPUTCOORDS, &DummyModuleNode::outputCoords, this);
+	stringStream.clear();
+	stringStream.str("");
+	stringStream << nodeName << "/" << DummyModuleNodeServices::OUTPUTJSON;
+	std::string outputJSONServiceName = stringStream.str();
+
+	outputJSONService = nodeHandle.advertiseService(outputJSONServiceName, &DummyModuleNode::outputJSON, this);
 }
 
-bool DummyModuleNode::outputCoords(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res){
-	ROS_INFO("outputCoords called");
+bool DummyModuleNode::outputJSON(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res){
+	ROS_INFO("outputJSON called");
 	std::cout << std::string(req.json) << std::endl;
+	res.succeeded = true;
+	res.message = "success!";
 	return true;
 }
 
@@ -90,7 +102,10 @@ int main(int argc, char **argv){
 		return -1;
 	}
 
-	ros::init(argc, argv, NODE_NAME);
+	std::stringstream stringStream;
+	stringStream <<  NODE_NAME_BASE << "_" << equipletID << "_" << moduleID;
+	std::string nodeName = stringStream.str();
+	ros::init(argc, argv, nodeName);
 
 	ROS_INFO("Creating Dummy Module");
 
