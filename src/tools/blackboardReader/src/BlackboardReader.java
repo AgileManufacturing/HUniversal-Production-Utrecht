@@ -1,14 +1,14 @@
 /**
- * @file DummyAgent.java
- * @brief Provide a dummy agent that let the deltarobot move
- * @date Created: 2012-11-20
+ * @file BlackboardReader.java
+ * @brief
+ * @date Created: 2013-03-20
  *
- * @author Dick van der Steen
+ * @author Arjen van Zanten
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,72 +26,69 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
  **/
 
-package nl.hu;
-
-import com.google.gson.Gson;
-import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
 import nl.hu.client.BlackboardClient;
 import nl.hu.client.ISubscriber;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
-/**
- * DummyAgent that makes the deltarobot move
- **/
-public class DummyAgent extends Agent implements ISubscriber {
+public class BlackboardReader implements ISubscriber {
     private BlackboardClient client;
-    private String database = "REXOS";
-    private String topic = "instruction";
-    private String collection = "blackboard";
-    private int i = 0;
 
-    public void setup() {
-        // Create a new blackboard client
-        client = new BlackboardClient("localhost", this);
+    public BlackboardReader(String host, String database, String collection, ArrayList<String> topics) {
+        client = new BlackboardClient(host, this);
         try {
             client.setDatabase(database);
             client.setCollection(collection);
-            client.subscribe(topic);
+
+            for (String topic : topics) {
+                client.subscribe(topic);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-	    System.out.println("Hello, I'm a dummy agent!");
-
-        // Add a new cyclic behaviour that moves the deltarobot 500 times
-        this.addBehaviour(new CyclicBehaviour() {
-            @Override
-            public void action() {
-                Gson gson = new Gson();
-
-                ArrayList<Point> points = new ArrayList<Point>();
-                points.add(new Point(i, i, i, i));
-
-                i++;
-                InstructionMessage a = new InstructionMessage("moveRelativePath", "DeltaRobotNode", "FIND_ID", null, points);
-                BlackboardMessage mes = new BlackboardMessage(topic, a);
-                try {
-                    //System.out.print(System.nanoTime());
-                    Thread.sleep(500);
-                    client.insertJson(gson.toJson(mes));
-
-                    if (i == 500) {
-                        System.out.println("done!");
-	                    i = 0;
-                        blockingReceive();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     @Override
     public void onMessage(String topic, Object message) {
-        //System.out.println("Topic: " + topic + " message: " + message);
+        System.out.println("Topic: " + topic + " message: " + message);
     }
+
+    public static void main(String[] args) {
+        if (args.length > 3) {
+            String host = args[0];
+            String database = args[1];
+            String collection = args[2];
+
+            System.out.println("Mongo host:" + host + "\n"
+                    + "Database:" + database + "\n"
+                    + "Collection:" + collection);
+
+            ArrayList<String> topics = new ArrayList<String>(args.length - 3);
+            for (int i = 3; i < args.length; i++) {
+                topics.add(args[i]);
+                System.out.println("Topic " + (i - 2) + ": " + args[i]);
+            }
+
+            System.out.println("Starting. Press q and then enter to close.");
+            BlackboardReader blackboardReader = new BlackboardReader(host, database, collection, topics);
+
+            try {
+                while (true) {
+                    if (System.in.read() == 'q') {
+                        System.exit(0);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+	        System.out.println("Usage: <host> <database> <collection> <topics>[ <topics>...]");
+        }
+    }
+
 }

@@ -44,7 +44,7 @@
 	<echo file="${homedir}/.rexos-export" append="true" message="${basedir}/libraries/mongo-2.9.3.jar:${basedir}/libraries/jade.jar:${basedir}/libraries/gson-2.2.2.jar"/>
 
 	<!-- default target, for new targets add them in depends list-->	
-	<target name="all" depends="libraries, mas">
+	<target name="all" depends="libraries, mas, tools">
         <!-- set the total classpath to the export file-->
         <loadfile property="classpath" srcFile="${homedir}/.rexos-export"/>
         <echo file="${homedir}/.rexos-export" message="${basic-export}:${classpath}"/>
@@ -62,6 +62,12 @@
     	</ant>        
 	</target>
 
+	<!-- tools target-->
+	<target name="tools" depends="libraries">
+    	<ant antfile="build.xml" target="all" dir="tools" inheritRefs="true" useNativeBasedir="true">
+    	
+    	</ant>        
+	</target>
 
 	<!-- clean target-->
 	<target name="clean">
