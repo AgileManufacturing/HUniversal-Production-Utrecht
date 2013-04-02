@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package>
+    <name>dummy_module_node</name>
+    <version>0.0.0</version>
+    <description>The dummy_module_node package</description>
+    <maintainer email="lowcostvision@gmail.com">Leau Caust</maintainer>
+    <license>newBSD</license>
+    <url type="website">https://github.com/AgileManufacturing/HUniversal-Production-Utrecht</url>
+    <author email="ap.vanzanten@gmail.com">Arjen van Zanten</author>
+    <author email="ammar.abdulamir@gmail.com">Ammar Abdulamir</author>
+    <buildtool_depend>catkin</buildtool_depend>
+    <build_depend>std_msgs</build_depend>
+    <build_depend>roscpp</build_depend>
+    <build_depend>rexos_mast</build_depend>
+    <build_depend>rexos_std_msgs</build_depend>
+    <build_depend>rexos_std_srvs</build_depend>
+    <build_depend>rexos_utilities</build_depend>
+    <build_depend>Libjson</build_depend>
+    <run_depend>roscpp</run_depend>
+    <run_depend>std_msgs</run_depend>
+    <run_depend>rexos_mast</run_depend>
+    <run_depend>rexos_std_msgs</run_depend>
+    <run_depend>rexos_std_srvs</run_depend>
+    <run_depend>rexos_utilities</run_depend>
+    <run_depend>Libjson</run_depend>
+    <export>
+        <cpp cflags="-I${prefix}/include"/>
+    </export>
+</package>

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package>
+  <name>environment_cache</name>
+  <version>0.0.0</version>
+  <description>The environment_cache package</description>
+  <maintainer email="lowcostvision@gmail.com">Leau Caust</maintainer>
+  <license>newBSD</license>
+  <url type="website">https://github.com/AgileManufacturing/HUniversal-Production-Utrecht</url>
+  <author email="dickvandersteen@gmail.com">Dickvdsteen</author>
+  <author email="koenbraham@gmail.com">KBraham</author>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>environment_communication_msgs</build_depend>
+ 
+  <run_depend>roscpp</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>environment_communication_msgs</run_depend>
+  <export>
+    <cpp cflags="-I${prefix}/include"/>
+  </export>
+</package>

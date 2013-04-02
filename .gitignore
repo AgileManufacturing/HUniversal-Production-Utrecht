@@ -15,35 +15,25 @@
 
 bin/
 dist/
-srv_gen/
-msg_gen/
-ros/deltaRobotNode/src/deltaRobotNode/
-ros/rosMast/src/rosMast/
-ros/environmentCommunicationMessages/src
-ros/lookupHandler/src/lookupHandler
-ros/environmentCache/src/environmentCache
-ros/crateLocatorNode/src/crateLocatorNode/
-ros/rexosStdMsgs/src/rexosStdMsgs/
-ros/rexosStdSrvs/src/rexosStdSrvs/
-ros/environmentCache/src/environmentCache
-tools/gripperTestNode/src/gripperTestNode/
 libraries/mongo-cxx-driver/.sconf_temp/
 libraries/mongo-cxx-driver/.sconsign.dblite
 libraries/mongo-cxx-driver/config.log
-build/
+libraries/mongo-cxx-driver/.sconsign.dblite
+libraries/mongo-cxx-driver/config.log
 libraries/blackboardJavaClient/*.jar
-.rexos-export
+build/
+devel/
 
 
 # Ignore project file, cmake text file and editor temporary files
 
-tools/CMakeLists.txt_files/
+.rexos-export
 sync.sh
 *.sublime-project
 *.sublime-workspace
 *~
 *.class
-libraries/mongo-cxx-driver/.sconsign.dblite
-libraries/mongo-cxx-driver/config.log
+*.orig
+
 APDescription.txt
 MTPs-Main-Container.txt

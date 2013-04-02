@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package>
+  <name>keyboard_control_node</name>
+  <version>0.0.0</version>
+  <description>The keyboard_control_node package</description>
+  <maintainer email="lowcostvision@gmail.com">Leau Caust</maintainer>
+  <license>newBSD</license>
+  <url type="website">https://github.com/AgileManufacturing/HUniversal-Production-Utrecht</url>
+  <author email="dickvandersteen@gmail.com">Dickvdsteen</author>
+  <author email="koenbraham@gmail.com">KBraham</author>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>delta_robot_node</build_depend>
+  <run_depend>delta_robot_node</run_depend>
+
+  <export>
+  </export>
+</package>
