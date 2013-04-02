@@ -48,7 +48,7 @@ public class EquipletAgent extends Agent implements ISubscriber {
     private String collection = "blackboard";
     private int i = 0;
 
-    public void setup() {
+    /*public void setup() {
         // Create a new blackboard client
         client = new BlackboardClient("localhost", this);
         try {
@@ -87,7 +87,7 @@ public class EquipletAgent extends Agent implements ISubscriber {
                     e.printStackTrace();
                 }
             }
-        });
+        });*/
     }
 
     @Override
