@@ -13,10 +13,7 @@ import equipletAgent.EquipletAgent;
 public class MainAgent extends Agent {
 
 	  protected void setup() {
-			try {
-				//WaitMsgBehaviour behaviour = new WaitMsgBehaviour();
-				//addBehaviour(behaviour);
-				
+			try {				
 				System.out.println("Starting agents:");
 				
 				//instantiate the 'equiplet' agents
