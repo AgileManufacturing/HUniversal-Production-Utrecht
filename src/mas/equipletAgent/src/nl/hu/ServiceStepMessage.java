@@ -1,9 +1,9 @@
 /**
- * @file InstructionMessage.java
- * @brief Provides a message for the instruction blackboard
- * @date Created: 2012-11-20
+ * @file ServiceStepMessage.java
+ * @brief Provides a message for the servicestep blackboard
+ * @date Created: 2013-04-03
  *
- * @author Dick van der Steen
+ * @author Hessel Meulenbeld
  *
  * @section LICENSE
  * License: newBSD
@@ -29,24 +29,26 @@
  **/
 package nl.hu;
 
+import java.util.Dictionary;
 /**
- * Implementation of a message for the instruction blackboard
+ * Implementation of a message for the servicestep blackboard
  */
-public class InstructionMessage
-{
-	public String command;
-	public String destination;
-	public String look_up;
-	public Object look_up_parameters;
-	public Object payload;
+public class ServiceStepMessage{
+	public int service_step_id;
+	public int product_step_id;
+	public String type;
+	public Dictionary parameters;
+	public int status;
+	public Object time_data;
 
-	public InstructionMessage(String command, String destination, String look_up, Object look_up_parameters ,Object payload)
-	{
-		this.command = command;
-		this.destination = destination;
-		this.look_up = look_up;
-		this.look_up_parameters = look_up_parameters;
-		this.payload = payload;
-
+	public ServiceStepMessage(int service_step_id, int product_step_id,
+							  String type, Dictionary parameters,
+							  int status, Object time_data){
+		this.service_step_id = service_step_id;
+		this.product_step_id = product_step_id;
+		this.type = type;
+		this.parameters = parameters;
+		this.status = status;
+		this.time_data = schedule_data
 	}
 }

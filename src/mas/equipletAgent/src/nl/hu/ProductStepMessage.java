@@ -29,6 +29,7 @@
  **/
 package nl.hu;
 
+import java.util.Dictionary;
 /**
  * Implementation of a message for the productstep blackboard
  */
