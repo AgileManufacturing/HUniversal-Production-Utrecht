@@ -26,7 +26,6 @@ public class EquipletAgent extends Agent {
 						message.addReceiver(msg.getSender());
 						message.setOntology("CanPerformStep");
 						send(message);
-						//System.out.println("Send msg to : " + getAID() + " to " + msg.getSender());
 				} else {
 					block();
 				}
