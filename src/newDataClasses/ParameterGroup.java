@@ -71,6 +71,19 @@ public class ParameterGroup implements Serializable{
 		return (Parameter[]) values.toArray();
 	}
 	
+	/*
+	 * Directly get for a parameter.
+	 * No need to first retrieve the parameter object
+	 */
+	
+	public String getParameterValue(String key) {
+		return this._parameters.get(key).getValue();
+	}
+	
+	public void setParameterValue(String key, String value) throws Exception {
+			this._parameters.put(key, new Parameter(key, value));
+	}
+	
 	
 	
 	
