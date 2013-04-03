@@ -17,7 +17,7 @@ public ArrayList<ProductionStep> productionStepList;
 
 	  protected void setup() {
 			try {
-				productionStepList = new ArrayList<ProductionStep>(arrayToList(getArguments()));		
+				productionStepList = new ArrayList<ProductionStep>(ArrayList(getArguments()));		
 				
 				NegotiatorBehaviour nb = new NegotiatorBehaviour(this);
 				addBehaviour(nb);
@@ -26,6 +26,7 @@ public ArrayList<ProductionStep> productionStepList;
 				System.out.println("I spawned as a product agent");
 				
 			} catch (Exception e) {
+				System.out.println("I failed as a product agent");
 				System.out.println("Exited with: " + e);
 				doDelete();
 			}
