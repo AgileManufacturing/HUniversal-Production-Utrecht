@@ -3,6 +3,7 @@ package equipletAgent;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 @SuppressWarnings("serial")
 public class EquipletAgent extends Agent {
@@ -18,11 +19,14 @@ public class EquipletAgent extends Agent {
 
 		public void action() {
 			try{
-				ACLMessage msg = receive(); 
-				if (msg != null) { 
-					System.out.println(msg.getContent());
+				ACLMessage msg = receive(MessageTemplate.MatchOntology("CanPerformStep"));
+				if (msg != null){
+						ACLMessage message = new ACLMessage(ACLMessage.DISCONFIRM);
+						message.addReceiver(msg.getSender());
+						message.setOntology("CanPerformStep");
+						send(message);
+						//System.out.println("Send msg to : " + getAID() + " to " + msg.getSender());
 				} else {
-					System.out.println("No msg received");
 					block();
 				}
 			}
@@ -31,14 +35,13 @@ public class EquipletAgent extends Agent {
 			}
 		}
 	}
-
+	//Sets up the equiplet. The canperformStep id is the id of the step this equiplet can perform
 	  protected void setup() {
 			try {
 				WaitMsgBehaviour behaviour = new WaitMsgBehaviour();
 				addBehaviour(behaviour);
-				   Object[] args = getArguments();
-				   _canPerformStepId = (int) args[0];
-				System.out.println("Started! my id is : " + _canPerformStepId);
+				Object[] args = getArguments();
+				_canPerformStepId = (int) args[0];
 			} catch (Exception e) {
 				System.out.println("Exited with: " + e);
 				doDelete();
