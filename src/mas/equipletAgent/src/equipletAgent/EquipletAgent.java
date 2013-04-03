@@ -71,7 +71,6 @@ public class EquipletAgent extends Agent {
     	equipletDbName = getAID().getLocalName();
     	
     	Gson gson = new Gson();
-    	
     	try {
 			Mongo collectiveDbMongoClient = new Mongo(collectiveDbIp, collectiveDbPort);
 			collectiveDb = collectiveDbMongoClient.getDB(collectiveDbName);
@@ -102,10 +101,22 @@ public class EquipletAgent extends Agent {
     }
     
     public void takeDown(){
-		try {
+    	Gson gson = new Gson();
+    	try {
 			Mongo collectiveDbMongoClient = new Mongo(collectiveDbIp, collectiveDbPort);
 			collectiveDb = collectiveDbMongoClient.getDB(collectiveDbName);
-			//TODO: delete own data of Collection EquipletDirectory
+			
+			client = new BlackboardClient(collectiveDbIp, null);
+	        try {
+	            client.setDatabase(collectiveDbName);
+	            client.setCollection(equipletDirectoryName);
+	            
+	            BasicDBObject searchQuery = new BasicDBObject();
+	        	searchQuery.put("AID", getAID());
+	            
+	            client.removeJson(gson.toJson(searchQuery));
+	        } catch (Exception e) {}
+			
 			collectiveDbMongoClient.close();
 			
 			//TODO: message to PA's
