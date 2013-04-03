@@ -13,10 +13,15 @@
  */
 package newDataClasses;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-public class ParameterList{
+public class ParameterList implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7394630866218200410L;
 	private HashMap<String, ParameterGroup> _parameterGroups;
 	
 	public ParameterList() {

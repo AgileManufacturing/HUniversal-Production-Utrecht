@@ -13,8 +13,14 @@
  */
 package newDataClasses;
 
-public class Parameter {
+import java.io.Serializable;
 
+public class Parameter implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7830428356814146610L;
 	private String _key;
 	private String _value;
 	

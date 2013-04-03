@@ -13,8 +13,6 @@
  */
 package newDataClasses;
 
-import dataClasses.ProductionStep;
-
 public class Production {
 	
 	private ProductionStep[] _productionSteps;
@@ -28,7 +26,8 @@ public class Production {
 		this._productionSteps = productionSteps;
 	}
 	
+	public ProductionStep[] getProductionSteps() {
+		return _productionSteps;
+	}
 	
-	
-
 }

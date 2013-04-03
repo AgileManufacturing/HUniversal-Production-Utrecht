@@ -1,17 +1,15 @@
 package productAgent;
 
-import java.util.ArrayList;
+import jade.core.AID;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+
+import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import jade.core.AID;
-import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.OneShotBehaviour;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
-import dataClasses.ProductionStep;
-import dataClasses.equipletAgentData;
+import newDataClasses.ProductionStep;
 
 @SuppressWarnings("serial")
 public class NegotiatorBehaviour extends CyclicBehaviour{
@@ -91,7 +89,7 @@ public class NegotiatorBehaviour extends CyclicBehaviour{
 				message.addReceiver(Aid);
 				message.setOntology("CanPerformStep");
 				
-				message.setContentObject(step.parameters); // lets give em the parameters of this step.
+				message.setContentObject((Serializable) step.getParameterList()); // lets give em the parameters of this step.
 				
 				_productAgent.send(message);
 				

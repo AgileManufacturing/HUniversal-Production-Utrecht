@@ -1,14 +1,12 @@
 package productAgent;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
-
-import dataClasses.ProductionStep;
-import dataClasses.equipletAgentData;
-
 import jade.core.AID;
 import jade.core.Agent;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+
+import newDataClasses.ProductionStep;
 
 public class Productagent extends Agent {
 

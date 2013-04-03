@@ -13,26 +13,34 @@
  */
 package newDataClasses;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class ParameterGroup {
+public class ParameterGroup implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4985505923411671880L;
 
 	private String _name;
 	
 	private HashMap<String, Parameter> _parameters;
 	
-	public ParameterGroup() {
+	public ParameterGroup(String name) {
+		this._name = name;
 		this._parameters = new HashMap<String, Parameter>();
+		
 	}
 	
-	public ParameterGroup(Parameter parameter) throws Exception {
-		this();
+	public ParameterGroup(Parameter parameter, String name) throws Exception {
+		this(name);
 		this.add(parameter);
 	}
 	
-	public ParameterGroup(Parameter[] parameters) throws Exception {
-		this();
+	public ParameterGroup(Parameter[] parameters, String name) throws Exception {
+		this(name);
 		this.add(parameters);
 	}
 	
