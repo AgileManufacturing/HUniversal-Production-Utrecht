@@ -15,6 +15,7 @@ public class NegotiatorBehaviour extends CyclicBehaviour{
 
 	private Productagent productAgent;
 	private int currentStep = 0;
+	private ArrayList<equipletAgentData> usableEquipletsList;
 	
 	public NegotiatorBehaviour(Productagent pa) {
 		this.productAgent = pa;
@@ -28,16 +29,14 @@ public class NegotiatorBehaviour extends CyclicBehaviour{
 		
 		//For testing purposes. Only 1 & 3 can perform his steps.
 		productAgent.canPerfStepEquiplet = new ArrayList<equipletAgentData>();
-		equipletAgentData d = new equipletAgentData();
-		d.AID = new AID("eqa1", AID.ISLOCALNAME);
+		equipletAgentData d = new equipletAgentData(new AID("eqa1", AID.ISLOCALNAME));
 		productAgent.canPerfStepEquiplet.add(d);
 		
-		d = new equipletAgentData();
-		d.AID = new AID("eqa3", AID.ISLOCALNAME);
+		d = new equipletAgentData(new AID("eqa1", AID.ISLOCALNAME));
 		productAgent.canPerfStepEquiplet.add(d);
 		//End for testing purposes
 		
-
+		usableEquipletsList = new ArrayList<equipletAgentData>();
 		switch(currentStep){
 			case 0: //Lets ask each EQ-A whether they can perform the step 
 				startSending();
@@ -46,7 +45,12 @@ public class NegotiatorBehaviour extends CyclicBehaviour{
 			case 1: //We have asked the EQ-A's. Now lets await their response.
 				//If the response is positive, we might want to check the params aswell.
 				startReceiving();
+				break;			
+			case 2: //We have asked the EQ-A's. Now lets await their response.
+					//If the response is positive, we might want to check the params aswell.
+				//startReceiving();
 				break;
+					
 		}
 	}
 	
@@ -57,9 +61,12 @@ public class NegotiatorBehaviour extends CyclicBehaviour{
 				.MatchOntology("CanPerformStep"));
 		if (receive != null) {
 			try {
-				String senderName = receive.getSender().getName();
-				System.out.println("Performative received at PA : " + receive.getPerformative());
-				System.out.println("PA received: " + senderName);
+				AID senderId = receive.getSender();
+				
+				if(receive.getPerformative() == ACLMessage.CONFIRM){
+					usableEquipletsList.add(new equipletAgentData(senderId));
+				}
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -72,7 +79,8 @@ public class NegotiatorBehaviour extends CyclicBehaviour{
 	public void startSending(){
 		//Foreach equipletagent
 		for(equipletAgentData ead : productAgent.canPerfStepEquiplet){
-			// Send the request to each agent
+			// Send the request to each agent. 
+			// We want to know if it can perform the step with the given parameters.
 			try {
 				ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 				message.addReceiver(ead.AID);

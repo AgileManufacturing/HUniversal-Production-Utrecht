@@ -1,7 +1,9 @@
 package productAgent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
+import dataClasses.ProductionStep;
 import dataClasses.equipletAgentData;
 
 import jade.core.AID;
@@ -11,10 +13,11 @@ public class Productagent extends Agent {
 
 public ArrayList<equipletAgentData> canPerfStepEquiplet;
 public ArrayList<equipletAgentData> canPerfStepWithParamsEquiplet;
-	
+public ArrayList<ProductionStep> productionStepList;
+
 	  protected void setup() {
 			try {
-				Object[] stepList =	null;			
+				productionStepList = new ArrayList<ProductionStep>(arrayToList(getArguments()));		
 				
 				NegotiatorBehaviour nb = new NegotiatorBehaviour(this);
 				addBehaviour(nb);
