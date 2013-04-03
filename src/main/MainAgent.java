@@ -1,18 +1,13 @@
 package main;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import jade.core.Agent;
+import jade.wrapper.AgentController;
 import newDataClasses.Parameter;
 import newDataClasses.ParameterGroup;
 import newDataClasses.ParameterList;
 import newDataClasses.Product;
 import newDataClasses.Production;
 import newDataClasses.ProductionStep;
-
-import jade.core.Agent;
-import jade.wrapper.AgentController;
-import equipletAgent.EquipletAgent;
 
 @SuppressWarnings("serial")
 public class MainAgent extends Agent {
@@ -39,7 +34,7 @@ public class MainAgent extends Agent {
 				p.add(new Parameter("Id", "1"));
 				parameterList.AddParameterGroup(p);
 				
-				p = new ParameterGroup("Shape"); // group colour
+				p = new ParameterGroup("Shape"); // group shape
 				p.add(new Parameter("Id", "2"));
 				parameterList.AddParameterGroup(p);
 				
@@ -55,7 +50,7 @@ public class MainAgent extends Agent {
 				p.add(new Parameter("Id", "3"));
 				parameterList.AddParameterGroup(p);
 				
-				p = new ParameterGroup("Shape"); // group colour
+				p = new ParameterGroup("Shape"); // group shape
 				p.add(new Parameter("Id", "4"));
 				parameterList.AddParameterGroup(p);
 				
@@ -70,9 +65,9 @@ public class MainAgent extends Agent {
 				p.add(new Parameter("Id", "5"));
 				parameterList.AddParameterGroup(p);
 				
-				p = new ParameterGroup("Shape"); // group colour
+				p = new ParameterGroup("Shape"); // group shape
 				p.add(new Parameter("Id", "6"));
-				parameterList.AddParameterGroup(p);
+				parameterList.AddParameterGroup(p); 
 				
 				p = new ParameterGroup("loc"); // group location
 				p.add(new Parameter("x", "2"));
@@ -85,7 +80,7 @@ public class MainAgent extends Agent {
 				p.add(new Parameter("Id", "7"));
 				parameterList.AddParameterGroup(p);
 				
-				p = new ParameterGroup("Shape"); // group colour
+				p = new ParameterGroup("Shape"); // group shape
 				p.add(new Parameter("Id", "8"));
 				parameterList.AddParameterGroup(p);
 				

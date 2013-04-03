@@ -29,9 +29,9 @@ public class NegotiatorBehaviour extends CyclicBehaviour{
 		// Store the plausible agents with the amount of time it will take (timeslots)
 		
 		//For testing purposes. Only 1 & 3 can perform his steps.
-		_productAgent.canPerfStepEquiplet = new Hashtable<ProductionStep, AID>();
-		_productAgent.canPerfStepEquiplet.put(_productAgent.productionStepList.get(0), new AID("eqa1", AID.ISLOCALNAME));
-		_productAgent.canPerfStepEquiplet.put(_productAgent.productionStepList.get(1), new AID("eqa2", AID.ISLOCALNAME));
+			_productAgent.canPerfStepEquiplet = new Hashtable<ProductionStep, AID>();
+			_productAgent.canPerfStepEquiplet.put(_productAgent.productionStepList.get(0), new AID("eqa1", AID.ISLOCALNAME));
+			_productAgent.canPerfStepEquiplet.put(_productAgent.productionStepList.get(1), new AID("eqa2", AID.ISLOCALNAME));
 		//End hard coded production step list
 		
 		
@@ -79,6 +79,7 @@ public class NegotiatorBehaviour extends CyclicBehaviour{
 		
 		Enumeration keys = _productAgent.canPerfStepEquiplet.keys();
         while (keys.hasMoreElements()) {
+        	//iterate over each element in the canPerfStepEquiplet hashtable
         	//retrieve the elements
         	ProductionStep step = (ProductionStep) keys.nextElement();
             AID Aid = _productAgent.canPerfStepEquiplet.get(step);
@@ -89,11 +90,12 @@ public class NegotiatorBehaviour extends CyclicBehaviour{
 				message.addReceiver(Aid);
 				message.setOntology("CanPerformStep");
 				
-				message.setContentObject((Serializable) step.getParameterList()); // lets give em the parameters of this step.
+				message.setContentObject(step.getParameterList()); // lets give em the parameters of this step.
 				
 				_productAgent.send(message);
 				
 				System.out.println("send message to: " + Aid);
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
