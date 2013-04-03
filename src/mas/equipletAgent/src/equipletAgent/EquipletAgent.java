@@ -67,20 +67,11 @@ public class EquipletAgent extends Agent {
 	private BlackboardClient client;
 	
     public void setup() {
-    	
-    	//TODO: Reconfiguration
-    	/*//If there are any arguments, put them in the database_ip and the database_port
-    	Object[] args = getArguments();
-    	if (args != null && args.length > 0){
-			database_ip = (String)args[0];
-			if(args.length > 1){
-				database_port = (int)args[1];
-			}
-		}*/
-    	
     	//set the database name to the name of the equiplet
     	equipletDbName = getAID().getLocalName();
+    	
     	Gson gson = new Gson();
+    	
     	try {
 			Mongo collectiveDbMongoClient = new Mongo(collectiveDbIp, collectiveDbPort);
 			collectiveDb = collectiveDbMongoClient.getDB(collectiveDbName);
@@ -93,14 +84,13 @@ public class EquipletAgent extends Agent {
 	            ArrayList<Long> capabilities = new ArrayList<Long>();
 	            capabilities.add(5l);
 	            capabilities.add(3l);
-	            DbData dbData = new DbData();
+	            DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 	            EquipletDirectoryMessage entry = new EquipletDirectoryMessage(getAID(), capabilities, dbData);
 	            client.insertJson(gson.toJson(entry));
 	        } catch (Exception e) {
 	            this.doDelete();
 	        }
-			//TODO: write to Collection EquipletDirectory
-			collectiveDbMongoClient.close();
+	        collectiveDbMongoClient.close();
 			
 			Mongo equipletDbMongoClient = new Mongo(equipletDbIp, equipletDbPort);
 			equipletDb = equipletDbMongoClient.getDB(equipletDbName);
