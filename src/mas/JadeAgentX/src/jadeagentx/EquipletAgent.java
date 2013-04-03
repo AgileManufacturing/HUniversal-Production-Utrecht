@@ -53,6 +53,7 @@ public class EquipletAgent extends Agent {
                         // deserialize content 
                         String messageID = msg.getConversationId();
                         String content = msg.getContent();
+                        
                         String Ontology = msg.getOntology();
                         System.out.println(msg.getOntology());
                         ACLMessage confirmationMsg = new ACLMessage(ACLMessage.DISCONFIRM);
