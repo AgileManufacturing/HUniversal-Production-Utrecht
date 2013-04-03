@@ -3,8 +3,13 @@ package main;
 import java.util.ArrayList;
 import java.util.List;
 
-import dataClasses.Parameter;
-import dataClasses.ProductionStep;
+import newDataClasses.Parameter;
+import newDataClasses.ParameterGroup;
+import newDataClasses.ParameterList;
+import newDataClasses.Product;
+import newDataClasses.Production;
+import newDataClasses.ProductionStep;
+
 import jade.core.Agent;
 import jade.wrapper.AgentController;
 import equipletAgent.EquipletAgent;
@@ -29,30 +34,81 @@ public class MainAgent extends Agent {
 				ar = null;
 				
 				//Lets make a parameter list
-				ArrayList<Parameter> parameterList = new ArrayList<Parameter>();
-				parameterList.add(new Parameter("rood", 2, 3));
-				parameterList.add(new Parameter("blauw", 2, 3));
-				parameterList.add(new Parameter("paars", 2, 3));
-				parameterList.add(new Parameter("geel", 2, 3));
+				ParameterList parameterList = new ParameterList();
+				ParameterGroup p = new ParameterGroup("Color"); // group colour
+				p.add(new Parameter("Id", "1"));
+				parameterList.AddParameterGroup(p);
+				
+				p = new ParameterGroup("Shape"); // group colour
+				p.add(new Parameter("Id", "2"));
+				parameterList.AddParameterGroup(p);
+				
+				p = new ParameterGroup("loc"); // group location
+				p.add(new Parameter("x", "2"));
+				p.add(new Parameter("y", "2"));
+				parameterList.AddParameterGroup(p);
 				
 				//Next we want to have some production steps
-				ProductionStep stp1 = new ProductionStep(1, parameterList);
-				ProductionStep stp2 = new ProductionStep(2, parameterList);
-				ProductionStep stp3 = new ProductionStep(3, parameterList);
-				ProductionStep stp4 = new ProductionStep(2, parameterList);
-				ProductionStep stp5 = new ProductionStep(1, parameterList);
+				ProductionStep stp1 = new ProductionStep(parameterList);
+				
+				p = new ParameterGroup("Color"); // group colour
+				p.add(new Parameter("Id", "3"));
+				parameterList.AddParameterGroup(p);
+				
+				p = new ParameterGroup("Shape"); // group colour
+				p.add(new Parameter("Id", "4"));
+				parameterList.AddParameterGroup(p);
+				
+				p = new ParameterGroup("loc"); // group location
+				p.add(new Parameter("x", "2"));
+				p.add(new Parameter("y", "2"));
+				parameterList.AddParameterGroup(p);
+								
+				ProductionStep stp2 = new ProductionStep(parameterList);
+				
+				p = new ParameterGroup("Color"); // group colour
+				p.add(new Parameter("Id", "5"));
+				parameterList.AddParameterGroup(p);
+				
+				p = new ParameterGroup("Shape"); // group colour
+				p.add(new Parameter("Id", "6"));
+				parameterList.AddParameterGroup(p);
+				
+				p = new ParameterGroup("loc"); // group location
+				p.add(new Parameter("x", "2"));
+				p.add(new Parameter("y", "2"));
+				parameterList.AddParameterGroup(p);
+
+				ProductionStep stp3 = new ProductionStep(parameterList);
+				
+				p = new ParameterGroup("Color"); // group colour
+				p.add(new Parameter("Id", "7"));
+				parameterList.AddParameterGroup(p);
+				
+				p = new ParameterGroup("Shape"); // group colour
+				p.add(new Parameter("Id", "8"));
+				parameterList.AddParameterGroup(p);
+				
+				p = new ParameterGroup("loc"); // group location
+				p.add(new Parameter("x", "2"));
+				p.add(new Parameter("y", "2"));
+				parameterList.AddParameterGroup(p);
+				
+				ProductionStep stp4 = new ProductionStep(parameterList);				
 				
 				//Our argument for the product agent. The total production of the product, 
 				//consists of multiple steps
-				Object[] stepList = new Object[]{
+				ProductionStep[] stepList = new ProductionStep[]{
 						stp1,
 						stp2,
 						stp3,
-						stp4,
-						stp5
+						stp4
 				};
 				
-			((AgentController)getContainerController().createNewAgent("pa1","productAgent.Productagent", stepList)).start();
+				Production production = new Production(stepList);
+				Product product = new Product(production);
+				
+			((AgentController)getContainerController().createNewAgent("pa1","productAgent.Productagent", product.getProduction().getProductionSteps())).start();
 				
 			} catch (Exception e) {
 				System.out.println("Exited with: " + e);

@@ -1,23 +1,28 @@
 package productAgent;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import dataClasses.ProductionStep;
-import dataClasses.equipletAgentData;
-
 import jade.core.AID;
 import jade.core.Agent;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+
+import newDataClasses.ProductionStep;
+
 public class Productagent extends Agent {
 
-public ArrayList<equipletAgentData> canPerfStepEquiplet;
-public ArrayList<equipletAgentData> canPerfStepWithParamsEquiplet;
+public Hashtable<ProductionStep, AID> canPerfStepEquiplet;
+public Hashtable canPerfStepWithParamsEquiplet;
 public ArrayList<ProductionStep> productionStepList;
 
 	  protected void setup() {
 			try {
-				productionStepList = new ArrayList<ProductionStep>(ArrayList(getArguments()));		
+				
+				productionStepList = new ArrayList<ProductionStep>();
+				for(Object t : getArguments()){ 
+					// At this moment we want to cast each item.
+					//This should be updated later however.
+					productionStepList.add((ProductionStep)t);	
+				}
 				
 				NegotiatorBehaviour nb = new NegotiatorBehaviour(this);
 				addBehaviour(nb);
@@ -26,7 +31,6 @@ public ArrayList<ProductionStep> productionStepList;
 				System.out.println("I spawned as a product agent");
 				
 			} catch (Exception e) {
-				System.out.println("I failed as a product agent");
 				System.out.println("Exited with: " + e);
 				doDelete();
 			}

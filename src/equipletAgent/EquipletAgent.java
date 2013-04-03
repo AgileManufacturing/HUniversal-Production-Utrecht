@@ -1,5 +1,6 @@
 package equipletAgent;
 
+
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -25,7 +26,6 @@ public class EquipletAgent extends Agent {
 						message.addReceiver(msg.getSender());
 						message.setOntology("CanPerformStep");
 						send(message);
-						//System.out.println("Send msg to : " + getAID() + " to " + msg.getSender());
 				} else {
 					block();
 				}
