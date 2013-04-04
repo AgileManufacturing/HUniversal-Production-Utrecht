@@ -7,6 +7,8 @@ import jade.lang.acl.ACLMessage;
 import com.mongodb.*;
 import org.bson.types.*;
 
+//TODO add registering with BlackBoard agent for changing productionstep status to WAITING
+
 public class ServiceAgent extends Agent {
 	private static final long serialVersionUID = 1L;
 	private Hashtable<String, Long> services;
@@ -47,7 +49,12 @@ public class ServiceAgent extends Agent {
 				if(content != null) {
 					switch(message.getOntology()) {
 						case "canDoProductionStep":
-							//TODO check production step BB for step type
+							//TODO get step data using content
+							//lookup what services are needed
+							//are those services available?
+							//send answer
+							
+							
 							int stepID = Integer.parseInt(content);
 							boolean isAble = stepTypes.size() < stepID;
 							reply.setContent("" + isAble);
@@ -59,7 +66,12 @@ public class ServiceAgent extends Agent {
 								System.out.println("Cannot do step " + stepID);
 							break;
 						case "getProductionStepDuration":
-							//TODO split the step in equiplet steps and ask the hardware agents how long these will take
+							//TODO get step data using content
+							//lookup what services are needed
+							//add all durations of those services
+							//send answer
+							
+							
 							int duration = 0;
 							
 							for(String service : stepTypes.get(Integer.parseInt(content))) {
@@ -72,6 +84,9 @@ public class ServiceAgent extends Agent {
 							System.out.println("Step takes " + duration + "timeslots");
 							break;
 						case "scheduleStepWithLogistics":
+							//TODO add behaviour handling scheduling with logistics agent
+							
+							
 //							reply.setContent("" + true);
 //							reply.setOntology("DoneScheduling");
 					    	addBehaviour(new PlanServiceBehaviour(getAgent(), content));
@@ -97,13 +112,16 @@ public class ServiceAgent extends Agent {
 		
 		private String service;
 
-		public PlanServiceBehaviour(Agent agent, long stepID) {
+		public PlanServiceBehaviour(Agent agent, ObjectId stepID) {
 			super(agent);
 			this.service = service;
 		}
 
 		@Override
 		public void action() {
+			//TODO negociate with logistics agent to determine when parts can be here
+			//send a message to equiplet agent with the answer.
+			
 			System.out.println("planning service " + service);
 		}
     }
@@ -123,7 +141,7 @@ public class ServiceAgent extends Agent {
 		@Override
 		public void action() {
 			System.out.println("service " + service + " done");
-			//update status step in production step BB
+			//TODO update status step in production step BB
 		}
 
 		@Override
@@ -132,7 +150,7 @@ public class ServiceAgent extends Agent {
 		}
     }
     
-    public void onMessage(/*params*/) {
+    public void onMessage(/*TODO params*/) {
     	addBehaviour(new DoServiceBehaviour(this, null/*service uit params*/));
     }
 }
