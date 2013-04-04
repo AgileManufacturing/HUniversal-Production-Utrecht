@@ -35,6 +35,7 @@ package equipletAgent;
 import com.mongodb.*;
 import com.google.gson.Gson;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -52,7 +53,7 @@ public class EquipletAgent extends Agent {
 	private static final long serialVersionUID = 1L;
 
 	//This is the service agent of this equiplet
-	private Agent serviceAgent;
+	private AID serviceAgent;
 	
 	// This is the collective database used by all product agents and equiplets
 	// and contains the collection EquipletDirectory.
@@ -86,7 +87,7 @@ public class EquipletAgent extends Agent {
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
             capabilities = (ArrayList<Long>) args[0];
-            serviceAgent = (ServiceAgent) args[1];
+            serviceAgent = new AID((String)args[1], AID.ISLOCALNAME);
             System.out.println(capabilities +" "+ equipletDbName);
 		}
 		
@@ -157,14 +158,17 @@ public class EquipletAgent extends Agent {
                                  confirmationMsg.setContent("Dit is niet mogelijk");
                                  System.out.println("Dit is niet mogelijk");
                              }
-                         case "GetProductionDuration":
-                        	 ACLMessage message = new ACLMessage();
-                        	 message.setOntology("");
-                        	 message.setContent("");
-                        	 serviceAgent.send(message);
+                         case "getProductionDuration":
+                        	 ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+                        	 message.addReceiver(serviceAgent);
+                        	 message.setOntology("getProductionStepDuration");
+                        	 message.setContent(content);
+                        	 send(message);
                         	 //TODO: Ask service agent to calculate step duration,
                         	 //wait for the result 
                         	 //and return the result to the product agent.
+                             break;
+                         case "getProductionStepDuration":
                              break;
                          case "scheduleStep":
                         	 long timeslot = Long.parseLong(content);
