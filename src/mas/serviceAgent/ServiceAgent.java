@@ -3,6 +3,7 @@ package serviceAgent;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import nl.hu.client.BlackboardClient;
 
@@ -18,6 +19,7 @@ import jade.lang.acl.ACLMessage;
 public class ServiceAgent extends Agent {
 	private static final long serialVersionUID = 1L;
 	private Hashtable<String, Long> services;
+	private Hashtable<String, String[]> steps;
 
     public void setup() {
     	services = new Hashtable<String, Long>();
@@ -25,6 +27,10 @@ public class ServiceAgent extends Agent {
     	services.put("Glue", 20l);
     	services.put("Pick", 5l);
     	services.put("Place", 5l);
+    	
+    	steps.put("Pick&Place", new String[] {"Pick", "Place"});
+    	steps.put("Attach", new String[] {"Glue", "Pick", "Place"});
+    	steps.put("Screw", new String[] {"Drill", "Pick", "Place"});
     	
     	addBehaviour(new AnswerBehaviour(this));
     }
@@ -47,37 +53,83 @@ public class ServiceAgent extends Agent {
 				reply = message.createReply();
 				String content = message.getContent();
 				switch(message.getOntology()) {
-					case "getServiceDuration":
-						reply.setContent("" + services.get(content));
+					case "getProductionStepDuration":
+						int duration = 0;
 						
-						System.out.println("Service takes " + reply.getContent() + "timeslots");
+						for(String service : steps.get(content)) {
+							duration += services.get(service);
+						}
+						
+						reply.setContent("" + duration);
+						
+						System.out.println("Step takes " + duration + "timeslots");
 						break;
-					case "scheduleService":
-						reply.setContent("" + true);
-				    	addBehaviour(new DoServiceBehaviour(getAgent(), content, services.get(content)));
+					case "canDoProductionStep":
+						boolean isAble = steps.containsKey(content);
+						reply.setContent("" + isAble);
+						
+						if(isAble)
+							System.out.println("Can do step " + content);
+						else
+							System.out.println("Cannot do step " + content);
+						break;
+					case "scheduleProductionStep":
+						reply.setContent("Step scheduled");
+				    	addBehaviour(new PlanServiceBehaviour(getAgent(), content));
 						
 						System.out.println("Scheduled service succesfully");
 						break;
 					default:
+						System.out.println("Unknown ontology: " + message.getOntology() + " content: " + content);
 						break;
 				}
+				send(reply);
 			}
 			block();
 		}
     }
     
-    private class DoServiceBehaviour extends WakerBehaviour {
+    private class PlanServiceBehaviour extends OneShotBehaviour {
 		private static final long serialVersionUID = 1L;
 		
 		private String service;
 
-		public DoServiceBehaviour(Agent agent, String service, long duration) {
-			super(agent, duration);
+		public PlanServiceBehaviour(Agent agent, String service) {
+			super(agent);
 			this.service = service;
 		}
-		
-		public void handleElapsedTimeout() {
-			System.out.println("service " + service + " done");
+
+		@Override
+		public void action() {
+			System.out.println("planning service " + service);
 		}
+    }
+    
+    private class DoServiceBehaviour extends SimpleBehaviour {
+		private static final long serialVersionUID = 1L;
+		
+		private String service;
+
+		public DoServiceBehaviour(Agent agent, String service) {
+			super(agent);
+			this.service = service;
+
+			System.out.println("executing service " + service);
+		}
+
+		@Override
+		public void action() {
+			System.out.println("service " + service + " done");
+			//update status step in production step BB
+		}
+
+		@Override
+		public boolean done() {
+			return false;
+		}
+    }
+    
+    public void onMessage(/*params*/) {
+    	addBehaviour(new DoServiceBehaviour(this, null/*service uit params*/));
     }
 }
