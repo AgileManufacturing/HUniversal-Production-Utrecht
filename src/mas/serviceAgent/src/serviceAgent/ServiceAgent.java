@@ -22,12 +22,14 @@ public class ServiceAgent extends Agent {
 	private Hashtable<String, String[]> steps;
 
     public void setup() {
+    	
     	services = new Hashtable<String, Long>();
     	services.put("Drill", 15l);
     	services.put("Glue", 20l);
     	services.put("Pick", 5l);
     	services.put("Place", 5l);
     	
+    	steps = new Hashtable<String, String[]>();
     	steps.put("Pick&Place", new String[] {"Pick", "Place"});
     	steps.put("Attach", new String[] {"Glue", "Pick", "Place"});
     	steps.put("Screw", new String[] {"Drill", "Pick", "Place"});
