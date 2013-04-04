@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file BlackboardClient.java
  * @brief Class representing a blackboard connection.
  * @date Created: 2012-04-04
@@ -9,7 +9,7 @@
  * @section LICENSE
  * License: newBSD
  *
- * Copyright � 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
