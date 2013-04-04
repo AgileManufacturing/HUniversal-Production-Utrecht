@@ -37,12 +37,12 @@ import com.google.gson.Gson;
 
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import ParameterList.ParameterList;
 import ParameterList.ProductionStep;
 import nl.hu.client.BlackboardClient;
+import serviceAgent.ServiceAgent;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -54,6 +54,9 @@ import java.util.ArrayList;
 public class EquipletAgent extends Agent {
 	private static final long serialVersionUID = 1L;
 
+	//This is the service agent of this equiplet
+	private Agent serviceAgent;
+	
 	// This is the collective database used by all product agents and equiplets
 	// and contains the collection EquipletDirectory.
 	private DB collectiveDb = null;
@@ -87,6 +90,7 @@ public class EquipletAgent extends Agent {
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
             capabilities = (ArrayList<Long>) args[0];
+            serviceAgent = (ServiceAgent) args[1];
             System.out.println(capabilities +" "+ equipletDbName);
 		}
 		
@@ -121,8 +125,9 @@ public class EquipletAgent extends Agent {
 
 		//Behaviour for receiving messages, checks each 5000
 		 addBehaviour(new CyclicBehaviour(this) {
-             
-             @Override
+			private static final long serialVersionUID = 1L;
+
+			@Override
 				public void action() {
                  //myAgent.addBehaviour(new RequestPerformer());
                  System.out.println(getAID().getName() + " checking messages");
@@ -149,9 +154,17 @@ public class EquipletAgent extends Agent {
                      ACLMessage confirmationMsg = new ACLMessage(ACLMessage.DISCONFIRM);
                      switch(Ontology){
                          case "canPerformStep": 
+
                              if(capabilities.contains(pal.GetParameterGroup("banaan").getParameter("banaan"))){
                                  confirmationMsg.setPerformative(ACLMessage.CONFIRM);
-                                 confirmationMsg.setContent("Dit is mogelijk");
+
+                             
+                            	 /*TODO: Place step on the product steps blackboard, with the status EVALUATING, and no schedule data.
+                            	 Equiplet agent asks service agent to evaluate whether or not the equiplet is capable of executing the step.# 
+                            	 Wait for result.
+                            	 Report result back to product agent.*/
+
+                            	 confirmationMsg.setContent("Dit is mogelijk");
                                  System.out.println("Dit is mogelijk");
                              }
                              else{
@@ -160,8 +173,23 @@ public class EquipletAgent extends Agent {
                                  System.out.println("Dit is niet mogelijk");
                              }
                          case "GetProductionDuration":
+                        	 ACLMessage message = new ACLMessage();
+                        	 message.setOntology("");
+                        	 message.setContent("");
+                        	 serviceAgent.send(message);
+                        	 //TODO: Ask service agent to calculate step duration,
+                        	 //wait for the result 
+                        	 //and return the result to the product agent.
                              break;
-                           
+                         case "scheduleStep":
+                        	 long timeslot = Long.parseLong(content);
+                        	 /*TODO: Ask service agent to schedule the step with the logistics at time X if possible.
+                        	 Wait for result.
+                        	 Report result back to product agent.
+                        	 If the result is positive:
+								Set the status of the step on the product steps blackboard to PLANNED and add the schedule data.
+                        	 */
+                        	 break;
                      }
                      
                      System.out.println(content);
