@@ -27,7 +27,7 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package nl.hu;
+package equipletAgent;
 
 import java.util.Dictionary;
 /**
@@ -54,6 +54,6 @@ public class ProductStepMessage{
 		this.input_parts = input_parts;
 		this.output_parts = output_parts;
 		this.status = status;
-		this.schedule_data = schedule_data
+		this.schedule_data = schedule_data;
 	}
 }
