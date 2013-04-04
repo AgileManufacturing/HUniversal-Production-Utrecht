@@ -34,21 +34,21 @@ import java.util.Dictionary;
  * Implementation of a message for the servicestep blackboard
  */
 public class ServiceStepMessage{
-	public int service_step_id;
-	public int product_step_id;
+	public int serviceStepId;
+	public int productStepId;
 	public String type;
 	public Dictionary parameters;
 	public int status;
-	public Object time_data;
+	public Object timeData;
 
-	public ServiceStepMessage(int service_step_id, int product_step_id,
+	public ServiceStepMessage(int serviceStepId, int productStepId,
 							  String type, Dictionary parameters,
-							  int status, Object time_data){
-		this.service_step_id = service_step_id;
-		this.product_step_id = product_step_id;
+							  int status, Object timeData){
+		this.serviceStepId = serviceStepId;
+		this.productStepId = productStepId;
 		this.type = type;
 		this.parameters = parameters;
 		this.status = status;
-		this.time_data = time_data;
+		this.timeData = timeData;
 	}
 }
