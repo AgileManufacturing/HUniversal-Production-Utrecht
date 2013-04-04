@@ -36,6 +36,7 @@ import com.mongodb.*;
 import com.google.gson.Gson;
 
 import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import nl.hu.client.BlackboardClient;
@@ -82,6 +83,7 @@ public class EquipletAgent extends Agent {
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
             capabilities = (ArrayList<Long>) args[0];
+            System.out.println(capabilities +" "+ equipletDbName);
 		}
 		
 		Gson gson = new Gson();
@@ -114,55 +116,50 @@ public class EquipletAgent extends Agent {
 		}
 
 		//Behaviour for receiving messages, checks each 5000
-		addBehaviour(new TickerBehaviour(this, 5000) {
-			private static final long serialVersionUID = 1L;
+		 addBehaviour(new CyclicBehaviour(this) {
+             
+             @Override
+				public void action() {
+                 //myAgent.addBehaviour(new RequestPerformer());
+                 System.out.println(getAID().getName() + " checking messages");
+                 ACLMessage msg = receive();
+                 if (msg != null) {
+                     //msg.setOntology("CanPerformStep");
+                     // Process the message
+                     System.out.println(getAID().getName() + " reporting: message received");
 
-			@Override
-			protected void onTick() {
-				// myAgent.addBehaviour(new RequestPerformer());
-				//System.out.println(getAID().getName() + " checking messages");
-				ACLMessage msg = receive();
-				if (msg != null) {
-					// msg.setOntology("CanPerformStep");
-					// Process the message
-					System.out.println(getAID().getName() + " reporting: message received");
-
-					// deserialize content
-					String messageID = msg.getConversationId();
-					String content = msg.getContent();
-					String Ontology = msg.getOntology();
-					System.out.println(msg.getOntology());
-					ACLMessage confirmationMsg = new ACLMessage(ACLMessage.DISCONFIRM);
-					switch (Ontology) {
-						case "CanPerformSteps":
-							if (capabilities.contains(Long.parseLong(content))) {
-								confirmationMsg.setPerformative(ACLMessage.CONFIRM);
-								confirmationMsg.setContent("Dit is mogelijk");
-								System.out.println("Dit is mogelijk");
-							} else {
-								confirmationMsg.setPerformative(ACLMessage.DISCONFIRM);
-								confirmationMsg.setContent("Dit is niet mogelijk");
-								System.out.println("Dit is niet mogelijk");
-							}
-						case "GetProductionDuration":
-							break;
-					}
-					myAgent.send(confirmationMsg);
-
-					// na deserialization is het een list of dictionary,
-
-					// zoek uit hoe je een string terug serialized naar whatever
-					// it was before serialization
-
-					// haal het content object eruit,
-
-					// de rest spreekt voorzich
-
-					confirmationMsg.createReply();
-
+                     // deserialize content 
+                     String messageID = msg.getConversationId();
+                     String content = msg.getContent();
+                     
+                     String Ontology = msg.getOntology();
+                     System.out.println("Msg Ontology = "+msg.getOntology());
+                     ACLMessage confirmationMsg = new ACLMessage(ACLMessage.DISCONFIRM);
+                     switch(Ontology){
+                         case "canPerformStep": 
+                             if(capabilities.contains(Long.parseLong(content))){
+                                 confirmationMsg.setPerformative(ACLMessage.CONFIRM);
+                                 confirmationMsg.setContent("Dit is mogelijk");
+                                 System.out.println("Dit is mogelijk");
+                             }
+                             else{
+                                 confirmationMsg.setPerformative(ACLMessage.DISCONFIRM);
+                                 confirmationMsg.setContent("Dit is niet mogelijk");
+                                 System.out.println("Dit is niet mogelijk");
+                             }
+                         case "GetProductionDuration":
+                             break;
+                           
+                     }
+                     
+                     System.out.println(content);
+                     
+                     
+                     myAgent.send(confirmationMsg);	
+                 }
+					block();
 				}
-			}
-		});
+         });
 	}
 
 	public void takeDown() {
