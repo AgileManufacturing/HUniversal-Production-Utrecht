@@ -36,5 +36,4 @@ public class ParameterList implements Serializable{
 	public ParameterGroup GetParameterGroup(String name) {
 		return this._parameterGroups.get(name);
 	}
-
 }
