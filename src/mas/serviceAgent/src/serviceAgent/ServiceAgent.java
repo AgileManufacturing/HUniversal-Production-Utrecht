@@ -4,6 +4,8 @@ import java.util.Hashtable;
 import jade.core.Agent;
 import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
+import com.mongodb.*;
+import org.bson.types.*;
 
 public class ServiceAgent extends Agent {
 	private static final long serialVersionUID = 1L;
@@ -41,40 +43,48 @@ public class ServiceAgent extends Agent {
 			ACLMessage reply, message = receive();
 			if(message != null) {
 				reply = message.createReply();
-				String content = message.getContent();
-				switch(message.getOntology()) {
-					case "canDoProductionStep":
-						//TODO check production step BB for step type
-						int stepID = Integer.parseInt(content);
-						boolean isAble = stepTypes.size() < stepID;
-						reply.setContent("" + isAble);
-						
-						if(isAble)
-							System.out.println("Can do step " + stepID);
-						else
-							System.out.println("Cannot do step " + stepID);
-						break;
-					case "getProductionStepDuration":
-						//TODO split the step in equiplet steps and ask the hardware agents how long these will take
-						int duration = 0;
-						
-						for(String service : stepTypes.get(Integer.parseInt(content))) {
-							duration += services.get(service);
-						}
-						
-						reply.setContent("" + duration);
-						
-						System.out.println("Step takes " + duration + "timeslots");
-						break;
-					case "scheduleProductionStep":
-						reply.setContent("Step scheduled");
-				    	addBehaviour(new PlanServiceBehaviour(getAgent(), content));
-						
-						System.out.println("Scheduled service succesfully");
-						break;
-					default:
-						System.out.println("Unknown ontology: " + message.getOntology() + " content: " + content);
-						break;
+				ObjectId content = (ObjectId) message.getContentObject();
+				if(content != null) {
+					switch(message.getOntology()) {
+						case "canDoProductionStep":
+							//TODO check production step BB for step type
+							int stepID = Integer.parseInt(content);
+							boolean isAble = stepTypes.size() < stepID;
+							reply.setContent("" + isAble);
+							reply.setOntology("isAble");
+							
+							if(isAble)
+								System.out.println("Can do step " + stepID);
+							else
+								System.out.println("Cannot do step " + stepID);
+							break;
+						case "getProductionStepDuration":
+							//TODO split the step in equiplet steps and ask the hardware agents how long these will take
+							int duration = 0;
+							
+							for(String service : stepTypes.get(Integer.parseInt(content))) {
+								duration += services.get(service);
+							}
+							
+							reply.setContent("" + duration);
+							reply.setOntology("Duration");
+							
+							System.out.println("Step takes " + duration + "timeslots");
+							break;
+						case "scheduleStepWithLogistics":
+//							reply.setContent("" + true);
+//							reply.setOntology("DoneScheduling");
+					    	addBehaviour(new PlanServiceBehaviour(getAgent(), content));
+							
+							System.out.println("Scheduled service succesfully");
+							break;
+						default:
+							reply.setContent("Unknown ontology");
+							System.out.println("Unknown ontology: " + message.getOntology() + " content: " + content);
+							break;
+					}
+				} else {
+					reply.setContent("No content");
 				}
 				send(reply);
 			}
@@ -87,7 +97,7 @@ public class ServiceAgent extends Agent {
 		
 		private String service;
 
-		public PlanServiceBehaviour(Agent agent, String service) {
+		public PlanServiceBehaviour(Agent agent, long stepID) {
 			super(agent);
 			this.service = service;
 		}
