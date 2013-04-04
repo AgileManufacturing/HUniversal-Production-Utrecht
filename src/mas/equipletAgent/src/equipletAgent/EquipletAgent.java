@@ -141,27 +141,28 @@ public class EquipletAgent extends Agent {
                      // deserialize content 
                      String messageID = msg.getConversationId();
                      
-                     Object content = null;
+                     Object contentObject = null;
+                     String contentString = "";
 					 
 					 try {
-						content = msg.getContentObject();
+						contentObject = msg.getContentObject();
 					} catch (UnreadableException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
-                                          String Ontology = msg.getOntology();
-                     
+	                   
                      System.out.println("Msg Ontology = "+msg.getOntology());
                      ACLMessage confirmationMsg = new ACLMessage(ACLMessage.DISCONFIRM);
+                     
+                     String Ontology = msg.getOntology();
                      switch(Ontology){
                          case "canPerformStep": 
-                        	 ProductionStep proStepC = (ProductionStep)content;
+                        	 ProductionStep proStepC = (ProductionStep)contentObject;
                         	 ParameterList pal = proStepC.getParameterList();
                              if(capabilities.contains(proStepC.getCapability())){
                                  confirmationMsg.setPerformative(ACLMessage.CONFIRM);
-
                              
+                                   
                             	 /*TODO: Place step on the product steps blackboard, with the status EVALUATING, and no schedule data.
                             	 Equiplet agent asks service agent to evaluate whether or not the equiplet is capable of executing the step.# 
                             	 Wait for result.
@@ -179,7 +180,7 @@ public class EquipletAgent extends Agent {
                         	 ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
                         	 message.addReceiver(serviceAgent);
                         	 message.setOntology("getProductionStepDuration");
-                        	 message.setContent(content.toString());
+                        	 message.setContent(contentObject.toString());
                         	 
                         	 send(message);
                         	 //TODO: Ask service agent to calculate step duration,
@@ -187,9 +188,12 @@ public class EquipletAgent extends Agent {
                         	 //and return the result to the product agent.
                              break;
                          case "getProductionStepDuration":
+                        	 
+                        	 
                              break;
                          case "scheduleStep":
-                        	 long timeslot = Long.parseLong(content.toString());
+                        	 long timeslot = Long.parseLong(contentString);
+                        	 System.out.println("timeslot = "+ timeslot);
                         	 /*TODO: Ask service agent to schedule the step with the logistics at time X if possible.
                         	 Wait for result.
                         	 Report result back to product agent.
@@ -199,8 +203,7 @@ public class EquipletAgent extends Agent {
                         	 break;
                      }
                      
-                     System.out.println(content);
-                     
+                     //System.out.println(contentString);                     
                      
                      myAgent.send(confirmationMsg);	
                  }
