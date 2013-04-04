@@ -29,12 +29,18 @@
 
 package libraries.blackboardJavaClient.src.nl.hu.client;
 
-import com.mongodb.*;
-import com.mongodb.util.JSON;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.Bytes;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.mongodb.Mongo;
+import com.mongodb.util.JSON;
 
 /**
  * Client class for a mongodb blackboard.

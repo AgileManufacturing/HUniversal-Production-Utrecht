@@ -31,11 +31,11 @@ package blackboard;
  *
  **/
 
-import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
-import libraries.blackboardJavaClient.src.nl.hu.client.ISubscriber;
-
 import java.io.IOException;
 import java.util.ArrayList;
+
+import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
+import libraries.blackboardJavaClient.src.nl.hu.client.ISubscriber;
 
 public class BlackboardReader implements ISubscriber {
     private BlackboardClient client;

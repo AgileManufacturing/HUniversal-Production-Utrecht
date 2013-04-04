@@ -1,13 +1,13 @@
 package equipletAgent;
 
 
-import newDataClasses.Parameter;
-import newDataClasses.ParameterGroup;
-import newDataClasses.ParameterList;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import newDataClasses.Parameter;
+import newDataClasses.ParameterGroup;
+import newDataClasses.ParameterList;
 
 @SuppressWarnings("serial")
 public class EquipletAgent extends Agent {
