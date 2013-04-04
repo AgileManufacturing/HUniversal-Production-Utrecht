@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 package jadeagentx;
-import jadeagentx.EquipletAgent;
+import equipletAgent.EquipletAgent;
 import jade.core.Agent;
 import jade.wrapper.AgentController;
 import java.util.ArrayList;

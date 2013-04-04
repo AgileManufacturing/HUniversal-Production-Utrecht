@@ -110,7 +110,7 @@ public class BlackboardClient {
 	 * @var TailedCursorThread tailableCursorThread
 	 * Thread for tracking tailable cursor on operation log of MongoDB
 	 **/
-	private TailedCursorThread tailableCursorThread;
+	//private TailedCursorThread tailableCursorThread;
 
 	/**
 	 * @var DBCursor tailedCursor
@@ -133,10 +133,10 @@ public class BlackboardClient {
 	/**
 	 * Class for tailable cursor thread within the client
 	 **/
-	public class TailedCursorThread extends Thread {
-		/**
+	/*public class TailedCursorThread extends Thread {
+		*//**
 		 * Constructor of TailedCursorThread.
-		 **/
+		 **//*
 		public TailedCursorThread() {
 			OPLOG_DATABASE = mongo.getDB(LOCAL);
 			OPLOG_COLLECTION = OPLOG_DATABASE.getCollection(OPLOG);
@@ -147,9 +147,9 @@ public class BlackboardClient {
 			tailedCursor.skip(tailedCursor.size());
 		}
 
-		/**
+		*//**
 		 * Run method for the TailedCursorThread. This will check for changes within the cursor and calls the onMessage method of its subscriber.
-		 **/
+		 **//*
 		@Override
 		public void run() {
 			String operation;
@@ -168,7 +168,7 @@ public class BlackboardClient {
 				}
 			}
 		}
-	}
+	}*/
 
 	/**
 	 * Constructor of BlackboardClient.
@@ -224,8 +224,8 @@ public class BlackboardClient {
 		}
 		this.collection = collection;
 		currentCollection = currentDatabase.getCollection(this.collection);
-		this.tailableCursorThread = new TailedCursorThread();
-		this.tailableCursorThread.start();
+		//this.tailableCursorThread = new TailedCursorThread();
+		//this.tailableCursorThread.start();
 	}
 
 	/**
