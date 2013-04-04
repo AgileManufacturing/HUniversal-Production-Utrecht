@@ -152,16 +152,16 @@ public class EquipletAgent extends Agent {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-
+					
 					String Ontology = msg.getOntology();
 
 					System.out.println("Msg Ontology = " + msg.getOntology());
 					ACLMessage confirmationMsg = new ACLMessage(ACLMessage.DISCONFIRM);
 					switch (Ontology) {
 					case "canPerformStep":
-						ProductionStep proStepC = (ProductionStep) content;
-						ParameterList pal = proStepC.getParameterList();
-						if (capabilities.contains(pal.GetParameterGroup("banaan").getParameter("StepName"))) {
+						ProductionStep proStepC = (ProductionStep)content;
+                   	 	ParameterList pal = proStepC.getParameterList();
+                        if(capabilities.contains(proStepC.getCapability())){
 							confirmationMsg.setPerformative(ACLMessage.CONFIRM);
 							
 							Gson gson = new Gson();
@@ -236,7 +236,8 @@ public class EquipletAgent extends Agent {
 					System.out.println(content);
 
 					myAgent.send(confirmationMsg);
-				}
+                     
+                    				}
 				block();
 			}
 		});
