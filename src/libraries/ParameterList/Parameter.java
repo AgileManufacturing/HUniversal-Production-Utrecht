@@ -11,7 +11,7 @@
  * Version: 1.0
  *
  */
-package newDataClasses;
+package ParameterList;
 
 import java.io.Serializable;
 

@@ -11,7 +11,7 @@
  * Version: 1.0
  *
  */
-package newDataClasses;
+package ParameterList;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -36,5 +36,4 @@ public class ParameterList implements Serializable{
 	public ParameterGroup GetParameterGroup(String name) {
 		return this._parameterGroups.get(name);
 	}
-
 }

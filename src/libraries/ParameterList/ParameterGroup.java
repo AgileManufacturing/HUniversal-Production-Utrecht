@@ -11,7 +11,7 @@
  * Version: 1.0
  *
  */
-package newDataClasses;
+package ParameterList;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -83,11 +83,4 @@ public class ParameterGroup implements Serializable{
 	public void setParameterValue(String key, String value) throws Exception {
 			this._parameters.put(key, new Parameter(key, value));
 	}
-	
-	
-	
-	
-	
-	
-	
 }
