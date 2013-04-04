@@ -45,6 +45,8 @@ import ParameterList.ProductionStep;
 import nl.hu.client.BlackboardClient;
 import serviceAgent.ServiceAgent;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -113,7 +115,7 @@ public class EquipletAgent extends Agent {
 			collectiveDb = collectiveDbMongoClient.getDB(collectiveDbName);
 			
 			//put capabilities on the equipletDirectory
-			client = new BlackboardClient(collectiveDbIp, null);
+			client = new BlackboardClient(collectiveDbIp);
 			try {
 				client.setDatabase(collectiveDbName);
 				client.setCollection(equipletDirectoryName);
@@ -159,7 +161,6 @@ public class EquipletAgent extends Agent {
 						contentObject = msg.getContentObject();
 					} catch (UnreadableException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
 					}
 					String Ontology = msg.getOntology();
 
@@ -177,7 +178,7 @@ public class EquipletAgent extends Agent {
 								Mongo equipletDbMongoClient = new Mongo(equipletDbIp, equipletDbPort);
 								equipletDb = equipletDbMongoClient.getDB(equipletDbName);
 
-								client = new BlackboardClient(equipletDbIp, null);
+								client = new BlackboardClient(equipletDbIp);
 								try {
 									client.setDatabase(equipletDbName);
 									client.setCollection(productStepsName);
@@ -208,18 +209,20 @@ public class EquipletAgent extends Agent {
 							System.out.println("Dit is niet mogelijk");
 						}
 					case "getProductionDuration":
+						try {
+							contentObject = msg.getContentObject();
+						} catch (UnreadableException e1) {}
 						ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 						message.addReceiver(serviceAgent);
 						message.setOntology("getProductionStepDuration");
-						message.setContent("");
+						try {
+							message.setContentObject((Serializable)contentObject);
+						} catch (IOException e) {}
 
 						send(message);
-						// TODO: Ask service agent to calculate step duration,
-						// wait for the result
-						// and return the result to the product agent.
 						break;
 					case "getProductionStepDuration":
-						message = new ACLMessage(ACLMessage.REQUEST);
+						message = new ACLMessage(ACLMessage.INFORM);
 						AID productAgentAID = new AID();
 						message.addReceiver(productAgentAID);
 						message.setOntology("");
@@ -255,7 +258,7 @@ public class EquipletAgent extends Agent {
 					collectiveDbPort);
 			collectiveDb = collectiveDbMongoClient.getDB(collectiveDbName);
 
-			client = new BlackboardClient(collectiveDbIp, null);
+			client = new BlackboardClient(collectiveDbIp);
 			try {
 				client.setDatabase(collectiveDbName);
 				client.setCollection(equipletDirectoryName);
