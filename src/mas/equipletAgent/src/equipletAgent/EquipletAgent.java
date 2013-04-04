@@ -39,6 +39,9 @@ import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.UnreadableException;
+import ParameterList.ParameterList;
+import ParameterList.ProductionStep;
 import nl.hu.client.BlackboardClient;
 
 import java.net.UnknownHostException;
@@ -75,6 +78,7 @@ public class EquipletAgent extends Agent {
 	//Arraylist with IDs of the capabilities of the equiplet
 	private ArrayList<Long> capabilities;
 
+	@SuppressWarnings("serial")
 	public void setup() {
 		// set the database name to the name of the equiplet
 		equipletDbName = getAID().getLocalName();
@@ -130,14 +134,22 @@ public class EquipletAgent extends Agent {
 
                      // deserialize content 
                      String messageID = msg.getConversationId();
-                     String content = msg.getContent();
                      
+                     ProductionStep content = null;
+					try {
+						content = (ProductionStep)msg.getContentObject();
+					} catch (UnreadableException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+                     ParameterList pal = content.getParameterList();
                      String Ontology = msg.getOntology();
+                     
                      System.out.println("Msg Ontology = "+msg.getOntology());
                      ACLMessage confirmationMsg = new ACLMessage(ACLMessage.DISCONFIRM);
                      switch(Ontology){
                          case "canPerformStep": 
-                             if(capabilities.contains(Long.parseLong(content))){
+                             if(capabilities.contains(pal.GetParameterGroup("banaan").getParameter("banaan"))){
                                  confirmationMsg.setPerformative(ACLMessage.CONFIRM);
                                  confirmationMsg.setContent("Dit is mogelijk");
                                  System.out.println("Dit is mogelijk");
