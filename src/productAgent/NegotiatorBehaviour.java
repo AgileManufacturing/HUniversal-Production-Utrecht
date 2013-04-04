@@ -5,7 +5,6 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
-import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
