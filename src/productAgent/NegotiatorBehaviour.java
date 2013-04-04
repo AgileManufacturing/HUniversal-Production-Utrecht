@@ -58,9 +58,7 @@ public class NegotiatorBehaviour extends CyclicBehaviour{
 		if (receive != null) {
 			try {
 				AID senderId = receive.getSender();
-				
 				ProductionStep step = (ProductionStep) receive.getContentObject();
-				
 				if(receive.getPerformative() == ACLMessage.CONFIRM){
 					_filteredEquipletsAndStepsList.put(step, senderId);
 				}
@@ -89,11 +87,8 @@ public class NegotiatorBehaviour extends CyclicBehaviour{
 				ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 				message.addReceiver(Aid);
 				message.setOntology("CanPerformStep");
-				
 				message.setContentObject(step.getParameterList()); // lets give em the parameters of this step.
-				
 				_productAgent.send(message);
-				
 				System.out.println("send message to: " + Aid);
 				
 			} catch (Exception e) {

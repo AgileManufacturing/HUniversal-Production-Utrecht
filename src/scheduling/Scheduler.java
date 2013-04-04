@@ -5,11 +5,11 @@ package scheduling;
 public class Scheduler {
 	
 	public Scheduler(Object[] equipletList, Object productionStep){
-		blackboard.connect(scheduleBlackboard);
+		//blackboard.connect(scheduleBlackboard);
 		
 		//TODO tijdSloten berekenen welke vrij zijn	en eerste vrije slot kiezen	
 		
-		schedule(equipletList[0], startTimeSlot);
+		//schedule(equipletList[0], startTimeSlot);
 		
 	}
 	
