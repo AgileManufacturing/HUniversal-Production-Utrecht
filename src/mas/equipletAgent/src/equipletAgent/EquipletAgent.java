@@ -82,10 +82,17 @@ public class EquipletAgent extends Agent {
 	// Arraylist with IDs of the capabilities of the equiplet
 	private ArrayList<Long> capabilities;
 
-	private Hashtable<Long, AID> communicationTable; 
-	
+	private Hashtable<Long, AID> communicationTable;
+	private Hashtable<String, Integer> stepStatusTable;
+
 	@SuppressWarnings("serial")
 	public void setup() {
+		//Fills the stepStatusTable
+		stepStatusTable = new Hashtable<String, Integer>();
+		stepStatusTable.put("EVALUATING", 0);
+		stepStatusTable.put("PLANNED", 1);
+		stepStatusTable.put("WAITING", 2);
+		
 		// set the database name to the name of the equiplet
 		equipletDbName = getAID().getLocalName();
 
@@ -152,40 +159,37 @@ public class EquipletAgent extends Agent {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
+
 					String Ontology = msg.getOntology();
 
 					System.out.println("Msg Ontology = " + msg.getOntology());
 					ACLMessage confirmationMsg = new ACLMessage(ACLMessage.DISCONFIRM);
 					switch (Ontology) {
 					case "canPerformStep":
-						ProductionStep proStepC = (ProductionStep)content;
-                   	 	ParameterList pal = proStepC.getParameterList();
-                        if(capabilities.contains(proStepC.getCapability())){
+						ProductionStep proStepC = (ProductionStep) content;
+						ParameterList pal = proStepC.getParameterList();
+						if (capabilities.contains(proStepC.getCapability())) {
 							confirmationMsg.setPerformative(ACLMessage.CONFIRM);
-							
+
 							Gson gson = new Gson();
 							try {
 								Mongo equipletDbMongoClient = new Mongo(equipletDbIp, equipletDbPort);
 								equipletDb = equipletDbMongoClient.getDB(equipletDbName);
-								
+
 								client = new BlackboardClient(equipletDbIp, null);
 								try {
 									client.setDatabase(equipletDbName);
 									client.setCollection(productStepsName);
-
-									DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
-									ProductStepMessage entry = new ProductStepMessage(msg.getSender(),  );
+									ProductStepMessage entry = new ProductStepMessage(msg.getSender(), proStepC.getCapability(), null, null, null, stepStatusTable.get("EVALUATING"), null);
 									client.insertJson(gson.toJson(entry));
 								} catch (Exception e) {
-									//TODO: ERROR HANDLING
+									// TODO: ERROR HANDLING
 								}
-								productSteps = equipletDb.getCollection(productStepsName);
 								equipletDbMongoClient.close();
 							} catch (UnknownHostException e) {
-								//TODO: ERROR HANDLING
+								// TODO: ERROR HANDLING
 							}
-							
+
 							/*
 							 * TODO: Place step on the product steps blackboard,
 							 * with the status EVALUATING, and no schedule data.
@@ -236,8 +240,8 @@ public class EquipletAgent extends Agent {
 					System.out.println(content);
 
 					myAgent.send(confirmationMsg);
-                     
-                    				}
+
+				}
 				block();
 			}
 		});
