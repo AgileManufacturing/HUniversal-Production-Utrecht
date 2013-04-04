@@ -15,6 +15,6 @@ public class Scheduler {
 	}
 	
 	private void schedule(Object equiplet, int startTimeslot){
-		blackboard.place(equipletID, duration);
+	//	blackboard.place(equipletID, duration);
 	}
 }
