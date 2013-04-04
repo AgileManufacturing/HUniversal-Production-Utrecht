@@ -1,13 +1,15 @@
 /**
  * @file BlackboardClient.java
- * @brief Symbolizes an blackboardclient.
+ * @brief Class representing a blackboard connection.
+ * @date Created: 2012-04-04
  *
  * @author 1.0 Dick van der Steen
+ * @author Jan-Willem Willebrands
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright Â© 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -25,6 +27,8 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ * @note 2013-04-04 JWW: Generalized BlackboardClient. Can now be used for more than just listening to topics.
  **/
 
 package nl.hu.client;
@@ -294,17 +298,21 @@ public class BlackboardClient {
 		 **/
 		@Override
 		public void run() {
-			while (!interrupted()) {
-				while (tailedCursor.hasNext()) {
-					OplogEntry entry = new OplogEntry((DBObject) tailedCursor.next());
-					MongoOperation operation = entry.getOperation();
-					
-					for (BlackboardSubscription sub : subscriptions) {
-						if (sub.getOperation().equals(operation)) {
-							sub.getSubscriber().onMessage(operation, entry);
+			try {
+				while (!Thread.interrupted()) {
+					while (tailedCursor.hasNext()) {
+						OplogEntry entry = new OplogEntry(
+								(DBObject) tailedCursor.next());
+						MongoOperation operation = entry.getOperation();
+
+						for (BlackboardSubscription sub : subscriptions) {
+							if (sub.getOperation().equals(operation)) {
+								sub.getSubscriber().onMessage(operation, entry);
+							}
 						}
 					}
 				}
+			} catch (MongoInterruptedException ex) {
 			}
 		}
 	}
