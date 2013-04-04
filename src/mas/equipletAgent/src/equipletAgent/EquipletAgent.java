@@ -43,7 +43,6 @@ import jade.lang.acl.UnreadableException;
 import ParameterList.ParameterList;
 import ParameterList.ProductionStep;
 import nl.hu.client.BlackboardClient;
-import serviceAgent.ServiceAgent;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -113,7 +112,7 @@ public class EquipletAgent extends Agent {
 			collectiveDb = collectiveDbMongoClient.getDB(collectiveDbName);
 			
 			//put capabilities on the equipletDirectory
-			client = new BlackboardClient(collectiveDbIp, null);
+			client = new BlackboardClient(collectiveDbIp);
 			try {
 				client.setDatabase(collectiveDbName);
 				client.setCollection(equipletDirectoryName);
@@ -177,7 +176,7 @@ public class EquipletAgent extends Agent {
 								Mongo equipletDbMongoClient = new Mongo(equipletDbIp, equipletDbPort);
 								equipletDb = equipletDbMongoClient.getDB(equipletDbName);
 
-								client = new BlackboardClient(equipletDbIp, null);
+								client = new BlackboardClient(equipletDbIp);
 								try {
 									client.setDatabase(equipletDbName);
 									client.setCollection(productStepsName);
@@ -255,7 +254,7 @@ public class EquipletAgent extends Agent {
 					collectiveDbPort);
 			collectiveDb = collectiveDbMongoClient.getDB(collectiveDbName);
 
-			client = new BlackboardClient(collectiveDbIp, null);
+			client = new BlackboardClient(collectiveDbIp);
 			try {
 				client.setDatabase(collectiveDbName);
 				client.setCollection(equipletDirectoryName);
