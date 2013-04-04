@@ -47,6 +47,7 @@ import serviceAgent.ServiceAgent;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 /**
  * EquipletAgent that communicates with product agents and with its own service
@@ -82,8 +83,18 @@ public class EquipletAgent extends Agent {
 	//Arraylist with IDs of the capabilities of the equiplet
 	private ArrayList<Long> capabilities;
 
+
+	private Hashtable<Long, AID> communicationTable;
+	private Hashtable<String, Integer> stepStatusTable;
+
 	@SuppressWarnings("serial")
 	public void setup() {
+		//Fills the stepStatusTable
+		stepStatusTable = new Hashtable<String, Integer>();
+		stepStatusTable.put("EVALUATING", 0);
+		stepStatusTable.put("PLANNED", 1);
+		stepStatusTable.put("WAITING", 2);
+		
 		// set the database name to the name of the equiplet
 		equipletDbName = getAID().getLocalName();
 
@@ -150,66 +161,91 @@ public class EquipletAgent extends Agent {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-	                   
-                     System.out.println("Msg Ontology = "+msg.getOntology());
-                     ACLMessage confirmationMsg = new ACLMessage(ACLMessage.DISCONFIRM);
-                     
-                     String Ontology = msg.getOntology();
-                     switch(Ontology){
-                         case "canPerformStep": 
-                        	 ProductionStep proStepC = (ProductionStep)contentObject;
-                        	 ParameterList pal = proStepC.getParameterList();
-                             if(capabilities.contains(proStepC.getCapability())){
-                                 confirmationMsg.setPerformative(ACLMessage.CONFIRM);
-                             
-                                   
-                            	 /*TODO: Place step on the product steps blackboard, with the status EVALUATING, and no schedule data.
-                            	 Equiplet agent asks service agent to evaluate whether or not the equiplet is capable of executing the step.# 
-                            	 Wait for result.
-                            	 Report result back to product agent.*/
+					String Ontology = msg.getOntology();
 
-                            	 confirmationMsg.setContent("Dit is mogelijk");
-                                 System.out.println("Dit is mogelijk");
-                             }
-                             else{
-                                 confirmationMsg.setPerformative(ACLMessage.DISCONFIRM);
-                                 confirmationMsg.setContent("Dit is niet mogelijk");
-                                 System.out.println("Dit is niet mogelijk");
-                             }
-                         case "getProductionDuration":
-                        	 ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-                        	 message.addReceiver(serviceAgent);
-                        	 message.setOntology("getProductionStepDuration");
-                        	 message.setContent(contentObject.toString());
-                        	 
-                        	 send(message);
-                        	 //TODO: Ask service agent to calculate step duration,
-                        	 //wait for the result 
-                        	 //and return the result to the product agent.
-                             break;
-                         case "getProductionStepDuration":
-                        	 
-                        	 
-                             break;
-                         case "scheduleStep":
-                        	 long timeslot = Long.parseLong(contentString);
-                        	 System.out.println("timeslot = "+ timeslot);
-                        	 /*TODO: Ask service agent to schedule the step with the logistics at time X if possible.
-                        	 Wait for result.
-                        	 Report result back to product agent.
-                        	 If the result is positive:
-								Set the status of the step on the product steps blackboard to PLANNED and add the schedule data.
-                        	 */
-                        	 break;
-                     }
-                     
-                     //System.out.println(contentString);                     
-                     
-                     myAgent.send(confirmationMsg);	
-                 }
-					block();
+					System.out.println("Msg Ontology = " + msg.getOntology());
+					ACLMessage confirmationMsg = new ACLMessage(ACLMessage.DISCONFIRM);
+					switch (Ontology) {
+					case "canPerformStep":
+						ProductionStep proStepC = (ProductionStep) contentObject;
+						ParameterList pal = proStepC.getParameterList();
+						if (capabilities.contains(proStepC.getCapability())) {
+							confirmationMsg.setPerformative(ACLMessage.CONFIRM);
+
+							Gson gson = new Gson();
+							try {
+								Mongo equipletDbMongoClient = new Mongo(equipletDbIp, equipletDbPort);
+								equipletDb = equipletDbMongoClient.getDB(equipletDbName);
+
+								client = new BlackboardClient(equipletDbIp, null);
+								try {
+									client.setDatabase(equipletDbName);
+									client.setCollection(productStepsName);
+									ProductStepMessage entry = new ProductStepMessage(msg.getSender(), proStepC.getCapability(), null, null, null, stepStatusTable.get("EVALUATING"), null);
+									client.insertJson(gson.toJson(entry));
+								} catch (Exception e) {
+									// TODO: ERROR HANDLING
+								}
+								equipletDbMongoClient.close();
+							} catch (UnknownHostException e) {
+								// TODO: ERROR HANDLING
+							}
+
+							/*
+							 * TODO: Place step on the product steps blackboard,
+							 * with the status EVALUATING, and no schedule data.
+							 * Equiplet agent asks service agent to evaluate
+							 * whether or not the equiplet is capable of
+							 * executing the step.# Wait for result. Report
+							 * result back to product agent.
+							 */
+
+							confirmationMsg.setContent("Dit is mogelijk");
+							System.out.println("Dit is mogelijk");
+						} else {
+							confirmationMsg.setPerformative(ACLMessage.DISCONFIRM);
+							confirmationMsg.setContent("Dit is niet mogelijk");
+							System.out.println("Dit is niet mogelijk");
+						}
+					case "getProductionDuration":
+						ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+						message.addReceiver(serviceAgent);
+						message.setOntology("getProductionStepDuration");
+						message.setContent("");
+
+						send(message);
+						// TODO: Ask service agent to calculate step duration,
+						// wait for the result
+						// and return the result to the product agent.
+						break;
+					case "getProductionStepDuration":
+						message = new ACLMessage(ACLMessage.REQUEST);
+						AID productAgentAID = new AID();
+						message.addReceiver(productAgentAID);
+						message.setOntology("");
+						send(message);
+						break;
+					case "scheduleStep":
+						long timeslot = Long.parseLong(contentString);
+						/*
+						 * TODO: Ask service agent to schedule the step with the
+						 * logistics at time X if possible. Wait for result.
+						 * Report result back to product agent. If the result is
+						 * positive: Set the status of the step on the product
+						 * steps blackboard to PLANNED and add the schedule
+						 * data.
+						 */
+						break;
+					}
+
+					
+					myAgent.send(confirmationMsg);
+
 				}
-         });
+				block();
+			}
+		});
+
 	}
 
 	public void takeDown() {
