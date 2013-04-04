@@ -1,17 +1,6 @@
 package serviceAgent;
 
-import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
-
-import nl.hu.client.BlackboardClient;
-
-import com.google.gson.Gson;
-import com.mongodb.Mongo;
-
-import equipletAgent.DbData;
-import equipletAgent.EquipletDirectoryMessage;
 import jade.core.Agent;
 import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
@@ -19,7 +8,7 @@ import jade.lang.acl.ACLMessage;
 public class ServiceAgent extends Agent {
 	private static final long serialVersionUID = 1L;
 	private Hashtable<String, Long> services;
-	private Hashtable<String, String[]> steps;
+	private Hashtable<String, String[]> stepTypes;
 
     public void setup() {
     	services = new Hashtable<String, Long>();
@@ -27,10 +16,11 @@ public class ServiceAgent extends Agent {
     	services.put("Glue", 20l);
     	services.put("Pick", 5l);
     	services.put("Place", 5l);
-    	
-    	steps.put("Pick&Place", new String[] {"Pick", "Place"});
-    	steps.put("Attach", new String[] {"Glue", "Pick", "Place"});
-    	steps.put("Screw", new String[] {"Drill", "Pick", "Place"});
+
+    	stepTypes = new Hashtable<String, String[]>();
+    	stepTypes.put("Pick&Place", new String[] {"Pick", "Place"});
+    	stepTypes.put("Attack", new String[] {"Glue", "Pick", "Place"});
+    	stepTypes.put("Screw", new String[] {"Drill", "Pick", "Place"});
     	
     	addBehaviour(new AnswerBehaviour(this));
     }
@@ -53,25 +43,28 @@ public class ServiceAgent extends Agent {
 				reply = message.createReply();
 				String content = message.getContent();
 				switch(message.getOntology()) {
+					case "canDoProductionStep":
+						//TODO check production step BB for step type
+						int stepID = Integer.parseInt(content);
+						boolean isAble = stepTypes.size() < stepID;
+						reply.setContent("" + isAble);
+						
+						if(isAble)
+							System.out.println("Can do step " + stepID);
+						else
+							System.out.println("Cannot do step " + stepID);
+						break;
 					case "getProductionStepDuration":
+						//TODO split the step in equiplet steps and ask the hardware agents how long these will take
 						int duration = 0;
 						
-						for(String service : steps.get(content)) {
+						for(String service : stepTypes.get(Integer.parseInt(content))) {
 							duration += services.get(service);
 						}
 						
 						reply.setContent("" + duration);
 						
 						System.out.println("Step takes " + duration + "timeslots");
-						break;
-					case "canDoProductionStep":
-						boolean isAble = steps.containsKey(content);
-						reply.setContent("" + isAble);
-						
-						if(isAble)
-							System.out.println("Can do step " + content);
-						else
-							System.out.println("Cannot do step " + content);
 						break;
 					case "scheduleProductionStep":
 						reply.setContent("Step scheduled");
