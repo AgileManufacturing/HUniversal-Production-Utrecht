@@ -82,7 +82,6 @@ public class EquipletAgent extends Agent {
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
             capabilities = (ArrayList<Long>) args[0];
-            System.out.println(capabilities);
 		}
 		
 		Gson gson = new Gson();
