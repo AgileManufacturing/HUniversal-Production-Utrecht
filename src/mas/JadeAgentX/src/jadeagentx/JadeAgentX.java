@@ -4,6 +4,7 @@
  */
 package jadeagentx;
 import equipletAgent.EquipletAgent;
+import serviceAgent.ServiceAgent;
 import jade.core.Agent;
 import jade.wrapper.AgentController;
 import java.util.ArrayList;
