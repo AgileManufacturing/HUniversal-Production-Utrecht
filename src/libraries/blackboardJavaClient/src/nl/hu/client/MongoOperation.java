@@ -31,22 +31,55 @@
 
 package nl.hu.client;
 
+/**
+ * Enum listing the different CRUD operations in MongoDB, as well as their internal representation in the oplog.
+ *
+ */
 public enum MongoOperation {
+	/**
+	 * Insert operation.
+	 */
 	INSERT("i"),
+	/**
+	 * Update operation.
+	 */
 	UPDATE("u"),
+	/**
+	 * NOOP operation.
+	 */
 	NOOP("n"),
+	/**
+	 * Delete operation.
+	 */
 	DELETE("d");
 	
+	/**
+	 * @var String opCode
+	 * Internal representation in the "op" field of the oplog for this operation.
+	 */
 	private final String opCode;
 
+	/**
+	 * Constructs the MongoOperation with the specified opcode.
+	 * @param opCode Internal representation in the "op" field of the oplog for this operation.
+	 */
 	private MongoOperation(String opCode) {
 		this.opCode = opCode;
 	}
 
+	/**
+	 * Returns the opcode for this operation.
+	 * @return The opcode for this operation.
+	 */
 	public String getOpCode() {
 		return opCode;
 	}
 	
+	/**
+	 * Attempts to find the {@link MongoOperation} corresponding to the given opCode.
+	 * @param opCode The opcode for which to find the MongoOperation
+	 * @return The MongoOperation corresponding to the given opCode or null.
+	 */
 	public static MongoOperation get(String opCode) {
 		for (MongoOperation op : values()) {
 			if (op.opCode.equals(opCode)) {

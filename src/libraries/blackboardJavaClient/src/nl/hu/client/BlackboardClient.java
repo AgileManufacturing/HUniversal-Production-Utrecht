@@ -109,13 +109,16 @@ public class BlackboardClient {
 	 **/
 	private DBCollection oplogCollection;
 
+	/**
+	 * @var TailedCursorThread tcThread
+	 * Thread for tracking tailable cursor on operation log of MongoDB
+	 */
 	private TailedCursorThread tcThread;
 	
 	/**
 	 * Constructor of BlackboardClient.
 	 *
 	 * @param host The mongoDB host.
-	 * @param subscriber The subscriber.
 	 **/
 	public BlackboardClient(String host) {
 		try {
@@ -131,7 +134,6 @@ public class BlackboardClient {
 	 *
 	 * @param host The ip of the MongoDB host.
 	 * @param port The port of the MongoDB host.
-	 * @param subscriber The subscriber.
 	 **/
 	public BlackboardClient(String host, int port) {
 		try {
@@ -251,7 +253,12 @@ public class BlackboardClient {
 		currentCollection.findAndModify((DBObject) JSON.parse(query), setObject);
 	}
 	
-
+	/**
+	 * Subscribes to the specified CRUD operation in the current database and collection.
+	 * 
+	 * @param sub Specification of operation and callback object.
+	 * @throws Exception
+	 */
 	public void subscribe(BlackboardSubscription sub) throws Exception {
 		if (collection == null || collection.isEmpty()) {
 			throw new Exception("No collection selected");
@@ -265,7 +272,11 @@ public class BlackboardClient {
 		}
 	}
 
-
+	/**
+	 * Removes the specified subscription.
+	 * 
+	 * @param sub Subscription that should be removed.
+	 */
 	public void unsubscribe(BlackboardSubscription sub) {
 		subscriptions.remove(sub);
 		if (subscriptions.size() == 0) {

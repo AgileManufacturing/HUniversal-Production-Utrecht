@@ -35,41 +35,106 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 
+/**
+ * Utility class for handling an oplog entry.
+ */
 public class OplogEntry {
+	
+	/**
+	 * @var String NAMESPACE_FIELD
+	 * Name of the namespace field within the oplog entry.
+	 */
 	private static final String NAMESPACE_FIELD = "ns";
+	
+	/**
+	 * @var String TIMESTAMP_FIELD
+	 * Name of the timestamp field within the oplog entry.
+	 */
 	private static final String TIMESTAMP_FIELD = "ts";
+	
+	/**
+	 * @var String OPERATION_FIELD
+	 * Name of the operation field within the oplog entry.
+	 */
 	private static final String OPERATION_FIELD = "op";
+	
+	/**
+	 * @var String UID_FIELD
+	 * Name of the uid field within the oplog entry.
+	 */
 	private static final String UID_FIELD = "h";
+	
+	/**
+	 * @var String UPDATE_DOC_FIELD
+	 * Name of the update document field within the oplog entry.
+	 */
 	private static final String UPDATE_DOC_FIELD = "o";
+	
+	/**
+	 * @var String UPDATE_CRITERIA_FIELD
+	 * Name of the update criteria field within the oplog entry.
+	 */
 	private static final String UPDATE_CRITERIA_FIELD = "o2";
 	
+	/**
+	 * @var DBObject oplogEntry
+	 * Internal DBObject representation of the oplog entry.
+	 */
 	private DBObject oplogEntry;
 
+	/**
+	 * Construct an OplogEntry object based on the specified entry.
+	 * @param oplogEntry The DBObject containing the oplog data.
+	 */
 	public OplogEntry(DBObject oplogEntry) {
 		this.oplogEntry = oplogEntry;
 	}
 	
+	/**
+	 * Returns the operation of this oplog entry.
+	 * @return the operation of this oplog entry.
+	 */
 	public MongoOperation getOperation() {
 		Object obj = oplogEntry.get(OPERATION_FIELD);
 		return MongoOperation.get((String)obj);
 	}
 	
+	/**
+	 * Returns the namespace of this oplog entry.
+	 * @return the namespace of this oplog entry.
+	 */
 	public String getNamespace() {
 		return oplogEntry.get(NAMESPACE_FIELD).toString();
 	}
 	
+	/**
+	 * Returns the update document of this oplog entry.
+	 * @return the update document of this oplog entry.
+	 */
 	public String getUpdateDocument() { 
 		return oplogEntry.get(UPDATE_DOC_FIELD).toString();
 	}
 	
+	/**
+	 * Returns the update criteria of this oplog entry.
+	 * @return the update criteria of this oplog entry.
+	 */
 	public String getUpdateCriteria() {
 		return oplogEntry.get(UPDATE_CRITERIA_FIELD).toString();
 	}
-	
+
+	/**
+	 * Returns a JSON serialization of the oplog entry.
+	 * @return A JSON serialization of the oplog entry.
+	 */
 	public String toString() {
 		return oplogEntry.toString();
 	}
 	
+	/**
+	 * Attempts to retrieve the ObjectId for the target document of the operation.
+	 * @return ObjectId representing the target document or null.
+	 */
 	public ObjectId getTargetObjectId() {
 		Object targetObj = oplogEntry.get("o2");
 		if (targetObj == null) {
