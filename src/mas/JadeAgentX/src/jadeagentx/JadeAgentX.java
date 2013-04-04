@@ -4,6 +4,7 @@
  */
 package jadeagentx;
 import equipletAgent.EquipletAgent;
+import serviceAgent.ServiceAgent;
 import jade.core.Agent;
 import jade.wrapper.AgentController;
 import java.util.ArrayList;
@@ -41,8 +42,10 @@ public class JadeAgentX extends Agent {
         capabilities1.add(3l);
         capabilities1.add(4l);
         
+        String serviceAgentName = "serviceAgent1";
+        ((AgentController)getContainerController().createNewAgent(serviceAgentName, "serviceAgent.ServiceAgent", null)).start();
         
-        Object[] ar = new Object[]{capabilities1, d, inputParts, outputParts};
+        Object[] ar = new Object[]{capabilities1, serviceAgentName, d, inputParts, outputParts};
         ((AgentController)getContainerController().createNewAgent("equipletAgent1", "equipletAgent.EquipletAgent", ar)).start();
         // TODO code application logic here
         ArrayList<Long> capabilities2 = new ArrayList<Long>();
@@ -51,7 +54,7 @@ public class JadeAgentX extends Agent {
         capabilities2.add(3l);
         capabilities2.add(5l);
         
-        ar = new Object[]{capabilities2, d, inputParts, outputParts};
+        ar = new Object[]{capabilities2, serviceAgentName, d, inputParts, outputParts};
         ((AgentController)getContainerController().createNewAgent("equipletAgent2", "equipletAgent.EquipletAgent", ar)).start();
         
         ArrayList<Long> capabilities3 = new ArrayList<Long>();
@@ -60,7 +63,7 @@ public class JadeAgentX extends Agent {
         capabilities3.add(2l);
         capabilities3.add(4l);
         
-        ar = new Object[]{capabilities3, d, inputParts, outputParts};
+        ar = new Object[]{capabilities3, serviceAgentName, d, inputParts, outputParts};
         ((AgentController)getContainerController().createNewAgent("equipletAgent3", "equipletAgent.EquipletAgent", ar)).start();
         
         ar = null;
