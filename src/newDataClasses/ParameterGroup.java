@@ -68,7 +68,7 @@ public class ParameterGroup implements Serializable{
 	
 	public Parameter[] getParameters() {
 		Collection<Parameter> values = this._parameters.values();	
-		return (Parameter[]) values.toArray();
+		return values.toArray(new Parameter[values.size()]);
 	}
 	
 	/*
