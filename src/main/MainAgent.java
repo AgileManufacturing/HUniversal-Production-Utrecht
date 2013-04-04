@@ -1,5 +1,9 @@
 package main;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
+import jade.core.AID;
 import jade.core.Agent;
 import jade.wrapper.AgentController;
 import newDataClasses.Parameter;
@@ -11,7 +15,6 @@ import newDataClasses.ProductionStep;
 
 @SuppressWarnings("serial")
 public class MainAgent extends Agent {
-
 	protected void setup() {
 		try {
 			System.out.println("Starting agents:");
@@ -116,5 +119,4 @@ public class MainAgent extends Agent {
 			doDelete();
 		}
 	}
-
 }
