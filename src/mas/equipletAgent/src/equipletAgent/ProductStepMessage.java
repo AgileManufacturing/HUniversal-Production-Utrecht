@@ -29,31 +29,32 @@
  **/
 package equipletAgent;
 
+import jade.core.AID;
+
 import java.util.Dictionary;
+import java.util.Hashtable;
 /**
  * Implementation of a message for the productstep blackboard
  */
 public class ProductStepMessage{
-	public int product_step_id;
-	public int product_agent_id;
-	public String type;
-	public Dictionary parameters;
-	public Object input_parts;
-	public Object output_parts;
+	public AID productAgentId;
+	public Long type;
+	public Hashtable<String, String> parameters;
+	public Object inputParts;
+	public Object outputParts;
 	public int status;
-	public Object schedule_data;
+	public Object scheduleData;
 
-	public ProductStepMessage(int product_step_id, int product_agent_id,
-							  String type, Dictionary parameters,
-							  Object input_parts, Object output_parts,
-							  int status, Object schedule_data){
-		this.product_step_id = product_step_id;
-		this.product_agent_id = product_agent_id;
+	public ProductStepMessage(AID productAgentId,
+							  Long type, Hashtable<String, String> parameters,
+							  Object inputParts, Object outputParts,
+							  int status, Object scheduleData){
+		this.productAgentId = productAgentId;
 		this.type = type;
 		this.parameters = parameters;
-		this.input_parts = input_parts;
-		this.output_parts = output_parts;
+		this.inputParts = inputParts;
+		this.outputParts = outputParts;
 		this.status = status;
-		this.schedule_data = schedule_data;
+		this.scheduleData = scheduleData;
 	}
 }
