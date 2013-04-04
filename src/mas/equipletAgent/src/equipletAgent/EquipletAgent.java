@@ -158,7 +158,7 @@ public class EquipletAgent extends Agent {
                          case "canPerformStep": 
                         	 ProductionStep proStepC = (ProductionStep)content;
                         	 ParameterList pal = proStepC.getParameterList();
-                             if(capabilities.contains(pal.GetParameterGroup("banaan").getParameter("StepName"))){
+                             if(capabilities.contains(proStepC.getCapability())){
                                  confirmationMsg.setPerformative(ACLMessage.CONFIRM);
 
                              
