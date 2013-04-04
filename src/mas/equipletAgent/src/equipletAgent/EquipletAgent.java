@@ -141,21 +141,23 @@ public class EquipletAgent extends Agent {
                      // deserialize content 
                      String messageID = msg.getConversationId();
                      
-                     ProductionStep content = null;
-					try {
-						content = (ProductionStep)msg.getContentObject();
+                     Object content = null;
+					 
+					 try {
+						content = msg.getContentObject();
 					} catch (UnreadableException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-                     ParameterList pal = content.getParameterList();
-                     String Ontology = msg.getOntology();
+					
+                                          String Ontology = msg.getOntology();
                      
                      System.out.println("Msg Ontology = "+msg.getOntology());
                      ACLMessage confirmationMsg = new ACLMessage(ACLMessage.DISCONFIRM);
                      switch(Ontology){
                          case "canPerformStep": 
-
+                        	 ProductionStep proStepC = (ProductionStep)content;
+                        	 ParameterList pal = proStepC.getParameterList();
                              if(capabilities.contains(pal.GetParameterGroup("banaan").getParameter("StepName"))){
                                  confirmationMsg.setPerformative(ACLMessage.CONFIRM);
 
@@ -177,7 +179,8 @@ public class EquipletAgent extends Agent {
                         	 ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
                         	 message.addReceiver(serviceAgent);
                         	 message.setOntology("getProductionStepDuration");
-                        	 message.setContent(content);
+                        	 message.setContent(content.toString());
+                        	 
                         	 send(message);
                         	 //TODO: Ask service agent to calculate step duration,
                         	 //wait for the result 
@@ -186,7 +189,7 @@ public class EquipletAgent extends Agent {
                          case "getProductionStepDuration":
                              break;
                          case "scheduleStep":
-                        	 long timeslot = Long.parseLong((pal.GetParameterGroup("banaan").getParameter("timeSlot")).toString());
+                        	 long timeslot = Long.parseLong(content.toString());
                         	 /*TODO: Ask service agent to schedule the step with the logistics at time X if possible.
                         	 Wait for result.
                         	 Report result back to product agent.
