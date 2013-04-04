@@ -4,6 +4,7 @@ package equipletAgent;
 import newDataClasses.Parameter;
 import newDataClasses.ParameterGroup;
 import newDataClasses.ParameterList;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
