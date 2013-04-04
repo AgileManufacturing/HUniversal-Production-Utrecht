@@ -1,5 +1,9 @@
 package main;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
+import jade.core.AID;
 import jade.core.Agent;
 import jade.wrapper.AgentController;
 import newDataClasses.Parameter;
@@ -11,7 +15,8 @@ import newDataClasses.ProductionStep;
 
 @SuppressWarnings("serial")
 public class MainAgent extends Agent {
-
+	  public Object[] stepList = new Object[]{};
+	  public Dictionary<AID, String> allEquiplets = new Hashtable(); // containts the agent ID + the ID given to what task it can perform
 	  protected void setup() {
 			try {				
 				System.out.println("Starting agents:");
