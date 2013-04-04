@@ -5,12 +5,15 @@ package scheduling;
 public class Scheduler {
 	
 	public Scheduler(Object[] equipletList, Object productionStep){
-		blackboard.connect(scheduleBlackboard);
-		int neededTimeSlots = (ProductionStep) productionStep.getTimeSlots();
+		//blackboard.connect(scheduleBlackboard);
 		
-		//TODO tijdSloten berekenen welke vrij zijn		
+		//TODO tijdSloten berekenen welke vrij zijn	en eerste vrije slot kiezen	
 		
-		(ProductionStep)productionStep.schedule(equipletList[0], neededTimeSlots);
+		//schedule(equipletList[0], startTimeSlot);
+		
+	}
+	
+	private void schedule(Object equiplet, int startTimeslot){
 		
 	}
 }
