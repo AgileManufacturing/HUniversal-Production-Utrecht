@@ -155,7 +155,7 @@ public class EquipletAgent extends Agent {
                      switch(Ontology){
                          case "canPerformStep": 
 
-                             if(capabilities.contains(pal.GetParameterGroup("banaan").getParameter("banaan"))){
+                             if(capabilities.contains(pal.GetParameterGroup("banaan").getParameter("StepName"))){
                                  confirmationMsg.setPerformative(ACLMessage.CONFIRM);
 
                              
@@ -182,7 +182,7 @@ public class EquipletAgent extends Agent {
                         	 //and return the result to the product agent.
                              break;
                          case "scheduleStep":
-                        	 long timeslot = Long.parseLong(content);
+                        	 long timeslot = Long.parseLong((pal.GetParameterGroup("banaan").getParameter("timeSlot")).toString());
                         	 /*TODO: Ask service agent to schedule the step with the logistics at time X if possible.
                         	 Wait for result.
                         	 Report result back to product agent.
