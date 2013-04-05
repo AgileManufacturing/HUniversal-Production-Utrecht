@@ -21,12 +21,12 @@ public class PlannerBehaviour extends CyclicBehaviour{
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Dictionary<Object, AID> desiredEquiplets = new Hashtable(); // contains the current step + the agent ID
 		
-		Object[] stepId = m.stepList;
+	//	Object[] stepId = m.stepList;
 		
 		// vergelijk het stap ID met de equiplets die de stap daardwerkelijk kunnen uitvoeren.
 		// wanneer ze het kunnen, zet ze in een nieuwe lijst en ga naar de volgende.
 		// Anders ga naar de volgende.
-		if(!allEquiplets.isEmpty()){
+	/*	if(!allEquiplets.isEmpty()){
 			System.out.println("filling 'desiredEquiplets' dictionary");
 			while(allEquiplets.elements().nextElement() != null){
 				allEquiplets.equals(stepId);
@@ -35,7 +35,7 @@ public class PlannerBehaviour extends CyclicBehaviour{
 		}else{
 			System.out.println("the 'desiredEquiplets' dictionary could not be filled");
 		}
-		
+		*/
 		
 		
 		

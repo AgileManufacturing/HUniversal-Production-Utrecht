@@ -25,10 +25,11 @@ public class NegotiatorBehaviour extends CyclicBehaviour {
 		int timeSlots = -1;
 
 		// foreachProductionstep in object[]{
-		AID aid = _productAgent.getAID();
-		_productAgent.addBehaviour(new Conversation(aid, null));
+		for (int i = 0; i < 2; i++) {
+			AID aid = _productAgent.getAID();
+			_productAgent.addBehaviour(new Conversation(aid, null));
+		}
 		// }
-
 	}
 
 	private class Conversation extends SequentialBehaviour {
@@ -42,6 +43,7 @@ public class NegotiatorBehaviour extends CyclicBehaviour {
 
 		public void onStart() {
 			final String ConversationId = _productAgent.generateCID();
+
 			addSubBehaviour(new OneShotBehaviour() {
 				public void action() {
 					try {
@@ -61,13 +63,13 @@ public class NegotiatorBehaviour extends CyclicBehaviour {
 			MessageTemplate template = MessageTemplate.and(
 					MessageTemplate.MatchPerformative(ACLMessage.CONFIRM),
 					MessageTemplate.MatchConversationId(ConversationId));
+
 			addSubBehaviour(new receiveBehaviour(myAgent, 40000, template) {
 				public void handle(ACLMessage msg) {
 					if (msg == null)
 						System.out.println("Timeout");
 					else
 						System.out.println("Received: " + msg);
-
 				}
 			});
 		}
