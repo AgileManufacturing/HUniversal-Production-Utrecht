@@ -42,6 +42,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import ParameterList.ProductionStep;
 import nl.hu.client.BlackboardClient;
+import serviceAgent.ServiceAgent;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -50,6 +51,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import org.bson.BSONObject;
 import org.bson.types.ObjectId;
 
 /**
@@ -61,7 +63,7 @@ public class EquipletAgent extends Agent {
 
 	// This is the service agent of this equiplet
 	private AID serviceAgent;
-
+	
 	// This is the collective database used by all product agents and equiplets
 	// and contains the collection EquipletDirectory.
 	private DB collectiveDb = null;
@@ -79,10 +81,10 @@ public class EquipletAgent extends Agent {
 	private DBCollection productSteps = null;
 	private String productStepsName = "ProductSteps";
 
-	// BlackboardClient to communicate with the blackboards
+	//BlackboardClient to communicate with the blackboards
 	private BlackboardClient client;
 
-	// Arraylist with IDs of the capabilities of the equiplet
+	//Arraylist with IDs of the capabilities of the equiplet
 	private ArrayList<Long> capabilities;
 
 	private Hashtable<String, ObjectId> communicationTable;
@@ -105,13 +107,13 @@ public class EquipletAgent extends Agent {
 			serviceAgent = new AID((String) args[1], AID.ISLOCALNAME);
 			System.out.println(capabilities + " " + equipletDbName);
 		}
-
+		
 		Gson gson = new Gson();
 		try {
 			// setup connection with MongoDB.
 			Mongo collectiveDbMongoClient = new Mongo(collectiveDbIp, collectiveDbPort);
 			collectiveDb = collectiveDbMongoClient.getDB(collectiveDbName);
-
+			
 			// put capabilities on the equipletDirectory
 			client = new BlackboardClient(collectiveDbIp);
 			try {
@@ -136,7 +138,7 @@ public class EquipletAgent extends Agent {
 		}
 
 		// Behaviour for receiving messages, checks each 5000
-		addBehaviour(new CyclicBehaviour(this) {
+		 addBehaviour(new CyclicBehaviour(this) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -246,58 +248,92 @@ public class EquipletAgent extends Agent {
 						break;
 
 					case "getProductionDuration":
-						try {
-							contentObject = msg.getContentObject();
-						} catch (UnreadableException e1) {
-
-							System.out.println(e1);
-							e1.printStackTrace();
-
-						}
-						ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-						message.addReceiver(serviceAgent);
-						message.setConversationId(msg.getConversationId());
-						message.setOntology("getProductionStepDuration");
 
 						try {
+							
+						ObjectId contentObjectId = communicationTable.get(msg
+								.getConversationId());
+						
+							ACLMessage message = new ACLMessage(
+									ACLMessage.REQUEST);
+							message.addReceiver(serviceAgent);
+							message.setConversationId(msg.getConversationId());
+							message.setContentObject((Serializable)contentObjectId);
+							message.setOntology("getProductionStepDuration");
 
-							message.setContentObject((Serializable) contentObject);
+							try {
 
-						} catch (IOException e) {
+								message.setContentObject((Serializable) contentObject);
 
-							System.out.println(e);
-							e.printStackTrace();
+							} catch (IOException e) {
 
+								System.out.println(e);
+								e.printStackTrace();
+
+							}
+
+							send(message);
+
+						} catch (Exception e) {
+							// TODO: ERROR HANDLING
+							myAgent.doDelete();
 						}
-
-						send(message);
 
 						break;
 
 					case "ProductionDurationResponce":
 
-						message = new ACLMessage(ACLMessage.INFORM);
-						AID productAgentAID = new AID();
-						message.addReceiver(productAgentAID);
-						message.setOntology("ProductionDuration");
-						message.setConversationId(msg.getConversationId());
-
-						// TODO: kijk in blackboard naar de duration en stuur
-						// deze naar de PA
-
-						send(message);
-
+						try{
+							
+						
+						ObjectId contentObjectId = communicationTable.get(msg
+								.getConversationId());
+						client = new BlackboardClient(equipletDbIp);
+						
+							client.setDatabase(equipletDbName);
+							client.setCollection(productStepsName);
+							BasicDBObject query = new BasicDBObject();
+							query.put("_id", contentObjectId);
+							productStep = client.findDocuments(query).get(0);
+														
+							ScheduleData Schedule = (ScheduleData)productStep.get("scheduleData");
+							Long Duration = Schedule.getDuration();
+							////
+													
+							ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+							message.addReceiver((AID) productStep.get("productAgentId"));
+							message.setOntology("ProductionDuration");
+							message.setConversationId(msg.getConversationId());
+							message.setContentObject((Serializable) Duration);
+							
+							send(message);
+							
+						}catch(Exception e){
+							myAgent.doDelete();
+						}
+					
 						break;
 
 					case "scheduleStep":
-						long timeslot = Long.parseLong(contentString);
-
-						System.out.println("" + timeslot);
-						ACLMessage timeslotMessage = new ACLMessage(ACLMessage.REQUEST);
-						timeslotMessage.addReceiver(serviceAgent);
-						timeslotMessage.setOntology("scheduleProductionStep");
-						timeslotMessage.setContent(String.valueOf(timeslot));
-						send(timeslotMessage);
+						try{
+							
+							long timeslot = Long.parseLong(contentString);
+							ObjectId contentObjectId = communicationTable.get(msg
+									.getConversationId());
+							client = new BlackboardClient(equipletDbIp);
+							client.setDatabase(equipletDbName);
+							client.setCollection(productStepsName);
+							BasicDBObject query = new BasicDBObject();
+							query.put("_id", contentObjectId);
+							productStep = client.findDocuments(query).get(0);
+							System.out.println("" + timeslot);
+							ACLMessage timeslotMessage = new ACLMessage(
+									ACLMessage.REQUEST);
+							timeslotMessage.addReceiver(serviceAgent);
+							timeslotMessage.setOntology("scheduleStepWithLogistics");
+							timeslotMessage.setContent(String.valueOf(timeslot));
+							timeslotMessage.setConversationId(msg.getConversationId());
+							send(timeslotMessage);
 						/*
 						 * TODO: Ask service agent to schedule the step with the
 						 * logistics at time X if possible. Wait for result.
@@ -306,16 +342,21 @@ public class EquipletAgent extends Agent {
 						 * steps blackboard to PLANNED and add the schedule
 						 * data.
 						 */
-						break;
+							ACLMessage confirmScheduleStep = new ACLMessage(ACLMessage.CONFIRM);
+							confirmScheduleStep.setConversationId(msg.getConversationId());
+							confirmScheduleStep.addReceiver((AID) productStep.get("productAgentId"));
+							}
+							catch(Exception e){
+							
+							}
+							break;
 					}
 
-				}
-				block();
 			}
-		});
-
+			block();
+		}
+	});
 	}
-
 	public void takeDown() {
 		Gson gson = new Gson();
 		try {
@@ -347,6 +388,5 @@ public class EquipletAgent extends Agent {
 		} catch (UnknownHostException e) {
 			// The equiplet is already going down, so it has to do nothing here.
 		}
-
 	}
 }

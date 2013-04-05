@@ -45,12 +45,12 @@ public class ProductStepMessage{
 	public Object inputParts;
 	public Object outputParts;
 	public int status;
-	public Object scheduleData;
+	public ScheduleData scheduleData;
 
 	public ProductStepMessage(AID productAgentId,
 							  Long type, ParameterList parameters,
 							  Object inputParts, Object outputParts,
-							  int status, Object scheduleData){
+							  int status, ScheduleData scheduleData){
 		this.productAgentId = productAgentId;
 		this.type = type;
 		this.parameters = parameters;

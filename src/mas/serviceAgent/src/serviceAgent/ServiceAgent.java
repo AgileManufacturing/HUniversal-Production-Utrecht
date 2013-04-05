@@ -28,13 +28,13 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
     	productionStepBBClient = new BlackboardClient("");
     	serviceStepBBClient = new BlackboardClient("");
     	try {
-			productionStepBBClient.setDatabase("");
-			productionStepBBClient.setCollection("");
+			productionStepBBClient.setDatabase("CollectionDb");
+			productionStepBBClient.setCollection("ProductionStepCollection");
 			productionStepBBClient.subscribe(new BlackboardSubscription(MongoOperation.INSERT, this)); //need react on new production steps
 			productionStepBBClient.subscribe(new BlackboardSubscription(MongoOperation.UPDATE, this)); //need to react on state changes of production steps to WAITING
 
-			serviceStepBBClient.setDatabase("");
-			serviceStepBBClient.setCollection("");
+			serviceStepBBClient.setDatabase("CollectionDb");
+			serviceStepBBClient.setCollection("ServiceStepCollection");
 			serviceStepBBClient.subscribe(new BlackboardSubscription(MongoOperation.UPDATE, this)); //need to react on state changes of service steps
 		} catch (Exception e) {
 			e.printStackTrace();
