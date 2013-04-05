@@ -33,20 +33,22 @@ import jade.core.AID;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
+
+import ParameterList.ParameterList;
 /**
  * Implementation of a message for the productstep blackboard
  */
 public class ProductStepMessage{
 	public AID productAgentId;
 	public Long type;
-	public Hashtable<String, String> parameters;
+	public ParameterList parameters;
 	public Object inputParts;
 	public Object outputParts;
 	public int status;
 	public ScheduleData scheduleData;
 
 	public ProductStepMessage(AID productAgentId,
-							  Long type, Hashtable<String, String> parameters,
+							  Long type, ParameterList parameters,
 							  Object inputParts, Object outputParts,
 							  int status, ScheduleData scheduleData){
 		this.productAgentId = productAgentId;
