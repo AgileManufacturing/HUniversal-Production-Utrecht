@@ -51,6 +51,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import org.bson.types.ObjectId;
+
 /**
  * EquipletAgent that communicates with product agents and with its own service
  * agent.
@@ -94,6 +96,7 @@ public class EquipletAgent extends Agent {
 		equipletDbName = getAID().getLocalName();
 
 		//TODO: Not Hardcoded capabilities/get capabilities from the service agent.
+		// agent.
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
             capabilities = (ArrayList<Long>) args[0];
@@ -163,17 +166,24 @@ public class EquipletAgent extends Agent {
 				String Ontology = msg.getOntology();
 				switch (Ontology) {
 				case "canPerformStep":
+						//getting the product step from the message.
 					ProductionStep proStepC = (ProductionStep) contentObject;
 					ParameterList pal = proStepC.getParameterList();
 					if (capabilities.contains(proStepC.getCapability())) {
 						confirmationMsg.setPerformative(ACLMessage.CONFIRM);
 
 						Gson gson = new Gson();
+						
+						// Makes a database connection and puts the new step in it.
+						client = new BlackboardClient(equipletDbIp);
 						try {
 							Mongo equipletDbMongoClient = new Mongo(equipletDbIp, equipletDbPort);
 							equipletDb = equipletDbMongoClient.getDB(equipletDbName);
 
 							client = new BlackboardClient(equipletDbIp);
+							message.setConversationId(msg.getConversationId());
+							message.addReceiver(serviceAgent);
+							message.setOntology("canDoProductionStep");
 							try {
 								client.setDatabase(equipletDbName);
 								client.setCollection(productStepsName);
@@ -187,6 +197,7 @@ public class EquipletAgent extends Agent {
 							equipletDbMongoClient.close();
 						} catch (UnknownHostException e) {
 							// TODO: ERROR HANDLING
+							myAgent.doDelete();
 						}
 						confirmationMsg.setContent("Dit is mogelijk");
 						System.out.println("Dit is mogelijk");
@@ -265,6 +276,7 @@ public class EquipletAgent extends Agent {
 
 				client.removeDocuments(gson.toJson(searchQuery));
 			} catch (Exception e) {
+				//The equiplet is already going down, so it has to do nothing here.
 			}
 
 			collectiveDbMongoClient.close();
@@ -277,6 +289,7 @@ public class EquipletAgent extends Agent {
 			equipletDb.dropDatabase();
 			equipletDbMongoClient.close();
 		} catch (UnknownHostException e) {
+			//The equiplet is already going down, so it has to do nothing here.
 		}
 
 	}
