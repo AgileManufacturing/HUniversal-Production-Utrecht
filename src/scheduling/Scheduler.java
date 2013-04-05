@@ -16,9 +16,9 @@ import com.mongodb.ServerAddress;
 
 //usual imports
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
-//import blackboard;
 
 public class Scheduler {
 	
@@ -26,7 +26,7 @@ public class Scheduler {
 		//blackboard.connect(scheduleBlackboard);
 		//MongoClient mongoClient = new MongoClient();
 		// or
-		MongoClient mongoClient = new MongoClient( "localhost" );
+		MongoClient mongoClient = new MongoClient( "localhost" );//145.89.191.131 is hu server
 		// or
 		//MongoClient mongoClient = new MongoClient( "localhost" , 27017 );
 		// or, to connect to a replica set, supply a seed list of members
@@ -34,19 +34,26 @@ public class Scheduler {
 		                                      new ServerAddress("localhost", 27018),
 		                                      new ServerAddress("localhost", 27019)));*/
 		
-		DB db = mongoClient.getDB( "scheduleBlackboard" );
-		//boolean auth = db.authenticate("root", char['g','e','e','n']);
-		Set<String> colls = db.getCollectionNames();
-		//show current collections
-		for (String s : colls) {
-		    System.out.println(s);
-		}
+		DB db = mongoClient.getDB( "scheduleBlackboard" );//set db to use
 		
+		//authenticating mongodb
+		//boolean auth = db.authenticate("root", char['g','e','e','n']);
 		//end connecting
+		
+		//get current collection names(table names)
+		Set<String> colls = db.getCollectionNames();
+		//show current collection data
+		//for (String s : colls) {
+			List<DBObject> data = db.getCollection("eq1").find().toArray();//nameOfCollection should be 'schedule'
+			for(int i = 0; i < data.size(); i++){
+				System.out.println(data.get(i).toString());
+				
+			}
+		//}
 		
 		//TODO tijdsloten berekenen welke vrij zijn	en eerste vrije slot kiezen
 		//( bepaald ook welke equiplet het wordt indien meerdere equiplets beschikbaar)	
-		int startTimeSlot = 0;
+		int startTimeSlot = 1;
 		
 		schedule(equipletList[0], startTimeSlot);
 		
