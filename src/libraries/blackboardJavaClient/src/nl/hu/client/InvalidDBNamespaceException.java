@@ -1,7 +1,7 @@
-﻿/**
- * @file BlackboardSubscriber.java
- * @brief Interface for subscribing to blackboard events.
- * @date Created: 2012-04-04
+/**
+ * @file InvalidDBNamespaceException.java
+ * @brief Thrown when the database namespace is incorrect.
+ * @date Created: 2012-04-05
  *
  * @author Jan-Willem Willebrands
  *
@@ -32,15 +32,22 @@
 package nl.hu.client;
 
 /**
- * Interface used for subscribing to blackboard events.
+ * Thrown when the database namespace is incorrect.
  */
-public interface BlackboardSubscriber{
+public class InvalidDBNamespaceException extends Exception {
+
+	/**
+	 * @var long serialVersionUID
+	 * SerialUID for this class.
+	 */
+	private static final long serialVersionUID = 6479137977336676219L;
 	
 	/**
-	 * Callback function that is invoked whenever the subscribed event occurs.
+	 * Constructs an InvalidDBNamespaceException object with the specified message.
 	 * 
-	 * @param operation The {@link MongoOperation} that triggered the callback.
-	 * @param entry {@link OplogEntry} object representing the oplog entry.
+	 * @param message Message describing the contents of this exception.
 	 */
-	public void onMessage(MongoOperation operation, OplogEntry entry);
+	public InvalidDBNamespaceException(String message) {
+		super(message);
+	}
 }

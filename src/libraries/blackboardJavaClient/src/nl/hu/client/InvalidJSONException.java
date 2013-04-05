@@ -1,7 +1,7 @@
-﻿/**
- * @file BlackboardSubscriber.java
- * @brief Interface for subscribing to blackboard events.
- * @date Created: 2012-04-04
+/**
+ * @file InvalidJSONException.java
+ * @brief Thrown when invalid JSON is encountered.
+ * @date Created: 2012-04-05
  *
  * @author Jan-Willem Willebrands
  *
@@ -31,16 +31,24 @@
 
 package nl.hu.client;
 
+import com.mongodb.util.JSONParseException;
+
 /**
- * Interface used for subscribing to blackboard events.
+ * Thrown when invalid JSON is encountered.
  */
-public interface BlackboardSubscriber{
-	
+public class InvalidJSONException extends Exception {
 	/**
-	 * Callback function that is invoked whenever the subscribed event occurs.
-	 * 
-	 * @param operation The {@link MongoOperation} that triggered the callback.
-	 * @param entry {@link OplogEntry} object representing the oplog entry.
+	 * @var long serialVersionUID
+	 * Serial version ID of this class.
 	 */
-	public void onMessage(MongoOperation operation, OplogEntry entry);
+	private static final long serialVersionUID = -7981116871524728088L;
+
+	/**
+	 * Constructs an InvalidJSONException storing the JSONParseException as its cause.
+	 * 
+	 * @param ex The JSONParseException that caused this exception.
+	 */
+	public InvalidJSONException(JSONParseException ex) {
+		super("An error has occurred while parsing the JSON string.", ex);
+	}
 }
