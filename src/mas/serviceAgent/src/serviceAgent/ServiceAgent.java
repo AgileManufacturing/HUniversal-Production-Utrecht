@@ -2,9 +2,12 @@ package serviceAgent;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
+
 import jade.core.Agent;
 import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.UnreadableException;
 
 import com.google.gson.Gson;
 import com.mongodb.*;
@@ -67,7 +70,18 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			ACLMessage reply, message = receive();
 			if(message != null) {
 				reply = message.createReply();
-				ObjectId content = (ObjectId) message.getContentObject();
+				ObjectId content = null;
+				List<DBObject> productionStep = null;
+				try {
+					content = (ObjectId) message.getContentObject();
+				} catch (UnreadableException e) {
+					e.printStackTrace();
+				}
+				try {
+					productionStep = productionStepBBClient.findDocuments("_id:" + content);
+				} catch (InvalidJSONException | InvalidDBNamespaceException e) {
+					e.printStackTrace();
+				}
 				if(content != null) {
 					switch(message.getOntology()) {
 						case "canDoProductionStep":
@@ -76,21 +90,16 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 							//is this stepType present in stepTypes?
 							//send answer
 							
-							ArrayList<String> productionStep = productionStepBBClient.getJson("_id:" + content);
-							productionStepBBClient.
-							
-							
-							int stepID = Integer.parseInt(content);
-							boolean isAble = stepTypes.size() < stepID;
+							boolean isAble = stepTypes.containsKey(productionStep.get(0).get("type"));
 							reply.setContent("" + isAble);
-							reply.setOntology("isAble");
+							reply.setOntology("canDoProductionResponse");
 							
 							if(isAble)
-								System.out.println("Can do step " + stepID);
+								System.out.println("Can do step " + content);
 							else
-								System.out.println("Cannot do step " + stepID);
+								System.out.println("Cannot do step " + content);
 							break;
-						case "getProductionStepDuration":
+						case "getProductionDuration":
 							//TODO get step data using content
 							//extract stepType
 							//add all durations of those services of this stepTypes
@@ -99,12 +108,12 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 							
 							int duration = 0;
 							
-							for(String service : stepTypes.get(Integer.parseInt(content))) {
+							for(String service : stepTypes.get(productionStep.get(0).get("type"))) {
 								duration += services.get(service);
 							}
 							
 							reply.setContent("" + duration);
-							reply.setOntology("Duration");
+							reply.setOntology("ProductionDurationResponse");
 							
 							System.out.println("Step takes " + duration + "timeslots");
 							break;
@@ -159,7 +168,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		public DoServiceBehaviour(Agent agent, String service) {
 			super(agent);
 			this.service = service;
-			Gson.class
 
 			System.out.println("executing service " + service);
 		}
