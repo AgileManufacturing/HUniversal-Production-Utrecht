@@ -51,6 +51,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import org.bson.types.ObjectId;
+
 /**
  * EquipletAgent that communicates with product agents and with its own service
  * agent.
@@ -86,7 +88,7 @@ public class EquipletAgent extends Agent {
 	private ArrayList<Long> capabilities;
 
 
-	private Hashtable<Long, AID> communicationTable;
+	private Hashtable<AID, ObjectId> communicationTable;
 
 	@SuppressWarnings("serial")
 	public void setup() {
@@ -115,7 +117,7 @@ public class EquipletAgent extends Agent {
 				
 				DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 				EquipletDirectoryMessage entry = new EquipletDirectoryMessage(getAID(), capabilities, dbData);
-				client.insertJson(gson.toJson(entry));
+				client.insertDocument(gson.toJson(entry));
 			} catch (Exception e) {
 				this.doDelete();
 			}
@@ -155,6 +157,7 @@ public class EquipletAgent extends Agent {
 					contentObject = msg.getContentObject();
 				} catch (UnreadableException e) {
 					// TODO Auto-generated catch block
+					System.out.println("Exception Caught, No Content Object Given");
 				}
 				
 				 
@@ -180,7 +183,7 @@ public class EquipletAgent extends Agent {
 								ProductStepMessage entry = new ProductStepMessage(msg.getSender(), proStepC.getCapability(), 
 																				  null, null, null, 
 																				  ProductStepStatusCode.EVALUATING.getStatus(), null);
-								client.insertJson(gson.toJson(entry));
+								client.insertDocument(gson.toJson(entry));
 							} catch (Exception e) {
 								// TODO: ERROR HANDLING
 							}
@@ -207,23 +210,49 @@ public class EquipletAgent extends Agent {
 				case "getProductionDuration":
 					try {
 						contentObject = msg.getContentObject();
-					} catch (UnreadableException e1) {}
+					} catch (UnreadableException e1) {
+						
+						System.out.println(e1);
+						e1.printStackTrace();
+						
+						
+					}
 					ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 					message.addReceiver(serviceAgent);
+					message.setConversationId(msg.getConversationId());
 					message.setOntology("getProductionStepDuration");
+					
 					try {
+						
 						message.setContentObject((Serializable)contentObject);
-					} catch (IOException e) {}
-
+						
+					} catch (IOException e) {
+						
+						System.out.println(e);
+						e.printStackTrace();
+						
+					}
+										
 					send(message);
+					
 					break;
-				case "getProductionStepDuration":
+					
+				case "ProductionDurationResponce":
+					
 					message = new ACLMessage(ACLMessage.INFORM);
 					AID productAgentAID = new AID();
 					message.addReceiver(productAgentAID);
-					message.setOntology("");
+					message.setOntology("ProductionDuration");
+					message.setConversationId(msg.getConversationId());
+					
+					//TODO: kijk in blackboard naar de duration en stuur deze naar de PA
+					
+					
+					
 					send(message);
+					
 					break;
+					
 				case "scheduleStep":
                	 long timeslot = Long.parseLong(contentString);
                	 
@@ -266,7 +295,7 @@ public class EquipletAgent extends Agent {
 				BasicDBObject searchQuery = new BasicDBObject();
 				searchQuery.put("AID", getAID());
 
-				client.removeJson(gson.toJson(searchQuery));
+				client.removeDocuments(gson.toJson(searchQuery));
 			} catch (Exception e) {
 			}
 
