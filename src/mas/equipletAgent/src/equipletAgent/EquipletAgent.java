@@ -115,7 +115,7 @@ public class EquipletAgent extends Agent {
 				
 				DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 				EquipletDirectoryMessage entry = new EquipletDirectoryMessage(getAID(), capabilities, dbData);
-				client.insertJson(gson.toJson(entry));
+				client.insertDocument(gson.toJson(entry));
 			} catch (Exception e) {
 				this.doDelete();
 			}
@@ -180,7 +180,7 @@ public class EquipletAgent extends Agent {
 								ProductStepMessage entry = new ProductStepMessage(msg.getSender(), proStepC.getCapability(), 
 																				  null, null, null, 
 																				  ProductStepStatusCode.EVALUATING.getStatus(), null);
-								client.insertJson(gson.toJson(entry));
+								client.insertDocument(gson.toJson(entry));
 							} catch (Exception e) {
 								// TODO: ERROR HANDLING
 							}
@@ -241,9 +241,6 @@ public class EquipletAgent extends Agent {
                	 */
                	 break;
 				}
-
-				
-
 			}
 			block();
 		}
@@ -266,7 +263,7 @@ public class EquipletAgent extends Agent {
 				BasicDBObject searchQuery = new BasicDBObject();
 				searchQuery.put("AID", getAID());
 
-				client.removeJson(gson.toJson(searchQuery));
+				client.removeDocuments(gson.toJson(searchQuery));
 			} catch (Exception e) {
 			}
 
