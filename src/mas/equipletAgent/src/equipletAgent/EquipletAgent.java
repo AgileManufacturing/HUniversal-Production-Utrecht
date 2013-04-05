@@ -309,13 +309,15 @@ public class EquipletAgent extends Agent {
 
 					case "scheduleStep":
 						long timeslot = Long.parseLong(contentString);
-
+						client = new BlackboardClient(equipletDbIp);
+						
 						System.out.println("" + timeslot);
 						ACLMessage timeslotMessage = new ACLMessage(
 								ACLMessage.REQUEST);
 						timeslotMessage.addReceiver(serviceAgent);
-						timeslotMessage.setOntology("scheduleProductionStep");
+						timeslotMessage.setOntology("scheduleStepWithLogistics");
 						timeslotMessage.setContent(String.valueOf(timeslot));
+						timeslotMessage.setConversationId(msg.getConversationId());
 						send(timeslotMessage);
 						/*
 						 * TODO: Ask service agent to schedule the step with the
@@ -325,6 +327,9 @@ public class EquipletAgent extends Agent {
 						 * steps blackboard to PLANNED and add the schedule
 						 * data.
 						 */
+						ACLMessage confirmScheduleStep = new ACLMessage(ACLMessage.CONFIRM);
+						confirmScheduleStep.setConversationId(msg.getConversationId());
+						confirmScheduleStep.addReceiver(productAgentAID);
 						break;
 					}
 
