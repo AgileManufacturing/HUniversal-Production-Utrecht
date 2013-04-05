@@ -40,12 +40,12 @@ import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
-import ParameterList.ParameterList;
 import ParameterList.ProductionStep;
 import nl.hu.client.BlackboardClient;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -65,10 +65,9 @@ public class EquipletAgent extends Agent {
 	// This is the collective database used by all product agents and equiplets
 	// and contains the collection EquipletDirectory.
 	private DB collectiveDb = null;
-	private String collectiveDbIp = "localhost";
+	private String collectiveDbIp = "145.89.191.131";
 	private int collectiveDbPort = 27017;
 	private String collectiveDbName = "CollectiveDb";
-	// private DBCollection equipletDirectory = null;
 	private String equipletDirectoryName = "EquipletDirectory";
 
 	// This is the database specific for this equiplet, this database contains
@@ -86,10 +85,16 @@ public class EquipletAgent extends Agent {
 	// Arraylist with IDs of the capabilities of the equiplet
 	private ArrayList<Long> capabilities;
 
-	private Hashtable<AID, ObjectId> communicationTable;
+	private Hashtable<String, ObjectId> communicationTable;
 
 	public void setup() {
-		// set the database name to the name of the equiplet
+		// set the database name to the name of the equiplet and set the database ip to its own IP.
+		try{
+			InetAddress IP = InetAddress.getLocalHost();
+			equipletDbIp = IP.getHostAddress();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		equipletDbName = getAID().getLocalName();
 
 		// TODO: Not Hardcoded capabilities/get capabilities from the service
@@ -104,8 +109,7 @@ public class EquipletAgent extends Agent {
 		Gson gson = new Gson();
 		try {
 			// setup connection with MongoDB.
-			Mongo collectiveDbMongoClient = new Mongo(collectiveDbIp,
-					collectiveDbPort);
+			Mongo collectiveDbMongoClient = new Mongo(collectiveDbIp, collectiveDbPort);
 			collectiveDb = collectiveDbMongoClient.getDB(collectiveDbName);
 
 			// put capabilities on the equipletDirectory
@@ -114,10 +118,8 @@ public class EquipletAgent extends Agent {
 				client.setDatabase(collectiveDbName);
 				client.setCollection(equipletDirectoryName);
 
-				DbData dbData = new DbData(equipletDbIp, equipletDbPort,
-						equipletDbName);
-				EquipletDirectoryMessage entry = new EquipletDirectoryMessage(
-						getAID(), capabilities, dbData);
+				DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
+				EquipletDirectoryMessage entry = new EquipletDirectoryMessage(getAID(), capabilities, dbData);
 				client.insertDocument(gson.toJson(entry));
 			} catch (Exception e) {
 				this.doDelete();
@@ -125,8 +127,7 @@ public class EquipletAgent extends Agent {
 			collectiveDbMongoClient.close();
 
 			// creation of the productSteps database if it doesn't exist.
-			Mongo equipletDbMongoClient = new Mongo(equipletDbIp,
-					equipletDbPort);
+			Mongo equipletDbMongoClient = new Mongo(equipletDbIp, equipletDbPort);
 			equipletDb = equipletDbMongoClient.getDB(equipletDbName);
 			productSteps = equipletDb.getCollection(productStepsName);
 			equipletDbMongoClient.close();
@@ -146,8 +147,7 @@ public class EquipletAgent extends Agent {
 				ACLMessage msg = receive();
 				if (msg != null) {
 					// Process the message
-					System.out.println(getAID().getName()
-							+ " reporting: message received");
+					System.out.println(getAID().getName() + " reporting: message received");
 
 					// deserialize content
 					Object contentObject = null;
@@ -156,9 +156,7 @@ public class EquipletAgent extends Agent {
 					try {
 						contentObject = msg.getContentObject();
 					} catch (UnreadableException e) {
-						// TODO Auto-generated catch block
-						System.out
-								.println("Exception Caught, No Content Object Given");
+						System.out.println("Exception Caught, No Content Object Given");
 					}
 
 					// Start of the switch statement on the ontology
@@ -169,32 +167,24 @@ public class EquipletAgent extends Agent {
 					case "canPerformStep":
 						// getting the product step from the message.
 						ProductionStep proStepC = (ProductionStep) contentObject;
-						ParameterList pal = proStepC.getParameterList();
 
 						ObjectId productStepEntryId = null;
 						Gson gson = new Gson();
 
-						// Makes a database connection and puts the new step in
-						// it.
+						// Makes a database connection and puts the new step in it.
 						client = new BlackboardClient(equipletDbIp);
 						try {
 							client.setDatabase(equipletDbName);
 							client.setCollection(productStepsName);
 							// TODO: get inputParts
 							// TODO: get ouputPart
-							// TODO: get parameters
-							ProductStepMessage entry = new ProductStepMessage(
-									msg.getSender(), proStepC.getCapability(),
-									null, null, null,
-									ProductStepStatusCode.EVALUATING
-											.getStatus(), null);
-							productStepEntryId = client.insertDocument(gson
-									.toJson(entry));
-
-							// Asks the serviceAgent if it can perform this
-							// product step.
-							ACLMessage message = new ACLMessage(
-									ACLMessage.REQUEST);
+							ProductStepMessage entry = new ProductStepMessage(msg.getSender(), proStepC.getCapability(),
+									proStepC.getParameterList(), null, null,
+									ProductStepStatusCode.EVALUATING.getStatus(), null);
+							productStepEntryId = client.insertDocument(gson.toJson(entry));
+							communicationTable.put(msg.getConversationId(), productStepEntryId);
+							// Asks the serviceAgent if it can do this product step.
+							ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 							message.setConversationId(msg.getConversationId());
 							message.addReceiver(serviceAgent);
 							message.setOntology("canDoProductionStep");
@@ -233,24 +223,17 @@ public class EquipletAgent extends Agent {
 							query.put("_id", productStepEntryId);
 							productStep = client.findDocuments(query).get(0);
 							int status = (Integer) productStep.get("status");
-							AID productAgent = (AID) productStep
-									.get("productAgentId");
-							if (status == ProductStepStatusCode.EVALUATING
-									.getStatus()) {
-								ACLMessage message = new ACLMessage(
-										ACLMessage.CONFIRM);
-								message.setConversationId(msg
-										.getConversationId());
+							AID productAgent = (AID) productStep.get("productAgentId");
+							if (status == ProductStepStatusCode.EVALUATING.getStatus()) {
+								ACLMessage message = new ACLMessage(ACLMessage.CONFIRM);
+								message.setConversationId(msg.getConversationId());
 								message.setOntology("");// TODO: set ontology
 								message.addReceiver(productAgent);
 								message.setContent("This is possible");
 								send(message);
-							} else if (status == ProductStepStatusCode.ABORTED
-									.getStatus()) {
-								ACLMessage message = new ACLMessage(
-										ACLMessage.DISCONFIRM);
-								message.setConversationId(msg
-										.getConversationId());
+							} else if (status == ProductStepStatusCode.ABORTED.getStatus()) {
+								ACLMessage message = new ACLMessage(ACLMessage.DISCONFIRM);
+								message.setConversationId(msg.getConversationId());
 								message.setOntology("");// TODO: set ontology
 								message.addReceiver(productAgent);
 								message.setContent("This is impossible");
@@ -310,8 +293,7 @@ public class EquipletAgent extends Agent {
 						long timeslot = Long.parseLong(contentString);
 
 						System.out.println("" + timeslot);
-						ACLMessage timeslotMessage = new ACLMessage(
-								ACLMessage.REQUEST);
+						ACLMessage timeslotMessage = new ACLMessage(ACLMessage.REQUEST);
 						timeslotMessage.addReceiver(serviceAgent);
 						timeslotMessage.setOntology("scheduleProductionStep");
 						timeslotMessage.setContent(String.valueOf(timeslot));
@@ -337,8 +319,7 @@ public class EquipletAgent extends Agent {
 	public void takeDown() {
 		Gson gson = new Gson();
 		try {
-			Mongo collectiveDbMongoClient = new Mongo(collectiveDbIp,
-					collectiveDbPort);
+			Mongo collectiveDbMongoClient = new Mongo(collectiveDbIp, collectiveDbPort);
 			collectiveDb = collectiveDbMongoClient.getDB(collectiveDbName);
 
 			client = new BlackboardClient(collectiveDbIp);
@@ -359,8 +340,7 @@ public class EquipletAgent extends Agent {
 
 			// TODO: message to PA's
 
-			Mongo equipletDbMongoClient = new Mongo(equipletDbIp,
-					equipletDbPort);
+			Mongo equipletDbMongoClient = new Mongo(equipletDbIp, equipletDbPort);
 			equipletDb = equipletDbMongoClient.getDB(equipletDbName);
 			equipletDb.dropDatabase();
 			equipletDbMongoClient.close();
