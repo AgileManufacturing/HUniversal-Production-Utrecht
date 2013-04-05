@@ -7,7 +7,7 @@ import newDataClasses.Product;
 import newDataClasses.Production;
 import newDataClasses.ProductionEquipletMapper;
 import newDataClasses.ProductionStep;
-import main.MainAgent;
+//import main.MainAgent;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 
@@ -21,7 +21,7 @@ public class PlannerBehaviour extends CyclicBehaviour{
 	
 	public void action() {
 		// check all available equiplets	
-		MainAgent m = new MainAgent();
+		//MainAgent m = new MainAgent();
 		//Dictionary<AID, String> allEquiplets = m.allEquiplets;
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Dictionary<Object, AID> desiredEquiplets = new Hashtable(); // contains the current step + the agent ID
