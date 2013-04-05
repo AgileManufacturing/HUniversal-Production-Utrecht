@@ -1,5 +1,3 @@
-package blackboard;
-
 /**
  * @file BlackboardReader.java
  * @brief
@@ -10,7 +8,7 @@ package blackboard;
  * @section LICENSE
  * License: newBSD
  *
- * Copyright © 2013, HU University of Applied Sciences Utrecht.
+ * Copyright Â© 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

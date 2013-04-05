@@ -53,6 +53,7 @@ public class NegotiatorBehaviour extends CyclicBehaviour {
 						message.setOntology("CanPerformStep");
 						message.setContentObject(_productionStep);
 						_productAgent.send(message);
+						
 						System.out.println("send message to: " + _aid);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -64,12 +65,30 @@ public class NegotiatorBehaviour extends CyclicBehaviour {
 					MessageTemplate.MatchPerformative(ACLMessage.CONFIRM),
 					MessageTemplate.MatchConversationId(ConversationId));
 
-			addSubBehaviour(new receiveBehaviour(myAgent, 40000, template) {
+			addSubBehaviour(new receiveBehaviour(myAgent, 10000, template) {
 				public void handle(ACLMessage msg) {
 					if (msg == null)
 						System.out.println("Timeout");
-					else
-						System.out.println("Received: " + msg);
+					else{						
+						
+						System.out.println("Response Received: " + msg);
+					}
+				}
+			});
+			
+			addSubBehaviour(new OneShotBehaviour() {
+				public void action() {
+					try {
+						ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+						message.setConversationId(ConversationId);
+						message.addReceiver(_aid);
+						message.setOntology("GetProductionDuration");
+						message.setContentObject(_productionStep);
+						_productAgent.send(message);
+						System.out.println("send message to: " + _aid);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			});
 		}
