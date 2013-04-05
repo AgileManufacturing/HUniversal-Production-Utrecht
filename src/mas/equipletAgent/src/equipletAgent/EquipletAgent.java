@@ -51,6 +51,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import org.bson.BSONObject;
 import org.bson.types.ObjectId;
 
 /**
@@ -264,47 +265,70 @@ public class EquipletAgent extends Agent {
 						break;
 
 					case "getProductionDuration":
-						try {
-							contentObject = msg.getContentObject();
-						} catch (UnreadableException e1) {
-
-							System.out.println(e1);
-							e1.printStackTrace();
-
-						}
-						ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-						message.addReceiver(serviceAgent);
-						message.setConversationId(msg.getConversationId());
-						message.setOntology("getProductionStepDuration");
 
 						try {
+							
+						ObjectId contentObjectId = communicationTable.get(msg
+								.getConversationId());
+						
+							ACLMessage message = new ACLMessage(
+									ACLMessage.REQUEST);
+							message.addReceiver(serviceAgent);
+							message.setConversationId(msg.getConversationId());
+							message.setContentObject((Serializable)contentObjectId);
+							message.setOntology("getProductionStepDuration");
 
-							message.setContentObject((Serializable) contentObject);
+							try {
 
-						} catch (IOException e) {
+								message.setContentObject((Serializable) contentObject);
 
-							System.out.println(e);
-							e.printStackTrace();
+							} catch (IOException e) {
 
+								System.out.println(e);
+								e.printStackTrace();
+
+							}
+
+							send(message);
+
+						} catch (Exception e) {
+							// TODO: ERROR HANDLING
+							myAgent.doDelete();
 						}
-
-						send(message);
 
 						break;
 
 					case "ProductionDurationResponce":
 
-						message = new ACLMessage(ACLMessage.INFORM);
-						AID productAgentAID = new AID();
-						message.addReceiver(productAgentAID);
-						message.setOntology("ProductionDuration");
-						message.setConversationId(msg.getConversationId());
-
-						// TODO: kijk in blackboard naar de duration en stuur
-						// deze naar de PA
-
-						send(message);
-
+						try{
+							
+						
+						ObjectId contentObjectId = communicationTable.get(msg
+								.getConversationId());
+						client = new BlackboardClient(equipletDbIp);
+						
+							client.setDatabase(equipletDbName);
+							client.setCollection(productStepsName);
+							BasicDBObject query = new BasicDBObject();
+							query.put("_id", contentObjectId);
+							productStep = client.findDocuments(query).get(0);
+														
+							ScheduleData Schedule = (ScheduleData)productStep.get("scheduleData");
+							Long Duration = Schedule.getDuration();
+							////
+													
+							ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+							message.addReceiver((AID) productStep.get("productAgentId"));
+							message.setOntology("ProductionDuration");
+							message.setConversationId(msg.getConversationId());
+							message.setContentObject((Serializable) Duration);
+							
+							send(message);
+							
+						}catch(Exception e){
+							myAgent.doDelete();
+						}
+					
 						break;
 
 					case "scheduleStep":
