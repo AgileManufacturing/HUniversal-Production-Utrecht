@@ -1,67 +1,108 @@
 package productAgent;
 
 import jade.core.AID;
+import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.SequentialBehaviour;
+import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-
-import java.util.Enumeration;
-import java.util.Hashtable;
-
 import newDataClasses.ProductionStep;
 
 @SuppressWarnings("serial")
 public class NegotiatorBehaviour extends CyclicBehaviour {
 
-	private Productagent _productAgent;
-	private int _currentStep;
-	private Hashtable<ProductionStep, AID> _filteredEquipletsAndStepsList;
+	private ProductAgent _productAgent;
 
-	public NegotiatorBehaviour(Productagent pa) {
+	public NegotiatorBehaviour(ProductAgent pa) {
 		this._productAgent = pa;
-		_currentStep = 0;
-		_filteredEquipletsAndStepsList = new Hashtable<ProductionStep, AID>();
 	}
 
 	@Override
 	public void action() {
-		// Negotiate with the list containing possible equiplet agents.
-		// Store the plausible agents with the amount of time it will take
-		// (timeslots)
 
-		// For testing purposes. Only 1 & 3 can perform his steps.
-		_productAgent.canPerfStepEquiplet = new Hashtable<ProductionStep, AID>();
-		_productAgent.canPerfStepEquiplet.put(_productAgent.productionStepList
-				.get(0), new AID("eqa1", AID.ISLOCALNAME));
-		_productAgent.canPerfStepEquiplet.put(_productAgent.productionStepList
-				.get(1), new AID("eqa2", AID.ISLOCALNAME));
-		// End hard coded production step list
+		int timeSlots = -1;
 
-		switch (_currentStep) {
-		case 0:
-			//Lets ask each EQ-A whether they can perform the step
-			startSending();
-			_currentStep = 1;
-			break;
-		case 1:
-			//We have asked the EQ-A's. Now lets await their response.
-			startReceiving();
-			break;
-		}
+		// foreachProductionstep in object[]{
+		AID aid = _productAgent.getAID();
+		_productAgent.addBehaviour(new Conversation(aid, null));
+		// }
+
 	}
 
-	// Starts receiving msgs from the equiplet agents.
-	// It will only respond to CanPerformStep ontology msgs.
-	public void startReceiving() {
+	private class Conversation extends SequentialBehaviour {
+		private AID _aid;
+		private ProductionStep _productionStep;
+
+		public Conversation(AID aid, ProductionStep productionStep) {
+			this._aid = aid;
+			this._productionStep = productionStep;
+		}
+
+		public void onStart() {
+			final String ConversationId = _productAgent.generateCID();
+			addSubBehaviour(new OneShotBehaviour() {
+				public void action() {
+					try {
+						ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+						message.setConversationId(ConversationId);
+						message.addReceiver(_aid);
+						message.setOntology("CanPerformStep");
+						message.setContentObject(_productionStep);
+						_productAgent.send(message);
+						System.out.println("send message to: " + _aid);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+
+			MessageTemplate template = MessageTemplate.and(
+					MessageTemplate.MatchPerformative(ACLMessage.CONFIRM),
+					MessageTemplate.MatchConversationId(ConversationId));
+			addSubBehaviour(new receiveBehaviour(myAgent, 40000, template) {
+				public void handle(ACLMessage msg) {
+					if (msg == null)
+						System.out.println("Timeout");
+					else
+						System.out.println("Received: " + msg);
+
+				}
+			});
+		}
+
+	}
+
+	/*
+	 * Starts the conversation with the given equiplet agent how many timeslots
+	 * an step will take. Will initiate the converstion and then waits for the
+	 * response.
+	 */
+	public int doConversationStepDuration(ProductionStep step, AID aid) {
+		// Send the request with parameters
+		// Check if it is a confirm.
+		// if so, ask how long it will take
+		// save yerr shit
+		try {
+			ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+			message.addReceiver(aid);
+			message.setOntology("CanPerformStep");
+			message.setContentObject(step);
+			_productAgent.send(message);
+			System.out.println("send message to: " + aid);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// So much for the sending. Lets try to receive a response.
+
 		ACLMessage receive = _productAgent.receive(MessageTemplate
-				.MatchOntology("CanPerformStep"));
-		if (receive != null) {
+				.MatchOntology("GetStepDuration"));
+		if (receive != null && receive.getSender() == aid) {
 			try {
-				AID senderId = receive.getSender();
-				ProductionStep step = (ProductionStep) receive
-						.getContentObject();
 				if (receive.getPerformative() == ACLMessage.CONFIRM) {
-					_filteredEquipletsAndStepsList.put(step, senderId);
+					return 1;
 				}
 
 			} catch (Exception e) {
@@ -70,32 +111,86 @@ public class NegotiatorBehaviour extends CyclicBehaviour {
 		} else {
 			block();
 		}
+		return -1;
 	}
 
-	// Starts sending msgs to the equiplet agents in the possible equiplet agent
-	// list.
-	public void startSending() {
-		// Foreach equipletagent
- 
-		Enumeration<ProductionStep> keys = _productAgent.canPerfStepEquiplet.keys();
-		while (keys.hasMoreElements()) {
-			// iterate over each step in the canPerfStepEquiplet hashtable
-			// retrieve the elements
-			ProductionStep step = (ProductionStep) keys.nextElement();
-			AID Aid = _productAgent.canPerfStepEquiplet.get(step);
-			
-			try {
-				ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-				message.addReceiver(Aid);
-				message.setOntology("CanPerformStep");
-				message.setContentObject(step);
-				_productAgent.send(message);
-				System.out.println("send message to: " + Aid);
+	// --- Methods to initialize ACLMessages -------------------
 
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+	private ACLMessage newMsg(int perf, String content, AID dest) {
+		ACLMessage msg = newMsg(perf);
+		if (dest != null)
+			msg.addReceiver(dest);
+		msg.setContent(content);
+		return msg;
+	}
+
+	private ACLMessage newMsg(int perf) {
+		ACLMessage msg = new ACLMessage(perf);
+		msg.setConversationId(_productAgent.generateCID());
+		return msg;
+	}
+}
+
+@SuppressWarnings("serial")
+class receiveBehaviour extends SimpleBehaviour {
+
+	private MessageTemplate template;
+	private long timeOut, wakeupTime;
+	private boolean finished;
+
+	private ACLMessage msg;
+
+	public ACLMessage getMessage() {
+		return msg;
+	}
+
+	public receiveBehaviour(Agent a, int millis, MessageTemplate mt) {
+		super(a);
+		timeOut = millis;
+		template = mt;
+	}
+
+	public void onStart() {
+		wakeupTime = (timeOut < 0 ? Long.MAX_VALUE : System.currentTimeMillis()
+				+ timeOut);
+	}
+
+	public boolean done() {
+		return finished;
+	}
+
+	public void action() {
+		if (template == null)
+			msg = myAgent.receive();
+		else
+			msg = myAgent.receive(template);
+
+		if (msg != null) {
+			finished = true;
+			handle(msg);
+			return;
 		}
+		long dt = wakeupTime - System.currentTimeMillis();
+		if (dt > 0)
+			block(dt);
+		else {
+			finished = true;
+			handle(msg);
+		}
+	}
+
+	public void handle(ACLMessage m) { /* can be redefined in sub_class */
+	}
+
+	public void reset() {
+		msg = null;
+		finished = false;
+		super.reset();
+	}
+
+	public void reset(int dt) {
+		timeOut = dt;
+		reset();
 	}
 
 }

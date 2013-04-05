@@ -1,38 +1,44 @@
 package productAgent;
 
-import jade.core.AID;
 import jade.core.Agent;
+import newDataClasses.Product;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
+public class ProductAgent extends Agent {
+	//Private fields
+	private Product _product;
+	
+	//CID variables
+	private static int _cidCnt = 0;
+	private String _cidBase;
 
-import newDataClasses.ProductionStep;
+	protected void setup() {
+		try {
+			_product = (Product) getArguments()[0];
 
-public class Productagent extends Agent {
+			NegotiatorBehaviour nb = new NegotiatorBehaviour(this);
+			addBehaviour(nb);
 
-public Hashtable<ProductionStep, AID> canPerfStepEquiplet;
-public Hashtable canPerfStepWithParamsEquiplet;
-public ArrayList<ProductionStep> productionStepList;
+			System.out.println("I spawned as a product agent");
 
-	  protected void setup() {
-			try {
-				
-				productionStepList = new ArrayList<ProductionStep>();
-				for(Object t : getArguments()){ 
-					// At this moment we want to cast each item.
-					//This should be updated later however.
-					productionStepList.add((ProductionStep)t);	
-				}
-				
-				NegotiatorBehaviour nb = new NegotiatorBehaviour(this);
-				addBehaviour(nb);
-				//WaitMsgBehaviour behaviour = new WaitMsgBehaviour();
-				
-				System.out.println("I spawned as a product agent");
-				
-			} catch (Exception e) {
-				System.out.println("Exited with: " + e);
-				doDelete();
-			}
-	  } 
+		} catch (Exception e) {
+			System.out.println("Exited with: " + e);
+			doDelete();
+		}
+	}
+
+	/*
+	 * Generates an unique conversation id based on the agents localname,
+	 * the objects hashcode and the current time.
+	 */
+	public String generateCID() {
+		if (_cidBase == null) {
+			_cidBase = getLocalName() + hashCode() + System.currentTimeMillis()
+					% 10000 + "_";
+		}
+		return _cidBase + (_cidCnt++);
+	}
+
+	public Product getProduct() {
+		return this._product;
+	}
 }
