@@ -24,6 +24,7 @@ public class ProductionStep implements Serializable {
 
 	private int _requiredTimeSlots;
 	private long _id;
+	private long _capability;
 	
 	private ParameterList _parameters;
 
@@ -50,6 +51,14 @@ public class ProductionStep implements Serializable {
 	
 	public ParameterList getParameterList() {
 		return _parameters;
+	}
+
+	public long getCapability() {
+		return _capability;
+	}
+
+	public void setCapability(long _capability) {
+		this._capability = _capability;
 	}
 	
 }

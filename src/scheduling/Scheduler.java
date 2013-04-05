@@ -18,6 +18,6 @@ public class Scheduler {
 	}
 	
 	private void schedule(AID equiplet, int startTimeslot){
-		blackboard.place(equipletID, startTimeSlot);
+		//blackboard.place(equipletID, startTimeSlot);
 	}
 }
