@@ -12,6 +12,13 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import newDataClasses.Parameter;
+import newDataClasses.ParameterGroup;
+import newDataClasses.ParameterList;
+import newDataClasses.Product;
+import newDataClasses.Production;
+import newDataClasses.ProductionStep;
+
 /**
  *
  * @author wouter
@@ -25,49 +32,110 @@ public class JadeAgentX extends Agent {
         try{
         System.out.println("starting a agent");
         
-        Dictionary d=new Hashtable();
-        d.put("x", "1");
-        d.put("y", "2");
-        
-        ArrayList<String> inputParts = new ArrayList<String>();
-        ArrayList<String> outputParts = new ArrayList<String>();
-        
-        inputParts.add("part1");
-        inputParts.add("part2");
-        
-        outputParts.add("object1");
-        outputParts.add("object2");
-
         ArrayList<Long> capabilities1 = new ArrayList<Long>();
-        capabilities1.add(3l);
-        capabilities1.add(4l);
+        capabilities1.add(1l);
         
         String serviceAgentName = "serviceAgent1";
         ((AgentController)getContainerController().createNewAgent(serviceAgentName, "serviceAgent.ServiceAgent", null)).start();
         
-        Object[] ar = new Object[]{capabilities1, serviceAgentName, d, inputParts, outputParts};
-        ((AgentController)getContainerController().createNewAgent("equipletAgent1", "equipletAgent.EquipletAgent", ar)).start();
+        Object[] ar = new Object[]{capabilities1, serviceAgentName};
+        ((AgentController)getContainerController().createNewAgent("eqa1", "equipletAgent.EquipletAgent", ar)).start();
         // TODO code application logic here
         ArrayList<Long> capabilities2 = new ArrayList<Long>();
         //capabilities2.clear();
-        capabilities2.add(6l);
-        capabilities2.add(3l);
-        capabilities2.add(5l);
+        capabilities2.add(2l);
         
-        ar = new Object[]{capabilities2, serviceAgentName, d, inputParts, outputParts};
-        ((AgentController)getContainerController().createNewAgent("equipletAgent2", "equipletAgent.EquipletAgent", ar)).start();
+        ar = new Object[]{capabilities2, serviceAgentName};
+        ((AgentController)getContainerController().createNewAgent("eqa2", "equipletAgent.EquipletAgent", ar)).start();
         
         ArrayList<Long> capabilities3 = new ArrayList<Long>();
         //capabilities3.clear();
-        capabilities3.add(1l);
-        capabilities3.add(2l);
-        capabilities3.add(4l);
+        capabilities3.add(3l);
         
-        ar = new Object[]{capabilities3, serviceAgentName, d, inputParts, outputParts};
-        ((AgentController)getContainerController().createNewAgent("equipletAgent3", "equipletAgent.EquipletAgent", ar)).start();
+        ar = new Object[]{capabilities3, serviceAgentName};
+        ((AgentController)getContainerController().createNewAgent("eqa3", "equipletAgent.EquipletAgent", ar)).start();
         
         ar = null;
         
+        // Lets make a parameter list
+		ParameterList parameterList = new ParameterList();
+		ParameterGroup p = new ParameterGroup("Color"); // group colour
+		p.add(new Parameter("Id", "1"));
+		parameterList.AddParameterGroup(p);
+
+		p = new ParameterGroup("Shape"); // group shape
+		p.add(new Parameter("Id", "2"));
+		parameterList.AddParameterGroup(p);
+
+		p = new ParameterGroup("loc"); // group location
+		p.add(new Parameter("x", "2"));
+		p.add(new Parameter("y", "2"));
+		parameterList.AddParameterGroup(p);
+
+		// Next we want to have some production steps
+		ProductionStep stp1 = new ProductionStep(1, parameterList);
+
+		p = new ParameterGroup("Color"); // group colour
+		p.add(new Parameter("Id", "3"));
+		parameterList.AddParameterGroup(p);
+
+		p = new ParameterGroup("Shape"); // group shape
+		p.add(new Parameter("Id", "4"));
+		parameterList.AddParameterGroup(p);
+
+		p = new ParameterGroup("loc"); // group location
+		p.add(new Parameter("x", "2"));
+		p.add(new Parameter("y", "2"));
+		parameterList.AddParameterGroup(p);
+
+		ProductionStep stp2 = new ProductionStep(2, parameterList);
+
+		p = new ParameterGroup("Color"); // group colour
+		p.add(new Parameter("Id", "5"));
+		parameterList.AddParameterGroup(p);
+
+		p = new ParameterGroup("Shape"); // group shape
+		p.add(new Parameter("Id", "6"));
+		parameterList.AddParameterGroup(p);
+
+		p = new ParameterGroup("loc"); // group location
+		p.add(new Parameter("x", "2"));
+		p.add(new Parameter("y", "2"));
+		parameterList.AddParameterGroup(p);
+
+		ProductionStep stp3 = new ProductionStep(3, parameterList);
+
+		p = new ParameterGroup("Color"); // group colour
+		p.add(new Parameter("Id", "7"));
+		parameterList.AddParameterGroup(p);
+
+		p = new ParameterGroup("Shape"); // group shape
+		p.add(new Parameter("Id", "8"));
+		parameterList.AddParameterGroup(p);
+
+		p = new ParameterGroup("loc"); // group location
+		p.add(new Parameter("x", "2"));
+		p.add(new Parameter("y", "2"));
+		parameterList.AddParameterGroup(p);
+
+		ProductionStep stp4 = new ProductionStep(4, parameterList);
+
+		// Our argument for the product agent. The total production of the
+		// product,
+		// consists of multiple steps
+		ProductionStep[] stepList = new ProductionStep[] { stp1, stp2,
+				stp3, stp4 };
+
+		Production production = new Production(stepList);
+		Product product = new Product(production);
+
+		//We need to pass an Object[] to the createNewAgent. 
+		// But we only want to pass our product!
+		Object[] arg = new Object[1];
+		arg[0] = product;
+
+		((AgentController) getContainerController().createNewAgent("pa1",
+				"productAgent.ProductAgent", arg)).start();
         
         }catch(Exception e){
             

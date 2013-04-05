@@ -34,7 +34,7 @@ import jade.core.AID;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import ParameterList.ParameterList;
+import newDataClasses.ParameterList;
 /**
  * Implementation of a message for the productstep blackboard
  */

@@ -40,7 +40,8 @@ import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
-import ParameterList.ProductionStep;
+import newDataClasses.ParameterList;
+import newDataClasses.ProductionStep;
 import nl.hu.client.BlackboardClient;
 import serviceAgent.ServiceAgent;
 
@@ -67,7 +68,7 @@ public class EquipletAgent extends Agent {
 	// This is the collective database used by all product agents and equiplets
 	// and contains the collection EquipletDirectory.
 	private DB collectiveDb = null;
-	private String collectiveDbIp = "145.89.191.131";
+	private String collectiveDbIp = "localhost";
 	private int collectiveDbPort = 27017;
 	private String collectiveDbName = "CollectiveDb";
 	private String equipletDirectoryName = "EquipletDirectory";
@@ -98,7 +99,7 @@ public class EquipletAgent extends Agent {
 			e.printStackTrace();
 		}
 		equipletDbName = getAID().getLocalName();
-
+		communicationTable = new Hashtable<String, ObjectId>();
 		// TODO: Not Hardcoded capabilities/get capabilities from the service
 		// agent.
 		Object[] args = getArguments();
@@ -109,33 +110,18 @@ public class EquipletAgent extends Agent {
 		}
 		
 		Gson gson = new Gson();
+		// put capabilities on the equipletDirectory
 		try {
-			// setup connection with MongoDB.
-			Mongo collectiveDbMongoClient = new Mongo(collectiveDbIp, collectiveDbPort);
-			collectiveDb = collectiveDbMongoClient.getDB(collectiveDbName);
-			
-			// put capabilities on the equipletDirectory
 			client = new BlackboardClient(collectiveDbIp);
-			try {
-				client.setDatabase(collectiveDbName);
-				client.setCollection(equipletDirectoryName);
-
-				DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
-				EquipletDirectoryMessage entry = new EquipletDirectoryMessage(getAID(), capabilities, dbData);
-				client.insertDocument(gson.toJson(entry));
-			} catch (Exception e) {
-				this.doDelete();
-			}
-			collectiveDbMongoClient.close();
-
-			// creation of the productSteps database if it doesn't exist.
-			Mongo equipletDbMongoClient = new Mongo(equipletDbIp, equipletDbPort);
-			equipletDb = equipletDbMongoClient.getDB(equipletDbName);
-			productSteps = equipletDb.getCollection(productStepsName);
-			equipletDbMongoClient.close();
-		} catch (UnknownHostException e1) {
+			client.setDatabase(collectiveDbName);
+			client.setCollection(equipletDirectoryName);
+			DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
+			EquipletDirectoryMessage entry = new EquipletDirectoryMessage(getAID(), capabilities, dbData);
+			client.insertDocument(gson.toJson(entry));
+		} catch (Exception e) {
 			this.doDelete();
 		}
+		
 
 		// Behaviour for receiving messages, checks each 5000
 		 addBehaviour(new CyclicBehaviour(this) {
@@ -166,16 +152,15 @@ public class EquipletAgent extends Agent {
 					switch (msg.getOntology()) {
 
 					// Case to check if the equiplet can perform the given step.
-					case "canPerformStep":
+					case "CanPerformStep":
 						// getting the product step from the message.
 						ProductionStep proStepC = (ProductionStep) contentObject;
-
 						ObjectId productStepEntryId = null;
 						Gson gson = new Gson();
 
 						// Makes a database connection and puts the new step in it.
-						client = new BlackboardClient(equipletDbIp);
 						try {
+							client = new BlackboardClient(equipletDbIp);
 							client.setDatabase(equipletDbName);
 							client.setCollection(productStepsName);
 							// TODO: get inputParts
@@ -193,11 +178,13 @@ public class EquipletAgent extends Agent {
 							try {
 								message.setContentObject((Serializable) productStepEntryId);
 							} catch (IOException e) {
+								e.printStackTrace();
 								// TODO: ERROR HANDLING'
 								myAgent.doDelete();
 							}
 							send(message);
 						} catch (Exception e) {
+							e.printStackTrace();
 							// TODO: ERROR HANDLING
 							myAgent.doDelete();
 						}
@@ -211,8 +198,9 @@ public class EquipletAgent extends Agent {
 
 						try {
 							productStepEntryId = (ObjectId) contentObject;
-						} catch (ClassCastException ex) {
+						} catch (ClassCastException e) {
 							// TODO: ERROR HANDLING
+							e.printStackTrace();
 							myAgent.doDelete();
 						}
 						// Makes a database connection and gets the right
@@ -243,11 +231,12 @@ public class EquipletAgent extends Agent {
 							}
 						} catch (Exception e) {
 							// TODO: ERROR HANDLING
+							e.printStackTrace();
 							myAgent.doDelete();
 						}
 						break;
 
-					case "getProductionDuration":
+					case "GetProductionDuration":
 
 						try {
 							
@@ -276,6 +265,7 @@ public class EquipletAgent extends Agent {
 
 						} catch (Exception e) {
 							// TODO: ERROR HANDLING
+							e.printStackTrace();
 							myAgent.doDelete();
 						}
 
@@ -360,9 +350,6 @@ public class EquipletAgent extends Agent {
 	public void takeDown() {
 		Gson gson = new Gson();
 		try {
-			Mongo collectiveDbMongoClient = new Mongo(collectiveDbIp, collectiveDbPort);
-			collectiveDb = collectiveDbMongoClient.getDB(collectiveDbName);
-
 			client = new BlackboardClient(collectiveDbIp);
 			try {
 				client.setDatabase(collectiveDbName);
@@ -376,16 +363,14 @@ public class EquipletAgent extends Agent {
 				// The equiplet is already going down, so it has to do nothing
 				// here.
 			}
-
-			collectiveDbMongoClient.close();
-
 			// TODO: message to PA's
 
-			Mongo equipletDbMongoClient = new Mongo(equipletDbIp, equipletDbPort);
+			/*Mongo equipletDbMongoClient = new Mongo(equipletDbIp, equipletDbPort);
 			equipletDb = equipletDbMongoClient.getDB(equipletDbName);
 			equipletDb.dropDatabase();
-			equipletDbMongoClient.close();
-		} catch (UnknownHostException e) {
+			equipletDbMongoClient.close();*/
+		} catch (Exception e) {
+			e.printStackTrace();
 			// The equiplet is already going down, so it has to do nothing here.
 		}
 	}
