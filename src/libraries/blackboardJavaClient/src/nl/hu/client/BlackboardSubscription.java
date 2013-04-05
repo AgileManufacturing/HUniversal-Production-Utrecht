@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file BlackboardSubscription.java
  * @brief Basic object for storing blackboard subscriptions.
  * @date Created: 2012-04-04
@@ -8,7 +8,7 @@
  * @section LICENSE
  * License: newBSD
  *
- * Copyright � 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -31,24 +31,53 @@
 
 package nl.hu.client;
 
-
+/**
+ * Object representing a subscriptiong to a blackboard event.
+ *
+ */
 public class BlackboardSubscription {
+	/**
+	 * @var MongoOperation operation
+	 * The operation the subscriber wishes to respond to.
+	 */
 	private MongoOperation operation;
+	/**
+	 * @var BlackboardSubscriber subscriber
+	 * The object that should be called when the specifiedk operation occurs.
+	 */
 	private BlackboardSubscriber subscriber;
 	
+	/**
+	 * Creates a BlackboardSubscriber object.
+	 * 
+	 * @param operation The operation the subscriber wishes to respond to.
+	 * @param subscriber The object that should be called when the specifiedk operation occurs.
+	 */
 	public BlackboardSubscription(MongoOperation operation, BlackboardSubscriber subscriber) {
 		this.operation = operation;
 		this.subscriber = subscriber;
 	}
 
+	/**
+	 * Returns the operation associated with this subscription.
+	 * @return The operation associated with this subscription.
+	 */
 	public MongoOperation getOperation() {
 		return operation;
 	}
 
+	/**
+	 * Returns the subscriber for this subscription.
+	 * @return The subscriber for this subscription.
+	 */
 	public BlackboardSubscriber getSubscriber() {
 		return subscriber;
 	}
 
+	/**
+	 * Computes the hashcode for this object.
+	 * @return Hashcode for this object.
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -60,6 +89,11 @@ public class BlackboardSubscription {
 		return result;
 	}
 
+	/**
+	 * Checks whether two BlackboardSubscription objects are equal.
+	 * Two objects are regarded as equals when both its operation and subscriber are equal.
+	 * @return Whether or not the two objects are equal.
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
