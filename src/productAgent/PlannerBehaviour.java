@@ -8,11 +8,16 @@ import jade.core.behaviours.CyclicBehaviour;
 
 @SuppressWarnings("serial")
 public class PlannerBehaviour extends CyclicBehaviour{
-	@Override
+	private ProductAgent _productAgent;
+
+	public PlannerBehaviour(ProductAgent pa) {
+		this._productAgent = pa;
+	}
+	
 	public void action() {
 		// check all available equiplets	
 		MainAgent m = new MainAgent();
-		Dictionary<AID, String> allEquiplets = m.allEquiplets;
+		//Dictionary<AID, String> allEquiplets = m.allEquiplets;
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Dictionary<Object, AID> desiredEquiplets = new Hashtable(); // contains the current step + the agent ID
 		

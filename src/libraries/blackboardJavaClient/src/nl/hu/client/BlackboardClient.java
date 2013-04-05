@@ -31,13 +31,20 @@
  * @note 2013-04-04 JWW: Generalized BlackboardClient. Can now be used for more than just listening to topics.
  **/
 
-package nl.hu.client;
-
-import com.mongodb.*;
-import com.mongodb.util.JSON;
+package libraries.blackboardJavaClient.src.nl.hu.client;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.Bytes;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.mongodb.Mongo;
+import com.mongodb.MongoInterruptedException;
+import com.mongodb.util.JSON;
 
 /**
  * Client class for a mongodb blackboard.
