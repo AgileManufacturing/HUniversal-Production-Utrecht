@@ -332,17 +332,25 @@ public class EquipletAgent extends Agent {
 						break;
 
 					case "scheduleStep":
-						long timeslot = Long.parseLong(contentString);
-						client = new BlackboardClient(equipletDbIp);
-						
-						System.out.println("" + timeslot);
-						ACLMessage timeslotMessage = new ACLMessage(
-								ACLMessage.REQUEST);
-						timeslotMessage.addReceiver(serviceAgent);
-						timeslotMessage.setOntology("scheduleStepWithLogistics");
-						timeslotMessage.setContent(String.valueOf(timeslot));
-						timeslotMessage.setConversationId(msg.getConversationId());
-						send(timeslotMessage);
+						try{
+							
+							long timeslot = Long.parseLong(contentString);
+							ObjectId contentObjectId = communicationTable.get(msg
+									.getConversationId());
+							client = new BlackboardClient(equipletDbIp);
+							client.setDatabase(equipletDbName);
+							client.setCollection(productStepsName);
+							BasicDBObject query = new BasicDBObject();
+							query.put("_id", contentObjectId);
+							productStep = client.findDocuments(query).get(0);
+							System.out.println("" + timeslot);
+							ACLMessage timeslotMessage = new ACLMessage(
+									ACLMessage.REQUEST);
+							timeslotMessage.addReceiver(serviceAgent);
+							timeslotMessage.setOntology("scheduleStepWithLogistics");
+							timeslotMessage.setContent(String.valueOf(timeslot));
+							timeslotMessage.setConversationId(msg.getConversationId());
+							send(timeslotMessage);
 						/*
 						 * TODO: Ask service agent to schedule the step with the
 						 * logistics at time X if possible. Wait for result.
@@ -351,19 +359,21 @@ public class EquipletAgent extends Agent {
 						 * steps blackboard to PLANNED and add the schedule
 						 * data.
 						 */
-						ACLMessage confirmScheduleStep = new ACLMessage(ACLMessage.CONFIRM);
-						confirmScheduleStep.setConversationId(msg.getConversationId());
-						confirmScheduleStep.addReceiver(productAgentAID);
-						break;
+							ACLMessage confirmScheduleStep = new ACLMessage(ACLMessage.CONFIRM);
+							confirmScheduleStep.setConversationId(msg.getConversationId());
+							confirmScheduleStep.addReceiver((AID) productStep.get("productAgentId"));
+							}
+							catch(Exception e){
+							
+							}
+							break;
 					}
 
 			}
 			block();
 		}
 	});
-
 	}
-
 	public void takeDown() {
 		Gson gson = new Gson();
 		try {
@@ -397,6 +407,5 @@ public class EquipletAgent extends Agent {
 		} catch (UnknownHostException e) {
 			// The equiplet is already going down, so it has to do nothing here.
 		}
-
 	}
 }
