@@ -1,10 +1,8 @@
-﻿/**
+/**
  * @file BlackboardClient.java
- * @brief Class representing a blackboard connection.
- * @date Created: 2012-04-04
+ * @brief Symbolizes an blackboardclient.
  *
  * @author 1.0 Dick van der Steen
- * @author Jan-Willem Willebrands
  *
  * @section LICENSE
  * License: newBSD
@@ -27,22 +25,33 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- * @note 2013-04-04 JWW: Generalized BlackboardClient. Can now be used for more than just listening to topics.
  **/
 
-package nl.hu.client;
+package libraries.blackboardJavaClient.src.nl.hu.client;
 
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * Client class for a mongodb blackboard.
  **/
 public class BlackboardClient {
+	/**
+	 * @var String OR_OPERAND
+	 * Or operand used by MongoDB.
+	 **/
+	private final String OR_OPERAND = "$or";
+
+	/**
+	 * @var String AND_OPERAND
+	 * And operand used by MongoDB.
+	 **/
+	private final String AND_OPERAND = "$and";
+
 	/**
 	 * @var String OPLOG
 	 * Operation log collection name of MongoDB.
@@ -65,7 +74,7 @@ public class BlackboardClient {
 	 * @var HashMap<String, BasicDBObject> subscriptions
 	 * Link between subscribed topic name and MongoDbs BasicDBObjects
 	 **/
-	private ArrayList<BlackboardSubscription> subscriptions;
+	private HashMap<String, BasicDBObject> subscriptions;
 
 	/**
 	 * @var String collection
@@ -80,6 +89,12 @@ public class BlackboardClient {
 	private String database;
 
 	/**
+	 * @var ISubscriber callback
+	 * Callback object for incoming messages on subscribed topic.
+	 **/
+	private ISubscriber callback;
+
+	/**
 	 * @var DB currentDatabase
 	 * Database object of the currently used database
 	 **/
@@ -92,35 +107,80 @@ public class BlackboardClient {
 	private DBCollection currentCollection;
 
 	/**
+	 * @var TailedCursorThread tailableCursorThread
+	 * Thread for tracking tailable cursor on operation log of MongoDB
+	 **/
+	private TailedCursorThread tailableCursorThread;
+
+	/**
 	 * @var DBCursor tailedCursor
 	 * TailedCursor for tracking changes on the operation log of MongoDB
 	 **/
 	private DBCursor tailedCursor;
 
 	/**
-	 * @var DB oplogDatabase
+	 * @var DB OPLOG_DATABASE
 	 * Database object of the oplog database
 	 **/
-	private DB oplogDatabase;
+	private DB OPLOG_DATABASE;
 
 	/**
-	 * @var DBCollection oplogCollection
+	 * @var DBCollection OPLOG_COLLECTION
 	 * DBCollection object of the oplog collection
 	 **/
-	private DBCollection oplogCollection;
+	private DBCollection OPLOG_COLLECTION;
 
-	private TailedCursorThread tcThread;
-	
+	/**
+	 * Class for tailable cursor thread within the client
+	 **/
+	public class TailedCursorThread extends Thread {
+		/**
+		 * Constructor of TailedCursorThread.
+		 **/
+		public TailedCursorThread() {
+			OPLOG_DATABASE = mongo.getDB(LOCAL);
+			OPLOG_COLLECTION = OPLOG_DATABASE.getCollection(OPLOG);
+
+			BasicDBObject where = new BasicDBObject();
+			where.put("ns", database + "." + collection);
+			tailedCursor = OPLOG_COLLECTION.find(where).addOption(Bytes.QUERYOPTION_TAILABLE).addOption(Bytes.QUERYOPTION_AWAITDATA);
+			tailedCursor.skip(tailedCursor.size());
+		}
+
+		/**
+		 * Run method for the TailedCursorThread. This will check for changes within the cursor and calls the onMessage method of its subscriber.
+		 **/
+		@Override
+		public void run() {
+			String operation;
+			while (true) {
+				while (tailedCursor.hasNext()) {
+					DBObject object = (DBObject) tailedCursor.next();
+					operation = object.get("op").toString();
+					if (operation.equals("i")) {
+						BasicDBObject o = (BasicDBObject) object.get("o");
+						String topic = o.get("topic").toString();
+						if (subscriptions.get(topic) != null) {
+							callback.onMessage(topic, o.get("message"));
+						}
+
+					}
+				}
+			}
+		}
+	}
+
 	/**
 	 * Constructor of BlackboardClient.
 	 *
 	 * @param host The mongoDB host.
 	 * @param subscriber The subscriber.
 	 **/
-	public BlackboardClient(String host) {
+	public BlackboardClient(String host, ISubscriber subscriber) {
 		try {
-			this.subscriptions = new ArrayList<BlackboardSubscription>();
+			this.subscriptions = new HashMap<String, BasicDBObject>();
 			this.mongo = new Mongo(host);
+			this.callback = subscriber;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -133,10 +193,11 @@ public class BlackboardClient {
 	 * @param port The port of the MongoDB host.
 	 * @param subscriber The subscriber.
 	 **/
-	public BlackboardClient(String host, int port) {
+	public BlackboardClient(String host, int port, ISubscriber subscriber) {
 		try {
-			this.subscriptions = new ArrayList<BlackboardSubscription>();
+			this.subscriptions = new HashMap<String, BasicDBObject>();
 			this.mongo = new Mongo(host, port);
+			this.callback = subscriber;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -146,27 +207,25 @@ public class BlackboardClient {
 	 * Sets the database to use.
 	 *
 	 * @param database The database to load from MongoDB.
-	 * @throws Exception 
 	 **/
-	public void setDatabase(String database) throws Exception {
-		if (database == null || database.isEmpty()) {
-			throw new Exception("Database name cannot be empty.");
-		}
+	public void setDatabase(String database) {
 		this.database = database;
 		currentDatabase = mongo.getDB(this.database);
 	}
 
 	/**
-	 * Sets the collection to use.
+	 * Sets the collection to use. Will start an TailedCursorThread.
 	 *
 	 * @param collection The collection to load from MongoDB.
 	 **/
 	public void setCollection(String collection) throws Exception {
-		if (currentDatabase == null) {
+		if (database.isEmpty() || database == null) {
 			throw new Exception("No database selected");
 		}
 		this.collection = collection;
 		currentCollection = currentDatabase.getCollection(this.collection);
+		this.tailableCursorThread = new TailedCursorThread();
+		this.tailableCursorThread.start();
 	}
 
 	/**
@@ -175,9 +234,9 @@ public class BlackboardClient {
 	 * @param json The json format for the MongoDB insert statement.
 	 **/
 	public void insertJson(String json) throws Exception {
-		if (collection == null || collection.isEmpty()) {
+		if (collection.isEmpty() || collection == null) {
 			throw new Exception("No collection selected");
-		} else if (database == null || database.isEmpty()) {
+		} else if (database.isEmpty() || database == null) {
 			throw new Exception("No database selected");
 		}
 		currentCollection.insert((DBObject) JSON.parse(json));
@@ -189,9 +248,9 @@ public class BlackboardClient {
 	 * @param json The json format for the MongoDB remove statement.
 	 **/
 	public void removeJson(String json) throws Exception {
-		if (collection == null || collection.isEmpty()) {
+		if (collection.isEmpty() || collection == null) {
 			throw new Exception("No collection selected");
-		} else if (database == null || database.isEmpty()) {
+		} else if (database.isEmpty() || database == null) {
 			throw new Exception("No database selected");
 		}
 		currentCollection.remove((DBObject) JSON.parse(json));
@@ -203,9 +262,10 @@ public class BlackboardClient {
 	 * @param json The json format for the MongoDB query statement.
 	 **/
 	public ArrayList<String> getJson(String json) throws Exception {
-		if (collection == null || collection.isEmpty()) {
+		int size = 0;
+		if (collection.isEmpty() || collection == null) {
 			throw new Exception("No collection selected");
-		} else if (database == null || database.isEmpty()) {
+		} else if (database.isEmpty() || database == null) {
 			throw new Exception("No database selected");
 		}
 		ArrayList<String> jsons = new ArrayList<String>();
@@ -217,9 +277,33 @@ public class BlackboardClient {
 	}
 
 	/**
+	 * Reads an message from the MongoDB blackboard.
+	 *
+	 * @param TODO
+	 **/
+	public String read() throws Exception {
+		if (collection.isEmpty() || collection == null) {
+			throw new Exception("No collection selected");
+		} else if (database.isEmpty() || database == null) {
+			throw new Exception("No database selected");
+		} else if (subscriptions.size() == 0) {
+			throw new Exception("No subscriptions has been found");
+		}
+
+		BasicDBObject messageCheckObject = new BasicDBObject();
+		messageCheckObject.put(OR_OPERAND, subscriptions.values());
+		BasicDBObject message = (BasicDBObject) currentCollection.findOne(messageCheckObject);
+		if (message != null) {
+			return message.toString();
+		}
+		return null;
+	}
+
+	/**
 	 * Removes first message on blackboard
 	 **/
 	public void removeFirst() {
+		BasicDBObject messageCheckObject = new BasicDBObject();
 		BasicDBObject message = (BasicDBObject) currentCollection.findOne();
 		currentCollection.remove(message);
 	}
@@ -232,9 +316,9 @@ public class BlackboardClient {
 	 * @param unset The json format for the MongoDB unset statement.
 	 **/
 	public void updateJson(String query, String set, String unset) throws Exception {
-		if (collection == null || collection.isEmpty()) {
+		if (collection.isEmpty() || collection == null) {
 			throw new Exception("No collection selected");
-		} else if (database == null || database.isEmpty()) {
+		} else if (database.isEmpty() || database == null) {
 			throw new Exception("No database selected");
 		}
 		if (set == null) {
@@ -250,70 +334,27 @@ public class BlackboardClient {
 		System.out.println(setObject);
 		currentCollection.findAndModify((DBObject) JSON.parse(query), setObject);
 	}
-	
 
-	public void subscribe(BlackboardSubscription sub) throws Exception {
-		if (collection == null || collection.isEmpty()) {
+	/**
+	 * Subscribes the client on a certain topic.
+	 *
+	 * @param topic The topic to subscribe to.
+	 **/
+	public void subscribe(String topic) throws Exception {
+		if (collection.isEmpty() || collection == null) {
 			throw new Exception("No collection selected");
-		} else if (database == null || database.isEmpty()) {
+		} else if (database.isEmpty() || database == null) {
 			throw new Exception("No database selected");
 		}
-		subscriptions.add(sub);
-		if (tcThread == null) {
-			tcThread = new TailedCursorThread();
-			tcThread.start();
-		}
+		subscriptions.put(topic, new BasicDBObject("topic", topic));
 	}
 
-
-	public void unsubscribe(BlackboardSubscription sub) {
-		subscriptions.remove(sub);
-		if (subscriptions.size() == 0) {
-			tcThread.interrupt();
-			tcThread = null;
-		}
-	}
-	
 	/**
-	 * Class for tailable cursor thread within the client
+	 * Unsubscribes the client from a certain topic.
+	 *
+	 * @param topic The topic to unsubscribe from.
 	 **/
-	public class TailedCursorThread extends Thread {
-		/**
-		 * Constructor of TailedCursorThread.
-		 **/
-		public TailedCursorThread() {
-			oplogDatabase = mongo.getDB(LOCAL);
-			oplogCollection = oplogDatabase.getCollection(OPLOG);
-
-			BasicDBObject where = new BasicDBObject();
-			where.put("ns", database + "." + collection);
-			tailedCursor = oplogCollection.find(where);
-			tailedCursor.addOption(Bytes.QUERYOPTION_TAILABLE);
-			tailedCursor.addOption(Bytes.QUERYOPTION_AWAITDATA);
-			tailedCursor.skip(tailedCursor.size());
-		}
-
-		/**
-		 * Run method for the TailedCursorThread. This will check for changes within the cursor and calls the onMessage method of its subscriber.
-		 **/
-		@Override
-		public void run() {
-			try {
-				while (!Thread.interrupted()) {
-					while (tailedCursor.hasNext()) {
-						OplogEntry entry = new OplogEntry(
-								(DBObject) tailedCursor.next());
-						MongoOperation operation = entry.getOperation();
-
-						for (BlackboardSubscription sub : subscriptions) {
-							if (sub.getOperation().equals(operation)) {
-								sub.getSubscriber().onMessage(operation, entry);
-							}
-						}
-					}
-				}
-			} catch (MongoInterruptedException ex) {
-			}
-		}
+	public void unsubscribe(String topic) {
+		subscriptions.remove(topic);
 	}
 }
