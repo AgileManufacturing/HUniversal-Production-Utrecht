@@ -24,34 +24,40 @@ public class EquipletAgent extends Agent {
 				ACLMessage msg = receive();
 				if (msg != null) {
 
+					String convid = msg.getConversationId();
 					switch (msg.getOntology()) {
-
 					case "CanPerformStep":
 						_step = (ProductionStep) msg.getContentObject();
-						System.out.println("Receiving parameters = "
-								+ writeParamsToString(_step.getParameterList()));
+						System.out
+								.println("Receiving parameters = "
+										+ writeParamsToString(_step
+												.getParameterList()));
 
 						// check params. Not really our thing
 						ACLMessage message = new ACLMessage(
 								ACLMessage.DISCONFIRM);
 						message.setOntology("CanPerformStep");
 						message.addReceiver(msg.getSender());
-						//Debuggin. Set false to disconfirm the requested step
+						// Debuggin. Set false to disconfirm the requested step
 						if (true) {
 							message.setPerformative(ACLMessage.CONFIRM);
 						}
+						message.setConversationId(convid);
 						send(message);
 						break;
 					case "getPerformDuration":
 						_step = (ProductionStep) msg.getContentObject();
-						System.out.println("Receiving parameters = "
-								+ writeParamsToString(_step.getParameterList()));
+						System.out
+								.println("Receiving parameters = "
+										+ writeParamsToString(_step
+												.getParameterList()));
 
 						// check params. Not really our thing
-						ACLMessage message2 = new ACLMessage(
-								ACLMessage.DISCONFIRM);
-						message2.setOntology("CanPerformStep");
+						ACLMessage message2 = new ACLMessage(ACLMessage.INFORM);
+						message2.setOntology("GetProductionDuration");
+						message2.setContentObject(15);
 						message2.addReceiver(msg.getSender());
+						message2.setConversationId(convid);
 						send(message2);
 						break;
 					}
