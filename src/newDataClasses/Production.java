@@ -21,20 +21,22 @@ import java.util.HashMap;
 public class Production {
 	
 	private ProductionStep[] _productionSteps;
-	private HashMap<Long, ArrayList<AID>> _plausibleEquiplets;
+	
+	private ProductionEquipletMapper _prodletmap;
+
+	
 	
 	public Production() {
-		
+		_prodletmap = new ProductionEquipletMapper();
 	}
 	
 	public Production(ProductionStep[] productionSteps) throws Exception {
+		this();
 		if(productionSteps == null) throw new Exception("Production steps can't be null");
 		this._productionSteps = productionSteps;
 		
-		this._plausibleEquiplets = new HashMap<Long, ArrayList<AID>>();
-		
 		for(ProductionStep p : this._productionSteps){
-			_plausibleEquiplets.put(p.getId(), new ArrayList<AID>());
+			this._prodletmap.addProductionStep(p.getId());
 		}
 	}
 	
@@ -42,18 +44,13 @@ public class Production {
 		return _productionSteps;
 	}
 	
-	public void addEquipletToProductionStep(long stepId, AID equipletId){
-		ArrayList<AID> tmp = _plausibleEquiplets.get(stepId);
-		tmp.add(equipletId);
+	public void setProductionEquipletMapping(ProductionEquipletMapper prodLetMap) throws Exception {
+		if(prodLetMap == null) throw new Exception("mapping cant be null");
+		this._prodletmap = prodLetMap;
 	}
 	
-	public void removeEquipletFromProductionStep(long stepId, AID equipletId){
-		ArrayList<AID> tmp = _plausibleEquiplets.get(stepId);
-		tmp.remove(tmp.indexOf(equipletId));
-	}
-	
-	public ArrayList<AID> getPlausibleEquiplets(long stepId){
-		return _plausibleEquiplets.get(stepId);
+	public ProductionEquipletMapper getProductionEquipletMapping() {
+		return this._prodletmap;
 	}
 	
 }
