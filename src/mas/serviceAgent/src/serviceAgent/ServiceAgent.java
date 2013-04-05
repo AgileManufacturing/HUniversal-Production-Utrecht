@@ -1,30 +1,52 @@
 package serviceAgent;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import jade.core.Agent;
 import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
+
+import com.google.gson.Gson;
 import com.mongodb.*;
 import org.bson.types.*;
+import nl.hu.client.*;
 
 //TODO add registering with BlackBoard agent for changing productionstep status to WAITING
 
-public class ServiceAgent extends Agent {
+public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	private static final long serialVersionUID = 1L;
+	
+	private BlackboardClient productionStepBBClient, serviceStepBBClient;
 	private Hashtable<String, Long> services;
-	private Hashtable<String, String[]> stepTypes;
+	private Hashtable<Long, String[]> stepTypes;
 
     public void setup() {
+    	//TODO fill in host, database and collection
+    	productionStepBBClient = new BlackboardClient("");
+    	serviceStepBBClient = new BlackboardClient("");
+    	try {
+			productionStepBBClient.setDatabase("");
+			productionStepBBClient.setCollection("");
+			productionStepBBClient.subscribe(new BlackboardSubscription(MongoOperation.INSERT, this)); //need react on new production steps
+			productionStepBBClient.subscribe(new BlackboardSubscription(MongoOperation.UPDATE, this)); //need to react on state changes of production steps to WAITING
+
+			serviceStepBBClient.setDatabase("");
+			serviceStepBBClient.setCollection("");
+			serviceStepBBClient.subscribe(new BlackboardSubscription(MongoOperation.UPDATE, this)); //need to react on state changes of service steps
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
     	services = new Hashtable<String, Long>();
     	services.put("Drill", 15l);
     	services.put("Glue", 20l);
     	services.put("Pick", 5l);
     	services.put("Place", 5l);
 
-    	stepTypes = new Hashtable<String, String[]>();
-    	stepTypes.put("Pick&Place", new String[] {"Pick", "Place"});
-    	stepTypes.put("Attack", new String[] {"Glue", "Pick", "Place"});
-    	stepTypes.put("Screw", new String[] {"Drill", "Pick", "Place"});
+    	stepTypes = new Hashtable<Long, String[]>();
+    	stepTypes.put(1l, new String[] {"Pick", "Place"});			//Pick&Place
+    	stepTypes.put(2l, new String[] {"Glue", "Pick", "Place"});	//Attack
+    	stepTypes.put(3l, new String[] {"Drill", "Pick", "Place"});	//Screw
     	
     	addBehaviour(new AnswerBehaviour(this));
     }
@@ -50,9 +72,12 @@ public class ServiceAgent extends Agent {
 					switch(message.getOntology()) {
 						case "canDoProductionStep":
 							//TODO get step data using content
-							//lookup what services are needed
-							//are those services available?
+							//extract stepType
+							//is this stepType present in stepTypes?
 							//send answer
+							
+							ArrayList<String> productionStep = productionStepBBClient.getJson("_id:" + content);
+							productionStepBBClient.
 							
 							
 							int stepID = Integer.parseInt(content);
@@ -67,8 +92,8 @@ public class ServiceAgent extends Agent {
 							break;
 						case "getProductionStepDuration":
 							//TODO get step data using content
-							//lookup what services are needed
-							//add all durations of those services
+							//extract stepType
+							//add all durations of those services of this stepTypes
 							//send answer
 							
 							
@@ -134,6 +159,7 @@ public class ServiceAgent extends Agent {
 		public DoServiceBehaviour(Agent agent, String service) {
 			super(agent);
 			this.service = service;
+			Gson.class
 
 			System.out.println("executing service " + service);
 		}
@@ -150,7 +176,8 @@ public class ServiceAgent extends Agent {
 		}
     }
     
-    public void onMessage(/*TODO params*/) {
-    	addBehaviour(new DoServiceBehaviour(this, null/*service uit params*/));
-    }
+	@Override
+	public void onMessage(MongoOperation operation, OplogEntry entry) {
+	    //TODO implement onMessage
+	}
 }
