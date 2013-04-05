@@ -35,9 +35,12 @@ package nl.hu.client;
 
 import com.mongodb.*;
 import com.mongodb.util.JSON;
+import com.mongodb.util.JSONParseException;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.bson.types.ObjectId;
 
 /**
  * Client class for a mongodb blackboard.
@@ -145,16 +148,34 @@ public class BlackboardClient {
 	}
 
 	/**
+	 * Utility function for parsing JSON that catches the runtime JSON exception and throws an InvalidJSONException instead.
+	 * @param jsonString The JSON string that needs to be parsed to a DBObject.
+	 * @return The DBObject parsed from the JSON string.
+	 * @throws InvalidJSONException An error exists within the JSON.
+	 */
+	public DBObject parseJSONWithCheckException(String jsonString) throws InvalidJSONException {
+		DBObject obj = null;
+		try {
+			obj = (DBObject)JSON.parse(jsonString);
+		} catch (JSONParseException ex) {
+			throw new InvalidJSONException(ex);
+		}
+		
+		return obj;
+	}
+	
+	/**
 	 * Sets the database to use.
 	 *
 	 * @param database The database to load from MongoDB.
-	 * @throws Exception 
+	 * @throws InvalidDBNamespaceException Database name cannot be empty.
 	 **/
-	public void setDatabase(String database) throws Exception {
+	public void setDatabase(String database) throws InvalidDBNamespaceException {
 		if (database == null || database.isEmpty()) {
-			throw new Exception("Database name cannot be empty.");
+			throw new InvalidDBNamespaceException("Database name cannot be empty.");
 		}
 		this.database = database;
+		currentCollection = null;
 		currentDatabase = mongo.getDB(this.database);
 	}
 
@@ -162,108 +183,147 @@ public class BlackboardClient {
 	 * Sets the collection to use.
 	 *
 	 * @param collection The collection to load from MongoDB.
+	 * @throws InvalidDBNamespaceException No database has been selected.
 	 **/
-	public void setCollection(String collection) throws Exception {
+	public void setCollection(String collection) throws InvalidDBNamespaceException {
 		if (currentDatabase == null) {
-			throw new Exception("No database selected");
+			throw new InvalidDBNamespaceException("No database selected");
 		}
 		this.collection = collection;
 		currentCollection = currentDatabase.getCollection(this.collection);
 	}
 
 	/**
-	 * Inserts document into MongoDB using json format. Will throw an exception if collection or database has not been set.
-	 *
-	 * @param json The json format for the MongoDB insert statement.
-	 **/
-	public void insertJson(String json) throws Exception {
-		if (collection == null || collection.isEmpty()) {
-			throw new Exception("No collection selected");
-		} else if (database == null || database.isEmpty()) {
-			throw new Exception("No database selected");
+	 * Inserts a document into the currently selected collection.
+	 * 
+	 * @param obj DBObject representing the document to be inserted.
+	 * @return ObjectId of the inserted object.
+	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 */
+	public ObjectId insertDocument(DBObject obj) throws InvalidDBNamespaceException {
+		if (currentCollection == null) {
+			throw new InvalidDBNamespaceException("No collection has been selected.");
 		}
-		currentCollection.insert((DBObject) JSON.parse(json));
+		currentCollection.insert(obj);
+		return ObjectId.massageToObjectId(obj.get("_id"));
+	}
+	
+	/**
+	 * Inserts document into the currently selected collection using JSON format.
+	 *
+	 * @param json JSON String representing the document to be inserted.
+	 * @return ObjectId of the inserted object.
+	 * @throws InvalidJSONException The provided JSON contains errors.
+	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 **/
+	public ObjectId insertDocument(String json) throws InvalidJSONException, InvalidDBNamespaceException {
+		DBObject obj = parseJSONWithCheckException(json);
+		return insertDocument(obj);
 	}
 
 	/**
-	 * Removes document from MongoDB using json format. Will throw an exception if collection or database has not been set.
-	 *
-	 * @param json The json format for the MongoDB remove statement.
-	 **/
-	public void removeJson(String json) throws Exception {
-		if (collection == null || collection.isEmpty()) {
-			throw new Exception("No collection selected");
-		} else if (database == null || database.isEmpty()) {
-			throw new Exception("No database selected");
+	 * Removes all documents matching the provided query from the currently selected collection.
+	 * 
+	 * @param query DBObject representing the query used for deleting documents.
+	 * @return The amount of records that have been removed.
+	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 */
+	public int removeDocuments(DBObject query) throws InvalidDBNamespaceException {
+		if (currentCollection == null) {
+			throw new InvalidDBNamespaceException("No collection has been selected.");
 		}
-		currentCollection.remove((DBObject) JSON.parse(json));
+		
+		WriteResult res = currentCollection.remove(query);
+		return res.getN();
 	}
-
+	
 	/**
-	 * Queries MongoDB using json format, will throw an exception if collection or database has not been set.
+	 * Removes all documents matching the provided query from the currently selected collection.
 	 *
-	 * @param json The json format for the MongoDB query statement.
+	 * @param queryAsJSON JSON serialization of an Object 
+	 * @return The amount of records that have been removed.
+	 * @throws InvalidJSONException The provided JSON contains errors.
+	 * @throws InvalidDBNamespaceException No collection has been selected.
 	 **/
-	public ArrayList<String> getJson(String json) throws Exception {
-		if (collection == null || collection.isEmpty()) {
-			throw new Exception("No collection selected");
-		} else if (database == null || database.isEmpty()) {
-			throw new Exception("No database selected");
-		}
-		ArrayList<String> jsons = new ArrayList<String>();
-		List<DBObject> found = currentCollection.find((DBObject) JSON.parse(json)).toArray();
-		for (DBObject obj : found) {
-			jsons.add(obj.toString());
-		}
-		return jsons;
+	public int removeDocuments(String queryAsJSON) throws InvalidJSONException, InvalidDBNamespaceException {
+		DBObject query = parseJSONWithCheckException(queryAsJSON);
+		return removeDocuments(query);
 	}
-
+	
 	/**
-	 * Removes first message on blackboard
-	 **/
-	public void removeFirst() {
-		BasicDBObject message = (BasicDBObject) currentCollection.findOne();
-		currentCollection.remove(message);
-	}
-
-	/**
-	 * Updates document from MongoDB using json format. Will throw an exception if collection or database has not been set.
+	 * Retrieves all documents matching the provided query from the currently selected collection.
 	 *
-	 * @param query The json format for the MongoDB query statement.
-	 * @param set The json format for the MongoDB set statement.
-	 * @param unset The json format for the MongoDB unset statement.
+	 * @param query DBObject representing the query.
+	 * @return List of all documents matching the query.
+	 * @throws InvalidDBNamespaceException No collection has been selected.
 	 **/
-	public void updateJson(String query, String set, String unset) throws Exception {
-		if (collection == null || collection.isEmpty()) {
-			throw new Exception("No collection selected");
-		} else if (database == null || database.isEmpty()) {
-			throw new Exception("No database selected");
+	public List<DBObject> findDocuments(DBObject query) throws InvalidDBNamespaceException {
+		if (currentCollection == null) {
+			throw new InvalidDBNamespaceException("No collection has been selected.");
 		}
-		if (set == null) {
-			set = "";
+		
+		List<DBObject> found = currentCollection.find(query).toArray();
+		return found;
+	}
+	
+	/**
+	 * Retrieves all documents matching the provided query from the currently selected collection.
+	 *
+	 * @param queryAsJSON JSON string representing the query.
+	 * @return List of all documents matching the query.
+	 * @throws InvalidJSONException The provided JSON contains errors.
+	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 **/
+	public List<DBObject> findDocuments(String queryAsJSON) throws InvalidJSONException, InvalidDBNamespaceException {
+		DBObject query = parseJSONWithCheckException(queryAsJSON);
+		return findDocuments(query);
+	}
+	
+	/**
+	 * Updates all documents matching the provided search query within the currently selected collection.
+	 * Documents are updated according to the query specified in updateQuery.
+	 * 
+	 * @param searchQuery The query that should be used to select the target documents.
+	 * @param updateQuery The query that should be used to update the target documents.
+	 * @return The amount of documents that have been updated.
+	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 * @throws Exception
+	 */
+	public int updateDocuments(DBObject searchQuery, DBObject updateQuery) throws InvalidDBNamespaceException {
+		if (currentCollection == null) {
+			throw new InvalidDBNamespaceException("No collection has been selected.");
 		}
-		if (unset == null) {
-			unset = "";
-		}
-		BasicDBObject setObject = new BasicDBObject();
-		setObject.put("$set", (DBObject) JSON.parse(set));
-		setObject.put("$unset", (DBObject) JSON.parse(unset));
-		System.out.println(query);
-		System.out.println(setObject);
-		currentCollection.findAndModify((DBObject) JSON.parse(query), setObject);
+		
+		WriteResult res = currentCollection.update(searchQuery, updateQuery);
+		return res.getN();
+	}
+	
+	/**
+	 * Updates all documents matching the provided search query within the currently selected collection.
+	 * Documents are updated according to the query specified in updateQuery.
+	 *
+	 * @param searchQueryAsJSON JSON serialization of the query that should be used to select the target documents.
+	 * @param updateQueryAsJSON JSON serialization of the query that should be used to update the target documents.
+	 * @return The amount of documents that have been updated.
+	 * @throws InvalidJSONException The provided JSON contains errors.
+	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 **/
+	public int updateDocuments(String searchQueryAsJSON, String updateQueryAsJSON) throws InvalidJSONException, InvalidDBNamespaceException {
+		DBObject searchQuery = parseJSONWithCheckException(searchQueryAsJSON);
+		DBObject updateQuery = parseJSONWithCheckException(updateQueryAsJSON);
+		
+		return updateDocuments(searchQuery, updateQuery);
 	}
 	
 	/**
 	 * Subscribes to the specified CRUD operation in the current database and collection.
 	 * 
 	 * @param sub Specification of operation and callback object.
-	 * @throws Exception
+	 * @throws InvalidDBNamespaceException No collection has been selected.
 	 */
-	public void subscribe(BlackboardSubscription sub) throws Exception {
-		if (collection == null || collection.isEmpty()) {
-			throw new Exception("No collection selected");
-		} else if (database == null || database.isEmpty()) {
-			throw new Exception("No database selected");
+	public void subscribe(BlackboardSubscription sub) throws InvalidDBNamespaceException {
+		if (currentCollection == null) {
+			throw new InvalidDBNamespaceException("No collection selected");
 		}
 		subscriptions.add(sub);
 		if (tcThread == null) {
