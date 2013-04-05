@@ -35,24 +35,20 @@ public class JadeAgentX extends Agent {
         ArrayList<Long> capabilities1 = new ArrayList<Long>();
         capabilities1.add(1l);
         
-        String serviceAgentName = "serviceAgent1";
-        ((AgentController)getContainerController().createNewAgent(serviceAgentName, "serviceAgent.ServiceAgent", null)).start();
         
-        Object[] ar = new Object[]{capabilities1, serviceAgentName};
+        Object[] ar = new Object[]{capabilities1};
         ((AgentController)getContainerController().createNewAgent("eqa1", "equipletAgent.EquipletAgent", ar)).start();
         // TODO code application logic here
         ArrayList<Long> capabilities2 = new ArrayList<Long>();
-        //capabilities2.clear();
         capabilities2.add(2l);
         
-        ar = new Object[]{capabilities2, serviceAgentName};
+        ar = new Object[]{capabilities2};
         ((AgentController)getContainerController().createNewAgent("eqa2", "equipletAgent.EquipletAgent", ar)).start();
         
         ArrayList<Long> capabilities3 = new ArrayList<Long>();
-        //capabilities3.clear();
         capabilities3.add(3l);
         
-        ar = new Object[]{capabilities3, serviceAgentName};
+        ar = new Object[]{capabilities3};
         ((AgentController)getContainerController().createNewAgent("eqa3", "equipletAgent.EquipletAgent", ar)).start();
         
         ar = null;

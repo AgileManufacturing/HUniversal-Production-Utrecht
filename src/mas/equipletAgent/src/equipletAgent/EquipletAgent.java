@@ -40,6 +40,8 @@ import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
+import jade.wrapper.AgentController;
+import jade.wrapper.StaleProxyException;
 import newDataClasses.ParameterList;
 import newDataClasses.ProductionStep;
 import nl.hu.client.BlackboardClient;
@@ -80,7 +82,7 @@ public class EquipletAgent extends Agent {
 	private int equipletDbPort = 27017;
 	private String equipletDbName = "";
 	private DBCollection productSteps = null;
-	private String productStepsName = "ProductSteps";
+	private String productStepsName = "ProductStepsBlackBoard";
 
 	//BlackboardClient to communicate with the blackboards
 	private BlackboardClient client;
@@ -105,9 +107,19 @@ public class EquipletAgent extends Agent {
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			capabilities = (ArrayList<Long>) args[0];
-			serviceAgent = new AID((String) args[1], AID.ISLOCALNAME);
 			System.out.println(capabilities + " " + equipletDbName);
 		}
+        try {
+        	DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
+        	Object[] arguments = new Object[]{dbData};
+			((AgentController)getContainerController().createNewAgent(getName() + "-serviceAgent", "serviceAgent.ServiceAgent", arguments)).start();
+			serviceAgent = new AID((String) getName() + "-serviceAgent", AID.ISLOCALNAME);
+		} catch (StaleProxyException e1) {
+			e1.printStackTrace();
+			this.doDelete();
+		}
+		
+		
 		
 		Gson gson = new Gson();
 		// put capabilities on the equipletDirectory
@@ -195,7 +207,8 @@ public class EquipletAgent extends Agent {
 						productStepEntryId = null;
 						DBObject productStep = null;
 						gson = new Gson();
-
+						//TODO: cleanup onderstaande
+						//TODO: one blackboardclient
 						try {
 							productStepEntryId = (ObjectId) contentObject;
 						} catch (ClassCastException e) {

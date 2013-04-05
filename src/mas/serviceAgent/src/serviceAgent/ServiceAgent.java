@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
@@ -12,6 +13,7 @@ import jade.lang.acl.UnreadableException;
 import com.google.gson.Gson;
 import com.mongodb.*;
 
+import equipletAgent.DbData;
 import equipletAgent.ScheduleData;
 
 import org.bson.types.*;
@@ -26,18 +28,24 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	private BlackboardClient productionStepBBClient, serviceStepBBClient;
 	private Hashtable<String, Long> services;
 	private Hashtable<Long, String[]> stepTypes;
+	private DbData dbData;
 
     public void setup() {
     	//TODO fill in host, database and collection
-    	productionStepBBClient = new BlackboardClient("localhost");
-    	serviceStepBBClient = new BlackboardClient("localhost");
+    	Object[] args = getArguments();
+    	if (args != null && args.length > 0) {
+    		dbData = (DbData)args[0];
+		}
+    	
+    	productionStepBBClient = new BlackboardClient(dbData.ip);
+    	serviceStepBBClient = new BlackboardClient(dbData.ip);
     	try {
-			productionStepBBClient.setDatabase(getName());
-			productionStepBBClient.setCollection("ProductionStepBlackBoard");
+			productionStepBBClient.setDatabase(dbData.name);
+			productionStepBBClient.setCollection("ProductStepsBlackBoard");
 			productionStepBBClient.subscribe(new BlackboardSubscription(MongoOperation.INSERT, this)); //need react on new production steps
 			productionStepBBClient.subscribe(new BlackboardSubscription(MongoOperation.UPDATE, this)); //need to react on state changes of production steps to WAITING
 
-			serviceStepBBClient.setDatabase(getName());
+			serviceStepBBClient.setDatabase(dbData.name);
 			serviceStepBBClient.setCollection("ProductionStepBlackBoard");
 			serviceStepBBClient.subscribe(new BlackboardSubscription(MongoOperation.UPDATE, this)); //need to react on state changes of service steps
 		} catch (Exception e) {
@@ -79,9 +87,11 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 				List<DBObject> productionStep = null;
 				try {
 					content = (ObjectId) message.getContentObject();
-					productionStep = productionStepBBClient.findDocuments("{_id:" + content.toStringMongod() + "}");
+					BasicDBObject query = new BasicDBObject();
+					query.put("_id", content);
+					productionStep = productionStepBBClient.findDocuments(query);
 					System.out.println(productionStep.get(0).get("scheduleData"));
-				} catch (UnreadableException | InvalidJSONException | InvalidDBNamespaceException e) {
+				} catch (UnreadableException | InvalidDBNamespaceException e) {
 					e.printStackTrace();
 				}
 				if(content != null) {
