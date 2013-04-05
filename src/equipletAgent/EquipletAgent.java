@@ -1,5 +1,7 @@
 package equipletAgent;
 
+import java.util.Random;
+
 import newDataClasses.*;
 import jade.core.AID;
 import jade.core.Agent;
@@ -28,34 +30,26 @@ public class EquipletAgent extends Agent {
 					switch (msg.getOntology()) {
 					case "CanPerformStep":
 						_step = (ProductionStep) msg.getContentObject();
-						System.out
-								.println("Receiving parameters = "
-										+ writeParamsToString(_step
-												.getParameterList()));
-
-						// check params. Not really our thing
+					//	System.out.println("Received query at " + myAgent.getAID() + " if I can perform step: " + _step.getId());
 						ACLMessage message = new ACLMessage(
 								ACLMessage.DISCONFIRM);
 						message.setOntology("CanPerformStep");
 						message.addReceiver(msg.getSender());
 						// Debuggin. Set false to disconfirm the requested step
-						if (true) {
+						if (getRandomBoolean()) {
 							message.setPerformative(ACLMessage.CONFIRM);
 						}
+						
 						message.setConversationId(convid);
 						send(message);
 						break;
-					case "getPerformDuration":
+					case "GetProductionDuration":
 						_step = (ProductionStep) msg.getContentObject();
-						System.out
-								.println("Receiving parameters = "
-										+ writeParamsToString(_step
-												.getParameterList()));
-
-						// check params. Not really our thing
+						//System.out.println("Received query at " + myAgent.getAID() + " how long it would take to perform: " + _step.getId());
 						ACLMessage message2 = new ACLMessage(ACLMessage.INFORM);
 						message2.setOntology("GetProductionDuration");
-						message2.setContentObject(15);
+						long timeslots = 15;
+						message2.setContentObject(timeslots);
 						message2.addReceiver(msg.getSender());
 						message2.setConversationId(convid);
 						send(message2);
@@ -68,6 +62,10 @@ public class EquipletAgent extends Agent {
 				System.out.println("Error : " + e);
 			}
 		}
+	}
+	public boolean getRandomBoolean() {
+	    Random random = new Random();
+	    return random.nextBoolean();
 	}
 
 	private String writeParamsToString(ParameterList p) {

@@ -13,7 +13,7 @@ import newDataClasses.ProductionEquipletMapper;
 import newDataClasses.ProductionStep;
 
 @SuppressWarnings("serial")
-public class NegotiatorBehaviour extends CyclicBehaviour {
+public class NegotiatorBehaviour extends OneShotBehaviour {
 
 	private ProductAgent _productAgent;
 
@@ -83,29 +83,34 @@ public class NegotiatorBehaviour extends CyclicBehaviour {
 				}
 			});
 
-			MessageTemplate template = MessageTemplate.and(
-					MessageTemplate.MatchPerformative(ACLMessage.CONFIRM),
-					MessageTemplate.MatchConversationId(ConversationId));
+			MessageTemplate template = MessageTemplate.MatchConversationId(ConversationId);
 
 			addSubBehaviour(new receiveBehaviour(myAgent, 10000, template) {
 				public void handle(ACLMessage msg) {
 					if (msg == null)
 						System.out.println("Productagent "
 								+ myAgent.getLocalName()
-								+ " timed out on waiting for CanPerformStep");
+								+ " timed out on waiting for " + _aid + " CanPerformStep");
 					// Dont add. Skip next step.
 					else {
+						if(msg.getPerformative() == ACLMessage.CONFIRM){
 						// Add next behaviour
 						canPerformStep = true;
 						System.out.println("Received CONFIRM from: " + _aid
 								+ ". He can perform step: "
 								+ _productionStep.getId());
+						} else {
+							System.out.println("Received DISCONFIRM from: " + _aid
+									+ ". He cant perform step: "
+									+ _productionStep.getId());
+						}
 					}
 				}
 			});
-			if (canPerformStep) {
+			
 				addSubBehaviour(new OneShotBehaviour() {
 					public void action() {
+						if (canPerformStep) {
 						try {
 							ACLMessage message = new ACLMessage(
 									ACLMessage.REQUEST);
@@ -120,6 +125,7 @@ public class NegotiatorBehaviour extends CyclicBehaviour {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
+						}
 					}
 				});
 
@@ -133,10 +139,10 @@ public class NegotiatorBehaviour extends CyclicBehaviour {
 							System.out
 									.println("Productagent "
 											+ myAgent.getLocalName()
-											+ " timed out on waiting for GetProductionDuration");
+											+ " timed out on waiting for " + _aid + " GetProductionDurationStep " + _productionStep.getId());
 						else {
 							try {
-								Long timeSlots = (Long) msg.getContentObject();
+								long timeSlots = (Long) msg.getContentObject();
 								System.out.println("Received INFORM from: "
 										+ _aid + ". He can perform step: "
 										+ _productionStep.getId()
@@ -152,8 +158,6 @@ public class NegotiatorBehaviour extends CyclicBehaviour {
 				});
 			}
 		}
-
-	}
 }
 
 @SuppressWarnings("serial")
