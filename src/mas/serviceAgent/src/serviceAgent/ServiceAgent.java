@@ -11,7 +11,11 @@ import jade.lang.acl.UnreadableException;
 
 import com.google.gson.Gson;
 import com.mongodb.*;
+
+import equipletAgent.ScheduleData;
+
 import org.bson.types.*;
+
 import nl.hu.client.*;
 
 //TODO add registering with BlackBoard agent for changing productionstep status to WAITING
@@ -25,16 +29,16 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
     public void setup() {
     	//TODO fill in host, database and collection
-    	productionStepBBClient = new BlackboardClient("");
-    	serviceStepBBClient = new BlackboardClient("");
+    	productionStepBBClient = new BlackboardClient("localhost");
+    	serviceStepBBClient = new BlackboardClient("localhost");
     	try {
-			productionStepBBClient.setDatabase("");
-			productionStepBBClient.setCollection("");
+			productionStepBBClient.setDatabase(getName());
+			productionStepBBClient.setCollection("ProductionStepBlackBoard");
 			productionStepBBClient.subscribe(new BlackboardSubscription(MongoOperation.INSERT, this)); //need react on new production steps
 			productionStepBBClient.subscribe(new BlackboardSubscription(MongoOperation.UPDATE, this)); //need to react on state changes of production steps to WAITING
 
-			serviceStepBBClient.setDatabase("");
-			serviceStepBBClient.setCollection("");
+			serviceStepBBClient.setDatabase(getName());
+			serviceStepBBClient.setCollection("ProductionStepBlackBoard");
 			serviceStepBBClient.subscribe(new BlackboardSubscription(MongoOperation.UPDATE, this)); //need to react on state changes of service steps
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -65,6 +69,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			super(agent);
 		}
 
+		//ObjectId("515ed5c435c25ab235f81e16")
 		@Override
 		public void action() {
 			ACLMessage reply, message = receive();
@@ -74,12 +79,9 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 				List<DBObject> productionStep = null;
 				try {
 					content = (ObjectId) message.getContentObject();
-				} catch (UnreadableException e) {
-					e.printStackTrace();
-				}
-				try {
-					productionStep = productionStepBBClient.findDocuments("_id:" + content);
-				} catch (InvalidJSONException | InvalidDBNamespaceException e) {
+					productionStep = productionStepBBClient.findDocuments("{_id:" + content.toStringMongod() + "}");
+					System.out.println(productionStep.get(0).get("scheduleData"));
+				} catch (UnreadableException | InvalidJSONException | InvalidDBNamespaceException e) {
 					e.printStackTrace();
 				}
 				if(content != null) {
@@ -111,8 +113,13 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 							for(String service : stepTypes.get(productionStep.get(0).get("type"))) {
 								duration += services.get(service);
 							}
+
+							ScheduleData scheduleData = (ScheduleData) productionStep.get(0).get("scheduleData");
+							scheduleData.setDuration(duration);
+							productionStep.get(0).put("scheduleData", scheduleData);
+//							productionStepBBClient.
 							
-							reply.setContent("" + duration);
+							reply.setContent("Evaluation Complete");
 							reply.setOntology("ProductionDurationResponse");
 							
 							System.out.println("Step takes " + duration + "timeslots");
@@ -123,9 +130,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 							
 //							reply.setContent("" + true);
 //							reply.setOntology("DoneScheduling");
-					    	addBehaviour(new PlanServiceBehaviour(getAgent(), content));
-							
-							System.out.println("Scheduled service succesfully");
+//					    	addBehaviour(new PlanServiceBehaviour(getAgent(), content));
 							break;
 						default:
 							reply.setContent("Unknown ontology");
@@ -140,6 +145,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			block();
 		}
     }
+    
+//    private <T> T JSONtoObject(Object o) {
+//    	return new T();
+//    }
     
     private class PlanServiceBehaviour extends OneShotBehaviour {
 		private static final long serialVersionUID = 1L;
