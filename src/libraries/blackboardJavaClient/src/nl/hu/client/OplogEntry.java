@@ -8,7 +8,7 @@
  * @section LICENSE
  * License: newBSD
  *
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -111,16 +111,16 @@ public class OplogEntry {
 	 * Returns the update document of this oplog entry.
 	 * @return the update document of this oplog entry.
 	 */
-	public String getUpdateDocument() { 
-		return oplogEntry.get(UPDATE_DOC_FIELD).toString();
+	public Object getUpdateDocument() { 
+		return oplogEntry.get(UPDATE_DOC_FIELD);
 	}
 	
 	/**
 	 * Returns the update criteria of this oplog entry.
 	 * @return the update criteria of this oplog entry.
 	 */
-	public String getUpdateCriteria() {
-		return oplogEntry.get(UPDATE_CRITERIA_FIELD).toString();
+	public Object getUpdateCriteria() {
+		return oplogEntry.get(UPDATE_CRITERIA_FIELD);
 	}
 
 	/**

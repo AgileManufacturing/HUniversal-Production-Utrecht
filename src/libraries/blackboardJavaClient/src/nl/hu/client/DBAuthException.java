@@ -1,7 +1,7 @@
-﻿/**
- * @file MongoOperation.java
- * @brief Enum representing the different CRUD operations in MongoDB.
- * @date Created: 2012-04-04
+/**
+ * @file DBAuthException.java
+ * @brief Thrown when authentication with a database fails.
+ * @date Created: 5 apr. 2013
  *
  * @author Jan-Willem Willebrands
  *
@@ -26,67 +26,24 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
  **/
-
 package nl.hu.client;
 
 /**
- * Enum listing the different CRUD operations in MongoDB, as well as their internal representation in the oplog.
- *
+ * Thrown when authentication with a database fails.
  */
-public enum MongoOperation {
+public class DBAuthException extends Exception {
 	/**
-	 * Insert operation.
+	 * @var long serialVersionUID
+	 * SerialVersionUID for the class.
 	 */
-	INSERT("i"),
-	/**
-	 * Update operation.
-	 */
-	UPDATE("u"),
-	/**
-	 * NOOP operation.
-	 */
-	NOOP("n"),
-	/**
-	 * Delete operation.
-	 */
-	DELETE("d");
-	
-	/**
-	 * @var String opCode
-	 * Internal representation in the "op" field of the oplog for this operation.
-	 */
-	private final String opCode;
+	private static final long serialVersionUID = 879715532789750988L;
 
 	/**
-	 * Constructs the MongoOperation with the specified opcode.
-	 * @param opCode Internal representation in the "op" field of the oplog for this operation.
+	 * Constructs an exception with the specified message.
+	 * @param msg A message providing additional information about the exception.
 	 */
-	private MongoOperation(String opCode) {
-		this.opCode = opCode;
-	}
-
-	/**
-	 * Returns the opcode for this operation.
-	 * @return The opcode for this operation.
-	 */
-	public String getOpCode() {
-		return opCode;
-	}
-	
-	/**
-	 * Attempts to find the {@link MongoOperation} corresponding to the given opCode.
-	 * @param opCode The opcode for which to find the MongoOperation
-	 * @return The MongoOperation corresponding to the given opCode or null.
-	 */
-	public static MongoOperation get(String opCode) {
-		for (MongoOperation op : values()) {
-			if (op.opCode.equals(opCode)) {
-				return op;
-			}
-		}
-		
-		return null;
+	public DBAuthException(String msg) {
+		super(msg);
 	}
 }

@@ -9,7 +9,7 @@
  * @section LICENSE
  * License: newBSD
  *
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2012-2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -39,7 +39,6 @@ import com.mongodb.util.JSONParseException;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.bson.types.ObjectId;
 
 /**
@@ -126,7 +125,7 @@ public class BlackboardClient {
 	public BlackboardClient(String host) {
 		try {
 			this.subscriptions = new ArrayList<BlackboardSubscription>();
-			this.mongo = new Mongo(host);
+			this.mongo = MongoDBConnection.getInstanceForHost(new ServerAddress(host)).getMongoClient();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -141,7 +140,7 @@ public class BlackboardClient {
 	public BlackboardClient(String host, int port) {
 		try {
 			this.subscriptions = new ArrayList<BlackboardSubscription>();
-			this.mongo = new Mongo(host, port);
+			this.mongo = MongoDBConnection.getInstanceForHost(new ServerAddress(host, port)).getMongoClient();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -177,6 +176,20 @@ public class BlackboardClient {
 		this.database = database;
 		currentCollection = null;
 		currentDatabase = mongo.getDB(this.database);
+	}
+	
+	/**
+	 * Sets the database to use and connects using the specified username and password.
+	 * @throws InvalidDBNamespaceException Database name cannot be empty.
+	 * @throws DBAuthException Authentication failed.
+	 * 
+	 * 
+	 */
+	public void setDatabase(String database, String user, String password) throws InvalidDBNamespaceException, DBAuthException {
+		setDatabase(database);
+		if (!currentDatabase.authenticate(user, password.toCharArray())) {
+			throw new DBAuthException("The provided username and password combination is incorrect.");
+		}
 	}
 
 	/**
@@ -320,18 +333,28 @@ public class BlackboardClient {
 	 * 
 	 * @param sub Specification of operation and callback object.
 	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 * @return true if subscription was successful. false otherwise.
 	 */
-	public void subscribe(BlackboardSubscription sub) throws InvalidDBNamespaceException {
+	public boolean subscribe(BlackboardSubscription sub) throws InvalidDBNamespaceException {
 		if (currentCollection == null) {
 			throw new InvalidDBNamespaceException("No collection selected");
 		}
 		subscriptions.add(sub);
 		if (tcThread == null) {
-			tcThread = new TailedCursorThread();
-			tcThread.start();
+			try {
+				tcThread = new TailedCursorThread();
+				tcThread.start();
+			} catch (MongoException ex) {
+				// This can happen when the database has not bee configured properly and the Oplog collection does not exist.
+				// Creating a tailed cursor on a non-existing collection throws a MongoException.
+				// Inform the user subscribing failed.
+				return false;
+			}
 		}
+		
+		return true;
 	}
-
+	
 	/**
 	 * Removes the specified subscription.
 	 * 

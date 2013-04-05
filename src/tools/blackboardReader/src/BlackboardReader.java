@@ -1,6 +1,6 @@
 /**
  * @file BlackboardReader.java
- * @brief
+ * @brief Basic application for monitoring blackboards.
  * @date Created: 2013-03-20
  *
  * @author Arjen van Zanten
@@ -27,36 +27,54 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
+ *@note 2013-04-05 JWW: Adapted to new BlackboardClient.
  **/
 
 import nl.hu.client.BlackboardClient;
-import nl.hu.client.ISubscriber;
+import nl.hu.client.BlackboardSubscriber;
+import nl.hu.client.BlackboardSubscription;
+import nl.hu.client.MongoOperation;
+import nl.hu.client.OplogEntry;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class BlackboardReader implements ISubscriber {
+import com.mongodb.DBObject;
+
+public class BlackboardReader implements BlackboardSubscriber {
     private BlackboardClient client;
+    ArrayList<String> topics;
 
     public BlackboardReader(String host, String database, String collection, ArrayList<String> topics) {
-        client = new BlackboardClient(host, this);
+        client = new BlackboardClient(host);
         try {
             client.setDatabase(database);
             client.setCollection(collection);
 
-            for (String topic : topics) {
-                client.subscribe(topic);
-            }
+            client.subscribe(new BlackboardSubscription(MongoOperation.INSERT, this));
+            this.topics = topics;
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-    @Override
-    public void onMessage(String topic, Object message) {
-        System.out.println("Topic: " + topic + " message: " + message);
-    }
+    
+	/**
+	 * @see nl.hu.client.BlackboardSubscriber#onMessage(nl.hu.client.MongoOperation, nl.hu.client.OplogEntry)
+	 */
+	@Override
+	public void onMessage(MongoOperation operation, OplogEntry entry) {
+		DBObject obj = (DBObject)entry.getUpdateDocument();
+		if (obj.containsField("topic") && obj.containsField("message")) {
+			if (topics.contains(obj.get("topic"))) {
+				System.out.println("New message: [" + obj.get("topic") + "] " + obj.get("message"));
+			} else {
+				System.out.println("Message for unregistered topic.");
+			}
+		} else {
+			System.out.println("Unrecognized message.");
+		}
+	}
 
     public static void main(String[] args) {
         if (args.length > 3) {
@@ -90,5 +108,4 @@ public class BlackboardReader implements ISubscriber {
 	        System.out.println("Usage: <host> <database> <collection> <topics>[ <topics>...]");
         }
     }
-
 }

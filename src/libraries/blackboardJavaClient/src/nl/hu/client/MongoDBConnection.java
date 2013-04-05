@@ -1,7 +1,7 @@
-﻿/**
- * @file MongoOperation.java
- * @brief Enum representing the different CRUD operations in MongoDB.
- * @date Created: 2012-04-04
+/**
+ * @file MongoDBConnection.java
+ * @brief Helper class for managing Mongo connections.
+ * @date Created: 2012-04-05
  *
  * @author Jan-Willem Willebrands
  *
@@ -26,67 +26,71 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
  **/
 
 package nl.hu.client;
 
+import java.util.Hashtable;
+
+import com.mongodb.Mongo;
+import com.mongodb.ServerAddress;
+
 /**
- * Enum listing the different CRUD operations in MongoDB, as well as their internal representation in the oplog.
- *
+ * Helper class for managing Mongo connections.
  */
-public enum MongoOperation {
-	/**
-	 * Insert operation.
-	 */
-	INSERT("i"),
-	/**
-	 * Update operation.
-	 */
-	UPDATE("u"),
-	/**
-	 * NOOP operation.
-	 */
-	NOOP("n"),
-	/**
-	 * Delete operation.
-	 */
-	DELETE("d");
-	
-	/**
-	 * @var String opCode
-	 * Internal representation in the "op" field of the oplog for this operation.
-	 */
-	private final String opCode;
-
-	/**
-	 * Constructs the MongoOperation with the specified opcode.
-	 * @param opCode Internal representation in the "op" field of the oplog for this operation.
-	 */
-	private MongoOperation(String opCode) {
-		this.opCode = opCode;
-	}
-
-	/**
-	 * Returns the opcode for this operation.
-	 * @return The opcode for this operation.
-	 */
-	public String getOpCode() {
-		return opCode;
+public class MongoDBConnection {
+	private static Hashtable<ServerAddress, MongoDBConnection> databaseConnections;
+	static {
+		databaseConnections = new Hashtable<ServerAddress, MongoDBConnection>();
 	}
 	
 	/**
-	 * Attempts to find the {@link MongoOperation} corresponding to the given opCode.
-	 * @param opCode The opcode for which to find the MongoOperation
-	 * @return The MongoOperation corresponding to the given opCode or null.
+	 * @var Mongo mongoClient
+	 * The {@link Mongo} object representing this connection.
 	 */
-	public static MongoOperation get(String opCode) {
-		for (MongoOperation op : values()) {
-			if (op.opCode.equals(opCode)) {
-				return op;
-			}
+	private Mongo mongoClient;
+	
+	/**
+	 * @var ServerAddress address
+	 * The host address to which this client is connected.
+	 */
+	private ServerAddress address;
+	
+	/**
+	 * Creates a new Mongo client for the specified address.
+	 * @param address The {@link ServerAddress} where the host resides.
+	 */
+	private MongoDBConnection(ServerAddress address) {
+		mongoClient = new Mongo(address);
+		this.address = address;
+	}
+	
+	/**
+	 * Returns a {@link MongoDBConnection} instance for the specified host.
+	 * @param address The {@link ServerAddress} where the host resides.
+	 * @return A {@link MongoDBConnection} instance for the specified host.
+	 */
+	public static MongoDBConnection getInstanceForHost(ServerAddress address) {
+		if (!databaseConnections.containsKey(address)) {
+			databaseConnections.put(address, new MongoDBConnection(address));
 		}
 		
-		return null;
+		return databaseConnections.get(address);
+	}
+	
+	/**
+	 * Returns the {@link Mongo} client for this connection.
+	 * @return The {@link Mongo} client for this connection.
+	 */
+	public Mongo getMongoClient() {
+		return mongoClient;
+	}
+	
+	/**
+	 * Returns the {@link ServerAddress} for this connection.
+	 * @return The {@link ServerAddress} for this connection.
+	 */
+	public ServerAddress getServerAddress() {
+		return address;
 	}
 }
