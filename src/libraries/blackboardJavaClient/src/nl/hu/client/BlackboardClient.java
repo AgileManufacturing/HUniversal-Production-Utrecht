@@ -49,13 +49,13 @@ public class BlackboardClient {
 	 * @var String OPLOG
 	 * Operation log collection name of MongoDB.
 	 **/
-	private final String OPLOG = "oplog.rs";
+	private static final String OPLOG_COLLECTION_NAME = "oplog.rs";
 
 	/**
 	 * @var String LOCAL
 	 * Local database name of MongoDB.
 	 **/
-	private final String LOCAL = "local";
+	private static final String OPLOG_DATABASE_NAME = "local";
 
 	/**
 	 * @var Mongo mongo
@@ -70,18 +70,6 @@ public class BlackboardClient {
 	private ArrayList<BlackboardSubscription> subscriptions;
 
 	/**
-	 * @var String collection
-	 * Name of the used MongoDB collection
-	 **/
-	private String collection;
-
-	/**
-	 * @var String database
-	 * Name of the used MongoDB database
-	 **/
-	private String database;
-
-	/**
 	 * @var DB currentDatabase
 	 * Database object of the currently used database
 	 **/
@@ -94,28 +82,10 @@ public class BlackboardClient {
 	private DBCollection currentCollection;
 
 	/**
-	 * @var DBCursor tailedCursor
-	 * TailedCursor for tracking changes on the operation log of MongoDB
-	 **/
-	private DBCursor tailedCursor;
-
-	/**
-	 * @var DB oplogDatabase
-	 * Database object of the oplog database
-	 **/
-	private DB oplogDatabase;
-
-	/**
-	 * @var DBCollection oplogCollection
-	 * DBCollection object of the oplog collection
-	 **/
-	private DBCollection oplogCollection;
-
-	/**
 	 * @var TailedCursorThread tcThread
 	 * Thread for tracking tailable cursor on operation log of MongoDB
-	 */
-	private TailedCursorThread tcThread;
+	 **/
+	private OplogMonitorThread oplogMonitorThread;
 	
 	/**
 	 * Constructor of BlackboardClient.
@@ -151,7 +121,7 @@ public class BlackboardClient {
 	 * @param jsonString The JSON string that needs to be parsed to a DBObject.
 	 * @return The DBObject parsed from the JSON string.
 	 * @throws InvalidJSONException An error exists within the JSON.
-	 */
+	 **/
 	public DBObject parseJSONWithCheckException(String jsonString) throws InvalidJSONException {
 		DBObject obj = null;
 		try {
@@ -173,18 +143,15 @@ public class BlackboardClient {
 		if (database == null || database.isEmpty()) {
 			throw new InvalidDBNamespaceException("Database name cannot be empty.");
 		}
-		this.database = database;
 		currentCollection = null;
-		currentDatabase = mongo.getDB(this.database);
+		currentDatabase = mongo.getDB(database);
 	}
 	
 	/**
 	 * Sets the database to use and connects using the specified username and password.
 	 * @throws InvalidDBNamespaceException Database name cannot be empty.
 	 * @throws DBAuthException Authentication failed.
-	 * 
-	 * 
-	 */
+	 **/
 	public void setDatabase(String database, String user, String password) throws InvalidDBNamespaceException, DBAuthException {
 		setDatabase(database);
 		if (!currentDatabase.authenticate(user, password.toCharArray())) {
@@ -202,8 +169,7 @@ public class BlackboardClient {
 		if (currentDatabase == null) {
 			throw new InvalidDBNamespaceException("No database selected");
 		}
-		this.collection = collection;
-		currentCollection = currentDatabase.getCollection(this.collection);
+		currentCollection = currentDatabase.getCollection(collection);
 	}
 
 	/**
@@ -212,7 +178,7 @@ public class BlackboardClient {
 	 * @param obj DBObject representing the document to be inserted.
 	 * @return ObjectId of the inserted object.
 	 * @throws InvalidDBNamespaceException No collection has been selected.
-	 */
+	 **/
 	public ObjectId insertDocument(DBObject obj) throws InvalidDBNamespaceException {
 		if (currentCollection == null) {
 			throw new InvalidDBNamespaceException("No collection has been selected.");
@@ -240,7 +206,7 @@ public class BlackboardClient {
 	 * @param query DBObject representing the query used for deleting documents.
 	 * @return The amount of records that have been removed.
 	 * @throws InvalidDBNamespaceException No collection has been selected.
-	 */
+	 **/
 	public int removeDocuments(DBObject query) throws InvalidDBNamespaceException {
 		if (currentCollection == null) {
 			throw new InvalidDBNamespaceException("No collection has been selected.");
@@ -261,6 +227,22 @@ public class BlackboardClient {
 	public int removeDocuments(String queryAsJSON) throws InvalidJSONException, InvalidDBNamespaceException {
 		DBObject query = parseJSONWithCheckException(queryAsJSON);
 		return removeDocuments(query);
+	}
+	
+	/**
+	 * Retrieves the document corresponding to the given ObjectId.
+	 *
+	 * @param query ObjectId of the requested object.
+	 * @return The object corresponding to the given id, or null if no such object was found.
+	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 **/
+	public DBObject findDocumentById(ObjectId objId) throws InvalidDBNamespaceException {
+		if (currentCollection == null) {
+			throw new InvalidDBNamespaceException("No collection has been selected.");
+		}
+		
+		DBObject found = currentCollection.findOne(QueryBuilder.start("_id").is(objId).get());
+		return found;
 	}
 	
 	/**
@@ -301,7 +283,7 @@ public class BlackboardClient {
 	 * @return The amount of documents that have been updated.
 	 * @throws InvalidDBNamespaceException No collection has been selected.
 	 * @throws Exception
-	 */
+	 **/
 	public int updateDocuments(DBObject searchQuery, DBObject updateQuery) throws InvalidDBNamespaceException {
 		if (currentCollection == null) {
 			throw new InvalidDBNamespaceException("No collection has been selected.");
@@ -334,61 +316,105 @@ public class BlackboardClient {
 	 * @param sub Specification of operation and callback object.
 	 * @throws InvalidDBNamespaceException No collection has been selected.
 	 * @return true if subscription was successful. false otherwise.
-	 */
+	 **/
 	public boolean subscribe(BlackboardSubscription sub) throws InvalidDBNamespaceException {
 		if (currentCollection == null) {
 			throw new InvalidDBNamespaceException("No collection selected");
 		}
 		subscriptions.add(sub);
-		if (tcThread == null) {
-			try {
-				tcThread = new TailedCursorThread();
-				tcThread.start();
-			} catch (MongoException ex) {
-				// This can happen when the database has not bee configured properly and the Oplog collection does not exist.
-				// Creating a tailed cursor on a non-existing collection throws a MongoException.
-				// Inform the user subscribing failed.
-				return false;
-			}
-		}
 		
-		return true;
+		// Attempt to create a new thread for the current subscriptions.
+		return createNewMonitorThread();
 	}
 	
 	/**
 	 * Removes the specified subscription.
 	 * 
 	 * @param sub Subscription that should be removed.
-	 */
+	 **/
 	public void unsubscribe(BlackboardSubscription sub) {
 		subscriptions.remove(sub);
-		if (subscriptions.size() == 0) {
-			tcThread.interrupt();
-			tcThread = null;
+		
+		if (subscriptions.size() > 0) {
+			createNewMonitorThread();
+		} else {
+			oplogMonitorThread.interrupt();
 		}
+	}
+	
+	/**
+	 * Closes and cleans up any open resources for this client.
+	 * Should be called before disposing of the BlackboardClient object.
+	 **/
+	public void close() {
+		
+		// Stop the monitor thread.
+		if (oplogMonitorThread != null) {
+			oplogMonitorThread.interrupt();
+		}
+	}
+
+	/**
+	 * Attempts to create and start a new monitor thread.
+	 * If creation of a new thread fails, the old thread will be kept alive.
+	 * @return true if the new thread was created successfully, false otherwise.
+	 **/
+	private boolean createNewMonitorThread() {
+		OplogMonitorThread newThread = null;
+		
+		// Create a query that will select all documents matching one of the queries of the subscribers within the
+		// selected database/collection combination.
+		DBObject[] subs = new DBObject[subscriptions.size()];
+		for (int i = 0 ; i < subscriptions.size() ; ++i) {
+			subs[i] = subscriptions.get(i).getQuery();
+		}
+		
+		DBObject query = QueryBuilder.start("ns").is(currentDatabase.getName() + "." + currentCollection.getName())
+				.and(subs).get();
+
+		try {
+			newThread = new OplogMonitorThread(OPLOG_DATABASE_NAME, OPLOG_COLLECTION_NAME, query);
+		} catch (MongoException ex) {
+			// This can happen when the database has not been configured properly and the Oplog collection does not exist.
+			// Creating a tailed cursor on a non-existing collection throws a MongoException.
+			return false;
+		}
+		
+		if (oplogMonitorThread != null) {
+			oplogMonitorThread.interrupt();
+		}
+		oplogMonitorThread = newThread;
+		oplogMonitorThread.start();
+		
+		return true;
 	}
 	
 	/**
 	 * Class for tailable cursor thread within the client
 	 **/
-	public class TailedCursorThread extends Thread {
+	private class OplogMonitorThread extends Thread {
+		
+		/**
+		 * Tailed cursor for this thread.
+		 **/
+		private DBCursor tailedCursor;
+		
 		/**
 		 * Constructor of TailedCursorThread.
 		 **/
-		public TailedCursorThread() {
-			oplogDatabase = mongo.getDB(LOCAL);
-			oplogCollection = oplogDatabase.getCollection(OPLOG);
+		public OplogMonitorThread(String oplogDBName, String oplogCollectionName, DBObject query) {
+			DB database = mongo.getDB(oplogDBName);
+			DBCollection collection = database.getCollection(oplogCollectionName);
 
-			BasicDBObject where = new BasicDBObject();
-			where.put("ns", database + "." + collection);
-			tailedCursor = oplogCollection.find(where);
+			tailedCursor = collection.find(query);
 			tailedCursor.addOption(Bytes.QUERYOPTION_TAILABLE);
 			tailedCursor.addOption(Bytes.QUERYOPTION_AWAITDATA);
 			tailedCursor.skip(tailedCursor.size());
 		}
 
 		/**
-		 * Run method for the TailedCursorThread. This will check for changes within the cursor and calls the onMessage method of its subscriber.
+		 * Run method for the TailedCursorThread.
+		 * This will check for changes within the cursor and calls the onMessage method of its subscriber.
 		 **/
 		@Override
 		public void run() {
@@ -400,7 +426,7 @@ public class BlackboardClient {
 						MongoOperation operation = entry.getOperation();
 
 						for (BlackboardSubscription sub : subscriptions) {
-							if (sub.getOperation().equals(operation)) {
+							if (sub.matchesWithEntry(entry)) {
 								sub.getSubscriber().onMessage(operation, entry);
 							}
 						}

@@ -31,18 +31,18 @@ package nl.hu.client;
 
 /**
  * Thrown when authentication with a database fails.
- */
+ **/
 public class DBAuthException extends Exception {
 	/**
 	 * @var long serialVersionUID
 	 * SerialVersionUID for the class.
-	 */
+	 **/
 	private static final long serialVersionUID = 879715532789750988L;
 
 	/**
 	 * Constructs an exception with the specified message.
 	 * @param msg A message providing additional information about the exception.
-	 */
+	 **/
 	public DBAuthException(String msg) {
 		super(msg);
 	}

@@ -1,7 +1,7 @@
-/**
+﻿/**
  * @file BlackboardSubscription.java
- * @brief Object representing a subscription to a blackboard event.
- * @date Created: 8 apr. 2013
+ * @brief Object representing a subscription to one of the basic MongoDB operations.
+ * @date Created: 2012-04-08
  *
  * @author Jan-Willem Willebrands
  *
@@ -26,50 +26,44 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  **/
+
 package nl.hu.client;
 
 import com.mongodb.DBObject;
+import com.mongodb.QueryBuilder;
 
 /**
- * Object representing a subscription to a blackboard event.
+ * Object representing a subscription to one of the basic MongoDB operations.
+ *
  **/
-public abstract class BlackboardSubscription {
+public class BasicOperationSubscription extends BlackboardSubscription {
 	/**
-	 * @var BlackboardSubscriber subscriber
-	 * The object that should be called when the specified operation occurs.
+	 * @var MongoOperation operation
+	 * The operation the subscriber wishes to respond to.
 	 **/
-	private BlackboardSubscriber subscriber;
+	private MongoOperation operation;
 	
 	/**
-	 * Creates the query associated with this subscription.
-	 * @return The query associated with this subscription.
+	 * Creates a BlackboardSubscriber object.
+	 * 
+	 * @param operation The operation the subscriber wishes to respond to.
+	 * @param subscriber The object that should be called when the specified operation occurs.
 	 **/
-	public abstract DBObject getQuery();
-	
-	/**
-	 * Returns whether or not the given object matches the query for this subscription.
-	 * @param entry The oplog entry to check with the query.
-	 * @return Whether or not the given object matches the query for this subscription.
-	 **/
-	public abstract boolean matchesWithEntry(OplogEntry entry);
-	
-	/**
-	 * Constructs a BlackboardSubscription object for the given subscriber.
-	 * @param subscriber The subscriber of this subscription.
-	 **/
-	public BlackboardSubscription(BlackboardSubscriber subscriber) {
-		this.subscriber = subscriber;
+	public BasicOperationSubscription(MongoOperation operation, BlackboardSubscriber subscriber) {
+		super(subscriber);
+		this.operation = operation;
 	}
-	
+
 	/**
-	 * Returns the subscriber for this subscription.
-	 * @return The subscriber for this subscription.
+	 * Returns the operation associated with this subscription.
+	 * @return The operation associated with this subscription.
 	 **/
-	public BlackboardSubscriber getSubscriber() {
-		return subscriber;
+	public MongoOperation getOperation() {
+		return operation;
 	}
-	
+
 	/**
 	 * Computes the hashcode for this object.
 	 * @return Hashcode for this object.
@@ -77,9 +71,9 @@ public abstract class BlackboardSubscription {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
+		int result = super.hashCode();
 		result = prime * result
-				+ ((subscriber == null) ? 0 : subscriber.hashCode());
+				+ ((operation == null) ? 0 : operation.hashCode());
 		return result;
 	}
 
@@ -91,16 +85,29 @@ public abstract class BlackboardSubscription {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
+		if (!super.equals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		BlackboardSubscription other = (BlackboardSubscription) obj;
-		if (subscriber == null) {
-			if (other.subscriber != null)
-				return false;
-		} else if (!subscriber.equals(other.subscriber))
+		BasicOperationSubscription other = (BasicOperationSubscription) obj;
+		if (operation != other.operation)
 			return false;
 		return true;
+	}
+
+	/**
+	 * @see nl.hu.client.BlackboardSubscription#getQuery()
+	 **/
+	@Override
+	public DBObject getQuery() {
+		return QueryBuilder.start("op").is(operation.getOpCode()).get();
+	}
+
+	/**
+	 * @see nl.hu.client.BlackboardSubscription#matchesWithEntry(com.mongodb.DBObject)
+	 **/
+	@Override
+	public boolean matchesWithEntry(OplogEntry entry) {
+		return entry.getOperation() == operation;
 	}
 }

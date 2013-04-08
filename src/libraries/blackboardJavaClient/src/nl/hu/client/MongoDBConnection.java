@@ -37,7 +37,7 @@ import com.mongodb.ServerAddress;
 
 /**
  * Helper class for managing Mongo connections.
- */
+ **/
 public class MongoDBConnection {
 	private static Hashtable<ServerAddress, MongoDBConnection> databaseConnections;
 	static {
@@ -47,19 +47,19 @@ public class MongoDBConnection {
 	/**
 	 * @var Mongo mongoClient
 	 * The {@link Mongo} object representing this connection.
-	 */
+	 **/
 	private Mongo mongoClient;
 	
 	/**
 	 * @var ServerAddress address
 	 * The host address to which this client is connected.
-	 */
+	 **/
 	private ServerAddress address;
 	
 	/**
 	 * Creates a new Mongo client for the specified address.
 	 * @param address The {@link ServerAddress} where the host resides.
-	 */
+	 **/
 	private MongoDBConnection(ServerAddress address) {
 		mongoClient = new Mongo(address);
 		this.address = address;
@@ -69,7 +69,7 @@ public class MongoDBConnection {
 	 * Returns a {@link MongoDBConnection} instance for the specified host.
 	 * @param address The {@link ServerAddress} where the host resides.
 	 * @return A {@link MongoDBConnection} instance for the specified host.
-	 */
+	 **/
 	public static MongoDBConnection getInstanceForHost(ServerAddress address) {
 		if (!databaseConnections.containsKey(address)) {
 			databaseConnections.put(address, new MongoDBConnection(address));
@@ -81,7 +81,7 @@ public class MongoDBConnection {
 	/**
 	 * Returns the {@link Mongo} client for this connection.
 	 * @return The {@link Mongo} client for this connection.
-	 */
+	 **/
 	public Mongo getMongoClient() {
 		return mongoClient;
 	}
@@ -89,7 +89,7 @@ public class MongoDBConnection {
 	/**
 	 * Returns the {@link ServerAddress} for this connection.
 	 * @return The {@link ServerAddress} for this connection.
-	 */
+	 **/
 	public ServerAddress getServerAddress() {
 		return address;
 	}

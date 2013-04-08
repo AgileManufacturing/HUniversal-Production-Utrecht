@@ -33,7 +33,7 @@ package nl.hu.client;
 
 /**
  * Interface used for subscribing to blackboard events.
- */
+ **/
 public interface BlackboardSubscriber{
 	
 	/**
@@ -41,6 +41,6 @@ public interface BlackboardSubscriber{
 	 * 
 	 * @param operation The {@link MongoOperation} that triggered the callback.
 	 * @param entry {@link OplogEntry} object representing the oplog entry.
-	 */
+	 **/
 	public void onMessage(MongoOperation operation, OplogEntry entry);
 }
