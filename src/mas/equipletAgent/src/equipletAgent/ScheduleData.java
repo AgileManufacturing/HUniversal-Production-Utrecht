@@ -1,31 +1,28 @@
 package equipletAgent;
 
 /**
- * Instances of this class contain schedule data with the start time, duration and the deadline of a production step in timeslots.
+ * Instances of this class contain schedule data with the start time, duration and the deadline of a <code>ProductionStep</code> in timeslots.
  * 
  * @author Peter Bonnema
  *
  */
 public class ScheduleData {
-	/**
-	 * When the production step execution should start.
-	 */
 	private long startTime;
-	/**
-	 * How long it will take to complete the step
-	 */
 	private long duration;
-	/**
-	 * When the production step should be finished.
-	 */
 	private long deadline;
 	
 	/**
-	 * Creates a new ScheduleData with the specified start time, duration and deadline.
+	 * Creates a new <code>ScheduleData</code> leaving <code>startTime</code>, <code>duration</code> and <code>deadline</code> uninitialized.
+	 */
+	public ScheduleData() {
+	}
+
+	/**
+	 * Creates a new <code>ScheduleData</code> with the specified start time, duration and deadline.
 	 * 
-	 * @param startTime
-	 * @param duration
-	 * @param deadline
+	 * @param startTime When execution of the <code>ProductionStep</code> with this <code>ScheduleData</code> should start.
+	 * @param duration How long it will take to complete the <code>ProductionStep</code>.
+	 * @param deadline The <code>ProductionStep</code> with this <code>ScheduleData</code> should be finished after this timeslot.
 	 */
 	public ScheduleData(long startTime, long duration, long deadline) {
 		this.startTime = startTime;
@@ -34,14 +31,14 @@ public class ScheduleData {
 	}
 
 	/**
-	 * @return the startTime
+	 * @return the start time
 	 */
 	public long getStartTime() {
 		return startTime;
 	}
 
 	/**
-	 * @param startTime the startTime to set
+	 * @param startTime the start time to set
 	 */
 	public void setStartTime(long startTime) {
 		this.startTime = startTime;

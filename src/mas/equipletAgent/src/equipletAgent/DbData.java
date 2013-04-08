@@ -10,4 +10,9 @@ public class DbData {
 		this.port = port;
 		this.name = name;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("DbData [ip=%s, port=%s, name=%s]", ip, port, name);
+	}
 }

@@ -1,10 +1,7 @@
 package serviceAgent;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Hashtable;
-import java.util.List;
-
-import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
@@ -12,10 +9,7 @@ import jade.lang.acl.UnreadableException;
 
 import com.google.gson.Gson;
 import com.mongodb.*;
-
-import equipletAgent.DbData;
-import equipletAgent.ScheduleData;
-
+import equipletAgent.*;
 import org.bson.types.*;
 
 import nl.hu.client.*;
@@ -59,8 +53,9 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
     	services.put("Place", 5l);
 
     	stepTypes = new Hashtable<Long, String[]>();
-    	stepTypes.put(1l, new String[] {"Pick", "Place"});			//Pick&Place
-    	stepTypes.put(2l, new String[] {"Glue", "Pick", "Place"});	//Attack
+    	stepTypes.put(0l, new String[] {"Pick", "Place"});			//Pick&Place
+    	stepTypes.put(1l, new String[] {"Glue", "Pick", "Place"});	//Attack
+    	stepTypes.put(2l, new String[] {"Drill", "Pick", "Place"});	//Screw
     	stepTypes.put(3l, new String[] {"Drill", "Pick", "Place"});	//Screw
     	
     	addBehaviour(new AnswerBehaviour(this));
@@ -68,6 +63,22 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
     
     public void takeDown() {
     	
+    }
+
+    public void printDBObjectPretty(DBObject obj, String prefix, String total_prefix, StringBuilder result) {
+    	Object value;
+		for(String key : obj.keySet()) {
+			value = obj.get(key);
+			if(value instanceof DBObject) {
+				result.append(total_prefix + key + ":\n");
+				printDBObjectPretty((DBObject) value, prefix, prefix + total_prefix, result);
+			}
+			else if(value == null) {
+				result.append(total_prefix + key + ": " + value + "\n");
+			} else {
+				result.append(total_prefix + key + ": " + value + " (" + value.getClass().getSimpleName() + ")\n");
+			}
+		}
     }
     
     private class AnswerBehaviour extends CyclicBehaviour {
@@ -77,20 +88,18 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			super(agent);
 		}
 
-		//ObjectId("515ed5c435c25ab235f81e16")
 		@Override
 		public void action() {
 			ACLMessage reply, message = receive();
 			if(message != null) {
 				reply = message.createReply();
 				ObjectId content = null;
-				List<DBObject> productionStep = null;
+				DBObject productionStep = null;
 				try {
 					content = (ObjectId) message.getContentObject();
 					BasicDBObject query = new BasicDBObject();
 					query.put("_id", content);
-					productionStep = productionStepBBClient.findDocuments(query);
-					System.out.println(productionStep.get(0).get("scheduleData"));
+					productionStep = productionStepBBClient.findDocuments(query).get(0);
 				} catch (UnreadableException | InvalidDBNamespaceException e) {
 					e.printStackTrace();
 				}
@@ -102,16 +111,34 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 							//is this stepType present in stepTypes?
 							//send answer
 							
-							boolean isAble = stepTypes.containsKey(productionStep.get(0).get("type"));
+							boolean isAble = stepTypes.containsKey(((Integer)productionStep.get("type")).longValue());
 							reply.setContent("" + isAble);
-							reply.setOntology("canDoProductionResponse");
+							try {
+								reply.setContentObject(content);
+							} catch (IOException e1) {
+								e1.printStackTrace();
+							}
+							reply.setOntology("canDoProductionStepResponse");
 							
-							if(isAble)
-								System.out.println("Can do step " + content);
-							else
-								System.out.println("Cannot do step " + content);
+							if(isAble) {
+								productionStep.removeField("productAgentId");
+								productionStep.removeField("parameters");
+								productionStep.removeField("inputParts");
+								productionStep.removeField("outputParts");
+								productionStep.removeField("status");
+								productionStep.removeField("scheduleData");
+								System.out.println(getLocalName() + " can do step");
+							} else {
+								productionStep.removeField("_id");
+								productionStep.removeField("status");
+								productionStep.removeField("scheduleData");
+								System.out.println(getLocalName() + " cannot do step");
+							}
+							StringBuilder strBuilder = new StringBuilder("Production step:\n");
+							printDBObjectPretty(productionStep, "    ", "    ", strBuilder);
+							System.out.println(strBuilder);
 							break;
-						case "getProductionDuration":
+						case "getProductionStepDuration":
 							//TODO get step data using content
 							//extract stepType
 							//add all durations of those services of this stepTypes
@@ -119,20 +146,37 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 							
 							
 							int duration = 0;
-							
-							for(String service : stepTypes.get(productionStep.get(0).get("type"))) {
+							for(String service : stepTypes.get(((Integer)(productionStep.get("type"))).longValue())) {
 								duration += services.get(service);
 							}
 
-							ScheduleData scheduleData = (ScheduleData) productionStep.get(0).get("scheduleData");
+//							ScheduleData scheduleData = (ScheduleData) productionStep.get("scheduleData");
+							ScheduleData scheduleData = new ScheduleData();
 							scheduleData.setDuration(duration);
-							productionStep.get(0).put("scheduleData", scheduleData);
-//							productionStepBBClient.
+							
+							Gson gson = new Gson();
+							productionStep.put("scheduleData", scheduleData);
+							try {
+//								System.out.println("{ _id: ObjectId(\"" + productionStep.get("_id") + "\") }");
+//								System.out.println("updated " +
+//										productionStepBBClient.updateDocuments(
+//											"{ _id: ObjectId(\"" + productionStep.get("_id") + "\") }",
+//											"{ $set: { \"scheduleData\": " + gson.toJson(scheduleData) + " } }")
+//										+ " documents");
+
+								System.out.println("updated " +
+										productionStepBBClient.updateDocuments(
+											new BasicDBObject("_id", productionStep.get("_id")),
+											new BasicDBObject("$set", new BasicDBObject("scheduleData", gson.fromJson(gson.toJson(scheduleData), BasicDBObject.class))))
+										+ " documents");
+							} catch (InvalidDBNamespaceException e) {
+								e.printStackTrace();
+							}
 							
 							reply.setContent("Evaluation Complete");
 							reply.setOntology("ProductionDurationResponse");
 							
-							System.out.println("Step takes " + duration + "timeslots");
+							System.out.println("Step takes " + duration + " timeslots");
 							break;
 						case "scheduleStepWithLogistics":
 							//TODO add behaviour handling scheduling with logistics agent

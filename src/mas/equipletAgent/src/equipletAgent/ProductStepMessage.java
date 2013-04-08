@@ -38,7 +38,7 @@ import newDataClasses.ParameterList;
 /**
  * Implementation of a message for the productstep blackboard
  */
-public class ProductStepMessage{
+public class ProductStepMessage {
 	public AID productAgentId;
 	public Long type;
 	public ParameterList parameters;

@@ -34,6 +34,8 @@ package equipletAgent;
 
 import com.mongodb.*;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -49,6 +51,7 @@ import serviceAgent.ServiceAgent;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -92,6 +95,7 @@ public class EquipletAgent extends Agent {
 
 	private Hashtable<String, ObjectId> communicationTable;
 
+	@SuppressWarnings("unchecked")
 	public void setup() {
 		// set the database name to the name of the equiplet and set the database ip to its own IP.
 		try{
@@ -112,11 +116,11 @@ public class EquipletAgent extends Agent {
         try {
         	DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
         	Object[] arguments = new Object[]{dbData};
-			((AgentController)getContainerController().createNewAgent(getName() + "-serviceAgent", "serviceAgent.ServiceAgent", arguments)).start();
-			serviceAgent = new AID((String) getName() + "-serviceAgent", AID.ISLOCALNAME);
+			((AgentController)getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "serviceAgent.ServiceAgent", arguments)).start();
+			serviceAgent = new AID((String) getLocalName() + "-serviceAgent", AID.ISLOCALNAME);
 		} catch (StaleProxyException e1) {
 			e1.printStackTrace();
-			this.doDelete();
+			doDelete();
 		}
 		
 		
@@ -131,7 +135,7 @@ public class EquipletAgent extends Agent {
 			EquipletDirectoryMessage entry = new EquipletDirectoryMessage(getAID(), capabilities, dbData);
 			client.insertDocument(gson.toJson(entry));
 		} catch (Exception e) {
-			this.doDelete();
+			doDelete();
 		}
 		
 
@@ -143,11 +147,11 @@ public class EquipletAgent extends Agent {
 			public void action() {
 
 				// myAgent.addBehaviour(new RequestPerformer());
-				System.out.println(getAID().getName() + " checking messages");
+				System.out.println(getLocalName() + " checking messages");
 				ACLMessage msg = receive();
 				if (msg != null) {
 					// Process the message
-					System.out.println(getAID().getName() + " reporting: message received");
+					System.out.println(getLocalName() + " reporting: message received from " + msg.getSender().getLocalName());
 
 					// deserialize content
 					Object contentObject = null;
@@ -168,9 +172,10 @@ public class EquipletAgent extends Agent {
 						// getting the product step from the message.
 						ProductionStep proStepC = (ProductionStep) contentObject;
 						ObjectId productStepEntryId = null;
-						Gson gson = new Gson();
+						Gson gson = new GsonBuilder().serializeNulls().create();
 
 						// Makes a database connection and puts the new step in it.
+						//TODO make use of a single BlackBoardClient object in an instance variable instead of recreating it
 						try {
 							client = new BlackboardClient(equipletDbIp);
 							client.setDatabase(equipletDbName);
@@ -188,7 +193,7 @@ public class EquipletAgent extends Agent {
 							message.addReceiver(serviceAgent);
 							message.setOntology("canDoProductionStep");
 							try {
-								message.setContentObject((Serializable) productStepEntryId);
+								message.setContentObject(productStepEntryId);
 							} catch (IOException e) {
 								e.printStackTrace();
 								// TODO: ERROR HANDLING'
@@ -206,7 +211,14 @@ public class EquipletAgent extends Agent {
 					case "canDoProductionStepResponse":
 						productStepEntryId = null;
 						DBObject productStep = null;
-						gson = new Gson();
+						gson = new GsonBuilder()
+							.registerTypeAdapter(jade.util.leap.List.class, new InstanceCreator<jade.util.leap.List>() {
+								@Override
+								public jade.util.leap.List createInstance(Type type) {
+									return new jade.util.leap.ArrayList();
+								}
+							})
+							.create();
 						//TODO: cleanup onderstaande
 						//TODO: one blackboardclient
 						try {
@@ -226,7 +238,7 @@ public class EquipletAgent extends Agent {
 							query.put("_id", productStepEntryId);
 							productStep = client.findDocuments(query).get(0);
 							int status = (Integer) productStep.get("status");
-							AID productAgent = (AID) productStep.get("productAgentId");
+							AID productAgent = gson.fromJson(productStep.get("productAgentId").toString(), AID.class);
 							if (status == ProductStepStatusCode.EVALUATING.getStatus()) {
 								ACLMessage message = new ACLMessage(ACLMessage.CONFIRM);
 								message.setConversationId(msg.getConversationId());
@@ -253,26 +265,26 @@ public class EquipletAgent extends Agent {
 
 						try {
 							
-						ObjectId contentObjectId = communicationTable.get(msg
-								.getConversationId());
+							ObjectId contentObjectId = communicationTable.get(msg
+									.getConversationId());
 						
 							ACLMessage message = new ACLMessage(
 									ACLMessage.REQUEST);
 							message.addReceiver(serviceAgent);
 							message.setConversationId(msg.getConversationId());
-							message.setContentObject((Serializable)contentObjectId);
+							message.setContentObject(contentObjectId);
 							message.setOntology("getProductionStepDuration");
 
-							try {
-
-								message.setContentObject((Serializable) contentObject);
-
-							} catch (IOException e) {
-
-								System.out.println(e);
-								e.printStackTrace();
-
-							}
+//							try {
+//
+//								message.setContentObject((Serializable) contentObject);
+//
+//							} catch (IOException e) {
+//
+//								System.out.println(e);
+//								e.printStackTrace();
+//
+//							}
 
 							send(message);
 
@@ -284,14 +296,12 @@ public class EquipletAgent extends Agent {
 
 						break;
 
-					case "ProductionDurationResponce":
+					case "ProductionDurationResponse":
 
-						try{
-							
-						
-						ObjectId contentObjectId = communicationTable.get(msg
-								.getConversationId());
-						client = new BlackboardClient(equipletDbIp);
+						try {
+							ObjectId contentObjectId = communicationTable.get(msg
+									.getConversationId());
+							client = new BlackboardClient(equipletDbIp);
 						
 							client.setDatabase(equipletDbName);
 							client.setCollection(productStepsName);

@@ -134,7 +134,7 @@ public class JadeAgentX extends Agent {
 				"productAgent.ProductAgent", arg)).start();
         
         }catch(Exception e){
-            
+            e.printStackTrace();
         }
     }
 }
