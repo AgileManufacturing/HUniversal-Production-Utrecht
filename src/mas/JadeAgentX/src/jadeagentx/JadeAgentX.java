@@ -42,14 +42,14 @@ public class JadeAgentX extends Agent {
         ArrayList<Long> capabilities2 = new ArrayList<Long>();
         capabilities2.add(2l);
         
-        ar = new Object[]{capabilities2};
-        ((AgentController)getContainerController().createNewAgent("eqa2", "equipletAgent.EquipletAgent", ar)).start();
-        
-        ArrayList<Long> capabilities3 = new ArrayList<Long>();
-        capabilities3.add(3l);
-        
-        ar = new Object[]{capabilities3};
-        ((AgentController)getContainerController().createNewAgent("eqa3", "equipletAgent.EquipletAgent", ar)).start();
+//        ar = new Object[]{capabilities2};
+//        ((AgentController)getContainerController().createNewAgent("eqa2", "equipletAgent.EquipletAgent", ar)).start();
+//        
+//        ArrayList<Long> capabilities3 = new ArrayList<Long>();
+//        capabilities3.add(3l);
+//        
+//        ar = new Object[]{capabilities3};
+//        ((AgentController)getContainerController().createNewAgent("eqa3", "equipletAgent.EquipletAgent", ar)).start();
         
         ar = null;
         
@@ -119,8 +119,8 @@ public class JadeAgentX extends Agent {
 		// Our argument for the product agent. The total production of the
 		// product,
 		// consists of multiple steps
-		ProductionStep[] stepList = new ProductionStep[] { stp1, stp2,
-				stp3, stp4 };
+		ProductionStep[] stepList = new ProductionStep[] { stp1, stp2 };
+//		, stp3, stp4 };
 
 		Production production = new Production(stepList);
 		Product product = new Product(production);

@@ -106,12 +106,11 @@ public class EquipletAgent extends Agent {
 		}
 		equipletDbName = getAID().getLocalName();
 		communicationTable = new Hashtable<String, ObjectId>();
-		// TODO: Not Hardcoded capabilities/get capabilities from the service
-		// agent.
+		// TODO: Not Hardcoded capabilities/get capabilities from the service agent.
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			capabilities = (ArrayList<Long>) args[0];
-			System.out.println(capabilities + " " + equipletDbName);
+			System.out.format("%s %s%n", capabilities, equipletDbName);
 		}
         try {
         	DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
@@ -135,6 +134,7 @@ public class EquipletAgent extends Agent {
 			EquipletDirectoryMessage entry = new EquipletDirectoryMessage(getAID(), capabilities, dbData);
 			client.insertDocument(gson.toJson(entry));
 		} catch (Exception e) {
+			e.printStackTrace();
 			doDelete();
 		}
 		
@@ -147,11 +147,10 @@ public class EquipletAgent extends Agent {
 			public void action() {
 
 				// myAgent.addBehaviour(new RequestPerformer());
-				System.out.println(getLocalName() + " checking messages");
 				ACLMessage msg = receive();
+				Gson gson;
 				if (msg != null) {
 					// Process the message
-					System.out.println(getLocalName() + " reporting: message received from " + msg.getSender().getLocalName());
 
 					// deserialize content
 					Object contentObject = null;
@@ -160,11 +159,13 @@ public class EquipletAgent extends Agent {
 					try {
 						contentObject = msg.getContentObject();
 					} catch (UnreadableException e) {
-						System.out.println("Exception Caught, No Content Object Given");
+//						System.out.println("Exception Caught, No Content Object Given");
 					}
 
+					System.out.format("%s received message from %s (%s:%s)%n",
+							getLocalName(), msg.getSender().getLocalName(), msg.getOntology(), contentObject == null ? contentString : contentObject);
+
 					// Start of the switch statement on the ontology
-					System.out.println("Msg Ontology = " + msg.getOntology());
 					switch (msg.getOntology()) {
 
 					// Case to check if the equiplet can perform the given step.
@@ -172,7 +173,7 @@ public class EquipletAgent extends Agent {
 						// getting the product step from the message.
 						ProductionStep proStepC = (ProductionStep) contentObject;
 						ObjectId productStepEntryId = null;
-						Gson gson = new GsonBuilder().serializeNulls().create();
+						gson = new GsonBuilder().serializeNulls().create();
 
 						// Makes a database connection and puts the new step in it.
 						//TODO make use of a single BlackBoardClient object in an instance variable instead of recreating it
@@ -264,12 +265,8 @@ public class EquipletAgent extends Agent {
 					case "GetProductionDuration":
 
 						try {
-							
-							ObjectId contentObjectId = communicationTable.get(msg
-									.getConversationId());
-						
-							ACLMessage message = new ACLMessage(
-									ACLMessage.REQUEST);
+							ObjectId contentObjectId = communicationTable.get(msg.getConversationId());
+							ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 							message.addReceiver(serviceAgent);
 							message.setConversationId(msg.getConversationId());
 							message.setContentObject(contentObjectId);
@@ -295,10 +292,15 @@ public class EquipletAgent extends Agent {
 						}
 
 						break;
-
 					case "ProductionDurationResponse":
-
 						try {
+							gson = new GsonBuilder()
+								.registerTypeAdapter(jade.util.leap.List.class, new InstanceCreator<jade.util.leap.List>() {
+									@Override
+									public jade.util.leap.List createInstance(Type type) {
+										return new jade.util.leap.ArrayList();
+									}
+								}).create();
 							ObjectId contentObjectId = communicationTable.get(msg
 									.getConversationId());
 							client = new BlackboardClient(equipletDbIp);
@@ -309,19 +311,19 @@ public class EquipletAgent extends Agent {
 							query.put("_id", contentObjectId);
 							productStep = client.findDocuments(query).get(0);
 														
-							ScheduleData Schedule = (ScheduleData)productStep.get("scheduleData");
-							Long Duration = Schedule.getDuration();
-							////
-													
+							ScheduleData Schedule = gson.fromJson(productStep.get("scheduleData").toString(), ScheduleData.class);
+							
 							ACLMessage message = new ACLMessage(ACLMessage.INFORM);
-							message.addReceiver((AID) productStep.get("productAgentId"));
+							message.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
 							message.setOntology("ProductionDuration");
 							message.setConversationId(msg.getConversationId());
-							message.setContentObject((Serializable) Duration);
+							message.setContentObject(Schedule.getDuration());
 							
+							System.out.format("sending message: %s%n", message);
 							send(message);
 							
 						}catch(Exception e){
+							e.printStackTrace();
 							myAgent.doDelete();
 						}
 					
@@ -339,7 +341,7 @@ public class EquipletAgent extends Agent {
 							BasicDBObject query = new BasicDBObject();
 							query.put("_id", contentObjectId);
 							productStep = client.findDocuments(query).get(0);
-							System.out.println("" + timeslot);
+							System.out.format("%d%n", timeslot);
 							ACLMessage timeslotMessage = new ACLMessage(
 									ACLMessage.REQUEST);
 							timeslotMessage.addReceiver(serviceAgent);
@@ -358,17 +360,17 @@ public class EquipletAgent extends Agent {
 							ACLMessage confirmScheduleStep = new ACLMessage(ACLMessage.CONFIRM);
 							confirmScheduleStep.setConversationId(msg.getConversationId());
 							confirmScheduleStep.addReceiver((AID) productStep.get("productAgentId"));
-							}
-							catch(Exception e){
-							
-							}
-							break;
+						}
+						catch(Exception e){
+							e.printStackTrace();
+						}
+						break;
 					}
 
+				}
+				block();
 			}
-			block();
-		}
-	});
+		});
 	}
 	public void takeDown() {
 		Gson gson = new Gson();
@@ -383,6 +385,7 @@ public class EquipletAgent extends Agent {
 
 				client.removeDocuments(gson.toJson(searchQuery));
 			} catch (Exception e) {
+				e.printStackTrace();
 				// The equiplet is already going down, so it has to do nothing
 				// here.
 			}

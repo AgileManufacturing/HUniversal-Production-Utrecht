@@ -106,11 +106,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 				if(content != null) {
 					switch(message.getOntology()) {
 						case "canDoProductionStep":
-							//TODO get step data using content
-							//extract stepType
-							//is this stepType present in stepTypes?
-							//send answer
-							
 							boolean isAble = stepTypes.containsKey(((Integer)productionStep.get("type")).longValue());
 							reply.setContent("" + isAble);
 							try {
@@ -127,48 +122,35 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 								productionStep.removeField("outputParts");
 								productionStep.removeField("status");
 								productionStep.removeField("scheduleData");
-								System.out.println(getLocalName() + " can do step");
+								
+								StringBuilder strBuilder = new StringBuilder("Production step:\n");
+								printDBObjectPretty(productionStep, "    ", "    ", strBuilder);
+								System.out.format("%s can do step %s%n", getLocalName(), strBuilder);
 							} else {
 								productionStep.removeField("_id");
 								productionStep.removeField("status");
 								productionStep.removeField("scheduleData");
-								System.out.println(getLocalName() + " cannot do step");
+								
+								StringBuilder strBuilder = new StringBuilder("Production step:\n");
+								printDBObjectPretty(productionStep, "    ", "    ", strBuilder);
+								System.out.format("%s cannot do step %s%n", getLocalName(), strBuilder);
 							}
-							StringBuilder strBuilder = new StringBuilder("Production step:\n");
-							printDBObjectPretty(productionStep, "    ", "    ", strBuilder);
-							System.out.println(strBuilder);
 							break;
 						case "getProductionStepDuration":
-							//TODO get step data using content
-							//extract stepType
-							//add all durations of those services of this stepTypes
-							//send answer
-							
-							
 							int duration = 0;
 							for(String service : stepTypes.get(((Integer)(productionStep.get("type"))).longValue())) {
 								duration += services.get(service);
 							}
 
-//							ScheduleData scheduleData = (ScheduleData) productionStep.get("scheduleData");
 							ScheduleData scheduleData = new ScheduleData();
 							scheduleData.setDuration(duration);
 							
 							Gson gson = new Gson();
 							productionStep.put("scheduleData", scheduleData);
 							try {
-//								System.out.println("{ _id: ObjectId(\"" + productionStep.get("_id") + "\") }");
-//								System.out.println("updated " +
-//										productionStepBBClient.updateDocuments(
-//											"{ _id: ObjectId(\"" + productionStep.get("_id") + "\") }",
-//											"{ $set: { \"scheduleData\": " + gson.toJson(scheduleData) + " } }")
-//										+ " documents");
-
-								System.out.println("updated " +
-										productionStepBBClient.updateDocuments(
-											new BasicDBObject("_id", productionStep.get("_id")),
-											new BasicDBObject("$set", new BasicDBObject("scheduleData", gson.fromJson(gson.toJson(scheduleData), BasicDBObject.class))))
-										+ " documents");
+								productionStepBBClient.updateDocuments(
+										new BasicDBObject("_id", productionStep.get("_id")),
+										new BasicDBObject("$set", new BasicDBObject("scheduleData", gson.fromJson(gson.toJson(scheduleData), BasicDBObject.class))));
 							} catch (InvalidDBNamespaceException e) {
 								e.printStackTrace();
 							}
@@ -176,7 +158,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 							reply.setContent("Evaluation Complete");
 							reply.setOntology("ProductionDurationResponse");
 							
-							System.out.println("Step takes " + duration + " timeslots");
+							System.out.format("%s will do %d timeslots about this step%n", getLocalName(), duration);
 							break;
 						case "scheduleStepWithLogistics":
 							//TODO add behaviour handling scheduling with logistics agent
@@ -188,13 +170,16 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 							break;
 						default:
 							reply.setContent("Unknown ontology");
-							System.out.println("Unknown ontology: " + message.getOntology() + " content: " + content);
+							System.out.format("Unknown ontology: %s content: %s%n", message.getOntology(), content);
 							break;
 					}
 				} else {
 					reply.setContent("No content");
 				}
+
+				System.out.format("%s sending %s%n", getLocalName(), reply);
 				send(reply);
+				System.out.format("sent reply to %s%n", getLocalName());
 			}
 			block();
 		}
@@ -219,7 +204,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			//TODO negociate with logistics agent to determine when parts can be here
 			//send a message to equiplet agent with the answer.
 			
-			System.out.println("planning service " + service);
+			System.out.format("planning service %s%n", service);
 		}
     }
     
@@ -231,13 +216,13 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		public DoServiceBehaviour(Agent agent, String service) {
 			super(agent);
 			this.service = service;
-
-			System.out.println("executing service " + service);
+			
+			System.out.format("planning service %s%n", service);
 		}
 
 		@Override
 		public void action() {
-			System.out.println("service " + service + " done");
+			System.out.format("service %s done%n", service);
 			//TODO update status step in production step BB
 		}
 
