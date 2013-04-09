@@ -1,4 +1,4 @@
-package equipletAgent;
+package newDataClasses;
 
 /**
  * Instances of this class contain schedule data with the start time, duration and the deadline of a <code>ProductionStep</code> in timeslots.

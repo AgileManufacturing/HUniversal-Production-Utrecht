@@ -55,9 +55,11 @@ import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 import newDataClasses.ParameterList;
 import newDataClasses.ProductionStep;
+import nl.hu.client.BasicOperationSubscription;
 import nl.hu.client.BlackboardClient;
 import nl.hu.client.BlackboardSubscriber;
 import nl.hu.client.BlackboardSubscription;
+import nl.hu.client.GeneralMongoException;
 import nl.hu.client.InvalidDBNamespaceException;
 import nl.hu.client.MongoOperation;
 import nl.hu.client.OplogEntry;
@@ -147,10 +149,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 	        equipletBBclient = new BlackboardClient(equipletDbIp);
 	        equipletBBclient.setDatabase(equipletDbName);
 	        equipletBBclient.setCollection(productStepsName);
-	        equipletBBclient.subscribe(new BlackboardSubscription(MongoOperation.UPDATE, this));
-		} catch (InvalidDBNamespaceException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+	        equipletBBclient.subscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
+		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException e) {
+			e.printStackTrace();
 			doDelete();
 		}
 		
@@ -211,10 +212,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 		return serviceAgent;
 	}
 	
-	
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
-		// TODO Auto-generated method stub
-		
+		// TODO Implement onMessage
 	}
 }

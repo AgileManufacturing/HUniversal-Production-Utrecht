@@ -35,6 +35,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 import newDataClasses.ParameterList;
+import newDataClasses.ScheduleData;
 /**
  * Implementation of a message for the productstep blackboard
  */

@@ -2,6 +2,8 @@ package behaviours;
 
 import java.lang.reflect.Type;
 
+import newDataClasses.ScheduleData;
+
 import org.bson.types.ObjectId;
 
 import com.google.gson.Gson;
@@ -11,7 +13,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 import equipletAgent.EquipletAgent;
-import equipletAgent.ScheduleData;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;

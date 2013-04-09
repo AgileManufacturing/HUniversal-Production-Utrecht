@@ -17,9 +17,6 @@ import jade.lang.acl.UnreadableException;
  * The Class ScheduleStep.
  */
 public class ScheduleStep extends ReceiveBehaviour {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("ScheduleStep");
 	private EquipletAgent equipletAgent;
@@ -50,14 +47,12 @@ public class ScheduleStep extends ReceiveBehaviour {
 			
 			long timeslot = Long.parseLong(contentString);
 			ObjectId contentObjectId = equipletAgent.getCommunicationSlot(message.getConversationId());
-			BasicDBObject query = new BasicDBObject();
-			query.put("_id", contentObjectId);
+			BasicDBObject query = new BasicDBObject("_id", contentObjectId);
 			DBObject productStep = equipletAgent.getEquipletBBclient().findDocuments(query).get(0);
 			System.out.format("%d%n", timeslot);
-			ACLMessage timeslotMessage = new ACLMessage(
-					ACLMessage.REQUEST);
+			ACLMessage timeslotMessage = new ACLMessage(ACLMessage.REQUEST);
 			timeslotMessage.addReceiver(equipletAgent.getServiceAgent());
-			timeslotMessage.setOntology("scheduleStepWithLogistics");
+			timeslotMessage.setOntology("planStepWithLogistics");
 			timeslotMessage.setContent(String.valueOf(timeslot));
 			timeslotMessage.setConversationId(message.getConversationId());
 			myAgent.send(timeslotMessage);

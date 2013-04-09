@@ -143,7 +143,7 @@ public class BlackboardClient {
 	 * @return The DBObject parsed from the JSON string.
 	 * @throws InvalidJSONException An error exists within the JSON.
 	 **/
-	public DBObject parseJSONWithCheckException(String jsonString) throws InvalidJSONException {
+	public static DBObject parseJSONWithCheckException(String jsonString) throws InvalidJSONException {
 		DBObject obj = null;
 		try {
 			obj = (DBObject)JSON.parse(jsonString);

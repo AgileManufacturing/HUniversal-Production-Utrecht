@@ -1,21 +1,16 @@
 package hardwareAgent;
 
-import java.util.Hashtable;
-
 import behaviours.EvaluateDuration;
 
 import equipletAgent.DbData;
 import jade.core.Agent;
+import nl.hu.client.BasicOperationSubscription;
 import nl.hu.client.BlackboardClient;
 import nl.hu.client.BlackboardSubscriber;
-import nl.hu.client.BlackboardSubscription;
 import nl.hu.client.MongoOperation;
 import nl.hu.client.OplogEntry;
 
 public class HardwareAgent extends Agent implements BlackboardSubscriber {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private BlackboardClient serviceStepBBClient, equipletStepBBClient;
@@ -34,7 +29,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 			serviceStepBBClient = new BlackboardClient(dbData.ip);
 			serviceStepBBClient.setDatabase(dbData.name);
 			serviceStepBBClient.setCollection("ServiceStepsBlackboard");
-			serviceStepBBClient.subscribe(new BlackboardSubscription(MongoOperation.INSERT, this));
+			serviceStepBBClient.subscribe(new BasicOperationSubscription(MongoOperation.INSERT, this));
 			
 			equipletStepBBClient = new BlackboardClient(dbData.ip);
 			equipletStepBBClient.setDatabase(dbData.name);

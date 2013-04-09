@@ -1,6 +1,7 @@
 package serviceAgent;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.Hashtable;
 
 import jade.core.AID;
@@ -10,11 +11,13 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.mongodb.*;
 
 import equipletAgent.*;
 import org.bson.types.*;
 
+import newDataClasses.ScheduleData;
 import nl.hu.client.*;
 
 //TODO add registering with BlackBoard agent for changing productionstep status to WAITING
@@ -36,29 +39,30 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			dbData = (DbData) args[0];
 		}
 
-		productionStepBBClient = new BlackboardClient(dbData.ip);
-		serviceStepBBClient = new BlackboardClient(dbData.ip);
 		try {
+			productionStepBBClient = new BlackboardClient(dbData.ip);
+			serviceStepBBClient = new BlackboardClient(dbData.ip);
+
 			productionStepBBClient.setDatabase(dbData.name);
 			productionStepBBClient.setCollection("ProductStepsBlackBoard");
-			productionStepBBClient.subscribe(new BlackboardSubscription(
+			productionStepBBClient.subscribe(new BasicOperationSubscription(
 					MongoOperation.INSERT, this)); // need react on new
 													// production steps
-			productionStepBBClient.subscribe(new BlackboardSubscription(
+			productionStepBBClient.subscribe(new BasicOperationSubscription(
 					MongoOperation.UPDATE, this)); // need to react on state
 													// changes of production
 													// steps to WAITING
-			productionStepBBClient.subscribe(new BlackboardSubscription(
+			productionStepBBClient.subscribe(new BasicOperationSubscription(
 					MongoOperation.DELETE, this)); // Need to react on deletion
 													// of steps which means that
 													// they are cancelled.
 
 			serviceStepBBClient.setDatabase(dbData.name);
 			serviceStepBBClient.setCollection("ServiceStepsBlackBoard");
-			serviceStepBBClient.subscribe(new BlackboardSubscription(
+			serviceStepBBClient.subscribe(new BasicOperationSubscription(
 					MongoOperation.UPDATE, this)); // need to react on state
-													// changes of service steps
-		} catch (Exception e) {
+		} catch (UnknownHostException | GeneralMongoException
+				| InvalidDBNamespaceException e) {
 			e.printStackTrace();
 			doDelete();
 		}
@@ -120,7 +124,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					query.put("_id", content);
 					productionStep = productionStepBBClient
 							.findDocuments(query).get(0);
-				} catch (UnreadableException | InvalidDBNamespaceException e) {
+				} catch (UnreadableException | InvalidDBNamespaceException
+						| GeneralMongoException e) {
 					e.printStackTrace();
 					doDelete();
 				}
@@ -188,10 +193,11 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 													"$set",
 													new BasicDBObject(
 															"scheduleData",
-															gson.fromJson(
-																	gson.toJson(scheduleData),
-																	BasicDBObject.class))));
-						} catch (InvalidDBNamespaceException e) {
+															BlackboardClient
+																	.parseJSONWithCheckException(gson
+																			.toJson(scheduleData)))));
+						} catch (InvalidDBNamespaceException
+								| GeneralMongoException | InvalidJSONException e) {
 							e.printStackTrace();
 							doDelete();
 						}
@@ -202,7 +208,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 						// System.out.format("%s will do %d timeslots about this step%n",
 						// getLocalName(), duration);
 						break;
-					case "scheduleStepWithLogistics":
+					case "planStepWithLogistics":
 						// TODO add behaviour handling scheduling with logistics
 						// agent
 
@@ -236,10 +242,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		}
 	}
 
-	// private <T> T JSONtoObject(Object o) {
-	// return new T();
-	// }
-
 	private class PlanServiceBehaviour extends OneShotBehaviour {
 		private static final long serialVersionUID = 1L;
 
@@ -252,11 +254,35 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 		@Override
 		public void action() {
-			// TODO negociate with logistics agent to determine when parts can
+			// TODO negotiate with logistics agent to determine when parts can
 			// be here
 			// send a message to equiplet agent with the answer.
 
 			System.out.format("planning service %s%n", service);
+		}
+	}
+
+	@Override
+	public void onMessage(MongoOperation operation, OplogEntry entry) {
+		switch (entry.getNamespace().split(".")[1]) {
+		case "ProductStepsBlackBoard":
+
+			switch (operation) {
+			case INSERT:
+				addBehaviour(new ReportStepDurationBehaviour(this,
+						entry.getTargetObjectId()));
+				break;
+			case UPDATE:
+				addBehaviour(new DoServiceBehaviour(this, ));
+				break;
+			case DELETE:
+				break;
+			default:
+				break;
+			}
+			break;
+		case "ServiceStepsBlackBoard":
+			break;
 		}
 	}
 
@@ -284,28 +310,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		}
 	}
 
-	@Override
-	public void onMessage(MongoOperation operation, OplogEntry entry) {
-		switch (entry.getNamespace().split(".")[1]) {
-		case "ProductStepsBlackBoard":
-
-			switch (operation) {
-			case INSERT:
-				break;
-			case UPDATE:
-				break;
-			case DELETE:
-				break;
-			default:
-				break;
-			}
-			break;
-		case "ServiceStepsBlackBoard":
-			break;
-		}
-	}
-
 	private class ReportStepDurationBehaviour extends OneShotBehaviour {
+		static final long serialVersionUID = 1L;
 		private ObjectId stepId;
 
 		public ReportStepDurationBehaviour(Agent a, ObjectId stepId) {
@@ -321,36 +327,15 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			try {
 				productionStep = (BasicDBObject) productionStepBBClient
 						.findDocuments(query).get(0);
-			} catch (InvalidDBNamespaceException e1) {
-				e1.printStackTrace();
+			} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+				e.printStackTrace();
 				doDelete();
 			}
 
 			boolean isAble = stepTypes.containsKey(((Integer) productionStep
 					.get("type")).longValue());
 
-			if (!isAble) {
-				ACLMessage message = new ACLMessage(ACLMessage.DISCONFIRM);
-				message.setOntology("canDoProductionStepResponse");
-				message.setContent("Not able");
-				try {
-					message.setContentObject(entry.getTargetObjectId());
-				} catch (IOException e) {
-					e.printStackTrace();
-					doDelete();
-				}
-				addBehaviour(new SenderBehaviour(this, message));
-
-				productionStep.removeField("_id");
-				productionStep.removeField("status");
-				productionStep.removeField("scheduleData");
-
-				StringBuilder strBuilder = new StringBuilder(
-						"Production step:\n");
-				printDBObjectPretty(productionStep, "    ", "    ", strBuilder);
-				System.out.format("%s cannot do step %s%n", getLocalName(),
-						strBuilder);
-			} else {
+			if (isAble) {
 				int duration = 0;
 				for (String service : stepTypes.get(((Integer) (productionStep
 						.get("type"))).longValue())) {
@@ -363,18 +348,14 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 				Gson gson = new Gson();
 				productionStep.put("scheduleData", scheduleData);
 				try {
-					productionStepBBClient
-							.updateDocuments(
-									new BasicDBObject("_id", productionStep
-											.get("_id")),
-									new BasicDBObject(
-											"$set",
-											new BasicDBObject(
-													"scheduleData",
-													gson.fromJson(
-															gson.toJson(scheduleData),
-															BasicDBObject.class))));
-				} catch (InvalidDBNamespaceException e) {
+					productionStepBBClient.updateDocuments(
+							query,
+							new BasicDBObject("$set", new BasicDBObject(
+									"scheduleData", BlackboardClient
+											.parseJSONWithCheckException(gson
+													.toJson(scheduleData)))));
+				} catch (InvalidDBNamespaceException | GeneralMongoException
+						| InvalidJSONException e) {
 					e.printStackTrace();
 					doDelete();
 				}
@@ -391,8 +372,28 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 				printDBObjectPretty(productionStep, "    ", "    ", strBuilder);
 				System.out.format("%s can do step %s%n", getLocalName(),
 						strBuilder);
+			} else {
+				ACLMessage message = new ACLMessage(ACLMessage.DISCONFIRM);
+				message.setOntology("canDoProductionStepResponse");
+				message.setContent("Not able");
+				try {
+					message.setContentObject(stepId);
+				} catch (IOException e) {
+					e.printStackTrace();
+					doDelete();
+				}
+				addBehaviour(new SenderBehaviour(ServiceAgent.this, message));
+
+				productionStep.removeField("_id");
+				productionStep.removeField("status");
+				productionStep.removeField("scheduleData");
+
+				StringBuilder strBuilder = new StringBuilder(
+						"Production step:\n");
+				printDBObjectPretty(productionStep, "    ", "    ", strBuilder);
+				System.out.format("%s cannot do step %s%n", getLocalName(),
+						strBuilder);
 			}
 		}
-
 	}
 }
