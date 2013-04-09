@@ -97,6 +97,8 @@ public class EquipletAgent extends Agent {
 
 	@SuppressWarnings("unchecked")
 	public void setup() {
+		System.out.println("I spawned as a equiplet agent.");
+		
 		// set the database name to the name of the equiplet and set the database ip to its own IP.
 		try{
 			InetAddress IP = InetAddress.getLocalHost();
@@ -159,11 +161,12 @@ public class EquipletAgent extends Agent {
 					try {
 						contentObject = msg.getContentObject();
 					} catch (UnreadableException e) {
-//						System.out.println("Exception Caught, No Content Object Given");
+//						System.out.println("Exception Caught, No Content Object Given " + e);
 					}
 
 					System.out.format("%s received message from %s (%s:%s)%n",
-							getLocalName(), msg.getSender().getLocalName(), msg.getOntology(), contentObject == null ? contentString : contentObject);
+							getLocalName(), msg.getSender().getLocalName(), msg.getOntology(),
+							contentObject != null ? contentObject : contentString);
 
 					// Start of the switch statement on the ontology
 					switch (msg.getOntology()) {
@@ -283,6 +286,9 @@ public class EquipletAgent extends Agent {
 //
 //							}
 
+							System.out.format("%s sending message: %s:%n",
+									getLocalName(), message.getOntology(),
+									message.getContentObject() != null ? message.getContentObject() : message.getContent());
 							send(message);
 
 						} catch (Exception e) {
@@ -319,7 +325,9 @@ public class EquipletAgent extends Agent {
 							message.setConversationId(msg.getConversationId());
 							message.setContentObject(Schedule.getDuration());
 							
-							System.out.format("sending message: %s%n", message);
+							System.out.format("%s sending message: %s:%n",
+									getLocalName(), message.getOntology(),
+									message.getContentObject() != null ? message.getContentObject() : message.getContent());
 							send(message);
 							
 						}catch(Exception e){

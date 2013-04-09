@@ -35,10 +35,10 @@ public class NegotiatorBehaviour extends OneShotBehaviour {
 			pem.addProductionStep(stp.getId());
 			pem.addEquipletToProductionStep(stp.getId(), new AID("eqa1",
 					AID.ISLOCALNAME));
-			pem.addEquipletToProductionStep(stp.getId(), new AID("eqa2",
-					AID.ISLOCALNAME));
-			pem.addEquipletToProductionStep(stp.getId(), new AID("eqa3",
-					AID.ISLOCALNAME));
+//			pem.addEquipletToProductionStep(stp.getId(), new AID("eqa2",
+//					AID.ISLOCALNAME));
+//			pem.addEquipletToProductionStep(stp.getId(), new AID("eqa3",
+//					AID.ISLOCALNAME));
 		}
 		// foreachProductionstep in object[]{
 		for (ProductionStep stp : _productAgent.getProduct().getProduction()
@@ -58,7 +58,7 @@ public class NegotiatorBehaviour extends OneShotBehaviour {
 		public Conversation(AID aid, ProductionStep productionStep) {
 			this._aid = aid;
 			this._productionStep = productionStep;
-			canPerformStep = false;
+			canPerformStep = true;
 		}
 
 		public void onStart() {
@@ -108,9 +108,9 @@ public class NegotiatorBehaviour extends OneShotBehaviour {
 				}
 			});
 			
-				addSubBehaviour(new OneShotBehaviour() {
-					public void action() {
-						if (canPerformStep) {
+			addSubBehaviour(new OneShotBehaviour() {
+				public void action() {
+					if (canPerformStep) {
 						try {
 							ACLMessage message = new ACLMessage(
 									ACLMessage.REQUEST);
@@ -125,39 +125,39 @@ public class NegotiatorBehaviour extends OneShotBehaviour {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-						}
 					}
-				});
+				}
+			});
 
-				template = MessageTemplate.and(
-						MessageTemplate.MatchPerformative(ACLMessage.INFORM),
-						MessageTemplate.MatchConversationId(ConversationId));
+			template = MessageTemplate.and(
+					MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+					MessageTemplate.MatchConversationId(ConversationId));
 
-				addSubBehaviour(new receiveBehaviour(myAgent, 10000, template) {
-					public void handle(ACLMessage msg) {
-						if (msg == null)
+			addSubBehaviour(new receiveBehaviour(myAgent, 10000, template) {
+				public void handle(ACLMessage msg) {
+					if (msg == null)
+						System.out
+								.println("Productagent "
+										+ myAgent.getLocalName()
+										+ " timed out on waiting for " + _aid + " GetProductionDurationStep " + _productionStep.getId());
+					else {
+						try {
+							long timeSlots = (Long) msg.getContentObject();
+							System.out.println("Received INFORM from: "
+									+ _aid + ". He can perform step: "
+									+ _productionStep.getId()
+									+ ". This step will take " + timeSlots
+									+ " timeslots.");
+						} catch (UnreadableException e) {
 							System.out
-									.println("Productagent "
-											+ myAgent.getLocalName()
-											+ " timed out on waiting for " + _aid + " GetProductionDurationStep " + _productionStep.getId());
-						else {
-							try {
-								long timeSlots = (Long) msg.getContentObject();
-								System.out.println("Received INFORM from: "
-										+ _aid + ". He can perform step: "
-										+ _productionStep.getId()
-										+ ". This step will take " + timeSlots
-										+ " timeslots.");
-							} catch (UnreadableException e) {
-								System.out
-										.println("Error on receiving timeslots from: "
-												+ _aid + " " + e);
-							}
+									.println("Error on receiving timeslots from: "
+											+ _aid + " " + e);
 						}
 					}
-				});
-			}
+				}
+			});
 		}
+	}
 }
 
 @SuppressWarnings("serial")
