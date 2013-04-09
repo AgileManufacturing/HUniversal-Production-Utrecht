@@ -112,6 +112,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 
 	@SuppressWarnings("unchecked")
 	public void setup() {
+		System.out.println("I spawned as a equiplet agent.");
+		
 		// set the database name to the name of the equiplet and set the database ip to its own IP.
 		try{
 			InetAddress IP = InetAddress.getLocalHost();
@@ -162,7 +164,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 			e.printStackTrace();
 			doDelete();
 		}
-		
+
 		CanPerformStep canPerformStepBehaviour = new CanPerformStep(this);
         addBehaviour(canPerformStepBehaviour);
 		
