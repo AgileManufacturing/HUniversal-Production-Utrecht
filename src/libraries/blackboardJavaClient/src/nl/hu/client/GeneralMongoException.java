@@ -1,5 +1,5 @@
 /**
- * @file MongoConnectionException.java
+ * @file GeneralMongoException.java
  * @brief Thrown when connecting to a MongoDB server fails.
  * @date Created: 9 apr. 2013
  *
