@@ -32,7 +32,7 @@ public class ProductAgent extends Agent {
 			PlannerBehaviour pb = new PlannerBehaviour();
 			addBehaviour(pb);
 
-			ProduceBehaviour pb = new ProduceBehaviour(_product);
+			ProduceBehaviour prb = new ProduceBehaviour();
 			
 			
 			System.out.println("I spawned as a product agent");
