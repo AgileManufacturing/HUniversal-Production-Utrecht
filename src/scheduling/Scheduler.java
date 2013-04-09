@@ -50,8 +50,13 @@ public class Scheduler {
 		//end connecting
 		
 		//extract data of mongoDB to Object Array
-		List<DBObject> data = db.getCollection("eq1").find().toArray();//nameOfCollection should be 'schedule'
-		schedules= new Schedule[data.size()];
+		int scheduleCount = 0;
+		for(int i = 0; i<equipletList.length;i++){
+			//old name is eq1
+			List<DBObject> data = db.getCollection(equipletList[i].getName()).find().toArray();//nameOfCollection should be 'schedule'
+			scheduleCount += data.size();
+		}
+		schedules= new Schedule[scheduleCount];
 		
 		
 		FreeTimeSlot[] freetimes = new FreeTimeSlot[data.size()];
