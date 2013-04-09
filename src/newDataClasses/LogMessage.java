@@ -8,7 +8,7 @@ package newDataClasses;
  *
  */
 public class LogMessage {
-	private String ID;
+	private String id;
 	private String time;
 	private String message;
 	private String state;
