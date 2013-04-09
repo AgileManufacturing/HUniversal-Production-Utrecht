@@ -130,7 +130,7 @@ public class Scheduler {
 
         msg.addReceiver(equipletAID); 
 
-        send(msg);
+        //send(msg);
 		
 		//equipletAgent.scheduleProductionStep(startSlot);
 		
