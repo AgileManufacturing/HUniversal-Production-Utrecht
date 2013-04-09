@@ -59,9 +59,19 @@ public class ReceiveBehaviour extends SimpleBehaviour {
 			handle(msg);
 		}
 	}
-
-	public void handle(ACLMessage m) { /* can be redefined in sub_class */
-	}
+	
+	 /*
+	  * This function will be called in the sub_class e.g.
+	  * new ReceiveBehaviour(myAgent, 10000, template) {
+				public void handle(ACLMessage msg) {
+					if(msg == null) timeout expired
+					
+					handle msg stuff.
+				}
+		}
+	  */
+	public void handle(ACLMessage m)
+	{}
 
 	public void reset() {
 		msg = null;

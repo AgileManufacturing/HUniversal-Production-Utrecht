@@ -1,3 +1,4 @@
+
 package main;
 
 import java.util.Dictionary;
@@ -13,6 +14,19 @@ import newDataClasses.Product;
 import newDataClasses.Production;
 import newDataClasses.ProductionStep;
 
+/*
+ * Author: Alexander
+ * 
+ * Dummy main agent for testing purposes.
+ * Starts up the different agents and sets the (for now) hardcoded information.
+ * 
+ * DISCLAIMER
+ * I DID NOT FOLLOW ANY CODING REGULATIONS. THIS IS NOT OFFICIAL PROJECT CODE,
+ * NOR WILL IT BE USED FOR ANYTHING OTHER THEN TESTING.
+ * COMMENTS ARE SCARCE AND CRAPPY
+ *  
+ *  USE AT OWN RISK.
+ */
 @SuppressWarnings("serial")
 public class MainAgent extends Agent {
 	protected void setup() {
@@ -32,7 +46,7 @@ public class MainAgent extends Agent {
 			((AgentController) getContainerController().createNewAgent("eqa3",
 					"equipletAgent.EquipletAgent", ar)).start();
 			
-			ar = new Object[] { 2 }; // rotate
+			ar = new Object[] { 2 }; // colour
 			((AgentController) getContainerController().createNewAgent("eqa4",
 					"equipletAgent.EquipletAgent", ar)).start();
 			
@@ -40,7 +54,7 @@ public class MainAgent extends Agent {
 			((AgentController) getContainerController().createNewAgent("eqa5",
 					"equipletAgent.EquipletAgent", ar)).start();
 			
-			ar = new Object[] { 1 }; // rotate
+			ar = new Object[] { 1 }; // pickndplace
 			((AgentController) getContainerController().createNewAgent("eqa6",
 					"equipletAgent.EquipletAgent", ar)).start();
 

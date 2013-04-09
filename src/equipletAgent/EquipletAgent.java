@@ -1,16 +1,4 @@
-/*
- * Author: Alexander
- * 
- * Dummy equipletagent for testing purposes.
- * Listens to 2 different incomming conv. and responds to them.
- * 
- * DISCLAIMER
- * I DID NOT FOLLOW ANY CODING REGULATIONS. THIS IS NOT OFFICIAL PROJECT CODE,
- * NOR WILL IT BE USED FOR ANYTHING OTHER THEN TESTING.
- * COMMENTS ARE SCARCE AND CRAPPY
- *  
- *  USE AT OWN RISK.
- */
+
 
 package equipletAgent;
 
@@ -28,6 +16,19 @@ import newDataClasses.ParameterGroup;
 import newDataClasses.ParameterList;
 import newDataClasses.ProductionStep;
 
+/*
+ * Author: Alexander
+ * 
+ * Dummy equipletagent for testing purposes.
+ * Listens to 2 different incomming conv. and responds to them.
+ * 
+ * DISCLAIMER
+ * I DID NOT FOLLOW ANY CODING REGULATIONS. THIS IS NOT OFFICIAL PROJECT CODE,
+ * NOR WILL IT BE USED FOR ANYTHING OTHER THEN TESTING.
+ * COMMENTS ARE SCARCE AND CRAPPY
+ *  
+ *  USE AT OWN RISK.
+ */
 @SuppressWarnings("serial")
 public class EquipletAgent extends Agent {
 
@@ -206,5 +207,4 @@ public class EquipletAgent extends Agent {
 			}
 		}
 	}
-
 }

@@ -1,3 +1,11 @@
+/*
+ * @Author Alexander
+ * @Version 0.1
+ * 
+ * Initial product agent. 
+ * Added functions to generate a Conv. Id based on the agents localname.
+ */
+
 package productAgent;
 
 import jade.core.Agent;

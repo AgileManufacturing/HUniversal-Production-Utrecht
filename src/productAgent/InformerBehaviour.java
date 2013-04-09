@@ -1,16 +1,3 @@
-/*
- * Version 1.1
- * 
- * Author: Alexander Streng
- * 
- * Behaviour for negotiating with the equipletagens to
- * determine the viable equiplets for the scheduling algorithm.
- * Will first check whether the equiplet can perform the given step with the given parameters.
- * If the equipletagent returns with an confirm, the product agent will ask for the duration of
- * the operation ( in timeslots ).
- * 
- */
-
 package productAgent;
 
 import jade.core.AID;
@@ -25,6 +12,18 @@ import jade.lang.acl.UnreadableException;
 import newDataClasses.ProductionEquipletMapper;
 import newDataClasses.ProductionStep;
 
+/*
+ * Version 1.1
+ * 
+ * Author: Alexander Streng
+ * 
+ * Behaviour for negotiating with the equipletagens to
+ * determine the viable equiplets for the scheduling algorithm.
+ * Will first check whether the equiplet can perform the given step with the given parameters.
+ * If the equipletagent returns with an confirm, the product agent will ask for the duration of
+ * the operation ( in timeslots ).
+ * 
+ */
 @SuppressWarnings("serial")
 public class InformerBehaviour extends OneShotBehaviour {
 
