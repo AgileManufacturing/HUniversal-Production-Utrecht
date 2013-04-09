@@ -1,15 +1,12 @@
 package productAgent;
 
 import jade.core.AID;
-import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.ParallelBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
-import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
-import newDataClasses.ProductionEquipletMapper;
 import newDataClasses.ProductionStep;
 
 /*
@@ -96,7 +93,6 @@ public class InformerBehaviour extends OneShotBehaviour {
 				par.addSubBehaviour(new Conversation(aid, stp));
 			}
 		}
-	
 		myAgent.addBehaviour(par);
 	}
 
@@ -117,6 +113,11 @@ public class InformerBehaviour extends OneShotBehaviour {
 			this._productionStep = productionStep;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * @see jade.core.behaviours.Behaviour#onStart()
+		 * starts the conversation
+		 */
 		public void onStart() {
 			final String ConversationId = _productAgent.generateCID();
 			final MessageTemplate template = MessageTemplate

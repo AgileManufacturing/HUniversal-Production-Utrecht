@@ -1,10 +1,6 @@
 
 package main;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
-
-import jade.core.AID;
 import jade.core.Agent;
 import jade.wrapper.AgentController;
 import newDataClasses.Parameter;
