@@ -53,6 +53,7 @@ public class Scheduler {
 		List<DBObject> data = db.getCollection("eq1").find().toArray();//nameOfCollection should be 'schedule'
 		schedules= new Schedule[data.size()];
 		
+		
 		FreeTimeSlot[] freetimes = new FreeTimeSlot[data.size()];
 		
 		for(int i = 0; i < data.size(); i++){
