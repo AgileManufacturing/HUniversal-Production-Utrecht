@@ -1,14 +1,14 @@
 /**
  * @file InvalidDBNamespaceException.java
  * @brief Thrown when the database namespace is incorrect.
- * @date Created: 2012-04-05
+ * @date Created: 2013-04-05
  *
  * @author Jan-Willem Willebrands
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -33,20 +33,20 @@ package nl.hu.client;
 
 /**
  * Thrown when the database namespace is incorrect.
- */
+ **/
 public class InvalidDBNamespaceException extends Exception {
 
 	/**
 	 * @var long serialVersionUID
 	 * SerialUID for this class.
-	 */
+	 **/
 	private static final long serialVersionUID = 6479137977336676219L;
 	
 	/**
 	 * Constructs an InvalidDBNamespaceException object with the specified message.
 	 * 
 	 * @param message Message describing the contents of this exception.
-	 */
+	 **/
 	public InvalidDBNamespaceException(String message) {
 		super(message);
 	}

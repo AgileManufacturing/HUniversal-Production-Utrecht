@@ -1,7 +1,7 @@
-﻿/**
- * @file BlackboardSubscriber.java
- * @brief Interface for subscribing to blackboard events.
- * @date Created: 2013-04-04
+/**
+ * @file GeneralMongoException.java
+ * @brief Thrown when connecting to a MongoDB server fails.
+ * @date Created: 9 apr. 2013
  *
  * @author Jan-Willem Willebrands
  *
@@ -26,21 +26,26 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
  **/
-
 package nl.hu.client;
 
 /**
- * Interface used for subscribing to blackboard events.
+ * Thrown when connecting to a MongoDB server fails.
  **/
-public interface BlackboardSubscriber{
+public class GeneralMongoException extends Exception {
 	
 	/**
-	 * Callback function that is invoked whenever the subscribed event occurs.
-	 * 
-	 * @param operation The {@link MongoOperation} that triggered the callback.
-	 * @param entry {@link OplogEntry} object representing the oplog entry.
+	 * @var long serialVersionUID
+	 * SerialVersionUID for this class.
 	 **/
-	public void onMessage(MongoOperation operation, OplogEntry entry);
+	private static final long serialVersionUID = 2792870683299145176L;
+
+	/**
+	 * Constructs a new exception with the specified detail message and cause.
+	 * @param msg A message providing additional information about the exception.
+	 * @param cause The cause of this exception.
+	 **/
+	public GeneralMongoException(String msg, Throwable cause) {
+		super(msg, cause);
+	}
 }

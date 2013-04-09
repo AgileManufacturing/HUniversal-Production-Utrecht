@@ -1,7 +1,7 @@
-﻿/**
- * @file BlackboardSubscriber.java
- * @brief Interface for subscribing to blackboard events.
- * @date Created: 2013-04-04
+/**
+ * @file DBAuthException.java
+ * @brief Thrown when authentication with a database fails.
+ * @date Created: 5 apr. 2013
  *
  * @author Jan-Willem Willebrands
  *
@@ -26,21 +26,24 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
  **/
-
 package nl.hu.client;
 
 /**
- * Interface used for subscribing to blackboard events.
+ * Thrown when authentication with a database fails.
  **/
-public interface BlackboardSubscriber{
-	
+public class DBAuthException extends Exception {
 	/**
-	 * Callback function that is invoked whenever the subscribed event occurs.
-	 * 
-	 * @param operation The {@link MongoOperation} that triggered the callback.
-	 * @param entry {@link OplogEntry} object representing the oplog entry.
+	 * @var long serialVersionUID
+	 * SerialVersionUID for the class.
 	 **/
-	public void onMessage(MongoOperation operation, OplogEntry entry);
+	private static final long serialVersionUID = 879715532789750988L;
+
+	/**
+	 * Constructs an exception with the specified message.
+	 * @param msg A message providing additional information about the exception.
+	 **/
+	public DBAuthException(String msg) {
+		super(msg);
+	}
 }

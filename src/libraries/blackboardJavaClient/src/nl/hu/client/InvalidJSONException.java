@@ -8,7 +8,7 @@
  * @section LICENSE
  * License: newBSD
  *
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -35,19 +35,19 @@ import com.mongodb.util.JSONParseException;
 
 /**
  * Thrown when invalid JSON is encountered.
- */
+ **/
 public class InvalidJSONException extends Exception {
 	/**
 	 * @var long serialVersionUID
 	 * Serial version ID of this class.
-	 */
+	 **/
 	private static final long serialVersionUID = -7981116871524728088L;
 
 	/**
 	 * Constructs an InvalidJSONException storing the JSONParseException as its cause.
 	 * 
 	 * @param ex The JSONParseException that caused this exception.
-	 */
+	 **/
 	public InvalidJSONException(JSONParseException ex) {
 		super("An error has occurred while parsing the JSON string.", ex);
 	}
