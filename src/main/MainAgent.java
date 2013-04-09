@@ -62,7 +62,7 @@ public class MainAgent extends Agent {
 			parameterList.AddParameterGroup(p);
 
 			// Next we want to have some production steps
-			ProductionStep stp1 = new ProductionStep(1, parameterList);
+			ProductionStep stp1 = new ProductionStep(1, 0, parameterList);
 
 			p = new ParameterGroup("Color"); // group colour
 			p.add(new Parameter("Id", "3"));
@@ -77,7 +77,7 @@ public class MainAgent extends Agent {
 			p.add(new Parameter("y", "2"));
 			parameterList.AddParameterGroup(p);
 
-			ProductionStep stp2 = new ProductionStep(2, parameterList);
+			ProductionStep stp2 = new ProductionStep(2, 1, parameterList);
 
 			p = new ParameterGroup("Color"); // group colour
 			p.add(new Parameter("Id", "5"));
@@ -92,7 +92,7 @@ public class MainAgent extends Agent {
 			p.add(new Parameter("y", "2"));
 			parameterList.AddParameterGroup(p);
 
-			ProductionStep stp3 = new ProductionStep(3, parameterList);
+			ProductionStep stp3 = new ProductionStep(3, 2, parameterList);
 
 			p = new ParameterGroup("Color"); // group colour
 			p.add(new Parameter("Id", "7"));
@@ -107,7 +107,7 @@ public class MainAgent extends Agent {
 			p.add(new Parameter("y", "2"));
 			parameterList.AddParameterGroup(p);
 
-			ProductionStep stp4 = new ProductionStep(4, parameterList);
+			ProductionStep stp4 = new ProductionStep(4, 3, parameterList);
 
 			// Our argument for the product agent. The total production of the
 			// product,

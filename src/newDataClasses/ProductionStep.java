@@ -32,8 +32,9 @@ public class ProductionStep implements Serializable {
 		this._parameters = new ParameterList();
 	}
 	
-	public ProductionStep(long id, ParameterList parameterList) {
+	public ProductionStep(long id, long capability,  ParameterList parameterList) {
 		this._id = id;
+		this._capability = capability;
 		this._parameters = parameterList;
 	}
 	
@@ -55,10 +56,6 @@ public class ProductionStep implements Serializable {
 
 	public long getCapability() {
 		return _capability;
-	}
-
-	public void setCapability(long _capability) {
-		this._capability = _capability;
 	}
 	
 }
