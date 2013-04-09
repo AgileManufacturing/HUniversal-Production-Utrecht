@@ -37,6 +37,7 @@ public class Scheduler {
 		//MongoClient mongoClient = new MongoClient();
 		// or
 		
+		//Make connectiion with database
 		MongoClient mongoClient =null;
 		try {
 			mongoClient = new MongoClient( "localhost" );//145.89.191.131 is hu server
@@ -57,7 +58,7 @@ public class Scheduler {
 		//boolean auth = db.authenticate("root", char['g','e','e','n']);
 		//end connecting
 		
-		//extract data of mongoDB to Object Array
+		//extract data of every equiplet their mongoDB to Object Array
 		int scheduleCount = 0;
 		FreeTimeSlot[] freetimes;
 		for(int i = 0; i<equipletList.length;i++){
@@ -65,14 +66,16 @@ public class Scheduler {
 			List<DBObject> data = db.getCollection(equipletList[i].getName()).find().toArray();//nameOfCollection should be 'schedule'
 			scheduleCount += data.size();
 		}
+		
+		//intialise object Schedule and object FreeTimeSlot arrays
 		schedules= new Schedule[scheduleCount];
-		
-		
 		freetimes = new FreeTimeSlot[scheduleCount];
 		
+		//get every scheduled timeslot of every equiplet
 		for(int extract = 0; extract<equipletList.length;extract++){
 			List<DBObject> data = db.getCollection(equipletList[extract].getName()).find().toArray();//nameOfCollection should be 'schedule'
 			for(int i = 0; i < data.size(); i++){
+				//debug
 				System.out.println(data.get(i).toString());
 				
 				double b = (Double) data.get(i).get("startTime");
@@ -81,17 +84,21 @@ public class Scheduler {
 				double c = (Double) data.get(i).get("duration");
 				int dur = (int)c;
 				
+				//add scheduled timeslot to array of scheduled timeslots and mention which equiplet
 				schedules[i] = this.new Schedule(stati, dur, equipletList[extract].getName());
 				
 				//debug
 				System.out.println(schedules[i].toString());
 			}
 		}
+		//break connection
 		mongoClient.close();
 		
+		//initialise timeslot to start checking and temporarily value for calculation
 		int startTimeSlot = 0;
 		int freetimeslotCounter = 0;
 		
+		//check within every schedule of the schedules array for free timeslots and add them to the free time slots array 
 		for(int run = 0; run < schedules.length;run++){
 			if(schedules[run].getStartTime() > startTimeSlot){
 				if(schedules.length > (run+1)){
@@ -99,15 +106,21 @@ public class Scheduler {
 						int freeTimeSlot = schedules[(run+1)].getStartTime() - schedules[run].getDeadline()-1;
 						int timeslotToSchedule= (schedules[run].getDeadline()+1);
 						
+						
+						//debug
 						System.out.println("Vrij tijd sloten: "+freeTimeSlot + " startend op tijdslot: "+ timeslotToSchedule );
+						
 						freetimes[freetimeslotCounter] = this.new FreeTimeSlot(timeslotToSchedule, freeTimeSlot, schedules[run].getEquipletName());
 					}
 				}
 			}
 		}
 		
+		//set startslot which need to be scheduled
 		int startSlot = 0;
 		FreeTimeSlot freetimeslotEq = null;
+		
+		//calculate freetime slot and asign them to the above intialized values
 		if(freetimes.length > 1){
 			for(int chooseTimeSlot = 1;chooseTimeSlot < freetimes.length; chooseTimeSlot++){
 				if(freetimes[chooseTimeSlot].getStartTime() < freetimes[chooseTimeSlot-1].getStartTime()){
@@ -117,7 +130,9 @@ public class Scheduler {
 			}
 		}
 		
+		//init AID
 		AID equipletAID =null;
+		//get the equiplet from the timeslot
 		for (int i=0; i<equipletList.length;i++)
         {
             if(equipletList[i].getName().equals(freetimeslotEq.getEquipletName())){
@@ -125,6 +140,7 @@ public class Scheduler {
             }
         }
 		
+		//send the message to the equiplet to schedule the timeslot
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
         msg.setContent( "Schedule" );
 
