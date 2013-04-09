@@ -26,7 +26,7 @@ import newDataClasses.ProductionEquipletMapper;
 import newDataClasses.ProductionStep;
 
 @SuppressWarnings("serial")
-public class NegotiatorBehaviour extends OneShotBehaviour {
+public class InformerBehaviour extends OneShotBehaviour {
 
 	private ProductAgent _productAgent;
 
