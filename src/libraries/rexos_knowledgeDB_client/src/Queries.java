@@ -134,6 +134,9 @@ public class Queries {
             "      `product_steps_services`.`service` = `services`.`id`\n" +
             "    ) ;";
 
+    /**
+     * A private constructor preventing this class to be constructed.
+     **/
     private Queries() {
     }
 }
