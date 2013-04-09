@@ -31,6 +31,18 @@ public class MainAgent extends Agent {
 			ar = new Object[] { 3 }; // rotate
 			((AgentController) getContainerController().createNewAgent("eqa3",
 					"equipletAgent.EquipletAgent", ar)).start();
+			
+			ar = new Object[] { 2 }; // rotate
+			((AgentController) getContainerController().createNewAgent("eqa4",
+					"equipletAgent.EquipletAgent", ar)).start();
+			
+			ar = new Object[] { 3 }; // rotate
+			((AgentController) getContainerController().createNewAgent("eqa5",
+					"equipletAgent.EquipletAgent", ar)).start();
+			
+			ar = new Object[] { 1 }; // rotate
+			((AgentController) getContainerController().createNewAgent("eqa6",
+					"equipletAgent.EquipletAgent", ar)).start();
 
 			ar = null;
 

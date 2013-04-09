@@ -20,7 +20,7 @@ public class ProductAgent extends Agent {
 		try {
 			_product = (Product) getArguments()[0];
 
-			NegotiatorBehaviour nb = new NegotiatorBehaviour(this);
+			InformerBehaviour nb = new InformerBehaviour();
 			addBehaviour(nb);
 
 			System.out.println("I spawned as a product agent");
