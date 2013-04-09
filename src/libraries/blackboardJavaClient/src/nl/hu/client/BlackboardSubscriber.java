@@ -1,7 +1,7 @@
 ﻿/**
  * @file BlackboardSubscriber.java
  * @brief Interface for subscribing to blackboard events.
- * @date Created: 2012-04-04
+ * @date Created: 2013-04-04
  *
  * @author Jan-Willem Willebrands
  *

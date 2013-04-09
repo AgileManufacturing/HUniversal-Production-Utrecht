@@ -46,13 +46,13 @@ import org.bson.types.ObjectId;
  **/
 public class BlackboardClient {
 	/**
-	 * @var String OPLOG
+	 * @var String OPLOG_COLLECTION_NAME
 	 * Operation log collection name of MongoDB.
 	 **/
 	private static final String OPLOG_COLLECTION_NAME = "oplog.rs";
 
 	/**
-	 * @var String LOCAL
+	 * @var String OPLOG_DATABASE_NAME
 	 * Local database name of MongoDB.
 	 **/
 	private static final String OPLOG_DATABASE_NAME = "local";
@@ -64,7 +64,7 @@ public class BlackboardClient {
 	private Mongo mongo;
 
 	/**
-	 * @var HashMap<String, BasicDBObject> subscriptions
+	 * @var HashMap<BlackboardSubscription> subscriptions
 	 * Link between subscribed topic name and MongoDbs BasicDBObjects
 	 **/
 	private ArrayList<BlackboardSubscription> subscriptions;
@@ -82,7 +82,7 @@ public class BlackboardClient {
 	private DBCollection currentCollection;
 
 	/**
-	 * @var TailedCursorThread tcThread
+	 * @var OplogMonitorThread oplogMonitorThread
 	 * Thread for tracking tailable cursor on operation log of MongoDB
 	 **/
 	private OplogMonitorThread oplogMonitorThread;
@@ -149,6 +149,9 @@ public class BlackboardClient {
 	
 	/**
 	 * Sets the database to use and connects using the specified username and password.
+	 * @param database The database to load from MongoDB.
+	 * @param user The username that should be used to authenticate with the database.
+	 * @param password The password for the user.
 	 * @throws InvalidDBNamespaceException Database name cannot be empty.
 	 * @throws DBAuthException Authentication failed.
 	 **/
@@ -390,17 +393,21 @@ public class BlackboardClient {
 	}
 	
 	/**
-	 * Class for tailable cursor thread within the client
+	 * Class for the tailed oplog cursor thread within the client
 	 **/
 	private class OplogMonitorThread extends Thread {
 		
 		/**
+		 * @var DBCursor tailedCursor
 		 * Tailed cursor for this thread.
 		 **/
 		private DBCursor tailedCursor;
 		
 		/**
-		 * Constructor of TailedCursorThread.
+		 * Constructor of OplogMonitorThread.
+		 * @param oplogDBName The database in which the oplog collection resides.
+		 * @param oplogCollectionName The name of the oplog collection.
+		 * @param query The query that will be used in the tailed cursor.
 		 **/
 		public OplogMonitorThread(String oplogDBName, String oplogCollectionName, DBObject query) {
 			DB database = mongo.getDB(oplogDBName);

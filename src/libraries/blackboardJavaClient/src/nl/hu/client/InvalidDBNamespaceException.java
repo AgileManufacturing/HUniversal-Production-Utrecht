@@ -1,7 +1,7 @@
 /**
  * @file InvalidDBNamespaceException.java
  * @brief Thrown when the database namespace is incorrect.
- * @date Created: 2012-04-05
+ * @date Created: 2013-04-05
  *
  * @author Jan-Willem Willebrands
  *

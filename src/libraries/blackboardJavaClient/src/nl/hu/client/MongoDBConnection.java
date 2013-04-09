@@ -39,6 +39,10 @@ import com.mongodb.ServerAddress;
  * Helper class for managing Mongo connections.
  **/
 public class MongoDBConnection {
+	/**
+	 * @var Hashtable<ServerAddress, MongoDBConnection> databaseConnections
+	 * Hashmap storing the active Mongo connection for each host.
+	 **/
 	private static Hashtable<ServerAddress, MongoDBConnection> databaseConnections;
 	static {
 		databaseConnections = new Hashtable<ServerAddress, MongoDBConnection>();
@@ -46,7 +50,7 @@ public class MongoDBConnection {
 	
 	/**
 	 * @var Mongo mongoClient
-	 * The {@link Mongo} object representing this connection.
+	 * The Mongo object representing this connection.
 	 **/
 	private Mongo mongoClient;
 	
@@ -58,7 +62,7 @@ public class MongoDBConnection {
 	
 	/**
 	 * Creates a new Mongo client for the specified address.
-	 * @param address The {@link ServerAddress} where the host resides.
+	 * @param address The ServerAddress where the host resides.
 	 **/
 	private MongoDBConnection(ServerAddress address) {
 		mongoClient = new Mongo(address);
@@ -67,7 +71,7 @@ public class MongoDBConnection {
 	
 	/**
 	 * Returns a {@link MongoDBConnection} instance for the specified host.
-	 * @param address The {@link ServerAddress} where the host resides.
+	 * @param address The ServerAddress where the host resides.
 	 * @return A {@link MongoDBConnection} instance for the specified host.
 	 **/
 	public static MongoDBConnection getInstanceForHost(ServerAddress address) {
@@ -79,16 +83,16 @@ public class MongoDBConnection {
 	}
 	
 	/**
-	 * Returns the {@link Mongo} client for this connection.
-	 * @return The {@link Mongo} client for this connection.
+	 * Returns the Mongo client for this connection.
+	 * @return The Mongo client for this connection.
 	 **/
 	public Mongo getMongoClient() {
 		return mongoClient;
 	}
 	
 	/**
-	 * Returns the {@link ServerAddress} for this connection.
-	 * @return The {@link ServerAddress} for this connection.
+	 * Returns the ServerAddress for this connection.
+	 * @return The ServerAddress for this connection.
 	 **/
 	public ServerAddress getServerAddress() {
 		return address;
