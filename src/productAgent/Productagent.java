@@ -1,3 +1,11 @@
+/*
+ * @Author Alexander
+ * @Version 0.1
+ * 
+ * Initial product agent. 
+ * Added functions to generate a Conv. Id based on the agents localname.
+ */
+
 package productAgent;
 
 import jade.core.Agent;
@@ -20,7 +28,7 @@ public class ProductAgent extends Agent {
 		try {
 			_product = (Product) getArguments()[0];
 
-			NegotiatorBehaviour nb = new NegotiatorBehaviour(this);
+			InformerBehaviour nb = new InformerBehaviour();
 			addBehaviour(nb);
 
 			System.out.println("I spawned as a product agent");
