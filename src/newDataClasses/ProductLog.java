@@ -15,7 +15,7 @@ public class ProductLog {
 	//private SQLiteDatabaseConnection local;
 	//private RemoteDatabaseConnection remote;
 	
-	public void Add(LogMessage[] msg){
+	public void add(LogMessage[] msg){
 		if(writeToLocal){
 			//local.insert()
 		}
@@ -24,7 +24,7 @@ public class ProductLog {
 		}
 	}
 	
-	public void PushLocalToRemote(){
+	public void pushLocalToRemote(){
 		//get latest remote
 		//get local since latest remote
 		//write to remote

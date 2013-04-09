@@ -38,6 +38,6 @@ public class ProduceBehaviour extends OneShotBehaviour{
 
 	void productionStepEnded(boolean succes, LogMessage[] log)
 	{	
-		_product.Add(log);
+		_product.add(log);
 	}
 }

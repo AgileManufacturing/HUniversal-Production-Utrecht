@@ -49,7 +49,7 @@ public class Product {
 		this._production = production;
 	}
 	
-	public void Add(LogMessage[] msg){
-		log.Add(msg);
+	public void add(LogMessage[] msg){
+		log.add(msg);
 	}
 }
