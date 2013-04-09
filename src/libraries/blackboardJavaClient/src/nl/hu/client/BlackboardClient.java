@@ -59,6 +59,18 @@ public class BlackboardClient {
 	private static final String OPLOG_DATABASE_NAME = "local";
 
 	/**
+	 * @var String oplogUser
+	 * The username for the oplog database.
+	 **/
+	private String oplogUser = null;
+	
+	/**
+	 * @var String oplogPassword
+	 * The password to be used for the oplog database.
+	 **/
+	private String oplogPassword = null;
+	
+	/**
 	 * @var Mongo mongo
 	 * Connection object to MongoDB.
 	 **/
@@ -95,7 +107,7 @@ public class BlackboardClient {
 	 * @throws MongoConnectionException Connecting to the database failed.
 	 * @throws UnknownHostException The IP address of a host could not be determined.
 	 **/
-	public BlackboardClient(String host) throws UnknownHostException, MongoConnectionException {
+	public BlackboardClient(String host) throws UnknownHostException, GeneralMongoException {
 		this.subscriptions = new ArrayList<BlackboardSubscription>();
 		this.mongo = MongoDBConnection.getInstanceForHost(new ServerAddress(host)).getMongoClient();
 	}
@@ -108,9 +120,21 @@ public class BlackboardClient {
 	 * @throws MongoConnectionException Connecting to the database failed.
 	 * @throws UnknownHostException The IP address of a host could not be determined.
 	 **/
-	public BlackboardClient(String host, int port) throws UnknownHostException, MongoConnectionException {
+	public BlackboardClient(String host, int port) throws UnknownHostException, GeneralMongoException {
 		this.subscriptions = new ArrayList<BlackboardSubscription>();
 		this.mongo = MongoDBConnection.getInstanceForHost(new ServerAddress(host, port)).getMongoClient();
+	}
+	
+	/**
+	 * Sets the username and password that will be used for connecting to the Oplog database.
+	 * If authentication is required, these credentials should be set before any subscriptions are added.
+	 * The client defaults to no authentication, in which case both username and password are set to null.
+	 * @param username Username for the oplog database.
+	 * @param password Password for the oplog database.
+	 **/
+	public void setOplogCredentials(String username, String password) {
+		this.oplogUser = username;
+		this.oplogPassword = password;
 	}
 
 	/**
@@ -151,11 +175,16 @@ public class BlackboardClient {
 	 * @param password The password for the user.
 	 * @throws InvalidDBNamespaceException Database name cannot be empty.
 	 * @throws DBAuthException Authentication failed.
+	 * @throws GeneralMongoException A MongoException occurred.
 	 **/
-	public void setDatabase(String database, String user, String password) throws InvalidDBNamespaceException, DBAuthException {
+	public void setDatabase(String database, String user, String password) throws InvalidDBNamespaceException, DBAuthException, GeneralMongoException {
 		setDatabase(database);
-		if (!currentDatabase.authenticate(user, password.toCharArray())) {
-			throw new DBAuthException("The provided username and password combination is incorrect.");
+		try {
+			if (!currentDatabase.authenticate(user, password.toCharArray())) {
+				throw new DBAuthException("The provided username and password combination is incorrect.");
+			}
+		} catch (MongoException mongoException) {
+			throw new GeneralMongoException("An error occurred attempting to authenticate.", mongoException);
 		}
 	}
 
@@ -178,12 +207,17 @@ public class BlackboardClient {
 	 * @param obj DBObject representing the document to be inserted.
 	 * @return ObjectId of the inserted object.
 	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 * @throws GeneralMongoException A MongoException occurred.
 	 **/
-	public ObjectId insertDocument(DBObject obj) throws InvalidDBNamespaceException {
+	public ObjectId insertDocument(DBObject obj) throws InvalidDBNamespaceException, GeneralMongoException {
 		if (currentCollection == null) {
 			throw new InvalidDBNamespaceException("No collection has been selected.");
 		}
-		currentCollection.insert(obj);
+		try {
+			currentCollection.insert(obj);
+		} catch (MongoException mongoException) {
+			throw new GeneralMongoException("An error occurred attempting to insert.", mongoException);
+		}
 		return ObjectId.massageToObjectId(obj.get("_id"));
 	}
 	
@@ -194,8 +228,9 @@ public class BlackboardClient {
 	 * @return ObjectId of the inserted object.
 	 * @throws InvalidJSONException The provided JSON contains errors.
 	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 * @throws GeneralMongoException A MongoException occurred.
 	 **/
-	public ObjectId insertDocument(String json) throws InvalidJSONException, InvalidDBNamespaceException {
+	public ObjectId insertDocument(String json) throws InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
 		DBObject obj = parseJSONWithCheckException(json);
 		return insertDocument(obj);
 	}
@@ -206,14 +241,20 @@ public class BlackboardClient {
 	 * @param query DBObject representing the query used for deleting documents.
 	 * @return The amount of records that have been removed.
 	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 * @throws GeneralMongoException A MongoException occurred.
 	 **/
-	public int removeDocuments(DBObject query) throws InvalidDBNamespaceException {
+	public int removeDocuments(DBObject query) throws InvalidDBNamespaceException, GeneralMongoException {
 		if (currentCollection == null) {
 			throw new InvalidDBNamespaceException("No collection has been selected.");
 		}
 		
-		WriteResult res = currentCollection.remove(query);
-		return res.getN();
+		try {
+			WriteResult res = currentCollection.remove(query);
+			return res.getN();
+		} catch (MongoException mongoException) {
+			throw new GeneralMongoException("An error occurred attempting to remove.", mongoException);
+		}
+		
 	}
 	
 	/**
@@ -223,8 +264,9 @@ public class BlackboardClient {
 	 * @return The amount of records that have been removed.
 	 * @throws InvalidJSONException The provided JSON contains errors.
 	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 * @throws GeneralMongoException A MongoException occurred.
 	 **/
-	public int removeDocuments(String queryAsJSON) throws InvalidJSONException, InvalidDBNamespaceException {
+	public int removeDocuments(String queryAsJSON) throws InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
 		DBObject query = parseJSONWithCheckException(queryAsJSON);
 		return removeDocuments(query);
 	}
@@ -235,14 +277,20 @@ public class BlackboardClient {
 	 * @param objId ObjectId of the requested object.
 	 * @return The object corresponding to the given id, or null if no such object was found.
 	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 * @throws GeneralMongoException A MongoException occurred.
 	 **/
-	public DBObject findDocumentById(ObjectId objId) throws InvalidDBNamespaceException {
+	public DBObject findDocumentById(ObjectId objId) throws InvalidDBNamespaceException, GeneralMongoException {
 		if (currentCollection == null) {
 			throw new InvalidDBNamespaceException("No collection has been selected.");
 		}
 		
-		DBObject found = currentCollection.findOne(QueryBuilder.start("_id").is(objId).get());
-		return found;
+		try {
+			DBObject found = currentCollection.findOne(QueryBuilder.start("_id").is(objId).get());
+			return found;
+		} catch (MongoException mongoException){
+			throw new GeneralMongoException("An error occurred attempting to remove.", mongoException);
+		}
+		
 	}
 	
 	/**
@@ -251,14 +299,19 @@ public class BlackboardClient {
 	 * @param query DBObject representing the query.
 	 * @return List of all documents matching the query.
 	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 * @throws GeneralMongoException A MongoException occurred.
 	 **/
-	public List<DBObject> findDocuments(DBObject query) throws InvalidDBNamespaceException {
+	public List<DBObject> findDocuments(DBObject query) throws InvalidDBNamespaceException, GeneralMongoException {
 		if (currentCollection == null) {
 			throw new InvalidDBNamespaceException("No collection has been selected.");
 		}
 		
-		List<DBObject> found = currentCollection.find(query).toArray();
-		return found;
+		try {
+			List<DBObject> found = currentCollection.find(query).toArray();
+			return found;
+		} catch (MongoException mongoException) {
+			throw new GeneralMongoException("An error occurred attempting to execute find query.", mongoException);
+		}
 	}
 	
 	/**
@@ -268,8 +321,9 @@ public class BlackboardClient {
 	 * @return List of all documents matching the query.
 	 * @throws InvalidJSONException The provided JSON contains errors.
 	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 * @throws GeneralMongoException A MongoException occurred.
 	 **/
-	public List<DBObject> findDocuments(String queryAsJSON) throws InvalidJSONException, InvalidDBNamespaceException {
+	public List<DBObject> findDocuments(String queryAsJSON) throws InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
 		DBObject query = parseJSONWithCheckException(queryAsJSON);
 		return findDocuments(query);
 	}
@@ -282,15 +336,19 @@ public class BlackboardClient {
 	 * @param updateQuery The query that should be used to update the target documents.
 	 * @return The amount of documents that have been updated.
 	 * @throws InvalidDBNamespaceException No collection has been selected.
-	 * @throws Exception
+	 * @throws GeneralMongoException A MongoException occurred.
 	 **/
-	public int updateDocuments(DBObject searchQuery, DBObject updateQuery) throws InvalidDBNamespaceException {
+	public int updateDocuments(DBObject searchQuery, DBObject updateQuery) throws InvalidDBNamespaceException, GeneralMongoException {
 		if (currentCollection == null) {
 			throw new InvalidDBNamespaceException("No collection has been selected.");
 		}
 		
-		WriteResult res = currentCollection.update(searchQuery, updateQuery);
-		return res.getN();
+		try {
+			WriteResult res = currentCollection.update(searchQuery, updateQuery);
+			return res.getN();
+		} catch (MongoException mongoException) {
+			throw new GeneralMongoException("An error occurred attempting to update.", mongoException);
+		}
 	}
 	
 	/**
@@ -302,8 +360,9 @@ public class BlackboardClient {
 	 * @return The amount of documents that have been updated.
 	 * @throws InvalidJSONException The provided JSON contains errors.
 	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 * @throws GeneralMongoException A MongoException occurred.
 	 **/
-	public int updateDocuments(String searchQueryAsJSON, String updateQueryAsJSON) throws InvalidJSONException, InvalidDBNamespaceException {
+	public int updateDocuments(String searchQueryAsJSON, String updateQueryAsJSON) throws InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
 		DBObject searchQuery = parseJSONWithCheckException(searchQueryAsJSON);
 		DBObject updateQuery = parseJSONWithCheckException(updateQueryAsJSON);
 		
@@ -353,7 +412,7 @@ public class BlackboardClient {
 			oplogMonitorThread.interrupt();
 		}
 	}
-
+	
 	/**
 	 * Attempts to create and start a new monitor thread.
 	 * If creation of a new thread fails, the old thread will be kept alive.
@@ -373,7 +432,11 @@ public class BlackboardClient {
 				.and(subs).get();
 
 		try {
-			newThread = new OplogMonitorThread(OPLOG_DATABASE_NAME, OPLOG_COLLECTION_NAME, query);
+			if (oplogUser != null) {
+				newThread = new OplogMonitorThread(OPLOG_DATABASE_NAME, OPLOG_COLLECTION_NAME, oplogUser, oplogPassword, query);
+			} else {
+				newThread = new OplogMonitorThread(OPLOG_DATABASE_NAME, OPLOG_COLLECTION_NAME, query);
+			}
 		} catch (MongoException ex) {
 			// This can happen when the database has not been configured properly and the Oplog collection does not exist.
 			// Creating a tailed cursor on a non-existing collection throws a MongoException.
@@ -416,6 +479,28 @@ public class BlackboardClient {
 			tailedCursor.skip(tailedCursor.size());
 		}
 
+		/**
+		 * Constructs a tailed cursor for the specified query on the oplog collection.
+		 * This constructor should be used when user authentication is required.
+		 * 
+		 * @param oplogDBName The database in which the oplog collection resides.
+		 * @param oplogCollectionName The name of the oplog collection.
+		 * @param username Username that will be used to authenticate with the oplog database. This user should have read access.
+		 * @param password The password belonging to the specified user.
+		 * @param query The query that will be used in the tailed cursor.
+		 **/
+		public OplogMonitorThread(String oplogDBName, String oplogCollectionName,
+				String username, String password, DBObject query) {
+			DB database = mongo.getDB(oplogDBName);
+			database.authenticate(username, password.toCharArray());
+			DBCollection collection = database.getCollection(oplogCollectionName);
+
+			tailedCursor = collection.find(query);
+			tailedCursor.addOption(Bytes.QUERYOPTION_TAILABLE);
+			tailedCursor.addOption(Bytes.QUERYOPTION_AWAITDATA);
+			tailedCursor.skip(tailedCursor.size());
+		}
+		
 		/**
 		 * Run method for the TailedCursorThread.
 		 * This will check for changes within the cursor and calls the onMessage method of its subscriber.

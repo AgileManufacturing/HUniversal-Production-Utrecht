@@ -64,13 +64,13 @@ public class MongoDBConnection {
 	/**
 	 * Creates a new Mongo client for the specified address.
 	 * @param address The ServerAddress where the host resides.
-	 * @throws MongoConnectionException Connecting to the database server failed.
+	 * @throws GeneralMongoException Connecting to the database server failed.
 	 **/
-	private MongoDBConnection(ServerAddress address) throws MongoConnectionException {
+	private MongoDBConnection(ServerAddress address) throws GeneralMongoException {
 		try {
 			mongoClient = new Mongo(address);
-		} catch (MongoException ex) {
-			throw new MongoConnectionException("Connection failed.", ex);
+		} catch (MongoException mongoException) {
+			throw new GeneralMongoException("A mongo exception occurred while connecting.", mongoException);
 		}
 		this.address = address;
 	}
@@ -81,7 +81,7 @@ public class MongoDBConnection {
 	 * @return A {@link MongoDBConnection} instance for the specified host.
 	 * @throws MongoConnectionException Connecting to the database server failed.
 	 **/
-	public static MongoDBConnection getInstanceForHost(ServerAddress address) throws MongoConnectionException {
+	public static MongoDBConnection getInstanceForHost(ServerAddress address) throws GeneralMongoException {
 		if (!databaseConnections.containsKey(address)) {
 			databaseConnections.put(address, new MongoDBConnection(address));
 		}

@@ -32,7 +32,7 @@ package nl.hu.client;
 /**
  * Thrown when connecting to a MongoDB server fails.
  **/
-public class MongoConnectionException extends Exception {
+public class GeneralMongoException extends Exception {
 	
 	/**
 	 * @var long serialVersionUID
@@ -45,7 +45,7 @@ public class MongoConnectionException extends Exception {
 	 * @param msg A message providing additional information about the exception.
 	 * @param cause The cause of this exception.
 	 **/
-	public MongoConnectionException(String msg, Throwable cause) {
+	public GeneralMongoException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 }
