@@ -235,7 +235,7 @@ public class BlackboardClient {
 	/**
 	 * Retrieves the document corresponding to the given ObjectId.
 	 *
-	 * @param query ObjectId of the requested object.
+	 * @param objId ObjectId of the requested object.
 	 * @return The object corresponding to the given id, or null if no such object was found.
 	 * @throws InvalidDBNamespaceException No collection has been selected.
 	 **/
