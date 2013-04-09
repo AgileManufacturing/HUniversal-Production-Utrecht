@@ -29,7 +29,7 @@
  * 
  **/
 
-package nl.hu.client;
+package libraries.blackboardJavaClient.src.nl.hu.client;
 
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;

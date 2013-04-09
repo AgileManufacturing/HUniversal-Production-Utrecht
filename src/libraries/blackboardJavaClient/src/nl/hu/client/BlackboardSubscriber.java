@@ -29,7 +29,7 @@
  * 
  **/
 
-package nl.hu.client;
+package libraries.blackboardJavaClient.src.nl.hu.client;
 
 /**
  * Interface used for subscribing to blackboard events.
