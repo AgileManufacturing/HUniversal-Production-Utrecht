@@ -13,6 +13,9 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
+/**
+ * The Class ScheduleStep.
+ */
 public class ScheduleStep extends ReceiveBehaviour {
 	/**
 	 * 
@@ -21,6 +24,11 @@ public class ScheduleStep extends ReceiveBehaviour {
 	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("ScheduleStep");
 	private EquipletAgent equipletAgent;
 
+	/**
+	 * Instantiates a new schedule step.
+	 *
+	 * @param a the a
+	 */
 	public ScheduleStep(Agent a) {
 		super(a, -1, messageTemplate);
 		equipletAgent = (EquipletAgent) a;
@@ -53,16 +61,14 @@ public class ScheduleStep extends ReceiveBehaviour {
 			timeslotMessage.setContent(String.valueOf(timeslot));
 			timeslotMessage.setConversationId(message.getConversationId());
 			myAgent.send(timeslotMessage);
-		
-		/* 
-		  * TODO: Ask service agent to schedule the step with the
-		  * logistics at time X if possible. Wait for result.
-		  * Report result back to product agent. If the result is
-		  * positive: Set the status of the step on the product
-		  * steps blackboard to PLANNED and add the schedule
-		  * data.
-		  */
-		 
+		/*
+		 * TODO: Ask service agent to schedule the step with the
+		 * logistics at time X if possible. Wait for result.
+		 * Report result back to product agent. If the result is
+		 * positive: Set the status of the step on the product
+		 * steps blackboard to PLANNED and add the schedule
+		 * data.
+		 */
 			ACLMessage confirmScheduleStep = new ACLMessage(ACLMessage.CONFIRM);
 			confirmScheduleStep.setConversationId(message.getConversationId());
 			confirmScheduleStep.addReceiver((AID) productStep.get("productAgentId"));

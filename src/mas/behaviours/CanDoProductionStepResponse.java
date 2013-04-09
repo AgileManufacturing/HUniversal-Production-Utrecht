@@ -18,7 +18,9 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
-
+/**
+ * The Class CanDoProductionStepResponse.
+ */
 public class CanDoProductionStepResponse extends ReceiveBehaviour{
 	/**
 	 * 
@@ -27,6 +29,11 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour{
     private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CanDoProductionStepResponse");
     private EquipletAgent equipletAgent;
 	
+	/**
+	 * Instantiates a new can do production step response.
+	 *
+	 * @param a the a
+	 */
 	public CanDoProductionStepResponse(Agent a) {
 		super(a, -1, messageTemplate);
 		equipletAgent = (EquipletAgent)a;

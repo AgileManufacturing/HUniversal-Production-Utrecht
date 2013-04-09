@@ -18,6 +18,9 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
+/**
+ * The Class ProductionDurationResponse.
+ */
 public class ProductionDurationResponse extends ReceiveBehaviour {
 	/**
 	 * 
@@ -26,6 +29,11 @@ public class ProductionDurationResponse extends ReceiveBehaviour {
 	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("ProductionDurationResponse");
 	private EquipletAgent equipletAgent;
 
+	/**
+	 * Instantiates a new production duration response.
+	 *
+	 * @param a the a
+	 */
 	public ProductionDurationResponse(Agent a) {
 		super(a, -1, messageTemplate);
 		equipletAgent = (EquipletAgent) a;

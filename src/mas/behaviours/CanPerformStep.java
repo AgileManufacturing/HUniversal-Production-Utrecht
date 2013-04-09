@@ -17,7 +17,9 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
-
+/**
+ * The Class CanPerformStep.
+ */
 public class CanPerformStep extends ReceiveBehaviour{
 	/**
 	 * 
@@ -26,6 +28,11 @@ public class CanPerformStep extends ReceiveBehaviour{
     private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CanPerformStep");
     private EquipletAgent equipletAgent;
 	
+	/**
+	 * Instantiates a new can perform step.
+	 *
+	 * @param a the a
+	 */
 	public CanPerformStep(Agent a) {
 		super(a, -1, messageTemplate);
 		equipletAgent = (EquipletAgent)a;

@@ -8,7 +8,9 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
-
+/**
+ * The Class GetProductionDuration.
+ */
 public class GetProductionDuration extends ReceiveBehaviour{
 	/**
 	 * 
@@ -17,6 +19,11 @@ public class GetProductionDuration extends ReceiveBehaviour{
     private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("GetProductionDuration");
     private EquipletAgent equipletAgent;
 	
+	/**
+	 * Instantiates a new gets the production duration.
+	 *
+	 * @param a the a
+	 */
 	public GetProductionDuration(Agent a) {
 		super(a, -1, messageTemplate);
 		equipletAgent = (EquipletAgent)a;

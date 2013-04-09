@@ -14,10 +14,22 @@ class ReceiveBehaviour extends SimpleBehaviour {
 
 	private ACLMessage msg;
 
+	/**
+	 * Gets the message.
+	 *
+	 * @return the message
+	 */
 	public ACLMessage getMessage() {
 		return msg;
 	}
 
+	/**
+	 * Instantiates a new receive behaviour.
+	 *
+	 * @param a the a
+	 * @param millis the millis
+	 * @param mt the mt
+	 */
 	public ReceiveBehaviour(Agent a, int millis, MessageTemplate mt) {
 		super(a);
 		timeOut = millis;
@@ -53,6 +65,11 @@ class ReceiveBehaviour extends SimpleBehaviour {
 		}
 	}
 
+	/**
+	 * Handle.
+	 *
+	 * @param m the m
+	 */
 	public void handle(ACLMessage m) { /* can be redefined in sub_class */
 	}
 
@@ -62,6 +79,11 @@ class ReceiveBehaviour extends SimpleBehaviour {
 		super.reset();
 	}
 
+	/**
+	 * Reset.
+	 *
+	 * @param dt the dt
+	 */
 	public void reset(int dt) {
 		timeOut = dt;
 		reset();
