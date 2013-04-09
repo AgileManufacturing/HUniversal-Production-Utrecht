@@ -47,6 +47,7 @@ import jade.wrapper.StaleProxyException;
 import newDataClasses.ParameterList;
 import newDataClasses.ProductionStep;
 import nl.hu.client.BlackboardClient;
+import nl.hu.client.InvalidDBNamespaceException;
 import serviceAgent.ServiceAgent;
 
 import java.io.IOException;
@@ -88,7 +89,7 @@ public class EquipletAgent extends Agent {
 	private String productStepsName = "ProductStepsBlackBoard";
 
 	//BlackboardClient to communicate with the blackboards
-	private BlackboardClient client;
+	private BlackboardClient collectiveBBclient, equipletBBclient;
 
 	//Arraylist with IDs of the capabilities of the equiplet
 	private ArrayList<Long> capabilities;
@@ -121,18 +122,29 @@ public class EquipletAgent extends Agent {
 			e1.printStackTrace();
 			doDelete();
 		}
+        
+        try {
+        	collectiveBBclient = new BlackboardClient(collectiveDbIp);
+			collectiveBBclient.setDatabase(collectiveDbName);
+	        collectiveBBclient.setCollection(equipletDirectoryName);
+	        
+	        equipletBBclient = new BlackboardClient(equipletDbIp);
+	        equipletBBclient.setDatabase(equipletDbName);
+	        equipletBBclient.setCollection(productStepsName);
+		} catch (InvalidDBNamespaceException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			doDelete();
+		}
 		
 		
 		
 		Gson gson = new Gson();
 		// put capabilities on the equipletDirectory
 		try {
-			client = new BlackboardClient(collectiveDbIp);
-			client.setDatabase(collectiveDbName);
-			client.setCollection(equipletDirectoryName);
 			DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 			EquipletDirectoryMessage entry = new EquipletDirectoryMessage(getAID(), capabilities, dbData);
-			client.insertDocument(gson.toJson(entry));
+			collectiveBBclient.insertDocument(gson.toJson(entry));
 		} catch (Exception e) {
 			e.printStackTrace();
 			doDelete();
@@ -178,15 +190,12 @@ public class EquipletAgent extends Agent {
 						// Makes a database connection and puts the new step in it.
 						//TODO make use of a single BlackBoardClient object in an instance variable instead of recreating it
 						try {
-							client = new BlackboardClient(equipletDbIp);
-							client.setDatabase(equipletDbName);
-							client.setCollection(productStepsName);
 							// TODO: get inputParts
 							// TODO: get ouputPart
 							ProductStepMessage entry = new ProductStepMessage(msg.getSender(), proStepC.getCapability(),
 									proStepC.getParameterList(), null, null,
 									ProductStepStatusCode.EVALUATING.getStatus(), null);
-							productStepEntryId = client.insertDocument(gson.toJson(entry));
+							productStepEntryId = equipletBBclient.insertDocument(gson.toJson(entry));
 							communicationTable.put(msg.getConversationId(), productStepEntryId);
 							// Asks the serviceAgent if it can do this product step.
 							ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
@@ -231,13 +240,10 @@ public class EquipletAgent extends Agent {
 						}
 						// Makes a database connection and gets the right
 						// product step out of it.
-						client = new BlackboardClient(equipletDbIp);
 						try {
-							client.setDatabase(equipletDbName);
-							client.setCollection(productStepsName);
 							BasicDBObject query = new BasicDBObject();
 							query.put("_id", productStepEntryId);
-							productStep = client.findDocuments(query).get(0);
+							productStep = equipletBBclient.findDocuments(query).get(0);
 							int status = (Integer) productStep.get("status");
 							AID productAgent = gson.fromJson(productStep.get("productAgentId").toString(), AID.class);
 							if (status == ProductStepStatusCode.EVALUATING.getStatus()) {
@@ -303,13 +309,9 @@ public class EquipletAgent extends Agent {
 								}).create();
 							ObjectId contentObjectId = communicationTable.get(msg
 									.getConversationId());
-							client = new BlackboardClient(equipletDbIp);
-						
-							client.setDatabase(equipletDbName);
-							client.setCollection(productStepsName);
 							BasicDBObject query = new BasicDBObject();
 							query.put("_id", contentObjectId);
-							productStep = client.findDocuments(query).get(0);
+							productStep = equipletBBclient.findDocuments(query).get(0);
 														
 							ScheduleData Schedule = gson.fromJson(productStep.get("scheduleData").toString(), ScheduleData.class);
 							
@@ -335,12 +337,9 @@ public class EquipletAgent extends Agent {
 							long timeslot = Long.parseLong(contentString);
 							ObjectId contentObjectId = communicationTable.get(msg
 									.getConversationId());
-							client = new BlackboardClient(equipletDbIp);
-							client.setDatabase(equipletDbName);
-							client.setCollection(productStepsName);
 							BasicDBObject query = new BasicDBObject();
 							query.put("_id", contentObjectId);
-							productStep = client.findDocuments(query).get(0);
+							productStep = equipletBBclient.findDocuments(query).get(0);
 							System.out.format("%d%n", timeslot);
 							ACLMessage timeslotMessage = new ACLMessage(
 									ACLMessage.REQUEST);
@@ -375,29 +374,14 @@ public class EquipletAgent extends Agent {
 	public void takeDown() {
 		Gson gson = new Gson();
 		try {
-			client = new BlackboardClient(collectiveDbIp);
-			try {
-				client.setDatabase(collectiveDbName);
-				client.setCollection(equipletDirectoryName);
-
-				BasicDBObject searchQuery = new BasicDBObject();
-				searchQuery.put("AID", getAID());
-
-				client.removeDocuments(gson.toJson(searchQuery));
-			} catch (Exception e) {
-				e.printStackTrace();
-				// The equiplet is already going down, so it has to do nothing
-				// here.
-			}
-			// TODO: message to PA's
-
-			/*Mongo equipletDbMongoClient = new Mongo(equipletDbIp, equipletDbPort);
-			equipletDb = equipletDbMongoClient.getDB(equipletDbName);
-			equipletDb.dropDatabase();
-			equipletDbMongoClient.close();*/
+			BasicDBObject searchQuery = new BasicDBObject();
+			searchQuery.put("AID", getAID());
+			collectiveBBclient.removeDocuments(gson.toJson(searchQuery));
 		} catch (Exception e) {
 			e.printStackTrace();
 			// The equiplet is already going down, so it has to do nothing here.
 		}
+		// TODO: message to PA's
+		// TODO: remove own database
 	}
 }
