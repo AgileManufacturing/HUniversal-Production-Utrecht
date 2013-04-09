@@ -37,7 +37,7 @@ public class Scheduler {
 		//MongoClient mongoClient = new MongoClient();
 		// or
 		
-		//Make connectiion with database
+		//Make connection with database
 		MongoClient mongoClient =null;
 		try {
 			mongoClient = new MongoClient( "localhost" );//145.89.191.131 is hu server
