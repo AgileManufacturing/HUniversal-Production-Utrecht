@@ -29,7 +29,8 @@ public class ProductAgent extends Agent {
 			_product = (Product) getArguments()[0];
 
 			InformerBehaviour nb = new InformerBehaviour();
-			addBehaviour(nb);
+			PlannerBehaviour pb = new PlannerBehaviour();
+			addBehaviour(pb);
 
 			ProduceBehaviour pb = new ProduceBehaviour(_product);
 			

@@ -2,6 +2,7 @@ package scheduling;
 
 //jade imports
 import jade.core.AID;
+import jade.core.Agent;
 
 //mongodb imports
 import com.mongodb.MongoClient;
@@ -14,11 +15,18 @@ import com.mongodb.DBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.ServerAddress;
 
+//Required imports
+import jade.domain.AMSService;
+import jade.domain.FIPAAgentManagement.*;
+import jade.lang.acl.ACLMessage;
+
 //usual imports
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+
+import productAgent.ProductAgent;
 
 
 public class Scheduler {
@@ -99,13 +107,31 @@ public class Scheduler {
 		}
 		
 		int startSlot = 0;
+		FreeTimeSlot freetimeslotEq = null;
 		if(freetimes.length > 1){
 			for(int chooseTimeSlot = 1;chooseTimeSlot < freetimes.length; chooseTimeSlot++){
 				if(freetimes[chooseTimeSlot].getStartTime() < freetimes[chooseTimeSlot-1].getStartTime()){
 					startSlot = freetimes[chooseTimeSlot].getStartTime();
+					freetimeslotEq = freetimes[chooseTimeSlot];
 				}
 			}
 		}
+		
+		AID equipletAID =null;
+		for (int i=0; i<equipletList.length;i++)
+        {
+            if(equipletList[i].getName().equals(freetimeslotEq.getEquipletName())){
+            	equipletAID = equipletList[i];
+            }
+        }
+		
+		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+        msg.setContent( "Schedule" );
+
+        msg.addReceiver(equipletAID); 
+
+        //send(msg);
+		
 		//equipletAgent.scheduleProductionStep(startSlot);
 		
 	}
@@ -119,6 +145,10 @@ public class Scheduler {
 			this.startTime = start;
 			this.duration = dura;
 			this.equipletName = equiplet;
+		}
+		
+		public String getEquipletName(){
+			return this.equipletName;
 		}
 		
 		public int getStartTime(){
