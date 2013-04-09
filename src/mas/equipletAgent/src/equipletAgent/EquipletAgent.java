@@ -32,6 +32,12 @@
 
 package equipletAgent;
 
+import behaviours.CanDoProductionStepResponse;
+import behaviours.CanPerformStep;
+import behaviours.GetProductionDuration;
+import behaviours.ProductionDurationResponse;
+import behaviours.ScheduleStep;
+
 import com.mongodb.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -40,15 +46,23 @@ import com.google.gson.InstanceCreator;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.ReceiverBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.MessageTemplate.MatchExpression;
 import jade.lang.acl.UnreadableException;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 import newDataClasses.ParameterList;
 import newDataClasses.ProductionStep;
 import nl.hu.client.BlackboardClient;
+import nl.hu.client.BlackboardSubscriber;
+import nl.hu.client.BlackboardSubscription;
 import nl.hu.client.InvalidDBNamespaceException;
+import nl.hu.client.MongoOperation;
+import nl.hu.client.OplogEntry;
 import serviceAgent.ServiceAgent;
+import behaviours.CanPerformStep;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -65,7 +79,7 @@ import org.bson.types.ObjectId;
  * EquipletAgent that communicates with product agents and with its own service
  * agent.
  **/
-public class EquipletAgent extends Agent {
+public class EquipletAgent extends Agent implements BlackboardSubscriber{
 	private static final long serialVersionUID = 1L;
 
 	// This is the service agent of this equiplet
@@ -74,7 +88,7 @@ public class EquipletAgent extends Agent {
 	// This is the collective database used by all product agents and equiplets
 	// and contains the collection EquipletDirectory.
 	private DB collectiveDb = null;
-	private String collectiveDbIp = "localhost";
+	private String collectiveDbIp = "145.89.191.131";
 	private int collectiveDbPort = 27017;
 	private String collectiveDbName = "CollectiveDb";
 	private String equipletDirectoryName = "EquipletDirectory";
@@ -131,13 +145,12 @@ public class EquipletAgent extends Agent {
 	        equipletBBclient = new BlackboardClient(equipletDbIp);
 	        equipletBBclient.setDatabase(equipletDbName);
 	        equipletBBclient.setCollection(productStepsName);
+	        equipletBBclient.subscribe(new BlackboardSubscription(MongoOperation.UPDATE, this));
 		} catch (InvalidDBNamespaceException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			doDelete();
 		}
-		
-		
 		
 		Gson gson = new Gson();
 		// put capabilities on the equipletDirectory
@@ -150,227 +163,22 @@ public class EquipletAgent extends Agent {
 			doDelete();
 		}
 		
-
-		// Behaviour for receiving messages, checks each 5000
-		 addBehaviour(new CyclicBehaviour(this) {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void action() {
-
-				// myAgent.addBehaviour(new RequestPerformer());
-				ACLMessage msg = receive();
-				Gson gson;
-				if (msg != null) {
-					// Process the message
-
-					// deserialize content
-					Object contentObject = null;
-					String contentString = msg.getContent();
-
-					try {
-						contentObject = msg.getContentObject();
-					} catch (UnreadableException e) {
-//						System.out.println("Exception Caught, No Content Object Given");
-					}
-
-					System.out.format("%s received message from %s (%s:%s)%n",
-							getLocalName(), msg.getSender().getLocalName(), msg.getOntology(), contentObject == null ? contentString : contentObject);
-
-					// Start of the switch statement on the ontology
-					switch (msg.getOntology()) {
-
-					// Case to check if the equiplet can perform the given step.
-					case "CanPerformStep":
-						// getting the product step from the message.
-						ProductionStep proStepC = (ProductionStep) contentObject;
-						ObjectId productStepEntryId = null;
-						gson = new GsonBuilder().serializeNulls().create();
-
-						// Makes a database connection and puts the new step in it.
-						//TODO make use of a single BlackBoardClient object in an instance variable instead of recreating it
-						try {
-							// TODO: get inputParts
-							// TODO: get ouputPart
-							ProductStepMessage entry = new ProductStepMessage(msg.getSender(), proStepC.getCapability(),
-									proStepC.getParameterList(), null, null,
-									ProductStepStatusCode.EVALUATING.getStatus(), null);
-							productStepEntryId = equipletBBclient.insertDocument(gson.toJson(entry));
-							communicationTable.put(msg.getConversationId(), productStepEntryId);
-							// Asks the serviceAgent if it can do this product step.
-							ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-							message.setConversationId(msg.getConversationId());
-							message.addReceiver(serviceAgent);
-							message.setOntology("canDoProductionStep");
-							try {
-								message.setContentObject(productStepEntryId);
-							} catch (IOException e) {
-								e.printStackTrace();
-								// TODO: ERROR HANDLING'
-								myAgent.doDelete();
-							}
-							send(message);
-						} catch (Exception e) {
-							e.printStackTrace();
-							// TODO: ERROR HANDLING
-							myAgent.doDelete();
-						}
-						break;
-					// Case for the response on the send message to the service
-					// agent in the case canDoProductionStep
-					case "canDoProductionStepResponse":
-						productStepEntryId = null;
-						DBObject productStep = null;
-						gson = new GsonBuilder()
-							.registerTypeAdapter(jade.util.leap.List.class, new InstanceCreator<jade.util.leap.List>() {
-								@Override
-								public jade.util.leap.List createInstance(Type type) {
-									return new jade.util.leap.ArrayList();
-								}
-							})
-							.create();
-						//TODO: cleanup onderstaande
-						//TODO: one blackboardclient
-						try {
-							productStepEntryId = (ObjectId) contentObject;
-						} catch (ClassCastException e) {
-							// TODO: ERROR HANDLING
-							e.printStackTrace();
-							myAgent.doDelete();
-						}
-						// Makes a database connection and gets the right
-						// product step out of it.
-						try {
-							BasicDBObject query = new BasicDBObject();
-							query.put("_id", productStepEntryId);
-							productStep = equipletBBclient.findDocuments(query).get(0);
-							int status = (Integer) productStep.get("status");
-							AID productAgent = gson.fromJson(productStep.get("productAgentId").toString(), AID.class);
-							if (status == ProductStepStatusCode.EVALUATING.getStatus()) {
-								ACLMessage message = new ACLMessage(ACLMessage.CONFIRM);
-								message.setConversationId(msg.getConversationId());
-								message.setOntology("");// TODO: set ontology
-								message.addReceiver(productAgent);
-								message.setContent("This is possible");
-								send(message);
-							} else if (status == ProductStepStatusCode.ABORTED.getStatus()) {
-								ACLMessage message = new ACLMessage(ACLMessage.DISCONFIRM);
-								message.setConversationId(msg.getConversationId());
-								message.setOntology("");// TODO: set ontology
-								message.addReceiver(productAgent);
-								message.setContent("This is impossible");
-								send(message);
-							}
-						} catch (Exception e) {
-							// TODO: ERROR HANDLING
-							e.printStackTrace();
-							myAgent.doDelete();
-						}
-						break;
-
-					case "GetProductionDuration":
-
-						try {
-							ObjectId contentObjectId = communicationTable.get(msg.getConversationId());
-							ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-							message.addReceiver(serviceAgent);
-							message.setConversationId(msg.getConversationId());
-							message.setContentObject(contentObjectId);
-							message.setOntology("getProductionStepDuration");
-
-//							try {
-//
-//								message.setContentObject((Serializable) contentObject);
-//
-//							} catch (IOException e) {
-//
-//								System.out.println(e);
-//								e.printStackTrace();
-//
-//							}
-
-							send(message);
-
-						} catch (Exception e) {
-							// TODO: ERROR HANDLING
-							e.printStackTrace();
-							myAgent.doDelete();
-						}
-
-						break;
-					case "ProductionDurationResponse":
-						try {
-							gson = new GsonBuilder()
-								.registerTypeAdapter(jade.util.leap.List.class, new InstanceCreator<jade.util.leap.List>() {
-									@Override
-									public jade.util.leap.List createInstance(Type type) {
-										return new jade.util.leap.ArrayList();
-									}
-								}).create();
-							ObjectId contentObjectId = communicationTable.get(msg
-									.getConversationId());
-							BasicDBObject query = new BasicDBObject();
-							query.put("_id", contentObjectId);
-							productStep = equipletBBclient.findDocuments(query).get(0);
-														
-							ScheduleData Schedule = gson.fromJson(productStep.get("scheduleData").toString(), ScheduleData.class);
-							
-							ACLMessage message = new ACLMessage(ACLMessage.INFORM);
-							message.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
-							message.setOntology("ProductionDuration");
-							message.setConversationId(msg.getConversationId());
-							message.setContentObject(Schedule.getDuration());
-							
-							System.out.format("sending message: %s%n", message);
-							send(message);
-							
-						}catch(Exception e){
-							e.printStackTrace();
-							myAgent.doDelete();
-						}
-					
-						break;
-
-					case "scheduleStep":
-						try{
-							
-							long timeslot = Long.parseLong(contentString);
-							ObjectId contentObjectId = communicationTable.get(msg
-									.getConversationId());
-							BasicDBObject query = new BasicDBObject();
-							query.put("_id", contentObjectId);
-							productStep = equipletBBclient.findDocuments(query).get(0);
-							System.out.format("%d%n", timeslot);
-							ACLMessage timeslotMessage = new ACLMessage(
-									ACLMessage.REQUEST);
-							timeslotMessage.addReceiver(serviceAgent);
-							timeslotMessage.setOntology("scheduleStepWithLogistics");
-							timeslotMessage.setContent(String.valueOf(timeslot));
-							timeslotMessage.setConversationId(msg.getConversationId());
-							send(timeslotMessage);
-						/*
-						 * TODO: Ask service agent to schedule the step with the
-						 * logistics at time X if possible. Wait for result.
-						 * Report result back to product agent. If the result is
-						 * positive: Set the status of the step on the product
-						 * steps blackboard to PLANNED and add the schedule
-						 * data.
-						 */
-							ACLMessage confirmScheduleStep = new ACLMessage(ACLMessage.CONFIRM);
-							confirmScheduleStep.setConversationId(msg.getConversationId());
-							confirmScheduleStep.addReceiver((AID) productStep.get("productAgentId"));
-						}
-						catch(Exception e){
-							e.printStackTrace();
-						}
-						break;
-					}
-
-				}
-				block();
-			}
-		});
+		CanPerformStep canPerformStepBehaviour = new CanPerformStep(this);
+        addBehaviour(canPerformStepBehaviour);
+		
+		CanDoProductionStepResponse canDoProductionStepResponseBehaviour = new CanDoProductionStepResponse(this);
+		addBehaviour(canDoProductionStepResponseBehaviour);
+		
+		GetProductionDuration getProductionDurationBehaviour = new GetProductionDuration(this);
+		addBehaviour(getProductionDurationBehaviour);
+	
+		ProductionDurationResponse productionDurationResponseBehaviour = new ProductionDurationResponse(this);
+		addBehaviour(productionDurationResponseBehaviour);
+		
+		ScheduleStep scheduleStepBehaviour = new ScheduleStep(this);
+		addBehaviour(scheduleStepBehaviour);
 	}
+	
 	public void takeDown() {
 		Gson gson = new Gson();
 		try {
@@ -383,5 +191,28 @@ public class EquipletAgent extends Agent {
 		}
 		// TODO: message to PA's
 		// TODO: remove own database
+	}
+	
+	public BlackboardClient getEquipletBBclient(){
+		return equipletBBclient;
+	}
+	
+	public void addCommunicationSlot(String conversationId, ObjectId objectId){
+		communicationTable.put(conversationId, objectId);
+	}
+	
+	public ObjectId getCommunicationSlot(String conversationId){
+		return communicationTable.get(conversationId);
+	}
+	
+	public AID getServiceAgent(){
+		return serviceAgent;
+	}
+	
+	
+	@Override
+	public void onMessage(MongoOperation operation, OplogEntry entry) {
+		// TODO Auto-generated method stub
+		
 	}
 }

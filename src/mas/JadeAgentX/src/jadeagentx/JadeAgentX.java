@@ -34,6 +34,10 @@ public class JadeAgentX extends Agent {
         
         ArrayList<Long> capabilities1 = new ArrayList<Long>();
         capabilities1.add(1l);
+        capabilities1.add(11l);
+        capabilities1.add(24l);
+        capabilities1.add(23412l);
+        capabilities1.add(15l);
         
         
         Object[] ar = new Object[]{capabilities1};
@@ -41,15 +45,20 @@ public class JadeAgentX extends Agent {
         // TODO code application logic here
         ArrayList<Long> capabilities2 = new ArrayList<Long>();
         capabilities2.add(2l);
+        capabilities2.add(5l);
+        capabilities2.add(9l);
         
-//        ar = new Object[]{capabilities2};
-//        ((AgentController)getContainerController().createNewAgent("eqa2", "equipletAgent.EquipletAgent", ar)).start();
-//        
-//        ArrayList<Long> capabilities3 = new ArrayList<Long>();
-//        capabilities3.add(3l);
-//        
-//        ar = new Object[]{capabilities3};
-//        ((AgentController)getContainerController().createNewAgent("eqa3", "equipletAgent.EquipletAgent", ar)).start();
+        ar = new Object[]{capabilities2};
+        ((AgentController)getContainerController().createNewAgent("eqa2", "equipletAgent.EquipletAgent", ar)).start();
+        
+        ArrayList<Long> capabilities3 = new ArrayList<Long>();
+        capabilities3.add(3l);
+        capabilities3.add(4l);
+        capabilities3.add(7l);
+        capabilities3.add(9l);
+        
+        ar = new Object[]{capabilities3};
+        ((AgentController)getContainerController().createNewAgent("eqa3", "equipletAgent.EquipletAgent", ar)).start();
         
         ar = null;
         
