@@ -29,9 +29,15 @@ public class ProductAgent extends Agent {
 			_product = (Product) getArguments()[0];
 
 			InformerBehaviour nb = new InformerBehaviour();
-			addBehaviour(nb);
+			PlannerBehaviour pb = new PlannerBehaviour();
+			addBehaviour(pb);
 
+			ProduceBehaviour pb = new ProduceBehaviour(_product);
+			
+			
 			System.out.println("I spawned as a product agent");
+			
+			
 
 		} catch (Exception e) {
 			System.out.println("Exited with: " + e);

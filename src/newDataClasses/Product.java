@@ -17,6 +17,14 @@ package newDataClasses;
 public class Product {
 	
 	private Production _production;
+	private ProductLog log; 
+
+	/**
+	 * @return the log
+	 */
+	public ProductLog getLog() {
+		return log;
+	}
 
 	public Product() {
 		
@@ -41,6 +49,7 @@ public class Product {
 		this._production = production;
 	}
 	
-	
-	
+	public void add(LogMessage[] msg){
+		log.add(msg);
+	}
 }
