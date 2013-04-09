@@ -29,7 +29,6 @@
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +36,11 @@ import java.util.Map;
  * A class representing a database row.
  **/
 public class Row {
+    /**
+     * @var HashMap<String, Object> row
+     *
+     * A hashmap containing the row data with column name as keys and values as object.
+     **/
     private HashMap<String, Object> row;
 
     /**
