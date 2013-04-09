@@ -50,24 +50,34 @@ public class Scheduler {
 		//end connecting
 		
 		//extract data of mongoDB to Object Array
-		List<DBObject> data = db.getCollection("eq1").find().toArray();//nameOfCollection should be 'schedule'
-		schedules= new Schedule[data.size()];
+		int scheduleCount = 0;
+		FreeTimeSlot[] freetimes;
+		for(int i = 0; i<equipletList.length;i++){
+			//old name is eq1
+			List<DBObject> data = db.getCollection(equipletList[i].getName()).find().toArray();//nameOfCollection should be 'schedule'
+			scheduleCount += data.size();
+		}
+		schedules= new Schedule[scheduleCount];
 		
-		FreeTimeSlot[] freetimes = new FreeTimeSlot[data.size()];
 		
-		for(int i = 0; i < data.size(); i++){
-			System.out.println(data.get(i).toString());
-			
-			double b = (Double) data.get(i).get("startTime");
-			int stati = (int)b;
-			
-			double c = (Double) data.get(i).get("duration");
-			int dur = (int)c;
-			
-			schedules[i] = this.new Schedule(stati, dur);
-			
-			System.out.println("Schedule "+i+" added");
-			System.out.println(schedules[i].toString());
+		freetimes = new FreeTimeSlot[scheduleCount];
+		
+		for(int extract = 0; extract<equipletList.length;extract++){
+			List<DBObject> data = db.getCollection(equipletList[extract].getName()).find().toArray();//nameOfCollection should be 'schedule'
+			for(int i = 0; i < data.size(); i++){
+				System.out.println(data.get(i).toString());
+				
+				double b = (Double) data.get(i).get("startTime");
+				int stati = (int)b;
+				
+				double c = (Double) data.get(i).get("duration");
+				int dur = (int)c;
+				
+				schedules[i] = this.new Schedule(stati, dur, equipletList[extract].getName());
+				
+				//debug
+				System.out.println(schedules[i].toString());
+			}
 		}
 		mongoClient.close();
 		
@@ -80,8 +90,9 @@ public class Scheduler {
 					if(schedules[run].getDeadline() < schedules[(run+1)].getStartTime()){
 						int freeTimeSlot = schedules[(run+1)].getStartTime() - schedules[run].getDeadline()-1;
 						int timeslotToSchedule= (schedules[run].getDeadline()+1);
+						
 						System.out.println("Vrij tijd sloten: "+freeTimeSlot + " startend op tijdslot: "+ timeslotToSchedule );
-						freetimes[freetimeslotCounter] = this.new FreeTimeSlot(timeslotToSchedule, freeTimeSlot);
+						freetimes[freetimeslotCounter] = this.new FreeTimeSlot(timeslotToSchedule, freeTimeSlot, schedules[run].getEquipletName());
 					}
 				}
 			}
@@ -102,10 +113,12 @@ public class Scheduler {
 	private class FreeTimeSlot{
 		private int startTime = -1;
 		private int duration = -1;
+		private String equipletName = "";
 		
-		public FreeTimeSlot(int start, int dura){
+		public FreeTimeSlot(int start, int dura, String equiplet){
 			this.startTime = start;
 			this.duration = dura;
+			this.equipletName = equiplet;
 		}
 		
 		public int getStartTime(){
@@ -120,11 +133,13 @@ public class Scheduler {
 		private int startTime = -1;
 		private int duration = -1;
 		private int deadline = -1;
+		private String equipletName = "";
 		
-		public Schedule(int start, int dura){
+		public Schedule(int start, int dura, String equiplet){
 			this.startTime = start;
 			this.duration = dura;
 			this.deadline = start+dura-1;
+			this.equipletName = equiplet;
 		}
 		
 		public int getStartTime(){
@@ -134,11 +149,8 @@ public class Scheduler {
 			this.startTime = newStartTime;
 		}
 		
-		public int getDuration(){
-			return this.duration;
-		}
-		public void setDuration(int newDuration){
-			this.duration = newDuration;
+		public String getEquipletName(){
+			return this.equipletName;
 		}
 		
 		public int getDeadline(){
@@ -149,7 +161,7 @@ public class Scheduler {
 		}
 		
 		public String toString(){
-			return "{ startTime:"+startTime+", duration:"+duration+", deadline:"+deadline+" }";
+			return "{ startTime:"+startTime+", duration:"+duration+", deadline:"+deadline+", EquipletName:"+equipletName + " }";
 		}
 	}
 }

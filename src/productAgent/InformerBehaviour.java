@@ -1,16 +1,3 @@
-/*
- * Version 1.1
- * 
- * Author: Alexander Streng
- * 
- * Behaviour for negotiating with the equipletagens to
- * determine the viable equiplets for the scheduling algorithm.
- * Will first check whether the equiplet can perform the given step with the given parameters.
- * If the equipletagent returns with an confirm, the product agent will ask for the duration of
- * the operation ( in timeslots ).
- * 
- */
-
 package productAgent;
 
 import jade.core.AID;
@@ -25,6 +12,18 @@ import jade.lang.acl.UnreadableException;
 import newDataClasses.ProductionEquipletMapper;
 import newDataClasses.ProductionStep;
 
+/*
+ * Version 1.1
+ * 
+ * Author: Alexander Streng
+ * 
+ * Behaviour for negotiating with the equipletagens to
+ * determine the viable equiplets for the scheduling algorithm.
+ * Will first check whether the equiplet can perform the given step with the given parameters.
+ * If the equipletagent returns with an confirm, the product agent will ask for the duration of
+ * the operation ( in timeslots ).
+ * 
+ */
 @SuppressWarnings("serial")
 public class InformerBehaviour extends OneShotBehaviour {
 
@@ -146,7 +145,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 			});
 			
 			// 2 - wait for an response. ( handles a 10 sec timeout )
-			addSubBehaviour(new receiveBehaviour(myAgent, 10000, template) {
+			addSubBehaviour(new ReceiveBehaviour(myAgent, 10000, template) {
 				public void handle(ACLMessage msg) {
 					if (msg == null) {
 						
@@ -190,7 +189,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 							});
 
 							//4- waits for the response ( handles a 10 sec timeout ).
-							addSubBehaviour(new receiveBehaviour(myAgent,
+							addSubBehaviour(new ReceiveBehaviour(myAgent,
 									10000, template) {
 								public void handle(ACLMessage msg) {
 									if (msg == null) {
@@ -259,69 +258,4 @@ public class InformerBehaviour extends OneShotBehaviour {
 		}
 	}
 
-	/* Receiver class based on the ReceiverBehaviour.
-	 * instead of polling .done(), this class will return when either the timeout fires or a msg is received.
-	 */
-	private class receiveBehaviour extends SimpleBehaviour {
-
-		private MessageTemplate template;
-		private long timeOut, wakeupTime;
-		private boolean finished;
-
-		private ACLMessage msg;
-
-		public ACLMessage getMessage() {
-			return msg;
-		}
-
-		public receiveBehaviour(Agent a, int millis, MessageTemplate mt) {
-			super(a);
-			timeOut = millis;
-			template = mt;
-		}
-
-		public void onStart() {
-			wakeupTime = (timeOut < 0 ? Long.MAX_VALUE : System
-					.currentTimeMillis() + timeOut);
-		}
-
-		public boolean done() {
-			return finished;
-		}
-
-		public void action() {
-			if (template == null)
-				msg = myAgent.receive();
-			else
-				msg = myAgent.receive(template);
-
-			if (msg != null) {
-				finished = true;
-				handle(msg);
-				return;
-			}
-			long dt = wakeupTime - System.currentTimeMillis();
-			if (dt > 0)
-				block(dt);
-			else {
-				finished = true;
-				handle(msg);
-			}
-		}
-
-		public void handle(ACLMessage m) { /* can be redefined in sub_class */
-		}
-
-		public void reset() {
-			msg = null;
-			finished = false;
-			super.reset();
-		}
-
-		public void reset(int dt) {
-			timeOut = dt;
-			reset();
-		}
-
-	}
 }
