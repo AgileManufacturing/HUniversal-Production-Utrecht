@@ -37,6 +37,7 @@ import com.mongodb.*;
 import com.mongodb.util.JSON;
 import com.mongodb.util.JSONParseException;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import org.bson.types.ObjectId;
@@ -88,32 +89,28 @@ public class BlackboardClient {
 	private OplogMonitorThread oplogMonitorThread;
 	
 	/**
-	 * Constructor of BlackboardClient.
+	 * Constructs a BlackboardClient for the server at the specified host.
 	 *
 	 * @param host The mongoDB host.
+	 * @throws MongoConnectionException Connecting to the database failed.
+	 * @throws UnknownHostException The IP address of a host could not be determined.
 	 **/
-	public BlackboardClient(String host) {
-		try {
-			this.subscriptions = new ArrayList<BlackboardSubscription>();
-			this.mongo = MongoDBConnection.getInstanceForHost(new ServerAddress(host)).getMongoClient();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public BlackboardClient(String host) throws UnknownHostException, MongoConnectionException {
+		this.subscriptions = new ArrayList<BlackboardSubscription>();
+		this.mongo = MongoDBConnection.getInstanceForHost(new ServerAddress(host)).getMongoClient();
 	}
 
 	/**
-	 * Constructor of BlackboardClient.
+	 * Constructs a BlackboardClient for the server at the specified host and port.
 	 *
 	 * @param host The ip of the MongoDB host.
 	 * @param port The port of the MongoDB host.
+	 * @throws MongoConnectionException Connecting to the database failed.
+	 * @throws UnknownHostException The IP address of a host could not be determined.
 	 **/
-	public BlackboardClient(String host, int port) {
-		try {
-			this.subscriptions = new ArrayList<BlackboardSubscription>();
-			this.mongo = MongoDBConnection.getInstanceForHost(new ServerAddress(host, port)).getMongoClient();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public BlackboardClient(String host, int port) throws UnknownHostException, MongoConnectionException {
+		this.subscriptions = new ArrayList<BlackboardSubscription>();
+		this.mongo = MongoDBConnection.getInstanceForHost(new ServerAddress(host, port)).getMongoClient();
 	}
 
 	/**

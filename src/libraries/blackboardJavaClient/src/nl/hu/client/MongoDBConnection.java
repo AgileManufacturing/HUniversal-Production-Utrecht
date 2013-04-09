@@ -33,6 +33,7 @@ package nl.hu.client;
 import java.util.Hashtable;
 
 import com.mongodb.Mongo;
+import com.mongodb.MongoException;
 import com.mongodb.ServerAddress;
 
 /**
@@ -63,9 +64,14 @@ public class MongoDBConnection {
 	/**
 	 * Creates a new Mongo client for the specified address.
 	 * @param address The ServerAddress where the host resides.
+	 * @throws MongoConnectionException Connecting to the database server failed.
 	 **/
-	private MongoDBConnection(ServerAddress address) {
-		mongoClient = new Mongo(address);
+	private MongoDBConnection(ServerAddress address) throws MongoConnectionException {
+		try {
+			mongoClient = new Mongo(address);
+		} catch (MongoException ex) {
+			throw new MongoConnectionException("Connection failed.", ex);
+		}
 		this.address = address;
 	}
 	
@@ -73,8 +79,9 @@ public class MongoDBConnection {
 	 * Returns a {@link MongoDBConnection} instance for the specified host.
 	 * @param address The ServerAddress where the host resides.
 	 * @return A {@link MongoDBConnection} instance for the specified host.
+	 * @throws MongoConnectionException Connecting to the database server failed.
 	 **/
-	public static MongoDBConnection getInstanceForHost(ServerAddress address) {
+	public static MongoDBConnection getInstanceForHost(ServerAddress address) throws MongoConnectionException {
 		if (!databaseConnections.containsKey(address)) {
 			databaseConnections.put(address, new MongoDBConnection(address));
 		}
