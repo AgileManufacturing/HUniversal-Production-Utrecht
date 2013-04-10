@@ -44,41 +44,37 @@ public class OplogEntry {
 	 * @var String NAMESPACE_FIELD
 	 * Name of the namespace field within the oplog entry.
 	 **/
-	private static final String NAMESPACE_FIELD = "ns";
+	public static final String NAMESPACE_FIELD = "ns";
 	
 	/**
 	 * @var String TIMESTAMP_FIELD
 	 * Name of the timestamp field within the oplog entry.
 	 **/
-	// Warnings suppressed: Field included for future reference.
-	@SuppressWarnings("unused")
-	private static final String TIMESTAMP_FIELD = "ts";
+	public static final String TIMESTAMP_FIELD = "ts";
 	
 	/**
 	 * @var String OPERATION_FIELD
 	 * Name of the operation field within the oplog entry.
 	 **/
-	private static final String OPERATION_FIELD = "op";
+	public static final String OPERATION_FIELD = "op";
 	
 	/**
 	 * @var String UID_FIELD
 	 * Name of the uid field within the oplog entry.
 	 **/
-	// Warnings suppressed: Field included for future reference.
-	@SuppressWarnings("unused")
-	private static final String UID_FIELD = "h";
+	public static final String UID_FIELD = "h";
 	
 	/**
 	 * @var String UPDATE_DOC_FIELD
 	 * Name of the update document field within the oplog entry.
 	 **/
-	private static final String UPDATE_DOC_FIELD = "o";
+	public static final String UPDATE_DOC_FIELD = "o";
 	
 	/**
 	 * @var String UPDATE_CRITERIA_FIELD
 	 * Name of the update criteria field within the oplog entry.
 	 **/
-	private static final String UPDATE_CRITERIA_FIELD = "o2";
+	public static final String UPDATE_CRITERIA_FIELD = "o2";
 	
 	/**
 	 * @var DBObject oplogEntry
@@ -115,16 +111,16 @@ public class OplogEntry {
 	 * Returns the update query (i.e. the query that was used to update the target documents) of this oplog entry.
 	 * @return the update query of this oplog entry.
 	 **/
-	public Object getUpdateDocument() { 
-		return oplogEntry.get(UPDATE_DOC_FIELD);
+	public DBObject getUpdateDocument() { 
+		return (DBObject)oplogEntry.get(UPDATE_DOC_FIELD);
 	}
 	
 	/**
 	 * Returns the update criteria (i.e. the query used to match target documents) of this oplog entry.
 	 * @return the update criteria of this oplog entry.
 	 **/
-	public Object getUpdateCriteria() {
-		return oplogEntry.get(UPDATE_CRITERIA_FIELD);
+	public DBObject getUpdateCriteria() {
+		return (DBObject)oplogEntry.get(UPDATE_CRITERIA_FIELD);
 	}
 
 	/**
