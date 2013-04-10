@@ -30,16 +30,17 @@ import com.mongodb.BasicDBObject;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
  * A blackboard entry.
  **/
 public class Entries implements TreeModel {
-    private BasicDBObject root;
+    ArrayList<BasicDBObject> root = new ArrayList<BasicDBObject>();
 
-    public Entries(BasicDBObject entry) {
-        root = entry;
+    public Entries(ArrayList<BasicDBObject> entries) {
+        root = entries;
     }
 
     @Override
@@ -49,7 +50,9 @@ public class Entries implements TreeModel {
 
     @Override
     public Object getChild(Object parent, int index) {
-        if (parent instanceof BasicDBObject) {
+        if (parent instanceof ArrayList)
+            return root.get(index);
+        else {
             BasicDBObject bdo = (BasicDBObject) parent;
             if (index >= bdo.size()) return null;
 
@@ -57,25 +60,28 @@ public class Entries implements TreeModel {
             for (Map.Entry<String, Object> entry : bdo.entrySet()) {
                 if (i++ == index) return entry.getValue();
             }
-        }
 
-        return null;
+            return null;
+        }
     }
 
     @Override
     public int getChildCount(Object parent) {
-        int children = 0;
+        int children;
 
-        if (parent instanceof BasicDBObject)
+        if (parent instanceof ArrayList)
+            children = root.size();
+        else if (parent instanceof BasicDBObject)
             children = ((BasicDBObject) parent).size();
-
+        else
+            children = 0;
 
         return children;
     }
 
     @Override
     public boolean isLeaf(Object node) {
-        return !(node instanceof BasicDBObject);
+        return !(node instanceof ArrayList || node instanceof BasicDBObject);
     }
 
     @Override
@@ -84,14 +90,20 @@ public class Entries implements TreeModel {
 
     @Override
     public int getIndexOfChild(Object parent, Object child) {
-        if (parent instanceof BasicDBObject) {
+        int index = -1;
+
+        if (parent instanceof ArrayList)
+            index = 0;
+        else if (parent instanceof BasicDBObject) {
             BasicDBObject bdo = (BasicDBObject) parent;
-            for (int i = 0; i < bdo.size(); i++) {
-                if (bdo.equals(child)) return i;
-            }
+            for (int i = 0; i < bdo.size(); i++)
+                if (bdo.equals(child)) index = i;
+
+        } else {
+            index = -1;
         }
 
-        return -1;
+        return index;
     }
 
     @Override

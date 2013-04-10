@@ -28,11 +28,13 @@ import models.Blackboards;
 import models.Entries;
 
 import javax.swing.*;
+import java.util.ArrayList;
 
 public class BlackboardReader {
     private JList blackboards;
     private JPanel mainPanel;
     private JTree entries;
+    private ArrayList<BasicDBObject> entriesList = new ArrayList<BasicDBObject>();
 
     public BlackboardReader() {
         JFrame frame = new JFrame("BlackboardReader");
@@ -44,13 +46,13 @@ public class BlackboardReader {
         Blackboards blackboard = new Blackboards();
         blackboards.setModel(blackboard);
         blackboard.add("test");
-
-//        Entries entry = new Entries();
-//        entries.setModel(entry);
     }
 
-    public void set(BasicDBObject o) {
-        Entries entry = new Entries(o);
-        entries.setModel(entry);
+    public void setListEntries() {
+        entries.setModel(new Entries(entriesList));
+    }
+
+    public ArrayList<BasicDBObject> getEntriesList() {
+        return entriesList;
     }
 }
