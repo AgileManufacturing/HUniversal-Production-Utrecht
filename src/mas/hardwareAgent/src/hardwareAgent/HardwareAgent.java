@@ -52,6 +52,10 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 		
 		FillPlaceholders fillPlaceholdersBehaviour = new FillPlaceholders(this);
 		addBehaviour(fillPlaceholdersBehaviour);
+		
+		CheckForModules checkForModules = new CheckForModules(this);
+		addBehaviour(checkForModules);
+		
 	}
 
 	public void takeDown() {
