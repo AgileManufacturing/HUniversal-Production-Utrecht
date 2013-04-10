@@ -112,15 +112,15 @@ public class OplogEntry {
 	}
 	
 	/**
-	 * Returns the update document of this oplog entry.
-	 * @return the update document of this oplog entry.
+	 * Returns the update query (i.e. the query that was used to update the target documents) of this oplog entry.
+	 * @return the update query of this oplog entry.
 	 **/
 	public Object getUpdateDocument() { 
 		return oplogEntry.get(UPDATE_DOC_FIELD);
 	}
 	
 	/**
-	 * Returns the update criteria of this oplog entry.
+	 * Returns the update criteria (i.e. the query used to match target documents) of this oplog entry.
 	 * @return the update criteria of this oplog entry.
 	 **/
 	public Object getUpdateCriteria() {
