@@ -31,9 +31,6 @@ package equipletAgent;
 
 import jade.core.AID;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
-
 import newDataClasses.ParameterList;
 import newDataClasses.ScheduleData;
 /**

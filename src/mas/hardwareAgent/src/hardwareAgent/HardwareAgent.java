@@ -1,12 +1,19 @@
 package hardwareAgent;
 
-import behaviours.EvaluateDuration;
+import org.bson.types.ObjectId;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+
+import behaviours.*;
 
 import equipletAgent.DbData;
 import jade.core.Agent;
 import nl.hu.client.BasicOperationSubscription;
 import nl.hu.client.BlackboardClient;
 import nl.hu.client.BlackboardSubscriber;
+import nl.hu.client.GeneralMongoException;
+import nl.hu.client.InvalidDBNamespaceException;
 import nl.hu.client.MongoOperation;
 import nl.hu.client.OplogEntry;
 
@@ -34,6 +41,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 			equipletStepBBClient = new BlackboardClient(dbData.ip);
 			equipletStepBBClient.setDatabase(dbData.name);
 			equipletStepBBClient.setCollection("EquipletStepsBlackboard");
+			equipletStepBBClient.subscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
 		} catch (Exception e) {
 			e.printStackTrace();
 			doDelete();
@@ -41,6 +49,13 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 		
 		EvaluateDuration evaluateDurationBehaviour = new EvaluateDuration(this);
 		addBehaviour(evaluateDurationBehaviour);
+		
+		FillPlaceholders fillPlaceholdersBehaviour = new FillPlaceholders(this);
+		addBehaviour(fillPlaceholdersBehaviour);
+		
+		CheckForModules checkForModules = new CheckForModules(this);
+		addBehaviour(checkForModules);
+		
 	}
 
 	public void takeDown() {
@@ -56,22 +71,30 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
 		switch (entry.getNamespace().split(".")[1]) {
 		case "ServiceStepsBlackboard":
-
 			switch (operation) {
 			case INSERT:
-				break;
-			case UPDATE:
-				break;
-			case DELETE:
 				break;
 			default:
 				break;
 			}
 			break;
 		case "EquipletStepsBlackboard":
+			switch(operation){
+			case UPDATE:
+				try {
+					ObjectId id = entry.getTargetObjectId();
+					BasicDBObject query = new BasicDBObject();
+					query.put("_id", id);
+					DBObject equipletStep = equipletStepBBClient.findDocuments(query).get(0);
+				} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+					// TODO Error no document
+					e.printStackTrace();
+				}
+				break;
+			default:
+				break;
+			}
 			break;
 		}
-
 	}
-
 }

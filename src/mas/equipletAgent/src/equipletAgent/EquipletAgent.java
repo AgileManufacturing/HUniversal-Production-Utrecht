@@ -32,49 +32,27 @@
 
 package equipletAgent;
 
-import behaviours.CanDoProductionStepResponse;
-import behaviours.CanPerformStep;
-import behaviours.GetProductionDuration;
-import behaviours.ProductionDurationResponse;
-import behaviours.ScheduleStep;
+import behaviours.*;
 
 import com.mongodb.*;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.ReceiverBehaviour;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.MessageTemplate.MatchExpression;
-import jade.lang.acl.UnreadableException;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
-import newDataClasses.ParameterList;
-import newDataClasses.ProductionStep;
 import nl.hu.client.BasicOperationSubscription;
 import nl.hu.client.BlackboardClient;
 import nl.hu.client.BlackboardSubscriber;
-import nl.hu.client.BlackboardSubscription;
 import nl.hu.client.GeneralMongoException;
 import nl.hu.client.InvalidDBNamespaceException;
 import nl.hu.client.MongoOperation;
 import nl.hu.client.OplogEntry;
-import serviceAgent.ServiceAgent;
-import behaviours.CanPerformStep;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import org.bson.BSONObject;
 import org.bson.types.ObjectId;
 
 /**
@@ -87,9 +65,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 	// This is the service agent of this equiplet
 	private AID serviceAgent;
 	
-	// This is the collective database used by all product agents and equiplets
-	// and contains the collection EquipletDirectory.
-	private DB collectiveDb = null;
 	private String collectiveDbIp = "145.89.191.131";
 	private int collectiveDbPort = 27017;
 	private String collectiveDbName = "CollectiveDb";
@@ -97,7 +72,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 
 	// This is the database specific for this equiplet, this database contains
 	// all the collections of the equiplet, service and hardware agents.
-	private DB equipletDb = null;
 	private String equipletDbIp = "localhost";
 	private int equipletDbPort = 27017;
 	private String equipletDbName = "";
@@ -174,7 +148,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 		
 		GetProductionDuration getProductionDurationBehaviour = new GetProductionDuration(this);
 		addBehaviour(getProductionDurationBehaviour);
-	
+		
 		ProductionDurationResponse productionDurationResponseBehaviour = new ProductionDurationResponse(this);
 		addBehaviour(productionDurationResponseBehaviour);
 		
