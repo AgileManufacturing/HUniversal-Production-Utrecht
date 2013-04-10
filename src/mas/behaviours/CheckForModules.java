@@ -7,18 +7,6 @@ package behaviours;
 
 import hardwareAgent.HardwareAgent;
 
-import java.io.IOException;
-
-import newDataClasses.ProductionStep;
-
-import org.bson.types.ObjectId;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import equipletAgent.ProductStepMessage;
-import equipletAgent.ProductStepStatusCode;
-import equipletAgent.EquipletAgent;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -48,6 +36,16 @@ public class CheckForModules extends ReceiveBehaviour{
 
 		try {
 			contentObject = message.getContentObject();
+			
+			ACLMessage reply;			
+			reply = message.createReply();
+			reply.setPerformative(ACLMessage.CONFIRM);
+			myAgent.send(reply);
+			
+			//TODO: check in knowledge database if the requested modules are available
+			// if available set performative (ACLMessage.Confirm) else set performative (ACLMessage.Disconfirm)
+			
+			
 		} catch (UnreadableException e) {
 			//System.out.println("Exception Caught, No Content Object Given");
 		}
