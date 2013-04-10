@@ -22,10 +22,9 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	private Product _product; 
 
 	/**
-	 * @param _product
 	 */
-	public ProduceBehaviour(Product _product) {
-		_product = this._product;
+	public ProduceBehaviour() {
+		
 	}
 	
 	/* (non-Javadoc)

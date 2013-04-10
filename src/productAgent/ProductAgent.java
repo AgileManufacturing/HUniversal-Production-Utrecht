@@ -34,7 +34,7 @@ public class ProductAgent extends Agent {
 
 			ib = new InformerBehaviour();
 			PlannerBehaviour pb = new PlannerBehaviour();
-			ProduceBehaviour pbz = new ProduceBehaviour(_product);
+			ProduceBehaviour pbz = new ProduceBehaviour();
 
 			addBehaviour(ib);
 
@@ -48,7 +48,6 @@ public class ProductAgent extends Agent {
 					}
 				}
 			});
-
 			System.out.println("I spawned as a product agent");
 
 		} catch (Exception e) {
