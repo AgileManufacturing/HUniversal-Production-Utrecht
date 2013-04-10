@@ -1,43 +1,55 @@
-/*
+package productAgent;
+
+import jade.core.AID;
+import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
+import newDataClasses.Product;
+import newDataClasses.ProductionStep;
+
+/**
  * @Author Alexander
  * @Version 0.1
  * 
- * Initial product agent. 
- * Added functions to generate a Conv. Id based on the agents localname.
+ *          Initial product agent. Added functions to generate a Conv. Id based
+ *          on the agents localname.
  */
-
-package productAgent;
-
-import jade.core.Agent;
-import newDataClasses.Product;
-
 public class ProductAgent extends Agent {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	//Private fields
+	// Private fields
 	private Product _product;
-	
-	//CID variables
+	private InformerBehaviour ib;
+
+	// CID variables
 	private static int _cidCnt = 0;
 	private String _cidBase;
 
+	@SuppressWarnings("serial")
 	protected void setup() {
 		try {
 			_product = (Product) getArguments()[0];
 
-			InformerBehaviour nb = new InformerBehaviour();
+			ib = new InformerBehaviour();
 			PlannerBehaviour pb = new PlannerBehaviour();
-			addBehaviour(pb);
+			ProduceBehaviour pbz = new ProduceBehaviour(_product);
 
-			ProduceBehaviour pb = new ProduceBehaviour(_product);
-			
-			
+			addBehaviour(ib);
+
+			addBehaviour(new CyclicBehaviour() {
+				@Override
+				public void action() {
+					if (ib.done()) {
+						outPutProductStepList();
+					} else {
+						System.out.println(" -- Informer Not done -- ");
+					}
+				}
+			});
+
 			System.out.println("I spawned as a product agent");
-			
-			
 
 		} catch (Exception e) {
 			System.out.println("Exited with: " + e);
@@ -46,8 +58,8 @@ public class ProductAgent extends Agent {
 	}
 
 	/*
-	 * Generates an unique conversation id based on the agents localname,
-	 * the objects hashcode and the current time.
+	 * Generates an unique conversation id based on the agents localname, the
+	 * objects hashcode and the current time.
 	 */
 	public String generateCID() {
 		if (_cidBase == null) {
@@ -59,5 +71,18 @@ public class ProductAgent extends Agent {
 
 	public Product getProduct() {
 		return this._product;
+	}
+
+	public void outPutProductStepList() {
+		for (ProductionStep stp : this.getProduct().getProduction()
+				.getProductionSteps()) {
+			for (AID aid : this.getProduct().getProduction()
+					.getProductionEquipletMapping()
+					.getEquipletsForProductionStep(stp.getId())) {
+				System.out
+						.println("Step: " + stp.getId() + " has equiplets:\n");
+				System.out.println(aid.getLocalName());
+			}
+		}
 	}
 }

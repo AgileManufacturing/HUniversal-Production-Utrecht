@@ -96,6 +96,10 @@ public class InformerBehaviour extends OneShotBehaviour {
 		myAgent.addBehaviour(par);
 	}
 
+	public int onEnd() { 
+		 	return 0; 
+		 } 
+
 	/* The conversation class holds the behaviour for a conversation with an equiplet agent.
 	 * The sequentialbehaviour it extends consists of 4 sequences.
 	 * 1 - Inform if the equiplet can perform the step with the given parameters
