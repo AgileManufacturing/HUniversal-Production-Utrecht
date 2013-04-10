@@ -1,7 +1,7 @@
 ﻿/**
  * @file BlackboardClient.java
  * @brief Class representing a blackboard connection.
- * @date Created: 2012-04-04
+ * @date Created: late 2012
  *
  * @author 1.0 Dick van der Steen
  * @author Jan-Willem Willebrands
@@ -40,6 +40,7 @@ import com.mongodb.util.JSONParseException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.bson.types.ObjectId;
 
 /**
@@ -412,7 +413,7 @@ public class BlackboardClient {
 			oplogMonitorThread.interrupt();
 		}
 	}
-	
+
 	/**
 	 * Attempts to create and start a new monitor thread.
 	 * If creation of a new thread fails, the old thread will be kept alive.
