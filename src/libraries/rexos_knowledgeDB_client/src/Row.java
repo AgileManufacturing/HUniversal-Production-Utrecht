@@ -1,5 +1,4 @@
 /**
- * @author Arjen van Zanten
  * @author Ammar Abdulamir
  * @file Row.java
  * @brief A class representing a database row.
