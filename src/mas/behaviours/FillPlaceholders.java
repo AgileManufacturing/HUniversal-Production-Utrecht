@@ -13,12 +13,12 @@ import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
-public class EvaluateDuration extends ReceiveBehaviour {
+public class FillPlaceholders extends ReceiveBehaviour {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("EvaluateDuration");
+	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("FillPlaceholders");
 	private HardwareAgent hardwareAgent;
 
 	/**
@@ -27,7 +27,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 	 * @param a
 	 *            the a
 	 */
-	public EvaluateDuration(Agent a) {
+	public FillPlaceholders(Agent a) {
 		super(a, -1, messageTemplate);
 		hardwareAgent = (HardwareAgent) a;
 	}
@@ -57,49 +57,9 @@ public class EvaluateDuration extends ReceiveBehaviour {
 				myAgent.doDelete();
 			}
 			if (productionStep != null) {
-				int type = ((Integer) productionStep.get("type"));
-				Object parameters = productionStep.get("parameters");
-				switch (type) {
-				case 1:// pickup
-					PickUpTranslation(parameters);
-					break;
-				case 2:// drop
-					DropTranslation(parameters);
-					break;
-				default:
-					break;
-				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	private boolean PickUpTranslation(Object parameters) {
-		// double x = parameters.getX();
-		// double y = parameters.getY();
-		// double z = parameters.getZ();
-		// long relative = parameters.getRelative();
-
-		// Move delta robot to *,*,8 relative to crate A(relative)
-		// Move delta robot to x,y,* relative to crate A(relative)
-		// Move delta robot to *,*,z relative to crate A(relative)
-		// Activate gripper
-		// Move delta robot to *,*,8 relative to crate A(relative)
-		return true;
-	}
-
-	private boolean DropTranslation(Object parameters) {
-		// double x = parameters.getX();
-		// double y = parameters.getY();
-		// double z = parameters.getZ();
-		// long relative = parameters.getRelative();
-
-		// Move delta robot to *,*,8 relative to crate A
-		// Move delta robot to x,y,* relative to crate A
-		// Move delta robot to *,*,z relative to crate A
-		// Deactivate gripper
-		// Move delta robot to *,*,8 relative to crate A
-		return true;
 	}
 }
