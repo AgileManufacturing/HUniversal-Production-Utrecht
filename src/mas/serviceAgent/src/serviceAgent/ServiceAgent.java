@@ -15,6 +15,7 @@ import com.google.gson.JsonSyntaxException;
 import com.mongodb.*;
 
 import equipletAgent.*;
+
 import org.bson.types.*;
 
 import newDataClasses.ScheduleData;
@@ -24,6 +25,8 @@ import nl.hu.client.*;
 
 public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	private static final long serialVersionUID = 1L;
+
+	public static final long timeSlotDurationMs = 1000;
 
 	private BlackboardClient productionStepBBClient, serviceStepBBClient;
 	private Hashtable<String, Long> services;
@@ -264,16 +267,33 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
+		BasicDBObject productionStep = null;
+		try {
+			productionStep = (BasicDBObject) productionStepBBClient
+					.findDocuments(
+							new BasicDBObject("_id", entry.getTargetObjectId()))
+					.get(0);
+		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+			e.printStackTrace();
+			doDelete();
+		}
+
 		switch (entry.getNamespace().split(".")[1]) {
 		case "ProductStepsBlackBoard":
 
 			switch (operation) {
 			case INSERT:
 				addBehaviour(new ReportStepDurationBehaviour(this,
-						entry.getTargetObjectId()));
+						productionStep));
 				break;
 			case UPDATE:
-				addBehaviour(new DoServiceBehaviour(this, ));
+				ProductStepStatusCode status = (ProductStepStatusCode) productionStep
+						.get("status");
+				if (status == ProductStepStatusCode.WAITING) {
+					for (String service : stepTypes.get(productionStep
+							.get("type")))
+						addBehaviour(new DoServiceBehaviour(this, service));
+				}
 				break;
 			case DELETE:
 				break;
@@ -286,59 +306,23 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		}
 	}
 
-	private class DoServiceBehaviour extends SimpleBehaviour {
-		private static final long serialVersionUID = 1L;
-
-		private String service;
-
-		public DoServiceBehaviour(Agent agent, String service) {
-			super(agent);
-			this.service = service;
-
-			System.out.format("planning service %s%n", service);
-		}
-
-		@Override
-		public void action() {
-			System.out.format("service %s done%n", service);
-			// TODO update status step in production step BB
-		}
-
-		@Override
-		public boolean done() {
-			return false;
-		}
-	}
-
 	private class ReportStepDurationBehaviour extends OneShotBehaviour {
 		static final long serialVersionUID = 1L;
-		private ObjectId stepId;
+		private BasicDBObject productionStep = null;
 
-		public ReportStepDurationBehaviour(Agent a, ObjectId stepId) {
+		public ReportStepDurationBehaviour(Agent a, BasicDBObject productionStep) {
 			super(a);
-			this.stepId = stepId;
+			this.productionStep = productionStep;
 		}
 
 		@Override
 		public void action() {
-			BasicDBObject query = new BasicDBObject("_id", stepId);
-
-			BasicDBObject productionStep = null;
-			try {
-				productionStep = (BasicDBObject) productionStepBBClient
-						.findDocuments(query).get(0);
-			} catch (InvalidDBNamespaceException | GeneralMongoException e) {
-				e.printStackTrace();
-				doDelete();
-			}
-
-			boolean isAble = stepTypes.containsKey(((Integer) productionStep
-					.get("type")).longValue());
+			long stepType = ((Integer) productionStep.get("type")).longValue();
+			boolean isAble = stepTypes.containsKey(stepType);
 
 			if (isAble) {
 				int duration = 0;
-				for (String service : stepTypes.get(((Integer) (productionStep
-						.get("type"))).longValue())) {
+				for (String service : stepTypes.get(stepType)) {
 					duration += services.get(service);
 				}
 
@@ -348,12 +332,17 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 				Gson gson = new Gson();
 				productionStep.put("scheduleData", scheduleData);
 				try {
-					productionStepBBClient.updateDocuments(
-							query,
-							new BasicDBObject("$set", new BasicDBObject(
-									"scheduleData", BlackboardClient
-											.parseJSONWithCheckException(gson
-													.toJson(scheduleData)))));
+					productionStepBBClient
+							.updateDocuments(
+									new BasicDBObject("_id", productionStep
+											.get("_id")),
+									new BasicDBObject(
+											"$set",
+											new BasicDBObject(
+													"scheduleData",
+													BlackboardClient
+															.parseJSONWithCheckException(gson
+																	.toJson(scheduleData)))));
 				} catch (InvalidDBNamespaceException | GeneralMongoException
 						| InvalidJSONException e) {
 					e.printStackTrace();
@@ -377,7 +366,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 				message.setOntology("canDoProductionStepResponse");
 				message.setContent("Not able");
 				try {
-					message.setContentObject(stepId);
+					message.setContentObject((ObjectId) productionStep
+							.get("_id"));
 				} catch (IOException e) {
 					e.printStackTrace();
 					doDelete();
@@ -394,6 +384,38 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 				System.out.format("%s cannot do step %s%n", getLocalName(),
 						strBuilder);
 			}
+		}
+	}
+
+	private class DoServiceBehaviour extends SimpleBehaviour {
+		private static final long serialVersionUID = 1L;
+
+		private boolean finished = false;
+		private final long startTime, duration;
+		private String service;
+
+		public DoServiceBehaviour(Agent agent, String service) {
+			super(agent);
+			this.service = service;
+			startTime = System.currentTimeMillis();
+			duration = timeSlotDurationMs * services.get(service);
+			System.out.format("executing service %s%n", service);
+		}
+
+		@Override
+		public void action() {
+			if (System.currentTimeMillis() - startTime < duration)
+				block(duration - (System.currentTimeMillis() - startTime));
+			else {
+				System.out.format("service %s done%n", service);
+				finished = true;
+			}
+			// TODO update status step in production step BB
+		}
+
+		@Override
+		public boolean done() {
+			return finished;
 		}
 	}
 }
