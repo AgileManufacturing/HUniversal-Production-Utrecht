@@ -24,7 +24,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 	private DbData dbData;
 
 	public void setup() {
-		System.out.println("I spawned as a service agent.");
+		System.out.println("I spawned as a hardware agent.");
 
 		// TODO fill in host, database and collection
 		Object[] args = getArguments();
