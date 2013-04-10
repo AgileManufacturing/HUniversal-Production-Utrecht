@@ -152,7 +152,7 @@ public class Scheduler {
 		
 	}
 	
-	private class FreeTimeSlot{
+	public class FreeTimeSlot{
 		private int startTime = -1;
 		private int duration = -1;
 		private String equipletName = "";
@@ -175,7 +175,7 @@ public class Scheduler {
 		}
 	}
 	
-	private class Schedule{
+	public class Schedule{
 		private int startTime = -1;
 		private int duration = -1;
 		private int deadline = -1;
