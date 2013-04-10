@@ -37,9 +37,9 @@ import java.util.Map;
  * A blackboard entry.
  **/
 public class Entries implements TreeModel {
-    ArrayList<BasicDBObject> root = new ArrayList<BasicDBObject>();
+    ArrayList<EntryObject> root;
 
-    public Entries(ArrayList<BasicDBObject> entries) {
+    public Entries(ArrayList<EntryObject> entries) {
         root = entries;
     }
 
@@ -53,12 +53,17 @@ public class Entries implements TreeModel {
         if (parent instanceof ArrayList)
             return root.get(index);
         else {
-            BasicDBObject bdo = (BasicDBObject) parent;
+            BasicDBObject bdo = ((EntryObject) parent).getBdo();
             if (index >= bdo.size()) return null;
 
             int i = 0;
             for (Map.Entry<String, Object> entry : bdo.entrySet()) {
-                if (i++ == index) return entry.getValue();
+                if (i++ == index) {
+                    if (entry.getValue() instanceof BasicDBObject)
+                        return new EntryObject(entry.getKey(), (BasicDBObject) entry.getValue());
+                    else
+                        return new EntryObject(entry.getKey(), entry.getValue());
+                }
             }
 
             return null;
@@ -71,8 +76,8 @@ public class Entries implements TreeModel {
 
         if (parent instanceof ArrayList)
             children = root.size();
-        else if (parent instanceof BasicDBObject)
-            children = ((BasicDBObject) parent).size();
+        else if (parent instanceof EntryObject && ((EntryObject) parent).isBdo())
+            children = ((EntryObject) parent).getBdo().size();
         else
             children = 0;
 
@@ -81,7 +86,7 @@ public class Entries implements TreeModel {
 
     @Override
     public boolean isLeaf(Object node) {
-        return !(node instanceof ArrayList || node instanceof BasicDBObject);
+        return !(node instanceof ArrayList || node instanceof EntryObject && ((EntryObject) node).getBdo() != null);
     }
 
     @Override
@@ -94,13 +99,14 @@ public class Entries implements TreeModel {
 
         if (parent instanceof ArrayList)
             index = 0;
-        else if (parent instanceof BasicDBObject) {
-            BasicDBObject bdo = (BasicDBObject) parent;
-            for (int i = 0; i < bdo.size(); i++)
-                if (bdo.equals(child)) index = i;
-
-        } else {
-            index = -1;
+        else if (parent instanceof EntryObject && ((EntryObject) parent).isBdo()) {
+            BasicDBObject bdo = ((EntryObject) parent).getBdo();
+            int i = 0;
+            for (String key : bdo.keySet()) {
+                if (key.equals((((EntryObject) child)).getEntryName())) break;
+                i++;
+            }
+            index = i;
         }
 
         return index;

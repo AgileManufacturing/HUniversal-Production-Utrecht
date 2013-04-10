@@ -51,11 +51,9 @@ public class Blackboards implements ListModel<String> {
 
     @Override
     public void addListDataListener(ListDataListener l) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void removeListDataListener(ListDataListener l) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

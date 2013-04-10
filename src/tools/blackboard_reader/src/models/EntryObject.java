@@ -1,8 +1,8 @@
 /**
  * @author Ammar Abdulamir
- * @file BlackboardReader.java
- * @brief A blackboard reader GUI.
- * @date Created: 4/9/13
+ * @file
+ * @brief
+ * @date Created: 4/10/13
  * @section LICENSE
  * License: newBSD
  * Copyright © 2013, HU University of Applied Sciences Utrecht.
@@ -23,37 +23,55 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
+package models;
+
 import com.mongodb.BasicDBObject;
-import models.Blackboards;
-import models.Entries;
-import models.EntryObject;
 
-import javax.swing.*;
-import java.util.ArrayList;
+public class EntryObject {
+    private BasicDBObject bdo;
+    private Object object;
+    private final String entryName;
 
-public class BlackboardReader {
-    private JList blackboards;
-    private JPanel mainPanel;
-    private JTree entries;
-    private ArrayList<EntryObject> entriesList = new ArrayList<EntryObject>();
-
-    public BlackboardReader() {
-        JFrame frame = new JFrame("BlackboardReader");
-        frame.setContentPane(mainPanel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
-
-        Blackboards blackboard = new Blackboards();
-        blackboards.setModel(blackboard);
-        blackboard.add("test");
+    public EntryObject(BasicDBObject bdo) {
+        this("Entry", bdo);
     }
 
-    public void setListEntries() {
-        entries.setModel(new Entries(entriesList));
+    public EntryObject(String entryName, BasicDBObject bdo) {
+        this.entryName = entryName;
+        this.bdo = bdo;
     }
 
-    public ArrayList<EntryObject> getEntriesList() {
-        return entriesList;
+    public EntryObject(String entryName, Object object) {
+        this.entryName = entryName;
+        this.object = object;
+    }
+
+    public BasicDBObject getBdo() {
+        return bdo;
+    }
+
+    public Object getObject() {
+        return object;
+    }
+
+    public String getEntryName() {
+        return entryName;
+    }
+
+    public boolean isBdo() {
+        return bdo != null;
+    }
+
+    @Override
+    public String toString() {
+        String ret;
+
+        if (bdo != null) {
+            ret = "[" + entryName + "]";
+            if (bdo.containsField("_id")) ret += " " + bdo.get("_id");
+        } else
+            ret = entryName + ": " + object;
+
+        return ret;
     }
 }
