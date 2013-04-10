@@ -1,7 +1,7 @@
 ﻿/**
  * @file BlackboardSubscription.java
  * @brief Object representing a subscription to one of the basic MongoDB operations.
- * @date Created: 2012-04-08
+ * @date Created: 2013-04-08
  *
  * @author Jan-Willem Willebrands
  *
@@ -79,6 +79,7 @@ public class BasicOperationSubscription extends BlackboardSubscription {
 
 	/**
 	 * Checks whether two BlackboardSubscription objects are equal.
+	 * @param obj The other object.
 	 * @return Whether or not the two objects are equal.
 	 **/
 	@Override
@@ -100,7 +101,7 @@ public class BasicOperationSubscription extends BlackboardSubscription {
 	 **/
 	@Override
 	public DBObject getQuery() {
-		return QueryBuilder.start("op").is(operation.getOpCode()).get();
+		return QueryBuilder.start(OplogEntry.OPERATION_FIELD).is(operation.getOpCode()).get();
 	}
 
 	/**
