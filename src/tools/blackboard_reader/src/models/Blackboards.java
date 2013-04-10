@@ -1,8 +1,8 @@
 /**
  * @author Ammar Abdulamir
- * @file BlackboardReader.java
- * @brief A blackboard reader GUI.
- * @date Created: 4/9/13
+ * @file Blackboards.java
+ * @brief A blackboard model.
+ * @date Created: 4/10/13
  * @section LICENSE
  * License: newBSD
  * Copyright © 2013, HU University of Applied Sciences Utrecht.
@@ -23,34 +23,39 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-import com.mongodb.BasicDBObject;
-import models.Blackboards;
-import models.Entries;
+package models;
 
 import javax.swing.*;
+import javax.swing.event.ListDataListener;
+import java.util.ArrayList;
 
-public class BlackboardReader {
-    private JList blackboards;
-    private JPanel mainPanel;
-    private JTree entries;
+/**
+ * A blackboard model.
+ **/
+public class Blackboards implements ListModel<String> {
+    private ArrayList<String> blackboards = new ArrayList<String>();
 
-    public BlackboardReader() {
-        JFrame frame = new JFrame("BlackboardReader");
-        frame.setContentPane(mainPanel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
-
-        Blackboards blackboard = new Blackboards();
-        blackboards.setModel(blackboard);
-        blackboard.add("test");
-
-//        Entries entry = new Entries();
-//        entries.setModel(entry);
+    public void add(String name) {
+        blackboards.add(name);
     }
 
-    public void set(BasicDBObject o) {
-        Entries entry = new Entries(o);
-        entries.setModel(entry);
+    @Override
+    public int getSize() {
+        return blackboards.size();
+    }
+
+    @Override
+    public String getElementAt(int index) {
+        return "[" + blackboards.get(index) + "]";
+    }
+
+    @Override
+    public void addListDataListener(ListDataListener l) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void removeListDataListener(ListDataListener l) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

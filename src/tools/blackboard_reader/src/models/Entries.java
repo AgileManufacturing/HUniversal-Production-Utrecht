@@ -1,7 +1,7 @@
 /**
  * @author Ammar Abdulamir
- * @file Blackboard.java
- * @brief A blackboard model.
+ * @file Entries.java
+ * @brief A blackboard entry.
  * @date Created: 4/10/13
  * @section LICENSE
  * License: newBSD
@@ -25,37 +25,80 @@
 
 package models;
 
-import javax.swing.*;
-import javax.swing.event.ListDataListener;
-import java.util.ArrayList;
+import com.mongodb.BasicDBObject;
+
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+import java.util.Map;
 
 /**
- * A blackboard model.
+ * A blackboard entry.
  **/
-public class Blackboard implements ListModel<String> {
-    private ArrayList<String> blackboards = new ArrayList<String>();
+public class Entries implements TreeModel {
+    private BasicDBObject root;
 
-    public void add(String name) {
-        blackboards.add(name);
+    public Entries(BasicDBObject entry) {
+        root = entry;
     }
 
     @Override
-    public int getSize() {
-        return blackboards.size();
+    public Object getRoot() {
+        return root;
     }
 
     @Override
-    public String getElementAt(int index) {
-        return "bb: " + blackboards.get(index);
+    public Object getChild(Object parent, int index) {
+        if (parent instanceof BasicDBObject) {
+            BasicDBObject bdo = (BasicDBObject) parent;
+            if (index >= bdo.size()) return null;
+
+            int i = 0;
+            for (Map.Entry<String, Object> entry : bdo.entrySet()) {
+                if (i++ == index) return entry.getValue();
+            }
+        }
+
+        return null;
     }
 
     @Override
-    public void addListDataListener(ListDataListener l) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public int getChildCount(Object parent) {
+        int children = 0;
+
+        if (parent instanceof BasicDBObject)
+            children = ((BasicDBObject) parent).size();
+
+
+        return children;
     }
 
     @Override
-    public void removeListDataListener(ListDataListener l) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public boolean isLeaf(Object node) {
+        return !(node instanceof BasicDBObject);
+    }
+
+    @Override
+    public void valueForPathChanged(TreePath path, Object newValue) {
+    }
+
+    @Override
+    public int getIndexOfChild(Object parent, Object child) {
+        if (parent instanceof BasicDBObject) {
+            BasicDBObject bdo = (BasicDBObject) parent;
+            for (int i = 0; i < bdo.size(); i++) {
+                if (bdo.equals(child)) return i;
+            }
+        }
+
+        return -1;
+    }
+
+    @Override
+    public void addTreeModelListener(TreeModelListener l) {
+    }
+
+    @Override
+    public void removeTreeModelListener(TreeModelListener l) {
     }
 }
