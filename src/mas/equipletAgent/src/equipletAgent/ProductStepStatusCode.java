@@ -1,6 +1,6 @@
 package equipletAgent;
 
-public enum ProductStepStatusCode{
+public enum ProductStepStatusCode {
 	EVALUATING(0),
 	PLANNED(1),
 	WAITING(2),
