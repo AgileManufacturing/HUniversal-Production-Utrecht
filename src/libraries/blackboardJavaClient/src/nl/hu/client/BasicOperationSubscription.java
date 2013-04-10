@@ -101,7 +101,7 @@ public class BasicOperationSubscription extends BlackboardSubscription {
 	 **/
 	@Override
 	public DBObject getQuery() {
-		return QueryBuilder.start("op").is(operation.getOpCode()).get();
+		return QueryBuilder.start(OplogEntry.OPERATION_FIELD).is(operation.getOpCode()).get();
 	}
 
 	/**
