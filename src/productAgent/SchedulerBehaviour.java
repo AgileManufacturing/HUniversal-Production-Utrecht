@@ -151,15 +151,13 @@ public class SchedulerBehaviour extends CyclicBehaviour{
         }
 		
 		//send the message to the equiplet to schedule the timeslot
+		
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-        msg.setContent( "Schedule" );
-
-        msg.addReceiver(equipletAID); 
-        jade.core.Agent a= new Agent();
-        a.send(msg);
-		
-		//equipletAgent.scheduleProductionStep(startSlot);
-		
+		msg.setOntology("ScheduleStep");
+        msg.setContent( ""+freetimeslotEq.startTime );
+        msg.addReceiver(equipletAID);
+        
+        myAgent.send(msg);
 	}
 	
 	private class FreeTimeSlot{
