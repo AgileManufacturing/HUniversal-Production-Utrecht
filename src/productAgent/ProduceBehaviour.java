@@ -3,9 +3,9 @@
  */
 package productAgent;
 
+import jade.core.behaviours.OneShotBehaviour;
 import newDataClasses.LogMessage;
 import newDataClasses.Product;
-import jade.core.behaviours.OneShotBehaviour;
 
 /**
  * 

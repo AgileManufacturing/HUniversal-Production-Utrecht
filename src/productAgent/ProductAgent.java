@@ -33,6 +33,18 @@ public class ProductAgent extends Agent {
 
 			this.addBehaviour(new OverviewBehaviour());
 
+		//addBehaviour(pb);
+
+		/*	addBehaviour(new CyclicBehaviour() {
+				@Override
+				public void action() {
+					if (ib.done()) {
+						outPutProductStepList();
+					} else {
+						System.out.println(" -- Informer Not done -- ");
+					}
+				}
+			});  */
 			System.out.println("I spawned as a product agent");
 
 		} catch (Exception e) {
@@ -55,6 +67,10 @@ public class ProductAgent extends Agent {
 
 	public Product getProduct() {
 		return this._product;
+	}
+	
+	public void setProduct(Product value) {
+		this._product = value;
 	}
 
 	public void outPutProductStepList() {

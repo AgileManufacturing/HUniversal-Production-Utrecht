@@ -13,9 +13,9 @@
  */
 package newDataClasses;
 
-import java.util.ArrayList;
-
 import jade.core.AID;
+
+import java.util.ArrayList;
 
 public class ProductionEquipletMapper extends Mapper<Long, AID> {
 	
