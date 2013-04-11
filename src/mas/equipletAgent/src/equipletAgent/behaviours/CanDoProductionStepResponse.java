@@ -1,4 +1,4 @@
-package behaviours;
+package equipletAgent.behaviours;
 
 import java.lang.reflect.Type;
 
@@ -12,6 +12,7 @@ import com.mongodb.DBObject;
 
 import equipletAgent.ProductStepStatusCode;
 import equipletAgent.EquipletAgent;
+import behaviours.ReceiveBehaviour;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
@@ -80,14 +81,14 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour{
 			if (status == ProductStepStatusCode.EVALUATING.getStatus()) {
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.CONFIRM);
 				responseMessage.setConversationId(message.getConversationId());
-				responseMessage.setOntology("");// TODO: set ontology
+				responseMessage.setOntology("CanPerformStepResponse");
 				responseMessage.addReceiver(productAgent);
 				message.setContent("This is possible");
 				myAgent.send(responseMessage);
 			} else if (status == ProductStepStatusCode.ABORTED.getStatus()) {
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.DISCONFIRM);
 				responseMessage.setConversationId(message.getConversationId());
-				responseMessage.setOntology("");// TODO: set ontology
+				responseMessage.setOntology("CanPerformStepResponse");
 				responseMessage.addReceiver(productAgent);
 				responseMessage.setContent("This is impossible");
 				myAgent.send(responseMessage);

@@ -16,7 +16,7 @@ import jade.lang.acl.MessageTemplate;
  *
  */
 @SuppressWarnings("serial")
-abstract class ReceiveBehaviour extends CyclicBehaviour {
+public abstract class ReceiveBehaviour extends CyclicBehaviour {
 
 	private MessageTemplate template;
 	private long timeout, wakeupTime;

@@ -32,26 +32,33 @@
 
 package equipletAgent;
 
-import behaviours.*;
-
 import com.mongodb.*;
 import com.google.gson.Gson;
 
+import equipletAgent.behaviours.*;
+
 import jade.core.AID;
 import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
+import newDataClasses.ScheduleData;
 import nl.hu.client.BasicOperationSubscription;
 import nl.hu.client.BlackboardClient;
 import nl.hu.client.BlackboardSubscriber;
+import nl.hu.client.FieldUpdateSubscription;
+import nl.hu.client.FieldUpdateSubscription.MongoUpdateLogOperation;
 import nl.hu.client.GeneralMongoException;
 import nl.hu.client.InvalidDBNamespaceException;
 import nl.hu.client.MongoOperation;
 import nl.hu.client.OplogEntry;
+
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Map.Entry;
 
 import org.bson.types.ObjectId;
 
@@ -85,6 +92,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 	private ArrayList<Long> capabilities;
 
 	private Hashtable<String, ObjectId> communicationTable;
+	
+	private Gson gson;
 
 	@SuppressWarnings("unchecked")
 	public void setup() {
@@ -123,13 +132,17 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 	        equipletBBclient = new BlackboardClient(equipletDbIp);
 	        equipletBBclient.setDatabase(equipletDbName);
 	        equipletBBclient.setCollection(productStepsName);
-	        equipletBBclient.subscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
+	        
+	        FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
+	        statusSubscription.addOperation(MongoUpdateLogOperation.SET);
+	        
+	        equipletBBclient.subscribe(statusSubscription);
 		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException e) {
 			e.printStackTrace();
 			doDelete();
 		}
 		
-		Gson gson = new Gson();
+		gson = new Gson();
 		// put capabilities on the equipletDirectory
 		try {
 			DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
@@ -157,7 +170,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 	}
 	
 	public void takeDown() {
-		Gson gson = new Gson();
 		try {
 			BasicDBObject searchQuery = new BasicDBObject();
 			searchQuery.put("AID", getAID());
@@ -188,6 +200,85 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 	
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
-		// TODO Implement onMessage
+		switch (entry.getNamespace().split(".")[1]) {
+		case "ProductStepsBlackBoard":
+			try {
+				ObjectId id = entry.getTargetObjectId();
+				BasicDBObject query = new BasicDBObject();
+				query.put("_id", id);
+				DBObject productStep = equipletBBclient.findDocuments(query).get(0);
+				
+				String conversationId = null;
+				for(Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
+					if (tableEntry.getValue() == id){
+						conversationId = tableEntry.getKey();
+						break;
+					}
+				}
+				if(conversationId == null){
+					throw new Exception();
+				}
+				
+				ACLMessage responseMessage;
+				
+				ProductStepStatusCode status = (ProductStepStatusCode) productStep.get("status");
+				switch(status){
+				case PLANNED:
+					try {
+						ScheduleData scheduleData = (ScheduleData)productStep.get("scheduleData");
+						responseMessage = new ACLMessage(ACLMessage.INFORM);
+						responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
+						responseMessage.setOntology("ProductionDuration");
+						responseMessage.setConversationId(conversationId);
+						responseMessage.setContentObject(scheduleData.getStartTime());
+						send(responseMessage);
+					} catch (IOException e) {
+						// TODO Error no document
+						e.printStackTrace();
+					}
+					break;
+				case IN_PROGRESS:
+					responseMessage = new ACLMessage(ACLMessage.INFORM);
+					responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
+					responseMessage.setOntology("StatusUpdate");
+					responseMessage.setConversationId(conversationId);
+					responseMessage.setContent("INPROGRESS");
+					send(responseMessage);
+					break;
+				case FAILED:
+					responseMessage = new ACLMessage(ACLMessage.INFORM);
+					responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
+					responseMessage.setOntology("StatusUpdate");
+					responseMessage.setConversationId(conversationId);
+					responseMessage.setContent("FAILED");
+					send(responseMessage);
+					break;
+				case SUSPENDED_OR_WARNING:
+					responseMessage = new ACLMessage(ACLMessage.INFORM);
+					responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
+					responseMessage.setOntology("StatusUpdate");
+					responseMessage.setConversationId(conversationId);
+					responseMessage.setContent("SUSPENDED_OR_WARNING");
+					send(responseMessage);
+					break;
+				case DONE:
+					responseMessage = new ACLMessage(ACLMessage.INFORM);
+					responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
+					responseMessage.setOntology("StatusUpdate");
+					responseMessage.setConversationId(conversationId);
+					responseMessage.setContent("DONE");
+					send(responseMessage);
+					break;
+				default:
+					break;
+				}
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			break;
+		default:
+			break;
+		}
 	}
 }

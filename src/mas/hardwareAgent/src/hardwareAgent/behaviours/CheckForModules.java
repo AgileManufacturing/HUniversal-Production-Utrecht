@@ -1,10 +1,11 @@
-package behaviours;
+package hardwareAgent.behaviours;
 
 /**
  * Author: Thierry Gerritse
  * Class: CheckForModules.java * 
  */
 
+import behaviours.ReceiveBehaviour;
 import hardwareAgent.HardwareAgent;
 
 import jade.core.Agent;
