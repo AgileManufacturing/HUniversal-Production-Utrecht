@@ -330,6 +330,43 @@ public class BlackboardClient {
 	}
 	
 	/**
+	 * Finds the distinct values for a specified field across the current collection.
+	 *
+	 * @param distinctField The field for which to return the distinct values.
+	 * @param query DBObject representing the query.
+	 * @return Object array containing the distinct values of the specified field.
+	 * @throws InvalidJSONException The provided JSON contains errors.
+	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 * @throws GeneralMongoException A MongoException occurred.
+	 **/
+	public Object[] findDistinctValues(String distinctField, DBObject query) throws InvalidDBNamespaceException, GeneralMongoException {
+		if (currentCollection == null) {
+			throw new InvalidDBNamespaceException("No collection has been selected.");
+		}
+		
+		try {
+			return currentCollection.distinct(distinctField, query).toArray(); 
+		} catch (MongoException mongoException) {
+			throw new GeneralMongoException("An error occurred attempting to execute distinct query.", mongoException);
+		}
+	}
+	
+	/**
+	 * Finds the distinct values for a specified field across the current collection.
+	 *
+	 * @param distinctField The field for which to return the distinct values.
+	 * @param queryAsJSON JSON string representing the query.
+	 * @return Object array containing the distinct values of the specified field.
+	 * @throws InvalidJSONException The provided JSON contains errors.
+	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 * @throws GeneralMongoException A MongoException occurred.
+	 **/
+	public Object[] findDistinctValues(String distinctField, String queryAsJSON) throws InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
+		DBObject query = parseJSONWithCheckException(queryAsJSON);
+		return findDistinctValues(distinctField, query);
+	}
+	
+	/**
 	 * Updates all documents matching the provided search query within the currently selected collection.
 	 * Documents are updated according to the query specified in updateQuery.
 	 * 
