@@ -1,7 +1,7 @@
 /**
  * @author Ammar Abdulamir
- * @file
- * @brief
+ * @file Blackboards.java
+ * @brief A blackboard model.
  * @date Created: 4/10/13
  * @section LICENSE
  * License: newBSD
@@ -23,55 +23,43 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package models;
+package rexos.client.blackboardreader.models;
 
-import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
 
-public class EntryObject {
-    private BasicDBObject bdo;
-    private Object object;
-    private final String entryName;
+import javax.swing.*;
+import javax.swing.event.ListDataListener;
+import java.util.ArrayList;
 
-    public EntryObject(BasicDBObject bdo) {
-        this("Entry", bdo);
+/**
+ * A blackboard model.
+ **/
+public class Blackboards implements ListModel<DBCollection> {
+    private ArrayList<DBCollection> blackboards = new ArrayList<DBCollection>();
+
+    public Blackboards() {
+        blackboards = new ArrayList<DBCollection>();
     }
 
-    public EntryObject(String entryName, BasicDBObject bdo) {
-        this.entryName = entryName;
-        this.bdo = bdo;
-    }
-
-    public EntryObject(String entryName, Object object) {
-        this.entryName = entryName;
-        this.object = object;
-    }
-
-    public BasicDBObject getBdo() {
-        return bdo;
-    }
-
-    public Object getObject() {
-        return object;
-    }
-
-    public String getEntryName() {
-        return entryName;
-    }
-
-    public boolean isBdo() {
-        return bdo != null;
+    public void add(DBCollection collection) {
+        blackboards.add(collection);
     }
 
     @Override
-    public String toString() {
-        String ret;
+    public int getSize() {
+        return blackboards.size();
+    }
 
-        if (bdo != null) {
-            ret = "[" + entryName + "]";
-            if (bdo.containsField("_id")) ret += " " + bdo.get("_id");
-        } else
-            ret = entryName + ": " + object;
+    @Override
+    public DBCollection getElementAt(int index) {
+        return blackboards.get(index);
+    }
 
-        return ret;
+    @Override
+    public void addListDataListener(ListDataListener l) {
+    }
+
+    @Override
+    public void removeListDataListener(ListDataListener l) {
     }
 }

@@ -23,7 +23,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package models;
+package rexos.client.blackboardreader.models;
 
 import com.mongodb.BasicDBObject;
 
@@ -37,10 +37,18 @@ import java.util.Map;
  * A blackboard entry.
  **/
 public class Entries implements TreeModel {
-    ArrayList<EntryObject> root;
+    private final ArrayList<EntryNode> root;
 
-    public Entries(ArrayList<EntryObject> entries) {
-        root = entries;
+//    public Entries(ArrayList<EntryNode> entries) {
+//        root = entries;
+//    }
+
+    public Entries(){
+        root = new ArrayList<EntryNode>();
+    }
+
+    public void add(EntryNode node){
+        root.add(node);
     }
 
     @Override
@@ -53,17 +61,13 @@ public class Entries implements TreeModel {
         if (parent instanceof ArrayList)
             return root.get(index);
         else {
-            BasicDBObject bdo = ((EntryObject) parent).getBdo();
+            BasicDBObject bdo = ((EntryNode) parent).getNodeAsBdo();
             if (index >= bdo.size()) return null;
 
             int i = 0;
             for (Map.Entry<String, Object> entry : bdo.entrySet()) {
-                if (i++ == index) {
-                    if (entry.getValue() instanceof BasicDBObject)
-                        return new EntryObject(entry.getKey(), (BasicDBObject) entry.getValue());
-                    else
-                        return new EntryObject(entry.getKey(), entry.getValue());
-                }
+                if (i++ == index)
+                    return new EntryNode(entry.getKey(), entry.getValue());
             }
 
             return null;
@@ -76,8 +80,8 @@ public class Entries implements TreeModel {
 
         if (parent instanceof ArrayList)
             children = root.size();
-        else if (parent instanceof EntryObject && ((EntryObject) parent).isBdo())
-            children = ((EntryObject) parent).getBdo().size();
+        else if (parent instanceof EntryNode && ((EntryNode) parent).isBdoNode())
+            children = ((EntryNode) parent).getNodeAsBdo().size();
         else
             children = 0;
 
@@ -86,7 +90,7 @@ public class Entries implements TreeModel {
 
     @Override
     public boolean isLeaf(Object node) {
-        return !(node instanceof ArrayList || node instanceof EntryObject && ((EntryObject) node).getBdo() != null);
+        return !(node instanceof ArrayList || node instanceof EntryNode && ((EntryNode) node).isBdoNode() && ((EntryNode) node).getNodeAsBdo().size() > 0);
     }
 
     @Override
@@ -99,11 +103,11 @@ public class Entries implements TreeModel {
 
         if (parent instanceof ArrayList)
             index = 0;
-        else if (parent instanceof EntryObject && ((EntryObject) parent).isBdo()) {
-            BasicDBObject bdo = ((EntryObject) parent).getBdo();
+        else if (parent instanceof EntryNode && ((EntryNode) parent).isBdoNode()) {
+            BasicDBObject bdo = ((EntryNode) parent).getNodeAsBdo();
             int i = 0;
             for (String key : bdo.keySet()) {
-                if (key.equals((((EntryObject) child)).getEntryName())) break;
+                if (key.equals((((EntryNode) child)).getKey())) break;
                 i++;
             }
             index = i;

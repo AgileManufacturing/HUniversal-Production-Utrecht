@@ -1,8 +1,8 @@
 /**
  * @author Ammar Abdulamir
- * @file BlackboardReader.java
- * @brief A blackboard reader GUI.
- * @date Created: 4/9/13
+ * @file EntryNode.java
+ * @brief
+ * @date Created: 4/10/13
  * @section LICENSE
  * License: newBSD
  * Copyright © 2013, HU University of Applied Sciences Utrecht.
@@ -23,37 +23,50 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
+package rexos.client.blackboardreader.models;
+
 import com.mongodb.BasicDBObject;
-import models.Blackboards;
-import models.Entries;
-import models.EntryObject;
 
-import javax.swing.*;
-import java.util.ArrayList;
+public class EntryNode {
+    private final String key;
+    private final Object node;
 
-public class BlackboardReader {
-    private JList blackboards;
-    private JPanel mainPanel;
-    private JTree entries;
-    private ArrayList<EntryObject> entriesList = new ArrayList<EntryObject>();
-
-    public BlackboardReader() {
-        JFrame frame = new JFrame("BlackboardReader");
-        frame.setContentPane(mainPanel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
-
-        Blackboards blackboard = new Blackboards();
-        blackboards.setModel(blackboard);
-        blackboard.add("test");
+    public EntryNode(BasicDBObject bdo) {
+        this("Entry", bdo);
     }
 
-    public void setListEntries() {
-        entries.setModel(new Entries(entriesList));
+    public EntryNode(String key, Object object) {
+        this.key = key;
+        this.node = object;
     }
 
-    public ArrayList<EntryObject> getEntriesList() {
-        return entriesList;
+    public BasicDBObject getNodeAsBdo() {
+        return (BasicDBObject) node;
+    }
+
+    public Object getNode() {
+        return node;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public boolean isBdoNode() {
+        return node instanceof BasicDBObject;
+    }
+
+    @Override
+    public String toString() {
+        String ret;
+
+        if (isBdoNode()) {
+            ret = "[" + key + "]";
+            if (getNodeAsBdo().containsField("_id"))
+                ret += " {" + getNodeAsBdo().get("_id") + "}";
+        } else
+            ret = key + ": " + node;
+
+        return ret;
     }
 }
