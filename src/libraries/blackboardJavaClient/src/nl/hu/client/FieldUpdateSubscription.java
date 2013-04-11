@@ -89,7 +89,7 @@ public class FieldUpdateSubscription extends BasicOperationSubscription {
 	private String fieldName;
 	
 	/**
-	 * @var Set<MongoUpdateLogOperator> subscribedOperators
+	 * @var Set<MongoUpdateLogOperator> subscribedOperations
 	 * The update operations that should be monitored for the specified field.
 	 **/
 	EnumSet<MongoUpdateLogOperation> subscribedOperations;

@@ -45,6 +45,10 @@ public class MongoDBConnection {
 	 * Hashmap storing the active Mongo connection for each host.
 	 **/
 	private static Hashtable<ServerAddress, MongoDBConnection> databaseConnections;
+	
+	/**
+	 * Initializes the databaseConnections Hashtable.
+	 **/
 	static {
 		databaseConnections = new Hashtable<ServerAddress, MongoDBConnection>();
 	}
