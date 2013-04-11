@@ -8,9 +8,9 @@ package hardwareAgent.behaviours;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import KnowledgeDBClient.KnowledgeDBClient;
-import KnowledgeDBClient.Queries;
-import KnowledgeDBClient.Row;
+import rexos.libraries.knowledge.KnowledgeDBClient;
+import rexos.libraries.knowledge.Queries;
+import rexos.libraries.knowledge.Row;
 import behaviours.ReceiveBehaviour;
 import hardwareAgent.HardwareAgent;
 

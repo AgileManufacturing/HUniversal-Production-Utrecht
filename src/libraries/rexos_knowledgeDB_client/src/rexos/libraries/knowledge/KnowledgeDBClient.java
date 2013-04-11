@@ -27,8 +27,6 @@
  **/
 package rexos.libraries.knowledge;
 
-package KnowledgeDBClient;
-
 import com.mysql.jdbc.Connection;
 
 import java.sql.*;

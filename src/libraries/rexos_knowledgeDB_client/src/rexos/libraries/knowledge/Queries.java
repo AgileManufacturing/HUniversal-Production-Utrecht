@@ -25,8 +25,6 @@
  **/
 package rexos.libraries.knowledge;
 
-package KnowledgeDBClient;
-
 /**
  * Contains all queries.
  **/
