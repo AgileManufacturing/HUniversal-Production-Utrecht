@@ -1,19 +1,16 @@
 package productAgent;
 
-import java.net.UnknownHostException;
-import java.util.List;
-
-import scheduling.Scheduler.FreeTimeSlot;
-import scheduling.Scheduler.Schedule;
-
-import com.mongodb.DB;
-import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
-
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
+
+import java.net.UnknownHostException;
+import java.util.List;
+
+import com.mongodb.DB;
+import com.mongodb.DBObject;
+import com.mongodb.MongoClient;
 
 public class SchedulerBehaviour extends CyclicBehaviour{
 

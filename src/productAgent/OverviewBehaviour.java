@@ -4,8 +4,7 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.ParallelBehaviour;
 import jade.core.behaviours.ThreadedBehaviourFactory;
-import jade.core.behaviours.WakerBehaviour;
-import jade.domain.introspection.ACLMessage;
+import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
 public class OverviewBehaviour extends CyclicBehaviour {
@@ -28,7 +27,7 @@ public class OverviewBehaviour extends CyclicBehaviour {
 		@Override
 		public void action() {
 
-			ACLMessage msg = receive();
+			ACLMessage msg = myAgent.receive();
 
 			if (msg != null) {
 				WaitMsgBehaviour behaviour = new WaitMsgBehaviour(msg);
@@ -52,22 +51,20 @@ public class OverviewBehaviour extends CyclicBehaviour {
 		public void action(){
 			try {
 				switch(msg.getOntology()){
-					case planningBehaviour:
+					case "planningBehaviour":
 						myAgent.addBehaviour(new OneShotBehaviour(myAgent) {
-
 						@Override
 						public void action() {
 							
-							
 						}
 					});
-				case infoBehav:
+				case "informerBehaviour":
 					
-				case schedBehav:
+				case "schedulerBehaviour":
 					
-				case prodBehav:
+				case "produceBehaviour":
 					
-				case waitBehav:
+				case "waiting":
 					
 				case "reschedule":
 					
