@@ -1,10 +1,7 @@
 package productAgent;
 
 import jade.core.AID;
-import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
-import jade.core.behaviours.SequentialBehaviour;
-
 import java.util.List;
 import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
 import newDataClasses.Product;
@@ -16,16 +13,13 @@ import jade.lang.acl.MessageTemplate;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
-
 @SuppressWarnings("serial")
 public class PlannerBehaviour extends OneShotBehaviour {
 	private AID _aid;
-	private ProductionStep _productionStep;
+
 	private ProductAgent _productAgent;
 
-	public void plannerBehaviour() {
-
-	}
+	public void plannerBehaviour(){}
 	
 	public int onEnd(){
 		return 0;
@@ -41,12 +35,10 @@ public class PlannerBehaviour extends OneShotBehaviour {
 				message.setConversationId(ConversationId);
 				message.addReceiver(_aid);
 				message.setOntology("planningBehaviour");
-				message.setContentObject(_productionStep);
 				_productAgent.send(message);
 				
 				
-				BlackboardClient bbc = new BlackboardClient("145.89.191.131",
-						27017);
+				BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
 				bbc.setDatabase("CollectiveDb");
 				bbc.setCollection("EquipletDirectory");
 				

@@ -7,6 +7,7 @@ import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import newDataClasses.ProductionEquipletMapper;
 import newDataClasses.ProductionStep;
 
 /*
@@ -29,58 +30,38 @@ public class InformerBehaviour extends OneShotBehaviour {
 	@Override
 	public void action() {
 		_productAgent = (ProductAgent) myAgent;
-		
+
 		/*
-		 * Testing. Hardcode list with eqa's
-		 * this list will later be renderd from the planning behaviour.
+		 * Testing. Hardcode list with eqa's this list will later be renderd
+		 * from the planning behaviour.
 		 */
+		ProductionEquipletMapper pem = _productAgent.getProduct()
+				.getProduction().getProductionEquipletMapping();
+
 		for (ProductionStep stp : _productAgent.getProduct().getProduction()
 				.getProductionSteps()) {
-			_productAgent.getProduct().getProduction()
-					.getProductionEquipletMapping()
-					.addProductionStep(stp.getId());
-			_productAgent
-					.getProduct()
-					.getProduction()
-					.getProductionEquipletMapping()
-					.addEquipletToProductionStep(stp.getId(),
-							new AID("eqa1", AID.ISLOCALNAME));
-			_productAgent
-					.getProduct()
-					.getProduction()
-					.getProductionEquipletMapping()
-					.addEquipletToProductionStep(stp.getId(),
-							new AID("eqa2", AID.ISLOCALNAME));
-			_productAgent
-					.getProduct()
-					.getProduction()
-					.getProductionEquipletMapping()
-					.addEquipletToProductionStep(stp.getId(),
-							new AID("eqa3", AID.ISLOCALNAME));
-			_productAgent
-					.getProduct()
-					.getProduction()
-					.getProductionEquipletMapping()
-					.addEquipletToProductionStep(stp.getId(),
-							new AID("eqa4", AID.ISLOCALNAME));
-			_productAgent
-					.getProduct()
-					.getProduction()
-					.getProductionEquipletMapping()
-					.addEquipletToProductionStep(stp.getId(),
-							new AID("eqa5", AID.ISLOCALNAME));
-			_productAgent
-					.getProduct()
-					.getProduction()
-					.getProductionEquipletMapping()
-					.addEquipletToProductionStep(stp.getId(),
-							new AID("eqa6", AID.ISLOCALNAME));
+
+			pem.addProductionStep(stp.getId());
+
+			pem.addEquipletToProductionStep(stp.getId(), new AID("eqa1",
+					AID.ISLOCALNAME));
+			pem.addEquipletToProductionStep(stp.getId(), new AID("eqa2",
+					AID.ISLOCALNAME));
+			pem.addEquipletToProductionStep(stp.getId(), new AID("eqa3",
+					AID.ISLOCALNAME));
+			pem.addEquipletToProductionStep(stp.getId(), new AID("eqa4",
+					AID.ISLOCALNAME));
+			pem.addEquipletToProductionStep(stp.getId(), new AID("eqa5",
+					AID.ISLOCALNAME));
+			pem.addEquipletToProductionStep(stp.getId(), new AID("eqa6",
+					AID.ISLOCALNAME));
 		}
-		
+
 		/*
-		 * We want to have our conversations in parallel. We also only want to return when
-		 * all child conversations are finished. So iterate through each step in our productionlist
-		 * and create a conversation object. ( as behaviour )
+		 * We want to have our conversations in parallel. We also only want to
+		 * return when all child conversations are finished. So iterate through
+		 * each step in our productionlist and create a conversation object. (
+		 * as behaviour )
 		 */
 		ParallelBehaviour par = new ParallelBehaviour(
 				ParallelBehaviour.WHEN_ALL);
@@ -100,17 +81,20 @@ public class InformerBehaviour extends OneShotBehaviour {
 		 	return 0; 
 	} 
 
-	/* The conversation class holds the behaviour for a conversation with an equiplet agent.
-	 * The sequentialbehaviour it extends consists of 4 sequences.
-	 * 1 - Inform if the equiplet can perform the step with the given parameters
-	 * 2 - wait for an response. ( handles a 10 sec timeout )
-	 * 3 - if the response was a CONFIRM, ask about the duration.
-	 * 4- waits for the response ( handles a 10 sec timeout ).
+
+
+	/*
+	 * The conversation class holds the behaviour for a conversation with an
+	 * equiplet agent. The sequentialbehaviour it extends consists of 4
+	 * sequences. 1 - Inform if the equiplet can perform the step with the given
+	 * parameters 2 - wait for an response. ( handles a 10 sec timeout ) 3 - if
+	 * the response was a CONFIRM, ask about the duration. 4- waits for the
+	 * response ( handles a 10 sec timeout ).
 	 */
 	private class Conversation extends SequentialBehaviour {
 		private AID _aid;
 		private ProductionStep _productionStep;
-		private boolean debug = true;
+		private boolean debug = false;
 
 		public Conversation(AID aid, ProductionStep productionStep) {
 			this._aid = aid;
@@ -119,15 +103,16 @@ public class InformerBehaviour extends OneShotBehaviour {
 
 		/*
 		 * (non-Javadoc)
-		 * @see jade.core.behaviours.Behaviour#onStart()
-		 * starts the conversation
+		 * 
+		 * @see jade.core.behaviours.Behaviour#onStart() starts the conversation
 		 */
 		public void onStart() {
 			final String ConversationId = _productAgent.generateCID();
 			final MessageTemplate template = MessageTemplate
 					.MatchConversationId(ConversationId);
 
-			// 1 - Inform if the equiplet can perform the step with the given parameters
+			// 1 - Inform if the equiplet can perform the step with the given
+			// parameters
 			addSubBehaviour(new OneShotBehaviour() {
 				public void action() {
 					try {
@@ -148,12 +133,12 @@ public class InformerBehaviour extends OneShotBehaviour {
 					}
 				}
 			});
-			
+
 			// 2 - wait for an response. ( handles a 10 sec timeout )
 			addSubBehaviour(new ReceiveBehaviour(myAgent, 10000, template) {
 				public void handle(ACLMessage msg) {
 					if (msg == null) {
-						
+
 						if (debug) {
 							System.out.println("Productagent "
 									+ myAgent.getLocalName()
@@ -161,16 +146,19 @@ public class InformerBehaviour extends OneShotBehaviour {
 									+ _aid.getLocalName() + " CanPerformStep: "
 									+ _productionStep.getId());
 						}
-						
+
 					} else {
-						
+
 						if (msg.getPerformative() == ACLMessage.CONFIRM) {
-							System.out.println("Received CONFIRM from: "
-									+ _aid.getLocalName()
-									+ ". He can perform step: "
-									+ _productionStep.getId());
-							
-							// 3 - if the response was a CONFIRM, ask about the duration.
+							if (debug) {
+								System.out.println("Received CONFIRM from: "
+										+ _aid.getLocalName()
+										+ ". He can perform step: "
+										+ _productionStep.getId());
+							}
+
+							// 3 - if the response was a CONFIRM, ask about the
+							// duration.
 							addSubBehaviour(new OneShotBehaviour() {
 								public void action() {
 									try {
@@ -181,19 +169,22 @@ public class InformerBehaviour extends OneShotBehaviour {
 										message.setOntology("GetProductionDuration");
 										message.setContentObject(_productionStep);
 										_productAgent.send(message);
-										System.out
-												.println("Querying: "
-														+ _aid.getLocalName()
-														+ " how long it would take to perform: "
-														+ _productionStep
-																.getId());
+										if (debug) {
+											System.out
+													.println("Querying: "
+															+ _aid.getLocalName()
+															+ " how long it would take to perform: "
+															+ _productionStep
+																	.getId());
+										}
 									} catch (Exception e) {
 										e.printStackTrace();
 									}
 								}
 							});
 
-							//4- waits for the response ( handles a 10 sec timeout ).
+							// 4- waits for the response ( handles a 10 sec
+							// timeout ).
 							addSubBehaviour(new ReceiveBehaviour(myAgent,
 									10000, template) {
 								public void handle(ACLMessage msg) {

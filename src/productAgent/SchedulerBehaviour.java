@@ -6,25 +6,54 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.mongodb.DB;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
+@SuppressWarnings("serial")
 public class SchedulerBehaviour extends CyclicBehaviour{
 
+	private ProductAgent _productAgent;
+	private long stepID;
+	private newDataClasses.ProductionStep pStep;
+	
+	public SchedulerBehaviour(long id, newDataClasses.ProductionStep productionstep ){
+		stepID = id;
+		pStep = productionstep;
+	}
+	
 	@Override
 	public void action() {
-		// TODO Auto-generated method stub
+		_productAgent = (ProductAgent) myAgent;
+		ACLMessage msg = myAgent.receive();
+		if (msg != null) {
+			_productAgent
+				.getProduct()
+				.getProduction()
+				.getProductionEquipletMapping();
+			try {
+				Scheduler( _productAgent.getProduct().getProduction().getProductionEquipletMapping().getEquipletsForProductionStep(stepID), pStep);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			block();
+		}
 		// Lets schedule ourself with the equiplet agents in our current list.
 	}
 
-	public void Scheduler(AID[] equipletList, Object productionStep)throws Exception{
+	/**
+	 * Scheduler function schedules the given production step
+	 * @param equipletList
+	 * @param productionStep
+	 * @throws Exception
+	 */
+	public void Scheduler(ArrayList<AID> equipletList, newDataClasses.ProductionStep productionStep)throws Exception{
 		Schedule[] schedules;
-		
-		//MongoClient mongoClient = new MongoClient();
-		// or
 		
 		//Make connection with database
 		MongoClient mongoClient =null;
@@ -33,13 +62,6 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
-		
-		// or
-		//MongoClient mongoClient = new MongoClient( "localhost" , 27017 );
-		// or, to connect to a replica set, supply a seed list of members
-		/*MongoClient mongoClient = new MongoClient(Arrays.asList(new ServerAddress("localhost", 27017),
-		                                      new ServerAddress("localhost", 27018),
-		                                      new ServerAddress("localhost", 27019)));*/
 		
 		DB db = mongoClient.getDB( "ScheduleBlackBoard" );//set db to use
 		
@@ -50,9 +72,9 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 		//extract data of every equiplet their mongoDB to Object Array
 		int scheduleCount = 0;
 		FreeTimeSlot[] freetimes;
-		for(int i = 0; i<equipletList.length;i++){
+		for(int i = 0; i<equipletList.size();i++){
 			//old name is eq1
-			List<DBObject> data = db.getCollection(equipletList[i].getName()).find().toArray();//nameOfCollection should be 'schedule'
+			List<DBObject> data = db.getCollection(equipletList.get(i).getName()).find().toArray();//nameOfCollection should be 'schedule'
 			scheduleCount += data.size();
 		}
 		
@@ -61,8 +83,8 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 		freetimes = new FreeTimeSlot[scheduleCount];
 		
 		//get every scheduled timeslot of every equiplet
-		for(int extract = 0; extract<equipletList.length;extract++){
-			List<DBObject> data = db.getCollection(equipletList[extract].getName()).find().toArray();//nameOfCollection should be 'schedule'
+		for(int extract = 0; extract<equipletList.size();extract++){
+			List<DBObject> data = db.getCollection(equipletList.get(extract).getName()).find().toArray();//nameOfCollection should be 'schedule'
 			for(int i = 0; i < data.size(); i++){
 				//debug
 				System.out.println(data.get(i).toString());
@@ -74,7 +96,7 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 				int dur = (int)c;
 				
 				//add scheduled timeslot to array of scheduled timeslots and mention which equiplet
-				schedules[i] = this.new Schedule(stati, dur, equipletList[extract].getName());
+				schedules[i] = this.new Schedule(stati, dur, equipletList.get(extract).getName());
 				
 				//debug
 				System.out.println(schedules[i].toString());
@@ -94,7 +116,6 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 					if(schedules[run].getDeadline() < schedules[(run+1)].getStartTime()){
 						int freeTimeSlot = schedules[(run+1)].getStartTime() - schedules[run].getDeadline()-1;
 						int timeslotToSchedule= (schedules[run].getDeadline()+1);
-						
 						
 						//debug
 						System.out.println("Vrij tijd sloten: "+freeTimeSlot + " startend op tijdslot: "+ timeslotToSchedule );
@@ -122,23 +143,21 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 		//init AID
 		AID equipletAID =null;
 		//get the equiplet from the timeslot
-		for (int i=0; i<equipletList.length;i++)
+		for (int i=0; i<equipletList.size();i++)
         {
-            if(equipletList[i].getName().equals(freetimeslotEq.getEquipletName())){
-            	equipletAID = equipletList[i];
+            if(equipletList.get(i).getName().equals(freetimeslotEq.getEquipletName())){
+            	equipletAID = equipletList.get(i);
             }
         }
 		
 		//send the message to the equiplet to schedule the timeslot
+		
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-        msg.setContent( "Schedule" );
-
-        msg.addReceiver(equipletAID); 
-        jade.core.Agent a= new Agent();
-        a.send(msg);
-		
-		//equipletAgent.scheduleProductionStep(startSlot);
-		
+		msg.setOntology("ScheduleStep");
+        msg.setContent( ""+freetimeslotEq.startTime );
+        msg.addReceiver(equipletAID);
+        
+        myAgent.send(msg);
 	}
 	
 	private class FreeTimeSlot{
@@ -159,6 +178,7 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 		public int getStartTime(){
 			return this.startTime;
 		}
+		@SuppressWarnings("unused")
 		public int getDuration(){
 			return this.duration;
 		}
@@ -180,6 +200,7 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 		public int getStartTime(){
 			return this.startTime;
 		}
+		@SuppressWarnings("unused")
 		public void setStartTime(int newStartTime){
 			this.startTime = newStartTime;
 		}
@@ -191,6 +212,7 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 		public int getDeadline(){
 			return this.deadline;
 		}
+		@SuppressWarnings("unused")
 		public void setDeadline(int newDeadline){
 			this.deadline = newDeadline;
 		}
