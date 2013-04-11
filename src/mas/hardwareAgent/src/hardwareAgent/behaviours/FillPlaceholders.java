@@ -16,9 +16,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 public class FillPlaceholders extends ReceiveBehaviour {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("FillPlaceholders");
 	private HardwareAgent hardwareAgent;
