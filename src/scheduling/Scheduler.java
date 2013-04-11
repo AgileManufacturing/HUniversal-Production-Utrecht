@@ -2,31 +2,17 @@ package scheduling;
 
 //jade imports
 import jade.core.AID;
-import jade.core.Agent;
-
-//mongodb imports
-import com.mongodb.MongoClient;
-import com.mongodb.MongoException;
-import com.mongodb.WriteConcern;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.DBCursor;
-import com.mongodb.ServerAddress;
-
-//Required imports
-import jade.domain.AMSService;
-import jade.domain.FIPAAgentManagement.*;
 import jade.lang.acl.ACLMessage;
 
 //usual imports
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
-import productAgent.ProductAgent;
+import com.mongodb.DB;
+import com.mongodb.DBObject;
+//mongodb imports
+import com.mongodb.MongoClient;
+//Required imports
 
 
 public class Scheduler {

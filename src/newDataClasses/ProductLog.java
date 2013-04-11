@@ -3,6 +3,8 @@
  */
 package newDataClasses;
 
+import newDataClasses.sqldatadase.sqliteDatabase;
+
 /**
  * @author Theodoor de Graaff <theodoor.degraaff@student.hu.nl>
  *
@@ -10,14 +12,14 @@ package newDataClasses;
 public class ProductLog {
 
 	private boolean writeToRemote;
-	private boolean writeToLocal;
+	private boolean writeToLocal = true; 
 	
-	//private SQLiteDatabaseConnection local;
+	private sqliteDatabase local;
 	//private RemoteDatabaseConnection remote;
 	
 	public void add(LogMessage[] msg){
 		if(writeToLocal){
-			//local.insert()
+			local.insert(msg);
 		}
 		if(writeToRemote){
 			//remote.insert()
@@ -29,6 +31,5 @@ public class ProductLog {
 		//get local since latest remote
 		//write to remote
 	}
-	
 	
 }

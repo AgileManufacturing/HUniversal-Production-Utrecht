@@ -1,23 +1,20 @@
 package productAgent;
 
+import jade.core.AID;
+import jade.core.behaviours.CyclicBehaviour;
+
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
+
+import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
+import newDataClasses.Production;
+import newDataClasses.ProductionEquipletMapper;
+import newDataClasses.ProductionStep;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
-
-import newDataClasses.Product;
-import newDataClasses.Production;
-import newDataClasses.ProductionEquipletMapper;
-import newDataClasses.ProductionStep;
-import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
-import main.MainAgent;
-import jade.core.AID;
-import jade.core.behaviours.CyclicBehaviour;
 
 @SuppressWarnings("serial")
 public class PlannerBehaviour extends CyclicBehaviour {

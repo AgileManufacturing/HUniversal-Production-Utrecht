@@ -31,9 +31,10 @@
 
 package libraries.blackboardJavaClient.src.nl.hu.client;
 
+import org.bson.types.ObjectId;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import org.bson.types.ObjectId;
 
 /**
  * Utility class for handling an oplog entry.
