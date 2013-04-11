@@ -7,17 +7,17 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 /**
- * @author Peter
- * 
  * <code>ReceiveBehaviour</code>'s encapsulates the <code>receive()</code> method and calls the <code>handle()</code> method for each message in the agents message queue matching the specified <code>MessageTemplate</code> or after a timeout.
- * When no template is specified all messages are removed from the queue and <code>handle()</code>d.
- * When all messages have been processed or the timeout expires it automatically continues to wait for new messages and the timeout will be reset. Extend this class and implement the <code>handle()</code> method to process the messages.
- * To set the timeout either supply an amount of milliseconds above 0 in the constructor call or call the <code>setTimeout()</code> method. Use the <code>clearTimeout()</code> to clear the timeout after it has been set.
+ * When no template is specified all messages are removed from the queue and <code>handle()</code> is called for each of them.
+ * When all messages have been processed or the timeout expires it automatically continues to wait for new messages and the timeout will restart. Extend this class and implement the <code>handle()</code> method to process the messages.
+ * To set the timeout either supply a non-negative amount of milliseconds in the constructor or call the <code>setTimeout()</code> method. Use the <code>clearTimeout()</code> to clear the timeout.
+ * 
+ * @author Peter
  *
  */
-@SuppressWarnings("serial")
 public abstract class ReceiveBehaviour extends CyclicBehaviour {
-
+	private static final long serialVersionUID = 1L;
+	
 	private MessageTemplate template;
 	private long timeout, wakeupTime;
 
@@ -68,6 +68,7 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	public void action() {
 		while((msg = myAgent.receive(template)) != null) {
 			handle(msg);
+			restartTimer();
 		}
 		long dt = wakeupTime - System.currentTimeMillis();
 		if (dt > 0)
@@ -104,6 +105,13 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 		timeout = -1;
 		onStart();
 	}
+	
+	/**
+	 * Restarts the timer with the previously specified amount of milliseconds.
+	 */
+	public void restartTimer() {
+		onStart();
+	}
 
 	public void onStart() {
 		wakeupTime = (timeout < 0 ? Long.MAX_VALUE : System.currentTimeMillis()
@@ -132,57 +140,4 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	 * @param m the m
 	 */
 	public abstract void handle(ACLMessage m); /* can be redefined in sub_class */
-	
-	/**
-	 * @author Peter
-	 * <code>ReceiveOnceBehaviour</code>'s are functionally equivalent to <code>ReceiveBehaviour</code> but terminate after the first message matching the template arrives or after the timeout.
-	 * If a message arrives it still calls <code>handle()</code> for every matching message in the queue present at that time.
-	 *
-	 */
-	public abstract class ReceiveOnceBehaviour extends ReceiveBehaviour {
-		/**
-		 * Instantiates a new <code>ReceiveOnceBehaviour</code> without a <code>MessageTemplate</code> and no timeout.
-		 * 
-		 * @param a
-		 */
-		public ReceiveOnceBehaviour(Agent a) {
-			this(a, -1, null);
-		}
-		
-		/**
-		 * Instantiates a new <code>ReceiveOnceBehaviour</code> without a <code>MessageTemplate</code> with the specified timeout.
-		 * 
-		 * @param a
-		 * @param millis
-		 */
-		public ReceiveOnceBehaviour(Agent a, int millis) {
-			this(a, millis, null);
-		}
-		
-		/**
-		 * Instantiates a new <code>ReceiveOnceBehaviour</code> with the specified <code>MessageTemplate</code> and no timeout.
-		 * 
-		 * @param a
-		 * @param mt
-		 */
-		public ReceiveOnceBehaviour(Agent a, MessageTemplate mt) {
-			this(a, -1, mt);
-		}
-		
-		/**
-		 * Instantiates a new <code>ReceiveOnceBehaviour</code> with the specified <code>MessageTemplate</code> with the specified timeout.
-		 * 
-		 * @param a
-		 * @param millis
-		 * @param mt
-		 */
-		public ReceiveOnceBehaviour(Agent a, int millis, MessageTemplate mt) {
-			super(a, millis, mt);
-		}
-
-		public void action() {
-			super.action();
-			getAgent().removeBehaviour(this);
-		}
-	}
 }
