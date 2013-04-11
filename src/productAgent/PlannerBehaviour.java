@@ -18,17 +18,34 @@ import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
 import main.MainAgent;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.SequentialBehaviour;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 @SuppressWarnings("serial")
 public class PlannerBehaviour extends CyclicBehaviour {
 	private ProductAgent _productAgent;
+	private AID _aid;
+	private ProductionStep _behaviour;
 
-	public PlannerBehaviour() {
+	public PlannerBehaviour(AID aid, ProductionStep behaviour) {
+		this._aid = aid;
+		this._behaviour = behaviour;
 	}
 
 	public void action() {
+		final String ConversationId = _productAgent.generateCID();
+		final MessageTemplate template = MessageTemplate.MatchConversationId(ConversationId);
 		_productAgent = (ProductAgent) myAgent;
 		try {
+			ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+			message.setConversationId(ConversationId);
+			message.addReceiver(_aid);
+			message.setOntology("planningBehaviour");
+			message.setContentObject(_behaviour);
+			_productAgent.send(message);
+			
+			
 			BlackboardClient bbc = new BlackboardClient("145.89.191.131",
 					27017);
 			bbc.setDatabase("CollectiveDb");
