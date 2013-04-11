@@ -1,5 +1,6 @@
-/**
- * @author Arjen van Zanten
+
+/** 
+* @author Arjen van Zanten
  * @author Ammar Abdulamir
  * @file KnowledgeDBClient.java
  * @brief A client to communicate with knowledge database.
@@ -23,6 +24,8 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
+
+package KnowledgeDBClient;
 
 import com.mysql.jdbc.Connection;
 
