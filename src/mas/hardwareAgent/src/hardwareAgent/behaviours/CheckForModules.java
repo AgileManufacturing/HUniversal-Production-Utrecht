@@ -56,7 +56,9 @@ public class CheckForModules extends ReceiveBehaviour{
 	        resultSet = client.executeSelectQuery(Queries.MODULES);
 	        while (resultSet.next()) {
 	            System.out.println(new Row(resultSet));
-	            modulesPresent = true;
+	            if(resultSet.equals(contentString)){
+	            	modulesPresent = true;
+	            }
 	        }
 	        //System.out.println();
 			
