@@ -54,11 +54,17 @@ import nl.hu.client.MongoOperation;
 import nl.hu.client.OplogEntry;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.bson.types.ObjectId;
 
@@ -76,6 +82,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 	private int collectiveDbPort = 27017;
 	private String collectiveDbName = "CollectiveDb";
 	private String equipletDirectoryName = "EquipletDirectory";
+	private String timeDataName = "TimeData";
 
 	// This is the database specific for this equiplet, this database contains
 	// all the collections of the equiplet, service and hardware agents.
@@ -94,6 +101,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 	private Hashtable<String, ObjectId> communicationTable;
 	
 	private Gson gson;
+	
+	private Timer timeToNextTimeSlot;
+	private long nextUsedTimeSlot;
+	private Time firstTimeSlot;
+	private long timeSlotLength;
 
 	@SuppressWarnings("unchecked")
 	public void setup() {
@@ -152,7 +164,21 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 			e.printStackTrace();
 			doDelete();
 		}
-
+		
+		try {
+			collectiveBBclient.setCollection(timeDataName);
+			DBObject timeData = collectiveBBclient.findDocuments(new BasicDBObject()).get(0);
+			firstTimeSlot = (Time)timeData.get("firstTimeSlot");
+			timeSlotLength = (Long)timeData.get("timeSlotLength");
+			collectiveBBclient.setCollection(equipletDirectoryName);
+		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+			e.printStackTrace();
+			doDelete();
+		}
+		
+		timeToNextTimeSlot = new Timer();
+		nextUsedTimeSlot = -1l;
+		
 		CanPerformStep canPerformStepBehaviour = new CanPerformStep(this);
         addBehaviour(canPerformStepBehaviour);
 		
@@ -171,15 +197,37 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 	
 	public void takeDown() {
 		try {
-			BasicDBObject searchQuery = new BasicDBObject();
-			searchQuery.put("AID", getAID());
+			BasicDBObject searchQuery = new BasicDBObject("AID", getAID());
 			collectiveBBclient.removeDocuments(gson.toJson(searchQuery));
+			
+			BasicDBObject query = new BasicDBObject();
+			List<DBObject> productSteps = equipletBBclient.findDocuments(query);
+			for(DBObject productStep : productSteps){
+				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
+				responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
+				
+				String conversationId = null;
+				ObjectId id = (ObjectId) productStep.get("_id");
+				for(Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
+					if (tableEntry.getValue() == id){
+						conversationId = tableEntry.getKey();
+						break;
+					}
+				}
+				if(conversationId == null){
+					throw new Exception();
+				}
+				responseMessage.setConversationId(conversationId);
+				responseMessage.setContent("I'm dying");
+				send(responseMessage);
+				
+				// TODO: remove own database
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			// The equiplet is already going down, so it has to do nothing here.
 		}
-		// TODO: message to PA's
-		// TODO: remove own database
 	}
 	
 	public BlackboardClient getEquipletBBclient(){
@@ -198,15 +246,14 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 		return serviceAgent;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
 		switch (entry.getNamespace().split(".")[1]) {
 		case "ProductStepsBlackBoard":
 			try {
 				ObjectId id = entry.getTargetObjectId();
-				BasicDBObject query = new BasicDBObject();
-				query.put("_id", id);
-				DBObject productStep = equipletBBclient.findDocuments(query).get(0);
+				DBObject productStep = equipletBBclient.findDocumentById(id);
 				
 				String conversationId = null;
 				for(Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
@@ -219,8 +266,13 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 					throw new Exception();
 				}
 				
-				ACLMessage responseMessage;
-				responseMessage = new ACLMessage(ACLMessage.INFORM);
+				
+				Hashtable<String, String> statusData = new Hashtable<String, String>();
+				try{
+					statusData = (Hashtable<String, String>)productStep.get("statusData");
+				}catch(Exception e){}	
+				
+				ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
 				responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
 				responseMessage.setConversationId(conversationId);
 				
@@ -233,7 +285,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 						responseMessage.setContentObject(scheduleData.getStartTime());
 						send(responseMessage);
 					} catch (IOException e) {
-						// TODO Error no document
+						responseMessage.setPerformative(ACLMessage.FAILURE);
+						responseMessage.setContent("An error occured in the planning/please reschedule");
+						send(responseMessage);
 						e.printStackTrace();
 					}
 					break;
@@ -245,11 +299,13 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 				case FAILED:
 					responseMessage.setOntology("StatusUpdate");
 					responseMessage.setContent("FAILED");
+					responseMessage.setContentObject((Serializable) statusData);
 					send(responseMessage);
 					break;
 				case SUSPENDED_OR_WARNING:
 					responseMessage.setOntology("StatusUpdate");
 					responseMessage.setContent("SUSPENDED_OR_WARNING");
+					responseMessage.setContentObject((Serializable) statusData);
 					send(responseMessage);
 					break;
 				case DONE:
@@ -267,6 +323,15 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 			break;
 		default:
 			break;
+		}
+	}
+	
+	private class nextProductStepTask extends TimerTask{
+		@Override
+		public void run() {
+			//TODO say to service agent to start
+			//TODO get next productStep out of database.
+			//TODO Set Timer again.
 		}
 	}
 }

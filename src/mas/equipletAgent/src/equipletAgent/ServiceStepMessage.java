@@ -30,6 +30,7 @@
 package equipletAgent;
 
 import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.Map;
 /**
  * Implementation of a message for the servicestep blackboard
@@ -38,14 +39,14 @@ public class ServiceStepMessage {
 	public int serviceStepId;
 	public int productStepId;
 	public String type;
-	public Dictionary<String, String> parameters;
+	public Map<String, String> parameters;
 	public int status;
-	public Map<String, String> statusData;
+	public Hashtable<String, String> statusData;
 	public Object timeData;
 
 	public ServiceStepMessage(int serviceStepId, int productStepId,
-							  String type, Dictionary<String, String> parameters,
-							  int status, Map<String, String> statusData, Object timeData){
+							  String type, Map<String, String> parameters,
+							  int status, Hashtable<String, String> statusData, Object timeData){
 		this.serviceStepId = serviceStepId;
 		this.productStepId = productStepId;
 		this.type = type;
