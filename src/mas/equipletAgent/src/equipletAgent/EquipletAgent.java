@@ -220,16 +220,16 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 				}
 				
 				ACLMessage responseMessage;
+				responseMessage = new ACLMessage(ACLMessage.INFORM);
+				responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
+				responseMessage.setConversationId(conversationId);
 				
 				ProductStepStatusCode status = (ProductStepStatusCode) productStep.get("status");
 				switch(status){
 				case PLANNED:
 					try {
 						ScheduleData scheduleData = (ScheduleData)productStep.get("scheduleData");
-						responseMessage = new ACLMessage(ACLMessage.INFORM);
-						responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
 						responseMessage.setOntology("ProductionDuration");
-						responseMessage.setConversationId(conversationId);
 						responseMessage.setContentObject(scheduleData.getStartTime());
 						send(responseMessage);
 					} catch (IOException e) {
@@ -238,34 +238,22 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 					}
 					break;
 				case IN_PROGRESS:
-					responseMessage = new ACLMessage(ACLMessage.INFORM);
-					responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
 					responseMessage.setOntology("StatusUpdate");
-					responseMessage.setConversationId(conversationId);
 					responseMessage.setContent("INPROGRESS");
 					send(responseMessage);
 					break;
 				case FAILED:
-					responseMessage = new ACLMessage(ACLMessage.INFORM);
-					responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
 					responseMessage.setOntology("StatusUpdate");
-					responseMessage.setConversationId(conversationId);
 					responseMessage.setContent("FAILED");
 					send(responseMessage);
 					break;
 				case SUSPENDED_OR_WARNING:
-					responseMessage = new ACLMessage(ACLMessage.INFORM);
-					responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
 					responseMessage.setOntology("StatusUpdate");
-					responseMessage.setConversationId(conversationId);
 					responseMessage.setContent("SUSPENDED_OR_WARNING");
 					send(responseMessage);
 					break;
 				case DONE:
-					responseMessage = new ACLMessage(ACLMessage.INFORM);
-					responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
 					responseMessage.setOntology("StatusUpdate");
-					responseMessage.setConversationId(conversationId);
 					responseMessage.setContent("DONE");
 					send(responseMessage);
 					break;

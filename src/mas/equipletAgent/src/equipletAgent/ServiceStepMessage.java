@@ -30,6 +30,7 @@
 package equipletAgent;
 
 import java.util.Dictionary;
+import java.util.Map;
 /**
  * Implementation of a message for the servicestep blackboard
  */
@@ -37,18 +38,20 @@ public class ServiceStepMessage{
 	public int serviceStepId;
 	public int productStepId;
 	public String type;
-	public Dictionary parameters;
+	public Dictionary<String, String> parameters;
 	public int status;
+	public Map<String, String> statusData;
 	public Object timeData;
 
 	public ServiceStepMessage(int serviceStepId, int productStepId,
-							  String type, Dictionary parameters,
-							  int status, Object timeData){
+							  String type, Dictionary<String, String> parameters,
+							  int status, Map<String, String> statusData, Object timeData){
 		this.serviceStepId = serviceStepId;
 		this.productStepId = productStepId;
 		this.type = type;
 		this.parameters = parameters;
 		this.status = status;
+		this.statusData = statusData;
 		this.timeData = timeData;
 	}
 }
