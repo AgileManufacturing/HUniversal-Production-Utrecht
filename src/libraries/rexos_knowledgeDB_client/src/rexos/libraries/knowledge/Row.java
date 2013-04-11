@@ -1,7 +1,6 @@
-
 /**
  * @author Ammar Abdulamir
- * @file Row.java
+ * @file rexos.libraries.knowledge.Row.java
  * @brief A class representing a database row.
  * @date Created: 2013-04-08
  * @section LICENSE
@@ -32,7 +31,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-
 
 /**
  * A class representing a database row.

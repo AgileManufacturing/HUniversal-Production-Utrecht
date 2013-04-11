@@ -1,7 +1,6 @@
-
 /**
  * @author Ammar Abdulamir
- * @file Queries.java
+ * @file rexos.libraries.knowledge.Queries.java
  * @brief Contains all queries.
  * @date Created: 2013-04-05
  * @section LICENSE

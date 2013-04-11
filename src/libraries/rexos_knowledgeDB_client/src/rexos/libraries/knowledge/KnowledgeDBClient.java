@@ -1,9 +1,7 @@
-
-/** 
-* @author Arjen van Zanten
- * @author Ammar Abdulamir
+/**
  * @author Arjen van Zanten
- * @file KnowledgeDBClient.java
+ * @author Ammar Abdulamir
+ * @file rexos.libraries.knowledge.KnowledgeDBClient.java
  * @brief A client to communicate with knowledge database.
  * @date Created: 2013-04-05
  * @section LICENSE
