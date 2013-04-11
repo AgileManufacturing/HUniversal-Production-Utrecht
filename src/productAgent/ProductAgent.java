@@ -21,7 +21,6 @@ public class ProductAgent extends Agent {
 
 	// Private fields
 	private Product _product;
-	private InformerBehaviour ib;
 
 	// CID variables
 	private static int _cidCnt = 0;
@@ -32,26 +31,12 @@ public class ProductAgent extends Agent {
 		try {
 			_product = (Product) getArguments()[0];
 
-			ib = new InformerBehaviour();
-			PlannerBehaviour pb = new PlannerBehaviour();
-			ProduceBehaviour pbz = new ProduceBehaviour();
+			this.addBehaviour(new OverviewBehaviour());
 
-			addBehaviour(ib);
-
-			addBehaviour(new CyclicBehaviour() {
-				@Override
-				public void action() {
-					if (ib.done()) {
-						outPutProductStepList();
-					} else {
-						System.out.println(" -- Informer Not done -- ");
-					}
-				}
-			});
 			System.out.println("I spawned as a product agent");
 
 		} catch (Exception e) {
-			System.out.println("Exited with: " + e);
+			System.out.println("Productagent exited with: " + e.getMessage());
 			doDelete();
 		}
 	}
