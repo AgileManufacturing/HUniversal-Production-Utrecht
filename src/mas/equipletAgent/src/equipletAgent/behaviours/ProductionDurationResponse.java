@@ -1,10 +1,12 @@
-package behaviours;
+package equipletAgent.behaviours;
 
 import java.lang.reflect.Type;
 
 import newDataClasses.ScheduleData;
 
 import org.bson.types.ObjectId;
+
+import behaviours.ReceiveBehaviour;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

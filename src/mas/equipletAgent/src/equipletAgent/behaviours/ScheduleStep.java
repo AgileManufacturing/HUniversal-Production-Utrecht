@@ -1,7 +1,9 @@
-package behaviours;
+package equipletAgent.behaviours;
 
 
 import org.bson.types.ObjectId;
+
+import behaviours.ReceiveBehaviour;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -52,18 +54,10 @@ public class ScheduleStep extends ReceiveBehaviour {
 			System.out.format("%d%n", timeslot);
 			ACLMessage timeslotMessage = new ACLMessage(ACLMessage.REQUEST);
 			timeslotMessage.addReceiver(equipletAgent.getServiceAgent());
-			timeslotMessage.setOntology("planStepWithLogistics");
+			timeslotMessage.setOntology("PlanStepWithLogistics");
 			timeslotMessage.setContent(String.valueOf(timeslot));
 			timeslotMessage.setConversationId(message.getConversationId());
 			myAgent.send(timeslotMessage);
-		/*
-		 * TODO: Ask service agent to schedule the step with the
-		 * logistics at time X if possible. Wait for result.
-		 * Report result back to product agent. If the result is
-		 * positive: Set the status of the step on the product
-		 * steps blackboard to PLANNED and add the schedule
-		 * data.
-		 */
 			ACLMessage confirmScheduleStep = new ACLMessage(ACLMessage.CONFIRM);
 			confirmScheduleStep.setConversationId(message.getConversationId());
 			confirmScheduleStep.addReceiver((AID) productStep.get("productAgentId"));

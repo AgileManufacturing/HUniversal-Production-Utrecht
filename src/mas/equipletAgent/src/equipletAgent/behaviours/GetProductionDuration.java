@@ -1,6 +1,8 @@
-package behaviours;
+package equipletAgent.behaviours;
 
 import org.bson.types.ObjectId;
+
+import behaviours.ReceiveBehaviour;
 
 import equipletAgent.EquipletAgent;
 import jade.core.Agent;
@@ -50,19 +52,7 @@ public class GetProductionDuration extends ReceiveBehaviour{
 			responseMessage.addReceiver(equipletAgent.getServiceAgent());
 			responseMessage.setConversationId(message.getConversationId());
 			responseMessage.setContentObject(contentObjectId);
-			responseMessage.setOntology("getProductionStepDuration");
-
-			/*try {
-
-				responseMessage.setContentObject((Serializable) contentObject);
-
-			} catch (IOException e) {
-
-				System.out.println(e);
-				e.printStackTrace();
-
-			}*/
-
+			responseMessage.setOntology("GetProductionStepDuration");
 			myAgent.send(responseMessage);
 
 		} catch (Exception e) {

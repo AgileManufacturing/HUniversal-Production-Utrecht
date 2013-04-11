@@ -11,6 +11,10 @@
 *.la
 *.a
 
+# ignore intelliJ Idea project files
+.idea/
+*.iml
+
 # Ignore the generated folders by the build system
 
 bin/

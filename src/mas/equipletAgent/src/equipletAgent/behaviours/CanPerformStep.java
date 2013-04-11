@@ -1,10 +1,12 @@
-package behaviours;
+package equipletAgent.behaviours;
 
 import java.io.IOException;
 
 import newDataClasses.ProductionStep;
 
 import org.bson.types.ObjectId;
+
+import behaviours.ReceiveBehaviour;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -56,7 +58,6 @@ public class CanPerformStep extends ReceiveBehaviour{
 		ObjectId productStepEntryId = null;
 		Gson gson = new GsonBuilder().serializeNulls().create();
 
-		//TODO make use of a single BlackBoardClient object in an instance variable instead of recreating it
 		try {
 			// TODO: get inputParts
 			// TODO: get ouputPart
@@ -69,12 +70,12 @@ public class CanPerformStep extends ReceiveBehaviour{
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
 			responseMessage.setConversationId(message.getConversationId());
 			responseMessage.addReceiver(equipletAgent.getServiceAgent());
-			responseMessage.setOntology("canDoProductionStep");
+			responseMessage.setOntology("CanDoProductionStep");
 			try {
 				responseMessage.setContentObject(productStepEntryId);
 			} catch (IOException e) {
 				e.printStackTrace();
-				// TODO: ERROR HANDLING'
+				// TODO: ERROR HANDLING
 				myAgent.doDelete();
 			}
 			myAgent.send(responseMessage);

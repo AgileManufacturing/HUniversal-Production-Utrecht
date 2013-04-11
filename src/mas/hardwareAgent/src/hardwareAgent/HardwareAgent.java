@@ -1,5 +1,7 @@
 package hardwareAgent;
 
+import hardwareAgent.behaviours.*;
+
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
