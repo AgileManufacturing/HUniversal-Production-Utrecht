@@ -1,14 +1,14 @@
 /**
- * @file ServiceStepMessage.java
- * @brief Provides a message for the servicestep blackboard
- * @date Created: 2013-04-03
+ * @file ServiceGenerator.java
+ * @brief 
+ * @date Created: 11 apr. 2013
  *
- * @author Hessel Meulenbeld
+ * @author Peter Bonnema
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright Â© 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,33 +26,20 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  **/
-package equipletAgent;
+package serviceAgent;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.Map;
+import com.mongodb.BasicDBObject;
+
+import equipletAgent.ProductStepMessage;
+import equipletAgent.ServiceStepMessage;
+
 /**
- * Implementation of a message for the servicestep blackboard
+ * @author Peter Bonnema
+ *
  */
-public class ServiceStepMessage {
-	public int serviceStepId;
-	public int productStepId;
-	public String type;
-	public Map<String, String> parameters;
-	public int status;
-	public Hashtable<String, String> statusData;
-	public Object timeData;
-
-	public ServiceStepMessage(int serviceStepId, int productStepId,
-							  String type, Map<String, String> parameters,
-							  int status, Hashtable<String, String> statusData, Object timeData){
-		this.serviceStepId = serviceStepId;
-		this.productStepId = productStepId;
-		this.type = type;
-		this.parameters = parameters;
-		this.status = status;
-		this.statusData = statusData;
-		this.timeData = timeData;
-	}
+public interface Service {
+	public boolean canPerform(long productStepType, BasicDBObject parameters);
+	public ServiceStepMessage[] getServiceSteps(long productStepType, BasicDBObject parameters);
 }
