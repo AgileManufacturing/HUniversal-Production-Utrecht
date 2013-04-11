@@ -22,14 +22,15 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
+package rexos.libraries.knowledge;
 
 /**
  * Contains all queries.
  **/
 public class Queries {
     /**
-	 * @var String MODULES_REQUIRED_PER_SERVICE
-	 *
+     * @var String MODULES_REQUIRED_PER_SERVICE
+     *
      * A constant representing an sql query for fetching all modules required by a specific service. Has a service name as the only parameter.
      **/
     public static final String MODULES_REQUIRED_PER_SERVICE = "SELECT\n" +
@@ -44,8 +45,8 @@ public class Queries {
             "WHERE (`services`.`name` = (?));";
 
     /**
-	 * @var String MODULES
-	 *
+     * @var String MODULES
+     *
      * A constant representing an sql query for fetching all modules.
      **/
     public static final String MODULES = "SELECT \n" +
@@ -69,8 +70,8 @@ public class Queries {
             "    ) ;";
 
     /**
-	 * @var String PART_PROPERTIES
-	 *
+     * @var String PART_PROPERTIES
+     *
      * A constant representing an sql query for fetching all part properties for a specific part. Has a part type name as the only paramter.
      **/
     public static final String PART_PROPERTIES = "SELECT\n" +
@@ -88,8 +89,8 @@ public class Queries {
             "WHERE (`part_types`.`name` = (?));";
 
     /**
-	 * @var String PARTS
-	 *
+     * @var String PARTS
+     *
      * A constant representing an sql query for fetching all parts.
      **/
     public static final String PARTS = "SELECT\n" +
@@ -101,8 +102,8 @@ public class Queries {
             "        ON (`parts`.`type` = `part_types`.`id`);";
 
     /**
-	 * @var String POSSIBLE_STEPS_PER_EQUIPLET
-	 *
+     * @var String POSSIBLE_STEPS_PER_EQUIPLET
+     *
      * A constant representing an sql query for fetching the possible steps per equiplet. Has an equiplet address as the only parameter.
      **/
     public static final String POSSIBLE_STEPS_PER_EQUIPLET = "SELECT\n" +
@@ -128,8 +129,8 @@ public class Queries {
             "GROUP BY `step`;";
 
     /**
-	 * @var String POSSIBLE_STEPS_PER_SERVICE
-	 *
+     * @var String POSSIBLE_STEPS_PER_SERVICE
+     *
      * A constant representing an sql query for fetching all possible steps for all services.
      **/
     public static final String POSSIBLE_STEPS_PER_SERVICE = "SELECT \n" +

@@ -1,6 +1,6 @@
 /**
- * @author Arjen van Zanten
  * @author Ammar Abdulamir
+ * @author Arjen van Zanten
  * @file KnowledgeDBClient.java
  * @brief A client to communicate with knowledge database.
  * @date Created: 2013-04-05
@@ -23,6 +23,7 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
+package rexos.libraries.knowledge;
 
 import com.mysql.jdbc.Connection;
 
@@ -55,9 +56,9 @@ public class KnowledgeDBClient {
     private static final String PASS = "soxer";
 
     /**
-     * @var KnowledgeDBClient client
+     * @var rexos.libraries.knowledge.KnowledgeDBClient client
      *
-     * The only KnowledgeDBClient instance.
+     * The only rexos.libraries.knowledge.KnowledgeDBClient instance.
      **/
     private static KnowledgeDBClient client;
 
@@ -69,9 +70,9 @@ public class KnowledgeDBClient {
     private Connection connection;
 
     /**
-     * Get current KnowledgeDBClient instance.
+     * Get current rexos.libraries.knowledge.KnowledgeDBClient instance.
      *
-     * @return The current KnowledgeDBClient.
+     * @return The current rexos.libraries.knowledge.KnowledgeDBClient.
      **/
     public static synchronized KnowledgeDBClient getClient() {
         if (client == null) {
