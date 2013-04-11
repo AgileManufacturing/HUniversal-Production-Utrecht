@@ -1,6 +1,6 @@
 /**
  * @author Ammar Abdulamir
- * @file Row.java
+ * @file rexos.libraries.knowledge.Row.java
  * @brief A class representing a database row.
  * @date Created: 2013-04-08
  * @section LICENSE

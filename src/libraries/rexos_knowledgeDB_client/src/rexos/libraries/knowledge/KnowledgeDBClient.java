@@ -1,7 +1,7 @@
 /**
- * @author Ammar Abdulamir
  * @author Arjen van Zanten
- * @file KnowledgeDBClient.java
+ * @author Ammar Abdulamir
+ * @file rexos.libraries.knowledge.KnowledgeDBClient.java
  * @brief A client to communicate with knowledge database.
  * @date Created: 2013-04-05
  * @section LICENSE
@@ -26,25 +26,34 @@
 package rexos.libraries.knowledge;
 
 import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.JDBC4PreparedStatement;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Properties;
 
 /**
  * A client to communicate with knowledge database.
  **/
 public class KnowledgeDBClient {
     /**
-     * @var String PROPERTIES_ENVIRONMENT_VARIABLE
+     * @var String URL
      *
-     * The environment variable that holds the path to the properties file.
+     * The odbc connection url.
      **/
-    private static final String PROPERTIES_ENVIRONMENT_VARIABLE = "KNOWLEDGE_DB_PROPERTIES";
+    private static final String URL = "jdbc:mysql://145.89.191.131:3306/rexos_knowledge_base";
+
+    /**
+     * @var String USER
+     *
+     * The database username.
+     **/
+    private static final String USER = "rexos";
+
+    /**
+     * @var String PASS
+     *
+     * The database password.
+     **/
+    private static final String PASS = "soxer";
 
     /**
      * @var rexos.libraries.knowledge.KnowledgeDBClient client
@@ -78,20 +87,8 @@ public class KnowledgeDBClient {
      **/
     private KnowledgeDBClient() {
         try {
-            Properties dbProperties = new Properties();
-            FileInputStream in = new FileInputStream(System.getenv(PROPERTIES_ENVIRONMENT_VARIABLE));
-            dbProperties.load(in);
-
-            String url = "jdbc:mysql://" + dbProperties.getProperty("host") + ":" + dbProperties.getProperty("port")
-                    + "/" + dbProperties.getProperty("db");
-            in.close();
-
-            connection = (Connection) DriverManager.getConnection(url, dbProperties.getProperty("username"), dbProperties.getProperty("password"));
+            this.connection = (Connection) DriverManager.getConnection(URL, USER, PASS);
         } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -122,7 +119,7 @@ public class KnowledgeDBClient {
     }
 
     /**
-     * Executes a single query statement.
+     * Execute a single query statement.
      *
      * @param query The query to be executed.
      *
@@ -136,7 +133,7 @@ public class KnowledgeDBClient {
     }
 
     /**
-     * Executes a single query statement with parameters.
+     * Execute a single query statement with parameters.
      *
      * @param query The query to be executed.
      * @param parameters The parameters for the query in a consecutive order.
@@ -152,46 +149,5 @@ public class KnowledgeDBClient {
         }
 
         return statement.executeQuery();
-    }
-
-
-    /**
-     * Executes an insert or update query.
-     *
-     * @param query The insert or update query.
-     *
-     * @return Last insert ID on successful insert query, or 0 for an update query.
-     * @throws SQLException
-     **/
-    public int executeUpdateQuery(String query) throws SQLException {
-        return executeUpdateQuery(query, null);
-    }
-
-    /**
-     * Executes an insert or update query.
-     *
-     * @param query The insert or update query.
-     * @param parameters The parameters for the query in a consecutive order.
-     *
-     * @return Last insert ID on successful insert query, or 0 for an update query.
-     * @throws SQLException
-     **/
-    public int executeUpdateQuery(String query, Object[] parameters) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-
-        if (parameters != null) {
-            for (int i = 0; i < parameters.length; i++) {
-                statement.setString(i + 1, parameters[i].toString());
-            }
-        }
-
-        statement.executeUpdate();
-        if (((JDBC4PreparedStatement) statement).getLastInsertID() > 0) {
-            ResultSet keys = statement.getGeneratedKeys();
-            keys.next();
-            return keys.getInt(1);
-        } else {
-            return 0;
-        }
     }
 }
