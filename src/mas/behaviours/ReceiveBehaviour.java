@@ -10,13 +10,13 @@ import jade.lang.acl.MessageTemplate;
  * @author Peter
  * 
  * <code>ReceiveBehaviour</code>'s encapsulates the <code>receive()</code> method and calls the <code>handle()</code> method for each message in the agents message queue matching the specified <code>MessageTemplate</code> or after a timeout.
- * When no template
+ * When no template is specified all messages are removed from the queue and <code>handle()</code>d.
  * When all messages have been processed or the timeout expires it automatically continues to wait for new messages and the timeout will be reset. Extend this class and implement the <code>handle()</code> method to process the messages.
  * To set the timeout either supply an amount of milliseconds above 0 in the constructor call or call the <code>setTimeout()</code> method. Use the <code>clearTimeout()</code> to clear the timeout after it has been set.
  *
  */
 @SuppressWarnings("serial")
-abstract class ReceiveBehaviour extends CyclicBehaviour {
+public abstract class ReceiveBehaviour extends CyclicBehaviour {
 
 	private MessageTemplate template;
 	private long timeout, wakeupTime;
