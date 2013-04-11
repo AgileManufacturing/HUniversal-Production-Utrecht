@@ -36,7 +36,7 @@ public class ProductAgent extends Agent {
 			PlannerBehaviour pb = new PlannerBehaviour();
 			ProduceBehaviour pbz = new ProduceBehaviour();
 
-			addBehaviour(ib);
+			addBehaviour(pb);
 
 			addBehaviour(new CyclicBehaviour() {
 				@Override
@@ -70,6 +70,10 @@ public class ProductAgent extends Agent {
 
 	public Product getProduct() {
 		return this._product;
+	}
+	
+	public void setProduct(Product value) {
+		this._product = value;
 	}
 
 	public void outPutProductStepList() {
