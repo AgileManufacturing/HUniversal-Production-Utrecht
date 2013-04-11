@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * Implementation of a message for the servicestep blackboard
  */
-public class ServiceStepMessage{
+public class ServiceStepMessage {
 	public int serviceStepId;
 	public int productStepId;
 	public String type;
