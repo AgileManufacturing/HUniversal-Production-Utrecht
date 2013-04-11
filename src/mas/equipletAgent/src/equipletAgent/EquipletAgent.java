@@ -59,8 +59,8 @@ import org.bson.types.ObjectId;
  **/
 public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	/**
-	 *  @var Long serialVersionUID
-	 *  The serial version UID.
+	 * @var Long serialVersionUID
+	 * The serial version UID.
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -71,8 +71,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	private AID serviceAgent;
 
 	/**
-	 *  @var String collectiveDbIp
-	 *  IP of the collective database.
+	 * @var String collectiveDbIp
+	 * IP of the collective database.
 	 */
 	private String collectiveDbIp = "145.89.191.131";
 	
@@ -167,17 +167,32 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	private long nextUsedTimeSlot;
 	
 	/**
-	 * 
+	 * @var long firstTimeSlot
+	 * The first time slot of the grid.
 	 */
 	private long firstTimeSlot;
+	
+	/**
+	 * @var long timeSlotLength
+	 * The length of a time slot.
+	 */
 	private long timeSlotLength;
 
+	/**
+	 * Setup function for the equipletAgent.
+	 * Configures the IP and database name of the equiplet.
+	 * Gets its capabilities from the arguments.
+	 * Creates its service agent. 
+	 * Makes connections with the BlackboardCLients and subscribes on changes on the status field.
+	 * Puts its capabilities on the equipletDirectory blackboard.
+	 * Gets the time data from the blackboard.
+	 * Initializes the Timer objects.
+	 * Starts its behaviours.
+	 */
 	@SuppressWarnings("unchecked")
 	public void setup() {
 		System.out.println("I spawned as a equiplet agent.");
 
-		// set the database name to the name of the equiplet and set the
-		// database ip to its own IP.
 		try {
 			InetAddress IP = InetAddress.getLocalHost();
 			equipletDbIp = IP.getHostAddress();
@@ -186,6 +201,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		}
 		equipletDbName = getAID().getLocalName();
 		communicationTable = new Hashtable<String, ObjectId>();
+		gson = new Gson();
+
 		// TODO: Not Hardcoded capabilities/get capabilities from the service
 		// agent.
 		Object[] args = getArguments();
@@ -221,8 +238,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			doDelete();
 		}
 
-		gson = new Gson();
-		// put capabilities on the equipletDirectory
 		try {
 			DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 			EquipletDirectoryMessage entry = new EquipletDirectoryMessage(getAID(), capabilities, dbData);
@@ -262,12 +277,19 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		addBehaviour(scheduleStepBehaviour);
 	}
 
+	/**
+	 * Takedown function for the equipletAgent.
+	 * Removes itself from the equipletDirectory.
+	 * Informs the productAgents who have planned a productStep on its blackboard of its dead.
+	 * Removes its database.
+	 */
 	public void takeDown() {
 		try {
 			BasicDBObject searchQuery = new BasicDBObject("AID", getAID());
 			collectiveBBClient.removeDocuments(gson.toJson(searchQuery));
 
 			BasicDBObject query = new BasicDBObject();
+			//TODO: USE DISTINCT.
 			List<DBObject> productSteps = equipletBBClient.findDocuments(query);
 			for (DBObject productStep : productSteps) {
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
