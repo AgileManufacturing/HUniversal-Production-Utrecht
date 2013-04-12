@@ -8,6 +8,7 @@ import serviceAgent.behaviour.GetProductStepDuration;
 import jade.core.Agent;
 import com.mongodb.*;
 import equipletAgent.*;
+import newDataClasses.DbData;
 import nl.hu.client.*;
 
 public class ServiceAgent extends Agent implements BlackboardSubscriber {

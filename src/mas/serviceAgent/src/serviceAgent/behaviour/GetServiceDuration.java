@@ -41,7 +41,7 @@ import com.mongodb.DBObject;
 import nl.hu.client.BlackboardClient;
 import nl.hu.client.GeneralMongoException;
 import nl.hu.client.InvalidDBNamespaceException;
-import equipletAgent.ServiceStepMessage;
+import serviceAgent.ServiceStepMessage;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;

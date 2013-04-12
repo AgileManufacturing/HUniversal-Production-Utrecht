@@ -40,7 +40,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
-import equipletAgent.ServiceStepMessage;
+import serviceAgent.ServiceStepMessage;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;

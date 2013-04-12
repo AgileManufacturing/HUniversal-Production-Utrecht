@@ -42,6 +42,7 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
+import newDataClasses.DbData;
 import newDataClasses.ScheduleData;
 import nl.hu.client.*;
 import nl.hu.client.FieldUpdateSubscription.MongoUpdateLogOperation;
@@ -435,7 +436,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			// TODO ask for permission to start
 			// TODO set the step on waiting so the service agent knows that it has to start with it.
 			try {
-				BasicDBObject query = new BasicDBObject("status", ProductStepStatusCode.PLANNED);
+				BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED);
 				query.put("$order_by", new BasicDBObject("scheduleData", new BasicDBObject("startTime", "-1")));
 				DBObject nextProductStep = equipletBBClient.findDocuments(query).get(0);
 				ScheduleData scheduleData = (ScheduleData) nextProductStep.get("scheduleData");

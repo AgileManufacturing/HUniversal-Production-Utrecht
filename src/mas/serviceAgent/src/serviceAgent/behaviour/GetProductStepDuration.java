@@ -17,7 +17,7 @@ import behaviours.ReceiveBehaviour;
 
 import com.mongodb.BasicDBObject;
 
-import equipletAgent.ServiceStepMessage;
+import serviceAgent.ServiceStepMessage;
 
 /**
  * @author Peter Bonnema
