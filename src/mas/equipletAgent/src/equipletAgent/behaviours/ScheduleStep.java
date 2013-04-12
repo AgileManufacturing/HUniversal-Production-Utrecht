@@ -9,7 +9,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 import equipletAgent.EquipletAgent;
-import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -58,9 +57,6 @@ public class ScheduleStep extends ReceiveBehaviour {
 			timeslotMessage.setContent(String.valueOf(timeslot));
 			timeslotMessage.setConversationId(message.getConversationId());
 			myAgent.send(timeslotMessage);
-			ACLMessage confirmScheduleStep = new ACLMessage(ACLMessage.CONFIRM);
-			confirmScheduleStep.setConversationId(message.getConversationId());
-			confirmScheduleStep.addReceiver((AID) productStep.get("productAgentId"));
 		}
 		catch(Exception e){
 			e.printStackTrace();
