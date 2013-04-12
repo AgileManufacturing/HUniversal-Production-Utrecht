@@ -77,9 +77,11 @@ public class InformerBehaviour extends OneShotBehaviour {
 		myAgent.addBehaviour(par);
 	}
 
-	public int onEnd() {
-		return 0;
-	}
+	public int onEnd() { 
+		 	return 0; 
+	} 
+
+
 
 	/*
 	 * The conversation class holds the behaviour for a conversation with an
