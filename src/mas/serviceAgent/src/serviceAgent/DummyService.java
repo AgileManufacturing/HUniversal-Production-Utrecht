@@ -1,14 +1,14 @@
 /**
- * @file ServiceStepMessage.java
- * @brief Provides a message for the servicestep blackboard
- * @date Created: 2013-04-03
+ * @file DummyService.java
+ * @brief 
+ * @date Created: 12 apr. 2013
  *
- * @author Hessel Meulenbeld
+ * @author Peter Bonnema
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,54 +26,39 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  **/
 package serviceAgent;
 
-import java.util.HashMap;
-
-import org.bson.types.ObjectId;
-
-import equipletAgent.StepStatusCode;
-
-import newDataClasses.ScheduleData;
+import com.mongodb.BasicDBObject;
 
 /**
- * Implementation of a message for the servicestep blackboard
+ * @author Peter
+ *
  */
-public class ServiceStepMessage {
-	public ObjectId productStepId;
-	public long type;
-	public HashMap<String, String> parameters;
-	public StepStatusCode status;
-	public HashMap<String, String> statusData;
-	public ScheduleData timeData;
+public class DummyService implements Service {
+	private static final long serialVersionUID = 1L;
 
-	public ServiceStepMessage(ObjectId productStepId, long type,
-			HashMap<String, String> parameters, StepStatusCode status,
-			HashMap<String, String> statusData, ScheduleData timeData) {
-		this.productStepId = productStepId;
-		this.type = type;
-		this.parameters = parameters;
-		this.status = status;
-		this.statusData = statusData;
-		this.timeData = timeData;
+	/**
+	 * 
+	 */
+	public DummyService() {
 	}
 
-	public boolean equals(Object obj) {
-		if (obj == null)
-			return false;
-		if (obj == this)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ServiceStepMessage other = (ServiceStepMessage) obj;
-		return	productStepId.equals(other.productStepId)
-				&& type == other.type
-				&& parameters.equals(other.parameters)
-				&& status == other.status
-				&& statusData.equals(other.statusData)
-				&& timeData.equals(other.timeData);
+	/* (non-Javadoc)
+	 * @see serviceAgent.Service#canPerform(long, com.mongodb.BasicDBObject)
+	 */
+	@Override
+	public boolean canPerform(long productStepType, BasicDBObject parameters) {
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see serviceAgent.Service#getServiceSteps(long, com.mongodb.BasicDBObject)
+	 */
+	@Override
+	public ServiceStepMessage[] getServiceSteps(long productStepType,
+			BasicDBObject parameters) {
+		return null;
 	}
 }
