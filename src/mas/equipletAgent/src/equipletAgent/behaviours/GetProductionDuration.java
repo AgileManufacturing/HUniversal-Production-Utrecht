@@ -37,11 +37,11 @@ public class GetProductionDuration extends ReceiveBehaviour{
 				myAgent.getLocalName(), message.getSender().getLocalName(),
 				message.getOntology());
 		try {
-			//ObjectId contentObjectId = equipletAgent.getCommunicationSlot(message.getConversationId());
+			ObjectId contentObjectId = equipletAgent.getCommunicationSlot(message.getConversationId());
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
 			responseMessage.addReceiver(equipletAgent.getServiceAgent());
 			responseMessage.setConversationId(message.getConversationId());
-			//responseMessage.setContentObject(contentObjectId);
+			responseMessage.setContentObject(contentObjectId);
 			responseMessage.setOntology("GetProductionStepDuration");
 			myAgent.send(responseMessage);
 		} catch (Exception e) {

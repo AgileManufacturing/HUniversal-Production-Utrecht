@@ -1,19 +1,9 @@
 package equipletAgent.behaviours;
 
-import java.lang.reflect.Type;
-
 import newDataClasses.ScheduleData;
-
 import org.bson.types.ObjectId;
-
 import behaviours.ReceiveBehaviour;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-
 import equipletAgent.EquipletAgent;
 import jade.core.AID;
 import jade.core.Agent;
@@ -55,24 +45,16 @@ public class ProductionDurationResponse extends ReceiveBehaviour {
 		System.out.format("%s received message from %s (%s:%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
 
 		try {
-			Gson gson = new GsonBuilder().registerTypeAdapter(jade.util.leap.List.class, new InstanceCreator<jade.util.leap.List>() {
-				@Override
-				public jade.util.leap.List createInstance(Type type) {
-					return new jade.util.leap.ArrayList();
-				}
-			}).create();
-			ObjectId contentObjectId = equipletAgent.getCommunicationSlot(message.getConversationId());
-			BasicDBObject query = new BasicDBObject();
-			query.put("_id", contentObjectId);
-			DBObject productStep = equipletAgent.getEquipletBBclient().findDocuments(query).get(0);
+			ObjectId id = equipletAgent.getCommunicationSlot(message.getConversationId());
+			DBObject productStep = equipletAgent.getEquipletBBclient().findDocumentById(id);
 
-			ScheduleData Schedule = gson.fromJson(productStep.get("scheduleData").toString(), ScheduleData.class);
-
+			ScheduleData schedule = (ScheduleData)productStep.get("scheduleData");
+			System.out.println(schedule.getDuration() + "");
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
-			responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
+			responseMessage.addReceiver(new AID(productStep.get("productAgentId").toString(), AID.ISLOCALNAME));
 			responseMessage.setOntology("ProductionDuration");
 			responseMessage.setConversationId(message.getConversationId());
-			responseMessage.setContentObject(Schedule.getDuration());
+			responseMessage.setContentObject(schedule.getDuration());
 
 			System.out.format("sending message: %s%n", responseMessage);
 			myAgent.send(responseMessage);

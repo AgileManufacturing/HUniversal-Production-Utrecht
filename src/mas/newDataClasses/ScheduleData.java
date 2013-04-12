@@ -1,12 +1,18 @@
 package newDataClasses;
 
+import java.io.Serializable;
+
 /**
  * Instances of this class contain schedule data with the start time, duration and the deadline of a <code>ProductionStep</code> in timeslots.
  * 
  * @author Peter Bonnema
  *
  */
-public class ScheduleData {
+public class ScheduleData implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private long startTime;
 	private long duration;
 	private long deadline;
