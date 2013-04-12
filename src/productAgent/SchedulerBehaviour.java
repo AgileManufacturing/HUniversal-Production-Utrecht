@@ -133,6 +133,7 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 		
 		//Startslot which need to be scheduled
 		FreeTimeSlot freetimeslotEq = null;
+		//number of timeslots to schedule
 		int timeslotsToSchedule = productionstep.getRequiredTimeSlots();
 		
 		//calculate freetime slot and asign them to the above intialized values
