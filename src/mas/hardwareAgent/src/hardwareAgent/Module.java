@@ -1,17 +1,33 @@
 package hardwareAgent;
 
+/**
+ * Authors: Thierry Gerritse & Wouter Veen
+ * Class: CheckForModules.java * 
+ */
+
 public class Module {
-	//ik moet weten hoe lang iets duurt
-	//stuur dit terug 
-	long stepDuration;
-	public Module(){
+
+	private long _stepDuration;
+	
+	public Module(long stepDuration)throws Exception{
+		
+		if(stepDuration == 0l){
+			throw new Exception("Duration can not be 0");
+		}
+		else{
+		
+			this._stepDuration = stepDuration;
+			
+		}
 		
 	}
+	
 	public void setStepDuration(long stepDuration){
-		this.stepDuration = stepDuration;
+		this._stepDuration = stepDuration;
 	}
+	
 	public long getStepDuration(){
-		return this.stepDuration;
+		return this._stepDuration;
 		
 	}
 }
