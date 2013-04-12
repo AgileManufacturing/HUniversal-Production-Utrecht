@@ -3,6 +3,8 @@
  */
 package productAgent;
 
+import java.util.List;
+
 import jade.core.behaviours.OneShotBehaviour;
 import newDataClasses.LogMessage;
 import newDataClasses.Product;
@@ -35,7 +37,7 @@ public class ProduceBehaviour extends OneShotBehaviour{
 		// TODO Auto-generated method stub
 	}
 
-	void productionStepEnded(boolean succes, LogMessage[] log)
+	void productionStepEnded(boolean succes, List<LogMessage> log)
 	{	
 		_product.add(log);
 	}
