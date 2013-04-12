@@ -56,7 +56,7 @@ public class OverviewBehaviour extends OneShotBehaviour {
 			
 		});
 
-		_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour() {
+		/*_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour() {
 			@Override
 			public void action() {
 				for (ProductionStep stp : _productAgent.getProduct()
@@ -72,11 +72,11 @@ public class OverviewBehaviour extends OneShotBehaviour {
 					}
 				}
 			}
-		});
+		}); */
 
 		System.out.println("Lets add a Scheduler");
-		// _schedulerBehaviour = new SchedulerBehaviour();
-		// _sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
+		 _schedulerBehaviour = new SchedulerBehaviour();
+		 _sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
 
 		System.out.println("Lets add a produce");
 		// _produceBehaviour = new ProduceBehaviour();

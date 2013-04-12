@@ -41,7 +41,8 @@ public class EquipletAgent extends Agent {
 
 	public boolean getRandomBoolean() {
 		Random random = new Random();
-		return random.nextBoolean();
+		//return random.nextBoolean();
+		return true;
 	}
 
 	public int getRandomInt(int r) {

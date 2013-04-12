@@ -39,8 +39,7 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 				for (ProductionStep ps : psa) {
 					long PA_id = ps.getId();
 
-					//Scheduler(production.getProductionEquipletMapping().getEquipletsForProductionStep(PA_id).keySet(), ps);
-
+					Scheduler(production.getProductionEquipletMapping().getEquipletsForProductionStep(PA_id));
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -57,7 +56,7 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 	 * @param productionStep
 	 * @throws Exception
 	 */
-	public void Scheduler(ArrayList<AID> equipletList, ProductionStep productionstep)throws Exception{
+	public void Scheduler(ArrayList<AID> equipletList)throws Exception{
 		Schedule[] schedules;
 		
 		//Make connection with database
@@ -132,18 +131,14 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 			}
 		}
 		
-		//Startslot which need to be scheduled
+		//set startslot which need to be scheduled
 		FreeTimeSlot freetimeslotEq = null;
-		//number of timeslots to schedule
-		int timeslotsToSchedule = productionstep.getRequiredTimeSlots();
 		
 		//calculate freetime slot and asign them to the above intialized values
 		if(freetimes.length > 1){
 			for(int chooseTimeSlot = 1;chooseTimeSlot < freetimes.length; chooseTimeSlot++){
-				if(freetimes[chooseTimeSlot].getDuration() <= timeslotsToSchedule){
-					if(freetimes[chooseTimeSlot].getStartTime() < freetimes[chooseTimeSlot-1].getStartTime()){
-						freetimeslotEq = freetimes[chooseTimeSlot];
-					}
+				if(freetimes[chooseTimeSlot].getStartTime() < freetimes[chooseTimeSlot-1].getStartTime()){
+					freetimeslotEq = freetimes[chooseTimeSlot];
 				}
 			}
 		}
