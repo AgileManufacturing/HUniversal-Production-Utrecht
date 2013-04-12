@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import newDataClasses.LogMessage;
 
@@ -44,7 +45,7 @@ public class sqliteDatabase {
 			System.out.println("Connecting to database...");
 			try {
 				conn = DriverManager.getConnection(DB_URL + DB_FILE, USER, PASS);
-				PreparedStatement create = conn.prepareStatement("CREATE TABLE IF NOT EXISTS log (id INT, time VARCHAR(30), state VARCHAR(30), message VARCHAR(250)");
+				PreparedStatement create = conn.prepareStatement("CREATE TABLE IF NOT EXISTS log (id INT, time VARCHAR(30), state VARCHAR(30), message VARCHAR(250))");
 				create.execute();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -55,7 +56,7 @@ public class sqliteDatabase {
 	/**
 	 * @param msg
 	 */
-	public void insert(LogMessage[] msgs) {
+	public void insert(List<LogMessage> msgs) {
 		try {
 			PreparedStatement insert = conn.prepareStatement("INSERT INTO LOG (id, time, state, message) VALUES (?, ?, ?, ?)");
 			
