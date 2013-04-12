@@ -43,209 +43,298 @@ import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 import newDataClasses.ScheduleData;
-import nl.hu.client.BasicOperationSubscription;
-import nl.hu.client.BlackboardClient;
-import nl.hu.client.BlackboardSubscriber;
-import nl.hu.client.FieldUpdateSubscription;
+import nl.hu.client.*;
 import nl.hu.client.FieldUpdateSubscription.MongoUpdateLogOperation;
-import nl.hu.client.GeneralMongoException;
-import nl.hu.client.InvalidDBNamespaceException;
-import nl.hu.client.MongoOperation;
-import nl.hu.client.OplogEntry;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.sql.Time;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import org.bson.types.ObjectId;
 
 /**
- * EquipletAgent that communicates with product agents and with its own service
- * agent.
+ * EquipletAgent that communicates with product agents and with its own service agent.
  **/
-public class EquipletAgent extends Agent implements BlackboardSubscriber{
+public class EquipletAgent extends Agent implements BlackboardSubscriber {
+	/**
+	 * @var Long serialVersionUID
+	 * The serial version UID.
+	 */
 	private static final long serialVersionUID = 1L;
 
-	// This is the service agent of this equiplet
+	/**
+	 * @var AID serviceAgent
+	 * AID of the serviceAgent connected to this EquipletAgent.
+	 */
 	private AID serviceAgent;
-	
+
+	/**
+	 * @var String collectiveDbIp
+	 * IP of the collective database.
+	 */
 	private String collectiveDbIp = "145.89.191.131";
+	
+	/**
+	 * @var int collectiveDbPort
+	 * Port number of the collective database.
+	 */
 	private int collectiveDbPort = 27017;
+	
+	/**
+	 * @var String collectiveDbName
+	 * Name of the collective database.
+	 */
 	private String collectiveDbName = "CollectiveDb";
+	
+	/**
+	 * @var String equipletDirectoryName
+	 * Name of the collection containing the equipletDirectory.
+	 */
 	private String equipletDirectoryName = "EquipletDirectory";
+	
+	/**
+	 * @var String timeDataName
+	 * Name of the collection containing the timeData.
+	 */
 	private String timeDataName = "TimeData";
 
-	// This is the database specific for this equiplet, this database contains
-	// all the collections of the equiplet, service and hardware agents.
+	/**
+	 * @var String equipletDbIp
+	 * IP of the equiplet database.
+	 */
 	private String equipletDbIp = "localhost";
+	
+	/**
+	 * @var int equipletDbPort
+	 * Port number of the equiplet database.
+	 */
 	private int equipletDbPort = 27017;
+	
+	/**
+	 * @var String equipletDbName
+	 * Name of the equiplet database.
+	 */
 	private String equipletDbName = "";
-	private DBCollection productSteps = null;
+	
+	/**
+	 * @var String productStepsName
+	 * Name of the collection containing the productSteps.
+	 */
 	private String productStepsName = "ProductStepsBlackBoard";
 
-	//BlackboardClient to communicate with the blackboards
-	private BlackboardClient collectiveBBclient, equipletBBclient;
+	/**
+	 * @var BlackboardClient collectiveBBClient
+	 * Object for communication with the collective blackboard.
+	 */
+	private BlackboardClient collectiveBBClient;
+	
+	/**
+	 * @var BlackboardClient equipletBBClient
+	 * Object for communication with the equiplet blackboard.
+	 */
+	private BlackboardClient equipletBBClient;
 
-	//Arraylist with IDs of the capabilities of the equiplet
+	/**
+	 * @var ArrayList<Long> capabilities
+	 * List with all the capabilities of this equiplet.
+	 */
 	private ArrayList<Long> capabilities;
 
+	/**
+	 * @var Hashtable<String, ObjectId> communicationTable
+	 * Table with the combinations conversationID and ObjectId.
+	 */
 	private Hashtable<String, ObjectId> communicationTable;
-	
+
+	/**
+	 * @var Gson gson
+	 * Gson object used to work with Json.
+	 */
 	private Gson gson;
+
+	/**
+	 * @var Timer timeToNextUsedTimeSlot
+	 * Timer used to trigger when the next used time slot is ready.
+	 */
+	private Timer timeToNextUsedTimeSlot;
 	
-	private Timer timeToNextTimeSlot;
+	/**
+	 * @var long nextUsedTimeSlot
+	 * The next used time slot.
+	 */
 	private long nextUsedTimeSlot;
-	private Time firstTimeSlot;
+	
+	/**
+	 * @var long firstTimeSlot
+	 * The first time slot of the grid.
+	 */
+	private long firstTimeSlot;
+	
+	/**
+	 * @var long timeSlotLength
+	 * The length of a time slot.
+	 */
 	private long timeSlotLength;
 
+	/**
+	 * Setup function for the equipletAgent.
+	 * Configures the IP and database name of the equiplet.
+	 * Gets its capabilities from the arguments.
+	 * Creates its service agent. 
+	 * Makes connections with the BlackboardCLients and subscribes on changes on the status field.
+	 * Puts its capabilities on the equipletDirectory blackboard.
+	 * Gets the time data from the blackboard.
+	 * Initializes the Timer objects.
+	 * Starts its behaviours.
+	 */
 	@SuppressWarnings("unchecked")
 	public void setup() {
 		System.out.println("I spawned as a equiplet agent.");
-		
-		// set the database name to the name of the equiplet and set the database ip to its own IP.
-		try{
+
+		try {
 			InetAddress IP = InetAddress.getLocalHost();
 			equipletDbIp = IP.getHostAddress();
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		equipletDbName = getAID().getLocalName();
 		communicationTable = new Hashtable<String, ObjectId>();
-		// TODO: Not Hardcoded capabilities/get capabilities from the service agent.
+		gson = new Gson();
+
+		// TODO: Not Hardcoded capabilities/get capabilities from the service
+		// agent.
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			capabilities = (ArrayList<Long>) args[0];
 			System.out.format("%s %s%n", capabilities, equipletDbName);
 		}
-        try {
-        	DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
-        	Object[] arguments = new Object[]{dbData};
-			((AgentController)getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "serviceAgent.ServiceAgent", arguments)).start();
+		try {
+			DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
+			Object[] arguments = new Object[] { dbData };
+			((AgentController) getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "serviceAgent.ServiceAgent", arguments)).start();
 			serviceAgent = new AID((String) getLocalName() + "-serviceAgent", AID.ISLOCALNAME);
 		} catch (StaleProxyException e1) {
 			e1.printStackTrace();
 			doDelete();
 		}
-        
-        try {
-        	collectiveBBclient = new BlackboardClient(collectiveDbIp);
-			collectiveBBclient.setDatabase(collectiveDbName);
-	        collectiveBBclient.setCollection(equipletDirectoryName);
-	        
-	        equipletBBclient = new BlackboardClient(equipletDbIp);
-	        equipletBBclient.setDatabase(equipletDbName);
-	        equipletBBclient.setCollection(productStepsName);
-	        
-	        FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
-	        statusSubscription.addOperation(MongoUpdateLogOperation.SET);
-	        
-	        equipletBBclient.subscribe(statusSubscription);
+
+		try {
+			collectiveBBClient = new BlackboardClient(collectiveDbIp);
+			collectiveBBClient.setDatabase(collectiveDbName);
+			collectiveBBClient.setCollection(equipletDirectoryName);
+
+			equipletBBClient = new BlackboardClient(equipletDbIp);
+			equipletBBClient.setDatabase(equipletDbName);
+			equipletBBClient.setCollection(productStepsName);
+
+			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
+			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
+
+			equipletBBClient.subscribe(statusSubscription);
 		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException e) {
 			e.printStackTrace();
 			doDelete();
 		}
-		
-		gson = new Gson();
-		// put capabilities on the equipletDirectory
+
 		try {
 			DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 			EquipletDirectoryMessage entry = new EquipletDirectoryMessage(getAID(), capabilities, dbData);
-			collectiveBBclient.insertDocument(gson.toJson(entry));
+			collectiveBBClient.insertDocument(gson.toJson(entry));
 		} catch (Exception e) {
 			e.printStackTrace();
 			doDelete();
 		}
-		
+
 		try {
-			collectiveBBclient.setCollection(timeDataName);
-			DBObject timeData = collectiveBBclient.findDocuments(new BasicDBObject()).get(0);
-			firstTimeSlot = (Time)timeData.get("firstTimeSlot");
-			timeSlotLength = (Long)timeData.get("timeSlotLength");
-			collectiveBBclient.setCollection(equipletDirectoryName);
+			collectiveBBClient.setCollection(timeDataName);
+			DBObject timeData = collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
+			firstTimeSlot = (Long) timeData.get("firstTimeSlot");
+			timeSlotLength = (Long) timeData.get("timeSlotLength");
+			collectiveBBClient.setCollection(equipletDirectoryName);
 		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 			e.printStackTrace();
 			doDelete();
 		}
-		
-		timeToNextTimeSlot = new Timer();
+
+		timeToNextUsedTimeSlot = new Timer();
 		nextUsedTimeSlot = -1l;
-		
+
 		CanPerformStep canPerformStepBehaviour = new CanPerformStep(this);
-        addBehaviour(canPerformStepBehaviour);
-		
+		addBehaviour(canPerformStepBehaviour);
+
 		CanDoProductionStepResponse canDoProductionStepResponseBehaviour = new CanDoProductionStepResponse(this);
 		addBehaviour(canDoProductionStepResponseBehaviour);
-		
+
 		GetProductionDuration getProductionDurationBehaviour = new GetProductionDuration(this);
 		addBehaviour(getProductionDurationBehaviour);
-		
+
 		ProductionDurationResponse productionDurationResponseBehaviour = new ProductionDurationResponse(this);
 		addBehaviour(productionDurationResponseBehaviour);
-		
+
 		ScheduleStep scheduleStepBehaviour = new ScheduleStep(this);
 		addBehaviour(scheduleStepBehaviour);
 	}
-	
+
+	/**
+	 * Takedown function for the equipletAgent.
+	 * Removes itself from the equipletDirectory.
+	 * Informs the productAgents who have planned a productStep on its blackboard of its dead.
+	 * Removes its database.
+	 */
 	public void takeDown() {
 		try {
 			BasicDBObject searchQuery = new BasicDBObject("AID", getAID());
-			collectiveBBclient.removeDocuments(gson.toJson(searchQuery));
-			
+			collectiveBBClient.removeDocuments(gson.toJson(searchQuery));
+
 			BasicDBObject query = new BasicDBObject();
-			List<DBObject> productSteps = equipletBBclient.findDocuments(query);
-			for(DBObject productStep : productSteps){
+			//TODO: USE DISTINCT.
+			List<DBObject> productSteps = equipletBBClient.findDocuments(query);
+			for (DBObject productStep : productSteps) {
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
 				responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
-				
+
 				String conversationId = null;
 				ObjectId id = (ObjectId) productStep.get("_id");
-				for(Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
-					if (tableEntry.getValue() == id){
+				for (Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
+					if (tableEntry.getValue() == id) {
 						conversationId = tableEntry.getKey();
 						break;
 					}
 				}
-				if(conversationId == null){
+				if (conversationId == null) {
 					throw new Exception();
 				}
 				responseMessage.setConversationId(conversationId);
 				responseMessage.setContent("I'm dying");
 				send(responseMessage);
-				
+
 				// TODO: remove own database
 			}
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			// The equiplet is already going down, so it has to do nothing here.
 		}
 	}
-	
-	public BlackboardClient getEquipletBBclient(){
-		return equipletBBclient;
+
+	public BlackboardClient getEquipletBBclient() {
+		return equipletBBClient;
 	}
-	
-	public void addCommunicationSlot(String conversationId, ObjectId objectId){
+
+	public void addCommunicationSlot(String conversationId, ObjectId objectId) {
 		communicationTable.put(conversationId, objectId);
 	}
-	
-	public ObjectId getCommunicationSlot(String conversationId){
+
+	public ObjectId getCommunicationSlot(String conversationId) {
 		return communicationTable.get(conversationId);
 	}
-	
-	public AID getServiceAgent(){
+
+	public AID getServiceAgent() {
 		return serviceAgent;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
@@ -253,34 +342,42 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 		case "ProductStepsBlackBoard":
 			try {
 				ObjectId id = entry.getTargetObjectId();
-				DBObject productStep = equipletBBclient.findDocumentById(id);
-				
+				DBObject productStep = equipletBBClient.findDocumentById(id);
+
 				String conversationId = null;
-				for(Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
-					if (tableEntry.getValue() == id){
+				for (Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
+					if (tableEntry.getValue() == id) {
 						conversationId = tableEntry.getKey();
 						break;
 					}
 				}
-				if(conversationId == null){
+				if (conversationId == null) {
 					throw new Exception();
 				}
-				
-				
+
 				Hashtable<String, String> statusData = new Hashtable<String, String>();
-				try{
-					statusData = (Hashtable<String, String>)productStep.get("statusData");
-				}catch(Exception e){}	
-				
+				try {
+					statusData = (Hashtable<String, String>) productStep.get("statusData");
+				} catch (Exception e) {
+				}
+
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
 				responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
 				responseMessage.setConversationId(conversationId);
-				
+
 				StepStatusCode status = (StepStatusCode) productStep.get("status");
-				switch(status){
+				switch (status) {
 				case PLANNED:
 					try {
-						ScheduleData scheduleData = (ScheduleData)productStep.get("scheduleData");
+						ScheduleData scheduleData = (ScheduleData) productStep.get("scheduleData");
+						if (scheduleData.getStartTime() < nextUsedTimeSlot) {
+							nextUsedTimeSlot = scheduleData.getStartTime();
+							timeToNextUsedTimeSlot.cancel();
+							long startTimeSlot = nextUsedTimeSlot * timeSlotLength + firstTimeSlot;
+							long currentTime = System.currentTimeMillis();
+							timeToNextUsedTimeSlot.schedule(new nextProductStepTask(equipletBBClient), startTimeSlot - currentTime);
+						}
+
 						responseMessage.setOntology("ProductionDuration");
 						responseMessage.setContentObject(scheduleData.getStartTime());
 						send(responseMessage);
@@ -325,13 +422,34 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 			break;
 		}
 	}
-	
-	private class nextProductStepTask extends TimerTask{
+
+	private class nextProductStepTask extends TimerTask {
+		private BlackboardClient equipletBBClient;
+
+		public nextProductStepTask(BlackboardClient equipletBBClient) {
+			this.equipletBBClient = equipletBBClient;
+		}
+
 		@Override
 		public void run() {
-			//TODO say to service agent to start
-			//TODO get next productStep out of database.
-			//TODO Set Timer again.
+			// TODO ask for permission to start
+			// TODO set the step on waiting so the service agent knows that it has to start with it.
+			try {
+				BasicDBObject query = new BasicDBObject("status", ProductStepStatusCode.PLANNED);
+				query.put("$order_by", new BasicDBObject("scheduleData", new BasicDBObject("startTime", "-1")));
+				DBObject nextProductStep = equipletBBClient.findDocuments(query).get(0);
+				ScheduleData scheduleData = (ScheduleData) nextProductStep.get("scheduleData");
+				if (scheduleData.getStartTime() < nextUsedTimeSlot) {
+					nextUsedTimeSlot = scheduleData.getStartTime();
+					timeToNextUsedTimeSlot.cancel();
+					long startTimeSlot = nextUsedTimeSlot * timeSlotLength + firstTimeSlot;
+					long currentTime = System.currentTimeMillis();
+					timeToNextUsedTimeSlot.schedule(new nextProductStepTask(equipletBBClient), startTimeSlot - currentTime);
+				}
+			} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 }
