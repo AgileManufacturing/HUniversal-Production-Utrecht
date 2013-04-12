@@ -57,14 +57,12 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 	public void Scheduler(Set<AID> equipletList, ProductionStep productionstep)
 			throws Exception {
 		Schedule[] schedules;
-		ArrayList<AID> equipletlist = null;
-		for (AID i : equipletList) {
-			equipletlist.add(i);
-		}
-
-		// Make connection with database
-		MongoClient mongoClient = null;
-
+		//load set into arraylist
+		 List<AID> equipletlist = new ArrayList<AID>(equipletList);
+		
+		//Make connection with database
+		MongoClient mongoClient =null;
+		
 		try {
 			mongoClient = new MongoClient("localhost");// 145.89.191.131 is hu
 														// server
