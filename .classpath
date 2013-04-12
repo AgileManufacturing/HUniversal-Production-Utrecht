@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="lib/jade.jar"/>
 	<classpathentry kind="lib" path="lib/mongo-2.10.1.jar"/>
 	<classpathentry kind="lib" path="lib/sqlite-jdbc-3.7.2.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -9,6 +9,19 @@ package newDataClasses;
  *
  */
 public class LogMessage {
+	/**
+	 * @param id
+	 * @param time
+	 * @param message
+	 * @param state
+	 */
+	public LogMessage(String id, String time, String message, String state) {
+		super();
+		this.id = id;
+		this.time = time;
+		this.message = message;
+		this.state = state;
+	}
 	private String id;
 	/**
 	 * @return the id
