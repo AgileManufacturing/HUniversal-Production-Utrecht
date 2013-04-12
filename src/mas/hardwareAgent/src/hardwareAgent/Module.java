@@ -1,7 +1,8 @@
 package hardwareAgent;
 
 /**
- * Authors: Thierry Gerritse & Wouter Veen
+ * Authors: Thierry Gerritse 
+ * Authors: Wouter Veen
  * Class: CheckForModules.java * 
  */
 
