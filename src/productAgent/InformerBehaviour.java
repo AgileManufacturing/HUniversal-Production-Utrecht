@@ -1,7 +1,6 @@
 package ProductAgent;
 
 import jade.core.AID;
-import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.ParallelBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
@@ -33,6 +32,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 	private Product _product;
 	private Production _production;
 	private ProductionEquipletMapper _pem;
+	private boolean _isDone;
 
 	public InformerBehaviour() {
 	}
@@ -43,6 +43,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 		_product = this._productAgent.getProduct();
 		_production = _product.getProduction();
 		_pem = new ProductionEquipletMapper();
+		_isDone = false;
 
 		/*
 		 * We want to have our conversations in parallel. We also only want to
@@ -50,8 +51,13 @@ public class InformerBehaviour extends OneShotBehaviour {
 		 * each step in our productionlist and create a conversation object. (
 		 * as behaviour )
 		 */
-		_par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
+		
+		SequentialBehaviour seq = new SequentialBehaviour();
+		myAgent.addBehaviour(seq);
 
+		_par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
+		seq.addSubBehaviour(_par);
+		
 		for (ProductionStep stp : _product.getProduction().getProductionSteps()) {
 
 			_pem.addProductionStep(stp.getId());
@@ -63,30 +69,31 @@ public class InformerBehaviour extends OneShotBehaviour {
 			}
 		}
 
-		myAgent.addBehaviour(_par);
-
 		// Checking if timeout expired?
-		myAgent.addBehaviour(new CyclicBehaviour() {
+		seq.addSubBehaviour(new OneShotBehaviour() {
 			@Override
 			public void action() {
 				// TODO Auto-generated method stub
 				if (_par.done()) {
 					System.out.println("Done informing.");
 					try {
+						
 						_production.setProductionEquipletMapping(_pem);
 						_product.setProduction(_production);
 						_productAgent.setProduct(_product);
+						_isDone = true;
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					myAgent.removeBehaviour(this);
+				} else {
+					System.out.println("Not done informing.");
 				}
 			}
 		});
 	}
-
-	public int onEnd() {
-		return 0;
+	
+	public boolean isDone(){
+		return this._isDone;
 	}
 
 	/*

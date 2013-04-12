@@ -47,6 +47,8 @@ public class PlannerBehaviour extends OneShotBehaviour {
 					String name = (String)aid.get("name").toString();
 					pem.addEquipletToProductionStep(PA_id, new AID(name, AID.ISLOCALNAME));
 				}
+
+				System.out.println("Doing planner for productionstep " + ps.getId());
 			}
 			
 			production.setProductionEquipletMapping(pem);
