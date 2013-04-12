@@ -1,7 +1,7 @@
 package ProductAgent;
 
 import jade.core.AID;
-import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
 import newDataClasses.Product;
@@ -17,7 +17,7 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
 @SuppressWarnings("serial")
-public class SchedulerBehaviour extends CyclicBehaviour{
+public class SchedulerBehaviour extends OneShotBehaviour{
 
 	private ProductAgent _productAgent;
 	
@@ -25,29 +25,24 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 	public void action() {
 		// Lets schedule ourself with the equiplet agents in our current list.
 		_productAgent = (ProductAgent) myAgent;
-		ACLMessage msg = myAgent.receive();
-		if (msg != null) {
-			_productAgent
-				.getProduct()
-				.getProduction()
-				.getProductionEquipletMapping();
-			try {
-				Product product = this._productAgent.getProduct();
-				Production production = product.getProduction();
-				ProductionStep[] psa = production.getProductionSteps();
-				
-				for (ProductionStep ps : psa) {
-					long PA_id = ps.getId();
-
-					Scheduler(production.getProductionEquipletMapping().getEquipletsForProductionStep(PA_id));
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
+		
+		_productAgent
+			.getProduct()
+			.getProduction()
+			.getProductionEquipletMapping();
+		try {
+			Product product = this._productAgent.getProduct();
+			Production production = product.getProduction();
+			ProductionStep[] psa = production.getProductionSteps();
+			
+			for (ProductionStep ps : psa) {
+				long PA_id = ps.getId();
+				//Scheduler(production.getProductionEquipletMapping().getEquipletsForProductionStep(PA_id).keySet(), ps);
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		else {
-			block();
-		}
+		
 	}
 
 	/**
