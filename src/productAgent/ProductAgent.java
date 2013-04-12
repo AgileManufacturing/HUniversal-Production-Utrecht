@@ -2,7 +2,8 @@ package ProductAgent;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.ParallelBehaviour;
+import jade.core.behaviours.ThreadedBehaviourFactory;
 import newDataClasses.Product;
 import newDataClasses.ProductionStep;
 
@@ -14,10 +15,9 @@ import newDataClasses.ProductionStep;
  *          on the agents localname.
  */
 public class ProductAgent extends Agent {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
+	private ParallelBehaviour _par;
 
 	// Private fields
 	private Product _product;
@@ -31,8 +31,16 @@ public class ProductAgent extends Agent {
 		try {
 			_product = (Product) getArguments()[0];
 
-			addBehaviour(new OverviewBehaviour());
-
+			_par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
+			addBehaviour(_par);
+			
+			_par.addSubBehaviour(new OverviewBehaviour());
+			
+			_par.addSubBehaviour(new SocketBehaviour());
+			
+			_par.addSubBehaviour(new sideOverviewBehaviour());
+			
+			
 			System.out.println("I spawned as a product agent");
 
 		} catch (Exception e) {
