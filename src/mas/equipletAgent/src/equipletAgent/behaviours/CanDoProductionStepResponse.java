@@ -54,7 +54,7 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour{
 				myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
 		
 		ObjectId productStepEntryId = null;
-		DBObject productStep = null;
+		BasicDBObject productStep = null;
 		Gson gson = new GsonBuilder()
 			.registerTypeAdapter(jade.util.leap.List.class, new InstanceCreator<jade.util.leap.List>() {
 				@Override
@@ -75,17 +75,17 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour{
 		try {
 			BasicDBObject query = new BasicDBObject();
 			query.put("_id", productStepEntryId);
-			productStep = equipletAgent.getEquipletBBclient().findDocuments(query).get(0);
-			int status = (Integer) productStep.get("status");
+			productStep = (BasicDBObject) equipletAgent.getEquipletBBclient().findDocuments(query).get(0);
+			StepStatusCode status = StepStatusCode.valueOf(productStep.getString("status"));
 			AID productAgent = gson.fromJson(productStep.get("productAgentId").toString(), AID.class);
-			if (status == StepStatusCode.EVALUATING.getStatus()) {
+			if (status == StepStatusCode.EVALUATING) {
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.CONFIRM);
 				responseMessage.setConversationId(message.getConversationId());
 				responseMessage.setOntology("CanPerformStepResponse");
 				responseMessage.addReceiver(productAgent);
 				message.setContent("This is possible");
 				myAgent.send(responseMessage);
-			} else if (status == StepStatusCode.ABORTED.getStatus()) {
+			} else if (status == StepStatusCode.ABORTED) {
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.DISCONFIRM);
 				responseMessage.setConversationId(message.getConversationId());
 				responseMessage.setOntology("CanPerformStepResponse");

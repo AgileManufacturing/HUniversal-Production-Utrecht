@@ -45,14 +45,14 @@ public class ProductStepMessage {
 	public ParameterList parameters;
 	public Object inputParts;
 	public Object outputParts;
-	public int status;
+	public StepStatusCode status;
 	public HashMap<String, String> statusData;
 	public ScheduleData scheduleData;
 
 	public ProductStepMessage(AID productAgentId,
 							  long type, ParameterList parameters,
 							  Object inputParts, Object outputParts,
-							  int status, HashMap<String, String> statusData, ScheduleData scheduleData){
+							  StepStatusCode status, HashMap<String, String> statusData, ScheduleData scheduleData){
 		this.productAgentId = productAgentId;
 		this.type = type;
 		this.parameters = parameters;
@@ -156,7 +156,7 @@ public class ProductStepMessage {
 	/**
 	 * @return the status
 	 */
-	public int getStatus() {
+	public StepStatusCode getStatus() {
 		return status;
 	}
 
@@ -164,7 +164,7 @@ public class ProductStepMessage {
 	 * @param status the status to set
 	 */
 	public void setStatus(StepStatusCode status) {
-		this.status = status.getStatus();
+		this.status = status;
 	}
 
 	/**
