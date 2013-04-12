@@ -42,7 +42,6 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
-import jade.wrapper.StaleProxyException;
 import newDataClasses.DbData;
 import newDataClasses.ScheduleData;
 import nl.hu.client.*;
@@ -51,7 +50,6 @@ import nl.hu.client.FieldUpdateSubscription.MongoUpdateLogOperation;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.*;
 import java.util.Map.Entry;
 import org.bson.types.ObjectId;
@@ -204,28 +202,24 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		equipletDbName = getAID().getLocalName();
 		communicationTable = new Hashtable<String, ObjectId>();
 		gson = new GsonBuilder().create();
-
-		// TODO: Not Hardcoded capabilities/get capabilities from the service
-		// agent.
-		Object[] args = getArguments();
-		if (args != null && args.length > 0) {
-			capabilities = (ArrayList<Long>) args[0];
-			System.out.format("%s %s%n", capabilities, equipletDbName);
-		}
-		try {
+		try{
+			// TODO: Not Hardcoded capabilities/get capabilities from the service agent.
+			Object[] args = getArguments();
+			if (args != null && args.length > 0) {
+				capabilities = (ArrayList<Long>) args[0];
+				System.out.format("%s %s%n", capabilities, equipletDbName);
+			}
+			
 			DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
+			
 			Object[] arguments = new Object[] { dbData };
 			((AgentController) getContainerController().createNewAgent(getLocalName() + "-hardwareAgent", "hardwareAgent.HardwareAgent", arguments)).start();
 			AID hardwareAgent = new AID((String) getLocalName() + "-hardwareAgent", AID.ISLOCALNAME);
+			
 			arguments = new Object[] { dbData, hardwareAgent };
 			((AgentController) getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "serviceAgent.ServiceAgent", arguments)).start();
 			serviceAgent = new AID((String) getLocalName() + "-serviceAgent", AID.ISLOCALNAME);
-		} catch (StaleProxyException e1) {
-			e1.printStackTrace();
-			doDelete();
-		}
-
-		try {
+			
 			collectiveBBClient = new BlackboardClient(collectiveDbIp);
 			collectiveBBClient.setDatabase(collectiveDbName);
 			collectiveBBClient.setCollection(equipletDirectoryName);
@@ -238,27 +232,16 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 
 			equipletBBClient.subscribe(statusSubscription);
-		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException e) {
-			e.printStackTrace();
-			doDelete();
-		}
-
-		try {
-			DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
+			
 			EquipletDirectoryMessage entry = new EquipletDirectoryMessage(getAID(), capabilities, dbData);
 			collectiveBBClient.insertDocument(gson.toJson(entry));
-		} catch (Exception e) {
-			e.printStackTrace();
-			doDelete();
-		}
-
-		try {
+			
 			collectiveBBClient.setCollection(timeDataName);
 			DBObject timeData = collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
 			firstTimeSlot = ((Double)timeData.get("firstTimeSlot")).longValue();
 			timeSlotLength = ((Double)timeData.get("timeSlotLength")).longValue();
 			collectiveBBClient.setCollection(equipletDirectoryName);
-		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+		}catch(Exception e){
 			e.printStackTrace();
 			doDelete();
 		}
@@ -293,7 +276,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			BasicDBObject searchQuery = new BasicDBObject("AID", getAID());
 			collectiveBBClient.removeDocuments(gson.toJson(searchQuery));
 
-			//TODO: USE DISTINCT.
 			/*List<DBObject> productSteps = equipletBBClient.findDocuments(new BasicDBObject());
 			for (DBObject productStep : productSteps) {
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);

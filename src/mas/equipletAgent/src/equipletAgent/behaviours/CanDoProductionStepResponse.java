@@ -1,15 +1,7 @@
 package equipletAgent.behaviours;
 
-import java.lang.reflect.Type;
-
 import org.bson.types.ObjectId;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-
 import equipletAgent.StepStatusCode;
 import equipletAgent.EquipletAgent;
 import behaviours.ReceiveBehaviour;
@@ -22,62 +14,43 @@ import jade.lang.acl.UnreadableException;
 /**
  * The Class CanDoProductionStepResponse.
  */
-public class CanDoProductionStepResponse extends ReceiveBehaviour{
+public class CanDoProductionStepResponse extends ReceiveBehaviour {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-    private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CanDoProductionStepResponse");
-    private EquipletAgent equipletAgent;
-	
+	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CanDoProductionStepResponse");
+	private EquipletAgent equipletAgent;
+
 	/**
 	 * Instantiates a new can do production step response.
-	 *
-	 * @param a the a
+	 * 
+	 * @param a
+	 *            the a
 	 */
 	public CanDoProductionStepResponse(Agent a) {
 		super(a, -1, messageTemplate);
-		equipletAgent = (EquipletAgent)a;
+		equipletAgent = (EquipletAgent) a;
 	}
-	
+
 	@Override
-	public void handle(ACLMessage message){
+	public void handle(ACLMessage message) {
 		Object contentObject = null;
 		String contentString = message.getContent();
-
 		try {
 			contentObject = message.getContentObject();
 		} catch (UnreadableException e) {
-			//System.out.println("Exception Caught, No Content Object Given");
+			// System.out.println("Exception Caught, No Content Object Given");
 		}
-		System.out.format("%s received message from %s (%s:%s)%n",
-				myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
-		
-		ObjectId productStepEntryId = null;
-		BasicDBObject productStep = null;
-		Gson gson = new GsonBuilder()
-			.registerTypeAdapter(jade.util.leap.List.class, new InstanceCreator<jade.util.leap.List>() {
-				@Override
-				public jade.util.leap.List createInstance(Type type) {
-					return new jade.util.leap.ArrayList();
-				}
-			})
-			.create();
+		System.out.format("%s received message from %s (%s:%s)%n", myAgent.getLocalName(),
+				message.getSender().getLocalName(), message.getOntology(),
+				contentObject == null ? contentString : contentObject);
+
+		ObjectId productStepEntryId = equipletAgent.getCommunicationSlot(msg.getConversationId());
 		try {
-			productStepEntryId = (ObjectId) contentObject;
-		} catch (ClassCastException e) {
-			// TODO: ERROR HANDLING
-			e.printStackTrace();
-			myAgent.doDelete();
-		}
-		// Makes a database connection and gets the right
-		// product step out of it.
-		try {
-			BasicDBObject query = new BasicDBObject();
-			query.put("_id", productStepEntryId);
-			productStep = (BasicDBObject) equipletAgent.getEquipletBBclient().findDocuments(query).get(0);
+			BasicDBObject productStep = (BasicDBObject) equipletAgent.getEquipletBBclient().findDocumentById(productStepEntryId);
 			StepStatusCode status = StepStatusCode.valueOf(productStep.getString("status"));
-			AID productAgent = gson.fromJson(productStep.get("productAgentId").toString(), AID.class);
+			AID productAgent = new AID(productStep.get("productAgentId").toString(), AID.ISLOCALNAME);
 			if (status == StepStatusCode.EVALUATING) {
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.CONFIRM);
 				responseMessage.setConversationId(message.getConversationId());

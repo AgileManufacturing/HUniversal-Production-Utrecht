@@ -33,28 +33,17 @@ public class GetProductionDuration extends ReceiveBehaviour{
 	
 	@Override
 	public void handle(ACLMessage message){
-		Object contentObject = null;
-		String contentString = message.getContent();
-
+		System.out.format("%s received message from %s%n",
+				myAgent.getLocalName(), message.getSender().getLocalName(),
+				message.getOntology());
 		try {
-			contentObject = message.getContentObject();
-		} catch (UnreadableException e) {
-			//System.out.println("Exception Caught, No Content Object Given");
-		}
-		System.out.format("%s received message from %s (%s:%s)%n",
-				myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
-		
-		
-		
-		try {
-			ObjectId contentObjectId = equipletAgent.getCommunicationSlot(message.getConversationId());
+			//ObjectId contentObjectId = equipletAgent.getCommunicationSlot(message.getConversationId());
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
 			responseMessage.addReceiver(equipletAgent.getServiceAgent());
 			responseMessage.setConversationId(message.getConversationId());
-			responseMessage.setContentObject(contentObjectId);
+			//responseMessage.setContentObject(contentObjectId);
 			responseMessage.setOntology("GetProductionStepDuration");
 			myAgent.send(responseMessage);
-
 		} catch (Exception e) {
 			// TODO: ERROR HANDLING
 			e.printStackTrace();
