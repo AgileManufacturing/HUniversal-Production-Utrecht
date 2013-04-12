@@ -129,6 +129,13 @@ public class EquipletAgent extends Agent {
 			try {
 				String convid = msg.getConversationId();
 				switch (msg.getOntology()) {
+				
+				case "ScheduleStep":
+					if (debug)
+						System.out.println("EQ: PA -> "
+								+ myAgent.getLocalName() + " Received query"
+								+ " schedule");
+					break;
 
 				case "CanPerformStep":
 					_step = (ProductionStep) msg.getContentObject();

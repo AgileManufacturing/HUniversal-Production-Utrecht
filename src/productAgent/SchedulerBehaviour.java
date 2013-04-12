@@ -64,7 +64,7 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 		MongoClient mongoClient =null;
 		
 		try {
-			mongoClient = new MongoClient("localhost");// 145.89.191.131 is hu
+			mongoClient = new MongoClient("145.89.191.131");// 145.89.191.131 is hu
 														// server
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -169,7 +169,7 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 		// get the equiplet from the timeslot
 		for (int i = 0; i < equipletlist.size(); i++) {
 
-			if (equipletlist.get(i).getName()
+			if (freetimeslotEq != null && equipletlist.get(i).getName()
 					.equals(freetimeslotEq.getEquipletName())) {
 				equipletAID = equipletlist.get(i);
 			}
@@ -177,12 +177,16 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 
 		// send the message to the equiplet to schedule the timeslot
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setConversationId(_productAgent.generateCID());
-		msg.setOntology("ScheduleStep");
-		msg.setContent("" + freetimeslotEq.getStartTime());
-		msg.addReceiver(equipletAID);
 
-		myAgent.send(msg);
+		
+		if(freetimeslotEq != null){
+			msg.setConversationId(_productAgent.generateCID());
+			msg.setOntology("ScheduleStep");
+	        msg.setContent( ""+freetimeslotEq.getStartTime() );
+	        msg.addReceiver(equipletAID);
+	        myAgent.send(msg);
+		}
+      
 	}
 
 	private class FreeTimeSlot {
