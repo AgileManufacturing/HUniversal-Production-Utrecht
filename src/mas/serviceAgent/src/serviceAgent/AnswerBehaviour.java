@@ -18,6 +18,8 @@ import com.google.gson.Gson;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
+import equipletAgent.StepStatusCode;
+
 public class AnswerBehaviour extends CyclicBehaviour {
 	private static final long serialVersionUID = 1L;
 
@@ -32,12 +34,14 @@ public class AnswerBehaviour extends CyclicBehaviour {
 		if (message != null) {
 			reply = message.createReply();
 			ObjectId content = null;
-			DBObject productionStep = null;
+			BasicDBObject productionStep = null;
 			try {
 				content = (ObjectId) message.getContentObject();
 				BasicDBObject query = new BasicDBObject("_id", content);
-				productionStep = agent.getProductionStepBBClient()
+				productionStep = (BasicDBObject) agent.getProductionStepBBClient()
 						.findDocuments(query).get(0);
+				int a = productionStep.getInt("status");
+				StepStatusCode.valueOf("" + a);
 			} catch (UnreadableException | InvalidDBNamespaceException
 					| GeneralMongoException e) {
 				e.printStackTrace();
@@ -58,12 +62,12 @@ public class AnswerBehaviour extends CyclicBehaviour {
 					reply.setOntology("canDoProductionStepResponse");
 
 					if (isAble) {
-						// productionStep.removeField("productAgentId");
-						// productionStep.removeField("parameters");
-						// productionStep.removeField("inputParts");
-						// productionStep.removeField("outputParts");
-						// productionStep.removeField("status");
-						// productionStep.removeField("scheduleData");
+						 productionStep.removeField("productAgentId");
+						 productionStep.removeField("parameters");
+						 productionStep.removeField("inputParts");
+						 productionStep.removeField("outputParts");
+//						 productionStep.removeField("status");
+//						 productionStep.removeField("scheduleData");
 
 						StringBuilder strBuilder = new StringBuilder(
 								"Production step:\n");
@@ -72,9 +76,9 @@ public class AnswerBehaviour extends CyclicBehaviour {
 						System.out.format("%s can do step %s%n",
 								agent.getLocalName(), strBuilder);
 					} else {
-						// productionStep.removeField("_id");
-						// productionStep.removeField("status");
-						// productionStep.removeField("scheduleData");
+						 productionStep.removeField("_id");
+//						 productionStep.removeField("status");
+//						 productionStep.removeField("scheduleData");
 
 						StringBuilder strBuilder = new StringBuilder(
 								"Production step:\n");
@@ -102,9 +106,10 @@ public class AnswerBehaviour extends CyclicBehaviour {
 								new BasicDBObject("_id",
 										productionStep.get("_id")),
 								new BasicDBObject("$set", new BasicDBObject(
-										"scheduleData", gson.fromJson(
-												gson.toJson(scheduleData),
-												ScheduleData.class))));
+//										"scheduleData", gson.fromJson(
+//												gson.toJson(scheduleData),
+//												ScheduleData.class))));
+										"scheduleData", scheduleData)));
 					} catch (InvalidDBNamespaceException
 							| GeneralMongoException e) {
 						e.printStackTrace();

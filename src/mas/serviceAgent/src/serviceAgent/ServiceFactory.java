@@ -60,7 +60,7 @@ public class ServiceFactory {
 		return null;
 	}
 	
-	public Service[] getServicesForStep(int stepType) {
+	public Service[] getServicesForStep(long stepType) {
 //		KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
 //		ArrayList<Service> servicesForStep = new ArrayList<Service>();
 //		try {

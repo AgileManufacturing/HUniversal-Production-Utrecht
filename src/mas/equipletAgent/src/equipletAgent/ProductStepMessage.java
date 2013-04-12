@@ -29,6 +29,7 @@
  **/
 package equipletAgent;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 import jade.core.AID;
@@ -40,6 +41,8 @@ import newDataClasses.ScheduleData;
  * Implementation of a message for the productstep blackboard
  */
 public class ProductStepMessage {
+	private static final long serialVersionUID = 1L;
+	
 	private AID productAgentId;
 	private long type;
 	private ParameterList parameters;
