@@ -42,7 +42,7 @@ import nl.hu.client.BlackboardClient;
 import nl.hu.client.GeneralMongoException;
 import nl.hu.client.InvalidDBNamespaceException;
 import nl.hu.client.InvalidJSONException;
-import equipletAgent.ServiceStepMessage;
+import serviceAgent.ServiceStepMessage;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;

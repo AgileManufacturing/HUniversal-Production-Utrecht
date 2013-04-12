@@ -31,6 +31,8 @@ package serviceAgent;
 
 import java.util.HashMap;
 
+import equipletAgent.StepStatusCode;
+
 import newDataClasses.ScheduleData;
 
 /**

@@ -27,7 +27,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mongodb.BasicDBObject;
 
-import equipletAgent.ServiceStepMessage;
+import serviceAgent.ServiceStepMessage;
 
 /**
  * @author Peter Bonnema
@@ -68,6 +68,6 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 				.get("parameters");
 		
 		ServiceStepMessage[] serviceSteps = service.getServiceSteps(productStepType, parameters);
-		getAgent().addBehaviour(new GetServiceDurationBehaviour(getAgent(), serviceSteps));
+		getAgent().addBehaviour(new GetServiceDurationBehaviour(getAgent(), client, serviceSteps));
 	}
 }

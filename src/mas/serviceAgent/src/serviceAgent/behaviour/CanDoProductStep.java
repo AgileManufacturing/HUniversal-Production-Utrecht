@@ -12,7 +12,7 @@ import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
-import equipletAgent.ServiceStepMessage;
+import serviceAgent.ServiceStepMessage;
 
 import serviceAgent.Service;
 import jade.core.Agent;
