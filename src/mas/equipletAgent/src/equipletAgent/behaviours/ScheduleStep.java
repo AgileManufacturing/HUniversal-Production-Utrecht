@@ -58,9 +58,6 @@ public class ScheduleStep extends ReceiveBehaviour {
 			timeslotMessage.setContent(String.valueOf(timeslot));
 			timeslotMessage.setConversationId(message.getConversationId());
 			myAgent.send(timeslotMessage);
-			ACLMessage confirmScheduleStep = new ACLMessage(ACLMessage.CONFIRM);
-			confirmScheduleStep.setConversationId(message.getConversationId());
-			confirmScheduleStep.addReceiver((AID) productStep.get("productAgentId"));
 		}
 		catch(Exception e){
 			e.printStackTrace();

@@ -87,6 +87,7 @@ public class JadeAgentX extends Agent {
 
 			// Next we want to have some production steps
 			ProductionStep stp1 = new ProductionStep(1, parameterList);
+			stp1.setCapability(1);
 
 			p = new ParameterGroup("Color"); // group colour
 			p.add(new Parameter("Id", "3"));
@@ -102,6 +103,7 @@ public class JadeAgentX extends Agent {
 			parameterList.AddParameterGroup(p);
 
 			ProductionStep stp2 = new ProductionStep(2, parameterList);
+			stp2.setCapability(2);
 
 			p = new ParameterGroup("Color"); // group colour
 			p.add(new Parameter("Id", "5"));
@@ -117,6 +119,7 @@ public class JadeAgentX extends Agent {
 			parameterList.AddParameterGroup(p);
 
 			ProductionStep stp3 = new ProductionStep(3, parameterList);
+			stp3.setCapability(3);
 
 			p = new ParameterGroup("Color"); // group colour
 			p.add(new Parameter("Id", "7"));
@@ -132,12 +135,13 @@ public class JadeAgentX extends Agent {
 			parameterList.AddParameterGroup(p);
 
 			ProductionStep stp4 = new ProductionStep(4, parameterList);
+			stp4.setCapability(4);
 
 			// Our argument for the product agent. The total production of the
 			// product,
 			// consists of multiple steps
 			ProductionStep[] stepList = new ProductionStep[] { stp1, stp2, stp3, stp4 };
-
+			
 			Production production = new Production(stepList);
 			Product product = new Product(production);
 
