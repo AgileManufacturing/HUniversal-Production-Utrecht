@@ -1,6 +1,6 @@
 package equipletAgent;
 
-public enum ProductStepStatusCode {
+public enum StepStatusCode {
 	EVALUATING(0),
 	PLANNED(1),
 	WAITING(2),
@@ -12,7 +12,7 @@ public enum ProductStepStatusCode {
 
 	private int status;
 	
-	private ProductStepStatusCode(int status){
+	private StepStatusCode(int status){
 		this.status = status;
 	}
 	

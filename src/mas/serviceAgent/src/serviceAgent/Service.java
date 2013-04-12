@@ -40,6 +40,17 @@ import equipletAgent.ServiceStepMessage;
  *
  */
 public interface Service {
+	/**
+	 * @param productStepType
+	 * @param parameters
+	 * @return
+	 */
 	public boolean canPerform(long productStepType, BasicDBObject parameters);
+	
+	/**
+	 * @param productStepType
+	 * @param parameters
+	 * @return
+	 */
 	public ServiceStepMessage[] getServiceSteps(long productStepType, BasicDBObject parameters);
 }
