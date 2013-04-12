@@ -1,7 +1,7 @@
 /**
  * @author Ammar Abdulamir
  * @file Entries.java
- * @brief A blackboard entry.
+ * @brief A model for entries.
  * @date Created: 4/10/13
  * @section LICENSE
  * License: newBSD
@@ -34,28 +34,49 @@ import java.util.ArrayList;
 import java.util.Map;
 
 /**
- * A blackboard entry.
+ * A model for entries.
  **/
 public class Entries implements TreeModel {
+    /**
+     * A list of entries.
+     *
+     * @var ArrayList root
+     **/
     private final ArrayList<EntryNode> root;
 
-//    public Entries(ArrayList<EntryNode> entries) {
-//        root = entries;
-//    }
-
-    public Entries(){
+    /**
+     * The constructor.
+     **/
+    public Entries() {
         root = new ArrayList<EntryNode>();
     }
 
-    public void add(EntryNode node){
+    /**
+     * Adds an entry to the list.
+     *
+     * @param node An entry.
+     */
+    public void add(EntryNode node) {
         root.add(node);
     }
 
+    /**
+     * Gets the root node.
+     *
+     * @return The root node.
+     */
     @Override
     public Object getRoot() {
         return root;
     }
 
+    /**
+     * Gets the child of parent at index in the parent's child array.
+     *
+     * @param parent The parent.
+     * @param index The index.
+     * @return Returns the child of a parent at a specific index.
+     **/
     @Override
     public Object getChild(Object parent, int index) {
         if (parent instanceof ArrayList)
@@ -74,6 +95,12 @@ public class Entries implements TreeModel {
         }
     }
 
+    /**
+     * Returns the number of children of parent.
+     *
+     * @param parent The parent.
+     * @return The number of children the parent has.
+     **/
     @Override
     public int getChildCount(Object parent) {
         int children;
@@ -88,6 +115,12 @@ public class Entries implements TreeModel {
         return children;
     }
 
+    /**
+     * Check if node is a leaf.
+     *
+     * @param node The node
+     * @return Returns whether the node is a leaf or not.
+     **/
     @Override
     public boolean isLeaf(Object node) {
         return !(node instanceof ArrayList || node instanceof EntryNode && ((EntryNode) node).isBdoNode() && ((EntryNode) node).getNodeAsBdo().size() > 0);
@@ -97,6 +130,13 @@ public class Entries implements TreeModel {
     public void valueForPathChanged(TreePath path, Object newValue) {
     }
 
+    /**
+     * Returns the index of child in parent. If either parent or child is null, returns -1.
+     *
+     * @param parent The parent.
+     * @param child The child.
+     * @return The index of the child in parent.
+     */
     @Override
     public int getIndexOfChild(Object parent, Object child) {
         int index = -1;

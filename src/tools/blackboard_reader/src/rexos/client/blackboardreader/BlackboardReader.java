@@ -36,13 +36,44 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.util.ArrayList;
 
+/**
+ * A blackboard reader GUI.
+ **/
 public class BlackboardReader implements ListSelectionListener {
-    private JList collections;
+    /**
+     * The main panel of the form.
+     *
+     * @var JPanel mainPanel
+     **/
     private JPanel mainPanel;
+    /**
+     * A list of blackboards.
+     *
+     * @var JList collections
+     **/
+    private JList collections;
+    /**
+     * The tree containing entries of the currently selected blackboard.
+     *
+     * @var JTree entries
+     **/
     private JTree entries;
-    private final ArrayList<EntryNode> entriesList;
+    /**
+     * A list of blackboard entries.
+     *
+     * @var ArrayList blackboardEntries
+     **/
+    private final ArrayList<EntryNode> blackboardEntries;
+    /**
+     * The blackboards.
+     *
+     * @var Blackboard blackboard
+     **/
     private final Blackboards blackboards;
 
+    /**
+     * BlackboardReader constructor.
+     **/
     public BlackboardReader() {
         JFrame frame = new JFrame("Blackboard Reader");
         frame.setContentPane(mainPanel);
@@ -50,18 +81,27 @@ public class BlackboardReader implements ListSelectionListener {
         frame.pack();
         frame.setVisible(true);
 
-        entriesList = new ArrayList<EntryNode>();
+        blackboardEntries = new ArrayList<EntryNode>();
         blackboards = new Blackboards();
         collections.addListSelectionListener(this);
 
     }
 
+    /**
+     * Used to get the blackboards(collections).
+     *
+     * @return Returns blackboards(collections).
+     */
     public Blackboards getBlackboards() {
-        collections.updateUI();
         return blackboards;
     }
 
-    public void setListEntries(DBCollection collection) {
+    /**
+     * Updates the model for the current blackboard.
+     *
+     * @param collection A blackboard.
+     **/
+    public void updateEntriesModel(DBCollection collection) {
         Entries model = new Entries();
 
         DBCursor cursor = collection.find();
@@ -72,18 +112,31 @@ public class BlackboardReader implements ListSelectionListener {
         entries.setModel(model);
     }
 
-    public void setBlackboards() {
+    /**
+     * Update the blackboards list.
+     **/
+    public void updateBlackboards() {
         collections.setModel(blackboards);
     }
 
-    public ArrayList<EntryNode> getEntriesList() {
-        return entriesList;
+    /**
+     * Gets the entries of the currently selected blackboard.
+     *
+     * @return Returns the entries for the currently selected blackboard.
+     **/
+    public ArrayList<EntryNode> getBlackboardEntries() {
+        return blackboardEntries;
     }
 
+    /**
+     * Triggered when a blackboard has been selected in the list.
+     *
+     * @param e A ListSelectionEvent.
+     */
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
-            setListEntries((DBCollection) collections.getModel().getElementAt(collections.getSelectedIndex()));
+            updateEntriesModel((DBCollection) collections.getModel().getElementAt(collections.getSelectedIndex()));
         }
     }
 }

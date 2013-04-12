@@ -1,7 +1,7 @@
 /**
  * @author Ammar Abdulamir
  * @file Blackboards.java
- * @brief A blackboard model.
+ * @brief A model for blackboards.
  * @date Created: 4/10/13
  * @section LICENSE
  * License: newBSD
@@ -32,24 +32,48 @@ import javax.swing.event.ListDataListener;
 import java.util.ArrayList;
 
 /**
- * A blackboard model.
+ * A model for blackboards.
  **/
 public class Blackboards implements ListModel<DBCollection> {
+    /**
+     * A list of blackboards(collections).
+     *
+     * @var ArrayList blackboards
+     **/
     private ArrayList<DBCollection> blackboards = new ArrayList<DBCollection>();
 
+    /**
+     * The constructor.
+     **/
     public Blackboards() {
         blackboards = new ArrayList<DBCollection>();
     }
 
+    /**
+     * Adds a blackboard to the current list.
+     *
+     * @param collection A blackboard
+     */
     public void add(DBCollection collection) {
         blackboards.add(collection);
     }
 
+    /**
+     * Gets the numbers of available blackboards in the list.
+     *
+     * @return The number of blackboards.
+     */
     @Override
     public int getSize() {
         return blackboards.size();
     }
 
+    /**
+     * Gets a blackboard with a specific index.
+     *
+     * @param index The index of the blackboard within the list.
+     * @return A blackboard.
+     **/
     @Override
     public DBCollection getElementAt(int index) {
         return blackboards.get(index);

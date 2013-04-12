@@ -1,7 +1,7 @@
 /**
  * @author Ammar Abdulamir
  * @file EntryNode.java
- * @brief
+ * @brief A blackboard entry.
  * @date Created: 4/10/13
  * @section LICENSE
  * License: newBSD
@@ -27,35 +27,84 @@ package rexos.client.blackboardreader.models;
 
 import com.mongodb.BasicDBObject;
 
+/**
+ * A blackboard entry.
+ **/
 public class EntryNode {
+    /**
+     * The entry's key.
+     *
+     * @var String key
+     **/
     private final String key;
+    /**
+     * The entry's value.
+     *
+     * @var String node
+     **/
     private final Object node;
 
+    /**
+     * A constructor.
+     *
+     * @param bdo A BasicDBObject
+     **/
     public EntryNode(BasicDBObject bdo) {
         this("Entry", bdo);
     }
 
+    /**
+     * A constructor.
+     *
+     * @param key The key
+     * @param object The value
+     **/
     public EntryNode(String key, Object object) {
         this.key = key;
         this.node = object;
     }
 
+    /**
+     * Gets a BasicDBObject.
+     *
+     * @return A BasicDBObject representation of the value.
+     **/
     public BasicDBObject getNodeAsBdo() {
         return (BasicDBObject) node;
     }
 
+    /**
+     * Gets the value.
+     *
+     * @return The value
+     **/
     public Object getNode() {
         return node;
     }
 
+    /**
+     * Gets the key.
+     *
+     * @return The key
+     **/
     public String getKey() {
         return key;
     }
 
+    /**
+     * Check if current value is a BasicDBObject.
+     *
+     * @return Returns if the current value is a BasicDBObject
+     **/
     public boolean isBdoNode() {
         return node instanceof BasicDBObject;
     }
 
+    /**
+     * eturns a string representation of the object.
+     *
+     * @return a string representation of the object
+     */
     @Override
     public String toString() {
         String ret;
