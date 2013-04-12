@@ -56,10 +56,8 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 	@SuppressWarnings("null")
 	public void Scheduler(Set<AID> equipletList, ProductionStep productionstep)throws Exception{
 		Schedule[] schedules;
-		ArrayList<AID> equipletlist = null;
-		for(AID i : equipletList){
-		    equipletlist.add(i);
-		}
+		//load set into arraylist
+		 List<AID> equipletlist = new ArrayList<AID>(equipletList);
 		
 		//Make connection with database
 		MongoClient mongoClient =null;
