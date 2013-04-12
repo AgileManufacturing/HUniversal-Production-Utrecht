@@ -1,8 +1,10 @@
 package equipletAgent.behaviours;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import newDataClasses.ProductionStep;
+import newDataClasses.ScheduleData;
 
 import org.bson.types.ObjectId;
 
@@ -61,7 +63,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 			// TODO: get ouputPart
 			ProductStepMessage entry = new ProductStepMessage(message.getSender(), proStepC.getCapability(),
 					proStepC.getParameterList(), null, null,
-					StepStatusCode.EVALUATING, null, null);
+					StepStatusCode.EVALUATING, new HashMap<String, String>(), new ScheduleData());
 			productStepEntryId = equipletAgent.getEquipletBBclient().insertDocument(gson.toJson(entry));
 			equipletAgent.addCommunicationSlot(message.getConversationId(), productStepEntryId);
 			// Asks the serviceAgent if it can do this product step.
