@@ -160,12 +160,16 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 		
 		//send the message to the equiplet to schedule the timeslot
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setConversationId(_productAgent.generateCID());
-		msg.setOntology("ScheduleStep");
-        msg.setContent( ""+freetimeslotEq.getStartTime() );
-        msg.addReceiver(equipletAID);
+		
+		if(freetimeslotEq == null){
+			msg.setConversationId(_productAgent.generateCID());
+			msg.setOntology("ScheduleStep");
+	        msg.setContent( ""+freetimeslotEq.getStartTime() );
+	        msg.addReceiver(equipletAID);
+	        myAgent.send(msg);
+		}
         
-        myAgent.send(msg);
+        
 	}
 	
 	private class FreeTimeSlot{
