@@ -34,6 +34,7 @@ package equipletAgent;
 
 import com.mongodb.*;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import equipletAgent.behaviours.*;
 
@@ -202,7 +203,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		}
 		equipletDbName = getAID().getLocalName();
 		communicationTable = new Hashtable<String, ObjectId>();
-		gson = new Gson();
+		gson = new GsonBuilder().create();
 
 		// TODO: Not Hardcoded capabilities/get capabilities from the service
 		// agent.
@@ -214,6 +215,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		try {
 			DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 			Object[] arguments = new Object[] { dbData };
+			((AgentController) getContainerController().createNewAgent(getLocalName() + "-hardwareAgent", "hardwareAgent.HardwareAgent", arguments)).start();
+			AID hardwareAgent = new AID((String) getLocalName() + "-hardwareAgent", AID.ISLOCALNAME);
+			arguments = new Object[] { dbData, hardwareAgent };
 			((AgentController) getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "serviceAgent.ServiceAgent", arguments)).start();
 			serviceAgent = new AID((String) getLocalName() + "-serviceAgent", AID.ISLOCALNAME);
 		} catch (StaleProxyException e1) {
@@ -251,8 +255,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		try {
 			collectiveBBClient.setCollection(timeDataName);
 			DBObject timeData = collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
-			firstTimeSlot = (Long) timeData.get("firstTimeSlot");
-			timeSlotLength = (Long) timeData.get("timeSlotLength");
+			firstTimeSlot = ((Double)timeData.get("firstTimeSlot")).longValue();
+			timeSlotLength = ((Double)timeData.get("timeSlotLength")).longValue();
 			collectiveBBClient.setCollection(equipletDirectoryName);
 		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 			e.printStackTrace();
@@ -289,12 +293,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			BasicDBObject searchQuery = new BasicDBObject("AID", getAID());
 			collectiveBBClient.removeDocuments(gson.toJson(searchQuery));
 
-			BasicDBObject query = new BasicDBObject();
 			//TODO: USE DISTINCT.
-			List<DBObject> productSteps = equipletBBClient.findDocuments(query);
+			/*List<DBObject> productSteps = equipletBBClient.findDocuments(new BasicDBObject());
 			for (DBObject productStep : productSteps) {
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
-				responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
+				responseMessage.addReceiver(new AID(productStep.get("productAgentId").toString(), AID.ISLOCALNAME));
 
 				String conversationId = null;
 				ObjectId id = (ObjectId) productStep.get("_id");
@@ -310,13 +313,22 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				responseMessage.setConversationId(conversationId);
 				responseMessage.setContent("I'm dying");
 				send(responseMessage);
-
-				// TODO: remove own database
+			}*/
+			Object[] productAgents = equipletBBClient.findDistinctValues("productAgentId", new BasicDBObject());
+			for(Object productAgent : productAgents){
+				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
+				responseMessage.addReceiver(new AID(productAgent.toString(), AID.ISLOCALNAME));
+				responseMessage.setContent("I'm dying");
+				send(responseMessage);
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			// The equiplet is already going down, so it has to do nothing here.
+		}
+		try {
+			equipletBBClient.removeDocuments(new BasicDBObject());
+		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+			e.printStackTrace();
 		}
 	}
 

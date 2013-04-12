@@ -10,6 +10,7 @@ import behaviours.ReceiveBehaviour;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mongodb.DBObject;
 
 import equipletAgent.ProductStepMessage;
 import equipletAgent.StepStatusCode;
@@ -61,7 +62,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 			// TODO: get ouputPart
 			ProductStepMessage entry = new ProductStepMessage(message.getSender(), proStepC.getCapability(),
 					proStepC.getParameterList(), null, null,
-					StepStatusCode.EVALUATING, null, null);
+					StepStatusCode.EVALUATING.getStatus(), null, null);
 			productStepEntryId = equipletAgent.getEquipletBBclient().insertDocument(gson.toJson(entry));
 			equipletAgent.addCommunicationSlot(message.getConversationId(), productStepEntryId);
 			// Asks the serviceAgent if it can do this product step.
