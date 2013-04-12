@@ -11,6 +11,7 @@ import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
 
+import serviceAgent.DummyService;
 import serviceAgent.ServiceStepMessage;
 
 import serviceAgent.Service;

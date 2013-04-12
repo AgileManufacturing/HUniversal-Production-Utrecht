@@ -40,19 +40,18 @@ import newDataClasses.ScheduleData;
  * Implementation of a message for the productstep blackboard
  */
 public class ProductStepMessage {
-	public AID productAgentId;
-	public long type;
-	public ParameterList parameters;
-	public Object inputParts;
-	public Object outputParts;
-	public StepStatusCode status;
-	public HashMap<String, String> statusData;
-	public ScheduleData scheduleData;
+	private AID productAgentId;
+	private long type;
+	private ParameterList parameters;
+	private Object inputParts;
+	private Object outputParts;
+	private StepStatusCode status;
+	private HashMap<String, String> statusData;
+	private ScheduleData scheduleData;
 
-	public ProductStepMessage(AID productAgentId,
-							  long type, ParameterList parameters,
-							  Object inputParts, Object outputParts,
-							  StepStatusCode status, HashMap<String, String> statusData, ScheduleData scheduleData){
+	public ProductStepMessage(AID productAgentId, long type,
+			ParameterList parameters, Object inputParts, Object outputParts,
+			StepStatusCode status, HashMap<String, String> statusData, ScheduleData scheduleData) {
 		this.productAgentId = productAgentId;
 		this.type = type;
 		this.parameters = parameters;
@@ -60,6 +59,138 @@ public class ProductStepMessage {
 		this.outputParts = outputParts;
 		this.status = status;
 		this.statusData = statusData;
+		this.scheduleData = scheduleData;
+	}
+
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (obj == this)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ProductStepMessage other = (ProductStepMessage) obj;
+		return productAgentId.equals(other.productAgentId)
+				&& type == other.type
+				&& parameters.equals(other.parameters)
+				&& inputParts.equals(other.inputParts)
+				&& outputParts.equals(other.outputParts)
+				&& status == other.status
+				&& statusData.equals(other.statusData)
+				&& scheduleData.equals(other.scheduleData);
+	}
+
+	/**
+	 * @return the productAgentId
+	 */
+	public AID getProductAgentId() {
+		return productAgentId;
+	}
+
+	/**
+	 * @param productAgentId the productAgentId to set
+	 */
+	public void setProductAgentId(AID productAgentId) {
+		this.productAgentId = productAgentId;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public long getType() {
+		return type;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(long type) {
+		this.type = type;
+	}
+
+	/**
+	 * @return the parameters
+	 */
+	public ParameterList getParameters() {
+		return parameters;
+	}
+
+	/**
+	 * @param parameters the parameters to set
+	 */
+	public void setParameters(ParameterList parameters) {
+		this.parameters = parameters;
+	}
+
+	/**
+	 * @return the inputParts
+	 */
+	public Object getInputParts() {
+		return inputParts;
+	}
+
+	/**
+	 * @param inputParts the inputParts to set
+	 */
+	public void setInputParts(Object inputParts) {
+		this.inputParts = inputParts;
+	}
+
+	/**
+	 * @return the outputParts
+	 */
+	public Object getOutputParts() {
+		return outputParts;
+	}
+
+	/**
+	 * @param outputParts the outputParts to set
+	 */
+	public void setOutputParts(Object outputParts) {
+		this.outputParts = outputParts;
+	}
+
+	/**
+	 * @return the status
+	 */
+	public StepStatusCode getStatus() {
+		return status;
+	}
+
+	/**
+	 * @param status the status to set
+	 */
+	public void setStatus(StepStatusCode status) {
+		this.status = status;
+	}
+
+	/**
+	 * @return the statusData
+	 */
+	public HashMap<String, String> getStatusData() {
+		return statusData;
+	}
+
+	/**
+	 * @param statusData the statusData to set
+	 */
+	public void setStatusData(HashMap<String, String> statusData) {
+		this.statusData = statusData;
+	}
+
+	/**
+	 * @return the scheduleData
+	 */
+	public ScheduleData getScheduleData() {
+		return scheduleData;
+	}
+
+	/**
+	 * @param scheduleData the scheduleData to set
+	 */
+	public void setScheduleData(ScheduleData scheduleData) {
 		this.scheduleData = scheduleData;
 	}
 }
