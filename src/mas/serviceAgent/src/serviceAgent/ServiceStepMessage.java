@@ -29,24 +29,25 @@
  **/
 package serviceAgent;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.HashMap;
+
+import newDataClasses.ScheduleData;
+
 /**
  * Implementation of a message for the servicestep blackboard
  */
 public class ServiceStepMessage {
-	public int serviceStepId;
-	public int productStepId;
+	public long serviceStepId;
+	public long productStepId;
 	public String type;
-	public Map<String, String> parameters;
-	public int status;
-	public Hashtable<String, String> statusData;
-	public Object timeData;
+	public HashMap<String, String> parameters;
+	public StepStatusCode status;
+	public HashMap<String, String> statusData;
+	public ScheduleData timeData;
 
 	public ServiceStepMessage(int serviceStepId, int productStepId,
-							  String type, Map<String, String> parameters,
-							  int status, Hashtable<String, String> statusData, Object timeData){
+							  String type, HashMap<String, String> parameters,
+							  StepStatusCode status, HashMap<String, String> statusData, ScheduleData timeData) {
 		this.serviceStepId = serviceStepId;
 		this.productStepId = productStepId;
 		this.type = type;
@@ -54,5 +55,24 @@ public class ServiceStepMessage {
 		this.status = status;
 		this.statusData = statusData;
 		this.timeData = timeData;
+	}
+	
+	public boolean equals(Object obj) {
+		if(obj == null)
+			return false;
+		if(obj == this)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ServiceStepMessage other = (ServiceStepMessage) obj;
+		return	serviceStepId == other.serviceStepId &&
+				productStepId == other.productStepId &&
+				type.equals(other.type) &&
+				parameters.equals(other.parameters) &&
+				status == other.status &&
+				statusData.equals(other.statusData) &&
+				timeData.equals(other.timeData);
 	}
 }

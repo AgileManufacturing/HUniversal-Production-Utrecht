@@ -10,7 +10,7 @@ import com.google.gson.InstanceCreator;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
-import equipletAgent.ProductStepStatusCode;
+import equipletAgent.StepStatusCode;
 import equipletAgent.EquipletAgent;
 import behaviours.ReceiveBehaviour;
 import jade.core.AID;
@@ -78,14 +78,14 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour{
 			productStep = equipletAgent.getEquipletBBclient().findDocuments(query).get(0);
 			int status = (Integer) productStep.get("status");
 			AID productAgent = gson.fromJson(productStep.get("productAgentId").toString(), AID.class);
-			if (status == ProductStepStatusCode.EVALUATING.getStatus()) {
+			if (status == StepStatusCode.EVALUATING.getStatus()) {
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.CONFIRM);
 				responseMessage.setConversationId(message.getConversationId());
 				responseMessage.setOntology("CanPerformStepResponse");
 				responseMessage.addReceiver(productAgent);
 				message.setContent("This is possible");
 				myAgent.send(responseMessage);
-			} else if (status == ProductStepStatusCode.ABORTED.getStatus()) {
+			} else if (status == StepStatusCode.ABORTED.getStatus()) {
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.DISCONFIRM);
 				responseMessage.setConversationId(message.getConversationId());
 				responseMessage.setOntology("CanPerformStepResponse");
