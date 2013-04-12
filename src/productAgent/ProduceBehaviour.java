@@ -1,7 +1,7 @@
 /**
  * 
  */
-package productAgent;
+package ProductAgent;
 
 import jade.core.behaviours.OneShotBehaviour;
 import newDataClasses.LogMessage;

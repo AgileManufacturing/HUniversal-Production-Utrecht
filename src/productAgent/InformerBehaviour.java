@@ -1,12 +1,15 @@
-package productAgent;
+package ProductAgent;
 
 import jade.core.AID;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.ParallelBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import newDataClasses.Product;
+import newDataClasses.Production;
 import newDataClasses.ProductionEquipletMapper;
 import newDataClasses.ProductionStep;
 
@@ -26,36 +29,20 @@ import newDataClasses.ProductionStep;
 public class InformerBehaviour extends OneShotBehaviour {
 
 	private ProductAgent _productAgent;
+	private ParallelBehaviour _par;
+	private Product _product;
+	private Production _production;
+	private ProductionEquipletMapper _pem;
+
+	public InformerBehaviour() {
+	}
 
 	@Override
 	public void action() {
 		_productAgent = (ProductAgent) myAgent;
-
-		/*
-		 * Testing. Hardcode list with eqa's this list will later be renderd
-		 * from the planning behaviour.
-		 */
-		ProductionEquipletMapper pem = _productAgent.getProduct()
-				.getProduction().getProductionEquipletMapping();
-
-		for (ProductionStep stp : _productAgent.getProduct().getProduction()
-				.getProductionSteps()) {
-
-			pem.addProductionStep(stp.getId());
-
-			pem.addEquipletToProductionStep(stp.getId(), new AID("eqa1",
-					AID.ISLOCALNAME));
-			pem.addEquipletToProductionStep(stp.getId(), new AID("eqa2",
-					AID.ISLOCALNAME));
-			pem.addEquipletToProductionStep(stp.getId(), new AID("eqa3",
-					AID.ISLOCALNAME));
-			pem.addEquipletToProductionStep(stp.getId(), new AID("eqa4",
-					AID.ISLOCALNAME));
-			pem.addEquipletToProductionStep(stp.getId(), new AID("eqa5",
-					AID.ISLOCALNAME));
-			pem.addEquipletToProductionStep(stp.getId(), new AID("eqa6",
-					AID.ISLOCALNAME));
-		}
+		_product = this._productAgent.getProduct();
+		_production = _product.getProduction();
+		_pem = new ProductionEquipletMapper();
 
 		/*
 		 * We want to have our conversations in parallel. We also only want to
@@ -63,18 +50,39 @@ public class InformerBehaviour extends OneShotBehaviour {
 		 * each step in our productionlist and create a conversation object. (
 		 * as behaviour )
 		 */
-		ParallelBehaviour par = new ParallelBehaviour(
-				ParallelBehaviour.WHEN_ALL);
+		_par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 
-		for (ProductionStep stp : _productAgent.getProduct().getProduction()
-				.getProductionSteps()) {
-			for (AID aid : _productAgent.getProduct().getProduction()
+		for (ProductionStep stp : _product.getProduction().getProductionSteps()) {
+
+			_pem.addProductionStep(stp.getId());
+
+			for (AID aid : _product.getProduction()
 					.getProductionEquipletMapping()
 					.getEquipletsForProductionStep(stp.getId())) {
-				par.addSubBehaviour(new Conversation(aid, stp));
+				_par.addSubBehaviour(new Conversation(aid, stp, _pem));
 			}
 		}
-		myAgent.addBehaviour(par);
+
+		myAgent.addBehaviour(_par);
+
+		// Checking if timeout expired?
+		myAgent.addBehaviour(new CyclicBehaviour() {
+			@Override
+			public void action() {
+				// TODO Auto-generated method stub
+				if (_par.done()) {
+					System.out.println("Done informing.");
+					try {
+						_production.setProductionEquipletMapping(_pem);
+						_product.setProduction(_production);
+						_productAgent.setProduct(_product);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					myAgent.removeBehaviour(this);
+				}
+			}
+		});
 	}
 
 	public int onEnd() {
@@ -92,11 +100,14 @@ public class InformerBehaviour extends OneShotBehaviour {
 	private class Conversation extends SequentialBehaviour {
 		private AID _aid;
 		private ProductionStep _productionStep;
-		private boolean debug = false;
+		private boolean debug = true;
+		private ProductionEquipletMapper _pem;
 
-		public Conversation(AID aid, ProductionStep productionStep) {
+		public Conversation(AID aid, ProductionStep productionStep,
+				ProductionEquipletMapper pem) {
 			this._aid = aid;
 			this._productionStep = productionStep;
+			this._pem = pem;
 		}
 
 		/*
@@ -218,15 +229,9 @@ public class InformerBehaviour extends OneShotBehaviour {
 												// Adds the equiplet to the
 												// production step in
 												// the mapper list.
-												_productAgent
-														.getProduct()
-														.getProduction()
-														.getProductionEquipletMapping()
-														.addEquipletToProductionStep(
-																_productionStep
-																		.getId(),
-																_aid);
-
+												_pem.addEquipletToProductionStep(
+														_productionStep.getId(),
+														_aid);
 											}
 										} catch (UnreadableException e) {
 											System.out

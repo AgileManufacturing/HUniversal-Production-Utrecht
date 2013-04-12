@@ -1,31 +1,29 @@
-package productAgent;
+package ProductAgent;
 
 import jade.core.AID;
-import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
+import newDataClasses.Product;
 import newDataClasses.Production;
 import newDataClasses.ProductionEquipletMapper;
 import newDataClasses.ProductionStep;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
 @SuppressWarnings("serial")
-public class PlannerBehaviour extends CyclicBehaviour {
+public class PlannerBehaviour extends OneShotBehaviour {
 	private ProductAgent _productAgent;
 
 	public PlannerBehaviour() {
 	}
 
 	public void action() {
-		_productAgent = (ProductAgent) myAgent;
 		try {
+			_productAgent = (ProductAgent) myAgent;
 			BlackboardClient bbc = new BlackboardClient("145.89.191.131",
 					27017);
 			bbc.setDatabase("CollectiveDb");
@@ -45,8 +43,9 @@ public class PlannerBehaviour extends CyclicBehaviour {
 				List<DBObject> testData = bbc.findDocuments(equipletCapabilityQuery);
 				
 				for(DBObject db : testData) {
-					String aid = (String)db.get("AID").toString();
-					pem.addEquipletToProductionStep(PA_id, new AID(aid, true));
+					DBObject aid = (DBObject)db.get("db");
+					String name = (String)aid.get("name").toString();
+					pem.addEquipletToProductionStep(PA_id, new AID(name, AID.ISLOCALNAME));
 				}
 			}
 			
@@ -55,7 +54,7 @@ public class PlannerBehaviour extends CyclicBehaviour {
 			this._productAgent.setProduct(product);
 
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception planner " + e);
 		}
 	}
 }

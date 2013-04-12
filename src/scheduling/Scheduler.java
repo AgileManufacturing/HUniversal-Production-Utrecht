@@ -1,4 +1,4 @@
-package scheduling;
+package Scheduling;
 
 //jade imports
 import jade.core.AID;
