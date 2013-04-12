@@ -2,6 +2,7 @@
 
 package equipletAgent;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
@@ -48,7 +49,7 @@ public class EquipletAgent extends Agent {
 		Random random = new Random();
 		return random.nextInt(r);
 	}
-
+	
 	private String writeParamsToString(ParameterList p) {
 		String[] Groups = new String[3];
 		Groups[0] = "Color";

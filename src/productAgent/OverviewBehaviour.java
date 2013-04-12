@@ -152,7 +152,7 @@ public class OverviewBehaviour extends Behaviour {
 			default:
 				return;
 		}
-	}*/
+	}
 	
 	// Reschedule
 	public void reschedule(){
@@ -185,4 +185,5 @@ public class OverviewBehaviour extends Behaviour {
 				// TODO Auto-generated method stub
 				
 			}
+	}
 }

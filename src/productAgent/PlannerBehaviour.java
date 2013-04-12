@@ -23,7 +23,13 @@ public class PlannerBehaviour extends OneShotBehaviour {
 	
 	public int onEnd(){
 		return 0;
-	}	
+	}
+	
+	public void removeEquiplet(AID aid){
+		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
+		// convert the AID to the desired dbObject
+		//bbc.removeDocuments(); // add the desired dbObject as param.
+	}
 		public void action() {
 			ProductAgent _productAgent = null;
 			final String ConversationId = _productAgent.generateCID();
@@ -41,6 +47,7 @@ public class PlannerBehaviour extends OneShotBehaviour {
 				BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
 				bbc.setDatabase("CollectiveDb");
 				bbc.setCollection("EquipletDirectory");
+				
 				
 				Product product = this._productAgent.getProduct();
 				Production production = product.getProduction();
