@@ -276,7 +276,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber{
 				responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
 				responseMessage.setConversationId(conversationId);
 				
-				ProductStepStatusCode status = (ProductStepStatusCode) productStep.get("status");
+				StepStatusCode status = (StepStatusCode) productStep.get("status");
 				switch(status){
 				case PLANNED:
 					try {

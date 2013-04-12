@@ -12,7 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import equipletAgent.ProductStepMessage;
-import equipletAgent.ProductStepStatusCode;
+import equipletAgent.StepStatusCode;
 import equipletAgent.EquipletAgent;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
@@ -63,7 +63,7 @@ public class CanPerformStep extends ReceiveBehaviour{
 			// TODO: get ouputPart
 			ProductStepMessage entry = new ProductStepMessage(message.getSender(), proStepC.getCapability(),
 					proStepC.getParameterList(), null, null,
-					ProductStepStatusCode.EVALUATING.getStatus(), null, null);
+					StepStatusCode.EVALUATING.getStatus(), null, null);
 			productStepEntryId = equipletAgent.getEquipletBBclient().insertDocument(gson.toJson(entry));
 			equipletAgent.addCommunicationSlot(message.getConversationId(), productStepEntryId);
 			// Asks the serviceAgent if it can do this product step.

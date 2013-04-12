@@ -140,18 +140,18 @@ public class BlackboardClient {
 
 	/**
 	 * Utility function for parsing JSON that catches the runtime JSON exception and throws an InvalidJSONException instead.
-	 * @param jsonString The JSON string that needs to be parsed to a DBObject.
-	 * @return The DBObject parsed from the JSON string.
+	 * 
+	 * @param jsonString The JSON string that needs to be parsed to an object of type T.
+	 * @return The T object parsed from the JSON string.
 	 * @throws InvalidJSONException An error exists within the JSON.
 	 **/
-	public static DBObject parseJSONWithCheckException(String jsonString) throws InvalidJSONException {
+	private DBObject parseJSONWithCheckException(String jsonString) throws InvalidJSONException {
 		DBObject obj = null;
 		try {
-			obj = (DBObject)JSON.parse(jsonString);
+			obj = (DBObject) JSON.parse(jsonString);
 		} catch (JSONParseException ex) {
 			throw new InvalidJSONException(ex);
 		}
-		
 		return obj;
 	}
 	

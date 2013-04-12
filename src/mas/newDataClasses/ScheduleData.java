@@ -71,6 +71,21 @@ public class ScheduleData {
 	public void setDeadline(long deadline) {
 		this.deadline = deadline;
 	}
+	
+	public boolean equals(Object obj) {
+		if(obj == null)
+			return false;
+		if(obj == this)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ScheduleData other = (ScheduleData) obj;
+		return	startTime == other.startTime &&
+				duration == other.duration &&
+				deadline == other.deadline;
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
