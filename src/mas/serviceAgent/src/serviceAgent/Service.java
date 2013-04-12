@@ -33,7 +33,6 @@ package serviceAgent;
 import com.mongodb.BasicDBObject;
 
 import equipletAgent.ProductStepMessage;
-import equipletAgent.ServiceStepMessage;
 
 /**
  * @author Peter Bonnema

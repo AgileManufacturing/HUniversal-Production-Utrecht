@@ -42,6 +42,7 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
+import newDataClasses.DbData;
 import newDataClasses.ScheduleData;
 import nl.hu.client.*;
 import nl.hu.client.FieldUpdateSubscription.MongoUpdateLogOperation;

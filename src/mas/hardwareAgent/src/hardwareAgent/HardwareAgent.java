@@ -9,8 +9,8 @@ import com.mongodb.DBObject;
 
 import behaviours.*;
 
-import equipletAgent.DbData;
 import jade.core.Agent;
+import newDataClasses.DbData;
 import nl.hu.client.BasicOperationSubscription;
 import nl.hu.client.BlackboardClient;
 import nl.hu.client.BlackboardSubscriber;

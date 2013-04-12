@@ -1,4 +1,4 @@
-package equipletAgent;
+package newDataClasses;
 
 public class DbData {
 	public String ip;

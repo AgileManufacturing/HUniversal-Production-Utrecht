@@ -18,6 +18,7 @@ import equipletAgent.*;
 
 import org.bson.types.*;
 
+import newDataClasses.DbData;
 import newDataClasses.ScheduleData;
 import nl.hu.client.*;
 
