@@ -30,22 +30,28 @@
  **/
 package serviceAgent;
 
+import java.util.HashMap;
+
+import newDataClasses.ScheduleData;
+
 import com.mongodb.BasicDBObject;
+
+import equipletAgent.StepStatusCode;
 
 /**
  * @author Peter
- *
+ * 
  */
 public class DummyService implements Service {
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * 
 	 */
 	public DummyService() {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see serviceAgent.Service#canPerform(long, com.mongodb.BasicDBObject)
 	 */
 	@Override
@@ -53,12 +59,17 @@ public class DummyService implements Service {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see serviceAgent.Service#getServiceSteps(long, com.mongodb.BasicDBObject)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see serviceAgent.Service#getServiceSteps(long,
+	 * com.mongodb.BasicDBObject)
 	 */
 	@Override
 	public ServiceStepMessage[] getServiceSteps(long productStepType,
 			BasicDBObject parameters) {
-		return null;
+		return new ServiceStepMessage[] { new ServiceStepMessage(1l,
+				new HashMap<String, String>(), StepStatusCode.EVALUATING,
+				new HashMap<String, String>(), new ScheduleData()) };
 	}
 }
