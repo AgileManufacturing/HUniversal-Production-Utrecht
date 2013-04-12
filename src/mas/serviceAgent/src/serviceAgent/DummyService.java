@@ -1,14 +1,14 @@
 /**
- * @file ServiceGenerator.java
+ * @file DummyService.java
  * @brief 
- * @date Created: 11 apr. 2013
+ * @date Created: 12 apr. 2013
  *
  * @author Peter Bonnema
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright � 2013, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -30,24 +30,46 @@
  **/
 package serviceAgent;
 
+import java.util.HashMap;
+
+import newDataClasses.ScheduleData;
+
 import com.mongodb.BasicDBObject;
 
+import equipletAgent.StepStatusCode;
+
 /**
- * @author Peter Bonnema
- *
+ * @author Peter
+ * 
  */
-public interface Service {
+public class DummyService implements Service {
 	/**
-	 * @param productStepType
-	 * @param parameters
-	 * @return
+	 * 
 	 */
-	public boolean canPerform(long productStepType, BasicDBObject parameters);
-	
-	/**
-	 * @param productStepType
-	 * @param parameters
-	 * @return
+	public DummyService() {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see serviceAgent.Service#canPerform(long, com.mongodb.BasicDBObject)
 	 */
-	public ServiceStepMessage[] getServiceSteps(long productStepType, BasicDBObject parameters);
+	@Override
+	public boolean canPerform(long productStepType, BasicDBObject parameters) {
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see serviceAgent.Service#getServiceSteps(long,
+	 * com.mongodb.BasicDBObject)
+	 */
+	@Override
+	public ServiceStepMessage[] getServiceSteps(long productStepType,
+			BasicDBObject parameters) {
+		return new ServiceStepMessage[] { new ServiceStepMessage(1l,
+				new HashMap<String, String>(), StepStatusCode.EVALUATING,
+				new HashMap<String, String>(), new ScheduleData()) };
+	}
 }

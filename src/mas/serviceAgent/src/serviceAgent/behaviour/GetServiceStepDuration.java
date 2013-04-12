@@ -93,7 +93,9 @@ public class GetServiceStepDuration extends ReceiveBehaviour {
 						gson.toJson(client.findDocumentById(serviceStepId)),
 						ServiceStepMessage.class);
 				
-				duration += serviceStep.timeData.getDuration();
+				duration += serviceStep.getTimeData().getDuration();
+				
+				//TODO store duration when ready
 			} catch (UnreadableException | JsonSyntaxException
 					| InvalidDBNamespaceException | GeneralMongoException e) {
 				e.printStackTrace();

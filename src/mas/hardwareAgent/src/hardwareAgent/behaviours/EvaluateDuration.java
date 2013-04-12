@@ -1,6 +1,7 @@
 package hardwareAgent.behaviours;
 
 import hardwareAgent.HardwareAgent;
+import hardwareAgent.Module;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -20,7 +21,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("EvaluateDuration");
+	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("GetServiceStepDuration");
 	private HardwareAgent hardwareAgent;
 
 	/**
@@ -48,29 +49,37 @@ public class EvaluateDuration extends ReceiveBehaviour {
 
 		try {
 			ObjectId objectId = null;
-			DBObject productionStep = null;
+			DBObject serviceStep = null;
 			try {
 				objectId = (ObjectId) message.getContentObject();
 				BasicDBObject query = new BasicDBObject();
 				query.put("_id", objectId);
-				productionStep = hardwareAgent.getServiceStepsBBClient().findDocuments(query).get(0);
+				serviceStep = hardwareAgent.getServiceStepsBBClient().findDocuments(query).get(0);
 			} catch (UnreadableException | InvalidDBNamespaceException e) {
 				e.printStackTrace();
 				myAgent.doDelete();
 			}
-			if (productionStep != null) {
-				int type = ((Integer) productionStep.get("type"));
-				Object parameters = productionStep.get("parameters");
-				switch (type) {
-				case 1:// pickup
-					PickUpTranslation(parameters);
-					break;
-				case 2:// drop
-					DropTranslation(parameters);
-					break;
-				default:
-					break;
-				}
+			if (serviceStep != null) {
+				long stepType = ((long) serviceStep.get("type"));
+				Object parameters = serviceStep.get("parameters");
+				
+					// kijk in hashmap welke module hoort bij deze step
+					
+					Module leadingModule = (Module)hardwareAgent.GetModuleForStep(stepType);
+					
+					//vraag aan die module vertaal deze service step in equipletsteps
+					
+					
+					
+					
+					//plaats equipletsteps en hun duration en zijn status op eveluating op bb,
+					
+					
+					
+					//tel de duur van equi steps bij elkaar op,
+					// zet dit bij de duration van de betreffende service step
+					// stuur peter een reactie met het staat er
+					
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

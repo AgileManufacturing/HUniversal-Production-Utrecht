@@ -1,5 +1,7 @@
 package hardwareAgent;
 
+import java.util.HashMap;
+
 import hardwareAgent.behaviours.*;
 
 import org.bson.types.ObjectId;
@@ -24,7 +26,20 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 
 	private BlackboardClient serviceStepBBClient, equipletStepBBClient;
 	private DbData dbData;
-
+	private HashMap<Long,Object> stepLeaderMap;
+	
+	public void RegisterModule(long step,Object module){
+		
+		this.stepLeaderMap.put(step, module);
+		
+	}
+	
+	public Object GetModuleForStep(long step){
+		
+		return this.stepLeaderMap.get(step);
+		
+	}
+	
 	public void setup() {
 		System.out.println("Hardware agent "+ this +" reporting.");
 
@@ -39,6 +54,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 			serviceStepBBClient.setDatabase(dbData.name);
 			serviceStepBBClient.setCollection("ServiceStepsBlackboard");
 			serviceStepBBClient.subscribe(new BasicOperationSubscription(MongoOperation.INSERT, this));
+			serviceStepBBClient.subscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
 			
 			equipletStepBBClient = new BlackboardClient(dbData.ip);
 			equipletStepBBClient.setDatabase(dbData.name);
@@ -75,6 +91,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 		case "ServiceStepsBlackboard":
 			switch (operation) {
 			case INSERT:
+						
 				break;
 			default:
 				break;

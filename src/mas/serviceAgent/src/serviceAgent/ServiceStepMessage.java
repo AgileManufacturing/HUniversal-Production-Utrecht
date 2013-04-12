@@ -30,27 +30,31 @@
 package serviceAgent;
 
 import java.util.HashMap;
+import org.bson.types.ObjectId;
 
 import equipletAgent.StepStatusCode;
-
 import newDataClasses.ScheduleData;
 
 /**
  * Implementation of a message for the servicestep blackboard
  */
 public class ServiceStepMessage {
-	public long serviceStepId;
-	public long productStepId;
-	public String type;
-	public HashMap<String, String> parameters;
-	public StepStatusCode status;
-	public HashMap<String, String> statusData;
-	public ScheduleData timeData;
+	private ObjectId productStepId;
+	private long type;
+	private HashMap<String, String> parameters;
+	private StepStatusCode status;
+	private HashMap<String, String> statusData;
+	private ScheduleData timeData;
 
-	public ServiceStepMessage(int serviceStepId, int productStepId,
-							  String type, HashMap<String, String> parameters,
-							  StepStatusCode status, HashMap<String, String> statusData, ScheduleData timeData) {
-		this.serviceStepId = serviceStepId;
+	public ServiceStepMessage(long type, HashMap<String, String> parameters,
+			StepStatusCode status, HashMap<String, String> statusData,
+			ScheduleData timeData) {
+		this(null, type, parameters, status, statusData, timeData);
+	}
+
+	public ServiceStepMessage(ObjectId productStepId, long type,
+			HashMap<String, String> parameters, StepStatusCode status,
+			HashMap<String, String> statusData, ScheduleData timeData) {
 		this.productStepId = productStepId;
 		this.type = type;
 		this.parameters = parameters;
@@ -58,23 +62,110 @@ public class ServiceStepMessage {
 		this.statusData = statusData;
 		this.timeData = timeData;
 	}
-	
+
 	public boolean equals(Object obj) {
-		if(obj == null)
+		if (obj == null)
 			return false;
-		if(obj == this)
+		if (obj == this)
 			return true;
 		if (!super.equals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		ServiceStepMessage other = (ServiceStepMessage) obj;
-		return	serviceStepId == other.serviceStepId &&
-				productStepId == other.productStepId &&
-				type.equals(other.type) &&
-				parameters.equals(other.parameters) &&
-				status == other.status &&
-				statusData.equals(other.statusData) &&
-				timeData.equals(other.timeData);
+		return productStepId.equals(other.productStepId)
+				&& type == other.type
+				&& parameters.equals(other.parameters)
+				&& status == other.status
+				&& statusData.equals(other.statusData)
+				&& timeData.equals(other.timeData);
+	}
+
+	/**
+	 * @return the productStepId
+	 */
+	public ObjectId getProductStepId() {
+		return productStepId;
+	}
+
+	/**
+	 * @param productStepId
+	 *            the productStepId to set
+	 */
+	public void setProductStepId(ObjectId productStepId) {
+		this.productStepId = productStepId;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public long getType() {
+		return type;
+	}
+
+	/**
+	 * @param type
+	 *            the type to set
+	 */
+	public void setType(long type) {
+		this.type = type;
+	}
+
+	/**
+	 * @return the parameters
+	 */
+	public HashMap<String, String> getParameters() {
+		return parameters;
+	}
+
+	/**
+	 * @param parameters
+	 *            the parameters to set
+	 */
+	public void setParameters(HashMap<String, String> parameters) {
+		this.parameters = parameters;
+	}
+
+	/**
+	 * @return the status
+	 */
+	public StepStatusCode getStatus() {
+		return status;
+	}
+
+	/**
+	 * @param status the status to set
+	 */
+	public void setStatus(StepStatusCode status) {
+		this.status = status;
+	}
+
+	/**
+	 * @return the statusData
+	 */
+	public HashMap<String, String> getStatusData() {
+		return statusData;
+	}
+
+	/**
+	 * @param statusData the statusData to set
+	 */
+	public void setStatusData(HashMap<String, String> statusData) {
+		this.statusData = statusData;
+	}
+
+	/**
+	 * @return the timeData
+	 */
+	public ScheduleData getTimeData() {
+		return timeData;
+	}
+
+	/**
+	 * @param timeData
+	 *            the timeData to set
+	 */
+	public void setTimeData(ScheduleData timeData) {
+		this.timeData = timeData;
 	}
 }

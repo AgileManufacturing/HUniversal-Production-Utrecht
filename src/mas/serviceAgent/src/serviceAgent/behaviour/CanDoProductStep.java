@@ -11,6 +11,7 @@ import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
 
+import serviceAgent.DummyService;
 import serviceAgent.ServiceStepMessage;
 
 import serviceAgent.Service;
@@ -81,19 +82,5 @@ public class CanDoProductStep extends ReceiveBehaviour {
 		} else {
 			m.setPerformative(ACLMessage.DISCONFIRM);
 		}
-	}
-
-	public static class DummyService implements Service {
-		@Override
-		public boolean canPerform(long productStepType, BasicDBObject parameters) {
-			return true;
-		}
-
-		@Override
-		public ServiceStepMessage[] getServiceSteps(long productStepType,
-				BasicDBObject parameters) {
-			return null;
-		}
-
 	}
 }

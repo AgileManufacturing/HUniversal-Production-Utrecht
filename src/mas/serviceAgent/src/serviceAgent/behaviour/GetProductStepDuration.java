@@ -11,7 +11,7 @@ import nl.hu.client.InvalidDBNamespaceException;
 import org.bson.types.ObjectId;
 
 import serviceAgent.Service;
-import serviceAgent.behaviour.CanDoProductStep.DummyService;
+import serviceAgent.DummyService;
 
 import behaviours.ReceiveBehaviour;
 
