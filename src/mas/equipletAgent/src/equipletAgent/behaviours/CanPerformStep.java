@@ -22,11 +22,9 @@ import jade.lang.acl.UnreadableException;
 /**
  * The Class CanPerformStep.
  */
-public class CanPerformStep extends ReceiveBehaviour{
-	/**
-	 * 
-	 */
+public class CanPerformStep extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
+	
     private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CanPerformStep");
     private EquipletAgent equipletAgent;
 	
@@ -63,7 +61,7 @@ public class CanPerformStep extends ReceiveBehaviour{
 			// TODO: get ouputPart
 			ProductStepMessage entry = new ProductStepMessage(message.getSender(), proStepC.getCapability(),
 					proStepC.getParameterList(), null, null,
-					StepStatusCode.EVALUATING.getStatus(), null, null);
+					StepStatusCode.EVALUATING, null, null);
 			productStepEntryId = equipletAgent.getEquipletBBclient().insertDocument(gson.toJson(entry));
 			equipletAgent.addCommunicationSlot(message.getConversationId(), productStepEntryId);
 			// Asks the serviceAgent if it can do this product step.
