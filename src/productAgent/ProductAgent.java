@@ -3,7 +3,6 @@ package ProductAgent;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.ParallelBehaviour;
-import jade.core.behaviours.ThreadedBehaviourFactory;
 import newDataClasses.Product;
 import newDataClasses.ProductionStep;
 
@@ -32,15 +31,15 @@ public class ProductAgent extends Agent {
 			_product = (Product) getArguments()[0];
 
 			_par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
-			addBehaviour(_par);
+
 			
 			_par.addSubBehaviour(new OverviewBehaviour());
 			
-			_par.addSubBehaviour(new SocketBehaviour());
+			//_par.addSubBehaviour(new SocketBehaviour());
 			
-			_par.addSubBehaviour(new sideOverviewBehaviour());
+			//_par.addSubBehaviour(new sideOverviewBehaviour());
 			
-			
+			addBehaviour(_par);
 			System.out.println("I spawned as a product agent");
 
 		} catch (Exception e) {
@@ -74,7 +73,7 @@ public class ProductAgent extends Agent {
 				.getProductionSteps()) {
 			for (AID aid : this.getProduct().getProduction()
 					.getProductionEquipletMapping()
-					.getEquipletsForProductionStep(stp.getId())) {
+					.getEquipletsForProductionStep(stp.getId()).keySet()) {
 				System.out
 						.println("Step: " + stp.getId() + " has equiplets:\n");
 				System.out.println(aid.getLocalName());

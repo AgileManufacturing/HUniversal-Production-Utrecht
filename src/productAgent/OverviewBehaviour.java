@@ -65,9 +65,10 @@ public class OverviewBehaviour extends OneShotBehaviour {
 							+ " has Equiplets; \n");
 					for (AID aid : _productAgent.getProduct().getProduction()
 							.getProductionEquipletMapping()
-							.getEquipletsForProductionStep(stp.getId())) {
+							.getEquipletsForProductionStep(stp.getId()).keySet() ) {
 						System.out.println("Eq localname: "
-								+ aid.getLocalName() + " AID: " + aid + "\n");
+								+ aid.getLocalName() + " AID: " + aid + " timeslots: " + _productAgent.getProduct().getProduction()
+								.getProductionEquipletMapping().getTimeSlotsForEquiplet(stp.getId(), aid));
 					}
 				}
 			}

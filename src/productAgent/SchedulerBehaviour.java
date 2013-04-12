@@ -39,7 +39,7 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 				for (ProductionStep ps : psa) {
 					long PA_id = ps.getId();
 
-					Scheduler(production.getProductionEquipletMapping().getEquipletsForProductionStep(PA_id));
+					//Scheduler(production.getProductionEquipletMapping().getEquipletsForProductionStep(PA_id));
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
