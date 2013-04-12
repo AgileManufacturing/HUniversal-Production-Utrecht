@@ -1,4 +1,4 @@
-package productAgent;
+package ProductAgent;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -31,21 +31,8 @@ public class ProductAgent extends Agent {
 		try {
 			_product = (Product) getArguments()[0];
 
-			this.addBehaviour(new OverviewBehaviour());
-			SocketBehaviour sb = new SocketBehaviour();
+			addBehaviour(new OverviewBehaviour());
 
-		//addBehaviour(pb);
-
-		/*	addBehaviour(new CyclicBehaviour() {
-				@Override
-				public void action() {
-					if (ib.done()) {
-						outPutProductStepList();
-					} else {
-						System.out.println(" -- Informer Not done -- ");
-					}
-				}
-			});  */
 			System.out.println("I spawned as a product agent");
 
 		} catch (Exception e) {

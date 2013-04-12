@@ -1,9 +1,11 @@
-package productAgent;
+package ProductAgent;
 
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 
+import newDataClasses.Product;
+import newDataClasses.Production;
 import newDataClasses.ProductionStep;
 
 import java.net.UnknownHostException;
@@ -18,13 +20,6 @@ import com.mongodb.MongoClient;
 public class SchedulerBehaviour extends CyclicBehaviour{
 
 	private ProductAgent _productAgent;
-	private long stepID;
-	private newDataClasses.ProductionStep pStep;
-	
-	public SchedulerBehaviour(long id, ProductionStep productionstep ){
-		stepID = id;
-		pStep = productionstep;
-	}
 	
 	@Override
 	public void action() {
@@ -37,7 +32,15 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 				.getProduction()
 				.getProductionEquipletMapping();
 			try {
-				Scheduler( _productAgent.getProduct().getProduction().getProductionEquipletMapping().getEquipletsForProductionStep(stepID), pStep);
+				Product product = this._productAgent.getProduct();
+				Production production = product.getProduction();
+				ProductionStep[] psa = production.getProductionSteps();
+				
+				for (ProductionStep ps : psa) {
+					long PA_id = ps.getId();
+
+					Scheduler(production.getProductionEquipletMapping().getEquipletsForProductionStep(PA_id));
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -53,7 +56,7 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 	 * @param productionStep
 	 * @throws Exception
 	 */
-	public void Scheduler(ArrayList<AID> equipletList, newDataClasses.ProductionStep productionStep)throws Exception{
+	public void Scheduler(ArrayList<AID> equipletList)throws Exception{
 		Schedule[] schedules;
 		
 		//Make connection with database
@@ -152,6 +155,7 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 		
 		//send the message to the equiplet to schedule the timeslot
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		msg.setConversationId(_productAgent.generateCID());
 		msg.setOntology("ScheduleStep");
         msg.setContent( ""+freetimeslotEq.getStartTime() );
         msg.addReceiver(equipletAID);

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package productAgent;
+package ProductAgent;
 
 import jade.core.Agent;
 import jade.core.behaviours.SimpleBehaviour;
