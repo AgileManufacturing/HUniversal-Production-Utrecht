@@ -1,7 +1,6 @@
 package productAgent;
 
 import jade.core.AID;
-import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 
@@ -27,6 +26,7 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 	
 	@Override
 	public void action() {
+		// Lets schedule ourself with the equiplet agents in our current list.
 		_productAgent = (ProductAgent) myAgent;
 		ACLMessage msg = myAgent.receive();
 		if (msg != null) {
@@ -43,7 +43,6 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 		else {
 			block();
 		}
-		// Lets schedule ourself with the equiplet agents in our current list.
 	}
 
 	/**
@@ -57,6 +56,7 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 		
 		//Make connection with database
 		MongoClient mongoClient =null;
+		
 		try {
 			mongoClient = new MongoClient( "localhost" );//145.89.191.131 is hu server
 		} catch (UnknownHostException e) {
@@ -127,14 +127,12 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 		}
 		
 		//set startslot which need to be scheduled
-		int startSlot = 0;
 		FreeTimeSlot freetimeslotEq = null;
 		
 		//calculate freetime slot and asign them to the above intialized values
 		if(freetimes.length > 1){
 			for(int chooseTimeSlot = 1;chooseTimeSlot < freetimes.length; chooseTimeSlot++){
 				if(freetimes[chooseTimeSlot].getStartTime() < freetimes[chooseTimeSlot-1].getStartTime()){
-					startSlot = freetimes[chooseTimeSlot].getStartTime();
 					freetimeslotEq = freetimes[chooseTimeSlot];
 				}
 			}
@@ -151,10 +149,9 @@ public class SchedulerBehaviour extends CyclicBehaviour{
         }
 		
 		//send the message to the equiplet to schedule the timeslot
-		
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setOntology("ScheduleStep");
-        msg.setContent( ""+freetimeslotEq.startTime );
+        msg.setContent( ""+freetimeslotEq.getStartTime() );
         msg.addReceiver(equipletAID);
         
         myAgent.send(msg);
