@@ -33,13 +33,24 @@
 
 package libraries.blackboardJavaClient.src.nl.hu.client;
 
-import com.mongodb.*;
-import com.mongodb.util.JSON;
-import com.mongodb.util.JSONParseException;
-
 import java.util.ArrayList;
 import java.util.List;
+
 import org.bson.types.ObjectId;
+
+import com.mongodb.Bytes;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.mongodb.Mongo;
+import com.mongodb.MongoException;
+import com.mongodb.MongoInterruptedException;
+import com.mongodb.QueryBuilder;
+import com.mongodb.ServerAddress;
+import com.mongodb.WriteResult;
+import com.mongodb.util.JSON;
+import com.mongodb.util.JSONParseException;
 
 /**
  * Client class for a mongodb blackboard.

@@ -16,8 +16,6 @@ package newDataClasses;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import jade.core.AID;
-
 public abstract class Mapper<KT,VT> {
 
 	protected HashMap<KT, ArrayList<VT>> _items;

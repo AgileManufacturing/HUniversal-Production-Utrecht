@@ -13,6 +13,8 @@
  */
 package newDataClasses;
 
+import java.util.List;
+
 
 public class Product {
 	
@@ -49,7 +51,7 @@ public class Product {
 		this._production = production;
 	}
 	
-	public void add(LogMessage[] msg){
+	public void add(List<LogMessage> msg){
 		log.add(msg);
 	}
 }
