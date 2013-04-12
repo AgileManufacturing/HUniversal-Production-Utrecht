@@ -30,6 +30,8 @@
  **/
 package serviceAgent;
 
+import com.mongodb.BasicDBObject;
+
 import equipletAgent.ProductStepMessage;
 import equipletAgent.ServiceStepMessage;
 
@@ -38,6 +40,6 @@ import equipletAgent.ServiceStepMessage;
  *
  */
 public interface Service {
-	public boolean canPerform(ProductStepMessage productStep);
-	public ServiceStepMessage[] getServiceSteps(ProductStepMessage productStep);
+	public boolean canPerform(long productStepType, BasicDBObject parameters);
+	public ServiceStepMessage[] getServiceSteps(long productStepType, BasicDBObject parameters);
 }

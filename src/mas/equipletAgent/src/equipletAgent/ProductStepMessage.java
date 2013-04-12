@@ -29,6 +29,8 @@
  **/
 package equipletAgent;
 
+import java.util.Hashtable;
+
 import jade.core.AID;
 
 import newDataClasses.ParameterList;
@@ -43,18 +45,20 @@ public class ProductStepMessage {
 	public Object inputParts;
 	public Object outputParts;
 	public int status;
+	public Hashtable<String, String> statusData;
 	public ScheduleData scheduleData;
 
 	public ProductStepMessage(AID productAgentId,
 							  Long type, ParameterList parameters,
 							  Object inputParts, Object outputParts,
-							  int status, ScheduleData scheduleData){
+							  int status, Hashtable<String, String> statusData, ScheduleData scheduleData){
 		this.productAgentId = productAgentId;
 		this.type = type;
 		this.parameters = parameters;
 		this.inputParts = inputParts;
 		this.outputParts = outputParts;
 		this.status = status;
+		this.statusData = statusData;
 		this.scheduleData = scheduleData;
 	}
 }

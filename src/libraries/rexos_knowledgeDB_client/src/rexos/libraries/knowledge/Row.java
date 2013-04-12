@@ -25,8 +25,7 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-
-package KnowledgeDBClient;
+package rexos.libraries.knowledge;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -44,7 +43,7 @@ public class Row {
      *
      * A hashmap containing the row data with column name as keys and values as object.
      **/
-    private HashMap<String, Object> row;
+    private final HashMap<String, Object> row;
 
     /**
      * A constructor for constructing a row from a ResultSet.
@@ -86,7 +85,7 @@ public class Row {
      **/
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("Row { ");
+        StringBuilder builder = new StringBuilder("rexos.libraries.knowledge.Row { ");
         for (Map.Entry<String, Object> entry : row.entrySet()) {
             builder.append(entry.getKey());
             builder.append('=');
