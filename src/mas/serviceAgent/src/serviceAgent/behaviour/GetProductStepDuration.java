@@ -1,30 +1,20 @@
 package serviceAgent.behaviour;
 
 import jade.core.Agent;
-import jade.core.behaviours.OneShotBehaviour;
-import jade.core.behaviours.SenderBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 
-import java.io.IOException;
-import java.util.Hashtable;
-
-import newDataClasses.ScheduleData;
 import nl.hu.client.BlackboardClient;
 import nl.hu.client.GeneralMongoException;
 import nl.hu.client.InvalidDBNamespaceException;
-import nl.hu.client.InvalidJSONException;
 
 import org.bson.types.ObjectId;
 
 import serviceAgent.Service;
-import serviceAgent.ServiceAgent;
 import serviceAgent.behaviour.CanDoProductStep.DummyService;
 
 import behaviours.ReceiveBehaviour;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.mongodb.BasicDBObject;
 
 import equipletAgent.ServiceStepMessage;
@@ -68,6 +58,6 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 				.get("parameters");
 		
 		ServiceStepMessage[] serviceSteps = service.getServiceSteps(productStepType, parameters);
-		getAgent().addBehaviour(new GetServiceDurationBehaviour(getAgent(), serviceSteps));
+		getAgent().addBehaviour(new GetServiceDuration(getAgent(), client, serviceSteps));
 	}
 }

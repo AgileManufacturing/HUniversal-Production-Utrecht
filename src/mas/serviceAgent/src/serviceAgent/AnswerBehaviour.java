@@ -9,13 +9,10 @@ import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 
 import newDataClasses.ScheduleData;
-import nl.hu.client.BlackboardClient;
 import nl.hu.client.GeneralMongoException;
 import nl.hu.client.InvalidDBNamespaceException;
-import nl.hu.client.InvalidJSONException;
 
 import org.bson.types.ObjectId;
-
 
 import com.google.gson.Gson;
 import com.mongodb.BasicDBObject;
@@ -49,9 +46,8 @@ public class AnswerBehaviour extends CyclicBehaviour {
 			if (content != null) {
 				switch (message.getOntology()) {
 				case "CanDoProductionStep":
-					boolean isAble = agent.getStepTypes()
-							.containsKey(((Integer) productionStep
-									.get("type")).longValue());
+					boolean isAble = agent.getStepTypes().containsKey(
+							((Integer) productionStep.get("type")).longValue());
 					reply.setContent("" + isAble);
 					try {
 						reply.setContentObject(content);
@@ -71,8 +67,8 @@ public class AnswerBehaviour extends CyclicBehaviour {
 
 						StringBuilder strBuilder = new StringBuilder(
 								"Production step:\n");
-						agent.printDBObjectPretty(productionStep, "    ", "    ",
-								strBuilder);
+						agent.printDBObjectPretty(productionStep, "    ",
+								"    ", strBuilder);
 						System.out.format("%s can do step %s%n",
 								agent.getLocalName(), strBuilder);
 					} else {
@@ -82,16 +78,16 @@ public class AnswerBehaviour extends CyclicBehaviour {
 
 						StringBuilder strBuilder = new StringBuilder(
 								"Production step:\n");
-						agent.printDBObjectPretty(productionStep, "    ", "    ",
-								strBuilder);
+						agent.printDBObjectPretty(productionStep, "    ",
+								"    ", strBuilder);
 						System.out.format("%s cannot do step %s%n",
 								agent.getLocalName(), strBuilder);
 					}
 					break;
 				case "GetProductionStepDuration":
 					int duration = 0;
-					for (String service : agent.getStepTypes()
-							.get(((Integer) (productionStep.get("type")))
+					for (String service : agent.getStepTypes().get(
+							((Integer) (productionStep.get("type")))
 									.longValue())) {
 						duration += agent.getServices().get(service);
 					}
@@ -102,19 +98,15 @@ public class AnswerBehaviour extends CyclicBehaviour {
 					Gson gson = new Gson();
 					productionStep.put("scheduleData", scheduleData);
 					try {
-						agent.getProductionStepBBClient()
-								.updateDocuments(
-										new BasicDBObject("_id",
-												productionStep.get("_id")),
-										new BasicDBObject(
-												"$set",
-												new BasicDBObject(
-														"scheduleData",
-														BlackboardClient
-																.parseJSONWithCheckException(gson
-																		.toJson(scheduleData)))));
+						agent.getProductionStepBBClient().updateDocuments(
+								new BasicDBObject("_id",
+										productionStep.get("_id")),
+								new BasicDBObject("$set", new BasicDBObject(
+										"scheduleData", gson.fromJson(
+												gson.toJson(scheduleData),
+												ScheduleData.class))));
 					} catch (InvalidDBNamespaceException
-							| GeneralMongoException | InvalidJSONException e) {
+							| GeneralMongoException e) {
 						e.printStackTrace();
 						agent.doDelete();
 					}

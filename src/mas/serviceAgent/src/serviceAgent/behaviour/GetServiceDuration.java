@@ -41,7 +41,6 @@ import com.mongodb.DBObject;
 import nl.hu.client.BlackboardClient;
 import nl.hu.client.GeneralMongoException;
 import nl.hu.client.InvalidDBNamespaceException;
-import nl.hu.client.InvalidJSONException;
 import equipletAgent.ServiceStepMessage;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
@@ -51,7 +50,7 @@ import jade.lang.acl.ACLMessage;
  * @author Peter
  * 
  */
-public class GetServiceDurationBehaviour extends OneShotBehaviour {
+public class GetServiceDuration extends OneShotBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	private BlackboardClient client;
@@ -60,7 +59,7 @@ public class GetServiceDurationBehaviour extends OneShotBehaviour {
 	/**
 	 * @param a
 	 */
-	public GetServiceDurationBehaviour(Agent a, BlackboardClient client,
+	public GetServiceDuration(Agent a, BlackboardClient client,
 			ServiceStepMessage[] serviceSteps) {
 		super(a);
 		this.client = client;
@@ -76,19 +75,18 @@ public class GetServiceDurationBehaviour extends OneShotBehaviour {
 		agent.addBehaviour(new GetServiceStepDuration(agent, client));
 		try {
 			for (ServiceStepMessage serviceStep : serviceSteps) {
-				serviceStepId = client.insertDocument(BlackboardClient
-						.<DBObject> parseJSONWithCheckException(gson
-								.toJson(serviceStep)));
+				serviceStepId = client.insertDocument(gson.fromJson(
+						gson.toJson(serviceStep), DBObject.class));
 
 				message = new ACLMessage(ACLMessage.QUERY_IF);
-//				message.addReceiver(r);
-				//TODO add receiver to msg
+				// message.addReceiver(r);
+				// TODO add receiver to msg
 				message.setContentObject(serviceStepId);
 				message.setOntology("GetServiceStepDuration");
 				agent.send(message);
 			}
 		} catch (InvalidDBNamespaceException | GeneralMongoException
-				| InvalidJSONException | IOException e) {
+				| IOException e) {
 			e.printStackTrace();
 		}
 	}
