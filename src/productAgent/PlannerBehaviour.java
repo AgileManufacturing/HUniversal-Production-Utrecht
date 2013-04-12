@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
+import newDataClasses.Product;
 import newDataClasses.Production;
 import newDataClasses.ProductionEquipletMapper;
 import newDataClasses.ProductionStep;

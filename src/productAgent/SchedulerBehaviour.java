@@ -4,6 +4,8 @@ import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 
+import newDataClasses.ProductionStep;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +21,7 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 	private long stepID;
 	private newDataClasses.ProductionStep pStep;
 	
-	public SchedulerBehaviour(long id, newDataClasses.ProductionStep productionstep ){
+	public SchedulerBehaviour(long id, ProductionStep productionstep ){
 		stepID = id;
 		pStep = productionstep;
 	}
