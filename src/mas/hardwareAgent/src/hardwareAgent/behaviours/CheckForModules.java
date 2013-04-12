@@ -74,11 +74,11 @@ public class CheckForModules extends ReceiveBehaviour {
 				}
 				myAgent.send(reply);
 
-				// TODO: check in knowledge database if the requested modules
+				/** checks in knowledge database if the requested modules
 				// are available
 				// if available set performative (ACLMessage.Confirm) else set
 				// performative (ACLMessage.Disconfirm)
-
+				**/
 			} catch (UnreadableException e) {
 				// System.out.println("Exception Caught, No Content Object Given");
 			} catch (SQLException e) {
