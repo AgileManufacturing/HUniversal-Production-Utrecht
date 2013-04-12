@@ -35,6 +35,7 @@ public class ProductAgent extends Agent {
 			ib = new InformerBehaviour();
 			PlannerBehaviour pb = new PlannerBehaviour();
 			ProduceBehaviour pbz = new ProduceBehaviour();
+			SocketBehaviour sb = new SocketBehaviour();
 
 			addBehaviour(pb);
 
