@@ -1,6 +1,4 @@
-
-/** 
-* @author Arjen van Zanten
+/**
  * @author Ammar Abdulamir
  * @author Arjen van Zanten
  * @file KnowledgeDBClient.java
