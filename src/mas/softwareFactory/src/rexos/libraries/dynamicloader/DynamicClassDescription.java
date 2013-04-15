@@ -1,5 +1,5 @@
 /**
- * @file SoftwareDescription.java
+ * @file DynamicClassDescription.java
  * @brief Contains all information about a piece of software.
  * @date Created: 12 apr. 2013
  *
@@ -27,14 +27,14 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package rexos.mas;
+package rexos.libraries.dynamicloader;
 
 import rexos.libraries.knowledge.Row;
 
 /**
  * Contains all information about a piece of software.
  **/
-public class SoftwareDescription {
+public class DynamicClassDescription {
 	/**
 	 * @var long id
 	 * The ID (corresponding to the Knowledge Database) of this piece of software.
@@ -67,14 +67,14 @@ public class SoftwareDescription {
 
 	
 	/**
-	 * Constructs a new SoftwareDescription object.
+	 * Constructs a new DynamicClassDescription object.
 	 * @param ID The ID (corresponding to the Knowledge Database) of this piece of software.
 	 * @param name The name of this piece of software.
 	 * @param description A description of the software.
 	 * @param className The (fully distinguished) name of the class that represents this object.
 	 * @param jarLocation The location of the jar containing the data for the representing class.
 	 **/
-	public SoftwareDescription(long ID, String name, String description, String className, String jarLocation) {
+	public DynamicClassDescription(long ID, String name, String description, String className, String jarLocation) {
 		this.id = ID;
 		this.name = name;
 		this.description = description;
@@ -83,12 +83,12 @@ public class SoftwareDescription {
 	}
 	
 	/**
-	 * Constructs a new SoftwareDescription object from the given row object.
+	 * Constructs a new DynamicClassDescription object from the given row object.
 	 * @param row The row object containing the information for the to be created object.
-	 * @return A SoftwareDescription object based on the data contained in the row.
+	 * @return A DynamicClassDescription object based on the data contained in the row.
 	 **/
-	public static SoftwareDescription createFromRow(Row row) {
-		return new SoftwareDescription(
+	public static DynamicClassDescription createFromRow(Row row) {
+		return new DynamicClassDescription(
 				(long)row.get("id"),
 				(String)row.get("name"),
 				(String)row.get("description"),
@@ -165,7 +165,7 @@ public class SoftwareDescription {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SoftwareDescription other = (SoftwareDescription) obj;
+		DynamicClassDescription other = (DynamicClassDescription) obj;
 		if (id != other.id)
 			return false;
 		if (className == null) {

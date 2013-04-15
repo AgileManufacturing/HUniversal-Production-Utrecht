@@ -1,6 +1,6 @@
 /**
- * @file SoftwareClassLoader.java
- * @brief Custom class loader for classes in the rexos.mas.software namespace.
+ * @file DynamicClassLoader.java
+ * @brief Custom class loader.
  * @date Created: 12 apr. 2013
  *
  * @author Jan-Willem Willebrands
@@ -27,19 +27,14 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package rexos.mas;
+package rexos.libraries.dynamicloader;
 
 import java.util.HashMap;
 
 /**
- * Custom class loader for classes in the rexos.mas.software namespace.
+ * Custom class loader.
  **/
-public class SoftwareClassLoader extends ClassLoader {
-	/**
-	 * @var String SOFTWARE_ROOT_NAMESPACE
-	 * The root namespace of classes that will be loaded by this loader.
-	 **/
-	private static final String SOFTWARE_ROOT_NAMESPACE = "rexos.mas.software";
+public class DynamicClassLoader extends ClassLoader {
 	
 	/**
 	 * @var HashMap<String,byte[]> registeredClasses
@@ -48,10 +43,10 @@ public class SoftwareClassLoader extends ClassLoader {
 	HashMap<String, byte[]> registeredClasses;
 	
 	/**
-	 * Constructs a new SoftwareClassLoader object.
+	 * Constructs a new DynamicClassLoader object.
 	 * @param parent The parent class loader that should be used.
 	 **/
-	public SoftwareClassLoader(ClassLoader parent) {
+	public DynamicClassLoader(ClassLoader parent) {
 		super(parent);
 		registeredClasses = new HashMap<String, byte[]>();
 	}
@@ -76,13 +71,12 @@ public class SoftwareClassLoader extends ClassLoader {
 	
 	/**
 	 * Attempts to load the class corresponding to the given name.
-	 * This will only load classes that fall within SOFTWARE_ROOT_NAMESPACE.
 	 * @param name The name of the class
 	 * @return The resulting Class object.
 	 * @see java.lang.ClassLoader#loadClass(java.lang.String)
 	 **/
 	public Class<?> loadClass(String name) throws ClassNotFoundException {
-		if (!name.startsWith(SOFTWARE_ROOT_NAMESPACE) || !registeredClasses.containsKey(name)) {
+		if (!registeredClasses.containsKey(name)) {
 			return super.loadClass(name);
 		}
 		

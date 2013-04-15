@@ -1,5 +1,5 @@
 /**
- * @file SoftwareFactory.java
+ * @file DynamicClassFactory.java
  * @brief Generic class for loading class data from a remote server based on a description.
  * @date Created: 12 apr. 2013
  *
@@ -27,37 +27,37 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package rexos.mas;
+package rexos.libraries.dynamicloader;
 
 import java.util.Hashtable;
 
 /**
  * Generic class for loading class data from a remote server based on a description.
  **/
-public class SoftwareFactory<T> {
+public class DynamicClassFactory<T> {
 	/**
-	 * @var Hashtable<Long, SoftwareData> softwareCache
-	 * A cache holding the SofwareData for each id.
+	 * @var Hashtable<Long, DynamicClassData> softwareCache
+	 * A cache holding the DynamicClassData for each id.
 	 **/
-	private Hashtable<Long, SoftwareData>softwareCache;
+	private Hashtable<Long, DynamicClassData>softwareCache;
 	
 	/**
-	 * Constructs a new SoftwareFactory.
+	 * Constructs a new DynamicClassFactory.
 	 **/
-	public SoftwareFactory() {
-		softwareCache = new Hashtable<Long, SoftwareData>();
+	public DynamicClassFactory() {
+		softwareCache = new Hashtable<Long, DynamicClassData>();
 	}
 	
 	/**
-	 * Returns a SoftwareClassLoader for the given description.
-	 * @param description SoftwareDescription containing the relevant information for the software.
-	 * @return A SoftwareClassLoader that is able to create an object for the given description.
-	 * @throws SoftwareLoadException No loader could be created.
+	 * Returns a DynamicClassLoader for the given description.
+	 * @param description DynamicClassDescription containing the relevant information for the software.
+	 * @return A DynamicClassLoader that is able to create an object for the given description.
+	 * @throws InstantiateClassException No loader could be created.
 	 **/
-	private SoftwareClassLoader getClassLoader(SoftwareDescription description) throws SoftwareLoadException {
-		SoftwareData entry = softwareCache.get(description.getId());
+	private DynamicClassLoader getClassLoader(DynamicClassDescription description) throws InstantiateClassException {
+		DynamicClassData entry = softwareCache.get(description.getId());
 		if (entry == null) {
-			entry = new SoftwareData(description);
+			entry = new DynamicClassData(description);
 			softwareCache.put(description.getId(), entry);
 		}
 		
@@ -66,21 +66,21 @@ public class SoftwareFactory<T> {
 	
 	/**
 	 * Attempts to instantiate an object of the class specified in the description.
-	 * @param description SoftwareDescription containing the relevant information for the software.
+	 * @param description DynamicClassDescription containing the relevant information for the software.
 	 * @return An object of the class specified in the description.
-	 * @throws SoftwareLoadException The object of the specified class could not be instantiated.
+	 * @throws InstantiateClassException The object of the specified class could not be instantiated.
 	 *
 	 **/
-	public T createObjectFromDescription(SoftwareDescription description) throws SoftwareLoadException {
+	public T createObjectFromDescription(DynamicClassDescription description) throws InstantiateClassException {
 		try {
-			SoftwareClassLoader loader = getClassLoader(description);
+			DynamicClassLoader loader = getClassLoader(description);
 			Class<?> cls = loader.loadClass(description.getClassName());
 			
 			@SuppressWarnings("unchecked")
 			T obj = (T)cls.newInstance();
 			return obj;
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-			throw new SoftwareLoadException("Failed to instantiate object of class " + description.getClassName(), ex);
+			throw new InstantiateClassException("Failed to instantiate object of class " + description.getClassName(), ex);
 		}
 	}
 }

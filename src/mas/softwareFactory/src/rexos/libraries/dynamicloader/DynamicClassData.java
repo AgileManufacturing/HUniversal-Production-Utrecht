@@ -1,5 +1,5 @@
 /**
- * @file SoftwareData.java
+ * @file DynamicClassData.java
  * @brief Contains all data required to instantiate an object of a class.
  * @date Created: 13 apr. 2013
  *
@@ -27,7 +27,7 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package rexos.mas;
+package rexos.libraries.dynamicloader;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -41,7 +41,7 @@ import java.util.jar.JarFile;
 /**
  * Contains all data required to instantiate an object of a class.
  **/
-class SoftwareData {
+class DynamicClassData {
 	/**
 	 * @var boolean loaderNeedsRefresh
 	 * Indicates whether or not the class data has changed since creating the last SoftwareClassLoader.
@@ -58,7 +58,7 @@ class SoftwareData {
 	 * @var SoftwareDescription description
 	 * Description of the class represented by this SoftwareData object.
 	 **/
-	private SoftwareDescription description;
+	private DynamicClassDescription description;
 	
 	/**
 	 * @var byte[] classData
@@ -68,23 +68,23 @@ class SoftwareData {
 	
 	/**
 	 * @var SoftwareClassLoader loader
-	 * Current instance of the SoftwareClassLoader for this class.
+	 * Current instance of the DynamicClassLoader for this class.
 	 **/
-	private SoftwareClassLoader loader;
+	private DynamicClassLoader loader;
 	
 	/**
 	 * Construct an object for the given description.
-	 * @param description SoftwareDescription describing the class.
+	 * @param description DynamicClassDescription describing the class.
 	 **/
-	public SoftwareData(SoftwareDescription description) {
+	public DynamicClassData(DynamicClassDescription description) {
 		this.description = description;
 	}
 	
 	/**
-	 * Returns the SoftwareDescription for this object.
-	 * @return the SoftwareDescription for this object.
+	 * Returns the DynamicClassDescription for this object.
+	 * @return the DynamicClassDescription for this object.
 	 **/
-	public SoftwareDescription getDescription() {
+	public DynamicClassDescription getDescription() {
 		return description;
 	}
 
@@ -101,20 +101,20 @@ class SoftwareData {
 	 * Attempts to return a classloader for the latest classdata.
 	 * If updating the class data fails for whatever reason, a loader for the previous version is returned if available.
 	 * @return A SoftwareClassLoader for the class represented by this object.
-	 * @throws SoftwareLoadException Retrieving the class data failed.
+	 * @throws InstantiateClassException Retrieving the class data failed.
 	 **/
-	public SoftwareClassLoader getLoader() throws SoftwareLoadException {
+	public DynamicClassLoader getLoader() throws InstantiateClassException {
 		// Attempt to update the class data.
 		// If an error occurs but a previous version is in cache, use that instead.
 		try {
 			updateClassData();
 		} catch (IOException ex) {
 			if (getLastModified() != 0) {
-				throw new SoftwareLoadException("Failed to retrieve software.", ex);
+				throw new InstantiateClassException("Failed to retrieve software.", ex);
 			}
 		}
 		if (classDataChanged) {
-			setLoader(new SoftwareClassLoader(SoftwareData.class.getClassLoader()));
+			setLoader(new DynamicClassLoader(DynamicClassData.class.getClassLoader()));
 			loader.registerClass(description.getClassName(), classData);
 			classDataChanged = false;
 		}
@@ -135,7 +135,7 @@ class SoftwareData {
 	 * Sets the description that will be used for this object.
 	 * @param description The description that will be used for this object.
 	 **/
-	public void setDescription(SoftwareDescription description) {
+	public void setDescription(DynamicClassDescription description) {
 		this.description = description;
 		this.lastModified = 0;
 		classDataChanged = true;
@@ -151,9 +151,9 @@ class SoftwareData {
 	
 	/**
 	 * Sets the loader for this object.
-	 * @param loader SoftwareClassLoader capable of instantiating an object for the lastest version of the represented class.
+	 * @param loader DynamicClassLoader capable of instantiating an object for the lastest version of the represented class.
 	 **/
-	private void setLoader(SoftwareClassLoader loader) {
+	private void setLoader(DynamicClassLoader loader) {
 		this.loader = loader;
 	}
 	

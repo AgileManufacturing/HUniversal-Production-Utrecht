@@ -1,5 +1,5 @@
 /**
- * @file SoftwareLoadException.java
+ * @file InstantiateClassException.java
  * @brief Thrown when a request to instantiate an object has failed.
  * @date Created: 13 apr. 2013
  *
@@ -27,12 +27,12 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package rexos.mas;
+package rexos.libraries.dynamicloader;
 
 /**
  * Thrown when a request to instantiate an object has failed.
  **/
-public class SoftwareLoadException extends Exception {
+public class InstantiateClassException extends Exception {
 	/**
 	 * @var long serialVersionUID
 	 * The serial version UID for this class.
@@ -44,7 +44,7 @@ public class SoftwareLoadException extends Exception {
 	 * @param msg Message describing what caused the exception.
 	 * @param cause The cause of this exception.
 	 **/
-	public SoftwareLoadException(String msg, Throwable cause) {
+	public InstantiateClassException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 }
