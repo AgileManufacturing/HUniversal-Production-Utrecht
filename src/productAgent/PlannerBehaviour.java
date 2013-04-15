@@ -41,8 +41,7 @@ public class PlannerBehaviour extends OneShotBehaviour {
 		public void action() {
 			try {
 				_productAgent = (ProductAgent) myAgent;
-				BlackboardClient bbc = new BlackboardClient("145.89.191.131",
-						27017);
+				BlackboardClient bbc = new BlackboardClient("145.89.191.131",27017);
 				bbc.setDatabase("CollectiveDb");
 				bbc.setCollection("EquipletDirectory");
 				
