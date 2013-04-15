@@ -40,18 +40,73 @@ import newDataClasses.ScheduleData;
 /**
  * Implementation of a message for the productstep blackboard
  */
-public class ProductStepMessage {
+public class ProductStepMessage implements Serializable{
+	/**
+	 * @var static final long serialVersionUID
+	 * The serial version uid for this class.
+	 */
 	private static final long serialVersionUID = 1L;
 	
+	/**
+	 * @var AID productAgentId
+	 * The AID of the productAgent linked to this product step.
+	 */
 	private AID productAgentId;
+	
+	/**
+	 * @var long type
+	 * The type of the product step
+	 */
 	private long type;
+	
+	/**
+	 * @var ParameterList parameters
+	 * The parameterlist for this product step.
+	 */
 	private ParameterList parameters;
+	
+	/**
+	 * @var Object inputParts
+	 * The input parts needed for this product step.
+	 */
 	private Object inputParts;
+	
+	/**
+	 * @var Object outputParts
+	 * The result parts for this product step.
+	 */
 	private Object outputParts;
+	
+	/**
+	 * @var StepStatusCode status
+	 * The status for this product step.
+	 */
 	private StepStatusCode status;
+	
+	/**
+	 * @var HashMap<String, String> statusData
+	 * The extra data provided by the status for this product step.
+	 */
 	private HashMap<String, String> statusData;
+	
+	/**
+	 * @var ScheduleData scheduleData
+	 * The schedule for this product step.
+	 */
 	private ScheduleData scheduleData;
 
+	/**
+	 * The constructor for the product step entry.
+	 * 
+	 * @param productAgentId - AID of the product agent linked to the product step 
+	 * @param type - The type of the product step
+	 * @param parameters - The parameters for the product step
+	 * @param inputParts - The input parts for the product step
+	 * @param outputParts - The output parts for the product step
+	 * @param status - The status for the product step
+	 * @param statusData - The additional data for the status
+	 * @param scheduleData - The schedule data
+	 */
 	public ProductStepMessage(AID productAgentId, long type,
 			ParameterList parameters, Object inputParts, Object outputParts,
 			StepStatusCode status, HashMap<String, String> statusData, ScheduleData scheduleData) {
@@ -65,6 +120,11 @@ public class ProductStepMessage {
 		this.scheduleData = scheduleData;
 	}
 
+	/**
+	 * Function to check if this productstep equals to another object.
+	 * 
+	 * @param obj - The object to compare with
+	 */
 	public boolean equals(Object obj) {
 		if (obj == null)
 			return false;

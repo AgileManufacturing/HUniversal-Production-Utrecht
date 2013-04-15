@@ -31,7 +31,6 @@
 package behaviours;
 
 import jade.core.Agent;
-import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 /**

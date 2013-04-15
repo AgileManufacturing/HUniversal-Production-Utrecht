@@ -4,20 +4,13 @@
  */
 package jadeagentx;
 
-import equipletAgent.EquipletAgent;
-import serviceAgent.ServiceAgent;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.OneShotBehaviour;
-import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.Hashtable;
 
 import newDataClasses.Parameter;
 import newDataClasses.ParameterGroup;

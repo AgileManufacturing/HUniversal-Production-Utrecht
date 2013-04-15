@@ -9,8 +9,6 @@ import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
-import behaviours.*;
-
 import jade.core.Agent;
 import newDataClasses.DbData;
 import nl.hu.client.BasicOperationSubscription;
