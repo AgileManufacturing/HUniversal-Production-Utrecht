@@ -421,7 +421,12 @@ public class BlackboardClient {
 		subscriptions.add(sub);
 		
 		// Attempt to create a new thread for the current subscriptions.
-		return createNewMonitorThread();
+		boolean creationSuccessfull = createNewMonitorThread();
+		if (!creationSuccessfull) {
+			subscriptions.remove(sub);
+		}
+		
+		return creationSuccessfull;
 	}
 	
 	/**
