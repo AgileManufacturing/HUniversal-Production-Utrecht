@@ -1,109 +1,35 @@
 package productAgent;
 
+import java.util.HashMap;
+
+import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
-import jade.core.behaviours.ParallelBehaviour;
-import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.SequentialBehaviour;
-import jade.core.behaviours.ThreadedBehaviourFactory;
-import jade.lang.acl.ACLMessage;
+import newDataClasses.ProductionStep;
 
 @SuppressWarnings("serial")
-public class OverviewBehaviour extends CyclicBehaviour {
-	int state = 0;
-	PlannerBehaviour planBehav = new PlannerBehaviour();
-	InformerBehaviour infoBehav = new InformerBehaviour();
-	SchedulerBehaviour schedBehav = new SchedulerBehaviour();
-	ProduceBehaviour prodBehav = new ProduceBehaviour();
-	private ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
-	ACLMessage msg;
-	/*
-	private class receiveMsgBehaviour extends CyclicBehaviour {
-		ParallelBehaviour par;
-		
-		private receiveMsgBehaviour(){
-			par = new ParallelBehaviour(
-					ParallelBehaviour.WHEN_ALL);
-		}
-		
-		@Override
-		public void action() {
-			ACLMessage msg = myAgent.receive();
-			if (msg != null) {
-				WaitMsgBehaviour behaviour = new WaitMsgBehaviour(msg);
-				par.addSubBehaviour(behaviour);
-			} else {
-				block();
-			}
-			myAgent.addBehaviour(par);
-		}
-
-	}
-	
-	private class WaitMsgBehaviour extends OneShotBehaviour {
-		ACLMessage msg;
-
-		public WaitMsgBehaviour(ACLMessage msg) {
-			this.msg = msg;
-		}
-	
-		public void action(){
-			try {
-				switch(msg.getOntology()){
-					case "planningBehaviour":
-						final OneShotBehaviour osbPlan = new OneShotBehaviour(){
-							public void action(){
-								myAgent.addBehaviour(tbf.wrap(osbPlan));					
-							}
-						};	
-					case "informerBehaviour":
-						final OneShotBehaviour osbInfo = new OneShotBehaviour(){
-							public void action(){
-								myAgent.addBehaviour(tbf.wrap(osbInfo));					
-							}
-						};	
-					case "schedulerBehaviour":
-						final OneShotBehaviour osbSched = new OneShotBehaviour(){
-							public void action(){
-								myAgent.addBehaviour(tbf.wrap(osbSched));					
-							}
-						};	
-					case "produceBehaviour":
-						final OneShotBehaviour osbProd = new OneShotBehaviour(){
-							public void action(){
-								myAgent.addBehaviour(tbf.wrap(osbProd));					
-							}
-						};	
-					case "waiting":
-						
-					case "reschedule":
-						
-					default:
-						return;
-					}
-				}catch(Exception e){
-					System.out.println("" + e);
-				}
-			}
-		}
-			/*changeBehaviour(1);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}*/
-public class OverviewBehaviour extends Behaviour {
-	private ThreadedBehaviourFactory _tbf;
+public class OverviewBehaviour extends OneShotBehaviour {
 	private ProductAgent _productAgent;
-	private int _currentState;
+	private boolean _isDone;
+	// private ThreadedBehaviourFactory _pbf;
 
-	/* Behaviours */
+	/* Behaviour */
 	private PlannerBehaviour _plannerBehaviour;
+	private InformerBehaviour _informerBehaviour;
 	private SchedulerBehaviour _schedulerBehaviour;
+	private ProduceBehaviour _produceBehaviour;
+	private SequentialBehaviour _sequentialBehaviour;
 
 	public OverviewBehaviour() {
-		_tbf = new ThreadedBehaviourFactory();
-		_productAgent = (ProductAgent) myAgent;
+		System.out.println("New overview behaviour created.");
 	}
 
+	/*
+	 * (non-Javadoc) This behaviour should have 2 parallel sub-behaviours. One
+	 * where the normal flow ( plan, inform, schedule, produce ) is follow, and
+	 * one where is listend for incoming msgs.
+	 */
 	@Override
 	public void action() {
 		SequentialBehaviour s = new SequentialBehaviour();
@@ -121,28 +47,28 @@ public class OverviewBehaviour extends Behaviour {
 			case 0: // planner
 				final OneShotBehaviour osbPlan = new OneShotBehaviour(){
 					public void action(){
-						myAgent.addBehaviour(tbf.wrap(osbPlan));					
+						//myAgent.addBehaviour(tbf.wrap(osbPlan));					
 					}
 				};				
 				break;
 			case 1: // informer
 				final OneShotBehaviour osbInfo = new OneShotBehaviour(){
 					public void action(){
-						myAgent.addBehaviour(tbf.wrap(osbInfo));
+						//myAgent.addBehaviour(tbf.wrap(osbInfo));
 					}
 				};				
 				break;
 			case 2: // scheduler
 				final OneShotBehaviour osbSched = new OneShotBehaviour(){
 					public void action(){
-						myAgent.addBehaviour(tbf.wrap(osbSched));
+						//myAgent.addBehaviour(tbf.wrap(osbSched));
 					}
 				};
 				break;
 			case 3: // production
 				final OneShotBehaviour osbProd = new OneShotBehaviour(){
 					public void action(){
-						myAgent.addBehaviour(tbf.wrap(osbProd));			
+						//myAgent.addBehaviour(tbf.wrap(osbProd));			
 					}
 				};
 				break;
@@ -157,7 +83,7 @@ public class OverviewBehaviour extends Behaviour {
 	// Reschedule
 	public void reschedule(){
 		// reschedule from the given step, step represents the point at which the production has to be resumed
-	private void changeBehaviour(int state) {
+	/*private void changeBehaviour(int state) {
 		switch (state) {
 		case 0: // Planner
 			break;
@@ -169,21 +95,61 @@ public class OverviewBehaviour extends Behaviour {
 			break;
 		default: // Listening for other msgs
 			return;
-		}
-	}
+		}*/
+	
+		_productAgent = (ProductAgent) myAgent;
 
-	/* (non-Javadoc)
-	 * @see jade.core.behaviours.Behaviour#done()
-	 */
-	@Override
-	public boolean done() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+		System.out.println("Lets add a Sequential");
+		_sequentialBehaviour = new SequentialBehaviour();
+		_productAgent.addBehaviour(_sequentialBehaviour);
+
+		System.out.println("Lets add a plannerbehaviour");
+		_sequentialBehaviour.addSubBehaviour(new PlannerBehaviour());
+
+		System.out.println("Lets add a Informer");
+		_informerBehaviour = new InformerBehaviour();
+		_sequentialBehaviour.addSubBehaviour(_informerBehaviour);
+
+		// we need to wait till all conv. of the informer are done. We dont want
+		// to block, but do want to wait.
+		_sequentialBehaviour.addSubBehaviour(new CyclicBehaviour(){
 			@Override
 			public void action() {
 				// TODO Auto-generated method stub
-				
+				if(_informerBehaviour.isDone()){
+					_sequentialBehaviour.removeSubBehaviour(this);
+				}
 			}
+			
+		});
+
+		_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour() {
+			@Override
+			public void action() {
+				for (ProductionStep stp : _productAgent.getProduct()
+						.getProduction().getProductionSteps()) {
+					System.out.println("ProductionStep " + stp.getId()
+							+ " has Equiplets; \n");
+
+					for (AID aid : _productAgent.getProduct().getProduction()
+							.getProductionEquipletMapping()
+							.getEquipletsForProductionStep(stp.getId()).keySet()) {
+						System.out.println("Eq localname: "
+								+ aid.getLocalName() + " AID: " + aid + "\n");
+					}
+				}
+			}
+		});
+
+		System.out.println("Lets add a Scheduler");
+		// _schedulerBehaviour = new SchedulerBehaviour();
+		// _sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
+
+		System.out.println("Lets add a produce");
+		// _produceBehaviour = new ProduceBehaviour();
+		// _sequentialBehaviour.addSubBehaviour(_produceBehaviour);
+
+		System.out
+				.println("Added all behaviours. And everything should start. Aw yeah!");
 	}
 }

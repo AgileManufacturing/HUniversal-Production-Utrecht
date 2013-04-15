@@ -2,21 +2,20 @@ package productAgent;
 
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
+
 import java.util.List;
+
 import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
 import newDataClasses.Product;
 import newDataClasses.Production;
 import newDataClasses.ProductionEquipletMapper;
 import newDataClasses.ProductionStep;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
+
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
 @SuppressWarnings("serial")
 public class PlannerBehaviour extends OneShotBehaviour {
-	private AID _aid;
-
 	private ProductAgent _productAgent;
 
 	public void plannerBehaviour(){}
@@ -30,24 +29,22 @@ public class PlannerBehaviour extends OneShotBehaviour {
 		// convert the AID to the desired dbObject
 		//bbc.removeDocuments(); // add the desired dbObject as param.
 	}
-		public void action() {
+		/*public void action() {
 			ProductAgent _productAgent = null;
 			final String ConversationId = _productAgent.generateCID();
 			final MessageTemplate template = MessageTemplate
 					.MatchConversationId(ConversationId);
-			_productAgent = (ProductAgent) myAgent;
+
+			public PlannerBehaviour() {
+	}*/
+
+		public void action() {
 			try {
-				ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-				message.setConversationId(ConversationId);
-				message.addReceiver(_aid);
-				message.setOntology("planningBehaviour");
-				_productAgent.send(message);
-				
-				
-				BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
+				_productAgent = (ProductAgent) myAgent;
+				BlackboardClient bbc = new BlackboardClient("145.89.191.131",
+						27017);
 				bbc.setDatabase("CollectiveDb");
 				bbc.setCollection("EquipletDirectory");
-				
 				
 				Product product = this._productAgent.getProduct();
 				Production production = product.getProduction();
@@ -62,19 +59,41 @@ public class PlannerBehaviour extends OneShotBehaviour {
 					DBObject equipletCapabilityQuery = QueryBuilder.start("capabilities").is(PA_capability).get();
 					List<DBObject> testData = bbc.findDocuments(equipletCapabilityQuery);
 					
-					for(DBObject db : testData) {
-						String aid = (String)db.get("AID").toString();
-						pem.addEquipletToProductionStep(PA_id, new AID(aid, true));
+					
+					Product product1 = this._productAgent.getProduct();
+					Production production1 = product1.getProduction();
+					ProductionStep[] psa1 = production1.getProductionSteps();
+					
+					ProductionEquipletMapper pem1 = production1.getProductionEquipletMapping();
+					
+					for (ProductionStep ps1 : psa1) {
+						long PA_id1 = ps1.getId();
+						long PA_capability1 = ps1.getCapability();
+						
+						DBObject equipletCapabilityQuery1 = QueryBuilder.start("capabilities").is(PA_capability1).get();
+						List<DBObject> testData1 = bbc.findDocuments(equipletCapabilityQuery1);
+						
+						for(DBObject db : testData1) {
+							String aid = (String)db.get("AID").toString();
+							pem1.addEquipletToProductionStep(PA_id1, new AID(aid, true));
+						}
+	
+					for(DBObject db : testData1) {
+						DBObject aid = (DBObject)db.get("db");
+						String name = (String)aid.get("name").toString();
+						pem1.addEquipletToProductionStep(PA_id1, new AID(name, AID.ISLOCALNAME));
 					}
+	
+					System.out.println("Doing planner for productionstep " + ps1.getId());
 				}
 				
-				production.setProductionEquipletMapping(pem);
-				product.setProduction(production);
-				this._productAgent.setProduct(product);
+				production1.setProductionEquipletMapping(pem1);
+				product1.setProduction(production1);
+				this._productAgent.setProduct(product1);
+				}
 	
-			} catch (Exception e) {
-				System.out.println("Exception");
-			}		
-		}
+			}catch (Exception e) {
+				System.out.println("Exception planner " + e);
+			}
 	}
-
+}

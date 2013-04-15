@@ -11,6 +11,7 @@ import newDataClasses.ProductionStep;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.mongodb.DB;
 import com.mongodb.DBObject;
@@ -38,8 +39,8 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 				
 				for (ProductionStep ps : psa) {
 					long PA_id = ps.getId();
-
-					Scheduler(production.getProductionEquipletMapping().getEquipletsForProductionStep(PA_id));
+					
+					Scheduler(production.getProductionEquipletMapping().getEquipletsForProductionStep(PA_id).keySet(), ps);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -56,8 +57,13 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 	 * @param productionStep
 	 * @throws Exception
 	 */
-	public void Scheduler(ArrayList<AID> equipletList)throws Exception{
+	@SuppressWarnings("null")
+	public void Scheduler(Set<AID> equipletList, ProductionStep productionstep)throws Exception{
 		Schedule[] schedules;
+		ArrayList<AID> equipletlist = null;
+		for(AID i : equipletList){
+		    equipletlist.add(i);
+		}
 		
 		//Make connection with database
 		MongoClient mongoClient =null;
@@ -77,9 +83,9 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 		//extract data of every equiplet their mongoDB to Object Array
 		int scheduleCount = 0;
 		FreeTimeSlot[] freetimes;
-		for(int i = 0; i<equipletList.size();i++){
+		for(int i = 0; i<equipletlist.size();i++){
 			//old name is eq1
-			List<DBObject> data = db.getCollection(equipletList.get(i).getName()).find().toArray();//nameOfCollection should be 'schedule'
+			List<DBObject> data = db.getCollection(equipletlist.get(i).getName()).find().toArray();//nameOfCollection should be 'schedule'
 			scheduleCount += data.size();
 		}
 		
@@ -88,8 +94,8 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 		freetimes = new FreeTimeSlot[scheduleCount];
 		
 		//get every scheduled timeslot of every equiplet
-		for(int extract = 0; extract<equipletList.size();extract++){
-			List<DBObject> data = db.getCollection(equipletList.get(extract).getName()).find().toArray();//nameOfCollection should be 'schedule'
+		for(int extract = 0; extract<equipletlist.size();extract++){
+			List<DBObject> data = db.getCollection(equipletlist.get(extract).getName()).find().toArray();//nameOfCollection should be 'schedule'
 			for(int i = 0; i < data.size(); i++){
 				//debug
 				System.out.println(data.get(i).toString());
@@ -101,7 +107,7 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 				int dur = (int)c;
 				
 				//add scheduled timeslot to array of scheduled timeslots and mention which equiplet
-				schedules[i] = this.new Schedule(stati, dur, equipletList.get(extract).getName());
+				schedules[i] = this.new Schedule(stati, dur, equipletlist.get(extract).getName());
 				
 				//debug
 				System.out.println(schedules[i].toString());
@@ -131,14 +137,18 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 			}
 		}
 		
-		//set startslot which need to be scheduled
+		//Startslot which need to be scheduled
 		FreeTimeSlot freetimeslotEq = null;
+		//number of timeslots to schedule
+		int timeslotsToSchedule = productionstep.getRequiredTimeSlots();
 		
 		//calculate freetime slot and asign them to the above intialized values
 		if(freetimes.length > 1){
 			for(int chooseTimeSlot = 1;chooseTimeSlot < freetimes.length; chooseTimeSlot++){
-				if(freetimes[chooseTimeSlot].getStartTime() < freetimes[chooseTimeSlot-1].getStartTime()){
-					freetimeslotEq = freetimes[chooseTimeSlot];
+				if(freetimes[chooseTimeSlot].getDuration() <= timeslotsToSchedule){
+					if(freetimes[chooseTimeSlot].getStartTime() < freetimes[chooseTimeSlot-1].getStartTime()){
+						freetimeslotEq = freetimes[chooseTimeSlot];
+					}
 				}
 			}
 		}
@@ -146,10 +156,11 @@ public class SchedulerBehaviour extends CyclicBehaviour{
 		//init AID
 		AID equipletAID =null;
 		//get the equiplet from the timeslot
-		for (int i=0; i<equipletList.size();i++)
+		for (int i=0; i<equipletlist.size();i++)
         {
-            if(equipletList.get(i).getName().equals(freetimeslotEq.getEquipletName())){
-            	equipletAID = equipletList.get(i);
+			
+            if(equipletlist.get(i).getName().equals(freetimeslotEq.getEquipletName())){
+            	equipletAID = equipletlist.get(i);
             }
         }
 		

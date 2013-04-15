@@ -13,11 +13,8 @@ public class sideOverviewBehaviour extends CyclicBehaviour {
 	ProductAgent pa = new ProductAgent();
 	
 	private class receiveMsgBehaviour extends CyclicBehaviour {
-		ParallelBehaviour par;
 		
 		private receiveMsgBehaviour(){
-			par = new ParallelBehaviour(
-					ParallelBehaviour.WHEN_ALL);
 		}
 		
 		@Override
@@ -25,11 +22,9 @@ public class sideOverviewBehaviour extends CyclicBehaviour {
 			ACLMessage msg = myAgent.receive();
 			if (msg != null) {
 				WaitMsgBehaviour behaviour = new WaitMsgBehaviour(msg);
-				par.addSubBehaviour(behaviour);
 			} else {
 				block();
 			}
-			myAgent.addBehaviour(par);
 		}
 
 	}
@@ -63,7 +58,7 @@ public class sideOverviewBehaviour extends CyclicBehaviour {
 								pa.rescheduleAndRemoveEquiplet();
 							}
 						};
-						break;
+						break;	
 					default:
 						return;
 					}
