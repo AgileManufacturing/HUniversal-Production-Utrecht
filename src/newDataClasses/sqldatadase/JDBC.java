@@ -43,12 +43,10 @@ public class JDBC {
 
 			
 			// STEP 4: Execute a query
-			System.out.println("Creating database...");
 			stmt = conn.createStatement();
 
 		//	String sql = "CREATE DATABASE STUDENTS";
 		//	stmt.executeUpdate(sql);
-			System.out.println("Database created successfully...");
 		} catch (SQLException se) {
 			// Handle errors for JDBC
 			se.printStackTrace();
@@ -70,6 +68,5 @@ public class JDBC {
 				se.printStackTrace();
 			}
 		}
-		System.out.println("Goodbye!");
 	}
 }

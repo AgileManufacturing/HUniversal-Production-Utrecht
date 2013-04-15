@@ -1,10 +1,7 @@
 package unitTests;
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import jade.domain.introspection.AddedBehaviour;
 import newDataClasses.LogMessage;
 import newDataClasses.ProductLog;
 import newDataClasses.sqldatadase.sqliteDatabase;
