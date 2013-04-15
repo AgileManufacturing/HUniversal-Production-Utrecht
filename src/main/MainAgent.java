@@ -125,7 +125,7 @@ public class MainAgent extends Agent {
 					"ProductAgent.ProductAgent", arg)).start();
 
 		} catch (Exception e) {
-			System.out.println("Exited with: " + e);
+			e.printStackTrace();
 			doDelete();
 		}
 	}

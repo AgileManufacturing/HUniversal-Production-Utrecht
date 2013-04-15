@@ -1,7 +1,5 @@
 package productAgent;
 
-import java.util.HashMap;
-
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
@@ -32,71 +30,6 @@ public class OverviewBehaviour extends OneShotBehaviour {
 	 */
 	@Override
 	public void action() {
-		SequentialBehaviour s = new SequentialBehaviour();
-		
-		s.addSubBehaviour(new PlannerBehaviour());
-		s.addSubBehaviour(new InformerBehaviour());
-		s.addSubBehaviour(new SchedulerBehaviour());
-		s.addSubBehaviour(new ProduceBehaviour());
-		
-		myAgent.addBehaviour(s);
-	}
-	// Change behaviour
-	public void changeBehaviour(int state) throws InterruptedException{
-		switch(state){
-			case 0: // planner
-				final OneShotBehaviour osbPlan = new OneShotBehaviour(){
-					public void action(){
-						//myAgent.addBehaviour(tbf.wrap(osbPlan));					
-					}
-				};				
-				break;
-			case 1: // informer
-				final OneShotBehaviour osbInfo = new OneShotBehaviour(){
-					public void action(){
-						//myAgent.addBehaviour(tbf.wrap(osbInfo));
-					}
-				};				
-				break;
-			case 2: // scheduler
-				final OneShotBehaviour osbSched = new OneShotBehaviour(){
-					public void action(){
-						//myAgent.addBehaviour(tbf.wrap(osbSched));
-					}
-				};
-				break;
-			case 3: // production
-				final OneShotBehaviour osbProd = new OneShotBehaviour(){
-					public void action(){
-						//myAgent.addBehaviour(tbf.wrap(osbProd));			
-					}
-				};
-				break;
-			case 4: // waiting
-				myAgent.waitUntilStarted();
-				break;
-			default:
-				return;
-		}
-	}
-	
-	// Reschedule
-	public void reschedule(){
-		// reschedule from the given step, step represents the point at which the production has to be resumed
-	/*private void changeBehaviour(int state) {
-		switch (state) {
-		case 0: // Planner
-			break;
-		case 1: // Informer
-			break;
-		case 2: // Scheduler
-			break;
-		case 3: // Producing
-			break;
-		default: // Listening for other msgs
-			return;
-		}*/
-	
 		_productAgent = (ProductAgent) myAgent;
 
 		System.out.println("Lets add a Sequential");
@@ -123,27 +56,27 @@ public class OverviewBehaviour extends OneShotBehaviour {
 			
 		});
 
-		_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour() {
+		/*_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour() {
 			@Override
 			public void action() {
 				for (ProductionStep stp : _productAgent.getProduct()
 						.getProduction().getProductionSteps()) {
 					System.out.println("ProductionStep " + stp.getId()
 							+ " has Equiplets; \n");
-
 					for (AID aid : _productAgent.getProduct().getProduction()
 							.getProductionEquipletMapping()
-							.getEquipletsForProductionStep(stp.getId()).keySet()) {
+							.getEquipletsForProductionStep(stp.getId()).keySet() ) {
 						System.out.println("Eq localname: "
-								+ aid.getLocalName() + " AID: " + aid + "\n");
+								+ aid.getLocalName() + " AID: " + aid + " timeslots: " + _productAgent.getProduct().getProduction()
+								.getProductionEquipletMapping().getTimeSlotsForEquiplet(stp.getId(), aid));
 					}
 				}
 			}
-		});
+		}); */
 
 		System.out.println("Lets add a Scheduler");
-		// _schedulerBehaviour = new SchedulerBehaviour();
-		// _sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
+		 _schedulerBehaviour = new SchedulerBehaviour();
+		 _sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
 
 		System.out.println("Lets add a produce");
 		// _produceBehaviour = new ProduceBehaviour();
@@ -151,5 +84,7 @@ public class OverviewBehaviour extends OneShotBehaviour {
 
 		System.out
 				.println("Added all behaviours. And everything should start. Aw yeah!");
+
 	}
+
 }

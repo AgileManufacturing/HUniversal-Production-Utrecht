@@ -236,9 +236,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 												// Adds the equiplet to the
 												// production step in
 												// the mapper list.
-												_pem.addEquipletToProductionStep(
-														_productionStep.getId(),
-														_aid);
+												_pem.addEquipletToProductionStep(_productionStep.getId(),_aid, timeSlots);
 											}
 										} catch (UnreadableException e) {
 											System.out
