@@ -1,14 +1,14 @@
 /**
- * @file EquipletDirectoryMessage.java
- * @brief Provides an entry class for the EquipletDirectory blackboard.
- * @date Created: 2013-04-02
+ * @file InstantiateClassException.java
+ * @brief Thrown when a request to instantiate an object has failed.
+ * @date Created: 13 apr. 2013
  *
- * @author Hessel Meulenbeld
+ * @author Jan-Willem Willebrands
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright � 2013, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -27,41 +27,24 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package equipletAgent;
+package rexos.libraries.dynamicloader;
 
-import jade.core.AID;
-import java.util.ArrayList;
-import newDataClasses.DbData;
-
-public class EquipletDirectoryMessage {
+/**
+ * Thrown when a request to instantiate an object has failed.
+ **/
+public class InstantiateClassException extends Exception {
 	/**
-	 * @var AID AID
-	 * The AID of the equipletAgent
-	 */
-	public AID AID;
-	
-	/**
-	 * @var ArrayList<Long> capabilities
-	 * The capabilities of the equipletAgent
-	 */
-	public ArrayList<Long> capabilities;
-	
-	/**
-	 * @var DbData db
-	 * The information about the database of the equipletAgent.
-	 */
-	public DbData db;
+	 * @var long serialVersionUID
+	 * The serial version UID for this class.
+	 **/
+	private static final long serialVersionUID = -7622049890774222503L;
 
 	/**
-	 * Constructor for an entry in the equipletDirectory.
-	 * 
-	 * @param AID the AID of the equipletAgent.
-	 * @param capabilities the capabilities of the equipletAgent.
-	 * @param db the information about the database of the equipletAgent.
-	 */
-	public EquipletDirectoryMessage(AID AID, ArrayList<Long> capabilities, DbData db){
-		this.AID = AID;
-		this.capabilities = capabilities;
-		this.db = db;
+	 * Constructs a new exception with the specified messages and cause.
+	 * @param msg Message describing what caused the exception.
+	 * @param cause The cause of this exception.
+	 **/
+	public InstantiateClassException(String msg, Throwable cause) {
+		super(msg, cause);
 	}
 }

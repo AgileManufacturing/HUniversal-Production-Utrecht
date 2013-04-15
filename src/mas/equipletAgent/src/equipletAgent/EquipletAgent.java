@@ -220,11 +220,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			((AgentController) getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "serviceAgent.ServiceAgent", arguments)).start();
 			serviceAgent = new AID((String) getLocalName() + "-serviceAgent", AID.ISLOCALNAME);
 			
-			collectiveBBClient = new BlackboardClient(collectiveDbIp);
+			collectiveBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
 			collectiveBBClient.setDatabase(collectiveDbName);
 			collectiveBBClient.setCollection(equipletDirectoryName);
 
-			equipletBBClient = new BlackboardClient(equipletDbIp);
+			equipletBBClient = new BlackboardClient(equipletDbIp, equipletDbPort);
 			equipletBBClient.setDatabase(equipletDbName);
 			equipletBBClient.setCollection(productStepsName);
 
@@ -361,6 +361,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				responseMessage.setConversationId(conversationId);
 
 				StepStatusCode status = (StepStatusCode) productStep.get("status");
+				System.out.println("status update: " + status.toString());
 				switch (status) {
 				case PLANNED:
 					try {
