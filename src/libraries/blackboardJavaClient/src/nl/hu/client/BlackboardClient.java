@@ -421,7 +421,12 @@ public class BlackboardClient {
 		subscriptions.add(sub);
 		
 		// Attempt to create a new thread for the current subscriptions.
-		return createNewMonitorThread();
+		boolean creationSuccessfull = createNewMonitorThread();
+		if (!creationSuccessfull) {
+			subscriptions.remove(sub);
+		}
+		
+		return creationSuccessfull;
 	}
 	
 	/**
@@ -430,12 +435,13 @@ public class BlackboardClient {
 	 * @param sub Subscription that should be removed.
 	 **/
 	public void unsubscribe(BlackboardSubscription sub) {
-		subscriptions.remove(sub);
-		
-		if (subscriptions.size() > 0) {
-			createNewMonitorThread();
-		} else {
-			oplogMonitorThread.interrupt();
+		// Only create a new thread if a subscription was actually removed.
+		if (subscriptions.remove(sub)) {
+			if (subscriptions.size() > 0) {
+				createNewMonitorThread();
+			} else if (oplogMonitorThread != null) {
+				oplogMonitorThread.interrupt();
+			}
 		}
 	}
 	
