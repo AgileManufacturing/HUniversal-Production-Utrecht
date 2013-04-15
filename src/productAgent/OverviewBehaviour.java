@@ -24,7 +24,7 @@ public class OverviewBehaviour extends OneShotBehaviour {
 	}
 
 	/*
-	 * (non-Javadoc) This behaviour should have 2 parallel sub-behaviours. One
+	 * (non-Javadoc) This behaviour should have 3 parallel sub-behaviours. One
 	 * where the normal flow ( plan, inform, schedule, produce ) is follow, and
 	 * one where is listend for incoming msgs.
 	 */

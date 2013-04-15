@@ -122,7 +122,7 @@ public class MainAgent extends Agent {
 			arg[0] = product;
 
 			((AgentController) getContainerController().createNewAgent("pa1",
-					"ProductAgent.ProductAgent", arg)).start();
+					"productAgent.ProductAgent", arg)).start();
 
 		} catch (Exception e) {
 			e.printStackTrace();
