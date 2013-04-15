@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import serviceAgent.behaviour.CanDoProductStep;
 import serviceAgent.behaviour.GetProductStepDuration;
+import jade.core.AID;
 import jade.core.Agent;
 import com.mongodb.*;
 import equipletAgent.*;
@@ -20,6 +21,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	private HashMap<String, Long> services;
 	private HashMap<Long, String[]> stepTypes;
 	private DbData dbData;
+	private AID hardwareAgentAID;
 
 	public void setup() {
 		System.out.println("I spawned as a service agent.");
@@ -27,6 +29,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			dbData = (DbData) args[0];
+//			hardwareAgentAID = (AID) args[1];
 		}
 
 		try {
@@ -61,7 +64,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		//create serviceFactory
 		addBehaviour(new AnswerBehaviour(this));
 		addBehaviour(new CanDoProductStep(this, productionStepBBClient));
-		addBehaviour(new GetProductStepDuration(this, serviceStepBBClient));
+		addBehaviour(new GetProductStepDuration(this, productionStepBBClient, serviceStepBBClient));
 		
 		//receive behaviours from EA
 		//add EvaluateProductionStep receiveBehaviour --> conversation with HA
@@ -72,9 +75,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	}
 
 	public void takeDown() {
-		// TODO implement graceful death
 		productionStepBBClient.unsubscribe(statusSubscription);
 		serviceStepBBClient.unsubscribe(statusSubscription);
+		//TODO clear serviceStepBB
+		//TODO set status of all productionStepBB to ABORTED
 	}
 
 	public void printDBObjectPretty(DBObject obj, String prefix,
@@ -155,6 +159,13 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 */
 	public DbData getDbData() {
 		return dbData;
+	}
+
+	/**
+	 * @return the hardwareAgentAID
+	 */
+	public AID getHardwareAgentAID() {
+		return hardwareAgentAID;
 	}
 
 	/**

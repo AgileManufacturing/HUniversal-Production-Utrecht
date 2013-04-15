@@ -1,14 +1,14 @@
 /**
- * @file BlackboardMessage.java
- * @brief Provides a blackboard message
- * @date Created: 2012-11-20
+ * @file ServiceFactory.java
+ * @brief 
+ * @date Created: 12 apr. 2013
  *
- * @author Dick van der Steen
+ * @author Jan-Willem Willebrands
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -27,24 +27,61 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
+package serviceAgent;
 
-package nl.hu;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+
+import rexos.libraries.knowledge.Row;
+import rexos.libraries.knowledge.KnowledgeDBClient;
+import rexos.libraries.knowledge.Queries;
+
+import jade.core.AID;
 
 /**
- * Implementation of a blackboard message
+ * 
  **/
-public class BlackboardMessage
-{
-	public String topic;
+public class ServiceFactory {
 
-	public Object message;
-
-	public BlackboardMessage(String topic, Object message)
-	{
-		this.topic = topic;
-		this.message = message;
+	private Hashtable<Integer, Service>serviceCache;
+	private String equipletAID;
+	
+	public ServiceFactory(String equipletAID) {
+		this.equipletAID = equipletAID;
 	}
-
-
-
+	
+	private Service	getServiceByServiceID(int serviceID) {
+		if (serviceCache.containsKey(serviceID)) {
+			
+		}
+		
+		return null;
+	}
+	
+	public Service[] getServicesForStep(long stepType) {
+//		KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
+//		ArrayList<Service> servicesForStep = new ArrayList<Service>();
+//		try {
+//			ResultSet rs = knowledgeClient.executeSelectQuery(
+//					Queries.POSSIBLE_SERVICES_PER_EQUIPLET,
+//					new Object[]{equipletAID, stepType});
+//			
+//			ArrayList<Integer> serviceIDs = new ArrayList<Integer>();
+//			while (rs.next()) {
+//				Row row = new Row(rs);
+//				serviceIDs.add((Integer)row.get("id"));
+//			}
+//			
+//			for (Integer serviceID : serviceIDs) {
+//				
+//			}
+//		} catch (SQLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
+		return new Service[]{new DummyService()};
+	}
 }

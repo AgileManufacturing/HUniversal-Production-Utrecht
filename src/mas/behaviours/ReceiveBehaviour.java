@@ -137,7 +137,7 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	/**
 	 * This method is called when a message matching 
 	 *
-	 * @param m the m
+	 * @param message the m
 	 */
-	public abstract void handle(ACLMessage m); /* can be redefined in sub_class */
+	public abstract void handle(ACLMessage message); /* can be redefined in sub_class */
 }

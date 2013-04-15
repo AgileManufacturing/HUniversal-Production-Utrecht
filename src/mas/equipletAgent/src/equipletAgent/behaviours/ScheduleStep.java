@@ -9,7 +9,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 import equipletAgent.EquipletAgent;
-import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;

@@ -31,63 +31,133 @@
 package serviceAgent.behaviour;
 
 import java.io.IOException;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.bson.types.ObjectId;
 
+import behaviours.ReceiveBehaviour;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
+import newDataClasses.ScheduleData;
 import nl.hu.client.BlackboardClient;
 import nl.hu.client.GeneralMongoException;
 import nl.hu.client.InvalidDBNamespaceException;
+import serviceAgent.ServiceAgent;
 import serviceAgent.ServiceStepMessage;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 
 /**
  * @author Peter
  * 
  */
-public class GetServiceDuration extends OneShotBehaviour {
+public class GetServiceDuration extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
-	private BlackboardClient client;
-	private ServiceStepMessage[] serviceSteps;
+	private BlackboardClient productionStepBlackBoard, serviceStepBlackBoard;
+	private List<ServiceStepMessage> serviceSteps;
+	private String conversationId;
+
+	private long duration = 0;
 
 	/**
 	 * @param a
 	 */
-	public GetServiceDuration(Agent a, BlackboardClient client,
-			ServiceStepMessage[] serviceSteps) {
-		super(a);
-		this.client = client;
-		this.serviceSteps = serviceSteps;
+	public GetServiceDuration(Agent a,
+			BlackboardClient productionStepBlackBoard,
+			BlackboardClient serviceStepBlackBoard,
+			ServiceStepMessage[] serviceSteps, String conversationId) {
+		this(a, 2000, productionStepBlackBoard, serviceStepBlackBoard,
+				serviceSteps, conversationId);
 	}
 
-	public void action() {
+	/**
+	 * @param a
+	 */
+	public GetServiceDuration(Agent a, int millis,
+			BlackboardClient productionStepBlackBoard,
+			BlackboardClient serviceStepBlackBoard,
+			ServiceStepMessage[] serviceSteps, String conversationId) {
+		super(a, millis, MessageTemplate
+				.and(MessageTemplate
+						.MatchOntology("GetServiceStepDurationResponse"),
+						MessageTemplate.MatchConversationId(conversationId)));
+		this.productionStepBlackBoard = productionStepBlackBoard;
+		this.serviceStepBlackBoard = serviceStepBlackBoard;
+		this.serviceSteps = Arrays.asList(serviceSteps);
+		this.conversationId = conversationId;
+	}
+
+	public void onStart() {
 		ObjectId serviceStepId;
 		ACLMessage message;
-		Agent agent = getAgent();
+		ServiceAgent agent = (ServiceAgent) getAgent();
 		Gson gson = new GsonBuilder().create();
 
-		agent.addBehaviour(new GetServiceStepDuration(agent, client));
 		try {
 			for (ServiceStepMessage serviceStep : serviceSteps) {
-				serviceStepId = client.insertDocument(gson.fromJson(
-						gson.toJson(serviceStep), DBObject.class));
+				serviceStepId = serviceStepBlackBoard.insertDocument(gson
+						.fromJson(gson.toJson(serviceStep), DBObject.class));
 
 				message = new ACLMessage(ACLMessage.QUERY_IF);
-				// message.addReceiver(r);
-				// TODO add receiver to msg
-				message.setContentObject(serviceStepId);
+				message.addReceiver(agent.getHardwareAgentAID());
 				message.setOntology("GetServiceStepDuration");
+				message.setContentObject(serviceStepId);
+				message.setConversationId(conversationId);
 				agent.send(message);
 			}
 		} catch (InvalidDBNamespaceException | GeneralMongoException
 				| IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage)
+	 */
+	@Override
+	public void handle(ACLMessage message) {
+		if (message != null) {
+			try {
+				Gson gson = new GsonBuilder().create();
+				ServiceStepMessage serviceStep = gson.fromJson(gson
+						.toJson(serviceStepBlackBoard
+								.findDocumentById((ObjectId) message
+										.getContentObject())),
+						ServiceStepMessage.class);
+
+				duration += serviceStep.getTimeData().getDuration();
+				serviceSteps.remove(serviceStep);
+				// TODO store duration when ready
+				if (serviceSteps.isEmpty()) {
+					productionStepBlackBoard.updateDocuments(
+							new BasicDBObject("_id", serviceStep
+									.getProductStepId()),
+							new BasicDBObject("$set", new BasicDBObject(
+									"scheduleData", gson.fromJson(
+											gson.toJson(scheduleData),
+											ScheduleData.class))));
+					getAgent().removeBehaviour(this);
+				}
+			} catch (UnreadableException | JsonSyntaxException
+					| InvalidDBNamespaceException | GeneralMongoException e) {
+				e.printStackTrace();
+			}
+		} else {
+			// TODO handle timeout
 		}
 	}
 }

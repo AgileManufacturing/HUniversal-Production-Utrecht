@@ -1,6 +1,12 @@
 package newDataClasses;
 
-public class DbData {
+import java.io.Serializable;
+
+public class DbData implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public String ip;
 	public int port;
 	public String name;

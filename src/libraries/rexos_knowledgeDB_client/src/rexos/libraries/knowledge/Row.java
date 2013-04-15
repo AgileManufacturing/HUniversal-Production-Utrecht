@@ -1,4 +1,3 @@
-
 /**
  * @author Ammar Abdulamir
  * @file Row.java
@@ -32,7 +31,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-
 
 /**
  * A class representing a database row.

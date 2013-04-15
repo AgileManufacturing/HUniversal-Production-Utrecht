@@ -29,6 +29,7 @@
  **/
 package equipletAgent;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 import jade.core.AID;
@@ -40,19 +41,20 @@ import newDataClasses.ScheduleData;
  * Implementation of a message for the productstep blackboard
  */
 public class ProductStepMessage {
-	public AID productAgentId;
-	public long type;
-	public ParameterList parameters;
-	public Object inputParts;
-	public Object outputParts;
-	public int status;
-	public HashMap<String, String> statusData;
-	public ScheduleData scheduleData;
+	private static final long serialVersionUID = 1L;
+	
+	private AID productAgentId;
+	private long type;
+	private ParameterList parameters;
+	private Object inputParts;
+	private Object outputParts;
+	private StepStatusCode status;
+	private HashMap<String, String> statusData;
+	private ScheduleData scheduleData;
 
-	public ProductStepMessage(AID productAgentId,
-							  long type, ParameterList parameters,
-							  Object inputParts, Object outputParts,
-							  int status, HashMap<String, String> statusData, ScheduleData scheduleData){
+	public ProductStepMessage(AID productAgentId, long type,
+			ParameterList parameters, Object inputParts, Object outputParts,
+			StepStatusCode status, HashMap<String, String> statusData, ScheduleData scheduleData) {
 		this.productAgentId = productAgentId;
 		this.type = type;
 		this.parameters = parameters;
@@ -156,7 +158,7 @@ public class ProductStepMessage {
 	/**
 	 * @return the status
 	 */
-	public int getStatus() {
+	public StepStatusCode getStatus() {
 		return status;
 	}
 
@@ -164,7 +166,7 @@ public class ProductStepMessage {
 	 * @param status the status to set
 	 */
 	public void setStatus(StepStatusCode status) {
-		this.status = status.getStatus();
+		this.status = status;
 	}
 
 	/**
