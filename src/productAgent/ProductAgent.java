@@ -1,4 +1,4 @@
-package ProductAgent;
+package productAgent;
 
 import jade.core.AID;
 import jade.core.Agent;

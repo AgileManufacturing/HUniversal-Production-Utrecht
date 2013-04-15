@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ProductAgent;
+package productAgent;
 
 import java.util.List;
 
