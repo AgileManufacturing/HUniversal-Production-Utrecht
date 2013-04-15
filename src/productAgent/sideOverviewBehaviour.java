@@ -1,16 +1,16 @@
-package ProductAgent;
+package productAgent;
 
+import newDataClasses.ProductionStep;
+import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.ParallelBehaviour;
-import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.SequentialBehaviour;
-import jade.core.behaviours.ThreadedBehaviourFactory;
 import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
 public class sideOverviewBehaviour extends CyclicBehaviour {
 	ACLMessage msg;
+	ProductAgent pa = new ProductAgent();
 	
 	private class receiveMsgBehaviour extends CyclicBehaviour {
 		
@@ -40,9 +40,25 @@ public class sideOverviewBehaviour extends CyclicBehaviour {
 			try {
 				switch(msg.getOntology()){
 					case "waiting":
-						
+						OneShotBehaviour waitingBehaviour = new OneShotBehaviour(){
+							public void action(){
+								
+							}
+						};
 					case "reschedule":
-						
+						OneShotBehaviour reschedule = new OneShotBehaviour(){
+							public void action(){
+								pa.reschedule();
+							}
+						};
+						break;
+					case "reschedule++":
+						OneShotBehaviour rescheduleAndRemoveEquiplet = new OneShotBehaviour(){
+							public void action(){
+								pa.rescheduleAndRemoveEquiplet();
+							}
+						};
+						break;	
 					default:
 						return;
 					}
@@ -51,6 +67,7 @@ public class sideOverviewBehaviour extends CyclicBehaviour {
 				}
 			}
 		}
+	
 
 	@Override
 	public void action() {

@@ -62,7 +62,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 
 			_pem.addProductionStep(stp.getId());
 
-			for (AID aid : _product.getProduction()
+			for (AID aid : _productAgent.getProduct().getProduction()
 					.getProductionEquipletMapping()
 					.getEquipletsForProductionStep(stp.getId()).keySet()) {
 				_par.addSubBehaviour(new Conversation(aid, stp, _pem));
