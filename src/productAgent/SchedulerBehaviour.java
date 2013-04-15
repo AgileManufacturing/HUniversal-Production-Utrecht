@@ -33,12 +33,17 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			Product product = this._productAgent.getProduct();
 			Production production = product.getProduction();
 			ProductionStep[] psa = production.getProductionSteps();
-
+			//debug
+			System.out.println("SIZEEEEE "+psa.length);
+			
 			for (ProductionStep ps : psa) {
 				int PA_id = ps.getId();
+				System.out.println("SIZEEEEE "+production.getProductionEquipletMapping()
+						.getEquipletsForProductionStep(PA_id).keySet().size());
 
 				Scheduler(production.getProductionEquipletMapping()
 						.getEquipletsForProductionStep(PA_id).keySet(), ps);
+				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -59,9 +64,10 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 		Schedule[] schedules;
 		//load set into arraylist
 		 List<AID> equipletlist = new ArrayList<AID>(equipletList);
-		
+		 System.out.println("EQ LIST SIZE:"+equipletlist.size()+" OR  "+equipletList.size());
 		//Make connection with database
 		MongoClient mongoClient =null;
+		System.out.println("Scheduler Started");
 		
 		try {
 			mongoClient = new MongoClient("145.89.191.131");// 145.89.191.131 is hu
@@ -173,7 +179,12 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 					.equals(freetimeslotEq.getEquipletName())) {
 				equipletAID = equipletlist.get(i);
 			}
+			//debug
+			System.out.println("NAME:"+equipletlist.get(i));
 		}
+		
+		//debug
+		//System.out.println("AID: "+equipletAID.getName());
 
 		// send the message to the equiplet to schedule the timeslot
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
@@ -185,6 +196,12 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 	        msg.setContent( ""+freetimeslotEq.getStartTime() );
 	        msg.addReceiver(equipletAID);
 	        myAgent.send(msg);
+	        
+	        //debug
+	        System.out.println("Send Timeslot to EQ");
+		}else{
+			//debug
+			System.out.println("No Timeslot asigned.");
 		}
       
 	}
