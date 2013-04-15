@@ -31,13 +31,18 @@ public class CheckForModules extends ReceiveBehaviour {
 	/**
 	 * 
 	 * Instantiates a new check for module.
-	 * s
+	 * 
 	 */
 	public CheckForModules(Agent a) {
 		super(a, -1, messageTemplate);
 		hardwareAgent = (HardwareAgent) a;
 	}
-
+	/**
+	 * 
+	 * @param ACLMessage message
+	 * handles a incomming messages and will 
+	 * check what kind a module its need 
+	 */
 	@Override
 	public void handle(ACLMessage message) {
 		Object contentObject = null;
