@@ -35,7 +35,7 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			ProductionStep[] psa = production.getProductionSteps();
 
 			for (ProductionStep ps : psa) {
-				long PA_id = ps.getId();
+				int PA_id = ps.getId();
 
 				Scheduler(production.getProductionEquipletMapping()
 						.getEquipletsForProductionStep(PA_id).keySet(), ps);

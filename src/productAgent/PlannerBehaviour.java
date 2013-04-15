@@ -60,7 +60,7 @@ public class PlannerBehaviour extends OneShotBehaviour {
 				//Iterate over all the production steps
 				for (ProductionStep ps : psa) {
 					//Get the ID for the production step
-					long PA_id = ps.getId();
+					int PA_id = ps.getId();
 					//Get the type of production step, aka capability
 					long PA_capability = ps.getCapability();
 					//Create the select query for the blackboard
