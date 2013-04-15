@@ -11,7 +11,7 @@
  * Version: 1.0
  *
  */
-package ProductAgent;
+package productAgent;
 
 import java.io.BufferedReader;
 import java.io.IOException;

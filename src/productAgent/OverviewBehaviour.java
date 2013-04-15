@@ -1,4 +1,4 @@
-package ProductAgent;
+package productAgent;
 
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
@@ -56,7 +56,7 @@ public class OverviewBehaviour extends OneShotBehaviour {
 			
 		});
 
-		_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour() {
+		/*_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour() {
 			@Override
 			public void action() {
 				for (ProductionStep stp : _productAgent.getProduct()
@@ -65,17 +65,18 @@ public class OverviewBehaviour extends OneShotBehaviour {
 							+ " has Equiplets; \n");
 					for (AID aid : _productAgent.getProduct().getProduction()
 							.getProductionEquipletMapping()
-							.getEquipletsForProductionStep(stp.getId())) {
+							.getEquipletsForProductionStep(stp.getId()).keySet() ) {
 						System.out.println("Eq localname: "
-								+ aid.getLocalName() + " AID: " + aid + "\n");
+								+ aid.getLocalName() + " AID: " + aid + " timeslots: " + _productAgent.getProduct().getProduction()
+								.getProductionEquipletMapping().getTimeSlotsForEquiplet(stp.getId(), aid));
 					}
 				}
 			}
-		});
+		}); */
 
 		System.out.println("Lets add a Scheduler");
-		// _schedulerBehaviour = new SchedulerBehaviour();
-		// _sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
+		 _schedulerBehaviour = new SchedulerBehaviour();
+		 _sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
 
 		System.out.println("Lets add a produce");
 		// _produceBehaviour = new ProduceBehaviour();

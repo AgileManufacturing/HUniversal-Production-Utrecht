@@ -2,6 +2,7 @@
 
 package equipletAgent;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
@@ -41,14 +42,15 @@ public class EquipletAgent extends Agent {
 
 	public boolean getRandomBoolean() {
 		Random random = new Random();
-		return random.nextBoolean();
+		//return random.nextBoolean();
+		return true;
 	}
 
 	public int getRandomInt(int r) {
 		Random random = new Random();
 		return random.nextInt(r);
 	}
-
+	
 	private String writeParamsToString(ParameterList p) {
 		String[] Groups = new String[3];
 		Groups[0] = "Color";
@@ -128,6 +130,13 @@ public class EquipletAgent extends Agent {
 			try {
 				String convid = msg.getConversationId();
 				switch (msg.getOntology()) {
+				
+				case "ScheduleStep":
+					if (debug)
+						System.out.println("EQ: PA -> "
+								+ myAgent.getLocalName() + " Received query"
+								+ " schedule");
+					break;
 
 				case "CanPerformStep":
 					_step = (ProductionStep) msg.getContentObject();

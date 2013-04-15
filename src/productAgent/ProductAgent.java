@@ -1,5 +1,8 @@
-package ProductAgent;
+package productAgent;
 
+import java.util.HashMap;
+
+import equipletAgent.EquipletAgent;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -26,6 +29,9 @@ public class ProductAgent extends Agent {
 	private static int _cidCnt = 0;
 	private String _cidBase;
 
+	public int prodStep = 0;
+	PlannerBehaviour planBehav = new PlannerBehaviour();
+	EquipletAgent eqAgent = new EquipletAgent();
 	@SuppressWarnings("serial")
 	protected void setup() {
 		try {
@@ -52,6 +58,18 @@ public class ProductAgent extends Agent {
 		}
 		return _cidBase + (_cidCnt++);
 	}
+	
+	public void reschedule(){
+		int curProdStep = prodStep;
+		planBehav.action();
+	}
+	
+	public void rescheduleAndRemoveEquiplet(){
+		int curProdStep = prodStep;
+		AID removeEQ = getAID(); // get the AID at which the rescheduling was needed
+		planBehav.removeEquiplet(removeEQ);
+		// restart the planner behaviour at the curProdStep set by the produceBehaviour	
+	}
 
 	public Product getProduct() {
 		return this._product;
@@ -64,11 +82,11 @@ public class ProductAgent extends Agent {
 	public void outPutProductStepList() {
 		for (ProductionStep stp : this.getProduct().getProduction()
 				.getProductionSteps()) {
+			
 			for (AID aid : this.getProduct().getProduction()
 					.getProductionEquipletMapping()
-					.getEquipletsForProductionStep(stp.getId())) {
-				System.out
-						.println("Step: " + stp.getId() + " has equiplets:\n");
+					.getEquipletsForProductionStep(stp.getId()).keySet()) {
+				System.out.println("Step: " + stp.getId() + " has equiplets:\n");
 				System.out.println(aid.getLocalName());
 			}
 		}
