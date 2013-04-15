@@ -78,7 +78,7 @@ public class EquipletAgent extends Agent {
 	protected void setup() {
 		try {
 			Object[] args = getArguments();
-			_canPerformStepId = (int) args[0];
+			_canPerformStepId = (Integer) args[0];
 
 			addBehaviour(new receiveMsgBehaviour());
 
