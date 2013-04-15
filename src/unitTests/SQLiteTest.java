@@ -1,3 +1,4 @@
+package unitTests;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public class SQLiteTest {
 	 */
 	@Test
 	public void testAdd() {
-		ProductLog test = new ProductLog(false, true, new sqliteDatabase("test.db"));
+		ProductLog test = new ProductLog(false, true, new sqliteDatabase(null));
 		List<LogMessage> msgs = new ArrayList<LogMessage>();
 		
 		msgs.add(new LogMessage("id", "12-04-2013 10:09", "producing", "Start producing"));
