@@ -68,10 +68,9 @@ public class PlannerBehaviour extends OneShotBehaviour {
 					List<DBObject> equipletDirectory = bbc.findDocuments(equipletCapabilityQuery);
 					
 					for(DBObject dbo : equipletDirectory) {
-						String aid = (String)dbo.get("AID").toString();
-						pem.addEquipletToProductionStep(PA_id, new AID(aid, AID.ISLOCALNAME));
-						//DBObject aid = (DBObject)db.get("db");
-						//String name = (String)aid.get("name").toString();
+						DBObject aid = (DBObject)dbo.get("db");
+						String name = (String)aid.get("name").toString();
+						pem.addEquipletToProductionStep(PA_id, new AID(name, AID.ISLOCALNAME));
 					}
 	
 					System.out.println("Doing planner for productionstep " + PA_id);
