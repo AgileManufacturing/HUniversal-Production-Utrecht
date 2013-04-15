@@ -1,6 +1,6 @@
 /**
  * @file SoftwareDescription.java
- * @brief 
+ * @brief Contains all information about a piece of software.
  * @date Created: 12 apr. 2013
  *
  * @author Jan-Willem Willebrands
@@ -32,23 +32,61 @@ package rexos.mas;
 import rexos.libraries.knowledge.Row;
 
 /**
- * 
+ * Contains all information about a piece of software.
  **/
 public class SoftwareDescription {
-	private long ID;
-	private String name;
-	private String description;
-	private String className;
-	private String jarLocation;
+	/**
+	 * @var long id
+	 * The ID (corresponding to the Knowledge Database) of this piece of software.
+	 **/
+	private long id;
 	
+	/**
+	 * @var String name
+	 * The name of this piece of software.
+	 **/
+	private String name;
+	
+	/**
+	 * @var String description
+	 * A description of the software.
+	 **/
+	private String description;
+	
+	/**
+	 * @var String className
+	 * The (fully distinguished) name of the class that represents this object.
+	 **/
+	private String className;
+	
+	/**
+	 * @var String jarLocation
+	 * The location of the jar containing the data for the representing class.
+	 **/
+	private String jarLocation;
+
+	
+	/**
+	 * Constructs a new SoftwareDescription object.
+	 * @param ID The ID (corresponding to the Knowledge Database) of this piece of software.
+	 * @param name The name of this piece of software.
+	 * @param description A description of the software.
+	 * @param className The (fully distinguished) name of the class that represents this object.
+	 * @param jarLocation The location of the jar containing the data for the representing class.
+	 **/
 	public SoftwareDescription(long ID, String name, String description, String className, String jarLocation) {
-		this.ID = ID;
+		this.id = ID;
 		this.name = name;
 		this.description = description;
 		this.className = className;
 		this.jarLocation = jarLocation;
 	}
 	
+	/**
+	 * Constructs a new SoftwareDescription object from the given row object.
+	 * @param row The row object containing the information for the to be created object.
+	 * @return A SoftwareDescription object based on the data contained in the row.
+	 **/
 	public static SoftwareDescription createFromRow(Row row) {
 		return new SoftwareDescription(
 				(long)row.get("id"),
@@ -57,32 +95,55 @@ public class SoftwareDescription {
 				(String)row.get("class_name"),
 				(String)row.get("jar_location"));
 	}
-	
-	public long getID() {
-		return ID;
+
+	/**
+	 * Returns the ID (corresponding to the Knowledge Database) of this piece of software.
+	 * @return The ID (corresponding to the Knowledge Database) of this piece of software.
+	 **/
+	public long getId() {
+		return id;
 	}
 
+	/**
+	 * Returns the name of this piece of software.
+	 * @return The name of this piece of software.
+	 **/
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Returns the description of the software.
+	 * @return The description of the software.
+	 **/
 	public String getDescription() {
 		return description;
 	}
 
+	/**
+	 * Returns the (fully distinguished) name of the class that represents this object.
+	 * @return The (fully distinguished) name of the class that represents this object.
+	 **/
 	public String getClassName() {
 		return className;
 	}
 
+	/**
+	 * Returns the location of the jar containing the data for the representing class.
+	 * @return The location of the jar containing the data for the representing class.
+	 **/
 	public String getJarLocation() {
 		return jarLocation;
 	}
 
+	/**
+	 * @see java.lang.Object#hashCode()
+	 **/
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (ID ^ (ID >>> 32));
+		result = prime * result + (int) (id ^ (id >>> 32));
 		result = prime * result
 				+ ((className == null) ? 0 : className.hashCode());
 		result = prime * result
@@ -93,6 +154,9 @@ public class SoftwareDescription {
 		return result;
 	}
 
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 **/
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -102,7 +166,7 @@ public class SoftwareDescription {
 		if (getClass() != obj.getClass())
 			return false;
 		SoftwareDescription other = (SoftwareDescription) obj;
-		if (ID != other.ID)
+		if (id != other.id)
 			return false;
 		if (className == null) {
 			if (other.className != null)

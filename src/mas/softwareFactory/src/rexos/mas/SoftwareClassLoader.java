@@ -1,6 +1,6 @@
 /**
  * @file SoftwareClassLoader.java
- * @brief 
+ * @brief Custom class loader for classes in the rexos.mas.software namespace.
  * @date Created: 12 apr. 2013
  *
  * @author Jan-Willem Willebrands
@@ -32,26 +32,57 @@ package rexos.mas;
 import java.util.HashMap;
 
 /**
- * 
+ * Custom class loader for classes in the rexos.mas.software namespace.
  **/
 public class SoftwareClassLoader extends ClassLoader {
+	/**
+	 * @var String SOFTWARE_ROOT_NAMESPACE
+	 * The root namespace of classes that will be loaded by this loader.
+	 **/
+	private static final String SOFTWARE_ROOT_NAMESPACE = "rexos.mas.software";
+	
+	/**
+	 * @var HashMap<String,byte[]> registeredClasses
+	 * The classes that have been registered for loading for this object.
+	 **/
 	HashMap<String, byte[]> registeredClasses;
 	
+	/**
+	 * Constructs a new SoftwareClassLoader object.
+	 * @param parent The parent class loader that should be used.
+	 **/
 	public SoftwareClassLoader(ClassLoader parent) {
 		super(parent);
 		registeredClasses = new HashMap<String, byte[]>();
 	}
 	
+	/**
+	 * Checks whether or not the specified class has been registered for loading.
+	 * @param name The name of the class.
+	 * @return Whether or not the specified class has been registered for loading.
+	 **/
 	public boolean isClassRegistered(String name) {
 		return registeredClasses.containsKey(name);
 	}
 	
+	/**
+	 * Registers a class for loading with this class loader object.
+	 * @param name The name of the class.
+	 * @param data A byte[] containing the definition of the class. (i.e. contents of the .class file)
+	 **/
 	public void registerClass(String name, byte[] data) {
 		registeredClasses.put(name, data);
 	}
 	
+	/**
+	 * Attempts to load the class corresponding to the given name.
+	 * This will only load classes that fall within SOFTWARE_ROOT_NAMESPACE.
+	 * @param name The name of the class
+	 * @return The resulting Class object.
+	 * @see java.lang.ClassLoader#loadClass(java.lang.String)
+	 **/
 	public Class<?> loadClass(String name) throws ClassNotFoundException {
-		if (!name.startsWith("rexos.") || !registeredClasses.containsKey(name)) {
+		if (!name.startsWith(SOFTWARE_ROOT_NAMESPACE) || !registeredClasses.containsKey(name)) {
 			return super.loadClass(name);
 		}
 		

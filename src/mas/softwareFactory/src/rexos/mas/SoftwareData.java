@@ -1,6 +1,6 @@
 /**
  * @file SoftwareData.java
- * @brief 
+ * @brief Contains all data required to instantiate an object of a class.
  * @date Created: 13 apr. 2013
  *
  * @author Jan-Willem Willebrands
@@ -39,57 +39,132 @@ import java.net.URLConnection;
 import java.util.jar.JarFile;
 
 /**
- * 
+ * Contains all data required to instantiate an object of a class.
  **/
 class SoftwareData {
-	private boolean loaderNeedsRefresh = true;
+	/**
+	 * @var boolean loaderNeedsRefresh
+	 * Indicates whether or not the class data has changed since creating the last SoftwareClassLoader.
+	 **/
+	private boolean classDataChanged = true;
+	
+	/**
+	 * @var long lastModified
+	 * Timestamp indicating when the class data was last updated.
+	 **/
 	private long lastModified = 0;
+	
+	/**
+	 * @var SoftwareDescription description
+	 * Description of the class represented by this SoftwareData object.
+	 **/
 	private SoftwareDescription description;
+	
+	/**
+	 * @var byte[] classData
+	 * The classdata of the class represented by this SoftwareData object.
+	 **/
 	private byte[] classData;
+	
+	/**
+	 * @var SoftwareClassLoader loader
+	 * Current instance of the SoftwareClassLoader for this class.
+	 **/
 	private SoftwareClassLoader loader;
 	
+	/**
+	 * Construct an object for the given description.
+	 * @param description SoftwareDescription describing the class.
+	 **/
 	public SoftwareData(SoftwareDescription description) {
 		this.description = description;
 	}
 	
-	public long getLastModified() {
-		return lastModified;
-	}
-
+	/**
+	 * Returns the SoftwareDescription for this object.
+	 * @return the SoftwareDescription for this object.
+	 **/
 	public SoftwareDescription getDescription() {
 		return description;
 	}
 
-	public void setLastModified(long lastModified) {
-		this.lastModified = lastModified;
+	
+	/**
+	 * Returns the last modified timestamp.
+	 * @return the last modified timestamp.
+	 **/
+	public long getLastModified() {
+		return lastModified;
 	}
 
-	public void setDescription(SoftwareDescription description) {
-		this.description = description;
-		this.lastModified = 0;
-		loaderNeedsRefresh = true;
-	}
-	
-	public void setClassData(byte[] classData) {
-		this.classData = classData;
-		loaderNeedsRefresh = true;
-	}
-	
-	public SoftwareClassLoader getLoader() throws IOException {
-		updateClassData();
-		if (loaderNeedsRefresh) {
+	/**
+	 * Attempts to return a classloader for the latest classdata.
+	 * If updating the class data fails for whatever reason, a loader for the previous version is returned if available.
+	 * @return A SoftwareClassLoader for the class represented by this object.
+	 * @throws SoftwareLoadException Retrieving the class data failed.
+	 **/
+	public SoftwareClassLoader getLoader() throws SoftwareLoadException {
+		// Attempt to update the class data.
+		// If an error occurs but a previous version is in cache, use that instead.
+		try {
+			updateClassData();
+		} catch (IOException ex) {
+			if (getLastModified() != 0) {
+				throw new SoftwareLoadException("Failed to retrieve software.", ex);
+			}
+		}
+		if (classDataChanged) {
 			setLoader(new SoftwareClassLoader(SoftwareData.class.getClassLoader()));
 			loader.registerClass(description.getClassName(), classData);
-			loaderNeedsRefresh = false;
+			classDataChanged = false;
 		}
 		return loader;
 	}
+	
+	/**
+	 * Sets the byte[] containing class data for this object.
+	 * The array is not copied and should be preallocated.
+	 * @param classData The class data that should be used.
+	 **/
+	private void setClassData(byte[] classData) {
+		this.classData = classData;
+		classDataChanged = true;
+	}
+	
+	/**
+	 * Sets the description that will be used for this object.
+	 * @param description The description that will be used for this object.
+	 **/
+	public void setDescription(SoftwareDescription description) {
+		this.description = description;
+		this.lastModified = 0;
+		classDataChanged = true;
+	}
 
-	public void setLoader(SoftwareClassLoader loader) {
+	/**
+	 * Sets the last modified timestamp.
+	 * @param lastModified The last time the class data was updated.
+	 **/
+	private void setLastModified(long lastModified) {
+		this.lastModified = lastModified;
+	}
+	
+	/**
+	 * Sets the loader for this object.
+	 * @param loader SoftwareClassLoader capable of instantiating an object for the lastest version of the represented class.
+	 **/
+	private void setLoader(SoftwareClassLoader loader) {
 		this.loader = loader;
 	}
 	
-	private byte[] getClassDataFromJar(JarFile jar, String className) throws IOException {
+	/**
+	 * Extract data for a given class from the specified jar file.
+	 * @param jar JarFile containing the class data.
+	 * @param className Fully qualified name of the class that should be extracted.
+	 * @return Byte array containing the data for the specified class.
+	 * @throws IOException Reading from the JarFile failed.
+	 **/
+	private byte[] extractClassDataFromJar(JarFile jar, String className) throws IOException {
 		// Convert classname to  in jar.
 		String pathInJar = className.replace('.', '/').concat(".class");
 		InputStream inStream = jar.getInputStream(jar.getJarEntry(pathInJar));
@@ -103,6 +178,10 @@ class SoftwareData {
 		return buffer.toByteArray();
 	}
 	
+	/**
+	 * Attempts to update the stored class data to the latest version if available.
+	 * @throws IOException Retrieving an updated version of the class data failed.
+	 **/
 	private void updateClassData() throws IOException {
 		JarFile jarFile = null;
 		URL jarLocationURL = new URL(description.getJarLocation());
@@ -132,7 +211,7 @@ class SoftwareData {
 		}
 		
 		if (jarFile != null) {
-			setClassData(getClassDataFromJar(jarFile, description.getClassName()));
+			setClassData(extractClassDataFromJar(jarFile, description.getClassName()));
 			setLastModified(con.getLastModified());
 		}
 		

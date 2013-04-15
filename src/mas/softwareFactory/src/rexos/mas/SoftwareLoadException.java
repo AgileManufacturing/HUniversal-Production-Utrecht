@@ -1,6 +1,6 @@
 /**
  * @file SoftwareLoadException.java
- * @brief 
+ * @brief Thrown when a request to instantiate an object has failed.
  * @date Created: 13 apr. 2013
  *
  * @author Jan-Willem Willebrands
@@ -30,14 +30,20 @@
 package rexos.mas;
 
 /**
- * 
+ * Thrown when a request to instantiate an object has failed.
  **/
 public class SoftwareLoadException extends Exception {
 	/**
-	 * 
+	 * @var long serialVersionUID
+	 * The serial version UID for this class.
 	 **/
 	private static final long serialVersionUID = -7622049890774222503L;
 
+	/**
+	 * Constructs a new exception with the specified messages and cause.
+	 * @param msg Message describing what caused the exception.
+	 * @param cause The cause of this exception.
+	 **/
 	public SoftwareLoadException(String msg, Throwable cause) {
 		super(msg, cause);
 	}

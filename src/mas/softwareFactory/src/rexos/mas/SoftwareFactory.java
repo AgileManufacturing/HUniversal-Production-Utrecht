@@ -1,6 +1,6 @@
 /**
  * @file SoftwareFactory.java
- * @brief 
+ * @brief Generic class for loading class data from a remote server based on a description.
  * @date Created: 12 apr. 2013
  *
  * @author Jan-Willem Willebrands
@@ -29,29 +29,48 @@
  **/
 package rexos.mas;
 
-import java.io.IOException;
 import java.util.Hashtable;
 
 /**
- * 
+ * Generic class for loading class data from a remote server based on a description.
  **/
 public class SoftwareFactory<T> {
+	/**
+	 * @var Hashtable<Long, SoftwareData> softwareCache
+	 * A cache holding the SofwareData for each id.
+	 **/
 	private Hashtable<Long, SoftwareData>softwareCache;
 	
+	/**
+	 * Constructs a new SoftwareFactory.
+	 **/
 	public SoftwareFactory() {
 		softwareCache = new Hashtable<Long, SoftwareData>();
 	}
 	
-	private SoftwareClassLoader getClassLoader(SoftwareDescription description) throws IOException {
-		SoftwareData entry = softwareCache.get(description.getID());
+	/**
+	 * Returns a SoftwareClassLoader for the given description.
+	 * @param description SoftwareDescription containing the relevant information for the software.
+	 * @return A SoftwareClassLoader that is able to create an object for the given description.
+	 * @throws SoftwareLoadException No loader could be created.
+	 **/
+	private SoftwareClassLoader getClassLoader(SoftwareDescription description) throws SoftwareLoadException {
+		SoftwareData entry = softwareCache.get(description.getId());
 		if (entry == null) {
 			entry = new SoftwareData(description);
-			softwareCache.put(description.getID(), entry);
+			softwareCache.put(description.getId(), entry);
 		}
 		
 		return entry.getLoader();
 	}
 	
+	/**
+	 * Attempts to instantiate an object of the class specified in the description.
+	 * @param description SoftwareDescription containing the relevant information for the software.
+	 * @return An object of the class specified in the description.
+	 * @throws SoftwareLoadException The object of the specified class could not be instantiated.
+	 *
+	 **/
 	public T createObjectFromDescription(SoftwareDescription description) throws SoftwareLoadException {
 		try {
 			SoftwareClassLoader loader = getClassLoader(description);
@@ -60,7 +79,7 @@ public class SoftwareFactory<T> {
 			@SuppressWarnings("unchecked")
 			T obj = (T)cls.newInstance();
 			return obj;
-		} catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
 			throw new SoftwareLoadException("Failed to instantiate object of class " + description.getClassName(), ex);
 		}
 	}
