@@ -1,7 +1,7 @@
-#include "Libjson/JSONAllocator.h"
+#include "libjson/JSONAllocator.h"
 
 #if defined(JSON_MEMORY_CALLBACKS) || defined(JSON_MEMORY_POOL)
-#include "Libjson/JSONMemory.h"
+#include "libjson/JSONMemory.h"
 
 void * JSONAllocatorRelayer::alloc(size_t bytes) json_nothrow {
 	return JSONMemory::json_malloc(bytes);

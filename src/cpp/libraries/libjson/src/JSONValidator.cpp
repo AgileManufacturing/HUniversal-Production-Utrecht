@@ -1,4 +1,4 @@
-#include "Libjson/JSONValidator.h"
+#include "libjson/JSONValidator.h"
 
 #ifdef JSON_VALIDATE
 

@@ -50,7 +50,7 @@
 #include <rexos_utilities/Utilities.h>
 
 #pragma GCC system_header
-#include <Libjson/libjson.h>
+#include <libjson/libjson.h>
 
 /**
  * The equipletNode, will manage all modules and keep track of their states

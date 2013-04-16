@@ -1,10 +1,10 @@
-#include "Libjson/JSONDebug.h"
+#include "libjson/JSONDebug.h"
 #ifdef JSON_DEBUG
 
 #ifdef JSON_STDERROR
     #include <iostream>  //need std::cerr
 #else
-    #include "Libjson/JSONSingleton.h"
+    #include "libjson/JSONSingleton.h"
     //otherwise, use a callback to tell the end user what happened
     json_error_callback_t JSONDebug::register_callback(json_error_callback_t callback) json_nothrow {
 		json_error_callback_t res = JSONSingleton<json_error_callback_t>::get();

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>Libjson</name>
+  <name>libjson</name>
   <version>0.0.0</version>
-  <description>The Libjson package</description>
+  <description>The libjson package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
@@ -49,7 +49,7 @@
 
     <!-- Other tools can request additional information be placed here -->
 
-    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lLibjson"/>
+    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -llibjson"/>
 
   </export>
 </package>

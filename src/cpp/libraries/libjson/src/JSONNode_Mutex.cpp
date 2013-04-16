@@ -1,5 +1,5 @@
-#include "Libjson/JSONNode.h"
-#include "Libjson/JSONGlobals.h"
+#include "libjson/JSONNode.h"
+#include "libjson/JSONGlobals.h"
 
 #ifdef JSON_MUTEX_CALLBACKS
 

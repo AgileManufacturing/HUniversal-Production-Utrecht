@@ -7,7 +7,7 @@
  *
  */
 
-#include "Libjson/JSONPreparse.h"
+#include "libjson/JSONPreparse.h"
 
 #if (defined(JSON_PREPARSE) && defined(JSON_READ_PRIORITY))
 
@@ -58,7 +58,7 @@ inline bool isHex(json_char c) json_nothrow {
 }
 
 #ifdef JSON_STRICT
-	#include "Libjson/NumberToString.h"
+	#include "libjson/NumberToString.h"
 #endif
 
 json_number FetchNumber(const json_string & _string) json_nothrow;

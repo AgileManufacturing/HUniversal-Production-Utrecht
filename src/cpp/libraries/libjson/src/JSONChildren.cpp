@@ -1,5 +1,5 @@
-#include "Libjson/JSONChildren.h"
-#include "Libjson/JSONNode.h"
+#include "libjson/JSONChildren.h"
+#include "libjson/JSONNode.h"
 
 /*
  *	reserves a certain number of bytes, in memory saving mode it creates a special

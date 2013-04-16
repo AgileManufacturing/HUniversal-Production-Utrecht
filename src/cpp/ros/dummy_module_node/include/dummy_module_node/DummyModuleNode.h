@@ -39,7 +39,7 @@
 
 // GCC system header to suppress libjson warnings
 #pragma GCC system_header
-#include <Libjson/libjson.h>
+#include <libjson/libjson.h>
 // ---------------------------------------------
 
 class DummyModuleNode : public rexos_mast::StateMachine{

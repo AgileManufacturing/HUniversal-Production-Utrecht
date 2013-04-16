@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(dummy_module_node)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation rexos_mast rexos_std_msgs rexos_std_srvs Libjson rexos_utilities)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation rexos_mast rexos_std_msgs rexos_std_srvs libjson rexos_utilities)
 find_package(Log4cxx)
 
 generate_messages (
@@ -13,7 +13,7 @@ generate_messages (
 catkin_package(
 INCLUDE_DIRS include 
 LIBRARIES  
-CATKIN_DEPENDS rexos_mast rexos_std_msgs rexos_std_srvs Libjson roscpp std_msgs rexos_utilities
+CATKIN_DEPENDS rexos_mast rexos_std_msgs rexos_std_srvs libjson roscpp std_msgs rexos_utilities
 DEPENDS)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

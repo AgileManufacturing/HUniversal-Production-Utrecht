@@ -1,8 +1,8 @@
-#include "Libjson/JSONStream.h"
+#include "libjson/JSONStream.h"
 
 #ifdef JSON_STREAM
-#include "Libjson/JSONWorker.h"
-#include "Libjson/JSONValidator.h"
+#include "libjson/JSONWorker.h"
+#include "libjson/JSONValidator.h"
 
 
 JSONStream::JSONStream(json_stream_callback_t call_p, json_stream_e_callback_t call_e, void * callbackIdentifier) json_nothrow : state(true), call(call_p), err_call(call_e), buffer(), callback_identifier(callbackIdentifier) {
