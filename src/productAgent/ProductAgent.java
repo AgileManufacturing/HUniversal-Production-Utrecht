@@ -17,6 +17,8 @@ public class ProductAgent extends Agent {
 	/**
 	 * 
 	 */
+	ProduceBehaviour prodBehav = new ProduceBehaviour();
+	
 	private static final long serialVersionUID = 1L;
 
 	// Private fields
@@ -59,14 +61,16 @@ public class ProductAgent extends Agent {
 	public void reschedule(){
 		@SuppressWarnings("unused")
 		int curProdStep = prodStep;
-		planBehav.action();
+		planBehav.action(); // add the posibility to reschedule at the given prodStep
 	}
 	
 	public void rescheduleAndRemoveEquiplet(){
+		//int curProdStep = prodBehav.getCurrentProductionStep(); // TODO get the current production step from 'produceBehaviour'
 		@SuppressWarnings("unused")
 		int curProdStep = prodStep;
 		AID removeEQ = getAID(); // get the AID at which the rescheduling was needed
 		planBehav.removeEquiplet(removeEQ);
+		reschedule();
 		// restart the planner behaviour at the curProdStep set by the produceBehaviour	
 	}
 
