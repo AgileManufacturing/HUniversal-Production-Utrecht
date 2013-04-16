@@ -56,13 +56,14 @@ public class OverviewBehaviour extends OneShotBehaviour {
 			
 		});
 
-		/*_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour() {
+		_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour() {
 			@Override
 			public void action() {
+				System.out.println("\n");
 				for (ProductionStep stp : _productAgent.getProduct()
 						.getProduction().getProductionSteps()) {
 					System.out.println("ProductionStep " + stp.getId()
-							+ " has Equiplets; \n");
+							+ " has Equiplets;");
 					for (AID aid : _productAgent.getProduct().getProduction()
 							.getProductionEquipletMapping()
 							.getEquipletsForProductionStep(stp.getId()).keySet() ) {
@@ -70,9 +71,10 @@ public class OverviewBehaviour extends OneShotBehaviour {
 								+ aid.getLocalName() + " AID: " + aid + " timeslots: " + _productAgent.getProduct().getProduction()
 								.getProductionEquipletMapping().getTimeSlotsForEquiplet(stp.getId(), aid));
 					}
+					System.out.println("\n");
 				}
 			}
-		}); */
+		});
 
 		System.out.println("Lets add a Scheduler");
 		 _schedulerBehaviour = new SchedulerBehaviour();
