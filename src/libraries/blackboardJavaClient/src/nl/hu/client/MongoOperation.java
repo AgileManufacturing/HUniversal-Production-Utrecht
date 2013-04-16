@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file MongoOperation.java
  * @brief Enum representing the different CRUD operations in MongoDB.
  * @date Created: 2012-04-04

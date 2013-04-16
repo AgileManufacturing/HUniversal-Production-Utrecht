@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file OplogEntry.java
  * @brief Representation of a document in the oplog collection.
  * @date Created: 2012-04-04
