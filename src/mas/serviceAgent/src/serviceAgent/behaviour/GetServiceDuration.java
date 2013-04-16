@@ -76,6 +76,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 	private String conversationId;
 
 	private long duration = 0;
+	private int remainingServiceSteps;
 
 	/**
 	 * @param a
@@ -103,6 +104,8 @@ public class GetServiceDuration extends ReceiveBehaviour {
 		this.serviceStepBlackBoard = serviceStepBlackBoard;
 		this.serviceSteps = Arrays.asList(serviceSteps);
 		this.conversationId = conversationId;
+		
+		remainingServiceSteps = serviceSteps.length;
 	}
 
 	public void onStart() {
@@ -123,7 +126,8 @@ public class GetServiceDuration extends ReceiveBehaviour {
 					agent.getHardwareAgentAID().getLocalName(), serviceSteps
 							.size());
 			for (ServiceStepMessage serviceStep : serviceSteps) {
-				serviceStepId = serviceStepBlackBoard.insertDocument(gson.toJson(serviceStep));
+				serviceStepId = serviceStepBlackBoard.insertDocument(gson
+						.toJson(serviceStep));
 
 				message = new ACLMessage(ACLMessage.QUERY_IF);
 				message.addReceiver(agent.getHardwareAgentAID());
@@ -148,7 +152,13 @@ public class GetServiceDuration extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
-				Gson gson = new GsonBuilder().create();
+				Gson gson = new GsonBuilder().registerTypeAdapter(
+						DBObject.class, new InstanceCreator<DBObject>() {
+							@Override
+							public DBObject createInstance(Type type) {
+								return new BasicDBObject();
+							}
+						}).create();
 				ServiceStepMessage serviceStep = gson.fromJson(gson
 						.toJson(serviceStepBlackBoard
 								.findDocumentById((ObjectId) message
@@ -160,9 +170,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 						serviceStep.getTimeData().getDuration());
 
 				duration += serviceStep.getTimeData().getDuration();
-				serviceSteps.remove(serviceStep);
-				// TODO store duration when ready
-				if (serviceSteps.isEmpty()) {
+				if (--remainingServiceSteps == 0) {
 					ScheduleData scheduleData = null;
 
 					productionStepBlackBoard.updateDocuments(
@@ -171,7 +179,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 							new BasicDBObject("$set", new BasicDBObject(
 									"scheduleData", gson.fromJson(
 											gson.toJson(scheduleData),
-											ScheduleData.class))));
+											DBObject.class))));
 					getAgent().removeBehaviour(this);
 				}
 			} catch (UnreadableException | JsonSyntaxException
