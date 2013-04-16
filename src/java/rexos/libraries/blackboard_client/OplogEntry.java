@@ -29,7 +29,7 @@
  * 
  **/
 
-package nl.hu.client;
+package rexos.libraries.blackboard_client;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;

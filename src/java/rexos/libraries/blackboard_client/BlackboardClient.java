@@ -31,7 +31,7 @@
  * @note 2013-04-04 JWW: Generalized BlackboardClient. Can now be used for more than just listening to topics.
  **/
 
-package nl.hu.client;
+package rexos.libraries.blackboard_client;
 
 import com.mongodb.*;
 import com.mongodb.util.JSON;

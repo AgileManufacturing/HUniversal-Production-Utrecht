@@ -27,7 +27,7 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package nl.hu.client;
+package rexos.libraries.blackboard_client;
 
 import java.util.EnumSet;
 import com.mongodb.DBObject;
@@ -142,7 +142,7 @@ public class FieldUpdateSubscription extends BasicOperationSubscription {
 	}
 	
 	/**
-	 * @see nl.hu.client.BasicOperationSubscription#getQuery()
+	 * @see rexos.libraries.blackboard_client.BasicOperationSubscription#getQuery()
 	 **/
 	@Override
 	public DBObject getQuery() {
@@ -157,7 +157,7 @@ public class FieldUpdateSubscription extends BasicOperationSubscription {
 	}
 	
 	/**
-	 * @see nl.hu.client.BasicOperationSubscription#matchesWithEntry(nl.hu.client.OplogEntry)
+	 * @see rexos.libraries.blackboard_client.BasicOperationSubscription#matchesWithEntry(rexos.libraries.blackboard_client.OplogEntry)
 	 **/
 	@Override
 	public boolean matchesWithEntry(OplogEntry entry) {

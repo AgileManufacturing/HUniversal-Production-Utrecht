@@ -29,7 +29,7 @@
  * 
  **/
 
-package nl.hu.client;
+package rexos.libraries.blackboard_client;
 
 /**
  * Interface used for subscribing to blackboard events.

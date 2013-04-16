@@ -23,7 +23,7 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package rexos.libraries.knowledge;
+package rexos.libraries.knowledgedb_client;
 
 import com.mysql.jdbc.Connection;
 
@@ -56,9 +56,9 @@ public class KnowledgeDBClient {
     private static final String PASS = "soxer";
 
     /**
-     * @var rexos.libraries.knowledge.KnowledgeDBClient client
+     * @var rexos.libraries.knowledgedb_client.KnowledgeDBClient client
      *
-     * The only rexos.libraries.knowledge.KnowledgeDBClient instance.
+     * The only rexos.libraries.knowledgedb_client.KnowledgeDBClient instance.
      **/
     private static KnowledgeDBClient client;
 
@@ -70,9 +70,9 @@ public class KnowledgeDBClient {
     private Connection connection;
 
     /**
-     * Get current rexos.libraries.knowledge.KnowledgeDBClient instance.
+     * Get current rexos.libraries.knowledgedb_client.KnowledgeDBClient instance.
      *
-     * @return The current rexos.libraries.knowledge.KnowledgeDBClient.
+     * @return The current rexos.libraries.knowledgedb_client.KnowledgeDBClient.
      **/
     public static synchronized KnowledgeDBClient getClient() {
         if (client == null) {

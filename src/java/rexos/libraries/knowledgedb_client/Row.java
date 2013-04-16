@@ -24,7 +24,7 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package rexos.libraries.knowledge;
+package rexos.libraries.knowledgedb_client;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -83,7 +83,7 @@ public class Row {
      **/
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("rexos.libraries.knowledge.Row { ");
+        StringBuilder builder = new StringBuilder("rexos.libraries.knowledgedb_client.Row { ");
         for (Map.Entry<String, Object> entry : row.entrySet()) {
             builder.append(entry.getKey());
             builder.append('=');

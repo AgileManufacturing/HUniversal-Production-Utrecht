@@ -29,7 +29,7 @@
  * 
  **/
 
-package nl.hu.client;
+package rexos.libraries.blackboard_client;
 
 /**
  * Thrown when the database namespace is incorrect.

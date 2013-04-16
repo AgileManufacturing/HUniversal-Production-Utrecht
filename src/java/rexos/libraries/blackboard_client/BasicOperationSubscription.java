@@ -29,7 +29,7 @@
  * 
  **/
 
-package nl.hu.client;
+package rexos.libraries.blackboard_client;
 
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
@@ -97,7 +97,7 @@ public class BasicOperationSubscription extends BlackboardSubscription {
 	}
 
 	/**
-	 * @see nl.hu.client.BlackboardSubscription#getQuery()
+	 * @see rexos.libraries.blackboard_client.BlackboardSubscription#getQuery()
 	 **/
 	@Override
 	public DBObject getQuery() {
@@ -105,7 +105,7 @@ public class BasicOperationSubscription extends BlackboardSubscription {
 	}
 
 	/**
-	 * @see nl.hu.client.BlackboardSubscription#matchesWithEntry(com.mongodb.DBObject)
+	 * @see rexos.libraries.blackboard_client.BlackboardSubscription#matchesWithEntry(com.mongodb.DBObject)
 	 **/
 	@Override
 	public boolean matchesWithEntry(OplogEntry entry) {

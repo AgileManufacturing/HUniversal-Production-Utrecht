@@ -29,7 +29,7 @@
  * 
  **/
 
-package nl.hu.client;
+package rexos.libraries.blackboard_client;
 
 /**
  * Enum listing the different CRUD operations in MongoDB, as well as their internal representation in the oplog.
