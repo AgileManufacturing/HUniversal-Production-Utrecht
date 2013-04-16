@@ -46,23 +46,23 @@ public class ServiceStepMessage {
 	private BasicDBObject parameters;
 	private StepStatusCode status;
 	private BasicDBObject statusData;
-	private ScheduleData timeData;
+	private ScheduleData scheduleData;
 
 	public ServiceStepMessage(long type, BasicDBObject parameters,
 			StepStatusCode status, BasicDBObject statusData,
-			ScheduleData timeData) {
-		this(null, type, parameters, status, statusData, timeData);
+			ScheduleData scheduleData) {
+		this(null, type, parameters, status, statusData, scheduleData);
 	}
 
 	public ServiceStepMessage(ObjectId productStepId, long type,
 			BasicDBObject parameters, StepStatusCode status,
-			BasicDBObject statusData, ScheduleData timeData) {
+			BasicDBObject statusData, ScheduleData scheduleData) {
 		this.productStepId = productStepId;
 		this.type = type;
 		this.parameters = parameters;
 		this.status = status;
 		this.statusData = statusData;
-		this.timeData = timeData;
+		this.scheduleData = scheduleData;
 	}
 
 	public boolean equals(Object obj) {
@@ -79,7 +79,7 @@ public class ServiceStepMessage {
 				&& parameters.equals(other.parameters)
 				&& status == other.status
 				&& statusData.equals(other.statusData)
-				&& timeData.equals(other.timeData);
+				&& scheduleData.equals(other.scheduleData);
 	}
 
 	/**
@@ -158,17 +158,17 @@ public class ServiceStepMessage {
 	}
 
 	/**
-	 * @return the timeData
+	 * @return the scheduleData
 	 */
-	public ScheduleData getTimeData() {
-		return timeData;
+	public ScheduleData getScheduleData() {
+		return scheduleData;
 	}
 
 	/**
-	 * @param timeData
-	 *            the timeData to set
+	 * @param scheduleData
+	 *            the scheduleData to set
 	 */
-	public void setTimeData(ScheduleData timeData) {
-		this.timeData = timeData;
+	public void setScheduleData(ScheduleData scheduleData) {
+		this.scheduleData = scheduleData;
 	}
 }
