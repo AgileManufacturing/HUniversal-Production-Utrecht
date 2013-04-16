@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file BlackboardClient.java
  * @brief Class representing a blackboard connection.
  * @date Created: late 2012
