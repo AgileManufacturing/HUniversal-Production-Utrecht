@@ -51,7 +51,7 @@ public class ProductionDurationResponse extends ReceiveBehaviour {
 			DBObject productStep = equipletAgent.getEquipletBBclient().findDocumentById(id);
 
 			ScheduleData schedule = new ScheduleData(); 
-			schedule.fromBasicDBObject(((BasicDBObject)productStep.get("scheduleData")));
+			schedule.fillWithBasicDBObject(((BasicDBObject)productStep.get("scheduleData")));
 			System.out.println(schedule.getDuration() + "");
 			
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);

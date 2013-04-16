@@ -167,9 +167,9 @@ public class GetServiceDuration extends ReceiveBehaviour {
 
 				System.out.format("%s says step type %s will take %d %n",
 						getAgent().getLocalName(), serviceStep.getType(),
-						serviceStep.getTimeData().getDuration());
+						serviceStep.getScheduleData().getDuration());
 
-				duration += serviceStep.getTimeData().getDuration();
+				duration += serviceStep.getScheduleData().getDuration();
 				if (--remainingServiceSteps == 0) {
 					ScheduleData scheduleData = null;
 

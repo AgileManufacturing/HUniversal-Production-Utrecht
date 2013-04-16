@@ -103,7 +103,7 @@ public class ScheduleData implements Serializable {
 				startTime, duration, deadline);
 	}
 	
-	public void fromBasicDBObject(BasicDBObject object){
+	public void fillWithBasicDBObject(BasicDBObject object){
 		this.startTime = object.getLong("startTime");
 		this.duration = object.getLong("duration");
 		this.deadline = object.getLong("deadline");
