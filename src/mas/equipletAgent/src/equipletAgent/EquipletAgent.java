@@ -143,10 +143,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	private ArrayList<Long> capabilities;
 
 	/**
-	 * @var Hashtable<String, ObjectId> communicationTable
+	 * @var HashMap<String, ObjectId> communicationTable
 	 * Table with the combinations conversationID and ObjectId.
 	 */
-	private Hashtable<String, ObjectId> communicationTable;
+	private HashMap<String, ObjectId> communicationTable;
 
 	/**
 	 * @var Gson gson
@@ -200,7 +200,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			e.printStackTrace();
 		}
 		equipletDbName = getAID().getLocalName();
-		communicationTable = new Hashtable<String, ObjectId>();
+		communicationTable = new HashMap<String, ObjectId>();
 		gson = new GsonBuilder().create();
 		try{
 			// TODO: Not Hardcoded capabilities/get capabilities from the service agent.
@@ -353,9 +353,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					throw new Exception();
 				}
 
-				Hashtable<String, String> statusData = new Hashtable<String, String>();
+				HashMap<String, String> statusData = new HashMap<String, String>();
 				try {
-					statusData = (Hashtable<String, String>) productStep.get("statusData");
+					statusData = (HashMap<String, String>) productStep.get("statusData");
 				} catch (Exception e) {
 				}
 
@@ -395,13 +395,13 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				case FAILED:
 					responseMessage.setOntology("StatusUpdate");
 					responseMessage.setContent("FAILED");
-					responseMessage.setContentObject((Serializable) statusData);
+					responseMessage.setContentObject(statusData);
 					send(responseMessage);
 					break;
 				case SUSPENDED_OR_WARNING:
 					responseMessage.setOntology("StatusUpdate");
 					responseMessage.setContent("SUSPENDED_OR_WARNING");
-					responseMessage.setContentObject((Serializable) statusData);
+					responseMessage.setContentObject(statusData);
 					send(responseMessage);
 					break;
 				case DONE:

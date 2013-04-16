@@ -44,8 +44,7 @@ import jade.core.AID;
  * 
  **/
 public class ServiceFactory {
-
-	private Hashtable<Integer, Service>serviceCache;
+	private Hashtable<Integer, Service> serviceCache;
 	private String equipletAID;
 	
 	public ServiceFactory(String equipletAID) {
