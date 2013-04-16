@@ -1,11 +1,8 @@
 package productAgent;
 
-import java.util.HashMap;
-
 import equipletAgent.EquipletAgent;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
 import newDataClasses.Product;
 import newDataClasses.ProductionStep;
 
@@ -20,6 +17,8 @@ public class ProductAgent extends Agent {
 	/**
 	 * 
 	 */
+	ProduceBehaviour prodBehav = new ProduceBehaviour();
+	
 	private static final long serialVersionUID = 1L;
 
 	// Private fields
@@ -32,7 +31,6 @@ public class ProductAgent extends Agent {
 	public int prodStep = 0;
 	PlannerBehaviour planBehav = new PlannerBehaviour();
 	EquipletAgent eqAgent = new EquipletAgent();
-	@SuppressWarnings("serial")
 	protected void setup() {
 		try {
 			_product = (Product) getArguments()[0];
@@ -61,13 +59,14 @@ public class ProductAgent extends Agent {
 	
 	public void reschedule(){
 		int curProdStep = prodStep;
-		planBehav.action();
+		planBehav.action(); // add the posibility to reschedule at the given prodStep
 	}
 	
 	public void rescheduleAndRemoveEquiplet(){
-		int curProdStep = prodStep;
+		//int curProdStep = prodBehav.getCurrentProductionStep(); // TODO get the current production step from 'produceBehaviour'
 		AID removeEQ = getAID(); // get the AID at which the rescheduling was needed
 		planBehav.removeEquiplet(removeEQ);
+		reschedule();
 		// restart the planner behaviour at the curProdStep set by the produceBehaviour	
 	}
 

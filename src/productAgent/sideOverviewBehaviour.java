@@ -1,10 +1,7 @@
 package productAgent;
 
-import newDataClasses.ProductionStep;
-import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
-import jade.core.behaviours.ParallelBehaviour;
 import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
@@ -26,7 +23,6 @@ public class sideOverviewBehaviour extends CyclicBehaviour {
 				block();
 			}
 		}
-
 	}
 	
 	private class WaitMsgBehaviour extends OneShotBehaviour {
