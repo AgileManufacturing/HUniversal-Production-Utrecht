@@ -309,6 +309,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		}
 		try {
 			equipletBBClient.removeDocuments(new BasicDBObject());
+			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
+			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
+			equipletBBClient.unsubscribe(statusSubscription);
 		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 			e.printStackTrace();
 		}

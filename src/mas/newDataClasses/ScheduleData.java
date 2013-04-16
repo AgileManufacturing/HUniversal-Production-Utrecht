@@ -2,6 +2,8 @@ package newDataClasses;
 
 import java.io.Serializable;
 
+import com.mongodb.BasicDBObject;
+
 /**
  * Instances of this class contain schedule data with the start time, duration and the deadline of a <code>ProductionStep</code> in timeslots.
  * 
@@ -99,5 +101,19 @@ public class ScheduleData implements Serializable {
 		return String.format(
 				"ScheduleData [startTime=%s, duration=%s, deadline=%s]",
 				startTime, duration, deadline);
+	}
+	
+	public void fromBasicDBObject(BasicDBObject object){
+		this.startTime = object.getLong("startTime");
+		this.duration = object.getLong("duration");
+		this.deadline = object.getLong("deadline");
+	}
+	
+	public BasicDBObject toBasicDBObject(){
+		BasicDBObject data = new BasicDBObject();
+		data.put("startTime", startTime);
+		data.put("duration", duration);
+		data.put("deadline", deadline);
+		return new BasicDBObject("scheduleData", data);
 	}
 }
