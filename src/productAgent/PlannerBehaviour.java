@@ -14,8 +14,11 @@ import newDataClasses.ProductionStep;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
-@SuppressWarnings("serial")
 public class PlannerBehaviour extends OneShotBehaviour {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ProductAgent _productAgent;
 
 	public void plannerBehaviour() {

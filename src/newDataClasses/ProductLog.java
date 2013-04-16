@@ -42,6 +42,7 @@ public class ProductLog {
 	}
 
 	public void pushLocalToRemote(){
+		// TODO:
 		//get latest remote
 		//get local since latest remote
 		//write to remote
