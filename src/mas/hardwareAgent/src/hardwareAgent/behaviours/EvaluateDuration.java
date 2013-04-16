@@ -69,15 +69,18 @@ public class EvaluateDuration extends ReceiveBehaviour {
 					
 					//vraag aan die module vertaal deze service step in equipletsteps
 					
-					
-					
+					long stepDuration = leadingModule.getStepDuration();
 					
 					//plaats equipletsteps en hun duration en zijn status op eveluating op bb,
 					
+					ACLMessage reply;
+					reply = message.createReply();
+					reply.setContent("it is there!");
+					myAgent.send(reply);
+					
+					// zet duration van de betreffende service step
 					
 					
-					//tel de duur van equi steps bij elkaar op,
-					// zet dit bij de duration van de betreffende service step
 					// stuur peter een reactie met het staat er
 					
 			}
