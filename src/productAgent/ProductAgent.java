@@ -1,11 +1,8 @@
 package productAgent;
 
-import java.util.HashMap;
-
 import equipletAgent.EquipletAgent;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
 import newDataClasses.Product;
 import newDataClasses.ProductionStep;
 
@@ -32,7 +29,7 @@ public class ProductAgent extends Agent {
 	public int prodStep = 0;
 	PlannerBehaviour planBehav = new PlannerBehaviour();
 	EquipletAgent eqAgent = new EquipletAgent();
-	@SuppressWarnings("serial")
+
 	protected void setup() {
 		try {
 			_product = (Product) getArguments()[0];
@@ -60,11 +57,13 @@ public class ProductAgent extends Agent {
 	}
 	
 	public void reschedule(){
+		@SuppressWarnings("unused")
 		int curProdStep = prodStep;
 		planBehav.action();
 	}
 	
 	public void rescheduleAndRemoveEquiplet(){
+		@SuppressWarnings("unused")
 		int curProdStep = prodStep;
 		AID removeEQ = getAID(); // get the AID at which the rescheduling was needed
 		planBehav.removeEquiplet(removeEQ);

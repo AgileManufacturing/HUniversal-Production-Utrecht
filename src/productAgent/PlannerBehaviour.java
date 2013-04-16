@@ -26,6 +26,7 @@ public class PlannerBehaviour extends OneShotBehaviour {
 	}
 
 	public void removeEquiplet(AID aid) {
+		@SuppressWarnings("unused")
 		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
 		// convert the AID to the desired dbObject
 		// bbc.removeDocuments(); // add the desired dbObject as param.
@@ -53,7 +54,7 @@ public class PlannerBehaviour extends OneShotBehaviour {
 			// Iterate over all the production steps
 			for (ProductionStep ps : psa) {
 				// Get the ID for the production step
-				long PA_id = ps.getId();
+				int PA_id = ps.getId();
 				// Get the type of production step, aka capability
 				long PA_capability = ps.getCapability();
 				// Create the select query for the blackboard

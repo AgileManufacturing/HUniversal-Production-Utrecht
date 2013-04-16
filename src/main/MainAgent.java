@@ -133,7 +133,7 @@ public class MainAgent extends Agent {
 					stp3, stp4 };
 
 			Production production = new Production(stepList);
-			Product product = new Product(production);
+			Product product = new Product(production, getAID().toString());
 
 			//We need to pass an Object[] to the createNewAgent. 
 			// But we only want to pass our product!

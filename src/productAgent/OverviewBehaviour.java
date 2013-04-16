@@ -1,21 +1,24 @@
 package productAgent;
 
+import newDataClasses.ProductionStep;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
-import newDataClasses.ProductionStep;
 
 @SuppressWarnings("serial")
 public class OverviewBehaviour extends OneShotBehaviour {
 	private ProductAgent _productAgent;
+	@SuppressWarnings("unused")
 	private boolean _isDone;
 	// private ThreadedBehaviourFactory _pbf;
 
 	/* Behaviour */
+	@SuppressWarnings("unused")
 	private PlannerBehaviour _plannerBehaviour;
 	private InformerBehaviour _informerBehaviour;
 	private SchedulerBehaviour _schedulerBehaviour;
+	@SuppressWarnings("unused")
 	private ProduceBehaviour _produceBehaviour;
 	private SequentialBehaviour _sequentialBehaviour;
 

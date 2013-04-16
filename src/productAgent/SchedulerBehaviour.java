@@ -37,6 +37,7 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			//System.out.println("SIZEEEEE "+psa.length);
 			 System.out.println("Commence Scheduling!");
 			for (ProductionStep ps : psa) {
+
 				long PA_id = ps.getId();
 				//System.out.println("SIZEEEEE "+production.getProductionEquipletMapping()
 						//.getEquipletsForProductionStep(PA_id).keySet().size());
@@ -58,7 +59,6 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 	 * @param productionStep
 	 * @throws Exception
 	 */
-	@SuppressWarnings("null")
 	public void Scheduler(Set<AID> equipletList, ProductionStep productionstep)
 			throws Exception {
 		Schedule[] schedules;
@@ -225,7 +225,6 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			return this.startTime;
 		}
 
-		@SuppressWarnings("unused")
 		public int getDuration() {
 			return this.duration;
 		}
