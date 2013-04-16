@@ -69,12 +69,16 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 			handle(msg);
 			restartTimer();
 		}
-		long dt = wakeupTime - System.currentTimeMillis();
-		if (dt > 0)
-			block(dt);
-		else {
-			clearTimeout();
-			handle((ACLMessage) null);
+		if(wakeupTime == 0) {
+			block();
+		} else {
+			long dt = wakeupTime - System.currentTimeMillis();
+			if (dt > 0)
+				block(dt);
+			else {
+				clearTimeout();
+				handle((ACLMessage) null);
+			}
 		}
 	}
 
@@ -113,7 +117,7 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	}
 
 	public void onStart() {
-		wakeupTime = (timeout < 0 ? Long.MAX_VALUE : System.currentTimeMillis()
+		wakeupTime = (timeout < 0 ? 0 : System.currentTimeMillis()
 				+ timeout);
 	}
 
