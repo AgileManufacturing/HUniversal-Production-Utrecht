@@ -1,10 +1,7 @@
 package productAgent;
 
-import newDataClasses.ProductionStep;
-import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
-import jade.core.behaviours.ParallelBehaviour;
 import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
@@ -12,6 +9,7 @@ public class sideOverviewBehaviour extends CyclicBehaviour {
 	ACLMessage msg;
 	ProductAgent pa = new ProductAgent();
 	
+	@SuppressWarnings("unused")
 	private class receiveMsgBehaviour extends CyclicBehaviour {
 		
 		private receiveMsgBehaviour(){
@@ -40,12 +38,14 @@ public class sideOverviewBehaviour extends CyclicBehaviour {
 			try {
 				switch(msg.getOntology()){
 					case "waiting":
+						@SuppressWarnings("unused")
 						OneShotBehaviour waitingBehaviour = new OneShotBehaviour(){
 							public void action(){
 								
 							}
 						};
 					case "reschedule":
+						@SuppressWarnings("unused")
 						OneShotBehaviour reschedule = new OneShotBehaviour(){
 							public void action(){
 								pa.reschedule();
@@ -53,6 +53,7 @@ public class sideOverviewBehaviour extends CyclicBehaviour {
 						};
 						break;
 					case "reschedule++":
+						@SuppressWarnings("unused")
 						OneShotBehaviour rescheduleAndRemoveEquiplet = new OneShotBehaviour(){
 							public void action(){
 								pa.rescheduleAndRemoveEquiplet();

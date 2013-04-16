@@ -38,8 +38,10 @@ import com.mongodb.DBObject;
 
 public class OplogEntry {
 	private static final String NAMESPACE_FIELD = "ns";
+	@SuppressWarnings("unused")
 	private static final String TIMESTAMP_FIELD = "ts";
 	private static final String OPERATION_FIELD = "op";
+	@SuppressWarnings("unused")
 	private static final String UID_FIELD = "h";
 	private static final String UPDATE_DOC_FIELD = "o";
 	private static final String UPDATE_CRITERIA_FIELD = "o2";

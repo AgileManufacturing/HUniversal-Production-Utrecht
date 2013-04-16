@@ -15,6 +15,10 @@ import jade.lang.acl.MessageTemplate;
  */
 public class ReceiveBehaviour extends SimpleBehaviour {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private MessageTemplate template;
 	private long timeOut, wakeupTime;
 	private boolean finished;

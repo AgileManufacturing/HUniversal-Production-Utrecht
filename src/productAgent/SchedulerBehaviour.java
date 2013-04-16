@@ -58,7 +58,6 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 	 * @param productionStep
 	 * @throws Exception
 	 */
-	@SuppressWarnings("null")
 	public void Scheduler(Set<AID> equipletList, ProductionStep productionstep)
 			throws Exception {
 		Schedule[] schedules;
@@ -225,7 +224,6 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			return this.startTime;
 		}
 
-		@SuppressWarnings("unused")
 		public int getDuration() {
 			return this.duration;
 		}
