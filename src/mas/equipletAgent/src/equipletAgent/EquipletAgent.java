@@ -48,7 +48,6 @@ import nl.hu.client.*;
 import nl.hu.client.FieldUpdateSubscription.MongoUpdateLogOperation;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.*;
 import java.util.Map.Entry;
@@ -360,7 +359,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				}
 
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
-				responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
+				AID productAgent = new AID((String)((DBObject)productStep.get("productAgentId")).get("name"), AID.ISGUID);
+				responseMessage.addReceiver(productAgent);
 				responseMessage.setConversationId(conversationId);
 
 				StepStatusCode status = (StepStatusCode) productStep.get("status");
