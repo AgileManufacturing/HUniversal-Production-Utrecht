@@ -148,7 +148,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 									.getProductStepId()),
 							new BasicDBObject("$set", new BasicDBObject(
 									"scheduleData", gson.fromJson(
-											gson.toJson(scheduleData),
+											gson.toJson(0),
 											ScheduleData.class))));
 					getAgent().removeBehaviour(this);
 				}
