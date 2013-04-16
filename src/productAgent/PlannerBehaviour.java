@@ -25,11 +25,11 @@ public class PlannerBehaviour extends OneShotBehaviour {
 		return 0;
 	}
 
+	// This function is for testing purposes only and will later be replaced within the Equiplet Agent its functionality
 	public void removeEquiplet(AID aid) {
-		@SuppressWarnings("unused")
 		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
 
-		// try to remove the given 'aid' from the blackboard (for testing purposes only)
+		// try to remove the given 'aid' from the blackboard 
 		try {		
 			bbc.removeDocuments(aid.toString());
 		} catch (InvalidJSONException | InvalidDBNamespaceException e) {
