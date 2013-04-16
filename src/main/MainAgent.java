@@ -33,13 +33,32 @@ public class MainAgent extends Agent {
 			Object[] ar = new Object[] { 1 };// pickndplace
 			((AgentController) getContainerController().createNewAgent("eqa1",
 					"equipletAgent.EquipletAgent", ar)).start();
-
 			ar = new Object[] { 2 }; // colour
 			((AgentController) getContainerController().createNewAgent("eqa2",
 					"equipletAgent.EquipletAgent", ar)).start();
-
 			ar = new Object[] { 3 }; // rotate
 			((AgentController) getContainerController().createNewAgent("eqa3",
+					"equipletAgent.EquipletAgent", ar)).start();
+			ar = new Object[] { 2 }; // rotate
+			((AgentController) getContainerController().createNewAgent("eqa4",
+					"equipletAgent.EquipletAgent", ar)).start();
+			ar = new Object[] { 1 }; // rotate
+			((AgentController) getContainerController().createNewAgent("eqa5",
+					"equipletAgent.EquipletAgent", ar)).start();
+			ar = new Object[] { 3 }; // rotate
+			((AgentController) getContainerController().createNewAgent("eqa6",
+					"equipletAgent.EquipletAgent", ar)).start();
+			ar = new Object[] { 1 }; // rotate
+			((AgentController) getContainerController().createNewAgent("eqa7",
+					"equipletAgent.EquipletAgent", ar)).start();
+			ar = new Object[] { 1 }; // rotate
+			((AgentController) getContainerController().createNewAgent("eqa8",
+					"equipletAgent.EquipletAgent", ar)).start();
+			ar = new Object[] { 2 }; // rotate
+			((AgentController) getContainerController().createNewAgent("eqa9",
+					"equipletAgent.EquipletAgent", ar)).start();
+			ar = new Object[] { 3 }; // rotate
+			((AgentController) getContainerController().createNewAgent("eqa10",
 					"equipletAgent.EquipletAgent", ar)).start();
 
 			ar = null;

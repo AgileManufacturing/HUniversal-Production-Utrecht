@@ -2,10 +2,10 @@ package productAgent;
 
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
-
 import java.util.List;
-
 import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
+import libraries.blackboardJavaClient.src.nl.hu.client.InvalidDBNamespaceException;
+import libraries.blackboardJavaClient.src.nl.hu.client.InvalidJSONException;
 import newDataClasses.Product;
 import newDataClasses.Production;
 import newDataClasses.ProductionEquipletMapper;
@@ -31,10 +31,15 @@ public class PlannerBehaviour extends OneShotBehaviour {
 	public void removeEquiplet(AID aid) {
 		@SuppressWarnings("unused")
 		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
-		// convert the AID to the desired dbObject
-		// bbc.removeDocuments(); // add the desired dbObject as param.
-	}
 
+		// try to remove the given 'aid' from the blackboard (for testing purposes only)
+		try {		
+			bbc.removeDocuments(aid.toString());
+		} catch (InvalidJSONException | InvalidDBNamespaceException e) {
+			e.printStackTrace();
+		}
+	}
+		
 	public void action() {
 		try {
 			// Get the root Agent

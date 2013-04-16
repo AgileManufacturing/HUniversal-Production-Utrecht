@@ -34,12 +34,13 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			Production production = product.getProduction();
 			ProductionStep[] psa = production.getProductionSteps();
 			//debug
-			System.out.println("SIZEEEEE "+psa.length);
-			
+			//System.out.println("SIZEEEEE "+psa.length);
+			 System.out.println("Commence Scheduling!");
 			for (ProductionStep ps : psa) {
-				int PA_id = ps.getId();
-				System.out.println("SIZEEEEE "+production.getProductionEquipletMapping()
-						.getEquipletsForProductionStep(PA_id).keySet().size());
+
+				long PA_id = ps.getId();
+				//System.out.println("SIZEEEEE "+production.getProductionEquipletMapping()
+						//.getEquipletsForProductionStep(PA_id).keySet().size());
 
 				Scheduler(production.getProductionEquipletMapping()
 						.getEquipletsForProductionStep(PA_id).keySet(), ps);
@@ -63,9 +64,9 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 		Schedule[] schedules;
 		//load set into arraylist
 		 List<AID> equipletlist = new ArrayList<AID>(equipletList);
-		 System.out.println("EQ LIST SIZE:"+equipletlist.size()+" OR  "+equipletList.size());
+		 System.out.println("No. of equiplets for step: " + productionstep.getId() + ": " + equipletlist.size());
 		//Make connection with database
-		MongoClient mongoClient =null;
+		MongoClient mongoClient = null;
 		System.out.println("Scheduler Started");
 		
 		try {
@@ -200,7 +201,7 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 	        System.out.println("Send Timeslot to EQ");
 		}else{
 			//debug
-			System.out.println("No Timeslot asigned.");
+			System.out.println("No Timeslot asigned. \n");
 		}
       
 	}

@@ -24,7 +24,6 @@ public class sideOverviewBehaviour extends CyclicBehaviour {
 				block();
 			}
 		}
-
 	}
 	
 	private class WaitMsgBehaviour extends OneShotBehaviour {

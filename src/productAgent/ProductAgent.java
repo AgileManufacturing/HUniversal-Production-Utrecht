@@ -14,27 +14,26 @@ import newDataClasses.ProductionStep;
  *          on the agents localname.
  */
 public class ProductAgent extends Agent {
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 1L;
 
 	// Private fields
 	private Product _product;
-
+	private OverviewBehaviour _overviewBehaviour;
+	
+	
 	// CID variables
 	private static int _cidCnt = 0;
 	private String _cidBase;
 
 	public int prodStep = 0;
-	PlannerBehaviour planBehav = new PlannerBehaviour();
-	EquipletAgent eqAgent = new EquipletAgent();
+	
 
 	protected void setup() {
 		try {
 			_product = (Product) getArguments()[0];
-
-			addBehaviour(new OverviewBehaviour());
+			_overviewBehaviour = new OverviewBehaviour();
+			addBehaviour(_overviewBehaviour);
 
 			System.out.println("I spawned as a product agent");
 
@@ -57,17 +56,12 @@ public class ProductAgent extends Agent {
 	}
 	
 	public void reschedule(){
-		@SuppressWarnings("unused")
-		int curProdStep = prodStep;
-		planBehav.action();
+		_overviewBehaviour.Reschedule();
 	}
 	
 	public void rescheduleAndRemoveEquiplet(){
-		@SuppressWarnings("unused")
-		int curProdStep = prodStep;
-		AID removeEQ = getAID(); // get the AID at which the rescheduling was needed
-		planBehav.removeEquiplet(removeEQ);
-		// restart the planner behaviour at the curProdStep set by the produceBehaviour	
+		//remove equiplet first
+		_overviewBehaviour.Reschedule();
 	}
 
 	public Product getProduct() {
