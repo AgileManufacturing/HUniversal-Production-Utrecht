@@ -80,7 +80,7 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		System.out.format("%s received message from %s %n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
+		System.out.format("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
 
 		ObjectId productStepEntryId = equipletAgent.getCommunicationSlot(msg.getConversationId());
 		try {

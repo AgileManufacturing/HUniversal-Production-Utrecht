@@ -31,6 +31,7 @@
 package serviceAgent.behaviour;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,9 +43,13 @@ import behaviours.ReceiveBehaviour;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.TypeAdapter;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+
+import equipletAgent.StepStatusCode;
 
 import newDataClasses.ScheduleData;
 import nl.hu.client.BlackboardClient;
@@ -103,7 +108,14 @@ public class GetServiceDuration extends ReceiveBehaviour {
 		ObjectId serviceStepId;
 		ACLMessage message;
 		ServiceAgent agent = (ServiceAgent) getAgent();
-		Gson gson = new GsonBuilder().create();
+		Gson gson = new GsonBuilder().registerTypeAdapter(
+				DBObject.class,
+				new InstanceCreator<DBObject>() {
+					@Override
+					public DBObject createInstance(Type type) {
+						return new BasicDBObject();
+					}
+				}).create();
 
 		try {
 			for (ServiceStepMessage serviceStep : serviceSteps) {
@@ -143,13 +155,13 @@ public class GetServiceDuration extends ReceiveBehaviour {
 				serviceSteps.remove(serviceStep);
 				// TODO store duration when ready
 				if (serviceSteps.isEmpty()) {
-					productionStepBlackBoard.updateDocuments(
-							new BasicDBObject("_id", serviceStep
-									.getProductStepId()),
-							new BasicDBObject("$set", new BasicDBObject(
-									"scheduleData", gson.fromJson(
-											gson.toJson(scheduleData),
-											ScheduleData.class))));
+					// productionStepBlackBoard.updateDocuments(
+					// new BasicDBObject("_id", serviceStep
+					// .getProductStepId()),
+					// new BasicDBObject("$set", new BasicDBObject(
+					// "scheduleData", gson.fromJson(
+					// gson.toJson(scheduleData),
+					// ScheduleData.class))));
 					getAgent().removeBehaviour(this);
 				}
 			} catch (UnreadableException | JsonSyntaxException

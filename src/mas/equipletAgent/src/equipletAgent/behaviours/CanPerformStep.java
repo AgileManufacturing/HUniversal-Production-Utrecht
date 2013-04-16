@@ -114,7 +114,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 			ProductStepMessage entry = new ProductStepMessage(message.getSender(), proStepC.getCapability(),
 					proStepC.getParameterList(), null, null,
 					StepStatusCode.EVALUATING, new HashMap<String, String>(), new ScheduleData());
-			productStepEntryId = equipletAgent.getEquipletBBclient().insertDocument(new BasicDBObject("ProductionStep", entry));
+			productStepEntryId = equipletAgent.getEquipletBBclient().insertDocument(gson.toJson(entry));
 			equipletAgent.addCommunicationSlot(message.getConversationId(), productStepEntryId);
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
 			responseMessage.setConversationId(message.getConversationId());

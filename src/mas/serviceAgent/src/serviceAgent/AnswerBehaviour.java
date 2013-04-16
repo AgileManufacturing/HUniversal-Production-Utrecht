@@ -106,10 +106,9 @@ public class AnswerBehaviour extends CyclicBehaviour {
 								new BasicDBObject("_id",
 										productionStep.get("_id")),
 								new BasicDBObject("$set", new BasicDBObject(
-//										"scheduleData", gson.fromJson(
-//												gson.toJson(scheduleData),
-//												ScheduleData.class))));
-										"scheduleData", scheduleData)));
+										"scheduleData", gson.fromJson(
+												gson.toJson(scheduleData),
+												ScheduleData.class))));
 					} catch (InvalidDBNamespaceException
 							| GeneralMongoException e) {
 						e.printStackTrace();

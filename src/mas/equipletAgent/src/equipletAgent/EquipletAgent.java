@@ -74,7 +74,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 * @var String collectiveDbIp
 	 * IP of the collective database.
 	 */
-	private String collectiveDbIp = "localhost";//"145.89.191.131";
+	private String collectiveDbIp = "145.89.191.131";
 	
 	/**
 	 * @var int collectiveDbPort
