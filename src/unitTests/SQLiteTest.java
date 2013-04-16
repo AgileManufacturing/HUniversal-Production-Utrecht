@@ -1,9 +1,7 @@
-import static org.junit.Assert.*;
-
+package unitTests;
 import java.util.ArrayList;
 import java.util.List;
 
-import jade.domain.introspection.AddedBehaviour;
 import newDataClasses.LogMessage;
 import newDataClasses.ProductLog;
 import newDataClasses.sqldatadase.sqliteDatabase;
@@ -52,7 +50,7 @@ public class SQLiteTest {
 	 */
 	@Test
 	public void testAdd() {
-		ProductLog test = new ProductLog(false, true, new sqliteDatabase("test.db"));
+		ProductLog test = new ProductLog(false, true, new sqliteDatabase(null));
 		List<LogMessage> msgs = new ArrayList<LogMessage>();
 		
 		msgs.add(new LogMessage("id", "12-04-2013 10:09", "producing", "Start producing"));

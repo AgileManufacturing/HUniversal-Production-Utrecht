@@ -49,6 +49,7 @@ public class GateWayAgent extends Agent {
 		}
 	} // END of inner class WaitPingAndReplyBehaviour
 	
+	@SuppressWarnings("unused")
 	private class XMLReader 
 	{
 		 public void parse(String Message)

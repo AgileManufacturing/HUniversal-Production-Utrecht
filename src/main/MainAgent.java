@@ -114,7 +114,7 @@ public class MainAgent extends Agent {
 					stp3, stp4 };
 
 			Production production = new Production(stepList);
-			Product product = new Product(production);
+			Product product = new Product(production, getAID().toString());
 
 			//We need to pass an Object[] to the createNewAgent. 
 			// But we only want to pass our product!
@@ -122,7 +122,7 @@ public class MainAgent extends Agent {
 			arg[0] = product;
 
 			((AgentController) getContainerController().createNewAgent("pa1",
-					"ProductAgent.ProductAgent", arg)).start();
+					"productAgent.ProductAgent", arg)).start();
 
 		} catch (Exception e) {
 			e.printStackTrace();

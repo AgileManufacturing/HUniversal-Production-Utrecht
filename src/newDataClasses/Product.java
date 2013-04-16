@@ -15,6 +15,8 @@ package newDataClasses;
 
 import java.util.List;
 
+import newDataClasses.sqldatadase.sqliteDatabase;
+
 
 public class Product {
 	
@@ -32,9 +34,10 @@ public class Product {
 		
 	}
 	
-	public Product(Production production) throws Exception {
+	public Product(Production production, String aid) throws Exception {
 		if(production == null) throw new Exception("Production can't be null");
 		setProduction(production);
+		log = new ProductLog(false, true, new sqliteDatabase(aid));
 	}
 
 	/**

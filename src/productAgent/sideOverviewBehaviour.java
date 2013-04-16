@@ -9,6 +9,7 @@ public class sideOverviewBehaviour extends CyclicBehaviour {
 	ACLMessage msg;
 	ProductAgent pa = new ProductAgent();
 	
+	@SuppressWarnings("unused")
 	private class receiveMsgBehaviour extends CyclicBehaviour {
 		
 		private receiveMsgBehaviour(){
@@ -36,12 +37,14 @@ public class sideOverviewBehaviour extends CyclicBehaviour {
 			try {
 				switch(msg.getOntology()){
 					case "waiting":
+						@SuppressWarnings("unused")
 						OneShotBehaviour waitingBehaviour = new OneShotBehaviour(){
 							public void action(){
 								
 							}
 						};
 					case "reschedule":
+						@SuppressWarnings("unused")
 						OneShotBehaviour reschedule = new OneShotBehaviour(){
 							public void action(){
 								pa.reschedule();
@@ -49,6 +52,7 @@ public class sideOverviewBehaviour extends CyclicBehaviour {
 						};
 						break;
 					case "reschedule++":
+						@SuppressWarnings("unused")
 						OneShotBehaviour rescheduleAndRemoveEquiplet = new OneShotBehaviour(){
 							public void action(){
 								pa.rescheduleAndRemoveEquiplet();

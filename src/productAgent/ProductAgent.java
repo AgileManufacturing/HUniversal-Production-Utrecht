@@ -31,6 +31,7 @@ public class ProductAgent extends Agent {
 	public int prodStep = 0;
 	PlannerBehaviour planBehav = new PlannerBehaviour();
 	EquipletAgent eqAgent = new EquipletAgent();
+
 	protected void setup() {
 		try {
 			_product = (Product) getArguments()[0];
@@ -58,12 +59,15 @@ public class ProductAgent extends Agent {
 	}
 	
 	public void reschedule(){
+		@SuppressWarnings("unused")
 		int curProdStep = prodStep;
 		planBehav.action(); // add the posibility to reschedule at the given prodStep
 	}
 	
 	public void rescheduleAndRemoveEquiplet(){
 		//int curProdStep = prodBehav.getCurrentProductionStep(); // TODO get the current production step from 'produceBehaviour'
+		@SuppressWarnings("unused")
+		int curProdStep = prodStep;
 		AID removeEQ = getAID(); // get the AID at which the rescheduling was needed
 		planBehav.removeEquiplet(removeEQ);
 		reschedule();

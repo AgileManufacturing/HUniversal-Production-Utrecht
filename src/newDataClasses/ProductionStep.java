@@ -23,7 +23,7 @@ public class ProductionStep implements Serializable {
 	private static final long serialVersionUID = -832835122145455883L;
 
 	private int _requiredTimeSlots;
-	private long _id;
+	private int _id;
 	private long _capability;
 	
 	private ParameterList _parameters;
@@ -32,13 +32,13 @@ public class ProductionStep implements Serializable {
 		this._parameters = new ParameterList();
 	}
 	
-	public ProductionStep(long id, long capability,  ParameterList parameterList) {
+	public ProductionStep(int id, long capability,  ParameterList parameterList) {
 		this._id = id;
 		this._capability = capability;
 		this._parameters = parameterList;
 	}
 	
-	public long getId(){
+	public int getId(){
 		return this._id;
 	}
 	
