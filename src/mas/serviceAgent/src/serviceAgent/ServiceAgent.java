@@ -4,7 +4,7 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 
 import serviceAgent.behaviour.CanDoProductStep;
-import serviceAgent.behaviour.GetProductStepDuration;
+import serviceAgent.behaviour.GetProductDuration;
 import jade.core.AID;
 import jade.core.Agent;
 import com.mongodb.*;
@@ -64,7 +64,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		//create serviceFactory
 //		addBehaviour(new AnswerBehaviour(this));
 		addBehaviour(new CanDoProductStep(this, productionStepBBClient));
-		addBehaviour(new GetProductStepDuration(this, productionStepBBClient, serviceStepBBClient));
+		addBehaviour(new GetProductDuration(this, productionStepBBClient, serviceStepBBClient));
 		
 		//receive behaviours from EA
 		//add EvaluateProductionStep receiveBehaviour --> conversation with HA
@@ -117,7 +117,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 			switch (operation) {
 			case INSERT:
-//				addBehaviour(new GetProductStepDuration(this, productionStep));
+//				addBehaviour(new GetProductDuration(this, productionStep));
 				break;
 			case UPDATE:
 				StepStatusCode status = (StepStatusCode) productionStep

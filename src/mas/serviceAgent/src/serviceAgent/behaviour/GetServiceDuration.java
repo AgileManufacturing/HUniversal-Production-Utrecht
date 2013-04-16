@@ -55,6 +55,7 @@ import newDataClasses.ScheduleData;
 import nl.hu.client.BlackboardClient;
 import nl.hu.client.GeneralMongoException;
 import nl.hu.client.InvalidDBNamespaceException;
+import nl.hu.client.InvalidJSONException;
 import serviceAgent.ServiceAgent;
 import serviceAgent.ServiceStepMessage;
 import jade.core.Agent;
@@ -108,8 +109,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 		ObjectId serviceStepId;
 		ACLMessage message;
 		ServiceAgent agent = (ServiceAgent) getAgent();
-		Gson gson = new GsonBuilder().registerTypeAdapter(
-				DBObject.class,
+		Gson gson = new GsonBuilder().registerTypeAdapter(DBObject.class,
 				new InstanceCreator<DBObject>() {
 					@Override
 					public DBObject createInstance(Type type) {
@@ -118,9 +118,12 @@ public class GetServiceDuration extends ReceiveBehaviour {
 				}).create();
 
 		try {
+			System.out.format("%s asking %s for duration of %d steps%n", agent
+					.getLocalName(),
+					agent.getHardwareAgentAID().getLocalName(), serviceSteps
+							.size());
 			for (ServiceStepMessage serviceStep : serviceSteps) {
-				serviceStepId = serviceStepBlackBoard.insertDocument(gson
-						.fromJson(gson.toJson(serviceStep), DBObject.class));
+				serviceStepId = serviceStepBlackBoard.insertDocument(gson.toJson(serviceStep));
 
 				message = new ACLMessage(ACLMessage.QUERY_IF);
 				message.addReceiver(agent.getHardwareAgentAID());
@@ -130,8 +133,9 @@ public class GetServiceDuration extends ReceiveBehaviour {
 				agent.send(message);
 			}
 		} catch (InvalidDBNamespaceException | GeneralMongoException
-				| IOException e) {
+				| IOException | InvalidJSONException e) {
 			e.printStackTrace();
+			agent.doDelete();
 		}
 	}
 
@@ -151,17 +155,23 @@ public class GetServiceDuration extends ReceiveBehaviour {
 										.getContentObject())),
 						ServiceStepMessage.class);
 
+				System.out.format("%s says step type %s will take %d %n",
+						getAgent().getLocalName(), serviceStep.getType(),
+						serviceStep.getTimeData().getDuration());
+
 				duration += serviceStep.getTimeData().getDuration();
 				serviceSteps.remove(serviceStep);
 				// TODO store duration when ready
 				if (serviceSteps.isEmpty()) {
-					// productionStepBlackBoard.updateDocuments(
-					// new BasicDBObject("_id", serviceStep
-					// .getProductStepId()),
-					// new BasicDBObject("$set", new BasicDBObject(
-					// "scheduleData", gson.fromJson(
-					// gson.toJson(scheduleData),
-					// ScheduleData.class))));
+					ScheduleData scheduleData = null;
+
+					productionStepBlackBoard.updateDocuments(
+							new BasicDBObject("_id", serviceStep
+									.getProductStepId()),
+							new BasicDBObject("$set", new BasicDBObject(
+									"scheduleData", gson.fromJson(
+											gson.toJson(scheduleData),
+											ScheduleData.class))));
 					getAgent().removeBehaviour(this);
 				}
 			} catch (UnreadableException | JsonSyntaxException

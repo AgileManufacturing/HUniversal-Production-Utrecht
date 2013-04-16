@@ -17,18 +17,15 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 public class EvaluateDuration extends ReceiveBehaviour {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
+	
 	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("GetServiceStepDuration");
 	private HardwareAgent hardwareAgent;
 
 	/**
 	 * Instantiates a new schedule step.
 	 * 
-	 * @param a
-	 *            the a
+	 * @param a the a
 	 */
 	public EvaluateDuration(Agent a) {
 		super(a, -1, messageTemplate);
@@ -49,41 +46,37 @@ public class EvaluateDuration extends ReceiveBehaviour {
 
 		try {
 			ObjectId objectId = null;
-			DBObject serviceStep = null;
+			BasicDBObject serviceStep = null;
 			try {
 				objectId = (ObjectId) message.getContentObject();
-				BasicDBObject query = new BasicDBObject();
-				query.put("_id", objectId);
-				serviceStep = hardwareAgent.getServiceStepsBBClient().findDocuments(query).get(0);
+				serviceStep = (BasicDBObject) hardwareAgent.getServiceStepsBBClient().findDocumentById(objectId);
 			} catch (UnreadableException | InvalidDBNamespaceException e) {
 				e.printStackTrace();
 				myAgent.doDelete();
 			}
-			if (serviceStep != null) {
-				long stepType = ((long) serviceStep.get("type"));
-				Object parameters = serviceStep.get("parameters");
-				
-					// kijk in hashmap welke module hoort bij deze step
-					
-					Module leadingModule = (Module)hardwareAgent.GetModuleForStep(stepType);
-					
-					//vraag aan die module vertaal deze service step in equipletsteps
-					
-					long stepDuration = leadingModule.getStepDuration();
-					
-					//plaats equipletsteps en hun duration en zijn status op eveluating op bb,
-					
-					ACLMessage reply;
-					reply = message.createReply();
-					reply.setContent("it is there!");
-					myAgent.send(reply);
-					
-					// zet duration van de betreffende service step
-					
-					
-					// stuur peter een reactie met het staat er
-					
-			}
+
+			long stepType = serviceStep.getLong("type");
+			Object parameters = serviceStep.get("parameters");
+			
+			// kijk in hashmap welke module hoort bij deze step
+			
+			Module leadingModule = (Module)hardwareAgent.GetModuleForStep(stepType);
+			
+			//vraag aan die module vertaal deze service step in equipletsteps
+			
+			long stepDuration = leadingModule.getStepDuration();
+			
+			//plaats equipletsteps en hun duration en zijn status op eveluating op bb,
+			
+			ACLMessage reply;
+			reply = message.createReply();
+			reply.setContent("it is there!");
+			myAgent.send(reply);
+			
+			// zet duration van de betreffende service step
+			
+			
+			// stuur peter een reactie met het staat er
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
