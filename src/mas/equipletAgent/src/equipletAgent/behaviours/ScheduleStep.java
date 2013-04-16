@@ -88,7 +88,6 @@ public class ScheduleStep extends ReceiveBehaviour {
 		System.out.format("%s received message from %s (%s:%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
 
 		try{
-			
 			long timeslot = Long.parseLong(contentString);
 			System.out.format("%d%n", timeslot);
 			ACLMessage timeslotMessage = new ACLMessage(ACLMessage.REQUEST);

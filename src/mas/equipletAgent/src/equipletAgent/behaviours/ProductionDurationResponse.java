@@ -53,14 +53,17 @@ public class ProductionDurationResponse extends ReceiveBehaviour {
 			ScheduleData schedule = new ScheduleData(); 
 			schedule.fromBasicDBObject(((BasicDBObject)productStep.get("scheduleData")));
 			System.out.println(schedule.getDuration() + "");
+			
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
-			responseMessage.addReceiver(new AID(productStep.get("productAgentId").toString(), AID.ISLOCALNAME));
+			AID productAgent = new AID((String)((DBObject)productStep.get("productAgentId")).get("name"), AID.ISGUID);
+			responseMessage.addReceiver(productAgent);
 			responseMessage.setOntology("ProductionDuration");
 			responseMessage.setConversationId(message.getConversationId());
 			responseMessage.setContentObject(schedule.getDuration());
-
-			System.out.format("sending message: %s%n", responseMessage);
 			myAgent.send(responseMessage);
+			
+			System.out.format("sending message: %s%n", responseMessage);
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();

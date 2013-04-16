@@ -30,7 +30,8 @@
 package equipletAgent;
 
 import java.io.Serializable;
-import java.util.HashMap;
+
+import com.mongodb.BasicDBObject;
 
 import jade.core.AID;
 
@@ -84,10 +85,10 @@ public class ProductStepMessage implements Serializable{
 	private StepStatusCode status;
 	
 	/**
-	 * @var HashMap<String, String> statusData
+	 * @var basicDBObject statusData
 	 * The extra data provided by the status for this product step.
 	 */
-	private HashMap<String, String> statusData;
+	private BasicDBObject statusData;
 	
 	/**
 	 * @var ScheduleData scheduleData
@@ -109,7 +110,7 @@ public class ProductStepMessage implements Serializable{
 	 */
 	public ProductStepMessage(AID productAgentId, long type,
 			ParameterList parameters, Object inputParts, Object outputParts,
-			StepStatusCode status, HashMap<String, String> statusData, ScheduleData scheduleData) {
+			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
 		this.productAgentId = productAgentId;
 		this.type = type;
 		this.parameters = parameters;
@@ -232,14 +233,14 @@ public class ProductStepMessage implements Serializable{
 	/**
 	 * @return the statusData
 	 */
-	public HashMap<String, String> getStatusData() {
+	public BasicDBObject getStatusData() {
 		return statusData;
 	}
 
 	/**
 	 * @param statusData the statusData to set
 	 */
-	public void setStatusData(HashMap<String, String> statusData) {
+	public void setStatusData(BasicDBObject statusData) {
 		this.statusData = statusData;
 	}
 
