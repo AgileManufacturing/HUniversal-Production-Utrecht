@@ -48,7 +48,6 @@ import nl.hu.client.*;
 import nl.hu.client.FieldUpdateSubscription.MongoUpdateLogOperation;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.*;
 import java.util.Map.Entry;
@@ -143,10 +142,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	private ArrayList<Long> capabilities;
 
 	/**
-	 * @var Hashtable<String, ObjectId> communicationTable
+	 * @var HashMap<String, ObjectId> communicationTable
 	 * Table with the combinations conversationID and ObjectId.
 	 */
-	private Hashtable<String, ObjectId> communicationTable;
+	private HashMap<String, ObjectId> communicationTable;
 
 	/**
 	 * @var Gson gson
@@ -200,7 +199,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			e.printStackTrace();
 		}
 		equipletDbName = getAID().getLocalName();
-		communicationTable = new Hashtable<String, ObjectId>();
+		communicationTable = new HashMap<String, ObjectId>();
 		gson = new GsonBuilder().create();
 		try{
 			// TODO: Not Hardcoded capabilities/get capabilities from the service agent.
@@ -309,6 +308,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		}
 		try {
 			equipletBBClient.removeDocuments(new BasicDBObject());
+			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
+			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
+			equipletBBClient.unsubscribe(statusSubscription);
 		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 			e.printStackTrace();
 		}
@@ -350,14 +352,15 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					throw new Exception();
 				}
 
-				Hashtable<String, String> statusData = new Hashtable<String, String>();
+				HashMap<String, String> statusData = new HashMap<String, String>();
 				try {
-					statusData = (Hashtable<String, String>) productStep.get("statusData");
+					statusData = (HashMap<String, String>) productStep.get("statusData");
 				} catch (Exception e) {
 				}
 
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
-				responseMessage.addReceiver(gson.fromJson(productStep.get("productAgentId").toString(), AID.class));
+				AID productAgent = new AID((String)((DBObject)productStep.get("productAgentId")).get("name"), AID.ISGUID);
+				responseMessage.addReceiver(productAgent);
 				responseMessage.setConversationId(conversationId);
 
 				StepStatusCode status = (StepStatusCode) productStep.get("status");
@@ -392,13 +395,13 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				case FAILED:
 					responseMessage.setOntology("StatusUpdate");
 					responseMessage.setContent("FAILED");
-					responseMessage.setContentObject((Serializable) statusData);
+					responseMessage.setContentObject(statusData);
 					send(responseMessage);
 					break;
 				case SUSPENDED_OR_WARNING:
 					responseMessage.setOntology("StatusUpdate");
 					responseMessage.setContent("SUSPENDED_OR_WARNING");
-					responseMessage.setContentObject((Serializable) statusData);
+					responseMessage.setContentObject(statusData);
 					send(responseMessage);
 					break;
 				case DONE:

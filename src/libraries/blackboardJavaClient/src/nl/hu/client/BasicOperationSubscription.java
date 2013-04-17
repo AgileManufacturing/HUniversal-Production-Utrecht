@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file BlackboardSubscription.java
  * @brief Object representing a subscription to one of the basic MongoDB operations.
  * @date Created: 2013-04-08

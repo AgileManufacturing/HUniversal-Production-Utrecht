@@ -3,6 +3,8 @@ package equipletAgent.behaviours;
 import newDataClasses.ScheduleData;
 import org.bson.types.ObjectId;
 import behaviours.ReceiveBehaviour;
+
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import equipletAgent.EquipletAgent;
 import jade.core.AID;
@@ -48,16 +50,20 @@ public class ProductionDurationResponse extends ReceiveBehaviour {
 			ObjectId id = equipletAgent.getCommunicationSlot(message.getConversationId());
 			DBObject productStep = equipletAgent.getEquipletBBclient().findDocumentById(id);
 
-			ScheduleData schedule = (ScheduleData)productStep.get("scheduleData");
+			ScheduleData schedule = new ScheduleData(); 
+			schedule.fillWithBasicDBObject(((BasicDBObject)productStep.get("scheduleData")));
 			System.out.println(schedule.getDuration() + "");
+			
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
-			responseMessage.addReceiver(new AID(productStep.get("productAgentId").toString(), AID.ISLOCALNAME));
+			AID productAgent = new AID((String)((DBObject)productStep.get("productAgentId")).get("name"), AID.ISGUID);
+			responseMessage.addReceiver(productAgent);
 			responseMessage.setOntology("ProductionDuration");
 			responseMessage.setConversationId(message.getConversationId());
 			responseMessage.setContentObject(schedule.getDuration());
-
-			System.out.format("sending message: %s%n", responseMessage);
 			myAgent.send(responseMessage);
+			
+			System.out.format("sending message: %s%n", responseMessage);
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();

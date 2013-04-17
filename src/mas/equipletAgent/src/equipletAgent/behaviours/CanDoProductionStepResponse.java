@@ -31,6 +31,8 @@ package equipletAgent.behaviours;
 
 import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+
 import equipletAgent.StepStatusCode;
 import equipletAgent.EquipletAgent;
 import behaviours.ReceiveBehaviour;
@@ -80,13 +82,13 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		System.out.format("%s received message from %s %n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
+		System.out.format("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
 
-		ObjectId productStepEntryId = equipletAgent.getCommunicationSlot(msg.getConversationId());
+		ObjectId productStepEntryId = equipletAgent.getCommunicationSlot(message.getConversationId());
 		try {
 			BasicDBObject productStep = (BasicDBObject) equipletAgent.getEquipletBBclient().findDocumentById(productStepEntryId);
 			StepStatusCode status = StepStatusCode.valueOf(productStep.getString("status"));
-			AID productAgent = new AID(productStep.get("productAgentId").toString(), AID.ISLOCALNAME);
+			AID productAgent = new AID((String)((DBObject)productStep.get("productAgentId")).get("name"), AID.ISGUID);
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.CONFIRM);
 			responseMessage.setConversationId(message.getConversationId());
 			responseMessage.setOntology("CanPerformStepResponse");

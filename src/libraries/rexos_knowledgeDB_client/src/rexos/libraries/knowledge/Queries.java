@@ -128,7 +128,34 @@ public class Queries {
             "        ON (`product_steps_services`.`product_step` = `product_steps`.`id`)\n" +
             "WHERE (`equiplets`.`jade_address` = (?))\n" +
             "GROUP BY `step`;";
-
+    
+    /**
+     * @var String POSSIBLE_SERVICES_PER_EQUIPLET
+     *
+     * A constant representing an sql query for fetching all possible services per equiplet.
+     **/
+    public static final String POSSIBLE_SERVICES_PER_EQUIPLET = "SELECT \n" +
+		    "                `equiplets`.`jade_address`  " +
+		    "                , `services`.`id` " +
+		    "            FROM  " +
+		    "                `rexos_knowledge_base`.`modules`  " +
+		    "                INNER JOIN `rexos_knowledge_base`.`equiplets`   " +
+		    "                    ON (`modules`.`location` = `equiplets`.`id`)  " +
+		    "                INNER JOIN `rexos_knowledge_base`.`module_types`   " +
+		    "                    ON (`modules`.`module_type` = `module_types`.`id`)  " +
+		    "                INNER JOIN `rexos_knowledge_base`.`module_groups`   " +
+		    "                    ON (`module_types`.`module_group` = `module_groups`.`id`)  " +
+		    "                INNER JOIN `rexos_knowledge_base`.`service_module`   " +
+		    "                    ON (`service_module`.`module` = `module_groups`.`id`)  " +
+		    "                INNER JOIN `rexos_knowledge_base`.`services`   " +
+		    "                    ON (`service_module`.`service` = `services`.`id`)  " +
+		    "                INNER JOIN `rexos_knowledge_base`.`product_steps_services`   " +
+		    "                    ON (`product_steps_services`.`service` = `services`.`id`)  " +
+		    "                INNER JOIN `rexos_knowledge_base`.`product_steps`   " +
+		    "                    ON (`product_steps_services`.`product_step` = `product_steps`.`id`)  " +
+		    "            WHERE (`equiplets`.`jade_address` = (?)) " +
+		    "			GROUP BY (`services`.`id`);";    
+		    
     /**
      * @var String POSSIBLE_STEPS_PER_SERVICE
      *

@@ -30,7 +30,6 @@
 package equipletAgent.behaviours;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 import newDataClasses.ProductionStep;
 import newDataClasses.ScheduleData;
@@ -41,6 +40,7 @@ import behaviours.ReceiveBehaviour;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mongodb.BasicDBObject;
 
 import equipletAgent.ProductStepMessage;
 import equipletAgent.StepStatusCode;
@@ -112,7 +112,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 			// TODO: get ouputPart
 			ProductStepMessage entry = new ProductStepMessage(message.getSender(), proStepC.getCapability(),
 					proStepC.getParameterList(), null, null,
-					StepStatusCode.EVALUATING, new HashMap<String, String>(), new ScheduleData());
+					StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
 			productStepEntryId = equipletAgent.getEquipletBBclient().insertDocument(gson.toJson(entry));
 			equipletAgent.addCommunicationSlot(message.getConversationId(), productStepEntryId);
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);

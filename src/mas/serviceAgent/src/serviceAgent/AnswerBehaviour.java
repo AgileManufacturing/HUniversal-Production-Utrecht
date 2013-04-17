@@ -38,12 +38,9 @@ public class AnswerBehaviour extends CyclicBehaviour {
 			try {
 				content = (ObjectId) message.getContentObject();
 				BasicDBObject query = new BasicDBObject("_id", content);
-				productionStep = (BasicDBObject) agent.getProductionStepBBClient()
-						.findDocuments(query).get(0);
-				int a = productionStep.getInt("status");
-				StepStatusCode.valueOf("" + a);
-			} catch (UnreadableException | InvalidDBNamespaceException
-					| GeneralMongoException e) {
+				productionStep = (BasicDBObject) agent.getProductionStepBBClient().findDocuments(query).get(0);
+				StepStatusCode status = StepStatusCode.valueOf(productionStep.getString("status"));
+			} catch (UnreadableException | InvalidDBNamespaceException | GeneralMongoException e) {
 				e.printStackTrace();
 				agent.doDelete();
 			}
@@ -102,16 +99,10 @@ public class AnswerBehaviour extends CyclicBehaviour {
 					Gson gson = new Gson();
 					productionStep.put("scheduleData", scheduleData);
 					try {
-						agent.getProductionStepBBClient().updateDocuments(
-								new BasicDBObject("_id",
-										productionStep.get("_id")),
-								new BasicDBObject("$set", new BasicDBObject(
-//										"scheduleData", gson.fromJson(
-//												gson.toJson(scheduleData),
-//												ScheduleData.class))));
-										"scheduleData", scheduleData)));
-					} catch (InvalidDBNamespaceException
-							| GeneralMongoException e) {
+						BasicDBObject query = new BasicDBObject("_id", productionStep.get("id"));
+						BasicDBObject update = new BasicDBObject("$set", scheduleData.toBasicDBObject());
+						agent.getProductionStepBBClient().updateDocuments(query, update);
+					} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 						e.printStackTrace();
 						agent.doDelete();
 					}

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file BlackboardClient.java
  * @brief Class representing a blackboard connection.
  * @date Created: late 2012
@@ -145,7 +145,7 @@ public class BlackboardClient {
 	 * @return The T object parsed from the JSON string.
 	 * @throws InvalidJSONException An error exists within the JSON.
 	 **/
-	private DBObject parseJSONWithCheckException(String jsonString) throws InvalidJSONException {
+	private DBObject parseJSONWithCheckedException(String jsonString) throws InvalidJSONException {
 		DBObject obj = null;
 		try {
 			obj = (DBObject) JSON.parse(jsonString);
@@ -232,7 +232,7 @@ public class BlackboardClient {
 	 * @throws GeneralMongoException A MongoException occurred.
 	 **/
 	public ObjectId insertDocument(String json) throws InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
-		DBObject obj = parseJSONWithCheckException(json);
+		DBObject obj = parseJSONWithCheckedException(json);
 		return insertDocument(obj);
 	}
 
@@ -268,7 +268,7 @@ public class BlackboardClient {
 	 * @throws GeneralMongoException A MongoException occurred.
 	 **/
 	public int removeDocuments(String queryAsJSON) throws InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
-		DBObject query = parseJSONWithCheckException(queryAsJSON);
+		DBObject query = parseJSONWithCheckedException(queryAsJSON);
 		return removeDocuments(query);
 	}
 	
@@ -325,7 +325,7 @@ public class BlackboardClient {
 	 * @throws GeneralMongoException A MongoException occurred.
 	 **/
 	public List<DBObject> findDocuments(String queryAsJSON) throws InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
-		DBObject query = parseJSONWithCheckException(queryAsJSON);
+		DBObject query = parseJSONWithCheckedException(queryAsJSON);
 		return findDocuments(query);
 	}
 	
@@ -362,7 +362,7 @@ public class BlackboardClient {
 	 * @throws GeneralMongoException A MongoException occurred.
 	 **/
 	public Object[] findDistinctValues(String distinctField, String queryAsJSON) throws InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
-		DBObject query = parseJSONWithCheckException(queryAsJSON);
+		DBObject query = parseJSONWithCheckedException(queryAsJSON);
 		return findDistinctValues(distinctField, query);
 	}
 	
@@ -401,8 +401,8 @@ public class BlackboardClient {
 	 * @throws GeneralMongoException A MongoException occurred.
 	 **/
 	public int updateDocuments(String searchQueryAsJSON, String updateQueryAsJSON) throws InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
-		DBObject searchQuery = parseJSONWithCheckException(searchQueryAsJSON);
-		DBObject updateQuery = parseJSONWithCheckException(updateQueryAsJSON);
+		DBObject searchQuery = parseJSONWithCheckedException(searchQueryAsJSON);
+		DBObject updateQuery = parseJSONWithCheckedException(updateQueryAsJSON);
 		
 		return updateDocuments(searchQuery, updateQuery);
 	}

@@ -32,6 +32,8 @@ package serviceAgent;
 import java.util.HashMap;
 import org.bson.types.ObjectId;
 
+import com.mongodb.BasicDBObject;
+
 import equipletAgent.StepStatusCode;
 import newDataClasses.ScheduleData;
 
@@ -41,26 +43,26 @@ import newDataClasses.ScheduleData;
 public class ServiceStepMessage {
 	private ObjectId productStepId;
 	private long type;
-	private HashMap<String, String> parameters;
+	private BasicDBObject parameters;
 	private StepStatusCode status;
-	private HashMap<String, String> statusData;
-	private ScheduleData timeData;
+	private BasicDBObject statusData;
+	private ScheduleData scheduleData;
 
-	public ServiceStepMessage(long type, HashMap<String, String> parameters,
-			StepStatusCode status, HashMap<String, String> statusData,
-			ScheduleData timeData) {
-		this(null, type, parameters, status, statusData, timeData);
+	public ServiceStepMessage(long type, BasicDBObject parameters,
+			StepStatusCode status, BasicDBObject statusData,
+			ScheduleData scheduleData) {
+		this(null, type, parameters, status, statusData, scheduleData);
 	}
 
 	public ServiceStepMessage(ObjectId productStepId, long type,
-			HashMap<String, String> parameters, StepStatusCode status,
-			HashMap<String, String> statusData, ScheduleData timeData) {
+			BasicDBObject parameters, StepStatusCode status,
+			BasicDBObject statusData, ScheduleData scheduleData) {
 		this.productStepId = productStepId;
 		this.type = type;
 		this.parameters = parameters;
 		this.status = status;
 		this.statusData = statusData;
-		this.timeData = timeData;
+		this.scheduleData = scheduleData;
 	}
 
 	public boolean equals(Object obj) {
@@ -73,12 +75,11 @@ public class ServiceStepMessage {
 		if (getClass() != obj.getClass())
 			return false;
 		ServiceStepMessage other = (ServiceStepMessage) obj;
-		return productStepId.equals(other.productStepId)
-				&& type == other.type
+		return productStepId.equals(other.productStepId) && type == other.type
 				&& parameters.equals(other.parameters)
 				&& status == other.status
 				&& statusData.equals(other.statusData)
-				&& timeData.equals(other.timeData);
+				&& scheduleData.equals(other.scheduleData);
 	}
 
 	/**
@@ -114,7 +115,7 @@ public class ServiceStepMessage {
 	/**
 	 * @return the parameters
 	 */
-	public HashMap<String, String> getParameters() {
+	public BasicDBObject getParameters() {
 		return parameters;
 	}
 
@@ -122,7 +123,7 @@ public class ServiceStepMessage {
 	 * @param parameters
 	 *            the parameters to set
 	 */
-	public void setParameters(HashMap<String, String> parameters) {
+	public void setParameters(BasicDBObject parameters) {
 		this.parameters = parameters;
 	}
 
@@ -134,7 +135,8 @@ public class ServiceStepMessage {
 	}
 
 	/**
-	 * @param status the status to set
+	 * @param status
+	 *            the status to set
 	 */
 	public void setStatus(StepStatusCode status) {
 		this.status = status;
@@ -143,29 +145,30 @@ public class ServiceStepMessage {
 	/**
 	 * @return the statusData
 	 */
-	public HashMap<String, String> getStatusData() {
+	public BasicDBObject getStatusData() {
 		return statusData;
 	}
 
 	/**
-	 * @param statusData the statusData to set
+	 * @param statusData
+	 *            the statusData to set
 	 */
-	public void setStatusData(HashMap<String, String> statusData) {
+	public void setStatusData(BasicDBObject statusData) {
 		this.statusData = statusData;
 	}
 
 	/**
-	 * @return the timeData
+	 * @return the scheduleData
 	 */
-	public ScheduleData getTimeData() {
-		return timeData;
+	public ScheduleData getScheduleData() {
+		return scheduleData;
 	}
 
 	/**
-	 * @param timeData
-	 *            the timeData to set
+	 * @param scheduleData
+	 *            the scheduleData to set
 	 */
-	public void setTimeData(ScheduleData timeData) {
-		this.timeData = timeData;
+	public void setScheduleData(ScheduleData scheduleData) {
+		this.scheduleData = scheduleData;
 	}
 }

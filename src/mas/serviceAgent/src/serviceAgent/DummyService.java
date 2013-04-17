@@ -30,8 +30,6 @@
  **/
 package serviceAgent;
 
-import java.util.HashMap;
-
 import newDataClasses.ScheduleData;
 
 import com.mongodb.BasicDBObject;
@@ -69,7 +67,7 @@ public class DummyService implements Service {
 	public ServiceStepMessage[] getServiceSteps(long productStepType,
 			BasicDBObject parameters) {
 		return new ServiceStepMessage[] { new ServiceStepMessage(1l,
-				new HashMap<String, String>(), StepStatusCode.EVALUATING,
-				new HashMap<String, String>(), new ScheduleData()) };
+				parameters, StepStatusCode.EVALUATING, new BasicDBObject(
+						"status", "dummy status"), new ScheduleData()) };
 	}
 }
