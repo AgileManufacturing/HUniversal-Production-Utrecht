@@ -28,6 +28,7 @@ public class ProductAgent extends Agent {
 	public int prodStep = 0;
 	
 
+	@Override
 	protected void setup() {
 		try {
 			_product = (Product) getArguments()[0];

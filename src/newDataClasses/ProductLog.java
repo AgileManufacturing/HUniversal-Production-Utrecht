@@ -5,7 +5,7 @@ package newDataClasses;
 
 import java.util.List;
 
-import newDataClasses.sqldatadase.sqliteDatabase;
+import newDataClasses.sqldatabase.sqliteDatabase;
 
 /**
  * @author Theodoor de Graaff <theodoor.degraaff@student.hu.nl>

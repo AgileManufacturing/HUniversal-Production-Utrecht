@@ -15,7 +15,7 @@ package newDataClasses;
 
 import java.util.List;
 
-import newDataClasses.sqldatadase.sqliteDatabase;
+import newDataClasses.sqldatabase.sqliteDatabase;
 
 
 public class Product {

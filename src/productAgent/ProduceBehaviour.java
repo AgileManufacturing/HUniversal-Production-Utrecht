@@ -46,10 +46,11 @@ public class ProduceBehaviour extends OneShotBehaviour{
 		// TODO Auto-generated method stub
 	}
 
-	void productionStepEnded(ProductionStep step, boolean succes, List<LogMessage> log)
+	void productionStepEnded(ProductionStep step, @SuppressWarnings("unused") boolean succes, List<LogMessage> log)
 	{	
 		currentProductionStep = step.getId();
 		_product.add(log);
+		
 		// TODO Set ProductionStep Status to succes. 
 		
 	}

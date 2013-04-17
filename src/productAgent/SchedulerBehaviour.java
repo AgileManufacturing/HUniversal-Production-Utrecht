@@ -63,7 +63,7 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			throws Exception {
 		Schedule[] schedules;
 		//load set into arraylist
-		 List<AID> equipletlist = new ArrayList<AID>(equipletList);
+		 List<AID> equipletlist = new ArrayList<>(equipletList);
 		 System.out.println("No. of equiplets for step: " + productionstep.getId() + ": " + equipletlist.size());
 		//Make connection with database
 		MongoClient mongoClient = null;
@@ -265,6 +265,7 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			this.deadline = newDeadline;
 		}
 
+		@Override
 		public String toString() {
 			return "{ startTime:" + startTime + ", duration:" + duration
 					+ ", deadline:" + deadline + ", EquipletName:"

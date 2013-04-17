@@ -37,6 +37,7 @@ public class GateWayAgent extends Agent {
 			super(a);
 		}
 
+		@Override
 		public void action() {
 			ACLMessage msg = myAgent.receive();
 			if(msg != null){
@@ -58,6 +59,7 @@ public class GateWayAgent extends Agent {
 		  }
 	}
 
+	@Override
 	protected void setup() {
 		// Registration with the DF 
 		DFAgentDescription dfd = new DFAgentDescription();

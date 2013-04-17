@@ -26,11 +26,12 @@ public class PlannerBehaviour extends OneShotBehaviour {
 	public void plannerBehaviour() {
 	}
 
+	@Override
 	public int onEnd() {
 		return 0;
 	}
 
-	public void removeEquiplet(AID aid) {
+	public static void removeEquiplet(AID aid) {
 		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
 
 		// try to remove the given 'aid' from the blackboard (for testing purposes only)
@@ -41,6 +42,7 @@ public class PlannerBehaviour extends OneShotBehaviour {
 		}
 	}
 		
+	@Override
 	public void action() {
 		try {
 			// Get the root Agent
@@ -74,7 +76,7 @@ public class PlannerBehaviour extends OneShotBehaviour {
 
 				for (DBObject dbo : equipletDirectory) {
 					DBObject aid = (DBObject) dbo.get("db");
-					String name = (String) aid.get("name").toString();
+					String name = aid.get("name").toString();
 					pem.addEquipletToProductionStep(PA_id, new AID(name,
 							AID.ISLOCALNAME));
 				}

@@ -134,6 +134,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 		 * 
 		 * @see jade.core.behaviours.Behaviour#onStart() starts the conversation
 		 */
+		@Override
 		public void onStart() {
 			final String ConversationId = _productAgent.generateCID();
 			final MessageTemplate template = MessageTemplate
@@ -147,6 +148,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 				 */
 				private static final long serialVersionUID = 1L;
 
+				@Override
 				public void action() {
 					try {
 						ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
@@ -174,6 +176,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 				 */
 				private static final long serialVersionUID = 1L;
 
+				@Override
 				public void handle(ACLMessage msg) {
 					if (msg == null) {
 
@@ -203,6 +206,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 								 */
 								private static final long serialVersionUID = 1L;
 
+								@Override
 								public void action() {
 									try {
 										ACLMessage message = new ACLMessage(
@@ -235,6 +239,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 										 */
 										private static final long serialVersionUID = 1L;
 
+								@Override
 								public void handle(ACLMessage msg) {
 									if (msg == null) {
 										if (debug) {

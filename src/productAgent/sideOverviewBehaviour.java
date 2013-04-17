@@ -33,12 +33,14 @@ public class sideOverviewBehaviour extends CyclicBehaviour {
 			this.msg = msg;
 		}
 	
+		@Override
 		public void action(){
 			try {
 				switch(msg.getOntology()){
 					case "waiting":
 						@SuppressWarnings("unused")
 						OneShotBehaviour waitingBehaviour = new OneShotBehaviour(){
+							@Override
 							public void action(){
 								
 							}
@@ -46,6 +48,7 @@ public class sideOverviewBehaviour extends CyclicBehaviour {
 					case "reschedule":
 						@SuppressWarnings("unused")
 						OneShotBehaviour reschedule = new OneShotBehaviour(){
+							@Override
 							public void action(){
 								pa.reschedule();
 							}
@@ -54,6 +57,7 @@ public class sideOverviewBehaviour extends CyclicBehaviour {
 					case "reschedule++":
 						@SuppressWarnings("unused")
 						OneShotBehaviour rescheduleAndRemoveEquiplet = new OneShotBehaviour(){
+							@Override
 							public void action(){
 								pa.rescheduleAndRemoveEquiplet();
 							}

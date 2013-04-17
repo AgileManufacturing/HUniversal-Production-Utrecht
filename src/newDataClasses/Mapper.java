@@ -21,7 +21,7 @@ public abstract class Mapper<KT,VT> {
 	protected HashMap<KT, ArrayList<VT>> _items;
 	
 	protected Mapper() {
-		this._items = new HashMap<KT, ArrayList<VT>>();
+		this._items = new HashMap<>();
 	}
 	
 	protected void addKey(KT id) {
