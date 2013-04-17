@@ -77,7 +77,6 @@ public class InformerBehaviour extends OneShotBehaviour {
 				if (_par.done()) {
 					System.out.println("Done informing.");
 					try {
-						
 						_production.setProductionEquipletMapping(_pem);
 						_product.setProduction(_production);
 						_productAgent.setProduct(_product);

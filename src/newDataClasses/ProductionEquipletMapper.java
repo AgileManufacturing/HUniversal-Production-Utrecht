@@ -57,8 +57,8 @@ public class ProductionEquipletMapper {
 		this.equipletList.put(productionStepID, tmp);
 	}
 	
-	public HashMap<AID, Long> getEquipletsForProductionStep(int i) {
-		return this.equipletList.get(i);
+	public HashMap<AID, Long> getEquipletsForProductionStep(long pA_id) {
+		return this.equipletList.get(pA_id);
 	}
 	
 	public void setTimeSlotsForEquplet(Integer productionStepID, AID equipletID, Long timeslots) {
@@ -67,8 +67,8 @@ public class ProductionEquipletMapper {
 		this.equipletList.put(productionStepID, tmp);
 	}
 	
-	public Long getTimeSlotsForEquiplet(Long productionStepID, AID equipletID) {
-		return this.equipletList.get(productionStepID).get(equipletID);
+	public Long getTimeSlotsForEquiplet(int i, AID equipletID) {
+		return this.equipletList.get(i).get(equipletID);
 	}
 	
 

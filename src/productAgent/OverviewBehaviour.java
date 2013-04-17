@@ -1,5 +1,7 @@
 package productAgent;
 
+import newDataClasses.ProductionStep;
+import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
@@ -25,7 +27,7 @@ public class OverviewBehaviour extends OneShotBehaviour {
 	}
 
 	/*
-	 * (non-Javadoc) This behaviour should have 2 parallel sub-behaviours. One
+	 * (non-Javadoc) This behaviour should have 3 parallel sub-behaviours. One
 	 * where the normal flow ( plan, inform, schedule, produce ) is follow, and
 	 * one where is listend for incoming msgs.
 	 */
@@ -57,13 +59,14 @@ public class OverviewBehaviour extends OneShotBehaviour {
 			
 		});
 
-		/*_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour() {
+		_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour() {
 			@Override
 			public void action() {
+				System.out.println("\n");
 				for (ProductionStep stp : _productAgent.getProduct()
 						.getProduction().getProductionSteps()) {
 					System.out.println("ProductionStep " + stp.getId()
-							+ " has Equiplets; \n");
+							+ " has Equiplets;");
 					for (AID aid : _productAgent.getProduct().getProduction()
 							.getProductionEquipletMapping()
 							.getEquipletsForProductionStep(stp.getId()).keySet() ) {
@@ -71,9 +74,10 @@ public class OverviewBehaviour extends OneShotBehaviour {
 								+ aid.getLocalName() + " AID: " + aid + " timeslots: " + _productAgent.getProduct().getProduction()
 								.getProductionEquipletMapping().getTimeSlotsForEquiplet(stp.getId(), aid));
 					}
+					System.out.println("\n");
 				}
 			}
-		}); */
+		});
 
 		System.out.println("Lets add a Scheduler");
 		 _schedulerBehaviour = new SchedulerBehaviour();
@@ -88,4 +92,7 @@ public class OverviewBehaviour extends OneShotBehaviour {
 
 	}
 
+	public void reschedule(){
+		
+	}
 }

@@ -1,8 +1,10 @@
 package productAgent;
 
-import equipletAgent.EquipletAgent;
 import jade.core.AID;
 import jade.core.Agent;
+import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
+import libraries.blackboardJavaClient.src.nl.hu.client.InvalidDBNamespaceException;
+import libraries.blackboardJavaClient.src.nl.hu.client.InvalidJSONException;
 import newDataClasses.Product;
 import newDataClasses.ProductionStep;
 
@@ -14,27 +16,26 @@ import newDataClasses.ProductionStep;
  *          on the agents localname.
  */
 public class ProductAgent extends Agent {
-	/**
-	 * 
-	 */
-	ProduceBehaviour prodBehav = new ProduceBehaviour();
 	
 	private static final long serialVersionUID = 1L;
 
 	// Private fields
 	private Product _product;
-
+	private OverviewBehaviour _overviewBehaviour;
+	
+	
 	// CID variables
 	private static int _cidCnt = 0;
 	private String _cidBase;
 
-	PlannerBehaviour planBehav = new PlannerBehaviour();
+	public int prodStep = 0;
+	
 
 	protected void setup() {
 		try {
 			_product = (Product) getArguments()[0];
-
-			addBehaviour(new OverviewBehaviour());
+			_overviewBehaviour = new OverviewBehaviour();
+			addBehaviour(_overviewBehaviour);
 
 			System.out.println("I spawned as a product agent");
 
@@ -57,19 +58,27 @@ public class ProductAgent extends Agent {
 	}
 	
 	public void reschedule(){
-		@SuppressWarnings("unused")
-		ProductionStep curProdStep = prodBehav.get_currentproductionstep();
-		planBehav.action(); // add the posibility to reschedule at the given prodStep
+		_overviewBehaviour.reschedule();
 	}
 	
 	public void rescheduleAndRemoveEquiplet(){
-		AID removeEQ = getAID(); // get the AID at which the rescheduling was needed
-		planBehav.removeEquiplet(removeEQ);
-		reschedule();
+		removeEquiplet(getAID());
+		_overviewBehaviour.reschedule();
 	}
 
 	public Product getProduct() {
 		return this._product;
+	}
+	
+	// This function is for testing purposes only and will later be replaced within the Equiplet Agent its functionality
+	public void removeEquiplet(AID aid) {
+		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
+		// try to remove the given 'aid' from the blackboard 
+		try {		
+			bbc.removeDocuments(aid.toString());
+		} catch (InvalidJSONException | InvalidDBNamespaceException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void setProduct(Product value) {
