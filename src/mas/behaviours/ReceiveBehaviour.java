@@ -66,13 +66,9 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	}
 
 	public void action() {
-		try {
-			while(myAgent != null && (msg = myAgent.receive(template)) != null) {
-				handle(msg);
-				restartTimer();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		while(myAgent != null && (msg = myAgent.receive(template)) != null) {
+			handle(msg);
+			restartTimer();
 		}
 		if(wakeupTime == 0) {
 			block();

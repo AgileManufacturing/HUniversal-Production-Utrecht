@@ -85,6 +85,7 @@ public abstract class ReceiveOnceBehaviour extends ReceiveBehaviour {
 
 	public void action() {
 		handle(msg = myAgent.receive(template));
-		getAgent().removeBehaviour(this);
+		if(myAgent != null)
+			myAgent.removeBehaviour(this);
 	}
 }
