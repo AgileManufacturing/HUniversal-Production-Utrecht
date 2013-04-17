@@ -2,6 +2,8 @@ package productAgent;
 
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
+
+import java.util.ArrayList;
 import java.util.List;
 import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
 import libraries.blackboardJavaClient.src.nl.hu.client.InvalidDBNamespaceException;
@@ -52,7 +54,7 @@ public class PlannerBehaviour extends OneShotBehaviour {
 			// Get the production object
 			Production production = product.getProduction();
 			// Retrieve the productionstep array
-			ProductionStep[] psa = production.getProductionSteps();
+			ArrayList<ProductionStep> psa = production.getProductionSteps();
 			// Retrieve the equipletmapper
 			ProductionEquipletMapper pem = production
 					.getProductionEquipletMapping();

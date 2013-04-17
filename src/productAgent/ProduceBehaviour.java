@@ -29,7 +29,7 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	 * @return the _currentproductionstep
 	 */
 	public ProductionStep get_currentproductionstep() {
-		return _product.getProduction().getProductionSteps()[currentProductionStep];
+		return _product.getProduction().getProductionSteps().get(currentProductionStep);
 	}
 
 	/**

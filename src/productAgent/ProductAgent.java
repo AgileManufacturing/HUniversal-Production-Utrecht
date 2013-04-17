@@ -32,6 +32,7 @@ public class ProductAgent extends Agent {
 	protected void setup() {
 		try {
 			_product = (Product) getArguments()[0];
+			
 			_overviewBehaviour = new OverviewBehaviour();
 			addBehaviour(_overviewBehaviour);
 
@@ -56,12 +57,12 @@ public class ProductAgent extends Agent {
 	}
 	
 	public void reschedule(){
-		_overviewBehaviour.Reschedule();
+		_overviewBehaviour.reschedule();
 	}
 	
 	public void rescheduleAndRemoveEquiplet(){
 		//remove equiplet first
-		_overviewBehaviour.Reschedule();
+		_overviewBehaviour.reschedule();
 	}
 
 	public Product getProduct() {
