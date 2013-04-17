@@ -101,6 +101,7 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour {
 				responseMessage.setPerformative(ACLMessage.DISCONFIRM);
 				myAgent.send(responseMessage);
 				break;
+				//$CASES-OMITTED$
 			default:
 				break;
 			}
