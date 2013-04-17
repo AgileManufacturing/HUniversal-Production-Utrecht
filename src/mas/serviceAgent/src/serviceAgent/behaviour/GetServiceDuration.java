@@ -102,6 +102,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 		remainingServiceSteps = serviceSteps.length;
 	}
 
+	@Override
 	public void onStart() {
 		ObjectId serviceStepId;
 		ACLMessage message;

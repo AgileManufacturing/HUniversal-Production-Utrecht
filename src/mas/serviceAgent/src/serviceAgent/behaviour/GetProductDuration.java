@@ -12,17 +12,12 @@ import nl.hu.client.InvalidDBNamespaceException;
 import org.bson.types.ObjectId;
 
 import serviceAgent.Service;
-import serviceAgent.DummyService;
 import serviceAgent.ServiceFactory;
+import serviceAgent.ServiceStepMessage;
 
 import behaviours.ReceiveBehaviour;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-
-import equipletAgent.ProductStepMessage;
-
-import serviceAgent.ServiceStepMessage;
 
 /**
  * @author Peter Bonnema
@@ -51,48 +46,45 @@ public class GetProductDuration extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		ObjectId productStepId = null;
-		BasicDBObject productStep = null;
-
 		try {
-			productStepId = (ObjectId) message.getContentObject();
-			productStep = (BasicDBObject) productionStepBlackBoard
+			ObjectId productStepId = (ObjectId) message.getContentObject();
+			BasicDBObject productStep = (BasicDBObject) productionStepBlackBoard
 					.findDocumentById(productStepId);
+			long productStepType = productStep.getLong("type");
+
+			System.out.format(
+					"%s got message GetProductionDuration for step type %s%n",
+					getAgent().getLocalName(), productStepType);
+
+			Service[] services = null;
+			Service service = null;
+			ServiceFactory factory = new ServiceFactory(message.getSender()
+					.getName());
+			if ((services = factory.getServicesForStep(productStepType)).length > 0) {
+				service = services[0];
+			} else {
+				getAgent().doDelete();
+				throw new RuntimeException(
+						"Service Agent - No available services for stepType "
+								+ productStep);
+			}
+
+			BasicDBObject parameters = (BasicDBObject) productStep
+					.get("parameters");
+
+			ServiceStepMessage[] serviceSteps = service.getServiceSteps(
+					productStepType, parameters);
+			for (ServiceStepMessage serviceStep : serviceSteps) {
+				serviceStep.setProductStepId(productStepId);
+			}
+
+			getAgent().addBehaviour(
+					new GetServiceDuration(getAgent(), productionStepBlackBoard,
+							serviceStepBlackBoard, serviceSteps, msg
+									.getConversationId()));
 		} catch (UnreadableException | InvalidDBNamespaceException
 				| GeneralMongoException e) {
 			e.printStackTrace();
 		}
-		long productStepType = productStep.getLong("type");
-
-		System.out.format(
-				"%s got message GetProductionDuration for step type %s%n",
-				getAgent().getLocalName(), productStepType);
-
-		Service[] services = null;
-		Service service = null;
-		ServiceFactory factory = new ServiceFactory(message.getSender()
-				.getName());
-		if ((services = factory.getServicesForStep(productStepType)).length > 0) {
-			service = services[0];
-		} else {
-			getAgent().doDelete();
-			throw new RuntimeException(
-					"Service Agent - No available services for stepType "
-							+ productStep);
-		}
-
-		BasicDBObject parameters = (BasicDBObject) productStep
-				.get("parameters");
-
-		ServiceStepMessage[] serviceSteps = service.getServiceSteps(
-				productStepType, parameters);
-		for (ServiceStepMessage serviceStep : serviceSteps) {
-			serviceStep.setProductStepId(productStepId);
-		}
-
-		getAgent().addBehaviour(
-				new GetServiceDuration(getAgent(), productionStepBlackBoard,
-						serviceStepBlackBoard, serviceSteps, msg
-								.getConversationId()));
 	}
 }
