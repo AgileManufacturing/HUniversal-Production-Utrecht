@@ -62,7 +62,7 @@ public class SQLiteTest {
 	 */
 	@Test
 	public void testPushLocalToRemote() {
-		
+		//TODO Add test code for function
 	}
 
 }

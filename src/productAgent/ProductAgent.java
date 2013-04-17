@@ -1,6 +1,5 @@
 package productAgent;
 
-import testingAgents.EquipletAgent;
 import jade.core.AID;
 import jade.core.Agent;
 import newDataClasses.Product;
