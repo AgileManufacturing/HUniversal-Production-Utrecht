@@ -34,6 +34,9 @@ package newDataClasses;
  * @author Alexander
  *
  */
-public class ProductionStepStatus {
-
+public enum ProductionStepStatus {
+	STATE_DONE,
+	STATE_TODO,
+	STATE_PRODUCING,
+	STATE_FAILED			
 }

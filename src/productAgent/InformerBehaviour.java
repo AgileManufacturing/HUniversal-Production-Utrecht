@@ -11,6 +11,7 @@ import newDataClasses.Product;
 import newDataClasses.Production;
 import newDataClasses.ProductionEquipletMapper;
 import newDataClasses.ProductionStep;
+import newDataClasses.ProductionStepStatus;
 
 /*
  * Version 1.1
@@ -51,21 +52,24 @@ public class InformerBehaviour extends OneShotBehaviour {
 		 * each step in our productionlist and create a conversation object. (
 		 * as behaviour )
 		 */
-		
+
 		SequentialBehaviour seq = new SequentialBehaviour();
 		myAgent.addBehaviour(seq);
 
 		_par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 		seq.addSubBehaviour(_par);
-		
+
 		for (ProductionStep stp : _product.getProduction().getProductionSteps()) {
+			if (stp.getStatus() == ProductionStepStatus.STATE_TODO) {
+				
+				//adds the step to te new list (the one that will be returned to the scheduler)
+				_pem.addProductionStep(stp.getId());
 
-			_pem.addProductionStep(stp.getId());
-
-			for (AID aid : _productAgent.getProduct().getProduction()
-					.getProductionEquipletMapping()
-					.getEquipletsForProductionStep(stp.getId()).keySet()) {
-				_par.addSubBehaviour(new Conversation(aid, stp, _pem));
+				for (AID aid : _productAgent.getProduct().getProduction()
+						.getProductionEquipletMapping()
+						.getEquipletsForProductionStep(stp.getId()).keySet()) {
+					_par.addSubBehaviour(new Conversation(aid, stp, _pem));
+				}
 			}
 		}
 
@@ -90,8 +94,8 @@ public class InformerBehaviour extends OneShotBehaviour {
 			}
 		});
 	}
-	
-	public boolean isDone(){
+
+	public boolean isDone() {
 		return this._isDone;
 	}
 
@@ -235,7 +239,9 @@ public class InformerBehaviour extends OneShotBehaviour {
 												// Adds the equiplet to the
 												// production step in
 												// the mapper list.
-												_pem.addEquipletToProductionStep(_productionStep.getId(),_aid, timeSlots);
+												_pem.addEquipletToProductionStep(
+														_productionStep.getId(),
+														_aid, timeSlots);
 											}
 										} catch (UnreadableException e) {
 											System.out
