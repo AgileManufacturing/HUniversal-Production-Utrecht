@@ -1,5 +1,6 @@
 package productAgent;
 
+import testingAgents.EquipletAgent;
 import jade.core.AID;
 import jade.core.Agent;
 import newDataClasses.Product;
@@ -15,7 +16,9 @@ import newDataClasses.ProductionStep;
 public class ProductAgent extends Agent {
 	
 	private static final long serialVersionUID = 1L;
-
+	
+	
+	
 	// Private fields
 	private Product _product;
 	private OverviewBehaviour _overviewBehaviour;
