@@ -34,7 +34,7 @@ import com.mongodb.BasicDBObject;
 
 /**
  * @author Peter Bonnema
- *
+ * 
  */
 public interface Service {
 	/**
@@ -43,11 +43,17 @@ public interface Service {
 	 * @return
 	 */
 	public boolean canPerform(long productStepType, BasicDBObject parameters);
-	
+
 	/**
 	 * @param productStepType
 	 * @param parameters
 	 * @return
 	 */
-	public ServiceStepMessage[] getServiceSteps(long productStepType, BasicDBObject parameters);
+	public ServiceStepMessage[] getServiceSteps(long productStepType,
+			BasicDBObject parameters);
+
+	/**
+	 * @return the name of this service
+	 */
+	public String getName();
 }

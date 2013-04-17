@@ -41,6 +41,8 @@ import equipletAgent.StepStatusCode;
  * 
  */
 public class DummyService implements Service {
+	private static final String name = "DummyService";
+
 	/**
 	 * 
 	 */
@@ -66,8 +68,18 @@ public class DummyService implements Service {
 	@Override
 	public ServiceStepMessage[] getServiceSteps(long productStepType,
 			BasicDBObject parameters) {
-		return new ServiceStepMessage[] { new ServiceStepMessage(1l,
+		return new ServiceStepMessage[] { new ServiceStepMessage(1l, name,
 				parameters, StepStatusCode.EVALUATING, new BasicDBObject(
 						"status", "dummy status"), new ScheduleData()) };
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see serviceAgent.Service#getName()
+	 */
+	@Override
+	public String getName() {
+		return name;
 	}
 }
