@@ -41,7 +41,6 @@ import equipletAgent.behaviours.*;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
-import jade.wrapper.AgentController;
 import newDataClasses.DbData;
 import newDataClasses.ScheduleData;
 import nl.hu.client.*;
@@ -188,6 +187,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 * Initializes the Timer objects.
 	 * Starts its behaviours.
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public void setup() {
 		System.out.println("I spawned as a equiplet agent.");
@@ -199,7 +199,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			e.printStackTrace();
 		}
 		equipletDbName = getAID().getLocalName();
-		communicationTable = new HashMap<String, ObjectId>();
+		communicationTable = new HashMap<>();
 		gson = new GsonBuilder().create();
 		try{
 			// TODO: Not Hardcoded capabilities/get capabilities from the service agent.
@@ -212,12 +212,12 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 			
 			Object[] arguments = new Object[] { dbData };
-			((AgentController) getContainerController().createNewAgent(getLocalName() + "-hardwareAgent", "hardwareAgent.HardwareAgent", arguments)).start();
-			AID hardwareAgent = new AID((String) getLocalName() + "-hardwareAgent", AID.ISLOCALNAME);
+			getContainerController().createNewAgent(getLocalName() + "-hardwareAgent", "hardwareAgent.HardwareAgent", arguments).start();
+			AID hardwareAgent = new AID(getLocalName() + "-hardwareAgent", AID.ISLOCALNAME);
 			
 			arguments = new Object[] { dbData, hardwareAgent };
-			((AgentController) getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "serviceAgent.ServiceAgent", arguments)).start();
-			serviceAgent = new AID((String) getLocalName() + "-serviceAgent", AID.ISLOCALNAME);
+			getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "serviceAgent.ServiceAgent", arguments).start();
+			serviceAgent = new AID(getLocalName() + "-serviceAgent", AID.ISLOCALNAME);
 			
 			collectiveBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
 			collectiveBBClient.setDatabase(collectiveDbName);
@@ -270,31 +270,12 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 * Informs the productAgents who have planned a productStep on its blackboard of its dead.
 	 * Removes its database.
 	 */
+	@Override
 	public void takeDown() {
 		try {
 			BasicDBObject searchQuery = new BasicDBObject("AID", getAID());
 			collectiveBBClient.removeDocuments(gson.toJson(searchQuery));
 
-			/*List<DBObject> productSteps = equipletBBClient.findDocuments(new BasicDBObject());
-			for (DBObject productStep : productSteps) {
-				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
-				responseMessage.addReceiver(new AID(productStep.get("productAgentId").toString(), AID.ISLOCALNAME));
-
-				String conversationId = null;
-				ObjectId id = (ObjectId) productStep.get("_id");
-				for (Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
-					if (tableEntry.getValue() == id) {
-						conversationId = tableEntry.getKey();
-						break;
-					}
-				}
-				if (conversationId == null) {
-					throw new Exception();
-				}
-				responseMessage.setConversationId(conversationId);
-				responseMessage.setContent("I'm dying");
-				send(responseMessage);
-			}*/
 			Object[] productAgents = equipletBBClient.findDistinctValues("productAgentId", new BasicDBObject());
 			for(Object productAgent : productAgents){
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
@@ -352,10 +333,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					throw new Exception();
 				}
 
-				HashMap<String, String> statusData = new HashMap<String, String>();
+				HashMap<String, String> statusData = null;
 				try {
 					statusData = (HashMap<String, String>) productStep.get("statusData");
 				} catch (Exception e) {
+					statusData = new HashMap<>();
 				}
 
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
@@ -423,6 +405,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	}
 
 	private class nextProductStepTask extends TimerTask {
+		@SuppressWarnings("hiding")
 		private BlackboardClient equipletBBClient;
 
 		public nextProductStepTask(BlackboardClient equipletBBClient) {
