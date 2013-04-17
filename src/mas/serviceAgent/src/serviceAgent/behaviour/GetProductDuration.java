@@ -51,11 +51,13 @@ public class GetProductDuration extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
+		ObjectId productStepId = null;
 		BasicDBObject productStep = null;
 
 		try {
+			productStepId = (ObjectId) message.getContentObject();
 			productStep = (BasicDBObject) productionStepBlackBoard
-					.findDocumentById((ObjectId) message.getContentObject());
+					.findDocumentById(productStepId);
 		} catch (UnreadableException | InvalidDBNamespaceException
 				| GeneralMongoException e) {
 			e.printStackTrace();
@@ -84,6 +86,10 @@ public class GetProductDuration extends ReceiveBehaviour {
 
 		ServiceStepMessage[] serviceSteps = service.getServiceSteps(
 				productStepType, parameters);
+		for (ServiceStepMessage serviceStep : serviceSteps) {
+			serviceStep.setProductStepId(productStepId);
+		}
+
 		getAgent().addBehaviour(
 				new GetServiceDuration(getAgent(), productionStepBlackBoard,
 						serviceStepBlackBoard, serviceSteps, msg

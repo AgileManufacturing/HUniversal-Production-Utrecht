@@ -126,6 +126,7 @@ public class ProductStepMessage implements Serializable{
 	 * 
 	 * @param obj - The object to compare with
 	 */
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null)
 			return false;

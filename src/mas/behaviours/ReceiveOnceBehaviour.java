@@ -83,8 +83,10 @@ public abstract class ReceiveOnceBehaviour extends ReceiveBehaviour {
 		super(a, millis, mt);
 	}
 
+	@Override
 	public void action() {
 		handle(msg = myAgent.receive(template));
-		getAgent().removeBehaviour(this);
+		if(myAgent != null)
+			myAgent.removeBehaviour(this);
 	}
 }

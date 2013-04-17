@@ -62,10 +62,12 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 		super(a);
 		timeout = millis;
 		template = mt;
+		restartTimer();
 	}
 
+	@Override
 	public void action() {
-		while((msg = myAgent.receive(template)) != null) {
+		while(myAgent != null && (msg = myAgent.receive(template)) != null) {
 			handle(msg);
 			restartTimer();
 		}
@@ -98,7 +100,7 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	 */
 	public void setTimeout(long millis) {
 		timeout = millis;
-		onStart();
+		restartTimer();
 	}
 	
 	/**
@@ -106,21 +108,18 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	 */
 	public void clearTimeout() {
 		timeout = -1;
-		onStart();
+		restartTimer();
 	}
 	
 	/**
 	 * Restarts the timer with the previously specified amount of milliseconds.
 	 */
 	public void restartTimer() {
-		onStart();
-	}
-
-	public void onStart() {
 		wakeupTime = (timeout < 0 ? 0 : System.currentTimeMillis()
 				+ timeout);
 	}
 
+	@Override
 	public void reset() {
 		super.reset();
 		msg = null;
@@ -132,9 +131,9 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	 *
 	 * @param timeout The timeout
 	 */
-	public void reset(int timeout) {
+	public void reset(int newTimeout) {
 		reset();
-		this.timeout = timeout;
+		this.timeout = newTimeout;
 	}
 
 	/**

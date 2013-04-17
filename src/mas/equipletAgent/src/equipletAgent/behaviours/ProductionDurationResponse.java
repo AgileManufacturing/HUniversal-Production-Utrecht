@@ -62,7 +62,7 @@ public class ProductionDurationResponse extends ReceiveBehaviour {
 			responseMessage.setContentObject(schedule.getDuration());
 			myAgent.send(responseMessage);
 			
-			System.out.format("sending message: %s%n", responseMessage);
+			System.out.format("sending message: %s%n", responseMessage.getOntology());
 			
 
 		} catch (Exception e) {

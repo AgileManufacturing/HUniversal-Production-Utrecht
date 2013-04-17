@@ -16,25 +16,41 @@ package newDataClasses;
 import java.io.Serializable;
 
 public class ProductionStep implements Serializable {
+
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = -832835122145455883L;
 
 	private int _requiredTimeSlots;
-	private long _id;
+	private int _id;
 	private long _capability;
+	private ProductionStepStatus _status;
 	
 	private ParameterList _parameters;
 
 	public ProductionStep() {
 		this._parameters = new ParameterList();
+		this._status = ProductionStepStatus.STATE_TODO;
 	}
 	
-	public ProductionStep(long id, ParameterList parameterList) {
+	public ProductionStep(int id, long capability,  ParameterList parameterList) {
 		this._id = id;
+		this._capability = capability;
 		this._parameters = parameterList;
+		this._status = ProductionStepStatus.STATE_TODO;
 	}
 	
-	public long getId(){
+	public int getId(){
 		return this._id;
+	}
+	
+	public ProductionStepStatus getStatus(){
+		return this._status;
+	}
+	
+	public void setStatus(ProductionStepStatus status){
+		this._status = status;
 	}
 	
 	public void setRequiredTimeSlots(int timeSlots) {
@@ -51,10 +67,6 @@ public class ProductionStep implements Serializable {
 
 	public long getCapability() {
 		return _capability;
-	}
-
-	public void setCapability(long _capability) {
-		this._capability = _capability;
 	}
 	
 }

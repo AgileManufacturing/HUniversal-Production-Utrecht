@@ -1,6 +1,6 @@
 package hardwareAgent;
 /**
- * Author: Wouter Veen
+ * Author: Wouter Veen & Thierry Gerritse
  * Class: EquipletStepMessage.java 
  **/
 import org.bson.types.ObjectId;

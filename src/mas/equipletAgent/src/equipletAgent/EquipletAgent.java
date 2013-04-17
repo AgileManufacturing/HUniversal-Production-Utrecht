@@ -215,7 +215,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			getContainerController().createNewAgent(getLocalName() + "-hardwareAgent", "hardwareAgent.HardwareAgent", arguments).start();
 			AID hardwareAgent = new AID(getLocalName() + "-hardwareAgent", AID.ISLOCALNAME);
 			
-			arguments = new Object[] { dbData, hardwareAgent };
+			arguments = new Object[] { dbData, getAID(), hardwareAgent };
 			getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "serviceAgent.ServiceAgent", arguments).start();
 			serviceAgent = new AID(getLocalName() + "-serviceAgent", AID.ISLOCALNAME);
 			
