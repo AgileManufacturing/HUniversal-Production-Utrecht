@@ -1,5 +1,10 @@
 package hardwareAgent;
 
+/**
+ * Author: Hessel Meulenbeld & Thierry Gerritse
+ * Class: HardwareAgent.java 
+ **/
+
 import java.util.HashMap;
 
 import hardwareAgent.behaviours.*;
