@@ -1,7 +1,12 @@
 package hardwareAgent.behaviours;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import hardwareAgent.EquipletStepMessage;
 import hardwareAgent.HardwareAgent;
 import hardwareAgent.Module;
+import hardwareAgent.TimeData;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -10,6 +15,11 @@ import jade.lang.acl.UnreadableException;
 import nl.hu.client.InvalidDBNamespaceException;
 
 import org.bson.types.ObjectId;
+
+import rexos.libraries.knowledge.KnowledgeDBClient;
+import rexos.libraries.knowledge.Queries;
+import rexos.libraries.knowledge.Row;
+import serviceAgent.ServiceStepMessage;
 
 import behaviours.ReceiveBehaviour;
 
@@ -22,6 +32,10 @@ public class EvaluateDuration extends ReceiveBehaviour {
 
 	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("GetServiceStepDuration");
 	private HardwareAgent hardwareAgent;
+	/**
+	 * Authors: Thierry Gerritse 
+	 * Class: EvaluateDuration.java* 
+	 */
 
 	/**
 	 * Instantiates a new schedule step.
@@ -56,20 +70,32 @@ public class EvaluateDuration extends ReceiveBehaviour {
 				e.printStackTrace();
 				myAgent.doDelete();
 			}
-
+			
 			long stepType = serviceStep.getLong("type");
-			Object parameters = serviceStep.get("parameters");
-
-			// kijk in hashmap welke module hoort bij deze step
-
-			// Module leadingModule =
-			// (Module)hardwareAgent.GetModuleForStep(stepType);
-
-			// vraag aan die module vertaal deze service step in equipletsteps
-
-			// long stepDuration = leadingModule.getStepDuration();
-			long stepDuration = 10l;
-
+			BasicDBObject parameters = (BasicDBObject) serviceStep.get("parameters");
+			
+			String serviceName = serviceStep.getString("serviceName");
+						
+			/**
+			 * haal de naam van de leidende module uit knowledge db aan de hand van de servicestep.service (ofzo)
+			 * 
+			 * String moduleName = 
+			 * 
+			 */
+			
+			Module module = hardwareAgent.GetModuleByName("gripper");		
+			
+			EquipletStepMessage[] equipletSteps = module.getEquipletSteps(parameters);
+			
+			long stepDuration = 0l;
+			
+			for(EquipletStepMessage equipletStep : equipletSteps){
+				
+				TimeData td = equipletStep.timeData;
+				stepDuration += td.getDuration();
+				
+			}
+			
 			ScheduleData schedule = new ScheduleData();
 			schedule.fillWithBasicDBObject(((BasicDBObject) serviceStep.get("scheduleData")));
 			schedule.setDuration(stepDuration);

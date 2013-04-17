@@ -1,40 +1,14 @@
 package hardwareAgent;
 
+import com.mongodb.BasicDBObject;
+
 /**
  * Authors: Thierry Gerritse 
  * Authors: Wouter Veen
  * Class: CheckForModules.java * 
  */
 
-public class Module {
-	/**
-	 * @var long _stepDuration
-	 * duration of a step that must be taken
-	 */
-	private long _stepDuration;
+public interface Module {
 	
-	/**
-	 * @param long stepDuration
-	 */
-	public Module(long stepDuration)throws Exception{
-		
-		if(stepDuration == 0l){
-			throw new Exception("Duration can not be 0");
-		}
-		else{
-		
-			this._stepDuration = stepDuration;
-			
-		}
-		
-	}
-	
-	public void setStepDuration(long stepDuration){
-		this._stepDuration = stepDuration;
-	}
-	
-	public long getStepDuration(){
-		return this._stepDuration;
-		
-	}
+	public EquipletStepMessage[] getEquipletSteps(BasicDBObject parameters);
 }
