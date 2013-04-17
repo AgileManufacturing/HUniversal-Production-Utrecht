@@ -50,7 +50,7 @@ public class MongoDBConnection {
 	 * Initializes the databaseConnections Hashtable.
 	 **/
 	static {
-		databaseConnections = new Hashtable<ServerAddress, MongoDBConnection>();
+		databaseConnections = new Hashtable<>();
 	}
 	
 	/**

@@ -75,13 +75,13 @@ public class BlackboardClient {
 	 * @var Mongo mongo
 	 * Connection object to MongoDB.
 	 **/
-	private Mongo mongo;
+	Mongo mongo;
 
 	/**
 	 * @var HashMap<BlackboardSubscription> subscriptions
 	 * Link between subscribed topic name and MongoDbs BasicDBObjects
 	 **/
-	private ArrayList<BlackboardSubscription> subscriptions;
+	ArrayList<BlackboardSubscription> subscriptions;
 
 	/**
 	 * @var DB currentDatabase
@@ -109,7 +109,7 @@ public class BlackboardClient {
 	 * @throws UnknownHostException The IP address of a host could not be determined.
 	 **/
 	public BlackboardClient(String host) throws UnknownHostException, GeneralMongoException {
-		this.subscriptions = new ArrayList<BlackboardSubscription>();
+		this.subscriptions = new ArrayList<>();
 		this.mongo = MongoDBConnection.getInstanceForHost(new ServerAddress(host)).getMongoClient();
 	}
 
@@ -122,7 +122,7 @@ public class BlackboardClient {
 	 * @throws UnknownHostException The IP address of a host could not be determined.
 	 **/
 	public BlackboardClient(String host, int port) throws UnknownHostException, GeneralMongoException {
-		this.subscriptions = new ArrayList<BlackboardSubscription>();
+		this.subscriptions = new ArrayList<>();
 		this.mongo = MongoDBConnection.getInstanceForHost(new ServerAddress(host, port)).getMongoClient();
 	}
 	
@@ -145,6 +145,7 @@ public class BlackboardClient {
 	 * @return The T object parsed from the JSON string.
 	 * @throws InvalidJSONException An error exists within the JSON.
 	 **/
+	@SuppressWarnings("static-method")
 	private DBObject parseJSONWithCheckedException(String jsonString) throws InvalidJSONException {
 		DBObject obj = null;
 		try {
@@ -555,7 +556,7 @@ public class BlackboardClient {
 				while (!Thread.interrupted()) {
 					while (tailedCursor.hasNext()) {
 						OplogEntry entry = new OplogEntry(
-								(DBObject) tailedCursor.next());
+								tailedCursor.next());
 						MongoOperation operation = entry.getOperation();
 
 						for (BlackboardSubscription sub : subscriptions) {
@@ -566,6 +567,7 @@ public class BlackboardClient {
 					}
 				}
 			} catch (MongoInterruptedException ex) {
+				//empty
 			}
 		}
 	}

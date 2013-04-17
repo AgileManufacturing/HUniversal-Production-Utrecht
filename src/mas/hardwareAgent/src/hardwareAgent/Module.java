@@ -16,17 +16,11 @@ public class Module {
 	/**
 	 * @param long stepDuration
 	 */
-	public Module(long stepDuration)throws Exception{
-		
+	public Module(long stepDuration) throws Exception {
 		if(stepDuration == 0l){
 			throw new Exception("Duration can not be 0");
 		}
-		else{
-		
-			this._stepDuration = stepDuration;
-			
-		}
-		
+		this._stepDuration = stepDuration;
 	}
 	
 	public void setStepDuration(long stepDuration){

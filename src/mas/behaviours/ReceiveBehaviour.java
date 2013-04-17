@@ -65,6 +65,7 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 		restartTimer();
 	}
 
+	@Override
 	public void action() {
 		while(myAgent != null && (msg = myAgent.receive(template)) != null) {
 			handle(msg);
@@ -118,6 +119,7 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 				+ timeout);
 	}
 
+	@Override
 	public void reset() {
 		super.reset();
 		msg = null;
@@ -129,6 +131,7 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	 *
 	 * @param timeout The timeout
 	 */
+	@SuppressWarnings("hiding")
 	public void reset(int timeout) {
 		reset();
 		this.timeout = timeout;

@@ -29,7 +29,6 @@
  **/
 package serviceAgent;
 
-import java.util.HashMap;
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
@@ -42,29 +41,32 @@ import newDataClasses.ScheduleData;
  */
 public class ServiceStepMessage {
 	private ObjectId productStepId;
+	private String serviceName;
 	private long type;
 	private BasicDBObject parameters;
 	private StepStatusCode status;
 	private BasicDBObject statusData;
 	private ScheduleData scheduleData;
 
-	public ServiceStepMessage(long type, BasicDBObject parameters,
+	public ServiceStepMessage(long type, String serviceName, BasicDBObject parameters,
 			StepStatusCode status, BasicDBObject statusData,
 			ScheduleData scheduleData) {
-		this(null, type, parameters, status, statusData, scheduleData);
+		this(null, type, serviceName, parameters, status, statusData, scheduleData);
 	}
 
-	public ServiceStepMessage(ObjectId productStepId, long type,
+	public ServiceStepMessage(ObjectId productStepId, long type, String serviceName,
 			BasicDBObject parameters, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
 		this.productStepId = productStepId;
 		this.type = type;
+		this.serviceName = serviceName;
 		this.parameters = parameters;
 		this.status = status;
 		this.statusData = statusData;
 		this.scheduleData = scheduleData;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null)
 			return false;
@@ -76,10 +78,20 @@ public class ServiceStepMessage {
 			return false;
 		ServiceStepMessage other = (ServiceStepMessage) obj;
 		return productStepId.equals(other.productStepId) && type == other.type
+				&& serviceName.equals(other.serviceName)
 				&& parameters.equals(other.parameters)
 				&& status == other.status
 				&& statusData.equals(other.statusData)
 				&& scheduleData.equals(other.scheduleData);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return super.hashCode();
 	}
 
 	/**
@@ -110,6 +122,20 @@ public class ServiceStepMessage {
 	 */
 	public void setType(long type) {
 		this.type = type;
+	}
+
+	/**
+	 * @return the serviceName
+	 */
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	/**
+	 * @param serviceName the serviceName to set
+	 */
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
 	}
 
 	/**
