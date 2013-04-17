@@ -26,6 +26,7 @@
 package rexos.libraries.knowledge;
 
 import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.JDBC4PreparedStatement;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -119,7 +120,7 @@ public class KnowledgeDBClient {
     }
 
     /**
-     * Execute a single query statement.
+     * Executes a single query statement.
      *
      * @param query The query to be executed.
      *
@@ -133,7 +134,7 @@ public class KnowledgeDBClient {
     }
 
     /**
-     * Execute a single query statement with parameters.
+     * Executes a single query statement with parameters.
      *
      * @param query The query to be executed.
      * @param parameters The parameters for the query in a consecutive order.
@@ -149,5 +150,46 @@ public class KnowledgeDBClient {
         }
 
         return statement.executeQuery();
+    }
+
+
+    /**
+     * Executes an insert or update query.
+     *
+     * @param query The insert or update query.
+     *
+     * @return Last insert ID on successful insert query, or 0 for an update query.
+     * @throws SQLException
+     **/
+    public int executeUpdateQuery(String query) throws SQLException {
+        return executeUpdateQuery(query, null);
+    }
+
+    /**
+     * Executes an insert or update query.
+     *
+     * @param query The insert or update query.
+     * @param parameters The parameters for the query in a consecutive order.
+     *
+     * @return Last insert ID on successful insert query, or 0 for an update query.
+     * @throws SQLException
+     **/
+    public int executeUpdateQuery(String query, Object[] parameters) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+
+        if (parameters != null) {
+            for (int i = 0; i < parameters.length; i++) {
+                statement.setString(i + 1, parameters[i].toString());
+            }
+        }
+
+        statement.executeUpdate();
+        if (((JDBC4PreparedStatement) statement).getLastInsertID() > 0) {
+            ResultSet keys = statement.getGeneratedKeys();
+            keys.next();
+            return keys.getInt(1);
+        } else {
+            return 0;
+        }
     }
 }
