@@ -47,6 +47,7 @@ public class sqliteDatabase {
 				conn = DriverManager.getConnection(DB_URL + DB_FILE, USER, PASS);
 				PreparedStatement create = conn.prepareStatement("CREATE TABLE IF NOT EXISTS log (id INT, time VARCHAR(30), state VARCHAR(30), message VARCHAR(250))");
 				create.execute();
+				create.close();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -67,6 +68,8 @@ public class sqliteDatabase {
 				insert.setString(4, msg.getMessage());
 				insert.execute();
 			}
+			
+			insert.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

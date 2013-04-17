@@ -22,9 +22,10 @@ public class JDBC {
 	static final String USER = "username";
 	static final String PASS = "password";
 	
+	private static Connection conn;
+	private static Statement stmt;
+	
 	public static void main(String[] args) {
-		Connection conn = null;
-		Statement stmt = null;
 		try {
 			// STEP 1: Setup the Driver
 			try {
@@ -59,7 +60,7 @@ public class JDBC {
 				if (stmt != null)
 					stmt.close();
 			} catch (SQLException se2) {
-				
+				//SQLException closing
 			}
 			try {
 				if (conn != null)

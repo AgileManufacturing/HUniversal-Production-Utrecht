@@ -50,5 +50,7 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	{	
 		currentProductionStep = step.getId();
 		_product.add(log);
+		// TODO Set ProductionStep Status to succes. 
+		
 	}
 }
