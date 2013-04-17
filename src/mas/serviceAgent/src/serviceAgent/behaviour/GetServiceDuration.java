@@ -181,11 +181,11 @@ public class GetServiceDuration extends ReceiveBehaviour {
 					answer.setConversationId(conversationId);
 					answer.setOntology("ProductionDurationResponse");
 					agent.send(answer);
-					
-					agent.removeBehaviour(this);
 
 					System.out.format("%s sending msg (%s)%n", myAgent.getLocalName(),
 							answer.getOntology());
+					
+					agent.removeBehaviour(this);
 				}
 			} catch (UnreadableException | JsonSyntaxException
 					| InvalidDBNamespaceException | GeneralMongoException e) {
