@@ -32,8 +32,6 @@ package serviceAgent.behaviour;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,11 +43,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.TypeAdapter;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-
-import equipletAgent.StepStatusCode;
 
 import newDataClasses.ScheduleData;
 import nl.hu.client.BlackboardClient;
@@ -59,7 +54,6 @@ import nl.hu.client.InvalidJSONException;
 import serviceAgent.ServiceAgent;
 import serviceAgent.ServiceStepMessage;
 import jade.core.Agent;
-import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
@@ -104,7 +98,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 		this.serviceStepBlackBoard = serviceStepBlackBoard;
 		this.serviceSteps = Arrays.asList(serviceSteps);
 		this.conversationId = conversationId;
-		
+
 		remainingServiceSteps = serviceSteps.length;
 	}
 
@@ -142,7 +136,6 @@ public class GetServiceDuration extends ReceiveBehaviour {
 			agent.doDelete();
 		}
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -151,6 +144,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if (message != null) {
+			ServiceAgent agent = (ServiceAgent) getAgent();
 			try {
 				Gson gson = new GsonBuilder().registerTypeAdapter(
 						DBObject.class, new InstanceCreator<DBObject>() {
@@ -165,22 +159,33 @@ public class GetServiceDuration extends ReceiveBehaviour {
 										.getContentObject())),
 						ServiceStepMessage.class);
 
-				System.out.format("%s says step type %s will take %d %n",
-						getAgent().getLocalName(), serviceStep.getType(),
+				System.out.format("%s says step type %s will take %d%n",
+						agent.getLocalName(), serviceStep.getType(),
 						serviceStep.getScheduleData().getDuration());
 
-				duration += serviceStep.getScheduleData().getDuration();
+				ScheduleData scheduleData = serviceStep.getScheduleData();
+				duration += scheduleData.getDuration();
 				if (--remainingServiceSteps == 0) {
-					ScheduleData scheduleData = null;
-
+					System.out.format(
+							"Saving duration of %d in prod. step %s%n",
+							duration, serviceStep.getProductStepId());
+					scheduleData.setDuration(duration);
 					productionStepBlackBoard.updateDocuments(
 							new BasicDBObject("_id", serviceStep
 									.getProductStepId()),
-							new BasicDBObject("$set", new BasicDBObject(
-									"scheduleData", gson.fromJson(
-											gson.toJson(scheduleData),
-											DBObject.class))));
-					getAgent().removeBehaviour(this);
+							new BasicDBObject("$set", scheduleData
+									.toBasicDBObject()));
+
+					ACLMessage answer = new ACLMessage(ACLMessage.INFORM);
+					answer.addReceiver(agent.getEquipletAgentAID());
+					answer.setConversationId(conversationId);
+					answer.setOntology("ProductionDurationResponse");
+					agent.send(answer);
+					
+					agent.removeBehaviour(this);
+
+					System.out.format("%s sending msg (%s)%n", myAgent.getLocalName(),
+							answer.getOntology());
 				}
 			} catch (UnreadableException | JsonSyntaxException
 					| InvalidDBNamespaceException | GeneralMongoException e) {

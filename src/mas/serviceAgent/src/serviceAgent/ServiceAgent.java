@@ -21,7 +21,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	private HashMap<String, Long> services;
 	private HashMap<Long, String[]> stepTypes;
 	private DbData dbData;
-	private AID hardwareAgentAID;
+	private AID equipletAgentAID, hardwareAgentAID;
 
 	public void setup() {
 		System.out.println("I spawned as a service agent.");
@@ -29,7 +29,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			dbData = (DbData) args[0];
-			hardwareAgentAID = (AID) args[1];
+			equipletAgentAID = (AID) args[1];
+			hardwareAgentAID = (AID) args[2];
 		}
 
 		try {
@@ -159,6 +160,13 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 */
 	public DbData getDbData() {
 		return dbData;
+	}
+
+	/**
+	 * @return the equipletAgentAID
+	 */
+	public AID getEquipletAgentAID() {
+		return equipletAgentAID;
 	}
 
 	/**
