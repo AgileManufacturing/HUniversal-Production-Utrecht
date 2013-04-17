@@ -1,6 +1,5 @@
 package productAgent;
 
-import equipletAgent.EquipletAgent;
 import jade.core.AID;
 import jade.core.Agent;
 import newDataClasses.Product;
@@ -56,12 +55,12 @@ public class ProductAgent extends Agent {
 	}
 	
 	public void reschedule(){
-		_overviewBehaviour.Reschedule();
+		_overviewBehaviour.reschedule();
 	}
 	
 	public void rescheduleAndRemoveEquiplet(){
 		//remove equiplet first
-		_overviewBehaviour.Reschedule();
+		_overviewBehaviour.reschedule();
 	}
 
 	public Product getProduct() {

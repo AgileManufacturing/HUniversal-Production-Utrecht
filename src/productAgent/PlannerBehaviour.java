@@ -29,7 +29,6 @@ public class PlannerBehaviour extends OneShotBehaviour {
 	}
 
 	public void removeEquiplet(AID aid) {
-		@SuppressWarnings("unused")
 		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
 
 		// try to remove the given 'aid' from the blackboard (for testing purposes only)

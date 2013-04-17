@@ -68,6 +68,11 @@ public class OverviewBehaviour extends OneShotBehaviour {
 		});
 
 		_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void action() {
 				System.out.println("\n");
