@@ -78,6 +78,7 @@ public class ScheduleData implements Serializable {
 		this.deadline = deadline;
 	}
 	
+	@Override
 	public boolean equals(Object obj) {
 		if(obj == null)
 			return false;

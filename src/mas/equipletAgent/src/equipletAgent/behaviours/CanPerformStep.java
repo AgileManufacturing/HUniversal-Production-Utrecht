@@ -97,7 +97,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 		try {
 			contentObject = message.getContentObject();
 		} catch (UnreadableException e) {
-			//System.out.println("Exception Caught, No Content Object Given");
+			System.out.println("Exception Caught, No Content Object Given");
 		}
 		System.out.format("%s received message from %s (%s:%s)%n",
 				myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
@@ -106,31 +106,32 @@ public class CanPerformStep extends ReceiveBehaviour {
 		ProductionStep proStepC = (ProductionStep) contentObject;
 		ObjectId productStepEntryId = null;
 		Gson gson = new GsonBuilder().serializeNulls().create();
-
-		try {
-			// TODO: get inputParts
-			// TODO: get ouputPart
-			ProductStepMessage entry = new ProductStepMessage(message.getSender(), proStepC.getCapability(),
-					proStepC.getParameterList(), null, null,
-					StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
-			productStepEntryId = equipletAgent.getEquipletBBclient().insertDocument(gson.toJson(entry));
-			equipletAgent.addCommunicationSlot(message.getConversationId(), productStepEntryId);
-			ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
-			responseMessage.setConversationId(message.getConversationId());
-			responseMessage.addReceiver(equipletAgent.getServiceAgent());
-			responseMessage.setOntology("CanDoProductionStep");
+		if(proStepC != null){
 			try {
-				responseMessage.setContentObject(productStepEntryId);
-			} catch (IOException e) {
+				// TODO: get inputParts
+				// TODO: get ouputPart
+				ProductStepMessage entry = new ProductStepMessage(message.getSender(), proStepC.getCapability(),
+						proStepC.getParameterList(), null, null,
+						StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
+				productStepEntryId = equipletAgent.getEquipletBBclient().insertDocument(gson.toJson(entry));
+				equipletAgent.addCommunicationSlot(message.getConversationId(), productStepEntryId);
+				ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
+				responseMessage.setConversationId(message.getConversationId());
+				responseMessage.addReceiver(equipletAgent.getServiceAgent());
+				responseMessage.setOntology("CanDoProductionStep");
+				try {
+					responseMessage.setContentObject(productStepEntryId);
+				} catch (IOException e) {
+					e.printStackTrace();
+					// TODO: ERROR HANDLING
+					myAgent.doDelete();
+				}
+				myAgent.send(responseMessage);
+			} catch (Exception e) {
 				e.printStackTrace();
 				// TODO: ERROR HANDLING
 				myAgent.doDelete();
 			}
-			myAgent.send(responseMessage);
-		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO: ERROR HANDLING
-			myAgent.doDelete();
 		}
 	}
 }

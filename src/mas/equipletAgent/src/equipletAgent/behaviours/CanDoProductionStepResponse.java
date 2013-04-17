@@ -91,7 +91,7 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour {
 			AID productAgent = new AID((String)((DBObject)productStep.get("productAgentId")).get("name"), AID.ISGUID);
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.CONFIRM);
 			responseMessage.setConversationId(message.getConversationId());
-			responseMessage.setOntology("CanPerformStepResponse");
+			responseMessage.setOntology("CanPerformStep");
 			responseMessage.addReceiver(productAgent);
 			switch(status){
 			case EVALUATING:

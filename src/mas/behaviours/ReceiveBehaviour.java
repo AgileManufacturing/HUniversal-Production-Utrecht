@@ -131,10 +131,9 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	 *
 	 * @param timeout The timeout
 	 */
-	@SuppressWarnings("hiding")
-	public void reset(int timeout) {
+	public void reset(int newTimeout) {
 		reset();
-		this.timeout = timeout;
+		timeout = newTimeout;
 	}
 
 	/**

@@ -7,7 +7,6 @@ package jadeagentx;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
-import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 import java.util.ArrayList;
@@ -30,11 +29,13 @@ public class JadeAgentX extends Agent {
 	 * @param args
 	 *            the command line arguments
 	 */
+	@Override
 	protected void setup() {
 		try {
 			System.out.println("starting a agent");
 
-			ArrayList<Long> capabilities1 = new ArrayList<Long>();
+			ArrayList<Long> capabilities1 = new ArrayList<>();
+			capabilities1.add(0l);
 			capabilities1.add(1l);
 			capabilities1.add(11l);
 			capabilities1.add(24l);
@@ -42,24 +43,24 @@ public class JadeAgentX extends Agent {
 			capabilities1.add(15l);
 
 			Object[] ar = new Object[] { capabilities1 };
-			((AgentController) getContainerController().createNewAgent("eqa1", "equipletAgent.EquipletAgent", ar)).start();
+			getContainerController().createNewAgent("eqa1", "equipletAgent.EquipletAgent", ar).start();
 			// TODO code application logic here
-			ArrayList<Long> capabilities2 = new ArrayList<Long>();
+			ArrayList<Long> capabilities2 = new ArrayList<>();
 			capabilities2.add(2l);
 			capabilities2.add(5l);
 			capabilities2.add(9l);
 
 			ar = new Object[] { capabilities2 };
-			((AgentController) getContainerController().createNewAgent("eqa2", "equipletAgent.EquipletAgent", ar)).start();
+			getContainerController().createNewAgent("eqa2", "equipletAgent.EquipletAgent", ar).start();
 
-			ArrayList<Long> capabilities3 = new ArrayList<Long>();
+			ArrayList<Long> capabilities3 = new ArrayList<>();
 			capabilities3.add(3l);
 			capabilities3.add(4l);
 			capabilities3.add(7l);
 			capabilities3.add(9l);
 
 			ar = new Object[] { capabilities3 };
-			((AgentController) getContainerController().createNewAgent("eqa3", "equipletAgent.EquipletAgent", ar)).start();
+			getContainerController().createNewAgent("eqa3", "equipletAgent.EquipletAgent", ar).start();
 
 			ar = null;
 
@@ -79,8 +80,7 @@ public class JadeAgentX extends Agent {
 			parameterList.AddParameterGroup(p);
 
 			// Next we want to have some production steps
-			ProductionStep stp1 = new ProductionStep(1, parameterList);
-			stp1.setCapability(1);
+			ProductionStep stp1 = new ProductionStep(1, 0, parameterList);
 
 			p = new ParameterGroup("Color"); // group colour
 			p.add(new Parameter("Id", "3"));
@@ -95,8 +95,7 @@ public class JadeAgentX extends Agent {
 			p.add(new Parameter("y", "2"));
 			parameterList.AddParameterGroup(p);
 
-			ProductionStep stp2 = new ProductionStep(2, parameterList);
-			stp2.setCapability(2);
+			ProductionStep stp2 = new ProductionStep(2, 1, parameterList);
 
 			p = new ParameterGroup("Color"); // group colour
 			p.add(new Parameter("Id", "5"));
@@ -111,8 +110,7 @@ public class JadeAgentX extends Agent {
 			p.add(new Parameter("y", "2"));
 			parameterList.AddParameterGroup(p);
 
-			ProductionStep stp3 = new ProductionStep(3, parameterList);
-			stp3.setCapability(3);
+			ProductionStep stp3 = new ProductionStep(3, 2, parameterList);
 
 			p = new ParameterGroup("Color"); // group colour
 			p.add(new Parameter("Id", "7"));
@@ -127,16 +125,19 @@ public class JadeAgentX extends Agent {
 			p.add(new Parameter("y", "2"));
 			parameterList.AddParameterGroup(p);
 
-			ProductionStep stp4 = new ProductionStep(4, parameterList);
-			stp4.setCapability(4);
+			ProductionStep stp4 = new ProductionStep(4, 3, parameterList);
 
 			// Our argument for the product agent. The total production of the
 			// product,
 			// consists of multiple steps
-			ProductionStep[] stepList = new ProductionStep[] { stp1, stp2, stp3, stp4 };
-			
+			ArrayList<ProductionStep> stepList = new ArrayList<>();
+			stepList.add(stp1);
+			stepList.add(stp2);
+			stepList.add(stp3);
+			stepList.add(stp4);
+
 			Production production = new Production(stepList);
-			Product product = new Product(production);
+			Product product = new Product(production, getAID().toString());
 
 			// We need to pass an Object[] to the createNewAgent.
 			// But we only want to pass our product!
@@ -166,7 +167,7 @@ public class JadeAgentX extends Agent {
 			ACLMessage message = receive();
 			if (message != null) {
 				try {
-					((AgentController) getContainerController().createNewAgent("pa" + count++, "productAgent.ProductAgent", args)).start();
+					getContainerController().createNewAgent("pa" + count++, "productAgent.ProductAgent", args).start();
 				} catch (StaleProxyException e) {
 					e.printStackTrace();
 				}
