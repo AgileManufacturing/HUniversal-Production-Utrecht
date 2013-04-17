@@ -31,6 +31,7 @@ public class ProductAgent extends Agent {
 	protected void setup() {
 		try {
 			_product = (Product) getArguments()[0];
+			
 			_overviewBehaviour = new OverviewBehaviour();
 			addBehaviour(_overviewBehaviour);
 
