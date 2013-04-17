@@ -79,7 +79,7 @@ public class PlannerBehaviour extends OneShotBehaviour {
 
 					for (DBObject dbo : equipletDirectory) {
 						DBObject aid = (DBObject) dbo.get("db");
-						String name = (String) aid.get("name").toString();
+						String name = aid.get("name").toString();
 						pem.addEquipletToProductionStep(PA_id, new AID(name,
 								AID.ISLOCALNAME));
 					}

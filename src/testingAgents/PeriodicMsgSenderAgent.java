@@ -62,6 +62,7 @@ public class PeriodicMsgSenderAgent extends Agent {
 	private static int _cidCnt = 0;
 	private String _cidBase;
 
+	@Override
 	@SuppressWarnings("serial")
 	protected void setup() {
 		try {
@@ -80,12 +81,12 @@ public class PeriodicMsgSenderAgent extends Agent {
 		}
 	}
 
-	public boolean getRandomBoolean() {
+	public static boolean getRandomBoolean() {
 		Random random = new Random();
 		return random.nextBoolean();
 	}
 
-	public int getRandomInt(int r) {
+	public static int getRandomInt(int r) {
 		Random random = new Random();
 		return random.nextInt(r);
 	}
