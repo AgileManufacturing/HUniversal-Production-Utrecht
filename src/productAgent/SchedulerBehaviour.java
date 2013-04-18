@@ -33,16 +33,17 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 		try {
 			Product product = this._productAgent.getProduct();
 			Production production = product.getProduction();
-			ProductionStep[] psa = production.getProductionSteps();
+			ArrayList<ProductionStep> psa = production.getProductionSteps();
 			
 			
 			//debug
-			System.out.println("NUMBER OF EQUIPLETS: "+psa.length);
+			System.out.println("NUMBER OF EQUIPLETS: "+psa.size());
 			
 			for (ProductionStep ps : psa) {
-				long PA_id = ps.getId();
+				Long PA_id = Long.valueOf(ps.getId());
+				
 				if(production.getProductionEquipletMapping().getEquipletsForProductionStep(PA_id).keySet().size() >0){
-					this.timeslotsToSchedule =  production.getProductionEquipletMapping().getTimeSlotsForEquiplet(PA_id, (AID)production.getProductionEquipletMapping()
+					this.timeslotsToSchedule =  production.getProductionEquipletMapping().getTimeSlotsForEquiplet(PA_id.intValue(), (AID)production.getProductionEquipletMapping()
 							.getEquipletsForProductionStep(PA_id).keySet().toArray()[0]).intValue();
 				}
 				

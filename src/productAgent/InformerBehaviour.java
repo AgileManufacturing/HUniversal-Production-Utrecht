@@ -68,7 +68,11 @@ public class InformerBehaviour extends OneShotBehaviour {
 				
 				//adds the step to te new list (the one that will be returned to the scheduler)
 				_pem.addProductionStep(stp.getId());
-
+				
+				System.out.println("Size keyset AIDS: "+_productAgent.getProduct().getProduction()
+						.getProductionEquipletMapping()
+						.getEquipletsForProductionStep(stp.getId()).keySet().size());
+				
 				for (AID aid : _productAgent.getProduct().getProduction()
 						.getProductionEquipletMapping()
 						.getEquipletsForProductionStep(stp.getId()).keySet()) {
