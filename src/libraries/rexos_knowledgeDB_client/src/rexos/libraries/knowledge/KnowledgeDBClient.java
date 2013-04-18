@@ -42,6 +42,13 @@ import java.util.Properties;
  **/
 public class KnowledgeDBClient {
     /**
+     * @var String PROPERTIES_ENVIRONMENT_VARIABLE
+     *
+     * The environment variable that holds the path to the properties file.
+     **/
+    private static final String PROPERTIES_ENVIRONMENT_VARIABLE = "KNOWLEDGE_DB_PROPERTIES";
+
+    /**
      * @var rexos.libraries.knowledge.KnowledgeDBClient client
      *
      * The only rexos.libraries.knowledge.KnowledgeDBClient instance.
@@ -73,15 +80,15 @@ public class KnowledgeDBClient {
      **/
     private KnowledgeDBClient() {
         try {
-            Properties properties = new Properties();
-            FileInputStream in = new FileInputStream(System.getenv("KNOWLEDGE_DB_PROPERTIES"));
-            properties.load(in);
+            Properties dbProperties = new Properties();
+            FileInputStream in = new FileInputStream(System.getenv(PROPERTIES_ENVIRONMENT_VARIABLE));
+            dbProperties.load(in);
 
-            String url = "jdbc:mysql://" + properties.getProperty("host") + ":" + properties.getProperty("port")
-                    + "/" + properties.getProperty("db");
-
-            this.connection = (Connection) DriverManager.getConnection(url, properties.getProperty("username"), properties.getProperty("password"));
+            String url = "jdbc:mysql://" + dbProperties.getProperty("host") + ":" + dbProperties.getProperty("port")
+                    + "/" + dbProperties.getProperty("db");
             in.close();
+
+            connection = (Connection) DriverManager.getConnection(url, dbProperties.getProperty("username"), dbProperties.getProperty("password"));
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
