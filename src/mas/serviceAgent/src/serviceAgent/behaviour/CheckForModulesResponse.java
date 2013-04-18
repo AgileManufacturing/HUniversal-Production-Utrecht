@@ -1,7 +1,7 @@
 /**
- * @file DummyService.java
+ * @file CheckForModulesResponse.java
  * @brief 
- * @date Created: 12 apr. 2013
+ * @date Created: 18 apr. 2013
  *
  * @author Peter Bonnema
  *
@@ -28,59 +28,57 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  **/
-package serviceAgent;
+package serviceAgent.behaviour;
 
-import hardwareAgent.Module;
-import newDataClasses.ScheduleData;
-
-import com.mongodb.BasicDBObject;
-
-import equipletAgent.StepStatusCode;
+import serviceAgent.ServiceAgent;
+import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import behaviours.ReceiveOnceBehaviour;
 
 /**
  * @author Peter
  * 
  */
-public class DummyService implements Service {
-	private static final String name = "DummyService";
+public class CheckForModulesResponse extends ReceiveOnceBehaviour {
+	private static final long serialVersionUID = 1L;
+	private ServiceAgent agent;
 
 	/**
-	 * 
+	 * @param a
 	 */
-	public DummyService() {
+	public CheckForModulesResponse(Agent a) {
+		this(a, 2000);
+	}
+
+	/**
+	 * @param a
+	 * @param millis
+	 */
+	public CheckForModulesResponse(Agent a, int millis) {
+		super(a, millis, MessageTemplate
+				.MatchOntology("CheckForModulesResponse"));
+		agent = (ServiceAgent) a;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see serviceAgent.Service#canPerform(long, com.mongodb.BasicDBObject)
+	 * @see behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage)
 	 */
 	@Override
-	public long[] getModuleIds(long productStepType, BasicDBObject parameters) {
-		return new long[] { 1l, 2l, 3l };
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see serviceAgent.Service#getServiceSteps(long,
-	 * com.mongodb.BasicDBObject)
-	 */
-	@Override
-	public ServiceStepMessage[] getServiceSteps(long productStepType,
-			BasicDBObject parameters) {
-		return new ServiceStepMessage[] { new ServiceStepMessage(1l, name,
-				parameters, StepStatusCode.EVALUATING, new BasicDBObject(
-						"status", "dummy status"), new ScheduleData()) };
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see serviceAgent.Service#getName()
-	 */
-	@Override
-	public String getName() {
-		return name;
+	public void handle(ACLMessage message) {
+		if (message != null) {
+			ACLMessage reply = message.createReply();
+			reply.clearAllReceiver();
+			message.addReceiver(agent.getEquipletAgentAID());
+			message.setPerformative(message.getPerformative());
+			message.setOntology("CanDoProductionStepResponse");
+			getAgent().send(reply);
+			System.out.format("%s sending step available (%s)%n", getAgent()
+					.getLocalName(), message.getPerformative());
+		} else {
+			// TODO handle timeout
+		}
 	}
 }

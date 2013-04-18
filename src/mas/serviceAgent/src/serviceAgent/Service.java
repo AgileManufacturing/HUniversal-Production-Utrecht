@@ -30,6 +30,8 @@
  **/
 package serviceAgent;
 
+import hardwareAgent.Module;
+
 import com.mongodb.BasicDBObject;
 
 /**
@@ -42,7 +44,7 @@ public interface Service {
 	 * @param parameters
 	 * @return
 	 */
-	public boolean canPerform(long productStepType, BasicDBObject parameters);
+	public long[] getModuleIds(long productStepType, BasicDBObject parameters);
 
 	/**
 	 * @param productStepType
