@@ -34,6 +34,7 @@ package hardwareAgent;
 import java.util.HashMap;
 
 import hardwareAgent.behaviours.*;
+import serviceAgent.Service;
 
 import org.bson.types.ObjectId;
 
@@ -56,27 +57,27 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 	private BlackboardClient serviceStepBBClient, equipletStepBBClient;
 	private DbData dbData;
 	private HashMap<String,Module> ModulesMap;
+	private HashMap<Service, Module> LeadingModules;
 		
 	public void RegisterModule(String name,Module module){
 		
-		this.ModulesMap.put(name, module);
+		ModulesMap.put(name, module);
 		
 	}
 	
 	public Module GetModuleByName(String name)throws Exception{
 		
-		if (this.ModulesMap.get(name)!= null){			
-			return this.ModulesMap.get(name);
+		if (ModulesMap.get(name)!= null){			
+			return ModulesMap.get(name);
 		}
-		else{
-			throw new Exception("No Stepleader difined for this stepType");
-		}
+		throw new Exception("No Stepleader difined for this stepType");
 	}
 	
 	@Override
 	public void setup() {
 		System.out.println("Hardware agent "+ this +" reporting.");
 		ModulesMap = new HashMap<String,Module>();
+		LeadingModules = new HashMap<Service, Module>();
 
 		// TODO fill in host, database and collection
 		Object[] args = getArguments();
