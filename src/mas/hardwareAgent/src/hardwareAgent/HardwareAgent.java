@@ -56,27 +56,23 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 
 	private BlackboardClient serviceStepBBClient, equipletStepBBClient;
 	private DbData dbData;
-	private HashMap<String,Module> ModulesMap;
+	private HashMap<Long,Module> ModulesMap;
 	private HashMap<Service, Module> LeadingModules;
 		
-	public void RegisterModule(String name,Module module){
+	public void RegisterModule(long name,Module module){
 		
 		ModulesMap.put(name, module);
 		
 	}
 	
-	public Module GetModuleByName(String name)throws Exception{
-		
-		if (ModulesMap.get(name)!= null){			
-			return ModulesMap.get(name);
-		}
-		throw new Exception("No Stepleader difined for this stepType");
+	public Module GetModuleById(long id)throws Exception{
+		return ModulesMap.get(id);
 	}
 	
 	@Override
 	public void setup() {
 		System.out.println("Hardware agent "+ this +" reporting.");
-		ModulesMap = new HashMap<String,Module>();
+		ModulesMap = new HashMap<Long,Module>();
 		LeadingModules = new HashMap<Service, Module>();
 
 		// TODO fill in host, database and collection
@@ -117,7 +113,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 		
 		// for now: use precompiled grippermodule class
 		GripperModule gp = new GripperModule();
-		RegisterModule("gripper", gp);
+		RegisterModule(3l, gp);
 		///
 		
 		
