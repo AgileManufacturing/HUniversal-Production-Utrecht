@@ -17,11 +17,11 @@ import newDataClasses.LogMessage;
  * @author Theodoor
  * 
  */
-public class sqliteDatabase {
+public class sqliteDatabase{
 
 	static final String JDBC_DRIVER = "org.sqlite.JDBC";
 	static final String DB_URL = "jdbc:sqlite:";
-	String DB_FILE = "default.sqlite3";
+	String DB_FILE = "default.sqlite";
 
 	// Database credentials
 	static final String USER = "username";
