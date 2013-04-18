@@ -28,34 +28,19 @@ package rexos.libraries.knowledge;
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.JDBC4PreparedStatement;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Properties;
 
 /**
  * A client to communicate with knowledge database.
  **/
 public class KnowledgeDBClient {
-    /**
-     * @var String URL
-     *
-     * The odbc connection url.
-     **/
-    private static final String URL = "jdbc:mysql://145.89.191.131:3306/rexos_knowledge_base";
-
-    /**
-     * @var String USER
-     *
-     * The database username.
-     **/
-    private static final String USER = "rexos";
-
-    /**
-     * @var String PASS
-     *
-     * The database password.
-     **/
-    private static final String PASS = "soxer";
-
     /**
      * @var rexos.libraries.knowledge.KnowledgeDBClient client
      *
@@ -88,8 +73,20 @@ public class KnowledgeDBClient {
      **/
     private KnowledgeDBClient() {
         try {
-            this.connection = (Connection) DriverManager.getConnection(URL, USER, PASS);
+            Properties properties = new Properties();
+            FileInputStream in = new FileInputStream(System.getenv("KNOWLEDGE_DB_PROPERTIES"));
+            properties.load(in);
+
+            String url = "jdbc:mysql://" + properties.getProperty("host") + ":" + properties.getProperty("port")
+                    + "/" + properties.getProperty("db");
+
+            this.connection = (Connection) DriverManager.getConnection(url, properties.getProperty("username"), properties.getProperty("password"));
+            in.close();
         } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
