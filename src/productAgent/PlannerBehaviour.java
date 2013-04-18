@@ -17,19 +17,22 @@ import newDataClasses.ProductionStepStatus;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
-@SuppressWarnings("serial")
 public class PlannerBehaviour extends OneShotBehaviour {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ProductAgent _productAgent;
 
 	public void plannerBehaviour() {
 	}
 
+	@Override
 	public int onEnd() {
 		return 0;
 	}
 
-	public void removeEquiplet(AID aid) {
-		@SuppressWarnings("unused")
+	public static void removeEquiplet(AID aid) {
 		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
 
 		// try to remove the given 'aid' from the blackboard (for testing
@@ -37,10 +40,12 @@ public class PlannerBehaviour extends OneShotBehaviour {
 		try {
 			bbc.removeDocuments(aid.toString());
 		} catch (InvalidJSONException | InvalidDBNamespaceException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
+	@Override
 	public void action() {
 		try {
 			// Get the root Agent
@@ -75,7 +80,7 @@ public class PlannerBehaviour extends OneShotBehaviour {
 
 					for (DBObject dbo : equipletDirectory) {
 						DBObject aid = (DBObject) dbo.get("db");
-						String name = (String) aid.get("name").toString();
+						String name = aid.get("name").toString();
 						pem.addEquipletToProductionStep(PA_id, new AID(name,
 								AID.ISLOCALNAME));
 					}

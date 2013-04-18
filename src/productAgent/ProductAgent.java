@@ -1,8 +1,10 @@
 package productAgent;
 
-import testingAgents.EquipletAgent;
 import jade.core.AID;
 import jade.core.Agent;
+import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
+import libraries.blackboardJavaClient.src.nl.hu.client.InvalidDBNamespaceException;
+import libraries.blackboardJavaClient.src.nl.hu.client.InvalidJSONException;
 import newDataClasses.Product;
 import newDataClasses.ProductionStep;
 
@@ -31,6 +33,7 @@ public class ProductAgent extends Agent {
 	public int prodStep = 0;
 	
 
+	@Override
 	protected void setup() {
 		try {
 			_product = (Product) getArguments()[0];
@@ -63,12 +66,24 @@ public class ProductAgent extends Agent {
 	}
 	
 	public void rescheduleAndRemoveEquiplet(){
+		removeEquiplet(getAID());
 		//remove equiplet first
 		_overviewBehaviour.reschedule();
 	}
 
 	public Product getProduct() {
 		return this._product;
+	}
+	
+	// This function is for testing purposes only and will later be replaced within the Equiplet Agent its functionality
+	public void removeEquiplet(AID aid) {
+		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
+		// try to remove the given 'aid' from the blackboard 
+		try {		
+			bbc.removeDocuments(aid.toString());
+		} catch (InvalidJSONException | InvalidDBNamespaceException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void setProduct(Product value) {

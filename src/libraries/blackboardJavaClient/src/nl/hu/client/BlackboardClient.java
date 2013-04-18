@@ -105,7 +105,7 @@ public class BlackboardClient {
 	 **/
 	public BlackboardClient(String host) {
 		try {
-			this.subscriptions = new ArrayList<BlackboardSubscription>();
+			this.subscriptions = new ArrayList<>();
 			this.mongo = MongoDBConnection.getInstanceForHost(new ServerAddress(host)).getMongoClient();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -120,7 +120,7 @@ public class BlackboardClient {
 	 **/
 	public BlackboardClient(String host, int port) {
 		try {
-			this.subscriptions = new ArrayList<BlackboardSubscription>();
+			this.subscriptions = new ArrayList<>();
 			this.mongo = MongoDBConnection.getInstanceForHost(new ServerAddress(host, port)).getMongoClient();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -133,7 +133,7 @@ public class BlackboardClient {
 	 * @return The DBObject parsed from the JSON string.
 	 * @throws InvalidJSONException An error exists within the JSON.
 	 **/
-	public DBObject parseJSONWithCheckException(String jsonString) throws InvalidJSONException {
+	public static DBObject parseJSONWithCheckException(String jsonString) throws InvalidJSONException {
 		DBObject obj = null;
 		try {
 			obj = (DBObject)JSON.parse(jsonString);
@@ -433,7 +433,7 @@ public class BlackboardClient {
 				while (!Thread.interrupted()) {
 					while (tailedCursor.hasNext()) {
 						OplogEntry entry = new OplogEntry(
-								(DBObject) tailedCursor.next());
+								tailedCursor.next());
 						MongoOperation operation = entry.getOperation();
 
 						for (BlackboardSubscription sub : subscriptions) {

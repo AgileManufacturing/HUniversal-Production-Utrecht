@@ -25,7 +25,7 @@ public class ParameterList implements Serializable{
 	private HashMap<String, ParameterGroup> _parameterGroups;
 	
 	public ParameterList() {
-		this._parameterGroups = new HashMap<String, ParameterGroup>();
+		this._parameterGroups = new HashMap<>();
 	}
 	
 	public void AddParameterGroup(ParameterGroup parameterGroup) throws Exception {

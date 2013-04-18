@@ -5,9 +5,9 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
-public class sideOverviewBehaviour extends CyclicBehaviour {
+public class SideOverviewBehaviour extends CyclicBehaviour {
 	ACLMessage msg;
-	ProductAgent pa = new ProductAgent();
+	ProductAgent pa;
 	
 	@SuppressWarnings("unused")
 	private class receiveMsgBehaviour extends CyclicBehaviour {
@@ -33,27 +33,35 @@ public class sideOverviewBehaviour extends CyclicBehaviour {
 			this.msg = msg;
 		}
 	
+		@Override
 		public void action(){
 			try {
 				switch(msg.getOntology()){
-					case "waiting":
+					// the traveling time between equiplets
+					case "journey":
 						@SuppressWarnings("unused")
 						OneShotBehaviour waitingBehaviour = new OneShotBehaviour(){
+							@Override
 							public void action(){
 								
 							}
 						};
+						break;
+					// reschedule the product
 					case "reschedule":
 						@SuppressWarnings("unused")
 						OneShotBehaviour reschedule = new OneShotBehaviour(){
+							@Override
 							public void action(){
 								pa.reschedule();
 							}
 						};
 						break;
-					case "reschedule++":
+					// remove the equiplet with a malfunction and reschedule the product
+					case "equiplet malfunction":
 						@SuppressWarnings("unused")
 						OneShotBehaviour rescheduleAndRemoveEquiplet = new OneShotBehaviour(){
+							@Override
 							public void action(){
 								pa.rescheduleAndRemoveEquiplet();
 							}

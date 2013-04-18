@@ -39,19 +39,20 @@ public class EquipletAgent extends Agent {
 		return _canPerformStepId;
 	}
 
-	public boolean getRandomBoolean() {
+	public static boolean getRandomBoolean() {
 		@SuppressWarnings("unused")
 		Random random = new Random();
 		//return random.nextBoolean();
 		return true;
 	}
 
-	public int getRandomInt(int r) {
+	public static int getRandomInt(int r) {
 		Random random = new Random();
 		return random.nextInt(r);
 	}
 
 	// equiplet can perform
+	@Override
 	protected void setup() {
 		try {
 			Object[] args = getArguments();
@@ -103,6 +104,7 @@ public class EquipletAgent extends Agent {
 			this.msg = msg;
 		}
 
+		@Override
 		public void action() {
 			try {
 				String convid = msg.getConversationId();
@@ -140,6 +142,7 @@ public class EquipletAgent extends Agent {
 								+ _step.getId());
 
 					myAgent.addBehaviour(new WakerBehaviour(myAgent, delay) {
+						@Override
 						public void handleElapsedTimeout() {
 							if (true && delay > 10000)
 								System.out.println("EQ: " + myAgent.getLocalName()
@@ -175,6 +178,7 @@ public class EquipletAgent extends Agent {
 								+ "GetProductionDuration " + _step.getId());
 
 					myAgent.addBehaviour(new WakerBehaviour(myAgent, delay) {
+						@Override
 						public void handleElapsedTimeout() {
 							if (debug)
 								System.out.println("EQ: "

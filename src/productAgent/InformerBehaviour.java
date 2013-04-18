@@ -25,9 +25,13 @@ import newDataClasses.ProductionStepStatus;
  * the operation ( in timeslots ).
  * 
  */
-@SuppressWarnings("serial")
+
 public class InformerBehaviour extends OneShotBehaviour {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ProductAgent _productAgent;
 	private ParallelBehaviour _par;
 	private Product _product;
@@ -75,6 +79,11 @@ public class InformerBehaviour extends OneShotBehaviour {
 
 		// Checking if timeout expired?
 		seq.addSubBehaviour(new OneShotBehaviour() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void action() {
 				// TODO Auto-generated method stub
@@ -108,6 +117,10 @@ public class InformerBehaviour extends OneShotBehaviour {
 	 * response ( handles a 10 sec timeout ).
 	 */
 	private class Conversation extends SequentialBehaviour {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private AID _aid;
 		private ProductionStep _productionStep;
 		private boolean debug = true;
@@ -125,6 +138,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 		 * 
 		 * @see jade.core.behaviours.Behaviour#onStart() starts the conversation
 		 */
+		@Override
 		public void onStart() {
 			final String ConversationId = _productAgent.generateCID();
 			final MessageTemplate template = MessageTemplate
@@ -133,6 +147,12 @@ public class InformerBehaviour extends OneShotBehaviour {
 			// 1 - Inform if the equiplet can perform the step with the given
 			// parameters
 			addSubBehaviour(new OneShotBehaviour() {
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
 				public void action() {
 					try {
 						ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
@@ -155,6 +175,12 @@ public class InformerBehaviour extends OneShotBehaviour {
 
 			// 2 - wait for an response. ( handles a 10 sec timeout )
 			addSubBehaviour(new ReceiveBehaviour(myAgent, 10000, template) {
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
 				public void handle(ACLMessage msg) {
 					if (msg == null) {
 
@@ -179,6 +205,12 @@ public class InformerBehaviour extends OneShotBehaviour {
 							// 3 - if the response was a CONFIRM, ask about the
 							// duration.
 							addSubBehaviour(new OneShotBehaviour() {
+								/**
+								 * 
+								 */
+								private static final long serialVersionUID = 1L;
+
+								@Override
 								public void action() {
 									try {
 										ACLMessage message = new ACLMessage(
@@ -206,6 +238,12 @@ public class InformerBehaviour extends OneShotBehaviour {
 							// timeout ).
 							addSubBehaviour(new ReceiveBehaviour(myAgent,
 									10000, template) {
+								/**
+										 * 
+										 */
+										private static final long serialVersionUID = 1L;
+
+								@Override
 								public void handle(ACLMessage msg) {
 									if (msg == null) {
 										if (debug) {
