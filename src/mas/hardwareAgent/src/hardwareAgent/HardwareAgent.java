@@ -47,6 +47,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 		}
 	}
 	
+	@Override
 	public void setup() {
 		System.out.println("Hardware agent "+ this +" reporting.");
 
@@ -94,6 +95,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 		
 	}
 
+	@Override
 	public void takeDown() {
 		// TODO implement graceful death
 	}
@@ -111,6 +113,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 			case INSERT:
 						
 				break;
+				//$CASES-OMITTED$
 			default:
 				break;
 			}
@@ -128,9 +131,12 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 					e.printStackTrace();
 				}
 				break;
+				//$CASES-OMITTED$
 			default:
 				break;
 			}
+			break;
+		default:
 			break;
 		}
 	}

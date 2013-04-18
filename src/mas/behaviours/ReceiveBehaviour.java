@@ -133,7 +133,7 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	 */
 	public void reset(int newTimeout) {
 		reset();
-		this.timeout = newTimeout;
+		timeout = newTimeout;
 	}
 
 	/**

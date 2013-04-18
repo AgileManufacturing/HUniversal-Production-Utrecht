@@ -8,8 +8,6 @@ import jade.lang.acl.UnreadableException;
 
 import nl.hu.client.InvalidDBNamespaceException;
 
-import rexos.libraries.knowledge.KnowledgeDBClient;
-
 import org.bson.types.ObjectId;
 
 import behaviours.ReceiveBehaviour;
