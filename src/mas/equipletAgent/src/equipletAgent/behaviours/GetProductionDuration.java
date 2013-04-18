@@ -82,7 +82,7 @@ public class GetProductionDuration extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		System.out.format("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
 		try {
-			ObjectId productStepId = equipletAgent.getCommunicationSlot(message.getConversationId());
+			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
 			responseMessage.addReceiver(equipletAgent.getServiceAgent());
 			responseMessage.setConversationId(message.getConversationId());

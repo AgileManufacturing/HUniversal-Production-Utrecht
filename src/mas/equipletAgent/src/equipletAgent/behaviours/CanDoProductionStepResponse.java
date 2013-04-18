@@ -29,6 +29,8 @@
  **/
 package equipletAgent.behaviours;
 
+import nl.hu.client.BlackboardClient;
+
 import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -63,15 +65,17 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour {
 	 * The equipletAgent related to this behaviour.
 	 */
 	private EquipletAgent equipletAgent;
+	private BlackboardClient equipletBBClient;
 
 	/**
 	 * Instantiates a new can do production step response.
 	 * 
 	 * @param a - The agent for this behaviour
 	 */
-	public CanDoProductionStepResponse(Agent a) {
+	public CanDoProductionStepResponse(Agent a, BlackboardClient equipletBBClient) {
 		super(a, -1, messageTemplate);
 		equipletAgent = (EquipletAgent) a;
+		this.equipletBBClient = equipletBBClient;
 	}
 
 	/**
@@ -84,9 +88,9 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		System.out.format("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
 
-		ObjectId productStepEntryId = equipletAgent.getCommunicationSlot(message.getConversationId());
+		ObjectId productStepEntryId = equipletAgent.getRelatedObjectId(message.getConversationId());
 		try {
-			BasicDBObject productStep = (BasicDBObject) equipletAgent.getEquipletBBclient().findDocumentById(productStepEntryId);
+			BasicDBObject productStep = (BasicDBObject) equipletBBClient.findDocumentById(productStepEntryId);
 			StepStatusCode status = StepStatusCode.valueOf(productStep.getString("status"));
 			AID productAgent = new AID((String)((DBObject)productStep.get("productAgentId")).get("name"), AID.ISGUID);
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.CONFIRM);

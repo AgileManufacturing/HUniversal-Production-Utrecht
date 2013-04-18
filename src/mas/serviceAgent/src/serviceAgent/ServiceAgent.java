@@ -3,11 +3,14 @@ package serviceAgent;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
+import org.bson.types.ObjectId;
+
 import serviceAgent.behaviour.CanDoProductStep;
 import serviceAgent.behaviour.GetProductDuration;
 import jade.core.AID;
 import jade.core.Agent;
 import com.mongodb.*;
+
 import equipletAgent.*;
 import newDataClasses.DbData;
 import nl.hu.client.*;
@@ -40,19 +43,13 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 			productionStepBBClient.setDatabase(dbData.name);
 			productionStepBBClient.setCollection("ProductStepsBlackBoard");
-			productionStepBBClient.subscribe(statusSubscription); // need to
-																	// react on
-																	// state
-																	// changes
-																	// of
-																	// production
-																	// steps to
-																	// WAITING
-
+			//Needs to react on state changes of production steps to WAITING
+			productionStepBBClient.subscribe(statusSubscription);
+			
 			serviceStepBBClient.setDatabase(dbData.name);
 			serviceStepBBClient.setCollection("ServiceStepsBlackBoard");
-			serviceStepBBClient.subscribe(statusSubscription); // need to react
-																// on status
+			//Needs to react on status changes
+			serviceStepBBClient.subscribe(statusSubscription);
 		} catch (UnknownHostException | GeneralMongoException
 				| InvalidDBNamespaceException e) {
 			e.printStackTrace();
@@ -67,7 +64,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 		stepTypes = new HashMap<>();
 		stepTypes.put(0l, new String[] { "Pick", "Place" }); // Pick&Place
-		stepTypes.put(1l, new String[] { "Glue", "Pick", "Place" }); // Attack
+		stepTypes.put(1l, new String[] { "Glue", "Pick", "Place" }); // Attach
 		stepTypes.put(2l, new String[] { "Drill", "Pick", "Place" }); // Screw
 		stepTypes.put(3l, new String[] { "Drill", "Pick", "Place" }); // Screw
 
@@ -89,8 +86,19 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	public void takeDown() {
 		productionStepBBClient.unsubscribe(statusSubscription);
 		serviceStepBBClient.unsubscribe(statusSubscription);
-		// TODO clear serviceStepBB
-		// TODO set status of all productionStepBB to ABORTED
+		try {
+			serviceStepBBClient.removeDocuments(new BasicDBObject());
+			
+			BasicDBObject failData = new BasicDBObject("source", "service agent");
+			failData.put("reason", "died");
+			BasicDBObject update = new BasicDBObject("status", StepStatusCode.FAILED);
+			update.put("statusData", failData);
+			productionStepBBClient.updateDocuments(
+					new BasicDBObject(),
+					new BasicDBObject("$set", update));
+		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void printDBObjectPretty(DBObject obj, String prefix,
@@ -114,37 +122,48 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
 		try {
-			BasicDBObject productionStep = (BasicDBObject) productionStepBBClient
-					.findDocuments(
-							new BasicDBObject("_id", entry.getTargetObjectId()))
-					.get(0);
-
 			switch (entry.getNamespace().split(".")[1]) {
 			case "ProductStepsBlackBoard":
-
+				BasicDBObject productionStep = (BasicDBObject) productionStepBBClient.findDocumentById(entry.getTargetObjectId());
 				switch (operation) {
 				case INSERT:
 					// addBehaviour(new GetProductDuration(this,
 					// productionStep));
 					break;
 				case UPDATE:
-					StepStatusCode status = (StepStatusCode) productionStep
-							.get("status");
+					StepStatusCode status = StepStatusCode.valueOf((String)productionStep.get("status"));
 					if (status == StepStatusCode.WAITING) {
+						ObjectId productStepId = (ObjectId)productionStep.get("_id");
+						serviceStepBBClient.updateDocuments(
+								new BasicDBObject("productStepId", productStepId),
+								new BasicDBObject("$set", new BasicDBObject("status", status)));
 						// for (String service : stepTypes.get(productionStep
 						// .get("type")));
 						// addBehaviour(new DoServiceBehaviour(this, service));
 					}
 					break;
 				case DELETE:
-					// TODO remove servicesteps from serviceStepBB
+					ObjectId productStepId = (ObjectId)productionStep.get("_id");
+					serviceStepBBClient.removeDocuments(new BasicDBObject("productStepId", productStepId));
 					break;
-				// $CASES-OMITTED$
 				default:
 					break;
 				}
 				break;
 			case "ServiceStepsBlackBoard":
+				BasicDBObject serviceStep = (BasicDBObject) serviceStepBBClient.findDocumentById(entry.getTargetObjectId());
+				ObjectId productStepId = (ObjectId) serviceStep.get("productStepId");
+				switch(operation){
+				case UPDATE:
+					BasicDBObject update = new BasicDBObject("status", serviceStep.get("status"));
+					update.put("statusData", serviceStep.get("statusData"));
+					productionStepBBClient.updateDocuments(
+							new BasicDBObject("_id", productStepId),
+							new BasicDBObject("$set", update));
+					break;
+				default:
+					break;
+				}
 				break;
 			default:
 				break;

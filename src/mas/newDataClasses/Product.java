@@ -38,7 +38,7 @@ public class Product {
 	public Product(Production production, String aid) throws Exception {
 		if(production == null) throw new Exception("Production can't be null");
 		setProduction(production);
-		log = new ProductLog(false, true, new sqliteDatabase(aid));
+		//log = new ProductLog(false, true, new sqliteDatabase(aid));
 	}
 
 	/**

@@ -1,6 +1,6 @@
 /**
- * @file CanPerfomStep.java
- * @brief Behaviour for handling the messages with the ontology CanPerformStep
+ * @file StartStep.java
+ * @brief Behaviour for handling the messages with the ontology StartStep
  * @date Created: 2013-04-02
  *
  * @author Hessel Meulenbeld
@@ -29,21 +29,20 @@
  **/
 package equipletAgent.behaviours;
 
-import java.io.IOException;
-
-import newDataClasses.ProductionStep;
-import newDataClasses.ScheduleData;
-import nl.hu.client.BlackboardClient;
 
 import org.bson.types.ObjectId;
 
+import newDataClasses.ScheduleData;
+import nl.hu.client.BlackboardClient;
+import nl.hu.client.GeneralMongoException;
+import nl.hu.client.InvalidDBNamespaceException;
+
 import behaviours.ReceiveBehaviour;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
-import equipletAgent.ProductStepMessage;
+import equipletAgent.NextProductStepTimer;
 import equipletAgent.StepStatusCode;
 import equipletAgent.EquipletAgent;
 import jade.core.Agent;
@@ -52,9 +51,9 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 /**
- * The Class CanPerformStep.
+ * The Class StartStep.
  */
-public class CanPerformStep extends ReceiveBehaviour {
+public class StartStep extends ReceiveBehaviour {
 	/**
 	 * @var static final long serialVersionUID
 	 * The serial version UID for this class
@@ -64,9 +63,9 @@ public class CanPerformStep extends ReceiveBehaviour {
 	/**
 	 * @var MessageTemplate messageTemplate
 	 * The messageTemplate this behaviour listens to.
-	 * This behaviour listens to the ontology: CanPeformStep.
+	 * This behaviour listens to the ontology: StartStep.
 	 */
-    private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CanPerformStep");
+    private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("StartStep");
     
     /**
 	 * @var EquipletAgent equipletAgent
@@ -80,7 +79,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 	 *
 	 * @param a The agent for this behaviour
 	 */
-	public CanPerformStep(Agent a, BlackboardClient equipletBBClient) {
+	public StartStep(Agent a, BlackboardClient equipletBBClient) {
 		super(a, -1, messageTemplate);
 		equipletAgent = (EquipletAgent)a;
 		this.equipletBBClient = equipletBBClient;
@@ -88,7 +87,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 	
 	/**
 	 * Function to handle the incoming messages for this behaviour.
-	 * Handles the response to the CanPeformStep question and asks the service agent the same question.
+	 * Handles the response to the StartStep.
 	 * 
 	 * @param message - The received message.
 	 */
@@ -105,36 +104,27 @@ public class CanPerformStep extends ReceiveBehaviour {
 		System.out.format("%s received message from %s (%s:%s)%n",
 				myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
 		
+		try {
+			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
+			equipletBBClient.updateDocuments(
+					new BasicDBObject("_id", productStepId), 
+					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING)));			
+		} catch (InvalidDBNamespaceException | GeneralMongoException e1) {
+			e1.printStackTrace();
+		}
 		
-		ProductionStep proStepC = (ProductionStep) contentObject;
-		ObjectId productStepEntryId = null;
-		Gson gson = new GsonBuilder().serializeNulls().create();
-		if(proStepC != null){
-			try {
-				// TODO: get inputParts
-				// TODO: get ouputPart
-				ProductStepMessage entry = new ProductStepMessage(message.getSender(), proStepC.getCapability(),
-						proStepC.getParameterList(), null, null,
-						StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
-				productStepEntryId = equipletBBClient.insertDocument(gson.toJson(entry));
-				equipletAgent.addCommunicationRelation(message.getConversationId(), productStepEntryId);
-				ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
-				responseMessage.setConversationId(message.getConversationId());
-				responseMessage.addReceiver(equipletAgent.getServiceAgent());
-				responseMessage.setOntology("CanDoProductionStep");
-				try {
-					responseMessage.setContentObject(productStepEntryId);
-				} catch (IOException e) {
-					e.printStackTrace();
-					// TODO: ERROR HANDLING
-					myAgent.doDelete();
-				}
-				myAgent.send(responseMessage);
-			} catch (Exception e) {
-				e.printStackTrace();
-				// TODO: ERROR HANDLING
-				myAgent.doDelete();
+		NextProductStepTimer timer = equipletAgent.getTimer();
+		try {
+			BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED);
+			query.put("$order_by", new BasicDBObject("scheduleData", new BasicDBObject("startTime", "-1")));
+			DBObject nextProductStep = equipletBBClient.findDocuments(query).get(0);
+			ScheduleData scheduleData = (ScheduleData) nextProductStep.get("scheduleData");
+			if (scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
+				timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 			}
+		} catch (Exception e) {
+			timer.setNextUsedTimeSlot(-1);
+		e.printStackTrace();
 		}
 	}
 }

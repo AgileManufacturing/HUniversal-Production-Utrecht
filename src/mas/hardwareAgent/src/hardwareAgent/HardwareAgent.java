@@ -50,6 +50,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 	@Override
 	public void setup() {
 		System.out.println("Hardware agent "+ this +" reporting.");
+		ModulesMap = new HashMap<String,Module>();
 
 		// TODO fill in host, database and collection
 		Object[] args = getArguments();

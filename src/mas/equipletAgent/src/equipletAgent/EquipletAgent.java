@@ -154,16 +154,16 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 	/**
 	 * @var Timer timeToNextUsedTimeSlot
-	 * Timer used to trigger when the next used time slot is ready.
+	 * Timer used to trigger when the next used time slot is ready to start.
 	 */
-	private Timer timeToNextUsedTimeSlot;
+	private NextProductStepTimer timer;
 	
 	/**
-	 * @var long nextUsedTimeSlot
-	 * The next used time slot.
+	 * @var ObjectId nextProductStep
+	 * The next product step.
 	 */
-	private long nextUsedTimeSlot;
-	
+	private ObjectId nextProductStep;
+
 	/**
 	 * @var long firstTimeSlot
 	 * The first time slot of the grid.
@@ -199,7 +199,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			e.printStackTrace();
 		}
 		equipletDbName = getAID().getLocalName();
-		communicationTable = new HashMap<>();
+		communicationTable = new HashMap<String, ObjectId>();
 		gson = new GsonBuilder().create();
 		try{
 			// TODO: Not Hardcoded capabilities/get capabilities from the service agent.
@@ -245,23 +245,26 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			doDelete();
 		}
 
-		timeToNextUsedTimeSlot = new Timer();
-		nextUsedTimeSlot = -1l;
+		timer = new NextProductStepTimer(firstTimeSlot, timeSlotLength);
+		timer.setNextUsedTimeSlot(-1l);
 
-		CanPerformStep canPerformStepBehaviour = new CanPerformStep(this);
+		CanPerformStep canPerformStepBehaviour = new CanPerformStep(this, equipletBBClient);
 		addBehaviour(canPerformStepBehaviour);
 
-		CanDoProductionStepResponse canDoProductionStepResponseBehaviour = new CanDoProductionStepResponse(this);
+		CanDoProductionStepResponse canDoProductionStepResponseBehaviour = new CanDoProductionStepResponse(this, equipletBBClient);
 		addBehaviour(canDoProductionStepResponseBehaviour);
 
 		GetProductionDuration getProductionDurationBehaviour = new GetProductionDuration(this);
 		addBehaviour(getProductionDurationBehaviour);
 
-		ProductionDurationResponse productionDurationResponseBehaviour = new ProductionDurationResponse(this);
+		ProductionDurationResponse productionDurationResponseBehaviour = new ProductionDurationResponse(this, equipletBBClient);
 		addBehaviour(productionDurationResponseBehaviour);
 
 		ScheduleStep scheduleStepBehaviour = new ScheduleStep(this);
 		addBehaviour(scheduleStepBehaviour);
+		
+		StartStep startStepBehaviour = new StartStep(this, equipletBBClient);
+		addBehaviour(startStepBehaviour);
 	}
 
 	/**
@@ -295,22 +298,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public BlackboardClient getEquipletBBclient() {
-		return equipletBBClient;
-	}
-
-	public void addCommunicationSlot(String conversationId, ObjectId objectId) {
-		communicationTable.put(conversationId, objectId);
-	}
-
-	public ObjectId getCommunicationSlot(String conversationId) {
-		return communicationTable.get(conversationId);
-	}
-
-	public AID getServiceAgent() {
-		return serviceAgent;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -351,12 +338,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				case PLANNED:
 					try {
 						ScheduleData scheduleData = (ScheduleData) productStep.get("scheduleData");
-						if (scheduleData.getStartTime() < nextUsedTimeSlot) {
-							nextUsedTimeSlot = scheduleData.getStartTime();
-							timeToNextUsedTimeSlot.cancel();
-							long startTimeSlot = nextUsedTimeSlot * timeSlotLength + firstTimeSlot;
-							long currentTime = System.currentTimeMillis();
-							timeToNextUsedTimeSlot.schedule(new nextProductStepTask(equipletBBClient), startTimeSlot - currentTime);
+						if (scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
+							timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 						}
 
 						responseMessage.setOntology("ProductionDuration");
@@ -404,34 +387,38 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		}
 	}
 
-	private class nextProductStepTask extends TimerTask {
-		@SuppressWarnings("hiding")
-		private BlackboardClient equipletBBClient;
+	public BlackboardClient getEquipletBBClient() {
+		return equipletBBClient;
+	}
 
-		public nextProductStepTask(BlackboardClient equipletBBClient) {
-			this.equipletBBClient = equipletBBClient;
-		}
+	public void addCommunicationRelation(String conversationId, ObjectId objectId) {
+		communicationTable.put(conversationId, objectId);
+	}
 
-		@Override
-		public void run() {
-			// TODO ask for permission to start
-			// TODO set the step on waiting so the service agent knows that it has to start with it.
-			try {
-				BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED);
-				query.put("$order_by", new BasicDBObject("scheduleData", new BasicDBObject("startTime", "-1")));
-				DBObject nextProductStep = equipletBBClient.findDocuments(query).get(0);
-				ScheduleData scheduleData = (ScheduleData) nextProductStep.get("scheduleData");
-				if (scheduleData.getStartTime() < nextUsedTimeSlot) {
-					nextUsedTimeSlot = scheduleData.getStartTime();
-					timeToNextUsedTimeSlot.cancel();
-					long startTimeSlot = nextUsedTimeSlot * timeSlotLength + firstTimeSlot;
-					long currentTime = System.currentTimeMillis();
-					timeToNextUsedTimeSlot.schedule(new nextProductStepTask(equipletBBClient), startTimeSlot - currentTime);
-				}
-			} catch (InvalidDBNamespaceException | GeneralMongoException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	public ObjectId getRelatedObjectId(String conversationId) {
+		return communicationTable.get(conversationId);
+	}
+	
+	public String getConversationId(ObjectId productStepEntry) {
+		String conversationId = null;
+		for (Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
+			if (tableEntry.getValue() == productStepEntry) {
+				conversationId = tableEntry.getKey();
+				break;
 			}
 		}
+		return conversationId; 		
+	}
+	
+	public AID getServiceAgent() {
+		return serviceAgent;
+	}
+	
+	public NextProductStepTimer getTimer(){
+		return timer;
+	}
+
+	public ObjectId getNextProductStep() {
+		return nextProductStep;
 	}
 }

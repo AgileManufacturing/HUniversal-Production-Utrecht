@@ -1,6 +1,8 @@
 package equipletAgent.behaviours;
 
 import newDataClasses.ScheduleData;
+import nl.hu.client.BlackboardClient;
+
 import org.bson.types.ObjectId;
 import behaviours.ReceiveBehaviour;
 
@@ -23,15 +25,17 @@ public class ProductionDurationResponse extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("ProductionDurationResponse");
 	private EquipletAgent equipletAgent;
+	private BlackboardClient equipletBBClient;
 
 	/**
 	 * Instantiates a new production duration response.
 	 *
 	 * @param a the a
 	 */
-	public ProductionDurationResponse(Agent a) {
+	public ProductionDurationResponse(Agent a, BlackboardClient equipletBBClient) {
 		super(a, -1, messageTemplate);
 		equipletAgent = (EquipletAgent) a;
+		this.equipletBBClient = equipletBBClient;
 	}
 
 	@Override
@@ -47,8 +51,8 @@ public class ProductionDurationResponse extends ReceiveBehaviour {
 		System.out.format("%s received message from %s (%s:%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
 
 		try {
-			ObjectId id = equipletAgent.getCommunicationSlot(message.getConversationId());
-			DBObject productStep = equipletAgent.getEquipletBBclient().findDocumentById(id);
+			ObjectId id = equipletAgent.getRelatedObjectId(message.getConversationId());
+			DBObject productStep = equipletBBClient.findDocumentById(id);
 
 			ScheduleData schedule = new ScheduleData(); 
 			schedule.fillWithBasicDBObject(((BasicDBObject)productStep.get("scheduleData")));
