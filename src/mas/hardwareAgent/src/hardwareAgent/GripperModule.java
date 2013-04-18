@@ -12,9 +12,6 @@ public class GripperModule implements Module{
 	private long _stepDuration = 10l;
 	
 	public GripperModule(){
-		
-		HardwareAgent hardwareAgent = new HardwareAgent();		
-		hardwareAgent.RegisterModule("gripper", this);
 	}
 	
 	@Override

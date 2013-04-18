@@ -70,17 +70,17 @@ public class CheckForModules extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		Object contentObject = null;
+		long[] contentObject = null;
 		String contentString = message.getContent();
 		try {
 
 			try {
-				contentObject = message.getContentObject();
+				contentObject = (long[]) message.getContentObject();
 
 				ACLMessage reply;
 				reply = message.createReply();
 
-				boolean modulesPresent = false;
+				boolean modulesPresent = true;
 
 //				KnowledgeDBClient client = KnowledgeDBClient.getClient();
 //
@@ -94,20 +94,15 @@ public class CheckForModules extends ReceiveBehaviour {
 //					}
 //				}
 				// System.out.println();
-				try{
+									
+				for( long CO : contentObject){
+					if(hardwareAgent.GetModuleById(CO)== null){
 					
-				
-					if(hardwareAgent.GetModuleByName(contentString)!= null){
-					
-						modulesPresent = true;
+						modulesPresent = false;
 					
 					}
-				}catch(Exception e){
-					
-					// module not found
-					
 				}
-				
+								
 				if (modulesPresent) {
 
 					reply.setPerformative(ACLMessage.CONFIRM);

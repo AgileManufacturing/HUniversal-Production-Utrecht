@@ -103,7 +103,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 			 * 
 			 */
 			
-			Module module = hardwareAgent.GetModuleByName("gripper");		
+			Module module = hardwareAgent.GetModuleById(3l);		
 			
 			EquipletStepMessage[] equipletSteps = module.getEquipletSteps(parameters);
 			
