@@ -30,7 +30,7 @@ public class ParameterGroup implements Serializable{
 	
 	public ParameterGroup(String name) {
 		this._name = name;
-		this._parameters = new HashMap<String, Parameter>();
+		this._parameters = new HashMap<>();
 		
 	}
 	

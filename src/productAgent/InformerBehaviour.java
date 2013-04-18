@@ -11,6 +11,7 @@ import newDataClasses.Product;
 import newDataClasses.Production;
 import newDataClasses.ProductionEquipletMapper;
 import newDataClasses.ProductionStep;
+import newDataClasses.ProductionStepStatus;
 
 /*
  * Version 1.1
@@ -24,9 +25,13 @@ import newDataClasses.ProductionStep;
  * the operation ( in timeslots ).
  * 
  */
-@SuppressWarnings("serial")
+
 public class InformerBehaviour extends OneShotBehaviour {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ProductAgent _productAgent;
 	private ParallelBehaviour _par;
 	private Product _product;
@@ -51,33 +56,40 @@ public class InformerBehaviour extends OneShotBehaviour {
 		 * each step in our productionlist and create a conversation object. (
 		 * as behaviour )
 		 */
-		
+
 		SequentialBehaviour seq = new SequentialBehaviour();
 		myAgent.addBehaviour(seq);
 
 		_par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 		seq.addSubBehaviour(_par);
-		
+
 		for (ProductionStep stp : _product.getProduction().getProductionSteps()) {
+			if (stp.getStatus() == ProductionStepStatus.STATE_TODO) {
+				
+				//adds the step to te new list (the one that will be returned to the scheduler)
+				_pem.addProductionStep(stp.getId());
 
-			_pem.addProductionStep(stp.getId());
-
-			for (AID aid : _productAgent.getProduct().getProduction()
-					.getProductionEquipletMapping()
-					.getEquipletsForProductionStep(stp.getId()).keySet()) {
-				_par.addSubBehaviour(new Conversation(aid, stp, _pem));
+				for (AID aid : _productAgent.getProduct().getProduction()
+						.getProductionEquipletMapping()
+						.getEquipletsForProductionStep(stp.getId()).keySet()) {
+					_par.addSubBehaviour(new Conversation(aid, stp, _pem));
+				}
 			}
 		}
 
 		// Checking if timeout expired?
 		seq.addSubBehaviour(new OneShotBehaviour() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void action() {
 				// TODO Auto-generated method stub
 				if (_par.done()) {
 					System.out.println("Done informing.");
 					try {
-						
 						_production.setProductionEquipletMapping(_pem);
 						_product.setProduction(_production);
 						_productAgent.setProduct(_product);
@@ -91,8 +103,8 @@ public class InformerBehaviour extends OneShotBehaviour {
 			}
 		});
 	}
-	
-	public boolean isDone(){
+
+	public boolean isDone() {
 		return this._isDone;
 	}
 
@@ -105,6 +117,10 @@ public class InformerBehaviour extends OneShotBehaviour {
 	 * response ( handles a 10 sec timeout ).
 	 */
 	private class Conversation extends SequentialBehaviour {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private AID _aid;
 		private ProductionStep _productionStep;
 		private boolean debug = true;
@@ -122,6 +138,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 		 * 
 		 * @see jade.core.behaviours.Behaviour#onStart() starts the conversation
 		 */
+		@Override
 		public void onStart() {
 			final String ConversationId = _productAgent.generateCID();
 			final MessageTemplate template = MessageTemplate
@@ -130,6 +147,12 @@ public class InformerBehaviour extends OneShotBehaviour {
 			// 1 - Inform if the equiplet can perform the step with the given
 			// parameters
 			addSubBehaviour(new OneShotBehaviour() {
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
 				public void action() {
 					try {
 						ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
@@ -152,6 +175,12 @@ public class InformerBehaviour extends OneShotBehaviour {
 
 			// 2 - wait for an response. ( handles a 10 sec timeout )
 			addSubBehaviour(new ReceiveBehaviour(myAgent, 10000, template) {
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				@Override
 				public void handle(ACLMessage msg) {
 					if (msg == null) {
 
@@ -176,6 +205,12 @@ public class InformerBehaviour extends OneShotBehaviour {
 							// 3 - if the response was a CONFIRM, ask about the
 							// duration.
 							addSubBehaviour(new OneShotBehaviour() {
+								/**
+								 * 
+								 */
+								private static final long serialVersionUID = 1L;
+
+								@Override
 								public void action() {
 									try {
 										ACLMessage message = new ACLMessage(
@@ -203,6 +238,12 @@ public class InformerBehaviour extends OneShotBehaviour {
 							// timeout ).
 							addSubBehaviour(new ReceiveBehaviour(myAgent,
 									10000, template) {
+								/**
+										 * 
+										 */
+										private static final long serialVersionUID = 1L;
+
+								@Override
 								public void handle(ACLMessage msg) {
 									if (msg == null) {
 										if (debug) {
@@ -236,7 +277,9 @@ public class InformerBehaviour extends OneShotBehaviour {
 												// Adds the equiplet to the
 												// production step in
 												// the mapper list.
-												_pem.addEquipletToProductionStep(_productionStep.getId(),_aid, timeSlots);
+												_pem.addEquipletToProductionStep(
+														_productionStep.getId(),
+														_aid, timeSlots);
 											}
 										} catch (UnreadableException e) {
 											System.out

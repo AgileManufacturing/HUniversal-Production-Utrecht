@@ -1,8 +1,7 @@
 
 
-package equipletAgent;
+package testingAgents;
 
-import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
@@ -40,41 +39,20 @@ public class EquipletAgent extends Agent {
 		return _canPerformStepId;
 	}
 
-	public boolean getRandomBoolean() {
+	public static boolean getRandomBoolean() {
+		@SuppressWarnings("unused")
 		Random random = new Random();
 		//return random.nextBoolean();
 		return true;
 	}
 
-	public int getRandomInt(int r) {
+	public static int getRandomInt(int r) {
 		Random random = new Random();
 		return random.nextInt(r);
 	}
-	
-	private String writeParamsToString(ParameterList p) {
-		String[] Groups = new String[3];
-		Groups[0] = "Color";
-		Groups[1] = "Shape";
-		Groups[2] = "loc";
-
-		String returnString = "Parameters are: \n";
-
-		for (int i = 0; i < Groups.length; i++) {
-			returnString += "Group : " + Groups[i] + " \n";
-			ParameterGroup pg = p.GetParameterGroup(Groups[i]);
-			Parameter[] pga = pg.getParameters();
-			for (int j = 0; j < pga.length; j++) {
-				returnString += "Parameter : " + pg.getParameters()[j].getKey()
-						+ " value: "
-						+ pg.getParameterValue(pg.getParameters()[j].getKey());
-			}
-
-		}
-
-		return returnString;
-	}
 
 	// equiplet can perform
+	@Override
 	protected void setup() {
 		try {
 			Object[] args = getArguments();
@@ -126,6 +104,7 @@ public class EquipletAgent extends Agent {
 			this.msg = msg;
 		}
 
+		@Override
 		public void action() {
 			try {
 				String convid = msg.getConversationId();
@@ -158,15 +137,16 @@ public class EquipletAgent extends Agent {
 					delay = getRandomInt(randomSeed / 2);
 					if (debug)
 						System.out.println("EQ: " + myAgent.getLocalName()
-								+ " will be waiting : " + delay / 2
+								+ " will wait : " + delay / 2
 								+ " ms to send his msg " + "CanPerformStep "
 								+ _step.getId());
 
 					myAgent.addBehaviour(new WakerBehaviour(myAgent, delay) {
+						@Override
 						public void handleElapsedTimeout() {
 							if (true && delay > 10000)
 								System.out.println("EQ: " + myAgent.getLocalName()
-										+ " waited : " + delay / 2
+										+ " will wait : " + delay / 2
 										+ " ms before sending "
 										+ "CanPerformStep " + _step.getId());
 							send(message);
@@ -198,6 +178,7 @@ public class EquipletAgent extends Agent {
 								+ "GetProductionDuration " + _step.getId());
 
 					myAgent.addBehaviour(new WakerBehaviour(myAgent, delay) {
+						@Override
 						public void handleElapsedTimeout() {
 							if (debug)
 								System.out.println("EQ: "

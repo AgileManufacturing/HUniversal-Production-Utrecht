@@ -41,7 +41,7 @@ import com.mongodb.ServerAddress;
 public class MongoDBConnection {
 	private static Hashtable<ServerAddress, MongoDBConnection> databaseConnections;
 	static {
-		databaseConnections = new Hashtable<ServerAddress, MongoDBConnection>();
+		databaseConnections = new Hashtable<>();
 	}
 	
 	/**

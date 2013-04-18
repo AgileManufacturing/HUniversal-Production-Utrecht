@@ -1,8 +1,9 @@
 
 package main;
 
+import java.util.ArrayList;
+
 import jade.core.Agent;
-import jade.wrapper.AgentController;
 import newDataClasses.Parameter;
 import newDataClasses.ParameterGroup;
 import newDataClasses.ParameterList;
@@ -25,22 +26,42 @@ import newDataClasses.ProductionStep;
  */
 @SuppressWarnings("serial")
 public class MainAgent extends Agent {
+	@Override
 	protected void setup() {
 		try {
 			System.out.println("Starting agents:");
 
 			// instantiate the 'equiplet' agents
 			Object[] ar = new Object[] { 1 };// pickndplace
-			((AgentController) getContainerController().createNewAgent("eqa1",
-					"equipletAgent.EquipletAgent", ar)).start();
-
+			getContainerController().createNewAgent("eqa1",
+					"equipletAgent.EquipletAgent", ar).start();
 			ar = new Object[] { 2 }; // colour
-			((AgentController) getContainerController().createNewAgent("eqa2",
-					"equipletAgent.EquipletAgent", ar)).start();
-
+			getContainerController().createNewAgent("eqa2",
+					"equipletAgent.EquipletAgent", ar).start();
 			ar = new Object[] { 3 }; // rotate
-			((AgentController) getContainerController().createNewAgent("eqa3",
-					"equipletAgent.EquipletAgent", ar)).start();
+			getContainerController().createNewAgent("eqa3",
+					"equipletAgent.EquipletAgent", ar).start();
+			ar = new Object[] { 2 }; // rotate
+			getContainerController().createNewAgent("eqa4",
+					"equipletAgent.EquipletAgent", ar).start();
+			ar = new Object[] { 1 }; // rotate
+			getContainerController().createNewAgent("eqa5",
+					"equipletAgent.EquipletAgent", ar).start();
+			ar = new Object[] { 3 }; // rotate
+			getContainerController().createNewAgent("eqa6",
+					"equipletAgent.EquipletAgent", ar).start();
+			ar = new Object[] { 1 }; // rotate
+			getContainerController().createNewAgent("eqa7",
+					"equipletAgent.EquipletAgent", ar).start();
+			ar = new Object[] { 1 }; // rotate
+			getContainerController().createNewAgent("eqa8",
+					"equipletAgent.EquipletAgent", ar).start();
+			ar = new Object[] { 2 }; // rotate
+			getContainerController().createNewAgent("eqa9",
+					"equipletAgent.EquipletAgent", ar).start();
+			ar = new Object[] { 3 }; // rotate
+			getContainerController().createNewAgent("eqa10",
+					"equipletAgent.EquipletAgent", ar).start();
 
 			ar = null;
 
@@ -110,19 +131,22 @@ public class MainAgent extends Agent {
 			// Our argument for the product agent. The total production of the
 			// product,
 			// consists of multiple steps
-			ProductionStep[] stepList = new ProductionStep[] { stp1, stp2,
-					stp3, stp4 };
+			ArrayList<ProductionStep> stepList = new ArrayList<>();
+			stepList.add(stp1);
+			stepList.add(stp2);
+			stepList.add(stp3);
+			stepList.add(stp4);
 
 			Production production = new Production(stepList);
-			Product product = new Product(production);
+			Product product = new Product(production, getAID().toString());
 
 			//We need to pass an Object[] to the createNewAgent. 
 			// But we only want to pass our product!
 			Object[] arg = new Object[1];
 			arg[0] = product;
 
-			((AgentController) getContainerController().createNewAgent("pa1",
-					"productAgent.ProductAgent", arg)).start();
+			getContainerController().createNewAgent("pa1",
+					"productAgent.ProductAgent", arg).start();
 
 		} catch (Exception e) {
 			e.printStackTrace();

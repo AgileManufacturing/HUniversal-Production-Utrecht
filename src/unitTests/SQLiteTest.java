@@ -1,13 +1,10 @@
 package unitTests;
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import jade.domain.introspection.AddedBehaviour;
 import newDataClasses.LogMessage;
 import newDataClasses.ProductLog;
-import newDataClasses.sqldatadase.sqliteDatabase;
+import newDataClasses.sqldatabase.sqliteDatabase;
 
 import org.junit.Test;
 
@@ -51,10 +48,11 @@ public class SQLiteTest {
 	/**
 	 * Test method for {@link newDataClasses.ProductLog#add(newDataClasses.LogMessage[])}.
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void testAdd() {
 		ProductLog test = new ProductLog(false, true, new sqliteDatabase(null));
-		List<LogMessage> msgs = new ArrayList<LogMessage>();
+		List<LogMessage> msgs = new ArrayList<>();
 		
 		msgs.add(new LogMessage("id", "12-04-2013 10:09", "producing", "Start producing"));
 		test.add(msgs);
@@ -65,7 +63,7 @@ public class SQLiteTest {
 	 */
 	@Test
 	public void testPushLocalToRemote() {
-		
+		//TODO Add test code for function
 	}
 
 }

@@ -8,6 +8,7 @@ import java.util.List;
 import jade.core.behaviours.OneShotBehaviour;
 import newDataClasses.LogMessage;
 import newDataClasses.Product;
+import newDataClasses.ProductionStep;
 
 /**
  * 
@@ -22,6 +23,14 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	 */
 	private static final long serialVersionUID = 1L;
 	private Product _product; 
+	private int currentProductionStep;
+	
+	/**
+	 * @return the _currentproductionstep
+	 */
+	public ProductionStep get_currentproductionstep() {
+		return _product.getProduction().getProductionSteps().get(currentProductionStep);
+	}
 
 	/**
 	 */
@@ -37,8 +46,12 @@ public class ProduceBehaviour extends OneShotBehaviour{
 		// TODO Auto-generated method stub
 	}
 
-	void productionStepEnded(boolean succes, List<LogMessage> log)
+	void productionStepEnded(ProductionStep step, @SuppressWarnings("unused") boolean succes, List<LogMessage> log)
 	{	
+		currentProductionStep = step.getId();
 		_product.add(log);
+		
+		// TODO Set ProductionStep Status to succes. 
+		
 	}
 }

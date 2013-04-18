@@ -4,6 +4,7 @@ package scheduling;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 
+
 //usual imports
 import java.net.UnknownHostException;
 import java.util.List;
@@ -103,6 +104,7 @@ public class Scheduler {
 		}
 		
 		//set startslot which need to be scheduled
+		@SuppressWarnings("unused")
 		int startSlot = 0;
 		FreeTimeSlot freetimeslotEq = null;
 		
@@ -192,6 +194,7 @@ public class Scheduler {
 			this.deadline = newDeadline;
 		}
 		
+		@Override
 		public String toString(){
 			return "{ startTime:"+startTime+", duration:"+duration+", deadline:"+deadline+", EquipletName:"+equipletName + " }";
 		}

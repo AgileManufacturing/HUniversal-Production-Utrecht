@@ -37,6 +37,7 @@ public class GateWayAgent extends Agent {
 			super(a);
 		}
 
+		@Override
 		public void action() {
 			ACLMessage msg = myAgent.receive();
 			if(msg != null){
@@ -49,6 +50,7 @@ public class GateWayAgent extends Agent {
 		}
 	} // END of inner class WaitPingAndReplyBehaviour
 	
+	@SuppressWarnings("unused")
 	private class XMLReader 
 	{
 		 public void parse(String Message)
@@ -57,6 +59,7 @@ public class GateWayAgent extends Agent {
 		  }
 	}
 
+	@Override
 	protected void setup() {
 		// Registration with the DF 
 		DFAgentDescription dfd = new DFAgentDescription();
