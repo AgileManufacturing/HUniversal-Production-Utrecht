@@ -34,34 +34,34 @@ public class MainAgent extends Agent {
 			// instantiate the 'equiplet' agents
 			Object[] ar = new Object[] { 1 };// pickndplace
 			getContainerController().createNewAgent("eqa1",
-					"equipletAgent.EquipletAgent", ar).start();
+					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[] { 2 }; // colour
 			getContainerController().createNewAgent("eqa2",
-					"equipletAgent.EquipletAgent", ar).start();
+					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[] { 3 }; // rotate
 			getContainerController().createNewAgent("eqa3",
-					"equipletAgent.EquipletAgent", ar).start();
+					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[] { 2 }; // rotate
 			getContainerController().createNewAgent("eqa4",
-					"equipletAgent.EquipletAgent", ar).start();
+					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[] { 1 }; // rotate
 			getContainerController().createNewAgent("eqa5",
-					"equipletAgent.EquipletAgent", ar).start();
+					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[] { 3 }; // rotate
 			getContainerController().createNewAgent("eqa6",
-					"equipletAgent.EquipletAgent", ar).start();
+					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[] { 1 }; // rotate
 			getContainerController().createNewAgent("eqa7",
-					"equipletAgent.EquipletAgent", ar).start();
+					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[] { 1 }; // rotate
 			getContainerController().createNewAgent("eqa8",
-					"equipletAgent.EquipletAgent", ar).start();
+					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[] { 2 }; // rotate
 			getContainerController().createNewAgent("eqa9",
-					"equipletAgent.EquipletAgent", ar).start();
+					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[] { 3 }; // rotate
 			getContainerController().createNewAgent("eqa10",
-					"equipletAgent.EquipletAgent", ar).start();
+					"testingAgents.EquipletAgent", ar).start();
 
 			ar = null;
 
