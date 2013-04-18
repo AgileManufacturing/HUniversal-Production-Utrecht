@@ -22,7 +22,7 @@ public class ProductionEquipletMapper {
 	private HashMap<Integer, HashMap<AID, Long>> equipletList;
 	
 	public ProductionEquipletMapper() {
-		equipletList = new HashMap<Integer, HashMap<AID, Long>>();
+		equipletList = new HashMap<>();
 	}
 	
 	public void addProductionStep(int productionStepID) {

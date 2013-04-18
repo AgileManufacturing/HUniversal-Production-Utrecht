@@ -7,6 +7,7 @@ import jade.lang.acl.ACLMessage;
 import newDataClasses.Product;
 import newDataClasses.Production;
 import newDataClasses.ProductionStep;
+import newDataClasses.ProductionStepStatus;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -33,18 +34,19 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			Product product = this._productAgent.getProduct();
 			Production production = product.getProduction();
 			ArrayList<ProductionStep> psa = production.getProductionSteps();
-			//debug
-			//System.out.println("SIZEEEEE "+psa.length);
-			 System.out.println("Commence Scheduling!");
+			// debug
+			// System.out.println("SIZEEEEE "+psa.length);
+			System.out.println("Commence Scheduling!");
 			for (ProductionStep ps : psa) {
+				if (ps.getStatus() == ProductionStepStatus.STATE_TODO) {
+					
+					long PA_id = ps.getId();
+					// System.out.println("SIZEEEEE "+production.getProductionEquipletMapping()
+					// .getEquipletsForProductionStep(PA_id).keySet().size());
 
-				long PA_id = ps.getId();
-				//System.out.println("SIZEEEEE "+production.getProductionEquipletMapping()
-						//.getEquipletsForProductionStep(PA_id).keySet().size());
-
-				Scheduler(production.getProductionEquipletMapping()
-						.getEquipletsForProductionStep(PA_id).keySet(), ps);
-				
+					Scheduler(production.getProductionEquipletMapping()
+							.getEquipletsForProductionStep(PA_id).keySet(), ps);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -62,16 +64,18 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 	public void Scheduler(Set<AID> equipletList, ProductionStep productionstep)
 			throws Exception {
 		Schedule[] schedules;
-		//load set into arraylist
-		 List<AID> equipletlist = new ArrayList<AID>(equipletList);
-		 System.out.println("No. of equiplets for step: " + productionstep.getId() + ": " + equipletlist.size());
-		//Make connection with database
+		// load set into arraylist
+		List<AID> equipletlist = new ArrayList<>(equipletList);
+		System.out.println("No. of equiplets for step: "
+				+ productionstep.getId() + ": " + equipletlist.size());
+		// Make connection with database
 		MongoClient mongoClient = null;
 		System.out.println("Scheduler Started");
-		
+
 		try {
-			mongoClient = new MongoClient("145.89.191.131");// 145.89.191.131 is hu
-														// server
+			mongoClient = new MongoClient("145.89.191.131");// 145.89.191.131 is
+															// hu
+			// server
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -175,35 +179,35 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 		// get the equiplet from the timeslot
 		for (int i = 0; i < equipletlist.size(); i++) {
 
-			if (freetimeslotEq != null && equipletlist.get(i).getName()
-					.equals(freetimeslotEq.getEquipletName())) {
+			if (freetimeslotEq != null
+					&& equipletlist.get(i).getName()
+							.equals(freetimeslotEq.getEquipletName())) {
 				equipletAID = equipletlist.get(i);
 			}
-			//debug
-			System.out.println("NAME:"+equipletlist.get(i));
+			// debug
+			System.out.println("NAME:" + equipletlist.get(i));
 		}
-		
-		//debug
-		//System.out.println("AID: "+equipletAID.getName());
+
+		// debug
+		// System.out.println("AID: "+equipletAID.getName());
 
 		// send the message to the equiplet to schedule the timeslot
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 
-		
-		if(freetimeslotEq != null){
+		if (freetimeslotEq != null) {
 			msg.setConversationId(_productAgent.generateCID());
 			msg.setOntology("ScheduleStep");
-	        msg.setContent( ""+freetimeslotEq.getStartTime() );
-	        msg.addReceiver(equipletAID);
-	        myAgent.send(msg);
-	        
-	        //debug
-	        System.out.println("Send Timeslot to EQ");
-		}else{
-			//debug
+			msg.setContent("" + freetimeslotEq.getStartTime());
+			msg.addReceiver(equipletAID);
+			myAgent.send(msg);
+
+			// debug
+			System.out.println("Send Timeslot to EQ");
+		} else {
+			// debug
 			System.out.println("No Timeslot asigned. \n");
 		}
-      
+
 	}
 
 	private class FreeTimeSlot {
@@ -265,6 +269,7 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			this.deadline = newDeadline;
 		}
 
+		@Override
 		public String toString() {
 			return "{ startTime:" + startTime + ", duration:" + duration
 					+ ", deadline:" + deadline + ", EquipletName:"

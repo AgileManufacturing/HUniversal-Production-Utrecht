@@ -194,6 +194,7 @@ public class Scheduler {
 			this.deadline = newDeadline;
 		}
 		
+		@Override
 		public String toString(){
 			return "{ startTime:"+startTime+", duration:"+duration+", deadline:"+deadline+", EquipletName:"+equipletName + " }";
 		}

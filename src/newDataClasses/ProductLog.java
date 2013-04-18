@@ -5,7 +5,7 @@ package newDataClasses;
 
 import java.util.List;
 
-import newDataClasses.sqldatadase.sqliteDatabase;
+import newDataClasses.sqldatabase.sqliteDatabase;
 
 /**
  * @author Theodoor de Graaff <theodoor.degraaff@student.hu.nl>
@@ -42,6 +42,7 @@ public class ProductLog {
 	}
 
 	public void pushLocalToRemote(){
+		// TODO:
 		//get latest remote
 		//get local since latest remote
 		//write to remote

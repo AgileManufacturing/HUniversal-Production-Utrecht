@@ -126,7 +126,7 @@ public class BlackboardClient {
 	 **/
 	public BlackboardClient(String host) {
 		try {
-			this.subscriptions = new ArrayList<BlackboardSubscription>();
+			this.subscriptions = new ArrayList<>();
 			this.mongo = new Mongo(host);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -142,7 +142,7 @@ public class BlackboardClient {
 	 **/
 	public BlackboardClient(String host, int port) {
 		try {
-			this.subscriptions = new ArrayList<BlackboardSubscription>();
+			this.subscriptions = new ArrayList<>();
 			this.mongo = new Mongo(host, port);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -215,7 +215,7 @@ public class BlackboardClient {
 		} else if (database == null || database.isEmpty()) {
 			throw new Exception("No database selected");
 		}
-		ArrayList<String> jsons = new ArrayList<String>();
+		ArrayList<String> jsons = new ArrayList<>();
 		List<DBObject> found = currentCollection.find((DBObject) JSON.parse(json)).toArray();
 		for (DBObject obj : found) {
 			jsons.add(obj.toString());
@@ -251,8 +251,8 @@ public class BlackboardClient {
 			unset = "";
 		}
 		BasicDBObject setObject = new BasicDBObject();
-		setObject.put("$set", (DBObject) JSON.parse(set));
-		setObject.put("$unset", (DBObject) JSON.parse(unset));
+		setObject.put("$set", JSON.parse(set));
+		setObject.put("$unset", JSON.parse(unset));
 		System.out.println(query);
 		System.out.println(setObject);
 		currentCollection.findAndModify((DBObject) JSON.parse(query), setObject);
@@ -309,7 +309,7 @@ public class BlackboardClient {
 				while (!Thread.interrupted()) {
 					while (tailedCursor.hasNext()) {
 						OplogEntry entry = new OplogEntry(
-								(DBObject) tailedCursor.next());
+								tailedCursor.next());
 						MongoOperation operation = entry.getOperation();
 
 						for (BlackboardSubscription sub : subscriptions) {

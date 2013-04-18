@@ -35,15 +35,18 @@ public class ReceiveBehaviour extends SimpleBehaviour {
 		template = mt;
 	}
 
+	@Override
 	public void onStart() {
 		wakeupTime = (timeOut < 0 ? Long.MAX_VALUE : System
 				.currentTimeMillis() + timeOut);
 	}
 
+	@Override
 	public boolean done() {
 		return finished;
 	}
 
+	@Override
 	public void action() {
 		if (template == null)
 			msg = myAgent.receive();
@@ -77,6 +80,7 @@ public class ReceiveBehaviour extends SimpleBehaviour {
 	public void handle(ACLMessage m)
 	{}
 
+	@Override
 	public void reset() {
 		msg = null;
 		finished = false;

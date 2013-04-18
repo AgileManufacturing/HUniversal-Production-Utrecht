@@ -69,6 +69,7 @@ public class OplogEntry {
 		return oplogEntry.get(UPDATE_CRITERIA_FIELD).toString();
 	}
 	
+	@Override
 	public String toString() {
 		return oplogEntry.toString();
 	}

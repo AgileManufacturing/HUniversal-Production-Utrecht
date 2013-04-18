@@ -6,25 +6,46 @@ import jade.core.behaviours.OneShotBehaviour;
 import java.util.ArrayList;
 import java.util.List;
 import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
+import libraries.blackboardJavaClient.src.nl.hu.client.InvalidDBNamespaceException;
+import libraries.blackboardJavaClient.src.nl.hu.client.InvalidJSONException;
 import newDataClasses.Product;
 import newDataClasses.Production;
 import newDataClasses.ProductionEquipletMapper;
 import newDataClasses.ProductionStep;
+import newDataClasses.ProductionStepStatus;
 
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
-@SuppressWarnings("serial")
 public class PlannerBehaviour extends OneShotBehaviour {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ProductAgent _productAgent;
 
 	public void plannerBehaviour() {
 	}
 
+	@Override
 	public int onEnd() {
 		return 0;
 	}
-	
+
+	public static void removeEquiplet(AID aid) {
+		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
+
+		// try to remove the given 'aid' from the blackboard (for testing
+		// purposes only)
+		try {
+			bbc.removeDocuments(aid.toString());
+		} catch (InvalidJSONException | InvalidDBNamespaceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Override
 	public void action() {
 		try {
 			// Get the root Agent
@@ -46,24 +67,27 @@ public class PlannerBehaviour extends OneShotBehaviour {
 					.getProductionEquipletMapping();
 			// Iterate over all the production steps
 			for (ProductionStep ps : psa) {
-				// Get the ID for the production step
-				int PA_id = ps.getId();
-				// Get the type of production step, aka capability
-				long PA_capability = ps.getCapability();
-				// Create the select query for the blackboard
-				DBObject equipletCapabilityQuery = QueryBuilder
-						.start("capabilities").is(PA_capability).get();
-				List<DBObject> equipletDirectory = bbc
-						.findDocuments(equipletCapabilityQuery);
+				if (ps.getStatus() == ProductionStepStatus.STATE_TODO) {
+					// Get the ID for the production step
+					int PA_id = ps.getId();
+					// Get the type of production step, aka capability
+					long PA_capability = ps.getCapability();
+					// Create the select query for the blackboard
+					DBObject equipletCapabilityQuery = QueryBuilder
+							.start("capabilities").is(PA_capability).get();
+					List<DBObject> equipletDirectory = bbc
+							.findDocuments(equipletCapabilityQuery);
 
-				for (DBObject dbo : equipletDirectory) {
-					DBObject aid = (DBObject) dbo.get("db");
-					String name = (String) aid.get("name").toString();
-					pem.addEquipletToProductionStep(PA_id, new AID(name,
-							AID.ISLOCALNAME));
+					for (DBObject dbo : equipletDirectory) {
+						DBObject aid = (DBObject) dbo.get("db");
+						String name = aid.get("name").toString();
+						pem.addEquipletToProductionStep(PA_id, new AID(name,
+								AID.ISLOCALNAME));
+					}
+
+					System.out.println("Doing planner for productionstep "
+							+ PA_id);
 				}
-
-				System.out.println("Doing planner for productionstep " + PA_id);
 			}
 			// Set the production mapper in the production object
 			production.setProductionEquipletMapping(pem);

@@ -6,8 +6,11 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 
-@SuppressWarnings("serial")
 public class OverviewBehaviour extends OneShotBehaviour {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ProductAgent _productAgent;
 	@SuppressWarnings("unused")
 	private boolean _isDone;
@@ -49,6 +52,11 @@ public class OverviewBehaviour extends OneShotBehaviour {
 		// we need to wait till all conv. of the informer are done. We dont want
 		// to block, but do want to wait.
 		_sequentialBehaviour.addSubBehaviour(new CyclicBehaviour(){
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void action() {
 				// TODO Auto-generated method stub
@@ -60,6 +68,11 @@ public class OverviewBehaviour extends OneShotBehaviour {
 		});
 
 		_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void action() {
 				System.out.println("\n");
