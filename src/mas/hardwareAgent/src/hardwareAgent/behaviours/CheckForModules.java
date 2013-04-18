@@ -82,19 +82,32 @@ public class CheckForModules extends ReceiveBehaviour {
 
 				boolean modulesPresent = false;
 
-				KnowledgeDBClient client = KnowledgeDBClient.getClient();
-
-				ResultSet resultSet;
-
-				resultSet = client.executeSelectQuery(Queries.MODULES);
-				while (resultSet.next()) {
-					System.out.println(new Row(resultSet));
-					if (resultSet.equals(contentString)) {
-						modulesPresent = true;
-					}
-				}
+//				KnowledgeDBClient client = KnowledgeDBClient.getClient();
+//
+//				ResultSet resultSet;
+//
+//				resultSet = client.executeSelectQuery(Queries.MODULES);
+//				while (resultSet.next()) {
+//					System.out.println(new Row(resultSet));
+//					if (resultSet.equals(contentString)) {
+//						modulesPresent = true;
+//					}
+//				}
 				// System.out.println();
-
+				try{
+					
+				
+					if(hardwareAgent.GetModuleByName(contentString)!= null){
+					
+						modulesPresent = true;
+					
+					}
+				}catch(Exception e){
+					
+					// module not found
+					
+				}
+				
 				if (modulesPresent) {
 
 					reply.setPerformative(ACLMessage.CONFIRM);
@@ -111,7 +124,7 @@ public class CheckForModules extends ReceiveBehaviour {
 				**/
 			} catch (UnreadableException e) {
 				// System.out.println("Exception Caught, No Content Object Given");
-			} catch (SQLException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
