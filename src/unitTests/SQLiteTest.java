@@ -48,8 +48,9 @@ public class SQLiteTest {
 	/**
 	 * Test method for {@link newDataClasses.ProductLog#add(newDataClasses.LogMessage[])}.
 	 */
+	@SuppressWarnings("static-method")
 	@Test
-	public static void testAdd() {
+	public void testAdd() {
 		ProductLog test = new ProductLog(false, true, new sqliteDatabase(null));
 		List<LogMessage> msgs = new ArrayList<>();
 		

@@ -49,7 +49,6 @@ public class sqliteDatabase {
 			try (PreparedStatement create = conn
 					.prepareStatement("CREATE TABLE IF NOT EXISTS log (id INT, time VARCHAR(30), state VARCHAR(30), message VARCHAR(250))")) {
 				create.execute();
-				create.close();
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -62,17 +61,15 @@ public class sqliteDatabase {
 	 */
 	public void insert(List<LogMessage> msgs) {
 		try {
-			try(PreparedStatement insert = conn
-					.prepareStatement("INSERT INTO LOG (id, time, state, message) VALUES (?, ?, ?, ?)")){
-			for (LogMessage msg : msgs) {
-				insert.setString(1, msg.getId());
-				insert.setString(2, msg.getTime());
-				insert.setString(3, msg.getState());
-				insert.setString(4, msg.getMessage());
-				insert.execute();
-			}
-
-			insert.close();
+			try (PreparedStatement insert = conn
+					.prepareStatement("INSERT INTO LOG (id, time, state, message) VALUES (?, ?, ?, ?)")) {
+				for (LogMessage msg : msgs) {
+					insert.setString(1, msg.getId());
+					insert.setString(2, msg.getTime());
+					insert.setString(3, msg.getState());
+					insert.setString(4, msg.getMessage());
+					insert.execute();
+				}
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
