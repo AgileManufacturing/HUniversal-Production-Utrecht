@@ -53,11 +53,9 @@ import jade.lang.acl.ACLMessage;
  */
 public class PeriodicMsgSenderAgent extends Agent {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	
+	private boolean debug = true;
+
 	// CID variables
 	private static int _cidCnt = 0;
 	private String _cidBase;
@@ -65,15 +63,28 @@ public class PeriodicMsgSenderAgent extends Agent {
 	@SuppressWarnings("serial")
 	protected void setup() {
 		try {
-			addBehaviour(new WakerBehaviour(this, getRandomInt(30000)) {
-				@Override
-				protected void onWake() {
-					ACLMessage message = new ACLMessage(ACLMessage.INFORM);
-					message.setOntology("Reschedule");
-					message.addReceiver(new AID("pa1", AID.ISLOCALNAME));
-				}
 
+			addBehaviour(new WakerBehaviour(this, getRandomInt(30000)) {
+				protected void onWake() {
+					
+					ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+					message.addReceiver(new AID("pa1", AID.ISLOCALNAME));
+					message.setConversationId(generateCID());
+					
+					if(getRandomBoolean()){
+						if (debug)
+							System.out.println("Sending a reschedule msg.");
+						message.setOntology("Reschedule");
+					} else {
+						if (debug)
+							System.out.println("Sending a Move msg.");
+						message.setOntology("MoveToEQ");
+					}
+					
+					myAgent.send(message);
+				}
 			});
+
 		} catch (Exception e) {
 			System.out.println("PeriodicMsgSenderAgent Exited with: " + e);
 			doDelete();
@@ -89,7 +100,7 @@ public class PeriodicMsgSenderAgent extends Agent {
 		Random random = new Random();
 		return random.nextInt(r);
 	}
-	
+
 	/*
 	 * Generates an unique conversation id based on the agents localname, the
 	 * objects hashcode and the current time.
@@ -101,5 +112,5 @@ public class PeriodicMsgSenderAgent extends Agent {
 		}
 		return _cidBase + (_cidCnt++);
 	}
-	
+
 }
