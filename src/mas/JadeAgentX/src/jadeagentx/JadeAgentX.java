@@ -1,7 +1,33 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/**
+ * @file JadeAgentX.java
+ * @brief Makes the agents with specific variables to test with. 
+ * @date Created: 12-04-13
+ *
+ * @author Wouter Veen
+ * 
+ * @section LICENSE
+ * License: newBSD
+ *
+ * Copyright � 2013, HU University of Applied Sciences Utrecht.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ * - Neither the name of the HU University of Applied Sciences Utrecht nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **/
+
 package jadeagentx;
 
 import jade.core.Agent;
@@ -18,22 +44,22 @@ import newDataClasses.Product;
 import newDataClasses.Production;
 import newDataClasses.ProductionStep;
 
-/**
- * 
- * @author wouter
- */
+
 public class JadeAgentX extends Agent {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @param args
-	 *            the command line arguments
+	 * 
+	 *the command line arguments
 	 */
 	@Override
 	protected void setup() {
 		try {
 			System.out.println("starting a agent");
-
+			
+			/**
+			 * Make a array list of capabilities
+			 */
 			ArrayList<Long> capabilities1 = new ArrayList<>();
 			capabilities1.add(0l);
 			capabilities1.add(1l);
@@ -41,7 +67,10 @@ public class JadeAgentX extends Agent {
 			capabilities1.add(24l);
 			capabilities1.add(23412l);
 			capabilities1.add(15l);
-
+			
+			/**
+			 * make a new equipletagent to use. 
+			 */
 			Object[] ar = new Object[] { capabilities1 };
 			getContainerController().createNewAgent("eqa1", "equipletAgent.EquipletAgent", ar).start();
 			// TODO code application logic here
@@ -64,7 +93,9 @@ public class JadeAgentX extends Agent {
 
 			ar = null;
 
-			// Lets make a parameter list
+			/**
+			 *  Lets make a parameter list
+			 */
 			ParameterList parameterList = new ParameterList();
 			ParameterGroup p = new ParameterGroup("Color"); // group colour
 			p.add(new Parameter("Id", "1"));
@@ -126,10 +157,12 @@ public class JadeAgentX extends Agent {
 			parameterList.AddParameterGroup(p);
 
 			ProductionStep stp4 = new ProductionStep(4, 3, parameterList);
-
-			// Our argument for the product agent. The total production of the
-			// product,
-			// consists of multiple steps
+			
+			/**
+			 *Our argument for the product agent. The total production of the
+			 *product,
+			 *consists of multiple steps
+			 */
 			ArrayList<ProductionStep> stepList = new ArrayList<>();
 			stepList.add(stp1);
 			stepList.add(stp2);
@@ -139,8 +172,11 @@ public class JadeAgentX extends Agent {
 			Production production = new Production(stepList);
 			Product product = new Product(production, getAID().toString());
 
-			// We need to pass an Object[] to the createNewAgent.
-			// But we only want to pass our product!
+			/**
+			 * We need to pass an Object[] to the createNewAgent.
+			 * But we only want to pass our product!
+			 */
+			
 			Object[] args = new Object[1];
 			args[0] = product;
 
@@ -151,17 +187,23 @@ public class JadeAgentX extends Agent {
 	}
 
 	private static long count = 0;
-
 	public class StartProductAgent extends CyclicBehaviour {
 		private static final long serialVersionUID = 1L;
 
 		Object[] args;
-
+		/**
+		 * 
+		 * @param a
+		 * @param args
+		 */
 		public StartProductAgent(Agent a, Object[] args) {
 			super(a);
 			this.args = args;
 		}
-
+		
+		/**
+		 * Make new product agent
+		 */
 		@Override
 		public void action() {
 			ACLMessage message = receive();
