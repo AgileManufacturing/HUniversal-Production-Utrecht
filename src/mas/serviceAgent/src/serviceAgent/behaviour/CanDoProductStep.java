@@ -13,6 +13,7 @@ import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
 
+import serviceAgent.ServiceAgent;
 import serviceAgent.ServiceFactory;
 import serviceAgent.Service;
 import jade.core.Agent;
@@ -28,6 +29,7 @@ import behaviours.*;
 public class CanDoProductStep extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
+	private ServiceAgent agent;
 	private BlackboardClient client;
 	private ServiceFactory factory;
 
@@ -36,6 +38,7 @@ public class CanDoProductStep extends ReceiveBehaviour {
 	 */
 	public CanDoProductStep(Agent a, BlackboardClient client) {
 		super(a, -1, MessageTemplate.MatchOntology("CanDoProductionStep"));
+		agent = (ServiceAgent) a;
 		this.client = client;
 	}
 
@@ -55,41 +58,37 @@ public class CanDoProductStep extends ReceiveBehaviour {
 				stepType = productStep.getLong("type");
 			} catch (NullPointerException e) {
 				e.printStackTrace();
-				getAgent().doDelete();
+				agent.doDelete();
 			}
 			BasicDBObject parameters = (BasicDBObject) productStep
 					.get("parameters");
 
 			System.out.format(
 					"%s got message CanDoProductionStep for step type %s%n",
-					getAgent().getLocalName(), stepType);
+					agent.getLocalName(), stepType);
 
 			if (factory == null)
 				factory = new ServiceFactory(message.getSender().toString());
 			Service service = factory.getServicesForStep(stepType)[0];
 
-			ACLMessage reply = message.createReply();
-			reply.setOntology("CanDoProductionStepResponse");
+			ACLMessage newMsg = message.createReply();
+			newMsg.clearAllReceiver();
+			newMsg.addReceiver(agent.getHardwareAgentAID());
+			newMsg.setOntology("CheckForModules");
 			try {
-				reply.setContentObject(productStepId);
+				newMsg.setContentObject(service
+						.getModuleIds(stepType, parameters));
 			} catch (IOException e) {
 				e.printStackTrace();
-				getAgent().doDelete();
+				agent.doDelete();
 			}
-			if (service.canPerform(stepType, parameters)) {
-				message.setPerformative(ACLMessage.CONFIRM);
-				System.out.format("%s sending can do step%n", getAgent()
-						.getLocalName());
-			} else {
-				message.setPerformative(ACLMessage.DISCONFIRM);
-				System.out.format("%s sending cannot do step%n", getAgent()
-						.getLocalName());
-			}
-			getAgent().send(reply);
+			agent.send(newMsg);
+
+			agent.addBehaviour(new CheckForModulesResponse(agent));
 		} catch (UnreadableException | InvalidDBNamespaceException
 				| GeneralMongoException e) {
 			e.printStackTrace();
-			getAgent().doDelete();
+			agent.doDelete();
 		}
 	}
 }
