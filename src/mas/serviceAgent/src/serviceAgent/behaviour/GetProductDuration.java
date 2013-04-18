@@ -13,7 +13,6 @@ import org.bson.types.ObjectId;
 
 import serviceAgent.Service;
 import serviceAgent.ServiceFactory;
-import serviceAgent.ServiceStepMessage;
 
 import behaviours.ReceiveBehaviour;
 
@@ -54,7 +53,7 @@ public class GetProductDuration extends ReceiveBehaviour {
 
 			System.out.format(
 					"%s got message GetProductionDuration for step type %s%n",
-					getAgent().getLocalName(), productStepType);
+					myAgent.getLocalName(), productStepType);
 
 			Service[] services = null;
 			Service service = null;
@@ -63,7 +62,7 @@ public class GetProductDuration extends ReceiveBehaviour {
 			if ((services = factory.getServicesForStep(productStepType)).length > 0) {
 				service = services[0];
 			} else {
-				getAgent().doDelete();
+				myAgent.doDelete();
 				throw new RuntimeException(
 						"Service Agent - No available services for stepType "
 								+ productStep);
@@ -72,19 +71,19 @@ public class GetProductDuration extends ReceiveBehaviour {
 			BasicDBObject parameters = (BasicDBObject) productStep
 					.get("parameters");
 
-			ServiceStepMessage[] serviceSteps = service.getServiceSteps(
+			BasicDBObject[] serviceSteps = service.getServiceSteps(
 					productStepType, parameters);
-			for (ServiceStepMessage serviceStep : serviceSteps) {
-				serviceStep.setProductStepId(productStepId);
+			for (BasicDBObject serviceStep : serviceSteps) {
+				serviceStep.put("productStepId", productStepId);
 			}
 
-			getAgent().addBehaviour(
-					new GetServiceDuration(getAgent(), productionStepBlackBoard,
-							serviceStepBlackBoard, serviceSteps, msg
-									.getConversationId()));
+			myAgent.addBehaviour(new GetServiceDuration(myAgent,
+					productionStepBlackBoard, serviceStepBlackBoard,
+					serviceSteps, msg.getConversationId()));
 		} catch (UnreadableException | InvalidDBNamespaceException
 				| GeneralMongoException e) {
 			e.printStackTrace();
+			myAgent.doDelete();
 		}
 	}
 }

@@ -21,7 +21,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	private HashMap<String, Long> services;
 	private HashMap<Long, String[]> stepTypes;
 	private DbData dbData;
-	private AID equipletAgentAID, hardwareAgentAID;
+	private AID equipletAgentAID, logisticsAID, hardwareAgentAID;
 
 	@Override
 	public void setup() {
@@ -79,7 +79,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 		// receive behaviours from EA
 		// add EvaluateProductionStep receiveBehaviour --> conversation with HA
-		// add GetStartTime receiveBehaviour --> conversation with LA
+		// add ScheduleProductStep receiveBehaviour --> conversation with LA
 		// add ScheduleStep receiveBehaviour
 		// add StepDuration receiveBehaviour
 		// add StepDuration receiveBehaviour
@@ -181,6 +181,13 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 */
 	public AID getEquipletAgentAID() {
 		return equipletAgentAID;
+	}
+
+	/**
+	 * @return the logisticsAID
+	 */
+	public AID getLogisticsAID() {
+		return logisticsAID;
 	}
 
 	/**
