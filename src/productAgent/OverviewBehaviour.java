@@ -89,10 +89,9 @@ public class OverviewBehaviour extends OneShotBehaviour {
 
 		System.out
 				.println("Added all behaviours. And everything should start. Aw yeah!");
-
 	}
 
 	public void reschedule(){
-		
+		System.out.println("Rescheduling will be implemented here");
 	}
 }

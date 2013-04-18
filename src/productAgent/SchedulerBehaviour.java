@@ -32,7 +32,7 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 		try {
 			Product product = this._productAgent.getProduct();
 			Production production = product.getProduction();
-			ProductionStep[] psa = production.getProductionSteps();
+			ArrayList<ProductionStep> psa = production.getProductionSteps();
 			//debug
 			//System.out.println("SIZEEEEE "+psa.length);
 			 System.out.println("Commence Scheduling!");

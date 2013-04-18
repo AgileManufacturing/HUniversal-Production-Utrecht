@@ -1,6 +1,8 @@
 
 package main;
 
+import java.util.ArrayList;
+
 import jade.core.Agent;
 import jade.wrapper.AgentController;
 import newDataClasses.Parameter;
@@ -129,8 +131,11 @@ public class MainAgent extends Agent {
 			// Our argument for the product agent. The total production of the
 			// product,
 			// consists of multiple steps
-			ProductionStep[] stepList = new ProductionStep[] { stp1, stp2,
-					stp3, stp4 };
+			ArrayList<ProductionStep> stepList = new ArrayList<ProductionStep>();
+			stepList.add(stp1);
+			stepList.add(stp2);
+			stepList.add(stp3);
+			stepList.add(stp4);
 
 			Production production = new Production(stepList);
 			Product product = new Product(production, getAID().toString());

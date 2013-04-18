@@ -13,19 +13,19 @@
  */
 package newDataClasses;
 
+import java.util.ArrayList;
+
 public class Production {
 	
-	private ProductionStep[] _productionSteps;
+	private ArrayList<ProductionStep> _productionSteps;
 	
 	private ProductionEquipletMapper _prodletmap;
 
-	
-	
 	public Production() {
 		_prodletmap = new ProductionEquipletMapper();
 	}
 	
-	public Production(ProductionStep[] productionSteps) throws Exception {
+	public Production(ArrayList<ProductionStep> productionSteps) throws Exception {
 		this();
 		if(productionSteps == null) throw new Exception("Production steps can't be null");
 		this._productionSteps = productionSteps;
@@ -35,7 +35,7 @@ public class Production {
 		}
 	}
 	
-	public ProductionStep[] getProductionSteps() {
+	public ArrayList<ProductionStep> getProductionSteps() {
 		return _productionSteps;
 	}
 	
