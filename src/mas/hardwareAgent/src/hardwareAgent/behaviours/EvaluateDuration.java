@@ -79,7 +79,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 			/**
 			 * haal de naam van de leidende module uit knowledge db aan de hand van de servicestep.service (ofzo)
 			 * 
-			 * String moduleName = 
+			 * String moduleName = iets vanuit de modulefactory geloof ik?
 			 * 
 			 */
 			

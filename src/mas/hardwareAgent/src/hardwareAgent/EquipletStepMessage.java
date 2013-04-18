@@ -13,7 +13,7 @@ public class EquipletStepMessage {
 	
 	/**
 	 * @param serviceStepID
-	 * @param constructionData
+	 * @param ionstructionData
 	 * @param type
 	 * @param timeData
 	 * @return
