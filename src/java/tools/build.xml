@@ -1,14 +1,11 @@
-<project name="REXOS" default="all">
-	<target name="all" depends="blackboardJavaClient"> 
-	</target>
+<project name="tools" default="all">
+	
+	<import file="../build.xml"/>
 
-	<target name="blackboardJavaClient">
-		<ant antfile="build.xml" target="build" dir="blackboardJavaClient" inheritRefs="true" useNativeBasedir="true"/>  
+	<target name="all">
 	</target>
-
 
 	<target name="clean">
-		<ant antfile="build.xml" target="clean" dir="blackboardJavaClient" inheritRefs="true" useNativeBasedir="true"/>  
 	</target>
 
 </project>

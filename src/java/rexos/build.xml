@@ -1,14 +1,22 @@
-<project name="REXOS" default="all">
-	<target name="all" depends="blackboardJavaClient"> 
+<project name="rexos" default="all">
+	<import file="../build.xml"/>
+
+	<target name="all" depends="libraries"> 
 	</target>
 
-	<target name="blackboardJavaClient">
-		<ant antfile="build.xml" target="build" dir="blackboardJavaClient" inheritRefs="true" useNativeBasedir="true"/>  
+	<target name="libraries">
+		<ant antfile="build.xml" target="all" dir="libraries" inheritRefs="true" useNativeBasedir="true"/>  
 	</target>
 
+	<!--	Uncomment when mas actually exists. 
+	<target name="mas">
+		<ant antfile="build.xml" target="all" dir="mas" inheritRefs="true" useNativeBasedir="true"/>  
+	</target> -->
 
 	<target name="clean">
-		<ant antfile="build.xml" target="clean" dir="blackboardJavaClient" inheritRefs="true" useNativeBasedir="true"/>  
+		<ant antfile="build.xml" target="clean" dir="libraries" inheritRefs="true" useNativeBasedir="true"/> 
+		<!--	Uncomment when mas actually exists. 
+			<ant antfile="build.xml" target="clean" dir="mas" inheritRefs="true" useNativeBasedir="true"/>  -->
 	</target>
 
 </project>
