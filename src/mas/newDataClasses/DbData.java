@@ -34,9 +34,9 @@ public class DbData implements IMongoSaveable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		ip = object.getString("ip", null);
-		port = object.getInt("port", -1);
-		name = object.getString("name", null);
+		ip = object.getString("ip");
+		port = object.getInt("port");
+		name = object.getString("name");
 	}
 
 	/**

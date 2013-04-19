@@ -92,11 +92,11 @@ public class ServiceStepMessage implements IMongoSaveable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		productStepId = object.getObjectId("productStepId", null);
-		serviceName = object.getString("serviceName", null);
-		type = object.getLong("type", -1l);
+		productStepId = object.getObjectId("productStepId");
+		serviceName = object.getString("serviceName");
+		type = object.getLong("type");
 		parameters = (BasicDBObject) object.get("parameters");
-		status = StepStatusCode.valueOf(object.getString("status", null));
+		status = StepStatusCode.valueOf(object.getString("status"));
 		statusData = (BasicDBObject) object.get("statusData");
 		scheduleData = new ScheduleData((BasicDBObject) object.get("scheduleData"));
 	}
