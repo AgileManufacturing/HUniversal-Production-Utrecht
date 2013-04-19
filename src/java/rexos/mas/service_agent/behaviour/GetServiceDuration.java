@@ -37,6 +37,7 @@ import java.util.List;
 import org.bson.types.ObjectId;
 
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.equiplet_agent.ProductStepMessage;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;

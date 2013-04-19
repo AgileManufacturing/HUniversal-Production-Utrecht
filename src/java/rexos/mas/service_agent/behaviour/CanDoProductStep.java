@@ -21,6 +21,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import rexos.mas.behaviours.*;
+import rexos.mas.equiplet_agent.ProductStepMessage;
 
 /**
  * @author Peter Bonnema
