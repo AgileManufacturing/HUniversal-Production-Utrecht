@@ -278,22 +278,22 @@ public class ProductStepMessage implements IMongoSaveable {
 
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		this.productAgentId = new AID((String)(object.get("productAgentId")), jade.core.AID.ISGUID);
-		this.type = object.getLong("type");
-		this.parameters = (BasicDBObject)object.get("parameters");
-		this.inputParts = ((BasicDBList)object.get("inputParts")).toArray(new Long[((BasicDBList)object.get("inputParts")).size()]);
-		this.outputPart = object.getLong("outputPart", -1l);
-		this.status = StepStatusCode.valueOf(object.getString("status"));
+		productAgentId = new AID((String)(object.get("productAgentId")), jade.core.AID.ISGUID);
+		type = object.getLong("type");
+		parameters = (BasicDBObject)object.get("parameters");
+		inputParts = ((BasicDBList)object.get("inputParts")).toArray(new Long[0]);
+		outputPart = object.getLong("outputPart", -1l);
+		status = StepStatusCode.valueOf(object.getString("status"));
 		
 		if(object.containsField("statusData")){
-			this.statusData = (BasicDBObject) object.get(statusData);
-		}else{
-			this.statusData = new BasicDBObject();
+			statusData = (BasicDBObject) object.get(statusData);
+		} else {
+			statusData = new BasicDBObject();
 		}
 		if(object.containsField("scheduleData")){
-			this.scheduleData = new ScheduleData((BasicDBObject)object.get("scheduleData"));
-		}else{
-			this.scheduleData = new ScheduleData();
+			scheduleData = new ScheduleData((BasicDBObject)object.get("scheduleData"));
+		} else {
+			scheduleData = new ScheduleData();
 		}
 		
 	}

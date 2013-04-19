@@ -97,8 +97,16 @@ public class ServiceStepMessage implements IMongoSaveable {
 		type = object.getLong("type");
 		parameters = (BasicDBObject) object.get("parameters");
 		status = StepStatusCode.valueOf(object.getString("status"));
-		statusData = (BasicDBObject) object.get("statusData");
-		scheduleData = new ScheduleData((BasicDBObject) object.get("scheduleData"));
+		if(object.containsField("statusData")){
+			statusData = (BasicDBObject) object.get(statusData);
+		} else {
+			statusData = new BasicDBObject();
+		}
+		if(object.containsField("scheduleData")){
+			scheduleData = new ScheduleData((BasicDBObject)object.get("scheduleData"));
+		} else {
+			scheduleData = new ScheduleData();
+		}
 	}
 
 	/**
