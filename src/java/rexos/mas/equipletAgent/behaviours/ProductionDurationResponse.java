@@ -1,14 +1,14 @@
-package equipletAgent.behaviours;
+package rexos.mas.equipletAgent.behaviours;
 
-import newDataClasses.ScheduleData;
-import nl.hu.client.BlackboardClient;
+import rexos.mas.newDataClasses.ScheduleData;
+import rexos.libraries.blackboard_client.BlackboardClient;
 
 import org.bson.types.ObjectId;
-import behaviours.ReceiveBehaviour;
+import rexos.mas.behaviours.ReceiveBehaviour;
 
 import com.mongodb.BasicDBObject;
-import equipletAgent.EquipletAgent;
-import equipletAgent.ProductStepMessage;
+import rexos.mas.equipletAgent.EquipletAgent;
+import rexos.mas.equipletAgent.ProductStepMessage;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;

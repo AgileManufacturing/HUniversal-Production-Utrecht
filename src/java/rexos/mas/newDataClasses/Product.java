@@ -11,12 +11,12 @@
  * Version: 1.0
  *
  */
-package newDataClasses;
+package rexos.mas.newDataClasses;
 
 
 import java.util.List;
 
-import newDataClasses.sqldatadase.sqliteDatabase;
+import rexos.mas.newDataClasses.sqldatadase.sqliteDatabase;
 
 
 public class Product {

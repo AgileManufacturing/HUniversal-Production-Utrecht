@@ -27,15 +27,15 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package equipletAgent;
+package rexos.mas.equipletAgent;
 
 import jade.core.AID;
 import java.util.ArrayList;
 
 import com.mongodb.BasicDBObject;
 
-import newDataClasses.DbData;
-import newDataClasses.IMongoSaveable;
+import rexos.mas.newDataClasses.DbData;
+import rexos.mas.newDataClasses.IMongoSaveable;
 
 public class EquipletDirectoryMessage implements IMongoSaveable{
 	/**

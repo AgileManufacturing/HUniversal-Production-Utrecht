@@ -28,13 +28,13 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  **/
-package serviceAgent;
+package rexos.mas.serviceAgent;
 
-import newDataClasses.ScheduleData;
+import rexos.mas.newDataClasses.ScheduleData;
 
 import com.mongodb.BasicDBObject;
 
-import equipletAgent.StepStatusCode;
+import rexos.mas.equipletAgent.StepStatusCode;
 
 /**
  * @author Peter

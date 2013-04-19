@@ -28,7 +28,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
 **/
-package newDataClasses;
+package rexos.mas.newDataClasses;
 
 /**
  * @author Alexander

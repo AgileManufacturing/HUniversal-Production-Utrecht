@@ -1,6 +1,6 @@
-package productAgent;
+package rexos.mas.productAgent;
 
-import newDataClasses.ProductionStep;
+import rexos.mas.newDataClasses.ProductionStep;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;

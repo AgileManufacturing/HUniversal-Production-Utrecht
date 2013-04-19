@@ -1,13 +1,13 @@
-package productAgent;
+package rexos.mas.productAgent;
 
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
-import newDataClasses.Product;
-import newDataClasses.Production;
-import newDataClasses.ProductionStep;
-import newDataClasses.ProductionStepStatus;
+import rexos.mas.newDataClasses.Product;
+import rexos.mas.newDataClasses.Production;
+import rexos.mas.newDataClasses.ProductionStep;
+import rexos.mas.newDataClasses.ProductionStepStatus;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;

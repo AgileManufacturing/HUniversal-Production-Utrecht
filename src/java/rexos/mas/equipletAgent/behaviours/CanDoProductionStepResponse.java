@@ -27,22 +27,22 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package equipletAgent.behaviours;
+package rexos.mas.equipletAgent.behaviours;
 
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import nl.hu.client.BlackboardClient;
+import rexos.libraries.blackboard_client.BlackboardClient;
 
 import org.bson.types.ObjectId;
 
-import behaviours.ReceiveBehaviour;
+import rexos.mas.behaviours.ReceiveBehaviour;
 
 import com.mongodb.BasicDBObject;
 
-import equipletAgent.EquipletAgent;
-import equipletAgent.ProductStepMessage;
+import rexos.mas.equipletAgent.EquipletAgent;
+import rexos.mas.equipletAgent.ProductStepMessage;
 
 /**
  * The Class CanDoProductionStepResponse.

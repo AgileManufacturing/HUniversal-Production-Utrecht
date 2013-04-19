@@ -1,4 +1,4 @@
-package equipletAgent;
+package rexos.mas.equipletAgent;
 
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
@@ -6,8 +6,8 @@ import jade.lang.acl.ACLMessage;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import nl.hu.client.GeneralMongoException;
-import nl.hu.client.InvalidDBNamespaceException;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 
 import org.bson.types.ObjectId;
 

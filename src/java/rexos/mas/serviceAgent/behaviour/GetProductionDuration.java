@@ -1,20 +1,20 @@
-package serviceAgent.behaviour;
+package rexos.mas.serviceAgent.behaviour;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
-import nl.hu.client.BlackboardClient;
-import nl.hu.client.GeneralMongoException;
-import nl.hu.client.InvalidDBNamespaceException;
+import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 
 import org.bson.types.ObjectId;
 
-import serviceAgent.Service;
-import serviceAgent.ServiceFactory;
+import rexos.mas.serviceAgent.Service;
+import rexos.mas.serviceAgent.ServiceFactory;
 
-import behaviours.ReceiveBehaviour;
+import rexos.mas.behaviours.ReceiveBehaviour;
 
 import com.mongodb.BasicDBObject;
 

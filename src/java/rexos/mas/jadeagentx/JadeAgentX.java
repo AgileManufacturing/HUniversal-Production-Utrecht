@@ -28,7 +28,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package jadeagentx;
+package rexos.mas.jadeagentx;
 
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -37,12 +37,12 @@ import jade.wrapper.StaleProxyException;
 
 import java.util.ArrayList;
 
-import newDataClasses.Parameter;
-import newDataClasses.ParameterGroup;
-import newDataClasses.ParameterList;
-import newDataClasses.Product;
-import newDataClasses.Production;
-import newDataClasses.ProductionStep;
+import rexos.mas.newDataClasses.Parameter;
+import rexos.mas.newDataClasses.ParameterGroup;
+import rexos.mas.newDataClasses.ParameterList;
+import rexos.mas.newDataClasses.Product;
+import rexos.mas.newDataClasses.Production;
+import rexos.mas.newDataClasses.ProductionStep;
 
 
 public class JadeAgentX extends Agent {
@@ -72,7 +72,7 @@ public class JadeAgentX extends Agent {
 			 * make a new equipletagent to use. 
 			 */
 			Object[] ar = new Object[] { capabilities1 };
-			getContainerController().createNewAgent("eqa1", "equipletAgent.EquipletAgent", ar).start();
+			getContainerController().createNewAgent("eqa1", "rexos.mas.equipletAgent.EquipletAgent", ar).start();
 			// TODO code application logic here
 			ArrayList<Long> capabilities2 = new ArrayList<>();
 			capabilities2.add(2l);
@@ -80,7 +80,7 @@ public class JadeAgentX extends Agent {
 			capabilities2.add(9l);
 
 			ar = new Object[] { capabilities2 };
-			getContainerController().createNewAgent("eqa2", "equipletAgent.EquipletAgent", ar).start();
+			getContainerController().createNewAgent("eqa2", "rexos.mas.equipletAgent.EquipletAgent", ar).start();
 
 			ArrayList<Long> capabilities3 = new ArrayList<>();
 			capabilities3.add(3l);
@@ -89,7 +89,7 @@ public class JadeAgentX extends Agent {
 			capabilities3.add(9l);
 
 			ar = new Object[] { capabilities3 };
-			getContainerController().createNewAgent("eqa3", "equipletAgent.EquipletAgent", ar).start();
+			getContainerController().createNewAgent("eqa3", "rexos.mas.equipletAgent.EquipletAgent", ar).start();
 
 			ar = null;
 
@@ -209,7 +209,7 @@ public class JadeAgentX extends Agent {
 			ACLMessage message = receive();
 			if (message != null) {
 				try {
-					getContainerController().createNewAgent("pa" + count++, "productAgent.ProductAgent", args).start();
+					getContainerController().createNewAgent("pa" + count++, "rexos.mas.productAgent.ProductAgent", args).start();
 				} catch (StaleProxyException e) {
 					e.printStackTrace();
 				}

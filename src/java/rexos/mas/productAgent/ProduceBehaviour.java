@@ -1,14 +1,14 @@
 /**
  * 
  */
-package productAgent;
+package rexos.mas.productAgent;
 
 import java.util.List;
 
 import jade.core.behaviours.OneShotBehaviour;
-import newDataClasses.LogMessage;
-import newDataClasses.Product;
-import newDataClasses.ProductionStep;
+import rexos.mas.newDataClasses.LogMessage;
+import rexos.mas.newDataClasses.Product;
+import rexos.mas.newDataClasses.ProductionStep;
 
 /**
  * 

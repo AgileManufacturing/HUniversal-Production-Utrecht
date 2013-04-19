@@ -27,14 +27,14 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package serviceAgent;
+package rexos.mas.serviceAgent;
 
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
 
-import equipletAgent.StepStatusCode;
-import newDataClasses.ScheduleData;
+import rexos.mas.equipletAgent.StepStatusCode;
+import rexos.mas.newDataClasses.ScheduleData;
 
 /**
  * Implementation of a message for the serviceStep blackboard

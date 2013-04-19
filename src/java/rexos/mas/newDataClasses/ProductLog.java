@@ -1,11 +1,11 @@
 /**
  * 
  */
-package newDataClasses;
+package rexos.mas.newDataClasses;
 
 import java.util.List;
 
-import newDataClasses.sqldatadase.sqliteDatabase;
+import rexos.mas.newDataClasses.sqldatadase.sqliteDatabase;
 
 /**
  * @author Theodoor de Graaff <theodoor.degraaff@student.hu.nl>

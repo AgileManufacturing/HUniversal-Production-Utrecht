@@ -30,18 +30,18 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package equipletAgent;
+package rexos.mas.equipletAgent;
 
 import com.mongodb.*;
-import equipletAgent.behaviours.*;
+import rexos.mas.equipletAgent.behaviours.*;
 
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
-import newDataClasses.DbData;
-import newDataClasses.ScheduleData;
-import nl.hu.client.*;
-import nl.hu.client.FieldUpdateSubscription.MongoUpdateLogOperation;
+import rexos.mas.newDataClasses.DbData;
+import rexos.mas.newDataClasses.ScheduleData;
+import rexos.libraries.blackboard_client.*;
+import rexos.libraries.blackboard_client.FieldUpdateSubscription.MongoUpdateLogOperation;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -202,11 +202,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 			
 			Object[] arguments = new Object[] { dbData };
-			getContainerController().createNewAgent(getLocalName() + "-hardwareAgent", "hardwareAgent.HardwareAgent", arguments).start();
+			getContainerController().createNewAgent(getLocalName() + "-hardwareAgent", "rexos.mas.hardwareAgent.HardwareAgent", arguments).start();
 			AID hardwareAgent = new AID(getLocalName() + "-hardwareAgent", AID.ISLOCALNAME);
 			
 			arguments = new Object[] { dbData, getAID(), hardwareAgent };
-			getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "serviceAgent.ServiceAgent", arguments).start();
+			getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "rexos.mas.serviceAgent.ServiceAgent", arguments).start();
 			serviceAgent = new AID(getLocalName() + "-serviceAgent", AID.ISLOCALNAME);
 			
 			collectiveBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);

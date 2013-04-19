@@ -1,7 +1,7 @@
 /**
  * 
  */
-package productAgent;
+package rexos.mas.productAgent;
 
 import jade.core.Agent;
 import jade.core.behaviours.SimpleBehaviour;

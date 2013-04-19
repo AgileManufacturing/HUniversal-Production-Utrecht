@@ -1,4 +1,4 @@
-package newDataClasses;
+package rexos.mas.newDataClasses;
 
 import com.mongodb.BasicDBObject;
 

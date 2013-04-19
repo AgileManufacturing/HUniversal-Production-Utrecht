@@ -27,16 +27,16 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package serviceAgent;
+package rexos.mas.serviceAgent;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import rexos.libraries.knowledge.Row;
-import rexos.libraries.knowledge.KnowledgeDBClient;
-import rexos.libraries.knowledge.Queries;
+import rexos.libraries.knowledgedb_client.Row;
+import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
+import rexos.libraries.knowledgedb_client.Queries;
 
 import jade.core.AID;
 

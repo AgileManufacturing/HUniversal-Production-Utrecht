@@ -1,7 +1,7 @@
 /**
  * 
  */
-package newDataClasses.sqldatadase;
+package rexos.mas.newDataClasses.sqldatadase;
 
 import java.sql.Connection;
 import java.sql.Driver;

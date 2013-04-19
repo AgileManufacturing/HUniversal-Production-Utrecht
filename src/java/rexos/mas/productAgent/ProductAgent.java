@@ -1,10 +1,10 @@
-package productAgent;
+package rexos.mas.productAgent;
 
 //import testingAgents.EquipletAgent;
 import jade.core.AID;
 import jade.core.Agent;
-import newDataClasses.Product;
-import newDataClasses.ProductionStep;
+import rexos.mas.newDataClasses.Product;
+import rexos.mas.newDataClasses.ProductionStep;
 
 /**
  * @Author Alexander

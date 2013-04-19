@@ -1,4 +1,4 @@
-package hardwareAgent.behaviours;
+package rexos.mas.hardwareAgent.behaviours;
 
 /**
  * @file EvaluateDuration.java
@@ -33,29 +33,29 @@ package hardwareAgent.behaviours;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import hardwareAgent.EquipletStepMessage;
-import hardwareAgent.HardwareAgent;
-import hardwareAgent.Module;
-import hardwareAgent.TimeData;
+import rexos.mas.hardwareAgent.EquipletStepMessage;
+import rexos.mas.hardwareAgent.HardwareAgent;
+import rexos.mas.hardwareAgent.Module;
+import rexos.mas.hardwareAgent.TimeData;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
-import nl.hu.client.InvalidDBNamespaceException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 
 import org.bson.types.ObjectId;
 
-import rexos.libraries.knowledge.KnowledgeDBClient;
-import rexos.libraries.knowledge.Queries;
-import rexos.libraries.knowledge.Row;
-import serviceAgent.ServiceStepMessage;
+import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
+import rexos.libraries.knowledgedb_client.Queries;
+import rexos.libraries.knowledgedb_client.Row;
+import rexos.mas.serviceAgent.ServiceStepMessage;
 
-import behaviours.ReceiveBehaviour;
+import rexos.mas.behaviours.ReceiveBehaviour;
 
 import com.mongodb.BasicDBObject;
 
-import newDataClasses.*;
+import rexos.mas.newDataClasses.*;
 
 public class EvaluateDuration extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;

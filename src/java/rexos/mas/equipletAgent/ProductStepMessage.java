@@ -27,13 +27,13 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package equipletAgent;
+package rexos.mas.equipletAgent;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import jade.core.AID;
-import newDataClasses.IMongoSaveable;
-import newDataClasses.ScheduleData;
+import rexos.mas.newDataClasses.IMongoSaveable;
+import rexos.mas.newDataClasses.ScheduleData;
 
 /**
  * Implementation of a message for the productstep blackboard

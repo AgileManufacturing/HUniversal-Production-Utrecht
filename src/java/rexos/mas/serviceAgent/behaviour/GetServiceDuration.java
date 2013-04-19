@@ -28,7 +28,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  **/
-package serviceAgent.behaviour;
+package rexos.mas.serviceAgent.behaviour;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -36,15 +36,15 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 
-import behaviours.ReceiveBehaviour;
+import rexos.mas.behaviours.ReceiveBehaviour;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
-import nl.hu.client.BlackboardClient;
-import nl.hu.client.GeneralMongoException;
-import nl.hu.client.InvalidDBNamespaceException;
-import serviceAgent.ServiceAgent;
+import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.mas.serviceAgent.ServiceAgent;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;

@@ -1,19 +1,19 @@
-package serviceAgent;
+package rexos.mas.serviceAgent;
 
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
 import org.bson.types.ObjectId;
 
-import serviceAgent.behaviour.CanDoProductStep;
-import serviceAgent.behaviour.GetProductionDuration;
+import rexos.mas.serviceAgent.behaviour.CanDoProductStep;
+import rexos.mas.serviceAgent.behaviour.GetProductionDuration;
 import jade.core.AID;
 import jade.core.Agent;
 import com.mongodb.*;
 
-import equipletAgent.*;
-import newDataClasses.DbData;
-import nl.hu.client.*;
+import rexos.mas.equipletAgent.*;
+import rexos.mas.newDataClasses.DbData;
+import rexos.libraries.blackboard_client.*;
 
 public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	private static final long serialVersionUID = 1L;

@@ -29,7 +29,7 @@
  **/
 package rexos.libraries.dynamicloader;
 
-import rexos.libraries.knowledge.Row;
+import rexos.libraries.knowledgedb_client.Row;
 
 /**
  * Contains all information about a piece of software.

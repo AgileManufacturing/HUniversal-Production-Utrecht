@@ -1,4 +1,4 @@
-package productAgent;
+package rexos.mas.productAgent;
 
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;

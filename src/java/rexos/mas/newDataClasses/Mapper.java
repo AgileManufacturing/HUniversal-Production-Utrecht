@@ -11,7 +11,7 @@
  * Version: 1.0
  *
  */
-package newDataClasses;
+package rexos.mas.newDataClasses;
 
 import java.util.ArrayList;
 import java.util.HashMap;

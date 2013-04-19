@@ -1,4 +1,4 @@
-package productAgent;
+package rexos.mas.productAgent;
 
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
@@ -7,11 +7,11 @@ import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
-import newDataClasses.Product;
-import newDataClasses.Production;
-import newDataClasses.ProductionEquipletMapper;
-import newDataClasses.ProductionStep;
-import newDataClasses.ProductionStepStatus;
+import rexos.mas.newDataClasses.Product;
+import rexos.mas.newDataClasses.Production;
+import rexos.mas.newDataClasses.ProductionEquipletMapper;
+import rexos.mas.newDataClasses.ProductionStep;
+import rexos.mas.newDataClasses.ProductionStepStatus;
 
 /*
  * Version 1.1

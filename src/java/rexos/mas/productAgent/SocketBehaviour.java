@@ -11,7 +11,7 @@
  * Version: 1.0
  *
  */
-package productAgent;
+package rexos.mas.productAgent;
 
 import java.io.BufferedReader;
 import java.io.IOException;

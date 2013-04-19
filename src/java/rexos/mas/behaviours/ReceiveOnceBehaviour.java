@@ -28,7 +28,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  **/
-package behaviours;
+package rexos.mas.behaviours;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;

@@ -28,13 +28,13 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  **/
-package serviceAgent.behaviour;
+package rexos.mas.serviceAgent.behaviour;
 
-import serviceAgent.ServiceAgent;
+import rexos.mas.serviceAgent.ServiceAgent;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import behaviours.ReceiveOnceBehaviour;
+import rexos.mas.behaviours.ReceiveOnceBehaviour;
 
 /**
  * @author Peter

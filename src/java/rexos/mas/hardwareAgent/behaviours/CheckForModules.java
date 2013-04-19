@@ -1,4 +1,4 @@
-package hardwareAgent.behaviours;
+package rexos.mas.hardwareAgent.behaviours;
 
 /**
  * @file CheckForModules.java
@@ -30,8 +30,8 @@ package hardwareAgent.behaviours;
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-import behaviours.ReceiveBehaviour;
-import hardwareAgent.HardwareAgent;
+import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.hardwareAgent.HardwareAgent;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;

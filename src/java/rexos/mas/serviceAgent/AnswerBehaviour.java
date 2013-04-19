@@ -1,4 +1,4 @@
-package serviceAgent;
+package rexos.mas.serviceAgent;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -8,9 +8,9 @@ import jade.lang.acl.UnreadableException;
 
 import java.io.IOException;
 
-import newDataClasses.ScheduleData;
-import nl.hu.client.GeneralMongoException;
-import nl.hu.client.InvalidDBNamespaceException;
+import rexos.mas.newDataClasses.ScheduleData;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 
 import org.bson.types.ObjectId;
 
