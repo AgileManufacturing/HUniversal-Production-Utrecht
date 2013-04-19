@@ -164,8 +164,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 						answer.setConversationId(conversationId);
 						answer.setOntology("GetTransportDuration");
 
-						long[] inputParts = (long[]) productStep
-								.get("inputParts");
+						long[] inputParts = (long[]) productStep.get("inputParts");
 						answer.setContentObject(inputParts);
 
 						agent.send(answer);
@@ -180,8 +179,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 					scheduleData.put("duration", duration);
 					productionStepBlackBoard.updateDocuments(new BasicDBObject(
 							"_id", serviceStep.get("productStepId")),
-							new BasicDBObject("$set", new BasicDBObject(
-									"scheduleData", scheduleData)));
+							new BasicDBObject("$set", new BasicDBObject("scheduleData", scheduleData)));
 
 					System.out.format(
 							"Saving duration of %d in prod. step %s%n",

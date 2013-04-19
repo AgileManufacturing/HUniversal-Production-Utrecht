@@ -77,22 +77,6 @@ public class ScheduleData implements Serializable {
 	public void setDeadline(long deadline) {
 		this.deadline = deadline;
 	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if(obj == null)
-			return false;
-		if(obj == this)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ScheduleData other = (ScheduleData) obj;
-		return	startTime == other.startTime &&
-				duration == other.duration &&
-				deadline == other.deadline;
-	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -115,6 +99,40 @@ public class ScheduleData implements Serializable {
 		data.put("startTime", startTime);
 		data.put("duration", duration);
 		data.put("deadline", deadline);
-		return new BasicDBObject("scheduleData", data);
+		return data;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (deadline ^ (deadline >>> 32));
+		result = prime * result + (int) (duration ^ (duration >>> 32));
+		result = prime * result + (int) (startTime ^ (startTime >>> 32));
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ScheduleData other = (ScheduleData) obj;
+		if (deadline != other.deadline)
+			return false;
+		if (duration != other.duration)
+			return false;
+		if (startTime != other.startTime)
+			return false;
+		return true;
 	}
 }

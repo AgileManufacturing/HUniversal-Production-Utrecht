@@ -117,8 +117,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 			try {
 				// TODO: get inputParts
 				ProductStepMessage entry = new ProductStepMessage(message.getSender(), productStep.getCapability(),
-						productStep.getParameterListAsDBObject(), null, null,
-						proStepC.getParameterList(), new long[0], 0l,
+						productStep.getParameterListAsDBObject(), new long[0], 0l,
 						StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
 				productStepEntryId = equipletBBClient.insertDocument(gson.toJson(entry));	
 				equipletAgent.addCommunicationRelation(message.getConversationId(), productStepEntryId);
