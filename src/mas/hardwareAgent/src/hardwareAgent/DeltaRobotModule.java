@@ -1,8 +1,8 @@
 
 
 /**
- * @file HardwareAgent.java
- * @brief Provides the data for the gripepermodule.
+ * @file DeltaRobotModule.java
+ * @brief Provides a deltaRobotModule.
  * @date Created: 12-04-13
  *
  * @author Thierry Gerritse
@@ -29,17 +29,29 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
+
 package hardwareAgent;
 
 import com.mongodb.BasicDBObject;
 
 public class DeltaRobotModule implements Module {
 	
+	public DeltaRobotModule(){
+	}
+	
 	@Override
 	public EquipletStepMessage[] getEquipletSteps(BasicDBObject parameters) {
-		
 		// TODO Auto-generated method stub
-		return null;
-	}
+		//return null;
+		
+		TimeData td = new TimeData(2l);
+		
+		EquipletStepMessage esm = new EquipletStepMessage(null, 1l, 2l, td);
+		
+		EquipletStepMessage[] dummyData = {esm};
+		
+		return dummyData;
+		
+	}	
 
 }

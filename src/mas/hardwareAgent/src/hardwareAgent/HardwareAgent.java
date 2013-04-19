@@ -111,7 +111,9 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 		
 		// for now: use precompiled grippermodule class
 		GripperModule gp = new GripperModule();
-		RegisterModule(3l, gp);
+		RegisterModule(1l, gp);
+		DeltaRobotModule drm = new DeltaRobotModule();
+		RegisterModule(2l, drm);
 		///
 		
 		
