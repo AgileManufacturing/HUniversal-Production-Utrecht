@@ -1,12 +1,8 @@
 package newDataClasses;
 
-import java.io.Serializable;
+import com.mongodb.BasicDBObject;
 
-public class DbData implements Serializable{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class DbData implements IMongoSaveable {
 	public String ip;
 	public int port;
 	public String name;
@@ -16,9 +12,23 @@ public class DbData implements Serializable{
 		this.port = port;
 		this.name = name;
 	}
+	
+	public DbData(BasicDBObject dbData){
+		fromBasicDBObject(dbData);
+	}
 
 	@Override
-	public String toString() {
-		return String.format("DbData [ip=%s, port=%s, name=%s]", ip, port, name);
+	public void fromBasicDBObject(BasicDBObject dbData){
+		this.ip = dbData.getString("ip");
+		this.port = dbData.getInt("port");
+		this.name = dbData.getString("name");
+	}
+	
+	@Override
+	public BasicDBObject toBasicDBObject(){
+		BasicDBObject dbData = new BasicDBObject("ip", ip);
+		dbData.put("port", port);
+		dbData.put("name", name);
+		return dbData;
 	}
 }

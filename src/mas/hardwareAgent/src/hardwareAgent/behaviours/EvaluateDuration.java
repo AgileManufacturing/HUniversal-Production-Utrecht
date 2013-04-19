@@ -107,18 +107,18 @@ public class EvaluateDuration extends ReceiveBehaviour {
 			
 			EquipletStepMessage[] equipletSteps = module.getEquipletSteps(parameters);
 			
-//			long stepDuration = 0l;
-			long stepDuration = 10l;
+			long stepDuration = 0l;
+			//long stepDuration = 10l;
 			
-//			for(EquipletStepMessage equipletStep : equipletSteps){
-//				
-//				TimeData td = equipletStep.timeData;
-//				stepDuration += td.getDuration();
-//				
-//			}
+			for(EquipletStepMessage equipletStep : equipletSteps){
+				
+				TimeData td = equipletStep.timeData;
+				stepDuration += td.getDuration();
+				
+			}
 			
 			ScheduleData schedule = new ScheduleData();
-			schedule.fillWithBasicDBObject(((BasicDBObject) serviceStep.get("scheduleData")));
+			schedule.fromBasicDBObject(((BasicDBObject) serviceStep.get("scheduleData")));
 			schedule.setDuration(stepDuration);
 
 			hardwareAgent.getServiceStepsBBClient().updateDocuments(

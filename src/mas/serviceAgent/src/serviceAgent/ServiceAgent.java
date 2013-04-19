@@ -6,7 +6,7 @@ import java.util.HashMap;
 import org.bson.types.ObjectId;
 
 import serviceAgent.behaviour.CanDoProductStep;
-import serviceAgent.behaviour.GetProductDuration;
+import serviceAgent.behaviour.GetProductionDuration;
 import jade.core.AID;
 import jade.core.Agent;
 import com.mongodb.*;
@@ -71,7 +71,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		// create serviceFactory
 		// addBehaviour(new AnswerBehaviour(this));
 		addBehaviour(new CanDoProductStep(this, productionStepBBClient));
-		addBehaviour(new GetProductDuration(this, productionStepBBClient,
+		addBehaviour(new GetProductionDuration(this, productionStepBBClient,
 				serviceStepBBClient));
 
 		// receive behaviours from EA
@@ -91,7 +91,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			
 			BasicDBObject failData = new BasicDBObject("source", "service agent");
 			failData.put("reason", "died");
-			BasicDBObject update = new BasicDBObject("status", StepStatusCode.FAILED);
+			BasicDBObject update = new BasicDBObject("status", StepStatusCode.FAILED.name());
 			update.put("statusData", failData);
 			productionStepBBClient.updateDocuments(
 					new BasicDBObject(),
@@ -127,7 +127,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 				BasicDBObject productionStep = (BasicDBObject) productionStepBBClient.findDocumentById(entry.getTargetObjectId());
 				switch (operation) {
 				case INSERT:
-					// addBehaviour(new GetProductDuration(this,
+					// addBehaviour(new GetProductionDuration(this,
 					// productionStep));
 					break;
 				case UPDATE:

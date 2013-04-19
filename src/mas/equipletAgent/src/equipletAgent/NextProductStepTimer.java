@@ -12,7 +12,6 @@ import nl.hu.client.InvalidDBNamespaceException;
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 
 public class NextProductStepTimer extends Timer{
 	EquipletAgent equipletAgent;
@@ -63,7 +62,7 @@ public class NextProductStepTimer extends Timer{
 				ObjectId productStepEntry = equipletAgent.getNextProductStep();
 				String conversationId = equipletAgent.getConversationId(productStepEntry);
 				BasicDBObject productStep = (BasicDBObject)equipletAgent.getEquipletBBClient().findDocumentById(productStepEntry);
-				AID productAgent = new AID((String)((DBObject)productStep.get("productAgentId")).get("name"), AID.ISGUID);
+				AID productAgent = new AID((String)productStep.get("productAgentId"), AID.ISGUID);
 
 				ACLMessage answer = new ACLMessage(ACLMessage.QUERY_IF);
 				answer.setConversationId(conversationId);

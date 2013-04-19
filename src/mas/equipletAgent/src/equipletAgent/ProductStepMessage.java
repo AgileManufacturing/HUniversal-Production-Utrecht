@@ -29,21 +29,15 @@
  **/
 package equipletAgent;
 
-import java.io.Serializable;
 import com.mongodb.BasicDBObject;
 import jade.core.AID;
+import newDataClasses.IMongoSaveable;
 import newDataClasses.ScheduleData;
 
 /**
  * Implementation of a message for the productstep blackboard
  */
-public class ProductStepMessage implements Serializable{
-	/**
-	 * @var static final long serialVersionUID
-	 * The serial version uid for this class.
-	 */
-	private static final long serialVersionUID = 1L;
-	
+public class ProductStepMessage implements IMongoSaveable {
 	/**
 	 * @var AID productAgentId
 	 * The AID of the productAgent linked to this product step.
@@ -66,13 +60,13 @@ public class ProductStepMessage implements Serializable{
 	 * @var Object inputParts
 	 * The input parts needed for this product step.
 	 */
-	private Object inputParts;
+	private long[] inputParts;
 	
 	/**
-	 * @var Object outputParts
+	 * @var long outputPart
 	 * The result parts for this product step.
 	 */
-	private Object outputParts;
+	private long outputPart;
 	
 	/**
 	 * @var StepStatusCode status
@@ -99,24 +93,28 @@ public class ProductStepMessage implements Serializable{
 	 * @param type - The type of the product step
 	 * @param parameters - The parameters for the product step
 	 * @param inputParts - The input parts for the product step
-	 * @param outputParts - The output parts for the product step
+	 * @param outputPart - The output parts for the product step
 	 * @param status - The status for the product step
 	 * @param statusData - The additional data for the status
 	 * @param scheduleData - The schedule data
 	 */
 	public ProductStepMessage(AID productAgentId, long type,
-			BasicDBObject parameters, Object inputParts, Object outputParts,
+			BasicDBObject parameters, long[] inputParts, long outputPart,
 			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
 		this.productAgentId = productAgentId;
 		this.type = type;
 		this.parameters = parameters;
 		this.inputParts = inputParts;
-		this.outputParts = outputParts;
+		this.outputPart = outputPart;
 		this.status = status;
 		this.statusData = statusData;
 		this.scheduleData = scheduleData;
 	}
 
+	public ProductStepMessage(BasicDBObject object){
+		fromBasicDBObject(object);
+	}
+	
 	/**
 	 * Function to check if this productstep equals to another object.
 	 * 
@@ -137,10 +135,18 @@ public class ProductStepMessage implements Serializable{
 				&& type == other.type
 				&& parameters.equals(other.parameters)
 				&& inputParts.equals(other.inputParts)
-				&& outputParts.equals(other.outputParts)
+				&& outputPart == other.outputPart
 				&& status == other.status
 				&& statusData.equals(other.statusData)
 				&& scheduleData.equals(other.scheduleData);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 
 	/**
@@ -188,29 +194,29 @@ public class ProductStepMessage implements Serializable{
 	/**
 	 * @return the inputParts
 	 */
-	public Object getInputParts() {
+	public long[] getInputParts() {
 		return inputParts;
 	}
 
 	/**
 	 * @param inputParts the inputParts to set
 	 */
-	public void setInputParts(Object inputParts) {
+	public void setInputParts(long[] inputParts) {
 		this.inputParts = inputParts;
 	}
 
 	/**
-	 * @return the outputParts
+	 * @return the outputPart
 	 */
-	public Object getOutputParts() {
-		return outputParts;
+	public long getOutputPart() {
+		return outputPart;
 	}
 
 	/**
-	 * @param outputParts the outputParts to set
+	 * @param outputPart the outputPart to set
 	 */
-	public void setOutputParts(Object outputParts) {
-		this.outputParts = outputParts;
+	public void setOutputParts(long outputPart) {
+		this.outputPart = outputPart;
 	}
 
 	/**
@@ -253,5 +259,41 @@ public class ProductStepMessage implements Serializable{
 	 */
 	public void setScheduleData(ScheduleData scheduleData) {
 		this.scheduleData = scheduleData;
+	}
+
+	@Override
+	public BasicDBObject toBasicDBObject() {
+		BasicDBObject object = new BasicDBObject();
+		object.put("productAgentId", this.productAgentId.getName());
+		object.put("type", this.type);
+		object.put("parameters", parameters);
+		object.put("inputParts", this.inputParts);
+		object.put("outputPart", this.outputPart);
+		object.put("status", this.status.toString());
+		object.put("statusData", this.statusData);
+		object.put("scheduleDat", this.scheduleData.toBasicDBObject());
+		return object;
+	}
+
+	@Override
+	public void fromBasicDBObject(BasicDBObject object) {
+		this.productAgentId = new AID((String)(object.get("AID")), jade.core.AID.ISGUID);
+		this.type = object.getLong("type");
+		this.parameters = (BasicDBObject)object.get("parameters");
+		this.inputParts = (long[]) object.get("inputParts");
+		this.outputPart = object.getLong("outputPart", -1l);
+		this.status = StepStatusCode.valueOf(object.getString("status"));
+		
+		if(object.containsField("statusData")){
+			this.statusData = (BasicDBObject) object.get(statusData);
+		}else{
+			this.statusData = new BasicDBObject();
+		}
+		if(object.containsField("scheduleData")){
+			this.scheduleData = new ScheduleData((BasicDBObject)object.get("scheduleData"));
+		}else{
+			this.scheduleData = new ScheduleData();
+		}
+		
 	}
 }

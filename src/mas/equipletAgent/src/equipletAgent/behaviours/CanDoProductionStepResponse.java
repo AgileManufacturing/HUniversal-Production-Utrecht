@@ -29,19 +29,20 @@
  **/
 package equipletAgent.behaviours;
 
-import nl.hu.client.BlackboardClient;
-
-import org.bson.types.ObjectId;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-
-import equipletAgent.StepStatusCode;
-import equipletAgent.EquipletAgent;
-import behaviours.ReceiveBehaviour;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import nl.hu.client.BlackboardClient;
+
+import org.bson.types.ObjectId;
+
+import behaviours.ReceiveBehaviour;
+
+import com.mongodb.BasicDBObject;
+
+import equipletAgent.EquipletAgent;
+import equipletAgent.ProductStepMessage;
 
 /**
  * The Class CanDoProductionStepResponse.
@@ -90,25 +91,20 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour {
 
 		ObjectId productStepEntryId = equipletAgent.getRelatedObjectId(message.getConversationId());
 		try {
-			BasicDBObject productStep = (BasicDBObject) equipletBBClient.findDocumentById(productStepEntryId);
-			StepStatusCode status = StepStatusCode.valueOf(productStep.getString("status"));
-			AID productAgent = new AID((String)((DBObject)productStep.get("productAgentId")).get("name"), AID.ISGUID);
-			ACLMessage responseMessage = new ACLMessage(ACLMessage.CONFIRM);
+			ProductStepMessage productStep = new ProductStepMessage((BasicDBObject) equipletBBClient.findDocumentById(productStepEntryId));
+			AID productAgent = productStep.getProductAgentId();
+			ACLMessage responseMessage = new ACLMessage(message.getPerformative());
 			responseMessage.setConversationId(message.getConversationId());
 			responseMessage.setOntology("CanPerformStep");
 			responseMessage.addReceiver(productAgent);
-			switch(status){
-			case EVALUATING:
-				myAgent.send(responseMessage);
+			switch(message.getPerformative()){
+			case ACLMessage.DISCONFIRM:
+				equipletBBClient.removeDocuments(new BasicDBObject("_id", productStepEntryId));
 				break;
-			case ABORTED:
-				responseMessage.setPerformative(ACLMessage.DISCONFIRM);
-				myAgent.send(responseMessage);
-				break;
-				//$CASES-OMITTED$
 			default:
 				break;
 			}
+			myAgent.send(responseMessage);
 		} catch (Exception e) {
 			// TODO: ERROR HANDLING
 			e.printStackTrace();

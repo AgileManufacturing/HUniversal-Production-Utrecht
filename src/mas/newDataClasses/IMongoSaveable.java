@@ -1,14 +1,14 @@
 /**
- * @file LogMessage.java
- * @brief Provides the logging for messages.
- * @date Created: 12-04-13
+ * @file IMongoSaveable.java
+ * @brief 
+ * @date Created: 19 apr. 2013
  *
- * @author Theodoor
- * 
+ * @author Peter Bonnema
+ *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright � 2013, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,73 +26,24 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  **/
 package newDataClasses;
 
-public class LogMessage {
+import com.mongodb.BasicDBObject;
+
+/**
+ * @author Peter
+ *
+ */
+public interface IMongoSaveable {
 	/**
-	 * @param id
-	 * @param time
-	 * @param message
-	 * @param state
+	 * @return
 	 */
-	public LogMessage(String id, String time, String message, String state) {
-		super();
-		this.id = id;
-		this.time = time;
-		this.message = message;
-		this.state = state;
-	}
-	private String id;
+	public BasicDBObject toBasicDBObject();
+	
 	/**
-	 * @return the id
+	 * @return
 	 */
-	public String getId() {
-		return id;
-	}
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
-	/**
-	 * @return the time
-	 */
-	public String getTime() {
-		return time;
-	}
-	/**
-	 * @param time the time to set
-	 */
-	public void setTime(String time) {
-		this.time = time;
-	}
-	/**
-	 * @return the message
-	 */
-	public String getMessage() {
-		return message;
-	}
-	/**
-	 * @param message the message to set
-	 */
-	public void setMessage(String message) {
-		this.message = message;
-	}
-	/**
-	 * @return the state
-	 */
-	public String getState() {
-		return state;
-	}
-	/**
-	 * @param state the state to set
-	 */
-	public void setState(String state) {
-		this.state = state;
-	}
-	private String time;
-	private String message;
-	private String state;
+	public void fromBasicDBObject(BasicDBObject object);
 }

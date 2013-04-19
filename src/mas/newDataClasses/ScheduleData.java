@@ -1,8 +1,7 @@
 package newDataClasses;
 
-import java.io.Serializable;
-
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 
 /**
  * Instances of this class contain schedule data with the start time, duration and the deadline of a <code>ProductionStep</code> in timeslots.
@@ -10,9 +9,7 @@ import com.mongodb.BasicDBObject;
  * @author Peter Bonnema
  *
  */
-public class ScheduleData implements Serializable {
-	private static final long serialVersionUID = 9026243337206679739L;
-	
+public class ScheduleData implements IMongoSaveable {
 	private long startTime;
 	private long duration;
 	private long deadline;
@@ -21,6 +18,13 @@ public class ScheduleData implements Serializable {
 	 * Creates a new <code>ScheduleData</code> leaving <code>startTime</code>, <code>duration</code> and <code>deadline</code> uninitialized.
 	 */
 	public ScheduleData() {
+	}
+	
+	/**
+	 * @param object
+	 */
+	public ScheduleData(BasicDBObject object) {
+		fromBasicDBObject(object);
 	}
 
 	/**
@@ -77,22 +81,6 @@ public class ScheduleData implements Serializable {
 	public void setDeadline(long deadline) {
 		this.deadline = deadline;
 	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if(obj == null)
-			return false;
-		if(obj == this)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ScheduleData other = (ScheduleData) obj;
-		return	startTime == other.startTime &&
-				duration == other.duration &&
-				deadline == other.deadline;
-	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -103,18 +91,56 @@ public class ScheduleData implements Serializable {
 				"ScheduleData [startTime=%s, duration=%s, deadline=%s]",
 				startTime, duration, deadline);
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (deadline ^ (deadline >>> 32));
+		result = prime * result + (int) (duration ^ (duration >>> 32));
+		result = prime * result + (int) (startTime ^ (startTime >>> 32));
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ScheduleData other = (ScheduleData) obj;
+		if (deadline != other.deadline)
+			return false;
+		if (duration != other.duration)
+			return false;
+		if (startTime != other.startTime)
+			return false;
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see newDataClasses.IMongoSaveable#ToBasicDBObject()
+	 */
+	@Override
+	public BasicDBObject toBasicDBObject() {
+		return (BasicDBObject) BasicDBObjectBuilder.start()
+				.add("startTime", startTime)
+				.add("duration", duration)
+				.add("deadline", deadline).get();
+	}
 	
-	public void fillWithBasicDBObject(BasicDBObject object) {
+	@Override
+	public void fromBasicDBObject(BasicDBObject object) {
 		this.startTime = object.getLong("startTime");
 		this.duration = object.getLong("duration");
 		this.deadline = object.getLong("deadline");
-	}
-	
-	public BasicDBObject toBasicDBObject() {
-		BasicDBObject data = new BasicDBObject();
-		data.put("startTime", startTime);
-		data.put("duration", duration);
-		data.put("deadline", deadline);
-		return new BasicDBObject("scheduleData", data);
 	}
 }
