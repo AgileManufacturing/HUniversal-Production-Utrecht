@@ -40,9 +40,9 @@ import nl.hu.client.InvalidDBNamespaceException;
 import behaviours.ReceiveBehaviour;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 
 import equipletAgent.NextProductStepTimer;
+import equipletAgent.ProductStepMessage;
 import equipletAgent.StepStatusCode;
 import equipletAgent.EquipletAgent;
 import jade.core.Agent;
@@ -117,8 +117,8 @@ public class StartStep extends ReceiveBehaviour {
 		try {
 			BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED);
 			query.put("$order_by", new BasicDBObject("scheduleData", new BasicDBObject("startTime", "-1")));
-			DBObject nextProductStep = equipletBBClient.findDocuments(query).get(0);
-			ScheduleData scheduleData = (ScheduleData) nextProductStep.get("scheduleData");
+			ProductStepMessage nextProductStep = new ProductStepMessage((BasicDBObject)equipletBBClient.findDocuments(query).get(0));
+			ScheduleData scheduleData = nextProductStep.getScheduleData();
 			if (scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
 				timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 			}
