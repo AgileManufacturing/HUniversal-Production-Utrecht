@@ -98,8 +98,7 @@ public class CheckForModules extends ReceiveBehaviour {
 				for( long CO : contentObject){
 					if(hardwareAgent.GetModuleById(CO)== null){
 					
-						modulesPresent = false;
-					
+						modulesPresent = false;					
 					}
 				}
 								
@@ -110,6 +109,8 @@ public class CheckForModules extends ReceiveBehaviour {
 				} else {
 					reply.setPerformative(ACLMessage.DISCONFIRM);
 				}
+				
+				reply.setOntology("CheckForModulesResponce");
 				myAgent.send(reply);
 
 				/** checks in knowledge database if the requested modules
