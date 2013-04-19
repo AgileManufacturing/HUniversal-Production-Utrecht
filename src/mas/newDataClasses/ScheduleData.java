@@ -42,10 +42,10 @@ public class ScheduleData implements IMongoSaveable {
 	}
 
 	/* (non-Javadoc)
-	 * @see newDataClasses.DBSaveable#ToBasicDBObject()
+	 * @see newDataClasses.DBSaveable#toBasicDBObject()
 	 */
 	@Override
-	public BasicDBObject ToBasicDBObject() {
+	public BasicDBObject toBasicDBObject() {
 		return (BasicDBObject) BasicDBObjectBuilder.start()
 				.add("startTime", startTime)
 				.add("duration", duration)
@@ -53,10 +53,10 @@ public class ScheduleData implements IMongoSaveable {
 	}
 
 	/* (non-Javadoc)
-	 * @see newDataClasses.DBSaveable#FromBasicDBObject(com.mongodb.BasicDBObject)
+	 * @see newDataClasses.DBSaveable#fromBasicDBObject(com.mongodb.BasicDBObject)
 	 */
 	@Override
-	public void FromBasicDBObject(BasicDBObject object) {
+	public void fromBasicDBObject(BasicDBObject object) {
 		this.startTime = object.getLong("startTime", -1);
 		this.duration = object.getLong("duration", -1);
 		this.deadline = object.getLong("deadline", -1);

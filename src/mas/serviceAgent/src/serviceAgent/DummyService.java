@@ -75,7 +75,7 @@ public class DummyService implements Service {
 				.add("parameters", parameters)
 				.add("status", StepStatusCode.EVALUATING.name())
 				.add("statusData", new BasicDBObject("status", "dummy status"))
-				.add("scheduleData", new ScheduleData().ToBasicDBObject()).get();
+				.add("scheduleData", new ScheduleData().toBasicDBObject()).get();
 
 		return new BasicDBObject[] { service };
 	}

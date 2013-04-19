@@ -69,14 +69,14 @@ public class ServiceStepMessage implements IMongoSaveable {
 	}
 
 	public ServiceStepMessage(BasicDBObject object) {
-		FromBasicDBObject(object);
+		fromBasicDBObject(object);
 	}
 
 	/* (non-Javadoc)
-	 * @see newDataClasses.DBSaveable#ToBasicDBObject()
+	 * @see newDataClasses.DBSaveable#toBasicDBObject()
 	 */
 	@Override
-	public BasicDBObject ToBasicDBObject() {
+	public BasicDBObject toBasicDBObject() {
 		return (BasicDBObject) BasicDBObjectBuilder.start()
 				.add("productStepId", productStepId)
 				.add("serviceName", serviceName)
@@ -84,14 +84,14 @@ public class ServiceStepMessage implements IMongoSaveable {
 				.add("parameters", parameters)
 				.add("status", status.name())
 				.add("statusData", statusData)
-				.add("scheduleData", scheduleData.ToBasicDBObject()).get();
+				.add("scheduleData", scheduleData.toBasicDBObject()).get();
 	}
 
 	/* (non-Javadoc)
-	 * @see newDataClasses.DBSaveable#FromBasicDBObject(com.mongodb.BasicDBObject)
+	 * @see newDataClasses.DBSaveable#fromBasicDBObject(com.mongodb.BasicDBObject)
 	 */
 	@Override
-	public void FromBasicDBObject(BasicDBObject object) {
+	public void fromBasicDBObject(BasicDBObject object) {
 		productStepId = object.getObjectId("productStepId", null);
 		serviceName = object.getString("serviceName", null);
 		type = object.getLong("type", -1l);

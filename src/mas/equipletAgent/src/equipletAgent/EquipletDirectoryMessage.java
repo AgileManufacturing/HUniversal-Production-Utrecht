@@ -37,7 +37,7 @@ import com.mongodb.BasicDBObject;
 import newDataClasses.DbData;
 import newDataClasses.IMongoSaveable;
 
-public class EquipletDirectoryMessage implements IMongoSaveable{
+public class EquipletDirectoryMessage implements IMongoSaveable {
 	/**
 	 * @var AID AID
 	 * The AID of the equipletAgent

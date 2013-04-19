@@ -13,12 +13,16 @@ public class DbData implements IMongoSaveable {
 		this.port = port;
 		this.name = name;
 	}
+	
+	public DbData(BasicDBObject object){
+		fromBasicDBObject(object);
+	}
 
 	/* (non-Javadoc)
-	 * @see newDataClasses.DBSaveable#ToBasicDBObject()
+	 * @see newDataClasses.DBSaveable#toBasicDBObject()
 	 */
 	@Override
-	public BasicDBObject ToBasicDBObject() {
+	public BasicDBObject toBasicDBObject() {
 		return (BasicDBObject) BasicDBObjectBuilder.start()
 				.add("ip", ip)
 				.add("port", port)
@@ -26,10 +30,10 @@ public class DbData implements IMongoSaveable {
 	}
 
 	/* (non-Javadoc)
-	 * @see newDataClasses.DBSaveable#FromBasicDBObject(com.mongodb.BasicDBObject)
+	 * @see newDataClasses.DBSaveable#fromBasicDBObject(com.mongodb.BasicDBObject)
 	 */
 	@Override
-	public void FromBasicDBObject(BasicDBObject object) {
+	public void fromBasicDBObject(BasicDBObject object) {
 		ip = object.getString("ip", null);
 		port = object.getInt("port", -1);
 		name = object.getString("name", null);
