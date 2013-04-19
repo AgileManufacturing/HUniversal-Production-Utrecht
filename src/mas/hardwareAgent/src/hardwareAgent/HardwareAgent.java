@@ -57,9 +57,9 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 	private DbData dbData;
 	private HashMap<Long,Module> ModulesMap;
 		
-	public void RegisterModule(long name,Module module){
+	public void RegisterModule(long id,Module module){
 		
-		this.ModulesMap.put(name, module);
+		this.ModulesMap.put(id, module);
 		
 	}
 	
@@ -72,6 +72,8 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 	@Override
 	public void setup() {
 		System.out.println("Hardware agent "+ this +" reporting.");
+		
+		ModulesMap = new HashMap<Long, Module>();
 
 		// TODO fill in host, database and collection
 		Object[] args = getArguments();
