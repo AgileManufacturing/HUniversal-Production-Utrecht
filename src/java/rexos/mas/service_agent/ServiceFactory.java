@@ -27,27 +27,53 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package rexos.mas.service_agent;
+package serviceAgent;
 
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Hashtable;
+
+import rexos.libraries.dynamicloader.DynamicClassDescription;
+import rexos.libraries.dynamicloader.DynamicClassFactory;
+import rexos.libraries.knowledge.Row;
+import rexos.libraries.knowledge.KnowledgeDBClient;
+import rexos.libraries.knowledge.Queries;
+
+import jade.core.AID;
 
 /**
  * 
  **/
 public class ServiceFactory {
-	private Hashtable<Integer, Service> serviceCache;
+	private DynamicClassFactory<Service>factory;
+	private Hashtable<Long, Service> serviceCache;
 	private String equipletAID;
 	
 	public ServiceFactory(String equipletAID) {
 		this.equipletAID = equipletAID;
+		serviceCache = new Hashtable<Long, Service>();
+		this.factory = new DynamicClassFactory<Service>(Service.class);
 	}
 	
 	private Service	getServiceByServiceID(int serviceID) {
-		if (serviceCache.containsKey(serviceID)) {
-			
+		Service service = null;
+		KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
+		try {
+			ResultSet rs = knowledgeClient.executeSelectQuery("SELECT * FROM software WHERE id=5");
+			if (rs.next()) {
+				Row row = new Row(rs);
+				DynamicClassDescription description = DynamicClassDescription.createFromRow(row);
+				service = factory.createNewObjectIfOutdated(description, serviceCache.get(description.getId()));
+				serviceCache.put(description.getId(), service);
+			}
+		} catch (Exception e) {
+			//TODO: Do something useful.
+			e.printStackTrace();
 		}
 		
-		return null;
+		return service;
 	}
 	
 	public Service[] getServicesForStep(long stepType) {
@@ -72,6 +98,6 @@ public class ServiceFactory {
 //			e.printStackTrace();
 //		}
 		
-		return new Service[]{new DummyService()};
+		return new Service[]{getServiceByServiceID(1)};
 	}
 }
