@@ -30,13 +30,9 @@ package hardwareAgent.behaviours;
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import hardwareAgent.EquipletStepMessage;
 import hardwareAgent.HardwareAgent;
 import hardwareAgent.Module;
-import hardwareAgent.TimeData;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -46,9 +42,6 @@ import nl.hu.client.InvalidDBNamespaceException;
 
 import org.bson.types.ObjectId;
 
-import rexos.libraries.knowledge.KnowledgeDBClient;
-import rexos.libraries.knowledge.Queries;
-import rexos.libraries.knowledge.Row;
 import serviceAgent.ServiceStepMessage;
 
 import behaviours.ReceiveBehaviour;
@@ -60,9 +53,10 @@ import newDataClasses.*;
 public class EvaluateDuration extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("GetServiceStepDuration");
+	private static MessageTemplate messageTemplate = MessageTemplate
+			.MatchOntology("GetServiceStepDuration");
 	private HardwareAgent hardwareAgent;
-	
+
 	public EvaluateDuration(Agent a) {
 		super(a, -1, messageTemplate);
 		hardwareAgent = (HardwareAgent) a;
@@ -70,60 +64,62 @@ public class EvaluateDuration extends ReceiveBehaviour {
 
 	@Override
 	public void handle(ACLMessage message) {
-		Object contentObject = null;
-		String contentString = message.getContent();
+		long[] moduleIds = null;
 
 		try {
-			contentObject = message.getContentObject();
+			moduleIds = (long[]) message.getContentObject();
 		} catch (UnreadableException e) {
 			// System.out.println("Exception Caught, No Content Object Given");
 		}
-		System.out.format("%s received message from %s (%s:%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
+		System.out.format("%s received message from %s (%s:%s)%n", myAgent
+				.getLocalName(), message.getSender().getLocalName(), message
+				.getOntology(), moduleIds);
 
 		try {
 			ObjectId objectId = null;
-			BasicDBObject serviceStep = null;
+			ServiceStepMessage serviceStep = null;
 			try {
 				objectId = (ObjectId) message.getContentObject();
-				serviceStep = (BasicDBObject) hardwareAgent.getServiceStepsBBClient().findDocumentById(objectId);
+				serviceStep = new ServiceStepMessage(
+						(BasicDBObject) hardwareAgent.getServiceStepsBBClient()
+								.findDocumentById(objectId));
 			} catch (UnreadableException | InvalidDBNamespaceException e) {
 				e.printStackTrace();
 				myAgent.doDelete();
 			}
-			
-			long stepType = serviceStep.getLong("type");
-			BasicDBObject parameters = (BasicDBObject) serviceStep.get("parameters");
-			
-			String serviceName = serviceStep.getString("serviceName");
-						
+
+			long stepType = serviceStep.getType();
+			BasicDBObject parameters = serviceStep.getParameters();
+
+			String serviceName = serviceStep.getServiceName();
+
 			/**
-			 * haal de naam van de leidende module uit knowledge db aan de hand van de servicestep.service (ofzo)
+			 * haal de naam van de leidende module uit knowledge db aan de hand
+			 * van de servicestep.service (ofzo)
 			 * 
 			 * String moduleName = iets vanuit de modulefactory geloof ik?
 			 * 
 			 */
-			
-			Module module = hardwareAgent.GetModuleById(3l);		
-			
-			EquipletStepMessage[] equipletSteps = module.getEquipletSteps(parameters);
-			
+
+
 			long stepDuration = 0l;
-			//long stepDuration = 10l;
-			
-			for(EquipletStepMessage equipletStep : equipletSteps){
-				
-				TimeData td = equipletStep.timeData;
-				stepDuration += td.getDuration();
-				
+			EquipletStepMessage[] equipletSteps;
+			Module module;
+			for (long moduleId : moduleIds) {
+				module = hardwareAgent.GetModuleById(moduleId);
+				equipletSteps = module.getEquipletSteps(parameters);
+				for (EquipletStepMessage equipletStep : equipletSteps) {
+					stepDuration += equipletStep.getTimeData().getDuration();
+				}
 			}
-			
-			ScheduleData schedule = new ScheduleData();
-			schedule.fromBasicDBObject(((BasicDBObject) serviceStep.get("scheduleData")));
+
+			ScheduleData schedule = serviceStep.getScheduleData();
 			schedule.setDuration(stepDuration);
 
 			hardwareAgent.getServiceStepsBBClient().updateDocuments(
-					new BasicDBObject("_id", objectId), 
-					new BasicDBObject("$set", schedule.toBasicDBObject()));
+					new BasicDBObject("_id", objectId),
+					new BasicDBObject("$set", new BasicDBObject("scheduleData",
+							schedule.toBasicDBObject())));
 			// plaats equipletsteps en hun duration en zijn status op eveluating
 			// op bb,
 
