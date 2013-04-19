@@ -12,7 +12,6 @@ import nl.hu.client.InvalidDBNamespaceException;
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 
 public class NextProductStepTimer extends Timer{
 	EquipletAgent equipletAgent;

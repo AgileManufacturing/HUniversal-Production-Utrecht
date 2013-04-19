@@ -111,6 +111,10 @@ public class ProductStepMessage implements IMongoSaveable {
 		this.scheduleData = scheduleData;
 	}
 
+	public ProductStepMessage(BasicDBObject object){
+		fromBasicDBObject(object);
+	}
+	
 	/**
 	 * Function to check if this productstep equals to another object.
 	 * 
@@ -277,11 +281,7 @@ public class ProductStepMessage implements IMongoSaveable {
 		this.type = object.getLong("type");
 		this.parameters = (BasicDBObject)object.get("parameters");
 		this.inputParts = (long[]) object.get("inputParts");
-		if(object.containsField("outputPart")){
-			this.outputPart = object.getLong("outputPart");
-		}else{
-			this.outputPart = -1l;
-		}
+		this.outputPart = object.getLong("outputPart", -1l);
 		this.status = StepStatusCode.valueOf(object.getString("status"));
 		
 		if(object.containsField("statusData")){

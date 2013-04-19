@@ -7,8 +7,8 @@ import org.bson.types.ObjectId;
 import behaviours.ReceiveBehaviour;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import equipletAgent.EquipletAgent;
+import equipletAgent.ProductStepMessage;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
@@ -52,14 +52,13 @@ public class ProductionDurationResponse extends ReceiveBehaviour {
 
 		try {
 			ObjectId id = equipletAgent.getRelatedObjectId(message.getConversationId());
-			DBObject productStep = equipletBBClient.findDocumentById(id);
+			ProductStepMessage productStep = new ProductStepMessage((BasicDBObject)equipletBBClient.findDocumentById(id));
 
-			ScheduleData schedule = new ScheduleData(); 
-			schedule.fromBasicDBObject(((BasicDBObject)productStep.get("scheduleData")));
+			ScheduleData schedule = productStep.getScheduleData();
 			System.out.println(schedule.getDuration() + "");
 			
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
-			AID productAgent = new AID((String)productStep.get("productAgentId"), AID.ISGUID);
+			AID productAgent = productStep.getProductAgentId();
 			responseMessage.addReceiver(productAgent);
 			responseMessage.setOntology("ProductionDuration");
 			responseMessage.setConversationId(message.getConversationId());
