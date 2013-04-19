@@ -57,16 +57,12 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 	private DbData dbData;
 	private HashMap<Long,Module> ModulesMap;
 		
-	public void RegisterModule(long id,Module module){
-		
+	public void RegisterModule(long id,Module module) {
 		this.ModulesMap.put(id, module);
-		
 	}
 	
-	public Module GetModuleById(long id)throws Exception{
-						
+	public Module GetModuleById(long id) {
 		return this.ModulesMap.get(id);
-		
 	}
 	
 	@Override

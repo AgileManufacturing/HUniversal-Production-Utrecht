@@ -30,12 +30,6 @@ package hardwareAgent.behaviours;
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import rexos.libraries.knowledge.KnowledgeDBClient;
-import rexos.libraries.knowledge.Queries;
-import rexos.libraries.knowledge.Row;
 import behaviours.ReceiveBehaviour;
 import hardwareAgent.HardwareAgent;
 
@@ -110,7 +104,7 @@ public class CheckForModules extends ReceiveBehaviour {
 					reply.setPerformative(ACLMessage.DISCONFIRM);
 				}
 				
-				reply.setOntology("CheckForModulesResponce");
+				reply.setOntology("CheckForModulesResponse");
 				myAgent.send(reply);
 
 				/** checks in knowledge database if the requested modules

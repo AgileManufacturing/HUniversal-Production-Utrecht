@@ -70,13 +70,13 @@ public class ProductStepMessage implements Serializable{
 	 * @var Object inputParts
 	 * The input parts needed for this product step.
 	 */
-	private Object inputParts;
+	private long[] inputParts;
 	
 	/**
-	 * @var Object outputParts
+	 * @var long outputPart
 	 * The result parts for this product step.
 	 */
-	private Object outputParts;
+	private long outputPart;
 	
 	/**
 	 * @var StepStatusCode status
@@ -103,19 +103,19 @@ public class ProductStepMessage implements Serializable{
 	 * @param type - The type of the product step
 	 * @param parameters - The parameters for the product step
 	 * @param inputParts - The input parts for the product step
-	 * @param outputParts - The output parts for the product step
+	 * @param outputPart - The output parts for the product step
 	 * @param status - The status for the product step
 	 * @param statusData - The additional data for the status
 	 * @param scheduleData - The schedule data
 	 */
 	public ProductStepMessage(AID productAgentId, long type,
-			ParameterList parameters, Object inputParts, Object outputParts,
+			ParameterList parameters, long[] inputParts, long outputPart,
 			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
 		this.productAgentId = productAgentId;
 		this.type = type;
 		this.parameters = parameters;
 		this.inputParts = inputParts;
-		this.outputParts = outputParts;
+		this.outputPart = outputPart;
 		this.status = status;
 		this.statusData = statusData;
 		this.scheduleData = scheduleData;
@@ -141,10 +141,18 @@ public class ProductStepMessage implements Serializable{
 				&& type == other.type
 				&& parameters.equals(other.parameters)
 				&& inputParts.equals(other.inputParts)
-				&& outputParts.equals(other.outputParts)
+				&& outputPart == other.outputPart
 				&& status == other.status
 				&& statusData.equals(other.statusData)
 				&& scheduleData.equals(other.scheduleData);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 
 	/**
@@ -192,29 +200,29 @@ public class ProductStepMessage implements Serializable{
 	/**
 	 * @return the inputParts
 	 */
-	public Object getInputParts() {
+	public long[] getInputParts() {
 		return inputParts;
 	}
 
 	/**
 	 * @param inputParts the inputParts to set
 	 */
-	public void setInputParts(Object inputParts) {
+	public void setInputParts(long[] inputParts) {
 		this.inputParts = inputParts;
 	}
 
 	/**
-	 * @return the outputParts
+	 * @return the outputPart
 	 */
-	public Object getOutputParts() {
-		return outputParts;
+	public long getOutputPart() {
+		return outputPart;
 	}
 
 	/**
-	 * @param outputParts the outputParts to set
+	 * @param outputPart the outputPart to set
 	 */
-	public void setOutputParts(Object outputParts) {
-		this.outputParts = outputParts;
+	public void setOutputParts(long outputPart) {
+		this.outputPart = outputPart;
 	}
 
 	/**

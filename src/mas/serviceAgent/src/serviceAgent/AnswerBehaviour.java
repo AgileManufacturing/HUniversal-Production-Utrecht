@@ -17,8 +17,6 @@ import org.bson.types.ObjectId;
 import com.google.gson.Gson;
 import com.mongodb.BasicDBObject;
 
-import equipletAgent.StepStatusCode;
-
 public class AnswerBehaviour extends CyclicBehaviour {
 	private static final long serialVersionUID = 1L;
 
@@ -38,7 +36,6 @@ public class AnswerBehaviour extends CyclicBehaviour {
 				content = (ObjectId) message.getContentObject();
 				BasicDBObject query = new BasicDBObject("_id", content);
 				productionStep = (BasicDBObject) agent.getProductionStepBBClient().findDocuments(query).get(0);
-				StepStatusCode status = StepStatusCode.valueOf(productionStep.getString("status"));
 			} catch (UnreadableException | InvalidDBNamespaceException | GeneralMongoException e) {
 				e.printStackTrace();
 				agent.doDelete();
@@ -95,7 +92,6 @@ public class AnswerBehaviour extends CyclicBehaviour {
 					ScheduleData scheduleData = new ScheduleData();
 					scheduleData.setDuration(duration);
 
-					Gson gson = new Gson();
 					productionStep.put("scheduleData", scheduleData);
 					try {
 						BasicDBObject query = new BasicDBObject("_id", productionStep.get("id"));

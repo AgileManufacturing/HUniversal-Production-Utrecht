@@ -30,7 +30,6 @@
  **/
 package serviceAgent;
 
-import hardwareAgent.Module;
 import newDataClasses.ScheduleData;
 
 import com.mongodb.BasicDBObject;
@@ -72,10 +71,10 @@ public class DummyService implements Service {
 		BasicDBObject service = new BasicDBObject("serviceName", name)
 				.append("type", 1l)
 				.append("parameters", parameters)
-				.append("status", StepStatusCode.EVALUATING)
+				.append("status", StepStatusCode.EVALUATING.name())
 				.append("statusData",
 						new BasicDBObject("status", "dummy status"))
-				.append("scheduleData", new ScheduleData());
+				.append("scheduleData", new ScheduleData().toBasicDBObject());
 
 		return new BasicDBObject[] { service };
 	}

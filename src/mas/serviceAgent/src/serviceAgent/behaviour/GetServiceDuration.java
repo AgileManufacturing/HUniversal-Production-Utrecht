@@ -31,7 +31,6 @@
 package serviceAgent.behaviour;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,20 +38,13 @@ import org.bson.types.ObjectId;
 
 import behaviours.ReceiveBehaviour;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
-import com.google.gson.JsonSyntaxException;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
-import newDataClasses.ScheduleData;
 import nl.hu.client.BlackboardClient;
 import nl.hu.client.GeneralMongoException;
 import nl.hu.client.InvalidDBNamespaceException;
-import nl.hu.client.InvalidJSONException;
 import serviceAgent.ServiceAgent;
-import serviceAgent.ServiceStepMessage;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
