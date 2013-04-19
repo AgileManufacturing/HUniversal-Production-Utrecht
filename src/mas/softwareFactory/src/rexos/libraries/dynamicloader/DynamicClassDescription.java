@@ -89,7 +89,7 @@ public class DynamicClassDescription {
 	 **/
 	public static DynamicClassDescription createFromRow(Row row) {
 		return new DynamicClassDescription(
-				(long)row.get("id"),
+				new Long((Integer)row.get("id")),
 				(String)row.get("name"),
 				(String)row.get("description"),
 				(String)row.get("class_name"),
