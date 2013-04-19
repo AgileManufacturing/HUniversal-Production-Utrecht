@@ -1,8 +1,7 @@
 package newDataClasses;
 
-import java.io.Serializable;
-
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 
 /**
  * Instances of this class contain schedule data with the start time, duration and the deadline of a <code>ProductionStep</code> in timeslots.
@@ -10,9 +9,7 @@ import com.mongodb.BasicDBObject;
  * @author Peter Bonnema
  *
  */
-public class ScheduleData implements Serializable {
-	private static final long serialVersionUID = 9026243337206679739L;
-	
+public class ScheduleData implements IMongoSaveable {
 	private long startTime;
 	private long duration;
 	private long deadline;
@@ -21,6 +18,13 @@ public class ScheduleData implements Serializable {
 	 * Creates a new <code>ScheduleData</code> leaving <code>startTime</code>, <code>duration</code> and <code>deadline</code> uninitialized.
 	 */
 	public ScheduleData() {
+	}
+	
+	/**
+	 * @param object
+	 */
+	public ScheduleData(BasicDBObject object) {
+		FromBasicDBObject(object);
 	}
 
 	/**
@@ -87,20 +91,6 @@ public class ScheduleData implements Serializable {
 				"ScheduleData [startTime=%s, duration=%s, deadline=%s]",
 				startTime, duration, deadline);
 	}
-	
-	public void fillWithBasicDBObject(BasicDBObject object) {
-		this.startTime = object.getLong("startTime");
-		this.duration = object.getLong("duration");
-		this.deadline = object.getLong("deadline");
-	}
-	
-	public BasicDBObject toBasicDBObject() {
-		BasicDBObject data = new BasicDBObject();
-		data.put("startTime", startTime);
-		data.put("duration", duration);
-		data.put("deadline", deadline);
-		return data;
-	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -134,5 +124,26 @@ public class ScheduleData implements Serializable {
 		if (startTime != other.startTime)
 			return false;
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see newDataClasses.IMongoSaveable#ToBasicDBObject()
+	 */
+	@Override
+	public BasicDBObject ToBasicDBObject() {
+		return (BasicDBObject) BasicDBObjectBuilder.start()
+				.add("startTime", startTime)
+				.add("duration", duration)
+				.add("deadline", deadline).get();
+	}
+
+	/* (non-Javadoc)
+	 * @see newDataClasses.IMongoSaveable#FromBasicDBObject(com.mongodb.BasicDBObject)
+	 */
+	@Override
+	public void FromBasicDBObject(BasicDBObject object) {
+		this.startTime = object.getLong("startTime");
+		this.duration = object.getLong("duration");
+		this.deadline = object.getLong("deadline");
 	}
 }

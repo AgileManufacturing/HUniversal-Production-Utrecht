@@ -300,10 +300,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
-		switch (entry.getNamespace().split(".")[1]) {
+		switch (entry.getNamespace().split("\\.")[1]) {
 		case "ProductStepsBlackBoard":
 			try {
 				ObjectId id = entry.getTargetObjectId();

@@ -91,7 +91,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			
 			BasicDBObject failData = new BasicDBObject("source", "service agent");
 			failData.put("reason", "died");
-			BasicDBObject update = new BasicDBObject("status", StepStatusCode.FAILED);
+			BasicDBObject update = new BasicDBObject("status", StepStatusCode.FAILED.name());
 			update.put("statusData", failData);
 			productionStepBBClient.updateDocuments(
 					new BasicDBObject(),
