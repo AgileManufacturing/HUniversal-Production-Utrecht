@@ -49,7 +49,7 @@ public class Row {
      * @param resultSet The ResultSet from a statement execution.
      **/
     public Row(ResultSet resultSet) {
-        row = new HashMap<>();
+        row = new HashMap<String, Object>();
 
         try {
             ResultSetMetaData metadata = resultSet.getMetaData();
