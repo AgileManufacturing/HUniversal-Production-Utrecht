@@ -73,6 +73,7 @@
 	<!-- default target, handles the classpath file and calls the allpackages target -->
 	<target name="all">
 		<delete file="${export-classpath-file}"/>
+		<mkdir dir="${buildpath}"/>
 		<touch file="${export-classpath-file}"/>
 		<echo file="${export-classpath-file}" append="false" message="export CLASSPATH=$CLASSPATH"/>
 		
