@@ -33,6 +33,7 @@ package serviceAgent;
 import newDataClasses.ScheduleData;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 
 import equipletAgent.StepStatusCode;
 
@@ -41,7 +42,7 @@ import equipletAgent.StepStatusCode;
  * 
  */
 public class DummyService implements Service {
-	private static final String name = "DummyService";
+	public static final String name = "DummyService";
 
 	/**
 	 * 
@@ -68,13 +69,13 @@ public class DummyService implements Service {
 	@Override
 	public BasicDBObject[] getServiceSteps(long productStepType,
 			BasicDBObject parameters) {
-		BasicDBObject service = new BasicDBObject("serviceName", name)
-				.append("type", 1l)
-				.append("parameters", parameters)
-				.append("status", StepStatusCode.EVALUATING.name())
-				.append("statusData",
-						new BasicDBObject("status", "dummy status"))
-				.append("scheduleData", new ScheduleData().toBasicDBObject());
+		BasicDBObject service = (BasicDBObject) BasicDBObjectBuilder.start()
+				.add("serviceName", name)
+				.add("type", 1l)
+				.add("parameters", parameters)
+				.add("status", StepStatusCode.EVALUATING.name())
+				.add("statusData", new BasicDBObject("status", "dummy status"))
+				.add("scheduleData", new ScheduleData().ToBasicDBObject()).get();
 
 		return new BasicDBObject[] { service };
 	}
@@ -87,5 +88,13 @@ public class DummyService implements Service {
 	@Override
 	public String getName() {
 		return name;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return String.format("DummyService []");
 	}
 }

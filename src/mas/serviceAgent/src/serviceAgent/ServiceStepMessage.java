@@ -32,14 +32,16 @@ package serviceAgent;
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 
 import equipletAgent.StepStatusCode;
+import newDataClasses.IMongoSaveable;
 import newDataClasses.ScheduleData;
 
 /**
  * Implementation of a message for the serviceStep blackboard
  */
-public class ServiceStepMessage {
+public class ServiceStepMessage implements IMongoSaveable {
 	private ObjectId productStepId;
 	private String serviceName;
 	private long type;
@@ -66,33 +68,37 @@ public class ServiceStepMessage {
 		this.scheduleData = scheduleData;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null)
-			return false;
-		if (obj == this)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ServiceStepMessage other = (ServiceStepMessage) obj;
-		return productStepId.equals(other.productStepId)
-				&& serviceName.equals(other.serviceName)
-				&& type == other.type
-				&& parameters.equals(other.parameters)
-				&& status == other.status
-				&& statusData.equals(other.statusData)
-				&& scheduleData.equals(other.scheduleData);
+	public ServiceStepMessage(BasicDBObject object) {
+		FromBasicDBObject(object);
 	}
 
 	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
+	 * @see newDataClasses.DBSaveable#ToBasicDBObject()
 	 */
 	@Override
-	public int hashCode() {
-		// TODO Auto-generated method stub
-		return super.hashCode();
+	public BasicDBObject ToBasicDBObject() {
+		return (BasicDBObject) BasicDBObjectBuilder.start()
+				.add("productStepId", productStepId)
+				.add("serviceName", serviceName)
+				.add("type", type)
+				.add("parameters", parameters)
+				.add("status", status.name())
+				.add("statusData", statusData)
+				.add("scheduleData", scheduleData.ToBasicDBObject()).get();
+	}
+
+	/* (non-Javadoc)
+	 * @see newDataClasses.DBSaveable#FromBasicDBObject(com.mongodb.BasicDBObject)
+	 */
+	@Override
+	public void FromBasicDBObject(BasicDBObject object) {
+		productStepId = object.getObjectId("productStepId", null);
+		serviceName = object.getString("serviceName", null);
+		type = object.getLong("type", -1l);
+		parameters = (BasicDBObject) object.get("parameters");
+		status = StepStatusCode.valueOf(object.getString("status", null));
+		statusData = (BasicDBObject) object.get("statusData");
+		scheduleData = new ScheduleData((BasicDBObject) object.get("scheduleData"));
 	}
 
 	/**

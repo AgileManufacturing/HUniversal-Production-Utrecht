@@ -117,7 +117,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 			try {
 				// TODO: get inputParts
 				ProductStepMessage entry = new ProductStepMessage(message.getSender(), productStep.getCapability(),
-						productStep.getParameterListAsDBObject(), new long[0], 0l,
+						productStep.getParameterList(), new long[0], 0l,
 						StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
 				productStepEntryId = equipletBBClient.insertDocument(gson.toJson(entry));	
 				equipletAgent.addCommunicationRelation(message.getConversationId(), productStepEntryId);
@@ -137,7 +137,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 				reply.setContent("Failed to process the step");
 				myAgent.send(reply);
 			}
-		}else{
+		} else {
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.FAILURE);
 			reply.setContent("No step given");
