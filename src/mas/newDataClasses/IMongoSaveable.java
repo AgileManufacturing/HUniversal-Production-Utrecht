@@ -1,5 +1,5 @@
 /**
- * @file IMongoSaveable.java
+ * @file DBSaveable.java
  * @brief 
  * @date Created: 19 apr. 2013
  *

@@ -41,6 +41,8 @@ import behaviours.ReceiveBehaviour;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
+import equipletAgent.ProductStepMessage;
+
 import nl.hu.client.BlackboardClient;
 import nl.hu.client.GeneralMongoException;
 import nl.hu.client.InvalidDBNamespaceException;
@@ -143,9 +145,9 @@ public class GetServiceDuration extends ReceiveBehaviour {
 			try {
 				DBObject serviceStep = serviceStepBlackBoard
 						.findDocumentById((ObjectId) message.getContentObject());
-				DBObject productStep = productionStepBlackBoard
-						.findDocumentById((ObjectId) serviceStep
-								.get("productStepId"));
+				ProductStepMessage productStep = new ProductStepMessage(
+						(BasicDBObject)productionStepBlackBoard.findDocumentById(
+								(ObjectId) serviceStep.get("productStepId")));
 				BasicDBObject scheduleData;
 				
 				switch (message.getOntology()) {
@@ -164,7 +166,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 						answer.setConversationId(conversationId);
 						answer.setOntology("GetTransportDuration");
 
-						long[] inputParts = (long[]) productStep.get("inputParts");
+						Long[] inputParts = productStep.getInputParts();
 						answer.setContentObject(inputParts);
 
 						agent.send(answer);
@@ -174,8 +176,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 					duration += Integer.parseInt(message.getContent());
 
 					// read scheduleData from product step BB
-					scheduleData = (BasicDBObject) productStep
-							.get("scheduleData");
+					scheduleData = productStep.getScheduleData().toBasicDBObject();
 					scheduleData.put("duration", duration);
 					productionStepBlackBoard.updateDocuments(new BasicDBObject(
 							"_id", serviceStep.get("productStepId")),

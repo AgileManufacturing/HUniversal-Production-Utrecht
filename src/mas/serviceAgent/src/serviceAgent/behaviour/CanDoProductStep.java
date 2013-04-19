@@ -13,6 +13,8 @@ import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
 
+import equipletAgent.ProductStepMessage;
+
 import serviceAgent.ServiceAgent;
 import serviceAgent.ServiceFactory;
 import serviceAgent.Service;
@@ -51,17 +53,16 @@ public class CanDoProductStep extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		try {
 			ObjectId productStepId = (ObjectId) message.getContentObject();
-			BasicDBObject productStep = (BasicDBObject) client
-					.findDocumentById(productStepId);
+			ProductStepMessage productStep = new ProductStepMessage((BasicDBObject) client
+					.findDocumentById(productStepId));
 			long stepType = 0;
 			try {
-				stepType = productStep.getLong("type");
+				stepType = productStep.getType();
 			} catch (NullPointerException e) {
 				e.printStackTrace();
 				agent.doDelete();
 			}
-			BasicDBObject parameters = (BasicDBObject) productStep
-					.get("parameters");
+			BasicDBObject parameters = productStep.getParameters();
 
 			System.out.format(
 					"%s got message CanDoProductionStep for step type %s%n",

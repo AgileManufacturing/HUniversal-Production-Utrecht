@@ -18,6 +18,7 @@ public class ScheduleData implements IMongoSaveable {
 	 * Creates a new <code>ScheduleData</code> leaving <code>startTime</code>, <code>duration</code> and <code>deadline</code> uninitialized.
 	 */
 	public ScheduleData() {
+		
 	}
 	
 	/**
@@ -38,6 +39,27 @@ public class ScheduleData implements IMongoSaveable {
 		this.startTime = startTime;
 		this.duration = duration;
 		this.deadline = deadline;
+	}
+
+	/* (non-Javadoc)
+	 * @see newDataClasses.DBSaveable#toBasicDBObject()
+	 */
+	@Override
+	public BasicDBObject toBasicDBObject() {
+		return (BasicDBObject) BasicDBObjectBuilder.start()
+				.add("startTime", startTime)
+				.add("duration", duration)
+				.add("deadline", deadline).get();
+	}
+
+	/* (non-Javadoc)
+	 * @see newDataClasses.DBSaveable#fromBasicDBObject(com.mongodb.BasicDBObject)
+	 */
+	@Override
+	public void fromBasicDBObject(BasicDBObject object) {
+		this.startTime = object.getLong("startTime", -1);
+		this.duration = object.getLong("duration", -1);
+		this.deadline = object.getLong("deadline", -1);
 	}
 
 	/**
@@ -90,57 +112,5 @@ public class ScheduleData implements IMongoSaveable {
 		return String.format(
 				"ScheduleData [startTime=%s, duration=%s, deadline=%s]",
 				startTime, duration, deadline);
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (deadline ^ (deadline >>> 32));
-		result = prime * result + (int) (duration ^ (duration >>> 32));
-		result = prime * result + (int) (startTime ^ (startTime >>> 32));
-		return result;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ScheduleData other = (ScheduleData) obj;
-		if (deadline != other.deadline)
-			return false;
-		if (duration != other.duration)
-			return false;
-		if (startTime != other.startTime)
-			return false;
-		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see newDataClasses.IMongoSaveable#ToBasicDBObject()
-	 */
-	@Override
-	public BasicDBObject toBasicDBObject() {
-		return (BasicDBObject) BasicDBObjectBuilder.start()
-				.add("startTime", startTime)
-				.add("duration", duration)
-				.add("deadline", deadline).get();
-	}
-	
-	@Override
-	public void fromBasicDBObject(BasicDBObject object) {
-		this.startTime = object.getLong("startTime");
-		this.duration = object.getLong("duration");
-		this.deadline = object.getLong("deadline");
 	}
 }

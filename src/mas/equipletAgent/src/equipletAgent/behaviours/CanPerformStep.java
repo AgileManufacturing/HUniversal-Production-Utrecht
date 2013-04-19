@@ -113,9 +113,9 @@ public class CanPerformStep extends ReceiveBehaviour {
 		if(productStep != null){
 			try {
 				// TODO: get inputParts instead of dummy data
-				long[] inputParts = {1l, 2l, 3l};
+				Long[] inputParts = {1l, 2l, 3l};
 				//TODO: get outputPart
-				long outputPart = 0l;
+				long outputPart = -1l;
 				ProductStepMessage entry = new ProductStepMessage(message.getSender(), productStep.getCapability(),
 						productStep.getParameterListAsDBObject(), inputParts, outputPart,
 						StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
@@ -137,7 +137,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 				reply.setContent("Failed to process the step");
 				myAgent.send(reply);
 			}
-		}else{
+		} else {
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.FAILURE);
 			reply.setContent("No step given");

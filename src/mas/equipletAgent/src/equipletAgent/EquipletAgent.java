@@ -229,7 +229,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			firstTimeSlot = timeData.getLong("firstTimeSlot");
 			timeSlotLength = timeData.getLong("timeSlotLength");
 			collectiveBBClient.setCollection(equipletDirectoryName);
-		}catch(Exception e){
+		} catch(Exception e) {
 			e.printStackTrace();
 			doDelete();
 		}
@@ -294,7 +294,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		case "ProductStepsBlackBoard":
 			try {
 				ObjectId id = entry.getTargetObjectId();
-				DBObject productStep = equipletBBClient.findDocumentById(id);
+				ProductStepMessage productStep = new ProductStepMessage((BasicDBObject)equipletBBClient.findDocumentById(id));
 
 				String conversationId = null;
 				for (Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
@@ -307,24 +307,16 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					throw new Exception();
 				}
 
-				BasicDBObject statusData = null;
-				try {
-					statusData = (BasicDBObject)productStep.get("statusData");
-				} catch (Exception e) {
-					statusData = new BasicDBObject();
-				}
-
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
-				AID productAgent = new AID((String)productStep.get("productAgentId"), AID.ISGUID);
-				responseMessage.addReceiver(productAgent);
+				responseMessage.addReceiver(productStep.getProductAgentId());
 				responseMessage.setConversationId(conversationId);
 
-				StepStatusCode status = (StepStatusCode) productStep.get("status");
-				System.out.println("status update: " + status.toString());
-				switch (status) {
+				System.out.println("status update: " + productStep.getStatus().toString());
+				switch (productStep.getStatus()) {
 				case PLANNED:
 					try {
-						ScheduleData scheduleData = (ScheduleData) productStep.get("scheduleData");
+						ScheduleData scheduleData = productStep.getScheduleData();
+						
 						if (scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
 							timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 						}
@@ -347,13 +339,13 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				case FAILED:
 					responseMessage.setOntology("StatusUpdate");
 					responseMessage.setContent("FAILED");
-					responseMessage.setContentObject(statusData);
+					responseMessage.setContentObject(productStep.getStatusData());
 					send(responseMessage);
 					break;
 				case SUSPENDED_OR_WARNING:
 					responseMessage.setOntology("StatusUpdate");
 					responseMessage.setContent("SUSPENDED_OR_WARNING");
-					responseMessage.setContentObject(statusData);
+					responseMessage.setContentObject(productStep.getStatusData());
 					send(responseMessage);
 					break;
 				case DONE:

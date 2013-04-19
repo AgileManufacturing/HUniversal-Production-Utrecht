@@ -29,18 +29,20 @@
  **/
 package equipletAgent.behaviours;
 
-import nl.hu.client.BlackboardClient;
-
-import org.bson.types.ObjectId;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-
-import equipletAgent.EquipletAgent;
-import behaviours.ReceiveBehaviour;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import nl.hu.client.BlackboardClient;
+
+import org.bson.types.ObjectId;
+
+import behaviours.ReceiveBehaviour;
+
+import com.mongodb.BasicDBObject;
+
+import equipletAgent.EquipletAgent;
+import equipletAgent.ProductStepMessage;
 
 /**
  * The Class CanDoProductionStepResponse.
@@ -89,8 +91,8 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour {
 
 		ObjectId productStepEntryId = equipletAgent.getRelatedObjectId(message.getConversationId());
 		try {
-			BasicDBObject productStep = (BasicDBObject) equipletBBClient.findDocumentById(productStepEntryId);
-			AID productAgent = new AID((String)productStep.get("productAgentId"), AID.ISGUID);
+			ProductStepMessage productStep = new ProductStepMessage((BasicDBObject) equipletBBClient.findDocumentById(productStepEntryId));
+			AID productAgent = productStep.getProductAgentId();
 			ACLMessage responseMessage = new ACLMessage(message.getPerformative());
 			responseMessage.setConversationId(message.getConversationId());
 			responseMessage.setOntology("CanPerformStep");

@@ -29,6 +29,7 @@
  **/
 package equipletAgent;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import jade.core.AID;
 import newDataClasses.IMongoSaveable;
@@ -60,7 +61,7 @@ public class ProductStepMessage implements IMongoSaveable {
 	 * @var Object inputParts
 	 * The input parts needed for this product step.
 	 */
-	private long[] inputParts;
+	private Long[] inputParts;
 	
 	/**
 	 * @var long outputPart
@@ -99,7 +100,7 @@ public class ProductStepMessage implements IMongoSaveable {
 	 * @param scheduleData - The schedule data
 	 */
 	public ProductStepMessage(AID productAgentId, long type,
-			BasicDBObject parameters, long[] inputParts, long outputPart,
+			BasicDBObject parameters, Long[] inputParts, long outputPart,
 			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
 		this.productAgentId = productAgentId;
 		this.type = type;
@@ -111,6 +112,10 @@ public class ProductStepMessage implements IMongoSaveable {
 		this.scheduleData = scheduleData;
 	}
 
+	public ProductStepMessage(BasicDBObject object){
+		fromBasicDBObject(object);
+	}
+	
 	/**
 	 * Function to check if this productstep equals to another object.
 	 * 
@@ -190,14 +195,14 @@ public class ProductStepMessage implements IMongoSaveable {
 	/**
 	 * @return the inputParts
 	 */
-	public long[] getInputParts() {
+	public Long[] getInputParts() {
 		return inputParts;
 	}
 
 	/**
 	 * @param inputParts the inputParts to set
 	 */
-	public void setInputParts(long[] inputParts) {
+	public void setInputParts(Long[] inputParts) {
 		this.inputParts = inputParts;
 	}
 
@@ -273,26 +278,22 @@ public class ProductStepMessage implements IMongoSaveable {
 
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		this.productAgentId = new AID((String)(object.get("AID")), jade.core.AID.ISGUID);
-		this.type = object.getLong("type");
-		this.parameters = (BasicDBObject)object.get("parameters");
-		this.inputParts = (long[]) object.get("inputParts");
-		if(object.containsField("outputPart")){
-			this.outputPart = object.getLong("outputPart");
-		}else{
-			this.outputPart = -1l;
-		}
-		this.status = StepStatusCode.valueOf(object.getString("status"));
+		productAgentId = new AID((String)(object.get("productAgentId")), jade.core.AID.ISGUID);
+		type = object.getLong("type");
+		parameters = (BasicDBObject)object.get("parameters");
+		inputParts = ((BasicDBList)object.get("inputParts")).toArray(new Long[0]);
+		outputPart = object.getLong("outputPart", -1l);
+		status = StepStatusCode.valueOf(object.getString("status"));
 		
 		if(object.containsField("statusData")){
-			this.statusData = (BasicDBObject) object.get(statusData);
-		}else{
-			this.statusData = new BasicDBObject();
+			statusData = (BasicDBObject) object.get(statusData);
+		} else {
+			statusData = new BasicDBObject();
 		}
 		if(object.containsField("scheduleData")){
-			this.scheduleData = new ScheduleData((BasicDBObject)object.get("scheduleData"));
-		}else{
-			this.scheduleData = new ScheduleData();
+			scheduleData = new ScheduleData((BasicDBObject)object.get("scheduleData"));
+		} else {
+			scheduleData = new ScheduleData();
 		}
 		
 	}
