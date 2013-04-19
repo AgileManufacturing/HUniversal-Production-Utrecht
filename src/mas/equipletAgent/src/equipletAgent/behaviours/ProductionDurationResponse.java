@@ -55,11 +55,11 @@ public class ProductionDurationResponse extends ReceiveBehaviour {
 			DBObject productStep = equipletBBClient.findDocumentById(id);
 
 			ScheduleData schedule = new ScheduleData(); 
-			schedule.fillWithBasicDBObject(((BasicDBObject)productStep.get("scheduleData")));
+			schedule.fromBasicDBObject(((BasicDBObject)productStep.get("scheduleData")));
 			System.out.println(schedule.getDuration() + "");
 			
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
-			AID productAgent = new AID((String)((DBObject)productStep.get("productAgentId")).get("name"), AID.ISGUID);
+			AID productAgent = new AID((String)productStep.get("productAgentId"), AID.ISGUID);
 			responseMessage.addReceiver(productAgent);
 			responseMessage.setOntology("ProductionDuration");
 			responseMessage.setConversationId(message.getConversationId());

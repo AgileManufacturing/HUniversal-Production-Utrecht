@@ -40,10 +40,10 @@ public interface IMongoSaveable {
 	/**
 	 * @return
 	 */
-	public BasicDBObject ToBasicDBObject();
+	public BasicDBObject toBasicDBObject();
 	
 	/**
 	 * @return
 	 */
-	public void FromBasicDBObject(BasicDBObject object);
+	public void fromBasicDBObject(BasicDBObject object);
 }

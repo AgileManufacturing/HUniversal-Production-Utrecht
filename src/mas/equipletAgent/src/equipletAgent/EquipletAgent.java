@@ -33,9 +33,6 @@
 package equipletAgent;
 
 import com.mongodb.*;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import equipletAgent.behaviours.*;
 
 import jade.core.AID;
@@ -147,12 +144,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	private HashMap<String, ObjectId> communicationTable;
 
 	/**
-	 * @var Gson gson
-	 * Gson object used to work with Json.
-	 */
-	private Gson gson;
-
-	/**
 	 * @var Timer timeToNextUsedTimeSlot
 	 * Timer used to trigger when the next used time slot is ready to start.
 	 */
@@ -200,7 +191,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		}
 		equipletDbName = getAID().getLocalName();
 		communicationTable = new HashMap<String, ObjectId>();
-		gson = new GsonBuilder().create();
 		try{
 			// TODO: Not Hardcoded capabilities/get capabilities from the service agent.
 			Object[] args = getArguments();
@@ -229,16 +219,15 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
-
 			equipletBBClient.subscribe(statusSubscription);
 			
 			EquipletDirectoryMessage entry = new EquipletDirectoryMessage(getAID(), capabilities, dbData);
-			collectiveBBClient.insertDocument(gson.toJson(entry));
+			collectiveBBClient.insertDocument(entry.toBasicDBObject());
 			
 			collectiveBBClient.setCollection(timeDataName);
-			DBObject timeData = collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
-			firstTimeSlot = ((Double)timeData.get("firstTimeSlot")).longValue();
-			timeSlotLength = ((Double)timeData.get("timeSlotLength")).longValue();
+			BasicDBObject timeData = (BasicDBObject)collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
+			firstTimeSlot = timeData.getLong("firstTimeSlot");
+			timeSlotLength = timeData.getLong("timeSlotLength");
 			collectiveBBClient.setCollection(equipletDirectoryName);
 		}catch(Exception e){
 			e.printStackTrace();
@@ -276,13 +265,12 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	@Override
 	public void takeDown() {
 		try {
-			BasicDBObject searchQuery = new BasicDBObject("AID", getAID());
-			collectiveBBClient.removeDocuments(gson.toJson(searchQuery));
+			collectiveBBClient.removeDocuments(new BasicDBObject("AID", getAID().getName()));
 
 			Object[] productAgents = equipletBBClient.findDistinctValues("productAgentId", new BasicDBObject());
 			for(Object productAgent : productAgents){
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
-				responseMessage.addReceiver(new AID(productAgent.toString(), AID.ISLOCALNAME));
+				responseMessage.addReceiver(new AID(productAgent.toString(), AID.ISGUID));
 				responseMessage.setContent("I'm dying");
 				send(responseMessage);
 			}
@@ -319,15 +307,15 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					throw new Exception();
 				}
 
-				HashMap<String, String> statusData = null;
+				BasicDBObject statusData = null;
 				try {
-					statusData = (HashMap<String, String>) productStep.get("statusData");
+					statusData = (BasicDBObject)productStep.get("statusData");
 				} catch (Exception e) {
-					statusData = new HashMap<>();
+					statusData = new BasicDBObject();
 				}
 
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
-				AID productAgent = new AID((String)((DBObject)productStep.get("productAgentId")).get("name"), AID.ISGUID);
+				AID productAgent = new AID((String)productStep.get("productAgentId"), AID.ISGUID);
 				responseMessage.addReceiver(productAgent);
 				responseMessage.setConversationId(conversationId);
 

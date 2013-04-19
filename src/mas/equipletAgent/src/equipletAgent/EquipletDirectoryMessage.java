@@ -31,9 +31,13 @@ package equipletAgent;
 
 import jade.core.AID;
 import java.util.ArrayList;
-import newDataClasses.DbData;
 
-public class EquipletDirectoryMessage {
+import com.mongodb.BasicDBObject;
+
+import newDataClasses.DbData;
+import newDataClasses.IMongoSaveable;
+
+public class EquipletDirectoryMessage implements IMongoSaveable{
 	/**
 	 * @var AID AID
 	 * The AID of the equipletAgent
@@ -41,7 +45,7 @@ public class EquipletDirectoryMessage {
 	public AID AID;
 	
 	/**
-	 * @var ArrayList<Long> capabilities
+	 * @var long[] capabilities
 	 * The capabilities of the equipletAgent
 	 */
 	public ArrayList<Long> capabilities;
@@ -63,5 +67,25 @@ public class EquipletDirectoryMessage {
 		this.AID = AID;
 		this.capabilities = capabilities;
 		this.db = db;
+	}
+	
+	public EquipletDirectoryMessage(BasicDBObject object){
+		fromBasicDBObject(object);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public void fromBasicDBObject(BasicDBObject object){
+		this.AID = new AID((String)(object.get("AID")), jade.core.AID.ISGUID);
+		this.capabilities = (ArrayList<Long>) object.get("capabilities");
+		this.db = new DbData((BasicDBObject)object.get("db"));
+	}
+	
+	@Override
+	public BasicDBObject toBasicDBObject(){
+		BasicDBObject entry = new BasicDBObject("AID", this.AID.getName());
+		entry.put("capabilities", capabilities);
+		entry.put("db", db.toBasicDBObject());
+		return entry;
 	}
 }

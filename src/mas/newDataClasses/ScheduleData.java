@@ -25,7 +25,7 @@ public class ScheduleData implements IMongoSaveable {
 	 * @param object
 	 */
 	public ScheduleData(BasicDBObject object) {
-		FromBasicDBObject(object);
+		fromBasicDBObject(object);
 	}
 
 	/**
