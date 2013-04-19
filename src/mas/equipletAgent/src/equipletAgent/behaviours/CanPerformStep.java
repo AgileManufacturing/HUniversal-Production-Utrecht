@@ -34,6 +34,9 @@ import java.io.IOException;
 import newDataClasses.ProductionStep;
 import newDataClasses.ScheduleData;
 import nl.hu.client.BlackboardClient;
+import nl.hu.client.GeneralMongoException;
+import nl.hu.client.InvalidDBNamespaceException;
+import nl.hu.client.InvalidJSONException;
 
 import org.bson.types.ObjectId;
 
@@ -103,38 +106,42 @@ public class CanPerformStep extends ReceiveBehaviour {
 			System.out.println("Exception Caught, No Content Object Given");
 		}
 		System.out.format("%s received message from %s (%s:%s)%n",
-				myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
+				myAgent.getLocalName(), message.getSender().getLocalName(),
+				message.getOntology(), contentObject == null ? contentString : contentObject);
 		
 		
-		ProductionStep proStepC = (ProductionStep) contentObject;
+		ProductionStep productStep = (ProductionStep) contentObject;
 		ObjectId productStepEntryId = null;
 		Gson gson = new GsonBuilder().serializeNulls().create();
-		if(proStepC != null){
+		if(productStep != null){
 			try {
 				// TODO: get inputParts
-				// TODO: get ouputPart
-				ProductStepMessage entry = new ProductStepMessage(message.getSender(), proStepC.getCapability(),
-						proStepC.getParameterList(), null, null,
+				ProductStepMessage entry = new ProductStepMessage(message.getSender(), productStep.getCapability(),
+						productStep.getParameterListAsDBObject(), null, null,
 						StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
-				productStepEntryId = equipletBBClient.insertDocument(gson.toJson(entry));
+				productStepEntryId = equipletBBClient.insertDocument(gson.toJson(entry));	
 				equipletAgent.addCommunicationRelation(message.getConversationId(), productStepEntryId);
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
 				responseMessage.setConversationId(message.getConversationId());
 				responseMessage.addReceiver(equipletAgent.getServiceAgent());
 				responseMessage.setOntology("CanDoProductionStep");
-				try {
-					responseMessage.setContentObject(productStepEntryId);
-				} catch (IOException e) {
-					e.printStackTrace();
-					// TODO: ERROR HANDLING
-					myAgent.doDelete();
-				}
+				responseMessage.setContentObject(productStepEntryId);
 				myAgent.send(responseMessage);
-			} catch (Exception e) {
+			} catch (InvalidJSONException | InvalidDBNamespaceException | GeneralMongoException e) {
 				e.printStackTrace();
-				// TODO: ERROR HANDLING
 				myAgent.doDelete();
+			} catch (IOException e) {
+				e.printStackTrace();
+				ACLMessage reply = message.createReply();
+				reply.setPerformative(ACLMessage.FAILURE);
+				reply.setContent("Failed to process the step");
+				myAgent.send(reply);
 			}
+		}else{
+			ACLMessage reply = message.createReply();
+			reply.setPerformative(ACLMessage.FAILURE);
+			reply.setContent("No step given");
+			myAgent.send(reply);
 		}
 	}
 }

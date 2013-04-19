@@ -30,12 +30,8 @@
 package equipletAgent;
 
 import java.io.Serializable;
-
 import com.mongodb.BasicDBObject;
-
 import jade.core.AID;
-
-import newDataClasses.ParameterList;
 import newDataClasses.ScheduleData;
 
 /**
@@ -64,7 +60,7 @@ public class ProductStepMessage implements Serializable{
 	 * @var ParameterList parameters
 	 * The parameterlist for this product step.
 	 */
-	private ParameterList parameters;
+	private BasicDBObject parameters;
 	
 	/**
 	 * @var Object inputParts
@@ -109,7 +105,7 @@ public class ProductStepMessage implements Serializable{
 	 * @param scheduleData - The schedule data
 	 */
 	public ProductStepMessage(AID productAgentId, long type,
-			ParameterList parameters, Object inputParts, Object outputParts,
+			BasicDBObject parameters, Object inputParts, Object outputParts,
 			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
 		this.productAgentId = productAgentId;
 		this.type = type;
@@ -178,14 +174,14 @@ public class ProductStepMessage implements Serializable{
 	/**
 	 * @return the parameters
 	 */
-	public ParameterList getParameters() {
+	public BasicDBObject getParameters() {
 		return parameters;
 	}
 
 	/**
 	 * @param parameters the parameters to set
 	 */
-	public void setParameters(ParameterList parameters) {
+	public void setParameters(BasicDBObject parameters) {
 		this.parameters = parameters;
 	}
 

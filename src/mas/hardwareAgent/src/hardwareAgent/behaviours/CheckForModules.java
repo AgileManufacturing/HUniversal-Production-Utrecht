@@ -79,6 +79,7 @@ public class CheckForModules extends ReceiveBehaviour {
 
 				ACLMessage reply;
 				reply = message.createReply();
+				reply.setOntology("CheckForModulesResponse");
 
 				boolean modulesPresent = true;
 

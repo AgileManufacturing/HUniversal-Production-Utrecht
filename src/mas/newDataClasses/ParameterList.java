@@ -37,4 +37,8 @@ public class ParameterList implements Serializable{
 		return this._parameterGroups.get(name);
 	}
 
+	public HashMap<String, ParameterGroup> getParametersGroups(){
+		return this._parameterGroups;
+	}
+	
 }
