@@ -31,11 +31,11 @@
 package rexos.mas.service_agent;
 
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
-
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.StepStatusCode;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 
 /**
  * @author Peter

@@ -30,12 +30,13 @@
 package rexos.mas.equiplet_agent;
 
 import jade.core.AID;
-import java.util.ArrayList;
 
-import com.mongodb.BasicDBObject;
+import java.util.ArrayList;
 
 import rexos.mas.data.DbData;
 import rexos.mas.data.IMongoSaveable;
+
+import com.mongodb.BasicDBObject;
 
 public class EquipletDirectoryMessage implements IMongoSaveable {
 	/**

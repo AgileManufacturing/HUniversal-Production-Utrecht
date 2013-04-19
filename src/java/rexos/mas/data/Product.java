@@ -16,8 +16,6 @@ package rexos.mas.data;
 
 import java.util.List;
 
-import rexos.mas.data.sqldatadase.sqliteDatabase;
-
 
 public class Product {
 	

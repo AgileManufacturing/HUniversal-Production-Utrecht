@@ -1,16 +1,15 @@
 package rexos.mas.hardware_agent.behaviours;
 
-import rexos.mas.hardware_agent.HardwareAgent;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
-import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
-
 import org.bson.types.ObjectId;
 
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.hardware_agent.HardwareAgent;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;

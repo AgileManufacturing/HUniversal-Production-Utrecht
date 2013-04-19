@@ -4,20 +4,20 @@ import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
-import rexos.mas.data.Product;
-import rexos.mas.data.Production;
-import rexos.mas.data.ProductionStep;
-import rexos.mas.data.ProductionStepStatus;
-
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import rexos.mas.data.Product;
+import rexos.mas.data.Production;
+import rexos.mas.data.ProductionStep;
+import rexos.mas.data.ProductionStepStatus;
+
 import com.mongodb.DB;
 import com.mongodb.DBObject;
-//import com.mongodb.MongoClient;
 import com.mongodb.Mongo;
+//import com.mongodb.MongoClient;
 
 @SuppressWarnings("serial")
 public class SchedulerBehaviour extends OneShotBehaviour {

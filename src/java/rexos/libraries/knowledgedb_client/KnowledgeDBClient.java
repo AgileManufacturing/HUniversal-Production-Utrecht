@@ -25,10 +25,15 @@
  **/
 package rexos.libraries.knowledgedb_client;
 
-import com.mysql.jdbc.Connection;
-
-import java.sql.*;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+
+import com.mysql.jdbc.Connection;
 
 /**
  * A client to communicate with knowledge database.

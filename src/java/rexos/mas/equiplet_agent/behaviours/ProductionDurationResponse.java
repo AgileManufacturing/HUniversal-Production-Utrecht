@@ -1,20 +1,20 @@
 package rexos.mas.equiplet_agent.behaviours;
 
-import rexos.libraries.blackboard_client.BlackboardClient;
-
-import org.bson.types.ObjectId;
-import rexos.mas.behaviours.ReceiveBehaviour;
-
-import com.mongodb.BasicDBObject;
-
-import rexos.mas.data.ScheduleData;
-import rexos.mas.equiplet_agent.EquipletAgent;
-import rexos.mas.equiplet_agent.ProductStepMessage;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+
+import org.bson.types.ObjectId;
+
+import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.ScheduleData;
+import rexos.mas.equiplet_agent.EquipletAgent;
+import rexos.mas.equiplet_agent.ProductStepMessage;
+
+import com.mongodb.BasicDBObject;
 
 /**
  * The Class ProductionDurationResponse.

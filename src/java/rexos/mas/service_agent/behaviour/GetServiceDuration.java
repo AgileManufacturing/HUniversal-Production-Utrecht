@@ -30,26 +30,26 @@
  **/
 package rexos.mas.service_agent.behaviour;
 
+import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import org.bson.types.ObjectId;
 
-import rexos.mas.behaviours.ReceiveBehaviour;
-import rexos.mas.equiplet_agent.ProductStepMessage;
-
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.service_agent.ServiceAgent;
-import jade.core.Agent;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 /**
  * @author Peter

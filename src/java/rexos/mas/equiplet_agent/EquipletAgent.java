@@ -32,23 +32,36 @@
 
 package rexos.mas.equiplet_agent;
 
-import com.mongodb.*;
-
-import rexos.mas.data.DbData;
-import rexos.mas.data.ScheduleData;
-import rexos.mas.equiplet_agent.behaviours.*;
-
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
-import rexos.libraries.blackboard_client.*;
-import rexos.libraries.blackboard_client.FieldUpdateSubscription.MongoUpdateLogOperation;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map.Entry;
+
 import org.bson.types.ObjectId;
+
+import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.BlackboardSubscriber;
+import rexos.libraries.blackboard_client.FieldUpdateSubscription;
+import rexos.libraries.blackboard_client.FieldUpdateSubscription.MongoUpdateLogOperation;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.blackboard_client.MongoOperation;
+import rexos.libraries.blackboard_client.OplogEntry;
+import rexos.mas.data.DbData;
+import rexos.mas.data.ScheduleData;
+import rexos.mas.equiplet_agent.behaviours.CanDoProductionStepResponse;
+import rexos.mas.equiplet_agent.behaviours.CanPerformStep;
+import rexos.mas.equiplet_agent.behaviours.GetProductionDuration;
+import rexos.mas.equiplet_agent.behaviours.ProductionDurationResponse;
+import rexos.mas.equiplet_agent.behaviours.ScheduleStep;
+import rexos.mas.equiplet_agent.behaviours.StartStep;
+
+import com.mongodb.BasicDBObject;
 
 /**
  * EquipletAgent that communicates with product agents and with its own service agent.

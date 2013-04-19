@@ -30,6 +30,7 @@
 package rexos.libraries.blackboard_client;
 
 import java.util.EnumSet;
+
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 

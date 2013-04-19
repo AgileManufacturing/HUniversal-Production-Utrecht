@@ -29,14 +29,14 @@
  **/
 package rexos.mas.equiplet_agent.behaviours;
 
-import org.bson.types.ObjectId;
-
-import rexos.mas.behaviours.ReceiveBehaviour;
-
-import rexos.mas.equiplet_agent.EquipletAgent;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+
+import org.bson.types.ObjectId;
+
+import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.equiplet_agent.EquipletAgent;
 
 /**
  * The Class GetProductionDuration.

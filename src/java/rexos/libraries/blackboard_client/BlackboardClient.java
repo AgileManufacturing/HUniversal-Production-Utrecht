@@ -33,15 +33,22 @@
 
 package rexos.libraries.blackboard_client;
 
-import com.mongodb.*;
-import com.mongodb.util.JSON;
-import com.mongodb.util.JSONParseException;
-
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
+
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
+import com.mongodb.Mongo;
+import com.mongodb.MongoException;
+import com.mongodb.QueryBuilder;
+import com.mongodb.ServerAddress;
+import com.mongodb.WriteResult;
+import com.mongodb.util.JSON;
+import com.mongodb.util.JSONParseException;
 
 /**
  * Client class for a mongodb blackboard.

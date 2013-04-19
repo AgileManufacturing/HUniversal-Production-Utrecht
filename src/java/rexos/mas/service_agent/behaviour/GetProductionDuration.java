@@ -5,16 +5,14 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
+import org.bson.types.ObjectId;
+
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
-
-import org.bson.types.ObjectId;
-
+import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.service_agent.Service;
 import rexos.mas.service_agent.ServiceFactory;
-
-import rexos.mas.behaviours.ReceiveBehaviour;
 
 import com.mongodb.BasicDBObject;
 

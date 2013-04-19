@@ -36,21 +36,19 @@ import jade.lang.acl.UnreadableException;
 
 import java.io.IOException;
 
+import org.bson.types.ObjectId;
+
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
-
-import org.bson.types.ObjectId;
-
 import rexos.mas.behaviours.ReceiveBehaviour;
-
-import com.mongodb.BasicDBObject;
-
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.equiplet_agent.StepStatusCode;
+
+import com.mongodb.BasicDBObject;
 
 /**
  * The Class CanPerformStep.

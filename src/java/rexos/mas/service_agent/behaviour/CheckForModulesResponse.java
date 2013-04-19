@@ -30,11 +30,11 @@
  **/
 package rexos.mas.service_agent.behaviour;
 
-import rexos.mas.service_agent.ServiceAgent;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
+import rexos.mas.service_agent.ServiceAgent;
 
 /**
  * @author Peter

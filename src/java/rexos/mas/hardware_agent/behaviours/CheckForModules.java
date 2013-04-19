@@ -30,13 +30,12 @@ package rexos.mas.hardware_agent.behaviours;
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-import rexos.mas.behaviours.ReceiveBehaviour;
-import rexos.mas.hardware_agent.HardwareAgent;
-
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.hardware_agent.HardwareAgent;
 
 public class CheckForModules extends ReceiveBehaviour {
 	/**

@@ -29,16 +29,7 @@
  **/
 package rexos.mas.service_agent;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Hashtable;
-
-import rexos.libraries.knowledgedb_client.Row;
-import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
-import rexos.libraries.knowledgedb_client.Queries;
-
-import jade.core.AID;
 
 /**
  * 

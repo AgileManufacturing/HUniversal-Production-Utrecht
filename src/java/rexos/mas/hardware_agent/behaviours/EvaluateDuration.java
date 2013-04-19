@@ -30,29 +30,20 @@ package rexos.mas.hardware_agent.behaviours;
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import rexos.mas.hardware_agent.EquipletStepMessage;
-import rexos.mas.hardware_agent.HardwareAgent;
-import rexos.mas.hardware_agent.Module;
-import rexos.mas.hardware_agent.TimeData;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
-import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
-
 import org.bson.types.ObjectId;
 
-import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
-import rexos.libraries.knowledgedb_client.Queries;
-import rexos.libraries.knowledgedb_client.Row;
-import rexos.mas.service_agent.ServiceStepMessage;
-
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
-import rexos.mas.data.*;
+import rexos.mas.data.ScheduleData;
+import rexos.mas.hardware_agent.EquipletStepMessage;
+import rexos.mas.hardware_agent.HardwareAgent;
+import rexos.mas.hardware_agent.Module;
+import rexos.mas.hardware_agent.TimeData;
 
 import com.mongodb.BasicDBObject;
 

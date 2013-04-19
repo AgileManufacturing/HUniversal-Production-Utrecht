@@ -31,18 +31,12 @@ package rexos.mas.hardware_agent;
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-import java.util.HashMap;
+import jade.core.Agent;
 
-import rexos.mas.data.DbData;
-import rexos.mas.hardware_agent.behaviours.*;
-import rexos.mas.service_agent.Service;
+import java.util.HashMap;
 
 import org.bson.types.ObjectId;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-
-import jade.core.Agent;
 import rexos.libraries.blackboard_client.BasicOperationSubscription;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.BlackboardSubscriber;
@@ -50,6 +44,14 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
+import rexos.mas.data.DbData;
+import rexos.mas.hardware_agent.behaviours.CheckForModules;
+import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
+import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
+import rexos.mas.service_agent.Service;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 public class HardwareAgent extends Agent implements BlackboardSubscriber {
 	private static final long serialVersionUID = 1L;

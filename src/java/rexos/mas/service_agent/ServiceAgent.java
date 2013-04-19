@@ -1,19 +1,27 @@
 package rexos.mas.service_agent;
 
+import jade.core.AID;
+import jade.core.Agent;
+
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
 import org.bson.types.ObjectId;
 
+import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.BlackboardSubscriber;
+import rexos.libraries.blackboard_client.FieldUpdateSubscription;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.blackboard_client.MongoOperation;
+import rexos.libraries.blackboard_client.OplogEntry;
+import rexos.mas.data.DbData;
+import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.service_agent.behaviour.CanDoProductStep;
 import rexos.mas.service_agent.behaviour.GetProductionDuration;
-import jade.core.AID;
-import jade.core.Agent;
-import com.mongodb.*;
 
-import rexos.mas.data.DbData;
-import rexos.mas.equiplet_agent.*;
-import rexos.libraries.blackboard_client.*;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	private static final long serialVersionUID = 1L;

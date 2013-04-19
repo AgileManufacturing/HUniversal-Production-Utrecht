@@ -3,9 +3,10 @@
  */
 package rexos.mas.productAgent;
 
+import jade.core.behaviours.OneShotBehaviour;
+
 import java.util.List;
 
-import jade.core.behaviours.OneShotBehaviour;
 import rexos.mas.data.LogMessage;
 import rexos.mas.data.Product;
 import rexos.mas.data.ProductionStep;

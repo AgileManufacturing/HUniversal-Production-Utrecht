@@ -8,13 +8,12 @@ import jade.lang.acl.UnreadableException;
 
 import java.io.IOException;
 
-import rexos.mas.data.ScheduleData;
-import rexos.libraries.blackboard_client.GeneralMongoException;
-import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
-
 import org.bson.types.ObjectId;
 
-import com.google.gson.Gson;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.mas.data.ScheduleData;
+
 import com.mongodb.BasicDBObject;
 
 public class AnswerBehaviour extends CyclicBehaviour {

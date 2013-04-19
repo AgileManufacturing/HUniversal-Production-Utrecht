@@ -29,11 +29,12 @@
  **/
 package rexos.mas.equiplet_agent;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
 import jade.core.AID;
 import rexos.mas.data.IMongoSaveable;
 import rexos.mas.data.ScheduleData;
+
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
 
 /**
  * Implementation of a message for the productstep blackboard
