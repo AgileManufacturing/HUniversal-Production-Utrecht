@@ -1,3 +1,5 @@
+echo -e "\033[36m===== Setting ROS_PACKAGE_PATH =====\033[0m"
+source .export-rospath
 echo -e "\033[36m===== Building C++ =====\033[0m"
 catkin_make
 source devel/setup.sh
