@@ -34,6 +34,7 @@ package hardwareAgent;
 import java.util.HashMap;
 
 import hardwareAgent.behaviours.*;
+import serviceAgent.Service;
 
 import org.bson.types.ObjectId;
 
@@ -56,20 +57,21 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 	private BlackboardClient serviceStepBBClient, equipletStepBBClient;
 	private DbData dbData;
 	private HashMap<Long,Module> ModulesMap;
+	private HashMap<Service, Module> LeadingModules;
 		
 	public void RegisterModule(long id,Module module) {
 		this.ModulesMap.put(id, module);
 	}
 	
 	public Module GetModuleById(long id) {
-		return this.ModulesMap.get(id);
+		return ModulesMap.get(id);
 	}
 	
 	@Override
 	public void setup() {
 		System.out.println("Hardware agent "+ this +" reporting.");
-		
-		ModulesMap = new HashMap<Long, Module>();
+		ModulesMap = new HashMap<Long,Module>();
+		LeadingModules = new HashMap<Service, Module>();
 
 		// TODO fill in host, database and collection
 		Object[] args = getArguments();

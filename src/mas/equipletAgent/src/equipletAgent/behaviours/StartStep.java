@@ -1,6 +1,6 @@
 /**
- * @file CanDoProductionStepResponse.java
- * @brief Behaviour for handling the messages with the ontology CanDoProductionStepResponse
+ * @file StartStep.java
+ * @brief Behaviour for handling the messages with the ontology StartStep
  * @date Created: 2013-04-02
  *
  * @author Hessel Meulenbeld
@@ -29,24 +29,31 @@
  **/
 package equipletAgent.behaviours;
 
-import nl.hu.client.BlackboardClient;
 
 import org.bson.types.ObjectId;
+
+import newDataClasses.ScheduleData;
+import nl.hu.client.BlackboardClient;
+import nl.hu.client.GeneralMongoException;
+import nl.hu.client.InvalidDBNamespaceException;
+
+import behaviours.ReceiveBehaviour;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
+import equipletAgent.NextProductStepTimer;
 import equipletAgent.StepStatusCode;
 import equipletAgent.EquipletAgent;
-import behaviours.ReceiveBehaviour;
-import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 
 /**
- * The Class CanDoProductionStepResponse.
+ * The Class StartStep.
  */
-public class CanDoProductionStepResponse extends ReceiveBehaviour {
+public class StartStep extends ReceiveBehaviour {
 	/**
 	 * @var static final long serialVersionUID
 	 * The serial version UID for this class
@@ -56,63 +63,68 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour {
 	/**
 	 * @var MessageTemplate messageTemplate
 	 * The messageTemplate this behaviour listens to.
-	 * This behaviour listens to the ontology: CanDoProductionStepResponse.
+	 * This behaviour listens to the ontology: StartStep.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CanDoProductionStepResponse");
-	
-	/**
+    private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("StartStep");
+    
+    /**
 	 * @var EquipletAgent equipletAgent
 	 * The equipletAgent related to this behaviour.
 	 */
-	private EquipletAgent equipletAgent;
-	private BlackboardClient equipletBBClient;
-
+    private EquipletAgent equipletAgent;
+    private BlackboardClient equipletBBClient;
+	
 	/**
-	 * Instantiates a new can do production step response.
-	 * 
-	 * @param a - The agent for this behaviour
+	 * Instantiates a new can perform step.
+	 *
+	 * @param a The agent for this behaviour
 	 */
-	public CanDoProductionStepResponse(Agent a, BlackboardClient equipletBBClient) {
+	public StartStep(Agent a, BlackboardClient equipletBBClient) {
 		super(a, -1, messageTemplate);
-		equipletAgent = (EquipletAgent) a;
+		equipletAgent = (EquipletAgent)a;
 		this.equipletBBClient = equipletBBClient;
 	}
-
+	
 	/**
 	 * Function to handle the incoming messages for this behaviour.
-	 * Handles the response to the CanPeformStep question and gives the result to the product agent.
+	 * Handles the response to the StartStep.
 	 * 
 	 * @param message - The received message.
 	 */
 	@Override
-	public void handle(ACLMessage message) {
-		System.out.format("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
+	public void handle(ACLMessage message){
+		Object contentObject = null;
+		String contentString = message.getContent();
 
-		ObjectId productStepEntryId = equipletAgent.getRelatedObjectId(message.getConversationId());
 		try {
-			BasicDBObject productStep = (BasicDBObject) equipletBBClient.findDocumentById(productStepEntryId);
-			StepStatusCode status = StepStatusCode.valueOf(productStep.getString("status"));
-			AID productAgent = new AID((String)((DBObject)productStep.get("productAgentId")).get("name"), AID.ISGUID);
-			ACLMessage responseMessage = new ACLMessage(ACLMessage.CONFIRM);
-			responseMessage.setConversationId(message.getConversationId());
-			responseMessage.setOntology("CanPerformStep");
-			responseMessage.addReceiver(productAgent);
-			switch(status){
-			case EVALUATING:
-				myAgent.send(responseMessage);
-				break;
-			case ABORTED:
-				responseMessage.setPerformative(ACLMessage.DISCONFIRM);
-				myAgent.send(responseMessage);
-				break;
-				//$CASES-OMITTED$
-			default:
-				break;
+			contentObject = message.getContentObject();
+		} catch (UnreadableException e) {
+			System.out.println("Exception Caught, No Content Object Given");
+		}
+		System.out.format("%s received message from %s (%s:%s)%n",
+				myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
+		
+		try {
+			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
+			equipletBBClient.updateDocuments(
+					new BasicDBObject("_id", productStepId), 
+					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING)));			
+		} catch (InvalidDBNamespaceException | GeneralMongoException e1) {
+			e1.printStackTrace();
+		}
+		
+		NextProductStepTimer timer = equipletAgent.getTimer();
+		try {
+			BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED);
+			query.put("$order_by", new BasicDBObject("scheduleData", new BasicDBObject("startTime", "-1")));
+			DBObject nextProductStep = equipletBBClient.findDocuments(query).get(0);
+			ScheduleData scheduleData = (ScheduleData) nextProductStep.get("scheduleData");
+			if (scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
+				timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 			}
 		} catch (Exception e) {
-			// TODO: ERROR HANDLING
-			e.printStackTrace();
-			myAgent.doDelete();
+			timer.setNextUsedTimeSlot(-1);
+		e.printStackTrace();
 		}
 	}
 }

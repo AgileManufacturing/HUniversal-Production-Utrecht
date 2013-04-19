@@ -15,6 +15,8 @@ package newDataClasses;
 
 import java.io.Serializable;
 
+import com.mongodb.BasicDBObject;
+
 public class ProductionStep implements Serializable {
 
 	/**
@@ -63,6 +65,19 @@ public class ProductionStep implements Serializable {
 	
 	public ParameterList getParameterList() {
 		return _parameters;
+	}
+	
+	public BasicDBObject getParameterListAsDBObject(){
+		BasicDBObject parameters = new BasicDBObject();
+		for(String groupName : _parameters.getParametersGroups().keySet()){
+			ParameterGroup group = _parameters.GetParameterGroup(groupName);
+			BasicDBObject parametersDB = new BasicDBObject();
+			for(Parameter parameter : group.getParameters()){
+				parametersDB.put(parameter.getKey(), parameter.getValue());
+			}
+			parameters.put(group.getName(), parametersDB);
+		}
+		return parameters;
 	}
 
 	public long getCapability() {
