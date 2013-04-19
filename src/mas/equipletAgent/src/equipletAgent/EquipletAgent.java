@@ -229,7 +229,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			firstTimeSlot = timeData.getLong("firstTimeSlot");
 			timeSlotLength = timeData.getLong("timeSlotLength");
 			collectiveBBClient.setCollection(equipletDirectoryName);
-		}catch(Exception e){
+		} catch(Exception e) {
 			e.printStackTrace();
 			doDelete();
 		}

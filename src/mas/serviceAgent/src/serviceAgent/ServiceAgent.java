@@ -38,15 +38,15 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		}
 
 		try {
-			productionStepBBClient = new BlackboardClient(dbData.ip);
-			serviceStepBBClient = new BlackboardClient(dbData.ip);
+			productionStepBBClient = new BlackboardClient(dbData.getIp());
+			serviceStepBBClient = new BlackboardClient(dbData.getIp());
 
-			productionStepBBClient.setDatabase(dbData.name);
+			productionStepBBClient.setDatabase(dbData.getName());
 			productionStepBBClient.setCollection("ProductStepsBlackBoard");
 			//Needs to react on state changes of production steps to WAITING
 			productionStepBBClient.subscribe(statusSubscription);
 			
-			serviceStepBBClient.setDatabase(dbData.name);
+			serviceStepBBClient.setDatabase(dbData.getName());
 			serviceStepBBClient.setCollection("ServiceStepsBlackBoard");
 			//Needs to react on status changes
 			serviceStepBBClient.subscribe(statusSubscription);

@@ -80,14 +80,14 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 		}
 
 		try {
-			serviceStepBBClient = new BlackboardClient(dbData.ip);
-			serviceStepBBClient.setDatabase(dbData.name);
+			serviceStepBBClient = new BlackboardClient(dbData.getIp());
+			serviceStepBBClient.setDatabase(dbData.getName());
 			serviceStepBBClient.setCollection("ServiceStepsBlackBoard");
 			serviceStepBBClient.subscribe(new BasicOperationSubscription(MongoOperation.INSERT, this));
 			serviceStepBBClient.subscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
 			
-			equipletStepBBClient = new BlackboardClient(dbData.ip);
-			equipletStepBBClient.setDatabase(dbData.name);
+			equipletStepBBClient = new BlackboardClient(dbData.getIp());
+			equipletStepBBClient.setDatabase(dbData.getName());
 			equipletStepBBClient.setCollection("EquipletStepsBlackBoard");
 			equipletStepBBClient.subscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
 		} catch (Exception e) {
@@ -111,7 +111,9 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 		
 		// for now: use precompiled grippermodule class
 		GripperModule gp = new GripperModule();
-		RegisterModule(3l, gp);
+		RegisterModule(1l, gp);
+		DeltaRobotModule drm = new DeltaRobotModule();
+		RegisterModule(2l, drm);
 		///
 		
 		
