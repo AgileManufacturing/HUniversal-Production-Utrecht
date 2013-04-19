@@ -9,15 +9,22 @@ import com.mongodb.BasicDBObject;
 
 public class GripperModule implements Module{
 	
-	private long _stepDuration = 10l;
-	
 	public GripperModule(){
 	}
 	
 	@Override
 	public EquipletStepMessage[] getEquipletSteps(BasicDBObject parameters) {
 		// TODO Auto-generated method stub
-		return null;
+		//return null;
+		
+		TimeData td = new TimeData(2l);
+		
+		EquipletStepMessage esm = new EquipletStepMessage(null, 1l, 2l, td);
+		
+		EquipletStepMessage[] dummyData = {esm};
+		
+		return dummyData;
+		
 	}	
 	
 
