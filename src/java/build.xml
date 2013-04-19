@@ -11,6 +11,9 @@
 
 	<!-- Specify the location of the export classpath file. -->
 	<property name="export-classpath-file" value="${buildpath}/.export-classpath"/>
+	
+	<!-- Add a reference to the global environment -->
+	<property environment="env"/>
 
 	<!-- Macro for the following things:
 	- load current classpath
@@ -49,6 +52,18 @@
 		</sequential>
 	</macrodef>
 
+	<!-- Creates the base export file, initialized to the current classpath -->
+	<target name="create-base-export-file">
+		<!-- Delete old file -->
+		<delete file="${export-classpath-file}" />
+
+		<!-- Set value of CLASSPATH to "" if it doesn exist. -->
+		<property name="env.CLASSPATH" value="" />
+
+		<!-- Write current classpath to file -->
+		<echo file="${export-classpath-file}" append="false" message="export CLASSPATH=${env.CLASSPATH}"/>
+	</target>
+
 	<!-- Target for adding a path to export classpath file if it isn't already in there. Requires param path.-->
 	<target name="add-path-to-classpath">
 	 	<condition property="path.inFile">	
@@ -72,23 +87,16 @@
 
 	<!-- default target, handles the classpath file and calls the allpackages target -->
 	<target name="all">
-		<delete file="${export-classpath-file}"/>
 		<mkdir dir="${buildpath}"/>
-		<touch file="${export-classpath-file}"/>
-		<echo file="${export-classpath-file}" append="false" message="export CLASSPATH=$CLASSPATH"/>
 		
 		<antcall target="allpackages"/>
-    
-        <!-- set the total classpath to the export file--> 
-    	<loadfile property="classpath" srcFile="${export-classpath-file}"/>
-    	<echo file="${export-classpath-file}" append="false" message="${classpath}"/>
 	</target>
 	
 	<!-- allpackages target, add the required targets to depends -->
 	<target name="allpackages" depends="rexos"/>
 
 	<!-- rexos target, calls rexos/build.xml -->	
-	<target name="rexos">
+	<target name="rexos" depends="create-base-export-file">
     	<ant antfile="build.xml" target="all" dir="rexos" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
 
@@ -102,6 +110,8 @@
 	<!-- clean target, cleans rexos and tools -->
 	<target name="clean">
     	<ant antfile="build.xml" target="clean" dir="rexos" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
+    	<delete file="${export-classpath-file}" />
+    	<delete dir="${buildpath}" />
     	<!-- uncomment when tools actually exists 
     	<ant antfile="build.xml" target="clean" dir="tools" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
 		-->
