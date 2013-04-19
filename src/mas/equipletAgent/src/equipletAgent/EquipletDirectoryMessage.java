@@ -31,6 +31,10 @@ package equipletAgent;
 
 import jade.core.AID;
 import java.util.ArrayList;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+
 import newDataClasses.DbData;
 
 public class EquipletDirectoryMessage {
@@ -63,5 +67,19 @@ public class EquipletDirectoryMessage {
 		this.AID = AID;
 		this.capabilities = capabilities;
 		this.db = db;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void fromBasicDBObject(BasicDBObject object){
+		this.AID = new AID((String)(object.get("AID")), jade.core.AID.ISGUID);
+		this.capabilities = (ArrayList<Long>) object.get("capabilities");
+		this.db.fromBasicDBObject((BasicDBObject)object.get("db"));
+	}
+	
+	public BasicDBObject toBasicDBObject(){
+		BasicDBObject entry = new BasicDBObject("AID", this.AID.getName());
+		entry.put("capabilities", capabilities);
+		entry.put("db", db.toBasicDBObject());
+		return entry;
 	}
 }

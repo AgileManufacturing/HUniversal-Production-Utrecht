@@ -115,9 +115,10 @@ public class CanPerformStep extends ReceiveBehaviour {
 		Gson gson = new GsonBuilder().serializeNulls().create();
 		if(productStep != null){
 			try {
-				// TODO: get inputParts
+				// TODO: get inputParts instead of dummy data
+				long[] inputParts = {1l, 2l, 3l};
 				ProductStepMessage entry = new ProductStepMessage(message.getSender(), productStep.getCapability(),
-						productStep.getParameterListAsDBObject(), null, null,
+						productStep.getParameterListAsDBObject(), inputParts, null,
 						StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
 				productStepEntryId = equipletBBClient.insertDocument(gson.toJson(entry));	
 				equipletAgent.addCommunicationRelation(message.getConversationId(), productStepEntryId);

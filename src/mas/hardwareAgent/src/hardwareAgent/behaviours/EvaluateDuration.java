@@ -118,7 +118,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 //			}
 			
 			ScheduleData schedule = new ScheduleData();
-			schedule.fillWithBasicDBObject(((BasicDBObject) serviceStep.get("scheduleData")));
+			schedule.fromBasicDBObject(((BasicDBObject) serviceStep.get("scheduleData")));
 			schedule.setDuration(stepDuration);
 
 			hardwareAgent.getServiceStepsBBClient().updateDocuments(

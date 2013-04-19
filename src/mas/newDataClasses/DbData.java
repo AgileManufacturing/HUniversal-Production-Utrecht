@@ -2,6 +2,8 @@ package newDataClasses;
 
 import java.io.Serializable;
 
+import com.mongodb.BasicDBObject;
+
 public class DbData implements Serializable{
 	/**
 	 * 
@@ -16,9 +18,19 @@ public class DbData implements Serializable{
 		this.port = port;
 		this.name = name;
 	}
+	
+	public DbData() {}
 
-	@Override
-	public String toString() {
-		return String.format("DbData [ip=%s, port=%s, name=%s]", ip, port, name);
+	public void fromBasicDBObject(BasicDBObject dbData){
+		this.ip = dbData.getString("ip");
+		this.port = dbData.getInt("port");
+		this.name = dbData.getString("name");
+	}
+	
+	public BasicDBObject toBasicDBObject(){
+		BasicDBObject dbData = new BasicDBObject("ip", ip);
+		dbData.put("port", port);
+		dbData.put("name", name);
+		return dbData;
 	}
 }
