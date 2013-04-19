@@ -55,20 +55,19 @@ public class CheckForModules extends ReceiveBehaviour {
 		super(a, -1, messageTemplate);
 		hardwareAgent = (HardwareAgent) a;
 	}
+
 	/**
 	 * 
-	 * @param ACLMessage message
-	 * handles a incomming messages and will 
-	 * check what kind a module its need 
+	 * @param ACLMessage
+	 *            message handles a incoming messages and will check what kind a
+	 *            module its need
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		long[] contentObject = null;
-		String contentString = message.getContent();
+		long[] moduleIds = null;
 		try {
-
 			try {
-				contentObject = (long[]) message.getContentObject();
+				moduleIds = (long[]) message.getContentObject();
 
 				ACLMessage reply;
 				reply = message.createReply();
@@ -76,26 +75,25 @@ public class CheckForModules extends ReceiveBehaviour {
 
 				boolean modulesPresent = true;
 
-//				KnowledgeDBClient client = KnowledgeDBClient.getClient();
-//
-//				ResultSet resultSet;
-//
-//				resultSet = client.executeSelectQuery(Queries.MODULES);
-//				while (resultSet.next()) {
-//					System.out.println(new Row(resultSet));
-//					if (resultSet.equals(contentString)) {
-//						modulesPresent = true;
-//					}
-//				}
+				// KnowledgeDBClient client = KnowledgeDBClient.getClient();
+				//
+				// ResultSet resultSet;
+				//
+				// resultSet = client.executeSelectQuery(Queries.MODULES);
+				// while (resultSet.next()) {
+				// System.out.println(new Row(resultSet));
+				// if (resultSet.equals(contentString)) {
+				// modulesPresent = true;
+				// }
+				// }
 				// System.out.println();
-									
-				for( long CO : contentObject){
-					if(hardwareAgent.GetModuleById(CO)== null){
-					
-						modulesPresent = false;					
+
+				for (long moduleId : moduleIds) {
+					if (hardwareAgent.GetModuleById(moduleId) == null) {
+						modulesPresent = false;
 					}
 				}
-								
+
 				if (modulesPresent) {
 
 					reply.setPerformative(ACLMessage.CONFIRM);
@@ -103,25 +101,24 @@ public class CheckForModules extends ReceiveBehaviour {
 				} else {
 					reply.setPerformative(ACLMessage.DISCONFIRM);
 				}
-				
+
 				reply.setOntology("CheckForModulesResponse");
 				myAgent.send(reply);
 
-				/** checks in knowledge database if the requested modules
-				// are available
-				// if available set performative (ACLMessage.Confirm) else set
-				// performative (ACLMessage.Disconfirm)
-				**/
+				/**
+				 * checks in knowledge database if the requested modules // are
+				 * available // if available set performative
+				 * (ACLMessage.Confirm) else set // performative
+				 * (ACLMessage.Disconfirm)
+				 **/
 			} catch (UnreadableException e) {
 				// System.out.println("Exception Caught, No Content Object Given");
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			System.out.format("%s received message from %s (%s:%s)%n", myAgent
 					.getLocalName(), message.getSender().getLocalName(),
-					message.getOntology(),
-					contentObject == null ? contentString : contentObject);
+					message.getOntology(), moduleIds);
 
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -34,10 +34,10 @@ package rexos.mas.hardware_agent;
 import org.bson.types.ObjectId;
 
 public class EquipletStepMessage {
-	public ObjectId serviceStepID;
-	public Long instructionData;
-	public Long type;
-	public TimeData timeData;
+	private ObjectId serviceStepID;
+	private Long instructionData;
+	private Long type;
+	private TimeData timeData;
 	
 	/**
 	 * @param serviceStepID
@@ -53,5 +53,71 @@ public class EquipletStepMessage {
 		this.instructionData = instructionData;
 		this.timeData = timeData;
 		this.type = type;
+	}
+
+	/**
+	 * @return the serviceStepID
+	 */
+	public ObjectId getServiceStepID() {
+		return serviceStepID;
+	}
+
+	/**
+	 * @param serviceStepID the serviceStepID to set
+	 */
+	public void setServiceStepID(ObjectId serviceStepID) {
+		this.serviceStepID = serviceStepID;
+	}
+
+	/**
+	 * @return the instructionData
+	 */
+	public Long getInstructionData() {
+		return instructionData;
+	}
+
+	/**
+	 * @param instructionData the instructionData to set
+	 */
+	public void setInstructionData(Long instructionData) {
+		this.instructionData = instructionData;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public Long getType() {
+		return type;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(Long type) {
+		this.type = type;
+	}
+
+	/**
+	 * @return the timeData
+	 */
+	public TimeData getTimeData() {
+		return timeData;
+	}
+
+	/**
+	 * @param timeData the timeData to set
+	 */
+	public void setTimeData(TimeData timeData) {
+		this.timeData = timeData;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return String
+				.format("EquipletStepMessage [serviceStepID=%s, instructionData=%s, type=%s, timeData=%s]",
+						serviceStepID, instructionData, type, timeData);
 	}
 }

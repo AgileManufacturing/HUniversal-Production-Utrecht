@@ -39,18 +39,8 @@ public class GripperModule implements Module{
 	
 	@Override
 	public EquipletStepMessage[] getEquipletSteps(BasicDBObject parameters) {
-		// TODO Auto-generated method stub
-		//return null;
-		
 		TimeData td = new TimeData(2l);
-		
-		EquipletStepMessage esm = new EquipletStepMessage(null, 1l, 2l, td);
-		
-		EquipletStepMessage[] dummyData = {esm};
-		
+		EquipletStepMessage[] dummyData = { new EquipletStepMessage(null, 1l, 2l, td) };
 		return dummyData;
-		
-	}	
-	
-
+	}
 }
