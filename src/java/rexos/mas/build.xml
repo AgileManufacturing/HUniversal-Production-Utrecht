@@ -1,0 +1,7 @@
+<project name="mas" default="all">
+	<target name="all"> 
+	</target>
+
+	<target name="clean">
+	</target>
+</project>

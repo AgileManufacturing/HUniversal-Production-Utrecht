@@ -1,0 +1,21 @@
+<project name="libraries" default="all">
+	
+	<import file="../build.xml"/>
+
+	<target name="all" depends="blackboard_client, knowledgedb_client"> 
+	</target>
+
+	<target name="blackboard_client">
+		<ant antfile="build.xml" target="build" dir="blackboard_client" inheritRefs="true" useNativeBasedir="true"/>  
+	</target>
+
+	<target name="knowledgedb_client">
+		<ant antfile="build.xml" target="build" dir="knowledgedb_client" inheritRefs="true" useNativeBasedir="true"/>  
+	</target>
+
+	<target name="clean">
+		<ant antfile="build.xml" target="clean" dir="blackboard_client" inheritRefs="true" useNativeBasedir="true"/> 
+		<ant antfile="build.xml" target="clean" dir="knowledgedb_client" inheritRefs="true" useNativeBasedir="true"/>   
+	</target>
+
+</project>
