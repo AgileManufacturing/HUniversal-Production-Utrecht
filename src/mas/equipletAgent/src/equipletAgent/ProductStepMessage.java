@@ -29,21 +29,23 @@
  **/
 package equipletAgent;
 
-import java.io.Serializable;
+import java.util.HashMap;
+
 import com.mongodb.BasicDBObject;
 import jade.core.AID;
+import newDataClasses.ParameterList;
 import newDataClasses.ScheduleData;
 
 /**
  * Implementation of a message for the productstep blackboard
  */
-public class ProductStepMessage implements Serializable{
+public class ProductStepMessage extends BasicDBObject {
 	/**
 	 * @var static final long serialVersionUID
 	 * The serial version uid for this class.
 	 */
-	private static final long serialVersionUID = 1L;
-	
+	private static final long serialVersionUID = -800667987733841713L;
+
 	/**
 	 * @var AID productAgentId
 	 * The AID of the productAgent linked to this product step.
@@ -60,7 +62,7 @@ public class ProductStepMessage implements Serializable{
 	 * @var ParameterList parameters
 	 * The parameterlist for this product step.
 	 */
-	private BasicDBObject parameters;
+	private ParameterList parameters;
 	
 	/**
 	 * @var Object inputParts
@@ -105,7 +107,7 @@ public class ProductStepMessage implements Serializable{
 	 * @param scheduleData - The schedule data
 	 */
 	public ProductStepMessage(AID productAgentId, long type,
-			BasicDBObject parameters, long[] inputParts, long outputPart,
+			ParameterList parameters, long[] inputParts, long outputPart,
 			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
 		this.productAgentId = productAgentId;
 		this.type = type;
@@ -182,14 +184,14 @@ public class ProductStepMessage implements Serializable{
 	/**
 	 * @return the parameters
 	 */
-	public BasicDBObject getParameters() {
+	public ParameterList getParameters() {
 		return parameters;
 	}
 
 	/**
 	 * @param parameters the parameters to set
 	 */
-	public void setParameters(BasicDBObject parameters) {
+	public void setParameters(ParameterList parameters) {
 		this.parameters = parameters;
 	}
 
