@@ -113,7 +113,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 		if(productStep != null){
 			try {
 				// TODO: get inputParts instead of dummy data
-				long[] inputParts = {1l, 2l, 3l};
+				Long[] inputParts = {1l, 2l, 3l};
 				//TODO: get outputPart
 				long outputPart = -1l;
 				ProductStepMessage entry = new ProductStepMessage(message.getSender(), productStep.getCapability(),
