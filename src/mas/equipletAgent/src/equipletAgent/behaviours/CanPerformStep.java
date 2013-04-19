@@ -29,6 +29,11 @@
  **/
 package equipletAgent.behaviours;
 
+import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
+
 import java.io.IOException;
 
 import newDataClasses.ProductionStep;
@@ -36,23 +41,16 @@ import newDataClasses.ScheduleData;
 import nl.hu.client.BlackboardClient;
 import nl.hu.client.GeneralMongoException;
 import nl.hu.client.InvalidDBNamespaceException;
-import nl.hu.client.InvalidJSONException;
 
 import org.bson.types.ObjectId;
 
 import behaviours.ReceiveBehaviour;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.mongodb.BasicDBObject;
 
+import equipletAgent.EquipletAgent;
 import equipletAgent.ProductStepMessage;
 import equipletAgent.StepStatusCode;
-import equipletAgent.EquipletAgent;
-import jade.core.Agent;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
 
 /**
  * The Class CanPerformStep.
@@ -112,7 +110,6 @@ public class CanPerformStep extends ReceiveBehaviour {
 		
 		ProductionStep productStep = (ProductionStep) contentObject;
 		ObjectId productStepEntryId = null;
-		Gson gson = new GsonBuilder().serializeNulls().create();
 		if(productStep != null){
 			try {
 				// TODO: get inputParts instead of dummy data
@@ -122,7 +119,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 				ProductStepMessage entry = new ProductStepMessage(message.getSender(), productStep.getCapability(),
 						productStep.getParameterListAsDBObject(), inputParts, outputPart,
 						StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
-				productStepEntryId = equipletBBClient.insertDocument(gson.toJson(entry));	
+				productStepEntryId = equipletBBClient.insertDocument(entry.toBasicDBObject());	
 				equipletAgent.addCommunicationRelation(message.getConversationId(), productStepEntryId);
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
 				responseMessage.setConversationId(message.getConversationId());
@@ -130,7 +127,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 				responseMessage.setOntology("CanDoProductionStep");
 				responseMessage.setContentObject(productStepEntryId);
 				myAgent.send(responseMessage);
-			} catch (InvalidJSONException | InvalidDBNamespaceException | GeneralMongoException e) {
+			} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 				e.printStackTrace();
 				myAgent.doDelete();
 			} catch (IOException e) {

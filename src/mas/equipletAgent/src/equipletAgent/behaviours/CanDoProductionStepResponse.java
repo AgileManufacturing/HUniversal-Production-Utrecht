@@ -90,7 +90,7 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour {
 		ObjectId productStepEntryId = equipletAgent.getRelatedObjectId(message.getConversationId());
 		try {
 			BasicDBObject productStep = (BasicDBObject) equipletBBClient.findDocumentById(productStepEntryId);
-			AID productAgent = new AID((String)((DBObject)productStep.get("productAgentId")).get("name"), AID.ISGUID);
+			AID productAgent = new AID((String)productStep.get("productAgentId"), AID.ISGUID);
 			ACLMessage responseMessage = new ACLMessage(message.getPerformative());
 			responseMessage.setConversationId(message.getConversationId());
 			responseMessage.setOntology("CanPerformStep");

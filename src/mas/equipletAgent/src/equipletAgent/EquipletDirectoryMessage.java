@@ -45,7 +45,7 @@ public class EquipletDirectoryMessage implements IMongoSaveable{
 	public AID AID;
 	
 	/**
-	 * @var ArrayList<Long> capabilities
+	 * @var long[] capabilities
 	 * The capabilities of the equipletAgent
 	 */
 	public ArrayList<Long> capabilities;
@@ -69,12 +69,16 @@ public class EquipletDirectoryMessage implements IMongoSaveable{
 		this.db = db;
 	}
 	
-	@Override
+	public EquipletDirectoryMessage(BasicDBObject object){
+		fromBasicDBObject(object);
+	}
+	
 	@SuppressWarnings("unchecked")
+	@Override
 	public void fromBasicDBObject(BasicDBObject object){
 		this.AID = new AID((String)(object.get("AID")), jade.core.AID.ISGUID);
 		this.capabilities = (ArrayList<Long>) object.get("capabilities");
-		this.db.fromBasicDBObject((BasicDBObject)object.get("db"));
+		this.db = new DbData((BasicDBObject)object.get("db"));
 	}
 	
 	@Override

@@ -31,18 +31,13 @@ package equipletAgent;
 
 import com.mongodb.BasicDBObject;
 import jade.core.AID;
+import newDataClasses.IMongoSaveable;
 import newDataClasses.ScheduleData;
 
 /**
  * Implementation of a message for the productstep blackboard
  */
-public class ProductStepMessage extends BasicDBObject {
-	/**
-	 * @var static final long serialVersionUID
-	 * The serial version uid for this class.
-	 */
-	private static final long serialVersionUID = -800667987733841713L;
-
+public class ProductStepMessage implements IMongoSaveable {
 	/**
 	 * @var AID productAgentId
 	 * The AID of the productAgent linked to this product step.
@@ -260,5 +255,45 @@ public class ProductStepMessage extends BasicDBObject {
 	 */
 	public void setScheduleData(ScheduleData scheduleData) {
 		this.scheduleData = scheduleData;
+	}
+
+	@Override
+	public BasicDBObject toBasicDBObject() {
+		BasicDBObject object = new BasicDBObject();
+		object.put("productAgentId", this.productAgentId.getName());
+		object.put("type", this.type);
+		object.put("parameters", parameters);
+		object.put("inputParts", this.inputParts);
+		object.put("outputPart", this.outputPart);
+		object.put("status", this.status.toString());
+		object.put("statusData", this.statusData);
+		object.put("scheduleDat", this.scheduleData.toBasicDBObject());
+		return object;
+	}
+
+	@Override
+	public void fromBasicDBObject(BasicDBObject object) {
+		this.productAgentId = new AID((String)(object.get("AID")), jade.core.AID.ISGUID);
+		this.type = object.getLong("type");
+		this.parameters = (BasicDBObject)object.get("parameters");
+		this.inputParts = (long[]) object.get("inputParts");
+		if(object.containsField("outputPart")){
+			this.outputPart = object.getLong("outputPart");
+		}else{
+			this.outputPart = -1l;
+		}
+		this.status = StepStatusCode.valueOf(object.getString("status"));
+		
+		if(object.containsField("statusData")){
+			this.statusData = (BasicDBObject) object.get(statusData);
+		}else{
+			this.statusData = new BasicDBObject();
+		}
+		if(object.containsField("scheduleData")){
+			this.scheduleData = new ScheduleData((BasicDBObject)object.get("scheduleData"));
+		}else{
+			this.scheduleData = new ScheduleData();
+		}
+		
 	}
 }

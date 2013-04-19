@@ -59,7 +59,7 @@ public class ProductionDurationResponse extends ReceiveBehaviour {
 			System.out.println(schedule.getDuration() + "");
 			
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
-			AID productAgent = new AID((String)((DBObject)productStep.get("productAgentId")).get("name"), AID.ISGUID);
+			AID productAgent = new AID((String)productStep.get("productAgentId"), AID.ISGUID);
 			responseMessage.addReceiver(productAgent);
 			responseMessage.setOntology("ProductionDuration");
 			responseMessage.setConversationId(message.getConversationId());
