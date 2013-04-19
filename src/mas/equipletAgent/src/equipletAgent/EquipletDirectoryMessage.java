@@ -33,11 +33,11 @@ import jade.core.AID;
 import java.util.ArrayList;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 
 import newDataClasses.DbData;
+import newDataClasses.IMongoSaveable;
 
-public class EquipletDirectoryMessage {
+public class EquipletDirectoryMessage implements IMongoSaveable{
 	/**
 	 * @var AID AID
 	 * The AID of the equipletAgent
@@ -69,6 +69,7 @@ public class EquipletDirectoryMessage {
 		this.db = db;
 	}
 	
+	@Override
 	@SuppressWarnings("unchecked")
 	public void fromBasicDBObject(BasicDBObject object){
 		this.AID = new AID((String)(object.get("AID")), jade.core.AID.ISGUID);
@@ -76,6 +77,7 @@ public class EquipletDirectoryMessage {
 		this.db.fromBasicDBObject((BasicDBObject)object.get("db"));
 	}
 	
+	@Override
 	public BasicDBObject toBasicDBObject(){
 		BasicDBObject entry = new BasicDBObject("AID", this.AID.getName());
 		entry.put("capabilities", capabilities);

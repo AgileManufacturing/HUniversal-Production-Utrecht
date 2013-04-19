@@ -37,7 +37,7 @@ import equipletAgent.StepStatusCode;
 import newDataClasses.ScheduleData;
 
 /**
- * Implementation of a message for the servicestep blackboard
+ * Implementation of a message for the serviceStep blackboard
  */
 public class ServiceStepMessage {
 	private ObjectId productStepId;
@@ -48,18 +48,18 @@ public class ServiceStepMessage {
 	private BasicDBObject statusData;
 	private ScheduleData scheduleData;
 
-	public ServiceStepMessage(long type, String serviceName, BasicDBObject parameters,
+	public ServiceStepMessage(String serviceName, long type, BasicDBObject parameters,
 			StepStatusCode status, BasicDBObject statusData,
 			ScheduleData scheduleData) {
-		this(null, type, serviceName, parameters, status, statusData, scheduleData);
+		this(null, serviceName, type, parameters, status, statusData, scheduleData);
 	}
 
-	public ServiceStepMessage(ObjectId productStepId, long type, String serviceName,
+	public ServiceStepMessage(ObjectId productStepId, String serviceName, long type,
 			BasicDBObject parameters, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
 		this.productStepId = productStepId;
-		this.type = type;
 		this.serviceName = serviceName;
+		this.type = type;
 		this.parameters = parameters;
 		this.status = status;
 		this.statusData = statusData;
@@ -77,8 +77,9 @@ public class ServiceStepMessage {
 		if (getClass() != obj.getClass())
 			return false;
 		ServiceStepMessage other = (ServiceStepMessage) obj;
-		return productStepId.equals(other.productStepId) && type == other.type
+		return productStepId.equals(other.productStepId)
 				&& serviceName.equals(other.serviceName)
+				&& type == other.type
 				&& parameters.equals(other.parameters)
 				&& status == other.status
 				&& statusData.equals(other.statusData)

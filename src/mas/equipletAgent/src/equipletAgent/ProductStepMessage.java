@@ -29,9 +29,6 @@
  **/
 package equipletAgent;
 
-import java.io.Serializable;
-import java.util.List;
-
 import com.mongodb.BasicDBObject;
 import jade.core.AID;
 import newDataClasses.ScheduleData;
@@ -39,13 +36,13 @@ import newDataClasses.ScheduleData;
 /**
  * Implementation of a message for the productstep blackboard
  */
-public class ProductStepMessage implements Serializable{
+public class ProductStepMessage extends BasicDBObject {
 	/**
 	 * @var static final long serialVersionUID
 	 * The serial version uid for this class.
 	 */
-	private static final long serialVersionUID = 1L;
-	
+	private static final long serialVersionUID = -800667987733841713L;
+
 	/**
 	 * @var AID productAgentId
 	 * The AID of the productAgent linked to this product step.
@@ -71,10 +68,10 @@ public class ProductStepMessage implements Serializable{
 	private long[] inputParts;
 	
 	/**
-	 * @var Object outputParts
+	 * @var long outputPart
 	 * The result parts for this product step.
 	 */
-	private Object outputParts;
+	private long outputPart;
 	
 	/**
 	 * @var StepStatusCode status
@@ -101,19 +98,19 @@ public class ProductStepMessage implements Serializable{
 	 * @param type - The type of the product step
 	 * @param parameters - The parameters for the product step
 	 * @param inputParts - The input parts for the product step
-	 * @param outputParts - The output parts for the product step
+	 * @param outputPart - The output parts for the product step
 	 * @param status - The status for the product step
 	 * @param statusData - The additional data for the status
 	 * @param scheduleData - The schedule data
 	 */
 	public ProductStepMessage(AID productAgentId, long type,
-			BasicDBObject parameters, long[] inputParts, Object outputParts,
+			BasicDBObject parameters, long[] inputParts, long outputPart,
 			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
 		this.productAgentId = productAgentId;
 		this.type = type;
 		this.parameters = parameters;
 		this.inputParts = inputParts;
-		this.outputParts = outputParts;
+		this.outputPart = outputPart;
 		this.status = status;
 		this.statusData = statusData;
 		this.scheduleData = scheduleData;
@@ -139,10 +136,18 @@ public class ProductStepMessage implements Serializable{
 				&& type == other.type
 				&& parameters.equals(other.parameters)
 				&& inputParts.equals(other.inputParts)
-				&& outputParts.equals(other.outputParts)
+				&& outputPart == other.outputPart
 				&& status == other.status
 				&& statusData.equals(other.statusData)
 				&& scheduleData.equals(other.scheduleData);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 
 	/**
@@ -190,7 +195,7 @@ public class ProductStepMessage implements Serializable{
 	/**
 	 * @return the inputParts
 	 */
-	public Object getInputParts() {
+	public long[] getInputParts() {
 		return inputParts;
 	}
 
@@ -202,17 +207,17 @@ public class ProductStepMessage implements Serializable{
 	}
 
 	/**
-	 * @return the outputParts
+	 * @return the outputPart
 	 */
-	public Object getOutputParts() {
-		return outputParts;
+	public long getOutputPart() {
+		return outputPart;
 	}
 
 	/**
-	 * @param outputParts the outputParts to set
+	 * @param outputPart the outputPart to set
 	 */
-	public void setOutputParts(Object outputParts) {
-		this.outputParts = outputParts;
+	public void setOutputParts(long outputPart) {
+		this.outputPart = outputPart;
 	}
 
 	/**

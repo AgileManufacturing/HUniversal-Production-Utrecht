@@ -75,8 +75,8 @@ public class CheckForModulesResponse extends ReceiveOnceBehaviour {
 			reply.setPerformative(message.getPerformative());
 			reply.setOntology("CanDoProductionStepResponse");
 			getAgent().send(reply);
-			System.out.format("%s sending step available (%s)%n", getAgent()
-					.getLocalName(), message.getPerformative());
+			System.out.format("%s sending step availability (%b)%n", getAgent()
+					.getLocalName(), message.getPerformative() == ACLMessage.CONFIRM);
 		} else {
 			// TODO handle timeout
 		}

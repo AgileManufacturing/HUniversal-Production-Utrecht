@@ -1,14 +1,14 @@
 /**
- * @file GripperModule.java
- * @brief Provides the data to be used for hardware agents.
- * @date Created: 12-04-13
+ * @file IMongoSaveable.java
+ * @brief 
+ * @date Created: 19 apr. 2013
  *
- * @author Thierry Gerritse
- * 
+ * @author Peter Bonnema
+ *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright � 2013, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,31 +26,24 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  **/
-
-package hardwareAgent;
+package newDataClasses;
 
 import com.mongodb.BasicDBObject;
 
-public class GripperModule implements Module{
+/**
+ * @author Peter
+ *
+ */
+public interface IMongoSaveable {
+	/**
+	 * @return
+	 */
+	public BasicDBObject toBasicDBObject();
 	
-	public GripperModule(){
-	}
-	
-	@Override
-	public EquipletStepMessage[] getEquipletSteps(BasicDBObject parameters) {
-		// TODO Auto-generated method stub
-		//return null;
-		
-		TimeData td = new TimeData(2l);
-		
-		EquipletStepMessage esm = new EquipletStepMessage(null, 1l, 2l, td);
-		
-		EquipletStepMessage[] dummyData = {esm};
-		
-		return dummyData;
-		
-	}	
-	
-
+	/**
+	 * @return
+	 */
+	public void fromBasicDBObject(BasicDBObject object);
 }

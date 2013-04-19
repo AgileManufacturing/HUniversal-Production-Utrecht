@@ -31,7 +31,6 @@
 package serviceAgent.behaviour;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,20 +38,13 @@ import org.bson.types.ObjectId;
 
 import behaviours.ReceiveBehaviour;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
-import com.google.gson.JsonSyntaxException;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
-import newDataClasses.ScheduleData;
 import nl.hu.client.BlackboardClient;
 import nl.hu.client.GeneralMongoException;
 import nl.hu.client.InvalidDBNamespaceException;
-import nl.hu.client.InvalidJSONException;
 import serviceAgent.ServiceAgent;
-import serviceAgent.ServiceStepMessage;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -172,8 +164,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 						answer.setConversationId(conversationId);
 						answer.setOntology("GetTransportDuration");
 
-						long[] inputParts = (long[]) productStep
-								.get("inputParts");
+						long[] inputParts = (long[]) productStep.get("inputParts");
 						answer.setContentObject(inputParts);
 
 						agent.send(answer);
@@ -188,8 +179,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 					scheduleData.put("duration", duration);
 					productionStepBlackBoard.updateDocuments(new BasicDBObject(
 							"_id", serviceStep.get("productStepId")),
-							new BasicDBObject("$set", new BasicDBObject(
-									"scheduleData", scheduleData)));
+							new BasicDBObject("$set", new BasicDBObject("scheduleData", scheduleData)));
 
 					System.out.format(
 							"Saving duration of %d in prod. step %s%n",

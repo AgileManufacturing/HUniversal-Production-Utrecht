@@ -300,10 +300,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
-		switch (entry.getNamespace().split(".")[1]) {
+		switch (entry.getNamespace().split("\\.")[1]) {
 		case "ProductStepsBlackBoard":
 			try {
 				ObjectId id = entry.getTargetObjectId();
@@ -320,11 +319,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					throw new Exception();
 				}
 
-				HashMap<String, String> statusData = null;
+				BasicDBObject statusData = null;
 				try {
-					statusData = (HashMap<String, String>) productStep.get("statusData");
+					statusData = (BasicDBObject)productStep.get("statusData");
 				} catch (Exception e) {
-					statusData = new HashMap<>();
+					statusData = new BasicDBObject();
 				}
 
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
