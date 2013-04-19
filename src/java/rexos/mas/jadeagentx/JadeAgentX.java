@@ -37,12 +37,12 @@ import jade.wrapper.StaleProxyException;
 
 import java.util.ArrayList;
 
-import rexos.mas.newDataClasses.Parameter;
-import rexos.mas.newDataClasses.ParameterGroup;
-import rexos.mas.newDataClasses.ParameterList;
-import rexos.mas.newDataClasses.Product;
-import rexos.mas.newDataClasses.Production;
-import rexos.mas.newDataClasses.ProductionStep;
+import rexos.mas.data.Parameter;
+import rexos.mas.data.ParameterGroup;
+import rexos.mas.data.ParameterList;
+import rexos.mas.data.Product;
+import rexos.mas.data.Production;
+import rexos.mas.data.ProductionStep;
 
 
 public class JadeAgentX extends Agent {
@@ -72,7 +72,7 @@ public class JadeAgentX extends Agent {
 			 * make a new equipletagent to use. 
 			 */
 			Object[] ar = new Object[] { capabilities1 };
-			getContainerController().createNewAgent("eqa1", "rexos.mas.equipletAgent.EquipletAgent", ar).start();
+			getContainerController().createNewAgent("eqa1", "rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 			// TODO code application logic here
 			ArrayList<Long> capabilities2 = new ArrayList<>();
 			capabilities2.add(2l);
@@ -80,7 +80,7 @@ public class JadeAgentX extends Agent {
 			capabilities2.add(9l);
 
 			ar = new Object[] { capabilities2 };
-			getContainerController().createNewAgent("eqa2", "rexos.mas.equipletAgent.EquipletAgent", ar).start();
+			getContainerController().createNewAgent("eqa2", "rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 
 			ArrayList<Long> capabilities3 = new ArrayList<>();
 			capabilities3.add(3l);
@@ -89,7 +89,7 @@ public class JadeAgentX extends Agent {
 			capabilities3.add(9l);
 
 			ar = new Object[] { capabilities3 };
-			getContainerController().createNewAgent("eqa3", "rexos.mas.equipletAgent.EquipletAgent", ar).start();
+			getContainerController().createNewAgent("eqa3", "rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 
 			ar = null;
 

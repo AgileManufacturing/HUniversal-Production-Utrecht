@@ -4,10 +4,10 @@ import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
-import rexos.mas.newDataClasses.Product;
-import rexos.mas.newDataClasses.Production;
-import rexos.mas.newDataClasses.ProductionStep;
-import rexos.mas.newDataClasses.ProductionStepStatus;
+import rexos.mas.data.Product;
+import rexos.mas.data.Production;
+import rexos.mas.data.ProductionStep;
+import rexos.mas.data.ProductionStepStatus;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;

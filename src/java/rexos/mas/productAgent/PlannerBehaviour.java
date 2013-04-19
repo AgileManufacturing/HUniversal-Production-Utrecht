@@ -10,11 +10,11 @@ import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.blackboard_client.InvalidJSONException;
-import rexos.mas.newDataClasses.Product;
-import rexos.mas.newDataClasses.Production;
-import rexos.mas.newDataClasses.ProductionEquipletMapper;
-import rexos.mas.newDataClasses.ProductionStep;
-import rexos.mas.newDataClasses.ProductionStepStatus;
+import rexos.mas.data.Product;
+import rexos.mas.data.Production;
+import rexos.mas.data.ProductionEquipletMapper;
+import rexos.mas.data.ProductionStep;
+import rexos.mas.data.ProductionStepStatus;
 
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
