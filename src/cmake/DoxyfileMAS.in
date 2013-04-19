@@ -665,7 +665,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = @DOCS_PATH@/mas \
+INPUT                  = @DOCS_PATH@/java/rexos/mas \
                          @DOCS_PATH@/mainpage.dox
 
 # This tag can be used to specify the character encoding of the source files
@@ -729,8 +729,7 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = @DOCS_PATH@/libraries/mongo-cxx-driver \
-                         @DOCS_PATH@/libraries/libjson
+EXCLUDE                = 
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
@@ -749,10 +748,6 @@ EXCLUDE_PATTERNS       = */msg_gen/* \
                          */src/*/srv/* \
                          */src/*/msg/* \
                          */src/*/__init__.py \
-                         */openBBS/* \
-                         */blackboardServer/* \
-                         */autoKeyStoreServer/* \
-                         */autoKeyStoreJava/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
