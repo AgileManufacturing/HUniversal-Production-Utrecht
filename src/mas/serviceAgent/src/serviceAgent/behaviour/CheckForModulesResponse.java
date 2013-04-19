@@ -71,9 +71,9 @@ public class CheckForModulesResponse extends ReceiveOnceBehaviour {
 		if (message != null) {
 			ACLMessage reply = message.createReply();
 			reply.clearAllReceiver();
-			message.addReceiver(agent.getEquipletAgentAID());
-			message.setPerformative(message.getPerformative());
-			message.setOntology("CanDoProductionStepResponse");
+			reply.addReceiver(agent.getEquipletAgentAID());
+			reply.setPerformative(message.getPerformative());
+			reply.setOntology("CanDoProductionStepResponse");
 			getAgent().send(reply);
 			System.out.format("%s sending step available (%s)%n", getAgent()
 					.getLocalName(), message.getPerformative());

@@ -59,9 +59,9 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 	private HashMap<Long,Module> ModulesMap;
 	private HashMap<Service, Module> LeadingModules;
 		
-	public void RegisterModule(long name,Module module){
+	public void RegisterModule(long id,Module module){
 		
-		ModulesMap.put(name, module);
+		this.ModulesMap.put(id, module);
 		
 	}
 	

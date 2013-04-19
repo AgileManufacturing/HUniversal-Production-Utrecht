@@ -66,8 +66,9 @@ public class GetServiceDuration extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	private BlackboardClient productionStepBlackBoard, serviceStepBlackBoard;
-	private List<ServiceStepMessage> serviceSteps;
+	private List<BasicDBObject> serviceSteps;
 	private String conversationId;
+	private ServiceAgent agent;
 
 	private long duration = 0;
 	private int remainingServiceSteps;
@@ -78,7 +79,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 	public GetServiceDuration(Agent a,
 			BlackboardClient productionStepBlackBoard,
 			BlackboardClient serviceStepBlackBoard,
-			ServiceStepMessage[] serviceSteps, String conversationId) {
+			BasicDBObject[] serviceSteps, String conversationId) {
 		this(a, 2000, productionStepBlackBoard, serviceStepBlackBoard,
 				serviceSteps, conversationId);
 	}
@@ -89,54 +90,56 @@ public class GetServiceDuration extends ReceiveBehaviour {
 	public GetServiceDuration(Agent a, int millis,
 			BlackboardClient productionStepBlackBoard,
 			BlackboardClient serviceStepBlackBoard,
-			ServiceStepMessage[] serviceSteps, String conversationId) {
-		super(a, millis, MessageTemplate
-				.and(MessageTemplate
-						.MatchOntology("GetServiceStepDurationResponse"),
-						MessageTemplate.MatchConversationId(conversationId)));
+			BasicDBObject[] serviceSteps, String conversationId) {
+		super(
+				a,
+				millis,
+				MessageTemplate
+						.and(MessageTemplate
+								.MatchConversationId(conversationId),
+								MessageTemplate.or(
+										MessageTemplate
+												.MatchOntology("GetServiceStepDurationResponse"),
+										MessageTemplate
+												.MatchOntology("GetTransportDurationResponse"))));
+
 		this.productionStepBlackBoard = productionStepBlackBoard;
 		this.serviceStepBlackBoard = serviceStepBlackBoard;
 		this.serviceSteps = Arrays.asList(serviceSteps);
 		this.conversationId = conversationId;
+		agent = (ServiceAgent) a;
 
 		remainingServiceSteps = serviceSteps.length;
 	}
 
 	@Override
 	public void onStart() {
+		System.out.format("%s asking %s for duration of %d steps%n", agent
+				.getLocalName(), agent.getHardwareAgentAID().getLocalName(),
+				serviceSteps.size());
+
 		ObjectId serviceStepId;
-		ACLMessage message;
-		ServiceAgent agent = (ServiceAgent) getAgent();
-		Gson gson = new GsonBuilder().registerTypeAdapter(DBObject.class,
-				new InstanceCreator<DBObject>() {
-					@Override
-					public DBObject createInstance(Type type) {
-						return new BasicDBObject();
-					}
-				}).create();
-
+		ACLMessage message = new ACLMessage(ACLMessage.QUERY_IF);
+		message.addReceiver(agent.getHardwareAgentAID());
+		message.setOntology("GetServiceStepDuration");
+		message.setConversationId(conversationId);
 		try {
-			System.out.format("%s asking %s for duration of %d steps%n", agent
-					.getLocalName(),
-					agent.getHardwareAgentAID().getLocalName(), serviceSteps
-							.size());
-			for (ServiceStepMessage serviceStep : serviceSteps) {
-				serviceStepId = serviceStepBlackBoard.insertDocument(gson
-						.toJson(serviceStep));
-
-				message = new ACLMessage(ACLMessage.QUERY_IF);
-				message.addReceiver(agent.getHardwareAgentAID());
-				message.setOntology("GetServiceStepDuration");
+			for (BasicDBObject serviceStep : serviceSteps) {
+				serviceStepId = serviceStepBlackBoard.insertDocument(serviceStep);
 				message.setContentObject(serviceStepId);
-				message.setConversationId(conversationId);
 				agent.send(message);
 			}
 		} catch (InvalidDBNamespaceException | GeneralMongoException
-				| IOException | InvalidJSONException e) {
+				| IOException e) {
 			e.printStackTrace();
 			agent.doDelete();
 		}
+
+		message.clearAllReceiver();
+		message.addReceiver(agent.getLogisticsAID());
+		message.setOntology("GetTransportDuration");
 	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -145,37 +148,52 @@ public class GetServiceDuration extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if (message != null) {
-			ServiceAgent agent = (ServiceAgent) getAgent();
 			try {
-				Gson gson = new GsonBuilder().registerTypeAdapter(
-						DBObject.class, new InstanceCreator<DBObject>() {
-							@Override
-							public DBObject createInstance(Type type) {
-								return new BasicDBObject();
-							}
-						}).create();
-				ServiceStepMessage serviceStep = gson.fromJson(gson
-						.toJson(serviceStepBlackBoard
-								.findDocumentById((ObjectId) message
-										.getContentObject())),
-						ServiceStepMessage.class);
+				DBObject serviceStep = serviceStepBlackBoard
+						.findDocumentById((ObjectId) message.getContentObject());
+				DBObject productStep = productionStepBlackBoard
+						.findDocumentById((ObjectId) serviceStep
+								.get("productStepId"));
+				BasicDBObject scheduleData;
+				
+				switch (message.getOntology()) {
+				case "GetServiceStepDurationResponse":
+					System.out.format("%s says step type %s will take %d%n",
+							agent.getLocalName(), serviceStep.get("type"),
+							((BasicDBObject) serviceStep.get("scheduleData"))
+									.getLong("duration"));
 
-				System.out.format("%s says step type %s will take %d%n",
-						agent.getLocalName(), serviceStep.getType(),
-						serviceStep.getScheduleData().getDuration());
+					scheduleData = (BasicDBObject) serviceStep
+							.get("scheduleData");
+					duration += scheduleData.getLong("duration");
+					if (--remainingServiceSteps == 0) {
+						ACLMessage answer = new ACLMessage(ACLMessage.QUERY_IF);
+						answer.addReceiver(agent.getLogisticsAID());
+						answer.setConversationId(conversationId);
+						answer.setOntology("GetTransportDuration");
 
-				ScheduleData scheduleData = serviceStep.getScheduleData();
-				duration += scheduleData.getDuration();
-				if (--remainingServiceSteps == 0) {
+						long[] inputParts = (long[]) productStep
+								.get("inputParts");
+						answer.setContentObject(inputParts);
+
+						agent.send(answer);
+					}
+					break;
+				case "GetTransportDurationResponse":
+					duration += Integer.parseInt(message.getContent());
+
+					// read scheduleData from product step BB
+					scheduleData = (BasicDBObject) productStep
+							.get("scheduleData");
+					scheduleData.put("duration", duration);
+					productionStepBlackBoard.updateDocuments(new BasicDBObject(
+							"_id", serviceStep.get("productStepId")),
+							new BasicDBObject("$set", new BasicDBObject(
+									"scheduleData", scheduleData)));
+
 					System.out.format(
 							"Saving duration of %d in prod. step %s%n",
-							duration, serviceStep.getProductStepId());
-					scheduleData.setDuration(duration);
-					productionStepBlackBoard.updateDocuments(
-							new BasicDBObject("_id", serviceStep
-									.getProductStepId()),
-							new BasicDBObject("$set", scheduleData
-									.toBasicDBObject()));
+							duration, serviceStep.get("productStepId"));
 
 					ACLMessage answer = new ACLMessage(ACLMessage.INFORM);
 					answer.addReceiver(agent.getEquipletAgentAID());
@@ -183,13 +201,16 @@ public class GetServiceDuration extends ReceiveBehaviour {
 					answer.setOntology("ProductionDurationResponse");
 					agent.send(answer);
 
-					System.out.format("%s sending msg (%s)%n", myAgent.getLocalName(),
-							answer.getOntology());
-					
+					System.out.format("%s sending msg (%s)%n",
+							myAgent.getLocalName(), answer.getOntology());
+
 					agent.removeBehaviour(this);
+					break;
+				default:
+					break;
 				}
-			} catch (UnreadableException | JsonSyntaxException
-					| InvalidDBNamespaceException | GeneralMongoException e) {
+			} catch (IOException | InvalidDBNamespaceException
+					| GeneralMongoException | UnreadableException e) {
 				e.printStackTrace();
 			}
 		} else {

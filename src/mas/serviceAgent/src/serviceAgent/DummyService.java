@@ -67,11 +67,17 @@ public class DummyService implements Service {
 	 * com.mongodb.BasicDBObject)
 	 */
 	@Override
-	public ServiceStepMessage[] getServiceSteps(long productStepType,
+	public BasicDBObject[] getServiceSteps(long productStepType,
 			BasicDBObject parameters) {
-		return new ServiceStepMessage[] { new ServiceStepMessage(1l, name,
-				parameters, StepStatusCode.EVALUATING, new BasicDBObject(
-						"status", "dummy status"), new ScheduleData()) };
+		BasicDBObject service = new BasicDBObject("serviceName", name)
+				.append("type", 1l)
+				.append("parameters", parameters)
+				.append("status", StepStatusCode.EVALUATING)
+				.append("statusData",
+						new BasicDBObject("status", "dummy status"))
+				.append("scheduleData", new ScheduleData());
+
+		return new BasicDBObject[] { service };
 	}
 
 	/*

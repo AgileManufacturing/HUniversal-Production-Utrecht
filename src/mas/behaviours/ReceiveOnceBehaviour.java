@@ -31,6 +31,7 @@
 package behaviours;
 
 import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 /**
@@ -85,8 +86,21 @@ public abstract class ReceiveOnceBehaviour extends ReceiveBehaviour {
 
 	@Override
 	public void action() {
-		handle(msg = myAgent.receive(template));
-		if(myAgent != null)
-			myAgent.removeBehaviour(this);
+		if(myAgent != null && (msg = myAgent.receive(template)) != null) {
+			handle(msg);
+			if(myAgent != null)
+				myAgent.removeBehaviour(this);
+		} else if(wakeupTime == 0) {
+			block();
+		} else {
+			long dt = wakeupTime - System.currentTimeMillis();
+			if (dt > 0)
+				block(dt);
+			else {
+				handle((ACLMessage) null);
+				if(myAgent != null)
+					myAgent.removeBehaviour(this);
+			}
+		}
 	}
 }
