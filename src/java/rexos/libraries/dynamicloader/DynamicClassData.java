@@ -136,9 +136,11 @@ class DynamicClassData {
 	 * @param description The description that will be used for this object.
 	 **/
 	public void setDescription(DynamicClassDescription description) {
+		if (!description.equals(this.description)) {
+			this.lastModified = 0;
+			classDataChanged = true;
+		}
 		this.description = description;
-		this.lastModified = 0;
-		classDataChanged = true;
 	}
 
 	/**
@@ -213,8 +215,7 @@ class DynamicClassData {
 		if (jarFile != null) {
 			setClassData(extractClassDataFromJar(jarFile, description.getClassName()));
 			setLastModified(con.getLastModified());
+			jarFile.close();
 		}
-		
-		jarFile.close();
 	}
 }
