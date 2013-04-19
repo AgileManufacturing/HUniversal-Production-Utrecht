@@ -22,7 +22,7 @@ import com.mongodb.BasicDBObject;
  * @author Peter Bonnema
  * 
  */
-public class GetProductDuration extends ReceiveBehaviour {
+public class GetProductionDuration extends ReceiveBehaviour {
 	static final long serialVersionUID = 1L;
 
 	private BlackboardClient productionStepBlackBoard, serviceStepBlackBoard;
@@ -30,7 +30,7 @@ public class GetProductDuration extends ReceiveBehaviour {
 	/**
 	 * @param a
 	 */
-	public GetProductDuration(Agent a,
+	public GetProductionDuration(Agent a,
 			BlackboardClient productionStepBlackBoard,
 			BlackboardClient serviceStepBlackBoard) {
 		super(a, MessageTemplate.MatchOntology("GetProductionStepDuration"));
