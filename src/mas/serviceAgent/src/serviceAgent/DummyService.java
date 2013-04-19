@@ -57,7 +57,7 @@ public class DummyService implements Service {
 	 */
 	@Override
 	public long[] getModuleIds(long productStepType, BasicDBObject parameters) {
-		return new long[] { 1l, 2l, 3l };
+		return new long[] { 1l, 2l };
 	}
 
 	/*

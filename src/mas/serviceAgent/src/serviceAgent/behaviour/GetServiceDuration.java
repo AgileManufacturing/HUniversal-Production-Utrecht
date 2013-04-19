@@ -43,10 +43,12 @@ import com.mongodb.DBObject;
 
 import equipletAgent.ProductStepMessage;
 
+import newDataClasses.ScheduleData;
 import nl.hu.client.BlackboardClient;
 import nl.hu.client.GeneralMongoException;
 import nl.hu.client.InvalidDBNamespaceException;
 import serviceAgent.ServiceAgent;
+import serviceAgent.ServiceStepMessage;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -119,7 +121,8 @@ public class GetServiceDuration extends ReceiveBehaviour {
 		message.setConversationId(conversationId);
 		try {
 			for (BasicDBObject serviceStep : serviceSteps) {
-				serviceStepId = serviceStepBlackBoard.insertDocument(serviceStep);
+				serviceStepId = serviceStepBlackBoard
+						.insertDocument(serviceStep);
 				message.setContentObject(serviceStepId);
 				agent.send(message);
 			}
@@ -143,23 +146,25 @@ public class GetServiceDuration extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
-				DBObject serviceStep = serviceStepBlackBoard
-						.findDocumentById((ObjectId) message.getContentObject());
+				ServiceStepMessage serviceStep = new ServiceStepMessage(
+						(BasicDBObject) serviceStepBlackBoard
+								.findDocumentById((ObjectId) message
+										.getContentObject()));
 				ProductStepMessage productStep = new ProductStepMessage(
-						(BasicDBObject)productionStepBlackBoard.findDocumentById(
-								(ObjectId) serviceStep.get("productStepId")));
-				BasicDBObject scheduleData;
-				
+						(BasicDBObject) productionStepBlackBoard
+								.findDocumentById(serviceStep
+										.getProductStepId()));
+				ScheduleData scheduleData;
+
 				switch (message.getOntology()) {
 				case "GetServiceStepDurationResponse":
-					System.out.format("%s says step type %s will take %d%n",
-							agent.getLocalName(), serviceStep.get("type"),
-							((BasicDBObject) serviceStep.get("scheduleData"))
-									.getLong("duration"));
+					scheduleData = serviceStep.getScheduleData();
 
-					scheduleData = (BasicDBObject) serviceStep
-							.get("scheduleData");
-					duration += scheduleData.getLong("duration");
+					System.out.format("%s says step type %s will take %d%n",
+							message.getSender().getLocalName(),
+							serviceStep.getType(), scheduleData.getDuration());
+
+					duration += scheduleData.getDuration();
 					if (--remainingServiceSteps == 0) {
 						ACLMessage answer = new ACLMessage(ACLMessage.QUERY_IF);
 						answer.addReceiver(agent.getLogisticsAID());
@@ -176,15 +181,17 @@ public class GetServiceDuration extends ReceiveBehaviour {
 					duration += Integer.parseInt(message.getContent());
 
 					// read scheduleData from product step BB
-					scheduleData = productStep.getScheduleData().toBasicDBObject();
-					scheduleData.put("duration", duration);
-					productionStepBlackBoard.updateDocuments(new BasicDBObject(
-							"_id", serviceStep.get("productStepId")),
-							new BasicDBObject("$set", new BasicDBObject("scheduleData", scheduleData)));
+					scheduleData = productStep.getScheduleData();
+					scheduleData.setDuration(duration);
+					productionStepBlackBoard.updateDocuments(
+							new BasicDBObject("_id", serviceStep
+									.getProductStepId()),
+							new BasicDBObject("$set", new BasicDBObject("scheduleData", scheduleData
+									.toBasicDBObject())));
 
 					System.out.format(
 							"Saving duration of %d in prod. step %s%n",
-							duration, serviceStep.get("productStepId"));
+							duration, serviceStep.getProductStepId());
 
 					ACLMessage answer = new ACLMessage(ACLMessage.INFORM);
 					answer.addReceiver(agent.getEquipletAgentAID());
