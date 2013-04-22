@@ -208,8 +208,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		try{
 			// TODO: Not Hardcoded capabilities/get capabilities from the service agent.
 			Object[] args = getArguments();
+			AID logisticsAgent = null;
 			if (args != null && args.length > 0) {
 				capabilities = (ArrayList<Long>) args[0];
+				logisticsAgent = (AID) args[1];
 				System.out.format("%s %s%n", capabilities, equipletDbName);
 			}
 			
@@ -219,7 +221,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			getContainerController().createNewAgent(getLocalName() + "-hardwareAgent", "rexos.mas.hardware_agent.HardwareAgent", arguments).start();
 			AID hardwareAgent = new AID(getLocalName() + "-hardwareAgent", AID.ISLOCALNAME);
 			
-			arguments = new Object[] { dbData, getAID(), hardwareAgent };
+			arguments = new Object[] { dbData, getAID(), hardwareAgent, logisticsAgent };
 			getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "rexos.mas.service_agent.ServiceAgent", arguments).start();
 			serviceAgent = new AID(getLocalName() + "-serviceAgent", AID.ISLOCALNAME);
 			

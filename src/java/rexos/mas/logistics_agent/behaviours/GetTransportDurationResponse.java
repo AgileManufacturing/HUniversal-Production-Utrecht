@@ -1,7 +1,7 @@
 /**
- * @file DummyService.java
+ * @file GetTransportDurationResponse.java
  * @brief 
- * @date Created: 12 apr. 2013
+ * @date Created: 20 apr. 2013
  *
  * @author Peter Bonnema
  *
@@ -28,68 +28,54 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  **/
-package rexos.mas.service_agent;
+package rexos.mas.logistics_agent.behaviours;
 
-import rexos.mas.data.ScheduleData;
-import rexos.mas.equiplet_agent.StepStatusCode;
-
-import com.mongodb.BasicDBObject;
+import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
+import rexos.mas.behaviours.ReceiveBehaviour;
 
 /**
  * @author Peter
  * 
  */
-public class DummyService implements Service {
-	public static final String name = "DummyService";
+public class GetTransportDurationResponse extends ReceiveBehaviour {
+	private static final long serialVersionUID = 1L;
+
+	private static final long transportDurationPerPart = 3;
 
 	/**
-	 * 
+	 * @param a
 	 */
-	public DummyService() {
+	public GetTransportDurationResponse(Agent a) {
+		super(a, -1, MessageTemplate.MatchOntology("GetTransportDuration"));
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see serviceAgent.Service#canPerform(long, com.mongodb.BasicDBObject)
+	 * @see
+	 * rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage)
 	 */
 	@Override
-	public long[] getModuleIds(long productStepType, BasicDBObject parameters) {
-		return new long[] { 1l, 2l };
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see serviceAgent.Service#getServiceSteps(long,
-	 * com.mongodb.BasicDBObject)
-	 */
-	@Override
-	public ServiceStepMessage[] getServiceSteps(long productStepType,
-			BasicDBObject parameters) {
-		ServiceStepMessage service = new ServiceStepMessage(1l, 1l,
-				parameters, StepStatusCode.EVALUATING, new BasicDBObject(
-						"status", "dummy status"), new ScheduleData());
-		return new ServiceStepMessage[] { service };
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see serviceAgent.Service#getName()
-	 */
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return String.format("DummyService []");
+	public void handle(ACLMessage message) {
+		try {
+			System.out.format("%s received message from %s (%s:%s)%n",
+					myAgent.getLocalName(), message.getSender().getLocalName(),
+					message.getOntology(), message.getContentObject());
+			Long[] parts = (Long[]) message.getContentObject();
+			ACLMessage reply = message.createReply();
+			reply.setOntology("GetTransportDurationResponse");
+			reply.setContent(String.valueOf(parts.length
+					* transportDurationPerPart));
+			myAgent.send(reply);
+			System.out.format(
+					"It will take %d timeslots to deliver %d parts%n",
+					parts.length * transportDurationPerPart, parts.length);
+		} catch (UnreadableException e) {
+			e.printStackTrace();
+			myAgent.doDelete();
+		}
 	}
 }

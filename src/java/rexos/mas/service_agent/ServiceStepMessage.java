@@ -43,24 +43,24 @@ import com.mongodb.BasicDBObjectBuilder;
  */
 public class ServiceStepMessage implements IMongoSaveable {
 	private ObjectId productStepId;
-	private String serviceName;
+	private long serviceId;
 	private long type;
 	private BasicDBObject parameters;
 	private StepStatusCode status;
 	private BasicDBObject statusData;
 	private ScheduleData scheduleData;
 
-	public ServiceStepMessage(String serviceName, long type, BasicDBObject parameters,
+	public ServiceStepMessage(long serviceId, long type, BasicDBObject parameters,
 			StepStatusCode status, BasicDBObject statusData,
 			ScheduleData scheduleData) {
-		this(null, serviceName, type, parameters, status, statusData, scheduleData);
+		this(null, serviceId, type, parameters, status, statusData, scheduleData);
 	}
 
-	public ServiceStepMessage(ObjectId productStepId, String serviceName, long type,
+	public ServiceStepMessage(ObjectId productStepId, long serviceId, long type,
 			BasicDBObject parameters, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
 		this.productStepId = productStepId;
-		this.serviceName = serviceName;
+		this.serviceId = serviceId;
 		this.type = type;
 		this.parameters = parameters;
 		this.status = status;
@@ -79,7 +79,7 @@ public class ServiceStepMessage implements IMongoSaveable {
 	public BasicDBObject toBasicDBObject() {
 		return (BasicDBObject) BasicDBObjectBuilder.start()
 				.add("productStepId", productStepId)
-				.add("serviceName", serviceName)
+				.add("serviceId", serviceId)
 				.add("type", type)
 				.add("parameters", parameters)
 				.add("status", status.name())
@@ -93,7 +93,7 @@ public class ServiceStepMessage implements IMongoSaveable {
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		productStepId = object.getObjectId("productStepId");
-		serviceName = object.getString("serviceName");
+		serviceId = object.getLong("serviceId");
 		type = object.getLong("type");
 		parameters = (BasicDBObject) object.get("parameters");
 		status = StepStatusCode.valueOf(object.getString("status"));
@@ -140,17 +140,17 @@ public class ServiceStepMessage implements IMongoSaveable {
 	}
 
 	/**
-	 * @return the serviceName
+	 * @return the serviceId
 	 */
-	public String getServiceName() {
-		return serviceName;
+	public long getServiceId() {
+		return serviceId;
 	}
 
 	/**
-	 * @param serviceName the serviceName to set
+	 * @param serviceId the serviceId to set
 	 */
-	public void setServiceName(String serviceName) {
-		this.serviceName = serviceName;
+	public void setServiceId(long serviceId) {
+		this.serviceId = serviceId;
 	}
 
 	/**

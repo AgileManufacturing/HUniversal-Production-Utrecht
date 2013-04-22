@@ -30,9 +30,11 @@
 
 package rexos.mas.jadeagentx;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 import java.util.ArrayList;
@@ -44,19 +46,28 @@ import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
 
-
 public class JadeAgentX extends Agent {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * 
-	 *the command line arguments
+	 * the command line arguments
 	 */
 	@Override
 	protected void setup() {
 		try {
 			System.out.println("starting a agent");
-			
+
+			/**
+			 * Make a new logistics agent
+			 */
+			AgentController logisticsCon = getContainerController()
+					.createNewAgent("logistics",
+							"rexos.mas.logistics_agent.LogisticsAgent",
+							new Object[0]);
+			logisticsCon.start();
+			AID logisticsAID = new AID(logisticsCon.getName(), AID.ISGUID);
+
 			/**
 			 * Make a array list of capabilities
 			 */
@@ -67,34 +78,36 @@ public class JadeAgentX extends Agent {
 			capabilities1.add(24l);
 			capabilities1.add(23412l);
 			capabilities1.add(15l);
-			
+
 			/**
-			 * make a new equipletagent to use. 
+			 * make a new equipletagent to use.
 			 */
-			Object[] ar = new Object[] { capabilities1 };
-			getContainerController().createNewAgent("eqa1", "rexos.mas.equiplet_agent.EquipletAgent", ar).start();
+			Object[] ar = new Object[] { capabilities1, logisticsAID };
+			getContainerController().createNewAgent("eqa1",
+					"rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 			// TODO code application logic here
+
 			ArrayList<Long> capabilities2 = new ArrayList<>();
 			capabilities2.add(2l);
 			capabilities2.add(5l);
 			capabilities2.add(9l);
-
-			ar = new Object[] { capabilities2 };
-			getContainerController().createNewAgent("eqa2", "rexos.mas.equiplet_agent.EquipletAgent", ar).start();
+			ar = new Object[] { capabilities2, logisticsAID };
+			getContainerController().createNewAgent("eqa2",
+					"rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 
 			ArrayList<Long> capabilities3 = new ArrayList<>();
 			capabilities3.add(3l);
 			capabilities3.add(4l);
 			capabilities3.add(7l);
 			capabilities3.add(9l);
-
-			ar = new Object[] { capabilities3 };
-			getContainerController().createNewAgent("eqa3", "rexos.mas.equiplet_agent.EquipletAgent", ar).start();
+			ar = new Object[] { capabilities3, logisticsAID };
+			getContainerController().createNewAgent("eqa3",
+					"rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 
 			ar = null;
 
 			/**
-			 *  Lets make a parameter list
+			 * Lets make a parameter list
 			 */
 			ParameterList parameterList = new ParameterList();
 			ParameterGroup p = new ParameterGroup("Color"); // group colour
@@ -157,11 +170,10 @@ public class JadeAgentX extends Agent {
 			parameterList.AddParameterGroup(p);
 
 			ProductionStep stp4 = new ProductionStep(4, 3, parameterList);
-			
+
 			/**
-			 *Our argument for the product agent. The total production of the
-			 *product,
-			 *consists of multiple steps
+			 * Our argument for the product agent. The total production of the
+			 * product, consists of multiple steps
 			 */
 			ArrayList<ProductionStep> stepList = new ArrayList<>();
 			stepList.add(stp1);
@@ -173,24 +185,29 @@ public class JadeAgentX extends Agent {
 			Product product = new Product(production, getAID().toString());
 
 			/**
-			 * We need to pass an Object[] to the createNewAgent.
-			 * But we only want to pass our product!
+			 * We need to pass an Object[] to the createNewAgent. But we only
+			 * want to pass our product!
 			 */
-			
+
 			Object[] args = new Object[1];
 			args[0] = product;
 
+			getContainerController().createNewAgent("pa" + count++,
+					"rexos.mas.productAgent.ProductAgent", args).start();
 			addBehaviour(new StartProductAgent(this, args));
 		} catch (Exception e) {
 			e.printStackTrace();
+			doDelete();
 		}
 	}
 
-	private static long count = 0;
+	static long count = 0;
+
 	public class StartProductAgent extends CyclicBehaviour {
 		private static final long serialVersionUID = 1L;
 
 		Object[] args;
+
 		/**
 		 * 
 		 * @param a
@@ -200,7 +217,7 @@ public class JadeAgentX extends Agent {
 			super(a);
 			this.args = args;
 		}
-		
+
 		/**
 		 * Make new product agent
 		 */
@@ -209,7 +226,9 @@ public class JadeAgentX extends Agent {
 			ACLMessage message = receive();
 			if (message != null) {
 				try {
-					getContainerController().createNewAgent("pa" + count++, "rexos.mas.productAgent.ProductAgent", args).start();
+					getContainerController().createNewAgent("pa" + count++,
+							"rexos.mas.productAgent.ProductAgent", args)
+							.start();
 				} catch (StaleProxyException e) {
 					e.printStackTrace();
 				}

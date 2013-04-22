@@ -48,7 +48,6 @@ import rexos.mas.data.DbData;
 import rexos.mas.hardware_agent.behaviours.CheckForModules;
 import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
 import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
-import rexos.mas.service_agent.Service;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -58,22 +57,20 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 
 	private BlackboardClient serviceStepBBClient, equipletStepBBClient;
 	private DbData dbData;
-	private HashMap<Long,Module> ModulesMap;
-	private HashMap<Service, Module> LeadingModules;
+	private HashMap<Long,Module> leadingModules;
 		
-	public void RegisterModule(long id,Module module) {
-		this.ModulesMap.put(id, module);
+	public void registerLeadingModule(long serviceId, Module module) {
+		leadingModules.put(serviceId, module);
 	}
 	
-	public Module GetModuleById(long id) {
-		return ModulesMap.get(id);
+	public Module getLeadingModule(long serviceId) {
+		return leadingModules.get(serviceId);
 	}
 	
 	@Override
 	public void setup() {
-		System.out.println("Hardware agent "+ this +" reporting.");
-		ModulesMap = new HashMap<Long,Module>();
-		LeadingModules = new HashMap<Service, Module>();
+		System.out.println("Hardware agent " + this + " reporting.");
+		leadingModules = new HashMap<Long,Module>();
 
 		// TODO fill in host, database and collection
 		Object[] args = getArguments();
@@ -113,9 +110,9 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 		
 		// for now: use precompiled grippermodule class
 		GripperModule gp = new GripperModule();
-		RegisterModule(1l, gp);
+		registerLeadingModule(1l, gp);
 		DeltaRobotModule drm = new DeltaRobotModule();
-		RegisterModule(2l, drm);
+		registerLeadingModule(2l, drm);
 		///
 		
 		

@@ -49,7 +49,7 @@ public interface Service {
 	 * @param parameters
 	 * @return
 	 */
-	public BasicDBObject[] getServiceSteps(long productStepType,
+	public ServiceStepMessage[] getServiceSteps(long productStepType,
 			BasicDBObject parameters);
 
 	/**

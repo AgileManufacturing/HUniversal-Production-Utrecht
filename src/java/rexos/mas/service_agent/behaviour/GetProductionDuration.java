@@ -13,6 +13,7 @@ import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.service_agent.Service;
 import rexos.mas.service_agent.ServiceFactory;
+import rexos.mas.service_agent.ServiceStepMessage;
 
 import com.mongodb.BasicDBObject;
 
@@ -69,10 +70,10 @@ public class GetProductionDuration extends ReceiveBehaviour {
 			BasicDBObject parameters = (BasicDBObject) productStep
 					.get("parameters");
 
-			BasicDBObject[] serviceSteps = service.getServiceSteps(
+			ServiceStepMessage[] serviceSteps = service.getServiceSteps(
 					productStepType, parameters);
-			for (BasicDBObject serviceStep : serviceSteps) {
-				serviceStep.put("productStepId", productStepId);
+			for (ServiceStepMessage serviceStep : serviceSteps) {
+				serviceStep.setProductStepId(productStepId);
 			}
 
 			myAgent.addBehaviour(new GetServiceDuration(myAgent,
