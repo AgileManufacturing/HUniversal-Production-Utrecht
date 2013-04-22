@@ -54,10 +54,8 @@ import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.mas.data.DbData;
 import rexos.mas.data.ScheduleData;
-import rexos.mas.equiplet_agent.behaviours.CanDoProductionStepResponse;
 import rexos.mas.equiplet_agent.behaviours.CanPerformStep;
 import rexos.mas.equiplet_agent.behaviours.GetProductionDuration;
-import rexos.mas.equiplet_agent.behaviours.ProductionDurationResponse;
 import rexos.mas.equiplet_agent.behaviours.ScheduleStep;
 import rexos.mas.equiplet_agent.behaviours.StartStep;
 
@@ -196,7 +194,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	@SuppressWarnings("unchecked")
 	public void setup() {
 		System.out.println("I spawned as a equiplet agent.");
-
+		
+		//gets his IP and sets the equiplet blackboard IP.
 		try {
 			InetAddress IP = InetAddress.getLocalHost();
 			equipletDbIp = IP.getHostAddress();
@@ -217,29 +216,36 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			
 			DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 			
+			//creates his hardware agent.
 			Object[] arguments = new Object[] { dbData };
 			getContainerController().createNewAgent(getLocalName() + "-hardwareAgent", "rexos.mas.hardware_agent.HardwareAgent", arguments).start();
 			AID hardwareAgent = new AID(getLocalName() + "-hardwareAgent", AID.ISLOCALNAME);
 			
+			//creates his service agent.
 			arguments = new Object[] { dbData, getAID(), hardwareAgent, logisticsAgent };
 			getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "rexos.mas.service_agent.ServiceAgent", arguments).start();
 			serviceAgent = new AID(getLocalName() + "-serviceAgent", AID.ISLOCALNAME);
 			
+			//makes connection with the collective blackboard.
 			collectiveBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
 			collectiveBBClient.setDatabase(collectiveDbName);
 			collectiveBBClient.setCollection(equipletDirectoryName);
 
+			//makes connection with the equiplet blackboard.
 			equipletBBClient = new BlackboardClient(equipletDbIp, equipletDbPort);
 			equipletBBClient.setDatabase(equipletDbName);
 			equipletBBClient.setCollection(productStepsName);
-
+			
+			//subscribes on changes of the status field on the equiplet blackboard.
 			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			equipletBBClient.subscribe(statusSubscription);
 			
+			//inserts himself on the collective blackboard equiplet directory.
 			EquipletDirectoryMessage entry = new EquipletDirectoryMessage(getAID(), capabilities, dbData);
 			collectiveBBClient.insertDocument(entry.toBasicDBObject());
 			
+			//gets the timedata for synchronizing from the collective blackboard.
 			collectiveBBClient.setCollection(timeDataName);
 			BasicDBObject timeData = (BasicDBObject)collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
 			firstTimeSlot = timeData.getLong("firstTimeSlot");
@@ -249,25 +255,24 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			e.printStackTrace();
 			doDelete();
 		}
-
+		
+		//initiates the timer to the next product step.
 		timer = new NextProductStepTimer(firstTimeSlot, timeSlotLength);
 		timer.setNextUsedTimeSlot(-1l);
 
+		//starts the behaviour for receiving messages with the Ontology CanPerformStep.
 		CanPerformStep canPerformStepBehaviour = new CanPerformStep(this, equipletBBClient);
 		addBehaviour(canPerformStepBehaviour);
 
-		CanDoProductionStepResponse canDoProductionStepResponseBehaviour = new CanDoProductionStepResponse(this, equipletBBClient);
-		addBehaviour(canDoProductionStepResponseBehaviour);
-
+		//starts the behaviour for receiving messages with the Ontology GetProductionDuration.
 		GetProductionDuration getProductionDurationBehaviour = new GetProductionDuration(this);
 		addBehaviour(getProductionDurationBehaviour);
 
-		ProductionDurationResponse productionDurationResponseBehaviour = new ProductionDurationResponse(this, equipletBBClient);
-		addBehaviour(productionDurationResponseBehaviour);
-
+		//starts the behaviour for receiving messages with the Ontology ScheduleStep.
 		ScheduleStep scheduleStepBehaviour = new ScheduleStep(this);
 		addBehaviour(scheduleStepBehaviour);
 		
+		//starts the behaviour for receiving messages with the Ontology StartStep.
 		StartStep startStepBehaviour = new StartStep(this, equipletBBClient);
 		addBehaviour(startStepBehaviour);
 	}
@@ -281,8 +286,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	@Override
 	public void takeDown() {
 		try {
+			//Removes himself from the collective blackboard equiplet directory.
 			collectiveBBClient.removeDocuments(new BasicDBObject("AID", getAID().getName()));
 
+			//Messages all his product agents that he is going to die.
 			Object[] productAgents = equipletBBClient.findDistinctValues("productAgentId", new BasicDBObject());
 			for(Object productAgent : productAgents){
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
@@ -295,6 +302,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			// The equiplet is already going down, so it has to do nothing here.
 		}
 		try {
+			//Clears his own blackboard and removes his subscription on that blackboard.
 			equipletBBClient.removeDocuments(new BasicDBObject());
 			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
@@ -304,33 +312,37 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		}
 	}
 
+	/**
+	 * onMessage function for the equipletAgent.
+	 * Listens to updates of the blackboard clients and handles them.
+	 */
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
 		switch (entry.getNamespace().split("\\.")[1]) {
 		case "ProductStepsBlackBoard":
 			try {
+				//Get the productstep.
 				ObjectId id = entry.getTargetObjectId();
 				ProductStepMessage productStep = new ProductStepMessage((BasicDBObject)equipletBBClient.findDocumentById(id));
 
-				String conversationId = null;
-				for (Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
-					if (tableEntry.getValue() == id) {
-						conversationId = tableEntry.getKey();
-						break;
-					}
-				}
+				//Gets the conversationId if it doesn't exist throws an error.
+				String conversationId = getConversationId(id);
 				if (conversationId == null) {
 					throw new Exception();
 				}
 
+				//Create the responseMessage
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
 				responseMessage.addReceiver(productStep.getProductAgentId());
 				responseMessage.setConversationId(conversationId);
 
 				System.out.println("status update: " + productStep.getStatus().toString());
 				switch (productStep.getStatus()) {
+				//Depending on the changed status fills in  the responseMessage and sends it to the product agent.
 				case PLANNED:
 					try {
+						//If the start time of the newly planned productStep is 
+						//earlier as the next used time slot make it the next used timeslot.
 						ScheduleData scheduleData = productStep.getScheduleData();
 						
 						if (scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
@@ -382,37 +394,70 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		}
 	}
 
+	/**
+	 * Getter for the EquipletBBClient
+	 * @return the equipletBBClient.
+	 */
 	public BlackboardClient getEquipletBBClient() {
 		return equipletBBClient;
 	}
 
+	/**
+	 * Function for adding a new relation between conversationId and objectId
+	 * @param conversationId the conversationId in the new relation.
+	 * @param objectId the objectId in the new relation.
+	 */
 	public void addCommunicationRelation(String conversationId, ObjectId objectId) {
 		communicationTable.put(conversationId, objectId);
 	}
 
+	/**
+	 * Getter for getting the objectId by a conversationId.
+	 * @param conversationId the conversationId of which the related objectId is needed.
+	 * @return ObjectId for the given conversationId.
+	 */
 	public ObjectId getRelatedObjectId(String conversationId) {
 		return communicationTable.get(conversationId);
 	}
 	
+	/**
+	 * Getter for getting the related conversationId for the given ObjectId.
+	 * @param productStepEntry the ObjectId for which the related conversationId is needed.
+	 * @return the related conversationId or null if the relation does not exist.
+	 */
 	public String getConversationId(ObjectId productStepEntry) {
 		String conversationId = null;
-		for (Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
-			if (tableEntry.getValue() == productStepEntry) {
-				conversationId = tableEntry.getKey();
-				break;
+		if(communicationTable.containsValue(productStepEntry)){
+			for (Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
+				if (tableEntry.getValue() == productStepEntry) {
+					conversationId = tableEntry.getKey();
+					break;
+				}
 			}
 		}
 		return conversationId; 		
 	}
 	
+	/**
+	 * Getter for the service agent from this equiplet agent.
+	 * @return the serviceAgent.
+	 */
 	public AID getServiceAgent() {
 		return serviceAgent;
 	}
 	
+	/**
+	 * Getter for the timer that handles the next product step. 
+	 * @return the timer.
+	 */
 	public NextProductStepTimer getTimer(){
 		return timer;
 	}
 
+	/**
+	 * Getter for the next product step.
+	 * @return the nextProductStep
+	 */
 	public ObjectId getNextProductStep() {
 		return nextProductStep;
 	}

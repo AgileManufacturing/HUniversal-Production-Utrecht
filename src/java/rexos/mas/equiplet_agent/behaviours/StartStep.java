@@ -71,6 +71,11 @@ public class StartStep extends ReceiveBehaviour {
 	 * The equipletAgent related to this behaviour.
 	 */
     private EquipletAgent equipletAgent;
+    
+    /**
+     * @var BlackboardClient equipletBBClient
+     * The blackboard client used for the equiplet blackboard.
+     */
     private BlackboardClient equipletBBClient;
 	
 	/**
@@ -103,6 +108,7 @@ public class StartStep extends ReceiveBehaviour {
 		System.out.format("%s received message from %s (%s:%s)%n",
 				myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
 		
+		//Gets the productStepId and updates all the productsteps on the blackboard the status to waiting.
 		try {
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
 			equipletBBClient.updateDocuments(
@@ -112,6 +118,7 @@ public class StartStep extends ReceiveBehaviour {
 			e1.printStackTrace();
 		}
 		
+		//Get the next product step and set the timer for the next product step
 		NextProductStepTimer timer = equipletAgent.getTimer();
 		try {
 			BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED);

@@ -55,87 +55,84 @@ import com.mongodb.BasicDBObject;
  */
 public class CanPerformStep extends ReceiveBehaviour {
 	/**
-	 * @var static final long serialVersionUID
+	 * @var static final long serialVersionUID 
 	 * The serial version UID for this class
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * @var MessageTemplate messageTemplate
-	 * The messageTemplate this behaviour listens to.
-	 * This behaviour listens to the ontology: CanPeformStep.
+	 * The messageTemplate this behaviour listens to. This behaviour listens to the ontology: CanPeformStep.
 	 */
-    private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CanPerformStep");
-    
-    /**
-	 * @var EquipletAgent equipletAgent
+	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CanPerformStep");
+
+	/**
+	 * @var EquipletAgent equipletAgent 
 	 * The equipletAgent related to this behaviour.
 	 */
-    private EquipletAgent equipletAgent;
-    private BlackboardClient equipletBBClient;
-	
+	private EquipletAgent equipletAgent;
+	private BlackboardClient equipletBBClient;
+
 	/**
 	 * Instantiates a new can perform step.
-	 *
-	 * @param a The agent for this behaviour
+	 * 
+	 * @param a
+	 *            The agent for this behaviour
 	 */
 	public CanPerformStep(Agent a, BlackboardClient equipletBBClient) {
 		super(a, -1, messageTemplate);
-		equipletAgent = (EquipletAgent)a;
+		equipletAgent = (EquipletAgent) a;
 		this.equipletBBClient = equipletBBClient;
 	}
-	
+
 	/**
-	 * Function to handle the incoming messages for this behaviour.
-	 * Handles the response to the CanPeformStep question and asks the service agent the same question.
+	 * Function to handle the incoming messages for this behaviour. Handles the
+	 * response to the CanPeformStep question and asks the service agent the
+	 * same question.
 	 * 
-	 * @param message - The received message.
+	 * @param message
+	 *            - The received message.
 	 */
 	@Override
-	public void handle(ACLMessage message){
-		Object contentObject = null;
-		String contentString = message.getContent();
+	public void handle(ACLMessage message) {
+		System.out.format("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
 
+		ProductionStep productStep = null;
 		try {
-			contentObject = message.getContentObject();
+			// gets the productstep out of the message.
+			productStep = (ProductionStep) message.getContentObject();
+			ObjectId productStepEntryId = null;
+			
+			// puts the productstep on the blackboard.
+			// TODO: get inputParts instead of dummy data
+			Long[] inputParts = { 1l, 2l, 3l };
+			// TODO: get outputPart
+			long outputPart = -1l;
+			ProductStepMessage entry = new ProductStepMessage(message.getSender(), productStep.getCapability(), productStep.getParameterListAsDBObject(), inputParts, outputPart, StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
+			productStepEntryId = equipletBBClient.insertDocument(entry.toBasicDBObject());
+			equipletAgent.addCommunicationRelation(message.getConversationId(), productStepEntryId);
+			
+			// asks the service agent if the productionstep can be done.
+			ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
+			responseMessage.setConversationId(message.getConversationId());
+			responseMessage.addReceiver(equipletAgent.getServiceAgent());
+			responseMessage.setOntology("CanDoProductionStep");
+			responseMessage.setContentObject(productStepEntryId);
+			myAgent.send(responseMessage);
+
+			// starts a behaviour which listens to the response of this question.
+			CanDoProductionStepResponse canDoProductionStepResponseBehaviour = new CanDoProductionStepResponse(myAgent, equipletBBClient);
+			myAgent.addBehaviour(canDoProductionStepResponseBehaviour);
+		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+			e.printStackTrace();
+			myAgent.doDelete();
+		} catch (IOException e) {
+			e.printStackTrace();
+			ACLMessage reply = message.createReply();
+			reply.setPerformative(ACLMessage.FAILURE);
+			reply.setContent("Failed to process the step");
+			myAgent.send(reply);
 		} catch (UnreadableException e) {
-			System.out.println("Exception Caught, No Content Object Given");
-		}
-		System.out.format("%s received message from %s (%s:%s)%n",
-				myAgent.getLocalName(), message.getSender().getLocalName(),
-				message.getOntology(), contentObject == null ? contentString : contentObject);
-		
-		
-		ProductionStep productStep = (ProductionStep) contentObject;
-		ObjectId productStepEntryId = null;
-		if(productStep != null){
-			try {
-				// TODO: get inputParts instead of dummy data
-				Long[] inputParts = {1l, 2l, 3l};
-				//TODO: get outputPart
-				long outputPart = -1l;
-				ProductStepMessage entry = new ProductStepMessage(message.getSender(), productStep.getCapability(),
-						productStep.getParameterListAsDBObject(), inputParts, outputPart,
-						StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
-				productStepEntryId = equipletBBClient.insertDocument(entry.toBasicDBObject());	
-				equipletAgent.addCommunicationRelation(message.getConversationId(), productStepEntryId);
-				ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
-				responseMessage.setConversationId(message.getConversationId());
-				responseMessage.addReceiver(equipletAgent.getServiceAgent());
-				responseMessage.setOntology("CanDoProductionStep");
-				responseMessage.setContentObject(productStepEntryId);
-				myAgent.send(responseMessage);
-			} catch (InvalidDBNamespaceException | GeneralMongoException e) {
-				e.printStackTrace();
-				myAgent.doDelete();
-			} catch (IOException e) {
-				e.printStackTrace();
-				ACLMessage reply = message.createReply();
-				reply.setPerformative(ACLMessage.FAILURE);
-				reply.setContent("Failed to process the step");
-				myAgent.send(reply);
-			}
-		} else {
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.FAILURE);
 			reply.setContent("No step given");

@@ -48,31 +48,26 @@ public class OverviewBehaviour extends OneShotBehaviour {
 
 		// we need to wait till all conv. of the informer are done. We dont want
 		// to block, but do want to wait.
-		_sequentialBehaviour.addSubBehaviour(new CyclicBehaviour(){
+		_sequentialBehaviour.addSubBehaviour(new CyclicBehaviour() {
 			@Override
 			public void action() {
 				// TODO Auto-generated method stub
-				if(_informerBehaviour.isDone()){
+				if (_informerBehaviour.isDone()) {
 					_sequentialBehaviour.removeSubBehaviour(this);
 				}
+				block(1000);
 			}
-			
+
 		});
 
 		_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour() {
 			@Override
 			public void action() {
 				System.out.println("\n");
-				for (ProductionStep stp : _productAgent.getProduct()
-						.getProduction().getProductionSteps()) {
-					System.out.println("ProductionStep " + stp.getId()
-							+ " has Equiplets;");
-					for (AID aid : _productAgent.getProduct().getProduction()
-							.getProductionEquipletMapping()
-							.getEquipletsForProductionStep(stp.getId()).keySet() ) {
-						System.out.println("Eq localname: "
-								+ aid.getLocalName() + " AID: " + aid + " timeslots: " + _productAgent.getProduct().getProduction()
-								.getProductionEquipletMapping().getTimeSlotsForEquiplet(stp.getId(), aid));
+				for (ProductionStep stp : _productAgent.getProduct().getProduction().getProductionSteps()) {
+					System.out.println("ProductionStep " + stp.getId() + " has Equiplets;");
+					for (AID aid : _productAgent.getProduct().getProduction().getProductionEquipletMapping().getEquipletsForProductionStep(stp.getId()).keySet()) {
+						System.out.println("Eq localname: " + aid.getLocalName() + " AID: " + aid + " timeslots: " + _productAgent.getProduct().getProduction().getProductionEquipletMapping().getTimeSlotsForEquiplet(stp.getId(), aid));
 					}
 					System.out.println("\n");
 				}
@@ -80,19 +75,18 @@ public class OverviewBehaviour extends OneShotBehaviour {
 		});
 
 		System.out.println("Lets add a Scheduler");
-		 _schedulerBehaviour = new SchedulerBehaviour();
-		 _sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
+		_schedulerBehaviour = new SchedulerBehaviour();
+		_sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
 
 		System.out.println("Lets add a produce");
 		// _produceBehaviour = new ProduceBehaviour();
 		// _sequentialBehaviour.addSubBehaviour(_produceBehaviour);
 
-		System.out
-				.println("Added all behaviours. And everything should start. Aw yeah!");
+		System.out.println("Added all behaviours. And everything should start. Aw yeah!");
 
 	}
 
-	public void reschedule(){
-		
+	public void reschedule() {
+
 	}
 }

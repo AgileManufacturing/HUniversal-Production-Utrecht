@@ -125,6 +125,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 		 * 
 		 * @see jade.core.behaviours.Behaviour#onStart() starts the conversation
 		 */
+		@Override
 		public void onStart() {
 			final String ConversationId = _productAgent.generateCID();
 			final MessageTemplate template = MessageTemplate
@@ -133,6 +134,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 			// 1 - Inform if the equiplet can perform the step with the given
 			// parameters
 			addSubBehaviour(new OneShotBehaviour() {
+				@Override
 				public void action() {
 					try {
 						ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
@@ -153,8 +155,9 @@ public class InformerBehaviour extends OneShotBehaviour {
 				}
 			});
 
-			// 2 - wait for an response. ( handles a 10 sec timeout )
-			addSubBehaviour(new ReceiveBehaviour(myAgent, 10000, template) {
+			// 2 - wait for an response. ( handles a 20 sec timeout )
+			addSubBehaviour(new ReceiveBehaviour(myAgent, 20000, template) {
+				@Override
 				public void handle(ACLMessage msg) {
 					if (msg == null) {
 
@@ -179,6 +182,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 							// 3 - if the response was a CONFIRM, ask about the
 							// duration.
 							addSubBehaviour(new OneShotBehaviour() {
+								@Override
 								public void action() {
 									try {
 										ACLMessage message = new ACLMessage(
@@ -206,6 +210,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 							// timeout ).
 							addSubBehaviour(new ReceiveBehaviour(myAgent,
 									10000, template) {
+								@Override
 								public void handle(ACLMessage msg) {
 									if (msg == null) {
 										if (debug) {

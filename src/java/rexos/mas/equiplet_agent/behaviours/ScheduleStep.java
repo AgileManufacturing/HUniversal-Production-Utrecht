@@ -32,7 +32,6 @@ package rexos.mas.equiplet_agent.behaviours;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
 
@@ -77,18 +76,11 @@ public class ScheduleStep extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		Object contentObject = null;
-		String contentString = message.getContent();
+		System.out.format("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
 
-		try {
-			contentObject = message.getContentObject();
-		} catch (UnreadableException e) {
-			// System.out.println("Exception Caught, No Content Object Given");
-		}
-		System.out.format("%s received message from %s (%s:%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
-
+		//Gets the timeslot from the string, asks the serviceAgent to plan the step with logistics.
 		try{
-			long timeslot = Long.parseLong(contentString);
+			long timeslot = Long.parseLong(message.getContent());
 			System.out.format("%d%n", timeslot);
 			ACLMessage timeslotMessage = new ACLMessage(ACLMessage.REQUEST);
 			timeslotMessage.addReceiver(equipletAgent.getServiceAgent());

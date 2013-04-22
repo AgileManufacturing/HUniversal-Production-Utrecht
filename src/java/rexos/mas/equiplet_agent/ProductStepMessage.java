@@ -113,6 +113,10 @@ public class ProductStepMessage implements IMongoSaveable {
 		this.scheduleData = scheduleData;
 	}
 
+	/**
+	 * Constructor for a ProductStepMessage.
+	 * @param object The BasicDBObject of which the ProductStepMessage has to be builded.
+	 */
 	public ProductStepMessage(BasicDBObject object){
 		fromBasicDBObject(object);
 	}
@@ -229,6 +233,10 @@ public class ProductStepMessage implements IMongoSaveable {
 		this.scheduleData = scheduleData;
 	}
 
+	/**
+	 * Function for getting the BasicDBObject from this class.
+	 * @return the created BasicDBObject.
+	 */
 	@Override
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject object = new BasicDBObject();
@@ -243,6 +251,9 @@ public class ProductStepMessage implements IMongoSaveable {
 		return object;
 	}
 
+	/**
+	 * Function to fill this class with a BasicDBObject.
+	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		productAgentId = new AID((String)(object.get("productAgentId")), AID.ISGUID);

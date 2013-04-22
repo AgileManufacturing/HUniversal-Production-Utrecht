@@ -34,12 +34,21 @@ public class NextProductStepTimer extends Timer{
 	 */
 	private long timeSlotLength;
 	
+	/**
+	 * Constructor for the next product step timer.
+	 * @param firstTimeSlot the first time slot from the grid/equiplet.
+	 * @param timeSlotLength the length of a time slot.
+	 */
 	public NextProductStepTimer(long firstTimeSlot, long timeSlotLength){
 		super();
 		this.firstTimeSlot = firstTimeSlot;
 		this.timeSlotLength = timeSlotLength;
 	}
 	
+	/**
+	 * Function for setting the next used time slot.
+	 * @param nextUsedTimeSlot the index of the next used timeslot, fill -1 when not used.
+	 */
 	public void setNextUsedTimeSlot(long nextUsedTimeSlot){
 		this.nextUsedTimeSlot = nextUsedTimeSlot;
 		cancel();
@@ -50,20 +59,29 @@ public class NextProductStepTimer extends Timer{
 		}
 	}
 	
+	/**
+	 * Getter for getting the nextUsedTimeSlot.
+	 * @return the next used timeslot
+	 */
 	public long getNextUsedTimeSlot() {
 		return nextUsedTimeSlot;
 	}
 	
 	private class NextProductStepTask extends TimerTask {
 
+		/**
+		 * run method for this TimerTask.
+		 */
 		@Override
 		public void run() {
 			try {
+				//Gets all the objects needed to start the next step.
 				ObjectId productStepEntry = equipletAgent.getNextProductStep();
 				String conversationId = equipletAgent.getConversationId(productStepEntry);
 				BasicDBObject productStep = (BasicDBObject)equipletAgent.getEquipletBBClient().findDocumentById(productStepEntry);
 				AID productAgent = new AID((String)productStep.get("productAgentId"), AID.ISGUID);
 
+				//ask the productAgent to start the production of the step.
 				ACLMessage answer = new ACLMessage(ACLMessage.QUERY_IF);
 				answer.setConversationId(conversationId);
 				answer.addReceiver(productAgent);
