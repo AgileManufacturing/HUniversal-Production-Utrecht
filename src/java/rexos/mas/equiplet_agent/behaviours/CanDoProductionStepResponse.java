@@ -37,7 +37,7 @@ import jade.lang.acl.MessageTemplate;
 import org.bson.types.ObjectId;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
-import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 
@@ -46,7 +46,7 @@ import com.mongodb.BasicDBObject;
 /**
  * The Class CanDoProductionStepResponse.
  */
-public class CanDoProductionStepResponse extends ReceiveBehaviour {
+public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 	/**
 	 * @var static final long serialVersionUID
 	 * The serial version UID for this class
@@ -73,7 +73,7 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour {
 	 * @param a - The agent for this behaviour
 	 */
 	public CanDoProductionStepResponse(Agent a, BlackboardClient equipletBBClient) {
-		super(a, -1, messageTemplate);
+		super(a, 5000, messageTemplate);
 		equipletAgent = (EquipletAgent) a;
 		this.equipletBBClient = equipletBBClient;
 	}
@@ -86,28 +86,34 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		System.out.format("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
-
-		ObjectId productStepEntryId = equipletAgent.getRelatedObjectId(message.getConversationId());
-		try {
-			ProductStepMessage productStep = new ProductStepMessage((BasicDBObject) equipletBBClient.findDocumentById(productStepEntryId));
-			AID productAgent = productStep.getProductAgentId();
-			ACLMessage responseMessage = new ACLMessage(message.getPerformative());
-			responseMessage.setConversationId(message.getConversationId());
-			responseMessage.setOntology("CanPerformStep");
-			responseMessage.addReceiver(productAgent);
-			switch(message.getPerformative()){
-			case ACLMessage.DISCONFIRM:
-				equipletBBClient.removeDocuments(new BasicDBObject("_id", productStepEntryId));
-				break;
-			default:
-				break;
+		if(message != null){
+			System.out.format("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
+	
+			ObjectId productStepEntryId = equipletAgent.getRelatedObjectId(message.getConversationId());
+			try {
+				//gets the productstep from the blackboard to get the productAgent out of it.
+				ProductStepMessage productStep = new ProductStepMessage((BasicDBObject) equipletBBClient.findDocumentById(productStepEntryId));
+				AID productAgent = productStep.getProductAgentId();
+				//sends a message to the productAgent to answer to the question CanPerformStep.
+				ACLMessage responseMessage = new ACLMessage(message.getPerformative());
+				responseMessage.setConversationId(message.getConversationId());
+				responseMessage.setOntology("CanPerformStep");
+				responseMessage.addReceiver(productAgent);
+				switch(message.getPerformative()){
+				case ACLMessage.DISCONFIRM:
+					//if the productstep can not be done by this equiplet remove it.
+					equipletBBClient.removeDocuments(new BasicDBObject("_id", productStepEntryId));
+					break;
+				default:
+					break;
+				}
+				myAgent.send(responseMessage);
+			} catch (Exception e) {
+				// TODO: ERROR HANDLING
+				e.printStackTrace();
+				myAgent.doDelete();
 			}
-			myAgent.send(responseMessage);
-		} catch (Exception e) {
-			// TODO: ERROR HANDLING
-			e.printStackTrace();
-			myAgent.doDelete();
 		}
+		myAgent.removeBehaviour(this);
 	}
 }

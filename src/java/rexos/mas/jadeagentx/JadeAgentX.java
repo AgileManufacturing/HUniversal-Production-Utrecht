@@ -192,8 +192,8 @@ public class JadeAgentX extends Agent {
 			Object[] args = new Object[1];
 			args[0] = product;
 
-			getContainerController().createNewAgent("pa" + count++,
-					"rexos.mas.productAgent.ProductAgent", args).start();
+//			getContainerController().createNewAgent("pa" + count++,
+//					"rexos.mas.productAgent.ProductAgent", args).start();
 			addBehaviour(new StartProductAgent(this, args));
 		} catch (Exception e) {
 			e.printStackTrace();

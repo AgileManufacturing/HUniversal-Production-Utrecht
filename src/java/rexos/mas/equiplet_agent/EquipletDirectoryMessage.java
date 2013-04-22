@@ -70,10 +70,17 @@ public class EquipletDirectoryMessage implements IMongoSaveable {
 		this.db = db;
 	}
 	
+	/**
+	 * Constructor for an entry in the equipletDirectory.
+	 * @param object BasicDBObject to fill this class with.
+	 */
 	public EquipletDirectoryMessage(BasicDBObject object){
 		fromBasicDBObject(object);
 	}
 	
+	/**
+	 * Function to fill this class with a BasicDBObject.
+	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object){
 		this.AID = new AID((String)(object.get("AID")), jade.core.AID.ISGUID);
@@ -81,6 +88,10 @@ public class EquipletDirectoryMessage implements IMongoSaveable {
 		this.db = new DbData((BasicDBObject)object.get("db"));
 	}
 	
+	/**
+	 * Function to get the BasicDBObject of this class.
+	 * @return BasicDBObject from this class
+	 */
 	@Override
 	public BasicDBObject toBasicDBObject(){
 		BasicDBObject entry = new BasicDBObject("AID", this.AID.getName());
