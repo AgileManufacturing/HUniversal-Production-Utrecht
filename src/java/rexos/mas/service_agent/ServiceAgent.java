@@ -184,10 +184,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					}
 					break;
 				case DELETE:
-					ObjectId productStepId = (ObjectId) productionStep
-							.get("_id");
-					serviceStepBBClient.removeDocuments(new BasicDBObject(
-							"productStepId", productStepId));
+//					ObjectId productStepId = (ObjectId) productionStep
+//							.get("_id");
+//					serviceStepBBClient.removeDocuments(new BasicDBObject(
+//							"productStepId", productStepId));
 					break;
 				default:
 					break;

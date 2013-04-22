@@ -30,6 +30,10 @@
  **/
 package rexos.mas.service_agent;
 
+import java.util.HashMap;
+
+import rexos.mas.data.ParameterList;
+import rexos.mas.data.Position;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.StepStatusCode;
 
@@ -76,6 +80,14 @@ public class DummyService implements Service {
 						"dummy status"), new ScheduleData());
 		return new ServiceStepMessage[] { service };
 	}
+
+//	/* (non-Javadoc)
+//	 * @see rexos.mas.service_agent.Service#getParameters(java.util.HashMap)
+//	 */
+//	@Override
+//	public ParameterList getParameters(HashMap<Long, Position> partParameters) {
+//		return null;
+//	}
 
 	/*
 	 * (non-Javadoc)
