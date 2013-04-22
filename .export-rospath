@@ -1,0 +1,7 @@
+if echo $ROS_PACKAGE_PATH | grep -q $PWD
+then
+	echo "$PWD is already in ROS_PACKAGE_PATH."
+else
+	export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$PWD
+	echo "Added $PWD to ROS_PACKAGE_PATH"
+fi
