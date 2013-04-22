@@ -40,14 +40,18 @@ import org.bson.types.ObjectId;
 import rexos.libraries.blackboard_client.BasicOperationSubscription;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.BlackboardSubscriber;
+import rexos.libraries.blackboard_client.FieldUpdateSubscription;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
+import rexos.libraries.blackboard_client.FieldUpdateSubscription.MongoUpdateLogOperation;
 import rexos.mas.data.DbData;
+import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.hardware_agent.behaviours.CheckForModules;
 import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
 import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
+import rexos.mas.service_agent.ServiceStepMessage;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -66,7 +70,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 	public Module getLeadingModule(long serviceId) {
 		return leadingModules.get(serviceId);
 	}
-	
+		
 	@Override
 	public void setup() {
 		System.out.println("Hardware agent " + this + " reporting.");
@@ -82,8 +86,10 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient.setDatabase(dbData.getName());
 			serviceStepBBClient.setCollection("ServiceStepsBlackBoard");
-			serviceStepBBClient.subscribe(new BasicOperationSubscription(MongoOperation.INSERT, this));
-			serviceStepBBClient.subscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
+					
+			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
+			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
+			serviceStepBBClient.subscribe(statusSubscription);
 			
 			equipletStepBBClient = new BlackboardClient(dbData.getIp());
 			equipletStepBBClient.setDatabase(dbData.getName());
@@ -113,8 +119,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 		registerLeadingModule(1l, gp);
 		DeltaRobotModule drm = new DeltaRobotModule();
 		registerLeadingModule(2l, drm);
-		///
-		
+		///		
 		
 	}
 
@@ -133,8 +138,31 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 		switch (entry.getNamespace().split(".")[1]) {
 		case "ServiceStepsBlackboard":
 			switch (operation) {
-			case INSERT:
+			case UPDATE:
 						
+				ObjectId id = entry.getTargetObjectId();
+				try {
+					ServiceStepMessage serviceStep = new ServiceStepMessage((BasicDBObject)serviceStepBBClient.findDocumentById(id));
+					
+					Module leadingModule = getLeadingModule(serviceStep
+							.getServiceId());
+					EquipletStepMessage[] equipletSteps = leadingModule
+							.getEquipletSteps(serviceStep.getParameters());
+					
+							
+					//neem de equipletSteps die horen bij deze service step 
+					// en plan deze op de equipletstep bb
+					
+					
+					
+				} catch (InvalidDBNamespaceException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (GeneralMongoException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 				break;
 				//$CASES-OMITTED$
 			default:
