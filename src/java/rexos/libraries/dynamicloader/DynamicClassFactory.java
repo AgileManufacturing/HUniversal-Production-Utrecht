@@ -41,10 +41,13 @@ public class DynamicClassFactory<T> {
 	 **/
 	private Hashtable<Long, DynamicClassData>softwareCache;
 	
+	private Class<T> type;
+	
 	/**
 	 * Constructs a new DynamicClassFactory.
 	 **/
-	public DynamicClassFactory() {
+	public DynamicClassFactory(Class<T> type) {
+		this.type = type;
 		softwareCache = new Hashtable<Long, DynamicClassData>();
 	}
 	
@@ -60,8 +63,35 @@ public class DynamicClassFactory<T> {
 			entry = new DynamicClassData(description);
 			softwareCache.put(description.getId(), entry);
 		}
+		// Update the description.
+		entry.setDescription(description);
 		
 		return entry.getLoader();
+	}
+	
+	/**
+	 * Use the given loader to instantiate an object of the specified class.
+	 * @param loader The loader that should be used to instantiate the object.
+	 * @param className The className of the class that should be instantiated.
+	 * @return An object of the specified class.
+	 * @throws InstantiateClassException The object of the specified class could not be instantiated.
+	 *
+	 **/
+	private T createObjectWithLoader(DynamicClassLoader loader, String className) throws InstantiateClassException {
+		try {
+			Class<?> cls = loader.loadClass(className);
+			
+			// This warning is suppressed because it should be an exception if the created object is not a subclass of T.
+			@SuppressWarnings("unchecked")
+			T obj = (T)cls.newInstance();
+			return obj;
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+			throw new InstantiateClassException("Failed to instantiate object of class " + className, e);
+		} catch (ClassCastException ce) {
+			throw new InstantiateClassException("The described class " + className + " is not castable to "
+					+ type.getName(), ce);
+		}
+		
 	}
 	
 	/**
@@ -72,15 +102,24 @@ public class DynamicClassFactory<T> {
 	 *
 	 **/
 	public T createObjectFromDescription(DynamicClassDescription description) throws InstantiateClassException {
-		try {
 			DynamicClassLoader loader = getClassLoader(description);
-			Class<?> cls = loader.loadClass(description.getClassName());
-			
-			@SuppressWarnings("unchecked")
-			T obj = (T)cls.newInstance();
-			return obj;
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-			throw new InstantiateClassException("Failed to instantiate object of class " + description.getClassName(), ex);
+			return createObjectWithLoader(loader, description.getClassName());
+	}
+	
+	/**
+	 * Checks of the given obj is up to date according to the specified description.
+	 * If it's not, a new object will be constructed.
+	 * @param description DynamicClassDescription containing the relevant information for the software.
+	 * @param obj The object that should be checked.
+	 * @return An object of type T that is up to date according to the given description.
+	 * @throws InstantiateClassException The object of the specified class could not be instantiated.
+	 **/
+	public T createNewObjectIfOutdated(DynamicClassDescription description, T obj) throws InstantiateClassException {
+		T objToReturn = obj;
+		DynamicClassLoader loader = getClassLoader(description);
+		if (obj == null || !obj.getClass().getClassLoader().equals(loader)) {
+			objToReturn = createObjectWithLoader(loader, description.getClassName());
 		}
+		return objToReturn;
 	}
 }

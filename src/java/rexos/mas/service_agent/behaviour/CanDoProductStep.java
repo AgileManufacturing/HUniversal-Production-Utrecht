@@ -52,15 +52,9 @@ public class CanDoProductStep extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		try {
 			ObjectId productStepId = (ObjectId) message.getContentObject();
-			ProductStepMessage productStep = new ProductStepMessage((BasicDBObject) client
-					.findDocumentById(productStepId));
-			long stepType = 0;
-			try {
-				stepType = productStep.getType();
-			} catch (NullPointerException e) {
-				e.printStackTrace();
-				agent.doDelete();
-			}
+			ProductStepMessage productStep = new ProductStepMessage(
+					(BasicDBObject) client.findDocumentById(productStepId));
+			long stepType = productStep.getType();
 			BasicDBObject parameters = productStep.getParameters();
 
 			System.out.format(
@@ -76,8 +70,8 @@ public class CanDoProductStep extends ReceiveBehaviour {
 			newMsg.addReceiver(agent.getHardwareAgentAID());
 			newMsg.setOntology("CheckForModules");
 			try {
-				newMsg.setContentObject(service
-						.getModuleIds(stepType, parameters));
+				newMsg.setContentObject(service.getModuleIds(stepType,
+						parameters));
 			} catch (IOException e) {
 				e.printStackTrace();
 				agent.doDelete();

@@ -135,7 +135,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 	
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
-		switch (entry.getNamespace().split(".")[1]) {
+		switch (entry.getNamespace().split("\\.")[1]) {
 		case "ServiceStepsBlackboard":
 			switch (operation) {
 			case UPDATE:
