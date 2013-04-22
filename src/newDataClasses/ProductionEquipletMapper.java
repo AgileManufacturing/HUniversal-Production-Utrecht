@@ -57,7 +57,8 @@ public class ProductionEquipletMapper {
 		this.equipletList.put(productionStepID, tmp);
 	}
 	
-	public HashMap<AID, Long> getEquipletsForProductionStep(long pA_id) {
+	public HashMap<AID, Long> getEquipletsForProductionStep(int pA_id) {
+		HashMap<AID, Long> s2 = this.equipletList.get(pA_id);
 		return this.equipletList.get(pA_id);
 	}
 	

@@ -40,10 +40,10 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			System.out.println("NUMBER OF EQUIPLETS: "+psa.size());
 			
 			for (ProductionStep ps : psa) {
-				Long PA_id = Long.valueOf(ps.getId());
+				int PA_id = ps.getId();
 				
 				if(production.getProductionEquipletMapping().getEquipletsForProductionStep(PA_id).keySet().size() >0){
-					this.timeslotsToSchedule =  production.getProductionEquipletMapping().getTimeSlotsForEquiplet(PA_id.intValue(), (AID)production.getProductionEquipletMapping()
+					this.timeslotsToSchedule =  production.getProductionEquipletMapping().getTimeSlotsForEquiplet(PA_id, (AID)production.getProductionEquipletMapping()
 							.getEquipletsForProductionStep(PA_id).keySet().toArray()[0]).intValue();
 				}
 				
