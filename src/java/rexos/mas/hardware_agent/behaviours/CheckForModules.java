@@ -113,8 +113,6 @@ public class CheckForModules extends ReceiveBehaviour {
 				 **/
 			} catch (UnreadableException e) {
 				// System.out.println("Exception Caught, No Content Object Given");
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
 			System.out.format("%s received message from %s (%s:%s)%n", myAgent
 					.getLocalName(), message.getSender().getLocalName(),
