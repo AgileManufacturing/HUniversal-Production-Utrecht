@@ -71,7 +71,12 @@ public class InformerBehaviour extends OneShotBehaviour {
 				// to the scheduler)
 				_pem.addProductionStep(stp.getId());
 
-				for (AID aid : _production.getProductionEquipletMapping()
+				System.out.println("Size keyset AIDS: "+_productAgent.getProduct().getProduction()
+						.getProductionEquipletMapping()
+						.getEquipletsForProductionStep(stp.getId()).keySet().size());
+				
+				for (AID aid : _productAgent.getProduct().getProduction()
+						.getProductionEquipletMapping()
 						.getEquipletsForProductionStep(stp.getId()).keySet()) {
 					_par.addSubBehaviour(new Conversation(aid, stp, _pem));
 				}
