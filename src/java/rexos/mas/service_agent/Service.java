@@ -1,6 +1,7 @@
 /**
- * @file ServiceGenerator.java
- * @brief 
+ * @file Service.java
+ * @brief Instances of subclasses of this interface represent different services a certain equiplet can perform.
+ * Services translate product steps into service steps.
  * @date Created: 11 apr. 2013
  *
  * @author Peter Bonnema
@@ -28,31 +29,71 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  **/
+
 package rexos.mas.service_agent;
+
+import java.util.HashMap;
+
+import rexos.mas.data.ParameterList;
+import rexos.mas.data.Position;
 
 import com.mongodb.BasicDBObject;
 
 /**
+ * Instances of subclasses of this interface represent different services a
+ * certain equiplet can perform. Services translate product steps into service
+ * steps.
+ * 
  * @author Peter Bonnema
  * 
  */
 public interface Service {
 	/**
+	 * This method determines which modules are need to perform this service and
+	 * returns an array containing the module id's of those modules.
+	 * 
 	 * @param productStepType
+	 *            The type of the productStep that needs to be translated
 	 * @param parameters
-	 * @return
+	 *            The parameters of the productStep.
+	 * @return An array of module id's of the modules needed to perform the
+	 *         service.
 	 */
 	public long[] getModuleIds(long productStepType, BasicDBObject parameters);
 
 	/**
+	 * This method translates the productStep into a single or multiple
+	 * serviceSteps.
+	 * 
 	 * @param productStepType
+	 *            The type of the productStep to translate.
 	 * @param parameters
-	 * @return
+	 *            The parameters of the productStep to use.
+	 * @return An array of ServiceStepMessage each representing a serviceStep as
+	 *         a result of the translation.
 	 */
 	public ServiceStepMessage[] getServiceSteps(long productStepType,
 			BasicDBObject parameters);
+	
+	/**
+	 * @param partParameters
+	 * @return
+	 */
+	public ParameterList getParameters(HashMap<Long, Position> partParameters);
 
 	/**
+	 * Returns the Id of this service. Id's are used to identify services and
+	 * are the same as those used in the knowledge database.
+	 * 
+	 * @return the id of this service
+	 */
+	public long getId();
+
+	/**
+	 * Implementations should return a clear name for this service analog to its
+	 * function. It is intended for debugging purposes. Internally services are
+	 * identified by their Id and not by their name.
+	 * 
 	 * @return the name of this service
 	 */
 	public String getName();

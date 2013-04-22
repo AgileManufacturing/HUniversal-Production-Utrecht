@@ -38,7 +38,7 @@ public class CanDoProductStep extends ReceiveBehaviour {
 	 * @param a
 	 */
 	public CanDoProductStep(Agent a, BlackboardClient client) {
-		super(a, -1, MessageTemplate.MatchOntology("CanDoProductionStep"));
+		super(a, MessageTemplate.MatchOntology("CanDoProductionStep"));
 		agent = (ServiceAgent) a;
 		this.client = client;
 	}

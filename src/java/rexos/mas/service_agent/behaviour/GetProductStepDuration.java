@@ -21,7 +21,7 @@ import com.mongodb.BasicDBObject;
  * @author Peter Bonnema
  * 
  */
-public class GetProductionDuration extends ReceiveBehaviour {
+public class GetProductStepDuration extends ReceiveBehaviour {
 	static final long serialVersionUID = 1L;
 
 	private BlackboardClient productionStepBlackBoard, serviceStepBlackBoard;
@@ -29,7 +29,7 @@ public class GetProductionDuration extends ReceiveBehaviour {
 	/**
 	 * @param a
 	 */
-	public GetProductionDuration(Agent a,
+	public GetProductStepDuration(Agent a,
 			BlackboardClient productionStepBlackBoard,
 			BlackboardClient serviceStepBlackBoard) {
 		super(a, MessageTemplate.MatchOntology("GetProductionStepDuration"));
@@ -51,7 +51,7 @@ public class GetProductionDuration extends ReceiveBehaviour {
 			long productStepType = productStep.getLong("type");
 
 			System.out.format(
-					"%s got message GetProductionDuration for step type %s%n",
+					"%s got message GetProductStepDuration for step type %s%n",
 					myAgent.getLocalName(), productStepType);
 
 			Service[] services = null;
@@ -62,8 +62,9 @@ public class GetProductionDuration extends ReceiveBehaviour {
 				service = services[0];
 			} else {
 				myAgent.doDelete();
+				//TODO find a good solution for when this happens
 				throw new RuntimeException(
-						"Service Agent - No available services for stepType "
+						"Service Agent - No available services for productStep "
 								+ productStep);
 			}
 

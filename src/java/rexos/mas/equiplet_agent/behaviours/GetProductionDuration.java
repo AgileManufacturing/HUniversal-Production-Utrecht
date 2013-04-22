@@ -1,6 +1,6 @@
 /**
- * @file GetProductionDuration.java
- * @brief Behaviour for handling the messages with the ontology GetProductionDuration
+ * @file GetProductStepDuration.java
+ * @brief Behaviour for handling the messages with the ontology GetProductStepDuration
  * @date Created: 2013-04-02
  *
  * @author Hessel Meulenbeld
@@ -39,7 +39,7 @@ import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
 
 /**
- * The Class GetProductionDuration.
+ * The Class GetProductStepDuration.
  */
 public class GetProductionDuration extends ReceiveBehaviour {
 	/**
@@ -51,9 +51,9 @@ public class GetProductionDuration extends ReceiveBehaviour {
 	/**
 	 * @var MessageTemplate messageTemplate
 	 * The messageTemplate this behaviour listens to.
-	 * This behaviour listens to the ontology: GetProductionDuration.
+	 * This behaviour listens to the ontology: GetProductStepDuration.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("GetProductionDuration");
+	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("GetProductStepDuration");
 	
 	/**
 	 * @var EquipletAgent equipletAgent
@@ -74,7 +74,7 @@ public class GetProductionDuration extends ReceiveBehaviour {
 
 	/**
 	 * Function to handle the incoming messages for this behaviour.
-	 * Handles the response to the GetProductionDuration question and asks the service agent the same question.
+	 * Handles the response to the GetProductStepDuration question and asks the service agent the same question.
 	 * 
 	 * @param message - The received message.
 	 */

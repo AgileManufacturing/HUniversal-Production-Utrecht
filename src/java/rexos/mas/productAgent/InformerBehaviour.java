@@ -185,7 +185,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 												ACLMessage.REQUEST);
 										message.setConversationId(ConversationId);
 										message.addReceiver(_aid);
-										message.setOntology("GetProductionDuration");
+										message.setOntology("GetProductStepDuration");
 										message.setContentObject(_productionStep);
 										_productAgent.send(message);
 										if (debug) {

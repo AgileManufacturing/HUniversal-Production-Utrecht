@@ -36,14 +36,17 @@ import rexos.mas.equiplet_agent.StepStatusCode;
 import com.mongodb.BasicDBObject;
 
 /**
+ * Just a dummy service for testing purposes.
+ * 
  * @author Peter
  * 
  */
 public class DummyService implements Service {
-	public static final String name = "DummyService";
+	private static final long id = 1l;
+	private static final String name = "DummyService";
 
 	/**
-	 * 
+	 * Creates a new DummyService.
 	 */
 	public DummyService() {
 	}
@@ -51,7 +54,8 @@ public class DummyService implements Service {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see serviceAgent.Service#canPerform(long, com.mongodb.BasicDBObject)
+	 * @see rexos.mas.service_agent.Service#getModuleIds(long,
+	 * com.mongodb.BasicDBObject)
 	 */
 	@Override
 	public long[] getModuleIds(long productStepType, BasicDBObject parameters) {
@@ -61,22 +65,32 @@ public class DummyService implements Service {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see serviceAgent.Service#getServiceSteps(long,
+	 * @see rexos.mas.service_agent.Service#getServiceSteps(long,
 	 * com.mongodb.BasicDBObject)
 	 */
 	@Override
 	public ServiceStepMessage[] getServiceSteps(long productStepType,
 			BasicDBObject parameters) {
-		ServiceStepMessage service = new ServiceStepMessage(1l, 1l,
-				parameters, StepStatusCode.EVALUATING, new BasicDBObject(
-						"status", "dummy status"), new ScheduleData());
+		ServiceStepMessage service = new ServiceStepMessage(1l, 1l, parameters,
+				StepStatusCode.EVALUATING, new BasicDBObject("status",
+						"dummy status"), new ScheduleData());
 		return new ServiceStepMessage[] { service };
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see serviceAgent.Service#getName()
+	 * @see rexos.mas.service_agent.Service#getId()
+	 */
+	@Override
+	public long getId() {
+		return id;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see rexos.mas.service_agent.Service#getName()
 	 */
 	@Override
 	public String getName() {
@@ -90,6 +104,7 @@ public class DummyService implements Service {
 	 */
 	@Override
 	public String toString() {
-		return String.format("DummyService []");
+		return String.format("DummyService [getId()=%s, getName()=%s]",
+				getId(), getName());
 	}
 }
