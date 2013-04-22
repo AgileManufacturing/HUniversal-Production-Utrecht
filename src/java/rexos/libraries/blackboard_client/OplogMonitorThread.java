@@ -1,6 +1,6 @@
 /**
  * @file OplogMonitorThread.java
- * @brief 
+ * @brief Class for the tailed oplog cursor thread within the client
  * @date Created: 18 apr. 2013
  *
  * @author Jan-Willem Willebrands
