@@ -68,9 +68,6 @@ public class OverviewBehaviour extends OneShotBehaviour {
 		});
 
 		_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour() {
-			/**
-			 * 
-			 */
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -95,6 +92,28 @@ public class OverviewBehaviour extends OneShotBehaviour {
 		System.out.println("Lets add a Scheduler");
 		 _schedulerBehaviour = new SchedulerBehaviour();
 		 _sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
+		 
+			_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour() {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void action() {
+					System.out.println("\n");
+					for (ProductionStep stp : _productAgent.getProduct()
+							.getProduction().getProductionSteps()) {
+						System.out.println("ProductionStep " + stp.getId()
+								+ " has Equiplets;");
+						for (AID aid : _productAgent.getProduct().getProduction()
+								.getProductionEquipletMapping()
+								.getEquipletsForProductionStep(stp.getId()).keySet() ) {
+							System.out.println("Eq localname: "
+									+ aid.getLocalName() + " AID: " + aid + " timeslots: " + _productAgent.getProduct().getProduction()
+									.getProductionEquipletMapping().getTimeSlotsForEquiplet(stp.getId(), aid));
+						}
+						System.out.println("\n");
+					}
+				}
+			});
 
 		System.out.println("Lets add a produce");
 		// _produceBehaviour = new ProduceBehaviour();

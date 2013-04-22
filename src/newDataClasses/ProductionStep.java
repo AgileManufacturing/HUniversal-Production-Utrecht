@@ -31,14 +31,12 @@ public class ProductionStep implements Serializable {
 
 	public ProductionStep() {
 		this._parameters = new ParameterList();
-		this._status = ProductionStepStatus.STATE_TODO;
 	}
 	
 	public ProductionStep(int id, long capability,  ParameterList parameterList) {
 		this._id = id;
 		this._capability = capability;
 		this._parameters = parameterList;
-		this._status = ProductionStepStatus.STATE_TODO;
 	}
 	
 	public int getId(){

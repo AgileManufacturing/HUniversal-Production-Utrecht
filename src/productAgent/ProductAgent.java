@@ -93,7 +93,6 @@ public class ProductAgent extends Agent {
 	public void outPutProductStepList() {
 		for (ProductionStep stp : this.getProduct().getProduction()
 				.getProductionSteps()) {
-			
 			for (AID aid : this.getProduct().getProduction()
 					.getProductionEquipletMapping()
 					.getEquipletsForProductionStep(stp.getId()).keySet()) {

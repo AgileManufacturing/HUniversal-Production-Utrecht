@@ -1,9 +1,6 @@
 package productAgent;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import jade.core.AID;
@@ -48,11 +45,14 @@ public class InformerBehaviour extends OneShotBehaviour {
 	public InformerBehaviour() {
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public void action() {
+		
 		_productAgent = (ProductAgent) myAgent;
 		_product = this._productAgent.getProduct();
 		_production = _product.getProduction();
+
 		_pem = new ProductionEquipletMapper();
 		_isDone = false;
 
@@ -62,35 +62,24 @@ public class InformerBehaviour extends OneShotBehaviour {
 		 * each step in our productionlist and create a conversation object. (
 		 * as behaviour )
 		 */
-
 		SequentialBehaviour seq = new SequentialBehaviour();
 		myAgent.addBehaviour(seq);
 
 		_par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 		seq.addSubBehaviour(_par);
 
-		for (ProductionStep stp : _product.getProduction().getProductionSteps()) {
+		for (ProductionStep stp : _production.getProductionSteps()) {
 			if (stp.getStatus() == ProductionStepStatus.STATE_TODO) {
-				
-				//adds the step to te new list (the one that will be returned to the scheduler)
+
+				// adds the step to te new list (the one that will be returned
+				// to the scheduler)
 				_pem.addProductionStep(stp.getId());
 				
-				HashMap<AID, Long> hashmap = _productAgent.getProduct().getProduction()
-						.getProductionEquipletMapping()
-						.getEquipletsForProductionStep(stp.getId());
+				ProductionEquipletMapper s1 = _production.getProductionEquipletMapping();
 				
-				for (Map.Entry<AID, Long> e : hashmap.entrySet()) {
-				    AID aid = e.getKey();
-				    Long step = e.getValue();
-				    _par.addSubBehaviour(new Conversation(aid, stp, _pem));
-				}
-				
-				/*
-				for (AID aid :  _productAgent.getProduct().getProduction()
-						.getProductionEquipletMapping()
-						.getEquipletsForProductionStep(stp.getId()).keySet()) {
+				for (AID aid : _production.getProductionEquipletMapping().getEquipletsForProductionStep(stp.getId()).keySet()) {
 					_par.addSubBehaviour(new Conversation(aid, stp, _pem));
-				}*/
+				}
 			}
 		}
 
@@ -258,7 +247,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 								/**
 										 * 
 										 */
-										private static final long serialVersionUID = 1L;
+								private static final long serialVersionUID = 1L;
 
 								@Override
 								public void handle(ACLMessage msg) {

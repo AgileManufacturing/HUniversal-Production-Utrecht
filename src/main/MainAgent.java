@@ -3,6 +3,7 @@ package main;
 
 import java.util.ArrayList;
 
+import jade.core.AID;
 import jade.core.Agent;
 import newDataClasses.Parameter;
 import newDataClasses.ParameterGroup;
@@ -10,6 +11,7 @@ import newDataClasses.ParameterList;
 import newDataClasses.Product;
 import newDataClasses.Production;
 import newDataClasses.ProductionStep;
+import newDataClasses.ProductionStepStatus;
 
 /*
  * Author: Alexander
@@ -41,6 +43,7 @@ public class MainAgent extends Agent {
 			ar = new Object[] { 3 }; // rotate
 			getContainerController().createNewAgent("eqa3",
 					"testingAgents.EquipletAgent", ar).start();
+
 			ar = new Object[] { 2 }; // rotate
 			getContainerController().createNewAgent("eqa4",
 					"testingAgents.EquipletAgent", ar).start();
@@ -82,6 +85,7 @@ public class MainAgent extends Agent {
 
 			// Next we want to have some production steps
 			ProductionStep stp1 = new ProductionStep(1, 0, parameterList);
+			stp1.setStatus(ProductionStepStatus.STATE_TODO);
 
 			p = new ParameterGroup("Color"); // group colour
 			p.add(new Parameter("Id", "3"));
@@ -97,7 +101,8 @@ public class MainAgent extends Agent {
 			parameterList.AddParameterGroup(p);
 
 			ProductionStep stp2 = new ProductionStep(2, 1, parameterList);
-
+			stp2.setStatus(ProductionStepStatus.STATE_TODO);
+			
 			p = new ParameterGroup("Color"); // group colour
 			p.add(new Parameter("Id", "5"));
 			parameterList.AddParameterGroup(p);
@@ -112,7 +117,8 @@ public class MainAgent extends Agent {
 			parameterList.AddParameterGroup(p);
 
 			ProductionStep stp3 = new ProductionStep(3, 2, parameterList);
-
+			stp3.setStatus(ProductionStepStatus.STATE_TODO);
+			
 			p = new ParameterGroup("Color"); // group colour
 			p.add(new Parameter("Id", "7"));
 			parameterList.AddParameterGroup(p);
@@ -127,7 +133,8 @@ public class MainAgent extends Agent {
 			parameterList.AddParameterGroup(p);
 
 			ProductionStep stp4 = new ProductionStep(4, 3, parameterList);
-
+			stp4.setStatus(ProductionStepStatus.STATE_TODO);
+			
 			// Our argument for the product agent. The total production of the
 			// product,
 			// consists of multiple steps
@@ -138,10 +145,10 @@ public class MainAgent extends Agent {
 			stepList.add(stp4);
 
 			Production production = new Production(stepList);
-			Product product = new Product(production, getAID().toString());
+			Product product = new Product(production, new AID("pa1", AID.ISLOCALNAME).toString());
 
 			//We need to pass an Object[] to the createNewAgent. 
-			// But we only want to pass our product!
+			//But we only want to pass our product!
 			Object[] arg = new Object[1];
 			arg[0] = product;
 
