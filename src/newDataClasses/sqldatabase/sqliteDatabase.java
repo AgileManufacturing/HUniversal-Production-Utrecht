@@ -42,8 +42,6 @@ public class sqliteDatabase{
 					.println("Error loading database driver: " + e.toString());
 			return;
 		}
-
-		System.out.println("Connecting to database...");
 		try {
 			conn = DriverManager.getConnection(DB_URL + DB_FILE, USER, PASS);
 			try (PreparedStatement create = conn
