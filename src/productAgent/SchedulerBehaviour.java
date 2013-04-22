@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import libraries.rexos.src.java.rexos.libraries.blackboard_client.*;
+
 import com.mongodb.DB;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
@@ -76,20 +78,12 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 		//load set into arraylist
 		 List<AID> equipletlist = new ArrayList<AID>(equipletList);
 	
-		//Make connection with database
-		MongoClient mongoClient =null;
+		//Make connection with blackboard
+		BlackboardClient bbc = new BlackboardClient("145.89.191.131");
+		bbc.setDatabase("ScheduleBlackBoard");
 		
 		//debug
 		System.out.println("Scheduler Started");
-		
-		try {
-			mongoClient = new MongoClient("145.89.191.131");// 145.89.191.131 is hu
-														// server
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-
-		DB db = mongoClient.getDB("ScheduleBlackBoard");// set db to use
 
 		// authenticating mongodb
 		// boolean auth = db.authenticate("root", char['g','e','e','n']);
@@ -100,10 +94,10 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 		FreeTimeSlot[] freetimes;
 		for (int i = 0; i < equipletlist.size(); i++) {
 			// old name is eqa1
-			List<DBObject> data = db
-					.getCollection(equipletlist.get(i).getLocalName()).find()
-					.toArray();// nameOfCollection should be 'schedule'
-			scheduleCount += data.size();
+			bbc.setCollection(equipletlist.get(i).getLocalName().toString());
+			List<DBObject> blackBoard = bbc.findDocuments(" ");
+			//List<DBObject> data = db.getCollection(equipletlist.get(i).getLocalName()).find().toArray();// nameOfCollection should be 'schedule'
+			scheduleCount += blackBoard.size();
 			
 			//debug
 			System.out.println("----- Get list of the already scheduled data -------");
@@ -122,15 +116,16 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 
 		// get every scheduled timeslot of every equiplet
 		for (int extract = 0; extract < equipletlist.size(); extract++) {
-			List<DBObject> data = db
-					.getCollection(equipletlist.get(extract).getLocalName()).find()
-					.toArray();// nameOfCollection should be 'schedule'
-			for (int i = 0; i < data.size(); i++) {
+			bbc.setCollection(equipletlist.get(extract).getLocalName().toString());
+			List<DBObject> blackBoard = bbc.findDocuments(" ");
+			
+			//List<DBObject> data = db.getCollection(equipletlist.get(extract).getLocalName()).find().toArray();// nameOfCollection should be 'schedule'
+			for (int i = 0; i < blackBoard.size(); i++) {
 
-				double b = (Double) data.get(i).get("startTime");
+				double b = (Double) blackBoard.get(i).get("startTime");
 				int stati = (int) b;
 
-				double c = (Double) data.get(i).get("duration");
+				double c = (Double) blackBoard.get(i).get("duration");
 				int dur = (int) c;
 
 				// add scheduled timeslot to array of scheduled timeslots and
@@ -139,8 +134,6 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 						extract).getName());
 			}
 		}
-		// break connection
-		mongoClient.close();
 
 		// initialise timeslot to start checking and temporarily value for
 		// calculation

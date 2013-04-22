@@ -1,5 +1,11 @@
 package productAgent;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.ParallelBehaviour;
@@ -69,15 +75,22 @@ public class InformerBehaviour extends OneShotBehaviour {
 				//adds the step to te new list (the one that will be returned to the scheduler)
 				_pem.addProductionStep(stp.getId());
 				
-				System.out.println("Size keyset AIDS: "+_productAgent.getProduct().getProduction()
+				HashMap<AID, Long> hashmap = _productAgent.getProduct().getProduction()
 						.getProductionEquipletMapping()
-						.getEquipletsForProductionStep(stp.getId()).keySet().size());
+						.getEquipletsForProductionStep(stp.getId());
 				
-				for (AID aid : _productAgent.getProduct().getProduction()
+				for (Map.Entry<AID, Long> e : hashmap.entrySet()) {
+				    AID aid = e.getKey();
+				    Long step = e.getValue();
+				    _par.addSubBehaviour(new Conversation(aid, stp, _pem));
+				}
+				
+				/*
+				for (AID aid :  _productAgent.getProduct().getProduction()
 						.getProductionEquipletMapping()
 						.getEquipletsForProductionStep(stp.getId()).keySet()) {
 					_par.addSubBehaviour(new Conversation(aid, stp, _pem));
-				}
+				}*/
 			}
 		}
 
