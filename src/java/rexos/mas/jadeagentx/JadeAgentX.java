@@ -233,6 +233,7 @@ public class JadeAgentX extends Agent {
 					e.printStackTrace();
 				}
 			}
+			block();
 		}
 	}
 }
