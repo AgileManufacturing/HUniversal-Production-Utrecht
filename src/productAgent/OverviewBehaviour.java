@@ -68,9 +68,6 @@ public class OverviewBehaviour extends OneShotBehaviour {
 		});
 
 		_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour() {
-			/**
-			 * 
-			 */
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -94,7 +91,7 @@ public class OverviewBehaviour extends OneShotBehaviour {
 
 		System.out.println("Lets add a Scheduler");
 		 _schedulerBehaviour = new SchedulerBehaviour();
-		 _sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
+		 //_sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
 
 		System.out.println("Lets add a produce");
 		// _produceBehaviour = new ProduceBehaviour();

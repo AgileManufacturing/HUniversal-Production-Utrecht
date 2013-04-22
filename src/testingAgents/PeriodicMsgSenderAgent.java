@@ -1,6 +1,10 @@
 /**
  * @file PeriodicMsgSenderAgent.java
- * @brief 
+ * @brief  Sends periodic msgs to test the product agent's parallel behaviour
+ *         Sends an 'Reschedule' msg to force the product agent to reschedule.
+ *         Sends an 'EquipletMalfunction' msg to fake the malfunctioning of an
+ *         equiplet
+ * 
  * @date Created: 17 Apr 2013
  * 
  * @author Alexander
@@ -27,6 +31,13 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
+ * DISCLAIMER
+ * I DID NOT FOLLOW ANY CODING REGULATIONS. THIS IS NOT
+ * OFFICIAL PROJECT CODE, NOR WILL IT BE USED FOR ANYTHING OTHER THEN
+ * TESTING. COMMENTS ARE SCARCE AND CRAPPY
+ * 
+ * USE AT OWN RISK.
+ * 
  **/
 package testingAgents;
 
@@ -37,20 +48,6 @@ import jade.core.Agent;
 import jade.core.behaviours.WakerBehaviour;
 import jade.lang.acl.ACLMessage;
 
-/**
- * @author Alexander
- * 
- *         Sends periodic msgs to test the product agent's parallel behaviour
- *         Sends an 'Reschedule' msg to force the product agent to reschedule.
- *         Sends an 'EquipletMalfunction' msg to fake the malfunctioning of an
- *         equiplet
- * 
- *         DISCLAIMER I DID NOT FOLLOW ANY CODING REGULATIONS. THIS IS NOT
- *         OFFICIAL PROJECT CODE, NOR WILL IT BE USED FOR ANYTHING OTHER THEN
- *         TESTING. COMMENTS ARE SCARCE AND CRAPPY
- * 
- *         USE AT OWN RISK.
- */
 public class PeriodicMsgSenderAgent extends Agent {
 
 	private static final long serialVersionUID = 1L;
@@ -67,12 +64,12 @@ public class PeriodicMsgSenderAgent extends Agent {
 
 			addBehaviour(new WakerBehaviour(this, getRandomInt(30000)) {
 				protected void onWake() {
-					
+
 					ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 					message.addReceiver(new AID("pa1", AID.ISLOCALNAME));
 					message.setConversationId(generateCID());
-					
-					if(getRandomBoolean()){
+
+					if (getRandomBoolean()) {
 						if (debug)
 							System.out.println("Sending a reschedule msg.");
 						message.setOntology("Reschedule");
@@ -81,7 +78,7 @@ public class PeriodicMsgSenderAgent extends Agent {
 							System.out.println("Sending a Move msg.");
 						message.setOntology("MoveToEQ");
 					}
-					
+
 					myAgent.send(message);
 				}
 			});

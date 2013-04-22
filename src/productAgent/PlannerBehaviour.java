@@ -75,9 +75,10 @@ public class PlannerBehaviour extends OneShotBehaviour {
 					// Create the select query for the blackboard
 					DBObject equipletCapabilityQuery = QueryBuilder
 							.start("capabilities").is(PA_capability).get();
+					
 					List<DBObject> equipletDirectory = bbc
 							.findDocuments(equipletCapabilityQuery);
-
+					
 					for (DBObject dbo : equipletDirectory) {
 						DBObject aid = (DBObject) dbo.get("db");
 						String name = aid.get("name").toString();
@@ -85,8 +86,7 @@ public class PlannerBehaviour extends OneShotBehaviour {
 								AID.ISLOCALNAME));
 					}
 
-					System.out.println("Doing planner for productionstep "
-							+ PA_id);
+
 				}
 			}
 			// Set the production mapper in the production object

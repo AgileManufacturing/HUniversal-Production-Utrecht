@@ -72,7 +72,6 @@ public class ReceiveBehaviour extends SimpleBehaviour {
 	  * new ReceiveBehaviour(myAgent, 10000, template) {
 				public void handle(ACLMessage msg) {
 					if(msg == null) timeout expired
-					
 					handle msg stuff.
 				}
 		}
