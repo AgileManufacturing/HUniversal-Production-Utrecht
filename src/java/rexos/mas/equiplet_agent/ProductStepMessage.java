@@ -116,40 +116,6 @@ public class ProductStepMessage implements IMongoSaveable {
 	public ProductStepMessage(BasicDBObject object){
 		fromBasicDBObject(object);
 	}
-	
-	/**
-	 * Function to check if this productstep equals to another object.
-	 * 
-	 * @param obj - The object to compare with
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null)
-			return false;
-		if (obj == this)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ProductStepMessage other = (ProductStepMessage) obj;
-		return productAgentId.equals(other.productAgentId)
-				&& type == other.type
-				&& parameters.equals(other.parameters)
-				&& inputParts.equals(other.inputParts)
-				&& outputPart == other.outputPart
-				&& status == other.status
-				&& statusData.equals(other.statusData)
-				&& scheduleData.equals(other.scheduleData);
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
 
 	/**
 	 * @return the productAgentId
@@ -279,7 +245,7 @@ public class ProductStepMessage implements IMongoSaveable {
 
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		productAgentId = new AID((String)(object.get("productAgentId")), jade.core.AID.ISGUID);
+		productAgentId = new AID((String)(object.get("productAgentId")), AID.ISGUID);
 		type = object.getLong("type");
 		parameters = (BasicDBObject)object.get("parameters");
 		inputParts = ((BasicDBList)object.get("inputParts")).toArray(new Long[0]);

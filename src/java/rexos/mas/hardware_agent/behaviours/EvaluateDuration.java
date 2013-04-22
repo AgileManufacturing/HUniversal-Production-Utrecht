@@ -30,6 +30,8 @@ package rexos.mas.hardware_agent.behaviours;
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
+import java.io.IOException;
+
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -37,6 +39,7 @@ import jade.lang.acl.UnreadableException;
 
 import org.bson.types.ObjectId;
 
+import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ScheduleData;
@@ -46,7 +49,6 @@ import rexos.mas.hardware_agent.Module;
 import rexos.mas.service_agent.ServiceStepMessage;
 
 import com.mongodb.BasicDBObject;
-
 
 public class EvaluateDuration extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
@@ -62,60 +64,29 @@ public class EvaluateDuration extends ReceiveBehaviour {
 
 	@Override
 	public void handle(ACLMessage message) {
-		long[] moduleIds = null;
-
 		try {
-			moduleIds = (long[]) message.getContentObject();
-		} catch (UnreadableException e) {
-			// System.out.println("Exception Caught, No Content Object Given");
-		}
-		System.out.format("%s received message from %s (%s:%s)%n", myAgent
-				.getLocalName(), message.getSender().getLocalName(), message
-				.getOntology(), moduleIds);
-
-		try {
-			ObjectId objectId = null;
-			ServiceStepMessage serviceStep = null;
-			try {
-				objectId = (ObjectId) message.getContentObject();
-				serviceStep = new ServiceStepMessage(
-						(BasicDBObject) hardwareAgent.getServiceStepsBBClient()
-								.findDocumentById(objectId));
-			} catch (UnreadableException | InvalidDBNamespaceException e) {
-				e.printStackTrace();
-				myAgent.doDelete();
-			}
-
-			long stepType = serviceStep.getType();
-			BasicDBObject parameters = serviceStep.getParameters();
-
-			String serviceName = serviceStep.getServiceName();
-
-			/**
-			 * haal de naam van de leidende module uit knowledge db aan de hand
-			 * van de servicestep.service (ofzo)
-			 * 
-			 * String moduleName = iets vanuit de modulefactory geloof ik?
-			 * 
-			 */
-
+			ObjectId serviceStepId = (ObjectId) message.getContentObject();
+			ServiceStepMessage serviceStep = new ServiceStepMessage(
+					(BasicDBObject) hardwareAgent.getServiceStepsBBClient()
+							.findDocumentById(serviceStepId));
+			System.out.format("%s received message from %s (%s:%s)%n",
+					myAgent.getLocalName(), message.getSender().getLocalName(),
+					message.getOntology(), serviceStepId);
 
 			long stepDuration = 0l;
-			EquipletStepMessage[] equipletSteps;
-			Module module;
-			for (long moduleId : moduleIds) {
-				module = hardwareAgent.GetModuleById(moduleId);
-				equipletSteps = module.getEquipletSteps(parameters);
-				for (EquipletStepMessage equipletStep : equipletSteps) {
-					stepDuration += equipletStep.getTimeData().getDuration();
-				}
+			Module leadingModule = hardwareAgent.getLeadingModule(serviceStep
+					.getServiceId());
+			EquipletStepMessage[] equipletSteps = leadingModule
+					.getEquipletSteps(serviceStep.getParameters());
+			for (EquipletStepMessage equipletStep : equipletSteps) {
+				stepDuration += equipletStep.getTimeData().getDuration();
 			}
 
 			ScheduleData schedule = serviceStep.getScheduleData();
 			schedule.setDuration(stepDuration);
 
 			hardwareAgent.getServiceStepsBBClient().updateDocuments(
-					new BasicDBObject("_id", objectId),
+					new BasicDBObject("_id", serviceStepId),
 					new BasicDBObject("$set", new BasicDBObject("scheduleData",
 							schedule.toBasicDBObject())));
 			// plaats equipletsteps en hun duration en zijn status op eveluating
@@ -123,15 +94,17 @@ public class EvaluateDuration extends ReceiveBehaviour {
 
 			ACLMessage reply;
 			reply = message.createReply();
-			reply.setContentObject(objectId);
+			reply.setContentObject(serviceStepId);
 			reply.setOntology("GetServiceStepDurationResponse");
 			myAgent.send(reply);
 
 			// zet duration van de betreffende service step
 
 			// stuur peter een reactie met het staat er
-		} catch (Exception e) {
+		} catch (UnreadableException | InvalidDBNamespaceException
+				| GeneralMongoException | IOException e) {
 			e.printStackTrace();
+			myAgent.doDelete();
 		}
 	}
 }

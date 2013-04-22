@@ -32,7 +32,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	private HashMap<String, Long> services;
 	private HashMap<Long, String[]> stepTypes;
 	private DbData dbData;
-	private AID equipletAgentAID, logisticsAID, hardwareAgentAID;
+	private AID equipletAgentAID, hardwareAgentAID, logisticsAID;
 
 	@Override
 	public void setup() {
@@ -43,6 +43,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			dbData = (DbData) args[0];
 			equipletAgentAID = (AID) args[1];
 			hardwareAgentAID = (AID) args[2];
+			logisticsAID = (AID) args[3];
 		}
 
 		try {

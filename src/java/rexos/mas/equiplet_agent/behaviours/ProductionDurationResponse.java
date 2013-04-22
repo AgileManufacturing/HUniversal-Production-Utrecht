@@ -20,10 +20,8 @@ import com.mongodb.BasicDBObject;
  * The Class ProductionDurationResponse.
  */
 public class ProductionDurationResponse extends ReceiveBehaviour {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
+	
 	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("ProductionDurationResponse");
 	private EquipletAgent equipletAgent;
 	private BlackboardClient equipletBBClient;
@@ -49,14 +47,15 @@ public class ProductionDurationResponse extends ReceiveBehaviour {
 		} catch (UnreadableException e) {
 			// System.out.println("Exception Caught, No Content Object Given");
 		}
-		System.out.format("%s received message from %s (%s:%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
+		System.out.format("%s received message from %s (%s:%s)%n",
+				myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(),
+				contentObject == null ? contentString : contentObject);
 
 		try {
 			ObjectId id = equipletAgent.getRelatedObjectId(message.getConversationId());
 			ProductStepMessage productStep = new ProductStepMessage((BasicDBObject)equipletBBClient.findDocumentById(id));
 
 			ScheduleData schedule = productStep.getScheduleData();
-			System.out.println(schedule.getDuration() + "");
 			
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
 			AID productAgent = productStep.getProductAgentId();

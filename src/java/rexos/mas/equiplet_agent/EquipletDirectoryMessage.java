@@ -74,7 +74,6 @@ public class EquipletDirectoryMessage implements IMongoSaveable {
 		fromBasicDBObject(object);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public void fromBasicDBObject(BasicDBObject object){
 		this.AID = new AID((String)(object.get("AID")), jade.core.AID.ISGUID);

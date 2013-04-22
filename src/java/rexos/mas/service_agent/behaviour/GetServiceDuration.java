@@ -51,6 +51,7 @@ import rexos.mas.service_agent.ServiceAgent;
 import rexos.mas.service_agent.ServiceStepMessage;
 
 import com.mongodb.BasicDBObject;
+
 /**
  * @author Peter
  * 
@@ -59,10 +60,11 @@ public class GetServiceDuration extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	private BlackboardClient productionStepBlackBoard, serviceStepBlackBoard;
-	private List<BasicDBObject> serviceSteps;
 	private String conversationId;
 	private ServiceAgent agent;
 
+	private List<ServiceStepMessage> serviceSteps;
+	private ObjectId productStepId;
 	private long duration = 0;
 	private int remainingServiceSteps;
 
@@ -72,7 +74,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 	public GetServiceDuration(Agent a,
 			BlackboardClient productionStepBlackBoard,
 			BlackboardClient serviceStepBlackBoard,
-			BasicDBObject[] serviceSteps, String conversationId) {
+			ServiceStepMessage[] serviceSteps, String conversationId) {
 		this(a, 2000, productionStepBlackBoard, serviceStepBlackBoard,
 				serviceSteps, conversationId);
 	}
@@ -83,7 +85,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 	public GetServiceDuration(Agent a, int millis,
 			BlackboardClient productionStepBlackBoard,
 			BlackboardClient serviceStepBlackBoard,
-			BasicDBObject[] serviceSteps, String conversationId) {
+			ServiceStepMessage[] serviceSteps, String conversationId) {
 		super(
 				a,
 				millis,
@@ -117,9 +119,9 @@ public class GetServiceDuration extends ReceiveBehaviour {
 		message.setOntology("GetServiceStepDuration");
 		message.setConversationId(conversationId);
 		try {
-			for (BasicDBObject serviceStep : serviceSteps) {
+			for (ServiceStepMessage serviceStep : serviceSteps) {
 				serviceStepId = serviceStepBlackBoard
-						.insertDocument(serviceStep);
+						.insertDocument(serviceStep.toBasicDBObject());
 				message.setContentObject(serviceStepId);
 				agent.send(message);
 			}
@@ -128,10 +130,6 @@ public class GetServiceDuration extends ReceiveBehaviour {
 			e.printStackTrace();
 			agent.doDelete();
 		}
-
-		message.clearAllReceiver();
-		message.addReceiver(agent.getLogisticsAID());
-		message.setOntology("GetTransportDuration");
 	}
 
 	/*
@@ -143,52 +141,61 @@ public class GetServiceDuration extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
-				ServiceStepMessage serviceStep = new ServiceStepMessage(
-						(BasicDBObject) serviceStepBlackBoard
-								.findDocumentById((ObjectId) message
-										.getContentObject()));
-				ProductStepMessage productStep = new ProductStepMessage(
-						(BasicDBObject) productionStepBlackBoard
-								.findDocumentById(serviceStep
-										.getProductStepId()));
+				ProductStepMessage productStep;
 				ScheduleData scheduleData;
 
 				switch (message.getOntology()) {
 				case "GetServiceStepDurationResponse":
+					ServiceStepMessage serviceStep = new ServiceStepMessage(
+							(BasicDBObject) serviceStepBlackBoard
+									.findDocumentById((ObjectId) message
+											.getContentObject()));
+					productStep = new ProductStepMessage(
+							(BasicDBObject) productionStepBlackBoard
+									.findDocumentById(serviceStep
+											.getProductStepId()));
 					scheduleData = serviceStep.getScheduleData();
 
-					System.out.format("%s says step type %s will take %d%n",
-							message.getSender().getLocalName(),
-							serviceStep.getType(), scheduleData.getDuration());
+					System.out.format("%s step type %s will take %d%n",
+							agent.getLocalName(), serviceStep.getType(),
+							scheduleData.getDuration());
 
 					duration += scheduleData.getDuration();
 					if (--remainingServiceSteps == 0) {
-						ACLMessage answer = new ACLMessage(ACLMessage.QUERY_IF);
-						answer.addReceiver(agent.getLogisticsAID());
-						answer.setConversationId(conversationId);
-						answer.setOntology("GetTransportDuration");
+						productStepId = serviceStep.getProductStepId();
+
+						ACLMessage logisticsMsg = new ACLMessage(
+								ACLMessage.QUERY_IF);
+						logisticsMsg.addReceiver(agent.getLogisticsAID());
+						logisticsMsg.setConversationId(conversationId);
+						logisticsMsg.setOntology("GetTransportDuration");
 
 						Long[] inputParts = productStep.getInputParts();
-						answer.setContentObject(inputParts);
+						logisticsMsg.setContentObject(inputParts);
 
-						agent.send(answer);
+						agent.send(logisticsMsg);
+						System.out.println("Asking LA for transport time");
 					}
 					break;
 				case "GetTransportDurationResponse":
+					productStep = new ProductStepMessage(
+							(BasicDBObject) productionStepBlackBoard
+									.findDocumentById(productStepId));
+
 					duration += Integer.parseInt(message.getContent());
 
 					// read scheduleData from product step BB
 					scheduleData = productStep.getScheduleData();
 					scheduleData.setDuration(duration);
 					productionStepBlackBoard.updateDocuments(
-							new BasicDBObject("_id", serviceStep
-									.getProductStepId()),
-							new BasicDBObject("$set", new BasicDBObject("scheduleData", scheduleData
-									.toBasicDBObject())));
+							new BasicDBObject("_id", productStepId),
+							new BasicDBObject("$set", new BasicDBObject(
+									"scheduleData", scheduleData
+											.toBasicDBObject())));
 
 					System.out.format(
 							"Saving duration of %d in prod. step %s%n",
-							duration, serviceStep.getProductStepId());
+							duration, productStepId);
 
 					ACLMessage answer = new ACLMessage(ACLMessage.INFORM);
 					answer.addReceiver(agent.getEquipletAgentAID());

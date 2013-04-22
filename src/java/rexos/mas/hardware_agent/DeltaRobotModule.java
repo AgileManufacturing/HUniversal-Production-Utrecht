@@ -1,5 +1,3 @@
-
-
 /**
  * @file DeltaRobotModule.java
  * @brief Provides a deltaRobotModule.
@@ -34,23 +32,12 @@ package rexos.mas.hardware_agent;
 import com.mongodb.BasicDBObject;
 
 public class DeltaRobotModule implements Module {
-	
 	public DeltaRobotModule(){
 	}
-	
+
 	@Override
 	public EquipletStepMessage[] getEquipletSteps(BasicDBObject parameters) {
-		// TODO Auto-generated method stub
-		//return null;
-		
-		TimeData td = new TimeData(2l);
-		
-		EquipletStepMessage esm = new EquipletStepMessage(null, 1l, 2l, td);
-		
-		EquipletStepMessage[] dummyData = {esm};
-		
+		EquipletStepMessage[] dummyData = { new EquipletStepMessage(null, 1l, 2l, new TimeData(5l)) };
 		return dummyData;
-		
-	}	
-
+	}
 }
