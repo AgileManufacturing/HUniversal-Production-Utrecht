@@ -148,6 +148,49 @@ public class Queries {
             "    ) ;";
 
     /**
+     * @var String SOFTWARE_FOR_MODULE
+     * 
+     * SQL query for retrieving the software for the specified module from the database.
+     * Expects an integer parameter corresponding to the moduleId
+     **/
+    public static final String SOFTWARE_FOR_MODULE = "SELECT " + 
+    		"    software.id AS id, " + 
+    		"    software.class_name AS class_name, " + 
+    		"    software.description AS description, " + 
+    		"    software.jar_location AS jar_location, " + 
+    		"    software.name AS name " + 
+    		" FROM " + 
+    		"    software " + 
+    		" WHERE " + 
+    		"    id = (SELECT  " + 
+    		"            software " + 
+    		"        FROM " + 
+    		"            modules " + 
+    		"                INNER JOIN " + 
+    		"            module_types ON modules.module_type = module_types.id " + 
+    		"        WHERE " + 
+    		"            modules.id = (?))";
+    
+    /**
+     * @var String SOFTWARE_FOR_SERVICE
+     * 
+     * SQL query for retrieving the software for the specified service from the database.
+     * Expects an integer parameter corresponding to the serviceId
+     **/
+    public static final String SOFTWARE_FOR_SERVICE = "SELECT  " + 
+    		"    software.id AS id, " + 
+    		"    software.class_name AS class_name, " + 
+    		"    software.description AS description, " + 
+    		"    software.jar_location AS jar_location, " + 
+    		"    software.name AS name " + 
+    		" FROM " + 
+    		"    software " + 
+    		"        INNER JOIN " + 
+    		"    services ON services.software = software.id " + 
+    		" WHERE " + 
+    		"    services.id = (?)";
+    
+    /**
      * A private constructor preventing this class to be constructed.
      **/
     private Queries() {
