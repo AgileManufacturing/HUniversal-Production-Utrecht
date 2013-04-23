@@ -8,16 +8,13 @@ import newDataClasses.Product;
 import newDataClasses.Production;
 import newDataClasses.ProductionStep;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import libraries.rexos.src.java.rexos.libraries.blackboard_client.*;
 
-import com.mongodb.DB;
 import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
 
 @SuppressWarnings("serial")
 public class SchedulerBehaviour extends OneShotBehaviour {
@@ -96,7 +93,6 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			// old name is eqa1
 			bbc.setCollection(equipletlist.get(i).getLocalName().toString());
 			List<DBObject> blackBoard = bbc.findDocuments(" ");
-			//List<DBObject> data = db.getCollection(equipletlist.get(i).getLocalName()).find().toArray();// nameOfCollection should be 'schedule'
 			scheduleCount += blackBoard.size();
 			
 			//debug
@@ -245,6 +241,7 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			return this.duration;
 		}
 		
+		@Override
 		public String toString(){
 			return "{Start TimeSlot: "+this.startTime + ", Duration: "+this.duration + ", EquipletName: "+this.equipletName+"}";
 		}
@@ -285,6 +282,7 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			this.deadline = newDeadline;
 		}
 
+		@Override
 		public String toString() {
 			return "{ startTime:" + startTime + ", duration:" + duration
 					+ ", deadline:" + deadline + ", EquipletName:"
