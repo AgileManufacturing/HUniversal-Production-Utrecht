@@ -173,21 +173,15 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 				case UPDATE:
 					StepStatusCode status = productionStep.getStatus();
 					if (status == StepStatusCode.WAITING) {
-						ObjectId productStepId = entry.getTargetObjectId();
 						serviceStepBBClient.updateDocuments(new BasicDBObject(
 								"productStepId", entry.getTargetObjectId()),
 								new BasicDBObject("$set", new BasicDBObject(
 										"status", status)));
-						// for (String service : stepTypes.get(productionStep
-						// .get("type")));
-						// addBehaviour(new DoServiceBehaviour(this, service));
 					}
 					break;
 				case DELETE:
-//					ObjectId productStepId = (ObjectId) productionStep
-//							.get("_id");
-//					serviceStepBBClient.removeDocuments(new BasicDBObject(
-//							"productStepId", productStepId));
+					serviceStepBBClient.removeDocuments(new BasicDBObject(
+							"productStepId", entry.getTargetObjectId()));
 					break;
 				default:
 					break;
