@@ -247,7 +247,7 @@ public class ProductStepMessage implements IMongoSaveable {
 		object.put("outputPart", this.outputPart);
 		object.put("status", this.status.toString());
 		object.put("statusData", this.statusData);
-		object.put("scheduleDat", this.scheduleData.toBasicDBObject());
+		object.put("scheduleData", this.scheduleData.toBasicDBObject());
 		return object;
 	}
 

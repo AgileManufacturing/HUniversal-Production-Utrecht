@@ -1,14 +1,14 @@
 /**
- * @file DummyService.java
- * @brief 
- * @date Created: 12 apr. 2013
+ * @file PickAndPlaceService.java
+ * @brief Class for the pick&place service.
+ * @date Created: 23 apr. 2013
  *
- * @author Peter Bonnema
+ * @author Hessel Meulenbeld
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright © 2013, HU University of Applied Sciences Utrecht.
+ * Copyright � 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,97 +26,76 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
  **/
 package rexos.mas.service_agent;
 
-//import java.util.HashMap;
-
-//import rexos.mas.data.ParameterList;
-//import rexos.mas.data.Position;
-import rexos.mas.data.ScheduleData;
-import rexos.mas.equiplet_agent.StepStatusCode;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 import com.mongodb.BasicDBObject;
+import rexos.libraries.knowledgedb_client.*;
+import rexos.mas.equiplet_agent.StepStatusCode;
 
-/**
- * Just a dummy service for testing purposes.
- * 
- * @author Peter
- * 
- */
-public class DummyService implements Service {
-	private static final long id = 1l;
-	private static final String name = "DummyService";
 
+public class PickAndPlaceService implements Service {
+
+	private KnowledgeDBClient client;
+	private long id = 0l;
+	
 	/**
-	 * Creates a new DummyService.
-	 */
-	public DummyService() {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see rexos.mas.service_agent.Service#getModuleIds(long,
-	 * com.mongodb.BasicDBObject)
+	 * @see rexos.mas.service_agent.Service#getModuleIds(long, com.mongodb.BasicDBObject)
 	 */
 	@Override
 	public long[] getModuleIds(long productStepType, BasicDBObject parameters) {
-		return new long[] { 1l, 2l };
+		ArrayList<Long> moduleIds = new ArrayList<Long>();
+		
+		client = KnowledgeDBClient.getClient();
+		try {
+			Object[] queryParameters = {"HUniplacer.pickandplace"};
+			ResultSet resultSet = client.executeSelectQuery(Queries.MODULES_REQUIRED_PER_SERVICE, queryParameters);
+			while(resultSet.next()){
+				Row row = new Row(resultSet);
+				moduleIds.add((long)row.get("id"));
+			}
+			resultSet.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		long[] moduleIdsArray = new long[moduleIds.size()];
+		for(int i = 0; i < moduleIds.size(); i++){
+			moduleIdsArray[i] = moduleIds.get(i);
+		}
+		return moduleIdsArray;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see rexos.mas.service_agent.Service#getServiceSteps(long,
-	 * com.mongodb.BasicDBObject)
+	/**
+	 * @see rexos.mas.service_agent.Service#getServiceSteps(long, com.mongodb.BasicDBObject)
 	 */
 	@Override
-	public ServiceStepMessage[] getServiceSteps(long productStepType,
-			BasicDBObject parameters) {
-		ServiceStepMessage service = new ServiceStepMessage(1l, 1l, parameters,
-				StepStatusCode.EVALUATING, new BasicDBObject("status",
-						"dummy status"), new ScheduleData());
-		return new ServiceStepMessage[] { service };
+	public ServiceStepMessage[] getServiceSteps(long productStepType, BasicDBObject parameters) {
+		ServiceStepMessage[] serviceStepMessages = new ServiceStepMessage[2];
+		serviceStepMessages[0] = new ServiceStepMessage(id, 4l, parameters, StepStatusCode.EVALUATING , null, null);//pick
+		serviceStepMessages[1] = new ServiceStepMessage(id, 5l, parameters, StepStatusCode.EVALUATING, null, null);//place
+		return serviceStepMessages;
 	}
 
-//	/* (non-Javadoc)
-//	 * @see rexos.mas.service_agent.Service#getParameters(java.util.HashMap)
-//	 */
-//	@Override
-//	public ParameterList getParameters(HashMap<Long, Position> partParameters) {
-//		return null;
-//	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see rexos.mas.service_agent.Service#getId()
 	 */
 	@Override
 	public long getId() {
-		return id;
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see rexos.mas.service_agent.Service#getName()
 	 */
 	@Override
 	public String getName() {
-		return name;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return String.format("DummyService [getId()=%s, getName()=%s]",
-				getId(), getName());
-	}
 }
