@@ -83,22 +83,18 @@ public class InformerBehaviour extends OneShotBehaviour {
 			}
 		}
 
-		// Checking if timeout expired?
+		// Lets set our production objects
 		seq.addSubBehaviour(new OneShotBehaviour() {
-			/**
-			 * 
-			 */
 			private static final long serialVersionUID = 1L;
-
 			@Override
 			public void action() {
-				// TODO Auto-generated method stub
 				if (_par.done()) {
 					System.out.println("Done informing.");
 					try {
 						_production.setProductionEquipletMapping(_pem);
 						_product.setProduction(_production);
 						_productAgent.setProduct(_product);
+						
 						_isDone = true;
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -108,6 +104,7 @@ public class InformerBehaviour extends OneShotBehaviour {
 				}
 			}
 		});
+	
 	}
 
 	public boolean isDone() {

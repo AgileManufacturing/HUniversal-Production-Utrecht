@@ -1,5 +1,3 @@
-
-
 package testingAgents;
 
 import jade.core.Agent;
@@ -42,7 +40,7 @@ public class EquipletAgent extends Agent {
 	public static boolean getRandomBoolean() {
 		@SuppressWarnings("unused")
 		Random random = new Random();
-		//return random.nextBoolean();
+		// return random.nextBoolean();
 		return true;
 	}
 
@@ -66,15 +64,15 @@ public class EquipletAgent extends Agent {
 		}
 	}
 
-	//Behaviour for receiving msgs, and dealing with them in a parallel behaviour
+	// Behaviour for receiving msgs, and dealing with them in a parallel
+	// behaviour
 	private class receiveMsgBehaviour extends CyclicBehaviour {
 		ParallelBehaviour par;
-		
-		private receiveMsgBehaviour(){
-			par = new ParallelBehaviour(
-					ParallelBehaviour.WHEN_ALL);
+
+		private receiveMsgBehaviour() {
+			par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 		}
-		
+
 		@Override
 		public void action() {
 
@@ -109,7 +107,7 @@ public class EquipletAgent extends Agent {
 			try {
 				String convid = msg.getConversationId();
 				switch (msg.getOntology()) {
-				
+
 				case "ScheduleStep":
 					if (debug)
 						System.out.println("EQ: PA -> "
@@ -145,7 +143,8 @@ public class EquipletAgent extends Agent {
 						@Override
 						public void handleElapsedTimeout() {
 							if (true && delay > 10000)
-								System.out.println("EQ: " + myAgent.getLocalName()
+								System.out.println("EQ: "
+										+ myAgent.getLocalName()
 										+ " will wait : " + delay / 2
 										+ " ms before sending "
 										+ "CanPerformStep " + _step.getId());
@@ -173,8 +172,7 @@ public class EquipletAgent extends Agent {
 					delay = getRandomInt(randomSeed);
 					if (true && delay > 10000)
 						System.out.println("EQ: " + myAgent.getLocalName()
-								+ " waited : " + delay
-								+ " ms before sending "
+								+ " waited : " + delay + " ms before sending "
 								+ "GetProductionDuration " + _step.getId());
 
 					myAgent.addBehaviour(new WakerBehaviour(myAgent, delay) {
@@ -182,10 +180,10 @@ public class EquipletAgent extends Agent {
 						public void handleElapsedTimeout() {
 							if (debug)
 								System.out.println("EQ: "
-										+ myAgent.getLocalName()
-										+ " -> PA "
-										+ " send msg GetProductionDuration ( " + _step.getId() + " ) after "
-										+ delay + " ms.");
+										+ myAgent.getLocalName() + " -> PA "
+										+ " send msg GetProductionDuration ( "
+										+ _step.getId() + " ) after " + delay
+										+ " ms.");
 							send(message);
 						}
 					});
