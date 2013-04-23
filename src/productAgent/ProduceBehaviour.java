@@ -26,15 +26,6 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	 */
 	private static final long serialVersionUID = 1L;
 	private Product _product;
-	private int currentProductionStep;
-
-	/**
-	 * @return the _currentproductionstep
-	 */
-	public ProductionStep get_currentproductionstep(){
-		return _product.getProduction().getProductionSteps()
-				.get(currentProductionStep);
-	}
 
 	/**
 	 */
@@ -50,15 +41,18 @@ public class ProduceBehaviour extends OneShotBehaviour{
 		// TODO Auto-generated method stub
 	}
 
+	static void canProductionStepStart(ProductionStep step){
+		step.setStatus(ProductionStepStatus.STATE_PRODUCING);
+	}
+
 	void productionStepEnded(ProductionStep step, boolean succes,
 			List<LogMessage> log){
-		currentProductionStep = step.getId();
 		_product.add(log);
 		if (succes){
 			step.setStatus(ProductionStepStatus.STATE_DONE);
 		} else{
 			step.setStatus(ProductionStepStatus.STATE_FAILED);
 		}
-		// TODO If latest step, end production?
+		// TODO If latest step, check all steps done, then end production?
 	}
 }
