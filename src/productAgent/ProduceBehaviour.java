@@ -9,6 +9,7 @@ import jade.core.behaviours.OneShotBehaviour;
 import newDataClasses.LogMessage;
 import newDataClasses.Product;
 import newDataClasses.ProductionStep;
+import newDataClasses.ProductionStepStatus;
 
 /**
  * 
@@ -46,12 +47,19 @@ public class ProduceBehaviour extends OneShotBehaviour{
 		// TODO Auto-generated method stub
 	}
 
-	void productionStepEnded(ProductionStep step, @SuppressWarnings("unused") boolean succes, List<LogMessage> log)
+	void productionStepEnded(ProductionStep step, boolean succes, List<LogMessage> log)
 	{	
 		currentProductionStep = step.getId();
 		_product.add(log);
 		
-		// TODO Set ProductionStep Status to succes. 
+		if(succes){
+			step.setStatus(ProductionStepStatus.STATE_DONE);
+		}
+		else{
+			step.setStatus(ProductionStepStatus.STATE_FAILED);
+		}
+		
+		// TODO If latest step, end production?
 		
 	}
 }
