@@ -1,76 +1,78 @@
 /**
- *
+ * 
  * Project: Dummy Product Agent
- *
+ * 
  * Package: newDataClasses
- *
+ * 
  * File: ProductionEquipletMapper.java
- *
+ * 
  * Author: Mike Schaap
- *
+ * 
  * Version: 1.0
- *
+ * 
  */
+
 package newDataClasses;
 
 import jade.core.AID;
 
 import java.util.HashMap;
 
-public class ProductionEquipletMapper {
-	
+public class ProductionEquipletMapper{
 	private HashMap<Integer, HashMap<AID, Long>> equipletList;
-	
-	public ProductionEquipletMapper() {
+
+	public ProductionEquipletMapper(){
 		equipletList = new HashMap<Integer, HashMap<AID, Long>>();
 	}
-	
-	public void addProductionStep(int productionStepID) {
-		if(this.equipletList.containsKey(productionStepID) == false) {
+
+	public void addProductionStep(int productionStepID){
+		if (this.equipletList.containsKey(productionStepID) == false){
 			this.equipletList.put(productionStepID, new HashMap<AID, Long>());
-		} else {
-			//DEBUG: Production step already exists
+		} else{
+			// DEBUG: Production step already exists
 		}
 	}
-	
-	public void removeProductionStep(Long productionStepID) {
-		if(this.equipletList.containsKey(productionStepID) == true) {
+
+	public void removeProductionStep(Long productionStepID){
+		if (this.equipletList.containsKey(productionStepID) == true){
 			this.equipletList.remove(productionStepID);
-		} else {
-			//DEBUG: Production step doesn't exist
+		} else{
+			// DEBUG: Production step doesn't exist
 		}
 	}
-	
-	public void addEquipletToProductionStep(Integer productionStepID, AID equipletID) {
+
+	public void addEquipletToProductionStep(Integer productionStepID,
+			AID equipletID){
 		this.addEquipletToProductionStep(productionStepID, equipletID, -1L);
 	}
-	
-	public void addEquipletToProductionStep(Integer productionStepID, AID equipletID, Long timeslots) {
+
+	public void addEquipletToProductionStep(Integer productionStepID,
+			AID equipletID, Long timeslots){
 		HashMap<AID, Long> tmp = this.equipletList.get(productionStepID);
 		tmp.put(equipletID, timeslots);
 		this.equipletList.put(productionStepID, tmp);
 	}
-	
-	public void removeEquipletFromProductionStep(Integer productionStepID, AID equipletID){
+
+	public void removeEquipletFromProductionStep(Integer productionStepID,
+			AID equipletID){
 		HashMap<AID, Long> tmp = this.equipletList.get(productionStepID);
 		tmp.remove(equipletID);
 		this.equipletList.put(productionStepID, tmp);
 	}
-	
-	public HashMap<AID, Long> getEquipletsForProductionStep(int pA_id) {
+
+	public HashMap<AID, Long> getEquipletsForProductionStep(int pA_id){
 		HashMap<AID, Long> s2 = this.equipletList.get(pA_id);
 		return this.equipletList.get(pA_id);
 	}
-	
-	public void setTimeSlotsForEquplet(Integer productionStepID, AID equipletID, Long timeslots) {
+
+	public void setTimeSlotsForEquplet(Integer productionStepID,
+			AID equipletID, Long timeslots){
 		HashMap<AID, Long> tmp = this.equipletList.get(productionStepID);
 		tmp.put(equipletID, timeslots);
 		this.equipletList.put(productionStepID, tmp);
 	}
-	
-	public Long getTimeSlotsForEquiplet(int i, AID equipletID) {
+
+	public Long getTimeSlotsForEquiplet(int i, AID equipletID){
 		return this.equipletList.get(i).get(equipletID);
 	}
-	
-
 }

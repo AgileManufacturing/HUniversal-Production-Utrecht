@@ -1,3 +1,4 @@
+
 package productAgent;
 
 import jade.core.behaviours.CyclicBehaviour;
@@ -5,81 +6,78 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
-public class sideOverviewBehaviour extends CyclicBehaviour {
+public class SideOverviewBehaviour extends CyclicBehaviour{
 	ACLMessage msg;
 	ProductAgent pa;
-	
+
 	@SuppressWarnings("unused")
-	private class receiveMsgBehaviour extends CyclicBehaviour {
-		
+	private class receiveMsgBehaviour extends CyclicBehaviour{
 		private receiveMsgBehaviour(){
 		}
-		
+
 		@Override
-		public void action() {
+		public void action(){
 			ACLMessage msg = myAgent.receive();
-			if (msg != null) {
+			if (msg != null){
 				WaitMsgBehaviour behaviour = new WaitMsgBehaviour(msg);
-			} else {
+			} else{
 				block();
 			}
 		}
 	}
-	
-	private class WaitMsgBehaviour extends OneShotBehaviour {
+
+	private class WaitMsgBehaviour extends OneShotBehaviour{
 		ACLMessage msg;
 
-		public WaitMsgBehaviour(ACLMessage msg) {
+		public WaitMsgBehaviour(ACLMessage msg){
 			this.msg = msg;
 		}
-	
+
 		@Override
 		public void action(){
-			try {
+			try{
 				switch(msg.getOntology()){
-					// the traveling time between equiplets
-					case "journey":
-						@SuppressWarnings("unused")
-						OneShotBehaviour waitingBehaviour = new OneShotBehaviour(){
-							@Override
-							public void action(){
-								
-							}
-						};
-						break;
-					// reschedule the product
-					case "reschedule":
-						@SuppressWarnings("unused")
-						OneShotBehaviour reschedule = new OneShotBehaviour(){
-							@Override
-							public void action(){
-								pa.reschedule();
-							}
-						};
-						break;
-					// remove the equiplet with a malfunction and reschedule the product
-					case "equiplet malfunction":
-						@SuppressWarnings("unused")
-						OneShotBehaviour rescheduleAndRemoveEquiplet = new OneShotBehaviour(){
-							@Override
-							public void action(){
-								pa.rescheduleAndRemoveEquiplet();
-							}
-						};
-						break;	
-					default:
-						return;
-					}
-				}catch(Exception e){
-					System.out.println("" + e);
+				// the traveling time between equiplets
+				case "journey":
+					@SuppressWarnings("unused")
+					OneShotBehaviour waitingBehaviour = new OneShotBehaviour(){
+						@Override
+						public void action(){
+						}
+					};
+					break;
+				// reschedule the product
+				case "reschedule":
+					@SuppressWarnings("unused")
+					OneShotBehaviour reschedule = new OneShotBehaviour(){
+						@Override
+						public void action(){
+							pa.reschedule();
+						}
+					};
+					break;
+				// remove the equiplet with a malfunction and reschedule the
+				// product
+				case "equiplet malfunction":
+					@SuppressWarnings("unused")
+					OneShotBehaviour rescheduleAndRemoveEquiplet = new OneShotBehaviour(){
+						@Override
+						public void action(){
+							pa.rescheduleAndRemoveEquiplet();
+						}
+					};
+					break;
+				default:
+					return;
 				}
+			} catch(Exception e){
+				System.out.println("" + e);
 			}
 		}
-	
+	}
 
 	@Override
-	public void action() {
+	public void action(){
 		// TODO Auto-generated method stub
-		
 	}
 }
