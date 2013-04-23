@@ -1,57 +1,64 @@
 /**
  * 
  */
+
 package productAgent;
+
+import jade.core.behaviours.OneShotBehaviour;
 
 import java.util.List;
 
-import jade.core.behaviours.OneShotBehaviour;
 import newDataClasses.LogMessage;
 import newDataClasses.Product;
 import newDataClasses.ProductionStep;
+import newDataClasses.ProductionStepStatus;
 
 /**
  * 
- * @brief This behaviour is running when the production is about to start till the end of the production.
+ * @brief This behaviour is running when the production is about to start till
+ *        the end of the production.
  * @author Theodoor de Graaff <theodoor.degraaff@student.hu.nl>
  * 
  */
 public class ProduceBehaviour extends OneShotBehaviour{
-	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Product _product; 
+	private Product _product;
 	private int currentProductionStep;
-	
+
 	/**
 	 * @return the _currentproductionstep
 	 */
-	public ProductionStep get_currentproductionstep() {
-		return _product.getProduction().getProductionSteps().get(currentProductionStep);
+	public ProductionStep get_currentproductionstep(){
+		return _product.getProduction().getProductionSteps()
+				.get(currentProductionStep);
 	}
 
 	/**
 	 */
-	public ProduceBehaviour() {
-		
+	public ProduceBehaviour(){
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see jade.core.behaviours.Behaviour#action()
 	 */
 	@Override
-	public void action() {
+	public void action(){
 		// TODO Auto-generated method stub
 	}
 
-	void productionStepEnded(ProductionStep step, @SuppressWarnings("unused") boolean succes, List<LogMessage> log)
-	{	
+	void productionStepEnded(ProductionStep step, boolean succes,
+			List<LogMessage> log){
 		currentProductionStep = step.getId();
 		_product.add(log);
-		
-		// TODO Set ProductionStep Status to succes. 
-		
+		if (succes){
+			step.setStatus(ProductionStepStatus.STATE_DONE);
+		} else{
+			step.setStatus(ProductionStepStatus.STATE_FAILED);
+		}
+		// TODO If latest step, end production?
 	}
 }
