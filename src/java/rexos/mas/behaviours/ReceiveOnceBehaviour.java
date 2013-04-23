@@ -86,7 +86,9 @@ public abstract class ReceiveOnceBehaviour extends ReceiveBehaviour {
 
 	@Override
 	public void action() {
-		if(myAgent != null && (msg = myAgent.receive(template)) != null) {
+		ACLMessage msg = getMessage();
+		long wakeupTime = getWakeupTime();
+		if(myAgent != null && (msg = myAgent.receive(getTemplate())) != null) {
 			handle(msg);
 			if(myAgent != null)
 				myAgent.removeBehaviour(this);

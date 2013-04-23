@@ -22,10 +22,10 @@ import jade.lang.acl.MessageTemplate;
 public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	private static final long serialVersionUID = 1L;
 
-	protected MessageTemplate template;
-	protected long timeout, wakeupTime;
+	private MessageTemplate template;
+	private long timeout, wakeupTime;
 
-	protected ACLMessage msg;
+	private ACLMessage msg;
 
 	/**
 	 * Instantiates a new <code>ReceiveBehaviour</code> without a
@@ -111,15 +111,6 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	}
 
 	/**
-	 * Gets the current message.
-	 * 
-	 * @return the message
-	 */
-	public ACLMessage getMessage() {
-		return msg;
-	}
-
-	/**
 	 * Sets the timer to <code>millis</code> milliseconds in which a timeout
 	 * should occur if no message matching the template were to arrive within
 	 * that time then it restarts the timer.
@@ -152,6 +143,36 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 		msg = null;
 		timeout = -1;
 		restartTimer();
+	}
+
+	/**
+	 * Gets the current message.
+	 * 
+	 * @return the message
+	 */
+	public ACLMessage getMessage() {
+		return msg;
+	}
+
+	/**
+	 * @return the template
+	 */
+	public MessageTemplate getTemplate() {
+		return template;
+	}
+
+	/**
+	 * @return the timeout
+	 */
+	public long getTimeout() {
+		return timeout;
+	}
+
+	/**
+	 * @return the wakeupTime
+	 */
+	public long getWakeupTime() {
+		return wakeupTime;
 	}
 
 	/**

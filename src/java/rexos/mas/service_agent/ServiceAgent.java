@@ -22,6 +22,7 @@ import rexos.mas.service_agent.behaviour.CanDoProductStep;
 import rexos.mas.service_agent.behaviour.GetProductStepDuration;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 
 /**
@@ -116,17 +117,30 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		try {
 			serviceStepBBClient.removeDocuments(new BasicDBObject());
 
-			BasicDBObject failData = new BasicDBObject("source",
-					"service agent");
-			failData.put("reason", "died");
-			BasicDBObject update = new BasicDBObject("status",
-					StepStatusCode.FAILED.name());
-			update.put("statusData", failData);
+			DBObject update = BasicDBObjectBuilder
+					.start("status", StepStatusCode.FAILED.name())
+					.push("statusData")
+						.add("source", "service agent")
+						.add("reason", "died")
+						.pop()
+					.get();
 			productionStepBBClient.updateDocuments(new BasicDBObject(),
 					new BasicDBObject("$set", update));
 		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void handleHardwareAgentTimeout() {
+
+	}
+
+	public void handleEquipletAgentTimeout() {
+
+	}
+
+	public void handleLogisticsAgentTimeout() {
+
 	}
 
 	/**
@@ -184,10 +198,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					}
 					break;
 				case DELETE:
-//					ObjectId productStepId = (ObjectId) productionStep
-//							.get("_id");
-//					serviceStepBBClient.removeDocuments(new BasicDBObject(
-//							"productStepId", productStepId));
+					// ObjectId productStepId = (ObjectId) productionStep
+					// .get("_id");
+					// serviceStepBBClient.removeDocuments(new BasicDBObject(
+					// "productStepId", productStepId));
 					break;
 				default:
 					break;
