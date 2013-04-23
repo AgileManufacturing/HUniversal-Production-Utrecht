@@ -4,9 +4,10 @@
 
 package productAgent;
 
+import jade.core.behaviours.OneShotBehaviour;
+
 import java.util.List;
 
-import jade.core.behaviours.OneShotBehaviour;
 import newDataClasses.LogMessage;
 import newDataClasses.Product;
 import newDataClasses.ProductionStep;
