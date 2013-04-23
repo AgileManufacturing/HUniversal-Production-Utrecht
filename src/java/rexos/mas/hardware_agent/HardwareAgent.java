@@ -47,7 +47,9 @@ import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.libraries.blackboard_client.FieldUpdateSubscription.MongoUpdateLogOperation;
 import rexos.mas.data.DbData;
+import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.hardware_agent.behaviours.CheckForModules;
 import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
 import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
@@ -152,8 +154,12 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 							
 					//neem de equipletSteps die horen bij deze service step 
 					// en plan deze op de equipletstep bb
+										
+					for(EquipletStepMessage eq : equipletSteps){
 					
+						equipletStepBBClient.insertDocument(eq.toBasicDBObject());					
 					
+					}
 					
 				} catch (InvalidDBNamespaceException e1) {
 					// TODO Auto-generated catch block

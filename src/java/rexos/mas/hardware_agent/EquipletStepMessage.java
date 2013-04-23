@@ -31,9 +31,18 @@
  **/
 package rexos.mas.hardware_agent;
 
+import jade.core.AID;
+
 import org.bson.types.ObjectId;
 
-public class EquipletStepMessage {
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+
+import rexos.mas.data.IMongoSaveable;
+import rexos.mas.data.ScheduleData;
+import rexos.mas.equiplet_agent.StepStatusCode;
+
+public class EquipletStepMessage implements IMongoSaveable {
 	private ObjectId serviceStepID;
 	private Long instructionData;
 	private Long type;
@@ -119,5 +128,23 @@ public class EquipletStepMessage {
 		return String
 				.format("EquipletStepMessage [serviceStepID=%s, instructionData=%s, type=%s, timeData=%s]",
 						serviceStepID, instructionData, type, timeData);
+	}
+
+	@Override
+	public BasicDBObject toBasicDBObject() {
+		BasicDBObject object = new BasicDBObject();
+		object.put("serviceStepID", serviceStepID);
+		object.put("instructionData", instructionData);
+		object.put("type", type);
+		object.put("timeData", timeData);
+		return object;
+	}
+
+	@Override
+	public void fromBasicDBObject(BasicDBObject object) {
+		serviceStepID = object.getObjectId("serviceStepID");
+		instructionData = object.getLong("instructionData");
+		type = object.getLong("type");
+		timeData = new TimeData(object.getLong("timeData"));	
 	}
 }
