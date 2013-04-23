@@ -1,10 +1,11 @@
 
 package main;
 
-import java.util.ArrayList;
-
 import jade.core.AID;
 import jade.core.Agent;
+
+import java.util.ArrayList;
+
 import newDataClasses.Parameter;
 import newDataClasses.ParameterGroup;
 import newDataClasses.ParameterList;

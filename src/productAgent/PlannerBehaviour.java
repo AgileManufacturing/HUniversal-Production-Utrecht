@@ -6,6 +6,7 @@ import jade.core.behaviours.OneShotBehaviour;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
 import libraries.blackboardJavaClient.src.nl.hu.client.InvalidDBNamespaceException;
 import libraries.blackboardJavaClient.src.nl.hu.client.InvalidJSONException;

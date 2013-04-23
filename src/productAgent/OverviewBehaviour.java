@@ -1,11 +1,11 @@
 
 package productAgent;
 
-import newDataClasses.ProductionStep;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
+import newDataClasses.ProductionStep;
 
 public class OverviewBehaviour extends OneShotBehaviour{
 	/**
@@ -125,7 +125,7 @@ public class OverviewBehaviour extends OneShotBehaviour{
 			}
 		});
 		System.out.println("Lets add a produce");
-		_produceBehaviour = new ProduceBehaviour();
+		// _produceBehaviour = new ProduceBehaviour();
 		// _sequentialBehaviour.addSubBehaviour(_produceBehaviour);
 		System.out
 				.println("Added all behaviours. And everything should start. Aw yeah!");

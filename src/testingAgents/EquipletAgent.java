@@ -10,9 +10,6 @@ import jade.lang.acl.ACLMessage;
 
 import java.util.Random;
 
-import newDataClasses.Parameter;
-import newDataClasses.ParameterGroup;
-import newDataClasses.ParameterList;
 import newDataClasses.ProductionStep;
 
 /*

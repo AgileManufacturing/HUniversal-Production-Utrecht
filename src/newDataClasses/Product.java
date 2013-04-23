@@ -16,8 +16,6 @@ package newDataClasses;
 
 import java.util.List;
 
-import newDataClasses.sqldatabase.sqliteDatabase;
-
 public class Product{
 	private Production _production;
 	private ProductLog log;

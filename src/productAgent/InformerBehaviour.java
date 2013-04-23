@@ -1,9 +1,6 @@
 
 package productAgent;
 
-import java.util.HashMap;
-import java.util.Set;
-
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.ParallelBehaviour;

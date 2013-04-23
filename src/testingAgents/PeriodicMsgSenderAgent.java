@@ -49,12 +49,12 @@
 
 package testingAgents;
 
-import java.util.Random;
-
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.WakerBehaviour;
 import jade.lang.acl.ACLMessage;
+
+import java.util.Random;
 
 public class PeriodicMsgSenderAgent extends Agent{
 	private static final long serialVersionUID = 1L;
