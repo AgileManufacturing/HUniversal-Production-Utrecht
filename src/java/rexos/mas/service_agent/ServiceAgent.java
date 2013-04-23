@@ -35,7 +35,7 @@ import com.mongodb.DBObject;
 public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	private static final long serialVersionUID = 1L;
 
-	private BlackboardClient productionStepBBClient, serviceStepBBClient;
+	private BlackboardClient productStepBBClient, serviceStepBBClient;
 	private FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription(
 			"status", this);
 	private HashMap<String, Long> services;
@@ -61,13 +61,13 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		}
 
 		try {
-			productionStepBBClient = new BlackboardClient(dbData.getIp());
+			productStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
 
-			productionStepBBClient.setDatabase(dbData.getName());
-			productionStepBBClient.setCollection("ProductStepsBlackBoard");
+			productStepBBClient.setDatabase(dbData.getName());
+			productStepBBClient.setCollection("ProductStepsBlackBoard");
 			// Needs to react on state changes of production steps to WAITING
-			productionStepBBClient.subscribe(statusSubscription);
+			productStepBBClient.subscribe(statusSubscription);
 
 			serviceStepBBClient.setDatabase(dbData.getName());
 			serviceStepBBClient.setCollection("ServiceStepsBlackBoard");
@@ -93,9 +93,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 		// create serviceFactory
 		// addBehaviour(new AnswerBehaviour(this));
-		addBehaviour(new CanDoProductStep(this, productionStepBBClient));
-		addBehaviour(new GetProductStepDuration(this, productionStepBBClient,
-				serviceStepBBClient));
+		addBehaviour(new CanDoProductStep(this));
+		addBehaviour(new GetProductStepDuration(this));
 
 		// receive behaviours from EA
 		// add EvaluateProductionStep receiveBehaviour --> conversation with HA
@@ -112,7 +111,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 */
 	@Override
 	public void takeDown() {
-		productionStepBBClient.unsubscribe(statusSubscription);
+		productStepBBClient.unsubscribe(statusSubscription);
 		serviceStepBBClient.unsubscribe(statusSubscription);
 		try {
 			serviceStepBBClient.removeDocuments(new BasicDBObject());
@@ -124,7 +123,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 						.add("reason", "died")
 						.pop()
 					.get();
-			productionStepBBClient.updateDocuments(new BasicDBObject(),
+			productStepBBClient.updateDocuments(new BasicDBObject(),
 					new BasicDBObject("$set", update));
 		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 			e.printStackTrace();
@@ -181,7 +180,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			switch (entry.getNamespace().split("\\.")[1]) {
 			case "ProductStepsBlackBoard":
 				ProductStepMessage productionStep = new ProductStepMessage(
-						(BasicDBObject) productionStepBBClient
+						(BasicDBObject) productStepBBClient
 								.findDocumentById(entry.getTargetObjectId()));
 				switch (operation) {
 				case UPDATE:
@@ -217,7 +216,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					BasicDBObject update = new BasicDBObject("status",
 							serviceStep.get("status"));
 					update.put("statusData", serviceStep.get("statusData"));
-					productionStepBBClient.updateDocuments(new BasicDBObject(
+					productStepBBClient.updateDocuments(new BasicDBObject(
 							"_id", productStepId), new BasicDBObject("$set",
 							update));
 					break;
@@ -277,10 +276,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	}
 
 	/**
-	 * @return the productionStepBBClient
+	 * @return the productStepBBClient
 	 */
-	public BlackboardClient getProductionStepBBClient() {
-		return productionStepBBClient;
+	public BlackboardClient getProductStepBBClient() {
+		return productStepBBClient;
 	}
 
 	/**

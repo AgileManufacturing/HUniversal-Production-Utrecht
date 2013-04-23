@@ -12,7 +12,6 @@ import java.io.IOException;
 
 import org.bson.types.ObjectId;
 
-import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
@@ -31,16 +30,14 @@ public class CanDoProductStep extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	private ServiceAgent agent;
-	private BlackboardClient client;
 	private ServiceFactory factory;
 
 	/**
 	 * @param a
 	 */
-	public CanDoProductStep(Agent a, BlackboardClient client) {
+	public CanDoProductStep(Agent a) {
 		super(a, MessageTemplate.MatchOntology("CanDoProductionStep"));
 		agent = (ServiceAgent) a;
-		this.client = client;
 	}
 
 	/*
@@ -53,7 +50,8 @@ public class CanDoProductStep extends ReceiveBehaviour {
 		try {
 			ObjectId productStepId = (ObjectId) message.getContentObject();
 			ProductStepMessage productStep = new ProductStepMessage(
-					(BasicDBObject) client.findDocumentById(productStepId));
+					(BasicDBObject) agent.getProductStepBBClient()
+							.findDocumentById(productStepId));
 			long stepType = productStep.getType();
 			BasicDBObject parameters = productStep.getParameters();
 

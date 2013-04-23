@@ -64,7 +64,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 	 * @param a The agent for this behaviour
 	 */
 	public ScheduleStep(Agent a) {
-		super(a, -1, messageTemplate);
+		super(a, messageTemplate);
 		equipletAgent = (EquipletAgent) a;
 	}
 
