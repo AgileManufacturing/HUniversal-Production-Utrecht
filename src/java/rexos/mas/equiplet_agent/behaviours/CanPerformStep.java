@@ -80,7 +80,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 	 *            The agent for this behaviour
 	 */
 	public CanPerformStep(Agent a, BlackboardClient equipletBBClient) {
-		super(a, -1, messageTemplate);
+		super(a, messageTemplate);
 		equipletAgent = (EquipletAgent) a;
 		this.equipletBBClient = equipletBBClient;
 	}

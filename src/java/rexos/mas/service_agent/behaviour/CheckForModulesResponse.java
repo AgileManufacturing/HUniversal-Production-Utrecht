@@ -79,6 +79,9 @@ public class CheckForModulesResponse extends ReceiveOnceBehaviour {
 					.getLocalName(), message.getPerformative() == ACLMessage.CONFIRM);
 		} else {
 			// TODO handle timeout
+			
+			System.out.println("CheckForModulesResponse timeout!");
+			agent.handleHardwareAgentTimeout();
 		}
 	}
 }
