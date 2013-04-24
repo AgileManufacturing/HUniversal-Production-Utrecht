@@ -55,7 +55,7 @@ public class ServiceFactory {
 		this.factory = new DynamicClassFactory<Service>(Service.class);
 	}
 	
-	private Service	getServiceByServiceID(long serviceID) {
+	private Service	getServiceByServiceID(int serviceID) {
 		Service service = null;
 		try {
 			KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
@@ -73,7 +73,7 @@ public class ServiceFactory {
 		return service;
 	}
 	
-	public Service[] getServicesForStep(long stepType) {
+	public Service[] getServicesForStep(int stepType) {
 		ArrayList<Service> servicesForStep = new ArrayList<Service>();
 		try {
 			KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
@@ -82,7 +82,7 @@ public class ServiceFactory {
 					equipletAID, stepType);
 			
 			for (int i = 0 ; i < rows.length ; ++i) {
-				servicesForStep.add(getServiceByServiceID((long)rows[i].get("id")));
+				servicesForStep.add(getServiceByServiceID((int)rows[i].get("id")));
 			}
 		} catch (KnowledgeException | KeyNotFoundException ex) {
 			// TODO Auto-generated catch block
