@@ -38,8 +38,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	private BlackboardClient productStepBBClient, serviceStepBBClient;
 	private FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription(
 			"status", this);
-	private HashMap<String, Long> services;
-	private HashMap<Long, String[]> stepTypes;
+	private HashMap<String, Integer> services;
+	private HashMap<Integer, String[]> stepTypes;
 	private DbData dbData;
 	private AID equipletAgentAID, hardwareAgentAID, logisticsAID;
 
@@ -80,16 +80,16 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		}
 
 		services = new HashMap<>();
-		services.put("Drill", 15l);
-		services.put("Glue", 20l);
-		services.put("Pick", 5l);
-		services.put("Place", 5l);
+		services.put("Drill", 15);
+		services.put("Glue", 20);
+		services.put("Pick", 5);
+		services.put("Place", 5);
 
 		stepTypes = new HashMap<>();
-		stepTypes.put(0l, new String[] { "Pick", "Place" }); // Pick&Place
-		stepTypes.put(1l, new String[] { "Glue", "Pick", "Place" }); // Attach
-		stepTypes.put(2l, new String[] { "Drill", "Pick", "Place" }); // Screw
-		stepTypes.put(3l, new String[] { "Drill", "Pick", "Place" }); // Screw
+		stepTypes.put(0, new String[] { "Pick", "Place" }); // Pick&Place
+		stepTypes.put(1, new String[] { "Glue", "Pick", "Place" }); // Attach
+		stepTypes.put(2, new String[] { "Drill", "Pick", "Place" }); // Screw
+		stepTypes.put(3, new String[] { "Drill", "Pick", "Place" }); // Screw
 
 		// create serviceFactory
 		// addBehaviour(new AnswerBehaviour(this));
@@ -230,14 +230,14 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	/**
 	 * @return the services
 	 */
-	public HashMap<String, Long> getServices() {
+	public HashMap<String, Integer> getServices() {
 		return services;
 	}
 
 	/**
 	 * @return the stepTypes
 	 */
-	public HashMap<Long, String[]> getStepTypes() {
+	public HashMap<Integer, String[]> getStepTypes() {
 		return stepTypes;
 	}
 

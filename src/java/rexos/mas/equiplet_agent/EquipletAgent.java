@@ -66,7 +66,7 @@ import com.mongodb.BasicDBObject;
  **/
 public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	/**
-	 * @var Long serialVersionUID
+	 * @var long serialVersionUID
 	 * The serial version UID.
 	 */
 	private static final long serialVersionUID = 1L;
@@ -144,10 +144,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	private BlackboardClient equipletBBClient;
 
 	/**
-	 * @var ArrayList<Long> capabilities
+	 * @var ArrayList<Integer> capabilities
 	 * List with all the capabilities of this equiplet.
 	 */
-	private ArrayList<Long> capabilities;
+	private ArrayList<Integer> capabilities;
 
 	/**
 	 * @var HashMap<String, ObjectId> communicationTable
@@ -168,16 +168,16 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	private ObjectId nextProductStep;
 
 	/**
-	 * @var long firstTimeSlot
+	 * @var int firstTimeSlot
 	 * The first time slot of the grid.
 	 */
-	private long firstTimeSlot;
+	private int firstTimeSlot;
 	
 	/**
-	 * @var long timeSlotLength
+	 * @var int timeSlotLength
 	 * The length of a time slot.
 	 */
-	private long timeSlotLength;
+	private int timeSlotLength;
 
 	/**
 	 * Setup function for the equipletAgent.
@@ -209,7 +209,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			Object[] args = getArguments();
 			AID logisticsAgent = null;
 			if (args != null && args.length > 0) {
-				capabilities = (ArrayList<Long>) args[0];
+				capabilities = (ArrayList<Integer>) args[0];
 				logisticsAgent = (AID) args[1];
 				System.out.format("%s %s%n", capabilities, equipletDbName);
 			}
@@ -248,8 +248,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			//gets the timedata for synchronizing from the collective blackboard.
 			collectiveBBClient.setCollection(timeDataName);
 			BasicDBObject timeData = (BasicDBObject)collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
-			firstTimeSlot = timeData.getLong("firstTimeSlot");
-			timeSlotLength = timeData.getLong("timeSlotLength");
+			firstTimeSlot = timeData.getInt("firstTimeSlot");
+			timeSlotLength = timeData.getInt("timeSlotLength");
 			collectiveBBClient.setCollection(equipletDirectoryName);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -258,7 +258,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		
 		//initiates the timer to the next product step.
 		timer = new NextProductStepTimer(firstTimeSlot, timeSlotLength);
-		timer.setNextUsedTimeSlot(-1l);
+		timer.setNextUsedTimeSlot(-1);
 
 		//starts the behaviour for receiving messages with the Ontology CanPerformStep.
 		CanPerformStep canPerformStepBehaviour = new CanPerformStep(this, equipletBBClient);

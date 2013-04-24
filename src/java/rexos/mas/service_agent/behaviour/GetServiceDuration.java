@@ -63,7 +63,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 	private ServiceAgent agent;
 
 	private List<ServiceStepMessage> serviceSteps;
-	private long duration = 0;
+	private int duration = 0;
 	private int remainingServiceSteps;
 
 	/**

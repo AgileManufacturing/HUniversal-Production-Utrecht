@@ -46,10 +46,10 @@ public class EquipletDirectoryMessage implements IMongoSaveable {
 	public AID AID;
 	
 	/**
-	 * @var long[] capabilities
+	 * @var ArrayList<Integer> capabilities
 	 * The capabilities of the equipletAgent
 	 */
-	public ArrayList<Long> capabilities;
+	public ArrayList<Integer> capabilities;
 	
 	/**
 	 * @var DbData db
@@ -64,7 +64,7 @@ public class EquipletDirectoryMessage implements IMongoSaveable {
 	 * @param capabilities the capabilities of the equipletAgent.
 	 * @param db the information about the database of the equipletAgent.
 	 */
-	public EquipletDirectoryMessage(AID AID, ArrayList<Long> capabilities, DbData db){
+	public EquipletDirectoryMessage(AID AID, ArrayList<Integer> capabilities, DbData db){
 		this.AID = AID;
 		this.capabilities = capabilities;
 		this.db = db;
@@ -84,7 +84,7 @@ public class EquipletDirectoryMessage implements IMongoSaveable {
 	@Override
 	public void fromBasicDBObject(BasicDBObject object){
 		this.AID = new AID((String)(object.get("AID")), jade.core.AID.ISGUID);
-		this.capabilities = (ArrayList<Long>) object.get("capabilities");
+		this.capabilities = (ArrayList<Integer>) object.get("capabilities");
 		this.db = new DbData((BasicDBObject)object.get("db"));
 	}
 	

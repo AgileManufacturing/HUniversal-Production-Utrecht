@@ -7,7 +7,6 @@ import jade.lang.acl.UnreadableException;
 
 import org.bson.types.ObjectId;
 
-import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
@@ -48,7 +47,7 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 			ProductStepMessage productStep = new ProductStepMessage(
 					(BasicDBObject) agent.getProductStepBBClient()
 							.findDocumentById(productStepId));
-			long productStepType = productStep.getType();
+			int productStepType = productStep.getType();
 
 			System.out.format(
 					"%s got message GetProductStepDuration for step type %s%n",

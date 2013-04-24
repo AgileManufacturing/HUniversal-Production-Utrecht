@@ -31,32 +31,32 @@ package rexos.mas.hardware_agent;
 
 public class TimeData {
 	/**
-	 * @var long duration
+	 * @var int duration
 	 * the length of duration 
 	 */
-	public long duration;
+	public int duration;
 	
 	/**
 	 * 
 	 * @param duration
 	 */
-	public TimeData(long duration) {
+	public TimeData(int duration) {
 		this.duration = duration;
 	}
 	/**
 	 * getter for the duration.
 	 * @return duration
 	 */
-	public long getDuration(){
+	public int getDuration(){
 		
-		return this.duration;
+		return duration;
 		
 	}
 	/**
 	 * setter to set the duration
 	 * @param duration
 	 */
-	public void setDuration(long duration){
+	public void setDuration(int duration){
 		
 		this.duration = duration;
 		

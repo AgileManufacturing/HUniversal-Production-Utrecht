@@ -42,8 +42,8 @@ import com.mongodb.BasicDBObjectBuilder;
 public class Position implements Serializable, IMongoSaveable {
 	private static final long serialVersionUID = 1L;
 
-	private long x, y, z;
-	private long relativeToPartId;
+	private double x, y, z;
+	private int relativeToPartId;
 
 	/**
 	 * 
@@ -64,7 +64,7 @@ public class Position implements Serializable, IMongoSaveable {
 	 * @param y
 	 * @param z
 	 */
-	public Position(long x, long y, long z) {
+	public Position(double x, double y, double z) {
 		this(x, y, z, -1);
 	}
 
@@ -74,7 +74,7 @@ public class Position implements Serializable, IMongoSaveable {
 	 * @param z
 	 * @param relativeToPartId
 	 */
-	public Position(long x, long y, long z, long referencePartId) {
+	public Position(double x, double y, double z, int referencePartId) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -104,16 +104,16 @@ public class Position implements Serializable, IMongoSaveable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		x = object.getLong("x");
-		y = object.getLong("y");
-		z = object.getLong("z");
-		relativeToPartId = object.getLong("relativeToPartId");
+		x = object.getDouble("x");
+		y = object.getDouble("y");
+		z = object.getDouble("z");
+		relativeToPartId = object.getInt("relativeToPartId");
 	}
 
 	/**
 	 * @return the x
 	 */
-	public long getX() {
+	public double getX() {
 		return x;
 	}
 
@@ -121,14 +121,14 @@ public class Position implements Serializable, IMongoSaveable {
 	 * @param x
 	 *            the x to set
 	 */
-	public void setX(long x) {
+	public void setX(double x) {
 		this.x = x;
 	}
 
 	/**
 	 * @return the y
 	 */
-	public long getY() {
+	public double getY() {
 		return y;
 	}
 
@@ -136,14 +136,14 @@ public class Position implements Serializable, IMongoSaveable {
 	 * @param y
 	 *            the y to set
 	 */
-	public void setY(long y) {
+	public void setY(double y) {
 		this.y = y;
 	}
 
 	/**
 	 * @return the z
 	 */
-	public long getZ() {
+	public double getZ() {
 		return z;
 	}
 
@@ -151,14 +151,14 @@ public class Position implements Serializable, IMongoSaveable {
 	 * @param z
 	 *            the z to set
 	 */
-	public void setZ(long z) {
+	public void setZ(double z) {
 		this.z = z;
 	}
 
 	/**
 	 * @return the relativeToPartId
 	 */
-	public long getRelativeToPartId() {
+	public int getRelativeToPartId() {
 		return relativeToPartId;
 	}
 
@@ -166,7 +166,7 @@ public class Position implements Serializable, IMongoSaveable {
 	 * @param relativeToPartId
 	 *            the relativeToPartId to set
 	 */
-	public void setRelativeToPartId(long relativeToPartId) {
+	public void setRelativeToPartId(int relativeToPartId) {
 		this.relativeToPartId = relativeToPartId;
 	}
 

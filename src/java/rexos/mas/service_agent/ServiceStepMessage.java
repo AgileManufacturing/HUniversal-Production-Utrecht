@@ -43,20 +43,20 @@ import com.mongodb.BasicDBObjectBuilder;
  */
 public class ServiceStepMessage implements IMongoSaveable {
 	private ObjectId productStepId;
-	private long serviceId;
+	private int serviceId;
 	private int type;
 	private BasicDBObject parameters;
 	private StepStatusCode status;
 	private BasicDBObject statusData;
 	private ScheduleData scheduleData;
 
-	public ServiceStepMessage(long serviceId, int type, BasicDBObject parameters,
+	public ServiceStepMessage(int serviceId, int type, BasicDBObject parameters,
 			StepStatusCode status, BasicDBObject statusData,
 			ScheduleData scheduleData) {
 		this(null, serviceId, type, parameters, status, statusData, scheduleData);
 	}
 
-	public ServiceStepMessage(ObjectId productStepId, long serviceId, int type,
+	public ServiceStepMessage(ObjectId productStepId, int serviceId, int type,
 			BasicDBObject parameters, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
 		this.productStepId = productStepId;
@@ -93,7 +93,7 @@ public class ServiceStepMessage implements IMongoSaveable {
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		productStepId = object.getObjectId("productStepId");
-		serviceId = object.getLong("serviceId");
+		serviceId = object.getInt("serviceId");
 		type = object.getInt("type");
 		parameters = (BasicDBObject) object.get("parameters");
 		status = StepStatusCode.valueOf(object.getString("status"));
@@ -142,14 +142,14 @@ public class ServiceStepMessage implements IMongoSaveable {
 	/**
 	 * @return the serviceId
 	 */
-	public long getServiceId() {
+	public int getServiceId() {
 		return serviceId;
 	}
 
 	/**
 	 * @param serviceId the serviceId to set
 	 */
-	public void setServiceId(long serviceId) {
+	public void setServiceId(int serviceId) {
 		this.serviceId = serviceId;
 	}
 

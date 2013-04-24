@@ -59,7 +59,7 @@ public interface Service {
 	 * @return An array of module id's of the modules needed to perform the
 	 *         service.
 	 */
-	public long[] getModuleIds(long productStepType, BasicDBObject parameters);
+	public int[] getModuleIds(int productStepType, BasicDBObject parameters);
 
 	/**
 	 * This method translates the productStep into a single or multiple
@@ -72,14 +72,14 @@ public interface Service {
 	 * @return An array of ServiceStepMessage each representing a serviceStep as
 	 *         a result of the translation.
 	 */
-	public ServiceStepMessage[] getServiceSteps(long productStepType,
+	public ServiceStepMessage[] getServiceSteps(int productStepType,
 			BasicDBObject parameters);
 	
 //	/**
 //	 * @param partParameters
 //	 * @return
 //	 */
-//	public ParameterList getParameters(HashMap<Long, Position> partParameters);
+//	public ParameterList getParameters(HashMap<Integer, Position> partParameters);
 
 	/**
 	 * Returns the Id of this service. Id's are used to identify services and
@@ -87,7 +87,7 @@ public interface Service {
 	 * 
 	 * @return the id of this service
 	 */
-	public long getId();
+	public int getId();
 
 	/**
 	 * Implementations should return a clear name for this service analog to its

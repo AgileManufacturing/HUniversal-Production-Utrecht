@@ -10,9 +10,9 @@ import com.mongodb.BasicDBObjectBuilder;
  *
  */
 public class ScheduleData implements IMongoSaveable {
-	private long startTime;
-	private long duration;
-	private long deadline;
+	private int startTime;
+	private int duration;
+	private int deadline;
 	
 	/**
 	 * Creates a new <code>ScheduleData</code> leaving <code>startTime</code>, <code>duration</code> and <code>deadline</code> uninitialized.
@@ -35,7 +35,7 @@ public class ScheduleData implements IMongoSaveable {
 	 * @param duration How long it will take to complete the <code>ProductionStep</code>.
 	 * @param deadline The <code>ProductionStep</code> with this <code>ScheduleData</code> should be finished after this timeslot.
 	 */
-	public ScheduleData(long startTime, long duration, long deadline) {
+	public ScheduleData(int startTime, int duration, int deadline) {
 		this.startTime = startTime;
 		this.duration = duration;
 		this.deadline = deadline;
@@ -57,50 +57,50 @@ public class ScheduleData implements IMongoSaveable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		this.startTime = object.getLong("startTime", -1);
-		this.duration = object.getLong("duration", -1);
-		this.deadline = object.getLong("deadline", -1);
+		this.startTime = object.getInt("startTime", -1);
+		this.duration = object.getInt("duration", -1);
+		this.deadline = object.getInt("deadline", -1);
 	}
 
 	/**
 	 * @return the start time
 	 */
-	public long getStartTime() {
+	public int getStartTime() {
 		return startTime;
 	}
 
 	/**
 	 * @param startTime the start time to set
 	 */
-	public void setStartTime(long startTime) {
+	public void setStartTime(int startTime) {
 		this.startTime = startTime;
 	}
 
 	/**
 	 * @return the duration
 	 */
-	public long getDuration() {
+	public int getDuration() {
 		return duration;
 	}
 
 	/**
 	 * @param duration the duration to set
 	 */
-	public void setDuration(long duration) {
+	public void setDuration(int duration) {
 		this.duration = duration;
 	}
 
 	/**
 	 * @return the deadline
 	 */
-	public long getDeadline() {
+	public int getDeadline() {
 		return deadline;
 	}
 
 	/**
 	 * @param deadline the deadline to set
 	 */
-	public void setDeadline(long deadline) {
+	public void setDeadline(int deadline) {
 		this.deadline = deadline;
 	}
 

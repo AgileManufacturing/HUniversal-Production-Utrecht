@@ -63,20 +63,20 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 
 	private BlackboardClient serviceStepBBClient, equipletStepBBClient;
 	private DbData dbData;
-	private HashMap<Long,Module> leadingModules;
+	private HashMap<Integer, Module> leadingModules;
 		
-	public void registerLeadingModule(long serviceId, Module module) {
+	public void registerLeadingModule(int serviceId, Module module) {
 		leadingModules.put(serviceId, module);
 	}
 	
-	public Module getLeadingModule(long serviceId) {
+	public Module getLeadingModule(int serviceId) {
 		return leadingModules.get(serviceId);
 	}
 		
 	@Override
 	public void setup() {
 		System.out.println("Hardware agent " + this + " reporting.");
-		leadingModules = new HashMap<Long,Module>();
+		leadingModules = new HashMap<Integer, Module>();
 
 		// TODO fill in host, database and collection
 		Object[] args = getArguments();
@@ -118,9 +118,9 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 		
 		// for now: use precompiled grippermodule class
 		GripperModule gp = new GripperModule();
-		registerLeadingModule(1l, gp);
+		registerLeadingModule(1, gp);
 		DeltaRobotModule drm = new DeltaRobotModule();
-		registerLeadingModule(2l, drm);
+		registerLeadingModule(2, drm);
 		///		
 		
 	}

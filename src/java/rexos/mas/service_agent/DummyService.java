@@ -46,7 +46,7 @@ import com.mongodb.BasicDBObject;
  * 
  */
 public class DummyService implements Service {
-	private static final long id = 1l;
+	private static final int id = 1;
 	private static final String name = "DummyService";
 
 	/**
@@ -58,24 +58,24 @@ public class DummyService implements Service {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see rexos.mas.service_agent.Service#getModuleIds(long,
+	 * @see rexos.mas.service_agent.Service#getModuleIds(int,
 	 * com.mongodb.BasicDBObject)
 	 */
 	@Override
-	public long[] getModuleIds(long productStepType, BasicDBObject parameters) {
-		return new long[] { 1l, 2l };
+	public int[] getModuleIds(int productStepType, BasicDBObject parameters) {
+		return new int[] { 1, 2 };
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see rexos.mas.service_agent.Service#getServiceSteps(long,
+	 * @see rexos.mas.service_agent.Service#getServiceSteps(int,
 	 * com.mongodb.BasicDBObject)
 	 */
 	@Override
-	public ServiceStepMessage[] getServiceSteps(long productStepType,
+	public ServiceStepMessage[] getServiceSteps(int productStepType,
 			BasicDBObject parameters) {
-		ServiceStepMessage service = new ServiceStepMessage(1l, 1, parameters,
+		ServiceStepMessage service = new ServiceStepMessage(1, 1, parameters,
 				StepStatusCode.EVALUATING, new BasicDBObject("status",
 						"dummy status"), new ScheduleData());
 		return new ServiceStepMessage[] { service };
@@ -85,7 +85,7 @@ public class DummyService implements Service {
 //	 * @see rexos.mas.service_agent.Service#getParameters(java.util.HashMap)
 //	 */
 //	@Override
-//	public ParameterList getParameters(HashMap<Long, Position> partParameters) {
+//	public ParameterList getParameters(HashMap<Integer, Position> partParameters) {
 //		return null;
 //	}
 
@@ -95,7 +95,7 @@ public class DummyService implements Service {
 	 * @see rexos.mas.service_agent.Service#getId()
 	 */
 	@Override
-	public long getId() {
+	public int getId() {
 		return id;
 	}
 

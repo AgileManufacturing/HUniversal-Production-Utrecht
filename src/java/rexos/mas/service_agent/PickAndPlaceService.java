@@ -29,54 +29,64 @@
  **/
 package rexos.mas.service_agent;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import com.mongodb.BasicDBObject;
 import rexos.libraries.knowledgedb_client.*;
+import rexos.mas.data.Position;
 import rexos.mas.equiplet_agent.StepStatusCode;
-
 
 public class PickAndPlaceService implements Service {
 
 	private KnowledgeDBClient client;
-	private long id = 0l;
-	
+	private int id = 0;
+	private int saveMovementPlane = 6;
+
 	/**
-	 * @see rexos.mas.service_agent.Service#getModuleIds(long, com.mongodb.BasicDBObject)
+	 * @see rexos.mas.service_agent.Service#getModuleIds(int, com.mongodb.BasicDBObject)
 	 */
 	@Override
-	public long[] getModuleIds(long productStepType, BasicDBObject parameters) {
-		ArrayList<Long> moduleIds = new ArrayList<Long>();
-		
-		client = KnowledgeDBClient.getClient();
+	public int[] getModuleIds(int productStepType, BasicDBObject parameters) {
+		int[] moduleIds = new int[0];
+		//ArrayList<Integer> moduleIds = new ArrayList<Integer>();
+
 		try {
-			Object[] queryParameters = {"HUniplacer.pickandplace"};
-			ResultSet resultSet = client.executeSelectQuery(Queries.MODULES_REQUIRED_PER_SERVICE, queryParameters);
-			while(resultSet.next()){
-				Row row = new Row(resultSet);
-				moduleIds.add((long)row.get("id"));
+			client = KnowledgeDBClient.getClient();
+
+			Object[] queryParameters = { "HUniplacer.pickandplace" };
+			Row[] rows = client.executeSelectQuery(Queries.MODULES_REQUIRED_PER_SERVICE, queryParameters);
+			moduleIds = new int[rows.length];
+			for(int i = 0; i < rows.length; i++){
+				moduleIds[i] = (int) rows[i].get("id");
 			}
-			resultSet.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (KnowledgeException | KeyNotFoundException e1) {
+			e1.printStackTrace();
 		}
-		long[] moduleIdsArray = new long[moduleIds.size()];
-		for(int i = 0; i < moduleIds.size(); i++){
-			moduleIdsArray[i] = moduleIds.get(i);
-		}
-		return moduleIdsArray;
+		return new int[] { 1, 2 };// TODO get this working
+		//return moduleIds;
 	}
 
 	/**
-	 * @see rexos.mas.service_agent.Service#getServiceSteps(long, com.mongodb.BasicDBObject)
+	 * @see rexos.mas.service_agent.Service#getServiceSteps(int, com.mongodb.BasicDBObject)
 	 */
 	@Override
-	public ServiceStepMessage[] getServiceSteps(long productStepType, BasicDBObject parameters) {
+	public ServiceStepMessage[] getServiceSteps(int productStepType, BasicDBObject parameters) {
+		int inputPart = parameters.getInt("InputPart");
+		double inputPartSize = 0.5;// TODO: FROM KNOWLEDGE DB
 		ServiceStepMessage[] serviceStepMessages = new ServiceStepMessage[2];
-		serviceStepMessages[0] = new ServiceStepMessage(id, 4l, parameters, StepStatusCode.EVALUATING , null, null);//pick
-		serviceStepMessages[1] = new ServiceStepMessage(id, 5l, parameters, StepStatusCode.EVALUATING, null, null);//place
+
+		BasicDBObject pickParameters = new BasicDBObject();
+		pickParameters.put("InputPart", inputPart);
+		pickParameters.put("Position", new Position());
+		pickParameters.put("SaveMovementPlane", new BasicDBObject("Height", saveMovementPlane).put("RelativeTo", null));
+
+		Position position = new Position((BasicDBObject) parameters.get("Position"));
+		position.setZ(position.getZ() + inputPartSize);
+		BasicDBObject placeParameters = new BasicDBObject();
+		placeParameters.put("InputPart", inputPart);
+		placeParameters.put("Position", position);
+		placeParameters.put("SaveMovementPlane", new BasicDBObject("Height", saveMovementPlane).put("RelativeTo", inputPart));
+
+		serviceStepMessages[0] = new ServiceStepMessage(id, 4, pickParameters, StepStatusCode.EVALUATING, null, null);// pick //TODO: NOT HARDCODED ID.
+		serviceStepMessages[1] = new ServiceStepMessage(id, 5, placeParameters, StepStatusCode.EVALUATING, null, null);// place //TODOD NOT HARDCODE ID.
 		return serviceStepMessages;
 	}
 
@@ -84,9 +94,8 @@ public class PickAndPlaceService implements Service {
 	 * @see rexos.mas.service_agent.Service#getId()
 	 */
 	@Override
-	public long getId() {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getId() {
+		return id;
 	}
 
 	/**

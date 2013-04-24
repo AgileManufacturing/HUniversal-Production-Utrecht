@@ -47,10 +47,10 @@ public class ProductStepMessage implements IMongoSaveable {
 	private AID productAgentId;
 	
 	/**
-	 * @var long type
+	 * @var int type
 	 * The type of the product step
 	 */
-	private long type;
+	private int type;
 	
 	/**
 	 * @var ParameterList parameters
@@ -59,16 +59,16 @@ public class ProductStepMessage implements IMongoSaveable {
 	private BasicDBObject parameters;
 	
 	/**
-	 * @var Object inputPartTypes
+	 * @var int[] inputPartTypes
 	 * The input part types needed for this product step.
 	 */
-	private Long[] inputPartTypes;
+	private Integer[] inputPartTypes;
 	
 	/**
-	 * @var long outputPartType
+	 * @var int outputPartType
 	 * The result part type for this product step.
 	 */
-	private long outputPartType;
+	private int outputPartType;
 	
 	/**
 	 * @var StepStatusCode status
@@ -100,8 +100,8 @@ public class ProductStepMessage implements IMongoSaveable {
 	 * @param statusData - The additional data for the status
 	 * @param scheduleData - The schedule data
 	 */
-	public ProductStepMessage(AID productAgentId, long type,
-			BasicDBObject parameters, Long[] inputPartTypes, long outputPartType,
+	public ProductStepMessage(AID productAgentId, int type,
+			BasicDBObject parameters, Integer[] inputPartTypes, int outputPartType,
 			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
 		this.productAgentId = productAgentId;
 		this.type = type;
@@ -138,14 +138,14 @@ public class ProductStepMessage implements IMongoSaveable {
 	/**
 	 * @return the type
 	 */
-	public long getType() {
+	public int getType() {
 		return type;
 	}
 
 	/**
 	 * @param type the type to set
 	 */
-	public void setType(long type) {
+	public void setType(int type) {
 		this.type = type;
 	}
 
@@ -166,28 +166,28 @@ public class ProductStepMessage implements IMongoSaveable {
 	/**
 	 * @return the inputPartTypes
 	 */
-	public Long[] getInputPartTypes() {
+	public Integer[] getInputPartTypes() {
 		return inputPartTypes;
 	}
 
 	/**
 	 * @param inputPartTypes the inputPartTypes to set
 	 */
-	public void setInputPartTypes(Long[] inputPartTypes) {
+	public void setInputPartTypes(Integer[] inputPartTypes) {
 		this.inputPartTypes = inputPartTypes;
 	}
 
 	/**
 	 * @return the outputPartType
 	 */
-	public long getOutputPartType() {
+	public int getOutputPartType() {
 		return outputPartType;
 	}
 
 	/**
 	 * @param outputPartType the outputPartType to set
 	 */
-	public void setOutputPartType(long outputPartType) {
+	public void setOutputPartType(int outputPartType) {
 		this.outputPartType = outputPartType;
 	}
 
@@ -257,10 +257,10 @@ public class ProductStepMessage implements IMongoSaveable {
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		productAgentId = new AID((String)(object.get("productAgentId")), AID.ISGUID);
-		type = object.getLong("type");
+		type = object.getInt("type");
 		parameters = (BasicDBObject)object.get("parameters");
-		inputPartTypes = ((BasicDBList)object.get("inputPartTypes")).toArray(new Long[0]);
-		outputPartType = object.getLong("outputPartType", -1l);
+		inputPartTypes = ((BasicDBList)object.get("inputPartTypes")).toArray(new Integer[0]);
+		outputPartType = object.getInt("outputPartType", -1);
 		status = StepStatusCode.valueOf(object.getString("status"));
 		
 		if(object.containsField("statusData")){

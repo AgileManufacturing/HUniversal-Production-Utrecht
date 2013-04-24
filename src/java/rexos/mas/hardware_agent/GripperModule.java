@@ -39,7 +39,7 @@ public class GripperModule implements Module{
 	
 	@Override
 	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters) {
-		TimeData td = new TimeData(2l); //TODO: timedata hardcoded
+		TimeData td = new TimeData(2); //TODO: timedata hardcoded
 		
 		EquipletStepMessage[] equipletSteps = new EquipletStepMessage[5];
 		

@@ -38,7 +38,7 @@ public class DeltaRobotModule implements Module {
 	@Override
 	public EquipletStepMessage[] getEquipletSteps(int stepType,BasicDBObject parameters) {
 		
-		EquipletStepMessage[] dummyData = { new EquipletStepMessage(null, new InstructionData(), 1l, new TimeData(5l)) };		
+		EquipletStepMessage[] dummyData = { new EquipletStepMessage(null, new InstructionData(), 1, new TimeData(5)) };		
 		
 		return dummyData;
 	}
@@ -47,7 +47,7 @@ public class DeltaRobotModule implements Module {
 		
 		// maak een equipletStep aan de hand van de parameters
 		
-		EquipletStepMessage equipletStep = new EquipletStepMessage(null, new InstructionData(), 4l,new TimeData(7l));		
+		EquipletStepMessage equipletStep = new EquipletStepMessage(null, new InstructionData(), 4,new TimeData(7));		
 		
 		
 		return equipletStep;

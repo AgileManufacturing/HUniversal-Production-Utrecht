@@ -64,10 +64,10 @@ public class CheckForModules extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		long[] moduleIds = null;
+		int[] moduleIds = null;
 		try {
 			try {
-				moduleIds = (long[]) message.getContentObject();
+				moduleIds = (int[]) message.getContentObject();
 
 				ACLMessage reply;
 				reply = message.createReply();
@@ -88,7 +88,7 @@ public class CheckForModules extends ReceiveBehaviour {
 				// }
 				// System.out.println();
 
-				for (long moduleId : moduleIds) {
+				for (int moduleId : moduleIds) {
 					if (hardwareAgent.getLeadingModule(moduleId) == null) {
 						modulesPresent = false;
 					}

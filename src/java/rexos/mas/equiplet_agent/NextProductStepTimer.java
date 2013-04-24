@@ -17,29 +17,29 @@ public class NextProductStepTimer extends Timer{
 	EquipletAgent equipletAgent;
 	
 	/**
-	 * @var long nextUsedTimeSlot
+	 * @var int nextUsedTimeSlot
 	 * The next used time slot.
 	 */
-	private long nextUsedTimeSlot;
+	private int nextUsedTimeSlot;
 
 	/**
-	 * @var long firstTimeSlot
+	 * @var int firstTimeSlot
 	 * The first time slot of the grid.
 	 */
-	private long firstTimeSlot;
+	private int firstTimeSlot;
 	
 	/**
-	 * @var long timeSlotLength
-	 * The length of a time slot.
+	 * @var int timeSlotLength
+	 * The length of a time slot in milliseconds.
 	 */
-	private long timeSlotLength;
+	private int timeSlotLength;
 	
 	/**
 	 * Constructor for the next product step timer.
 	 * @param firstTimeSlot the first time slot from the grid/equiplet.
 	 * @param timeSlotLength the length of a time slot.
 	 */
-	public NextProductStepTimer(long firstTimeSlot, long timeSlotLength){
+	public NextProductStepTimer(int firstTimeSlot, int timeSlotLength){
 		super();
 		this.firstTimeSlot = firstTimeSlot;
 		this.timeSlotLength = timeSlotLength;
@@ -49,12 +49,12 @@ public class NextProductStepTimer extends Timer{
 	 * Function for setting the next used time slot.
 	 * @param nextUsedTimeSlot the index of the next used timeslot, fill -1 when not used.
 	 */
-	public void setNextUsedTimeSlot(long nextUsedTimeSlot){
+	public void setNextUsedTimeSlot(int nextUsedTimeSlot){
 		this.nextUsedTimeSlot = nextUsedTimeSlot;
 		cancel();
 		if(nextUsedTimeSlot != -1){
-			long startTimeSlot = nextUsedTimeSlot * timeSlotLength + firstTimeSlot;
-			long currentTime = System.currentTimeMillis();
+			int startTimeSlot = nextUsedTimeSlot * timeSlotLength + firstTimeSlot;
+			int currentTime = (int)System.currentTimeMillis();
 			this.schedule(new NextProductStepTask(), startTimeSlot - currentTime);
 		}
 	}
@@ -63,7 +63,7 @@ public class NextProductStepTimer extends Timer{
 	 * Getter for getting the nextUsedTimeSlot.
 	 * @return the next used timeslot
 	 */
-	public long getNextUsedTimeSlot() {
+	public int getNextUsedTimeSlot() {
 		return nextUsedTimeSlot;
 	}
 	
