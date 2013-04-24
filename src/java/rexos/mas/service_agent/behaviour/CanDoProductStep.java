@@ -60,7 +60,9 @@ public class CanDoProductStep extends ReceiveBehaviour {
 					agent.getLocalName(), stepType);
 
 			if (factory == null)
-				factory = new ServiceFactory(message.getSender().toString());
+				factory = new ServiceFactory(message.getSender().getLocalName());
+			System.out.println(message.getSender().getLocalName());
+			System.out.println(stepType);
 			Service service = factory.getServicesForStep(stepType)[0];
 
 			ACLMessage newMsg = message.createReply();

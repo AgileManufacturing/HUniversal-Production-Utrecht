@@ -72,36 +72,30 @@ public class JadeAgentX extends Agent {
 			 * Make a array list of capabilities
 			 */
 			ArrayList<Integer> capabilities1 = new ArrayList<>();
-			capabilities1.add(0);
 			capabilities1.add(1);
-			capabilities1.add(1);
-			capabilities1.add(24);
-			capabilities1.add(23412);
-			capabilities1.add(15);
+			capabilities1.add(2);
+			capabilities1.add(3);
 
 			/**
 			 * make a new equipletagent to use.
 			 */
 			Object[] ar = new Object[] { capabilities1, logisticsAID };
-			getContainerController().createNewAgent("eqa1",
+			getContainerController().createNewAgent("EQ1",
 					"rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 			// TODO code application logic here
 
 			ArrayList<Integer> capabilities2 = new ArrayList<>();
+			capabilities2.add(1);
 			capabilities2.add(2);
-			capabilities2.add(5);
-			capabilities2.add(9);
 			ar = new Object[] { capabilities2, logisticsAID };
-			getContainerController().createNewAgent("eqa2",
+			getContainerController().createNewAgent("EQ2",
 					"rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 
 			ArrayList<Integer> capabilities3 = new ArrayList<>();
-			capabilities3.add(3);
-			capabilities3.add(4);
-			capabilities3.add(7);
-			capabilities3.add(9);
+			capabilities3.add(1);
+			capabilities3.add(2);
 			ar = new Object[] { capabilities3, logisticsAID };
-			getContainerController().createNewAgent("eqa3",
+			getContainerController().createNewAgent("EQ3",
 					"rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 
 			ar = null;
@@ -124,7 +118,7 @@ public class JadeAgentX extends Agent {
 			parameterList.AddParameterGroup(p);
 
 			// Next we want to have some production steps
-			ProductionStep stp1 = new ProductionStep(1, 0, parameterList);
+			ProductionStep stp1 = new ProductionStep(1, 1, parameterList);
 
 			p = new ParameterGroup("Color"); // group colour
 			p.add(new Parameter("Id", "3"));

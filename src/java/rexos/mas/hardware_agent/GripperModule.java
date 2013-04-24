@@ -48,6 +48,10 @@ public class GripperModule implements Module{
 		case 1: // pick
 			
 			equipletSteps[0] = null;
+			equipletSteps[1] = null;
+			equipletSteps[2] = null;
+			equipletSteps[3] = null;
+			equipletSteps[4] = null;
 			
 			
 			

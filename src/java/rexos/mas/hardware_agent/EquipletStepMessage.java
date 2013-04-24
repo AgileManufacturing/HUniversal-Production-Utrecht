@@ -31,21 +31,16 @@
  **/
 package rexos.mas.hardware_agent;
 
-import jade.core.AID;
 
 import org.bson.types.ObjectId;
-
-import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-
 import rexos.mas.data.IMongoSaveable;
-import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.StepStatusCode;
 
 public class EquipletStepMessage implements IMongoSaveable {
 	private ObjectId serviceStepID;
 	private InstructionData instructionData;
-	private int type;
+	private StepStatusCode status;
 	private TimeData timeData;
 	
 	/**
@@ -56,12 +51,12 @@ public class EquipletStepMessage implements IMongoSaveable {
 	 * @return
 	 */
 	public EquipletStepMessage(ObjectId serviceStepID,
-			InstructionData instructionData, int type, TimeData timeData){
+			InstructionData instructionData, StepStatusCode status, TimeData timeData){
 		
 		this.serviceStepID = serviceStepID;
 		this.instructionData = instructionData;
+		this.status = status;
 		this.timeData = timeData;
-		this.type = type;
 	}
 
 	/**
@@ -93,17 +88,17 @@ public class EquipletStepMessage implements IMongoSaveable {
 	}
 
 	/**
-	 * @return the type
+	 * @return the status
 	 */
-	public int getType() {
-		return type;
+	public StepStatusCode getStatus() {
+		return status;
 	}
 
 	/**
-	 * @param type the type to set
+	 * @param status the status to set
 	 */
-	public void setType(int type) {
-		this.type = type;
+	public void setStatus(StepStatusCode status) {
+		this.status = status;
 	}
 
 	/**
@@ -126,8 +121,8 @@ public class EquipletStepMessage implements IMongoSaveable {
 	@Override
 	public String toString() {
 		return String
-				.format("EquipletStepMessage [serviceStepID=%s, instructionData=%s, type=%s, timeData=%s]",
-						serviceStepID, instructionData, type, timeData);
+				.format("EquipletStepMessage [serviceStepID=%s, instructionData=%s, status=%s, timeData=%s]",
+						serviceStepID, instructionData, status, timeData);
 	}
 
 	@Override
@@ -135,7 +130,7 @@ public class EquipletStepMessage implements IMongoSaveable {
 		BasicDBObject object = new BasicDBObject();
 		object.put("serviceStepID", serviceStepID);
 		object.put("instructionData", instructionData);
-		object.put("type", type);
+		object.put("status", status);
 		object.put("timeData", timeData);
 		return object;
 	}
@@ -144,7 +139,7 @@ public class EquipletStepMessage implements IMongoSaveable {
 	public void fromBasicDBObject(BasicDBObject object) {
 		serviceStepID = object.getObjectId("serviceStepID");
 		instructionData = new InstructionData((BasicDBObject) object.get("instructionData"));
-		type = object.getInt("type");
+		status = StepStatusCode.valueOf(object.getString("status"));
 		timeData = new TimeData(object.getInt("timeData"));	
 	}
 }
