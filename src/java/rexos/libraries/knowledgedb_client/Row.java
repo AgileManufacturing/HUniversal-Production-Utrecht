@@ -47,17 +47,14 @@ public class Row {
      * A constructor for constructing a row from a ResultSet.
      *
      * @param resultSet The ResultSet from a statement execution.
+     * @throws SQLException Failed to read from the ResultSet.
      **/
-    public Row(ResultSet resultSet) {
+    public Row(ResultSet resultSet) throws SQLException {
         row = new HashMap<String, Object>();
 
-        try {
-            ResultSetMetaData metadata = resultSet.getMetaData();
-            for (int i = 1; i <= metadata.getColumnCount(); i++) {
-                row.put(metadata.getColumnLabel(i), resultSet.getObject(i));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        ResultSetMetaData metadata = resultSet.getMetaData();
+        for (int i = 1; i <= metadata.getColumnCount(); i++) {
+            row.put(metadata.getColumnLabel(i), resultSet.getObject(i));
         }
     }
 
@@ -68,11 +65,12 @@ public class Row {
      *
      * @return The value of the column.
      **/
-    public Object get(String column) {
-        if (row.containsKey(column))
-            return row.get(column);
+    public Object get(String column) throws KeyNotFoundException {
+        if (!row.containsKey(column)) {
+            throw new KeyNotFoundException("No column with name " + column + " was found in this row.");
+        }
 
-        return null;
+        return row.get(column);
     }
 
 
@@ -83,7 +81,8 @@ public class Row {
      **/
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("rexos.libraries.knowledgedb_client.Row { ");
+        StringBuilder builder = new StringBuilder(Row.class.getName());
+        builder.append("{ ");
         for (Map.Entry<String, Object> entry : row.entrySet()) {
             builder.append(entry.getKey());
             builder.append('=');
