@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /**
@@ -109,7 +110,7 @@ class DynamicClassData {
 		try {
 			updateClassData();
 		} catch (IOException ex) {
-			if (getLastModified() != 0) {
+			if (loader == null) {
 				throw new InstantiateClassException("Failed to retrieve software.", ex);
 			}
 		}
@@ -169,7 +170,11 @@ class DynamicClassData {
 	private byte[] extractClassDataFromJar(JarFile jar, String className) throws IOException {
 		// Convert classname to  in jar.
 		String pathInJar = className.replace('.', '/').concat(".class");
-		InputStream inStream = jar.getInputStream(jar.getJarEntry(pathInJar));
+		JarEntry entry = jar.getJarEntry(pathInJar);
+		if (entry == null) {
+			throw new IOException("Path " + pathInJar + " not found in jarfile.");
+		}
+		InputStream inStream = jar.getInputStream(entry);
 		
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		int b;
@@ -207,15 +212,23 @@ class DynamicClassData {
 			File file = new File(jarFileName);
 			file.deleteOnExit();
 			FileOutputStream fos = new FileOutputStream(file);
-			fos.write(buffer.toByteArray());
-			fos.close();
+			try {
+				fos.write(buffer.toByteArray());
+			}
+			finally {
+				fos.close();
+			}
 			jarFile = new JarFile(file);
 		}
 		
 		if (jarFile != null) {
-			setClassData(extractClassDataFromJar(jarFile, description.getClassName()));
-			setLastModified(con.getLastModified());
-			jarFile.close();
+			try {
+				setClassData(extractClassDataFromJar(jarFile, description.getClassName()));
+				setLastModified(con.getLastModified());
+			}
+			finally {
+				jarFile.close();
+			}
 		}
 	}
 }
