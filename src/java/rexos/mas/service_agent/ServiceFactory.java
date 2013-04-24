@@ -78,7 +78,7 @@ public class ServiceFactory {
 		try {
 			KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
 			Row[] rows = knowledgeClient.executeSelectQuery(
-					Queries.POSSIBLE_SERVICES_PER_EQUIPLET,
+					Queries.SERVICES_FOR_STEP_FOR_EQUIPLET,
 					equipletAID, stepType);
 			
 			for (int i = 0 ; i < rows.length ; ++i) {
