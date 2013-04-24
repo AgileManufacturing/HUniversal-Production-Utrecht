@@ -29,14 +29,14 @@
  **/
 package rexos.mas.hardware_agent;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Hashtable;
 
 import rexos.libraries.dynamicloader.DynamicClassDescription;
 import rexos.libraries.dynamicloader.DynamicClassFactory;
 import rexos.libraries.dynamicloader.InstantiateClassException;
+import rexos.libraries.knowledgedb_client.KeyNotFoundException;
 import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
+import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
 
@@ -70,22 +70,22 @@ public class ModuleFactory {
 	 * @param moduleId The id of the module that should be updated.
 	 **/
 	private void updateModuleInCache(long moduleId) {
-		KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
 		try {
-			ResultSet result = knowledgeClient.executeSelectQuery(
+		KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
+		
+			Row[] rows = knowledgeClient.executeSelectQuery(
 					Queries.SOFTWARE_FOR_MODULE,
 					new Object[]{moduleId});
 			
-			if (result.next()) {
-				Row row = new Row(result);
-				DynamicClassDescription description = DynamicClassDescription.createFromRow(row);
+			if (rows.length > 0) {
+				DynamicClassDescription description = DynamicClassDescription.createFromRow(rows[0]);
 				moduleCache.put(
 						moduleId,
 						factory.createNewObjectIfOutdated(
 								description,
 								moduleCache.get(moduleId)));
 			}
-		} catch (SQLException | InstantiateClassException e) {
+		} catch (InstantiateClassException | KnowledgeException | KeyNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
