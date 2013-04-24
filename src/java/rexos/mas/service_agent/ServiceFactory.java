@@ -29,49 +29,68 @@
  **/
 package rexos.mas.service_agent;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+
+import rexos.libraries.dynamicloader.DynamicClassDescription;
+import rexos.libraries.dynamicloader.DynamicClassFactory;
+import rexos.libraries.dynamicloader.InstantiateClassException;
+import rexos.libraries.knowledgedb_client.KeyNotFoundException;
+import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
+import rexos.libraries.knowledgedb_client.KnowledgeException;
+import rexos.libraries.knowledgedb_client.Queries;
+import rexos.libraries.knowledgedb_client.Row;
 
 /**
  * 
  **/
 public class ServiceFactory {
-	private Hashtable<Integer, Service> serviceCache;
+	private DynamicClassFactory<Service>factory;
+	private Hashtable<Long, Service> serviceCache;
 	private String equipletAID;
 	
 	public ServiceFactory(String equipletAID) {
 		this.equipletAID = equipletAID;
+		serviceCache = new Hashtable<Long, Service>();
+		this.factory = new DynamicClassFactory<Service>(Service.class);
 	}
 	
-	private Service	getServiceByServiceID(int serviceID) {
-		if (serviceCache.containsKey(serviceID)) {
-			
+	private Service	getServiceByServiceID(long serviceID) {
+		Service service = null;
+		try {
+			KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
+			Row[] rows = knowledgeClient.executeSelectQuery("SELECT * FROM software WHERE id=5");
+			if (rows.length > 0) {
+				DynamicClassDescription description = DynamicClassDescription.createFromRow(rows[0]);
+				service = factory.createNewObjectIfOutdated(description, serviceCache.get(description.getId()));
+				serviceCache.put(description.getId(), service);
+			}
+		} catch (KnowledgeException | InstantiateClassException | KeyNotFoundException e) {
+			//TODO: Do something useful.
+			e.printStackTrace();
 		}
 		
-		return null;
+		return service;
 	}
 	
 	public Service[] getServicesForStep(long stepType) {
-//		KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
-//		ArrayList<Service> servicesForStep = new ArrayList<Service>();
-//		try {
-//			ResultSet rs = knowledgeClient.executeSelectQuery(
-//					Queries.POSSIBLE_SERVICES_PER_EQUIPLET,
-//					new Object[]{equipletAID, stepType});
-//			
-//			ArrayList<Integer> serviceIDs = new ArrayList<Integer>();
-//			while (rs.next()) {
-//				Row row = new Row(rs);
-//				serviceIDs.add((Integer)row.get("id"));
-//			}
-//			
-//			for (Integer serviceID : serviceIDs) {
-//				
-//			}
-//		} catch (SQLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		ArrayList<Service> servicesForStep = new ArrayList<Service>();
+		try {
+			KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
+			Row[] rows = knowledgeClient.executeSelectQuery(
+					Queries.POSSIBLE_SERVICES_PER_EQUIPLET,
+					equipletAID, stepType);
+			
+			for (int i = 0 ; i < rows.length ; ++i) {
+				servicesForStep.add(getServiceByServiceID((long)rows[i].get("id")));
+			}
+		} catch (KnowledgeException | KeyNotFoundException ex) {
+			// TODO Auto-generated catch block
+			ex.printStackTrace();
+		}
 		
-		return new Service[]{new DummyService()};
+		Service[] services = new Service[servicesForStep.size()];
+		servicesForStep.toArray(services);
+		return services;
 	}
 }
