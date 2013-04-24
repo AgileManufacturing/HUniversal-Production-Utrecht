@@ -22,14 +22,14 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package rexos.client.blackboardreader;
+package tools.blackboard_reader;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
-import rexos.client.blackboardreader.models.Blackboards;
-import rexos.client.blackboardreader.models.Entries;
-import rexos.client.blackboardreader.models.EntryNode;
+import tools.blackboard_reader.models.Blackboards;
+import tools.blackboard_reader.models.Entries;
+import tools.blackboard_reader.models.EntryNode;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;

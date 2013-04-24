@@ -23,7 +23,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package rexos.client.blackboardreader.models;
+package tools.blackboard_reader.models;
 
 import com.mongodb.BasicDBObject;
 

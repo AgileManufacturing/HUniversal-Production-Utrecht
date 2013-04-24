@@ -2,7 +2,11 @@
 	
 	<import file="../build.xml"/>
 
-	<target name="all">
+	<target name="all" depends="blackboard_reader">
+	</target>
+
+	<target name="blackboard_reader">
+		<ant antfile="build.xml" target="build" dir="blackboard_reader" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
 
 	<target name="clean">

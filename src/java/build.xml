@@ -93,19 +93,17 @@
 	</target>
 	
 	<!-- allpackages target, add the required targets to depends -->
-	<target name="allpackages" depends="rexos"/>
+	<target name="allpackages" depends="rexos, tools"/>
 
 	<!-- rexos target, calls rexos/build.xml -->	
 	<target name="rexos" depends="create-base-export-file">
     	<ant antfile="build.xml" target="all" dir="rexos" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
 
-	<!-- tools target, calls tools/build.xml 
-		uncomment when tools actually exists 
+	<!-- tools target, calls tools/build.xml --> 
 	<target name="tools" depends="rexos">
    		<ant antfile="build.xml" target="all" dir="tools" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target> 
-	-->
 
 	<!-- clean target, cleans rexos and tools -->
 	<target name="clean">
