@@ -11,7 +11,9 @@ import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.service_agent.Service;
+import rexos.mas.service_agent.ServiceAgent;
 import rexos.mas.service_agent.ServiceFactory;
 import rexos.mas.service_agent.ServiceStepMessage;
 
@@ -24,17 +26,14 @@ import com.mongodb.BasicDBObject;
 public class GetProductStepDuration extends ReceiveBehaviour {
 	static final long serialVersionUID = 1L;
 
-	private BlackboardClient productionStepBlackBoard, serviceStepBlackBoard;
+	private ServiceAgent agent;
 
 	/**
 	 * @param a
 	 */
-	public GetProductStepDuration(Agent a,
-			BlackboardClient productionStepBlackBoard,
-			BlackboardClient serviceStepBlackBoard) {
+	public GetProductStepDuration(Agent a) {
 		super(a, MessageTemplate.MatchOntology("GetProductionStepDuration"));
-		this.productionStepBlackBoard = productionStepBlackBoard;
-		this.serviceStepBlackBoard = serviceStepBlackBoard;
+		agent = (ServiceAgent) a;
 	}
 
 	/*
@@ -46,13 +45,14 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		try {
 			ObjectId productStepId = (ObjectId) message.getContentObject();
-			BasicDBObject productStep = (BasicDBObject) productionStepBlackBoard
-					.findDocumentById(productStepId);
-			long productStepType = productStep.getLong("type");
+			ProductStepMessage productStep = new ProductStepMessage(
+					(BasicDBObject) agent.getProductStepBBClient()
+							.findDocumentById(productStepId));
+			long productStepType = productStep.getType();
 
 			System.out.format(
 					"%s got message GetProductStepDuration for step type %s%n",
-					myAgent.getLocalName(), productStepType);
+					agent.getLocalName(), productStepType);
 
 			Service[] services = null;
 			Service service = null;
@@ -61,15 +61,14 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 			if ((services = factory.getServicesForStep(productStepType)).length > 0) {
 				service = services[0];
 			} else {
-				myAgent.doDelete();
-				//TODO find a good solution for when this happens
+				agent.doDelete();
+				// TODO find a good solution for when this happens
 				throw new RuntimeException(
 						"Service Agent - No available services for productStep "
 								+ productStep);
 			}
 
-			BasicDBObject parameters = (BasicDBObject) productStep
-					.get("parameters");
+			BasicDBObject parameters = productStep.getParameters();
 
 			ServiceStepMessage[] serviceSteps = service.getServiceSteps(
 					productStepType, parameters);
@@ -77,13 +76,12 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 				serviceStep.setProductStepId(productStepId);
 			}
 
-			myAgent.addBehaviour(new GetServiceDuration(myAgent,
-					productionStepBlackBoard, serviceStepBlackBoard,
-					serviceSteps, message.getConversationId()));
+			agent.addBehaviour(new GetServiceDuration(agent, serviceSteps,
+					message.getConversationId()));
 		} catch (UnreadableException | InvalidDBNamespaceException
 				| GeneralMongoException e) {
 			e.printStackTrace();
-			myAgent.doDelete();
+			agent.doDelete();
 		}
 	}
 }

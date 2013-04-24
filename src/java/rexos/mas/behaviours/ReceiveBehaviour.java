@@ -29,7 +29,7 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 
 	/**
 	 * Instantiates a new <code>ReceiveBehaviour</code> without a
-	 * <code>MessageTemplate</code> and no timeout.
+	 * <code>MessageTemplate</code> and no timeout (-1).
 	 * 
 	 * @param a
 	 *            The agent this behaviour belongs to.
@@ -40,7 +40,7 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 
 	/**
 	 * Instantiates a new <code>ReceiveBehaviour</code> with the specified
-	 * <code>MessageTemplate</code> and no timeout.
+	 * <code>MessageTemplate</code> and no timeout (-1).
 	 * 
 	 * @param a
 	 *            The agent this behaviour belongs to.
