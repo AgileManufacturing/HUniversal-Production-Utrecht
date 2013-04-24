@@ -49,7 +49,7 @@ public class ModuleFactory {
 	 * @var Hashtable<Long, Module> moduleCache
 	 * Hashtable containing instances of already instantiated modules.
 	 **/
-	private Hashtable<Long, Module> moduleCache;
+	private Hashtable<Integer, Module> moduleCache;
 	
 	/**
 	 * @var DynamicClassFactory<Module> factory
@@ -62,14 +62,14 @@ public class ModuleFactory {
 	 **/
 	public ModuleFactory() {
 		factory = new DynamicClassFactory<Module>(Module.class);
-		moduleCache = new Hashtable<Long, Module>();
+		moduleCache = new Hashtable<Integer, Module>();
 	}
 	
 	/**
 	 * Updates the moduleCache with the latest version retrieved from the knowledge database.
 	 * @param moduleId The id of the module that should be updated.
 	 **/
-	private void updateModuleInCache(long moduleId) {
+	private void updateModuleInCache(int moduleId) {
 		try {
 		KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
 		
@@ -97,7 +97,7 @@ public class ModuleFactory {
 	 * @return Module object representing the software required for the specified module or null if no software could be loaded.
 	 *
 	 **/
-	public Module getModuleById(long moduleId) {
+	public Module getModuleById(int moduleId) {
 		updateModuleInCache(moduleId);
 		return moduleCache.get(moduleId);
 	}
