@@ -75,7 +75,7 @@ public class DummyService implements Service {
 	@Override
 	public ServiceStepMessage[] getServiceSteps(long productStepType,
 			BasicDBObject parameters) {
-		ServiceStepMessage service = new ServiceStepMessage(1l, 1l, parameters,
+		ServiceStepMessage service = new ServiceStepMessage(1l, 1, parameters,
 				StepStatusCode.EVALUATING, new BasicDBObject("status",
 						"dummy status"), new ScheduleData());
 		return new ServiceStepMessage[] { service };

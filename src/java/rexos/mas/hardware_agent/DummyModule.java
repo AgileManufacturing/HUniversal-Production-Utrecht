@@ -1,15 +1,14 @@
 /**
- * @file Module.java
- * @brief Provides an inteface to make modules. 
- * @date Created: 2013-04-02
+ * @file DummyModule.java
+ * @brief 
+ * @date Created: 22 apr. 2013
  *
- * @author Thierry Gerritse
- * @author Wouter Veen
+ * @author Jan-Willem Willebrands
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright � 2013, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,12 +31,24 @@ package rexos.mas.hardware_agent;
 
 import com.mongodb.BasicDBObject;
 
-public interface Module {
+/**
+ * 
+ **/
+public class DummyModule implements Module {
+
 	
+	public String toString() {
+		return "DummyModule v2";
+	}
+
 	/**
-	 * 
-	 * @param parameters
-	 * @return
-	 */
-	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters);
+	 * @see rexos.mas.hardware_agent.Module#getEquipletSteps(int, com.mongodb.BasicDBObject)
+	 **/
+	@Override
+	public EquipletStepMessage[] getEquipletSteps(int stepType,
+			BasicDBObject parameters) {
+		// TODO Auto-generated method stub
+		return new EquipletStepMessage[0];
+	}
+
 }

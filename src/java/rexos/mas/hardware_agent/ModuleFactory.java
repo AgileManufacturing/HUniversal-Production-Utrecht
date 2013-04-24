@@ -1,7 +1,7 @@
 /**
- * @file ServiceFactory.java
- * @brief 
- * @date Created: 12 apr. 2013
+ * @file ModuleFactory.java
+ * @brief Creates and caches instances of the software required for modules.
+ * @date Created: 22 apr. 2013
  *
  * @author Jan-Willem Willebrands
  *
@@ -27,9 +27,8 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package rexos.mas.service_agent;
+package rexos.mas.hardware_agent;
 
-import java.util.ArrayList;
 import java.util.Hashtable;
 
 import rexos.libraries.dynamicloader.DynamicClassDescription;
@@ -42,55 +41,64 @@ import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
 
 /**
- * 
+ * Creates and caches instances of the software required for modules.
+ * This class makes sure that when a module is requested, an object of the latest version (according to the knowledge database) is returned.
  **/
-public class ServiceFactory {
-	private DynamicClassFactory<Service>factory;
-	private Hashtable<Long, Service> serviceCache;
-	private String equipletAID;
+public class ModuleFactory {
+	/**
+	 * @var Hashtable<Long, Module> moduleCache
+	 * Hashtable containing instances of already instantiated modules.
+	 **/
+	private Hashtable<Long, Module> moduleCache;
 	
-	public ServiceFactory(String equipletAID) {
-		this.equipletAID = equipletAID;
-		serviceCache = new Hashtable<Long, Service>();
-		this.factory = new DynamicClassFactory<Service>(Service.class);
+	/**
+	 * @var DynamicClassFactory<Module> factory
+	 * The DynamicClassFactory object that is used to load dynamic class data.
+	 **/
+	private DynamicClassFactory<Module> factory;
+	
+	/**
+	 * Initializes an empty ModuleFactory object.
+	 **/
+	public ModuleFactory() {
+		factory = new DynamicClassFactory<Module>(Module.class);
+		moduleCache = new Hashtable<Long, Module>();
 	}
 	
-	private Service	getServiceByServiceID(long serviceID) {
-		Service service = null;
+	/**
+	 * Updates the moduleCache with the latest version retrieved from the knowledge database.
+	 * @param moduleId The id of the module that should be updated.
+	 **/
+	private void updateModuleInCache(long moduleId) {
 		try {
-			KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
-			Row[] rows = knowledgeClient.executeSelectQuery("SELECT * FROM software WHERE id=5");
+		KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
+		
+			Row[] rows = knowledgeClient.executeSelectQuery(
+					Queries.SOFTWARE_FOR_MODULE,
+					new Object[]{moduleId});
+			
 			if (rows.length > 0) {
 				DynamicClassDescription description = DynamicClassDescription.createFromRow(rows[0]);
-				service = factory.createNewObjectIfOutdated(description, serviceCache.get(description.getId()));
-				serviceCache.put(description.getId(), service);
+				moduleCache.put(
+						moduleId,
+						factory.createNewObjectIfOutdated(
+								description,
+								moduleCache.get(moduleId)));
 			}
-		} catch (KnowledgeException | InstantiateClassException | KeyNotFoundException e) {
-			//TODO: Do something useful.
+		} catch (InstantiateClassException | KnowledgeException | KeyNotFoundException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		return service;
 	}
 	
-	public Service[] getServicesForStep(long stepType) {
-		ArrayList<Service> servicesForStep = new ArrayList<Service>();
-		try {
-			KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
-			Row[] rows = knowledgeClient.executeSelectQuery(
-					Queries.POSSIBLE_SERVICES_PER_EQUIPLET,
-					equipletAID, stepType);
-			
-			for (int i = 0 ; i < rows.length ; ++i) {
-				servicesForStep.add(getServiceByServiceID((long)rows[i].get("id")));
-			}
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			// TODO Auto-generated catch block
-			ex.printStackTrace();
-		}
-		
-		Service[] services = new Service[servicesForStep.size()];
-		servicesForStep.toArray(services);
-		return services;
+	/**
+	 * Returns an object representing the software required for the specified module.
+	 * @param moduleId The module for which software should be loaded.
+	 * @return Module object representing the software required for the specified module or null if no software could be loaded.
+	 *
+	 **/
+	public Module getModuleById(long moduleId) {
+		updateModuleInCache(moduleId);
+		return moduleCache.get(moduleId);
 	}
 }

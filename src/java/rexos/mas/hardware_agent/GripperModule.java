@@ -38,9 +38,31 @@ public class GripperModule implements Module{
 	}
 	
 	@Override
-	public EquipletStepMessage[] getEquipletSteps(BasicDBObject parameters) {
-		TimeData td = new TimeData(2l);
-		EquipletStepMessage[] dummyData = { new EquipletStepMessage(null, 1l, 2l, td) };
-		return dummyData;
+	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters) {
+		TimeData td = new TimeData(2l); //TODO: timedata hardcoded
+		
+		EquipletStepMessage[] equipletSteps = new EquipletStepMessage[5];
+		
+		switch(stepType){
+		
+		case 1: // pick
+			
+			equipletSteps[0] = null;
+			
+			
+			
+			
+			break;
+		
+		case 2: // place/drop
+			
+			
+			
+			break;
+		
+		}
+		
+		
+		return equipletSteps;
 	}
 }

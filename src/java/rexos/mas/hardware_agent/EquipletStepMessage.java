@@ -44,19 +44,19 @@ import rexos.mas.equiplet_agent.StepStatusCode;
 
 public class EquipletStepMessage implements IMongoSaveable {
 	private ObjectId serviceStepID;
-	private Long instructionData;
+	private InstructionData instructionData;
 	private Long type;
 	private TimeData timeData;
 	
 	/**
 	 * @param serviceStepID
-	 * @param ionstructionData
+	 * @param instructionData
 	 * @param type
 	 * @param timeData
 	 * @return
 	 */
 	public EquipletStepMessage(ObjectId serviceStepID,
-							  Long instructionData, Long type, TimeData timeData){
+			InstructionData instructionData, Long type, TimeData timeData){
 		
 		this.serviceStepID = serviceStepID;
 		this.instructionData = instructionData;
@@ -81,14 +81,14 @@ public class EquipletStepMessage implements IMongoSaveable {
 	/**
 	 * @return the instructionData
 	 */
-	public Long getInstructionData() {
+	public InstructionData getInstructionData() {
 		return instructionData;
 	}
 
 	/**
 	 * @param instructionData the instructionData to set
 	 */
-	public void setInstructionData(Long instructionData) {
+	public void setInstructionData(InstructionData instructionData) {
 		this.instructionData = instructionData;
 	}
 
@@ -143,7 +143,7 @@ public class EquipletStepMessage implements IMongoSaveable {
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		serviceStepID = object.getObjectId("serviceStepID");
-		instructionData = object.getLong("instructionData");
+		instructionData = new InstructionData((BasicDBObject) object.get("instructionData"));
 		type = object.getLong("type");
 		timeData = new TimeData(object.getLong("timeData"));	
 	}

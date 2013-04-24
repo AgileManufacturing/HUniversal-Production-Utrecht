@@ -149,12 +149,8 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 					Module leadingModule = getLeadingModule(serviceStep
 							.getServiceId());
 					EquipletStepMessage[] equipletSteps = leadingModule
-							.getEquipletSteps(serviceStep.getParameters());
-					
-							
-					//neem de equipletSteps die horen bij deze service step 
-					// en plan deze op de equipletstep bb
-										
+							.getEquipletSteps(serviceStep.getType(),serviceStep.getParameters());
+															
 					for(EquipletStepMessage eq : equipletSteps){
 					
 						equipletStepBBClient.insertDocument(eq.toBasicDBObject());					

@@ -44,19 +44,19 @@ import com.mongodb.BasicDBObjectBuilder;
 public class ServiceStepMessage implements IMongoSaveable {
 	private ObjectId productStepId;
 	private long serviceId;
-	private long type;
+	private int type;
 	private BasicDBObject parameters;
 	private StepStatusCode status;
 	private BasicDBObject statusData;
 	private ScheduleData scheduleData;
 
-	public ServiceStepMessage(long serviceId, long type, BasicDBObject parameters,
+	public ServiceStepMessage(long serviceId, int type, BasicDBObject parameters,
 			StepStatusCode status, BasicDBObject statusData,
 			ScheduleData scheduleData) {
 		this(null, serviceId, type, parameters, status, statusData, scheduleData);
 	}
 
-	public ServiceStepMessage(ObjectId productStepId, long serviceId, long type,
+	public ServiceStepMessage(ObjectId productStepId, long serviceId, int type,
 			BasicDBObject parameters, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
 		this.productStepId = productStepId;
@@ -94,7 +94,7 @@ public class ServiceStepMessage implements IMongoSaveable {
 	public void fromBasicDBObject(BasicDBObject object) {
 		productStepId = object.getObjectId("productStepId");
 		serviceId = object.getLong("serviceId");
-		type = object.getLong("type");
+		type = object.getInt("type");
 		parameters = (BasicDBObject) object.get("parameters");
 		status = StepStatusCode.valueOf(object.getString("status"));
 		if(object.containsField("statusData")){
@@ -127,7 +127,7 @@ public class ServiceStepMessage implements IMongoSaveable {
 	/**
 	 * @return the type
 	 */
-	public long getType() {
+	public int getType() {
 		return type;
 	}
 
@@ -135,7 +135,7 @@ public class ServiceStepMessage implements IMongoSaveable {
 	 * @param type
 	 *            the type to set
 	 */
-	public void setType(long type) {
+	public void setType(int type) {
 		this.type = type;
 	}
 
