@@ -39,5 +39,5 @@ public interface Module {
 	 * @param parameters
 	 * @return
 	 */
-	public EquipletStepMessage[] getEquipletSteps(BasicDBObject parameters);
+	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters);
 }
