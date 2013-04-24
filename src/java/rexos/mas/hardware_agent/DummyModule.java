@@ -36,17 +36,19 @@ import com.mongodb.BasicDBObject;
  **/
 public class DummyModule implements Module {
 
-	/**
-	 * @see rexos.mas.hardware_agent.Module#getEquipletSteps(com.mongodb.BasicDBObject)
-	 **/
-	@Override
-	public EquipletStepMessage[] getEquipletSteps(BasicDBObject parameters) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 	public String toString() {
 		return "DummyModule v2";
+	}
+
+	/**
+	 * @see rexos.mas.hardware_agent.Module#getEquipletSteps(int, com.mongodb.BasicDBObject)
+	 **/
+	@Override
+	public EquipletStepMessage[] getEquipletSteps(int stepType,
+			BasicDBObject parameters) {
+		// TODO Auto-generated method stub
+		return new EquipletStepMessage[0];
 	}
 
 }
