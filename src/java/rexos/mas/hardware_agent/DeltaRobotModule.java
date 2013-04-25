@@ -29,6 +29,8 @@
  **/
 package rexos.mas.hardware_agent;
 
+import rexos.mas.equiplet_agent.StepStatusCode;
+
 import com.mongodb.BasicDBObject;
 
 public class DeltaRobotModule implements Module {
@@ -36,8 +38,19 @@ public class DeltaRobotModule implements Module {
 	}
 
 	@Override
-	public EquipletStepMessage[] getEquipletSteps(BasicDBObject parameters) {
-		EquipletStepMessage[] dummyData = { new EquipletStepMessage(null, 1l, 2l, new TimeData(5l)) };
+	public EquipletStepMessage[] getEquipletSteps(int stepType,BasicDBObject parameters) {
+		
+		EquipletStepMessage[] dummyData = { new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(5)) };		
+		
 		return dummyData;
+	}
+	
+	public EquipletStepMessage getEquipletStep(BasicDBObject parameters) {
+		
+		// maak een equipletStep aan de hand van de parameters
+		EquipletStepMessage equipletStep = new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(7));		
+		
+		
+		return equipletStep;
 	}
 }

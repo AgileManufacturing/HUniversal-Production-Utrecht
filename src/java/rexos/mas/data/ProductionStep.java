@@ -26,7 +26,7 @@ public class ProductionStep implements Serializable {
 
 	private int _requiredTimeSlots;
 	private int _id;
-	private long _capability;
+	private int _capability;
 	private ProductionStepStatus _status;
 	
 	private ParameterList _parameters;
@@ -36,7 +36,7 @@ public class ProductionStep implements Serializable {
 		this._status = ProductionStepStatus.STATE_TODO;
 	}
 	
-	public ProductionStep(int id, long capability,  ParameterList parameterList) {
+	public ProductionStep(int id, int capability,  ParameterList parameterList) {
 		this._id = id;
 		this._capability = capability;
 		this._parameters = parameterList;
@@ -80,7 +80,7 @@ public class ProductionStep implements Serializable {
 		return parameters;
 	}
 
-	public long getCapability() {
+	public int getCapability() {
 		return _capability;
 	}
 	

@@ -105,10 +105,10 @@ public class CanPerformStep extends ReceiveBehaviour {
 			
 			// puts the productstep on the blackboard.
 			// TODO: get inputParts instead of dummy data
-			Long[] inputParts = { 1l, 2l, 3l };
+			Integer[] inputParts = { 1, 2, 3 };
 			// TODO: get outputPart
-			long outputPart = -1l;
-			ProductStepMessage entry = new ProductStepMessage(message.getSender(), productStep.getCapability(), productStep.getParameterListAsDBObject(), inputParts, outputPart, StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
+			int outputPart = -1;
+			ProductStepMessage entry = new ProductStepMessage(message.getSender(), (int)productStep.getCapability(), productStep.getParameterListAsDBObject(), inputParts, outputPart, StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
 			productStepEntryId = equipletBBClient.insertDocument(entry.toBasicDBObject());
 			equipletAgent.addCommunicationRelation(message.getConversationId(), productStepEntryId);
 			

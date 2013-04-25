@@ -52,7 +52,7 @@ public class CanDoProductStep extends ReceiveBehaviour {
 			ProductStepMessage productStep = new ProductStepMessage(
 					(BasicDBObject) agent.getProductStepBBClient()
 							.findDocumentById(productStepId));
-			long stepType = productStep.getType();
+			int stepType = productStep.getType();
 			BasicDBObject parameters = productStep.getParameters();
 
 			System.out.format(

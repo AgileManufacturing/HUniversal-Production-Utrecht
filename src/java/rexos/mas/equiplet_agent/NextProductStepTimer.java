@@ -17,29 +17,29 @@ public class NextProductStepTimer extends Timer{
 	EquipletAgent equipletAgent;
 	
 	/**
-	 * @var long nextUsedTimeSlot
+	 * @var int nextUsedTimeSlot
 	 * The next used time slot.
 	 */
 	private long nextUsedTimeSlot;
 
 	/**
-	 * @var long firstTimeSlot
+	 * @var int firstTimeSlot
 	 * The first time slot of the grid.
 	 */
-	private long firstTimeSlot;
+	private int firstTimeSlot;
 	
 	/**
-	 * @var long timeSlotLength
-	 * The length of a time slot.
+	 * @var int timeSlotLength
+	 * The length of a time slot in milliseconds.
 	 */
-	private long timeSlotLength;
+	private int timeSlotLength;
 	
 	/**
 	 * Constructor for the next product step timer.
 	 * @param firstTimeSlot the first time slot from the grid/equiplet.
 	 * @param timeSlotLength the length of a time slot.
 	 */
-	public NextProductStepTimer(long firstTimeSlot, long timeSlotLength){
+	public NextProductStepTimer(int firstTimeSlot, int timeSlotLength){
 		super();
 		this.firstTimeSlot = firstTimeSlot;
 		this.timeSlotLength = timeSlotLength;
@@ -68,6 +68,8 @@ public class NextProductStepTimer extends Timer{
 	}
 	
 	private class NextProductStepTask extends TimerTask {
+		public NextProductStepTask() {
+		}
 
 		/**
 		 * run method for this TimerTask.

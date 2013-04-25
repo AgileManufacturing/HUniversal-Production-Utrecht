@@ -31,37 +31,32 @@
  **/
 package rexos.mas.hardware_agent;
 
-import jade.core.AID;
-
 import org.bson.types.ObjectId;
-
-import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-
 import rexos.mas.data.IMongoSaveable;
-import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.StepStatusCode;
 
 public class EquipletStepMessage implements IMongoSaveable {
 	private ObjectId serviceStepID;
-	private Long instructionData;
-	private Long type;
+	private InstructionData instructionData;
+	private StepStatusCode status;
 	private TimeData timeData;
-	
+
 	/**
 	 * @param serviceStepID
-	 * @param ionstructionData
+	 * @param instructionData
 	 * @param type
 	 * @param timeData
 	 * @return
 	 */
 	public EquipletStepMessage(ObjectId serviceStepID,
-							  Long instructionData, Long type, TimeData timeData){
-		
+			InstructionData instructionData, StepStatusCode status,
+			TimeData timeData) {
+
 		this.serviceStepID = serviceStepID;
 		this.instructionData = instructionData;
+		this.status = status;
 		this.timeData = timeData;
-		this.type = type;
 	}
 
 	/**
@@ -72,7 +67,8 @@ public class EquipletStepMessage implements IMongoSaveable {
 	}
 
 	/**
-	 * @param serviceStepID the serviceStepID to set
+	 * @param serviceStepID
+	 *            the serviceStepID to set
 	 */
 	public void setServiceStepID(ObjectId serviceStepID) {
 		this.serviceStepID = serviceStepID;
@@ -81,29 +77,31 @@ public class EquipletStepMessage implements IMongoSaveable {
 	/**
 	 * @return the instructionData
 	 */
-	public Long getInstructionData() {
+	public InstructionData getInstructionData() {
 		return instructionData;
 	}
 
 	/**
-	 * @param instructionData the instructionData to set
+	 * @param instructionData
+	 *            the instructionData to set
 	 */
-	public void setInstructionData(Long instructionData) {
+	public void setInstructionData(InstructionData instructionData) {
 		this.instructionData = instructionData;
 	}
 
 	/**
-	 * @return the type
+	 * @return the status
 	 */
-	public Long getType() {
-		return type;
+	public StepStatusCode getStatus() {
+		return status;
 	}
 
 	/**
-	 * @param type the type to set
+	 * @param status
+	 *            the status to set
 	 */
-	public void setType(Long type) {
-		this.type = type;
+	public void setStatus(StepStatusCode status) {
+		this.status = status;
 	}
 
 	/**
@@ -114,20 +112,23 @@ public class EquipletStepMessage implements IMongoSaveable {
 	}
 
 	/**
-	 * @param timeData the timeData to set
+	 * @param timeData
+	 *            the timeData to set
 	 */
 	public void setTimeData(TimeData timeData) {
 		this.timeData = timeData;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
 		return String
-				.format("EquipletStepMessage [serviceStepID=%s, instructionData=%s, type=%s, timeData=%s]",
-						serviceStepID, instructionData, type, timeData);
+				.format("EquipletStepMessage [serviceStepID=%s, instructionData=%s, status=%s, timeData=%s]",
+						serviceStepID, instructionData, status, timeData);
 	}
 
 	@Override
@@ -135,16 +136,20 @@ public class EquipletStepMessage implements IMongoSaveable {
 		BasicDBObject object = new BasicDBObject();
 		object.put("serviceStepID", serviceStepID);
 		object.put("instructionData", instructionData);
-		object.put("type", type);
-		object.put("timeData", timeData);
+		object.put("status", status);
+		object.put("timeData", timeData.getDuration());
+		// TODO add timeData as a basicDBObject by making it implement the
+		// IMongoSaveable interface or make timeData of type int instead of a
+		// class type.
 		return object;
 	}
 
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		serviceStepID = object.getObjectId("serviceStepID");
-		instructionData = object.getLong("instructionData");
-		type = object.getLong("type");
-		timeData = new TimeData(object.getLong("timeData"));	
+		instructionData = new InstructionData(
+				(BasicDBObject) object.get("instructionData"));
+		status = StepStatusCode.valueOf(object.getString("status"));
+		timeData = new TimeData(object.getInt("timeData"));
 	}
 }

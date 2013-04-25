@@ -45,8 +45,8 @@ import com.mongodb.BasicDBObjectBuilder;
  */
 public class ServiceStepMessage implements IMongoSaveable {
 	private ObjectId _id;
-	private long serviceId;
-	private long type;
+	private int serviceId;
+	private int type;
 	private ObjectId productStepId;
 	private BasicDBObject parameters;
 	private StepStatusCode status;
@@ -61,11 +61,11 @@ public class ServiceStepMessage implements IMongoSaveable {
 	 * @param statusData
 	 * @param scheduleData
 	 */
-	public ServiceStepMessage(long serviceId, long type,
+	public ServiceStepMessage(int serviceId, int type,
 			BasicDBObject parameters, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
-		this(null, serviceId, type, null, parameters, status,
-				statusData, scheduleData);
+		this(null, serviceId, type, null, parameters, status, statusData,
+				scheduleData);
 	}
 
 	/**
@@ -77,8 +77,8 @@ public class ServiceStepMessage implements IMongoSaveable {
 	 * @param statusData
 	 * @param scheduleData
 	 */
-	public ServiceStepMessage(long serviceId,
-			long type, ObjectId productStepId, BasicDBObject parameters, StepStatusCode status,
+	public ServiceStepMessage(int serviceId, int type, ObjectId productStepId,
+			BasicDBObject parameters, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
 		this(null, serviceId, type, productStepId, parameters, status,
 				statusData, scheduleData);
@@ -93,11 +93,11 @@ public class ServiceStepMessage implements IMongoSaveable {
 	 * @param statusData
 	 * @param scheduleData
 	 */
-	public ServiceStepMessage(ObjectId _id, long serviceId, long type,
+	public ServiceStepMessage(ObjectId _id, int serviceId, int type,
 			BasicDBObject parameters, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
-		this(_id, serviceId, type, null, parameters, status,
-				statusData, scheduleData);
+		this(_id, serviceId, type, null, parameters, status, statusData,
+				scheduleData);
 	}
 
 	/**
@@ -110,7 +110,8 @@ public class ServiceStepMessage implements IMongoSaveable {
 	 * @param statusData
 	 * @param scheduleData
 	 */
-	public ServiceStepMessage(ObjectId _id, long serviceId, long type, ObjectId productStepId, BasicDBObject parameters,
+	public ServiceStepMessage(ObjectId _id, int serviceId, int type,
+			ObjectId productStepId, BasicDBObject parameters,
 			StepStatusCode status, BasicDBObject statusData,
 			ScheduleData scheduleData) {
 		this._id = _id;
@@ -154,9 +155,9 @@ public class ServiceStepMessage implements IMongoSaveable {
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		_id = object.getObjectId("_id");
+		serviceId = object.getInt("serviceId");
+		type = object.getInt("type");
 		productStepId = object.getObjectId("productStepId");
-		serviceId = object.getLong("serviceId");
-		type = object.getLong("type");
 		parameters = (BasicDBObject) object.get("parameters");
 		status = StepStatusCode.valueOf(object.getString("status"));
 		if (object.containsField("statusData")) {
@@ -205,7 +206,7 @@ public class ServiceStepMessage implements IMongoSaveable {
 	/**
 	 * @return the type
 	 */
-	public long getType() {
+	public int getType() {
 		return type;
 	}
 
@@ -213,14 +214,14 @@ public class ServiceStepMessage implements IMongoSaveable {
 	 * @param type
 	 *            the type to set
 	 */
-	public void setType(long type) {
+	public void setType(int type) {
 		this.type = type;
 	}
 
 	/**
 	 * @return the serviceId
 	 */
-	public long getServiceId() {
+	public int getServiceId() {
 		return serviceId;
 	}
 
@@ -228,7 +229,7 @@ public class ServiceStepMessage implements IMongoSaveable {
 	 * @param serviceId
 	 *            the serviceId to set
 	 */
-	public void setServiceId(long serviceId) {
+	public void setServiceId(int serviceId) {
 		this.serviceId = serviceId;
 	}
 

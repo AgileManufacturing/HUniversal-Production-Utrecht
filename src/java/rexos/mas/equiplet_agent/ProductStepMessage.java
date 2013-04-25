@@ -51,9 +51,10 @@ public class ProductStepMessage implements IMongoSaveable {
 	private AID productAgentId;
 
 	/**
-	 * @var long type The type of the product step
+	 * @var int type
+	 * The type of the product step
 	 */
-	private long type;
+	private int type;
 
 	/**
 	 * @var ParameterList parameters The parameterlist for this product step.
@@ -61,15 +62,15 @@ public class ProductStepMessage implements IMongoSaveable {
 	private BasicDBObject parameters;
 
 	/**
-	 * @var Object inputPartTypes The input part types needed for this product
+	 * @var int[] inputPartTypes
 	 *      step.
 	 */
-	private Long[] inputPartTypes;
+	private Integer[] inputPartTypes;
 
 	/**
-	 * @var long outputPartType The result part type for this product step.
+	 * @var int outputPartType
 	 */
-	private long outputPartType;
+	private int outputPartType;
 
 	/**
 	 * @var StepStatusCode status The status for this product step.
@@ -107,9 +108,8 @@ public class ProductStepMessage implements IMongoSaveable {
 	 * @param scheduleData
 	 *            - The schedule data
 	 */
-	public ProductStepMessage(AID productAgentId, long type,
-			BasicDBObject parameters, Long[] inputPartTypes,
-			long outputPartType, StepStatusCode status,
+	public ProductStepMessage(AID productAgentId, int type,
+			BasicDBObject parameters, Integer[] inputPartTypes, int outputPartType, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
 		this(null, productAgentId, type, parameters, inputPartTypes,
 				outputPartType, status, statusData, scheduleData);
@@ -136,9 +136,9 @@ public class ProductStepMessage implements IMongoSaveable {
 	 * @param scheduleData
 	 *            - The schedule data
 	 */
-	public ProductStepMessage(ObjectId _id, AID productAgentId, long type,
-			BasicDBObject parameters, Long[] inputPartTypes,
-			long outputPartType, StepStatusCode status,
+	public ProductStepMessage(ObjectId _id, AID productAgentId, int type,
+			BasicDBObject parameters, Integer[] inputPartTypes,
+			int outputPartType, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
 		this._id = _id;
 		this.productAgentId = productAgentId;
@@ -195,7 +195,7 @@ public class ProductStepMessage implements IMongoSaveable {
 	/**
 	 * @return the type
 	 */
-	public long getType() {
+	public int getType() {
 		return type;
 	}
 
@@ -203,7 +203,7 @@ public class ProductStepMessage implements IMongoSaveable {
 	 * @param type
 	 *            the type to set
 	 */
-	public void setType(long type) {
+	public void setType(int type) {
 		this.type = type;
 	}
 
@@ -225,7 +225,7 @@ public class ProductStepMessage implements IMongoSaveable {
 	/**
 	 * @return the inputPartTypes
 	 */
-	public Long[] getInputPartTypes() {
+	public Integer[] getInputPartTypes() {
 		return inputPartTypes;
 	}
 
@@ -233,14 +233,14 @@ public class ProductStepMessage implements IMongoSaveable {
 	 * @param inputPartTypes
 	 *            the inputPartTypes to set
 	 */
-	public void setInputPartTypes(Long[] inputPartTypes) {
+	public void setInputPartTypes(Integer[] inputPartTypes) {
 		this.inputPartTypes = inputPartTypes;
 	}
 
 	/**
 	 * @return the outputPartType
 	 */
-	public long getOutputPartType() {
+	public int getOutputPartType() {
 		return outputPartType;
 	}
 
@@ -248,7 +248,7 @@ public class ProductStepMessage implements IMongoSaveable {
 	 * @param outputPartType
 	 *            the outputPartType to set
 	 */
-	public void setOutputPartType(long outputPartType) {
+	public void setOutputPartType(int outputPartType) {
 		this.outputPartType = outputPartType;
 	}
 
@@ -326,11 +326,10 @@ public class ProductStepMessage implements IMongoSaveable {
 		_id = object.getObjectId("_id");
 		productAgentId = new AID((String) (object.get("productAgentId")),
 				AID.ISGUID);
-		type = object.getLong("type");
+		type = object.getInt("type");
 		parameters = (BasicDBObject) object.get("parameters");
-		inputPartTypes = ((BasicDBList) object.get("inputPartTypes"))
-				.toArray(new Long[0]);
-		outputPartType = object.getLong("outputPartType", -1l);
+		inputPartTypes = ((BasicDBList)object.get("inputPartTypes")).toArray(new Integer[0]);
+		outputPartType = object.getInt("outputPartType", -1);
 		status = StepStatusCode.valueOf(object.getString("status"));
 
 		if (object.containsField("statusData")) {

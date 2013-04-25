@@ -30,6 +30,8 @@
 
 package rexos.mas.hardware_agent;
 
+import rexos.mas.equiplet_agent.StepStatusCode;
+
 import com.mongodb.BasicDBObject;
 
 public class GripperModule implements Module{
@@ -38,9 +40,28 @@ public class GripperModule implements Module{
 	}
 	
 	@Override
-	public EquipletStepMessage[] getEquipletSteps(BasicDBObject parameters) {
-		TimeData td = new TimeData(2l);
-		EquipletStepMessage[] dummyData = { new EquipletStepMessage(null, 1l, 2l, td) };
-		return dummyData;
+	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters) {
+		TimeData td = new TimeData(2); //TODO: timedata hardcoded
+		
+		EquipletStepMessage[] equipletSteps = new EquipletStepMessage[3];
+		
+		switch(stepType){
+		
+		case 1: // pick
+			equipletSteps[0] = new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3));
+			equipletSteps[1] = new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(4));
+			equipletSteps[2] = new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(5));
+			break;
+		
+		case 2: // place/drop
+			equipletSteps[0] = new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(2));
+			equipletSteps[1] = new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3));
+			equipletSteps[2] = new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(4));
+			break;
+		
+		}
+		
+		
+		return equipletSteps;
 	}
 }

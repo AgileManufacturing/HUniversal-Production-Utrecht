@@ -46,7 +46,7 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 			ProductStepMessage productStep = new ProductStepMessage(
 					(BasicDBObject) agent.getProductStepBBClient()
 							.findDocumentById(productStepId));
-			long productStepType = productStep.getType();
+			int productStepType = productStep.getType();
 
 			System.out.format(
 					"%s got message GetProductStepDuration for step type %s%n",

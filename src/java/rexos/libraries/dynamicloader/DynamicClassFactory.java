@@ -81,17 +81,14 @@ public class DynamicClassFactory<T> {
 		try {
 			Class<?> cls = loader.loadClass(className);
 			
-			// This warning is suppressed because it should be an exception if the created object is not a subclass of T.
-			@SuppressWarnings("unchecked")
-			T obj = (T)cls.newInstance();
-			return obj;
+			Object obj = cls.newInstance();
+			return type.cast(obj);
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 			throw new InstantiateClassException("Failed to instantiate object of class " + className, e);
 		} catch (ClassCastException ce) {
 			throw new InstantiateClassException("The described class " + className + " is not castable to "
 					+ type.getName(), ce);
 		}
-		
 	}
 	
 	/**

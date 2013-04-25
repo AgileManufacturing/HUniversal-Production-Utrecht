@@ -156,6 +156,30 @@ public class Queries {
 		    "            WHERE (`equiplets`.`jade_address` = (?)) " +
 		    "			GROUP BY (`services`.`id`);";    
 		    
+    
+    public static final String SERVICES_FOR_STEP_FOR_EQUIPLET = "SELECT " + 
+    		"    `services`.`name`, `services`.`id`" + 
+    		"FROM" + 
+    		"    `rexos_knowledge_base`.`modules`" + 
+    		"        INNER JOIN" + 
+    		"    `rexos_knowledge_base`.`equiplets` ON (`modules`.`location` = `equiplets`.`id`)" + 
+    		"        INNER JOIN" + 
+    		"    `rexos_knowledge_base`.`module_types` ON (`modules`.`module_type` = `module_types`.`id`)" + 
+    		"        INNER JOIN" + 
+    		"    `rexos_knowledge_base`.`module_groups` ON (`module_types`.`module_group` = `module_groups`.`id`)" + 
+    		"        INNER JOIN" + 
+    		"    `rexos_knowledge_base`.`service_module` ON (`service_module`.`module` = `module_groups`.`id`)" + 
+    		"        INNER JOIN" + 
+    		"    `rexos_knowledge_base`.`services` ON (`service_module`.`service` = `services`.`id`)" + 
+    		"        INNER JOIN" + 
+    		"    `rexos_knowledge_base`.`product_steps_services` ON (`product_steps_services`.`service` = `services`.`id`)" + 
+    		"        INNER JOIN" + 
+    		"    `rexos_knowledge_base`.`product_steps` ON (`product_steps_services`.`product_step` = `product_steps`.`id`)" + 
+    		"WHERE" + 
+    		"    (`equiplets`.`jade_address` = (?)" + 
+    		"        AND `product_steps`.`id` = (?))" + 
+    		"GROUP BY (`services`.`id`);";
+    		
     /**
      * @var String POSSIBLE_STEPS_PER_SERVICE
      *
@@ -175,6 +199,49 @@ public class Queries {
             "      `product_steps_services`.`service` = `services`.`id`\n" +
             "    ) ;";
 
+    /**
+     * @var String SOFTWARE_FOR_MODULE
+     * 
+     * SQL query for retrieving the software for the specified module from the database.
+     * Expects an integer parameter corresponding to the moduleId
+     **/
+    public static final String SOFTWARE_FOR_MODULE = "SELECT " + 
+    		"    software.id AS id, " + 
+    		"    software.class_name AS class_name, " + 
+    		"    software.description AS description, " + 
+    		"    software.jar_location AS jar_location, " + 
+    		"    software.name AS name " + 
+    		" FROM " + 
+    		"    software " + 
+    		" WHERE " + 
+    		"    id = (SELECT  " + 
+    		"            software " + 
+    		"        FROM " + 
+    		"            modules " + 
+    		"                INNER JOIN " + 
+    		"            module_types ON modules.module_type = module_types.id " + 
+    		"        WHERE " + 
+    		"            modules.id = (?))";
+    
+    /**
+     * @var String SOFTWARE_FOR_SERVICE
+     * 
+     * SQL query for retrieving the software for the specified service from the database.
+     * Expects an integer parameter corresponding to the serviceId
+     **/
+    public static final String SOFTWARE_FOR_SERVICE = "SELECT  " + 
+    		"    software.id AS id, " + 
+    		"    software.class_name AS class_name, " + 
+    		"    software.description AS description, " + 
+    		"    software.jar_location AS jar_location, " + 
+    		"    software.name AS name " + 
+    		" FROM " + 
+    		"    software " + 
+    		"        INNER JOIN " + 
+    		"    services ON services.software = software.id " + 
+    		" WHERE " + 
+    		"    services.id = (?)";
+    
     /**
      * A private constructor preventing this class to be constructed.
      **/

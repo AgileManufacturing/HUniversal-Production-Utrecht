@@ -1,15 +1,14 @@
 /**
- * @file Module.java
- * @brief Provides an inteface to make modules. 
- * @date Created: 2013-04-02
+ * @file KeyNotFoundException.java
+ * @brief Thrown when a key is not found in a collection.
+ * @date Created: 23 apr. 2013
  *
- * @author Thierry Gerritse
- * @author Wouter Veen
+ * @author Jan-Willem Willebrands
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright � 2013, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,16 +27,25 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package rexos.mas.hardware_agent;
+package rexos.libraries.knowledgedb_client;
 
-import com.mongodb.BasicDBObject;
+/**
+ * Thrown when a key is not found in a collection.
+ **/
+public class KeyNotFoundException extends Exception {
 
-public interface Module {
-	
 	/**
-	 * 
-	 * @param parameters
-	 * @return
-	 */
-	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters);
+	 * @var long serialVersionUID
+	 * SerialVersionUID for this class.
+	 **/
+	private static final long serialVersionUID = 2958245856536253243L;
+
+	/**
+	 * Constructs a new exception with the specified detail message.
+	 * @param message A message providing additional information about the exception.
+	 **/
+	public KeyNotFoundException(String message) {
+		super(message);
+	}
+
 }

@@ -73,11 +73,11 @@ public class EvaluateDuration extends ReceiveBehaviour {
 					myAgent.getLocalName(), message.getSender().getLocalName(),
 					message.getOntology(), serviceStepId);
 
-			long stepDuration = 0l;
+			int stepDuration = 0;
 			Module leadingModule = hardwareAgent.getLeadingModule(serviceStep
 					.getServiceId());
 			EquipletStepMessage[] equipletSteps = leadingModule
-					.getEquipletSteps(serviceStep.getParameters());
+					.getEquipletSteps(serviceStep.getType(), serviceStep.getParameters());
 			for (EquipletStepMessage equipletStep : equipletSteps) {
 				stepDuration += equipletStep.getTimeData().getDuration();
 			}
@@ -89,18 +89,13 @@ public class EvaluateDuration extends ReceiveBehaviour {
 					new BasicDBObject("_id", serviceStepId),
 					new BasicDBObject("$set", new BasicDBObject("scheduleData",
 							schedule.toBasicDBObject())));
-			// plaats equipletsteps en hun duration en zijn status op eveluating
-			// op bb,
-
+			
 			ACLMessage reply;
 			reply = message.createReply();
 			reply.setContentObject(serviceStepId);
 			reply.setOntology("GetServiceStepDurationResponse");
 			myAgent.send(reply);
 
-			// zet duration van de betreffende service step
-
-			// stuur peter een reactie met het staat er
 		} catch (UnreadableException | InvalidDBNamespaceException
 				| GeneralMongoException | IOException e) {
 			e.printStackTrace();

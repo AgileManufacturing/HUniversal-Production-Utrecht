@@ -55,13 +55,13 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 	private String conversationId;
 	private ServiceAgent agent;
 	private ObjectId productStepId;
-	private Long[] parts;
+	private Integer[] parts;
 
 	/**
 	 * @param a
 	 */
 	public ArePartsAvailableResponse(Agent a, String conversationId,
-			ObjectId productStepId, Long[] parts) {
+			ObjectId productStepId, Integer[] parts) {
 		this(a, 2000, conversationId, productStepId, parts);
 	}
 
@@ -70,7 +70,7 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 	 * @param millis
 	 */
 	public ArePartsAvailableResponse(Agent a, int millis,
-			String conversationId, ObjectId productStepId, Long[] parts) {
+			String conversationId, ObjectId productStepId, Integer[] parts) {
 		super(a, millis, MessageTemplate.and(
 				MessageTemplate.MatchConversationId(conversationId),
 				MessageTemplate.MatchOntology("ArePartsAvailableResponse")));
