@@ -29,6 +29,8 @@
  **/
 package rexos.mas.equiplet_agent;
 
+import org.bson.types.ObjectId;
+
 import jade.core.AID;
 import rexos.mas.data.IMongoSaveable;
 import rexos.mas.data.ScheduleData;
@@ -40,69 +42,105 @@ import com.mongodb.BasicDBObject;
  * Implementation of a message for the productstep blackboard
  */
 public class ProductStepMessage implements IMongoSaveable {
+	private ObjectId _id;
+
 	/**
-	 * @var AID productAgentId
-	 * The AID of the productAgent linked to this product step.
+	 * @var AID productAgentId The AID of the productAgent linked to this
+	 *      product step.
 	 */
 	private AID productAgentId;
-	
+
 	/**
-	 * @var long type
-	 * The type of the product step
+	 * @var long type The type of the product step
 	 */
 	private long type;
-	
+
 	/**
-	 * @var ParameterList parameters
-	 * The parameterlist for this product step.
+	 * @var ParameterList parameters The parameterlist for this product step.
 	 */
 	private BasicDBObject parameters;
-	
+
 	/**
-	 * @var Object inputPartTypes
-	 * The input part types needed for this product step.
+	 * @var Object inputPartTypes The input part types needed for this product
+	 *      step.
 	 */
 	private Long[] inputPartTypes;
-	
+
 	/**
-	 * @var long outputPartType
-	 * The result part type for this product step.
+	 * @var long outputPartType The result part type for this product step.
 	 */
 	private long outputPartType;
-	
+
 	/**
-	 * @var StepStatusCode status
-	 * The status for this product step.
+	 * @var StepStatusCode status The status for this product step.
 	 */
 	private StepStatusCode status;
-	
+
 	/**
-	 * @var basicDBObject statusData
-	 * The extra data provided by the status for this product step.
+	 * @var basicDBObject statusData The extra data provided by the status for
+	 *      this product step.
 	 */
 	private BasicDBObject statusData;
-	
+
 	/**
-	 * @var ScheduleData scheduleData
-	 * The schedule for this product step.
+	 * @var ScheduleData scheduleData The schedule for this product step.
 	 */
 	private ScheduleData scheduleData;
 
 	/**
 	 * The constructor for the product step entry.
 	 * 
-	 * @param productAgentId - AID of the product agent linked to the product step 
-	 * @param type - The type of the product step
-	 * @param parameters - The parameters for the product step
-	 * @param inputPartTypes - The input parts for the product step
-	 * @param outputPartType - The output parts for the product step
-	 * @param status - The status for the product step
-	 * @param statusData - The additional data for the status
-	 * @param scheduleData - The schedule data
+	 * @param productAgentId
+	 *            - AID of the product agent linked to the product step
+	 * @param type
+	 *            - The type of the product step
+	 * @param parameters
+	 *            - The parameters for the product step
+	 * @param inputPartTypes
+	 *            - The input parts for the product step
+	 * @param outputPartType
+	 *            - The output parts for the product step
+	 * @param status
+	 *            - The status for the product step
+	 * @param statusData
+	 *            - The additional data for the status
+	 * @param scheduleData
+	 *            - The schedule data
 	 */
 	public ProductStepMessage(AID productAgentId, long type,
-			BasicDBObject parameters, Long[] inputPartTypes, long outputPartType,
-			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
+			BasicDBObject parameters, Long[] inputPartTypes,
+			long outputPartType, StepStatusCode status,
+			BasicDBObject statusData, ScheduleData scheduleData) {
+		this(null, productAgentId, type, parameters, inputPartTypes,
+				outputPartType, status, statusData, scheduleData);
+	}
+
+	/**
+	 * The constructor for the product step entry.
+	 * 
+	 * @param _id
+	 * @param productAgentId
+	 *            - AID of the product agent linked to the product step
+	 * @param type
+	 *            - The type of the product step
+	 * @param parameters
+	 *            - The parameters for the product step
+	 * @param inputPartTypes
+	 *            - The input parts for the product step
+	 * @param outputPartType
+	 *            - The output parts for the product step
+	 * @param status
+	 *            - The status for the product step
+	 * @param statusData
+	 *            - The additional data for the status
+	 * @param scheduleData
+	 *            - The schedule data
+	 */
+	public ProductStepMessage(ObjectId _id, AID productAgentId, long type,
+			BasicDBObject parameters, Long[] inputPartTypes,
+			long outputPartType, StepStatusCode status,
+			BasicDBObject statusData, ScheduleData scheduleData) {
+		this._id = _id;
 		this.productAgentId = productAgentId;
 		this.type = type;
 		this.parameters = parameters;
@@ -115,10 +153,28 @@ public class ProductStepMessage implements IMongoSaveable {
 
 	/**
 	 * Constructor for a ProductStepMessage.
-	 * @param object The BasicDBObject of which the ProductStepMessage has to be builded.
+	 * 
+	 * @param object
+	 *            The BasicDBObject of which the ProductStepMessage has to be
+	 *            builded.
 	 */
-	public ProductStepMessage(BasicDBObject object){
+	public ProductStepMessage(BasicDBObject object) {
 		fromBasicDBObject(object);
+	}
+
+	/**
+	 * @return the _id
+	 */
+	public ObjectId get_id() {
+		return _id;
+	}
+
+	/**
+	 * @param _id
+	 *            the _id to set
+	 */
+	public void set_id(ObjectId _id) {
+		this._id = _id;
 	}
 
 	/**
@@ -129,7 +185,8 @@ public class ProductStepMessage implements IMongoSaveable {
 	}
 
 	/**
-	 * @param productAgentId the productAgentId to set
+	 * @param productAgentId
+	 *            the productAgentId to set
 	 */
 	public void setProductAgentId(AID productAgentId) {
 		this.productAgentId = productAgentId;
@@ -143,7 +200,8 @@ public class ProductStepMessage implements IMongoSaveable {
 	}
 
 	/**
-	 * @param type the type to set
+	 * @param type
+	 *            the type to set
 	 */
 	public void setType(long type) {
 		this.type = type;
@@ -157,7 +215,8 @@ public class ProductStepMessage implements IMongoSaveable {
 	}
 
 	/**
-	 * @param parameters the parameters to set
+	 * @param parameters
+	 *            the parameters to set
 	 */
 	public void setParameters(BasicDBObject parameters) {
 		this.parameters = parameters;
@@ -171,7 +230,8 @@ public class ProductStepMessage implements IMongoSaveable {
 	}
 
 	/**
-	 * @param inputPartTypes the inputPartTypes to set
+	 * @param inputPartTypes
+	 *            the inputPartTypes to set
 	 */
 	public void setInputPartTypes(Long[] inputPartTypes) {
 		this.inputPartTypes = inputPartTypes;
@@ -185,7 +245,8 @@ public class ProductStepMessage implements IMongoSaveable {
 	}
 
 	/**
-	 * @param outputPartType the outputPartType to set
+	 * @param outputPartType
+	 *            the outputPartType to set
 	 */
 	public void setOutputPartType(long outputPartType) {
 		this.outputPartType = outputPartType;
@@ -199,7 +260,8 @@ public class ProductStepMessage implements IMongoSaveable {
 	}
 
 	/**
-	 * @param status the status to set
+	 * @param status
+	 *            the status to set
 	 */
 	public void setStatus(StepStatusCode status) {
 		this.status = status;
@@ -213,7 +275,8 @@ public class ProductStepMessage implements IMongoSaveable {
 	}
 
 	/**
-	 * @param statusData the statusData to set
+	 * @param statusData
+	 *            the statusData to set
 	 */
 	public void setStatusData(BasicDBObject statusData) {
 		this.statusData = statusData;
@@ -227,7 +290,8 @@ public class ProductStepMessage implements IMongoSaveable {
 	}
 
 	/**
-	 * @param scheduleData the scheduleData to set
+	 * @param scheduleData
+	 *            the scheduleData to set
 	 */
 	public void setScheduleData(ScheduleData scheduleData) {
 		this.scheduleData = scheduleData;
@@ -235,11 +299,14 @@ public class ProductStepMessage implements IMongoSaveable {
 
 	/**
 	 * Function for getting the BasicDBObject from this class.
+	 * 
 	 * @return the created BasicDBObject.
 	 */
 	@Override
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject object = new BasicDBObject();
+		if (_id != null)
+			object.put("_id", _id);
 		object.put("productAgentId", productAgentId.getName());
 		object.put("type", type);
 		object.put("parameters", parameters);
@@ -256,20 +323,24 @@ public class ProductStepMessage implements IMongoSaveable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		productAgentId = new AID((String)(object.get("productAgentId")), AID.ISGUID);
+		_id = object.getObjectId("_id");
+		productAgentId = new AID((String) (object.get("productAgentId")),
+				AID.ISGUID);
 		type = object.getLong("type");
-		parameters = (BasicDBObject)object.get("parameters");
-		inputPartTypes = ((BasicDBList)object.get("inputPartTypes")).toArray(new Long[0]);
+		parameters = (BasicDBObject) object.get("parameters");
+		inputPartTypes = ((BasicDBList) object.get("inputPartTypes"))
+				.toArray(new Long[0]);
 		outputPartType = object.getLong("outputPartType", -1l);
 		status = StepStatusCode.valueOf(object.getString("status"));
-		
-		if(object.containsField("statusData")){
+
+		if (object.containsField("statusData")) {
 			statusData = (BasicDBObject) object.get(statusData);
 		} else {
 			statusData = new BasicDBObject();
 		}
-		if(object.containsField("scheduleData")){
-			scheduleData = new ScheduleData((BasicDBObject)object.get("scheduleData"));
+		if (object.containsField("scheduleData")) {
+			scheduleData = new ScheduleData(
+					(BasicDBObject) object.get("scheduleData"));
 		} else {
 			scheduleData = new ScheduleData();
 		}

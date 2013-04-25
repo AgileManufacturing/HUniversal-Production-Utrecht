@@ -81,7 +81,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 		//Gets the timeslot from the string, asks the serviceAgent to plan the step with logistics.
 		try{
 			long timeslot = Long.parseLong(message.getContent());
-			System.out.format("%d%n", timeslot);
+			System.out.format("scheduling step for timeslot %d%n", timeslot);
 			ACLMessage timeslotMessage = new ACLMessage(ACLMessage.REQUEST);
 			timeslotMessage.addReceiver(equipletAgent.getServiceAgent());
 			timeslotMessage.setOntology("PlanStepWithLogistics");

@@ -18,6 +18,7 @@ import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.mas.data.DbData;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.equiplet_agent.StepStatusCode;
+import rexos.mas.logistics_agent.behaviours.ArePartsAvailable;
 import rexos.mas.service_agent.behaviour.CanDoProductStep;
 import rexos.mas.service_agent.behaviour.GetProductStepDuration;
 
@@ -38,8 +39,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	private BlackboardClient productStepBBClient, serviceStepBBClient;
 	private FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription(
 			"status", this);
-	private HashMap<String, Long> services;
-	private HashMap<Long, String[]> stepTypes;
+	private HashMap<String, Service> convIdServiceMapping;
 	private DbData dbData;
 	private AID equipletAgentAID, hardwareAgentAID, logisticsAID;
 
@@ -79,26 +79,17 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			doDelete();
 		}
 
-		services = new HashMap<>();
-		services.put("Drill", 15l);
-		services.put("Glue", 20l);
-		services.put("Pick", 5l);
-		services.put("Place", 5l);
-
-		stepTypes = new HashMap<>();
-		stepTypes.put(0l, new String[] { "Pick", "Place" }); // Pick&Place
-		stepTypes.put(1l, new String[] { "Glue", "Pick", "Place" }); // Attach
-		stepTypes.put(2l, new String[] { "Drill", "Pick", "Place" }); // Screw
-		stepTypes.put(3l, new String[] { "Drill", "Pick", "Place" }); // Screw
+		convIdServiceMapping = new HashMap<String, Service>();
 
 		// create serviceFactory
 		// addBehaviour(new AnswerBehaviour(this));
 		addBehaviour(new CanDoProductStep(this));
 		addBehaviour(new GetProductStepDuration(this));
+		addBehaviour(new ArePartsAvailable(this));
 
 		// receive behaviours from EA
 		// add EvaluateProductionStep receiveBehaviour --> conversation with HA
-		// add ScheduleProductStep receiveBehaviour --> conversation with LA
+		// add PlanStepWithLogistics receiveBehaviour --> conversation with LA
 		// add ScheduleStep receiveBehaviour
 		// add StepDuration receiveBehaviour
 		// add StepDuration receiveBehaviour
@@ -140,6 +131,18 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 	public void handleLogisticsAgentTimeout() {
 
+	}
+	
+	public Service MapConvIdWithService(String conversationId, Service service) {
+		return convIdServiceMapping.put(conversationId, service);
+	}
+	
+	public Service GetServiceForConvId(String conversationId) {
+		return convIdServiceMapping.get(conversationId);
+	}
+	
+	public Service RemoveConvIdServiceMapping(String conversationId) {
+		return convIdServiceMapping.remove(conversationId);
 	}
 
 	/**
@@ -231,20 +234,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			e.printStackTrace();
 			doDelete();
 		}
-	}
-
-	/**
-	 * @return the services
-	 */
-	public HashMap<String, Long> getServices() {
-		return services;
-	}
-
-	/**
-	 * @return the stepTypes
-	 */
-	public HashMap<Long, String[]> getStepTypes() {
-		return stepTypes;
 	}
 
 	/**

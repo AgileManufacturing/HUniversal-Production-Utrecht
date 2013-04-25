@@ -7,14 +7,12 @@ import jade.lang.acl.UnreadableException;
 
 import org.bson.types.ObjectId;
 
-import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.service_agent.Service;
 import rexos.mas.service_agent.ServiceAgent;
-import rexos.mas.service_agent.ServiceFactory;
 import rexos.mas.service_agent.ServiceStepMessage;
 
 import com.mongodb.BasicDBObject;
@@ -54,22 +52,8 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 					"%s got message GetProductStepDuration for step type %s%n",
 					agent.getLocalName(), productStepType);
 
-			Service[] services = null;
-			Service service = null;
-			ServiceFactory factory = new ServiceFactory(message.getSender()
-					.getName());
-			if ((services = factory.getServicesForStep(productStepType)).length > 0) {
-				service = services[0];
-			} else {
-				agent.doDelete();
-				// TODO find a good solution for when this happens
-				throw new RuntimeException(
-						"Service Agent - No available services for productStep "
-								+ productStep);
-			}
-
+			Service service = agent.GetServiceForConvId(message.getConversationId());
 			BasicDBObject parameters = productStep.getParameters();
-
 			ServiceStepMessage[] serviceSteps = service.getServiceSteps(
 					productStepType, parameters);
 			for (ServiceStepMessage serviceStep : serviceSteps) {

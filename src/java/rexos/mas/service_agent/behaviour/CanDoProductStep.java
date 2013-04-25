@@ -60,23 +60,35 @@ public class CanDoProductStep extends ReceiveBehaviour {
 					agent.getLocalName(), stepType);
 
 			if (factory == null)
-				factory = new ServiceFactory(message.getSender().toString());
-			Service service = factory.getServicesForStep(stepType)[0];
+				factory = new ServiceFactory(message.getSender().getLocalName());
+			
+			Service[] services = factory.getServicesForStep(stepType);
+			if ((services = factory.getServicesForStep(stepType)).length > 0) {
+				Service service = services[0];
+				agent.MapConvIdWithService(message.getConversationId(), service);
 
-			ACLMessage newMsg = message.createReply();
-			newMsg.clearAllReceiver();
-			newMsg.addReceiver(agent.getHardwareAgentAID());
-			newMsg.setOntology("CheckForModules");
-			try {
-				newMsg.setContentObject(service.getModuleIds(stepType,
-						parameters));
-			} catch (IOException e) {
-				e.printStackTrace();
-				agent.doDelete();
+				ACLMessage newMsg = message.createReply();
+				newMsg.clearAllReceiver();
+				newMsg.addReceiver(agent.getHardwareAgentAID());
+				newMsg.setOntology("CheckForModules");
+				try {
+					newMsg.setContentObject(service.getModuleIds(stepType,
+							parameters));
+				} catch (IOException e) {
+					e.printStackTrace();
+					agent.doDelete();
+				}
+				agent.send(newMsg);
+
+				agent.addBehaviour(new CheckForModulesResponse(agent));
+			} else {
+				ACLMessage reply = message.createReply();
+				reply.setPerformative(ACLMessage.DISCONFIRM);
+				reply.setOntology("CanDoProductionStepResponse");
+				getAgent().send(reply);
+				System.out.format("%s sending step availability (%b)%n", getAgent()
+						.getLocalName(), reply.getPerformative() == ACLMessage.CONFIRM);
 			}
-			agent.send(newMsg);
-
-			agent.addBehaviour(new CheckForModulesResponse(agent));
 		} catch (UnreadableException | InvalidDBNamespaceException
 				| GeneralMongoException e) {
 			e.printStackTrace();

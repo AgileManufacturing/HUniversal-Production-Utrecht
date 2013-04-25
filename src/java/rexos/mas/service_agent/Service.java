@@ -37,6 +37,10 @@ package rexos.mas.service_agent;
 //import rexos.mas.data.ParameterList;
 //import rexos.mas.data.Position;
 
+import java.util.HashMap;
+
+import rexos.mas.data.Position;
+
 import com.mongodb.BasicDBObject;
 
 /**
@@ -74,12 +78,15 @@ public interface Service {
 	 */
 	public ServiceStepMessage[] getServiceSteps(long productStepType,
 			BasicDBObject parameters);
-	
-//	/**
-//	 * @param partParameters
-//	 * @return
-//	 */
-//	public ParameterList getParameters(HashMap<Long, Position> partParameters);
+
+	/**
+	 * @param partParameters
+	 * @param serviceSteps
+	 * @return
+	 */
+	public ServiceStepMessage[] updateParameters(
+			HashMap<Long, Position> partParameters,
+			ServiceStepMessage[] serviceSteps);
 
 	/**
 	 * Returns the Id of this service. Id's are used to identify services and

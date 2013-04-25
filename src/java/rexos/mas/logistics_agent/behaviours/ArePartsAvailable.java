@@ -1,7 +1,7 @@
 /**
- * @file DBSaveable.java
+ * @file ArePartsAvailable.java
  * @brief 
- * @date Created: 19 apr. 2013
+ * @date Created: 20 apr. 2013
  *
  * @author Peter Bonnema
  *
@@ -28,22 +28,49 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  **/
-package rexos.mas.data;
+package rexos.mas.logistics_agent.behaviours;
 
-import com.mongodb.BasicDBObject;
+import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
+import rexos.mas.behaviours.ReceiveBehaviour;
 
 /**
  * @author Peter
- *
+ * 
  */
-public interface IMongoSaveable {
+public class ArePartsAvailable extends ReceiveBehaviour {
+	private static final long serialVersionUID = 1L;
+
 	/**
-	 * @return
+	 * @param a
 	 */
-	public BasicDBObject toBasicDBObject();
-	
-	/**
-	 * @param object
+	public ArePartsAvailable(Agent a) {
+		super(a, MessageTemplate.MatchOntology("ArePartsAvailable"));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage)
 	 */
-	public void fromBasicDBObject(BasicDBObject object);
+	@Override
+	public void handle(ACLMessage message) {
+		try {
+			Long[] parts = (Long[]) message.getContentObject();
+			ACLMessage reply = message.createReply();
+			reply.setOntology("ArePartsAvailableResponse");
+			//TODO determine actual part availability
+			reply.setPerformative(ACLMessage.CONFIRM);
+			myAgent.send(reply);
+
+			myAgent.addBehaviour(new ArePartsAvailableInTime(myAgent, message.getConversationId()));
+			System.out.format("Parts: { %s } are available%n", (Object[]) parts);
+		} catch (UnreadableException e) {
+			e.printStackTrace();
+			myAgent.doDelete();
+		}
+	}
 }
