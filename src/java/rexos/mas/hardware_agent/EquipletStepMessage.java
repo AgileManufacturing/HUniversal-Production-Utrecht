@@ -147,9 +147,8 @@ public class EquipletStepMessage implements IMongoSaveable {
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		serviceStepID = object.getObjectId("serviceStepID");
-		instructionData = new InstructionData(
-				(BasicDBObject) object.get("instructionData"));
+		instructionData = new InstructionData((BasicDBObject) object.get("instructionData"));
 		status = StepStatusCode.valueOf(object.getString("status"));
-		timeData = new TimeData(object.getInt("timeData"));
+		timeData = new TimeData(object.getInt("timeData"));	
 	}
 }

@@ -30,7 +30,7 @@
  **/
 package rexos.mas.service_agent;
 
-import java.util.HashMap;
+//import java.util.HashMap;
 
 import rexos.mas.data.Position;
 import rexos.mas.data.ScheduleData;

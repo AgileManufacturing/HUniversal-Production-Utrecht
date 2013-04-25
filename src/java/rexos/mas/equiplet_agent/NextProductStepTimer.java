@@ -20,7 +20,7 @@ public class NextProductStepTimer extends Timer{
 	 * @var int nextUsedTimeSlot
 	 * The next used time slot.
 	 */
-	private long nextUsedTimeSlot;
+	private int nextUsedTimeSlot;
 
 	/**
 	 * @var int firstTimeSlot
@@ -49,12 +49,12 @@ public class NextProductStepTimer extends Timer{
 	 * Function for setting the next used time slot.
 	 * @param nextUsedTimeSlot the index of the next used timeslot, fill -1 when not used.
 	 */
-	public void setNextUsedTimeSlot(long nextUsedTimeSlot){
+	public void setNextUsedTimeSlot(int nextUsedTimeSlot){
 		this.nextUsedTimeSlot = nextUsedTimeSlot;
 		cancel();
 		if(nextUsedTimeSlot != -1){
-			long startTimeSlot = nextUsedTimeSlot * timeSlotLength + firstTimeSlot;
-			long currentTime = System.currentTimeMillis();
+			int startTimeSlot = nextUsedTimeSlot * timeSlotLength + firstTimeSlot;
+			int currentTime = (int)System.currentTimeMillis();
 			this.schedule(new NextProductStepTask(), startTimeSlot - currentTime);
 		}
 	}
@@ -63,7 +63,7 @@ public class NextProductStepTimer extends Timer{
 	 * Getter for getting the nextUsedTimeSlot.
 	 * @return the next used timeslot
 	 */
-	public long getNextUsedTimeSlot() {
+	public int getNextUsedTimeSlot() {
 		return nextUsedTimeSlot;
 	}
 	
