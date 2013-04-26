@@ -59,7 +59,9 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		try {
-			Long[] parts = (Long[]) message.getContentObject();
+			System.out.format("%s ArePartsAvailable%n", myAgent.getLocalName());
+			
+			Integer[] parts = (Integer[]) message.getContentObject();
 			ACLMessage reply = message.createReply();
 			reply.setOntology("ArePartsAvailableResponse");
 			//TODO determine actual part availability

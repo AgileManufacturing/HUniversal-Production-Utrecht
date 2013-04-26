@@ -17,13 +17,13 @@ import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.service_agent.ServiceAgent;
 
-public class PlanStepWithLogistics extends ReceiveBehaviour {
+public class ScheduleStep extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	private ServiceAgent agent;
 
-	public PlanStepWithLogistics(Agent agent) {
-		super(agent, MessageTemplate.MatchOntology("PlanStepWithLogistics"));
+	public ScheduleStep(Agent agent) {
+		super(agent, MessageTemplate.MatchOntology("ScheduleStep"));
 		this.agent = (ServiceAgent) agent;
 	}
 
@@ -37,16 +37,17 @@ public class PlanStepWithLogistics extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
+				System.out.format("%s scheduling step with Logistics%n", agent.getLocalName());
+				
 				ProductStepMessage productStep = new ProductStepMessage(
 						(BasicDBObject) agent.getProductStepBBClient()
 								.findDocumentById((ObjectId) message
 										.getContentObject()));
-
-				ACLMessage sendMsg = message.createReply();
-				sendMsg.clearAllReceiver();
+				
+				ACLMessage sendMsg = new ACLMessage(ACLMessage.QUERY_IF);
+				sendMsg.setConversationId(message.getConversationId());
 				sendMsg.addReceiver(agent.getLogisticsAID());
 				sendMsg.setOntology("ArePartsAvailable");
-				sendMsg.setPerformative(ACLMessage.QUERY_IF);
 				sendMsg.setContentObject(productStep.getInputPartTypes());
 				agent.send(sendMsg);
 

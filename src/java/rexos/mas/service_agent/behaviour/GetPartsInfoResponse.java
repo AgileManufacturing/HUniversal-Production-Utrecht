@@ -46,6 +46,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.Position;
+import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.service_agent.ServiceAgent;
 import rexos.mas.service_agent.ServiceStepMessage;
 
@@ -96,22 +97,35 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 						.findDocuments(
 								new BasicDBObject("productStepId",
 										productStepId));
-				ServiceStepMessage[] serviceSteps = new ServiceStepMessage[dbServiceSteps.size()];
+				ServiceStepMessage[] serviceSteps = new ServiceStepMessage[dbServiceSteps
+						.size()];
 
 				for (int i = 0; i < dbServiceSteps.size(); i++) {
 					serviceSteps[i] = new ServiceStepMessage(
 							(BasicDBObject) dbServiceSteps.get(i));
 				}
 
-				HashMap<Long, Position> parameters = (HashMap<Long, Position>) message
+				HashMap<Integer, Position> parameters = (HashMap<Integer, Position>) message
 						.getContentObject();
+
+				System.out.format("%s got partsInfo: %s%n",
+						agent.getLocalName(), parameters.toString());
+
 				ServiceStepMessage[] filledInParameters = agent
 						.GetServiceForConvId(conversationId).updateParameters(
 								parameters, serviceSteps);
 
-				for(ServiceStepMessage serviceStep : filledInParameters) {
-					agent.getServiceStepBBClient().updateDocuments(new BasicDBObject("_id", serviceStep.getId()), serviceStep.toBasicDBObject());
+				for (ServiceStepMessage serviceStep : filledInParameters) {
+					agent.getServiceStepBBClient().updateDocuments(
+							new BasicDBObject("_id", serviceStep.getId()),
+							new BasicDBObject("$set", serviceStep
+									.toBasicDBObject()));
 				}
+
+				agent.getProductStepBBClient().updateDocuments(
+						new BasicDBObject("_id", productStepId),
+						new BasicDBObject("$set", new BasicDBObject("status",
+								StepStatusCode.PLANNED.name())));
 			} catch (UnreadableException | InvalidDBNamespaceException
 					| GeneralMongoException e) {
 				e.printStackTrace();

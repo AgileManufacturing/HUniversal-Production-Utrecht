@@ -73,6 +73,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
+				System.out.format("%s GetPartsInfo%n", myAgent.getLocalName());
 				// TODO probleem: als PA parameters aangeeft is dat soms
 				// part-gebonden: bal A op pos
 				// x en bal B op pos y. Daarom moeten de parts of als parameters
@@ -84,11 +85,11 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 				// hebben (van en naar pos). Een hashmap kan dus niet zomaar
 				// tenzij Position wordt uitgebreid met een van en naar pos.
 
-				Long[] partIds = (Long[]) message.getContentObject();
-				HashMap<Long, Position> partsParameters = new HashMap<Long, Position>();
+				Integer[] partIds = (Integer[]) message.getContentObject();
+				HashMap<Integer, Position> partsParameters = new HashMap<Integer, Position>();
 
 				int x = 0;
-				for (long partId : partIds) {
+				for (int partId : partIds) {
 					partsParameters.put(partId, new Position(x++, 1, 3));
 				}
 

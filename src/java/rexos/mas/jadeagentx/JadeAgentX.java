@@ -41,7 +41,6 @@ import java.util.ArrayList;
 
 import rexos.mas.data.Parameter;
 import rexos.mas.data.ParameterGroup;
-import rexos.mas.data.ParameterList;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
@@ -84,86 +83,35 @@ public class JadeAgentX extends Agent {
 					"rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 			// TODO code application logic here
 
-			ArrayList<Integer> capabilities2 = new ArrayList<>();
-			capabilities2.add(1);
-			capabilities2.add(2);
-			ar = new Object[] { capabilities2, logisticsAID };
-			getContainerController().createNewAgent("EQ2",
-					"rexos.mas.equiplet_agent.EquipletAgent", ar).start();
-
-			ArrayList<Integer> capabilities3 = new ArrayList<>();
-			capabilities3.add(1);
-			capabilities3.add(2);
-			ar = new Object[] { capabilities3, logisticsAID };
-			getContainerController().createNewAgent("EQ3",
-					"rexos.mas.equiplet_agent.EquipletAgent", ar).start();
-
-			ar = null;
+//			ArrayList<Integer> capabilities2 = new ArrayList<>();
+//			capabilities2.add(1);
+//			capabilities2.add(2);
+//			ar = new Object[] { capabilities2, logisticsAID };
+//			getContainerController().createNewAgent("EQ2",
+//					"rexos.mas.equiplet_agent.EquipletAgent", ar).start();
+//
+//			ArrayList<Integer> capabilities3 = new ArrayList<>();
+//			capabilities3.add(1);
+//			capabilities3.add(2);
+//			ar = new Object[] { capabilities3, logisticsAID };
+//			getContainerController().createNewAgent("EQ3",
+//					"rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 
 			/**
 			 * Lets make a parameter list
 			 */
-			ParameterList parameterList = new ParameterList();
-			ParameterGroup p = new ParameterGroup("Color"); // group colour
-			p.add(new Parameter("Id", "1"));
-			parameterList.AddParameterGroup(p);
-
-			p = new ParameterGroup("Shape"); // group shape
-			p.add(new Parameter("Id", "2"));
-			parameterList.AddParameterGroup(p);
-
-			p = new ParameterGroup("loc"); // group location
-			p.add(new Parameter("x", "2"));
-			p.add(new Parameter("y", "2"));
-			parameterList.AddParameterGroup(p);
+			ParameterGroup parameters = new ParameterGroup();
+			parameters.addParameter("part", new Parameter("1"));
+			parameters.addParameter("x", new Parameter("1"));
+			parameters.addParameter("y", new Parameter("2"));
+			parameters.addParameter("z", new Parameter("3"));
+			parameters.addParameter("relativeToPart", new Parameter("2"));
 
 			// Next we want to have some production steps
-			ProductionStep stp1 = new ProductionStep(1, 1, parameterList);
-
-			p = new ParameterGroup("Color"); // group colour
-			p.add(new Parameter("Id", "3"));
-			parameterList.AddParameterGroup(p);
-
-			p = new ParameterGroup("Shape"); // group shape
-			p.add(new Parameter("Id", "4"));
-			parameterList.AddParameterGroup(p);
-
-			p = new ParameterGroup("loc"); // group location
-			p.add(new Parameter("x", "2"));
-			p.add(new Parameter("y", "2"));
-			parameterList.AddParameterGroup(p);
-
-			ProductionStep stp2 = new ProductionStep(2, 1, parameterList);
-
-			p = new ParameterGroup("Color"); // group colour
-			p.add(new Parameter("Id", "5"));
-			parameterList.AddParameterGroup(p);
-
-			p = new ParameterGroup("Shape"); // group shape
-			p.add(new Parameter("Id", "6"));
-			parameterList.AddParameterGroup(p);
-
-			p = new ParameterGroup("loc"); // group location
-			p.add(new Parameter("x", "2"));
-			p.add(new Parameter("y", "2"));
-			parameterList.AddParameterGroup(p);
-
-			ProductionStep stp3 = new ProductionStep(3, 2, parameterList);
-
-			p = new ParameterGroup("Color"); // group colour
-			p.add(new Parameter("Id", "7"));
-			parameterList.AddParameterGroup(p);
-
-			p = new ParameterGroup("Shape"); // group shape
-			p.add(new Parameter("Id", "8"));
-			parameterList.AddParameterGroup(p);
-
-			p = new ParameterGroup("loc"); // group location
-			p.add(new Parameter("x", "2"));
-			p.add(new Parameter("y", "2"));
-			parameterList.AddParameterGroup(p);
-
-			ProductionStep stp4 = new ProductionStep(4, 3, parameterList);
+			ProductionStep stp1 = new ProductionStep(1, 1, parameters);
+			ProductionStep stp2 = new ProductionStep(2, 1, parameters);
+			ProductionStep stp3 = new ProductionStep(3, 1, parameters);
+			ProductionStep stp4 = new ProductionStep(4, 1, parameters);
 
 			/**
 			 * Our argument for the product agent. The total production of the

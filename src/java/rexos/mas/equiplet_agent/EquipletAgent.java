@@ -82,6 +82,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 * IP of the collective database.
 	 */
 	private String collectiveDbIp = "145.89.191.131";
+//	private String collectiveDbIp = "localhost";
 	
 	/**
 	 * @var int collectiveDbPort
@@ -345,7 +346,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 							timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 						}
 
-						responseMessage.setOntology("ProductionDuration");
+//						System.out.println("%s Sending ProductionDuration tot %s%n", getAID(), );
+						responseMessage.setOntology("Planned");
 						responseMessage.setContentObject(scheduleData.getStartTime());
 						send(responseMessage);
 					} catch (IOException e) {
@@ -425,7 +427,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		String conversationId = null;
 		if(communicationTable.containsValue(productStepEntry)){
 			for (Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
-				if (tableEntry.getValue() == productStepEntry) {
+				if (tableEntry.getValue().equals(productStepEntry)) {
 					conversationId = tableEntry.getKey();
 					break;
 				}

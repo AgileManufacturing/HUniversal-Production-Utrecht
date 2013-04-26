@@ -90,6 +90,8 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
+				System.out.format("%s ArePartsAvailableResponse%n",
+						agent.getLocalName());
 				if (message.getPerformative() == ACLMessage.CONFIRM) {
 					ACLMessage sendMsg = message.createReply();
 					sendMsg.setOntology("ArePartsAvailableInTime");
@@ -102,9 +104,10 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 				} else {
 					agent.getProductStepBBClient().updateDocuments(
 							new BasicDBObject("_id", productStepId),
-							new BasicDBObject("status", StepStatusCode.ABORTED)
+							new BasicDBObject("$set", new BasicDBObject(
+									"status", StepStatusCode.ABORTED.name())
 									.append("statusData", new BasicDBObject(
-											"reason", "missing parts")));
+											"reason", "missing parts"))));
 				}
 			} catch (IOException | InvalidDBNamespaceException
 					| GeneralMongoException e) {
