@@ -30,7 +30,7 @@
  **/
 package rexos.mas.service_agent;
 
-//import java.util.HashMap;
+import java.util.HashMap;
 
 import rexos.mas.data.Position;
 import rexos.mas.data.ScheduleData;
@@ -85,9 +85,9 @@ public class DummyService implements Service {
 	 */
 	@Override
 	public ServiceStepMessage[] updateParameters(
-			HashMap<Long, Position> partParameters,
+			HashMap<Integer, Position> partParameters,
 			ServiceStepMessage[] serviceSteps) {
-		return null;
+		return new ServiceStepMessage[0];
 	}
 
 	/*

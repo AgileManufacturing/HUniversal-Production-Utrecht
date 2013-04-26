@@ -50,18 +50,18 @@ public class PickAndPlaceService implements Service {
 		int[] moduleIds = new int[0];
 		//ArrayList<Integer> moduleIds = new ArrayList<Integer>();
 
-		try {
-			client = KnowledgeDBClient.getClient();
-
-			Object[] queryParameters = { "HUniplacer.pickandplace" };
-			Row[] rows = client.executeSelectQuery(Queries.MODULES_REQUIRED_PER_SERVICE, queryParameters);
-			moduleIds = new int[rows.length];
-			for(int i = 0; i < rows.length; i++){
-				moduleIds[i] = (int) rows[i].get("id");
-			}
-		} catch (KnowledgeException | KeyNotFoundException e1) {
-			e1.printStackTrace();
-		}
+//		try {
+//			client = KnowledgeDBClient.getClient();
+//
+//			Object[] queryParameters = { "HUniplacer.pickandplace" };
+//			Row[] rows = client.executeSelectQuery(Queries.MODULES_REQUIRED_PER_SERVICE, queryParameters);
+//			moduleIds = new int[rows.length];
+//			for(int i = 0; i < rows.length; i++){
+//				moduleIds[i] = (int) rows[i].get("id");
+//			}
+//		} catch (KnowledgeException | KeyNotFoundException e1) {
+//			e1.printStackTrace();
+//		}
 		return new int[] { 1, 2 };// TODO get this working
 		//return moduleIds;
 	}
@@ -71,7 +71,7 @@ public class PickAndPlaceService implements Service {
 	 */
 	@Override
 	public ServiceStepMessage[] getServiceSteps(int productStepType, BasicDBObject parameters) {
-		int inputPart = parameters.getInt("InputPart");
+		int inputPart = parameters.getInt("Position");
 		double inputPartSize = 0.5;// TODO: FROM KNOWLEDGE DB
 		ServiceStepMessage[] serviceStepMessages = new ServiceStepMessage[2];
 
@@ -114,7 +114,7 @@ public class PickAndPlaceService implements Service {
 	 */
 	@Override
 	public ServiceStepMessage[] updateParameters(
-			HashMap<Long, Position> partParameters,
+			HashMap<Integer, Position> partParameters,
 			ServiceStepMessage[] serviceSteps) {
 		// TODO Auto-generated method stub
 		return null;

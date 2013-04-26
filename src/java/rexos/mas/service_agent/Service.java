@@ -85,7 +85,7 @@ public interface Service {
 	 * @return
 	 */
 	public ServiceStepMessage[] updateParameters(
-			HashMap<Long, Position> partParameters,
+			HashMap<Integer, Position> partParameters,
 			ServiceStepMessage[] serviceSteps);
 
 	/**
