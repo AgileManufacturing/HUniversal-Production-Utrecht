@@ -61,7 +61,12 @@ public class ServiceFactory {
 			KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
 			Row[] rows = knowledgeClient.executeSelectQuery("SELECT * FROM software WHERE id=5");
 			if (rows.length > 0) {
-				DynamicClassDescription description = DynamicClassDescription.createFromRow(rows[0]);
+				DynamicClassDescription description = new DynamicClassDescription(
+						new Long((Integer)rows[0].get("id")),
+						(String)rows[0].get("name"),
+						(String)rows[0].get("description"),
+						(String)rows[0].get("class_name"),
+						(String)rows[0].get("jar_location"));
 				service = factory.createNewObjectIfOutdated(description, serviceCache.get(description.getId()));
 				serviceCache.put(description.getId(), service);
 			}
