@@ -39,6 +39,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.data.Position;
+import rexos.mas.equiplet_agent.ProductStepMessage;
 
 /**
  * @author Peter
@@ -85,7 +86,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 				// hebben (van en naar pos). Een hashmap kan dus niet zomaar
 				// tenzij Position wordt uitgebreid met een van en naar pos.
 
-				Integer[] partIds = (Integer[]) message.getContentObject();
+				Integer[] partIds = ((ProductStepMessage) message.getContentObject()).getInputPartTypes();
 				HashMap<Integer, Position> partsParameters = new HashMap<Integer, Position>();
 
 				int x = 0;
@@ -94,6 +95,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 				}
 
 				ACLMessage reply = message.createReply();
+				reply.setPerformative(ACLMessage.INFORM);
 				reply.setOntology("GetPartsInfoResponse");
 				reply.setContentObject(partsParameters);
 				myAgent.send(reply);

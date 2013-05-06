@@ -17,7 +17,6 @@ import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ParameterGroup;
 import rexos.mas.equiplet_agent.ProductStepMessage;
-import rexos.mas.service_agent.PickAndPlaceService;
 import rexos.mas.service_agent.Service;
 import rexos.mas.service_agent.ServiceAgent;
 import rexos.mas.service_agent.ServiceFactory;

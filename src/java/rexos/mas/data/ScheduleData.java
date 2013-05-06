@@ -1,5 +1,7 @@
 package rexos.mas.data;
 
+import java.io.Serializable;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 
@@ -9,7 +11,9 @@ import com.mongodb.BasicDBObjectBuilder;
  * @author Peter Bonnema
  *
  */
-public class ScheduleData implements IMongoSaveable {
+public class ScheduleData implements IMongoSaveable, Serializable {
+	private static final long serialVersionUID = 8380622365668923276L;
+	
 	private int startTime;
 	private int duration;
 	private int deadline;

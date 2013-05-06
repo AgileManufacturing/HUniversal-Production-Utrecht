@@ -1,19 +1,18 @@
 /**
- *
+ * 
  * Project: product-agents
- *
+ * 
  * Package: newDataClasses
- *
+ * 
  * File: ParameterGroup.java
- *
+ * 
  * Author: Mike Schaap
- *
+ * 
  * Version: 1.0
- *
+ * 
  */
 package rexos.mas.data;
 
-import java.io.Serializable;
 import java.util.HashMap;
 
 import com.mongodb.BasicDBObject;
@@ -22,8 +21,8 @@ import com.mongodb.BasicDBObject;
  * @author Peter
  * 
  */
-public class ParameterGroup extends Parameter implements IMongoSaveable, Serializable {
-	private static final long serialVersionUID = 1L;
+public class ParameterGroup extends Parameter implements IMongoSaveable {
+	private static final long serialVersionUID = -8737315910311192437L;
 	
 	/**
 	 * 
@@ -49,8 +48,9 @@ public class ParameterGroup extends Parameter implements IMongoSaveable, Seriali
 	 * @param name
 	 * @param parameter
 	 */
-	public void addParameter(String name, Parameter parameter) {
+	public ParameterGroup addParameter(String name, Parameter parameter) {
 		_parameters.put(name, parameter);
+		return this;
 	}
 
 	/**
@@ -76,42 +76,34 @@ public class ParameterGroup extends Parameter implements IMongoSaveable, Seriali
 		return (HashMap<String, Parameter>) _parameters.clone();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see rexos.mas.data.IMongoSaveable#toBasicDBObject()
-	 */
+	/* (non-Javadoc)
+	 * @see rexos.mas.data.IMongoSaveable#toBasicDBObject() */
 	@Override
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject dbObject = new BasicDBObject();
-		for (String name : _parameters.keySet()) {
-			Parameter parameter = _parameters.get(name);
-			if (parameter instanceof ParameterGroup) {
-				dbObject.append(name,
-						((ParameterGroup) parameter).toBasicDBObject());
+		for(String name : _parameters.keySet()) {
+			Object parameterValue = _parameters.get(name).getValue();
+			if(parameterValue instanceof IMongoSaveable) {
+				dbObject.append(name, ((IMongoSaveable) parameterValue).toBasicDBObject());
 			} else {
-				dbObject.append(name, parameter.getValue());
+				dbObject.append(name, parameterValue);
 			}
 		}
 		return dbObject;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see
 	 * rexos.mas.data.IMongoSaveable#fromBasicDBObject(com.mongodb.BasicDBObject
-	 * )
-	 */
+	 * ) */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		for (String name : object.keySet()) {
+		for(String name : object.keySet()) {
 			Object parameter = object.get(name);
-			if (parameter instanceof BasicDBObject) {
-				_parameters.put(name, new ParameterGroup(
-						(BasicDBObject) parameter));
+			if(parameter instanceof BasicDBObject) {
+				_parameters.put(name, new ParameterGroup((BasicDBObject) parameter));
 			} else {
-				_parameters.put(name, new Parameter((String) object.get(name)));
+				_parameters.put(name, new Parameter(object.get(name)));
 			}
 		}
 	}
