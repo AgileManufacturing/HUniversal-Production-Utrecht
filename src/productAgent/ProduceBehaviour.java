@@ -4,7 +4,7 @@
 
 package productAgent;
 
-import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.CyclicBehaviour;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ import newDataClasses.ProductionStepStatus;
  * @author Theodoor de Graaff <theodoor.degraaff@student.hu.nl>
  * 
  */
-public class ProduceBehaviour extends OneShotBehaviour{
+public class ProduceBehaviour extends CyclicBehaviour{
 	/**
 	 * 
 	 */
