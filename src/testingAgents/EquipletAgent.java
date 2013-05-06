@@ -30,8 +30,7 @@ public class EquipletAgent extends Agent{
 	public static boolean getRandomBoolean(){
 		@SuppressWarnings("unused")
 		Random random = new Random();
-		// return random.nextBoolean();
-		return true;
+		return random.nextBoolean();
 	}
 
 	public static int getRandomInt(int r){
@@ -106,9 +105,11 @@ public class EquipletAgent extends Agent{
 					message.setOntology("CanPerformStep");
 					message.addReceiver(msg.getSender());
 					// Debuggin. Set false to disconfirm the requested step
+					
 					if (getRandomBoolean()){
 						message.setPerformative(ACLMessage.CONFIRM);
 					}
+					
 					message.setConversationId(convid);
 					delay = getRandomInt(randomSeed / 2);
 					if (debug)

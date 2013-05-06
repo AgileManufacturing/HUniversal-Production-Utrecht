@@ -29,34 +29,34 @@ public class MainAgent extends Agent{
 			System.out.println("Starting agents:");
 			// instantiate the 'equiplet' agents
 			Object[] ar = new Object[]{1};// pickndplace
-			getContainerController().createNewAgent("eqa1",
+			getContainerController().createNewAgent("EQ1",
 					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[]{2}; // colour
-			getContainerController().createNewAgent("eqa2",
+			getContainerController().createNewAgent("EQ2",
 					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[]{3}; // rotate
-			getContainerController().createNewAgent("eqa3",
+			getContainerController().createNewAgent("EQ3",
 					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[]{2}; // rotate
-			getContainerController().createNewAgent("eqa4",
+			getContainerController().createNewAgent("EQ4",
 					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[]{1}; // rotate
-			getContainerController().createNewAgent("eqa5",
+			getContainerController().createNewAgent("EQ5",
 					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[]{3}; // rotate
-			getContainerController().createNewAgent("eqa6",
+			getContainerController().createNewAgent("EQ6",
 					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[]{1}; // rotate
-			getContainerController().createNewAgent("eqa7",
+			getContainerController().createNewAgent("EQ7",
 					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[]{1}; // rotate
-			getContainerController().createNewAgent("eqa8",
+			getContainerController().createNewAgent("EQ8",
 					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[]{2}; // rotate
-			getContainerController().createNewAgent("eqa9",
+			getContainerController().createNewAgent("EQ9",
 					"testingAgents.EquipletAgent", ar).start();
 			ar = new Object[]{3}; // rotate
-			getContainerController().createNewAgent("eqa10",
+			getContainerController().createNewAgent("EQ10",
 					"testingAgents.EquipletAgent", ar).start();
 			ar = null;
 			// Lets make a parameter list
