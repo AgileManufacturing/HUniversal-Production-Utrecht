@@ -188,6 +188,7 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 				}
 			}
 		}
+		
 		// init AID
 		AID equipletAID = null;
 		// get the equiplet from the timeslot
@@ -216,10 +217,13 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 			msg.setContent("" + freetimeslotEq.getStartTime());
 			msg.addReceiver(equipletAID);
 			myAgent.send(msg);
+			
 			if(debug != 0){
 				// debug
 				System.out.println("Send Timeslot " + equipletAID.getName()
 						+ " to EQ");
+				System.out.println(equipletAID);
+				
 			}
 		} else{
 			if(debug != 0){
@@ -228,10 +232,15 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 			}
 		}
 		if(debug != 0){
-		System.out.println();
+			System.out.println();
 		}
 	}
 
+	/**
+	 * FreeTimeSlot which contains the specifications of a timeslot
+	 * @author Ricky
+	 *
+	 */
 	private class FreeTimeSlot{
 		private int startTime = -1;
 		private int duration = -1;
@@ -263,6 +272,11 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 		}
 	}
 
+	/**
+	 * Schedule Object containts information to schedule a timeslot
+	 * @author Ricky
+	 *
+	 */
 	private class Schedule{
 		private int startTime = -1;
 		private int duration = -1;
