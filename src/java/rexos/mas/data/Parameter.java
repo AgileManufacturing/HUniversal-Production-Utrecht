@@ -16,30 +16,16 @@ package rexos.mas.data;
 import java.io.Serializable;
 
 public class Parameter implements Serializable {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -7830428356814146610L;
-	private String _key;
+	private static final long serialVersionUID = 1L;
+	
 	private String _value;
 	
-	public Parameter(String key) throws Exception {
-		if(key == null) throw new Exception("Key can't be null");
-		this._key = key;
+	public Parameter() {
+		this._value = null;
 	}
 	
-	public Parameter(String key, String value) throws Exception {
-		this(key);
-		if(value == null) throw new Exception("Value can't be null");
+	public Parameter(String value) {
 		this._value = value;
-	}
-	
-	/**
-	 * @return the _key
-	 */
-	public String getKey() {
-		return _key;
 	}
 
 	/**

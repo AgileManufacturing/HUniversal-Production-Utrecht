@@ -1,5 +1,7 @@
 package rexos.mas.equiplet_agent.behaviours;
 
+import java.io.IOException;
+
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
@@ -8,6 +10,8 @@ import jade.lang.acl.MessageTemplate;
 import org.bson.types.ObjectId;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.EquipletAgent;
@@ -54,20 +58,26 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 
 				//sends a message to the productAgent with the production duration.
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
-				AID productAgent = productStep.getProductAgentId();
-				responseMessage.addReceiver(productAgent);
+				responseMessage.addReceiver(productStep.getProductAgentId());
 				responseMessage.setOntology("ProductionDuration");
 				responseMessage.setConversationId(message.getConversationId());
-				responseMessage.setContentObject(schedule.getDuration());
-				myAgent.send(responseMessage);
+				responseMessage.setContentObject(new Long(schedule.getDuration()));
+				equipletAgent.send(responseMessage);
+				
+				ACLMessage scheduleStepMessage = new ACLMessage(ACLMessage.REQUEST);
+				scheduleStepMessage.addReceiver(equipletAgent.getAID());
+				scheduleStepMessage.setOntology("ScheduleStep");
+				scheduleStepMessage.setConversationId(message.getConversationId());
+				scheduleStepMessage.setContent(String.valueOf(5));
+				equipletAgent.send(scheduleStepMessage);
 
 				System.out.format("sending message: %s%n", responseMessage.getOntology());
-
-			} catch (Exception e) {
+				System.out.format("sending message: %s%n", scheduleStepMessage.getOntology());
+			} catch (IOException | InvalidDBNamespaceException | GeneralMongoException e) {
 				e.printStackTrace();
-				myAgent.doDelete();
+				equipletAgent.doDelete();
 			}
 		}
-		myAgent.removeBehaviour(this);
+		equipletAgent.removeBehaviour(this);
 	}
 }

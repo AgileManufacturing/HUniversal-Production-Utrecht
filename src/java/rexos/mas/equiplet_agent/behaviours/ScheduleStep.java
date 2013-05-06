@@ -29,10 +29,16 @@
  **/
 package rexos.mas.equiplet_agent.behaviours;
 
+import org.bson.types.ObjectId;
+
+import com.mongodb.BasicDBObject;
+
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.EquipletAgent;
 
 /**
@@ -40,28 +46,29 @@ import rexos.mas.equiplet_agent.EquipletAgent;
  */
 public class ScheduleStep extends ReceiveBehaviour {
 	/**
-	 * @var static final long serialVersionUID
-	 * The serial version UID for this class
+	 * @var static final long serialVersionUID The serial version UID for this
+	 *      class
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
-	 * @var MessageTemplate messageTemplate
-	 * The messageTemplate this behaviour listens to.
-	 * This behaviour listens to the ontology: ScheduleStep.
+	 * @var MessageTemplate messageTemplate The messageTemplate this behaviour
+	 *      listens to. This behaviour listens to the ontology: ScheduleStep.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("ScheduleStep");
-	
+	private static MessageTemplate messageTemplate = MessageTemplate
+			.MatchOntology("ScheduleStep");
+
 	/**
-	 * @var EquipletAgent equipletAgent
-	 * The equipletAgent related to this behaviour.
+	 * @var EquipletAgent equipletAgent The equipletAgent related to this
+	 *      behaviour.
 	 */
 	private EquipletAgent equipletAgent;
 
 	/**
 	 * Instantiates a new schedule step.
-	 *
-	 * @param a The agent for this behaviour
+	 * 
+	 * @param a
+	 *            The agent for this behaviour
 	 */
 	public ScheduleStep(Agent a) {
 		super(a, messageTemplate);
@@ -69,27 +76,42 @@ public class ScheduleStep extends ReceiveBehaviour {
 	}
 
 	/**
-	 * Function to handle the incoming messages for this behaviour.
-	 * Handles the response to the ScheduleStep question and asks the service agent to schedule.
+	 * Function to handle the incoming messages for this behaviour. Handles the
+	 * response to the ScheduleStep question and asks the service agent to
+	 * schedule.
 	 * 
-	 * @param message - The received message.
+	 * @param message
+	 *            - The received message.
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		System.out.format("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
+		System.out.format("%s received message from %s%n", equipletAgent
+				.getLocalName(), message.getSender().getLocalName(), message
+				.getOntology());
 
-		//Gets the timeslot from the string, asks the serviceAgent to plan the step with logistics.
-		try{
+		// Gets the timeslot from the string, asks the serviceAgent to plan the
+		// step with logistics.
+		try {
 			int timeslot = Integer.parseInt(message.getContent());
 			System.out.format("scheduling step for timeslot %d%n", timeslot);
-			ACLMessage timeslotMessage = new ACLMessage(ACLMessage.REQUEST);
-			timeslotMessage.addReceiver(equipletAgent.getServiceAgent());
-			timeslotMessage.setOntology("PlanStepWithLogistics");
-			timeslotMessage.setContent(String.valueOf(timeslot));
-			timeslotMessage.setConversationId(message.getConversationId());
-			myAgent.send(timeslotMessage);
-		}
-		catch(Exception e){
+
+			ObjectId productStepId = equipletAgent.getRelatedObjectId(message
+					.getConversationId());
+			BlackboardClient client = equipletAgent.getEquipletBBClient();
+			ScheduleData scheduleData = new ScheduleData(
+					(BasicDBObject) ((BasicDBObject) client.findDocumentById(productStepId)).get("scheduleData"));
+			scheduleData.setStartTime(timeslot);
+			client.updateDocuments(new BasicDBObject("_id", productStepId),
+					new BasicDBObject("$set", new BasicDBObject("scheduleData",
+							scheduleData.toBasicDBObject())));
+
+			ACLMessage scheduleMessage = new ACLMessage(ACLMessage.REQUEST);
+			scheduleMessage.addReceiver(equipletAgent.getServiceAgent());
+			scheduleMessage.setOntology("ScheduleStep");
+			scheduleMessage.setContentObject(productStepId);
+			scheduleMessage.setConversationId(message.getConversationId());
+			equipletAgent.send(scheduleMessage);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

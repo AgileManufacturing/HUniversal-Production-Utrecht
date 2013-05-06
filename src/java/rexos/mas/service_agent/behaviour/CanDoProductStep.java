@@ -15,7 +15,9 @@ import org.bson.types.ObjectId;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.ParameterGroup;
 import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.service_agent.PickAndPlaceService;
 import rexos.mas.service_agent.Service;
 import rexos.mas.service_agent.ServiceAgent;
 import rexos.mas.service_agent.ServiceFactory;
@@ -53,17 +55,18 @@ public class CanDoProductStep extends ReceiveBehaviour {
 					(BasicDBObject) agent.getProductStepBBClient()
 							.findDocumentById(productStepId));
 			int stepType = productStep.getType();
-			BasicDBObject parameters = productStep.getParameters();
+			ParameterGroup parameters = productStep.getParameters();
 
 			System.out.format(
 					"%s got message CanDoProductionStep for step type %s%n",
 					agent.getLocalName(), stepType);
 
-			if (factory == null)
-				factory = new ServiceFactory(message.getSender().getLocalName());
-			
+			 if (factory == null)
+				 factory = new ServiceFactory(message.getSender().getLocalName());
+
 			Service[] services = factory.getServicesForStep(stepType);
-			if ((services = factory.getServicesForStep(stepType)).length > 0) {
+//			Service[] services = new Service[] { new PickAndPlaceService() };
+			if (services.length > 0) {
 				Service service = services[0];
 				agent.MapConvIdWithService(message.getConversationId(), service);
 
@@ -72,8 +75,9 @@ public class CanDoProductStep extends ReceiveBehaviour {
 				newMsg.addReceiver(agent.getHardwareAgentAID());
 				newMsg.setOntology("CheckForModules");
 				try {
+					//TODO change service.getModuleIds parameters to type ParameterGroup
 					newMsg.setContentObject(service.getModuleIds(stepType,
-							parameters));
+							parameters.toBasicDBObject()));
 				} catch (IOException e) {
 					e.printStackTrace();
 					agent.doDelete();
@@ -86,8 +90,9 @@ public class CanDoProductStep extends ReceiveBehaviour {
 				reply.setPerformative(ACLMessage.DISCONFIRM);
 				reply.setOntology("CanDoProductionStepResponse");
 				getAgent().send(reply);
-				System.out.format("%s sending step availability (%b)%n", getAgent()
-						.getLocalName(), reply.getPerformative() == ACLMessage.CONFIRM);
+				System.out.format("%s sending step availability (%b)%n",
+						getAgent().getLocalName(),
+						reply.getPerformative() == ACLMessage.CONFIRM);
 			}
 		} catch (UnreadableException | InvalidDBNamespaceException
 				| GeneralMongoException e) {

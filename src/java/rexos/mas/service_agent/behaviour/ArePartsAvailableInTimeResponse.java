@@ -71,9 +71,9 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 	 */
 	public ArePartsAvailableInTimeResponse(Agent a, int millis,
 			String conversationId, ObjectId productStepId, Integer[] parts) {
-		super(a, millis, MessageTemplate.and(
-				MessageTemplate.MatchConversationId(conversationId),
-				MessageTemplate.MatchOntology("ArePartsAvailableResponse")));
+		super(a, millis, MessageTemplate.and(MessageTemplate
+				.MatchConversationId(conversationId), MessageTemplate
+				.MatchOntology("ArePartsAvailableInTimeResponse")));
 		agent = (ServiceAgent) a;
 		this.conversationId = conversationId;
 		this.productStepId = productStepId;
@@ -90,6 +90,8 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
+				System.out.format("%s ArePartsAvailableInTimeResponse%n",
+						agent.getLocalName());
 				if (message.getPerformative() == ACLMessage.CONFIRM) {
 					ACLMessage sendMsg = message.createReply();
 					sendMsg.setOntology("GetPartsInfo");
@@ -103,11 +105,14 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 					agent.getProductStepBBClient()
 							.updateDocuments(
 									new BasicDBObject("_id", productStepId),
-									new BasicDBObject("status",
-											StepStatusCode.ABORTED)
-											.append("statusData",
-													new BasicDBObject("reason",
-															"parts cannot be delivered on time")));
+									new BasicDBObject(
+											"$set",
+											new BasicDBObject("status",
+													StepStatusCode.ABORTED.name())
+													.append("statusData",
+															new BasicDBObject(
+																	"reason",
+																	"parts cannot be delivered on time"))));
 				}
 			} catch (IOException | InvalidDBNamespaceException
 					| GeneralMongoException e) {

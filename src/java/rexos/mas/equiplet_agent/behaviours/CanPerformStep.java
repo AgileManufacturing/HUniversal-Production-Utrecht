@@ -55,20 +55,21 @@ import com.mongodb.BasicDBObject;
  */
 public class CanPerformStep extends ReceiveBehaviour {
 	/**
-	 * @var static final long serialVersionUID 
-	 * The serial version UID for this class
+	 * @var static final long serialVersionUID The serial version UID for this
+	 *      class
 	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
-	 * The messageTemplate this behaviour listens to. This behaviour listens to the ontology: CanPeformStep.
+	 * @var MessageTemplate messageTemplate The messageTemplate this behaviour
+	 *      listens to. This behaviour listens to the ontology: CanPeformStep.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CanPerformStep");
+	private static MessageTemplate messageTemplate = MessageTemplate
+			.MatchOntology("CanPerformStep");
 
 	/**
-	 * @var EquipletAgent equipletAgent 
-	 * The equipletAgent related to this behaviour.
+	 * @var EquipletAgent equipletAgent The equipletAgent related to this
+	 *      behaviour.
 	 */
 	private EquipletAgent equipletAgent;
 	private BlackboardClient equipletBBClient;
@@ -95,23 +96,33 @@ public class CanPerformStep extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		System.out.format("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
+		System.out.format("%s received message from %s%n",
+				myAgent.getLocalName(), message.getSender().getLocalName(),
+				message.getOntology());
 
 		ProductionStep productStep = null;
 		try {
 			// gets the productstep out of the message.
 			productStep = (ProductionStep) message.getContentObject();
 			ObjectId productStepEntryId = null;
-			
+
 			// puts the productstep on the blackboard.
 			// TODO: get inputParts instead of dummy data
 			Integer[] inputParts = { 1, 2, 3 };
 			// TODO: get outputPart
 			int outputPart = -1;
-			ProductStepMessage entry = new ProductStepMessage(message.getSender(), (int)productStep.getCapability(), productStep.getParameterListAsDBObject(), inputParts, outputPart, StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
-			productStepEntryId = equipletBBClient.insertDocument(entry.toBasicDBObject());
-			equipletAgent.addCommunicationRelation(message.getConversationId(), productStepEntryId);
-			
+			ProductStepMessage entry = new ProductStepMessage(
+					message.getSender(), productStep.getCapability(),
+					productStep.getParameters(), inputParts,
+					outputPart, StepStatusCode.EVALUATING, new BasicDBObject(),
+					new ScheduleData());
+			productStepEntryId = equipletBBClient.insertDocument(entry
+					.toBasicDBObject());
+			equipletAgent.addCommunicationRelation(message.getConversationId(),
+					productStepEntryId);
+			String convId = equipletAgent.getConversationId(productStepEntryId);
+			ObjectId id = equipletAgent.getRelatedObjectId(message.getConversationId());
+
 			// asks the service agent if the productionstep can be done.
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
 			responseMessage.setConversationId(message.getConversationId());
@@ -120,9 +131,10 @@ public class CanPerformStep extends ReceiveBehaviour {
 			responseMessage.setContentObject(productStepEntryId);
 			myAgent.send(responseMessage);
 
-			// starts a behaviour which listens to the response of this question.
-			CanDoProductionStepResponse canDoProductionStepResponseBehaviour = new CanDoProductionStepResponse(myAgent, equipletBBClient);
-			myAgent.addBehaviour(canDoProductionStepResponseBehaviour);
+			// starts a behaviour which listens to the response of this
+			// question.
+			myAgent.addBehaviour(new CanDoProductionStepResponse(myAgent,
+					equipletBBClient));
 		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 			e.printStackTrace();
 			myAgent.doDelete();
@@ -133,6 +145,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 			reply.setContent("Failed to process the step");
 			myAgent.send(reply);
 		} catch (UnreadableException e) {
+			e.printStackTrace();
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.FAILURE);
 			reply.setContent("No step given");

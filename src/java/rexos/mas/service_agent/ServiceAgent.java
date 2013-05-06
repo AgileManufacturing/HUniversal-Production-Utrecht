@@ -18,9 +18,9 @@ import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.mas.data.DbData;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.equiplet_agent.StepStatusCode;
-import rexos.mas.logistics_agent.behaviours.ArePartsAvailable;
 import rexos.mas.service_agent.behaviour.CanDoProductStep;
 import rexos.mas.service_agent.behaviour.GetProductStepDuration;
+import rexos.mas.service_agent.behaviour.ScheduleStep;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -85,11 +85,11 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		// addBehaviour(new AnswerBehaviour(this));
 		addBehaviour(new CanDoProductStep(this));
 		addBehaviour(new GetProductStepDuration(this));
-		addBehaviour(new ArePartsAvailable(this));
+		addBehaviour(new ScheduleStep(this));
 
 		// receive behaviours from EA
 		// add EvaluateProductionStep receiveBehaviour --> conversation with HA
-		// add PlanStepWithLogistics receiveBehaviour --> conversation with LA
+		// add ScheduleStep receiveBehaviour --> conversation with LA
 		// add ScheduleStep receiveBehaviour
 		// add StepDuration receiveBehaviour
 		// add StepDuration receiveBehaviour

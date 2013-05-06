@@ -14,80 +14,105 @@
 package rexos.mas.data;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashMap;
 
-public class ParameterGroup implements Serializable{
+import com.mongodb.BasicDBObject;
+
+/**
+ * @author Peter
+ * 
+ */
+public class ParameterGroup extends Parameter implements IMongoSaveable, Serializable {
+	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * 
+	 */
+	private HashMap<String, Parameter> _parameters;
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 4985505923411671880L;
+	public ParameterGroup() {
+		_parameters = new HashMap<String, Parameter>();
+	}
 
-	private String _name;
-	
-	private HashMap<String, Parameter> _parameters;
-	
-	public ParameterGroup(String name) {
-		this._name = name;
-		this._parameters = new HashMap<>();
-		
+	/**
+	 * 
+	 */
+	public ParameterGroup(BasicDBObject object) {
+		_parameters = new HashMap<String, Parameter>();
+		fromBasicDBObject(object);
 	}
-	
-	public ParameterGroup(Parameter parameter, String name) throws Exception {
-		this(name);
-		this.add(parameter);
+
+	/**
+	 * @param name
+	 * @param parameter
+	 */
+	public void addParameter(String name, Parameter parameter) {
+		_parameters.put(name, parameter);
 	}
-	
-	public ParameterGroup(Parameter[] parameters, String name) throws Exception {
-		this(name);
-		this.add(parameters);
+
+	/**
+	 * @param name
+	 * @return
+	 */
+	public Parameter getParameter(String name) {
+		return _parameters.get(name);
 	}
-	
-	
-	public String getName() {
-		return this._name;
+
+	/**
+	 * @param name
+	 * @return
+	 */
+	public Parameter removeParameter(String name) {
+		return _parameters.remove(name);
 	}
-	
-	
-	public void add(Parameter parameter) throws Exception {
-		if(parameter == null) throw new Exception("Can't add a null parameter!");
-		this._parameters.put(parameter.getKey(), parameter);
+
+	/**
+	 * @return
+	 */
+	public HashMap<String, Parameter> getParameters() {
+		return (HashMap<String, Parameter>) _parameters.clone();
 	}
-	
-	public void add(Parameter[] parameters) throws Exception {
-		if(parameters == null) throw new Exception("Can't add null parameters!");
-		for(Parameter p : parameters) {
-			this.add(p);
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see rexos.mas.data.IMongoSaveable#toBasicDBObject()
+	 */
+	@Override
+	public BasicDBObject toBasicDBObject() {
+		BasicDBObject dbObject = new BasicDBObject();
+		for (String name : _parameters.keySet()) {
+			Parameter parameter = _parameters.get(name);
+			if (parameter instanceof ParameterGroup) {
+				dbObject.append(name,
+						((ParameterGroup) parameter).toBasicDBObject());
+			} else {
+				dbObject.append(name, parameter.getValue());
+			}
+		}
+		return dbObject;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * rexos.mas.data.IMongoSaveable#fromBasicDBObject(com.mongodb.BasicDBObject
+	 * )
+	 */
+	@Override
+	public void fromBasicDBObject(BasicDBObject object) {
+		for (String name : object.keySet()) {
+			Object parameter = object.get(name);
+			if (parameter instanceof BasicDBObject) {
+				_parameters.put(name, new ParameterGroup(
+						(BasicDBObject) parameter));
+			} else {
+				_parameters.put(name, new Parameter((String) object.get(name)));
+			}
 		}
 	}
-	
-	public Parameter getParameter(String key) {
-		return this._parameters.get(key);
-	}
-	
-	public Parameter[] getParameters() {
-		Collection<Parameter> values = this._parameters.values();	
-		return values.toArray(new Parameter[values.size()]);
-	}
-	
-	/*
-	 * Directly get for a parameter.
-	 * No need to first retrieve the parameter object
-	 */
-	
-	public String getParameterValue(String key) {
-		return this._parameters.get(key).getValue();
-	}
-	
-	public void setParameterValue(String key, String value) throws Exception {
-			this._parameters.put(key, new Parameter(key, value));
-	}
-	
-	
-	
-	
-	
-	
-	
 }

@@ -69,7 +69,8 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
-				Long[] parts = (Long[]) message.getContentObject();
+				System.out.format("%s ArePartsAvailableInTime%n", myAgent.getLocalName());
+				Integer[] parts = (Integer[]) message.getContentObject();
 				ACLMessage reply = message.createReply();
 				reply.setOntology("ArePartsAvailableInTimeResponse");
 				reply.setPerformative(ACLMessage.CONFIRM);
