@@ -218,6 +218,13 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 			msg.addReceiver(equipletAID);
 			myAgent.send(msg);
 			
+			/* SEND MESSAGES TO OTHER PLATFORMS
+			 * computername is resolved by the hosts file in either Linux or Windows
+			AID remoteAMS = new AID("agentname@"+containername, AID.ISGUID);  		
+			remoteAMS.addAddresses("http://"+computername+":"+portnumber+"/acc");
+			msg.addReceiver(remoteAMS);
+			myAgent.send(msg);*/
+			
 			if(debug != 0){
 				// debug
 				System.out.println("Send Timeslot " + equipletAID.getName()
