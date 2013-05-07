@@ -65,7 +65,7 @@ import rexos.mas.service_agent.ServiceStepMessage;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
-public class HardwareAgent extends Agent implements BlackboardSubscriber {
+public class HardwareAgent extends Agent implements BlackboardSubscriber, ModuleUpdateListener {
 	private static final long serialVersionUID = 1L;
 
 	private BlackboardClient serviceStepBBClient, equipletStepBBClient;
@@ -215,7 +215,6 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 				}
 
 				break;
-			// $CASES-OMITTED$
 			default:
 				break;
 			}
@@ -234,13 +233,36 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 					e.printStackTrace();
 				}
 				break;
-			// $CASES-OMITTED$
 			default:
 				break;
 			}
 			break;
 		default:
 			break;
+		}
+	}
+
+	@Override
+	public void onModuleUpdate(int moduleId, Module oldSoftware, Module newSoftware) {
+		try {
+			KnowledgeDBClient client = KnowledgeDBClient.getClient();
+			Row[] rows;
+
+			rows = client.executeSelectQuery(Queries.MODULES);
+
+			for (int i = 0; i < rows.length; i++) {
+				System.out.println(rows[i]);
+
+				// neem id van module
+				// geef id aan modulefactory,
+				// je krijgt een module terug,
+				//
+				// register module bij de hardwareagent..
+
+			}
+		} catch (KnowledgeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

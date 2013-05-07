@@ -2,7 +2,6 @@ package rexos.mas.equiplet_agent.behaviours;
 
 import java.io.IOException;
 
-import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
