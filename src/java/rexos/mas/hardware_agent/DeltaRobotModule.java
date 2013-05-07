@@ -29,28 +29,38 @@
  **/
 package rexos.mas.hardware_agent;
 
+import java.util.ArrayList;
+
 import rexos.mas.equiplet_agent.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 
 public class DeltaRobotModule implements Module {
+	int saveMovementPlane = 6;
+	
 	public DeltaRobotModule(){
 	}
 
 	@Override
 	public EquipletStepMessage[] getEquipletSteps(int stepType,BasicDBObject parameters) {
+		EquipletStepMessage[] equipletSteps;
+		ArrayList<EquipletStepMessage> steps;
 		
-		EquipletStepMessage[] dummyData = { new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(5)) };		
+		switch(stepType){
 		
-		return dummyData;
-	}
-	
-	public EquipletStepMessage getEquipletStep(BasicDBObject parameters) {
-		
-		// maak een equipletStep aan de hand van de parameters
-		EquipletStepMessage equipletStep = new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(7));		
-		
-		
-		return equipletStep;
+		case 1: //Move to savePlane
+			steps = new ArrayList<EquipletStepMessage>();
+			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3)));
+			equipletSteps = new EquipletStepMessage[steps.size()];
+			return steps.toArray(equipletSteps);
+		case 2: //Move
+			steps = new ArrayList<EquipletStepMessage>();
+			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3)));
+			equipletSteps = new EquipletStepMessage[steps.size()];
+			return steps.toArray(equipletSteps);
+		default:
+			break;
+		}
+		return new EquipletStepMessage[0];
 	}
 }

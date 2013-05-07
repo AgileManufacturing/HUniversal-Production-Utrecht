@@ -95,20 +95,20 @@ public class PickAndPlaceService implements Service {
 	 */
 	@Override
 	public ServiceStepMessage[] getServiceSteps(int productStepType, BasicDBObject parameters) {
-		int inputPart = parameters.getInt("part");
+		int part = parameters.getInt("part");
 		double inputPartSize = 0.5;// TODO: FROM KNOWLEDGE DB
 
-		BasicDBObject pickParameters =
-				new BasicDBObject().append("part", inputPart)
-						.append("position", new Position().toBasicDBObject())
-						.append("SaveMovementPlane", saveMovementPlane);
+		BasicDBObject pickParameters = new BasicDBObject();
+		pickParameters.put("InputPart", part);
+		pickParameters.put("Position", new Position());
+		pickParameters.put("SaveMovementPlane", new BasicDBObject("Height", saveMovementPlane).put("RelativeTo", null));
 
-		Position placePosition = new Position((BasicDBObject) parameters.get("position"));
-		placePosition.setZ(placePosition.getZ() + inputPartSize);
-		BasicDBObject placeParameters =
-				new BasicDBObject().append("part", inputPart)
-						.append("position", placePosition.toBasicDBObject())
-						.append("SaveMovementPlane", saveMovementPlane);
+		Position position = new Position((BasicDBObject) parameters.get("Position"));
+		position.setZ(position.getZ() + inputPartSize);
+		BasicDBObject placeParameters = new BasicDBObject();
+		placeParameters.put("InputPart", part);
+		placeParameters.put("Position", position);
+		placeParameters.put("SaveMovementPlane", new BasicDBObject("Height", saveMovementPlane).put("RelativeTo", part));
 
 		return new ServiceStepMessage[] {
 				new ServiceStepMessage(id, 4, pickParameters, StepStatusCode.EVALUATING, null, null),
@@ -118,7 +118,6 @@ public class PickAndPlaceService implements Service {
 		// place //TODO NOT HARDCODE ID.
 		};
 	}
-
 	/* (non-Javadoc)
 	 * @see rexos.mas.service_agent.Service#updateParameters(java.util.HashMap,
 	 * rexos.mas.service_agent.ServiceStepMessage[]) */
