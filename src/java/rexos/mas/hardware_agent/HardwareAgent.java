@@ -71,6 +71,9 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	}
 
 	public int getLeadingModule(int serviceId) {
+		if(leadingModuleForStep.get(serviceId) == null){
+			return 0;
+		}
 		return leadingModuleForStep.get(serviceId);
 	}
 
