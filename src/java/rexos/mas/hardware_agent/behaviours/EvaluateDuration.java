@@ -46,6 +46,7 @@ import rexos.mas.data.ScheduleData;
 import rexos.mas.hardware_agent.EquipletStepMessage;
 import rexos.mas.hardware_agent.HardwareAgent;
 import rexos.mas.hardware_agent.Module;
+import rexos.mas.hardware_agent.ModuleFactory;
 import rexos.mas.service_agent.ServiceStepMessage;
 
 import com.mongodb.BasicDBObject;
@@ -56,6 +57,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 	private static MessageTemplate messageTemplate = MessageTemplate
 			.MatchOntology("GetServiceStepDuration");
 	private HardwareAgent hardwareAgent;
+	private ModuleFactory moduleFactory;
 
 	public EvaluateDuration(Agent a) {
 		super(a, -1, messageTemplate);
@@ -74,9 +76,10 @@ public class EvaluateDuration extends ReceiveBehaviour {
 					message.getOntology(), serviceStepId);
 
 			int stepDuration = 0;
-			Module leadingModule = hardwareAgent.getModule(serviceStep
+			int leadingModule = hardwareAgent.getLeadingModule(serviceStep
 					.getServiceId());
-			EquipletStepMessage[] equipletSteps = leadingModule
+			Module module = moduleFactory.getModuleById(leadingModule);
+			EquipletStepMessage[] equipletSteps = module
 					.getEquipletSteps(serviceStep.getType(), serviceStep.getParameters());
 			for (EquipletStepMessage equipletStep : equipletSteps) {
 				stepDuration += equipletStep.getTimeData().getDuration();

@@ -89,7 +89,9 @@ public class CheckForModules extends ReceiveBehaviour {
 				// System.out.println();
 
 				for (int moduleId : moduleIds) {
-					if (hardwareAgent.getModule(moduleId) == null) {
+					
+					//TODO: zorg dat 0 return afgevangen word ..
+					if (hardwareAgent.getLeadingModule(moduleId) == 0) {
 						modulesPresent = false;
 					}
 				}
