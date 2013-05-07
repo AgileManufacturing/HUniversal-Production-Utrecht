@@ -32,10 +32,6 @@ package rexos.mas.hardware_agent;
  **/
 
 import jade.core.Agent;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.UnreadableException;
-
-import java.sql.ResultSet;
 import java.util.HashMap;
 
 import org.bson.types.ObjectId;
@@ -54,9 +50,6 @@ import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
 import rexos.mas.data.DbData;
-import rexos.mas.data.ScheduleData;
-import rexos.mas.equiplet_agent.ProductStepMessage;
-import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.hardware_agent.behaviours.CheckForModules;
 import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
 import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
@@ -86,6 +79,9 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		System.out.println("Hardware agent " + this + " reporting.");
 		leadingModuleForStep = new HashMap<Integer, Integer>();
 
+		moduleFactory = new ModuleFactory();
+		moduleFactory.subscribeToUpdates(this);
+		
 		// TODO fill in host, database and collection
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
@@ -131,21 +127,14 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			resultSet = client.executeSelectQuery(Queries.MODULES);
 
 			for (int i = 0; i < resultSet.length; i++) {
-				System.out.println(resultSet[i]);
-
-				// neem id van module
 				try{
 					int id = (int) resultSet[i].get("id");
 					Module m = moduleFactory.getModuleById(id);
 					int[] steps = m.isLeadingForSteps();
-					
 					for(int step : steps){						
 						registerLeadingModule(step,id);						
 					}					
-					
-				}catch(Exception e){
-					
-				}
+				}catch(Exception e){/*key doesn't exist*/}
 				
 				// geef id aan modulefactory,
 				// je krijgt een module terug,
@@ -198,38 +187,22 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		case "ServiceStepsBlackboard":
 			switch (operation) {
 			case UPDATE:
-
 				ObjectId id = entry.getTargetObjectId();
 				try {
-
 					ServiceStepMessage serviceStep = new ServiceStepMessage(
-							(BasicDBObject) serviceStepBBClient
-									.findDocumentById(id));
-					
-					
+							(BasicDBObject)serviceStepBBClient.findDocumentById(id));
 					int leadingModule = getLeadingModule(serviceStep.getServiceId());
-					
 					Module module = moduleFactory.getModuleById(leadingModule);
-
-					EquipletStepMessage[] equipletSteps = module
-							.getEquipletSteps(serviceStep.getType(),
-									serviceStep.getParameters());
-
+					EquipletStepMessage[] equipletSteps = module.getEquipletSteps(
+							serviceStep.getType(),
+							serviceStep.getParameters());
 					for (EquipletStepMessage eq : equipletSteps) {
-
-						equipletStepBBClient.insertDocument(eq
-								.toBasicDBObject());
-
+						equipletStepBBClient.insertDocument(eq.toBasicDBObject());
 					}
-
-				} catch (InvalidDBNamespaceException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (GeneralMongoException e1) {
+				} catch (InvalidDBNamespaceException | GeneralMongoException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-
 				break;
 			default:
 				break;
@@ -239,11 +212,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			switch (operation) {
 			case UPDATE:
 				try {
-					ObjectId id = entry.getTargetObjectId();
-					BasicDBObject query = new BasicDBObject();
-					query.put("_id", id);
-					DBObject equipletStep = equipletStepBBClient.findDocuments(
-							query).get(0);
+					DBObject equipletStep = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
 				} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 					// TODO Error no document
 					e.printStackTrace();
@@ -260,25 +229,11 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 
 	@Override
 	public void onModuleUpdate(int moduleId, Module oldSoftware, Module newSoftware) {
-		try {
-			KnowledgeDBClient client = KnowledgeDBClient.getClient();
-			Row[] rows;
-
-			rows = client.executeSelectQuery(Queries.MODULES);
-
-			for (int i = 0; i < rows.length; i++) {
-				System.out.println(rows[i]);
-
-				// neem id van module
-				// geef id aan modulefactory,
-				// je krijgt een module terug,
-				//
-				// register module bij de hardwareagent..
-
-			}
-		} catch (KnowledgeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		for (int step : oldSoftware.isLeadingForSteps()) {
+			leadingModuleForStep.remove(step);
+		}
+		for (int step : newSoftware.isLeadingForSteps()) {
+			leadingModuleForStep.put(step, moduleId);
 		}
 	}
 }
