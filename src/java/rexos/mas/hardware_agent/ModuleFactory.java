@@ -78,7 +78,12 @@ public class ModuleFactory {
 					new Object[]{moduleId});
 			
 			if (rows.length > 0) {
-				DynamicClassDescription description = DynamicClassDescription.createFromRow(rows[0]);
+				DynamicClassDescription description = new DynamicClassDescription(
+						new Long((Integer)rows[0].get("id")),
+						(String)rows[0].get("name"),
+						(String)rows[0].get("description"),
+						(String)rows[0].get("class_name"),
+						(String)rows[0].get("jar_location"));
 				moduleCache.put(
 						moduleId,
 						factory.createNewObjectIfOutdated(

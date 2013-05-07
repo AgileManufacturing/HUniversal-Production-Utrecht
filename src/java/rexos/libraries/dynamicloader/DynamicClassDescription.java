@@ -29,9 +29,6 @@
  **/
 package rexos.libraries.dynamicloader;
 
-import rexos.libraries.knowledgedb_client.KeyNotFoundException;
-import rexos.libraries.knowledgedb_client.Row;
-
 /**
  * Contains all information about a piece of software.
  **/
@@ -81,21 +78,6 @@ public class DynamicClassDescription {
 		this.description = description;
 		this.className = className;
 		this.jarLocation = jarLocation;
-	}
-	
-	/**
-	 * Constructs a new DynamicClassDescription object from the given row object.
-	 * @param row The row object containing the information for the to be created object.
-	 * @return A DynamicClassDescription object based on the data contained in the row.
-	 * @throws KeyNotFoundException One of the required columns wasn't found.
-	 **/
-	public static DynamicClassDescription createFromRow(Row row) throws KeyNotFoundException {
-		return new DynamicClassDescription(
-				new Long((Integer)row.get("id")),
-				(String)row.get("name"),
-				(String)row.get("description"),
-				(String)row.get("class_name"),
-				(String)row.get("jar_location"));
 	}
 
 	/**
