@@ -30,38 +30,50 @@
 
 package rexos.mas.hardware_agent;
 
+import java.util.ArrayList;
+
 import rexos.mas.equiplet_agent.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 
 public class GripperModule implements Module{
+	int gripperSize = 2;
 	
 	public GripperModule(){
 	}
 	
+//	public GripperModule(){
+//	}
+	
 	@Override
-	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters) {
-		TimeData td = new TimeData(2); //TODO: timedata hardcoded
-		
-		EquipletStepMessage[] equipletSteps = new EquipletStepMessage[3];
+	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters) {		
+		EquipletStepMessage[] equipletSteps;
+		ArrayList<EquipletStepMessage> steps;
 		
 		switch(stepType){
 		
 		case 1: // pick
-			equipletSteps[0] = new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3));
-			equipletSteps[1] = new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(4));
-			equipletSteps[2] = new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(5));
-			break;
-		
+			steps = new ArrayList<EquipletStepMessage>();
+			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3)));
+			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(4)));
+			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(5)));
+			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3)));
+			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(4)));
+			equipletSteps = new EquipletStepMessage[steps.size()];
+			return steps.toArray(equipletSteps);
 		case 2: // place/drop
-			equipletSteps[0] = new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(2));
-			equipletSteps[1] = new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3));
-			equipletSteps[2] = new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(4));
+			steps = new ArrayList<EquipletStepMessage>();
+			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3)));
+			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(4)));
+			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(5)));
+			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3)));
+			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(4)));
+			equipletSteps = new EquipletStepMessage[steps.size()];
+			return steps.toArray(equipletSteps);
+		default:
 			break;
 		
 		}
-		
-		
-		return equipletSteps;
+		return new EquipletStepMessage[0];
 	}
 }

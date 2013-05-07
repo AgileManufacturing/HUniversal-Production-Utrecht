@@ -54,7 +54,7 @@ class OplogMonitorThread extends Thread {
 	 * @var HashMap<BlackboardSubscription> subscriptions
 	 * Link between subscribed topic name and MongoDbs BasicDBObjects
 	 **/
-	BlackboardSubscription[] subscriptions;
+	private BlackboardSubscription[] subscriptions;
 	
 	/**
 	 * Constructor of OplogMonitorThread.
@@ -97,7 +97,7 @@ class OplogMonitorThread extends Thread {
 	/**
 	 * Sets the subscriptions that are used for the query of this oplog monitor.
 	 * @param subscriptions ArrayList containing all the subscriptions this monitor will subscribe to.
-	 */
+	 **/
 	public void setSubscriptions(ArrayList<BlackboardSubscription> subscriptions) {
 		this.subscriptions = new BlackboardSubscription[subscriptions.size()];
 		subscriptions.toArray(this.subscriptions);
