@@ -1,11 +1,10 @@
 /**
  * @file Module.java
  * @brief Provides an inteface to make modules. 
- * @date Created: 2013-04-02
+ * @date Created: 2013-04-18
  *
  * @author Thierry Gerritse
- * @author Wouter Veen
- *
+ * 
  * @section LICENSE
  * License: newBSD
  *
@@ -40,4 +39,6 @@ public interface Module {
 	 * @return
 	 */
 	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters);
+	
+	public int[] isLeadingForSteps();
 }

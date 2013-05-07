@@ -63,4 +63,10 @@ public class DeltaRobotModule implements Module {
 		}
 		return new EquipletStepMessage[0];
 	}
+
+	@Override
+	public int[] isLeadingForSteps() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

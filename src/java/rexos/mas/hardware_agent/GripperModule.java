@@ -41,10 +41,7 @@ public class GripperModule implements Module{
 	
 	public GripperModule(){
 	}
-	
-//	public GripperModule(){
-//	}
-	
+
 	@Override
 	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters) {		
 		EquipletStepMessage[] equipletSteps;
@@ -75,5 +72,11 @@ public class GripperModule implements Module{
 		
 		}
 		return new EquipletStepMessage[0];
+	}
+
+	@Override
+	public int[] isLeadingForSteps() {
+		
+		return null;
 	}
 }
