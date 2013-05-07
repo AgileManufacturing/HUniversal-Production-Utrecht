@@ -1,9 +1,9 @@
 /**
  * @file ProductionStepStatus.java
- * @brief
+ * @brief Class with the production step status
  * @date Created: 17 Apr 2013
  * 
- * @author Alexander
+ * @author Alexander Streng
  * 
  * @section LICENSE License: newBSD
  * 
@@ -39,10 +39,6 @@
 
 package newDataClasses;
 
-/**
- * @author Alexander
- * 
- */
 public enum ProductionStepStatus{
 	STATE_DONE, STATE_TODO, STATE_PRODUCING, STATE_FAILED
 }

@@ -7,7 +7,7 @@
  * 
  * @date Created: 17 Apr 2013
  * 
- * @author Alexander
+ * @author Alexander Streng
  * 
  * @section LICENSE License: newBSD
  * 
@@ -38,12 +38,6 @@
  *          STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  *          ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  *          OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- *          DISCLAIMER I DID NOT FOLLOW ANY CODING REGULATIONS. THIS IS NOT
- *          OFFICIAL PROJECT CODE, NOR WILL IT BE USED FOR ANYTHING OTHER THEN
- *          TESTING. COMMENTS ARE SCARCE AND CRAPPY
- * 
- *          USE AT OWN RISK.
  * 
  **/
 
