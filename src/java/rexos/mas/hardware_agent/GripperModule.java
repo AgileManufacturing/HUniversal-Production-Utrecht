@@ -38,7 +38,7 @@ public class GripperModule implements Module{
 	
 	public GripperModule(){
 	}
-	
+		
 	@Override
 	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters) {
 		TimeData td = new TimeData(2); //TODO: timedata hardcoded
@@ -63,5 +63,11 @@ public class GripperModule implements Module{
 		
 		
 		return equipletSteps;
+	}
+
+	@Override
+	public int[] isLeadingForSteps() {
+		
+		return null;
 	}
 }

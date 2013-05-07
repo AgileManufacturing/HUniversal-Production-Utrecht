@@ -89,7 +89,7 @@ public class CheckForModules extends ReceiveBehaviour {
 				// System.out.println();
 
 				for (int moduleId : moduleIds) {
-					if (hardwareAgent.getLeadingModule(moduleId) == null) {
+					if (hardwareAgent.getModule(moduleId) == null) {
 						modulesPresent = false;
 					}
 				}

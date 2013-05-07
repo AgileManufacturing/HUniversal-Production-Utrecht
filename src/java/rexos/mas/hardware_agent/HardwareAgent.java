@@ -63,20 +63,21 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 
 	private BlackboardClient serviceStepBBClient, equipletStepBBClient;
 	private DbData dbData;
-	private HashMap<Integer, Module> leadingModules;
+	private HashMap<Integer, Module> Modules;
+	private HashMap<Integer, Integer> leadingModulesForStep;
 		
-	public void registerLeadingModule(int serviceId, Module module) {
-		leadingModules.put(serviceId, module);
+	public void registerModule(int serviceId, Module module) {
+		Modules.put(serviceId, module);
 	}
 	
-	public Module getLeadingModule(int serviceId) {
-		return leadingModules.get(serviceId);
+	public Module getModule(int serviceId) {
+		return Modules.get(serviceId);
 	}
 		
 	@Override
 	public void setup() {
 		System.out.println("Hardware agent " + this + " reporting.");
-		leadingModules = new HashMap<Integer, Module>();
+		Modules = new HashMap<Integer, Module>();
 
 		// TODO fill in host, database and collection
 		Object[] args = getArguments();
@@ -118,11 +119,22 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 		
 		// for now: use precompiled grippermodule class
 		GripperModule gp = new GripperModule();
-		registerLeadingModule(1, gp);
+		registerModule(1, gp);
 		DeltaRobotModule drm = new DeltaRobotModule();
-		registerLeadingModule(2, drm);
+		registerModule(2, drm);
 		///		
 		
+		/// ga na voor welke stappen deze modules leidend zijn en sla dit op in de hashmap
+		 
+		
+	}
+	
+	public Module getLeadingModuleForStep(int stepId){
+		
+		int moduleId = leadingModulesForStep.get(stepId);
+		
+		return getModule(moduleId);
+			
 	}
 
 	@Override
@@ -146,7 +158,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 				try {
 					ServiceStepMessage serviceStep = new ServiceStepMessage((BasicDBObject)serviceStepBBClient.findDocumentById(id));
 					
-					Module leadingModule = getLeadingModule(serviceStep
+					Module leadingModule = getModule(serviceStep
 							.getServiceId());
 					EquipletStepMessage[] equipletSteps = leadingModule
 							.getEquipletSteps(serviceStep.getType(),serviceStep.getParameters());
