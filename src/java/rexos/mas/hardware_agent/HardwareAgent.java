@@ -70,21 +70,21 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 
 	private BlackboardClient serviceStepBBClient, equipletStepBBClient;
 	private DbData dbData;
-	private HashMap<Integer, Module> Modules;
 	private HashMap<Integer, Integer> leadingModuleForStep;
+	private ModuleFactory moduleFactory;
 	
-	public void registerModule(int serviceId, Module module) {
-		Modules.put(serviceId, module);
+	public void registerLeadingModule(int serviceId, int moduleId) {
+		leadingModuleForStep.put(serviceId, moduleId);
 	}
 
-	public Module getModule(int serviceId) {
-		return Modules.get(serviceId);
+	public int getLeadingModule(int serviceId) {
+		return leadingModuleForStep.get(serviceId);
 	}
 
 	@Override
 	public void setup() {
 		System.out.println("Hardware agent " + this + " reporting.");
-		Modules = new HashMap<Integer, Module>();
+		leadingModuleForStep = new HashMap<Integer, Integer>();
 
 		// TODO fill in host, database and collection
 		Object[] args = getArguments();
@@ -134,6 +134,19 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 				System.out.println(resultSet[i]);
 
 				// neem id van module
+				try{
+					int id = (int) resultSet[i].get("id");
+					Module m = moduleFactory.getModuleById(id);
+					int[] steps = m.isLeadingForSteps();
+					
+					for(int step : steps){						
+						registerLeadingModule(step,id);						
+					}					
+					
+				}catch(Exception e){
+					
+				}
+				
 				// geef id aan modulefactory,
 				// je krijgt een module terug,
 				//
@@ -164,11 +177,11 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 
 	}
 	
-	public Module getLeadingModuleForStep(int stepId){
+	public int getLeadingModuleForStep(int stepId){
 	
 		int moduleId = leadingModuleForStep.get(stepId);
 		
-		return getModule(moduleId);
+		return getLeadingModule(moduleId);
 	}
 	@Override
 	public void takeDown() {
@@ -192,10 +205,13 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber {
 					ServiceStepMessage serviceStep = new ServiceStepMessage(
 							(BasicDBObject) serviceStepBBClient
 									.findDocumentById(id));
+					
+					
+					int leadingModule = getLeadingModule(serviceStep.getServiceId());
+					
+					Module module = moduleFactory.getModuleById(leadingModule);
 
-					Module leadingModule = getModule(serviceStep.getServiceId());
-
-					EquipletStepMessage[] equipletSteps = leadingModule
+					EquipletStepMessage[] equipletSteps = module
 							.getEquipletSteps(serviceStep.getType(),
 									serviceStep.getParameters());
 
