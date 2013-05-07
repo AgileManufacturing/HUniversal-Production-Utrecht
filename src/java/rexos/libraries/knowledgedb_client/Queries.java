@@ -69,6 +69,33 @@ public class Queries {
             "    ON (\n" +
             "      `modules`.`location` = `equiplets`.`id`\n" +
             "    ) ;";
+    
+    /**
+     * @var String MODULES_PER_EQUIPLET
+     *
+     * A constant representing an sql query for fetching a modules.
+     **/
+    public static final String MODULE_PER_EQUIPLET = "SELECT " + 
+    		 "  `module_groups`.`name` AS `group`,\n" +
+             "  `module_types`.`name` AS `type`,\n" +
+             "  `modules`.`id` AS `module`,\n" +
+             "  `equiplets`.`jade_address` AS `equiplet` \n" +
+             "FROM\n" +
+             "  `rexos_knowledge_base`.`module_types` \n" +
+             "  INNER JOIN `rexos_knowledge_base`.`module_groups` \n" +
+             "    ON (\n" +
+             "      `module_types`.`module_group` = `module_groups`.`id`\n" +
+             "    ) \n" +
+             "  INNER JOIN `rexos_knowledge_base`.`modules` \n" +
+             "    ON (\n" +
+             "      `modules`.`module_type` = `module_types`.`id`\n" +
+             "    ) \n" +
+             "  LEFT JOIN `rexos_knowledge_base`.`equiplets` \n" +
+             "    ON (\n" +
+             "      `modules`.`location` = `equiplets`.`id`\n" +
+             "WHERE\n" + 
+             "		`modules`.`module_id` = `equiplets`.`id`\n" +
+             "    ) ;";
 
     /**
      * @var String PART_PROPERTIES
@@ -240,8 +267,7 @@ public class Queries {
     		"        INNER JOIN " + 
     		"    services ON services.software = software.id " + 
     		" WHERE " + 
-    		"    services.id = (?)";
-    
+    		"    services.id = (?)";		
     /**
      * A private constructor preventing this class to be constructed.
      **/
