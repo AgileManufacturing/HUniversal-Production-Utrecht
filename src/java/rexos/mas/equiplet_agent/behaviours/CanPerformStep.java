@@ -120,9 +120,6 @@ public class CanPerformStep extends ReceiveBehaviour {
 					.toBasicDBObject());
 			equipletAgent.addCommunicationRelation(message.getConversationId(),
 					productStepEntryId);
-			String convId = equipletAgent.getConversationId(productStepEntryId);
-			ObjectId id = equipletAgent.getRelatedObjectId(message.getConversationId());
-
 			// asks the service agent if the productionstep can be done.
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
 			responseMessage.setConversationId(message.getConversationId());

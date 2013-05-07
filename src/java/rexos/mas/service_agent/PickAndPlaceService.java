@@ -71,21 +71,21 @@ public class PickAndPlaceService implements Service {
 	 */
 	@Override
 	public ServiceStepMessage[] getServiceSteps(int productStepType, BasicDBObject parameters) {
-		int inputPart = parameters.getInt("Position");
+		int part = parameters.getInt("part");
 		double inputPartSize = 0.5;// TODO: FROM KNOWLEDGE DB
 		ServiceStepMessage[] serviceStepMessages = new ServiceStepMessage[2];
 
 		BasicDBObject pickParameters = new BasicDBObject();
-		pickParameters.put("InputPart", inputPart);
+		pickParameters.put("InputPart", part);
 		pickParameters.put("Position", new Position());
 		pickParameters.put("SaveMovementPlane", new BasicDBObject("Height", saveMovementPlane).put("RelativeTo", null));
 
 		Position position = new Position((BasicDBObject) parameters.get("Position"));
 		position.setZ(position.getZ() + inputPartSize);
 		BasicDBObject placeParameters = new BasicDBObject();
-		placeParameters.put("InputPart", inputPart);
+		placeParameters.put("InputPart", part);
 		placeParameters.put("Position", position);
-		placeParameters.put("SaveMovementPlane", new BasicDBObject("Height", saveMovementPlane).put("RelativeTo", inputPart));
+		placeParameters.put("SaveMovementPlane", new BasicDBObject("Height", saveMovementPlane).put("RelativeTo", part));
 
 		serviceStepMessages[0] = new ServiceStepMessage(id, 4, pickParameters, StepStatusCode.EVALUATING, null, null);// pick //TODO: NOT HARDCODED ID.
 		serviceStepMessages[1] = new ServiceStepMessage(id, 5, placeParameters, StepStatusCode.EVALUATING, null, null);// place //TODOD NOT HARDCODE ID.
