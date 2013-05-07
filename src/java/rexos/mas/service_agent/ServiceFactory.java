@@ -59,7 +59,7 @@ public class ServiceFactory {
 		Service service = null;
 		try {
 			KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
-			Row[] rows = knowledgeClient.executeSelectQuery("SELECT * FROM software WHERE id=5");
+			Row[] rows = knowledgeClient.executeSelectQuery(Queries.SOFTWARE_FOR_SERVICE, serviceID);
 			if (rows.length > 0) {
 				DynamicClassDescription description = new DynamicClassDescription(
 						new Long((Integer)rows[0].get("id")),
