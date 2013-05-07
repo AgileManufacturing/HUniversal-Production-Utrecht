@@ -66,7 +66,7 @@ public class InstructionData implements IMongoSaveable {
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject object = new BasicDBObject();
 		object.put("command", command);
-		object.put("command", destination);
+		object.put("destination", destination);
 		object.put("look_up", look_up);
 		object.put("look_up_parameters", look_up_parameters);
 		object.put("payload", payload);
@@ -77,7 +77,7 @@ public class InstructionData implements IMongoSaveable {
 	public void fromBasicDBObject(BasicDBObject object) {
 		
 		command = object.getString("command");
-		command = object.getString("command");
+		destination = object.getString("destination");
 		look_up = object.getString("look_up");
 		look_up_parameters = (BasicDBObject) object.get("look_up_parameters");
 		payload = (BasicDBObject) object.get("payload");
