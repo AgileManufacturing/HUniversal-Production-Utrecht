@@ -40,23 +40,16 @@ import com.mongodb.BasicDBObjectBuilder;
  * 
  */
 public class Position implements Serializable, IMongoSaveable {
-	private static final long serialVersionUID = 1L;
-
+	private static final long serialVersionUID = 7125027379799391886L;
+	
 	private double x, y, z;
-	private int relativeToPartId;
+	private int relativeToPart;
 
 	/**
 	 * 
 	 */
 	public Position() {
 		this(-1, -1, -1, -1);
-	}
-
-	/**
-	 * @param object
-	 */
-	public Position(BasicDBObject object) {
-		fromBasicDBObject(object);
 	}
 
 	/**
@@ -69,16 +62,30 @@ public class Position implements Serializable, IMongoSaveable {
 	}
 
 	/**
+	 * @param relativeToPart
+	 */
+	public Position(int relativeToPart) {
+		this(-1, -1, -1, relativeToPart);
+	}
+
+	/**
 	 * @param x
 	 * @param y
 	 * @param z
-	 * @param relativeToPartId
+	 * @param relativeToPart
 	 */
-	public Position(double x, double y, double z, int referencePartId) {
+	public Position(double x, double y, double z, int relativeToPart) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
-		this.relativeToPartId = referencePartId;
+		this.relativeToPart = relativeToPart;
+	}
+
+	/**
+	 * @param object
+	 */
+	public Position(BasicDBObject object) {
+		fromBasicDBObject(object);
 	}
 
 	/*
@@ -92,7 +99,7 @@ public class Position implements Serializable, IMongoSaveable {
 				.add("x", x)
 				.add("y", y)
 				.add("z", z)
-				.add("relativeToPartId", relativeToPartId).get();
+				.add("relativeToPart", relativeToPart).get();
 	}
 
 	/*
@@ -107,7 +114,7 @@ public class Position implements Serializable, IMongoSaveable {
 		x = object.getDouble("x");
 		y = object.getDouble("y");
 		z = object.getDouble("z");
-		relativeToPartId = object.getInt("relativeToPartId");
+		relativeToPart = object.getInt("relativeToPart");
 	}
 
 	/**
@@ -156,18 +163,18 @@ public class Position implements Serializable, IMongoSaveable {
 	}
 
 	/**
-	 * @return the relativeToPartId
+	 * @return the relativeToPart
 	 */
-	public int getRelativeToPartId() {
-		return relativeToPartId;
+	public int getRelativeToPart() {
+		return relativeToPart;
 	}
 
 	/**
-	 * @param relativeToPartId
-	 *            the relativeToPartId to set
+	 * @param relativeToPart
+	 *            the relativeToPart to set
 	 */
-	public void setRelativeToPartId(int relativeToPartId) {
-		this.relativeToPartId = relativeToPartId;
+	public void setRelativeToPart(int relativeToPart) {
+		this.relativeToPart = relativeToPart;
 	}
 
 	/*
@@ -177,7 +184,7 @@ public class Position implements Serializable, IMongoSaveable {
 	 */
 	@Override
 	public String toString() {
-		return String.format("Position [x=%s, y=%s, z=%s, relativeToPartId=%s]",
-				x, y, z, relativeToPartId);
+		return String.format("Position [x=%s, y=%s, z=%s, relativeToPart=%s]",
+				x, y, z, relativeToPart);
 	}
 }

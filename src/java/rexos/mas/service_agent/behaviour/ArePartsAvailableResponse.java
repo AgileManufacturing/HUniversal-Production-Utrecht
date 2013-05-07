@@ -32,8 +32,6 @@ package rexos.mas.service_agent.behaviour;
 
 import java.io.IOException;
 
-import org.bson.types.ObjectId;
-
 import com.mongodb.BasicDBObject;
 
 import jade.core.Agent;
@@ -42,6 +40,7 @@ import jade.lang.acl.MessageTemplate;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
+import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.service_agent.ServiceAgent;
 
@@ -54,15 +53,13 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 
 	private String conversationId;
 	private ServiceAgent agent;
-	private ObjectId productStepId;
-	private Integer[] parts;
+	private ProductStepMessage productStep;
 
 	/**
 	 * @param a
 	 */
-	public ArePartsAvailableResponse(Agent a, String conversationId,
-			ObjectId productStepId, Integer[] parts) {
-		this(a, 2000, conversationId, productStepId, parts);
+	public ArePartsAvailableResponse(Agent a, String conversationId, ProductStepMessage productStep) {
+		this(a, 2000, conversationId, productStep);
 	}
 
 	/**
@@ -70,14 +67,13 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 	 * @param millis
 	 */
 	public ArePartsAvailableResponse(Agent a, int millis,
-			String conversationId, ObjectId productStepId, Integer[] parts) {
+			String conversationId, ProductStepMessage productStep) {
 		super(a, millis, MessageTemplate.and(
 				MessageTemplate.MatchConversationId(conversationId),
 				MessageTemplate.MatchOntology("ArePartsAvailableResponse")));
 		agent = (ServiceAgent) a;
 		this.conversationId = conversationId;
-		this.productStepId = productStepId;
-		this.parts = parts;
+		this.productStep = productStep;
 	}
 
 	/*
@@ -93,21 +89,22 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 				System.out.format("%s ArePartsAvailableResponse%n",
 						agent.getLocalName());
 				if (message.getPerformative() == ACLMessage.CONFIRM) {
+					//TODO voeg tijdslot toe aan message zodat LA weet wanneer.
 					ACLMessage sendMsg = message.createReply();
 					sendMsg.setOntology("ArePartsAvailableInTime");
 					sendMsg.setPerformative(ACLMessage.QUERY_IF);
-					sendMsg.setContentObject(parts);
+					sendMsg.setContentObject(productStep);
 					agent.send(sendMsg);
 
 					agent.addBehaviour(new ArePartsAvailableInTimeResponse(
-							agent, conversationId, productStepId, parts));
+							agent, conversationId, productStep));
 				} else {
 					agent.getProductStepBBClient().updateDocuments(
-							new BasicDBObject("_id", productStepId),
+							new BasicDBObject("_id", productStep.get_id()),
 							new BasicDBObject("$set", new BasicDBObject(
 									"status", StepStatusCode.ABORTED.name())
 									.append("statusData", new BasicDBObject(
-											"reason", "missing parts"))));
+											"reason", "missing productStep"))));
 				}
 			} catch (IOException | InvalidDBNamespaceException
 					| GeneralMongoException e) {

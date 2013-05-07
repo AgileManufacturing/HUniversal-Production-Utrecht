@@ -41,6 +41,7 @@ import java.util.ArrayList;
 
 import rexos.mas.data.Parameter;
 import rexos.mas.data.ParameterGroup;
+import rexos.mas.data.Position;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
@@ -101,11 +102,8 @@ public class JadeAgentX extends Agent {
 			 * Lets make a parameter list
 			 */
 			ParameterGroup parameters = new ParameterGroup();
-			parameters.addParameter("part", new Parameter("1"));
-			parameters.addParameter("x", new Parameter("1"));
-			parameters.addParameter("y", new Parameter("2"));
-			parameters.addParameter("z", new Parameter("3"));
-			parameters.addParameter("relativeToPart", new Parameter("2"));
+			parameters.addParameter("part", new Parameter(1));
+			parameters.addParameter("position", new Parameter(new Position(1, 2, 3, 2)));
 
 			// Next we want to have some production steps
 			ProductionStep stp1 = new ProductionStep(1, 1, parameters);
