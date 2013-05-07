@@ -48,12 +48,11 @@ public class ScheduleStep extends ReceiveBehaviour {
 				sendMsg.setConversationId(message.getConversationId());
 				sendMsg.addReceiver(agent.getLogisticsAID());
 				sendMsg.setOntology("ArePartsAvailable");
-				sendMsg.setContentObject(productStep.getInputPartTypes());
+				sendMsg.setContentObject(productStep);
 				agent.send(sendMsg);
 
 				agent.addBehaviour(new ArePartsAvailableResponse(agent, message
-						.getConversationId(), (ObjectId) message
-						.getContentObject(), productStep.getInputPartTypes()));
+						.getConversationId(), productStep));
 			} catch (InvalidDBNamespaceException | GeneralMongoException
 					| UnreadableException | IOException e) {
 				e.printStackTrace();

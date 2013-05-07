@@ -2,32 +2,51 @@
  * @file ProductStepMessage.java
  * @brief Provides a message for the productstep blackboard
  * @date Created: 2013-04-03
- *
+ * 
  * @author Hessel Meulenbeld
- *
+ * 
  * @section LICENSE
- * License: newBSD
- *
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
- * - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
- * - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
- * - Neither the name of the HU University of Applied Sciences Utrecht nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT
- * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
- * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *          License: newBSD
+ * 
+ *          Copyright © 2012, HU University of Applied Sciences Utrecht.
+ *          All rights reserved.
+ * 
+ *          Redistribution and use in source and binary forms, with or without
+ *          modification, are permitted provided that the following conditions
+ *          are met:
+ *          - Redistributions of source code must retain the above copyright
+ *          notice, this list of conditions and the following disclaimer.
+ *          - Redistributions in binary form must reproduce the above copyright
+ *          notice, this list of conditions and the following disclaimer in the
+ *          documentation and/or other materials provided with the distribution.
+ *          - Neither the name of the HU University of Applied Sciences Utrecht
+ *          nor the names of its contributors may be used to endorse or promote
+ *          products derived from this software without specific prior written
+ *          permission.
+ * 
+ *          THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *          "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *          LIMITED TO,
+ *          THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ *          PARTICULAR PURPOSE
+ *          ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED
+ *          SCIENCES UTRECHT
+ *          BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ *          OR
+ *          CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ *          SUBSTITUTE
+ *          GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ *          INTERRUPTION)
+ *          HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ *          STRICT
+ *          LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *          ANY WAY OUT
+ *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ *          SUCH DAMAGE.
  **/
 package rexos.mas.equiplet_agent;
+
+import java.io.Serializable;
 
 import org.bson.types.ObjectId;
 
@@ -42,7 +61,12 @@ import com.mongodb.BasicDBObject;
 /**
  * Implementation of a message for the productstep blackboard
  */
-public class ProductStepMessage implements IMongoSaveable {
+public class ProductStepMessage implements IMongoSaveable, Serializable {
+	private static final long serialVersionUID = 6752380093194239016L;
+
+	/**
+	 * @var Mongo ObjectId of the entry of this ProductStep in a blackboard.
+	 */
 	private ObjectId _id;
 
 	/**
@@ -90,56 +114,39 @@ public class ProductStepMessage implements IMongoSaveable {
 	/**
 	 * The constructor for the product step entry.
 	 * 
-	 * @param productAgentId
-	 *            - AID of the product agent linked to the product step
-	 * @param type
-	 *            - The type of the product step
-	 * @param parameters
-	 *            - The parameters for the product step
-	 * @param inputPartTypes
-	 *            - The input parts for the product step
-	 * @param outputPartType
-	 *            - The output parts for the product step
-	 * @param status
-	 *            - The status for the product step
-	 * @param statusData
-	 *            - The additional data for the status
-	 * @param scheduleData
-	 *            - The schedule data
+	 * @param productAgentId AID of the product agent linked to the product step
+	 * @param type The type of the product step
+	 * @param parameters The parameters for the product step
+	 * @param inputPartTypes The input parts for the product step
+	 * @param outputPartType The output parts for the product step
+	 * @param status The status for the product step
+	 * @param statusData The additional data for the status
+	 * @param scheduleData The schedule data
 	 */
-	public ProductStepMessage(AID productAgentId, int type,
-			ParameterGroup parameters, Integer[] inputPartTypes,
-			int outputPartType, StepStatusCode status,
+	public ProductStepMessage(AID productAgentId, int type, ParameterGroup parameters,
+			Integer[] inputPartTypes, int outputPartType, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
-		this(null, productAgentId, type, parameters, inputPartTypes,
-				outputPartType, status, statusData, scheduleData);
+		this(null, productAgentId, type, parameters, inputPartTypes, outputPartType, status,
+			statusData, scheduleData);
 	}
 
 	/**
 	 * The constructor for the product step entry.
 	 * 
-	 * @param _id
-	 * @param productAgentId
-	 *            - AID of the product agent linked to the product step
-	 * @param type
-	 *            - The type of the product step
-	 * @param parameters
-	 *            - The parameters for the product step
-	 * @param inputPartTypes
-	 *            - The input parts for the product step
-	 * @param outputPartType
-	 *            - The output parts for the product step
-	 * @param status
-	 *            - The status for the product step
-	 * @param statusData
-	 *            - The additional data for the status
-	 * @param scheduleData
-	 *            - The schedule data
+	 * @param _id Mongo ObjectId of the entry of this ProductStep in a
+	 *            blackboard.
+	 * @param productAgentId AID of the product agent linked to the product step
+	 * @param type The type of the product step
+	 * @param parameters The parameters for the product step
+	 * @param inputPartTypes The input parts for the product step
+	 * @param outputPartType The output parts for the product step
+	 * @param status The status for the product step
+	 * @param statusData The additional data for the status
+	 * @param scheduleData The schedule data
 	 */
 	public ProductStepMessage(ObjectId _id, AID productAgentId, int type,
-			ParameterGroup parameters, Integer[] inputPartTypes,
-			int outputPartType, StepStatusCode status,
-			BasicDBObject statusData, ScheduleData scheduleData) {
+			ParameterGroup parameters, Integer[] inputPartTypes, int outputPartType,
+			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
 		this._id = _id;
 		this.productAgentId = productAgentId;
 		this.type = type;
@@ -305,7 +312,7 @@ public class ProductStepMessage implements IMongoSaveable {
 	@Override
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject object = new BasicDBObject();
-		if (_id != null)
+		if(_id != null)
 			object.put("_id", _id);
 		object.put("productAgentId", productAgentId.getName());
 		object.put("type", type);
@@ -325,26 +332,23 @@ public class ProductStepMessage implements IMongoSaveable {
 	public void fromBasicDBObject(BasicDBObject object) {
 		_id = object.getObjectId("_id");
 		try {
-			productAgentId = new AID((String) (object.get("productAgentId")),
-				AID.ISGUID);
+			productAgentId = new AID((String) (object.get("productAgentId")), AID.ISGUID);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		type = object.getInt("type");
 		parameters = new ParameterGroup((BasicDBObject) object.get("parameters"));
-		inputPartTypes = ((BasicDBList) object.get("inputPartTypes"))
-				.toArray(new Integer[0]);
+		inputPartTypes = ((BasicDBList) object.get("inputPartTypes")).toArray(new Integer[0]);
 		outputPartType = object.getInt("outputPartType", -1);
 		status = StepStatusCode.valueOf(object.getString("status"));
 
-		if (object.containsField("statusData")) {
+		if(object.containsField("statusData")) {
 			statusData = (BasicDBObject) object.get(statusData);
 		} else {
 			statusData = new BasicDBObject();
 		}
-		if (object.containsField("scheduleData")) {
-			scheduleData = new ScheduleData(
-					(BasicDBObject) object.get("scheduleData"));
+		if(object.containsField("scheduleData")) {
+			scheduleData = new ScheduleData((BasicDBObject) object.get("scheduleData"));
 		} else {
 			scheduleData = new ScheduleData();
 		}

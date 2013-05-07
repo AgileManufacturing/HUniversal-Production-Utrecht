@@ -32,8 +32,6 @@ package rexos.mas.service_agent.behaviour;
 
 import java.io.IOException;
 
-import org.bson.types.ObjectId;
-
 import com.mongodb.BasicDBObject;
 
 import jade.core.Agent;
@@ -42,6 +40,7 @@ import jade.lang.acl.MessageTemplate;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.service_agent.ServiceAgent;
 
@@ -54,15 +53,13 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 
 	private String conversationId;
 	private ServiceAgent agent;
-	private ObjectId productStepId;
-	private Integer[] parts;
+	private ProductStepMessage productStep;
 
 	/**
 	 * @param a
 	 */
-	public ArePartsAvailableInTimeResponse(Agent a, String conversationId,
-			ObjectId productStepId, Integer[] parts) {
-		this(a, 2000, conversationId, productStepId, parts);
+	public ArePartsAvailableInTimeResponse(Agent a, String conversationId, ProductStepMessage productStep) {
+		this(a, 2000, conversationId, productStep);
 	}
 
 	/**
@@ -70,14 +67,13 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 	 * @param millis
 	 */
 	public ArePartsAvailableInTimeResponse(Agent a, int millis,
-			String conversationId, ObjectId productStepId, Integer[] parts) {
+			String conversationId, ProductStepMessage productStep) {
 		super(a, millis, MessageTemplate.and(MessageTemplate
 				.MatchConversationId(conversationId), MessageTemplate
 				.MatchOntology("ArePartsAvailableInTimeResponse")));
 		agent = (ServiceAgent) a;
 		this.conversationId = conversationId;
-		this.productStepId = productStepId;
-		this.parts = parts;
+		this.productStep = productStep;
 	}
 
 	/*
@@ -96,15 +92,15 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 					ACLMessage sendMsg = message.createReply();
 					sendMsg.setOntology("GetPartsInfo");
 					sendMsg.setPerformative(ACLMessage.QUERY_IF);
-					sendMsg.setContentObject(parts);
+					sendMsg.setContentObject(productStep);
 					agent.send(sendMsg);
 
 					agent.addBehaviour(new GetPartsInfoResponse(agent,
-							conversationId, productStepId));
+							conversationId, productStep));
 				} else {
 					agent.getProductStepBBClient()
 							.updateDocuments(
-									new BasicDBObject("_id", productStepId),
+									new BasicDBObject("_id", productStep.get_id()),
 									new BasicDBObject(
 											"$set",
 											new BasicDBObject("status",
@@ -112,7 +108,7 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 													.append("statusData",
 															new BasicDBObject(
 																	"reason",
-																	"parts cannot be delivered on time"))));
+																	"productStep cannot be delivered on time"))));
 				}
 			} catch (IOException | InvalidDBNamespaceException
 					| GeneralMongoException e) {
