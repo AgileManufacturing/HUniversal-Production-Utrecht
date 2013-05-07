@@ -73,9 +73,9 @@ public class Queries {
     /**
      * @var String MODULES_PER_EQUIPLET
      *
-     * A constant representing an sql query for fetching a modules.
+     * A constant representing an sql query for fetching all modules per equiplet.
      **/
-    public static final String MODULE_PER_EQUIPLET = "SELECT " + 
+    public static final String MODULES_PER_EQUIPLET = "SELECT " + 
     		 "  `module_groups`.`name` AS `group`,\n" +
              "  `module_types`.`name` AS `type`,\n" +
              "  `modules`.`id` AS `module`,\n" +
@@ -93,8 +93,7 @@ public class Queries {
              "  LEFT JOIN `rexos_knowledge_base`.`equiplets` \n" +
              "    ON (\n" +
              "      `modules`.`location` = `equiplets`.`id`\n" +
-             "WHERE\n" + 
-             "		`modules`.`module_id` = `equiplets`.`id`\n" +
+             "WHERE (`equiplets`.`jade_address` = (?)) " + 
              "    ) ;";
 
     /**
