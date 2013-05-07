@@ -29,6 +29,7 @@
  **/
 package rexos.mas.hardware_agent;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 import rexos.libraries.dynamicloader.DynamicClassDescription;
@@ -58,10 +59,17 @@ public class ModuleFactory {
 	private DynamicClassFactory<Module> factory;
 	
 	/**
+	 * @var ArrayList<ModuleUpdateListener> updateSubscribers
+	 * The objects that have subscribed to software updates.
+	 **/
+	private ArrayList<ModuleUpdateListener> updateSubscribers;
+	
+	/**
 	 * Initializes an empty ModuleFactory object.
 	 **/
 	public ModuleFactory() {
 		factory = new DynamicClassFactory<Module>(Module.class);
+		updateSubscribers = new ArrayList<ModuleUpdateListener>();
 		moduleCache = new Hashtable<Integer, Module>();
 	}
 	
@@ -71,7 +79,7 @@ public class ModuleFactory {
 	 **/
 	private void updateModuleInCache(int moduleId) {
 		try {
-		KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
+			KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
 		
 			Row[] rows = knowledgeClient.executeSelectQuery(
 					Queries.SOFTWARE_FOR_MODULE,
@@ -84,11 +92,18 @@ public class ModuleFactory {
 						(String)rows[0].get("description"),
 						(String)rows[0].get("class_name"),
 						(String)rows[0].get("jar_location"));
-				moduleCache.put(
-						moduleId,
-						factory.createNewObjectIfOutdated(
-								description,
-								moduleCache.get(moduleId)));
+				
+				Module oldSoftware = moduleCache.get(moduleId);
+				Module newSoftware = factory.createNewObjectIfOutdated(description, oldSoftware);
+				moduleCache.put(moduleId, newSoftware);
+				
+				// Notify subscribers if the software was updated.
+				// If no previous version exists, this is not considered an updated.
+				if (oldSoftware != null && oldSoftware != newSoftware) {
+					for (ModuleUpdateListener sub : updateSubscribers) {
+						sub.onModuleUpdate(moduleId, oldSoftware, newSoftware);
+					}
+				}
 			}
 		} catch (InstantiateClassException | KnowledgeException | KeyNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -105,5 +120,27 @@ public class ModuleFactory {
 	public Module getModuleById(int moduleId) {
 		updateModuleInCache(moduleId);
 		return moduleCache.get(moduleId);
+	}
+	
+	/**
+	 * Subscribe to software updates.
+	 * The subscriber will be notified whenever a new version is loaded of a certain module.
+	 * The first time software is loaded is not considered to be an update.
+	 * @param listener The object expecting a callback on updates.
+	 *
+	 */
+	public void subscribeToUpdates(ModuleUpdateListener listener) {
+		if (!updateSubscribers.contains(listener)) {
+			updateSubscribers.add(listener);
+		}
+	}
+	
+	/**
+	 * Unsubscribe from software updates.
+	 * @param listener The object that should be unsubscribed from updates.
+	 *
+	 **/
+	public void unsubscribeToUpdates(ModuleUpdateListener listener) {
+		updateSubscribers.remove(listener);
 	}
 }
