@@ -1,3 +1,39 @@
+/**
+ * @file InformerBehaviour.java
+ * @brief Behaviour in which the product agent communicates with the equiplet
+ *        agents to check if they can perform steps with the desired parameters.
+ * @date Created: 02-04-2013
+ * 
+ * @author Alexander Streng
+ * 
+ *         Copyright © 2013, HU University of Applied Sciences Utrecht. All
+ *         rights reserved.
+ * 
+ *         Redistribution and use in source and binary forms, with or without
+ *         modification, are permitted provided that the following conditions
+ *         are met: - Redistributions of source code must retain the above
+ *         copyright notice, this list of conditions and the following
+ *         disclaimer. - Redistributions in binary form must reproduce the above
+ *         copyright notice, this list of conditions and the following
+ *         disclaimer in the documentation and/or other materials provided with
+ *         the distribution. - Neither the name of the HU University of Applied
+ *         Sciences Utrecht nor the names of its contributors may be used to
+ *         endorse or promote products derived from this software without
+ *         specific prior written permission.
+ * 
+ *         THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *         "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *         LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ *         A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE HU
+ *         UNIVERSITY OF APPLIED SCIENCES UTRECHT BE LIABLE FOR ANY DIRECT,
+ *         INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ *         (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ *         SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ *         HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ *         STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ *         IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *         POSSIBILITY OF SUCH DAMAGE.
+ **/
 
 package productAgent;
 
@@ -22,15 +58,12 @@ import newDataClasses.ProductionStepStatus;
  * agent will ask for the duration of the operation ( in timeslots ).
  */
 public class InformerBehaviour extends OneShotBehaviour{
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private ProductAgent _productAgent;
 	private ParallelBehaviour _par;
 	private Product _product;
 	private Production _production;
-	private ProductionEquipletMapper _pem;
+	private ProductionEquipletMapper _prodEQmap;
 	private boolean _isDone;
 
 	public InformerBehaviour(){
@@ -42,7 +75,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 		_productAgent = (ProductAgent) myAgent;
 		_product = this._productAgent.getProduct();
 		_production = _product.getProduction();
-		_pem = new ProductionEquipletMapper();
+		_prodEQmap = new ProductionEquipletMapper();
 		_isDone = false;
 		/*
 		 * We want to have our conversations in parallel. We also only want to
@@ -58,28 +91,27 @@ public class InformerBehaviour extends OneShotBehaviour{
 			if (stp.getStatus() == ProductionStepStatus.STATE_TODO){
 				// adds the step to te new list (the one that will be returned
 				// to the scheduler)
-				_pem.addProductionStep(stp.getId());
+				_prodEQmap.addProductionStep(stp.getId());
 				ProductionEquipletMapper s1 = _production
 						.getProductionEquipletMapping();
 				for(AID aid : _production.getProductionEquipletMapping()
 						.getEquipletsForProductionStep(stp.getId()).keySet()){
-					_par.addSubBehaviour(new Conversation(aid, stp, _pem));
+					_par.addSubBehaviour(new Conversation(aid, stp, _prodEQmap));
 				}
 			}
 		}
-
 		// Lets set our production objects
-		seq.addSubBehaviour(new OneShotBehaviour() {
+		seq.addSubBehaviour(new OneShotBehaviour(){
 			private static final long serialVersionUID = 1L;
+
 			@Override
-			public void action() {
-				if (_par.done()) {
+			public void action(){
+				if (_par.done()){
 					System.out.println("Done informing.");
 					try{
-						_production.setProductionEquipletMapping(_pem);
+						_production.setProductionEquipletMapping(_prodEQmap);
 						_product.setProduction(_production);
 						_productAgent.setProduct(_product);
-						
 						_isDone = true;
 					} catch(Exception e){
 						e.printStackTrace();
@@ -89,7 +121,6 @@ public class InformerBehaviour extends OneShotBehaviour{
 				}
 			}
 		});
-	
 	}
 
 	public boolean isDone(){
@@ -112,13 +143,13 @@ public class InformerBehaviour extends OneShotBehaviour{
 		private AID _aid;
 		private ProductionStep _productionStep;
 		private boolean debug = true;
-		private ProductionEquipletMapper _pem;
+		private ProductionEquipletMapper _prodEQmap;
 
 		public Conversation(AID aid, ProductionStep productionStep,
 				ProductionEquipletMapper pem){
 			this._aid = aid;
 			this._productionStep = productionStep;
-			this._pem = pem;
+			this._prodEQmap = pem;
 		}
 
 		/*
@@ -128,7 +159,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 		@Override
 		public void onStart(){
 			final String ConversationId = _productAgent.generateCID();
-			final MessageTemplate template = MessageTemplate
+			final MessageTemplate msgtemplate = MessageTemplate
 					.MatchConversationId(ConversationId);
 			// 1 - Inform if the equiplet can perform the step with the given
 			// parameters
@@ -159,7 +190,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 				}
 			});
 			// 2 - wait for an response. ( handles a 10 sec timeout )
-			addSubBehaviour(new ReceiveBehaviour(myAgent, 10000, template){
+			addSubBehaviour(new ReceiveBehaviour(myAgent, 10000, msgtemplate){
 				/**
 				 * 
 				 */
@@ -217,14 +248,15 @@ public class InformerBehaviour extends OneShotBehaviour{
 							// 4- waits for the response ( handles a 10 sec
 							// timeout ).
 							addSubBehaviour(new ReceiveBehaviour(myAgent,
-									10000, template){
+									10000, msgtemplate){
 								/**
 										 * 
 										 */
 								private static final long serialVersionUID = 1L;
 
 								@Override
-								public void handle(ACLMessage msg){
+								public void handle(
+										@SuppressWarnings("hiding") ACLMessage msg){
 									if (msg == null){
 										if (debug){
 											System.out
@@ -246,7 +278,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 													System.out
 															.println("Received INFORM from: "
 																	+ _aid.getLocalName()
-																	+ ". He can perform step: "
+																	+ ". It can perform step: "
 																	+ _productionStep
 																			.getId()
 																	+ ". This step will take "
@@ -256,9 +288,11 @@ public class InformerBehaviour extends OneShotBehaviour{
 												// Adds the equiplet to the
 												// production step in
 												// the mapper list.
-												_pem.addEquipletToProductionStep(
-														_productionStep.getId(),
-														_aid, timeSlots);
+												_prodEQmap
+														.addEquipletToProductionStep(
+																_productionStep
+																		.getId(),
+																_aid, timeSlots);
 											}
 										} catch(UnreadableException e){
 											System.out
@@ -273,7 +307,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 							if (debug){
 								System.out.println("Received DISCONFIRM from: "
 										+ _aid.getLocalName()
-										+ ". He cant perform step: "
+										+ ". It cant perform step: "
 										+ _productionStep.getId());
 							}
 						}
