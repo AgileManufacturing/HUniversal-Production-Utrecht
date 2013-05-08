@@ -49,21 +49,7 @@ import newDataClasses.Product;
 import newDataClasses.ProductionStep;
 import newDataClasses.ProductionStepStatus;
 
-<<<<<<< HEAD
-public class ProduceBehaviour extends OneShotBehaviour{
-=======
-/**
- * 
- * @brief This behaviour is running when the production is about to start till
- *        the end of the production.
- * @author Theodoor de Graaff <theodoor.degraaff@student.hu.nl>
- * 
- */
 public class ProduceBehaviour extends CyclicBehaviour{
-	/**
-	 * 
-	 */
->>>>>>> 13344469328d41ad9da3bafb5d379caf55f92ac0
 	private static final long serialVersionUID = 1L;
 	private Product _product;
 
