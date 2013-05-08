@@ -88,21 +88,16 @@ public class OverviewBehaviour extends OneShotBehaviour{
 				}
 			}
 		});
-<<<<<<< HEAD
-
 		System.out.println("Lets add a Scheduler");
-		 _schedulerBehaviour = new SchedulerBehaviour();
-		 _sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
-		 
+		_schedulerBehaviour = new SchedulerBehaviour();
+		_sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
 		System.out.println("Lets add a produce");
 		// _produceBehaviour = new ProduceBehaviour(myAgent);
-=======
 		System.out.println("Add a SchedulerBehaviour");
 		_schedulerBehaviour = new SchedulerBehaviour();
 		_sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
 		System.out.println("Add a ProduceBehaviour");
 		// _produceBehaviour = new ProduceBehaviour();
->>>>>>> 214368cfa76ff487d3af9cba541f01dd3a5dae87
 		// _sequentialBehaviour.addSubBehaviour(_produceBehaviour);
 		System.out
 				.println("Added all behaviours. And everything should start.");
