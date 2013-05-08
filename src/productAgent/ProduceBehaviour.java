@@ -71,7 +71,7 @@ public class ProduceBehaviour extends CyclicBehaviour{
 
 	void productionStepEnded(ProductionStep step, boolean succes,
 			List<LogMessage> log){
-		_product.add(log);
+		_product.addLogMsg(log);
 		if (succes){
 			step.setStatus(ProductionStepStatus.STATE_DONE);
 		} else{
