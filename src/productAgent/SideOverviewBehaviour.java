@@ -6,7 +6,7 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
-public class sideOverviewBehaviour extends CyclicBehaviour{
+public class SideOverviewBehaviour extends CyclicBehaviour{
 	ACLMessage msg;
 	ProductAgent pa;
 
