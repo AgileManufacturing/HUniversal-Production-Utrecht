@@ -64,7 +64,7 @@ public class OverviewBehaviour extends OneShotBehaviour{
 		 _sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
 		 
 		System.out.println("Lets add a produce");
-		// _produceBehaviour = new ProduceBehaviour();
+		// _produceBehaviour = new ProduceBehaviour(myAgent);
 		// _sequentialBehaviour.addSubBehaviour(_produceBehaviour);
 
 		System.out.println("Added all behaviours. And everything should start. Aw yeah!");

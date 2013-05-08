@@ -5,6 +5,8 @@
 package productAgent;
 
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.SequentialBehaviour;
 
 import java.util.List;
 
@@ -20,17 +22,14 @@ import newDataClasses.ProductionStepStatus;
  * @author Theodoor de Graaff <theodoor.degraaff@student.hu.nl>
  * 
  */
-public class ProduceBehaviour extends CyclicBehaviour{
+public class ProduceBehaviour extends OneShotBehaviour{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	private Product _product;
+	private ProductAgent _productAgent;
 
-	/**
-	 */
-	public ProduceBehaviour(){
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -38,7 +37,12 @@ public class ProduceBehaviour extends CyclicBehaviour{
 	 */
 	@Override
 	public void action(){
-		// TODO Auto-generated method stub
+		_productAgent = (ProductAgent) myAgent;
+		SequentialBehaviour seq = new SequentialBehaviour();
+		myAgent.addBehaviour(seq);
+		
+		
+
 	}
 
 	static void canProductionStepStart(ProductionStep step){
