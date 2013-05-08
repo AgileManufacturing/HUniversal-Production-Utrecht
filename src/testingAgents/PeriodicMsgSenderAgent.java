@@ -7,7 +7,7 @@
  * 
  * @date Created: 17 Apr 2013
  * 
- * @author Alexander
+ * @author Alexander Streng
  * 
  * @section LICENSE License: newBSD
  * 
@@ -39,12 +39,6 @@
  *          ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  *          OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- *          DISCLAIMER I DID NOT FOLLOW ANY CODING REGULATIONS. THIS IS NOT
- *          OFFICIAL PROJECT CODE, NOR WILL IT BE USED FOR ANYTHING OTHER THEN
- *          TESTING. COMMENTS ARE SCARCE AND CRAPPY
- * 
- *          USE AT OWN RISK.
- * 
  **/
 
 package testingAgents;
@@ -60,44 +54,45 @@ public class PeriodicMsgSenderAgent extends Agent{
 	private static final long serialVersionUID = 1L;
 	private boolean debug = true;
 	// CID variables
-	private static int _cidCnt = 0;
-	private String _cidBase;
+	private static int _convIDCnt = 0;
+	private String _convIDBase;
 
 	@Override
 	@SuppressWarnings("serial")
 	protected void setup(){
 		try{
 			addBehaviour(new WakerBehaviour(this, getRandomInt(30000)){
+				@Override
 				protected void onWake(){
 					ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 					message.addReceiver(new AID("pa1", AID.ISLOCALNAME));
 					message.setConversationId(generateCID());
 					if (getRandomBoolean()){
 						if (debug)
-							System.out.println("Sending a reschedule msg.");
+							System.out.println("Sending a reschedule message.");
 						message.setOntology("Reschedule");
 					} else{
 						if (debug)
-							System.out.println("Sending a Move msg.");
+							System.out.println("Sending a move message.");
 						message.setOntology("MoveToEQ");
 					}
 					myAgent.send(message);
 				}
 			});
 		} catch(Exception e){
-			System.out.println("PeriodicMsgSenderAgent Exited with: " + e);
+			System.out.println("PeriodicMsgSenderAgent exited with: " + e);
 			doDelete();
 		}
 	}
 
 	public static boolean getRandomBoolean(){
-		Random random = new Random();
-		return random.nextBoolean();
+		Random randomBool = new Random();
+		return randomBool.nextBoolean();
 	}
 
-	public static int getRandomInt(int r){
-		Random random = new Random();
-		return random.nextInt(r);
+	public static int getRandomInt(int random){
+		Random randomInt = new Random();
+		return randomInt.nextInt(random);
 	}
 
 	/*
@@ -105,10 +100,10 @@ public class PeriodicMsgSenderAgent extends Agent{
 	 * objects hashcode and the current time.
 	 */
 	public String generateCID(){
-		if (_cidBase == null){
-			_cidBase = getLocalName() + hashCode() + System.currentTimeMillis()
-					% 10000 + "_";
+		if (_convIDBase == null){
+			_convIDBase = getLocalName() + hashCode()
+					+ System.currentTimeMillis() % 10000 + "_";
 		}
-		return _cidBase + (_cidCnt++);
+		return _convIDBase + (_convIDCnt++);
 	}
 }

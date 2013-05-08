@@ -1,25 +1,13 @@
-
-package unitTests;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import newDataClasses.LogMessage;
-import newDataClasses.ProductLog;
-import newDataClasses.sqldatabase.sqliteDatabase;
-
-import org.junit.Test;
-
 /**
- * @file sqlite.java
- * @brief TODO
- * @date Created: 12 apr. 2013
+ * @file SQLiteTest.java
+ * @brief Class for testing purposes on behave of the SQLite database
+ * @date Created: 02-04-2013
  * 
- * @author Theodoor
+ * @author Theodoor de Graaff
  * 
  * @section LICENSE License: newBSD
  * 
- *          Copyright © 2013, HU University of Applied Sciences Utrecht. All
+ *          Copyright © 2012, HU University of Applied Sciences Utrecht. All
  *          rights reserved.
  * 
  *          Redistribution and use in source and binary forms, with or without
@@ -48,10 +36,18 @@ import org.junit.Test;
  *          OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  **/
-/**
- * @author Theodoor
- * 
- */
+
+package unitTests;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import newDataClasses.LogMessage;
+import newDataClasses.ProductLog;
+import newDataClasses.sqldatabase.sqliteDatabase;
+
+import org.junit.Test;
+
 public class SQLiteTest{
 	/**
 	 * Test method for
@@ -60,11 +56,12 @@ public class SQLiteTest{
 	@SuppressWarnings("static-method")
 	@Test
 	public void testAdd(){
-		ProductLog test = new ProductLog(false, true, new sqliteDatabase(null));
-		List<LogMessage> msgs = new ArrayList<>();
-		msgs.add(new LogMessage("id", "12-04-2013 10:09", "producing",
+		ProductLog testLog = new ProductLog(false, true, new sqliteDatabase(
+				null));
+		List<LogMessage> logMsgList = new ArrayList<>();
+		logMsgList.add(new LogMessage("id", "12-04-2013 10:09", "producing",
 				"Start producing"));
-		test.add(msgs);
+		testLog.add(logMsgList);
 	}
 
 	/**
