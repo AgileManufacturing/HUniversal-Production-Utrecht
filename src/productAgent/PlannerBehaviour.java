@@ -74,11 +74,11 @@ public class PlannerBehaviour extends OneShotBehaviour{
 	public static void removeEquiplet(AID aid){
 		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
 		// try to remove the given 'aid' from the blackboard (for testing
-		// purposes only)
+		// purposes only, this funtion will later be called upon from the
+		// Equiplet agent code)
 		try{
 			bbc.removeDocuments(aid.toString());
 		} catch(InvalidJSONException | InvalidDBNamespaceException e){
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -88,49 +88,38 @@ public class PlannerBehaviour extends OneShotBehaviour{
 		try{
 			// Get the root Agent
 			_productAgent = (ProductAgent) myAgent;
-			// Create the blackboardclient to connect to a specific IP & port
 			BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
-			// Select the database
 			bbc.setDatabase("CollectiveDb");
-			// Select the collection
 			bbc.setCollection("EquipletDirectory");
-			// Get the product object
 			Product product = this._productAgent.getProduct();
-			// Get the production object
 			Production production = product.getProduction();
-			// Retrieve the productionstep array
 			ArrayList<ProductionStep> psa = production.getProductionSteps();
-			// Retrieve the equipletmapper
-			ProductionEquipletMapper pem = production
+			ProductionEquipletMapper prodEQmap = production
 					.getProductionEquipletMapping();
 			// Iterate over all the production steps
-			for(ProductionStep ps : psa){
-				if (ps.getStatus() == ProductionStepStatus.STATE_TODO){
-					// Get the ID for the production step
-					int PA_id = ps.getId();
+			for(ProductionStep prodStep : psa){
+				if (prodStep.getStatus() == ProductionStepStatus.STATE_TODO){
+					int PA_id = prodStep.getId();
 					// Get the type of production step, aka capability
-					long PA_capability = ps.getCapability();
+					long PA_capability = prodStep.getCapability();
 					// Create the select query for the blackboard
 					DBObject equipletCapabilityQuery = QueryBuilder
 							.start("capabilities").is(PA_capability).get();
 					List<DBObject> equipletDirectory = bbc
 							.findDocuments(equipletCapabilityQuery);
-					for(DBObject dbo : equipletDirectory){
-						DBObject aid = (DBObject) dbo.get("db");
+					for(DBObject DBobj : equipletDirectory){
+						DBObject aid = (DBObject) DBobj.get("db");
 						String name = aid.get("name").toString();
-						pem.addEquipletToProductionStep(PA_id, new AID(name,
-								AID.ISLOCALNAME));
+						prodEQmap.addEquipletToProductionStep(PA_id, new AID(
+								name, AID.ISLOCALNAME));
 					}
 				}
 			}
-			// Set the production mapper in the production object
-			production.setProductionEquipletMapping(pem);
-			// Add the production to the product object
+			production.setProductionEquipletMapping(prodEQmap);
 			product.setProduction(production);
-			// Set the product object in the product agent
 			this._productAgent.setProduct(product);
 		} catch(Exception e){
-			System.out.println("Exception planner " + e);
+			System.out.println("Exception PlannerBehaviour: " + e);
 		}
 	}
 }

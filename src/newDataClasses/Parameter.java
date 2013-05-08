@@ -65,14 +65,14 @@ public class Parameter implements Serializable{
 	/**
 	 * @return the _key
 	 */
-	public String getKey(){
+	public String getParamKey(){
 		return _key;
 	}
 
 	/**
 	 * @return the _value
 	 */
-	public String getValue(){
+	public String getParamValue(){
 		return _value;
 	}
 
@@ -80,7 +80,7 @@ public class Parameter implements Serializable{
 	 * @param _value
 	 *            the _value to set
 	 */
-	public void setValue(String value){
+	public void setParamValue(String value){
 		this._value = value;
 	}
 }

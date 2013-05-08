@@ -78,7 +78,7 @@ public class Product{
 		this._production = production;
 	}
 
-	public void add(List<LogMessage> msg){
+	public void addLogMsg(List<LogMessage> msg){
 		log.add(msg);
 	}
 }

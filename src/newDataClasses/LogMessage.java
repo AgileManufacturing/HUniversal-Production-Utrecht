@@ -1,6 +1,6 @@
 /**
  * @file LogMessage.java
- * @brief Class in which the logging messages can be retrieved.
+ * @brief Class in which the logging messages can be set and retrieved.
  * @date Created: 02-04-2013
  * 
  * @author Theodoor de Graaff

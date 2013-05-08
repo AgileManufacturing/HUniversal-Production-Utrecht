@@ -4,6 +4,7 @@
  * @date Created: 08-04-2013
  * 
  * @author Alexander Streng
+ * @author Arno Derks
  * 
  * @section LICENSE License: newBSD
  * 
@@ -53,8 +54,8 @@ public class ProductAgent extends Agent{
 	private Product _product;
 	private OverviewBehaviour _overviewBehaviour;
 	// CID variables
-	private static int _cidCnt = 0;
-	private String _cidBase;
+	private static int _convIDCnt = 0;
+	private String _convIDBase;
 	public int prodStep = 0;
 
 	@Override
@@ -75,11 +76,11 @@ public class ProductAgent extends Agent{
 	 * objects hashcode and the current time.
 	 */
 	public String generateCID(){
-		if (_cidBase == null){
-			_cidBase = getLocalName() + hashCode() + System.currentTimeMillis()
-					% 10000 + "_";
+		if (_convIDBase == null){
+			_convIDBase = getLocalName() + hashCode()
+					+ System.currentTimeMillis() % 10000 + "_";
 		}
-		return _cidBase + (_cidCnt++);
+		return _convIDBase + (_convIDCnt++);
 	}
 
 	public void reschedule(){
@@ -98,6 +99,7 @@ public class ProductAgent extends Agent{
 
 	// This function is for testing purposes only and will later be replaced
 	// within the Equiplet Agent its functionality
+	@SuppressWarnings("static-method")
 	public void removeEquiplet(AID aid){
 		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
 		// try to remove the given 'aid' from the blackboard

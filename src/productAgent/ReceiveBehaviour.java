@@ -56,10 +56,10 @@ public class ReceiveBehaviour extends SimpleBehaviour{
 		return msg;
 	}
 
-	public ReceiveBehaviour(Agent a, int millis, MessageTemplate mt){
-		super(a);
+	public ReceiveBehaviour(Agent agnt, int millis, MessageTemplate msgtmplt){
+		super(agnt);
 		timeOut = millis;
-		template = mt;
+		template = msgtmplt;
 	}
 
 	@Override
@@ -84,6 +84,7 @@ public class ReceiveBehaviour extends SimpleBehaviour{
 			handle(msg);
 			return;
 		}
+		// wat is dt???
 		long dt = wakeupTime - System.currentTimeMillis();
 		if (dt > 0)
 			block(dt);
@@ -109,6 +110,7 @@ public class ReceiveBehaviour extends SimpleBehaviour{
 		super.reset();
 	}
 
+	// wat is dt???
 	public void reset(int dt){
 		timeOut = dt;
 		reset();

@@ -56,14 +56,14 @@ public class SocketBehaviour extends CyclicBehaviour{
 	 */
 	private static final long serialVersionUID = 1L;
 	private Socket socket;
-	private PrintWriter out = null;
-	private BufferedReader in = null;
+	private PrintWriter outputStream = null;
+	private BufferedReader inputStream = null;
 
 	public SocketBehaviour(){
 		try{
 			socket = new Socket(InetAddress.getByName("127.0.0.1"), 10080);
-			out = new PrintWriter(socket.getOutputStream(), true);
-			in = new BufferedReader(new InputStreamReader(
+			outputStream = new PrintWriter(socket.getOutputStream(), true);
+			inputStream = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
 		} catch(UnknownHostException e){
 			// TODO Auto-generated catch block
@@ -81,16 +81,16 @@ public class SocketBehaviour extends CyclicBehaviour{
 	@Override
 	public void action(){
 		try{
-			if (in.ready()){
-				// is toch mijn code, dus niet zeuren
-				String s = in.readLine();
+			if (inputStream.ready()){
+				String s = inputStream.readLine();
 				this.sent(s);
 			}
 		} catch(Exception e){
+			e.printStackTrace();
 		}
 	}
 
 	public void sent(String msg){
-		out.println(msg);
+		outputStream.println(msg);
 	}
 }

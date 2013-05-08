@@ -46,8 +46,7 @@ public class OverviewBehaviour extends OneShotBehaviour{
 	private static final long serialVersionUID = 1L;
 	private ProductAgent _productAgent;
 	@SuppressWarnings("unused")
-	private boolean _isDone;
-	// private ThreadedBehaviourFactory _pbf;
+	private boolean _isDone = false;
 	/* Behaviour */
 	@SuppressWarnings("unused")
 	private PlannerBehaviour _plannerBehaviour;
@@ -63,42 +62,41 @@ public class OverviewBehaviour extends OneShotBehaviour{
 
 	/*
 	 * (non-Javadoc) This behaviour should have 3 parallel sub-behaviours. One
-	 * where the normal flow ( plan, inform, schedule, produce ) is follow, and
-	 * one where is listend for incoming msgs.
+	 * where the normal flow ( plan, inform, schedule, produce ) is followed,
+	 * and one where it listens to incoming messages. MIST NOG 1 MOGELIJKHEID!
 	 */
 	@Override
 	public void action(){
 		_productAgent = (ProductAgent) myAgent;
-		System.out.println("Lets add a Sequential");
+		System.out.println("Add a SequentialBehaviour");
 		_sequentialBehaviour = new SequentialBehaviour();
 		_productAgent.addBehaviour(_sequentialBehaviour);
-		System.out.println("Lets add a plannerbehaviour");
+		System.out.println("Add a PlannerBehaviour");
 		_sequentialBehaviour.addSubBehaviour(new PlannerBehaviour());
-		System.out.println("Lets add a Informer");
+		System.out.println("Add an InformerBehaviour");
 		_informerBehaviour = new InformerBehaviour();
 		_sequentialBehaviour.addSubBehaviour(_informerBehaviour);
-		// we need to wait till all conv. of the informer are done. We dont want
-		// to block, but do want to wait.
+		// we need to wait till all conv. of the informer are done. We don't
+		// want to block, but do want to wait.
 		_sequentialBehaviour.addSubBehaviour(new CyclicBehaviour(){
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void action(){
-				// TODO Auto-generated method stub
 				if (_informerBehaviour.isDone()){
 					_sequentialBehaviour.removeSubBehaviour(this);
 				}
 			}
 		});
-		System.out.println("Lets add a Scheduler");
+		System.out.println("Add a SchedulerBehaviour");
 		_schedulerBehaviour = new SchedulerBehaviour();
 		_sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
-		System.out.println("Lets add a produce");
+		System.out.println("Add a ProduceBehaviour");
 		// _produceBehaviour = new ProduceBehaviour();
 		// _sequentialBehaviour.addSubBehaviour(_produceBehaviour);
 		System.out
-				.println("Added all behaviours. And everything should start. Aw yeah!");
-		System.out.println("Lets add a Scheduler");
+				.println("Added all behaviours. And everything should start.");
+		System.out.println("Add a Scheduler");
 		_schedulerBehaviour = new SchedulerBehaviour();
 		_sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
 		_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour(){
@@ -131,11 +129,12 @@ public class OverviewBehaviour extends OneShotBehaviour{
 				}
 			}
 		});
-		System.out.println("Lets add a produce");
+		System.out.println("Add a ProduceBehaviour");
 		// _produceBehaviour = new ProduceBehaviour();
 		// _sequentialBehaviour.addSubBehaviour(_produceBehaviour);
 	}
 
+	@SuppressWarnings("static-method")
 	public void reschedule(){
 		System.out.println("Rescheduling will be implemented here");
 	}

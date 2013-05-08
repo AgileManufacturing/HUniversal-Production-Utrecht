@@ -43,9 +43,6 @@ package newDataClasses;
 import java.io.Serializable;
 
 public class ProductionStep implements Serializable{
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -832835122145455883L;
 	private int _requiredTimeSlots;
 	private int _id;

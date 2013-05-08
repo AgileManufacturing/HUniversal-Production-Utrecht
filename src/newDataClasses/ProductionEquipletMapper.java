@@ -1,6 +1,6 @@
 /**
  * @file ProductionEquipletMapper.java
- * @brief Class in which the equiplet can be assigned to/removed from an
+ * @brief Class in which the equiplet can be assigned to/removed from a
  *        production step, same goes for the timeslots needed for the step.
  * @date Created: 02-04-2013
  * 
@@ -74,28 +74,31 @@ public class ProductionEquipletMapper{
 
 	public void addEquipletToProductionStep(Integer productionStepID,
 			AID equipletID, Long timeslots){
-		HashMap<AID, Long> tmp = this.equipletList.get(productionStepID);
-		tmp.put(equipletID, timeslots);
-		this.equipletList.put(productionStepID, tmp);
+		HashMap<AID, Long> tempEQHashmap = this.equipletList
+				.get(productionStepID);
+		tempEQHashmap.put(equipletID, timeslots);
+		this.equipletList.put(productionStepID, tempEQHashmap);
 	}
 
 	public void removeEquipletFromProductionStep(Integer productionStepID,
 			AID equipletID){
-		HashMap<AID, Long> tmp = this.equipletList.get(productionStepID);
-		tmp.remove(equipletID);
-		this.equipletList.put(productionStepID, tmp);
+		HashMap<AID, Long> tempEQHashmap = this.equipletList
+				.get(productionStepID);
+		tempEQHashmap.remove(equipletID);
+		this.equipletList.put(productionStepID, tempEQHashmap);
 	}
 
 	public HashMap<AID, Long> getEquipletsForProductionStep(int pA_id){
-		HashMap<AID, Long> s2 = this.equipletList.get(pA_id);
+		// HashMap<AID, Long> s2 = this.equipletList.get(pA_id);
 		return this.equipletList.get(pA_id);
 	}
 
-	public void setTimeSlotsForEquplet(Integer productionStepID,
+	public void setTimeSlotsForEquiplet(Integer productionStepID,
 			AID equipletID, Long timeslots){
-		HashMap<AID, Long> tmp = this.equipletList.get(productionStepID);
-		tmp.put(equipletID, timeslots);
-		this.equipletList.put(productionStepID, tmp);
+		HashMap<AID, Long> tempTimeslotForEQHashmap = this.equipletList
+				.get(productionStepID);
+		tempTimeslotForEQHashmap.put(equipletID, timeslots);
+		this.equipletList.put(productionStepID, tempTimeslotForEQHashmap);
 	}
 
 	public Long getTimeSlotsForEquiplet(int i, AID equipletID){

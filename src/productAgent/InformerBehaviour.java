@@ -63,7 +63,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 	private ParallelBehaviour _par;
 	private Product _product;
 	private Production _production;
-	private ProductionEquipletMapper _pem;
+	private ProductionEquipletMapper _prodEQmap;
 	private boolean _isDone;
 
 	public InformerBehaviour(){
@@ -75,7 +75,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 		_productAgent = (ProductAgent) myAgent;
 		_product = this._productAgent.getProduct();
 		_production = _product.getProduction();
-		_pem = new ProductionEquipletMapper();
+		_prodEQmap = new ProductionEquipletMapper();
 		_isDone = false;
 		/*
 		 * We want to have our conversations in parallel. We also only want to
@@ -91,12 +91,12 @@ public class InformerBehaviour extends OneShotBehaviour{
 			if (stp.getStatus() == ProductionStepStatus.STATE_TODO){
 				// adds the step to te new list (the one that will be returned
 				// to the scheduler)
-				_pem.addProductionStep(stp.getId());
+				_prodEQmap.addProductionStep(stp.getId());
 				ProductionEquipletMapper s1 = _production
 						.getProductionEquipletMapping();
 				for(AID aid : _production.getProductionEquipletMapping()
 						.getEquipletsForProductionStep(stp.getId()).keySet()){
-					_par.addSubBehaviour(new Conversation(aid, stp, _pem));
+					_par.addSubBehaviour(new Conversation(aid, stp, _prodEQmap));
 				}
 			}
 		}
@@ -109,7 +109,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 				if (_par.done()){
 					System.out.println("Done informing.");
 					try{
-						_production.setProductionEquipletMapping(_pem);
+						_production.setProductionEquipletMapping(_prodEQmap);
 						_product.setProduction(_production);
 						_productAgent.setProduct(_product);
 						_isDone = true;
@@ -143,13 +143,13 @@ public class InformerBehaviour extends OneShotBehaviour{
 		private AID _aid;
 		private ProductionStep _productionStep;
 		private boolean debug = true;
-		private ProductionEquipletMapper _pem;
+		private ProductionEquipletMapper _prodEQmap;
 
 		public Conversation(AID aid, ProductionStep productionStep,
 				ProductionEquipletMapper pem){
 			this._aid = aid;
 			this._productionStep = productionStep;
-			this._pem = pem;
+			this._prodEQmap = pem;
 		}
 
 		/*
@@ -159,7 +159,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 		@Override
 		public void onStart(){
 			final String ConversationId = _productAgent.generateCID();
-			final MessageTemplate template = MessageTemplate
+			final MessageTemplate msgtemplate = MessageTemplate
 					.MatchConversationId(ConversationId);
 			// 1 - Inform if the equiplet can perform the step with the given
 			// parameters
@@ -190,7 +190,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 				}
 			});
 			// 2 - wait for an response. ( handles a 10 sec timeout )
-			addSubBehaviour(new ReceiveBehaviour(myAgent, 10000, template){
+			addSubBehaviour(new ReceiveBehaviour(myAgent, 10000, msgtemplate){
 				/**
 				 * 
 				 */
@@ -248,14 +248,15 @@ public class InformerBehaviour extends OneShotBehaviour{
 							// 4- waits for the response ( handles a 10 sec
 							// timeout ).
 							addSubBehaviour(new ReceiveBehaviour(myAgent,
-									10000, template){
+									10000, msgtemplate){
 								/**
 										 * 
 										 */
 								private static final long serialVersionUID = 1L;
 
 								@Override
-								public void handle(ACLMessage msg){
+								public void handle(
+										@SuppressWarnings("hiding") ACLMessage msg){
 									if (msg == null){
 										if (debug){
 											System.out
@@ -277,7 +278,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 													System.out
 															.println("Received INFORM from: "
 																	+ _aid.getLocalName()
-																	+ ". He can perform step: "
+																	+ ". It can perform step: "
 																	+ _productionStep
 																			.getId()
 																	+ ". This step will take "
@@ -287,9 +288,11 @@ public class InformerBehaviour extends OneShotBehaviour{
 												// Adds the equiplet to the
 												// production step in
 												// the mapper list.
-												_pem.addEquipletToProductionStep(
-														_productionStep.getId(),
-														_aid, timeSlots);
+												_prodEQmap
+														.addEquipletToProductionStep(
+																_productionStep
+																		.getId(),
+																_aid, timeSlots);
 											}
 										} catch(UnreadableException e){
 											System.out
@@ -304,7 +307,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 							if (debug){
 								System.out.println("Received DISCONFIRM from: "
 										+ _aid.getLocalName()
-										+ ". He cant perform step: "
+										+ ". It cant perform step: "
 										+ _productionStep.getId());
 							}
 						}

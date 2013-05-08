@@ -44,10 +44,10 @@ import java.util.ArrayList;
 
 public class Production{
 	private ArrayList<ProductionStep> _productionSteps;
-	private ProductionEquipletMapper _prodletmap;
+	private ProductionEquipletMapper _prodEQMap;
 
 	public Production(){
-		_prodletmap = new ProductionEquipletMapper();
+		_prodEQMap = new ProductionEquipletMapper();
 	}
 
 	public Production(ArrayList<ProductionStep> productionSteps)
@@ -57,7 +57,7 @@ public class Production{
 			throw new Exception("Production steps can't be null");
 		this._productionSteps = productionSteps;
 		for(ProductionStep p : this._productionSteps){
-			this._prodletmap.addProductionStep(p.getId());
+			this._prodEQMap.addProductionStep(p.getId());
 		}
 	}
 
@@ -65,14 +65,14 @@ public class Production{
 		return _productionSteps;
 	}
 
-	public void setProductionEquipletMapping(ProductionEquipletMapper prodLetMap)
+	public void setProductionEquipletMapping(ProductionEquipletMapper prodEQMap)
 			throws Exception{
-		if (prodLetMap == null)
+		if (prodEQMap == null)
 			throw new Exception("mapping cant be null");
-		this._prodletmap = prodLetMap;
+		this._prodEQMap = prodEQMap;
 	}
 
 	public ProductionEquipletMapper getProductionEquipletMapping(){
-		return this._prodletmap;
+		return this._prodEQMap;
 	}
 }

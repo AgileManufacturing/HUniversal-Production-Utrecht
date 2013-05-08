@@ -51,25 +51,22 @@ import newDataClasses.ProductionStep;
 @SuppressWarnings("serial")
 public class EquipletAgent extends Agent{
 	private int _canPerformStepId;
-	private ProductionStep _step;
+	private ProductionStep _prodStep;
 
 	public int getCanPerformStepId(){
 		return _canPerformStepId;
 	}
 
 	public static boolean getRandomBoolean(){
-		@SuppressWarnings("unused")
-		Random random = new Random();
-		// return random.nextBoolean();
-		return true;
+		Random randomBool = new Random();
+		return randomBool.nextBoolean();
 	}
 
-	public static int getRandomInt(int r){
-		Random random = new Random();
-		return random.nextInt(r);
+	public static int getRandomInt(int random){
+		Random randomInt = new Random();
+		return randomInt.nextInt(random);
 	}
 
-	// equiplet can perform
 	@Override
 	protected void setup(){
 		try{
@@ -77,17 +74,17 @@ public class EquipletAgent extends Agent{
 			_canPerformStepId = (Integer) args[0];
 			addBehaviour(new receiveMsgBehaviour());
 		} catch(Exception e){
-			System.out.println("EquipletAgent Exited with: " + e);
+			System.out.println("EquipletAgent exited with: " + e);
 			doDelete();
 		}
 	}
 
-	// Behaviour for receiving msgs, and dealing with them in a parallel
+	// Behaviour for receiving messages and handling simultaniously(parallel)
 	private class receiveMsgBehaviour extends CyclicBehaviour{
-		ParallelBehaviour par;
+		ParallelBehaviour parBehav;
 
 		private receiveMsgBehaviour(){
-			par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
+			parBehav = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 		}
 
 		@Override
@@ -95,11 +92,11 @@ public class EquipletAgent extends Agent{
 			ACLMessage msg = receive();
 			if (msg != null){
 				WaitMsgBehaviour behaviour = new WaitMsgBehaviour(msg);
-				par.addSubBehaviour(behaviour);
+				parBehav.addSubBehaviour(behaviour);
 			} else{
 				block();
 			}
-			myAgent.addBehaviour(par);
+			myAgent.addBehaviour(parBehav);
 		}
 	}
 
@@ -126,15 +123,16 @@ public class EquipletAgent extends Agent{
 								+ " schedule");
 					break;
 				case "CanPerformStep":
-					_step = (ProductionStep) msg.getContentObject();
+					_prodStep = (ProductionStep) msg.getContentObject();
 					if (debug)
 						System.out.println("EQ: PA -> "
 								+ myAgent.getLocalName() + " Received query"
-								+ " if I can perform step: " + _step.getId());
+								+ " if I can perform step: "
+								+ _prodStep.getId());
 					message = new ACLMessage(ACLMessage.DISCONFIRM);
 					message.setOntology("CanPerformStep");
 					message.addReceiver(msg.getSender());
-					// Debuggin. Set false to disconfirm the requested step
+					// Debugging. Set false to disconfirm the requested step
 					if (getRandomBoolean()){
 						message.setPerformative(ACLMessage.CONFIRM);
 					}
@@ -143,8 +141,8 @@ public class EquipletAgent extends Agent{
 					if (debug)
 						System.out.println("EQ: " + myAgent.getLocalName()
 								+ " will wait : " + delay / 2
-								+ " ms to send his msg " + "CanPerformStep "
-								+ _step.getId());
+								+ " ms before sending " + "CanPerformStep "
+								+ _prodStep.getId());
 					myAgent.addBehaviour(new WakerBehaviour(myAgent, delay){
 						@Override
 						public void handleElapsedTimeout(){
@@ -153,18 +151,18 @@ public class EquipletAgent extends Agent{
 										+ myAgent.getLocalName()
 										+ " will wait : " + delay / 2
 										+ " ms before sending "
-										+ "CanPerformStep " + _step.getId());
+										+ "CanPerformStep " + _prodStep.getId());
 							send(message);
 						}
 					});
 					break;
 				case "GetProductionDuration":
-					_step = (ProductionStep) msg.getContentObject();
+					_prodStep = (ProductionStep) msg.getContentObject();
 					if (debug)
 						System.out.println("EQ: PA -> "
 								+ myAgent.getLocalName() + " Received query"
 								+ " how long it would take to perform: "
-								+ _step.getId());
+								+ _prodStep.getId());
 					message = new ACLMessage(ACLMessage.INFORM);
 					message.setOntology("GetProductionDuration");
 					long timeslots = getRandomInt(30);
@@ -176,7 +174,7 @@ public class EquipletAgent extends Agent{
 					if (true && delay > 10000)
 						System.out.println("EQ: " + myAgent.getLocalName()
 								+ " waited : " + delay + " ms before sending "
-								+ "GetProductionDuration " + _step.getId());
+								+ "GetProductionDuration " + _prodStep.getId());
 					myAgent.addBehaviour(new WakerBehaviour(myAgent, delay){
 						@Override
 						public void handleElapsedTimeout(){
@@ -184,8 +182,8 @@ public class EquipletAgent extends Agent{
 								System.out.println("EQ: "
 										+ myAgent.getLocalName() + " -> PA "
 										+ " send msg GetProductionDuration ( "
-										+ _step.getId() + " ) after " + delay
-										+ " ms.");
+										+ _prodStep.getId() + " ) after "
+										+ delay + " ms.");
 							send(message);
 						}
 					});

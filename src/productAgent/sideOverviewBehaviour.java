@@ -57,6 +57,7 @@ public class SideOverviewBehaviour extends CyclicBehaviour{
 
 		@Override
 		public void action(){
+			@SuppressWarnings("hiding")
 			ACLMessage msg = myAgent.receive();
 			if (msg != null){
 				WaitMsgBehaviour behaviour = new WaitMsgBehaviour(msg);
@@ -67,6 +68,7 @@ public class SideOverviewBehaviour extends CyclicBehaviour{
 	}
 
 	private class WaitMsgBehaviour extends OneShotBehaviour{
+		@SuppressWarnings("hiding")
 		ACLMessage msg;
 
 		public WaitMsgBehaviour(ACLMessage msg){
@@ -83,6 +85,7 @@ public class SideOverviewBehaviour extends CyclicBehaviour{
 					OneShotBehaviour waitingBehaviour = new OneShotBehaviour(){
 						@Override
 						public void action(){
+							// TODO
 						}
 					};
 					break;
@@ -118,6 +121,5 @@ public class SideOverviewBehaviour extends CyclicBehaviour{
 
 	@Override
 	public void action(){
-		// TODO Auto-generated method stub
 	}
 }

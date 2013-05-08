@@ -56,11 +56,12 @@ public class SQLiteTest{
 	@SuppressWarnings("static-method")
 	@Test
 	public void testAdd(){
-		ProductLog test = new ProductLog(false, true, new sqliteDatabase(null));
-		List<LogMessage> msgs = new ArrayList<>();
-		msgs.add(new LogMessage("id", "12-04-2013 10:09", "producing",
+		ProductLog testLog = new ProductLog(false, true, new sqliteDatabase(
+				null));
+		List<LogMessage> logMsgList = new ArrayList<>();
+		logMsgList.add(new LogMessage("id", "12-04-2013 10:09", "producing",
 				"Start producing"));
-		test.add(msgs);
+		testLog.add(logMsgList);
 	}
 
 	/**

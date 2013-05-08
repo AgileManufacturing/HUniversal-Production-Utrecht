@@ -45,7 +45,7 @@ import java.util.List;
 import newDataClasses.sqldatabase.sqliteDatabase;
 
 public class ProductLog{
-	private boolean writeToRemote;
+	private boolean writeToRemote = false;
 	private boolean writeToLocal = true;
 	private sqliteDatabase local;
 

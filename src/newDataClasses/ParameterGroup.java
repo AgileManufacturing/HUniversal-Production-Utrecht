@@ -74,7 +74,7 @@ public class ParameterGroup implements Serializable{
 	public void add(Parameter parameter) throws Exception{
 		if (parameter == null)
 			throw new Exception("Can't add a null parameter!");
-		this._parameters.put(parameter.getKey(), parameter);
+		this._parameters.put(parameter.getParamKey(), parameter);
 	}
 
 	public void add(Parameter[] parameters) throws Exception{
@@ -99,7 +99,7 @@ public class ParameterGroup implements Serializable{
 	 * object
 	 */
 	public String getParameterValue(String key){
-		return this._parameters.get(key).getValue();
+		return this._parameters.get(key).getParamValue();
 	}
 
 	public void setParameterValue(String key, String value) throws Exception{

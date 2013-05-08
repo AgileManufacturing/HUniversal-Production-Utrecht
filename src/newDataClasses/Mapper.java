@@ -1,6 +1,7 @@
 /**
  * @file Mapper.java
- * @brief
+ * @brief Class where the key and value can be added to/ removed from the
+ *        hashmap aswell as the posibility to retrieve the value.
  * @date Created: 02-04-2013
  * 
  * @author Mike Schaap
@@ -49,25 +50,25 @@ public abstract class Mapper<KT, VT> {
 		this._items = new HashMap<>();
 	}
 
-	protected void addKey(KT id){
+	protected void addMapKey(KT id){
 		this._items.put(id, new ArrayList<VT>());
 	}
 
-	protected void removeKey(KT id){
+	protected void removeMapKey(KT id){
 		this._items.remove(id);
 	}
 
-	protected ArrayList<VT> getValues(KT id){
+	protected ArrayList<VT> getMapValues(KT id){
 		return this._items.get(id);
 	}
 
-	protected void addValue(KT id, VT value){
+	protected void addMapValue(KT id, VT value){
 		ArrayList<VT> tmp = this._items.get(id);
 		tmp.add(value);
 		this._items.put(id, tmp);
 	}
 
-	protected void removeValue(KT id, VT value){
+	protected void removeMapValue(KT id, VT value){
 		ArrayList<VT> tmp = this._items.get(id);
 		tmp.remove(value);
 		this._items.put(id, tmp);

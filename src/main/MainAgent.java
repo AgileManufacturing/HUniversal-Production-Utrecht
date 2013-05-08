@@ -53,13 +53,6 @@ import newDataClasses.Production;
 import newDataClasses.ProductionStep;
 import newDataClasses.ProductionStepStatus;
 
-/*
- * Author: Alexander Dummy main agent for testing purposes. Starts up the
- * different agents and sets the (for now) hardcoded information. DISCLAIMER I
- * DID NOT FOLLOW ANY CODING REGULATIONS. THIS IS NOT OFFICIAL PROJECT CODE, NOR
- * WILL IT BE USED FOR ANYTHING OTHER THEN TESTING. COMMENTS ARE SCARCE AND
- * CRAPPY USE AT OWN RISK.
- */
 @SuppressWarnings("serial")
 public class MainAgent extends Agent{
 	@Override
@@ -67,38 +60,38 @@ public class MainAgent extends Agent{
 		try{
 			System.out.println("Starting agents:");
 			// instantiate the 'equiplet' agents
-			Object[] ar = new Object[]{1};// pickndplace
-			getContainerController().createNewAgent("eqa1",
-					"testingAgents.EquipletAgent", ar).start();
-			ar = new Object[]{2}; // colour
-			getContainerController().createNewAgent("eqa2",
-					"testingAgents.EquipletAgent", ar).start();
-			ar = new Object[]{3}; // rotate
-			getContainerController().createNewAgent("eqa3",
-					"testingAgents.EquipletAgent", ar).start();
-			ar = new Object[]{2}; // rotate
-			getContainerController().createNewAgent("eqa4",
-					"testingAgents.EquipletAgent", ar).start();
-			ar = new Object[]{1}; // rotate
-			getContainerController().createNewAgent("eqa5",
-					"testingAgents.EquipletAgent", ar).start();
-			ar = new Object[]{3}; // rotate
-			getContainerController().createNewAgent("eqa6",
-					"testingAgents.EquipletAgent", ar).start();
-			ar = new Object[]{1}; // rotate
-			getContainerController().createNewAgent("eqa7",
-					"testingAgents.EquipletAgent", ar).start();
-			ar = new Object[]{1}; // rotate
-			getContainerController().createNewAgent("eqa8",
-					"testingAgents.EquipletAgent", ar).start();
-			ar = new Object[]{2}; // rotate
-			getContainerController().createNewAgent("eqa9",
-					"testingAgents.EquipletAgent", ar).start();
-			ar = new Object[]{3}; // rotate
-			getContainerController().createNewAgent("eqa10",
-					"testingAgents.EquipletAgent", ar).start();
-			ar = null;
-			// Lets make a parameter list
+			Object[] EquipletArray = new Object[]{1};// pickndplace
+			getContainerController().createNewAgent("EQ1",
+					"testingAgents.EquipletAgent", EquipletArray).start();
+			EquipletArray = new Object[]{2}; // colour
+			getContainerController().createNewAgent("EQ2",
+					"testingAgents.EquipletAgent", EquipletArray).start();
+			EquipletArray = new Object[]{3}; // rotate
+			getContainerController().createNewAgent("EQ3",
+					"testingAgents.EquipletAgent", EquipletArray).start();
+			EquipletArray = new Object[]{2}; // rotate
+			getContainerController().createNewAgent("EQ4",
+					"testingAgents.EquipletAgent", EquipletArray).start();
+			EquipletArray = new Object[]{1}; // rotate
+			getContainerController().createNewAgent("EQ5",
+					"testingAgents.EquipletAgent", EquipletArray).start();
+			EquipletArray = new Object[]{3}; // rotate
+			getContainerController().createNewAgent("EQ6",
+					"testingAgents.EquipletAgent", EquipletArray).start();
+			EquipletArray = new Object[]{1}; // rotate
+			getContainerController().createNewAgent("EQ7",
+					"testingAgents.EquipletAgent", EquipletArray).start();
+			EquipletArray = new Object[]{1}; // rotate
+			getContainerController().createNewAgent("EQ8",
+					"testingAgents.EquipletAgent", EquipletArray).start();
+			EquipletArray = new Object[]{2}; // rotate
+			getContainerController().createNewAgent("EQ9",
+					"testingAgents.EquipletAgent", EquipletArray).start();
+			EquipletArray = new Object[]{3}; // rotate
+			getContainerController().createNewAgent("EQ10",
+					"testingAgents.EquipletAgent", EquipletArray).start();
+			EquipletArray = null;
+			// Create a parameterlist
 			ParameterList parameterList = new ParameterList();
 			ParameterGroup p = new ParameterGroup("Color"); // group colour
 			p.add(new Parameter("Id", "1"));
@@ -110,7 +103,7 @@ public class MainAgent extends Agent{
 			p.add(new Parameter("x", "2"));
 			p.add(new Parameter("y", "2"));
 			parameterList.AddParameterGroup(p);
-			// Next we want to have some production steps
+			// Create productionsteps
 			ProductionStep stp1 = new ProductionStep(1, 0, parameterList);
 			stp1.setStatus(ProductionStepStatus.STATE_TODO);
 			p = new ParameterGroup("Color"); // group colour
@@ -149,9 +142,7 @@ public class MainAgent extends Agent{
 			parameterList.AddParameterGroup(p);
 			ProductionStep stp4 = new ProductionStep(4, 3, parameterList);
 			stp4.setStatus(ProductionStepStatus.STATE_TODO);
-			// Our argument for the product agent. The total production of the
-			// product,
-			// consists of multiple steps
+			// The product agent will receive several steps to handle.
 			ArrayList<ProductionStep> stepList = new ArrayList<>();
 			stepList.add(stp1);
 			stepList.add(stp2);
