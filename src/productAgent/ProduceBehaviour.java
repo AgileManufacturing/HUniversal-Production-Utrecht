@@ -43,6 +43,7 @@ package productAgent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
+import jade.lang.acl.ACLMessage;
 
 import java.util.List;
 
@@ -55,7 +56,60 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	private static final long serialVersionUID = 1L;
 	private Product _product;
 	private ProductAgent _productAgent;
+	ACLMessage msg;
 
+	@SuppressWarnings("unused")
+	private class receiveMsgBehaviour extends CyclicBehaviour{
+		private static final long serialVersionUID = 1L;
+
+		private receiveMsgBehaviour(){
+		}
+
+		@Override
+		public void action(){
+			@SuppressWarnings("hiding")
+			ACLMessage msg = myAgent.receive();
+			if (msg != null){
+				WaitMsgBehaviour behaviour = new WaitMsgBehaviour(msg);
+			} else{
+				block();
+			}
+		}
+	}
+
+	private class WaitMsgBehaviour extends OneShotBehaviour{
+		private static final long serialVersionUID = 1L;
+		ACLMessage msg;
+
+		public WaitMsgBehaviour(ACLMessage msg){
+			this.msg = msg;
+		}
+
+		@Override
+		public void action(){
+			try{
+				switch(msg.getOntology()){
+				// The productionstep has been initiated.
+				case "productionStart":
+					// De productie is gestart bij de equiplet.
+					break;
+				// The productionstep has completed.
+				case "productionFinished":
+					// De productie is klaar en de logfile zal nu worden
+					// ontvangen/aangevraagd (is nog niet duidelijk).
+					break;
+				// For some reason production can't be started.
+				case "notStarted":
+					_productAgent.reschedule();
+					break;
+				default:
+					break;
+				}
+			} catch(Exception e){
+				System.out.println("" + e);
+			}
+		}
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -66,9 +120,11 @@ public class ProduceBehaviour extends OneShotBehaviour{
 		_productAgent = (ProductAgent) myAgent;
 		SequentialBehaviour seq = new SequentialBehaviour();
 		myAgent.addBehaviour(seq);
-		
-		
-
+		@SuppressWarnings("hiding")
+		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		msg.setOntology("StartProduction");
+		msg.addReceiver(null); // add the equiplet AID
+		myAgent.send(msg);
 	}
 
 	static void canProductionStepStart(ProductionStep step){
