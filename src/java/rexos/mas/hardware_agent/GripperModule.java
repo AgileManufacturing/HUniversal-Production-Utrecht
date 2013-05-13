@@ -34,8 +34,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import org.bson.BasicBSONObject;
-
 import rexos.mas.equiplet_agent.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
@@ -80,7 +78,7 @@ public class GripperModule implements Module{
 			steps.addAll(new ArrayList<EquipletStepMessage>
 				(Arrays.asList(movementModule.getEquipletSteps(1, parameters))));//MOVE TO
 			steps.add(new EquipletStepMessage(null, new InstructionData(),
-					StepStatusCode.EVALUATING, new TimeData(4)));//DEACTIVATE GRIPPER
+					StepStatusCode.EVALUATING, new TimeData(1)));//DEACTIVATE GRIPPER
 			steps.addAll(new ArrayList<EquipletStepMessage>
 				(Arrays.asList(movementModule.getEquipletSteps(2, parameters))));//SAVE MOVE
 			equipletSteps = new EquipletStepMessage[steps.size()];

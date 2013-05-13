@@ -59,10 +59,7 @@ public class DeltaRobotModule implements Module {
 		case 2: //Move
 			steps = new ArrayList<EquipletStepMessage>();
 			steps.add(moveToSafePlane(parameters));
-			steps.add(new EquipletStepMessage(null, new InstructionData(),
-					StepStatusCode.EVALUATING, new TimeData(3)));//to desired position(x, y)
-			steps.add(new EquipletStepMessage(null, new InstructionData(),
-					StepStatusCode.EVALUATING, new TimeData(3)));//down to desired position(z)
+			steps.addAll(move(parameters));
 			equipletSteps = new EquipletStepMessage[steps.size()];
 			return steps.toArray(equipletSteps);
 		default:
@@ -89,19 +86,23 @@ public class DeltaRobotModule implements Module {
 		return step;
 	}
 	
-	private EquipletStepMessage move(BasicDBObject parameters){
+	private static ArrayList<EquipletStepMessage> move(BasicDBObject parameters){
+		ArrayList<EquipletStepMessage> steps = new ArrayList<EquipletStepMessage>();
+		
 		double extraSize = parameters.getDouble("extraSize");
 		
 		Position position = new Position((BasicDBObject)parameters.get("position"));
 		
 		BasicDBObject lookUpParameters = new BasicDBObject("ID", position.getRelativeToPart());
-		BasicDBObject payload = new BasicDBObject("z", extraSize + position.getZ());
-		payload.put("x", position.getX());
-		payload.put("y", position.getY());
-		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID",
-				lookUpParameters, payload);
-		EquipletStepMessage step = new EquipletStepMessage(null, instructionData,
-				StepStatusCode.EVALUATING, new TimeData(4));
-		return step;
+		BasicDBObject payloadXY = new BasicDBObject("x", position.getX());
+		payloadXY.put("y", position.getY());
+		InstructionData instructionDataXY = new InstructionData("move", "deltarobot", "FIND_ID",
+				lookUpParameters, payloadXY);
+		BasicDBObject payloadZ = new BasicDBObject("z", extraSize + position.getZ());
+		InstructionData instructionDataZ = new InstructionData("move", "deltarobot", "FIND_ID",
+				lookUpParameters, payloadZ);
+		steps.add(new EquipletStepMessage(null, instructionDataXY, StepStatusCode.EVALUATING, new TimeData(4)));
+		steps.add(new EquipletStepMessage(null, instructionDataZ, StepStatusCode.EVALUATING, new TimeData(4)));
+		return steps;
 	}
 }
