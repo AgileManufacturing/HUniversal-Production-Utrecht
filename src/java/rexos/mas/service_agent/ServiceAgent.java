@@ -67,7 +67,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 							equipletAgentAID.getLocalName() + "-hardwareAgent",
 							"rexos.mas.hardware_agent.HardwareAgent", arguments);
 			hardwareAgentCnt.start();
-			hardwareAgentAID = new AID(hardwareAgentCnt.getName(), AID.ISLOCALNAME);
+			hardwareAgentAID = new AID(hardwareAgentCnt.getName(), AID.ISGUID);
 		} catch(StaleProxyException e1) {
 			takeDown();
 			e1.printStackTrace();

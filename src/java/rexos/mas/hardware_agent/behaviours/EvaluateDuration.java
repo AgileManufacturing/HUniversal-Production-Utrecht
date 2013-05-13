@@ -97,6 +97,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 			int stepDuration = 0;
 			int leadingModule = hardwareAgent.getLeadingModule(serviceStep.getServiceId());
 			Module module = moduleFactory.getModuleById(leadingModule);
+			module.setConfiguration(hardwareAgent.getConfiguration());
 			EquipletStepMessage[] equipletSteps =
 					module.getEquipletSteps(serviceStep.getType(), serviceStep.getParameters());
 			for(EquipletStepMessage equipletStep : equipletSteps) {

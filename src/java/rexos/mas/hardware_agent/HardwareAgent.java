@@ -57,6 +57,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	private HashMap<Integer, Integer> leadingModuleForStep;
 	private ModuleFactory moduleFactory;
 	private AID equipletAgentAID, serviceAgentAID;
+	private HashMap<Integer, Object> configuration;
 	
 	public void registerLeadingModule(int serviceId, int moduleId) {
 		leadingModuleForStep.put(serviceId, moduleId);
@@ -84,6 +85,9 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			serviceAgentAID = (AID) args[2];
 		}
 
+		configuration = new HashMap<Integer, Object>();
+		configuration.put(1, new HashMap<Integer, Object>().put(2, null));
+		
 		try {
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient.setDatabase(dbData.getName());
@@ -219,5 +223,9 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		for (int step : newSoftware.isLeadingForSteps()) {
 			leadingModuleForStep.put(step, moduleId);
 		}
+	}
+	
+	public HashMap<Integer, Object> getConfiguration(){
+		return configuration;
 	}
 }

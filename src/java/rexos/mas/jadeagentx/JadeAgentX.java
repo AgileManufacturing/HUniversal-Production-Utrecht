@@ -79,20 +79,6 @@ public class JadeAgentX extends Agent {
 			getContainerController().createNewAgent("EQ1",
 					"rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 
-//			ArrayList<Integer> capabilities2 = new ArrayList<>();
-//			capabilities2.add(1);
-//			capabilities2.add(2);
-//			ar = new Object[] { capabilities2, logisticsAID };
-//			getContainerController().createNewAgent("EQ2",
-//					"rexos.mas.equiplet_agent.EquipletAgent", ar).start();
-//
-//			ArrayList<Integer> capabilities3 = new ArrayList<>();
-//			capabilities3.add(1);
-//			capabilities3.add(2);
-//			ar = new Object[] { capabilities3, logisticsAID };
-//			getContainerController().createNewAgent("EQ3",
-//					"rexos.mas.equiplet_agent.EquipletAgent", ar).start();
-
 			/**
 			 * Lets make a parameter list
 			 */
