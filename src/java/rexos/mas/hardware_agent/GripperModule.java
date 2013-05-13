@@ -94,6 +94,9 @@ public class GripperModule implements Module{
 
 	@Override
 	public int[] isLeadingForSteps() {
-		return new int[]{1};
+		
+		int[]steps = {1,2,3,4,5};
+		
+		return steps;
 	}
 }

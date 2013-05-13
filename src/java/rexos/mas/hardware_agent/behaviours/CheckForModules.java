@@ -89,10 +89,17 @@ public class CheckForModules extends ReceiveBehaviour {
 				// System.out.println();
 
 				for (int moduleId : moduleIds) {
-					
-					//TODO: zorg dat 0 return afgevangen word ..
-					if (hardwareAgent.getLeadingModule(moduleId) == 0) {
-						modulesPresent = false;
+
+					try {
+
+						if (hardwareAgent.getLeadingModule(moduleId) == 0) {
+							modulesPresent = false;
+						}
+
+					} catch (Exception e) {
+						
+						System.out.println("Exception Caught. No module found.");
+						
 					}
 				}
 
@@ -116,8 +123,8 @@ public class CheckForModules extends ReceiveBehaviour {
 			} catch (UnreadableException e) {
 				// System.out.println("Exception Caught, No Content Object Given");
 			}
-			System.out.format("%s received message from %s (%s:%s)%n", myAgent
-					.getLocalName(), message.getSender().getLocalName(),
+			System.out.format("%s received message from %s (%s:%s)%n",
+					myAgent.getLocalName(), message.getSender().getLocalName(),
 					message.getOntology(), moduleIds);
 
 		} catch (Exception e) {
