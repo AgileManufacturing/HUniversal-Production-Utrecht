@@ -64,6 +64,7 @@ import com.mongodb.DBObject;
 public class HardwareAgent extends Agent implements BlackboardSubscriber, ModuleUpdateListener {
 	private static final long serialVersionUID = 1L;
 
+	private AID equipletAgentAID;
 	private BlackboardClient serviceStepBBClient, equipletStepBBClient;
 	private DbData dbData;
 	private HashMap<Integer, Integer> leadingModuleForStep;
@@ -75,7 +76,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	}
 
 	public int getLeadingModule(int serviceId) {
-		if(leadingModuleForStep.get(serviceId) == null){
+		if(!leadingModuleForStep.containsKey(serviceId)){
 			return 0;
 		}
 		return leadingModuleForStep.get(serviceId);
@@ -116,7 +117,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			doDelete();
 		}
 
-		EvaluateDuration evaluateDurationBehaviour = new EvaluateDuration(this);
+		EvaluateDuration evaluateDurationBehaviour = new EvaluateDuration(this, moduleFactory);
 		addBehaviour(evaluateDurationBehaviour);
 
 		FillPlaceholders fillPlaceholdersBehaviour = new FillPlaceholders(this);

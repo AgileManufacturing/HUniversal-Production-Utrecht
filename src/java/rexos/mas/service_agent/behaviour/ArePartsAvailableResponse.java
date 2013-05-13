@@ -89,7 +89,6 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 				System.out.format("%s ArePartsAvailableResponse%n",
 						agent.getLocalName());
 				if (message.getPerformative() == ACLMessage.CONFIRM) {
-					//TODO voeg tijdslot toe aan message zodat LA weet wanneer.
 					ACLMessage sendMsg = message.createReply();
 					sendMsg.setOntology("ArePartsAvailableInTime");
 					sendMsg.setPerformative(ACLMessage.QUERY_IF);

@@ -81,8 +81,7 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 	/**
 	 * @param a
 	 */
-	public GetPartsInfoResponse(Agent a, String conversationId,
-			ProductStepMessage productStep) {
+	public GetPartsInfoResponse(Agent a, String conversationId, ProductStepMessage productStep) {
 		this(a, 2000, conversationId, productStep);
 	}
 
@@ -92,8 +91,7 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 	 */
 	public GetPartsInfoResponse(Agent a, int millis, String conversationId,
 			ProductStepMessage productStep) {
-		super(a, millis, MessageTemplate.and(
-				MessageTemplate.MatchConversationId(conversationId),
+		super(a, millis, MessageTemplate.and(MessageTemplate.MatchConversationId(conversationId),
 				MessageTemplate.MatchOntology("GetPartsInfoResponse")));
 		agent = (ServiceAgent) a;
 		this.conversationId = conversationId;
@@ -109,33 +107,26 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 			try {
 				List<DBObject> dbServiceSteps =
 						agent.getServiceStepBBClient().findDocuments(
-								new BasicDBObject("productStepId", productStep
-										.get_id()));
-				ServiceStepMessage[] serviceSteps =
-						new ServiceStepMessage[dbServiceSteps.size()];
+								new BasicDBObject("productStepId", productStep.get_id()));
+				ServiceStepMessage[] serviceSteps = new ServiceStepMessage[dbServiceSteps.size()];
 
 				for(int i = 0; i < dbServiceSteps.size(); i++) {
-					serviceSteps[i] =
-							new ServiceStepMessage(
-									(BasicDBObject) dbServiceSteps.get(i));
+					serviceSteps[i] = new ServiceStepMessage((BasicDBObject) dbServiceSteps.get(i));
 				}
 
 				HashMap<Integer, Position> parameters =
 						(HashMap<Integer, Position>) message.getContentObject();
 
-				System.out.format("%s got partsInfo: %s%n",
-						agent.getLocalName(), parameters.toString());
+				System.out.format("%s got partsInfo: %s%n", agent.getLocalName(),
+						parameters.toString());
 
-				ServiceStepMessage[] orderedSteps =
-						ServiceStepMessage.sort(serviceSteps);
-
+				ServiceStepMessage[] orderedSteps = ServiceStepMessage.sort(serviceSteps);
 				ServiceStepMessage[] parameterizedSteps =
-						agent.GetServiceForConvId(conversationId)
-								.updateParameters(parameters, orderedSteps);
+						agent.GetServiceForConvId(conversationId).updateParameters(parameters,
+								orderedSteps);
 
 				ScheduleData scheduleData;
-				int nextStartTime =
-						productStep.getScheduleData().getStartTime();
+				int nextStartTime = productStep.getScheduleData().getStartTime();
 				for(ServiceStepMessage serviceStep : parameterizedSteps) {
 					scheduleData = serviceStep.getScheduleData();
 					scheduleData.setStartTime(nextStartTime);
@@ -145,16 +136,14 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 
 					agent.getServiceStepBBClient().updateDocuments(
 							new BasicDBObject("_id", serviceStep.getId()),
-							new BasicDBObject("$set", serviceStep
-									.toBasicDBObject()));
+							new BasicDBObject("$set", serviceStep.toBasicDBObject()));
 				}
 
 				agent.getProductStepBBClient().updateDocuments(
 						new BasicDBObject("_id", productStep.get_id()),
 						new BasicDBObject("$set", new BasicDBObject("status",
 								StepStatusCode.PLANNED.name())));
-			} catch(UnreadableException | InvalidDBNamespaceException
-					| GeneralMongoException e) {
+			} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException e) {
 				e.printStackTrace();
 				agent.doDelete();
 			}
