@@ -33,6 +33,8 @@ package rexos.mas.hardware_agent;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
+
 import java.util.HashMap;
 
 import org.bson.types.ObjectId;
@@ -68,7 +70,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	private DbData dbData;
 	private HashMap<Integer, Integer> leadingModuleForStep;
 	private ModuleFactory moduleFactory;
-	private EquipletAgent equipletAgent;
+	private AID equipletAgent, serviceAgent;
 	
 	public void registerLeadingModule(int serviceId, int moduleId) {
 		leadingModuleForStep.put(serviceId, moduleId);
@@ -92,7 +94,8 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			dbData = (DbData) args[0];
-			equipletAgent = (EquipletAgent) args[1];
+			equipletAgent = (AID) args[1];
+			serviceAgent = (AID) args[2];
 		}
 
 		try {
@@ -129,39 +132,26 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		try {
 			client = KnowledgeDBClient.getClient();
 
-			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgent.getAID().getLocalName());
+			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgent.getLocalName());
 			for(Row row : rows){
 				try{
 					int id = (int)row.get("module");
 					Module m = moduleFactory.getModuleById(id);
+					for(int i : m.isLeadingForSteps()){
+						System.out.println(i);
+					}
 					for(int step : m.isLeadingForSteps()){
 						registerLeadingModule(step, id);
 					}
-				}catch(Exception e){/* the row has no id*/;}
+				}catch(Exception e){/* the row has no module*/}
 			}
 			for(int key : leadingModuleForStep.keySet()){
 				System.out.println(key + ": " + leadingModuleForStep.get(key));
 			}
 		} catch (KnowledgeException e1) {
-			// TODO Auto-generated catch block
+			takeDown();
 			e1.printStackTrace();
 		}
-
-		// kijk voor alle modules in de hashmap modules voor welke stap/stappen
-		// deze module leidend is
-		// en zet het id van de module, en het id van de bijbehorende step in de
-		// leadingModuleForStep Hashmap
-
-		// for now: use precompiled grippermodule class
-
-		//GripperModule gp = new GripperModule();
-		//registerModule(1, gp);
-		//DeltaRobotModule drm = new DeltaRobotModule();
-		//registerModule(2, drm);
-		///		
-		
-		/// ga na voor welke stappen deze modules leidend zijn en sla dit op in de hashmap
-
 	}
 	
 	public int getLeadingModuleForStep(int stepId){
@@ -172,7 +162,18 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	}
 	@Override
 	public void takeDown() {
-		// TODO implement graceful death
+		try {
+			//Clears his own blackboard and removes his subscription on that blackboard.
+			equipletStepBBClient.removeDocuments(new BasicDBObject());
+			equipletStepBBClient.unsubscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
+		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+			e.printStackTrace();
+		}
+		
+		ACLMessage deadMessage = new ACLMessage(ACLMessage.FAILURE);
+		deadMessage.addReceiver(serviceAgent);
+		deadMessage.setOntology("HardwareAgentDied");
+		send(deadMessage);
 	}
 
 	public BlackboardClient getServiceStepsBBClient() {
