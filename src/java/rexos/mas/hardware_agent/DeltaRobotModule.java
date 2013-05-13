@@ -31,12 +31,15 @@ package rexos.mas.hardware_agent;
 
 import java.util.ArrayList;
 
+import org.bson.BasicBSONObject;
+
+import rexos.mas.data.Position;
 import rexos.mas.equiplet_agent.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 
 public class DeltaRobotModule implements Module {
-	int saveMovementPlane = 6;
+	double safeMovementPlane = 6;
 	
 	public DeltaRobotModule(){
 	}
@@ -50,12 +53,16 @@ public class DeltaRobotModule implements Module {
 		
 		case 1: //Move to savePlane
 			steps = new ArrayList<EquipletStepMessage>();
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3)));
+			steps.add(moveToSafePlane(parameters));
 			equipletSteps = new EquipletStepMessage[steps.size()];
 			return steps.toArray(equipletSteps);
 		case 2: //Move
 			steps = new ArrayList<EquipletStepMessage>();
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3)));
+			steps.add(moveToSafePlane(parameters));
+			steps.add(new EquipletStepMessage(null, new InstructionData(),
+					StepStatusCode.EVALUATING, new TimeData(3)));//to desired position(x, y)
+			steps.add(new EquipletStepMessage(null, new InstructionData(),
+					StepStatusCode.EVALUATING, new TimeData(3)));//down to desired position(z)
 			equipletSteps = new EquipletStepMessage[steps.size()];
 			return steps.toArray(equipletSteps);
 		default:
@@ -66,7 +73,35 @@ public class DeltaRobotModule implements Module {
 
 	@Override
 	public int[] isLeadingForSteps() {
-		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	private EquipletStepMessage moveToSafePlane(BasicDBObject parameters){
+		double extraSize = parameters.getDouble("extraSize");
+		
+		BasicDBObject lookUpParameters = new BasicDBObject("ID",
+				((BasicBSONObject) parameters.get("postion")).get("relativeToPart"));
+		BasicDBObject payload = new BasicDBObject("z", extraSize + safeMovementPlane);
+		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID",
+				lookUpParameters, payload);
+		EquipletStepMessage step = new EquipletStepMessage(null, instructionData,
+				StepStatusCode.EVALUATING, new TimeData(4));
+		return step;
+	}
+	
+	private EquipletStepMessage move(BasicDBObject parameters){
+		double extraSize = parameters.getDouble("extraSize");
+		
+		Position position = new Position((BasicDBObject)parameters.get("position"));
+		
+		BasicDBObject lookUpParameters = new BasicDBObject("ID", position.getRelativeToPart());
+		BasicDBObject payload = new BasicDBObject("z", extraSize + position.getZ());
+		payload.put("x", position.getX());
+		payload.put("y", position.getY());
+		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID",
+				lookUpParameters, payload);
+		EquipletStepMessage step = new EquipletStepMessage(null, instructionData,
+				StepStatusCode.EVALUATING, new TimeData(4));
+		return step;
 	}
 }

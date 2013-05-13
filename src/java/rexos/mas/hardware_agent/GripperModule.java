@@ -31,6 +31,10 @@
 package rexos.mas.hardware_agent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
+import org.bson.BasicBSONObject;
 
 import rexos.mas.equiplet_agent.StepStatusCode;
 
@@ -38,33 +42,47 @@ import com.mongodb.BasicDBObject;
 
 public class GripperModule implements Module{
 	int gripperSize = 2;
+	Module movementModule;
+	int id;
+	HashMap<Integer, Object> configuration;
 	
-	public GripperModule(){
+	public GripperModule(HashMap<Integer, Object> configuration, Integer id){
+		this.configuration = configuration;
+		this.id = id;
 	}
 
 	@Override
 	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters) {		
 		EquipletStepMessage[] equipletSteps;
 		ArrayList<EquipletStepMessage> steps;
-		
 		switch(stepType){
 		
 		case 1: // pick
 			steps = new ArrayList<EquipletStepMessage>();
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3)));
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(4)));
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(5)));
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3)));
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(4)));
+			
+			BasicDBObject moveParameters = (BasicDBObject) parameters.copy();
+			moveParameters.put("extraSize", gripperSize);
+			steps.addAll(new ArrayList<EquipletStepMessage>
+				(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters))));//MOVE TO
+			
+			InstructionData instructionData = new InstructionData("deactivate", "gripper", "FIND_ID",
+					new BasicDBObject("ID", ((BasicDBObject) parameters.get("position")).get("relativeToPart")),
+					new BasicDBObject());
+			steps.add(new EquipletStepMessage(null, instructionData,
+					StepStatusCode.EVALUATING, new TimeData(1)));//ACTIVATE GRIPPER
+			
+			steps.addAll(new ArrayList<EquipletStepMessage>
+				(Arrays.asList(movementModule.getEquipletSteps(2, parameters))));//SAVE MOVE
 			equipletSteps = new EquipletStepMessage[steps.size()];
 			return steps.toArray(equipletSteps);
 		case 2: // place/drop
 			steps = new ArrayList<EquipletStepMessage>();
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3)));
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(4)));
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(5)));
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3)));
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(4)));
+			steps.addAll(new ArrayList<EquipletStepMessage>
+				(Arrays.asList(movementModule.getEquipletSteps(1, parameters))));//MOVE TO
+			steps.add(new EquipletStepMessage(null, new InstructionData(),
+					StepStatusCode.EVALUATING, new TimeData(4)));//DEACTIVATE GRIPPER
+			steps.addAll(new ArrayList<EquipletStepMessage>
+				(Arrays.asList(movementModule.getEquipletSteps(2, parameters))));//SAVE MOVE
 			equipletSteps = new EquipletStepMessage[steps.size()];
 			return steps.toArray(equipletSteps);
 		default:
@@ -76,7 +94,6 @@ public class GripperModule implements Module{
 
 	@Override
 	public int[] isLeadingForSteps() {
-		
-		return null;
+		return new int[]{1};
 	}
 }
