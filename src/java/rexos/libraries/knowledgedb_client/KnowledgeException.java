@@ -49,4 +49,12 @@ public class KnowledgeException extends Exception {
 		super(message, cause);
 	}
 
+	/**
+	 * Constructs a new exception with the specified detail message.
+	 * @param message A message providing additional information about the exception.
+	 **/
+	public KnowledgeException(String message) {
+		super(message);
+	}
+
 }
