@@ -31,6 +31,7 @@ package rexos.mas.hardware_agent;
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
+import jade.core.AID;
 import jade.core.Agent;
 import java.util.HashMap;
 
@@ -61,6 +62,7 @@ import com.mongodb.DBObject;
 public class HardwareAgent extends Agent implements BlackboardSubscriber, ModuleUpdateListener {
 	private static final long serialVersionUID = 1L;
 
+	private AID equipletAgentAID;
 	private BlackboardClient serviceStepBBClient, equipletStepBBClient;
 	private DbData dbData;
 	private HashMap<Integer, Integer> leadingModuleForStep;
@@ -71,7 +73,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	}
 
 	public int getLeadingModule(int serviceId) {
-		if(leadingModuleForStep.get(serviceId) == null){
+		if(!leadingModuleForStep.containsKey(serviceId)){
 			return 0;
 		}
 		return leadingModuleForStep.get(serviceId);
@@ -89,6 +91,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			dbData = (DbData) args[0];
+			equipletAgentAID = (AID) args[1];
 		}
 
 		try {
@@ -111,7 +114,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			doDelete();
 		}
 
-		EvaluateDuration evaluateDurationBehaviour = new EvaluateDuration(this);
+		EvaluateDuration evaluateDurationBehaviour = new EvaluateDuration(this, moduleFactory);
 		addBehaviour(evaluateDurationBehaviour);
 
 		FillPlaceholders fillPlaceholdersBehaviour = new FillPlaceholders(this);
@@ -127,11 +130,11 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 
 			Row[] resultSet;
 
-			resultSet = client.executeSelectQuery(Queries.MODULES);
+			resultSet = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgentAID.getLocalName());
 
 			for (int i = 0; i < resultSet.length; i++) {
 				try{
-					int id = (int) resultSet[i].get("id");
+					int id = (int) resultSet[i].get("module");
 					Module m = moduleFactory.getModuleById(id);
 					int[] steps = m.isLeadingForSteps();
 					for(int step : steps){						

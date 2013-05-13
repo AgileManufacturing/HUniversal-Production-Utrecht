@@ -47,17 +47,19 @@
 package rexos.mas.service_agent;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.bson.BSONObject;
 
 import com.mongodb.BasicDBObject;
 import rexos.libraries.knowledgedb_client.*;
 import rexos.mas.data.Position;
+import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.StepStatusCode;
 
 public class PickAndPlaceService implements Service {
 	private KnowledgeDBClient client;
-	private int id = 0;
+	private int id = 1;
 	private int saveMovementPlane = 6;
 
 	/**
@@ -66,7 +68,7 @@ public class PickAndPlaceService implements Service {
 	 */
 	@Override
 	public int[] getModuleIds(int productStepType, BasicDBObject parameters) {
-//		int[] moduleIds = new int[0];
+		// int[] moduleIds = new int[0];
 		// ArrayList<Integer> moduleIds = new ArrayList<Integer>();
 
 		// try {
@@ -100,24 +102,28 @@ public class PickAndPlaceService implements Service {
 
 		BasicDBObject pickParameters = new BasicDBObject();
 		pickParameters.put("InputPart", part);
-		pickParameters.put("Position", new Position());
-		pickParameters.put("SaveMovementPlane", new BasicDBObject("Height", saveMovementPlane).put("RelativeTo", null));
+		pickParameters.put("Position", new Position().toBasicDBObject());
+		pickParameters.put("SaveMovementPlane",
+				new BasicDBObject("Height", saveMovementPlane).put("RelativeTo", null));
 
-		Position position = new Position((BasicDBObject) parameters.get("Position"));
+		Position position = new Position((BasicDBObject) parameters.get("position"));
 		position.setZ(position.getZ() + inputPartSize);
 		BasicDBObject placeParameters = new BasicDBObject();
 		placeParameters.put("InputPart", part);
-		placeParameters.put("Position", position);
-		placeParameters.put("SaveMovementPlane", new BasicDBObject("Height", saveMovementPlane).put("RelativeTo", part));
+		placeParameters.put("Position", position.toBasicDBObject());
+		placeParameters.put("SaveMovementPlane",
+				new BasicDBObject("Height", saveMovementPlane).put("RelativeTo", part));
 
 		return new ServiceStepMessage[] {
-				new ServiceStepMessage(id, 4, pickParameters, StepStatusCode.EVALUATING, null, null),
+				new ServiceStepMessage(id, 4, pickParameters, StepStatusCode.EVALUATING, null,
+						new ScheduleData()),
 				// pick //TODO NOT HARDCODED ID.
 				new ServiceStepMessage(id, 5, placeParameters, StepStatusCode.EVALUATING, null,
-						null)
+						new ScheduleData())
 		// place //TODO NOT HARDCODE ID.
 		};
 	}
+
 	/* (non-Javadoc)
 	 * @see rexos.mas.service_agent.Service#updateParameters(java.util.HashMap,
 	 * rexos.mas.service_agent.ServiceStepMessage[]) */
@@ -125,8 +131,8 @@ public class PickAndPlaceService implements Service {
 	public ServiceStepMessage[] updateParameters(HashMap<Integer, Position> partParameters,
 			ServiceStepMessage[] serviceSteps) {
 		BasicDBObject pickParameters = serviceSteps[0].getParameters();
-		pickParameters.putAll((BSONObject) new BasicDBObject("parameters", partParameters.get(pickParameters.getInt("part"))
-				.toBasicDBObject()));
+		pickParameters.putAll((LinkedHashMap<String, Object>) new BasicDBObject("Position", partParameters.get(
+				pickParameters.getInt("InputPart")).toBasicDBObject()));
 		serviceSteps[0].setParameters(pickParameters);
 		return serviceSteps;
 	}
@@ -144,7 +150,6 @@ public class PickAndPlaceService implements Service {
 	 */
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Pick&Place";
 	}
 }

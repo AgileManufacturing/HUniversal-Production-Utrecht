@@ -1,31 +1,48 @@
 /**
  * @file GetServiceStepBehaviour.java
- * @brief 
+ * @brief
  * @date Created: 11 apr. 2013
- *
+ * 
  * @author Peter Bonnema
- *
+ * 
  * @section LICENSE
- * License: newBSD
- *
- * Copyright © 2013, HU University of Applied Sciences Utrecht.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
- * - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
- * - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
- * - Neither the name of the HU University of Applied Sciences Utrecht nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT
- * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
- * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *          License: newBSD
+ * 
+ *          Copyright © 2013, HU University of Applied Sciences Utrecht.
+ *          All rights reserved.
+ * 
+ *          Redistribution and use in source and binary forms, with or without
+ *          modification, are permitted provided that the following conditions
+ *          are met:
+ *          - Redistributions of source code must retain the above copyright
+ *          notice, this list of conditions and the following disclaimer.
+ *          - Redistributions in binary form must reproduce the above copyright
+ *          notice, this list of conditions and the following disclaimer in the
+ *          documentation and/or other materials provided with the distribution.
+ *          - Neither the name of the HU University of Applied Sciences Utrecht
+ *          nor the names of its contributors may be used to endorse or promote
+ *          products derived from this software without specific prior written
+ *          permission.
+ * 
+ *          THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *          "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *          LIMITED TO,
+ *          THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ *          PARTICULAR PURPOSE
+ *          ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED
+ *          SCIENCES UTRECHT
+ *          BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ *          OR
+ *          CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ *          SUBSTITUTE
+ *          GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ *          INTERRUPTION)
+ *          HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ *          STRICT
+ *          LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *          ANY WAY OUT
+ *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ *          SUCH DAMAGE.
  * 
  **/
 package rexos.mas.service_agent.behaviour;
@@ -69,20 +86,17 @@ public class GetServiceDuration extends ReceiveBehaviour {
 	/**
 	 * @param a
 	 */
-	public GetServiceDuration(Agent a, ServiceStepMessage[] serviceSteps,
-			String conversationId) {
+	public GetServiceDuration(Agent a, ServiceStepMessage[] serviceSteps, String conversationId) {
 		this(a, 2000, serviceSteps, conversationId);
 	}
 
 	/**
 	 * @param a
 	 */
-	public GetServiceDuration(Agent a, int millis,
-			ServiceStepMessage[] serviceSteps, String conversationId) {
-		super(a, millis,
-				MessageTemplate.and(MessageTemplate
-						.MatchConversationId(conversationId), MessageTemplate
-						.MatchOntology("GetServiceStepDurationResponse")));
+	public GetServiceDuration(Agent a, int millis, ServiceStepMessage[] serviceSteps,
+			String conversationId) {
+		super(a, millis, MessageTemplate.and(MessageTemplate.MatchConversationId(conversationId),
+				MessageTemplate.MatchOntology("GetServiceStepDurationResponse")));
 
 		this.serviceSteps = Arrays.asList(serviceSteps);
 		this.conversationId = conversationId;
@@ -93,67 +107,59 @@ public class GetServiceDuration extends ReceiveBehaviour {
 
 	@Override
 	public void onStart() {
-		System.out.format("%s asking %s for duration of %d steps%n", agent
-				.getLocalName(), agent.getHardwareAgentAID().getLocalName(),
-				serviceSteps.size());
+		System.out.format("%s asking %s for duration of %d steps%n", agent.getLocalName(), agent
+				.getHardwareAgentAID().getLocalName(), serviceSteps.size());
 
-		ObjectId serviceStepId;
+		ObjectId serviceStepId = null;
 		ACLMessage message = new ACLMessage(ACLMessage.QUERY_IF);
 		message.addReceiver(agent.getHardwareAgentAID());
 		message.setOntology("GetServiceStepDuration");
 		message.setConversationId(conversationId);
 		try {
 			BlackboardClient serviceStepBB = agent.getServiceStepBBClient();
-			for (ServiceStepMessage serviceStep : serviceSteps) {
-				serviceStepId = serviceStepBB.insertDocument(serviceStep
-						.toBasicDBObject());
+			for(int i = serviceSteps.size() - 1; i >= 0; i--) {
+				ServiceStepMessage serviceStep = serviceSteps.get(i);
+				serviceStep.setNextStep(serviceStepId);
+				serviceStepId = serviceStepBB.insertDocument(serviceStep.toBasicDBObject());
 				message.setContentObject(serviceStepId);
 				agent.send(message);
 			}
-		} catch (InvalidDBNamespaceException | GeneralMongoException
-				| IOException e) {
+		} catch(InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 			e.printStackTrace();
 			agent.doDelete();
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage)
-	 */
+	/* (non-Javadoc)
+	 * @see behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage) */
 	@Override
 	public void handle(ACLMessage message) {
-		if (message != null) {
+		if(message != null) {
 			try {
-				ServiceStepMessage serviceStep = new ServiceStepMessage(
-						(BasicDBObject) agent.getServiceStepBBClient()
-								.findDocumentById(
-										(ObjectId) message.getContentObject()));
+				ServiceStepMessage serviceStep =
+						new ServiceStepMessage((BasicDBObject) agent.getServiceStepBBClient()
+								.findDocumentById((ObjectId) message.getContentObject()));
 
 				ObjectId productStepId = serviceStep.getProductStepId();
-				ProductStepMessage productStep = new ProductStepMessage(
-						(BasicDBObject) agent.getProductStepBBClient()
+				ProductStepMessage productStep =
+						new ProductStepMessage((BasicDBObject) agent.getProductStepBBClient()
 								.findDocumentById(productStepId));
 				ScheduleData scheduleData = serviceStep.getScheduleData();
 
-				System.out.format("%s step type %s will take %d%n",
-						agent.getLocalName(), serviceStep.getType(),
-						scheduleData.getDuration());
+				System.out.format("%s step type %s will take %d%n", agent.getLocalName(),
+						serviceStep.getType(), scheduleData.getDuration());
 
 				duration += scheduleData.getDuration();
-				if (--remainingServiceSteps == 0) {
+				if(--remainingServiceSteps == 0) {
 					scheduleData = productStep.getScheduleData();
 					scheduleData.setDuration(duration);
 					agent.getProductStepBBClient().updateDocuments(
 							new BasicDBObject("_id", productStepId),
-							new BasicDBObject("$set", new BasicDBObject(
-									"scheduleData", scheduleData
-											.toBasicDBObject())));
+							new BasicDBObject("$set", new BasicDBObject("scheduleData",
+									scheduleData.toBasicDBObject())));
 
-					System.out.format(
-							"Saving duration of %d in prod. step %s%n",
-							duration, productStepId);
+					System.out.format("Saving duration of %d in prod. step %s%n", duration,
+							productStepId);
 
 					ACLMessage answer = new ACLMessage(ACLMessage.INFORM);
 					answer.addReceiver(agent.getEquipletAgentAID());
@@ -161,13 +167,12 @@ public class GetServiceDuration extends ReceiveBehaviour {
 					answer.setOntology("ProductionDurationResponse");
 					agent.send(answer);
 
-					System.out.format("%s sending msg (%s)%n",
-							myAgent.getLocalName(), answer.getOntology());
+					System.out.format("%s sending msg (%s)%n", myAgent.getLocalName(),
+							answer.getOntology());
 
 					agent.removeBehaviour(this);
 				}
-			} catch (InvalidDBNamespaceException | GeneralMongoException
-					| UnreadableException e) {
+			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {
 				e.printStackTrace();
 			}
 		} else {

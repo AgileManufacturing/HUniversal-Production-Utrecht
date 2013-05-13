@@ -67,6 +67,6 @@ public class DeltaRobotModule implements Module {
 	@Override
 	public int[] isLeadingForSteps() {
 		// TODO Auto-generated method stub
-		return null;
+		return new int[] {1};
 	}
 }

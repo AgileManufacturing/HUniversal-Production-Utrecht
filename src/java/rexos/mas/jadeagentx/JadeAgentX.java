@@ -39,8 +39,8 @@ import jade.wrapper.StaleProxyException;
 
 import java.util.ArrayList;
 
-import rexos.mas.data.Parameter;
-import rexos.mas.data.ParameterGroup;
+import com.mongodb.BasicDBObject;
+
 import rexos.mas.data.Position;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
@@ -82,7 +82,6 @@ public class JadeAgentX extends Agent {
 			Object[] ar = new Object[] { capabilities1, logisticsAID };
 			getContainerController().createNewAgent("EQ1",
 					"rexos.mas.equiplet_agent.EquipletAgent", ar).start();
-			// TODO code application logic here
 
 //			ArrayList<Integer> capabilities2 = new ArrayList<>();
 //			capabilities2.add(1);
@@ -101,9 +100,9 @@ public class JadeAgentX extends Agent {
 			/**
 			 * Lets make a parameter list
 			 */
-			ParameterGroup parameters = new ParameterGroup();
-			parameters.addParameter("part", new Parameter(1));
-			parameters.addParameter("position", new Parameter(new Position(1, 2, 3, 2)));
+			BasicDBObject parameters = new BasicDBObject();
+			parameters.append("part", 1);
+			parameters.append("position", new Position(1.0, 2.0, 3.0, 2).toBasicDBObject());
 
 			// Next we want to have some production steps
 			ProductionStep stp1 = new ProductionStep(1, 1, parameters);

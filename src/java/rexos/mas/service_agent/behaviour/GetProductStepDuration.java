@@ -10,7 +10,6 @@ import org.bson.types.ObjectId;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
-import rexos.mas.data.ParameterGroup;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.service_agent.Service;
 import rexos.mas.service_agent.ServiceAgent;
@@ -54,9 +53,9 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 					agent.getLocalName(), productStepType);
 
 			Service service = agent.GetServiceForConvId(message.getConversationId());
-			ParameterGroup parameters = productStep.getParameters();
+			BasicDBObject parameters = productStep.getParameters();
 			ServiceStepMessage[] serviceSteps = service.getServiceSteps(
-					productStepType, parameters.toBasicDBObject());
+					productStepType, parameters);
 			for (ServiceStepMessage serviceStep : serviceSteps) {
 				serviceStep.setProductStepId(productStepId);
 			}

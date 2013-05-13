@@ -14,7 +14,8 @@
 package rexos.mas.data;
 
 import java.io.Serializable;
-import java.util.HashMap;
+
+import com.mongodb.BasicDBObject;
 
 public class ProductionStep implements Serializable {
 
@@ -27,14 +28,14 @@ public class ProductionStep implements Serializable {
 	private int _id;
 	private int _capability;
 	private ProductionStepStatus _status;
-	private ParameterGroup _parameters;
+	private BasicDBObject _parameters;
 
 	public ProductionStep() {
-		this._parameters = new ParameterGroup();
+		this._parameters = new BasicDBObject();
 		this._status = ProductionStepStatus.STATE_TODO;
 	}
 	
-	public ProductionStep(int id, int capability, ParameterGroup parameterList) {
+	public ProductionStep(int id, int capability, BasicDBObject parameterList) {
 		this._id = id;
 		this._capability = capability;
 		this._parameters = parameterList;
@@ -61,7 +62,7 @@ public class ProductionStep implements Serializable {
 		return this._requiredTimeSlots;
 	}
 	
-	public ParameterGroup getParameters() {
+	public BasicDBObject getParameters() {
 		return _parameters;
 	}
 

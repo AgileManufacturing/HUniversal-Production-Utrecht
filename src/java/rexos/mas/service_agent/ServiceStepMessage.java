@@ -81,7 +81,21 @@ public class ServiceStepMessage implements IMongoSaveable {
 	 */
 	public ServiceStepMessage(int serviceId, int type, BasicDBObject parameters,
 			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
-		this(null, null, serviceId, type, null, parameters, status, statusData, scheduleData);
+		this(null, serviceId, type, null, parameters, status, statusData, scheduleData);
+	}
+
+	/**
+	 * @param nextStep
+	 * @param serviceId
+	 * @param type
+	 * @param parameters
+	 * @param status
+	 * @param statusData
+	 * @param scheduleData
+	 */
+	public ServiceStepMessage(ObjectId nextStep, int serviceId, int type, BasicDBObject parameters,
+			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
+		this(nextStep, serviceId, type, null, parameters, status, statusData, scheduleData);
 	}
 
 	/**
@@ -96,8 +110,7 @@ public class ServiceStepMessage implements IMongoSaveable {
 	public ServiceStepMessage(int serviceId, int type, ObjectId productStepId,
 			BasicDBObject parameters, StepStatusCode status, BasicDBObject statusData,
 			ScheduleData scheduleData) {
-		this(null, null, serviceId, type, productStepId, parameters, status, statusData,
-			scheduleData);
+		this(null, serviceId, type, productStepId, parameters, status, statusData, scheduleData);
 	}
 
 	/**
@@ -113,25 +126,6 @@ public class ServiceStepMessage implements IMongoSaveable {
 	public ServiceStepMessage(ObjectId nextStep, int serviceId, int type, ObjectId productStepId,
 			BasicDBObject parameters, StepStatusCode status, BasicDBObject statusData,
 			ScheduleData scheduleData) {
-		this(null, nextStep, serviceId, type, productStepId, parameters, status, statusData,
-			scheduleData);
-	}
-
-	/**
-	 * @param id
-	 * @param nextStep
-	 * @param serviceId
-	 * @param type
-	 * @param productStepId
-	 * @param parameters
-	 * @param status
-	 * @param statusData
-	 * @param scheduleData
-	 */
-	public ServiceStepMessage(ObjectId id, ObjectId nextStep, int serviceId, int type,
-			ObjectId productStepId, BasicDBObject parameters, StepStatusCode status,
-			BasicDBObject statusData, ScheduleData scheduleData) {
-		_id = id;
 		this.nextStep = nextStep;
 		this.serviceId = serviceId;
 		this.type = type;
@@ -187,16 +181,14 @@ public class ServiceStepMessage implements IMongoSaveable {
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject dbObject =
 				(BasicDBObject) BasicDBObjectBuilder.start()
-						.add("productStepId", productStepId)
+						.add("nextStep", nextStep)
 						.add("serviceId", serviceId)
 						.add("type", type)
+						.add("productStepId", productStepId)
 						.add("parameters", parameters)
 						.add("status", status.name())
 						.add("statusData", statusData)
 						.add("scheduleData", scheduleData.toBasicDBObject()).get();
-
-		if(_id != null)
-			dbObject.append("_id", _id);
 
 		return dbObject;
 	}
@@ -207,6 +199,7 @@ public class ServiceStepMessage implements IMongoSaveable {
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		_id = object.getObjectId("_id");
+		nextStep = object.getObjectId("nextStep");
 		serviceId = object.getInt("serviceId");
 		type = object.getInt("type");
 		productStepId = object.getObjectId("productStepId");
@@ -229,14 +222,6 @@ public class ServiceStepMessage implements IMongoSaveable {
 	 */
 	public ObjectId getId() {
 		return _id;
-	}
-
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	public void setId(ObjectId id) {
-		_id = id;
 	}
 
 	/**

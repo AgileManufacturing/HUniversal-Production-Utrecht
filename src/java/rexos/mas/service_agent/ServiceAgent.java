@@ -2,6 +2,7 @@ package rexos.mas.service_agent;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
 
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -105,7 +106,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		productStepBBClient.unsubscribe(statusSubscription);
 		serviceStepBBClient.unsubscribe(statusSubscription);
 		try {
-			serviceStepBBClient.removeDocuments(new BasicDBObject());
+//			serviceStepBBClient.removeDocuments(new BasicDBObject());
 
 			DBObject update = BasicDBObjectBuilder
 					.start("status", StepStatusCode.FAILED.name())
@@ -116,6 +117,12 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					.get();
 			productStepBBClient.updateDocuments(new BasicDBObject(),
 					new BasicDBObject("$set", update));
+			
+			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+			message.addReceiver(equipletAgentAID);
+			message.addReceiver(hardwareAgentAID);
+			message.setOntology("serviceAgentDied");
+			send(message);
 		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 			e.printStackTrace();
 		}
@@ -133,16 +140,16 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 	}
 	
-	public Service MapConvIdWithService(String conversationId, Service service) {
-		return convIdServiceMapping.put(conversationId, service);
+	public void MapConvIdWithService(String conversationId, Service service) {
+		convIdServiceMapping.put(conversationId, service);
 	}
 	
 	public Service GetServiceForConvId(String conversationId) {
 		return convIdServiceMapping.get(conversationId);
 	}
 	
-	public Service RemoveConvIdServiceMapping(String conversationId) {
-		return convIdServiceMapping.remove(conversationId);
+	public void RemoveConvIdServiceMapping(String conversationId) {
+		convIdServiceMapping.remove(conversationId);
 	}
 
 	/**
