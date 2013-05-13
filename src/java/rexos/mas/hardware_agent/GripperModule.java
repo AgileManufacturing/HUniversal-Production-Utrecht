@@ -41,6 +41,7 @@ import com.mongodb.BasicDBObject;
 
 public class GripperModule implements Module{
 	int gripperSize = 2;
+	ModuleFactory mf;
 	Module movementModule;
 	int id;
 	HashMap<Integer, Object> configuration;
@@ -48,6 +49,7 @@ public class GripperModule implements Module{
 	public GripperModule(HashMap<Integer, Object> configuration, Integer id){
 		this.configuration = configuration;
 		this.id = id;
+		mf = new ModuleFactory();
 	}
 
 	@Override
@@ -56,7 +58,6 @@ public class GripperModule implements Module{
 		ArrayList<EquipletStepMessage> steps;
 		
 		int movementModuleId = findMovementModule(configuration);
-		ModuleFactory mf = new ModuleFactory();
 		movementModule = mf.getModuleById(movementModuleId);
 		
 		switch(stepType){

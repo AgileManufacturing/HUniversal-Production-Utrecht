@@ -70,7 +70,7 @@ public class DeltaRobotModule implements Module {
 
 	@Override
 	public int[] isLeadingForSteps() {
-		return null;
+		return new int[]{};
 	}
 	
 	private EquipletStepMessage moveToSafePlane(BasicDBObject parameters){

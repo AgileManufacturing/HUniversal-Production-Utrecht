@@ -215,7 +215,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 			
 			//creates his hardware agent.
-			Object[] arguments = new Object[] { dbData };
+			Object[] arguments = new Object[] { dbData, this };
 			getContainerController().createNewAgent(getLocalName() + "-hardwareAgent", "rexos.mas.hardware_agent.HardwareAgent", arguments).start();
 			AID hardwareAgent = new AID(getLocalName() + "-hardwareAgent", AID.ISLOCALNAME);
 			
