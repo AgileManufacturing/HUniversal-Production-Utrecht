@@ -52,7 +52,6 @@ import org.bson.types.ObjectId;
 
 import jade.core.AID;
 import rexos.mas.data.IMongoSaveable;
-import rexos.mas.data.ParameterGroup;
 import rexos.mas.data.ScheduleData;
 
 import com.mongodb.BasicDBList;
@@ -83,7 +82,7 @@ public class ProductStepMessage implements IMongoSaveable, Serializable {
 	/**
 	 * @var ParameterList parameters The parameterlist for this product step.
 	 */
-	private ParameterGroup parameters;
+	private BasicDBObject parameters;
 
 	/**
 	 * @var int[] inputPartTypes step.
@@ -123,7 +122,7 @@ public class ProductStepMessage implements IMongoSaveable, Serializable {
 	 * @param statusData The additional data for the status
 	 * @param scheduleData The schedule data
 	 */
-	public ProductStepMessage(AID productAgentId, int type, ParameterGroup parameters,
+	public ProductStepMessage(AID productAgentId, int type, BasicDBObject parameters,
 			Integer[] inputPartTypes, int outputPartType, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
 		this(null, productAgentId, type, parameters, inputPartTypes, outputPartType, status,
@@ -145,7 +144,7 @@ public class ProductStepMessage implements IMongoSaveable, Serializable {
 	 * @param scheduleData The schedule data
 	 */
 	public ProductStepMessage(ObjectId _id, AID productAgentId, int type,
-			ParameterGroup parameters, Integer[] inputPartTypes, int outputPartType,
+			BasicDBObject parameters, Integer[] inputPartTypes, int outputPartType,
 			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
 		this._id = _id;
 		this.productAgentId = productAgentId;
@@ -217,7 +216,7 @@ public class ProductStepMessage implements IMongoSaveable, Serializable {
 	/**
 	 * @return the parameters
 	 */
-	public ParameterGroup getParameters() {
+	public BasicDBObject getParameters() {
 		return parameters;
 	}
 
@@ -225,7 +224,7 @@ public class ProductStepMessage implements IMongoSaveable, Serializable {
 	 * @param parameters
 	 *            the parameters to set
 	 */
-	public void setParameters(ParameterGroup parameters) {
+	public void setParameters(BasicDBObject parameters) {
 		this.parameters = parameters;
 	}
 
@@ -316,7 +315,7 @@ public class ProductStepMessage implements IMongoSaveable, Serializable {
 			object.put("_id", _id);
 		object.put("productAgentId", productAgentId.getName());
 		object.put("type", type);
-		object.put("parameters", parameters.toBasicDBObject());
+		object.put("parameters", parameters);
 		object.put("inputPartTypes", inputPartTypes);
 		object.put("outputPartType", outputPartType);
 		object.put("status", status.toString());
@@ -337,7 +336,7 @@ public class ProductStepMessage implements IMongoSaveable, Serializable {
 			e.printStackTrace();
 		}
 		type = object.getInt("type");
-		parameters = new ParameterGroup((BasicDBObject) object.get("parameters"));
+		parameters = (BasicDBObject) object.get("parameters");
 		inputPartTypes = ((BasicDBList) object.get("inputPartTypes")).toArray(new Integer[0]);
 		outputPartType = object.getInt("outputPartType", -1);
 		status = StepStatusCode.valueOf(object.getString("status"));

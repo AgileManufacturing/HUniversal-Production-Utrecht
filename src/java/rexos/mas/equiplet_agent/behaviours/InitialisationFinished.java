@@ -1,11 +1,9 @@
-package rexos.mas.hardware_agent.behaviours;
-
 /**
- * @file EvaluateDuration.java
- * @brief Handles the GetServiceStepDuratation Message.
- * @date Created: 12-04-13
+ * @file InitialisationFinished.java
+ * @brief Behaviour for handling the messages with the ontology InitialisationFinished
+ * @date Created: 2013-04-02
  * 
- * @author Thierry Gerritse
+ * @author Hessel Meulenbeld
  * 
  * @section LICENSE
  *          License: newBSD
@@ -46,81 +44,70 @@ package rexos.mas.hardware_agent.behaviours;
  *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *          SUCH DAMAGE.
  **/
-
-import java.io.IOException;
+package rexos.mas.equiplet_agent.behaviours;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
 
-import org.bson.types.ObjectId;
-
+import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
-import rexos.mas.data.ScheduleData;
-import rexos.mas.hardware_agent.EquipletStepMessage;
-import rexos.mas.hardware_agent.HardwareAgent;
-import rexos.mas.hardware_agent.Module;
-import rexos.mas.hardware_agent.ModuleFactory;
-import rexos.mas.service_agent.ServiceStepMessage;
+import rexos.mas.equiplet_agent.EquipletAgent;
+import rexos.mas.equiplet_agent.EquipletDirectoryMessage;
 
-import com.mongodb.BasicDBObject;
-
-public class EvaluateDuration extends ReceiveBehaviour {
+/** The Class InitialisationFinished. */
+public class InitialisationFinished extends ReceiveBehaviour {
+	/**
+	 * @var static final long serialVersionUID The serial version UID for this
+	 *      class
+	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * @var MessageTemplate messageTemplate The messageTemplate this behaviour
+	 *      listens to. This behaviour listens to the ontology: InitialisationFinished.
+	 */
 	private static MessageTemplate messageTemplate = MessageTemplate
-			.MatchOntology("GetServiceStepDuration");
-	private HardwareAgent hardwareAgent;
-	private ModuleFactory moduleFactory;
+			.MatchOntology("InitialisationFinished");
 
-	public EvaluateDuration(Agent a, ModuleFactory moduleFactory) {
-		super(a, -1, messageTemplate);
-		hardwareAgent = (HardwareAgent) a;
-		this.moduleFactory = moduleFactory;
+	/**
+	 * @var EquipletAgent equipletAgent The equipletAgent related to this
+	 *      behaviour.
+	 */
+	private EquipletAgent equipletAgent;
+	private BlackboardClient collectiveBBClient;
+
+	/**
+	 * Instantiates a new can perform step.
+	 * 
+	 * @param a The agent for this behaviour
+	 */
+	public InitialisationFinished(Agent a, BlackboardClient collectiveBBClient) {
+		super(a, messageTemplate);
+		equipletAgent = (EquipletAgent) a;
+		this.collectiveBBClient = collectiveBBClient;
 	}
 
+	/**
+	 * Function to handle the incoming messages for this behaviour. Handles the
+	 * response to the InitialisationFinished.
+	 * 
+	 * @param message The received message.
+	 */
 	@Override
 	public void handle(ACLMessage message) {
+		System.out.format("%s received message from %s%n", myAgent.getLocalName(), message
+				.getSender().getLocalName(), message.getOntology());
+		
+		//inserts himself on the collective blackboard equiplet directory.
+		EquipletDirectoryMessage entry = new EquipletDirectoryMessage(equipletAgent.getAID(), equipletAgent.getCapabilities(), equipletAgent.getDbData());
 		try {
-			ObjectId serviceStepId = (ObjectId) message.getContentObject();
-			BasicDBObject dbServiceStep =
-					(BasicDBObject) hardwareAgent.getServiceStepsBBClient().findDocumentById(
-							serviceStepId);
-
-			ServiceStepMessage serviceStep = new ServiceStepMessage(dbServiceStep);
-			System.out.format("%s received message from %s (%s:%s)%n", myAgent.getLocalName(),
-					message.getSender().getLocalName(), message.getOntology(), serviceStepId);
-
-			int stepDuration = 0;
-			int leadingModule = hardwareAgent.getLeadingModule(serviceStep.getServiceId());
-			Module module = moduleFactory.getModuleById(leadingModule);
-			EquipletStepMessage[] equipletSteps =
-					module.getEquipletSteps(serviceStep.getType(), serviceStep.getParameters());
-			for(EquipletStepMessage equipletStep : equipletSteps) {
-				stepDuration += equipletStep.getTimeData().getDuration();
-			}
-
-			ScheduleData schedule = serviceStep.getScheduleData();
-			schedule.setDuration(stepDuration);
-
-			hardwareAgent.getServiceStepsBBClient().updateDocuments(
-					new BasicDBObject("_id", serviceStepId),
-					new BasicDBObject("$set", new BasicDBObject("scheduleData", schedule
-							.toBasicDBObject())));
-
-			ACLMessage reply;
-			reply = message.createReply();
-			reply.setContentObject(serviceStepId);
-			reply.setOntology("GetServiceStepDurationResponse");
-			myAgent.send(reply);
-
-		} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException
-				| IOException e) {
+			collectiveBBClient.insertDocument(entry.toBasicDBObject());
+		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-			myAgent.doDelete();
 		}
 	}
 }

@@ -2,6 +2,9 @@ package rexos.mas.service_agent;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
+import jade.wrapper.AgentController;
+import jade.wrapper.StaleProxyException;
 
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -20,6 +23,7 @@ import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.service_agent.behaviour.CanDoProductStep;
 import rexos.mas.service_agent.behaviour.GetProductStepDuration;
+import rexos.mas.service_agent.behaviour.InitialisationFinished;
 import rexos.mas.service_agent.behaviour.ScheduleStep;
 
 import com.mongodb.BasicDBObject;
@@ -37,27 +41,36 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	private static final long serialVersionUID = 1L;
 
 	private BlackboardClient productStepBBClient, serviceStepBBClient;
-	private FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription(
-			"status", this);
+	private FieldUpdateSubscription statusSubscription =
+			new FieldUpdateSubscription("status", this);
 	private HashMap<String, Service> convIdServiceMapping;
 	private DbData dbData;
 	private AID equipletAgentAID, hardwareAgentAID, logisticsAID;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jade.core.Agent#setup()
-	 */
+	/* (non-Javadoc)
+	 * @see jade.core.Agent#setup() */
 	@Override
 	public void setup() {
 		System.out.println("I spawned as a service agent.");
 
 		Object[] args = getArguments();
-		if (args != null && args.length > 0) {
+		if(args != null && args.length > 0) {
 			dbData = (DbData) args[0];
 			equipletAgentAID = (AID) args[1];
-			hardwareAgentAID = (AID) args[2];
-			logisticsAID = (AID) args[3];
+			logisticsAID = (AID) args[2];
+		}
+
+		Object[] arguments = new Object[] { dbData, equipletAgentAID, getAID() };
+		try {
+			AgentController hardwareAgentCnt =
+					getContainerController().createNewAgent(
+							equipletAgentAID.getLocalName() + "-hardwareAgent",
+							"rexos.mas.hardware_agent.HardwareAgent", arguments);
+			hardwareAgentCnt.start();
+			hardwareAgentAID = new AID(hardwareAgentCnt.getName(), AID.ISLOCALNAME);
+		} catch(StaleProxyException e1) {
+			takeDown();
+			e1.printStackTrace();
 		}
 
 		try {
@@ -73,8 +86,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			serviceStepBBClient.setCollection("ServiceStepsBlackBoard");
 			// Needs to react on status changes
 			serviceStepBBClient.subscribe(statusSubscription);
-		} catch (UnknownHostException | GeneralMongoException
-				| InvalidDBNamespaceException e) {
+		} catch(UnknownHostException | GeneralMongoException | InvalidDBNamespaceException e) {
 			e.printStackTrace();
 			doDelete();
 		}
@@ -86,6 +98,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		addBehaviour(new CanDoProductStep(this));
 		addBehaviour(new GetProductStepDuration(this));
 		addBehaviour(new ScheduleStep(this));
+		addBehaviour(new InitialisationFinished(this));
 
 		// receive behaviours from EA
 		// add EvaluateProductionStep receiveBehaviour --> conversation with HA
@@ -95,28 +108,28 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		// add StepDuration receiveBehaviour
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jade.core.Agent#takeDown()
-	 */
+	/* (non-Javadoc)
+	 * @see jade.core.Agent#takeDown() */
 	@Override
 	public void takeDown() {
 		productStepBBClient.unsubscribe(statusSubscription);
 		serviceStepBBClient.unsubscribe(statusSubscription);
 		try {
-			serviceStepBBClient.removeDocuments(new BasicDBObject());
+			// serviceStepBBClient.removeDocuments(new BasicDBObject());
 
-			DBObject update = BasicDBObjectBuilder
-					.start("status", StepStatusCode.FAILED.name())
-					.push("statusData")
-						.add("source", "service agent")
-						.add("reason", "died")
-						.pop()
-					.get();
-			productStepBBClient.updateDocuments(new BasicDBObject(),
-					new BasicDBObject("$set", update));
-		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+			DBObject update =
+					BasicDBObjectBuilder.start("status", StepStatusCode.FAILED.name())
+							.push("statusData").add("source", "service agent")
+							.add("reason", "died").pop().get();
+			productStepBBClient.updateDocuments(new BasicDBObject(), new BasicDBObject("$set",
+					update));
+
+			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+			message.addReceiver(equipletAgentAID);
+			message.addReceiver(hardwareAgentAID);
+			message.setOntology("serviceAgentDied");
+			send(message);
+		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 			e.printStackTrace();
 		}
 	}
@@ -132,17 +145,17 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	public void handleLogisticsAgentTimeout() {
 
 	}
-	
-	public Service MapConvIdWithService(String conversationId, Service service) {
-		return convIdServiceMapping.put(conversationId, service);
+
+	public void MapConvIdWithService(String conversationId, Service service) {
+		convIdServiceMapping.put(conversationId, service);
 	}
-	
+
 	public Service GetServiceForConvId(String conversationId) {
 		return convIdServiceMapping.get(conversationId);
 	}
-	
-	public Service RemoveConvIdServiceMapping(String conversationId) {
-		return convIdServiceMapping.remove(conversationId);
+
+	public void RemoveConvIdServiceMapping(String conversationId) {
+		convIdServiceMapping.remove(conversationId);
 	}
 
 	/**
@@ -151,16 +164,15 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 * @param total_prefix
 	 * @param result
 	 */
-	public void printDBObjectPretty(DBObject obj, String prefix,
-			String total_prefix, StringBuilder result) {
+	public void printDBObjectPretty(DBObject obj, String prefix, String total_prefix,
+			StringBuilder result) {
 		Object value;
-		for (String key : obj.keySet()) {
+		for(String key : obj.keySet()) {
 			value = obj.get(key);
-			if (value instanceof DBObject) {
+			if(value instanceof DBObject) {
 				result.append(total_prefix + key + ":\n");
-				printDBObjectPretty((DBObject) value, prefix, prefix
-						+ total_prefix, result);
-			} else if (value == null) {
+				printDBObjectPretty((DBObject) value, prefix, prefix + total_prefix, result);
+			} else if(value == null) {
 				result.append(total_prefix + key + ": " + value + "\n");
 			} else {
 				result.append(total_prefix + key + ": " + value + " ("
@@ -169,62 +181,59 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see
 	 * rexos.libraries.blackboard_client.BlackboardSubscriber#onMessage(rexos
 	 * .libraries.blackboard_client.MongoOperation,
-	 * rexos.libraries.blackboard_client.OplogEntry)
-	 */
+	 * rexos.libraries.blackboard_client.OplogEntry) */
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
 		try {
-			switch (entry.getNamespace().split("\\.")[1]) {
-			case "ProductStepsBlackBoard":
-				ProductStepMessage productionStep = new ProductStepMessage(
-						(BasicDBObject) productStepBBClient
-								.findDocumentById(entry.getTargetObjectId()));
-				switch (operation) {
-				case UPDATE:
-					StepStatusCode status = productionStep.getStatus();
-					if (status == StepStatusCode.WAITING) {
-						serviceStepBBClient.updateDocuments(new BasicDBObject(
-								"productStepId", entry.getTargetObjectId()),
-								new BasicDBObject("$set", new BasicDBObject(
-										"status", status)));
+			switch(entry.getNamespace().split("\\.")[1]) {
+				case "ProductStepsBlackBoard":
+					ProductStepMessage productionStep =
+							new ProductStepMessage(
+									(BasicDBObject) productStepBBClient.findDocumentById(entry
+											.getTargetObjectId()));
+					switch(operation) {
+						case UPDATE:
+							StepStatusCode status = productionStep.getStatus();
+							if(status == StepStatusCode.WAITING) {
+								serviceStepBBClient.updateDocuments(new BasicDBObject(
+										"productStepId", entry.getTargetObjectId()),
+										new BasicDBObject("$set", new BasicDBObject("status",
+												status)));
+							}
+							break;
+						case DELETE:
+							serviceStepBBClient.removeDocuments(new BasicDBObject("productStepId",
+									entry.getTargetObjectId()));
+							break;
+						default:
+							break;
 					}
 					break;
-				case DELETE:
-					serviceStepBBClient.removeDocuments(new BasicDBObject(
-							"productStepId", entry.getTargetObjectId()));
+				case "ServiceStepsBlackBoard":
+					BasicDBObject serviceStep =
+							(BasicDBObject) serviceStepBBClient.findDocumentById(entry
+									.getTargetObjectId());
+					ObjectId productStepId = (ObjectId) serviceStep.get("productStepId");
+					switch(operation) {
+						case UPDATE:
+							BasicDBObject update =
+									new BasicDBObject("status", serviceStep.get("status"));
+							update.put("statusData", serviceStep.get("statusData"));
+							productStepBBClient.updateDocuments(new BasicDBObject("_id",
+									productStepId), new BasicDBObject("$set", update));
+							break;
+						default:
+							break;
+					}
 					break;
 				default:
 					break;
-				}
-				break;
-			case "ServiceStepsBlackBoard":
-				BasicDBObject serviceStep = (BasicDBObject) serviceStepBBClient
-						.findDocumentById(entry.getTargetObjectId());
-				ObjectId productStepId = (ObjectId) serviceStep
-						.get("productStepId");
-				switch (operation) {
-				case UPDATE:
-					BasicDBObject update = new BasicDBObject("status",
-							serviceStep.get("status"));
-					update.put("statusData", serviceStep.get("statusData"));
-					productStepBBClient.updateDocuments(new BasicDBObject(
-							"_id", productStepId), new BasicDBObject("$set",
-							update));
-					break;
-				default:
-					break;
-				}
-				break;
-			default:
-				break;
 			}
-		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 			e.printStackTrace();
 			doDelete();
 		}

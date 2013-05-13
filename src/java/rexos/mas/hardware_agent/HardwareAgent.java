@@ -31,7 +31,10 @@ package rexos.mas.hardware_agent;
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
+import jade.core.AID;
 import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
+
 import java.util.HashMap;
 
 import org.bson.types.ObjectId;
@@ -65,13 +68,14 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	private DbData dbData;
 	private HashMap<Integer, Integer> leadingModuleForStep;
 	private ModuleFactory moduleFactory;
+	private AID equipletAgentAID, serviceAgentAID;
 	
 	public void registerLeadingModule(int serviceId, int moduleId) {
 		leadingModuleForStep.put(serviceId, moduleId);
 	}
 
 	public int getLeadingModule(int serviceId) {
-		if(leadingModuleForStep.get(serviceId) == null){
+		if(!leadingModuleForStep.containsKey(serviceId)){
 			return 0;
 		}
 		return leadingModuleForStep.get(serviceId);
@@ -85,10 +89,11 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		moduleFactory = new ModuleFactory();
 		moduleFactory.subscribeToUpdates(this);
 		
-		// TODO fill in host, database and collection
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			dbData = (DbData) args[0];
+			equipletAgentAID = (AID) args[1];
+			serviceAgentAID = (AID) args[2];
 		}
 
 		try {
@@ -111,7 +116,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			doDelete();
 		}
 
-		EvaluateDuration evaluateDurationBehaviour = new EvaluateDuration(this);
+		EvaluateDuration evaluateDurationBehaviour = new EvaluateDuration(this, moduleFactory);
 		addBehaviour(evaluateDurationBehaviour);
 
 		FillPlaceholders fillPlaceholdersBehaviour = new FillPlaceholders(this);
@@ -125,48 +130,31 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		try {
 			client = KnowledgeDBClient.getClient();
 
-			Row[] resultSet;
-
-			resultSet = client.executeSelectQuery(Queries.MODULES);
-
-			for (int i = 0; i < resultSet.length; i++) {
+			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgentAID.getLocalName());
+			for(Row row : rows){
 				try{
-					int id = (int) resultSet[i].get("id");
+					int id = (int)row.get("module");
 					Module m = moduleFactory.getModuleById(id);
-					int[] steps = m.isLeadingForSteps();
-					for(int step : steps){						
-						registerLeadingModule(step,id);						
-					}					
-				}catch(Exception e){/*key doesn't exist*/}
-				
-				// geef id aan modulefactory,
-				// je krijgt een module terug,
-				//
-				// register module bij de hardwareagent..
-
+					for(int i : m.isLeadingForSteps()){
+						System.out.println(i);
+					}
+					for(int step : m.isLeadingForSteps()){
+						registerLeadingModule(step, id);
+					}
+				}catch(Exception e){/* the row has no module*/}
 			}
-			System.out.println();
-
+			for(int key : leadingModuleForStep.keySet()){
+				System.out.println(key + ": " + leadingModuleForStep.get(key));
+			}
 		} catch (KnowledgeException e1) {
-			// TODO Auto-generated catch block
+			takeDown();
 			e1.printStackTrace();
 		}
-
-		// kijk voor alle modules in de hashmap modules voor welke stap/stappen
-		// deze module leidend is
-		// en zet het id van de module, en het id van de bijbehorende step in de
-		// leadingModuleForStep Hashmap
-
-		// for now: use precompiled grippermodule class
-
-		//GripperModule gp = new GripperModule();
-		//registerModule(1, gp);
-		//DeltaRobotModule drm = new DeltaRobotModule();
-		//registerModule(2, drm);
-		///		
 		
-		/// ga na voor welke stappen deze modules leidend zijn en sla dit op in de hashmap
-
+		ACLMessage startedMessage = new ACLMessage(ACLMessage.INFORM);
+		startedMessage.addReceiver(serviceAgentAID);
+		startedMessage.setOntology("InitialisationFinished");
+		send(startedMessage);
 	}
 	
 	public int getLeadingModuleForStep(int stepId){
@@ -177,7 +165,18 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	}
 	@Override
 	public void takeDown() {
-		// TODO implement graceful death
+		try {
+			//Clears his own blackboard and removes his subscription on that blackboard.
+			equipletStepBBClient.removeDocuments(new BasicDBObject());
+			equipletStepBBClient.unsubscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
+		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+			e.printStackTrace();
+		}
+		
+		ACLMessage deadMessage = new ACLMessage(ACLMessage.FAILURE);
+		deadMessage.addReceiver(serviceAgentAID);
+		deadMessage.setOntology("HardwareAgentDied");
+		send(deadMessage);
 	}
 
 	public BlackboardClient getServiceStepsBBClient() {

@@ -75,17 +75,6 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 		if (message != null) {
 			try {
 				System.out.format("%s GetPartsInfo%n", myAgent.getLocalName());
-				// TODO probleem: als PA parameters aangeeft is dat soms
-				// part-gebonden: bal A op pos
-				// x en bal B op pos y. Daarom moeten de parts of als parameters
-				// worden aangegeven, samen met de pos, of de part-gebonden
-				// parameters komen bij de
-				// parts array in: niet nice.
-				// TODO probleem: een part kan twee of meer part-gebonden
-				// parameters
-				// hebben (van en naar pos). Een hashmap kan dus niet zomaar
-				// tenzij Position wordt uitgebreid met een van en naar pos.
-
 				Integer[] partIds = ((ProductStepMessage) message.getContentObject()).getInputPartTypes();
 				HashMap<Integer, Position> partsParameters = new HashMap<Integer, Position>();
 

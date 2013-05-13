@@ -1,9 +1,9 @@
 /**
- * @file Module.java
- * @brief Provides an inteface to make modules.
- * @date Created: 2013-04-18
+ * @file InitialisationFinished.java
+ * @brief Behaviour for handling the messages with the ontology InitialisationFinished
+ * @date Created: 2013-04-02
  * 
- * @author Thierry Gerritse
+ * @author Hessel Meulenbeld
  * 
  * @section LICENSE
  *          License: newBSD
@@ -44,69 +44,63 @@
  *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *          SUCH DAMAGE.
  **/
+package rexos.mas.service_agent.behaviour;
 
-package rexos.mas.hardware_agent;
+import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
-import java.util.HashMap;
+import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.service_agent.ServiceAgent;
 
-import com.mongodb.BasicDBObject;
-
-public abstract class Module {
-	private int id;
-	private ModuleFactory moduleFactory;
-	private HashMap<Integer, Object> configuration;
+/** The Class InitialisationFinished. */
+public class InitialisationFinished extends ReceiveBehaviour {
+	/**
+	 * @var static final long serialVersionUID The serial version UID for this
+	 *      class
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
+	 * @var MessageTemplate messageTemplate The messageTemplate this behaviour
+	 *      listens to. This behaviour listens to the ontology: InitialisationFinished.
+	 */
+	private static MessageTemplate messageTemplate = MessageTemplate
+			.MatchOntology("InitialisationFinished");
+
+	/**
+	 * @var ServiceAgent serviceAgent The serviceAgent related to this
+	 *      behaviour.
+	 */
+	private ServiceAgent serviceAgent;
+
+	/**
+	 * Instantiates a new can perform step.
 	 * 
-	 * @param parameters
-	 * @return
+	 * @param a The agent for this behaviour
 	 */
-	public abstract EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters);
-
-	/**
-	 * @return
-	 */
-	public abstract int[] isLeadingForSteps();
-	
-	/**
-	 * @return
-	 */
-	public int getId() {
-		return id;
-	}
-	
-	/**
-	 * @param id
-	 */
-	public void setId(int id) {
-		this.id = id;
-	}
-	
-	/**
-	 * @return the moduleFactory
-	 */
-	public ModuleFactory getModuleFactory() {
-		return moduleFactory;
+	public InitialisationFinished(Agent a) {
+		super(a, messageTemplate);
+		serviceAgent = (ServiceAgent) a;
 	}
 
 	/**
-	 * @param moduleFactory the moduleFactory to set
+	 * Function to handle the incoming messages for this behaviour. Handles the
+	 * response to the InitialisationFinished.
+	 * 
+	 * @param message The received message.
 	 */
-	public void setModuleFactory(ModuleFactory moduleFactory) {
-		this.moduleFactory = moduleFactory;
-	}
-
-	/**
-	 * @return the configuration
-	 */
-	public HashMap<Integer, Object> getConfiguration() {
-		return configuration;
-	}
-
-	/**
-	 * @param configuration the configuration to set
-	 */
-	public void setConfiguration(HashMap<Integer, Object> configuration) {
-		this.configuration = configuration;
+	@Override
+	public void handle(ACLMessage message) {
+		System.out.format("%s received message from %s%n", myAgent.getLocalName(), message
+				.getSender().getLocalName(), message.getOntology());
+		
+		ACLMessage response = new ACLMessage(ACLMessage.CONFIRM);
+		response.addReceiver(serviceAgent.getEquipletAgentAID());
+		response.setOntology("InitialisationFinished");
+		serviceAgent.send(response);
 	}
 }
