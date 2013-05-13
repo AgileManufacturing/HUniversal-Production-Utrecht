@@ -30,6 +30,7 @@
 
 package rexos.mas.hardware_agent;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -53,6 +54,11 @@ public class GripperModule implements Module{
 	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters) {		
 		EquipletStepMessage[] equipletSteps;
 		ArrayList<EquipletStepMessage> steps;
+		
+		int movementModuleId = findMovementModule(configuration);
+		ModuleFactory mf = new ModuleFactory();
+		movementModule = mf.getModuleById(movementModuleId);
+		
 		switch(stepType){
 		
 		case 1: // pick
@@ -96,5 +102,24 @@ public class GripperModule implements Module{
 		int[]steps = {1,2,3,4,5};
 		
 		return steps;
+	}
+	
+	private int findMovementModule(HashMap<Integer, Object> hashMap){
+		if(hashMap.containsKey(id)){
+			return -1;
+		}
+		for(int key : hashMap.keySet()){
+			try{
+				HashMap<Integer, Object> tempHashMap = (HashMap<Integer, Object>)hashMap.get(key);
+				if(tempHashMap.containsKey(id)){
+					return key;
+				}
+				int tempId = findMovementModule(tempHashMap);
+				if(tempId != -1){
+					return tempId;
+				}
+			}catch(Exception e){/* its no HashMap so do nothing*/}
+		}
+		return -1;
 	}
 }
