@@ -97,11 +97,16 @@ public class ModuleFactory {
 				Module newSoftware = factory.createNewObjectIfOutdated(description, oldSoftware);
 				moduleCache.put(moduleId, newSoftware);
 				
-				// Notify subscribers if the software was updated.
-				// If no previous version exists, this is not considered an updated.
-				if (oldSoftware != null && oldSoftware != newSoftware) {
-					for (ModuleUpdateListener sub : updateSubscribers) {
-						sub.onModuleUpdate(moduleId, oldSoftware, newSoftware);
+				if (oldSoftware != newSoftware) {
+					newSoftware.setId(moduleId);
+					newSoftware.setModuleFactory(this);
+					
+					// Notify subscribers if the software was updated.
+					// If no previous version exists, this is not considered an updated.
+					if (oldSoftware != null) {
+						for (ModuleUpdateListener sub : updateSubscribers) {
+							sub.onModuleUpdate(moduleId, oldSoftware, newSoftware);
+						}
 					}
 				}
 			}
