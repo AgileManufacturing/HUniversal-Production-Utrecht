@@ -92,7 +92,7 @@ public class KnowledgeDBClient {
             // Check required properties.
             String[] reqProperties = new String[]{"host", "port", "db", "username", "password"};
             for (String property : reqProperties) {
-            	if (dbProperties.containsKey(property)) {
+            	if (!dbProperties.containsKey(property)) {
             		throw new KnowledgeException("Property " + property + " was not found in properties file.");
             	}
             }
