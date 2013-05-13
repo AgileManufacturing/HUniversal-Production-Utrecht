@@ -135,6 +135,7 @@ public class Queries {
     public static final String POSSIBLE_STEPS_PER_EQUIPLET = "SELECT\n" +
             "    `equiplets`.`jade_address`\n" +
             "    , `product_steps`.`name` AS `step`\n" +
+            "    , `product_steps`.`id` AS `id`\n" +
             "FROM\n" +
             "    `rexos_knowledge_base`.`modules`\n" +
             "    INNER JOIN `rexos_knowledge_base`.`equiplets` \n" +
