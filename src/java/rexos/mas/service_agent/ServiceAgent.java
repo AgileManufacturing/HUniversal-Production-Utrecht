@@ -2,6 +2,7 @@ package rexos.mas.service_agent;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.wrapper.StaleProxyException;
 
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -56,10 +57,19 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		if (args != null && args.length > 0) {
 			dbData = (DbData) args[0];
 			equipletAgentAID = (AID) args[1];
-			hardwareAgentAID = (AID) args[2];
-			logisticsAID = (AID) args[3];
+			//hardwareAgentAID = (AID) args[2];
+			logisticsAID = (AID) args[2];
 		}
 
+		Object[] arguments = new Object[] { dbData, equipletAgentAID, this.getAID() };
+		try {
+			getContainerController().createNewAgent(getLocalName() + "-hardwareAgent", "rexos.mas.hardware_agent.HardwareAgent", arguments).start();
+		} catch (StaleProxyException e1) {
+			takeDown();
+			e1.printStackTrace();
+		}
+		hardwareAgentAID = new AID(getLocalName() + "-hardwareAgent", AID.ISLOCALNAME);
+		
 		try {
 			productStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
