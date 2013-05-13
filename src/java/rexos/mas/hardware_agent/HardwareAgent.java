@@ -39,23 +39,11 @@ import java.util.HashMap;
 
 import org.bson.types.ObjectId;
 
-import rexos.libraries.blackboard_client.BasicOperationSubscription;
-import rexos.libraries.blackboard_client.BlackboardClient;
-import rexos.libraries.blackboard_client.BlackboardSubscriber;
-import rexos.libraries.blackboard_client.FieldUpdateSubscription;
-import rexos.libraries.blackboard_client.GeneralMongoException;
-import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
-import rexos.libraries.blackboard_client.MongoOperation;
-import rexos.libraries.blackboard_client.OplogEntry;
+import rexos.libraries.blackboard_client.*;
 import rexos.libraries.blackboard_client.FieldUpdateSubscription.MongoUpdateLogOperation;
-import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
-import rexos.libraries.knowledgedb_client.KnowledgeException;
-import rexos.libraries.knowledgedb_client.Queries;
-import rexos.libraries.knowledgedb_client.Row;
+import rexos.libraries.knowledgedb_client.*;
 import rexos.mas.data.DbData;
-import rexos.mas.hardware_agent.behaviours.CheckForModules;
-import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
-import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
+import rexos.mas.hardware_agent.behaviours.*;
 import rexos.mas.service_agent.ServiceStepMessage;
 
 import com.mongodb.BasicDBObject;
@@ -135,16 +123,10 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 				try{
 					int id = (int)row.get("module");
 					Module m = moduleFactory.getModuleById(id);
-					for(int i : m.isLeadingForSteps()){
-						System.out.println(i);
-					}
 					for(int step : m.isLeadingForSteps()){
 						registerLeadingModule(step, id);
 					}
-				}catch(Exception e){/* the row has no module*/}
-			}
-			for(int key : leadingModuleForStep.keySet()){
-				System.out.println(key + ": " + leadingModuleForStep.get(key));
+				}catch(Exception e){/*the row has no module*/}
 			}
 		} catch (KnowledgeException e1) {
 			takeDown();
