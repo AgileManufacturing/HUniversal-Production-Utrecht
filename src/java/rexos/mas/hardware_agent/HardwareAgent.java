@@ -53,7 +53,6 @@ import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
 import rexos.mas.data.DbData;
-import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.hardware_agent.behaviours.CheckForModules;
 import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
 import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
@@ -69,7 +68,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	private DbData dbData;
 	private HashMap<Integer, Integer> leadingModuleForStep;
 	private ModuleFactory moduleFactory;
-	private AID equipletAgent, serviceAgent;
+	private AID equipletAgentAID, serviceAgentAID;
 	
 	public void registerLeadingModule(int serviceId, int moduleId) {
 		leadingModuleForStep.put(serviceId, moduleId);
@@ -93,8 +92,8 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			dbData = (DbData) args[0];
-			equipletAgent = (AID) args[1];
-			serviceAgent = (AID) args[2];
+			equipletAgentAID = (AID) args[1];
+			serviceAgentAID = (AID) args[2];
 		}
 
 		try {
@@ -131,7 +130,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		try {
 			client = KnowledgeDBClient.getClient();
 
-			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgent.getLocalName());
+			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgentAID.getLocalName());
 			for(Row row : rows){
 				try{
 					int id = (int)row.get("module");
@@ -151,6 +150,11 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			takeDown();
 			e1.printStackTrace();
 		}
+		
+		ACLMessage startedMessage = new ACLMessage(ACLMessage.INFORM);
+		startedMessage.addReceiver(serviceAgentAID);
+		startedMessage.setOntology("InitialisationFinished");
+		send(startedMessage);
 	}
 	
 	public int getLeadingModuleForStep(int stepId){
@@ -170,7 +174,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		}
 		
 		ACLMessage deadMessage = new ACLMessage(ACLMessage.FAILURE);
-		deadMessage.addReceiver(serviceAgent);
+		deadMessage.addReceiver(serviceAgentAID);
 		deadMessage.setOntology("HardwareAgentDied");
 		send(deadMessage);
 	}

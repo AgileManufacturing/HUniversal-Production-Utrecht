@@ -21,6 +21,7 @@ import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.service_agent.behaviour.CanDoProductStep;
 import rexos.mas.service_agent.behaviour.GetProductStepDuration;
+import rexos.mas.service_agent.behaviour.InitialisationFinished;
 import rexos.mas.service_agent.behaviour.ScheduleStep;
 
 import com.mongodb.BasicDBObject;
@@ -57,11 +58,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		if (args != null && args.length > 0) {
 			dbData = (DbData) args[0];
 			equipletAgentAID = (AID) args[1];
-			//hardwareAgentAID = (AID) args[2];
 			logisticsAID = (AID) args[2];
 		}
 
-		Object[] arguments = new Object[] { dbData, equipletAgentAID, this.getAID() };
+		Object[] arguments = new Object[] { dbData, equipletAgentAID, getAID() };
 		try {
 			getContainerController().createNewAgent(getLocalName() + "-hardwareAgent", "rexos.mas.hardware_agent.HardwareAgent", arguments).start();
 		} catch (StaleProxyException e1) {
@@ -96,6 +96,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		addBehaviour(new CanDoProductStep(this));
 		addBehaviour(new GetProductStepDuration(this));
 		addBehaviour(new ScheduleStep(this));
+		addBehaviour(new InitialisationFinished(this));
 
 		// receive behaviours from EA
 		// add EvaluateProductionStep receiveBehaviour --> conversation with HA

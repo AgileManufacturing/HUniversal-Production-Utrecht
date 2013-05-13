@@ -178,6 +178,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	private int timeSlotLength;
 
 	/**
+	 * @var DbData dbData
+	 * The dbData of the equipletAgent.
+	 */
+	private DbData dbData;
+	/**
 	 * Setup function for the equipletAgent.
 	 * Configures the IP and database name of the equiplet.
 	 * Gets its capabilities from the arguments.
@@ -212,13 +217,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				System.out.format("%s %s%n", capabilities, equipletDbName);
 			}
 			
-			DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
+			dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 			
-			/*//creates his hardware agent.
-			Object[] arguments = new Object[] { dbData, this };
-			getContainerController().createNewAgent(getLocalName() + "-hardwareAgent", "rexos.mas.hardware_agent.HardwareAgent", arguments).start();
-			AID hardwareAgent = new AID(getLocalName() + "-hardwareAgent", AID.ISLOCALNAME);
-			*/
 			//creates his service agent.
 			Object[] arguments = new Object[] { dbData, getAID(), logisticsAgent };
 			getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "rexos.mas.service_agent.ServiceAgent", arguments).start();
@@ -238,10 +238,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			equipletBBClient.subscribe(statusSubscription);
-			
-			//inserts himself on the collective blackboard equiplet directory.
-			EquipletDirectoryMessage entry = new EquipletDirectoryMessage(getAID(), capabilities, dbData);
-			collectiveBBClient.insertDocument(entry.toBasicDBObject());
 			
 			//gets the timedata for synchronizing from the collective blackboard.
 			collectiveBBClient.setCollection(timeDataName);
@@ -272,6 +268,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		
 		//starts the behaviour for receiving message when the Service Agent Dies.
 		addBehaviour(new ServiceAgentDied(this));
+		
+		//starts the behaviour for receving message initialisation finished.
+		addBehaviour(new InitialisationFinished(this, collectiveBBClient));
 	}
 
 	/**
@@ -464,5 +463,13 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 */
 	public ObjectId getNextProductStep() {
 		return nextProductStep;
+	}
+
+	public ArrayList<Integer> getCapabilities() {
+		return capabilities;
+	}
+
+	public DbData getDbData() {
+		return dbData;
 	}
 }
