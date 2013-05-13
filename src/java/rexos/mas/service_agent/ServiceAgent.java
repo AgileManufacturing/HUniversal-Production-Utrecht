@@ -61,8 +61,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		}
 
 		Object[] arguments = new Object[] { dbData, equipletAgentAID, getAID() };
-				dbData, equipletAgentAID, getAID()
-		};
 		try {
 			AgentController hardwareAgentCnt =
 					getContainerController().createNewAgent(
