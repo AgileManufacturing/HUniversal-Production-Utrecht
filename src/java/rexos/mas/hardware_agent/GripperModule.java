@@ -30,7 +30,10 @@
 
 package rexos.mas.hardware_agent;
 
+
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 import rexos.mas.equiplet_agent.StepStatusCode;
 
@@ -38,8 +41,15 @@ import com.mongodb.BasicDBObject;
 
 public class GripperModule implements Module{
 	int gripperSize = 2;
+	ModuleFactory mf;
+	Module movementModule;
+	int id;
+	HashMap<Integer, Object> configuration;
 	
-	public GripperModule(){
+	public GripperModule(HashMap<Integer, Object> configuration, Integer id){
+		this.configuration = configuration;
+		this.id = id;
+		mf = new ModuleFactory();
 	}
 
 	@Override
@@ -47,24 +57,37 @@ public class GripperModule implements Module{
 		EquipletStepMessage[] equipletSteps;
 		ArrayList<EquipletStepMessage> steps;
 		
+		int movementModuleId = findMovementModule(configuration);
+		movementModule = mf.getModuleById(movementModuleId);
+		
 		switch(stepType){
 		
 		case 1: // pick
 			steps = new ArrayList<EquipletStepMessage>();
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3)));
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(4)));
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(5)));
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3)));
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(4)));
+			
+			BasicDBObject moveParameters = (BasicDBObject) parameters.copy();
+			moveParameters.put("extraSize", gripperSize);
+			steps.addAll(new ArrayList<EquipletStepMessage>
+				(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters))));//MOVE TO
+			
+			InstructionData instructionData = new InstructionData("deactivate", "gripper", "FIND_ID",
+					new BasicDBObject("ID", ((BasicDBObject) parameters.get("position")).get("relativeToPart")),
+					new BasicDBObject());
+			steps.add(new EquipletStepMessage(null, instructionData,
+					StepStatusCode.EVALUATING, new TimeData(1)));//ACTIVATE GRIPPER
+			
+			steps.addAll(new ArrayList<EquipletStepMessage>
+				(Arrays.asList(movementModule.getEquipletSteps(2, parameters))));//SAVE MOVE
 			equipletSteps = new EquipletStepMessage[steps.size()];
 			return steps.toArray(equipletSteps);
 		case 2: // place/drop
 			steps = new ArrayList<EquipletStepMessage>();
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3)));
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(4)));
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(5)));
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(3)));
-			steps.add(new EquipletStepMessage(null, new InstructionData(), StepStatusCode.EVALUATING, new TimeData(4)));
+			steps.addAll(new ArrayList<EquipletStepMessage>
+				(Arrays.asList(movementModule.getEquipletSteps(1, parameters))));//MOVE TO
+			steps.add(new EquipletStepMessage(null, new InstructionData(),
+					StepStatusCode.EVALUATING, new TimeData(1)));//DEACTIVATE GRIPPER
+			steps.addAll(new ArrayList<EquipletStepMessage>
+				(Arrays.asList(movementModule.getEquipletSteps(2, parameters))));//SAVE MOVE
 			equipletSteps = new EquipletStepMessage[steps.size()];
 			return steps.toArray(equipletSteps);
 		default:
@@ -77,6 +100,27 @@ public class GripperModule implements Module{
 	@Override
 	public int[] isLeadingForSteps() {
 		
-		return null;
+		int[]steps = {1,2,3,4,5};
+		
+		return steps;
+	}
+	
+	private int findMovementModule(HashMap<Integer, Object> hashMap){
+		if(hashMap.containsKey(id)){
+			return -1;
+		}
+		for(int key : hashMap.keySet()){
+			try{
+				HashMap<Integer, Object> tempHashMap = (HashMap<Integer, Object>)hashMap.get(key);
+				if(tempHashMap.containsKey(id)){
+					return key;
+				}
+				int tempId = findMovementModule(tempHashMap);
+				if(tempId != -1){
+					return tempId;
+				}
+			}catch(Exception e){/* its no HashMap so do nothing*/}
+		}
+		return -1;
 	}
 }

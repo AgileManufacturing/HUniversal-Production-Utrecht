@@ -54,10 +54,7 @@ import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.mas.data.DbData;
 import rexos.mas.data.ScheduleData;
-import rexos.mas.equiplet_agent.behaviours.CanPerformStep;
-import rexos.mas.equiplet_agent.behaviours.GetProductionDuration;
-import rexos.mas.equiplet_agent.behaviours.ScheduleStep;
-import rexos.mas.equiplet_agent.behaviours.StartStep;
+import rexos.mas.equiplet_agent.behaviours.*;
 
 import com.mongodb.BasicDBObject;
 
@@ -218,7 +215,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			DbData dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 			
 			//creates his hardware agent.
-			Object[] arguments = new Object[] { dbData };
+			Object[] arguments = new Object[] { dbData, this };
 			getContainerController().createNewAgent(getLocalName() + "-hardwareAgent", "rexos.mas.hardware_agent.HardwareAgent", arguments).start();
 			AID hardwareAgent = new AID(getLocalName() + "-hardwareAgent", AID.ISLOCALNAME);
 			
@@ -272,6 +269,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		
 		//starts the behaviour for receiving messages with the Ontology StartStep.
 		addBehaviour(new StartStep(this, equipletBBClient));
+		
+		//starts the behaviour for receiving message when the Service Agent Dies.
+		addBehaviour(new ServiceAgentDied(this));
 	}
 
 	/**
@@ -291,6 +291,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			for(Object productAgent : productAgents){
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
 				responseMessage.addReceiver(new AID(productAgent.toString(), AID.ISGUID));
+				responseMessage.setOntology("EquipletAgentDied");
 				responseMessage.setContent("I'm dying");
 				send(responseMessage);
 			}
@@ -307,6 +308,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 			e.printStackTrace();
 		}
+		
+		ACLMessage deadMessage = new ACLMessage(ACLMessage.FAILURE);
+		deadMessage.addReceiver(serviceAgent);
+		deadMessage.setOntology("EquipletAgentDied");
+		send(deadMessage);
 	}
 
 	/**

@@ -51,6 +51,7 @@ import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
 import rexos.mas.data.DbData;
+import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.hardware_agent.behaviours.CheckForModules;
 import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
 import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
@@ -67,6 +68,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	private DbData dbData;
 	private HashMap<Integer, Integer> leadingModuleForStep;
 	private ModuleFactory moduleFactory;
+	private EquipletAgent equipletAgent;
 	
 	public void registerLeadingModule(int serviceId, int moduleId) {
 		leadingModuleForStep.put(serviceId, moduleId);
@@ -87,11 +89,10 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		moduleFactory = new ModuleFactory();
 		moduleFactory.subscribeToUpdates(this);
 		
-		// TODO fill in host, database and collection
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			dbData = (DbData) args[0];
-			equipletAgentAID = (AID) args[1];
+			equipletAgent = (EquipletAgent) args[1];
 		}
 
 		try {
@@ -128,28 +129,19 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		try {
 			client = KnowledgeDBClient.getClient();
 
-			Row[] resultSet;
-
-			resultSet = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgentAID.getLocalName());
-
-			for (int i = 0; i < resultSet.length; i++) {
+			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgent.getAID().getLocalName());
+			for(Row row : rows){
 				try{
-					int id = (int) resultSet[i].get("module");
+					int id = (int)row.get("module");
 					Module m = moduleFactory.getModuleById(id);
-					int[] steps = m.isLeadingForSteps();
-					for(int step : steps){						
-						registerLeadingModule(step,id);						
-					}					
-				}catch(Exception e){/*key doesn't exist*/}
-				
-				// geef id aan modulefactory,
-				// je krijgt een module terug,
-				//
-				// register module bij de hardwareagent..
-
+					for(int step : m.isLeadingForSteps()){
+						registerLeadingModule(step, id);
+					}
+				}catch(Exception e){/* the row has no id*/;}
 			}
-			System.out.println();
-
+			for(int key : leadingModuleForStep.keySet()){
+				System.out.println(key + ": " + leadingModuleForStep.get(key));
+			}
 		} catch (KnowledgeException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

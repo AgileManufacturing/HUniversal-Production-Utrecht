@@ -92,9 +92,8 @@ public class Queries {
              "    ) \n" +
              "  LEFT JOIN `rexos_knowledge_base`.`equiplets` \n" +
              "    ON (\n" +
-             "      `modules`.`location` = `equiplets`.`id`\n" +
-             "WHERE (`equiplets`.`jade_address` = (?)) " + 
-             "    ) ;";
+             "      `modules`.`location` = `equiplets`.`id`)\n" +
+             "WHERE (`equiplets`.`jade_address` = (?));";
 
     /**
      * @var String PART_PROPERTIES
