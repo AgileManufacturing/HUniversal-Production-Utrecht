@@ -64,7 +64,6 @@ import com.mongodb.DBObject;
 public class HardwareAgent extends Agent implements BlackboardSubscriber, ModuleUpdateListener {
 	private static final long serialVersionUID = 1L;
 
-	private AID equipletAgentAID;
 	private BlackboardClient serviceStepBBClient, equipletStepBBClient;
 	private DbData dbData;
 	private HashMap<Integer, Integer> leadingModuleForStep;
