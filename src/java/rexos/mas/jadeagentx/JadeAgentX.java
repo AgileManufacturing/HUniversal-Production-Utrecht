@@ -71,15 +71,11 @@ public class JadeAgentX extends Agent {
 			/**
 			 * Make a array list of capabilities
 			 */
-			ArrayList<Integer> capabilities1 = new ArrayList<>();
-			capabilities1.add(1);
-			capabilities1.add(2);
-			capabilities1.add(3);
 
 			/**
 			 * make a new equipletagent to use.
 			 */
-			Object[] ar = new Object[] { capabilities1, logisticsAID };
+			Object[] ar = new Object[] { logisticsAID };
 			getContainerController().createNewAgent("EQ1",
 					"rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 
