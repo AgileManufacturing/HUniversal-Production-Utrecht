@@ -145,6 +145,13 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		send(startedMessage);
 	}
 	
+	/**
+	 * @return the equipletAgentAID
+	 **/
+	public AID getEquipletAgentAID() {
+		return equipletAgentAID;
+	}
+
 	public int getLeadingModuleForStep(int stepId){
 	
 		int moduleId = leadingModuleForStep.get(stepId);

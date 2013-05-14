@@ -49,8 +49,6 @@ package rexos.mas.service_agent;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import org.bson.BSONObject;
-
 import com.mongodb.BasicDBObject;
 import rexos.libraries.knowledgedb_client.*;
 import rexos.mas.data.Position;

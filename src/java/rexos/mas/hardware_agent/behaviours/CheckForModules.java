@@ -6,6 +6,7 @@ package rexos.mas.hardware_agent.behaviours;
  * @date Created: 12-04-13
  *
  * @author Thierry Gerritse
+ * @author Jan-Willem Willebrands
  * 
  * @section LICENSE
  * License: newBSD
@@ -28,20 +29,31 @@ package rexos.mas.hardware_agent.behaviours;
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ * @note 2013-05-14 JWW: This should be adapted to use MOST once it's done.
  **/
+
+import java.util.ArrayList;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import rexos.libraries.knowledgedb_client.KeyNotFoundException;
+import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
+import rexos.libraries.knowledgedb_client.KnowledgeException;
+import rexos.libraries.knowledgedb_client.Queries;
+import rexos.libraries.knowledgedb_client.Row;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.hardware_agent.HardwareAgent;
 
 public class CheckForModules extends ReceiveBehaviour {
 	/**
-	 * 
-	 */
+	 * @var long serialVersionUID
+	 * SerialUID for this class.
+	 **/
 	private static final long serialVersionUID = 1L;
+	
 	private static MessageTemplate messageTemplate = MessageTemplate
 			.MatchOntology("CheckForModules");
 	private HardwareAgent hardwareAgent;
@@ -55,82 +67,70 @@ public class CheckForModules extends ReceiveBehaviour {
 		super(a, -1, messageTemplate);
 		hardwareAgent = (HardwareAgent) a;
 	}
+	
+	/**
+	 * Returns a list of module group ids for which a module is available on this equiplet.
+	 * This data is currently retrieved from the knowledge base.
+	 * Once MOST is implemented, this method should take MOST data into account.
+	 * 
+	 * @return An arraylist containing module group ids for the modules that are attached to this equiplet.
+	 *
+	 **/
+	private ArrayList<Integer> getAvailableModuleGroups() {
+		ArrayList<Integer> availableModules = new ArrayList<Integer>();
+		try {
+			
+			KnowledgeDBClient client = KnowledgeDBClient.getClient();
+			Row[] rows = client.executeSelectQuery(
+					Queries.MODULES_PER_EQUIPLET, hardwareAgent
+							.getEquipletAgentAID().getLocalName());
+			for (Row row : rows) {
+				availableModules.add((Integer) row.get("groupId"));
+			}
+		} catch (KeyNotFoundException | KnowledgeException ex) {
+			// Return the current (possibly empty) arraylist if reading 
+			// from the knowledge db fails for whatever reason.
+		}
+		
+		return availableModules;
+	}
 
 	/**
-	 * 
-	 * @param ACLMessage
-	 *            message handles a incoming messages and will check what kind a
-	 *            module its need
+	 * Responds to incoming messages querying whether a module is available for a set of module group ids.
+	 * This method will respond with a CheckForModulesResponse message.
+	 * If all modules are available, a CONFIRM will be sent.
+	 * If one or more modules are missing, a DISCONFIRM will be sent.
+	 * @param ACLMessage The incoming message.
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		int[] moduleIds = null;
+		boolean modulesPresent = true;
+		
 		try {
-			try {
-				moduleIds = (int[]) message.getContentObject();
+			int[] moduleGroupIds = (int[]) message.getContentObject();
+			ArrayList<Integer> availableModuleGroups = getAvailableModuleGroups();
+			
 
-				ACLMessage reply;
-				reply = message.createReply();
-				reply.setOntology("CheckForModulesResponse");
-
-				boolean modulesPresent = true;
-
-				// KnowledgeDBClient client = KnowledgeDBClient.getClient();
-				//
-				// ResultSet resultSet;
-				//
-				// resultSet = client.executeSelectQuery(Queries.MODULES);
-				// while (resultSet.next()) {
-				// System.out.println(new Row(resultSet));
-				// if (resultSet.equals(contentString)) {
-				// modulesPresent = true;
-				// }
-				// }
-				// System.out.println();
-
-				for (int moduleId : moduleIds) {
-
-					try {
-
-						if (hardwareAgent.getLeadingModule(moduleId) == 0) {
-							modulesPresent = false;
-						}
-
-					} catch (Exception e) {
-						
-						System.out.println("Exception Caught. No module found.");
-						
-					}
+			for (int groupId : moduleGroupIds) {
+				if (!availableModuleGroups.contains(groupId)) {
+					modulesPresent = false;
+					break;
 				}
-
-				if (modulesPresent) {
-
-					reply.setPerformative(ACLMessage.CONFIRM);
-
-				} else {
-					reply.setPerformative(ACLMessage.DISCONFIRM);
-				}
-
-				reply.setOntology("CheckForModulesResponse");
-				myAgent.send(reply);
-
-				/**
-				 * checks in knowledge database if the requested modules // are
-				 * available // if available set performative
-				 * (ACLMessage.Confirm) else set // performative
-				 * (ACLMessage.Disconfirm)
-				 **/
-			} catch (UnreadableException e) {
-				// System.out.println("Exception Caught, No Content Object Given");
 			}
-			System.out.format("%s received message from %s (%s:%s)%n",
-					myAgent.getLocalName(), message.getSender().getLocalName(),
-					message.getOntology(), moduleIds);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO: ERROR HANDLING
-			myAgent.doDelete();
+		} catch (UnreadableException ex) {
+			modulesPresent = false;
+		} finally {
+			ACLMessage reply;
+			reply = message.createReply();
+			reply.setOntology("CheckForModulesResponse");
+			if (modulesPresent) {
+				reply.setPerformative(ACLMessage.CONFIRM);
+			} else {
+				reply.setPerformative(ACLMessage.DISCONFIRM);
+			}
+			
+			myAgent.send(reply);
 		}
+
 	}
 }
