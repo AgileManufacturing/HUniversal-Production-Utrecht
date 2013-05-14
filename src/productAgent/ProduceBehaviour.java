@@ -149,6 +149,5 @@ public class ProduceBehaviour extends OneShotBehaviour{
 		} else{
 			step.setStatus(ProductionStepStatus.STATE_FAILED);
 		}
-		// TODO If latest step, check all steps done, then end production?
 	}
 }
