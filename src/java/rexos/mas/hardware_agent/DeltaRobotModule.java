@@ -46,8 +46,6 @@
  **/
 package rexos.mas.hardware_agent;
 
-import org.bson.BasicBSONObject;
-
 import rexos.mas.data.Position;
 import rexos.mas.equiplet_agent.StepStatusCode;
 
@@ -56,46 +54,47 @@ import com.mongodb.BasicDBObject;
 public class DeltaRobotModule extends Module {
 	private static final double SAFE_MOVEMENT_PLANE = 6;
 
-	public DeltaRobotModule() {}
+	public DeltaRobotModule() {
+	}
 
 	@Override
 	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters) {
-		switch(stepType) {
-			case 1: // Move to savePlane
-				return new EquipletStepMessage[]{moveToSafePlane(parameters)};
-			case 2: // MoveXY
-				return new EquipletStepMessage[]{moveXY(parameters)};
-			case 3: // MoveZ
-				return new EquipletStepMessage[]{moveZ(parameters)};
-			default:
-				break;
+		switch (stepType) {
+		case 1: // Move to savePlane
+			return new EquipletStepMessage[] { moveToSafePlane(parameters) };
+		case 2: // MoveXY
+			return new EquipletStepMessage[] { moveXY(parameters) };
+		case 3: // MoveZ
+			return new EquipletStepMessage[] { moveZ(parameters) };
+		default:
+			break;
 		}
 		return new EquipletStepMessage[0];
 	}
 
 	@Override
-	public EquipletStepMessage[] fillPlaceHolders(EquipletStepMessage[] steps, BasicDBObject parameters){
+	public EquipletStepMessage[] fillPlaceHolders(EquipletStepMessage[] steps, BasicDBObject parameters) {
 		Position position = new Position((BasicDBObject) parameters.get("position"));
-		for(EquipletStepMessage step : steps){
+		for (EquipletStepMessage step : steps) {
 			InstructionData instructionData = step.getInstructionData();
 			BasicDBObject lookUpParameters = instructionData.getLookUpParameters();
 			BasicDBObject payload = instructionData.getPayload();
-			if(lookUpParameters.getString("ID").equals("RELATIVE-TO-PLACEHOLDER")){
+			if (lookUpParameters.getString("ID").equals("RELATIVE-TO-PLACEHOLDER")) {
 				lookUpParameters.put("ID", position.getRelativeToPart());
 			}
-			if(payload.getString("x").equals("X-PLACEHOLDER")){
+			if (payload.getString("x").equals("X-PLACEHOLDER")) {
 				payload.put("x", position.getX());
 			}
-			if(payload.getString("y").equals("Y-PLACEHOLDER")){
+			if (payload.getString("y").equals("Y-PLACEHOLDER")) {
 				payload.put("y", position.getY());
 			}
-			if(payload.getString("z").equals("Z-PLACEHOLDER")){
+			if (payload.getString("z").equals("Z-PLACEHOLDER")) {
 				payload.put("z", position.getZ());
 			}
 		}
 		return steps;
 	}
-	
+
 	@Override
 	public int[] isLeadingForSteps() {
 		return new int[] {};
@@ -103,61 +102,52 @@ public class DeltaRobotModule extends Module {
 
 	private EquipletStepMessage moveToSafePlane(BasicDBObject parameters) {
 		double extraSize = parameters.getDouble("extraSize");
-
-		BasicDBObject lookUpParameters =
-				new BasicDBObject("ID",
-						((BasicBSONObject) parameters.get("postion")).get("relativeToPart"));
+				
+		BasicDBObject lookUpParameters = new BasicDBObject("ID", ((BasicDBObject) parameters.get("Position")).get("relativeToPart"));
 		BasicDBObject payload = new BasicDBObject("z", extraSize + SAFE_MOVEMENT_PLANE);
-		InstructionData instructionData =
-				new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
-		EquipletStepMessage step =
-				new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING,
-						new TimeData(4));
+		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
+		EquipletStepMessage step = new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(4));
 		return step;
 	}
 
-	private EquipletStepMessage moveXY(BasicDBObject parameters){
-		Position position = new Position((BasicDBObject) parameters.get("position"));
+	private EquipletStepMessage moveXY(BasicDBObject parameters) {
+		Position position = new Position((BasicDBObject) parameters.get("Position"));
 		BasicDBObject lookUpParameters = new BasicDBObject();
-		if(position.getRelativeToPart() == -1){
+		if (position.getRelativeToPart() == -1) {
 			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
-		}else{
+		} else {
 			lookUpParameters.put("ID", position.getRelativeToPart());
 		}
 		BasicDBObject payload = new BasicDBObject();
-		if(position.getX() == -1){
+		if (position.getX() == -1) {
 			payload.put("x", "X-PLACEHOLDER");
-		}else{
+		} else {
 			payload.put("x", position.getX());
 		}
-		if(position.getY() == -1){
+		if (position.getY() == -1) {
 			payload.put("y", "Y-PLACEHOLDER");
-		}else{
+		} else {
 			payload.put("y", position.getY());
 		}
-		InstructionData instructionData = new InstructionData(
-				"move", "deltarobot", "FIND_ID",
-				lookUpParameters, payload);
+		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
 		return new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(4));
 	}
-	
-	private EquipletStepMessage moveZ(BasicDBObject parameters){
-		Position position = new Position((BasicDBObject) parameters.get("position"));
+
+	private EquipletStepMessage moveZ(BasicDBObject parameters) {
+		Position position = new Position((BasicDBObject) parameters.get("Position"));
 		BasicDBObject lookUpParameters = new BasicDBObject();
-		if(position.getRelativeToPart() == -1){
+		if (position.getRelativeToPart() == -1) {
 			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
-		}else{
+		} else {
 			lookUpParameters.put("ID", position.getRelativeToPart());
 		}
 		BasicDBObject payload = new BasicDBObject();
-		if(position.getZ() == -1){
+		if (position.getZ() == -1) {
 			payload.put("z", "Z-PLACEHOLDER");
-		}else{
+		} else {
 			payload.put("z", position.getZ());
 		}
-		InstructionData instructionData = new InstructionData(
-				"move", "deltarobot", "FIND_ID",
-				lookUpParameters, payload);
+		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
 		return new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(4));
 	}
 

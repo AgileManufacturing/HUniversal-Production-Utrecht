@@ -61,7 +61,8 @@ public class GripperModule extends Module {
 
 	private Module movementModule;
 
-	public GripperModule() {}
+	public GripperModule() {
+	}
 
 	@Override
 	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters) {
@@ -78,27 +79,27 @@ public class GripperModule extends Module {
 
 			BasicDBObject moveParameters = (BasicDBObject) parameters.copy();
 			moveParameters.put("extraSize", GRIPPER_SIZE);
-			
-			steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule.getEquipletSteps(1, parameters))));// SAVE MOVE
-			steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule.getEquipletSteps(2, moveParameters))));// MOVE TO XY
-			steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule.getEquipletSteps(3, moveParameters))));// MOVE TO Z
+
+			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));// SAVE MOVE
+			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(2, moveParameters)));// MOVE TO XY
+			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, moveParameters)));// MOVE TO Z
 			steps.add(activateGripper(moveParameters));// ACTIVATE GRIPPER
-			steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule.getEquipletSteps(1, parameters))));// SAVE MOVE
-			
+			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));// SAVE MOVE
+
 			equipletSteps = new EquipletStepMessage[steps.size()];
 			return steps.toArray(equipletSteps);
 		case 2: // place
 			steps = new ArrayList<EquipletStepMessage>();
-			
+
 			moveParameters = (BasicDBObject) parameters.copy();
 			moveParameters.put("extraSize", GRIPPER_SIZE);
-			
-			steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule.getEquipletSteps(1, parameters))));// SAVE MOVE
-			steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule.getEquipletSteps(2, moveParameters))));// MOVE TO XY
-			steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule.getEquipletSteps(3, moveParameters))));// MOVE TO Z
+
+			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));// SAVE MOVE
+			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(2, moveParameters)));// MOVE TO XY
+			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, moveParameters)));// MOVE TO Z
 			steps.add(deactivateGripper(moveParameters));// DEACTIVATE GRIPPER
-			steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule.getEquipletSteps(1, parameters))));// SAVE MOVE
-			
+			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));// SAVE MOVE
+
 			equipletSteps = new EquipletStepMessage[steps.size()];
 			return steps.toArray(equipletSteps);
 		default:
@@ -111,17 +112,17 @@ public class GripperModule extends Module {
 	@Override
 	public EquipletStepMessage[] fillPlaceHolders(EquipletStepMessage[] steps, BasicDBObject parameters) {
 		Position position = new Position((BasicDBObject) parameters.get("position"));
-		
+
 		int movementModuleId = findMovementModule(getConfiguration());
 		movementModule = getModuleFactory().getModuleById(movementModuleId);
-				
-		for(EquipletStepMessage step : steps){
-			if(step.getModuleId() == movementModule.getId()){
-				movementModule.fillPlaceHolders(new EquipletStepMessage[]{step}, parameters);
-			}else{
+
+		for (EquipletStepMessage step : steps) {
+			if (step.getModuleId() == movementModule.getId()) {
+				movementModule.fillPlaceHolders(new EquipletStepMessage[] { step }, parameters);
+			} else {
 				InstructionData instructionData = step.getInstructionData();
 				BasicDBObject lookUpParameters = instructionData.getLookUpParameters();
-				if(lookUpParameters.getString("ID").equals("RELATIVE-TO-PLACEHOLDER")){
+				if (lookUpParameters.getString("ID").equals("RELATIVE-TO-PLACEHOLDER")) {
 					lookUpParameters.put("ID", position.getRelativeToPart());
 				}
 			}
@@ -155,34 +156,31 @@ public class GripperModule extends Module {
 		return -1;
 	}
 
-	private EquipletStepMessage activateGripper(BasicDBObject parameters){
-		Position position = new Position((BasicDBObject) parameters.get("position"));
+	private EquipletStepMessage activateGripper(BasicDBObject parameters) {
+		Position position = new Position((BasicDBObject) parameters.get("Position"));
 		BasicDBObject lookUpParameters = new BasicDBObject();
-		if(position.getRelativeToPart() == -1){
+		if (position.getRelativeToPart() == -1) {
 			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
-		}else{
+		} else {
 			lookUpParameters.put("ID", position.getRelativeToPart());
 		}
-		
-		InstructionData instructionData = new InstructionData(
-				"activate", "gripper", "FIND_ID",
-				lookUpParameters, new BasicDBObject());
+
+		InstructionData instructionData = new InstructionData("activate", "gripper", "FIND_ID", lookUpParameters, new BasicDBObject());
 		return new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(1));
 	}
-	
-	private EquipletStepMessage deactivateGripper(BasicDBObject parameters){
-		Position position = new Position((BasicDBObject) parameters.get("position"));
+
+	private EquipletStepMessage deactivateGripper(BasicDBObject parameters) {
+		System.out.println(parameters.toString());
+		Position position = new Position((BasicDBObject) parameters.get("Position"));
 		BasicDBObject lookUpParameters = new BasicDBObject();
-		if(position.getRelativeToPart() == -1){
+		if (position.getRelativeToPart() == -1) {
 			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
-		}else{
+		} else {
 			lookUpParameters.put("ID", position.getRelativeToPart());
 		}
-		
-		InstructionData instructionData = new InstructionData(
-				"deactivate", "gripper", "FIND_ID",
-				lookUpParameters, new BasicDBObject());
+
+		InstructionData instructionData = new InstructionData("deactivate", "gripper", "FIND_ID", lookUpParameters, new BasicDBObject());
 		return new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(1));
 	}
-	
+
 }
