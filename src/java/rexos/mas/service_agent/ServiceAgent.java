@@ -92,6 +92,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			serviceStepBBClient.setCollection("ServiceStepsBlackBoard");
 			// Needs to react on status changes
 			serviceStepBBClient.subscribe(statusSubscription);
+			serviceStepBBClient.removeDocuments(new BasicDBObject());
 		} catch(UnknownHostException | GeneralMongoException | InvalidDBNamespaceException e) {
 			e.printStackTrace();
 			doDelete();

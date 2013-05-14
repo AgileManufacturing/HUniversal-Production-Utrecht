@@ -119,8 +119,8 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			equipletStepBBClient = new BlackboardClient(dbData.getIp());
 			equipletStepBBClient.setDatabase(dbData.getName());
 			equipletStepBBClient.setCollection("EquipletStepsBlackBoard");
-			equipletStepBBClient.subscribe(new BasicOperationSubscription(MongoOperation.UPDATE,
-					this));
+			equipletStepBBClient.subscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
+			equipletStepBBClient.removeDocuments(new BasicDBObject());
 		} catch(Exception e) {
 			e.printStackTrace();
 			doDelete();
@@ -140,9 +140,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		try {
 			client = KnowledgeDBClient.getClient();
 
-			Row[] rows =
-					client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET,
-							equipletAgentAID.getLocalName());
+			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgentAID.getLocalName());
 			for(Row row : rows) {
 				try {
 					int id = (int) row.get("module");
@@ -153,7 +151,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 				} catch(Exception e) {/* the row has no module */}
 			}
 		} catch(KnowledgeException e1) {
-			takeDown();
+			doDelete();
 			e1.printStackTrace();
 		}
 

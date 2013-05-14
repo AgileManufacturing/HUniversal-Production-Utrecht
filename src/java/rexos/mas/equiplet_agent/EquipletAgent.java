@@ -191,7 +191,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 * status field. Puts its capabilities on the equipletDirectory blackboard. Gets the time data from the blackboard. Initializes the Timer objects. Starts its behaviours.
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void setup() {
 		System.out.println("I spawned as a equiplet agent.");
 
@@ -244,6 +243,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			equipletBBClient = new BlackboardClient(equipletDbIp, equipletDbPort);
 			equipletBBClient.setDatabase(equipletDbName);
 			equipletBBClient.setCollection(productStepsName);
+			equipletBBClient.removeDocuments(new BasicDBObject());
 
 			// subscribes on changes of the status field on the equiplet
 			// blackboard.

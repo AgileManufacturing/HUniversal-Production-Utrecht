@@ -47,6 +47,7 @@
  **/
 package rexos.mas.service_agent.behaviour;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -121,6 +122,11 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 				ServiceStepMessage[] parameterizedSteps =
 						agent.GetServiceForConvId(conversationId).updateParameters(parameters, orderedSteps);
 
+				ACLMessage informMsg = new ACLMessage(ACLMessage.INFORM);
+				informMsg.setOntology("FillPlaceholders");
+				informMsg.setConversationId(message.getConversationId());
+				informMsg.addReceiver(agent.getHardwareAgentAID());
+				
 				ScheduleData scheduleData;
 				int nextStartTime = productStep.getScheduleData().getStartTime();
 				for(ServiceStepMessage serviceStep : parameterizedSteps) {
@@ -132,11 +138,14 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 
 					agent.getServiceStepBBClient().updateDocuments(new BasicDBObject("_id", serviceStep.getId()),
 							new BasicDBObject("$set", serviceStep.toBasicDBObject()));
+					
+					informMsg.setContentObject(serviceStep.getId());
+					agent.send(informMsg);
 				}
 
 				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStep.get_id()),
 						new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.PLANNED.name())));
-			} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException e) {
+			} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 				e.printStackTrace();
 				agent.doDelete();
 			}
