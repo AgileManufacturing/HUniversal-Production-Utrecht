@@ -102,9 +102,7 @@ public class DeltaRobotModule extends Module {
 
 	private EquipletStepMessage moveToSafePlane(BasicDBObject parameters) {
 		double extraSize = parameters.getDouble("extraSize");
-		
-		System.out.println(parameters.toString());
-		
+				
 		BasicDBObject lookUpParameters = new BasicDBObject("ID", ((BasicDBObject) parameters.get("Position")).get("relativeToPart"));
 		BasicDBObject payload = new BasicDBObject("z", extraSize + SAFE_MOVEMENT_PLANE);
 		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);

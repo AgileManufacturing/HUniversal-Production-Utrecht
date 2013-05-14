@@ -146,8 +146,8 @@ public class EquipletStepMessage implements IMongoSaveable {
 		BasicDBObject object = new BasicDBObject();
 		object.put("serviceStepID", serviceStepID);
 		object.put("moduleId", moduleId);
-		object.put("instructionData", instructionData);
-		object.put("status", status);
+		object.put("instructionData", instructionData.toBasicDBObject());
+		object.put("status", status.toString());
 		object.put("timeData", timeData.getDuration());
 		// TODO add timeData as a basicDBObject by making it implement the
 		// IMongoSaveable interface or make timeData of type int instead of a
