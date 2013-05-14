@@ -4,6 +4,7 @@
  *        step.
  * @date Created: 16-04-2013
  * 
+ * @author Arno Derks
  * @author Theodoor de Graaff
  * 
  * @section LICENSE License: newBSD
