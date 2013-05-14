@@ -111,6 +111,7 @@ public class Position implements Serializable, IMongoSaveable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
+		System.out.println(object.toString());
 		x = object.getDouble("x");
 		y = object.getDouble("y");
 		z = object.getDouble("z");

@@ -85,8 +85,10 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			serviceAgentAID = (AID) args[2];
 		}
 
+		HashMap<Integer, Object> hm = new HashMap<Integer, Object>();
+		hm.put(2, null);
 		configuration = new HashMap<Integer, Object>();
-		configuration.put(1, new HashMap<Integer, Object>().put(2, null));
+		configuration.put(1, hm);
 		
 		try {
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
