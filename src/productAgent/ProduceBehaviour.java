@@ -49,6 +49,7 @@ import java.util.List;
 
 import newDataClasses.LogMessage;
 import newDataClasses.Product;
+import newDataClasses.ProductionEquipletMapper;
 import newDataClasses.ProductionStep;
 import newDataClasses.ProductionStepStatus;
 
@@ -56,6 +57,8 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	private static final long serialVersionUID = 1L;
 	private Product _product;
 	private ProductAgent _productAgent;
+	private ProductionEquipletMapper _prodEQMap;
+	private int currentProdStep[] = {};
 	ACLMessage msg;
 
 	@SuppressWarnings("unused")
@@ -87,18 +90,25 @@ public class ProduceBehaviour extends OneShotBehaviour{
 
 		@Override
 		public void action(){
+			_prodEQMap = new ProductionEquipletMapper();
 			try{
 				switch(msg.getOntology()){
 				// The productionstep has been initiated.
-				case "productionStart":
+				case "productionStepStarted":
 					// De productie is gestart bij de equiplet.
+					// Achterhaal de currentProdStep welke is gestart en geef
+					// deze mee aan "canProductionStepStart".
+					//
 					break;
 				// The productionstep has completed.
-				case "productionFinished":
-					// De productie is klaar en de logfile zal nu worden
-					// ontvangen/aangevraagd (is nog niet duidelijk).
+				case "productionStepFinished":
+					// Ontvang de log-file van de equiplet agent en schrijf deze
+					// in de SQLite database.
+					// De DB moet ergens worden aangemaakt.
+					// Werk de currentProdStep bij.
 					break;
-				// For some reason production can't be started.
+				// For some reason production can't be started thus it has to be
+				// rescheduled.
 				case "notStarted":
 					_productAgent.reschedule();
 					break;
