@@ -77,7 +77,7 @@ public class Queries {
      * A constant representing an sql query for fetching all modules per equiplet.
      **/
     public static final String MODULES_PER_EQUIPLET = "SELECT " + 
-    		 "  `module_groups`.`name` AS `group`,\n" +
+    		 "  `module_groups`.`id` AS `groupId`,\n" +
              "  `module_types`.`name` AS `type`,\n" +
              "  `modules`.`id` AS `module`,\n" +
              "  `equiplets`.`jade_address` AS `equiplet` \n" +

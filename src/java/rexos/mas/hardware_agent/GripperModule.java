@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import rexos.mas.data.Position;
 import rexos.mas.equiplet_agent.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
@@ -70,70 +71,118 @@ public class GripperModule extends Module {
 		int movementModuleId = findMovementModule(getConfiguration());
 		movementModule = getModuleFactory().getModuleById(movementModuleId);
 
-		switch(stepType) {
+		switch (stepType) {
 
-			case 1: // pick
-				steps = new ArrayList<EquipletStepMessage>();
+		case 1: // pick
+			steps = new ArrayList<EquipletStepMessage>();
 
-				BasicDBObject moveParameters = (BasicDBObject) parameters.copy();
-				moveParameters.put("extraSize", GRIPPER_SIZE);
-				steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule
-						.getEquipletSteps(1, moveParameters))));// MOVE TO
-
-				InstructionData instructionData =
-						new InstructionData("deactivate", "gripper", "FIND_ID",
-								new BasicDBObject("ID",
-										((BasicDBObject) parameters.get("position"))
-												.get("relativeToPart")), new BasicDBObject());
-				steps.add(new EquipletStepMessage(null, instructionData, StepStatusCode.EVALUATING,
-						new TimeData(1)));// ACTIVATE GRIPPER
-
-				steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule
-						.getEquipletSteps(2, parameters))));// SAVE MOVE
-				equipletSteps = new EquipletStepMessage[steps.size()];
-				return steps.toArray(equipletSteps);
-			case 2: // place/drop
-				steps = new ArrayList<EquipletStepMessage>();
-				steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule
-						.getEquipletSteps(1, parameters))));// MOVE TO
-				steps.add(new EquipletStepMessage(null, new InstructionData(),
-						StepStatusCode.EVALUATING, new TimeData(1)));// DEACTIVATE
-																		// GRIPPER
-				steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule
-						.getEquipletSteps(2, parameters))));// SAVE MOVE
-				equipletSteps = new EquipletStepMessage[steps.size()];
-				return steps.toArray(equipletSteps);
-			default:
-				break;
+			BasicDBObject moveParameters = (BasicDBObject) parameters.copy();
+			moveParameters.put("extraSize", GRIPPER_SIZE);
+			
+			steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule.getEquipletSteps(1, parameters))));// SAVE MOVE
+			steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule.getEquipletSteps(2, moveParameters))));// MOVE TO XY
+			steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule.getEquipletSteps(3, moveParameters))));// MOVE TO Z
+			steps.add(activateGripper(moveParameters));// ACTIVATE GRIPPER
+			steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule.getEquipletSteps(1, parameters))));// SAVE MOVE
+			
+			equipletSteps = new EquipletStepMessage[steps.size()];
+			return steps.toArray(equipletSteps);
+		case 2: // place
+			steps = new ArrayList<EquipletStepMessage>();
+			
+			moveParameters = (BasicDBObject) parameters.copy();
+			moveParameters.put("extraSize", GRIPPER_SIZE);
+			
+			steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule.getEquipletSteps(1, parameters))));// SAVE MOVE
+			steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule.getEquipletSteps(2, moveParameters))));// MOVE TO XY
+			steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule.getEquipletSteps(3, moveParameters))));// MOVE TO Z
+			steps.add(deactivateGripper(moveParameters));// DEACTIVATE GRIPPER
+			steps.addAll(new ArrayList<EquipletStepMessage>(Arrays.asList(movementModule.getEquipletSteps(1, parameters))));// SAVE MOVE
+			
+			equipletSteps = new EquipletStepMessage[steps.size()];
+			return steps.toArray(equipletSteps);
+		default:
+			break;
 
 		}
 		return new EquipletStepMessage[0];
 	}
 
 	@Override
+	public EquipletStepMessage[] fillPlaceHolders(EquipletStepMessage[] steps, BasicDBObject parameters) {
+		Position position = new Position((BasicDBObject) parameters.get("position"));
+		
+		int movementModuleId = findMovementModule(getConfiguration());
+		movementModule = getModuleFactory().getModuleById(movementModuleId);
+				
+		for(EquipletStepMessage step : steps){
+			if(step.getModuleId() == movementModule.getId()){
+				movementModule.fillPlaceHolders(new EquipletStepMessage[]{step}, parameters);
+			}else{
+				InstructionData instructionData = step.getInstructionData();
+				BasicDBObject lookUpParameters = instructionData.getLookUpParameters();
+				if(lookUpParameters.getString("ID").equals("RELATIVE-TO-PLACEHOLDER")){
+					lookUpParameters.put("ID", position.getRelativeToPart());
+				}
+			}
+		}
+		return steps;
+	}
+
+	@Override
 	public int[] isLeadingForSteps() {
-		int[] steps = {
-				1, 2
-		};
+		int[] steps = { 1, 2 };
 		return steps;
 	}
 
 	private int findMovementModule(HashMap<Integer, Object> hashMap) {
-		if(hashMap.containsKey(getId())) {
+		if (hashMap.containsKey(getId())) {
 			return -1;
 		}
-		for(int key : hashMap.keySet()) {
+		for (int key : hashMap.keySet()) {
 			try {
 				HashMap<Integer, Object> tempHashMap = (HashMap<Integer, Object>) hashMap.get(key);
-				if(tempHashMap.containsKey(getId())) {
+				if (tempHashMap.containsKey(getId())) {
 					return key;
 				}
 				int tempId = findMovementModule(tempHashMap);
-				if(tempId != -1) {
+				if (tempId != -1) {
 					return tempId;
 				}
-			} catch(Exception e) {/* its no HashMap so do nothing */}
+			} catch (Exception e) {/* its no HashMap so do nothing */
+			}
 		}
 		return -1;
 	}
+
+	private EquipletStepMessage activateGripper(BasicDBObject parameters){
+		Position position = new Position((BasicDBObject) parameters.get("position"));
+		BasicDBObject lookUpParameters = new BasicDBObject();
+		if(position.getRelativeToPart() == -1){
+			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
+		}else{
+			lookUpParameters.put("ID", position.getRelativeToPart());
+		}
+		
+		InstructionData instructionData = new InstructionData(
+				"activate", "gripper", "FIND_ID",
+				lookUpParameters, new BasicDBObject());
+		return new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(1));
+	}
+	
+	private EquipletStepMessage deactivateGripper(BasicDBObject parameters){
+		Position position = new Position((BasicDBObject) parameters.get("position"));
+		BasicDBObject lookUpParameters = new BasicDBObject();
+		if(position.getRelativeToPart() == -1){
+			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
+		}else{
+			lookUpParameters.put("ID", position.getRelativeToPart());
+		}
+		
+		InstructionData instructionData = new InstructionData(
+				"deactivate", "gripper", "FIND_ID",
+				lookUpParameters, new BasicDBObject());
+		return new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(1));
+	}
+	
 }

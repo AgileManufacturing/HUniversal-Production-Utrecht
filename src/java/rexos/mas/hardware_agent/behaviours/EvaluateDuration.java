@@ -56,6 +56,7 @@ import jade.lang.acl.UnreadableException;
 
 import org.bson.types.ObjectId;
 
+import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
@@ -97,12 +98,18 @@ public class EvaluateDuration extends ReceiveBehaviour {
 			int stepDuration = 0;
 			int leadingModule = hardwareAgent.getLeadingModule(serviceStep.getServiceId());
 			Module module = moduleFactory.getModuleById(leadingModule);
+			module.setConfiguration(hardwareAgent.getConfiguration());
 			EquipletStepMessage[] equipletSteps =
 					module.getEquipletSteps(serviceStep.getType(), serviceStep.getParameters());
+			System.out.println("number of steps: " + equipletSteps.length);
+			BlackboardClient equipletStepsBBClient = hardwareAgent.getEquipletStepsBBClient();
 			for(EquipletStepMessage equipletStep : equipletSteps) {
 				stepDuration += equipletStep.getTimeData().getDuration();
+				equipletStep.setServiceStepID(serviceStepId);
+				equipletStepsBBClient.insertDocument(equipletStep.toBasicDBObject());
+				System.out.println(equipletStep.toString());
 			}
-
+			
 			ScheduleData schedule = serviceStep.getScheduleData();
 			schedule.setDuration(stepDuration);
 

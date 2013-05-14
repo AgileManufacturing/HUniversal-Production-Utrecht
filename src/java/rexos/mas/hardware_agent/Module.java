@@ -63,6 +63,8 @@ public abstract class Module {
 	 */
 	public abstract EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters);
 
+	public abstract EquipletStepMessage[] fillPlaceHolders(EquipletStepMessage[] steps, BasicDBObject parameters);
+	
 	/**
 	 * @return
 	 */
