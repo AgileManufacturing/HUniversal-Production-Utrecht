@@ -89,8 +89,7 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 	 * @param a
 	 * @param millis
 	 */
-	public GetPartsInfoResponse(Agent a, int millis, String conversationId,
-			ProductStepMessage productStep) {
+	public GetPartsInfoResponse(Agent a, int millis, String conversationId, ProductStepMessage productStep) {
 		super(a, millis, MessageTemplate.and(MessageTemplate.MatchConversationId(conversationId),
 				MessageTemplate.MatchOntology("GetPartsInfoResponse")));
 		agent = (ServiceAgent) a;
@@ -114,16 +113,13 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 					serviceSteps[i] = new ServiceStepMessage((BasicDBObject) dbServiceSteps.get(i));
 				}
 
-				HashMap<Integer, Position> parameters =
-						(HashMap<Integer, Position>) message.getContentObject();
+				HashMap<Integer, Position> parameters = (HashMap<Integer, Position>) message.getContentObject();
 
-				System.out.format("%s got partsInfo: %s%n", agent.getLocalName(),
-						parameters.toString());
+				System.out.format("%s got partsInfo: %s%n", agent.getLocalName(), parameters.toString());
 
 				ServiceStepMessage[] orderedSteps = ServiceStepMessage.sort(serviceSteps);
 				ServiceStepMessage[] parameterizedSteps =
-						agent.GetServiceForConvId(conversationId).updateParameters(parameters,
-								orderedSteps);
+						agent.GetServiceForConvId(conversationId).updateParameters(parameters, orderedSteps);
 
 				ScheduleData scheduleData;
 				int nextStartTime = productStep.getScheduleData().getStartTime();
@@ -134,21 +130,20 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 
 					nextStartTime += scheduleData.getDuration();
 
-					agent.getServiceStepBBClient().updateDocuments(
-							new BasicDBObject("_id", serviceStep.getId()),
+					agent.getServiceStepBBClient().updateDocuments(new BasicDBObject("_id", serviceStep.getId()),
 							new BasicDBObject("$set", serviceStep.toBasicDBObject()));
 				}
 
-				agent.getProductStepBBClient().updateDocuments(
-						new BasicDBObject("_id", productStep.get_id()),
-						new BasicDBObject("$set", new BasicDBObject("status",
-								StepStatusCode.PLANNED.name())));
+				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStep.get_id()),
+						new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.PLANNED.name())));
 			} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException e) {
 				e.printStackTrace();
 				agent.doDelete();
 			}
 		} else {
 			// TODO handle timeout
+			System.out.println(agent.getName() + " - GetPartsInfoResponse timeout!");
+			agent.doDelete();
 		}
 	}
 }

@@ -57,7 +57,8 @@ import rexos.mas.equiplet_agent.StepStatusCode;
 
 public class PickAndPlaceService implements Service {
 	private KnowledgeDBClient client;
-	private int id = 1;
+	private static final int ID = 1;
+	private static final String NAME = "huniplacer pick&place";
 	private int saveMovementPlane = 6;
 
 	/**
@@ -66,27 +67,18 @@ public class PickAndPlaceService implements Service {
 	 */
 	@Override
 	public int[] getModuleIds(int productStepType, BasicDBObject parameters) {
-		// int[] moduleIds = new int[0];
-		// ArrayList<Integer> moduleIds = new ArrayList<Integer>();
-
-		// try {
-		// client = KnowledgeDBClient.getClient();
-		//
-		// Object[] queryParameters = { "HUniplacer.pickandplace" };
-		// Row[] rows =
-		// client.executeSelectQuery(Queries.MODULES_REQUIRED_PER_SERVICE,
-		// queryParameters);
-		// moduleIds = new int[rows.length];
-		// for(int i = 0; i < rows.length; i++){
-		// moduleIds[i] = (int) rows[i].get("id");
-		// }
-		// } catch (KnowledgeException | KeyNotFoundException e1) {
-		// e1.printStackTrace();
-		// }
-		return new int[] {
-				1, 2
-		};// TODO get this working
-			// return moduleIds;
+		try {
+			client = KnowledgeDBClient.getClient();
+			Row[] moduleGroups = client.executeSelectQuery(Queries.MODULEGROUPS_REQUIRED_PER_SERVICE, NAME);
+			int[] moduleIds = new int[moduleGroups.length];
+			for(int i = 0; i < moduleGroups.length; i++) {
+				moduleIds[i] = (int) moduleGroups[i].get("module_id");
+			}
+			return moduleIds;
+		} catch(KnowledgeException | KeyNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
@@ -101,23 +93,20 @@ public class PickAndPlaceService implements Service {
 		BasicDBObject pickParameters = new BasicDBObject();
 		pickParameters.put("InputPart", part);
 		pickParameters.put("Position", new Position().toBasicDBObject());
-		pickParameters.put("SaveMovementPlane",
-				new BasicDBObject("Height", saveMovementPlane).put("RelativeTo", null));
+		pickParameters.put("SaveMovementPlane", new BasicDBObject("Height", saveMovementPlane).put("RelativeTo", null));
 
 		Position position = new Position((BasicDBObject) parameters.get("position"));
 		position.setZ(position.getZ() + inputPartSize);
 		BasicDBObject placeParameters = new BasicDBObject();
 		placeParameters.put("InputPart", part);
 		placeParameters.put("Position", position.toBasicDBObject());
-		placeParameters.put("SaveMovementPlane",
-				new BasicDBObject("Height", saveMovementPlane).put("RelativeTo", part));
+		placeParameters
+				.put("SaveMovementPlane", new BasicDBObject("Height", saveMovementPlane).put("RelativeTo", part));
 
 		return new ServiceStepMessage[] {
-				new ServiceStepMessage(id, 4, pickParameters, StepStatusCode.EVALUATING, null,
-						new ScheduleData()),
+				new ServiceStepMessage(ID, 1, pickParameters, StepStatusCode.EVALUATING, null, new ScheduleData()),
 				// pick //TODO NOT HARDCODED ID.
-				new ServiceStepMessage(id, 5, placeParameters, StepStatusCode.EVALUATING, null,
-						new ScheduleData())
+				new ServiceStepMessage(ID, 2, placeParameters, StepStatusCode.EVALUATING, null, new ScheduleData())
 		// place //TODO NOT HARDCODE ID.
 		};
 	}
@@ -140,7 +129,7 @@ public class PickAndPlaceService implements Service {
 	 */
 	@Override
 	public int getId() {
-		return id;
+		return ID;
 	}
 
 	/**
@@ -148,6 +137,6 @@ public class PickAndPlaceService implements Service {
 	 */
 	@Override
 	public String getName() {
-		return "Pick&Place";
+		return NAME;
 	}
 }

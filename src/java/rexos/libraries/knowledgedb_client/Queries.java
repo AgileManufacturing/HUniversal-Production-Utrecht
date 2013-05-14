@@ -30,20 +30,21 @@ package rexos.libraries.knowledgedb_client;
  **/
 public class Queries {
     /**
-     * @var String MODULES_REQUIRED_PER_SERVICE
+     * @var String MODULEGROUPS_REQUIRED_PER_SERVICE
      *
      * A constant representing an sql query for fetching all modules required by a specific service. Has a service name as the only parameter.
      **/
-    public static final String MODULES_REQUIRED_PER_SERVICE = "SELECT\n" +
-            "    `module_groups`.`name` AS `module`\n" +
-            "    , `services`.`name` AS `service`\n" +
+    public static final String MODULEGROUPS_REQUIRED_PER_SERVICE = "SELECT\n" +
+            "    `module_groups`.`id` AS `module_id`,\n" +
+            "    `module_groups`.`name` AS `module_name`,\n" +
+            "    `services`.`name` AS `service_name`\n" +
             "FROM\n" +
             "    `rexos_knowledge_base`.`service_module`\n" +
             "    INNER JOIN `rexos_knowledge_base`.`module_groups` \n" +
             "        ON (`service_module`.`module` = `module_groups`.`id`)\n" +
             "    INNER JOIN `rexos_knowledge_base`.`services` \n" +
             "        ON (`service_module`.`service` = `services`.`id`)\n" +
-            "WHERE (`services`.`name` = (?));";
+            "WHERE (`services`.`id` = (?));";
 
     /**
      * @var String MODULES

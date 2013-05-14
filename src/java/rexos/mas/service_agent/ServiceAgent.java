@@ -41,11 +41,11 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	private static final long serialVersionUID = 1L;
 
 	private BlackboardClient productStepBBClient, serviceStepBBClient;
-	private FieldUpdateSubscription statusSubscription =
-			new FieldUpdateSubscription("status", this);
-	private HashMap<String, Service> convIdServiceMapping;
+	private FieldUpdateSubscription statusSubscription;
 	private DbData dbData;
 	private AID equipletAgentAID, hardwareAgentAID, logisticsAID;
+	private ServiceFactory serviceFactory;
+	private HashMap<String, Service> convIdServiceMapping;
 
 	/* (non-Javadoc)
 	 * @see jade.core.Agent#setup() */
@@ -53,6 +53,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	public void setup() {
 		System.out.println("I spawned as a service agent.");
 
+		// handle arguments given to this agent
 		Object[] args = getArguments();
 		if(args != null && args.length > 0) {
 			dbData = (DbData) args[0];
@@ -60,22 +61,27 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			logisticsAID = (AID) args[2];
 		}
 
-		Object[] arguments = new Object[] { dbData, equipletAgentAID, getAID() };
+		// Create a hardware agent for this equiplet
+		Object[] arguments = new Object[] {
+				dbData, equipletAgentAID, getAID()
+		};
 		try {
 			AgentController hardwareAgentCnt =
-					getContainerController().createNewAgent(
-							equipletAgentAID.getLocalName() + "-hardwareAgent",
+					getContainerController().createNewAgent(equipletAgentAID.getLocalName() + "-hardwareAgent",
 							"rexos.mas.hardware_agent.HardwareAgent", arguments);
 			hardwareAgentCnt.start();
 			hardwareAgentAID = new AID(hardwareAgentCnt.getName(), AID.ISGUID);
-		} catch(StaleProxyException e1) {
-			takeDown();
-			e1.printStackTrace();
+		} catch(StaleProxyException e) {
+			e.printStackTrace();
+			doDelete();
 		}
 
 		try {
+			// create blackboard clients, configure them and subscribe to status
+			// changes of any steps
 			productStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
+			statusSubscription = new FieldUpdateSubscription("status", this);
 
 			productStepBBClient.setDatabase(dbData.getName());
 			productStepBBClient.setCollection("ProductStepsBlackBoard");
@@ -92,20 +98,13 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		}
 
 		convIdServiceMapping = new HashMap<String, Service>();
+		serviceFactory = new ServiceFactory(equipletAgentAID.getLocalName());
 
-		// create serviceFactory
-		// addBehaviour(new AnswerBehaviour(this));
-		addBehaviour(new CanDoProductStep(this));
+		// Add behaviours
+		addBehaviour(new CanDoProductStep(this, serviceFactory));
 		addBehaviour(new GetProductStepDuration(this));
 		addBehaviour(new ScheduleStep(this));
 		addBehaviour(new InitialisationFinished(this));
-
-		// receive behaviours from EA
-		// add EvaluateProductionStep receiveBehaviour --> conversation with HA
-		// add ScheduleStep receiveBehaviour --> conversation with LA
-		// add ScheduleStep receiveBehaviour
-		// add StepDuration receiveBehaviour
-		// add StepDuration receiveBehaviour
 	}
 
 	/* (non-Javadoc)
@@ -118,11 +117,9 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			// serviceStepBBClient.removeDocuments(new BasicDBObject());
 
 			DBObject update =
-					BasicDBObjectBuilder.start("status", StepStatusCode.FAILED.name())
-							.push("statusData").add("source", "service agent")
-							.add("reason", "died").pop().get();
-			productStepBBClient.updateDocuments(new BasicDBObject(), new BasicDBObject("$set",
-					update));
+					BasicDBObjectBuilder.start("status", StepStatusCode.FAILED.name()).push("statusData")
+							.add("source", "service agent").add("reason", "died").pop().get();
+			productStepBBClient.updateDocuments(new BasicDBObject(), new BasicDBObject("$set", update));
 
 			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 			message.addReceiver(equipletAgentAID);
@@ -132,18 +129,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public void handleHardwareAgentTimeout() {
-
-	}
-
-	public void handleEquipletAgentTimeout() {
-
-	}
-
-	public void handleLogisticsAgentTimeout() {
-
 	}
 
 	public void MapConvIdWithService(String conversationId, Service service) {
@@ -164,8 +149,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 * @param total_prefix
 	 * @param result
 	 */
-	public void printDBObjectPretty(DBObject obj, String prefix, String total_prefix,
-			StringBuilder result) {
+	public void printDBObjectPretty(DBObject obj, String prefix, String total_prefix, StringBuilder result) {
 		Object value;
 		for(String key : obj.keySet()) {
 			value = obj.get(key);
@@ -175,8 +159,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			} else if(value == null) {
 				result.append(total_prefix + key + ": " + value + "\n");
 			} else {
-				result.append(total_prefix + key + ": " + value + " ("
-						+ value.getClass().getSimpleName() + ")\n");
+				result.append(total_prefix + key + ": " + value + " (" + value.getClass().getSimpleName() + ")\n");
 			}
 		}
 	}
@@ -192,22 +175,20 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			switch(entry.getNamespace().split("\\.")[1]) {
 				case "ProductStepsBlackBoard":
 					ProductStepMessage productionStep =
-							new ProductStepMessage(
-									(BasicDBObject) productStepBBClient.findDocumentById(entry
-											.getTargetObjectId()));
+							new ProductStepMessage((BasicDBObject) productStepBBClient.findDocumentById(entry
+									.getTargetObjectId()));
 					switch(operation) {
 						case UPDATE:
 							StepStatusCode status = productionStep.getStatus();
 							if(status == StepStatusCode.WAITING) {
-								serviceStepBBClient.updateDocuments(new BasicDBObject(
-										"productStepId", entry.getTargetObjectId()),
-										new BasicDBObject("$set", new BasicDBObject("status",
-												status)));
+								serviceStepBBClient.updateDocuments(
+										new BasicDBObject("productStepId", entry.getTargetObjectId()),
+										new BasicDBObject("$set", new BasicDBObject("status", status)));
 							}
 							break;
 						case DELETE:
-							serviceStepBBClient.removeDocuments(new BasicDBObject("productStepId",
-									entry.getTargetObjectId()));
+							serviceStepBBClient.removeDocuments(new BasicDBObject("productStepId", entry
+									.getTargetObjectId()));
 							break;
 						default:
 							break;
@@ -215,16 +196,14 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					break;
 				case "ServiceStepsBlackBoard":
 					BasicDBObject serviceStep =
-							(BasicDBObject) serviceStepBBClient.findDocumentById(entry
-									.getTargetObjectId());
+							(BasicDBObject) serviceStepBBClient.findDocumentById(entry.getTargetObjectId());
 					ObjectId productStepId = (ObjectId) serviceStep.get("productStepId");
 					switch(operation) {
 						case UPDATE:
-							BasicDBObject update =
-									new BasicDBObject("status", serviceStep.get("status"));
+							BasicDBObject update = new BasicDBObject("status", serviceStep.get("status"));
 							update.put("statusData", serviceStep.get("statusData"));
-							productStepBBClient.updateDocuments(new BasicDBObject("_id",
-									productStepId), new BasicDBObject("$set", update));
+							productStepBBClient.updateDocuments(new BasicDBObject("_id", productStepId),
+									new BasicDBObject("$set", update));
 							break;
 						default:
 							break;

@@ -116,9 +116,10 @@ public class GetServiceDuration extends ReceiveBehaviour {
 		message.setOntology("GetServiceStepDuration");
 		message.setConversationId(conversationId);
 		try {
+			ServiceStepMessage serviceStep;
 			BlackboardClient serviceStepBB = agent.getServiceStepBBClient();
 			for(int i = serviceSteps.size() - 1; i >= 0; i--) {
-				ServiceStepMessage serviceStep = serviceSteps.get(i);
+				serviceStep = serviceSteps.get(i);
 				serviceStep.setNextStep(serviceStepId);
 				serviceStepId = serviceStepBB.insertDocument(serviceStep.toBasicDBObject());
 				message.setContentObject(serviceStepId);
@@ -167,8 +168,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 					answer.setOntology("ProductionDurationResponse");
 					agent.send(answer);
 
-					System.out.format("%s sending msg (%s)%n", myAgent.getLocalName(),
-							answer.getOntology());
+					System.out.format("%s sending msg (%s)%n", myAgent.getLocalName(), answer.getOntology());
 
 					agent.removeBehaviour(this);
 				}
@@ -177,6 +177,8 @@ public class GetServiceDuration extends ReceiveBehaviour {
 			}
 		} else {
 			// TODO handle timeout
+			System.out.println(agent.getName() + " - GetServiceStepDurationResponse timeout!");
+			agent.doDelete();
 		}
 	}
 }
