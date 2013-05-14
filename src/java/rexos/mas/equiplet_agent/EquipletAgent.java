@@ -267,22 +267,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		timer = new NextProductStepTimer(firstTimeSlot, timeSlotLength);
 		timer.setNextUsedTimeSlot(-1);
 
-		// starts the behaviour for receiving messages with the Ontology
-		// CanPerformStep.
-		addBehaviour(new CanPerformStep(this, equipletBBClient));
-
-		// starts the behaviour for receiving messages with the Ontology
-		// GetProductionDuration.
-		addBehaviour(new GetProductionDuration(this));
-
-		// starts the behaviour for receiving messages with the Ontology
-		// ScheduleStep.
-		addBehaviour(new ScheduleStep(this));
-
-		// starts the behaviour for receiving messages with the Ontology
-		// StartStep.
-		addBehaviour(new StartStep(this, equipletBBClient));
-
 		// starts the behaviour for receiving message when the Service Agent
 		// Dies.
 		addBehaviour(new ServiceAgentDied(this));

@@ -38,6 +38,7 @@ import rexos.mas.equiplet_agent.StepStatusCode;
 
 public class EquipletStepMessage implements IMongoSaveable {
 	private ObjectId serviceStepID;
+	private int moduleId;
 	private InstructionData instructionData;
 	private StepStatusCode status;
 	private TimeData timeData;
@@ -49,11 +50,12 @@ public class EquipletStepMessage implements IMongoSaveable {
 	 * @param timeData
 	 * @return
 	 */
-	public EquipletStepMessage(ObjectId serviceStepID,
+	public EquipletStepMessage(ObjectId serviceStepID, int moduleId,
 			InstructionData instructionData, StepStatusCode status,
 			TimeData timeData) {
 
 		this.serviceStepID = serviceStepID;
+		this.moduleId = moduleId;
 		this.instructionData = instructionData;
 		this.status = status;
 		this.timeData = timeData;
@@ -74,6 +76,14 @@ public class EquipletStepMessage implements IMongoSaveable {
 		this.serviceStepID = serviceStepID;
 	}
 
+	public int getModuleId(){
+		return moduleId;
+	}
+	
+	public void setModuleId(int moduleId){
+		this.moduleId = moduleId;
+	}
+	
 	/**
 	 * @return the instructionData
 	 */
@@ -135,6 +145,7 @@ public class EquipletStepMessage implements IMongoSaveable {
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject object = new BasicDBObject();
 		object.put("serviceStepID", serviceStepID);
+		object.put("moduleId", moduleId);
 		object.put("instructionData", instructionData);
 		object.put("status", status);
 		object.put("timeData", timeData.getDuration());
@@ -147,6 +158,7 @@ public class EquipletStepMessage implements IMongoSaveable {
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		serviceStepID = object.getObjectId("serviceStepID");
+		moduleId = object.getInt("moduleId");
 		instructionData = new InstructionData((BasicDBObject) object.get("instructionData"));
 		status = StepStatusCode.valueOf(object.getString("status"));
 		timeData = new TimeData(object.getInt("timeData"));	
