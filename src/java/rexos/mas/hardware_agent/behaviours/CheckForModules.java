@@ -69,13 +69,14 @@ public class CheckForModules extends ReceiveBehaviour {
 	}
 	
 	/**
-	 * Returns the available modules for this equiplet. This data is currently retrieved from the
-	 * knowledge base. Once MOST is implemented, this method should take MOST data into account.
+	 * Returns a list of module group ids for which a module is available on this equiplet.
+	 * This data is currently retrieved from the knowledge base.
+	 * Once MOST is implemented, this method should take MOST data into account.
 	 * 
-	 * @return An arraylist containing the ids of the available modules for this equiplet.
+	 * @return An arraylist containing module group ids for the modules that are attached to this equiplet.
 	 *
 	 **/
-	private ArrayList<Integer> getAvailableModules() {
+	private ArrayList<Integer> getAvailableModuleGroups() {
 		ArrayList<Integer> availableModules = new ArrayList<Integer>();
 		try {
 			
@@ -84,7 +85,7 @@ public class CheckForModules extends ReceiveBehaviour {
 					Queries.MODULES_PER_EQUIPLET, hardwareAgent
 							.getEquipletAgentAID().getLocalName());
 			for (Row row : rows) {
-				availableModules.add((Integer) row.get("module"));
+				availableModules.add((Integer) row.get("groupId"));
 			}
 		} catch (KeyNotFoundException | KnowledgeException ex) {
 			// Return the current (possibly empty) arraylist if reading 
@@ -95,7 +96,7 @@ public class CheckForModules extends ReceiveBehaviour {
 	}
 
 	/**
-	 * Responds to incoming messages querying whether a set of modules is available.
+	 * Responds to incoming messages querying whether a module is available for a set of module group ids.
 	 * This method will respond with a CheckForModulesResponse message.
 	 * If all modules are available, a CONFIRM will be sent.
 	 * If one or more modules are missing, a DISCONFIRM will be sent.
@@ -106,12 +107,12 @@ public class CheckForModules extends ReceiveBehaviour {
 		boolean modulesPresent = true;
 		
 		try {
-			int[] moduleIds = (int[]) message.getContentObject();
-			ArrayList<Integer> availableModules = getAvailableModules();
+			int[] moduleGroupIds = (int[]) message.getContentObject();
+			ArrayList<Integer> availableModuleGroups = getAvailableModuleGroups();
 			
 
-			for (int moduleId : moduleIds) {
-				if (!availableModules.contains(moduleId)) {
+			for (int groupId : moduleGroupIds) {
+				if (!availableModuleGroups.contains(groupId)) {
 					modulesPresent = false;
 					break;
 				}
