@@ -123,6 +123,8 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 			}
 		} else {
 			// TODO handle timeout
+			System.out.println(agent.getName() + " - ArePartsAvailableInTimeReponse timeout!");
+			agent.doDelete();
 		}
 	}
 }

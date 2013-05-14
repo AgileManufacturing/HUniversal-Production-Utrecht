@@ -50,9 +50,6 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
-import rexos.libraries.blackboard_client.BlackboardClient;
-import rexos.libraries.blackboard_client.GeneralMongoException;
-import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.service_agent.ServiceAgent;
 

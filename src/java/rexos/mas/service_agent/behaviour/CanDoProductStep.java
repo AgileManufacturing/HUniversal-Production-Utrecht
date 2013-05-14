@@ -14,6 +14,7 @@ import org.bson.types.ObjectId;
 
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.knowledgedb_client.Queries;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.service_agent.Service;
@@ -35,9 +36,10 @@ public class CanDoProductStep extends ReceiveBehaviour {
 	/**
 	 * @param a
 	 */
-	public CanDoProductStep(Agent a) {
+	public CanDoProductStep(Agent a, ServiceFactory factory) {
 		super(a, MessageTemplate.MatchOntology("CanDoProductionStep"));
 		agent = (ServiceAgent) a;
+		this.factory = factory;
 	}
 
 	/*
@@ -59,27 +61,24 @@ public class CanDoProductStep extends ReceiveBehaviour {
 					"%s got message CanDoProductionStep for step type %s%n",
 					agent.getLocalName(), stepType);
 
-			 if (factory == null)
-				 factory = new ServiceFactory(message.getSender().getLocalName());
-
 			Service[] services = factory.getServicesForStep(stepType);
 			if (services.length > 0) {
 				Service service = services[0];
 				agent.MapConvIdWithService(message.getConversationId(), service);
 
-				ACLMessage newMsg = message.createReply();
-				newMsg.clearAllReceiver();
-				newMsg.addReceiver(agent.getHardwareAgentAID());
-				newMsg.setOntology("CheckForModules");
+//				Queries.MODULEGROUPS_REQUIRED_PER_SERVICE;
+				ACLMessage msg = new ACLMessage(ACLMessage.QUERY_IF);
+				msg.setConversationId(message.getConversationId());
+				msg.addReceiver(agent.getHardwareAgentAID());
+				msg.setOntology("CheckForModules");
 				try {
-					//TODO change service.getModuleIds parameters to type ParameterGroup
-					newMsg.setContentObject(service.getModuleIds(stepType,
+					msg.setContentObject(service.getModuleIds(stepType,
 							parameters));
 				} catch (IOException e) {
 					e.printStackTrace();
 					agent.doDelete();
 				}
-				agent.send(newMsg);
+				agent.send(msg);
 
 				agent.addBehaviour(new CheckForModulesResponse(agent));
 			} else {
