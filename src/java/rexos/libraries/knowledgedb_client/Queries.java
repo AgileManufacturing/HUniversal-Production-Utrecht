@@ -35,9 +35,9 @@ public class Queries {
      * A constant representing an sql query for fetching all modules required by a specific service. Has a service name as the only parameter.
      **/
     public static final String MODULEGROUPS_REQUIRED_PER_SERVICE = "SELECT\n" +
-            "    `module_groups`.`id` AS `module_id`\n" +
-            "    `module_groups`.`name` AS `module_name`\n" +
-            "    , `services`.`name` AS `service`\n" +
+            "    `module_groups`.`id` AS `module_id`,\n" +
+            "    `module_groups`.`name` AS `module_name`,\n" +
+            "    `services`.`name` AS `service_name`\n" +
             "FROM\n" +
             "    `rexos_knowledge_base`.`service_module`\n" +
             "    INNER JOIN `rexos_knowledge_base`.`module_groups` \n" +
