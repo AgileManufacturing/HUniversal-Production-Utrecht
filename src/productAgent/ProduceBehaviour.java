@@ -40,25 +40,31 @@
 
 package productAgent;
 
+import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import newDataClasses.LogMessage;
 import newDataClasses.Product;
+import newDataClasses.Production;
 import newDataClasses.ProductionEquipletMapper;
 import newDataClasses.ProductionStep;
 import newDataClasses.ProductionStepStatus;
 
 public class ProduceBehaviour extends OneShotBehaviour{
 	private static final long serialVersionUID = 1L;
-	private Product _product;
-	private ProductAgent _productAgent;
-	private ProductionEquipletMapper _prodEQMap;
-	private int currentProdStep[] = {};
+	private Product _product;// TODO unused
+	private Production _production;
+	private ProductAgent _productAgent; // TODO unused
+	private ProductionEquipletMapper _prodEQMap; // TODO unused
+	private int currProdStep = 1;
+	ProductionEquipletMapper s1;
 	ACLMessage msg;
 
 	@SuppressWarnings("unused")
@@ -91,21 +97,68 @@ public class ProduceBehaviour extends OneShotBehaviour{
 		@Override
 		public void action(){
 			_prodEQMap = new ProductionEquipletMapper();
+			for(ProductionStep stp : _production.getProductionSteps()){
+				if (stp.getStatus() == ProductionStepStatus.STATE_TODO){
+					// adds the step to te new list (the one that will be
+					// returned
+					// to the scheduler)
+					_prodEQMap.addProductionStep(stp.getId());
+					s1 = _production.getProductionEquipletMapping();
+					// TODO implementeren versie Ricky
+					for(AID aid : _production.getProductionEquipletMapping()
+							.getEquipletsForProductionStep(stp.getId())
+							.keySet()){
+						//
+					}
+				}
+			}
+			HashMap<Integer, HashMap<AID, Long>> bla = s1.getHashMap();
 			try{
 				switch(msg.getOntology()){
 				// The productionstep has been initiated.
 				case "productionStepStarted":
-					// De productie is gestart bij de equiplet.
-					// Achterhaal de currentProdStep welke is gestart en geef
-					// deze mee aan "canProductionStepStart".
-					//
+					// TODO key = msg.getContent().parse
+					int key = 0; // temp
+					if (key != currProdStep){
+						// TODO error
+					}
+					if (!bla.get(key).containsKey(msg.getSender())){
+						// TODO error
+					}
+					{
+						ArrayList<ProductionStep> ProductionStepArrayList = ((ProductAgent) myAgent)
+								.getProduct().getProduction()
+								.getProductionSteps();
+						for(ProductionStep stp : ProductionStepArrayList){
+							if (key == stp.getId()){
+								canProductionStepStart(stp);
+							}
+						}
+					}
 					break;
 				// The productionstep has completed.
 				case "productionStepFinished":
-					// Ontvang de log-file van de equiplet agent en schrijf deze
-					// in de SQLite database.
-					// De DB moet ergens worden aangemaakt.
-					// Werk de currentProdStep bij.
+					// TODO key = msg.getContent().parse
+					int keyfinish = 0; // temp
+					if (keyfinish != currProdStep){
+						// TODO error
+					}
+					if (!bla.get(keyfinish).containsKey(msg.getSender())){
+						// TODO error
+					}
+					{
+						ArrayList<ProductionStep> ProductionStepArrayList = ((ProductAgent) myAgent)
+								.getProduct().getProduction()
+								.getProductionSteps();
+						for(ProductionStep stp : ProductionStepArrayList){
+							if (keyfinish == stp.getId()){
+								productionStepEnded(stp, true, null);
+								// productionStepEnded(stp, msg.getContent,
+								// msg.getContent);
+							}
+						}
+					}
+					currProdStep++;
 					break;
 				// For some reason production can't be started thus it has to be
 				// rescheduled.
