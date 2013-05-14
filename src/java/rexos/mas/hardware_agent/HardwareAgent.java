@@ -175,6 +175,10 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	public BlackboardClient getServiceStepsBBClient() {
 		return serviceStepBBClient;
 	}
+	
+	public BlackboardClient getEquipletStepsBBClient(){
+		return equipletStepBBClient;
+	}
 
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {

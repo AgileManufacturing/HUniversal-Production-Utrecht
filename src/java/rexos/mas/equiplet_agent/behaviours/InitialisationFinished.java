@@ -109,5 +109,21 @@ public class InitialisationFinished extends ReceiveBehaviour {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		// starts the behaviour for receiving messages with the Ontology
+		// CanPerformStep.
+		equipletAgent.addBehaviour(new CanPerformStep(equipletAgent, equipletAgent.getEquipletBBClient()));
+
+		// starts the behaviour for receiving messages with the Ontology
+		// GetProductionDuration.
+		equipletAgent.addBehaviour(new GetProductionDuration(equipletAgent));
+
+		// starts the behaviour for receiving messages with the Ontology
+		// ScheduleStep.
+		equipletAgent.addBehaviour(new ScheduleStep(equipletAgent));
+
+		// starts the behaviour for receiving messages with the Ontology
+		// StartStep.
+		equipletAgent.addBehaviour(new StartStep(equipletAgent, equipletAgent.getEquipletBBClient()));
 	}
 }

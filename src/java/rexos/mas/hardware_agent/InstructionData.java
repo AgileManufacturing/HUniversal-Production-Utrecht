@@ -58,10 +58,32 @@ public class InstructionData implements IMongoSaveable {
 		
 	}
 	
-	public InstructionData() {
-		// TODO Auto-generated constructor stub
-	}
+	public InstructionData() {}
 
+	public String getCommand(){
+		return command;
+	}
+	
+	public String getDestination(){
+		return destination;
+	}
+	
+	public BasicDBObject getLookUpParameters(){
+		return look_up_parameters;
+	}
+	
+	public void setLookUpParameters(BasicDBObject look_up_parameters){
+		this.look_up_parameters = look_up_parameters;
+	}
+	
+	public BasicDBObject getPayload(){
+		return payload;
+	}
+	
+	public void setPayload(BasicDBObject payload){
+		this.payload = payload;
+	}
+	
 	@Override
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject object = new BasicDBObject();
