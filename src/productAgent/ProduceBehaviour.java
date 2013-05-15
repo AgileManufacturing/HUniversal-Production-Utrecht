@@ -4,6 +4,7 @@
  *        step.
  * @date Created: 16-04-2013
  * 
+ * @author Arno Derks
  * @author Theodoor de Graaff
  * 
  * @section LICENSE License: newBSD
@@ -40,23 +41,110 @@
 
 package productAgent;
 
+import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
+import jade.lang.acl.ACLMessage;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import newDataClasses.LogMessage;
 import newDataClasses.Product;
+import newDataClasses.Production;
+import newDataClasses.ProductionEquipletMapper;
 import newDataClasses.ProductionStep;
 import newDataClasses.ProductionStepStatus;
 
 public class ProduceBehaviour extends OneShotBehaviour{
 	private static final long serialVersionUID = 1L;
-	private Product _product;
-	private ProductAgent _productAgent;
+	private Product _product;// TODO unused
+	private Production _production;
+	private ProductAgent _productAgent; // TODO unused
+	private ProductionEquipletMapper _prodEQMap; // TODO unused
+	private int currProdStep = 1;
+	ProductionEquipletMapper s1;
+	ACLMessage msg;
 
+	@Override
+	public void action(){
+		_prodEQMap = new ProductionEquipletMapper();
+		// retrieve the productstep
+		for(ProductionStep stp : _production.getProductionSteps()){
+			if (stp.getStatus() == ProductionStepStatus.STATE_TODO){
+				// adds the step to te new list (the one that will be
+				// returned to the scheduler)
+				_prodEQMap.addProductionStep(stp.getId());
+				s1 = _production.getProductionEquipletMapping();
+				// retrieve the AID
+				HashMap<AID, Long> equipletAndTimeslot = _production.getProductionEquipletMapping()
+						.getEquipletsForProductionStep(stp.getId());
+				// roep seq behav aan
+				myAgent.addBehaviour(new newProducing(equipletAndTimeslot, stp));
+			}
+		}
+	}
+}
 
+class newProducing extends SequentialBehaviour{
+	public newProducing(HashMap EqAndTs, ProductionStep productionStep){
+	
+	}
+	public void onStart(){
+		addSubBehaviour(new OneShotBehaviour(){
+
+			@Override
+			public void action(){
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		addSubBehaviour(new OneShotBehaviour(){
+
+			@Override
+			public void action(){
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+	}
+		
+}
+	
+	@SuppressWarnings("unused") 
+	class receiveMsgBehaviour extends CyclicBehaviour{
+		private static final long serialVersionUID = 1L;
+
+		private receiveMsgBehaviour(){
+		}
+
+		@Override
+		public void action(){
+			@SuppressWarnings("hiding")
+			ACLMessage msg = myAgent.receive();
+			if (msg != null){
+				WaitMsgBehaviour behaviour = new WaitMsgBehaviour(msg);
+			} else{
+				block();
+			}
+		}
+	}
+
+	class WaitMsgBehaviour extends OneShotBehaviour{
+		private static final long serialVersionUID = 1L;
+		@SuppressWarnings("hiding")
+		ACLMessage msg;
+
+		public WaitMsgBehaviour(ACLMessage msg){
+			this.msg = msg;
+		}
+			@SuppressWarnings("unchecked")
+			HashMap<Integer, HashMap<AID, Long>> bla = s1.getHashMap();
+		}	
 	/*
 	 * (non-Javadoc)
 	 * @see jade.core.behaviours.Behaviour#action()
@@ -66,12 +154,14 @@ public class ProduceBehaviour extends OneShotBehaviour{
 		_productAgent = (ProductAgent) myAgent;
 		SequentialBehaviour seq = new SequentialBehaviour();
 		myAgent.addBehaviour(seq);
-		
-		
-
+		@SuppressWarnings("hiding")
+		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		msg.setOntology("StartProduction");
+		msg.addReceiver(null); // add the equiplet AID
+		myAgent.send(msg);
 	}
 
-	static void canProductionStepStart(ProductionStep step){
+	public void canProductionStepStart(ProductionStep step){
 		step.setStatus(ProductionStepStatus.STATE_PRODUCING);
 	}
 
@@ -83,6 +173,70 @@ public class ProduceBehaviour extends OneShotBehaviour{
 		} else{
 			step.setStatus(ProductionStepStatus.STATE_FAILED);
 		}
-		// TODO If latest step, check all steps done, then end production?
 	}
+	
 }
+		
+	class producing extends OneShotBehaviour{
+			@Override
+			public void action(){
+				try{
+				switch(msg.getOntology()){
+				// The productionstep has been initiated.
+				case "productionStepStarted":
+					// TODO key = msg.getContent().parse
+					int key = 0; // temp
+					if (key != currProdStep){
+						// TODO error
+					}
+					if (!bla.get(key).containsKey(msg.getSender())){
+						// TODO error
+					}
+					{
+						ArrayList<ProductionStep> ProductionStepArrayList = ((ProductAgent) myAgent)
+								.getProduct().getProduction()
+								.getProductionSteps();
+						for(ProductionStep stp : ProductionStepArrayList){
+							if (key == stp.getId()){
+								canProductionStepStart(stp);
+							}
+						}
+					}
+					break;
+				// The productionstep has completed.
+				case "productionStepFinished":
+					// TODO key = msg.getContent().parse
+					int keyfinish = 0; // temp
+					if (keyfinish != currProdStep){
+						// TODO error
+					}
+					if (!bla.get(keyfinish).containsKey(msg.getSender())){
+						// TODO error
+					}
+					{
+						ArrayList<ProductionStep> ProductionStepArrayList = ((ProductAgent) myAgent)
+								.getProduct().getProduction()
+								.getProductionSteps();
+						for(ProductionStep stp : ProductionStepArrayList){
+							if (keyfinish == stp.getId()){
+								productionStepEnded(stp, true, null);
+								// productionStepEnded(stp, msg.getContent,
+								// msg.getContent);
+							}
+						}
+					}
+					currProdStep++;
+					break;
+				// For some reason production can't be started thus it has to be
+				// rescheduled.
+				case "notStarted":
+					_productAgent.reschedule();
+					break;
+				default:
+					break;
+				}
+			} catch(Exception e){
+				System.out.println("" + e);
+			}
+		}
+	}

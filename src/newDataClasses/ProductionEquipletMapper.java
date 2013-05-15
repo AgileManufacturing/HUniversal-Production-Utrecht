@@ -50,6 +50,11 @@ public class ProductionEquipletMapper{
 	public ProductionEquipletMapper(){
 		equipletList = new HashMap<Integer, HashMap<AID, Long>>();
 	}
+	
+	public HashMap getHashMap(){
+		return equipletList;
+	}
+	
 
 	public void addProductionStep(int productionStepID){
 		if (this.equipletList.containsKey(productionStepID) == false){
