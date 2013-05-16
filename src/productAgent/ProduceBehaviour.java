@@ -105,6 +105,7 @@ class newProducing extends SequentialBehaviour{
 			@Override
 			public void action(){
 				// TODO Auto-generated method stub
+				// implementeer de lus die op berichten wacht
 			}
 		});
 		addSubBehaviour(new OneShotBehaviour(){
@@ -113,6 +114,12 @@ class newProducing extends SequentialBehaviour{
 			@Override
 			public void action(){
 				// TODO Auto-generated method stub
+				// check het AID van de berichtgevende EQA met die bij de stap
+				// hoort
+				// check de inhoud van het bericht (msg.getontology())
+				// verander de state in STATE_PRODUCING
+				// wacht op een finished bericht uit de vorige OSB
+				// ontvang Log en schrijf deze weg
 			}
 		});
 	}
