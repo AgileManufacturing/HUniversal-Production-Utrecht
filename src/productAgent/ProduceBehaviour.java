@@ -47,7 +47,6 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -79,7 +78,8 @@ public class ProduceBehaviour extends OneShotBehaviour{
 				_prodEQMap.addProductionStep(stp.getId());
 				s1 = _production.getProductionEquipletMapping();
 				// retrieve the AID
-				HashMap<AID, Long> equipletAndTimeslot = _production.getProductionEquipletMapping()
+				HashMap<AID, Long> equipletAndTimeslot = _production
+						.getProductionEquipletMapping()
 						.getEquipletsForProductionStep(stp.getId());
 				// roep seq behav aan
 				myAgent.addBehaviour(new newProducing(equipletAndTimeslot, stp));
@@ -89,66 +89,66 @@ public class ProduceBehaviour extends OneShotBehaviour{
 }
 
 class newProducing extends SequentialBehaviour{
+	private static final long serialVersionUID = 1L;
+
 	public newProducing(HashMap EqAndTs, ProductionStep productionStep){
-	
+		//
 	}
+
+	@Override
 	public void onStart(){
 		addSubBehaviour(new OneShotBehaviour(){
+			private static final long serialVersionUID = 1L;
+			ACLMessage msg;
+			ProductAgent _productAgent;
 
 			@Override
 			public void action(){
 				// TODO Auto-generated method stub
-				
 			}
-			
 		});
 		addSubBehaviour(new OneShotBehaviour(){
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void action(){
 				// TODO Auto-generated method stub
-				
 			}
-			
 		});
 	}
-		
 }
-	
-	@SuppressWarnings("unused") 
-	class receiveMsgBehaviour extends CyclicBehaviour{
-		private static final long serialVersionUID = 1L;
 
-		private receiveMsgBehaviour(){
-		}
+@SuppressWarnings("unused")
+class receiveMsgBehaviour extends CyclicBehaviour{
+	private static final long serialVersionUID = 1L;
 
-		@Override
-		public void action(){
-			@SuppressWarnings("hiding")
-			ACLMessage msg = myAgent.receive();
-			if (msg != null){
-				WaitMsgBehaviour behaviour = new WaitMsgBehaviour(msg);
-			} else{
-				block();
-			}
-		}
+	private receiveMsgBehaviour(){
 	}
 
-	class WaitMsgBehaviour extends OneShotBehaviour{
-		private static final long serialVersionUID = 1L;
+	@Override
+	public void action(){
 		@SuppressWarnings("hiding")
-		ACLMessage msg;
-
-		public WaitMsgBehaviour(ACLMessage msg){
-			this.msg = msg;
+		ACLMessage msg = myAgent.receive();
+		if (msg != null){
+			WaitMsgBehaviour behaviour = new WaitMsgBehaviour(msg);
+		} else{
+			block();
 		}
-			@SuppressWarnings("unchecked")
-			HashMap<Integer, HashMap<AID, Long>> bla = s1.getHashMap();
-		}	
-	/*
-	 * (non-Javadoc)
-	 * @see jade.core.behaviours.Behaviour#action()
-	 */
+	}
+}
+
+class WaitMsgBehaviour extends OneShotBehaviour{
+	private static final long serialVersionUID = 1L;
+	ProductAgent _productAgent;
+	@SuppressWarnings("hiding")
+	ACLMessage msg;
+
+	public WaitMsgBehaviour(ACLMessage msg){
+		this.msg = msg;
+	}
+
+	@SuppressWarnings("unchecked")
+	// HashMap<Integer, HashMap<AID, Long>> bla = s1.getHashMap();
 	@Override
 	public void action(){
 		_productAgent = (ProductAgent) myAgent;
@@ -159,6 +159,59 @@ class newProducing extends SequentialBehaviour{
 		msg.setOntology("StartProduction");
 		msg.addReceiver(null); // add the equiplet AID
 		myAgent.send(msg);
+	}
+}
+
+class producing extends OneShotBehaviour{
+	private static final long serialVersionUID = 1L;
+	Product _product;
+	ProductAgent _productAgent;
+	ACLMessage msg;
+
+	@Override
+	public void action(){
+		try{
+			switch(msg.getOntology()){
+			// The productionstep has been initiated.
+			case "productionStepStarted":
+				// TODO key = msg.getContent().parse
+				/*
+				 * int key = 0; // temp if (key != currProdStep){ // TODO error
+				 * } if (!bla.get(key).containsKey(msg.getSender())){ // TODO
+				 * error } { ArrayList<ProductionStep> ProductionStepArrayList =
+				 * ((ProductAgent) myAgent)
+				 * .getProduct().getProduction().getProductionSteps();
+				 * for(ProductionStep stp : ProductionStepArrayList){ if (key ==
+				 * stp.getId()){ canProductionStepStart(stp); } } }
+				 */
+				break;
+			// The productionstep has completed.
+			case "productionStepFinished":
+				// TODO key = msg.getContent().parse
+				/*
+				 * int keyfinish = 0; // temp if (keyfinish != currProdStep){ //
+				 * TODO error } if
+				 * (!bla.get(keyfinish).containsKey(msg.getSender())){ // TODO
+				 * error } { ArrayList<ProductionStep> ProductionStepArrayList =
+				 * ((ProductAgent) myAgent)
+				 * .getProduct().getProduction().getProductionSteps();
+				 * for(ProductionStep stp : ProductionStepArrayList){ if
+				 * (keyfinish == stp.getId()){ productionStepEnded(stp, true,
+				 * null); // productionStepEnded(stp, msg.getContent, //
+				 * msg.getContent); } } } currProdStep++;
+				 */
+				break;
+			// For some reason production can't be started thus it has to be
+			// rescheduled.
+			case "notStarted":
+				_productAgent.reschedule();
+				break;
+			default:
+				break;
+			}
+		} catch(Exception e){
+			System.out.println("" + e);
+		}
 	}
 
 	public void canProductionStepStart(ProductionStep step){
@@ -174,69 +227,4 @@ class newProducing extends SequentialBehaviour{
 			step.setStatus(ProductionStepStatus.STATE_FAILED);
 		}
 	}
-	
 }
-		
-	class producing extends OneShotBehaviour{
-			@Override
-			public void action(){
-				try{
-				switch(msg.getOntology()){
-				// The productionstep has been initiated.
-				case "productionStepStarted":
-					// TODO key = msg.getContent().parse
-					int key = 0; // temp
-					if (key != currProdStep){
-						// TODO error
-					}
-					if (!bla.get(key).containsKey(msg.getSender())){
-						// TODO error
-					}
-					{
-						ArrayList<ProductionStep> ProductionStepArrayList = ((ProductAgent) myAgent)
-								.getProduct().getProduction()
-								.getProductionSteps();
-						for(ProductionStep stp : ProductionStepArrayList){
-							if (key == stp.getId()){
-								canProductionStepStart(stp);
-							}
-						}
-					}
-					break;
-				// The productionstep has completed.
-				case "productionStepFinished":
-					// TODO key = msg.getContent().parse
-					int keyfinish = 0; // temp
-					if (keyfinish != currProdStep){
-						// TODO error
-					}
-					if (!bla.get(keyfinish).containsKey(msg.getSender())){
-						// TODO error
-					}
-					{
-						ArrayList<ProductionStep> ProductionStepArrayList = ((ProductAgent) myAgent)
-								.getProduct().getProduction()
-								.getProductionSteps();
-						for(ProductionStep stp : ProductionStepArrayList){
-							if (keyfinish == stp.getId()){
-								productionStepEnded(stp, true, null);
-								// productionStepEnded(stp, msg.getContent,
-								// msg.getContent);
-							}
-						}
-					}
-					currProdStep++;
-					break;
-				// For some reason production can't be started thus it has to be
-				// rescheduled.
-				case "notStarted":
-					_productAgent.reschedule();
-					break;
-				default:
-					break;
-				}
-			} catch(Exception e){
-				System.out.println("" + e);
-			}
-		}
-	}
