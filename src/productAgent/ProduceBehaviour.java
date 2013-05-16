@@ -4,6 +4,7 @@
  *        step.
  * @date Created: 16-04-2013
  * 
+ * @author Arno Derks
  * @author Theodoor de Graaff
  * 
  * @section LICENSE License: newBSD
@@ -67,8 +68,55 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	ProductionEquipletMapper s1;
 	ACLMessage msg;
 
-	@SuppressWarnings("unused")
-	private class receiveMsgBehaviour extends CyclicBehaviour{
+	@Override
+	public void action(){
+		_prodEQMap = new ProductionEquipletMapper();
+		// retrieve the productstep
+		for(ProductionStep stp : _production.getProductionSteps()){
+			if (stp.getStatus() == ProductionStepStatus.STATE_TODO){
+				// adds the step to te new list (the one that will be
+				// returned to the scheduler)
+				_prodEQMap.addProductionStep(stp.getId());
+				s1 = _production.getProductionEquipletMapping();
+				// retrieve the AID
+				HashMap<AID, Long> equipletAndTimeslot = _production.getProductionEquipletMapping()
+						.getEquipletsForProductionStep(stp.getId());
+				// roep seq behav aan
+				myAgent.addBehaviour(new newProducing(equipletAndTimeslot, stp));
+			}
+		}
+	}
+}
+
+class newProducing extends SequentialBehaviour{
+	public newProducing(HashMap EqAndTs, ProductionStep productionStep){
+	
+	}
+	public void onStart(){
+		addSubBehaviour(new OneShotBehaviour(){
+
+			@Override
+			public void action(){
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		addSubBehaviour(new OneShotBehaviour(){
+
+			@Override
+			public void action(){
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+	}
+		
+}
+	
+	@SuppressWarnings("unused") 
+	class receiveMsgBehaviour extends CyclicBehaviour{
 		private static final long serialVersionUID = 1L;
 
 		private receiveMsgBehaviour(){
@@ -86,34 +134,53 @@ public class ProduceBehaviour extends OneShotBehaviour{
 		}
 	}
 
-	private class WaitMsgBehaviour extends OneShotBehaviour{
+	class WaitMsgBehaviour extends OneShotBehaviour{
 		private static final long serialVersionUID = 1L;
+		@SuppressWarnings("hiding")
 		ACLMessage msg;
 
 		public WaitMsgBehaviour(ACLMessage msg){
 			this.msg = msg;
 		}
-
-		@Override
-		public void action(){
-			_prodEQMap = new ProductionEquipletMapper();
-			for(ProductionStep stp : _production.getProductionSteps()){
-				if (stp.getStatus() == ProductionStepStatus.STATE_TODO){
-					// adds the step to te new list (the one that will be
-					// returned
-					// to the scheduler)
-					_prodEQMap.addProductionStep(stp.getId());
-					s1 = _production.getProductionEquipletMapping();
-					// TODO implementeren versie Ricky
-					for(AID aid : _production.getProductionEquipletMapping()
-							.getEquipletsForProductionStep(stp.getId())
-							.keySet()){
-						//
-					}
-				}
-			}
+			@SuppressWarnings("unchecked")
 			HashMap<Integer, HashMap<AID, Long>> bla = s1.getHashMap();
-			try{
+		}	
+	/*
+	 * (non-Javadoc)
+	 * @see jade.core.behaviours.Behaviour#action()
+	 */
+	@Override
+	public void action(){
+		_productAgent = (ProductAgent) myAgent;
+		SequentialBehaviour seq = new SequentialBehaviour();
+		myAgent.addBehaviour(seq);
+		@SuppressWarnings("hiding")
+		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		msg.setOntology("StartProduction");
+		msg.addReceiver(null); // add the equiplet AID
+		myAgent.send(msg);
+	}
+
+	public void canProductionStepStart(ProductionStep step){
+		step.setStatus(ProductionStepStatus.STATE_PRODUCING);
+	}
+
+	void productionStepEnded(ProductionStep step, boolean succes,
+			List<LogMessage> log){
+		_product.addLogMsg(log);
+		if (succes){
+			step.setStatus(ProductionStepStatus.STATE_DONE);
+		} else{
+			step.setStatus(ProductionStepStatus.STATE_FAILED);
+		}
+	}
+	
+}
+		
+	class producing extends OneShotBehaviour{
+			@Override
+			public void action(){
+				try{
 				switch(msg.getOntology()){
 				// The productionstep has been initiated.
 				case "productionStepStarted":
@@ -173,34 +240,3 @@ public class ProduceBehaviour extends OneShotBehaviour{
 			}
 		}
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see jade.core.behaviours.Behaviour#action()
-	 */
-	@Override
-	public void action(){
-		_productAgent = (ProductAgent) myAgent;
-		SequentialBehaviour seq = new SequentialBehaviour();
-		myAgent.addBehaviour(seq);
-		@SuppressWarnings("hiding")
-		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setOntology("StartProduction");
-		msg.addReceiver(null); // add the equiplet AID
-		myAgent.send(msg);
-	}
-
-	static void canProductionStepStart(ProductionStep step){
-		step.setStatus(ProductionStepStatus.STATE_PRODUCING);
-	}
-
-	void productionStepEnded(ProductionStep step, boolean succes,
-			List<LogMessage> log){
-		_product.addLogMsg(log);
-		if (succes){
-			step.setStatus(ProductionStepStatus.STATE_DONE);
-		} else{
-			step.setStatus(ProductionStepStatus.STATE_FAILED);
-		}
-	}
-}
