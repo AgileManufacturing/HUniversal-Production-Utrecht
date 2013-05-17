@@ -109,7 +109,6 @@ public class EvaluateDuration extends ReceiveBehaviour {
 				equipletStep.setServiceStepID(serviceStepId);
 				equipletStep.setNextStepID(next);
 				next = equipletStepsBBClient.insertDocument(equipletStep.toBasicDBObject());
-				System.out.println(equipletStep.toString());
 			}
 			
 			ScheduleData schedule = serviceStep.getScheduleData();

@@ -162,7 +162,7 @@ public class GripperModule extends Module {
 	}
 
 	private EquipletStepMessage activateGripper(BasicDBObject parameters) {
-		Position position = new Position((BasicDBObject) parameters.get("Position"));
+		Position position = new Position((BasicDBObject) parameters.get("position"));
 		BasicDBObject lookUpParameters = new BasicDBObject();
 		if (position.getRelativeToPart() == -1) {
 			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
@@ -175,8 +175,7 @@ public class GripperModule extends Module {
 	}
 
 	private EquipletStepMessage deactivateGripper(BasicDBObject parameters) {
-		System.out.println(parameters.toString());
-		Position position = new Position((BasicDBObject) parameters.get("Position"));
+		Position position = new Position((BasicDBObject) parameters.get("position"));
 		BasicDBObject lookUpParameters = new BasicDBObject();
 		if (position.getRelativeToPart() == -1) {
 			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
