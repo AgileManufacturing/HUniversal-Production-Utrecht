@@ -37,6 +37,7 @@ import jade.lang.acl.MessageTemplate;
 import org.bson.types.ObjectId;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.ProductStepMessage;
@@ -110,7 +111,7 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 				myAgent.send(responseMessage);
 			} catch (Exception e) {
 				// TODO: ERROR HANDLING
-				e.printStackTrace();
+				Logger.log(e);
 				myAgent.doDelete();
 			}
 		}
