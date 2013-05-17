@@ -117,6 +117,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		serviceStepBBClient.unsubscribe(statusSubscription);
 		try {
 			// serviceStepBBClient.removeDocuments(new BasicDBObject());
+			Logger.log("ServiceAgent takedown");
 
 			DBObject update =
 					BasicDBObjectBuilder.start("status", StepStatusCode.FAILED.name()).push("statusData")
@@ -126,7 +127,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 			message.addReceiver(equipletAgentAID);
 			message.addReceiver(hardwareAgentAID);
-			message.setOntology("serviceAgentDied");
+			message.setOntology("ServiceAgentDied");
 			send(message);
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 			Logger.log(e);
