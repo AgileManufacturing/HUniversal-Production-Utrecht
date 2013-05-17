@@ -73,8 +73,7 @@ import com.mongodb.BasicDBObject;
 public class EvaluateDuration extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
-	private static MessageTemplate messageTemplate = MessageTemplate
-			.MatchOntology("GetServiceStepDuration");
+	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("GetServiceStepDuration");
 	private HardwareAgent hardwareAgent;
 	private ModuleFactory moduleFactory;
 
@@ -88,37 +87,9 @@ public class EvaluateDuration extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		try {
 			ObjectId serviceStepId = (ObjectId) message.getContentObject();
-			BasicDBObject dbServiceStep =
-					(BasicDBObject) hardwareAgent.getServiceStepsBBClient().findDocumentById(
-							serviceStepId);
-
-			ServiceStepMessage serviceStep = new ServiceStepMessage(dbServiceStep);
 			Logger.log("%s received message from %s (%s:%s)%n", myAgent.getLocalName(),
 					message.getSender().getLocalName(), message.getOntology(), serviceStepId);
-
-			int stepDuration = 0;
-			int leadingModule = hardwareAgent.getLeadingModule(serviceStep.getServiceId());
-			Module module = moduleFactory.getModuleById(leadingModule);
-			module.setConfiguration(hardwareAgent.getConfiguration());
-			EquipletStepMessage[] equipletSteps =
-					module.getEquipletSteps(serviceStep.getType(), serviceStep.getParameters());
-			BlackboardClient equipletStepsBBClient = hardwareAgent.getEquipletStepsBBClient();
-			ObjectId next = null;
-			for(int i = equipletSteps.length -1; i >= 0; i--){
-				EquipletStepMessage equipletStep = equipletSteps[i];
-				stepDuration += equipletStep.getTimeData().getDuration();
-				equipletStep.setServiceStepID(serviceStepId);
-				equipletStep.setNextStepID(next);
-				next = equipletStepsBBClient.insertDocument(equipletStep.toBasicDBObject());
-			}
-			
-			ScheduleData schedule = serviceStep.getScheduleData();
-			schedule.setDuration(stepDuration);
-
-			hardwareAgent.getServiceStepsBBClient().updateDocuments(
-					new BasicDBObject("_id", serviceStepId),
-					new BasicDBObject("$set", new BasicDBObject("scheduleData", schedule
-							.toBasicDBObject())));
+			EvaluateStepDuration(serviceStepId);
 
 			ACLMessage reply;
 			reply = message.createReply();
@@ -126,10 +97,47 @@ public class EvaluateDuration extends ReceiveBehaviour {
 			reply.setOntology("GetServiceStepDurationResponse");
 			myAgent.send(reply);
 
-		} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException
-				| IOException e) {
+		} catch (UnreadableException | IOException e) {
 			e.printStackTrace();
 			myAgent.doDelete();
 		}
 	}
+
+	public void EvaluateStepDuration(ObjectId serviceStepId) {
+		try {
+			BasicDBObject dbServiceStep = (BasicDBObject) hardwareAgent.getServiceStepsBBClient().findDocumentById(serviceStepId);
+
+			ServiceStepMessage serviceStep = new ServiceStepMessage(dbServiceStep);
+
+			int stepDuration = 0;
+			int leadingModule = hardwareAgent.getLeadingModule(serviceStep.getServiceId());
+			Module module = moduleFactory.getModuleById(leadingModule);
+			module.setConfiguration(hardwareAgent.getConfiguration());
+			EquipletStepMessage[] equipletSteps = 
+					module.getEquipletSteps(serviceStep.getType(), serviceStep.getParameters());
+			BlackboardClient equipletStepsBBClient = hardwareAgent.getEquipletStepsBBClient();
+			ObjectId next = null;
+			for (int i = equipletSteps.length - 1; i >= 0; i--) {
+				EquipletStepMessage equipletStep = equipletSteps[i];
+				stepDuration += equipletStep.getTimeData().getDuration();
+				equipletStep.setServiceStepID(serviceStepId);
+				equipletStep.setNextStepID(next);
+				next = equipletStepsBBClient.insertDocument(equipletStep.toBasicDBObject());
+			}
+
+			ScheduleData schedule = serviceStep.getScheduleData();
+			schedule.setDuration(stepDuration);
+
+			hardwareAgent.getServiceStepsBBClient().updateDocuments(
+					new BasicDBObject("_id", serviceStepId), new BasicDBObject("$set",
+							new BasicDBObject("scheduleData", schedule.toBasicDBObject())));
+			if(serviceStep.getNextStep() != null){
+				EvaluateStepDuration(serviceStep.getNextStep());
+			}
+		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+			e.printStackTrace();
+			myAgent.doDelete();
+		}
+	}
+
 }

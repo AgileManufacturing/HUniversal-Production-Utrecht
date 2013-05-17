@@ -10,6 +10,7 @@ import jade.lang.acl.UnreadableException;
 import org.bson.types.ObjectId;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
@@ -42,49 +43,44 @@ public class FillPlaceholders extends ReceiveBehaviour {
 
 	@Override
 	public void handle(ACLMessage message) {
-		Object contentObject = null;
-		String contentString = message.getContent();
-
-		try {
-			contentObject = message.getContentObject();
+		try{
+			ObjectId serviceStepId = (ObjectId) message.getContentObject();
+			Logger.log("%s received message from %s %n", myAgent.getLocalName(), message.getSender().getLocalName(),
+					message.getOntology());
+			FillStepPlaceholders(serviceStepId);
 		} catch(UnreadableException e) {
-			// Logger.log("Exception Caught, No Content Object Given");
-		}
-		Logger.log("%s received message from %s (%s:%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(),
-				message.getOntology(), contentObject == null ? contentString : contentObject);
-
-		try {
-			ObjectId objectId = null;
-			ServiceStepMessage serviceStep = null;
-			try {
-				objectId = (ObjectId) message.getContentObject();
-				serviceStep =
-						new ServiceStepMessage((BasicDBObject) hardwareAgent.getServiceStepsBBClient()
-								.findDocumentById(objectId));
-				BlackboardClient equipletStepBBClient = hardwareAgent.getEquipletStepsBBClient();
-				BasicDBObject query = new BasicDBObject("serviceStepID", serviceStep.getId());
-
-				List<DBObject> steps = equipletStepBBClient.findDocuments(query);
-				EquipletStepMessage[] equipletSteps = new EquipletStepMessage[steps.size()];
-				for(int i = 0; i < steps.size(); i++) {
-					equipletSteps[i] = new EquipletStepMessage((BasicDBObject) steps.get(i));
-				}
-
-				int leadingModule = hardwareAgent.getLeadingModule(serviceStep.getServiceId());
-				Module module = moduleFactory.getModuleById(leadingModule);
-				module.setConfiguration(hardwareAgent.getConfiguration());
-
-				equipletSteps = module.fillPlaceHolders(equipletSteps, serviceStep.getParameters());
-				for(EquipletStepMessage step : equipletSteps) {
-					equipletStepBBClient
-							.updateDocuments(new BasicDBObject("_id", step.getId()), step.toBasicDBObject());
-				}
-			} catch(UnreadableException | InvalidDBNamespaceException e) {
-				e.printStackTrace();
-				myAgent.doDelete();
-			}
-		} catch(Exception e) {
 			e.printStackTrace();
+			myAgent.doDelete();
+		}
+	}
+
+	public void FillStepPlaceholders(ObjectId serviceStepId){
+		try {
+			ServiceStepMessage serviceStep = new ServiceStepMessage(
+					(BasicDBObject) hardwareAgent.getServiceStepsBBClient().findDocumentById(serviceStepId));
+			BlackboardClient equipletStepBBClient = hardwareAgent.getEquipletStepsBBClient();
+			BasicDBObject query = new BasicDBObject("serviceStepID", serviceStep.getId());
+
+			List<DBObject> steps = equipletStepBBClient.findDocuments(query);
+			EquipletStepMessage[] equipletSteps = new EquipletStepMessage[steps.size()];
+			for(int i = 0; i < steps.size(); i++) {
+				equipletSteps[i] = new EquipletStepMessage((BasicDBObject) steps.get(i));
+			}
+
+			int leadingModule = hardwareAgent.getLeadingModule(serviceStep.getServiceId());
+			Module module = moduleFactory.getModuleById(leadingModule);
+			module.setConfiguration(hardwareAgent.getConfiguration());
+
+			equipletSteps = module.fillPlaceHolders(equipletSteps, serviceStep.getParameters());
+			for(EquipletStepMessage step : equipletSteps) {
+				equipletStepBBClient.updateDocuments(new BasicDBObject("_id", step.getId()), step.toBasicDBObject());
+			}
+			if(serviceStep.getNextStep() != null){
+				FillStepPlaceholders(serviceStep.getNextStep());
+			}
+		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+			e.printStackTrace();
+			myAgent.doDelete();
 		}
 	}
 }
