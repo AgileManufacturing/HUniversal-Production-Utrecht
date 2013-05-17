@@ -59,7 +59,7 @@ import java.util.List;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
-import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.data.Position;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.ProductStepMessage;
@@ -74,7 +74,7 @@ import com.mongodb.DBObject;
  * @author Peter
  * 
  */
-public class GetPartsInfoResponse extends ReceiveBehaviour {
+public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	private String conversationId;
