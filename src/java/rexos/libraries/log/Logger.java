@@ -43,13 +43,13 @@ public class Logger {
 		return debugEnabled;
 	}
 	
-	public static void Log(String msg) {
+	public static void log(String msg) {
 		if (debugEnabled) {
 			outStream.println(msg);
 		}
 	}
 	
-	public static void Log(Throwable throwable) {
+	public static void log(Throwable throwable) {
 		if (debugEnabled) {
 			throwable.printStackTrace(errStream);
 		}
