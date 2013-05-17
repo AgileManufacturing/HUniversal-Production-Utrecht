@@ -72,6 +72,11 @@ public class ServiceStepMessage implements MongoSaveable {
 	private ScheduleData scheduleData;
 
 	/**
+	 * 
+	 */
+	public ServiceStepMessage() {}
+
+	/**
 	 * @param serviceId
 	 * @param type
 	 * @param parameters

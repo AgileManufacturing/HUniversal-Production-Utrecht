@@ -114,7 +114,7 @@ public class JadeAgentX extends Agent {
 			 * want to pass our product!
 			 */
 
-			Thread.currentThread().sleep(1000);
+			Thread.sleep(1000);
 			Object[] args = new Object[1];
 			args[0] = product;
 
