@@ -48,69 +48,72 @@ import rexos.libraries.knowledgedb_client.Row;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.hardware_agent.HardwareAgent;
 
+/**
+ * Class for the receivebehaviour to receive messages with the ontology CheckForModules
+ */
 public class CheckForModules extends ReceiveBehaviour {
 	/**
 	 * @var long serialVersionUID
-	 * SerialUID for this class.
+	 * The serialVersionUID.
 	 **/
 	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @var MessageTemplate messageTemplate
+	 * Contains the MessageTemplate to match.
+	 */
+	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CheckForModules");
 	
-	private static MessageTemplate messageTemplate = MessageTemplate
-			.MatchOntology("CheckForModules");
+	/**
+	 * @var HardwareAgent hardwareAgent
+	 * The hardwareAgent for this behaviour.
+	 */
 	private HardwareAgent hardwareAgent;
 
 	/**
-	 * 
 	 * Instantiates a new check for module.
-	 * 
 	 */
 	public CheckForModules(Agent a) {
 		super(a, -1, messageTemplate);
 		hardwareAgent = (HardwareAgent) a;
 	}
-	
+
 	/**
-	 * Returns a list of module group ids for which a module is available on this equiplet.
-	 * This data is currently retrieved from the knowledge base.
-	 * Once MOST is implemented, this method should take MOST data into account.
+	 * Returns a list of module group ids for which a module is available on this equiplet. This data is currently retrieved from the knowledge base. Once MOST is implemented, this method should take MOST data into account.
 	 * 
 	 * @return An arraylist containing module group ids for the modules that are attached to this equiplet.
-	 *
 	 **/
 	private ArrayList<Integer> getAvailableModuleGroups() {
 		ArrayList<Integer> availableModules = new ArrayList<Integer>();
 		try {
-			
+
 			KnowledgeDBClient client = KnowledgeDBClient.getClient();
-			Row[] rows = client.executeSelectQuery(
-					Queries.MODULES_PER_EQUIPLET, 
-					hardwareAgent.getEquipletAgentAID().getLocalName());
+			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, hardwareAgent.getEquipletAgentAID().getLocalName());
 			for (Row row : rows) {
 				availableModules.add((Integer) row.get("groupId"));
 			}
 		} catch (KeyNotFoundException | KnowledgeException ex) {
-			// Return the current (possibly empty) arraylist if reading 
+			// Return the current (possibly empty) arraylist if reading
 			// from the knowledge db fails for whatever reason.
 		}
-		
+
 		return availableModules;
 	}
 
 	/**
-	 * Responds to incoming messages querying whether a module is available for a set of module group ids.
-	 * This method will respond with a CheckForModulesResponse message.
-	 * If all modules are available, a CONFIRM will be sent.
-	 * If one or more modules are missing, a DISCONFIRM will be sent.
-	 * @param ACLMessage The incoming message.
+	 * Responds to incoming messages querying whether a module is available for a set of module group ids. This method will respond with a CheckForModulesResponse message. If all modules are available, a CONFIRM will be sent. If one or more modules
+	 * are missing, a DISCONFIRM will be sent.
+	 * 
+	 * @param ACLMessage
+	 *            The incoming message.
 	 */
 	@Override
 	public void handle(ACLMessage message) {
 		boolean modulesPresent = true;
-		
+
 		try {
 			int[] moduleGroupIds = (int[]) message.getContentObject();
 			ArrayList<Integer> availableModuleGroups = getAvailableModuleGroups();
-			
 
 			for (int groupId : moduleGroupIds) {
 				if (!availableModuleGroups.contains(groupId)) {
@@ -129,7 +132,7 @@ public class CheckForModules extends ReceiveBehaviour {
 			} else {
 				reply.setPerformative(ACLMessage.DISCONFIRM);
 			}
-			
+
 			myAgent.send(reply);
 		}
 

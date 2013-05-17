@@ -39,21 +39,52 @@ import rexos.mas.equiplet_agent.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 
+/**
+ * EquipletStepMessage class containing all the data for a message on the EquipletStepBlackboard.
+ */
 public class EquipletStepMessage implements MongoSaveable {
+	/**
+	 * @var ObjectId _id
+	 * The id of this step.
+	 */
 	private ObjectId _id;
+	/**
+	 * @var ObjectId serviceStepId
+	 * The id of the service step related to this step.
+	 */
 	private ObjectId serviceStepID;
+	/**
+	 * @var ObjectId nextStep
+	 * The id of the next step for the same service.
+	 */
 	private ObjectId nextStep;
+	/**
+	 * @var int moduleId
+	 * The id of the module that created this step.
+	 */
 	private int moduleId;
+	/**
+	 * @var InstructionData instructionData
+	 * The instruction data for this step.
+	 */
 	private InstructionData instructionData;
+	/**
+	 * @var StepStatusCode status
+	 * The status of this step.
+	 */
 	private StepStatusCode status;
+	/**
+	 * @var TimeData timeData
+	 * The time data of this step.
+	 */
 	private TimeData timeData;
 
 	/**
+	 * Constructor for this class.
 	 * @param serviceStepID
 	 * @param instructionData
 	 * @param type
 	 * @param timeData
-	 * @return
 	 */
 	public EquipletStepMessage(ObjectId serviceStepID, int moduleId,
 			InstructionData instructionData, StepStatusCode status,
@@ -66,11 +97,16 @@ public class EquipletStepMessage implements MongoSaveable {
 		this.timeData = timeData;
 	}
 
+	/**
+	 * Constructor building this class from a BasicDBObject
+	 * @param object The BasicDBObject to build this class from.
+	 */
 	public EquipletStepMessage(BasicDBObject object){
 		fromBasicDBObject(object);
 	}
 	
 	/**
+	 * Getter for the id.
 	 * @return the id
 	 */
 	public ObjectId getId() {
@@ -78,6 +114,7 @@ public class EquipletStepMessage implements MongoSaveable {
 	}
 	
 	/**
+	 * Getter for the serviceStepID.
 	 * @return the serviceStepID
 	 */
 	public ObjectId getServiceStepID() {
@@ -85,26 +122,39 @@ public class EquipletStepMessage implements MongoSaveable {
 	}
 
 	/**
-	 * @param serviceStepID
-	 *            the serviceStepID to set
+	 * Setter for the ServiceStepID
+	 * @param serviceStepID The serviceStepID to set it to.
 	 */
 	public void setServiceStepID(ObjectId serviceStepID) {
 		this.serviceStepID = serviceStepID;
 	}
 
+	/**
+	 * Setter for the nextStepID
+	 * @param EquipletStepID The EquipletStepID to set it to.
+	 */
 	public void setNextStepID(ObjectId EquipletStepID){
 		this.nextStep = EquipletStepID;
 	}
 	
+	/**
+	 * Getter for the module id
+	 * @return The moduleId
+	 */
 	public int getModuleId(){
 		return moduleId;
 	}
 	
+	/**
+	 * Setter for the moduleId
+	 * @param moduleId The moduleId to set it to.
+	 */
 	public void setModuleId(int moduleId){
 		this.moduleId = moduleId;
 	}
 	
 	/**
+	 * Getter for the instruction data.
 	 * @return the instructionData
 	 */
 	public InstructionData getInstructionData() {
@@ -112,14 +162,15 @@ public class EquipletStepMessage implements MongoSaveable {
 	}
 
 	/**
-	 * @param instructionData
-	 *            the instructionData to set
+	 * Setter for the instruction data.
+	 * @param instructionData The instructionData to set it to
 	 */
 	public void setInstructionData(InstructionData instructionData) {
 		this.instructionData = instructionData;
 	}
 
 	/**
+	 * Getter for the status
 	 * @return the status
 	 */
 	public StepStatusCode getStatus() {
@@ -127,14 +178,15 @@ public class EquipletStepMessage implements MongoSaveable {
 	}
 
 	/**
-	 * @param status
-	 *            the status to set
+	 * Setter for the status
+	 * @param status The status to set it to
 	 */
 	public void setStatus(StepStatusCode status) {
 		this.status = status;
 	}
 
 	/**
+	 * Getter for the time data
 	 * @return the timeData
 	 */
 	public TimeData getTimeData() {
@@ -142,8 +194,8 @@ public class EquipletStepMessage implements MongoSaveable {
 	}
 
 	/**
-	 * @param timeData
-	 *            the timeData to set
+	 * Setter for the time data
+	 * @param timeData The timeData to set it to
 	 */
 	public void setTimeData(TimeData timeData) {
 		this.timeData = timeData;
@@ -161,6 +213,9 @@ public class EquipletStepMessage implements MongoSaveable {
 						serviceStepID, instructionData, status, timeData);
 	}
 
+	/**
+	 * @see rexos.mas.data.MongoSaveable#toBasicDBObject()
+	 */
 	@Override
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject object = new BasicDBObject();
@@ -173,6 +228,9 @@ public class EquipletStepMessage implements MongoSaveable {
 		return object;
 	}
 
+	/**
+	 * @see rexos.mas.data.MongoSaveable#fromBasicDBObject(BasicDBObject)
+	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		_id = object.getObjectId("_id");

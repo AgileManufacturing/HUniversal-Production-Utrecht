@@ -33,55 +33,65 @@ import rexos.mas.data.MongoSaveable;
 
 import com.mongodb.BasicDBObject;
 
+/**
+ * TimeData class containing the time data of an EquipletStepMessage.
+ */
 public class TimeData implements MongoSaveable {
 	/**
 	 * @var int duration
-	 * the length of duration 
+	 * The duration in timeslots
 	 */
 	public int duration;
-	
+
 	/**
-	 * 
-	 * @param duration
+	 * Constructor
+	 * @param duration The duration in timeslots
 	 */
 	public TimeData(int duration) {
 		this.duration = duration;
 	}
-	
+
 	/**
-	 * 
-	 * @param object
+	 * Constructor
+	 * @param object The BasicDBObject to fill this class with.
 	 */
-	public TimeData(BasicDBObject object){
+	public TimeData(BasicDBObject object) {
 		fromBasicDBObject(object);
 	}
-	
+
 	/**
 	 * getter for the duration.
 	 * @return duration
 	 */
-	public int getDuration(){
-		
+	public int getDuration() {
+
 		return duration;
-		
+
 	}
+
 	/**
 	 * setter to set the duration
-	 * @param duration
+	 * @param duration The duration in timeslots
 	 */
-	public void setDuration(int duration){
-		
+	public void setDuration(int duration) {
+
 		this.duration = duration;
-		
+
 	}
-	
+
+	/**
+	 * @see rexos.mas.data.MongoSaveable#toBasicDBObject()
+	 */
 	@Override
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject object = new BasicDBObject();
 		object.put("duration", duration);
 		return object;
 	}
-	
+
+	/**
+	 * @see rexos.mas.data.MongoSaveable#fromBasicDBObject(BasicDBObject)
+	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		duration = object.getInt("duration");

@@ -32,16 +32,46 @@ package rexos.mas.hardware_agent;
  **/
 
 import rexos.mas.data.MongoSaveable;
-
 import com.mongodb.BasicDBObject;
 
+/**
+ * InstructionData class containing the data for the equiplet instruction.
+ **/
 public class InstructionData implements MongoSaveable {
+	/**
+	 * @var String command
+	 * The command of the instruction. 
+	 */
 	private String command;
+	/**
+	 * @var String destionation
+	 * The destination of the instruction.(which module performs the instruction)
+	 */
 	private String destination;
+	/**
+	 * @var String look_up
+	 * The type of look_up for the instruction.(e.g. FIND_ID)
+	 */
 	private String look_up;
+	/**
+	 * @var BasicDBObject look_up_parameters
+	 * The look_up_parameters for the look_up.(e.g. the id to look for)
+	 */
 	private BasicDBObject look_up_parameters;
+	/**
+	 * @var BasicDBObject payload
+	 * The extra parameters for the instruction.(e.g. the location)
+	 */
 	private BasicDBObject payload;
 	
+	/**
+	 * Constructor for the InstructionData
+	 * @param command
+	 * @param destination
+	 * @param look_up
+	 * @param look_up_parameters
+	 * @param payload
+	 */
 	public InstructionData(String command, String destination,String look_up,
 			BasicDBObject look_up_parameters,BasicDBObject payload){
 		
@@ -53,38 +83,70 @@ public class InstructionData implements MongoSaveable {
 		
 	}
 	
+	/**
+	 * Constructor for the InstructionData
+	 * @param object BasicDBObject containing all the fields of this class.
+	 */
 	public InstructionData(BasicDBObject object){
-		
 		fromBasicDBObject(object);
-		
 	}
 	
+	/**
+	 * Empty Constructor
+	 */
 	public InstructionData() {}
 
+	/**
+	 * Getter for the command
+	 * @return the command
+	 */
 	public String getCommand(){
 		return command;
 	}
 	
+	/**
+	 * Getter for the destination
+	 * @return the destination
+	 */
 	public String getDestination(){
 		return destination;
 	}
 	
+	/**
+	 * Getter for the look_up_parameters
+	 * @return the look_up_parameters
+	 */
 	public BasicDBObject getLookUpParameters(){
 		return look_up_parameters;
 	}
 	
+	/**
+	 * Setter for the look_up_parameters
+	 * @param look_up_parameters the parameters to put in the look_up_parameters
+	 */
 	public void setLookUpParameters(BasicDBObject look_up_parameters){
 		this.look_up_parameters = look_up_parameters;
 	}
 	
+	/**
+	 * Getter for the payload
+	 * @return the payload
+	 */
 	public BasicDBObject getPayload(){
 		return payload;
 	}
 	
+	/**
+	 * Setter for the payload
+	 * @param payload the parameters to put in the payload
+	 */
 	public void setPayload(BasicDBObject payload){
 		this.payload = payload;
 	}
 	
+	/**
+	 * @see rexos.mas.data.MongoSaveable#toBasicDBObject()
+	 */
 	@Override
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject object = new BasicDBObject();
@@ -96,6 +158,9 @@ public class InstructionData implements MongoSaveable {
 		return object;
 	}
 
+	/**
+	 * @see rexos.mas.data.MongoSaveable#fromBasicDBObject(BasicDBObject)
+	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		
