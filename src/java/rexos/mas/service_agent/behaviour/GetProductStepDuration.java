@@ -58,7 +58,7 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 
 			agent.addBehaviour(new GetServiceDuration(agent, serviceSteps, message.getConversationId()));
 		} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException e) {
-			e.printStackTrace();
+			Logger.log(e);
 			agent.doDelete();
 		}
 	}

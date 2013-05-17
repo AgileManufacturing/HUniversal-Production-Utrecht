@@ -14,7 +14,6 @@ import org.bson.types.ObjectId;
 
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
-import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.ProductStepMessage;
@@ -76,7 +75,7 @@ public class CanDoProductStep extends ReceiveBehaviour {
 					msg.setContentObject(service.getModuleIds(stepType,
 							parameters));
 				} catch (IOException e) {
-					e.printStackTrace();
+					Logger.log(e);
 					agent.doDelete();
 				}
 				agent.send(msg);
@@ -93,7 +92,7 @@ public class CanDoProductStep extends ReceiveBehaviour {
 			}
 		} catch (UnreadableException | InvalidDBNamespaceException
 				| GeneralMongoException e) {
-			e.printStackTrace();
+			Logger.log(e);
 			agent.doDelete();
 		}
 	}

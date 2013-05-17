@@ -78,7 +78,8 @@ import rexos.libraries.knowledgedb_client.Row;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
 import rexos.mas.data.ScheduleData;
-import rexos.mas.equiplet_agent.behaviours.*;
+import rexos.mas.equiplet_agent.behaviours.InitialisationFinished;
+import rexos.mas.equiplet_agent.behaviours.ServiceAgentDied;
 
 import com.mongodb.BasicDBObject;
 
@@ -200,7 +201,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			InetAddress IP = InetAddress.getLocalHost();
 			equipletDbIp = IP.getHostAddress();
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.log(e);
 		}
 		equipletDbName = getAID().getLocalName();
 		communicationTable = new HashMap<String, ObjectId>();
@@ -223,7 +224,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				}
 			} catch (KnowledgeException e1) {
 				takeDown();
-				e1.printStackTrace();
+				Logger.log(e1);
 			}
 			Logger.log("%s %s%n", capabilities, equipletDbName);
 
@@ -260,7 +261,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			timeSlotLength = timeData.getInt("timeSlotLength");
 			collectiveBBClient.setCollection(equipletDirectoryName);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.log(e);
 			doDelete();
 		}
 
@@ -296,7 +297,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				send(responseMessage);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.log(e);
 			// The equiplet is already going down, so it has to do nothing here.
 		}
 		try {
@@ -307,7 +308,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			equipletBBClient.unsubscribe(statusSubscription);
 		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
-			e.printStackTrace();
+			Logger.log(e);
 		}
 
 		ACLMessage deadMessage = new ACLMessage(ACLMessage.FAILURE);
@@ -365,7 +366,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 						responseMessage.setPerformative(ACLMessage.FAILURE);
 						responseMessage.setContent("An error occured in the planning/please reschedule");
 						send(responseMessage);
-						e.printStackTrace();
+						Logger.log(e);
 					}
 					break;
 				case IN_PROGRESS:
@@ -395,7 +396,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				}
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				Logger.log(e1);
 			}
 			break;
 		default:

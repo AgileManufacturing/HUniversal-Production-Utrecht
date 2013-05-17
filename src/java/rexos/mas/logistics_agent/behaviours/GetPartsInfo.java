@@ -30,13 +30,14 @@
  **/
 package rexos.mas.logistics_agent.behaviours;
 
-import java.io.IOException;
-import java.util.HashMap;
-
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+
+import java.io.IOException;
+import java.util.HashMap;
+
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.data.Position;
@@ -90,7 +91,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 				reply.setContentObject(partsParameters);
 				myAgent.send(reply);
 			} catch (UnreadableException | IOException e) {
-				e.printStackTrace();
+				Logger.log(e);
 				myAgent.doDelete();
 			}
 		} else {

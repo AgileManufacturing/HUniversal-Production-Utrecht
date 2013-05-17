@@ -83,7 +83,7 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 
 				myAgent.addBehaviour(new GetPartsInfo(myAgent, message.getConversationId()));
 			} catch (UnreadableException e) {
-				e.printStackTrace();
+				Logger.log(e);
 				myAgent.doDelete();
 			}
 		} else {

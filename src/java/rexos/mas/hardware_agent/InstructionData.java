@@ -31,9 +31,9 @@ package rexos.mas.hardware_agent;
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-import com.mongodb.BasicDBObject;
-
 import rexos.mas.data.MongoSaveable;
+
+import com.mongodb.BasicDBObject;
 
 public class InstructionData implements MongoSaveable {
 	private String command;

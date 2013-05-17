@@ -39,14 +39,14 @@ import jade.wrapper.StaleProxyException;
 
 import java.util.ArrayList;
 
-import com.mongodb.BasicDBObject;
-
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.Position;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
+
+import com.mongodb.BasicDBObject;
 
 public class JadeAgentX extends Agent {
 	private static final long serialVersionUID = 1L;
@@ -122,7 +122,7 @@ public class JadeAgentX extends Agent {
 					"rexos.mas.productAgent.ProductAgent", args).start();
 			addBehaviour(new StartProductAgent(this, args));
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.log(e);
 			doDelete();
 		}
 	}
@@ -156,7 +156,7 @@ public class JadeAgentX extends Agent {
 							"rexos.mas.productAgent.ProductAgent", args)
 							.start();
 				} catch (StaleProxyException e) {
-					e.printStackTrace();
+					Logger.log(e);
 				}
 			}
 			block();

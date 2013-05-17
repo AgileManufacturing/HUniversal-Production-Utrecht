@@ -49,7 +49,6 @@ package rexos.mas.service_agent.behaviour;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.service_agent.ServiceAgent;

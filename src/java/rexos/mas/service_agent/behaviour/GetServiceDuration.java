@@ -127,7 +127,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 				agent.send(message);
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException | IOException e) {
-			e.printStackTrace();
+			Logger.log(e);
 			agent.doDelete();
 		}
 	}
@@ -174,7 +174,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 					agent.removeBehaviour(this);
 				}
 			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {
-				e.printStackTrace();
+				Logger.log(e);
 			}
 		} else {
 			// TODO handle timeout

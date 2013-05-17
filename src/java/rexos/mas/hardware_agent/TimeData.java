@@ -29,9 +29,9 @@
  **/
 package rexos.mas.hardware_agent;
 
-import com.mongodb.BasicDBObject;
-
 import rexos.mas.data.MongoSaveable;
+
+import com.mongodb.BasicDBObject;
 
 public class TimeData implements MongoSaveable {
 	/**

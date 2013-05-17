@@ -1,8 +1,8 @@
 package rexos.mas.logistics_agent;
 
+import jade.core.Agent;
 import rexos.libraries.log.Logger;
 import rexos.mas.logistics_agent.behaviours.ArePartsAvailable;
-import jade.core.Agent;
 
 public class LogisticsAgent extends Agent {
 	private static final long serialVersionUID = 1L;

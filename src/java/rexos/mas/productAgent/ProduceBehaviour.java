@@ -8,7 +8,10 @@ import jade.core.behaviours.OneShotBehaviour;
 
 import java.util.List;
 
-import rexos.mas.data.*;
+import rexos.mas.data.LogMessage;
+import rexos.mas.data.Product;
+import rexos.mas.data.ProductionStep;
+import rexos.mas.data.ProductionStepStatus;
 
 /**
  * 

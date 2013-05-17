@@ -8,8 +8,16 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import rexos.libraries.blackboard_client.*;
-import rexos.mas.data.*;
+import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.blackboard_client.InvalidJSONException;
+import rexos.libraries.log.Logger;
+import rexos.mas.data.Product;
+import rexos.mas.data.Production;
+import rexos.mas.data.ProductionEquipletMapper;
+import rexos.mas.data.ProductionStep;
+import rexos.mas.data.ProductionStepStatus;
 import rexos.mas.equiplet_agent.EquipletDirectoryMessage;
 
 import com.mongodb.BasicDBObject;
@@ -37,7 +45,7 @@ public class PlannerBehaviour extends OneShotBehaviour{
 			bbc.removeDocuments(aid.toString());
 		} catch (UnknownHostException | GeneralMongoException | InvalidJSONException | InvalidDBNamespaceException e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			Logger.log(e1);
 		}
 	}
 

@@ -146,13 +146,13 @@ public class CanPerformStep extends ReceiveBehaviour {
 			myAgent.addBehaviour(new CanDoProductionStepResponse(myAgent, equipletBBClient));
 		} catch(IOException | InvalidDBNamespaceException | GeneralMongoException
 				| NullPointerException e) {
-			e.printStackTrace();
+			Logger.log(e);
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.FAILURE);
 			reply.setContent("Failed to process the step");
 			myAgent.send(reply);
 		} catch(UnreadableException e) {
-			e.printStackTrace();
+			Logger.log(e);
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.FAILURE);
 			reply.setContent("No step given");

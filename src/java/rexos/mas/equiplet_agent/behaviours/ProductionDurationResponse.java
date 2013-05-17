@@ -1,10 +1,10 @@
 package rexos.mas.equiplet_agent.behaviours;
 
-import java.io.IOException;
-
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+
+import java.io.IOException;
 
 import org.bson.types.ObjectId;
 
@@ -74,7 +74,7 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 				Logger.log("sending message: %s%n", responseMessage.getOntology());
 				Logger.log("sending message: %s%n", scheduleStepMessage.getOntology());
 			} catch (IOException | InvalidDBNamespaceException | GeneralMongoException e) {
-				e.printStackTrace();
+				Logger.log(e);
 				equipletAgent.doDelete();
 			}
 		}

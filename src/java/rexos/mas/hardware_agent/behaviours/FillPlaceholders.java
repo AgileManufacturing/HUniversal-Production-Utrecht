@@ -1,11 +1,11 @@
 package rexos.mas.hardware_agent.behaviours;
 
-import java.util.List;
-
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+
+import java.util.List;
 
 import org.bson.types.ObjectId;
 
@@ -49,7 +49,7 @@ public class FillPlaceholders extends ReceiveBehaviour {
 					message.getOntology());
 			FillStepPlaceholders(serviceStepId);
 		} catch(UnreadableException e) {
-			e.printStackTrace();
+			Logger.log(e);
 			myAgent.doDelete();
 		}
 	}
@@ -79,7 +79,7 @@ public class FillPlaceholders extends ReceiveBehaviour {
 				FillStepPlaceholders(serviceStep.getNextStep());
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			e.printStackTrace();
+			Logger.log(e);
 			myAgent.doDelete();
 		}
 	}

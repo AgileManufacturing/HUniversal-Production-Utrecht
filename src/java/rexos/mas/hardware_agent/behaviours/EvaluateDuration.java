@@ -47,12 +47,12 @@ package rexos.mas.hardware_agent.behaviours;
  *          SUCH DAMAGE.
  **/
 
-import java.io.IOException;
-
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+
+import java.io.IOException;
 
 import org.bson.types.ObjectId;
 
@@ -135,7 +135,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 				EvaluateStepDuration(serviceStep.getNextStep());
 			}
 		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
-			e.printStackTrace();
+			Logger.log(e);
 			myAgent.doDelete();
 		}
 	}

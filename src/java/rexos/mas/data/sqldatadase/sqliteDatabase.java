@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import rexos.libraries.log.Logger;
 import rexos.mas.data.LogMessage;
 
 /**
@@ -49,7 +50,7 @@ public class sqliteDatabase {
 				create.execute();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Logger.log(e);
 			}
 	}
 	
@@ -69,7 +70,7 @@ public class sqliteDatabase {
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.log(e);
 		}		
 	}
 
