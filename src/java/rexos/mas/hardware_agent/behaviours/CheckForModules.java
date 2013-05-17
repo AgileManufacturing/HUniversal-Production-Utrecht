@@ -82,8 +82,8 @@ public class CheckForModules extends ReceiveBehaviour {
 			
 			KnowledgeDBClient client = KnowledgeDBClient.getClient();
 			Row[] rows = client.executeSelectQuery(
-					Queries.MODULES_PER_EQUIPLET, hardwareAgent
-							.getEquipletAgentAID().getLocalName());
+					Queries.MODULES_PER_EQUIPLET, 
+					hardwareAgent.getEquipletAgentAID().getLocalName());
 			for (Row row : rows) {
 				availableModules.add((Integer) row.get("groupId"));
 			}
