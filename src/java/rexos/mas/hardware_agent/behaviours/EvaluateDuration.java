@@ -59,6 +59,7 @@ import org.bson.types.ObjectId;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.hardware_agent.EquipletStepMessage;
@@ -92,24 +93,24 @@ public class EvaluateDuration extends ReceiveBehaviour {
 							serviceStepId);
 
 			ServiceStepMessage serviceStep = new ServiceStepMessage(dbServiceStep);
-			System.out.format("%s received message from %s (%s:%s)%n", myAgent.getLocalName(),
+			Logger.log("%s received message from %s (%s:%s)%n", myAgent.getLocalName(),
 					message.getSender().getLocalName(), message.getOntology(), serviceStepId);
 
 			int stepDuration = 0;
 			int leadingModule = hardwareAgent.getLeadingModule(serviceStep.getServiceId());
 			Module module = moduleFactory.getModuleById(leadingModule);
 			module.setConfiguration(hardwareAgent.getConfiguration());
-			System.out.println(serviceStep.getType() + " : : " + module.getId());
-			System.out.println(hardwareAgent.getConfiguration());
+			Logger.log(serviceStep.getType() + " : : " + module.getId());
+			Logger.log(hardwareAgent.getConfiguration());
 			EquipletStepMessage[] equipletSteps =
 					module.getEquipletSteps(serviceStep.getType(), serviceStep.getParameters());
-			System.out.println("number of steps: " + equipletSteps.length);
+			Logger.log("number of steps: " + equipletSteps.length);
 			BlackboardClient equipletStepsBBClient = hardwareAgent.getEquipletStepsBBClient();
 			for(EquipletStepMessage equipletStep : equipletSteps) {
 				stepDuration += equipletStep.getTimeData().getDuration();
 				equipletStep.setServiceStepID(serviceStepId);
 				equipletStepsBBClient.insertDocument(equipletStep.toBasicDBObject());
-				System.out.println(equipletStep.toString());
+				Logger.log(equipletStep.toString());
 			}
 			
 			ScheduleData schedule = serviceStep.getScheduleData();

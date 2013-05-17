@@ -8,6 +8,7 @@ import jade.lang.acl.UnreadableException;
 import org.bson.types.ObjectId;
 
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.hardware_agent.HardwareAgent;
 
@@ -38,9 +39,9 @@ public class FillPlaceholders extends ReceiveBehaviour {
 		try {
 			contentObject = message.getContentObject();
 		} catch (UnreadableException e) {
-			// System.out.println("Exception Caught, No Content Object Given");
+//			Logger.log("Exception Caught, No Content Object Given");
 		}
-		System.out.format("%s received message from %s (%s:%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
+		Logger.log("%s received message from %s (%s:%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
 
 		try {
 			ObjectId objectId = null;

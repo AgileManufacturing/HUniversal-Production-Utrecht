@@ -60,6 +60,7 @@ import org.bson.types.ObjectId;
 import rexos.libraries.blackboard_client.*;
 import rexos.libraries.blackboard_client.FieldUpdateSubscription.MongoUpdateLogOperation;
 import rexos.libraries.knowledgedb_client.*;
+import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
 import rexos.mas.hardware_agent.behaviours.*;
 import rexos.mas.service_agent.ServiceStepMessage;
@@ -90,7 +91,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 
 	@Override
 	public void setup() {
-		System.out.println("Hardware agent " + this + " reporting.");
+		Logger.log("Hardware agent " + this + " reporting.");
 		leadingModules = new HashMap<Integer, Integer>();
 
 		moduleFactory = new ModuleFactory();

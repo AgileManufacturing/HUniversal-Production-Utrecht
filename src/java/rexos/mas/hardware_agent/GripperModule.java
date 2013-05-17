@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import rexos.libraries.log.Logger;
 import rexos.mas.data.Position;
 import rexos.mas.equiplet_agent.StepStatusCode;
 
@@ -170,7 +171,7 @@ public class GripperModule extends Module {
 	}
 
 	private EquipletStepMessage deactivateGripper(BasicDBObject parameters) {
-		System.out.println(parameters.toString());
+		Logger.log(parameters.toString());
 		Position position = new Position((BasicDBObject) parameters.get("Position"));
 		BasicDBObject lookUpParameters = new BasicDBObject();
 		if (position.getRelativeToPart() == -1) {

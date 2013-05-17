@@ -37,6 +37,7 @@ import jade.lang.acl.MessageTemplate;
 import org.bson.types.ObjectId;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.ProductStepMessage;
@@ -87,7 +88,7 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null){
-			System.out.format("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
+			Logger.log("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
 	
 			ObjectId productStepEntryId = equipletAgent.getRelatedObjectId(message.getConversationId());
 			try {
@@ -99,13 +100,9 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 				responseMessage.setConversationId(message.getConversationId());
 				responseMessage.setOntology("CanPerformStep");
 				responseMessage.addReceiver(productAgent);
-				switch(message.getPerformative()){
-				case ACLMessage.DISCONFIRM:
+				if(message.getPerformative() == ACLMessage.DISCONFIRM) {
 					//if the productstep can not be done by this equiplet remove it.
 					equipletBBClient.removeDocuments(new BasicDBObject("_id", productStepEntryId));
-					break;
-				default:
-					break;
 				}
 				myAgent.send(responseMessage);
 			} catch (Exception e) {
