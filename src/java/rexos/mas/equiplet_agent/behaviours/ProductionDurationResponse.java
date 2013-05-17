@@ -11,6 +11,7 @@ import org.bson.types.ObjectId;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.EquipletAgent;
@@ -46,7 +47,7 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if (message != null) {
-			System.out.format("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
+			Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
 
 			try {
 				//gets the productstep
@@ -70,8 +71,8 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 				scheduleStepMessage.setContent(String.valueOf(5));
 				equipletAgent.send(scheduleStepMessage);
 
-				System.out.format("sending message: %s%n", responseMessage.getOntology());
-				System.out.format("sending message: %s%n", scheduleStepMessage.getOntology());
+				Logger.log("sending message: %s%n", responseMessage.getOntology());
+				Logger.log("sending message: %s%n", scheduleStepMessage.getOntology());
 			} catch (IOException | InvalidDBNamespaceException | GeneralMongoException e) {
 				e.printStackTrace();
 				equipletAgent.doDelete();

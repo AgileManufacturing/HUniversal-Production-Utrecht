@@ -50,6 +50,7 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
 
@@ -92,7 +93,7 @@ public class ServiceAgentDied extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		System.out.format("%s received message from %s%n", myAgent.getLocalName(), message
+		Logger.log("%s received message from %s%n", myAgent.getLocalName(), message
 				.getSender().getLocalName(), message.getOntology());
 		equipletAgent.takeDown();
 	}

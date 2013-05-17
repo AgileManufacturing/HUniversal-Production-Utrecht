@@ -58,6 +58,7 @@ import org.bson.types.ObjectId;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.ScheduleData;
@@ -109,7 +110,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		System.out.format("%s received message from %s%n", myAgent.getLocalName(), message
+		Logger.log("%s received message from %s%n", myAgent.getLocalName(), message
 				.getSender().getLocalName(), message.getOntology());
 
 		ProductionStep productStep = null;

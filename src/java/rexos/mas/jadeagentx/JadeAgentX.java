@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import com.mongodb.BasicDBObject;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.log.Logger;
 import rexos.mas.data.Position;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
@@ -57,7 +58,7 @@ public class JadeAgentX extends Agent {
 	@Override
 	protected void setup() {
 		try {
-			System.out.println("starting a agent");
+			Logger.log("starting a agent");
 
 			/**
 			 * Make a new logistics agent

@@ -60,6 +60,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.Position;
 import rexos.mas.data.ScheduleData;
@@ -116,17 +117,16 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 
 				HashMap<Integer, Position> parameters = (HashMap<Integer, Position>) message.getContentObject();
 
-				System.out.format("%s got partsInfo: %s%n", agent.getLocalName(), parameters.toString());
+				Logger.log("%s got partsInfo: %s%n", agent.getLocalName(), parameters.toString());
 
-				ServiceStepMessage[] orderedSteps = ServiceStepMessage.sort(serviceSteps);
 				ServiceStepMessage[] parameterizedSteps =
-						agent.GetServiceForConvId(conversationId).updateParameters(parameters, orderedSteps);
+						agent.GetServiceForConvId(conversationId).updateParameters(parameters, serviceSteps);
 
 				ACLMessage informMsg = new ACLMessage(ACLMessage.INFORM);
 				informMsg.setOntology("FillPlaceholders");
 				informMsg.setConversationId(message.getConversationId());
 				informMsg.addReceiver(agent.getHardwareAgentAID());
-				
+
 				ScheduleData scheduleData;
 				int nextStartTime = productStep.getScheduleData().getStartTime();
 				for(ServiceStepMessage serviceStep : parameterizedSteps) {
@@ -138,7 +138,7 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 
 					agent.getServiceStepBBClient().updateDocuments(new BasicDBObject("_id", serviceStep.getId()),
 							new BasicDBObject("$set", serviceStep.toBasicDBObject()));
-					
+
 					informMsg.setContentObject(serviceStep.getId());
 					agent.send(informMsg);
 				}
@@ -151,7 +151,7 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 			}
 		} else {
 			// TODO handle timeout
-			System.out.println(agent.getName() + " - GetPartsInfoResponse timeout!");
+			Logger.log(agent.getName() + " - GetPartsInfoResponse timeout!");
 			agent.doDelete();
 		}
 	}

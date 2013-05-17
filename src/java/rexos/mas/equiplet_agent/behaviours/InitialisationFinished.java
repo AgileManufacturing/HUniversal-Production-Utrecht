@@ -54,6 +54,7 @@ import jade.lang.acl.MessageTemplate;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.EquipletDirectoryMessage;
@@ -100,7 +101,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
-			System.out.format("%s received message from %s%n", myAgent.getLocalName(), message.getSender()
+			Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender()
 					.getLocalName(), message.getOntology());
 
 			// inserts himself on the collective blackboard equiplet directory.
@@ -127,7 +128,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 			equipletAgent.addBehaviour(new StartStep(equipletAgent, equipletAgent.getEquipletBBClient()));
 		} else {
 			// TODO handle timeout
-			System.out.println(equipletAgent.getName() + " - InitialisationFinished timeout!");
+			Logger.log(equipletAgent.getName() + " - InitialisationFinished timeout!");
 			equipletAgent.doDelete();
 		}
 	}

@@ -39,6 +39,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.equiplet_agent.StepStatusCode;
@@ -86,7 +87,7 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
-				System.out.format("%s ArePartsAvailableResponse%n",
+				Logger.log("%s ArePartsAvailableResponse%n",
 						agent.getLocalName());
 				if (message.getPerformative() == ACLMessage.CONFIRM) {
 					ACLMessage sendMsg = message.createReply();
@@ -112,7 +113,7 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 			}
 		} else {
 			// TODO handle timeout
-			System.out.println(agent.getName() + " - ArePartsAvailableResponse timeout!");
+			Logger.log(agent.getName() + " - ArePartsAvailableResponse timeout!");
 			agent.doDelete();
 		}
 	}

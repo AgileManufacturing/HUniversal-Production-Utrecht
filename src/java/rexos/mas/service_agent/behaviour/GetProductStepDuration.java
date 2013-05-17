@@ -9,6 +9,7 @@ import org.bson.types.ObjectId;
 
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.service_agent.Service;
@@ -34,36 +35,29 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 		agent = (ServiceAgent) a;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage)
-	 */
+	/* (non-Javadoc)
+	 * @see behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage) */
 	@Override
 	public void handle(ACLMessage message) {
 		try {
 			ObjectId productStepId = (ObjectId) message.getContentObject();
-			ProductStepMessage productStep = new ProductStepMessage(
-					(BasicDBObject) agent.getProductStepBBClient()
-							.findDocumentById(productStepId));
+			ProductStepMessage productStep =
+					new ProductStepMessage((BasicDBObject) agent.getProductStepBBClient().findDocumentById(
+							productStepId));
 			int productStepType = productStep.getType();
 
-			System.out.format(
-					"%s got message GetProductStepDuration for step type %s%n",
-					agent.getLocalName(), productStepType);
+			Logger.log("%s got message GetProductStepDuration for step type %s%n", agent.getLocalName(),
+					productStepType);
 
 			Service service = agent.GetServiceForConvId(message.getConversationId());
 			BasicDBObject parameters = productStep.getParameters();
-			ServiceStepMessage[] serviceSteps = service.getServiceSteps(
-					productStepType, parameters);
-			for (ServiceStepMessage serviceStep : serviceSteps) {
+			ServiceStepMessage[] serviceSteps = service.getServiceSteps(productStepType, parameters);
+			for(ServiceStepMessage serviceStep : serviceSteps) {
 				serviceStep.setProductStepId(productStepId);
 			}
 
-			agent.addBehaviour(new GetServiceDuration(agent, serviceSteps,
-					message.getConversationId()));
-		} catch (UnreadableException | InvalidDBNamespaceException
-				| GeneralMongoException e) {
+			agent.addBehaviour(new GetServiceDuration(agent, serviceSteps, message.getConversationId()));
+		} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException e) {
 			e.printStackTrace();
 			agent.doDelete();
 		}

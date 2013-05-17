@@ -35,6 +35,7 @@ import jade.lang.acl.MessageTemplate;
 
 import org.bson.types.ObjectId;
 
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
 
@@ -80,7 +81,7 @@ public class GetProductionDuration extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		System.out.format("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
+		Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
 		try {
 			//gets the productstepId and sends it to the service agent with the ontology GetProductionStepDuration.
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());

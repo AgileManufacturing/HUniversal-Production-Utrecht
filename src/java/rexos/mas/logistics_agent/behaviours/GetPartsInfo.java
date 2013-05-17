@@ -37,6 +37,7 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.data.Position;
 import rexos.mas.equiplet_agent.ProductStepMessage;
@@ -74,7 +75,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
-				System.out.format("%s GetPartsInfo%n", myAgent.getLocalName());
+				Logger.log("%s GetPartsInfo%n", myAgent.getLocalName());
 				Integer[] partIds = ((ProductStepMessage) message.getContentObject()).getInputPartTypes();
 				HashMap<Integer, Position> partsParameters = new HashMap<Integer, Position>();
 

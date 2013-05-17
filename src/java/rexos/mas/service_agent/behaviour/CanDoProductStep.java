@@ -15,6 +15,7 @@ import org.bson.types.ObjectId;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.knowledgedb_client.Queries;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.service_agent.Service;
@@ -57,7 +58,7 @@ public class CanDoProductStep extends ReceiveBehaviour {
 			int stepType = productStep.getType();
 			BasicDBObject parameters = productStep.getParameters();
 
-			System.out.format(
+			Logger.log(
 					"%s got message CanDoProductionStep for step type %s%n",
 					agent.getLocalName(), stepType);
 
@@ -86,7 +87,7 @@ public class CanDoProductStep extends ReceiveBehaviour {
 				reply.setPerformative(ACLMessage.DISCONFIRM);
 				reply.setOntology("CanDoProductionStepResponse");
 				getAgent().send(reply);
-				System.out.format("%s sending step availability (%b)%n",
+				Logger.log("%s sending step availability (%b)%n",
 						getAgent().getLocalName(),
 						reply.getPerformative() == ACLMessage.CONFIRM);
 			}

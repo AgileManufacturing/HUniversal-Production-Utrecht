@@ -33,6 +33,7 @@ package rexos.mas.service_agent.behaviour;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.service_agent.ServiceAgent;
 
@@ -75,11 +76,11 @@ public class CheckForModulesResponse extends ReceiveOnceBehaviour {
 			reply.setPerformative(message.getPerformative());
 			reply.setOntology("CanDoProductionStepResponse");
 			getAgent().send(reply);
-			System.out.format("%s sending step availability (%b)%n", getAgent()
+			Logger.log("%s sending step availability (%b)%n", getAgent()
 					.getLocalName(), message.getPerformative() == ACLMessage.CONFIRM);
 		} else {
 			// TODO handle timeout
-			System.out.println(agent.getName() + " - CheckForModulesResponse timeout!");
+			Logger.log(agent.getName() + " - CheckForModulesResponse timeout!");
 			agent.doDelete();
 		}
 	}
