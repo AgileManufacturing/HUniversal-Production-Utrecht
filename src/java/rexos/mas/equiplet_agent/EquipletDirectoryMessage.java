@@ -38,6 +38,9 @@ import rexos.mas.data.MongoSaveable;
 
 import com.mongodb.BasicDBObject;
 
+/**
+ * Represents an entry in the EquipletDirectory blackboard.
+ **/
 public class EquipletDirectoryMessage implements MongoSaveable {
 	/**
 	 * @var AID AID

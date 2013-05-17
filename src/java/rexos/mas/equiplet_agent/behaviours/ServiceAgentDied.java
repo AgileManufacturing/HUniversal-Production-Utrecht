@@ -56,28 +56,30 @@ import rexos.mas.equiplet_agent.EquipletAgent;
 /** The Class ServiceAgentDied. */
 public class ServiceAgentDied extends ReceiveBehaviour {
 	/**
-	 * @var static final long serialVersionUID The serial version UID for this
-	 *      class
+	 * @var static final long serialVersionUID
+	 *      The serial version UID for this class
 	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var MessageTemplate messageTemplate The messageTemplate this behaviour
-	 *      listens to. This behaviour listens to the ontology: ServiceAgentDied.
+	 * @var MessageTemplate messageTemplate
+	 *      The messageTemplate this behaviour listens to. This behaviour
+	 *      listens to the ontology: ServiceAgentDied.
 	 */
 	private static MessageTemplate messageTemplate = MessageTemplate
 			.MatchOntology("ServiceAgentDied");
 
 	/**
-	 * @var EquipletAgent equipletAgent The equipletAgent related to this
-	 *      behaviour.
+	 * @var EquipletAgent equipletAgent
+	 *      The equipletAgent related to this behaviour.
 	 */
 	private EquipletAgent equipletAgent;
 
 	/**
 	 * Instantiates a new service agent died.
 	 * 
-	 * @param a The agent for this behaviour
+	 * @param a
+	 *            The agent for this behaviour
 	 */
 	public ServiceAgentDied(Agent a) {
 		super(a, messageTemplate);
@@ -88,12 +90,14 @@ public class ServiceAgentDied extends ReceiveBehaviour {
 	 * Function to handle the incoming messages for this behaviour. Handles the
 	 * response when the service agent dies.
 	 * 
-	 * @param message The received message.
+	 * @param message
+	 *            The received message.
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		Logger.log("%s received message from %s (%s)%n", myAgent.getLocalName(), message
-				.getSender().getLocalName(), message.getOntology());
+		Logger.log("%s received message from %s (%s)%n",
+				myAgent.getLocalName(), message.getSender().getLocalName(),
+				message.getOntology());
 		equipletAgent.doDelete();
 	}
 }

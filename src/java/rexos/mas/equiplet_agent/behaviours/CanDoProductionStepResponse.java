@@ -50,20 +50,21 @@ import com.mongodb.BasicDBObject;
 public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 	/**
 	 * @var static final long serialVersionUID
-	 * The serial version UID for this class
+	 *      The serial version UID for this class
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * @var MessageTemplate messageTemplate
-	 * The messageTemplate this behaviour listens to.
-	 * This behaviour listens to the ontology: CanDoProductionStepResponse.
+	 *      The messageTemplate this behaviour listens to.
+	 *      This behaviour listens to the ontology: CanDoProductionStepResponse.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CanDoProductionStepResponse");
-	
+	private static MessageTemplate messageTemplate = MessageTemplate
+			.MatchOntology("CanDoProductionStepResponse");
+
 	/**
 	 * @var EquipletAgent equipletAgent
-	 * The equipletAgent related to this behaviour.
+	 *      The equipletAgent related to this behaviour.
 	 */
 	private EquipletAgent equipletAgent;
 	private BlackboardClient equipletBBClient;
@@ -71,9 +72,11 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 	/**
 	 * Instantiates a new can do production step response.
 	 * 
-	 * @param a - The agent for this behaviour
+	 * @param a
+	 *            - The agent for this behaviour
 	 */
-	public CanDoProductionStepResponse(Agent a, BlackboardClient equipletBBClient) {
+	public CanDoProductionStepResponse(Agent a,
+			BlackboardClient equipletBBClient) {
 		super(a, 5000, messageTemplate);
 		equipletAgent = (EquipletAgent) a;
 		this.equipletBBClient = equipletBBClient;
@@ -81,28 +84,40 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 
 	/**
 	 * Function to handle the incoming messages for this behaviour.
-	 * Handles the response to the CanPeformStep question and gives the result to the product agent.
+	 * Handles the response to the CanPeformStep question and gives the result
+	 * to the product agent.
 	 * 
-	 * @param message - The received message.
+	 * @param message
+	 *            - The received message.
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		if(message != null){
-			Logger.log("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
-	
-			ObjectId productStepEntryId = equipletAgent.getRelatedObjectId(message.getConversationId());
+		if (message != null) {
+			Logger.log("%s received message from %s (%s)%n",
+					myAgent.getLocalName(), message.getSender().getLocalName(),
+					message.getOntology());
+
+			ObjectId productStepEntryId = equipletAgent
+					.getRelatedObjectId(message.getConversationId());
 			try {
-				//gets the productstep from the blackboard to get the productAgent out of it.
-				ProductStepMessage productStep = new ProductStepMessage((BasicDBObject) equipletBBClient.findDocumentById(productStepEntryId));
+				// gets the productstep from the blackboard to get the
+				// productAgent out of it.
+				ProductStepMessage productStep = new ProductStepMessage(
+						(BasicDBObject) equipletBBClient
+								.findDocumentById(productStepEntryId));
 				AID productAgent = productStep.getProductAgentId();
-				//sends a message to the productAgent to answer to the question CanPerformStep.
-				ACLMessage responseMessage = new ACLMessage(message.getPerformative());
+				// sends a message to the productAgent to answer to the question
+				// CanPerformStep.
+				ACLMessage responseMessage = new ACLMessage(
+						message.getPerformative());
 				responseMessage.setConversationId(message.getConversationId());
 				responseMessage.setOntology("CanPerformStep");
 				responseMessage.addReceiver(productAgent);
-				if(message.getPerformative() == ACLMessage.DISCONFIRM) {
-					//if the productstep can not be done by this equiplet remove it.
-					equipletBBClient.removeDocuments(new BasicDBObject("_id", productStepEntryId));
+				if (message.getPerformative() == ACLMessage.DISCONFIRM) {
+					// if the productstep can not be done by this equiplet
+					// remove it.
+					equipletBBClient.removeDocuments(new BasicDBObject("_id",
+							productStepEntryId));
 				}
 				myAgent.send(responseMessage);
 			} catch (Exception e) {
