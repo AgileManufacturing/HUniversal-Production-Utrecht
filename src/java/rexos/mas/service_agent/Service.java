@@ -33,8 +33,10 @@
 package rexos.mas.service_agent;
 
 import java.util.HashMap;
-import com.mongodb.BasicDBObject;
+
 import rexos.mas.data.Position;
+
+import com.mongodb.BasicDBObject;
 
 /**
  * Instances of subclasses of this interface represent different services a

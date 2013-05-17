@@ -88,7 +88,7 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
-				System.out.format("%s ArePartsAvailableResponse%n",
+				Logger.log("%s ArePartsAvailableResponse%n",
 						agent.getLocalName());
 				if (message.getPerformative() == ACLMessage.CONFIRM) {
 					ACLMessage sendMsg = message.createReply();
@@ -114,7 +114,7 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 			}
 		} else {
 			// TODO handle timeout
-			System.out.println(agent.getName() + " - ArePartsAvailableResponse timeout!");
+			Logger.log(agent.getName() + " - ArePartsAvailableResponse timeout!");
 			agent.doDelete();
 		}
 	}

@@ -77,8 +77,7 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 	/**
 	 * @param a
 	 */
-	public ArePartsAvailableInTimeResponse(Agent a, String conversationId,
-			ProductStepMessage productStep) {
+	public ArePartsAvailableInTimeResponse(Agent a, String conversationId, ProductStepMessage productStep) {
 		this(a, 2000, conversationId, productStep);
 	}
 
@@ -86,8 +85,7 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 	 * @param a
 	 * @param millis
 	 */
-	public ArePartsAvailableInTimeResponse(Agent a, int millis, String conversationId,
-			ProductStepMessage productStep) {
+	public ArePartsAvailableInTimeResponse(Agent a, int millis, String conversationId, ProductStepMessage productStep) {
 		super(a, millis, MessageTemplate.and(MessageTemplate.MatchConversationId(conversationId),
 				MessageTemplate.MatchOntology("ArePartsAvailableInTimeResponse")));
 		agent = (ServiceAgent) a;
@@ -102,7 +100,7 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if(message != null) {
 			try {
-				System.out.format("%s ArePartsAvailableInTimeResponse%n", agent.getLocalName());
+				Logger.log("%s ArePartsAvailableInTimeResponse%n", agent.getLocalName());
 				if(message.getPerformative() == ACLMessage.CONFIRM) {
 					ACLMessage sendMsg = message.createReply();
 					sendMsg.setOntology("GetPartsInfo");
@@ -114,9 +112,8 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 				} else {
 					agent.getProductStepBBClient().updateDocuments(
 							new BasicDBObject("_id", productStep.get_id()),
-							new BasicDBObject("$set", new BasicDBObject("status",
-									StepStatusCode.ABORTED.name()).append("statusData",
-									new BasicDBObject("reason",
+							new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name())
+									.append("statusData", new BasicDBObject("reason",
 											"productStep cannot be delivered on time"))));
 				}
 			} catch(IOException | InvalidDBNamespaceException | GeneralMongoException e) {
@@ -125,7 +122,7 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 			}
 		} else {
 			// TODO handle timeout
-			System.out.println(agent.getName() + " - ArePartsAvailableInTimeReponse timeout!");
+			Logger.log(agent.getName() + " - ArePartsAvailableInTimeReponse timeout!");
 			agent.doDelete();
 		}
 	}

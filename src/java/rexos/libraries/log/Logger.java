@@ -43,6 +43,12 @@ public class Logger {
 		return debugEnabled;
 	}
 	
+	public static void log(Object obj) {
+		if (debugEnabled) {
+			outStream.println(obj.toString());
+		}
+	}
+	
 	public static void log(String msg) {
 		if (debugEnabled) {
 			outStream.println(msg);

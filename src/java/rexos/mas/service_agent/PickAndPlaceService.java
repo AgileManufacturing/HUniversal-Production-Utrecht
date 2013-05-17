@@ -65,7 +65,6 @@ public class PickAndPlaceService implements Service {
 	private KnowledgeDBClient client;
 	private static final int ID = 1;
 	private static final String NAME = "huniplacer pick&place";
-	private int saveMovementPlane = 6;
 
 	/**
 	 * @see rexos.mas.service_agent.Service#getModuleIds(int,
@@ -97,17 +96,14 @@ public class PickAndPlaceService implements Service {
 		double inputPartSize = 0.5;// TODO: FROM KNOWLEDGE DB
 
 		BasicDBObject pickParameters = new BasicDBObject();
-		pickParameters.put("InputPart", part);
-		pickParameters.put("Position", new Position().toBasicDBObject());
-		pickParameters.put("SaveMovementPlane", new BasicDBObject("Height", saveMovementPlane).put("RelativeTo", null));
+		pickParameters.put("part", part);
+		pickParameters.put("position", new Position().toBasicDBObject());
 
 		Position position = new Position((BasicDBObject) parameters.get("position"));
 		position.setZ(position.getZ() + inputPartSize);
 		BasicDBObject placeParameters = new BasicDBObject();
-		placeParameters.put("InputPart", part);
-		placeParameters.put("Position", position.toBasicDBObject());
-		placeParameters
-				.put("SaveMovementPlane", new BasicDBObject("Height", saveMovementPlane).put("RelativeTo", part));
+		placeParameters.put("part", part);
+		placeParameters.put("position", position.toBasicDBObject());
 
 		return new ServiceStepMessage[] {
 				new ServiceStepMessage(ID, 1, pickParameters, StepStatusCode.EVALUATING, null, new ScheduleData()),
@@ -123,10 +119,14 @@ public class PickAndPlaceService implements Service {
 	@Override
 	public ServiceStepMessage[] updateParameters(HashMap<Integer, Position> partParameters,
 			ServiceStepMessage[] serviceSteps) {
-		BasicDBObject pickParameters = serviceSteps[0].getParameters();
-		pickParameters.putAll((LinkedHashMap<String, Object>) new BasicDBObject("Position", partParameters.get(
-				pickParameters.getInt("InputPart")).toBasicDBObject()));
-		serviceSteps[0].setParameters(pickParameters);
+		int indexPickStep = 0;
+		if(serviceSteps[0].getType() == 2)
+			indexPickStep = 1;
+
+		BasicDBObject pickParameters = serviceSteps[indexPickStep].getParameters();
+		pickParameters.putAll((LinkedHashMap<String, Object>) new BasicDBObject("position", partParameters.get(
+				pickParameters.getInt("part")).toBasicDBObject()));
+		serviceSteps[indexPickStep].setParameters(pickParameters);
 		return serviceSteps;
 	}
 

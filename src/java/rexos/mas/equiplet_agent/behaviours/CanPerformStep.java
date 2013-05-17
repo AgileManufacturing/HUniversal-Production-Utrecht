@@ -110,7 +110,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		System.out.format("%s received message from %s%n", myAgent.getLocalName(), message
+		Logger.log("%s received message from %s%n", myAgent.getLocalName(), message
 				.getSender().getLocalName(), message.getOntology());
 
 		ProductionStep productStep = null;

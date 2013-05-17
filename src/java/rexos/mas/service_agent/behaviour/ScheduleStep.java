@@ -38,7 +38,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
-				System.out.format("%s scheduling step with Logistics%n", agent.getLocalName());
+				Logger.log("%s scheduling step with Logistics%n", agent.getLocalName());
 				
 				ProductStepMessage productStep = new ProductStepMessage(
 						(BasicDBObject) agent.getProductStepBBClient()

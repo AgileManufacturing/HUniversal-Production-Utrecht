@@ -35,7 +35,7 @@ public class FillPlaceholders extends ReceiveBehaviour {
 	 *            the a
 	 */
 	public FillPlaceholders(Agent a, ModuleFactory moduleFactory) {
-		super(a, -1, messageTemplate);
+		super(a, messageTemplate);
 		hardwareAgent = (HardwareAgent) a;
 		this.moduleFactory = moduleFactory;
 	}
@@ -47,40 +47,43 @@ public class FillPlaceholders extends ReceiveBehaviour {
 
 		try {
 			contentObject = message.getContentObject();
-		} catch (UnreadableException e) {
-			// System.out.println("Exception Caught, No Content Object Given");
+		} catch(UnreadableException e) {
+			// Logger.log("Exception Caught, No Content Object Given");
 		}
-		System.out.format("%s received message from %s (%s:%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
+		Logger.log("%s received message from %s (%s:%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(),
+				message.getOntology(), contentObject == null ? contentString : contentObject);
 
 		try {
 			ObjectId objectId = null;
 			ServiceStepMessage serviceStep = null;
 			try {
 				objectId = (ObjectId) message.getContentObject();
-				serviceStep = new ServiceStepMessage((BasicDBObject)hardwareAgent.getServiceStepsBBClient().findDocumentById(objectId));
+				serviceStep =
+						new ServiceStepMessage((BasicDBObject) hardwareAgent.getServiceStepsBBClient()
+								.findDocumentById(objectId));
 				BlackboardClient equipletStepBBClient = hardwareAgent.getEquipletStepsBBClient();
 				BasicDBObject query = new BasicDBObject("serviceStepID", serviceStep.getId());
-				
+
 				List<DBObject> steps = equipletStepBBClient.findDocuments(query);
 				EquipletStepMessage[] equipletSteps = new EquipletStepMessage[steps.size()];
-				for(int i = 0; i < steps.size(); i++){
-					equipletSteps[i] = new EquipletStepMessage((BasicDBObject)steps.get(i));
+				for(int i = 0; i < steps.size(); i++) {
+					equipletSteps[i] = new EquipletStepMessage((BasicDBObject) steps.get(i));
 				}
-				
+
 				int leadingModule = hardwareAgent.getLeadingModule(serviceStep.getServiceId());
 				Module module = moduleFactory.getModuleById(leadingModule);
 				module.setConfiguration(hardwareAgent.getConfiguration());
-				
+
 				equipletSteps = module.fillPlaceHolders(equipletSteps, serviceStep.getParameters());
-				for(EquipletStepMessage step : equipletSteps){
-					equipletStepBBClient.updateDocuments(new BasicDBObject("_id", step.getId()),
-							step.toBasicDBObject());
-				}				
-			} catch (UnreadableException | InvalidDBNamespaceException e) {
+				for(EquipletStepMessage step : equipletSteps) {
+					equipletStepBBClient
+							.updateDocuments(new BasicDBObject("_id", step.getId()), step.toBasicDBObject());
+				}
+			} catch(UnreadableException | InvalidDBNamespaceException e) {
 				Logger.log(e);
 				myAgent.doDelete();
 			}
-		} catch (Exception e) {
+		} catch(Exception e) {
 			Logger.log(e);
 		}
 	}

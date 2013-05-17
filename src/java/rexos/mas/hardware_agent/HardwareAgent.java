@@ -103,7 +103,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 
 	@Override
 	public void setup() {
-		System.out.println("Hardware agent " + this + " reporting.");
+		Logger.log("Hardware agent " + this + " reporting.");
 		leadingModules = new HashMap<Integer, Integer>();
 
 		moduleFactory = new ModuleFactory();

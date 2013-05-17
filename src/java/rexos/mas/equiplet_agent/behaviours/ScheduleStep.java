@@ -87,7 +87,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		System.out.format("%s received message from %s%n", equipletAgent
+		Logger.log("%s received message from %s%n", equipletAgent
 				.getLocalName(), message.getSender().getLocalName(), message
 				.getOntology());
 
@@ -95,7 +95,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 		// step with logistics.
 		try {
 			int timeslot = Integer.parseInt(message.getContent());
-			System.out.format("scheduling step for timeslot %d%n", timeslot);
+			Logger.log("scheduling step for timeslot %d%n", timeslot);
 
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message
 					.getConversationId());

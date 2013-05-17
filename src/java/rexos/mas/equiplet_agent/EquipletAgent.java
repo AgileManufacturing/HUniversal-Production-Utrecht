@@ -194,7 +194,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 */
 	@Override
 	public void setup() {
-		System.out.println("I spawned as a equiplet agent.");
+		Logger.log("I spawned as a equiplet agent.");
 
 		// gets his IP and sets the equiplet blackboard IP.
 		try {
@@ -226,7 +226,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				takeDown();
 				Logger.log(e1);
 			}
-			System.out.format("%s %s%n", capabilities, equipletDbName);
+			Logger.log("%s %s%n", capabilities, equipletDbName);
 
 			dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 
@@ -341,7 +341,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				responseMessage.addReceiver(productStep.getProductAgentId());
 				responseMessage.setConversationId(conversationId);
 
-				System.out.println("status update: " + productStep.getStatus().toString());
+				Logger.log("status update: " + productStep.getStatus().toString());
 				switch (productStep.getStatus()) {
 				// Depending on the changed status fills in the
 				// responseMessage and sends it to the product agent.
@@ -357,7 +357,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 							timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 						}
 
-						// System.out.println("%s Sending ProductionDuration tot %s%n",
+						// Logger.log("%s Sending ProductionDuration tot %s%n",
 						// getAID(), );
 						responseMessage.setOntology("Planned");
 						responseMessage.setContentObject(scheduleData.getStartTime());

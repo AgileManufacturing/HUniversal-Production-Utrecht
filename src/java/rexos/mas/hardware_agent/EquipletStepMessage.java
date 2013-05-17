@@ -33,9 +33,11 @@
 package rexos.mas.hardware_agent;
 
 import org.bson.types.ObjectId;
-import com.mongodb.BasicDBObject;
+
 import rexos.mas.data.MongoSaveable;
 import rexos.mas.equiplet_agent.StepStatusCode;
+
+import com.mongodb.BasicDBObject;
 
 public class EquipletStepMessage implements MongoSaveable {
 	private ObjectId _id;
@@ -179,6 +181,6 @@ public class EquipletStepMessage implements MongoSaveable {
 		moduleId = object.getInt("moduleId");
 		instructionData = new InstructionData((BasicDBObject) object.get("instructionData"));
 		status = StepStatusCode.valueOf(object.getString("status"));
-		timeData = new TimeData(object.getInt("timeData"));	
+		timeData = new TimeData((BasicDBObject) object.get("timeData"));	
 	}
 }

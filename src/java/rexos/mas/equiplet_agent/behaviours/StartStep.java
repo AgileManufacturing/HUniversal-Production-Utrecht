@@ -104,9 +104,9 @@ public class StartStep extends ReceiveBehaviour {
 		try {
 			contentObject = message.getContentObject();
 		} catch (UnreadableException e) {
-			System.out.println("Exception Caught, No Content Object Given");
+			Logger.log("Exception Caught, No Content Object Given");
 		}
-		System.out.format("%s received message from %s (%s:%s)%n",
+		Logger.log("%s received message from %s (%s:%s)%n",
 				myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
 		
 		//Gets the productStepId and updates all the productsteps on the blackboard the status to waiting.

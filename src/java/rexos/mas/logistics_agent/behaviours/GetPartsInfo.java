@@ -76,7 +76,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
-				System.out.format("%s GetPartsInfo%n", myAgent.getLocalName());
+				Logger.log("%s GetPartsInfo%n", myAgent.getLocalName());
 				Integer[] partIds = ((ProductStepMessage) message.getContentObject()).getInputPartTypes();
 				HashMap<Integer, Position> partsParameters = new HashMap<Integer, Position>();
 

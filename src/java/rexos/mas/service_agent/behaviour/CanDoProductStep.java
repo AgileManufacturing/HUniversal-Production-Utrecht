@@ -57,7 +57,7 @@ public class CanDoProductStep extends ReceiveBehaviour {
 			int stepType = productStep.getType();
 			BasicDBObject parameters = productStep.getParameters();
 
-			System.out.format(
+			Logger.log(
 					"%s got message CanDoProductionStep for step type %s%n",
 					agent.getLocalName(), stepType);
 
@@ -86,7 +86,7 @@ public class CanDoProductStep extends ReceiveBehaviour {
 				reply.setPerformative(ACLMessage.DISCONFIRM);
 				reply.setOntology("CanDoProductionStepResponse");
 				getAgent().send(reply);
-				System.out.format("%s sending step availability (%b)%n",
+				Logger.log("%s sending step availability (%b)%n",
 						getAgent().getLocalName(),
 						reply.getPerformative() == ACLMessage.CONFIRM);
 			}

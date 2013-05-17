@@ -93,7 +93,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 							serviceStepId);
 
 			ServiceStepMessage serviceStep = new ServiceStepMessage(dbServiceStep);
-			System.out.format("%s received message from %s (%s:%s)%n", myAgent.getLocalName(),
+			Logger.log("%s received message from %s (%s:%s)%n", myAgent.getLocalName(),
 					message.getSender().getLocalName(), message.getOntology(), serviceStepId);
 
 			int stepDuration = 0;
@@ -110,7 +110,6 @@ public class EvaluateDuration extends ReceiveBehaviour {
 				equipletStep.setServiceStepID(serviceStepId);
 				equipletStep.setNextStepID(next);
 				next = equipletStepsBBClient.insertDocument(equipletStep.toBasicDBObject());
-				System.out.println(equipletStep.toString());
 			}
 			
 			ScheduleData schedule = serviceStep.getScheduleData();

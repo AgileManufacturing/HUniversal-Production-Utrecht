@@ -52,7 +52,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 * @see jade.core.Agent#setup() */
 	@Override
 	public void setup() {
-		System.out.println("I spawned as a service agent.");
+		Logger.log("I spawned as a service agent.");
 
 		// handle arguments given to this agent
 		Object[] args = getArguments();
