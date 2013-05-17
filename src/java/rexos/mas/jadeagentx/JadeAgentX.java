@@ -41,6 +41,7 @@ import java.util.ArrayList;
 
 import com.mongodb.BasicDBObject;
 
+import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.mas.data.Position;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
@@ -68,9 +69,11 @@ public class JadeAgentX extends Agent {
 			logisticsCon.start();
 			AID logisticsAID = new AID(logisticsCon.getName(), AID.ISGUID);
 
-			/**
-			 * Make a array list of capabilities
-			 */
+			//Empty the equiplet directory before starting the first equiplet agent
+			BlackboardClient collectiveBBClient = new BlackboardClient("145.89.191.131", 27017);
+			collectiveBBClient.setDatabase("CollectiveDb");
+			collectiveBBClient.setCollection("EquipletDirectory");
+			collectiveBBClient.removeDocuments(new BasicDBObject());
 
 			/**
 			 * make a new equipletagent to use.
@@ -110,6 +113,7 @@ public class JadeAgentX extends Agent {
 			 * want to pass our product!
 			 */
 
+			Thread.currentThread().sleep(1000);
 			Object[] args = new Object[1];
 			args[0] = product;
 

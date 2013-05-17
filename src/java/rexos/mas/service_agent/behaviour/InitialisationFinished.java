@@ -50,11 +50,11 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
-import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.service_agent.ServiceAgent;
 
 /** The Class InitialisationFinished. */
-public class InitialisationFinished extends ReceiveBehaviour {
+public class InitialisationFinished extends ReceiveOnceBehaviour {
 	/**
 	 * @var static final long serialVersionUID The serial version UID for this
 	 *      class
@@ -80,7 +80,7 @@ public class InitialisationFinished extends ReceiveBehaviour {
 	 * @param a The agent for this behaviour
 	 */
 	public InitialisationFinished(Agent a) {
-		super(a, messageTemplate);
+		super(a, 2000, messageTemplate);
 		serviceAgent = (ServiceAgent) a;
 	}
 
@@ -92,12 +92,18 @@ public class InitialisationFinished extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		System.out.format("%s received message from %s%n", myAgent.getLocalName(), message
-				.getSender().getLocalName(), message.getOntology());
-		
-		ACLMessage response = new ACLMessage(ACLMessage.CONFIRM);
-		response.addReceiver(serviceAgent.getEquipletAgentAID());
-		response.setOntology("InitialisationFinished");
-		serviceAgent.send(response);
+		if(message != null) {
+			System.out.format("%s received message from %s%n", myAgent.getLocalName(), message
+					.getSender().getLocalName(), message.getOntology());
+			
+			ACLMessage response = new ACLMessage(ACLMessage.CONFIRM);
+			response.addReceiver(serviceAgent.getEquipletAgentAID());
+			response.setOntology("InitialisationFinished");
+			serviceAgent.send(response);
+		} else {
+			//TODO handle timeout
+			System.out.println(serviceAgent.getName() + " - InitialisationFinished timeout!");
+			serviceAgent.doDelete();
+		}
 	}
 }

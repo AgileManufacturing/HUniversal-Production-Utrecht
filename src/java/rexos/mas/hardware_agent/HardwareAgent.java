@@ -140,8 +140,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		try {
 			client = KnowledgeDBClient.getClient();
 
-			Row[] rows = client.executeSelectQuery(
-					Queries.MODULES_PER_EQUIPLET, equipletAgentAID.getLocalName());
+			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgentAID.getLocalName());
 			for (Row row : rows) {
 				try {
 					int id = (int) row.get("module");
@@ -154,7 +153,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 				}
 			}
 		} catch (KnowledgeException e1) {
-			takeDown();
+			doDelete();
 			e1.printStackTrace();
 		}
 
