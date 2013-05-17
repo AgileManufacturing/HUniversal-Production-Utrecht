@@ -50,6 +50,7 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.service_agent.ServiceAgent;
 
@@ -93,7 +94,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
-			System.out.format("%s received message from %s%n", myAgent.getLocalName(), message
+			Logger.log("%s received message from %s%n", myAgent.getLocalName(), message
 					.getSender().getLocalName(), message.getOntology());
 			
 			ACLMessage response = new ACLMessage(ACLMessage.CONFIRM);
@@ -102,7 +103,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 			serviceAgent.send(response);
 		} else {
 			//TODO handle timeout
-			System.out.println(serviceAgent.getName() + " - InitialisationFinished timeout!");
+			Logger.log(serviceAgent.getName() + " - InitialisationFinished timeout!");
 			serviceAgent.doDelete();
 		}
 	}

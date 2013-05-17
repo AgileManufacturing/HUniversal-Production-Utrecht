@@ -61,6 +61,7 @@ import org.bson.types.ObjectId;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.ProductStepMessage;
@@ -107,7 +108,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 
 	@Override
 	public void onStart() {
-		System.out.format("%s asking %s for duration of %d steps%n", agent.getLocalName(), agent
+		Logger.log("%s asking %s for duration of %d steps%n", agent.getLocalName(), agent
 				.getHardwareAgentAID().getLocalName(), serviceSteps.size());
 
 		ObjectId serviceStepId = null;
@@ -147,7 +148,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 								.findDocumentById(productStepId));
 				ScheduleData scheduleData = serviceStep.getScheduleData();
 
-				System.out.format("%s step type %s will take %d%n", agent.getLocalName(),
+				Logger.log("%s step type %s will take %d%n", agent.getLocalName(),
 						serviceStep.getType(), scheduleData.getDuration());
 
 				duration += scheduleData.getDuration();
@@ -159,7 +160,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 							new BasicDBObject("$set", new BasicDBObject("scheduleData",
 									scheduleData.toBasicDBObject())));
 
-					System.out.format("Saving duration of %d in prod. step %s%n", duration,
+					Logger.log("Saving duration of %d in prod. step %s%n", duration,
 							productStepId);
 
 					ACLMessage answer = new ACLMessage(ACLMessage.INFORM);
@@ -168,7 +169,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 					answer.setOntology("ProductionDurationResponse");
 					agent.send(answer);
 
-					System.out.format("%s sending msg (%s)%n", myAgent.getLocalName(), answer.getOntology());
+					Logger.log("%s sending msg (%s)%n", myAgent.getLocalName(), answer.getOntology());
 
 					agent.removeBehaviour(this);
 				}
@@ -177,7 +178,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 			}
 		} else {
 			// TODO handle timeout
-			System.out.println(agent.getName() + " - GetServiceStepDurationResponse timeout!");
+			Logger.log(agent.getName() + " - GetServiceStepDurationResponse timeout!");
 			agent.doDelete();
 		}
 	}

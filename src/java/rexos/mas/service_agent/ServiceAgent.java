@@ -18,6 +18,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
+import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.equiplet_agent.StepStatusCode;
@@ -51,7 +52,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 * @see jade.core.Agent#setup() */
 	@Override
 	public void setup() {
-		System.out.println("I spawned as a service agent.");
+		Logger.log("I spawned as a service agent.");
 
 		// handle arguments given to this agent
 		Object[] args = getArguments();

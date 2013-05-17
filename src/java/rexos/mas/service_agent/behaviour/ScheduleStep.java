@@ -13,6 +13,7 @@ import jade.lang.acl.UnreadableException;
 
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.service_agent.ServiceAgent;
@@ -37,7 +38,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
-				System.out.format("%s scheduling step with Logistics%n", agent.getLocalName());
+				Logger.log("%s scheduling step with Logistics%n", agent.getLocalName());
 				
 				ProductStepMessage productStep = new ProductStepMessage(
 						(BasicDBObject) agent.getProductStepBBClient()
