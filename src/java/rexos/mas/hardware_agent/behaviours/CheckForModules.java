@@ -53,17 +53,20 @@ import rexos.mas.hardware_agent.HardwareAgent;
  */
 public class CheckForModules extends ReceiveBehaviour {
 	/**
-	 * @var long serialVersionUID SerialUID for this class.
+	 * @var long serialVersionUID
+	 * The serialVersionUID.
 	 **/
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var MessageTemplate messageTemplate Contains the MessageTemplate to match.
+	 * @var MessageTemplate messageTemplate
+	 * Contains the MessageTemplate to match.
 	 */
 	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CheckForModules");
 	
 	/**
-	 * @var HardwareAgent hardwareAgent The hardwareAgent for this behaviour.
+	 * @var HardwareAgent hardwareAgent
+	 * The hardwareAgent for this behaviour.
 	 */
 	private HardwareAgent hardwareAgent;
 

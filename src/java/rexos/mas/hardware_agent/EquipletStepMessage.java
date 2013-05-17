@@ -44,31 +44,38 @@ import com.mongodb.BasicDBObject;
  */
 public class EquipletStepMessage implements MongoSaveable {
 	/**
-	 * @var ObjectId _id The id of this step..
+	 * @var ObjectId _id
+	 * The id of this step.
 	 */
 	private ObjectId _id;
 	/**
-	 * @var ObjectId serviceStepId The id of the service step related to this step.
+	 * @var ObjectId serviceStepId
+	 * The id of the service step related to this step.
 	 */
 	private ObjectId serviceStepID;
 	/**
-	 * @var ObjectId nextStep The id of the next step for the same service.
+	 * @var ObjectId nextStep
+	 * The id of the next step for the same service.
 	 */
 	private ObjectId nextStep;
 	/**
-	 * @var int moduleId The id of the module that created this step.
+	 * @var int moduleId
+	 * The id of the module that created this step.
 	 */
 	private int moduleId;
 	/**
-	 * @var InstructionData instructionData The instruction data for this step.
+	 * @var InstructionData instructionData
+	 * The instruction data for this step.
 	 */
 	private InstructionData instructionData;
 	/**
-	 * @var StepStatusCode status The status of this step.
+	 * @var StepStatusCode status
+	 * The status of this step.
 	 */
 	private StepStatusCode status;
 	/**
-	 * @var TimeData timeData The time data of this step.
+	 * @var TimeData timeData
+	 * The time data of this step.
 	 */
 	private TimeData timeData;
 

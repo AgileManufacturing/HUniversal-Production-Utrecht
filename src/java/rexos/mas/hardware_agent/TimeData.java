@@ -38,13 +38,14 @@ import com.mongodb.BasicDBObject;
  */
 public class TimeData implements MongoSaveable {
 	/**
-	 * @var int duration the length of duration
+	 * @var int duration
+	 * The duration in timeslots
 	 */
 	public int duration;
 
 	/**
 	 * Constructor
-	 * @param duration
+	 * @param duration The duration in timeslots
 	 */
 	public TimeData(int duration) {
 		this.duration = duration;
@@ -70,8 +71,7 @@ public class TimeData implements MongoSaveable {
 
 	/**
 	 * setter to set the duration
-	 * 
-	 * @param duration
+	 * @param duration The duration in timeslots
 	 */
 	public void setDuration(int duration) {
 

@@ -75,22 +75,26 @@ import com.mongodb.BasicDBObject;
  */
 public class EvaluateDuration extends ReceiveBehaviour {
 	/**
-	 * @var long serialVersionUID The serialVersionUID
+	 * @var long serialVersionUID
+	 * The serialVersionUID
 	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var MessageTemplate messageTemplate The messageTemplate to match the messages.
+	 * @var MessageTemplate messageTemplate
+	 * The messageTemplate to match the messages.
 	 */
 	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("GetServiceStepDuration");
 	
 	/**
-	 * @var HardwareAgent hardwareAgent The hardwareAgent of this behaviour.
+	 * @var HardwareAgent hardwareAgent
+	 * The hardwareAgent of this behaviour.
 	 */
 	private HardwareAgent hardwareAgent;
 	
 	/**
-	 * @var ModuleFactory moduleFactory The moduleFactory for this behaviour. 
+	 * @var ModuleFactory moduleFactory
+	 * The moduleFactory for this behaviour. 
 	 */
 	private ModuleFactory moduleFactory;
 

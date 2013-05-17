@@ -54,9 +54,6 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 
 import java.util.HashMap;
-
-import org.bson.types.ObjectId;
-
 import rexos.libraries.blackboard_client.BasicOperationSubscription;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.BlackboardSubscriber;
@@ -76,54 +73,62 @@ import rexos.mas.hardware_agent.behaviours.CheckForModules;
 import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
 import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 
 /**
  * HardwareAgent that communicates with the service agent and creates the messages for the Hardware layer.
  */
 public class HardwareAgent extends Agent implements BlackboardSubscriber, ModuleUpdateListener {
 	/**
-	 * @var long serialVersionUID The serial version UID.
+	 * @var long serialVersionUID
+	 * The serial version UID.
 	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var BlackboardClient serviceStepBBClient The blackboard client for the serviceStep blackboard.
+	 * @var BlackboardClient serviceStepBBClient
+	 * The blackboard client for the serviceStep blackboard.
 	 */
 	private BlackboardClient serviceStepBBClient; 
 	
 	/**
-	 * @var BlackboardClient equipletStepBBClient The blackboard client for the equipletStep blackboard
+	 * @var BlackboardClient equipletStepBBClient
+	 * The blackboard client for the equipletStep blackboard
 	 */
 	private BlackboardClient equipletStepBBClient;
 	
 	/**
-	 * @var DbData dbData The DbData of this equiplet.
+	 * @var DbData dbData
+	 * The DbData of this equiplet.
 	 */
 	private DbData dbData;
 	
 	/**
-	 * @var HashMap<Integer, Integer> leadingModules A HashMap containing the leadingModules per step.
+	 * @var HashMap<Integer, Integer> leadingModules
+	 * A HashMap containing the leadingModules per step.
 	 */
 	private HashMap<Integer, Integer> leadingModules;
 	
 	/**
-	 * @var ModuleFactory moduleFactory The moduleFactory of this agent.
+	 * @var ModuleFactory moduleFactory
+	 * The moduleFactory of this agent.
 	 */
 	private ModuleFactory moduleFactory;
 	
 	/**
-	 * @var AID equipletAgentAID The AID of the equipletAgent.
+	 * @var AID equipletAgentAID
+	 * The AID of the equipletAgent.
 	 */
 	private AID equipletAgentAID;
 	
 	/**
-	 * @var AID serviceAgentAID The AID of the serviceAgent.
+	 * @var AID serviceAgentAID
+	 * The AID of the serviceAgent.
 	 */
 	private AID serviceAgentAID;
 	
 	/**
-	 * @var HashMap<Integer, Object> configuration The configuration of this agent.
+	 * @var HashMap<Integer, Object> configuration
+	 * The configuration of this agent.
 	 */
 	private HashMap<Integer, Object> configuration;
 

@@ -62,12 +62,14 @@ import com.mongodb.BasicDBObject;
  */
 public class GripperModule extends Module {
 	/**
-	 * @var private static final int GRIPPER_SIZE A static value that contains the size of the gripper.
+	 * @var int GRIPPER_SIZE
+	 * A static value that contains the size of the gripper.
 	 */
 	private static final int GRIPPER_SIZE = 2;
 
 	/**
-	 * @var private Module movementModule The module that moves this module.
+	 * @var Module movementModule
+	 * The module that moves this module.
 	 */
 	private Module movementModule;
 

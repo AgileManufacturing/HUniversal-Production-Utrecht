@@ -39,23 +39,28 @@ import com.mongodb.BasicDBObject;
  **/
 public class InstructionData implements MongoSaveable {
 	/**
-	 * @var String command The command of the instruction. 
+	 * @var String command
+	 * The command of the instruction. 
 	 */
 	private String command;
 	/**
-	 * @var String destionation The destination of the instruction.(which module performs the instruction)
+	 * @var String destionation
+	 * The destination of the instruction.(which module performs the instruction)
 	 */
 	private String destination;
 	/**
-	 * @var String look_up The type of look_up for the instruction.(e.g. FIND_ID)
+	 * @var String look_up
+	 * The type of look_up for the instruction.(e.g. FIND_ID)
 	 */
 	private String look_up;
 	/**
-	 * @var BasicDBObject look_up_parameters The look_up_parameters for the look_up.(e.g. the id to look for)
+	 * @var BasicDBObject look_up_parameters
+	 * The look_up_parameters for the look_up.(e.g. the id to look for)
 	 */
 	private BasicDBObject look_up_parameters;
 	/**
-	 * @var BasicDBObject payload The extra parameters for the instruction.(e.g. the location)
+	 * @var BasicDBObject payload
+	 * The extra parameters for the instruction.(e.g. the location)
 	 */
 	private BasicDBObject payload;
 	

@@ -53,8 +53,22 @@ import java.util.HashMap;
 import com.mongodb.BasicDBObject;
 
 public abstract class Module {
+	/**
+	 * @var int id
+	 * The id of the module
+	 */
 	private int id;
+	
+	/**
+	 * @var ModuleFactory moduleFactory
+	 * The moduleFactory of the module.
+	 */
 	private ModuleFactory moduleFactory;
+	
+	/**
+	 * @var HashMap<Integer, Object> configuration
+	 * The configuration of the module.
+	 */
 	private HashMap<Integer, Object> configuration;
 
 	/**
