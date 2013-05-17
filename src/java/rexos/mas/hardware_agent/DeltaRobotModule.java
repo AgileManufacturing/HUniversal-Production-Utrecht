@@ -52,31 +52,55 @@ import rexos.mas.equiplet_agent.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 
+/**
+ * Module class that contains the functions for the deltarobot module.
+ */
 public class DeltaRobotModule extends Module {
+	/**
+	 * @var private static final double SAFE_MOVEMENT_PLANE A static value that contains the height of the safe movement plane.
+	 */
 	private static final double SAFE_MOVEMENT_PLANE = 6;
 
-	public DeltaRobotModule() {
-	}
+	/**
+	 * Empty Constructory
+	 */
+	public DeltaRobotModule() {}
 
+	/**
+	 * @see Module#getEquipletSteps(int, BasicDBObject)
+	 */
 	@Override
 	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters) {
+		//switch to determine which steps to make.
 		switch (stepType) {
-		case 1: // Move to savePlane
+		case 1: //case to move to the safe movement plane.
+			//returns the steps for moving to the safe movement plane.
 			return new EquipletStepMessage[] { moveToSafePlane(parameters) };
-		case 2: // MoveXY
+		case 2: //case to move on the x and y axis.
+			//returns the steps for the movement on the x and y axis.
 			return new EquipletStepMessage[] { moveXY(parameters) };
-		case 3: // MoveZ
+		case 3: //case to move on the z axis
+			//returns the steps for the movement on the z axis.
 			return new EquipletStepMessage[] { moveZ(parameters) };
 		default:
 			break;
 		}
+		//if this module can't handle the stepType return no steps.
 		return new EquipletStepMessage[0];
 	}
 
+	/**
+	 * @see Module#fillPlaceHolders(EquipletStepMessage[], BasicDBObject)
+	 */
 	@Override
 	public EquipletStepMessage[] fillPlaceHolders(EquipletStepMessage[] steps, BasicDBObject parameters) {
+		//get the new position parameters from the parameters
 		Position position = new Position((BasicDBObject) parameters.get("position"));
+		
+		//loop over the steps.
 		for (EquipletStepMessage step : steps) {
+			//get the lookUpParameters and the payload and
+			//replace the placeholders with real data.
 			InstructionData instructionData = step.getInstructionData();
 			BasicDBObject lookUpParameters = instructionData.getLookUpParameters();
 			BasicDBObject payload = instructionData.getPayload();
@@ -93,32 +117,56 @@ public class DeltaRobotModule extends Module {
 				payload.put("z", position.getZ());
 			}
 		}
+		//returns the filled in steps.
 		return steps;
 	}
 
+	/**
+	 * @see Module#isLeadingForSteps()
+	 */
 	@Override
 	public int[] isLeadingForSteps() {
 		return new int[] {};
 	}
 
+	/**
+	 * Function that builds the step for moving to the safe plane.
+	 * @param parameters The parameters to use by this step.
+	 * @return EquipletStepMessage to move to the safe plane.
+	 */
 	private EquipletStepMessage moveToSafePlane(BasicDBObject parameters) {
+		//get the extraSize from the parameters(e.g. Size of the module on this module)
 		double extraSize = parameters.getDouble("extraSize");
 
+		//create the lookUpParameters
 		BasicDBObject lookUpParameters = new BasicDBObject("ID", ((BasicDBObject) parameters.get("position")).get("relativeToPart"));
+		//create the payload
 		BasicDBObject payload = new BasicDBObject("z", extraSize + SAFE_MOVEMENT_PLANE);
+		//create the instruction data
 		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
+		//create an EquipletStepMessage and return it.
 		EquipletStepMessage step = new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(4));
 		return step;
 	}
 
+	/**
+	 * Function that builds the step for moving on the x and y axis.
+	 * @param parameters The parameters to use by this step. 
+	 * @return EquipletStepMessage to move on the x and y axis.
+	 */
 	private EquipletStepMessage moveXY(BasicDBObject parameters) {
+		//get the position parameters from the parameters.
 		Position position = new Position((BasicDBObject) parameters.get("position"));
+		
+		//fill in the lookUpParameters
 		BasicDBObject lookUpParameters = new BasicDBObject();
 		if (position.getRelativeToPart() == -1) {
 			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
 		} else {
 			lookUpParameters.put("ID", position.getRelativeToPart());
 		}
+		
+		//fill in the payload parameters
 		BasicDBObject payload = new BasicDBObject();
 		if (position.getX() == -1) {
 			payload.put("x", "X-PLACEHOLDER");
@@ -130,25 +178,40 @@ public class DeltaRobotModule extends Module {
 		} else {
 			payload.put("y", position.getY());
 		}
+		//create the instruction data.
 		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
+		//create the EquipletStepMessage and return it.
 		return new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(4));
 	}
 
+	/**
+	 * Function that builds the step for moving on the z axis.
+	 * @param parameters The parameters to use by this step.
+	 * @return EquipletStepMessage to move on the z axis.
+	 */
 	private EquipletStepMessage moveZ(BasicDBObject parameters) {
+		//get the position parameters from the parameters
 		Position position = new Position((BasicDBObject) parameters.get("position"));
+		
+		//fill in the lookUpParameters.
 		BasicDBObject lookUpParameters = new BasicDBObject();
 		if (position.getRelativeToPart() == -1) {
 			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
 		} else {
 			lookUpParameters.put("ID", position.getRelativeToPart());
 		}
+		
+		//fill in the payload parameters.
 		BasicDBObject payload = new BasicDBObject();
 		if (position.getZ() == -1) {
 			payload.put("z", "Z-PLACEHOLDER");
 		} else {
 			payload.put("z", position.getZ());
 		}
+		
+		//create the instruction data.
 		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
+		//create the EquipletStepMessage and return it. 
 		return new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(4));
 	}
 
