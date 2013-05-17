@@ -11,7 +11,7 @@ import com.mongodb.BasicDBObjectBuilder;
  * @author Peter Bonnema
  *
  */
-public class ScheduleData implements IMongoSaveable, Serializable {
+public class ScheduleData implements MongoSaveable, Serializable {
 	private static final long serialVersionUID = 8380622365668923276L;
 	private int startTime;
 	private int duration;

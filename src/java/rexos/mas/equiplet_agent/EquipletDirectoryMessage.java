@@ -34,11 +34,11 @@ import jade.core.AID;
 import java.util.ArrayList;
 
 import rexos.mas.data.DbData;
-import rexos.mas.data.IMongoSaveable;
+import rexos.mas.data.MongoSaveable;
 
 import com.mongodb.BasicDBObject;
 
-public class EquipletDirectoryMessage implements IMongoSaveable {
+public class EquipletDirectoryMessage implements MongoSaveable {
 	/**
 	 * @var AID AID
 	 * The AID of the equipletAgent

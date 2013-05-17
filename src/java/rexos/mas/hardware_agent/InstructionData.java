@@ -6,6 +6,7 @@ package rexos.mas.hardware_agent;
  * @date Created: 2013-04-24
  *
  * @author Thierry Gerritse
+ * @author Hessel Meulenbeld
  *
  * @section LICENSE
  * License: newBSD
@@ -32,9 +33,9 @@ package rexos.mas.hardware_agent;
 
 import com.mongodb.BasicDBObject;
 
-import rexos.mas.data.IMongoSaveable;
+import rexos.mas.data.MongoSaveable;
 
-public class InstructionData implements IMongoSaveable {
+public class InstructionData implements MongoSaveable {
 	private String command;
 	private String destination;
 	private String look_up;

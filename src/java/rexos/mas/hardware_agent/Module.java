@@ -4,6 +4,7 @@
  * @date Created: 2013-04-18
  * 
  * @author Thierry Gerritse
+ * @author Peter Bonnema
  * 
  * @section LICENSE
  *          License: newBSD

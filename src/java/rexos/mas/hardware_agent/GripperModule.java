@@ -4,6 +4,7 @@
  * @date Created: 12-04-13
  * 
  * @author Thierry Gerritse
+ * @author Hessel Meulenbeld
  * 
  * @section LICENSE
  *          License: newBSD
@@ -116,9 +117,11 @@ public class GripperModule extends Module {
 		int movementModuleId = findMovementModule(getConfiguration());
 		movementModule = getModuleFactory().getModuleById(movementModuleId);
 
+		
+		ArrayList<EquipletStepMessage> movementModuleSteps = new ArrayList<EquipletStepMessage>();
 		for (EquipletStepMessage step : steps) {
-			if (step.getModuleId() == movementModule.getId()) {
-				movementModule.fillPlaceHolders(new EquipletStepMessage[] { step }, parameters);
+			if (step.getModuleId() == movementModule.getId()){
+				movementModuleSteps.add(step);
 			} else {
 				InstructionData instructionData = step.getInstructionData();
 				BasicDBObject lookUpParameters = instructionData.getLookUpParameters();
@@ -127,6 +130,8 @@ public class GripperModule extends Module {
 				}
 			}
 		}
+		EquipletStepMessage[] temp = new EquipletStepMessage[movementModuleSteps.size()];
+		movementModule.fillPlaceHolders(movementModuleSteps.toArray(temp), parameters);
 		return steps;
 	}
 
