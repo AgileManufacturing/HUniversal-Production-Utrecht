@@ -119,14 +119,10 @@ public class PickAndPlaceService implements Service {
 	@Override
 	public ServiceStepMessage[] updateParameters(HashMap<Integer, Position> partParameters,
 			ServiceStepMessage[] serviceSteps) {
-		int indexPickStep = 0;
-		if(serviceSteps[0].getType() == 2)
-			indexPickStep = 1;
-
-		BasicDBObject pickParameters = serviceSteps[indexPickStep].getParameters();
+		BasicDBObject pickParameters = serviceSteps[0].getParameters();
 		pickParameters.putAll((LinkedHashMap<String, Object>) new BasicDBObject("position", partParameters.get(
 				pickParameters.getInt("part")).toBasicDBObject()));
-		serviceSteps[indexPickStep].setParameters(pickParameters);
+		serviceSteps[0].setParameters(pickParameters);
 		return serviceSteps;
 	}
 

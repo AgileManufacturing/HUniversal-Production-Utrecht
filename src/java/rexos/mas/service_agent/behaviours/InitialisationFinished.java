@@ -44,7 +44,7 @@
  *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *          SUCH DAMAGE.
  **/
-package rexos.mas.service_agent.behaviour;
+package rexos.mas.service_agent.behaviours;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;

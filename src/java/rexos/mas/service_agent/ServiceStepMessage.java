@@ -72,6 +72,11 @@ public class ServiceStepMessage implements MongoSaveable {
 	private ScheduleData scheduleData;
 
 	/**
+	 * 
+	 */
+	public ServiceStepMessage() {}
+
+	/**
 	 * @param serviceId
 	 * @param type
 	 * @param parameters
@@ -143,6 +148,10 @@ public class ServiceStepMessage implements MongoSaveable {
 		fromBasicDBObject(object);
 	}
 
+	/**
+	 * @param unsortedSteps
+	 * @return
+	 */
 	public static ServiceStepMessage[] sort(ServiceStepMessage[] unsortedSteps) {
 		// Find the first step
 		ServiceStepMessage firstServiceStep = null;

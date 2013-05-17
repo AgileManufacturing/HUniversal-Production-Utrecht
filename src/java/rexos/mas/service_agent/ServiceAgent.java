@@ -22,10 +22,10 @@ import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.equiplet_agent.StepStatusCode;
-import rexos.mas.service_agent.behaviour.CanDoProductStep;
-import rexos.mas.service_agent.behaviour.GetProductStepDuration;
-import rexos.mas.service_agent.behaviour.InitialisationFinished;
-import rexos.mas.service_agent.behaviour.ScheduleStep;
+import rexos.mas.service_agent.behaviours.CanDoProductStep;
+import rexos.mas.service_agent.behaviours.GetProductStepDuration;
+import rexos.mas.service_agent.behaviours.InitialisationFinished;
+import rexos.mas.service_agent.behaviours.ScheduleStep;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -117,6 +117,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		serviceStepBBClient.unsubscribe(statusSubscription);
 		try {
 			// serviceStepBBClient.removeDocuments(new BasicDBObject());
+			Logger.log("ServiceAgent takedown");
 
 			DBObject update =
 					BasicDBObjectBuilder.start("status", StepStatusCode.FAILED.name()).push("statusData")
@@ -126,7 +127,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 			message.addReceiver(equipletAgentAID);
 			message.addReceiver(hardwareAgentAID);
-			message.setOntology("serviceAgentDied");
+			message.setOntology("ServiceAgentDied");
 			send(message);
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 			Logger.log(e);

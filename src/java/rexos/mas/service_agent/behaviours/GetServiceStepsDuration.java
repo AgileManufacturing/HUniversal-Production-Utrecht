@@ -45,16 +45,12 @@
  *          SUCH DAMAGE.
  * 
  **/
-package rexos.mas.service_agent.behaviour;
+package rexos.mas.service_agent.behaviours;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 import org.bson.types.ObjectId;
 
@@ -62,7 +58,7 @@ import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
-import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.service_agent.ServiceAgent;
@@ -74,62 +70,32 @@ import com.mongodb.BasicDBObject;
  * @author Peter
  * 
  */
-public class GetServiceDuration extends ReceiveBehaviour {
+public class GetServiceStepsDuration extends ReceiveOnceBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	private String conversationId;
 	private ServiceAgent agent;
 
-	private List<ServiceStepMessage> serviceSteps;
-	private int duration = 0;
-	private int remainingServiceSteps;
-
 	/**
 	 * @param a
+	 * @param serviceSteps
+	 * @param conversationId
 	 */
-	public GetServiceDuration(Agent a, ServiceStepMessage[] serviceSteps, String conversationId) {
-		this(a, 2000, serviceSteps, conversationId);
+	public GetServiceStepsDuration(Agent a, String conversationId) {
+		this(a, 2000, conversationId);
 	}
 
 	/**
 	 * @param a
+	 * @param millis
+	 * @param serviceSteps
+	 * @param conversationId
 	 */
-	public GetServiceDuration(Agent a, int millis, ServiceStepMessage[] serviceSteps,
-			String conversationId) {
+	public GetServiceStepsDuration(Agent a, int millis, String conversationId) {
 		super(a, millis, MessageTemplate.and(MessageTemplate.MatchConversationId(conversationId),
 				MessageTemplate.MatchOntology("GetServiceStepDurationResponse")));
-
-		this.serviceSteps = Arrays.asList(serviceSteps);
-		this.conversationId = conversationId;
 		agent = (ServiceAgent) a;
-
-		remainingServiceSteps = serviceSteps.length;
-	}
-
-	@Override
-	public void onStart() {
-		Logger.log("%s asking %s for duration of %d steps%n", agent.getLocalName(), agent
-				.getHardwareAgentAID().getLocalName(), serviceSteps.size());
-
-		ObjectId serviceStepId = null;
-		ACLMessage message = new ACLMessage(ACLMessage.QUERY_IF);
-		message.addReceiver(agent.getHardwareAgentAID());
-		message.setOntology("GetServiceStepDuration");
-		message.setConversationId(conversationId);
-		try {
-			ServiceStepMessage serviceStep;
-			BlackboardClient serviceStepBB = agent.getServiceStepBBClient();
-			for(int i = serviceSteps.size() - 1; i >= 0; i--) {
-				serviceStep = serviceSteps.get(i);
-				serviceStep.setNextStep(serviceStepId);
-				serviceStepId = serviceStepBB.insertDocument(serviceStep.toBasicDBObject());
-				message.setContentObject(serviceStepId);
-				agent.send(message);
-			}
-		} catch(InvalidDBNamespaceException | GeneralMongoException | IOException e) {
-			Logger.log(e);
-			agent.doDelete();
-		}
+		this.conversationId = conversationId;
 	}
 
 	/* (non-Javadoc)
@@ -138,41 +104,34 @@ public class GetServiceDuration extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if(message != null) {
 			try {
-				ServiceStepMessage serviceStep =
-						new ServiceStepMessage((BasicDBObject) agent.getServiceStepBBClient()
-								.findDocumentById((ObjectId) message.getContentObject()));
+				BlackboardClient client = agent.getServiceStepBBClient();
+				ServiceStepMessage serviceStep = new ServiceStepMessage();
+				ObjectId nextStep = (ObjectId) message.getContentObject();
+				int duration = 0;
+				while(nextStep != null) {
+					serviceStep.fromBasicDBObject((BasicDBObject) client.findDocumentById(nextStep));
+					duration += serviceStep.getScheduleData().getDuration();
+					nextStep = serviceStep.getNextStep();
+				}
 
 				ObjectId productStepId = serviceStep.getProductStepId();
 				ProductStepMessage productStep =
-						new ProductStepMessage((BasicDBObject) agent.getProductStepBBClient()
-								.findDocumentById(productStepId));
-				ScheduleData scheduleData = serviceStep.getScheduleData();
+						new ProductStepMessage((BasicDBObject) agent.getProductStepBBClient().findDocumentById(
+								productStepId));
+				ScheduleData scheduleData = productStep.getScheduleData();
+				scheduleData.setDuration(duration);
 
-				Logger.log("%s step type %s will take %d%n", agent.getLocalName(),
-						serviceStep.getType(), scheduleData.getDuration());
+				Logger.log("Saving duration of %d in prod. step %s%n", duration, productStepId);
+				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
+						new BasicDBObject("$set", new BasicDBObject("scheduleData", scheduleData.toBasicDBObject())));
 
-				duration += scheduleData.getDuration();
-				if(--remainingServiceSteps == 0) {
-					scheduleData = productStep.getScheduleData();
-					scheduleData.setDuration(duration);
-					agent.getProductStepBBClient().updateDocuments(
-							new BasicDBObject("_id", productStepId),
-							new BasicDBObject("$set", new BasicDBObject("scheduleData",
-									scheduleData.toBasicDBObject())));
+				ACLMessage answer = new ACLMessage(ACLMessage.INFORM);
+				answer.addReceiver(agent.getEquipletAgentAID());
+				answer.setConversationId(conversationId);
+				answer.setOntology("ProductionDurationResponse");
+				agent.send(answer);
 
-					Logger.log("Saving duration of %d in prod. step %s%n", duration,
-							productStepId);
-
-					ACLMessage answer = new ACLMessage(ACLMessage.INFORM);
-					answer.addReceiver(agent.getEquipletAgentAID());
-					answer.setConversationId(conversationId);
-					answer.setOntology("ProductionDurationResponse");
-					agent.send(answer);
-
-					Logger.log("%s sending msg (%s)%n", myAgent.getLocalName(), answer.getOntology());
-
-					agent.removeBehaviour(this);
-				}
+				Logger.log("%s sending msg (%s)%n", myAgent.getLocalName(), answer.getOntology());
 			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {
 				Logger.log(e);
 			}

@@ -1,4 +1,6 @@
-package rexos.mas.service_agent.behaviour;
+package rexos.mas.service_agent.behaviours;
+
+import java.io.IOException;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
@@ -7,6 +9,7 @@ import jade.lang.acl.UnreadableException;
 
 import org.bson.types.ObjectId;
 
+import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
@@ -55,9 +58,27 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 			for(ServiceStepMessage serviceStep : serviceSteps) {
 				serviceStep.setProductStepId(productStepId);
 			}
+			
+			Logger.log("%s asking %s for duration of %d steps%n", agent.getLocalName(), agent.getHardwareAgentAID()
+					.getLocalName(), serviceSteps.length);
 
-			agent.addBehaviour(new GetServiceDuration(agent, serviceSteps, message.getConversationId()));
-		} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException e) {
+			ObjectId serviceStepId = null;
+			ACLMessage askMessage = new ACLMessage(ACLMessage.QUERY_IF);
+			askMessage.addReceiver(agent.getHardwareAgentAID());
+			askMessage.setOntology("GetServiceStepDuration");
+			askMessage.setConversationId(message.getConversationId());
+			ServiceStepMessage serviceStep;
+			BlackboardClient serviceStepBB = agent.getServiceStepBBClient();
+			for(int i = serviceSteps.length - 1; i >= 0; i--) {
+				serviceStep = serviceSteps[i];
+				serviceStep.setNextStep(serviceStepId);
+				serviceStepId = serviceStepBB.insertDocument(serviceStep.toBasicDBObject());
+			}
+			askMessage.setContentObject(serviceStepId);
+			agent.send(askMessage);
+
+			agent.addBehaviour(new GetServiceStepsDuration(agent, message.getConversationId()));
+		} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 			Logger.log(e);
 			agent.doDelete();
 		}
