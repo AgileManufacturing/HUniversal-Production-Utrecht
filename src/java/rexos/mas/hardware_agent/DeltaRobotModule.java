@@ -55,7 +55,8 @@ import com.mongodb.BasicDBObject;
 public class DeltaRobotModule extends Module {
 	private static final double SAFE_MOVEMENT_PLANE = 6;
 
-	public DeltaRobotModule() {}
+	public DeltaRobotModule() {
+	}
 
 	@Override
 	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters) {
@@ -82,13 +83,13 @@ public class DeltaRobotModule extends Module {
 			if (lookUpParameters.getString("ID").equals("RELATIVE-TO-PLACEHOLDER")) {
 				lookUpParameters.put("ID", position.getRelativeToPart());
 			}
-			if (payload.getString("x").equals("X-PLACEHOLDER")) {
+			if (payload.containsField("x") && payload.getString("x").equals("X-PLACEHOLDER")) {
 				payload.put("x", position.getX());
 			}
-			if (payload.getString("y").equals("Y-PLACEHOLDER")) {
+			if (payload.containsField("y") && payload.getString("y").equals("Y-PLACEHOLDER")) {
 				payload.put("y", position.getY());
 			}
-			if (payload.getString("z").equals("Z-PLACEHOLDER")) {
+			if (payload.containsField("z") && payload.getString("z").equals("Z-PLACEHOLDER")) {
 				payload.put("z", position.getZ());
 			}
 		}
@@ -102,8 +103,8 @@ public class DeltaRobotModule extends Module {
 
 	private EquipletStepMessage moveToSafePlane(BasicDBObject parameters) {
 		double extraSize = parameters.getDouble("extraSize");
-				
-		BasicDBObject lookUpParameters = new BasicDBObject("ID", ((BasicDBObject) parameters.get("Position")).get("relativeToPart"));
+
+		BasicDBObject lookUpParameters = new BasicDBObject("ID", ((BasicDBObject) parameters.get("position")).get("relativeToPart"));
 		BasicDBObject payload = new BasicDBObject("z", extraSize + SAFE_MOVEMENT_PLANE);
 		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
 		EquipletStepMessage step = new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(4));
@@ -111,7 +112,7 @@ public class DeltaRobotModule extends Module {
 	}
 
 	private EquipletStepMessage moveXY(BasicDBObject parameters) {
-		Position position = new Position((BasicDBObject) parameters.get("Position"));
+		Position position = new Position((BasicDBObject) parameters.get("position"));
 		BasicDBObject lookUpParameters = new BasicDBObject();
 		if (position.getRelativeToPart() == -1) {
 			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
@@ -134,7 +135,7 @@ public class DeltaRobotModule extends Module {
 	}
 
 	private EquipletStepMessage moveZ(BasicDBObject parameters) {
-		Position position = new Position((BasicDBObject) parameters.get("Position"));
+		Position position = new Position((BasicDBObject) parameters.get("position"));
 		BasicDBObject lookUpParameters = new BasicDBObject();
 		if (position.getRelativeToPart() == -1) {
 			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");

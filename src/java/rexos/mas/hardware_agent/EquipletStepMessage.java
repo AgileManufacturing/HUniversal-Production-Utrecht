@@ -179,6 +179,6 @@ public class EquipletStepMessage implements MongoSaveable {
 		moduleId = object.getInt("moduleId");
 		instructionData = new InstructionData((BasicDBObject) object.get("instructionData"));
 		status = StepStatusCode.valueOf(object.getString("status"));
-		timeData = new TimeData(object.getInt("timeData"));	
+		timeData = new TimeData((BasicDBObject) object.get("timeData"));	
 	}
 }

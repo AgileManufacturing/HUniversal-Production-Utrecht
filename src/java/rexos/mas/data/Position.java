@@ -111,10 +111,19 @@ public class Position implements Serializable, MongoSaveable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		x = object.getDouble("x");
-		y = object.getDouble("y");
-		z = object.getDouble("z");
-		relativeToPart = object.getInt("relativeToPart");
+		System.out.println(object);
+		if(object.containsField("x")){
+			x = object.getDouble("x");
+		}
+		if(object.containsField("y")){
+			y = object.getDouble("y");
+		}
+		if(object.containsField("z")){
+			z = object.getDouble("z");
+		}
+		if(object.containsField("relativeToPart")){
+			relativeToPart = object.getInt("relativeToPart");
+		}
 	}
 
 	/**
