@@ -50,10 +50,10 @@ package rexos.mas.equiplet_agent.behaviours;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.EquipletDirectoryMessage;
@@ -110,7 +110,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 			try {
 				collectiveBBClient.insertDocument(entry.toBasicDBObject());
 			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-				e.printStackTrace();
+				Logger.log(e);
 				equipletAgent.doDelete();
 			}
 

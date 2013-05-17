@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import rexos.libraries.blackboard_client.*;
+import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.log.Logger;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
@@ -67,7 +68,7 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 						.getEquipletsForProductionStep(PA_id).keySet(), ps);
 			}
 		} catch(Exception e){
-			e.printStackTrace();
+			Logger.log(e);
 		}
 	}
 

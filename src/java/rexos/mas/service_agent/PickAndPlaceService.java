@@ -49,11 +49,17 @@ package rexos.mas.service_agent;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import com.mongodb.BasicDBObject;
-import rexos.libraries.knowledgedb_client.*;
+import rexos.libraries.knowledgedb_client.KeyNotFoundException;
+import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
+import rexos.libraries.knowledgedb_client.KnowledgeException;
+import rexos.libraries.knowledgedb_client.Queries;
+import rexos.libraries.knowledgedb_client.Row;
+import rexos.libraries.log.Logger;
 import rexos.mas.data.Position;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.StepStatusCode;
+
+import com.mongodb.BasicDBObject;
 
 public class PickAndPlaceService implements Service {
 	private KnowledgeDBClient client;
@@ -76,7 +82,7 @@ public class PickAndPlaceService implements Service {
 			}
 			return moduleIds;
 		} catch(KnowledgeException | KeyNotFoundException e1) {
-			e1.printStackTrace();
+			Logger.log(e1);
 		}
 		return null;
 	}

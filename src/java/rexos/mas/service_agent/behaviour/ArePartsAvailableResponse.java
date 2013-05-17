@@ -30,19 +30,21 @@
  **/
 package rexos.mas.service_agent.behaviour;
 
-import java.io.IOException;
-
-import com.mongodb.BasicDBObject;
-
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+
+import java.io.IOException;
+
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.service_agent.ServiceAgent;
+
+import com.mongodb.BasicDBObject;
 
 /**
  * @author Peter
@@ -107,7 +109,7 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 				}
 			} catch (IOException | InvalidDBNamespaceException
 					| GeneralMongoException e) {
-				e.printStackTrace();
+				Logger.log(e);
 				agent.doDelete();
 			}
 		} else {

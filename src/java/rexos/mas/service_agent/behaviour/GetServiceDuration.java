@@ -61,6 +61,7 @@ import org.bson.types.ObjectId;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.ProductStepMessage;
@@ -126,7 +127,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 				agent.send(message);
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException | IOException e) {
-			e.printStackTrace();
+			Logger.log(e);
 			agent.doDelete();
 		}
 	}
@@ -173,7 +174,7 @@ public class GetServiceDuration extends ReceiveBehaviour {
 					agent.removeBehaviour(this);
 				}
 			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {
-				e.printStackTrace();
+				Logger.log(e);
 			}
 		} else {
 			// TODO handle timeout

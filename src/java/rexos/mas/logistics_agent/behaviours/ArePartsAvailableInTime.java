@@ -34,6 +34,7 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 
@@ -82,7 +83,7 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 
 				myAgent.addBehaviour(new GetPartsInfo(myAgent, message.getConversationId()));
 			} catch (UnreadableException e) {
-				e.printStackTrace();
+				Logger.log(e);
 				myAgent.doDelete();
 			}
 		} else {

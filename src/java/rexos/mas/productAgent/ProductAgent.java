@@ -1,12 +1,18 @@
 
 package rexos.mas.productAgent;
 
-import java.net.UnknownHostException;
-
 import jade.core.AID;
 import jade.core.Agent;
-import rexos.libraries.blackboard_client.*;
-import rexos.mas.data.*;
+
+import java.net.UnknownHostException;
+
+import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.blackboard_client.InvalidJSONException;
+import rexos.libraries.log.Logger;
+import rexos.mas.data.Product;
+import rexos.mas.data.ProductionStep;
 
 /**
  * @Author Alexander
@@ -72,7 +78,7 @@ public class ProductAgent extends Agent{
 			bbc.removeDocuments(aid.toString());
 		} catch (UnknownHostException | GeneralMongoException | InvalidJSONException | InvalidDBNamespaceException e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			Logger.log(e1);
 		}
 	}
 

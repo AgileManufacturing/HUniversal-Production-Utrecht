@@ -57,11 +57,24 @@ import java.util.HashMap;
 
 import org.bson.types.ObjectId;
 
-import rexos.libraries.blackboard_client.*;
+import rexos.libraries.blackboard_client.BasicOperationSubscription;
+import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.BlackboardSubscriber;
+import rexos.libraries.blackboard_client.FieldUpdateSubscription;
 import rexos.libraries.blackboard_client.FieldUpdateSubscription.MongoUpdateLogOperation;
-import rexos.libraries.knowledgedb_client.*;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.blackboard_client.MongoOperation;
+import rexos.libraries.blackboard_client.OplogEntry;
+import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
+import rexos.libraries.knowledgedb_client.KnowledgeException;
+import rexos.libraries.knowledgedb_client.Queries;
+import rexos.libraries.knowledgedb_client.Row;
+import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
-import rexos.mas.hardware_agent.behaviours.*;
+import rexos.mas.hardware_agent.behaviours.CheckForModules;
+import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
+import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
 import rexos.mas.service_agent.ServiceStepMessage;
 
 import com.mongodb.BasicDBObject;
@@ -122,7 +135,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			equipletStepBBClient.setCollection("EquipletStepsBlackBoard");
 			equipletStepBBClient.subscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.log(e);
 			doDelete();
 		}
 
@@ -154,7 +167,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			}
 		} catch (KnowledgeException e1) {
 			doDelete();
-			e1.printStackTrace();
+			Logger.log(e1);
 		}
 
 		ACLMessage startedMessage = new ACLMessage(ACLMessage.INFORM);
@@ -183,7 +196,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			equipletStepBBClient.removeDocuments(new BasicDBObject());
 			equipletStepBBClient.unsubscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
 		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
-			e.printStackTrace();
+			Logger.log(e);
 		}
 
 		ACLMessage deadMessage = new ACLMessage(ACLMessage.FAILURE);
@@ -217,7 +230,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 					}
 				} catch (InvalidDBNamespaceException | GeneralMongoException e1) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					Logger.log(e1);
 				}
 				break;
 			default:
@@ -231,7 +244,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 					DBObject equipletStep = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
 				} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 					// TODO Error no document
-					e.printStackTrace();
+					Logger.log(e);
 				}
 				break;
 			default:

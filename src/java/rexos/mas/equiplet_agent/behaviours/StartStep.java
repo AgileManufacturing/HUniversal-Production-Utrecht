@@ -40,6 +40,7 @@ import org.bson.types.ObjectId;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.EquipletAgent;
@@ -115,7 +116,7 @@ public class StartStep extends ReceiveBehaviour {
 					new BasicDBObject("_id", productStepId), 
 					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING)));			
 		} catch (InvalidDBNamespaceException | GeneralMongoException e1) {
-			e1.printStackTrace();
+			Logger.log(e1);
 		}
 		
 		//Get the next product step and set the timer for the next product step
@@ -130,7 +131,7 @@ public class StartStep extends ReceiveBehaviour {
 			}
 		} catch (Exception e) {
 			timer.setNextUsedTimeSlot(-1);
-		e.printStackTrace();
+		Logger.log(e);
 		}
 	}
 }

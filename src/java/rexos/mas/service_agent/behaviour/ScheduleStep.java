@@ -1,21 +1,22 @@
 package rexos.mas.service_agent.behaviour;
 
-import java.io.IOException;
-
-import org.bson.types.ObjectId;
-
-import com.mongodb.BasicDBObject;
-
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
+import java.io.IOException;
+
+import org.bson.types.ObjectId;
+
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.service_agent.ServiceAgent;
+
+import com.mongodb.BasicDBObject;
 
 public class ScheduleStep extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
@@ -55,7 +56,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 						.getConversationId(), productStep));
 			} catch (InvalidDBNamespaceException | GeneralMongoException
 					| UnreadableException | IOException e) {
-				e.printStackTrace();
+				Logger.log(e);
 				agent.doDelete();
 			}
 		}

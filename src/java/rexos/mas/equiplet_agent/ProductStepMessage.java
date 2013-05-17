@@ -46,11 +46,13 @@
  **/
 package rexos.mas.equiplet_agent;
 
+import jade.core.AID;
+
 import java.io.Serializable;
 
 import org.bson.types.ObjectId;
 
-import jade.core.AID;
+import rexos.libraries.log.Logger;
 import rexos.mas.data.MongoSaveable;
 import rexos.mas.data.ScheduleData;
 
@@ -333,7 +335,7 @@ public class ProductStepMessage implements MongoSaveable, Serializable {
 		try {
 			productAgentId = new AID((String) (object.get("productAgentId")), AID.ISGUID);
 		} catch(Exception e) {
-			e.printStackTrace();
+			Logger.log(e);
 		}
 		type = object.getInt("type");
 		parameters = (BasicDBObject) object.get("parameters");

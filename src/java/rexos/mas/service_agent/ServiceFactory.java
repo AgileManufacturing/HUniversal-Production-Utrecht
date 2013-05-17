@@ -40,6 +40,7 @@ import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
 import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
+import rexos.libraries.log.Logger;
 
 /**
  * 
@@ -72,7 +73,7 @@ public class ServiceFactory {
 			}
 		} catch (KnowledgeException | InstantiateClassException | KeyNotFoundException e) {
 			//TODO: Do something useful.
-			e.printStackTrace();
+			Logger.log(e);
 		}
 		
 		return service;
@@ -91,7 +92,7 @@ public class ServiceFactory {
 			}
 		} catch (KnowledgeException | KeyNotFoundException ex) {
 			// TODO Auto-generated catch block
-			ex.printStackTrace();
+			Logger.log(ex);
 		}
 		
 		Service[] services = new Service[servicesForStep.size()];

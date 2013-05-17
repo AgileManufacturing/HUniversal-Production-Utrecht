@@ -18,6 +18,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
+import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.equiplet_agent.StepStatusCode;
@@ -72,7 +73,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			hardwareAgentCnt.start();
 			hardwareAgentAID = new AID(hardwareAgentCnt.getName(), AID.ISGUID);
 		} catch(StaleProxyException e) {
-			e.printStackTrace();
+			Logger.log(e);
 			doDelete();
 		}
 
@@ -94,7 +95,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			serviceStepBBClient.subscribe(statusSubscription);
 			serviceStepBBClient.removeDocuments(new BasicDBObject());
 		} catch(UnknownHostException | GeneralMongoException | InvalidDBNamespaceException e) {
-			e.printStackTrace();
+			Logger.log(e);
 			doDelete();
 		}
 
@@ -128,7 +129,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			message.setOntology("serviceAgentDied");
 			send(message);
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			e.printStackTrace();
+			Logger.log(e);
 		}
 	}
 
@@ -214,7 +215,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					break;
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			e.printStackTrace();
+			Logger.log(e);
 			doDelete();
 		}
 	}

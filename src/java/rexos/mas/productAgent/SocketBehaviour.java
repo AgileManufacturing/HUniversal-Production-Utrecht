@@ -24,6 +24,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import rexos.libraries.log.Logger;
+
 public class SocketBehaviour extends CyclicBehaviour{
 	/**
 	 * 
@@ -41,10 +43,10 @@ public class SocketBehaviour extends CyclicBehaviour{
 					socket.getInputStream()));
 		} catch(UnknownHostException e){
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.log(e);
 		} catch(IOException e){
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.log(e);
 		}
 	}
 

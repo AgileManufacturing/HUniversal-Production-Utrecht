@@ -9,6 +9,7 @@ import org.bson.types.ObjectId;
 
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.service_agent.Service;
@@ -64,7 +65,7 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 					message.getConversationId()));
 		} catch (UnreadableException | InvalidDBNamespaceException
 				| GeneralMongoException e) {
-			e.printStackTrace();
+			Logger.log(e);
 			agent.doDelete();
 		}
 	}

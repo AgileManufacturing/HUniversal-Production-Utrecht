@@ -1,16 +1,17 @@
 package rexos.mas.equiplet_agent.behaviours;
 
-import java.io.IOException;
-
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+
+import java.io.IOException;
 
 import org.bson.types.ObjectId;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.EquipletAgent;
@@ -73,7 +74,7 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 				System.out.format("sending message: %s%n", responseMessage.getOntology());
 				System.out.format("sending message: %s%n", scheduleStepMessage.getOntology());
 			} catch (IOException | InvalidDBNamespaceException | GeneralMongoException e) {
-				e.printStackTrace();
+				Logger.log(e);
 				equipletAgent.doDelete();
 			}
 		}

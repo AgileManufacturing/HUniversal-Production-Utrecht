@@ -35,6 +35,7 @@ import jade.lang.acl.MessageTemplate;
 
 import org.bson.types.ObjectId;
 
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
 
@@ -95,7 +96,7 @@ public class GetProductionDuration extends ReceiveBehaviour {
 			myAgent.addBehaviour(productionDurationResponseBehaviour);
 		} catch (Exception e) {
 			// TODO: ERROR HANDLING
-			e.printStackTrace();
+			Logger.log(e);
 			myAgent.doDelete();
 		}
 	}

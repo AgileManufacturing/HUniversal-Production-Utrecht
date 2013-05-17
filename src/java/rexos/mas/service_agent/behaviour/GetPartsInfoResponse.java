@@ -47,19 +47,18 @@
  **/
 package rexos.mas.service_agent.behaviour;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.Position;
 import rexos.mas.data.ScheduleData;
@@ -67,6 +66,9 @@ import rexos.mas.equiplet_agent.ProductStepMessage;
 import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.service_agent.ServiceAgent;
 import rexos.mas.service_agent.ServiceStepMessage;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 /**
  * @author Peter
@@ -146,7 +148,7 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStep.get_id()),
 						new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.PLANNED.name())));
 			} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
-				e.printStackTrace();
+				Logger.log(e);
 				agent.doDelete();
 			}
 		} else {
