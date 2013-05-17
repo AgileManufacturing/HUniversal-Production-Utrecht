@@ -1,4 +1,4 @@
-package rexos.mas.service_agent.behaviour;
+package rexos.mas.service_agent.behaviours;
 
 import java.io.IOException;
 

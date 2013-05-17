@@ -148,6 +148,10 @@ public class ServiceStepMessage implements MongoSaveable {
 		fromBasicDBObject(object);
 	}
 
+	/**
+	 * @param unsortedSteps
+	 * @return
+	 */
 	public static ServiceStepMessage[] sort(ServiceStepMessage[] unsortedSteps) {
 		// Find the first step
 		ServiceStepMessage firstServiceStep = null;

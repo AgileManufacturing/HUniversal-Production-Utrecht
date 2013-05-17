@@ -1,7 +1,7 @@
 /**
- * @file ArePartsAvailableInTimeResponse.java
+ * @file GetServiceStepBehaviour.java
  * @brief
- * @date Created: 23 apr. 2013
+ * @date Created: 11 apr. 2013
  * 
  * @author Peter Bonnema
  * 
@@ -45,21 +45,24 @@
  *          SUCH DAMAGE.
  * 
  **/
-package rexos.mas.service_agent.behaviour;
+package rexos.mas.service_agent.behaviours;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 
-import java.io.IOException;
+import org.bson.types.ObjectId;
 
+import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
-import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.behaviours.ReceiveOnceBehaviour;
+import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.ProductStepMessage;
-import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.service_agent.ServiceAgent;
+import rexos.mas.service_agent.ServiceStepMessage;
 
 import com.mongodb.BasicDBObject;
 
@@ -67,62 +70,74 @@ import com.mongodb.BasicDBObject;
  * @author Peter
  * 
  */
-public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
+public class GetServiceStepsDuration extends ReceiveOnceBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	private String conversationId;
 	private ServiceAgent agent;
-	private ProductStepMessage productStep;
 
 	/**
 	 * @param a
+	 * @param serviceSteps
+	 * @param conversationId
 	 */
-	public ArePartsAvailableInTimeResponse(Agent a, String conversationId, ProductStepMessage productStep) {
-		this(a, 2000, conversationId, productStep);
+	public GetServiceStepsDuration(Agent a, String conversationId) {
+		this(a, 2000, conversationId);
 	}
 
 	/**
 	 * @param a
 	 * @param millis
+	 * @param serviceSteps
+	 * @param conversationId
 	 */
-	public ArePartsAvailableInTimeResponse(Agent a, int millis, String conversationId, ProductStepMessage productStep) {
+	public GetServiceStepsDuration(Agent a, int millis, String conversationId) {
 		super(a, millis, MessageTemplate.and(MessageTemplate.MatchConversationId(conversationId),
-				MessageTemplate.MatchOntology("ArePartsAvailableInTimeResponse")));
+				MessageTemplate.MatchOntology("GetServiceStepDurationResponse")));
 		agent = (ServiceAgent) a;
 		this.conversationId = conversationId;
-		this.productStep = productStep;
 	}
 
 	/* (non-Javadoc)
-	 * @see
-	 * rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage) */
+	 * @see behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage) */
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
 			try {
-				Logger.log("%s ArePartsAvailableInTimeResponse%n", agent.getLocalName());
-				if(message.getPerformative() == ACLMessage.CONFIRM) {
-					ACLMessage sendMsg = message.createReply();
-					sendMsg.setOntology("GetPartsInfo");
-					sendMsg.setPerformative(ACLMessage.QUERY_IF);
-					sendMsg.setContentObject(productStep);
-					agent.send(sendMsg);
-
-					agent.addBehaviour(new GetPartsInfoResponse(agent, conversationId, productStep));
-				} else {
-					agent.getProductStepBBClient().updateDocuments(
-							new BasicDBObject("_id", productStep.get_id()),
-							new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name())
-									.append("statusData", new BasicDBObject("reason",
-											"productStep cannot be delivered on time"))));
+				BlackboardClient client = agent.getServiceStepBBClient();
+				ServiceStepMessage serviceStep = new ServiceStepMessage();
+				ObjectId nextStep = (ObjectId) message.getContentObject();
+				int duration = 0;
+				while(nextStep != null) {
+					serviceStep.fromBasicDBObject((BasicDBObject) client.findDocumentById(nextStep));
+					duration += serviceStep.getScheduleData().getDuration();
+					nextStep = serviceStep.getNextStep();
 				}
-			} catch(IOException | InvalidDBNamespaceException | GeneralMongoException e) {
+
+				ObjectId productStepId = serviceStep.getProductStepId();
+				ProductStepMessage productStep =
+						new ProductStepMessage((BasicDBObject) agent.getProductStepBBClient().findDocumentById(
+								productStepId));
+				ScheduleData scheduleData = productStep.getScheduleData();
+				scheduleData.setDuration(duration);
+
+				Logger.log("Saving duration of %d in prod. step %s%n", duration, productStepId);
+				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
+						new BasicDBObject("$set", new BasicDBObject("scheduleData", scheduleData.toBasicDBObject())));
+
+				ACLMessage answer = new ACLMessage(ACLMessage.INFORM);
+				answer.addReceiver(agent.getEquipletAgentAID());
+				answer.setConversationId(conversationId);
+				answer.setOntology("ProductionDurationResponse");
+				agent.send(answer);
+
+				Logger.log("%s sending msg (%s)%n", myAgent.getLocalName(), answer.getOntology());
+			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {
 				Logger.log(e);
-				agent.doDelete();
 			}
 		} else {
 			// TODO handle timeout
-			Logger.log(agent.getName() + " - ArePartsAvailableInTimeReponse timeout!");
+			Logger.log(agent.getName() + " - GetServiceStepDurationResponse timeout!");
 			agent.doDelete();
 		}
 	}

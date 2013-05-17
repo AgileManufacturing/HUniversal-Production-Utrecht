@@ -1,7 +1,7 @@
 /**
- * @file GetServiceStepBehaviour.java
+ * @file GetPartsInfoResponse.java
  * @brief
- * @date Created: 11 apr. 2013
+ * @date Created: 23 apr. 2013
  * 
  * @author Peter Bonnema
  * 
@@ -45,99 +45,114 @@
  *          SUCH DAMAGE.
  * 
  **/
-package rexos.mas.service_agent.behaviour;
+package rexos.mas.service_agent.behaviours;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
-import org.bson.types.ObjectId;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 
-import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
-import rexos.mas.behaviours.ReceiveOnceBehaviour;
+import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.Position;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.service_agent.ServiceAgent;
 import rexos.mas.service_agent.ServiceStepMessage;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 /**
  * @author Peter
  * 
  */
-public class GetServiceStepsDuration extends ReceiveOnceBehaviour {
+public class GetPartsInfoResponse extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	private String conversationId;
 	private ServiceAgent agent;
+	private ProductStepMessage productStep;
 
 	/**
 	 * @param a
-	 * @param serviceSteps
-	 * @param conversationId
 	 */
-	public GetServiceStepsDuration(Agent a, String conversationId) {
-		this(a, 2000, conversationId);
+	public GetPartsInfoResponse(Agent a, String conversationId, ProductStepMessage productStep) {
+		this(a, 2000, conversationId, productStep);
 	}
 
 	/**
 	 * @param a
 	 * @param millis
-	 * @param serviceSteps
-	 * @param conversationId
 	 */
-	public GetServiceStepsDuration(Agent a, int millis, String conversationId) {
+	public GetPartsInfoResponse(Agent a, int millis, String conversationId, ProductStepMessage productStep) {
 		super(a, millis, MessageTemplate.and(MessageTemplate.MatchConversationId(conversationId),
-				MessageTemplate.MatchOntology("GetServiceStepDurationResponse")));
+				MessageTemplate.MatchOntology("GetPartsInfoResponse")));
 		agent = (ServiceAgent) a;
 		this.conversationId = conversationId;
+		this.productStep = productStep;
 	}
 
 	/* (non-Javadoc)
-	 * @see behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage) */
+	 * @see
+	 * rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage) */
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
 			try {
-				BlackboardClient client = agent.getServiceStepBBClient();
-				ServiceStepMessage serviceStep = new ServiceStepMessage();
-				ObjectId nextStep = (ObjectId) message.getContentObject();
-				int duration = 0;
-				while(nextStep != null) {
-					serviceStep.fromBasicDBObject((BasicDBObject) client.findDocumentById(nextStep));
-					duration += serviceStep.getScheduleData().getDuration();
-					nextStep = serviceStep.getNextStep();
+				List<DBObject> dbServiceSteps =
+						agent.getServiceStepBBClient().findDocuments(
+								new BasicDBObject("productStepId", productStep.get_id()));
+				ServiceStepMessage[] serviceSteps = new ServiceStepMessage[dbServiceSteps.size()];
+
+				for(int i = 0; i < dbServiceSteps.size(); i++) {
+					serviceSteps[i] = new ServiceStepMessage((BasicDBObject) dbServiceSteps.get(i));
 				}
 
-				ObjectId productStepId = serviceStep.getProductStepId();
-				ProductStepMessage productStep =
-						new ProductStepMessage((BasicDBObject) agent.getProductStepBBClient().findDocumentById(
-								productStepId));
-				ScheduleData scheduleData = productStep.getScheduleData();
-				scheduleData.setDuration(duration);
+				HashMap<Integer, Position> parameters = (HashMap<Integer, Position>) message.getContentObject();
 
-				Logger.log("Saving duration of %d in prod. step %s%n", duration, productStepId);
-				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
-						new BasicDBObject("$set", new BasicDBObject("scheduleData", scheduleData.toBasicDBObject())));
+				Logger.log("%s got partsInfo: %s%n", agent.getLocalName(), parameters.toString());
 
-				ACLMessage answer = new ACLMessage(ACLMessage.INFORM);
-				answer.addReceiver(agent.getEquipletAgentAID());
-				answer.setConversationId(conversationId);
-				answer.setOntology("ProductionDurationResponse");
-				agent.send(answer);
+				ServiceStepMessage[] parameterizedSteps =
+						agent.GetServiceForConvId(conversationId).updateParameters(parameters,
+								ServiceStepMessage.sort(serviceSteps));
 
-				Logger.log("%s sending msg (%s)%n", myAgent.getLocalName(), answer.getOntology());
-			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {
+				ScheduleData scheduleData;
+				int nextStartTime = productStep.getScheduleData().getStartTime();
+				for(ServiceStepMessage serviceStep : parameterizedSteps) {
+					scheduleData = serviceStep.getScheduleData();
+					scheduleData.setStartTime(nextStartTime);
+					serviceStep.setScheduleData(scheduleData);
+
+					nextStartTime += scheduleData.getDuration();
+
+					agent.getServiceStepBBClient().updateDocuments(new BasicDBObject("_id", serviceStep.getId()),
+							new BasicDBObject("$set", serviceStep.toBasicDBObject()));
+				}
+
+				ACLMessage informMsg = new ACLMessage(ACLMessage.INFORM);
+				informMsg.setOntology("FillPlaceholders");
+				informMsg.setConversationId(message.getConversationId());
+				informMsg.addReceiver(agent.getHardwareAgentAID());
+				informMsg.setContentObject(parameterizedSteps[0].getId());
+				agent.send(informMsg);
+
+				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStep.get_id()),
+						new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.PLANNED.name())));
+			} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 				Logger.log(e);
+				agent.doDelete();
 			}
 		} else {
 			// TODO handle timeout
-			Logger.log(agent.getName() + " - GetServiceStepDurationResponse timeout!");
+			Logger.log(agent.getName() + " - GetPartsInfoResponse timeout!");
 			agent.doDelete();
 		}
 	}
