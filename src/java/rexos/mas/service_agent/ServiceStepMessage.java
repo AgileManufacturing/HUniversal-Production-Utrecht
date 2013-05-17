@@ -48,7 +48,7 @@ package rexos.mas.service_agent;
 
 import org.bson.types.ObjectId;
 
-import rexos.mas.data.IMongoSaveable;
+import rexos.mas.data.MongoSaveable;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.StepStatusCode;
 
@@ -60,7 +60,7 @@ import com.mongodb.BasicDBObjectBuilder;
  * 
  * @author Peter
  */
-public class ServiceStepMessage implements IMongoSaveable {
+public class ServiceStepMessage implements MongoSaveable {
 	private ObjectId _id;
 	private ObjectId nextStep;
 	private int serviceId;

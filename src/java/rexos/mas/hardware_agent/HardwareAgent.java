@@ -83,7 +83,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	}
 
 	public int getLeadingModule(int serviceId) {
-		if(!leadingModules.containsKey(serviceId)) {
+		if (!leadingModules.containsKey(serviceId)) {
 			return 0;
 		}
 		return leadingModules.get(serviceId);
@@ -98,7 +98,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		moduleFactory.subscribeToUpdates(this);
 
 		Object[] args = getArguments();
-		if(args != null && args.length > 0) {
+		if (args != null && args.length > 0) {
 			dbData = (DbData) args[0];
 			equipletAgentAID = (AID) args[1];
 			serviceAgentAID = (AID) args[2];
@@ -108,14 +108,13 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		hm.put(2, null);
 		configuration = new HashMap<Integer, Object>();
 		configuration.put(1, hm);
-		
+
 		try {
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient.setDatabase(dbData.getName());
 			serviceStepBBClient.setCollection("ServiceStepsBlackBoard");
 
-			FieldUpdateSubscription statusSubscription =
-					new FieldUpdateSubscription("status", this);
+			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			serviceStepBBClient.subscribe(statusSubscription);
 
@@ -123,8 +122,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			equipletStepBBClient.setDatabase(dbData.getName());
 			equipletStepBBClient.setCollection("EquipletStepsBlackBoard");
 			equipletStepBBClient.subscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
-			equipletStepBBClient.removeDocuments(new BasicDBObject());
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			doDelete();
 		}
@@ -132,7 +130,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		EvaluateDuration evaluateDurationBehaviour = new EvaluateDuration(this, moduleFactory);
 		addBehaviour(evaluateDurationBehaviour);
 
-		FillPlaceholders fillPlaceholdersBehaviour = new FillPlaceholders(this);
+		FillPlaceholders fillPlaceholdersBehaviour = new FillPlaceholders(this, moduleFactory);
 		addBehaviour(fillPlaceholdersBehaviour);
 
 		CheckForModules checkForModules = new CheckForModules(this);
@@ -144,16 +142,18 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			client = KnowledgeDBClient.getClient();
 
 			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgentAID.getLocalName());
-			for(Row row : rows) {
+			for (Row row : rows) {
 				try {
 					int id = (int) row.get("module");
 					Module module = moduleFactory.getModuleById(id);
-					for(int step : module.isLeadingForSteps()) {
+					for (int step : module.isLeadingForSteps()) {
 						registerLeadingModule(step, id);
 					}
-				} catch(Exception e) {/* the row has no module */}
+				} catch (Exception e) {
+					/* the row has no module */
+				}
 			}
-		} catch(KnowledgeException e1) {
+		} catch (KnowledgeException e1) {
 			doDelete();
 			e1.printStackTrace();
 		}
@@ -182,9 +182,8 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			// Clears his own blackboard and removes his subscription on that
 			// blackboard.
 			equipletStepBBClient.removeDocuments(new BasicDBObject());
-			equipletStepBBClient.unsubscribe(new BasicOperationSubscription(MongoOperation.UPDATE,
-					this));
-		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+			equipletStepBBClient.unsubscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
+		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 			e.printStackTrace();
 		}
 
@@ -197,72 +196,65 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	public BlackboardClient getServiceStepsBBClient() {
 		return serviceStepBBClient;
 	}
-	
-	public BlackboardClient getEquipletStepsBBClient(){
+
+	public BlackboardClient getEquipletStepsBBClient() {
 		return equipletStepBBClient;
 	}
 
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
-		switch(entry.getNamespace().split("\\.")[1]) {
-			case "ServiceStepsBlackboard":
-				switch(operation) {
-					case UPDATE:
-						ObjectId id = entry.getTargetObjectId();
-						try {
-							ServiceStepMessage serviceStep =
-									new ServiceStepMessage(
-											(BasicDBObject) serviceStepBBClient
-													.findDocumentById(id));
-							int leadingModule = getLeadingModule(serviceStep.getServiceId());
-							Module module = moduleFactory.getModuleById(leadingModule);
-							EquipletStepMessage[] equipletSteps =
-									module.getEquipletSteps(serviceStep.getType(),
-											serviceStep.getParameters());
-							for(EquipletStepMessage eq : equipletSteps) {
-								equipletStepBBClient.insertDocument(eq.toBasicDBObject());
-							}
-						} catch(InvalidDBNamespaceException | GeneralMongoException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-						break;
-					default:
-						break;
-				}
-				break;
-			case "EquipletStepsBlackboard":
-				switch(operation) {
-					case UPDATE:
-						try {
-							DBObject equipletStep =
-									equipletStepBBClient
-											.findDocumentById(entry.getTargetObjectId());
-						} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-							// TODO Error no document
-							e.printStackTrace();
-						}
-						break;
-					default:
-						break;
+		switch (entry.getNamespace().split("\\.")[1]) {
+		case "ServiceStepsBlackboard":
+			switch (operation) {
+			case UPDATE:
+				ObjectId id = entry.getTargetObjectId();
+				try {
+					ServiceStepMessage serviceStep = new ServiceStepMessage((BasicDBObject) serviceStepBBClient.findDocumentById(id));
+					int leadingModule = getLeadingModule(serviceStep.getServiceId());
+					Module module = moduleFactory.getModuleById(leadingModule);
+					EquipletStepMessage[] equipletSteps = module.getEquipletSteps(serviceStep.getType(), serviceStep.getParameters());
+					for (EquipletStepMessage eq : equipletSteps) {
+						equipletStepBBClient.insertDocument(eq.toBasicDBObject());
+					}
+				} catch (InvalidDBNamespaceException | GeneralMongoException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
 				break;
 			default:
 				break;
+			}
+			break;
+		case "EquipletStepsBlackboard":
+			switch (operation) {
+			case UPDATE:
+				try {
+					DBObject equipletStep = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
+				} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+					// TODO Error no document
+					e.printStackTrace();
+				}
+				break;
+			default:
+				break;
+			}
+			break;
+		default:
+			break;
 		}
 	}
 
 	@Override
 	public void onModuleUpdate(int moduleId, Module oldSoftware, Module newSoftware) {
-		for(int step : oldSoftware.isLeadingForSteps()) {
+		for (int step : oldSoftware.isLeadingForSteps()) {
 			leadingModules.remove(step);
 		}
-		for(int step : newSoftware.isLeadingForSteps()) {
+		for (int step : newSoftware.isLeadingForSteps()) {
 			leadingModules.put(step, moduleId);
 		}
 	}
-	
-	public HashMap<Integer, Object> getConfiguration(){
+
+	public HashMap<Integer, Object> getConfiguration() {
 		return configuration;
 	}
 }

@@ -107,7 +107,7 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 				myAgent.send(responseMessage);
 			} catch (Exception e) {
 				// TODO: ERROR HANDLING
-				e.printStackTrace();
+				Logger.log(e);
 				myAgent.doDelete();
 			}
 		}

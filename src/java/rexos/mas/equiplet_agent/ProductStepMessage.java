@@ -51,7 +51,7 @@ import java.io.Serializable;
 import org.bson.types.ObjectId;
 
 import jade.core.AID;
-import rexos.mas.data.IMongoSaveable;
+import rexos.mas.data.MongoSaveable;
 import rexos.mas.data.ScheduleData;
 
 import com.mongodb.BasicDBList;
@@ -60,7 +60,7 @@ import com.mongodb.BasicDBObject;
 /**
  * Implementation of a message for the productstep blackboard
  */
-public class ProductStepMessage implements IMongoSaveable, Serializable {
+public class ProductStepMessage implements MongoSaveable, Serializable {
 	private static final long serialVersionUID = 6752380093194239016L;
 
 	/**

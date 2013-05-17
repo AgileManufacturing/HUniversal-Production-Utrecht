@@ -3,7 +3,7 @@ package rexos.mas.data;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 
-public class DbData implements IMongoSaveable {
+public class DbData implements MongoSaveable {
 	private String ip;
 	private int port;
 	private String name;

@@ -39,7 +39,7 @@ import com.mongodb.BasicDBObjectBuilder;
  * @author Peter
  * 
  */
-public class Position implements Serializable, IMongoSaveable {
+public class Position implements Serializable, MongoSaveable {
 	private static final long serialVersionUID = 7125027379799391886L;
 	
 	private double x, y, z;

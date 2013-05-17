@@ -29,7 +29,11 @@
  **/
 package rexos.mas.hardware_agent;
 
-public class TimeData {
+import com.mongodb.BasicDBObject;
+
+import rexos.mas.data.MongoSaveable;
+
+public class TimeData implements MongoSaveable {
 	/**
 	 * @var int duration
 	 * the length of duration 
@@ -43,6 +47,15 @@ public class TimeData {
 	public TimeData(int duration) {
 		this.duration = duration;
 	}
+	
+	/**
+	 * 
+	 * @param object
+	 */
+	public TimeData(BasicDBObject object){
+		fromBasicDBObject(object);
+	}
+	
 	/**
 	 * getter for the duration.
 	 * @return duration
@@ -60,5 +73,17 @@ public class TimeData {
 		
 		this.duration = duration;
 		
+	}
+	
+	@Override
+	public BasicDBObject toBasicDBObject() {
+		BasicDBObject object = new BasicDBObject();
+		object.put("duration", duration);
+		return object;
+	}
+	
+	@Override
+	public void fromBasicDBObject(BasicDBObject object) {
+		duration = object.getInt("duration");
 	}
 }

@@ -36,7 +36,7 @@ import com.mongodb.BasicDBObject;
  * @author Peter
  *
  */
-public interface IMongoSaveable {
+public interface MongoSaveable {
 	/**
 	 * @return
 	 */

@@ -4,6 +4,7 @@
  * @date Created: 12-04-13
  * 
  * @author Thierry Gerritse
+ * @author Hessel Meulenbeld
  * 
  * @section LICENSE
  *          License: newBSD
@@ -54,8 +55,7 @@ import com.mongodb.BasicDBObject;
 public class DeltaRobotModule extends Module {
 	private static final double SAFE_MOVEMENT_PLANE = 6;
 
-	public DeltaRobotModule() {
-	}
+	public DeltaRobotModule() {}
 
 	@Override
 	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters) {

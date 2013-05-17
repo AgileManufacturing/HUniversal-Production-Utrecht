@@ -6,6 +6,7 @@
  *
  * @author Thierry Gerritse
  * @author Wouter Veen
+ * @author Hessel Meulenbeld
  *
  * @section LICENSE
  * License: newBSD
@@ -33,11 +34,13 @@ package rexos.mas.hardware_agent;
 
 import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
-import rexos.mas.data.IMongoSaveable;
+import rexos.mas.data.MongoSaveable;
 import rexos.mas.equiplet_agent.StepStatusCode;
 
-public class EquipletStepMessage implements IMongoSaveable {
+public class EquipletStepMessage implements MongoSaveable {
+	private ObjectId _id;
 	private ObjectId serviceStepID;
+	private ObjectId nextStep;
 	private int moduleId;
 	private InstructionData instructionData;
 	private StepStatusCode status;
@@ -61,6 +64,17 @@ public class EquipletStepMessage implements IMongoSaveable {
 		this.timeData = timeData;
 	}
 
+	public EquipletStepMessage(BasicDBObject object){
+		fromBasicDBObject(object);
+	}
+	
+	/**
+	 * @return the id
+	 */
+	public ObjectId getId() {
+		return _id;
+	}
+	
 	/**
 	 * @return the serviceStepID
 	 */
@@ -76,6 +90,10 @@ public class EquipletStepMessage implements IMongoSaveable {
 		this.serviceStepID = serviceStepID;
 	}
 
+	public void setNextStepID(ObjectId EquipletStepID){
+		this.nextStep = EquipletStepID;
+	}
+	
 	public int getModuleId(){
 		return moduleId;
 	}
@@ -145,18 +163,18 @@ public class EquipletStepMessage implements IMongoSaveable {
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject object = new BasicDBObject();
 		object.put("serviceStepID", serviceStepID);
+		object.put("nextStep", nextStep);
 		object.put("moduleId", moduleId);
 		object.put("instructionData", instructionData.toBasicDBObject());
 		object.put("status", status.toString());
-		object.put("timeData", timeData.getDuration());
-		// TODO add timeData as a basicDBObject by making it implement the
-		// IMongoSaveable interface or make timeData of type int instead of a
-		// class type.
+		object.put("timeData", timeData.toBasicDBObject());
 		return object;
 	}
 
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
+		_id = object.getObjectId("_id");
+		nextStep = object.getObjectId("nextStep");
 		serviceStepID = object.getObjectId("serviceStepID");
 		moduleId = object.getInt("moduleId");
 		instructionData = new InstructionData((BasicDBObject) object.get("instructionData"));
