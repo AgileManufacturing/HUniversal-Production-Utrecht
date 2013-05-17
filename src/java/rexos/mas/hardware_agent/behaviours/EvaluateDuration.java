@@ -70,27 +70,55 @@ import rexos.mas.service_agent.ServiceStepMessage;
 
 import com.mongodb.BasicDBObject;
 
+/**
+ * Class for the receivebehaviour for receiving messages with the ontology GetServiceStepDuration
+ */
 public class EvaluateDuration extends ReceiveBehaviour {
+	/**
+	 * @var long serialVersionUID The serialVersionUID
+	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * @var MessageTemplate messageTemplate The messageTemplate to match the messages.
+	 */
 	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("GetServiceStepDuration");
+	
+	/**
+	 * @var HardwareAgent hardwareAgent The hardwareAgent of this behaviour.
+	 */
 	private HardwareAgent hardwareAgent;
+	
+	/**
+	 * @var ModuleFactory moduleFactory The moduleFactory for this behaviour. 
+	 */
 	private ModuleFactory moduleFactory;
 
+	/**
+	 * Constructory
+	 * @param a The agent
+	 * @param moduleFactory The moduleFactory
+	 */
 	public EvaluateDuration(Agent a, ModuleFactory moduleFactory) {
 		super(a, -1, messageTemplate);
 		hardwareAgent = (HardwareAgent) a;
 		this.moduleFactory = moduleFactory;
 	}
 
+	/**
+	 * @see ReceiveBehaviour#handle(ACLMessage)
+	 */
 	@Override
 	public void handle(ACLMessage message) {
 		try {
+			//get the serviceStepId
 			ObjectId serviceStepId = (ObjectId) message.getContentObject();
 			Logger.log("%s received message from %s (%s:%s)%n", myAgent.getLocalName(),
 					message.getSender().getLocalName(), message.getOntology(), serviceStepId);
+			//Evaluate the duration of the step
 			EvaluateStepDuration(serviceStepId);
 
+			//Send a message to the serviceAgent with the serviceStepId
 			ACLMessage reply;
 			reply = message.createReply();
 			reply.setContentObject(serviceStepId);
@@ -105,18 +133,22 @@ public class EvaluateDuration extends ReceiveBehaviour {
 
 	public void EvaluateStepDuration(ObjectId serviceStepId) {
 		try {
+			//get the serviceStep
 			BasicDBObject dbServiceStep = (BasicDBObject) hardwareAgent.getServiceStepsBBClient().findDocumentById(serviceStepId);
 
 			ServiceStepMessage serviceStep = new ServiceStepMessage(dbServiceStep);
 
 			int stepDuration = 0;
+			//get the leading module
 			int leadingModule = hardwareAgent.getLeadingModule(serviceStep.getServiceId());
 			Module module = moduleFactory.getModuleById(leadingModule);
 			module.setConfiguration(hardwareAgent.getConfiguration());
+			//create the equipletSteps
 			EquipletStepMessage[] equipletSteps = 
 					module.getEquipletSteps(serviceStep.getType(), serviceStep.getParameters());
 			BlackboardClient equipletStepsBBClient = hardwareAgent.getEquipletStepsBBClient();
 			ObjectId next = null;
+			//calculate the duration and put the steps on the blackboard
 			for (int i = equipletSteps.length - 1; i >= 0; i--) {
 				EquipletStepMessage equipletStep = equipletSteps[i];
 				stepDuration += equipletStep.getTimeData().getDuration();
@@ -124,13 +156,15 @@ public class EvaluateDuration extends ReceiveBehaviour {
 				equipletStep.setNextStepID(next);
 				next = equipletStepsBBClient.insertDocument(equipletStep.toBasicDBObject());
 			}
-
+			//get the scheduleData and add the duration.
 			ScheduleData schedule = serviceStep.getScheduleData();
 			schedule.setDuration(stepDuration);
 
+			//update the serviceStep
 			hardwareAgent.getServiceStepsBBClient().updateDocuments(
 					new BasicDBObject("_id", serviceStepId), new BasicDBObject("$set",
 							new BasicDBObject("scheduleData", schedule.toBasicDBObject())));
+			//if the serviceStep has an next step calculate the duration for that one too.
 			if(serviceStep.getNextStep() != null){
 				EvaluateStepDuration(serviceStep.getNextStep());
 			}

@@ -23,10 +23,27 @@ import rexos.mas.service_agent.ServiceStepMessage;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
+/**
+ * Class for the receivebehaviour receiving messages with the ontology FillPlaceholders.
+ */
 public class FillPlaceholders extends ReceiveBehaviour {
+	/**
+	 * @var long serialVersionUID The serialVersionUID.
+	 */
 	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * @var MessageTemplate messageTemplate The messageTemplate to match the messages to.
+	 */
 	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("FillPlaceholders");
+	
+	/**
+	 * @var HardwareAgent hardwareAgent The hardwareAgent for this behaviour.
+	 */
 	private HardwareAgent hardwareAgent;
+	/**
+	 * @var ModuleFactory moduleFactory The moduleFactory
+	 */
 	private ModuleFactory moduleFactory;
 
 	/**
@@ -41,6 +58,9 @@ public class FillPlaceholders extends ReceiveBehaviour {
 		this.moduleFactory = moduleFactory;
 	}
 
+	/**
+	 * @see ReceiveBehaviour#handle(ACLMessage)
+	 */
 	@Override
 	public void handle(ACLMessage message) {
 		try{
@@ -54,27 +74,35 @@ public class FillPlaceholders extends ReceiveBehaviour {
 		}
 	}
 
+	/**
+	 * Function for filling the placeholders of the equipletSteps for an serviceStepId
+	 * @param serviceStepId The serviceStepId to fill the equipletsSteps for.
+	 */
 	public void FillStepPlaceholders(ObjectId serviceStepId){
 		try {
+			//Get the serviceStep
 			ServiceStepMessage serviceStep = new ServiceStepMessage(
 					(BasicDBObject) hardwareAgent.getServiceStepsBBClient().findDocumentById(serviceStepId));
 			BlackboardClient equipletStepBBClient = hardwareAgent.getEquipletStepsBBClient();
 			BasicDBObject query = new BasicDBObject("serviceStepID", serviceStep.getId());
-
+			//Get the equipletSteps
 			List<DBObject> steps = equipletStepBBClient.findDocuments(query);
 			EquipletStepMessage[] equipletSteps = new EquipletStepMessage[steps.size()];
 			for(int i = 0; i < steps.size(); i++) {
 				equipletSteps[i] = new EquipletStepMessage((BasicDBObject) steps.get(i));
 			}
-
+			
+			//Get the leadingModule
 			int leadingModule = hardwareAgent.getLeadingModule(serviceStep.getServiceId());
 			Module module = moduleFactory.getModuleById(leadingModule);
 			module.setConfiguration(hardwareAgent.getConfiguration());
 
+			//Fill the placeholders
 			equipletSteps = module.fillPlaceHolders(equipletSteps, serviceStep.getParameters());
 			for(EquipletStepMessage step : equipletSteps) {
 				equipletStepBBClient.updateDocuments(new BasicDBObject("_id", step.getId()), step.toBasicDBObject());
 			}
+			//if the serviceStep has a nextStep fill the placeholders for that one to.
 			if(serviceStep.getNextStep() != null){
 				FillStepPlaceholders(serviceStep.getNextStep());
 			}
