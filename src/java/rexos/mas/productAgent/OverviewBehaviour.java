@@ -5,7 +5,7 @@ import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
-import rexos.mas.data.*;
+import rexos.mas.data.ProductionStep;
 
 public class OverviewBehaviour extends OneShotBehaviour{
 	/**

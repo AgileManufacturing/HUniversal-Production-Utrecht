@@ -116,7 +116,7 @@ public class StartStep extends ReceiveBehaviour {
 					new BasicDBObject("_id", productStepId), 
 					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING)));			
 		} catch (InvalidDBNamespaceException | GeneralMongoException e1) {
-			e1.printStackTrace();
+			Logger.log(e1);
 		}
 		
 		//Get the next product step and set the timer for the next product step
@@ -131,7 +131,7 @@ public class StartStep extends ReceiveBehaviour {
 			}
 		} catch (Exception e) {
 			timer.setNextUsedTimeSlot(-1);
-		e.printStackTrace();
+		Logger.log(e);
 		}
 	}
 }

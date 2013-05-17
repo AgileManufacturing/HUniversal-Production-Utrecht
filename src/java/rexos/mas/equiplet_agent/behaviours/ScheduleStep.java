@@ -29,18 +29,19 @@
  **/
 package rexos.mas.equiplet_agent.behaviours;
 
-import org.bson.types.ObjectId;
-
-import com.mongodb.BasicDBObject;
-
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+
+import org.bson.types.ObjectId;
+
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.EquipletAgent;
+
+import com.mongodb.BasicDBObject;
 
 /**
  * The Class ScheduleStep.
@@ -113,7 +114,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 			scheduleMessage.setConversationId(message.getConversationId());
 			equipletAgent.send(scheduleMessage);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.log(e);
 		}
 	}
 }

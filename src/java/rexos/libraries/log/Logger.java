@@ -1,6 +1,6 @@
 /**
  * @file Logger.java
- * @brief 
+ * @brief Helper for log messages, providing a single point for controlling program output.
  * @date Created: 17 mei 2013
  *
  * @author Jan-Willem Willebrands
@@ -32,35 +32,70 @@ package rexos.libraries.log;
 import java.io.PrintStream;
 
 /**
- * 
+ * Helper for log messages, providing a single point for controlling program output.
  **/
 public class Logger {
+	/**
+	 * @var PrintStream errStream
+	 * Stream that will be used for writing error messages, i.e. throwables.
+	 **/
 	private static final PrintStream errStream = System.err;
+	
+	/**
+	 * @var PrintStream outStream
+	 * Stream that will be used for writing log messages.
+	 **/
 	private static final PrintStream outStream = System.out;
+	
+	/**
+	 * @var boolean debugEnabled
+	 * Controls whether or not printing of log messages is enabled.
+	 **/
 	private static final boolean debugEnabled = true;
 	
+	/**
+	 * Returns whether or not debugging is enabled.
+	 * @return true if debugging is enabled, false otherwise.
+	 **/
 	public static boolean isDebugEnabled() {
 		return debugEnabled;
 	}
 	
+	/**
+	 * Writes the String representation (as returned by obj.toString) of the given object to the output stream.
+	 * @param obj The Object that should be printed.
+	 **/
 	public static void log(Object obj) {
 		if (debugEnabled) {
 			outStream.println(obj.toString());
 		}
 	}
 	
+	/**
+	 * Writes the specified message to the output stream.
+	 * @param msg The message that should be printed.
+	 **/
 	public static void log(String msg) {
 		if (debugEnabled) {
 			outStream.println(msg);
 		}
 	}
 	
+	/**
+	 * Writes the specified message to the output stream using the PrintStream format method.
+	 * @param msg A format string as described in http://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
+	 * @param objects Arguments referenced by the format specifiers in the format string.
+	 **/
 	public static void log(String msg, Object... objects) {
 		if (debugEnabled) {
 			outStream.format(msg, objects);
 		}
 	}
 	
+	/**
+	 * Prints the stacktrace for the specified throwable to the error stream.
+	 * @param throwable The throwable that should be printed.
+	 **/
 	public static void log(Throwable throwable) {
 		if (debugEnabled) {
 			throwable.printStackTrace(errStream);

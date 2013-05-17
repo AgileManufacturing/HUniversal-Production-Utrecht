@@ -52,7 +52,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import rexos.libraries.log.Logger;
 import rexos.mas.data.Position;
 import rexos.mas.equiplet_agent.StepStatusCode;
 

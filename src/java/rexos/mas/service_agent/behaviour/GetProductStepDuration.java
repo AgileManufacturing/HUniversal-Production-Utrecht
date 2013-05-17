@@ -79,7 +79,7 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 
 			agent.addBehaviour(new GetServiceStepsDuration(agent, message.getConversationId()));
 		} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
-			e.printStackTrace();
+			Logger.log(e);
 			agent.doDelete();
 		}
 	}

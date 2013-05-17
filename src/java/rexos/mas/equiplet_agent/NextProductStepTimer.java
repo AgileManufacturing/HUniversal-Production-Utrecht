@@ -10,6 +10,7 @@ import org.bson.types.ObjectId;
 
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.log.Logger;
 
 import com.mongodb.BasicDBObject;
 
@@ -91,7 +92,7 @@ public class NextProductStepTimer extends Timer{
 				equipletAgent.send(answer);
 			} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Logger.log(e);
 			}
 		}
 	}

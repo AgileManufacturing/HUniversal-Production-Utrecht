@@ -33,12 +33,13 @@ package rexos.mas.hardware_agent.behaviours;
  * @note 2013-05-14 JWW: This should be adapted to use MOST once it's done.
  **/
 
-import java.util.ArrayList;
-
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+
+import java.util.ArrayList;
+
 import rexos.libraries.knowledgedb_client.KeyNotFoundException;
 import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
 import rexos.libraries.knowledgedb_client.KnowledgeException;

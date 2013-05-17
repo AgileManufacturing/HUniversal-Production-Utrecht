@@ -96,7 +96,7 @@ public class GetProductionDuration extends ReceiveBehaviour {
 			myAgent.addBehaviour(productionDurationResponseBehaviour);
 		} catch (Exception e) {
 			// TODO: ERROR HANDLING
-			e.printStackTrace();
+			Logger.log(e);
 			myAgent.doDelete();
 		}
 	}

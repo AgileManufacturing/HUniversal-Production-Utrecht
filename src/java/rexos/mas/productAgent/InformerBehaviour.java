@@ -8,7 +8,12 @@ import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
-import rexos.mas.data.*;
+import rexos.libraries.log.Logger;
+import rexos.mas.data.Product;
+import rexos.mas.data.Production;
+import rexos.mas.data.ProductionEquipletMapper;
+import rexos.mas.data.ProductionStep;
+import rexos.mas.data.ProductionStepStatus;
 
 /*
  * Version 1.1 Author: Alexander Streng Behaviour for negotiating with the
@@ -78,7 +83,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 						
 						_isDone = true;
 					} catch(Exception e){
-						e.printStackTrace();
+						Logger.log(e);
 					}
 				} else{
 					System.out.println("Not done informing.");
@@ -150,7 +155,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 									+ _productionStep.getId());
 						}
 					} catch(Exception e){
-						e.printStackTrace();
+						Logger.log(e);
 					}
 				}
 			});
@@ -206,7 +211,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 																	.getId());
 										}
 									} catch(Exception e){
-										e.printStackTrace();
+										Logger.log(e);
 									}
 								}
 							});

@@ -133,7 +133,7 @@ public class GetServiceStepsDuration extends ReceiveOnceBehaviour {
 
 				Logger.log("%s sending msg (%s)%n", myAgent.getLocalName(), answer.getOntology());
 			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {
-				e.printStackTrace();
+				Logger.log(e);
 			}
 		} else {
 			// TODO handle timeout
