@@ -1,5 +1,5 @@
 /**
- * @file CanPerfomStep.java
+ * @file rexos/mas/equiplet_agent/behaviours/CanPerformStep.java
  * @brief Behaviour for handling the messages with the ontology CanPerformStep
  * @date Created: 2013-04-02
  * 

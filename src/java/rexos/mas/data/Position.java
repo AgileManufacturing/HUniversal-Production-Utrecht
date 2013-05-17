@@ -1,5 +1,5 @@
 /**
- * @file Position.java
+ * @file rexos/mas/data/Position.java
  * @brief 
  * @date Created: 22 apr. 2013
  *

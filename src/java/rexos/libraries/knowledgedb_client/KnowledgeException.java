@@ -1,5 +1,5 @@
 /**
- * @file KnowledgeException.java
+ * @file rexos/libraries/knowledgedb_client/KnowledgeException.java
  * @brief Thrown when connecting to or reading from the knowledge database fails.
  * @date Created: 23 apr. 2013
  *

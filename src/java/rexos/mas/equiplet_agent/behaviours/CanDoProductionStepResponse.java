@@ -1,5 +1,5 @@
 /**
- * @file CanDoProductionStepResponse.java
+ * @file rexos/mas/equiplet_agent/behaviours/CanDoProductionStepResponse.java
  * @brief Behaviour for handling the messages with the ontology CanDoProductionStepResponse
  * @date Created: 2013-04-02
  *

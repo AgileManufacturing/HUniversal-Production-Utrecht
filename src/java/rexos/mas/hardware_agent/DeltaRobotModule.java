@@ -1,5 +1,5 @@
 /**
- * @file DeltaRobotModule.java
+ * @file rexos/mas/hardware_agent/DeltaRobotModule.java
  * @brief Provides a deltaRobotModule.
  * @date Created: 12-04-13
  * 

@@ -1,5 +1,5 @@
 /**
- * @file ReceiveOnceBehaviour.java
+ * @file rexos/mas/behaviours/ReceiveOnceBehaviour.java
  * @brief 
  * @date Created: 11 apr. 2013
  *

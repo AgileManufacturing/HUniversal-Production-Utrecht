@@ -1,5 +1,5 @@
 /**
- * @file GetServiceStepBehaviour.java
+ * @file rexos/mas/service_agent/behaviours/GetServiceStepsDuration.java
  * @brief
  * @date Created: 11 apr. 2013
  * 

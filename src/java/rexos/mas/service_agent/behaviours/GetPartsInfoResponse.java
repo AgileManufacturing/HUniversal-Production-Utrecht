@@ -1,5 +1,5 @@
 /**
- * @file GetPartsInfoResponse.java
+ * @file rexos/mas/service_agent/behaviours/GetPartsInfoResponse.java
  * @brief
  * @date Created: 23 apr. 2013
  * 

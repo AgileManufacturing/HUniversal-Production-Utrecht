@@ -1,5 +1,5 @@
 /**
- * @file LogMessage.java
+ * @file rexos/mas/data/LogMessage.java
  * @brief Provides the logging for messages.
  * @date Created: 12-04-13
  *

@@ -1,5 +1,5 @@
 /**
- * @file EquipletDirectoryMessage.java
+ * @file rexos/mas/equiplet_agent/EquipletDirectoryMessage.java
  * @brief Provides an entry class for the EquipletDirectory blackboard.
  * @date Created: 2013-04-02
  *

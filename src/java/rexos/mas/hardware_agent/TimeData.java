@@ -1,5 +1,5 @@
 /**
- * @file TimeData.java
+ * @file rexos/mas/hardware_agent/TimeData.java
  * @brief Provides methods to get and set the TimeData.
  * @date Created: 2013-04-02
  *

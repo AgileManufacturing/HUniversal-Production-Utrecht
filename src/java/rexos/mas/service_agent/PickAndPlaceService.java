@@ -1,5 +1,5 @@
 /**
- * @file PickAndPlaceService.java
+ * @file rexos/mas/service_agent/PickAndPlaceService.java
  * @brief Class for the pick&place service.
  * @date Created: 23 apr. 2013
  * 

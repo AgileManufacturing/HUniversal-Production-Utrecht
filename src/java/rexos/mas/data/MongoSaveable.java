@@ -1,5 +1,5 @@
 /**
- * @file DBSaveable.java
+ * @file rexos/mas/data/MongoSaveable.java
  * @brief 
  * @date Created: 19 apr. 2013
  *
