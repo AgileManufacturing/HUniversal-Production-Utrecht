@@ -49,6 +49,12 @@ public class Logger {
 		}
 	}
 	
+	public static void log(String msg, Object... objects) {
+		if (debugEnabled) {
+			outStream.format(msg, objects);
+		}
+	}
+	
 	public static void log(Throwable throwable) {
 		if (debugEnabled) {
 			throwable.printStackTrace(errStream);
