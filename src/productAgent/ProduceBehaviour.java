@@ -90,54 +90,41 @@ public class ProduceBehaviour extends OneShotBehaviour{
 
 class newProducing extends SequentialBehaviour{
 	private static final long serialVersionUID = 1L;
+	private HashMap<AID, Long> EqAndTs;
+	private ProductionStep productionStep;
 
-	public newProducing(HashMap EqAndTs, ProductionStep productionStep){
-		//
+	public newProducing(HashMap<AID, Long> EqAndTs, ProductionStep productionStep){
+		this.EqAndTs = EqAndTs;
+		this.productionStep = productionStep;
 	}
 
 	@Override
 	public void onStart(){
 		addSubBehaviour(new OneShotBehaviour(){
 			private static final long serialVersionUID = 1L;
-			ACLMessage msg;
-			ProductAgent _productAgent;
-
 			@Override
 			public void action(){
-				// TODO Auto-generated method stub
-				// implementeer de lus die op berichten wacht
-			}
-		});
-		addSubBehaviour(new OneShotBehaviour(){
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void action(){
-				// TODO Auto-generated method stub
-				// check het AID van de berichtgevende EQA met die bij de stap
-				// hoort
-				// check de inhoud van het bericht (msg.getontology())
-				// verander de state in STATE_PRODUCING
-				// wacht op een finished bericht uit de vorige OSB
-				// ontvang Log en schrijf deze weg
+				myAgent.addBehaviour(new receiveMsgBehaviour(EqAndTs, productionStep));
 			}
 		});
 	}
 }
 
-@SuppressWarnings("unused")
 class receiveMsgBehaviour extends CyclicBehaviour{
 	private static final long serialVersionUID = 1L;
+	HashMap<AID, Long> eqAndTs;
+	private ProductionStep productionStep;
 
-	private receiveMsgBehaviour(){
+	receiveMsgBehaviour(HashMap<AID, Long> eqAndTs, ProductionStep productionStep){
+		this.eqAndTs = eqAndTs;
+		this.productionStep = productionStep;
 	}
 
 	@Override
 	public void action(){
-		@SuppressWarnings("hiding")
 		ACLMessage msg = myAgent.receive();
 		if (msg != null){
-			WaitMsgBehaviour behaviour = new WaitMsgBehaviour(msg);
+			myAgent.addBehaviour(new WaitMsgBehaviour(msg, eqAndTs, productionStep));
 		} else{
 			block();
 		}
@@ -147,15 +134,17 @@ class receiveMsgBehaviour extends CyclicBehaviour{
 class WaitMsgBehaviour extends OneShotBehaviour{
 	private static final long serialVersionUID = 1L;
 	ProductAgent _productAgent;
-	@SuppressWarnings("hiding")
 	ACLMessage msg;
+	HashMap<AID, Long> eqAndTs;
+	private ProductionStep productionStep;
 
-	public WaitMsgBehaviour(ACLMessage msg){
+	public WaitMsgBehaviour(ACLMessage msg, HashMap<AID, Long> eqAndTs, ProductionStep productionStep){
 		this.msg = msg;
+		this.eqAndTs = eqAndTs;
+		this.productionStep = productionStep;
 	}
 
-	@SuppressWarnings("unchecked")
-	// HashMap<Integer, HashMap<AID, Long>> bla = s1.getHashMap();
+	
 	@Override
 	public void action(){
 		_productAgent = (ProductAgent) myAgent;
@@ -164,7 +153,11 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 		@SuppressWarnings("hiding")
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setOntology("StartProduction");
-		msg.addReceiver(null); // add the equiplet AID
+		
+		if(eqAndTs.get(msg.getSender()) != productionStep.getId()){
+			// TODO error
+		}
+		msg.addReceiver(msg.getSender());
 		myAgent.send(msg);
 	}
 }
@@ -221,13 +214,14 @@ class producing extends OneShotBehaviour{
 		}
 	}
 
-	public void canProductionStepStart(ProductionStep step){
+	public static void canProductionStepStart(ProductionStep step){
 		step.setStatus(ProductionStepStatus.STATE_PRODUCING);
 	}
 
 	void productionStepEnded(ProductionStep step, boolean succes,
 			List<LogMessage> log){
-		_product.addLogMsg(log);
+		_productAgent = (ProductAgent) myAgent;
+		_productAgent.getProduct().addLogMsg(log);
 		if (succes){
 			step.setStatus(ProductionStepStatus.STATE_DONE);
 		} else{
