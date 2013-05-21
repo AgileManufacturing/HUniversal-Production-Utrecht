@@ -146,7 +146,7 @@ public class DeltaRobotModule extends Module {
 		//create the instruction data
 		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
 		//create an EquipletStepMessage and return it.
-		EquipletStepMessage step = new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(4));
+		EquipletStepMessage step = new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(), new TimeData(4));
 		return step;
 	}
 
@@ -182,7 +182,7 @@ public class DeltaRobotModule extends Module {
 		//create the instruction data.
 		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
 		//create the EquipletStepMessage and return it.
-		return new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(4));
+		return new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(), new TimeData(4));
 	}
 
 	/**
@@ -213,7 +213,7 @@ public class DeltaRobotModule extends Module {
 		//create the instruction data.
 		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
 		//create the EquipletStepMessage and return it. 
-		return new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(4));
+		return new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(), new TimeData(4));
 	}
 
 }
