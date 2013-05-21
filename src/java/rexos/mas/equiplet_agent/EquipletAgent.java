@@ -274,7 +274,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			BasicDBObject timeData = (BasicDBObject) collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
 			
 			// initiates the timer to the next product step.
-			timer = new NextProductStepTimer(timeData.getLong("firstTimeSlot"), timeData.getInt("timeSlotLength"));
+			timer = new NextProductStepTimer(timeData.getLong("firstTimeSlot"), timeData.getInt("timeSlotLength"), this);
 			timer.setNextUsedTimeSlot(-1);
 			
 			collectiveBBClient.setCollection(equipletDirectoryName);
@@ -371,6 +371,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 						ScheduleData scheduleData = productStep.getScheduleData();
 						if (scheduleData.getStartTime() > timer.getNextUsedTimeSlot()) {
 							timer.setNextUsedTimeSlot(scheduleData.getStartTime());
+							nextProductStep = id;
 						}
 
 						// Logger.log("%s Sending ProductionDuration tot %s%n",
