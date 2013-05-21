@@ -18,7 +18,7 @@ import rexos.mas.hardware_agent.EquipletStepMessage;
 import rexos.mas.hardware_agent.HardwareAgent;
 import rexos.mas.hardware_agent.Module;
 import rexos.mas.hardware_agent.ModuleFactory;
-import rexos.mas.service_agent.ServiceStepMessage;
+import rexos.mas.service_agent.ServiceStep;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -85,7 +85,7 @@ public class FillPlaceholders extends ReceiveBehaviour {
 	public void FillStepPlaceholders(ObjectId serviceStepId){
 		try {
 			//Get the serviceStep
-			ServiceStepMessage serviceStep = new ServiceStepMessage(
+			ServiceStep serviceStep = new ServiceStep(
 					(BasicDBObject) hardwareAgent.getServiceStepsBBClient().findDocumentById(serviceStepId));
 			BlackboardClient equipletStepBBClient = hardwareAgent.getEquipletStepsBBClient();
 			BasicDBObject query = new BasicDBObject("serviceStepID", serviceStep.getId());

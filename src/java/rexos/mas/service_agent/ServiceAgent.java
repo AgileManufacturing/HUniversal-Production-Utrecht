@@ -68,7 +68,7 @@ import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
-import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.equiplet_agent.ProductStep;
 import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.service_agent.behaviours.CanDoProductStep;
 import rexos.mas.service_agent.behaviours.GetProductStepDuration;
@@ -286,8 +286,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		try {
 			switch(entry.getNamespace().split("\\.")[1]) {
 				case "ProductStepsBlackBoard":
-					ProductStepMessage productionStep =
-							new ProductStepMessage((BasicDBObject) productStepBBClient.findDocumentById(entry
+					ProductStep productionStep =
+							new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(entry
 									.getTargetObjectId()));
 					switch(operation) {
 						case UPDATE:
@@ -313,8 +313,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					}
 					break;
 				case "ServiceStepsBlackBoard":
-					ServiceStepMessage serviceStep =
-							new ServiceStepMessage((BasicDBObject) serviceStepBBClient.findDocumentById(entry
+					ServiceStep serviceStep =
+							new ServiceStep((BasicDBObject) serviceStepBBClient.findDocumentById(entry
 									.getTargetObjectId()));
 					ObjectId productStepId = serviceStep.getProductStepId();
 					switch(operation) {

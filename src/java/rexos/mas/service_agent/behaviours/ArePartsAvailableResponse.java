@@ -40,7 +40,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
-import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.equiplet_agent.ProductStep;
 import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.service_agent.ServiceAgent;
 
@@ -55,12 +55,12 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 
 	private String conversationId;
 	private ServiceAgent agent;
-	private ProductStepMessage productStep;
+	private ProductStep productStep;
 
 	/**
 	 * @param a
 	 */
-	public ArePartsAvailableResponse(Agent a, String conversationId, ProductStepMessage productStep) {
+	public ArePartsAvailableResponse(Agent a, String conversationId, ProductStep productStep) {
 		this(a, 2000, conversationId, productStep);
 	}
 
@@ -69,7 +69,7 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 	 * @param millis
 	 */
 	public ArePartsAvailableResponse(Agent a, int millis,
-			String conversationId, ProductStepMessage productStep) {
+			String conversationId, ProductStep productStep) {
 		super(a, millis, MessageTemplate.and(
 				MessageTemplate.MatchConversationId(conversationId),
 				MessageTemplate.MatchOntology("ArePartsAvailableResponse")));

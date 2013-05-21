@@ -60,9 +60,9 @@ import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.data.ScheduleData;
-import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.equiplet_agent.ProductStep;
 import rexos.mas.service_agent.ServiceAgent;
-import rexos.mas.service_agent.ServiceStepMessage;
+import rexos.mas.service_agent.ServiceStep;
 
 import com.mongodb.BasicDBObject;
 
@@ -105,7 +105,7 @@ public class GetServiceStepsDuration extends ReceiveOnceBehaviour {
 		if(message != null) {
 			try {
 				BlackboardClient client = agent.getServiceStepBBClient();
-				ServiceStepMessage serviceStep = new ServiceStepMessage();
+				ServiceStep serviceStep = new ServiceStep();
 				ObjectId nextStep = (ObjectId) message.getContentObject();
 				int duration = 0;
 				while(nextStep != null) {
@@ -115,8 +115,8 @@ public class GetServiceStepsDuration extends ReceiveOnceBehaviour {
 				}
 
 				ObjectId productStepId = serviceStep.getProductStepId();
-				ProductStepMessage productStep =
-						new ProductStepMessage((BasicDBObject) agent.getProductStepBBClient().findDocumentById(
+				ProductStep productStep =
+						new ProductStep((BasicDBObject) agent.getProductStepBBClient().findDocumentById(
 								productStepId));
 				ScheduleData scheduleData = productStep.getScheduleData();
 				scheduleData.setDuration(duration);

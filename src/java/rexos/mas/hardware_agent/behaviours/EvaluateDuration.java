@@ -66,7 +66,7 @@ import rexos.mas.hardware_agent.EquipletStepMessage;
 import rexos.mas.hardware_agent.HardwareAgent;
 import rexos.mas.hardware_agent.Module;
 import rexos.mas.hardware_agent.ModuleFactory;
-import rexos.mas.service_agent.ServiceStepMessage;
+import rexos.mas.service_agent.ServiceStep;
 
 import com.mongodb.BasicDBObject;
 
@@ -144,7 +144,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 			//get the serviceStep
 			BasicDBObject dbServiceStep = (BasicDBObject) hardwareAgent.getServiceStepsBBClient().findDocumentById(serviceStepId);
 
-			ServiceStepMessage serviceStep = new ServiceStepMessage(dbServiceStep);
+			ServiceStep serviceStep = new ServiceStep(dbServiceStep);
 
 			int stepDuration = 0;
 			//get the leading module

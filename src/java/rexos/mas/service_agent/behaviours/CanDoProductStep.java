@@ -16,7 +16,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
-import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.equiplet_agent.ProductStep;
 import rexos.mas.service_agent.Service;
 import rexos.mas.service_agent.ServiceAgent;
 import rexos.mas.service_agent.ServiceFactory;
@@ -51,7 +51,7 @@ public class CanDoProductStep extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		try {
 			ObjectId productStepId = (ObjectId) message.getContentObject();
-			ProductStepMessage productStep = new ProductStepMessage(
+			ProductStep productStep = new ProductStep(
 					(BasicDBObject) agent.getProductStepBBClient()
 							.findDocumentById(productStepId));
 			int stepType = productStep.getType();

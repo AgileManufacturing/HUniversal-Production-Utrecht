@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/equiplet_agent/ProductStepMessage.java
+ * @file rexos/mas/equiplet_agent/ProductStep.java
  * @brief Provides a message for the productstep blackboard
  * @date Created: 2013-04-03
  * 
@@ -62,7 +62,7 @@ import com.mongodb.BasicDBObject;
 /**
  * Implementation of a message for the productstep blackboard
  */
-public class ProductStepMessage implements MongoSaveable, Serializable {
+public class ProductStep implements MongoSaveable, Serializable {
 	/**
 	 * @var long serialVersionUID
 	 *      The serial version UID.
@@ -145,7 +145,7 @@ public class ProductStepMessage implements MongoSaveable, Serializable {
 	 * @param scheduleData
 	 *            The schedule data
 	 */
-	public ProductStepMessage(AID productAgentId, int type,
+	public ProductStep(AID productAgentId, int type,
 			BasicDBObject parameters, Integer[] inputPartTypes,
 			int outputPartType, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
@@ -176,7 +176,7 @@ public class ProductStepMessage implements MongoSaveable, Serializable {
 	 * @param scheduleData
 	 *            The schedule data
 	 */
-	public ProductStepMessage(ObjectId _id, AID productAgentId, int type,
+	public ProductStep(ObjectId _id, AID productAgentId, int type,
 			BasicDBObject parameters, Integer[] inputPartTypes,
 			int outputPartType, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
@@ -192,13 +192,13 @@ public class ProductStepMessage implements MongoSaveable, Serializable {
 	}
 
 	/**
-	 * Constructor for a ProductStepMessage.
+	 * Constructor for a ProductStep.
 	 * 
 	 * @param object
-	 *            The BasicDBObject of which the ProductStepMessage has to be
+	 *            The BasicDBObject of which the ProductStep has to be
 	 *            built.
 	 */
-	public ProductStepMessage(BasicDBObject object) {
+	public ProductStep(BasicDBObject object) {
 		fromBasicDBObject(object);
 	}
 

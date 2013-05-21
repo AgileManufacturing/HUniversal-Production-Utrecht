@@ -36,7 +36,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
-import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.equiplet_agent.ProductStep;
 
 /**
  * @author Peter
@@ -72,7 +72,7 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 		if (message != null) {
 			try {
 				Logger.log("%s ArePartsAvailableInTime%n", myAgent.getLocalName());
-				ProductStepMessage productStep = (ProductStepMessage) message.getContentObject();
+				ProductStep productStep = (ProductStep) message.getContentObject();
 				int startTime = productStep.getScheduleData().getStartTime();
 				Integer[] parts = productStep.getInputPartTypes();
 				

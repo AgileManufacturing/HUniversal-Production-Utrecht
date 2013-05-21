@@ -370,7 +370,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			try {
 				// Get the productstep.
 				ObjectId id = entry.getTargetObjectId();
-				ProductStepMessage productStep = new ProductStepMessage(
+				ProductStep productStep = new ProductStep(
 						(BasicDBObject) equipletBBClient.findDocumentById(id));
 
 				// Gets the conversationId if it doesn't exist throws an

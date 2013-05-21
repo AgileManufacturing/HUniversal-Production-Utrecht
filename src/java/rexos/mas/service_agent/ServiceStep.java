@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/ServiceStepMessage.java
+ * @file rexos/mas/service_agent/ServiceStep.java
  * @brief Provides a message for the servicestep blackboard
  * @date Created: 2013-04-03
  * 
@@ -62,7 +62,7 @@ import com.mongodb.BasicDBObjectBuilder;
  * 
  * @author Peter
  */
-public class ServiceStepMessage implements MongoSaveable {
+public class ServiceStep implements MongoSaveable {
 	private ObjectId _id;
 	private ObjectId nextStep;
 	private int serviceId;
@@ -76,13 +76,13 @@ public class ServiceStepMessage implements MongoSaveable {
 	/**
 	 * Creates an empty ServiceStep.
 	 */
-	public ServiceStepMessage() {}
+	public ServiceStep() {}
 
 	/**
 	 * Creates a ServiceStep with the specified parameters. The nextStep field and productStepId field will be
 	 * initialized to null.
 	 * 
-	 * @param serviceId The ID of the service that created this ServiceStepMessage.
+	 * @param serviceId The ID of the service that created this ServiceStep.
 	 * @param type The type of this service step (e.g. "pick", "place", "move up").
 	 * @param parameters The parameters of the step.
 	 * @param status The status of the step.
@@ -90,7 +90,7 @@ public class ServiceStepMessage implements MongoSaveable {
 	 * @param scheduleData The schedule data containing start time, duration and deadline. The latter is currently
 	 *            unused.
 	 */
-	public ServiceStepMessage(int serviceId, int type, BasicDBObject parameters, StepStatusCode status,
+	public ServiceStep(int serviceId, int type, BasicDBObject parameters, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
 		this(null, serviceId, type, parameters, status, statusData, scheduleData);
 	}
@@ -99,8 +99,8 @@ public class ServiceStepMessage implements MongoSaveable {
 	 * Creates a ServiceStep with the specified parameters. The nextStep field will be initialized to null because it
 	 * cannot be sensibly filled in before saving this step on the blackboard.
 	 * 
-	 * @param productStepId The productStep this ServiceStepMessage resulted from.
-	 * @param serviceId The ID of the service that created this ServiceStepMessage.
+	 * @param productStepId The productStep this ServiceStep resulted from.
+	 * @param serviceId The ID of the service that created this ServiceStep.
 	 * @param type The type of this service step (e.g. "pick", "place", "move up").
 	 * @param parameters The parameters of the step.
 	 * @param status The status of the step.
@@ -108,7 +108,7 @@ public class ServiceStepMessage implements MongoSaveable {
 	 * @param scheduleData The schedule data containing start time, duration and deadline. The latter is currently
 	 *            unused.
 	 */
-	public ServiceStepMessage(ObjectId productStepId, int serviceId, int type, BasicDBObject parameters,
+	public ServiceStep(ObjectId productStepId, int serviceId, int type, BasicDBObject parameters,
 			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
 		this.nextStep = null;
 		this.serviceId = serviceId;
@@ -121,11 +121,11 @@ public class ServiceStepMessage implements MongoSaveable {
 	}
 
 	/**
-	 * Creates a new ServiceStepMessage and initializes all fields with the data in the specified BasicDBObject.
+	 * Creates a new ServiceStep and initializes all fields with the data in the specified BasicDBObject.
 	 * 
-	 * @param object The BasicDBObject containing all data to initialized the ServiceStepMessage with.
+	 * @param object The BasicDBObject containing all data to initialized the ServiceStep with.
 	 */
-	public ServiceStepMessage(BasicDBObject object) {
+	public ServiceStep(BasicDBObject object) {
 		fromBasicDBObject(object);
 	}
 
@@ -134,13 +134,13 @@ public class ServiceStepMessage implements MongoSaveable {
 	 * which the nextStep field is null.
 	 * 
 	 * @param unsortedSteps An array of steps to be sorted.
-	 * @return An array of ServiceStepMessage in the right order.
+	 * @return An array of ServiceStep in the right order.
 	 */
-	public static ServiceStepMessage[] sort(ServiceStepMessage[] unsortedSteps) {
+	public static ServiceStep[] sort(ServiceStep[] unsortedSteps) {
 		// Find the first step
-		ServiceStepMessage firstServiceStep = null;
-		outer: for(ServiceStepMessage serviceStep : unsortedSteps) {
-			for(ServiceStepMessage serviceStep2 : unsortedSteps) {
+		ServiceStep firstServiceStep = null;
+		outer: for(ServiceStep serviceStep : unsortedSteps) {
+			for(ServiceStep serviceStep2 : unsortedSteps) {
 				if(serviceStep2.getNextStep() != null && serviceStep2.getNextStep().equals(serviceStep.getId())) {
 					continue outer;
 				}
@@ -152,11 +152,11 @@ public class ServiceStepMessage implements MongoSaveable {
 		// sort all steps beginning with the one found above
 		int stepsCount = unsortedSteps.length;
 		ObjectId nextStepId;
-		ServiceStepMessage[] sortedSteps = new ServiceStepMessage[stepsCount];
+		ServiceStep[] sortedSteps = new ServiceStep[stepsCount];
 		sortedSteps[0] = firstServiceStep;
 		for(int i = 1; i < stepsCount; i++) {
 			nextStepId = sortedSteps[i - 1].getNextStep();
-			for(ServiceStepMessage serviceStep : unsortedSteps) {
+			for(ServiceStep serviceStep : unsortedSteps) {
 				if(serviceStep.getId().equals(nextStepId)) {
 					sortedSteps[i] = serviceStep;
 					break;

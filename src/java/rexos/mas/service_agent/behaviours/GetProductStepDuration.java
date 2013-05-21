@@ -14,10 +14,10 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
-import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.equiplet_agent.ProductStep;
 import rexos.mas.service_agent.Service;
 import rexos.mas.service_agent.ServiceAgent;
-import rexos.mas.service_agent.ServiceStepMessage;
+import rexos.mas.service_agent.ServiceStep;
 
 import com.mongodb.BasicDBObject;
 
@@ -44,8 +44,8 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		try {
 			ObjectId productStepId = (ObjectId) message.getContentObject();
-			ProductStepMessage productStep =
-					new ProductStepMessage((BasicDBObject) agent.getProductStepBBClient().findDocumentById(
+			ProductStep productStep =
+					new ProductStep((BasicDBObject) agent.getProductStepBBClient().findDocumentById(
 							productStepId));
 			int productStepType = productStep.getType();
 
@@ -54,8 +54,8 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 
 			Service service = agent.GetServiceForConvId(message.getConversationId());
 			BasicDBObject parameters = productStep.getParameters();
-			ServiceStepMessage[] serviceSteps = service.getServiceSteps(productStepType, parameters);
-			for(ServiceStepMessage serviceStep : serviceSteps) {
+			ServiceStep[] serviceSteps = service.getServiceSteps(productStepType, parameters);
+			for(ServiceStep serviceStep : serviceSteps) {
 				serviceStep.setProductStepId(productStepId);
 			}
 			
@@ -67,7 +67,7 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 			askMessage.addReceiver(agent.getHardwareAgentAID());
 			askMessage.setOntology("GetServiceStepDuration");
 			askMessage.setConversationId(message.getConversationId());
-			ServiceStepMessage serviceStep;
+			ServiceStep serviceStep;
 			BlackboardClient serviceStepBB = agent.getServiceStepBBClient();
 			for(int i = serviceSteps.length - 1; i >= 0; i--) {
 				serviceStep = serviceSteps[i];

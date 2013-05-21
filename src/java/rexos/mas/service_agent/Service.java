@@ -60,9 +60,9 @@ public interface Service {
 	 * 
 	 * @param productStepType The type of the productStep to translate.
 	 * @param parameters The parameters of the productStep to use.
-	 * @return An array of ServiceStepMessage each representing a serviceStep as a result of the translation.
+	 * @return An array of ServiceStep each representing a serviceStep as a result of the translation.
 	 */
-	public ServiceStepMessage[] getServiceSteps(int productStepType, BasicDBObject parameters);
+	public ServiceStep[] getServiceSteps(int productStepType, BasicDBObject parameters);
 
 	/**
 	 * Updates the parameters of the serviceSteps with new information contained in partParameters. partParameters
@@ -73,8 +73,8 @@ public interface Service {
 	 * @param serviceSteps the service steps to update.
 	 * @return the updated service steps.
 	 */
-	public ServiceStepMessage[] updateParameters(HashMap<Integer, Position> partParameters,
-			ServiceStepMessage[] serviceSteps);
+	public ServiceStep[] updateParameters(HashMap<Integer, Position> partParameters,
+			ServiceStep[] serviceSteps);
 
 	/**
 	 * Returns the Id of this service. Id's are used to identify services and are the same as those used in the

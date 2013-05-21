@@ -72,22 +72,22 @@ public class DummyService implements Service {
 	 * com.mongodb.BasicDBObject)
 	 */
 	@Override
-	public ServiceStepMessage[] getServiceSteps(int productStepType,
+	public ServiceStep[] getServiceSteps(int productStepType,
 			BasicDBObject parameters) {
-		ServiceStepMessage service = new ServiceStepMessage(1, 1, parameters,
+		ServiceStep service = new ServiceStep(1, 1, parameters,
 				StepStatusCode.EVALUATING, new BasicDBObject("status",
 						"dummy status"), new ScheduleData());
-		return new ServiceStepMessage[] { service };
+		return new ServiceStep[] { service };
 	}
 
 	/* (non-Javadoc)
-	 * @see rexos.mas.service_agent.Service#updateParameters(java.util.HashMap, rexos.mas.service_agent.ServiceStepMessage[])
+	 * @see rexos.mas.service_agent.Service#updateParameters(java.util.HashMap, rexos.mas.service_agent.ServiceStep[])
 	 */
 	@Override
-	public ServiceStepMessage[] updateParameters(
+	public ServiceStep[] updateParameters(
 			HashMap<Integer, Position> partParameters,
-			ServiceStepMessage[] serviceSteps) {
-		return new ServiceStepMessage[0];
+			ServiceStep[] serviceSteps) {
+		return new ServiceStep[0];
 	}
 
 	/*
