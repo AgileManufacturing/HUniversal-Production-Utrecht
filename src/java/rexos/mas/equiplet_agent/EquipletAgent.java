@@ -193,18 +193,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	private ObjectId nextProductStep;
 
 	/**
-	 * @var int firstTimeSlot
-	 *      The first time slot of the grid.
-	 */
-	private int firstTimeSlot;
-
-	/**
-	 * @var int timeSlotLength
-	 *      The length of a time slot.
-	 */
-	private int timeSlotLength;
-
-	/**
 	 * @var DbData dbData
 	 *      The dbData of the equipletAgent.
 	 */
@@ -245,9 +233,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			try {
 				client = KnowledgeDBClient.getClient();
 
-				Row[] rows = client.executeSelectQuery(
-						Queries.POSSIBLE_STEPS_PER_EQUIPLET, getAID()
-								.getLocalName());
+				Row[] rows = client.executeSelectQuery(Queries.POSSIBLE_STEPS_PER_EQUIPLET, getAID().getLocalName());
 				for (Row row : rows) {
 					capabilities.add((int) row.get("id"));
 				}
@@ -260,50 +246,42 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 
 			// creates his service agent.
-			Object[] arguments = new Object[] { dbData, getAID(),
-					logisticsAgent };
-			AgentController serviceAgentCnt = getContainerController()
-					.createNewAgent(getLocalName() + "-serviceAgent",
-							"rexos.mas.service_agent.ServiceAgent", arguments);
+			Object[] arguments = new Object[] { dbData, getAID(), logisticsAgent };
+			AgentController serviceAgentCnt = getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "rexos.mas.service_agent.ServiceAgent", arguments);
 			serviceAgentCnt.start();
 			serviceAgent = new AID(serviceAgentCnt.getName(), AID.ISGUID);
 
 			// makes connection with the collective blackboard.
-			collectiveBBClient = new BlackboardClient(collectiveDbIp,
-					collectiveDbPort);
+			collectiveBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
 			collectiveBBClient.setDatabase(collectiveDbName);
 			collectiveBBClient.setCollection(equipletDirectoryName);
 
 			// makes connection with the equiplet blackboard.
-			equipletBBClient = new BlackboardClient(equipletDbIp,
-					equipletDbPort);
+			equipletBBClient = new BlackboardClient(equipletDbIp, equipletDbPort);
 			equipletBBClient.setDatabase(equipletDbName);
 			equipletBBClient.setCollection(productStepsName);
 			equipletBBClient.removeDocuments(new BasicDBObject());
 
 			// subscribes on changes of the status field on the equiplet
 			// blackboard.
-			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription(
-					"status", this);
+			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			equipletBBClient.subscribe(statusSubscription);
 
 			// gets the timedata for synchronizing from the collective
 			// blackboard.
 			collectiveBBClient.setCollection(timeDataName);
-			BasicDBObject timeData = (BasicDBObject) collectiveBBClient
-					.findDocuments(new BasicDBObject()).get(0);
-			firstTimeSlot = timeData.getInt("firstTimeSlot");
-			timeSlotLength = timeData.getInt("timeSlotLength");
+			BasicDBObject timeData = (BasicDBObject) collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
+			
+			// initiates the timer to the next product step.
+			timer = new NextProductStepTimer(timeData.getLong("firstTimeSlot"), timeData.getInt("timeSlotLength"));
+			timer.setNextUsedTimeSlot(-1);
+			
 			collectiveBBClient.setCollection(equipletDirectoryName);
 		} catch (Exception e) {
 			Logger.log(e);
 			doDelete();
 		}
-
-		// initiates the timer to the next product step.
-		timer = new NextProductStepTimer(firstTimeSlot, timeSlotLength);
-		timer.setNextUsedTimeSlot(-1);
 
 		// starts the behaviour for receiving message when the Service Agent
 		// Dies.
@@ -323,16 +301,13 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		try {
 			// Removes himself from the collective blackboard equiplet
 			// directory.
-			collectiveBBClient.removeDocuments(new BasicDBObject("AID",
-					getAID().getName()));
+			collectiveBBClient.removeDocuments(new BasicDBObject("AID", getAID().getName()));
 
 			// Messages all his product agents that he is going to die.
-			Object[] productAgents = equipletBBClient.findDistinctValues(
-					"productAgentId", new BasicDBObject());
+			Object[] productAgents = equipletBBClient.findDistinctValues("productAgentId", new BasicDBObject());
 			for (Object productAgent : productAgents) {
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
-				responseMessage.addReceiver(new AID(productAgent.toString(),
-						AID.ISGUID));
+				responseMessage.addReceiver(new AID(productAgent.toString(), AID.ISGUID));
 				responseMessage.setOntology("EquipletAgentDied");
 				responseMessage.setContent("I'm dying");
 				send(responseMessage);
@@ -345,8 +320,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			// Clears his own blackboard and removes his subscription on that
 			// blackboard.
 			equipletBBClient.removeDocuments(new BasicDBObject());
-			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription(
-					"status", this);
+			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			equipletBBClient.unsubscribe(statusSubscription);
 		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
@@ -370,8 +344,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			try {
 				// Get the productstep.
 				ObjectId id = entry.getTargetObjectId();
-				ProductStepMessage productStep = new ProductStepMessage(
-						(BasicDBObject) equipletBBClient.findDocumentById(id));
+				ProductStepMessage productStep = new ProductStepMessage((BasicDBObject) equipletBBClient.findDocumentById(id));
 
 				// Gets the conversationId if it doesn't exist throws an
 				// error.
@@ -385,8 +358,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				responseMessage.addReceiver(productStep.getProductAgentId());
 				responseMessage.setConversationId(conversationId);
 
-				Logger.log("status update: "
-						+ productStep.getStatus().toString());
+				Logger.log("status update: " + productStep.getStatus().toString());
 				switch (productStep.getStatus()) {
 				// Depending on the changed status fills in the
 				// responseMessage and sends it to the product agent.
@@ -396,25 +368,19 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 						// productStep is
 						// earlier as the next used time slot make it
 						// the next used timeslot.
-						ScheduleData scheduleData = productStep
-								.getScheduleData();
-
-						if (scheduleData.getStartTime() < timer
-								.getNextUsedTimeSlot()) {
-							timer.setNextUsedTimeSlot(scheduleData
-									.getStartTime());
+						ScheduleData scheduleData = productStep.getScheduleData();
+						if (scheduleData.getStartTime() > timer.getNextUsedTimeSlot()) {
+							timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 						}
 
 						// Logger.log("%s Sending ProductionDuration tot %s%n",
 						// getAID(), );
 						responseMessage.setOntology("Planned");
-						responseMessage.setContentObject(scheduleData
-								.getStartTime());
+						responseMessage.setContentObject(scheduleData.getStartTime());
 						send(responseMessage);
 					} catch (IOException e) {
 						responseMessage.setPerformative(ACLMessage.FAILURE);
-						responseMessage
-								.setContent("An error occured in the planning/please reschedule");
+						responseMessage.setContent("An error occured in the planning/please reschedule");
 						send(responseMessage);
 						Logger.log(e);
 					}
@@ -427,15 +393,13 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				case FAILED:
 					responseMessage.setOntology("StatusUpdate");
 					responseMessage.setContent("FAILED");
-					responseMessage.setContentObject(productStep
-							.getStatusData());
+					responseMessage.setContentObject(productStep.getStatusData());
 					send(responseMessage);
 					break;
 				case SUSPENDED_OR_WARNING:
 					responseMessage.setOntology("StatusUpdate");
 					responseMessage.setContent("SUSPENDED_OR_WARNING");
-					responseMessage.setContentObject(productStep
-							.getStatusData());
+					responseMessage.setContentObject(productStep.getStatusData());
 					send(responseMessage);
 					break;
 				case DONE:
@@ -473,8 +437,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 * @param objectId
 	 *            the objectId in the new relation.
 	 */
-	public void addCommunicationRelation(String conversationId,
-			ObjectId objectId) {
+	public void addCommunicationRelation(String conversationId, ObjectId objectId) {
 		communicationTable.put(conversationId, objectId);
 	}
 
@@ -500,8 +463,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	public String getConversationId(ObjectId productStepEntry) {
 		String conversationId = null;
 		if (communicationTable.containsValue(productStepEntry)) {
-			for (Entry<String, ObjectId> tableEntry : communicationTable
-					.entrySet()) {
+			for (Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
 				if (tableEntry.getValue().equals(productStepEntry)) {
 					conversationId = tableEntry.getKey();
 					break;

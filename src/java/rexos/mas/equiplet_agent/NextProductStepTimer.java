@@ -59,7 +59,7 @@ public class NextProductStepTimer extends Timer{
 	 * @var int firstTimeSlot
 	 * The first time slot of the grid.
 	 */
-	private int firstTimeSlot;
+	private long firstTimeSlot;
 	
 	/**
 	 * @var int timeSlotLength
@@ -68,11 +68,17 @@ public class NextProductStepTimer extends Timer{
 	private int timeSlotLength;
 	
 	/**
+	 * @var NextProductStepTask task
+	 * The task for this timer
+	 */
+	private NextProductStepTask task;
+	
+	/**
 	 * Constructor for the next product step timer.
 	 * @param firstTimeSlot the first time slot from the grid/equiplet.
 	 * @param timeSlotLength the length of a time slot.
 	 */
-	public NextProductStepTimer(int firstTimeSlot, int timeSlotLength){
+	public NextProductStepTimer(long firstTimeSlot, int timeSlotLength){
 		super();
 		this.firstTimeSlot = firstTimeSlot;
 		this.timeSlotLength = timeSlotLength;
@@ -84,11 +90,16 @@ public class NextProductStepTimer extends Timer{
 	 */
 	public void setNextUsedTimeSlot(int nextUsedTimeSlot){
 		this.nextUsedTimeSlot = nextUsedTimeSlot;
-		cancel();
+		if(task != null){
+			task.cancel();
+		}
 		if(nextUsedTimeSlot != -1){
-			int startTimeSlot = nextUsedTimeSlot * timeSlotLength + firstTimeSlot;
-			int currentTime = (int)System.currentTimeMillis();
-			this.schedule(new NextProductStepTask(), startTimeSlot - currentTime);
+			long startTimeSlot = nextUsedTimeSlot * timeSlotLength + firstTimeSlot;
+			long currentTime = System.currentTimeMillis();
+			task = new NextProductStepTask();
+			if(startTimeSlot - currentTime > 0){
+				schedule(task, startTimeSlot - currentTime);
+			}
 		}
 	}
 	

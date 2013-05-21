@@ -56,8 +56,6 @@ import jade.lang.acl.ACLMessage;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bson.BasicBSONObject;
-
 import rexos.libraries.blackboard_client.BasicOperationSubscription;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.BlackboardSubscriber;
