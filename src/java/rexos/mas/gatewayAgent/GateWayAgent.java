@@ -37,7 +37,7 @@
  * 
  **/
 
-package java.rexos.mas.gatewayAgent;
+package rexos.mas.gatewayAgent;
 
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;

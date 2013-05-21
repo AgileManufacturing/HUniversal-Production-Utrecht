@@ -39,22 +39,22 @@
  * 
  **/
 
-package java.rexos.mas.productAgent;
+package rexos.mas.productAgent;
 
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 
-import java.rexos.mas.newDataClasses.Product;
-import java.rexos.mas.newDataClasses.Production;
-import java.rexos.mas.newDataClasses.ProductionEquipletMapper;
-import java.rexos.mas.newDataClasses.ProductionStep;
-import java.rexos.mas.newDataClasses.ProductionStepStatus;
+import rexos.mas.newDataClasses.Product;
+import rexos.mas.newDataClasses.Production;
+import rexos.mas.newDataClasses.ProductionEquipletMapper;
+import rexos.mas.newDataClasses.ProductionStep;
+import rexos.mas.newDataClasses.ProductionStepStatus;
 import java.util.ArrayList;
 import java.util.List;
 
-import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
-import libraries.blackboardJavaClient.src.nl.hu.client.InvalidDBNamespaceException;
-import libraries.blackboardJavaClient.src.nl.hu.client.InvalidJSONException;
+import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.blackboard_client.InvalidJSONException;
 
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;

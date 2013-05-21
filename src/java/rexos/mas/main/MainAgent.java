@@ -38,18 +38,18 @@
  * 
  **/
 
-package java.rexos.mas.main;
+package rexos.mas.main;
 
 import jade.core.AID;
 import jade.core.Agent;
 
-import java.rexos.mas.newDataClasses.Parameter;
-import java.rexos.mas.newDataClasses.ParameterGroup;
-import java.rexos.mas.newDataClasses.ParameterList;
-import java.rexos.mas.newDataClasses.Product;
-import java.rexos.mas.newDataClasses.Production;
-import java.rexos.mas.newDataClasses.ProductionStep;
-import java.rexos.mas.newDataClasses.ProductionStepStatus;
+import rexos.mas.newDataClasses.Parameter;
+import rexos.mas.newDataClasses.ParameterGroup;
+import rexos.mas.newDataClasses.ParameterList;
+import rexos.mas.newDataClasses.Product;
+import rexos.mas.newDataClasses.Production;
+import rexos.mas.newDataClasses.ProductionStep;
+import rexos.mas.newDataClasses.ProductionStepStatus;
 import java.util.ArrayList;
 
 @SuppressWarnings("serial")

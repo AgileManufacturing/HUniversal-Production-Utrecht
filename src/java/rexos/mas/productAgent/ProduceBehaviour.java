@@ -39,7 +39,7 @@
  * 
  **/
 
-package java.rexos.mas.productAgent;
+package rexos.mas.productAgent;
 
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
@@ -47,12 +47,12 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 
-import java.rexos.mas.newDataClasses.LogMessage;
-import java.rexos.mas.newDataClasses.Product;
-import java.rexos.mas.newDataClasses.Production;
-import java.rexos.mas.newDataClasses.ProductionEquipletMapper;
-import java.rexos.mas.newDataClasses.ProductionStep;
-import java.rexos.mas.newDataClasses.ProductionStepStatus;
+import rexos.mas.newDataClasses.LogMessage;
+import rexos.mas.newDataClasses.Product;
+import rexos.mas.newDataClasses.Production;
+import rexos.mas.newDataClasses.ProductionEquipletMapper;
+import rexos.mas.newDataClasses.ProductionStep;
+import rexos.mas.newDataClasses.ProductionStepStatus;
 import java.util.HashMap;
 import java.util.List;
 

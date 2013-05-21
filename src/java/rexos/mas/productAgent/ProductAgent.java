@@ -38,16 +38,16 @@
  * 
  **/
 
-package java.rexos.mas.productAgent;
+package rexos.mas.productAgent;
 
-import java.rexos.mas.newDataClasses.Product;
-import java.rexos.mas.newDataClasses.ProductionStep;
+import rexos.mas.newDataClasses.Product;
+import rexos.mas.newDataClasses.ProductionStep;
 
 import jade.core.AID;
 import jade.core.Agent;
-import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
-import libraries.blackboardJavaClient.src.nl.hu.client.InvalidDBNamespaceException;
-import libraries.blackboardJavaClient.src.nl.hu.client.InvalidJSONException;
+import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.blackboard_client.InvalidJSONException;
 
 public class ProductAgent extends Agent{
 	private static final long serialVersionUID = 1L;

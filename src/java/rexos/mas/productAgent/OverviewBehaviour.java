@@ -34,9 +34,9 @@
  *         POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package java.rexos.mas.productAgent;
+package rexos.mas.productAgent;
 
-import java.rexos.mas.newDataClasses.ProductionStep;
+import rexos.mas.newDataClasses.ProductionStep;
 
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;

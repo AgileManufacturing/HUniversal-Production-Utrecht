@@ -37,7 +37,7 @@
  * 
  **/
 
-package java.rexos.mas.newDataClasses;
+package rexos.mas.newDataClasses;
 
 public enum ProductionStepStatus{
 	STATE_DONE, STATE_TODO, STATE_PRODUCING, STATE_FAILED

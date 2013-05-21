@@ -37,7 +37,7 @@
  * 
  **/
 
-package java.rexos.mas.newDataClasses;
+package rexos.mas.newDataClasses;
 
 public class LogMessage{
 	/**

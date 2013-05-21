@@ -38,9 +38,9 @@
  * 
  **/
 
-package java.rexos.mas.newDataClasses.sqldatabase;
+package rexos.mas.newDataClasses.sqldatabase;
 
-import java.rexos.mas.newDataClasses.LogMessage;
+import rexos.mas.newDataClasses.LogMessage;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;

@@ -37,20 +37,20 @@
  * 
  **/
 
-package java.rexos.mas.productAgent;
+package rexos.mas.productAgent;
 
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
-import java.rexos.mas.newDataClasses.Product;
-import java.rexos.mas.newDataClasses.Production;
-import java.rexos.mas.newDataClasses.ProductionStep;
+import rexos.mas.newDataClasses.Product;
+import rexos.mas.newDataClasses.Production;
+import rexos.mas.newDataClasses.ProductionStep;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
+import rexos.libraries.blackboard_client.BlackboardClient;
 
 import com.mongodb.DBObject;
 

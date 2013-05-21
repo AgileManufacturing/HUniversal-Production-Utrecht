@@ -38,7 +38,7 @@
  * 
  **/
 
-package java.rexos.mas.productAgent;
+package rexos.mas.productAgent;
 
 import jade.core.behaviours.CyclicBehaviour;
 

@@ -38,9 +38,9 @@
  * 
  **/
 
-package java.rexos.mas.newDataClasses;
+package rexos.mas.newDataClasses;
 
-import java.rexos.mas.newDataClasses.sqldatabase.sqliteDatabase;
+import rexos.mas.newDataClasses.sqldatabase.sqliteDatabase;
 import java.util.List;
 
 public class ProductLog{

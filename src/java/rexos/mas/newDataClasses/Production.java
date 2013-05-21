@@ -38,7 +38,7 @@
  * 
  **/
 
-package java.rexos.mas.newDataClasses;
+package rexos.mas.newDataClasses;
 
 import java.util.ArrayList;
 
