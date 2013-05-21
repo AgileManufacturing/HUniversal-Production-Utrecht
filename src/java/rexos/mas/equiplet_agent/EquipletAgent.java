@@ -227,7 +227,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		try {
 			InetAddress IP = InetAddress.getLocalHost();
 			equipletDbIp = IP.getHostAddress();
-		} catch (Exception e) {
+		} catch(Exception e) {
 			Logger.log(e);
 		}
 		equipletDbName = getAID().getLocalName();
@@ -235,7 +235,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		try {
 			Object[] args = getArguments();
 			AID logisticsAgent = null;
-			if (args != null && args.length > 0) {
+			if(args != null && args.length > 0) {
 				logisticsAgent = (AID) args[0];
 			}
 
@@ -245,13 +245,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			try {
 				client = KnowledgeDBClient.getClient();
 
-				Row[] rows = client.executeSelectQuery(
-						Queries.POSSIBLE_STEPS_PER_EQUIPLET, getAID()
-								.getLocalName());
-				for (Row row : rows) {
+				Row[] rows = client.executeSelectQuery(Queries.POSSIBLE_STEPS_PER_EQUIPLET, getAID().getLocalName());
+				for(Row row : rows) {
 					capabilities.add((int) row.get("id"));
 				}
-			} catch (KnowledgeException e1) {
+			} catch(KnowledgeException e1) {
 				takeDown();
 				Logger.log(e1);
 			}
@@ -260,43 +258,40 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 
 			// creates his service agent.
-			Object[] arguments = new Object[] { dbData, getAID(),
-					logisticsAgent };
-			AgentController serviceAgentCnt = getContainerController()
-					.createNewAgent(getLocalName() + "-serviceAgent",
+			Object[] arguments = new Object[] {
+					dbData, getAID(), logisticsAgent
+			};
+			AgentController serviceAgentCnt =
+					getContainerController().createNewAgent(getLocalName() + "-serviceAgent",
 							"rexos.mas.service_agent.ServiceAgent", arguments);
 			serviceAgentCnt.start();
 			serviceAgent = new AID(serviceAgentCnt.getName(), AID.ISGUID);
 
 			// makes connection with the collective blackboard.
-			collectiveBBClient = new BlackboardClient(collectiveDbIp,
-					collectiveDbPort);
+			collectiveBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
 			collectiveBBClient.setDatabase(collectiveDbName);
 			collectiveBBClient.setCollection(equipletDirectoryName);
 
 			// makes connection with the equiplet blackboard.
-			equipletBBClient = new BlackboardClient(equipletDbIp,
-					equipletDbPort);
+			equipletBBClient = new BlackboardClient(equipletDbIp, equipletDbPort);
 			equipletBBClient.setDatabase(equipletDbName);
 			equipletBBClient.setCollection(productStepsName);
 			equipletBBClient.removeDocuments(new BasicDBObject());
 
 			// subscribes on changes of the status field on the equiplet
 			// blackboard.
-			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription(
-					"status", this);
+			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			equipletBBClient.subscribe(statusSubscription);
 
 			// gets the timedata for synchronizing from the collective
 			// blackboard.
 			collectiveBBClient.setCollection(timeDataName);
-			BasicDBObject timeData = (BasicDBObject) collectiveBBClient
-					.findDocuments(new BasicDBObject()).get(0);
+			BasicDBObject timeData = (BasicDBObject) collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
 			firstTimeSlot = timeData.getInt("firstTimeSlot");
 			timeSlotLength = timeData.getInt("timeSlotLength");
 			collectiveBBClient.setCollection(equipletDirectoryName);
-		} catch (Exception e) {
+		} catch(Exception e) {
 			Logger.log(e);
 			doDelete();
 		}
@@ -323,21 +318,18 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		try {
 			// Removes himself from the collective blackboard equiplet
 			// directory.
-			collectiveBBClient.removeDocuments(new BasicDBObject("AID",
-					getAID().getName()));
+			collectiveBBClient.removeDocuments(new BasicDBObject("AID", getAID().getName()));
 
 			// Messages all his product agents that he is going to die.
-			Object[] productAgents = equipletBBClient.findDistinctValues(
-					"productAgentId", new BasicDBObject());
-			for (Object productAgent : productAgents) {
+			Object[] productAgents = equipletBBClient.findDistinctValues("productAgentId", new BasicDBObject());
+			for(Object productAgent : productAgents) {
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
-				responseMessage.addReceiver(new AID(productAgent.toString(),
-						AID.ISGUID));
+				responseMessage.addReceiver(new AID(productAgent.toString(), AID.ISGUID));
 				responseMessage.setOntology("EquipletAgentDied");
 				responseMessage.setContent("I'm dying");
 				send(responseMessage);
 			}
-		} catch (Exception e) {
+		} catch(Exception e) {
 			Logger.log(e);
 			// The equiplet is already going down, so it has to do nothing here.
 		}
@@ -345,11 +337,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			// Clears his own blackboard and removes his subscription on that
 			// blackboard.
 			equipletBBClient.removeDocuments(new BasicDBObject());
-			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription(
-					"status", this);
+			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			equipletBBClient.unsubscribe(statusSubscription);
-		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 			Logger.log(e);
 		}
 
@@ -365,94 +356,77 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 */
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
-		switch (entry.getNamespace().split("\\.")[1]) {
-		case "ProductStepsBlackBoard":
-			try {
-				// Get the productstep.
-				ObjectId id = entry.getTargetObjectId();
-				ProductStep productStep = new ProductStep(
-						(BasicDBObject) equipletBBClient.findDocumentById(id));
+		switch(entry.getNamespace().split("\\.")[1]) {
+			case "ProductStepsBlackBoard":
+				try {
+					// Get the productstep.
+					ObjectId id = entry.getTargetObjectId();
+					ProductStep productStep = new ProductStep((BasicDBObject) equipletBBClient.findDocumentById(id));
 
-				// Gets the conversationId if it doesn't exist throws an
-				// error.
-				String conversationId = getConversationId(id);
-				if (conversationId == null) {
-					throw new Exception();
-				}
-
-				// Create the responseMessage
-				ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
-				responseMessage.addReceiver(productStep.getProductAgentId());
-				responseMessage.setConversationId(conversationId);
-
-				Logger.log("status update: "
-						+ productStep.getStatus().toString());
-				switch (productStep.getStatus()) {
-				// Depending on the changed status fills in the
-				// responseMessage and sends it to the product agent.
-				case PLANNED:
-					try {
-						// If the start time of the newly planned
-						// productStep is
-						// earlier as the next used time slot make it
-						// the next used timeslot.
-						ScheduleData scheduleData = productStep
-								.getScheduleData();
-
-						if (scheduleData.getStartTime() < timer
-								.getNextUsedTimeSlot()) {
-							timer.setNextUsedTimeSlot(scheduleData
-									.getStartTime());
-						}
-
-						// Logger.log("%s Sending ProductionDuration tot %s%n",
-						// getAID(), );
-						responseMessage.setOntology("Planned");
-						responseMessage.setContentObject(scheduleData
-								.getStartTime());
-						send(responseMessage);
-					} catch (IOException e) {
-						responseMessage.setPerformative(ACLMessage.FAILURE);
-						responseMessage
-								.setContent("An error occured in the planning/please reschedule");
-						send(responseMessage);
-						Logger.log(e);
+					// Gets the conversationId if it doesn't exist throws an
+					// error.
+					String conversationId = getConversationId(id);
+					if(conversationId == null) {
+						throw new Exception();
 					}
-					break;
-				case IN_PROGRESS:
-					responseMessage.setOntology("StatusUpdate");
-					responseMessage.setContent("INPROGRESS");
+
+					// Create the responseMessage
+					ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
+					responseMessage.addReceiver(productStep.getProductAgentId());
+					responseMessage.setConversationId(conversationId);
+
+					Logger.log("status update: " + productStep.getStatus().toString());
+					switch(productStep.getStatus()) {
+					// Depending on the changed status fills in the
+					// responseMessage and sends it to the product agent.
+						case PLANNED:
+							try {
+								// If the start time of the newly planned productStep is earlier as the next used time
+								// slot make it the next used timeslot.
+								ScheduleData scheduleData = productStep.getScheduleData();
+
+								if(scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
+									timer.setNextUsedTimeSlot(scheduleData.getStartTime());
+								}
+
+								// Logger.log("%s Sending ProductionDuration tot %s%n", getAID(), );
+								responseMessage.setOntology("Planned");
+								responseMessage.setContentObject(scheduleData.getStartTime());
+							} catch(IOException e) {
+								responseMessage.setPerformative(ACLMessage.FAILURE);
+								responseMessage.setContent("An error occured in the planning/please reschedule");
+								Logger.log(e);
+							}
+							break;
+						case IN_PROGRESS:
+							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setContent("INPROGRESS");
+							break;
+						case FAILED:
+							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setContent("FAILED");
+							responseMessage.setContentObject(productStep.getStatusData());
+							break;
+						case SUSPENDED_OR_WARNING:
+							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setContent("SUSPENDED_OR_WARNING");
+							responseMessage.setContentObject(productStep.getStatusData());
+							break;
+						case DONE:
+							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setContent("DONE");
+							break;
+						default:
+							break;
+					}
 					send(responseMessage);
-					break;
-				case FAILED:
-					responseMessage.setOntology("StatusUpdate");
-					responseMessage.setContent("FAILED");
-					responseMessage.setContentObject(productStep
-							.getStatusData());
-					send(responseMessage);
-					break;
-				case SUSPENDED_OR_WARNING:
-					responseMessage.setOntology("StatusUpdate");
-					responseMessage.setContent("SUSPENDED_OR_WARNING");
-					responseMessage.setContentObject(productStep
-							.getStatusData());
-					send(responseMessage);
-					break;
-				case DONE:
-					responseMessage.setOntology("StatusUpdate");
-					responseMessage.setContent("DONE");
-					send(responseMessage);
-					break;
-				default:
-					break;
+				} catch(Exception e1) {
+					// TODO Auto-generated catch block
+					Logger.log(e1);
 				}
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				Logger.log(e1);
-			}
-			break;
-		default:
-			break;
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -473,8 +447,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 * @param objectId
 	 *            the objectId in the new relation.
 	 */
-	public void addCommunicationRelation(String conversationId,
-			ObjectId objectId) {
+	public void addCommunicationRelation(String conversationId, ObjectId objectId) {
 		communicationTable.put(conversationId, objectId);
 	}
 
@@ -499,10 +472,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 */
 	public String getConversationId(ObjectId productStepEntry) {
 		String conversationId = null;
-		if (communicationTable.containsValue(productStepEntry)) {
-			for (Entry<String, ObjectId> tableEntry : communicationTable
-					.entrySet()) {
-				if (tableEntry.getValue().equals(productStepEntry)) {
+		if(communicationTable.containsValue(productStepEntry)) {
+			for(Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
+				if(tableEntry.getValue().equals(productStepEntry)) {
 					conversationId = tableEntry.getKey();
 					break;
 				}

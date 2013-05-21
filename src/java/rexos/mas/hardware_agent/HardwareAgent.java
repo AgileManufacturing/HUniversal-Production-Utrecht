@@ -53,6 +53,7 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import rexos.libraries.blackboard_client.BasicOperationSubscription;
 import rexos.libraries.blackboard_client.BlackboardClient;
@@ -63,6 +64,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
+import rexos.libraries.knowledgedb_client.KeyNotFoundException;
 import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
 import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
@@ -184,20 +186,20 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient.setDatabase(dbData.getName());
 			serviceStepBBClient.setCollection("ServiceStepsBlackBoard");
-
+	
 			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			serviceStepBBClient.subscribe(statusSubscription);
-
+	
 			equipletStepBBClient = new BlackboardClient(dbData.getIp());
 			equipletStepBBClient.setDatabase(dbData.getName());
 			equipletStepBBClient.setCollection("EquipletStepsBlackBoard");
 			equipletStepBBClient.subscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
-		} catch (Exception e) {
+		} catch(InvalidDBNamespaceException | UnknownHostException | GeneralMongoException e) {
 			Logger.log(e);
 			doDelete();
 		}
-		
+
 		//Start the behaviours
 		EvaluateDuration evaluateDurationBehaviour = new EvaluateDuration(this, moduleFactory);
 		addBehaviour(evaluateDurationBehaviour);
@@ -209,25 +211,21 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		addBehaviour(checkForModules);
 
 		//Register modules
-		KnowledgeDBClient client;
 		try {
-			client = KnowledgeDBClient.getClient();
-
+			KnowledgeDBClient client = KnowledgeDBClient.getClient();
 			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgentAID.getLocalName());
+			Module module;
+			int id;
 			for (Row row : rows) {
-				try {
-					int id = (int) row.get("module");
-					Module module = moduleFactory.getModuleById(id);
+					id = (int) row.get("module");
+					module = moduleFactory.getModuleById(id);
 					for (int step : module.isLeadingForSteps()) {
 						registerLeadingModule(step, id);
 					}
-				} catch (Exception e) {
-					/* the row has no module */
-				}
 			}
-		} catch (KnowledgeException e1) {
-			doDelete();
+		} catch (KnowledgeException | KeyNotFoundException e1) {
 			Logger.log(e1);
+			doDelete();
 		}
 		
 		//Send a message to the serviceAgent that the hardware agent is ready.

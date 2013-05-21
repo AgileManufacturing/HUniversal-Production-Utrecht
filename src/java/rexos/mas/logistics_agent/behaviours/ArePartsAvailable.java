@@ -71,7 +71,7 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 			myAgent.send(reply);
 
 			myAgent.addBehaviour(new ArePartsAvailableInTime(myAgent, message.getConversationId()));
-			Logger.log("Parts: { %s } are available%n", (Object[]) parts);
+			Logger.log("PartTypes { %s } are available%n", (Object[]) parts);
 		} catch (UnreadableException e) {
 			Logger.log(e);
 			myAgent.doDelete();

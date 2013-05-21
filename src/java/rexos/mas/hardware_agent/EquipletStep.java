@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/hardware_agent/EquipletStepMessage.java
+ * @file rexos/mas/hardware_agent/EquipletStep.java
  * @brief Makes a messages to be used for a 
  * @brief respond. This respond consist of a serviceStepID,instructiondata a type and timedata.
  * @date Created: 2013-04-02
@@ -40,9 +40,9 @@ import rexos.mas.equiplet_agent.StepStatusCode;
 import com.mongodb.BasicDBObject;
 
 /**
- * EquipletStepMessage class containing all the data for a message on the EquipletStepBlackboard.
+ * EquipletStep class containing all the data for a message on the EquipletStepBlackboard.
  */
-public class EquipletStepMessage implements MongoSaveable {
+public class EquipletStep implements MongoSaveable {
 	/**
 	 * @var ObjectId _id
 	 * The id of this step.
@@ -87,7 +87,7 @@ public class EquipletStepMessage implements MongoSaveable {
 	 * @param status The status
 	 * @param timeData The timeData
 	 */
-	public EquipletStepMessage(ObjectId serviceStepID, int moduleId,
+	public EquipletStep(ObjectId serviceStepID, int moduleId,
 			InstructionData instructionData, StepStatusCode status,
 			TimeData timeData) {
 
@@ -102,7 +102,7 @@ public class EquipletStepMessage implements MongoSaveable {
 	 * Constructor building this class from a BasicDBObject
 	 * @param object The BasicDBObject to build this class from.
 	 */
-	public EquipletStepMessage(BasicDBObject object){
+	public EquipletStep(BasicDBObject object){
 		fromBasicDBObject(object);
 	}
 	
@@ -210,7 +210,7 @@ public class EquipletStepMessage implements MongoSaveable {
 	@Override
 	public String toString() {
 		return String
-				.format("EquipletStepMessage [serviceStepID=%s, instructionData=%s, status=%s, timeData=%s]",
+				.format("EquipletStep [serviceStepID=%s, instructionData=%s, status=%s, timeData=%s]",
 						serviceStepID, instructionData, status, timeData);
 	}
 

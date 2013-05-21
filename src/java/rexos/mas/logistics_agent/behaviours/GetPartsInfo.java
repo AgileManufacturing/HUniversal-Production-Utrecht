@@ -80,7 +80,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 				Integer[] partIds = ((ProductStep) message.getContentObject()).getInputPartTypes();
 				HashMap<Integer, Position> partsParameters = new HashMap<Integer, Position>();
 
-				int x = 0;
+				int x = 2;
 				for (int partId : partIds) {
 					partsParameters.put(partId, new Position(x++, 1, 3));
 				}

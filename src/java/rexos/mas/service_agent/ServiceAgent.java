@@ -151,8 +151,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 */
 	private HashMap<String, Service> convIdServiceMapping;
 
-	/* (non-Javadoc)
-	 * @see jade.core.Agent#setup() */
+	/**
+	 * Initializes the agent. This includes creating and starting the hardware agent, creating and configuring two
+	 * blackboard clients, subscribing to status updates and adding all behaviours.
+	 */
 	@Override
 	public void setup() {
 		Logger.log("I spawned as a service agent.");
@@ -212,8 +214,11 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		addBehaviour(new InitialisationFinished(this));
 	}
 
-	/* (non-Javadoc)
-	 * @see jade.core.Agent#takeDown() */
+	/**
+	 * Deinitializes the agent by unsubscribing to status field updates, emptying the service step blackboard and
+	 * updating
+	 * the status of all product steps. It also notifies the equiplet agent and hardware agent that this agent died.
+	 */
 	//@formatter:off
 	@Override
 	public void takeDown() {
@@ -276,11 +281,12 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		convIdServiceMapping.remove(conversationId);
 	}
 
-	/* (non-Javadoc)
-	 * @see
-	 * rexos.libraries.blackboard_client.BlackboardSubscriber#onMessage(rexos
-	 * .libraries.blackboard_client.MongoOperation,
-	 * rexos.libraries.blackboard_client.OplogEntry) */
+	/**
+	 * This method is called by the blackboard client when certain (or any) CRUD operations are performed on the status
+	 * field of a product-/servicestep on a blackboard. For now the service agent just passes the message on to another
+	 * agent by updating the status field of the corresponding steps on the other blackboard. (e.g. changes the status
+	 * of all service steps to ABORTED when the status of a product step is changed to ABORTED).
+	 */
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
 		try {
@@ -321,6 +327,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 						case UPDATE:
 							StepStatusCode status = serviceStep.getStatus();
 							switch(status) {
+								case DELETED:
+									serviceStepBBClient.removeDocuments(new BasicDBObject("_id", entry
+											.getTargetObjectId()));
+									//$FALL-THROUGH$
 								case WAITING:
 								case IN_PROGRESS:
 								case SUSPENDED_OR_WARNING:
@@ -387,7 +397,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	/**
 	 * Returns the productSteps blackboard client.
 	 * 
-	 * @return  the productSteps blackboard client.
+	 * @return the productSteps blackboard client.
 	 */
 	public BlackboardClient getProductStepBBClient() {
 		return productStepBBClient;

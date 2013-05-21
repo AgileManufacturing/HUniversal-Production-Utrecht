@@ -82,9 +82,9 @@ public class GripperModule extends Module {
 	 * @see Module#getEquipletSteps(int, BasicDBObject)
 	 */
 	@Override
-	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters) {
-		EquipletStepMessage[] equipletSteps;
-		ArrayList<EquipletStepMessage> steps;
+	public EquipletStep[] getEquipletSteps(int stepType, BasicDBObject parameters) {
+		EquipletStep[] equipletSteps;
+		ArrayList<EquipletStep> steps;
 
 		//gets the newest code for the movementModule.
 		int movementModuleId = findMovementModule(getConfiguration());
@@ -93,7 +93,7 @@ public class GripperModule extends Module {
 		//switch to determine which steps to make.
 		switch (stepType) {
 		case 1: //case for the equiplet function pick.
-			steps = new ArrayList<EquipletStepMessage>();
+			steps = new ArrayList<EquipletStep>();
 
 			//get the parameters and put extra values in it.
 			BasicDBObject moveParameters = (BasicDBObject) parameters.copy();
@@ -111,10 +111,10 @@ public class GripperModule extends Module {
 			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));
 
 			//convert the ArrayList to an array and return it.
-			equipletSteps = new EquipletStepMessage[steps.size()];
+			equipletSteps = new EquipletStep[steps.size()];
 			return steps.toArray(equipletSteps);
 		case 2: //case for the equiplet function place. 
-			steps = new ArrayList<EquipletStepMessage>();
+			steps = new ArrayList<EquipletStep>();
 
 			//get the parameters and put extra values in it.
 			moveParameters = (BasicDBObject) parameters.copy();
@@ -132,20 +132,20 @@ public class GripperModule extends Module {
 			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));
 
 			//convert the ArrayList to an array and return it.
-			equipletSteps = new EquipletStepMessage[steps.size()];
+			equipletSteps = new EquipletStep[steps.size()];
 			return steps.toArray(equipletSteps);
 		default:
 			break;
 		}
 		//if this module can't handle the stepType return no steps. 
-		return new EquipletStepMessage[0];
+		return new EquipletStep[0];
 	}
 
 	/**
-	 * @see Module#fillPlaceHolders(EquipletStepMessage[], BasicDBObject)
+	 * @see Module#fillPlaceHolders(EquipletStep[], BasicDBObject)
 	 */
 	@Override
-	public EquipletStepMessage[] fillPlaceHolders(EquipletStepMessage[] steps, BasicDBObject parameters) {
+	public EquipletStep[] fillPlaceHolders(EquipletStep[] steps, BasicDBObject parameters) {
 		//get the new position parameters from the parameters
 		Position position = new Position((BasicDBObject) parameters.get("position"));
 
@@ -154,9 +154,9 @@ public class GripperModule extends Module {
 		movementModule = getModuleFactory().getModuleById(movementModuleId);
 
 		//make an ArrayList containing all the steps of the movementModule.
-		ArrayList<EquipletStepMessage> movementModuleSteps = new ArrayList<EquipletStepMessage>();
+		ArrayList<EquipletStep> movementModuleSteps = new ArrayList<EquipletStep>();
 		//loop over all the given EquipletSteps.
-		for (EquipletStepMessage step : steps) {
+		for (EquipletStep step : steps) {
 			//If the step is made by the movementModule add it to the ArrayList.
 			if (step.getModuleId() == movementModule.getId()){
 				movementModuleSteps.add(step);
@@ -170,7 +170,7 @@ public class GripperModule extends Module {
 			}
 		}
 		//let the movementModule fill in his steps.
-		EquipletStepMessage[] temp = new EquipletStepMessage[movementModuleSteps.size()];
+		EquipletStep[] temp = new EquipletStep[movementModuleSteps.size()];
 		movementModule.fillPlaceHolders(movementModuleSteps.toArray(temp), parameters);
 		//return the filled in steps.
 		return steps;
@@ -219,9 +219,9 @@ public class GripperModule extends Module {
 	/**
 	 * Function that builds the step for activating the gripper.
 	 * @param parameters The parameters to use by this step.
-	 * @return EquipletStepMessage to activate the gripper.
+	 * @return EquipletStep to activate the gripper.
 	 */
-	private EquipletStepMessage activateGripper(BasicDBObject parameters) {
+	private EquipletStep activateGripper(BasicDBObject parameters) {
 		//get the position parameters from the parameters.
 		Position position = new Position((BasicDBObject) parameters.get("position"));
 		
@@ -236,15 +236,15 @@ public class GripperModule extends Module {
 		//create the instruction data.
 		InstructionData instructionData = new InstructionData("activate", "gripper", "FIND_ID", lookUpParameters, new BasicDBObject());
 		//create and return the step.
-		return new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(1));
+		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(1));
 	}
 
 	/**
 	 * Function that builds the step for deactivating the gripper.
 	 * @param parameters The parameters to use by this step.
-	 * @return EquipletStepMessage to deactivate the gripper.
+	 * @return EquipletStep to deactivate the gripper.
 	 */
-	private EquipletStepMessage deactivateGripper(BasicDBObject parameters) {
+	private EquipletStep deactivateGripper(BasicDBObject parameters) {
 		//get the position parameters from the parameters.
 		Position position = new Position((BasicDBObject) parameters.get("position"));
 		
@@ -259,7 +259,7 @@ public class GripperModule extends Module {
 		//create instruction data.
 		InstructionData instructionData = new InstructionData("deactivate", "gripper", "FIND_ID", lookUpParameters, new BasicDBObject());
 		//create and return the step.
-		return new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(1));
+		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(1));
 	}
 
 }
