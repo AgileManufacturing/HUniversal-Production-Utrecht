@@ -23,17 +23,39 @@ import com.mongodb.BasicDBObject;
  * The Class ProductionDurationResponse.
  */
 public class ProductionDurationResponse extends ReceiveOnceBehaviour {
+	/**
+	 * @var long serialVersionUID
+	 *      The serialVersionUID for this class.
+	 **/
 	private static final long serialVersionUID = 1L;
 
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("ProductionDurationResponse");
+	/**
+	 * @var MessageTemplate messageTemplate
+	 *      The MessageTemplate indicating the messages this behaviour wishes to
+	 *      receive.
+	 **/
+	private static MessageTemplate messageTemplate = MessageTemplate
+			.MatchOntology("ProductionDurationResponse");
+
+	/**
+	 * @var EquipletAgent equipletAgent
+	 *      A reference to the equipletAgent this behaviour belongs to.
+	 **/
 	private EquipletAgent equipletAgent;
+
+	/**
+	 * @var BlackboardClient equipletBBClient
+	 *      The blackboardclient for this equiplet's blackboard.
+	 **/
 	private BlackboardClient equipletBBClient;
 
 	/**
 	 * Instantiates a new production duration response.
 	 * 
 	 * @param a
-	 *            the a
+	 *            the agent
+	 * @param equipletBBClient
+	 *            the equiplet blackboard.
 	 */
 	public ProductionDurationResponse(Agent a, BlackboardClient equipletBBClient) {
 		super(a, 5000, messageTemplate);
@@ -47,33 +69,43 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if (message != null) {
-			Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
+			Logger.log("%s received message from %s%n", myAgent.getLocalName(),
+					message.getSender().getLocalName(), message.getOntology());
 
 			try {
-				//gets the productstep
-				ObjectId id = equipletAgent.getRelatedObjectId(message.getConversationId());
-				ProductStepMessage productStep = new ProductStepMessage((BasicDBObject) equipletBBClient.findDocumentById(id));
+				// gets the productstep
+				ObjectId id = equipletAgent.getRelatedObjectId(message
+						.getConversationId());
+				ProductStepMessage productStep = new ProductStepMessage(
+						(BasicDBObject) equipletBBClient.findDocumentById(id));
 
 				ScheduleData schedule = productStep.getScheduleData();
 
-				//sends a message to the productAgent with the production duration.
+				// sends a message to the productAgent with the production
+				// duration.
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
 				responseMessage.addReceiver(productStep.getProductAgentId());
 				responseMessage.setOntology("ProductionDuration");
 				responseMessage.setConversationId(message.getConversationId());
-				responseMessage.setContentObject(new Long(schedule.getDuration()));
+				responseMessage.setContentObject(new Long(schedule
+						.getDuration()));
 				equipletAgent.send(responseMessage);
-				
-				ACLMessage scheduleStepMessage = new ACLMessage(ACLMessage.REQUEST);
+
+				ACLMessage scheduleStepMessage = new ACLMessage(
+						ACLMessage.REQUEST);
 				scheduleStepMessage.addReceiver(equipletAgent.getAID());
 				scheduleStepMessage.setOntology("ScheduleStep");
-				scheduleStepMessage.setConversationId(message.getConversationId());
+				scheduleStepMessage.setConversationId(message
+						.getConversationId());
 				scheduleStepMessage.setContent(String.valueOf(5));
 				equipletAgent.send(scheduleStepMessage);
 
-				Logger.log("sending message: %s%n", responseMessage.getOntology());
-				Logger.log("sending message: %s%n", scheduleStepMessage.getOntology());
-			} catch (IOException | InvalidDBNamespaceException | GeneralMongoException e) {
+				Logger.log("sending message: %s%n",
+						responseMessage.getOntology());
+				Logger.log("sending message: %s%n",
+						scheduleStepMessage.getOntology());
+			} catch (IOException | InvalidDBNamespaceException
+					| GeneralMongoException e) {
 				Logger.log(e);
 				equipletAgent.doDelete();
 			}

@@ -1,5 +1,5 @@
 /**
- * @file GeneralMongoException.java
+ * @file rexos/libraries/blackboard_client/GeneralMongoException.java
  * @brief Thrown when connecting to a MongoDB server fails.
  * @date Created: 9 apr. 2013
  *

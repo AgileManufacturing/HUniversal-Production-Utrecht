@@ -1,5 +1,5 @@
 /**
- * @file Logger.java
+ * @file rexos/libraries/log/Logger.java
  * @brief Helper for log messages, providing a single point for controlling program output.
  * @date Created: 17 mei 2013
  *

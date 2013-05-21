@@ -1,5 +1,5 @@
 /**
- * @file Module.java
+ * @file rexos/mas/hardware_agent/Module.java
  * @brief Provides an inteface to make modules.
  * @date Created: 2013-04-18
  * 
@@ -52,40 +52,68 @@ import java.util.HashMap;
 
 import com.mongodb.BasicDBObject;
 
+/**
+ * The abstract class for a Module
+ */
 public abstract class Module {
+	/**
+	 * @var int id
+	 * The id of the module
+	 */
 	private int id;
+	
+	/**
+	 * @var ModuleFactory moduleFactory
+	 * The moduleFactory of the module.
+	 */
 	private ModuleFactory moduleFactory;
+	
+	/**
+	 * @var HashMap<Integer, Object> configuration
+	 * The configuration of the module.
+	 */
 	private HashMap<Integer, Object> configuration;
 
 	/**
-	 * 
-	 * @param parameters
-	 * @return
+	 * Function for getting the EquipletSteps for a stepType.
+	 * @param stepType The stepType to get the EquipletSteps for.
+	 * @param parameters The parameters to use by making the steps.
+	 * @return The EquipletStepMessages
 	 */
 	public abstract EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters);
 
+	/**
+	 * Function for filling in the placeholders.
+	 * @param steps The steps to fill the placeholders for.
+	 * @param parameters The parameters to fill in the placeholders.
+	 * @return The filled in EquipletStepMessages
+	 */
 	public abstract EquipletStepMessage[] fillPlaceHolders(EquipletStepMessage[] steps, BasicDBObject parameters);
 	
 	/**
-	 * @return
+	 * Function for getting the steps this module is leading for.
+	 * @return int[] with step ids.
 	 */
 	public abstract int[] isLeadingForSteps();
 	
 	/**
-	 * @return
+	 * Getter for the id.
+	 * @return The id.
 	 */
 	public int getId() {
 		return id;
 	}
 	
 	/**
-	 * @param id
+	 * Setter for the id.
+	 * @param id The id to set it to.
 	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 	
 	/**
+	 * Getter for the moduleFactory
 	 * @return the moduleFactory
 	 */
 	public ModuleFactory getModuleFactory() {
@@ -93,13 +121,15 @@ public abstract class Module {
 	}
 
 	/**
-	 * @param moduleFactory the moduleFactory to set
+	 * Setter for the moduleFactory
+	 * @param moduleFactory the moduleFactory to set it to
 	 */
 	public void setModuleFactory(ModuleFactory moduleFactory) {
 		this.moduleFactory = moduleFactory;
 	}
 
 	/**
+	 * Getter for the configuration
 	 * @return the configuration
 	 */
 	public HashMap<Integer, Object> getConfiguration() {
@@ -107,7 +137,8 @@ public abstract class Module {
 	}
 
 	/**
-	 * @param configuration the configuration to set
+	 * Setter for the configuration
+	 * @param configuration the configuration to set it to
 	 */
 	public void setConfiguration(HashMap<Integer, Object> configuration) {
 		this.configuration = configuration;

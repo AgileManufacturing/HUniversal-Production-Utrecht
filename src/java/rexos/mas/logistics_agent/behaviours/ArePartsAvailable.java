@@ -1,5 +1,5 @@
 /**
- * @file ArePartsAvailable.java
+ * @file rexos/mas/logistics_agent/behaviours/ArePartsAvailable.java
  * @brief 
  * @date Created: 20 apr. 2013
  *

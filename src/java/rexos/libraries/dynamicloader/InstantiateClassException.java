@@ -1,5 +1,5 @@
 /**
- * @file InstantiateClassException.java
+ * @file rexos/libraries/dynamicloader/InstantiateClassException.java
  * @brief Thrown when a request to instantiate an object has failed.
  * @date Created: 13 apr. 2013
  *

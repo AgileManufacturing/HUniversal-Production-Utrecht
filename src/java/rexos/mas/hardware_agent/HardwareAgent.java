@@ -1,7 +1,7 @@
 package rexos.mas.hardware_agent;
 
 /**
- * @file HardwareAgent.java
+ * @file rexos/mas/hardware_agent/HardwareAgent.java
  * @brief Provides an Hardware agent that communicates with Service agents and
  *        its own modules.
  * @date Created: 12-04-13
@@ -54,9 +54,6 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 
 import java.util.HashMap;
-
-import org.bson.types.ObjectId;
-
 import rexos.libraries.blackboard_client.BasicOperationSubscription;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.BlackboardSubscriber;
@@ -75,25 +72,80 @@ import rexos.mas.data.DbData;
 import rexos.mas.hardware_agent.behaviours.CheckForModules;
 import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
 import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
-import rexos.mas.service_agent.ServiceStepMessage;
-
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 
+/**
+ * HardwareAgent that communicates with the service agent and creates the messages for the Hardware layer.
+ */
 public class HardwareAgent extends Agent implements BlackboardSubscriber, ModuleUpdateListener {
+	/**
+	 * @var long serialVersionUID
+	 * The serial version UID.
+	 */
 	private static final long serialVersionUID = 1L;
 
-	private BlackboardClient serviceStepBBClient, equipletStepBBClient;
+	/**
+	 * @var BlackboardClient serviceStepBBClient
+	 * The blackboard client for the serviceStep blackboard.
+	 */
+	private BlackboardClient serviceStepBBClient; 
+	
+	/**
+	 * @var BlackboardClient equipletStepBBClient
+	 * The blackboard client for the equipletStep blackboard
+	 */
+	private BlackboardClient equipletStepBBClient;
+	
+	/**
+	 * @var DbData dbData
+	 * The DbData of this equiplet.
+	 */
 	private DbData dbData;
+	
+	/**
+	 * @var HashMap<Integer, Integer> leadingModules
+	 * A HashMap containing the leadingModules per step.
+	 */
 	private HashMap<Integer, Integer> leadingModules;
+	
+	/**
+	 * @var ModuleFactory moduleFactory
+	 * The moduleFactory of this agent.
+	 */
 	private ModuleFactory moduleFactory;
-	private AID equipletAgentAID, serviceAgentAID;
+	
+	/**
+	 * @var AID equipletAgentAID
+	 * The AID of the equipletAgent.
+	 */
+	private AID equipletAgentAID;
+	
+	/**
+	 * @var AID serviceAgentAID
+	 * The AID of the serviceAgent.
+	 */
+	private AID serviceAgentAID;
+	
+	/**
+	 * @var HashMap<Integer, Object> configuration
+	 * The configuration of this agent.
+	 */
 	private HashMap<Integer, Object> configuration;
 
+	/**
+	 * Function for registering a leading module.
+	 * @param serviceId The service id to register for.
+	 * @param moduleId The module id to register
+	 */
 	public void registerLeadingModule(int serviceId, int moduleId) {
 		leadingModules.put(serviceId, moduleId);
 	}
 
+	/**
+	 * Function for getting the leading module for a service id.
+	 * @param serviceId The service id to get leading module for.
+	 * @return the leading module id.
+	 */
 	public int getLeadingModule(int serviceId) {
 		if (!leadingModules.containsKey(serviceId)) {
 			return 0;
@@ -101,14 +153,19 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		return leadingModules.get(serviceId);
 	}
 
+	/**
+	 * @see Agent#setup()
+	 */
 	@Override
 	public void setup() {
 		Logger.log("Hardware agent " + this + " reporting.");
 		leadingModules = new HashMap<Integer, Integer>();
 
+		//gets the modulefactory and subscribes to updates.
 		moduleFactory = new ModuleFactory();
 		moduleFactory.subscribeToUpdates(this);
 
+		//gets the dbData and AID from the arguments.
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			dbData = (DbData) args[0];
@@ -116,11 +173,13 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			serviceAgentAID = (AID) args[2];
 		}
 
-		HashMap<Integer, Object> hm = new HashMap<Integer, Object>();
-		hm.put(2, null);
+		//create the configuration
+		HashMap<Integer, Object> tempHashMap = new HashMap<Integer, Object>();
+		tempHashMap.put(2, null);
 		configuration = new HashMap<Integer, Object>();
-		configuration.put(1, hm);
+		configuration.put(1, tempHashMap);
 
+		//configure the blackboards
 		try {
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient.setDatabase(dbData.getName());
@@ -138,7 +197,8 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			Logger.log(e);
 			doDelete();
 		}
-
+		
+		//Start the behaviours
 		EvaluateDuration evaluateDurationBehaviour = new EvaluateDuration(this, moduleFactory);
 		addBehaviour(evaluateDurationBehaviour);
 
@@ -148,7 +208,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		CheckForModules checkForModules = new CheckForModules(this);
 		addBehaviour(checkForModules);
 
-		// /Register modules
+		//Register modules
 		KnowledgeDBClient client;
 		try {
 			client = KnowledgeDBClient.getClient();
@@ -169,7 +229,8 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			doDelete();
 			Logger.log(e1);
 		}
-
+		
+		//Send a message to the serviceAgent that the hardware agent is ready.
 		ACLMessage startedMessage = new ACLMessage(ACLMessage.INFORM);
 		startedMessage.addReceiver(serviceAgentAID);
 		startedMessage.setOntology("InitialisationFinished");
@@ -177,17 +238,16 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	}
 
 	/**
+	 * Getter for the equipletAgentAID
 	 * @return the equipletAgentAID
 	 **/
 	public AID getEquipletAgentAID() {
 		return equipletAgentAID;
 	}
 
-	public int getLeadingModuleForStep(int stepId) {
-		int moduleId = leadingModules.get(stepId);
-		return getLeadingModule(moduleId);
-	}
-
+	/**
+	 * @see Agent#takeDown()
+	 */
 	@Override
 	public void takeDown() {
 		try {
@@ -199,39 +259,39 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			Logger.log(e);
 		}
 
+		//Send the serviceAgent that he died.
 		ACLMessage deadMessage = new ACLMessage(ACLMessage.FAILURE);
 		deadMessage.addReceiver(serviceAgentAID);
 		deadMessage.setOntology("HardwareAgentDied");
 		send(deadMessage);
 	}
 
+	/**
+	 * Getter for the serviceSteps blackboard client
+	 * @return serviceStepBBClient
+	 */
 	public BlackboardClient getServiceStepsBBClient() {
 		return serviceStepBBClient;
 	}
 
+	/**
+	 * Getter for the equipletSteps blackboard client
+	 * @return equipletStepsBBClient
+	 */
 	public BlackboardClient getEquipletStepsBBClient() {
 		return equipletStepBBClient;
 	}
 
+	/**
+	 * @see BlackboardSubscriber#onMessage(MongoOperation, OplogEntry)
+	 */
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
 		switch (entry.getNamespace().split("\\.")[1]) {
 		case "ServiceStepsBlackboard":
 			switch (operation) {
 			case UPDATE:
-				ObjectId id = entry.getTargetObjectId();
-				try {
-					ServiceStepMessage serviceStep = new ServiceStepMessage((BasicDBObject) serviceStepBBClient.findDocumentById(id));
-					int leadingModule = getLeadingModule(serviceStep.getServiceId());
-					Module module = moduleFactory.getModuleById(leadingModule);
-					EquipletStepMessage[] equipletSteps = module.getEquipletSteps(serviceStep.getType(), serviceStep.getParameters());
-					for (EquipletStepMessage eq : equipletSteps) {
-						equipletStepBBClient.insertDocument(eq.toBasicDBObject());
-					}
-				} catch (InvalidDBNamespaceException | GeneralMongoException e1) {
-					// TODO Auto-generated catch block
-					Logger.log(e1);
-				}
+				//ObjectId id = entry.getTargetObjectId();
 				break;
 			default:
 				break;
@@ -240,12 +300,12 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		case "EquipletStepsBlackboard":
 			switch (operation) {
 			case UPDATE:
-				try {
-					DBObject equipletStep = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
-				} catch (InvalidDBNamespaceException | GeneralMongoException e) {
-					// TODO Error no document
-					Logger.log(e);
-				}
+//				try {
+//					DBObject equipletStep = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
+//				} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+//					// TODO Error no document
+//					Logger.log(e);
+//				}
 				break;
 			default:
 				break;
@@ -256,16 +316,25 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		}
 	}
 
+	/**
+	 * @see ModuleUpdateListener#onModuleUpdate(int, Module, Module)
+	 */
 	@Override
 	public void onModuleUpdate(int moduleId, Module oldSoftware, Module newSoftware) {
+		//remove old values from HashMap
 		for (int step : oldSoftware.isLeadingForSteps()) {
 			leadingModules.remove(step);
 		}
+		//add new values to HashMap
 		for (int step : newSoftware.isLeadingForSteps()) {
 			leadingModules.put(step, moduleId);
 		}
 	}
 
+	/**
+	 * Getter for the configuration
+	 * @return configuration
+	 */
 	public HashMap<Integer, Object> getConfiguration() {
 		return configuration;
 	}

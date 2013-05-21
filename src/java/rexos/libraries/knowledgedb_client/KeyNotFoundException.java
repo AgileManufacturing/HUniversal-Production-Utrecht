@@ -1,5 +1,5 @@
 /**
- * @file KeyNotFoundException.java
+ * @file rexos/libraries/knowledgedb_client/KeyNotFoundException.java
  * @brief Thrown when a key is not found in a collection.
  * @date Created: 23 apr. 2013
  *

@@ -1,5 +1,5 @@
 /**
- * @file Service.java
+ * @file rexos/mas/service_agent/Service.java
  * @brief Instances of subclasses of this interface represent different services a certain equiplet can perform.
  *        Services translate product steps into service steps.
  * @date Created: 11 apr. 2013

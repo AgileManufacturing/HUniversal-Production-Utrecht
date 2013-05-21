@@ -1,5 +1,5 @@
 /**
- * @file StartStep.java
+ * @file rexos/mas/equiplet_agent/behaviours/StartStep.java
  * @brief Behaviour for handling the messages with the ontology StartStep
  * @date Created: 2013-04-02
  *
@@ -29,7 +29,6 @@
  **/
 package rexos.mas.equiplet_agent.behaviours;
 
-
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -56,48 +55,53 @@ import com.mongodb.BasicDBObject;
 public class StartStep extends ReceiveBehaviour {
 	/**
 	 * @var static final long serialVersionUID
-	 * The serial version UID for this class
+	 *      The serial version UID for this class
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * @var MessageTemplate messageTemplate
-	 * The messageTemplate this behaviour listens to.
-	 * This behaviour listens to the ontology: StartStep.
+	 *      The messageTemplate this behaviour listens to.
+	 *      This behaviour listens to the ontology: StartStep.
 	 */
-    private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("StartStep");
-    
-    /**
+	private static MessageTemplate messageTemplate = MessageTemplate
+			.MatchOntology("StartStep");
+
+	/**
 	 * @var EquipletAgent equipletAgent
-	 * The equipletAgent related to this behaviour.
+	 *      The equipletAgent related to this behaviour.
 	 */
-    private EquipletAgent equipletAgent;
-    
-    /**
-     * @var BlackboardClient equipletBBClient
-     * The blackboard client used for the equiplet blackboard.
-     */
-    private BlackboardClient equipletBBClient;
-	
+	private EquipletAgent equipletAgent;
+
+	/**
+	 * @var BlackboardClient equipletBBClient
+	 *      The blackboard client used for the equiplet blackboard.
+	 */
+	private BlackboardClient equipletBBClient;
+
 	/**
 	 * Instantiates a new can perform step.
-	 *
-	 * @param a The agent for this behaviour
+	 * 
+	 * @param a
+	 *            The agent for this behaviour
+	 * @param equipletBBClient
+	 *            The BlackboardClient for this equiplet's blackboard.
 	 */
 	public StartStep(Agent a, BlackboardClient equipletBBClient) {
 		super(a, -1, messageTemplate);
-		equipletAgent = (EquipletAgent)a;
+		equipletAgent = (EquipletAgent) a;
 		this.equipletBBClient = equipletBBClient;
 	}
-	
+
 	/**
 	 * Function to handle the incoming messages for this behaviour.
 	 * Handles the response to the StartStep.
 	 * 
-	 * @param message - The received message.
+	 * @param message
+	 *            - The received message.
 	 */
 	@Override
-	public void handle(ACLMessage message){
+	public void handle(ACLMessage message) {
 		Object contentObject = null;
 		String contentString = message.getContent();
 
@@ -106,32 +110,40 @@ public class StartStep extends ReceiveBehaviour {
 		} catch (UnreadableException e) {
 			Logger.log("Exception Caught, No Content Object Given");
 		}
-		Logger.log("%s received message from %s (%s:%s)%n",
-				myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology(), contentObject == null ? contentString : contentObject);
-		
-		//Gets the productStepId and updates all the productsteps on the blackboard the status to waiting.
+		Logger.log("%s received message from %s (%s:%s)%n", myAgent
+				.getLocalName(), message.getSender().getLocalName(), message
+				.getOntology(), contentObject == null ? contentString
+				: contentObject);
+
+		// Gets the productStepId and updates all the productsteps on the
+		// blackboard the status to waiting.
 		try {
-			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
-			equipletBBClient.updateDocuments(
-					new BasicDBObject("_id", productStepId), 
-					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING)));			
+			ObjectId productStepId = equipletAgent.getRelatedObjectId(message
+					.getConversationId());
+			equipletBBClient.updateDocuments(new BasicDBObject("_id",
+					productStepId), new BasicDBObject("$set",
+					new BasicDBObject("status", StepStatusCode.WAITING)));
 		} catch (InvalidDBNamespaceException | GeneralMongoException e1) {
 			Logger.log(e1);
 		}
-		
-		//Get the next product step and set the timer for the next product step
+
+		// Get the next product step and set the timer for the next product step
 		NextProductStepTimer timer = equipletAgent.getTimer();
 		try {
-			BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED);
-			query.put("$order_by", new BasicDBObject("scheduleData", new BasicDBObject("startTime", "-1")));
-			ProductStepMessage nextProductStep = new ProductStepMessage((BasicDBObject)equipletBBClient.findDocuments(query).get(0));
+			BasicDBObject query = new BasicDBObject("status",
+					StepStatusCode.PLANNED);
+			query.put("$order_by", new BasicDBObject("scheduleData",
+					new BasicDBObject("startTime", "-1")));
+			ProductStepMessage nextProductStep = new ProductStepMessage(
+					(BasicDBObject) equipletBBClient.findDocuments(query)
+							.get(0));
 			ScheduleData scheduleData = nextProductStep.getScheduleData();
 			if (scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
 				timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 			}
 		} catch (Exception e) {
 			timer.setNextUsedTimeSlot(-1);
-		Logger.log(e);
+			Logger.log(e);
 		}
 	}
 }

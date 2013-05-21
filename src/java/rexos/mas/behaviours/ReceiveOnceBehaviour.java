@@ -1,6 +1,6 @@
 /**
- * @file ReceiveOnceBehaviour.java
- * @brief 
+ * @file rexos/mas/behaviours/ReceiveOnceBehaviour.java
+ * @brief Behaviour that receives a single message.
  * @date Created: 11 apr. 2013
  *
  * @author Peter Bonnema
@@ -42,6 +42,10 @@ import jade.lang.acl.MessageTemplate;
  * 
  */
 public abstract class ReceiveOnceBehaviour extends ReceiveBehaviour {
+	/**
+	 * @var long serialVersionUID
+	 * The serialVersionUID for this class.
+	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -84,6 +88,11 @@ public abstract class ReceiveOnceBehaviour extends ReceiveBehaviour {
 		super(a, millis, mt);
 	}
 
+	/**
+	 * 
+	 * @see rexos.mas.behaviours.ReceiveBehaviour#action()
+	 *
+	 */
 	@Override
 	public void action() {
 		ACLMessage msg = getMessage();

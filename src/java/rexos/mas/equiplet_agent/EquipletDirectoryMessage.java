@@ -1,5 +1,5 @@
 /**
- * @file EquipletDirectoryMessage.java
+ * @file rexos/mas/equiplet_agent/EquipletDirectoryMessage.java
  * @brief Provides an entry class for the EquipletDirectory blackboard.
  * @date Created: 2013-04-02
  *
@@ -38,24 +38,27 @@ import rexos.mas.data.MongoSaveable;
 
 import com.mongodb.BasicDBObject;
 
+/**
+ * Represents an entry in the EquipletDirectory blackboard.
+ **/
 public class EquipletDirectoryMessage implements MongoSaveable {
 	/**
 	 * @var AID AID
 	 * The AID of the equipletAgent
 	 */
-	public AID AID;
-	
+	private AID AID;
+
 	/**
 	 * @var ArrayList<Integer> capabilities
 	 * The capabilities of the equipletAgent
 	 */
-	public ArrayList<Integer> capabilities;
+	private ArrayList<Integer> capabilities;
 	
 	/**
 	 * @var DbData db
 	 * The information about the database of the equipletAgent.
 	 */
-	public DbData db;
+	private DbData db;
 
 	/**
 	 * Constructor for an entry in the equipletDirectory.
@@ -98,5 +101,13 @@ public class EquipletDirectoryMessage implements MongoSaveable {
 		entry.put("capabilities", capabilities);
 		entry.put("db", db.toBasicDBObject());
 		return entry;
+	}
+	
+	/**
+	 * Getter for the AID
+	 * @return the AID
+	 */
+	public AID getAID() {
+		return AID;
 	}
 }

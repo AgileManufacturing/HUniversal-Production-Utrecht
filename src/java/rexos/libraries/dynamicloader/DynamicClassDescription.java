@@ -1,5 +1,5 @@
 /**
- * @file DynamicClassDescription.java
+ * @file rexos/libraries/dynamicloader/DynamicClassDescription.java
  * @brief Contains all information about a piece of software.
  * @date Created: 12 apr. 2013
  *
