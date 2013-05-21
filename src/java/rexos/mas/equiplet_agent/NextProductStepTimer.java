@@ -78,10 +78,11 @@ public class NextProductStepTimer extends Timer{
 	 * @param firstTimeSlot the first time slot from the grid/equiplet.
 	 * @param timeSlotLength the length of a time slot.
 	 */
-	public NextProductStepTimer(long firstTimeSlot, int timeSlotLength){
+	public NextProductStepTimer(long firstTimeSlot, int timeSlotLength, EquipletAgent agent){
 		super();
 		this.firstTimeSlot = firstTimeSlot;
 		this.timeSlotLength = timeSlotLength;
+		equipletAgent = agent;
 	}
 	
 	/**
@@ -97,8 +98,10 @@ public class NextProductStepTimer extends Timer{
 			long startTimeSlot = nextUsedTimeSlot * timeSlotLength + firstTimeSlot;
 			long currentTime = System.currentTimeMillis();
 			task = new NextProductStepTask();
+			Logger.log("trying to schedule: " + (startTimeSlot - currentTime));
 			if(startTimeSlot - currentTime > 0){
 				schedule(task, startTimeSlot - currentTime);
+				Logger.log("schedule set to: " + (startTimeSlot - currentTime));
 			}
 		}
 	}
