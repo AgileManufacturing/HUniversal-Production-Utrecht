@@ -70,7 +70,7 @@ public class DbData implements MongoSaveable {
 
 	/**
 	 * Constructs a DbData object from the data contained in the specified BasicDBObject.
-	 * @param object
+	 * @param object The object
 	 *
 	 */
 	public DbData(BasicDBObject object) {

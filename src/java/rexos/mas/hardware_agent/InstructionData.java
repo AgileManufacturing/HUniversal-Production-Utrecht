@@ -66,11 +66,11 @@ public class InstructionData implements MongoSaveable {
 	
 	/**
 	 * Constructor for the InstructionData
-	 * @param command
-	 * @param destination
-	 * @param look_up
-	 * @param look_up_parameters
-	 * @param payload
+	 * @param command The command
+	 * @param destination The destination
+	 * @param look_up The look_up command
+	 * @param look_up_parameters The look_up_parameters
+	 * @param payload The payload parameters
 	 */
 	public InstructionData(String command, String destination,String look_up,
 			BasicDBObject look_up_parameters,BasicDBObject payload){
