@@ -53,8 +53,8 @@ public class FillPlaceholders extends ReceiveBehaviour {
 	/**
 	 * Instantiates a new schedule step.
 	 * 
-	 * @param a
-	 *            the a
+	 * @param a the agent
+	 * @param moduleFactory the moduleFactory
 	 */
 	public FillPlaceholders(Agent a, ModuleFactory moduleFactory) {
 		super(a, messageTemplate);

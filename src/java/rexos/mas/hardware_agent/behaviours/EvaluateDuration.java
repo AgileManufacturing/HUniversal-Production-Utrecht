@@ -135,6 +135,10 @@ public class EvaluateDuration extends ReceiveBehaviour {
 		}
 	}
 
+	/**
+	 * Function for evaluating the step duration
+	 * @param serviceStepId the serviceStep to evaluate.
+	 */
 	public void EvaluateStepDuration(ObjectId serviceStepId) {
 		try {
 			//get the serviceStep

@@ -104,8 +104,8 @@ public class CheckForModules extends ReceiveBehaviour {
 	 * Responds to incoming messages querying whether a module is available for a set of module group ids. This method will respond with a CheckForModulesResponse message. If all modules are available, a CONFIRM will be sent. If one or more modules
 	 * are missing, a DISCONFIRM will be sent.
 	 * 
-	 * @param ACLMessage
-	 *            The incoming message.
+	 * @param message
+	 * The incoming message.
 	 */
 	@Override
 	public void handle(ACLMessage message) {
