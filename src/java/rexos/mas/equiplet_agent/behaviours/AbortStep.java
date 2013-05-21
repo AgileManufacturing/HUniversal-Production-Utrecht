@@ -5,6 +5,8 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import org.bson.types.ObjectId;
 import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ProductionStep;
@@ -77,7 +79,7 @@ public class AbortStep extends ReceiveBehaviour {
 				
 			}
 			
-		}catch(Exception e){
+		}catch(GeneralMongoException | InvalidDBNamespaceException e){
 			
 		}
 	}

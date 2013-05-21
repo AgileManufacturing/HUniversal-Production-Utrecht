@@ -54,9 +54,11 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
+import jade.wrapper.StaleProxyException;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -71,6 +73,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
+import rexos.libraries.knowledgedb_client.KeyNotFoundException;
 import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
 import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
@@ -210,14 +213,14 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	@Override
 	public void setup() {
 		Logger.log("I spawned as a equiplet agent.");
-
 		// gets his IP and sets the equiplet blackboard IP.
 		try {
 			InetAddress IP = InetAddress.getLocalHost();
 			equipletDbIp = IP.getHostAddress();
-		} catch (Exception e) {
+		} catch (UnknownHostException e) {
 			Logger.log(e);
 		}
+		
 		equipletDbName = getAID().getLocalName();
 		communicationTable = new HashMap<String, ObjectId>();
 		try {
@@ -237,7 +240,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				for (Row row : rows) {
 					capabilities.add((int) row.get("id"));
 				}
-			} catch (KnowledgeException e1) {
+			} catch (KnowledgeException | KeyNotFoundException e1) {
 				takeDown();
 				Logger.log(e1);
 			}
@@ -272,13 +275,13 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			// blackboard.
 			collectiveBBClient.setCollection(timeDataName);
 			BasicDBObject timeData = (BasicDBObject) collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
-			
+
 			// initiates the timer to the next product step.
 			timer = new NextProductStepTimer(timeData.getLong("firstTimeSlot"), timeData.getInt("timeSlotLength"), this);
 			timer.setNextUsedTimeSlot(-1);
-			
+
 			collectiveBBClient.setCollection(equipletDirectoryName);
-		} catch (Exception e) {
+		} catch (GeneralMongoException | InvalidDBNamespaceException | UnknownHostException | StaleProxyException e) {
 			Logger.log(e);
 			doDelete();
 		}
@@ -312,7 +315,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				responseMessage.setContent("I'm dying");
 				send(responseMessage);
 			}
-		} catch (Exception e) {
+		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 			Logger.log(e);
 			// The equiplet is already going down, so it has to do nothing here.
 		}
@@ -412,7 +415,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					break;
 				}
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
 				Logger.log(e1);
 			}
 			break;

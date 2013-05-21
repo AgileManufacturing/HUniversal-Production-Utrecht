@@ -53,6 +53,7 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,6 +66,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
+import rexos.libraries.knowledgedb_client.KeyNotFoundException;
 import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
 import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
@@ -198,7 +200,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			equipletStepBBClient.setDatabase(dbData.getName());
 			equipletStepBBClient.setCollection("EquipletStepsBlackBoard");
 			equipletStepBBClient.subscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
-		} catch (Exception e) {
+		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException e) {
 			Logger.log(e);
 			doDelete();
 		}
@@ -226,7 +228,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 					for (int step : module.isLeadingForSteps()) {
 						registerLeadingModule(step, id);
 					}
-				} catch (Exception e) {
+				} catch (KeyNotFoundException e) {
 					/* the row has no module */
 				}
 			}

@@ -37,6 +37,8 @@ import jade.lang.acl.MessageTemplate;
 import org.bson.types.ObjectId;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
@@ -120,7 +122,7 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 							productStepEntryId));
 				}
 				myAgent.send(responseMessage);
-			} catch (Exception e) {
+			} catch (GeneralMongoException | InvalidDBNamespaceException e) {
 				// TODO: ERROR HANDLING
 				Logger.log(e);
 				myAgent.doDelete();

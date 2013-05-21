@@ -51,8 +51,6 @@ import jade.core.AID;
 import java.io.Serializable;
 
 import org.bson.types.ObjectId;
-
-import rexos.libraries.log.Logger;
 import rexos.mas.data.MongoSaveable;
 import rexos.mas.data.ScheduleData;
 
@@ -366,12 +364,7 @@ public class ProductStepMessage implements MongoSaveable, Serializable {
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		_id = object.getObjectId("_id");
-		try {
-			productAgentId = new AID((String) (object.get("productAgentId")),
-					AID.ISGUID);
-		} catch (Exception e) {
-			Logger.log(e);
-		}
+		productAgentId = new AID((String) (object.get("productAgentId")), AID.ISGUID);
 		type = object.getInt("type");
 		parameters = (BasicDBObject) object.get("parameters");
 		inputPartTypes = ((BasicDBList) object.get("inputPartTypes"))

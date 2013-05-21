@@ -141,7 +141,7 @@ public class StartStep extends ReceiveBehaviour {
 			if (scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
 				timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 			}
-		} catch (Exception e) {
+		} catch (GeneralMongoException | InvalidDBNamespaceException e) {
 			timer.setNextUsedTimeSlot(-1);
 			Logger.log(e);
 		}
