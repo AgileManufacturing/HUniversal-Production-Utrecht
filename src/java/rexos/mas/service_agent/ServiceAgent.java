@@ -1,3 +1,51 @@
+/**
+ * @file ServiceAgent.java
+ * @brief This agent manages services and oversees generation and scheduling of
+ *        serviceSteps. It also handles communication with the logistics agent.
+ * @date Created: 5 apr. 2013
+ * 
+ * @author Peter Bonnema
+ * 
+ * @section LICENSE
+ *          License: newBSD
+ * 
+ *          Copyright © 2013, HU University of Applied Sciences Utrecht.
+ *          All rights reserved.
+ * 
+ *          Redistribution and use in source and binary forms, with or without
+ *          modification, are permitted provided that the following conditions
+ *          are met:
+ *          - Redistributions of source code must retain the above copyright
+ *          notice, this list of conditions and the following disclaimer.
+ *          - Redistributions in binary form must reproduce the above copyright
+ *          notice, this list of conditions and the following disclaimer in the
+ *          documentation and/or other materials provided with the distribution.
+ *          - Neither the name of the HU University of Applied Sciences Utrecht
+ *          nor the names of its contributors may be used to endorse or promote
+ *          products derived from this software without specific prior written
+ *          permission.
+ * 
+ *          THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *          "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *          LIMITED TO,
+ *          THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ *          PARTICULAR PURPOSE
+ *          ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED
+ *          SCIENCES UTRECHT
+ *          BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ *          OR
+ *          CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ *          SUBSTITUTE
+ *          GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ *          INTERRUPTION)
+ *          HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ *          STRICT
+ *          LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *          ANY WAY OUT
+ *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ *          SUCH DAMAGE.
+ * 
+ **/
 package rexos.mas.service_agent;
 
 import jade.core.AID;
@@ -33,19 +81,74 @@ import com.mongodb.DBObject;
 
 /**
  * This agent manages services and oversees generation and scheduling of
- * serviceSteps.
+ * serviceSteps. It also handles communication with the logistics agent.
  * 
  * @author Peter
  * 
  */
 public class ServiceAgent extends Agent implements BlackboardSubscriber {
-	private static final long serialVersionUID = 1L;
+	/**
+	 * @var long serialVersionUID
+	 *      The serialVersionUID for this class.
+	 */
+	private static final long serialVersionUID = -5730473679881365598L;
 
-	private BlackboardClient productStepBBClient, serviceStepBBClient;
+	/**
+	 * @var BlackboardClient productStepBBClient
+	 *      The BlackboardClient used to interact with the product steps
+	 *      blackboard.
+	 */
+	private BlackboardClient productStepBBClient;
+
+	/**
+	 * @var BlackboardClient serviceStepBBClient
+	 *      The BlackboardClient used to interact with the service steps
+	 *      blackboard.
+	 */
+	private BlackboardClient serviceStepBBClient;
+
+	/**
+	 * @var FieldUpdateSubscription statusSubscription
+	 *      The subscription object used to subscribe this agent on a blackboard
+	 *      client to field updates on a blackboard.
+	 */
 	private FieldUpdateSubscription statusSubscription;
+
+	/**
+	 * @var DbData dbData
+	 *      Contains connection information for mongoDB database containing the
+	 *      productstep and servicestep blackboards.
+	 */
 	private DbData dbData;
-	private AID equipletAgentAID, hardwareAgentAID, logisticsAID;
+
+	/**
+	 * @var AID equipletAgentAID
+	 *      The AID of the equiplet agent of this equiplet.
+	 */
+	private AID equipletAgentAID;
+
+	/**
+	 * @var AID hardwareAgentAID
+	 *      The AID of the hardware agent of this equiplet.
+	 */
+	private AID hardwareAgentAID;
+
+	/**
+	 * @var AID logisticsAID
+	 *      The AID of the logistics agent.
+	 */
+	private AID logisticsAID;
+
+	/**
+	 * @var ServiceFactory serviceFactory
+	 *      The serviceFactory used to create instances of Service.
+	 */
 	private ServiceFactory serviceFactory;
+
+	/**
+	 * @var HashMap<String, Service> convIdServiceMapping
+	 *      This maps conversation id's with service objects.
+	 */
 	private HashMap<String, Service> convIdServiceMapping;
 
 	/* (non-Javadoc)
@@ -111,17 +214,22 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 	/* (non-Javadoc)
 	 * @see jade.core.Agent#takeDown() */
+	//@formatter:off
 	@Override
 	public void takeDown() {
 		productStepBBClient.unsubscribe(statusSubscription);
 		serviceStepBBClient.unsubscribe(statusSubscription);
 		try {
-			// serviceStepBBClient.removeDocuments(new BasicDBObject());
+			serviceStepBBClient.removeDocuments(new BasicDBObject());
 			Logger.log("ServiceAgent takedown");
 
 			DBObject update =
-					BasicDBObjectBuilder.start("status", StepStatusCode.FAILED.name()).push("statusData")
-							.add("source", "service agent").add("reason", "died").pop().get();
+					BasicDBObjectBuilder.start("status", StepStatusCode.FAILED.name())
+						.push("statusData")
+							.add("source", "service agent")
+							.add("reason", "died")
+							.pop()
+						.get();
 			productStepBBClient.updateDocuments(new BasicDBObject(), new BasicDBObject("$set", update));
 
 			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
@@ -132,39 +240,40 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 			Logger.log(e);
 		}
-	}
+	} //@formatter:on
 
+	/**
+	 * Maps the specified conversation id with the specified service object.
+	 * Once a service object has been created (by the service factory) it's
+	 * mapped with the conversation id of the scheduling negotiation of the
+	 * corresponding product step. With this mapping behaviours that do not have
+	 * a reference to a service object can still get one with
+	 * GetServiceForConvId.
+	 * 
+	 * @param conversationId the conversation id to map the service with.
+	 * @param service the service object that the conversation id will be mapped with.
+	 */
 	public void MapConvIdWithService(String conversationId, Service service) {
 		convIdServiceMapping.put(conversationId, service);
 	}
 
+	/**
+	 * Returns the service object mapped to the specified conversation id.
+	 * 
+	 * @param conversationId the conversation id to use to get the corresponding service object.
+	 * @return the service object mapped to the specified conversation id.
+	 */
 	public Service GetServiceForConvId(String conversationId) {
 		return convIdServiceMapping.get(conversationId);
 	}
 
+	/**
+	 * Removes the mapping of the specified conversation id with the corresponding service object.
+	 * 
+	 * @param conversationId
+	 */
 	public void RemoveConvIdServiceMapping(String conversationId) {
 		convIdServiceMapping.remove(conversationId);
-	}
-
-	/**
-	 * @param obj
-	 * @param prefix
-	 * @param total_prefix
-	 * @param result
-	 */
-	public void printDBObjectPretty(DBObject obj, String prefix, String total_prefix, StringBuilder result) {
-		Object value;
-		for(String key : obj.keySet()) {
-			value = obj.get(key);
-			if(value instanceof DBObject) {
-				result.append(total_prefix + key + ":\n");
-				printDBObjectPretty((DBObject) value, prefix, prefix + total_prefix, result);
-			} else if(value == null) {
-				result.append(total_prefix + key + ": " + value + "\n");
-			} else {
-				result.append(total_prefix + key + ": " + value + " (" + value.getClass().getSimpleName() + ")\n");
-			}
-		}
 	}
 
 	/* (non-Javadoc)
@@ -183,10 +292,16 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					switch(operation) {
 						case UPDATE:
 							StepStatusCode status = productionStep.getStatus();
-							if(status == StepStatusCode.WAITING) {
-								serviceStepBBClient.updateDocuments(
-										new BasicDBObject("productStepId", entry.getTargetObjectId()),
-										new BasicDBObject("$set", new BasicDBObject("status", status)));
+							switch(status) {
+								case WAITING:
+								case ABORTED:
+									serviceStepBBClient.updateDocuments(
+											new BasicDBObject("productStepId", entry.getTargetObjectId()),
+											new BasicDBObject("$set", new BasicDBObject("status", status).append(
+													"statusData", productionStep.getStatusData())));
+									break;
+								default:
+									break;
 							}
 							break;
 						case DELETE:
@@ -198,15 +313,27 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					}
 					break;
 				case "ServiceStepsBlackBoard":
-					BasicDBObject serviceStep =
-							(BasicDBObject) serviceStepBBClient.findDocumentById(entry.getTargetObjectId());
-					ObjectId productStepId = (ObjectId) serviceStep.get("productStepId");
+					ServiceStepMessage serviceStep =
+							new ServiceStepMessage((BasicDBObject) serviceStepBBClient.findDocumentById(entry
+									.getTargetObjectId()));
+					ObjectId productStepId = serviceStep.getProductStepId();
 					switch(operation) {
 						case UPDATE:
-							BasicDBObject update = new BasicDBObject("status", serviceStep.get("status"));
-							update.put("statusData", serviceStep.get("statusData"));
-							productStepBBClient.updateDocuments(new BasicDBObject("_id", productStepId),
-									new BasicDBObject("$set", update));
+							StepStatusCode status = serviceStep.getStatus();
+							switch(status) {
+								case WAITING:
+								case IN_PROGRESS:
+								case SUSPENDED_OR_WARNING:
+								case DONE:
+								case FAILED:
+									productStepBBClient.updateDocuments(
+											new BasicDBObject("_id", productStepId),
+											new BasicDBObject("$set", new BasicDBObject("status", status).append(
+													"statusData", serviceStep.getStatusData())));
+									break;
+								default:
+									break;
+							}
 							break;
 						default:
 							break;
@@ -222,42 +349,54 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	}
 
 	/**
-	 * @return the dbData
+	 * the DbData containing connection info for the blackboard mongoDB database.
+	 * 
+	 * @return the DbData containing connection info for the blackboard mongoDB database.
 	 */
 	public DbData getDbData() {
 		return dbData;
 	}
 
 	/**
-	 * @return the equipletAgentAID
+	 * Returns the AID of the equipletAgent of this equiplet.
+	 * 
+	 * @return the AID of the equipletAgent of this equiplet.
 	 */
 	public AID getEquipletAgentAID() {
 		return equipletAgentAID;
 	}
 
 	/**
-	 * @return the logisticsAID
+	 * Returns the AID of the logisticsAgent.
+	 * 
+	 * @return the AID of the logisticsAgent.
 	 */
 	public AID getLogisticsAID() {
 		return logisticsAID;
 	}
 
 	/**
-	 * @return the hardwareAgentAID
+	 * Returns the AID of the hardwareAgent of this equiplet.
+	 * 
+	 * @return the AID of the hardwareAgent of this equiplet.
 	 */
 	public AID getHardwareAgentAID() {
 		return hardwareAgentAID;
 	}
 
 	/**
-	 * @return the productStepBBClient
+	 * Returns the productSteps blackboard client.
+	 * 
+	 * @return  the productSteps blackboard client.
 	 */
 	public BlackboardClient getProductStepBBClient() {
 		return productStepBBClient;
 	}
 
 	/**
-	 * @return the serviceStepBBClient
+	 * Returns the serviceSteps blackboard client.
+	 * 
+	 * @return the serviceSteps blackboard client.
 	 */
 	public BlackboardClient getServiceStepBBClient() {
 		return serviceStepBBClient;

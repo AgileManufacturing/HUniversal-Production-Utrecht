@@ -3,7 +3,7 @@
  * @brief Provides a message for the servicestep blackboard
  * @date Created: 2013-04-03
  * 
- * @author Hessel Meulenbeld
+ * @author Peter Bonnema
  * 
  * @section LICENSE
  *          License: newBSD
@@ -56,7 +56,9 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 
 /**
- * Implementation of a message for the serviceStep blackboard
+ * Represents a service step. It implements the singular linked list principle in it that holds a reference to the next
+ * step that should be executed. The reference is in the form of a ObjectId of the next step. If this field is null it
+ * means it´s the last step for this product step.
  * 
  * @author Peter
  */
@@ -72,66 +74,43 @@ public class ServiceStepMessage implements MongoSaveable {
 	private ScheduleData scheduleData;
 
 	/**
-	 * 
+	 * Creates an empty ServiceStep.
 	 */
 	public ServiceStepMessage() {}
 
 	/**
-	 * @param serviceId
-	 * @param type
-	 * @param parameters
-	 * @param status
-	 * @param statusData
-	 * @param scheduleData
+	 * Creates a ServiceStep with the specified parameters. The nextStep field and productStepId field will be
+	 * initialized to null.
+	 * 
+	 * @param serviceId The ID of the service that created this ServiceStepMessage.
+	 * @param type The type of this service step (e.g. "pick", "place", "move up").
+	 * @param parameters The parameters of the step.
+	 * @param status The status of the step.
+	 * @param statusData The status data describing the status of the step.
+	 * @param scheduleData The schedule data containing start time, duration and deadline. The latter is currently
+	 *            unused.
 	 */
-	public ServiceStepMessage(int serviceId, int type, BasicDBObject parameters,
+	public ServiceStepMessage(int serviceId, int type, BasicDBObject parameters, StepStatusCode status,
+			BasicDBObject statusData, ScheduleData scheduleData) {
+		this(null, serviceId, type, parameters, status, statusData, scheduleData);
+	}
+
+	/**
+	 * Creates a ServiceStep with the specified parameters. The nextStep field will be initialized to null because it
+	 * cannot be sensibly filled in before saving this step on the blackboard.
+	 * 
+	 * @param productStepId The productStep this ServiceStepMessage resulted from.
+	 * @param serviceId The ID of the service that created this ServiceStepMessage.
+	 * @param type The type of this service step (e.g. "pick", "place", "move up").
+	 * @param parameters The parameters of the step.
+	 * @param status The status of the step.
+	 * @param statusData The status data describing the status of the step.
+	 * @param scheduleData The schedule data containing start time, duration and deadline. The latter is currently
+	 *            unused.
+	 */
+	public ServiceStepMessage(ObjectId productStepId, int serviceId, int type, BasicDBObject parameters,
 			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
-		this(null, serviceId, type, null, parameters, status, statusData, scheduleData);
-	}
-
-	/**
-	 * @param nextStep
-	 * @param serviceId
-	 * @param type
-	 * @param parameters
-	 * @param status
-	 * @param statusData
-	 * @param scheduleData
-	 */
-	public ServiceStepMessage(ObjectId nextStep, int serviceId, int type, BasicDBObject parameters,
-			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
-		this(nextStep, serviceId, type, null, parameters, status, statusData, scheduleData);
-	}
-
-	/**
-	 * @param serviceId
-	 * @param type
-	 * @param productStepId
-	 * @param parameters
-	 * @param status
-	 * @param statusData
-	 * @param scheduleData
-	 */
-	public ServiceStepMessage(int serviceId, int type, ObjectId productStepId,
-			BasicDBObject parameters, StepStatusCode status, BasicDBObject statusData,
-			ScheduleData scheduleData) {
-		this(null, serviceId, type, productStepId, parameters, status, statusData, scheduleData);
-	}
-
-	/**
-	 * @param nextStep
-	 * @param serviceId
-	 * @param type
-	 * @param productStepId
-	 * @param parameters
-	 * @param status
-	 * @param statusData
-	 * @param scheduleData
-	 */
-	public ServiceStepMessage(ObjectId nextStep, int serviceId, int type, ObjectId productStepId,
-			BasicDBObject parameters, StepStatusCode status, BasicDBObject statusData,
-			ScheduleData scheduleData) {
-		this.nextStep = nextStep;
+		this.nextStep = null;
 		this.serviceId = serviceId;
 		this.type = type;
 		this.productStepId = productStepId;
@@ -142,23 +121,27 @@ public class ServiceStepMessage implements MongoSaveable {
 	}
 
 	/**
-	 * @param object
+	 * Creates a new ServiceStepMessage and initializes all fields with the data in the specified BasicDBObject.
+	 * 
+	 * @param object The BasicDBObject containing all data to initialized the ServiceStepMessage with.
 	 */
 	public ServiceStepMessage(BasicDBObject object) {
 		fromBasicDBObject(object);
 	}
 
 	/**
-	 * @param unsortedSteps
-	 * @return
+	 * Sorts the ServiceStepMessages in the specified array bases on their nextStep field. The last step is the one of
+	 * which the nextStep field is null.
+	 * 
+	 * @param unsortedSteps An array of steps to be sorted.
+	 * @return An array of ServiceStepMessage in the right order.
 	 */
 	public static ServiceStepMessage[] sort(ServiceStepMessage[] unsortedSteps) {
 		// Find the first step
 		ServiceStepMessage firstServiceStep = null;
 		outer: for(ServiceStepMessage serviceStep : unsortedSteps) {
 			for(ServiceStepMessage serviceStep2 : unsortedSteps) {
-				if(serviceStep2.getNextStep() != null
-						&& serviceStep2.getNextStep().equals(serviceStep.getId())) {
+				if(serviceStep2.getNextStep() != null && serviceStep2.getNextStep().equals(serviceStep.getId())) {
 					continue outer;
 				}
 			}
@@ -183,28 +166,21 @@ public class ServiceStepMessage implements MongoSaveable {
 		return sortedSteps;
 	}
 
-	/**
-	 * @return
-	 */
+	/* (non-Javadoc)
+	 * @see rexos.mas.data.MongoSaveable#toBasicDBObject() */
 	@Override
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject dbObject =
-				(BasicDBObject) BasicDBObjectBuilder.start()
-						.add("nextStep", nextStep)
-						.add("serviceId", serviceId)
-						.add("type", type)
-						.add("productStepId", productStepId)
-						.add("parameters", parameters)
-						.add("status", status.name())
-						.add("statusData", statusData)
+				(BasicDBObject) BasicDBObjectBuilder.start().add("nextStep", nextStep).add("serviceId", serviceId)
+						.add("type", type).add("productStepId", productStepId).add("parameters", parameters)
+						.add("status", status.name()).add("statusData", statusData)
 						.add("scheduleData", scheduleData.toBasicDBObject()).get();
 
 		return dbObject;
 	}
 
-	/**
-	 * @param object
-	 */
+	/* (non-Javadoc)
+	 * @see rexos.mas.data.MongoSaveable#fromBasicDBObject(com.mongodb.BasicDBObject) */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		_id = object.getObjectId("_id");
@@ -227,27 +203,37 @@ public class ServiceStepMessage implements MongoSaveable {
 	}
 
 	/**
-	 * @return the id
+	 * Returns the MongoDB ObjectId of the entry of this service step on a blackboard if it was recreated from that
+	 * entry. Otherwise null is returned.
+	 * 
+	 * @return The MongoDB ObjectId or null.
 	 */
 	public ObjectId getId() {
 		return _id;
 	}
 
 	/**
-	 * @return the nextStep
+	 * Returns the ObjectId of the next step to be executed in bunch of steps created by a service object. This follows
+	 * the singular linked list pattern.
+	 * 
+	 * @return The ObjectId of the next step to be executed.
 	 */
 	public ObjectId getNextStep() {
 		return nextStep;
 	}
 
 	/**
-	 * @param nextStep the nextStep to set
+	 * Sets the ObjectId of the next step to be executed in bunch of steps created by a service object.
+	 * 
+	 * @param nextStep The ObjectId of the next step to be executed.
 	 */
 	public void setNextStep(ObjectId nextStep) {
 		this.nextStep = nextStep;
 	}
 
 	/**
+	 * The MongoDB ObjectId of the productStep
+	 * 
 	 * @return the productStepId
 	 */
 	public ObjectId getProductStepId() {
