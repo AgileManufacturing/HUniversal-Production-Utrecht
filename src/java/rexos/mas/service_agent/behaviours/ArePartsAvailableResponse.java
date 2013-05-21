@@ -101,7 +101,7 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 							agent, conversationId, productStep));
 				} else {
 					agent.getProductStepBBClient().updateDocuments(
-							new BasicDBObject("_id", productStep.get_id()),
+							new BasicDBObject("_id", productStep.getId()),
 							new BasicDBObject("$set", new BasicDBObject(
 									"status", StepStatusCode.ABORTED.name())
 									.append("statusData", new BasicDBObject(

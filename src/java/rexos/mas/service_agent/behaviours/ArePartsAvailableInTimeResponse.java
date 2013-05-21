@@ -111,7 +111,7 @@ public class ArePartsAvailableInTimeResponse extends ReceiveOnceBehaviour {
 					agent.addBehaviour(new GetPartsInfoResponse(agent, conversationId, productStep));
 				} else {
 					agent.getProductStepBBClient().updateDocuments(
-							new BasicDBObject("_id", productStep.get_id()),
+							new BasicDBObject("_id", productStep.getId()),
 							new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name())
 									.append("statusData", new BasicDBObject("reason",
 											"productStep cannot be delivered on time"))));

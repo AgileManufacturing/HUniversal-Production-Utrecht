@@ -109,7 +109,7 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 			try {
 				List<DBObject> dbServiceSteps =
 						agent.getServiceStepBBClient().findDocuments(
-								new BasicDBObject("productStepId", productStep.get_id()));
+								new BasicDBObject("productStepId", productStep.getId()));
 				ServiceStep[] serviceSteps = new ServiceStep[dbServiceSteps.size()];
 
 				for(int i = 0; i < dbServiceSteps.size(); i++) {
@@ -144,7 +144,7 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 				informMsg.setContentObject(parameterizedSteps[0].getId());
 				agent.send(informMsg);
 
-				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStep.get_id()),
+				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStep.getId()),
 						new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.PLANNED.name())));
 			} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 				Logger.log(e);
