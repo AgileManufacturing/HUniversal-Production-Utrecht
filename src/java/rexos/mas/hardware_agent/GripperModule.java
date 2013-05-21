@@ -236,7 +236,7 @@ public class GripperModule extends Module {
 		//create the instruction data.
 		InstructionData instructionData = new InstructionData("activate", "gripper", "FIND_ID", lookUpParameters, new BasicDBObject());
 		//create and return the step.
-		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(1));
+		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(), new TimeData(1));
 	}
 
 	/**
@@ -259,7 +259,7 @@ public class GripperModule extends Module {
 		//create instruction data.
 		InstructionData instructionData = new InstructionData("deactivate", "gripper", "FIND_ID", lookUpParameters, new BasicDBObject());
 		//create and return the step.
-		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new TimeData(1));
+		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(), new TimeData(1));
 	}
 
 }

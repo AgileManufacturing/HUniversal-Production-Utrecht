@@ -193,18 +193,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	private ObjectId nextProductStep;
 
 	/**
-	 * @var int firstTimeSlot
-	 *      The first time slot of the grid.
-	 */
-	private int firstTimeSlot;
-
-	/**
-	 * @var int timeSlotLength
-	 *      The length of a time slot.
-	 */
-	private int timeSlotLength;
-
-	/**
 	 * @var DbData dbData
 	 *      The dbData of the equipletAgent.
 	 */
@@ -258,12 +246,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 
 			// creates his service agent.
-			Object[] arguments = new Object[] {
-					dbData, getAID(), logisticsAgent
-			};
-			AgentController serviceAgentCnt =
+			Object[] arguments = new Object[] { dbData, getAID(), logisticsAgent };
+			AgentController serviceAgentCnt = getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "rexos.mas.service_agent.ServiceAgent", arguments);
 					getContainerController().createNewAgent(getLocalName() + "-serviceAgent",
-							"rexos.mas.service_agent.ServiceAgent", arguments);
 			serviceAgentCnt.start();
 			serviceAgent = new AID(serviceAgentCnt.getName(), AID.ISGUID);
 
@@ -288,17 +273,15 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			// blackboard.
 			collectiveBBClient.setCollection(timeDataName);
 			BasicDBObject timeData = (BasicDBObject) collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
-			firstTimeSlot = timeData.getInt("firstTimeSlot");
-			timeSlotLength = timeData.getInt("timeSlotLength");
+			// initiates the timer to the next product step.
+			timer = new NextProductStepTimer(timeData.getLong("firstTimeSlot"), timeData.getInt("timeSlotLength"), this);
+			timer.setNextUsedTimeSlot(-1);
+			
 			collectiveBBClient.setCollection(equipletDirectoryName);
 		} catch(Exception e) {
 			Logger.log(e);
 			doDelete();
 		}
-
-		// initiates the timer to the next product step.
-		timer = new NextProductStepTimer(firstTimeSlot, timeSlotLength);
-		timer.setNextUsedTimeSlot(-1);
 
 		// starts the behaviour for receiving message when the Service Agent
 		// Dies.
@@ -384,7 +367,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 								// If the start time of the newly planned productStep is earlier as the next used time
 								// slot make it the next used timeslot.
 								ScheduleData scheduleData = productStep.getScheduleData();
-
+							timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 								if(scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
 									timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 								}

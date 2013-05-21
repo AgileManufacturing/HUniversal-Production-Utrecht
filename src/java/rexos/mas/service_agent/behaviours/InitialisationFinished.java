@@ -50,11 +50,12 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import rexos.libraries.log.Logger;
+import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.service_agent.ServiceAgent;
 
 /** The Class InitialisationFinished. */
-public class InitialisationFinished extends ReceiveOnceBehaviour {
+public class InitialisationFinished extends ReceiveBehaviour {
 	/**
 	 * @var static final long serialVersionUID The serial version UID for this
 	 *      class
@@ -80,7 +81,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 	 * @param a The agent for this behaviour
 	 */
 	public InitialisationFinished(Agent a) {
-		super(a, 2000, messageTemplate);
+		super(a, -1, messageTemplate);
 		serviceAgent = (ServiceAgent) a;
 	}
 

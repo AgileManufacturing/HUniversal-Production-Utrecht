@@ -73,6 +73,13 @@ public class EquipletStep implements MongoSaveable {
 	 * The status of this step.
 	 */
 	private StepStatusCode status;
+	
+	/**
+	 * @var basicDBObject statusData The extra data provided by the status for
+	 *      this product step.
+	 */
+	private BasicDBObject statusData;
+	
 	/**
 	 * @var TimeData timeData
 	 * The time data of this step.
@@ -85,16 +92,18 @@ public class EquipletStep implements MongoSaveable {
 	 * @param moduleId The moduleId
 	 * @param instructionData The instructionData
 	 * @param status The status
+	 * @param statusData The extra data by the status
 	 * @param timeData The timeData
 	 */
 	public EquipletStep(ObjectId serviceStepID, int moduleId,
-			InstructionData instructionData, StepStatusCode status,
+			InstructionData instructionData, StepStatusCode status, BasicDBObject statusData,
 			TimeData timeData) {
 
 		this.serviceStepID = serviceStepID;
 		this.moduleId = moduleId;
 		this.instructionData = instructionData;
 		this.status = status;
+		this.statusData = statusData;
 		this.timeData = timeData;
 	}
 
@@ -187,6 +196,22 @@ public class EquipletStep implements MongoSaveable {
 	}
 
 	/**
+	 * Getter for the statusData
+	 * @return the statusData
+	 */
+	public BasicDBObject getStatusData(){
+		return statusData;
+	}
+	
+	/**
+	 * Setter for the statusData
+	 * @param statusData the statusData to set it to
+	 */
+	public void setStatusData(BasicDBObject statusData){
+		this.statusData = statusData;
+	}
+	
+	/**
 	 * Getter for the time data
 	 * @return the timeData
 	 */
@@ -225,6 +250,7 @@ public class EquipletStep implements MongoSaveable {
 		object.put("moduleId", moduleId);
 		object.put("instructionData", instructionData.toBasicDBObject());
 		object.put("status", status.toString());
+		object.put("statusData", statusData);
 		object.put("timeData", timeData.toBasicDBObject());
 		return object;
 	}
@@ -240,6 +266,11 @@ public class EquipletStep implements MongoSaveable {
 		moduleId = object.getInt("moduleId");
 		instructionData = new InstructionData((BasicDBObject) object.get("instructionData"));
 		status = StepStatusCode.valueOf(object.getString("status"));
+		if(object.containsField("statusData")){
+			statusData = (BasicDBObject) object.get("statusData");
+		}else{
+			statusData = new BasicDBObject();
+		}
 		timeData = new TimeData((BasicDBObject) object.get("timeData"));	
 	}
 }
