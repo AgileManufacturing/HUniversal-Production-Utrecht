@@ -1,5 +1,5 @@
 /**
- * @file ArePartsAvailableResponse.java
+ * @file rexos/mas/service_agent/behaviours/ArePartsAvailableResponse.java
  * @brief 
  * @date Created: 23 apr. 2013
  *

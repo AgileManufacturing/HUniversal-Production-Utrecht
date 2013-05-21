@@ -1,5 +1,5 @@
 /**
- * @file EquipletAgent.java
+ * @file rexos/mas/equiplet_agent/EquipletAgent.java
  * @brief Provides an equiplet agent that communicates with product agents and
  *        with its own service agent.
  * @date Created: 2013-04-02
@@ -84,113 +84,140 @@ import rexos.mas.equiplet_agent.behaviours.ServiceAgentDied;
 import com.mongodb.BasicDBObject;
 
 /**
- * EquipletAgent that communicates with product agents and with its own service agent.
+ * EquipletAgent that communicates with product agents and with its own service
+ * agent.
  **/
 public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	/**
-	 * @var long serialVersionUID The serial version UID.
+	 * @var long serialVersionUID
+	 *      The serial version UID.
 	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var AID serviceAgent AID of the serviceAgent connected to this EquipletAgent.
+	 * @var AID serviceAgent
+	 *      AID of the serviceAgent connected to this EquipletAgent.
 	 */
 	private AID serviceAgent;
 
 	/**
-	 * @var String collectiveDbIp IP of the collective database.
+	 * @var String collectiveDbIp
+	 *      IP of the collective database.
 	 */
 	private String collectiveDbIp = "145.89.191.131";
 	// private String collectiveDbIp = "localhost";
 
 	/**
-	 * @var int collectiveDbPort Port number of the collective database.
+	 * @var int collectiveDbPort
+	 *      Port number of the collective database.
 	 */
 	private int collectiveDbPort = 27017;
 
 	/**
-	 * @var String collectiveDbName Name of the collective database.
+	 * @var String collectiveDbName
+	 *      Name of the collective database.
 	 */
 	private String collectiveDbName = "CollectiveDb";
 
 	/**
-	 * @var String equipletDirectoryName Name of the collection containing the equipletDirectory.
+	 * @var String equipletDirectoryName
+	 *      Name of the collection containing the equipletDirectory.
 	 */
 	private String equipletDirectoryName = "EquipletDirectory";
 
 	/**
-	 * @var String timeDataName Name of the collection containing the timeData.
+	 * @var String timeDataName
+	 *      Name of the collection containing the timeData.
 	 */
 	private String timeDataName = "TimeData";
 
 	/**
-	 * @var String equipletDbIp IP of the equiplet database.
+	 * @var String equipletDbIp
+	 *      IP of the equiplet database.
 	 */
 	private String equipletDbIp = "localhost";
 
 	/**
-	 * @var int equipletDbPort Port number of the equiplet database.
+	 * @var int equipletDbPort
+	 *      Port number of the equiplet database.
 	 */
 	private int equipletDbPort = 27017;
 
 	/**
-	 * @var String equipletDbName Name of the equiplet database.
+	 * @var String equipletDbName
+	 *      Name of the equiplet database.
 	 */
 	private String equipletDbName = "";
 
 	/**
-	 * @var String productStepsName Name of the collection containing the productSteps.
+	 * @var String productStepsName
+	 *      Name of the collection containing the productSteps.
 	 */
 	private String productStepsName = "ProductStepsBlackBoard";
 
 	/**
-	 * @var BlackboardClient collectiveBBClient Object for communication with the collective blackboard.
+	 * @var BlackboardClient collectiveBBClient
+	 *      Object for communication with the collective blackboard.
 	 */
 	private BlackboardClient collectiveBBClient;
 
 	/**
-	 * @var BlackboardClient equipletBBClient Object for communication with the equiplet blackboard.
+	 * @var BlackboardClient equipletBBClient
+	 *      Object for communication with the equiplet blackboard.
 	 */
 	private BlackboardClient equipletBBClient;
 
 	/**
-	 * @var ArrayList<Integer> capabilities List with all the capabilities of this equiplet.
+	 * @var ArrayList<Integer> capabilities
+	 *      List with all the capabilities of this equiplet.
 	 */
 	private ArrayList<Integer> capabilities;
 
 	/**
-	 * @var HashMap<String, ObjectId> communicationTable Table with the combinations conversationID and ObjectId.
+	 * @var HashMap<String, ObjectId> communicationTable
+	 *      Table with the combinations conversationID and ObjectId.
 	 */
 	private HashMap<String, ObjectId> communicationTable;
 
 	/**
-	 * @var Timer timeToNextUsedTimeSlot Timer used to trigger when the next used time slot is ready to start.
+	 * @var Timer timeToNextUsedTimeSlot
+	 *      Timer used to trigger when the next used time slot is ready to
+	 *      start.
 	 */
 	private NextProductStepTimer timer;
 
 	/**
-	 * @var ObjectId nextProductStep The next product step.
+	 * @var ObjectId nextProductStep
+	 *      The next product step.
 	 */
 	private ObjectId nextProductStep;
 
 	/**
-	 * @var int firstTimeSlot The first time slot of the grid.
+	 * @var int firstTimeSlot
+	 *      The first time slot of the grid.
 	 */
 	private int firstTimeSlot;
 
 	/**
-	 * @var int timeSlotLength The length of a time slot.
+	 * @var int timeSlotLength
+	 *      The length of a time slot.
 	 */
 	private int timeSlotLength;
 
 	/**
-	 * @var DbData dbData The dbData of the equipletAgent.
+	 * @var DbData dbData
+	 *      The dbData of the equipletAgent.
 	 */
 	private DbData dbData;
 
 	/**
-	 * Setup function for the equipletAgent. Configures the IP and database name of the equiplet. Gets its capabilities from the arguments. Creates its service agent. Makes connections with the BlackboardCLients and subscribes on changes on the
-	 * status field. Puts its capabilities on the equipletDirectory blackboard. Gets the time data from the blackboard. Initializes the Timer objects. Starts its behaviours.
+	 * Setup function for the equipletAgent. Configures the IP and database name
+	 * of the equiplet. Gets its capabilities from the arguments. Creates its
+	 * service agent. Makes connections with the BlackboardCLients and
+	 * subscribes on changes on the
+	 * status field. Puts its capabilities on the equipletDirectory blackboard.
+	 * Gets the time data from the blackboard. Initializes the Timer objects.
+	 * Starts its behaviours.
 	 */
 	@Override
 	public void setup() {
@@ -218,7 +245,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			try {
 				client = KnowledgeDBClient.getClient();
 
-				Row[] rows = client.executeSelectQuery(Queries.POSSIBLE_STEPS_PER_EQUIPLET, getAID().getLocalName());
+				Row[] rows = client.executeSelectQuery(
+						Queries.POSSIBLE_STEPS_PER_EQUIPLET, getAID()
+								.getLocalName());
 				for (Row row : rows) {
 					capabilities.add((int) row.get("id"));
 				}
@@ -231,32 +260,39 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 
 			// creates his service agent.
-			Object[] arguments = new Object[] { dbData, getAID(), logisticsAgent };
-			AgentController serviceAgentCnt = getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "rexos.mas.service_agent.ServiceAgent", arguments);
+			Object[] arguments = new Object[] { dbData, getAID(),
+					logisticsAgent };
+			AgentController serviceAgentCnt = getContainerController()
+					.createNewAgent(getLocalName() + "-serviceAgent",
+							"rexos.mas.service_agent.ServiceAgent", arguments);
 			serviceAgentCnt.start();
 			serviceAgent = new AID(serviceAgentCnt.getName(), AID.ISGUID);
 
 			// makes connection with the collective blackboard.
-			collectiveBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
+			collectiveBBClient = new BlackboardClient(collectiveDbIp,
+					collectiveDbPort);
 			collectiveBBClient.setDatabase(collectiveDbName);
 			collectiveBBClient.setCollection(equipletDirectoryName);
 
 			// makes connection with the equiplet blackboard.
-			equipletBBClient = new BlackboardClient(equipletDbIp, equipletDbPort);
+			equipletBBClient = new BlackboardClient(equipletDbIp,
+					equipletDbPort);
 			equipletBBClient.setDatabase(equipletDbName);
 			equipletBBClient.setCollection(productStepsName);
 			equipletBBClient.removeDocuments(new BasicDBObject());
 
 			// subscribes on changes of the status field on the equiplet
 			// blackboard.
-			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
+			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription(
+					"status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			equipletBBClient.subscribe(statusSubscription);
 
 			// gets the timedata for synchronizing from the collective
 			// blackboard.
 			collectiveBBClient.setCollection(timeDataName);
-			BasicDBObject timeData = (BasicDBObject) collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
+			BasicDBObject timeData = (BasicDBObject) collectiveBBClient
+					.findDocuments(new BasicDBObject()).get(0);
 			firstTimeSlot = timeData.getInt("firstTimeSlot");
 			timeSlotLength = timeData.getInt("timeSlotLength");
 			collectiveBBClient.setCollection(equipletDirectoryName);
@@ -278,20 +314,25 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	}
 
 	/**
-	 * Takedown function for the equipletAgent. Removes itself from the equipletDirectory. Informs the productAgents who have planned a productStep on its blackboard of its dead. Removes its database.
+	 * Takedown function for the equipletAgent. Removes itself from the
+	 * equipletDirectory. Informs the productAgents who have planned a
+	 * productStep on its blackboard of its dead. Removes its database.
 	 */
 	@Override
 	public void takeDown() {
 		try {
 			// Removes himself from the collective blackboard equiplet
 			// directory.
-			collectiveBBClient.removeDocuments(new BasicDBObject("AID", getAID().getName()));
+			collectiveBBClient.removeDocuments(new BasicDBObject("AID",
+					getAID().getName()));
 
 			// Messages all his product agents that he is going to die.
-			Object[] productAgents = equipletBBClient.findDistinctValues("productAgentId", new BasicDBObject());
+			Object[] productAgents = equipletBBClient.findDistinctValues(
+					"productAgentId", new BasicDBObject());
 			for (Object productAgent : productAgents) {
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
-				responseMessage.addReceiver(new AID(productAgent.toString(), AID.ISGUID));
+				responseMessage.addReceiver(new AID(productAgent.toString(),
+						AID.ISGUID));
 				responseMessage.setOntology("EquipletAgentDied");
 				responseMessage.setContent("I'm dying");
 				send(responseMessage);
@@ -304,7 +345,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			// Clears his own blackboard and removes his subscription on that
 			// blackboard.
 			equipletBBClient.removeDocuments(new BasicDBObject());
-			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
+			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription(
+					"status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			equipletBBClient.unsubscribe(statusSubscription);
 		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
@@ -318,7 +360,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	}
 
 	/**
-	 * onMessage function for the equipletAgent. Listens to updates of the blackboard clients and handles them.
+	 * onMessage function for the equipletAgent. Listens to updates of the
+	 * blackboard clients and handles them.
 	 */
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
@@ -327,7 +370,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			try {
 				// Get the productstep.
 				ObjectId id = entry.getTargetObjectId();
-				ProductStepMessage productStep = new ProductStepMessage((BasicDBObject) equipletBBClient.findDocumentById(id));
+				ProductStepMessage productStep = new ProductStepMessage(
+						(BasicDBObject) equipletBBClient.findDocumentById(id));
 
 				// Gets the conversationId if it doesn't exist throws an
 				// error.
@@ -341,7 +385,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				responseMessage.addReceiver(productStep.getProductAgentId());
 				responseMessage.setConversationId(conversationId);
 
-				Logger.log("status update: " + productStep.getStatus().toString());
+				Logger.log("status update: "
+						+ productStep.getStatus().toString());
 				switch (productStep.getStatus()) {
 				// Depending on the changed status fills in the
 				// responseMessage and sends it to the product agent.
@@ -351,20 +396,25 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 						// productStep is
 						// earlier as the next used time slot make it
 						// the next used timeslot.
-						ScheduleData scheduleData = productStep.getScheduleData();
+						ScheduleData scheduleData = productStep
+								.getScheduleData();
 
-						if (scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
-							timer.setNextUsedTimeSlot(scheduleData.getStartTime());
+						if (scheduleData.getStartTime() < timer
+								.getNextUsedTimeSlot()) {
+							timer.setNextUsedTimeSlot(scheduleData
+									.getStartTime());
 						}
 
 						// Logger.log("%s Sending ProductionDuration tot %s%n",
 						// getAID(), );
 						responseMessage.setOntology("Planned");
-						responseMessage.setContentObject(scheduleData.getStartTime());
+						responseMessage.setContentObject(scheduleData
+								.getStartTime());
 						send(responseMessage);
 					} catch (IOException e) {
 						responseMessage.setPerformative(ACLMessage.FAILURE);
-						responseMessage.setContent("An error occured in the planning/please reschedule");
+						responseMessage
+								.setContent("An error occured in the planning/please reschedule");
 						send(responseMessage);
 						Logger.log(e);
 					}
@@ -377,13 +427,15 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				case FAILED:
 					responseMessage.setOntology("StatusUpdate");
 					responseMessage.setContent("FAILED");
-					responseMessage.setContentObject(productStep.getStatusData());
+					responseMessage.setContentObject(productStep
+							.getStatusData());
 					send(responseMessage);
 					break;
 				case SUSPENDED_OR_WARNING:
 					responseMessage.setOntology("StatusUpdate");
 					responseMessage.setContent("SUSPENDED_OR_WARNING");
-					responseMessage.setContentObject(productStep.getStatusData());
+					responseMessage.setContentObject(productStep
+							.getStatusData());
 					send(responseMessage);
 					break;
 				case DONE:
@@ -421,7 +473,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 * @param objectId
 	 *            the objectId in the new relation.
 	 */
-	public void addCommunicationRelation(String conversationId, ObjectId objectId) {
+	public void addCommunicationRelation(String conversationId,
+			ObjectId objectId) {
 		communicationTable.put(conversationId, objectId);
 	}
 
@@ -441,12 +494,14 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 * 
 	 * @param productStepEntry
 	 *            the ObjectId for which the related conversationId is needed.
-	 * @return the related conversationId or null if the relation does not exist.
+	 * @return the related conversationId or null if the relation does not
+	 *         exist.
 	 */
 	public String getConversationId(ObjectId productStepEntry) {
 		String conversationId = null;
 		if (communicationTable.containsValue(productStepEntry)) {
-			for (Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
+			for (Entry<String, ObjectId> tableEntry : communicationTable
+					.entrySet()) {
 				if (tableEntry.getValue().equals(productStepEntry)) {
 					conversationId = tableEntry.getKey();
 					break;
@@ -483,10 +538,24 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		return nextProductStep;
 	}
 
+	/**
+	 * Returns the capabilities (i.e. product step ids of steps it can perform)
+	 * for this equiplet.
+	 * 
+	 * @return The capabilities for this equiplet.
+	 * 
+	 */
 	public ArrayList<Integer> getCapabilities() {
 		return capabilities;
 	}
 
+	/**
+	 * Returns the details for this Equiplet's database.
+	 * 
+	 * @return DbData object containing the details for this Equiplet's
+	 *         database.
+	 * 
+	 */
 	public DbData getDbData() {
 		return dbData;
 	}

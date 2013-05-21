@@ -1,5 +1,5 @@
 /**
- * @file GetProductStepDuration.java
+ * @file rexos/mas/equiplet_agent/behaviours/GetProductionDuration.java
  * @brief Behaviour for handling the messages with the ontology GetProductStepDuration
  * @date Created: 2013-04-02
  *

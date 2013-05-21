@@ -1,5 +1,5 @@
 /**
- * @file ServiceFactory.java
+ * @file rexos/mas/service_agent/ServiceFactory.java
  * @brief 
  * @date Created: 12 apr. 2013
  *

@@ -1,5 +1,5 @@
 /**
- * @file ScheduleStep.java
+ * @file rexos/mas/equiplet_agent/behaviours/ScheduleStep.java
  * @brief Behaviour for handling the messages with the ontology ScheduleStep
  * @date Created: 2013-04-02
  *
@@ -48,21 +48,22 @@ import com.mongodb.BasicDBObject;
  */
 public class ScheduleStep extends ReceiveBehaviour {
 	/**
-	 * @var static final long serialVersionUID The serial version UID for this
-	 *      class
+	 * @var static final long serialVersionUID
+	 *      The serial version UID for this class
 	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var MessageTemplate messageTemplate The messageTemplate this behaviour
-	 *      listens to. This behaviour listens to the ontology: ScheduleStep.
+	 * @var MessageTemplate messageTemplate
+	 *      The messageTemplate this behaviour listens to. This behaviour
+	 *      listens to the ontology: ScheduleStep.
 	 */
 	private static MessageTemplate messageTemplate = MessageTemplate
 			.MatchOntology("ScheduleStep");
 
 	/**
-	 * @var EquipletAgent equipletAgent The equipletAgent related to this
-	 *      behaviour.
+	 * @var EquipletAgent equipletAgent
+	 *      The equipletAgent related to this behaviour.
 	 */
 	private EquipletAgent equipletAgent;
 
@@ -101,7 +102,9 @@ public class ScheduleStep extends ReceiveBehaviour {
 					.getConversationId());
 			BlackboardClient client = equipletAgent.getEquipletBBClient();
 			ScheduleData scheduleData = new ScheduleData(
-					(BasicDBObject) ((BasicDBObject) client.findDocumentById(productStepId)).get("scheduleData"));
+					(BasicDBObject) ((BasicDBObject) client
+							.findDocumentById(productStepId))
+							.get("scheduleData"));
 			scheduleData.setStartTime(timeslot);
 			client.updateDocuments(new BasicDBObject("_id", productStepId),
 					new BasicDBObject("$set", new BasicDBObject("scheduleData",

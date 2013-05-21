@@ -1,5 +1,5 @@
 /**
- * @file EquipletStepMessage.java
+ * @file rexos/mas/hardware_agent/EquipletStepMessage.java
  * @brief Makes a messages to be used for a 
  * @brief respond. This respond consist of a serviceStepID,instructiondata a type and timedata.
  * @date Created: 2013-04-02

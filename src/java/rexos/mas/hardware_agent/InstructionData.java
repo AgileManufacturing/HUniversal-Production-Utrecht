@@ -1,7 +1,7 @@
 package rexos.mas.hardware_agent;
 
 /**
- * @file InstructionData.java
+ * @file rexos/mas/hardware_agent/InstructionData.java
  * @brief Provides a instructionData object
  * @date Created: 2013-04-24
  *

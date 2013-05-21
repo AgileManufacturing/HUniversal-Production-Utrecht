@@ -1,7 +1,7 @@
 package rexos.mas.hardware_agent;
 
 /**
- * @file HardwareAgent.java
+ * @file rexos/mas/hardware_agent/HardwareAgent.java
  * @brief Provides an Hardware agent that communicates with Service agents and
  *        its own modules.
  * @date Created: 12-04-13

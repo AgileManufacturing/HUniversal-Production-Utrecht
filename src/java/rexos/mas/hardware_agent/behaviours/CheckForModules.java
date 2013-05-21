@@ -1,7 +1,7 @@
 package rexos.mas.hardware_agent.behaviours;
 
 /**
- * @file CheckForModules.java
+ * @file rexos/mas/hardware_agent/behaviours/CheckForModules.java
  * @brief Handles the CheckForModules message
  * @date Created: 12-04-13
  *

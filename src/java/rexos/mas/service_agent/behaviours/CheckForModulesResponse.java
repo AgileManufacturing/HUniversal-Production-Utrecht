@@ -1,5 +1,5 @@
 /**
- * @file CheckForModulesResponse.java
+ * @file rexos/mas/service_agent/behaviours/CheckForModulesResponse.java
  * @brief 
  * @date Created: 18 apr. 2013
  *

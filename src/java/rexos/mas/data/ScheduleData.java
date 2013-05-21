@@ -1,3 +1,33 @@
+/**
+ * @file rexos/mas/behaviours/ScheduleData.java
+ * @brief Data object for storing scheduling data.
+ * @date Created: 11 apr. 2013
+ *
+ * @author Peter Bonnema
+ *
+ * @section LICENSE
+ * License: newBSD
+ *
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ * - Neither the name of the HU University of Applied Sciences Utrecht nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ **/
 package rexos.mas.data;
 
 import java.io.Serializable;
@@ -12,9 +42,28 @@ import com.mongodb.BasicDBObjectBuilder;
  *
  */
 public class ScheduleData implements MongoSaveable, Serializable {
+	/**
+	 * @var long serialVersionUID
+	 * The serialVersionUID for this class.
+**/
 	private static final long serialVersionUID = 8380622365668923276L;
+	
+	/**
+	 * @var int startTime
+	 * The start time.
+	 **/
 	private int startTime;
+	
+	/**
+	 * @var int duration
+	 * The duration.
+	 **/
 	private int duration;
+	
+	/**
+	 * @var int deadline
+	 * The deadline.
+	 **/
 	private int deadline;
 	
 	/**
@@ -25,7 +74,8 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	}
 	
 	/**
-	 * @param object
+	 * Constructs a ScheduleData object with the data contained in the specified BasicDBObject.
+	 * @param object The DBObject containing the data for this ScheduleData object.
 	 */
 	public ScheduleData(BasicDBObject object) {
 		fromBasicDBObject(object);
@@ -44,9 +94,9 @@ public class ScheduleData implements MongoSaveable, Serializable {
 		this.deadline = deadline;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see newDataClasses.DBSaveable#toBasicDBObject()
-	 */
+	 **/
 	@Override
 	public BasicDBObject toBasicDBObject() {
 		return (BasicDBObject) BasicDBObjectBuilder.start()
@@ -55,9 +105,9 @@ public class ScheduleData implements MongoSaveable, Serializable {
 				.add("deadline", deadline).get();
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see newDataClasses.DBSaveable#fromBasicDBObject(com.mongodb.BasicDBObject)
-	 */
+	 **/
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		this.startTime = object.getInt("startTime", -1);
@@ -66,13 +116,15 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	}
 
 	/**
-	 * @return the start time
-	 */
+	 * Returns the start time for this object.
+	 * @return The start time
+	 **/
 	public int getStartTime() {
 		return startTime;
 	}
 
 	/**
+	 * Sets the start time for this object.
 	 * @param startTime the start time to set
 	 */
 	public void setStartTime(int startTime) {
@@ -80,6 +132,7 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	}
 
 	/**
+	 * Returns the duration for this object.
 	 * @return the duration
 	 */
 	public int getDuration() {
@@ -87,6 +140,7 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	}
 
 	/**
+	 * Sets the duration for this object.
 	 * @param duration the duration to set
 	 */
 	public void setDuration(int duration) {
@@ -94,6 +148,7 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	}
 
 	/**
+	 * Returns the deadline for this object.
 	 * @return the deadline
 	 */
 	public int getDeadline() {
@@ -101,15 +156,16 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	}
 
 	/**
+	 * Sets the deadline for this object.
 	 * @param deadline the deadline to set
 	 */
 	public void setDeadline(int deadline) {
 		this.deadline = deadline;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see java.lang.Object#toString()
-	 */
+	 **/
 	@Override
 	public String toString() {
 		return String.format(

@@ -1,5 +1,5 @@
 /**
- * @file GetPartsInfoResponse.java
+ * @file rexos/mas/logistics_agent/behaviours/GetPartsInfo.java
  * @brief 
  * @date Created: 22 apr. 2013
  *
