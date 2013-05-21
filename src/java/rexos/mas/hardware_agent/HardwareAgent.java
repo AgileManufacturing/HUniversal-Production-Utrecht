@@ -54,6 +54,8 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 
 import java.util.HashMap;
+import java.util.Map;
+
 import rexos.libraries.blackboard_client.BasicOperationSubscription;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.BlackboardSubscriber;
@@ -69,9 +71,12 @@ import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
+import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.hardware_agent.behaviours.CheckForModules;
 import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
 import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
+import rexos.mas.service_agent.ServiceStepMessage;
+
 import com.mongodb.BasicDBObject;
 
 /**
@@ -300,12 +305,26 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		case "EquipletStepsBlackboard":
 			switch (operation) {
 			case UPDATE:
-//				try {
-//					DBObject equipletStep = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
-//				} catch (InvalidDBNamespaceException | GeneralMongoException e) {
-//					// TODO Error no document
-//					Logger.log(e);
-//				}
+				try {
+					EquipletStepMessage equipletStep = new EquipletStepMessage((BasicDBObject) equipletStepBBClient.findDocumentById(entry.getTargetObjectId()));
+					ServiceStepMessage serviceStep = new ServiceStepMessage((BasicDBObject) serviceStepBBClient.findDocumentById(equipletStep.getServiceStepID()));
+					BasicDBObject searchQuery = new BasicDBObject("_id", serviceStep.getId());
+					StepStatusCode status = equipletStep.getStatus();
+					switch(status){
+					case IN_PROGRESS: case SUSPENDED_OR_WARNING: case DONE:
+					case ABORTED: case FAILED:
+						BasicDBObject statusData = serviceStep.getStatusData();
+						statusData.putAll((Map<String, Object>)equipletStep.getStatusData());
+						BasicDBObject updateQuery = new BasicDBObject("$set", new BasicDBObject("status", status).append("statusData", statusData));
+						serviceStepBBClient.updateDocuments(searchQuery, updateQuery);
+						break;
+					default:
+						break;
+					}
+				} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+					// TODO Error no document
+					Logger.log(e);
+				}
 				break;
 			default:
 				break;
