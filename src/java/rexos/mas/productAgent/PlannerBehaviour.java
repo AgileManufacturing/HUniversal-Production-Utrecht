@@ -83,7 +83,7 @@ public class PlannerBehaviour extends OneShotBehaviour{
 							.findDocuments(equipletCapabilityQuery);
 					for(DBObject dbo : equipletDirectory){
 						EquipletDirectoryMessage entry = new EquipletDirectoryMessage((BasicDBObject)dbo);
-						pem.addEquipletToProductionStep(PA_id, entry.AID);
+						pem.addEquipletToProductionStep(PA_id, entry.getAID());
 					}
 				}
 			}

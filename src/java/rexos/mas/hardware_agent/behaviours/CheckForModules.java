@@ -72,6 +72,7 @@ public class CheckForModules extends ReceiveBehaviour {
 
 	/**
 	 * Instantiates a new check for module.
+	 * @param a The agent of this behaviour.
 	 */
 	public CheckForModules(Agent a) {
 		super(a, -1, messageTemplate);

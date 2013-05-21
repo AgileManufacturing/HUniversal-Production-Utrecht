@@ -37,11 +37,12 @@ import com.mongodb.BasicDBObject;
  * TimeData class containing the time data of an EquipletStepMessage.
  */
 public class TimeData implements MongoSaveable {
+	
 	/**
 	 * @var int duration
 	 * The duration in timeslots
 	 */
-	public int duration;
+	private int duration;
 
 	/**
 	 * Constructor

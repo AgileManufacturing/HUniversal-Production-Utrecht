@@ -81,10 +81,11 @@ public class EquipletStepMessage implements MongoSaveable {
 
 	/**
 	 * Constructor for this class.
-	 * @param serviceStepID
-	 * @param instructionData
-	 * @param type
-	 * @param timeData
+	 * @param serviceStepID The serviceStepId
+	 * @param moduleId The moduleId
+	 * @param instructionData The instructionData
+	 * @param status The status
+	 * @param timeData The timeData
 	 */
 	public EquipletStepMessage(ObjectId serviceStepID, int moduleId,
 			InstructionData instructionData, StepStatusCode status,

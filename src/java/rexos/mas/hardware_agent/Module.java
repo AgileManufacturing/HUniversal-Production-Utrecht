@@ -52,6 +52,9 @@ import java.util.HashMap;
 
 import com.mongodb.BasicDBObject;
 
+/**
+ * The abstract class for a Module
+ */
 public abstract class Module {
 	/**
 	 * @var int id
