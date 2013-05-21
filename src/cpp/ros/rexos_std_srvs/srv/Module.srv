@@ -1,0 +1,4 @@
+string json
+---
+bool succeeded
+string message
