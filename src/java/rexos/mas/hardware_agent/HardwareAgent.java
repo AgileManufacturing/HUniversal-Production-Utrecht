@@ -77,7 +77,7 @@ import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.hardware_agent.behaviours.CheckForModules;
 import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
 import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
-import rexos.mas.service_agent.ServiceStepMessage;
+import rexos.mas.service_agent.ServiceStep;
 
 import com.mongodb.BasicDBObject;
 
@@ -304,8 +304,8 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			switch (operation) {
 			case UPDATE:
 				try {
-					EquipletStepMessage equipletStep = new EquipletStepMessage((BasicDBObject) equipletStepBBClient.findDocumentById(entry.getTargetObjectId()));
-					ServiceStepMessage serviceStep = new ServiceStepMessage((BasicDBObject) serviceStepBBClient.findDocumentById(equipletStep.getServiceStepID()));
+					EquipletStep equipletStep = new EquipletStep((BasicDBObject) equipletStepBBClient.findDocumentById(entry.getTargetObjectId()));
+					ServiceStep serviceStep = new ServiceStep((BasicDBObject) serviceStepBBClient.findDocumentById(equipletStep.getServiceStepID()));
 					BasicDBObject searchQuery = new BasicDBObject("_id", serviceStep.getId());
 					StepStatusCode status = equipletStep.getStatus();
 					switch(status){

@@ -248,7 +248,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			// creates his service agent.
 			Object[] arguments = new Object[] { dbData, getAID(), logisticsAgent };
 			AgentController serviceAgentCnt = getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "rexos.mas.service_agent.ServiceAgent", arguments);
-					getContainerController().createNewAgent(getLocalName() + "-serviceAgent",
 			serviceAgentCnt.start();
 			serviceAgent = new AID(serviceAgentCnt.getName(), AID.ISGUID);
 
