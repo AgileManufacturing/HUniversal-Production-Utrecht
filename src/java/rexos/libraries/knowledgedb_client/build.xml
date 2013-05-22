@@ -1,0 +1,18 @@
+<project name="knowledgedb_client" default="build" basedir=".">
+
+	<import file="../build.xml"/>
+
+	<target name="build" depends="jars"> 			
+		<!-- defined in the root build.xml -->
+		<buildjava dir="${basedir}"/>  
+	</target>
+
+	<target name="jars">
+		<antcall target="add-jar-to-classpath"><param name="jar" value="mysql-connector-java-5.1.24-bin.jar"/></antcall>
+	</target>
+
+	<target name="clean">
+		 <cleanjava dir="${basedir}"/>
+	</target>
+
+</project>

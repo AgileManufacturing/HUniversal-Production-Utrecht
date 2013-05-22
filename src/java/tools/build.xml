@@ -1,0 +1,11 @@
+<project name="tools" default="all">
+	
+	<import file="../build.xml"/>
+
+	<target name="all">
+	</target>
+
+	<target name="clean">
+	</target>
+
+</project>
