@@ -62,6 +62,7 @@ public class ProductAgent extends Agent{
 	private static int _convIDCnt = 0;
 	private String _convIDBase;
 	public int prodStep = 0;
+	private AID currentLocation;
 
 	@Override
 	protected void setup(){
@@ -132,5 +133,19 @@ public class ProductAgent extends Agent{
 				System.out.println(aid.getLocalName());
 			}
 		}
+	}
+
+	/**
+	 * @return the currentLocation
+	 */
+	public AID getCurrentLocation(){
+		return currentLocation;
+	}
+
+	/**
+	 * @param currentLocation the currentLocation to set
+	 */
+	public void setCurrentLocation(AID currentLocation){
+		this.currentLocation = currentLocation;
 	}
 }

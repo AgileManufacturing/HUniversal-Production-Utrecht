@@ -55,13 +55,16 @@ import rexos.mas.newDataClasses.ProductionStep;
 import rexos.mas.newDataClasses.ProductionStepStatus;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class ProduceBehaviour extends OneShotBehaviour{
 	private static final long serialVersionUID = 1L;
 	private Production _production;
-	private ProductionEquipletMapper _prodEQMap; // TODO unused
+	private ProductionEquipletMapper _prodEQMap;
 	ProductionEquipletMapper s1;
 	ACLMessage msg;
+	private HashMap<AID, Long> currentEandT; 
 
 	@Override
 	public void action(){
@@ -92,14 +95,25 @@ class newProducing extends SequentialBehaviour{
 	public newProducing(HashMap<AID, Long> EqAndTs, ProductionStep productionStep){
 		this.EqAndTs = EqAndTs;
 		this.productionStep = productionStep;
+		
 	}
 
 	@Override
 	public void onStart(){
 		addSubBehaviour(new OneShotBehaviour(){
 			private static final long serialVersionUID = 1L;
+			private AID nEq;
 			@Override
 			public void action(){
+				
+				for(Entry<AID, Long> Eq: EqAndTs.entrySet()){
+					nEq = Eq.getKey();
+				}
+				ProductAgent pa = (ProductAgent)myAgent;
+				if(nEq != pa.getCurrentLocation()){
+					//TODO: Ask GUI to move
+				}
+				
 				myAgent.addBehaviour(new receiveMsgBehaviour(EqAndTs, productionStep));
 			}
 		});
@@ -162,7 +176,7 @@ class producing extends OneShotBehaviour{
 	Product _product;
 	ProductAgent _productAgent;
 	ACLMessage msg;
-
+	
 	@Override
 	public void action(){
 		try{
@@ -195,6 +209,8 @@ class producing extends OneShotBehaviour{
 				 * null); // productionStepEnded(stp, msg.getContent, //
 				 * msg.getContent); } } } currProdStep++;
 				 */
+				_productAgent.setCurrentLocation(msg.getSender());
+				
 				break;
 			// For some reason production can't be started thus it has to be
 			// rescheduled.
