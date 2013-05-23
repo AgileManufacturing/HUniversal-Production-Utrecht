@@ -40,14 +40,18 @@
 
 package rexos.mas.productAgent;
 
+import java.net.UnknownHostException;
+
 import rexos.mas.newDataClasses.Product;
 import rexos.mas.newDataClasses.ProductionStep;
 
 import jade.core.AID;
 import jade.core.Agent;
 import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.blackboard_client.InvalidJSONException;
+import rexos.libraries.log.Logger;
 
 public class ProductAgent extends Agent{
 	private static final long serialVersionUID = 1L;
@@ -102,12 +106,14 @@ public class ProductAgent extends Agent{
 	// within the Equiplet Agent its functionality
 	@SuppressWarnings("static-method")
 	public void removeEquiplet(AID aid){
+		try{
 		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
 		// try to remove the given 'aid' from the blackboard
-		try{
+		
 			bbc.removeDocuments(aid.toString());
-		} catch(InvalidJSONException | InvalidDBNamespaceException e){
-			e.printStackTrace();
+		} catch (UnknownHostException | GeneralMongoException | InvalidJSONException | InvalidDBNamespaceException e1) {
+			// TODO Auto-generated catch block
+			Logger.log(e1);
 		}
 	}
 

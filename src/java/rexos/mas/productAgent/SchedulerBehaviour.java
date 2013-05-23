@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Set;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.log.Logger;
 
 import com.mongodb.DBObject;
 
@@ -105,7 +106,7 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 						.getEquipletsForProductionStep(PA_id).keySet(), ps);
 			}
 		} catch(Exception e){
-			e.printStackTrace();
+			Logger.log(e);
 		}
 	}
 

@@ -49,12 +49,16 @@ import rexos.mas.newDataClasses.Production;
 import rexos.mas.newDataClasses.ProductionEquipletMapper;
 import rexos.mas.newDataClasses.ProductionStep;
 import rexos.mas.newDataClasses.ProductionStepStatus;
+
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.blackboard_client.InvalidJSONException;
+import rexos.libraries.log.Logger;
 
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
@@ -72,14 +76,16 @@ public class PlannerBehaviour extends OneShotBehaviour{
 	}
 
 	public static void removeEquiplet(AID aid){
+		try{
 		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
 		// try to remove the given 'aid' from the blackboard (for testing
 		// purposes only, this funtion will later be called upon from the
 		// Equiplet agent code)
-		try{
+		
 			bbc.removeDocuments(aid.toString());
-		} catch(InvalidJSONException | InvalidDBNamespaceException e){
-			e.printStackTrace();
+		} catch (UnknownHostException | GeneralMongoException | InvalidJSONException | InvalidDBNamespaceException e1) {
+			// TODO Auto-generated catch block
+			Logger.log(e1);
 		}
 	}
 

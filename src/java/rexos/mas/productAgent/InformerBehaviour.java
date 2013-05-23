@@ -37,6 +37,7 @@
 
 package rexos.mas.productAgent;
 
+import rexos.libraries.log.Logger;
 import rexos.mas.newDataClasses.Product;
 import rexos.mas.newDataClasses.Production;
 import rexos.mas.newDataClasses.ProductionEquipletMapper;
@@ -115,7 +116,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 						_productAgent.setProduct(_product);
 						_isDone = true;
 					} catch(Exception e){
-						e.printStackTrace();
+						Logger.log(e);
 					}
 				} else{
 					System.out.println("Not done informing.");
@@ -186,7 +187,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 									+ _productionStep.getId());
 						}
 					} catch(Exception e){
-						e.printStackTrace();
+						Logger.log(e);
 					}
 				}
 			});
@@ -242,7 +243,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 																	.getId());
 										}
 									} catch(Exception e){
-										e.printStackTrace();
+										Logger.log(e);
 									}
 								}
 							});
@@ -257,7 +258,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 
 								@Override
 								public void handle(
-										@SuppressWarnings("hiding") ACLMessage msg){
+										ACLMessage msg){
 									if (msg == null){
 										if (debug){
 											System.out

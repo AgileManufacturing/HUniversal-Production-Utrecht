@@ -58,11 +58,8 @@ import java.util.List;
 
 public class ProduceBehaviour extends OneShotBehaviour{
 	private static final long serialVersionUID = 1L;
-	private Product _product;// TODO unused
 	private Production _production;
-	private ProductAgent _productAgent; // TODO unused
 	private ProductionEquipletMapper _prodEQMap; // TODO unused
-	private int currProdStep = 1;
 	ProductionEquipletMapper s1;
 	ACLMessage msg;
 
@@ -149,7 +146,6 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 		_productAgent = (ProductAgent) myAgent;
 		SequentialBehaviour seq = new SequentialBehaviour();
 		myAgent.addBehaviour(seq);
-		@SuppressWarnings("hiding")
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setOntology("StartProduction");
 		
