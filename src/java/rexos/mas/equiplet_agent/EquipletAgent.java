@@ -292,6 +292,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 		// starts the behaviour for receving message initialisation finished.
 		addBehaviour(new InitialisationFinished(this, collectiveBBClient));
+		
+		// starts the behaviour for making a log.
+		//TODO: logbehaviour.
+		//addBehaviour(new LogBehaviour(this, collectiveBBClient));
 	}
 
 	/**
