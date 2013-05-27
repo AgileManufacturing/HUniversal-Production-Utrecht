@@ -1,6 +1,7 @@
 /**
  * @file rexos/mas/service_agent/behaviours/GetPartsInfoResponse.java
- * @brief
+ * @brief Handles the GetPartsInfoResponse message which is an answer to GetPartsInfo and contains positional
+ *        information about the specified parts.
  * @date Created: 23 apr. 2013
  * 
  * @author Peter Bonnema
@@ -11,43 +12,29 @@
  *          Copyright © 2013, HU University of Applied Sciences Utrecht.
  *          All rights reserved.
  * 
- *          Redistribution and use in source and binary forms, with or without
- *          modification, are permitted provided that the following conditions
- *          are met:
- *          - Redistributions of source code must retain the above copyright
- *          notice, this list of conditions and the following disclaimer.
- *          - Redistributions in binary form must reproduce the above copyright
- *          notice, this list of conditions and the following disclaimer in the
- *          documentation and/or other materials provided with the distribution.
- *          - Neither the name of the HU University of Applied Sciences Utrecht
- *          nor the names of its contributors may be used to endorse or promote
- *          products derived from this software without specific prior written
- *          permission.
+ *          Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ *          the following conditions are met:
+ *          - Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *          following disclaimer.
+ *          - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *          following disclaimer in the documentation and/or other materials provided with the distribution.
+ *          - Neither the name of the HU University of Applied Sciences Utrecht nor the names of its contributors may be
+ *          used to endorse or promote products derived from this software without specific prior written permission.
  * 
  *          THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- *          "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *          LIMITED TO,
- *          THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- *          PARTICULAR PURPOSE
- *          ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED
- *          SCIENCES UTRECHT
- *          BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
- *          OR
- *          CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- *          SUBSTITUTE
- *          GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- *          INTERRUPTION)
- *          HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- *          STRICT
- *          LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- *          ANY WAY OUT
- *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- *          SUCH DAMAGE.
+ *          "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ *          THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ *          ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT
+ *          BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ *          CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ *          GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ *          HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *          LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  **/
 package rexos.mas.service_agent.behaviours;
 
-import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
@@ -57,6 +44,8 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+
+import org.bson.types.ObjectId;
 
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
@@ -73,59 +62,101 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 /**
- * @author Peter
+ * This behaviour handles the GetPartsInfoResponse message. This is an answer from the logistics agent for
+ * the message GetPartsInfo. The answer will contain positional information about the specified parts. It will generate
+ * a timeout after a specified period if no message is received.
+ * 
+ * @author Peter Bonnema
  * 
  */
 public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
-	private static final long serialVersionUID = 1L;
+	/**
+	 * @var long serialVersionUID
+	 *      The serialVersionUID of this class.
+	 */
+	private static final long serialVersionUID = -7419729795873947786L;
 
+	/**
+	 * @var String conversationId
+	 *      The conversationId which the answer will have. Any messages send in response will also have this
+	 *      conversationId.
+	 */
 	private String conversationId;
+
+	/**
+	 * @var ServiceAgent agent
+	 *      The service agent this behaviour belongs to.
+	 */
 	private ServiceAgent agent;
+
+	/**
+	 * @var ProductStep productStep
+	 *      The productStep from which the parts come.
+	 */
 	private ProductStep productStep;
 
 	/**
-	 * @param a
+	 * Creates a new GetPartsInfoResponse instance with the specified parameters. A default value of 2000 ms
+	 * is used for the timeout.
+	 * 
+	 * @param agent the agent this behaviour belongs to.
+	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
+	 * @param productStep The productStep from which the parts come.
 	 */
-	public GetPartsInfoResponse(Agent a, String conversationId, ProductStep productStep) {
-		this(a, 2000, conversationId, productStep);
+	public GetPartsInfoResponse(ServiceAgent agent, String conversationId, ProductStep productStep) {
+		this(agent, 2000, conversationId, productStep);
 	}
 
 	/**
-	 * @param a
-	 * @param millis
+	 * Creates a new GetPartsInfoResponse instance with the specified parameters.
+	 * 
+	 * @param agent the agent this behaviour belongs to.
+	 * @param millis the timeout period in milliseconds.
+	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
+	 * @param productStep The productStep from which the parts come.
 	 */
-	public GetPartsInfoResponse(Agent a, int millis, String conversationId, ProductStep productStep) {
-		super(a, millis, MessageTemplate.and(MessageTemplate.MatchConversationId(conversationId),
+	public GetPartsInfoResponse(ServiceAgent agent, int millis, String conversationId, ProductStep productStep) {
+		super(agent, millis, MessageTemplate.and(MessageTemplate.MatchConversationId(conversationId),
 				MessageTemplate.MatchOntology("GetPartsInfoResponse")));
-		agent = (ServiceAgent) a;
+		this.agent = agent;
 		this.conversationId = conversationId;
 		this.productStep = productStep;
 	}
 
-	/* (non-Javadoc)
-	 * @see
-	 * rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage) */
+	/**
+	 * Handles an incoming message from the logisticsAgent. The message contains positional information about the
+	 * specified parts. The message also contains the partId and partType of the output part of the productStep. Once a
+	 * message is received the outputPart field of the productStep on the blackboard is filled in with the partType of
+	 * the outputPart. Then updateParameters() is called on the service object mapped with the specified conversationId
+	 * and the resulting serviceSteps are saved on the serviceStepsBlackBoard. Finally a FillPlaceholders message is
+	 * send to the hardwareAgent to update the equipletSteps with the additional information. If a timeout occurs this
+	 * method will call doDelete() on the service agent.
+	 * 
+	 * @param message the message to handle or null on timeout.
+	 */
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
 			try {
+				ObjectId productStepId = productStep.getId();
 				List<DBObject> dbServiceSteps =
-						agent.getServiceStepBBClient().findDocuments(
-								new BasicDBObject("productStepId", productStep.getId()));
+						agent.getServiceStepBBClient().findDocuments(new BasicDBObject("productStepId", productStepId));
 				ServiceStep[] serviceSteps = new ServiceStep[dbServiceSteps.size()];
 
 				for(int i = 0; i < dbServiceSteps.size(); i++) {
 					serviceSteps[i] = new ServiceStep((BasicDBObject) dbServiceSteps.get(i));
 				}
-				HashMap<Integer, SimpleEntry<Integer, Position>> parameters = (HashMap<Integer, SimpleEntry<Integer, Position>>) message.getContentObject();
-				
+
+				HashMap<Integer, SimpleEntry<Integer, Position>> parameters =
+						(HashMap<Integer, SimpleEntry<Integer, Position>>) message.getContentObject();
+
 				Logger.log("%s got partsInfo: %s%n", agent.getLocalName(), parameters.toString());
 
-				int outputPartId = -1;
-				for(Entry<Integer, SimpleEntry<Integer, Position>> e : parameters.entrySet()){
-					if(e.getValue().getValue() == null){
-						outputPartId = e.getKey();
-						parameters.remove(outputPartId);
+				for(Entry<Integer, SimpleEntry<Integer, Position>> e : parameters.entrySet()) {
+					if(e.getValue().getValue() == null) {
+						agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
+								new BasicDBObject("outputPartType", e.getKey()));
+						parameters.remove(e.getKey());
 						break;
 					}
 				}
@@ -140,6 +171,7 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 					scheduleData = serviceStep.getScheduleData();
 					scheduleData.setStartTime(nextStartTime);
 					serviceStep.setScheduleData(scheduleData);
+					serviceStep.setStatus(StepStatusCode.PLANNED);
 
 					nextStartTime += scheduleData.getDuration();
 
