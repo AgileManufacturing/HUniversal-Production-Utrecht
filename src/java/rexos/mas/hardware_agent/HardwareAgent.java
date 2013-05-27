@@ -77,6 +77,7 @@ import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.hardware_agent.behaviours.CheckForModules;
 import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
 import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
+import rexos.mas.hardware_agent.behaviours.ServiceAgentDied;
 import rexos.mas.service_agent.ServiceStep;
 
 import com.mongodb.BasicDBObject;
@@ -214,6 +215,9 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 
 		CheckForModules checkForModules = new CheckForModules(this);
 		addBehaviour(checkForModules);
+		
+		ServiceAgentDied serviceAgentDied = new ServiceAgentDied(this);
+		addBehaviour(serviceAgentDied);
 
 		//Register modules
 		try {
