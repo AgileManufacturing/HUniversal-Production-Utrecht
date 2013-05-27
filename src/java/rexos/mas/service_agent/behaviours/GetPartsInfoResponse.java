@@ -53,8 +53,10 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
@@ -115,10 +117,18 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 				for(int i = 0; i < dbServiceSteps.size(); i++) {
 					serviceSteps[i] = new ServiceStep((BasicDBObject) dbServiceSteps.get(i));
 				}
-
-				HashMap<Integer, Position> parameters = (HashMap<Integer, Position>) message.getContentObject();
-
+				HashMap<Integer, SimpleEntry<Integer, Position>> parameters = (HashMap<Integer, SimpleEntry<Integer, Position>>) message.getContentObject();
+				
 				Logger.log("%s got partsInfo: %s%n", agent.getLocalName(), parameters.toString());
+
+				int outputPartId = -1;
+				for(Entry<Integer, SimpleEntry<Integer, Position>> e : parameters.entrySet()){
+					if(e.getValue().getValue() == null){
+						outputPartId = e.getKey();
+						parameters.remove(outputPartId);
+						break;
+					}
+				}
 
 				ServiceStep[] parameterizedSteps =
 						agent.GetServiceForConvId(conversationId).updateParameters(parameters,

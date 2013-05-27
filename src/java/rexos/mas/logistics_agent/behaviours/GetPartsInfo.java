@@ -36,8 +36,11 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
-
+import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
+import rexos.libraries.knowledgedb_client.KnowledgeException;
+import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.data.Position;
@@ -77,20 +80,26 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 		if (message != null) {
 			try {
 				Logger.log("%s GetPartsInfo%n", myAgent.getLocalName());
-				Integer[] partIds = ((ProductStep) message.getContentObject()).getInputPartTypes();
-				HashMap<Integer, Position> partsParameters = new HashMap<Integer, Position>();
-
+				Integer[] partTypes = ((ProductStep) message.getContentObject()).getInputPartTypes();				
+				HashMap<Integer, SimpleEntry<Integer, Position>> partParameters = new HashMap<Integer, SimpleEntry<Integer, Position>>();
 				int x = 2;
-				for (int partId : partIds) {
-					partsParameters.put(partId, new Position(x++, 1, 3));
+				int id = 1;
+				for (int partType : partTypes) {
+					partParameters.put(id++, new SimpleEntry<Integer, Position>(partType, new Position(x++, 1, 3)));
 				}
 
+				KnowledgeDBClient client = KnowledgeDBClient.getClient();
+				int outputPartType = client.executeUpdateQuery(Queries.INSERT_PART_TYPE, new Object[]{"OutputPart", partTypes.toString()});
+				int outputPartId = client.executeUpdateQuery(Queries.INSERT_PART, new Object[]{outputPartType});
+				
+				partParameters.put(outputPartId, new SimpleEntry<Integer, Position>(outputPartType, null));
+				
 				ACLMessage reply = message.createReply();
 				reply.setPerformative(ACLMessage.INFORM);
 				reply.setOntology("GetPartsInfoResponse");
-				reply.setContentObject(partsParameters);
+				reply.setContentObject(partParameters);
 				myAgent.send(reply);
-			} catch (UnreadableException | IOException e) {
+			} catch (UnreadableException | IOException | KnowledgeException e) {
 				Logger.log(e);
 				myAgent.doDelete();
 			}

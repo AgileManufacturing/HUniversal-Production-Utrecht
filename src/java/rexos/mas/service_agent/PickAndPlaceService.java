@@ -46,8 +46,10 @@
  **/
 package rexos.mas.service_agent;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
 import rexos.libraries.knowledgedb_client.KeyNotFoundException;
 import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
@@ -117,11 +119,15 @@ public class PickAndPlaceService implements Service {
 	 * @see rexos.mas.service_agent.Service#updateParameters(java.util.HashMap,
 	 * rexos.mas.service_agent.ServiceStep[]) */
 	@Override
-	public ServiceStep[] updateParameters(HashMap<Integer, Position> partParameters,
+	public ServiceStep[] updateParameters(HashMap<Integer, SimpleEntry<Integer, Position>> partParameters,
 			ServiceStep[] serviceSteps) {
 		BasicDBObject pickParameters = serviceSteps[0].getParameters();
-		pickParameters.putAll((LinkedHashMap<String, Object>) new BasicDBObject("position", partParameters.get(
-				pickParameters.getInt("part")).toBasicDBObject()));
+		for(Entry<Integer, SimpleEntry<Integer, Position>> e : partParameters.entrySet()){
+			if(e.getValue().getKey() == pickParameters.getInt("part")){
+				pickParameters.putAll((LinkedHashMap<String, Object>) 
+						new BasicDBObject("position", e.getValue().getValue().toBasicDBObject()));
+			}
+		}
 		serviceSteps[0].setParameters(pickParameters);
 		return serviceSteps;
 	}
