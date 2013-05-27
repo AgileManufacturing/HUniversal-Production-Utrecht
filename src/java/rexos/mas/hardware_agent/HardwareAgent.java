@@ -95,44 +95,44 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	 * @var BlackboardClient serviceStepBBClient
 	 * The blackboard client for the serviceStep blackboard.
 	 */
-	private BlackboardClient serviceStepBBClient; 
-	
+	private BlackboardClient serviceStepBBClient;
+
 	/**
 	 * @var BlackboardClient equipletStepBBClient
 	 * The blackboard client for the equipletStep blackboard
 	 */
 	private BlackboardClient equipletStepBBClient;
-	
+
 	/**
 	 * @var DbData dbData
 	 * The DbData of this equiplet.
 	 */
 	private DbData dbData;
-	
+
 	/**
 	 * @var HashMap<Integer, Integer> leadingModules
 	 * A HashMap containing the leadingModules per step.
 	 */
 	private HashMap<Integer, Integer> leadingModules;
-	
+
 	/**
 	 * @var ModuleFactory moduleFactory
 	 * The moduleFactory of this agent.
 	 */
 	private ModuleFactory moduleFactory;
-	
+
 	/**
 	 * @var AID equipletAgentAID
 	 * The AID of the equipletAgent.
 	 */
 	private AID equipletAgentAID;
-	
+
 	/**
 	 * @var AID serviceAgentAID
 	 * The AID of the serviceAgent.
 	 */
 	private AID serviceAgentAID;
-	
+
 	/**
 	 * @var HashMap<Integer, Object> configuration
 	 * The configuration of this agent.
@@ -191,11 +191,11 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient.setDatabase(dbData.getName());
 			serviceStepBBClient.setCollection("ServiceStepsBlackBoard");
-	
+
 			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			serviceStepBBClient.subscribe(statusSubscription);
-	
+
 			equipletStepBBClient = new BlackboardClient(dbData.getIp());
 			equipletStepBBClient.setDatabase(dbData.getName());
 			equipletStepBBClient.setCollection("EquipletStepsBlackBoard");
@@ -222,20 +222,17 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			Module module;
 			int id;
 			for (Row row : rows) {
-					id = (int) row.get("module");
-					module = moduleFactory.getModuleById(id);
-					for (int step : module.isLeadingForSteps()) {
-						registerLeadingModule(step, id);
-					}
-				} catch (KeyNotFoundException e) {
-					/* the row has no module */
+				id = (int) row.get("module");
+				module = moduleFactory.getModuleById(id);
+				for (int step : module.isLeadingForSteps()) {
+					registerLeadingModule(step, id);
 				}
 			}
 		} catch (KnowledgeException | KeyNotFoundException e1) {
 			Logger.log(e1);
 			doDelete();
 		}
-		
+
 		//Send a message to the serviceAgent that the hardware agent is ready.
 		ACLMessage startedMessage = new ACLMessage(ACLMessage.INFORM);
 		startedMessage.addReceiver(serviceAgentAID);
@@ -311,11 +308,14 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 					ServiceStep serviceStep = new ServiceStep((BasicDBObject) serviceStepBBClient.findDocumentById(equipletStep.getServiceStepID()));
 					BasicDBObject searchQuery = new BasicDBObject("_id", serviceStep.getId());
 					StepStatusCode status = equipletStep.getStatus();
-					switch(status){
-					case IN_PROGRESS: case SUSPENDED_OR_WARNING: case DONE:
-					case ABORTED: case FAILED:
+					switch (status) {
+					case IN_PROGRESS:
+					case SUSPENDED_OR_WARNING:
+					case DONE:
+					case ABORTED:
+					case FAILED:
 						BasicDBObject statusData = serviceStep.getStatusData();
-						statusData.putAll((Map<String, Object>)equipletStep.getStatusData());
+						statusData.putAll((Map<String, Object>) equipletStep.getStatusData());
 						BasicDBObject updateQuery = new BasicDBObject("$set", new BasicDBObject("status", status).append("statusData", statusData));
 						serviceStepBBClient.updateDocuments(searchQuery, updateQuery);
 						break;

@@ -73,7 +73,7 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 			try {
 				// gets the productstep
 				ObjectId id = equipletAgent.getRelatedObjectId(message.getConversationId());
-				ProductStepMessage productStep = new ProductStepMessage((BasicDBObject) equipletBBClient.findDocumentById(id));
+				ProductStep productStep = new ProductStep((BasicDBObject) equipletBBClient.findDocumentById(id));
 
 				ScheduleData schedule = productStep.getScheduleData();
 
