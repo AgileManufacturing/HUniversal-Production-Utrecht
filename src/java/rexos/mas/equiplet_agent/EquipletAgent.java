@@ -183,7 +183,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	private HashMap<String, ObjectId> communicationTable;
 
 	/**
-	 * @var Timer timeToNextUsedTimeSlot
+	 * @var NextProductStepTimer timer
 	 *      Timer used to trigger when the next used time slot is ready to
 	 *      start.
 	 */

@@ -1,6 +1,6 @@
 /**
  * @file rexos/mas/logistics_agent/behaviours/ArePartsAvailable.java
- * @brief 
+ * @brief Responds to questions whether or not a specific part is available.
  * @date Created: 20 apr. 2013
  *
  * @author Peter Bonnema
@@ -39,21 +39,24 @@ import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.ProductStep;
 
 /**
- * @author Peter
- * 
+ * Responds to questions whether or not a specific part is available.
  */
 public class ArePartsAvailable extends ReceiveBehaviour {
+	/**
+	 * @var long serialVersionUID
+	 *      The serialVersionUID for this class.
+	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @param a
+	 * Constructs the behaviour for the given agent.
+	 * @param a The agent associated with this behaviour.
 	 */
 	public ArePartsAvailable(Agent a) {
 		super(a, MessageTemplate.MatchOntology("ArePartsAvailable"));
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
 	 * 
 	 * @see
 	 * rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage)

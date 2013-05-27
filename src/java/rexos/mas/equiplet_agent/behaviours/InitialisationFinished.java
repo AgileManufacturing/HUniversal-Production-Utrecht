@@ -79,6 +79,11 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 	 *      The equipletAgent related to this behaviour.
 	 */
 	private EquipletAgent equipletAgent;
+
+	/**
+	 * @var BlackboardClient collectiveBBClient
+	 *      BlackboardClient for the collective blackboard.
+	 */
 	private BlackboardClient collectiveBBClient;
 
 	/**
@@ -86,6 +91,8 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 	 * 
 	 * @param a
 	 *            The agent for this behaviour
+	 * @param collectiveBBClient
+	 *      BlackboardClient for the collective blackboard.
 	 */
 	public InitialisationFinished(Agent a, BlackboardClient collectiveBBClient) {
 		super(a, 2000, messageTemplate);

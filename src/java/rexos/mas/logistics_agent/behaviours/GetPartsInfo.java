@@ -1,6 +1,6 @@
 /**
  * @file rexos/mas/logistics_agent/behaviours/GetPartsInfo.java
- * @brief 
+ * @brief Responds to GetPartsInfo messages, returning a mapping of part id to type and position.
  * @date Created: 22 apr. 2013
  *
  * @author Peter Bonnema
@@ -47,21 +47,29 @@ import rexos.mas.data.Position;
 import rexos.mas.equiplet_agent.ProductStep;
 
 /**
- * @author Peter
- * 
+ * Responds to GetPartsInfo messages, returning a mapping of part id to type and position.
  */
 public class GetPartsInfo extends ReceiveOnceBehaviour {
+	/**
+	 * @var long serialVersionUID
+	 *      The serialVersionUID for this class.
+	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @param a
+	 * Constructs the behaviour for the given agent.
+	 * @param a The agent associated with this behaviour.
+	 * @param conversationId The conversationId that should be used for this behaviour.
 	 */
 	public GetPartsInfo(Agent a, String conversationId) {
 		this(a, 2000, conversationId);
 	}
 
 	/**
-	 * @param a
+	 * Constructs the behaviour for the given agent.
+	 * @param a The agent associated with this behaviour.
+	 * @param millis Timeout in milliseconds.
+	 * @param conversationId The conversationId that should be used for this behaviour.
 	 */
 	public GetPartsInfo(Agent a, int millis, String conversationId) {
 		super(a, millis, MessageTemplate.and(
@@ -69,11 +77,10 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 				MessageTemplate.MatchConversationId(conversationId)));
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Handles GetPartsInfo messages and responds with a GetPartsInfoResponse.
 	 * 
-	 * @see
-	 * rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage)
+	 * @see rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage)
 	 */
 	@Override
 	public void handle(ACLMessage message) {
