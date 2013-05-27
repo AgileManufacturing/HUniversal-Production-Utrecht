@@ -44,7 +44,7 @@ import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.NextProductStepTimer;
-import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.equiplet_agent.ProductStep;
 import rexos.mas.equiplet_agent.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
@@ -134,7 +134,7 @@ public class StartStep extends ReceiveBehaviour {
 					StepStatusCode.PLANNED);
 			query.put("$order_by", new BasicDBObject("scheduleData",
 					new BasicDBObject("startTime", "-1")));
-			ProductStepMessage nextProductStep = new ProductStepMessage(
+			ProductStep nextProductStep = new ProductStep(
 					(BasicDBObject) equipletBBClient.findDocuments(query)
 							.get(0));
 			ScheduleData scheduleData = nextProductStep.getScheduleData();

@@ -77,7 +77,7 @@ import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.hardware_agent.behaviours.CheckForModules;
 import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
 import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
-import rexos.mas.service_agent.ServiceStepMessage;
+import rexos.mas.service_agent.ServiceStep;
 
 import com.mongodb.BasicDBObject;
 
@@ -191,11 +191,11 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient.setDatabase(dbData.getName());
 			serviceStepBBClient.setCollection("ServiceStepsBlackBoard");
-
+	
 			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			serviceStepBBClient.subscribe(statusSubscription);
-
+	
 			equipletStepBBClient = new BlackboardClient(dbData.getIp());
 			equipletStepBBClient.setDatabase(dbData.getName());
 			equipletStepBBClient.setCollection("EquipletStepsBlackBoard");
@@ -204,7 +204,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			Logger.log(e);
 			doDelete();
 		}
-		
+
 		//Start the behaviours
 		EvaluateDuration evaluateDurationBehaviour = new EvaluateDuration(this, moduleFactory);
 		addBehaviour(evaluateDurationBehaviour);
@@ -216,15 +216,14 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		addBehaviour(checkForModules);
 
 		//Register modules
-		KnowledgeDBClient client;
 		try {
-			client = KnowledgeDBClient.getClient();
-
+			KnowledgeDBClient client = KnowledgeDBClient.getClient();
 			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgentAID.getLocalName());
+			Module module;
+			int id;
 			for (Row row : rows) {
-				try {
-					int id = (int) row.get("module");
-					Module module = moduleFactory.getModuleById(id);
+					id = (int) row.get("module");
+					module = moduleFactory.getModuleById(id);
 					for (int step : module.isLeadingForSteps()) {
 						registerLeadingModule(step, id);
 					}
@@ -232,9 +231,9 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 					/* the row has no module */
 				}
 			}
-		} catch (KnowledgeException e1) {
-			doDelete();
+		} catch (KnowledgeException | KeyNotFoundException e1) {
 			Logger.log(e1);
+			doDelete();
 		}
 		
 		//Send a message to the serviceAgent that the hardware agent is ready.
@@ -308,8 +307,8 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			switch (operation) {
 			case UPDATE:
 				try {
-					EquipletStepMessage equipletStep = new EquipletStepMessage((BasicDBObject) equipletStepBBClient.findDocumentById(entry.getTargetObjectId()));
-					ServiceStepMessage serviceStep = new ServiceStepMessage((BasicDBObject) serviceStepBBClient.findDocumentById(equipletStep.getServiceStepID()));
+					EquipletStep equipletStep = new EquipletStep((BasicDBObject) equipletStepBBClient.findDocumentById(entry.getTargetObjectId()));
+					ServiceStep serviceStep = new ServiceStep((BasicDBObject) serviceStepBBClient.findDocumentById(equipletStep.getServiceStepID()));
 					BasicDBObject searchQuery = new BasicDBObject("_id", serviceStep.getId());
 					StepStatusCode status = equipletStep.getStatus();
 					switch(status){

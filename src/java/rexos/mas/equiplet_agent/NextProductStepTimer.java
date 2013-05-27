@@ -46,37 +46,40 @@ import com.mongodb.BasicDBObject;
 /**
  * Timer for executing the next product step.
  **/
-public class NextProductStepTimer extends Timer{
+public class NextProductStepTimer extends Timer {
 	EquipletAgent equipletAgent;
-	
+
 	/**
 	 * @var int nextUsedTimeSlot
-	 * The next used time slot.
+	 *      The next used time slot.
 	 */
 	private int nextUsedTimeSlot;
 
 	/**
 	 * @var int firstTimeSlot
-	 * The first time slot of the grid.
+	 *      The first time slot of the grid.
 	 */
 	private long firstTimeSlot;
-	
+
 	/**
 	 * @var int timeSlotLength
-	 * The length of a time slot in milliseconds.
+	 *      The length of a time slot in milliseconds.
 	 */
 	private int timeSlotLength;
-	
+
 	/**
 	 * @var NextProductStepTask task
-	 * The task for this timer
+	 *      The task for this timer
 	 */
 	private NextProductStepTask task;
-	
+
 	/**
 	 * Constructor for the next product step timer.
-	 * @param firstTimeSlot the first time slot from the grid/equiplet.
-	 * @param timeSlotLength the length of a time slot.
+	 * 
+	 * @param firstTimeSlot
+	 *            the first time slot from the grid/equiplet.
+	 * @param timeSlotLength
+	 *            the length of a time slot.
 	 */
 	public NextProductStepTimer(long firstTimeSlot, int timeSlotLength, EquipletAgent agent){
 		super();
@@ -84,53 +87,65 @@ public class NextProductStepTimer extends Timer{
 		this.timeSlotLength = timeSlotLength;
 		equipletAgent = agent;
 	}
-	
+
 	/**
 	 * Function for setting the next used time slot.
-	 * @param nextUsedTimeSlot the index of the next used timeslot, fill -1 when not used.
+	 * 
+	 * @param nextUsedTimeSlot
+	 *            the index of the next used timeslot, fill -1 when not used.
 	 */
-	public void setNextUsedTimeSlot(int nextUsedTimeSlot){
+	public void setNextUsedTimeSlot(int nextUsedTimeSlot) {
 		this.nextUsedTimeSlot = nextUsedTimeSlot;
-		if(task != null){
+		if (task != null) {
 			task.cancel();
 		}
-		if(nextUsedTimeSlot != -1){
-			long startTimeSlot = nextUsedTimeSlot * timeSlotLength + firstTimeSlot;
+		if (nextUsedTimeSlot != -1) {
+			long startTimeSlot = nextUsedTimeSlot * timeSlotLength
+					+ firstTimeSlot;
 			long currentTime = System.currentTimeMillis();
 			task = new NextProductStepTask();
 			Logger.log("trying to schedule: " + (startTimeSlot - currentTime));
-			if(startTimeSlot - currentTime > 0){
+			if (startTimeSlot - currentTime > 0) {
 				schedule(task, startTimeSlot - currentTime);
 				Logger.log("schedule set to: " + (startTimeSlot - currentTime));
 			}
 		}
 	}
-	
+
 	/**
 	 * Getter for getting the nextUsedTimeSlot.
+	 * 
 	 * @return the next used timeslot
 	 */
 	public int getNextUsedTimeSlot() {
 		return nextUsedTimeSlot;
 	}
-	
+
+	/**
+	 * Task in charge of starting the next product step.
+	 */
 	private class NextProductStepTask extends TimerTask {
 		public NextProductStepTask() {
 		}
 
 		/**
-		 * run method for this TimerTask.
+		 * Grabs the next product step from the blackboard and checks with the
+		 * Product Agent whether or not execution may be started.
 		 */
 		@Override
 		public void run() {
 			try {
-				//Gets all the objects needed to start the next step.
+				// Gets all the objects needed to start the next step.
 				ObjectId productStepEntry = equipletAgent.getNextProductStep();
-				String conversationId = equipletAgent.getConversationId(productStepEntry);
-				BasicDBObject productStep = (BasicDBObject)equipletAgent.getEquipletBBClient().findDocumentById(productStepEntry);
-				AID productAgent = new AID((String)productStep.get("productAgentId"), AID.ISGUID);
+				String conversationId = equipletAgent
+						.getConversationId(productStepEntry);
+				BasicDBObject productStep = (BasicDBObject) equipletAgent
+						.getEquipletBBClient().findDocumentById(
+								productStepEntry);
+				AID productAgent = new AID(
+						(String) productStep.get("productAgentId"), AID.ISGUID);
 
-				//ask the productAgent to start the production of the step.
+				// ask the productAgent to start the production of the step.
 				ACLMessage answer = new ACLMessage(ACLMessage.QUERY_IF);
 				answer.setConversationId(conversationId);
 				answer.addReceiver(productAgent);

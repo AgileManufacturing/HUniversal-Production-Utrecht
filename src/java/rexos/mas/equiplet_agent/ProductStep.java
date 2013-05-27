@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/equiplet_agent/ProductStepMessage.java
+ * @file rexos/mas/equiplet_agent/ProductStep.java
  * @brief Provides a message for the productstep blackboard
  * @date Created: 2013-04-03
  * 
@@ -60,7 +60,7 @@ import com.mongodb.BasicDBObject;
 /**
  * Implementation of a message for the productstep blackboard
  */
-public class ProductStepMessage implements MongoSaveable, Serializable {
+public class ProductStep implements MongoSaveable, Serializable {
 	/**
 	 * @var long serialVersionUID
 	 *      The serial version UID.
@@ -93,14 +93,14 @@ public class ProductStepMessage implements MongoSaveable, Serializable {
 	private BasicDBObject parameters;
 
 	/**
-	 * @var Integer[] inputPartTypes
-	 * List of part ids representing the input types.
+	 * @var Integer inputPartTypes[]
+	 *      List of part ids representing the input types.
 	 */
 	private Integer[] inputPartTypes;
 
 	/**
 	 * @var int outputPartType
-	 * Part id of the output part.
+	 *      Part id of the output part.
 	 */
 	private int outputPartType;
 
@@ -143,7 +143,7 @@ public class ProductStepMessage implements MongoSaveable, Serializable {
 	 * @param scheduleData
 	 *            The schedule data
 	 */
-	public ProductStepMessage(AID productAgentId, int type,
+	public ProductStep(AID productAgentId, int type,
 			BasicDBObject parameters, Integer[] inputPartTypes,
 			int outputPartType, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
@@ -174,7 +174,7 @@ public class ProductStepMessage implements MongoSaveable, Serializable {
 	 * @param scheduleData
 	 *            The schedule data
 	 */
-	public ProductStepMessage(ObjectId _id, AID productAgentId, int type,
+	public ProductStep(ObjectId _id, AID productAgentId, int type,
 			BasicDBObject parameters, Integer[] inputPartTypes,
 			int outputPartType, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
@@ -190,86 +190,107 @@ public class ProductStepMessage implements MongoSaveable, Serializable {
 	}
 
 	/**
-	 * Constructor for a ProductStepMessage.
+	 * Constructor for a ProductStep.
 	 * 
 	 * @param object
-	 *            The BasicDBObject of which the ProductStepMessage has to be
+	 *            The BasicDBObject of which the ProductStep has to be
 	 *            built.
 	 */
-	public ProductStepMessage(BasicDBObject object) {
+	public ProductStep(BasicDBObject object) {
 		fromBasicDBObject(object);
 	}
 
 	/**
 	 * Returns the ObjectID of this message.
 	 * 
-	 * @return the _id
+	 * @return An ObjectID corresponding to the document in the database if this
+	 *         object has been created from a DBObject retrieved from the
+	 *         database.
 	 */
-	public ObjectId get_id() {
+	public ObjectId getId() {
 		return _id;
 	}
 
 	/**
-	 * @param _id
-	 *            the _id to set
+	 * Sets the ObjectId for this object.
+	 * 
+	 * @param id
+	 *            The ObjectId corresponding to the data stored in this object.
+	 * 
 	 */
-	public void set_id(ObjectId _id) {
-		this._id = _id;
+	public void setId(ObjectId id) {
+		this._id = id;
 	}
 
 	/**
-	 * @return the productAgentId
+	 * Returns the AID of the productAgent linked to this step.
+	 * 
+	 * @return the AID of the productAgent linked to this step.
 	 */
 	public AID getProductAgentId() {
 		return productAgentId;
 	}
 
 	/**
+	 * Sets the AID of the productAgent linked to this step.
+	 * 
 	 * @param productAgentId
-	 *            the productAgentId to set
+	 *            the AID of the productAgent linked to this step.
 	 */
 	public void setProductAgentId(AID productAgentId) {
 		this.productAgentId = productAgentId;
 	}
 
 	/**
-	 * @return the type
+	 * Returns the type of this product step.
+	 * 
+	 * @return the type of this product step.
 	 */
 	public int getType() {
 		return type;
 	}
 
 	/**
+	 * Sets the type for this product step.
+	 * 
 	 * @param type
-	 *            the type to set
+	 *            The type of this product step.
 	 */
 	public void setType(int type) {
 		this.type = type;
 	}
 
 	/**
-	 * @return the parameters
+	 * Returns the parameters for this step.
+	 * 
+	 * @return the parameters for this step.
 	 */
 	public BasicDBObject getParameters() {
 		return parameters;
 	}
 
 	/**
+	 * Sets the parameters for this step.
+	 * 
 	 * @param parameters
-	 *            the parameters to set
+	 *            the parameters that should be used.
 	 */
 	public void setParameters(BasicDBObject parameters) {
 		this.parameters = parameters;
 	}
 
 	/**
-	 * @return the inputPartTypes
+	 * Returns an array of part types for the input parts.
+	 * 
+	 * @return the types of all input parts.
 	 */
 	public Integer[] getInputPartTypes() {
 		return inputPartTypes;
 	}
 
 	/**
+	 * Sets the input part types for this step.
+	 * 
 	 * @param inputPartTypes
 	 *            the inputPartTypes to set
 	 */
@@ -278,6 +299,8 @@ public class ProductStepMessage implements MongoSaveable, Serializable {
 	}
 
 	/**
+	 * Returns the type of the output part.
+	 * 
 	 * @return the outputPartType
 	 */
 	public int getOutputPartType() {
@@ -285,6 +308,8 @@ public class ProductStepMessage implements MongoSaveable, Serializable {
 	}
 
 	/**
+	 * Sets the output part type.
+	 * 
 	 * @param outputPartType
 	 *            the outputPartType to set
 	 */
@@ -293,13 +318,17 @@ public class ProductStepMessage implements MongoSaveable, Serializable {
 	}
 
 	/**
-	 * @return the status
+	 * Returns the status of this step.
+	 * 
+	 * @return the status of this step.
 	 */
 	public StepStatusCode getStatus() {
 		return status;
 	}
 
 	/**
+	 * Sets the status for this step.
+	 * 
 	 * @param status
 	 *            the status to set
 	 */
@@ -308,13 +337,18 @@ public class ProductStepMessage implements MongoSaveable, Serializable {
 	}
 
 	/**
-	 * @return the statusData
+	 * Returns additional info about the status if available.
+	 * 
+	 * @return Additional info about the status, e.g. a message specifying the
+	 *         type of error.
 	 */
 	public BasicDBObject getStatusData() {
 		return statusData;
 	}
 
 	/**
+	 * Sets additional info about the status.
+	 * 
 	 * @param statusData
 	 *            the statusData to set
 	 */
@@ -323,6 +357,8 @@ public class ProductStepMessage implements MongoSaveable, Serializable {
 	}
 
 	/**
+	 * Returns the scheduling data for this setp.
+	 * 
 	 * @return the scheduleData
 	 */
 	public ScheduleData getScheduleData() {
@@ -330,6 +366,8 @@ public class ProductStepMessage implements MongoSaveable, Serializable {
 	}
 
 	/**
+	 * Set the scheduling data for this step.
+	 * 
 	 * @param scheduleData
 	 *            the scheduleData to set
 	 */
@@ -338,7 +376,7 @@ public class ProductStepMessage implements MongoSaveable, Serializable {
 	}
 
 	/**
-	 * Function for getting the BasicDBObject from this class.
+	 * Creates a BasicDBObject representing the data contained in this object.
 	 * 
 	 * @return the created BasicDBObject.
 	 */

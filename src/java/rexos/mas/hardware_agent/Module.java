@@ -80,7 +80,7 @@ public abstract class Module {
 	 * @param parameters The parameters to use by making the steps.
 	 * @return The EquipletStepMessages
 	 */
-	public abstract EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters);
+	public abstract EquipletStep[] getEquipletSteps(int stepType, BasicDBObject parameters);
 
 	/**
 	 * Function for filling in the placeholders.
@@ -88,7 +88,7 @@ public abstract class Module {
 	 * @param parameters The parameters to fill in the placeholders.
 	 * @return The filled in EquipletStepMessages
 	 */
-	public abstract EquipletStepMessage[] fillPlaceHolders(EquipletStepMessage[] steps, BasicDBObject parameters);
+	public abstract EquipletStep[] fillPlaceHolders(EquipletStep[] steps, BasicDBObject parameters);
 	
 	/**
 	 * Function for getting the steps this module is leading for.

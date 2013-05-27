@@ -40,7 +40,8 @@ public enum StepStatusCode {
 	SUSPENDED_OR_WARNING(4),
 	DONE(5),
 	ABORTED(6),
-	FAILED(7);
+	FAILED(7),
+	DELETED(8);
 
 	/**
 	 * @var int status

@@ -42,7 +42,7 @@ import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
-import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.equiplet_agent.ProductStep;
 
 import com.mongodb.BasicDBObject;
 
@@ -104,7 +104,7 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 			try {
 				// gets the productstep from the blackboard to get the
 				// productAgent out of it.
-				ProductStepMessage productStep = new ProductStepMessage(
+				ProductStep productStep = new ProductStep(
 						(BasicDBObject) equipletBBClient
 								.findDocumentById(productStepEntryId));
 				AID productAgent = productStep.getProductAgentId();

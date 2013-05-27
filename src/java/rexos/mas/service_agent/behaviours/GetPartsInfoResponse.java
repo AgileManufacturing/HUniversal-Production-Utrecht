@@ -62,10 +62,10 @@ import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.data.Position;
 import rexos.mas.data.ScheduleData;
-import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.equiplet_agent.ProductStep;
 import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.service_agent.ServiceAgent;
-import rexos.mas.service_agent.ServiceStepMessage;
+import rexos.mas.service_agent.ServiceStep;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -79,12 +79,12 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 
 	private String conversationId;
 	private ServiceAgent agent;
-	private ProductStepMessage productStep;
+	private ProductStep productStep;
 
 	/**
 	 * @param a
 	 */
-	public GetPartsInfoResponse(Agent a, String conversationId, ProductStepMessage productStep) {
+	public GetPartsInfoResponse(Agent a, String conversationId, ProductStep productStep) {
 		this(a, 2000, conversationId, productStep);
 	}
 
@@ -92,7 +92,7 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 	 * @param a
 	 * @param millis
 	 */
-	public GetPartsInfoResponse(Agent a, int millis, String conversationId, ProductStepMessage productStep) {
+	public GetPartsInfoResponse(Agent a, int millis, String conversationId, ProductStep productStep) {
 		super(a, millis, MessageTemplate.and(MessageTemplate.MatchConversationId(conversationId),
 				MessageTemplate.MatchOntology("GetPartsInfoResponse")));
 		agent = (ServiceAgent) a;
@@ -109,24 +109,24 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 			try {
 				List<DBObject> dbServiceSteps =
 						agent.getServiceStepBBClient().findDocuments(
-								new BasicDBObject("productStepId", productStep.get_id()));
-				ServiceStepMessage[] serviceSteps = new ServiceStepMessage[dbServiceSteps.size()];
+								new BasicDBObject("productStepId", productStep.getId()));
+				ServiceStep[] serviceSteps = new ServiceStep[dbServiceSteps.size()];
 
 				for(int i = 0; i < dbServiceSteps.size(); i++) {
-					serviceSteps[i] = new ServiceStepMessage((BasicDBObject) dbServiceSteps.get(i));
+					serviceSteps[i] = new ServiceStep((BasicDBObject) dbServiceSteps.get(i));
 				}
 
 				HashMap<Integer, Position> parameters = (HashMap<Integer, Position>) message.getContentObject();
 
 				Logger.log("%s got partsInfo: %s%n", agent.getLocalName(), parameters.toString());
 
-				ServiceStepMessage[] parameterizedSteps =
+				ServiceStep[] parameterizedSteps =
 						agent.GetServiceForConvId(conversationId).updateParameters(parameters,
-								ServiceStepMessage.sort(serviceSteps));
+								ServiceStep.sort(serviceSteps));
 
 				ScheduleData scheduleData;
 				int nextStartTime = productStep.getScheduleData().getStartTime();
-				for(ServiceStepMessage serviceStep : parameterizedSteps) {
+				for(ServiceStep serviceStep : parameterizedSteps) {
 					scheduleData = serviceStep.getScheduleData();
 					scheduleData.setStartTime(nextStartTime);
 					serviceStep.setScheduleData(scheduleData);
@@ -144,7 +144,7 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 				informMsg.setContentObject(parameterizedSteps[0].getId());
 				agent.send(informMsg);
 
-				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStep.get_id()),
+				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStep.getId()),
 						new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.PLANNED.name())));
 			} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 				Logger.log(e);

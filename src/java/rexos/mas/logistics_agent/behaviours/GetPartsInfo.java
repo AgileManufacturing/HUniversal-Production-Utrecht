@@ -41,7 +41,7 @@ import java.util.HashMap;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.data.Position;
-import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.equiplet_agent.ProductStep;
 
 /**
  * @author Peter
@@ -77,10 +77,10 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 		if (message != null) {
 			try {
 				Logger.log("%s GetPartsInfo%n", myAgent.getLocalName());
-				Integer[] partIds = ((ProductStepMessage) message.getContentObject()).getInputPartTypes();
+				Integer[] partIds = ((ProductStep) message.getContentObject()).getInputPartTypes();
 				HashMap<Integer, Position> partsParameters = new HashMap<Integer, Position>();
 
-				int x = 0;
+				int x = 2;
 				for (int partId : partIds) {
 					partsParameters.put(partId, new Position(x++, 1, 3));
 				}

@@ -57,7 +57,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
-import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.equiplet_agent.ProductStep;
 import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.service_agent.ServiceAgent;
 
@@ -72,12 +72,12 @@ public class ArePartsAvailableInTimeResponse extends ReceiveOnceBehaviour {
 
 	private String conversationId;
 	private ServiceAgent agent;
-	private ProductStepMessage productStep;
+	private ProductStep productStep;
 
 	/**
 	 * @param a
 	 */
-	public ArePartsAvailableInTimeResponse(Agent a, String conversationId, ProductStepMessage productStep) {
+	public ArePartsAvailableInTimeResponse(Agent a, String conversationId, ProductStep productStep) {
 		this(a, 2000, conversationId, productStep);
 	}
 
@@ -85,7 +85,7 @@ public class ArePartsAvailableInTimeResponse extends ReceiveOnceBehaviour {
 	 * @param a
 	 * @param millis
 	 */
-	public ArePartsAvailableInTimeResponse(Agent a, int millis, String conversationId, ProductStepMessage productStep) {
+	public ArePartsAvailableInTimeResponse(Agent a, int millis, String conversationId, ProductStep productStep) {
 		super(a, millis, MessageTemplate.and(MessageTemplate.MatchConversationId(conversationId),
 				MessageTemplate.MatchOntology("ArePartsAvailableInTimeResponse")));
 		agent = (ServiceAgent) a;
@@ -111,7 +111,7 @@ public class ArePartsAvailableInTimeResponse extends ReceiveOnceBehaviour {
 					agent.addBehaviour(new GetPartsInfoResponse(agent, conversationId, productStep));
 				} else {
 					agent.getProductStepBBClient().updateDocuments(
-							new BasicDBObject("_id", productStep.get_id()),
+							new BasicDBObject("_id", productStep.getId()),
 							new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name())
 									.append("statusData", new BasicDBObject("reason",
 											"productStep cannot be delivered on time"))));
