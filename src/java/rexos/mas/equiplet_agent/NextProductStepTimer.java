@@ -47,6 +47,10 @@ import com.mongodb.BasicDBObject;
  * Timer for executing the next product step.
  **/
 public class NextProductStepTimer extends Timer {
+	/**
+	 * @var EquipletAgent equipletAgent
+	 *      The equipletAgent to which the timer belongs.
+	 */
 	EquipletAgent equipletAgent;
 
 	/**
@@ -80,8 +84,11 @@ public class NextProductStepTimer extends Timer {
 	 *            the first time slot from the grid/equiplet.
 	 * @param timeSlotLength
 	 *            the length of a time slot.
+	 * @param agent
+	 *            The equipletAgent to which the timer belongs.
 	 */
-	public NextProductStepTimer(long firstTimeSlot, int timeSlotLength, EquipletAgent agent){
+	public NextProductStepTimer(long firstTimeSlot, int timeSlotLength,
+			EquipletAgent agent) {
 		super();
 		this.firstTimeSlot = firstTimeSlot;
 		this.timeSlotLength = timeSlotLength;

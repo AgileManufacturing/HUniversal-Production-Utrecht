@@ -69,6 +69,10 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 	 *      The equipletAgent related to this behaviour.
 	 */
 	private EquipletAgent equipletAgent;
+	/**
+	 * @var BlackboardClient equipletBBClient
+	 * BlackboardClient for the product step blackboard.
+	 */
 	private BlackboardClient equipletBBClient;
 
 	/**
@@ -76,6 +80,8 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 	 * 
 	 * @param a
 	 *            - The agent for this behaviour
+	 * @param equipletBBClient
+	 * 		BlackboardClient for the product step blackboard.            
 	 */
 	public CanDoProductionStepResponse(Agent a,
 			BlackboardClient equipletBBClient) {

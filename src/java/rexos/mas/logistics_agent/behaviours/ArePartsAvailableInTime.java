@@ -1,6 +1,6 @@
 /**
  * @file rexos/mas/logistics_agent/behaviours/ArePartsAvailableInTime.java
- * @brief 
+ * @brief Responds to ArePartsAvailableInTime messages, returning whether or not the parts are available in time.
  * @date Created: 25 apr. 2013
  *
  * @author Peter Bonnema
@@ -39,21 +39,37 @@ import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.equiplet_agent.ProductStep;
 
 /**
- * @author Peter
- * 
+ * Responds to ArePartsAvailableInTime messages, returning whether or not the
+ * parts are available in time.
  */
 public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
+	/**
+	 * @var long serialVersionUID
+	 *      The serialVersionUID for this class.
+	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * Constructs the behaviour for the given agent.
+	 * 
 	 * @param a
+	 *            The agent associated with this behaviour.
+	 * @param conversationId
+	 *            The conversationId that should be used for this behaviour.
 	 */
 	public ArePartsAvailableInTime(Agent a, String conversationId) {
 		this(a, 2000, conversationId);
 	}
 
 	/**
+	 * Constructs the behaviour for the given agent.
+	 * 
 	 * @param a
+	 *            The agent associated with this behaviour.
+	 * @param millis
+	 *            Timeout in milliseconds.
+	 * @param conversationId
+	 *            The conversationId that should be used for this behaviour.
 	 */
 	public ArePartsAvailableInTime(Agent a, int millis, String conversationId) {
 		super(a, millis, MessageTemplate.and(
@@ -61,33 +77,38 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 				MessageTemplate.MatchConversationId(conversationId)));
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Handles ArePartsAvailableInTime messages and responds with an
+	 * ArePartsAvailableInTimeResponse indicating whether or not the parts will
+	 * be available in time.
 	 * 
-	 * @see
-	 * rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage)
+	 * @see rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage)
 	 */
 	@Override
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
-				Logger.log("%s ArePartsAvailableInTime%n", myAgent.getLocalName());
-				ProductStep productStep = (ProductStep) message.getContentObject();
+				Logger.log("%s ArePartsAvailableInTime%n",
+						myAgent.getLocalName());
+				ProductStep productStep = (ProductStep) message
+						.getContentObject();
 				int startTime = productStep.getScheduleData().getStartTime();
 				Integer[] parts = productStep.getInputPartTypes();
-				
+
 				ACLMessage reply = message.createReply();
 				reply.setOntology("ArePartsAvailableInTimeResponse");
 				reply.setPerformative(ACLMessage.CONFIRM);
 				myAgent.send(reply);
 
-				myAgent.addBehaviour(new GetPartsInfo(myAgent, message.getConversationId()));
+				myAgent.addBehaviour(new GetPartsInfo(myAgent, message
+						.getConversationId()));
 			} catch (UnreadableException e) {
 				Logger.log(e);
 				myAgent.doDelete();
 			}
 		} else {
-			Logger.log(myAgent.getLocalName() + " - ArePartsAvailableInTime timeout!");
+			Logger.log(myAgent.getLocalName()
+					+ " - ArePartsAvailableInTime timeout!");
 			myAgent.removeBehaviour(this);
 		}
 	}
