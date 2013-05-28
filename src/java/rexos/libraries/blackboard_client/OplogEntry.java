@@ -127,6 +127,7 @@ public class OplogEntry {
 	 * Returns a JSON serialization of the oplog entry.
 	 * @return A JSON serialization of the oplog entry.
 	 **/
+	@Override
 	public String toString() {
 		return oplogEntry.toString();
 	}

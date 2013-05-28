@@ -78,8 +78,8 @@ public class BlackboardClient {
 	private Mongo mongo;
 
 	/**
-	 * @var HashMap<BlackboardSubscription> subscriptions
-	 * Link between subscribed topic name and MongoDbs BasicDBObjects
+	 * @var ArrayList<BlackboardSubscription> subscriptions
+	 * ArrayList containing all the subscriptions for this blackboard.
 	 **/
 	private ArrayList<BlackboardSubscription> subscriptions;
 
@@ -144,7 +144,7 @@ public class BlackboardClient {
 	 * @return The DBObject parsed from the JSON string.
 	 * @throws InvalidJSONException An error exists within the JSON.
 	 **/
-	private DBObject parseJSONWithCheckedException(String jsonString) throws InvalidJSONException {
+	static DBObject parseJSONWithCheckedException(String jsonString) throws InvalidJSONException {
 		DBObject obj = null;
 		try {
 			obj = (DBObject)JSON.parse(jsonString);
@@ -472,14 +472,23 @@ public class BlackboardClient {
 			subs[i] = subscriptions.get(i).getQuery();
 		}
 		
-		DBObject query = QueryBuilder.start("ns").is(currentDatabase.getName() + "." + currentCollection.getName())
-				.and(subs).get();
+		DBObject query = 
+				// If namespace is current database and collection.
+				QueryBuilder.start("ns").is(currentDatabase.getName() + "." + currentCollection.getName())
+				// And it matches one of the subscriptions
+				.and(QueryBuilder.start().or(subs).get()).get();
 
 		try {
 			if (oplogUser != null) {
-				newThread = new OplogMonitorThread(OPLOG_DATABASE_NAME, OPLOG_COLLECTION_NAME, oplogUser, oplogPassword, query);
+				newThread = new OplogMonitorThread(
+						mongo,
+						OPLOG_DATABASE_NAME,
+						OPLOG_COLLECTION_NAME,
+						oplogUser,
+						oplogPassword,
+						query);
 			} else {
-				newThread = new OplogMonitorThread(OPLOG_DATABASE_NAME, OPLOG_COLLECTION_NAME, query);
+				newThread = new OplogMonitorThread(mongo, OPLOG_DATABASE_NAME, OPLOG_COLLECTION_NAME, query);
 			}
 		} catch (MongoException ex) {
 			// This can happen when the database has not been configured properly and the Oplog collection does not exist.
@@ -491,82 +500,9 @@ public class BlackboardClient {
 			oplogMonitorThread.interrupt();
 		}
 		oplogMonitorThread = newThread;
+		oplogMonitorThread.setSubscriptions(subscriptions);
 		oplogMonitorThread.start();
 		
 		return true;
-	}
-	
-	/**
-	 * Class for the tailed oplog cursor thread within the client
-	 **/
-	private class OplogMonitorThread extends Thread {
-		
-		/**
-		 * @var DBCursor tailedCursor
-		 * Tailed cursor for this thread.
-		 **/
-		private DBCursor tailedCursor;
-		
-		/**
-		 * Constructor of OplogMonitorThread.
-		 * @param oplogDBName The database in which the oplog collection resides.
-		 * @param oplogCollectionName The name of the oplog collection.
-		 * @param query The query that will be used in the tailed cursor.
-		 **/
-		public OplogMonitorThread(String oplogDBName, String oplogCollectionName, DBObject query) {
-			DB database = mongo.getDB(oplogDBName);
-			DBCollection collection = database.getCollection(oplogCollectionName);
-
-			tailedCursor = collection.find(query);
-			tailedCursor.addOption(Bytes.QUERYOPTION_TAILABLE);
-			tailedCursor.addOption(Bytes.QUERYOPTION_AWAITDATA);
-			tailedCursor.skip(tailedCursor.size());
-		}
-
-		/**
-		 * Constructs a tailed cursor for the specified query on the oplog collection.
-		 * This constructor should be used when user authentication is required.
-		 * 
-		 * @param oplogDBName The database in which the oplog collection resides.
-		 * @param oplogCollectionName The name of the oplog collection.
-		 * @param username Username that will be used to authenticate with the oplog database. This user should have read access.
-		 * @param password The password belonging to the specified user.
-		 * @param query The query that will be used in the tailed cursor.
-		 **/
-		public OplogMonitorThread(String oplogDBName, String oplogCollectionName,
-				String username, String password, DBObject query) {
-			DB database = mongo.getDB(oplogDBName);
-			database.authenticate(username, password.toCharArray());
-			DBCollection collection = database.getCollection(oplogCollectionName);
-
-			tailedCursor = collection.find(query);
-			tailedCursor.addOption(Bytes.QUERYOPTION_TAILABLE);
-			tailedCursor.addOption(Bytes.QUERYOPTION_AWAITDATA);
-			tailedCursor.skip(tailedCursor.size());
-		}
-		
-		/**
-		 * Run method for the TailedCursorThread.
-		 * This will check for changes within the cursor and calls the onMessage method of its subscriber.
-		 **/
-		@Override
-		public void run() {
-			try {
-				while (!Thread.interrupted()) {
-					while (tailedCursor.hasNext()) {
-						OplogEntry entry = new OplogEntry(
-								(DBObject) tailedCursor.next());
-						MongoOperation operation = entry.getOperation();
-
-						for (BlackboardSubscription sub : subscriptions) {
-							if (sub.matchesWithEntry(entry)) {
-								sub.getSubscriber().onMessage(operation, entry);
-							}
-						}
-					}
-				}
-			} catch (MongoInterruptedException ex) {
-			}
-		}
 	}
 }
