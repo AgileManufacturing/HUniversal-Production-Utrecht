@@ -48,7 +48,14 @@ public class ProductLog{
 	private boolean writeToLocal = true;
 	private sqliteDatabase local;
 
-	// private RemoteDatabaseConnection remote;
+public class ProductLog {
+
+	private boolean writeToRemote;
+	private boolean writeToLocal = true; 
+	
+	private sqliteDatabase local;
+	//private RemoteDatabaseConnection remote;
+	
 	public void add(List<LogMessage> msgs){
 		if (writeToLocal){
 			local.insert(msgs);

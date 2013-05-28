@@ -42,22 +42,30 @@ package rexos.mas.data;
 
 import java.io.Serializable;
 
-public class ProductionStep implements Serializable{
+import com.mongodb.BasicDBObject;
+
+public class ProductionStep implements Serializable {
+
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = -832835122145455883L;
 	private int _requiredTimeSlots;
 	private int _id;
-	private long _capability;
+	private int _capability;
 	private ProductionStepStatus _status;
-	private ParameterList _parameters;
+	private BasicDBObject _parameters;
 
-	public ProductionStep(){
-		this._parameters = new ParameterList();
+	public ProductionStep() {
+		this._parameters = new BasicDBObject();
+		this._status = ProductionStepStatus.STATE_TODO;
 	}
-
-	public ProductionStep(int id, long capability, ParameterList parameterList){
+	
+	public ProductionStep(int id, int capability, BasicDBObject parameterList) {
 		this._id = id;
 		this._capability = capability;
 		this._parameters = parameterList;
+		this._status = ProductionStepStatus.STATE_TODO;
 	}
 
 	public int getId(){
@@ -79,12 +87,12 @@ public class ProductionStep implements Serializable{
 	public int getRequiredTimeSlots(){
 		return this._requiredTimeSlots;
 	}
-
-	public ParameterList getParameterList(){
+	
+	public BasicDBObject getParameters() {
 		return _parameters;
 	}
 
-	public long getCapability(){
+	public int getCapability() {
 		return _capability;
 	}
 }
