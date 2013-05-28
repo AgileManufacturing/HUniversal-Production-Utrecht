@@ -340,7 +340,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 					StepStatusCode status = equipletStep.getStatus();
 					switch (status) {
 					case DONE:
-						if(equipletStep.getNextStepID() == null){
+						if(equipletStep.getNextStep() == null){
 							List<DBObject> equipletSteps = equipletStepBBClient.findDocuments(
 									new BasicDBObject("serviceStepID", equipletStep.getServiceStepID()));
 							serviceStepBBClient.updateDocuments(new BasicDBObject("_id", serviceStep.getId()),
