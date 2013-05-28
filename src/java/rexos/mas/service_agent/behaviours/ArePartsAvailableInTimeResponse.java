@@ -130,7 +130,7 @@ public class ArePartsAvailableInTimeResponse extends ReceiveOnceBehaviour {
 					ACLMessage sendMsg = message.createReply();
 					sendMsg.setOntology("GetPartsInfo");
 					sendMsg.setPerformative(ACLMessage.QUERY_IF);
-					sendMsg.setContentObject(productStep.getInputPartTypes());
+					sendMsg.setContentObject(productStep.getInputParts());
 					agent.send(sendMsg);
 
 					agent.addBehaviour(new GetPartsInfoResponse(agent, conversationId, productStep));

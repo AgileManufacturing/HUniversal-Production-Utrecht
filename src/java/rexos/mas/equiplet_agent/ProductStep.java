@@ -51,7 +51,9 @@ import jade.core.AID;
 import java.io.Serializable;
 
 import org.bson.types.ObjectId;
+
 import rexos.mas.data.MongoSaveable;
+import rexos.mas.data.Part;
 import rexos.mas.data.ScheduleData;
 
 import com.mongodb.BasicDBList;
@@ -93,16 +95,16 @@ public class ProductStep implements MongoSaveable, Serializable {
 	private BasicDBObject parameters;
 
 	/**
-	 * @var Integer inputPartTypes[]
-	 *      List of part ids representing the input types.
+	 * @var Part[] inputParts
+	 *      List of parts representing the input parts.
 	 */
-	private Integer[] inputPartTypes;
+	private Part[] inputParts;
 
 	/**
-	 * @var int outputPartType
+	 * @var Part outputPart
 	 *      Part id of the output part.
 	 */
-	private int outputPartType;
+	private Part outputPart;
 
 	/**
 	 * @var StepStatusCode status
@@ -132,9 +134,9 @@ public class ProductStep implements MongoSaveable, Serializable {
 	 *            The type of the product step
 	 * @param parameters
 	 *            The parameters for the product step
-	 * @param inputPartTypes
+	 * @param inputParts
 	 *            The input parts for the product step
-	 * @param outputPartType
+	 * @param outputPart
 	 *            The output parts for the product step
 	 * @param status
 	 *            The status for the product step
@@ -144,11 +146,11 @@ public class ProductStep implements MongoSaveable, Serializable {
 	 *            The schedule data
 	 */
 	public ProductStep(AID productAgentId, int type,
-			BasicDBObject parameters, Integer[] inputPartTypes,
-			int outputPartType, StepStatusCode status,
+			BasicDBObject parameters, Part[] inputParts,
+			Part outputPart, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
-		this(null, productAgentId, type, parameters, inputPartTypes,
-				outputPartType, status, statusData, scheduleData);
+		this(null, productAgentId, type, parameters, inputParts,
+				outputPart, status, statusData, scheduleData);
 	}
 
 	/**
@@ -163,9 +165,9 @@ public class ProductStep implements MongoSaveable, Serializable {
 	 *            The type of the product step
 	 * @param parameters
 	 *            The parameters for the product step
-	 * @param inputPartTypes
+	 * @param inputParts
 	 *            The input parts for the product step
-	 * @param outputPartType
+	 * @param outputPart
 	 *            The output parts for the product step
 	 * @param status
 	 *            The status for the product step
@@ -175,15 +177,15 @@ public class ProductStep implements MongoSaveable, Serializable {
 	 *            The schedule data
 	 */
 	public ProductStep(ObjectId _id, AID productAgentId, int type,
-			BasicDBObject parameters, Integer[] inputPartTypes,
-			int outputPartType, StepStatusCode status,
+			BasicDBObject parameters, Part[] inputParts,
+			Part outputPart, StepStatusCode status,
 			BasicDBObject statusData, ScheduleData scheduleData) {
 		this._id = _id;
 		this.productAgentId = productAgentId;
 		this.type = type;
 		this.parameters = parameters;
-		this.inputPartTypes = inputPartTypes;
-		this.outputPartType = outputPartType;
+		this.inputParts = inputParts;
+		this.outputPart = outputPart;
 		this.status = status;
 		this.statusData = statusData;
 		this.scheduleData = scheduleData;
@@ -280,41 +282,41 @@ public class ProductStep implements MongoSaveable, Serializable {
 	}
 
 	/**
-	 * Returns an array of part types for the input parts.
+	 * Returns an array of input parts.
 	 * 
-	 * @return the types of all input parts.
+	 * @return all input parts.
 	 */
-	public Integer[] getInputPartTypes() {
-		return inputPartTypes;
+	public Part[] getInputParts() {
+		return inputParts;
 	}
 
 	/**
-	 * Sets the input part types for this step.
+	 * Sets the input part for this step.
 	 * 
-	 * @param inputPartTypes
-	 *            the inputPartTypes to set
+	 * @param inputParts
+	 *            the inputParts to set
 	 */
-	public void setInputPartTypes(Integer[] inputPartTypes) {
-		this.inputPartTypes = inputPartTypes;
+	public void setInputPartTypes(Part[] inputParts) {
+		this.inputParts = inputParts;
 	}
 
 	/**
-	 * Returns the type of the output part.
+	 * Returns the output part.
 	 * 
-	 * @return the outputPartType
+	 * @return the outputPart
 	 */
-	public int getOutputPartType() {
-		return outputPartType;
+	public Part getOutputPart() {
+		return outputPart;
 	}
 
 	/**
-	 * Sets the output part type.
+	 * Sets the output part.
 	 * 
-	 * @param outputPartType
-	 *            the outputPartType to set
+	 * @param outputPart
+	 *            the outputPart to set
 	 */
-	public void setOutputPartType(int outputPartType) {
-		this.outputPartType = outputPartType;
+	public void setOutputPart(Part outputPart) {
+		this.outputPart = outputPart;
 	}
 
 	/**
@@ -388,8 +390,14 @@ public class ProductStep implements MongoSaveable, Serializable {
 		object.put("productAgentId", productAgentId.getName());
 		object.put("type", type);
 		object.put("parameters", parameters);
-		object.put("inputPartTypes", inputPartTypes);
-		object.put("outputPartType", outputPartType);
+		BasicDBObject[] tempInputParts = new BasicDBObject[inputParts.length];
+		for(int i = 0; i < inputParts.length; i++){
+			tempInputParts[i] = inputParts[i].toBasicDBObject();
+		}
+		object.put("inputParts", tempInputParts);
+		if(outputPart != null){
+			object.put("outputPart", outputPart.toBasicDBObject());
+		}
 		object.put("status", status.toString());
 		object.put("statusData", statusData);
 		object.put("scheduleData", scheduleData.toBasicDBObject());
@@ -405,9 +413,15 @@ public class ProductStep implements MongoSaveable, Serializable {
 		productAgentId = new AID((String) (object.get("productAgentId")), AID.ISGUID);
 		type = object.getInt("type");
 		parameters = (BasicDBObject) object.get("parameters");
-		inputPartTypes = ((BasicDBList) object.get("inputPartTypes"))
-				.toArray(new Integer[0]);
-		outputPartType = object.getInt("outputPartType", -1);
+		
+		BasicDBList tempInputParts = ((BasicDBList)object.get("inputParts"));
+		inputParts = new Part[tempInputParts.size()];
+		for(int i = 0; i < tempInputParts.size(); i++){
+			inputParts[i] = new Part((BasicDBObject)tempInputParts.get(i));
+		}
+		if(object.containsField("outputPart")){
+			outputPart = new Part((BasicDBObject)object.get("outputPart"));
+		}
 		status = StepStatusCode.valueOf(object.getString("status"));
 
 		if (object.containsField("statusData")) {

@@ -31,9 +31,9 @@
 
 package rexos.mas.service_agent;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 
+import rexos.mas.data.Part;
 import rexos.mas.data.Position;
 
 import com.mongodb.BasicDBObject;
@@ -74,7 +74,7 @@ public interface Service {
 	 * @param serviceSteps the service steps to update.
 	 * @return the updated service steps.
 	 */
-	public ServiceStep[] updateParameters(HashMap<Integer, SimpleEntry<Integer,Position>> partParameters,
+	public ServiceStep[] updateParameters(HashMap<Part, Position> partParameters,
 			ServiceStep[] serviceSteps);
 
 	/**
