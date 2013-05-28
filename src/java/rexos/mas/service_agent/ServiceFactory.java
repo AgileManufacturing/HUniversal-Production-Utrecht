@@ -32,9 +32,9 @@ package rexos.mas.service_agent;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import rexos.libraries.DynamicLoader.DynamicClassDescription;
-import rexos.libraries.DynamicLoader.DynamicClassFactory;
-import rexos.libraries.DynamicLoader.InstantiateClassException;
+import rexos.libraries.dynamicloader.DynamicClassDescription;
+import rexos.libraries.dynamicloader.DynamicClassFactory;
+import rexos.libraries.dynamicloader.InstantiateClassException;
 import rexos.libraries.knowledgedb_client.KeyNotFoundException;
 import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
 import rexos.libraries.knowledgedb_client.KnowledgeException;
