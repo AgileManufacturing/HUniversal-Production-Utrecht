@@ -472,8 +472,11 @@ public class BlackboardClient {
 			subs[i] = subscriptions.get(i).getQuery();
 		}
 		
-		DBObject query = QueryBuilder.start("ns").is(currentDatabase.getName() + "." + currentCollection.getName())
-				.and(subs).get();
+		DBObject query = 
+				// If namespace is current database and collection.
+				QueryBuilder.start("ns").is(currentDatabase.getName() + "." + currentCollection.getName())
+				// And it matches one of the subscriptions
+				.and(QueryBuilder.start().or(subs).get()).get();
 
 		try {
 			if (oplogUser != null) {
