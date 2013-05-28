@@ -47,8 +47,6 @@
 package rexos.mas.service_agent;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 
 import rexos.libraries.knowledgedb_client.KeyNotFoundException;
 import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
@@ -87,8 +85,8 @@ public class PickAndPlaceService extends Service {
 		double ballHeight = 0;
 		try {
 			KnowledgeDBClient client = KnowledgeDBClient.getClient();
-			Row[] partProperties = client.executeSelectQuery(Queries.PART_PROPERTY, part.getType(), "heigth");
-			ballHeight = (double) partProperties[0].get("part_type_properties.value");
+			Row[] partProperties = client.executeSelectQuery(Queries.PART_PROPERTY, part.getType(), "height");
+			ballHeight = Double.parseDouble((String) partProperties[0].get("value"));
 		} catch(KnowledgeException | KeyNotFoundException e) {
 			Logger.log(e);
 		}
