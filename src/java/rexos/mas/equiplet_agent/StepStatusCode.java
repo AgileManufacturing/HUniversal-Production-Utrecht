@@ -33,14 +33,42 @@ package rexos.mas.equiplet_agent;
  * Enum with status codes for product/service/equiplet steps.
  */
 public enum StepStatusCode {
+	/**
+	 * Step is evaluating.
+	 */
 	EVALUATING(0),
+	/**
+	 * Step is planned.
+	 */
 	PLANNED(1),
+	/**
+	 * Step is waiting for production.
+	 */
 	WAITING(2),
+	/**
+	 * Step is in progress.
+	 */
 	IN_PROGRESS(3),
+	/**
+	 * Step is suspended (possibly because of a warning).
+	 */
 	SUSPENDED_OR_WARNING(4),
+	/**
+	 * Step is done.
+	 */
 	DONE(5),
+	/**
+	 * Step is aborted.
+	 */
 	ABORTED(6),
-	FAILED(7);
+	/**
+	 * Step has failed.
+	 */
+	FAILED(7),
+	/**
+	 * Step should be deleted.
+	 */
+	DELETED(8);
 
 	/**
 	 * @var int status

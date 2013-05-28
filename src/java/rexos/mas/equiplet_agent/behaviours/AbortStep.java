@@ -1,5 +1,3 @@
-package rexos.mas.equiplet_agent.behaviours;
-
 /**
  * @file AbortStep.java
  * @brief responds to abort step message.
@@ -47,40 +45,66 @@ package rexos.mas.equiplet_agent.behaviours;
  *          SUCH DAMAGE.
  **/
 
+package rexos.mas.equiplet_agent.behaviours;
+
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+
 import org.bson.types.ObjectId;
+
 import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
-import rexos.mas.data.ProductionStep;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.StepStatusCode;
-import rexos.mas.hardware_agent.EquipletStepMessage;
+import rexos.mas.hardware_agent.EquipletStep;
+
 import com.mongodb.BasicDBObject;
 
+/**
+ * Handles incoming abort step messages from the product agent and updates the
+ * blackboard accordingly.
+ * 
+ * 
+ */
 public class AbortStep extends ReceiveBehaviour {
-	private static final long serialVersionUID = 1L;
+	/**
+	 * @var long serialVersionUID
+	 *      The serialVersionUID for this class.
+	 **/
+	private static final long serialVersionUID = -9022585847666136289L;
 
 	/**
-	 * @var MessageTemplate messageTemplate The messageTemplate this behaviour
-	 *      listens to. This behaviour listens to the ontology: AbortStep.
+	 * @var MessageTemplate messageTemplate
+	 *      The messageTemplate this behaviour
+	 *      listens to. This behaviour listens to the ontology: CancelStep.
 	 */
 	private static MessageTemplate messageTemplate = MessageTemplate
-			.MatchOntology("AbortStep");
+			.MatchOntology("CancelStep");
 
 	/**
-	 * @var EquipletAgent equipletAgent The equipletAgent related to this
+	 * @var EquipletAgent equipletAgent
+	 *      The equipletAgent related to this
 	 *      behaviour.
 	 */
 	private EquipletAgent equipletAgent;
+
+	/**
+	 * @var BlackboardClient equipletBBClient
+	 *      BlackboardClient for the equiplet's product step blackboard.
+	 */
 	private BlackboardClient equipletBBClient;
 
 	/**
 	 * Instantiates a new can perform step.
 	 * 
-	 * @param a The agent for this behaviour
+	 * @param a
+	 *            The agent for this behaviour
+	 * @param equipletBBClient
+	 *            BlackboardClient for the equiplet's product step blackboard.
 	 */
 	public AbortStep(Agent a, BlackboardClient equipletBBClient) {
 		super(a, messageTemplate);
@@ -90,43 +114,44 @@ public class AbortStep extends ReceiveBehaviour {
 
 	/**
 	 * Function to handle the incoming messages for this behaviour. Handles the
-	 * response to the AbortStep checks the step status, and aborts it if able to.
-	 * else send back failure
-	 * @param message The received message.
+	 * response to the AbortStep checks the step status, and aborts it if able
+	 * to.
+	 * else send back failure.
+	 * 
+	 * @param message
+	 *            The received message.
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		Logger.log("%s received message from %s%n", myAgent.getLocalName(), message
-				.getSender().getLocalName(), message.getOntology());
+		Logger.log("%s received message from %s(%s)%n", myAgent.getLocalName(),
+				message.getSender().getLocalName(), message.getOntology());
 
-		ProductionStep productStep = null;
 		try {
 			// gets the productstep out of the message.
 			ObjectId productStepEntryId = null;
-			
-			productStepEntryId = equipletAgent.getRelatedObjectId(message.getConversationId());
 
-			BasicDBObject step = (BasicDBObject)equipletBBClient.findDocumentById(productStepEntryId);
-			EquipletStepMessage esm = new EquipletStepMessage(step);
-			
-			if(esm.getStatus()==StepStatusCode.PLANNED){
-				
-				equipletBBClient.updateDocuments(new BasicDBObject("_id",productStepEntryId), new BasicDBObject("$set",new BasicDBObject("status",StepStatusCode.ABORTED)));
-				
+			productStepEntryId = equipletAgent.getRelatedObjectId(message
+					.getConversationId());
+
+			BasicDBObject step = (BasicDBObject) equipletBBClient
+					.findDocumentById(productStepEntryId);
+			EquipletStep esm = new EquipletStep(step);
+
+			if (esm.getStatus() == StepStatusCode.PLANNED) {
+				equipletBBClient.updateDocuments(
+						new BasicDBObject("_id", productStepEntryId),
+						new BasicDBObject("$set", new BasicDBObject("status",
+								StepStatusCode.ABORTED).append("statusData",
+								new BasicDBObject("reason",
+										"productagent canceled"))));
+			} else {
+				ACLMessage reply = message.createReply();
+				reply.setPerformative(ACLMessage.FAILURE);
+				myAgent.send(reply);
 			}
-			else{
-				
-			ACLMessage reply = message.createReply();
-			
-			reply.setPerformative(ACLMessage.FAILURE);
-			 
-			myAgent.send(reply);
-				
-			}
-			
-		}catch(Exception e){
-			
+		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+			Logger.log(e);
+			equipletAgent.doDelete();
 		}
 	}
-	
 }

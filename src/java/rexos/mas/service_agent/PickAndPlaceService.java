@@ -46,8 +46,10 @@
  **/
 package rexos.mas.service_agent;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
 import rexos.libraries.knowledgedb_client.KeyNotFoundException;
 import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
@@ -91,7 +93,7 @@ public class PickAndPlaceService implements Service {
 	 *      com.mongodb.BasicDBObject)
 	 */
 	@Override
-	public ServiceStepMessage[] getServiceSteps(int productStepType, BasicDBObject parameters) {
+	public ServiceStep[] getServiceSteps(int productStepType, BasicDBObject parameters) {
 		int part = parameters.getInt("part");
 		double inputPartSize = 0.5;// TODO: FROM KNOWLEDGE DB
 
@@ -105,23 +107,27 @@ public class PickAndPlaceService implements Service {
 		placeParameters.put("part", part);
 		placeParameters.put("position", position.toBasicDBObject());
 
-		return new ServiceStepMessage[] {
-				new ServiceStepMessage(ID, 1, pickParameters, StepStatusCode.EVALUATING, null, new ScheduleData()),
+		return new ServiceStep[] {
+				new ServiceStep(ID, 1, pickParameters, StepStatusCode.EVALUATING, null, new ScheduleData()),
 				// pick //TODO NOT HARDCODED ID.
-				new ServiceStepMessage(ID, 2, placeParameters, StepStatusCode.EVALUATING, null, new ScheduleData())
+				new ServiceStep(ID, 2, placeParameters, StepStatusCode.EVALUATING, null, new ScheduleData())
 		// place //TODO NOT HARDCODE ID.
 		};
 	}
 
 	/* (non-Javadoc)
 	 * @see rexos.mas.service_agent.Service#updateParameters(java.util.HashMap,
-	 * rexos.mas.service_agent.ServiceStepMessage[]) */
+	 * rexos.mas.service_agent.ServiceStep[]) */
 	@Override
-	public ServiceStepMessage[] updateParameters(HashMap<Integer, Position> partParameters,
-			ServiceStepMessage[] serviceSteps) {
+	public ServiceStep[] updateParameters(HashMap<Integer, SimpleEntry<Integer, Position>> partParameters,
+			ServiceStep[] serviceSteps) {
 		BasicDBObject pickParameters = serviceSteps[0].getParameters();
-		pickParameters.putAll((LinkedHashMap<String, Object>) new BasicDBObject("position", partParameters.get(
-				pickParameters.getInt("part")).toBasicDBObject()));
+		for(Entry<Integer, SimpleEntry<Integer, Position>> e : partParameters.entrySet()){
+			if(e.getValue().getKey() == pickParameters.getInt("part")){
+				pickParameters.putAll((LinkedHashMap<String, Object>) 
+						new BasicDBObject("position", e.getValue().getValue().toBasicDBObject()));
+			}
+		}
 		serviceSteps[0].setParameters(pickParameters);
 		return serviceSteps;
 	}

@@ -54,9 +54,11 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
+import jade.wrapper.StaleProxyException;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -71,6 +73,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
+import rexos.libraries.knowledgedb_client.KeyNotFoundException;
 import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
 import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
@@ -180,7 +183,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	private HashMap<String, ObjectId> communicationTable;
 
 	/**
-	 * @var Timer timeToNextUsedTimeSlot
+	 * @var NextProductStepTimer timer
 	 *      Timer used to trigger when the next used time slot is ready to
 	 *      start.
 	 */
@@ -210,20 +213,20 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	@Override
 	public void setup() {
 		Logger.log("I spawned as a equiplet agent.");
-
 		// gets his IP and sets the equiplet blackboard IP.
 		try {
 			InetAddress IP = InetAddress.getLocalHost();
 			equipletDbIp = IP.getHostAddress();
-		} catch (Exception e) {
+		} catch (UnknownHostException e) {
 			Logger.log(e);
 		}
+		
 		equipletDbName = getAID().getLocalName();
 		communicationTable = new HashMap<String, ObjectId>();
 		try {
 			Object[] args = getArguments();
 			AID logisticsAgent = null;
-			if (args != null && args.length > 0) {
+			if(args != null && args.length > 0) {
 				logisticsAgent = (AID) args[0];
 			}
 
@@ -234,10 +237,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				client = KnowledgeDBClient.getClient();
 
 				Row[] rows = client.executeSelectQuery(Queries.POSSIBLE_STEPS_PER_EQUIPLET, getAID().getLocalName());
-				for (Row row : rows) {
+				for(Row row : rows) {
 					capabilities.add((int) row.get("id"));
 				}
-			} catch (KnowledgeException e1) {
+			} catch (KnowledgeException | KeyNotFoundException e1) {
 				takeDown();
 				Logger.log(e1);
 			}
@@ -272,13 +275,13 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			// blackboard.
 			collectiveBBClient.setCollection(timeDataName);
 			BasicDBObject timeData = (BasicDBObject) collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
-			
+
 			// initiates the timer to the next product step.
 			timer = new NextProductStepTimer(timeData.getLong("firstTimeSlot"), timeData.getInt("timeSlotLength"), this);
 			timer.setNextUsedTimeSlot(-1);
-			
+
 			collectiveBBClient.setCollection(equipletDirectoryName);
-		} catch (Exception e) {
+		} catch (GeneralMongoException | InvalidDBNamespaceException | UnknownHostException | StaleProxyException e) {
 			Logger.log(e);
 			doDelete();
 		}
@@ -289,6 +292,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 		// starts the behaviour for receving message initialisation finished.
 		addBehaviour(new InitialisationFinished(this, collectiveBBClient));
+		
+		// starts the behaviour for making a log.
+		//TODO: logbehaviour.
+		//addBehaviour(new LogBehaviour(this, collectiveBBClient));
 	}
 
 	/**
@@ -305,14 +312,14 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 			// Messages all his product agents that he is going to die.
 			Object[] productAgents = equipletBBClient.findDistinctValues("productAgentId", new BasicDBObject());
-			for (Object productAgent : productAgents) {
+			for(Object productAgent : productAgents) {
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
 				responseMessage.addReceiver(new AID(productAgent.toString(), AID.ISGUID));
 				responseMessage.setOntology("EquipletAgentDied");
 				responseMessage.setContent("I'm dying");
 				send(responseMessage);
 			}
-		} catch (Exception e) {
+		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 			Logger.log(e);
 			// The equiplet is already going down, so it has to do nothing here.
 		}
@@ -323,7 +330,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			equipletBBClient.unsubscribe(statusSubscription);
-		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 			Logger.log(e);
 		}
 
@@ -339,85 +346,76 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 */
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
-		switch (entry.getNamespace().split("\\.")[1]) {
-		case "ProductStepsBlackBoard":
-			try {
-				// Get the productstep.
-				ObjectId id = entry.getTargetObjectId();
-				ProductStepMessage productStep = new ProductStepMessage((BasicDBObject) equipletBBClient.findDocumentById(id));
+		switch(entry.getNamespace().split("\\.")[1]) {
+			case "ProductStepsBlackBoard":
+				try {
+					// Get the productstep.
+					ObjectId id = entry.getTargetObjectId();
+					ProductStep productStep = new ProductStep((BasicDBObject) equipletBBClient.findDocumentById(id));
 
-				// Gets the conversationId if it doesn't exist throws an
-				// error.
-				String conversationId = getConversationId(id);
-				if (conversationId == null) {
-					throw new Exception();
-				}
-
-				// Create the responseMessage
-				ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
-				responseMessage.addReceiver(productStep.getProductAgentId());
-				responseMessage.setConversationId(conversationId);
-
-				Logger.log("status update: " + productStep.getStatus().toString());
-				switch (productStep.getStatus()) {
-				// Depending on the changed status fills in the
-				// responseMessage and sends it to the product agent.
-				case PLANNED:
-					try {
-						// If the start time of the newly planned
-						// productStep is
-						// earlier as the next used time slot make it
-						// the next used timeslot.
-						ScheduleData scheduleData = productStep.getScheduleData();
-						if (scheduleData.getStartTime() > timer.getNextUsedTimeSlot()) {
-							timer.setNextUsedTimeSlot(scheduleData.getStartTime());
-							nextProductStep = id;
-						}
-
-						// Logger.log("%s Sending ProductionDuration tot %s%n",
-						// getAID(), );
-						responseMessage.setOntology("Planned");
-						responseMessage.setContentObject(scheduleData.getStartTime());
-						send(responseMessage);
-					} catch (IOException e) {
-						responseMessage.setPerformative(ACLMessage.FAILURE);
-						responseMessage.setContent("An error occured in the planning/please reschedule");
-						send(responseMessage);
-						Logger.log(e);
+					// Gets the conversationId if it doesn't exist throws an
+					// error.
+					String conversationId = getConversationId(id);
+					if(conversationId == null) {
+						throw new Exception();
 					}
-					break;
-				case IN_PROGRESS:
-					responseMessage.setOntology("StatusUpdate");
-					responseMessage.setContent("INPROGRESS");
+
+					// Create the responseMessage
+					ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
+					responseMessage.addReceiver(productStep.getProductAgentId());
+					responseMessage.setConversationId(conversationId);
+
+					Logger.log("status update: " + productStep.getStatus().toString());
+					switch(productStep.getStatus()) {
+					// Depending on the changed status fills in the
+					// responseMessage and sends it to the product agent.
+						case PLANNED:
+							try {
+								// If the start time of the newly planned productStep is earlier as the next used time
+								// slot make it the next used timeslot.
+								ScheduleData scheduleData = productStep.getScheduleData();
+							timer.setNextUsedTimeSlot(scheduleData.getStartTime());
+								if(scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
+									timer.setNextUsedTimeSlot(scheduleData.getStartTime());
+								}
+
+								// Logger.log("%s Sending ProductionDuration tot %s%n", getAID(), );
+								responseMessage.setOntology("Planned");
+								responseMessage.setContentObject(scheduleData.getStartTime());
+							} catch(IOException e) {
+								responseMessage.setPerformative(ACLMessage.FAILURE);
+								responseMessage.setContent("An error occured in the planning/please reschedule");
+								Logger.log(e);
+							}
+							break;
+						case IN_PROGRESS:
+							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setContent("INPROGRESS");
+							break;
+						case FAILED:
+							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setContent("FAILED");
+							responseMessage.setContentObject(productStep.getStatusData());
+							break;
+						case SUSPENDED_OR_WARNING:
+							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setContent("SUSPENDED_OR_WARNING");
+							responseMessage.setContentObject(productStep.getStatusData());
+							break;
+						case DONE:
+							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setContent("DONE");
+							break;
+						default:
+							break;
+					}
 					send(responseMessage);
-					break;
-				case FAILED:
-					responseMessage.setOntology("StatusUpdate");
-					responseMessage.setContent("FAILED");
-					responseMessage.setContentObject(productStep.getStatusData());
-					send(responseMessage);
-					break;
-				case SUSPENDED_OR_WARNING:
-					responseMessage.setOntology("StatusUpdate");
-					responseMessage.setContent("SUSPENDED_OR_WARNING");
-					responseMessage.setContentObject(productStep.getStatusData());
-					send(responseMessage);
-					break;
-				case DONE:
-					responseMessage.setOntology("StatusUpdate");
-					responseMessage.setContent("DONE");
-					send(responseMessage);
-					break;
-				default:
-					break;
+				} catch(Exception e1) {
+					Logger.log(e1);
 				}
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				Logger.log(e1);
-			}
-			break;
-		default:
-			break;
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -463,9 +461,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 */
 	public String getConversationId(ObjectId productStepEntry) {
 		String conversationId = null;
-		if (communicationTable.containsValue(productStepEntry)) {
-			for (Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
-				if (tableEntry.getValue().equals(productStepEntry)) {
+		if(communicationTable.containsValue(productStepEntry)) {
+			for(Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
+				if(tableEntry.getValue().equals(productStepEntry)) {
 					conversationId = tableEntry.getKey();
 					break;
 				}

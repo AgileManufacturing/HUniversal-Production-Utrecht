@@ -29,6 +29,8 @@
  **/
 package rexos.mas.equiplet_agent.behaviours;
 
+import java.io.IOException;
+
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -36,6 +38,8 @@ import jade.lang.acl.MessageTemplate;
 import org.bson.types.ObjectId;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ScheduleData;
@@ -116,7 +120,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 			scheduleMessage.setContentObject(productStepId);
 			scheduleMessage.setConversationId(message.getConversationId());
 			equipletAgent.send(scheduleMessage);
-		} catch (Exception e) {
+		} catch (IOException | InvalidDBNamespaceException | GeneralMongoException e) {
 			Logger.log(e);
 		}
 	}

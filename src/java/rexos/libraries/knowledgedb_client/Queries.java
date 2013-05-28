@@ -268,6 +268,28 @@ public class Queries {
     		"    services ON services.software = software.id " + 
     		" WHERE " + 
     		"    services.id = (?)";		
+    
+    /**
+     * @var String INSERT_PART_TYPE
+     * 
+     * SQL statement for inserting a new part type in the database.
+     * Expects a string parameter corresponding the name
+     * Expects a string parameter corresponding the description.
+     */
+    public static final String INSERT_PART_TYPE = "INSERT INTO " + 
+    		"	part_types(name, description)" +
+    		"	VALUES((?),(?))";
+    
+    /**
+     * @var String INSERT_PART
+     * 
+     * SQL statement for inserting a new part in the database.
+     * Expects a integer parameter corresponding the part_type.
+     */
+    public static final String INSERT_PART = "INSERT INTO " + 
+    		"	parts(type)" + 
+    		"	VALUES((?))";
+    
     /**
      * A private constructor preventing this class to be constructed.
      **/

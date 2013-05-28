@@ -71,35 +71,35 @@ public class DeltaRobotModule extends Module {
 	 * @see Module#getEquipletSteps(int, BasicDBObject)
 	 */
 	@Override
-	public EquipletStepMessage[] getEquipletSteps(int stepType, BasicDBObject parameters) {
+	public EquipletStep[] getEquipletSteps(int stepType, BasicDBObject parameters) {
 		//switch to determine which steps to make.
 		switch (stepType) {
 		case 1: //case to move to the safe movement plane.
 			//returns the steps for moving to the safe movement plane.
-			return new EquipletStepMessage[] { moveToSafePlane(parameters) };
+			return new EquipletStep[] { moveToSafePlane(parameters) };
 		case 2: //case to move on the x and y axis.
 			//returns the steps for the movement on the x and y axis.
-			return new EquipletStepMessage[] { moveXY(parameters) };
+			return new EquipletStep[] { moveXY(parameters) };
 		case 3: //case to move on the z axis
 			//returns the steps for the movement on the z axis.
-			return new EquipletStepMessage[] { moveZ(parameters) };
+			return new EquipletStep[] { moveZ(parameters) };
 		default:
 			break;
 		}
 		//if this module can't handle the stepType return no steps.
-		return new EquipletStepMessage[0];
+		return new EquipletStep[0];
 	}
 
 	/**
-	 * @see Module#fillPlaceHolders(EquipletStepMessage[], BasicDBObject)
+	 * @see Module#fillPlaceHolders(EquipletStep[], BasicDBObject)
 	 */
 	@Override
-	public EquipletStepMessage[] fillPlaceHolders(EquipletStepMessage[] steps, BasicDBObject parameters) {
+	public EquipletStep[] fillPlaceHolders(EquipletStep[] steps, BasicDBObject parameters) {
 		//get the new position parameters from the parameters
 		Position position = new Position((BasicDBObject) parameters.get("position"));
 		
 		//loop over the steps.
-		for (EquipletStepMessage step : steps) {
+		for (EquipletStep step : steps) {
 			//get the lookUpParameters and the payload and
 			//replace the placeholders with real data.
 			InstructionData instructionData = step.getInstructionData();
@@ -133,9 +133,9 @@ public class DeltaRobotModule extends Module {
 	/**
 	 * Function that builds the step for moving to the safe plane.
 	 * @param parameters The parameters to use by this step.
-	 * @return EquipletStepMessage to move to the safe plane.
+	 * @return EquipletStep to move to the safe plane.
 	 */
-	private EquipletStepMessage moveToSafePlane(BasicDBObject parameters) {
+	private EquipletStep moveToSafePlane(BasicDBObject parameters) {
 		//get the extraSize from the parameters(e.g. Size of the module on this module)
 		double extraSize = parameters.getDouble("extraSize");
 
@@ -145,17 +145,17 @@ public class DeltaRobotModule extends Module {
 		BasicDBObject payload = new BasicDBObject("z", extraSize + SAFE_MOVEMENT_PLANE);
 		//create the instruction data
 		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
-		//create an EquipletStepMessage and return it.
-		EquipletStepMessage step = new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(), new TimeData(4));
+		//create an EquipletStep and return it.
+		EquipletStep step = new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(), new TimeData(4));
 		return step;
 	}
 
 	/**
 	 * Function that builds the step for moving on the x and y axis.
 	 * @param parameters The parameters to use by this step. 
-	 * @return EquipletStepMessage to move on the x and y axis.
+	 * @return EquipletStep to move on the x and y axis.
 	 */
-	private EquipletStepMessage moveXY(BasicDBObject parameters) {
+	private EquipletStep moveXY(BasicDBObject parameters) {
 		//get the position parameters from the parameters.
 		Position position = new Position((BasicDBObject) parameters.get("position"));
 		
@@ -181,16 +181,16 @@ public class DeltaRobotModule extends Module {
 		}
 		//create the instruction data.
 		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
-		//create the EquipletStepMessage and return it.
-		return new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(), new TimeData(4));
+		//create the EquipletStep and return it.
+		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(), new TimeData(4));
 	}
 
 	/**
 	 * Function that builds the step for moving on the z axis.
 	 * @param parameters The parameters to use by this step.
-	 * @return EquipletStepMessage to move on the z axis.
+	 * @return EquipletStep to move on the z axis.
 	 */
-	private EquipletStepMessage moveZ(BasicDBObject parameters) {
+	private EquipletStep moveZ(BasicDBObject parameters) {
 		//get the position parameters from the parameters
 		Position position = new Position((BasicDBObject) parameters.get("position"));
 		
@@ -212,8 +212,8 @@ public class DeltaRobotModule extends Module {
 		
 		//create the instruction data.
 		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
-		//create the EquipletStepMessage and return it. 
-		return new EquipletStepMessage(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(), new TimeData(4));
+		//create the EquipletStep and return it. 
+		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(), new TimeData(4));
 	}
 
 }
