@@ -1,7 +1,7 @@
 /**
  * @file rexos/mas/service_agent/Service.java
- * @brief Instances of subclasses of this interface represent different services a certain equiplet can perform.
- *        Services translate product steps into service steps.
+ * @brief A service object represents a service an equiplet can perform. Services translate productSteps into
+ *        serviceSteps.
  * @date Created: 11 apr. 2013
  * 
  * @author Peter Bonnema
@@ -34,36 +34,78 @@ package rexos.mas.service_agent;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 
+import rexos.libraries.knowledgedb_client.KeyNotFoundException;
+import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
+import rexos.libraries.knowledgedb_client.KnowledgeException;
+import rexos.libraries.knowledgedb_client.Queries;
+import rexos.libraries.knowledgedb_client.Row;
+import rexos.libraries.log.Logger;
 import rexos.mas.data.Position;
 
 import com.mongodb.BasicDBObject;
 
 /**
- * Instances of subclasses of this interface represent different services a certain equiplet can perform. Services
- * translate product steps into service steps.
+ * A service object represents a service an equiplet can perform. Services translate productSteps into serviceSteps.
  * 
  * @author Peter Bonnema
  * 
  */
-public interface Service {
+public abstract class Service {
 	/**
-	 * This method determines which modules are needed to perform this service and returns an array containing the
-	 * module id's of those modules.
-	 * 
-	 * @param productStepType The type of the productStep that needs to be translated
-	 * @param parameters The parameters of the productStep.
-	 * @return An array of module id's of the modules needed to perform the service.
+	 * @var String NAME
+	 *      The name of the service. It should be the same as the one in the knowledge database.
 	 */
-	public int[] getModuleIds(int productStepType, BasicDBObject parameters);
+	private String NAME;
+
+	/**
+	 * @var int ID
+	 *      The id of the service. It should be the same as the one in the knowledge database.
+	 */
+	private int ID;
+
+	/**
+	 * Creates a new Service object with the specified name and id. Subclasses should supply a hard-coded name and id of
+	 * the service to this constructor instead of asking it from client code.
+	 * 
+	 * @param name the name of this service
+	 * @param id the id of this service
+	 */
+	protected Service(String name, int id) {
+		NAME = name;
+		ID = id;
+	}
+
+	/**
+	 * This method determines what kind of modules (module groups) are needed to perform this service and returns an
+	 * array containing the the id's of those modulegroups.
+	 * 
+	 * @param productStepType the type of the productStep that needs to be translated
+	 * @param parameters the parameters of the productStep.
+	 * @return an array of module id's of the modules needed to perform the service.
+	 */
+	public int[] getModuleGroupIds(int productStepType, BasicDBObject parameters) {
+		try {
+			KnowledgeDBClient client = KnowledgeDBClient.getClient();
+			Row[] moduleGroups = client.executeSelectQuery(Queries.MODULEGROUPS_REQUIRED_PER_SERVICE, NAME);
+			int[] moduleIds = new int[moduleGroups.length];
+			for(int i = 0; i < moduleGroups.length; i++) {
+				moduleIds[i] = (int) moduleGroups[i].get("module_id");
+			}
+			return moduleIds;
+		} catch(KnowledgeException | KeyNotFoundException e1) {
+			Logger.log(e1);
+		}
+		return null;
+	}
 
 	/**
 	 * This method translates the productStep into a single or multiple serviceSteps.
 	 * 
-	 * @param productStepType The type of the productStep to translate.
-	 * @param parameters The parameters of the productStep to use.
-	 * @return An array of ServiceStep each representing a serviceStep as a result of the translation.
+	 * @param productStepType the type of the productStep to translate.
+	 * @param parameters the parameters of the productStep to use.
+	 * @return an array of ServiceStep each representing a serviceStep as a result of the translation.
 	 */
-	public ServiceStep[] getServiceSteps(int productStepType, BasicDBObject parameters);
+	public abstract ServiceStep[] getServiceSteps(int productStepType, BasicDBObject parameters);
 
 	/**
 	 * Updates the parameters of the serviceSteps with new information contained in partParameters. partParameters
@@ -74,7 +116,7 @@ public interface Service {
 	 * @param serviceSteps the service steps to update.
 	 * @return the updated service steps.
 	 */
-	public ServiceStep[] updateParameters(HashMap<Integer, SimpleEntry<Integer,Position>> partParameters,
+	public abstract ServiceStep[] updateParameters(HashMap<Integer, SimpleEntry<Integer, Position>> partParameters,
 			ServiceStep[] serviceSteps);
 
 	/**
@@ -83,13 +125,17 @@ public interface Service {
 	 * 
 	 * @return the id of this service.
 	 */
-	public int getId();
+	public int getId() {
+		return ID;
+	}
 
 	/**
 	 * Implementations should return a clear name for this service analog to its function. It is intended for debugging
-	 * purposes. Internally services are identified by their Id and not by their name.
+	 * purposes. Internally services are identified by their id and not by their name.
 	 * 
 	 * @return the name of this service.
 	 */
-	public String getName();
+	public String getName() {
+		return NAME;
+	}
 }
