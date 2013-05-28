@@ -95,7 +95,7 @@ public class ProductStep implements MongoSaveable, Serializable {
 	private BasicDBObject parameters;
 
 	/**
-	 * @var Part[] inputParts
+	 * @var Part inputParts[]
 	 *      List of parts representing the input parts.
 	 */
 	private Part[] inputParts;

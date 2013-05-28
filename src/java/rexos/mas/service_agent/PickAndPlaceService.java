@@ -47,8 +47,6 @@
 package rexos.mas.service_agent;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 
 import rexos.libraries.knowledgedb_client.KeyNotFoundException;
 import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
@@ -63,89 +61,61 @@ import rexos.mas.equiplet_agent.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 
-public class PickAndPlaceService implements Service {
-	private KnowledgeDBClient client;
-	private static final int ID = 1;
-	private static final String NAME = "huniplacer pick&place";
-
+/**
+ * Instances of this class represent the pick & place service and is meant to pick up objects like a cube and put them
+ * somewhere else on the working field. It produces 2 service steps: "pick" and "place".
+ * 
+ * @author Peter Bonnema
+ * 
+ */
+public class PickAndPlaceService extends Service {
 	/**
-	 * @see rexos.mas.service_agent.Service#getModuleIds(int,
-	 *      com.mongodb.BasicDBObject)
+	 * Creates a new PickAndPlaceService object.
 	 */
-	@Override
-	public int[] getModuleIds(int productStepType, BasicDBObject parameters) {
-		try {
-			client = KnowledgeDBClient.getClient();
-			Row[] moduleGroups = client.executeSelectQuery(Queries.MODULEGROUPS_REQUIRED_PER_SERVICE, NAME);
-			int[] moduleIds = new int[moduleGroups.length];
-			for(int i = 0; i < moduleGroups.length; i++) {
-				moduleIds[i] = (int) moduleGroups[i].get("module_id");
-			}
-			return moduleIds;
-		} catch(KnowledgeException | KeyNotFoundException e1) {
-			Logger.log(e1);
-		}
-		return null;
+	public PickAndPlaceService() {
+		super("huniplacer pick&place", 1);
 	}
 
 	/**
-	 * @see rexos.mas.service_agent.Service#getServiceSteps(int,
-	 *      com.mongodb.BasicDBObject)
+	 * @see rexos.mas.service_agent.Service#getServiceSteps(int, com.mongodb.BasicDBObject)
 	 */
 	@Override
 	public ServiceStep[] getServiceSteps(int productStepType, BasicDBObject parameters) {
-		Part part = new Part((BasicDBObject)parameters.get("part"));
-		double inputPartSize = 0.5;// TODO: FROM KNOWLEDGE DB
+		Part part = new Part((BasicDBObject) parameters.get("part"));
+		double ballHeight = 0;
+		try {
+			KnowledgeDBClient client = KnowledgeDBClient.getClient();
+			Row[] partProperties = client.executeSelectQuery(Queries.PART_PROPERTY, part.getType(), "height");
+			ballHeight = Double.parseDouble((String) partProperties[0].get("value"));
+		} catch(KnowledgeException | KeyNotFoundException e) {
+			Logger.log(e);
+		}
 
 		BasicDBObject pickParameters = new BasicDBObject();
 		pickParameters.put("part", part.toBasicDBObject());
 		pickParameters.put("position", new Position().toBasicDBObject());
 
 		Position position = new Position((BasicDBObject) parameters.get("position"));
-		position.setZ(position.getZ() + inputPartSize);
+		position.setZ(position.getZ() + ballHeight);
 		BasicDBObject placeParameters = new BasicDBObject();
 		placeParameters.put("part", part.toBasicDBObject());
 		placeParameters.put("position", position.toBasicDBObject());
 
 		return new ServiceStep[] {
-				new ServiceStep(ID, 1, pickParameters, StepStatusCode.EVALUATING, null, new ScheduleData()),
-				// pick //TODO NOT HARDCODED ID.
-				new ServiceStep(ID, 2, placeParameters, StepStatusCode.EVALUATING, null, new ScheduleData())
-		// place //TODO NOT HARDCODE ID.
+				new ServiceStep(getId(), 1, pickParameters, StepStatusCode.EVALUATING, null, new ScheduleData()),
+				new ServiceStep(getId(), 2, placeParameters, StepStatusCode.EVALUATING, null, new ScheduleData())
 		};
 	}
 
-	/* (non-Javadoc)
-	 * @see rexos.mas.service_agent.Service#updateParameters(java.util.HashMap,
-	 * rexos.mas.service_agent.ServiceStep[]) */
+	/**
+	 * @see rexos.mas.service_agent.Service#updateParameters(java.util.HashMap, rexos.mas.service_agent.ServiceStep[])
+	 */
 	@Override
-	public ServiceStep[] updateParameters(HashMap<Part, Position> partParameters,
-			ServiceStep[] serviceSteps) {
+	public ServiceStep[] updateParameters(HashMap<Part, Position> partParameters, ServiceStep[] serviceSteps) {
 		BasicDBObject pickParameters = serviceSteps[0].getParameters();
-		int partType = new Part((BasicDBObject)pickParameters.get("part")).getType();
-		for(Entry<Part, Position> e : partParameters.entrySet()){
-			if(e.getKey().getType() == partType){
-				pickParameters.putAll((LinkedHashMap<String, Object>) 
-						new BasicDBObject("position", e.getValue().toBasicDBObject()));
-			}
-		}
+		Position ballPosition = partParameters.values().toArray(new Position[0])[0];
+		pickParameters.put("position", ballPosition.toBasicDBObject());
 		serviceSteps[0].setParameters(pickParameters);
 		return serviceSteps;
-	}
-
-	/**
-	 * @see rexos.mas.service_agent.Service#getId()
-	 */
-	@Override
-	public int getId() {
-		return ID;
-	}
-
-	/**
-	 * @see rexos.mas.service_agent.Service#getName()
-	 */
-	@Override
-	public String getName() {
-		return NAME;
 	}
 }

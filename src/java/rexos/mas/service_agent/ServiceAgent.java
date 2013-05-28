@@ -287,6 +287,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 							StepStatusCode status = productionStep.getStatus();
 							switch(status) {
 								case WAITING:
+									// TODO zet eerste serviceStep van productStep op waiting
+									break;
 								case ABORTED:
 									serviceStepBBClient.updateDocuments(
 											new BasicDBObject("productStepId", entry.getTargetObjectId()),
@@ -296,10 +298,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 								default:
 									break;
 							}
-							break;
-						case DELETE:
-							serviceStepBBClient.removeDocuments(new BasicDBObject("productStepId", entry
-									.getTargetObjectId()));
 							break;
 						default:
 							break;
@@ -314,14 +312,32 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 						case UPDATE:
 							StepStatusCode status = serviceStep.getStatus();
 							switch(status) {
-								case DELETED:
-									serviceStepBBClient.removeDocuments(new BasicDBObject("_id", entry
-											.getTargetObjectId()));
-									//$FALL-THROUGH$
-								case WAITING:
+								case DONE:
+									if(serviceStep.getNextStep() != null) {
+										serviceStepBBClient.updateDocuments(
+												new BasicDBObject("_id", serviceStep.getNextStep()), new BasicDBObject(
+														"$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));
+										break;
+									}
+
+									
+									BasicDBObject log = new BasicDBObject("step0", serviceStep.toBasicDBObject());
+									ObjectId currentStepId = serviceStep.getNextStep();
+									BasicDBObject currentStep;
+									int i = 1;
+									while(currentStepId != null) {
+										currentStep = (BasicDBObject) serviceStepBBClient.findDocumentById(currentStepId);
+										log.append("step" + i++, currentStep);
+										currentStepId = currentStep.getObjectId("nextStep");
+									}
+
+									productStepBBClient.updateDocuments(
+											new BasicDBObject("_id", productStepId),
+											new BasicDBObject("$set", new BasicDBObject("status", status).append(
+													"statusData", log)));
+									break;
 								case IN_PROGRESS:
 								case SUSPENDED_OR_WARNING:
-								case DONE:
 								case FAILED:
 									productStepBBClient.updateDocuments(
 											new BasicDBObject("_id", productStepId),

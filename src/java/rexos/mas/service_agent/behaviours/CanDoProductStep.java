@@ -123,7 +123,7 @@ public class CanDoProductStep extends ReceiveBehaviour {
 				msg.setConversationId(message.getConversationId());
 				msg.addReceiver(agent.getHardwareAgentAID());
 				msg.setOntology("CheckForModules");
-				msg.setContentObject(service.getModuleIds(stepType, parameters));
+				msg.setContentObject(service.getModuleGroupIds(stepType, parameters));
 				agent.send(msg);
 
 				agent.addBehaviour(new CheckForModulesResponse(agent));
