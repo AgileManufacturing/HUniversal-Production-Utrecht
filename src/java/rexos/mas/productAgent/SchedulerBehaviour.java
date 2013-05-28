@@ -37,20 +37,21 @@
  * 
  **/
 
-package java.rexos.mas.productAgent;
+package rexos.mas.productAgent;
 
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
-import java.rexos.mas.newDataClasses.Product;
-import java.rexos.mas.newDataClasses.Production;
-import java.rexos.mas.newDataClasses.ProductionStep;
+import rexos.mas.data.Product;
+import rexos.mas.data.Production;
+import rexos.mas.data.ProductionStep;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
+import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.log.Logger;
 
 import com.mongodb.DBObject;
 
@@ -105,7 +106,7 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 						.getEquipletsForProductionStep(PA_id).keySet(), ps);
 			}
 		} catch(Exception e){
-			e.printStackTrace();
+			Logger.log(e);
 		}
 	}
 

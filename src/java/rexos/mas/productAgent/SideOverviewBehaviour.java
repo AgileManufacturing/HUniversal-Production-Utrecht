@@ -1,5 +1,5 @@
 
-package java.rexos.mas.productAgent;
+package rexos.mas.productAgent;
 
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
@@ -8,7 +8,7 @@ import jade.lang.acl.ACLMessage;
 @SuppressWarnings("serial")
 public class SideOverviewBehaviour extends CyclicBehaviour{
 	ACLMessage msg;
-	ProductAgent _productAgent;
+	ProductAgent pa;
 
 	@SuppressWarnings("unused")
 	private class receiveMsgBehaviour extends CyclicBehaviour{
@@ -37,13 +37,22 @@ public class SideOverviewBehaviour extends CyclicBehaviour{
 		public void action(){
 			try{
 				switch(msg.getOntology()){
+				// the traveling time between equiplets
+				case "journey":
+					@SuppressWarnings("unused")
+					OneShotBehaviour waitingBehaviour = new OneShotBehaviour(){
+						@Override
+						public void action(){
+						}
+					};
+					break;
 				// reschedule the product
 				case "reschedule":
 					@SuppressWarnings("unused")
 					OneShotBehaviour reschedule = new OneShotBehaviour(){
 						@Override
 						public void action(){
-							_productAgent.reschedule();
+							pa.reschedule();
 						}
 					};
 					break;
@@ -54,7 +63,7 @@ public class SideOverviewBehaviour extends CyclicBehaviour{
 					OneShotBehaviour rescheduleAndRemoveEquiplet = new OneShotBehaviour(){
 						@Override
 						public void action(){
-							_productAgent.rescheduleAndRemoveEquiplet();
+							pa.rescheduleAndRemoveEquiplet();
 						}
 					};
 					break;

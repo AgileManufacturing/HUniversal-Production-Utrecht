@@ -37,10 +37,12 @@ import jade.lang.acl.MessageTemplate;
 import org.bson.types.ObjectId;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
-import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.equiplet_agent.ProductStep;
 
 import com.mongodb.BasicDBObject;
 
@@ -67,6 +69,10 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 	 *      The equipletAgent related to this behaviour.
 	 */
 	private EquipletAgent equipletAgent;
+	/**
+	 * @var BlackboardClient equipletBBClient
+	 * BlackboardClient for the product step blackboard.
+	 */
 	private BlackboardClient equipletBBClient;
 
 	/**
@@ -74,6 +80,8 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 	 * 
 	 * @param a
 	 *            - The agent for this behaviour
+	 * @param equipletBBClient
+	 * 		BlackboardClient for the product step blackboard.            
 	 */
 	public CanDoProductionStepResponse(Agent a,
 			BlackboardClient equipletBBClient) {
@@ -102,7 +110,7 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 			try {
 				// gets the productstep from the blackboard to get the
 				// productAgent out of it.
-				ProductStepMessage productStep = new ProductStepMessage(
+				ProductStep productStep = new ProductStep(
 						(BasicDBObject) equipletBBClient
 								.findDocumentById(productStepEntryId));
 				AID productAgent = productStep.getProductAgentId();
@@ -120,7 +128,7 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 							productStepEntryId));
 				}
 				myAgent.send(responseMessage);
-			} catch (Exception e) {
+			} catch (GeneralMongoException | InvalidDBNamespaceException e) {
 				// TODO: ERROR HANDLING
 				Logger.log(e);
 				myAgent.doDelete();

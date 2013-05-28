@@ -1,9 +1,10 @@
 /**
- * @file LogMessage.java
- * @brief Class in which the logging messages can be set and retrieved.
+ * @file ParameterGroup.java
+ * @brief Class where parameters can be added to a parametergroup and their
+ *        value can be set.
  * @date Created: 02-04-2013
  * 
- * @author Theodoor de Graaff
+ * @author Mike Schaap
  * 
  * @section LICENSE License: newBSD
  * 
@@ -37,86 +38,71 @@
  * 
  **/
 
-package java.rexos.mas.newDataClasses;
+package rexos.mas.data;
 
-public class LogMessage{
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
+
+public class ParameterGroup implements Serializable{
 	/**
-	 * @param id
-	 * @param time
-	 * @param message
-	 * @param state
+	 * 
 	 */
-	public LogMessage(String id, String time, String message, String state){
-		super();
-		this.id = id;
-		this.time = time;
-		this.message = message;
-		this.state = state;
+	private static final long serialVersionUID = 4985505923411671880L;
+	private String _name;
+	private HashMap<String, Parameter> _parameters;
+
+	public ParameterGroup(String name){
+		this._name = name;
+		this._parameters = new HashMap<>();
 	}
 
-	private String id;
-
-	/**
-	 * @return the id
-	 */
-	public String getId(){
-		return id;
+	public ParameterGroup(Parameter parameter, String name) throws Exception{
+		this(name);
+		this.add(parameter);
 	}
 
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	public void setId(String id){
-		this.id = id;
+	public ParameterGroup(Parameter[] parameters, String name) throws Exception{
+		this(name);
+		this.add(parameters);
 	}
 
-	/**
-	 * @return the time
-	 */
-	public String getTime(){
-		return time;
+	public String getName(){
+		return this._name;
 	}
 
-	/**
-	 * @param time
-	 *            the time to set
-	 */
-	public void setTime(String time){
-		this.time = time;
+	public void add(Parameter parameter) throws Exception{
+		if (parameter == null)
+			throw new Exception("Can't add a null parameter!");
+		this._parameters.put(parameter.getParamKey(), parameter);
 	}
 
-	/**
-	 * @return the message
-	 */
-	public String getMessage(){
-		return message;
+	public void add(Parameter[] parameters) throws Exception{
+		if (parameters == null)
+			throw new Exception("Can't add null parameters!");
+		for(Parameter p : parameters){
+			this.add(p);
+		}
 	}
 
-	/**
-	 * @param message
-	 *            the message to set
-	 */
-	public void setMessage(String message){
-		this.message = message;
+	public Parameter getParameter(String key){
+		return this._parameters.get(key);
 	}
 
-	/**
-	 * @return the state
-	 */
-	public String getState(){
-		return state;
+	public Parameter[] getParameters(){
+		Collection<Parameter> values = this._parameters.values();
+		return values.toArray(new Parameter[values.size()]);
 	}
 
-	/**
-	 * @param state
-	 *            the state to set
+	/*
+	 * Directly get for a parameter. No need to first retrieve the parameter
+	 * object
 	 */
-	public void setState(String state){
-		this.state = state;
+	public String getParameterValue(String key){
+		return this._parameters.get(key).getParamValue();
 	}
 
-	private String time;
-	private String message;
-	private String state;
+	public void setParameterValue(String key, String value) throws Exception{
+		this._parameters.put(key, new Parameter(key, value));
+	}
 }

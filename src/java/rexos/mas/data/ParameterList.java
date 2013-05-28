@@ -1,13 +1,13 @@
-﻿/**
- * @file OplogEntry.java
- * @brief Representation of a document in the oplog collection.
- * @date Created: 2012-04-04
+/**
+ * @file ParameterList.java
+ * @brief Class where parametergroups can be added and get.
+ * @date Created: 02-04-2013
  * 
- * @author Jan-Willem Willebrands
+ * @author Mike Schaap
  * 
  * @section LICENSE License: newBSD
  * 
- *          Copyright © 2012, HU University of Applied Sciences Utrecht. All
+ *          Copyright � 2012, HU University of Applied Sciences Utrecht. All
  *          rights reserved.
  * 
  *          Redistribution and use in source and binary forms, with or without
@@ -37,59 +37,30 @@
  * 
  **/
 
-package libraries.blackboardJavaClient.src.client;
+package rexos.mas.data;
 
-import org.bson.types.ObjectId;
+import java.io.Serializable;
+import java.util.HashMap;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
+public class ParameterList implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7394630866218200410L;
+	private HashMap<String, ParameterGroup> _parameterGroups;
 
-public class OplogEntry{
-	private static final String NAMESPACE_FIELD = "ns";
-	@SuppressWarnings("unused")
-	private static final String TIMESTAMP_FIELD = "ts";
-	private static final String OPERATION_FIELD = "op";
-	@SuppressWarnings("unused")
-	private static final String UID_FIELD = "h";
-	private static final String UPDATE_DOC_FIELD = "o";
-	private static final String UPDATE_CRITERIA_FIELD = "o2";
-	private DBObject oplogEntry;
-
-	public OplogEntry(DBObject oplogEntry){
-		this.oplogEntry = oplogEntry;
+	public ParameterList(){
+		this._parameterGroups = new HashMap<>();
 	}
 
-	public MongoOperation getOperation(){
-		Object obj = oplogEntry.get(OPERATION_FIELD);
-		return MongoOperation.get((String) obj);
+	public void AddParameterGroup(ParameterGroup parameterGroup)
+			throws Exception{
+		if (parameterGroup == null)
+			throw new Exception("ParameterGroup can't be null");
+		this._parameterGroups.put(parameterGroup.getName(), parameterGroup);
 	}
 
-	public String getNamespace(){
-		return oplogEntry.get(NAMESPACE_FIELD).toString();
-	}
-
-	public String getUpdateDocument(){
-		return oplogEntry.get(UPDATE_DOC_FIELD).toString();
-	}
-
-	public String getUpdateCriteria(){
-		return oplogEntry.get(UPDATE_CRITERIA_FIELD).toString();
-	}
-
-	@Override
-	public String toString(){
-		return oplogEntry.toString();
-	}
-
-	public ObjectId getTargetObjectId(){
-		Object targetObj = oplogEntry.get("o2");
-		if (targetObj == null){
-			targetObj = oplogEntry.get("o");
-		}
-		ObjectId id = null;
-		if (targetObj instanceof BasicDBObject){
-			id = ((BasicDBObject) targetObj).getObjectId("_id");
-		}
-		return id;
+	public ParameterGroup GetParameterGroup(String name){
+		return this._parameterGroups.get(name);
 	}
 }

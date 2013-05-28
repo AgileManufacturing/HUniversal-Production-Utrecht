@@ -35,13 +35,14 @@
  *         POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package java.rexos.mas.productAgent;
+package rexos.mas.productAgent;
 
-import java.rexos.mas.newDataClasses.Product;
-import java.rexos.mas.newDataClasses.Production;
-import java.rexos.mas.newDataClasses.ProductionEquipletMapper;
-import java.rexos.mas.newDataClasses.ProductionStep;
-import java.rexos.mas.newDataClasses.ProductionStepStatus;
+import rexos.libraries.log.Logger;
+import rexos.mas.data.Product;
+import rexos.mas.data.Production;
+import rexos.mas.data.ProductionEquipletMapper;
+import rexos.mas.data.ProductionStep;
+import rexos.mas.data.ProductionStepStatus;
 
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
@@ -115,7 +116,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 						_productAgent.setProduct(_product);
 						_isDone = true;
 					} catch(Exception e){
-						e.printStackTrace();
+						Logger.log(e);
 					}
 				} else{
 					System.out.println("Not done informing.");
@@ -186,7 +187,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 									+ _productionStep.getId());
 						}
 					} catch(Exception e){
-						e.printStackTrace();
+						Logger.log(e);
 					}
 				}
 			});
@@ -242,7 +243,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 																	.getId());
 										}
 									} catch(Exception e){
-										e.printStackTrace();
+										Logger.log(e);
 									}
 								}
 							});
@@ -257,7 +258,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 
 								@Override
 								public void handle(
-										@SuppressWarnings("hiding") ACLMessage msg){
+										ACLMessage msg){
 									if (msg == null){
 										if (debug){
 											System.out

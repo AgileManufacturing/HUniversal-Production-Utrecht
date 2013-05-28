@@ -1,13 +1,13 @@
-﻿/**
- * @file MongoOperation.java
- * @brief Enum representing the different CRUD operations in MongoDB.
- * @date Created: 2012-04-04
+/**
+ * @file Parameter.java
+ * @brief Class used to set and get the parameters
+ * @date Created: 02-04-2013
  * 
- * @author Jan-Willem Willebrands
+ * @author Mike Schaap
  * 
  * @section LICENSE License: newBSD
  * 
- *          Copyright © 2012, HU University of Applied Sciences Utrecht. All
+ *          Copyright � 2012, HU University of Applied Sciences Utrecht. All
  *          rights reserved.
  * 
  *          Redistribution and use in source and binary forms, with or without
@@ -37,26 +37,50 @@
  * 
  **/
 
-package libraries.blackboardJavaClient.src.client;
+package rexos.mas.data;
 
-public enum MongoOperation{
-	INSERT("i"), UPDATE("u"), NOOP("n"), DELETE("d");
-	private final String opCode;
+import java.io.Serializable;
 
-	private MongoOperation(String opCode){
-		this.opCode = opCode;
+public class Parameter implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7830428356814146610L;
+	private String _key;
+	private String _value;
+
+	public Parameter(String key) throws Exception{
+		if (key == null)
+			throw new Exception("Key can't be null");
+		this._key = key;
 	}
 
-	public String getOpCode(){
-		return opCode;
+	public Parameter(String key, String value) throws Exception{
+		this(key);
+		if (value == null)
+			throw new Exception("Value can't be null");
+		this._value = value;
 	}
 
-	public static MongoOperation get(String opCode){
-		for(MongoOperation op : values()){
-			if (op.opCode.equals(opCode)){
-				return op;
-			}
-		}
-		return null;
+	/**
+	 * @return the _key
+	 */
+	public String getParamKey(){
+		return _key;
+	}
+
+	/**
+	 * @return the _value
+	 */
+	public String getParamValue(){
+		return _value;
+	}
+
+	/**
+	 * @param _value
+	 *            the _value to set
+	 */
+	public void setParamValue(String value){
+		this._value = value;
 	}
 }

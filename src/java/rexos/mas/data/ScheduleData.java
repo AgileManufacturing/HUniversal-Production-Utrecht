@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/behaviours/ScheduleData.java
+ * @file rexos/mas/data/ScheduleData.java
  * @brief Data object for storing scheduling data.
  * @date Created: 11 apr. 2013
  *
@@ -95,7 +95,7 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	}
 
 	/**
-	 * @see newDataClasses.DBSaveable#toBasicDBObject()
+	 * @see data.DBSaveable#toBasicDBObject()
 	 **/
 	@Override
 	public BasicDBObject toBasicDBObject() {
@@ -106,7 +106,7 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	}
 
 	/**
-	 * @see newDataClasses.DBSaveable#fromBasicDBObject(com.mongodb.BasicDBObject)
+	 * @see data.DBSaveable#fromBasicDBObject(com.mongodb.BasicDBObject)
 	 **/
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {

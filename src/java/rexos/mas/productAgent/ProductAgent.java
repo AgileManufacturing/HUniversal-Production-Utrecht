@@ -38,16 +38,20 @@
  * 
  **/
 
-package java.rexos.mas.productAgent;
+package rexos.mas.productAgent;
 
-import java.rexos.mas.newDataClasses.Product;
-import java.rexos.mas.newDataClasses.ProductionStep;
+import java.net.UnknownHostException;
+
+import rexos.mas.data.Product;
+import rexos.mas.data.ProductionStep;
 
 import jade.core.AID;
 import jade.core.Agent;
-import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
-import libraries.blackboardJavaClient.src.nl.hu.client.InvalidDBNamespaceException;
-import libraries.blackboardJavaClient.src.nl.hu.client.InvalidJSONException;
+import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.blackboard_client.InvalidJSONException;
+import rexos.libraries.log.Logger;
 
 public class ProductAgent extends Agent{
 	private static final long serialVersionUID = 1L;
@@ -58,6 +62,7 @@ public class ProductAgent extends Agent{
 	private static int _convIDCnt = 0;
 	private String _convIDBase;
 	public int prodStep = 0;
+	private AID currentLocation;
 
 	@Override
 	protected void setup(){
@@ -102,12 +107,14 @@ public class ProductAgent extends Agent{
 	// within the Equiplet Agent its functionality
 	@SuppressWarnings("static-method")
 	public void removeEquiplet(AID aid){
+		try{
 		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
 		// try to remove the given 'aid' from the blackboard
-		try{
+		
 			bbc.removeDocuments(aid.toString());
-		} catch(InvalidJSONException | InvalidDBNamespaceException e){
-			e.printStackTrace();
+		} catch (UnknownHostException | GeneralMongoException | InvalidJSONException | InvalidDBNamespaceException e1) {
+			// TODO Auto-generated catch block
+			Logger.log(e1);
 		}
 	}
 
@@ -126,5 +133,19 @@ public class ProductAgent extends Agent{
 				System.out.println(aid.getLocalName());
 			}
 		}
+	}
+
+	/**
+	 * @return the currentLocation
+	 */
+	public AID getCurrentLocation(){
+		return currentLocation;
+	}
+
+	/**
+	 * @param currentLocation the currentLocation to set
+	 */
+	public void setCurrentLocation(AID currentLocation){
+		this.currentLocation = currentLocation;
 	}
 }

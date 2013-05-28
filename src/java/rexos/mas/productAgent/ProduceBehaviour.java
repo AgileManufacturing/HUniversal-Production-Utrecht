@@ -39,7 +39,7 @@
  * 
  **/
 
-package java.rexos.mas.productAgent;
+package rexos.mas.productAgent;
 
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
@@ -47,24 +47,24 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 
-import java.rexos.mas.newDataClasses.LogMessage;
-import java.rexos.mas.newDataClasses.Product;
-import java.rexos.mas.newDataClasses.Production;
-import java.rexos.mas.newDataClasses.ProductionEquipletMapper;
-import java.rexos.mas.newDataClasses.ProductionStep;
-import java.rexos.mas.newDataClasses.ProductionStepStatus;
+import rexos.mas.data.LogMessage;
+import rexos.mas.data.Product;
+import rexos.mas.data.Production;
+import rexos.mas.data.ProductionEquipletMapper;
+import rexos.mas.data.ProductionStep;
+import rexos.mas.data.ProductionStepStatus;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class ProduceBehaviour extends OneShotBehaviour{
 	private static final long serialVersionUID = 1L;
-	private Product _product;// TODO unused
 	private Production _production;
-	private ProductAgent _productAgent; // TODO unused
-	private ProductionEquipletMapper _prodEQMap; // TODO unused
-	private int currProdStep = 1;
+	private ProductionEquipletMapper _prodEQMap;
 	ProductionEquipletMapper s1;
 	ACLMessage msg;
+	private HashMap<AID, Long> currentEandT; 
 
 	@Override
 	public void action(){
@@ -95,14 +95,25 @@ class newProducing extends SequentialBehaviour{
 	public newProducing(HashMap<AID, Long> EqAndTs, ProductionStep productionStep){
 		this.EqAndTs = EqAndTs;
 		this.productionStep = productionStep;
+		
 	}
 
 	@Override
 	public void onStart(){
 		addSubBehaviour(new OneShotBehaviour(){
 			private static final long serialVersionUID = 1L;
+			private AID nEq;
 			@Override
 			public void action(){
+				
+				for(Entry<AID, Long> Eq: EqAndTs.entrySet()){
+					nEq = Eq.getKey();
+				}
+				ProductAgent pa = (ProductAgent)myAgent;
+				if(nEq != pa.getCurrentLocation()){
+					//TODO: Ask GUI to move
+				}
+				
 				myAgent.addBehaviour(new receiveMsgBehaviour(EqAndTs, productionStep));
 			}
 		});
@@ -149,7 +160,6 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 		_productAgent = (ProductAgent) myAgent;
 		SequentialBehaviour seq = new SequentialBehaviour();
 		myAgent.addBehaviour(seq);
-		@SuppressWarnings("hiding")
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setOntology("StartProduction");
 		
@@ -166,7 +176,7 @@ class producing extends OneShotBehaviour{
 	Product _product;
 	ProductAgent _productAgent;
 	ACLMessage msg;
-
+	
 	@Override
 	public void action(){
 		try{
@@ -199,6 +209,8 @@ class producing extends OneShotBehaviour{
 				 * null); // productionStepEnded(stp, msg.getContent, //
 				 * msg.getContent); } } } currProdStep++;
 				 */
+				_productAgent.setCurrentLocation(msg.getSender());
+				
 				break;
 			// For some reason production can't be started thus it has to be
 			// rescheduled.

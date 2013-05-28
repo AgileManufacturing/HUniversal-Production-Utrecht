@@ -1,7 +1,6 @@
 /**
- * @file rexos/mas/equiplet_agent/behaviours/InitialisationFinished.java
- * @brief Behaviour for handling the messages with the ontology
- *        InitialisationFinished
+ * @file rexos/mas/hardware_agent/behaviours/ServiceAgentDied.java
+ * @brief Behaviour for handling the messages with the ontology ServiceAgentDied
  * @date Created: 2013-04-02
  * 
  * @author Hessel Meulenbeld
@@ -45,21 +44,17 @@
  *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *          SUCH DAMAGE.
  **/
-package rexos.mas.equiplet_agent.behaviours;
+package rexos.mas.hardware_agent.behaviours;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import rexos.libraries.blackboard_client.BlackboardClient;
-import rexos.libraries.blackboard_client.GeneralMongoException;
-import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
-import rexos.mas.behaviours.ReceiveOnceBehaviour;
-import rexos.mas.equiplet_agent.EquipletAgent;
-import rexos.mas.equiplet_agent.EquipletDirectoryMessage;
+import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.hardware_agent.HardwareAgent;
 
-/** The Class InitialisationFinished. */
-public class InitialisationFinished extends ReceiveOnceBehaviour {
+/** The Class ServiceAgentDied. */
+public class ServiceAgentDied extends ReceiveBehaviour {
 	/**
 	 * @var static final long serialVersionUID
 	 *      The serial version UID for this class
@@ -69,84 +64,40 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 	/**
 	 * @var MessageTemplate messageTemplate
 	 *      The messageTemplate this behaviour listens to. This behaviour
-	 *      listens to the ontology: InitialisationFinished.
+	 *      listens to the ontology: ServiceAgentDied.
 	 */
 	private static MessageTemplate messageTemplate = MessageTemplate
-			.MatchOntology("InitialisationFinished");
+			.MatchOntology("ServiceAgentDied");
 
 	/**
-	 * @var EquipletAgent equipletAgent
+	 * @var HardwareAgent hardwareAgent
 	 *      The equipletAgent related to this behaviour.
 	 */
-	private EquipletAgent equipletAgent;
+	private HardwareAgent hardwareAgent;
 
 	/**
-	 * @var BlackboardClient collectiveBBClient
-	 *      BlackboardClient for the collective blackboard.
-	 */
-	private BlackboardClient collectiveBBClient;
-
-	/**
-	 * Instantiates a new can perform step.
+	 * Instantiates a new service agent died.
 	 * 
 	 * @param a
 	 *            The agent for this behaviour
-	 * @param collectiveBBClient
-	 *      BlackboardClient for the collective blackboard.
 	 */
-	public InitialisationFinished(Agent a, BlackboardClient collectiveBBClient) {
-		super(a, 2000, messageTemplate);
-		equipletAgent = (EquipletAgent) a;
-		this.collectiveBBClient = collectiveBBClient;
+	public ServiceAgentDied(Agent a) {
+		super(a, messageTemplate);
+		hardwareAgent = (HardwareAgent) a;
 	}
 
 	/**
 	 * Function to handle the incoming messages for this behaviour. Handles the
-	 * response to the InitialisationFinished.
+	 * response when the service agent dies.
 	 * 
 	 * @param message
 	 *            The received message.
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		if (message != null) {
-			Logger.log("%s received message from %s%n", myAgent.getLocalName(),
-					message.getSender().getLocalName(), message.getOntology());
-
-			// inserts himself on the collective blackboard equiplet directory.
-			EquipletDirectoryMessage entry = new EquipletDirectoryMessage(
-					equipletAgent.getAID(), equipletAgent.getCapabilities(),
-					equipletAgent.getDbData());
-			try {
-				collectiveBBClient.insertDocument(entry.toBasicDBObject());
-			} catch (InvalidDBNamespaceException | GeneralMongoException e) {
-				Logger.log(e);
-				equipletAgent.doDelete();
-			}
-
-			// starts the behaviour for receiving messages with the Ontology
-			// CanPerformStep.
-			equipletAgent.addBehaviour(new CanPerformStep(equipletAgent,
-					equipletAgent.getEquipletBBClient()));
-
-			// starts the behaviour for receiving messages with the Ontology
-			// GetProductionDuration.
-			equipletAgent
-					.addBehaviour(new GetProductionDuration(equipletAgent));
-
-			// starts the behaviour for receiving messages with the Ontology
-			// ScheduleStep.
-			equipletAgent.addBehaviour(new ScheduleStep(equipletAgent));
-
-			// starts the behaviour for receiving messages with the Ontology
-			// StartStep.
-			equipletAgent.addBehaviour(new StartStep(equipletAgent,
-					equipletAgent.getEquipletBBClient()));
-		} else {
-			// TODO handle timeout
-			Logger.log(equipletAgent.getName()
-					+ " - InitialisationFinished timeout!");
-			equipletAgent.doDelete();
-		}
+		Logger.log("%s received message from %s (%s)%n",
+				myAgent.getLocalName(), message.getSender().getLocalName(),
+				message.getOntology());
+		hardwareAgent.doDelete();
 	}
 }

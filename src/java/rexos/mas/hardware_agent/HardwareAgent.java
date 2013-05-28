@@ -53,6 +53,7 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,6 +66,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
+import rexos.libraries.knowledgedb_client.KeyNotFoundException;
 import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
 import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
@@ -75,7 +77,8 @@ import rexos.mas.equiplet_agent.StepStatusCode;
 import rexos.mas.hardware_agent.behaviours.CheckForModules;
 import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
 import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
-import rexos.mas.service_agent.ServiceStepMessage;
+import rexos.mas.hardware_agent.behaviours.ServiceAgentDied;
+import rexos.mas.service_agent.ServiceStep;
 
 import com.mongodb.BasicDBObject;
 
@@ -93,44 +96,44 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	 * @var BlackboardClient serviceStepBBClient
 	 * The blackboard client for the serviceStep blackboard.
 	 */
-	private BlackboardClient serviceStepBBClient; 
-	
+	private BlackboardClient serviceStepBBClient;
+
 	/**
 	 * @var BlackboardClient equipletStepBBClient
 	 * The blackboard client for the equipletStep blackboard
 	 */
 	private BlackboardClient equipletStepBBClient;
-	
+
 	/**
 	 * @var DbData dbData
 	 * The DbData of this equiplet.
 	 */
 	private DbData dbData;
-	
+
 	/**
 	 * @var HashMap<Integer, Integer> leadingModules
 	 * A HashMap containing the leadingModules per step.
 	 */
 	private HashMap<Integer, Integer> leadingModules;
-	
+
 	/**
 	 * @var ModuleFactory moduleFactory
 	 * The moduleFactory of this agent.
 	 */
 	private ModuleFactory moduleFactory;
-	
+
 	/**
 	 * @var AID equipletAgentAID
 	 * The AID of the equipletAgent.
 	 */
 	private AID equipletAgentAID;
-	
+
 	/**
 	 * @var AID serviceAgentAID
 	 * The AID of the serviceAgent.
 	 */
 	private AID serviceAgentAID;
-	
+
 	/**
 	 * @var HashMap<Integer, Object> configuration
 	 * The configuration of this agent.
@@ -198,11 +201,11 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			equipletStepBBClient.setDatabase(dbData.getName());
 			equipletStepBBClient.setCollection("EquipletStepsBlackBoard");
 			equipletStepBBClient.subscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
-		} catch (Exception e) {
+		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException e) {
 			Logger.log(e);
 			doDelete();
 		}
-		
+
 		//Start the behaviours
 		EvaluateDuration evaluateDurationBehaviour = new EvaluateDuration(this, moduleFactory);
 		addBehaviour(evaluateDurationBehaviour);
@@ -212,29 +215,28 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 
 		CheckForModules checkForModules = new CheckForModules(this);
 		addBehaviour(checkForModules);
+		
+		ServiceAgentDied serviceAgentDied = new ServiceAgentDied(this);
+		addBehaviour(serviceAgentDied);
 
 		//Register modules
-		KnowledgeDBClient client;
 		try {
-			client = KnowledgeDBClient.getClient();
-
+			KnowledgeDBClient client = KnowledgeDBClient.getClient();
 			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgentAID.getLocalName());
+			Module module;
+			int id;
 			for (Row row : rows) {
-				try {
-					int id = (int) row.get("module");
-					Module module = moduleFactory.getModuleById(id);
-					for (int step : module.isLeadingForSteps()) {
-						registerLeadingModule(step, id);
-					}
-				} catch (Exception e) {
-					/* the row has no module */
+				id = (int) row.get("module");
+				module = moduleFactory.getModuleById(id);
+				for (int step : module.isLeadingForSteps()) {
+					registerLeadingModule(step, id);
 				}
 			}
-		} catch (KnowledgeException e1) {
-			doDelete();
+		} catch (KnowledgeException | KeyNotFoundException e1) {
 			Logger.log(e1);
+			doDelete();
 		}
-		
+
 		//Send a message to the serviceAgent that the hardware agent is ready.
 		ACLMessage startedMessage = new ACLMessage(ACLMessage.INFORM);
 		startedMessage.addReceiver(serviceAgentAID);
@@ -306,15 +308,18 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			switch (operation) {
 			case UPDATE:
 				try {
-					EquipletStepMessage equipletStep = new EquipletStepMessage((BasicDBObject) equipletStepBBClient.findDocumentById(entry.getTargetObjectId()));
-					ServiceStepMessage serviceStep = new ServiceStepMessage((BasicDBObject) serviceStepBBClient.findDocumentById(equipletStep.getServiceStepID()));
+					EquipletStep equipletStep = new EquipletStep((BasicDBObject) equipletStepBBClient.findDocumentById(entry.getTargetObjectId()));
+					ServiceStep serviceStep = new ServiceStep((BasicDBObject) serviceStepBBClient.findDocumentById(equipletStep.getServiceStepID()));
 					BasicDBObject searchQuery = new BasicDBObject("_id", serviceStep.getId());
 					StepStatusCode status = equipletStep.getStatus();
-					switch(status){
-					case IN_PROGRESS: case SUSPENDED_OR_WARNING: case DONE:
-					case ABORTED: case FAILED:
+					switch (status) {
+					case IN_PROGRESS:
+					case SUSPENDED_OR_WARNING:
+					case DONE:
+					case ABORTED:
+					case FAILED:
 						BasicDBObject statusData = serviceStep.getStatusData();
-						statusData.putAll((Map<String, Object>)equipletStep.getStatusData());
+						statusData.putAll((Map<String, Object>) equipletStep.getStatusData());
 						BasicDBObject updateQuery = new BasicDBObject("$set", new BasicDBObject("status", status).append("statusData", statusData));
 						serviceStepBBClient.updateDocuments(searchQuery, updateQuery);
 						break;

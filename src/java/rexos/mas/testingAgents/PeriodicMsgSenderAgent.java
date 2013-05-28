@@ -41,7 +41,7 @@
  * 
  **/
 
-package java.rexos.mas.testingAgents;
+package rexos.mas.testingAgents;
 
 import jade.core.AID;
 import jade.core.Agent;

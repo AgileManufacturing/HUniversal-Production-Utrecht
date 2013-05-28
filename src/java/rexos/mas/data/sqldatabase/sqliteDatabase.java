@@ -1,10 +1,10 @@
 /**
- * @file ParameterGroup.java
- * @brief Class where parameters can be added to a parametergroup and their
- *        value can be set.
+ * @file sqliteDatabase.java
+ * @brief Class in which an SQLite database is created and items can be inserted
+ *        into it.
  * @date Created: 02-04-2013
  * 
- * @author Mike Schaap
+ * @author Theodoor de Graaff
  * 
  * @section LICENSE License: newBSD
  * 
@@ -38,71 +38,69 @@
  * 
  **/
 
-package java.rexos.mas.newDataClasses;
+package rexos.mas.data.sqldatabase;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
+import rexos.mas.data.LogMessage;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
 
-public class ParameterGroup implements Serializable{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4985505923411671880L;
-	private String _name;
-	private HashMap<String, Parameter> _parameters;
+public class sqliteDatabase{
+	static final String JDBC_DRIVER = "org.sqlite.JDBC";
+	static final String DB_URL = "jdbc:sqlite:";
+	String DB_FILE = "default.sqlite";
+	// Database credentials
+	static final String USER = "username";
+	static final String PASS = "password";
+	Connection conn = null;
+	Statement stmt = null;
 
-	public ParameterGroup(String name){
-		this._name = name;
-		this._parameters = new HashMap<>();
-	}
-
-	public ParameterGroup(Parameter parameter, String name) throws Exception{
-		this(name);
-		this.add(parameter);
-	}
-
-	public ParameterGroup(Parameter[] parameters, String name) throws Exception{
-		this(name);
-		this.add(parameters);
-	}
-
-	public String getName(){
-		return this._name;
-	}
-
-	public void add(Parameter parameter) throws Exception{
-		if (parameter == null)
-			throw new Exception("Can't add a null parameter!");
-		this._parameters.put(parameter.getParamKey(), parameter);
-	}
-
-	public void add(Parameter[] parameters) throws Exception{
-		if (parameters == null)
-			throw new Exception("Can't add null parameters!");
-		for(Parameter p : parameters){
-			this.add(p);
+	public sqliteDatabase(String filename){
+		if (filename != null){
+			DB_FILE = filename;
+		}
+		try{
+			Driver d = (Driver) Class.forName(JDBC_DRIVER).newInstance();
+			DriverManager.registerDriver(d);
+		} catch(Exception e){
+			System.out
+					.println("Error loading database driver: " + e.toString());
+			return;
+		}
+		try{
+			conn = DriverManager.getConnection(DB_URL + DB_FILE, USER, PASS);
+			try(PreparedStatement create = conn
+					.prepareStatement("CREATE TABLE IF NOT EXISTS log (id INT, time VARCHAR(30), state VARCHAR(30), message VARCHAR(250))")){
+				create.execute();
+			}
+		} catch(SQLException e){
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
-	public Parameter getParameter(String key){
-		return this._parameters.get(key);
-	}
-
-	public Parameter[] getParameters(){
-		Collection<Parameter> values = this._parameters.values();
-		return values.toArray(new Parameter[values.size()]);
-	}
-
-	/*
-	 * Directly get for a parameter. No need to first retrieve the parameter
-	 * object
+	/**
+	 * @param msg
 	 */
-	public String getParameterValue(String key){
-		return this._parameters.get(key).getParamValue();
-	}
-
-	public void setParameterValue(String key, String value) throws Exception{
-		this._parameters.put(key, new Parameter(key, value));
+	public void insert(List<LogMessage> msgs){
+		try{
+			try(PreparedStatement insert = conn
+					.prepareStatement("INSERT INTO LOG (id, time, state, message) VALUES (?, ?, ?, ?)")){
+				for(LogMessage msg : msgs){
+					insert.setString(1, msg.getId());
+					insert.setString(2, msg.getTime());
+					insert.setString(3, msg.getState());
+					insert.setString(4, msg.getMessage());
+					insert.execute();
+				}
+			}
+		} catch(SQLException e){
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

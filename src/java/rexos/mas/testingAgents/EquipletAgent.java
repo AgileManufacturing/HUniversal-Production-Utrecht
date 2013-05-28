@@ -35,7 +35,7 @@
  *         POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package java.rexos.mas.testingAgents;
+package rexos.mas.testingAgents;
 
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -44,7 +44,7 @@ import jade.core.behaviours.ParallelBehaviour;
 import jade.core.behaviours.WakerBehaviour;
 import jade.lang.acl.ACLMessage;
 
-import java.rexos.mas.newDataClasses.ProductionStep;
+import rexos.mas.data.ProductionStep;
 import java.util.Random;
 
 @SuppressWarnings("serial")

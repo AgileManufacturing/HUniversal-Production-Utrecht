@@ -39,22 +39,26 @@
  * 
  **/
 
-package java.rexos.mas.productAgent;
+package rexos.mas.productAgent;
 
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 
-import java.rexos.mas.newDataClasses.Product;
-import java.rexos.mas.newDataClasses.Production;
-import java.rexos.mas.newDataClasses.ProductionEquipletMapper;
-import java.rexos.mas.newDataClasses.ProductionStep;
-import java.rexos.mas.newDataClasses.ProductionStepStatus;
+import rexos.mas.data.Product;
+import rexos.mas.data.Production;
+import rexos.mas.data.ProductionEquipletMapper;
+import rexos.mas.data.ProductionStep;
+import rexos.mas.data.ProductionStepStatus;
+
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import libraries.blackboardJavaClient.src.nl.hu.client.BlackboardClient;
-import libraries.blackboardJavaClient.src.nl.hu.client.InvalidDBNamespaceException;
-import libraries.blackboardJavaClient.src.nl.hu.client.InvalidJSONException;
+import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.blackboard_client.InvalidJSONException;
+import rexos.libraries.log.Logger;
 
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
@@ -72,14 +76,16 @@ public class PlannerBehaviour extends OneShotBehaviour{
 	}
 
 	public static void removeEquiplet(AID aid){
+		try{
 		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
 		// try to remove the given 'aid' from the blackboard (for testing
 		// purposes only, this funtion will later be called upon from the
 		// Equiplet agent code)
-		try{
+		
 			bbc.removeDocuments(aid.toString());
-		} catch(InvalidJSONException | InvalidDBNamespaceException e){
-			e.printStackTrace();
+		} catch (UnknownHostException | GeneralMongoException | InvalidJSONException | InvalidDBNamespaceException e1) {
+			// TODO Auto-generated catch block
+			Logger.log(e1);
 		}
 	}
 
