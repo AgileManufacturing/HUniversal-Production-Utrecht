@@ -47,14 +47,20 @@ public class ProductLog{
 	private boolean writeToRemote = false;
 	private boolean writeToLocal = true;
 	private sqliteDatabase local;
-
-public class ProductLog {
-
-	private boolean writeToRemote;
-	private boolean writeToLocal = true; 
-	
-	private sqliteDatabase local;
 	//private RemoteDatabaseConnection remote;
+	
+	/**
+	 * @param writeToRemote
+	 * @param writeToLocal
+	 * @param local
+	 */
+	 public ProductLog(boolean writeToRemote, boolean writeToLocal,
+			sqliteDatabase local){
+		super();
+		this.writeToRemote = writeToRemote;
+		this.writeToLocal = writeToLocal;
+		this.local = local;
+	}
 	
 	public void add(List<LogMessage> msgs){
 		if (writeToLocal){
@@ -63,19 +69,6 @@ public class ProductLog {
 		if (writeToRemote){
 			// remote.insert()
 		}
-	}
-
-	/**
-	 * @param writeToRemote
-	 * @param writeToLocal
-	 * @param local
-	 */
-	public ProductLog(boolean writeToRemote, boolean writeToLocal,
-			sqliteDatabase local){
-		super();
-		this.writeToRemote = writeToRemote;
-		this.writeToLocal = writeToLocal;
-		this.local = local;
 	}
 
 	public void pushLocalToRemote(){
