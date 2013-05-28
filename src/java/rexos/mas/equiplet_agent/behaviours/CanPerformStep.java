@@ -63,7 +63,7 @@ import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.EquipletAgent;
-import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.equiplet_agent.ProductStep;
 import rexos.mas.equiplet_agent.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
@@ -134,7 +134,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 			Integer[] inputParts = { 1, 2 };
 			// TODO: get outputPart
 			int outputPart = -1;
-			ProductStepMessage entry = new ProductStepMessage(
+			ProductStep entry = new ProductStep(
 					message.getSender(), productStep.getCapability(),
 					productStep.getParameters(), inputParts, outputPart,
 					StepStatusCode.EVALUATING, new BasicDBObject(),

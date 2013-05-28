@@ -29,6 +29,8 @@
  **/
 package rexos.mas.equiplet_agent.behaviours;
 
+import java.io.IOException;
+
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -94,7 +96,7 @@ public class GetProductionDuration extends ReceiveBehaviour {
 			
 			ProductionDurationResponse productionDurationResponseBehaviour = new ProductionDurationResponse(myAgent, equipletAgent.getEquipletBBClient());
 			myAgent.addBehaviour(productionDurationResponseBehaviour);
-		} catch (Exception e) {
+		} catch (IOException e) {
 			// TODO: ERROR HANDLING
 			Logger.log(e);
 			myAgent.doDelete();

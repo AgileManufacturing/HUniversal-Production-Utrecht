@@ -1,6 +1,6 @@
 /**
  * @file rexos/mas/service_agent/ServiceFactory.java
- * @brief 
+ * @brief Helper class for creating Service objects based on knowledgebase data.
  * @date Created: 12 apr. 2013
  *
  * @author Jan-Willem Willebrands
@@ -43,19 +43,42 @@ import rexos.libraries.knowledgedb_client.Row;
 import rexos.libraries.log.Logger;
 
 /**
- * 
+ * Helper class for creating Service objects based on knowledgebase data.
  **/
 public class ServiceFactory {
+	/**
+	 * @var DynamicClassFactory<Service> factory
+	 * The DynamicClassFactory used to instantiate Services.
+	 */
 	private DynamicClassFactory<Service>factory;
+	
+	/**
+	 * Hashtable<Long, Service> serviceCache
+	 * A cache of instantiated services. This cache stores the latest instantiated version of a Service.
+	 */
 	private Hashtable<Long, Service> serviceCache;
+	
+	/**
+	 * @var String equipletAID
+	 * The AID of the equiplet that will be used to determine which services are available.
+	 */
 	private String equipletAID;
 	
+	/**
+	 * Constructs a new ServiceFactory for the given equiplet.
+	 * @param equipletAID AID of the equiplet.
+	 */
 	public ServiceFactory(String equipletAID) {
 		this.equipletAID = equipletAID;
 		serviceCache = new Hashtable<Long, Service>();
 		this.factory = new DynamicClassFactory<Service>(Service.class);
 	}
 	
+	/**
+	 * Returns a Service object for the given serviceID.
+	 * @param serviceID The serviceID for which software should be loaded.
+	 * @return The Service object for the given serviceID.
+	 */
 	private Service	getServiceByServiceID(int serviceID) {
 		Service service = null;
 		try {
@@ -79,6 +102,11 @@ public class ServiceFactory {
 		return service;
 	}
 	
+	/**
+	 * Returns an array of Service objects for the services that are capable of processing the given product step.
+	 * @param stepType The type of the product step.
+	 * @return An array of Service objects capable of processing the given product step.
+	 */
 	public Service[] getServicesForStep(int stepType) {
 		ArrayList<Service> servicesForStep = new ArrayList<Service>();
 		try {

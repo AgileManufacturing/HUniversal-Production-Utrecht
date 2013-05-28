@@ -32,6 +32,7 @@ package rexos.mas.hardware_agent;
  **/
 
 import rexos.mas.data.MongoSaveable;
+
 import com.mongodb.BasicDBObject;
 
 /**
@@ -44,7 +45,7 @@ public class InstructionData implements MongoSaveable {
 	 */
 	private String command;
 	/**
-	 * @var String destionation
+	 * @var String destination
 	 * The destination of the instruction.(which module performs the instruction)
 	 */
 	private String destination;

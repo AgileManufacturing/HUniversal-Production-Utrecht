@@ -1,6 +1,6 @@
 /**
  * @file rexos/mas/logistics_agent/behaviours/GetPartsInfo.java
- * @brief 
+ * @brief Responds to GetPartsInfo messages, returning a mapping of part id to type and position.
  * @date Created: 22 apr. 2013
  *
  * @author Peter Bonnema
@@ -36,29 +36,40 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
-
+import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
+import rexos.libraries.knowledgedb_client.KnowledgeException;
+import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.data.Position;
-import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.equiplet_agent.ProductStep;
 
 /**
- * @author Peter
- * 
+ * Responds to GetPartsInfo messages, returning a mapping of part id to type and position.
  */
 public class GetPartsInfo extends ReceiveOnceBehaviour {
+	/**
+	 * @var long serialVersionUID
+	 *      The serialVersionUID for this class.
+	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @param a
+	 * Constructs the behaviour for the given agent.
+	 * @param a The agent associated with this behaviour.
+	 * @param conversationId The conversationId that should be used for this behaviour.
 	 */
 	public GetPartsInfo(Agent a, String conversationId) {
 		this(a, 2000, conversationId);
 	}
 
 	/**
-	 * @param a
+	 * Constructs the behaviour for the given agent.
+	 * @param a The agent associated with this behaviour.
+	 * @param millis Timeout in milliseconds.
+	 * @param conversationId The conversationId that should be used for this behaviour.
 	 */
 	public GetPartsInfo(Agent a, int millis, String conversationId) {
 		super(a, millis, MessageTemplate.and(
@@ -66,31 +77,36 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 				MessageTemplate.MatchConversationId(conversationId)));
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Handles GetPartsInfo messages and responds with a GetPartsInfoResponse.
 	 * 
-	 * @see
-	 * rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage)
+	 * @see rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage)
 	 */
 	@Override
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
 				Logger.log("%s GetPartsInfo%n", myAgent.getLocalName());
-				Integer[] partIds = ((ProductStepMessage) message.getContentObject()).getInputPartTypes();
-				HashMap<Integer, Position> partsParameters = new HashMap<Integer, Position>();
-
-				int x = 0;
-				for (int partId : partIds) {
-					partsParameters.put(partId, new Position(x++, 1, 3));
+				Integer[] partTypes = ((ProductStep) message.getContentObject()).getInputPartTypes();				
+				HashMap<Integer, SimpleEntry<Integer, Position>> partParameters = new HashMap<Integer, SimpleEntry<Integer, Position>>();
+				int x = 2;
+				int id = 1;
+				for (int partType : partTypes) {
+					partParameters.put(id++, new SimpleEntry<Integer, Position>(partType, new Position(x++, 1, 3)));
 				}
 
+				KnowledgeDBClient client = KnowledgeDBClient.getClient();
+				int outputPartType = client.executeUpdateQuery(Queries.INSERT_PART_TYPE, new Object[]{"OutputPart", partTypes.toString()});
+				int outputPartId = client.executeUpdateQuery(Queries.INSERT_PART, new Object[]{outputPartType});
+				
+				partParameters.put(outputPartId, new SimpleEntry<Integer, Position>(outputPartType, null));
+				
 				ACLMessage reply = message.createReply();
 				reply.setPerformative(ACLMessage.INFORM);
 				reply.setOntology("GetPartsInfoResponse");
-				reply.setContentObject(partsParameters);
+				reply.setContentObject(partParameters);
 				myAgent.send(reply);
-			} catch (UnreadableException | IOException e) {
+			} catch (UnreadableException | IOException | KnowledgeException e) {
 				Logger.log(e);
 				myAgent.doDelete();
 			}

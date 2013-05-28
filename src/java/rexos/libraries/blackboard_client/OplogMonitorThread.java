@@ -51,7 +51,7 @@ class OplogMonitorThread extends Thread {
 	private DBCursor tailedCursor;
 	
 	/**
-	 * @var HashMap<BlackboardSubscription> subscriptions
+	 * @var BlackboardSubscription subscriptions[]
 	 * Link between subscribed topic name and MongoDbs BasicDBObjects
 	 **/
 	private BlackboardSubscription[] subscriptions;

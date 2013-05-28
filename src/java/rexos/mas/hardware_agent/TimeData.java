@@ -34,7 +34,7 @@ import rexos.mas.data.MongoSaveable;
 import com.mongodb.BasicDBObject;
 
 /**
- * TimeData class containing the time data of an EquipletStepMessage.
+ * TimeData class containing the time data of an EquipletStep.
  */
 public class TimeData implements MongoSaveable {
 	

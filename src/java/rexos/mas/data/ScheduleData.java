@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/behaviours/ScheduleData.java
+ * @file rexos/mas/data/ScheduleData.java
  * @brief Data object for storing scheduling data.
  * @date Created: 11 apr. 2013
  *

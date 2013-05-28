@@ -1,6 +1,6 @@
 /**
  * @file rexos/mas/logistics_agent/behaviours/ArePartsAvailable.java
- * @brief 
+ * @brief Responds to questions whether or not a specific part is available.
  * @date Created: 20 apr. 2013
  *
  * @author Peter Bonnema
@@ -36,24 +36,27 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
-import rexos.mas.equiplet_agent.ProductStepMessage;
+import rexos.mas.equiplet_agent.ProductStep;
 
 /**
- * @author Peter
- * 
+ * Responds to questions whether or not a specific part is available.
  */
 public class ArePartsAvailable extends ReceiveBehaviour {
+	/**
+	 * @var long serialVersionUID
+	 *      The serialVersionUID for this class.
+	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @param a
+	 * Constructs the behaviour for the given agent.
+	 * @param a The agent associated with this behaviour.
 	 */
 	public ArePartsAvailable(Agent a) {
 		super(a, MessageTemplate.MatchOntology("ArePartsAvailable"));
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
 	 * 
 	 * @see
 	 * rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage)
@@ -63,7 +66,7 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 		try {
 			Logger.log("%s ArePartsAvailable%n", myAgent.getLocalName());
 			
-			Integer[] parts = ((ProductStepMessage) message.getContentObject()).getInputPartTypes();
+			Integer[] parts = ((ProductStep) message.getContentObject()).getInputPartTypes();
 			ACLMessage reply = message.createReply();
 			reply.setOntology("ArePartsAvailableResponse");
 			//TODO determine actual part availability
@@ -71,7 +74,7 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 			myAgent.send(reply);
 
 			myAgent.addBehaviour(new ArePartsAvailableInTime(myAgent, message.getConversationId()));
-			Logger.log("Parts: { %s } are available%n", (Object[]) parts);
+			Logger.log("PartTypes { %s } are available%n", (Object[]) parts);
 		} catch (UnreadableException e) {
 			Logger.log(e);
 			myAgent.doDelete();

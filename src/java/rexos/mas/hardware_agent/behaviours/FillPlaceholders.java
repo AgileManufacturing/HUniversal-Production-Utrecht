@@ -63,11 +63,11 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
-import rexos.mas.hardware_agent.EquipletStepMessage;
+import rexos.mas.hardware_agent.EquipletStep;
 import rexos.mas.hardware_agent.HardwareAgent;
 import rexos.mas.hardware_agent.Module;
 import rexos.mas.hardware_agent.ModuleFactory;
-import rexos.mas.service_agent.ServiceStepMessage;
+import rexos.mas.service_agent.ServiceStep;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -134,15 +134,15 @@ public class FillPlaceholders extends ReceiveBehaviour {
 	public void FillStepPlaceholders(ObjectId serviceStepId){
 		try {
 			//Get the serviceStep
-			ServiceStepMessage serviceStep = new ServiceStepMessage(
+			ServiceStep serviceStep = new ServiceStep(
 					(BasicDBObject) hardwareAgent.getServiceStepsBBClient().findDocumentById(serviceStepId));
 			BlackboardClient equipletStepBBClient = hardwareAgent.getEquipletStepsBBClient();
 			BasicDBObject query = new BasicDBObject("serviceStepID", serviceStep.getId());
 			//Get the equipletSteps
 			List<DBObject> steps = equipletStepBBClient.findDocuments(query);
-			EquipletStepMessage[] equipletSteps = new EquipletStepMessage[steps.size()];
+			EquipletStep[] equipletSteps = new EquipletStep[steps.size()];
 			for(int i = 0; i < steps.size(); i++) {
-				equipletSteps[i] = new EquipletStepMessage((BasicDBObject) steps.get(i));
+				equipletSteps[i] = new EquipletStep((BasicDBObject) steps.get(i));
 			}
 			
 			//Get the leadingModule
@@ -152,7 +152,7 @@ public class FillPlaceholders extends ReceiveBehaviour {
 
 			//Fill the placeholders
 			equipletSteps = module.fillPlaceHolders(equipletSteps, serviceStep.getParameters());
-			for(EquipletStepMessage step : equipletSteps) {
+			for(EquipletStep step : equipletSteps) {
 				equipletStepBBClient.updateDocuments(new BasicDBObject("_id", step.getId()), step.toBasicDBObject());
 			}
 			//if the serviceStep has a nextStep fill the placeholders for that one to.
