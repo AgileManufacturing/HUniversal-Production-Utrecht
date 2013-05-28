@@ -41,7 +41,7 @@ import com.mongodb.BasicDBObject;
 /**
  * Represents an entry in the EquipletDirectory blackboard.
  **/
-public class EquipletDirectoryMessage implements MongoSaveable {
+public class EquipletDirectoryEntry implements MongoSaveable {
 	/**
 	 * @var AID AID
 	 * The AID of the equipletAgent
@@ -67,7 +67,7 @@ public class EquipletDirectoryMessage implements MongoSaveable {
 	 * @param capabilities the capabilities of the equipletAgent.
 	 * @param db the information about the database of the equipletAgent.
 	 */
-	public EquipletDirectoryMessage(AID AID, ArrayList<Integer> capabilities, DbData db){
+	public EquipletDirectoryEntry(AID AID, ArrayList<Integer> capabilities, DbData db){
 		this.AID = AID;
 		this.capabilities = capabilities;
 		this.db = db;
@@ -77,7 +77,7 @@ public class EquipletDirectoryMessage implements MongoSaveable {
 	 * Constructor for an entry in the equipletDirectory.
 	 * @param object BasicDBObject to fill this class with.
 	 */
-	public EquipletDirectoryMessage(BasicDBObject object){
+	public EquipletDirectoryEntry(BasicDBObject object){
 		fromBasicDBObject(object);
 	}
 	

@@ -164,6 +164,16 @@ public class EquipletStep implements MongoSaveable {
 	public void setNextStepID(ObjectId EquipletStepID) {
 		this.nextStep = EquipletStepID;
 	}
+	
+	/**
+	 * Getter for the nextStepID
+	 * 
+	 * @return The nextStepID
+	 */
+	public ObjectId getNextStepID(){
+		return nextStep;
+	}
+	
 
 	/**
 	 * Getter for the module id

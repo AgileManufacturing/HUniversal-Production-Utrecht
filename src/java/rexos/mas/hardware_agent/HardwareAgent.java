@@ -55,6 +55,7 @@ import jade.lang.acl.ACLMessage;
 
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import rexos.libraries.blackboard_client.BasicOperationSubscription;
@@ -81,6 +82,7 @@ import rexos.mas.hardware_agent.behaviours.ServiceAgentDied;
 import rexos.mas.service_agent.ServiceStep;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 /**
  * HardwareAgent that communicates with the service agent and creates the messages for the Hardware layer.
@@ -337,21 +339,26 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 					BasicDBObject searchQuery = new BasicDBObject("_id", serviceStep.getId());
 					StepStatusCode status = equipletStep.getStatus();
 					switch (status) {
-					case IN_PROGRESS:
-					case SUSPENDED_OR_WARNING:
 					case DONE:
-					case ABORTED:
-					case FAILED:
+						if(equipletStep.getNextStepID() == null){
+							List<DBObject> equipletSteps = equipletStepBBClient.findDocuments(
+									new BasicDBObject("serviceStepID", equipletStep.getServiceStepID()));
+							serviceStepBBClient.updateDocuments(new BasicDBObject("_id", serviceStep.getId()),
+																new BasicDBObject("$set", new BasicDBObject("statusData", equipletSteps.toString())));
+						}
+						break;
+					case IN_PROGRESS: case SUSPENDED_OR_WARNING: case ABORTED: case FAILED:
 						BasicDBObject statusData = serviceStep.getStatusData();
 						statusData.putAll((Map<String, Object>) equipletStep.getStatusData());
 						BasicDBObject updateQuery = new BasicDBObject("$set", new BasicDBObject("status", status).append("statusData", statusData));
 						serviceStepBBClient.updateDocuments(searchQuery, updateQuery);
 						break;
+					case WAITING:
+						//TODO: set first step on waiting
 					default:
 						break;
 					}
 				} catch (InvalidDBNamespaceException | GeneralMongoException e) {
-					// TODO Error no document
 					Logger.log(e);
 				}
 				break;

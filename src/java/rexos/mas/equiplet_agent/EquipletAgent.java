@@ -292,10 +292,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 		// starts the behaviour for receving message initialisation finished.
 		addBehaviour(new InitialisationFinished(this, collectiveBBClient));
-		
-		// starts the behaviour for making a log.
-		//TODO: logbehaviour.
-		//addBehaviour(new LogBehaviour(this, collectiveBBClient));
 	}
 
 	/**
@@ -394,17 +390,21 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 							break;
 						case FAILED:
 							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setPerformative(ACLMessage.FAILURE);
 							responseMessage.setContent("FAILED");
 							responseMessage.setContentObject(productStep.getStatusData());
 							break;
 						case SUSPENDED_OR_WARNING:
 							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setPerformative(ACLMessage.FAILURE);
 							responseMessage.setContent("SUSPENDED_OR_WARNING");
 							responseMessage.setContentObject(productStep.getStatusData());
 							break;
 						case DONE:
 							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setPerformative(ACLMessage.CONFIRM);
 							responseMessage.setContent("DONE");
+							responseMessage.setContentObject(productStep.getStatusData());
 							break;
 						default:
 							break;

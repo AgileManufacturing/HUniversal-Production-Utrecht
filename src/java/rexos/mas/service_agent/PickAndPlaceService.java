@@ -46,7 +46,6 @@
  **/
 package rexos.mas.service_agent;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
@@ -57,6 +56,7 @@ import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
 import rexos.libraries.log.Logger;
+import rexos.mas.data.Part;
 import rexos.mas.data.Position;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.StepStatusCode;
@@ -94,17 +94,17 @@ public class PickAndPlaceService implements Service {
 	 */
 	@Override
 	public ServiceStep[] getServiceSteps(int productStepType, BasicDBObject parameters) {
-		int part = parameters.getInt("part");
+		Part part = new Part((BasicDBObject)parameters.get("part"));
 		double inputPartSize = 0.5;// TODO: FROM KNOWLEDGE DB
 
 		BasicDBObject pickParameters = new BasicDBObject();
-		pickParameters.put("part", part);
+		pickParameters.put("part", part.toBasicDBObject());
 		pickParameters.put("position", new Position().toBasicDBObject());
 
 		Position position = new Position((BasicDBObject) parameters.get("position"));
 		position.setZ(position.getZ() + inputPartSize);
 		BasicDBObject placeParameters = new BasicDBObject();
-		placeParameters.put("part", part);
+		placeParameters.put("part", part.toBasicDBObject());
 		placeParameters.put("position", position.toBasicDBObject());
 
 		return new ServiceStep[] {
@@ -119,13 +119,14 @@ public class PickAndPlaceService implements Service {
 	 * @see rexos.mas.service_agent.Service#updateParameters(java.util.HashMap,
 	 * rexos.mas.service_agent.ServiceStep[]) */
 	@Override
-	public ServiceStep[] updateParameters(HashMap<Integer, SimpleEntry<Integer, Position>> partParameters,
+	public ServiceStep[] updateParameters(HashMap<Part, Position> partParameters,
 			ServiceStep[] serviceSteps) {
 		BasicDBObject pickParameters = serviceSteps[0].getParameters();
-		for(Entry<Integer, SimpleEntry<Integer, Position>> e : partParameters.entrySet()){
-			if(e.getValue().getKey() == pickParameters.getInt("part")){
+		int partType = new Part((BasicDBObject)pickParameters.get("part")).getType();
+		for(Entry<Part, Position> e : partParameters.entrySet()){
+			if(e.getKey().getType() == partType){
 				pickParameters.putAll((LinkedHashMap<String, Object>) 
-						new BasicDBObject("position", e.getValue().getValue().toBasicDBObject()));
+						new BasicDBObject("position", e.getValue().toBasicDBObject()));
 			}
 		}
 		serviceSteps[0].setParameters(pickParameters);
