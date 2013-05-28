@@ -298,7 +298,31 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		case "ServiceStepsBlackboard":
 			switch (operation) {
 			case UPDATE:
+				//als service op waiting word gezet pak je eerste equipletstep die ook op 
+				//waiting moet worden gezet. 
 				//ObjectId id = entry.getTargetObjectId();
+				try {
+					EquipletStep equipletStep = new EquipletStep((BasicDBObject) equipletStepBBClient.findDocumentById(entry.getTargetObjectId()));
+					ServiceStep serviceStep = new ServiceStep((BasicDBObject) serviceStepBBClient.findDocumentById(equipletStep.getServiceStepID()));
+					BasicDBObject searchQuery = new BasicDBObject("_id", serviceStep.getId());
+					StepStatusCode status = serviceStep.getStatus();
+					switch(status){
+					case WAITING:
+						BasicDBObject statusData = serviceStep.getStatusData();
+						
+						//equipletStep.setStatus(StepStatusCode.WAITING);
+						break;
+					default:
+						break;
+					
+					}
+				} catch (InvalidDBNamespaceException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (GeneralMongoException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				break;
 			default:
 				break;
