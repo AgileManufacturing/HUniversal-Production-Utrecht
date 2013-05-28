@@ -1,6 +1,6 @@
 /**
  * @file rexos/mas/data/MongoSaveable.java
- * @brief 
+ * @brief Allows load/store behaviour in a mongo DB.
  * @date Created: 19 apr. 2013
  *
  * @author Peter Bonnema
@@ -33,17 +33,18 @@ package rexos.mas.data;
 import com.mongodb.BasicDBObject;
 
 /**
- * @author Peter
- *
+ * Allows load/store behaviour in a mongo DB.
  */
 public interface MongoSaveable {
 	/**
-	 * @return
+	 * Construct a BasicDBObject representing the object.
+	 * @return a BasicDBObject representing the object.
 	 */
 	public BasicDBObject toBasicDBObject();
 	
 	/**
-	 * @param object
+	 * Construct an object from the data contained in the specified BasicDBObject.
+	 * @param object The BasicDBObject containing the relevant data.
 	 */
 	public void fromBasicDBObject(BasicDBObject object);
 }
