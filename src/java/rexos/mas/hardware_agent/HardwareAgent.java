@@ -8,6 +8,7 @@ package rexos.mas.hardware_agent;
  * 
  * @author Thierry Gerritse
  * @author Hessel Meulenbeld
+ * @author Wouter Veen 
  * 
  * @section LICENSE
  *          License: newBSD
@@ -306,13 +307,16 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 				try {
 					EquipletStep equipletStep = new EquipletStep((BasicDBObject) equipletStepBBClient.findDocumentById(entry.getTargetObjectId()));
 					ServiceStep serviceStep = new ServiceStep((BasicDBObject) serviceStepBBClient.findDocumentById(equipletStep.getServiceStepID()));
-					BasicDBObject searchQuery = new BasicDBObject("_id", serviceStep.getId());
 					StepStatusCode status = serviceStep.getStatus();
 					switch(status){
 					case WAITING:
-						BasicDBObject statusData = serviceStep.getStatusData();
-						
-						//equipletStep.setStatus(StepStatusCode.WAITING);
+						List<DBObject> equipletSteps = equipletStepBBClient.findDocuments(new BasicDBObject("serviceStepID", serviceStep.getId()));
+						EquipletStep[] equipletStepsArray = new EquipletStep[equipletSteps.size()];
+						for(int i = 0; i < equipletSteps.size(); i++){
+							equipletStepsArray[i] = new EquipletStep((BasicDBObject)equipletSteps.get(i));
+						}
+						equipletStepBBClient.updateDocuments(new BasicDBObject("_id", EquipletStep.sort(equipletStepsArray)[0].getId()), 
+								new BasicDBObject("$set",new BasicDBObject("status", StepStatusCode.WAITING)));
 						break;
 					default:
 						break;
