@@ -18,7 +18,7 @@ import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.ProductionStepStatus;
-import rexos.mas.equiplet_agent.EquipletDirectoryMessage;
+import rexos.mas.equiplet_agent.EquipletDirectoryEntry;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -82,7 +82,7 @@ public class PlannerBehaviour extends OneShotBehaviour{
 					List<DBObject> equipletDirectory = bbc
 							.findDocuments(equipletCapabilityQuery);
 					for(DBObject dbo : equipletDirectory){
-						EquipletDirectoryMessage entry = new EquipletDirectoryMessage((BasicDBObject)dbo);
+						EquipletDirectoryEntry entry = new EquipletDirectoryEntry((BasicDBObject)dbo);
 						pem.addEquipletToProductionStep(PA_id, entry.getAID());
 					}
 				}

@@ -85,13 +85,13 @@ public class Position implements Serializable, MongoSaveable {
 	 * @var int relativeToPart
 	 * The id of the part the coordinates are relative to.
 **/
-	private int relativeToPart;
+	private Part relativeToPart;
 
 	/**
 	 * Constructs a default Position object with all fields set to -1.
 	 */
 	public Position() {
-		this(-1, -1, -1, -1);
+		this(-1, -1, -1, null);
 	}
 
 	/**
@@ -101,14 +101,14 @@ public class Position implements Serializable, MongoSaveable {
 	 * @param z The z coordinate
 	 */
 	public Position(double x, double y, double z) {
-		this(x, y, z, -1);
+		this(x, y, z, null);
 	}
 
 	/**
 	 * Constructs a Position object with -1 x, y and z coordinates relative to the specified part.
 	 * @param relativeToPart The id of the part to which the coordinates are relative.
 	 */
-	public Position(int relativeToPart) {
+	public Position(Part relativeToPart) {
 		this(-1, -1, -1, relativeToPart);
 	}
 
@@ -119,7 +119,7 @@ public class Position implements Serializable, MongoSaveable {
 	 * @param z The z coordinate
 	 * @param relativeToPart The id of the part to which the coordinates are relative.
 	 */
-	public Position(double x, double y, double z, int relativeToPart) {
+	public Position(double x, double y, double z, Part relativeToPart) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -139,8 +139,14 @@ public class Position implements Serializable, MongoSaveable {
 	 **/
 	@Override
 	public BasicDBObject toBasicDBObject() {
-		return (BasicDBObject) BasicDBObjectBuilder.start().add("x", x).add("y", y).add("z", z)
-				.add("relativeToPart", relativeToPart).get();
+		BasicDBObject object = new BasicDBObject();
+		object.put("x", x);
+		object.put("y", y);
+		object.put("z", z);
+		if(relativeToPart != null){
+			object.put("relativeToPart", relativeToPart.toBasicDBObject());
+		}
+		return object;
 	}
 
 	/** 
@@ -158,7 +164,7 @@ public class Position implements Serializable, MongoSaveable {
 			z = object.getDouble("z");
 		}
 		if(object.containsField("relativeToPart")) {
-			relativeToPart = object.getInt("relativeToPart");
+			relativeToPart = new Part((BasicDBObject)object.get("relativeToPart"));
 		}
 	}
 
@@ -214,7 +220,7 @@ public class Position implements Serializable, MongoSaveable {
 	 * Returns the partID of the relative part.
 	 * @return The partID of the relative part.
 	 */
-	public int getRelativeToPart() {
+	public Part getRelativeToPart() {
 		return relativeToPart;
 	}
 
@@ -222,7 +228,7 @@ public class Position implements Serializable, MongoSaveable {
 	 * Sets the partID of the relative part.
 	 * @param relativeToPart The partID of the relative part.
 	 */
-	public void setRelativeToPart(int relativeToPart) {
+	public void setRelativeToPart(Part relativeToPart) {
 		this.relativeToPart = relativeToPart;
 	}
 

@@ -165,7 +165,7 @@ public class GripperModule extends Module {
 				InstructionData instructionData = step.getInstructionData();
 				BasicDBObject lookUpParameters = instructionData.getLookUpParameters();
 				if (lookUpParameters.getString("ID").equals("RELATIVE-TO-PLACEHOLDER")) {
-					lookUpParameters.put("ID", position.getRelativeToPart());
+					lookUpParameters.put("ID", position.getRelativeToPart().getId());
 				}
 			}
 		}
@@ -227,10 +227,10 @@ public class GripperModule extends Module {
 		
 		//fill int het lookUpParameters with values or placeholders
 		BasicDBObject lookUpParameters = new BasicDBObject();
-		if (position.getRelativeToPart() == -1) {
+		if (position.getRelativeToPart() == null || position.getRelativeToPart().getId() == -1) {
 			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
 		} else {
-			lookUpParameters.put("ID", position.getRelativeToPart());
+			lookUpParameters.put("ID", position.getRelativeToPart().getId());
 		}
 		
 		//create the instruction data.
@@ -250,10 +250,10 @@ public class GripperModule extends Module {
 		
 		//fill in the lookUpParameters with values or placeholders.
 		BasicDBObject lookUpParameters = new BasicDBObject();
-		if (position.getRelativeToPart() == -1) {
+		if (position.getRelativeToPart() == null || position.getRelativeToPart().getId() == -1) {
 			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
 		} else {
-			lookUpParameters.put("ID", position.getRelativeToPart());
+			lookUpParameters.put("ID", position.getRelativeToPart().getId());
 		}
 
 		//create instruction data.
