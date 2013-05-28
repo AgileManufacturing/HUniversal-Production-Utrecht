@@ -61,34 +61,34 @@ public class MainAgent extends Agent{
 			// instantiate the 'equiplet' agents
 			Object[] EquipletArray = new Object[]{1};// pickndplace
 			getContainerController().createNewAgent("EQ1",
-					"testingAgents.EquipletAgent", EquipletArray).start();
+					"rexos.mas.testingAgents.EquipletAgent", EquipletArray).start();
 			EquipletArray = new Object[]{2}; // colour
 			getContainerController().createNewAgent("EQ2",
-					"testingAgents.EquipletAgent", EquipletArray).start();
+					"rexos.mas.testingAgents.EquipletAgent", EquipletArray).start();
 			EquipletArray = new Object[]{3}; // rotate
 			getContainerController().createNewAgent("EQ3",
-					"testingAgents.EquipletAgent", EquipletArray).start();
+					"rexos.mas.testingAgents.EquipletAgent", EquipletArray).start();
 			EquipletArray = new Object[]{2}; // rotate
 			getContainerController().createNewAgent("EQ4",
-					"testingAgents.EquipletAgent", EquipletArray).start();
+					"rexos.mas.testingAgents.EquipletAgent", EquipletArray).start();
 			EquipletArray = new Object[]{1}; // rotate
 			getContainerController().createNewAgent("EQ5",
-					"testingAgents.EquipletAgent", EquipletArray).start();
+					"rexos.mas.testingAgents.EquipletAgent", EquipletArray).start();
 			EquipletArray = new Object[]{3}; // rotate
 			getContainerController().createNewAgent("EQ6",
-					"testingAgents.EquipletAgent", EquipletArray).start();
+					"rexos.mas.testingAgents.EquipletAgent", EquipletArray).start();
 			EquipletArray = new Object[]{1}; // rotate
 			getContainerController().createNewAgent("EQ7",
-					"testingAgents.EquipletAgent", EquipletArray).start();
+					"rexos.mas.testingAgents.EquipletAgent", EquipletArray).start();
 			EquipletArray = new Object[]{1}; // rotate
 			getContainerController().createNewAgent("EQ8",
-					"testingAgents.EquipletAgent", EquipletArray).start();
+					"rexos.mas.testingAgents.EquipletAgent", EquipletArray).start();
 			EquipletArray = new Object[]{2}; // rotate
 			getContainerController().createNewAgent("EQ9",
-					"testingAgents.EquipletAgent", EquipletArray).start();
+					"rexos.mas.testingAgents.EquipletAgent", EquipletArray).start();
 			EquipletArray = new Object[]{3}; // rotate
 			getContainerController().createNewAgent("EQ10",
-					"testingAgents.EquipletAgent", EquipletArray).start();
+					"rexos.mas.testingAgents.EquipletAgent", EquipletArray).start();
 			EquipletArray = null;
 			// Create a parameterlist
 			ParameterList parameterList = new ParameterList();
@@ -155,7 +155,7 @@ public class MainAgent extends Agent{
 			Object[] arg = new Object[1];
 			arg[0] = product;
 			getContainerController().createNewAgent("pa1",
-					"productAgent.ProductAgent", arg).start();
+					"rexos.mas.productAgent.ProductAgent", arg).start();
 		} catch(Exception e){
 			e.printStackTrace();
 			doDelete();
