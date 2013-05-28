@@ -58,6 +58,7 @@ import java.util.ArrayList;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.log.Logger;
+import rexos.mas.data.Part;
 import rexos.mas.data.Position;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
@@ -105,8 +106,8 @@ public class JadeAgentX extends Agent {
 			 * Lets make a parameter list
 			 */
 			BasicDBObject parameters = new BasicDBObject();
-			parameters.append("part", 1);
-			parameters.append("position", new Position(1.0, 2.0, 3.0, 2).toBasicDBObject());
+			parameters.append("part", new Part(1).toBasicDBObject());
+			parameters.append("position", new Position(1.0, 2.0, 3.0, new Part(2)).toBasicDBObject());
 
 			// Next we want to have some production steps
 			ProductionStep stp1 = new ProductionStep(1, 1, parameters);

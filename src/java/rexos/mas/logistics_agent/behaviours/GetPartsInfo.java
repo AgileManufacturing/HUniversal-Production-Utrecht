@@ -36,15 +36,14 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 import java.io.IOException;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
 import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
+import rexos.mas.data.Part;
 import rexos.mas.data.Position;
-import rexos.mas.equiplet_agent.ProductStep;
 
 /**
  * Responds to GetPartsInfo messages, returning a mapping of part id to type and position.
@@ -87,19 +86,20 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 		if (message != null) {
 			try {
 				Logger.log("%s GetPartsInfo%n", myAgent.getLocalName());
-				Integer[] partTypes = ((ProductStep) message.getContentObject()).getInputPartTypes();				
-				HashMap<Integer, SimpleEntry<Integer, Position>> partParameters = new HashMap<Integer, SimpleEntry<Integer, Position>>();
+				Part[] parts = (Part[]) message.getContentObject();				
+				HashMap<Part, Position> partParameters = new HashMap<Part, Position>();
 				int x = 2;
 				int id = 1;
-				for (int partType : partTypes) {
-					partParameters.put(id++, new SimpleEntry<Integer, Position>(partType, new Position(x++, 1, 3)));
+				int type = 3;
+				for (Part part : parts) {
+					partParameters.put(new Part(part.getType(), id++), new Position(x++, 1, 3, new Part(type++, id + x)));
 				}
 
 				KnowledgeDBClient client = KnowledgeDBClient.getClient();
-				int outputPartType = client.executeUpdateQuery(Queries.INSERT_PART_TYPE, new Object[]{"OutputPart", partTypes.toString()});
+				int outputPartType = client.executeUpdateQuery(Queries.INSERT_PART_TYPE, new Object[]{"OutputPart", parts.toString()});
 				int outputPartId = client.executeUpdateQuery(Queries.INSERT_PART, new Object[]{outputPartType});
 				
-				partParameters.put(outputPartId, new SimpleEntry<Integer, Position>(outputPartType, null));
+				partParameters.put(new Part(outputPartType, outputPartId), null);
 				
 				ACLMessage reply = message.createReply();
 				reply.setPerformative(ACLMessage.INFORM);

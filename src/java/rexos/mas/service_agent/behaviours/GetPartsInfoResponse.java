@@ -40,7 +40,6 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 import java.io.IOException;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -51,6 +50,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
+import rexos.mas.data.Part;
 import rexos.mas.data.Position;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.ProductStep;
@@ -146,21 +146,19 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 				for(int i = 0; i < dbServiceSteps.size(); i++) {
 					serviceSteps[i] = new ServiceStep((BasicDBObject) dbServiceSteps.get(i));
 				}
-
-				HashMap<Integer, SimpleEntry<Integer, Position>> parameters =
-						(HashMap<Integer, SimpleEntry<Integer, Position>>) message.getContentObject();
-
+				
+				HashMap<Part, Position> parameters = (HashMap<Part, Position>) message.getContentObject();
+				
 				Logger.log("%s got partsInfo: %s%n", agent.getLocalName(), parameters.toString());
-
-				for(Entry<Integer, SimpleEntry<Integer, Position>> e : parameters.entrySet()) {
-					if(e.getValue().getValue() == null) {
+				
+				for(Entry<Part, Position> e : parameters.entrySet()) {
+					if(e.getValue() == null) {
 						agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
-								new BasicDBObject("outputPartType", e.getKey()));
+								new BasicDBObject("$set", new BasicDBObject("outputPart", e.getKey().toBasicDBObject())));
 						parameters.remove(e.getKey());
 						break;
 					}
 				}
-
 				ServiceStep[] parameterizedSteps =
 						agent.GetServiceForConvId(conversationId).updateParameters(parameters,
 								ServiceStep.sort(serviceSteps));

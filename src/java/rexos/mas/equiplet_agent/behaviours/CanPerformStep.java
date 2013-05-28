@@ -60,6 +60,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.Part;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.EquipletAgent;
@@ -131,12 +132,10 @@ public class CanPerformStep extends ReceiveBehaviour {
 
 			// puts the productstep on the blackboard.
 			// TODO: get inputParts instead of dummy data
-			Integer[] inputParts = { 1, 2 };
-			// TODO: get outputPart
-			int outputPart = -1;
+			Part[] inputParts = { new Part(1), new Part(2) };
 			ProductStep entry = new ProductStep(
 					message.getSender(), productStep.getCapability(),
-					productStep.getParameters(), inputParts, outputPart,
+					productStep.getParameters(), inputParts, null,
 					StepStatusCode.EVALUATING, new BasicDBObject(),
 					new ScheduleData());
 			productStepEntryId = equipletBBClient.insertDocument(entry

@@ -31,10 +31,9 @@
 
 package rexos.mas.service_agent;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 
-import rexos.libraries.knowledgedb_client.KeyNotFoundException;
+import rexos.mas.data.Part;
 import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
 import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
@@ -116,7 +115,7 @@ public abstract class Service {
 	 * @param serviceSteps the service steps to update.
 	 * @return the updated service steps.
 	 */
-	public abstract ServiceStep[] updateParameters(HashMap<Integer, SimpleEntry<Integer, Position>> partParameters,
+	public abstract ServiceStep[] updateParameters(HashMap<Part, Position>> partParameters,
 			ServiceStep[] serviceSteps);
 
 	/**

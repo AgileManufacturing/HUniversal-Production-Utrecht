@@ -36,7 +36,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
-import rexos.mas.equiplet_agent.ProductStep;
+import rexos.mas.data.Part;
 
 /**
  * Responds to ArePartsAvailableInTime messages, returning whether or not the
@@ -90,10 +90,7 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 			try {
 				Logger.log("%s ArePartsAvailableInTime%n",
 						myAgent.getLocalName());
-				ProductStep productStep = (ProductStep) message
-						.getContentObject();
-				int startTime = productStep.getScheduleData().getStartTime();
-				Integer[] parts = productStep.getInputPartTypes();
+				Part[] parts = (Part[]) message.getContentObject();
 
 				ACLMessage reply = message.createReply();
 				reply.setOntology("ArePartsAvailableInTimeResponse");
