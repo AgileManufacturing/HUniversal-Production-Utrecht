@@ -8,6 +8,7 @@ package rexos.mas.hardware_agent;
  * 
  * @author Thierry Gerritse
  * @author Hessel Meulenbeld
+ * @author Wouter Veen 
  * 
  * @section LICENSE
  *          License: newBSD
@@ -300,9 +301,34 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		case "ServiceStepsBlackboard":
 			switch (operation) {
 			case UPDATE:
+				//als service op waiting word gezet pak je eerste equipletstep die ook op 
+				//waiting moet worden gezet. 
 				//ObjectId id = entry.getTargetObjectId();
-				//TODO: one step on waiting
-				//TODO: if done next step on waitings
+				try {
+					EquipletStep equipletStep = new EquipletStep((BasicDBObject) equipletStepBBClient.findDocumentById(entry.getTargetObjectId()));
+					ServiceStep serviceStep = new ServiceStep((BasicDBObject) serviceStepBBClient.findDocumentById(equipletStep.getServiceStepID()));
+					StepStatusCode status = serviceStep.getStatus();
+					switch(status){
+					case WAITING:
+						List<DBObject> equipletSteps = equipletStepBBClient.findDocuments(new BasicDBObject("serviceStepID", serviceStep.getId()));
+						EquipletStep[] equipletStepsArray = new EquipletStep[equipletSteps.size()];
+						for(int i = 0; i < equipletSteps.size(); i++){
+							equipletStepsArray[i] = new EquipletStep((BasicDBObject)equipletSteps.get(i));
+						}
+						equipletStepBBClient.updateDocuments(new BasicDBObject("_id", EquipletStep.sort(equipletStepsArray)[0].getId()), 
+								new BasicDBObject("$set",new BasicDBObject("status", StepStatusCode.WAITING)));
+						break;
+					default:
+						break;
+					
+					}
+				} catch (InvalidDBNamespaceException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (GeneralMongoException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				break;
 			default:
 				break;
@@ -318,7 +344,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 					StepStatusCode status = equipletStep.getStatus();
 					switch (status) {
 					case DONE:
-						if(equipletStep.getNextStepID() == null){
+						if(equipletStep.getNextStep() == null){
 							List<DBObject> equipletSteps = equipletStepBBClient.findDocuments(
 									new BasicDBObject("serviceStepID", equipletStep.getServiceStepID()));
 							serviceStepBBClient.updateDocuments(new BasicDBObject("_id", serviceStep.getId()),
