@@ -322,7 +322,10 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 							List<DBObject> equipletSteps = equipletStepBBClient.findDocuments(
 									new BasicDBObject("serviceStepID", equipletStep.getServiceStepID()));
 							serviceStepBBClient.updateDocuments(new BasicDBObject("_id", serviceStep.getId()),
-																new BasicDBObject("$set", new BasicDBObject("statusData", equipletSteps.toString())));
+																new BasicDBObject("$set", new BasicDBObject("statusData", equipletSteps.toString()).append("status", StepStatusCode.DONE.name())));
+						}else{
+							equipletStepBBClient.updateDocuments(new BasicDBObject("_id", equipletStep.getNextStepID()),
+																 new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));
 						}
 						break;
 					case IN_PROGRESS: case SUSPENDED_OR_WARNING: case ABORTED: case FAILED:
@@ -331,8 +334,6 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 						BasicDBObject updateQuery = new BasicDBObject("$set", new BasicDBObject("status", status).append("statusData", statusData));
 						serviceStepBBClient.updateDocuments(searchQuery, updateQuery);
 						break;
-					case WAITING:
-						//TODO: set first step on waiting
 					default:
 						break;
 					}

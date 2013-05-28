@@ -127,6 +127,14 @@ public class NextProductStepTimer extends Timer {
 	public int getNextUsedTimeSlot() {
 		return nextUsedTimeSlot;
 	}
+	
+	/**
+	 * Getter for the first time slot
+	 * @return the first time slot
+	 */
+	public long getFirstTimeSlot(){
+		return firstTimeSlot;
+	}
 
 	/**
 	 * Task in charge of starting the next product step.
@@ -158,6 +166,13 @@ public class NextProductStepTimer extends Timer {
 				answer.addReceiver(productAgent);
 				answer.setOntology("StartStepQuestion");
 				equipletAgent.send(answer);
+				
+				//TODO: delete below
+				ACLMessage test = new ACLMessage(ACLMessage.QUERY_IF);
+				test.setConversationId(conversationId);
+				test.addReceiver(equipletAgent.getAID());
+				test.setOntology("StartStep");
+				equipletAgent.send(test);
 			} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 				// TODO Auto-generated catch block
 				Logger.log(e);
