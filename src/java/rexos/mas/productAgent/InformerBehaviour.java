@@ -38,11 +38,11 @@
 package rexos.mas.productAgent;
 
 import rexos.libraries.log.Logger;
-import rexos.mas.newDataClasses.Product;
-import rexos.mas.newDataClasses.Production;
-import rexos.mas.newDataClasses.ProductionEquipletMapper;
-import rexos.mas.newDataClasses.ProductionStep;
-import rexos.mas.newDataClasses.ProductionStepStatus;
+import rexos.mas.data.Product;
+import rexos.mas.data.Production;
+import rexos.mas.data.ProductionEquipletMapper;
+import rexos.mas.data.ProductionStep;
+import rexos.mas.data.ProductionStepStatus;
 
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;

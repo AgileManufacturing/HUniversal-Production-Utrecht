@@ -44,7 +44,7 @@ import jade.core.behaviours.ParallelBehaviour;
 import jade.core.behaviours.WakerBehaviour;
 import jade.lang.acl.ACLMessage;
 
-import rexos.mas.newDataClasses.ProductionStep;
+import rexos.mas.data.ProductionStep;
 import java.util.Random;
 
 @SuppressWarnings("serial")

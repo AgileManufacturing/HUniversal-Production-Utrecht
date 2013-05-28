@@ -42,8 +42,8 @@ package rexos.mas.productAgent;
 
 import java.net.UnknownHostException;
 
-import rexos.mas.newDataClasses.Product;
-import rexos.mas.newDataClasses.ProductionStep;
+import rexos.mas.data.Product;
+import rexos.mas.data.ProductionStep;
 
 import jade.core.AID;
 import jade.core.Agent;

@@ -39,9 +39,9 @@
 
 package rexos.mas.unitTests;
 
-import rexos.mas.newDataClasses.LogMessage;
-import rexos.mas.newDataClasses.ProductLog;
-import rexos.mas.newDataClasses.sqldatabase.sqliteDatabase;
+import rexos.mas.data.LogMessage;
+import rexos.mas.data.ProductLog;
+import rexos.mas.data.sqldatabase.sqliteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +50,7 @@ import org.junit.Test;
 public class SQLiteTest{
 	/**
 	 * Test method for
-	 * {@link rexos.mas.newDataClasses.ProductLog#add(rexos.mas.newDataClasses.LogMessage[])}.
+	 * {@link rexos.mas.data.ProductLog#add(rexos.mas.data.LogMessage[])}.
 	 */
 	@SuppressWarnings("static-method")
 	@Test
@@ -64,7 +64,7 @@ public class SQLiteTest{
 	}
 
 	/**
-	 * Test method for {@link rexos.mas.newDataClasses.ProductLog#pushLocalToRemote()}.
+	 * Test method for {@link rexos.mas.data.ProductLog#pushLocalToRemote()}.
 	 */
 	@Test
 	public void testPushLocalToRemote(){

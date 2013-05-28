@@ -43,13 +43,13 @@ package rexos.mas.main;
 import jade.core.AID;
 import jade.core.Agent;
 
-import rexos.mas.newDataClasses.Parameter;
-import rexos.mas.newDataClasses.ParameterGroup;
-import rexos.mas.newDataClasses.ParameterList;
-import rexos.mas.newDataClasses.Product;
-import rexos.mas.newDataClasses.Production;
-import rexos.mas.newDataClasses.ProductionStep;
-import rexos.mas.newDataClasses.ProductionStepStatus;
+import rexos.mas.data.Parameter;
+import rexos.mas.data.ParameterGroup;
+import rexos.mas.data.ParameterList;
+import rexos.mas.data.Product;
+import rexos.mas.data.Production;
+import rexos.mas.data.ProductionStep;
+import rexos.mas.data.ProductionStepStatus;
 import java.util.ArrayList;
 
 @SuppressWarnings("serial")

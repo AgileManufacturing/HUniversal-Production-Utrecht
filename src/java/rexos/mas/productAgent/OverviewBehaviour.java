@@ -36,7 +36,7 @@
 
 package rexos.mas.productAgent;
 
-import rexos.mas.newDataClasses.ProductionStep;
+import rexos.mas.data.ProductionStep;
 
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
