@@ -99,7 +99,7 @@ public class Queries {
     /**
      * @var String PART_PROPERTIES
      *
-     * A constant representing an sql query for fetching all part properties for a specific part. Has a part type name as the only paramter.
+     * A constant representing an sql query for fetching all part properties for a specific part. Has a part type id as the only parameter.
      **/
     public static final String PART_PROPERTIES = "SELECT\n" +
             "    `part_types`.`name`\n" +
@@ -113,7 +113,26 @@ public class Queries {
             "        ON (`part_type_properties`.`part_type` = `part_types`.`id`)\n" +
             "    INNER JOIN `rexos_knowledge_base`.`properties` \n" +
             "        ON (`part_type_properties`.`property` = `properties`.`id`)\n" +
-            "WHERE (`part_types`.`name` = (?));";
+            "WHERE (`part_types`.`id` = (?));";
+
+    /**
+     * @var String PART_PROPERTY
+     *
+     * A constant representing an sql query for fetching a specific part property for a specific part. Has a part type id and property name as parameters.
+     **/
+    public static final String PART_PROPERTY = "SELECT\n" +
+            "    `part_types`.`name`\n" +
+            "    , `part_type_properties`.`property`\n" +
+            "    , `part_type_properties`.`value`\n" +
+            "    , `properties`.`name`\n" +
+            "    , `properties`.`datatype`\n" +
+            "FROM\n" +
+            "    `rexos_knowledge_base`.`part_type_properties`\n" +
+            "    INNER JOIN `rexos_knowledge_base`.`part_types` \n" +
+            "        ON (`part_type_properties`.`part_type` = `part_types`.`id`)\n" +
+            "    INNER JOIN `rexos_knowledge_base`.`properties` \n" +
+            "        ON (`part_type_properties`.`property` = `properties`.`id`)\n" +
+            "WHERE (`part_types`.`id` = (?) AND `properties`.`name` = (?));";
 
     /**
      * @var String PARTS

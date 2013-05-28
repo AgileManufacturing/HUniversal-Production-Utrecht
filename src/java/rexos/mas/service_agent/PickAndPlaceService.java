@@ -83,11 +83,11 @@ public class PickAndPlaceService extends Service {
 	 */
 	@Override
 	public ServiceStep[] getServiceSteps(int productStepType, BasicDBObject parameters) {
-		Part part = new Part((BasicDBObject)parameters.get("part"));
+		Part part = new Part((BasicDBObject) parameters.get("part"));
 		double ballHeight = 0;
 		try {
 			KnowledgeDBClient client = KnowledgeDBClient.getClient();
-			Row[] partProperties = client.executeSelectQuery(Queries.PART_PROPERTY, part, "heigth");
+			Row[] partProperties = client.executeSelectQuery(Queries.PART_PROPERTY, part.getType(), "heigth");
 			ballHeight = (double) partProperties[0].get("part_type_properties.value");
 		} catch(KnowledgeException | KeyNotFoundException e) {
 			Logger.log(e);
@@ -113,16 +113,10 @@ public class PickAndPlaceService extends Service {
 	 * @see rexos.mas.service_agent.Service#updateParameters(java.util.HashMap, rexos.mas.service_agent.ServiceStep[])
 	 */
 	@Override
-	public ServiceStep[] updateParameters(HashMap<Part, Position> partParameters,
-			ServiceStep[] serviceSteps) {
+	public ServiceStep[] updateParameters(HashMap<Part, Position> partParameters, ServiceStep[] serviceSteps) {
 		BasicDBObject pickParameters = serviceSteps[0].getParameters();
-		int partType = new Part((BasicDBObject)pickParameters.get("part")).getType();
-		for(Entry<Part, Position> e : partParameters.entrySet()){
-			if(e.getKey().getType() == partType){
-						.getValue().toBasicDBObject()));
-						new BasicDBObject("position", e.getValue().toBasicDBObject()));
-			}
-		}
+		Position ballPosition = partParameters.values().toArray(new Position[0])[0];
+		pickParameters.put("position", ballPosition.toBasicDBObject());
 		serviceSteps[0].setParameters(pickParameters);
 		return serviceSteps;
 	}

@@ -34,6 +34,7 @@ package rexos.mas.service_agent;
 import java.util.HashMap;
 
 import rexos.mas.data.Part;
+import rexos.libraries.knowledgedb_client.KeyNotFoundException;
 import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
 import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
@@ -91,8 +92,8 @@ public abstract class Service {
 				moduleIds[i] = (int) moduleGroups[i].get("module_id");
 			}
 			return moduleIds;
-		} catch(KnowledgeException | KeyNotFoundException e1) {
-			Logger.log(e1);
+		} catch(KnowledgeException | KeyNotFoundException e) {
+			Logger.log(e);
 		}
 		return null;
 	}
@@ -115,7 +116,7 @@ public abstract class Service {
 	 * @param serviceSteps the service steps to update.
 	 * @return the updated service steps.
 	 */
-	public abstract ServiceStep[] updateParameters(HashMap<Part, Position>> partParameters,
+	public abstract ServiceStep[] updateParameters(HashMap<Part, Position> partParameters,
 			ServiceStep[] serviceSteps);
 
 	/**

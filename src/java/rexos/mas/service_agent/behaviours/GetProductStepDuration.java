@@ -90,7 +90,7 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 	 * of the serviceStep and all serviceSteps linked to it specified by the ObjectId in the message. First the service
 	 * object generated in CanDoProductStep is retrieved from the serviceAgent to generate serviceSteps. The generated
 	 * serviceSteps are stored on the serviceStepBlackBoard and a GetServiceStepDuration message is send to the
-	 * hardwareAgent. Finally a GetServiceStepsDuration behaviour is started to handle the answer.
+	 * hardwareAgent. Finally a GetServiceStepsDurationResponse behaviour is started to handle the answer.
 	 * 
 	 * @param message the message to handle or null on timeout.
 	 */
@@ -129,7 +129,7 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 			askMessage.setContentObject(serviceStepId);
 			agent.send(askMessage);
 
-			agent.addBehaviour(new GetServiceStepsDuration(agent, message.getConversationId()));
+			agent.addBehaviour(new GetServiceStepsDurationResponse(agent, message.getConversationId()));
 		} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 			Logger.log(e);
 			agent.doDelete();
