@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/behaviours/GetServiceStepsDurationResponse.java
+ * @file rexos/mas/service_agent/behaviours/GetServiceStepsDuration.java
  * @brief Handles the GetServiceStepsDurationResponse message from the hardwareAgent that indicates that the duration of
  *        all serviceSteps have been saved on the serviceStepsBlackBoard.
  * @date Created: 11 apr. 2013
