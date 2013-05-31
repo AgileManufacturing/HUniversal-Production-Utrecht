@@ -36,7 +36,6 @@ import org.bson.types.ObjectId;
 
 import rexos.mas.data.MongoSaveable;
 import rexos.mas.equiplet_agent.StepStatusCode;
-import rexos.mas.service_agent.EquipletStep;
 
 import com.mongodb.BasicDBObject;
 
