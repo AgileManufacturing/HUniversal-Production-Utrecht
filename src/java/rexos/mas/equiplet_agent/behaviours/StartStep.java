@@ -33,6 +33,8 @@
  **/
 package rexos.mas.equiplet_agent.behaviours;
 
+import java.util.List;
+
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -52,6 +54,7 @@ import rexos.mas.equiplet_agent.ProductStep;
 import rexos.mas.equiplet_agent.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 /**
  * The Class StartStep.
@@ -121,7 +124,7 @@ public class StartStep extends ReceiveBehaviour {
 		try {
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
 			equipletBBClient.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject("$set",
-					new BasicDBObject("status", StepStatusCode.WAITING)));
+					new BasicDBObject("status", StepStatusCode.WAITING.name())));
 		} catch(InvalidDBNamespaceException | GeneralMongoException e1) {
 			Logger.log(e1);
 		}
@@ -129,15 +132,21 @@ public class StartStep extends ReceiveBehaviour {
 		// Get the next product step and set the timer for the next product step
 		NextProductStepTimer timer = equipletAgent.getTimer();
 		try {
-			BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED);
+			BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED.name());
 			query.put("$order_by", new BasicDBObject("scheduleData", new BasicDBObject("startTime", "-1")));
 			ProductStep nextProductStep = new ProductStep((BasicDBObject) equipletBBClient.findDocuments(query).get(0));
-			ScheduleData scheduleData = nextProductStep.getScheduleData();
-			if(scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
-				timer.setNextUsedTimeSlot(scheduleData.getStartTime());
+			List<DBObject> objects = equipletBBClient.findDocuments(query);
+			if(!objects.isEmpty()){
+				ProductStep nextProductStep = new ProductStep((BasicDBObject)objects.get(0));
+				equipletAgent.setNextProductStep(nextProductStep.getId());
+				ScheduleData scheduleData = nextProductStep.getScheduleData();
+				if (scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
+					timer.setNextUsedTimeSlot(scheduleData.getStartTime());
+				}
+			}else{
+				timer.setNextUsedTimeSlot(-1);
 			}
-		} catch(GeneralMongoException | InvalidDBNamespaceException e) {
-			timer.setNextUsedTimeSlot(-1);
+		} catch (GeneralMongoException | InvalidDBNamespaceException e) {		
 			Logger.log(e);
 		}
 	}

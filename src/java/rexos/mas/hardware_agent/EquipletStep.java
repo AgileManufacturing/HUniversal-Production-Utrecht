@@ -36,6 +36,7 @@ import org.bson.types.ObjectId;
 
 import rexos.mas.data.MongoSaveable;
 import rexos.mas.equiplet_agent.StepStatusCode;
+import rexos.mas.hardware_agent.EquipletStep;
 
 import com.mongodb.BasicDBObject;
 
@@ -155,21 +156,21 @@ public class EquipletStep implements MongoSaveable {
 	}
 
 	/**
-	 * Setter for the nextStepID
+	 * Setter for the nextStep
 	 * 
-	 * @param EquipletStepID
-	 *            The EquipletStepID to set it to.
+	 * @param EquipletStep
+	 *            The EquipletStep to set it to.
 	 */
-	public void setNextStepID(ObjectId EquipletStepID) {
-		this.nextStep = EquipletStepID;
+	public void setNextStep(ObjectId EquipletStep) {
+		this.nextStep = EquipletStep;
 	}
 	
 	/**
-	 * Getter for the nextStepID
+	 * Getter for the nextStep
 	 * 
-	 * @return The nextStepID
+	 * @return The nextStep
 	 */
-	public ObjectId getNextStepID(){
+	public ObjectId getNextStep(){
 		return nextStep;
 	}
 	
@@ -315,5 +316,42 @@ public class EquipletStep implements MongoSaveable {
 			statusData = new BasicDBObject();
 		}
 		timeData = new TimeData((BasicDBObject) object.get("timeData"));
+	}
+	
+	/**
+	 * Sorts the EquipletStepMessage in the specified array bases on their nextStep field. The last step is the one of
+	 * which the nextStep field is null.
+	 * 
+	 * @param unsortedSteps an array of steps to be sorted.
+	 * @return an array of EquipletStep in the right order.
+	 */
+	public static EquipletStep[] sort(EquipletStep[] unsortedSteps) {
+		// Find the first step
+		EquipletStep firstServiceStep = null;
+		outer: for(EquipletStep serviceStep : unsortedSteps) {
+			for(EquipletStep equipletStep2 : unsortedSteps) {
+				if(equipletStep2.getNextStep() != null && equipletStep2.getNextStep().equals(serviceStep.getId())) {
+					continue outer;
+				}
+			}
+			firstServiceStep = serviceStep;
+			break;
+		}
+
+		// sort all steps beginning with the one found above
+		int stepsCount = unsortedSteps.length;
+		ObjectId nextStepId;
+		EquipletStep[] sortedSteps = new EquipletStep[stepsCount];
+		sortedSteps[0] = firstServiceStep;
+		for(int i = 1; i < stepsCount; i++) {
+			nextStepId = sortedSteps[i - 1].getNextStep();
+			for(EquipletStep serviceStep : unsortedSteps) {
+				if(serviceStep.getId().equals(nextStepId)) {
+					sortedSteps[i] = serviceStep;
+					break;
+				}
+			}
+		}
+		return sortedSteps;
 	}
 }

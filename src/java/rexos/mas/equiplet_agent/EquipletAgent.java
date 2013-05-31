@@ -370,7 +370,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 								// If the start time of the newly planned productStep is earlier as the next used time
 								// slot make it the next used timeslot.
 								ScheduleData scheduleData = productStep.getScheduleData();
-							timer.setNextUsedTimeSlot(scheduleData.getStartTime());
+								nextProductStep = productStep.getId();
+								timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 								if(scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
 									timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 								}
@@ -497,6 +498,15 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 */
 	public ObjectId getNextProductStep() {
 		return nextProductStep;
+	}
+	
+	/**
+	 * Setter for the next product step
+	 * 
+	 * @param nextProductStep The new next product step
+	 */
+	public void setNextProductStep(ObjectId nextProductStep){
+		this.nextProductStep = nextProductStep;
 	}
 
 	/**

@@ -70,7 +70,7 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 			Part[] parts = ((ProductStep) message.getContentObject()).getInputParts();
 			ACLMessage reply = message.createReply();
 			reply.setOntology("ArePartsAvailableResponse");
-			//TODO determine actual part availability
+			//TODO (out of scope) determine actual part availability 
 			reply.setPerformative(ACLMessage.CONFIRM);
 			myAgent.send(reply);
 

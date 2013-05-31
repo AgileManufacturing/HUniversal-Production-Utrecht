@@ -145,7 +145,7 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 				agent.doDelete();
 			}
 		} else {
-			// TODO handle timeout
+			// TODO (most) handle timeout
 			Logger.log(agent.getName() + " - ArePartsAvailableResponse timeout!");
 			agent.doDelete();
 		}

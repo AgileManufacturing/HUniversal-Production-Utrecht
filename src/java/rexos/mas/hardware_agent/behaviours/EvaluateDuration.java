@@ -163,7 +163,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 				EquipletStep equipletStep = equipletSteps[i];
 				stepDuration += equipletStep.getTimeData().getDuration();
 				equipletStep.setServiceStepID(serviceStepId);
-				equipletStep.setNextStepID(next);
+				equipletStep.setNextStep(next);
 				next = equipletStepsBBClient.insertDocument(equipletStep.toBasicDBObject());
 			}
 			// get the scheduleData and add the duration.
