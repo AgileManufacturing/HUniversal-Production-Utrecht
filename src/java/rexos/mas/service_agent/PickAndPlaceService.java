@@ -70,6 +70,12 @@ import com.mongodb.BasicDBObject;
  */
 public class PickAndPlaceService extends Service {
 	/**
+	 * @var double ballHeight
+	 *      The height of the ball as input part.
+	 */
+	private double ballHeight;
+
+	/**
 	 * Creates a new PickAndPlaceService object.
 	 */
 	public PickAndPlaceService() {
@@ -82,7 +88,6 @@ public class PickAndPlaceService extends Service {
 	@Override
 	public ServiceStep[] getServiceSteps(int productStepType, BasicDBObject parameters) {
 		Part part = new Part((BasicDBObject) parameters.get("part"));
-		double ballHeight = 0;
 		try {
 			KnowledgeDBClient client = KnowledgeDBClient.getClient();
 			Row[] partProperties = client.executeSelectQuery(Queries.PART_PROPERTY, part.getType(), "height");
@@ -114,6 +119,7 @@ public class PickAndPlaceService extends Service {
 	public ServiceStep[] updateParameters(HashMap<Part, Position> partParameters, ServiceStep[] serviceSteps) {
 		BasicDBObject pickParameters = serviceSteps[0].getParameters();
 		Position ballPosition = partParameters.values().toArray(new Position[0])[0];
+		ballPosition.setZ(ballPosition.getZ() + ballHeight);
 		pickParameters.put("position", ballPosition.toBasicDBObject());
 		serviceSteps[0].setParameters(pickParameters);
 		return serviceSteps;

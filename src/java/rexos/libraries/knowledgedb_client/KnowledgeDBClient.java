@@ -224,7 +224,7 @@ public class KnowledgeDBClient {
      * @throws KnowledgeException Reading from the knowledge database failed.
      **/
     public int executeUpdateQuery(String query) throws KnowledgeException{
-        return executeUpdateQuery(query, null);
+        return executeUpdateQuery(query, (Object) null);
     }
 
     /**
@@ -236,7 +236,7 @@ public class KnowledgeDBClient {
      * @return Last insert ID on successful insert query, or 0 for an update query.
      * @throws KnowledgeException Reading from the knowledge database failed.
      **/
-    public int executeUpdateQuery(String query, Object[] parameters) throws KnowledgeException {
+    public int executeUpdateQuery(String query, Object... parameters) throws KnowledgeException {
     	PreparedStatement statement = null;
     	ResultSet result = null;
     	int queryReturnValue = 0;
