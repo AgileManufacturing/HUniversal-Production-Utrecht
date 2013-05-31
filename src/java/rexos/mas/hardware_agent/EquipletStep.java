@@ -36,7 +36,7 @@ import org.bson.types.ObjectId;
 
 import rexos.mas.data.MongoSaveable;
 import rexos.mas.equiplet_agent.StepStatusCode;
-import rexos.mas.service_agent.EquipletStep;
+import rexos.mas.hardware_agent.EquipletStep;
 
 import com.mongodb.BasicDBObject;
 
@@ -156,21 +156,21 @@ public class EquipletStep implements MongoSaveable {
 	}
 
 	/**
-	 * Setter for the nextStepID
+	 * Setter for the nextStep
 	 * 
-	 * @param EquipletStepID
-	 *            The EquipletStepID to set it to.
+	 * @param EquipletStep
+	 *            The EquipletStep to set it to.
 	 */
-	public void setNextStepID(ObjectId EquipletStepID) {
-		this.nextStep = EquipletStepID;
+	public void setNextStep(ObjectId EquipletStep) {
+		this.nextStep = EquipletStep;
 	}
 	
 	/**
-	 * Getter for the nextStepID
+	 * Getter for the nextStep
 	 * 
-	 * @return The nextStepID
+	 * @return The nextStep
 	 */
-	public ObjectId getNextStepID(){
+	public ObjectId getNextStep(){
 		return nextStep;
 	}
 	
@@ -319,11 +319,11 @@ public class EquipletStep implements MongoSaveable {
 	}
 	
 	/**
-	 * Sorts the ServiceStepMessages in the specified array bases on their nextStep field. The last step is the one of
+	 * Sorts the EquipletStepMessage in the specified array bases on their nextStep field. The last step is the one of
 	 * which the nextStep field is null.
 	 * 
 	 * @param unsortedSteps an array of steps to be sorted.
-	 * @return an array of ServiceStep in the right order.
+	 * @return an array of EquipletStep in the right order.
 	 */
 	public static EquipletStep[] sort(EquipletStep[] unsortedSteps) {
 		// Find the first step
@@ -353,14 +353,5 @@ public class EquipletStep implements MongoSaveable {
 			}
 		}
 		return sortedSteps;
-	}
-	/**
-	 * Returns the ObjectId of the next step to be executed in a sequence of steps created by a service object. This
-	 * follows the singular linked list pattern.
-	 * 
-	 * @return the ObjectId of the next step to be executed.
-	 */
-	public ObjectId getNextStep() {
-		return nextStep;
 	}
 }
