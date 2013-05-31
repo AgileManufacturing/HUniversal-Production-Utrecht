@@ -37,6 +37,8 @@ import jade.lang.acl.UnreadableException;
 
 import java.io.IOException;
 import java.util.HashMap;
+
+import rexos.libraries.knowledgedb_client.KeyNotFoundException;
 import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
 import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
@@ -96,7 +98,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 				}
 
 				KnowledgeDBClient client = KnowledgeDBClient.getClient();
-				int outputPartType = client.executeUpdateQuery(Queries.INSERT_PART_TYPE, new Object[]{"OutputPart", parts.toString()});
+				int outputPartType = (int) client.executeSelectQuery(Queries.GET_PART_TYPE, new Object[]{"OutputPart"})[0].get("id");
 				int outputPartId = client.executeUpdateQuery(Queries.INSERT_PART, new Object[]{outputPartType});
 				
 				partParameters.put(new Part(outputPartType, outputPartId), null);
@@ -106,7 +108,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 				reply.setOntology("GetPartsInfoResponse");
 				reply.setContentObject(partParameters);
 				myAgent.send(reply);
-			} catch (UnreadableException | IOException | KnowledgeException e) {
+			} catch (UnreadableException | IOException | KnowledgeException | KeyNotFoundException e) {
 				Logger.log(e);
 				myAgent.doDelete();
 			}
