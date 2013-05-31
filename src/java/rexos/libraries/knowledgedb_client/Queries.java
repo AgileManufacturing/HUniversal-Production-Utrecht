@@ -310,16 +310,14 @@ public class Queries {
     		"	VALUES((?))";
     
     /**
-     * @var String GET_PART_TYPE
+     * @var String GET_PART_TYPE_ID
      * 
-     * SQL statement for getting a part from teh database.
-     * Expects a string parameter corresponding the part name.
+     * SQL statement for getting a part from the database.
+     * Expects a string parameter corresponding to the part name.
      */
-    public static final String GET_PART_TYPE = "SELECT " +
-    		"FROM" +
-    		"	part_types" +
-    		"WHERE " +
-    		"	name = (?)";
+    public static final String GET_PART_TYPE = "SELECT * " +
+    		"FROM part_types " +
+    		"WHERE (name = (?));";
     
     /**
      * A private constructor preventing this class to be constructed.

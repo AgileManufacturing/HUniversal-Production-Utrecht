@@ -104,7 +104,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 				}
 
 				KnowledgeDBClient client = KnowledgeDBClient.getClient();
-				int outputPartType = (int) client.executeSelectQuery(Queries.GET_PART_TYPE, new Object[]{"OutputPart"})[0].get("id");
+				int outputPartType = (int) client.executeSelectQuery(Queries.GET_PART_TYPE, "OutputPart")[0].get("id");
 				int outputPartId = client.executeUpdateQuery(Queries.INSERT_PART, outputPartType);
 
 				partParameters.put(new Part(outputPartType, outputPartId), null);
