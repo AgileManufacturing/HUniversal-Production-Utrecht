@@ -50,6 +50,7 @@ import org.bson.types.ObjectId;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.BlackboardSubscriber;
 import rexos.libraries.blackboard_client.FieldUpdateSubscription;
+import rexos.libraries.blackboard_client.FieldUpdateSubscription.MongoUpdateLogOperation;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.blackboard_client.MongoOperation;
@@ -176,6 +177,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			productStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
 			statusSubscription = new FieldUpdateSubscription("status", this);
+			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 
 			productStepBBClient.setDatabase(dbData.getName());
 			productStepBBClient.setCollection("ProductStepsBlackBoard");
@@ -286,6 +288,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					switch(operation) {
 						case UPDATE:
 							StepStatusCode status = productionStep.getStatus();
+							Logger.log("Service agent - prod.Step %s status set to %s\n", productionStep.getId(), status);
 							switch(status) {
 								case WAITING:
 									// fetch and sort all serviceSteps
@@ -295,6 +298,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 										serviceSteps[i] = new ServiceStep((BasicDBObject) dbServiceSteps.get(i));
 									}
 									serviceSteps = ServiceStep.sort(serviceSteps);
+
+									Logger.log("Service agent - setting status of ser.Step to %s\n", serviceSteps[0].getId(), status);
 									
 									// update the status of the first serviceStep to WAITING
 									serviceStepBBClient.updateDocuments(
@@ -303,6 +308,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 													"statusData", productionStep.getStatusData())));
 									break;
 								case ABORTED:
+									Logger.log("Service agent - aboring all serviceSteps of prod.Step\n", entry.getTargetObjectId());
 									serviceStepBBClient.updateDocuments(
 											new BasicDBObject("productStepId", entry.getTargetObjectId()),
 											new BasicDBObject("$set", new BasicDBObject("status", status.name()).append(
@@ -324,9 +330,11 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					switch(operation) {
 						case UPDATE:
 							StepStatusCode status = serviceStep.getStatus();
+							Logger.log("Service agent - serv.Step %s status set to %s\n", serviceStep.getId(), status);
 							switch(status) {
 								case DONE:
 									if(serviceStep.getNextStep() != null) {
+										Logger.log("Service agent - setting status of next serv.Step %s to %s\n", serviceStep.getNextStep(), StepStatusCode.WAITING);
 										serviceStepBBClient.updateDocuments(
 												new BasicDBObject("_id", serviceStep.getNextStep()), new BasicDBObject(
 														"$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));
@@ -334,7 +342,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 									}
 
 									// fetch and sort all serviceSteps
-									List<DBObject> dbServiceSteps = serviceStepBBClient.findDocuments(new BasicDBObject("productStepId", serviceStep.getProductStepId()));
+									List<DBObject> dbServiceSteps = serviceStepBBClient.findDocuments(new BasicDBObject("productStepId", productStepId));
 									ServiceStep[] serviceSteps = new ServiceStep[dbServiceSteps.size()];
 									for(int i = 0; i < dbServiceSteps.size(); i++) {
 										serviceSteps[i] = new ServiceStep((BasicDBObject) dbServiceSteps.get(i));
@@ -347,6 +355,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 										log.append("step" + i, serviceSteps[i]);
 									}
 
+									Logger.log("Service agent - saving log in prod.Step %s\n%s\n", productStepId, log);
+									
 									// save the log in the productStep
 									productStepBBClient.updateDocuments(
 											new BasicDBObject("_id", productStepId),
@@ -356,6 +366,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 								case IN_PROGRESS:
 								case SUSPENDED_OR_WARNING:
 								case FAILED:
+									Logger.log("Service agent - setting status of prod.Step %s to %s\n", productStepId, status);
 									productStepBBClient.updateDocuments(
 											new BasicDBObject("_id", productStepId),
 											new BasicDBObject("$set", new BasicDBObject("status", status.name()).append(
