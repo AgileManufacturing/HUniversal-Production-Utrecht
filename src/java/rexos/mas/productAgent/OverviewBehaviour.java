@@ -52,7 +52,6 @@ public class OverviewBehaviour extends OneShotBehaviour{
 
 			@Override
 			public void action(){
-				// TODO Auto-generated method stub
 				if (_informerBehaviour.isDone()){
 					_sequentialBehaviour.removeSubBehaviour(this);
 				}

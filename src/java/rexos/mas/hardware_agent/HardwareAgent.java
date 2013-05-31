@@ -323,11 +323,11 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 					
 					}
 				} catch (InvalidDBNamespaceException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
+					Logger.log(e1);
 				} catch (GeneralMongoException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
+					Logger.log(e1);
 				}
 				break;
 			default:

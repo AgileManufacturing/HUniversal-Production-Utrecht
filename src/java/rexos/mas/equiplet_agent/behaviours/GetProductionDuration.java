@@ -97,7 +97,6 @@ public class GetProductionDuration extends ReceiveBehaviour {
 			ProductionDurationResponse productionDurationResponseBehaviour = new ProductionDurationResponse(myAgent, equipletAgent.getEquipletBBClient());
 			myAgent.addBehaviour(productionDurationResponseBehaviour);
 		} catch (IOException e) {
-			// TODO: ERROR HANDLING
 			Logger.log(e);
 			myAgent.doDelete();
 		}

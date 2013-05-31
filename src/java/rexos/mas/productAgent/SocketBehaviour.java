@@ -42,10 +42,9 @@ public class SocketBehaviour extends CyclicBehaviour{
 			in = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
 		} catch(UnknownHostException e){
-			// TODO Auto-generated catch block
 			Logger.log(e);
 		} catch(IOException e){
-			// TODO Auto-generated catch block
+			
 			Logger.log(e);
 		}
 	}

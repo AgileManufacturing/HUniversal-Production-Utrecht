@@ -38,7 +38,7 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	 */
 	@Override
 	public void action(){
-		// TODO Auto-generated method stub
+		
 	}
 
 	static void canProductionStepStart(ProductionStep step){
