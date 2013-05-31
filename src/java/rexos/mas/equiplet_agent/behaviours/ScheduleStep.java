@@ -95,6 +95,8 @@ public class ScheduleStep extends ReceiveBehaviour {
 		Logger.log("%s received message from %s%n", equipletAgent
 				.getLocalName(), message.getSender().getLocalName(), message
 				.getOntology());
+		
+		//TODO implementeer check of stap ook echt wel past op de gevraagde plaats in bb
 
 		// Gets the timeslot from the string, asks the serviceAgent to plan the
 		// step with logistics.

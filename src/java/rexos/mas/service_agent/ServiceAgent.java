@@ -212,24 +212,30 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	//@formatter:off
 	@Override
 	public void takeDown() {
+		//TODO bouw eerst log op, dan pas alles verwijderen
+		
 		productStepBBClient.unsubscribe(statusSubscription);
 		serviceStepBBClient.unsubscribe(statusSubscription);
 		try {
+			List<DBObject> productSteps = productStepBBClient.findDocuments(new BasicDBObject());
+			ObjectId id;
+			BasicDBObject update, statusData;
+			for(DBObject productStep : productSteps) {
+				id = (ObjectId) productStep.get("_id");
+				statusData = new BasicDBObject("source", "service agent")
+						.append("reason", "died")
+						.append("log", buildLog(id));
+				update = new BasicDBObject("status", StepStatusCode.FAILED.name());
+				update.append("statusData", statusData);
+				
+				productStepBBClient.updateDocuments(new BasicDBObject("_id", id), new BasicDBObject("$set", update));
+			}
+			
 			serviceStepBBClient.removeDocuments(new BasicDBObject());
 			Logger.log("ServiceAgent takedown");
 
-			DBObject update =
-					BasicDBObjectBuilder.start("status", StepStatusCode.FAILED.name())
-						.push("statusData")
-							.add("source", "service agent")
-							.add("reason", "died")
-							.pop()
-						.get();
-			productStepBBClient.updateDocuments(new BasicDBObject(), new BasicDBObject("$set", update));
-
 			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 			message.addReceiver(equipletAgentAID);
-			message.addReceiver(hardwareAgentAID);
 			message.setOntology("ServiceAgentDied");
 			send(message);
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
@@ -290,32 +296,38 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 							StepStatusCode status = productionStep.getStatus();
 							switch(status) {
 								case WAITING:
-									Logger.log("Service agent - prod.Step %s status set to %s\n", productionStep.getId(), status);
-									
+									Logger.log("Service agent - prod.Step %s status set to %s\n",
+											productionStep.getId(), status);
+
 									// fetch and sort all serviceSteps
-									List<DBObject> dbServiceSteps = serviceStepBBClient.findDocuments(new BasicDBObject("productStepId", productionStep.getId()));
+									List<DBObject> dbServiceSteps =
+											serviceStepBBClient.findDocuments(new BasicDBObject("productStepId",
+													productionStep.getId()));
 									ServiceStep[] serviceSteps = new ServiceStep[dbServiceSteps.size()];
 									for(int i = 0; i < dbServiceSteps.size(); i++) {
 										serviceSteps[i] = new ServiceStep((BasicDBObject) dbServiceSteps.get(i));
 									}
 									serviceSteps = ServiceStep.sort(serviceSteps);
 
-									Logger.log("Service agent - setting status of serv.Step %s to %s\n", serviceSteps[0].getId(), status);
-									
+									Logger.log("Service agent - setting status of serv.Step %s to %s\n",
+											serviceSteps[0].getId(), status);
+
 									// update the status of the first serviceStep to WAITING
 									serviceStepBBClient.updateDocuments(
 											new BasicDBObject("_id", serviceSteps[0].getId()),
-											new BasicDBObject("$set", new BasicDBObject("status", status.name()).append(
-													"statusData", productionStep.getStatusData())));
+											new BasicDBObject("$set", new BasicDBObject("status", status.name())
+													.append("statusData", productionStep.getStatusData())));
 									break;
 								case ABORTED:
-									Logger.log("Service agent - prod.Step %s status set to %s\n", productionStep.getId(), status);
-									
-									Logger.log("Service agent - aboring all serviceSteps of prod.Step\n", entry.getTargetObjectId());
+									Logger.log("Service agent - prod.Step %s status set to %s\n",
+											productionStep.getId(), status);
+
+									Logger.log("Service agent - aboring all serviceSteps of prod.Step\n",
+											entry.getTargetObjectId());
 									serviceStepBBClient.updateDocuments(
 											new BasicDBObject("productStepId", entry.getTargetObjectId()),
-											new BasicDBObject("$set", new BasicDBObject("status", status.name()).append(
-													"statusData", productionStep.getStatusData())));
+											new BasicDBObject("$set", new BasicDBObject("status", status.name())
+													.append("statusData", productionStep.getStatusData())));
 									break;
 								default:
 									break;
@@ -335,24 +347,29 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 							StepStatusCode status = serviceStep.getStatus();
 							switch(status) {
 								case DONE:
-									Logger.log("Service agent - serv.Step %s status set to %s\n", serviceStep.getId(), status);
-									
+									Logger.log("Service agent - serv.Step %s status set to %s\n", serviceStep.getId(),
+											status);
+
 									if(serviceStep.getNextStep() != null) {
-										Logger.log("Service agent - setting status of next serv.Step %s to %s\n", serviceStep.getNextStep(), StepStatusCode.WAITING);
+										Logger.log("Service agent - setting status of next serv.Step %s to %s\n",
+												serviceStep.getNextStep(), StepStatusCode.WAITING);
 										serviceStepBBClient.updateDocuments(
 												new BasicDBObject("_id", serviceStep.getNextStep()),
-												new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));
+												new BasicDBObject("$set", new BasicDBObject("status",
+														StepStatusCode.WAITING.name())));
 										break;
 									}
 
 									// fetch and sort all serviceSteps
-									List<DBObject> dbServiceSteps = serviceStepBBClient.findDocuments(new BasicDBObject("productStepId", productStepId));
+									List<DBObject> dbServiceSteps =
+											serviceStepBBClient.findDocuments(new BasicDBObject("productStepId",
+													productStepId));
 									ServiceStep[] serviceSteps = new ServiceStep[dbServiceSteps.size()];
 									for(int i = 0; i < dbServiceSteps.size(); i++) {
 										serviceSteps[i] = new ServiceStep((BasicDBObject) dbServiceSteps.get(i));
 									}
 									serviceSteps = ServiceStep.sort(serviceSteps);
-									
+
 									// append all serviceSteps to the log
 									BasicDBObject log = new BasicDBObject();
 									for(int i = 0; i < serviceSteps.length; i++) {
@@ -360,22 +377,24 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 									}
 
 									Logger.log("Service agent - saving log in prod.Step %s\n%s\n", productStepId, log);
-									
+
 									// save the log in the productStep
 									productStepBBClient.updateDocuments(
 											new BasicDBObject("_id", productStepId),
-											new BasicDBObject("$set", new BasicDBObject("status", status.name()).append(
-													"statusData", log)));
+											new BasicDBObject("$set", new BasicDBObject("status", status.name())
+													.append("statusData", log)));
 									break;
 								case IN_PROGRESS:
 								case SUSPENDED_OR_WARNING:
 								case FAILED:
-									Logger.log("Service agent - serv.Step %s status set to %s\n", serviceStep.getId(), status);
-									Logger.log("Service agent - setting status of prod.Step %s to %s\n", productStepId, status);
+									Logger.log("Service agent - serv.Step %s status set to %s\n", serviceStep.getId(),
+											status);
+									Logger.log("Service agent - setting status of prod.Step %s to %s\n", productStepId,
+											status);
 									productStepBBClient.updateDocuments(
 											new BasicDBObject("_id", productStepId),
-											new BasicDBObject("$set", new BasicDBObject("status", status.name()).append(
-													"statusData", serviceStep.getStatusData())));
+											new BasicDBObject("$set", new BasicDBObject("status", status.name())
+													.append("statusData", serviceStep.getStatusData())));
 									break;
 								default:
 									break;
@@ -392,6 +411,35 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			Logger.log(e);
 			doDelete();
 		}
+	}
+
+	/**
+	 * Function for building the log of the given productStep.
+	 * 
+	 * @param productStep the productStep to build the log for.
+	 * 
+	 * @return the log as a BasicDBObject
+	 */
+	public BasicDBObject buildLog(ObjectId productStep) {
+		BasicDBObject log = new BasicDBObject();
+		List<DBObject> dbServiceSteps;
+		try {
+			dbServiceSteps = serviceStepBBClient.findDocuments(new BasicDBObject("serviceStepID", productStep));
+
+			ServiceStep[] serviceSteps = new ServiceStep[dbServiceSteps.size()];
+			for(int i = 0; i < dbServiceSteps.size(); i++) {
+				serviceSteps[i] = new ServiceStep((BasicDBObject) dbServiceSteps.get(i));
+			}
+			serviceSteps = ServiceStep.sort(serviceSteps);
+
+			// append all serviceSteps to the log
+			for(int i = 0; i < serviceSteps.length; i++) {
+				log.append("step" + i, serviceSteps[i].toBasicDBObject());
+			}
+		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+			Logger.log(e);
+		}
+		return log;
 	}
 
 	/**
