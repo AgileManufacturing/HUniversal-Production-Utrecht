@@ -389,7 +389,7 @@ public class BlackboardClient {
 		}
 		
 		try {
-			WriteResult res = currentCollection.update(searchQuery, updateQuery);
+			WriteResult res = currentCollection.updateMulti(searchQuery, updateQuery);
 			return res.getN();
 		} catch (MongoException mongoException) {
 			throw new GeneralMongoException("An error occurred attempting to update.", mongoException);
