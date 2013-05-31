@@ -191,7 +191,7 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 				agent.doDelete();
 			}
 		} else {
-			// TODO handle timeout
+			// TODO (most) handle timeout
 			Logger.log(agent.getName() + " - GetPartsInfoResponse timeout!");
 			agent.doDelete();
 		}

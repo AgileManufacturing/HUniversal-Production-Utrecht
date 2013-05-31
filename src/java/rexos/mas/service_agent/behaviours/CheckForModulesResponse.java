@@ -103,7 +103,7 @@ public class CheckForModulesResponse extends ReceiveOnceBehaviour {
 			Logger.log("%s sending step availability (%b)%n", getAgent().getLocalName(),
 					message.getPerformative() == ACLMessage.CONFIRM);
 		} else {
-			// TODO handle timeout
+			// TODO (most) handle timeout
 			Logger.log(agent.getName() + " - CheckForModulesResponse timeout!");
 			agent.doDelete();
 		}

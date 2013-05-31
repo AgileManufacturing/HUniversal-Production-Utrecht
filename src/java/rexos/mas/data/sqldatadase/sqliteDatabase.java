@@ -49,7 +49,6 @@ public class sqliteDatabase {
 				PreparedStatement create = conn.prepareStatement("CREATE TABLE IF NOT EXISTS log (id INT, time VARCHAR(30), state VARCHAR(30), message VARCHAR(250))");
 				create.execute();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				Logger.log(e);
 			}
 	}
@@ -69,7 +68,6 @@ public class sqliteDatabase {
 				insert.execute();
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			Logger.log(e);
 		}		
 	}

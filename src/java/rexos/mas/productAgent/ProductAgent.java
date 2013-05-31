@@ -77,7 +77,6 @@ public class ProductAgent extends Agent{
 			BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
 			bbc.removeDocuments(aid.toString());
 		} catch (UnknownHostException | GeneralMongoException | InvalidJSONException | InvalidDBNamespaceException e1) {
-			// TODO Auto-generated catch block
 			Logger.log(e1);
 		}
 	}

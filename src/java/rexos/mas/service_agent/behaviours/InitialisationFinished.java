@@ -93,7 +93,7 @@ public class InitialisationFinished extends ReceiveBehaviour {
 			response.setOntology("InitialisationFinished");
 			serviceAgent.send(response);
 		} else {
-			// TODO handle timeout
+			// TODO (most) handle timeout
 			Logger.log(serviceAgent.getName() + " - InitialisationFinished timeout!");
 			serviceAgent.doDelete();
 		}
