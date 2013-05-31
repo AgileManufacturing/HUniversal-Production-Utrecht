@@ -90,7 +90,7 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 				scheduleStepMessage.addReceiver(equipletAgent.getAID());
 				scheduleStepMessage.setOntology("ScheduleStep");
 				scheduleStepMessage.setConversationId(message.getConversationId());
-				scheduleStepMessage.setContent(String.valueOf((System.currentTimeMillis() - equipletAgent.getTimer().getFirstTimeSlot())/2000 + 5));
+				scheduleStepMessage.setContent(String.valueOf((System.currentTimeMillis() - equipletAgent.getTimer().getFirstTimeSlot())/2000 + 3));
 				equipletAgent.send(scheduleStepMessage);
 
 				Logger.log("sending message: %s%n", responseMessage.getOntology());
