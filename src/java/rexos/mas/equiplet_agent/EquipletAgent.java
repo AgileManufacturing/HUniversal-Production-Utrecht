@@ -85,6 +85,7 @@ import rexos.mas.equiplet_agent.behaviours.InitialisationFinished;
 import rexos.mas.equiplet_agent.behaviours.ServiceAgentDied;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 /**
  * EquipletAgent that communicates with product agents and with its own service
@@ -306,27 +307,22 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			// directory.
 			collectiveBBClient.removeDocuments(new BasicDBObject("AID", getAID().getName()));
 
-			// Messages all his product agents that he is going to die.
-			Object[] productAgents = equipletBBClient.findDistinctValues("productAgentId", new BasicDBObject());
-			for(Object productAgent : productAgents) {
+			// Messages all the product agents that he died.
+			for(DBObject object : equipletBBClient.findDocuments(new BasicDBObject())){
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
-				responseMessage.addReceiver(new AID(productAgent.toString(), AID.ISGUID));
+				responseMessage.addReceiver(new AID(object.get("productAgentId").toString(), AID.ISGUID));
 				responseMessage.setOntology("EquipletAgentDied");
-				responseMessage.setContent("I'm dying");
+				responseMessage.setContentObject((BasicDBObject)object.get("statusData"));
 				send(responseMessage);
 			}
-		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(e);
-			// The equiplet is already going down, so it has to do nothing here.
-		}
-		try {
+			
 			// Clears his own blackboard and removes his subscription on that
 			// blackboard.
 			equipletBBClient.removeDocuments(new BasicDBObject());
 			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			equipletBBClient.unsubscribe(statusSubscription);
-		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+		} catch(InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 			Logger.log(e);
 		}
 
