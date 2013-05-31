@@ -134,9 +134,8 @@ public class StartStep extends ReceiveBehaviour {
 		try {
 			BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED.name());
 			query.put("$order_by", new BasicDBObject("scheduleData", new BasicDBObject("startTime", "-1")));
-			ProductStep nextProductStep = new ProductStep((BasicDBObject) equipletBBClient.findDocuments(query).get(0));
 			List<DBObject> objects = equipletBBClient.findDocuments(query);
-			if(!objects.isEmpty()){
+			if(!objects.isEmpty()) {
 				ProductStep nextProductStep = new ProductStep((BasicDBObject)objects.get(0));
 				equipletAgent.setNextProductStep(nextProductStep.getId());
 				ScheduleData scheduleData = nextProductStep.getScheduleData();
