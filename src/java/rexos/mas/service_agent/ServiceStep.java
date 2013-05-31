@@ -200,16 +200,22 @@ public class ServiceStep implements MongoSaveable {
 	/**
 	 * @see rexos.mas.data.MongoSaveable#toBasicDBObject()
 	 */
+	//@formatter:off
 	@Override
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject dbObject =
-				(BasicDBObject) BasicDBObjectBuilder.start().add("nextStep", nextStep).add("serviceId", serviceId)
-						.add("type", type).add("productStepId", productStepId).add("parameters", parameters)
-						.add("status", status.name()).add("statusData", statusData)
-						.add("scheduleData", scheduleData.toBasicDBObject()).get();
+				(BasicDBObject) BasicDBObjectBuilder.start()
+					.add("nextStep", nextStep)
+					.add("serviceId", serviceId)
+					.add("type", type)
+					.add("productStepId", productStepId)
+					.add("parameters", parameters)
+					.add("status", status.name())
+					.add("statusData", statusData)
+					.add("scheduleData", scheduleData.toBasicDBObject()).get();
 
 		return dbObject;
-	}
+	} //@formatter:on
 
 	/**
 	 * @see rexos.mas.data.MongoSaveable#fromBasicDBObject(com.mongodb.BasicDBObject)

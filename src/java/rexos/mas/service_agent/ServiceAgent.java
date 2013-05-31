@@ -43,6 +43,7 @@ import jade.wrapper.StaleProxyException;
 
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.List;
 
 import org.bson.types.ObjectId;
 
@@ -287,12 +288,24 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 							StepStatusCode status = productionStep.getStatus();
 							switch(status) {
 								case WAITING:
-									// TODO zet eerste serviceStep van productStep op waiting
+									// fetch and sort all serviceSteps
+									List<DBObject> dbServiceSteps = serviceStepBBClient.findDocuments(new BasicDBObject("productStepId", productionStep.getId()));
+									ServiceStep[] serviceSteps = new ServiceStep[dbServiceSteps.size()];
+									for(int i = 0; i < dbServiceSteps.size(); i++) {
+										serviceSteps[i] = new ServiceStep((BasicDBObject) dbServiceSteps.get(i));
+									}
+									serviceSteps = ServiceStep.sort(serviceSteps);
+									
+									// update the status of the first serviceStep to WAITING
+									serviceStepBBClient.updateDocuments(
+											new BasicDBObject("_id", serviceSteps[0].getId()),
+											new BasicDBObject("$set", new BasicDBObject("status", status.name()).append(
+													"statusData", productionStep.getStatusData())));
 									break;
 								case ABORTED:
 									serviceStepBBClient.updateDocuments(
 											new BasicDBObject("productStepId", entry.getTargetObjectId()),
-											new BasicDBObject("$set", new BasicDBObject("status", status).append(
+											new BasicDBObject("$set", new BasicDBObject("status", status.name()).append(
 													"statusData", productionStep.getStatusData())));
 									break;
 								default:
@@ -320,20 +333,24 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 										break;
 									}
 
+									// fetch and sort all serviceSteps
+									List<DBObject> dbServiceSteps = serviceStepBBClient.findDocuments(new BasicDBObject("productStepId", serviceStep.getProductStepId()));
+									ServiceStep[] serviceSteps = new ServiceStep[dbServiceSteps.size()];
+									for(int i = 0; i < dbServiceSteps.size(); i++) {
+										serviceSteps[i] = new ServiceStep((BasicDBObject) dbServiceSteps.get(i));
+									}
+									serviceSteps = ServiceStep.sort(serviceSteps);
 									
-									BasicDBObject log = new BasicDBObject("step0", serviceStep.toBasicDBObject());
-									ObjectId currentStepId = serviceStep.getNextStep();
-									BasicDBObject currentStep;
-									int i = 1;
-									while(currentStepId != null) {
-										currentStep = (BasicDBObject) serviceStepBBClient.findDocumentById(currentStepId);
-										log.append("step" + i++, currentStep);
-										currentStepId = currentStep.getObjectId("nextStep");
+									// append all serviceSteps to the log
+									BasicDBObject log = new BasicDBObject();
+									for(int i = 0; i < serviceSteps.length; i++) {
+										log.append("step" + i, serviceSteps[i]);
 									}
 
+									// save the log in the productStep
 									productStepBBClient.updateDocuments(
 											new BasicDBObject("_id", productStepId),
-											new BasicDBObject("$set", new BasicDBObject("status", status).append(
+											new BasicDBObject("$set", new BasicDBObject("status", status.name()).append(
 													"statusData", log)));
 									break;
 								case IN_PROGRESS:
@@ -341,7 +358,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 								case FAILED:
 									productStepBBClient.updateDocuments(
 											new BasicDBObject("_id", productStepId),
-											new BasicDBObject("$set", new BasicDBObject("status", status).append(
+											new BasicDBObject("$set", new BasicDBObject("status", status.name()).append(
 													"statusData", serviceStep.getStatusData())));
 									break;
 								default:
