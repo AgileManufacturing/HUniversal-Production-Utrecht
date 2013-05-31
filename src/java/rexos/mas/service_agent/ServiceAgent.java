@@ -288,9 +288,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					switch(operation) {
 						case UPDATE:
 							StepStatusCode status = productionStep.getStatus();
-							Logger.log("Service agent - prod.Step %s status set to %s\n", productionStep.getId(), status);
 							switch(status) {
 								case WAITING:
+									Logger.log("Service agent - prod.Step %s status set to %s\n", productionStep.getId(), status);
+									
 									// fetch and sort all serviceSteps
 									List<DBObject> dbServiceSteps = serviceStepBBClient.findDocuments(new BasicDBObject("productStepId", productionStep.getId()));
 									ServiceStep[] serviceSteps = new ServiceStep[dbServiceSteps.size()];
@@ -308,6 +309,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 													"statusData", productionStep.getStatusData())));
 									break;
 								case ABORTED:
+									Logger.log("Service agent - prod.Step %s status set to %s\n", productionStep.getId(), status);
+									
 									Logger.log("Service agent - aboring all serviceSteps of prod.Step\n", entry.getTargetObjectId());
 									serviceStepBBClient.updateDocuments(
 											new BasicDBObject("productStepId", entry.getTargetObjectId()),
@@ -330,9 +333,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					switch(operation) {
 						case UPDATE:
 							StepStatusCode status = serviceStep.getStatus();
-							Logger.log("Service agent - serv.Step %s status set to %s\n", serviceStep.getId(), status);
 							switch(status) {
 								case DONE:
+									Logger.log("Service agent - serv.Step %s status set to %s\n", serviceStep.getId(), status);
+									
 									if(serviceStep.getNextStep() != null) {
 										Logger.log("Service agent - setting status of next serv.Step %s to %s\n", serviceStep.getNextStep(), StepStatusCode.WAITING);
 										serviceStepBBClient.updateDocuments(
@@ -352,7 +356,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 									// append all serviceSteps to the log
 									BasicDBObject log = new BasicDBObject();
 									for(int i = 0; i < serviceSteps.length; i++) {
-										log.append("step" + i, serviceSteps[i]);
+										log.append("step" + i, serviceSteps[i].toBasicDBObject());
 									}
 
 									Logger.log("Service agent - saving log in prod.Step %s\n%s\n", productStepId, log);
@@ -366,6 +370,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 								case IN_PROGRESS:
 								case SUSPENDED_OR_WARNING:
 								case FAILED:
+									Logger.log("Service agent - serv.Step %s status set to %s\n", serviceStep.getId(), status);
 									Logger.log("Service agent - setting status of prod.Step %s to %s\n", productStepId, status);
 									productStepBBClient.updateDocuments(
 											new BasicDBObject("_id", productStepId),
