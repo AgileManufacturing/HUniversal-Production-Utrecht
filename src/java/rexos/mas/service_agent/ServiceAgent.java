@@ -300,7 +300,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 									}
 									serviceSteps = ServiceStep.sort(serviceSteps);
 
-									Logger.log("Service agent - setting status of ser.Step to %s\n", serviceSteps[0].getId(), status);
+									Logger.log("Service agent - setting status of serv.Step %s to %s\n", serviceSteps[0].getId(), status);
 									
 									// update the status of the first serviceStep to WAITING
 									serviceStepBBClient.updateDocuments(
@@ -340,8 +340,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 									if(serviceStep.getNextStep() != null) {
 										Logger.log("Service agent - setting status of next serv.Step %s to %s\n", serviceStep.getNextStep(), StepStatusCode.WAITING);
 										serviceStepBBClient.updateDocuments(
-												new BasicDBObject("_id", serviceStep.getNextStep()), new BasicDBObject(
-														"$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));
+												new BasicDBObject("_id", serviceStep.getNextStep()),
+												new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));
 										break;
 									}
 

@@ -230,7 +230,7 @@ public class ServiceStep implements MongoSaveable {
 		parameters = (BasicDBObject) object.get("parameters");
 		status = StepStatusCode.valueOf(object.getString("status"));
 		if(object.containsField("statusData")) {
-			statusData = (BasicDBObject) object.get(statusData);
+			statusData = (BasicDBObject) object.get("statusData");
 		} else {
 			statusData = new BasicDBObject();
 		}

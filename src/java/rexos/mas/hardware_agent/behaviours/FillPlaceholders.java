@@ -153,7 +153,7 @@ public class FillPlaceholders extends ReceiveBehaviour {
 			//Fill the placeholders
 			equipletSteps = module.fillPlaceHolders(equipletSteps, serviceStep.getParameters());
 			for(EquipletStep step : equipletSteps) {
-				equipletStepBBClient.updateDocuments(new BasicDBObject("_id", step.getId()), step.toBasicDBObject());
+				equipletStepBBClient.updateDocuments(new BasicDBObject("_id", step.getId()), new BasicDBObject("$set", step.toBasicDBObject()));
 			}
 			//if the serviceStep has a nextStep fill the placeholders for that one to.
 			if(serviceStep.getNextStep() != null){
