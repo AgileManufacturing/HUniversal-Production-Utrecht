@@ -56,7 +56,7 @@ public class GetProductionDuration extends ReceiveBehaviour {
 	 * The messageTemplate this behaviour listens to.
 	 * This behaviour listens to the ontology: GetProductStepDuration.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("GetProductStepDuration");
+	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("GetProductionDuration");
 	
 	/**
 	 * @var EquipletAgent equipletAgent

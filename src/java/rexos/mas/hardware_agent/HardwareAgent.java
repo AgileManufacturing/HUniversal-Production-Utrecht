@@ -59,6 +59,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
+
 import rexos.libraries.blackboard_client.BasicOperationSubscription;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.BlackboardSubscriber;
@@ -267,6 +269,11 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		try {
 			// Clears his own blackboard and removes his subscription on that
 			// blackboard.
+			for(DBObject object : serviceStepBBClient.findDocuments(new BasicDBObject())){
+				serviceStepBBClient.updateDocuments(new BasicDBObject("_id", object.get("_id")),
+						new BasicDBObject("$set", new BasicDBObject("statusData", buildLog((ObjectId)object.get("_id")))));
+			}
+			
 			equipletStepBBClient.removeDocuments(new BasicDBObject());
 			equipletStepBBClient.unsubscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
@@ -361,27 +368,11 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 							switch(status) {
 								case DONE:
 									if(equipletStep.getNextStep() == null) {
-										List<DBObject> dbEquipletSteps =
-												equipletStepBBClient.findDocuments(new BasicDBObject("serviceStepID",
-														equipletStep.getServiceStepID()));
-
-										EquipletStep[] equipletSteps = new EquipletStep[dbEquipletSteps.size()];
-										for(int i = 0; i < dbEquipletSteps.size(); i++) {
-											equipletSteps[i] = new EquipletStep((BasicDBObject) dbEquipletSteps.get(i));
-										}
-										equipletSteps = EquipletStep.sort(equipletSteps);
-
-										// append all serviceSteps to the log
-										BasicDBObject log = new BasicDBObject();
-										for(int i = 0; i < equipletSteps.length; i++) {
-											log.append("step" + i, equipletSteps[i].toBasicDBObject());
-										}
-										
-										Logger.log("Hardware agent - saving log in serv.Step %s\n%s\n", serviceStep.getId(), log);
+										Logger.log("Hardware agent - saving log in serv.Step %s\n%s\n", serviceStep.getId(), buildLog(serviceStep.getId()));
 
 										serviceStepBBClient.updateDocuments(
 												new BasicDBObject("_id", serviceStep.getId()),
-												new BasicDBObject("$set", new BasicDBObject("statusData", log).append(
+												new BasicDBObject("$set", new BasicDBObject("statusData", buildLog(serviceStep.getId())).append(
 														"status", StepStatusCode.DONE.name())));
 										Logger.log("Hardware Agent - setting service step on DONE");
 									} else {
@@ -440,5 +431,33 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	 */
 	public HashMap<Integer, Object> getConfiguration() {
 		return configuration;
+	}
+	
+	/**
+	 * Function for building the log of the given serviceStep.
+	 * @param serviceStep the serviceStep to build the log for.
+	 * 
+	 * @return the log as a BasicDBObject
+	 */
+	public BasicDBObject buildLog(ObjectId serviceStep){
+		BasicDBObject log = new BasicDBObject();
+		List<DBObject> dbEquipletSteps;
+		try {
+			dbEquipletSteps = equipletStepBBClient.findDocuments(new BasicDBObject("serviceStepID", serviceStep));
+
+			EquipletStep[] equipletSteps = new EquipletStep[dbEquipletSteps.size()];
+			for(int i = 0; i < dbEquipletSteps.size(); i++) {
+				equipletSteps[i] = new EquipletStep((BasicDBObject) dbEquipletSteps.get(i));
+			}
+			equipletSteps = EquipletStep.sort(equipletSteps);
+	
+			// append all equipletsteps to the log
+			for(int i = 0; i < equipletSteps.length; i++) {
+				log.append("step" + i, equipletSteps[i].toBasicDBObject());
+			}
+		}catch (InvalidDBNamespaceException | GeneralMongoException e) {
+			Logger.log(e);
+		}
+		return log;
 	}
 }

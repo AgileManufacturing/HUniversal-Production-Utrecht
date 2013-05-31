@@ -1,3 +1,41 @@
+/**
+ * @file SchedulerBehaviour.java
+ * @brief Behaviour in which the product agent schedules the productsteps.
+ * @date Created: 23-04-2013
+ * 
+ * @author Ricky van Rijn
+ * 
+ * @section LICENSE License: newBSD
+ * 
+ *          Copyright © 2012, HU University of Applied Sciences Utrecht. All
+ *          rights reserved.
+ * 
+ *          Redistribution and use in source and binary forms, with or without
+ *          modification, are permitted provided that the following conditions
+ *          are met: - Redistributions of source code must retain the above
+ *          copyright notice, this list of conditions and the following
+ *          disclaimer. - Redistributions in binary form must reproduce the
+ *          above copyright notice, this list of conditions and the following
+ *          disclaimer in the documentation and/or other materials provided with
+ *          the distribution. - Neither the name of the HU University of Applied
+ *          Sciences Utrecht nor the names of its contributors may be used to
+ *          endorse or promote products derived from this software without
+ *          specific prior written permission.
+ * 
+ *          THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *          "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *          LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *          FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE HU
+ *          UNIVERSITY OF APPLIED SCIENCES UTRECHT BE LIABLE FOR ANY DIRECT,
+ *          INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ *          (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ *          SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ *          HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ *          STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *          ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ *          OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ **/
 
 package rexos.mas.productAgent;
 
@@ -5,15 +43,15 @@ import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
+import rexos.mas.data.Product;
+import rexos.mas.data.Production;
+import rexos.mas.data.ProductionStep;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.log.Logger;
-import rexos.mas.data.Product;
-import rexos.mas.data.Production;
-import rexos.mas.data.ProductionStep;
 
 import com.mongodb.DBObject;
 
@@ -21,11 +59,11 @@ import com.mongodb.DBObject;
 public class SchedulerBehaviour extends OneShotBehaviour{
 	private ProductAgent _productAgent;
 	private int timeslotsToSchedule = 0;
-	private int debug = 0;
-	
+	private int debug = 1;
+
 	@Override
 	public void action(){
-		// Lets schedule ourself with the equiplet agents in our current list.
+		// Shedule the PA with the equiplet agents in the current list.
 		_productAgent = (ProductAgent) myAgent;
 		_productAgent.getProduct().getProduction()
 				.getProductionEquipletMapping();
@@ -33,9 +71,9 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 			Product product = this._productAgent.getProduct();
 			Production production = product.getProduction();
 			ArrayList<ProductionStep> psa = production.getProductionSteps();
-			if(debug != 0){
+			if (debug != 0){
 				// debug
-				System.out.println("NUMBER OF EQUIPLETS: " + psa.size());
+				System.out.println("Number of equiplets: " + psa.size());
 			}
 			for(ProductionStep ps : psa){
 				int PA_id = ps.getId();
@@ -51,15 +89,15 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 													PA_id).keySet().toArray()[0])
 							.intValue();
 				}
-				if(debug != 0){
-					//debug
+				if (debug != 0){
+					// debug
 					System.out.println("-------------------");
-					System.out.println("STEP_ID:"
+					System.out.println("step_id:"
 							+ PA_id
-							+ " NUMBER OF EQ AVAILABLE: "
+							+ " number of eq available: "
 							+ production.getProductionEquipletMapping()
-									.getEquipletsForProductionStep(PA_id).keySet()
-									.size());
+									.getEquipletsForProductionStep(PA_id)
+									.keySet().size());
 					System.out.println("STEP_ID:" + ps.getId() + " requires "
 							+ this.timeslotsToSchedule + " timeslots");
 					System.out.println("-------------------");
@@ -87,22 +125,22 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 		// Make connection with blackboard
 		BlackboardClient bbc = new BlackboardClient("145.89.191.131");
 		bbc.setDatabase("ScheduleBlackBoard");
-		if(debug != 0){
+		if (debug != 0){
 			// debug
-			System.out.println("Scheduler Started");
+			System.out.println("Scheduler started");
 		}
 		// authenticating mongodb
 		// boolean auth = db.authenticate("root", char['g','e','e','n']);
 		// end connecting
 		// extract data of every equiplet their mongoDB to Object Array
 		int scheduleCount = 0;
-		FreeTimeSlot[] freetimes;
+		FreeTimeSlot[] freetimeslot;
 		for(int i = 0; i < equipletlist.size(); i++){
 			// old name is eqa1
 			bbc.setCollection(equipletlist.get(i).getLocalName().toString());
 			List<DBObject> blackBoard = bbc.findDocuments(" ");
 			scheduleCount += blackBoard.size();
-			if(debug != 0){
+			if (debug != 0){
 				// debug
 				System.out
 						.println("----- Get list of the already scheduled data -------");
@@ -110,22 +148,22 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 				System.out.println();
 			}
 		}
-		if(debug != 0){
+		if (debug != 0){
 			// debug
 			System.out.println("--------- ");
 			System.out.println("ScheduleCount: " + scheduleCount);
 			System.out.println();
 		}
-		// intialise object Schedule and object FreeTimeSlot arrays
+		// intialize object 'Schedule' and object 'FreeTimeSlot' arrays
 		schedules = new Schedule[scheduleCount];
-		freetimes = new FreeTimeSlot[scheduleCount];
+		freetimeslot = new FreeTimeSlot[scheduleCount];
 		// get every scheduled timeslot of every equiplet
 		for(int extract = 0; extract < equipletlist.size(); extract++){
 			bbc.setCollection(equipletlist.get(extract).getLocalName()
 					.toString());
 			List<DBObject> blackBoard = bbc.findDocuments(" ");
 			// List<DBObject> data =
-			// db.getCollection(equipletlist.get(extract).getLocalName()).find().toArray();//
+			// db.getCollection(equipletlist.get(extract).getLocalName()).find().toArray();
 			// nameOfCollection should be 'schedule'
 			for(int i = 0; i < blackBoard.size(); i++){
 				double b = (Double) blackBoard.get(i).get("startTime");
@@ -138,12 +176,13 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 						extract).getName());
 			}
 		}
-		// initialise timeslot to start checking and temporarily value for
+		// initialize timeslot to start checking and temporarily value for
 		// calculation
 		int startTimeSlot = 0;
 		int freetimeslotCounter = 0;
-		// check within every schedule of the schedules array for free timeslots
-		// and add them to the free time slots array
+		// check within every schedule of the 'schedules' array for free
+		// timeslots
+		// and add them to the 'freetimeslot' array
 		for(int run = 0; run < schedules.length; run++){
 			if (schedules[run].getStartTime() > startTimeSlot){
 				if (schedules.length > (run + 1)){
@@ -152,16 +191,18 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 						int freeTimeSlot = schedules[(run + 1)].getStartTime()
 								- schedules[run].getDeadline() - 1;
 						int timeslotToSchedule = (schedules[run].getDeadline() + 1);
-						if(debug != 0){
+						if (debug != 0){
 							// debug
-							System.out.println("Vrij tijd sloten: " + freeTimeSlot
-									+ " startend op tijdslot: "
+							System.out.println("Free timeslot: " + freeTimeSlot
+									+ " starting at timeslot: "
 									+ timeslotToSchedule);
-							freetimes[freetimeslotCounter] = this.new FreeTimeSlot(
+							freetimeslot[freetimeslotCounter] = this.new FreeTimeSlot(
 									timeslotToSchedule, freeTimeSlot,
 									schedules[run].getEquipletName());
-							System.out.println(freetimeslotCounter + " : "
-									+ freetimes[freetimeslotCounter].toString());
+							System.out.println(freetimeslotCounter
+									+ " : "
+									+ freetimeslot[freetimeslotCounter]
+											.toString());
 							System.out.println();
 						}
 						freetimeslotCounter++;
@@ -171,20 +212,20 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 		}
 		// Startslot which need to be scheduled
 		FreeTimeSlot freetimeslotEq = null;
-		if(debug != 0){
+		if (debug != 0){
 			System.out.println("---- Number of timeslots to schedule -----");
 			System.out.println("Timeslots to schedule: " + timeslotsToSchedule);
 			System.out.println();
 		}
 		// calculate freetime slot and asign them to the above intialized values
-		if (freetimes.length > 1){
-			if(debug != 0){
-				System.out.println("Free time Slots:" + freetimes.length);
+		if (freetimeslot.length > 1){
+			if (debug != 0){
+				System.out.println("Free time slots:" + freetimeslot.length);
 			}
-			for(int chooseTimeSlot = 0; chooseTimeSlot < freetimes.length; chooseTimeSlot++){
-				if (freetimes[chooseTimeSlot] != null){
-					if (freetimes[chooseTimeSlot].getDuration() <= timeslotsToSchedule){
-						freetimeslotEq = freetimes[chooseTimeSlot];
+			for(int chooseTimeSlot = 0; chooseTimeSlot < freetimeslot.length; chooseTimeSlot++){
+				if (freetimeslot[chooseTimeSlot] != null){
+					if (freetimeslot[chooseTimeSlot].getDuration() <= timeslotsToSchedule){
+						freetimeslotEq = freetimeslot[chooseTimeSlot];
 					}
 				}
 			}
@@ -199,16 +240,13 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 				equipletAID = equipletlist.get(i);
 			}
 		}
-		
-		if(debug != 0){
+		if (debug != 0){
 			// debug
 			System.out
-					.println("------- Equiplet which gains Free time slot --------");
-			System.out.println("AID NAME:" + equipletAID + "");
+					.println("------- Equiplet which gains free time slot --------");
+			System.out.println("AID name:" + equipletAID + "");
 			System.out.println();
 		}
-		
-		
 		// send the message to the equiplet to schedule the timeslot
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		if (freetimeslotEq != null && equipletAID != null){
@@ -217,19 +255,29 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 			msg.setContent("" + freetimeslotEq.getStartTime());
 			msg.addReceiver(equipletAID);
 			myAgent.send(msg);
-			if(debug != 0){
+			/*
+			 * SEND MESSAGES TO OTHER PLATFORMS computername is resolved by the
+			 * hosts file in either Linux or Windows AID remoteAMS = new
+			 * AID("agentname@"+containername, AID.ISGUID);
+			 * remoteAMS.addAddresses
+			 * ("http://"+computername+":"+portnumber+"/acc");
+			 * msg.addReceiver(remoteAMS); myAgent.send(msg);
+			 */
+			if (debug != 0){
 				// debug
-				System.out.println("Send Timeslot " + equipletAID.getName()
+				System.out.println("Send timeslot " + equipletAID.getName()
 						+ " to EQ");
+				System.out.println(equipletAID);
 			}
 		} else{
-			if(debug != 0){
+			if (debug != 0){
 				// debug
-				System.out.println("No Timeslot asigned.");
+				System.out.println("No timeslot asigned.");
 			}
 		}
-		if(debug != 0){
-		System.out.println();
+		if (debug != 0){
+			// debug
+			System.out.println();
 		}
 	}
 
