@@ -49,8 +49,8 @@ public class GetProductionDuration extends ReceiveBehaviour {
 	 * @var static final long serialVersionUID
 	 * The serial version UID for this class
 	 */
-	private static final long serialVersionUID = 1L;
-	
+	private static final long serialVersionUID = 2502684423295372637L;
+
 	/**
 	 * @var MessageTemplate messageTemplate
 	 * The messageTemplate this behaviour listens to.
@@ -71,7 +71,7 @@ public class GetProductionDuration extends ReceiveBehaviour {
 	 * 
 	 */
 	public GetProductionDuration(Agent a) {
-		super(a, -1, messageTemplate);
+		super(a, messageTemplate);
 		equipletAgent = (EquipletAgent) a;
 	}
 
@@ -87,15 +87,23 @@ public class GetProductionDuration extends ReceiveBehaviour {
 		try {
 			//gets the productstepId and sends it to the service agent with the ontology GetProductionStepDuration.
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
-			ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
-			responseMessage.addReceiver(equipletAgent.getServiceAgent());
-			responseMessage.setConversationId(message.getConversationId());
-			responseMessage.setContentObject(productStepId);
-			responseMessage.setOntology("GetProductionStepDuration");
-			myAgent.send(responseMessage);
 			
-			ProductionDurationResponse productionDurationResponseBehaviour = new ProductionDurationResponse(myAgent, equipletAgent.getEquipletBBClient());
-			myAgent.addBehaviour(productionDurationResponseBehaviour);
+			if(productStepId == null) {
+				ACLMessage responseMessage = message.createReply();
+				message.setPerformative(ACLMessage.DISCONFIRM);
+				responseMessage.setOntology("ConversationIdUnknown");
+				myAgent.send(responseMessage);
+			} else {
+				ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
+				responseMessage.addReceiver(equipletAgent.getServiceAgent());
+				responseMessage.setConversationId(message.getConversationId());
+				responseMessage.setContentObject(productStepId);
+				responseMessage.setOntology("GetProductionStepDuration");
+				myAgent.send(responseMessage);
+				
+				ProductionDurationResponse productionDurationResponseBehaviour = new ProductionDurationResponse(myAgent, equipletAgent.getEquipletBBClient());
+				myAgent.addBehaviour(productionDurationResponseBehaviour);
+			}
 		} catch (IOException e) {
 			Logger.log(e);
 			myAgent.doDelete();

@@ -87,7 +87,18 @@ public class PickAndPlaceService extends Service {
 	 */
 	@Override
 	public boolean canDoStep(int productStepType, BasicDBObject parameters) {
-		return parameters.containsField("part") && parameters.containsField("position");
+		if(parameters.containsField("part")) {
+			if(!(parameters.get("part") instanceof Integer)) {
+				return false;
+			}
+		}
+		
+		if(parameters.containsField("position")) {
+			if(!(parameters.get("position") instanceof Position)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
