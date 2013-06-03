@@ -54,85 +54,92 @@ import com.mongodb.BasicDBObject;
 /**
  * Data object for storing a part.
  */
-public class Part implements Serializable, MongoSaveable{
+public class Part implements Serializable, MongoSaveable {
 	/**
 	 * @var long serialVersionUID
-	 * The serialVersionUID for this class.
+	 *      The serialVersionUID for this class.
 	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @var int id
-	 * The id of the part.
+	 *      The id of the part.
 	 */
 	private int id;
-	
+
 	/**
 	 * @var int type
-	 * The type of the part.
+	 *      The type of the part.
 	 */
 	private int type;
-	
+
 	/**
 	 * Basic constructor for a part with parameter type.
+	 * 
 	 * @param type The type of the part
 	 */
-	public Part(int type){
+	public Part(int type) {
 		this.type = type;
 		this.id = -1;
 	}
-	
+
 	/**
 	 * constructor for a part with parameters type and id.
+	 * 
 	 * @param type The type of the part
 	 * @param id The id of the part
 	 */
-	public Part(int type, int id){
+	public Part(int type, int id) {
 		this.type = type;
 		this.id = id;
 	}
-	
+
 	/**
 	 * constructor for a part accepting a BasicDBObject.
+	 * 
 	 * @param object The BasicDBObject for the part
 	 */
-	public Part(BasicDBObject object){
+	public Part(BasicDBObject object) {
 		fromBasicDBObject(object);
 	}
-	
+
 	/**
 	 * Setter for the type
+	 * 
 	 * @param type The new type for the part
 	 */
-	public void setType(int type){
+	public void setType(int type) {
 		this.type = type;
 	}
-	
+
 	/**
 	 * Getter for the type
+	 * 
 	 * @return The type of the part
 	 */
-	public int getType(){
+	public int getType() {
 		return type;
 	}
-	
+
 	/**
 	 * Setter for the id
+	 * 
 	 * @param id The new id for the part
 	 */
-	public void setId(int id){
+	public void setId(int id) {
 		this.id = id;
 	}
-	
+
 	/**
 	 * Getter for the id
+	 * 
 	 * @return The id of the part
 	 */
-	public int getId(){
+	public int getId() {
 		return id;
 	}
-	
-	/** 
+
+	/**
 	 * @see rexos.mas.data.IMongoSaveable#toBasicDBObject(com.mongodb.BasicDBObject)
 	 **/
 	@Override
@@ -143,19 +150,18 @@ public class Part implements Serializable, MongoSaveable{
 		return object;
 	}
 
-	/** 
+	/**
 	 * @see rexos.mas.data.IMongoSaveable#fromBasicDBObject(com.mongodb.BasicDBObject)
 	 **/
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		if(object.containsField("type")){
+		try {
 			type = object.getInt("type");
-		}
-		if(object.containsField("id")){
-			id = object.getInt("id");
+			if(object.containsField("id")) {
+				id = object.getInt("id");
+			}
+		} catch(Exception e) {
+			throw new IllegalArgumentException();
 		}
 	}
-
-	
-
 }

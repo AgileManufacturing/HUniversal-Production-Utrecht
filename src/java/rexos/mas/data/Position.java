@@ -154,17 +154,15 @@ public class Position implements Serializable, MongoSaveable {
 	 **/
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		if(object.containsField("x")) {
+		try {
 			x = object.getDouble("x");
-		}
-		if(object.containsField("y")) {
 			y = object.getDouble("y");
-		}
-		if(object.containsField("z")) {
 			z = object.getDouble("z");
-		}
-		if(object.containsField("relativeToPart")) {
-			relativeToPart = new Part((BasicDBObject)object.get("relativeToPart"));
+			if(object.containsField("relativeToPart")) {
+				relativeToPart = new Part((BasicDBObject)object.get("relativeToPart"));
+			}
+		} catch(IllegalArgumentException | ClassCastException | NullPointerException e) {
+			throw new IllegalArgumentException();
 		}
 	}
 

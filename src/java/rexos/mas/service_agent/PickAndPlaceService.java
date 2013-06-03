@@ -85,18 +85,19 @@ public class PickAndPlaceService extends Service {
 	/**
 	 * @see rexos.mas.service_agent.Service#canDoStep(int, com.mongodb.BasicDBObject)
 	 */
+	@SuppressWarnings("unused")
 	@Override
 	public boolean canDoStep(int productStepType, BasicDBObject parameters) {
-		if(parameters.containsField("part")) {
-			if(!(parameters.get("part") instanceof Integer)) {
-				return false;
+		try {
+			if(parameters.containsField("part")) {
+				new Part((BasicDBObject) parameters.get("part"));
 			}
-		}
-		
-		if(parameters.containsField("position")) {
-			if(!(parameters.get("position") instanceof Position)) {
-				return false;
+			
+			if(parameters.containsField("position")) {
+				new Position((BasicDBObject) parameters.get("position"));
 			}
+		} catch (IllegalArgumentException e) {
+			return false;
 		}
 		return true;
 	}

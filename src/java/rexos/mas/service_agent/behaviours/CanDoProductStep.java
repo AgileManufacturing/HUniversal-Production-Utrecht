@@ -113,7 +113,7 @@ public class CanDoProductStep extends ReceiveBehaviour {
 			int stepType = productStep.getType();
 			BasicDBObject parameters = productStep.getParameters();
 
-			Logger.log("%s got message CanDoProductionStep for step type %s%n", agent.getLocalName(), stepType);
+			Logger.log("%s got message CanDoProductStep for step type %s%n", agent.getLocalName(), stepType);
 
 			Service[] services = factory.getServicesForStep(stepType);
 
