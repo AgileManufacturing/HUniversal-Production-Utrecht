@@ -46,7 +46,6 @@ import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.ProductStep;
-import rexos.mas.equiplet_agent.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -77,14 +76,21 @@ public class ScheduleStep extends ReceiveBehaviour {
 	private EquipletAgent equipletAgent;
 
 	/**
+	 * @var Blackboard productBBClient
+	 * 		The productBBClient for this behaviour.
+	 */
+	private BlackboardClient productBBClient;
+	
+	/**
 	 * Instantiates a new schedule step.
 	 * 
 	 * @param a
 	 *            The agent for this behaviour
 	 */
-	public ScheduleStep(Agent a) {
+	public ScheduleStep(Agent a, BlackboardClient productBBClient) {
 		super(a, messageTemplate);
 		equipletAgent = (EquipletAgent) a;
+		this.productBBClient = productBBClient;
 	}
 
 	/**
@@ -101,58 +107,44 @@ public class ScheduleStep extends ReceiveBehaviour {
 				.getLocalName(), message.getSender().getLocalName(), message
 				.getOntology());
 		
-		//TODO implementeer check of stap ook echt wel past op de gevraagde plaats in bb
-
-		// Gets the timeslot from the string, asks the serviceAgent to plan the
-		// step with logistics.
-		
 		try {
+			//Gets the timeslot out of the message content.
 			int timeslot = Integer.parseInt(message.getContent());
 			Logger.log("scheduling step for timeslot %d%n", timeslot);
 
-			ObjectId productStepId = equipletAgent.getRelatedObjectId(message
-					.getConversationId());
-			BlackboardClient client = equipletAgent.getEquipletBBClient();
+			//Gets the scheduledata out of the productstep.
+			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
 			ScheduleData scheduleData = new ScheduleData(
-					(BasicDBObject) ((BasicDBObject) client
-							.findDocumentById(productStepId))
-							.get("scheduleData"));
+					(BasicDBObject) (productBBClient.findDocumentById(productStepId)).get("scheduleData"));
+			int duration = scheduleData.getDuration();
 			
-			scheduleData.setStartTime(timeslot);
-					
-			int newDuration = scheduleData.getDuration();
-			int newStartTime = scheduleData.getStartTime();
-					
-			List<DBObject> plannedSteps = client.findDocuments(QueryBuilder.start("scheduleData.startTime").greaterThan(-1).get());
+			//Gets planned steps
+			List<DBObject> plannedSteps = productBBClient.findDocuments(QueryBuilder.start("scheduleData.startTime").greaterThan(-1).get());
 			
 			boolean fitsInTimeSlot = true;
 			
-			for(int i = 0; i < plannedSteps.size(); i++){
+			//check if other steps not are scheduled.
+			for(DBObject plannedStep : plannedSteps){
+				ProductStep productStep = new ProductStep((BasicDBObject)plannedStep);	
+				ScheduleData stepScheduleData = productStep.getScheduleData();
 				
-				ProductStep plannedStep = new ProductStep((BasicDBObject)plannedSteps.get(i));	
-				
-				ScheduleData newScheduleData = plannedStep.getScheduleData();
-				
-				int duration = newScheduleData.getDuration();
-				int startTime = newScheduleData.getStartTime();
-				//check				
-				if((newStartTime >= startTime) && newStartTime <= (startTime + duration)){	
-					
-					fitsInTimeSlot = false;					
-				}
-				else if((newStartTime + newDuration) >= startTime && (newStartTime + newDuration) <= (startTime + duration)){
-					
-					fitsInTimeSlot = false;
-				}
-				else if((newStartTime <= startTime) && ((newDuration + newStartTime) >= (duration + startTime))){
-
-					fitsInTimeSlot = false;
-				}
-
-			}
-			if (fitsInTimeSlot) {
+				int stepDuration = stepScheduleData.getDuration();
+				int stepStartTime = stepScheduleData.getStartTime();
 							
-				client.updateDocuments(
+				if((timeslot >= stepStartTime) &&
+						timeslot <= (stepStartTime + stepDuration)){
+					fitsInTimeSlot = false;					
+				}else if((timeslot + duration) >= stepStartTime &&
+						(timeslot + duration) <= (stepStartTime + stepDuration)){
+					fitsInTimeSlot = false;
+				}else if((timeslot <= stepStartTime) &&
+						((duration + timeslot) >= (stepDuration + stepStartTime))){
+					fitsInTimeSlot = false;
+				}
+			}
+			if (fitsInTimeSlot){
+				scheduleData.setStartTime(timeslot);
+				productBBClient.updateDocuments(
 						new BasicDBObject("_id", productStepId),
 						new BasicDBObject("$set", new BasicDBObject(
 								"scheduleData", scheduleData.toBasicDBObject())));

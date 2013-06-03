@@ -87,10 +87,10 @@ public class GetProductionDuration extends ReceiveBehaviour {
 		try {
 			//gets the productstepId and sends it to the service agent with the ontology GetProductionStepDuration.
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
-			
 			if(productStepId == null) {
+				Logger.log("Conversation id not known");
 				ACLMessage responseMessage = message.createReply();
-				message.setPerformative(ACLMessage.DISCONFIRM);
+				responseMessage.setPerformative(ACLMessage.DISCONFIRM);
 				responseMessage.setOntology("ConversationIdUnknown");
 				myAgent.send(responseMessage);
 			} else {

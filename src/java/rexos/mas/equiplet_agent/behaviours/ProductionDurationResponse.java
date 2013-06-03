@@ -85,16 +85,17 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 				responseMessage.setConversationId(message.getConversationId());
 				responseMessage.setContentObject(new Long(schedule.getDuration()));
 				equipletAgent.send(responseMessage);
+				Logger.log("sending message: %s%n", responseMessage.getOntology());
 
+				//TODO: remove below
 				ACLMessage scheduleStepMessage = new ACLMessage(ACLMessage.REQUEST);
 				scheduleStepMessage.addReceiver(equipletAgent.getAID());
 				scheduleStepMessage.setOntology("ScheduleStep");
 				scheduleStepMessage.setConversationId(message.getConversationId());
 				scheduleStepMessage.setContent(String.valueOf((System.currentTimeMillis() - equipletAgent.getTimer().getFirstTimeSlot())/2000 + 3));
 				equipletAgent.send(scheduleStepMessage);
-
-				Logger.log("sending message: %s%n", responseMessage.getOntology());
 				Logger.log("sending message: %s%n", scheduleStepMessage.getOntology());
+				//TODO: remove above
 			} catch (IOException | InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(e);
 				equipletAgent.doDelete();

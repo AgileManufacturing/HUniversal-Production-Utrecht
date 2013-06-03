@@ -60,7 +60,7 @@ import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.StepStatusCode;
-import rexos.mas.hardware_agent.EquipletStep;
+import rexos.mas.equiplet_agent.ProductStep;
 
 import com.mongodb.BasicDBObject;
 
@@ -93,23 +93,23 @@ public class AbortStep extends ReceiveBehaviour {
 	private EquipletAgent equipletAgent;
 
 	/**
-	 * @var BlackboardClient equipletBBClient
+	 * @var BlackboardClient productBBClient
 	 *      BlackboardClient for the equiplet's product step blackboard.
 	 */
-	private BlackboardClient equipletBBClient;
+	private BlackboardClient productBBClient;
 
 	/**
 	 * Instantiates a new can perform step.
 	 * 
 	 * @param a
 	 *            The agent for this behaviour
-	 * @param equipletBBClient
+	 * @param productBBClient
 	 *            BlackboardClient for the equiplet's product step blackboard.
 	 */
-	public AbortStep(Agent a, BlackboardClient equipletBBClient) {
+	public AbortStep(Agent a, BlackboardClient productBBClient) {
 		super(a, messageTemplate);
 		equipletAgent = (EquipletAgent) a;
-		this.equipletBBClient = equipletBBClient;
+		this.productBBClient = productBBClient;
 	}
 
 	/**
@@ -133,12 +133,12 @@ public class AbortStep extends ReceiveBehaviour {
 			productStepEntryId = equipletAgent.getRelatedObjectId(message
 					.getConversationId());
 
-			BasicDBObject step = (BasicDBObject) equipletBBClient
+			BasicDBObject step = (BasicDBObject) productBBClient
 					.findDocumentById(productStepEntryId);
-			EquipletStep esm = new EquipletStep(step);
+			ProductStep productStep = new ProductStep(step);
 
-			if (esm.getStatus() == StepStatusCode.PLANNED) {
-				equipletBBClient.updateDocuments(
+			if (productStep.getStatus() == StepStatusCode.PLANNED) {
+				productBBClient.updateDocuments(
 						new BasicDBObject("_id", productStepEntryId),
 						new BasicDBObject("$set", new BasicDBObject("status",
 								StepStatusCode.ABORTED).append("statusData",

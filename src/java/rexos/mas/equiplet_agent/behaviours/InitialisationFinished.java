@@ -136,7 +136,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 
 			// starts the behaviour for receiving messages with the Ontology
 			// ScheduleStep.
-			equipletAgent.addBehaviour(new ScheduleStep(equipletAgent));
+			equipletAgent.addBehaviour(new ScheduleStep(equipletAgent, equipletAgent.getEquipletBBClient()));
 
 			// starts the behaviour for receiving messages with the Ontology
 			// StartStep.
