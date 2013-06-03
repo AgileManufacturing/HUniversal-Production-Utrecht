@@ -242,7 +242,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					capabilities.add((int) row.get("id"));
 				}
 			} catch (KnowledgeException | KeyNotFoundException e1) {
-				takeDown();
+				doDelete();
 				Logger.log(e1);
 			}
 			Logger.log("%s %s%n", capabilities, equipletDbName);
