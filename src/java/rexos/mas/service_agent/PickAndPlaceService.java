@@ -81,6 +81,14 @@ public class PickAndPlaceService extends Service {
 	public PickAndPlaceService() {
 		super("huniplacer pick&place", 1);
 	}
+	
+	/**
+	 * @see rexos.mas.service_agent.Service#canDoStep(int, com.mongodb.BasicDBObject)
+	 */
+	@Override
+	public boolean canDoStep(int productStepType, BasicDBObject parameters) {
+		return parameters.containsField("part") && parameters.containsField("position");
+	}
 
 	/**
 	 * @see rexos.mas.service_agent.Service#getServiceSteps(int, com.mongodb.BasicDBObject)
