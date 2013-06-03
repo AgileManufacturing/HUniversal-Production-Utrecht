@@ -99,6 +99,17 @@ public abstract class Service {
 	}
 
 	/**
+	 * Determines whether this equiplet can perform a productStep of the specified type with the specified parameters
+	 * using this service.
+	 * 
+	 * @param productStepType the type of the productStep to perform.
+	 * @param parameters the parameters of the productStep.
+	 * @return a boolean to indicate whether this equiplet can perform a productstep of the specified type with the
+	 *         specified parameters using this service.
+	 */
+	public abstract boolean canDoStep(int productStepType, BasicDBObject parameters);
+
+	/**
 	 * This method translates the productStep into a single or multiple serviceSteps.
 	 * 
 	 * @param productStepType the type of the productStep to translate.
@@ -116,8 +127,7 @@ public abstract class Service {
 	 * @param serviceSteps the service steps to update.
 	 * @return the updated service steps.
 	 */
-	public abstract ServiceStep[] updateParameters(HashMap<Part, Position> partParameters,
-			ServiceStep[] serviceSteps);
+	public abstract ServiceStep[] updateParameters(HashMap<Part, Position> partParameters, ServiceStep[] serviceSteps);
 
 	/**
 	 * Returns the Id of this service. Id's are used to identify services and are the same as those used in the

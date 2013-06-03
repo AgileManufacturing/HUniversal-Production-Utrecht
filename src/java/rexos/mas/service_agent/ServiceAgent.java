@@ -65,7 +65,6 @@ import rexos.mas.service_agent.behaviours.InitialisationFinished;
 import rexos.mas.service_agent.behaviours.ScheduleStep;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 
 /**
@@ -205,17 +204,17 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	}
 
 	/**
-	 * Deinitializes the agent by unsubscribing to status field updates, emptying the service step blackboard and
-	 * updating
-	 * the status of all product steps. It also notifies the equiplet agent and hardware agent that this agent died.
+	 * Kill the agent by unsubscribing to status field updates, emptying the service step blackboard and updating the
+	 * status of all product steps. It also notifies the equiplet agent and hardware agent that this agent died.
 	 */
 	//@formatter:off
 	@Override
 	public void takeDown() {
-		//TODO bouw eerst log op, dan pas alles verwijderen
+		Logger.log("ServiceAgent takedown");
 		
 		productStepBBClient.unsubscribe(statusSubscription);
 		serviceStepBBClient.unsubscribe(statusSubscription);
+		
 		try {
 			List<DBObject> productSteps = productStepBBClient.findDocuments(new BasicDBObject());
 			ObjectId id;
@@ -232,15 +231,14 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			}
 			
 			serviceStepBBClient.removeDocuments(new BasicDBObject());
-			Logger.log("ServiceAgent takedown");
-
-			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
-			message.addReceiver(equipletAgentAID);
-			message.setOntology("ServiceAgentDied");
-			send(message);
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 			Logger.log(e);
 		}
+
+		ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+		message.addReceiver(equipletAgentAID);
+		message.setOntology("ServiceAgentDied");
+		send(message);
 	} //@formatter:on
 
 	/**
