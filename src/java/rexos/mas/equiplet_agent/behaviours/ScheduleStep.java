@@ -30,6 +30,7 @@
 package rexos.mas.equiplet_agent.behaviours;
 
 import java.io.IOException;
+import java.util.List;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
@@ -44,8 +45,12 @@ import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.EquipletAgent;
+import rexos.mas.equiplet_agent.ProductStep;
+import rexos.mas.equiplet_agent.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import com.mongodb.QueryBuilder;
 
 /**
  * The Class ScheduleStep.
@@ -100,6 +105,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 
 		// Gets the timeslot from the string, asks the serviceAgent to plan the
 		// step with logistics.
+		
 		try {
 			int timeslot = Integer.parseInt(message.getContent());
 			Logger.log("scheduling step for timeslot %d%n", timeslot);
@@ -111,19 +117,63 @@ public class ScheduleStep extends ReceiveBehaviour {
 					(BasicDBObject) ((BasicDBObject) client
 							.findDocumentById(productStepId))
 							.get("scheduleData"));
+			
 			scheduleData.setStartTime(timeslot);
-			client.updateDocuments(new BasicDBObject("_id", productStepId),
-					new BasicDBObject("$set", new BasicDBObject("scheduleData",
-							scheduleData.toBasicDBObject())));
+					
+			int newDuration = scheduleData.getDuration();
+			int newStartTime = scheduleData.getStartTime();
+					
+			List<DBObject> plannedSteps = client.findDocuments(QueryBuilder.start("scheduleData.startTime").greaterThan(-1).get());
+			
+			boolean fitsInTimeSlot = true;
+			
+			for(int i = 0; i < plannedSteps.size(); i++){
+				
+				ProductStep plannedStep = new ProductStep((BasicDBObject)plannedSteps.get(i));	
+				
+				ScheduleData newScheduleData = plannedStep.getScheduleData();
+				
+				int duration = newScheduleData.getDuration();
+				int startTime = newScheduleData.getStartTime();
+				//check				
+				if((newStartTime >= startTime) && newStartTime <= (startTime + duration)){	
+					
+					fitsInTimeSlot = false;					
+				}
+				else if((newStartTime + newDuration) >= startTime && (newStartTime + newDuration) <= (startTime + duration)){
+					
+					fitsInTimeSlot = false;
+				}
+				else if((newStartTime <= startTime) && ((newDuration + newStartTime) >= (duration + startTime))){
 
-			ACLMessage scheduleMessage = new ACLMessage(ACLMessage.REQUEST);
-			scheduleMessage.addReceiver(equipletAgent.getServiceAgent());
-			scheduleMessage.setOntology("ScheduleStep");
-			scheduleMessage.setContentObject(productStepId);
-			scheduleMessage.setConversationId(message.getConversationId());
-			equipletAgent.send(scheduleMessage);
-		} catch (IOException | InvalidDBNamespaceException | GeneralMongoException e) {
+					fitsInTimeSlot = false;
+				}
+
+			}
+			if (fitsInTimeSlot) {
+							
+				client.updateDocuments(
+						new BasicDBObject("_id", productStepId),
+						new BasicDBObject("$set", new BasicDBObject(
+								"scheduleData", scheduleData.toBasicDBObject())));
+
+				ACLMessage scheduleMessage = new ACLMessage(ACLMessage.REQUEST);
+				scheduleMessage.addReceiver(equipletAgent.getServiceAgent());
+				scheduleMessage.setOntology("ScheduleStep");
+				scheduleMessage.setContentObject(productStepId);
+				scheduleMessage.setConversationId(message.getConversationId());
+				equipletAgent.send(scheduleMessage);
+			}
+			else{
+				Logger.log("ScheduleStep disconfirm");
+				ACLMessage reply = message.createReply();
+				reply.setPerformative(ACLMessage.DISCONFIRM);
+				myAgent.send(reply);
+			}
+		} catch (IOException | InvalidDBNamespaceException
+				| GeneralMongoException e) {
 			Logger.log(e);
 		}
+		
 	}
 }
