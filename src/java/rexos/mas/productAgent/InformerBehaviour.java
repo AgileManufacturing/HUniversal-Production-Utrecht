@@ -42,7 +42,7 @@ import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
-import rexos.mas.data.ProductionStepStatus;
+import rexos.mas.data.StepStatusCode;
 
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
@@ -90,7 +90,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 		_par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 		seq.addSubBehaviour(_par);
 		for(ProductionStep stp : _production.getProductionSteps()){
-			if (stp.getStatus() == ProductionStepStatus.STATE_TODO){
+			if (stp.getStatus() == StepStatusCode.STATE_TODO){
 				// adds the step to te new list (the one that will be returned
 				// to the scheduler)
 				_prodEQmap.addProductionStep(stp.getId());

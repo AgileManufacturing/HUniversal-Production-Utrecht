@@ -112,7 +112,6 @@ public class ModuleFactory {
 				}
 			}
 		} catch (InstantiateClassException | KnowledgeException | KeyNotFoundException e) {
-			// TODO Auto-generated catch block
 			Logger.log(e);
 		}
 	}

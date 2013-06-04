@@ -1,34 +1,38 @@
 /**
  * @file rexos/mas/hardware_agent/EquipletStep.java
- * @brief Makes a messages to be used for a 
+ * @brief Makes a messages to be used for a
  * @brief respond. This respond consist of a serviceStepID,instructiondata a type and timedata.
  * @date Created: 2013-04-02
- *
+ * 
  * @author Thierry Gerritse
  * @author Wouter Veen
  * @author Hessel Meulenbeld
- *
+ * 
  * @section LICENSE
- * License: newBSD
- *
- * Copyright � 2013, HU University of Applied Sciences Utrecht.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
- * - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
- * - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
- * - Neither the name of the HU University of Applied Sciences Utrecht nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT
- * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
- * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *          License: newBSD
+ * 
+ *          Copyright � 2013, HU University of Applied Sciences Utrecht.
+ *          All rights reserved.
+ * 
+ *          Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ *          the following conditions are met:
+ *          - Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *          following disclaimer.
+ *          - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *          following disclaimer in the documentation and/or other materials provided with the distribution.
+ *          - Neither the name of the HU University of Applied Sciences Utrecht nor the names of its contributors may be
+ *          used to endorse or promote products derived from this software without specific prior written permission.
+ * 
+ *          THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *          "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ *          THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ *          ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT
+ *          BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ *          CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ *          GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ *          HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *          LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 package rexos.mas.hardware_agent;
 
@@ -36,6 +40,7 @@ import org.bson.types.ObjectId;
 
 import rexos.mas.data.MongoSaveable;
 import rexos.mas.equiplet_agent.StepStatusCode;
+import rexos.mas.hardware_agent.EquipletStep;
 
 import com.mongodb.BasicDBObject;
 
@@ -104,8 +109,7 @@ public class EquipletStep implements MongoSaveable {
 	 * @param timeData
 	 *            The timeData
 	 */
-	public EquipletStep(ObjectId serviceStepID, int moduleId,
-			InstructionData instructionData, StepStatusCode status,
+	public EquipletStep(ObjectId serviceStepID, int moduleId, InstructionData instructionData, StepStatusCode status,
 			BasicDBObject statusData, TimeData timeData) {
 
 		this.serviceStepID = serviceStepID;
@@ -155,13 +159,22 @@ public class EquipletStep implements MongoSaveable {
 	}
 
 	/**
-	 * Setter for the nextStepID
+	 * Setter for the nextStep
 	 * 
-	 * @param EquipletStepID
-	 *            The EquipletStepID to set it to.
+	 * @param EquipletStep
+	 *            The EquipletStep to set it to.
 	 */
-	public void setNextStepID(ObjectId EquipletStepID) {
-		this.nextStep = EquipletStepID;
+	public void setNextStep(ObjectId EquipletStep) {
+		this.nextStep = EquipletStep;
+	}
+
+	/**
+	 * Getter for the nextStep
+	 * 
+	 * @return The nextStep
+	 */
+	public ObjectId getNextStep() {
+		return nextStep;
 	}
 
 	/**
@@ -266,9 +279,8 @@ public class EquipletStep implements MongoSaveable {
 	 */
 	@Override
 	public String toString() {
-		return String
-				.format("EquipletStep [serviceStepID=%s, instructionData=%s, status=%s, timeData=%s]",
-						serviceStepID, instructionData, status, timeData);
+		return String.format("EquipletStep [serviceStepID=%s, instructionData=%s, status=%s, timeData=%s]",
+				serviceStepID, instructionData, status, timeData);
 	}
 
 	/**
@@ -296,14 +308,50 @@ public class EquipletStep implements MongoSaveable {
 		nextStep = object.getObjectId("nextStep");
 		serviceStepID = object.getObjectId("serviceStepID");
 		moduleId = object.getInt("moduleId");
-		instructionData = new InstructionData(
-				(BasicDBObject) object.get("instructionData"));
+		instructionData = new InstructionData((BasicDBObject) object.get("instructionData"));
 		status = StepStatusCode.valueOf(object.getString("status"));
-		if (object.containsField("statusData")) {
+		if(object.containsField("statusData")) {
 			statusData = (BasicDBObject) object.get("statusData");
 		} else {
 			statusData = new BasicDBObject();
 		}
 		timeData = new TimeData((BasicDBObject) object.get("timeData"));
+	}
+
+	/**
+	 * Sorts the EquipletStepMessage in the specified array bases on their nextStep field. The last step is the one of
+	 * which the nextStep field is null.
+	 * 
+	 * @param unsortedSteps an array of steps to be sorted.
+	 * @return an array of EquipletStep in the right order.
+	 */
+	public static EquipletStep[] sort(EquipletStep[] unsortedSteps) {
+		// Find the first step
+		EquipletStep firstServiceStep = null;
+		outer: for(EquipletStep serviceStep : unsortedSteps) {
+			for(EquipletStep equipletStep2 : unsortedSteps) {
+				if(equipletStep2.getNextStep() != null && equipletStep2.getNextStep().equals(serviceStep.getId())) {
+					continue outer;
+				}
+			}
+			firstServiceStep = serviceStep;
+			break;
+		}
+
+		// sort all steps beginning with the one found above
+		int stepsCount = unsortedSteps.length;
+		ObjectId nextStepId;
+		EquipletStep[] sortedSteps = new EquipletStep[stepsCount];
+		sortedSteps[0] = firstServiceStep;
+		for(int i = 1; i < stepsCount; i++) {
+			nextStepId = sortedSteps[i - 1].getNextStep();
+			for(EquipletStep serviceStep : unsortedSteps) {
+				if(serviceStep.getId().equals(nextStepId)) {
+					sortedSteps[i] = serviceStep;
+					break;
+				}
+			}
+		}
+		return sortedSteps;
 	}
 }

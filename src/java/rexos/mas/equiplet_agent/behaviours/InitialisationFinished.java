@@ -56,7 +56,7 @@ import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
-import rexos.mas.equiplet_agent.EquipletDirectoryMessage;
+import rexos.mas.equiplet_agent.EquipletDirectoryEntry;
 
 /** The Class InitialisationFinished. */
 public class InitialisationFinished extends ReceiveOnceBehaviour {
@@ -114,7 +114,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 					message.getSender().getLocalName(), message.getOntology());
 
 			// inserts himself on the collective blackboard equiplet directory.
-			EquipletDirectoryMessage entry = new EquipletDirectoryMessage(
+			EquipletDirectoryEntry entry = new EquipletDirectoryEntry(
 					equipletAgent.getAID(), equipletAgent.getCapabilities(),
 					equipletAgent.getDbData());
 			try {
@@ -136,14 +136,14 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 
 			// starts the behaviour for receiving messages with the Ontology
 			// ScheduleStep.
-			equipletAgent.addBehaviour(new ScheduleStep(equipletAgent));
+			equipletAgent.addBehaviour(new ScheduleStep(equipletAgent, equipletAgent.getEquipletBBClient()));
 
 			// starts the behaviour for receiving messages with the Ontology
 			// StartStep.
 			equipletAgent.addBehaviour(new StartStep(equipletAgent,
 					equipletAgent.getEquipletBBClient()));
 		} else {
-			// TODO handle timeout
+			// TODO (most) handle timeout
 			Logger.log(equipletAgent.getName()
 					+ " - InitialisationFinished timeout!");
 			equipletAgent.doDelete();

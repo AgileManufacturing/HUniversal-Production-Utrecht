@@ -67,14 +67,17 @@ public class ProductLog{
 			local.insert(msgs);
 		}
 		if (writeToRemote){
-			// remote.insert()
+			// TODO: remote.insert()
+			throw new UnsupportedOperationException();
 		}
 	}
 
-	public void pushLocalToRemote(){
+	public static void pushLocalToRemote(){
 		// TODO:
 		// get latest remote
 		// get local since latest remote
 		// write to remote
+		throw new UnsupportedOperationException();
+
 	}
 }

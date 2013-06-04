@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/behaviours/GetServiceStepsDuration.java
+ * @file rexos/mas/service_agent/behaviours/GetServiceStepsDurationResponse.java
  * @brief Handles the GetServiceStepsDurationResponse message from the hardwareAgent that indicates that the duration of
  *        all serviceSteps have been saved on the serviceStepsBlackBoard.
  * @date Created: 11 apr. 2013
@@ -55,13 +55,13 @@ import com.mongodb.BasicDBObject;
 
 /**
  * This behaviour handles the GetServiceStepsDurationResponse message. The hardwareAgent sends this message in response
- * to the GetServiceStepsDuration message to indicate that it saved the duration of all serviceSteps on the
+ * to the GetServiceStepsDurationResponse message to indicate that it saved the duration of all serviceSteps on the
  * serviceStepBlackboard. It will generate a timeout after a specified period if no message is received.
  * 
  * @author Peter
  * 
  */
-public class GetServiceStepsDuration extends ReceiveOnceBehaviour {
+public class GetServiceStepsDurationResponse extends ReceiveOnceBehaviour {
 	/**
 	 * @var long serialVersionUID
 	 *      The serialVersionUID of this class.
@@ -82,24 +82,24 @@ public class GetServiceStepsDuration extends ReceiveOnceBehaviour {
 	private ServiceAgent agent;
 
 	/**
-	 * Creates a new GetServiceStepsDuration instance with the specified parameters. A default value of 2000 ms
+	 * Creates a new GetServiceStepsDurationResponse instance with the specified parameters. A default value of 2000 ms
 	 * is used for the timeout.
 	 * 
 	 * @param agent the agent this behaviour belongs to.
 	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
 	 */
-	public GetServiceStepsDuration(ServiceAgent agent, String conversationId) {
+	public GetServiceStepsDurationResponse(ServiceAgent agent, String conversationId) {
 		this(agent, 2000, conversationId);
 	}
 
 	/**
-	 * Creates a new GetServiceStepsDuration instance with the specified parameters.
+	 * Creates a new GetServiceStepsDurationResponse instance with the specified parameters.
 	 * 
 	 * @param agent the agent this behaviour belongs to.
 	 * @param millis the timeout period in milliseconds.
 	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
 	 */
-	public GetServiceStepsDuration(ServiceAgent agent, int millis, String conversationId) {
+	public GetServiceStepsDurationResponse(ServiceAgent agent, int millis, String conversationId) {
 		super(agent, millis, MessageTemplate.and(MessageTemplate.MatchConversationId(conversationId),
 				MessageTemplate.MatchOntology("GetServiceStepDurationResponse")));
 		this.agent = agent;
@@ -108,7 +108,7 @@ public class GetServiceStepsDuration extends ReceiveOnceBehaviour {
 
 	/**
 	 * Handles an incoming message from the hardwareAgent. The message indicates that the duration of the serviceStep
-	 * specified by the GetServiceStepsDuration message and all serviceSteps linked to it are filled in on the
+	 * specified by the GetServiceStepsDurationResponse message and all serviceSteps linked to it are filled in on the
 	 * serviceStepsBlackBoard. First the duration of all serviceSteps are summed up and the resulting duration is saved
 	 * as the duration of the productStep on the productStepBlackBoard. Then a ProductionDurationResponse message is
 	 * send to the equipletAgent to inform it that the duration of the productStep has been determined. If a timeout
@@ -151,7 +151,7 @@ public class GetServiceStepsDuration extends ReceiveOnceBehaviour {
 				Logger.log(e);
 			}
 		} else {
-			// TODO handle timeout
+			// TODO (most) handle timeout
 			Logger.log(agent.getName() + " - GetServiceStepDurationResponse timeout!");
 			agent.doDelete();
 		}

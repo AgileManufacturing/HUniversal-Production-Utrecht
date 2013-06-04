@@ -131,8 +131,8 @@ public class OverviewBehaviour extends OneShotBehaviour{
 			}
 		});
 		System.out.println("Add a ProduceBehaviour");
-		// _produceBehaviour = new ProduceBehaviour();
-		// _sequentialBehaviour.addSubBehaviour(_produceBehaviour);
+		_produceBehaviour = new ProduceBehaviour();
+		_sequentialBehaviour.addSubBehaviour(_produceBehaviour);
 	}
 
 	@SuppressWarnings("static-method")

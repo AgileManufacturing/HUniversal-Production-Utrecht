@@ -36,6 +36,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.Part;
 import rexos.mas.equiplet_agent.ProductStep;
 
 /**
@@ -66,10 +67,10 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 		try {
 			Logger.log("%s ArePartsAvailable%n", myAgent.getLocalName());
 			
-			Integer[] parts = ((ProductStep) message.getContentObject()).getInputPartTypes();
+			Part[] parts = ((ProductStep) message.getContentObject()).getInputParts();
 			ACLMessage reply = message.createReply();
 			reply.setOntology("ArePartsAvailableResponse");
-			//TODO determine actual part availability
+			//TODO (out of scope) determine actual part availability 
 			reply.setPerformative(ACLMessage.CONFIRM);
 			myAgent.send(reply);
 

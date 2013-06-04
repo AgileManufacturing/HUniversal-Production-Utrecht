@@ -119,7 +119,6 @@ public class ServiceFactory {
 				servicesForStep.add(getServiceByServiceID((int)rows[i].get("id")));
 			}
 		} catch (KnowledgeException | KeyNotFoundException ex) {
-			// TODO Auto-generated catch block
 			Logger.log(ex);
 		}
 		

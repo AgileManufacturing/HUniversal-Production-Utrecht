@@ -105,8 +105,8 @@ public class DeltaRobotModule extends Module {
 			InstructionData instructionData = step.getInstructionData();
 			BasicDBObject lookUpParameters = instructionData.getLookUpParameters();
 			BasicDBObject payload = instructionData.getPayload();
-			if (lookUpParameters.getString("ID").equals("RELATIVE-TO-PLACEHOLDER")) {
-				lookUpParameters.put("ID", position.getRelativeToPart());
+			if (lookUpParameters.containsField("ID") && lookUpParameters.getString("ID").equals("RELATIVE-TO-PLACEHOLDER")) {
+				lookUpParameters.put("ID", position.getRelativeToPart().getId());
 			}
 			if (payload.containsField("x") && payload.getString("x").equals("X-PLACEHOLDER")) {
 				payload.put("x", position.getX());
@@ -140,7 +140,13 @@ public class DeltaRobotModule extends Module {
 		double extraSize = parameters.getDouble("extraSize");
 
 		//create the lookUpParameters
-		BasicDBObject lookUpParameters = new BasicDBObject("ID", ((BasicDBObject) parameters.get("position")).get("relativeToPart"));
+		Position position = new Position((BasicDBObject) parameters.get("position"));
+		BasicDBObject lookUpParameters = new BasicDBObject();
+		if(position.getRelativeToPart() != null && position.getRelativeToPart().getId() != -1){
+			lookUpParameters.put("ID", position.getRelativeToPart().getId());
+		}else{
+			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
+		}
 		//create the payload
 		BasicDBObject payload = new BasicDBObject("z", extraSize + SAFE_MOVEMENT_PLANE);
 		//create the instruction data
@@ -161,10 +167,10 @@ public class DeltaRobotModule extends Module {
 		
 		//fill in the lookUpParameters
 		BasicDBObject lookUpParameters = new BasicDBObject();
-		if (position.getRelativeToPart() == -1) {
+		if (position.getRelativeToPart() == null || position.getRelativeToPart().getId() == -1) {
 			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
 		} else {
-			lookUpParameters.put("ID", position.getRelativeToPart());
+			lookUpParameters.put("ID", position.getRelativeToPart().getId());
 		}
 		
 		//fill in the payload parameters
@@ -196,10 +202,10 @@ public class DeltaRobotModule extends Module {
 		
 		//fill in the lookUpParameters.
 		BasicDBObject lookUpParameters = new BasicDBObject();
-		if (position.getRelativeToPart() == -1) {
+		if (position.getRelativeToPart() == null || position.getRelativeToPart().getId() == -1) {
 			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
 		} else {
-			lookUpParameters.put("ID", position.getRelativeToPart());
+			lookUpParameters.put("ID", position.getRelativeToPart().getId());
 		}
 		
 		//fill in the payload parameters.

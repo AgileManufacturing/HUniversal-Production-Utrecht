@@ -4,6 +4,7 @@
  * @date Created: 17 Apr 2013
  * 
  * @author Alexander Streng
+ * @author Hessel Meulenbeld
  * 
  * @section LICENSE License: newBSD
  * 
@@ -39,6 +40,68 @@
 
 package rexos.mas.data;
 
-public enum ProductionStepStatus{
-	STATE_DONE, STATE_TODO, STATE_PRODUCING, STATE_FAILED
+/**
+ * Enum with status codes for product/service/equiplet steps.
+ */
+public enum StepStatusCode {
+	/**
+	 * Step is evaluating.
+	 */
+	EVALUATING(0),
+	/**
+	 * Step is planned.
+	 */
+	PLANNED(1),
+	/**
+	 * Step is waiting for production.
+	 */
+	WAITING(2),
+	/**
+	 * Step is in progress.
+	 */
+	IN_PROGRESS(3),
+	/**
+	 * Step is suspended (possibly because of a warning).
+	 */
+	SUSPENDED_OR_WARNING(4),
+	/**
+	 * Step is done.
+	 */
+	DONE(5),
+	/**
+	 * Step is aborted.
+	 */
+	ABORTED(6),
+	/**
+	 * Step has failed.
+	 */
+	FAILED(7),
+	/**
+	 * Step should be deleted.
+	 */
+	DELETED(8);
+
+	/**
+	 * @var int status
+	 * The status
+	 */
+	private int status;
+	
+	/**
+	 * Constructor for a status.
+	 * 
+	 * @param status - The status
+	 */
+	private StepStatusCode(int status){
+		this.status = status;
+	}
+	
+	/**
+	 * Function for getting the status.
+	 * 
+	 * @return The status as an int.
+	 */
+	public int getStatus(){
+		return status;
+	}
 }
