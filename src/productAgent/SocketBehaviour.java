@@ -40,6 +40,7 @@
 
 package productAgent;
 
+import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 
 import java.io.BufferedReader;
@@ -47,10 +48,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
-public class SocketBehaviour extends CyclicBehaviour{
+import newDataClasses.HeartbeatReceiver;
+
+public class SocketBehaviour extends CyclicBehaviour implements
+		HeartbeatReceiver {
 	/**
 	 * 
 	 */
@@ -58,39 +64,95 @@ public class SocketBehaviour extends CyclicBehaviour{
 	private Socket socket;
 	private PrintWriter outputStream = null;
 	private BufferedReader inputStream = null;
+	private boolean isConnected = false;
+	
+	private HeartBeartBehaviour _hbb;
 
-	public SocketBehaviour(){
-		try{
-			socket = new Socket(InetAddress.getByName("127.0.0.1"), 10080);
-			outputStream = new PrintWriter(socket.getOutputStream(), true);
-			inputStream = new BufferedReader(new InputStreamReader(
-					socket.getInputStream()));
-		} catch(UnknownHostException e){
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch(IOException e){
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	public SocketBehaviour(Agent a) {
+		try {
+			_hbb = new HeartBeartBehaviour(a,0,this);
+			a.addBehaviour(_hbb);
+			if (!isConnected) {
+				connect();
+			}
+		} catch (UnknownHostException e) {
+			System.out.println("Disconnecting!");
+		} catch (IOException e) {
+			System.out.println("Disconnecting!");
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see jade.core.behaviours.Behaviour#action()
 	 */
 	@Override
-	public void action(){
-		try{
-			if (inputStream.ready()){
-				String s = inputStream.readLine();
-				this.sent(s);
+	public void action() {
+		try {
+			if (!isConnected) {
+				connect();
+			} else {
+				if (inputStream.ready()) {
+					String s = inputStream.readLine();
+					if(s.equals("beat")) {
+						_hbb.reportHeartBeatAck();
+					}
+				}
 			}
-		} catch(Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			isConnected = false;
+			System.out.println("Disconnecting!");
 		}
 	}
 
-	public void sent(String msg){
-		outputStream.println(msg);
+	public void sent(String msg) {
+		try {
+			outputStream.println(msg);
+		} catch (Exception e) {
+			isConnected = false;
+		}
 	}
+
+	public void connect() throws UnknownHostException, IOException {
+		socket = new Socket();
+		socket.connect(new InetSocketAddress("127.0.0.1", 10080),
+				(int) TimeUnit.SECONDS.toMillis(10));
+		outputStream = new PrintWriter(socket.getOutputStream(), true);
+		inputStream = new BufferedReader(new InputStreamReader(
+				socket.getInputStream()));
+		isConnected = true;
+		_hbb.startHeartbeating();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see newDataClasses.HeartbeatReceiver#initHeartbeat()
+	 */
+	@Override
+	public void initHeartbeat() {
+		outputStream.println("heart");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see newDataClasses.HeartbeatReceiver#heartbeatTimeout()
+	 */
+	@Override
+	public void heartbeatTimeout() {
+		try {
+			this.isConnected = false;
+			this.resetConnection();
+		} catch (Exception e) {
+			System.out.println("Error when resetting the connection");
+		}
+	}
+	
+	public void resetConnection() throws IOException {
+		this.socket.close();
+		this.connect();
+	}
+
 }

@@ -55,6 +55,8 @@ public class OverviewBehaviour extends OneShotBehaviour{
 	@SuppressWarnings("unused")
 	private ProduceBehaviour _produceBehaviour;
 	private SequentialBehaviour _sequentialBehaviour;
+	
+	private SocketBehaviour _socketBehaviour;
 
 	public OverviewBehaviour(){
 		System.out.println("New overview behaviour created.");
@@ -68,6 +70,11 @@ public class OverviewBehaviour extends OneShotBehaviour{
 	@Override
 	public void action(){
 		_productAgent = (ProductAgent) myAgent;
+		
+		System.out.println("Add a SocketBehaviour");
+		_socketBehaviour = new SocketBehaviour(myAgent);
+		_productAgent.addBehaviour(_socketBehaviour);
+		
 		System.out.println("Add a SequentialBehaviour");
 		_sequentialBehaviour = new SequentialBehaviour();
 		_productAgent.addBehaviour(_sequentialBehaviour);
