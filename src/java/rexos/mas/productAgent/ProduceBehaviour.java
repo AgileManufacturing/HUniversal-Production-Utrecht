@@ -46,13 +46,14 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
-
+import rexos.libraries.log.Logger;
 import rexos.mas.data.LogMessage;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
-import rexos.mas.data.ProductionStepStatus;
+import rexos.mas.data.StepStatusCode;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +72,7 @@ public class ProduceBehaviour extends OneShotBehaviour{
 		_prodEQMap = new ProductionEquipletMapper();
 		// retrieve the productstep
 		for(ProductionStep stp : _production.getProductionSteps()){
-			if (stp.getStatus() == ProductionStepStatus.STATE_TODO){
+			if (stp.getStatus() == StepStatusCode.STATE_TODO){
 				// adds the step to te new list (the one that will be
 				// returned to the scheduler)
 				_prodEQMap.addProductionStep(stp.getId());
@@ -106,8 +107,14 @@ class newProducing extends SequentialBehaviour{
 			@Override
 			public void action(){
 				
-				for(Entry<AID, Long> Eq: EqAndTs.entrySet()){
-					nEq = Eq.getKey();
+				if(EqAndTs.size() == 1){
+					for(Entry<AID, Long> Eq: EqAndTs.entrySet()){
+						nEq = Eq.getKey();
+					}
+				}
+				else
+				{
+					Logger.log(new UnsupportedOperationException("Equipletcount is "+ EqAndTs.size() + "; excepted 1"));
 				}
 				ProductAgent pa = (ProductAgent)myAgent;
 				if(nEq != pa.getCurrentLocation()){
@@ -164,7 +171,7 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 		msg.setOntology("StartProduction");
 		
 		if(eqAndTs.get(msg.getSender()) != productionStep.getId()){
-			// TODO error
+			Logger.log(new UnsupportedOperationException("Equiplet sender not equal to associated equiplet in productionStep"));;
 		}
 		msg.addReceiver(msg.getSender());
 		myAgent.send(msg);
@@ -184,31 +191,32 @@ class producing extends OneShotBehaviour{
 			// The productionstep has been initiated.
 			case "productionStepStarted":
 				// TODO key = msg.getContent().parse
-				/*
-				 * int key = 0; // temp if (key != currProdStep){ // TODO error
-				 * } if (!bla.get(key).containsKey(msg.getSender())){ // TODO
-				 * error } { ArrayList<ProductionStep> ProductionStepArrayList =
-				 * ((ProductAgent) myAgent)
-				 * .getProduct().getProduction().getProductionSteps();
-				 * for(ProductionStep stp : ProductionStepArrayList){ if (key ==
-				 * stp.getId()){ canProductionStepStart(stp); } } }
+				
+				/*  int key = 0; // temp if (key != currProdStep){ // TODO error
+				  } if (!bla.get(key).containsKey(msg.getSender())){
+					  Logger.log(new UnsupportedOperationException(""));
+				  } { ArrayList<ProductionStep> ProductionStepArrayList =
+				  ((ProductAgent) myAgent)
+				  .getProduct().getProduction().getProductionSteps();
+				  for(ProductionStep stp : ProductionStepArrayList){ if (key ==
+				  stp.getId()){ canProductionStepStart(stp); } } }
 				 */
 				break;
 			// The productionstep has completed.
 			case "productionStepFinished":
 				// TODO key = msg.getContent().parse
 				/*
-				 * int keyfinish = 0; // temp if (keyfinish != currProdStep){ //
-				 * TODO error } if
-				 * (!bla.get(keyfinish).containsKey(msg.getSender())){ // TODO
-				 * error } { ArrayList<ProductionStep> ProductionStepArrayList =
-				 * ((ProductAgent) myAgent)
-				 * .getProduct().getProduction().getProductionSteps();
-				 * for(ProductionStep stp : ProductionStepArrayList){ if
-				 * (keyfinish == stp.getId()){ productionStepEnded(stp, true,
-				 * null); // productionStepEnded(stp, msg.getContent, //
-				 * msg.getContent); } } } currProdStep++;
-				 */
+				 int keyfinish = 0; // temp if (keyfinish != currProdStep){ //
+				 TODO error } if
+				 (!bla.get(keyfinish).containsKey(msg.getSender())){ // TODO
+				 error } { ArrayList<ProductionStep> ProductionStepArrayList =
+				 ((ProductAgent) myAgent)
+				 .getProduct().getProduction().getProductionSteps();
+				 for(ProductionStep stp : ProductionStepArrayList){ if
+				 (keyfinish == stp.getId()){ productionStepEnded(stp, true,
+				 null); // productionStepEnded(stp, msg.getContent, //
+				 msg.getContent); } } } currProdStep++;
+				*/
 				_productAgent.setCurrentLocation(msg.getSender());
 				
 				break;
@@ -221,12 +229,12 @@ class producing extends OneShotBehaviour{
 				break;
 			}
 		} catch(Exception e){
-			System.out.println("" + e);
+			Logger.log(e);
 		}
 	}
 
 	public static void canProductionStepStart(ProductionStep step){
-		step.setStatus(ProductionStepStatus.STATE_PRODUCING);
+		step.setStatus(StepStatusCode.STATE_PRODUCING);
 	}
 
 	void productionStepEnded(ProductionStep step, boolean succes,
@@ -234,9 +242,9 @@ class producing extends OneShotBehaviour{
 		_productAgent = (ProductAgent) myAgent;
 		_productAgent.getProduct().addLogMsg(log);
 		if (succes){
-			step.setStatus(ProductionStepStatus.STATE_DONE);
+			step.setStatus(StepStatusCode.STATE_DONE);
 		} else{
-			step.setStatus(ProductionStepStatus.STATE_FAILED);
+			step.setStatus(StepStatusCode.STATE_FAILED);
 		}
 	}
 }

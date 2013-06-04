@@ -53,30 +53,30 @@ public class ProductionStep implements Serializable {
 	private int _requiredTimeSlots;
 	private int _id;
 	private int _capability;
-	private ProductionStepStatus _status;
+	private StepStatusCode _status;
 	private BasicDBObject _parameters;
 
 	public ProductionStep() {
 		this._parameters = new BasicDBObject();
-		this._status = ProductionStepStatus.STATE_TODO;
+		this._status = StepStatusCode.STATE_TODO;
 	}
 	
 	public ProductionStep(int id, int capability, BasicDBObject parameterList) {
 		this._id = id;
 		this._capability = capability;
 		this._parameters = parameterList;
-		this._status = ProductionStepStatus.STATE_TODO;
+		this._status = StepStatusCode.STATE_TODO;
 	}
 
 	public int getId(){
 		return this._id;
 	}
 
-	public ProductionStepStatus getStatus(){
+	public StepStatusCode getStatus(){
 		return this._status;
 	}
 
-	public void setStatus(ProductionStepStatus status){
+	public void setStatus(StepStatusCode status){
 		this._status = status;
 	}
 

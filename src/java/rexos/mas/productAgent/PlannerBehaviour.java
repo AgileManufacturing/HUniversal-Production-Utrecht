@@ -48,7 +48,7 @@ import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
-import rexos.mas.data.ProductionStepStatus;
+import rexos.mas.data.StepStatusCode;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -104,7 +104,7 @@ public class PlannerBehaviour extends OneShotBehaviour{
 					.getProductionEquipletMapping();
 			// Iterate over all the production steps
 			for(ProductionStep prodStep : psa){
-				if (prodStep.getStatus() == ProductionStepStatus.STATE_TODO){
+				if (prodStep.getStatus() == StepStatusCode.STATE_TODO){
 					int PA_id = prodStep.getId();
 					// Get the type of production step, aka capability
 					long PA_capability = prodStep.getCapability();
