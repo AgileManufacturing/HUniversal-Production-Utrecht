@@ -56,7 +56,6 @@ import rexos.mas.data.StepStatusCode;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 public class ProduceBehaviour extends OneShotBehaviour{
@@ -65,14 +64,13 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	private ProductionEquipletMapper _prodEQMap;
 	ProductionEquipletMapper s1;
 	ACLMessage msg;
-	private HashMap<AID, Long> currentEandT; 
-
+	
 	@Override
 	public void action(){
 		_prodEQMap = new ProductionEquipletMapper();
 		// retrieve the productstep
 		for(ProductionStep stp : _production.getProductionSteps()){
-			if (stp.getStatus() == StepStatusCode.WAITING){
+			if (stp.getStatus() == StepStatusCode.PLANNED){
 				// adds the step to te new list (the one that will be
 				// returned to the scheduler)
 				_prodEQMap.addProductionStep(stp.getId());
@@ -167,12 +165,12 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 		_productAgent = (ProductAgent) myAgent;
 		SequentialBehaviour seq = new SequentialBehaviour();
 		myAgent.addBehaviour(seq);
-		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setOntology("StartProduction");
 		
 		//AID CHECK
 		if(eqAndTs.get(msg.getSender()) != productionStep.getId()){
-			Logger.log(new UnsupportedOperationException("Equiplet sender not equal to associated equiplet in productionStep"));;
+			Logger.log(new UnsupportedOperationException("Equiplet sender not equal to associated equiplet in productionStep"));
 		}
 		//TODO add content to change step state to STATE_PRODUCING
 		msg.addReceiver(msg.getSender());
@@ -236,7 +234,7 @@ class producing extends OneShotBehaviour{
 	}
 
 	public static void canProductionStepStart(ProductionStep step){
-		step.setStatus(StepStatusCode.IN_PROGRESS);
+		step.setStatus(StepStatusCode.WAITING);
 	}
 
 	void productionStepEnded(ProductionStep step, boolean succes,
