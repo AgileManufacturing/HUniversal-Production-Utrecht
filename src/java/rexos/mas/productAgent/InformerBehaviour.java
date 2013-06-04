@@ -90,7 +90,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 		_par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 		seq.addSubBehaviour(_par);
 		for(ProductionStep stp : _production.getProductionSteps()){
-			if (stp.getStatus() == StepStatusCode.STATE_TODO){
+			if (stp.getStatus() == StepStatusCode.EVALUATING){
 				// adds the step to te new list (the one that will be returned
 				// to the scheduler)
 				_prodEQmap.addProductionStep(stp.getId());
