@@ -85,6 +85,7 @@ import rexos.mas.equiplet_agent.behaviours.InitialisationFinished;
 import rexos.mas.equiplet_agent.behaviours.ServiceAgentDied;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 /**
  * EquipletAgent that communicates with product agents and with its own service
@@ -241,7 +242,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					capabilities.add((int) row.get("id"));
 				}
 			} catch (KnowledgeException | KeyNotFoundException e1) {
-				takeDown();
+				doDelete();
 				Logger.log(e1);
 			}
 			Logger.log("%s %s%n", capabilities, equipletDbName);
@@ -292,10 +293,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 		// starts the behaviour for receving message initialisation finished.
 		addBehaviour(new InitialisationFinished(this, collectiveBBClient));
-		
-		// starts the behaviour for making a log.
-		//TODO: logbehaviour.
-		//addBehaviour(new LogBehaviour(this, collectiveBBClient));
 	}
 
 	/**
@@ -310,27 +307,22 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			// directory.
 			collectiveBBClient.removeDocuments(new BasicDBObject("AID", getAID().getName()));
 
-			// Messages all his product agents that he is going to die.
-			Object[] productAgents = equipletBBClient.findDistinctValues("productAgentId", new BasicDBObject());
-			for(Object productAgent : productAgents) {
+			// Messages all the product agents that he died.
+			for(DBObject object : equipletBBClient.findDocuments(new BasicDBObject())){
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
-				responseMessage.addReceiver(new AID(productAgent.toString(), AID.ISGUID));
+				responseMessage.addReceiver(new AID(object.get("productAgentId").toString(), AID.ISGUID));
 				responseMessage.setOntology("EquipletAgentDied");
-				responseMessage.setContent("I'm dying");
+				responseMessage.setContentObject((BasicDBObject)object.get("statusData"));
 				send(responseMessage);
 			}
-		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(e);
-			// The equiplet is already going down, so it has to do nothing here.
-		}
-		try {
+			
 			// Clears his own blackboard and removes his subscription on that
 			// blackboard.
 			equipletBBClient.removeDocuments(new BasicDBObject());
 			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			equipletBBClient.unsubscribe(statusSubscription);
-		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+		} catch(InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 			Logger.log(e);
 		}
 
@@ -374,7 +366,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 								// If the start time of the newly planned productStep is earlier as the next used time
 								// slot make it the next used timeslot.
 								ScheduleData scheduleData = productStep.getScheduleData();
-							timer.setNextUsedTimeSlot(scheduleData.getStartTime());
+								nextProductStep = productStep.getId();
+								timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 								if(scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
 									timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 								}
@@ -394,17 +387,21 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 							break;
 						case FAILED:
 							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setPerformative(ACLMessage.FAILURE);
 							responseMessage.setContent("FAILED");
 							responseMessage.setContentObject(productStep.getStatusData());
 							break;
 						case SUSPENDED_OR_WARNING:
 							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setPerformative(ACLMessage.FAILURE);
 							responseMessage.setContent("SUSPENDED_OR_WARNING");
 							responseMessage.setContentObject(productStep.getStatusData());
 							break;
 						case DONE:
 							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setPerformative(ACLMessage.CONFIRM);
 							responseMessage.setContent("DONE");
+							responseMessage.setContentObject(productStep.getStatusData());
 							break;
 						default:
 							break;
@@ -497,6 +494,15 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 */
 	public ObjectId getNextProductStep() {
 		return nextProductStep;
+	}
+	
+	/**
+	 * Setter for the next product step
+	 * 
+	 * @param nextProductStep The new next product step
+	 */
+	public void setNextProductStep(ObjectId nextProductStep){
+		this.nextProductStep = nextProductStep;
 	}
 
 	/**

@@ -1,6 +1,6 @@
 /**
  * @file rexos/mas/service_agent/ServiceStep.java
- * @brief Provides a message for the servicestep blackboard
+ * @brief Provides a message for the serviceStep blackboard.
  * @date Created: 2013-04-03
  * 
  * @author Peter Bonnema
@@ -50,14 +50,58 @@ import com.mongodb.BasicDBObjectBuilder;
  * @author Peter Bonnema
  */
 public class ServiceStep implements MongoSaveable {
+	/**
+	 * @var ObjectId _id
+	 *      The MongoDb ObjectId of this serviceStep.
+	 */
 	private ObjectId _id;
+
+	/**
+	 * @var ObjectId nextStep
+	 *      The ObjectId of the next serviceStep to be executed.
+	 */
 	private ObjectId nextStep;
+
+	/**
+	 * @var int serviceId
+	 *      The id of the service that made this serviceStep.
+	 */
 	private int serviceId;
+
+	/**
+	 * @var int type
+	 *      The type of this serviceStep. It stands for things like "Pick" or "Place".
+	 */
 	private int type;
+
+	/**
+	 * @var ObjectId productStepId
+	 *      The MongoDB ObjectId of the productStep this serviceStep belongs to.
+	 */
 	private ObjectId productStepId;
+
+	/**
+	 * @var BasicDBObject parameters
+	 *      The parameters.
+	 */
 	private BasicDBObject parameters;
+
+	/**
+	 * @var StepStatusCode status
+	 *      The status of this step.
+	 */
 	private StepStatusCode status;
+
+	/**
+	 * @var BasicDBObject statusData
+	 *      The statusData giving extra information like reason/source in case of ABORTED.
+	 */
 	private BasicDBObject statusData;
+
+	/**
+	 * @var ScheduleData scheduleData
+	 *      The scheduleData containing startTime, duration and deadline.
+	 */
 	private ScheduleData scheduleData;
 
 	/**
@@ -153,21 +197,29 @@ public class ServiceStep implements MongoSaveable {
 		return sortedSteps;
 	}
 
-	/* (non-Javadoc)
-	 * @see rexos.mas.data.MongoSaveable#toBasicDBObject() */
+	/**
+	 * @see rexos.mas.data.MongoSaveable#toBasicDBObject()
+	 */
+	//@formatter:off
 	@Override
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject dbObject =
-				(BasicDBObject) BasicDBObjectBuilder.start().add("nextStep", nextStep).add("serviceId", serviceId)
-						.add("type", type).add("productStepId", productStepId).add("parameters", parameters)
-						.add("status", status.name()).add("statusData", statusData)
-						.add("scheduleData", scheduleData.toBasicDBObject()).get();
+				(BasicDBObject) BasicDBObjectBuilder.start()
+					.add("nextStep", nextStep)
+					.add("serviceId", serviceId)
+					.add("type", type)
+					.add("productStepId", productStepId)
+					.add("parameters", parameters)
+					.add("status", status.name())
+					.add("statusData", statusData)
+					.add("scheduleData", scheduleData.toBasicDBObject()).get();
 
 		return dbObject;
-	}
+	} //@formatter:on
 
-	/* (non-Javadoc)
-	 * @see rexos.mas.data.MongoSaveable#fromBasicDBObject(com.mongodb.BasicDBObject) */
+	/**
+	 * @see rexos.mas.data.MongoSaveable#fromBasicDBObject(com.mongodb.BasicDBObject)
+	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		_id = object.getObjectId("_id");
@@ -178,7 +230,7 @@ public class ServiceStep implements MongoSaveable {
 		parameters = (BasicDBObject) object.get("parameters");
 		status = StepStatusCode.valueOf(object.getString("status"));
 		if(object.containsField("statusData")) {
-			statusData = (BasicDBObject) object.get(statusData);
+			statusData = (BasicDBObject) object.get("statusData");
 		} else {
 			statusData = new BasicDBObject();
 		}

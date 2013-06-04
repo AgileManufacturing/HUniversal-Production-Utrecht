@@ -1,9 +1,9 @@
 /**
- * @file rexos/mas/service_agent/behaviours/InitialisationFinished.java
- * @brief Handles the InitialisationFinished message which the hardwareAgent sends to indicate its initialized.
- * @date Created: 2013-04-02
+ * @file OtherAgentDied.java
+ * @brief
+ * @date Created: 31 mei 2013
  * 
- * @author Hessel Meulenbeld
+ * @author Peter Bonnema
  * 
  * @section LICENSE
  *          License: newBSD
@@ -30,72 +30,53 @@
  *          HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  *          LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  **/
 package rexos.mas.service_agent.behaviours;
 
+import java.util.List;
+
+import org.bson.types.ObjectId;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+
+import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import rexos.libraries.log.Logger;
+import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.service_agent.ServiceAgent;
 
 /**
- * This behaviour handles the InitialisationFinished message. The hardwareAgent sends this message to indicate its done
- * initializing.
- * 
- * @author Hessel Meulenbeld
+ * @author Peter Bonnema
  * 
  */
-public class InitialisationFinished extends ReceiveBehaviour {
-	/**
-	 * @var long serialVersionUID
-	 *      The serialVersionUID for this class.
-	 */
-	private static final long serialVersionUID = 581780075377109392L;
+public class OtherAgentDied extends ReceiveBehaviour {
+	private ServiceAgent agent;
 
 	/**
-	 * @var MessageTemplate messageTemplate
-	 *      The messageTemplate this behaviour listens to. This behaviour listens to the ontology:
-	 *      InitialisationFinished.
+	 * @param agent
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("InitialisationFinished");
-
-	/**
-	 * @var ServiceAgent serviceAgent
-	 *      The serviceAgent related to this behaviour.
-	 */
-	private ServiceAgent serviceAgent;
-
-	/**
-	 * Instantiates a new InitialisationFinished.
-	 * 
-	 * @param a The agent for this behaviour
-	 */
-	public InitialisationFinished(ServiceAgent a) {
-		super(a, messageTemplate);
-		serviceAgent = a;
+	public OtherAgentDied(ServiceAgent agent) {
+		super(agent, MessageTemplate.or(MessageTemplate.MatchOntology("EquipletAgentDied"),
+				MessageTemplate.MatchOntology("HardwareAgentDied")));
+		this.agent = agent;
 	}
 
-	/**
-	 * Handles an incoming message from the hardwareAgent. The hardwareAgent sends this message to indicate that it's
-	 * completely initialized. Then the same message is send to the equipletAgent to indicate the same.
-	 * 
-	 * @param message the message to handle or null on timeout.
-	 */
+	/* (non-Javadoc)
+	 * @see rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage) */
 	@Override
 	public void handle(ACLMessage message) {
-		if(message != null) {
-			Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
-					message.getOntology());
-
-			ACLMessage response = new ACLMessage(ACLMessage.CONFIRM);
-			response.addReceiver(serviceAgent.getEquipletAgentAID());
-			response.setOntology("InitialisationFinished");
-			serviceAgent.send(response);
+		if(message.getOntology().equals("EquipletAgentDied")) {
+			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+			msg.addReceiver(agent.getHardwareAgentAID());
+			msg.setOntology("ServiceAgentDied");
+			agent.send(msg);
 		} else {
-			// TODO (most) handle timeout
-			Logger.log(serviceAgent.getName() + " - InitialisationFinished timeout!");
-			serviceAgent.doDelete();
+			agent.doDelete();
 		}
 	}
 }

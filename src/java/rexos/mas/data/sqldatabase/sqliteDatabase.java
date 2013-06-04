@@ -40,7 +40,9 @@
 
 package rexos.mas.data.sqldatabase;
 
+import rexos.libraries.log.Logger;
 import rexos.mas.data.LogMessage;
+
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -67,8 +69,7 @@ public class sqliteDatabase{
 			Driver d = (Driver) Class.forName(JDBC_DRIVER).newInstance();
 			DriverManager.registerDriver(d);
 		} catch(Exception e){
-			System.out
-					.println("Error loading database driver: " + e.toString());
+			Logger.log("Error loading database driver: " + e.toString());
 			return;
 		}
 		try{
@@ -79,7 +80,7 @@ public class sqliteDatabase{
 			}
 		} catch(SQLException e){
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.log(e);
 		}
 	}
 
@@ -100,7 +101,7 @@ public class sqliteDatabase{
 			}
 		} catch(SQLException e){
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.log(e);
 		}
 	}
 }

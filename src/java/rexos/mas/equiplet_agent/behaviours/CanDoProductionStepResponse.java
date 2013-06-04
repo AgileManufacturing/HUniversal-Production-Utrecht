@@ -116,8 +116,7 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 				AID productAgent = productStep.getProductAgentId();
 				// sends a message to the productAgent to answer to the question
 				// CanPerformStep.
-				ACLMessage responseMessage = new ACLMessage(
-						message.getPerformative());
+				ACLMessage responseMessage = new ACLMessage(message.getPerformative());
 				responseMessage.setConversationId(message.getConversationId());
 				responseMessage.setOntology("CanPerformStep");
 				responseMessage.addReceiver(productAgent);
@@ -129,7 +128,6 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 				}
 				myAgent.send(responseMessage);
 			} catch (GeneralMongoException | InvalidDBNamespaceException e) {
-				// TODO: ERROR HANDLING
 				Logger.log(e);
 				myAgent.doDelete();
 			}

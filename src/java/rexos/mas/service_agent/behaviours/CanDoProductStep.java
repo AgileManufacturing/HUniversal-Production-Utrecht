@@ -40,6 +40,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.bson.types.ObjectId;
 
@@ -112,18 +113,28 @@ public class CanDoProductStep extends ReceiveBehaviour {
 			int stepType = productStep.getType();
 			BasicDBObject parameters = productStep.getParameters();
 
-			Logger.log("%s got message CanDoProductionStep for step type %s%n", agent.getLocalName(), stepType);
+			Logger.log("%s got message CanDoProductStep for step type %s%n", agent.getLocalName(), stepType);
 
 			Service[] services = factory.getServicesForStep(stepType);
-			if(services.length > 0) {
-				Service service = services[0];
-				agent.MapConvIdWithService(message.getConversationId(), service);
+
+			ArrayList<Service> possibleServices = new ArrayList<Service>();
+			for(Service service : services) {
+				if(service.canDoStep(stepType, parameters)) {
+					possibleServices.add(service);
+				}
+			}
+
+			if(!possibleServices.isEmpty()) {
+				// TODO implement algorithm to intelligently choose a service here
+				Service choosenService = possibleServices.get(0);
+
+				agent.MapConvIdWithService(message.getConversationId(), choosenService);
 
 				ACLMessage msg = new ACLMessage(ACLMessage.QUERY_IF);
 				msg.setConversationId(message.getConversationId());
 				msg.addReceiver(agent.getHardwareAgentAID());
 				msg.setOntology("CheckForModules");
-				msg.setContentObject(service.getModuleIds(stepType, parameters));
+				msg.setContentObject(choosenService.getModuleGroupIds(stepType, parameters));
 				agent.send(msg);
 
 				agent.addBehaviour(new CheckForModulesResponse(agent));
