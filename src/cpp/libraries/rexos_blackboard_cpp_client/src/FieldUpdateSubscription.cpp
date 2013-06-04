@@ -87,6 +87,25 @@ bool FieldUpdateSubscription::getQuery(mongo::Query * query_out) const {
 }
 
 bool FieldUpdateSubscription::matchesWithEntry(const OplogEntry& entry) const {
+	if (!BasicOperationSubscription::matchesWithEntry(entry)) {
+		return false;
+	}
+
+	mongo::BSONObj updateDoc = entry.getUpdateDocument();
+	for (std::vector<MongoUpdateLogOperation>::const_iterator iter = subscribedOperations.begin(); iter != subscribedOperations.end() ; iter++) {
+		std::string operationString = stringForUpdateOperation(*iter);
+		if (!operationString.empty()) {
+			if (updateDoc.hasField(operationString)) {
+				mongo::BSONObj operationObj = updateDoc.getObjectField(operationString.c_str());
+				if (operationObj.hasField(fieldName)) {
+					return true;
+				}
+			}
+		} else if (updateDoc.hasField(fieldName)) {
+			return true;
+		}
+	}
+
 	return true;
 }
 
