@@ -28,6 +28,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 #include "rexos_blackboard_cpp_client/OplogEntry.h"
+#include "rexos_blackboard_cpp_client/MongoOperation.h"
 
 using namespace Blackboard;
 
@@ -52,23 +53,35 @@ const std::map<std::string, MongoOperation> OplogEntry::operationMap = {
 
 OplogEntry::OplogEntry(mongo::BSONObj oplogEntry) : oplogEntry(oplogEntry) {}
 
-MongoOperation OplogEntry::getOperation() {
+MongoOperation OplogEntry::getOperation() const{
 	return operationMap.at(oplogEntry.getStringField(OPERATION_FIELD.c_str()));
 }
 
-std::string OplogEntry::getNamespace() {
+std::string OplogEntry::getNamespace() const{
 	return std::string(oplogEntry.getStringField(NAMESPACE_FIELD.c_str()));
 }
 
-mongo::BSONObj OplogEntry::getUpdateDocument() {
+mongo::BSONObj OplogEntry::getUpdateDocument() const{
 	return oplogEntry.getObjectField(UPDATE_DOC_FIELD.c_str());
 }
 
-mongo::BSONObj OplogEntry::getUpdateCriteria() {
+mongo::BSONObj OplogEntry::getUpdateCriteria() const{
 	return oplogEntry.getObjectField(UPDATE_CRITERIA_FIELD.c_str());
 }
 
-bool OplogEntry::getTargetObjectId(mongo::OID & oid) {
+std::string OplogEntry::getOperationString(MongoOperation operation) {
+	std::map<std::string, MongoOperation>::const_iterator iter;
+	std::string operationString;
+	for (iter = operationMap.begin() ; iter != operationMap.end() ; iter++) {
+		if (iter->second == operation) {
+			operationString = iter->first;
+		}
+	}
+
+	return operationString;
+}
+
+bool OplogEntry::getTargetObjectId(mongo::OID & oid) const{
 	mongo::BSONObj targetObj;
 	if (oplogEntry.hasField(mongo::StringData(UPDATE_CRITERIA_FIELD))) {
 		targetObj = oplogEntry.getObjectField(UPDATE_CRITERIA_FIELD.c_str());

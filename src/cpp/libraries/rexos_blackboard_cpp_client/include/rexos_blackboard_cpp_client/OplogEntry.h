@@ -33,8 +33,8 @@
 
 #include <string>
 #include <map>
-#include "mongo/client/dbclient.h"
-#include "MongoOperation.h"
+#include "mongo/bson/bson.h"
+#include "rexos_blackboard_cpp_client/MongoOperation.h"
 
 namespace Blackboard {
 
@@ -89,32 +89,35 @@ public:
 	 * Returns the operation of this oplog entry.
 	 * @return the operation of this oplog entry.
 	 **/
-	MongoOperation getOperation();
+	MongoOperation getOperation() const;
 
 	/**
 	 * Returns the namespace of this oplog entry.
 	 * @return the namespace of this oplog entry.
 	 **/
-	std::string getNamespace();
+	std::string getNamespace() const;
 
 	/**
 	 * Returns the update query (i.e. the query that was used to update the target documents) of this oplog entry.
 	 * @return the update query of this oplog entry.
 	 **/
-	mongo::BSONObj getUpdateDocument();
+	mongo::BSONObj getUpdateDocument() const;
 
 	/**
 	 * Returns the update criteria (i.e. the query used to match target documents) of this oplog entry.
 	 * @return the update criteria of this oplog entry.
 	 **/
-	mongo::BSONObj getUpdateCriteria();
+	mongo::BSONObj getUpdateCriteria() const;
 
 	/**
 	 * Attempts to retrieve the ObjectId for the target document of the operation.
 	 * @param oid Reference to an OID object where the value should be stored.
 	 * @return true if an objectId could be extracted, false otherwise. When false is returned, oid is left unchanged.
 	 **/
-	bool getTargetObjectId(mongo::OID & oid);
+	bool getTargetObjectId(mongo::OID & oid) const;
+
+	static std::string getOperationString(MongoOperation operation);
+
 private:
 	/**
 	 * @var mongo::BSONObj oplogEntry
