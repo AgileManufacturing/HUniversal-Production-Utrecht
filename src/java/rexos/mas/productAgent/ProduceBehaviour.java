@@ -56,7 +56,6 @@ import rexos.mas.data.StepStatusCode;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 public class ProduceBehaviour extends OneShotBehaviour{
@@ -65,8 +64,7 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	private ProductionEquipletMapper _prodEQMap;
 	ProductionEquipletMapper s1;
 	ACLMessage msg;
-	private HashMap<AID, Long> currentEandT; 
-
+	
 	@Override
 	public void action(){
 		_prodEQMap = new ProductionEquipletMapper();
@@ -167,11 +165,11 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 		_productAgent = (ProductAgent) myAgent;
 		SequentialBehaviour seq = new SequentialBehaviour();
 		myAgent.addBehaviour(seq);
-		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setOntology("StartProduction");
 		
 		if(eqAndTs.get(msg.getSender()) != productionStep.getId()){
-			Logger.log(new UnsupportedOperationException("Equiplet sender not equal to associated equiplet in productionStep"));;
+			Logger.log(new UnsupportedOperationException("Equiplet sender not equal to associated equiplet in productionStep"));
 		}
 		msg.addReceiver(msg.getSender());
 		myAgent.send(msg);
