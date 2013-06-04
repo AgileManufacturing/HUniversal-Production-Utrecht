@@ -70,7 +70,7 @@ public class ProduceBehaviour extends OneShotBehaviour{
 		_prodEQMap = new ProductionEquipletMapper();
 		// retrieve the productstep
 		for(ProductionStep stp : _production.getProductionSteps()){
-			if (stp.getStatus() == StepStatusCode.WAITING){
+			if (stp.getStatus() == StepStatusCode.PLANNED){
 				// adds the step to te new list (the one that will be
 				// returned to the scheduler)
 				_prodEQMap.addProductionStep(stp.getId());
@@ -232,7 +232,7 @@ class producing extends OneShotBehaviour{
 	}
 
 	public static void canProductionStepStart(ProductionStep step){
-		step.setStatus(StepStatusCode.IN_PROGRESS);
+		step.setStatus(StepStatusCode.WAITING);
 	}
 
 	void productionStepEnded(ProductionStep step, boolean succes,
