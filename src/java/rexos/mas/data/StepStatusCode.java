@@ -4,6 +4,7 @@
  * @date Created: 17 Apr 2013
  * 
  * @author Alexander Streng
+ * @author Hessel Meulenbeld
  * 
  * @section LICENSE License: newBSD
  * 
