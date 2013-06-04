@@ -1,0 +1,19 @@
+<project name="blackboard_client" default="build" basedir=".">
+
+	<import file="../build.xml"/>
+
+	<target name="build" depends="jars"> 			
+		<!-- defined in the root build.xml -->
+		<buildjava dir="${basedir}"/>  
+	</target>
+
+	<target name="jars">
+		<antcall target="add-jar-to-classpath"><param name="jar" value="gson-2.2.2.jar"/></antcall>
+		<antcall target="add-jar-to-classpath"><param name="jar" value="mongo-2.9.3.jar"/></antcall>
+	</target>
+
+	<target name="clean">
+		 <cleanjava dir="${basedir}"/>
+	</target>
+
+</project>

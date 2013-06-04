@@ -1,4 +1,45 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# ignore intelliJ Idea project files
+.idea/
+*.iml
+
+# Ignore the generated folders by the build system
+
+bin/
+dist/
+libraries/mongo-cxx-driver/.sconf_temp/
+libraries/mongo-cxx-driver/.sconsign.dblite
+libraries/mongo-cxx-driver/config.log
+libraries/mongo-cxx-driver/.sconsign.dblite
+libraries/mongo-cxx-driver/config.log
+libraries/blackboardJavaClient/*.jar
+build/
+devel/
+
+
+# Ignore project file, cmake text file and editor temporary files
+
+.rexos-export
+sync.sh
+*.sublime-project
+*.sublime-workspace
+*~
+*.class
+*.orig
+
+APDescription.txt
+MTPs-Main-Container.txt
 .classpath
-bin
-/MTPs-Main-Container.txt
-/APDescription.txt
+.project

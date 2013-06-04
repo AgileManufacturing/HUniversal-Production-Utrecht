@@ -1,0 +1,3 @@
+REPOSITORY = "git@github.com:AgileManufacturing/HUniversal-Production-Utrecht.git"
+TARGET_GROUPS = "REXOS"
+REVIEWBOARD_URL = "http://reviews.agilemanufacturing.nl"
