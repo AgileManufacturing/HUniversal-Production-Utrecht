@@ -49,6 +49,7 @@ import jade.lang.acl.ACLMessage;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.LogMessage;
 import rexos.mas.data.Product;
+import rexos.mas.data.ProductStep;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
@@ -101,23 +102,10 @@ class newProducing extends SequentialBehaviour{
 	public void onStart(){
 		addSubBehaviour(new OneShotBehaviour(){
 			private static final long serialVersionUID = 1L;
-			private AID nEq;
 			@Override
 			public void action(){
 				
-				if(EqAndTs.size() == 1){
-					for(Entry<AID, Long> Eq: EqAndTs.entrySet()){
-						nEq = Eq.getKey();
-					}
-				}
-				else
-				{
-					Logger.log(new UnsupportedOperationException("Equipletcount is "+ EqAndTs.size() + "; excepted 1"));
-				}
-				ProductAgent pa = (ProductAgent)myAgent;
-				if(nEq != pa.getCurrentLocation()){
-					//TODO: Ask GUI to move
-				}
+				
 				
 				myAgent.addBehaviour(new receiveMsgBehaviour(EqAndTs, productionStep));
 			}
@@ -186,7 +174,34 @@ class producing extends OneShotBehaviour{
 	public void action(){
 		try{
 			switch(msg.getOntology()){
-			// The productionstep has been initiated.
+			case "Planned":
+				
+				break;
+			case "StatusUpdate":
+				ProductStep ps = 	(ProductStep)msg.getContentObject();
+				switch(msg.getContent()){
+				case "INPROGRESS":
+					
+					break;
+				case "SUSPENDED_OR_WARNING":
+					
+					break;
+				case "DONE":
+					
+					break;
+				default:
+					Logger.log(new UnsupportedOperationException("No case for " + msg.getContent()));
+
+					break;
+				}
+				
+				
+			 
+			 
+			break;
+			case "EquipletAgentDied":
+				
+				break;
 			case "productionStepStarted":
 				// TODO key = msg.getContent().parse
 				
@@ -215,15 +230,11 @@ class producing extends OneShotBehaviour{
 				 null); // productionStepEnded(stp, msg.getContent, //
 				 msg.getContent); } } } currProdStep++;
 				*/
-				_productAgent.setCurrentLocation(msg.getSender());
+				
 				
 				break;
-			// For some reason production can't be started thus it has to be
-			// rescheduled.
-			case "notStarted":
-				_productAgent.reschedule();
-				break;
 			default:
+				Logger.log(new UnsupportedOperationException("No case for " + msg.getOntology()));
 				break;
 			}
 		} catch(Exception e){
