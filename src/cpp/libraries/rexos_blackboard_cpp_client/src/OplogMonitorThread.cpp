@@ -68,31 +68,37 @@ mongo::Query OplogMonitorThread::createOplogQuery()
 
 	for (std::vector<BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
 		if ((*iter)->getQuery(&query)) {
-			orArray.append(query);
+			orArray.append(query.obj);
 		}
 	}
 
-	return QUERY("$or" << orArray.arr());
+	if (!omtNamespace.empty()) {
+		mongo::BSONArrayBuilder andArray;
+		andArray.append(BSON(OplogEntry::NAMESPACE_FIELD << omtNamespace));
+		andArray.append(BSON("$or" << orArray.arr()));
+		query = QUERY("$and" << andArray.arr());
+	} else {
+		query = QUERY("$or" << orArray.arr());
+	}
+
+	return query;
 }
 
-int OplogMonitorThread::getSkipCount()
+int OplogMonitorThread::getSkipCount(std::string collectionNamespace)
 {
-	mongo::BSONObj ret;
-	mongo::BSONObj bsonQry = BSON("collStats" << oplogCollectionName);
-	connection.runCommand(oplogDBName, bsonQry, ret);
-	return ret.getIntField("count");
+	return connection.count(collectionNamespace);
 }
 
 void OplogMonitorThread::run()
 {
 	bool interrupted = false;
-
+	std::string oplogName = oplogDBName.append(".").append(oplogCollectionName);
 	// Creating tailable cursor and skipping documents
 	std::auto_ptr<mongo::DBClientCursor> tailedCursor = connection.query(
-			oplogDBName.append(".").append(oplogCollectionName),
-			query,
+			oplogName,
+			createOplogQuery(),
 			0,
-			getSkipCount(),
+			getSkipCount(oplogName),
 			NULL,
 			mongo::QueryOption_CursorTailable | mongo::QueryOption_AwaitData,
 			0);
@@ -101,7 +107,6 @@ void OplogMonitorThread::run()
 		try {
 			while(tailedCursor->more()){
 				const OplogEntry oplogEntry(tailedCursor->next());
-				std::cout << "OMT: " << oplogEntry.toString() << std::endl;
 				for (std::vector<BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
 					if ((*iter)->matchesWithEntry(oplogEntry)) {
 						(*iter)->getSubscriber().blackboardReadCallback(oplogEntry.toString());
@@ -117,6 +122,16 @@ void OplogMonitorThread::run()
 void OplogMonitorThread::addSubscription(BlackboardSubscription& sub)
 {
 	subscriptions.push_back(&sub);
+}
+
+void OplogMonitorThread::setNamespace(std::string database, std::string collection)
+{
+	omtNamespace = database.append(".").append(collection);
+}
+
+void OplogMonitorThread::setNamespace(std::string omtNamespace)
+{
+	this->omtNamespace = omtNamespace;
 }
 
 } /* namespace Blackboard */

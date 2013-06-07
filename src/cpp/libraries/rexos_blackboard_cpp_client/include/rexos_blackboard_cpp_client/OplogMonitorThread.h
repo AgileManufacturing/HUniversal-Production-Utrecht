@@ -50,17 +50,20 @@ public:
 	void start();
 	void interrupt();
 	void addSubscription(BlackboardSubscription& sub);
+	void setNamespace(std::string database, std::string collection);
+	void setNamespace(std::string omtNamespace);
 
 private:
 	void run();
 	mongo::Query createOplogQuery();
-	int getSkipCount();
+	int getSkipCount(std::string collectionNamespace);
 
 	std::vector<BlackboardSubscription *> subscriptions;
 	mongo::DBClientConnection& connection;
 	mongo::Query query;
 	std::string oplogDBName;
 	std::string oplogCollectionName;
+	std::string omtNamespace;
 	boost::thread *thread;
 };
 
