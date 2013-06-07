@@ -118,6 +118,8 @@ public:
 
 	static std::string getOperationString(MongoOperation operation);
 
+	std::string toString() const;
+
 private:
 	/**
 	 * @var mongo::BSONObj oplogEntry

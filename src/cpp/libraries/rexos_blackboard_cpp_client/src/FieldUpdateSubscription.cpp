@@ -106,7 +106,7 @@ bool FieldUpdateSubscription::matchesWithEntry(const OplogEntry& entry) const {
 		}
 	}
 
-	return true;
+	return false;
 }
 
 std::string FieldUpdateSubscription::stringForUpdateOperation(MongoUpdateLogOperation operation) const {

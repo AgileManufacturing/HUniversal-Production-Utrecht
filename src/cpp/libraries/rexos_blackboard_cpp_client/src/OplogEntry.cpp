@@ -98,3 +98,7 @@ bool OplogEntry::getTargetObjectId(mongo::OID & oid) const{
 	return false;
 }
 
+std::string OplogEntry::toString() const {
+	return oplogEntry.toString(false, false);
+}
+
