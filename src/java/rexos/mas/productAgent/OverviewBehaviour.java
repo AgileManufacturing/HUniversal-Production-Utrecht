@@ -53,7 +53,6 @@ public class OverviewBehaviour extends OneShotBehaviour{
 	private PlannerBehaviour _plannerBehaviour;
 	private InformerBehaviour _informerBehaviour;
 	private SchedulerBehaviour _schedulerBehaviour;
-	@SuppressWarnings("unused")
 	private ProduceBehaviour _produceBehaviour;
 	private SequentialBehaviour _sequentialBehaviour;
 

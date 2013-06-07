@@ -178,10 +178,11 @@ class producing extends OneShotBehaviour{
 				
 				break;
 			case "StatusUpdate":
-				ProductStep ps = 	(ProductStep)msg.getContentObject();
+				ProductStep ps = 	(ProductStep)msg.getContentObject();					
+				
 				switch(msg.getContent()){
 				case "INPROGRESS":
-					
+							
 					break;
 				case "SUSPENDED_OR_WARNING":
 					
