@@ -87,7 +87,7 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 				equipletAgent.send(responseMessage);
 				Logger.log("sending message: %s%n", responseMessage.getOntology());
 
-				//TODO: remove below
+				//TODO: remove below after testing
 				ACLMessage scheduleStepMessage = new ACLMessage(ACLMessage.REQUEST);
 				scheduleStepMessage.addReceiver(equipletAgent.getAID());
 				scheduleStepMessage.setOntology("ScheduleStep");
@@ -95,7 +95,7 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 				scheduleStepMessage.setContent(String.valueOf((System.currentTimeMillis() - equipletAgent.getTimer().getFirstTimeSlot())/2000 + 3));
 				equipletAgent.send(scheduleStepMessage);
 				Logger.log("sending message: %s%n", scheduleStepMessage.getOntology());
-				//TODO: remove above
+				//TODO: remove above after testing
 			} catch (IOException | InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(e);
 				equipletAgent.doDelete();

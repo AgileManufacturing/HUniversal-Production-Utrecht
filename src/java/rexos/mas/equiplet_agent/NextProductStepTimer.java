@@ -167,7 +167,7 @@ public class NextProductStepTimer extends Timer {
 				answer.setOntology("StartStepQuestion");
 				equipletAgent.send(answer);
 				
-				//TODO: delete below
+				//TODO: delete below after testing
 				ACLMessage test = new ACLMessage(ACLMessage.QUERY_IF);
 				test.setConversationId(conversationId);
 				test.addReceiver(equipletAgent.getAID());

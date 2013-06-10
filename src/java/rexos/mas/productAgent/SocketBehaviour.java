@@ -8,7 +8,7 @@
  * 
  * @section LICENSE License: newBSD
  * 
- *          Copyright © 2012, HU University of Applied Sciences Utrecht. All
+ *          Copyright ï¿½ 2012, HU University of Applied Sciences Utrecht. All
  *          rights reserved.
  * 
  *          Redistribution and use in source and binary forms, with or without
@@ -68,10 +68,8 @@ public class SocketBehaviour extends CyclicBehaviour{
 			inputStream = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
 		} catch(UnknownHostException e){
-			// TODO Auto-generated catch block
 			Logger.log(e);
 		} catch(IOException e){
-			// TODO Auto-generated catch block
 			Logger.log(e);
 		}
 	}

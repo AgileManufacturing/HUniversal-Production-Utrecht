@@ -125,7 +125,7 @@ public class CanDoProductStep extends ReceiveBehaviour {
 			}
 
 			if(!possibleServices.isEmpty()) {
-				// TODO implement algorithm to intelligently choose a service here
+				// TODO (out of scope)implement algorithm to intelligently choose a service here
 				Service choosenService = possibleServices.get(0);
 
 				agent.MapConvIdWithService(message.getConversationId(), choosenService);
