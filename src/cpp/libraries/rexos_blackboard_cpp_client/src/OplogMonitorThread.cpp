@@ -50,10 +50,15 @@ OplogMonitorThread::OplogMonitorThread(
 {
 }
 
+OplogMonitorThread::~OplogMonitorThread() {
+	if (thread != NULL) {
+		delete thread;
+	}
+}
+
 void OplogMonitorThread::start()
 {
 	thread = new boost::thread(boost::bind(&OplogMonitorThread::run, this));
-	thread->join();
 }
 
 void OplogMonitorThread::interrupt()
@@ -117,11 +122,18 @@ void OplogMonitorThread::run()
 			interrupted = true;
 		}
 	}
+
+	delete thread;
 }
 
 void OplogMonitorThread::addSubscription(BlackboardSubscription& sub)
 {
 	subscriptions.push_back(&sub);
+}
+
+void OplogMonitorThread::removeSubscription(BlackboardSubscription& sub)
+{
+	subscriptions.erase(std::remove(subscriptions.begin(), subscriptions.end(), &sub), subscriptions.end());
 }
 
 void OplogMonitorThread::setNamespace(std::string database, std::string collection)

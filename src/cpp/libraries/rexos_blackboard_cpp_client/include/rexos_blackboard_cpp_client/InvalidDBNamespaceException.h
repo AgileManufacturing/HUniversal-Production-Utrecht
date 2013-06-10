@@ -1,7 +1,7 @@
 /**
- * @file OplogMonitorThread.h
+ * @file InvalidDBNamespaceException.h
  * @brief 
- * @date Created: 4 jun. 2013
+ * @date Created: 7 jun. 2013
  *
  * @author Jan-Willem Willebrands
  *
@@ -28,46 +28,27 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef OPLOGMONITORTHREAD_H_
-#define OPLOGMONITORTHREAD_H_
+#ifndef INVALIDDBNAMESPACEEXCEPTION_H_
+#define INVALIDDBNAMESPACEEXCEPTION_H_
 
-#include <string>
-#include <vector>
-#include "mongo/client/dbclientinterface.h"
-#include "boost/thread.hpp"
+#include <exception>
 
 namespace Blackboard {
 
-class BlackboardSubscription;
-
-class OplogMonitorThread {
+class InvalidDBNamespaceException : public std::exception
+{
 public:
-	OplogMonitorThread(
-			mongo::DBClientConnection& connection,
-			std::string oplogDBName,
-			std::string oplogCollectionName);
-
-	~OplogMonitorThread();
-	void start();
-	void interrupt();
-	void addSubscription(BlackboardSubscription& sub);
-	void removeSubscription(BlackboardSubscription& sub);
-	void setNamespace(std::string database, std::string collection);
-	void setNamespace(std::string omtNamespace);
+	InvalidDBNamespaceException(std::string reason) : reason(reason) {};
+	virtual ~InvalidDBNamespaceException() throw() { };
+	virtual const char* what() const throw() {return reason.c_str();}
 
 private:
-	void run();
-	mongo::Query createOplogQuery();
-	int getSkipCount(std::string collectionNamespace);
 
-	std::vector<BlackboardSubscription *> subscriptions;
-	mongo::DBClientConnection& connection;
-	mongo::Query query;
-	std::string oplogDBName;
-	std::string oplogCollectionName;
-	std::string omtNamespace;
-	boost::thread *thread;
+	std::string reason;
+
 };
 
-} /* namespace Blackboard */
-#endif /* OPLOGMONITORTHREAD_H_ */
+}
+
+
+#endif /* INVALIDDBNAMESPACEEXCEPTION_H_ */
