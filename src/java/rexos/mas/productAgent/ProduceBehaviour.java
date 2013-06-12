@@ -211,6 +211,7 @@ class producing extends OneShotBehaviour{
 					 * Equiplet agent informs the product agent that the product
 					 * step has been executed successfully.
 					 */
+					_product.addStatusDataToLog(ps.getStatusData());
 					break;
 				default:
 					Logger.log(new UnsupportedOperationException("No case for "

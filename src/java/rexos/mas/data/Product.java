@@ -42,6 +42,8 @@ package rexos.mas.data;
 
 import java.util.List;
 
+import com.mongodb.BasicDBObject;
+
 public class Product{
 	private Production _production;
 	private ProductLog log;
@@ -78,7 +80,11 @@ public class Product{
 		this._production = production;
 	}
 
-	public void addLogMsg(List<LogMessage> msg){
-		log.add(msg);
+	/**
+	 * @param statusData
+	 */
+	public void addStatusDataToLog(BasicDBObject statusData){
+		log.add(statusData);
+		
 	}
 }

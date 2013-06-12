@@ -40,28 +40,33 @@
 
 package rexos.mas.data;
 
+import rexos.libraries.log.Logger;
 import rexos.mas.data.sqldatabase.sqliteDatabase;
+
+import java.util.Iterator;
 import java.util.List;
+
+import com.mongodb.BasicDBObject;
 
 public class ProductLog{
 	private boolean writeToRemote = false;
 	private boolean writeToLocal = true;
 	private sqliteDatabase local;
-	//private RemoteDatabaseConnection remote;
-	
+
+	// private RemoteDatabaseConnection remote;
 	/**
 	 * @param writeToRemote
 	 * @param writeToLocal
 	 * @param local
 	 */
-	 public ProductLog(boolean writeToRemote, boolean writeToLocal,
+	public ProductLog(boolean writeToRemote, boolean writeToLocal,
 			sqliteDatabase local){
 		super();
 		this.writeToRemote = writeToRemote;
 		this.writeToLocal = writeToLocal;
 		this.local = local;
 	}
-	
+
 	public void add(List<LogMessage> msgs){
 		if (writeToLocal){
 			local.insert(msgs);
@@ -78,6 +83,19 @@ public class ProductLog{
 		// get local since latest remote
 		// write to remote
 		throw new UnsupportedOperationException();
+	}
 
+	/**
+	 * @param statusData
+	 */
+	public static void add(BasicDBObject statusData){
+		for(@SuppressWarnings("rawtypes")
+		Iterator i = statusData.toMap().entrySet().iterator(); i.hasNext();){
+			switch(i.getClass().getCanonicalName()){
+			default:
+				Logger.log(new UnsupportedOperationException("No log case for "
+						+ i.getClass().getCanonicalName()));
+			}
+		}
 	}
 }
