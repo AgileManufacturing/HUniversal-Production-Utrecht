@@ -65,7 +65,7 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	private ProductionEquipletMapper _prodEQMap;
 	ProductionEquipletMapper s1;
 	ACLMessage msg;
-	
+
 	@Override
 	public void action(){
 		_prodEQMap = new ProductionEquipletMapper();
@@ -92,22 +92,21 @@ class newProducing extends SequentialBehaviour{
 	private HashMap<AID, Long> EqAndTs;
 	private ProductionStep productionStep;
 
-	public newProducing(HashMap<AID, Long> EqAndTs, ProductionStep productionStep){
+	public newProducing(HashMap<AID, Long> EqAndTs,
+			ProductionStep productionStep){
 		this.EqAndTs = EqAndTs;
 		this.productionStep = productionStep;
-		
 	}
 
 	@Override
 	public void onStart(){
 		addSubBehaviour(new OneShotBehaviour(){
 			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void action(){
-				
-				
-				
-				myAgent.addBehaviour(new receiveMsgBehaviour(EqAndTs, productionStep));
+				myAgent.addBehaviour(new receiveMsgBehaviour(EqAndTs,
+						productionStep));
 			}
 		});
 	}
@@ -118,7 +117,8 @@ class receiveMsgBehaviour extends CyclicBehaviour{
 	HashMap<AID, Long> eqAndTs;
 	private ProductionStep productionStep;
 
-	receiveMsgBehaviour(HashMap<AID, Long> eqAndTs, ProductionStep productionStep){
+	receiveMsgBehaviour(HashMap<AID, Long> eqAndTs,
+			ProductionStep productionStep){
 		this.eqAndTs = eqAndTs;
 		this.productionStep = productionStep;
 	}
@@ -127,7 +127,8 @@ class receiveMsgBehaviour extends CyclicBehaviour{
 	public void action(){
 		ACLMessage msg = myAgent.receive();
 		if (msg != null){
-			myAgent.addBehaviour(new WaitMsgBehaviour(msg, eqAndTs, productionStep));
+			myAgent.addBehaviour(new WaitMsgBehaviour(msg, eqAndTs,
+					productionStep));
 		} else{
 			block();
 		}
@@ -141,13 +142,13 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 	HashMap<AID, Long> eqAndTs;
 	private ProductionStep productionStep;
 
-	public WaitMsgBehaviour(ACLMessage msg, HashMap<AID, Long> eqAndTs, ProductionStep productionStep){
+	public WaitMsgBehaviour(ACLMessage msg, HashMap<AID, Long> eqAndTs,
+			ProductionStep productionStep){
 		this.msg = msg;
 		this.eqAndTs = eqAndTs;
 		this.productionStep = productionStep;
 	}
 
-	
 	@Override
 	public void action(){
 		_productAgent = (ProductAgent) myAgent;
@@ -155,9 +156,9 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 		myAgent.addBehaviour(seq);
 		msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setOntology("StartProduction");
-		
-		if(eqAndTs.get(msg.getSender()) != productionStep.getId()){
-			Logger.log(new UnsupportedOperationException("Equiplet sender not equal to associated equiplet in productionStep"));
+		if (eqAndTs.get(msg.getSender()) != productionStep.getId()){
+			Logger.log(new UnsupportedOperationException(
+					"Equiplet sender not equal to associated equiplet in productionStep"));
 		}
 		msg.addReceiver(msg.getSender());
 		myAgent.send(msg);
@@ -169,73 +170,62 @@ class producing extends OneShotBehaviour{
 	Product _product;
 	ProductAgent _productAgent;
 	ACLMessage msg;
-	
+
 	@Override
 	public void action(){
 		try{
 			switch(msg.getOntology()){
 			case "Planned":
-				
 				break;
 			case "StatusUpdate":
-				ProductStep ps = 	(ProductStep)msg.getContentObject();					
-				
+				ProductStep ps = (ProductStep) msg.getContentObject();
 				switch(msg.getContent()){
-				case "INPROGRESS":
-							
-					break;
-				case "SUSPENDED_OR_WARNING":
+					case "INPROGRESS":
 					
-					break;
-				case "DONE":
 					
-					break;
-				default:
-					Logger.log(new UnsupportedOperationException("No case for " + msg.getContent()));
-
-					break;
+						break;
+					case "SUSPENDED_OR_WARNING":
+						
+						break;
+					case "DONE":
+						
+						break;
+					default:
+						Logger.log(new UnsupportedOperationException("No case for "
+								+ msg.getContent()));
+						break;
 				}
-				
-				
-			 
-			 
-			break;
+				break;
 			case "EquipletAgentDied":
 				
-				break;
-			case "productionStepStarted":
-				// TODO key = msg.getContent().parse
-				
-				/*  int key = 0; // temp if (key != currProdStep){ // TODO error
-				  } if (!bla.get(key).containsKey(msg.getSender())){
-					  Logger.log(new UnsupportedOperationException(""));
-				  } { ArrayList<ProductionStep> ProductionStepArrayList =
-				  ((ProductAgent) myAgent)
-				  .getProduct().getProduction().getProductionSteps();
-				  for(ProductionStep stp : ProductionStepArrayList){ if (key ==
-				  stp.getId()){ canProductionStepStart(stp); } } }
-				 */
-				break;
-			// The productionstep has completed.
-			case "productionStepFinished":
-				// TODO key = msg.getContent().parse
-				/*
-				 int keyfinish = 0; // temp if (keyfinish != currProdStep){ //
-				 TODO error } if
-				 (!bla.get(keyfinish).containsKey(msg.getSender())){ // TODO
-				 error } { ArrayList<ProductionStep> ProductionStepArrayList =
-				 ((ProductAgent) myAgent)
-				 .getProduct().getProduction().getProductionSteps();
-				 for(ProductionStep stp : ProductionStepArrayList){ if
-				 (keyfinish == stp.getId()){ productionStepEnded(stp, true,
-				 null); // productionStepEnded(stp, msg.getContent, //
-				 msg.getContent); } } } currProdStep++;
-				*/
 				
 				
 				break;
+			/*
+			 * case "productionStepStarted": // TODO key =
+			 * msg.getContent().parse int key = 0; // temp if (key !=
+			 * currProdStep){ // TODO error } if
+			 * (!bla.get(key).containsKey(msg.getSender())){ Logger.log(new
+			 * UnsupportedOperationException("")); } { ArrayList<ProductionStep>
+			 * ProductionStepArrayList = ((ProductAgent) myAgent)
+			 * .getProduct().getProduction().getProductionSteps();
+			 * for(ProductionStep stp : ProductionStepArrayList){ if (key ==
+			 * stp.getId()){ canProductionStepStart(stp); } } } break; // The
+			 * productionstep has completed. case "productionStepFinished": //
+			 * TODO key = msg.getContent().parse /* int keyfinish = 0; // temp
+			 * if (keyfinish != currProdStep){ // TODO error } if
+			 * (!bla.get(keyfinish).containsKey(msg.getSender())){ // TODO error
+			 * } { ArrayList<ProductionStep> ProductionStepArrayList =
+			 * ((ProductAgent) myAgent)
+			 * .getProduct().getProduction().getProductionSteps();
+			 * for(ProductionStep stp : ProductionStepArrayList){ if (keyfinish
+			 * == stp.getId()){ productionStepEnded(stp, true, null); //
+			 * productionStepEnded(stp, msg.getContent, // msg.getContent); } }
+			 * } currProdStep++; break;
+			 */
 			default:
-				Logger.log(new UnsupportedOperationException("No case for " + msg.getOntology()));
+				Logger.log(new UnsupportedOperationException("No case for "
+						+ msg.getOntology()));
 				break;
 			}
 		} catch(Exception e){
