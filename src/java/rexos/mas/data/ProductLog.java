@@ -91,7 +91,7 @@ public class ProductLog{
 	public static void add(BasicDBObject statusData){
 		for(@SuppressWarnings("rawtypes")
 		Iterator i = statusData.toMap().entrySet().iterator(); i.hasNext();){
-			switch(i.getClass().getCanonicalName()){
+			switch(i.getClass().getName()){
 			default:
 				Logger.log(new UnsupportedOperationException("No log case for "
 						+ i.getClass().getCanonicalName()));
