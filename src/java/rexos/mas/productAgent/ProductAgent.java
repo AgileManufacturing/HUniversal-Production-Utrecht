@@ -8,7 +8,7 @@
  * 
  * @section LICENSE License: newBSD
  * 
- *          Copyright © 2012, HU University of Applied Sciences Utrecht. All
+ *          Copyright ï¿½ 2012, HU University of Applied Sciences Utrecht. All
  *          rights reserved.
  * 
  *          Redistribution and use in source and binary forms, with or without
@@ -112,7 +112,6 @@ public class ProductAgent extends Agent{
 		
 			bbc.removeDocuments(aid.toString());
 		} catch (UnknownHostException | GeneralMongoException | InvalidJSONException | InvalidDBNamespaceException e1) {
-			// TODO Auto-generated catch block
 			Logger.log(e1);
 		}
 	}
