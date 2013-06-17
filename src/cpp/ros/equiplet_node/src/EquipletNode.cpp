@@ -80,7 +80,7 @@ EquipletNode::~EquipletNode(){
  * @param json The message parsed in the json format
  **/
 void EquipletNode::blackboardReadCallback(std::string json){
-        //lets parse a root node from the bb msg.
+    //lets parse a root node from the bb msg.
     //We might want to check the type of msg first.
     JSONNode n = libjson::parse(json);
     rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
@@ -306,15 +306,16 @@ bool EquipletNode::updateModuleState(int moduleID, rexos_mast::StateType state){
  * @param payload the payload, contains data that will get combined with environmentcache data
  **/
 void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupID, std::map<std::string, std::string> payload){
- 	
-    environment_communication_msgs::Map enviromentPayload = createEnviromentMap(payload);
+
+    
     lookup_handler::LookupServer msg;
     msg.request.lookupMsg.lookupType = lookupType;
     msg.request.lookupMsg.lookupID = lookupID;
-    msg.request.lookupMsg.payLoad = enviromentPayload;
+    msg.request.lookupMsg.payLoad = createMapMessageFromProperties(payload);
     
     ros::NodeHandle nodeHandle;
     ros::ServiceClient lookupClient = nodeHandle.serviceClient<lookup_handler::LookupServer>("LookupHandler/lookup");
+    
     if(lookupClient.call(msg)){
         
     } else{
@@ -323,21 +324,23 @@ void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupI
 }
 
 /**
- * Convert a map to a vector
+ * Create a Map message from a map with strings as keys and strings as values
  *
+ * @param properties The map to convert
+ *
+ * @return environment_communication_msgs::Map The map message object
  **/
-environment_communication_msgs::Map EquipletNode::createEnviromentMap(const std::map<std::string, std::string> Map){
-    environment_communication_msgs::Map * tempMap = new environment_communication_msgs::Map();  
-    std::vector<environment_communication_msgs::KeyValuePair> * tempVector = new std::vector<environment_communication_msgs::KeyValuePair>();
-    
-    for(map<string, string>::const_iterator i= Map.begin(); i!= Map.end(); ++i)
-    {
-       //tempMap->map.insert(i, std::pair<std::string,std::string>((*i).first,(*i).second));
-    }
-    
-    tempMap->map.vector(tempVector);
-    
-    return *tempMap;
+environment_communication_msgs::Map EquipletNode::createMapMessageFromProperties(std::map<std::string, std::string> &Map){
+	std::map<std::string, std::string>::iterator propertiesIterator;
+	environment_communication_msgs::Map mapMsg;
+	environment_communication_msgs::KeyValuePair prop;
+        
+	for(propertiesIterator = Map.begin(); propertiesIterator != Map.end(); propertiesIterator++){
+		prop.key = (*propertiesIterator).first;
+		prop.value = (*propertiesIterator).second;
+		mapMsg.map.push_back(prop);
+	}
+	return mapMsg;
 }
 
 /** 

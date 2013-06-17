@@ -116,5 +116,5 @@ private:
 	 * Client to read from blackboard
 	 **/
 	BlackboardCppClient  *blackboardClient;
-        environment_communication_msgs::Map createEnviromentMap(const std::map<std::string, std::string> Map);
+        environment_communication_msgs::Map createMapMessageFromProperties(std::map<std::string, std::string> &Map);
 };
