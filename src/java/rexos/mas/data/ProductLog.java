@@ -42,6 +42,7 @@ package rexos.mas.data;
 
 import rexos.libraries.log.Logger;
 import rexos.mas.data.sqldatabase.sqliteDatabase;
+import jade.core.AID;
 
 import java.util.Iterator;
 import java.util.List;
@@ -86,12 +87,16 @@ public class ProductLog{
 	}
 
 	/**
+	 * @param aid 
 	 * @param statusData
 	 */
-	public static void add(BasicDBObject statusData){
+	public void add(AID aid, BasicDBObject statusData){
 		for(@SuppressWarnings("rawtypes")
 		Iterator i = statusData.toMap().entrySet().iterator(); i.hasNext();){
 			switch(i.getClass().getName()){
+			case "java.lang.String":
+				local.insert(new LogMessage(aid, i.toString()));
+			break;
 			default:
 				Logger.log(new UnsupportedOperationException("No log case for "
 						+ i.getClass().getCanonicalName()));
