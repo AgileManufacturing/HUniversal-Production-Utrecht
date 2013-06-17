@@ -28,7 +28,12 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <equiplet_node/EquipletNode.h>
+#include <unistd.h>
+#include "equiplet_node/EquipletNode.h"
+#include "rexos_blackboard_cpp_client/BlackboardCppClient.h"
+#include "rexos_blackboard_cpp_client/BasicOperationSubscription.h"
+#include "rexos_blackboard_cpp_client/OplogEntry.h"
+#include "rexos_utilities/Utilities.h"
 
 /**
  * Create a new EquipletNode
@@ -47,12 +52,12 @@ EquipletNode::EquipletNode(int id):
 	modulePackageNodeMap = std::map< int, std::pair<std::string, std::string> >();
 	modulePackageNodeMap[1] = std::pair< std::string, std::string > ("deltaRobotNode", "DeltaRobotNode");
 	modulePackageNodeMap[2] = std::pair< std::string, std::string > ("gripperTestNode", "GripperTestNode");
-
-	blackboardClient = new BlackboardCppClient("localhost", "REXOS", "blackboard", this);
-	blackboardClient->subscribe("instruction");
-
-	std::cout << "Connected!" << std::endl;
 	
+	blackboardClient = new Blackboard::BlackboardCppClient("145.89.191.131", "test", "equipletStepBB");
+	Blackboard::BasicOperationSubscription * sub = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
+	subscriptions.push_back(sub);
+	blackboardClient->subscribe(*sub);
+
 	ros::NodeHandle nodeHandle;
 	std::stringstream stringStream;
 	stringStream << equipletId;
@@ -66,6 +71,10 @@ EquipletNode::EquipletNode(int id):
  **/
 EquipletNode::~EquipletNode(){
 	delete blackboardClient;
+	for (std::vector<Blackboard::BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
+		delete *iter;
+	}
+	subscriptions.clear();
 }
 
 /**
@@ -75,9 +84,10 @@ EquipletNode::~EquipletNode(){
  *
  * @param json The message parsed in the json format
  **/
-void EquipletNode::blackboardReadCallback(std::string json){
+void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) {
 	std::cout << "processMessage" << std::endl;
-	JSONNode n = libjson::parse(json);
+	JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
+	std::cout << n.write() << std::endl;
 	JSONNode message = n["message"];
 	//JSONNode::const_iterator messageIt;
 	std::string destination = message["destination"].as_string();
@@ -94,7 +104,7 @@ void EquipletNode::blackboardReadCallback(std::string json){
 	ss << destination;
 	ss << "/";
 	ss << command;
-	blackboardClient->removeOldestMessage();
+	std::cout << ss.str() << std::endl;
 }
 
 /**
@@ -330,12 +340,13 @@ void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupI
 		ROS_ERROR("Error in calling lookupHandler/lookup service");
 	}
 }
+
 /** 
  * Main that creates the equipletNode and adds hardware modules
  **/
 int main(int argc, char **argv){
 
-	// Check if an equiplet id is given at the command line	 
+	// Check if an equiplet id is given at the command line
 	int equipletId = 1;
 	if(argc != 2 || rexos_utilities::stringToInt(equipletId, argv[1]) != 0){
 		std::cerr << "Cannot read equiplet id from commandline. Assuming equiplet id is 1" <<std::endl;
@@ -345,7 +356,7 @@ int main(int argc, char **argv){
 	std::ostringstream ss;
 	ss << "Equiplet" << equipletId;
 	const char* equipletName = ss.str().c_str();
-	
+
 	ros::init(argc, argv, equipletName);
 	EquipletNode equipletNode(equipletId);
 
