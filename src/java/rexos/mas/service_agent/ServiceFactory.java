@@ -95,7 +95,6 @@ public class ServiceFactory {
 				serviceCache.put(description.getId(), service);
 			}
 		} catch (KnowledgeException | InstantiateClassException | KeyNotFoundException e) {
-			//TODO: Do something useful.
 			Logger.log(e);
 		}
 		
@@ -116,7 +115,12 @@ public class ServiceFactory {
 					equipletAID, stepType);
 			
 			for (int i = 0 ; i < rows.length ; ++i) {
-				servicesForStep.add(getServiceByServiceID((int)rows[i].get("id")));
+				
+				if(getServiceByServiceID((int)rows[i].get("id")) != null){
+				
+					servicesForStep.add(getServiceByServiceID((int)rows[i].get("id")));
+					
+				}
 			}
 		} catch (KnowledgeException | KeyNotFoundException ex) {
 			Logger.log(ex);

@@ -131,7 +131,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 			ObjectId productStepEntryId = null;
 
 			// puts the productstep on the blackboard.
-			// TODO: get inputParts instead of dummy data
+			// TODO: get inputParts instead of dummy data (overleggen met productagent)
 			Part[] inputParts = { new Part(1), new Part(2) };
 			ProductStep entry = new ProductStep(
 					message.getSender(), productStep.getCapability(),
