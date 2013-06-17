@@ -84,49 +84,7 @@ void EquipletNode::blackboardReadCallback(std::string json){
     //We might want to check the type of msg first.
     JSONNode n = libjson::parse(json);
     rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
-    
-    std::cout << "Step completed." << std::endl;
-    
-    std::cout << "id " << step->getId() << std::endl;
-    std::cout << "moduleId " << step->getModuleId() << std::endl;
-    std::cout << "nextStep " << step->getNextStep() << std::endl;
-    std::cout << "serviceStep Id " << step->getServiceStepID() << std::endl;
-    std::cout << "status " << step->getStatus() << std::endl;
-    
-    std::cout << "InstructData: command " << step->getInstructionData().getCommand() << std::endl;    
-    std::cout << "InstructData: dest " << step->getInstructionData().getDestination() << std::endl;
-    std::cout << "InstructData: lookup " << step->getInstructionData().getLook_up() << std::endl;
-    
-    std::cout << "InstructData: LookupParams " << step->getInstructionData().getDestination() << std::endl;
-    for( map<string, string>::iterator ii=step->getInstructionData().getLook_up_parameters().begin(); ii!=step->getInstructionData().getLook_up_parameters().end(); ++ii)
-    {
-        cout << (*ii).first << ": " << (*ii).second << endl;
-    }
-    
-    std::cout << "InstructData: payload " << step->getInstructionData().getDestination() << std::endl;
-    for( map<string, string>::iterator ii=step->getInstructionData().getPayload().begin(); ii!=step->getInstructionData().getPayload().end(); ++ii)
-    {
-        cout << (*ii).first << ": " << (*ii).second << endl;
-    }
-	/*std::cout << "processMessage" << std::endl;
-	JSONNode n = libjson::parse(json);
-	JSONNode message = n["message"];
-	//JSONNode::const_iterator messageIt;
-	std::string destination = message["destination"].as_string();
-	//std::cout << "Destination " << destination << std::endl;
-
-	std::string command = message["command"].as_string();
-	//std::cout << "Command " << command << std::endl;
-
-	std::string payload = message["payload"].write();
-	std::cout << "Payload " << payload << std::endl;
-
-	// Create the string for the service to call
-	std::stringstream ss;
-	ss << destination;
-	ss << "/";
-	ss << command;
-	blackboardClient->removeOldestMessage();*/
+    callLookupHandler(step->getInstructionData().getLook_up(), step->getInstructionData().getLook_up(), step->getInstructionData().getPayload());
 }
 
 /**
@@ -347,21 +305,41 @@ bool EquipletNode::updateModuleState(int moduleID, rexos_mast::StateType state){
  * @param lookupID the ID of the lookup
  * @param payload the payload, contains data that will get combined with environmentcache data
  **/
-void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupID, environment_communication_msgs::Map payload){
- 	lookup_handler::LookupServer msg;
-	msg.request.lookupMsg.lookupType = lookupType;
-	msg.request.lookupMsg.lookupID = lookupID;
-	msg.request.lookupMsg.payLoad = payload;
-
-	ros::NodeHandle nodeHandle;
-	ros::ServiceClient lookupClient = nodeHandle.serviceClient<lookup_handler::LookupServer>("LookupHandler/lookup");
-	if(lookupClient.call(msg)){
-		// TODO
-		// Read message
-	} else{
-		ROS_ERROR("Error in calling lookupHandler/lookup service");
-	}
+void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupID, std::map<std::string, std::string> payload){
+ 	
+    environment_communication_msgs::Map enviromentPayload = createEnviromentMap(payload);
+    lookup_handler::LookupServer msg;
+    msg.request.lookupMsg.lookupType = lookupType;
+    msg.request.lookupMsg.lookupID = lookupID;
+    msg.request.lookupMsg.payLoad = enviromentPayload;
+    
+    ros::NodeHandle nodeHandle;
+    ros::ServiceClient lookupClient = nodeHandle.serviceClient<lookup_handler::LookupServer>("LookupHandler/lookup");
+    if(lookupClient.call(msg)){
+        
+    } else{
+            ROS_ERROR("Error in calling lookupHandler/lookup service");
+    }
 }
+
+/**
+ * Convert a map to a vector
+ *
+ **/
+environment_communication_msgs::Map EquipletNode::createEnviromentMap(const std::map<std::string, std::string> Map){
+    environment_communication_msgs::Map * tempMap = new environment_communication_msgs::Map();  
+    std::vector<environment_communication_msgs::KeyValuePair> * tempVector = new std::vector<environment_communication_msgs::KeyValuePair>();
+    
+    for(map<string, string>::const_iterator i= Map.begin(); i!= Map.end(); ++i)
+    {
+       //tempMap->map.insert(i, std::pair<std::string,std::string>((*i).first,(*i).second));
+    }
+    
+    tempMap->map.vector(tempVector);
+    
+    return *tempMap;
+}
+
 /** 
  * Main that creates the equipletNode and adds hardware modules
  **/
@@ -385,6 +363,7 @@ int main(int argc, char **argv){
 	// This should change to modules being created in the Node itself after commands on blackboard
 	HardwareModuleProperties deltaRobot(1, 1, rexos_mast::safe, true, true);
 	HardwareModuleProperties gripper(2, 2, rexos_mast::safe, true, true);
+        
 	equipletNode.addHardwareModule(deltaRobot);
 	equipletNode.addHardwareModule(gripper);
 

@@ -71,7 +71,7 @@ public:
 	bool moduleError(rexos_mast::ErrorInModule::Request &request, rexos_mast::ErrorInModule::Response &response);
 	void sendStateChangeRequest(int moduleID, rexos_mast::StateType newState);
 	rexos_mast::StateType getModuleState(int moduleID);
-	void callLookupHandler(std::string lookupType, std::string lookupID, environment_communication_msgs::Map payload);
+	void callLookupHandler(std::string lookupType, std::string lookupID, std::map<std::string, std::string> payload);
 private:
 	/**
 	 * @var int equipletId
@@ -116,4 +116,5 @@ private:
 	 * Client to read from blackboard
 	 **/
 	BlackboardCppClient  *blackboardClient;
+        environment_communication_msgs::Map createEnviromentMap(const std::map<std::string, std::string> Map);
 };
