@@ -95,8 +95,9 @@ public class ProductLog{
 		Iterator i = statusData.toMap().entrySet().iterator(); i.hasNext();){
 			switch(i.getClass().getName()){
 			case "java.lang.String":
-				local.insert(new LogMessage(aid, i.toString()));
+				local.insert(new LogMessage(aid, i.toString()));	
 			break;
+			//TODO: Add other classes. 
 			default:
 				Logger.log(new UnsupportedOperationException("No log case for "
 						+ i.getClass().getCanonicalName()));
