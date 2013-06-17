@@ -213,7 +213,7 @@ void BlackboardCppClient::run(){
 			if(operation.compare("i")){
 				std::string topic = object.getObjectField("o").getStringField("topic");
 				if(subscriptions.count(topic)){
-					callback->blackboardReadCallback(object.getObjectField("o").toString());
+					callback->blackboardReadCallback(object.getObjectField("o").jsonString());
 				}
 			}
 		}

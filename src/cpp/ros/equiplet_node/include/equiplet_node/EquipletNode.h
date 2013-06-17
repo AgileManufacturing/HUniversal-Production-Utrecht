@@ -46,6 +46,7 @@
 #include <equiplet_node/HardwareModuleProperties.h>
 #include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
 #include <rexos_blackboard_cpp_client/BlackboardSubscriber.h>
+#include <rexos_datatypes/EquipletStep.h>
 #include <rexos_std_srvs/Module.h>
 #include <rexos_utilities/Utilities.h>
 

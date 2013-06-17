@@ -48,8 +48,12 @@ EquipletNode::EquipletNode(int id):
 	modulePackageNodeMap[1] = std::pair< std::string, std::string > ("deltaRobotNode", "DeltaRobotNode");
 	modulePackageNodeMap[2] = std::pair< std::string, std::string > ("gripperTestNode", "GripperTestNode");
 
-	blackboardClient = new BlackboardCppClient("localhost", "REXOS", "blackboard", this);
-	blackboardClient->subscribe("instruction");
+	//blackboardClient = new BlackboardCppClient("localhost", "REXOS", "blackboard", this);
+	//blackboardClient->subscribe("instruction");
+        
+        blackboardClient = new BlackboardCppClient("localhost", "CollectiveDb", "EquipletStepBB", this);
+        //blackboardClient = new BlackboardCppClient("145.89.191.131", 22, "CollectiveDb", "EquipletStepBB", this);
+        blackboardClient->subscribe("equipletSteps");
 
 	std::cout << "Connected!" << std::endl;
 	
@@ -76,7 +80,35 @@ EquipletNode::~EquipletNode(){
  * @param json The message parsed in the json format
  **/
 void EquipletNode::blackboardReadCallback(std::string json){
-	std::cout << "processMessage" << std::endl;
+        //lets parse a root node from the bb msg.
+    //We might want to check the type of msg first.
+    JSONNode n = libjson::parse(json);
+    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
+    
+    std::cout << "Step completed." << std::endl;
+    
+    std::cout << "id " << step->getId() << std::endl;
+    std::cout << "moduleId " << step->getModuleId() << std::endl;
+    std::cout << "nextStep " << step->getNextStep() << std::endl;
+    std::cout << "serviceStep Id " << step->getServiceStepID() << std::endl;
+    std::cout << "status " << step->getStatus() << std::endl;
+    
+    std::cout << "InstructData: command " << step->getInstructionData().getCommand() << std::endl;    
+    std::cout << "InstructData: dest " << step->getInstructionData().getDestination() << std::endl;
+    std::cout << "InstructData: lookup " << step->getInstructionData().getLook_up() << std::endl;
+    
+    std::cout << "InstructData: LookupParams " << step->getInstructionData().getDestination() << std::endl;
+    for( map<string, string>::iterator ii=step->getInstructionData().getLook_up_parameters().begin(); ii!=step->getInstructionData().getLook_up_parameters().end(); ++ii)
+    {
+        cout << (*ii).first << ": " << (*ii).second << endl;
+    }
+    
+    std::cout << "InstructData: payload " << step->getInstructionData().getDestination() << std::endl;
+    for( map<string, string>::iterator ii=step->getInstructionData().getPayload().begin(); ii!=step->getInstructionData().getPayload().end(); ++ii)
+    {
+        cout << (*ii).first << ": " << (*ii).second << endl;
+    }
+	/*std::cout << "processMessage" << std::endl;
 	JSONNode n = libjson::parse(json);
 	JSONNode message = n["message"];
 	//JSONNode::const_iterator messageIt;
@@ -94,7 +126,7 @@ void EquipletNode::blackboardReadCallback(std::string json){
 	ss << destination;
 	ss << "/";
 	ss << command;
-	blackboardClient->removeOldestMessage();
+	blackboardClient->removeOldestMessage();*/
 }
 
 /**
