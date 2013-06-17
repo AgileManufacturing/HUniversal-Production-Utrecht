@@ -43,30 +43,32 @@ class BlackboardSubscription;
 class OplogMonitorThread {
 public:
 	OplogMonitorThread(
-			mongo::DBClientConnection& connection,
+			std::string host,
 			std::string oplogDBName,
 			std::string oplogCollectionName);
 
 	~OplogMonitorThread();
 	void start();
 	void interrupt();
+	void restart();
 	void addSubscription(BlackboardSubscription& sub);
 	void removeSubscription(BlackboardSubscription& sub);
-	void setNamespace(std::string database, std::string collection);
+	void setNamespace(std::string &database, std::string &collection);
 	void setNamespace(std::string omtNamespace);
 
 private:
 	void run();
 	mongo::Query createOplogQuery();
 	int getSkipCount(std::string collectionNamespace);
+	long long int currentCursorId;
 
 	std::vector<BlackboardSubscription *> subscriptions;
-	mongo::DBClientConnection& connection;
 	mongo::Query query;
-	std::string oplogDBName;
-	std::string oplogCollectionName;
+	std::string host;
+	std::string oplogNamespace;
 	std::string omtNamespace;
-	boost::thread *thread;
+	boost::mutex subscriptionsMutex;
+	boost::thread *currentThread;
 };
 
 } /* namespace Blackboard */

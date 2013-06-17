@@ -33,20 +33,20 @@
 
 #include <string>
 
+namespace Blackboard
+{
+class BlackboardSubscription;
+
 /**
  * This class is an interface that provides a callback 
  * function for the blackboard clients.
  **/
-class BlackboardSubscriber{
+class BlackboardSubscriber {
 public:
-	/**
-	 * Callback function that is called when something happened on the blackboard
-	 *
-	 * @param json The message parsed in the json format
-	 **/
-	virtual void blackboardReadCallback(std::string json) = 0;
+	virtual void onMessage(BlackboardSubscription & subscription, std::string msgAsJSONString) = 0;
 
 	virtual ~BlackboardSubscriber(){}
 };
 
+}
 #endif

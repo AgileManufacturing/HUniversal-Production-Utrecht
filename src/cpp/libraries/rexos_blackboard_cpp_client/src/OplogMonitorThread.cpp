@@ -31,7 +31,7 @@
 #include <iostream>
 
 #include "rexos_blackboard_cpp_client/OplogMonitorThread.h"
-#include "mongo/client/dbclientinterface.h"
+#include "mongo/client/connpool.h"
 #include "boost/bind.hpp"
 #include "rexos_blackboard_cpp_client/OplogEntry.h"
 #include "rexos_blackboard_cpp_client/BlackboardSubscriber.h"
@@ -40,30 +40,44 @@
 namespace Blackboard {
 
 OplogMonitorThread::OplogMonitorThread(
-		mongo::DBClientConnection& connection,
+		std::string host,
 		std::string oplogDBName,
 		std::string oplogCollectionName) :
-				connection(connection),
-				oplogDBName(oplogDBName),
-				oplogCollectionName(oplogCollectionName),
-				thread(NULL)
+				host(host),
+				oplogNamespace()
 {
+	std::stringstream nsStream;
+	nsStream << oplogDBName << "." << oplogCollectionName;
+	oplogNamespace = nsStream.str();
 }
 
 OplogMonitorThread::~OplogMonitorThread() {
-	if (thread != NULL) {
-		delete thread;
-	}
+	interrupt();
 }
 
 void OplogMonitorThread::start()
 {
-	thread = new boost::thread(boost::bind(&OplogMonitorThread::run, this));
+	if (subscriptions.size() > 0) {
+		currentThread = new boost::thread(boost::bind(&OplogMonitorThread::run, this));
+	}
 }
 
 void OplogMonitorThread::interrupt()
 {
-	thread->interrupt();
+	if (currentThread != NULL) {
+		currentThread->interrupt();
+
+		mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
+		(*connection)->killCursor(currentCursorId);
+		connection->done();
+		delete connection;
+		delete currentThread;
+	}
+}
+
+void OplogMonitorThread::restart() {
+	interrupt();
+	start();
 }
 
 mongo::Query OplogMonitorThread::createOplogQuery()
@@ -71,11 +85,13 @@ mongo::Query OplogMonitorThread::createOplogQuery()
 	mongo::Query query;
 	mongo::BSONArrayBuilder orArray;
 
+	subscriptionsMutex.lock();
 	for (std::vector<BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
 		if ((*iter)->getQuery(&query)) {
 			orArray.append(query.obj);
 		}
 	}
+	subscriptionsMutex.unlock();
 
 	if (!omtNamespace.empty()) {
 		mongo::BSONArrayBuilder andArray;
@@ -86,64 +102,84 @@ mongo::Query OplogMonitorThread::createOplogQuery()
 		query = QUERY("$or" << orArray.arr());
 	}
 
+	std::cout << "Using query: " << query << std::endl;
 	return query;
-}
-
-int OplogMonitorThread::getSkipCount(std::string collectionNamespace)
-{
-	return connection.count(collectionNamespace);
 }
 
 void OplogMonitorThread::run()
 {
-	bool interrupted = false;
-	std::string oplogName = oplogDBName.append(".").append(oplogCollectionName);
-	// Creating tailable cursor and skipping documents
-	std::auto_ptr<mongo::DBClientCursor> tailedCursor = connection.query(
-			oplogName,
+	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
+
+	std::auto_ptr<mongo::DBClientCursor> tailedCursor = (*connection)->query(
+			oplogNamespace,
 			createOplogQuery(),
 			0,
-			getSkipCount(oplogName),
+			(*connection)->count(oplogNamespace),
 			NULL,
 			mongo::QueryOption_CursorTailable | mongo::QueryOption_AwaitData,
 			0);
 
-	while(!interrupted){
-		try {
-			while(tailedCursor->more()){
-				const OplogEntry oplogEntry(tailedCursor->next());
+	currentCursorId = tailedCursor->getCursorId();
+	try {
+		while(!tailedCursor->isDead()){
+			while (tailedCursor->more()) {
+				const OplogEntry oplogEntry(tailedCursor->nextSafe());
+				std::cout << oplogEntry.toString() << std::endl;
+				subscriptionsMutex.lock();
 				for (std::vector<BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
 					if ((*iter)->matchesWithEntry(oplogEntry)) {
-						(*iter)->getSubscriber().blackboardReadCallback(oplogEntry.toString());
+						(*iter)->getSubscriber().onMessage(**iter, oplogEntry.toString());
 					}
 				}
+				subscriptionsMutex.unlock();
+				boost::this_thread::interruption_point();
 			}
-		} catch (boost::thread_interrupted& e) {
-			interrupted = true;
+			boost::this_thread::interruption_point();
 		}
+		std::cout << "Cursor is dead." << std::endl;
+	} catch (boost::thread_interrupted& e) {
+		// Thread has been interrupted, work is done.
+		std::cout << "Interrupted" << std::endl;
+	} catch (mongo::AssertionException& ex) {
+		std::cout << "Assertion exception: " << ex.what() << std::endl;
 	}
 
-	delete thread;
+	connection->done();
+	delete connection;
+
+	std::cout << "run stopped" << std::endl;
 }
 
 void OplogMonitorThread::addSubscription(BlackboardSubscription& sub)
 {
+	subscriptionsMutex.lock();
 	subscriptions.push_back(&sub);
+	subscriptionsMutex.unlock();
+	restart();
 }
 
 void OplogMonitorThread::removeSubscription(BlackboardSubscription& sub)
 {
+	subscriptionsMutex.lock();
 	subscriptions.erase(std::remove(subscriptions.begin(), subscriptions.end(), &sub), subscriptions.end());
+	subscriptionsMutex.unlock();
+	restart();
 }
 
-void OplogMonitorThread::setNamespace(std::string database, std::string collection)
+void OplogMonitorThread::setNamespace(std::string &database, std::string &collection)
 {
-	omtNamespace = database.append(".").append(collection);
+	std::stringstream nsStream;
+	nsStream << database << "." << collection;
+	setNamespace(nsStream.str());
 }
 
 void OplogMonitorThread::setNamespace(std::string omtNamespace)
 {
 	this->omtNamespace = omtNamespace;
+	interrupt();
+	subscriptionsMutex.lock();
+	subscriptions.clear();
+	subscriptionsMutex.unlock();
 }
 
 } /* namespace Blackboard */

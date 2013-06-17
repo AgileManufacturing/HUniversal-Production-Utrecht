@@ -4,11 +4,12 @@
  * @date Created: 2012-11-12
  *
  * @author Dennis Koole
+ * @author Jan-Willem Willebrands
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2012-2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,11 +30,13 @@
  **/
 
 #include <iostream>
-#include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
-#include <rexos_utilities/Utilities.h>
-#include <memory>
-#include <set>
-#include <unistd.h>
+#include "mongo/client/connpool.h"
+#include "rexos_blackboard_cpp_client/BlackboardCppClient.h"
+#include "rexos_blackboard_cpp_client/InvalidDBNamespaceException.h"
+#include "rexos_blackboard_cpp_client/OplogMonitorThread.h"
+#include "rexos_blackboard_cpp_client/BlackboardSubscription.h"
+
+using namespace Blackboard;
 
 /**
  * Constructor for the BlackboardCppClient
@@ -41,15 +44,12 @@
  * @param hostname of the mongodb server
  * @param db The name of the database
  * @param coll The name of the database collection
- * @param func The address of the callback function
  **/
-BlackboardCppClient::BlackboardCppClient(const std::string &hostname, const std::string db, const std::string coll, BlackboardSubscriber *func): database(db), collection(coll), callback(func){
-	try{
-		connection.connect(hostname);
-		std::cout << "connected to database" << std::endl;
-	} catch(const mongo::DBException &e){
-		std::cout << "caught " << e.what() << std::endl;
-	}
+BlackboardCppClient::BlackboardCppClient(const std::string &hostname,
+		const std::string db, const std::string coll) :
+		host(hostname), database(db), collection(coll), readMessageThread(NULL)
+{
+
 }
 
 /**
@@ -59,23 +59,21 @@ BlackboardCppClient::BlackboardCppClient(const std::string &hostname, const std:
  * @param port the port number for the mongodb server
  * @param db The name of the database
  * @param coll The name of the database collection
- * @param func The address of the callback function
  **/
-BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll, BlackboardSubscriber *func): database(db), collection(coll), callback(func){
-	try{
-		connection.connect(mongo::HostAndPort(hostname, port));
-		std::cout << "connected to database" << std::endl;
-	} catch(const mongo::DBException &e){
-		std::cout << "caught " << e.what() << std::endl;
-	}
+BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port,
+		const std::string db, const std::string coll) :
+		host(mongo::HostAndPort(hostname, port).toString()),database(db), collection(coll), readMessageThread(NULL)
+{
+
 }
 
 /**
  * Destructor for the BlackboardCppClient
  **/
 BlackboardCppClient::~BlackboardCppClient(){
-	readMessageThread->interrupt();
-	delete readMessageThread;
+	if (readMessageThread != NULL) {
+		delete readMessageThread;
+	}
 }
 
 /**
@@ -84,7 +82,11 @@ BlackboardCppClient::~BlackboardCppClient(){
  * @param db the name of the database to use
  **/
 void BlackboardCppClient::setDatabase(const std::string &db){
+	if (db.empty()) {
+		throw InvalidDBNamespaceException("Database name may not be empty.");
+	}
 	database = db;
+	collection = "";
 }
 
 /**
@@ -93,77 +95,33 @@ void BlackboardCppClient::setDatabase(const std::string &db){
  * @param col the name of the collection to use
  **/
 void BlackboardCppClient::setCollection(const std::string &col){
+	if (col.empty()) {
+		throw InvalidDBNamespaceException("Collection name may not be empty.");
+	}
 	collection = col;
-}
 
-/**
- * Subscribe to a blackboard topic
- *
- * Subscribe to a blackboard topic. When the first subscription is added,
- * a thread will be started to handle the messages from the blackboard
- *
- * @param topic the name of the topic to subscribe to
- **/
-void BlackboardCppClient::subscribe(const std::string &topic){
-	if(collection.empty()){
-		std::cerr << "Collection is empty" << std::endl;
-	}
-	if(database.empty()){
-		std::cerr << "Database is empty" << std::endl;
-	}
-	subscriptions.insert(std::pair<std::string, mongo::BSONObj>(topic, BSON("topic" << topic)));
-	// Start thread to read from blackboard
-	if(subscriptions.size() == 1){
-		readMessageThread = new boost::thread(boost::bind(&BlackboardCppClient::run, this));
+	if (readMessageThread != NULL) {
+		readMessageThread->setNamespace(database, collection);
 	}
 }
 
-/**
- * Unsubscribe from a blackboard topic
- *
- * Unsubscribe from a blackboard topic,
- * when there are no subscriptions to topics anymore, the thread
- * that reads the messages from the blackboard will be interrupted
- *
- * @param topic the name of the topic
- **/
-void BlackboardCppClient::unsubscribe(const std::string &topic){
-	subscriptions.erase(topic);
-	if(subscriptions.size() == 0){
-		readMessageThread->interrupt();
+void BlackboardCppClient::subscribe(BlackboardSubscription &sub){
+	if (database.empty() || collection.empty()) {
+		throw InvalidDBNamespaceException("Database and collection names may not be empty.");
 	}
+
+	if (readMessageThread == NULL) {
+		readMessageThread = new OplogMonitorThread(host, "local", "oplog.rs");
+		readMessageThread->setNamespace(database, collection);
+	}
+
+	readMessageThread->addSubscription(sub);
 }
 
-/**
- * Set the callback function
- *
- * @param func The address of the callback function
- **/
-void BlackboardCppClient::setCallback(BlackboardSubscriber *func){
-	callback = func;
-}
-
-/**
- * Read oldest message from the blackboard
- **/
-std::string BlackboardCppClient::readOldestMessage(){
-	std::string name = database;
-	name.append(".");
-	name.append(collection);
-	mongo::BSONObj object = connection.findOne(name.c_str(), mongo::Query());
-	return object.jsonString();
-}
-
-/**
- * Remove the oldest message from the blackboard
- **/
-void BlackboardCppClient::removeOldestMessage(){
-	std::string name = database;
-	name.append(".");
-	name.append(collection);
-	mongo::Query nop;
-	mongo::BSONObj message = connection.findOne(name, nop);
-	connection.remove(name, message);
+void BlackboardCppClient::unsubscribe(BlackboardSubscription &sub){
+	if (readMessageThread != NULL) {
+		readMessageThread->removeSubscription(sub);
+	}
 }
 
 /**
@@ -171,51 +129,76 @@ void BlackboardCppClient::removeOldestMessage(){
  *
  * @param json
  **/
-void BlackboardCppClient::insertJson(std::string json){
+void BlackboardCppClient::insertDocument(std::string json){
+	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
 	std::string name = database;
 	name.append(".");
 	name.append(collection);
 	mongo::BSONObj bobj = mongo::fromjson(json);
-	connection.insert(name, bobj);
+	(*connection)->insert(name, bobj);
+	connection->done();
+	delete connection;
 }
 
-/**
- * Function is executed by all the threads to find out if there 
- **/
-void BlackboardCppClient::run(){
-	// Building name of database
-	std::string name = database;
-	name.append(".");
-	name.append(collection);
-	std::vector<mongo::BSONObj> values;
+void BlackboardCppClient::removeDocuments(std::string queryAsJSON) {
+	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
+	std::string dbNamespace = database;
+	dbNamespace.append(".");
+	dbNamespace.append(collection);
+	mongo::BSONObj query = mongo::fromjson(queryAsJSON);
+	(*connection)->remove(dbNamespace, query, false);
+	connection->done();
+	delete connection;
+}
 
-	// Creating tailable cursor query
-	mongo::Query where = QUERY("ns" << name);
+mongo::BSONObj BlackboardCppClient::findDocumentById(mongo::OID objectId) {
+	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
+	std::string dbNamespace = database;
+	dbNamespace.append(".");
+	dbNamespace.append(collection);
+	mongo::Query query = QUERY("_id" << objectId);
+	mongo::BSONObj document = (*connection)->findOne(dbNamespace, query);
+	connection->done();
+	delete connection;
+	return document;
+}
 
-	// Getting number of documents to skip
-	mongo::BSONObj ret;
-	mongo::BSONObj bsonQry = BSON("collStats" << "oplog.rs");
-	connection.runCommand( "local", bsonQry, ret);
 
-	// Creating tailable cursor and skipping documents
-	std::auto_ptr<mongo::DBClientCursor> tailedCursor = connection.query("local.oplog.rs", where, 0,
-	ret.getIntField("count"), 0, mongo::QueryOption_CursorTailable | mongo::QueryOption_AwaitData, 0);
+int BlackboardCppClient::findDocuments(std::string queryAsJSON, std::vector<mongo::BSONObj> &results) {
+	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
+	std::string dbNamespace = database;
+	dbNamespace.append(".");
+	dbNamespace.append(collection);
+	mongo::Query query(mongo::fromjson(queryAsJSON));
+	std::auto_ptr<mongo::DBClientCursor> cursor = (*connection)->query(dbNamespace, query);
 
-	while(true){
-		// Reset the subscription values
-		// Continue while the cursor has more
-		while(tailedCursor->more()){
-			// Get the operation performed on the database
-			const mongo::BSONObj & object = tailedCursor->next();
-			std::string operation = object["op"].toString();
-			
-			// Check if an insert is performed
-			if(operation.compare("i")){
-				std::string topic = object.getObjectField("o").getStringField("topic");
-				if(subscriptions.count(topic)){
-					callback->blackboardReadCallback(object.getObjectField("o").toString());
-				}
-			}
+	int resultCount = 0;
+	try {
+		while (cursor->more()) {
+			mongo::BSONObj obj = cursor->nextSafe();
+			results.push_back(obj);
+			resultCount++;
 		}
+	} catch (mongo::AssertionException &ex) {
+		// Error occurred at remote server, there will be no more objects.
 	}
+
+	connection->done();
+	delete connection;
+	return resultCount;
 }
+
+
+void BlackboardCppClient::updateDocuments(std::string queryAsJSON, std::string updateQueryAsJSON) {
+	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
+	std::string dbNamespace = database;
+	dbNamespace.append(".");
+	dbNamespace.append(collection);
+	mongo::Query query(mongo::fromjson(queryAsJSON));
+	mongo::BSONObj updateQuery = mongo::fromjson(updateQueryAsJSON);
+	(*connection)->update(dbNamespace, query, updateQuery, false, true);
+	connection->done();
+	delete connection;
+}
+
+
