@@ -187,7 +187,6 @@ class producing extends OneShotBehaviour{
 				// Planned?
 				break;
 			case "StatusUpdate":
-				@SuppressWarnings("unused")
 				ProductStep ps = (ProductStep) msg.getContentObject();
 				switch(msg.getContent()){
 				case "INPROGRESS":
