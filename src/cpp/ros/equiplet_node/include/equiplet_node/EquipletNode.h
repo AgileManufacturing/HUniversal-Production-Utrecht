@@ -38,25 +38,23 @@
 
 #include <string>
 #include <vector>
-#include <iostream>
-#include <sstream>
-#include <cstdio>
-#include <unistd.h>
-#include <algorithm> 
+#include <map>
 #include <equiplet_node/HardwareModuleProperties.h>
-#include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
 #include <rexos_blackboard_cpp_client/BlackboardSubscriber.h>
 #include <rexos_datatypes/EquipletStep.h>
 #include <rexos_std_srvs/Module.h>
-#include <rexos_utilities/Utilities.h>
 
 #pragma GCC system_header
 #include <libjson/libjson.h>
 
+namespace Blackboard {
+	class BlackboardCppClient;
+}
 /**
  * The equipletNode, will manage all modules and keep track of their states
  **/
-class EquipletNode: BlackboardSubscriber{
+class EquipletNode: Blackboard::BlackboardSubscriber{
+
 public:
 	EquipletNode(int id = 1);
 	virtual ~EquipletNode();
@@ -72,6 +70,7 @@ public:
 	void sendStateChangeRequest(int moduleID, rexos_mast::StateType newState);
 	rexos_mast::StateType getModuleState(int moduleID);
 	void callLookupHandler(std::string lookupType, std::string lookupID, environment_communication_msgs::Map payload);
+	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
 private:
 	/**
 	 * @var int equipletId
@@ -115,5 +114,8 @@ private:
 	 * @var BlackboardCppClient  *blackboardClient
 	 * Client to read from blackboard
 	 **/
-	BlackboardCppClient  *blackboardClient;
+	Blackboard::BlackboardCppClient  *blackboardClient;
+
+	std::vector<Blackboard::BlackboardSubscription *> subscriptions;
+
 };

@@ -1,14 +1,14 @@
 /**
- * @file BlackboardSubscriber.h
- * @brief the cpp client for the blackboard
- * @date Created: 2012-11-19
+ * @file BlackboardSubscription.cpp
+ * @brief 
+ * @date Created: 3 jun. 2013
  *
- * @author Dennis Koole
+ * @author Jan-Willem Willebrands
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,26 +28,18 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef BLACKBOARD_SUBSCRIBER_H_
-#define BLACKBOARD_SUBSCRIBER_H_
+#include "rexos_blackboard_cpp_client/BlackboardSubscription.h"
 
-#include <string>
+namespace Blackboard {
 
-namespace Blackboard
+BlackboardSubscriber& BlackboardSubscription::getSubscriber() const
 {
-class BlackboardSubscription;
-class OplogEntry;
-
-/**
- * This class is an interface that provides a callback 
- * function for the blackboard clients.
- **/
-class BlackboardSubscriber {
-public:
-	virtual void onMessage(BlackboardSubscription & subscription, const OplogEntry & oplogEntry) = 0;
-
-	virtual ~BlackboardSubscriber(){}
-};
-
+	return subscriber;
 }
-#endif
+
+BlackboardSubscription::BlackboardSubscription(BlackboardSubscriber & subscriber) :
+		subscriber(subscriber)
+{
+}
+
+} /* namespace Blackboard */
