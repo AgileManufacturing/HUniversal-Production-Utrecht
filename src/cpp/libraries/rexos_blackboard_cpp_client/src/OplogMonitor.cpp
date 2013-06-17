@@ -44,7 +44,8 @@ OplogMonitor::OplogMonitor(
 		std::string oplogDBName,
 		std::string oplogCollectionName) :
 				host(host),
-				oplogNamespace()
+				oplogNamespace(),
+				currentThread(NULL)
 {
 	std::stringstream nsStream;
 	nsStream << oplogDBName << "." << oplogCollectionName;
@@ -128,7 +129,7 @@ void OplogMonitor::run()
 				subscriptionsMutex.lock();
 				for (std::vector<BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
 					if ((*iter)->matchesWithEntry(oplogEntry)) {
-						(*iter)->getSubscriber().onMessage(**iter, oplogEntry.toString());
+						(*iter)->getSubscriber().onMessage(**iter, oplogEntry);
 					}
 				}
 				subscriptionsMutex.unlock();

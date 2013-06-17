@@ -36,6 +36,7 @@
 namespace Blackboard
 {
 class BlackboardSubscription;
+class OplogEntry;
 
 /**
  * This class is an interface that provides a callback 
@@ -43,7 +44,7 @@ class BlackboardSubscription;
  **/
 class BlackboardSubscriber {
 public:
-	virtual void onMessage(BlackboardSubscription & subscription, std::string msgAsJSONString) = 0;
+	virtual void onMessage(BlackboardSubscription & subscription, const OplogEntry & oplogEntry) = 0;
 
 	virtual ~BlackboardSubscriber(){}
 };
