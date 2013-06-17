@@ -33,7 +33,7 @@
 #include "mongo/client/connpool.h"
 #include "rexos_blackboard_cpp_client/BlackboardCppClient.h"
 #include "rexos_blackboard_cpp_client/InvalidDBNamespaceException.h"
-#include "rexos_blackboard_cpp_client/OplogMonitorThread.h"
+#include "rexos_blackboard_cpp_client/OplogMonitor.h"
 #include "rexos_blackboard_cpp_client/BlackboardSubscription.h"
 
 using namespace Blackboard;
@@ -47,7 +47,7 @@ using namespace Blackboard;
  **/
 BlackboardCppClient::BlackboardCppClient(const std::string &hostname,
 		const std::string db, const std::string coll) :
-		host(hostname), database(db), collection(coll), readMessageThread(NULL)
+		host(hostname), database(db), collection(coll), oplogMonitor(NULL)
 {
 
 }
@@ -62,7 +62,7 @@ BlackboardCppClient::BlackboardCppClient(const std::string &hostname,
  **/
 BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port,
 		const std::string db, const std::string coll) :
-		host(mongo::HostAndPort(hostname, port).toString()),database(db), collection(coll), readMessageThread(NULL)
+		host(mongo::HostAndPort(hostname, port).toString()),database(db), collection(coll), oplogMonitor(NULL)
 {
 
 }
@@ -71,8 +71,8 @@ BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port,
  * Destructor for the BlackboardCppClient
  **/
 BlackboardCppClient::~BlackboardCppClient(){
-	if (readMessageThread != NULL) {
-		delete readMessageThread;
+	if (oplogMonitor != NULL) {
+		delete oplogMonitor;
 	}
 }
 
@@ -100,8 +100,8 @@ void BlackboardCppClient::setCollection(const std::string &col){
 	}
 	collection = col;
 
-	if (readMessageThread != NULL) {
-		readMessageThread->setNamespace(database, collection);
+	if (oplogMonitor != NULL) {
+		oplogMonitor->setNamespace(database, collection);
 	}
 }
 
@@ -110,17 +110,17 @@ void BlackboardCppClient::subscribe(BlackboardSubscription &sub){
 		throw InvalidDBNamespaceException("Database and collection names may not be empty.");
 	}
 
-	if (readMessageThread == NULL) {
-		readMessageThread = new OplogMonitorThread(host, "local", "oplog.rs");
-		readMessageThread->setNamespace(database, collection);
+	if (oplogMonitor == NULL) {
+		oplogMonitor = new OplogMonitor(host, "local", "oplog.rs");
+		oplogMonitor->setNamespace(database, collection);
 	}
 
-	readMessageThread->addSubscription(sub);
+	oplogMonitor->addSubscription(sub);
 }
 
 void BlackboardCppClient::unsubscribe(BlackboardSubscription &sub){
-	if (readMessageThread != NULL) {
-		readMessageThread->removeSubscription(sub);
+	if (oplogMonitor != NULL) {
+		oplogMonitor->removeSubscription(sub);
 	}
 }
 

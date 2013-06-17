@@ -1,5 +1,5 @@
 /**
- * @file OplogMonitorThread.cpp
+ * @file OplogMonitor.cpp
  * @brief 
  * @date Created: 4 jun. 2013
  *
@@ -30,7 +30,7 @@
 
 #include <iostream>
 
-#include "rexos_blackboard_cpp_client/OplogMonitorThread.h"
+#include "rexos_blackboard_cpp_client/OplogMonitor.h"
 #include "mongo/client/connpool.h"
 #include "boost/bind.hpp"
 #include "rexos_blackboard_cpp_client/OplogEntry.h"
@@ -39,7 +39,7 @@
 
 namespace Blackboard {
 
-OplogMonitorThread::OplogMonitorThread(
+OplogMonitor::OplogMonitor(
 		std::string host,
 		std::string oplogDBName,
 		std::string oplogCollectionName) :
@@ -51,18 +51,18 @@ OplogMonitorThread::OplogMonitorThread(
 	oplogNamespace = nsStream.str();
 }
 
-OplogMonitorThread::~OplogMonitorThread() {
+OplogMonitor::~OplogMonitor() {
 	interrupt();
 }
 
-void OplogMonitorThread::start()
+void OplogMonitor::start()
 {
 	if (subscriptions.size() > 0) {
-		currentThread = new boost::thread(boost::bind(&OplogMonitorThread::run, this));
+		currentThread = new boost::thread(boost::bind(&OplogMonitor::run, this));
 	}
 }
 
-void OplogMonitorThread::interrupt()
+void OplogMonitor::interrupt()
 {
 	if (currentThread != NULL) {
 		currentThread->interrupt();
@@ -75,12 +75,12 @@ void OplogMonitorThread::interrupt()
 	}
 }
 
-void OplogMonitorThread::restart() {
+void OplogMonitor::restart() {
 	interrupt();
 	start();
 }
 
-mongo::Query OplogMonitorThread::createOplogQuery()
+mongo::Query OplogMonitor::createOplogQuery()
 {
 	mongo::Query query;
 	mongo::BSONArrayBuilder orArray;
@@ -106,7 +106,7 @@ mongo::Query OplogMonitorThread::createOplogQuery()
 	return query;
 }
 
-void OplogMonitorThread::run()
+void OplogMonitor::run()
 {
 	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
 
@@ -150,7 +150,7 @@ void OplogMonitorThread::run()
 	std::cout << "run stopped" << std::endl;
 }
 
-void OplogMonitorThread::addSubscription(BlackboardSubscription& sub)
+void OplogMonitor::addSubscription(BlackboardSubscription& sub)
 {
 	subscriptionsMutex.lock();
 	subscriptions.push_back(&sub);
@@ -158,7 +158,7 @@ void OplogMonitorThread::addSubscription(BlackboardSubscription& sub)
 	restart();
 }
 
-void OplogMonitorThread::removeSubscription(BlackboardSubscription& sub)
+void OplogMonitor::removeSubscription(BlackboardSubscription& sub)
 {
 	subscriptionsMutex.lock();
 	subscriptions.erase(std::remove(subscriptions.begin(), subscriptions.end(), &sub), subscriptions.end());
@@ -166,14 +166,14 @@ void OplogMonitorThread::removeSubscription(BlackboardSubscription& sub)
 	restart();
 }
 
-void OplogMonitorThread::setNamespace(std::string &database, std::string &collection)
+void OplogMonitor::setNamespace(std::string &database, std::string &collection)
 {
 	std::stringstream nsStream;
 	nsStream << database << "." << collection;
 	setNamespace(nsStream.str());
 }
 
-void OplogMonitorThread::setNamespace(std::string omtNamespace)
+void OplogMonitor::setNamespace(std::string omtNamespace)
 {
 	this->omtNamespace = omtNamespace;
 	interrupt();

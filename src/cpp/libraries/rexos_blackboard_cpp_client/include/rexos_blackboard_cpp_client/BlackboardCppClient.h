@@ -36,7 +36,7 @@
 #include "mongo/client/dbclientinterface.h"
 
 namespace Blackboard {
-class OplogMonitorThread;
+class OplogMonitor;
 class BlackboardSubscription;
 
 /**
@@ -78,7 +78,7 @@ private:
 	 * @var boost::thread *readMessageThread
 	 * Pointer to the thread that is created when there is one subscription
 	 **/
-	OplogMonitorThread *readMessageThread;
+	OplogMonitor *oplogMonitor;
 };
 
 }

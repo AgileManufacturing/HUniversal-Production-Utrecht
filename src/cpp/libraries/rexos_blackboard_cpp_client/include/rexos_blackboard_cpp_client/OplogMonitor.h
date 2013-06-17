@@ -1,5 +1,5 @@
 /**
- * @file OplogMonitorThread.h
+ * @file OplogMonitor.h
  * @brief 
  * @date Created: 4 jun. 2013
  *
@@ -28,8 +28,8 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef OPLOGMONITORTHREAD_H_
-#define OPLOGMONITORTHREAD_H_
+#ifndef OPLOGMONITOR_H_
+#define OPLOGMONITOR_H_
 
 #include <string>
 #include <vector>
@@ -40,14 +40,14 @@ namespace Blackboard {
 
 class BlackboardSubscription;
 
-class OplogMonitorThread {
+class OplogMonitor {
 public:
-	OplogMonitorThread(
+	OplogMonitor(
 			std::string host,
 			std::string oplogDBName,
 			std::string oplogCollectionName);
 
-	~OplogMonitorThread();
+	~OplogMonitor();
 	void start();
 	void interrupt();
 	void restart();
@@ -72,4 +72,4 @@ private:
 };
 
 } /* namespace Blackboard */
-#endif /* OPLOGMONITORTHREAD_H_ */
+#endif /* OPLOGMONITOR_H_ */
