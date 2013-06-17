@@ -75,11 +75,10 @@ public class sqliteDatabase{
 		try{
 			conn = DriverManager.getConnection(DB_URL + DB_FILE, USER, PASS);
 			try(PreparedStatement create = conn
-					.prepareStatement("CREATE TABLE IF NOT EXISTS log (id INT, time VARCHAR(30), state VARCHAR(30), message VARCHAR(250))")){
+					.prepareStatement("CREATE TABLE IF NOT EXISTS log (aid VARCHAR(100), message VARCHAR(SQLITE_MAX_LENGTH))")){
 				create.execute();
 			}
 		} catch(SQLException e){
-			// TODO Auto-generated catch block
 			Logger.log(e);
 		}
 	}
@@ -90,18 +89,32 @@ public class sqliteDatabase{
 	public void insert(List<LogMessage> msgs){
 		try{
 			try(PreparedStatement insert = conn
-					.prepareStatement("INSERT INTO LOG (id, time, state, message) VALUES (?, ?, ?, ?)")){
+					.prepareStatement("INSERT INTO LOG (aid, message) VALUES (?, ?)")){
 				for(LogMessage msg : msgs){
-					insert.setString(1, msg.getId());
-					insert.setString(2, msg.getTime());
-					insert.setString(3, msg.getState());
-					insert.setString(4, msg.getMessage());
+					insert.setString(1, msg.getSender().toString());
+					insert.setString(2, msg.getString());
 					insert.execute();
 				}
 			}
 		} catch(SQLException e){
-			// TODO Auto-generated catch block
 			Logger.log(e);
 		}
+	}
+
+	/**
+	 * @param logMessage
+	 */
+	public void insert(LogMessage msg){
+		try{
+			try(PreparedStatement insert = conn
+					.prepareStatement("INSERT INTO LOG (aid, message) VALUES (?, ?)")){
+					insert.setString(1, msg.getSender().toString());
+					insert.setString(2, msg.getString());
+					insert.execute();
+			}
+		} catch(SQLException e){
+			Logger.log(e);
+		}
+		
 	}
 }
