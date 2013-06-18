@@ -34,19 +34,8 @@
  **/
 package rexos.mas.service_agent.behaviours;
 
-import java.util.List;
-
-import org.bson.types.ObjectId;
-
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-
-import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import rexos.libraries.blackboard_client.BlackboardClient;
-import rexos.libraries.blackboard_client.GeneralMongoException;
-import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.service_agent.ServiceAgent;
 
@@ -55,6 +44,10 @@ import rexos.mas.service_agent.ServiceAgent;
  * 
  */
 public class OtherAgentDied extends ReceiveBehaviour {
+	/**
+	 * @var long serialVersionUID
+	 */
+	private static final long serialVersionUID = 5354177044839347391L;
 	private ServiceAgent agent;
 
 	/**

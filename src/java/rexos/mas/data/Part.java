@@ -164,4 +164,12 @@ public class Part implements Serializable, MongoSaveable {
 			throw new IllegalArgumentException();
 		}
 	}
+
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return String.format("Part [id=%s, type=%s]", id, type);
+	}
 }

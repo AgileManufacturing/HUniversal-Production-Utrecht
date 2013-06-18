@@ -312,7 +312,6 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
 		switch(entry.getNamespace().split("\\.")[1]) {
 			case "ServiceStepsBlackBoard":
-				Logger.log("Hardware Agent - serviceBB update: " + operation);
 				switch(operation) {
 					case UPDATE:
 						try {
@@ -352,7 +351,6 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 				}
 				break;
 			case "EquipletStepsBlackBoard":
-				Logger.log("Hardware Agent - equiplet blackboard updated");
 				switch(operation) {
 					case UPDATE:
 						try {

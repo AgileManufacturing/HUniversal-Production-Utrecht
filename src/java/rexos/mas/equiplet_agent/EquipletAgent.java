@@ -218,10 +218,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		try {
 			InetAddress IP = InetAddress.getLocalHost();
 			equipletDbIp = IP.getHostAddress();
-		} catch (UnknownHostException e) {
+		} catch(UnknownHostException e) {
 			Logger.log(e);
 		}
-		
+
 		equipletDbName = getAID().getLocalName();
 		communicationTable = new HashMap<String, ObjectId>();
 		try {
@@ -241,7 +241,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				for(Row row : rows) {
 					capabilities.add((int) row.get("id"));
 				}
-			} catch (KnowledgeException | KeyNotFoundException e1) {
+			} catch(KnowledgeException | KeyNotFoundException e1) {
 				doDelete();
 				Logger.log(e1);
 			}
@@ -250,8 +250,12 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 
 			// creates his service agent.
-			Object[] arguments = new Object[] { dbData, getAID(), logisticsAgent };
-			AgentController serviceAgentCnt = getContainerController().createNewAgent(getLocalName() + "-serviceAgent", "rexos.mas.service_agent.ServiceAgent", arguments);
+			Object[] arguments = new Object[] {
+					dbData, getAID(), logisticsAgent
+			};
+			AgentController serviceAgentCnt =
+					getContainerController().createNewAgent(getLocalName() + "-serviceAgent",
+							"rexos.mas.service_agent.ServiceAgent", arguments);
 			serviceAgentCnt.start();
 			serviceAgent = new AID(serviceAgentCnt.getName(), AID.ISGUID);
 
@@ -278,11 +282,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			BasicDBObject timeData = (BasicDBObject) collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
 
 			// initiates the timer to the next product step.
-			timer = new NextProductStepTimer(timeData.getLong("firstTimeSlot"), timeData.getInt("timeSlotLength"), this);
-			timer.setNextUsedTimeSlot(-1);
+			timer =
+					new NextProductStepTimer(timeData.getLong("firstTimeSlot"), timeData.getInt("timeSlotLength"), this);
 
 			collectiveBBClient.setCollection(equipletDirectoryName);
-		} catch (GeneralMongoException | InvalidDBNamespaceException | UnknownHostException | StaleProxyException e) {
+		} catch(GeneralMongoException | InvalidDBNamespaceException | UnknownHostException | StaleProxyException e) {
 			Logger.log(e);
 			doDelete();
 		}
@@ -308,14 +312,14 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			collectiveBBClient.removeDocuments(new BasicDBObject("AID", getAID().getName()));
 
 			// Messages all the product agents that he died.
-			for(DBObject object : equipletBBClient.findDocuments(new BasicDBObject())){
+			for(DBObject object : equipletBBClient.findDocuments(new BasicDBObject())) {
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
 				responseMessage.addReceiver(new AID(object.get("productAgentId").toString(), AID.ISGUID));
 				responseMessage.setOntology("EquipletAgentDied");
-				responseMessage.setContentObject((BasicDBObject)object.get("statusData"));
+				responseMessage.setContentObject((BasicDBObject) object.get("statusData"));
 				send(responseMessage);
 			}
-			
+
 			// Clears his own blackboard and removes his subscription on that
 			// blackboard.
 			equipletBBClient.removeDocuments(new BasicDBObject());
@@ -357,17 +361,16 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					responseMessage.addReceiver(productStep.getProductAgentId());
 					responseMessage.setConversationId(conversationId);
 
-					Logger.log("status update: " + productStep.getStatus().toString());
+					Logger.log("Equiplet agent - status update: " + productStep.getStatus().toString());
 					switch(productStep.getStatus()) {
 					// Depending on the changed status fills in the
 					// responseMessage and sends it to the product agent.
 						case PLANNED:
 							try {
-								// If the start time of the newly planned productStep is earlier as the next used time
+								// If the start time of the newly planned productStep is earlier then the next used time
 								// slot make it the next used timeslot.
-								ScheduleData scheduleData = productStep.getScheduleData();
 								nextProductStep = productStep.getId();
-								timer.setNextUsedTimeSlot(scheduleData.getStartTime());
+								ScheduleData scheduleData = productStep.getScheduleData();
 								if(scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
 									timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 								}
@@ -495,13 +498,13 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	public ObjectId getNextProductStep() {
 		return nextProductStep;
 	}
-	
+
 	/**
 	 * Setter for the next product step
 	 * 
 	 * @param nextProductStep The new next product step
 	 */
-	public void setNextProductStep(ObjectId nextProductStep){
+	public void setNextProductStep(ObjectId nextProductStep) {
 		this.nextProductStep = nextProductStep;
 	}
 

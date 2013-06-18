@@ -56,8 +56,6 @@ import jade.wrapper.StaleProxyException;
 
 import java.util.ArrayList;
 
-import org.bson.types.ObjectId;
-
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.Part;
@@ -112,9 +110,9 @@ public class JadeAgentX extends Agent {
 
 			// Next we want to have some production steps
 			ProductionStep stp1 = new ProductionStep(1, 1, parameters);
-			ProductionStep stp2 = new ProductionStep(2, 1, parameters);
-			ProductionStep stp3 = new ProductionStep(3, 1, parameters);
-			ProductionStep stp4 = new ProductionStep(4, 1, parameters);
+//			ProductionStep stp2 = new ProductionStep(2, 1, parameters);
+//			ProductionStep stp3 = new ProductionStep(3, 1, parameters);
+//			ProductionStep stp4 = new ProductionStep(4, 1, parameters);
 
 			/**
 			 * Our argument for the product agent. The total production of the

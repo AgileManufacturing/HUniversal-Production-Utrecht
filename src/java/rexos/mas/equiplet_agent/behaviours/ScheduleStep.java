@@ -112,7 +112,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 		try {
 			// Gets the timeslot out of the message content.
 			int start = (Integer) message.getContentObject();
-			Logger.log("scheduling step for timeslot %d%n", start);
+			Logger.log("Equiplet agent - scheduling step for timeslot %d%n", start);
 
 			// Gets the scheduledata out of the productstep.
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
