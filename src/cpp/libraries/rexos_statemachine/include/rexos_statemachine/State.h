@@ -42,5 +42,7 @@ namespace rexos_statemachine{
 	 * The representation of the states in a char array so its easy to print the enum values instead of the integer
 	 **/
 	const char* const state_txt[] = { "Safe", "Setup", "Shutdown", "Standby", "Start", "Stop", "Normal", "no state" };
+
+	const char is_transition_state[] = { 0, 1, 1, 0, 1, 1, 0, 0 };
 }
 #endif

@@ -146,24 +146,30 @@ bool StateMachine::changeState(rexos_statemachine::State newState) {
 	}
 
 	ChangeStateEntry changeStateEntry = it->second;
-	ROS_INFO("ChangeState from:%d to %d", it->second.statePair.first,it->second.statePair.second);
-	_setState(changeStateEntry.transition->transitionState);				//set the currentState on the transitionState
+	_setState(changeStateEntry.transition->transitionState);		//set the currentState on the transitionState
+	
 	TransitionActionClient* transitionActionClient = changeStateEntry.transition->transitionActionClient;
-	TransitionGoal goal;
-	transitionActionClient->sendGoal(goal);
-	transitionActionClient->waitForResult();
-
-	if (transitionActionClient->getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
-		//transition succeeded
-		_setState(changeStateEntry.statePair.second);
-	}else if(currentState != changeStateEntry.abortTransition->transitionState){
-		//abort method
-		_setState(changeStateEntry.abortTransition->transitionState);
-		transitionActionClient = changeStateEntry.abortTransition->transitionActionClient;
+	
+	while( rexos_statemachine::is_transition_state[currentState] ){
+		TransitionGoal goal;
 		transitionActionClient->sendGoal(goal);
-	}else{
-		//transition without an abort transition failed such as 'stop/shutdown' transition
+		transitionActionClient->waitForResult();
+
+		if(currentState == changeStateEntry.transition->transitionState){
+			if (transitionActionClient->getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
+				_setState(changeStateEntry.statePair.second);
+			}else{
+				_setState(changeStateEntry.abortTransition->transitionState);
+				transitionActionClient = changeStateEntry.abortTransition->transitionActionClient;
+			}
+		}else if (transitionActionClient->getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
+			_setState(changeStateEntry.statePair.first);
+		}else{
+			//ABORT TRANSITION FAILED
+			_setState(changeStateEntry.statePair.first);
+		}
 	}
+	
 	_forceToAllowedState();
 
 	return true;
