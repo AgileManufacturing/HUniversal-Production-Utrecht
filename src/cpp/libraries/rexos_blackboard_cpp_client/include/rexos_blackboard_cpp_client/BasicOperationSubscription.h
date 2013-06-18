@@ -1,6 +1,6 @@
 /**
  * @file BasicOperationSubscription.h
- * @brief 
+ * @brief Subscription for one of the basic Mongo CRUD operations.
  * @date Created: 3 jun. 2013
  *
  * @author Jan-Willem Willebrands
@@ -36,16 +36,34 @@
 
 namespace Blackboard {
 
+/**
+ * Subscription for one of the basic Mongo CRUD operations.
+ */
 class BasicOperationSubscription : public BlackboardSubscription {
 public:
+	/**
+	 * Constructs a subscriptions for the specified operation and subscriber.
+	 *
+	 * @param operation The operation to respond to.
+	 * @param subscriber The BlackboardSubscriber that should receive a callback when an event occurs.
+	 */
 	BasicOperationSubscription(MongoOperation operation, BlackboardSubscriber & subscriber);
 
-	virtual ~BasicOperationSubscription() {};
+	/**
+	 * @see BlackboardSubscription::getQuery(mongo::Query *)
+	 */
+	bool getQuery(mongo::Query * query_out) const;
 
-	bool getQuery(mongo::Query * query) const;
+	/**
+	 * @see BlackboardSubscription::matchesWithEntry(const OplogEntry&)
+	 */
 	bool matchesWithEntry(const OplogEntry& entry) const;
 
 private:
+	/**
+	 * @var MongoOperation operation
+	 * The operation to respond to.
+	 */
 	MongoOperation operation;
 };
 

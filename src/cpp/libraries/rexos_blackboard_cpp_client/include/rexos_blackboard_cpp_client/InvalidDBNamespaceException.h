@@ -1,6 +1,6 @@
 /**
  * @file InvalidDBNamespaceException.h
- * @brief 
+ * @brief Thrown when an attempt is made to perform an operation on an invalid namespace.
  * @date Created: 7 jun. 2013
  *
  * @author Jan-Willem Willebrands
@@ -34,16 +34,35 @@
 #include <exception>
 
 namespace Blackboard {
-
+/**
+ * Thrown when an attempt is made to perform an operation on an invalid namespace.
+ */
 class InvalidDBNamespaceException : public std::exception
 {
 public:
+	/**
+	 * Constructs the exception with the specified reason message.
+	 *
+	 * @var reason String providing more information about the cause of the exception.
+	 */
 	InvalidDBNamespaceException(std::string reason) : reason(reason) {};
+
+	/**
+	 * Virtual destructor so child classes will be able to cleanup if needed.
+	 */
 	virtual ~InvalidDBNamespaceException() throw() { };
+
+	/**
+	 * Returns more information about the cause of the exception.
+	 *
+	 * @return String providing more information about the exception.
+	 */
 	virtual const char* what() const throw() {return reason.c_str();}
 
 private:
-
+	/**
+	 * More information about the exception.
+	 */
 	std::string reason;
 
 };
