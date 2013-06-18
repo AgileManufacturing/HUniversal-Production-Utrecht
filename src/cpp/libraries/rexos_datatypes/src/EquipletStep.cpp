@@ -1,9 +1,32 @@
-/* 
- * File:   EquipletStep.cpp
- * Author: alexander-ubuntu
+/**
+ * @file EquipletStep.cpp
+ * @brief Container class of an equipletstep. 
+ * @date Created: 2012-09-19
+ *
+ * @author Alexander Streng
+ *
+ * @section LICENSE
+ * License: newBSD
  * 
- * Created on June 16, 2013, 3:33 PM
- */
+ * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ * - Neither the name of the HU University of Applied Sciences Utrecht nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **/
 
 #include "rexos_datatypes/EquipletStep.h"
 
@@ -12,6 +35,7 @@ namespace rexos_datatypes{
     std::string EquipletStep::getId(){
         return this->_id;
     }
+
     void EquipletStep::setId(std::string id){
         this->_id = id;    
     }
@@ -19,6 +43,7 @@ namespace rexos_datatypes{
     std::string EquipletStep::getServiceStepID(){
         return this->serviceStepID;
     }
+
     void EquipletStep::setServiceStepID(std::string serviceStepID){
         this->serviceStepID = serviceStepID;
     }
@@ -26,6 +51,7 @@ namespace rexos_datatypes{
     std::string EquipletStep::getNextStep(){
         return this->nextStep;
     }
+
     void EquipletStep::setNextStep(std::string nextStep){
         this->nextStep = nextStep;
     }
@@ -33,6 +59,7 @@ namespace rexos_datatypes{
     int EquipletStep::getModuleId(){
         return this->moduleId;
     }
+
     void EquipletStep::setModuleId(int id){
         this->moduleId = id;
     }
@@ -40,6 +67,7 @@ namespace rexos_datatypes{
     InstructionData EquipletStep::getInstructionData(){
         return this->instructionData;
     }
+
     void EquipletStep::setInstructionData(InstructionData instructionData){
         this->instructionData = instructionData;
     }
@@ -47,6 +75,7 @@ namespace rexos_datatypes{
     int EquipletStep::getStatus(){
         return this->status;
     }
+
     void EquipletStep::setStatus(int status){
         this->status = status;
     }
@@ -54,6 +83,7 @@ namespace rexos_datatypes{
     std::map<std::string, std::string> EquipletStep::getStatusData(){
         return this->statusData;
     }
+
     void EquipletStep::setStatusData(std::map<std::string, std::string> statusData){
         this->statusData = statusData;
     }
@@ -61,6 +91,7 @@ namespace rexos_datatypes{
     TimeData EquipletStep::getTimeData(){
         return this->timeData;
     }
+    
     void EquipletStep::setTimeData(TimeData timeData){
         this->timeData = timeData;
     }
@@ -105,9 +136,7 @@ namespace rexos_datatypes{
             }
             //increment the iterator
             ++i;
-        }
-        //first check if we got an instructiondata node
-        
+        }        
     }
     
     InstructionData EquipletStep::setInstructionDataFromNode(const JSONNode & n){
