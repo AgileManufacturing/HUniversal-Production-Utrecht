@@ -29,6 +29,7 @@
 
 #ifndef MODE_H
 #define MODE_H
+#define MODE_COUNT 4
 
 namespace rexos_statemachine{
 	/**

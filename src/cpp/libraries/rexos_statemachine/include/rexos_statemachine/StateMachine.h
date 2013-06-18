@@ -112,7 +112,7 @@ private:
 	 * @var map<rexos_statemachine::Mode,rexos_statemachine::State[]> ModePossibleStates
 	 * Possible states of all modus
 	 **/
-	std::map<rexos_statemachine::Mode, std::vector<rexos_statemachine::State> > modiPossibleStates;
+	std::map<rexos_statemachine::Mode, std::vector<rexos_statemachine::State> > modePossibleStates;
 
 	/**
 	 * @var typedef int (StateMachine::*stateFunctionPtr)()

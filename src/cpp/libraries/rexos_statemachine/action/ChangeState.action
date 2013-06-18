@@ -2,6 +2,5 @@
 int32 desiredState
 ---
 # Define the result
-bool executed
 ---
-bool feedback
+# Define the feedback

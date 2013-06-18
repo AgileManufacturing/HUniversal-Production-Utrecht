@@ -65,10 +65,11 @@ StateMachine::StateMachine(std::string nodeName) :
 	transitionMap[transitionStartStatePair]= {transitionStart,transitionStop,transitionStartStatePair};
 	transitionMap[transitionStopStatePair]= {transitionStop,NULL,transitionStopStatePair};
 
-	modiPossibleStates[MODE_NORMAL] = {STATE_NORMAL,STATE_STANDBY,STATE_SAFE};
-	modiPossibleStates[MODE_ERROR] = {STATE_STANDBY,STATE_SAFE};
-	modiPossibleStates[MODE_CRITICAL_ERROR] = {STATE_SAFE};
-	modiPossibleStates[MODE_E_STOP] = {STATE_SAFE};
+	modePossibleStates[MODE_NORMAL] = {STATE_NORMAL,STATE_STANDBY,STATE_SAFE};
+	modePossibleStates[MODE_SERVICE] = {STATE_NORMAL,STATE_STANDBY,STATE_SAFE};
+	modePossibleStates[MODE_ERROR] = {STATE_STANDBY,STATE_SAFE};
+	modePossibleStates[MODE_CRITICAL_ERROR] = {STATE_SAFE};
+	modePossibleStates[MODE_E_STOP] = {STATE_SAFE};
 
 	changeStateActionServer.start();
 	changeModeActionServer.start();
@@ -83,49 +84,46 @@ StateMachine::~StateMachine() {
 	//TODO pointer values remove
 }
 
-void StateMachine::onChangeStateAction(const ChangeStateGoalConstPtr& goal){
-	bool b = true;
-	switch (goal->desiredState) {
-		case rexos_statemachine::STATE_SAFE:
-			b = changeState(STATE_SAFE);
-			break;
-		case rexos_statemachine::STATE_STANDBY:
-			b = changeState(STATE_STANDBY);
-			break;
-		case rexos_statemachine::STATE_NORMAL:
-			b = changeState(STATE_NORMAL);
-			break;
-		default:
-			b = false;
-		}
+void StateMachine::onTransitionSetupAction(TransitionActionServer* as){
+	transitionSetup();
+	as->setSucceeded();
+}
 
-	if(b)
+void StateMachine::onTransitionShutdownAction(TransitionActionServer* as){
+	transitionShutdown();
+	as->setSucceeded();
+}
+
+void StateMachine::onTransitionStartAction(TransitionActionServer* as){
+	transitionStart();
+	as->setSucceeded();
+}
+
+void StateMachine::onTransitionStopAction(TransitionActionServer* as){
+	transitionStop();
+	as->setSucceeded();
+}
+
+State StateMachine::getCurrentState() {
+	return currentState;
+}
+
+Mode StateMachine::getCurrentMode() {
+	return currentMode;
+}
+
+void StateMachine::onChangeStateAction(const ChangeStateGoalConstPtr& goal){
+	if(changeState((rexos_statemachine::State) goal->desiredState))
 		changeStateActionServer.setSucceeded();
 	else
-		changeStateActionServer.setAborted(changeStateResult);
+		changeStateActionServer.setAborted();
 }
+
 void StateMachine::onChangeModeAction(const ChangeModeGoalConstPtr& goal){
-	ChangeModeResult res;
-	switch (goal->desiredMode) {
-		case rexos_statemachine::MODE_NORMAL:
-			res.executed = changeMode(MODE_NORMAL);
-			break;
-		case rexos_statemachine::MODE_SERVICE:
-			res.executed = changeMode(MODE_SERVICE);
-			break;
-		case rexos_statemachine::MODE_ERROR:
-			res.executed = changeMode(MODE_ERROR);
-			break;
-		case rexos_statemachine::MODE_CRITICAL_ERROR:
-			res.executed = changeMode(MODE_CRITICAL_ERROR);
-			break;
-		case rexos_statemachine::MODE_E_STOP:
-			res.executed = changeMode(MODE_E_STOP);
-			break;
-		default:
-			changeModeActionServer.setAborted(res);
-		}
-	changeModeActionServer.setSucceeded(res);
+	if(changeMode( (rexos_statemachine::Mode) goal->desiredMode))
+		changeModeActionServer.setSucceeded();
+	else
+		changeModeActionServer.setAborted();
 }
 
 /**
@@ -169,53 +167,28 @@ bool StateMachine::changeState(rexos_statemachine::State newState) {
 			_setState(changeStateEntry.statePair.first);
 		}
 	}
-	
+
 	_forceToAllowedState();
 
+	return currentState == it->first.second;
+}
+
+bool StateMachine::changeMode(Mode newMode) {
+	if(newMode > MODE_COUNT)
+		return false;
+
+	_setMode(newMode);
+	_forceToAllowedState();
 	return true;
 }
 
-void StateMachine::onTransitionSetupAction(TransitionActionServer* as){
-	transitionSetup();
-	as->setSucceeded();
-}
-
-void StateMachine::onTransitionShutdownAction(TransitionActionServer* as){
-	transitionShutdown();
-	as->setSucceeded();
-}
-
-void StateMachine::onTransitionStartAction(TransitionActionServer* as){
-	transitionStart();
-	as->setSucceeded();
-}
-
-void StateMachine::onTransitionStopAction(TransitionActionServer* as){
-	transitionStop();
-	as->setSucceeded();
-}
-
-State StateMachine::getCurrentState() {
-	return currentState;
-}
-
-Mode StateMachine::getCurrentMode() {
-	return currentMode;
-}
-
-bool StateMachine::statePossibleInMode(State state, Mode modi) {
-	std::vector<State> States = modiPossibleStates[modi];
+bool StateMachine::statePossibleInMode(State state, Mode mode) {
+	std::vector<State> States = modePossibleStates[mode];
 	for (int i = 0; i < States.size(); i++) {
 		if (States[i] == state)
 			return true;
 	}
 	return false;
-}
-
-bool StateMachine::changeMode(Mode newMode) {
-	_setMode(newMode);
-	_forceToAllowedState();
-	return true;
 }
 
 void StateMachine::_forceToAllowedState() {
@@ -243,8 +216,9 @@ void StateMachine::_setState(State state) {
 	}
 }
 
-void StateMachine::_setMode(Mode modi) {
-	currentMode = modi;
+void StateMachine::_setMode(Mode mode) {
+	ROS_INFO("mode changed to:%s",Mode_txt[mode]);
+	currentMode = mode;
 	if (listener != NULL) {
 		listener->onModeChanged();
 	}
