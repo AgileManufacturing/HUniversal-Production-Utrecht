@@ -1,6 +1,6 @@
 /**
  * @file BasicOperationSubscription.cpp
- * @brief 
+ * @brief Subscription for one of the basic Mongo CRUD operations.
  * @date Created: 3 jun. 2013
  *
  * @author Jan-Willem Willebrands
