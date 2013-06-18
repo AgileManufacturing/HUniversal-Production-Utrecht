@@ -44,6 +44,15 @@ import java.util.List;
 
 public class Product{
 	private Production _production;
+
+
+	/**
+	 * @param log the log to set
+	 */
+	public void setLog(ProductLog log){
+		this.log = log;
+	}
+
 	private ProductLog log;
 
 	/**
@@ -69,6 +78,7 @@ public class Product{
 	public Production getProduction(){
 		return _production;
 	}
+	
 
 	/**
 	 * @param _production
@@ -80,5 +90,10 @@ public class Product{
 
 	public void addLogMsg(List<LogMessage> msg){
 		log.add(msg);
+	}
+	
+	@Override
+	public String toString() {
+		return "DataObject [production=" +_production+"]";
 	}
 }

@@ -94,4 +94,10 @@ public class ProductionStep implements Serializable {
 	public int getCapability() {
 		return _capability;
 	}
+	
+	@Override
+	public String toString() {
+	   return "DataObject [id=" + _id + ", capability=" + _capability + ", parameter="
+		+ _parameters + "]";
+	}
 }

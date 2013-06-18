@@ -89,10 +89,10 @@ public class JadeAgentX extends Agent {
 
 			// Empty the equiplet directory before starting the first equiplet
 			// agent
-			BlackboardClient collectiveBBClient = new BlackboardClient("145.89.191.131", 27017);
-			collectiveBBClient.setDatabase("CollectiveDb");
-			collectiveBBClient.setCollection("EquipletDirectory");
-			collectiveBBClient.removeDocuments(new BasicDBObject());
+			//BlackboardClient collectiveBBClient = new BlackboardClient("145.89.191.131", 27017);
+			//collectiveBBClient.setDatabase("CollectiveDb");
+			//collectiveBBClient.setCollection("EquipletDirectory");
+			//collectiveBBClient.removeDocuments(new BasicDBObject());
 
 			/**
 			 * make a new equipletagent to use.
@@ -100,7 +100,7 @@ public class JadeAgentX extends Agent {
 			Object[] ar = new Object[] {
 				logisticsAID
 			};
-			getContainerController().createNewAgent("EQ1", "rexos.mas.equiplet_agent.EquipletAgent", ar).start();
+			//getContainerController().createNewAgent("EQ1", "rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 
 			/**
 			 * Lets make a parameter list

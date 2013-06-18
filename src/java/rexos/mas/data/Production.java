@@ -64,6 +64,10 @@ public class Production{
 	public ArrayList<ProductionStep> getProductionSteps(){
 		return _productionSteps;
 	}
+	
+	public void setProductionSteps(ArrayList<ProductionStep> prodsteps) {
+		this._productionSteps = prodsteps;
+	}
 
 	public void setProductionEquipletMapping(ProductionEquipletMapper prodEQMap)
 			throws Exception{
@@ -74,5 +78,10 @@ public class Production{
 
 	public ProductionEquipletMapper getProductionEquipletMapping(){
 		return this._prodEQMap;
+	}
+	
+	@Override
+	public String toString() {
+	   return "DataObject [productionSteps=" + _productionSteps+ "]";
 	}
 }

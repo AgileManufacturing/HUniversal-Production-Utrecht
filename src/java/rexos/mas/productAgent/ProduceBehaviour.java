@@ -64,24 +64,29 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	private ProductionEquipletMapper _prodEQMap;
 	ProductionEquipletMapper s1;
 	ACLMessage msg;
-	
+
 	@Override
 	public void action(){
-		_prodEQMap = new ProductionEquipletMapper();
-		// retrieve the productstep
-		for(ProductionStep stp : _production.getProductionSteps()){
-			if (stp.getStatus() == StepStatusCode.PLANNED){
-				// adds the step to te new list (the one that will be
-				// returned to the scheduler)
-				_prodEQMap.addProductionStep(stp.getId());
-				s1 = _production.getProductionEquipletMapping();
-				// retrieve the AID
-				HashMap<AID, Long> equipletAndTimeslot = _production
-						.getProductionEquipletMapping()
-						.getEquipletsForProductionStep(stp.getId());
-				// roep seq behav aan
-				myAgent.addBehaviour(new newProducing(equipletAndTimeslot, stp));
+		try{
+			_prodEQMap = new ProductionEquipletMapper();
+			// retrieve the productstep
+			for(ProductionStep stp : _production.getProductionSteps()){
+				if (stp.getStatus() == StepStatusCode.PLANNED){
+					// adds the step to te new list (the one that will be
+					// returned to the scheduler)
+					_prodEQMap.addProductionStep(stp.getId());
+					s1 = _production.getProductionEquipletMapping();
+					// retrieve the AID
+					HashMap<AID, Long> equipletAndTimeslot = _production
+							.getProductionEquipletMapping()
+							.getEquipletsForProductionStep(stp.getId());
+					// roep seq behav aan
+					myAgent.addBehaviour(new newProducing(equipletAndTimeslot,
+							stp));
+				}
 			}
+		} catch(Exception e){
+			Logger.log(e);
 		}
 	}
 }
@@ -91,10 +96,10 @@ class newProducing extends SequentialBehaviour{
 	private HashMap<AID, Long> EqAndTs;
 	private ProductionStep productionStep;
 
-	public newProducing(HashMap<AID, Long> EqAndTs, ProductionStep productionStep){
+	public newProducing(HashMap<AID, Long> EqAndTs,
+			ProductionStep productionStep){
 		this.EqAndTs = EqAndTs;
 		this.productionStep = productionStep;
-		
 	}
 
 	@Override
@@ -102,24 +107,24 @@ class newProducing extends SequentialBehaviour{
 		addSubBehaviour(new OneShotBehaviour(){
 			private static final long serialVersionUID = 1L;
 			private AID nEq;
+
 			@Override
 			public void action(){
-				
-				if(EqAndTs.size() == 1){
-					for(Entry<AID, Long> Eq: EqAndTs.entrySet()){
+				if (EqAndTs.size() == 1){
+					for(Entry<AID, Long> Eq : EqAndTs.entrySet()){
 						nEq = Eq.getKey();
 					}
+				} else{
+					Logger.log(new UnsupportedOperationException(
+							"Equipletcount is " + EqAndTs.size()
+									+ "; excepted 1"));
 				}
-				else
-				{
-					Logger.log(new UnsupportedOperationException("Equipletcount is "+ EqAndTs.size() + "; excepted 1"));
+				ProductAgent pa = (ProductAgent) myAgent;
+				if (nEq != pa.getCurrentLocation()){
+					// TODO: Ask GUI to move
 				}
-				ProductAgent pa = (ProductAgent)myAgent;
-				if(nEq != pa.getCurrentLocation()){
-					//TODO: Ask GUI to move
-				}
-				
-				myAgent.addBehaviour(new receiveMsgBehaviour(EqAndTs, productionStep));
+				myAgent.addBehaviour(new receiveMsgBehaviour(EqAndTs,
+						productionStep));
 			}
 		});
 	}
@@ -130,7 +135,8 @@ class receiveMsgBehaviour extends CyclicBehaviour{
 	HashMap<AID, Long> eqAndTs;
 	private ProductionStep productionStep;
 
-	receiveMsgBehaviour(HashMap<AID, Long> eqAndTs, ProductionStep productionStep){
+	receiveMsgBehaviour(HashMap<AID, Long> eqAndTs,
+			ProductionStep productionStep){
 		this.eqAndTs = eqAndTs;
 		this.productionStep = productionStep;
 	}
@@ -139,7 +145,8 @@ class receiveMsgBehaviour extends CyclicBehaviour{
 	public void action(){
 		ACLMessage msg = myAgent.receive();
 		if (msg != null){
-			myAgent.addBehaviour(new WaitMsgBehaviour(msg, eqAndTs, productionStep));
+			myAgent.addBehaviour(new WaitMsgBehaviour(msg, eqAndTs,
+					productionStep));
 		} else{
 			block();
 		}
@@ -153,13 +160,13 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 	HashMap<AID, Long> eqAndTs;
 	private ProductionStep productionStep;
 
-	public WaitMsgBehaviour(ACLMessage msg, HashMap<AID, Long> eqAndTs, ProductionStep productionStep){
+	public WaitMsgBehaviour(ACLMessage msg, HashMap<AID, Long> eqAndTs,
+			ProductionStep productionStep){
 		this.msg = msg;
 		this.eqAndTs = eqAndTs;
 		this.productionStep = productionStep;
 	}
 
-	
 	@Override
 	public void action(){
 		_productAgent = (ProductAgent) myAgent;
@@ -167,9 +174,9 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 		myAgent.addBehaviour(seq);
 		msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setOntology("StartProduction");
-		
-		if(eqAndTs.get(msg.getSender()) != productionStep.getId()){
-			Logger.log(new UnsupportedOperationException("Equiplet sender not equal to associated equiplet in productionStep"));
+		if (eqAndTs.get(msg.getSender()) != productionStep.getId()){
+			Logger.log(new UnsupportedOperationException(
+					"Equiplet sender not equal to associated equiplet in productionStep"));
 		}
 		msg.addReceiver(msg.getSender());
 		myAgent.send(msg);
@@ -181,7 +188,7 @@ class producing extends OneShotBehaviour{
 	Product _product;
 	ProductAgent _productAgent;
 	ACLMessage msg;
-	
+
 	@Override
 	public void action(){
 		try{
@@ -189,34 +196,33 @@ class producing extends OneShotBehaviour{
 			// The productionstep has been initiated.
 			case "productionStepStarted":
 				// TODO key = msg.getContent().parse
-				
-				/*  int key = 0; // temp if (key != currProdStep){ // TODO error
-				  } if (!bla.get(key).containsKey(msg.getSender())){
-					  Logger.log(new UnsupportedOperationException(""));
-				  } { ArrayList<ProductionStep> ProductionStepArrayList =
-				  ((ProductAgent) myAgent)
-				  .getProduct().getProduction().getProductionSteps();
-				  for(ProductionStep stp : ProductionStepArrayList){ if (key ==
-				  stp.getId()){ canProductionStepStart(stp); } } }
+				/*
+				 * int key = 0; // temp if (key != currProdStep){ // TODO error
+				 * } if (!bla.get(key).containsKey(msg.getSender())){
+				 * Logger.log(new UnsupportedOperationException("")); } {
+				 * ArrayList<ProductionStep> ProductionStepArrayList =
+				 * ((ProductAgent) myAgent)
+				 * .getProduct().getProduction().getProductionSteps();
+				 * for(ProductionStep stp : ProductionStepArrayList){ if (key ==
+				 * stp.getId()){ canProductionStepStart(stp); } } }
 				 */
 				break;
 			// The productionstep has completed.
 			case "productionStepFinished":
 				// TODO key = msg.getContent().parse
 				/*
-				 int keyfinish = 0; // temp if (keyfinish != currProdStep){ //
-				 TODO error } if
-				 (!bla.get(keyfinish).containsKey(msg.getSender())){ // TODO
-				 error } { ArrayList<ProductionStep> ProductionStepArrayList =
-				 ((ProductAgent) myAgent)
-				 .getProduct().getProduction().getProductionSteps();
-				 for(ProductionStep stp : ProductionStepArrayList){ if
-				 (keyfinish == stp.getId()){ productionStepEnded(stp, true,
-				 null); // productionStepEnded(stp, msg.getContent, //
-				 msg.getContent); } } } currProdStep++;
-				*/
+				 * int keyfinish = 0; // temp if (keyfinish != currProdStep){ //
+				 * TODO error } if
+				 * (!bla.get(keyfinish).containsKey(msg.getSender())){ // TODO
+				 * error } { ArrayList<ProductionStep> ProductionStepArrayList =
+				 * ((ProductAgent) myAgent)
+				 * .getProduct().getProduction().getProductionSteps();
+				 * for(ProductionStep stp : ProductionStepArrayList){ if
+				 * (keyfinish == stp.getId()){ productionStepEnded(stp, true,
+				 * null); // productionStepEnded(stp, msg.getContent, //
+				 * msg.getContent); } } } currProdStep++;
+				 */
 				_productAgent.setCurrentLocation(msg.getSender());
-				
 				break;
 			// For some reason production can't be started thus it has to be
 			// rescheduled.

@@ -36,6 +36,7 @@
 
 package rexos.mas.productAgent;
 
+import rexos.libraries.log.Logger;
 import rexos.mas.data.ProductionStep;
 
 import jade.core.AID;
@@ -56,7 +57,6 @@ public class OverviewBehaviour extends OneShotBehaviour{
 	@SuppressWarnings("unused")
 	private ProduceBehaviour _produceBehaviour;
 	private SequentialBehaviour _sequentialBehaviour;
-	
 	private SocketBehaviour _socketBehaviour;
 
 	public OverviewBehaviour(){
@@ -71,11 +71,9 @@ public class OverviewBehaviour extends OneShotBehaviour{
 	@Override
 	public void action(){
 		_productAgent = (ProductAgent) myAgent;
-		
 		System.out.println("Add a SocketBehaviour");
-		_socketBehaviour = new SocketBehaviour(myAgent);
+		_socketBehaviour = new SocketBehaviour(myAgent, _productAgent.getHost());
 		_productAgent.addBehaviour(_socketBehaviour);
-		
 		System.out.println("Add a SequentialBehaviour");
 		_sequentialBehaviour = new SequentialBehaviour();
 		_productAgent.addBehaviour(_sequentialBehaviour);
@@ -112,28 +110,32 @@ public class OverviewBehaviour extends OneShotBehaviour{
 
 			@Override
 			public void action(){
-				System.out.println("\n");
-				for(ProductionStep stp : _productAgent.getProduct()
-						.getProduction().getProductionSteps()){
-					System.out.println("ProductionStep " + stp.getId()
-							+ " has Equiplets;");
-					for(AID aid : _productAgent.getProduct().getProduction()
-							.getProductionEquipletMapping()
-							.getEquipletsForProductionStep(stp.getId())
-							.keySet()){
-						System.out.println("Eq localname: "
-								+ aid.getLocalName()
-								+ " AID: "
-								+ aid
-								+ " timeslots: "
-								+ _productAgent
-										.getProduct()
-										.getProduction()
-										.getProductionEquipletMapping()
-										.getTimeSlotsForEquiplet(stp.getId(),
-												aid));
-					}
+				try{
 					System.out.println("\n");
+					for(ProductionStep stp : _productAgent.getProduct()
+							.getProduction().getProductionSteps()){
+						System.out.println("ProductionStep " + stp.getId()
+								+ " has Equiplets;");
+						for(AID aid : _productAgent.getProduct()
+								.getProduction().getProductionEquipletMapping()
+								.getEquipletsForProductionStep(stp.getId())
+								.keySet()){
+							System.out.println("Eq localname: "
+									+ aid.getLocalName()
+									+ " AID: "
+									+ aid
+									+ " timeslots: "
+									+ _productAgent
+											.getProduct()
+											.getProduction()
+											.getProductionEquipletMapping()
+											.getTimeSlotsForEquiplet(
+													stp.getId(), aid));
+						}
+						System.out.println("\n");
+					}
+				} catch(Exception e){
+					Logger.log(e);
 				}
 			}
 		});
