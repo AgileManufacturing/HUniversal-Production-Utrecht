@@ -56,6 +56,8 @@ import jade.wrapper.StaleProxyException;
 
 import java.util.ArrayList;
 
+import org.bson.types.ObjectId;
+
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.Part;
@@ -87,8 +89,7 @@ public class JadeAgentX extends Agent {
 			logisticsCon.start();
 			AID logisticsAID = new AID(logisticsCon.getName(), AID.ISGUID);
 
-			// Empty the equiplet directory before starting the first equiplet
-			// agent
+			// Empty the equiplet directory before starting the first equiplet agent
 			BlackboardClient collectiveBBClient = new BlackboardClient("145.89.191.131", 27017);
 			collectiveBBClient.setDatabase("CollectiveDb");
 			collectiveBBClient.setCollection("EquipletDirectory");

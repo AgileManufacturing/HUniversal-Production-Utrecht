@@ -121,8 +121,7 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 				responseMessage.setOntology("CanPerformStep");
 				responseMessage.addReceiver(productAgent);
 				if (message.getPerformative() == ACLMessage.DISCONFIRM) {
-					// if the productstep can not be done by this equiplet
-					// remove it.
+					// if the productstep can not be done by this equiplet remove it.
 					equipletBBClient.removeDocuments(new BasicDBObject("_id",
 							productStepEntryId));
 				}
@@ -132,6 +131,5 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 				myAgent.doDelete();
 			}
 		}
-		myAgent.removeBehaviour(this);
 	}
 }
