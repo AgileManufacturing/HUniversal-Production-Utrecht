@@ -77,7 +77,7 @@ public class sqliteDatabase{
 		try{
 			conn = DriverManager.getConnection(DB_URL + DB_FILE, USER, PASS);
 			try(PreparedStatement create = conn
-					.prepareStatement("CREATE TABLE IF NOT EXISTS log (aid VARCHAR(100), message VARCHAR(10000))")){
+					.prepareStatement("CREATE TABLE IF NOT EXISTS log (aid VARCHAR, message VARCHAR)")){
 				create.execute();
 			}
 		} catch(SQLException e){
