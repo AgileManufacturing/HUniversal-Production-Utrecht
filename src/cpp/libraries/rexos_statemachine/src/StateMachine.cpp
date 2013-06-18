@@ -60,15 +60,10 @@ StateMachine::StateMachine(std::string nodeName) :
 	Transition *transitionStop = new Transition{new TransitionActionClient(nodeName + "/transition_stop",true), STATE_STOP};
 	Transition *transitionStart = new Transition{new TransitionActionClient(nodeName + "/transition_start",true), STATE_START};
 
-	ChangeStateEntry changeStateEntryShutdown = {transitionShutdown,NULL,transitionShutdownStatePair};
-	ChangeStateEntry changeStateEntrySetup = {transitionSetup,transitionShutdown,transitionSetupStatePair};
-	ChangeStateEntry changeStateEntryStop = {transitionStop,NULL,transitionStopStatePair};
-	ChangeStateEntry changeStateEntryStart = {transitionStart,transitionStop,transitionStartStatePair};
-
-	transitionMap[transitionSetupStatePair]= {transitionSetup,transitionShutdown};
-	transitionMap[transitionStartStatePair]= {transitionStart,transitionStop};
-	transitionMap[transitionStopStatePair]= {transitionStop,NULL};
-	transitionMap[transitionShutdownStatePair]= {transitionShutdown,NULL};
+	transitionMap[transitionSetupStatePair]= {transitionSetup,transitionShutdown,transitionSetupStatePair};
+	transitionMap[transitionShutdownStatePair]= {transitionShutdown,NULL,transitionShutdownStatePair};
+	transitionMap[transitionStartStatePair]= {transitionStart,transitionStop,transitionStartStatePair};
+	transitionMap[transitionStopStatePair]= {transitionStop,NULL,transitionStopStatePair};
 
 	modiPossibleStates[MODE_NORMAL] = {STATE_NORMAL,STATE_STANDBY,STATE_SAFE};
 	modiPossibleStates[MODE_ERROR] = {STATE_STANDBY,STATE_SAFE};
@@ -151,6 +146,7 @@ bool StateMachine::changeState(rexos_statemachine::State newState) {
 	}
 
 	ChangeStateEntry changeStateEntry = it->second;
+	ROS_INFO("ChangeState from:%d to %d", it->second.statePair.first,it->second.statePair.second);
 	_setState(changeStateEntry.transition->transitionState);				//set the currentState on the transitionState
 	TransitionActionClient* transitionActionClient = changeStateEntry.transition->transitionActionClient;
 	TransitionGoal goal;
