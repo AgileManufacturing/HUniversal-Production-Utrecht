@@ -1,0 +1,7 @@
+# Define the goal
+int32 desiredMode
+---
+# Define the result
+bool executed
+---
+# Define a feedback message
