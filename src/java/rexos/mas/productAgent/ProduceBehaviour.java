@@ -48,7 +48,6 @@ import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.Product;
-import rexos.mas.data.ProductStep;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
@@ -65,21 +64,26 @@ public class ProduceBehaviour extends OneShotBehaviour{
 
 	@Override
 	public void action(){
-		_prodEQMap = new ProductionEquipletMapper();
-		// retrieve the productstep
-		for(ProductionStep stp : _production.getProductionSteps()){
-			if (stp.getStatus() == StepStatusCode.PLANNED){
-				// adds the step to te new list (the one that will be
-				// returned to the scheduler)
-				_prodEQMap.addProductionStep(stp.getId());
-				s1 = _production.getProductionEquipletMapping();
-				// retrieve the AID
-				HashMap<AID, Long> equipletAndTimeslot = _production
-						.getProductionEquipletMapping()
-						.getEquipletsForProductionStep(stp.getId());
-				// roep seq behav aan
-				myAgent.addBehaviour(new newProducing(equipletAndTimeslot, stp));
+		try{
+			_prodEQMap = new ProductionEquipletMapper();
+			// retrieve the productstep
+			for(ProductionStep stp : _production.getProductionSteps()){
+				if (stp.getStatus() == StepStatusCode.PLANNED){
+					// adds the step to te new list (the one that will be
+					// returned to the scheduler)
+					_prodEQMap.addProductionStep(stp.getId());
+					s1 = _production.getProductionEquipletMapping();
+					// retrieve the AID
+					HashMap<AID, Long> equipletAndTimeslot = _production
+							.getProductionEquipletMapping()
+							.getEquipletsForProductionStep(stp.getId());
+					// roep seq behav aan
+					myAgent.addBehaviour(new newProducing(equipletAndTimeslot, stp));
+				}
 			}
+		}
+		catch(Exception e) {
+			
 		}
 	}
 }
@@ -187,7 +191,7 @@ class producing extends OneShotBehaviour{
 				// Planned?
 				break;
 			case "StatusUpdate":
-				ProductStep ps = (ProductStep) msg.getContentObject();
+				//ProductStep ps = (ProductStep) msg.getContentObject();
 				switch(msg.getContent()){
 				case "INPROGRESS":
 					// In progress
@@ -210,7 +214,7 @@ class producing extends OneShotBehaviour{
 					 * Equiplet agent informs the product agent that the product
 					 * step has been executed successfully.
 					 */
-					_product.addStatusDataToLog(msg.getSender(), ps.getStatusData());
+					//_product.addStatusDataToLog(msg.getSender(), ps.getStatusData());
 					break;
 				default:
 					Logger.log(new UnsupportedOperationException("No case for "
