@@ -63,6 +63,8 @@ public class sqliteDatabase{
 
 	public sqliteDatabase(String filename){
 		if (filename != null){
+			filename = filename.replaceAll("[\\/:*?\"<>|]","");
+			
 			DB_FILE = filename;
 		}
 		try{
@@ -75,7 +77,7 @@ public class sqliteDatabase{
 		try{
 			conn = DriverManager.getConnection(DB_URL + DB_FILE, USER, PASS);
 			try(PreparedStatement create = conn
-					.prepareStatement("CREATE TABLE IF NOT EXISTS log (aid VARCHAR(100), message VARCHAR(SQLITE_MAX_LENGTH))")){
+					.prepareStatement("CREATE TABLE IF NOT EXISTS log (aid VARCHAR(100), message VARCHAR(10000))")){
 				create.execute();
 			}
 		} catch(SQLException e){
