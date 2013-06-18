@@ -88,6 +88,7 @@ private:
 	 * Client to read from blackboard
 	 **/
 	Blackboard::BlackboardCppClient *blackboardClient;
+	std::vector<Blackboard::BlackboardSubscription *> subscriptions; 
 
 	MOSTDatabaseClient mostDatabaseclient;
 
@@ -103,3 +104,5 @@ private:
 	void transitionStop();
 	bool changeModuleState(int moduleID,rexos_statemachine::State state);
 };
+
+}

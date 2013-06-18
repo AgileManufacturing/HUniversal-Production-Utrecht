@@ -87,10 +87,10 @@ EquipletNode::~EquipletNode(){
  *
  * @param json The message parsed in the json format
  **/
-void EquipletNode::blackboardReadCallback(std::string json){
+void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) {
         //lets parse a root node from the bb msg.
-    //We might want to check the type of msg first.
-    JSONNode n = libjson::parse(json);
+JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
+std::cout << n.write() << std::endl;
     rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
     
     std::cout << "Step completed." << std::endl;
@@ -101,7 +101,7 @@ void EquipletNode::blackboardReadCallback(std::string json){
     std::cout << "serviceStep Id " << step->getServiceStepID() << std::endl;
     std::cout << "status " << step->getStatus() << std::endl;
     
-    std::cout << "InstructData: command " << step->getInstructionData().getCommand() << std::endl;    
+    std::cout << "InstructData: command " << step->getInstructionData().getCommand() << std::endl;
     std::cout << "InstructData: dest " << step->getInstructionData().getDestination() << std::endl;
     std::cout << "InstructData: lookup " << step->getInstructionData().getLook_up() << std::endl;
     
@@ -116,25 +116,24 @@ void EquipletNode::blackboardReadCallback(std::string json){
     {
         cout << (*ii).first << ": " << (*ii).second << endl;
     }
-	/*std::cout << "processMessage" << std::endl;
-	JSONNode n = libjson::parse(json);
-	JSONNode message = n["message"];
-	//JSONNode::const_iterator messageIt;
-	std::string destination = message["destination"].as_string();
-	//std::cout << "Destination " << destination << std::endl;
+/*std::cout << "processMessage" << std::endl;
+JSONNode message = n["message"];
+//JSONNode::const_iterator messageIt;
+std::string destination = message["destination"].as_string();
+//std::cout << "Destination " << destination << std::endl;
 
-	std::string command = message["command"].as_string();
-	//std::cout << "Command " << command << std::endl;
+std::string command = message["command"].as_string();
+//std::cout << "Command " << command << std::endl;
 
-	std::string payload = message["payload"].write();
-	std::cout << "Payload " << payload << std::endl;
+std::string payload = message["payload"].write();
+std::cout << "Payload " << payload << std::endl;
 
-	// Create the string for the service to call
-	std::stringstream ss;
-	ss << destination;
-	ss << "/";
-	ss << command;
-	blackboardClient->removeOldestMessage();*/
+// Create the string for the service to call
+std::stringstream ss;
+ss << destination;
+ss << "/";
+ss << command;
+std::cout << ss.str() << std::endl; */
 }
 
 std::string EquipletNode::getName() {
