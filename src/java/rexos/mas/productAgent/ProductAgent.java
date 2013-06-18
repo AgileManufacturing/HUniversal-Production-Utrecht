@@ -8,7 +8,7 @@
  * 
  * @section LICENSE License: newBSD
  * 
- *          Copyright © 2012, HU University of Applied Sciences Utrecht. All
+ *          Copyright ï¿½ 2012, HU University of Applied Sciences Utrecht. All
  *          rights reserved.
  * 
  *          Redistribution and use in source and binary forms, with or without
@@ -52,7 +52,6 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.blackboard_client.InvalidJSONException;
 import rexos.libraries.log.Logger;
-import com.google.gson.Gson;
 
 public class ProductAgent extends Agent{
 	private static final long serialVersionUID = 1L;
@@ -63,54 +62,18 @@ public class ProductAgent extends Agent{
 	private static int _convIDCnt = 0;
 	private String _convIDBase;
 	public int prodStep = 0;
-	private AID currentLocation;
-	
-	private Gson gson;
-	private String _host;
 
 	@Override
 	protected void setup(){
 		try{
-			gson = new Gson();
-			this._host = "127.0.0.1:10031";
-			Object[] args = this.getArguments();
-			if (args.length == 1){
-				_product = (Product) args[0];
-				
-			} else if (args.length == 2) {
-				String host = args[0].toString();
-				this._host = host;
-				String modifiedJson = args[1].toString();
-				String json = modifiedJson.replace('$', ',');
-				System.out.println(json);
-				_product = gson.fromJson(json, Product.class);
-				System.out.println("product aangemaakt");
-			} else if (args.length > 2){
-				String json = "";
-				for(int x = 0; x < args.length; x++){
-					if (x == 0){
-						json = args[x].toString();
-					} else{
-						json = json + "," + args[x];
-					}
-				}
-				System.out.println(json);
-				_product = gson.fromJson(json, Product.class);
-				System.out.println("product aangemaakt");
-			}
+			_product = (Product) getArguments()[0];
 			_overviewBehaviour = new OverviewBehaviour();
 			addBehaviour(_overviewBehaviour);
 			System.out.println("I spawned as a product agent");
-			String json = gson.toJson(_product);
-			System.out.println(json);
 		} catch(Exception e){
 			System.out.println("Productagent exited with: " + e.getMessage());
 			doDelete();
 		}
-	}
-	
-	public String getHost() {
-		return this._host;
 	}
 
 	/*
@@ -144,12 +107,11 @@ public class ProductAgent extends Agent{
 	@SuppressWarnings("static-method")
 	public void removeEquiplet(AID aid){
 		try{
-			BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
-			// try to remove the given 'aid' from the blackboard
+		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
+		// try to remove the given 'aid' from the blackboard
+		
 			bbc.removeDocuments(aid.toString());
-		} catch(UnknownHostException | GeneralMongoException
-				| InvalidJSONException | InvalidDBNamespaceException e1){
-			// TODO Auto-generated catch block
+		} catch (UnknownHostException | GeneralMongoException | InvalidJSONException | InvalidDBNamespaceException e1) {
 			Logger.log(e1);
 		}
 	}
@@ -169,20 +131,5 @@ public class ProductAgent extends Agent{
 				System.out.println(aid.getLocalName());
 			}
 		}
-	}
-
-	/**
-	 * @return the currentLocation
-	 */
-	public AID getCurrentLocation(){
-		return currentLocation;
-	}
-
-	/**
-	 * @param currentLocation
-	 *            the currentLocation to set
-	 */
-	public void setCurrentLocation(AID currentLocation){
-		this.currentLocation = currentLocation;
 	}
 }

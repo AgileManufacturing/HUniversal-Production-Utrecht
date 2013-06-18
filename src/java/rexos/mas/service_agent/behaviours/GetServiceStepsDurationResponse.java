@@ -151,7 +151,6 @@ public class GetServiceStepsDurationResponse extends ReceiveOnceBehaviour {
 				Logger.log(e);
 			}
 		} else {
-			// TODO (most) handle timeout
 			Logger.log(agent.getName() + " - GetServiceStepDurationResponse timeout!");
 			agent.doDelete();
 		}

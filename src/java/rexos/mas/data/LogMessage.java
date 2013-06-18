@@ -39,84 +39,48 @@
 
 package rexos.mas.data;
 
+import jade.core.AID;
+
 public class LogMessage{
 	/**
-	 * @param id
-	 * @param time
-	 * @param message
-	 * @param state
+	 * @param aid
+	 * @param string
 	 */
-	public LogMessage(String id, String time, String message, String state){
-		super();
-		this.id = id;
-		this.time = time;
-		this.message = message;
-		this.state = state;
-	}
-
-	private String id;
-
-	/**
-	 * @return the id
-	 */
-	public String getId(){
-		return id;
+	public LogMessage(AID aid, String string){
+		this.setSender(aid);
+		this.setString(string);
 	}
 
 	/**
-	 * @param id
-	 *            the id to set
+	 * @return the string
 	 */
-	public void setId(String id){
-		this.id = id;
+	public String getString(){
+		return string;
 	}
 
 	/**
-	 * @return the time
+	 * @param string the string to set
 	 */
-	public String getTime(){
-		return time;
+	public void setString(String string){
+		this.string = string;
 	}
 
 	/**
-	 * @param time
-	 *            the time to set
+	 * @return the sender
 	 */
-	public void setTime(String time){
-		this.time = time;
+	public AID getSender(){
+		return sender;
 	}
 
 	/**
-	 * @return the message
+	 * @param sender the sender to set
 	 */
-	public String getMessage(){
-		return message;
+	public void setSender(AID sender){
+		this.sender = sender;
 	}
 
-	/**
-	 * @param message
-	 *            the message to set
-	 */
-	public void setMessage(String message){
-		this.message = message;
-	}
+	private AID sender;
 
-	/**
-	 * @return the state
-	 */
-	public String getState(){
-		return state;
-	}
+	private String string;
 
-	/**
-	 * @param state
-	 *            the state to set
-	 */
-	public void setState(String state){
-		this.state = state;
-	}
-
-	private String time;
-	private String message;
-	private String state;
 }

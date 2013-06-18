@@ -143,7 +143,6 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 			equipletAgent.addBehaviour(new StartStep(equipletAgent,
 					equipletAgent.getEquipletBBClient()));
 		} else {
-			// TODO (most) handle timeout
 			Logger.log(equipletAgent.getName()
 					+ " - InitialisationFinished timeout!");
 			equipletAgent.doDelete();

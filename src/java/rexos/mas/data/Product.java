@@ -40,7 +40,11 @@
 
 package rexos.mas.data;
 
+import jade.core.AID;
+
 import java.util.List;
+
+import com.mongodb.BasicDBObject;
 
 public class Product{
 	private Production _production;
@@ -88,8 +92,13 @@ public class Product{
 		this._production = production;
 	}
 
-	public void addLogMsg(List<LogMessage> msg){
-		log.add(msg);
+	/**
+	 * @param aid 
+	 * @param statusData
+	 */
+	public void addStatusDataToLog(AID aid, BasicDBObject statusData){
+		log.add(aid, statusData);
+		
 	}
 	
 	@Override
