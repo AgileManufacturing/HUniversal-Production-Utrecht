@@ -3,6 +3,7 @@
  * @brief Symbolizes an entire EquipletNode.
  * @date Created: 2012-10-12
  *
+ * @author Dennis Koole
  * @author Joris Vergeer & Gerben Boot
  *
  * @section LICENSE
@@ -77,8 +78,36 @@ EquipletNode::~EquipletNode() {
  *
  * @param json The message parsed in the json format
  **/
-void EquipletNode::blackboardReadCallback(std::string json) {
-	std::cout << "processMessage" << std::endl;
+void EquipletNode::blackboardReadCallback(std::string json){
+        //lets parse a root node from the bb msg.
+    //We might want to check the type of msg first.
+    JSONNode n = libjson::parse(json);
+    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
+    
+    std::cout << "Step completed." << std::endl;
+    
+    std::cout << "id " << step->getId() << std::endl;
+    std::cout << "moduleId " << step->getModuleId() << std::endl;
+    std::cout << "nextStep " << step->getNextStep() << std::endl;
+    std::cout << "serviceStep Id " << step->getServiceStepID() << std::endl;
+    std::cout << "status " << step->getStatus() << std::endl;
+    
+    std::cout << "InstructData: command " << step->getInstructionData().getCommand() << std::endl;    
+    std::cout << "InstructData: dest " << step->getInstructionData().getDestination() << std::endl;
+    std::cout << "InstructData: lookup " << step->getInstructionData().getLook_up() << std::endl;
+    
+    std::cout << "InstructData: LookupParams " << step->getInstructionData().getDestination() << std::endl;
+    for( map<string, string>::iterator ii=step->getInstructionData().getLook_up_parameters().begin(); ii!=step->getInstructionData().getLook_up_parameters().end(); ++ii)
+    {
+        cout << (*ii).first << ": " << (*ii).second << endl;
+    }
+    
+    std::cout << "InstructData: payload " << step->getInstructionData().getDestination() << std::endl;
+    for( map<string, string>::iterator ii=step->getInstructionData().getPayload().begin(); ii!=step->getInstructionData().getPayload().end(); ++ii)
+    {
+        cout << (*ii).first << ": " << (*ii).second << endl;
+    }
+	/*std::cout << "processMessage" << std::endl;
 	JSONNode n = libjson::parse(json);
 	JSONNode message = n["message"];
 	//JSONNode::const_iterator messageIt;
@@ -96,7 +125,7 @@ void EquipletNode::blackboardReadCallback(std::string json) {
 	ss << destination;
 	ss << "/";
 	ss << command;
-	blackboardClient->removeOldestMessage();
+	blackboardClient->removeOldestMessage();*/
 }
 
 std::string EquipletNode::getName() {
@@ -114,17 +143,15 @@ ros::NodeHandle& EquipletNode::getNodeHandle() {
  * @param lookupID the ID of the lookup
  * @param payload the payload, contains data that will get combined with environmentcache data
  **/
-void EquipletNode::callLookupHandler(std::string lookupType,
-		std::string lookupID, environment_communication_msgs::Map payload) {
-	lookup_handler::LookupServer msg;
+void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupID, environment_communication_msgs::Map payload){
+ 	lookup_handler::LookupServer msg;
 	msg.request.lookupMsg.lookupType = lookupType;
 	msg.request.lookupMsg.lookupID = lookupID;
 	msg.request.lookupMsg.payLoad = payload;
 
 	ros::NodeHandle nodeHandle;
-	ros::ServiceClient lookupClient = nodeHandle.serviceClient<
-			lookup_handler::LookupServer>("LookupHandler/lookup");
-	if (lookupClient.call(msg)) {
+	ros::ServiceClient lookupClient = nodeHandle.serviceClient<lookup_handler::LookupServer>("LookupHandler/lookup");
+	if(lookupClient.call(msg)){
 		// TODO
 		// Read message
 	} else {

@@ -3,6 +3,7 @@
  * @brief Symbolizes an entire EquipletNode.
  * @date Created: 2012-10-12
  *
+ * @author Dennis Koole
  * @author Gerben Boot & Joris Vergeer
  *
  * @section LICENSE
@@ -27,6 +28,7 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
+
 #pragma once
 
 #include "ros/ros.h"
@@ -37,6 +39,7 @@
 
 #include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
 #include <rexos_blackboard_cpp_client/BlackboardSubscriber.h>
+#include <rexos_datatypes/EquipletStep.h>
 #include <rexos_utilities/Utilities.h>
 
 #include <rexos_statemachine/StateMachine.h>
@@ -99,5 +102,3 @@ private:
 	void transitionStop();
 	bool changeModuleState(int moduleID,rexos_statemachine::State state);
 };
-
-}
