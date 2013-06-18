@@ -3,7 +3,7 @@
  * @brief Symbolizes an entire EquipletNode.
  * @date Created: 2012-10-12
  *
- * @author Dennis Koole
+ * @author Joris Vergeer & Gerben Boot
  *
  * @section LICENSE
  * License: newBSD
@@ -28,53 +28,46 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <unistd.h>
-#include "equiplet_node/EquipletNode.h"
-#include "rexos_blackboard_cpp_client/BlackboardCppClient.h"
-#include "rexos_blackboard_cpp_client/BasicOperationSubscription.h"
-#include "rexos_blackboard_cpp_client/OplogEntry.h"
-#include "rexos_utilities/Utilities.h"
+#include <equiplet_node/EquipletNode.h>
+#include <rexos_statemachine/ChangeStateAction.h>
+#include <rexos_statemachine/ChangeModeAction.h>
+
+using namespace equiplet_node;
 
 /**
  * Create a new EquipletNode
  * @param id The unique identifier of the Equiplet
  **/
-EquipletNode::EquipletNode(int id): 
-	equipletId(id),
-	operationState(),
-	safetyState(), 
-	moduleTable(),
-	moduleErrorService(),
-	stateUpdateService(),
-	modulePackageNodeMap(),
-	blackboardClient(NULL){
-	// Create the map with moduleType mapped to package name and node name
-	modulePackageNodeMap = std::map< int, std::pair<std::string, std::string> >();
-	modulePackageNodeMap[1] = std::pair< std::string, std::string > ("deltaRobotNode", "DeltaRobotNode");
-	modulePackageNodeMap[2] = std::pair< std::string, std::string > ("gripperTestNode", "GripperTestNode");
-	
-	blackboardClient = new Blackboard::BlackboardCppClient("145.89.191.131", "test", "equipletStepBB");
-	Blackboard::BasicOperationSubscription * sub = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
-	subscriptions.push_back(sub);
-	blackboardClient->subscribe(*sub);
+EquipletNode::EquipletNode(int id, std::string blackboardIp) :
+		StateMachine(nameFromId(id)),
+		moduleRegistry(nameFromId(id), id),
+		equipletId(id),
+		blackboardClient(NULL) {
 
-	ros::NodeHandle nodeHandle;
-	std::stringstream stringStream;
-	stringStream << equipletId;
-	std::string str = stringStream.str();
-	moduleErrorService = nodeHandle.advertiseService("ModuleError_" + str, &EquipletNode::moduleError, this);
-	stateUpdateService = nodeHandle.advertiseService("StateUpdate_" + str, &EquipletNode::stateChanged, this);
-} 
+	if (mostDatabaseclient.getAllModuleData().size() > 0) {
+		ROS_WARN("Previous equiplet instance did not cleanup correctly");
+	}
+	mostDatabaseclient.clearModuleData();
+	mostDatabaseclient.setSafetyState(rexos_statemachine::STATE_SAFE);
+
+//	moduleUpdateServiceServer = nh.advertiseService(
+//			"/most/equiplet/moduleUpdate", &EquipletNode::moduleUpdateService,
+//			this);
+
+	blackboardClient = new BlackboardCppClient(blackboardIp, "REXOS",
+			"blackboard", this);
+	blackboardClient->subscribe("instruction");
+
+	std::cout << "Connected!" << std::endl;
+
+	moduleRegistry.setNewRegistrationsAllowed(true);
+}
 
 /**
  * Destructor for the EquipletNode
  **/
-EquipletNode::~EquipletNode(){
+EquipletNode::~EquipletNode() {
 	delete blackboardClient;
-	for (std::vector<Blackboard::BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
-		delete *iter;
-	}
-	subscriptions.clear();
 }
 
 /**
@@ -84,36 +77,9 @@ EquipletNode::~EquipletNode(){
  *
  * @param json The message parsed in the json format
  **/
-void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) {
-        //lets parse a root node from the bb msg.
-	JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
-	std::cout << n.write() << std::endl;
-    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
-    
-    std::cout << "Step completed." << std::endl;
-    
-    std::cout << "id " << step->getId() << std::endl;
-    std::cout << "moduleId " << step->getModuleId() << std::endl;
-    std::cout << "nextStep " << step->getNextStep() << std::endl;
-    std::cout << "serviceStep Id " << step->getServiceStepID() << std::endl;
-    std::cout << "status " << step->getStatus() << std::endl;
-    
-    std::cout << "InstructData: command " << step->getInstructionData().getCommand() << std::endl;    
-    std::cout << "InstructData: dest " << step->getInstructionData().getDestination() << std::endl;
-    std::cout << "InstructData: lookup " << step->getInstructionData().getLook_up() << std::endl;
-    
-    std::cout << "InstructData: LookupParams " << step->getInstructionData().getDestination() << std::endl;
-    for( map<string, string>::iterator ii=step->getInstructionData().getLook_up_parameters().begin(); ii!=step->getInstructionData().getLook_up_parameters().end(); ++ii)
-    {
-        cout << (*ii).first << ": " << (*ii).second << endl;
-    }
-    
-    std::cout << "InstructData: payload " << step->getInstructionData().getDestination() << std::endl;
-    for( map<string, string>::iterator ii=step->getInstructionData().getPayload().begin(); ii!=step->getInstructionData().getPayload().end(); ++ii)
-    {
-        cout << (*ii).first << ": " << (*ii).second << endl;
-    }
-	/*std::cout << "processMessage" << std::endl;
+void EquipletNode::blackboardReadCallback(std::string json) {
+	std::cout << "processMessage" << std::endl;
+	JSONNode n = libjson::parse(json);
 	JSONNode message = n["message"];
 	//JSONNode::const_iterator messageIt;
 	std::string destination = message["destination"].as_string();
@@ -130,218 +96,15 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	ss << destination;
 	ss << "/";
 	ss << command;
-	std::cout << ss.str() << std::endl; */
+	blackboardClient->removeOldestMessage();
 }
 
-/**
- * Callback function that is called when a message is received on the equiplet_statechanged topic
- * It updates the state of a hardware module.
- * 
- * @param request Contains the data required for a state transition
- * @param response Says if update was succesfull
- **/
-bool EquipletNode::stateChanged(rexos_mast::StateUpdate::Request &request, rexos_mast::StateUpdate::Response &response){
-	ROS_INFO("State changed message received");
-	if(updateModuleState(request.state.moduleID, rexos_mast::StateType(request.state.newState))){
-		response.succeeded = true;
-	} else{
-		response.succeeded = false;
-	}	
-	return true;
+std::string EquipletNode::getName() {
+	return nameFromId(equipletId);
 }
 
-/**
- * Callback for when a error occurs in a module
- *
- * @param request Contains the errorCode and the ID of the module were the error occured
- * @param response Will contain the new state after error occured
- **/
-bool EquipletNode::moduleError(rexos_mast::ErrorInModule::Request &request, rexos_mast::ErrorInModule::Response &response){
-	int moduleID = request.moduleError.moduleID;
-	ROS_INFO("Error message received from module %d", moduleID);
-
-	// TODO: Lookup errorcode in the DB and decide accordingly
-
-	// Lookup current state of the module
-	rexos_mast::StateType currentModuleState = getModuleState(moduleID);
-
-	// This will be changed to a proper way to decide what state should be entered on error
-	response.state.moduleID = moduleID;
-	response.state.newState = rexos_mast::StateType(currentModuleState - 3);
-	return true;
-}
-
-/**
- * Send a StateChange request to a specific module
- * 
- * @param moduleID the unique identifier for the module which state needs to change
- * @param newState the new state for the module
- **/
-void EquipletNode::sendStateChangeRequest(int moduleID, rexos_mast::StateType newState){
-	rexos_mast::StateChange msg;
-	msg.request.desiredState = newState;
-
-	ros::NodeHandle nodeHandle;
-	std::stringstream stringStream;
-	stringStream << equipletId + "_" << moduleID;
-	std::string str = stringStream.str();
-	ros::ServiceClient stateChangeRequestClient = nodeHandle.serviceClient<rexos_mast::StateChange>("RequestStateChange_" + str);
-
-	stateChangeRequestClient.call(msg);
-}
-
-/**
- * Update the safetyState of the Equiplet
- **/
-void EquipletNode::updateSafetyState(){
-	std::vector<HardwareModuleProperties>::iterator it;
-	rexos_mast::StateType newSafetyState = rexos_mast::safe;
-	for(it = moduleTable.begin(); it < moduleTable.end(); it++){
-		if((*it).actor && (*it).currentState > newSafetyState){
-			newSafetyState = (*it).currentState;
-		}
-	}
-	safetyState = newSafetyState;
-}
-
-/**
- * Update the operation state of the Equiplet
- **/
-void EquipletNode::updateOperationState(){
-	std::vector<HardwareModuleProperties>::iterator it;
-	bool operationStateSet = false;
-	// first set the operation state to the highest state possible 
-	rexos_mast::StateType newOperationState = rexos_mast::normal;
-
-	for(it = moduleTable.begin(); it < moduleTable.end(); it++){
-		// Set the new operation state if the hardware module is an actor, required for
-		// the current service and if its state is lower than the new operation state as
-		// Initialized above.
-		if((*it).actor && (*it).needed){
-			newOperationState = std::min((*it).currentState, newOperationState);
-			operationStateSet = true;
-		}
-	}
-	// If the operation state is not set, it means that there are no actor modules suited
-	// for the current service and so the operation state is equal to the lowest state possible
-	// the safe state.
-	if(!operationStateSet){
-		newOperationState = rexos_mast::safe;
-	}
-	operationState = newOperationState;
-}
-
-/**
- * Add a hardware module to the module table
- * 
- * @param module The hardware to add to the table
- *
- * @return true if the module has a unique id, otherwise false
- **/
-bool EquipletNode::addHardwareModule(HardwareModuleProperties module){
-	// First check if the module already exists
-	std::vector<HardwareModuleProperties>::iterator it;
-	for(it = moduleTable.begin(); it < moduleTable.end(); it++){
-		if(module.id == (*it).id){
-			return false;
-		}
-	}
-
-	// Create the string that is used to start another ROS node
-	std::pair< std::string, std::string > packageNodeName = modulePackageNodeMap[module.type];
-	std::stringstream ss(std::stringstream::in | std::stringstream::out);
-	ss << "rosrun " << packageNodeName.first << " " << packageNodeName.second << " " << equipletId << " " << module.id;
-	std::cout << ss.str() << std::endl;
-	int pid = -1;
-	switch(pid = fork()){
-		case 0:
-			fclose(stderr);
-			fclose(stdout);
-			fclose(stdin);
-			execl("/bin/sh", "/bin/sh", "-c", ss.str().c_str(), NULL);
-		case -1: 
-			std::cerr << "Cannot start node for hardware module " << module.id << std::endl;
-			return false;
-		default:
-			break;
-	}
-
-	
-	// Add the module to the table and update the safety state and operation state
-	moduleTable.push_back(module);
-	updateSafetyState();
-	updateOperationState(); 
-	
-	return true;
-}
-
-/**
- * Remove a hardware module from the module table
- *
- * @param id The identifier that is used to identify the hardware module that needs to be removed
- *
- * @return true if the hardware module is removed, false if the module could not be found in the table
- **/
-bool EquipletNode::removeHardwareModule(int id){
-	std::vector<HardwareModuleProperties>::iterator it;
-	for(it = moduleTable.begin(); it < moduleTable.end(); it++){
-		if((*it).id == id){
-			moduleTable.erase(it);
-			updateSafetyState();
-			updateOperationState();
-			return true;
-		}
-	}
-	return false;
-}
-
-/**
- * Print all hardware modules in the table
- **/
-void EquipletNode::printHardwareModules(){
-	std::vector<HardwareModuleProperties>::iterator it;
-	for(it = moduleTable.begin(); it < moduleTable.end(); it++){
-		std::cout << *it << std::endl;
-	}
-}
-
-/**
- * Get the state of the module corresponding to the moduleID
- *
- * @param moduleID the unique identifier for a module
- *
- * @return the State of the module
- **/
-rexos_mast::StateType EquipletNode::getModuleState(int moduleID){
-	std::vector<HardwareModuleProperties>::iterator it;
-	for(it = moduleTable.begin(); it < moduleTable.end(); it++){
-		if((*it).id == moduleID){
-			return (*it).currentState;
-		}
-	}
-	return rexos_mast::nostate;
-}
-
-/**
- * Update the state of a module in the module table. Also automatically updates the operationState and
- * safe state of the Equiplet
- *
- * @param moduleID the id of the module
- * @param state the new state of the module 
- * 
- * @return true if the module is found and the state is updated, false if the module is not found in module table
- **/
-bool EquipletNode::updateModuleState(int moduleID, rexos_mast::StateType state){
-	std::vector<HardwareModuleProperties>::iterator it;
-	for(it = moduleTable.begin(); it < moduleTable.end(); it++){
-		if((*it).id == moduleID){
-			(*it).currentState = state;
-			updateSafetyState();
-			updateOperationState();
-			return true;
-		}
-	}
-	return false;
+ros::NodeHandle& EquipletNode::getNodeHandle() {
+	return nh;
 }
 
 /**
@@ -351,56 +114,102 @@ bool EquipletNode::updateModuleState(int moduleID, rexos_mast::StateType state){
  * @param lookupID the ID of the lookup
  * @param payload the payload, contains data that will get combined with environmentcache data
  **/
-void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupID, environment_communication_msgs::Map payload){
- 	lookup_handler::LookupServer msg;
+void EquipletNode::callLookupHandler(std::string lookupType,
+		std::string lookupID, environment_communication_msgs::Map payload) {
+	lookup_handler::LookupServer msg;
 	msg.request.lookupMsg.lookupType = lookupType;
 	msg.request.lookupMsg.lookupID = lookupID;
 	msg.request.lookupMsg.payLoad = payload;
 
 	ros::NodeHandle nodeHandle;
-	ros::ServiceClient lookupClient = nodeHandle.serviceClient<lookup_handler::LookupServer>("LookupHandler/lookup");
-	if(lookupClient.call(msg)){
+	ros::ServiceClient lookupClient = nodeHandle.serviceClient<
+			lookup_handler::LookupServer>("LookupHandler/lookup");
+	if (lookupClient.call(msg)) {
 		// TODO
 		// Read message
-	} else{
+	} else {
 		ROS_ERROR("Error in calling lookupHandler/lookup service");
 	}
 }
 
-/** 
- * Main that creates the equipletNode and adds hardware modules
- **/
-int main(int argc, char **argv){
-
-	// Check if an equiplet id is given at the command line
-	int equipletId = 1;
-	if(argc != 2 || rexos_utilities::stringToInt(equipletId, argv[1]) != 0){
-		std::cerr << "Cannot read equiplet id from commandline. Assuming equiplet id is 1" <<std::endl;
-	}
-
-	// Set the id of the Equiplet
-	std::ostringstream ss;
-	ss << "Equiplet" << equipletId;
-	const char* equipletName = ss.str().c_str();
-
-	ros::init(argc, argv, equipletName);
-	EquipletNode equipletNode(equipletId);
-
-	// Add some hardware modules to this equiplet
-	// This should change to modules being created in the Node itself after commands on blackboard
-	HardwareModuleProperties deltaRobot(1, 1, rexos_mast::safe, true, true);
-	HardwareModuleProperties gripper(2, 2, rexos_mast::safe, true, true);
-	equipletNode.addHardwareModule(deltaRobot);
-	equipletNode.addHardwareModule(gripper);
-
-	// print the hardware modules that are currently added to the Equiplet
-	equipletNode.printHardwareModules();
-
-	ros::Rate poll_rate(10);
-	while(ros::ok()){
-		poll_rate.sleep();
-		ros::spinOnce();
-	}
-
-	return 0;
+bool EquipletNode::changeModuleState(int moduleID,rexos_statemachine::State state){
+//	rexos_most::ChangeStateGoal_ goal;
+//	goal.desiredState state;
+//	changeStateClient.sendGoal(goal,);
+//
+//	rexos_most::ChangeState::Request req;
+//	rexos_most::ChangeState::Response res;
+//	req.desiredState = rexos_most::STATE_SAFE;
+//	std::stringstream ss;
+//	ss << "/most/" << moduleID << "/changeState";
+//	if(!(nh.serviceClient<rexos_most::ChangeState>(
+//		ss.str()).call(req, res)) ||
+//		!res.executed)
+//	{
+//		return false;
+//	}
+	return true;
 }
+
+void EquipletNode::transitionSetup() {
+	moduleRegistry.setNewRegistrationsAllowed(false);
+
+	std::vector<ModuleProxy*> modules = moduleRegistry.getRigisteredModules();
+	for (int i = 0; i < modules.size(); i++) {
+		modules[i]->changeState(rexos_statemachine::STATE_STANDBY);
+	}
+}
+
+void EquipletNode::transitionShutdown() {
+	moduleRegistry.setNewRegistrationsAllowed(true);
+
+	std::vector<ModuleProxy*> modules = moduleRegistry.getRigisteredModules();
+	for (int i = 0; i < modules.size(); i++) {
+		modules[i]->changeState(rexos_statemachine::STATE_SAFE);
+	}
+}
+
+void EquipletNode::transitionStart() {
+}
+
+void EquipletNode::transitionStop() {
+}
+
+//bool EquipletNode::moduleUpdateService(rexos_most::ModuleUpdate::Request& req,
+//		rexos_most::ModuleUpdate::Response& res) {
+//	ROS_INFO("Received module update (id=%d, state=%s, modi=%s)", req.info.id,
+//			rexos_statemachine::MOSTState_txt[req.info.state],rexos_statemachine::MOSTModi_txt[req.info.modi]);
+//	MOSTDatabaseClient::ModuleData data;
+//	data.id = req.info.id;
+//	data.state = req.info.state;
+//	data.modi = req.info.modi;
+//	mostDatabaseclient.setModuleData(data);
+//
+//	rexos_statemachine::State safetyState = rexos_statemachine::STATE_SAFE;
+//	auto moduleDatas = mostDatabaseclient.getAllModuleData();
+//	for (auto it = moduleDatas.begin(); it != moduleDatas.end(); it++) {
+//		rexos_statemachine::State modState = (rexos_statemachine::State) it->state;
+//		rexos_statemachine::State roundedState;
+//		switch (modState) {
+//		case rexos_statemachine::STATE_SAFE:
+//			roundedState = rexos_statemachine::STATE_SAFE;
+//			break;
+//		case rexos_statemachine::STATE_SETUP:
+//		case rexos_statemachine::STATE_SHUTDOWN:
+//		case rexos_statemachine::STATE_STANDBY:
+//			roundedState = rexos_statemachine::STATE_STANDBY;
+//			break;
+//		case rexos_statemachine::STATE_START:
+//		case rexos_statemachine::STATE_STOP:
+//		case rexos_statemachine::STATE_NORMAL:
+//			roundedState = rexos_statemachine::STATE_NORMAL;
+//		}
+//
+//		if(roundedState > safetyState){
+//			safetyState = roundedState;
+//		}
+//
+//		mostDatabaseclient.setSafetyState(safetyState);
+//	}
+//	return true;
+//}
