@@ -60,7 +60,7 @@ typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeModeAction> Chan
 /**
  * The equipletNode, will manage all modules and keep track of their states
  **/
-class EquipletNode: public BlackboardSubscriber, rexos_statemachine::StateMachine {
+class EquipletNode: public Blackboard::BlackboardSubscriber, rexos_statemachine::StateMachine {
 public:
 	static std::string nameFromId(int id){
 		return std::string("equiplet_") + std::to_string(id);
@@ -86,7 +86,7 @@ private:
 	 * @var BlackboardCppClient  *blackboardClient
 	 * Client to read from blackboard
 	 **/
-	BlackboardCppClient *blackboardClient;
+	Blackboard::BlackboardCppClient *blackboardClient;
 
 	MOSTDatabaseClient mostDatabaseclient;
 
@@ -102,3 +102,5 @@ private:
 	void transitionStop();
 	bool changeModuleState(int moduleID,rexos_statemachine::State state);
 };
+
+}

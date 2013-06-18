@@ -55,9 +55,10 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 //			"/most/equiplet/moduleUpdate", &EquipletNode::moduleUpdateService,
 //			this);
 
-	blackboardClient = new BlackboardCppClient(blackboardIp, "REXOS",
-			"blackboard", this);
-	blackboardClient->subscribe("instruction");
+	blackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "test", "equipletStepBB");
+	Blackboard::BasicOperationSubscription * sub = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
+	subscriptions.push_back(sub);
+	blackboardClient->subscribe(*sub);
 
 	std::cout << "Connected!" << std::endl;
 

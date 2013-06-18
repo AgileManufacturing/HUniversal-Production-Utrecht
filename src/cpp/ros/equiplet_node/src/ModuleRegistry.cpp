@@ -5,7 +5,7 @@
  *      Author: joris
  */
 
-#include "equiplet_node/ModuleRegistry.h"
+#include <equiplet_node/ModuleRegistry.h>
 
 #include <equiplet_node/EquipletNode.h>
 
