@@ -51,6 +51,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import rexos.mas.data.Position;
+
 import com.mongodb.BasicDBObject;
 
 /**
@@ -59,10 +61,16 @@ import com.mongodb.BasicDBObject;
 public class PenModule extends Module {
 	/**
 	 * @var int PEN_OFFSET
-	 * A static value that contains the size of the gripper.
+	 * A static value that contains the offset of the pen in relation to the movement module.
 	 */
 	private static final int PEN_OFFSET = 4;
 
+	/**
+	 * @var double PEN_SIZE
+	 * A static value that contains the size of the pen in centimeters.
+	 */
+	private static final double PEN_SIZE = 0.2;
+	
 	/**
 	 * @var Module movementModule
 	 * The module that moves this module.
@@ -91,24 +99,32 @@ public class PenModule extends Module {
 		case 1: //case for the equiplet function draw line.
 			steps = new ArrayList<EquipletStep>();
 
-			//get the parameters and put extra values in it.
-			BasicDBObject moveParameters = (BasicDBObject) parameters.copy();
-			moveParameters.put("extraSize", PEN_OFFSET);
-
-			//get steps from the movementModule to move to the safe movement plane.
-			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));
-			//get steps from the movementModule to move on the x and y axis.
-			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(2, moveParameters)));
-			//get steps from the movementModule to move on the z axis.
-			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, moveParameters)));
-			//get steps from the movementModule to move on the x and y axis.
-			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(2, moveParameters)));
-			//get steps from the movementModule to move to the safe movement plane.
-			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));
-
+			if(parameters.containsField("startPosition") && parameters.containsField("endPosition")){
+				Position startPosition = new Position((BasicDBObject)parameters.get("startPosition"));
+				Position endPosition = new Position((BasicDBObject)parameters.get("endPosition"));
+				double xDifference = endPosition.getX() - startPosition.getX();
+				double yDifference = endPosition.getY() - startPosition.getY();
+				double lineLength = Math.sqrt(Math.pow(xDifference, 2) + Math.pow(yDifference, 2));
+				
+				int numberOfSteps = (int) (lineLength / PEN_SIZE);
+				double xStep = xDifference/numberOfSteps;
+				double yStep = yDifference/numberOfSteps;
+				
+				Position stepPosition = new Position();
+				stepPosition.setX(startPosition.getX() - xStep);
+				stepPosition.setY(startPosition.getY() - yStep);
+				for(int i = 0; i < numberOfSteps; i++){
+					stepPosition.setX(stepPosition.getX() + xStep);
+					stepPosition.setY(stepPosition.getY() + yStep);
+					steps.addAll(Arrays.asList(getStepsForDot(stepPosition.toBasicDBObject())));
+				}
+			}
+			
 			//convert the ArrayList to an array and return it.
 			equipletSteps = new EquipletStep[steps.size()];
 			return steps.toArray(equipletSteps);
+		case 2: //case for the equiplet function put dot.
+			return getStepsForDot(parameters);
 		default:
 			break;
 		}
@@ -169,5 +185,38 @@ public class PenModule extends Module {
 			}
 		}
 		return -1;
+	}
+
+	/**
+	 * Function for getting the steps for placing a dot.
+	 * @param parameters The parameters used for placing the dot.
+	 * @return An array of the generated equipletSteps
+	 */
+	private EquipletStep[] getStepsForDot(BasicDBObject parameters){
+		ArrayList<EquipletStep> steps = new ArrayList<EquipletStep>();
+		
+		//get the position of the dot.
+		Position position = new Position((BasicDBObject)parameters.get("position"));
+		position.setZ(0);
+		
+		//create the new parameters
+		BasicDBObject dotParameters = new BasicDBObject("position", position.toBasicDBObject());
+		dotParameters.put("extraSize", PEN_OFFSET);
+		
+		//get steps from the movementModule to move to the safe movement plane.
+		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, dotParameters)));
+		
+		//get steps from the movementModule to move on the x and y axis.
+		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(2, dotParameters)));
+		
+		//get steps from the movementModule to move on the z axis.
+		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, dotParameters)));
+		
+		//get steps from the movementModule to move to the safe movement plane.
+		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, dotParameters)));
+		
+		//convert the ArrayList to an array and return it.
+		EquipletStep[] equipletSteps = new EquipletStep[steps.size()];
+		return steps.toArray(equipletSteps);
 	}
 }
