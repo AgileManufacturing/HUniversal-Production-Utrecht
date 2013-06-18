@@ -73,7 +73,7 @@ public:
 	 * should no longer be used. Changes to the watched operations will not be reflected
 	 * until the subscriptions is removed and re-added to the client.
 	 *
-	 * @var operation The MongoUpdateLogOperation that should be watched.
+	 * @param operation The MongoUpdateLogOperation that should be watched.
 	 */
 	void addOperation(MongoUpdateLogOperation operation);
 
@@ -84,7 +84,7 @@ public:
 	 * should no longer be used. Changes to the watched operations will not be reflected
 	 * until the subscriptions is removed and re-added to the client.
 	 *
-	 * @var operation The MongoUpdateLogOperation that should be watched.
+	 * @param operation The MongoUpdateLogOperation that should be watched.
 	 */
 	void removeOperation(MongoUpdateLogOperation operation);
 

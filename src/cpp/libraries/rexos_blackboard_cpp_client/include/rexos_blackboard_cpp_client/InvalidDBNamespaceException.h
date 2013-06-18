@@ -43,7 +43,7 @@ public:
 	/**
 	 * Constructs the exception with the specified reason message.
 	 *
-	 * @var reason String providing more information about the cause of the exception.
+	 * @param reason String providing more information about the cause of the exception.
 	 */
 	InvalidDBNamespaceException(std::string reason) : reason(reason) {};
 

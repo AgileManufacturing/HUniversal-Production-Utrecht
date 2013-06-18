@@ -57,7 +57,7 @@ public:
 	 * Constructs a new client with the specified settings.
 	 *
 	 * @param hostname The server's hostname.
-	 * @param portn The port that should be used.
+	 * @param port The port that should be used.
 	 * @param db Name of the database that should be used.
 	 * @param coll Name of the collection that should be used.
 	 */
@@ -130,7 +130,7 @@ public:
 	 * Queries the database for all documents matching the given query.
 	 *
 	 * @param queryAsJSON The query that is used to determine which objects will be returned.
-	 * @param result Reference to a std::vector<mongo::BSONObj> that will be used to store the results.
+	 * @param results Reference to a std::vector<mongo::BSONObj> that will be used to store the results.
 	 *
 	 * @return The amount of documents that have been found.
 	 */
