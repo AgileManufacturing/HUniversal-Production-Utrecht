@@ -87,7 +87,7 @@ public class CheckForModules extends ReceiveBehaviour {
 	private ArrayList<Integer> getAvailableModuleGroups() {
 		ArrayList<Integer> availableModules = new ArrayList<Integer>();
 		try {
-
+			//get the availablemoduleGroups
 			KnowledgeDBClient client = KnowledgeDBClient.getClient();
 			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, hardwareAgent.getEquipletAgentAID().getLocalName());
 			for (Row row : rows) {
@@ -113,6 +113,8 @@ public class CheckForModules extends ReceiveBehaviour {
 		boolean modulesPresent = true;
 
 		try {
+			
+			//check is modules are present
 			int[] moduleGroupIds = (int[]) message.getContentObject();
 			ArrayList<Integer> availableModuleGroups = getAvailableModuleGroups();
 
@@ -125,6 +127,9 @@ public class CheckForModules extends ReceiveBehaviour {
 		} catch (UnreadableException ex) {
 			modulesPresent = false;
 		} finally {
+			
+			//send reply, confirm if modules are present disconfirm if not
+			
 			ACLMessage reply;
 			reply = message.createReply();
 			reply.setOntology("CheckForModulesResponse");

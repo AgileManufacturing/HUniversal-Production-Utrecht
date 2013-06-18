@@ -214,16 +214,19 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			doDelete();
 		}
 
-		// Start the behaviours
+		// Start the evaluateDurationBehaviour
 		EvaluateDuration evaluateDurationBehaviour = new EvaluateDuration(this, moduleFactory);
 		addBehaviour(evaluateDurationBehaviour);
 
+		// Start the fillPlaceholdersBehaviour
 		FillPlaceholders fillPlaceholdersBehaviour = new FillPlaceholders(this, moduleFactory);
 		addBehaviour(fillPlaceholdersBehaviour);
 
+		// Start the checkForModules
 		CheckForModules checkForModules = new CheckForModules(this);
 		addBehaviour(checkForModules);
 
+		// Start the serviceAgentDied
 		ServiceAgentDied serviceAgentDied = new ServiceAgentDied(this);
 		addBehaviour(serviceAgentDied);
 
