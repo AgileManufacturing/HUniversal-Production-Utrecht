@@ -75,7 +75,8 @@ public:
 
 private:
 	void callLookupHandler(std::string lookupType, std::string lookupID, environment_communication_msgs::Map payload);
-	//bool moduleUpdateService(rexos_most::ModuleUpdate::Request& req, rexos_most::ModuleUpdate::Response& res);
+	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
+private:
 	/**
 	 * @var int equipletId
 	 * The id of the equiplet
@@ -102,5 +103,3 @@ private:
 	void transitionStop();
 	bool changeModuleState(int moduleID,rexos_statemachine::State state);
 };
-
-}

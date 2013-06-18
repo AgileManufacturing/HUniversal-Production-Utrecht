@@ -4,7 +4,6 @@
  * @date Created: 2012-10-12
  *
  * @author Dennis Koole
- * @author Joris Vergeer & Gerben Boot
  *
  * @section LICENSE
  * License: newBSD
@@ -29,7 +28,12 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <equiplet_node/EquipletNode.h>
+#include <unistd.h>
+#include "equiplet_node/EquipletNode.h"
+#include "rexos_blackboard_cpp_client/BlackboardCppClient.h"
+#include "rexos_blackboard_cpp_client/BasicOperationSubscription.h"
+#include "rexos_blackboard_cpp_client/OplogEntry.h"
+#include "rexos_utilities/Utilities.h"
 #include <rexos_statemachine/ChangeStateAction.h>
 #include <rexos_statemachine/ChangeModeAction.h>
 
@@ -68,8 +72,12 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 /**
  * Destructor for the EquipletNode
  **/
-EquipletNode::~EquipletNode() {
+EquipletNode::~EquipletNode(){
 	delete blackboardClient;
+	for (std::vector<Blackboard::BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
+		delete *iter;
+	}
+	subscriptions.clear();
 }
 
 /**
