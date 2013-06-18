@@ -1,2 +1,0 @@
-int32 moduleID
-int32 errorCode

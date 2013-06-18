@@ -39,7 +39,7 @@
 #include <rexos_motor/StepperMotor.h>
 #include <delta_robot_node/Services.h>
 #include <delta_robot_node/Point.h>
-#include <rexos_mast/StateMachine.h>
+#include <rexos_statemachine/StateMachine.h>
 #include "delta_robot_node/MoveToPoint.h"
 #include "delta_robot_node/MovePath.h"
 #include "delta_robot_node/MoveToRelativePoint.h"
@@ -57,15 +57,15 @@ namespace deltaRobotNodeNamespace{
 	/**
 	 * the DeltaRobotNode which is a StateMachine
 	 **/
-	class DeltaRobotNode : public rexos_mast::StateMachine{
+	class DeltaRobotNode : public rexos_statemachine::StateMachine{
 	public:
-		DeltaRobotNode(int equipletID, int moduleID);
+		DeltaRobotNode(int moduleID);
 		virtual ~DeltaRobotNode();
 		
-		int transitionSetup();
-		int transitionShutdown();
-		int transitionStart();
-		int transitionStop();
+		virtual void transitionSetup();
+		virtual void transitionShutdown();
+		virtual void transitionStart();
+		virtual void transitionStop();
 			
 		// Main functions to be called from the services
 		bool calibrate();
@@ -90,6 +90,12 @@ namespace deltaRobotNodeNamespace{
 		Point *parsePointArray(std::string json, int & size);
 
 	private:
+		/**
+		 * @var ros::NodeHandle node
+		 * The nodeHandle used by ros services and topics
+		 **/
+		ros::NodeHandle nodeHandle;
+
 		/**
 		 * @var DeltaRobot::DeltaRobot * deltaRobot
 		 * the deltaRobot
@@ -162,6 +168,9 @@ namespace deltaRobotNodeNamespace{
 		 * Service for receiving calibrate commands
 		 **/
 		ros::ServiceServer calibrateService_json;
+
+		void startServices();
+		void stopServices();
 	};
 }
 #endif
