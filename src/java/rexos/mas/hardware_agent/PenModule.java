@@ -99,24 +99,33 @@ public class PenModule extends Module {
 		case 1: //case for the equiplet function draw line.
 			steps = new ArrayList<EquipletStep>();
 
+			//only get steps when start and end position are available.
 			if(parameters.containsField("startPosition") && parameters.containsField("endPosition")){
+				//get start position
 				Position startPosition = new Position((BasicDBObject)parameters.get("startPosition"));
+				//get end postion
 				Position endPosition = new Position((BasicDBObject)parameters.get("endPosition"));
-				double xDifference = endPosition.getX() - startPosition.getX();
-				double yDifference = endPosition.getY() - startPosition.getY();
-				double lineLength = Math.sqrt(Math.pow(xDifference, 2) + Math.pow(yDifference, 2));
+				//get the delta of the x and the y
+				double deltaX = endPosition.getX() - startPosition.getX();
+				double deltaY = endPosition.getY() - startPosition.getY();
+				//get the length of the line.
+				double lineLength = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
 				
+				//get the number of steps to perform and the x and y delta for each step.
 				int numberOfSteps = (int) (lineLength / PEN_SIZE);
-				double xStep = xDifference/numberOfSteps;
-				double yStep = yDifference/numberOfSteps;
+				double deltaXPerStep = deltaX/numberOfSteps;
+				double deltaYPerStep = deltaY/numberOfSteps;
 				
+				//create the new position for the steps.
 				Position stepPosition = new Position();
-				stepPosition.setX(startPosition.getX() - xStep);
-				stepPosition.setY(startPosition.getY() - yStep);
+				stepPosition.setX(startPosition.getX() - deltaXPerStep);
+				stepPosition.setY(startPosition.getY() - deltaYPerStep);
+				
+				//loop over all the steps and create them.
 				for(int i = 0; i < numberOfSteps; i++){
-					stepPosition.setX(stepPosition.getX() + xStep);
-					stepPosition.setY(stepPosition.getY() + yStep);
-					steps.addAll(Arrays.asList(getStepsForDot(stepPosition.toBasicDBObject())));
+					stepPosition.setX(stepPosition.getX() + deltaXPerStep);
+					stepPosition.setY(stepPosition.getY() + deltaYPerStep);
+					steps.addAll(Arrays.asList(getStepsForDot(new BasicDBObject("position", stepPosition.toBasicDBObject()))));
 				}
 			}
 			

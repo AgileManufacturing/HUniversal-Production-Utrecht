@@ -57,7 +57,7 @@ import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
 /**
- * The Class ScheduleStep.
+ * Handles messages for scheduling a step.
  */
 public class ScheduleStep extends ReceiveBehaviour {
 	/**
@@ -89,7 +89,9 @@ public class ScheduleStep extends ReceiveBehaviour {
 	 * Instantiates a new schedule step.
 	 * 
 	 * @param a
-	 *            The agent for this behaviour
+	 *      The agent for this behaviour
+	 * @param productBBClient
+	 * 		The blackboardClient for the productSteps.
 	 */
 	public ScheduleStep(Agent a, BlackboardClient productBBClient) {
 		super(a, messageTemplate);
