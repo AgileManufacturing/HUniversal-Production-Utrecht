@@ -4,6 +4,7 @@
  * @date Created: 2012-10-12
  *
  * @author Dennis Koole
+ * @author Alexander Streng
  *
  * @section LICENSE
  * License: newBSD
@@ -28,7 +29,12 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <equiplet_node/EquipletNode.h>
+#include <unistd.h>
+#include "equiplet_node/EquipletNode.h"
+#include "rexos_blackboard_cpp_client/BlackboardCppClient.h"
+#include "rexos_blackboard_cpp_client/BasicOperationSubscription.h"
+#include "rexos_blackboard_cpp_client/OplogEntry.h"
+#include "rexos_utilities/Utilities.h"
 
 /**
  * Create a new EquipletNode
@@ -46,17 +52,13 @@ EquipletNode::EquipletNode(int id):
 	// Create the map with moduleType mapped to package name and node name
 	modulePackageNodeMap = std::map< int, std::pair<std::string, std::string> >();
 	modulePackageNodeMap[1] = std::pair< std::string, std::string > ("deltaRobotNode", "DeltaRobotNode");
-	modulePackageNodeMap[2] = std::pair< std::string, std::string > ("gripperTestNode", "GripperTestNode");
-
-	//blackboardClient = new BlackboardCppClient("localhost", "REXOS", "blackboard", this);
-	//blackboardClient->subscribe("instruction");
-        
-        blackboardClient = new BlackboardCppClient("localhost", "CollectiveDb", "EquipletStepBB", this);
-        //blackboardClient = new BlackboardCppClient("145.89.191.131", 22, "CollectiveDb", "EquipletStepBB", this);
-        blackboardClient->subscribe("equipletSteps");
-
-	std::cout << "Connected!" << std::endl;
+	//modulePackageNodeMap[2] = std::pair< std::string, std::string > ("gripperTestNode", "GripperTestNode");
 	
+	blackboardClient = new Blackboard::BlackboardCppClient("145.89.191.131", "test", "equipletStepBB");
+	Blackboard::BasicOperationSubscription * sub = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
+	subscriptions.push_back(sub);
+	blackboardClient->subscribe(*sub);
+
 	ros::NodeHandle nodeHandle;
 	std::stringstream stringStream;
 	stringStream << equipletId;
@@ -70,6 +72,10 @@ EquipletNode::EquipletNode(int id):
  **/
 EquipletNode::~EquipletNode(){
 	delete blackboardClient;
+	for (std::vector<Blackboard::BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
+		delete *iter;
+	}
+	subscriptions.clear();
 }
 
 /**
@@ -306,7 +312,6 @@ bool EquipletNode::updateModuleState(int moduleID, rexos_mast::StateType state){
  * @param payload the payload, contains data that will get combined with environmentcache data
  **/
 void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupID, std::map<std::string, std::string> payload){
-
     
     lookup_handler::LookupServer msg;
     msg.request.lookupMsg.lookupType = lookupType;
@@ -348,7 +353,7 @@ environment_communication_msgs::Map EquipletNode::createMapMessageFromProperties
  **/
 int main(int argc, char **argv){
 
-	// Check if an equiplet id is given at the command line	 
+	// Check if an equiplet id is given at the command line
 	int equipletId = 1;
 	if(argc != 2 || rexos_utilities::stringToInt(equipletId, argv[1]) != 0){
 		std::cerr << "Cannot read equiplet id from commandline. Assuming equiplet id is 1" <<std::endl;
@@ -358,17 +363,18 @@ int main(int argc, char **argv){
 	std::ostringstream ss;
 	ss << "Equiplet" << equipletId;
 	const char* equipletName = ss.str().c_str();
-	
+
 	ros::init(argc, argv, equipletName);
 	EquipletNode equipletNode(equipletId);
 
 	// Add some hardware modules to this equiplet
+	// for now we only want the deltaRobot.
 	// This should change to modules being created in the Node itself after commands on blackboard
 	HardwareModuleProperties deltaRobot(1, 1, rexos_mast::safe, true, true);
-	HardwareModuleProperties gripper(2, 2, rexos_mast::safe, true, true);
+	//HardwareModuleProperties gripper(2, 2, rexos_mast::safe, true, true);
         
 	equipletNode.addHardwareModule(deltaRobot);
-	equipletNode.addHardwareModule(gripper);
+	//equipletNode.addHardwareModule(gripper);
 
 	// print the hardware modules that are currently added to the Equiplet
 	equipletNode.printHardwareModules();

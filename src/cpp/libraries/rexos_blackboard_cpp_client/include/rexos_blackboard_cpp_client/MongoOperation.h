@@ -1,14 +1,14 @@
 /**
- * @file BlackboardSubscriber.h
- * @brief the cpp client for the blackboard
- * @date Created: 2012-11-19
+ * @file MongoOperation.h
+ * @brief Enum representing the different CRUD operations in MongoDB.
+ * @date Created: 31 mei 2013
  *
- * @author Dennis Koole
+ * @author Jan-Willem Willebrands
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,26 +28,31 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef BLACKBOARD_SUBSCRIBER_H_
-#define BLACKBOARD_SUBSCRIBER_H_
+#ifndef MONGOOPERATION_H_
+#define MONGOOPERATION_H_
 
-#include <string>
-
-namespace Blackboard
-{
-class BlackboardSubscription;
-class OplogEntry;
-
+namespace Blackboard {
 /**
- * This class is an interface that provides a callback 
- * function for the blackboard clients.
- **/
-class BlackboardSubscriber {
-public:
-	virtual void onMessage(BlackboardSubscription & subscription, const OplogEntry & oplogEntry) = 0;
-
-	virtual ~BlackboardSubscriber(){}
+ * Enum representing the different CRUD operations in MongoDB.
+ */
+enum MongoOperation {
+	/**
+	 * Insert operation.
+	 **/
+	INSERT,
+	/**
+	 * Update operation.
+	 **/
+	UPDATE,
+	/**
+	 * Delete operation.
+	 **/
+	REMOVE,
+	/**
+	 * Noop operation.
+	 **/
+	NOOP
 };
-
 }
-#endif
+
+#endif /* MONGOOPERATION_H_ */

@@ -1,14 +1,14 @@
 /**
- * @file BlackboardSubscriber.h
- * @brief the cpp client for the blackboard
- * @date Created: 2012-11-19
+ * @file BasicOperationSubscription.cpp
+ * @brief 
+ * @date Created: 3 jun. 2013
  *
- * @author Dennis Koole
+ * @author Jan-Willem Willebrands
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,26 +28,24 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef BLACKBOARD_SUBSCRIBER_H_
-#define BLACKBOARD_SUBSCRIBER_H_
+#include "rexos_blackboard_cpp_client/BasicOperationSubscription.h"
+#include "rexos_blackboard_cpp_client/OplogEntry.h"
 
-#include <string>
+namespace Blackboard {
 
-namespace Blackboard
+BasicOperationSubscription::BasicOperationSubscription(MongoOperation operation, BlackboardSubscriber & subscriber) :
+		BlackboardSubscription(subscriber),
+		operation(operation)
 {
-class BlackboardSubscription;
-class OplogEntry;
-
-/**
- * This class is an interface that provides a callback 
- * function for the blackboard clients.
- **/
-class BlackboardSubscriber {
-public:
-	virtual void onMessage(BlackboardSubscription & subscription, const OplogEntry & oplogEntry) = 0;
-
-	virtual ~BlackboardSubscriber(){}
-};
-
 }
-#endif
+
+bool BasicOperationSubscription::getQuery(mongo::Query * query_out) const {
+	*query_out = QUERY(OplogEntry::OPERATION_FIELD << OplogEntry::getOperationString(operation));
+	return true;
+}
+
+bool BasicOperationSubscription::matchesWithEntry(const OplogEntry & entry) const {
+	return entry.getOperation() == operation;
+}
+
+} /* namespace Blackboard */

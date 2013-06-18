@@ -4,6 +4,7 @@
  * @date Created: 2012-10-12
  *
  * @author Dennis Koole
+ * @author Jan-Willem Willebrands
  *
  * @section LICENSE
  * License: newBSD
@@ -32,41 +33,34 @@
 #define BLACKBOARD_CPP_CLIENT_H_
 
 #include <string>
-#include <map>
-#include <vector>
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
-#include <rexos_blackboard_cpp_client/BlackboardSubscriber.h>
-#include <algorithm>
-#include <iostream>
+#include "mongo/client/dbclientinterface.h"
 
-#pragma GCC system_header
-#include "mongo/client/dbclient.h"
+namespace Blackboard {
+class OplogMonitor;
+class BlackboardSubscription;
 
 /**
  * This class represents the C++ client for the blackboard system
  **/
 class BlackboardCppClient{
 public:
-	BlackboardCppClient(const std::string &hostname, const std::string db, const std::string coll, BlackboardSubscriber *func);
-	BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll, BlackboardSubscriber *func);
+	BlackboardCppClient(const std::string &hostname, const std::string db, const std::string coll);
+	BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll);
 	virtual ~BlackboardCppClient();
 	void setDatabase(const std::string &db);
 	void setCollection(const std::string &col);
-	void subscribe(const std::string &topic);
-	void setCallback(BlackboardSubscriber *func);
-	void unsubscribe(const std::string &topic);
-	std::string readOldestMessage();
-	void removeOldestMessage();
-	void insertJson(std::string json);
+	void subscribe(BlackboardSubscription &sub);
+	void unsubscribe(BlackboardSubscription &sub);
+	void insertDocument(std::string json);
+	void removeDocuments(std::string queryAsJSON);
+	mongo::BSONObj findDocumentById(mongo::OID objectId);
+	int findDocuments(std::string queryAsJSON, std::vector<mongo::BSONObj> &results);
+	void updateDocuments(std::string queryAsJSON, std::string updateQueryAsJSON);
+
 	
 private:
 	void run();
-	/**
-	 * @var mongo::DBClientConnection connection
-	 * The connection to the mongodb database
-	 **/
-	mongo::DBClientConnection connection;
+	std::string host;
 
 	/**
 	 * @var std::string database
@@ -81,24 +75,11 @@ private:
 	std::string collection;
 
 	/**
-	 * @var std::map<std::string, mongo::BSONObj> subscriptions
-	 * map of the subscriptions top topics. The key is the topic name,
-	 * A bson object is stored as value to get the messages of the subscribed topic
-	 * from the database.
-	 **/
-	std::map<std::string, mongo::BSONObj> subscriptions;
-
-	/**
 	 * @var boost::thread *readMessageThread
 	 * Pointer to the thread that is created when there is one subscription
 	 **/
-	boost::thread *readMessageThread;
-
-	/**
-	 * @var BlackboardSubscriber *callback
-	 * Pointer to the callback function that is called by the thread in the run function
-	 **/
-	BlackboardSubscriber *callback;
+	OplogMonitor *oplogMonitor;
 };
 
+}
 #endif

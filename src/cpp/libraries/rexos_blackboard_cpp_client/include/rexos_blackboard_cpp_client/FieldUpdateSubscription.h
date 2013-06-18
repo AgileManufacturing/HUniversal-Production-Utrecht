@@ -1,14 +1,14 @@
 /**
- * @file BlackboardSubscriber.h
- * @brief the cpp client for the blackboard
- * @date Created: 2012-11-19
+ * @file FieldUpdateSubscription.h
+ * @brief 
+ * @date Created: 3 jun. 2013
  *
- * @author Dennis Koole
+ * @author Jan-Willem Willebrands
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,26 +28,36 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef BLACKBOARD_SUBSCRIBER_H_
-#define BLACKBOARD_SUBSCRIBER_H_
+#ifndef FIELDUPDATESUBSCRIPTION_H_
+#define FIELDUPDATESUBSCRIPTION_H_
 
-#include <string>
+#include "BasicOperationSubscription.h"
+#include <vector>
 
-namespace Blackboard
-{
-class BlackboardSubscription;
-class OplogEntry;
+namespace Blackboard {
 
-/**
- * This class is an interface that provides a callback 
- * function for the blackboard clients.
- **/
-class BlackboardSubscriber {
-public:
-	virtual void onMessage(BlackboardSubscription & subscription, const OplogEntry & oplogEntry) = 0;
-
-	virtual ~BlackboardSubscriber(){}
+enum MongoUpdateLogOperation {
+	SET,
+	UNSET,
+	REPLACE
 };
 
-}
-#endif
+class FieldUpdateSubscription: public Blackboard::BasicOperationSubscription {
+public:
+
+	FieldUpdateSubscription(std::string fieldName, BlackboardSubscriber & subscriber);
+
+	void addOperation(MongoUpdateLogOperation operation);
+	void removeOperation(MongoUpdateLogOperation operation);
+	bool getQuery(mongo::Query * query_out) const;
+	bool matchesWithEntry(const OplogEntry& entry) const;
+
+private:
+	std::string fieldName;
+
+	std::vector<MongoUpdateLogOperation> subscribedOperations;
+	std::string stringForUpdateOperation(MongoUpdateLogOperation operation) const;
+};
+
+} /* namespace Blackboard */
+#endif /* FIELDUPDATESUBSCRIPTION_H_ */
