@@ -1,6 +1,6 @@
 /**
  * @file BlackboardSubscription.cpp
- * @brief 
+ * @brief Abstract base class defining the basic structure a blackboard subscription should adhere to.
  * @date Created: 3 jun. 2013
  *
  * @author Jan-Willem Willebrands

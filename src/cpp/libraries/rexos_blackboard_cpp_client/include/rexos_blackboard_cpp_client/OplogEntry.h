@@ -116,8 +116,18 @@ public:
 	 **/
 	bool getTargetObjectId(mongo::OID & oid) const;
 
+	/**
+	 * Returns the string representation of the specified operation.
+	 *
+	 * @return the string representation of the specified operation.
+	 */
 	static std::string getOperationString(MongoOperation operation);
 
+	/**
+	 * Returns a string representing this object.
+	 *
+	 * @return A string representing this object.
+	 */
 	std::string toString() const;
 
 private:

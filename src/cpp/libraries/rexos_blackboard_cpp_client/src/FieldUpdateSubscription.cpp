@@ -1,6 +1,6 @@
 /**
  * @file FieldUpdateSubscription.cpp
- * @brief 
+ * @brief Subscription to changes to a specified field.
  * @date Created: 3 jun. 2013
  *
  * @author Jan-Willem Willebrands

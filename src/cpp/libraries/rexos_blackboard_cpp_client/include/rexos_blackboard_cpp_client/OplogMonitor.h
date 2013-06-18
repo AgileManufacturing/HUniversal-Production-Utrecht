@@ -1,6 +1,6 @@
 /**
  * @file OplogMonitor.h
- * @brief 
+ * @brief Monitors the oplog and dispatches callbacks for active subscriptions.
  * @date Created: 4 jun. 2013
  *
  * @author Jan-Willem Willebrands
@@ -40,34 +40,125 @@ namespace Blackboard {
 
 class BlackboardSubscription;
 
+/**
+ * Monitors the oplog and dispatches callbacks for active subscriptions.
+ */
 class OplogMonitor {
 public:
+	/**
+	 * Constructs an OplogMonitor for the specified host.
+	 *
+	 * @param host String containg the hostname of the server, e.g. localhost:27017
+	 * @param oplogDBName The database name where the oplog collection resides, typically local.
+	 * @param oplogCollectionName The name of the oplog collection, typically oplog.rs.
+	 */
 	OplogMonitor(
 			std::string host,
 			std::string oplogDBName,
 			std::string oplogCollectionName);
 
+	/**
+	 * Destructs the OplogMonitor and stops the current thread (if any).
+	 */
 	~OplogMonitor();
-	void start();
-	void interrupt();
-	void restart();
+
+	/**
+	 * Adds a subscription to be watched.
+	 *
+	 * @param sub Reference to the subscription that should be watched.
+	 */
 	void addSubscription(BlackboardSubscription& sub);
+
+	/**
+	 * Removes a watched subscription.
+	 *
+	 * @param sub Reference to the subscription that should be removed.
+	 */
 	void removeSubscription(BlackboardSubscription& sub);
+
+	/**
+	 * Sets the namespace of the database and collection that should be watched.
+	 *
+	 * @param database The name of the database.
+	 * @param collection The name of the collection.
+	 */
 	void setNamespace(std::string &database, std::string &collection);
+
+	/**
+	 * Sets the namespace of the database and collection that should be watched.
+	 *
+	 * @param omtNamespace The namespace of the collection, i.e. "database.collection".
+	 */
 	void setNamespace(std::string omtNamespace);
 
 private:
+	/**
+	 * Starts a new thread that will check for updates for all of the registered subscriptions.
+	 */
+	void start();
+
+	/**
+	 * Interrupts the current thread and kills its cursor.
+	 */
+	void interrupt();
+
+	/**
+	 * Interrupts the current thread and starts a new one.
+	 */
+	void restart();
+
+	/**
+	 * This method is used as the thread's main method to monitor the oplog and handle subscriptions.
+	 */
 	void run();
+
+	/**
+	 * Creates the query that should be used to filter interesting events from the oplog based on the current subscriptions.
+	 *
+	 * @return Query representing all current subscriptions.
+	 */
 	mongo::Query createOplogQuery();
-	int getSkipCount(std::string collectionNamespace);
+
+	/**
+	 * @var long long int currentCursorId
+	 * ID of the cursor that is currently being used.
+	 */
 	long long int currentCursorId;
 
+	/**
+	 * @var std::vector<BlackboardSubscription *> subscriptions
+	 * Vector holding all the subscriptions that have been registered.
+	 */
 	std::vector<BlackboardSubscription *> subscriptions;
-	mongo::Query query;
+
+	/**
+	 * @var std::string host
+	 * Hostname of the server.
+	 */
 	std::string host;
+
+	/**
+	 * @var std::string oplogNamespace
+	 * Namespace of the oplog collection.
+	 */
 	std::string oplogNamespace;
+
+	/**
+	 * @var std::string omtNamespace
+	 * The namespace of the database and collection that should be watched.
+	 */
 	std::string omtNamespace;
+
+	/**
+	 * @var boost::mutex subscriptionsMutex
+	 * Mutex used to protect the subscriptions vector.
+	 */
 	boost::mutex subscriptionsMutex;
+
+	/**
+	 * @var boost::thread *currentThread;
+	 * Pointer to the current thread.
+	 */
 	boost::thread *currentThread;
 };
 
