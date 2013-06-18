@@ -63,7 +63,7 @@ public class DeltaRobotModule extends Module {
 	private static final double SAFE_MOVEMENT_PLANE = 6;
 
 	/**
-	 * Empty Constructory
+	 * Empty Constructor
 	 */
 	public DeltaRobotModule() {}
 
@@ -74,13 +74,16 @@ public class DeltaRobotModule extends Module {
 	public EquipletStep[] getEquipletSteps(int stepType, BasicDBObject parameters) {
 		//switch to determine which steps to make.
 		switch (stepType) {
-		case 1: //case to move to the safe movement plane.
+		case 1:
+			//case to move to the safe movement plane.
 			//returns the steps for moving to the safe movement plane.
 			return new EquipletStep[] { moveToSafePlane(parameters) };
-		case 2: //case to move on the x and y axis.
+		case 2:
+			//case to move on the x and y axis.
 			//returns the steps for the movement on the x and y axis.
 			return new EquipletStep[] { moveXY(parameters) };
-		case 3: //case to move on the z axis
+		case 3:
+			//case to move on the z axis
 			//returns the steps for the movement on the z axis.
 			return new EquipletStep[] { moveZ(parameters) };
 		default:
