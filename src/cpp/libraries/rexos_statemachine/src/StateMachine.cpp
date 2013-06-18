@@ -38,10 +38,11 @@ using namespace rexos_statemachine;
  * Create a stateMachine
  * @param moduleID the unique identifier for the module that implements the statemachine
  **/
-StateMachine::StateMachine(std::string nodeName) :
+StateMachine::StateMachine(std::string nodeName,std::vector<rexos_statemachine::Mode> modes) :
 		listener(NULL),
 		currentState(STATE_SAFE),
 		currentMode(MODE_NORMAL),
+		modes(modes),
 		changeStateActionServer(nodeHandle, nodeName + "/change_state", boost::bind(&StateMachine::onChangeStateAction, this, _1), false),
 		changeModeActionServer(nodeHandle, nodeName + "/change_mode", boost::bind(&StateMachine::onChangeModeAction, this, _1), false),
 		transitionSetupServer(nodeHandle, nodeName + "/transition_setup", boost::bind(&StateMachine::onTransitionSetupAction, this, &transitionSetupServer), false),
@@ -65,11 +66,13 @@ StateMachine::StateMachine(std::string nodeName) :
 	transitionMap[transitionStartStatePair]= {transitionStart,transitionStop,transitionStartStatePair};
 	transitionMap[transitionStopStatePair]= {transitionStop,NULL,transitionStopStatePair};
 
-	modePossibleStates[MODE_NORMAL] = {STATE_NORMAL,STATE_STANDBY,STATE_SAFE};
-	modePossibleStates[MODE_SERVICE] = {STATE_NORMAL,STATE_STANDBY,STATE_SAFE};
-	modePossibleStates[MODE_ERROR] = {STATE_STANDBY,STATE_SAFE};
-	modePossibleStates[MODE_CRITICAL_ERROR] = {STATE_SAFE};
+	modePossibleStates[MODE_NORMAL] = {STATE_NORMAL,STATE_STANDBY,STATE_SAFE, STATE_SETUP, STATE_SHUTDOWN, STATE_START, STATE_STOP};
+	modePossibleStates[MODE_SERVICE] = {STATE_NORMAL,STATE_STANDBY,STATE_SAFE, STATE_SETUP, STATE_SHUTDOWN, STATE_START, STATE_STOP};
+	modePossibleStates[MODE_ERROR] = {STATE_STANDBY,STATE_SAFE,STATE_SETUP,STATE_SHUTDOWN,STATE_STOP};
+	modePossibleStates[MODE_CRITICAL_ERROR] = {STATE_SAFE,STATE_STOP,STATE_SHUTDOWN};
 	modePossibleStates[MODE_E_STOP] = {STATE_SAFE};
+	modePossibleStates[MODE_LOCK] = {STATE_NORMAL,STATE_STANDBY,STATE_SAFE, STATE_STOP};
+	modePossibleStates[MODE_STEP] = {STATE_NORMAL,STATE_STANDBY,STATE_SAFE, STATE_SETUP, STATE_SHUTDOWN, STATE_START, STATE_STOP};
 
 	changeStateActionServer.start();
 	changeModeActionServer.start();
@@ -133,17 +136,16 @@ void StateMachine::onChangeModeAction(const ChangeModeGoalConstPtr& goal){
  * @param response Will tell if the state transition was succesfull for the state change
  **/
 bool StateMachine::changeState(rexos_statemachine::State newState) {
-	// decode msg and read variables
-	//ROS_INFO("Request Statechange message received");
-	if (!statePossibleInMode(newState, currentMode) && newState > currentState )
-		return false;
-
 	transitionMapType::iterator it = transitionMap.find(StatePair(currentState, newState));
 	if (it == transitionMap.end()) {
 		return false;
 	}
 
 	ChangeStateEntry changeStateEntry = it->second;
+
+	if (!statePossibleInMode(changeStateEntry.transition->transitionState, currentMode) )
+		return false;
+
 	_setState(changeStateEntry.transition->transitionState);		//set the currentState on the transitionState
 	
 	TransitionActionClient* transitionActionClient = changeStateEntry.transition->transitionActionClient;
@@ -174,7 +176,13 @@ bool StateMachine::changeState(rexos_statemachine::State newState) {
 }
 
 bool StateMachine::changeMode(Mode newMode) {
-	if(newMode > MODE_COUNT)
+	bool succeeded = false;
+	for(Mode mode : modes){
+		if(mode == newMode)
+			succeeded = true;
+	}
+
+	if(!succeeded)
 		return false;
 
 	_setMode(newMode);
@@ -199,6 +207,8 @@ void StateMachine::_forceToAllowedState() {
 			break;
 		case STATE_STANDBY:
 			changeState(STATE_SAFE);
+			break;
+		default:
 			break;
 		}
 	}

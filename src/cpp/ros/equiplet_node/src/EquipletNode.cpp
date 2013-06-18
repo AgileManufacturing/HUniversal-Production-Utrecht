@@ -44,7 +44,15 @@ using namespace equiplet_node;
  * @param id The unique identifier of the Equiplet
  **/
 EquipletNode::EquipletNode(int id, std::string blackboardIp) :
-		StateMachine(nameFromId(id)),
+		StateMachine(nameFromId(id),
+			{rexos_statemachine::MODE_NORMAL, 
+			rexos_statemachine::MODE_SERVICE, 
+			rexos_statemachine::MODE_ERROR,
+			rexos_statemachine::MODE_CRITICAL_ERROR, 
+			rexos_statemachine::MODE_E_STOP,
+			rexos_statemachine::MODE_LOCK,
+			rexos_statemachine::MODE_STEP}
+		),
 		moduleRegistry(nameFromId(id), id),
 		equipletId(id),
 		blackboardClient(NULL) {

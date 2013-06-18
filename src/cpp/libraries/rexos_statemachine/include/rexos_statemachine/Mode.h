@@ -36,12 +36,19 @@ namespace rexos_statemachine{
 	 * @ enum Mode
 	 * The enumeration for the modi
 	 **/
-	typedef enum { MODE_NORMAL = 0, MODE_SERVICE = 1, MODE_ERROR = 2, MODE_CRITICAL_ERROR = 3, MODE_E_STOP = 4 } Mode;
+	typedef enum { 
+		MODE_NORMAL = 0, 
+		MODE_SERVICE = 1, 
+		MODE_ERROR = 2, 
+		MODE_CRITICAL_ERROR = 3, 
+		MODE_E_STOP = 4,
+		MODE_LOCK = 5,
+		MODE_STEP} Mode;
 
 	/**
 	 * @var const char* const state_txt[]
 	 * The representation of the states in a char array so its easy to print the enum values instead of the integer
 	 **/
-	const char* const Mode_txt[] = { "Normal", "Service", "Error", "Critical Error", "E_Stop" };
+	const char* const Mode_txt[] = { "Normal", "Service", "Error", "Critical Error", "E_Stop", "LOCK", "STEP" };
 }
 #endif
