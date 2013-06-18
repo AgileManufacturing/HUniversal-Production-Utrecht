@@ -46,7 +46,10 @@ import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
 
 /**
- * The Class GetProductStepDuration.
+ * The receive behaviour for receiving messages with ontology: "GetProductionDuration".
+ * When a message is received it checks if it can handle it.
+ * If not it sends a message to the sender with ontology:"ConversationIdUnknown".
+ * When it can handle the message, it sends a message to the serviceAgent with ontology: "GetProductionStepDuration".
  */
 public class GetProductionDuration extends ReceiveBehaviour {
 	/**

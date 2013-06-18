@@ -39,7 +39,7 @@ import rexos.mas.data.MongoSaveable;
 import com.mongodb.BasicDBObject;
 
 /**
- * Represents an entry in the EquipletDirectory blackboard.
+ * Representation of an entry in the EquipletDirectory blackboard.
  **/
 public class EquipletDirectoryEntry implements MongoSaveable {
 	/**
