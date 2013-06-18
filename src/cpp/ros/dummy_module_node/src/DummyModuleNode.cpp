@@ -28,17 +28,18 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
- #include "dummy_module_node/DummyModuleNode.h"
- #include "dummy_module_node/Services.h"
+#include "dummy_module_node/DummyModuleNode.h"
+#include "dummy_module_node/Services.h"
 
- // @cond HIDE_NODE_NAME_BASE_FROM_DOXYGEN
+// @cond HIDE_NODE_NAME_BASE_FROM_DOXYGEN
 #define NODE_NAME_BASE "dummy_module_node"
 // @endcond
 
-DummyModuleNode::DummyModuleNode(int equipletID, int moduleID) : rexos_mast::StateMachine(equipletID, moduleID) {
+DummyModuleNode::DummyModuleNode(int equipletID, int moduleID) :
+	rexos_statemachine::ModuleStateMachine(std::string(NODE_NAME_BASE), equipletID, moduleID) {
 
 	std::stringstream stringStream;
-	stringStream <<  NODE_NAME_BASE << "_" << equipletID << "_" << moduleID;
+	stringStream << NODE_NAME_BASE << "_" << equipletID << "_" << moduleID;
 	nodeName = stringStream.str();
 
 	std::cout << "Constructing " << nodeName << std::endl;
@@ -53,7 +54,7 @@ DummyModuleNode::DummyModuleNode(int equipletID, int moduleID) : rexos_mast::Sta
 	outputJSONService = nodeHandle.advertiseService(outputJSONServiceName, &DummyModuleNode::outputJSON, this);
 }
 
-bool DummyModuleNode::outputJSON(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res){
+bool DummyModuleNode::outputJSON(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res) {
 	ROS_INFO("outputJSON called");
 	std::cout << std::string(req.json) << std::endl;
 	res.succeeded = true;
@@ -61,49 +62,37 @@ bool DummyModuleNode::outputJSON(rexos_std_srvs::Module::Request &req, rexos_std
 	return true;
 }
 
-int DummyModuleNode::transitionSetup(){
+void DummyModuleNode::transitionSetup() {
 	ROS_INFO("Setup transition called");
-	setState(rexos_mast::setup);
-
-	return 0;
 }
 
-int DummyModuleNode::transitionShutdown(){
+void DummyModuleNode::transitionShutdown() {
 	ROS_INFO("Shutdown transition called");
-	setState(rexos_mast::shutdown);
-
-	return 0;
 }
 
-int DummyModuleNode::transitionStart(){
+void DummyModuleNode::transitionStart() {
 	ROS_INFO("Start transition called");
-	setState(rexos_mast::start);
-
-	return 0;
 }
 
-int DummyModuleNode::transitionStop(){
+void DummyModuleNode::transitionStop() {
 	ROS_INFO("Stop transition called");
-	setState(rexos_mast::stop);
-	
-	return 0;
 }
 
-DummyModuleNode::~DummyModuleNode(){
+DummyModuleNode::~DummyModuleNode() {
 	ROS_INFO("Destructing");
 }
 
-int main(int argc, char **argv){
+int main(int argc, char **argv) {
 	int equipletID = 0;
 	int moduleID = 0;
 
-	if(argc < 3 || !(rexos_utilities::stringToInt(equipletID, argv[1]) == 0 && rexos_utilities::stringToInt(moduleID, argv[2]) == 0)){ 	 	
+	if (argc < 3 || !(rexos_utilities::stringToInt(equipletID, argv[1]) == 0 && rexos_utilities::stringToInt(moduleID, argv[2]) == 0)) {
 		ROS_INFO("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
 		return -1;
 	}
 
 	std::stringstream stringStream;
-	stringStream <<  NODE_NAME_BASE << "_" << equipletID << "_" << moduleID;
+	stringStream << NODE_NAME_BASE << "_" << equipletID << "_" << moduleID;
 	std::string nodeName = stringStream.str();
 	ros::init(argc, argv, nodeName);
 
