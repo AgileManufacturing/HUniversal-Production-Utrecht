@@ -36,9 +36,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 
 /**
- * Instances of this class contain schedule data with the start time, duration and the deadline of a <code>ProductionStep</code> in timeslots.
- * 
- * @author Peter Bonnema
+ * Instances of this class contain schedule data with the start time,
+ * duration and the deadline of a <code>ProductionStep</code> in timeslots.
  *
  */
 public class ScheduleData implements MongoSaveable, Serializable {

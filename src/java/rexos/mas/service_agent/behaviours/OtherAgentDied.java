@@ -40,18 +40,26 @@ import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.service_agent.ServiceAgent;
 
 /**
- * @author Peter Bonnema
- * 
+ * Behaviour that receives messages when the equipletAgent or hardwareAgent dies.
  */
 public class OtherAgentDied extends ReceiveBehaviour {
 	/**
 	 * @var long serialVersionUID
+	 * 		The serial version UID for this class.
 	 */
-	private static final long serialVersionUID = 5354177044839347391L;
+	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * @var ServicAgent agent
+	 * 		The serviceAgent linked to this behaviour.
+	 */
 	private ServiceAgent agent;
 
 	/**
+	 * Constructor for this behaviour.
+	 * 
 	 * @param agent
+	 * 		The agent linked to this behaviour
 	 */
 	public OtherAgentDied(ServiceAgent agent) {
 		super(agent, MessageTemplate.or(MessageTemplate.MatchOntology("EquipletAgentDied"),

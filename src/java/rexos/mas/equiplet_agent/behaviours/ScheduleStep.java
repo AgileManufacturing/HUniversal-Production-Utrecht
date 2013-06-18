@@ -57,7 +57,10 @@ import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
 /**
- * The Class ScheduleStep.
+ * Receive behaviour for receiving messages with the ontology: "ScheduleStep".
+ * When it receives this message, it checks if it is possible to do plan the step on the given timeslot.
+ * Sends an <code>ACLMessage.DISCONFIRM</code> when it is not possible. When its possible it sends a message
+ * to the service agent with ontology: "ScheduleStep". and updates the blackboard.
  */
 public class ScheduleStep extends ReceiveBehaviour {
 	/**
@@ -89,7 +92,9 @@ public class ScheduleStep extends ReceiveBehaviour {
 	 * Instantiates a new schedule step.
 	 * 
 	 * @param a
-	 *            The agent for this behaviour
+	 *      The agent for this behaviour
+	 * @param productBBClient
+	 * 		The blackboardClient for the productSteps.
 	 */
 	public ScheduleStep(Agent a, BlackboardClient productBBClient) {
 		super(a, messageTemplate);

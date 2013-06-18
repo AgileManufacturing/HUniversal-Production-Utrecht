@@ -67,8 +67,6 @@ import com.mongodb.BasicDBObject;
 /**
  * Handles incoming abort step messages from the product agent and updates the
  * blackboard accordingly.
- * 
- * 
  */
 public class AbortStep extends ReceiveBehaviour {
 	/**

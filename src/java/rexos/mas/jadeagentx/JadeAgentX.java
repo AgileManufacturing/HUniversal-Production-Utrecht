@@ -55,7 +55,6 @@ import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 import java.util.ArrayList;
-
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.Part;
@@ -66,6 +65,9 @@ import rexos.mas.data.ProductionStep;
 
 import com.mongodb.BasicDBObject;
 
+/**
+ *	Test class for testing the equiplet agent, service agent and hardware agent.
+ */
 public class JadeAgentX extends Agent {
 	private static final long serialVersionUID = 1L;
 
@@ -147,15 +149,22 @@ public class JadeAgentX extends Agent {
 
 	static int count = 0;
 
+	/**
+	 * Behaviour for starting a product agent.
+	 *
+	 */
 	public class StartProductAgent extends CyclicBehaviour {
 		private static final long serialVersionUID = 1L;
 
 		Object[] args;
 
 		/**
+		 * Constructor for the StartProductAgent behaviour.
 		 * 
 		 * @param a
+		 * 		The agent this behaviour is linked to/this test agent.
 		 * @param args
+		 * 		The arguments for the product agent.
 		 */
 		public StartProductAgent(Agent a, Object[] args) {
 			super(a);

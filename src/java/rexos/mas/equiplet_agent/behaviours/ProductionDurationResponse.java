@@ -20,7 +20,9 @@ import rexos.mas.equiplet_agent.ProductStep;
 import com.mongodb.BasicDBObject;
 
 /**
- * The Class ProductionDurationResponse.
+ * A receive once behaviour for receiving messages with the ontology: "ProductionDurationResponse".
+ * Receives the message from its service agent and sends the productduration to the product agent.
+ * The message send to the product agent has the ontology: "ProductionDuration".
  */
 public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 	/**
