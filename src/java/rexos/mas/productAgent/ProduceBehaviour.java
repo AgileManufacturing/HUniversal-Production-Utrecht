@@ -48,6 +48,7 @@ import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.Product;
+import rexos.mas.data.ProductStep;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
@@ -191,7 +192,7 @@ class producing extends OneShotBehaviour{
 				// Planned?
 				break;
 			case "StatusUpdate":
-				//ProductStep ps = (ProductStep) msg.getContentObject();
+				ProductStep ps = (ProductStep) msg.getContentObject();
 				switch(msg.getContent()){
 				case "INPROGRESS":
 					// In progress
@@ -214,7 +215,7 @@ class producing extends OneShotBehaviour{
 					 * Equiplet agent informs the product agent that the product
 					 * step has been executed successfully.
 					 */
-					//_product.addStatusDataToLog(msg.getSender(), ps.getStatusData());
+					_product.addStatusDataToLog(msg.getSender(), ps.getStatusData());
 					break;
 				default:
 					Logger.log(new UnsupportedOperationException("No case for "
