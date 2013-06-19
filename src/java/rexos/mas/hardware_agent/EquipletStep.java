@@ -304,19 +304,20 @@ public class EquipletStep implements MongoSaveable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		_id = (ObjectId) object.remove("_id");
-		nextStep = (ObjectId) object.remove("nextStep");
-		serviceStepID = (ObjectId) object.remove("serviceStepID");
-		moduleId = (int) object.remove("moduleId");
-		instructionData = new InstructionData((BasicDBObject) object.remove("instructionData"));
-		status = StepStatusCode.valueOf((String) object.remove("status"));
-		if(object.containsField("statusData")) {
-			statusData = (BasicDBObject) object.remove("statusData");
+		BasicDBObject copy = (BasicDBObject) object.copy();
+		_id = (ObjectId) copy.remove("_id");
+		nextStep = (ObjectId) copy.remove("nextStep");
+		serviceStepID = (ObjectId) copy.remove("serviceStepID");
+		moduleId = (int) copy.remove("moduleId");
+		instructionData = new InstructionData((BasicDBObject) copy.remove("instructionData"));
+		status = StepStatusCode.valueOf((String) copy.remove("status"));
+		if(copy.containsField("statusData")) {
+			statusData = (BasicDBObject) copy.remove("statusData");
 		} else {
 			statusData = new BasicDBObject();
 		}
-		timeData = new TimeData((BasicDBObject) object.remove("timeData"));
-		if(!object.isEmpty()){
+		timeData = new TimeData((BasicDBObject) copy.remove("timeData"));
+		if(!copy.isEmpty()){
 			throw new IllegalArgumentException();
 		}
 	}

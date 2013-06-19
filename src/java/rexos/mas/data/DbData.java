@@ -91,10 +91,11 @@ public class DbData implements MongoSaveable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		ip = (String) object.remove("ip");
-		port = (int) object.remove("port");
-		name = (String) object.remove("name");
-		if(!object.isEmpty()){
+		BasicDBObject copy = (BasicDBObject)object.copy();
+		ip = (String) copy.remove("ip");
+		port = (int) copy.remove("port");
+		name = (String) copy.remove("name");
+		if(!copy.isEmpty()){
 			throw new IllegalArgumentException();
 		}
 	}

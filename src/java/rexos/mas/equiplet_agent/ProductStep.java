@@ -410,34 +410,35 @@ public class ProductStep implements MongoSaveable, Serializable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		_id = (ObjectId) object.remove("_id");
-		productAgentId = new AID((String) object.remove("productAgentId"), AID.ISGUID);
-		type = (int) object.remove("type");
-		parameters = (BasicDBObject) object.remove("parameters");
+		BasicDBObject copy = (BasicDBObject) object.copy();
+		_id = (ObjectId) copy.remove("_id");
+		productAgentId = new AID((String) copy.remove("productAgentId"), AID.ISGUID);
+		type = (int) copy.remove("type");
+		parameters = (BasicDBObject) copy.remove("parameters");
 		
-		BasicDBList tempInputParts = ((BasicDBList)object.remove("inputParts"));
+		BasicDBList tempInputParts = ((BasicDBList)copy.remove("inputParts"));
 		inputParts = new Part[tempInputParts.size()];
 		for(int i = 0; i < tempInputParts.size(); i++){
 			inputParts[i] = new Part((BasicDBObject)tempInputParts.get(i));
 		}
-		if(object.containsField("outputPart")){
-			outputPart = new Part((BasicDBObject)object.remove("outputPart"));
+		if(copy.containsField("outputPart")){
+			outputPart = new Part((BasicDBObject)copy.remove("outputPart"));
 		}
-		status = StepStatusCode.valueOf((String) object.remove("status"));
+		status = StepStatusCode.valueOf((String) copy.remove("status"));
 
-		if (object.containsField("statusData")) {
-			statusData = (BasicDBObject) object.remove("statusData");
+		if (copy.containsField("statusData")) {
+			statusData = (BasicDBObject) copy.remove("statusData");
 		} else {
 			statusData = new BasicDBObject();
 		}
-		if (object.containsField("scheduleData")) {
+		if (copy.containsField("scheduleData")) {
 			scheduleData = new ScheduleData(
-					(BasicDBObject) object.remove("scheduleData"));
+					(BasicDBObject) copy.remove("scheduleData"));
 		} else {
 			scheduleData = new ScheduleData();
 		}
-		if(!object.isEmpty()){
-			Logger.log(object);
+		if(!copy.isEmpty()){
+			Logger.log(copy);
 			throw new IllegalArgumentException();
 		}
 	}
