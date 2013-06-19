@@ -58,7 +58,11 @@ import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.EquipletDirectoryEntry;
 
-/** The Class InitialisationFinished. */
+/**
+ * A receive once behaviour for receiving messages with ontology: "InitialisationFinished".
+ * When the message is received the equiplet agent of this behaviour posts itself on the EquipletDirectory 
+ * to advertise itself for the product agents.
+ */
 public class InitialisationFinished extends ReceiveOnceBehaviour {
 	/**
 	 * @var static final long serialVersionUID
@@ -143,7 +147,6 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 			equipletAgent.addBehaviour(new StartStep(equipletAgent,
 					equipletAgent.getEquipletBBClient()));
 		} else {
-			// TODO (most) handle timeout
 			Logger.log(equipletAgent.getName()
 					+ " - InitialisationFinished timeout!");
 			equipletAgent.doDelete();

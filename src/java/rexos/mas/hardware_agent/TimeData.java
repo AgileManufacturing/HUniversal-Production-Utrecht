@@ -95,6 +95,9 @@ public class TimeData implements MongoSaveable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		duration = object.getInt("duration");
+		duration = (int) object.remove("duration");
+		if(!object.isEmpty()){
+			throw new IllegalArgumentException();
+		}
 	}
 }

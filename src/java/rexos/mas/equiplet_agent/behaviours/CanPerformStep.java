@@ -69,7 +69,14 @@ import rexos.mas.equiplet_agent.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 
-/** The Class CanPerformStep. */
+/**
+ * Receive behaviour for receiving messages with the ontology: "CanPerformStep".
+ * Receives a message with a production step as content,
+ * creates a productStep from that and places it on the blackboard.
+ * Sends a message to his service agent with ontology: "CanDoProductionStep".
+ * Starts a CanDoProductionStepResponse to wait on the response of the service agent.
+ * When there is an error the agent sends a message to the sender with ACLMessage.FAILURE
+ */
 public class CanPerformStep extends ReceiveBehaviour {
 	/**
 	 * @var static final long serialVersionUID
@@ -131,7 +138,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 			ObjectId productStepEntryId = null;
 
 			// puts the productstep on the blackboard.
-			// TODO: get inputParts instead of dummy data
+			// TODO: get inputParts instead of dummy data (overleggen met productagent)
 			Part[] inputParts = { new Part(1), new Part(2) };
 			ProductStep entry = new ProductStep(
 					message.getSender(), productStep.getCapability(),

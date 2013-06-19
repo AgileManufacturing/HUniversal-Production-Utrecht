@@ -105,7 +105,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 	 * @param moduleFactory The moduleFactory
 	 */
 	public EvaluateDuration(Agent a, ModuleFactory moduleFactory) {
-		super(a, -1, messageTemplate);
+		super(a, messageTemplate);
 		hardwareAgent = (HardwareAgent) a;
 		this.moduleFactory = moduleFactory;
 	}
@@ -129,7 +129,6 @@ public class EvaluateDuration extends ReceiveBehaviour {
 			reply.setContentObject(serviceStepId);
 			reply.setOntology("GetServiceStepDurationResponse");
 			myAgent.send(reply);
-
 		} catch(UnreadableException | IOException e) {
 			e.printStackTrace();
 			myAgent.doDelete();
@@ -182,5 +181,4 @@ public class EvaluateDuration extends ReceiveBehaviour {
 			myAgent.doDelete();
 		}
 	}
-
 }

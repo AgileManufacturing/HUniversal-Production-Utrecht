@@ -98,6 +98,7 @@ public class ServiceAgentDied extends ReceiveBehaviour {
 		Logger.log("%s received message from %s (%s)%n",
 				myAgent.getLocalName(), message.getSender().getLocalName(),
 				message.getOntology());
+		//remove the hardwareAgent
 		hardwareAgent.doDelete();
 	}
 }

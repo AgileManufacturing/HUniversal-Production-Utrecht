@@ -214,16 +214,19 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			doDelete();
 		}
 
-		// Start the behaviours
+		// Start the evaluateDurationBehaviour
 		EvaluateDuration evaluateDurationBehaviour = new EvaluateDuration(this, moduleFactory);
 		addBehaviour(evaluateDurationBehaviour);
 
+		// Start the fillPlaceholdersBehaviour
 		FillPlaceholders fillPlaceholdersBehaviour = new FillPlaceholders(this, moduleFactory);
 		addBehaviour(fillPlaceholdersBehaviour);
 
+		// Start the checkForModules
 		CheckForModules checkForModules = new CheckForModules(this);
 		addBehaviour(checkForModules);
 
+		// Start the serviceAgentDied
 		ServiceAgentDied serviceAgentDied = new ServiceAgentDied(this);
 		addBehaviour(serviceAgentDied);
 
@@ -334,11 +337,11 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 											new BasicDBObject("_id", EquipletStep.sort(equipletStepsArray)[0].getId()),
 											new BasicDBObject("$set", new BasicDBObject("status",
 													StepStatusCode.WAITING.name())));
-									// TODO: delete below
+									// TODO: delete below after testing
 									equipletStepBBClient.updateDocuments(
 											new BasicDBObject("serviceStepID", serviceStep.getId()), new BasicDBObject(
 													"$set", new BasicDBObject("status", StepStatusCode.DONE.name())));
-									// TODO: delete above
+									// TODO: delete above after testing
 									break;
 								default:
 									break;

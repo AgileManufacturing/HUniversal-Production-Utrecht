@@ -168,6 +168,7 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	 * that time then it restarts the timer.
 	 * 
 	 * @param millis
+	 * 		The number of milliseconds in which a timeout should occur.
 	 */
 	public void setTimer(long millis) {
 		timeout = millis;
@@ -211,6 +212,8 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	}
 
 	/**
+	 * Gets the message template for this behaviour.
+	 * 
 	 * @return the template
 	 */
 	public MessageTemplate getTemplate() {
@@ -218,6 +221,8 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	}
 
 	/**
+	 * Gets the timeout for this behaviour.
+	 * 
 	 * @return the timeout
 	 */
 	public long getTimeout() {
@@ -225,6 +230,8 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	}
 
 	/**
+	 * Gets the wakeup time for this behaviour.
+	 * 
 	 * @return the wakeupTime
 	 */
 	public long getWakeupTime() {

@@ -165,11 +165,14 @@ public class InstructionData implements MongoSaveable {
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		
-		command = object.getString("command");
-		destination = object.getString("destination");
-		look_up = object.getString("look_up");
-		look_up_parameters = (BasicDBObject) object.get("look_up_parameters");
-		payload = (BasicDBObject) object.get("payload");
+		command = (String) object.remove("command");
+		destination = (String) object.remove("destination");
+		look_up = (String) object.remove("look_up");
+		look_up_parameters = (BasicDBObject) object.remove("look_up_parameters");
+		payload = (BasicDBObject) object.remove("payload");
+		if(!object.isEmpty()){
+			throw new IllegalArgumentException();
+		}
 
 	}
 
