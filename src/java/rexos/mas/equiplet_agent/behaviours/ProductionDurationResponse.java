@@ -105,6 +105,5 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 				equipletAgent.doDelete();
 			}
 		}
-		equipletAgent.removeBehaviour(this);
 	}
 }

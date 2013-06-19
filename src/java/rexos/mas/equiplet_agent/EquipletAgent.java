@@ -81,6 +81,7 @@ import rexos.libraries.knowledgedb_client.Row;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
 import rexos.mas.data.ScheduleData;
+import rexos.mas.equiplet_agent.behaviours.AbortStep;
 import rexos.mas.equiplet_agent.behaviours.InitialisationFinished;
 import rexos.mas.equiplet_agent.behaviours.ServiceAgentDied;
 
@@ -166,10 +167,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	private BlackboardClient collectiveBBClient;
 
 	/**
-	 * @var BlackboardClient equipletBBClient
+	 * @var BlackboardClient productStepBBClient
 	 *      Object for communication with the equiplet blackboard.
 	 */
-	private BlackboardClient equipletBBClient;
+	private BlackboardClient productStepBBClient;
 
 	/**
 	 * @var ArrayList<Integer> capabilities
@@ -265,16 +266,16 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			collectiveBBClient.setCollection(equipletDirectoryName);
 
 			// makes connection with the equiplet blackboard.
-			equipletBBClient = new BlackboardClient(equipletDbIp, equipletDbPort);
-			equipletBBClient.setDatabase(equipletDbName);
-			equipletBBClient.setCollection(productStepsName);
-			equipletBBClient.removeDocuments(new BasicDBObject());
+			productStepBBClient = new BlackboardClient(equipletDbIp, equipletDbPort);
+			productStepBBClient.setDatabase(equipletDbName);
+			productStepBBClient.setCollection(productStepsName);
+			productStepBBClient.removeDocuments(new BasicDBObject());
 
 			// subscribes on changes of the status field on the equiplet
 			// blackboard.
 			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
-			equipletBBClient.subscribe(statusSubscription);
+			productStepBBClient.subscribe(statusSubscription);
 
 			// gets the timedata for synchronizing from the collective
 			// blackboard.
@@ -291,12 +292,14 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			doDelete();
 		}
 
-		// starts the behaviour for receiving message when the Service Agent
-		// Dies.
+		// starts the behaviour for receiving message when the Service Agent dies.
 		addBehaviour(new ServiceAgentDied(this));
 
-		// starts the behaviour for receving message initialisation finished.
-		addBehaviour(new InitialisationFinished(this, collectiveBBClient));
+		// starts the behaviour for receiving message initialization finished.
+		addBehaviour(new InitialisationFinished(this));
+
+		// starts the behaviour for receiving message initialization finished.
+		addBehaviour(new AbortStep(this));
 	}
 
 	/**
@@ -307,12 +310,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	@Override
 	public void takeDown() {
 		try {
-			// Removes himself from the collective blackboard equiplet
-			// directory.
+			// Removes himself from the collective blackboard equiplet directory.
 			collectiveBBClient.removeDocuments(new BasicDBObject("AID", getAID().getName()));
 
 			// Messages all the product agents that he died.
-			for(DBObject object : equipletBBClient.findDocuments(new BasicDBObject())) {
+			for(DBObject object : productStepBBClient.findDocuments(new BasicDBObject())) {
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.FAILURE);
 				responseMessage.addReceiver(new AID(object.get("productAgentId").toString(), AID.ISGUID));
 				responseMessage.setOntology("EquipletAgentDied");
@@ -320,12 +322,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				send(responseMessage);
 			}
 
-			// Clears his own blackboard and removes his subscription on that
-			// blackboard.
-			equipletBBClient.removeDocuments(new BasicDBObject());
+			// Clears his own blackboard and removes his subscription on that blackboard.
+			productStepBBClient.removeDocuments(new BasicDBObject());
 			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
-			equipletBBClient.unsubscribe(statusSubscription);
+			productStepBBClient.unsubscribe(statusSubscription);
 		} catch(InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 			Logger.log(e);
 		}
@@ -347,10 +348,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				try {
 					// Get the productstep.
 					ObjectId id = entry.getTargetObjectId();
-					ProductStep productStep = new ProductStep((BasicDBObject) equipletBBClient.findDocumentById(id));
+					ProductStep productStep = new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(id));
 
-					// Gets the conversationId if it doesn't exist throws an
-					// error.
+					// Gets the conversationId if it doesn't exist throws an error.
 					String conversationId = getConversationId(id);
 					if(conversationId == null) {
 						throw new Exception();
@@ -363,8 +363,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 					Logger.log("Equiplet agent - status update: " + productStep.getStatus().toString());
 					switch(productStep.getStatus()) {
-					// Depending on the changed status fills in the
-					// responseMessage and sends it to the product agent.
+					// Depending on the changed status fills in the responseMessage and sends it to the product agent.
 						case PLANNED:
 							try {
 								// If the start time of the newly planned productStep is earlier then the next used time
@@ -375,9 +374,15 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 									timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 								}
 
-								// Logger.log("%s Sending ProductionDuration tot %s%n", getAID(), );
 								responseMessage.setOntology("Planned");
 								responseMessage.setContentObject(scheduleData.getStartTime());
+
+//								ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
+//								cancelMessage.addReceiver(getAID());
+//								cancelMessage.setOntology("CancelStep");
+//								cancelMessage.setConversationId(getConversationId(nextProductStep));
+//								send(cancelMessage);
+//								Logger.log("Equiplet agent - sending message %s%n", ACLMessage.getPerformative(cancelMessage.getPerformative()));
 							} catch(IOException e) {
 								responseMessage.setPerformative(ACLMessage.FAILURE);
 								responseMessage.setContent("An error occured in the planning/please reschedule");
@@ -395,17 +400,18 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 							responseMessage.setOntology("StatusUpdate");
 							responseMessage.setPerformative(ACLMessage.CONFIRM);
 							responseMessage.setContentObject(productStep.getStatusData());
-							equipletBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
+							productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
 							break;
 						case DELETED:
 							responseMessage.setOntology("StatusUpdate");
 							responseMessage.setPerformative(ACLMessage.CONFIRM);
 							responseMessage.setContentObject(productStep.getStatusData());
-							equipletBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
+							productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
 							break;
 						default:
 							break;
 					}
+					Logger.log("Equiplet agent - sending message %s%n", ACLMessage.getPerformative(responseMessage.getPerformative()));
 					send(responseMessage);
 				} catch(Exception e1) {
 					Logger.log(e1);
@@ -417,12 +423,21 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	}
 
 	/**
-	 * Getter for the EquipletBBClient
+	 * Getter for the collectiveBBClient
 	 * 
-	 * @return the equipletBBClient.
+	 * @return the collectiveBBClient.
 	 */
-	public BlackboardClient getEquipletBBClient() {
-		return equipletBBClient;
+	public BlackboardClient getCollectiveBBClient() {
+		return collectiveBBClient;
+	}
+
+	/**
+	 * Getter for the productStepBBClient
+	 * 
+	 * @return the productStepBBClient.
+	 */
+	public BlackboardClient getProductStepBBClient() {
+		return productStepBBClient;
 	}
 
 	/**

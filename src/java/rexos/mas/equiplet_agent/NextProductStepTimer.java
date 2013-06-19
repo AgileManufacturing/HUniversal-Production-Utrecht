@@ -170,7 +170,7 @@ public class NextProductStepTimer extends Timer {
 				ObjectId productStepEntry = equipletAgent.getNextProductStep();
 				String conversationId = equipletAgent.getConversationId(productStepEntry);
 				BasicDBObject productStep =
-						(BasicDBObject) equipletAgent.getEquipletBBClient().findDocumentById(productStepEntry);
+						(BasicDBObject) equipletAgent.getProductStepBBClient().findDocumentById(productStepEntry);
 				AID productAgent = new AID((String) productStep.get("productAgentId"), AID.ISGUID);
 
 				// ask the productAgent to start the production of the step.
