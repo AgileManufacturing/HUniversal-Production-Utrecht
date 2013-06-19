@@ -52,6 +52,7 @@ import java.io.Serializable;
 
 import org.bson.types.ObjectId;
 
+import rexos.libraries.log.Logger;
 import rexos.mas.data.MongoSaveable;
 import rexos.mas.data.Part;
 import rexos.mas.data.ScheduleData;
@@ -409,31 +410,35 @@ public class ProductStep implements MongoSaveable, Serializable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		_id = object.getObjectId("_id");
-		productAgentId = new AID((String) (object.get("productAgentId")), AID.ISGUID);
-		type = object.getInt("type");
-		parameters = (BasicDBObject) object.get("parameters");
+		_id = (ObjectId) object.remove("_id");
+		productAgentId = new AID((String) object.remove("productAgentId"), AID.ISGUID);
+		type = (int) object.remove("type");
+		parameters = (BasicDBObject) object.remove("parameters");
 		
-		BasicDBList tempInputParts = ((BasicDBList)object.get("inputParts"));
+		BasicDBList tempInputParts = ((BasicDBList)object.remove("inputParts"));
 		inputParts = new Part[tempInputParts.size()];
 		for(int i = 0; i < tempInputParts.size(); i++){
 			inputParts[i] = new Part((BasicDBObject)tempInputParts.get(i));
 		}
 		if(object.containsField("outputPart")){
-			outputPart = new Part((BasicDBObject)object.get("outputPart"));
+			outputPart = new Part((BasicDBObject)object.remove("outputPart"));
 		}
-		status = StepStatusCode.valueOf(object.getString("status"));
+		status = StepStatusCode.valueOf((String) object.remove("status"));
 
 		if (object.containsField("statusData")) {
-			statusData = (BasicDBObject) object.get(statusData);
+			statusData = (BasicDBObject) object.remove("statusData");
 		} else {
 			statusData = new BasicDBObject();
 		}
 		if (object.containsField("scheduleData")) {
 			scheduleData = new ScheduleData(
-					(BasicDBObject) object.get("scheduleData"));
+					(BasicDBObject) object.remove("scheduleData"));
 		} else {
 			scheduleData = new ScheduleData();
+		}
+		if(!object.isEmpty()){
+			Logger.log(object);
+			throw new IllegalArgumentException();
 		}
 	}
 }

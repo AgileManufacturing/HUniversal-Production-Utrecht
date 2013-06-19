@@ -50,7 +50,6 @@ package rexos.mas.data;
 import java.io.Serializable;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
 
 /**
  * Data object for storing a 3d position.
@@ -155,9 +154,21 @@ public class Position implements Serializable, MongoSaveable {
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		try {
-			x = object.getDouble("x");
-			y = object.getDouble("y");
-			z = object.getDouble("z");
+			if(object.containsField("x")){
+				x = object.getDouble("x");
+			}else{
+				x = -1;
+			}
+			if(object.containsField("y")){
+				y = object.getDouble("y");
+			}else{
+				y = -1;
+			}
+			if(object.containsField("z")){
+				z = object.getDouble("z");
+			}else{
+				z = -1;
+			}
 			if(object.containsField("relativeToPart")) {
 				relativeToPart = new Part((BasicDBObject)object.get("relativeToPart"));
 			}

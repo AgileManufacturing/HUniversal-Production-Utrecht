@@ -89,12 +89,11 @@ public class PickAndPlaceService extends Service {
 	@Override
 	public boolean canDoStep(int productStepType, BasicDBObject parameters) {
 		try {
-			if(parameters.containsField("part")) {
+			if(parameters.containsField("part") && parameters.containsField("position")) {
 				new Part((BasicDBObject) parameters.get("part"));
-			}
-			
-			if(parameters.containsField("position")) {
 				new Position((BasicDBObject) parameters.get("position"));
+			} else {
+				return false;
 			}
 		} catch (IllegalArgumentException e) {
 			return false;

@@ -53,7 +53,11 @@ import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
 
-/** The Class ServiceAgentDied. */
+/**
+ * Receive behaviour for receiving messages with ontology: "ServiceAgendDied".
+ * When the service agent dies it sends this message to the equiplet agent,
+ * the equiplet agent prepares itself to die too.
+ */
 public class ServiceAgentDied extends ReceiveBehaviour {
 	/**
 	 * @var static final long serialVersionUID

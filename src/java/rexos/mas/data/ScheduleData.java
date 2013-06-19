@@ -36,9 +36,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 
 /**
- * Instances of this class contain schedule data with the start time, duration and the deadline of a <code>ProductionStep</code> in timeslots.
- * 
- * @author Peter Bonnema
+ * Instances of this class contain schedule data with the start time,
+ * duration and the deadline of a <code>ProductionStep</code> in timeslots.
  *
  */
 public class ScheduleData implements MongoSaveable, Serializable {
@@ -113,8 +112,14 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		this.startTime = object.getInt("startTime", -1);
+		object.remove("startTime");
 		this.duration = object.getInt("duration", -1);
+		object.remove("duration");
 		this.deadline = object.getInt("deadline", -1);
+		object.remove("deadline");
+		if(!object.isEmpty()){
+			throw new IllegalArgumentException();
+		}
 	}
 
 	/**

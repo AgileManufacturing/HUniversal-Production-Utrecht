@@ -52,6 +52,7 @@ public abstract class ReceiveOnceBehaviour extends ReceiveBehaviour {
 	 * Instantiates a new <code>ReceiveOnceBehaviour</code> without a <code>MessageTemplate</code> and no timeout.
 	 * 
 	 * @param a
+	 * 		The agent linked to this behaviour.
 	 */
 	public ReceiveOnceBehaviour(Agent a) {
 		this(a, -1, null);
@@ -61,7 +62,9 @@ public abstract class ReceiveOnceBehaviour extends ReceiveBehaviour {
 	 * Instantiates a new <code>ReceiveOnceBehaviour</code> without a <code>MessageTemplate</code> with the specified timeout.
 	 * 
 	 * @param a
+	 * 		The agent linked to this behaviour.
 	 * @param millis
+	 * 		The number of milliseconds in which a timeout should occur.
 	 */
 	public ReceiveOnceBehaviour(Agent a, int millis) {
 		this(a, millis, null);
@@ -71,7 +74,9 @@ public abstract class ReceiveOnceBehaviour extends ReceiveBehaviour {
 	 * Instantiates a new <code>ReceiveOnceBehaviour</code> with the specified <code>MessageTemplate</code> and no timeout.
 	 * 
 	 * @param a
+	 * 		The agent linked to this behaviour.
 	 * @param mt
+	 * 		The messageTemplate for this behaviour.
 	 */
 	public ReceiveOnceBehaviour(Agent a, MessageTemplate mt) {
 		this(a, -1, mt);
@@ -81,8 +86,11 @@ public abstract class ReceiveOnceBehaviour extends ReceiveBehaviour {
 	 * Instantiates a new <code>ReceiveOnceBehaviour</code> with the specified <code>MessageTemplate</code> with the specified timeout.
 	 * 
 	 * @param a
+	 * 		The agent linked to this behaviour.
 	 * @param millis
+	 * 		The number of milliseconds in which a timeout should occur.
 	 * @param mt
+	 * 		The messageTemplate for this behaviour.
 	 */
 	public ReceiveOnceBehaviour(Agent a, int millis, MessageTemplate mt) {
 		super(a, millis, mt);
