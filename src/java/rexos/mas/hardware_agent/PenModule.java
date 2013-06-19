@@ -61,19 +61,19 @@ import com.mongodb.BasicDBObject;
 public class PenModule extends Module {
 	/**
 	 * @var int PEN_OFFSET
-	 * A static value that contains the offset of the pen in relation to the movement module.
+	 *      A static value that contains the offset of the pen in relation to the movement module.
 	 */
 	private static final int PEN_OFFSET = 4;
 
 	/**
 	 * @var double PEN_SIZE
-	 * A static value that contains the size of the pen in centimeters.
+	 *      A static value that contains the size of the pen in centimeters.
 	 */
 	private static final double PEN_SIZE = 0.2;
-	
+
 	/**
 	 * @var Module movementModule
-	 * The module that moves this module.
+	 *      The module that moves this module.
 	 */
 	private Module movementModule;
 
@@ -90,54 +90,48 @@ public class PenModule extends Module {
 		EquipletStep[] equipletSteps;
 		ArrayList<EquipletStep> steps;
 
-		//gets the newest code for the movementModule.
+		// gets the newest code for the movementModule.
 		int movementModuleId = findMovementModule(getConfiguration());
 		movementModule = getModuleFactory().getModuleById(movementModuleId);
 
-		//switch to determine which steps to make.
-		switch (stepType) {
-		case 1: //case for the equiplet function draw line.
-			steps = new ArrayList<EquipletStep>();
+		// switch to determine which steps to make.
+		switch(stepType) {
+			case 3: // case for the equiplet function draw line.
+				steps = new ArrayList<EquipletStep>();
 
-			//only get steps when start and end position are available.
-			if(parameters.containsField("startPosition") && parameters.containsField("endPosition")){
-				//get start position
-				Position startPosition = new Position((BasicDBObject)parameters.get("startPosition"));
-				//get end postion
-				Position endPosition = new Position((BasicDBObject)parameters.get("endPosition"));
-				//get the delta of the x and the y
-				double deltaX = endPosition.getX() - startPosition.getX();
-				double deltaY = endPosition.getY() - startPosition.getY();
-				//get the length of the line.
-				double lineLength = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
-				
-				//get the number of steps to perform and the x and y delta for each step.
-				int numberOfSteps = (int) (lineLength / PEN_SIZE);
-				double deltaXPerStep = deltaX/numberOfSteps;
-				double deltaYPerStep = deltaY/numberOfSteps;
-				
-				//create the new position for the steps.
-				Position stepPosition = new Position();
-				stepPosition.setX(startPosition.getX() - deltaXPerStep);
-				stepPosition.setY(startPosition.getY() - deltaYPerStep);
-				
-				//loop over all the steps and create them.
-				for(int i = 0; i < numberOfSteps; i++){
-					stepPosition.setX(stepPosition.getX() + deltaXPerStep);
-					stepPosition.setY(stepPosition.getY() + deltaYPerStep);
-					steps.addAll(Arrays.asList(getStepsForDot(new BasicDBObject("position", stepPosition.toBasicDBObject()))));
+				// only get steps when start and end position are available.
+				if(parameters.containsField("startPosition") && parameters.containsField("endPosition")) {
+					// get start position
+					Position startPosition = new Position((BasicDBObject) parameters.get("startPosition"));
+					// get end postion
+					Position endPosition = new Position((BasicDBObject) parameters.get("endPosition"));
+					// get the delta of the x and the y
+					double deltaX = endPosition.getX() - startPosition.getX();
+					double deltaY = endPosition.getY() - startPosition.getY();
+					// get the length of the line.
+					double lineLength = Math.hypot(deltaX, deltaY);
+
+					// get the number of steps to perform and the x and y delta for each step.
+					int numberOfSteps = Math.max(1, (int) (lineLength / PEN_SIZE));
+					Position step = new Position(deltaX / numberOfSteps, deltaY / numberOfSteps, 0);
+
+					// loop over all the steps and create them.
+					for(int i = 0; i <= numberOfSteps; i++) {
+						steps.addAll(Arrays.asList(getStepsForDot(new BasicDBObject("position", startPosition
+								.toBasicDBObject()))));
+						startPosition.translate(step);
+					}
 				}
-			}
-			
-			//convert the ArrayList to an array and return it.
-			equipletSteps = new EquipletStep[steps.size()];
-			return steps.toArray(equipletSteps);
-		case 2: //case for the equiplet function put dot.
-			return getStepsForDot(parameters);
-		default:
-			break;
+
+				// convert the ArrayList to an array and return it.
+				equipletSteps = new EquipletStep[steps.size()];
+				return steps.toArray(equipletSteps);
+			case 4: // case for the equiplet function put dot.
+				return getStepsForDot(parameters);
+			default:
+				break;
 		}
-		//if this module can't handle the stepType return no steps. 
+		// if this module can't handle the stepType return no steps.
 		return new EquipletStep[0];
 	}
 
@@ -146,51 +140,46 @@ public class PenModule extends Module {
 	 */
 	@Override
 	public EquipletStep[] fillPlaceHolders(EquipletStep[] steps, BasicDBObject parameters) {
-		//get the newest code of the movementModule.
-		int movementModuleId = findMovementModule(getConfiguration());
-		movementModule = getModuleFactory().getModuleById(movementModuleId);
-		//let the movement module fill in the steps.
-		movementModule.fillPlaceHolders(steps, parameters);
-		
-		//return the filled in steps.
+		// return the filled in steps.
 		return steps;
 	}
 
 	/**
-	 * @see Module#isLeadingForSteps()
+	 * @see Module#isLeadingForServices()
 	 */
 	@Override
-	public int[] isLeadingForSteps() {
-		return new int[] { 1 };
+	public int[] isLeadingForServices() {
+		return new int[] { 2 };
 	}
 
 	/**
 	 * Function to find the movementModule of this module in the configuration HashMap.
+	 * 
 	 * @param hashMap A hashMap with the configuration of the module.
 	 * @return The int id of the movementModule.
 	 */
 	private int findMovementModule(HashMap<Integer, Object> hashMap) {
-		//check if the id is in this layer, return there is no movementModule(-1).
-		if (hashMap.containsKey(getId())) {
+		// check if the id is in this layer, return there is no movementModule(-1).
+		if(hashMap.containsKey(getId())) {
 			return -1;
 		}
-		
-		for (int key : hashMap.keySet()) {
+
+		for(int key : hashMap.keySet()) {
 			try {
-				//check each value of the HashMap to see if it is a HashMap
+				// check each value of the HashMap to see if it is a HashMap
 				HashMap<Integer, Object> tempHashMap = (HashMap<Integer, Object>) hashMap.get(key);
-				//check if the new HashMap contains the key of 
-				//this module then return the key of the HashMap(this is the movementModule).
-				if (tempHashMap.containsKey(getId())) {
+				// check if the new HashMap contains the key of
+				// this module then return the key of the HashMap(this is the movementModule).
+				if(tempHashMap.containsKey(getId())) {
 					return key;
 				}
-				//if the key isn't found search recursive in the next HashMap.
+				// if the key isn't found search recursive in the next HashMap.
 				int tempId = findMovementModule(tempHashMap);
-				//if the next HashMap has found the module return it
-				if (tempId != -1) {
+				// if the next HashMap has found the module return it
+				if(tempId != -1) {
 					return tempId;
 				}
-			} catch (ClassCastException e) {/* its no HashMap so do nothing */
+			} catch(ClassCastException e) {/* its no HashMap so do nothing */
 			}
 		}
 		return -1;
@@ -198,33 +187,34 @@ public class PenModule extends Module {
 
 	/**
 	 * Function for getting the steps for placing a dot.
+	 * 
 	 * @param parameters The parameters used for placing the dot.
 	 * @return An array of the generated equipletSteps
 	 */
-	private EquipletStep[] getStepsForDot(BasicDBObject parameters){
+	private EquipletStep[] getStepsForDot(BasicDBObject parameters) {
 		ArrayList<EquipletStep> steps = new ArrayList<EquipletStep>();
-		
-		//get the position of the dot.
-		Position position = new Position((BasicDBObject)parameters.get("position"));
+
+		// get the position of the dot.
+		Position position = new Position((BasicDBObject) parameters.get("position"));
 		position.setZ(0);
-		
-		//create the new parameters
+
+		// create the new parameters
 		BasicDBObject dotParameters = new BasicDBObject("position", position.toBasicDBObject());
 		dotParameters.put("extraSize", PEN_OFFSET);
-		
-		//get steps from the movementModule to move to the safe movement plane.
+
+		// get steps from the movementModule to move to the safe movement plane.
 		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, dotParameters)));
-		
-		//get steps from the movementModule to move on the x and y axis.
+
+		// get steps from the movementModule to move on the x and y axis.
 		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(2, dotParameters)));
-		
-		//get steps from the movementModule to move on the z axis.
+
+		// get steps from the movementModule to move on the z axis.
 		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, dotParameters)));
-		
-		//get steps from the movementModule to move to the safe movement plane.
+
+		// get steps from the movementModule to move to the safe movement plane.
 		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, dotParameters)));
-		
-		//convert the ArrayList to an array and return it.
+
+		// convert the ArrayList to an array and return it.
 		EquipletStep[] equipletSteps = new EquipletStep[steps.size()];
 		return steps.toArray(equipletSteps);
 	}

@@ -75,7 +75,7 @@ public class CheckForModules extends ReceiveBehaviour {
 	 * @param a The agent of this behaviour.
 	 */
 	public CheckForModules(Agent a) {
-		super(a, -1, messageTemplate);
+		super(a, messageTemplate);
 		hardwareAgent = (HardwareAgent) a;
 	}
 
@@ -111,9 +111,7 @@ public class CheckForModules extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		boolean modulesPresent = true;
-
 		try {
-			
 			//check is modules are present
 			int[] moduleGroupIds = (int[]) message.getContentObject();
 			ArrayList<Integer> availableModuleGroups = getAvailableModuleGroups();
@@ -127,9 +125,7 @@ public class CheckForModules extends ReceiveBehaviour {
 		} catch (UnreadableException ex) {
 			modulesPresent = false;
 		} finally {
-			
 			//send reply, confirm if modules are present disconfirm if not
-			
 			ACLMessage reply;
 			reply = message.createReply();
 			reply.setOntology("CheckForModulesResponse");
