@@ -111,13 +111,14 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	 **/
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		this.startTime = object.getInt("startTime", -1);
-		object.remove("startTime");
-		this.duration = object.getInt("duration", -1);
-		object.remove("duration");
-		this.deadline = object.getInt("deadline", -1);
-		object.remove("deadline");
-		if(!object.isEmpty()){
+		BasicDBObject copy = (BasicDBObject) object.copy();
+		this.startTime = copy.getInt("startTime", -1);
+		copy.remove("startTime");
+		this.duration = copy.getInt("duration", -1);
+		copy.remove("duration");
+		this.deadline = copy.getInt("deadline", -1);
+		copy.remove("deadline");
+		if(!copy.isEmpty()){
 			throw new IllegalArgumentException();
 		}
 	}
