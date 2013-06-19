@@ -385,26 +385,23 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 							}
 							break;
 						case IN_PROGRESS:
-							responseMessage.setOntology("StatusUpdate");
-							responseMessage.setContent("INPROGRESS");
-							break;
 						case FAILED:
-							responseMessage.setOntology("StatusUpdate");
-							responseMessage.setPerformative(ACLMessage.FAILURE);
-							responseMessage.setContent("FAILED");
-							responseMessage.setContentObject(productStep.getStatusData());
-							break;
 						case SUSPENDED_OR_WARNING:
 							responseMessage.setOntology("StatusUpdate");
-							responseMessage.setPerformative(ACLMessage.FAILURE);
-							responseMessage.setContent("SUSPENDED_OR_WARNING");
+							responseMessage.setPerformative(ACLMessage.CONFIRM);
 							responseMessage.setContentObject(productStep.getStatusData());
 							break;
 						case DONE:
 							responseMessage.setOntology("StatusUpdate");
 							responseMessage.setPerformative(ACLMessage.CONFIRM);
-							responseMessage.setContent("DONE");
 							responseMessage.setContentObject(productStep.getStatusData());
+							equipletBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
+							break;
+						case DELETED:
+							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setPerformative(ACLMessage.CONFIRM);
+							responseMessage.setContentObject(productStep.getStatusData());
+							equipletBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
 							break;
 						default:
 							break;

@@ -155,10 +155,14 @@ public class Part implements Serializable, MongoSaveable {
 	 **/
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
+		BasicDBObject copy = (BasicDBObject) object.copy();
 		try {
-			type = object.getInt("type");
-			if(object.containsField("id")) {
-				id = object.getInt("id");
+			type = (int) copy.remove("type");
+			if(copy.containsField("id")) {
+				id = (int) copy.remove("id");
+			}
+			if(!copy.isEmpty()){
+				throw new IllegalArgumentException();
 			}
 		} catch(Exception e) {
 			throw new IllegalArgumentException();

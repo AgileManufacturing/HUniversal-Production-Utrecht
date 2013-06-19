@@ -52,6 +52,7 @@ import java.io.Serializable;
 
 import org.bson.types.ObjectId;
 
+import rexos.libraries.log.Logger;
 import rexos.mas.data.MongoSaveable;
 import rexos.mas.data.Part;
 import rexos.mas.data.ScheduleData;
@@ -409,31 +410,36 @@ public class ProductStep implements MongoSaveable, Serializable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		_id = object.getObjectId("_id");
-		productAgentId = new AID((String) (object.get("productAgentId")), AID.ISGUID);
-		type = object.getInt("type");
-		parameters = (BasicDBObject) object.get("parameters");
+		BasicDBObject copy = (BasicDBObject) object.copy();
+		_id = (ObjectId) copy.remove("_id");
+		productAgentId = new AID((String) copy.remove("productAgentId"), AID.ISGUID);
+		type = (int) copy.remove("type");
+		parameters = (BasicDBObject) copy.remove("parameters");
 		
-		BasicDBList tempInputParts = ((BasicDBList)object.get("inputParts"));
+		BasicDBList tempInputParts = ((BasicDBList)copy.remove("inputParts"));
 		inputParts = new Part[tempInputParts.size()];
 		for(int i = 0; i < tempInputParts.size(); i++){
 			inputParts[i] = new Part((BasicDBObject)tempInputParts.get(i));
 		}
-		if(object.containsField("outputPart")){
-			outputPart = new Part((BasicDBObject)object.get("outputPart"));
+		if(copy.containsField("outputPart")){
+			outputPart = new Part((BasicDBObject)copy.remove("outputPart"));
 		}
-		status = StepStatusCode.valueOf(object.getString("status"));
+		status = StepStatusCode.valueOf((String) copy.remove("status"));
 
-		if (object.containsField("statusData")) {
-			statusData = (BasicDBObject) object.get(statusData);
+		if (copy.containsField("statusData")) {
+			statusData = (BasicDBObject) copy.remove("statusData");
 		} else {
 			statusData = new BasicDBObject();
 		}
-		if (object.containsField("scheduleData")) {
+		if (copy.containsField("scheduleData")) {
 			scheduleData = new ScheduleData(
-					(BasicDBObject) object.get("scheduleData"));
+					(BasicDBObject) copy.remove("scheduleData"));
 		} else {
 			scheduleData = new ScheduleData();
+		}
+		if(!copy.isEmpty()){
+			Logger.log(copy);
+			throw new IllegalArgumentException();
 		}
 	}
 }

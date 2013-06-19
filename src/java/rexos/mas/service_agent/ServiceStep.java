@@ -222,22 +222,26 @@ public class ServiceStep implements MongoSaveable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		_id = object.getObjectId("_id");
-		nextStep = object.getObjectId("nextStep");
-		serviceId = object.getInt("serviceId");
-		type = object.getInt("type");
-		productStepId = object.getObjectId("productStepId");
-		parameters = (BasicDBObject) object.get("parameters");
-		status = StepStatusCode.valueOf(object.getString("status"));
-		if(object.containsField("statusData")) {
-			statusData = (BasicDBObject) object.get("statusData");
+		BasicDBObject copy = (BasicDBObject) object.copy();
+		_id = (ObjectId) copy.remove("_id");
+		nextStep = (ObjectId) copy.remove("nextStep");
+		serviceId = (int) copy.remove("serviceId");
+		type = (int) copy.remove("type");
+		productStepId = (ObjectId) copy.remove("productStepId");
+		parameters = (BasicDBObject) copy.remove("parameters");
+		status = StepStatusCode.valueOf((String) copy.remove("status"));
+		if(copy.containsField("statusData")) {
+			statusData = (BasicDBObject) copy.remove("statusData");
 		} else {
 			statusData = new BasicDBObject();
 		}
-		if(object.containsField("scheduleData")) {
-			scheduleData = new ScheduleData((BasicDBObject) object.get("scheduleData"));
+		if(copy.containsField("scheduleData")) {
+			scheduleData = new ScheduleData((BasicDBObject) copy.remove("scheduleData"));
 		} else {
 			scheduleData = new ScheduleData();
+		}
+		if(!copy.isEmpty()){
+			throw new IllegalArgumentException();
 		}
 	}
 
