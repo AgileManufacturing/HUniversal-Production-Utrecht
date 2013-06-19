@@ -51,10 +51,10 @@ public:
 	bool outputJSON(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res);
 
 private:
-	virtual void transitionSetup();
-	virtual void transitionShutdown();
-	virtual void transitionStart();
-	virtual void transitionStop();
+	virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
+	virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
+	virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
+	virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
 	
 	/**
 	 * @var std::string nodeName

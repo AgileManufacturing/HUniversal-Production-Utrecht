@@ -62,20 +62,24 @@ bool DummyModuleNode::outputJSON(rexos_std_srvs::Module::Request &req, rexos_std
 	return true;
 }
 
-void DummyModuleNode::transitionSetup() {
+void DummyModuleNode::transitionSetup(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Setup transition called");
+	as->setSucceeded();
 }
 
-void DummyModuleNode::transitionShutdown() {
+void DummyModuleNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Shutdown transition called");
+	as->setSucceeded();
 }
 
-void DummyModuleNode::transitionStart() {
+void DummyModuleNode::transitionStart(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Start transition called");
+	as->setSucceeded();
 }
 
-void DummyModuleNode::transitionStop() {
+void DummyModuleNode::transitionStop(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Stop transition called");
+	as->setSucceeded();
 }
 
 DummyModuleNode::~DummyModuleNode() {

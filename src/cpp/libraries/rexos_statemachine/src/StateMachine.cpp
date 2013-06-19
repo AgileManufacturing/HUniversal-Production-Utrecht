@@ -88,23 +88,19 @@ StateMachine::~StateMachine() {
 }
 
 void StateMachine::onTransitionSetupAction(TransitionActionServer* as){
-	transitionSetup();
-	as->setSucceeded();
+	transitionSetup(as);
 }
 
 void StateMachine::onTransitionShutdownAction(TransitionActionServer* as){
-	transitionShutdown();
-	as->setSucceeded();
+	transitionShutdown(as);
 }
 
 void StateMachine::onTransitionStartAction(TransitionActionServer* as){
-	transitionStart();
-	as->setSucceeded();
+	transitionStart(as);
 }
 
 void StateMachine::onTransitionStopAction(TransitionActionServer* as){
-	transitionStop();
-	as->setSucceeded();
+	transitionStop(as);
 }
 
 State StateMachine::getCurrentState() {

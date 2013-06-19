@@ -40,6 +40,7 @@
 #include <delta_robot_node/Services.h>
 #include <delta_robot_node/Point.h>
 #include <rexos_statemachine/StateMachine.h>
+#include <rexos_statemachine/Transitions.h>
 #include "delta_robot_node/MoveToPoint.h"
 #include "delta_robot_node/MovePath.h"
 #include "delta_robot_node/MoveToRelativePoint.h"
@@ -62,10 +63,10 @@ namespace deltaRobotNodeNamespace{
 		DeltaRobotNode(int moduleID);
 		virtual ~DeltaRobotNode();
 		
-		virtual void transitionSetup();
-		virtual void transitionShutdown();
-		virtual void transitionStart();
-		virtual void transitionStop();
+		virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
+		virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
+		virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
+		virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
 			
 		// Main functions to be called from the services
 		bool calibrate();

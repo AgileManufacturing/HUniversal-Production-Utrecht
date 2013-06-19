@@ -115,11 +115,16 @@ private:
 	equiplet_node::ModuleRegistry moduleRegistry;
 
 	void changeEquipletState();
-	void transitionSetup();
-	void transitionShutdown();
-	void transitionStart();
-	void transitionStop();
+	virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
+	virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
+	virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
+	virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
 	bool changeModuleState(int moduleID,rexos_statemachine::State state);
+
+	rexos_statemachine::TransitionActionServer* setupTransitionActionServer;
+	rexos_statemachine::TransitionActionServer* shutdownTransitionActionServer;
+	rexos_statemachine::TransitionActionServer* startTransitionActionServer;
+	rexos_statemachine::TransitionActionServer* stopTransitionActionServer;
 };
 
 }

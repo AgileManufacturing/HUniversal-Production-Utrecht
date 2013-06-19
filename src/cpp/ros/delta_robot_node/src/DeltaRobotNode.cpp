@@ -543,7 +543,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::stopServices(){
  * Transition from Safe to Standby state
  * @return 0 if everything went OK else error
  **/
-void deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(){
+void deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Setup transition called");
 
 	// Generate the effector boundaries with voxel size 2
@@ -561,7 +561,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(){
  * Will turn power off the motor 
  * @return will be 0 if everything went ok else error
  **/
-void deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown(){
+void deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Shutdown transition called");
 	// Should have information about the workspace, calculate a safe spot and move towards it
 	deltaRobot->powerOff();
@@ -571,7 +571,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown(){
  * Transition from Standby to Normal state
  * @return will be 0 if everything went ok else error 
  **/
-void deltaRobotNodeNamespace::DeltaRobotNode::transitionStart(){
+void deltaRobotNodeNamespace::DeltaRobotNode::transitionStart(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Start transition called");
 	//The service servers should be set, to provide the normal methods for the equiplet
 	startServices();
@@ -580,7 +580,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::transitionStart(){
  * Transition from Normal to Standby state
  * @return will be 0 if everything went ok else error
  **/
-void deltaRobotNodeNamespace::DeltaRobotNode::transitionStop(){
+void deltaRobotNodeNamespace::DeltaRobotNode::transitionStop(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Stop transition called");
 	//The service servers should be set off, so the equiplet isn't able to set tasks for the module
 	stopServices();

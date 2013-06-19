@@ -30,10 +30,10 @@ TEST(MOSTStateMachineTest, Startup) {
 TEST(MOSTStateMachineTest, Setup) {
 	MockMOSTStateMachine mock;
 
-	EXPECT_CALL(mock, transitionSetup()).Times(1).WillOnce(Return(true));
-	EXPECT_CALL(mock, transitionStart()).Times(0);
-	EXPECT_CALL(mock, transitionStop()).Times(0);
-	EXPECT_CALL(mock, transitionShutdown()).Times(0);
+	EXPECT_CALL(mock, transitionSetup(TransitionActionServer* as)).Times(1).WillOnce(Return(true));
+	EXPECT_CALL(mock, transitionStart(TransitionActionServer* as)).Times(0);
+	EXPECT_CALL(mock, transitionStop(TransitionActionServer* as)).Times(0);
+	EXPECT_CALL(mock, transitionShutdown(TransitionActionServer* as)).Times(0);
 
 	EXPECT_EQ(mock.getCurrentState(), STATE_SAFE);
 
@@ -45,10 +45,10 @@ TEST(MOSTStateMachineTest, Setup) {
 TEST(MOSTStateMachineTest, Start) {
 	MockMOSTStateMachine mock;
 
-	EXPECT_CALL(mock, transitionSetup()).Times(1).WillOnce(Return(true));
-	EXPECT_CALL(mock, transitionStart()).Times(1).WillOnce(Return(true));
-	EXPECT_CALL(mock, transitionStop()).Times(0);
-	EXPECT_CALL(mock, transitionShutdown()).Times(0);
+	EXPECT_CALL(mock, transitionSetup(TransitionActionServer* as)).Times(1).WillOnce(Return(true));
+	EXPECT_CALL(mock, transitionStart(TransitionActionServer* as)).Times(1).WillOnce(Return(true));
+	EXPECT_CALL(mock, transitionStop(TransitionActionServer* as)).Times(0);
+	EXPECT_CALL(mock, transitionShutdown(TransitionActionServer* as)).Times(0);
 
 	EXPECT_EQ(mock.getCurrentState(), STATE_SAFE);
 
@@ -64,10 +64,10 @@ TEST(MOSTStateMachineTest, Start) {
 TEST(MOSTStateMachineTest, Stop) {
 	MockMOSTStateMachine mock;
 
-	EXPECT_CALL(mock, transitionSetup()).Times(1).WillOnce(Return(true));
-	EXPECT_CALL(mock, transitionStart()).Times(1).WillOnce(Return(true));
-	EXPECT_CALL(mock, transitionStop()).Times(1).WillOnce(Return(true));
-	EXPECT_CALL(mock, transitionShutdown()).Times(0);
+	EXPECT_CALL(mock, transitionSetup(TransitionActionServer* as)).Times(1).WillOnce(Return(true));
+	EXPECT_CALL(mock, transitionStart(TransitionActionServer* as)).Times(1).WillOnce(Return(true));
+	EXPECT_CALL(mock, transitionStop(TransitionActionServer* as)).Times(1).WillOnce(Return(true));
+	EXPECT_CALL(mock, transitionShutdown(TransitionActionServer* as)).Times(0);
 
 	EXPECT_EQ(mock.getCurrentState(), STATE_SAFE);
 
@@ -84,10 +84,10 @@ TEST(MOSTStateMachineTest, Stop) {
 TEST(MOSTStateMachineTest, Shutdown) {
 	MockMOSTStateMachine mock;
 
-	EXPECT_CALL(mock, transitionSetup()).Times(1).WillOnce(Return(true));
-	EXPECT_CALL(mock, transitionStart()).Times(1).WillOnce(Return(true));
-	EXPECT_CALL(mock, transitionStop()).Times(1).WillOnce(Return(true));
-	EXPECT_CALL(mock, transitionShutdown()).Times(1).WillOnce(Return(true));
+	EXPECT_CALL(mock, transitionSetup(TransitionActionServer* as)).Times(1).WillOnce(Return(true));
+	EXPECT_CALL(mock, transitionStart(TransitionActionServer* as)).Times(1).WillOnce(Return(true));
+	EXPECT_CALL(mock, transitionStop(TransitionActionServer* as)).Times(1).WillOnce(Return(true));
+	EXPECT_CALL(mock, transitionShutdown(TransitionActionServer* as)).Times(1).WillOnce(Return(true));
 
 	EXPECT_EQ(mock.getCurrentState(), STATE_SAFE);
 

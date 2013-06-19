@@ -202,7 +202,9 @@ void EquipletNode::onModeChanged(){
 	}
 }
 
-void EquipletNode::transitionSetup() {
+void EquipletNode::transitionSetup(rexos_statemachine::TransitionActionServer* as) {
+	setupTransitionActionServer = as;
+
 	moduleRegistry.setNewRegistrationsAllowed(false);
 
 	std::vector<ModuleProxy*> modules = moduleRegistry.getRigisteredModules();
@@ -211,7 +213,9 @@ void EquipletNode::transitionSetup() {
 	}
 }
 
-void EquipletNode::transitionShutdown() {
+void EquipletNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as) {
+	shutdownTransitionActionServer = as;
+
 	moduleRegistry.setNewRegistrationsAllowed(true);
 
 	std::vector<ModuleProxy*> modules = moduleRegistry.getRigisteredModules();
@@ -220,10 +224,12 @@ void EquipletNode::transitionShutdown() {
 	}
 }
 
-void EquipletNode::transitionStart() {
+void EquipletNode::transitionStart(rexos_statemachine::TransitionActionServer* as) {
+	as->setSucceeded();
 }
 
-void EquipletNode::transitionStop() {
+void EquipletNode::transitionStop(rexos_statemachine::TransitionActionServer* as) {
+	as->setSucceeded();
 }
 
 void EquipletNode::onModuleStateChanged(
@@ -232,6 +238,8 @@ void EquipletNode::onModuleStateChanged(
 	rexos_statemachine::State previousState)
 {
 	//ROS_INFO("EquipletNode received from %s a state change from %d to %d",moduleProxy->getModuleNodeName(),previousState,newState);
+
+	//if(currentM)
 }
 
 void EquipletNode::onModuleModeChanged(

@@ -30,17 +30,23 @@
 #ifndef TRANSITIONS_H
 #define TRANSITIONS_H
 
+#include <actionlib/server/simple_action_server.h>
+
+#include <rexos_statemachine/TransitionAction.h>
+
 namespace rexos_statemachine {
+
+typedef actionlib::SimpleActionServer<TransitionAction> TransitionActionServer;
 
 class Transitions {
 public:
 	virtual ~Transitions() {
 	}
 protected:
-	virtual void transitionStart() = 0;
-	virtual void transitionStop() = 0;
-	virtual void transitionSetup() = 0;
-	virtual void transitionShutdown() = 0;
+	virtual void transitionStart(TransitionActionServer* as) = 0;
+	virtual void transitionStop(TransitionActionServer* as) = 0;
+	virtual void transitionSetup(TransitionActionServer* as) = 0;
+	virtual void transitionShutdown(TransitionActionServer* as) = 0;
 };
 
 }
