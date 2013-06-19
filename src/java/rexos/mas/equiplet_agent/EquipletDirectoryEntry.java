@@ -86,9 +86,12 @@ public class EquipletDirectoryEntry implements MongoSaveable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object){
-		this.AID = new AID((String)(object.get("AID")), jade.core.AID.ISGUID);
-		this.capabilities = (ArrayList<Integer>) object.get("capabilities");
-		this.db = new DbData((BasicDBObject)object.get("db"));
+		this.AID = new AID((String)object.remove("AID"), jade.core.AID.ISGUID);
+		this.capabilities = (ArrayList<Integer>) object.remove("capabilities");
+		this.db = new DbData((BasicDBObject)object.remove("db"));
+		if(!object.isEmpty()){
+			throw new IllegalArgumentException();
+		}
 	}
 	
 	/**

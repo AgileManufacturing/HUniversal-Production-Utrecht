@@ -222,22 +222,25 @@ public class ServiceStep implements MongoSaveable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		_id = object.getObjectId("_id");
-		nextStep = object.getObjectId("nextStep");
-		serviceId = object.getInt("serviceId");
-		type = object.getInt("type");
-		productStepId = object.getObjectId("productStepId");
-		parameters = (BasicDBObject) object.get("parameters");
-		status = StepStatusCode.valueOf(object.getString("status"));
+		_id = (ObjectId) object.remove("_id");
+		nextStep = (ObjectId) object.remove("nextStep");
+		serviceId = (int) object.remove("serviceId");
+		type = (int) object.remove("type");
+		productStepId = (ObjectId) object.remove("productStepId");
+		parameters = (BasicDBObject) object.remove("parameters");
+		status = StepStatusCode.valueOf((String) object.remove("status"));
 		if(object.containsField("statusData")) {
-			statusData = (BasicDBObject) object.get("statusData");
+			statusData = (BasicDBObject) object.remove("statusData");
 		} else {
 			statusData = new BasicDBObject();
 		}
 		if(object.containsField("scheduleData")) {
-			scheduleData = new ScheduleData((BasicDBObject) object.get("scheduleData"));
+			scheduleData = new ScheduleData((BasicDBObject) object.remove("scheduleData"));
 		} else {
 			scheduleData = new ScheduleData();
+		}
+		if(!object.isEmpty()){
+			throw new IllegalArgumentException();
 		}
 	}
 
