@@ -6,6 +6,7 @@
  * 
  * @author Arno Derks
  * @author Theodoor de Graaff
+ * @author Ricky van Rijn
  * 
  * @section LICENSE License: newBSD
  * 
@@ -143,6 +144,7 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 	ACLMessage msg;
 	HashMap<AID, Long> eqAndTs;
 	private ProductionStep productionStep;
+	private StepStatusCode statusCodeInProgress;
 
 	public WaitMsgBehaviour(ACLMessage msg, HashMap<AID, Long> eqAndTs,
 			ProductionStep productionStep){
@@ -166,7 +168,8 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 			Logger.log(new UnsupportedOperationException(
 					"Equiplet sender not equal to associated equiplet in productionStep"));
 		}
-		//TODO add content to change step state to STATE_PRODUCING
+		
+		productionStep.setStatus(statusCodeInProgress(3));
 		msg.addReceiver(msg.getSender());
 		myAgent.send(msg);
 	}
