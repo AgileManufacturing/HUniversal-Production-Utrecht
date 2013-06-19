@@ -19,6 +19,8 @@
 #include <equiplet_node/StateUpdate.h>
 #include <equiplet_node/ModeUpdate.h>
 
+#include "equiplet_node/ModuleProxyListener.h"
+
 namespace equiplet_node {
 
 class EquipletNode;
@@ -28,18 +30,25 @@ typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeModeAction> Chan
 
 class ModuleProxy {
 public:
-	ModuleProxy(std::string equipletNodeName, std::string moduleName, int equipletId, int moduleId);
-	ModuleProxy(std::string equipletNodeName, std::string moduleNodeName);
+	ModuleProxy(std::string equipletNodeName, std::string moduleName, int equipletId, int moduleId, ModuleProxyListener* mpl = NULL);
+	ModuleProxy(std::string equipletNodeName, std::string moduleNodeName, ModuleProxyListener* mpl = NULL);
 	virtual ~ModuleProxy();
+
+	void setModuleProxyListener(ModuleProxyListener* mpl);
+
+	rexos_statemachine::State getCurrentState();
+	rexos_statemachine::Mode getCurrentMode();
+
+	std::string getModuleNodeName();
 
 	void changeState(rexos_statemachine::State state);
 	void changeMode(rexos_statemachine::Mode mode);
 
-	rexos_statemachine::State getCurrentState();
-	rexos_statemachine::Mode getCurrentMode();
 private:
 	bool onStateChangeServiceCallback(StateUpdateRequest &req, StateUpdateResponse &res);
 	bool onModeChangeServiceCallback(ModeUpdateRequest &req, ModeUpdateResponse &res);
+
+	ModuleProxyListener* moduleProxyListener;
 
 	std::string moduleNodeName;
 

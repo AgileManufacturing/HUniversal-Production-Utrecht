@@ -14,20 +14,30 @@
 
 #include <equiplet_node/ModuleProxy.h>
 
+#include "equiplet_node/ModuleRegistryListener.h"
+
 namespace equiplet_node {
 
 class EquipletNode;
 
-class ModuleRegistry {
+class ModuleRegistry : public equiplet_node::ModuleProxyListener {
 public:
-	ModuleRegistry(std::string nodeName, int equipletId);
+	ModuleRegistry(std::string nodeName, int equipletId, ModuleRegistryListener* mrl = NULL);
 	virtual ~ModuleRegistry();
 
+	void setModuleRegistryListener(ModuleRegistryListener* mrl);
+
 	void setNewRegistrationsAllowed(bool allowed);
+
+	void onModuleStateChanged(ModuleProxy* moduleProxy,rexos_statemachine::State newState, rexos_statemachine::State previousState);
+
+	void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
 
 	std::vector<ModuleProxy*> getRigisteredModules();
 private:
 	bool onRegisterServiceModuleCallback(RegisterModule::Request &req, RegisterModule::Response &res);
+
+	ModuleRegistryListener* moduleRegistryListener;
 
 	ros::NodeHandle rosNodeHandle;
 	ros::ServiceServer registerModuleServiceServer;

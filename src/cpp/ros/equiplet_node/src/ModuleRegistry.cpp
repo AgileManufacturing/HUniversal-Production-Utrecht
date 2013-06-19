@@ -11,9 +11,8 @@
 
 namespace equiplet_node {
 
-ModuleRegistry::ModuleRegistry(std::string nodeName, int equipletId)
-:newRegistrationsAllowed(false),
- equipletId(equipletId)
+ModuleRegistry::ModuleRegistry(std::string nodeName, int equipletId, ModuleRegistryListener* mrl)
+:newRegistrationsAllowed(false),equipletId(equipletId),moduleRegistryListener(mrl)
 {
 	registerModuleServiceServer = rosNodeHandle.advertiseService(
 			nodeName + "/register_module",
@@ -27,6 +26,11 @@ ModuleRegistry::~ModuleRegistry() {
 		delete proxy;
 	}
 }
+
+void ModuleRegistry::setModuleRegistryListener(ModuleRegistryListener* mrl){
+	moduleRegistryListener = mrl;
+}
+
 
 void ModuleRegistry::setNewRegistrationsAllowed(bool allowed){
 	newRegistrationsAllowed = allowed;
@@ -47,12 +51,34 @@ bool ModuleRegistry::onRegisterServiceModuleCallback(RegisterModule::Request &re
 			EquipletNode::nameFromId(equipletId),
 			req.name,
 			equipletId,
-			req.id);
+			req.id,this);
 	registeredModules.push_back(proxy);
 
 	ROS_INFO("registration successful");
 
 	return true;
+}
+
+void ModuleRegistry::onModuleStateChanged(
+	ModuleProxy* moduleProxy,
+	rexos_statemachine::State newState, 
+	rexos_statemachine::State previousState)
+{
+	//ROS_INFO("ModuleRegistry received from %s a state change from %s to %s",moduleProxy->getModuleNodeName(),previousState,newState);
+	if(moduleRegistryListener != NULL){
+		moduleRegistryListener->onModuleStateChanged(moduleProxy, newState, previousState);
+	}
+}
+
+void ModuleRegistry::onModuleModeChanged(
+	ModuleProxy* moduleProxy, 
+	rexos_statemachine::Mode newMode, 
+	rexos_statemachine::Mode previousMode)
+{
+	//ROS_INFO("ModuleRegistry received from %s a mode change from %s to %s",moduleProxy->getModuleNodeName(),previousMode,newMode);
+	if(moduleRegistryListener != NULL){
+		moduleRegistryListener->onModuleModeChanged(moduleProxy, newMode, previousMode);
+	}
 }
 
 } /* namespace equiplet_node */

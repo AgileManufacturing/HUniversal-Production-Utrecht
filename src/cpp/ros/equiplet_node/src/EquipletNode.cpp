@@ -72,9 +72,12 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 	subscriptions.push_back(sub);
 	blackboardClient->subscribe(*sub);
 
-	std::cout << "Connected!" << std::endl;
-
 	moduleRegistry.setNewRegistrationsAllowed(true);
+	moduleRegistry.setModuleRegistryListener(this);
+
+	setListener(this);
+
+	std::cout << "Connected!" << std::endl;
 }
 
 /**
@@ -175,23 +178,28 @@ void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupI
 	}
 }
 
-bool EquipletNode::changeModuleState(int moduleID,rexos_statemachine::State state){
-//	rexos_most::ChangeStateGoal_ goal;
-//	goal.desiredState state;
-//	changeStateClient.sendGoal(goal,);
-//
-//	rexos_most::ChangeState::Request req;
-//	rexos_most::ChangeState::Response res;
-//	req.desiredState = rexos_most::STATE_SAFE;
-//	std::stringstream ss;
-//	ss << "/most/" << moduleID << "/changeState";
-//	if(!(nh.serviceClient<rexos_most::ChangeState>(
-//		ss.str()).call(req, res)) ||
-//		!res.executed)
-//	{
-//		return false;
-//	}
-	return true;
+void EquipletNode::onStateChanged(){
+
+}
+	
+void EquipletNode::onModeChanged(){
+	bool changeModuleModes = false;
+
+	rexos_statemachine::Mode currentMode = getCurrentMode();
+	switch(currentMode){
+		case rexos_statemachine::MODE_NORMAL:	
+		case rexos_statemachine::MODE_ERROR:
+		case rexos_statemachine::MODE_CRITICAL_ERROR:
+		case rexos_statemachine::MODE_E_STOP:	
+			changeModuleModes = true; break;
+	}
+
+	if(changeModuleModes){
+		std::vector<ModuleProxy*> modules = moduleRegistry.getRigisteredModules();
+		for (int i = 0; i < modules.size(); i++) {
+			modules[i]->changeMode(currentMode);
+		}
+	}
 }
 
 void EquipletNode::transitionSetup() {
@@ -218,41 +226,18 @@ void EquipletNode::transitionStart() {
 void EquipletNode::transitionStop() {
 }
 
-//bool EquipletNode::moduleUpdateService(rexos_most::ModuleUpdate::Request& req,
-//		rexos_most::ModuleUpdate::Response& res) {
-//	ROS_INFO("Received module update (id=%d, state=%s, modi=%s)", req.info.id,
-//			rexos_statemachine::MOSTState_txt[req.info.state],rexos_statemachine::MOSTModi_txt[req.info.modi]);
-//	MOSTDatabaseClient::ModuleData data;
-//	data.id = req.info.id;
-//	data.state = req.info.state;
-//	data.modi = req.info.modi;
-//	mostDatabaseclient.setModuleData(data);
-//
-//	rexos_statemachine::State safetyState = rexos_statemachine::STATE_SAFE;
-//	auto moduleDatas = mostDatabaseclient.getAllModuleData();
-//	for (auto it = moduleDatas.begin(); it != moduleDatas.end(); it++) {
-//		rexos_statemachine::State modState = (rexos_statemachine::State) it->state;
-//		rexos_statemachine::State roundedState;
-//		switch (modState) {
-//		case rexos_statemachine::STATE_SAFE:
-//			roundedState = rexos_statemachine::STATE_SAFE;
-//			break;
-//		case rexos_statemachine::STATE_SETUP:
-//		case rexos_statemachine::STATE_SHUTDOWN:
-//		case rexos_statemachine::STATE_STANDBY:
-//			roundedState = rexos_statemachine::STATE_STANDBY;
-//			break;
-//		case rexos_statemachine::STATE_START:
-//		case rexos_statemachine::STATE_STOP:
-//		case rexos_statemachine::STATE_NORMAL:
-//			roundedState = rexos_statemachine::STATE_NORMAL;
-//		}
-//
-//		if(roundedState > safetyState){
-//			safetyState = roundedState;
-//		}
-//
-//		mostDatabaseclient.setSafetyState(safetyState);
-//	}
-//	return true;
-//}
+void EquipletNode::onModuleStateChanged(
+	ModuleProxy* moduleProxy,
+	rexos_statemachine::State newState, 
+	rexos_statemachine::State previousState)
+{
+	//ROS_INFO("EquipletNode received from %s a state change from %d to %d",moduleProxy->getModuleNodeName(),previousState,newState);
+}
+
+void EquipletNode::onModuleModeChanged(
+	ModuleProxy* moduleProxy, 
+	rexos_statemachine::Mode newMode, 
+	rexos_statemachine::Mode previousMode)
+{
+	//ROS_INFO("ModuleRegistry received from %s a mode change from %d to %d",moduleProxy->getModuleNodeName(),previousMode,newMode);
+}

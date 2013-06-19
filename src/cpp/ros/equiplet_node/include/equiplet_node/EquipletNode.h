@@ -60,23 +60,40 @@ typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeModeAction> Chan
 /**
  * The equipletNode, will manage all modules and keep track of their states
  **/
-class EquipletNode: public Blackboard::BlackboardSubscriber, rexos_statemachine::StateMachine {
+class EquipletNode : public 
+	Blackboard::BlackboardSubscriber, 
+	rexos_statemachine::StateMachine, 
+	rexos_statemachine::Listener,
+	equiplet_node::ModuleRegistryListener
+{
 public:
 	static std::string nameFromId(int id){
 		return std::string("equiplet_") + std::to_string(id);
 	}
 
 	EquipletNode(int id, std::string blackboardIp);
+
 	virtual ~EquipletNode();
+
 	void blackboardReadCallback(std::string json);
 
 	std::string getName();
+
 	ros::NodeHandle& getNodeHandle();
+
+	void onStateChanged();
+
+	void onModeChanged();
+
+	void onModuleStateChanged(ModuleProxy* moduleProxy,rexos_statemachine::State newState, rexos_statemachine::State previousState);
+
+	void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
 
 private:
 	void callLookupHandler(std::string lookupType, std::string lookupID, environment_communication_msgs::Map payload);
+
 	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
-private:
+
 	/**
 	 * @var int equipletId
 	 * The id of the equiplet

@@ -9,17 +9,18 @@
 
 namespace equiplet_node {
 
-ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleName, int equipletId, int moduleId)
-:ModuleProxy(equipletNodeName, moduleName + "_" + std::to_string(equipletId) + "_" + std::to_string(moduleId))
+ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleName, int equipletId, int moduleId, ModuleProxyListener* mpl)
+:ModuleProxy(equipletNodeName, moduleName + "_" + std::to_string(equipletId) + "_" + std::to_string(moduleId),mpl)
 {
 }
 
-ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleNodeName):
+ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleNodeName, ModuleProxyListener* mpl):
 		moduleNodeName(moduleNodeName),
 		changeStateActionClient(nodeHandle, moduleNodeName + "/change_state"),
 		changeModeActionClient(nodeHandle, moduleNodeName + "/change_mode"),
 		currentMode(rexos_statemachine::Mode::MODE_NORMAL),
-		currentState(rexos_statemachine::State::STATE_SAFE)
+		currentState(rexos_statemachine::State::STATE_SAFE),
+		moduleProxyListener(mpl)
 {
 	stateUpdateServiceServer = nodeHandle.advertiseService(
 			equipletNodeName + "/" + moduleNodeName + "/state_update",
@@ -32,6 +33,22 @@ ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleNodeNam
 
 ModuleProxy::~ModuleProxy() {
 	// TODO Auto-generated destructor stub
+}
+
+rexos_statemachine::State ModuleProxy::getCurrentState(){
+	return currentState;
+}
+
+rexos_statemachine::Mode ModuleProxy::getCurrentMode(){
+	return currentMode;
+}
+
+std::string ModuleProxy::getModuleNodeName(){
+	return moduleNodeName;
+}
+
+void ModuleProxy::setModuleProxyListener(ModuleProxyListener* mpl){
+	moduleProxyListener = mpl;
 }
 
 void ModuleProxy::changeState(rexos_statemachine::State state) {
@@ -49,17 +66,27 @@ void ModuleProxy::changeMode(rexos_statemachine::Mode mode) {
 }
 
 bool ModuleProxy::onStateChangeServiceCallback(StateUpdateRequest &req, StateUpdateResponse &res){
+	//ROS_INFO("ModuleProxy of %s received state change to %s", moduleNodeName.c_str(), rexos_statemachine::state_txt[currentState]);
+
+	rexos_statemachine::State previousState = currentState;
 	currentState = static_cast<rexos_statemachine::State>(req.state);
 
-	ROS_INFO("ModuleProxy of %s received state change to %s", moduleNodeName.c_str(), rexos_statemachine::state_txt[currentState]);
+	if(moduleProxyListener != NULL){
+		moduleProxyListener->onModuleStateChanged(this,currentState,previousState);
+	}
 
 	return true;
 }
 
 bool ModuleProxy::onModeChangeServiceCallback(ModeUpdateRequest &req, ModeUpdateResponse &res){
+	//ROS_INFO("ModuleProxy of %s received mode change to %s", moduleNodeName.c_str(), rexos_statemachine::Mode_txt[currentMode]);
+
+	rexos_statemachine::Mode previousMode = currentMode;
 	currentMode = static_cast<rexos_statemachine::Mode>(req.mode);
 
-	ROS_INFO("ModuleProxy of %s received mode change to %s", moduleNodeName.c_str(), rexos_statemachine::Mode_txt[currentMode]);
+	if(moduleProxyListener != NULL){
+		moduleProxyListener->onModuleModeChanged(this,currentMode,previousMode);
+	}
 
 	return true;
 }
