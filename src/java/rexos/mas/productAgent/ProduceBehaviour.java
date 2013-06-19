@@ -158,22 +158,19 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 		myAgent.addBehaviour(seq);
 		msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setOntology("StartProduction");
-<<<<<<< .mine
 		
 		//AID CHECK
 		if(eqAndTs.get(msg.getSender()) != productionStep.getId()){
 			Logger.log(new UnsupportedOperationException("Equiplet sender not equal to associated equiplet in productionStep"));
-=======
 		if (eqAndTs.get(msg.getSender()) != productionStep.getId()){
 			Logger.log(new UnsupportedOperationException(
 					"Equiplet sender not equal to associated equiplet in productionStep"));
-
->>>>>>> .theirs
 		}
 		//TODO add content to change step state to STATE_PRODUCING
 		msg.addReceiver(msg.getSender());
 		myAgent.send(msg);
 	}
+}
 }
 
 class producing extends OneShotBehaviour{
