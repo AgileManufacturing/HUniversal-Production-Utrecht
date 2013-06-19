@@ -239,7 +239,31 @@ void EquipletNode::onModuleStateChanged(
 {
 	//ROS_INFO("EquipletNode received from %s a state change from %d to %d",moduleProxy->getModuleNodeName(),previousState,newState);
 
-	//if(currentM)
+	if(getCurrentState() == rexos_statemachine::STATE_SETUP)
+	{
+		bool allModulesStandby = true;
+
+		std::vector<ModuleProxy*> modules = moduleRegistry.getRigisteredModules();
+		for (int i = 0; i < modules.size(); i++) {
+			if(modules[i]->getCurrentState() != rexos_statemachine::STATE_STANDBY)
+				allModulesStandby = false;
+		}
+
+		if(allModulesStandby)
+			setupTransitionActionServer->setSucceeded();
+	}else if(getCurrentState() == rexos_statemachine::STATE_SHUTDOWN)
+	{
+		bool allModulesSafe = true;
+
+		std::vector<ModuleProxy*> modules = moduleRegistry.getRigisteredModules();
+		for (int i = 0; i < modules.size(); i++) {
+			if(modules[i]->getCurrentState() != rexos_statemachine::STATE_SAFE)
+				allModulesSafe = false;
+		}
+
+		if(allModulesSafe)
+			shutdownTransitionActionServer->setSucceeded();
+	}
 }
 
 void EquipletNode::onModuleModeChanged(
