@@ -34,7 +34,6 @@
  **/
 package rexos.mas.service_agent.behaviours;
 
-
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import rexos.mas.behaviours.ReceiveBehaviour;

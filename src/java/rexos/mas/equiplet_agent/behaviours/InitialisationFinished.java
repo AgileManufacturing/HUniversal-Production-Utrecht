@@ -47,10 +47,8 @@
  **/
 package rexos.mas.equiplet_agent.behaviours;
 
-import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
@@ -85,12 +83,6 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 	private EquipletAgent equipletAgent;
 
 	/**
-	 * @var BlackboardClient collectiveBBClient
-	 *      BlackboardClient for the collective blackboard.
-	 */
-	private BlackboardClient collectiveBBClient;
-
-	/**
 	 * Instantiates a new can perform step.
 	 * 
 	 * @param a
@@ -98,10 +90,9 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 	 * @param collectiveBBClient
 	 *      BlackboardClient for the collective blackboard.
 	 */
-	public InitialisationFinished(Agent a, BlackboardClient collectiveBBClient) {
+	public InitialisationFinished(EquipletAgent a) {
 		super(a, 2000, messageTemplate);
-		equipletAgent = (EquipletAgent) a;
-		this.collectiveBBClient = collectiveBBClient;
+		equipletAgent = a;
 	}
 
 	/**
@@ -122,7 +113,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 					equipletAgent.getAID(), equipletAgent.getCapabilities(),
 					equipletAgent.getDbData());
 			try {
-				collectiveBBClient.insertDocument(entry.toBasicDBObject());
+				equipletAgent.getCollectiveBBClient().insertDocument(entry.toBasicDBObject());
 			} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(e);
 				equipletAgent.doDelete();
@@ -131,7 +122,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 			// starts the behaviour for receiving messages with the Ontology
 			// CanPerformStep.
 			equipletAgent.addBehaviour(new CanPerformStep(equipletAgent,
-					equipletAgent.getEquipletBBClient()));
+					equipletAgent.getProductStepBBClient()));
 
 			// starts the behaviour for receiving messages with the Ontology
 			// GetProductionDuration.
@@ -140,12 +131,12 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 
 			// starts the behaviour for receiving messages with the Ontology
 			// ScheduleStep.
-			equipletAgent.addBehaviour(new ScheduleStep(equipletAgent, equipletAgent.getEquipletBBClient()));
+			equipletAgent.addBehaviour(new ScheduleStep(equipletAgent, equipletAgent.getProductStepBBClient()));
 
 			// starts the behaviour for receiving messages with the Ontology
 			// StartStep.
 			equipletAgent.addBehaviour(new StartStep(equipletAgent,
-					equipletAgent.getEquipletBBClient()));
+					equipletAgent.getProductStepBBClient()));
 		} else {
 			Logger.log(equipletAgent.getName()
 					+ " - InitialisationFinished timeout!");

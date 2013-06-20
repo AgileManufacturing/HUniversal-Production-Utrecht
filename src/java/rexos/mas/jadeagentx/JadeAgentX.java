@@ -107,11 +107,13 @@ public class JadeAgentX extends Agent {
 			 * Lets make a parameter list
 			 */
 			BasicDBObject parameters = new BasicDBObject();
-			parameters.append("part", new Part(1).toBasicDBObject());
-			parameters.append("position", new Position(1.0, 2.0, 3.0, new Part(2)).toBasicDBObject());
+//			parameters.append("part", new Part(1).toBasicDBObject());
+//			parameters.append("position", new Position(1.0, 2.0, 3.0, new Part(2)).toBasicDBObject());
+			parameters.append("startPosition", new Position(1.0, 1.0).toBasicDBObject());
+			parameters.append("endPosition", new Position(1.0, 2.0).toBasicDBObject());
 
 			// Next we want to have some production steps
-			ProductionStep stp1 = new ProductionStep(1, 1, parameters);
+			ProductionStep stp1 = new ProductionStep(1, 3, parameters);
 //			ProductionStep stp2 = new ProductionStep(2, 1, parameters);
 //			ProductionStep stp3 = new ProductionStep(3, 1, parameters);
 //			ProductionStep stp4 = new ProductionStep(4, 1, parameters);

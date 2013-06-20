@@ -146,15 +146,18 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 				for(int i = 0; i < dbServiceSteps.size(); i++) {
 					serviceSteps[i] = new ServiceStep((BasicDBObject) dbServiceSteps.get(i));
 				}
-				
+
 				HashMap<Part, Position> parameters = (HashMap<Part, Position>) message.getContentObject();
-				
+
 				Logger.log("%s got partsInfo: %s%n", agent.getLocalName(), parameters.toString());
-				
+
 				for(Entry<Part, Position> e : parameters.entrySet()) {
 					if(e.getValue() == null) {
-						agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
-								new BasicDBObject("$set", new BasicDBObject("outputPart", e.getKey().toBasicDBObject())));
+						agent.getProductStepBBClient()
+								.updateDocuments(
+										new BasicDBObject("_id", productStepId),
+										new BasicDBObject("$set", new BasicDBObject("outputPart", e.getKey()
+												.toBasicDBObject())));
 						parameters.remove(e.getKey());
 						break;
 					}
@@ -173,8 +176,12 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 
 					nextStartTime += scheduleData.getDuration();
 
-					agent.getServiceStepBBClient().updateDocuments(new BasicDBObject("_id", serviceStep.getId()),
-							new BasicDBObject("$set", serviceStep.toBasicDBObject()));
+					agent.getServiceStepBBClient().updateDocuments(
+							new BasicDBObject("_id", serviceStep.getId()),
+							new BasicDBObject("$set",
+									new BasicDBObject("parameters", serviceStep.getParameters())
+											.append("scheduleData", serviceStep.getScheduleData().toBasicDBObject())
+											.append("status", serviceStep.getStatus().name())));
 				}
 
 				ACLMessage informMsg = new ACLMessage(ACLMessage.INFORM);

@@ -177,11 +177,11 @@ public class GripperModule extends Module {
 	}
 
 	/**
-	 * @see Module#isLeadingForSteps()
+	 * @see Module#isLeadingForServices()
 	 */
 	@Override
-	public int[] isLeadingForSteps() {
-		return new int[] { 1, 2 };
+	public int[] isLeadingForServices() {
+		return new int[] { 1 };
 	}
 
 	/**

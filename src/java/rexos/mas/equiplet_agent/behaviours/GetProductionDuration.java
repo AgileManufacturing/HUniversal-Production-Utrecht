@@ -103,7 +103,7 @@ public class GetProductionDuration extends ReceiveBehaviour {
 				myAgent.send(responseMessage);
 			} else {
 				ProductionDurationResponse productionDurationResponseBehaviour =
-						new ProductionDurationResponse(myAgent, equipletAgent.getEquipletBBClient());
+						new ProductionDurationResponse(myAgent, equipletAgent.getProductStepBBClient());
 				myAgent.addBehaviour(productionDurationResponseBehaviour);
 
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
