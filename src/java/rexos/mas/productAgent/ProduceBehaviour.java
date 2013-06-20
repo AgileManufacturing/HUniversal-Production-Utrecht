@@ -144,8 +144,7 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 	ACLMessage msg;
 	HashMap<AID, Long> eqAndTs;
 	private ProductionStep productionStep;
-	private StepStatusCode statusCodeInProgress;
-
+	
 	public WaitMsgBehaviour(ACLMessage msg, HashMap<AID, Long> eqAndTs,
 			ProductionStep productionStep){
 		this.msg = msg;
@@ -169,7 +168,7 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 					"Equiplet sender not equal to associated equiplet in productionStep"));
 		}
 		
-		productionStep.setStatus(statusCodeInProgress(3));
+		productionStep.setStatus(StepStatusCode.IN_PROGRESS);
 		msg.addReceiver(msg.getSender());
 		myAgent.send(msg);
 	}
