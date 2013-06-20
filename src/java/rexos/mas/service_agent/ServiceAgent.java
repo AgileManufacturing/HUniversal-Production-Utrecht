@@ -323,6 +323,9 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 									Logger.log("Service agent - aboring all serviceSteps of prod.Step\n",
 											entry.getTargetObjectId());
+									
+									//TODO inform LA to cancel part transport
+									
 									serviceStepBBClient.updateDocuments(
 											new BasicDBObject("productStepId", entry.getTargetObjectId()),
 											new BasicDBObject("$set", new BasicDBObject("status", status.name())
@@ -345,6 +348,17 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 						case UPDATE:
 							StepStatusCode status = serviceStep.getStatus();
 							switch(status) {
+								case DELETED:
+									Logger.log("Service agent - serv.Step %s status set to %s\n", serviceStep.getId(),
+											status);
+									productStepBBClient.updateDocuments(
+											new BasicDBObject("_id", serviceStep.getProductStepId()),
+											new BasicDBObject("$set", new BasicDBObject("status",
+													StepStatusCode.DELETED).append("statusData.log",
+													buildLog(serviceStep.getProductStepId()))));
+									serviceStepBBClient.removeDocuments(new BasicDBObject("_id", serviceStep
+											.getId()));
+									break;
 								case DONE:
 									Logger.log("Service agent - serv.Step %s status set to %s\n", serviceStep.getId(),
 											status);

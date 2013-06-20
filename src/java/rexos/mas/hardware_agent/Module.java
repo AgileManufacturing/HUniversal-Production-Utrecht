@@ -94,7 +94,7 @@ public abstract class Module {
 	 * Function for getting the steps this module is leading for.
 	 * @return int[] with step ids.
 	 */
-	public abstract int[] isLeadingForSteps();
+	public abstract int[] isLeadingForServices();
 	
 	/**
 	 * Getter for the id.

@@ -95,7 +95,7 @@ public class StartStep extends ReceiveBehaviour {
 	 *            The BlackboardClient for this equiplet's blackboard.
 	 */
 	public StartStep(Agent a, BlackboardClient equipletBBClient) {
-		super(a, -1, messageTemplate);
+		super(a, messageTemplate);
 		equipletAgent = (EquipletAgent) a;
 		this.equipletBBClient = equipletBBClient;
 	}
@@ -126,19 +126,19 @@ public class StartStep extends ReceiveBehaviour {
 		NextProductStepTimer timer = equipletAgent.getTimer();
 		try {
 			BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED.name());
-			query.put("$order_by", new BasicDBObject("scheduleData", new BasicDBObject("startTime", "-1")));
+			query.put("$order_by", new BasicDBObject("scheduleData", new BasicDBObject("startTime", "1")));
 			List<DBObject> objects = equipletBBClient.findDocuments(query);
 			if(!objects.isEmpty()) {
-				ProductStep nextProductStep = new ProductStep((BasicDBObject)objects.get(0));
+				ProductStep nextProductStep = new ProductStep((BasicDBObject) objects.get(0));
 				equipletAgent.setNextProductStep(nextProductStep.getId());
 				ScheduleData scheduleData = nextProductStep.getScheduleData();
-				if (scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
+				if(scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
 					timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 				}
-			}else{
+			} else {
 				timer.setNextUsedTimeSlot(-1);
 			}
-		} catch (GeneralMongoException | InvalidDBNamespaceException e) {		
+		} catch(GeneralMongoException | InvalidDBNamespaceException e) {
 			Logger.log(e);
 		}
 	}

@@ -2,7 +2,7 @@ package rexos.mas.hardware_agent.behaviours;
 
 /**
  * @file FillPlaceHolders.java
- * @brief 
+ * @brief
  * @date Created: 12-04-13
  * 
  * @author Thierry Gerritse
@@ -78,24 +78,24 @@ import com.mongodb.DBObject;
 public class FillPlaceholders extends ReceiveBehaviour {
 	/**
 	 * @var long serialVersionUID
-	 * The serialVersionUID.
+	 *      The serialVersionUID.
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * @var MessageTemplate messageTemplate
-	 * The messageTemplate to match the messages to.
+	 *      The messageTemplate to match the messages to.
 	 */
 	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("FillPlaceholders");
-	
+
 	/**
 	 * @var HardwareAgent hardwareAgent
-	 * The hardwareAgent for this behaviour.
+	 *      The hardwareAgent for this behaviour.
 	 */
 	private HardwareAgent hardwareAgent;
 	/**
 	 * @var ModuleFactory moduleFactory
-	 * The moduleFactory
+	 *      The moduleFactory
 	 */
 	private ModuleFactory moduleFactory;
 
@@ -116,7 +116,7 @@ public class FillPlaceholders extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		try{
+		try {
 			ObjectId serviceStepId = (ObjectId) message.getContentObject();
 			Logger.log("%s received message from %s %n", myAgent.getLocalName(), message.getSender().getLocalName(),
 					message.getOntology());
@@ -129,34 +129,37 @@ public class FillPlaceholders extends ReceiveBehaviour {
 
 	/**
 	 * Function for filling the placeholders of the equipletSteps for an serviceStepId
+	 * 
 	 * @param serviceStepId The serviceStepId to fill the equipletsSteps for.
 	 */
-	public void FillStepPlaceholders(ObjectId serviceStepId){
+	public void FillStepPlaceholders(ObjectId serviceStepId) {
 		try {
-			//Get the serviceStep
-			ServiceStep serviceStep = new ServiceStep(
-					(BasicDBObject) hardwareAgent.getServiceStepsBBClient().findDocumentById(serviceStepId));
+			// Get the serviceStep
+			ServiceStep serviceStep =
+					new ServiceStep((BasicDBObject) hardwareAgent.getServiceStepsBBClient().findDocumentById(
+							serviceStepId));
 			BlackboardClient equipletStepBBClient = hardwareAgent.getEquipletStepsBBClient();
 			BasicDBObject query = new BasicDBObject("serviceStepID", serviceStep.getId());
-			//Get the equipletSteps
+			// Get the equipletSteps
 			List<DBObject> steps = equipletStepBBClient.findDocuments(query);
 			EquipletStep[] equipletSteps = new EquipletStep[steps.size()];
 			for(int i = 0; i < steps.size(); i++) {
 				equipletSteps[i] = new EquipletStep((BasicDBObject) steps.get(i));
 			}
-			
-			//Get the leadingModule
+
+			// Get the leadingModule
 			int leadingModule = hardwareAgent.getLeadingModule(serviceStep.getServiceId());
 			Module module = moduleFactory.getModuleById(leadingModule);
 			module.setConfiguration(hardwareAgent.getConfiguration());
 
-			//Fill the placeholders
+			// Fill the placeholders
 			equipletSteps = module.fillPlaceHolders(equipletSteps, serviceStep.getParameters());
 			for(EquipletStep step : equipletSteps) {
-				equipletStepBBClient.updateDocuments(new BasicDBObject("_id", step.getId()), new BasicDBObject("$set", step.toBasicDBObject()));
+				equipletStepBBClient.updateDocuments(new BasicDBObject("_id", step.getId()), new BasicDBObject("$set", 
+						new BasicDBObject("instructionData", step.getInstructionData().toBasicDBObject())));
 			}
-			//if the serviceStep has a nextStep fill the placeholders for that one to.
-			if(serviceStep.getNextStep() != null){
+			// if the serviceStep has a nextStep fill the placeholders for that one to.
+			if(serviceStep.getNextStep() != null) {
 				FillStepPlaceholders(serviceStep.getNextStep());
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {

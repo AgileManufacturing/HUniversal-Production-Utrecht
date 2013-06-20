@@ -59,7 +59,7 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 	 *            the equiplet blackboard.
 	 */
 	public ProductionDurationResponse(Agent a, BlackboardClient equipletBBClient) {
-		super(a, 5000, messageTemplate);
+		super(a, 2000, messageTemplate);
 		equipletAgent = (EquipletAgent) a;
 		this.equipletBBClient = equipletBBClient;
 	}
@@ -69,8 +69,9 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		if (message != null) {
-			Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(), message.getOntology());
+		if(message != null) {
+			Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
+					message.getOntology());
 
 			try {
 				// gets the productstep
@@ -89,20 +90,21 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 				equipletAgent.send(responseMessage);
 				Logger.log("sending message: %s%n", responseMessage.getOntology());
 
-				//TODO: remove below after testing
+				// TODO: remove below after testing
 				ACLMessage scheduleStepMessage = new ACLMessage(ACLMessage.REQUEST);
 				scheduleStepMessage.addReceiver(equipletAgent.getAID());
 				scheduleStepMessage.setOntology("ScheduleStep");
 				scheduleStepMessage.setConversationId(message.getConversationId());
-				scheduleStepMessage.setContentObject((int) (System.currentTimeMillis() - equipletAgent.getTimer().getFirstTimeSlot())/2000 + 3);
+				int timeslot = (int) ((System.currentTimeMillis() - equipletAgent.getTimer()
+						.getFirstTimeSlot()) / equipletAgent.getTimer().getTimeSlotLength() + 5);
+				scheduleStepMessage.setContentObject(timeslot);
 				equipletAgent.send(scheduleStepMessage);
 				Logger.log("sending message: %s%n", scheduleStepMessage.getOntology());
-				//TODO: remove above after testing
-			} catch (IOException | InvalidDBNamespaceException | GeneralMongoException e) {
+				// TODO: remove above after testing
+			} catch(IOException | InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(e);
 				equipletAgent.doDelete();
 			}
 		}
-		equipletAgent.removeBehaviour(this);
 	}
 }
