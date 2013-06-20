@@ -22,20 +22,19 @@ public class ProductAgentProperties{
 	private Product _product;
 	
 	//The host to connect to, represented as: IP or Hostname : Port number. eg. 127.0.0.1:253 or localhost:273
-	private String _callbackHost;
+	private Callback _callback;
 	
 	
 	public ProductAgentProperties(){
 		
 	}
 	
-	public String getCallbackHost() {
-		return this._callbackHost;
+	public Callback getCallback() {
+		return this._callback;
 	}
 	
-	
-	public void setCallbackHost(String value) {
-		this._callbackHost = value;
+	public void setCallback(Callback value) {
+		this._callback = value;
 	}
 	
 	public Product getProduct() {

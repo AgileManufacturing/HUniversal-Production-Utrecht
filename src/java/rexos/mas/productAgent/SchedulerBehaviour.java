@@ -43,8 +43,13 @@ import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
+import rexos.mas.data.DbData;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
@@ -54,12 +59,15 @@ import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
 
 import com.mongodb.DBObject;
+import com.mongodb.BasicDBObject;
+import com.mongodb.QueryBuilder;
 
 @SuppressWarnings("serial")
 public class SchedulerBehaviour extends OneShotBehaviour{
 	private ProductAgent _productAgent;
 	private int timeslotsToSchedule = 0;
 	private int debug = 1;
+	private ProductionStep _prodStep;
 
 	@Override
 	public void action(){
@@ -121,141 +129,118 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 	 */
 	public void Scheduler(Set<AID> equipletList, ProductionStep productionstep)
 			throws Exception{
-		Schedule[] schedules;
+		
+		this._prodStep = productionstep;
+		
 		// load set into arraylist
 		List<AID> equipletlist = new ArrayList<AID>(equipletList);
-		// Make connection with blackboard
-		BlackboardClient bbc = new BlackboardClient("145.89.191.131");
-		bbc.setDatabase("ScheduleBlackBoard");
-		if (debug != 0){
-			// debug
-			System.out.println("Scheduler started");
+		
+		HashMap<AID, DbData> dbData = new HashMap<AID, DbData>(); 
+		
+		//Change this
+		
+		for(AID aid : equipletlist) {
+			
+			BlackboardClient bbc = new BlackboardClient("145.89.191.131");
+			bbc.setDatabase("CollectiveDB");
+			bbc.setCollection("EquipletDirectory");
+			
+			QueryBuilder qb = QueryBuilder.start("AID").is(aid);
+			
+			List<DBObject> aidInfo = bbc.findDocuments(qb.get());
+			
+			if(aidInfo.size() > 0) {
+				dbData.put(aid, new DbData((BasicDBObject) aidInfo.get(0)));
+			} else {
+				// TODO: what to do if list is empty
+			}	
 		}
-		// authenticating mongodb
-		// boolean auth = db.authenticate("root", char['g','e','e','n']);
-		// end connecting
-		// extract data of every equiplet their mongoDB to Object Array
+		
 		int scheduleCount = 0;
-		FreeTimeSlot[] freetimeslot;
-		for(int i = 0; i < equipletlist.size(); i++){
-			// old name is eqa1
-			bbc.setCollection(equipletlist.get(i).getLocalName().toString());
+		Schedule[] schedules;
+		ArrayList<FreeTimeSlot> freetimeslot = new ArrayList<FreeTimeSlot>();
+		
+	    Iterator<Entry<AID, DbData>> it = dbData.entrySet().iterator();
+	    while (it.hasNext()) {
+	        Map.Entry<AID, DbData> pairs = it.next();
+	        
+	        DbData dbDa = pairs.getValue();
+	        
+			BlackboardClient bbc = new BlackboardClient(dbDa.getIp(), dbDa.getPort());
+			bbc.setDatabase(dbDa.getName());
+			bbc.setCollection("ProductStepsBlackboard");
+			
 			List<DBObject> blackBoard = bbc.findDocuments(" ");
-			scheduleCount += blackBoard.size();
-			if (debug != 0){
-				// debug
-				System.out
-						.println("----- Get list of the already scheduled data -------");
-				System.out.println("" + equipletlist.get(i).getLocalName());
-				System.out.println();
-			}
-		}
-		if (debug != 0){
-			// debug
-			System.out.println("--------- ");
-			System.out.println("ScheduleCount: " + scheduleCount);
-			System.out.println();
-		}
-		// intialize object 'Schedule' and object 'FreeTimeSlot' arrays
-		schedules = new Schedule[scheduleCount];
-		freetimeslot = new FreeTimeSlot[scheduleCount];
-		// get every scheduled timeslot of every equiplet
-		for(int extract = 0; extract < equipletlist.size(); extract++){
-			bbc.setCollection(equipletlist.get(extract).getLocalName()
-					.toString());
-			List<DBObject> blackBoard = bbc.findDocuments(" ");
-			// List<DBObject> data =
-			// db.getCollection(equipletlist.get(extract).getLocalName()).find().toArray();
-			// nameOfCollection should be 'schedule'
-			for(int i = 0; i < blackBoard.size(); i++){
-				double b = (Double) blackBoard.get(i).get("startTime");
+			scheduleCount = blackBoard.size();
+			
+			schedules = new Schedule[scheduleCount];
+			
+			
+			// Gets planned steps
+			List<DBObject> plannedSteps =
+								bbc.findDocuments(QueryBuilder.start("scheduleData.startTime").greaterThan(-1).get());
+			for(int i = 0; i < plannedSteps.size(); i++){
+				double b = (Double) plannedSteps.get(i).get("startTime");
 				int stati = (int) b;
-				double c = (Double) blackBoard.get(i).get("duration");
+				double c = (Double) plannedSteps.get(i).get("duration");
 				int dur = (int) c;
 				// add scheduled timeslot to array of scheduled timeslots and
 				// mention which equiplet
-				schedules[i] = this.new Schedule(stati, dur, equipletlist.get(
-						extract).getName());
+				schedules[i] = new Schedule(stati, dur, pairs.getKey());
 			}
-		}
-		// initialize timeslot to start checking and temporarily value for
-		// calculation
-		int startTimeSlot = 0;
-		int freetimeslotCounter = 0;
-		// check within every schedule of the 'schedules' array for free
-		// timeslots
-		// and add them to the 'freetimeslot' array
-		for(int run = 0; run < schedules.length; run++){
-			if (schedules[run].getStartTime() > startTimeSlot){
-				if (schedules.length > (run + 1)){
-					if (schedules[run].getDeadline() < schedules[(run + 1)]
-							.getStartTime()){
-						int freeTimeSlot = schedules[(run + 1)].getStartTime()
-								- schedules[run].getDeadline() - 1;
-						int timeslotToSchedule = (schedules[run].getDeadline() + 1);
-						if (debug != 0){
-							// debug
-							System.out.println("Free timeslot: " + freeTimeSlot
-									+ " starting at timeslot: "
-									+ timeslotToSchedule);
-							freetimeslot[freetimeslotCounter] = this.new FreeTimeSlot(
+			
+			int startTimeSlot = 0;
+			// check within every schedule of the 'schedules' array for free
+			// timeslots
+			// and add them to the 'freetimeslot' array
+			for(int run = 0; run < schedules.length; run++){
+				if (schedules[run].getStartTime() > startTimeSlot){
+					if (schedules.length > (run + 1)){
+						if (schedules[run].getDeadline() < schedules[(run + 1)]
+								.getStartTime()){
+							int freeTimeSlot = schedules[(run + 1)].getStartTime()
+									- schedules[run].getDeadline() - 1;
+							int timeslotToSchedule = (schedules[run].getDeadline() + 1);
+							freetimeslot.add(new FreeTimeSlot(
 									timeslotToSchedule, freeTimeSlot,
-									schedules[run].getEquipletName());
-							System.out.println(freetimeslotCounter
-									+ " : "
-									+ freetimeslot[freetimeslotCounter]
-											.toString());
-							System.out.println();
+									schedules[run].getEquipletName()));
+							if (debug != 0){
+								// debug
+								System.out.println("Free timeslot: " + freeTimeSlot
+										+ " starting at timeslot: "
+										+ timeslotToSchedule);
+							}
 						}
-						freetimeslotCounter++;
 					}
 				}
-			}
-		}
-		// Startslot which need to be scheduled
-		FreeTimeSlot freetimeslotEq = null;
+			}		
+	    }
+	    
+	    FreeTimeSlot freetimeslotEq = null;
 		if (debug != 0){
 			System.out.println("---- Number of timeslots to schedule -----");
 			System.out.println("Timeslots to schedule: " + timeslotsToSchedule);
 			System.out.println();
 		}
+		
 		// calculate freetime slot and asign them to the above intialized values
-		if (freetimeslot.length > 1){
+		if (freetimeslot.size() > 1){
 			if (debug != 0){
-				System.out.println("Free time slots:" + freetimeslot.length);
+				System.out.println("Free time slots:" + freetimeslot.size());
 			}
-			for(int chooseTimeSlot = 0; chooseTimeSlot < freetimeslot.length; chooseTimeSlot++){
-				if (freetimeslot[chooseTimeSlot] != null){
-					if (freetimeslot[chooseTimeSlot].getDuration() <= timeslotsToSchedule){
-						freetimeslotEq = freetimeslot[chooseTimeSlot];
-					}
+			for(FreeTimeSlot fts : freetimeslot) {
+				if (fts.getDuration() <= timeslotsToSchedule){
+					freetimeslotEq = fts;
 				}
 			}
-		}
-		// init AID
-		AID equipletAID = null;
-		// get the equiplet from the timeslot
-		for(int i = 0; i < equipletlist.size(); i++){
-			if (freetimeslotEq != null
-					&& equipletlist.get(i).getName()
-							.equals(freetimeslotEq.getEquipletName())){
-				equipletAID = equipletlist.get(i);
-			}
-		}
-		if (debug != 0){
-			// debug
-			System.out
-					.println("------- Equiplet which gains free time slot --------");
-			System.out.println("AID name:" + equipletAID + "");
-			System.out.println();
-		}
-		// send the message to the equiplet to schedule the timeslot
-		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		if (freetimeslotEq != null && equipletAID != null){
-			msg.setConversationId(_productAgent.generateCID());
+		}	
+		
+		if (freetimeslotEq != null && freetimeslotEq.getEquipletName() != null){
+			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+			msg.setConversationId(this._prodStep.getConversationId());
 			msg.setOntology("ScheduleStep");
 			msg.setContent("" + freetimeslotEq.getStartTime());
-			msg.addReceiver(equipletAID);
+			msg.addReceiver(freetimeslotEq.getEquipletName());
 			myAgent.send(msg);
 			/*
 			 * SEND MESSAGES TO OTHER PLATFORMS computername is resolved by the
@@ -267,9 +252,8 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 			 */
 			if (debug != 0){
 				// debug
-				System.out.println("Send timeslot " + equipletAID.getName()
-						+ " to EQ");
-				System.out.println(equipletAID);
+				System.out.println("Send timeslot " + freetimeslotEq.getStartTime()
+						+ " to EQ name is "+freetimeslotEq.getEquipletName());
 			}
 		} else{
 			if (debug != 0){
@@ -277,24 +261,21 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 				System.out.println("No timeslot asigned.");
 			}
 		}
-		if (debug != 0){
-			// debug
-			System.out.println();
-		}
+		
 	}
 
 	private class FreeTimeSlot{
 		private int startTime = -1;
 		private int duration = -1;
-		private String equipletName = "";
+		private AID equipletName = null;
 
-		public FreeTimeSlot(int start, int dura, String equiplet){
+		public FreeTimeSlot(int start, int dura, AID equiplet){
 			this.startTime = start;
 			this.duration = dura;
 			this.equipletName = equiplet;
 		}
 
-		public String getEquipletName(){
+		public AID getEquipletName(){
 			return this.equipletName;
 		}
 
@@ -318,9 +299,9 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 		private int startTime = -1;
 		private int duration = -1;
 		private int deadline = -1;
-		private String equipletName = "";
+		private AID equipletName;
 
-		public Schedule(int start, int dura, String equiplet){
+		public Schedule(int start, int dura, AID equiplet){
 			this.startTime = start;
 			this.duration = dura;
 			this.deadline = start + dura - 1;
@@ -336,7 +317,7 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 			this.startTime = newStartTime;
 		}
 
-		public String getEquipletName(){
+		public AID getEquipletName(){
 			return this.equipletName;
 		}
 
