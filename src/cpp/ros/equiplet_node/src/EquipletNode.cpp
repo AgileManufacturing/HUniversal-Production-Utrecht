@@ -178,6 +178,10 @@ void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupI
 	}
 }
 
+bool changeModuleState(int moduleID,rexos_statemachine::State state){
+	
+}
+
 void EquipletNode::onStateChanged(){
 
 }

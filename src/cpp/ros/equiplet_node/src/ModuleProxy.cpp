@@ -20,7 +20,8 @@ ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleNodeNam
 		changeModeActionClient(nodeHandle, moduleNodeName + "/change_mode"),
 		currentMode(rexos_statemachine::Mode::MODE_NORMAL),
 		currentState(rexos_statemachine::State::STATE_SAFE),
-		moduleProxyListener(mpl)
+		moduleProxyListener(mpl),
+		moduleId(moduleId)
 {
 	stateUpdateServiceServer = nodeHandle.advertiseService(
 			equipletNodeName + "/" + moduleNodeName + "/state_update",
@@ -41,6 +42,10 @@ rexos_statemachine::State ModuleProxy::getCurrentState(){
 
 rexos_statemachine::Mode ModuleProxy::getCurrentMode(){
 	return currentMode;
+}
+
+int ModuleProxy::getModuleId(){
+	return moduleId;
 }
 
 std::string ModuleProxy::getModuleNodeName(){

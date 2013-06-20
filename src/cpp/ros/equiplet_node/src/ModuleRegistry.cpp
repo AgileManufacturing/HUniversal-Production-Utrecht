@@ -40,6 +40,14 @@ std::vector<ModuleProxy*> ModuleRegistry::getRigisteredModules(){
 	return registeredModules;
 }
 
+ModuleProxy* ModuleRegistry::getModule(int moduleId){
+	for(ModuleProxy* proxy : registeredModules){
+		if(proxy->getModuleId() == moduleId)
+			return proxy;
+	}
+	return NULL;
+}
+
 bool ModuleRegistry::onRegisterServiceModuleCallback(RegisterModule::Request &req, RegisterModule::Response &res) {
 	ROS_INFO("ModuleRegistry: New module %s with id %d registering", req.name.c_str(), req.id);
 	if(!newRegistrationsAllowed){

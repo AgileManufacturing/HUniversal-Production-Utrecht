@@ -34,6 +34,9 @@ public:
 	void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
 
 	std::vector<ModuleProxy*> getRigisteredModules();
+
+	ModuleProxy* getModule(int moduleId);
+
 private:
 	bool onRegisterServiceModuleCallback(RegisterModule::Request &req, RegisterModule::Response &res);
 
