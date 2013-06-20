@@ -123,8 +123,17 @@ public class sqliteDatabase{
 		if (conn != null){
 			try{
 				stmt = conn.createStatement();
-				try(ResultSet rs = stmt.executeQuery(("SELECT * FROM LOG"))){
-					return rs.toString();
+				try(ResultSet resultSet = stmt.executeQuery(("SELECT * FROM LOG"))){
+					StringBuilder builder = new StringBuilder();
+					int columnCount = resultSet.getMetaData().getColumnCount();
+					while (resultSet.next()) {
+					    for (int i = 0; i < columnCount;) {
+					        builder.append(resultSet.getString(i + 1));
+					        if (++i < columnCount) builder.append(",");
+					    }
+					    builder.append("\r\n");
+					}
+					return builder.toString();
 				}
 			} catch(SQLException e){
 				e.printStackTrace();
