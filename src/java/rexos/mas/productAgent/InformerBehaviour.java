@@ -71,7 +71,6 @@ public class InformerBehaviour extends OneShotBehaviour{
 	public InformerBehaviour(){
 	}
 
-	@SuppressWarnings("unused")
 	@Override
 	public void action(){
 		_productAgent = (ProductAgent) myAgent;
@@ -94,12 +93,24 @@ public class InformerBehaviour extends OneShotBehaviour{
 				// adds the step to te new list (the one that will be returned
 				// to the scheduler)
 				_prodEQmap.addProductionStep(stp.getId());
-				ProductionEquipletMapper s1 = _production
+				ProductionEquipletMapper pem = _production
 						.getProductionEquipletMapping();
+				
+				if(pem != null) {
+					for(AID aid : pem.getEquipletsForProductionStep(stp.getId()).keySet()) {
+						_par.addSubBehaviour(new Conversation(aid, stp, _prodEQmap));
+					}
+				} else {
+					//REPORT ERROR
+				}
+				
+				/*
+				 * OLD CODE
 				for(AID aid : _production.getProductionEquipletMapping()
 						.getEquipletsForProductionStep(stp.getId()).keySet()){
 					_par.addSubBehaviour(new Conversation(aid, stp, _prodEQmap));
 				}
+				*/
 			}
 		}
 		// Lets set our production objects
@@ -161,6 +172,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 		@Override
 		public void onStart(){
 			final String ConversationId = _productAgent.generateCID();
+			this._productionStep.setConversationId(ConversationId);
 			final MessageTemplate msgtemplate = MessageTemplate
 					.MatchConversationId(ConversationId);
 			// 1 - Inform if the equiplet can perform the step with the given

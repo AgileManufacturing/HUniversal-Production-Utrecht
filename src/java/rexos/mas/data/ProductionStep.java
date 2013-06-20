@@ -55,6 +55,8 @@ public class ProductionStep implements Serializable {
 	private int _capability;
 	private StepStatusCode _status;
 	private BasicDBObject _parameters;
+	
+	private String _convId;
 
 	public ProductionStep() {
 		this._parameters = new BasicDBObject();
@@ -66,6 +68,7 @@ public class ProductionStep implements Serializable {
 		this._capability = capability;
 		this._parameters = parameterList;
 	}
+
 
 	public int getId(){
 		return this._id;
@@ -93,6 +96,14 @@ public class ProductionStep implements Serializable {
 
 	public int getCapability() {
 		return _capability;
+	}
+	
+	public String getConversationId() {
+		return this._convId;
+	}
+	
+	public void setConversationId(String value) {
+		this._convId = value;
 	}
 	
 	@Override

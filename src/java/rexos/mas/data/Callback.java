@@ -22,7 +22,6 @@ package rexos.mas.data;
 
 public class Callback{
 	
-	
 	private String _host;
 	
 	private int _port;
@@ -30,10 +29,6 @@ public class Callback{
 	private int _reportLevel;
 	
 	private String _protocol;
-	
-	
-	
-	
 	
 	public Callback() {
 		
@@ -63,9 +58,12 @@ public class Callback{
 		this._reportLevel = value;
 	}
 	
+	public String getProtocol() {
+		return this._protocol;
+	}
 	
-	
-	
-	
+	public void setProtocol(String protocol) {
+		this._protocol = protocol;
+	}
 	
 }
