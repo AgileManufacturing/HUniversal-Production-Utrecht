@@ -74,40 +74,17 @@ public class ProductAgent extends Agent{
 		try{
 			gson = new Gson();
 			this._host = "145.89.253.111:89";
+			
 			Object[] args = this.getArguments();
+			
 			if(args.length > 0) {
 				if(args[0].getClass() == String.class) {
+					//Change the incoming JSON message to also implement the host to connect to.
 					_product = gson.fromJson((String)args[0], Product.class);
 				} else if(args[0].getClass() == Product.class) {
 					this._product = (Product) args[0];
 				}
 			}
-			/*
-			if (args.length == 1){
-				_product = (Product) args[0];
-				
-			} else if (args.length == 2) {
-				String host = args[0].toString();
-				this._host = host;
-				String modifiedJson = args[1].toString();
-				//String json = modifiedJson.replace('$', ',');
-				System.out.println(modifiedJson);
-				_product = gson.fromJson(modifiedJson, Product.class);
-				System.out.println("product aangemaakt");
-			} else if (args.length > 2){
-				String json = "";
-				for(int x = 0; x < args.length; x++){
-					if (x == 0){
-						json = args[x].toString();
-					} else{
-						json = json + "," + args[x];
-					}
-				}
-				System.out.println(json);
-				_product = gson.fromJson(json, Product.class);
-				System.out.println("product aangemaakt");
-				
-			}*/
 			_overviewBehaviour = new OverviewBehaviour();
 			addBehaviour(_overviewBehaviour);
 			
