@@ -179,6 +179,15 @@ void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupI
 	}
 }
 
+bool EquipletNode::changeModuleState(int moduleID,rexos_statemachine::State state){
+	ModuleProxy* moduleProxy = moduleRegistry.getModule(moduleID);
+	if(moduleProxy != NULL)
+	{
+		moduleProxy->changeState(state);
+	}
+	return true;
+}
+
 void EquipletNode::onStateChanged(){
 
 }
