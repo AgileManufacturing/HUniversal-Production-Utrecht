@@ -47,6 +47,7 @@
 
 #include <equiplet_node/ModuleRegistry.h>
 #include <equiplet_node/ModuleProxy.h>
+#include <equiplet_node/scada/EquipletScada.h>
 
 #pragma GCC system_header
 #include <libjson/libjson.h>
@@ -113,6 +114,8 @@ private:
 	ros::ServiceServer moduleUpdateServiceServer;
 
 	equiplet_node::ModuleRegistry moduleRegistry;
+
+	equiplet_node::scada::EquipletScada scada;
 
 	void changeEquipletState();
 	virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);

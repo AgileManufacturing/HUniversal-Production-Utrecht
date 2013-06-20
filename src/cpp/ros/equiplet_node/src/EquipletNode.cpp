@@ -54,6 +54,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 			rexos_statemachine::MODE_STEP}
 		),
 		moduleRegistry(nameFromId(id), id),
+		scada(&moduleRegistry),
 		equipletId(id),
 		blackboardClient(NULL) {
 
