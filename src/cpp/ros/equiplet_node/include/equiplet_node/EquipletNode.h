@@ -105,7 +105,7 @@ private:
 	 * Client to read from blackboard
 	 **/
 	Blackboard::BlackboardCppClient *blackboardClient;
-	std::vector<Blackboard::BlackboardSubscription *> subscriptions; 
+	Blackboard::BlackboardSubscription* equipletStepSubscription; 
 
 	MOSTDatabaseClient mostDatabaseclient;
 

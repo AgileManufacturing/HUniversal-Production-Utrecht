@@ -68,9 +68,8 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 //			this);
 
 	blackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "test", "equipletStepBB");
-	Blackboard::BasicOperationSubscription * sub = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
-	subscriptions.push_back(sub);
-	blackboardClient->subscribe(*sub);
+	//equipletStepSubscription will be enabled in setup transition of the equiplet
+	equipletStepSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
 
 	moduleRegistry.setNewRegistrationsAllowed(true);
 	moduleRegistry.setModuleRegistryListener(this);
@@ -85,10 +84,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
  **/
 EquipletNode::~EquipletNode(){
 	delete blackboardClient;
-	for (std::vector<Blackboard::BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
-		delete *iter;
-	}
-	subscriptions.clear();
+	delete equipletStepSubscription;
 }
 
 /**
@@ -179,7 +175,10 @@ void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupI
 }
 
 void EquipletNode::onStateChanged(){
-
+	switch(getCurrentState()){
+		case rexos_statemachine::STATE_SHUTDOWN: blackboardClient->unsubscribe(*equipletStepSubscription); break;
+		case rexos_statemachine::STATE_STANDBY: blackboardClient->subscribe(*equipletStepSubscription);	break;
+	}
 }
 	
 void EquipletNode::onModeChanged(){
