@@ -45,6 +45,8 @@ public:
 	void changeState(rexos_statemachine::State state);
 	void changeMode(rexos_statemachine::Mode mode);
 
+	bool setModuleInstruction();
+
 private:
 	ModuleProxy(std::string equipletNodeName, std::string moduleNodeName, ModuleProxyListener* mpl = NULL);
 	bool onStateChangeServiceCallback(StateUpdateRequest &req, StateUpdateResponse &res);

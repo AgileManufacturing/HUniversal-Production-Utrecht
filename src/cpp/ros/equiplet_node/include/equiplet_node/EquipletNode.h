@@ -119,7 +119,6 @@ private:
 	virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
 	virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
 	virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
-	bool changeModuleState(int moduleID,rexos_statemachine::State state);
 
 	rexos_statemachine::TransitionActionServer* setupTransitionActionServer;
 	rexos_statemachine::TransitionActionServer* shutdownTransitionActionServer;
