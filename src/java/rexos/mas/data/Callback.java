@@ -29,6 +29,10 @@ public class Callback{
 	
 	private int _reportLevel;
 	
+	private String _protocol;
+	
+	
+	
 	
 	
 	public Callback() {
