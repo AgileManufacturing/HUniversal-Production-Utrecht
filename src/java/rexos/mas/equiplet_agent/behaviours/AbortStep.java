@@ -47,13 +47,11 @@
 
 package rexos.mas.equiplet_agent.behaviours;
 
-import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import org.bson.types.ObjectId;
 
-import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
@@ -80,8 +78,7 @@ public class AbortStep extends ReceiveBehaviour {
 	 *      The messageTemplate this behaviour
 	 *      listens to. This behaviour listens to the ontology: CancelStep.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate
-			.MatchOntology("CancelStep");
+	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CancelStep");
 
 	/**
 	 * @var EquipletAgent equipletAgent
@@ -91,23 +88,14 @@ public class AbortStep extends ReceiveBehaviour {
 	private EquipletAgent equipletAgent;
 
 	/**
-	 * @var BlackboardClient productBBClient
-	 *      BlackboardClient for the equiplet's product step blackboard.
-	 */
-	private BlackboardClient productBBClient;
-
-	/**
 	 * Instantiates a new can perform step.
 	 * 
-	 * @param a
-	 *            The agent for this behaviour
-	 * @param productBBClient
-	 *            BlackboardClient for the equiplet's product step blackboard.
+	 * @param agent The agent for this behaviour
+	 * @param productBBClient BlackboardClient for the equiplet's product step blackboard.
 	 */
-	public AbortStep(Agent a, BlackboardClient productBBClient) {
-		super(a, messageTemplate);
-		equipletAgent = (EquipletAgent) a;
-		this.productBBClient = productBBClient;
+	public AbortStep(EquipletAgent agent) {
+		super(agent, messageTemplate);
+		equipletAgent = agent;
 	}
 
 	/**
@@ -121,35 +109,32 @@ public class AbortStep extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		Logger.log("%s received message from %s(%s)%n", myAgent.getLocalName(),
-				message.getSender().getLocalName(), message.getOntology());
-
-		try {
-			// gets the productstep out of the message.
-			ObjectId productStepEntryId = null;
-
-			productStepEntryId = equipletAgent.getRelatedObjectId(message
-					.getConversationId());
-
-			BasicDBObject step = (BasicDBObject) productBBClient
-					.findDocumentById(productStepEntryId);
-			ProductStep productStep = new ProductStep(step);
-
-			if (productStep.getStatus() == StepStatusCode.PLANNED) {
-				productBBClient.updateDocuments(
-						new BasicDBObject("_id", productStepEntryId),
-						new BasicDBObject("$set", new BasicDBObject("status",
-								StepStatusCode.ABORTED).append("statusData",
-								new BasicDBObject("reason",
-										"productagent canceled"))));
-			} else {
-				ACLMessage reply = message.createReply();
-				reply.setPerformative(ACLMessage.FAILURE);
-				myAgent.send(reply);
+		if(message != null) {
+			Logger.log("%s received message from %s(%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(),
+					message.getOntology());
+	
+			try {
+				// gets the productstep out of the message.
+				ObjectId productStepEntryId = equipletAgent.getRelatedObjectId(message.getConversationId());
+	
+				BasicDBObject step =
+						(BasicDBObject) equipletAgent.getProductStepBBClient().findDocumentById(productStepEntryId);
+				ProductStep productStep = new ProductStep(step);
+	
+				if(productStep.getStatus() == StepStatusCode.PLANNED) {
+					equipletAgent.getProductStepBBClient().updateDocuments(
+							new BasicDBObject("_id", productStepEntryId),
+							new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
+									"statusData", new BasicDBObject("reason", "productagent canceled"))));
+				} else {
+					ACLMessage reply = message.createReply();
+					reply.setPerformative(ACLMessage.FAILURE);
+					myAgent.send(reply);
+				}
+			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+				Logger.log(e);
+				equipletAgent.doDelete();
 			}
-		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(e);
-			equipletAgent.doDelete();
 		}
 	}
 }
