@@ -54,7 +54,7 @@ typedef actionlib::SimpleActionClient<TransitionAction> TransitionActionClient;
 class StateMachine: public rexos_statemachine::Transitions {
 public:
 
-	StateMachine(std::string nodeName,std::vector<rexos_statemachine::Mode> modes = {});
+	StateMachine(std::string nodeName,std::vector<rexos_statemachine::Mode> modes);
 
 	virtual ~StateMachine();
 

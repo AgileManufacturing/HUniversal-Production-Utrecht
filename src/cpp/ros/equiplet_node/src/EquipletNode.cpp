@@ -178,8 +178,9 @@ void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupI
 	}
 }
 
-bool changeModuleState(int moduleID,rexos_statemachine::State state){
-	if((ModuleProxy* moduleProxy = moduleRegistry.getModule(moduleID)) != NULL)
+bool EquipletNode::changeModuleState(int moduleID,rexos_statemachine::State state){
+	ModuleProxy* moduleProxy = moduleRegistry.getModule(moduleID);
+	if(moduleProxy != NULL)
 	{
 		moduleProxy->changeState(state);
 	}

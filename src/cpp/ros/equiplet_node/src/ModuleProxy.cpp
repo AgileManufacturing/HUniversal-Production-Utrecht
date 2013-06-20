@@ -9,19 +9,14 @@
 
 namespace equiplet_node {
 
-ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleName, int equipletId, int moduleId, ModuleProxyListener* mpl)
-:ModuleProxy(equipletNodeName, moduleName + "_" + std::to_string(equipletId) + "_" + std::to_string(moduleId),mpl)
-{
-}
-
-ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleNodeName, ModuleProxyListener* mpl):
-		moduleNodeName(moduleNodeName),
-		changeStateActionClient(nodeHandle, moduleNodeName + "/change_state"),
-		changeModeActionClient(nodeHandle, moduleNodeName + "/change_mode"),
-		currentMode(rexos_statemachine::Mode::MODE_NORMAL),
-		currentState(rexos_statemachine::State::STATE_SAFE),
-		moduleProxyListener(mpl),
-		moduleId(moduleId)
+ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleName, int equipletId, int moduleId, ModuleProxyListener* mpl):
+	moduleNodeName(moduleName + "_" + std::to_string(equipletId) + "_" + std::to_string(moduleId)),
+	changeStateActionClient(nodeHandle, moduleNodeName + "/change_state"),
+	changeModeActionClient(nodeHandle, moduleNodeName + "/change_mode"),
+	currentMode(rexos_statemachine::Mode::MODE_NORMAL),
+	currentState(rexos_statemachine::State::STATE_SAFE),
+	moduleProxyListener(mpl),
+	moduleId(moduleId)
 {
 	stateUpdateServiceServer = nodeHandle.advertiseService(
 			equipletNodeName + "/" + moduleNodeName + "/state_update",
