@@ -81,9 +81,22 @@ public class KnowledgeDBClient {
     private KnowledgeDBClient() throws KnowledgeException {
         try {
             Properties dbProperties = new Properties();
-            FileInputStream in = new FileInputStream(System.getenv(PROPERTIES_ENVIRONMENT_VARIABLE));
+            String propertyFilePath = System.getenv(PROPERTIES_ENVIRONMENT_VARIABLE);
+            if (propertyFilePath == null) {
+            	throw new KnowledgeException("Environment variable KNOWLEDGE_DB_PROPERTIES is not set.");
+            }
+            
+            FileInputStream in = new FileInputStream(propertyFilePath);
             dbProperties.load(in);
 
+            // Check required properties.
+            String[] reqProperties = new String[]{"host", "port", "db", "username", "password"};
+            for (String property : reqProperties) {
+            	if (!dbProperties.containsKey(property)) {
+            		throw new KnowledgeException("Property " + property + " was not found in properties file.");
+            	}
+            }
+            
             String url = "jdbc:mysql://" + dbProperties.getProperty("host") + ":" + dbProperties.getProperty("port")
                     + "/" + dbProperties.getProperty("db");
             in.close();
