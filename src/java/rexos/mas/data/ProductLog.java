@@ -5,7 +5,7 @@ package rexos.mas.data;
 
 import java.util.List;
 
-import rexos.mas.data.sqldatadase.sqliteDatabase;
+import rexos.mas.data.sqldatabase.sqliteDatabase;
 
 /**
  * @author Theodoor de Graaff <theodoor.degraaff@student.hu.nl>
