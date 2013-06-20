@@ -371,7 +371,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 								// slot make it the next used timeslot.
 								nextProductStep = productStep.getId();
 								ScheduleData scheduleData = productStep.getScheduleData();
-								if(scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
+								if(timer.getNextUsedTimeSlot() == 0 || scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
 									timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 								}
 

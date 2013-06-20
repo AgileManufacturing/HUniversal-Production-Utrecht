@@ -108,13 +108,13 @@ public class NextProductStepTimer extends Timer {
 			task.cancel();
 		}
 		if(nextUsedTimeSlot != -1) {
-			long startTimeSlot = nextUsedTimeSlot * timeSlotLength + firstTimeSlot;
+			long startPlannedTimeSlot = nextUsedTimeSlot * timeSlotLength + firstTimeSlot;
 			long currentTime = System.currentTimeMillis();
 			task = new NextProductStepTask();
-			Logger.log("Equiplet agent - trying to schedule: %d (%d - %d)%n", (startTimeSlot - currentTime), startTimeSlot, currentTime);
-			if(startTimeSlot - currentTime > 0) {
-				schedule(task, startTimeSlot - currentTime);
-				Logger.log("Equiplet agent - schedule set to: %d (%d - %d)%n", (startTimeSlot - currentTime), startTimeSlot, currentTime);
+			Logger.log("Equiplet agent - trying to schedule: %d (%d - %d)%n", (startPlannedTimeSlot - currentTime), startPlannedTimeSlot, currentTime);
+			if(startPlannedTimeSlot - currentTime > 0) {
+				schedule(task, startPlannedTimeSlot - currentTime);
+				Logger.log("Equiplet agent - schedule set to: %d (%d - %d)%n", (startPlannedTimeSlot - currentTime), startPlannedTimeSlot, currentTime);
 			} else {
 				Logger.log("");
 			}
