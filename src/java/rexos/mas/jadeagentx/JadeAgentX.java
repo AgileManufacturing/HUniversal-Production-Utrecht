@@ -55,7 +55,6 @@ import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 import java.util.ArrayList;
-
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.Part;
@@ -66,6 +65,9 @@ import rexos.mas.data.ProductionStep;
 
 import com.mongodb.BasicDBObject;
 
+/**
+ *	Test class for testing the equiplet agent, service agent and hardware agent.
+ */
 public class JadeAgentX extends Agent {
 	private static final long serialVersionUID = 1L;
 
@@ -87,8 +89,7 @@ public class JadeAgentX extends Agent {
 			logisticsCon.start();
 			AID logisticsAID = new AID(logisticsCon.getName(), AID.ISGUID);
 
-			// Empty the equiplet directory before starting the first equiplet
-			// agent
+			// Empty the equiplet directory before starting the first equiplet agent
 			//BlackboardClient collectiveBBClient = new BlackboardClient("145.89.191.131", 27017);
 			//collectiveBBClient.setDatabase("CollectiveDb");
 			//collectiveBBClient.setCollection("EquipletDirectory");
@@ -111,9 +112,9 @@ public class JadeAgentX extends Agent {
 
 			// Next we want to have some production steps
 			ProductionStep stp1 = new ProductionStep(1, 1, parameters);
-			ProductionStep stp2 = new ProductionStep(2, 1, parameters);
-			ProductionStep stp3 = new ProductionStep(3, 1, parameters);
-			ProductionStep stp4 = new ProductionStep(4, 1, parameters);
+//			ProductionStep stp2 = new ProductionStep(2, 1, parameters);
+//			ProductionStep stp3 = new ProductionStep(3, 1, parameters);
+//			ProductionStep stp4 = new ProductionStep(4, 1, parameters);
 
 			/**
 			 * Our argument for the product agent. The total production of the
@@ -148,15 +149,22 @@ public class JadeAgentX extends Agent {
 
 	static int count = 0;
 
+	/**
+	 * Behaviour for starting a product agent.
+	 *
+	 */
 	public class StartProductAgent extends CyclicBehaviour {
 		private static final long serialVersionUID = 1L;
 
 		Object[] args;
 
 		/**
+		 * Constructor for the StartProductAgent behaviour.
 		 * 
 		 * @param a
+		 * 		The agent this behaviour is linked to/this test agent.
 		 * @param args
+		 * 		The arguments for the product agent.
 		 */
 		public StartProductAgent(Agent a, Object[] args) {
 			super(a);

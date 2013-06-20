@@ -47,6 +47,7 @@ import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
@@ -63,7 +64,7 @@ public class sqliteDatabase{
 
 	public sqliteDatabase(String filename){
 		if (filename != null){
-			DB_FILE = filename;
+			DB_FILE = filename.replaceAll("[\\/:*?\"<>|]", "");
 		}
 		try{
 			Driver d = (Driver) Class.forName(JDBC_DRIVER).newInstance();
@@ -75,7 +76,7 @@ public class sqliteDatabase{
 		try{
 			conn = DriverManager.getConnection(DB_URL + DB_FILE, USER, PASS);
 			try(PreparedStatement create = conn
-					.prepareStatement("CREATE TABLE IF NOT EXISTS log (aid VARCHAR(100), message VARCHAR(SQLITE_MAX_LENGTH))")){
+					.prepareStatement("CREATE TABLE IF NOT EXISTS log (aid VARCHAR, message VARCHAR)")){
 				create.execute();
 			}
 		} catch(SQLException e){
@@ -108,13 +109,28 @@ public class sqliteDatabase{
 		try{
 			try(PreparedStatement insert = conn
 					.prepareStatement("INSERT INTO LOG (aid, message) VALUES (?, ?)")){
-					insert.setString(1, msg.getSender().toString());
-					insert.setString(2, msg.getString());
-					insert.execute();
+				insert.setString(1, msg.getSender().toString());
+				insert.setString(2, msg.getString());
+				insert.execute();
 			}
 		} catch(SQLException e){
 			Logger.log(e);
 		}
-		
+	}
+
+	@Override
+	public String toString(){
+		if (conn != null){
+			try{
+				stmt = conn.createStatement();
+				try(ResultSet rs = stmt.executeQuery(("SELECT * FROM LOG"))){
+					return rs.toString();
+				}
+			} catch(SQLException e){
+				e.printStackTrace();
+			}
+			return "";
+		}
+		return "No database created (yet)";
 	}
 }

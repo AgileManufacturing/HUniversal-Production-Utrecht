@@ -47,7 +47,9 @@ import rexos.mas.equiplet_agent.ProductStep;
 import com.mongodb.BasicDBObject;
 
 /**
- * The Class CanDoProductionStepResponse.
+ * A receive once behaviour for receiving messages with the ontology: "CanDoProductionStepResponse".
+ * Sends a message to the product agent with the ontology: "CanPerformStep",
+ * and an <code>ACLMessage.CONFIRM</code> or an <code>ACLMessage.DISCONFIRM</code>.
  */
 public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 	/**
@@ -79,7 +81,7 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 	 * Instantiates a new can do production step response.
 	 * 
 	 * @param a
-	 *            - The agent for this behaviour
+	 *      The agent for this behaviour
 	 * @param equipletBBClient
 	 * 		BlackboardClient for the product step blackboard.            
 	 */
@@ -121,8 +123,7 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 				responseMessage.setOntology("CanPerformStep");
 				responseMessage.addReceiver(productAgent);
 				if (message.getPerformative() == ACLMessage.DISCONFIRM) {
-					// if the productstep can not be done by this equiplet
-					// remove it.
+					// if the productstep can not be done by this equiplet remove it.
 					equipletBBClient.removeDocuments(new BasicDBObject("_id",
 							productStepEntryId));
 				}
@@ -132,6 +133,5 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 				myAgent.doDelete();
 			}
 		}
-		myAgent.removeBehaviour(this);
 	}
 }

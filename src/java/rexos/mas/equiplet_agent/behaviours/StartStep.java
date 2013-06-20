@@ -38,7 +38,6 @@ import java.util.List;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
 
 import org.bson.types.ObjectId;
 
@@ -57,7 +56,9 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 /**
- * The Class StartStep.
+ * Receive behaviour for receiving messages with the ontology: "StartStep".
+ * Starts the product step linked to the conversationId.
+ * Starts a timer for the next product step.
  */
 public class StartStep extends ReceiveBehaviour {
 	/**
@@ -108,16 +109,8 @@ public class StartStep extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		Object contentObject = null;
-		String contentString = message.getContent();
-
-		try {
-			contentObject = message.getContentObject();
-		} catch(UnreadableException e) {
-			Logger.log("Exception Caught, No Content Object Given");
-		}
-		Logger.log("%s received message from %s (%s:%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(),
-				message.getOntology(), contentObject == null ? contentString : contentObject);
+		Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
+				message.getOntology());
 
 		// Gets the productStepId and updates all the productsteps on the
 		// blackboard the status to waiting.

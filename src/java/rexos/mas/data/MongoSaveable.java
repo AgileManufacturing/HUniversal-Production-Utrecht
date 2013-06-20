@@ -50,8 +50,10 @@ public interface MongoSaveable {
 	/**
 	 * Construct an object from the data contained in the specified BasicDBObject.
 	 * 
-	 * @param object The BasicDBObject containing the relevant data.
+	 * @param object
+	 * 		The BasicDBObject containing the relevant data.
 	 * @throws IllegalArgumentException
+	 * 		Throws this exception when not all parameters are present in the data object.
 	 */
 	public void fromBasicDBObject(BasicDBObject object) throws IllegalArgumentException;
 }

@@ -71,8 +71,8 @@ public class OverviewBehaviour extends OneShotBehaviour{
 	public void action(){
 		_productAgent = (ProductAgent) myAgent;
 		System.out.println("Add a SocketBehaviour");
-		_socketBehaviour = new SocketBehaviour(myAgent, _productAgent.getHost());
-		_productAgent.addBehaviour(_socketBehaviour);
+		//_socketBehaviour = new SocketBehaviour(myAgent, _productAgent.getHost());
+		//_productAgent.addBehaviour(_socketBehaviour);
 		System.out.println("Add a SequentialBehaviour");
 		_sequentialBehaviour = new SequentialBehaviour();
 		_productAgent.addBehaviour(_sequentialBehaviour);

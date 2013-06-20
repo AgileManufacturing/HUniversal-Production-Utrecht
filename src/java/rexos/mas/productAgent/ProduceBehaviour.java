@@ -6,6 +6,7 @@
  * 
  * @author Arno Derks
  * @author Theodoor de Graaff
+ * @author Ricky van Rijn
  * 
  * @section LICENSE License: newBSD
  * 
@@ -48,6 +49,7 @@ import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.Product;
+import rexos.mas.data.ProductStep;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
@@ -142,6 +144,7 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 	ACLMessage msg;
 	HashMap<AID, Long> eqAndTs;
 	private ProductionStep productionStep;
+	private StepStatusCode statusCodeInProgress;
 
 	public WaitMsgBehaviour(ACLMessage msg, HashMap<AID, Long> eqAndTs,
 			ProductionStep productionStep){
@@ -157,13 +160,20 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 		myAgent.addBehaviour(seq);
 		msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setOntology("StartProduction");
+		
+		//AID CHECK
+		if(eqAndTs.get(msg.getSender()) != productionStep.getId()){
+			Logger.log(new UnsupportedOperationException("Equiplet sender not equal to associated equiplet in productionStep"));
 		if (eqAndTs.get(msg.getSender()) != productionStep.getId()){
 			Logger.log(new UnsupportedOperationException(
 					"Equiplet sender not equal to associated equiplet in productionStep"));
 		}
+		
+		productionStep.setStatus(statusCodeInProgress(3));
 		msg.addReceiver(msg.getSender());
 		myAgent.send(msg);
 	}
+}
 }
 
 class producing extends OneShotBehaviour{
@@ -191,7 +201,7 @@ class producing extends OneShotBehaviour{
 				// Planned?
 				break;
 			case "StatusUpdate":
-				//ProductStep ps = (ProductStep) msg.getContentObject();
+				ProductStep ps = (ProductStep) msg.getContentObject();
 				switch(msg.getContent()){
 				case "INPROGRESS":
 					// In progress
@@ -214,7 +224,7 @@ class producing extends OneShotBehaviour{
 					 * Equiplet agent informs the product agent that the product
 					 * step has been executed successfully.
 					 */
-					//_product.addStatusDataToLog(msg.getSender(), ps.getStatusData());
+					_product.addStatusDataToLog(msg.getSender(), ps.getStatusData());
 					break;
 				default:
 					Logger.log(new UnsupportedOperationException("No case for "

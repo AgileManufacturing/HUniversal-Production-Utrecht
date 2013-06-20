@@ -39,7 +39,7 @@ import rexos.mas.data.MongoSaveable;
 import com.mongodb.BasicDBObject;
 
 /**
- * Represents an entry in the EquipletDirectory blackboard.
+ * Representation of an entry in the EquipletDirectory blackboard.
  **/
 public class EquipletDirectoryEntry implements MongoSaveable {
 	/**
@@ -86,9 +86,13 @@ public class EquipletDirectoryEntry implements MongoSaveable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object){
-		this.AID = new AID((String)(object.get("AID")), jade.core.AID.ISGUID);
-		this.capabilities = (ArrayList<Integer>) object.get("capabilities");
-		this.db = new DbData((BasicDBObject)object.get("db"));
+		BasicDBObject copy = (BasicDBObject) object.copy();
+		this.AID = new AID((String)copy.remove("AID"), jade.core.AID.ISGUID);
+		this.capabilities = (ArrayList<Integer>) copy.remove("capabilities");
+		this.db = new DbData((BasicDBObject)copy.remove("db"));
+		if(!copy.isEmpty()){
+			throw new IllegalArgumentException();
+		}
 	}
 	
 	/**
