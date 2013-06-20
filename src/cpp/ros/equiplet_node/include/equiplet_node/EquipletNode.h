@@ -107,9 +107,10 @@ private:
 	Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
 	Blackboard::BlackboardSubscription* equipletStepSubscription; 
 
-	Blackboard::BlackboardCppClient *stateBlackboardClient;
-	Blackboard::BlackboardSubscription* stateBlackboardSubscription; 
+	Blackboard::BlackboardCppClient *equipletCommandBlackboardClient;
+	Blackboard::BlackboardSubscription* equipletCommandSubscription; 
 
+	Blackboard::BlackboardCppClient *equipletStateBlackboardClient;
 
 	MOSTDatabaseClient mostDatabaseclient;
 

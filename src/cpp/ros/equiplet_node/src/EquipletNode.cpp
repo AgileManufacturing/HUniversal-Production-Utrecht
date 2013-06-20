@@ -37,6 +37,8 @@
 #include <rexos_statemachine/ChangeStateAction.h>
 #include <rexos_statemachine/ChangeModeAction.h>
 
+#include <libjson/libjson.h>
+
 using namespace equiplet_node;
 
 /**
@@ -56,7 +58,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 		moduleRegistry(nameFromId(id), id),
 		equipletId(id),
 		equipletStepBlackboardClient(NULL),
-		stateBlackboardClient(NULL) 
+		equipletCommandBlackboardClient(NULL) 
 	{
 
 	if (mostDatabaseclient.getAllModuleData().size() > 0) {
@@ -73,9 +75,11 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 	//equipletStepSubscription will be enabled in setup transition of the equiplet
 	equipletStepSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
 
-	stateBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "StateBlackboard", "equipletCommands");
-	stateBlackboardSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
-	stateBlackboardClient->subscribe(*stateBlackboardSubscription);
+	equipletCommandBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "StateBlackboard", "equipletCommands");
+	equipletCommandSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
+	equipletCommandBlackboardClient->subscribe(*equipletCommandSubscription);
+
+	equipletStateBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "StateBlackboard", "equipletState");
 
 	moduleRegistry.setNewRegistrationsAllowed(true);
 	moduleRegistry.setModuleRegistryListener(this);
@@ -91,9 +95,9 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 EquipletNode::~EquipletNode(){
 	delete equipletStepBlackboardClient;
 	delete equipletStepSubscription;
-	stateBlackboardClient->unsubscribe(*stateBlackboardSubscription);
-	delete stateBlackboardClient;
-	delete stateBlackboardSubscription;
+	equipletCommandBlackboardClient->unsubscribe(*equipletCommandSubscription);
+	delete equipletCommandBlackboardClient;
+	delete equipletCommandSubscription;
 
 }
 
@@ -155,7 +159,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	ss << command;
 	std::cout << ss.str() << std::endl; */
 	}
-	else if(&subscription == stateBlackboardSubscription)
+	else if(&subscription == equipletCommandSubscription)
 	{
 
 	}
@@ -193,6 +197,16 @@ void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupI
 }
 
 void EquipletNode::onStateChanged(){
+	JSONNode jsonUpdateQuery;
+	jsonUpdateQuery.push_back(JSONNode("id",equipletId));
+
+	JSONNode jsonUpdateObject;
+	jsonUpdateObject.push_back(JSONNode("id",equipletId));
+	jsonUpdateObject.push_back(JSONNode("state",getCurrentState()));
+	jsonUpdateObject.push_back(JSONNode("mode",getCurrentMode()));
+
+	equipletStateBlackboardClient->updateDocuments(jsonUpdateQuery.write(),jsonUpdateObject.write());
+
 	switch(getCurrentState()){
 		case rexos_statemachine::STATE_SHUTDOWN: equipletStepBlackboardClient->unsubscribe(*equipletStepSubscription); break;
 		case rexos_statemachine::STATE_STANDBY: equipletStepBlackboardClient->subscribe(*equipletStepSubscription);	break;
@@ -200,6 +214,14 @@ void EquipletNode::onStateChanged(){
 }
 	
 void EquipletNode::onModeChanged(){
+	JSONNode jsonUpdateQuery;
+	jsonUpdateQuery.push_back(JSONNode("id",equipletId));
+
+	JSONNode jsonUpdateObject;
+	jsonUpdateObject.push_back(JSONNode("id",equipletId));
+	jsonUpdateObject.push_back(JSONNode("state",getCurrentState()));
+	jsonUpdateObject.push_back(JSONNode("mode",getCurrentMode()));
+	
 	bool changeModuleModes = false;
 
 	rexos_statemachine::Mode currentMode = getCurrentMode();
