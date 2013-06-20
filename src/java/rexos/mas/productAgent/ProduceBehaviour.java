@@ -85,7 +85,7 @@ public class ProduceBehaviour extends OneShotBehaviour{
 			}
 		}
 		catch(Exception e) {
-			
+			Logger.log(e);
 		}
 	}
 }
