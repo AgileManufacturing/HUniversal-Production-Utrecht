@@ -104,8 +104,12 @@ private:
 	 * @var BlackboardCppClient  *blackboardClient
 	 * Client to read from blackboard
 	 **/
-	Blackboard::BlackboardCppClient *blackboardClient;
+	Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
 	Blackboard::BlackboardSubscription* equipletStepSubscription; 
+
+	Blackboard::BlackboardCppClient *stateBlackboardClient;
+	Blackboard::BlackboardSubscription* stateBlackboardSubscription; 
+
 
 	MOSTDatabaseClient mostDatabaseclient;
 
