@@ -1,6 +1,6 @@
 /**
  * @file BlackboardSubscription.h
- * @brief 
+ * @brief Abstract base class defining the basic structure a blackboard subscription should adhere to.
  * @date Created: 3 jun. 2013
  *
  * @author Jan-Willem Willebrands
@@ -39,16 +39,50 @@ namespace Blackboard {
 class OplogEntry;
 class BlackboardSubscriber;
 
+/**
+ * Abstract base class defining the basic structure a blackboard subscription should adhere to.
+ */
 class BlackboardSubscription {
 public:
+	/**
+	 * Creates the query that should be used to find documents matching the subscription.
+	 *
+	 * @param query_out Pointer to a buffer that will hold the constructed mongo::Query object.
+	 */
 	virtual bool getQuery(mongo::Query * query_out) const = 0;
+
+	/**
+	 * Checks if the subscriptions matches the given oplogEntry.
+	 *
+	 * @param oplogEntry Reference to the oplogEntry describing the event.
+	 *
+	 * @return true if the subscription matches the oplogEntry, false otherwise.
+	 */
 	virtual bool matchesWithEntry(const OplogEntry & oplogEntry) const = 0;
+
+	/**
+	 * Returns the subscriber for this subscription.
+	 *
+	 * @return Reference to the subscriber associated with this subscription.
+	 */
 	BlackboardSubscriber & getSubscriber() const;
 
+	/**
+	 * Constructs a new subscription object with the specified subscriber.
+	 *
+	 * @param subscriber Reference to the object that should receive a callback for this subscription.
+	 */
 	BlackboardSubscription(BlackboardSubscriber & subscriber);
+
+	/**
+	 * Virtual destructor to allow child classes to clean up properly.
+	 */
 	virtual ~BlackboardSubscription() {};
 
 private:
+	/**
+	 * Reference to the subscriber associated with this subscription.
+	 */
 	BlackboardSubscriber & subscriber;
 };
 

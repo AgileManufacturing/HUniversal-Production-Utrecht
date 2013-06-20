@@ -1,6 +1,6 @@
 /**
  * @file BlackboardCppClient.cpp
- * @brief The cpp client for the blackboard
+ * @brief Represents a blackboard connection.
  * @date Created: 2012-11-12
  *
  * @author Dennis Koole
@@ -38,13 +38,6 @@
 
 using namespace Blackboard;
 
-/**
- * Constructor for the BlackboardCppClient
- *
- * @param hostname of the mongodb server
- * @param db The name of the database
- * @param coll The name of the database collection
- **/
 BlackboardCppClient::BlackboardCppClient(const std::string &hostname,
 		const std::string db, const std::string coll) :
 		host(hostname), database(db), collection(coll), oplogMonitor(NULL)
@@ -52,14 +45,6 @@ BlackboardCppClient::BlackboardCppClient(const std::string &hostname,
 
 }
 
-/**
- * Constructor for the BlackboardCppClient
- *
- * @param hostname of the mongodb server
- * @param port the port number for the mongodb server
- * @param db The name of the database
- * @param coll The name of the database collection
- **/
 BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port,
 		const std::string db, const std::string coll) :
 		host(mongo::HostAndPort(hostname, port).toString()),database(db), collection(coll), oplogMonitor(NULL)
@@ -67,33 +52,24 @@ BlackboardCppClient::BlackboardCppClient(const std::string &hostname, int port,
 
 }
 
-/**
- * Destructor for the BlackboardCppClient
- **/
 BlackboardCppClient::~BlackboardCppClient(){
 	if (oplogMonitor != NULL) {
 		delete oplogMonitor;
 	}
 }
 
-/**
- * Set the name of the database to use
- * 
- * @param db the name of the database to use
- **/
 void BlackboardCppClient::setDatabase(const std::string &db){
 	if (db.empty()) {
 		throw InvalidDBNamespaceException("Database name may not be empty.");
 	}
 	database = db;
 	collection = "";
+
+	if (oplogMonitor != NULL) {
+		oplogMonitor->setNamespace(database, collection);
+	}
 }
 
-/**
- * Set the name of the collection to use
- *
- * @param col the name of the collection to use
- **/
 void BlackboardCppClient::setCollection(const std::string &col){
 	if (col.empty()) {
 		throw InvalidDBNamespaceException("Collection name may not be empty.");
@@ -124,11 +100,6 @@ void BlackboardCppClient::unsubscribe(BlackboardSubscription &sub){
 	}
 }
 
-/**
- * Inserts json string into the database
- *
- * @param json
- **/
 void BlackboardCppClient::insertDocument(std::string json){
 	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
 	std::string name = database;

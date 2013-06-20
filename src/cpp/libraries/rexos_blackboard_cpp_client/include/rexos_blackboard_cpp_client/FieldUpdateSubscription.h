@@ -1,6 +1,6 @@
 /**
  * @file FieldUpdateSubscription.h
- * @brief 
+ * @brief Subscription to changes to a specified field.
  * @date Created: 3 jun. 2013
  *
  * @author Jan-Willem Willebrands
@@ -36,26 +36,86 @@
 
 namespace Blackboard {
 
+/**
+ * Different types of update operations that are available.
+ */
 enum MongoUpdateLogOperation {
+	/**
+	 * Represents a $set operation, e.g.: update({a:"a"}, {$set: {a : "b"}})
+	 */
 	SET,
+	/**
+	 * Represents an $unset operation, e.g.: update({a: "a"}, {$unset: {a : ""}})
+	 */
 	UNSET,
+	/**
+	 * Represents a replacement of the entire document, i.e. no $set or $unset is used.
+	 * e.g.: update({a: "a"}, {b : "c"})
+	 */
 	REPLACE
 };
 
+/**
+ * Subscription to changes to a specified field.
+ */
 class FieldUpdateSubscription: public Blackboard::BasicOperationSubscription {
 public:
-
+	/**
+	 * Constructs a subscriptions for the specified field and subscriber.
+	 */
 	FieldUpdateSubscription(std::string fieldName, BlackboardSubscriber & subscriber);
 
+	/**
+	 * Adds an update operation to watch for. This method may be used multiple times in
+	 * order to watch multiple update operations.
+	 *
+	 * \note Once the subscription has been added to the BlackboardClient, this method
+	 * should no longer be used. Changes to the watched operations will not be reflected
+	 * until the subscriptions is removed and re-added to the client.
+	 *
+	 * @param operation The MongoUpdateLogOperation that should be watched.
+	 */
 	void addOperation(MongoUpdateLogOperation operation);
+
+	/**
+	 * Removes an update operation.
+	 *
+	 * \note Once the subscription has been added to the BlackboardClient, this method
+	 * should no longer be used. Changes to the watched operations will not be reflected
+	 * until the subscriptions is removed and re-added to the client.
+	 *
+	 * @param operation The MongoUpdateLogOperation that should be watched.
+	 */
 	void removeOperation(MongoUpdateLogOperation operation);
+
+	/**
+	 * @see BasicOperationSubscription::matchesWithEntry(mongo::Query *)
+	 */
 	bool getQuery(mongo::Query * query_out) const;
+
+	/**
+	 * @see BasicOperationSubscription::matchesWithEntry(const OplogEntry&)
+	 */
 	bool matchesWithEntry(const OplogEntry& entry) const;
 
 private:
+	/**
+	 * @var std::string fieldName
+	 * Name of the field that should be watched.
+	 */
 	std::string fieldName;
 
+	/**
+	 * @var std::vector<MongoUpdateLogOperation> subscribedOperations
+	 * List of operations that will be watched.
+	 */
 	std::vector<MongoUpdateLogOperation> subscribedOperations;
+
+	/**
+	 * Returns the operation string for the specified update operation, e.g. $set or $unset.
+	 *
+	 * @return The operation string for the specified update operation.
+	 */
 	std::string stringForUpdateOperation(MongoUpdateLogOperation operation) const;
 };
 

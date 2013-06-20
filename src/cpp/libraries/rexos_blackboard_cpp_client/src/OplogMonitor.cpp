@@ -1,6 +1,6 @@
 /**
  * @file OplogMonitor.cpp
- * @brief 
+ * @brief Monitors the oplog and dispatches callbacks for active subscriptions.
  * @date Created: 4 jun. 2013
  *
  * @author Jan-Willem Willebrands
@@ -45,7 +45,8 @@ OplogMonitor::OplogMonitor(
 		std::string oplogCollectionName) :
 				host(host),
 				oplogNamespace(),
-				currentThread(NULL)
+				currentThread(NULL),
+				currentCursorId(0)
 {
 	std::stringstream nsStream;
 	nsStream << oplogDBName << "." << oplogCollectionName;
@@ -72,7 +73,9 @@ void OplogMonitor::interrupt()
 		(*connection)->killCursor(currentCursorId);
 		connection->done();
 		delete connection;
+
 		delete currentThread;
+		currentThread = NULL;
 	}
 }
 
