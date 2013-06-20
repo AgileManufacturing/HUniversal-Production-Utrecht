@@ -7,7 +7,7 @@
  * 
  * @section LICENSE License: newBSD
  * 
- *          Copyright © 2012, HU University of Applied Sciences Utrecht. All
+ *          Copyright ï¿½ 2012, HU University of Applied Sciences Utrecht. All
  *          rights reserved.
  * 
  *          Redistribution and use in source and binary forms, with or without
@@ -43,15 +43,15 @@ import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
-import rexos.mas.data.Product;
-import rexos.mas.data.Production;
-import rexos.mas.data.ProductionStep;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.log.Logger;
+import rexos.mas.data.Product;
+import rexos.mas.data.Production;
+import rexos.mas.data.ProductionStep;
 
 import com.mongodb.DBObject;
 
@@ -77,8 +77,9 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 			}
 			for(ProductionStep ps : psa){
 				int PA_id = ps.getId();
-				if (production.getProductionEquipletMapping()
-						.getEquipletsForProductionStep(PA_id).keySet().size() > 0){
+				java.util.HashMap<AID, Long> equiplets = production.getProductionEquipletMapping()
+						.getEquipletsForProductionStep(PA_id);
+				if (equiplets != null && equiplets.keySet().size() > 0){
 					this.timeslotsToSchedule = production
 							.getProductionEquipletMapping()
 							.getTimeSlotsForEquiplet(
@@ -95,15 +96,16 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 					System.out.println("step_id:"
 							+ PA_id
 							+ " number of eq available: "
-							+ production.getProductionEquipletMapping()
-									.getEquipletsForProductionStep(PA_id)
-									.keySet().size());
+							+ (equiplets != null ? equiplets.keySet().size() : 0));
 					System.out.println("STEP_ID:" + ps.getId() + " requires "
 							+ this.timeslotsToSchedule + " timeslots");
 					System.out.println("-------------------");
 				}
-				Scheduler(production.getProductionEquipletMapping()
-						.getEquipletsForProductionStep(PA_id).keySet(), ps);
+				if (equiplets != null && equiplets.size() != 0)
+				{
+					Scheduler(production.getProductionEquipletMapping().getEquipletsForProductionStep(PA_id).keySet(), ps);
+				}
+						
 			}
 		} catch(Exception e){
 			Logger.log(e);
