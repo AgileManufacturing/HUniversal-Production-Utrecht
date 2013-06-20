@@ -30,6 +30,7 @@
  **/
 
 #include <iostream>
+#include <memory>
 #include "mongo/client/connpool.h"
 #include "rexos_blackboard_cpp_client/BlackboardCppClient.h"
 #include "rexos_blackboard_cpp_client/InvalidDBNamespaceException.h"
@@ -141,7 +142,7 @@ int BlackboardCppClient::findDocuments(std::string queryAsJSON, std::vector<mong
 	dbNamespace.append(".");
 	dbNamespace.append(collection);
 	mongo::Query query(mongo::fromjson(queryAsJSON));
-	std::auto_ptr<mongo::DBClientCursor> cursor = (*connection)->query(dbNamespace, query);
+	std::unique_ptr<mongo::DBClientCursor> cursor((*connection)->query(dbNamespace, query));
 
 	int resultCount = 0;
 	try {

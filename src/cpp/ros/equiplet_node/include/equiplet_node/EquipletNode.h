@@ -57,7 +57,6 @@ class EquipletNode: Blackboard::BlackboardSubscriber{
 public:
 	EquipletNode(int id = 1);
 	virtual ~EquipletNode();
-	void blackboardReadCallback(std::string json);
 	bool addHardwareModule(HardwareModuleProperties module);
 	bool removeHardwareModule(int id);
 	void updateOperationState();
@@ -115,6 +114,10 @@ private:
 	 **/
 	Blackboard::BlackboardCppClient  *blackboardClient;
 
+	/**
+	 * @var std::vector<Blackboard::BlackboardSubscription *> subscriptions
+	 * List of active subscriptions so that they may be deleted upon removal from the OplogMonitor.
+	 */
 	std::vector<Blackboard::BlackboardSubscription *> subscriptions;
 
 };

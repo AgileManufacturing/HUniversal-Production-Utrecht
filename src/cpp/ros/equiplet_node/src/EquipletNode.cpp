@@ -78,11 +78,9 @@ EquipletNode::~EquipletNode(){
 }
 
 /**
- * This function is called when a new message on the Blackboard is received,
- * The command, destination and payload are read from the message, and the 
- * service specified in the message is called
+ * Callback for blackboard messages.
  *
- * @param json The message parsed in the json format
+ * \see Blackboard::BlackboardSubscriber::onMessage
  **/
 void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) {
 	std::cout << "processMessage" << std::endl;

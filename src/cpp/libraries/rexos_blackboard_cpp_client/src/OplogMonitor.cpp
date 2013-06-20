@@ -29,6 +29,7 @@
  **/
 
 #include <iostream>
+#include <memory>
 
 #include "rexos_blackboard_cpp_client/OplogMonitor.h"
 #include "mongo/client/connpool.h"
@@ -114,14 +115,14 @@ void OplogMonitor::run()
 {
 	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
 
-	std::auto_ptr<mongo::DBClientCursor> tailedCursor = (*connection)->query(
+	std::unique_ptr<mongo::DBClientCursor> tailedCursor((*connection)->query(
 			oplogNamespace,
 			createOplogQuery(),
 			0,
 			(*connection)->count(oplogNamespace),
 			NULL,
 			mongo::QueryOption_CursorTailable | mongo::QueryOption_AwaitData,
-			0);
+			0));
 
 	currentCursorId = tailedCursor->getCursorId();
 	try {
