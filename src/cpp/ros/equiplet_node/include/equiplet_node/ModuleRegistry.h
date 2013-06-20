@@ -33,7 +33,7 @@ public:
 
 	void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
 
-	std::vector<ModuleProxy*> getRigisteredModules();
+	std::vector<ModuleProxy*> getRegisteredModules();
 
 	ModuleProxy* getModule(int moduleId);
 

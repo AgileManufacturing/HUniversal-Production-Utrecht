@@ -54,7 +54,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 			rexos_statemachine::MODE_STEP}
 		),
 		moduleRegistry(nameFromId(id), id),
-		scada(&moduleRegistry),
+		scada(this, &moduleRegistry),
 		equipletId(id),
 		blackboardClient(NULL) {
 
@@ -205,7 +205,7 @@ void EquipletNode::onModeChanged(){
 	}
 
 	if(changeModuleModes){
-		std::vector<ModuleProxy*> modules = moduleRegistry.getRigisteredModules();
+		std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
 		for (int i = 0; i < modules.size(); i++) {
 			modules[i]->changeMode(currentMode);
 		}
@@ -217,7 +217,7 @@ void EquipletNode::transitionSetup(rexos_statemachine::TransitionActionServer* a
 
 	moduleRegistry.setNewRegistrationsAllowed(false);
 
-	std::vector<ModuleProxy*> modules = moduleRegistry.getRigisteredModules();
+	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
 	for (int i = 0; i < modules.size(); i++) {
 		modules[i]->changeState(rexos_statemachine::STATE_STANDBY);
 	}
@@ -228,7 +228,7 @@ void EquipletNode::transitionShutdown(rexos_statemachine::TransitionActionServer
 
 	moduleRegistry.setNewRegistrationsAllowed(true);
 
-	std::vector<ModuleProxy*> modules = moduleRegistry.getRigisteredModules();
+	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
 	for (int i = 0; i < modules.size(); i++) {
 		modules[i]->changeState(rexos_statemachine::STATE_SAFE);
 	}
@@ -253,7 +253,7 @@ void EquipletNode::onModuleStateChanged(
 	{
 		bool allModulesStandby = true;
 
-		std::vector<ModuleProxy*> modules = moduleRegistry.getRigisteredModules();
+		std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
 		for (int i = 0; i < modules.size(); i++) {
 			if(modules[i]->getCurrentState() != rexos_statemachine::STATE_STANDBY)
 				allModulesStandby = false;
@@ -265,7 +265,7 @@ void EquipletNode::onModuleStateChanged(
 	{
 		bool allModulesSafe = true;
 
-		std::vector<ModuleProxy*> modules = moduleRegistry.getRigisteredModules();
+		std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
 		for (int i = 0; i < modules.size(); i++) {
 			if(modules[i]->getCurrentState() != rexos_statemachine::STATE_SAFE)
 				allModulesSafe = false;

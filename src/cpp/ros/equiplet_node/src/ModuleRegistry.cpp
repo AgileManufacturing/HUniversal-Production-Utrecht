@@ -36,7 +36,7 @@ void ModuleRegistry::setNewRegistrationsAllowed(bool allowed){
 	newRegistrationsAllowed = allowed;
 }
 
-std::vector<ModuleProxy*> ModuleRegistry::getRigisteredModules(){
+std::vector<ModuleProxy*> ModuleRegistry::getRegisteredModules(){
 	return registeredModules;
 }
 

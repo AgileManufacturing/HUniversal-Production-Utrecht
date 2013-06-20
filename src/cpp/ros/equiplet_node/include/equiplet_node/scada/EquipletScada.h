@@ -6,11 +6,14 @@
 #define SCADA_DEFAULT_DOCUMENT_ROOT "."
 
 namespace equiplet_node {
+
+class EquipletNode;
+
 namespace scada {
 
 class EquipletScada {
 public:
-	EquipletScada(ModuleRegistry* moduleRegistry, int port = 8081);
+	EquipletScada(EquipletNode* equiplet, ModuleRegistry* moduleRegistry, int port = 8081);
 	virtual ~EquipletScada();
 
 private:
@@ -23,6 +26,7 @@ private:
 	void mongooseProcessModuleInfo(mg_connection* conn, mg_request_info* request_info);
 
 	ModuleRegistry* moduleRegistry;
+	EquipletNode* equiplet;
 
 	mg_context* mongooseContext;
 };

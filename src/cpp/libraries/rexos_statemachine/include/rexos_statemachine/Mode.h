@@ -29,7 +29,8 @@
 
 #ifndef MODE_H
 #define MODE_H
-#define MODE_COUNT 4
+
+#define MODE_COUNT 7
 
 namespace rexos_statemachine{
 	/**
@@ -49,6 +50,6 @@ namespace rexos_statemachine{
 	 * @var const char* const state_txt[]
 	 * The representation of the states in a char array so its easy to print the enum values instead of the integer
 	 **/
-	const char* const Mode_txt[] = { "Normal", "Service", "Error", "Critical Error", "E_Stop", "LOCK", "STEP" };
+	const char* const mode_txt[] = { "Normal", "Service", "Error", "Critical Error", "E_Stop", "LOCK", "STEP" };
 }
 #endif

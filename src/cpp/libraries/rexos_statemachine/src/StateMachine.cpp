@@ -228,7 +228,7 @@ void StateMachine::_setState(State state) {
 }
 
 void StateMachine::_setMode(Mode mode) {
-	ROS_INFO("mode changed to:%s",Mode_txt[mode]);
+	ROS_INFO("mode changed to:%s", mode_txt[mode]);
 	currentMode = mode;
 	if (listener != NULL) {
 		listener->onModeChanged();

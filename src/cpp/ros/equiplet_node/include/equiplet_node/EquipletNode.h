@@ -61,9 +61,9 @@ typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeModeAction> Chan
 /**
  * The equipletNode, will manage all modules and keep track of their states
  **/
-class EquipletNode : public 
-	Blackboard::BlackboardSubscriber, 
-	rexos_statemachine::StateMachine, 
+class EquipletNode :
+	public Blackboard::BlackboardSubscriber,
+	public rexos_statemachine::StateMachine,
 	rexos_statemachine::Listener,
 	equiplet_node::ModuleRegistryListener
 {
