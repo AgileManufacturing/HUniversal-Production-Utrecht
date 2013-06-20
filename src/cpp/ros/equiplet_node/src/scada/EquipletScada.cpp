@@ -21,6 +21,7 @@ EquipletScada::EquipletScada(ModuleRegistry* moduleRegistry, int port) :
 
 	const char *mongooseOptions[] = {
 			"listening_ports", std::to_string(port).c_str(),
+			"document_root", SCADA_DEFAULT_DOCUMENT_ROOT,
 			NULL
 	};
 
@@ -39,23 +40,37 @@ int EquipletScada::__mongooseBeginRequestCallback(mg_connection* connection) {
 	return thiz->mongooseBeginRequestCallback(connection);
 }
 int EquipletScada::mongooseBeginRequestCallback(mg_connection* connection) {
-	const struct mg_request_info *request_info = mg_get_request_info(connection);
-	char content[100];
+	mg_request_info *request_info = mg_get_request_info(connection);
 
-	// Prepare the message we're going to send
-	int content_length = snprintf(content, sizeof(content),
-			"Hello from mongoose! Remote port: %d", request_info->remote_port);
+	int processed = 1;
+	if (strcmp(request_info->uri, "/remote/equipletInfo") == 0) {
+		mongooseProcessEquipletInfo(connection, request_info);
+	} else if (strcmp(request_info->uri, "/remote/moduleInfo") == 0) {
+		mongooseProcessModuleInfo(connection, request_info);
+	} else if (strcmp(request_info->uri, "/remote/changeModuleModi") == 0) {
+		mongooseProcessChangeModuleModi(connection, request_info);
+	} else if (strcmp(request_info->uri, "/remote/makeEquipletSafe") == 0) {
+		mongooseProcessMakeEquipletSafe(connection, request_info);
+	} else {
+		processed = 0;
+	}
 
-	// Send HTTP reply to the client
-	mg_printf(connection, "HTTP/1.1 200 OK\r\n"
-			"Content-Type: text/plain\r\n"
-			"Content-Length: %d\r\n" // Always set Content-Length
-			"\r\n"
-			"%s", content_length, content);
+	return processed;
 
-	// Returning non-zero tells mongoose that our function has replied to
-	// the client, and mongoose should not send client any more data.
 	return 1;
+}
+
+void EquipletScada::mongooseProcessChangeModuleModi(mg_connection* conn, mg_request_info* request_info) {
+
+}
+void EquipletScada::mongooseProcessMakeEquipletSafe(mg_connection* conn, mg_request_info* request_info) {
+
+}
+void EquipletScada::mongooseProcessEquipletInfo(mg_connection* conn, mg_request_info* request_info) {
+
+}
+void EquipletScada::mongooseProcessModuleInfo(mg_connection* conn, mg_request_info* request_info) {
+
 }
 
 } /* namespace equiplet_node */
