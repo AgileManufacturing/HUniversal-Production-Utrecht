@@ -36,6 +36,7 @@ package rexos.mas.equiplet_agent;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -44,8 +45,12 @@ import org.bson.types.ObjectId;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
+import rexos.mas.data.ProductStep;
+import rexos.mas.data.ScheduleData;
+import rexos.mas.data.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 /**
  * Timer for executing the next product step.
@@ -151,6 +156,33 @@ public class NextProductStepTimer extends Timer {
 	 */
 	public long getFirstTimeSlot() {
 		return firstTimeSlot;
+	}
+	/**
+	 * 
+	 * when this function is called it reschedules the timer to the next step
+	 * 
+	 */
+	public void reScheduleTimer(){
+		
+				
+		try {
+			BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED.name());
+			query.put("$order_by", new BasicDBObject("scheduleData", new BasicDBObject("startTime", "1")));
+			List<DBObject> objects = equipletAgent.getProductStepBBClient().findDocuments(query);
+			if(!objects.isEmpty()) {
+				ProductStep nextProductStep = new ProductStep((BasicDBObject) objects.get(0));
+				equipletAgent.setNextProductStep(nextProductStep.getId());
+				ScheduleData scheduleData = nextProductStep.getScheduleData();
+				if(scheduleData.getStartTime() < getNextUsedTimeSlot()) {
+					setNextUsedTimeSlot(scheduleData.getStartTime());
+				}
+			} else {
+				setNextUsedTimeSlot(-1);
+			}
+		} catch(GeneralMongoException | InvalidDBNamespaceException e) {
+			Logger.log(e);
+		}
+		
 	}
 
 	/**
