@@ -220,8 +220,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		// gets his IP and sets the equiplet blackboard IP.
 		try {
 			InetAddress IP = InetAddress.getLocalHost();
-			//equipletDbIp = IP.getHostAddress();
-			equipletDbIp = "145.89.191.131";
+			equipletDbIp = IP.getHostAddress();
+			//equipletDbIp = "145.89.191.131";
 		} catch(UnknownHostException e) {
 			Logger.log(e);
 		}
@@ -398,19 +398,19 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 						case SUSPENDED_OR_WARNING:
 							responseMessage.setOntology("StatusUpdate");
 							responseMessage.setPerformative(ACLMessage.CONFIRM);
-							responseMessage.setContentObject(productStep.getStatusData());
+							responseMessage.setContentObject(productStep.toBasicDBObject());
 							break;
 						case DONE:
 							responseMessage.setOntology("StatusUpdate");
 							responseMessage.setPerformative(ACLMessage.CONFIRM);
 							productStep.setStatus(StepStatusCode.DONE);
-							responseMessage.setContentObject(productStep);
+							responseMessage.setContentObject(productStep.toBasicDBObject());
 							productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
 							break;
 						case DELETED:
 							responseMessage.setOntology("StatusUpdate");
 							responseMessage.setPerformative(ACLMessage.CONFIRM);
-							responseMessage.setContentObject(productStep.getStatusData());
+							responseMessage.setContentObject(productStep.toBasicDBObject());
 							productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
 							break;
 						default:

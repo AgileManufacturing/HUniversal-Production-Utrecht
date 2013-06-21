@@ -223,6 +223,7 @@ class producing extends rexos.mas.behaviours.ReceiveBehaviour{
 				case "IN_PROGRESS":
 					// In progress
 					break;
+				case "WAITING":
 				case "SUSPENDED_OR_WARNING":
 					/*
 					 * Equiplet agent informs the product agent that a problem
@@ -247,7 +248,7 @@ class producing extends rexos.mas.behaviours.ReceiveBehaviour{
 					break;
 				default:
 					Logger.log(new UnsupportedOperationException("No case for "
-							+ m.getOntology()));
+							+ step.getStatus().name()));
 					break;
 				}
 				break;
