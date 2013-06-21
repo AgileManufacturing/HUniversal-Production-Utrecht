@@ -57,7 +57,6 @@ import jade.wrapper.StaleProxyException;
 import java.util.ArrayList;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.log.Logger;
-import rexos.mas.data.Part;
 import rexos.mas.data.Position;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
@@ -110,7 +109,7 @@ public class JadeAgentX extends Agent {
 //			parameters.append("part", new Part(1).toBasicDBObject());
 //			parameters.append("position", new Position(1.0, 2.0, 3.0, new Part(2)).toBasicDBObject());
 			parameters.append("startPosition", new Position(1.0, 1.0).toBasicDBObject());
-			parameters.append("endPosition", new Position(1.0, 2.0).toBasicDBObject());
+			parameters.append("endPosition", new Position(200.0, 200.0).toBasicDBObject());
 
 			// Next we want to have some production steps
 			ProductionStep stp1 = new ProductionStep(1, 3, parameters);
