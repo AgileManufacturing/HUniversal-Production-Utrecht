@@ -1,14 +1,14 @@
 /**
- * @file DummyModuleNode.h
- * @brief A dummy module!
- * @date Created: 2013-03-13
+ * @file EquipletNode.cpp
+ * @brief Main for EquipletNode
+ * @date Created: 2012-10-12
  *
- * @author Arjen van Zanten
- * @author Ammar Abdulamir
+ * @author Joris Vergeer
  *
  * @section LICENSE
  * License: newBSD
- * Copyright © 2013, HU University of Applied Sciences Utrecht.
+ *
+ * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,45 +28,56 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef DUMMYMODULENODE_H
-#define DUMMYMODULENODE_H
+#include <equiplet_node/EquipletNode.h>
 
-#include "ros/ros.h"
-#include "rexos_std_srvs/Module.h"
+const char* DEFAULT_BLACKBOARD_IP = "145.89.191.131";
 
-#include <rexos_utilities/Utilities.h>
-#include <rexos_statemachine/ModuleStateMachine.h>
+static void show_usage(std::string name) {
+	std::cerr << "Usage: " << name << " <options(s)>\n" << "Options:\n"
+			<< "\t--help\t\tShow this help message\n"
+			<< "\t--blackboard\tIP address of the blackboard (default: 145.89.191.131)\n"
+			<< "\t--id\t\tID of this equiplet (default: 1)\n";
+}
 
-// GCC system header to suppress libjson warnings
-#pragma GCC system_header
-#include <libjson/libjson.h>
-// ---------------------------------------------
+int main(int argc, char **argv) {
+	std::string blackboardIP = DEFAULT_BLACKBOARD_IP;
+	int equipletID = 1;
 
-class DummyModuleNode : public rexos_statemachine::ModuleStateMachine{
-public:
-	DummyModuleNode(int equipletID, int moduleID);
-	virtual ~DummyModuleNode();
+	for (int i = 0; i < argc; i++) {
+		std::string arg = argv[i];
+		if (arg == "--help") {
+			show_usage(argv[0]);
+			return 0;
+		} else if (arg == "--blackboard") {
+			if (i + 1 < argc) {
+				blackboardIP = argv[i++];
+			} else {
+				std::cerr << "--blackboard requires one argument";
+				return -1;
+			}
+		} else if (arg == "--id") {
+			if (i + 1 < argc) {
+				std::stringstream ss;
+				ss << argv[i++];
+				ss >> equipletID;
+			} else {
+				std::cerr << "--id requires one argument";
+				return -1;
+			}
+		}
+	}
 
-	// services
-	bool outputJSON(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res);
+	// Set the id of the Equiplet
+	std::string equipletName = std::string("equiplet_") + std::to_string(equipletID);
 
-private:
-	virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
-	virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
-	virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
-	virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
-	
-	/**
-	 * @var std::string nodeName
-	 * The node's name.
-	 **/
-	 std::string nodeName;
+	ros::init(argc, argv, equipletName);
+	equiplet_node::EquipletNode equipletNode(equipletID, blackboardIP);
 
-	/**
-	 * @var ros::ServiceServer outputJSON
-	 * Service for outputting coordinates
-	 **/
-	ros::ServiceServer outputJSONService;
-};
+	ros::Rate poll_rate(10);
+	while (ros::ok()) {
+		poll_rate.sleep();
+		ros::spinOnce();
+	}
 
-#endif
+	return 0;
+}

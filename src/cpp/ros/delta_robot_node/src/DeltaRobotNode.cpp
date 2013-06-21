@@ -51,8 +51,8 @@
  * @param equipletID identifier for the equiplet
  * @param moduleID identifier for the deltarobot
  **/
-deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) : 
-	rexos_mast::StateMachine(equipletID, moduleID),
+deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int moduleID) :
+	rexos_statemachine::StateMachine("delta_robot_node_" + moduleID),
 	deltaRobot(NULL),
 	modbus(NULL),
 	motorManager(NULL),
@@ -67,22 +67,6 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 	moveRelativePathService_json(),
 	calibrateService_json(){
 	ROS_INFO("DeltaRobotnode Constructor entering...");
-
-	ros::NodeHandle nodeHandle;
-
-	// Advertise the old deprecated services
-	moveToPointService_old = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint_old, this);
-	movePathService_old =	nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::movePath_old, this);
-	moveToRelativePointService_old = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint_old, this);
-	moveRelativePathService_old = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_RELATIVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath_old, this);
-	calibrateService_old = nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate_old, this);
-
-	// Advertise the json services
-	moveToPointService_json = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_POINT_JSON, &deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint_json, this);
-	movePathService_json =	nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_PATH_JSON, &deltaRobotNodeNamespace::DeltaRobotNode::movePath_json, this);
-	moveToRelativePointService_json = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT_JSON, &deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint_json, this);
-	moveRelativePathService_json = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_RELATIVE_PATH_JSON, &deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath_json, this);
-	calibrateService_json = nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE_JSON, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate_json, this);
 
 	ROS_INFO("Configuring Modbus...");
 
@@ -152,9 +136,9 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate(){
  * @return always true
  **/
 bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate_old(delta_robot_node::Calibrate::Request &req, delta_robot_node::Calibrate::Response &res){
-	if(getState() != rexos_mast::normal){
+	if(getCurrentState() != rexos_statemachine::STATE_NORMAL){
 		res.succeeded = false;
-		res.message = "Cannot calibrate, mast state=" + std::string(rexos_mast::state_txt[getState()]);
+		res.message = "Cannot calibrate, mast state=" + std::string(rexos_statemachine::state_txt[getCurrentState()]);
 		ROS_INFO("%s",res.message.c_str());
 	} else {
 		res.succeeded = calibrate();
@@ -170,9 +154,9 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate_old(delta_robot_node::Ca
  * @return always true
  **/
 bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate_json(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res){
-	if(getState() != rexos_mast::normal){
+	if(getCurrentState() != rexos_statemachine::STATE_NORMAL){
 		res.succeeded = false;
-		res.message = "Cannot calibrate, mast state=" + std::string(rexos_mast::state_txt[getState()]);
+		res.message = "Cannot calibrate, mast state=" + std::string(rexos_statemachine::state_txt[getCurrentState()]);
 		ROS_INFO("%s",res.message.c_str());
 	} else {
 		res.succeeded = calibrate();
@@ -216,9 +200,9 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(double x, double y, do
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint_old(delta_robot_node::MoveToPoint::Request &req, delta_robot_node::MoveToPoint::Response &res) {
 	ROS_INFO("moveToPoint_old called");
 
-	if(getState() != rexos_mast::normal) {
+	if(getCurrentState() != rexos_statemachine::STATE_NORMAL){
 		res.succeeded = false;
-		res.message="Cannot move to point, mast state="+ std::string(rexos_mast::state_txt[getState()]);
+		res.message="Cannot move to point, mast state="+ std::string(rexos_statemachine::state_txt[getCurrentState()]);
 		ROS_INFO("%s",res.message.c_str());
 	} else {
 		res.succeeded = moveToPoint(req.motion.x, req.motion.y, req.motion.z, req.motion.maxAcceleration);
@@ -242,9 +226,9 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint_old(delta_robot_node::
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint_json(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res){
 	ROS_INFO("moveToPoint_json called");
 
-	if(getState() != rexos_mast::normal){
+	if(getCurrentState() != rexos_statemachine::STATE_NORMAL){
 		res.succeeded = false;
-		res.message = "Cannot move to point, mast state=" + std::string(rexos_mast::state_txt[getState()]);
+		res.message = "Cannot move to point, most state=" + std::string(rexos_statemachine::state_txt[getCurrentState()]);
 		ROS_INFO("%s",res.message.c_str());
 	} else {
 		Point p = parsePoint(req.json);
@@ -295,9 +279,9 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(double x, doub
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint_old(delta_robot_node::MoveToRelativePoint::Request &req, delta_robot_node::MoveToRelativePoint::Response &res){
 	ROS_INFO("moveToRelativePoint_old called");
 
-	if(getState() != rexos_mast::normal){
+	if(getCurrentState() != rexos_statemachine::STATE_NORMAL){
 		res.succeeded = false;
-		res.message = "Cannot move to relative point, mast state=" + std::string(rexos_mast::state_txt[getState()]);
+		res.message = "Cannot move to relative point, mast state=" + std::string(rexos_statemachine::state_txt[getCurrentState()]);
 		ROS_INFO("%s",res.message.c_str());
 	} else {
 		res.succeeded = moveToPoint(req.motion.x, req.motion.y, req.motion.z, req.motion.maxAcceleration);
@@ -321,9 +305,9 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint_old(delta_robo
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint_json(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res){
 	ROS_INFO("moveToRelativePoint_json called");
 
-	if(getState() != rexos_mast::normal){
+	if(getCurrentState() != rexos_statemachine::STATE_NORMAL){
 		res.succeeded = false;
-		res.message = "Cannot move to relative point, mast state=" + std::string(rexos_mast::state_txt[getState()]);
+		res.message = "Cannot move to relative point, mast state=" + std::string(rexos_statemachine::state_txt[getCurrentState()]);
 		ROS_INFO("%s",res.message.c_str());
 	} else {
 		Point p = parsePoint(req.json);
@@ -350,8 +334,8 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint_json(rexos_std
 bool deltaRobotNodeNamespace::DeltaRobotNode::movePath_old(delta_robot_node::MovePath::Request &req, delta_robot_node::MovePath::Response &res) {
 	ROS_INFO("movePath_old called");
 	res.succeeded = false;
-	if(getState() != rexos_mast::normal) {
-		res.message="Cannot move path, mast state="+ std::string(rexos_mast::state_txt[getState()]);
+	if(getCurrentState() != rexos_statemachine::STATE_NORMAL){
+		res.message="Cannot move path, mast state="+ std::string(rexos_statemachine::state_txt[getCurrentState()]);
 		ROS_INFO("%s",res.message.c_str());
 	} else {
 		if(!deltaRobot->checkPath(deltaRobot->getEffectorLocation(),rexos_datatypes::Point3D<double>(req.motion[0].x, req.motion[0].y, req.motion[0].z))){
@@ -391,8 +375,8 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath_json(rexos_std_srvs::Modu
 	ROS_INFO("movePath_json called");
 
 	res.succeeded = false;
-	if(getState() != rexos_mast::normal){
-		res.message = "Cannot move path, mast state=" + std::string(rexos_mast::state_txt[getState()]);
+	if(getCurrentState() != rexos_statemachine::STATE_NORMAL){
+		res.message = "Cannot move path, mast state=" + std::string(rexos_statemachine::state_txt[getCurrentState()]);
 		ROS_INFO("%s",res.message.c_str());
 	} else {
 		int size = 0;
@@ -436,8 +420,8 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath_json(rexos_std_srvs::Modu
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath_old(delta_robot_node::MoveRelativePath::Request &req, delta_robot_node::MoveRelativePath::Response &res) {
 	ROS_INFO("moveRelativePath_old called");
     res.succeeded = false;
-	if(getState() != rexos_mast::normal) {
-		res.message = "Cannot move to relative path, mast state= " + std::string(rexos_mast::state_txt[getState()]);
+    if(getCurrentState() != rexos_statemachine::STATE_NORMAL){
+		res.message = "Cannot move to relative path, mast state= " + std::string(rexos_statemachine::state_txt[getCurrentState()]);
 		ROS_INFO("%s",res.message.c_str());
 	} else {
 		rexos_datatypes::Point3D<double> oldLocation(deltaRobot->getEffectorLocation());
@@ -483,8 +467,8 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath_old(delta_robot_n
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath_json(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res){
 	ROS_INFO("moveRelativePath_json called");
 	res.succeeded = false;
-	if(getState() != rexos_mast::normal){
-		res.message = "Cannot move to relative path, mast state=" + std::string(rexos_mast::state_txt[getState()]);
+	if(getCurrentState() != rexos_statemachine::STATE_NORMAL){
+		res.message = "Cannot move to relative path, mast state=" + std::string(rexos_statemachine::state_txt[getCurrentState()]);
 		ROS_INFO("%s",res.message.c_str());
 	} else {
 		int size = 0;
@@ -523,12 +507,44 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath_json(rexos_std_sr
 }
 
 /**
+ * Will start the service servers of the module to make it able to perform tasks.
+ */
+void deltaRobotNodeNamespace::DeltaRobotNode::startServices(){
+	// Advertise the old deprecated services
+	moveToPointService_old = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint_old, this);
+	movePathService_old =	nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::movePath_old, this);
+	moveToRelativePointService_old = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT, &deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint_old, this);
+	moveRelativePathService_old = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_RELATIVE_PATH, &deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath_old, this);
+	//calibrateService_old = nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate_old, this);
+
+	// Advertise the json services
+	moveToPointService_json = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_POINT_JSON, &deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint_json, this);
+	movePathService_json =	nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_PATH_JSON, &deltaRobotNodeNamespace::DeltaRobotNode::movePath_json, this);
+	moveToRelativePointService_json = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT_JSON, &deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint_json, this);
+	moveRelativePathService_json = nodeHandle.advertiseService(DeltaRobotNodeServices::MOVE_RELATIVE_PATH_JSON, &deltaRobotNodeNamespace::DeltaRobotNode::moveRelativePath_json, this);
+	//calibrateService_json = nodeHandle.advertiseService(DeltaRobotNodeServices::CALIBRATE_JSON, &deltaRobotNodeNamespace::DeltaRobotNode::calibrate_json, this);
+}
+
+/**
+ * Shutdown the service servers
+ */
+void deltaRobotNodeNamespace::DeltaRobotNode::stopServices(){
+	moveToPointService_old.shutdown();
+	movePathService_old.shutdown();
+	moveToRelativePointService_old.shutdown();
+	moveRelativePathService_old.shutdown();
+	moveToPointService_json.shutdown();
+	movePathService_json.shutdown();
+	moveToRelativePointService_json.shutdown();
+	moveRelativePathService_json.shutdown();
+}
+
+/**
  * Transition from Safe to Standby state
  * @return 0 if everything went OK else error
  **/
-int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(){
+void deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Setup transition called");
-	setState(rexos_mast::setup);
 
 	// Generate the effector boundaries with voxel size 2
 	deltaRobot->generateBoundaries(2);
@@ -537,9 +553,7 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(){
 	// Calibrate the motors
 	if(!deltaRobot->calibrateMotors()){
 		ROS_ERROR("Calibration FAILED. EXITING.");
-		return 1;
 	}
-	return 0;
 }
 
 /**
@@ -547,35 +561,30 @@ int deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(){
  * Will turn power off the motor 
  * @return will be 0 if everything went ok else error
  **/
-int deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown(){
+void deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Shutdown transition called");
-	setState(rexos_mast::shutdown);
 	// Should have information about the workspace, calculate a safe spot and move towards it
 	deltaRobot->powerOff();
-	return 0;
 }
 
 /**
  * Transition from Standby to Normal state
  * @return will be 0 if everything went ok else error 
  **/
-int deltaRobotNodeNamespace::DeltaRobotNode::transitionStart(){
+void deltaRobotNodeNamespace::DeltaRobotNode::transitionStart(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Start transition called");
-	// Set currentState to start
-	setState(rexos_mast::start);
-	// Could calibrate here
-	return 0;
+	//The service servers should be set, to provide the normal methods for the equiplet
+	startServices();
 }
 /**
  * Transition from Normal to Standby state
  * @return will be 0 if everything went ok else error
  **/
-int deltaRobotNodeNamespace::DeltaRobotNode::transitionStop(){
+void deltaRobotNodeNamespace::DeltaRobotNode::transitionStop(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Stop transition called");
-	// Set currentState to stop
-	setState(rexos_mast::stop);
+	//The service servers should be set off, so the equiplet isn't able to set tasks for the module
+	stopServices();
 	// Go to base (Motors on 0 degrees)
-	return 0;
 }
 
 /**
@@ -655,7 +664,7 @@ int main(int argc, char **argv){
 
 	ROS_INFO("Creating DeltaRobotNode");
 
-	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID);
+	deltaRobotNodeNamespace::DeltaRobotNode drn(moduleID);
 
 	ROS_INFO("Running StateEngine");
 	ros::spin();

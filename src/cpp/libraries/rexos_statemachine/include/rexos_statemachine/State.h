@@ -1,13 +1,13 @@
 /**
  * @file States.h
- * @brief Interface for MAST in module
- * @date Created: 2012-10-19
+ * @brief States for  in module
+ * @date Created: 2013-17-03
  *
- * @author Arjan Groenewegen & Dennis Koole
+ * @author Gerben Boot & Joris Vergeer
  *
  * @section LICENSE
  * License: newBSD
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -30,17 +30,19 @@
 #ifndef STATES_H
 #define STATES_H
 
-namespace rexos_mast{
+namespace rexos_statemachine{
 	/**
-	 * @ typedef var enum StateType
+	 * @ enum State
 	 * The enumeration for the states
 	 **/
-	typedef enum{ safe = 0, setup = 1, shutdown = 2, standby = 3, start = 4, stop = 5, normal = 6, nostate = 7 } StateType;
+	typedef enum { STATE_SAFE = 0, STATE_SETUP = 1, STATE_SHUTDOWN = 2, STATE_STANDBY = 3, STATE_START = 4, STATE_STOP = 5, STATE_NORMAL = 6, STATE_NOSTATE = 7 } State;
 
 	/**
 	 * @var const char* const state_txt[]
 	 * The representation of the states in a char array so its easy to print the enum values instead of the integer
 	 **/
-	const char* const state_txt[] = { "Safe", "Setup", "Shutdown", "Standby", "Start", "Stop", "Normal" };
+	const char* const state_txt[] = { "Safe", "Setup", "Shutdown", "Standby", "Start", "Stop", "Normal", "no state" };
+
+	const char is_transition_state[] = { 0, 1, 1, 0, 1, 1, 0, 0 };
 }
 #endif

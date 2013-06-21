@@ -43,7 +43,8 @@
   
   <build_depend>roscpp</build_depend>
   <build_depend>std_msgs</build_depend>
-  <build_depend>rexos_mast</build_depend>
+  <build_depend>rexos_most</build_depend>
+  <build_depend>rexos_statemachine</build_depend>
   <build_depend>lookup_handler</build_depend>
   <build_depend>rexos_std_msgs</build_depend>
   <build_depend>rexos_std_srvs</build_depend>
@@ -54,7 +55,8 @@
 
   <run_depend>roscpp</run_depend>
   <run_depend>std_msgs</run_depend>
-  <run_depend>rexos_mast</run_depend>
+  <run_depend>rexos_most</run_depend>
+  <run_depend>rexos_statemachine</run_depend>
   <run_depend>lookup_handler</run_depend>
   <run_depend>rexos_std_msgs</run_depend>
   <run_depend>rexos_std_srvs</run_depend>

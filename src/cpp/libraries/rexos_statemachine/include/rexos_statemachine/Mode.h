@@ -1,10 +1,9 @@
 /**
- * @file DummyModuleNode.h
- * @brief A dummy module!
- * @date Created: 2013-03-13
+ * @file Mode.h
+ * @brief MODE enum for  in module
+ * @date Created: 2013-17-03
  *
- * @author Arjen van Zanten
- * @author Ammar Abdulamir
+ * @author Gerben Boot & Joris Vergeer
  *
  * @section LICENSE
  * License: newBSD
@@ -28,45 +27,28 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef DUMMYMODULENODE_H
-#define DUMMYMODULENODE_H
+#ifndef MODE_H
+#define MODE_H
+#define MODE_COUNT 4
 
-#include "ros/ros.h"
-#include "rexos_std_srvs/Module.h"
-
-#include <rexos_utilities/Utilities.h>
-#include <rexos_statemachine/ModuleStateMachine.h>
-
-// GCC system header to suppress libjson warnings
-#pragma GCC system_header
-#include <libjson/libjson.h>
-// ---------------------------------------------
-
-class DummyModuleNode : public rexos_statemachine::ModuleStateMachine{
-public:
-	DummyModuleNode(int equipletID, int moduleID);
-	virtual ~DummyModuleNode();
-
-	// services
-	bool outputJSON(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res);
-
-private:
-	virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
-	virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
-	virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
-	virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
-	
+namespace rexos_statemachine{
 	/**
-	 * @var std::string nodeName
-	 * The node's name.
+	 * @ enum Mode
+	 * The enumeration for the modi
 	 **/
-	 std::string nodeName;
+	typedef enum { 
+		MODE_NORMAL = 0, 
+		MODE_SERVICE = 1, 
+		MODE_ERROR = 2, 
+		MODE_CRITICAL_ERROR = 3, 
+		MODE_E_STOP = 4,
+		MODE_LOCK = 5,
+		MODE_STEP} Mode;
 
 	/**
-	 * @var ros::ServiceServer outputJSON
-	 * Service for outputting coordinates
+	 * @var const char* const state_txt[]
+	 * The representation of the states in a char array so its easy to print the enum values instead of the integer
 	 **/
-	ros::ServiceServer outputJSONService;
-};
-
+	const char* const Mode_txt[] = { "Normal", "Service", "Error", "Critical Error", "E_Stop", "LOCK", "STEP" };
+}
 #endif

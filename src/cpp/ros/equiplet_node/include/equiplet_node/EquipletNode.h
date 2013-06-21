@@ -4,6 +4,7 @@
  * @date Created: 2012-10-12
  *
  * @author Dennis Koole
+ * @author Gerben Boot & Joris Vergeer
  *
  * @section LICENSE
  * License: newBSD
@@ -31,97 +32,99 @@
 #pragma once
 
 #include "ros/ros.h"
-#include "rexos_mast/States.h"
-#include "rexos_mast/State.h"
-#include "rexos_mast/ModuleError.h"
 #include "lookup_handler/LookupServer.h"
 
 #include <string>
 #include <vector>
-#include <map>
-#include <equiplet_node/HardwareModuleProperties.h>
+
+#include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
 #include <rexos_blackboard_cpp_client/BlackboardSubscriber.h>
 #include <rexos_datatypes/EquipletStep.h>
-#include <rexos_std_srvs/Module.h>
+#include <rexos_utilities/Utilities.h>
+
+#include <rexos_statemachine/StateMachine.h>
+#include <rexos_most/MOSTDatabaseClient.h>
+
+#include <equiplet_node/ModuleRegistry.h>
+#include <equiplet_node/ModuleProxy.h>
 
 #pragma GCC system_header
 #include <libjson/libjson.h>
+#include <actionlib/client/simple_action_client.h>
 
-namespace Blackboard {
-	class BlackboardCppClient;
-}
+namespace equiplet_node {
+
+typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction> ChangeStateActionClient;
+typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeModeAction> ChangeModeActionClient;
+
 /**
  * The equipletNode, will manage all modules and keep track of their states
  **/
-class EquipletNode: Blackboard::BlackboardSubscriber{
-
+class EquipletNode : public 
+	Blackboard::BlackboardSubscriber, 
+	rexos_statemachine::StateMachine, 
+	rexos_statemachine::Listener,
+	equiplet_node::ModuleRegistryListener
+{
 public:
-	EquipletNode(int id = 1);
+	static std::string nameFromId(int id){
+		return std::string("equiplet_") + std::to_string(id);
+	}
+
+	EquipletNode(int id, std::string blackboardIp);
+
 	virtual ~EquipletNode();
+
 	void blackboardReadCallback(std::string json);
-	bool addHardwareModule(HardwareModuleProperties module);
-	bool removeHardwareModule(int id);
-	void updateOperationState();
-	void updateSafetyState();
-	bool updateModuleState(int moduleID, rexos_mast::StateType state);
-	void printHardwareModules();
-	bool stateChanged(rexos_mast::StateUpdate::Request &request, rexos_mast::StateUpdate::Response &response);
-	bool moduleError(rexos_mast::ErrorInModule::Request &request, rexos_mast::ErrorInModule::Response &response);
-	void sendStateChangeRequest(int moduleID, rexos_mast::StateType newState);
-	rexos_mast::StateType getModuleState(int moduleID);
-	void callLookupHandler(std::string lookupType, std::string lookupID, environment_communication_msgs::Map payload);
-	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
+
+	std::string getName();
+
+	ros::NodeHandle& getNodeHandle();
+
+	void onStateChanged();
+
+	void onModeChanged();
+
+	void onModuleStateChanged(ModuleProxy* moduleProxy,rexos_statemachine::State newState, rexos_statemachine::State previousState);
+
+	void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
+
 private:
+	void callLookupHandler(std::string lookupType, std::string lookupID, environment_communication_msgs::Map payload);
+
+	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
+
 	/**
 	 * @var int equipletId
 	 * The id of the equiplet
 	 **/
 	int equipletId;
-	/**
-	 * @var Mast::state operationState
-	 * The minimal operation state is equal to the lowest state of all modules that are actors
-	 **/
-	rexos_mast::StateType operationState;
-	/**
-	 * @var Mast::state safetyState
-	 * The safety state of the Equiplet. This is equal to the highest state of the actor modules
-	 **/
-	rexos_mast::StateType safetyState;
-	/**
-	 * @var std::vector<Mast::HardwareModuleProperties> moduleTable
-	 * The table that holds all information about the modules currently attached to this Equiplet
-	 **/
-	std::vector<HardwareModuleProperties> moduleTable;
-	/**
-	 * @var ros::ServiceServer moduleErrorService
-	 * Decides what needs to happen when a error occurs inside a module
-	 **/
-	ros::ServiceServer moduleErrorService; 
-	/**
-	 * @var ros::ServiceServer stateUpdateService;
-	 * Will receive state changed messages from modules
-	 **/
-	ros::ServiceServer stateUpdateService;
-	/**
-	 * @var std::map<int, pair> modulePackageNodeMap
-	 * A map with the moduleType as key and a pair of package name and node name as value.
-	 * This is used to find the name of the node that has to be started when a
-	 * module is added, and the package name where the node can be find. This is a TEMPORARY!!
-	 * solution. Better is to store this in some kind of database.
-	 **/
-	std::map<int, std::pair< std::string, std::string> > modulePackageNodeMap;
+
 	/**
 	 * @var BlackboardCppClient  *blackboardClient
 	 * Client to read from blackboard
 	 **/
-<<<<<<< HEAD
-	BlackboardCppClient  *blackboardClient;
-        environment_communication_msgs::Map createMapMessageFromProperties(std::map<std::string, std::string> &Map);
-};
-=======
-	Blackboard::BlackboardCppClient  *blackboardClient;
+	Blackboard::BlackboardCppClient *blackboardClient;
+	std::vector<Blackboard::BlackboardSubscription *> subscriptions; 
 
-	std::vector<Blackboard::BlackboardSubscription *> subscriptions;
+	MOSTDatabaseClient mostDatabaseclient;
 
+	ros::NodeHandle nh;
+	ros::ServiceServer moduleUpdateServiceServer;
+
+	equiplet_node::ModuleRegistry moduleRegistry;
+
+	void changeEquipletState();
+	virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
+	virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
+	virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
+	virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
+	bool changeModuleState(int moduleID,rexos_statemachine::State state);
+
+	rexos_statemachine::TransitionActionServer* setupTransitionActionServer;
+	rexos_statemachine::TransitionActionServer* shutdownTransitionActionServer;
+	rexos_statemachine::TransitionActionServer* startTransitionActionServer;
+	rexos_statemachine::TransitionActionServer* stopTransitionActionServer;
 };
->>>>>>> 201fc5f566e45af817f43c2ef2711d9745c4917a
+
+}
