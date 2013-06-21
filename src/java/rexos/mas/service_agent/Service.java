@@ -52,27 +52,22 @@ import com.mongodb.BasicDBObject;
  */
 public abstract class Service {
 	/**
-	 * @var String NAME
+	 * @var String name
 	 *      The name of the service. It should be the same as the one in the knowledge database.
 	 */
-	private String NAME;
+	private String name;
 
 	/**
-	 * @var int ID
+	 * @var int id
 	 *      The id of the service. It should be the same as the one in the knowledge database.
 	 */
-	private int ID;
+	private int id;
 
 	/**
-	 * Creates a new Service object with the specified name and id. Subclasses should supply a hard-coded name and id of
-	 * the service to this constructor instead of asking it from client code.
-	 * 
-	 * @param name the name of this service
-	 * @param id the id of this service
+	 * Creates a new Service object without a name and id. These should be set using the setter methods.
 	 */
-	protected Service(String name, int id) {
-		NAME = name;
-		ID = id;
+	public Service() {
+
 	}
 
 	/**
@@ -86,7 +81,7 @@ public abstract class Service {
 	public int[] getModuleGroupIds(int productStepType, BasicDBObject parameters) {
 		try {
 			KnowledgeDBClient client = KnowledgeDBClient.getClient();
-			Row[] moduleGroups = client.executeSelectQuery(Queries.MODULEGROUPS_REQUIRED_PER_SERVICE, NAME);
+			Row[] moduleGroups = client.executeSelectQuery(Queries.MODULEGROUPS_REQUIRED_PER_SERVICE, name);
 			int[] moduleIds = new int[moduleGroups.length];
 			for(int i = 0; i < moduleGroups.length; i++) {
 				moduleIds[i] = (int) moduleGroups[i].get("module_id");
@@ -130,22 +125,46 @@ public abstract class Service {
 	public abstract ServiceStep[] updateParameters(HashMap<Part, Position> partParameters, ServiceStep[] serviceSteps);
 
 	/**
-	 * Returns the Id of this service. Id's are used to identify services and are the same as those used in the
+	 * Returns the Id of this service. Id's are used to identify services and are intended to be the same as those used in the
 	 * knowledge database.
 	 * 
 	 * @return the id of this service.
 	 */
 	public int getId() {
-		return ID;
+		return id;
 	}
 
 	/**
-	 * Implementations should return a clear name for this service analog to its function. It is intended for debugging
-	 * purposes. Internally services are identified by their id and not by their name.
+	 * @param id the id to set
+	 */
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	/**
+	 * Returns the name of this service.
 	 * 
 	 * @return the name of this service.
 	 */
 	public String getName() {
-		return NAME;
+		return name;
+	}
+
+	/**
+	 * Sets the name of this service. This is intended to be the same as the name in the knowledge database. It is
+	 * intended for debugging purposes. Internally services are identified by their id and not by their name.
+	 * 
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return String.format("Service [name=%s, id=%s]", name, id);
 	}
 }

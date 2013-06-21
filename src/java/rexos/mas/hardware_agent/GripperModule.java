@@ -74,11 +74,6 @@ public class GripperModule extends Module {
 	private Module movementModule;
 
 	/**
-	 * Empty Constructor
-	 */
-	public GripperModule() {}
-
-	/**
 	 * @see Module#getEquipletSteps(int, BasicDBObject)
 	 */
 	@Override

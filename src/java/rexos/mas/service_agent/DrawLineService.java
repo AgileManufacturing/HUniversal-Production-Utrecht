@@ -44,15 +44,6 @@ import com.mongodb.BasicDBObject;
  *
  */
 public class DrawLineService extends Service {
-
-	/**
-	 * @param name
-	 * @param id
-	 */
-	public DrawLineService() {
-		super("huniplacer dot-matrix print", 2);
-	}
-
 	/**
 	 * @see rexos.mas.service_agent.Service#canDoStep(int, com.mongodb.BasicDBObject)
 	 */
