@@ -46,7 +46,6 @@
  **/
 package rexos.mas.equiplet_agent.behaviours;
 
-import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
@@ -89,8 +88,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 	 *      The messageTemplate this behaviour listens to. This behaviour
 	 *      listens to the ontology: CanPeformStep.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate
-			.MatchOntology("CanPerformStep");
+	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CanPerformStep");
 
 	/**
 	 * @var EquipletAgent equipletAgent
@@ -107,14 +105,12 @@ public class CanPerformStep extends ReceiveBehaviour {
 	/**
 	 * Instantiates a new can perform step.
 	 * 
-	 * @param a
-	 *            The agent for this behaviour
-	 * @param equipletBBClient
-	 *            The BlackboardClient for the EquipletBlackboard.
+	 * @param a The agent for this behaviour
+	 * @param equipletBBClient The BlackboardClient for the EquipletBlackboard.
 	 */
-	public CanPerformStep(Agent a, BlackboardClient equipletBBClient) {
+	public CanPerformStep(EquipletAgent a, BlackboardClient equipletBBClient) {
 		super(a, messageTemplate);
-		equipletAgent = (EquipletAgent) a;
+		equipletAgent = a;
 		this.equipletBBClient = equipletBBClient;
 	}
 
@@ -123,13 +119,12 @@ public class CanPerformStep extends ReceiveBehaviour {
 	 * response to the CanPeformStep question and asks the service agent the
 	 * same question.
 	 * 
-	 * @param message
-	 *            The received message.
+	 * @param message The received message.
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		Logger.log("%s received message from %s%n", myAgent.getLocalName(),
-				message.getSender().getLocalName(), message.getOntology());
+		Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
+				message.getOntology());
 
 		ProductionStep productStep = null;
 		try {
@@ -139,16 +134,14 @@ public class CanPerformStep extends ReceiveBehaviour {
 
 			// puts the productstep on the blackboard.
 			// TODO: get inputParts instead of dummy data (overleggen met productagent)
-			Part[] inputParts = { new Part(1), new Part(2) };
-			ProductStep entry = new ProductStep(
-					message.getSender(), productStep.getCapability(),
-					productStep.getParameters(), inputParts, null,
-					StepStatusCode.EVALUATING, new BasicDBObject(),
-					new ScheduleData());
-			productStepEntryId = equipletBBClient.insertDocument(entry
-					.toBasicDBObject());
-			equipletAgent.addCommunicationRelation(message.getConversationId(),
-					productStepEntryId);
+			Part[] inputParts = {
+					new Part(1), new Part(2)
+			};
+			ProductStep entry =
+					new ProductStep(message.getSender(), productStep.getCapability(), productStep.getParameters(),
+							inputParts, null, StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
+			productStepEntryId = equipletBBClient.insertDocument(entry.toBasicDBObject());
+			equipletAgent.addCommunicationRelation(message.getConversationId(), productStepEntryId);
 
 			// asks the service agent if the productionstep can be done.
 			ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
@@ -156,25 +149,22 @@ public class CanPerformStep extends ReceiveBehaviour {
 			responseMessage.addReceiver(equipletAgent.getServiceAgent());
 			responseMessage.setOntology("CanDoProductionStep");
 			responseMessage.setContentObject(productStepEntryId);
-			myAgent.send(responseMessage);
+			equipletAgent.send(responseMessage);
 
-			// starts a behaviour which listens to the response of this
-			// question.
-			myAgent.addBehaviour(new CanDoProductionStepResponse(myAgent,
-					equipletBBClient));
-		} catch (IOException | InvalidDBNamespaceException
-				| GeneralMongoException | NullPointerException e) {
+			// starts a behaviour which listens to the response of this question.
+			equipletAgent.addBehaviour(new CanDoProductionStepResponse(equipletAgent, equipletBBClient));
+		} catch(IOException | InvalidDBNamespaceException | GeneralMongoException | NullPointerException e) {
 			Logger.log(e);
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.FAILURE);
 			reply.setContent("Failed to process the step");
-			myAgent.send(reply);
-		} catch (UnreadableException e) {
+			equipletAgent.send(reply);
+		} catch(UnreadableException e) {
 			Logger.log(e);
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.FAILURE);
 			reply.setContent("No step given");
-			myAgent.send(reply);
+			equipletAgent.send(reply);
 		}
 	}
 }
