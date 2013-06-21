@@ -104,13 +104,26 @@ class OplogMonitorThread extends Thread {
 	}
 	
 	/**
+	 * Kills the current tailedCursor before invoking Thread.interrupt
+	 * 
+	 * @see java.lang.Thread#interrupt()
+	 **/
+	@Override
+	public void interrupt(){
+		if (tailedCursor != null) {
+			tailedCursor.close();
+		}
+		super.interrupt();
+	}
+	
+	/**
 	 * Run method for the TailedCursorThread.
 	 * This will check for changes within the cursor and calls the onMessage method of its subscriber.
 	 **/
 	@Override
 	public void run() {
 		try {
-			while (!Thread.interrupted()) {
+			while (!Thread.interrupted() && tailedCursor.getCursorId() == 0) {
 				while (tailedCursor.hasNext()) {
 					OplogEntry entry = new OplogEntry(tailedCursor.next());
 					MongoOperation operation = entry.getOperation();
