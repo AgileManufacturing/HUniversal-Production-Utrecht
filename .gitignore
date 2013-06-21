@@ -43,5 +43,4 @@ APDescription.txt
 MTPs-Main-Container.txt
 .classpath
 .project
-.project
-.classpath
+.settings/
