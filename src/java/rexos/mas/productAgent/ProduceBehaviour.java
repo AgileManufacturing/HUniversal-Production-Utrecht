@@ -47,16 +47,16 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
+
 import rexos.mas.data.LogMessage;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.ProductionStepStatus;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 public class ProduceBehaviour extends OneShotBehaviour{
 	private static final long serialVersionUID = 1L;

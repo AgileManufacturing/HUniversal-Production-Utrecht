@@ -7,6 +7,8 @@ import java.util.List;
 
 import rexos.mas.data.sqldatabase.sqliteDatabase;
 
+import com.mongodb.BasicDBObject;
+
 /**
  * @author Theodoor de Graaff <theodoor.degraaff@student.hu.nl>
  *

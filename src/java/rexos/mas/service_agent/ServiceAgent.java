@@ -57,8 +57,8 @@ import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
-import rexos.mas.equiplet_agent.ProductStep;
-import rexos.mas.equiplet_agent.StepStatusCode;
+import rexos.mas.data.ProductStep;
+import rexos.mas.data.StepStatusCode;
 import rexos.mas.service_agent.behaviours.CanDoProductStep;
 import rexos.mas.service_agent.behaviours.GetProductStepDuration;
 import rexos.mas.service_agent.behaviours.InitialisationFinished;
@@ -354,7 +354,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 									productStepBBClient.updateDocuments(
 											new BasicDBObject("_id", serviceStep.getProductStepId()),
 											new BasicDBObject("$set", new BasicDBObject("status",
-													StepStatusCode.DELETED).append("statusData.log",
+													StepStatusCode.DELETED.name()).append("statusData.log",
 													buildLog(serviceStep.getProductStepId()))));
 									serviceStepBBClient.removeDocuments(new BasicDBObject("_id", serviceStep
 											.getId()));

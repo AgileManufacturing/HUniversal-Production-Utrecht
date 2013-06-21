@@ -48,7 +48,7 @@
 package rexos.mas.hardware_agent;
 
 import rexos.mas.data.Position;
-import rexos.mas.equiplet_agent.StepStatusCode;
+import rexos.mas.data.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 
