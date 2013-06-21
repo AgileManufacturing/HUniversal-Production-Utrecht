@@ -338,7 +338,6 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 						try {
 							DBObject dbObject = serviceStepBBClient.findDocumentById(entry.getTargetObjectId());
 							if(dbObject != null) {
-
 								ServiceStep serviceStep = new ServiceStep((BasicDBObject) dbObject);
 								StepStatusCode status = serviceStep.getStatus();
 								switch(status) {
