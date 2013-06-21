@@ -188,59 +188,63 @@ class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour{
 	@Override
 	public void handle(ACLMessage m){
 		try{
-			switch(m.getOntology()){
-			case "StartStepQuestion":
-				/*
-				 * Equiplet agent requests permission for executing product
-				 * step. Product agent grants permission Currently I cannot
-				 * think of any reason why it wouldn�t. But I�m sure there
-				 * are reasons.
-				 */
-				ACLMessage reply = m.createReply();
-				reply.setOntology("StartStep");
-				myAgent.send(reply);
-				break;
-			case "StatusUpdate":
-				ProductStep step = (ProductStep) m.getContentObject();
-				switch(step.getStatus()){
-				case IN_PROGRESS:
-					// In progress
+			if (m != null){
+				switch(m.getOntology()){
+				case "StartStepQuestion":
+					/*
+					 * Equiplet agent requests permission for executing product
+					 * step. Product agent grants permission Currently I cannot
+					 * think of any reason why it wouldn�t. But I�m sure
+					 * there are reasons.
+					 */
+					ACLMessage reply = m.createReply();
+					reply.setOntology("StartStep");
+					myAgent.send(reply);
 					break;
-				case SUSPENDED_OR_WARNING:
-					/*
-					 * Equiplet agent informs the product agent that a problem
-					 * was encountered, but that it�s working on a solution.
-					 */
-				case FAILED:
-					/*
-					 * Equiplet agent informs the product agent that the product
-					 * step has been aborted or has failed, including a reason
-					 * and source. Product agent reschedules or gives up
-					 * entirely
-					 */
+				case "StatusUpdate":
+					ProductStep step = (ProductStep) m.getContentObject();
+					switch(step.getStatus()){
+					case IN_PROGRESS:
+						// In progress
+						break;
+					case SUSPENDED_OR_WARNING:
+						/*
+						 * Equiplet agent informs the product agent that a
+						 * problem was encountered, but that it�s working on a
+						 * solution.
+						 */
+					case FAILED:
+						/*
+						 * Equiplet agent informs the product agent that the
+						 * product step has been aborted or has failed,
+						 * including a reason and source. Product agent
+						 * reschedules or gives up entirely
+						 */
+						break;
+					case DONE:
+						/*
+						 * Equiplet agent informs the product agent that the
+						 * product step has been executed successfully.
+						 */
+						((ProductAgent) myAgent).getProduct()
+								.addStatusDataToLog(msg.getSender(),
+										step.getStatusData());
+						System.out.println("I'm done.");
+						break;
+					default:
+						Logger.log(new UnsupportedOperationException(
+								"No case for " + m.getOntology()));
+						break;
+					}
 					break;
-				case DONE:
-					/*
-					 * Equiplet agent informs the product agent that the product
-					 * step has been executed successfully.
-					 */
-					((ProductAgent)myAgent).getProduct().addStatusDataToLog(msg.getSender(),
-							step.getStatusData());
-					System.out.println("I'm done.");
+				case "EquipletAgentDied":
+					/* EquipletAgent taken down */
 					break;
 				default:
 					Logger.log(new UnsupportedOperationException("No case for "
 							+ m.getOntology()));
 					break;
 				}
-				break;
-			case "EquipletAgentDied":
-				/* EquipletAgent taken down */
-				break;
-			default:
-				Logger.log(new UnsupportedOperationException("No case for "
-						+ m.getOntology()));
-				break;
 			}
 		} catch(Exception e){
 			Logger.log(e);
