@@ -60,7 +60,7 @@ import rexos.mas.data.ProductionStep;
 import rexos.mas.data.StepStatusCode;
 
 /**
- * An product will have one 
+ * 
  *
  */
 public class ProduceBehaviour extends OneShotBehaviour{
@@ -86,7 +86,7 @@ public class ProduceBehaviour extends OneShotBehaviour{
 						// roep seq behav aan
 						// myAgent.addBehaviour(new newProducing(
 						// equipletAndTimeslot, stp));
-						myAgent.addBehaviour(new producing(myAgent, -1,
+						myAgent.addBehaviour(new ProducingReciever(myAgent, -1,
 								MessageTemplate.MatchAll()));
 					}
 				}
@@ -172,13 +172,13 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 	}
 }
 
-class producing extends rexos.mas.behaviours.ReceiveBehaviour{
+class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour{
 	/**
 	 * @param agnt
 	 * @param millis
 	 * @param msgtmplt
 	 **/
-	public producing(Agent agnt, int millis, MessageTemplate msgtmplt){
+	public ProducingReciever(Agent agnt, int millis, MessageTemplate msgtmplt){
 		super(agnt, millis, msgtmplt);
 	}
 
