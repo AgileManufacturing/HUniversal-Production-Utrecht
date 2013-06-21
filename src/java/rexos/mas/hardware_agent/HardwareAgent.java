@@ -237,7 +237,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		ServiceAgentDied serviceAgentDied = new ServiceAgentDied(this);
 		addBehaviour(serviceAgentDied);
 
-		// Register modules
+		// Get the modules for the equiplet and register the modules
 		try {
 			KnowledgeDBClient client = KnowledgeDBClient.getClient();
 			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgentAID.getLocalName());
@@ -332,6 +332,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 							switch(status) {
 							// TODO add other statuses like ABORTED, SUSPENDED etc
 								case ABORTED:
+												
 									Logger.log("Hardware Agent - serv.Step status set to: %s%n", status);
 									serviceStepBBClient.updateDocuments(
 											new BasicDBObject("_id", serviceStep.getId()),
@@ -340,6 +341,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 													buildLog(serviceStep.getId()))));
 									equipletStepBBClient.removeDocuments(new BasicDBObject("serviceStepID", serviceStep
 											.getId()));
+																	
 									break;
 								case PLANNED:
 								case WAITING:

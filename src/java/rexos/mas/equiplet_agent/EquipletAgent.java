@@ -52,6 +52,7 @@ package rexos.mas.equiplet_agent;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.WakerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
@@ -110,7 +111,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 *      IP of the collective database.
 	 */
 	private String collectiveDbIp = "145.89.191.131";
-	// private String collectiveDbIp = "localhost";
+	// private String collectiveDbIp = "localhost";Logger.log("Hardware agent " + this + " reporting.");
 
 	/**
 	 * @var int collectiveDbPort
@@ -377,12 +378,20 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 								responseMessage.setOntology("Planned");
 								responseMessage.setContentObject(scheduleData.getStartTime());
 
-//								ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
-//								cancelMessage.addReceiver(getAID());
-//								cancelMessage.setOntology("CancelStep");
-//								cancelMessage.setConversationId(getConversationId(nextProductStep));
-//								send(cancelMessage);
-//								Logger.log("Equiplet agent - sending message %s%n", ACLMessage.getPerformative(cancelMessage.getPerformative()));
+//								addBehaviour(new WakerBehaviour(this, 50){
+//									
+//									protected void onWake(){
+//			
+//									ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
+//									cancelMessage.addReceiver(getAID());
+//									cancelMessage.setOntology("AbortStep");
+//									cancelMessage.setConversationId(getConversationId(nextProductStep));
+//									send(cancelMessage);
+//									
+//									Logger.log("Equiplet agent - sending message %s%n", ACLMessage.getPerformative(cancelMessage.getPerformative()));
+//									}
+//								});
+								
 							} catch(IOException e) {
 								responseMessage.setPerformative(ACLMessage.FAILURE);
 								responseMessage.setContent("An error occured in the planning/please reschedule");
