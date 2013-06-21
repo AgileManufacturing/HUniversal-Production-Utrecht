@@ -171,5 +171,3 @@ void BlackboardCppClient::updateDocuments(std::string queryAsJSON, std::string u
 	connection->done();
 	delete connection;
 }
-
-

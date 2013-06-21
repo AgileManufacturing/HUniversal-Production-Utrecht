@@ -99,7 +99,6 @@ EquipletNode::~EquipletNode(){
 	equipletCommandBlackboardClient->unsubscribe(*equipletCommandSubscription);
 	delete equipletCommandBlackboardClient;
 	delete equipletCommandSubscription;
-
 }
 
 void EquipletNode::changeState(rexos_statemachine::State desiredState){
@@ -180,9 +179,9 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 
         while (i != n.end()){
             const char * node_name = i -> name().c_str();
-            if (strcmp(node_name, "set_disired_state") == 0){
+            if (strcmp(node_name, "set_desired_state") == 0){
                 changeState((rexos_statemachine::State) atoi(i -> as_string().c_str()));
-            }else if (strcmp(node_name, "set_disired_mode") == 0){
+            }else if (strcmp(node_name, "set_desired_mode") == 0){
                 changeMode((rexos_statemachine::Mode) atoi(i -> as_string().c_str()));
             }
             i++;
@@ -221,26 +220,28 @@ void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupI
 	}
 }
 
-void EquipletNode::onStateChanged(){
+void EquipletNode::updateEquipletStateOnBlackboard(){
 	JSONNode jsonUpdateQuery;
 	jsonUpdateQuery.push_back(JSONNode("id",equipletId));
 
-	JSONNode jsonUpdateObject;
-	jsonUpdateObject.push_back(JSONNode("id",equipletId));
-	jsonUpdateObject.push_back(JSONNode("state",getCurrentState()));
-	jsonUpdateObject.push_back(JSONNode("mode",getCurrentMode()));
+//	JSONNode body;
+//	body.push_back(JSONNode("state",getCurrentState()));
+//	body.push_back(JSONNode("mode",getCurrentMode()));
+//	JSONNode jsonSet;
+//	//jsonSet.push_back(JSONNode("$set",body.write()));
 
-	equipletStateBlackboardClient->updateDocuments(jsonUpdateQuery.write(),jsonUpdateObject.write());
+	std::ostringstream stringStream;
+	stringStream << "{$set: { state: " << getCurrentState() << ",mode: " << getCurrentMode() << "}}";
+
+	equipletStateBlackboardClient->updateDocuments(jsonUpdateQuery.write().c_str(),stringStream.str());
+}
+
+void EquipletNode::onStateChanged(){
+	updateEquipletStateOnBlackboard();
 }
 	
 void EquipletNode::onModeChanged(){
-	JSONNode jsonUpdateQuery;
-	jsonUpdateQuery.push_back(JSONNode("id",equipletId));
-
-	JSONNode jsonUpdateObject;
-	jsonUpdateObject.push_back(JSONNode("id",equipletId));
-	jsonUpdateObject.push_back(JSONNode("state",getCurrentState()));
-	jsonUpdateObject.push_back(JSONNode("mode",getCurrentMode()));
+	updateEquipletStateOnBlackboard();
 	
 	bool changeModuleModes = false;
 

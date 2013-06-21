@@ -102,6 +102,8 @@ private:
 	void changeMode(rexos_statemachine::Mode desiredMode);
 
 	bool setTransitionDone(rexos_statemachine::State transitionState);
+
+	void updateEquipletStateOnBlackboard();
 	/**
 	 * @var int equipletId
 	 * The id of the equiplet
