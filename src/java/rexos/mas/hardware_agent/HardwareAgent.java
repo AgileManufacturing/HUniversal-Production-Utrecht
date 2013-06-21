@@ -346,20 +346,39 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 										Logger.log("Hardware Agent - serv.Step status set to: %s%n", status);
 										cancelAllStepsForServiceStep(serviceStep.getId(), serviceStep.getStatusData()
 												.getString("reason"));
+										serviceStepBBClient.updateDocuments(
+												new BasicDBObject("_id", serviceStep.getId()),
+												new BasicDBObject("$set", new BasicDBObject("status",
+														StepStatusCode.DELETED.name()).append("statusData.log",
+														buildLog(serviceStep.getId()))));
+										equipletStepBBClient.removeDocuments(new BasicDBObject("serviceStepID",
+												serviceStep.getId()));
+
 										break;
 									case PLANNED:
 									case WAITING:
 										Logger.log("Hardware Agent - serv.Step status set to: %s%n", status);
-										equipletStepBBClient.updateDocuments(
-												new BasicDBObject("serviceStepID", serviceStep.getId()),
-												new BasicDBObject("$set", new BasicDBObject("status", status.name())
-														.append("statusData", serviceStep.getStatusData())));
-										// TODO: delete below after testing
-										if(status == StepStatusCode.WAITING)
-											equipletStepBBClient.updateDocuments(new BasicDBObject("serviceStepID",
-													serviceStep.getId()), new BasicDBObject("$set", new BasicDBObject(
-													"status", StepStatusCode.DONE.name())));
-										// TODO: delete above after testing
+										List<DBObject> dbObjects =
+												equipletStepBBClient.findDocuments(new BasicDBObject("serviceStepID",
+														serviceStep.getId()));
+										if(dbObjects.size() > 0) {
+											EquipletStep[] unsortedSteps = new EquipletStep[dbObjects.size()];
+											for(int i = 0; i < dbObjects.size(); i++) {
+												unsortedSteps[i] = new EquipletStep((BasicDBObject) dbObjects.get(i));
+											}
+											ObjectId id = EquipletStep.sort(unsortedSteps)[0].getId();
+											equipletStepBBClient.updateDocuments(
+													new BasicDBObject("_id", id),
+													new BasicDBObject("$set",
+															new BasicDBObject("status", status.name()).append(
+																	"statusData", serviceStep.getStatusData())));
+											// TODO: delete below after testing
+											// if(status == StepStatusCode.WAITING)
+											// equipletStepBBClient.updateDocuments(new BasicDBObject("serviceStepID",
+											// serviceStep.getId()), new BasicDBObject("$set", new BasicDBObject(
+											// "status", StepStatusCode.DONE.name())));
+											// TODO: delete above after testing
+										}
 										break;
 									default:
 										Logger.log("Hardware Agent - default serv.Step status set to: %s%n", status);
@@ -401,12 +420,10 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 															StepStatusCode.DONE.name())));
 											Logger.log("Hardware Agent - setting service step on DONE");
 										} else {
-											// equipletStepBBClient.updateDocuments(
-											// new BasicDBObject("_id",
-											// equipletStep.getNextStep()),
-											// new BasicDBObject("$set", new
-											// BasicDBObject("status",
-											// StepStatusCode.WAITING.name())));
+											equipletStepBBClient.updateDocuments(
+													new BasicDBObject("_id", equipletStep.getNextStep()),
+													new BasicDBObject("$set", new BasicDBObject("status",
+															StepStatusCode.WAITING.name())));
 										}
 										break;
 									case IN_PROGRESS:
