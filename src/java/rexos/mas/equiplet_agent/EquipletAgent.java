@@ -381,24 +381,24 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 								responseMessage.setContentObject(scheduleData.getStartTime());
 
 								//TODO: after testing delete below
-								addBehaviour(new WakerBehaviour(this, 75){
-									
-									/**
-									 * 
-									 */
-									private static final long serialVersionUID = 1L;
-
-									protected void onWake(){
-			
-									ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
-									cancelMessage.addReceiver(getAID());
-									cancelMessage.setOntology("AbortStep");
-									cancelMessage.setConversationId(getConversationId(nextProductStep));
-									send(cancelMessage);
-									
-									Logger.log("Equiplet agent - sending message %s%n", ACLMessage.getPerformative(cancelMessage.getPerformative()));
-									}
-								});
+//								addBehaviour(new WakerBehaviour(this, 75){
+//									
+//									/**
+//									 * 
+//									 */
+//									private static final long serialVersionUID = 1L;
+//
+//									protected void onWake(){
+//			
+//									ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
+//									cancelMessage.addReceiver(getAID());
+//									cancelMessage.setOntology("AbortStep");
+//									cancelMessage.setConversationId(getConversationId(nextProductStep));
+//									send(cancelMessage);
+//									
+//									Logger.log("Equiplet agent - sending message %s%n", ACLMessage.getPerformative(cancelMessage.getPerformative()));
+//									}
+//								});
 								//TODO: after testing delete above
 								
 							} catch(IOException e) {
