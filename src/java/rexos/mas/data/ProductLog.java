@@ -8,7 +8,7 @@
  * 
  * @section LICENSE License: newBSD
  * 
- *          Copyright © 2012, HU University of Applied Sciences Utrecht. All
+ *          Copyright ï¿½ 2012, HU University of Applied Sciences Utrecht. All
  *          rights reserved.
  * 
  *          Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,7 @@ public class ProductLog{
 	private boolean writeToLocal = true;
 	private sqliteDatabase local;
 
-	// private RemoteDatabaseConnection remote;
+	// TODO_REMOTE private RemoteDatabaseConnection remote;
 	/**
 	 * @param writeToRemote
 	 * @param writeToLocal
@@ -73,13 +73,13 @@ public class ProductLog{
 			local.insert(msgs);
 		}
 		if (writeToRemote){
-			// TODO: remote.insert()
+			// TODO_REMOTE remote.insert()
 			throw new UnsupportedOperationException();
 		}
 	}
 
 	public static void pushLocalToRemote(){
-		// TODO:
+		// TODO_REMOTE:
 		// get latest remote
 		// get local since latest remote
 		// write to remote
