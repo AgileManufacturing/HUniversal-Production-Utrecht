@@ -41,9 +41,10 @@ package rexos.mas.productAgent;
 
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
-import rexos.mas.data.DbData;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,12 +55,14 @@ import java.util.Set;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.log.Logger;
+import rexos.mas.data.DbData;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
+import rexos.mas.data.StepStatusCode;
 
-import com.mongodb.DBObject;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
 @SuppressWarnings("serial")
@@ -112,6 +115,7 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 				if (equiplets != null && equiplets.size() != 0)
 				{
 					Scheduler(production.getProductionEquipletMapping().getEquipletsForProductionStep(PA_id).keySet(), ps);
+
 				}
 						
 			}
@@ -127,7 +131,7 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 	 * @param productionStep
 	 * @throws Exception
 	 */
-	public void Scheduler(Set<AID> equipletList, ProductionStep productionstep)
+	public void Scheduler(Set<AID> equipletList, final ProductionStep productionstep)
 			throws Exception{
 		
 		this._prodStep = productionstep;
@@ -142,15 +146,15 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 		for(AID aid : equipletlist) {
 			
 			BlackboardClient bbc = new BlackboardClient("145.89.191.131");
-			bbc.setDatabase("CollectiveDB");
+			bbc.setDatabase("CollectiveDb");
 			bbc.setCollection("EquipletDirectory");
 			
-			QueryBuilder qb = QueryBuilder.start("AID").is(aid);
+			QueryBuilder qb = QueryBuilder.start("AID").is(aid.getName());
 			
 			List<DBObject> aidInfo = bbc.findDocuments(qb.get());
 			
 			if(aidInfo.size() > 0) {
-				dbData.put(aid, new DbData((BasicDBObject) aidInfo.get(0)));
+				dbData.put(aid, new DbData((BasicDBObject) aidInfo.get(0).get("db")));
 			} else {
 				// TODO: what to do if list is empty
 			}	
@@ -213,7 +217,11 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 						}
 					}
 				}
-			}		
+			}
+			if (schedules.length == 0) {
+				freetimeslot.add(new FreeTimeSlot((int)(System.currentTimeMillis() / 2000 + 5), productionstep.getRequiredTimeSlots(), pairs.getKey()));
+			}
+			
 	    }
 	    
 	    FreeTimeSlot freetimeslotEq = null;
@@ -224,7 +232,7 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 		}
 		
 		// calculate freetime slot and asign them to the above intialized values
-		if (freetimeslot.size() > 1){
+		if (freetimeslot.size() > 0){
 			if (debug != 0){
 				System.out.println("Free time slots:" + freetimeslot.size());
 			}
@@ -233,13 +241,13 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 					freetimeslotEq = fts;
 				}
 			}
-		}	
+		}
 		
 		if (freetimeslotEq != null && freetimeslotEq.getEquipletName() != null){
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 			msg.setConversationId(this._prodStep.getConversationId());
 			msg.setOntology("ScheduleStep");
-			msg.setContent("" + freetimeslotEq.getStartTime());
+			msg.setContentObject(freetimeslotEq.getStartTime());
 			msg.addReceiver(freetimeslotEq.getEquipletName());
 			myAgent.send(msg);
 			/*
@@ -261,6 +269,35 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 				System.out.println("No timeslot asigned.");
 			}
 		}
+		
+		final MessageTemplate msgtemplate = MessageTemplate.and(
+				MessageTemplate.MatchConversationId(this._prodStep.getConversationId()),
+				MessageTemplate.MatchOntology("Planned"));
+		
+		
+		
+		((SequentialBehaviour) parent).addSubBehaviour(new ReceiveBehaviour(myAgent,
+				10000, msgtemplate){
+			/**
+					 * 
+					 */
+			private static final long serialVersionUID = 1L;
+			private boolean debug = true;
+
+			@Override
+			public void handle(
+					ACLMessage msg){
+				if (msg == null){
+						System.out.println("Null message");
+				} else{
+					productionstep.setStatus(StepStatusCode.PLANNED);
+					System.out.println("Add a ProduceBehaviour");
+					ProduceBehaviour _produceBehaviour = new ProduceBehaviour();
+					((SequentialBehaviour) parent).addSubBehaviour(_produceBehaviour);
+				}
+			}
+		});
+
 		
 	}
 

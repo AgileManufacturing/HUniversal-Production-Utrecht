@@ -350,10 +350,10 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 											new BasicDBObject("$set", new BasicDBObject("status", status.name())
 													.append("statusData", serviceStep.getStatusData())));
 									// TODO: delete below after testing
-									if(status == StepStatusCode.WAITING)
-										equipletStepBBClient.updateDocuments(new BasicDBObject("serviceStepID",
-												serviceStep.getId()), new BasicDBObject("$set", new BasicDBObject(
-												"status", StepStatusCode.DONE.name())));
+//									if(status == StepStatusCode.WAITING)
+//										equipletStepBBClient.updateDocuments(new BasicDBObject("serviceStepID",
+//												serviceStep.getId()), new BasicDBObject("$set", new BasicDBObject(
+//												"status", StepStatusCode.DONE.name())));
 									// TODO: delete above after testing
 									break;
 								default:

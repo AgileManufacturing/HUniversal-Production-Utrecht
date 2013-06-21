@@ -10,7 +10,7 @@
  * 
  * @section LICENSE License: newBSD
  * 
- *          Copyright © 2012, HU University of Applied Sciences Utrecht. All
+ *          Copyright ï¿½ 2012, HU University of Applied Sciences Utrecht. All
  *          rights reserved.
  * 
  *          Redistribution and use in source and binary forms, with or without
@@ -43,19 +43,21 @@
 package rexos.mas.productAgent;
 
 import jade.core.AID;
+import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+
+import java.util.HashMap;
+
 import rexos.libraries.log.Logger;
-import rexos.mas.data.Product;
-import rexos.mas.data.ProductStep;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.StepStatusCode;
-
-import java.util.HashMap;
+import rexos.mas.equiplet_agent.ProductStep;
 
 public class ProduceBehaviour extends OneShotBehaviour{
 	private static final long serialVersionUID = 1L;
@@ -67,24 +69,28 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	@Override
 	public void action(){
 		try{
+			_production = ((ProductAgent) myAgent).getProduct().getProduction();
 			_prodEQMap = new ProductionEquipletMapper();
 			// retrieve the productstep
-			for(ProductionStep stp : _production.getProductionSteps()){
-				if (stp.getStatus() == StepStatusCode.PLANNED){
-					// adds the step to te new list (the one that will be
-					// returned to the scheduler)
-					_prodEQMap.addProductionStep(stp.getId());
-					s1 = _production.getProductionEquipletMapping();
-					// retrieve the AID
-					HashMap<AID, Long> equipletAndTimeslot = _production
-							.getProductionEquipletMapping()
-							.getEquipletsForProductionStep(stp.getId());
-					// roep seq behav aan
-					myAgent.addBehaviour(new newProducing(equipletAndTimeslot, stp));
+			if (_production != null && _production.getProductionSteps() != null){
+				for(ProductionStep stp : _production.getProductionSteps()){
+					if (stp.getStatus() == StepStatusCode.PLANNED){
+						// adds the step to te new list (the one that will be
+						// returned to the scheduler)
+						_prodEQMap.addProductionStep(stp.getId());
+						s1 = _production.getProductionEquipletMapping();
+						// retrieve the AID
+						HashMap<AID, Long> equipletAndTimeslot = _production
+								.getProductionEquipletMapping()
+								.getEquipletsForProductionStep(stp.getId());
+						// roep seq behav aan
+						//myAgent.addBehaviour(new newProducing(
+						//		equipletAndTimeslot, stp));
+						myAgent.addBehaviour(new producing(myAgent, -1, MessageTemplate.MatchAll()));
+					}
 				}
 			}
-		}
-		catch(Exception e) {
+		} catch(Exception e){
 			Logger.log(e);
 		}
 	}
@@ -144,7 +150,7 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 	ACLMessage msg;
 	HashMap<AID, Long> eqAndTs;
 	private ProductionStep productionStep;
-	
+
 	public WaitMsgBehaviour(ACLMessage msg, HashMap<AID, Long> eqAndTs,
 			ProductionStep productionStep){
 		this.msg = msg;
@@ -160,55 +166,64 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 		msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setOntology("StartProduction");
 		
-		//AID CHECK
-		if(eqAndTs.get(msg.getSender()) != productionStep.getId()){
-			Logger.log(new UnsupportedOperationException("Equiplet sender not equal to associated equiplet in productionStep"));
-		if (eqAndTs.get(msg.getSender()) != productionStep.getId()){
-			Logger.log(new UnsupportedOperationException(
-					"Equiplet sender not equal to associated equiplet in productionStep"));
-		}
 		
-		productionStep.setStatus(StepStatusCode.IN_PROGRESS);
-		msg.addReceiver(msg.getSender());
-		myAgent.send(msg);
+		// AID CHECK
+		//if (eqAndTs.get(msg.getSender()) != productionStep..getId()){
+			//Logger.log(new UnsupportedOperationException(
+			//		"Equiplet sender not equal to associated equiplet in productionStep"));
+			productionStep.setStatus(StepStatusCode.IN_PROGRESS);
+			msg.addReceiver(msg.getSender());
+			myAgent.send(msg);
+		//}
 	}
 }
-}
 
-class producing extends OneShotBehaviour{
+class producing extends rexos.mas.behaviours.ReceiveBehaviour{
+	/**
+	 * @param agnt
+	 * @param millis
+	 * @param msgtmplt
+	 **/
+	public producing(Agent agnt, int millis, MessageTemplate msgtmplt){
+		super(agnt, millis, msgtmplt);
+		// TODO Auto-generated constructor stub
+	}
+
+
+
 	private static final long serialVersionUID = 1L;
-	Product _product;
-	ProductAgent _productAgent;
+
 	ACLMessage msg;
+	
 
 	@Override
-	public void action(){
+	public void handle(ACLMessage m){
 		try{
-			switch(msg.getOntology()){
+			switch(m.getOntology()){
 			case "StartStepQuestion":
 				/*
 				 * Equiplet agent requests permission for executing product
 				 * step. Product agent grants permission Currently I cannot
-				 * think of any reason why it wouldn’t. But I’m sure there are
+				 * think of any reason why it wouldnï¿½t. But Iï¿½m sure there are
 				 * reasons.
 				 */
-				msg.addReplyTo(msg.getSender());
-				msg.setOntology("StartStep");
-				myAgent.send(msg);
+				ACLMessage reply = m.createReply();
+				reply.setOntology("StartStep");
+				myAgent.send(reply);
 				break;
 			case "Planned":
 				// Planned?
 				break;
 			case "StatusUpdate":
-				ProductStep ps = (ProductStep) msg.getContentObject();
-				switch(msg.getContent()){
-				case "INPROGRESS":
+				ProductStep step = (ProductStep)m.getContentObject();
+				switch(step.getStatus().name()){
+				case "IN_PROGRESS":
 					// In progress
 					break;
 				case "SUSPENDED_OR_WARNING":
 					/*
 					 * Equiplet agent informs the product agent that a problem
-					 * was encountered, but that it’s working on a solution.
+					 * was encountered, but that itï¿½s working on a solution.
 					 */
 				case "FAILED":
 					/*
@@ -223,11 +238,13 @@ class producing extends OneShotBehaviour{
 					 * Equiplet agent informs the product agent that the product
 					 * step has been executed successfully.
 					 */
-					_product.addStatusDataToLog(msg.getSender(), ps.getStatusData());
+					//_product.addStatusDataToLog(msg.getSender(),
+					//		ps.getStatusData());
+					System.out.println("I'm done.");
 					break;
 				default:
 					Logger.log(new UnsupportedOperationException("No case for "
-							+ msg.getContent()));
+							+ m.getOntology()));
 					break;
 				}
 				break;
@@ -236,11 +253,77 @@ class producing extends OneShotBehaviour{
 				break;
 			default:
 				Logger.log(new UnsupportedOperationException("No case for "
-						+ msg.getOntology()));
+						+ m.getOntology()));
 				break;
 			}
 		} catch(Exception e){
 			Logger.log(e);
 		}
 	}
+	
+	
+	//@Override
+	//public void action(){
+		//msg = myAgent.receive();
+//	try{
+//			switch(msg.getOntology()){
+//			case "StartStepQuestion":
+//				/*
+//				 * Equiplet agent requests permission for executing product
+//				 * step. Product agent grants permission Currently I cannot
+//				 * think of any reason why it wouldnï¿½t. But Iï¿½m sure there are
+//				 * reasons.
+//				 */
+//				ACLMessage reply = msg.createReply();
+//				reply.setOntology("StartStep");
+//				myAgent.send(reply);
+//				break;
+//			case "Planned":
+//				// Planned?
+//				break;
+//			case "StatusUpdate":
+//				ProductStep ps = (ProductStep) msg.getContentObject();
+//				switch(msg.getContent()){
+//				case "INPROGRESS":
+//					// In progress
+//					break;
+//				case "SUSPENDED_OR_WARNING":
+//					/*
+//					 * Equiplet agent informs the product agent that a problem
+//					 * was encountered, but that itï¿½s working on a solution.
+//					 */
+//				case "FAILED":
+//					/*
+//					 * Equiplet agent informs the product agent that the product
+//					 * step has been aborted or has failed, including a reason
+//					 * and source. Product agent reschedules or gives up
+//					 * entirely
+//					 */
+//					break;
+//				case "DONE":
+//					/*
+//					 * Equiplet agent informs the product agent that the product
+//					 * step has been executed successfully.
+//					 */
+//					//_product.addStatusDataToLog(msg.getSender(),
+//					//		ps.getStatusData());
+//					break;
+//				default:
+//					Logger.log(new UnsupportedOperationException("No case for "
+//							+ msg.getContent()));
+//					break;
+//				}
+//				break;
+//			case "EquipletAgentDied":
+//				/* EquipletAgent taken down */
+//				break;
+//			default:
+//				Logger.log(new UnsupportedOperationException("No case for "
+//						+ msg.getOntology()));
+//				break;
+//			}
+//		} catch(Exception e){
+//			Logger.log(e);
+//		}
+//	}
 }

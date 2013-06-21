@@ -55,9 +55,8 @@ import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 import java.util.ArrayList;
-import rexos.libraries.blackboard_client.BlackboardClient;
+
 import rexos.libraries.log.Logger;
-import rexos.mas.data.Part;
 import rexos.mas.data.Position;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
@@ -101,7 +100,7 @@ public class JadeAgentX extends Agent {
 			Object[] ar = new Object[] {
 				logisticsAID
 			};
-			//getContainerController().createNewAgent("EQ1", "rexos.mas.equiplet_agent.EquipletAgent", ar).start();
+			getContainerController().createNewAgent("EQ1", "rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 
 			/**
 			 * Lets make a parameter list

@@ -5,7 +5,7 @@
  * 
  * @author Alexander Streng
  * 
- *         Copyright © 2013, HU University of Applied Sciences Utrecht. All
+ *         Copyright ï¿½ 2013, HU University of Applied Sciences Utrecht. All
  *         rights reserved.
  * 
  *         Redistribution and use in source and binary forms, with or without
@@ -36,10 +36,6 @@
 
 package rexos.mas.productAgent;
 
-import rexos.libraries.log.Logger;
-import rexos.mas.data.ProductionStep;
-
-import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
@@ -73,11 +69,14 @@ public class OverviewBehaviour extends OneShotBehaviour{
 		System.out.println("Add a SocketBehaviour");
 		//_socketBehaviour = new SocketBehaviour(myAgent, _productAgent.getHost());
 		//_productAgent.addBehaviour(_socketBehaviour);
+		
 		System.out.println("Add a SequentialBehaviour");
 		_sequentialBehaviour = new SequentialBehaviour();
 		_productAgent.addBehaviour(_sequentialBehaviour);
+		
 		System.out.println("Add a PlannerBehaviour");
 		_sequentialBehaviour.addSubBehaviour(new PlannerBehaviour());
+		
 		System.out.println("Add an InformerBehaviour");
 		_informerBehaviour = new InformerBehaviour();
 		_sequentialBehaviour.addSubBehaviour(_informerBehaviour);
@@ -94,53 +93,23 @@ public class OverviewBehaviour extends OneShotBehaviour{
 			}
 		});
 		System.out.println("Add a SchedulerBehaviour");
-		_schedulerBehaviour = new SchedulerBehaviour();
-		_sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
-		System.out.println("Add a ProduceBehaviour");
+		
+		//_schedulerBehaviour = new SchedulerBehaviour();
+		//_sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
+		//System.out.println("Add a ProduceBehaviour");
 		// _produceBehaviour = new ProduceBehaviour();
 		// _sequentialBehaviour.addSubBehaviour(_produceBehaviour);
-		System.out
-				.println("Added all behaviours. And everything should start.");
-		System.out.println("Add a Scheduler");
+		//System.out.println("Added all behaviours. And everything should start.");
+		//System.out.println("Add a Scheduler");
+		
 		_schedulerBehaviour = new SchedulerBehaviour();
 		_sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
-		_sequentialBehaviour.addSubBehaviour(new OneShotBehaviour(){
-			private static final long serialVersionUID = 1L;
 
-			@Override
-			public void action(){
-				try{
-					System.out.println("\n");
-					for(ProductionStep stp : _productAgent.getProduct()
-							.getProduction().getProductionSteps()){
-						System.out.println("ProductionStep " + stp.getId()
-								+ " has Equiplets;");
-						for(AID aid : _productAgent.getProduct()
-								.getProduction().getProductionEquipletMapping()
-								.getEquipletsForProductionStep(stp.getId())
-								.keySet()){
-							System.out.println("Eq localname: "
-									+ aid.getLocalName()
-									+ " AID: "
-									+ aid
-									+ " timeslots: "
-									+ _productAgent
-											.getProduct()
-											.getProduction()
-											.getProductionEquipletMapping()
-											.getTimeSlotsForEquiplet(
-													stp.getId(), aid));
-						}
-						System.out.println("\n");
-					}
-				} catch(Exception e){
-					Logger.log(e);
-				}
-			}
-		});
-		System.out.println("Add a ProduceBehaviour");
-		_produceBehaviour = new ProduceBehaviour();
-		_sequentialBehaviour.addSubBehaviour(_produceBehaviour);
+		
+		
+		//System.out.println("Add a ProduceBehaviour");
+		//_produceBehaviour = new ProduceBehaviour();
+		//_sequentialBehaviour.addSubBehaviour(_produceBehaviour);
 	}
 
 	@SuppressWarnings("static-method")

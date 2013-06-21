@@ -399,7 +399,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 						case DONE:
 							responseMessage.setOntology("StatusUpdate");
 							responseMessage.setPerformative(ACLMessage.CONFIRM);
-							responseMessage.setContentObject(productStep.getStatusData());
+							productStep.setStatus(StepStatusCode.DONE);
+							responseMessage.setContentObject(productStep);
 							productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
 							break;
 						case DELETED:

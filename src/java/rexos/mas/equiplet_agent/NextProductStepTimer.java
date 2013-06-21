@@ -181,11 +181,11 @@ public class NextProductStepTimer extends Timer {
 				equipletAgent.send(answer);
 
 				// TODO: delete below after testing
-				ACLMessage test = new ACLMessage(ACLMessage.QUERY_IF);
-				test.setConversationId(conversationId);
-				test.addReceiver(equipletAgent.getAID());
-				test.setOntology("StartStep");
-				equipletAgent.send(test);
+//				ACLMessage test = new ACLMessage(ACLMessage.QUERY_IF);
+//				test.setConversationId(conversationId);
+//				test.addReceiver(equipletAgent.getAID());
+//				test.setOntology("StartStep");
+//				equipletAgent.send(test);
 			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(e);
 			}
