@@ -361,7 +361,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 									productStepBBClient.updateDocuments(
 											new BasicDBObject("_id", serviceStep.getProductStepId()),
 											new BasicDBObject("$set", new BasicDBObject("status",
-													StepStatusCode.DELETED).append("statusData.log",
+													StepStatusCode.DELETED.name()).append("statusData.log",
 													buildLog(serviceStep.getProductStepId()))));
 									serviceStepBBClient.removeDocuments(new BasicDBObject("_id", serviceStep
 											.getId()));
