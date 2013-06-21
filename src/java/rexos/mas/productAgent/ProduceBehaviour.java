@@ -49,6 +49,9 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
+
+import com.mongodb.BasicDBObject;
 
 import java.util.HashMap;
 
@@ -215,7 +218,7 @@ class producing extends rexos.mas.behaviours.ReceiveBehaviour{
 				// Planned?
 				break;
 			case "StatusUpdate":
-				ProductStep step = (ProductStep)m.getContentObject();
+				ProductStep step = new ProductStep((BasicDBObject)m.getContentObject());
 				switch(step.getStatus().name()){
 				case "IN_PROGRESS":
 					// In progress
@@ -256,7 +259,7 @@ class producing extends rexos.mas.behaviours.ReceiveBehaviour{
 						+ m.getOntology()));
 				break;
 			}
-		} catch(Exception e){
+		} catch(UnreadableException e){
 			Logger.log(e);
 		}
 	}
