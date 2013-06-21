@@ -1,5 +1,5 @@
 /**
- * @file OplogMonitorThread.java
+ * @file rexos/libraries/blackboard_client/OplogMonitorThread.java
  * @brief Class for the tailed oplog cursor thread within the client
  * @date Created: 18 apr. 2013
  *
@@ -51,10 +51,10 @@ class OplogMonitorThread extends Thread {
 	private DBCursor tailedCursor;
 	
 	/**
-	 * @var HashMap<BlackboardSubscription> subscriptions
+	 * @var BlackboardSubscription subscriptions[]
 	 * Link between subscribed topic name and MongoDbs BasicDBObjects
 	 **/
-	BlackboardSubscription[] subscriptions;
+	private BlackboardSubscription[] subscriptions;
 	
 	/**
 	 * Constructor of OplogMonitorThread.
@@ -97,10 +97,23 @@ class OplogMonitorThread extends Thread {
 	/**
 	 * Sets the subscriptions that are used for the query of this oplog monitor.
 	 * @param subscriptions ArrayList containing all the subscriptions this monitor will subscribe to.
-	 */
+	 **/
 	public void setSubscriptions(ArrayList<BlackboardSubscription> subscriptions) {
 		this.subscriptions = new BlackboardSubscription[subscriptions.size()];
 		subscriptions.toArray(this.subscriptions);
+	}
+	
+	/**
+	 * Kills the current tailedCursor before invoking Thread.interrupt
+	 * 
+	 * @see java.lang.Thread#interrupt()
+	 **/
+	@Override
+	public void interrupt(){
+		if (tailedCursor != null) {
+			tailedCursor.close();
+		}
+		super.interrupt();
 	}
 	
 	/**
@@ -110,7 +123,7 @@ class OplogMonitorThread extends Thread {
 	@Override
 	public void run() {
 		try {
-			while (!Thread.interrupted()) {
+			while (!Thread.interrupted() && tailedCursor.getCursorId() == 0) {
 				while (tailedCursor.hasNext()) {
 					OplogEntry entry = new OplogEntry(tailedCursor.next());
 					MongoOperation operation = entry.getOperation();
