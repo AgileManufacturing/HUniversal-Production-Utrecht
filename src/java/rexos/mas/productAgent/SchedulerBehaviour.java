@@ -66,7 +66,6 @@ import com.mongodb.QueryBuilder;
 public class SchedulerBehaviour extends OneShotBehaviour{
 	private ProductAgent _productAgent;
 	private int timeslotsToSchedule = 0;
-	private int debug = 1;
 	private ProductionStep _prodStep;
 
 	@Override
@@ -79,10 +78,7 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 			Product product = this._productAgent.getProduct();
 			Production production = product.getProduction();
 			ArrayList<ProductionStep> psa = production.getProductionSteps();
-			if (debug != 0){
-				// debug
-				System.out.println("Number of equiplets: " + psa.size());
-			}
+			
 			for(ProductionStep ps : psa){
 				int PA_id = ps.getId();
 				if (production.getProductionEquipletMapping()
@@ -97,19 +93,7 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 													PA_id).keySet().toArray()[0])
 							.intValue();
 				}
-				if (debug != 0){
-					// debug
-					System.out.println("-------------------");
-					System.out.println("step_id:"
-							+ PA_id
-							+ " number of eq available: "
-							+ production.getProductionEquipletMapping()
-									.getEquipletsForProductionStep(PA_id)
-									.keySet().size());
-					System.out.println("STEP_ID:" + ps.getId() + " requires "
-							+ this.timeslotsToSchedule + " timeslots");
-					System.out.println("-------------------");
-				}
+				
 				Scheduler(production.getProductionEquipletMapping()
 						.getEquipletsForProductionStep(PA_id).keySet(), ps);
 			}
@@ -129,7 +113,7 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 			throws Exception{
 		
 		this._prodStep = productionstep;
-		
+
 		// load set into arraylist
 		List<AID> equipletlist = new ArrayList<AID>(equipletList);
 		
@@ -203,12 +187,7 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 							freetimeslot.add(new FreeTimeSlot(
 									timeslotToSchedule, freeTimeSlot,
 									schedules[run].getEquipletName()));
-							if (debug != 0){
-								// debug
-								System.out.println("Free timeslot: " + freeTimeSlot
-										+ " starting at timeslot: "
-										+ timeslotToSchedule);
-							}
+							
 						}
 					}
 				}
@@ -216,17 +195,9 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 	    }
 	    
 	    FreeTimeSlot freetimeslotEq = null;
-		if (debug != 0){
-			System.out.println("---- Number of timeslots to schedule -----");
-			System.out.println("Timeslots to schedule: " + timeslotsToSchedule);
-			System.out.println();
-		}
 		
 		// calculate freetime slot and asign them to the above intialized values
 		if (freetimeslot.size() > 1){
-			if (debug != 0){
-				System.out.println("Free time slots:" + freetimeslot.size());
-			}
 			for(FreeTimeSlot fts : freetimeslot) {
 				if (fts.getDuration() <= timeslotsToSchedule){
 					freetimeslotEq = fts;
@@ -249,17 +220,8 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 			 * ("http://"+computername+":"+portnumber+"/acc");
 			 * msg.addReceiver(remoteAMS); myAgent.send(msg);
 			 */
-			if (debug != 0){
-				// debug
-				System.out.println("Send timeslot " + freetimeslotEq.getStartTime()
-						+ " to EQ name is "+freetimeslotEq.getEquipletName());
-			}
-		} else{
-			if (debug != 0){
-				// debug
-				System.out.println("No timeslot asigned.");
-			}
-		}
+			
+		} 
 		
 	}
 
