@@ -76,7 +76,12 @@ public class PenModule extends Module {
 	 *      The module that moves this module.
 	 */
 	private Module movementModule;
-	
+
+	/**
+	 * Empty Constructor
+	 */
+	public PenModule() {}
+
 	/**
 	 * @see Module#getEquipletSteps(int, BasicDBObject)
 	 */

@@ -112,7 +112,7 @@ public class CheckForModules extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		boolean modulesPresent = true;
 		try {
-			//check if modules are present
+			//check is modules are present
 			int[] moduleGroupIds = (int[]) message.getContentObject();
 			ArrayList<Integer> availableModuleGroups = getAvailableModuleGroups();
 
@@ -125,7 +125,7 @@ public class CheckForModules extends ReceiveBehaviour {
 		} catch (UnreadableException ex) {
 			modulesPresent = false;
 		} finally {
-			//send reply; confirm if modules are present, disconfirm if not.
+			//send reply, confirm if modules are present disconfirm if not
 			ACLMessage reply;
 			reply = message.createReply();
 			reply.setOntology("CheckForModulesResponse");

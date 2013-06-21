@@ -63,6 +63,11 @@ public class DeltaRobotModule extends Module {
 	private static final double SAFE_MOVEMENT_PLANE = 6;
 
 	/**
+	 * Empty Constructor
+	 */
+	public DeltaRobotModule() {}
+
+	/**
 	 * @see Module#getEquipletSteps(int, BasicDBObject)
 	 */
 	@Override

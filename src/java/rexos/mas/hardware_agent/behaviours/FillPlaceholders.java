@@ -118,7 +118,7 @@ public class FillPlaceholders extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		try {
 			ObjectId serviceStepId = (ObjectId) message.getContentObject();
-			Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
+			Logger.log("%s received message from %s %n", myAgent.getLocalName(), message.getSender().getLocalName(),
 					message.getOntology());
 			FillStepPlaceholders(serviceStepId);
 		} catch(UnreadableException e) {
@@ -154,9 +154,8 @@ public class FillPlaceholders extends ReceiveBehaviour {
 
 			// Fill the placeholders
 			equipletSteps = module.fillPlaceHolders(equipletSteps, serviceStep.getParameters());
-			Logger.log("Hardware agent - Saving updated instructionData of %d equipletSteps", equipletSteps.length);
 			for(EquipletStep step : equipletSteps) {
-				equipletStepBBClient.updateDocuments(new BasicDBObject("_id", step.getId()), new BasicDBObject("$set",
+				equipletStepBBClient.updateDocuments(new BasicDBObject("_id", step.getId()), new BasicDBObject("$set", 
 						new BasicDBObject("instructionData", step.getInstructionData().toBasicDBObject())));
 			}
 			// if the serviceStep has a nextStep fill the placeholders for that one to.

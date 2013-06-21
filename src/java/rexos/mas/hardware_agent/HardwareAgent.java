@@ -297,18 +297,6 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		send(deadMessage);
 	}
 
-	public void CancelAllStepsForServiceStep(ObjectId serviceStepId, String reason) {
-		try {
-			serviceStepBBClient.updateDocuments(
-					new BasicDBObject("_id", serviceStepId),
-					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.DELETED.name()).append(
-							"statusData", new BasicDBObject("reason", reason).append("log", buildLog(serviceStepId)))));
-			equipletStepBBClient.removeDocuments(new BasicDBObject("serviceStepID", serviceStepId));
-		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			e.printStackTrace();
-		}
-	}
-
 	/**
 	 * Getter for the serviceSteps blackboard client
 	 * 
@@ -345,7 +333,13 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 							// TODO add other statuses like ABORTED, SUSPENDED etc
 								case ABORTED:
 									Logger.log("Hardware Agent - serv.Step status set to: %s%n", status);
-									CancelAllStepsForServiceStep(serviceStep.getId(), "ServiceAgent aborted step.");
+									serviceStepBBClient.updateDocuments(
+											new BasicDBObject("_id", serviceStep.getId()),
+											new BasicDBObject("$set", new BasicDBObject("status",
+													StepStatusCode.DELETED.name()).append("statusData.log",
+													buildLog(serviceStep.getId()))));
+									equipletStepBBClient.removeDocuments(new BasicDBObject("serviceStepID", serviceStep
+											.getId()));
 									break;
 								case PLANNED:
 									equipletStepBBClient.updateDocuments(
