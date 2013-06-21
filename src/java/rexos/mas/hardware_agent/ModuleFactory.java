@@ -100,6 +100,7 @@ public class ModuleFactory {
 				
 				if (oldSoftware != newSoftware) {
 					newSoftware.setId(moduleId);
+					newSoftware.setName(description.getName());
 					newSoftware.setModuleFactory(this);
 					
 					// Notify subscribers if the software was updated.
