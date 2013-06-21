@@ -87,8 +87,6 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 	 * 
 	 * @param a
 	 *            The agent for this behaviour
-	 * @param collectiveBBClient
-	 *      BlackboardClient for the collective blackboard.
 	 */
 	public InitialisationFinished(EquipletAgent a) {
 		super(a, 2000, messageTemplate);

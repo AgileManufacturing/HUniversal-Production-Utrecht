@@ -91,7 +91,6 @@ public class AbortStep extends ReceiveBehaviour {
 	 * Instantiates a new can perform step.
 	 * 
 	 * @param agent The agent for this behaviour
-	 * @param productBBClient BlackboardClient for the equiplet's product step blackboard.
 	 */
 	public AbortStep(EquipletAgent agent) {
 		super(agent, messageTemplate);

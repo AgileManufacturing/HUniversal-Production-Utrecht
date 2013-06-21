@@ -83,7 +83,6 @@ import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.ScheduleData;
-import rexos.mas.data.StepStatusCode;
 import rexos.mas.equiplet_agent.behaviours.AbortStep;
 import rexos.mas.equiplet_agent.behaviours.InitialisationFinished;
 import rexos.mas.equiplet_agent.behaviours.ServiceAgentDied;

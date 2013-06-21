@@ -58,10 +58,10 @@ public class NextProductStepTimer extends Timer {
 	EquipletAgent equipletAgent;
 
 	/**
-	 * @var int nextUsedTimeSlot
+	 * @var long nextUsedTimeSlot
 	 *      The next used time slot.
 	 */
-	private int nextUsedTimeSlot;
+	private long nextUsedTimeSlot;
 
 	/**
 	 * @var long firstTimeSlot
@@ -70,10 +70,10 @@ public class NextProductStepTimer extends Timer {
 	private long firstTimeSlot;
 
 	/**
-	 * @var int timeSlotLength
+	 * @var long timeSlotLength
 	 *      The length of a time slot in milliseconds.
 	 */
-	private int timeSlotLength;
+	private long timeSlotLength;
 
 	/**
 	 * @var NextProductStepTask task
@@ -102,13 +102,13 @@ public class NextProductStepTimer extends Timer {
 	 * 
 	 * @param nextUsedTimeSlot the index of the next used timeslot, fill -1 when not used.
 	 */
-	public void setNextUsedTimeSlot(int nextUsedTimeSlot) {
+	public void setNextUsedTimeSlot(long nextUsedTimeSlot) {
 		this.nextUsedTimeSlot = nextUsedTimeSlot;
 		if(task != null) {
 			task.cancel();
 		}
 		if(nextUsedTimeSlot != -1) {
-			long startPlannedTimeSlot = ((long)nextUsedTimeSlot * timeSlotLength) + firstTimeSlot;
+			long startPlannedTimeSlot = (nextUsedTimeSlot * timeSlotLength) + firstTimeSlot;
 			long currentTime = System.currentTimeMillis();
 			task = new NextProductStepTask();
 			Logger.log("Equiplet agent - trying to schedule: %d (%d - %d)%n", (startPlannedTimeSlot - currentTime), startPlannedTimeSlot, currentTime);
@@ -126,18 +126,22 @@ public class NextProductStepTimer extends Timer {
 	 * 
 	 * @return the next used timeslot
 	 */
-	public int getNextUsedTimeSlot() {
+	public long getNextUsedTimeSlot() {
 		return nextUsedTimeSlot;
 	}
 
 	/**
+	 * Function for getting the timeSlotLength
+	 * 
 	 * @return the timeSlotLength
 	 */
-	public int getTimeSlotLength() {
+	public long getTimeSlotLength() {
 		return timeSlotLength;
 	}
 
 	/**
+	 * Function for setting the timeSlotLength
+	 * 
 	 * @param timeSlotLength the timeSlotLength to set
 	 */
 	public void setTimeSlotLength(int timeSlotLength) {
