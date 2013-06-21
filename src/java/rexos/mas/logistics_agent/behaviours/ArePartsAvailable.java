@@ -37,7 +37,7 @@ import jade.lang.acl.UnreadableException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.Part;
-import rexos.mas.equiplet_agent.ProductStep;
+import rexos.mas.data.ProductStep;
 
 /**
  * Responds to questions whether or not a specific part is available.

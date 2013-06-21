@@ -44,8 +44,8 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
-import rexos.mas.equiplet_agent.ProductStep;
-import rexos.mas.equiplet_agent.StepStatusCode;
+import rexos.mas.data.ProductStep;
+import rexos.mas.data.StepStatusCode;
 import rexos.mas.service_agent.ServiceAgent;
 
 import com.mongodb.BasicDBObject;

@@ -55,10 +55,14 @@ import java.util.HashMap;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
+import rexos.mas.data.ProductStep;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.StepStatusCode;
-import rexos.mas.equiplet_agent.ProductStep;
 
+/**
+ * An product will have one 
+ *
+ */
 public class ProduceBehaviour extends OneShotBehaviour{
 	private static final long serialVersionUID = 1L;
 	private Production _production;
@@ -79,14 +83,11 @@ public class ProduceBehaviour extends OneShotBehaviour{
 						// returned to the scheduler)
 						_prodEQMap.addProductionStep(stp.getId());
 						s1 = _production.getProductionEquipletMapping();
-						// retrieve the AID
-						HashMap<AID, Long> equipletAndTimeslot = _production
-								.getProductionEquipletMapping()
-								.getEquipletsForProductionStep(stp.getId());
 						// roep seq behav aan
-						//myAgent.addBehaviour(new newProducing(
-						//		equipletAndTimeslot, stp));
-						myAgent.addBehaviour(new producing(myAgent, -1, MessageTemplate.MatchAll()));
+						// myAgent.addBehaviour(new newProducing(
+						// equipletAndTimeslot, stp));
+						myAgent.addBehaviour(new producing(myAgent, -1,
+								MessageTemplate.MatchAll()));
 					}
 				}
 			}
@@ -165,16 +166,9 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 		myAgent.addBehaviour(seq);
 		msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setOntology("StartProduction");
-		
-		
-		// AID CHECK
-		//if (eqAndTs.get(msg.getSender()) != productionStep..getId()){
-			//Logger.log(new UnsupportedOperationException(
-			//		"Equiplet sender not equal to associated equiplet in productionStep"));
-			productionStep.setStatus(StepStatusCode.IN_PROGRESS);
-			msg.addReceiver(msg.getSender());
-			myAgent.send(msg);
-		//}
+		productionStep.setStatus(StepStatusCode.IN_PROGRESS);
+		msg.addReceiver(msg.getSender());
+		myAgent.send(msg);
 	}
 }
 
@@ -186,15 +180,10 @@ class producing extends rexos.mas.behaviours.ReceiveBehaviour{
 	 **/
 	public producing(Agent agnt, int millis, MessageTemplate msgtmplt){
 		super(agnt, millis, msgtmplt);
-		// TODO Auto-generated constructor stub
 	}
 
-
-
 	private static final long serialVersionUID = 1L;
-
 	ACLMessage msg;
-	
 
 	@Override
 	public void handle(ACLMessage m){
@@ -204,28 +193,25 @@ class producing extends rexos.mas.behaviours.ReceiveBehaviour{
 				/*
 				 * Equiplet agent requests permission for executing product
 				 * step. Product agent grants permission Currently I cannot
-				 * think of any reason why it wouldn�t. But I�m sure there are
-				 * reasons.
+				 * think of any reason why it wouldn�t. But I�m sure there
+				 * are reasons.
 				 */
 				ACLMessage reply = m.createReply();
 				reply.setOntology("StartStep");
 				myAgent.send(reply);
 				break;
-			case "Planned":
-				// Planned?
-				break;
 			case "StatusUpdate":
-				ProductStep step = (ProductStep)m.getContentObject();
-				switch(step.getStatus().name()){
-				case "IN_PROGRESS":
+				ProductStep step = (ProductStep) m.getContentObject();
+				switch(step.getStatus()){
+				case IN_PROGRESS:
 					// In progress
 					break;
-				case "SUSPENDED_OR_WARNING":
+				case SUSPENDED_OR_WARNING:
 					/*
 					 * Equiplet agent informs the product agent that a problem
 					 * was encountered, but that it�s working on a solution.
 					 */
-				case "FAILED":
+				case FAILED:
 					/*
 					 * Equiplet agent informs the product agent that the product
 					 * step has been aborted or has failed, including a reason
@@ -233,13 +219,13 @@ class producing extends rexos.mas.behaviours.ReceiveBehaviour{
 					 * entirely
 					 */
 					break;
-				case "DONE":
+				case DONE:
 					/*
 					 * Equiplet agent informs the product agent that the product
 					 * step has been executed successfully.
 					 */
-					//_product.addStatusDataToLog(msg.getSender(),
-					//		ps.getStatusData());
+					((ProductAgent)myAgent).getProduct().addStatusDataToLog(msg.getSender(),
+							step.getStatusData());
 					System.out.println("I'm done.");
 					break;
 				default:
@@ -260,70 +246,4 @@ class producing extends rexos.mas.behaviours.ReceiveBehaviour{
 			Logger.log(e);
 		}
 	}
-	
-	
-	//@Override
-	//public void action(){
-		//msg = myAgent.receive();
-//	try{
-//			switch(msg.getOntology()){
-//			case "StartStepQuestion":
-//				/*
-//				 * Equiplet agent requests permission for executing product
-//				 * step. Product agent grants permission Currently I cannot
-//				 * think of any reason why it wouldn�t. But I�m sure there are
-//				 * reasons.
-//				 */
-//				ACLMessage reply = msg.createReply();
-//				reply.setOntology("StartStep");
-//				myAgent.send(reply);
-//				break;
-//			case "Planned":
-//				// Planned?
-//				break;
-//			case "StatusUpdate":
-//				ProductStep ps = (ProductStep) msg.getContentObject();
-//				switch(msg.getContent()){
-//				case "INPROGRESS":
-//					// In progress
-//					break;
-//				case "SUSPENDED_OR_WARNING":
-//					/*
-//					 * Equiplet agent informs the product agent that a problem
-//					 * was encountered, but that it�s working on a solution.
-//					 */
-//				case "FAILED":
-//					/*
-//					 * Equiplet agent informs the product agent that the product
-//					 * step has been aborted or has failed, including a reason
-//					 * and source. Product agent reschedules or gives up
-//					 * entirely
-//					 */
-//					break;
-//				case "DONE":
-//					/*
-//					 * Equiplet agent informs the product agent that the product
-//					 * step has been executed successfully.
-//					 */
-//					//_product.addStatusDataToLog(msg.getSender(),
-//					//		ps.getStatusData());
-//					break;
-//				default:
-//					Logger.log(new UnsupportedOperationException("No case for "
-//							+ msg.getContent()));
-//					break;
-//				}
-//				break;
-//			case "EquipletAgentDied":
-//				/* EquipletAgent taken down */
-//				break;
-//			default:
-//				Logger.log(new UnsupportedOperationException("No case for "
-//						+ msg.getOntology()));
-//				break;
-//			}
-//		} catch(Exception e){
-//			Logger.log(e);
-//		}
-//	}
 }
