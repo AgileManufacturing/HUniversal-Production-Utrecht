@@ -292,7 +292,7 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 				} else{
 					productionstep.setStatus(StepStatusCode.PLANNED);
 					System.out.println("Add a ProduceBehaviour");
-					ProduceBehaviour _produceBehaviour = new ProduceBehaviour();
+					ProduceBehaviour _produceBehaviour = new ProduceBehaviour(myAgent);
 					((SequentialBehaviour) parent).addSubBehaviour(_produceBehaviour);
 				}
 			}

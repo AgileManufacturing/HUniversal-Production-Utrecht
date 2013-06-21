@@ -96,8 +96,10 @@ public class OverviewBehaviour extends OneShotBehaviour{
 		
 		_schedulerBehaviour = new SchedulerBehaviour();
 		_sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
-		_produceBehaviour = new ProduceBehaviour();
-		_sequentialBehaviour.addSubBehaviour(_produceBehaviour);
+		
+		// ProduceBehaviour is started in Schedulerbehaviour. 
+		//_produceBehaviour = new ProduceBehaviour(myAgent);
+		//_sequentialBehaviour.addSubBehaviour(_produceBehaviour);
 	}
 
 	@SuppressWarnings("static-method")
