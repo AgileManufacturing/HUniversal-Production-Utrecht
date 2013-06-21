@@ -155,27 +155,33 @@ public class EvaluateDuration extends ReceiveBehaviour {
 			module.setConfiguration(hardwareAgent.getConfiguration());
 			// create the equipletSteps
 			EquipletStep[] equipletSteps = module.getEquipletSteps(serviceStep.getType(), serviceStep.getParameters());
-			//TODO return error to pa if equipletSteps is empty
-			BlackboardClient equipletStepsBBClient = hardwareAgent.getEquipletStepsBBClient();
-			ObjectId next = null;
-			// calculate the duration and put the steps on the blackboard
-			for(int i = equipletSteps.length - 1; i >= 0; i--) {
-				EquipletStep equipletStep = equipletSteps[i];
-				stepDuration += equipletStep.getTimeData().getDuration();
-				equipletStep.setServiceStepID(serviceStepId);
-				equipletStep.setNextStep(next);
-				next = equipletStepsBBClient.insertDocument(equipletStep.toBasicDBObject());
-			}
-			// get the scheduleData and add the duration.
-			ScheduleData schedule = serviceStep.getScheduleData();
-			schedule.setDuration(stepDuration);
+			// TODO return error to pa if equipletSteps is empty
+			if(equipletSteps.length == 0) {
+				BlackboardClient equipletStepsBBClient = hardwareAgent.getEquipletStepsBBClient();
+				ObjectId next = null;
+				// calculate the duration and put the steps on the blackboard
+				for(int i = equipletSteps.length - 1; i >= 0; i--) {
+					EquipletStep equipletStep = equipletSteps[i];
+					stepDuration += equipletStep.getTimeData().getDuration();
+					equipletStep.setServiceStepID(serviceStepId);
+					equipletStep.setNextStep(next);
+					next = equipletStepsBBClient.insertDocument(equipletStep.toBasicDBObject());
+				}
+				// get the scheduleData and add the duration.
+				ScheduleData schedule = serviceStep.getScheduleData();
+				schedule.setDuration(stepDuration);
 
-			// update the serviceStep
-			hardwareAgent.getServiceStepsBBClient().updateDocuments(new BasicDBObject("_id", serviceStepId),
-					new BasicDBObject("$set", new BasicDBObject("scheduleData", schedule.toBasicDBObject())));
-			// if the serviceStep has an next step calculate the duration for that one too.
-			if(serviceStep.getNextStep() != null) {
-				EvaluateStepDuration(serviceStep.getNextStep());
+				// update the serviceStep
+				hardwareAgent.getServiceStepsBBClient().updateDocuments(new BasicDBObject("_id", serviceStepId),
+						new BasicDBObject("$set", new BasicDBObject("scheduleData", schedule.toBasicDBObject())));
+				// if the serviceStep has an next step calculate the duration for that one too.
+				if(serviceStep.getNextStep() != null) {
+					EvaluateStepDuration(serviceStep.getNextStep());
+				}
+			} else {
+				hardwareAgent.CancelAllStepsForServiceStep(serviceStepId, String.format(
+						"%s.getEquipletSteps(%d, %s) returned no steps.", module, serviceStep.getType(),
+						serviceStep.getParameters()));
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 			Logger.log(e);

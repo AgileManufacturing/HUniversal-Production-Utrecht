@@ -83,7 +83,6 @@ import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.ScheduleData;
-import rexos.mas.data.StepStatusCode;
 import rexos.mas.equiplet_agent.behaviours.AbortStep;
 import rexos.mas.equiplet_agent.behaviours.InitialisationFinished;
 import rexos.mas.equiplet_agent.behaviours.ServiceAgentDied;
@@ -380,8 +379,14 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 								responseMessage.setOntology("Planned");
 								responseMessage.setContentObject(scheduleData.getStartTime());
 
-//								addBehaviour(new WakerBehaviour(this, 50){
+								//TODO: after testing delete below
+//								addBehaviour(new WakerBehaviour(this, 75){
 //									
+//									/**
+//									 * 
+//									 */
+//									private static final long serialVersionUID = 1L;
+//
 //									protected void onWake(){
 //			
 //									ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
@@ -393,6 +398,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 //									Logger.log("Equiplet agent - sending message %s%n", ACLMessage.getPerformative(cancelMessage.getPerformative()));
 //									}
 //								});
+								//TODO: after testing delete above
 								
 							} catch(IOException e) {
 								responseMessage.setPerformative(ACLMessage.FAILURE);

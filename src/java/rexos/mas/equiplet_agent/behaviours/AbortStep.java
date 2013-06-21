@@ -91,7 +91,6 @@ public class AbortStep extends ReceiveBehaviour {
 	 * Instantiates a new can perform step.
 	 * 
 	 * @param agent The agent for this behaviour
-	 * @param productBBClient BlackboardClient for the equiplet's product step blackboard.
 	 */
 	public AbortStep(EquipletAgent agent) {
 		super(agent, messageTemplate);
@@ -126,6 +125,8 @@ public class AbortStep extends ReceiveBehaviour {
 							new BasicDBObject("_id", productStepEntryId),
 							new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
 									"statusData", new BasicDBObject("reason", "productagent canceled"))));
+					equipletAgent.getTimer().reScheduleTimer();
+					
 				} else {
 					ACLMessage reply = message.createReply();
 					reply.setPerformative(ACLMessage.FAILURE);

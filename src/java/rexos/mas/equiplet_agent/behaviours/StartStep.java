@@ -124,22 +124,6 @@ public class StartStep extends ReceiveBehaviour {
 
 		// Get the next product step and set the timer for the next product step
 		NextProductStepTimer timer = equipletAgent.getTimer();
-		try {
-			BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED.name());
-			query.put("$order_by", new BasicDBObject("scheduleData", new BasicDBObject("startTime", "1")));
-			List<DBObject> objects = equipletBBClient.findDocuments(query);
-			if(!objects.isEmpty()) {
-				ProductStep nextProductStep = new ProductStep((BasicDBObject) objects.get(0));
-				equipletAgent.setNextProductStep(nextProductStep.getId());
-				ScheduleData scheduleData = nextProductStep.getScheduleData();
-				if(scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
-					timer.setNextUsedTimeSlot(scheduleData.getStartTime());
-				}
-			} else {
-				timer.setNextUsedTimeSlot(-1);
-			}
-		} catch(GeneralMongoException | InvalidDBNamespaceException e) {
-			Logger.log(e);
-		}
+		timer.reScheduleTimer();
 	}
 }
