@@ -338,13 +338,15 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 						try {
 							DBObject dbObject = serviceStepBBClient.findDocumentById(entry.getTargetObjectId());
 							if(dbObject != null) {
+
 								ServiceStep serviceStep = new ServiceStep((BasicDBObject) dbObject);
 								StepStatusCode status = serviceStep.getStatus();
 								switch(status) {
 								// TODO add other statuses like ABORTED, SUSPENDED etc
 									case ABORTED:
 										Logger.log("Hardware Agent - serv.Step status set to: %s%n", status);
-										cancelAllStepsForServiceStep(serviceStep.getId(), serviceStep.getStatusData().getString("reason"));
+										cancelAllStepsForServiceStep(serviceStep.getId(), serviceStep.getStatusData()
+												.getString("reason"));
 										break;
 									case PLANNED:
 									case WAITING:

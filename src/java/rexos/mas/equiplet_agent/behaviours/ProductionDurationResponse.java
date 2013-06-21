@@ -91,15 +91,15 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 				Logger.log("sending message: %s%n", responseMessage.getOntology());
 
 				// TODO: remove below after testing
-				ACLMessage scheduleStepMessage = new ACLMessage(ACLMessage.REQUEST);
-				scheduleStepMessage.addReceiver(equipletAgent.getAID());
-				scheduleStepMessage.setOntology("ScheduleStep");
-				scheduleStepMessage.setConversationId(message.getConversationId());
-				int timeslot = (int) ((System.currentTimeMillis() - equipletAgent.getTimer()
-						.getFirstTimeSlot()) / equipletAgent.getTimer().getTimeSlotLength() + 5);
-				scheduleStepMessage.setContentObject(timeslot);
-				equipletAgent.send(scheduleStepMessage);
-				Logger.log("sending message: %s%n", scheduleStepMessage.getOntology());
+//				ACLMessage scheduleStepMessage = new ACLMessage(ACLMessage.REQUEST);
+//				scheduleStepMessage.addReceiver(equipletAgent.getAID());
+//				scheduleStepMessage.setOntology("ScheduleStep");
+//				scheduleStepMessage.setConversationId(message.getConversationId());
+//				int timeslot = (int) ((System.currentTimeMillis() - equipletAgent.getTimer()
+//						.getFirstTimeSlot()) / equipletAgent.getTimer().getTimeSlotLength() + 5);
+//				scheduleStepMessage.setContentObject(timeslot);
+//				equipletAgent.send(scheduleStepMessage);
+//				Logger.log("sending message: %s%n", scheduleStepMessage.getOntology());
 				// TODO: remove above after testing
 			} catch(IOException | InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(e);

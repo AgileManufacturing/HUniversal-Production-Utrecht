@@ -42,6 +42,8 @@ package rexos.mas.productAgent;
 
 import java.net.UnknownHostException;
 
+import com.google.gson.Gson;
+
 import rexos.mas.data.Product;
 import rexos.mas.data.ProductionStep;
 
@@ -62,19 +64,39 @@ public class ProductAgent extends Agent{
 	private static int _convIDCnt = 0;
 	private String _convIDBase;
 	public int prodStep = 0;
-	private AID currentLocation;
+	
+	private Gson gson;
+	private String _host;
+	
 
 	@Override
 	protected void setup(){
 		try{
-			_product = (Product) getArguments()[0];
+			gson = new Gson();
+			this._host = "145.89.253.111:89";
+			
+			Object[] args = this.getArguments();
+			
+			if(args.length > 0) {
+				if(args[0].getClass() == String.class) {
+					//Change the incoming JSON message to also implement the host to connect to.
+					_product = gson.fromJson((String)args[0], Product.class);
+				} else if(args[0].getClass() == Product.class) {
+					this._product = (Product) args[0];
+				}
+			}
 			_overviewBehaviour = new OverviewBehaviour();
 			addBehaviour(_overviewBehaviour);
+			
 			System.out.println("I spawned as a product agent");
 		} catch(Exception e){
 			System.out.println("Productagent exited with: " + e.getMessage());
 			doDelete();
 		}
+	}
+	
+	public String getHost() {
+		return this._host;
 	}
 
 	/*
@@ -132,19 +154,5 @@ public class ProductAgent extends Agent{
 				System.out.println(aid.getLocalName());
 			}
 		}
-	}
-
-	/**
-	 * @return the currentLocation
-	 */
-	public AID getCurrentLocation(){
-		return currentLocation;
-	}
-
-	/**
-	 * @param currentLocation the currentLocation to set
-	 */
-	public void setCurrentLocation(AID currentLocation){
-		this.currentLocation = currentLocation;
 	}
 }

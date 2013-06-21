@@ -156,7 +156,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 			// create the equipletSteps
 			EquipletStep[] equipletSteps = module.getEquipletSteps(serviceStep.getType(), serviceStep.getParameters());
 			// TODO return error to pa if equipletSteps is empty
-			if(equipletSteps.length == 0) {
+			if(equipletSteps.length > 0) {
 				BlackboardClient equipletStepsBBClient = hardwareAgent.getEquipletStepsBBClient();
 				ObjectId next = null;
 				// calculate the duration and put the steps on the blackboard
