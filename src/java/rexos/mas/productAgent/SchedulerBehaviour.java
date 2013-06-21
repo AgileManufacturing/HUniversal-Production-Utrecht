@@ -151,6 +151,7 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 				dbData.put(aid, new DbData((BasicDBObject) aidInfo.get(0)));
 			} else {
 				// TODO: what to do if list is empty
+				break;
 			}	
 		}
 		
