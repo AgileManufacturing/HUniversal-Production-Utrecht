@@ -101,26 +101,40 @@ void BlackboardCppClient::unsubscribe(BlackboardSubscription &sub){
 	}
 }
 
-void BlackboardCppClient::insertDocument(std::string json){
+bool BlackboardCppClient::insertDocument(std::string json, mongo::BSONObj * result_out){
 	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
-	std::string name = database;
-	name.append(".");
-	name.append(collection);
+	std::string dbNamespace = database;
+	dbNamespace.append(".");
+	dbNamespace.append(collection);
 	mongo::BSONObj bobj = mongo::fromjson(json);
-	(*connection)->insert(name, bobj);
+	(*connection)->insert(dbNamespace, bobj);
+
+	mongo::BSONObj result = (*connection)->getLastErrorDetailed(dbNamespace);
+	if (result_out != NULL) {
+		*result_out = result;
+	}
+
 	connection->done();
 	delete connection;
+	return result.getBoolField("ok");
 }
 
-void BlackboardCppClient::removeDocuments(std::string queryAsJSON) {
+int BlackboardCppClient::removeDocuments(std::string queryAsJSON, mongo::BSONObj * result_out) {
 	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
 	std::string dbNamespace = database;
 	dbNamespace.append(".");
 	dbNamespace.append(collection);
 	mongo::BSONObj query = mongo::fromjson(queryAsJSON);
 	(*connection)->remove(dbNamespace, query, false);
+
+	mongo::BSONObj result = (*connection)->getLastErrorDetailed(dbNamespace);
+	if (result_out != NULL) {
+		*result_out = result;
+	}
+
 	connection->done();
 	delete connection;
+	return result.getIntField("n");
 }
 
 mongo::BSONObj BlackboardCppClient::findDocumentById(mongo::OID objectId) {
@@ -161,7 +175,7 @@ int BlackboardCppClient::findDocuments(std::string queryAsJSON, std::vector<mong
 }
 
 
-void BlackboardCppClient::updateDocuments(std::string queryAsJSON, std::string updateQueryAsJSON) {
+int BlackboardCppClient::updateDocuments(std::string queryAsJSON, std::string updateQueryAsJSON, mongo::BSONObj * result_out) {
 	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
 	std::string dbNamespace = database;
 	dbNamespace.append(".");
@@ -169,8 +183,15 @@ void BlackboardCppClient::updateDocuments(std::string queryAsJSON, std::string u
 	mongo::Query query(mongo::fromjson(queryAsJSON));
 	mongo::BSONObj updateQuery = mongo::fromjson(updateQueryAsJSON);
 	(*connection)->update(dbNamespace, query, updateQuery, false, true);
+
+	mongo::BSONObj result = (*connection)->getLastErrorDetailed(dbNamespace);
+	if (result_out != NULL) {
+		*result_out = result;
+	}
+
 	connection->done();
 	delete connection;
+	return result.getIntField("n");
 }
 
 
