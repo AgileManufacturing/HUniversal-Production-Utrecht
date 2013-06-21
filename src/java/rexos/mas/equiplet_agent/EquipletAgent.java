@@ -83,6 +83,7 @@ import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.ScheduleData;
+import rexos.mas.data.StepStatusCode;
 import rexos.mas.equiplet_agent.behaviours.AbortStep;
 import rexos.mas.equiplet_agent.behaviours.InitialisationFinished;
 import rexos.mas.equiplet_agent.behaviours.ServiceAgentDied;
@@ -221,6 +222,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		try {
 			InetAddress IP = InetAddress.getLocalHost();
 			equipletDbIp = IP.getHostAddress();
+			//equipletDbIp = "145.89.191.131";
 		} catch(UnknownHostException e) {
 			Logger.log(e);
 		}
@@ -406,23 +408,25 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 								Logger.log(e);
 							}
 							break;
+						case WAITING:
 						case IN_PROGRESS:
 						case FAILED:
 						case SUSPENDED_OR_WARNING:
 							responseMessage.setOntology("StatusUpdate");
 							responseMessage.setPerformative(ACLMessage.CONFIRM);
-							responseMessage.setContentObject(productStep.getStatusData());
+							responseMessage.setContentObject(productStep.toBasicDBObject());
 							break;
 						case DONE:
 							responseMessage.setOntology("StatusUpdate");
 							responseMessage.setPerformative(ACLMessage.CONFIRM);
-							responseMessage.setContentObject(productStep.getStatusData());
+							productStep.setStatus(StepStatusCode.DONE);
+							responseMessage.setContentObject(productStep.toBasicDBObject());
 							productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
 							break;
 						case DELETED:
 							responseMessage.setOntology("StatusUpdate");
 							responseMessage.setPerformative(ACLMessage.CONFIRM);
-							responseMessage.setContentObject(productStep.getStatusData());
+							responseMessage.setContentObject(productStep.toBasicDBObject());
 							productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
 							break;
 						default:

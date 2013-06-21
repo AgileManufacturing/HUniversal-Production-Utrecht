@@ -43,3 +43,7 @@ APDescription.txt
 MTPs-Main-Container.txt
 .classpath
 .project
+.project
+.classpath
+doxy
+doc

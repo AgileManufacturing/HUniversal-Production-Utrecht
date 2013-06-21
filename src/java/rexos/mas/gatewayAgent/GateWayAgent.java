@@ -1,10 +1,9 @@
 /**
- * @file ProductLog.java
- * @brief Class to create the productionlog which is then able to be pushed to
- *        the remote location.
+ * @file GatewayAgent.java
+ * @brief
  * @date Created: 02-04-2013
  * 
- * @author Theodoor de Graaff
+ * @author Ricky van Rijn
  * 
  * @section LICENSE License: newBSD
  * 
@@ -38,72 +37,78 @@
  * 
  **/
 
-package rexos.mas.data;
+package rexos.mas.gatewayAgent;
 
-import rexos.libraries.log.Logger;
-import rexos.mas.data.sqldatabase.sqliteDatabase;
-import jade.core.AID;
+import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.lang.acl.ACLMessage;
+import jade.util.Logger;
+import jade.wrapper.AgentController;
 
-import java.util.Iterator;
-import java.util.List;
-
-import com.mongodb.BasicDBObject;
-
-import com.mongodb.BasicDBObject;
-
-public class ProductLog{
-	private boolean writeToRemote = false;
-	private boolean writeToLocal = true;
-	private sqliteDatabase local;
-
-	// private RemoteDatabaseConnection remote;
+public class GateWayAgent extends Agent{
 	/**
-	 * @param writeToRemote
-	 * @param writeToLocal
-	 * @param local
+	 * SerialVersion
 	 */
-	public ProductLog(boolean writeToRemote, boolean writeToLocal,
-			sqliteDatabase local){
-		super();
-		this.writeToRemote = writeToRemote;
-		this.writeToLocal = writeToLocal;
-		this.local = local;
-	}
+	private static final long serialVersionUID = 1;
+	private Logger myLogger = Logger.getMyLogger(getClass().getName());
 
-	public void add(List<LogMessage> msgs){
-		if (writeToLocal){
-			local.insert(msgs);
-		}
-		if (writeToRemote){
-			// TODO: remote.insert()
-			throw new UnsupportedOperationException();
+	private void creationOfAgents(){
+		String name = "Alice";
+		jade.wrapper.AgentContainer c = getContainerController();
+		try{
+			AgentController a = c.createNewAgent(name, "agent.com.Henk", null);
+			a.start();
+		} catch(Exception e){
+			System.out.println(e.getMessage());
 		}
 	}
 
-	public static void pushLocalToRemote(){
-		// TODO:
-		// get latest remote
-		// get local since latest remote
-		// write to remote
-		throw new UnsupportedOperationException();
-	}
+	@SuppressWarnings("serial")
+	private class WaitPingAndReplyBehaviour extends CyclicBehaviour{
+		public WaitPingAndReplyBehaviour(Agent a){
+			super(a);
+		}
 
-	/**
-	 * @param aid 
-	 * @param statusData
-	 */
-	public void add(AID aid, BasicDBObject statusData){
-		for(@SuppressWarnings("rawtypes")
-		Iterator i = statusData.toMap().entrySet().iterator(); i.hasNext();){
-			switch(i.getClass().getName()){
-			case "java.lang.String":
-				local.insert(new LogMessage(aid, i.toString()));	
-			break;
-			//TODO: Add other classes. 
-			default:
-				Logger.log(new UnsupportedOperationException("No log case for "
-						+ i.getClass().getCanonicalName()));
+		@Override
+		public void action(){
+			ACLMessage msg = myAgent.receive();
+			if (msg != null){
+				creationOfAgents();
+			} else{
+				block();
 			}
+		}
+	} // END of inner class WaitPingAndReplyBehaviour
+
+	@SuppressWarnings("unused")
+	private class XMLReader{
+		public void parse(String Message){
+		}
+	}
+
+	@Override
+	protected void setup(){
+		// Registration with the DF
+		DFAgentDescription dfd = new DFAgentDescription();
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType("SmallTalkAgent");
+		sd.setName(getName());
+		sd.setOwnership("RickyVanRijn");
+		dfd.setName(getAID());
+		dfd.addServices(sd);
+		try{
+			DFService.register(this, dfd);
+			WaitPingAndReplyBehaviour PingBehaviour = new WaitPingAndReplyBehaviour(
+					this);
+			addBehaviour(PingBehaviour);
+		} catch(FIPAException e){
+			myLogger.log(Logger.SEVERE, "Agent " + getLocalName()
+					+ " - Cannot register with DF", e);
+			doDelete();
 		}
 	}
 }

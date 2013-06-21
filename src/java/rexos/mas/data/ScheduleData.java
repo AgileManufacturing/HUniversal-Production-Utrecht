@@ -96,7 +96,7 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	}
 
 	/**
-	 * @see newDataClasses.DBSaveable#toBasicDBObject()
+	 * @see data.DBSaveable#toBasicDBObject()
 	 **/
 	@Override
 	public BasicDBObject toBasicDBObject() {
@@ -107,7 +107,7 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	}
 
 	/**
-	 * @see newDataClasses.DBSaveable#fromBasicDBObject(com.mongodb.BasicDBObject)
+	 * @see data.DBSaveable#fromBasicDBObject(com.mongodb.BasicDBObject)
 	 **/
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
