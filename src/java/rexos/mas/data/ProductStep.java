@@ -44,7 +44,7 @@
  *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *          SUCH DAMAGE.
  **/
-package rexos.mas.equiplet_agent;
+package rexos.mas.data;
 
 import jade.core.AID;
 
@@ -53,9 +53,6 @@ import java.io.Serializable;
 import org.bson.types.ObjectId;
 
 import rexos.libraries.log.Logger;
-import rexos.mas.data.MongoSaveable;
-import rexos.mas.data.Part;
-import rexos.mas.data.ScheduleData;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;

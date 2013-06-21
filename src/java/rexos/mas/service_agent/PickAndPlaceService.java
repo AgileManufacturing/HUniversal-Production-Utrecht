@@ -57,7 +57,7 @@ import rexos.libraries.log.Logger;
 import rexos.mas.data.Part;
 import rexos.mas.data.Position;
 import rexos.mas.data.ScheduleData;
-import rexos.mas.equiplet_agent.StepStatusCode;
+import rexos.mas.data.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 
