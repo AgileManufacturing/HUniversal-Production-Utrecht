@@ -43,6 +43,9 @@
 #include <rexos_utilities/Utilities.h>
 
 #include <rexos_statemachine/StateMachine.h>
+#include <rexos_statemachine/ChangeStateAction.h>
+#include <rexos_statemachine/ChangeModeAction.h>
+
 #include <rexos_most/MOSTDatabaseClient.h>
 
 #include <equiplet_node/ModuleRegistry.h>
@@ -94,6 +97,11 @@ private:
 
 	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
 
+	void changeState(rexos_statemachine::State desiredState);
+
+	void changeMode(rexos_statemachine::Mode desiredMode);
+
+	bool setTransitionDone(rexos_statemachine::State transitionState);
 	/**
 	 * @var int equipletId
 	 * The id of the equiplet
@@ -129,6 +137,10 @@ private:
 	rexos_statemachine::TransitionActionServer* shutdownTransitionActionServer;
 	rexos_statemachine::TransitionActionServer* startTransitionActionServer;
 	rexos_statemachine::TransitionActionServer* stopTransitionActionServer;
+
+	ChangeStateActionClient changeStateActionClient;
+	ChangeModeActionClient changeModeActionClient;
+
 };
 
 }

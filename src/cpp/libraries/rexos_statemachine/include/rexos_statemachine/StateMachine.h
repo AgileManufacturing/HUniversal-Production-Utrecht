@@ -64,21 +64,40 @@ public:
 	 **/
 	rexos_statemachine::State getCurrentState();
 
+	/**
+	 *@return the currentMode of the state machine
+	**/
 	rexos_statemachine::Mode getCurrentMode();
 
+	/**
+	 *Set a listener to statemachine for callback when state/mode changed
+	**/
 	void setListener(Listener* listener);
 
+	/**
+	 *Change State receive method for the State machine
+	 *The state will be changed by an action call
+	**/
 	void onChangeStateAction(const ChangeStateGoalConstPtr& goal);
 
+	/**
+	 *Change Mode receive method for the State machine
+	 *The mode will be changed by an action call
+	**/
 	void onChangeModeAction(const ChangeModeGoalConstPtr& goal);
 
 private:
+	//the statemachine call transitions by an action, so it starts by an own thread
 	void onTransitionSetupAction(TransitionActionServer* as);
 	void onTransitionShutdownAction(TransitionActionServer* as);
 	void onTransitionStartAction(TransitionActionServer* as);
 	void onTransitionStopAction(TransitionActionServer* as);
 
 protected:
+	/**
+	 *@var ros::NodeHandle nodeHandle;
+	 *nodeHandle to setup actionclients/-servers
+	**/
 	ros::NodeHandle nodeHandle;
 
 private:
@@ -94,8 +113,16 @@ private:
 
 	void _forceToAllowedState();
 
+	/**
+	 *@var std::vector<rexos_statemachine::Mode> modes
+	 *the modes of the statemachine
+	**/
 	std::vector<rexos_statemachine::Mode> modes;
 
+	/**
+	 *@var Listener* listener
+	 *Listener of the statemachine for callback when state/mode changed
+	**/
 	Listener* listener;
 
 	/**
@@ -117,42 +144,35 @@ private:
 	std::map<rexos_statemachine::Mode, std::vector<rexos_statemachine::State> > modePossibleStates;
 
 	/**
-	 * @var typedef int (StateMachine::*stateFunctionPtr)()
-	 * Function pointer definition for a state transition function
+	typedef std::pair<rexos_statemachine::State, rexos_statemachine::State> StatePair;
+	 * Used by transitions
+	 * key is src state
+	 * value is dest state
 	 **/
-	typedef void (StateMachine::*stateFunctionPtr)();
-
-	/**
-	 * @var std::map<std::pair<rexos_statemachine::State,MOSTState>, std::pair<stateFunctionPtr,stateFunctionPtr>> transitionMap;
-	 * key is a pair from src to destination
-	 * value is a pair with:
-	 * the key: functionpointer of the transition
-	 * the value: functionpointer of the transition while abort
-	 **/
-
 	typedef std::pair<rexos_statemachine::State, rexos_statemachine::State> StatePair;
 
+	/**
+	 * Transition object
+	**/
 	struct Transition {
+		/**
+		 * @var TransitionActionClient *transitionActionClient
+		 * A actionClient to send / activate the transition method
+		**/
 		TransitionActionClient *transitionActionClient;
-		//stateFunctionPtr transitionFunctionPointer;
+
+		/**
+		 * @var rexos_statemachine::State transitionState
+		 * The State of the Transition such as 'STATE_SETUP/STATE_START/...
+		**/
 		rexos_statemachine::State transitionState;
-		//stateFunctionPtr abortTransitionFunctionPointer;
-		//rexos_statemachine::State abortTransitionState;
 	};
 
+	
 	struct ChangeStateEntry{
 		Transition *transition,*abortTransition;
 		StatePair statePair;
 	};
-
-//	struct transitionMapEntryValue {
-//		stateFunctionPtr transitionFunctionPointer;
-//		rexos_statemachine::State transitionState;
-//		statePair previousNextState;
-//		transitionMapEntryValue abortTransition;
-//		//stateFunctionPtr abortTransitionFunctionPointer;
-//		//rexos_statemachine::State abortTransitionState;
-//	};
 
 	typedef std::pair<StatePair, ChangeStateEntry> transitionMapEntry;
 	typedef std::map<StatePair, ChangeStateEntry> transitionMapType;
