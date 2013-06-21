@@ -76,9 +76,9 @@ public class AbortStep extends ReceiveBehaviour {
 	/**
 	 * @var MessageTemplate messageTemplate
 	 *      The messageTemplate this behaviour
-	 *      listens to. This behaviour listens to the ontology: CancelStep.
+	 *      listens to. This behaviour listens to the ontology: AbortStep.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CancelStep");
+	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("AbortStep");
 
 	/**
 	 * @var EquipletAgent equipletAgent
