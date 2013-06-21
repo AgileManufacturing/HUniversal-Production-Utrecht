@@ -356,6 +356,10 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 
 										break;
 									case PLANNED:
+										equipletStepBBClient.updateDocuments(new BasicDBObject("serviceStepID",
+												serviceStep.getId()), new BasicDBObject("$set", new BasicDBObject(
+												"status", status.name())));
+										break;
 									case WAITING:
 										Logger.log("Hardware Agent - serv.Step status set to: %s%n", status);
 										List<DBObject> dbObjects =
