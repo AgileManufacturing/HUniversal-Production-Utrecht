@@ -53,11 +53,11 @@ import jade.lang.acl.MessageTemplate;
 import java.util.HashMap;
 
 import rexos.libraries.log.Logger;
+import rexos.mas.data.ProductStep;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.StepStatusCode;
-import rexos.mas.equiplet_agent.ProductStep;
 
 public class ProduceBehaviour extends OneShotBehaviour{
 	private static final long serialVersionUID = 1L;

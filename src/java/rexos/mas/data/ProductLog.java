@@ -47,7 +47,7 @@ import jade.core.AID;
 import java.util.Iterator;
 import java.util.List;
 
-import rexos.mas.data.sqldatabase.sqliteDatabase;
+import com.mongodb.BasicDBObject;
 
 public class ProductLog{
 	private boolean writeToRemote = false;

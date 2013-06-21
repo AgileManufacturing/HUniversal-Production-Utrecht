@@ -52,9 +52,9 @@ import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.data.Part;
 import rexos.mas.data.Position;
+import rexos.mas.data.ProductStep;
 import rexos.mas.data.ScheduleData;
-import rexos.mas.equiplet_agent.ProductStep;
-import rexos.mas.equiplet_agent.StepStatusCode;
+import rexos.mas.data.StepStatusCode;
 import rexos.mas.service_agent.ServiceAgent;
 import rexos.mas.service_agent.ServiceStep;
 

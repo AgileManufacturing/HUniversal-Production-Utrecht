@@ -51,7 +51,7 @@ public class ProductionEquipletMapper{
 		equipletList = new HashMap<Integer, HashMap<AID, Long>>();
 	}
 	
-	public HashMap getHashMap(){
+	public HashMap<Integer, HashMap<AID, Long>> getHashMap(){
 		return equipletList;
 	}
 	

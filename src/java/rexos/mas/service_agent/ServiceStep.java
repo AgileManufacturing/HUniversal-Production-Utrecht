@@ -37,7 +37,7 @@ import org.bson.types.ObjectId;
 
 import rexos.mas.data.MongoSaveable;
 import rexos.mas.data.ScheduleData;
-import rexos.mas.equiplet_agent.StepStatusCode;
+import rexos.mas.data.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -168,33 +168,36 @@ public class ServiceStep implements MongoSaveable {
 	 * @return an array of ServiceStep in the right order.
 	 */
 	public static ServiceStep[] sort(ServiceStep[] unsortedSteps) {
-		// Find the first step
-		ServiceStep firstServiceStep = null;
-		outer: for(ServiceStep serviceStep : unsortedSteps) {
-			for(ServiceStep serviceStep2 : unsortedSteps) {
-				if(serviceStep2.getNextStep() != null && serviceStep2.getNextStep().equals(serviceStep.getId())) {
-					continue outer;
+		if(unsortedSteps.length > 0){
+			// Find the first step
+			ServiceStep firstServiceStep = null;
+			outer: for(ServiceStep serviceStep : unsortedSteps) {
+				for(ServiceStep serviceStep2 : unsortedSteps) {
+					if(serviceStep2.getNextStep() != null && serviceStep2.getNextStep().equals(serviceStep.getId())) {
+						continue outer;
+					}
+				}
+				firstServiceStep = serviceStep;
+				break;
+			}
+	
+			// sort all steps beginning with the one found above
+			int stepsCount = unsortedSteps.length;
+			ObjectId nextStepId;
+			ServiceStep[] sortedSteps = new ServiceStep[stepsCount];
+			sortedSteps[0] = firstServiceStep;
+			for(int i = 1; i < stepsCount; i++) {
+				nextStepId = sortedSteps[i - 1].getNextStep();
+				for(ServiceStep serviceStep : unsortedSteps) {
+					if(serviceStep.getId().equals(nextStepId)) {
+						sortedSteps[i] = serviceStep;
+						break;
+					}
 				}
 			}
-			firstServiceStep = serviceStep;
-			break;
+			return sortedSteps;
 		}
-
-		// sort all steps beginning with the one found above
-		int stepsCount = unsortedSteps.length;
-		ObjectId nextStepId;
-		ServiceStep[] sortedSteps = new ServiceStep[stepsCount];
-		sortedSteps[0] = firstServiceStep;
-		for(int i = 1; i < stepsCount; i++) {
-			nextStepId = sortedSteps[i - 1].getNextStep();
-			for(ServiceStep serviceStep : unsortedSteps) {
-				if(serviceStep.getId().equals(nextStepId)) {
-					sortedSteps[i] = serviceStep;
-					break;
-				}
-			}
-		}
-		return sortedSteps;
+		return unsortedSteps;
 	}
 
 	/**

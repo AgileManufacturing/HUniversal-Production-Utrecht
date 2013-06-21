@@ -39,7 +39,7 @@ package rexos.mas.hardware_agent;
 import org.bson.types.ObjectId;
 
 import rexos.mas.data.MongoSaveable;
-import rexos.mas.equiplet_agent.StepStatusCode;
+import rexos.mas.data.StepStatusCode;
 import rexos.mas.hardware_agent.EquipletStep;
 
 import com.mongodb.BasicDBObject;
