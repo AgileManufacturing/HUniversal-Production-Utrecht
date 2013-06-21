@@ -49,8 +49,6 @@ import java.util.List;
 
 import com.mongodb.BasicDBObject;
 
-import com.mongodb.BasicDBObject;
-
 public class ProductLog{
 	private boolean writeToRemote = false;
 	private boolean writeToLocal = true;
