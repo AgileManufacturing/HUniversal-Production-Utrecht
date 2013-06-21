@@ -42,7 +42,7 @@ import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
-import rexos.mas.data.ProductionStepStatus;
+import rexos.mas.data.StepStatusCode;
 
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
@@ -71,7 +71,6 @@ public class InformerBehaviour extends OneShotBehaviour{
 	public InformerBehaviour(){
 	}
 
-	@SuppressWarnings("unused")
 	@Override
 	public void action(){
 		_productAgent = (ProductAgent) myAgent;
@@ -90,16 +89,28 @@ public class InformerBehaviour extends OneShotBehaviour{
 		_par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 		seq.addSubBehaviour(_par);
 		for(ProductionStep stp : _production.getProductionSteps()){
-			if (stp.getStatus() == ProductionStepStatus.STATE_TODO){
+			if (stp.getStatus() == StepStatusCode.EVALUATING){
 				// adds the step to te new list (the one that will be returned
 				// to the scheduler)
 				_prodEQmap.addProductionStep(stp.getId());
-				ProductionEquipletMapper s1 = _production
+				ProductionEquipletMapper pem = _production
 						.getProductionEquipletMapping();
+				
+				if(pem != null) {
+					for(AID aid : pem.getEquipletsForProductionStep(stp.getId()).keySet()) {
+						_par.addSubBehaviour(new Conversation(aid, stp, _prodEQmap));
+					}
+				} else {
+					//REPORT ERROR
+				}
+				
+				/*
+				 * OLD CODE
 				for(AID aid : _production.getProductionEquipletMapping()
 						.getEquipletsForProductionStep(stp.getId()).keySet()){
 					_par.addSubBehaviour(new Conversation(aid, stp, _prodEQmap));
 				}
+				*/
 			}
 		}
 		// Lets set our production objects
@@ -161,6 +172,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 		@Override
 		public void onStart(){
 			final String ConversationId = _productAgent.generateCID();
+			this._productionStep.setConversationId(ConversationId);
 			final MessageTemplate msgtemplate = MessageTemplate
 					.MatchConversationId(ConversationId);
 			// 1 - Inform if the equiplet can perform the step with the given

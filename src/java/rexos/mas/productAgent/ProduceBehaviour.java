@@ -6,10 +6,11 @@
  * 
  * @author Arno Derks
  * @author Theodoor de Graaff
+ * @author Ricky van Rijn
  * 
  * @section LICENSE License: newBSD
  * 
- *          Copyright © 2012, HU University of Applied Sciences Utrecht. All
+ *          Copyright ï¿½ 2012, HU University of Applied Sciences Utrecht. All
  *          rights reserved.
  * 
  *          Redistribution and use in source and binary forms, with or without
@@ -42,21 +43,21 @@
 package rexos.mas.productAgent;
 
 import jade.core.AID;
+import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
-import rexos.mas.data.LogMessage;
-import rexos.mas.data.Product;
+import java.util.HashMap;
+
+import rexos.libraries.log.Logger;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
-import rexos.mas.data.ProductionStepStatus;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import rexos.mas.data.StepStatusCode;
+import rexos.mas.equiplet_agent.ProductStep;
 
 public class ProduceBehaviour extends OneShotBehaviour{
 	private static final long serialVersionUID = 1L;
@@ -64,25 +65,33 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	private ProductionEquipletMapper _prodEQMap;
 	ProductionEquipletMapper s1;
 	ACLMessage msg;
-	private HashMap<AID, Long> currentEandT; 
 
 	@Override
 	public void action(){
-		_prodEQMap = new ProductionEquipletMapper();
-		// retrieve the productstep
-		for(ProductionStep stp : _production.getProductionSteps()){
-			if (stp.getStatus() == ProductionStepStatus.STATE_TODO){
-				// adds the step to te new list (the one that will be
-				// returned to the scheduler)
-				_prodEQMap.addProductionStep(stp.getId());
-				s1 = _production.getProductionEquipletMapping();
-				// retrieve the AID
-				HashMap<AID, Long> equipletAndTimeslot = _production
-						.getProductionEquipletMapping()
-						.getEquipletsForProductionStep(stp.getId());
-				// roep seq behav aan
-				myAgent.addBehaviour(new newProducing(equipletAndTimeslot, stp));
+		try{
+			_production = ((ProductAgent) myAgent).getProduct().getProduction();
+			_prodEQMap = new ProductionEquipletMapper();
+			// retrieve the productstep
+			if (_production != null && _production.getProductionSteps() != null){
+				for(ProductionStep stp : _production.getProductionSteps()){
+					if (stp.getStatus() == StepStatusCode.PLANNED){
+						// adds the step to te new list (the one that will be
+						// returned to the scheduler)
+						_prodEQMap.addProductionStep(stp.getId());
+						s1 = _production.getProductionEquipletMapping();
+						// retrieve the AID
+						HashMap<AID, Long> equipletAndTimeslot = _production
+								.getProductionEquipletMapping()
+								.getEquipletsForProductionStep(stp.getId());
+						// roep seq behav aan
+						//myAgent.addBehaviour(new newProducing(
+						//		equipletAndTimeslot, stp));
+						myAgent.addBehaviour(new producing(myAgent, -1, MessageTemplate.MatchAll()));
+					}
+				}
 			}
+		} catch(Exception e){
+			Logger.log(e);
 		}
 	}
 }
@@ -92,29 +101,21 @@ class newProducing extends SequentialBehaviour{
 	private HashMap<AID, Long> EqAndTs;
 	private ProductionStep productionStep;
 
-	public newProducing(HashMap<AID, Long> EqAndTs, ProductionStep productionStep){
+	public newProducing(HashMap<AID, Long> EqAndTs,
+			ProductionStep productionStep){
 		this.EqAndTs = EqAndTs;
 		this.productionStep = productionStep;
-		
 	}
 
 	@Override
 	public void onStart(){
 		addSubBehaviour(new OneShotBehaviour(){
 			private static final long serialVersionUID = 1L;
-			private AID nEq;
+
 			@Override
 			public void action(){
-				
-				for(Entry<AID, Long> Eq: EqAndTs.entrySet()){
-					nEq = Eq.getKey();
-				}
-				ProductAgent pa = (ProductAgent)myAgent;
-				if(nEq != pa.getCurrentLocation()){
-					//TODO: Ask GUI to move
-				}
-				
-				myAgent.addBehaviour(new receiveMsgBehaviour(EqAndTs, productionStep));
+				myAgent.addBehaviour(new receiveMsgBehaviour(EqAndTs,
+						productionStep));
 			}
 		});
 	}
@@ -125,7 +126,8 @@ class receiveMsgBehaviour extends CyclicBehaviour{
 	HashMap<AID, Long> eqAndTs;
 	private ProductionStep productionStep;
 
-	receiveMsgBehaviour(HashMap<AID, Long> eqAndTs, ProductionStep productionStep){
+	receiveMsgBehaviour(HashMap<AID, Long> eqAndTs,
+			ProductionStep productionStep){
 		this.eqAndTs = eqAndTs;
 		this.productionStep = productionStep;
 	}
@@ -134,7 +136,8 @@ class receiveMsgBehaviour extends CyclicBehaviour{
 	public void action(){
 		ACLMessage msg = myAgent.receive();
 		if (msg != null){
-			myAgent.addBehaviour(new WaitMsgBehaviour(msg, eqAndTs, productionStep));
+			myAgent.addBehaviour(new WaitMsgBehaviour(msg, eqAndTs,
+					productionStep));
 		} else{
 			block();
 		}
@@ -148,95 +151,179 @@ class WaitMsgBehaviour extends OneShotBehaviour{
 	HashMap<AID, Long> eqAndTs;
 	private ProductionStep productionStep;
 
-	public WaitMsgBehaviour(ACLMessage msg, HashMap<AID, Long> eqAndTs, ProductionStep productionStep){
+	public WaitMsgBehaviour(ACLMessage msg, HashMap<AID, Long> eqAndTs,
+			ProductionStep productionStep){
 		this.msg = msg;
 		this.eqAndTs = eqAndTs;
 		this.productionStep = productionStep;
 	}
 
-	
 	@Override
 	public void action(){
 		_productAgent = (ProductAgent) myAgent;
 		SequentialBehaviour seq = new SequentialBehaviour();
 		myAgent.addBehaviour(seq);
-		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setOntology("StartProduction");
 		
-		if(eqAndTs.get(msg.getSender()) != productionStep.getId()){
-			// TODO error
-		}
-		msg.addReceiver(msg.getSender());
-		myAgent.send(msg);
+		
+		// AID CHECK
+		//if (eqAndTs.get(msg.getSender()) != productionStep..getId()){
+			//Logger.log(new UnsupportedOperationException(
+			//		"Equiplet sender not equal to associated equiplet in productionStep"));
+			productionStep.setStatus(StepStatusCode.IN_PROGRESS);
+			msg.addReceiver(msg.getSender());
+			myAgent.send(msg);
+		//}
 	}
 }
 
-class producing extends OneShotBehaviour{
+class producing extends rexos.mas.behaviours.ReceiveBehaviour{
+	/**
+	 * @param agnt
+	 * @param millis
+	 * @param msgtmplt
+	 **/
+	public producing(Agent agnt, int millis, MessageTemplate msgtmplt){
+		super(agnt, millis, msgtmplt);
+		// TODO Auto-generated constructor stub
+	}
+
+
+
 	private static final long serialVersionUID = 1L;
-	Product _product;
-	ProductAgent _productAgent;
+
 	ACLMessage msg;
 	
+
 	@Override
-	public void action(){
+	public void handle(ACLMessage m){
 		try{
-			switch(msg.getOntology()){
-			// The productionstep has been initiated.
-			case "productionStepStarted":
-				// TODO key = msg.getContent().parse
+			switch(m.getOntology()){
+			case "StartStepQuestion":
 				/*
-				 * int key = 0; // temp if (key != currProdStep){ // TODO error
-				 * } if (!bla.get(key).containsKey(msg.getSender())){ // TODO
-				 * error } { ArrayList<ProductionStep> ProductionStepArrayList =
-				 * ((ProductAgent) myAgent)
-				 * .getProduct().getProduction().getProductionSteps();
-				 * for(ProductionStep stp : ProductionStepArrayList){ if (key ==
-				 * stp.getId()){ canProductionStepStart(stp); } } }
+				 * Equiplet agent requests permission for executing product
+				 * step. Product agent grants permission Currently I cannot
+				 * think of any reason why it wouldnï¿½t. But Iï¿½m sure there are
+				 * reasons.
 				 */
+				ACLMessage reply = m.createReply();
+				reply.setOntology("StartStep");
+				myAgent.send(reply);
 				break;
-			// The productionstep has completed.
-			case "productionStepFinished":
-				// TODO key = msg.getContent().parse
-				/*
-				 * int keyfinish = 0; // temp if (keyfinish != currProdStep){ //
-				 * TODO error } if
-				 * (!bla.get(keyfinish).containsKey(msg.getSender())){ // TODO
-				 * error } { ArrayList<ProductionStep> ProductionStepArrayList =
-				 * ((ProductAgent) myAgent)
-				 * .getProduct().getProduction().getProductionSteps();
-				 * for(ProductionStep stp : ProductionStepArrayList){ if
-				 * (keyfinish == stp.getId()){ productionStepEnded(stp, true,
-				 * null); // productionStepEnded(stp, msg.getContent, //
-				 * msg.getContent); } } } currProdStep++;
-				 */
-				_productAgent.setCurrentLocation(msg.getSender());
-				
+			case "Planned":
+				// Planned?
 				break;
-			// For some reason production can't be started thus it has to be
-			// rescheduled.
-			case "notStarted":
-				_productAgent.reschedule();
+			case "StatusUpdate":
+				ProductStep step = (ProductStep)m.getContentObject();
+				switch(step.getStatus().name()){
+				case "IN_PROGRESS":
+					// In progress
+					break;
+				case "SUSPENDED_OR_WARNING":
+					/*
+					 * Equiplet agent informs the product agent that a problem
+					 * was encountered, but that itï¿½s working on a solution.
+					 */
+				case "FAILED":
+					/*
+					 * Equiplet agent informs the product agent that the product
+					 * step has been aborted or has failed, including a reason
+					 * and source. Product agent reschedules or gives up
+					 * entirely
+					 */
+					break;
+				case "DONE":
+					/*
+					 * Equiplet agent informs the product agent that the product
+					 * step has been executed successfully.
+					 */
+					//_product.addStatusDataToLog(msg.getSender(),
+					//		ps.getStatusData());
+					System.out.println("I'm done.");
+					break;
+				default:
+					Logger.log(new UnsupportedOperationException("No case for "
+							+ m.getOntology()));
+					break;
+				}
+				break;
+			case "EquipletAgentDied":
+				/* EquipletAgent taken down */
 				break;
 			default:
+				Logger.log(new UnsupportedOperationException("No case for "
+						+ m.getOntology()));
 				break;
 			}
 		} catch(Exception e){
-			System.out.println("" + e);
+			Logger.log(e);
 		}
 	}
-
-	public static void canProductionStepStart(ProductionStep step){
-		step.setStatus(ProductionStepStatus.STATE_PRODUCING);
-	}
-
-	void productionStepEnded(ProductionStep step, boolean succes,
-			List<LogMessage> log){
-		_productAgent = (ProductAgent) myAgent;
-		_productAgent.getProduct().addLogMsg(log);
-		if (succes){
-			step.setStatus(ProductionStepStatus.STATE_DONE);
-		} else{
-			step.setStatus(ProductionStepStatus.STATE_FAILED);
-		}
-	}
+	
+	
+	//@Override
+	//public void action(){
+		//msg = myAgent.receive();
+//	try{
+//			switch(msg.getOntology()){
+//			case "StartStepQuestion":
+//				/*
+//				 * Equiplet agent requests permission for executing product
+//				 * step. Product agent grants permission Currently I cannot
+//				 * think of any reason why it wouldnï¿½t. But Iï¿½m sure there are
+//				 * reasons.
+//				 */
+//				ACLMessage reply = msg.createReply();
+//				reply.setOntology("StartStep");
+//				myAgent.send(reply);
+//				break;
+//			case "Planned":
+//				// Planned?
+//				break;
+//			case "StatusUpdate":
+//				ProductStep ps = (ProductStep) msg.getContentObject();
+//				switch(msg.getContent()){
+//				case "INPROGRESS":
+//					// In progress
+//					break;
+//				case "SUSPENDED_OR_WARNING":
+//					/*
+//					 * Equiplet agent informs the product agent that a problem
+//					 * was encountered, but that itï¿½s working on a solution.
+//					 */
+//				case "FAILED":
+//					/*
+//					 * Equiplet agent informs the product agent that the product
+//					 * step has been aborted or has failed, including a reason
+//					 * and source. Product agent reschedules or gives up
+//					 * entirely
+//					 */
+//					break;
+//				case "DONE":
+//					/*
+//					 * Equiplet agent informs the product agent that the product
+//					 * step has been executed successfully.
+//					 */
+//					//_product.addStatusDataToLog(msg.getSender(),
+//					//		ps.getStatusData());
+//					break;
+//				default:
+//					Logger.log(new UnsupportedOperationException("No case for "
+//							+ msg.getContent()));
+//					break;
+//				}
+//				break;
+//			case "EquipletAgentDied":
+//				/* EquipletAgent taken down */
+//				break;
+//			default:
+//				Logger.log(new UnsupportedOperationException("No case for "
+//						+ msg.getOntology()));
+//				break;
+//			}
+//		} catch(Exception e){
+//			Logger.log(e);
+//		}
+//	}
 }
