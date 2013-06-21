@@ -188,7 +188,7 @@ class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour{
 	@Override
 	public void handle(ACLMessage m){
 		try{
-			if (m != null){
+			if (m.getOntology() != null){
 				switch(m.getOntology()){
 				case "StartStepQuestion":
 					/*
