@@ -296,7 +296,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		send(deadMessage);
 	}
 
-	public void CancelAllStepsForServiceStep(ObjectId serviceStepId, String reason) {
+	public void cancelAllStepsForServiceStep(ObjectId serviceStepId, String reason) {
 		try {
 			serviceStepBBClient.updateDocuments(
 					new BasicDBObject("_id", serviceStepId),
@@ -344,7 +344,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 								// TODO add other statuses like ABORTED, SUSPENDED etc
 									case ABORTED:
 										Logger.log("Hardware Agent - serv.Step status set to: %s%n", status);
-										CancelAllStepsForServiceStep(serviceStep.getId(), "ServiceAgent aborted step.");
+										cancelAllStepsForServiceStep(serviceStep.getId(), serviceStep.getStatusData().getString("reason"));
 										break;
 									case PLANNED:
 									case WAITING:

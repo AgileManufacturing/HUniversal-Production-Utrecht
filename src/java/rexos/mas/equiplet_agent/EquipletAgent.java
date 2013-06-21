@@ -52,7 +52,6 @@ package rexos.mas.equiplet_agent;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.WakerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
@@ -83,6 +82,7 @@ import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.ScheduleData;
+import rexos.mas.data.StepStatusCode;
 import rexos.mas.equiplet_agent.behaviours.AbortStep;
 import rexos.mas.equiplet_agent.behaviours.InitialisationFinished;
 import rexos.mas.equiplet_agent.behaviours.ServiceAgentDied;
@@ -337,6 +337,17 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		deadMessage.addReceiver(serviceAgent);
 		deadMessage.setOntology("EquipletAgentDied");
 		send(deadMessage);
+	}
+
+	public void cancelAllStepsForProductStep(ObjectId productStepId, String reason) {
+		try {
+			productStepBBClient.updateDocuments(
+					new BasicDBObject("_id", productStepId),
+					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
+							"statusData", new BasicDBObject("reason", reason))));
+		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

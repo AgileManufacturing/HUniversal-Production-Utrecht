@@ -179,7 +179,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 					EvaluateStepDuration(serviceStep.getNextStep());
 				}
 			} else {
-				hardwareAgent.CancelAllStepsForServiceStep(serviceStepId, String.format(
+				hardwareAgent.cancelAllStepsForServiceStep(serviceStepId, String.format(
 						"%s.getEquipletSteps(%d, %s) returned no steps.", module, serviceStep.getType(),
 						serviceStep.getParameters()));
 			}

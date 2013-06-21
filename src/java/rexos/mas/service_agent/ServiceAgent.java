@@ -66,6 +66,7 @@ import rexos.mas.service_agent.behaviours.ScheduleStep;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.QueryBuilder;
 
 /**
  * This agent manages services and oversees generation and scheduling of
@@ -241,6 +242,19 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		send(message);
 	} //@formatter:on
 
+	public void cancelAllStepsForProductStep(ObjectId productStepId, String reason) {
+		try {
+			serviceStepBBClient.updateDocuments(
+					new BasicDBObject("productStepId", productStepId),
+					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
+							"statusData", new BasicDBObject("reason", reason))));
+
+			// TODO inform LA to cancel part transport
+		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Maps the specified conversation id with the specified service object.
 	 * Once a service object has been created (by the service factory) it's
@@ -269,8 +283,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	/**
 	 * Removes the mapping of the specified conversation id with the corresponding service object.
 	 * 
-	 * @param conversationId
-	 * 		The conversationId to remove from the mapping.
+	 * @param conversationId The conversationId to remove from the mapping.
 	 */
 	public void RemoveConvIdServiceMapping(String conversationId) {
 		convIdServiceMapping.remove(conversationId);
@@ -323,13 +336,9 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 									Logger.log("Service agent - aboring all serviceSteps of prod.Step%n",
 											entry.getTargetObjectId());
-									
-									//TODO inform LA to cancel part transport
-									
-									serviceStepBBClient.updateDocuments(
-											new BasicDBObject("productStepId", entry.getTargetObjectId()),
-											new BasicDBObject("$set", new BasicDBObject("status", status.name())
-													.append("statusData", productionStep.getStatusData())));
+
+									cancelAllStepsForProductStep(entry.getTargetObjectId(), productionStep
+											.getStatusData().getString("reason"));
 									break;
 								default:
 									break;
@@ -340,28 +349,35 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					}
 					break;
 				case "ServiceStepsBlackBoard":
+					ObjectId serviceStepId = entry.getTargetObjectId();
 					ServiceStep serviceStep =
-							new ServiceStep((BasicDBObject) serviceStepBBClient.findDocumentById(entry
-									.getTargetObjectId()));
+							new ServiceStep((BasicDBObject) serviceStepBBClient.findDocumentById(serviceStepId));
 					ObjectId productStepId = serviceStep.getProductStepId();
 					switch(operation) {
 						case UPDATE:
 							StepStatusCode status = serviceStep.getStatus();
 							switch(status) {
 								case DELETED:
-									Logger.log("Service agent - serv.Step %s status set to %s%n", serviceStep.getId(),
-											status);
-									productStepBBClient.updateDocuments(
-											new BasicDBObject("_id", serviceStep.getProductStepId()),
-											new BasicDBObject("$set", new BasicDBObject("status",
-													StepStatusCode.DELETED.name()).append("statusData.log",
-													buildLog(serviceStep.getProductStepId()))));
-									serviceStepBBClient.removeDocuments(new BasicDBObject("_id", serviceStep
-											.getId()));
+									Logger.log("Service agent - serv.Step %s status set to %s%n", serviceStepId, status);
+
+									List<DBObject> unDeletedServiceSteps =
+											serviceStepBBClient.findDocuments(QueryBuilder.start("productStepId")
+													.is(serviceStep.getProductStepId()).and("status")
+													.notEquals(StepStatusCode.DELETED.name()).get());
+
+									if(unDeletedServiceSteps.isEmpty()) {
+										productStepBBClient.updateDocuments(
+												new BasicDBObject("_id", productStepId),
+												new BasicDBObject("$set", new BasicDBObject("status",
+														StepStatusCode.DELETED.name()).append(
+														"statusData",
+														new BasicDBObject("reason", serviceStep.getStatusData().get(
+																"reason")).append("log", buildLog(productStepId)))));
+										serviceStepBBClient.removeDocuments(new BasicDBObject("_id", productStepId));
+									}
 									break;
 								case DONE:
-									Logger.log("Service agent - serv.Step %s status set to %s%n", serviceStep.getId(),
-											status);
+									Logger.log("Service agent - serv.Step %s status set to %s%n", serviceStepId, status);
 
 									if(serviceStep.getNextStep() != null) {
 										Logger.log("Service agent - setting status of next serv.Step %s to %s%n",
