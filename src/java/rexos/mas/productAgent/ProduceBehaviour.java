@@ -56,9 +56,9 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	private static final long serialVersionUID = 1L;
 	private Production _production;
 	ProductAgent pa;
-	//private ProductionEquipletMapper _prodEQMap;
-	//ACLMessage msg;
 
+	// private ProductionEquipletMapper _prodEQMap;
+	// ACLMessage msg;
 	/**
 	 * @param myAgent
 	 */
@@ -70,19 +70,19 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	public void action(){
 		try{
 			_production = ((ProductAgent) myAgent).getProduct().getProduction();
-			//_prodEQMap = new ProductionEquipletMapper();
+			// _prodEQMap = new ProductionEquipletMapper();
 			// retrieve the productstep
 			if (_production != null && _production.getProductionSteps() != null){
 				for(ProductionStep stp : _production.getProductionSteps()){
 					if (stp.getStatus() == StepStatusCode.PLANNED){
 						// adds the step to te new list (the one that will be
 						// returned to the scheduler)
-						//_prodEQMap.addProductionStep(stp.getId());
+						// _prodEQMap.addProductionStep(stp.getId());
 						// roep seq behav aan
 						// myAgent.addBehaviour(new newProducing(
 						// equipletAndTimeslot, stp));
 						myAgent.addBehaviour(new ProducingReciever(myAgent, -1,
-								MessageTemplate.MatchAll()));
+								MessageTemplate.MatchAll(), stp));
 					}
 				}
 			}
@@ -92,89 +92,93 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	}
 }
 
-//class newProducing extends SequentialBehaviour{
-//	private static final long serialVersionUID = 1L;
-//	private HashMap<AID, Long> EqAndTs;
-//	private ProductionStep productionStep;
+// class newProducing extends SequentialBehaviour{
+// private static final long serialVersionUID = 1L;
+// private HashMap<AID, Long> EqAndTs;
+// private ProductionStep productionStep;
 //
-//	public newProducing(HashMap<AID, Long> EqAndTs,
-//			ProductionStep productionStep){
-//		this.EqAndTs = EqAndTs;
-//		this.productionStep = productionStep;
-//	}
+// public newProducing(HashMap<AID, Long> EqAndTs,
+// ProductionStep productionStep){
+// this.EqAndTs = EqAndTs;
+// this.productionStep = productionStep;
+// }
 //
-//	@Override
-//	public void onStart(){
-//		addSubBehaviour(new OneShotBehaviour(){
-//			private static final long serialVersionUID = 1L;
+// @Override
+// public void onStart(){
+// addSubBehaviour(new OneShotBehaviour(){
+// private static final long serialVersionUID = 1L;
 //
-//			@Override
-//			public void action(){
-//				myAgent.addBehaviour(new receiveMsgBehaviour(EqAndTs,
-//						productionStep));
-//			}
-//		});
-//	}
-//}
+// @Override
+// public void action(){
+// myAgent.addBehaviour(new receiveMsgBehaviour(EqAndTs,
+// productionStep));
+// }
+// });
+// }
+// }
 //
-//class receiveMsgBehaviour extends CyclicBehaviour{
-//	private static final long serialVersionUID = 1L;
-//	HashMap<AID, Long> eqAndTs;
-//	private ProductionStep productionStep;
+// class receiveMsgBehaviour extends CyclicBehaviour{
+// private static final long serialVersionUID = 1L;
+// HashMap<AID, Long> eqAndTs;
+// private ProductionStep productionStep;
 //
-//	receiveMsgBehaviour(HashMap<AID, Long> eqAndTs,
-//			ProductionStep productionStep){
-//		this.eqAndTs = eqAndTs;
-//		this.productionStep = productionStep;
-//	}
+// receiveMsgBehaviour(HashMap<AID, Long> eqAndTs,
+// ProductionStep productionStep){
+// this.eqAndTs = eqAndTs;
+// this.productionStep = productionStep;
+// }
 //
-//	@Override
-//	public void action(){
-//		ACLMessage msg = myAgent.receive();
-//		if (msg != null){
-//			myAgent.addBehaviour(new WaitMsgBehaviour(msg, eqAndTs,
-//					productionStep));
-//		} else{
-//			block();
-//		}
-//	}
-//}
+// @Override
+// public void action(){
+// ACLMessage msg = myAgent.receive();
+// if (msg != null){
+// myAgent.addBehaviour(new WaitMsgBehaviour(msg, eqAndTs,
+// productionStep));
+// } else{
+// block();
+// }
+// }
+// }
 //
-//class WaitMsgBehaviour extends OneShotBehaviour{
-//	private static final long serialVersionUID = 1L;
-//	ProductAgent _productAgent;
-//	ACLMessage msg;
-//	HashMap<AID, Long> eqAndTs;
-//	private ProductionStep productionStep;
+// class WaitMsgBehaviour extends OneShotBehaviour{
+// private static final long serialVersionUID = 1L;
+// ProductAgent _productAgent;
+// ACLMessage msg;
+// HashMap<AID, Long> eqAndTs;
+// private ProductionStep productionStep;
 //
-//	public WaitMsgBehaviour(ACLMessage msg, HashMap<AID, Long> eqAndTs,
-//			ProductionStep productionStep){
-//		this.msg = msg;
-//		this.eqAndTs = eqAndTs;
-//		this.productionStep = productionStep;
-//	}
+// public WaitMsgBehaviour(ACLMessage msg, HashMap<AID, Long> eqAndTs,
+// ProductionStep productionStep){
+// this.msg = msg;
+// this.eqAndTs = eqAndTs;
+// this.productionStep = productionStep;
+// }
 //
-//	@Override
-//	public void action(){
-//		_productAgent = (ProductAgent) myAgent;
-//		SequentialBehaviour seq = new SequentialBehaviour();
-//		myAgent.addBehaviour(seq);
-//		msg = new ACLMessage(ACLMessage.INFORM);
-//		msg.setOntology("StartProduction");
-//		productionStep.setStatus(StepStatusCode.IN_PROGRESS);
-//		msg.addReceiver(msg.getSender());
-//		myAgent.send(msg);
-//	}
-//}
-
+// @Override
+// public void action(){
+// _productAgent = (ProductAgent) myAgent;
+// SequentialBehaviour seq = new SequentialBehaviour();
+// myAgent.addBehaviour(seq);
+// msg = new ACLMessage(ACLMessage.INFORM);
+// msg.setOntology("StartProduction");
+// productionStep.setStatus(StepStatusCode.IN_PROGRESS);
+// msg.addReceiver(msg.getSender());
+// myAgent.send(msg);
+// }
+// }
 class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour{
+	ProductionStep ProductAgentstp;
+
 	/**
 	 * @param agnt
 	 * @param millis
 	 * @param msgtmplt
+	 * @param stp
 	 **/
-	public ProducingReciever(Agent agnt, int millis, MessageTemplate msgtmplt){
+	public ProducingReciever(Agent agnt, int millis, MessageTemplate msgtmplt,
+			ProductionStep stp){
 		super(agnt, millis, msgtmplt);
+		this.ProductAgentstp = stp;
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -189,8 +193,8 @@ class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour{
 					/*
 					 * Equiplet agent requests permission for executing product
 					 * step. Product agent grants permission Currently I cannot
-					 * think of any reason why it wouldn�t. But I�m sure
-					 * there are reasons.
+					 * think of any reason why it wouldn�t. But I�m sure there
+					 * are reasons.
 					 */
 					ACLMessage reply = m.createReply();
 					reply.setOntology("StartStep");
@@ -198,6 +202,7 @@ class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour{
 					break;
 				case "StatusUpdate":
 					ProductStep step = (ProductStep) m.getContentObject();
+					ProductAgentstp.setStatus(step.getStatus());
 					switch(step.getStatus()){
 					case IN_PROGRESS:
 						// In progress
