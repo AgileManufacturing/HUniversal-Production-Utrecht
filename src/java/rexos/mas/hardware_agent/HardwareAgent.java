@@ -341,9 +341,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 													buildLog(serviceStep.getId()))));
 									equipletStepBBClient.removeDocuments(new BasicDBObject("serviceStepID", serviceStep
 											.getId()));
-									
-									Logger.log("banaanLOG in case aborted ");
-									
+																	
 									break;
 								case PLANNED:
 								case WAITING:
@@ -362,7 +360,6 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 									break;
 								default:
 									Logger.log("Hardware Agent - default serv.Step status set to: %s%n", status);
-									Logger.log("banaanLOG in default");
 									break;
 							}
 						} catch(InvalidDBNamespaceException | GeneralMongoException e) {

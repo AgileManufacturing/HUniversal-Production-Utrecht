@@ -381,8 +381,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 //								addBehaviour(new WakerBehaviour(this, 50){
 //									
 //									protected void onWake(){
-//										
-//										Logger.log("WAKEUP BANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN");	
+//			
 //									ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
 //									cancelMessage.addReceiver(getAID());
 //									cancelMessage.setOntology("AbortStep");
