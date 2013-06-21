@@ -92,6 +92,8 @@ public class ServiceFactory {
 						(String)rows[0].get("class_name"),
 						(String)rows[0].get("jar_location"));
 				service = factory.createNewObjectIfOutdated(description, serviceCache.get(description.getId()));
+				service.setId(serviceID);
+				service.setName(description.getName());
 				serviceCache.put(description.getId(), service);
 			}
 		} catch (KnowledgeException | InstantiateClassException | KeyNotFoundException e) {
