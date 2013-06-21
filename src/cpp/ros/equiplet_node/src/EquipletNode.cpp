@@ -1,3 +1,5 @@
+
+
 /**
  * @file EquipletNode.cpp
  * @brief Symbolizes an entire EquipletNode.
@@ -144,7 +146,7 @@ void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupI
  *
  * @return environment_communication_msgs::Map The map message object
  **/
-environment_communication_msgs::Map EnvironmentCache::createMapMessage(std::map<std::string, std::string> &Map){
+environment_communication_msgs::Map EquipletNode::createMapMessage(std::map<std::string, std::string> &Map){
 	std::map<std::string, std::string>::iterator MapIterator;
 	environment_communication_msgs::Map mapMsg;
 	environment_communication_msgs::KeyValuePair prop;
@@ -158,7 +160,6 @@ environment_communication_msgs::Map EnvironmentCache::createMapMessage(std::map<
 
 
 void EquipletNode::onStateChanged(){
-
 }
 
 void EquipletNode::onModeChanged(){

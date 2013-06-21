@@ -31,7 +31,6 @@ typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeModeAction> Chan
 class ModuleProxy {
 public:
 	ModuleProxy(std::string equipletNodeName, std::string moduleName, int equipletId, int moduleId, ModuleProxyListener* mpl = NULL);
-	ModuleProxy(std::string equipletNodeName, std::string moduleNodeName, ModuleProxyListener* mpl = NULL);
 	virtual ~ModuleProxy();
 
 	void setModuleProxyListener(ModuleProxyListener* mpl);
@@ -39,14 +38,21 @@ public:
 	rexos_statemachine::State getCurrentState();
 	rexos_statemachine::Mode getCurrentMode();
 
+	int getModuleId();
+
 	std::string getModuleNodeName();
 
 	void changeState(rexos_statemachine::State state);
 	void changeMode(rexos_statemachine::Mode mode);
 
+	bool setModuleInstruction();
+
 private:
+	ModuleProxy(std::string equipletNodeName, std::string moduleNodeName, ModuleProxyListener* mpl = NULL);
 	bool onStateChangeServiceCallback(StateUpdateRequest &req, StateUpdateResponse &res);
 	bool onModeChangeServiceCallback(ModeUpdateRequest &req, ModeUpdateResponse &res);
+
+	int moduleId;
 
 	ModuleProxyListener* moduleProxyListener;
 

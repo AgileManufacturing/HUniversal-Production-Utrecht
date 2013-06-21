@@ -39,7 +39,7 @@
 #include <rexos_motor/StepperMotor.h>
 #include <delta_robot_node/Services.h>
 #include <delta_robot_node/Point.h>
-#include <rexos_statemachine/StateMachine.h>
+#include <rexos_statemachine/ModuleStateMachine.h>
 #include <rexos_statemachine/Transitions.h>
 #include "delta_robot_node/MoveToPoint.h"
 #include "delta_robot_node/MovePath.h"
@@ -56,11 +56,11 @@
 
 namespace deltaRobotNodeNamespace{
 	/**
-	 * the DeltaRobotNode which is a StateMachine
+	 * the DeltaRobotNode which is a ModuleStateMachine
 	 **/
-	class DeltaRobotNode : public rexos_statemachine::StateMachine{
+	class DeltaRobotNode : public rexos_statemachine::ModuleStateMachine{
 	public:
-		DeltaRobotNode(int moduleID);
+		DeltaRobotNode(int equipletID, int moduleID);
 		virtual ~DeltaRobotNode();
 		
 		virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);

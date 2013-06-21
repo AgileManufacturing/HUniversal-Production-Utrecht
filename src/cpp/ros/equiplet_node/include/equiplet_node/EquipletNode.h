@@ -90,10 +90,11 @@ public:
 	void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
 
 private:
-	void callLookupHandler(std::string lookupType, std::string lookupID, environment_communication_msgs::Map payload);
+	void callLookupHandler(std::string lookupType, std::string lookupID, std::map<std::string, std::string> payloadMap);
 
 	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
 
+	environment_communication_msgs::Map createMapMessage(std::map<std::string, std::string> &Map);
 	/**
 	 * @var int equipletId
 	 * The id of the equiplet
@@ -128,3 +129,4 @@ private:
 };
 
 }
+

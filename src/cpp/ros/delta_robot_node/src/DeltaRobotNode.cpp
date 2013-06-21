@@ -51,8 +51,8 @@
  * @param equipletID identifier for the equiplet
  * @param moduleID identifier for the deltarobot
  **/
-deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int moduleID) :
-	rexos_statemachine::StateMachine("delta_robot_node_" + moduleID),
+deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) :
+	rexos_statemachine::ModuleStateMachine("delta_robot_node",equipletID,moduleID),
 	deltaRobot(NULL),
 	modbus(NULL),
 	motorManager(NULL),
@@ -664,7 +664,7 @@ int main(int argc, char **argv){
 
 	ROS_INFO("Creating DeltaRobotNode");
 
-	deltaRobotNodeNamespace::DeltaRobotNode drn(moduleID);
+	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID,moduleID);
 
 	ROS_INFO("Running StateEngine");
 	ros::spin();

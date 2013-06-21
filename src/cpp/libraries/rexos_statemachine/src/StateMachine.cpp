@@ -38,7 +38,7 @@ using namespace rexos_statemachine;
  * Create a stateMachine
  * @param moduleID the unique identifier for the module that implements the statemachine
  **/
-StateMachine::StateMachine(std::string nodeName,std::vector<rexos_statemachine::Mode> modes) :
+StateMachine::StateMachine(std::string nodeName,std::vector<rexos_statemachine::Mode> modes):
 		listener(NULL),
 		currentState(STATE_SAFE),
 		currentMode(MODE_NORMAL),
@@ -56,10 +56,15 @@ StateMachine::StateMachine(std::string nodeName,std::vector<rexos_statemachine::
 	StatePair transitionStopStatePair(STATE_NORMAL, STATE_STANDBY);
 	StatePair transitionShutdownStatePair(STATE_STANDBY, STATE_SAFE);
 
-	Transition *transitionShutdown = new Transition{new TransitionActionClient(nodeName + "/transition_shutdown",true), STATE_SHUTDOWN};
-	Transition *transitionSetup = new Transition{new TransitionActionClient(nodeName + "/transition_setup",true), STATE_SETUP};
-	Transition *transitionStop = new Transition{new TransitionActionClient(nodeName + "/transition_stop",true), STATE_STOP};
-	Transition *transitionStart = new Transition{new TransitionActionClient(nodeName + "/transition_start",true), STATE_START};
+	TransitionActionClient* transitionActionClientShutdown = new TransitionActionClient(nodeName + "/transition_shutdown",true);
+	TransitionActionClient* transitionActionClientSetup = new TransitionActionClient(nodeName + "/transition_setup",true);
+	TransitionActionClient* transitionActionClientStop = new TransitionActionClient(nodeName + "/transition_stop",true);
+	TransitionActionClient* transitionActionClientStart = new TransitionActionClient(nodeName + "/transition_start",true);
+
+	Transition *transitionShutdown = new Transition{transitionActionClientShutdown, STATE_SHUTDOWN};
+	Transition *transitionSetup = new Transition{transitionActionClientSetup, STATE_SETUP};
+	Transition *transitionStop = new Transition{transitionActionClientStop, STATE_STOP};
+	Transition *transitionStart = new Transition{transitionActionClientStart, STATE_START};
 
 	transitionMap[transitionSetupStatePair]= {transitionSetup,transitionShutdown,transitionSetupStatePair};
 	transitionMap[transitionShutdownStatePair]= {transitionShutdown,NULL,transitionShutdownStatePair};
