@@ -88,60 +88,57 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 /**
- * HardwareAgent that communicates with the service agent and creates the messages for the Hardware layer.
+ * HardwareAgent that communicates with the service agent and creates the
+ * messages for the Hardware layer.
  */
-public class HardwareAgent extends Agent implements BlackboardSubscriber, ModuleUpdateListener {
+public class HardwareAgent extends Agent implements BlackboardSubscriber,
+		ModuleUpdateListener {
 	/**
-	 * @var long serialVersionUID
-	 *      The serial version UID.
+	 * @var long serialVersionUID The serial version UID.
 	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var BlackboardClient serviceStepBBClient
-	 *      The blackboard client for the serviceStep blackboard.
+	 * @var BlackboardClient serviceStepBBClient The blackboard client for the
+	 *      serviceStep blackboard.
 	 */
 	private BlackboardClient serviceStepBBClient;
 
 	/**
-	 * @var BlackboardClient equipletStepBBClient
-	 *      The blackboard client for the equipletStep blackboard
+	 * @var BlackboardClient equipletStepBBClient The blackboard client for the
+	 *      equipletStep blackboard
 	 */
 	private BlackboardClient equipletStepBBClient;
 
 	/**
-	 * @var DbData dbData
-	 *      The DbData of this equiplet.
+	 * @var DbData dbData The DbData of this equiplet.
 	 */
 	private DbData dbData;
 
 	/**
-	 * @var HashMap<Integer, Integer> leadingModules
-	 *      A HashMap containing the leadingModules per step.
+	 * @var HashMap<Integer, Integer> leadingModules A HashMap containing the
+	 *      leadingModules per step.
 	 */
 	private HashMap<Integer, Integer> leadingModules;
 
 	/**
-	 * @var ModuleFactory moduleFactory
-	 *      The moduleFactory of this agent.
+	 * @var ModuleFactory moduleFactory The moduleFactory of this agent.
 	 */
 	private ModuleFactory moduleFactory;
 
 	/**
-	 * @var AID equipletAgentAID
-	 *      The AID of the equipletAgent.
+	 * @var AID equipletAgentAID The AID of the equipletAgent.
 	 */
 	private AID equipletAgentAID;
 
 	/**
-	 * @var AID serviceAgentAID
-	 *      The AID of the serviceAgent.
+	 * @var AID serviceAgentAID The AID of the serviceAgent.
 	 */
 	private AID serviceAgentAID;
 
 	/**
-	 * @var HashMap<Integer, Object> configuration
-	 *      The configuration of this agent.
+	 * @var HashMap<Integer, Object> configuration The configuration of this
+	 *      agent.
 	 */
 	private HashMap<Integer, Object> configuration;
 
@@ -153,8 +150,10 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	/**
 	 * Function for registering a leading module.
 	 * 
-	 * @param serviceId The service id to register for.
-	 * @param moduleId The module id to register
+	 * @param serviceId
+	 *            The service id to register for.
+	 * @param moduleId
+	 *            The module id to register
 	 */
 	public void registerLeadingModule(int serviceId, int moduleId) {
 		leadingModules.put(serviceId, moduleId);
@@ -163,11 +162,12 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	/**
 	 * Function for getting the leading module for a service id.
 	 * 
-	 * @param serviceId The service id to get leading module for.
+	 * @param serviceId
+	 *            The service id to get leading module for.
 	 * @return the leading module id.
 	 */
 	public int getLeadingModule(int serviceId) {
-		if(!leadingModules.containsKey(serviceId)) {
+		if (!leadingModules.containsKey(serviceId)) {
 			return 0;
 		}
 		return leadingModules.get(serviceId);
@@ -187,7 +187,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 
 		// gets the dbData and AID from the arguments.
 		Object[] args = getArguments();
-		if(args != null && args.length > 0) {
+		if (args != null && args.length > 0) {
 			dbData = (DbData) args[0];
 			equipletAgentAID = (AID) args[1];
 			serviceAgentAID = (AID) args[2];
@@ -216,17 +216,20 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			equipletStepBBClient.subscribe(statusSubscription);
 
 			equipletStepBBClient.removeDocuments(new BasicDBObject());
-		} catch(InvalidDBNamespaceException | UnknownHostException | GeneralMongoException e) {
+		} catch (InvalidDBNamespaceException | UnknownHostException
+				| GeneralMongoException e) {
 			Logger.log(e);
 			doDelete();
 		}
 
 		// Start the evaluateDurationBehaviour
-		EvaluateDuration evaluateDurationBehaviour = new EvaluateDuration(this, moduleFactory);
+		EvaluateDuration evaluateDurationBehaviour = new EvaluateDuration(this,
+				moduleFactory);
 		addBehaviour(evaluateDurationBehaviour);
 
 		// Start the fillPlaceholdersBehaviour
-		FillPlaceholders fillPlaceholdersBehaviour = new FillPlaceholders(this, moduleFactory);
+		FillPlaceholders fillPlaceholdersBehaviour = new FillPlaceholders(this,
+				moduleFactory);
 		addBehaviour(fillPlaceholdersBehaviour);
 
 		// Start the checkForModules
@@ -240,17 +243,19 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		// Get the modules for the equiplet and register the modules
 		try {
 			KnowledgeDBClient client = KnowledgeDBClient.getClient();
-			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgentAID.getLocalName());
+			Row[] rows = client.executeSelectQuery(
+					Queries.MODULES_PER_EQUIPLET,
+					equipletAgentAID.getLocalName());
 			Module module;
 			int id;
-			for(Row row : rows) {
+			for (Row row : rows) {
 				id = (int) row.get("module");
 				module = moduleFactory.getModuleById(id);
-				for(int step : module.isLeadingForServices()) {
+				for (int step : module.isLeadingForServices()) {
 					registerLeadingModule(step, id);
 				}
 			}
-		} catch(KnowledgeException | KeyNotFoundException e1) {
+		} catch (KnowledgeException | KeyNotFoundException e1) {
 			Logger.log(e1);
 			doDelete();
 		}
@@ -279,14 +284,18 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		try {
 			// Clears his own blackboard and removes his subscription on that
 			// blackboard.
-			for(DBObject object : serviceStepBBClient.findDocuments(new BasicDBObject())) {
-				serviceStepBBClient.updateDocuments(new BasicDBObject("_id", object.get("_id")), new BasicDBObject(
-						"$set", new BasicDBObject("statusData", buildLog((ObjectId) object.get("_id")))));
+			for (DBObject object : serviceStepBBClient
+					.findDocuments(new BasicDBObject())) {
+				serviceStepBBClient.updateDocuments(new BasicDBObject("_id",
+						object.get("_id")), new BasicDBObject("$set",
+						new BasicDBObject("statusData",
+								buildLog((ObjectId) object.get("_id")))));
 			}
 
 			equipletStepBBClient.removeDocuments(new BasicDBObject());
-			equipletStepBBClient.unsubscribe(new BasicOperationSubscription(MongoOperation.UPDATE, this));
-		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+			equipletStepBBClient.unsubscribe(new BasicOperationSubscription(
+					MongoOperation.UPDATE, this));
+		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 			Logger.log(e);
 		}
 
@@ -320,114 +329,179 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	 */
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
-		switch(entry.getNamespace().split("\\.")[1]) {
-			case "ServiceStepsBlackBoard":
-				switch(operation) {
-					case UPDATE:
-						try {
-							ServiceStep serviceStep =
-									new ServiceStep((BasicDBObject) serviceStepBBClient.findDocumentById(entry
-											.getTargetObjectId()));
-							StepStatusCode status = serviceStep.getStatus();
-							switch(status) {
-							// TODO add other statuses like ABORTED, SUSPENDED etc
-								case ABORTED:
-												
-									Logger.log("Hardware Agent - serv.Step status set to: %s%n", status);
-									serviceStepBBClient.updateDocuments(
-											new BasicDBObject("_id", serviceStep.getId()),
-											new BasicDBObject("$set", new BasicDBObject("status",
-													StepStatusCode.DELETED.name()).append("statusData.log",
-													buildLog(serviceStep.getId()))));
-									equipletStepBBClient.removeDocuments(new BasicDBObject("serviceStepID", serviceStep
-											.getId()));
-																	
-									break;
-								case PLANNED:
-								case WAITING:
-									Logger.log("Hardware Agent - serv.Step status set to: %s%n", status);
+		switch (entry.getNamespace().split("\\.")[1]) {
+		case "ServiceStepsBlackBoard":
+			switch (operation) {
+			case UPDATE:
+				try {
+					DBObject dbObject = serviceStepBBClient
+							.findDocumentById(entry.getTargetObjectId());
+					if (dbObject != null) {
 
-									equipletStepBBClient.updateDocuments(
-											new BasicDBObject("serviceStepID", serviceStep.getId()),
-											new BasicDBObject("$set", new BasicDBObject("status", status.name())
-													.append("statusData", serviceStep.getStatusData())));
-									// TODO: delete below after testing
-									if(status == StepStatusCode.WAITING)
-										equipletStepBBClient.updateDocuments(new BasicDBObject("serviceStepID",
-												serviceStep.getId()), new BasicDBObject("$set", new BasicDBObject(
-												"status", StepStatusCode.DONE.name())));
-									// TODO: delete above after testing
-									break;
-								default:
-									Logger.log("Hardware Agent - default serv.Step status set to: %s%n", status);
-									break;
-							}
-						} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-							Logger.log(e);
-						}
-						break;
-					default:
-						break;
-				}
-				break;
-			case "EquipletStepsBlackBoard":
-				switch(operation) {
-					case UPDATE:
-						try {
-							EquipletStep equipletStep =
-									new EquipletStep((BasicDBObject) equipletStepBBClient.findDocumentById(entry
-											.getTargetObjectId()));
-							ServiceStep serviceStep =
-									new ServiceStep((BasicDBObject) serviceStepBBClient.findDocumentById(equipletStep
-											.getServiceStepID()));
-							BasicDBObject searchQuery = new BasicDBObject("_id", serviceStep.getId());
-							StepStatusCode status = equipletStep.getStatus();
-							switch(status) {
-								case DONE:
-									Logger.log("Hardware Agent - equip.Step status set to: %s%n", status);
-									if(equipletStep.getNextStep() == null) {
-										Logger.log("Hardware agent - saving log in serv.Step %s\n%s\n",
-												serviceStep.getId(), buildLog(serviceStep.getId()));
+						ServiceStep serviceStep = new ServiceStep(
+								(BasicDBObject) dbObject);
+						StepStatusCode status = serviceStep.getStatus();
+						switch (status) {
+						// TODO add other statuses like ABORTED, SUSPENDED etc
+						case ABORTED:
 
-										serviceStepBBClient.updateDocuments(
-												new BasicDBObject("_id", serviceStep.getId()),
-												new BasicDBObject("$set", new BasicDBObject("statusData",
-														buildLog(serviceStep.getId())).append("status",
-														StepStatusCode.DONE.name())));
-										Logger.log("Hardware Agent - setting service step on DONE");
-									} else {
-										// equipletStepBBClient.updateDocuments(
-										// new BasicDBObject("_id", equipletStep.getNextStep()),
-										// new BasicDBObject("$set", new BasicDBObject("status",
-										// StepStatusCode.WAITING.name())));
-									}
-									break;
-								case IN_PROGRESS:
-								case SUSPENDED_OR_WARNING:
-								case ABORTED:
-								case FAILED:
-									Logger.log("Hardware Agent - equip.Step status set to: %s%n", status);
-									BasicDBObject statusData = serviceStep.getStatusData();
-									statusData.putAll((Map<String, Object>) equipletStep.getStatusData());
-									BasicDBObject updateQuery =
-											new BasicDBObject("$set", new BasicDBObject("status", status).append(
-													"statusData", statusData));
-									serviceStepBBClient.updateDocuments(searchQuery, updateQuery);
-									break;
-								default:
-									Logger.log("Hardware Agent - default equip.Step status set to: %s%n", status);
-									break;
-							}
-						} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-							Logger.log(e);
+							Logger.log(
+									"Hardware Agent - serv.Step status set to: %s%n",
+									status);
+							serviceStepBBClient.updateDocuments(
+									new BasicDBObject("_id", serviceStep
+											.getId()),
+									new BasicDBObject("$set",
+											new BasicDBObject("status",
+													StepStatusCode.DELETED
+															.name()).append(
+													"statusData.log",
+													buildLog(serviceStep
+															.getId()))));
+							equipletStepBBClient
+									.removeDocuments(new BasicDBObject(
+											"serviceStepID", serviceStep
+													.getId()));
+
+							break;
+						case PLANNED:
+						case WAITING:
+							Logger.log(
+									"Hardware Agent - serv.Step status set to: %s%n",
+									status);
+
+							equipletStepBBClient
+									.updateDocuments(
+											new BasicDBObject("serviceStepID",
+													serviceStep.getId()),
+											new BasicDBObject(
+													"$set",
+													new BasicDBObject("status",
+															status.name())
+															.append("statusData",
+																	serviceStep
+																			.getStatusData())));
+							// TODO: delete below after testing
+							if (status == StepStatusCode.WAITING)
+								equipletStepBBClient.updateDocuments(
+										new BasicDBObject("serviceStepID",
+												serviceStep.getId()),
+										new BasicDBObject("$set",
+												new BasicDBObject("status",
+														StepStatusCode.DONE
+																.name())));
+							// TODO: delete above after testing
+							break;
+						default:
+							Logger.log(
+									"Hardware Agent - default serv.Step status set to: %s%n",
+									status);
+							break;
 						}
-						break;
-					default:
-						break;
+					} else {
+						//Logger.log("Object bestaad niet meer");
+						
+						//TODO: Do something fancy
+					}
+				} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+					Logger.log(e);
 				}
 				break;
 			default:
 				break;
+			}
+			break;
+		case "EquipletStepsBlackBoard":
+			switch (operation) {
+			case UPDATE:
+							
+				try {
+					
+					DBObject dbObject = equipletStepBBClient
+							.findDocumentById(entry.getTargetObjectId());
+					
+					if(dbObject != null){
+					
+					EquipletStep equipletStep = new EquipletStep(
+							(BasicDBObject) dbObject);
+					ServiceStep serviceStep = new ServiceStep(
+							(BasicDBObject) serviceStepBBClient
+									.findDocumentById(equipletStep
+											.getServiceStepID()));
+					BasicDBObject searchQuery = new BasicDBObject("_id",
+							serviceStep.getId());
+					StepStatusCode status = equipletStep.getStatus();
+					switch (status) {
+					case DONE:
+						Logger.log(
+								"Hardware Agent - equip.Step status set to: %s%n",
+								status);
+						if (equipletStep.getNextStep() == null) {
+							Logger.log(
+									"Hardware agent - saving log in serv.Step %s\n%s\n",
+									serviceStep.getId(),
+									buildLog(serviceStep.getId()));
+
+							serviceStepBBClient
+									.updateDocuments(
+											new BasicDBObject("_id",
+													serviceStep.getId()),
+											new BasicDBObject(
+													"$set",
+													new BasicDBObject(
+															"statusData",
+															buildLog(serviceStep
+																	.getId()))
+															.append("status",
+																	StepStatusCode.DONE
+																			.name())));
+							Logger.log("Hardware Agent - setting service step on DONE");
+						} else {
+							// equipletStepBBClient.updateDocuments(
+							// new BasicDBObject("_id",
+							// equipletStep.getNextStep()),
+							// new BasicDBObject("$set", new
+							// BasicDBObject("status",
+							// StepStatusCode.WAITING.name())));
+						}
+						break;
+					case IN_PROGRESS:
+					case SUSPENDED_OR_WARNING:
+					case ABORTED:
+					case FAILED:
+						Logger.log(
+								"Hardware Agent - equip.Step status set to: %s%n",
+								status);
+						BasicDBObject statusData = serviceStep.getStatusData();
+						statusData.putAll((Map<String, Object>) equipletStep
+								.getStatusData());
+						BasicDBObject updateQuery = new BasicDBObject("$set",
+								new BasicDBObject("status", status).append(
+										"statusData", statusData));
+						serviceStepBBClient.updateDocuments(searchQuery,
+								updateQuery);
+						break;
+					default:
+						Logger.log(
+								"Hardware Agent - default equip.Step status set to: %s%n",
+								status);
+						break;
+					}
+					}else{
+						//Logger.log("Object bestaad niet meer");
+						
+						//TODO: Do something fancy
+					}
+				} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+					Logger.log(e);
+				}
+				break;
+			default:
+				break;
+			}
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -435,13 +509,14 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	 * @see ModuleUpdateListener#onModuleUpdate(int, Module, Module)
 	 */
 	@Override
-	public void onModuleUpdate(int moduleId, Module oldSoftware, Module newSoftware) {
+	public void onModuleUpdate(int moduleId, Module oldSoftware,
+			Module newSoftware) {
 		// remove old values from HashMap
-		for(int step : oldSoftware.isLeadingForServices()) {
+		for (int step : oldSoftware.isLeadingForServices()) {
 			leadingModules.remove(step);
 		}
 		// add new values to HashMap
-		for(int step : newSoftware.isLeadingForServices()) {
+		for (int step : newSoftware.isLeadingForServices()) {
 			leadingModules.put(step, moduleId);
 		}
 	}
@@ -458,7 +533,8 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	/**
 	 * Function for building the log of the given serviceStep.
 	 * 
-	 * @param serviceStep the serviceStep to build the log for.
+	 * @param serviceStep
+	 *            the serviceStep to build the log for.
 	 * 
 	 * @return the log as a BasicDBObject
 	 */
@@ -466,19 +542,23 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		BasicDBObject log = new BasicDBObject();
 		List<DBObject> dbEquipletSteps;
 		try {
-			dbEquipletSteps = equipletStepBBClient.findDocuments(new BasicDBObject("serviceStepID", serviceStep));
+			dbEquipletSteps = equipletStepBBClient
+					.findDocuments(new BasicDBObject("serviceStepID",
+							serviceStep));
 
-			EquipletStep[] equipletSteps = new EquipletStep[dbEquipletSteps.size()];
-			for(int i = 0; i < dbEquipletSteps.size(); i++) {
-				equipletSteps[i] = new EquipletStep((BasicDBObject) dbEquipletSteps.get(i));
+			EquipletStep[] equipletSteps = new EquipletStep[dbEquipletSteps
+					.size()];
+			for (int i = 0; i < dbEquipletSteps.size(); i++) {
+				equipletSteps[i] = new EquipletStep(
+						(BasicDBObject) dbEquipletSteps.get(i));
 			}
 			equipletSteps = EquipletStep.sort(equipletSteps);
 
 			// append all equipletsteps to the log
-			for(int i = 0; i < equipletSteps.length; i++) {
+			for (int i = 0; i < equipletSteps.length; i++) {
 				log.append("step" + i, equipletSteps[i].toBasicDBObject());
 			}
-		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 			Logger.log(e);
 		}
 		return log;
