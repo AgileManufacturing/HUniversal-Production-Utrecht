@@ -48,6 +48,8 @@ namespace rexos_statemachine {
 
 typedef actionlib::SimpleActionServer<ChangeStateAction> ChangeStateActionServer;
 typedef actionlib::SimpleActionServer<ChangeModeAction> ChangeModeActionServer;
+typedef actionlib::SimpleActionClient<ChangeStateAction> ChangeStateActionClient;
+typedef actionlib::SimpleActionClient<ChangeModeAction> ChangeModeActionClient;
 typedef actionlib::SimpleActionServer<TransitionAction> TransitionActionServer;
 typedef actionlib::SimpleActionClient<TransitionAction> TransitionActionClient;
 
@@ -94,6 +96,10 @@ private:
 	void onTransitionStopAction(TransitionActionServer* as);
 
 protected:
+	void changeState(State desiredState,ChangeStateActionClient* changeStateActionClient = NULL);
+
+	void changeMode(Mode desiredMode,ChangeModeActionClient* changeModeActionClient = NULL);
+
 	/**
 	 *@var ros::NodeHandle nodeHandle;
 	 *nodeHandle to setup actionclients/-servers
@@ -101,9 +107,9 @@ protected:
 	ros::NodeHandle nodeHandle;
 
 private:
-	bool changeState(rexos_statemachine::State newState);
+	bool _changeState(State newState);
 
-	bool changeMode(rexos_statemachine::Mode newMode);
+	bool _changeMode(Mode newMode);
 
 	bool statePossibleInMode(rexos_statemachine::State state, rexos_statemachine::Mode modi);
 
@@ -112,6 +118,8 @@ private:
 	void _setMode(rexos_statemachine::Mode state);
 
 	void _forceToAllowedState();
+
+	std::string nodeName;
 
 	/**
 	 *@var std::vector<rexos_statemachine::Mode> modes
@@ -185,10 +193,6 @@ private:
 	TransitionActionServer transitionShutdownServer;
 	TransitionActionServer transitionStartServer;
 	TransitionActionServer transitionStopServer;
-
-	ros::ServiceClient moduleUpdateServiceClient;
-
-	ChangeStateResult changeStateResult;
 };
 
 }
