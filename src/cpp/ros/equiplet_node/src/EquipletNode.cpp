@@ -101,19 +101,6 @@ EquipletNode::~EquipletNode(){
 	delete equipletCommandSubscription;
 }
 
-void EquipletNode::changeState(rexos_statemachine::State desiredState){
-	ROS_INFO("changeState called with desiredState %s",rexos_statemachine::state_txt[desiredState]);
-	rexos_statemachine::ChangeStateGoal goal;
-	goal.desiredState = desiredState;
-	changeStateActionClient.sendGoal(goal);
-}
-
-void EquipletNode::changeMode(rexos_statemachine::Mode desiredMode){
-	rexos_statemachine::ChangeModeGoal goal;
-	goal.desiredMode = desiredMode;
-	changeModeActionClient.sendGoal(goal);
-}
-
 /**
  * This function is called when a new message on the Blackboard is received,
  * The command, destination and payload are read from the message, and the 

@@ -52,7 +52,7 @@
  * @param moduleID identifier for the deltarobot
  **/
 deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) :
-	rexos_statemachine::ModuleStateMachine("delta_robot_node",equipletID,moduleID),
+	rexos_statemachine::ModuleStateMachine("delta_robot_node",equipletID,moduleID,true),
 	deltaRobot(NULL),
 	modbus(NULL),
 	motorManager(NULL),

@@ -97,10 +97,6 @@ private:
 
 	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
 
-	void changeState(rexos_statemachine::State desiredState);
-
-	void changeMode(rexos_statemachine::Mode desiredMode);
-
 	bool setTransitionDone(rexos_statemachine::State transitionState);
 
 	void updateEquipletStateOnBlackboard();

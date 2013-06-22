@@ -6,7 +6,7 @@
 
 using namespace rexos_statemachine;
 
-ModuleStateMachine::ModuleStateMachine(std::string moduleName, int equipletId, int moduleId)
+ModuleStateMachine::ModuleStateMachine(std::string moduleName, int equipletId, int moduleId,bool actorModule)
 :StateMachine(moduleName + "_" + std::to_string(equipletId) + "_" + std::to_string(moduleId),
 		{rexos_statemachine::MODE_NORMAL, 
 		rexos_statemachine::MODE_SERVICE, 
@@ -17,6 +17,7 @@ ModuleStateMachine::ModuleStateMachine(std::string moduleName, int equipletId, i
 ,moduleName(moduleName)
 ,moduleId(moduleId)
 ,equipletId(equipletId)
+,actorModule(actorModule)
 {
 	std::string moduleNamespaceName = moduleName + "_" + std::to_string(equipletId) + "_" + std::to_string(moduleId);
 	std::string equipletNamespaceName = "equiplet_" + std::to_string(equipletId);
@@ -49,4 +50,11 @@ void ModuleStateMachine::onModeChanged() {
 	rexos_statemachine_srvs::ModeUpdateResponse res;
 	req.mode = getCurrentMode();
 	changeModeNotificationClient.call(req, res);
+}
+
+void ModuleStateMachine::setInError(){
+	if(actorModule)
+		changeMode(rexos_statemachine::MODE_CRITICAL_ERROR);
+	else
+		changeMode(rexos_statemachine::MODE_ERROR);
 }

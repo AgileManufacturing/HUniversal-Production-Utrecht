@@ -15,10 +15,14 @@ class ModuleStateMachine : public StateMachine, public Listener {
 	ros::ServiceClient changeStateNotificationClient;
 	ros::ServiceClient changeModeNotificationClient;
 public:
-	ModuleStateMachine(std::string moduleName, int equipletId, int moduleId);
-private:
+	ModuleStateMachine(std::string moduleName, int equipletId, int moduleId, bool actorModule);
+protected:
 	void onStateChanged();
 	void onModeChanged();
+
+	void setInError();
+
+	bool actorModule;
 };
 
 }
