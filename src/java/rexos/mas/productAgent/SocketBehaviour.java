@@ -41,20 +41,20 @@
 package rexos.mas.productAgent;
 
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.CyclicBehaviour;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 import rexos.libraries.log.Logger;
-import rexos.mas.data.Callback;
 
-public class SocketBehaviour extends Behaviour implements
+public class SocketBehaviour extends CyclicBehaviour implements
 		HeartbeatReceiver{
 	/**
 	 * 
@@ -67,14 +67,12 @@ public class SocketBehaviour extends Behaviour implements
 	private HeartBeartBehaviour _hbb;
 	private Agent _agent;
 	
-	private boolean _stopBehaviour = false;
-	
-	private Callback _callback;
+	private String _hostToConnect = "";
 
-	public SocketBehaviour(Agent a, Callback callback){
+	public SocketBehaviour(Agent a, String host){
 		try{
 			_agent = a;
-			_callback = callback;
+			_hostToConnect = host;
 			_hbb = new HeartBeartBehaviour(a, 0, this);
 			a.addBehaviour(_hbb);
 			if (!isConnected){
@@ -89,11 +87,6 @@ public class SocketBehaviour extends Behaviour implements
 		}
 	}
 
-	@Override
-	public boolean done() {
-		return this._stopBehaviour;
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * @see jade.core.behaviours.Behaviour#action()
@@ -127,7 +120,10 @@ public class SocketBehaviour extends Behaviour implements
 
 	public void connect() throws UnknownHostException, IOException{
 		socket = new Socket();
-		socket.connect(new InetSocketAddress(_callback.getHost(), _callback.getPort()),
+		String[] hostSplit = _hostToConnect.split(":");
+		String host = hostSplit[0];
+		int port = Integer.parseInt(hostSplit[1]);
+		socket.connect(new InetSocketAddress(host, port),
 				(int) TimeUnit.SECONDS.toMillis(10));
 		outputStream = new PrintWriter(socket.getOutputStream(), true);
 		inputStream = new BufferedReader(new InputStreamReader(
@@ -166,10 +162,5 @@ public class SocketBehaviour extends Behaviour implements
 	public void resetConnection() throws IOException{
 		this.socket.close();
 		this.connect();
-	}
-	
-	public void stop() {
-		this._hbb.stopHeartbeating();
-		this._stopBehaviour = true;
 	}
 }

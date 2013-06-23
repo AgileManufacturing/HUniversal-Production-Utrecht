@@ -16,6 +16,7 @@ package rexos.mas.productAgent;
 import java.util.concurrent.TimeUnit;
 
 import jade.core.Agent;
+import jade.core.behaviours.TickerBehaviour;
 import jade.core.behaviours.WakerBehaviour;
 
 /**

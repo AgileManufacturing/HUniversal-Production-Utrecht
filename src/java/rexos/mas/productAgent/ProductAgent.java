@@ -5,7 +5,6 @@
  * 
  * @author Alexander Streng
  * @author Arno Derks
- * @author Mike Schaap
  * 
  * @section LICENSE License: newBSD
  * 
@@ -41,125 +40,119 @@
 
 package rexos.mas.productAgent;
 
+import java.net.UnknownHostException;
+
 import com.google.gson.Gson;
 
-import rexos.mas.data.AgentStatus;
-import rexos.mas.data.Callback;
 import rexos.mas.data.Product;
-import rexos.mas.data.ProductAgentProperties;
+import rexos.mas.data.ProductionStep;
 
-
+import jade.core.AID;
 import jade.core.Agent;
+import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.blackboard_client.InvalidJSONException;
+import rexos.libraries.log.Logger;
 
-public class ProductAgent extends Agent {
-
+public class ProductAgent extends Agent{
 	private static final long serialVersionUID = 1L;
 	// Private fields
-
+	private Product _product;
 	private OverviewBehaviour _overviewBehaviour;
-
 	// CID variables
 	private static int _convIDCnt = 0;
 	private String _convIDBase;
 	public int prodStep = 0;
-
-	private Gson _gson;
-	private ProductAgentProperties _properties;
-	private AgentStatus _status;
-
-	public ProductAgent() {
-		_gson = new Gson();
-		_status = AgentStatus.STARTING;
-	}
+	
+	private Gson gson;
+	private String _host;
+	
 
 	@Override
-	protected void setup() {
-		try {
-			// Load all arguments
-			this.loadArguments();
-			// Create the Overview Behaviour and start it
+	protected void setup(){
+		try{
+			gson = new Gson();
+			this._host = "145.89.253.111:89";
+			
+			Object[] args = this.getArguments();
+			
+			if(args.length > 0) {
+				if(args[0].getClass() == String.class) {
+					//Change the incoming JSON message to also implement the host to connect to.
+					_product = gson.fromJson((String)args[0], Product.class);
+				} else if(args[0].getClass() == Product.class) {
+					this._product = (Product) args[0];
+				}
+			}
 			_overviewBehaviour = new OverviewBehaviour();
 			addBehaviour(_overviewBehaviour);
+			
 			System.out.println("I spawned as a product agent");
-		} catch (Exception e) {
+		} catch(Exception e){
 			System.out.println("Productagent exited with: " + e.getMessage());
 			doDelete();
 		}
 	}
-
-	private void loadArguments() {
-		// Get the arguments passed to the ProductAgent
-		Object[] args = this.getArguments();
-		// Check if there are any arguments. If there aren't any there is a
-		// problem. We need atleast one arguments for the product
-		if (args.length > 0) {
-			// The first argument should be the ProductAgentProperties object,
-			// whether it's in json or as object.
-			// Check if the arguments is a string (so we can assume it's JSON)
-			// or if it's a known object
-			if (args[0].getClass() == String.class) {
-				// Change the incoming JSON message to also implement the host
-				// to connect to.
-				this._properties = _gson.fromJson((String) args[0],
-						ProductAgentProperties.class);
-			} else if (args[0].getClass() == ProductAgentProperties.class) {
-				this._properties = (ProductAgentProperties) args[0];
-			}
-		} else {
-			System.out
-					.println("No arguments found. ProductAgent needs atleast one ProductAgentPropeties as argument");
-			// TODO: Throw exception. No need to continue if no product is
-			// defined.
-			throw new IllegalArgumentException("No argument(s) found.");
-		}
+	
+	public String getHost() {
+		return this._host;
 	}
 
 	/*
 	 * Generates an unique conversation id based on the agents localname, the
 	 * objects hashcode and the current time.
 	 */
-	public String generateCID() {
-		if (_convIDBase == null) {
+	public String generateCID(){
+		if (_convIDBase == null){
 			_convIDBase = getLocalName() + hashCode()
 					+ System.currentTimeMillis() % 10000 + "_";
 		}
 		return _convIDBase + (_convIDCnt++);
 	}
 
-	public void reschedule() {
+	public void reschedule(){
 		_overviewBehaviour.reschedule();
 	}
 
-	public ProductAgentProperties getProperties() {
-		return this._properties;
+	public void rescheduleAndRemoveEquiplet(){
+		removeEquiplet(getAID());
+		// remove equiplet first
+		_overviewBehaviour.reschedule();
 	}
 
-	public void setProperties(ProductAgentProperties properties) {
-		this._properties = properties;
+	public Product getProduct(){
+		return this._product;
 	}
 
-	public Callback getCallback() {
-		return this._properties.getCallback();
+	// This function is for testing purposes only and will later be replaced
+	// within the Equiplet Agent its functionality
+	@SuppressWarnings("static-method")
+	public void removeEquiplet(AID aid){
+		try{
+		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
+		// try to remove the given 'aid' from the blackboard
+		
+			bbc.removeDocuments(aid.toString());
+		} catch (UnknownHostException | GeneralMongoException | InvalidJSONException | InvalidDBNamespaceException e1) {
+			Logger.log(e1);
+		}
 	}
 
-	public void setCallback(Callback callback) {
-		this._properties.setCallback(callback);
+	public void setProduct(Product value){
+		this._product = value;
 	}
 
-	public Product getProduct() {
-		return this._properties.getProduct();
+	public void outPutProductStepList(){
+		for(ProductionStep stp : this.getProduct().getProduction()
+				.getProductionSteps()){
+			for(AID aid : this.getProduct().getProduction()
+					.getProductionEquipletMapping()
+					.getEquipletsForProductionStep(stp.getId()).keySet()){
+				System.out
+						.println("Step: " + stp.getId() + " has equiplets:\n");
+				System.out.println(aid.getLocalName());
+			}
+		}
 	}
-
-	public void setProduct(Product product) {
-		this._properties.setProduct(product);
-	}
-	
-	public AgentStatus getStatus(){
-		return this._status;
-	}
-	
-	public void setStatus(AgentStatus status) {
-		this._status = status;
-	}
-
 }
