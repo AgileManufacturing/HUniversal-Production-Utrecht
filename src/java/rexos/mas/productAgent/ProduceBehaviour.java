@@ -44,7 +44,7 @@
 package rexos.mas.productAgent;
 
 import jade.core.Agent;
-import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import rexos.libraries.log.Logger;
@@ -54,62 +54,77 @@ import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.StepStatusCode;
 
-public class ProduceBehaviour extends OneShotBehaviour{
+public class ProduceBehaviour extends Behaviour {
 	private static final long serialVersionUID = 1L;
 	private Production _production;
-	ProductAgent pa;
+
+	private boolean _isDone = false;
+	private boolean _isError = false;
+	private boolean _isCompleted = false;
+
 	private BehaviourCallback _bc;
-	private boolean _error = false;
 
 	// private ProductionEquipletMapper _prodEQMap;
 	// ACLMessage msg;
 	/**
 	 * @param myAgent
 	 */
-	public ProduceBehaviour(Agent myAgent, BehaviourCallback bc){
+	public ProduceBehaviour(Agent myAgent, BehaviourCallback bc) {
 		super(myAgent);
 		this._bc = bc;
 	}
-	
-	@Override
-	public int onEnd() {
-		if(this._error != false) {
-			this._bc.handleCallback(BehaviourStatus.COMPLETED);
-		} else {
-			this._bc.handleCallback(BehaviourStatus.ERROR);
-		}
-		return 0;
-	}
 
 	@Override
-	public void action(){
-		try{
+	public void onStart() {
+		try {
 			_production = ((ProductAgent) myAgent).getProduct().getProduction();
-			// _prodEQMap = new ProductionEquipletMapper();
-			// retrieve the productstep
-			if (_production != null && _production.getProductionSteps() != null){
-				for(ProductionStep stp : _production.getProductionSteps()){
-					if (stp.getStatus() == StepStatusCode.PLANNED){
-						// adds the step to te new list (the one that will be
-						// returned to the scheduler)
-						// _prodEQMap.addProductionStep(stp.getId());
-						// roep seq behav aan
-						// myAgent.addBehaviour(new newProducing(
-						// equipletAndTimeslot, stp));
-						myAgent.addBehaviour(new ProducingReciever(myAgent, -1,
-								MessageTemplate.MatchAll(), stp));
+			if (_production != null && _production.getProductionSteps() != null) {
+				for (ProductionStep stp : _production.getProductionSteps()) {
+					if (stp.getStatus() == StepStatusCode.PLANNED) {
+						myAgent.addBehaviour(new ProducingReceiver(myAgent, -1,
+								MessageTemplate.MatchAll(), stp, this));
+					} else {
+						this._isError = true;
 					}
 				}
 			}
-		} catch(Exception e){
+		} catch (Exception e) {
 			Logger.log(e);
 		}
-		System.out.println("A");
+	}
+
+	@Override
+	public void action() {
+		try {
+			if (this._isDone) {
+				this._bc.handleCallback(BehaviourStatus.COMPLETED);
+				this._isCompleted = true;
+			} else if (this._isError) {
+				this._bc.handleCallback(BehaviourStatus.ERROR);
+				this._isCompleted = true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public boolean done() {
+		return this._isCompleted;
+	}
+	
+	public void reportProductStatus(BehaviourStatus bs) {
+		if(bs == BehaviourStatus.COMPLETED) {
+			this._isDone = true;
+		} else {
+			this._isError = true;
+		}
 	}
 }
 
-class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour{
+class ProducingReceiver extends rexos.mas.behaviours.ReceiveBehaviour {
 	ProductionStep ProductAgentstp;
+	private ProduceBehaviour _pb;
 
 	/**
 	 * @param agnt
@@ -117,26 +132,27 @@ class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour{
 	 * @param msgtmplt
 	 * @param stp
 	 **/
-	public ProducingReciever(Agent agnt, int millis, MessageTemplate msgtmplt,
-			ProductionStep stp){
+	public ProducingReceiver(Agent agnt, int millis, MessageTemplate msgtmplt,
+			ProductionStep stp, ProduceBehaviour pb) {
 		super(agnt, millis, msgtmplt);
 		this.ProductAgentstp = stp;
+		this._pb = pb;
 	}
 
 	private static final long serialVersionUID = 1L;
 	ACLMessage msg;
 
 	@Override
-	public void handle(ACLMessage m){
-		try{
-			if (m.getOntology() != null){
-				switch(m.getOntology()){
+	public void handle(ACLMessage m) {
+		try {
+			if (m.getOntology() != null) {
+				switch (m.getOntology()) {
 				case "StartStepQuestion":
 					/*
 					 * Equiplet agent requests permission for executing product
 					 * step. Product agent grants permission Currently I cannot
-					 * think of any reason why it wouldn�t. But I�m sure there
-					 * are reasons.
+					 * think of any reason why it wouldn�t. But I�m sure
+					 * there are reasons.
 					 */
 					ACLMessage reply = m.createReply();
 					reply.setOntology("StartStep");
@@ -145,7 +161,7 @@ class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour{
 				case "StatusUpdate":
 					ProductStep step = (ProductStep) m.getContentObject();
 					ProductAgentstp.setStatus(step.getStatus());
-					switch(step.getStatus()){
+					switch (step.getStatus()) {
 					case IN_PROGRESS:
 						// In progress
 						break;
@@ -171,8 +187,7 @@ class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour{
 						((ProductAgent) myAgent).getProduct()
 								.addStatusDataToLog(msg.getSender(),
 										step.getStatusData());
-					
-						System.out.println("I'm done.");
+						_pb.reportProductStatus(BehaviourStatus.COMPLETED);
 						break;
 					default:
 						Logger.log(new UnsupportedOperationException(
@@ -188,10 +203,12 @@ class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour{
 							+ m.getOntology()));
 					break;
 				}
+			} else {
+				_pb.reportProductStatus(BehaviourStatus.ERROR);
 			}
-		} catch(Exception e){
+		} catch (Exception e) {
 			Logger.log(e);
+			_pb.reportProductStatus(BehaviourStatus.ERROR);
 		}
-		System.out.println("B");
 	}
 }

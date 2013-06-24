@@ -42,7 +42,7 @@ package rexos.mas.productAgent;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -68,13 +68,16 @@ import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
 @SuppressWarnings("serial")
-public class SchedulerBehaviour extends OneShotBehaviour {
+public class SchedulerBehaviour extends Behaviour {
 
 	private ProductAgent _productAgent;
 	private int timeslotsToSchedule = 0;
 	private int debug = 1;
-	private boolean _error = false;
 	private ProductionStep _prodStep;
+	
+	private boolean _isDone = false;
+	private boolean _isError = false;
+	private boolean _isCompleted = false;
 
 	private BehaviourCallback _bc;
 
@@ -82,19 +85,9 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 		super(myAgent);
 		this._bc = bc;
 	}
-	
-	@Override
-	public int onEnd() {
-		if(this._error != false) {
-			this._bc.handleCallback(BehaviourStatus.COMPLETED);
-		} else {
-			this._bc.handleCallback(BehaviourStatus.ERROR);
-		}
-		return 0;
-	}
 
 	@Override
-	public void action() {
+	public void onStart() {
 		try {
 			// Shedule the PA with the equiplet agents in the current list.
 			_productAgent = (ProductAgent) myAgent;
@@ -104,7 +97,7 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			Product product = this._productAgent.getProduct();
 			Production production = product.getProduction();
 			ArrayList<ProductionStep> psa = production.getProductionSteps();
-			
+
 			for (ProductionStep ps : psa) {
 				int PA_id = ps.getId();
 				java.util.HashMap<AID, Long> equiplets = production
@@ -125,14 +118,35 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 					Scheduler(production.getProductionEquipletMapping()
 							.getEquipletsForProductionStep(PA_id).keySet(), ps);
 				} else {
-					//TODO: THIS SHOULD NOT HAPPEN. THROW EXCEPTION!
+					_isError = true;
+					// TODO: THIS SHOULD NOT HAPPEN. THROW EXCEPTION!
 				}
 
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			Logger.log(e);
 		}
-		System.out.println("Done Scheduling");
+	}
+
+	@Override
+	public void action() {
+		try {
+			if (_isDone) {
+				this._bc.handleCallback(BehaviourStatus.COMPLETED);
+				_isCompleted = true;
+			} else if (_isError) {
+				this._bc.handleCallback(BehaviourStatus.ERROR);
+				_isCompleted = true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public boolean done() {
+		return _isCompleted;
 	}
 
 	/**
@@ -260,14 +274,12 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			msg.addReceiver(freetimeslotEq.getEquipletName());
 			myAgent.send(msg);
 		} else {
-			//TODO: Throw exeption
+			// TODO: Throw exeption
 		}
 
 		final MessageTemplate msgtemplate = MessageTemplate.and(MessageTemplate
 				.MatchConversationId(this._prodStep.getConversationId()),
 				MessageTemplate.MatchOntology("Planned"));
-		
-		
 
 		((SequentialBehaviour) parent).addSubBehaviour(new ReceiveBehaviour(
 				myAgent, 10000, msgtemplate) {
@@ -280,8 +292,10 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			public void handle(ACLMessage msg) {
 				if (msg == null) {
 					System.out.println("Null message - Scheduler");
+					_isError = true;
 				} else {
-					//TODO:: Scheduler is done. Make a nice ending pls
+					_isDone = true;
+					// TODO:: Scheduler is done. Make a nice ending pls
 				}
 			}
 		});

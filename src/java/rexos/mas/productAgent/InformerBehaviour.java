@@ -67,22 +67,18 @@ public class InformerBehaviour extends Behaviour {
 
 	private static final long serialVersionUID = 1L;
 	private ProductAgent _productAgent;
-	private ParallelBehaviour _par;
 	private Product _product;
 	private Production _production;
 	private ProductionEquipletMapper _prodEQmap;
+	
 	private boolean _isDone = false;;
 	private boolean _isError = false;
 	private boolean _isCompleted = false;
 
 	private BehaviourCallback _bc;
 
-	public static boolean isDone = false;
-	public static boolean isError = false;
-
 	private SequentialBehaviour _seqBehaviour;
-
-	private boolean running = false;
+	private ParallelBehaviour _parBehaviour;
 
 	public InformerBehaviour(Agent myAgent, BehaviourCallback bc) {
 		super(myAgent);
@@ -97,10 +93,11 @@ public class InformerBehaviour extends Behaviour {
 		_product = this._productAgent.getProduct();
 		_production = _product.getProduction();
 		_prodEQmap = new ProductionEquipletMapper();
+		
 		_seqBehaviour = new SequentialBehaviour();
+		_parBehaviour = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 
-		final ParallelBehaviour par = new ParallelBehaviour(
-				ParallelBehaviour.WHEN_ALL);
+		
 
 		for (ProductionStep stp : _production.getProductionSteps()) {
 			if (stp.getStatus() == StepStatusCode.EVALUATING) {
@@ -110,11 +107,10 @@ public class InformerBehaviour extends Behaviour {
 				_prodEQmap.addProductionStep(stp.getId());
 				ProductionEquipletMapper pem = _production
 						.getProductionEquipletMapping();
-
 				if (pem != null) {
 					for (AID aid : pem.getEquipletsForProductionStep(
 							stp.getId()).keySet()) {
-						par.addSubBehaviour(new Conversation(aid, stp,
+						_parBehaviour.addSubBehaviour(new Conversation(aid, stp,
 								_prodEQmap));
 					}
 				} else {
@@ -123,14 +119,14 @@ public class InformerBehaviour extends Behaviour {
 				}
 			}
 		}
-		_seqBehaviour.addSubBehaviour(par);
+		_seqBehaviour.addSubBehaviour(_parBehaviour);
 
-		this._seqBehaviour.addSubBehaviour(new OneShotBehaviour() {
+		_seqBehaviour.addSubBehaviour(new OneShotBehaviour() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void action() {
-				if (par.done()) {
+				if (_parBehaviour.done()) {
 					System.out.println("Done parallel informing.");
 					try {
 						_production.setProductionEquipletMapping(_prodEQmap);
@@ -236,7 +232,6 @@ public class InformerBehaviour extends Behaviour {
 						}
 					} catch (Exception e) {
 						Logger.log(e);
-						isError = true;
 					}
 				}
 			});
@@ -257,7 +252,6 @@ public class InformerBehaviour extends Behaviour {
 									+ _aid.getLocalName() + " CanPerformStep: "
 									+ _productionStep.getId());
 						}
-						isError = true;
 					} else {
 						if (msg.getPerformative() == ACLMessage.CONFIRM) {
 							if (debug) {
@@ -294,7 +288,6 @@ public class InformerBehaviour extends Behaviour {
 										}
 									} catch (Exception e) {
 										Logger.log(e);
-										isError = true;
 									}
 								}
 							});
@@ -345,14 +338,12 @@ public class InformerBehaviour extends Behaviour {
 																_productionStep
 																		.getId(),
 																_aid, timeSlots);
-												isDone = true;
 											}
 										} catch (UnreadableException e) {
 											System.out
 													.println("Error on receiving timeslots from: "
 															+ _aid.getLocalName()
 															+ " " + e);
-											isError = true;
 										}
 									}
 								}
@@ -364,8 +355,6 @@ public class InformerBehaviour extends Behaviour {
 										+ ". It cant perform step: "
 										+ _productionStep.getId());
 							}
-							isError = true;
-							isDone = true;
 						}
 					}
 				}
