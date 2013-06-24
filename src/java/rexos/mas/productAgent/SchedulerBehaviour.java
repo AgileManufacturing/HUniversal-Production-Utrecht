@@ -84,11 +84,12 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 	}
 	
 	@Override
-	public int onEnd(){
+	public int onEnd() {
 		if(this._error != false) {
 			this._bc.handleCallback(BehaviourStatus.COMPLETED);
+		} else {
+			this._bc.handleCallback(BehaviourStatus.ERROR);
 		}
-		this._bc.handleCallback(BehaviourStatus.ERROR);
 		return 0;
 	}
 
@@ -131,6 +132,7 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 		} catch (Exception e) {
 			Logger.log(e);
 		}
+		System.out.println("Done Scheduling");
 	}
 
 	/**
@@ -264,6 +266,8 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 		final MessageTemplate msgtemplate = MessageTemplate.and(MessageTemplate
 				.MatchConversationId(this._prodStep.getConversationId()),
 				MessageTemplate.MatchOntology("Planned"));
+		
+		
 
 		((SequentialBehaviour) parent).addSubBehaviour(new ReceiveBehaviour(
 				myAgent, 10000, msgtemplate) {
@@ -275,7 +279,7 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			@Override
 			public void handle(ACLMessage msg) {
 				if (msg == null) {
-					System.out.println("Null message");
+					System.out.println("Null message - Scheduler");
 				} else {
 					//TODO:: Scheduler is done. Make a nice ending pls
 				}

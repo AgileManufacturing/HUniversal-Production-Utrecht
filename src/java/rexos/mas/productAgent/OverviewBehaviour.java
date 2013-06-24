@@ -66,8 +66,8 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 
 	private void initialize() {
 		System.out.println("Creating the SocketBehaviour");
-		_socketBehaviour = new SocketBehaviour(myAgent, _productAgent
-				.getProperties().getCallback());
+		//_socketBehaviour = new SocketBehaviour(myAgent, _productAgent
+		//		.getProperties().getCallback());
 
 		System.out.println("Creating the PlannerBehaviour");
 		_plannerBehaviour = new PlannerBehaviour(myAgent, this);
@@ -88,8 +88,8 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 		_productAgent.addBehaviour(_sequentialBehaviour);
 
 		// Starting the SocketBehaviour, so the agent can communicate with the
-		System.out.println("Add a SocketBehaviour");
-		_productAgent.addBehaviour(_socketBehaviour);
+		//System.out.println("Add a SocketBehaviour");
+		//_productAgent.addBehaviour(_socketBehaviour);
 	}
 
 	/*
@@ -157,15 +157,15 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 			this.startInforming();
 			break;
 		case INFORMING:
-			System.out.println("Done Informing");
+			System.out.println("Done Informing.");
 			this.startScheduling();
 			break;
 		case SCHEDULING:
-			System.out.println("Done scheduling");
+			System.out.println("Done scheduling.");
 			this.startProducing();
 			break;
 		case PRODUCING:
-			System.out.println("DONE!.");
+			System.out.println("Done producing.");
 			this.cleanBehaviour();
 			break;
 		default:
@@ -175,6 +175,7 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 	}
 
 	public void cleanBehaviour() {
-		_socketBehaviour.stop();
+		System.out.println("Done overview. Stopping SocketBehaviour.");
+		//_socketBehaviour.stop();
 	}
 }
