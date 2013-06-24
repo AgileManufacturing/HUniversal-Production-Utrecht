@@ -64,6 +64,11 @@ bool DummyModuleNode::outputJSON(rexos_std_srvs::Module::Request &req, rexos_std
 
 void DummyModuleNode::transitionSetup(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Setup transition called");
+
+	srand(time(NULL));
+	int randWait = rand() % 10;
+	sleep(randWait);
+
 	as->setSucceeded();
 }
 

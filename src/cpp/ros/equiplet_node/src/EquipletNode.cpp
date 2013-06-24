@@ -42,6 +42,9 @@
 
 using namespace equiplet_node;
 
+boost::condition_variable condit;
+boost::mutex mutexit;
+
 /**
  * Create a new EquipletNode
  * @param id The unique identifier of the Equiplet
@@ -253,7 +256,7 @@ void EquipletNode::onModuleStateChanged(
 	rexos_statemachine::State newState, 
 	rexos_statemachine::State previousState)
 {
-	//ROS_INFO("EquipletNode received from %s a state change from %d to %d",moduleProxy->getModuleNodeName(),previousState,newState);
+	ROS_INFO("EquipletNode received from %s a state change from %d to %d",moduleProxy->getModuleNodeName().c_str() ,previousState,newState);
 	if(rexos_statemachine::is_transition_state[getCurrentState()])
 		finishTransition(moduleRegistry.getRegisteredModules());
 }
@@ -263,32 +266,45 @@ void EquipletNode::onModuleModeChanged(
 	rexos_statemachine::Mode newMode, 
 	rexos_statemachine::Mode previousMode)
 {
-	//ROS_INFO("ModuleRegistry received from %s a mode change from %d to %d",moduleProxy->getModuleNodeName(),previousMode,newMode);
+	ROS_INFO("ModuleRegistry received from %s a mode change from %d to %d",moduleProxy->getModuleNodeName().c_str() ,previousMode,newMode);
 }
 
 void EquipletNode::transitionSetup(rexos_statemachine::TransitionActionServer* as) {
+	ROS_INFO("EquipletNode: transitionSetup");
 	setupTransitionActionServer = as;
 
 	moduleRegistry.setNewRegistrationsAllowed(false);
 	changeModuleStates(moduleRegistry.getRegisteredModules(),rexos_statemachine::STATE_STANDBY);
 	finishTransition(moduleRegistry.getRegisteredModules());
+
+	boost::unique_lock<boost::mutex> lock( mutexit );
+	condit.wait( lock );
 }
 
 void EquipletNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as) {
+	ROS_INFO("EquipletNode: transitionShutdown");
 	shutdownTransitionActionServer = as;
 
 	moduleRegistry.setNewRegistrationsAllowed(true);
 	changeModuleStates(moduleRegistry.getRegisteredModules(),rexos_statemachine::STATE_SAFE);
 	finishTransition(moduleRegistry.getRegisteredModules());
+
+	boost::unique_lock<boost::mutex> lock( mutexit );
+		condit.wait( lock );
 }
 
 void EquipletNode::transitionStart(rexos_statemachine::TransitionActionServer* as) {
+	ROS_INFO("EquipletNode: transitionStart");
 	as->setSucceeded();
 }
 
 void EquipletNode::transitionStop(rexos_statemachine::TransitionActionServer* as) {
+	ROS_INFO("EquipletNode: transitionStop");
 	stopTransitionActionServer = as;
 	finishTransition(moduleRegistry.getRegisteredModules());
+
+	boost::unique_lock<boost::mutex> lock( mutexit );
+		condit.wait( lock );
 }
 
 void EquipletNode::changeModuleStates(std::vector<ModuleProxy*> modules, rexos_statemachine::State desiredState){
@@ -299,7 +315,7 @@ void EquipletNode::changeModuleStates(std::vector<ModuleProxy*> modules, rexos_s
 
 bool EquipletNode::finishTransition(std::vector<ModuleProxy*> modules){
 	rexos_statemachine::State desiredTransitionState;
-	rexos_statemachine::TransitionActionServer* transitionActionServer = NULL;
+	rexos_statemachine::TransitionActionServer* transitionActionServer;
 	switch(getCurrentState()){
 		case rexos_statemachine::STATE_SETUP: 
 			desiredTransitionState = rexos_statemachine::STATE_STANDBY;
@@ -319,17 +335,20 @@ bool EquipletNode::finishTransition(std::vector<ModuleProxy*> modules){
 
 	bool allModulesDone = true;
 	for(int i=0; i < modules.size(); i++){
-		if(modules[i]->getCurrentState() == getCurrentState()){
+		if(modules[i]->getCurrentState() != desiredTransitionState){
 			allModulesDone = false;
+			ROS_INFO("Not all modules are in state : %s", rexos_statemachine::state_txt[desiredTransitionState]);
 			break;
-		}else if(modules[i]->getCurrentState() != desiredTransitionState){
-			transitionActionServer->setAborted();	
-			return false;
 		}
 	}
 
 	if(allModulesDone){
+		ROS_INFO("All modules have done their transition");
 		transitionActionServer->setSucceeded();
+
+		//boost::unique_lock<boost::mutex> lock( mutexit );
+		condit.notify_one();
+
 		return true;
 	}
 }
