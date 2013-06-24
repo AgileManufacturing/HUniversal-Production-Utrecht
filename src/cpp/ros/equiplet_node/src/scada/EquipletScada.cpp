@@ -43,6 +43,7 @@ EquipletScada::EquipletScada(EquipletNode* equiplet, ModuleRegistry* moduleRegis
 	};
 
 	mg_callbacks mongooseCallbacks;
+	memset(&mongooseCallbacks, 0, sizeof(mongooseCallbacks));
 	mongooseCallbacks.begin_request = &EquipletScada::__mongooseBeginRequestCallback;
 
 	mongooseContext = mg_start(&mongooseCallbacks, this, mongooseOptions);
