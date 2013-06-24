@@ -53,7 +53,7 @@
  * @param moduleID identifier for the deltarobot
  **/
 deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) :
-	rexos_statemachine::ModuleStateMachine("delta_robot_node", equipletID, moduleID),
+	rexos_statemachine::ModuleStateMachine("delta_robot_node",equipletID, moduleID, true),
 	deltaRobot(NULL),
 	modbus(NULL),
 	motorManager(NULL),
@@ -133,6 +133,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 	JSONNode n = libjson::parse(goal->json);
     JSONNode::const_iterator i = n.begin();
 
+    //i = JSON of a instructionData
     //i[0] = command (move)
     //i[1] destination ( deltarobot )
 	//i[2] lookup
