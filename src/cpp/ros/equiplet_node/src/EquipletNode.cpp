@@ -34,6 +34,7 @@
 #include "equiplet_node/EquipletNode.h"
 #include "rexos_blackboard_cpp_client/BlackboardCppClient.h"
 #include "rexos_blackboard_cpp_client/FieldUpdateSubscription.h"
+#include "rexos_blackboard_cpp_client/BasicOperationSubscription.h"
 #include "rexos_blackboard_cpp_client/OplogEntry.h"
 #include "rexos_utilities/Utilities.h"
 #include <rexos_statemachine/ChangeStateAction.h>
@@ -73,8 +74,9 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 
 	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "test", "equipletStepBB");
 	equipletStepSubscription = new Blackboard::FieldUpdateSubscription("status", *this);
-	equipletStepBlackboardClient->subscribe(*equipletStepSubscription);
+
 	subscriptions.push_back(equipletStepSubscription);
+	equipletStepBlackboardClient->subscribe(*equipletStepSubscription);
 
 	moduleRegistry.setNewRegistrationsAllowed(true);
 	moduleRegistry.setModuleRegistryListener(this);
