@@ -48,6 +48,7 @@ import rexos.mas.data.StepStatusCode;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.ParallelBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
@@ -62,7 +63,7 @@ import jade.lang.acl.UnreadableException;
  * given parameters. If the equipletagent returns with an confirm, the product
  * agent will ask for the duration of the operation ( in timeslots ).
  */
-public class InformerBehaviour extends OneShotBehaviour {
+public class InformerBehaviour extends Behaviour {
 
 	private static final long serialVersionUID = 1L;
 	private ProductAgent _productAgent;
@@ -70,104 +71,108 @@ public class InformerBehaviour extends OneShotBehaviour {
 	private Product _product;
 	private Production _production;
 	private ProductionEquipletMapper _prodEQmap;
-	private boolean _isDone;
-	private boolean _error = false;
+	private boolean _isDone = false;;
+	private boolean _isError = false;
+	private boolean _isCompleted = false;
 
 	private BehaviourCallback _bc;
-	
+
 	public static boolean isDone = false;
 	public static boolean isError = false;
+
+	private SequentialBehaviour _seqBehaviour;
+
+	private boolean running = false;
 
 	public InformerBehaviour(Agent myAgent, BehaviourCallback bc) {
 		super(myAgent);
 		this._bc = bc;
+		_seqBehaviour = new SequentialBehaviour();
 	}
 
 	@Override
-	public int onEnd() {
-		if(this._error != false) {
-			this._bc.handleCallback(BehaviourStatus.COMPLETED);
-		} else {
-			this._bc.handleCallback(BehaviourStatus.ERROR);
+	public void onStart() {
+
+		_productAgent = (ProductAgent) myAgent;
+		_product = this._productAgent.getProduct();
+		_production = _product.getProduction();
+		_prodEQmap = new ProductionEquipletMapper();
+		_seqBehaviour = new SequentialBehaviour();
+
+		final ParallelBehaviour par = new ParallelBehaviour(
+				ParallelBehaviour.WHEN_ALL);
+
+		for (ProductionStep stp : _production.getProductionSteps()) {
+			if (stp.getStatus() == StepStatusCode.EVALUATING) {
+				// adds the step to te new list (the one that will be
+				// returned
+				// to the scheduler)
+				_prodEQmap.addProductionStep(stp.getId());
+				ProductionEquipletMapper pem = _production
+						.getProductionEquipletMapping();
+
+				if (pem != null) {
+					for (AID aid : pem.getEquipletsForProductionStep(
+							stp.getId()).keySet()) {
+						par.addSubBehaviour(new Conversation(aid, stp,
+								_prodEQmap));
+					}
+				} else {
+					// REPORT ERROR
+					System.out.println("Pem is null");
+				}
+			}
 		}
-		return 0;
+		_seqBehaviour.addSubBehaviour(par);
+
+		this._seqBehaviour.addSubBehaviour(new OneShotBehaviour() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void action() {
+				if (par.done()) {
+					System.out.println("Done parallel informing.");
+					try {
+						_production.setProductionEquipletMapping(_prodEQmap);
+						_product.setProduction(_production);
+						_productAgent.setProduct(_product);
+						_isDone = true;
+					} catch (Exception e) {
+						Logger.log(e);
+					}
+				} else {
+					System.out.println("Not done informing.");
+					_isError = true;
+				}
+			}
+		});
+		myAgent.addBehaviour(_seqBehaviour);
 	}
 
 	@Override
 	public void action() {
 		try {
-			_productAgent = (ProductAgent) myAgent;
-			_product = this._productAgent.getProduct();
-			_production = _product.getProduction();
-			_prodEQmap = new ProductionEquipletMapper();
-			_isDone = false;
-			/*
-			 * We want to have our conversations in parallel. We also only want
-			 * to return when all child conversations are finished. So iterate
-			 * through each step in our productionlist and create a conversation
-			 * object. ( as behaviour )
-			 */
-			SequentialBehaviour seq = new SequentialBehaviour();
-
-
-			_par = new ParallelBehaviour(_productAgent, ParallelBehaviour.WHEN_ALL);
-			
-			for (ProductionStep stp : _production.getProductionSteps()) {
-				if (stp.getStatus() == StepStatusCode.EVALUATING) {
-					// adds the step to te new list (the one that will be
-					// returned
-					// to the scheduler)
-					_prodEQmap.addProductionStep(stp.getId());
-					ProductionEquipletMapper pem = _production
-							.getProductionEquipletMapping();
-
-					if (pem != null) {
-						for (AID aid : pem.getEquipletsForProductionStep(
-								stp.getId()).keySet()) {
-							_par.addSubBehaviour(new Conversation(aid, stp,
-									_prodEQmap));
-						}
-					} else {
-						// REPORT ERROR
-						System.out.println("Pem is null");
-					}
-				}
+			if (_isDone) {
+				this._bc.handleCallback(BehaviourStatus.COMPLETED);
+				_isCompleted = true;
+			} else if (_isError) {
+				this._bc.handleCallback(BehaviourStatus.ERROR);
+				_isCompleted = true;
 			}
-			seq.addSubBehaviour(_par);
-
-			// Lets set our production objects
-			seq.addSubBehaviour(new OneShotBehaviour() {
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public void action() {
-					if (_par.done()) {
-						System.out.println("Done parallel informing.");
-						try {
-							_production
-									.setProductionEquipletMapping(_prodEQmap);
-							_product.setProduction(_production);
-							_productAgent.setProduct(_product);
-							_isDone = true;
-						} catch (Exception e) {
-							Logger.log(e);
-						}
-					} else {
-						System.out.println("Not done informing.");
-					}
-				}
-			}); 
-			
-			myAgent.addBehaviour(seq);
-			
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public boolean isDone() {
-		return this._isDone;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see jade.core.behaviours.Behaviour#done()
+	 */
+	@Override
+	public boolean done() {
+		// TODO Auto-generated method stub
+		return _isCompleted;
 	}
 
 	/*
@@ -360,10 +365,12 @@ public class InformerBehaviour extends OneShotBehaviour {
 										+ _productionStep.getId());
 							}
 							isError = true;
+							isDone = true;
 						}
 					}
 				}
 			});
 		}
 	}
+
 }

@@ -82,15 +82,8 @@ public class SocketBehaviour extends Behaviour implements HeartbeatReceiver {
 			_hbb = new HeartBeartBehaviour(a, 0, this);
 			_gsonParser = new Gson();
 			a.addBehaviour(_hbb);
-			if (!isConnected) {
-				connect();
-			}
-		} catch (UnknownHostException e) {
-			System.out.println("Disconnecting!");
-			Logger.log(e);
-		} catch (IOException e) {
-			System.out.println("Disconnecting!");
-			Logger.log(e);
+		}catch(Exception e) {
+			e.printStackTrace();
 		}
 	}
 

@@ -52,11 +52,11 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 
 	/* Behaviour */
 	private PlannerBehaviour _plannerBehaviour;
-	//private InformerBehaviour _informerBehaviour;
+	private InformerBehaviour _informerBehaviour;
 	private SchedulerBehaviour _schedulerBehaviour;
 	private ProduceBehaviour _produceBehaviour;
 	private SequentialBehaviour _sequentialBehaviour;
-	//private SocketBehaviour _socketBehaviour;
+	private SocketBehaviour _socketBehaviour;
 
 	public OverviewBehaviour(Agent myAgent) {
 		super(myAgent);
@@ -67,13 +67,13 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 	private void initialize() {
 		System.out.println("Creating the SocketBehaviour");
 		//_socketBehaviour = new SocketBehaviour(myAgent, _productAgent
-				//.getProperties().getCallback());
+		//		.getProperties().getCallback());
 
 		System.out.println("Creating the PlannerBehaviour");
 		_plannerBehaviour = new PlannerBehaviour(myAgent, this);
 
-		//System.out.println("Creating the InformerBehaviour");
-		//_informerBehaviour = new InformerBehaviour(myAgent, this);
+		System.out.println("Creating the InformerBehaviour");
+		_informerBehaviour = new InformerBehaviour(myAgent, this);
 
 		System.out.println("Creating the ScheduleBehaviour");
 		_schedulerBehaviour = new SchedulerBehaviour(myAgent, this);
@@ -88,7 +88,7 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 		_productAgent.addBehaviour(_sequentialBehaviour);
 
 		// Starting the SocketBehaviour, so the agent can communicate with the
-		System.out.println("Add a SocketBehaviour");
+		//System.out.println("Add a SocketBehaviour");
 		//_productAgent.addBehaviour(_socketBehaviour);
 	}
 
@@ -126,7 +126,7 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 	public void startInforming() {
 		_productAgent.setStatus(AgentStatus.INFORMING);
 		System.out.println("Add an InformerBehaviour");
-		//_sequentialBehaviour.addSubBehaviour(_informerBehaviour);
+		_sequentialBehaviour.addSubBehaviour(_informerBehaviour);
 	}
 
 	public void startScheduling() {
