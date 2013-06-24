@@ -1,14 +1,15 @@
 /**
  * @file BlackboardCppClient.h
- * @brief the cpp client for the blackboard
+ * @brief Represents a blackboard connection.
  * @date Created: 2012-10-12
  *
  * @author Dennis Koole
+ * @author Jan-Willem Willebrands
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2012-2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,41 +33,154 @@
 #define BLACKBOARD_CPP_CLIENT_H_
 
 #include <string>
-#include <map>
-#include <vector>
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
-#include <rexos_blackboard_cpp_client/BlackboardSubscriber.h>
-#include <algorithm>
-#include <iostream>
+#include "mongo/client/dbclientinterface.h"
 
-#pragma GCC system_header
-#include "mongo/client/dbclient.h"
+namespace Blackboard {
+class OplogMonitor;
+class BlackboardSubscription;
 
 /**
- * This class represents the C++ client for the blackboard system
+ * Represents a blackboard connection.
  **/
 class BlackboardCppClient{
 public:
-	BlackboardCppClient(const std::string &hostname, const std::string db, const std::string coll, BlackboardSubscriber *func);
-	BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll, BlackboardSubscriber *func);
-	virtual ~BlackboardCppClient();
-	void setDatabase(const std::string &db);
-	void setCollection(const std::string &col);
-	void subscribe(const std::string &topic);
-	void setCallback(BlackboardSubscriber *func);
-	void unsubscribe(const std::string &topic);
-	std::string readOldestMessage();
-	void removeOldestMessage();
-	void insertJson(std::string json);
-	
-private:
-	void run();
 	/**
-	 * @var mongo::DBClientConnection connection
-	 * The connection to the mongodb database
-	 **/
-	mongo::DBClientConnection connection;
+	 * Constructs a new client with the specified settings.
+	 *
+	 * @param hostname The server's hostname.
+	 * @param db Name of the database that should be used.
+	 * @param coll Name of the collection that should be used.
+	 */
+	BlackboardCppClient(const std::string &hostname, const std::string db, const std::string coll);
+
+	/**
+	 * Constructs a new client with the specified settings.
+	 *
+	 * @param hostname The server's hostname.
+	 * @param port The port that should be used.
+	 * @param db Name of the database that should be used.
+	 * @param coll Name of the collection that should be used.
+	 */
+	BlackboardCppClient(const std::string &hostname, int port, const std::string db, const std::string coll);
+
+	/**
+	 * Destroys the client and its oplog monitor.
+	 */
+	virtual ~BlackboardCppClient();
+
+	/**
+	 * Sets the database to be used.
+	 *
+	 * @note Changing the namespace (i.e. database or collection) of the client causes
+	 * any running monitor thread to stop. In addition, all subscriptions are removed from the client.
+	 *
+	 * @param db Name of the database.
+	 */
+	void setDatabase(const std::string &db);
+
+	/**
+	 * Sets the collection to be used.
+	 * If a monitor thread is active, it is stopped and all subscriptions are removed.
+	 *
+	 * @note Changing the namespace (i.e. database or collection) of the client causes
+	 * any running monitor thread to stop. In addition, all subscriptions are removed from the client.
+	 *
+	 * @param col Name of the collection that should be used.
+	 */
+	void setCollection(const std::string &col);
+
+	/**
+	 * Adds the specified subscription to be watched.
+	 *
+	 * @param sub The subscription that should be watched.
+	 */
+	void subscribe(BlackboardSubscription &sub);
+
+	/**
+	 * Removes the specified subscription.
+	 *
+	 * @param sub The subscription that should be removed.
+	 */
+	void unsubscribe(BlackboardSubscription &sub);
+
+	/**
+	 * Inserts a document into the database.
+	 *
+	 * @param json JSON string representation of the object that should be inserted.
+	 *
+	 * @return true if insert was successful, false otherwise.
+	 */
+	bool insertDocument(std::string json, mongo::BSONObj * result_out = NULL);
+
+	/**
+	 * Removes documents matching the specified query from the database.
+	 *
+	 * @param queryAsJSON The query that is used to determine which objects will be removed.
+	 *
+	 * @return The amount of documents that have been removed.
+	 * A return value of 0 can indicate either that no documents match the query, or that an error has occurred.
+	 * To find out if an error has occured, check the ok field in the result object. This will be set to 0 in case of errors.
+	 */
+	int removeDocuments(std::string queryAsJSON, mongo::BSONObj * result_out = NULL);
+
+	/**
+	 * Queries the blackboard for an object with the specified objectId.
+	 *
+	 * @param objectId The objectId of the object.
+	 *
+	 * @return The document with the specified ObjectId.
+	 */
+	mongo::BSONObj findDocumentById(mongo::OID objectId);
+
+	/**
+	 * Queries the database for all documents matching the given query.
+	 *
+	 * @param queryAsJSON The query that is used to determine which objects will be returned.
+	 * @param results Reference to a std::vector<mongo::BSONObj> that will be used to store the results.
+	 *
+	 * @return The amount of documents that have been found.
+	 */
+	int findDocuments(std::string queryAsJSON, std::vector<mongo::BSONObj> &results);
+
+	/**
+	 * Updates all documents matching the query according to the specified update query.
+	 *
+	 * @param queryAsJSON The query used to determine which documents should be updated.
+	 * @param updateQueryAsJSON The query that is used to update the matching documents.
+	 * @param result_out Pointer to a mongo::BSONObj buffer where the result will be stored.
+	 * @param updateMultiple Controls whether one or all all document(s) matching the search query will be updated.
+	 * When set to true, $set or $unset operators must be used within the updateQuery. It is not allowed to do a replace in this case.
+	 *
+	 *
+	 * @return The amount of documents that have been updated.
+	 * A return value of 0 can indicate either that no documents match the query, or that an error has occurred.
+	 * To find out if an error has occured, check the ok field in the result object. This will be set to 0 in case of errors.
+	 */
+	int updateDocuments(
+			std::string queryAsJSON,
+			std::string updateQueryAsJSON,
+			mongo::BSONObj * result_out = NULL,
+			bool updateMultiple = true);
+
+	/**
+	 * Updates the document with the specified objectId according to the specified update query.
+	 *
+	 * @param objectId ObjectId of the document that should be updated.
+	 * @param updateQueryAsJSON The query that is used to update the matching document.
+	 * @param result_out Pointer to a mongo::BSONObj buffer where the result will be stored.
+	 *
+	 * @return The amount of documents that have been updated.
+	 * A return value of 0 can indicate either that no documents match the query, or that an error has occurred.
+	 * To find out if an error has occured, check the ok field in the result object. This will be set to 0 in case of errors.
+	 */
+	int updateDocumentById(mongo::OID objectId, std::string updateQueryAsJSON,	mongo::BSONObj * result_out);
+
+private:
+	/**
+	 * @var std::string host
+	 * Hostname of the server.
+	 */
+	std::string host;
 
 	/**
 	 * @var std::string database
@@ -81,24 +195,11 @@ private:
 	std::string collection;
 
 	/**
-	 * @var std::map<std::string, mongo::BSONObj> subscriptions
-	 * map of the subscriptions top topics. The key is the topic name,
-	 * A bson object is stored as value to get the messages of the subscribed topic
-	 * from the database.
+	 * @var boost::thread *oplogMonitor
+	 * Pointer to OplogMonitor that is used to monitor the oplog.
 	 **/
-	std::map<std::string, mongo::BSONObj> subscriptions;
-
-	/**
-	 * @var boost::thread *readMessageThread
-	 * Pointer to the thread that is created when there is one subscription
-	 **/
-	boost::thread *readMessageThread;
-
-	/**
-	 * @var BlackboardSubscriber *callback
-	 * Pointer to the callback function that is called by the thread in the run function
-	 **/
-	BlackboardSubscriber *callback;
+	OplogMonitor *oplogMonitor;
 };
 
+}
 #endif

@@ -1,7 +1,7 @@
 /**
- * @file BlackboardSubscriber.h
- * @brief Interface providing callback functions for the blackboard client.
- * @date Created: 2012-11-19
+ * @file MongoOperation.h
+ * @brief Enum representing the different CRUD operations in MongoDB.
+ * @date Created: 31 mei 2013
  *
  * @author Jan-Willem Willebrands
  *
@@ -28,31 +28,31 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef BLACKBOARD_SUBSCRIBER_H_
-#define BLACKBOARD_SUBSCRIBER_H_
+#ifndef MONGOOPERATION_H_
+#define MONGOOPERATION_H_
 
-namespace Blackboard
-{
-class BlackboardSubscription;
-class OplogEntry;
-
+namespace Blackboard {
 /**
- * Interface providing callback functions for the blackboard client.
- **/
-class BlackboardSubscriber {
-public:
+ * Enum representing the different CRUD operations in MongoDB.
+ */
+enum MongoOperation {
 	/**
-	 * This callback is invoked whenever an oplog entry is parsed matching a subscription.
-	 * @param subscription Reference to the BlackboardSubscription for which this callback was invoked.
-	 * @param oplogEntry Reference to the OplogEntry containing all information about the event.
-	 */
-	virtual void onMessage(BlackboardSubscription & subscription, const OplogEntry & oplogEntry) = 0;
-
+	 * Insert operation.
+	 **/
+	INSERT,
 	/**
-	 * Virtual destructor to make sure child classes will be able to clean up.
-	 */
-	virtual ~BlackboardSubscriber(){}
+	 * Update operation.
+	 **/
+	UPDATE,
+	/**
+	 * Delete operation.
+	 **/
+	REMOVE,
+	/**
+	 * Noop operation.
+	 **/
+	NOOP
 };
-
 }
-#endif
+
+#endif /* MONGOOPERATION_H_ */
