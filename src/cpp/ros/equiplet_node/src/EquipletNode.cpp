@@ -70,7 +70,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 //			this);
 
 	blackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "test", "equipletStepBB");
-	Blackboard::BasicOperationSubscription * sub = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
+	Blackboard::BasicOperationSubscription * sub = new Blackboard::FieldUpdateSubscription("status", this);
 	subscriptions.push_back(sub);
 	blackboardClient->subscribe(*sub);
 
@@ -101,10 +101,29 @@ EquipletNode::~EquipletNode(){
  * @param json The message parsed in the json format
  **/
 void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) {
-        //lets parse a root node from the bb msg.
+    // IMPORTANT: At this moment we assume there is only one subscription.
 	JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
 	std::cout << n.write() << std::endl;
     rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
+    if (step->getStatus().compare("WAITING") == 0) {
+    	rexos_statemachine::Mode currentMode = getCurrentMode();
+
+    	std::stringstream query = "{ _id : " << n["_id"] << "}";
+
+    	if (currentMode == rexos_statemachine::MODE_NORMAL) {
+    		rexos_statemachine::State currentState = getCurrentState();
+
+    		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
+    			blackboardClient->updateDocuments(query.str(), "{$set : {status: \"IN_PROGRESS\"");
+    			// Execute instruction;
+    		} else {
+    			blackboardClient->updateDocuments(query.str(), "{$set : {status: \"ERROR\"");
+    		}
+    	} else {
+    		ROS_INFO("Instruction received but current mode is %s", rexos_statemachine::Mode_txt[currentMode]);
+    		blackboardClient->updateDocuments(query.str(), "{$set : {status: \"ERROR\"");
+    	}
+    }
 
 }
 

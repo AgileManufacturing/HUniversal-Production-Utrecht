@@ -37,8 +37,8 @@ namespace rexos_datatypes{
         InstructionData getInstructionData();
         void setInstructionData(InstructionData instructionData);
 
-        int getStatus();
-        void setStatus(int status);
+        std::string getStatus();
+        void setStatus(std::string status);
 
         std::map<std::string, std::string> getStatusData();
         void setStatusData(map<std::string, std::string> statusData);
@@ -51,7 +51,7 @@ namespace rexos_datatypes{
             std::string nextStep;
             int moduleId;
             InstructionData instructionData;
-            int status;
+            std::string status;
             std::map<std::string, std::string> statusData;
             TimeData timeData;
             void setValues(const JSONNode & n);

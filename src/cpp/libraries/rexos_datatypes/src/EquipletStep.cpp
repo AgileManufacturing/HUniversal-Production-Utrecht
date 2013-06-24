@@ -72,11 +72,11 @@ namespace rexos_datatypes{
         this->instructionData = instructionData;
     }
 
-    int EquipletStep::getStatus(){
+    std::string EquipletStep::getStatus(){
         return this->status;
     }
 
-    void EquipletStep::setStatus(int status){
+    void EquipletStep::setStatus(std::string status){
         this->status = status;
     }
 
@@ -126,7 +126,7 @@ namespace rexos_datatypes{
                 setInstructionData(setInstructionDataFromNode(*i));
             }
             else if (strcmp(node_name, "status") == 0){
-                setStatus(i -> as_int());
+                setStatus(i -> as_string());
             }
             else if (strcmp(node_name, "statusData") == 0){
                 setStatusData(setMapFromNode(*i));
