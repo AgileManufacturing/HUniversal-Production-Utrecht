@@ -67,11 +67,11 @@ public class Product{
 		return log;
 	}
 
-	public Product(Production production, AID aid){
+	public Product(Production production, String aid){
 		if (production == null)
 			Logger.log(new Exception("Production can't be null"));
 		setProduction(production);
-		log = new ProductLog(false, true, new sqliteDatabase(aid.toString()));
+		log = new ProductLog(false, true, new sqliteDatabase(aid));
 	}
 
 	/**
