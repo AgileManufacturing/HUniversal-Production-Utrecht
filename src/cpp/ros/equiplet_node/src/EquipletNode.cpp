@@ -235,8 +235,7 @@ void EquipletNode::onModeChanged(){
 	rexos_statemachine::Mode currentMode = getCurrentMode();
 	switch(currentMode){
 		case rexos_statemachine::MODE_NORMAL:	
-		case rexos_statemachine::MODE_ERROR:
-		case rexos_statemachine::MODE_CRITICAL_ERROR:
+		case rexos_statemachine::MODE_SERVICE:
 		case rexos_statemachine::MODE_E_STOP:	
 			changeModuleModes = true; break;
 	}
@@ -254,7 +253,7 @@ void EquipletNode::onModuleStateChanged(
 	rexos_statemachine::State newState, 
 	rexos_statemachine::State previousState)
 {
-	//ROS_INFO("EquipletNode received from %s a state change from %d to %d",moduleProxy->getModuleNodeName(),previousState,newState);
+	//ROS_INFO("Module State Changed received from %s a state change from %d to %d",moduleProxy->getModuleNodeName(),previousState,newState);
 	if(rexos_statemachine::is_transition_state[getCurrentState()])
 		finishTransition(moduleRegistry.getRegisteredModules());
 }
@@ -264,7 +263,11 @@ void EquipletNode::onModuleModeChanged(
 	rexos_statemachine::Mode newMode, 
 	rexos_statemachine::Mode previousMode)
 {
-	//ROS_INFO("ModuleRegistry received from %s a mode change from %d to %d",moduleProxy->getModuleNodeName(),previousMode,newMode);
+	//ROS_INFO("Module Mode Changed received from %s a mode change from %d to %d",moduleProxy->getModuleNodeName(),previousMode,newMode);
+	if(newMode == rexos_statemachine::MODE_ERROR)
+		changeMode(rexos_statemachine::MODE_ERROR);
+	else if(newMode == rexos_statemachine::MODE_CRITICAL_ERROR)
+		changeMode(rexos_statemachine::MODE_CRITICAL_ERROR);
 }
 
 void EquipletNode::transitionSetup(rexos_statemachine::TransitionActionServer* as) {
