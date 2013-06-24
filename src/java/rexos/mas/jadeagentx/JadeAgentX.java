@@ -56,9 +56,12 @@ import jade.wrapper.StaleProxyException;
 
 import java.util.ArrayList;
 
+import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.log.Logger;
+import rexos.mas.data.Callback;
 import rexos.mas.data.Position;
 import rexos.mas.data.Product;
+import rexos.mas.data.ProductAgentProperties;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
 
@@ -77,7 +80,7 @@ public class JadeAgentX extends Agent {
 	@Override
 	protected void setup() {
 		try {
-			Logger.log("starting a agent");
+			Logger.log("starting an agent");
 
 			/**
 			 * Make a new logistics agent
@@ -89,10 +92,10 @@ public class JadeAgentX extends Agent {
 			AID logisticsAID = new AID(logisticsCon.getName(), AID.ISGUID);
 
 			// Empty the equiplet directory before starting the first equiplet agent
-			//BlackboardClient collectiveBBClient = new BlackboardClient("145.89.191.131", 27017);
-			//collectiveBBClient.setDatabase("CollectiveDb");
-			//collectiveBBClient.setCollection("EquipletDirectory");
-			//collectiveBBClient.removeDocuments(new BasicDBObject());
+			BlackboardClient collectiveBBClient = new BlackboardClient("145.89.191.131", 27017);
+			collectiveBBClient.setDatabase("CollectiveDb");
+			collectiveBBClient.setCollection("EquipletDirectory");
+			collectiveBBClient.removeDocuments(new BasicDBObject());
 
 			/**
 			 * make a new equipletagent to use.
@@ -109,7 +112,7 @@ public class JadeAgentX extends Agent {
 //			parameters.append("part", new Part(1).toBasicDBObject());
 //			parameters.append("position", new Position(1.0, 2.0, 3.0, new Part(2)).toBasicDBObject());
 			parameters.append("startPosition", new Position(1.0, 1.0).toBasicDBObject());
-			parameters.append("endPosition", new Position(1.0, 2.0).toBasicDBObject());
+			parameters.append("endPosition", new Position(1.0, 1.0).toBasicDBObject());
 
 			// Next we want to have some production steps
 			ProductionStep stp1 = new ProductionStep(1, 3, parameters);
@@ -129,6 +132,14 @@ public class JadeAgentX extends Agent {
 
 			Production production = new Production(stepList);
 			Product product = new Product(production, getAID().toString());
+			
+			Callback callback = new Callback();
+			callback.setHost("127.0.0.1");
+			callback.setPort(1233);
+			
+			ProductAgentProperties pap = new ProductAgentProperties();
+			pap.setCallback(callback);
+			pap.setProduct(product);
 
 			/**
 			 * We need to pass an Object[] to the createNewAgent. But we only
@@ -137,7 +148,7 @@ public class JadeAgentX extends Agent {
 
 			Thread.sleep(1000);
 			Object[] args = new Object[1];
-			args[0] = product;
+			args[0] = pap;
 
 			getContainerController().createNewAgent("pa" + count++, "rexos.mas.productAgent.ProductAgent", args)
 					.start();

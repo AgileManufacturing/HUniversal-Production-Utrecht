@@ -4,8 +4,10 @@
  * @date Created: 08-04-2013
  * 
  * @author Alexander Streng
+ * @author Mike Schaap
+ * @author Arno Derks
  * 
- *         Copyright ï¿½ 2013, HU University of Applied Sciences Utrecht. All
+ *         Copyright © 2013, HU University of Applied Sciences Utrecht. All
  *         rights reserved.
  * 
  *         Redistribution and use in source and binary forms, with or without
@@ -36,17 +38,19 @@
 
 package rexos.mas.productAgent;
 
-import jade.core.behaviours.CyclicBehaviour;
+import rexos.mas.data.AgentStatus;
+import rexos.mas.data.BehaviourStatus;
+import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 
-public class OverviewBehaviour extends OneShotBehaviour{
+public class OverviewBehaviour extends OneShotBehaviour implements
+		BehaviourCallback {
+
 	private static final long serialVersionUID = 1L;
 	private ProductAgent _productAgent;
-	@SuppressWarnings("unused")
-	private boolean _isDone = false;
+
 	/* Behaviour */
-	@SuppressWarnings("unused")
 	private PlannerBehaviour _plannerBehaviour;
 	private InformerBehaviour _informerBehaviour;
 	private SchedulerBehaviour _schedulerBehaviour;
@@ -54,8 +58,38 @@ public class OverviewBehaviour extends OneShotBehaviour{
 	private SequentialBehaviour _sequentialBehaviour;
 	private SocketBehaviour _socketBehaviour;
 
-	public OverviewBehaviour(){
-		System.out.println("New overview behaviour created.");
+	public OverviewBehaviour(Agent myAgent) {
+		super(myAgent);
+		System.out
+				.println("Overview behaviour created. Starting all behaviours to the agents.");
+	}
+
+	private void initialize() {
+		System.out.println("Creating the SocketBehaviour");
+		//_socketBehaviour = new SocketBehaviour(myAgent, _productAgent
+		//		.getProperties().getCallback());
+
+		System.out.println("Creating the PlannerBehaviour");
+		_plannerBehaviour = new PlannerBehaviour(myAgent, this);
+
+		System.out.println("Creating the InformerBehaviour");
+		_informerBehaviour = new InformerBehaviour(myAgent, this);
+
+		System.out.println("Creating the ScheduleBehaviour");
+		_schedulerBehaviour = new SchedulerBehaviour(myAgent, this);
+
+		System.out.println("Creating the ProductBehaviour");
+		_produceBehaviour = new ProduceBehaviour(myAgent, this);
+
+		System.out.println("Creating the SequentialBehaviour");
+		_sequentialBehaviour = new SequentialBehaviour();
+		// Starting a sequentialBehaviour
+		System.out.println("Add a SequentialBehaviour");
+		_productAgent.addBehaviour(_sequentialBehaviour);
+
+		// Starting the SocketBehaviour, so the agent can communicate with the
+		//System.out.println("Add a SocketBehaviour");
+		//_productAgent.addBehaviour(_socketBehaviour);
 	}
 
 	/*
@@ -64,56 +98,84 @@ public class OverviewBehaviour extends OneShotBehaviour{
 	 * and one where it listens to incoming messages. MIST NOG 1 MOGELIJKHEID!
 	 */
 	@Override
-	public void action(){
-		_productAgent = (ProductAgent) myAgent;
-		System.out.println("Add a SocketBehaviour");
-		//_socketBehaviour = new SocketBehaviour(myAgent, _productAgent.getHost());
-		//_productAgent.addBehaviour(_socketBehaviour);
-		
-		System.out.println("Add a SequentialBehaviour");
-		_sequentialBehaviour = new SequentialBehaviour();
-		_productAgent.addBehaviour(_sequentialBehaviour);
-		
-		System.out.println("Add a PlannerBehaviour");
-		_sequentialBehaviour.addSubBehaviour(new PlannerBehaviour());
-		
-		System.out.println("Add an InformerBehaviour");
-		_informerBehaviour = new InformerBehaviour();
-		_sequentialBehaviour.addSubBehaviour(_informerBehaviour);
-		// we need to wait till all conv. of the informer are done. We don't
-		// want to block, but do want to wait.
-		_sequentialBehaviour.addSubBehaviour(new CyclicBehaviour(){
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void action(){
-				if (_informerBehaviour.isDone()){
-					_sequentialBehaviour.removeSubBehaviour(this);
-				}
-			}
-		});
-		System.out.println("Add a SchedulerBehaviour");
-		
-		//_schedulerBehaviour = new SchedulerBehaviour();
-		//_sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
-		//System.out.println("Add a ProduceBehaviour");
-		// _produceBehaviour = new ProduceBehaviour();
-		// _sequentialBehaviour.addSubBehaviour(_produceBehaviour);
-		//System.out.println("Added all behaviours. And everything should start.");
-		//System.out.println("Add a Scheduler");
-		
-		_schedulerBehaviour = new SchedulerBehaviour();
-		_sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
-
-		
-		
-		//System.out.println("Add a ProduceBehaviour");
-		//_produceBehaviour = new ProduceBehaviour();
-		//_sequentialBehaviour.addSubBehaviour(_produceBehaviour);
+	public void action() {
+		try {
+			_productAgent = (ProductAgent) myAgent;
+			// Initialize all behaviours
+			this.initialize();
+			// Star the planning behaviour. This behaviour will call the
+			// handleCallback function when done,
+			// which in turn create all the other behaviours
+			this.startPlanning();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@SuppressWarnings("static-method")
-	public void reschedule(){
+	public void reschedule() {
 		System.out.println("Rescheduling will be implemented here");
+	}
+
+	public void startPlanning() {
+		_productAgent.setStatus(AgentStatus.PLANNING);
+		System.out.println("Add a PlannerBehaviour");
+		_sequentialBehaviour.addSubBehaviour(_plannerBehaviour);
+	}
+
+	public void startInforming() {
+		_productAgent.setStatus(AgentStatus.INFORMING);
+		System.out.println("Add an InformerBehaviour");
+		_sequentialBehaviour.addSubBehaviour(_informerBehaviour);
+	}
+
+	public void startScheduling() {
+		_productAgent.setStatus(AgentStatus.SCHEDULING);
+		System.out.println("Add a SchedulerBehaviour");
+		_sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
+	}
+
+	public void startProducing() {
+		_productAgent.setStatus(AgentStatus.PRODUCING);
+		System.out.println("Add a ProduceBehaviour");
+		_sequentialBehaviour.addSubBehaviour(_produceBehaviour);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see rexos.mas.productAgent.BehaviourCallback#handleCallback()
+	 */
+	@Override
+	public void handleCallback(BehaviourStatus bs) {
+		// USE behaviourstatus to check if behaviour finished nicely
+		// TODO Auto-generated method stub
+		AgentStatus as = _productAgent.getStatus();
+		switch (as) {
+		case PLANNING:
+			System.out.println("Done planning.");
+			this.startInforming();
+			break;
+		case INFORMING:
+			System.out.println("Done Informing.");
+			this.startScheduling();
+			break;
+		case SCHEDULING:
+			System.out.println("Done scheduling.");
+			this.startProducing();
+			break;
+		case PRODUCING:
+			System.out.println("Done producing.");
+			this.cleanBehaviour();
+			break;
+		default:
+			System.out.println("Unknown status. Status: " + as.toString());
+			break;
+		}
+	}
+
+	public void cleanBehaviour() {
+		System.out.println("Done overview, stopping SocketBehaviour.");
+		//_socketBehaviour.stop();
 	}
 }

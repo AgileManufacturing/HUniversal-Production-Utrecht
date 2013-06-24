@@ -8,7 +8,7 @@
  * 
  * @section LICENSE License: newBSD
  * 
- *          Copyright © 2012, HU University of Applied Sciences Utrecht. All
+ *          Copyright ï¿½ 2012, HU University of Applied Sciences Utrecht. All
  *          rights reserved.
  * 
  *          Redistribution and use in source and binary forms, with or without
@@ -41,6 +41,8 @@
 package rexos.mas.data;
 
 import jade.core.AID;
+import rexos.libraries.log.Logger;
+import java.util.List;
 import rexos.mas.data.sqldatabase.sqliteDatabase;
 
 import com.mongodb.BasicDBObject;
@@ -65,12 +67,9 @@ public class Product{
 		return log;
 	}
 
-	public Product(){
-	}
-
-	public Product(Production production, String aid) throws Exception{
+	public Product(Production production, String aid){
 		if (production == null)
-			throw new Exception("Production can't be null");
+			Logger.log(new Exception("Production can't be null"));
 		setProduction(production);
 		log = new ProductLog(false, true, new sqliteDatabase(aid));
 	}

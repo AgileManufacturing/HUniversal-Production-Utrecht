@@ -77,7 +77,6 @@ import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
-import rexos.mas.data.EquipletCommandEntry;
 import rexos.mas.data.EquipletState;
 import rexos.mas.data.EquipletStateEntry;
 import rexos.mas.data.StepStatusCode;
@@ -397,7 +396,6 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 								ServiceStep serviceStep = new ServiceStep((BasicDBObject) dbObject);
 								StepStatusCode status = serviceStep.getStatus();
 								switch(status) {
-								// TODO add other statuses like ABORTED, SUSPENDED etc
 									case ABORTED:
 										Logger.log("Hardware Agent - serv.Step status set to: %s%n", status);
 										cancelAllStepsForServiceStep(serviceStep.getId(), serviceStep.getStatusData()
