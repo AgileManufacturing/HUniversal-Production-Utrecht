@@ -128,7 +128,7 @@ public class JadeAgentX extends Agent {
 			// stepList.add(stp4);
 
 			Production production = new Production(stepList);
-			Product product = new Product(production, getAID().toString());
+			Product product = new Product(production, getAID());
 
 			/**
 			 * We need to pass an Object[] to the createNewAgent. But we only

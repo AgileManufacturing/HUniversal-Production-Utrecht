@@ -48,6 +48,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
 
 public class ProductLog{
 	private boolean writeToRemote = false;
@@ -87,7 +88,7 @@ public class ProductLog{
 	}
 
 	/**
-	 * @param aid 
+	 * @param aid
 	 * @param statusData
 	 */
 	public void add(AID aid, BasicDBObject statusData){
@@ -95,9 +96,12 @@ public class ProductLog{
 		Iterator i = statusData.toMap().entrySet().iterator(); i.hasNext();){
 			switch(i.getClass().getName()){
 			case "java.lang.String":
-				local.insert(new LogMessage(aid, i.toString()));	
-			break;
-			//TODO: Add other classes. 
+				local.insert(new LogMessage(aid, i.toString()));
+				break;
+			case "com.mongodb.BasicDbObject" :
+				Logger.log(new UnsupportedOperationException(
+						"Not implemented case for "
+								+ i.getClass().getCanonicalName()));
 			default:
 				Logger.log(new UnsupportedOperationException("No log case for "
 						+ i.getClass().getCanonicalName()));

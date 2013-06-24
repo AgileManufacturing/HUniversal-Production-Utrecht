@@ -42,6 +42,7 @@
 
 package rexos.mas.productAgent;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -92,80 +93,6 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	}
 }
 
-// class newProducing extends SequentialBehaviour{
-// private static final long serialVersionUID = 1L;
-// private HashMap<AID, Long> EqAndTs;
-// private ProductionStep productionStep;
-//
-// public newProducing(HashMap<AID, Long> EqAndTs,
-// ProductionStep productionStep){
-// this.EqAndTs = EqAndTs;
-// this.productionStep = productionStep;
-// }
-//
-// @Override
-// public void onStart(){
-// addSubBehaviour(new OneShotBehaviour(){
-// private static final long serialVersionUID = 1L;
-//
-// @Override
-// public void action(){
-// myAgent.addBehaviour(new receiveMsgBehaviour(EqAndTs,
-// productionStep));
-// }
-// });
-// }
-// }
-//
-// class receiveMsgBehaviour extends CyclicBehaviour{
-// private static final long serialVersionUID = 1L;
-// HashMap<AID, Long> eqAndTs;
-// private ProductionStep productionStep;
-//
-// receiveMsgBehaviour(HashMap<AID, Long> eqAndTs,
-// ProductionStep productionStep){
-// this.eqAndTs = eqAndTs;
-// this.productionStep = productionStep;
-// }
-//
-// @Override
-// public void action(){
-// ACLMessage msg = myAgent.receive();
-// if (msg != null){
-// myAgent.addBehaviour(new WaitMsgBehaviour(msg, eqAndTs,
-// productionStep));
-// } else{
-// block();
-// }
-// }
-// }
-//
-// class WaitMsgBehaviour extends OneShotBehaviour{
-// private static final long serialVersionUID = 1L;
-// ProductAgent _productAgent;
-// ACLMessage msg;
-// HashMap<AID, Long> eqAndTs;
-// private ProductionStep productionStep;
-//
-// public WaitMsgBehaviour(ACLMessage msg, HashMap<AID, Long> eqAndTs,
-// ProductionStep productionStep){
-// this.msg = msg;
-// this.eqAndTs = eqAndTs;
-// this.productionStep = productionStep;
-// }
-//
-// @Override
-// public void action(){
-// _productAgent = (ProductAgent) myAgent;
-// SequentialBehaviour seq = new SequentialBehaviour();
-// myAgent.addBehaviour(seq);
-// msg = new ACLMessage(ACLMessage.INFORM);
-// msg.setOntology("StartProduction");
-// productionStep.setStatus(StepStatusCode.IN_PROGRESS);
-// msg.addReceiver(msg.getSender());
-// myAgent.send(msg);
-// }
-// }
 class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour{
 	ProductionStep ProductAgentstp;
 
@@ -229,6 +156,7 @@ class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour{
 						((ProductAgent) myAgent).getProduct()
 								.addStatusDataToLog(msg.getSender(),
 										step.getStatusData());
+					
 						System.out.println("I'm done.");
 						break;
 					default:
