@@ -119,8 +119,8 @@ public class SocketBehaviour extends Behaviour implements HeartbeatReceiver {
 			}
 		} catch (Exception e) {
 			isConnected = false;
-			System.out.println("Agent: " + _agent.getLocalName()
-					+ " is disconnected!");
+			//System.out.println("Agent: " + _agent.getLocalName()
+			//		+ " is disconnected!");
 		}
 	}
 

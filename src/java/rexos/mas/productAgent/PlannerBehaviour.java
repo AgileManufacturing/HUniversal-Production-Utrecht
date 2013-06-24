@@ -77,8 +77,9 @@ public class PlannerBehaviour extends OneShotBehaviour{
 	public int onEnd(){
 		if(this._error != false) {
 			this._bc.handleCallback(BehaviourStatus.COMPLETED);
+		} else {
+			this._bc.handleCallback(BehaviourStatus.ERROR);
 		}
-		this._bc.handleCallback(BehaviourStatus.ERROR);
 		return 0;
 	}
 

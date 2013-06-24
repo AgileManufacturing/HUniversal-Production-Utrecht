@@ -72,11 +72,12 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	}
 	
 	@Override
-	public int onEnd(){
+	public int onEnd() {
 		if(this._error != false) {
 			this._bc.handleCallback(BehaviourStatus.COMPLETED);
+		} else {
+			this._bc.handleCallback(BehaviourStatus.ERROR);
 		}
-		this._bc.handleCallback(BehaviourStatus.ERROR);
 		return 0;
 	}
 
@@ -103,6 +104,7 @@ public class ProduceBehaviour extends OneShotBehaviour{
 		} catch(Exception e){
 			Logger.log(e);
 		}
+		System.out.println("A");
 	}
 }
 
@@ -190,5 +192,6 @@ class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour{
 		} catch(Exception e){
 			Logger.log(e);
 		}
+		System.out.println("B");
 	}
 }

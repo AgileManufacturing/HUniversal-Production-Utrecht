@@ -62,8 +62,8 @@ import jade.lang.acl.UnreadableException;
  * given parameters. If the equipletagent returns with an confirm, the product
  * agent will ask for the duration of the operation ( in timeslots ).
  */
-public class InformerBehaviour extends OneShotBehaviour{
-	
+public class InformerBehaviour extends OneShotBehaviour {
+
 	private static final long serialVersionUID = 1L;
 	private ProductAgent _productAgent;
 	private ParallelBehaviour _par;
@@ -72,86 +72,101 @@ public class InformerBehaviour extends OneShotBehaviour{
 	private ProductionEquipletMapper _prodEQmap;
 	private boolean _isDone;
 	private boolean _error = false;
-	
-	private BehaviourCallback _bc;
 
-	public InformerBehaviour(Agent myAgent, BehaviourCallback bc){
+	private BehaviourCallback _bc;
+	
+	public static boolean isDone = false;
+	public static boolean isError = false;
+
+	public InformerBehaviour(Agent myAgent, BehaviourCallback bc) {
 		super(myAgent);
 		this._bc = bc;
 	}
-	
+
 	@Override
-	public int onEnd(){
+	public int onEnd() {
 		if(this._error != false) {
 			this._bc.handleCallback(BehaviourStatus.COMPLETED);
+		} else {
+			this._bc.handleCallback(BehaviourStatus.ERROR);
 		}
-		this._bc.handleCallback(BehaviourStatus.ERROR);
 		return 0;
 	}
 
 	@Override
-	public void action(){
-		_productAgent = (ProductAgent) myAgent;
-		_product = this._productAgent.getProduct();
-		_production = _product.getProduction();
-		_prodEQmap = new ProductionEquipletMapper();
-		_isDone = false;
-		/*
-		 * We want to have our conversations in parallel. We also only want to
-		 * return when all child conversations are finished. So iterate through
-		 * each step in our productionlist and create a conversation object. (
-		 * as behaviour )
-		 */
-		SequentialBehaviour seq = new SequentialBehaviour();
-		myAgent.addBehaviour(seq);
-		_par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
-		seq.addSubBehaviour(_par);
-		for(ProductionStep stp : _production.getProductionSteps()){
-			if (stp.getStatus() == StepStatusCode.EVALUATING){
-				// adds the step to te new list (the one that will be returned
-				// to the scheduler)
-				_prodEQmap.addProductionStep(stp.getId());
-				ProductionEquipletMapper pem = _production
-						.getProductionEquipletMapping();
-				
-				if(pem != null) {
-					for(AID aid : pem.getEquipletsForProductionStep(stp.getId()).keySet()) {
-						_par.addSubBehaviour(new Conversation(aid, stp, _prodEQmap));
-					}
-				} else {
-					//REPORT ERROR
-				}
-			}
-		}
-		
-		// Lets set our production objects
-		seq.addSubBehaviour(new OneShotBehaviour(){
-			private static final long serialVersionUID = 1L;
+	public void action() {
+		try {
+			_productAgent = (ProductAgent) myAgent;
+			_product = this._productAgent.getProduct();
+			_production = _product.getProduction();
+			_prodEQmap = new ProductionEquipletMapper();
+			_isDone = false;
+			/*
+			 * We want to have our conversations in parallel. We also only want
+			 * to return when all child conversations are finished. So iterate
+			 * through each step in our productionlist and create a conversation
+			 * object. ( as behaviour )
+			 */
+			SequentialBehaviour seq = new SequentialBehaviour();
 
-			@Override
-			public void action(){
-				if (_par.done()){
-					System.out.println("Done informing.");
-					try{
-						_production.setProductionEquipletMapping(_prodEQmap);
-						_product.setProduction(_production);
-						_productAgent.setProduct(_product);
-						_isDone = true;
-					} catch(Exception e){
-						Logger.log(e);
+
+			_par = new ParallelBehaviour(_productAgent, ParallelBehaviour.WHEN_ALL);
+			
+			for (ProductionStep stp : _production.getProductionSteps()) {
+				if (stp.getStatus() == StepStatusCode.EVALUATING) {
+					// adds the step to te new list (the one that will be
+					// returned
+					// to the scheduler)
+					_prodEQmap.addProductionStep(stp.getId());
+					ProductionEquipletMapper pem = _production
+							.getProductionEquipletMapping();
+
+					if (pem != null) {
+						for (AID aid : pem.getEquipletsForProductionStep(
+								stp.getId()).keySet()) {
+							_par.addSubBehaviour(new Conversation(aid, stp,
+									_prodEQmap));
+						}
+					} else {
+						// REPORT ERROR
+						System.out.println("Pem is null");
 					}
-				} else{
-					System.out.println("Not done informing.");
 				}
 			}
-		});
-		
-		while(this._isDone == false) {
-			block();
+			seq.addSubBehaviour(_par);
+
+			// Lets set our production objects
+			seq.addSubBehaviour(new OneShotBehaviour() {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void action() {
+					if (_par.done()) {
+						System.out.println("Done parallel informing.");
+						try {
+							_production
+									.setProductionEquipletMapping(_prodEQmap);
+							_product.setProduction(_production);
+							_productAgent.setProduct(_product);
+							_isDone = true;
+						} catch (Exception e) {
+							Logger.log(e);
+						}
+					} else {
+						System.out.println("Not done informing.");
+					}
+				}
+			}); 
+			
+			myAgent.addBehaviour(seq);
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
-	public boolean isDone(){
+	public boolean isDone() {
 		return this._isDone;
 	}
 
@@ -163,7 +178,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 	 * the response was a CONFIRM, ask about the duration. 4- waits for the
 	 * response ( handles a 10 sec timeout ).
 	 */
-	private class Conversation extends SequentialBehaviour{
+	private class Conversation extends SequentialBehaviour {
 		/**
 		 * 
 		 */
@@ -174,7 +189,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 		private ProductionEquipletMapper _prodEQmap;
 
 		public Conversation(AID aid, ProductionStep productionStep,
-				ProductionEquipletMapper pem){
+				ProductionEquipletMapper pem) {
 			this._aid = aid;
 			this._productionStep = productionStep;
 			this._prodEQmap = pem;
@@ -182,62 +197,65 @@ public class InformerBehaviour extends OneShotBehaviour{
 
 		/*
 		 * (non-Javadoc)
+		 * 
 		 * @see jade.core.behaviours.Behaviour#onStart() starts the conversation
 		 */
 		@Override
-		public void onStart(){
+		public void onStart() {
 			final String ConversationId = _productAgent.generateCID();
 			this._productionStep.setConversationId(ConversationId);
 			final MessageTemplate msgtemplate = MessageTemplate
 					.MatchConversationId(ConversationId);
 			// 1 - Inform if the equiplet can perform the step with the given
 			// parameters
-			addSubBehaviour(new OneShotBehaviour(){
+			addSubBehaviour(new OneShotBehaviour() {
 				/**
 				 * 
 				 */
 				private static final long serialVersionUID = 1L;
 
 				@Override
-				public void action(){
-					try{
+				public void action() {
+					try {
 						ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 						message.setConversationId(ConversationId);
 						message.addReceiver(_aid);
 						message.setOntology("CanPerformStep");
 						message.setContentObject(_productionStep);
 						_productAgent.send(message);
-						if (debug){
+						if (debug) {
 							System.out.println("Querying: "
 									+ _aid.getLocalName()
 									+ " if he can perform step: "
 									+ _productionStep.getId());
 						}
-					} catch(Exception e){
+					} catch (Exception e) {
 						Logger.log(e);
+						isError = true;
 					}
 				}
 			});
 			// 2 - wait for an response. ( handles a 10 sec timeout )
-			addSubBehaviour(new ReceiveBehaviour(myAgent, 10000, msgtemplate){
+			addSubBehaviour(new ReceiveBehaviour(myAgent, 10000, msgtemplate) {
 				/**
 				 * 
 				 */
 				private static final long serialVersionUID = 1L;
 
 				@Override
-				public void handle(ACLMessage msg){
-					if (msg == null){
-						if (debug){
+				public void handle(ACLMessage msg) {
+					if (msg == null) {
+						if (debug) {
 							System.out.println("Productagent "
 									+ myAgent.getLocalName()
 									+ " TIMED OUT on waiting for "
 									+ _aid.getLocalName() + " CanPerformStep: "
 									+ _productionStep.getId());
 						}
-					} else{
-						if (msg.getPerformative() == ACLMessage.CONFIRM){
-							if (debug){
+						isError = true;
+					} else {
+						if (msg.getPerformative() == ACLMessage.CONFIRM) {
+							if (debug) {
 								System.out.println("Received CONFIRM from: "
 										+ _aid.getLocalName()
 										+ ". He can perform step: "
@@ -245,15 +263,15 @@ public class InformerBehaviour extends OneShotBehaviour{
 							}
 							// 3 - if the response was a CONFIRM, ask about the
 							// duration.
-							addSubBehaviour(new OneShotBehaviour(){
+							addSubBehaviour(new OneShotBehaviour() {
 								/**
 								 * 
 								 */
 								private static final long serialVersionUID = 1L;
 
 								@Override
-								public void action(){
-									try{
+								public void action() {
+									try {
 										ACLMessage message = new ACLMessage(
 												ACLMessage.REQUEST);
 										message.setConversationId(ConversationId);
@@ -261,7 +279,7 @@ public class InformerBehaviour extends OneShotBehaviour{
 										message.setOntology("GetProductionDuration");
 										message.setContentObject(_productionStep);
 										_productAgent.send(message);
-										if (debug){
+										if (debug) {
 											System.out
 													.println("Querying: "
 															+ _aid.getLocalName()
@@ -269,25 +287,25 @@ public class InformerBehaviour extends OneShotBehaviour{
 															+ _productionStep
 																	.getId());
 										}
-									} catch(Exception e){
+									} catch (Exception e) {
 										Logger.log(e);
+										isError = true;
 									}
 								}
 							});
 							// 4- waits for the response ( handles a 10 sec
 							// timeout ).
 							addSubBehaviour(new ReceiveBehaviour(myAgent,
-									10000, msgtemplate){
+									10000, msgtemplate) {
 								/**
 										 * 
 										 */
 								private static final long serialVersionUID = 1L;
 
 								@Override
-								public void handle(
-										ACLMessage msg){
-									if (msg == null){
-										if (debug){
+								public void handle(ACLMessage msg) {
+									if (msg == null) {
+										if (debug) {
 											System.out
 													.println("Productagent "
 															+ myAgent
@@ -298,12 +316,12 @@ public class InformerBehaviour extends OneShotBehaviour{
 															+ _productionStep
 																	.getId());
 										}
-									} else{
-										try{
-											if (msg.getPerformative() == ACLMessage.INFORM){
+									} else {
+										try {
+											if (msg.getPerformative() == ACLMessage.INFORM) {
 												long timeSlots = (Long) msg
 														.getContentObject();
-												if (debug){
+												if (debug) {
 													System.out
 															.println("Received INFORM from: "
 																	+ _aid.getLocalName()
@@ -322,23 +340,26 @@ public class InformerBehaviour extends OneShotBehaviour{
 																_productionStep
 																		.getId(),
 																_aid, timeSlots);
+												isDone = true;
 											}
-										} catch(UnreadableException e){
+										} catch (UnreadableException e) {
 											System.out
 													.println("Error on receiving timeslots from: "
 															+ _aid.getLocalName()
 															+ " " + e);
+											isError = true;
 										}
 									}
 								}
 							});
-						} else{
-							if (debug){
+						} else {
+							if (debug) {
 								System.out.println("Received DISCONFIRM from: "
 										+ _aid.getLocalName()
 										+ ". It cant perform step: "
 										+ _productionStep.getId());
 							}
+							isError = true;
 						}
 					}
 				}

@@ -79,7 +79,7 @@ public class JadeAgentX extends Agent {
 	@Override
 	protected void setup() {
 		try {
-			Logger.log("starting a agent");
+			Logger.log("starting an agent");
 
 			/**
 			 * Make a new logistics agent
@@ -102,7 +102,7 @@ public class JadeAgentX extends Agent {
 			Object[] ar = new Object[] {
 				logisticsAID
 			};
-			getContainerController().createNewAgent("EQ1", "rexos.mas.equiplet_agent.EquipletAgent", ar).start();
+			//getContainerController().createNewAgent("EQ1", "rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 
 			/**
 			 * Lets make a parameter list
