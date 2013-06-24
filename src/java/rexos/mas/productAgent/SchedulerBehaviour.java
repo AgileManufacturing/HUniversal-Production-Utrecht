@@ -91,7 +91,7 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 											.getProductionEquipletMapping()
 											.getEquipletsForProductionStep(
 													PA_id).keySet().toArray()[0])
-							.intValue();
+															.intValue();
 				}
 				
 				Scheduler(production.getProductionEquipletMapping()
@@ -158,7 +158,6 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 			
 			schedules = new Schedule[scheduleCount];
 			
-			
 			// Gets planned steps
 			List<DBObject> plannedSteps =
 								bbc.findDocuments(QueryBuilder.start("scheduleData.startTime").greaterThan(-1).get());
@@ -187,7 +186,6 @@ public class SchedulerBehaviour extends OneShotBehaviour{
 							freetimeslot.add(new FreeTimeSlot(
 									timeslotToSchedule, freeTimeSlot,
 									schedules[run].getEquipletName()));
-							
 						}
 					}
 				}
