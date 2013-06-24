@@ -84,11 +84,12 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 	}
 	
 	@Override
-	public int onEnd(){
+	public int onEnd() {
 		if(this._error != false) {
 			this._bc.handleCallback(BehaviourStatus.COMPLETED);
+		} else {
+			this._bc.handleCallback(BehaviourStatus.ERROR);
 		}
-		this._bc.handleCallback(BehaviourStatus.ERROR);
 		return 0;
 	}
 
@@ -131,6 +132,7 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 		} catch (Exception e) {
 			Logger.log(e);
 		}
+		System.out.println("Done Scheduling");
 	}
 
 	/**
@@ -205,33 +207,33 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 
 			int startTimeSlot = 0;
 			// check within every schedule of the 'schedules' array for free
-			// timeslots
-			// and add them to the 'freetimeslot' array
-			for (int run = 0; run < schedules.length; run++) {
-				if (schedules[run].getStartTime() > startTimeSlot) {
-					if (schedules.length > (run + 1)) {
-						if (schedules[run].getDeadline() < schedules[(run + 1)]
-								.getStartTime()) {
-							int freeTimeSlot = schedules[(run + 1)]
-									.getStartTime()
-									- schedules[run].getDeadline() - 1;
-							int timeslotToSchedule = (schedules[run]
-									.getDeadline() + 1);
-							freetimeslot.add(new FreeTimeSlot(
-									timeslotToSchedule, freeTimeSlot,
-									schedules[run].getEquipletName()));
-							if (debug != 0) {
-								// debug
-								System.out.println("Free timeslot: "
-										+ freeTimeSlot
-										+ " starting at timeslot: "
-										+ timeslotToSchedule);
+			// timeslots and add them to the 'freetimeslot' array
+			if(schedules.length > 0){
+				for (int run = 0; run < schedules.length; run++) {
+					if (schedules[run].getStartTime() > startTimeSlot) {
+						if (schedules.length > (run + 1)) {
+							if (schedules[run].getDeadline() < schedules[(run + 1)]
+									.getStartTime()) {
+								int freeTimeSlot = schedules[(run + 1)]
+										.getStartTime()
+										- schedules[run].getDeadline() - 1;
+								int timeslotToSchedule = (schedules[run]
+										.getDeadline() + 1);
+								freetimeslot.add(new FreeTimeSlot(
+										timeslotToSchedule, freeTimeSlot,
+										schedules[run].getEquipletName()));
+								if (debug != 0) {
+									// debug
+									System.out.println("Free timeslot: "
+											+ freeTimeSlot
+											+ " starting at timeslot: "
+											+ timeslotToSchedule);
+								}
 							}
 						}
 					}
 				}
-			}
-			if (schedules.length == 0) {
+			}else{
 				freetimeslot.add(new FreeTimeSlot((int) (System
 						.currentTimeMillis() / 2000 + 5), productionstep
 						.getRequiredTimeSlots(), pairs.getKey()));
@@ -275,9 +277,10 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			@Override
 			public void handle(ACLMessage msg) {
 				if (msg == null) {
-					System.out.println("Null message");
+					System.out.println("Null message - Scheduler");
 				} else {
 					//TODO:: Scheduler is done. Make a nice ending pls
+					System.out.println("Scheduled");
 				}
 			}
 		});
