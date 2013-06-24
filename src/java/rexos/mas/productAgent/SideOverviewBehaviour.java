@@ -63,7 +63,7 @@ public class SideOverviewBehaviour extends CyclicBehaviour{
 					OneShotBehaviour rescheduleAndRemoveEquiplet = new OneShotBehaviour(){
 						@Override
 						public void action(){
-							pa.rescheduleAndRemoveEquiplet();
+							//pa.rescheduleAndRemoveEquiplet();
 						}
 					};
 					break;

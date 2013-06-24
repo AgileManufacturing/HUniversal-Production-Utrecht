@@ -42,50 +42,44 @@
 package rexos.mas.productAgent;
 
 import jade.core.AID;
+import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 
+import rexos.mas.data.BehaviourStatus;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.StepStatusCode;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
-import rexos.libraries.blackboard_client.GeneralMongoException;
-import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
-import rexos.libraries.blackboard_client.InvalidJSONException;
-import rexos.libraries.log.Logger;
 
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
 public class PlannerBehaviour extends OneShotBehaviour{
+	
 	private static final long serialVersionUID = 1L;
 	private ProductAgent _productAgent;
+	private BehaviourCallback _bc;
+	
+	private boolean _error = false;
 
-	public void plannerBehaviour(){
+	public PlannerBehaviour(Agent myAgent, BehaviourCallback bc){
+		super(myAgent);
+		this._bc = bc;
 	}
 
 	@Override
 	public int onEnd(){
-		return 0;
-	}
-
-	public static void removeEquiplet(AID aid){
-		try{
-		BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
-		// try to remove the given 'aid' from the blackboard (for testing
-		// purposes only, this funtion will later be called upon from the
-		// Equiplet agent code)
-		
-			bbc.removeDocuments(aid.toString());
-		} catch (UnknownHostException | GeneralMongoException | InvalidJSONException | InvalidDBNamespaceException e1) {
-			Logger.log(e1);
+		if(this._error != false) {
+			this._bc.handleCallback(BehaviourStatus.COMPLETED);
 		}
+		this._bc.handleCallback(BehaviourStatus.ERROR);
+		return 0;
 	}
 
 	@Override
@@ -118,6 +112,8 @@ public class PlannerBehaviour extends OneShotBehaviour{
 						prodEQmap.addEquipletToProductionStep(PA_id, new AID(
 								name, AID.ISLOCALNAME));
 					}
+				} else {
+					//TODO: Prodstep SHOULD be in evaluatin at this point. If it isn't throw big error!
 				}
 			}
 			production.setProductionEquipletMapping(prodEQmap);
