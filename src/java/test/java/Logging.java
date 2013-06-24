@@ -42,51 +42,16 @@ package test.java;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import jade.core.AID;
-import jade.core.Agent;
-import jade.wrapper.AgentController;
-import jade.wrapper.StaleProxyException;
-import rexos.mas.hardware_agent.behaviours.CheckForModules;
-import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
-import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
-import rexos.mas.hardware_agent.behaviours.ServiceAgentDied;
 import rexos.mas.hardware_agent.*;
-import rexos.libraries.blackboard_client.BasicOperationSubscription;
-import rexos.libraries.blackboard_client.BlackboardClient;
-import rexos.libraries.blackboard_client.BlackboardSubscriber;
-import rexos.libraries.blackboard_client.FieldUpdateSubscription;
-import rexos.libraries.blackboard_client.FieldUpdateSubscription.MongoUpdateLogOperation;
-import rexos.libraries.blackboard_client.GeneralMongoException;
-import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
-import rexos.libraries.blackboard_client.MongoOperation;
-import rexos.libraries.blackboard_client.OplogEntry;
-import rexos.libraries.knowledgedb_client.KeyNotFoundException;
-import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
-import rexos.libraries.knowledgedb_client.KnowledgeException;
-import rexos.libraries.knowledgedb_client.Queries;
-import rexos.libraries.knowledgedb_client.Row;
-import rexos.libraries.log.Logger;
-import rexos.mas.data.DbData;
 import rexos.mas.data.StepStatusCode;
-import rexos.mas.service_agent.ServiceStep;
-
-import org.bson.types.ObjectId;
 import org.junit.Test;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-
-import rexos.mas.data.Part;
 import rexos.mas.data.Position;
 import rexos.mas.data.Product;
-import rexos.mas.data.ProductLog;
-import rexos.mas.data.ProductStep;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
-import rexos.mas.data.ScheduleData;
-import rexos.mas.hardware_agent.HardwareAgent;;
 
 
 
