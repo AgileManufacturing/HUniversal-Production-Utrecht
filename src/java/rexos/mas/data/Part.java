@@ -158,13 +158,11 @@ public class Part implements Serializable, MongoSaveable {
 		BasicDBObject copy = (BasicDBObject) object.copy();
 		try {
 			type = (int) copy.remove("type");
-			if(copy.containsField("id")) {
-				id = (int) copy.remove("id");
-			}
+			id = (int) copy.remove("id");
 			if(!copy.isEmpty()){
 				throw new IllegalArgumentException();
 			}
-		} catch(Exception e) {
+		} catch(ClassCastException | NullPointerException e) {
 			throw new IllegalArgumentException();
 		}
 	}

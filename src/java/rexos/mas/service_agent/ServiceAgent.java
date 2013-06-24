@@ -58,6 +58,7 @@ import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
 import rexos.mas.data.ProductStep;
+import rexos.mas.data.StateEntry;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.service_agent.behaviours.CanDoProductStep;
 import rexos.mas.service_agent.behaviours.GetProductStepDuration;
@@ -96,6 +97,12 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 */
 	private BlackboardClient serviceStepBBClient;
 
+	/**
+	 * @var BlackboardClient stateBBClient
+	 * 		The BlackboardClient used to interact with the state blackboard.
+	 */
+	private BlackboardClient stateBBClient;
+	
 	/**
 	 * @var FieldUpdateSubscription statusSubscription
 	 *      The subscription object used to subscribe this agent on a blackboard
@@ -189,6 +196,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			// Needs to react on status changes
 			serviceStepBBClient.subscribe(statusSubscription);
 			serviceStepBBClient.removeDocuments(new BasicDBObject());
+			
+			stateBBClient = new BlackboardClient("145.89.191.131", 27017);
+			stateBBClient.setDatabase("StateBlackboard");
+			stateBBClient.setCollection("EquipletCommands");
 		} catch(UnknownHostException | GeneralMongoException | InvalidDBNamespaceException e) {
 			Logger.log(e);
 			doDelete();
@@ -336,6 +347,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 											new BasicDBObject("_id", serviceSteps[0].getId()),
 											new BasicDBObject("$set", new BasicDBObject("status", status.name())
 													.append("statusData", productionStep.getStatusData())));
+									
+									StateEntry stateEntry = new StateEntry(dbData.getName(), StateEntry.State.NORMAL);
+									stateBBClient.insertDocument(stateEntry.toBasicDBObject());
+									
 									break;
 								case ABORTED:
 									Logger.log("Service agent - prod.Step %s status set to %s%n",
@@ -419,6 +434,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 											new BasicDBObject("_id", productStepId),
 											new BasicDBObject("$set", new BasicDBObject("status", status.name())
 													.append("statusData", log)));
+									
+									StateEntry stateEntry = new StateEntry(dbData.getName(), StateEntry.State.STANDBY);
+									stateBBClient.insertDocument(stateEntry.toBasicDBObject());
+									
 									break;
 								case IN_PROGRESS:
 								case SUSPENDED_OR_WARNING:

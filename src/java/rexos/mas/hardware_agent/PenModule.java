@@ -63,7 +63,7 @@ public class PenModule extends Module {
 	 * @var int PEN_OFFSET
 	 *      A static value that contains the offset of the pen in relation to the movement module.
 	 */
-	private static final int PEN_OFFSET = 4;
+	private static final int PEN_OFFSET = 20;
 
 	/**
 	 * @var double PEN_SIZE
