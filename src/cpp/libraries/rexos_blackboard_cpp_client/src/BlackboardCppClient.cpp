@@ -175,14 +175,18 @@ int BlackboardCppClient::findDocuments(std::string queryAsJSON, std::vector<mong
 }
 
 
-int BlackboardCppClient::updateDocuments(std::string queryAsJSON, std::string updateQueryAsJSON, mongo::BSONObj * result_out) {
+int BlackboardCppClient::updateDocuments(
+		std::string queryAsJSON,
+		std::string updateQueryAsJSON,
+		mongo::BSONObj * result_out,
+		bool updateMultiple) {
 	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
 	std::string dbNamespace = database;
 	dbNamespace.append(".");
 	dbNamespace.append(collection);
 	mongo::Query query(mongo::fromjson(queryAsJSON));
 	mongo::BSONObj updateQuery = mongo::fromjson(updateQueryAsJSON);
-	(*connection)->update(dbNamespace, query, updateQuery, false, true);
+	(*connection)->update(dbNamespace, query, updateQuery, false, updateMultiple);
 
 	mongo::BSONObj result = (*connection)->getLastErrorDetailed(dbNamespace);
 	if (result_out != NULL) {

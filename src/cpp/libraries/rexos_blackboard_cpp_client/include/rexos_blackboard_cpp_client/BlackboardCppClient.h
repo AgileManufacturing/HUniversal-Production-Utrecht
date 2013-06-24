@@ -148,12 +148,19 @@ public:
 	 * @param queryAsJSON The query used to determine which documents should be updated.
 	 * @param updateQueryAsJSON The query that is used to update the matching documents.
 	 * @param result_out Pointer to a mongo::BSONObj buffer where the result will be stored.
+	 * @param updateMultiple Controls whether one or all all document(s) matching the search query will be updated.
+	 * When set to true, $set or $unset operators must be used within the updateQuery. It is not allowed to do a replace in this case.
+	 *
 	 *
 	 * @return The amount of documents that have been updated.
 	 * A return value of 0 can indicate either that no documents match the query, or that an error has occurred.
 	 * To find out if an error has occured, check the ok field in the result object. This will be set to 0 in case of errors.
 	 */
-	int updateDocuments(std::string queryAsJSON, std::string updateQueryAsJSON, mongo::BSONObj * result_out = NULL);
+	int updateDocuments(
+			std::string queryAsJSON,
+			std::string updateQueryAsJSON,
+			mongo::BSONObj * result_out = NULL,
+			bool updateMultiple = true);
 
 private:
 	/**
