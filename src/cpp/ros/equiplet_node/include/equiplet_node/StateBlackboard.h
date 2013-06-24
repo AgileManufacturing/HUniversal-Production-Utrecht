@@ -1,8 +1,8 @@
 /**
  * @file States.h
  * @brief States for  in module
- * @date Created: 2013-17-03
- *
+ * @date Created: 2013-21-03
+ * StateBlackboard
  * @author Gerben Boot & Joris Vergeer
  *
  * @section LICENSE
@@ -26,25 +26,12 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
+#pragma once
 
-#ifndef STATES_H
-#define STATES_H
+namespace equiplet_node{
 
-#define STATE_COUNT 7
+	const char* STATE_BLACKBOARD = "StateBlackboard";
 
-namespace rexos_statemachine{
-	/**
-	 * @ enum State
-	 * The enumeration for the states
-	 **/
-	typedef enum { STATE_SAFE = 0, STATE_SETUP = 1, STATE_SHUTDOWN = 2, STATE_STANDBY = 3, STATE_START = 4, STATE_STOP = 5, STATE_NORMAL = 6, STATE_NOSTATE = 7 } State;
-
-	/**
-	 * @var const char* const state_txt[]
-	 * The representation of the states in a char array so its easy to print the enum values instead of the integer
-	 **/
-	const char* const state_txt[] = { "Safe", "Setup", "Shutdown", "Standby", "Start", "Stop", "Normal", "no state" };
-
-	const char is_transition_state[] = { 0, 1, 1, 0, 1, 1, 0, 0 };
+	const char* COLLECTION_EQUIPLET_STATE = "equipletState";
+	const char* COLLECTION_EQUIPLET_COMMANDS = "equipletCommands";
 }
-#endif

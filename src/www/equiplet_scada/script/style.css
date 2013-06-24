@@ -1,0 +1,45 @@
+body {
+	background-color: silver;
+	font-family: sans-serif;
+}
+
+.border {
+    border:1px solid red;
+}
+
+.hidden {
+	display:none;
+}
+
+.moduleinfo {
+	border:1px solid black;
+	margin: 2px;
+	padding: 2px;
+	display: inline-block;
+}
+
+#container {
+	margin-left: auto;
+	margin-right: auto;
+	background-color: white;
+	width: 900px;
+}
+
+#header {
+	width: 898px;
+}
+
+#content {
+	width: 698px;
+	float: left;
+}
+
+#sidebar {
+	width: 198px;
+	float: right;	
+}
+
+#footer {
+	clear: both;
+	width: 898px;
+}

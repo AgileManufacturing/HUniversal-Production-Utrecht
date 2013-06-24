@@ -65,6 +65,17 @@ void ModuleProxy::changeMode(rexos_statemachine::Mode mode) {
 	changeModeActionClient.sendGoal(goal);
 }
 
+bool ModuleProxy::setModuleInstruction(){
+	changeState(rexos_statemachine::STATE_NORMAL);
+	changeStateActionClient.waitForResult();
+	if (changeStateActionClient.getState() != actionlib::SimpleClientGoalState::SUCCEEDED)
+		return false;
+
+	//set instruction data
+
+	changeState(rexos_statemachine::STATE_STANDBY);
+}
+
 bool ModuleProxy::onStateChangeServiceCallback(StateUpdateRequest &req, StateUpdateResponse &res){
 	//ROS_INFO("ModuleProxy of %s received state change to %s", moduleNodeName.c_str(), rexos_statemachine::state_txt[currentState]);
 

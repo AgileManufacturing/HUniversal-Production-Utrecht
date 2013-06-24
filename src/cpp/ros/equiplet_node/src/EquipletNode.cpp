@@ -36,6 +36,9 @@
 #include "rexos_utilities/Utilities.h"
 #include <rexos_statemachine/ChangeStateAction.h>
 #include <rexos_statemachine/ChangeModeAction.h>
+#include "equiplet_node/StateBlackboard.h"
+
+#include <libjson/libjson.h>
 
 using namespace equiplet_node;
 
@@ -54,9 +57,13 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 			rexos_statemachine::MODE_STEP}
 		),
 		moduleRegistry(nameFromId(id), id),
-		scada(this, &moduleRegistry),
+        scada(this, &moduleRegistry),
+		changeStateActionClient(nh, nameFromId(id) + "/change_state"),
+		changeModeActionClient(nh, nameFromId(id) + "/change_mode"),
 		equipletId(id),
-		blackboardClient(NULL) {
+		equipletStepBlackboardClient(NULL),
+		equipletCommandBlackboardClient(NULL) 
+	{
 
 	if (mostDatabaseclient.getAllModuleData().size() > 0) {
 		ROS_WARN("Previous equiplet instance did not cleanup correctly");
@@ -64,14 +71,15 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 	mostDatabaseclient.clearModuleData();
 	mostDatabaseclient.setSafetyState(rexos_statemachine::STATE_SAFE);
 
-//	moduleUpdateServiceServer = nh.advertiseService(
-//			"/most/equiplet/moduleUpdate", &EquipletNode::moduleUpdateService,
-//			this);
+	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "test", "equipletStepBB");
+	equipletStepSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
+	equipletStepBlackboardClient->subscribe(*equipletStepSubscription);
 
-	blackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "test", "equipletStepBB");
-	Blackboard::BasicOperationSubscription * sub = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
-	subscriptions.push_back(sub);
-	blackboardClient->subscribe(*sub);
+	equipletCommandBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_COMMANDS);
+	equipletCommandSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
+	equipletCommandBlackboardClient->subscribe(*equipletCommandSubscription);
+
+	equipletStateBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_STATE);
 
 	moduleRegistry.setNewRegistrationsAllowed(true);
 	moduleRegistry.setModuleRegistryListener(this);
@@ -85,11 +93,11 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
  * Destructor for the EquipletNode
  **/
 EquipletNode::~EquipletNode(){
-	delete blackboardClient;
-	for (std::vector<Blackboard::BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
-		delete *iter;
-	}
-	subscriptions.clear();
+	delete equipletStepBlackboardClient;
+	delete equipletStepSubscription;
+	equipletCommandBlackboardClient->unsubscribe(*equipletCommandSubscription);
+	delete equipletCommandBlackboardClient;
+	delete equipletCommandSubscription;
 }
 
 /**
@@ -100,52 +108,71 @@ EquipletNode::~EquipletNode(){
  * @param json The message parsed in the json format
  **/
 void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) {
-        //lets parse a root node from the bb msg.
-JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
-std::cout << n.write() << std::endl;
-    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
-    
-    std::cout << "Step completed." << std::endl;
-    
-    std::cout << "id " << step->getId() << std::endl;
-    std::cout << "moduleId " << step->getModuleId() << std::endl;
-    std::cout << "nextStep " << step->getNextStep() << std::endl;
-    std::cout << "serviceStep Id " << step->getServiceStepID() << std::endl;
-    std::cout << "status " << step->getStatus() << std::endl;
-    
-    std::cout << "InstructData: command " << step->getInstructionData().getCommand() << std::endl;
-    std::cout << "InstructData: dest " << step->getInstructionData().getDestination() << std::endl;
-    std::cout << "InstructData: lookup " << step->getInstructionData().getLook_up() << std::endl;
-    
-    std::cout << "InstructData: LookupParams " << step->getInstructionData().getDestination() << std::endl;
-    for( map<string, string>::iterator ii=step->getInstructionData().getLook_up_parameters().begin(); ii!=step->getInstructionData().getLook_up_parameters().end(); ++ii)
-    {
-        cout << (*ii).first << ": " << (*ii).second << endl;
-    }
-    
-    std::cout << "InstructData: payload " << step->getInstructionData().getDestination() << std::endl;
-    for( map<string, string>::iterator ii=step->getInstructionData().getPayload().begin(); ii!=step->getInstructionData().getPayload().end(); ++ii)
-    {
-        cout << (*ii).first << ": " << (*ii).second << endl;
-    }
-/*std::cout << "processMessage" << std::endl;
-JSONNode message = n["message"];
-//JSONNode::const_iterator messageIt;
-std::string destination = message["destination"].as_string();
-//std::cout << "Destination " << destination << std::endl;
+	if(&subscription == equipletStepSubscription)
+	{
 
-std::string command = message["command"].as_string();
-//std::cout << "Command " << command << std::endl;
+	        //lets parse a root node from the bb msg.
+	JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
+	std::cout << n.write() << std::endl;
+	    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
+	    
+	    std::cout << "Step completed." << std::endl;
+	    
+	    std::cout << "id " << step->getId() << std::endl;
+	    std::cout << "moduleId " << step->getModuleId() << std::endl;
+	    std::cout << "nextStep " << step->getNextStep() << std::endl;
+	    std::cout << "serviceStep Id " << step->getServiceStepID() << std::endl;
+	    std::cout << "status " << step->getStatus() << std::endl;
+	    
+	    std::cout << "InstructData: command " << step->getInstructionData().getCommand() << std::endl;
+	    std::cout << "InstructData: dest " << step->getInstructionData().getDestination() << std::endl;
+	    std::cout << "InstructData: lookup " << step->getInstructionData().getLook_up() << std::endl;
+	    
+	    std::cout << "InstructData: LookupParams " << step->getInstructionData().getDestination() << std::endl;
+	    for( map<string, string>::iterator ii=step->getInstructionData().getLook_up_parameters().begin(); ii!=step->getInstructionData().getLook_up_parameters().end(); ++ii)
+	    {
+	        cout << (*ii).first << ": " << (*ii).second << endl;
+	    }
+	    
+	    std::cout << "InstructData: payload " << step->getInstructionData().getDestination() << std::endl;
+	    for( map<string, string>::iterator ii=step->getInstructionData().getPayload().begin(); ii!=step->getInstructionData().getPayload().end(); ++ii)
+	    {
+	        cout << (*ii).first << ": " << (*ii).second << endl;
+	    }
+	/*std::cout << "processMessage" << std::endl;
+	JSONNode message = n["message"];
+	//JSONNode::const_iterator messageIt;
+	std::string destination = message["destination"].as_string();
+	//std::cout << "Destination " << destination << std::endl;
 
-std::string payload = message["payload"].write();
-std::cout << "Payload " << payload << std::endl;
+	std::string command = message["command"].as_string();
+	//std::cout << "Command " << command << std::endl;
 
-// Create the string for the service to call
-std::stringstream ss;
-ss << destination;
-ss << "/";
-ss << command;
-std::cout << ss.str() << std::endl; */
+	std::string payload = message["payload"].write();
+	std::cout << "Payload " << payload << std::endl;
+
+	// Create the string for the service to call
+	std::stringstream ss;
+	ss << destination;
+	ss << "/";
+	ss << command;
+	std::cout << ss.str() << std::endl; */
+	}
+	else if(&subscription == equipletCommandSubscription)
+	{
+		JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
+		JSONNode::const_iterator i = n.begin();
+
+        while (i != n.end()){
+            const char * node_name = i -> name().c_str();
+            if (strcmp(node_name, "desiredState") == 0){
+                changeState((rexos_statemachine::State) atoi(i -> as_string().c_str()));
+            }else if (strcmp(node_name, "desiredMode") == 0){
+                changeMode((rexos_statemachine::Mode) atoi(i -> as_string().c_str()));
+            }
+            i++;
+        }
+	}
 }
 
 std::string EquipletNode::getName() {
@@ -179,20 +206,29 @@ void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupI
 	}
 }
 
-bool EquipletNode::changeModuleState(int moduleID,rexos_statemachine::State state){
-	ModuleProxy* moduleProxy = moduleRegistry.getModule(moduleID);
-	if(moduleProxy != NULL)
-	{
-		moduleProxy->changeState(state);
-	}
-	return true;
+void EquipletNode::updateEquipletStateOnBlackboard(){
+	JSONNode jsonUpdateQuery;
+	jsonUpdateQuery.push_back(JSONNode("id",equipletId));
+
+//	JSONNode body;
+//	body.push_back(JSONNode("state",getCurrentState()));
+//	body.push_back(JSONNode("mode",getCurrentMode()));
+//	JSONNode jsonSet;
+//	//jsonSet.push_back(JSONNode("$set",body.write()));
+
+	std::ostringstream stringStream;
+	stringStream << "{$set: { state: " << getCurrentState() << ",mode: " << getCurrentMode() << "}}";
+
+	equipletStateBlackboardClient->updateDocuments(jsonUpdateQuery.write().c_str(),stringStream.str());
 }
 
 void EquipletNode::onStateChanged(){
-
+	updateEquipletStateOnBlackboard();
 }
 	
 void EquipletNode::onModeChanged(){
+	updateEquipletStateOnBlackboard();
+	
 	bool changeModuleModes = false;
 
 	rexos_statemachine::Mode currentMode = getCurrentMode();
@@ -212,68 +248,14 @@ void EquipletNode::onModeChanged(){
 	}
 }
 
-void EquipletNode::transitionSetup(rexos_statemachine::TransitionActionServer* as) {
-	setupTransitionActionServer = as;
-
-	moduleRegistry.setNewRegistrationsAllowed(false);
-
-	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
-	for (int i = 0; i < modules.size(); i++) {
-		modules[i]->changeState(rexos_statemachine::STATE_STANDBY);
-	}
-}
-
-void EquipletNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as) {
-	shutdownTransitionActionServer = as;
-
-	moduleRegistry.setNewRegistrationsAllowed(true);
-
-	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
-	for (int i = 0; i < modules.size(); i++) {
-		modules[i]->changeState(rexos_statemachine::STATE_SAFE);
-	}
-}
-
-void EquipletNode::transitionStart(rexos_statemachine::TransitionActionServer* as) {
-	as->setSucceeded();
-}
-
-void EquipletNode::transitionStop(rexos_statemachine::TransitionActionServer* as) {
-	as->setSucceeded();
-}
-
 void EquipletNode::onModuleStateChanged(
 	ModuleProxy* moduleProxy,
 	rexos_statemachine::State newState, 
 	rexos_statemachine::State previousState)
 {
 	//ROS_INFO("EquipletNode received from %s a state change from %d to %d",moduleProxy->getModuleNodeName(),previousState,newState);
-
-	if(getCurrentState() == rexos_statemachine::STATE_SETUP)
-	{
-		bool allModulesStandby = true;
-
-		std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
-		for (int i = 0; i < modules.size(); i++) {
-			if(modules[i]->getCurrentState() != rexos_statemachine::STATE_STANDBY)
-				allModulesStandby = false;
-		}
-
-		if(allModulesStandby)
-			setupTransitionActionServer->setSucceeded();
-	}else if(getCurrentState() == rexos_statemachine::STATE_SHUTDOWN)
-	{
-		bool allModulesSafe = true;
-
-		std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
-		for (int i = 0; i < modules.size(); i++) {
-			if(modules[i]->getCurrentState() != rexos_statemachine::STATE_SAFE)
-				allModulesSafe = false;
-		}
-
-		if(allModulesSafe)
-			shutdownTransitionActionServer->setSucceeded();
-	}
+	if(rexos_statemachine::is_transition_state[getCurrentState()])
+		finishTransition(moduleRegistry.getRegisteredModules());
 }
 
 void EquipletNode::onModuleModeChanged(
@@ -283,3 +265,72 @@ void EquipletNode::onModuleModeChanged(
 {
 	//ROS_INFO("ModuleRegistry received from %s a mode change from %d to %d",moduleProxy->getModuleNodeName(),previousMode,newMode);
 }
+
+void EquipletNode::transitionSetup(rexos_statemachine::TransitionActionServer* as) {
+	setupTransitionActionServer = as;
+
+	moduleRegistry.setNewRegistrationsAllowed(false);
+	changeModuleStates(moduleRegistry.getRegisteredModules(),rexos_statemachine::STATE_STANDBY);
+	finishTransition(moduleRegistry.getRegisteredModules());
+}
+
+void EquipletNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as) {
+	shutdownTransitionActionServer = as;
+
+	moduleRegistry.setNewRegistrationsAllowed(true);
+	changeModuleStates(moduleRegistry.getRegisteredModules(),rexos_statemachine::STATE_SAFE);
+	finishTransition(moduleRegistry.getRegisteredModules());
+}
+
+void EquipletNode::transitionStart(rexos_statemachine::TransitionActionServer* as) {
+	as->setSucceeded();
+}
+
+void EquipletNode::transitionStop(rexos_statemachine::TransitionActionServer* as) {
+	stopTransitionActionServer = as;
+	finishTransition(moduleRegistry.getRegisteredModules());
+}
+
+void EquipletNode::changeModuleStates(std::vector<ModuleProxy*> modules, rexos_statemachine::State desiredState){
+	for (int i = 0; i < modules.size(); i++) {
+		modules[i]->changeState(desiredState);
+	}
+}
+
+bool EquipletNode::finishTransition(std::vector<ModuleProxy*> modules){
+	rexos_statemachine::State desiredTransitionState;
+	rexos_statemachine::TransitionActionServer* transitionActionServer = NULL;
+	switch(getCurrentState()){
+		case rexos_statemachine::STATE_SETUP: 
+			desiredTransitionState = rexos_statemachine::STATE_STANDBY;
+			transitionActionServer = setupTransitionActionServer;
+			break;
+		case rexos_statemachine::STATE_SHUTDOWN: 
+			desiredTransitionState = rexos_statemachine::STATE_SAFE;
+			transitionActionServer = shutdownTransitionActionServer;
+			break;
+		case rexos_statemachine::STATE_STOP: 
+			desiredTransitionState = rexos_statemachine::STATE_STANDBY;
+			transitionActionServer = stopTransitionActionServer;
+			break;
+		default : 
+			return false;
+	}
+
+	bool allModulesDone = true;
+	for(int i=0; i < modules.size(); i++){
+		if(modules[i]->getCurrentState() == getCurrentState()){
+			allModulesDone = false;
+			break;
+		}else if(modules[i]->getCurrentState() != desiredTransitionState){
+			transitionActionServer->setAborted();	
+			return false;
+		}
+	}
+
+	if(allModulesDone){
+		transitionActionServer->setSucceeded();
+		return true;
+	}
+}
+

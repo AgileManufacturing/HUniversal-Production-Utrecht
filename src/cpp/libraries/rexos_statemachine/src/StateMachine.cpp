@@ -116,15 +116,55 @@ Mode StateMachine::getCurrentMode() {
 	return currentMode;
 }
 
+/**
+ * method to change te state from a subclass of the statemachine.
+ * the method send a _changeState action to itself so the action call hasn't implement in the subclass 
+ * @param desiredState is the desiredState
+ * @param changeStateActionClient = NULL when not given. By this param it is possilbe to waitForResult and getState when finished(SUCCEEDED/ABORTED)
+ **/
+void StateMachine::changeState(State desiredState,ChangeStateActionClient* changeStateActionClient) {
+	ROS_INFO("_changeState called with desiredState %s",rexos_statemachine::state_txt[desiredState]);
+	ChangeStateGoal goal;
+	goal.desiredState = desiredState;
+
+	if(changeStateActionClient == NULL){
+		changeStateActionClient = new ChangeStateActionClient(nodeHandle, nodeName + "/change_state"),
+		changeStateActionClient->sendGoal(goal);
+		delete changeStateActionClient;
+	}else{
+		changeStateActionClient->sendGoal(goal);
+	}
+}
+
+/**
+ * method to change te mode from a subclass of the statemachine.
+ * the method send a _changeMode action to itself so the action call hasn't implement in the subclass 
+ * @param desiredMode is the desiredMode
+ * @param changeModeActionClient = NULL when not given. By this param it is possilbe to waitForResult and getState when finished(SUCCEEDED/ABORTED)
+ **/
+void StateMachine::changeMode(Mode desiredMode,ChangeModeActionClient* changeModeActionClient) {
+	ROS_INFO("_changeMode called with desiredMode %s",rexos_statemachine::state_txt[desiredMode]);
+	ChangeModeGoal goal;
+	goal.desiredMode = desiredMode;
+
+	if(changeModeActionClient == NULL){
+		changeModeActionClient = new ChangeModeActionClient(nodeHandle, nodeName + "/change_mode"),
+		changeModeActionClient->sendGoal(goal);
+		delete changeModeActionClient;
+	}else{
+		changeModeActionClient->sendGoal(goal);
+	}
+}
+
 void StateMachine::onChangeStateAction(const ChangeStateGoalConstPtr& goal){
-	if(changeState((rexos_statemachine::State) goal->desiredState))
+	if(_changeState((rexos_statemachine::State) goal->desiredState))
 		changeStateActionServer.setSucceeded();
 	else
 		changeStateActionServer.setAborted();
 }
 
 void StateMachine::onChangeModeAction(const ChangeModeGoalConstPtr& goal){
-	if(changeMode( (rexos_statemachine::Mode) goal->desiredMode))
+	if(_changeMode( (rexos_statemachine::Mode) goal->desiredMode))
 		changeModeActionServer.setSucceeded();
 	else
 		changeModeActionServer.setAborted();
@@ -136,7 +176,7 @@ void StateMachine::onChangeModeAction(const ChangeModeGoalConstPtr& goal){
  * @param request Contains the params for the state change
  * @param response Will tell if the state transition was succesfull for the state change
  **/
-bool StateMachine::changeState(rexos_statemachine::State newState) {
+bool StateMachine::_changeState(rexos_statemachine::State newState) {
 	transitionMapType::iterator it = transitionMap.find(StatePair(currentState, newState));
 	if (it == transitionMap.end()) {
 		return false;
@@ -176,7 +216,7 @@ bool StateMachine::changeState(rexos_statemachine::State newState) {
 	return currentState == it->first.second;
 }
 
-bool StateMachine::changeMode(Mode newMode) {
+bool StateMachine::_changeMode(Mode newMode) {
 	bool succeeded = false;
 	for(Mode mode : modes){
 		if(mode == newMode)
@@ -204,10 +244,10 @@ void StateMachine::_forceToAllowedState() {
 	while (!statePossibleInMode(currentState, currentMode)) {
 		switch (currentState) {
 		case STATE_NORMAL:
-			changeState(STATE_STANDBY);
+			_changeState(STATE_STANDBY);
 			break;
 		case STATE_STANDBY:
-			changeState(STATE_SAFE);
+			_changeState(STATE_SAFE);
 			break;
 		default:
 			break;

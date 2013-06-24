@@ -43,6 +43,9 @@
 #include <rexos_utilities/Utilities.h>
 
 #include <rexos_statemachine/StateMachine.h>
+#include <rexos_statemachine/ChangeStateAction.h>
+#include <rexos_statemachine/ChangeModeAction.h>
+
 #include <rexos_most/MOSTDatabaseClient.h>
 
 #include <equiplet_node/ModuleRegistry.h>
@@ -95,6 +98,13 @@ private:
 
 	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
 
+	bool setTransitionDone(rexos_statemachine::State transitionState);
+
+	void updateEquipletStateOnBlackboard();
+
+	bool finishTransition(std::vector<ModuleProxy*> modules);
+
+	void changeModuleStates(std::vector<ModuleProxy*> modules, rexos_statemachine::State desiredState);
 	/**
 	 * @var int equipletId
 	 * The id of the equiplet
@@ -105,8 +115,13 @@ private:
 	 * @var BlackboardCppClient  *blackboardClient
 	 * Client to read from blackboard
 	 **/
-	Blackboard::BlackboardCppClient *blackboardClient;
-	std::vector<Blackboard::BlackboardSubscription *> subscriptions; 
+	Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
+	Blackboard::BlackboardSubscription* equipletStepSubscription; 
+
+	Blackboard::BlackboardCppClient *equipletCommandBlackboardClient;
+	Blackboard::BlackboardSubscription* equipletCommandSubscription; 
+
+	Blackboard::BlackboardCppClient *equipletStateBlackboardClient;
 
 	MOSTDatabaseClient mostDatabaseclient;
 
@@ -122,12 +137,15 @@ private:
 	virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
 	virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
 	virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
-	bool changeModuleState(int moduleID,rexos_statemachine::State state);
 
 	rexos_statemachine::TransitionActionServer* setupTransitionActionServer;
 	rexos_statemachine::TransitionActionServer* shutdownTransitionActionServer;
 	rexos_statemachine::TransitionActionServer* startTransitionActionServer;
 	rexos_statemachine::TransitionActionServer* stopTransitionActionServer;
+
+	ChangeStateActionClient changeStateActionClient;
+	ChangeModeActionClient changeModeActionClient;
+
 };
 
 }

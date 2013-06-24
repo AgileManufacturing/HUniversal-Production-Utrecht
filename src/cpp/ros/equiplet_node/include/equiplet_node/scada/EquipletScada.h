@@ -3,7 +3,7 @@
 #include <equiplet_node/ModuleRegistry.h>
 #include <equiplet_node/scada/mongoose.h>
 
-#define SCADA_DEFAULT_DOCUMENT_ROOT "."
+#define SCADA_DEFAULT_DOCUMENT_ROOT "./src/www/equiplet_scada/"
 
 namespace equiplet_node {
 
@@ -21,7 +21,8 @@ private:
 	int mongooseBeginRequestCallback(mg_connection* connection);
 
 	void mongooseProcessChangeModuleModi(mg_connection* conn, mg_request_info* request_info);
-	void mongooseProcessMakeEquipletSafe(mg_connection* conn, mg_request_info* request_info);
+	void mongooseProcessChangeEquipletMode(mg_connection* conn, mg_request_info* request_info);
+	void mongooseProcessChangeEquipletState(mg_connection* conn, mg_request_info* request_info);
 	void mongooseProcessEquipletInfo(mg_connection* conn, mg_request_info* request_info);
 	void mongooseProcessModuleInfo(mg_connection* conn, mg_request_info* request_info);
 
