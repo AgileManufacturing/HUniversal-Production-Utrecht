@@ -57,25 +57,35 @@ import com.mongodb.BasicDBObject;
  */
 public abstract class Module {
 	/**
+	 * @var String name
+	 *      The name of the module. It should be the same as the one in the knowledge database.
+	 */
+	private String name;
+	
+	/**
 	 * @var int id
-	 * The id of the module
+	 *      The id of the module. It should be the same as the one in the knowledge database.
 	 */
 	private int id;
-	
+
 	/**
 	 * @var ModuleFactory moduleFactory
-	 * The moduleFactory of the module.
+	 *      The moduleFactory of the module.
 	 */
 	private ModuleFactory moduleFactory;
-	
+
 	/**
 	 * @var HashMap<Integer, Object> configuration
-	 * The configuration of the module.
+	 *      The configuration of the module.
 	 */
 	private HashMap<Integer, Object> configuration;
 
+	public Module() {
+	}
+
 	/**
 	 * Function for getting the EquipletSteps for a stepType.
+	 * 
 	 * @param stepType The stepType to get the EquipletSteps for.
 	 * @param parameters The parameters to use by making the steps.
 	 * @return The EquipletStepMessages
@@ -84,36 +94,55 @@ public abstract class Module {
 
 	/**
 	 * Function for filling in the placeholders.
+	 * 
 	 * @param steps The steps to fill the placeholders for.
 	 * @param parameters The parameters to fill in the placeholders.
 	 * @return The filled in EquipletStepMessages
 	 */
 	public abstract EquipletStep[] fillPlaceHolders(EquipletStep[] steps, BasicDBObject parameters);
-	
+
 	/**
 	 * Function for getting the steps this module is leading for.
+	 * 
 	 * @return int[] with step ids.
 	 */
 	public abstract int[] isLeadingForServices();
-	
+
+	/**
+	 * Getter for the name.
+	 * 
+	 * @return the name.
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	/**
 	 * Getter for the id.
-	 * @return The id.
+	 * 
+	 * @return the id.
 	 */
 	public int getId() {
 		return id;
 	}
-	
+
 	/**
-	 * Setter for the id.
-	 * @param id The id to set it to.
+	 * @param id the id to set
 	 */
 	public void setId(int id) {
 		this.id = id;
 	}
-	
+
 	/**
 	 * Getter for the moduleFactory
+	 * 
 	 * @return the moduleFactory
 	 */
 	public ModuleFactory getModuleFactory() {
@@ -122,6 +151,7 @@ public abstract class Module {
 
 	/**
 	 * Setter for the moduleFactory
+	 * 
 	 * @param moduleFactory the moduleFactory to set it to
 	 */
 	public void setModuleFactory(ModuleFactory moduleFactory) {
@@ -130,6 +160,7 @@ public abstract class Module {
 
 	/**
 	 * Getter for the configuration
+	 * 
 	 * @return the configuration
 	 */
 	public HashMap<Integer, Object> getConfiguration() {
@@ -138,9 +169,18 @@ public abstract class Module {
 
 	/**
 	 * Setter for the configuration
+	 * 
 	 * @param configuration the configuration to set it to
 	 */
 	public void setConfiguration(HashMap<Integer, Object> configuration) {
 		this.configuration = configuration;
+	}
+
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return String.format("Module [name=%s, id=%s]", name, id);
 	}
 }

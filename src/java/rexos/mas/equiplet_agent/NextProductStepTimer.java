@@ -36,6 +36,7 @@ package rexos.mas.equiplet_agent;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -44,8 +45,12 @@ import org.bson.types.ObjectId;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
+import rexos.mas.data.ProductStep;
+import rexos.mas.data.ScheduleData;
+import rexos.mas.data.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 /**
  * Timer for executing the next product step.
@@ -58,10 +63,10 @@ public class NextProductStepTimer extends Timer {
 	EquipletAgent equipletAgent;
 
 	/**
-	 * @var int nextUsedTimeSlot
+	 * @var long nextUsedTimeSlot
 	 *      The next used time slot.
 	 */
-	private int nextUsedTimeSlot;
+	private long nextUsedTimeSlot;
 
 	/**
 	 * @var long firstTimeSlot
@@ -70,10 +75,10 @@ public class NextProductStepTimer extends Timer {
 	private long firstTimeSlot;
 
 	/**
-	 * @var int timeSlotLength
+	 * @var long timeSlotLength
 	 *      The length of a time slot in milliseconds.
 	 */
-	private int timeSlotLength;
+	private long timeSlotLength;
 
 	/**
 	 * @var NextProductStepTask task
@@ -102,13 +107,13 @@ public class NextProductStepTimer extends Timer {
 	 * 
 	 * @param nextUsedTimeSlot the index of the next used timeslot, fill -1 when not used.
 	 */
-	public void setNextUsedTimeSlot(int nextUsedTimeSlot) {
+	public void setNextUsedTimeSlot(long nextUsedTimeSlot) {
 		this.nextUsedTimeSlot = nextUsedTimeSlot;
 		if(task != null) {
 			task.cancel();
 		}
 		if(nextUsedTimeSlot != -1) {
-			long startPlannedTimeSlot = ((long)nextUsedTimeSlot * timeSlotLength) + firstTimeSlot;
+			long startPlannedTimeSlot = (nextUsedTimeSlot * timeSlotLength) + firstTimeSlot;
 			long currentTime = System.currentTimeMillis();
 			task = new NextProductStepTask();
 			Logger.log("Equiplet agent - trying to schedule: %d (%d - %d)%n", (startPlannedTimeSlot - currentTime), startPlannedTimeSlot, currentTime);
@@ -126,18 +131,22 @@ public class NextProductStepTimer extends Timer {
 	 * 
 	 * @return the next used timeslot
 	 */
-	public int getNextUsedTimeSlot() {
+	public long getNextUsedTimeSlot() {
 		return nextUsedTimeSlot;
 	}
 
 	/**
+	 * Function for getting the timeSlotLength
+	 * 
 	 * @return the timeSlotLength
 	 */
-	public int getTimeSlotLength() {
+	public long getTimeSlotLength() {
 		return timeSlotLength;
 	}
 
 	/**
+	 * Function for setting the timeSlotLength
+	 * 
 	 * @param timeSlotLength the timeSlotLength to set
 	 */
 	public void setTimeSlotLength(int timeSlotLength) {
@@ -151,6 +160,33 @@ public class NextProductStepTimer extends Timer {
 	 */
 	public long getFirstTimeSlot() {
 		return firstTimeSlot;
+	}
+	/**
+	 * 
+	 * when this function is called it reschedules the timer to the next step
+	 * 
+	 */
+	public void reScheduleTimer(){
+		
+				
+		try {
+			BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED.name());
+			query.put("$order_by", new BasicDBObject("scheduleData", new BasicDBObject("startTime", "1")));
+			List<DBObject> objects = equipletAgent.getProductStepBBClient().findDocuments(query);
+			if(!objects.isEmpty()) {
+				ProductStep nextProductStep = new ProductStep((BasicDBObject) objects.get(0));
+				equipletAgent.setNextProductStep(nextProductStep.getId());
+				ScheduleData scheduleData = nextProductStep.getScheduleData();
+				if(scheduleData.getStartTime() < getNextUsedTimeSlot()) {
+					setNextUsedTimeSlot(scheduleData.getStartTime());
+				}
+			} else {
+				setNextUsedTimeSlot(-1);
+			}
+		} catch(GeneralMongoException | InvalidDBNamespaceException e) {
+			Logger.log(e);
+		}
+		
 	}
 
 	/**
@@ -181,11 +217,11 @@ public class NextProductStepTimer extends Timer {
 				equipletAgent.send(answer);
 
 				// TODO: delete below after testing
-				ACLMessage test = new ACLMessage(ACLMessage.QUERY_IF);
-				test.setConversationId(conversationId);
-				test.addReceiver(equipletAgent.getAID());
-				test.setOntology("StartStep");
-				equipletAgent.send(test);
+//				ACLMessage test = new ACLMessage(ACLMessage.QUERY_IF);
+//				test.setConversationId(conversationId);
+//				test.addReceiver(equipletAgent.getAID());
+//				test.setOntology("StartStep");
+//				equipletAgent.send(test);
 			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(e);
 			}

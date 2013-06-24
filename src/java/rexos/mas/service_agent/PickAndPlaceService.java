@@ -57,7 +57,7 @@ import rexos.libraries.log.Logger;
 import rexos.mas.data.Part;
 import rexos.mas.data.Position;
 import rexos.mas.data.ScheduleData;
-import rexos.mas.equiplet_agent.StepStatusCode;
+import rexos.mas.data.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 
@@ -74,13 +74,6 @@ public class PickAndPlaceService extends Service {
 	 *      The height of the ball as input part.
 	 */
 	private double ballHeight;
-
-	/**
-	 * Creates a new PickAndPlaceService object.
-	 */
-	public PickAndPlaceService() {
-		super("huniplacer pick&place", 1);
-	}
 	
 	/**
 	 * @see rexos.mas.service_agent.Service#canDoStep(int, com.mongodb.BasicDBObject)

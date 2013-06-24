@@ -53,7 +53,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import rexos.mas.data.Position;
-import rexos.mas.equiplet_agent.StepStatusCode;
+import rexos.mas.data.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 
@@ -72,11 +72,6 @@ public class GripperModule extends Module {
 	 * The module that moves this module.
 	 */
 	private Module movementModule;
-
-	/**
-	 * Empty Constructor
-	 */
-	public GripperModule() {}
 
 	/**
 	 * @see Module#getEquipletSteps(int, BasicDBObject)

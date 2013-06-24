@@ -158,15 +158,33 @@ public class Position implements Serializable, MongoSaveable {
 	public Position(BasicDBObject object) {
 		fromBasicDBObject(object);
 	}
-
+	
+	/**
+	 * Adds the x and y value to the x and y value of this position.
+	 * 
+	 * @param x The x value to add
+	 * @param y The y value to add
+	 */
 	public void translate(double x, double y) {
 		translate(x, y, 0);
 	}
 
+	/**
+	 * Adds the position to this position.
+	 * 
+	 * @param position The position to add.
+	 */
 	public void translate(Position position) {
 		translate(position.getX(), position.getY(), position.getZ());
 	}
 
+	/**
+	 * Adds the x, y and z values to the x, y and z values of this position.
+	 * 
+	 * @param x the x value to add
+	 * @param y the y value to add
+	 * @param z the z value to add
+	 */
 	public void translate(double x, double y, double z) {
 		this.x += x;
 		this.y += y;

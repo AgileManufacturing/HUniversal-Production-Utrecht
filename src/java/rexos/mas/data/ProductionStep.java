@@ -8,7 +8,7 @@
  * 
  * @section LICENSE License: newBSD
  * 
- *          Copyright © 2012, HU University of Applied Sciences Utrecht. All
+ *          Copyright ï¿½ 2012, HU University of Applied Sciences Utrecht. All
  *          rights reserved.
  * 
  *          Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,7 @@ public class ProductionStep implements Serializable {
 	private int _requiredTimeSlots;
 	private int _id;
 	private int _capability;
-	private StepStatusCode _status;
+	private StepStatusCode _status = StepStatusCode.EVALUATING;
 	private BasicDBObject _parameters;
 	
 	private String _convId;

@@ -48,7 +48,7 @@
 package rexos.mas.hardware_agent;
 
 import rexos.mas.data.Position;
-import rexos.mas.equiplet_agent.StepStatusCode;
+import rexos.mas.data.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 
@@ -61,11 +61,6 @@ public class DeltaRobotModule extends Module {
 	 *      A static value that contains the height of the safe movement plane.
 	 */
 	private static final double SAFE_MOVEMENT_PLANE = 6;
-
-	/**
-	 * Empty Constructor
-	 */
-	public DeltaRobotModule() {}
 
 	/**
 	 * @see Module#getEquipletSteps(int, BasicDBObject)

@@ -56,9 +56,9 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.ProductStep;
+import rexos.mas.data.StepStatusCode;
 import rexos.mas.equiplet_agent.EquipletAgent;
-import rexos.mas.equiplet_agent.StepStatusCode;
-import rexos.mas.equiplet_agent.ProductStep;
 
 import com.mongodb.BasicDBObject;
 
@@ -76,9 +76,9 @@ public class AbortStep extends ReceiveBehaviour {
 	/**
 	 * @var MessageTemplate messageTemplate
 	 *      The messageTemplate this behaviour
-	 *      listens to. This behaviour listens to the ontology: CancelStep.
+	 *      listens to. This behaviour listens to the ontology: AbortStep.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CancelStep");
+	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("AbortStep");
 
 	/**
 	 * @var EquipletAgent equipletAgent
@@ -91,7 +91,6 @@ public class AbortStep extends ReceiveBehaviour {
 	 * Instantiates a new can perform step.
 	 * 
 	 * @param agent The agent for this behaviour
-	 * @param productBBClient BlackboardClient for the equiplet's product step blackboard.
 	 */
 	public AbortStep(EquipletAgent agent) {
 		super(agent, messageTemplate);
@@ -126,6 +125,8 @@ public class AbortStep extends ReceiveBehaviour {
 							new BasicDBObject("_id", productStepEntryId),
 							new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
 									"statusData", new BasicDBObject("reason", "productagent canceled"))));
+					equipletAgent.getTimer().reScheduleTimer();
+					
 				} else {
 					ACLMessage reply = message.createReply();
 					reply.setPerformative(ACLMessage.FAILURE);

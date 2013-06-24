@@ -52,6 +52,7 @@ package rexos.mas.equiplet_agent;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.WakerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
@@ -80,7 +81,9 @@ import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
+import rexos.mas.data.ProductStep;
 import rexos.mas.data.ScheduleData;
+import rexos.mas.data.StepStatusCode;
 import rexos.mas.equiplet_agent.behaviours.AbortStep;
 import rexos.mas.equiplet_agent.behaviours.InitialisationFinished;
 import rexos.mas.equiplet_agent.behaviours.ServiceAgentDied;
@@ -110,7 +113,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 *      IP of the collective database.
 	 */
 	private String collectiveDbIp = "145.89.191.131";
-	// private String collectiveDbIp = "localhost";
+	// private String collectiveDbIp = "localhost";Logger.log("Hardware agent " + this + " reporting.");
 
 	/**
 	 * @var int collectiveDbPort
@@ -377,12 +380,27 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 								responseMessage.setOntology("Planned");
 								responseMessage.setContentObject(scheduleData.getStartTime());
 
-//								ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
-//								cancelMessage.addReceiver(getAID());
-//								cancelMessage.setOntology("CancelStep");
-//								cancelMessage.setConversationId(getConversationId(nextProductStep));
-//								send(cancelMessage);
-//								Logger.log("Equiplet agent - sending message %s%n", ACLMessage.getPerformative(cancelMessage.getPerformative()));
+								//TODO: after testing delete below
+//								addBehaviour(new WakerBehaviour(this, 75){
+//									
+//									/**
+//									 * 
+//									 */
+//									private static final long serialVersionUID = 1L;
+//
+//									protected void onWake(){
+//			
+//									ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
+//									cancelMessage.addReceiver(getAID());
+//									cancelMessage.setOntology("AbortStep");
+//									cancelMessage.setConversationId(getConversationId(nextProductStep));
+//									send(cancelMessage);
+//									
+//									Logger.log("Equiplet agent - sending message %s%n", ACLMessage.getPerformative(cancelMessage.getPerformative()));
+//									}
+//								});
+								//TODO: after testing delete above
+								
 							} catch(IOException e) {
 								responseMessage.setPerformative(ACLMessage.FAILURE);
 								responseMessage.setContent("An error occured in the planning/please reschedule");
@@ -399,7 +417,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 						case DONE:
 							responseMessage.setOntology("StatusUpdate");
 							responseMessage.setPerformative(ACLMessage.CONFIRM);
-							responseMessage.setContentObject(productStep.getStatusData());
+							productStep.setStatus(StepStatusCode.DONE);
+							responseMessage.setContentObject(productStep);
 							productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
 							break;
 						case DELETED:

@@ -8,7 +8,7 @@
  * 
  * @section LICENSE License: newBSD
  * 
- *          Copyright © 2012, HU University of Applied Sciences Utrecht. All
+ *          Copyright ï¿½ 2012, HU University of Applied Sciences Utrecht. All
  *          rights reserved.
  * 
  *          Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,7 @@ public class ProductLog{
 	private boolean writeToLocal = true;
 	private sqliteDatabase local;
 
-	// private RemoteDatabaseConnection remote;
+	// TODO_REMOTE private RemoteDatabaseConnection remote;
 	/**
 	 * @param writeToRemote
 	 * @param writeToLocal
@@ -73,13 +73,13 @@ public class ProductLog{
 			local.insert(msgs);
 		}
 		if (writeToRemote){
-			// TODO: remote.insert()
+			// TODO_REMOTE remote.insert()
 			throw new UnsupportedOperationException();
 		}
 	}
 
 	public static void pushLocalToRemote(){
-		// TODO:
+		// TODO_REMOTE:
 		// get latest remote
 		// get local since latest remote
 		// write to remote
@@ -87,7 +87,7 @@ public class ProductLog{
 	}
 
 	/**
-	 * @param aid 
+	 * @param aid
 	 * @param statusData
 	 */
 	public void add(AID aid, BasicDBObject statusData){
@@ -95,9 +95,12 @@ public class ProductLog{
 		Iterator i = statusData.toMap().entrySet().iterator(); i.hasNext();){
 			switch(i.getClass().getName()){
 			case "java.lang.String":
-				local.insert(new LogMessage(aid, i.toString()));	
-			break;
-			//TODO: Add other classes. 
+				local.insert(new LogMessage(aid, i.toString()));
+				break;
+			case "com.mongodb.BasicDbObject" :
+				Logger.log(new UnsupportedOperationException(
+						"Not implemented case for "
+								+ i.getClass().getCanonicalName()));
 			default:
 				Logger.log(new UnsupportedOperationException("No log case for "
 						+ i.getClass().getCanonicalName()));
