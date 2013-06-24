@@ -42,61 +42,58 @@
 
 package rexos.mas.productAgent;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import rexos.libraries.log.Logger;
-import rexos.mas.data.BehaviourStatus;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.StepStatusCode;
 
-public class ProduceBehaviour extends OneShotBehaviour {
-
+public class ProduceBehaviour extends OneShotBehaviour{
 	private static final long serialVersionUID = 1L;
 	private Production _production;
-	private BehaviourCallback _bc;
-	private boolean _error = false;
+	ProductAgent pa;
 
+	// private ProductionEquipletMapper _prodEQMap;
+	// ACLMessage msg;
 	/**
 	 * @param myAgent
 	 */
-	public ProduceBehaviour(Agent myAgent, BehaviourCallback bc) {
+	public ProduceBehaviour(Agent myAgent){
 		super(myAgent);
-		this._bc = bc;
 	}
 
 	@Override
-	public int onEnd() {
-		if (this._error != false) {
-			this._bc.handleCallback(BehaviourStatus.COMPLETED);
-		}
-		this._bc.handleCallback(BehaviourStatus.ERROR);
-		return 0;
-	}
-
-	@Override
-	public void action() {
-		try {
+	public void action(){
+		try{
 			_production = ((ProductAgent) myAgent).getProduct().getProduction();
+			// _prodEQMap = new ProductionEquipletMapper();
 			// retrieve the productstep
-			if (_production != null && _production.getProductionSteps() != null) {
-				for (ProductionStep stp : _production.getProductionSteps()) {
-					if (stp.getStatus() == StepStatusCode.PLANNED) {
+			if (_production != null && _production.getProductionSteps() != null){
+				for(ProductionStep stp : _production.getProductionSteps()){
+					if (stp.getStatus() == StepStatusCode.PLANNED){
+						// adds the step to te new list (the one that will be
+						// returned to the scheduler)
+						// _prodEQMap.addProductionStep(stp.getId());
+						// roep seq behav aan
+						// myAgent.addBehaviour(new newProducing(
+						// equipletAndTimeslot, stp));
 						myAgent.addBehaviour(new ProducingReciever(myAgent, -1,
 								MessageTemplate.MatchAll(), stp));
 					}
 				}
 			}
-		} catch (Exception e) {
+		} catch(Exception e){
 			Logger.log(e);
 		}
 	}
 }
 
-class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour {
+class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour{
 	ProductionStep ProductAgentstp;
 
 	/**
@@ -106,7 +103,7 @@ class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour {
 	 * @param stp
 	 **/
 	public ProducingReciever(Agent agnt, int millis, MessageTemplate msgtmplt,
-			ProductionStep stp) {
+			ProductionStep stp){
 		super(agnt, millis, msgtmplt);
 		this.ProductAgentstp = stp;
 	}
@@ -115,16 +112,16 @@ class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour {
 	ACLMessage msg;
 
 	@Override
-	public void handle(ACLMessage m) {
-		try {
-			if (m.getOntology() != null) {
-				switch (m.getOntology()) {
+	public void handle(ACLMessage m){
+		try{
+			if (m.getOntology() != null){
+				switch(m.getOntology()){
 				case "StartStepQuestion":
 					/*
 					 * Equiplet agent requests permission for executing product
 					 * step. Product agent grants permission Currently I cannot
-					 * think of any reason why it wouldn�t. But I�m sure
-					 * there are reasons.
+					 * think of any reason why it wouldn�t. But I�m sure there
+					 * are reasons.
 					 */
 					ACLMessage reply = m.createReply();
 					reply.setOntology("StartStep");
@@ -133,7 +130,7 @@ class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour {
 				case "StatusUpdate":
 					ProductStep step = (ProductStep) m.getContentObject();
 					ProductAgentstp.setStatus(step.getStatus());
-					switch (step.getStatus()) {
+					switch(step.getStatus()){
 					case IN_PROGRESS:
 						// In progress
 						break;
@@ -159,6 +156,7 @@ class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour {
 						((ProductAgent) myAgent).getProduct()
 								.addStatusDataToLog(msg.getSender(),
 										step.getStatusData());
+					
 						System.out.println("I'm done.");
 						break;
 					default:
@@ -176,7 +174,7 @@ class ProducingReciever extends rexos.mas.behaviours.ReceiveBehaviour {
 					break;
 				}
 			}
-		} catch (Exception e) {
+		} catch(Exception e){
 			Logger.log(e);
 		}
 	}

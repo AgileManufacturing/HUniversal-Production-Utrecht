@@ -5,7 +5,6 @@
  * @date Created: 02-04-2013
  * 
  * @author Alexander Streng
- * @author Mike Schaap
  * 
  *         Copyright © 2013, HU University of Applied Sciences Utrecht. All
  *         rights reserved.
@@ -39,7 +38,6 @@
 package rexos.mas.productAgent;
 
 import rexos.libraries.log.Logger;
-import rexos.mas.data.BehaviourStatus;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
@@ -47,7 +45,6 @@ import rexos.mas.data.ProductionStep;
 import rexos.mas.data.StepStatusCode;
 
 import jade.core.AID;
-import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.ParallelBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
@@ -63,7 +60,6 @@ import jade.lang.acl.UnreadableException;
  * agent will ask for the duration of the operation ( in timeslots ).
  */
 public class InformerBehaviour extends OneShotBehaviour{
-	
 	private static final long serialVersionUID = 1L;
 	private ProductAgent _productAgent;
 	private ParallelBehaviour _par;
@@ -71,22 +67,8 @@ public class InformerBehaviour extends OneShotBehaviour{
 	private Production _production;
 	private ProductionEquipletMapper _prodEQmap;
 	private boolean _isDone;
-	private boolean _error = false;
-	
-	private BehaviourCallback _bc;
 
-	public InformerBehaviour(Agent myAgent, BehaviourCallback bc){
-		super(myAgent);
-		this._bc = bc;
-	}
-	
-	@Override
-	public int onEnd(){
-		if(this._error != false) {
-			this._bc.handleCallback(BehaviourStatus.COMPLETED);
-		}
-		this._bc.handleCallback(BehaviourStatus.ERROR);
-		return 0;
+	public InformerBehaviour(){
 	}
 
 	@Override
@@ -121,9 +103,16 @@ public class InformerBehaviour extends OneShotBehaviour{
 				} else {
 					//REPORT ERROR
 				}
+				
+				/*
+				 * OLD CODE
+				for(AID aid : _production.getProductionEquipletMapping()
+						.getEquipletsForProductionStep(stp.getId()).keySet()){
+					_par.addSubBehaviour(new Conversation(aid, stp, _prodEQmap));
+				}
+				*/
 			}
 		}
-		
 		// Lets set our production objects
 		seq.addSubBehaviour(new OneShotBehaviour(){
 			private static final long serialVersionUID = 1L;
@@ -145,10 +134,6 @@ public class InformerBehaviour extends OneShotBehaviour{
 				}
 			}
 		});
-		
-		while(this._isDone == false) {
-			block();
-		}
 	}
 
 	public boolean isDone(){
