@@ -33,7 +33,7 @@
 #include <unistd.h>
 #include "equiplet_node/EquipletNode.h"
 #include "rexos_blackboard_cpp_client/BlackboardCppClient.h"
-#include "rexos_blackboard_cpp_client/BasicOperationSubscription.h"
+#include "rexos_blackboard_cpp_client/FieldUpdateSubscription.h"
 #include "rexos_blackboard_cpp_client/OplogEntry.h"
 #include "rexos_utilities/Utilities.h"
 #include <rexos_statemachine/ChangeStateAction.h>
@@ -72,16 +72,9 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 //			this);
 
 	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "test", "equipletStepBB");
-	equipletStepSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
+	equipletStepSubscription = new Blackboard::FieldUpdateSubscription("status", *this);
 	equipletStepBlackboardClient->subscribe(*equipletStepSubscription);
 	subscriptions.push_back(equipletStepSubscription);
-
-/*	equipletCommandBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_COMMANDS);
-	equipletCommandSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
-	equipletCommandBlackboardClient->subscribe(*equipletCommandSubscription);
-	subscriptions.push_back(equipletCommandSubscription); */
-
-	//equipletStateBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_STATE);
 
 	moduleRegistry.setNewRegistrationsAllowed(true);
 	moduleRegistry.setModuleRegistryListener(this);
@@ -116,21 +109,35 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 
 	if(&subscription == equipletStepSubscription)
 	{
-	    //lets parse a root node from the bb msg.
+	    // IMPORTANT: At this moment we assume there is only one subscription.
 		JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
-
+		std::cout << n.write() << std::endl;
 	    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
-	    
-	    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
 
-	    prox->setInstruction(step->getInstructionData().getJsonNode());
-		
+	    if (step->getStatus().compare("WAITING") == 0) {
+	    	rexos_statemachine::Mode currentMode = getCurrentMode();
+
+	    	std::stringstream query("{ _id : ");
+	    	query << n["_id"].write() << "}";
+
+	    	if (currentMode == rexos_statemachine::MODE_NORMAL) {
+	    		rexos_statemachine::State currentState = getCurrentState();
+
+	    		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
+	    			equipletStepBlackboardClient->updateDocuments(query.str(), "{$set : {status: \"IN_PROGRESS\"");	    				    
+				    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
+				    prox->setInstruction(step->getInstructionData().getJsonNode());
+	    		} else {
+	    			equipletStepBlackboardClient->updateDocuments(query.str(), "{$set : {status: \"ERROR\"");
+	    		}
+	    	} else {
+	    		ROS_INFO("Instruction received but current mode is %s", rexos_statemachine::Mode_txt[currentMode]);
+	    		equipletStepBlackboardClient->updateDocuments(query.str(), "{$set : {status: \"ERROR\"");
+	    	}
+		}
 	}
     else if(&subscription == equipletCommandSubscription)
 	{
-		JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
-		JSONNode::const_iterator i = n.begin();
-
    /*     while (i != n.end()){
             const char * node_name = i -> name().c_str();
             if (strcmp(node_name, "set_desired_state") == 0){
