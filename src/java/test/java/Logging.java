@@ -109,7 +109,7 @@ public class Logging{
 		String exampleOfAnAidString = "MainAgent@145.89.100.2521099JADE  addresses (sequence httpLaptop_3_Win_87778acc ))";
 		String TestAidString = exampleOfAnAidString
 				+ ((Double) Math.random()).toString();
-		Product p = new Product(production, new AID(TestAidString, true));
+		Product p = new Product(production, TestAidString);
 		BasicDBObject update, statusData;
 					
 			BasicDBObject log = new BasicDBObject();
