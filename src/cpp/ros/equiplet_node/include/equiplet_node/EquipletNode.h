@@ -100,6 +100,10 @@ private:
 	bool setTransitionDone(rexos_statemachine::State transitionState);
 
 	void updateEquipletStateOnBlackboard();
+
+	bool finishTransition(std::vector<ModuleProxy*> modules);
+
+	void changeModuleStates(std::vector<ModuleProxy*> modules, rexos_statemachine::State desiredState);
 	/**
 	 * @var int equipletId
 	 * The id of the equiplet

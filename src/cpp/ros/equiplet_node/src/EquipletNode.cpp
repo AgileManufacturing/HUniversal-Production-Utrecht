@@ -166,9 +166,9 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 
         while (i != n.end()){
             const char * node_name = i -> name().c_str();
-            if (strcmp(node_name, "set_desired_state") == 0){
+            if (strcmp(node_name, "desiredState") == 0){
                 changeState((rexos_statemachine::State) atoi(i -> as_string().c_str()));
-            }else if (strcmp(node_name, "set_desired_mode") == 0){
+            }else if (strcmp(node_name, "desiredMode") == 0){
                 changeMode((rexos_statemachine::Mode) atoi(i -> as_string().c_str()));
             }
             i++;
@@ -249,76 +249,14 @@ void EquipletNode::onModeChanged(){
 	}
 }
 
-void EquipletNode::transitionSetup(rexos_statemachine::TransitionActionServer* as) {
-	setupTransitionActionServer = as;
-
-	moduleRegistry.setNewRegistrationsAllowed(false);
-
-	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
-	for (int i = 0; i < modules.size(); i++) {
-		modules[i]->changeState(rexos_statemachine::STATE_STANDBY);
-	}
-	setTransitionDone(rexos_statemachine::STATE_SETUP);
-}
-
-void EquipletNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as) {
-	shutdownTransitionActionServer = as;
-
-	moduleRegistry.setNewRegistrationsAllowed(true);
-
-	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
-	for (int i = 0; i < modules.size(); i++) {
-		modules[i]->changeState(rexos_statemachine::STATE_SAFE);
-	}
-	setTransitionDone(rexos_statemachine::STATE_SHUTDOWN);
-}
-
-void EquipletNode::transitionStart(rexos_statemachine::TransitionActionServer* as) {
-	as->setSucceeded();
-}
-
-void EquipletNode::transitionStop(rexos_statemachine::TransitionActionServer* as) {
-	as->setSucceeded();
-}
-
-bool EquipletNode::setTransitionDone(rexos_statemachine::State transitionState){
-	bool allModulesDone = false;
-
-	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
-
-	if(transitionState == rexos_statemachine::STATE_SETUP){
-		bool allModulesDone = true;
-		for (int i = 0; i < modules.size(); i++) {
-			if(modules[i]->getCurrentState() != rexos_statemachine::STATE_STANDBY)
-				allModulesDone = false;
-		}
-		if(allModulesDone)
-			setupTransitionActionServer->setSucceeded();
-	}else if(transitionState == rexos_statemachine::STATE_SHUTDOWN){
-		allModulesDone = true;
-		for (int i = 0; i < modules.size(); i++) {
-			if(modules[i]->getCurrentState() != rexos_statemachine::STATE_SAFE)
-				allModulesDone = false;
-		}
-		if(allModulesDone)
-			shutdownTransitionActionServer->setSucceeded();
-	}
-
-	
-	
-	return allModulesDone;
-}
-
 void EquipletNode::onModuleStateChanged(
 	ModuleProxy* moduleProxy,
 	rexos_statemachine::State newState, 
 	rexos_statemachine::State previousState)
 {
 	//ROS_INFO("EquipletNode received from %s a state change from %d to %d",moduleProxy->getModuleNodeName(),previousState,newState);
-	if(getCurrentState() == rexos_statemachine::STATE_SAFE)
-		setTransitionDone(rexos_statemachine::STATE_SHUTDOWN);
-	else if(getCurrentState() == rexos_statemachine::STATE_STANDBY)
-		setTransitionDone(rexos_statemachine::STATE_SETUP);
+	if(rexos_statemachine::is_transition_state[getCurrentState()])
+		finishTransition(moduleRegistry.getRegisteredModules());
 }
 
 void EquipletNode::onModuleModeChanged(
@@ -327,4 +265,70 @@ void EquipletNode::onModuleModeChanged(
 	rexos_statemachine::Mode previousMode)
 {
 	//ROS_INFO("ModuleRegistry received from %s a mode change from %d to %d",moduleProxy->getModuleNodeName(),previousMode,newMode);
+}
+
+void EquipletNode::transitionSetup(rexos_statemachine::TransitionActionServer* as) {
+	setupTransitionActionServer = as;
+	moduleRegistry.setNewRegistrationsAllowed(false);
+	changeModuleStates(moduleRegistry.getRegisteredModules(),rexos_statemachine::STATE_STANDBY);
+	finishTransition(moduleRegistry.getRegisteredModules());
+}
+
+void EquipletNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as) {
+	shutdownTransitionActionServer = as;
+	moduleRegistry.setNewRegistrationsAllowed(true);
+	changeModuleStates(moduleRegistry.getRegisteredModules(),rexos_statemachine::STATE_SAFE);
+	finishTransition(moduleRegistry.getRegisteredModules());
+}
+
+void EquipletNode::transitionStart(rexos_statemachine::TransitionActionServer* as) {
+	as->setSucceeded();
+}
+
+void EquipletNode::transitionStop(rexos_statemachine::TransitionActionServer* as) {
+	stopTransitionActionServer = as;
+	finishTransition(moduleRegistry.getRegisteredModules());
+}
+
+void EquipletNode::changeModuleStates(std::vector<ModuleProxy*> modules, rexos_statemachine::State desiredState){
+	for (int i = 0; i < modules.size(); i++) {
+		modules[i]->changeState(desiredState);
+	}
+}
+
+bool EquipletNode::finishTransition(std::vector<ModuleProxy*> modules){
+	rexos_statemachine::State desiredTransitionState;
+	rexos_statemachine::TransitionActionServer* transitionActionServer = NULL;
+	switch(getCurrentState()){
+		case rexos_statemachine::STATE_SETUP: 
+			desiredTransitionState = rexos_statemachine::STATE_STANDBY;
+			transitionActionServer = setupTransitionActionServer;
+			break;
+		case rexos_statemachine::STATE_SHUTDOWN: 
+			desiredTransitionState = rexos_statemachine::STATE_SAFE;
+			transitionActionServer = shutdownTransitionActionServer;
+			break;
+		case rexos_statemachine::STATE_STOP: 
+			desiredTransitionState = rexos_statemachine::STATE_STANDBY;
+			transitionActionServer = stopTransitionActionServer;
+			break;
+		default : 
+			return false;
+	}
+
+	bool allModulesDone = true;
+	for(int i=0; i < modules.size(); i++){
+		if(modules[i]->getCurrentState() == getCurrentState()){
+			allModulesDone = false;
+			break;
+		}else if(modules[i]->getCurrentState() != desiredTransitionState){
+			transitionActionServer->setAborted();	
+			return false;
+		}
+	}
+
+	if(allModulesDone){
+		transitionActionServer->setSucceeded();
+		return true;
+	}
 }
