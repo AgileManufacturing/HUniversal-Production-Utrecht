@@ -57,8 +57,9 @@ import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
+import rexos.mas.data.EquipletState;
 import rexos.mas.data.ProductStep;
-import rexos.mas.data.StateEntry;
+import rexos.mas.data.EquipletCommandEntry;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.service_agent.behaviours.CanDoProductStep;
 import rexos.mas.service_agent.behaviours.GetProductStepDuration;
@@ -134,6 +135,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 *      The AID of the logistics agent.
 	 */
 	private AID logisticsAID;
+	
+	private int equipletId;
 
 	/**
 	 * @var ServiceFactory serviceFactory
@@ -161,11 +164,12 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			dbData = (DbData) args[0];
 			equipletAgentAID = (AID) args[1];
 			logisticsAID = (AID) args[2];
+			equipletId = (int) args[3];
 		}
 
 		// Create a hardware agent for this equiplet
 		Object[] arguments = new Object[] {
-				dbData, equipletAgentAID, getAID()
+				dbData, equipletAgentAID, getAID(), equipletId
 		};
 		try {
 			AgentController hardwareAgentCnt =
@@ -348,7 +352,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 											new BasicDBObject("$set", new BasicDBObject("status", status.name())
 													.append("statusData", productionStep.getStatusData())));
 									
-									StateEntry stateEntry = new StateEntry(dbData.getName(), StateEntry.State.NORMAL);
+									EquipletCommandEntry stateEntry = new EquipletCommandEntry(dbData.getName(), EquipletState.NORMAL);
 									stateBBClient.insertDocument(stateEntry.toBasicDBObject());
 									
 									break;
@@ -435,7 +439,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 											new BasicDBObject("$set", new BasicDBObject("status", status.name())
 													.append("statusData", log)));
 									
-									StateEntry stateEntry = new StateEntry(dbData.getName(), StateEntry.State.STANDBY);
+									EquipletCommandEntry stateEntry = new EquipletCommandEntry(dbData.getName(), EquipletState.STANDBY);
 									stateBBClient.insertDocument(stateEntry.toBasicDBObject());
 									
 									break;

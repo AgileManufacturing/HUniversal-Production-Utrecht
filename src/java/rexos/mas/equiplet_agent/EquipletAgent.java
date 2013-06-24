@@ -221,7 +221,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		try {
 			InetAddress IP = InetAddress.getLocalHost();
 			equipletDbIp = IP.getHostAddress();
-			//equipletDbIp = "145.89.191.131";
 		} catch(UnknownHostException e) {
 			Logger.log(e);
 		}
@@ -236,7 +235,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			}
 
 			capabilities = new ArrayList<Integer>();
-			// /Register modules
+			// Register modules
 			KnowledgeDBClient client;
 			try {
 				client = KnowledgeDBClient.getClient();
@@ -253,9 +252,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 			dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 
+			//TODO register this equiplet on the knowledge db and add the equipletId to the arguments for the SA
 			// creates his service agent.
 			Object[] arguments = new Object[] {
-					dbData, getAID(), logisticsAgent
+					dbData, getAID(), logisticsAgent, 1
 			};
 			AgentController serviceAgentCnt =
 					getContainerController().createNewAgent(getLocalName() + "-serviceAgent",
@@ -384,34 +384,36 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 								// slot make it the next used timeslot.
 								nextProductStep = productStep.getId();
 								ScheduleData scheduleData = productStep.getScheduleData();
-								if(timer.getNextUsedTimeSlot() == 0 || scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
+								if(timer.getNextUsedTimeSlot() == 0
+										|| scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
 									timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 								}
 
 								responseMessage.setOntology("Planned");
 								responseMessage.setContentObject(scheduleData.getStartTime());
 
-								//TODO: after testing delete below
-//								addBehaviour(new WakerBehaviour(this, 75){
-//									
-//									/**
-//									 * 
-//									 */
-//									private static final long serialVersionUID = 1L;
-//
-//									protected void onWake(){
-//			
-//									ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
-//									cancelMessage.addReceiver(getAID());
-//									cancelMessage.setOntology("AbortStep");
-//									cancelMessage.setConversationId(getConversationId(nextProductStep));
-//									send(cancelMessage);
-//									
-//									Logger.log("Equiplet agent - sending message %s%n", ACLMessage.getPerformative(cancelMessage.getPerformative()));
-//									}
-//								});
-								//TODO: after testing delete above
-								
+								// TODO: after testing delete below
+								// addBehaviour(new WakerBehaviour(this, 75){
+								//
+								// /**
+								// *
+								// */
+								// private static final long serialVersionUID = 1L;
+								//
+								// protected void onWake(){
+								//
+								// ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
+								// cancelMessage.addReceiver(getAID());
+								// cancelMessage.setOntology("AbortStep");
+								// cancelMessage.setConversationId(getConversationId(nextProductStep));
+								// send(cancelMessage);
+								//
+								// Logger.log("Equiplet agent - sending message %s%n",
+								// ACLMessage.getPerformative(cancelMessage.getPerformative()));
+								// }
+								// });
+								// TODO: after testing delete above
+
 							} catch(IOException e) {
 								responseMessage.setPerformative(ACLMessage.FAILURE);
 								responseMessage.setContent("An error occured in the planning/please reschedule");
@@ -442,7 +444,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 						default:
 							break;
 					}
-					Logger.log("Equiplet agent - sending message %s%n", ACLMessage.getPerformative(responseMessage.getPerformative()));
+					Logger.log("Equiplet agent - sending message %s%n",
+							ACLMessage.getPerformative(responseMessage.getPerformative()));
 					send(responseMessage);
 				} catch(Exception e1) {
 					Logger.log(e1);

@@ -1,14 +1,14 @@
 /**
- * @file StateEntry.java
- * @brief An entry for the state blackboard
+ * @file EquipletStateEntry.java
+ * @brief 
  * @date Created: 24 jun. 2013
  *
- * @author Hessel Meulenbeld
+ * @author Peter Bonnema
  *
  * @section LICENSE
  * License: newBSD
  *
- * Copyright � 2013, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,78 +26,45 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  **/
 package rexos.mas.data;
+
+import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
 
 /**
- * entry for the state blackboard
+ * @author Peter Bonnema
+ *
  */
-public class StateEntry implements MongoSaveable {
+public class EquipletStateEntry implements MongoSaveable {
+	private ObjectId _id;
+	private String equipletId;
+	private EquipletMode equipletMode;
+	private EquipletState equipletState;
+
 	/**
-	 * enum for the states of an equiplet
+	 * @param equipletId
+	 * @param equipletMode
+	 * @param equipletState
 	 */
-	public static enum State{
-		/**
-		 * safe state of the equiplet
-		 */
-		SAFE(0),
-		/**
-		 * standby state of the equiplet
-		 */
-		STANDBY(3),
-		/**
-		 * normal state of the equiplet
-		 */
-		NORMAL(6);
-		
-		/**
-		 * @var int value
-		 * 		The value of the state
-		 */
-		private int value;
-		
-		/**
-		 * constructor for the state
-		 * @param value The value of the state
-		 */
-		private State(int value){
-			this.value = value;
-		}
+	public EquipletStateEntry(String equipletId, EquipletMode equipletMode, EquipletState equipletState) {
+		this.equipletId = equipletId;
+		this.equipletMode = equipletMode;
+		this.equipletState = equipletState;
 	}
 	
-	/**
-	 * @var String name
-	 * 		The name of the equiplet
-	 */
-	private String name;
-	
-	/**
-	 * @var State desired_state
-	 * 		The state desired for the equiplet
-	 */
-	private State desiredState;
-	
-	/**
-	 * constructor for the state entry
-	 * @param name the name of the equiplet
-	 * @param desiredState the desiredState for the equiplet
-	 */
-	public StateEntry(String name, State desiredState){
-		this.name = name;
-		this.desiredState = desiredState;
+	public EquipletStateEntry(BasicDBObject object) {
+		fromBasicDBObject(object);
 	}
-	
+
 	/**
 	 * @see rexos.mas.data.MongoSaveable#toBasicDBObject()
 	 */
 	@Override
 	public BasicDBObject toBasicDBObject() {
-		BasicDBObject object = new BasicDBObject();
-		object.put("name", name);
-		object.put("desiredState", desiredState.value);
-		return object;
+		return null;
 	}
 
 	/**
@@ -105,12 +72,55 @@ public class StateEntry implements MongoSaveable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) throws IllegalArgumentException {
-		BasicDBObject copy = (BasicDBObject) object.copy();
-		this.name = (String) copy.remove("name");
-		this.desiredState = State.valueOf((String) copy.remove("desiredState"));
-		if(!copy.isEmpty()){
-			throw new IllegalArgumentException();
-		}
+
 	}
 
+	/**
+	 * @return the equipletId
+	 */
+	public String getEquipletId() {
+		return equipletId;
+	}
+
+	/**
+	 * @param equipletId the equipletId to set
+	 */
+	public void setEquipletId(String equipletId) {
+		this.equipletId = equipletId;
+	}
+
+	/**
+	 * @return the equipletMode
+	 */
+	public EquipletMode getEquipletMode() {
+		return equipletMode;
+	}
+
+	/**
+	 * @param equipletMode the equipletMode to set
+	 */
+	public void setEquipletMode(EquipletMode equipletMode) {
+		this.equipletMode = equipletMode;
+	}
+
+	/**
+	 * @return the equipletState
+	 */
+	public EquipletState getEquipletState() {
+		return equipletState;
+	}
+
+	/**
+	 * @param equipletState the equipletState to set
+	 */
+	public void setEquipletState(EquipletState equipletState) {
+		this.equipletState = equipletState;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public ObjectId getId() {
+		return _id;
+	}
 }

@@ -154,7 +154,7 @@ public class FillPlaceholders extends ReceiveBehaviour {
 
 			// Fill the placeholders
 			equipletSteps = module.fillPlaceHolders(equipletSteps, serviceStep.getParameters());
-			Logger.log("Hardware agent - Saving updated instructionData of %d equipletSteps", equipletSteps.length);
+			Logger.log("Hardware agent - Saving updated instructionData of %d equipletSteps%n", equipletSteps.length);
 			for(EquipletStep step : equipletSteps) {
 				equipletStepBBClient.updateDocuments(new BasicDBObject("_id", step.getId()), new BasicDBObject("$set",
 						new BasicDBObject("instructionData", step.getInstructionData().toBasicDBObject())));
