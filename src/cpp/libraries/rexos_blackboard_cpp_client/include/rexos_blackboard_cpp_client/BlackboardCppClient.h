@@ -162,6 +162,19 @@ public:
 			mongo::BSONObj * result_out = NULL,
 			bool updateMultiple = true);
 
+	/**
+	 * Updates the document with the specified objectId according to the specified update query.
+	 *
+	 * @param objectId ObjectId of the document that should be updated.
+	 * @param updateQueryAsJSON The query that is used to update the matching document.
+	 * @param result_out Pointer to a mongo::BSONObj buffer where the result will be stored.
+	 *
+	 * @return The amount of documents that have been updated.
+	 * A return value of 0 can indicate either that no documents match the query, or that an error has occurred.
+	 * To find out if an error has occured, check the ok field in the result object. This will be set to 0 in case of errors.
+	 */
+	int updateDocumentById(mongo::OID objectId, std::string updateQueryAsJSON,	mongo::BSONObj * result_out);
+
 private:
 	/**
 	 * @var std::string host
