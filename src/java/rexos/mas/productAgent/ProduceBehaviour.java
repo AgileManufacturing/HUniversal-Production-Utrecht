@@ -7,6 +7,7 @@
  * @author Arno Derks
  * @author Theodoor de Graaff
  * @author Ricky van Rijn
+ * @author Mike Schaap
  * 
  * @section LICENSE License: newBSD
  * 
@@ -47,6 +48,7 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import rexos.libraries.log.Logger;
+import rexos.mas.data.BehaviourStatus;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
@@ -56,14 +58,26 @@ public class ProduceBehaviour extends OneShotBehaviour{
 	private static final long serialVersionUID = 1L;
 	private Production _production;
 	ProductAgent pa;
+	private BehaviourCallback _bc;
+	private boolean _error = false;
 
 	// private ProductionEquipletMapper _prodEQMap;
 	// ACLMessage msg;
 	/**
 	 * @param myAgent
 	 */
-	public ProduceBehaviour(Agent myAgent){
+	public ProduceBehaviour(Agent myAgent, BehaviourCallback bc){
 		super(myAgent);
+		this._bc = bc;
+	}
+	
+	@Override
+	public int onEnd(){
+		if(this._error != false) {
+			this._bc.handleCallback(BehaviourStatus.COMPLETED);
+		}
+		this._bc.handleCallback(BehaviourStatus.ERROR);
+		return 0;
 	}
 
 	@Override

@@ -42,8 +42,6 @@ package rexos.mas.data;
 
 import jade.core.AID;
 
-import java.util.List;
-
 import rexos.libraries.log.Logger;
 import rexos.mas.data.sqldatabase.sqliteDatabase;
 

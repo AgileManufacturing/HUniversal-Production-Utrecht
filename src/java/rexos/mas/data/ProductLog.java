@@ -48,7 +48,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
 
 public class ProductLog{
 	private boolean writeToRemote = false;

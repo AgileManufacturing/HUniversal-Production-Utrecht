@@ -51,11 +51,14 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
+
+import com.google.gson.Gson;
+
 import rexos.libraries.log.Logger;
 import rexos.mas.data.Callback;
+import rexos.mas.data.GUIMessage;
 
-public class SocketBehaviour extends Behaviour implements
-		HeartbeatReceiver{
+public class SocketBehaviour extends Behaviour implements HeartbeatReceiver {
 	/**
 	 * 
 	 */
@@ -66,24 +69,26 @@ public class SocketBehaviour extends Behaviour implements
 	private boolean isConnected = false;
 	private HeartBeartBehaviour _hbb;
 	private Agent _agent;
-	
+	private Gson _gsonParser;
+
 	private boolean _stopBehaviour = false;
-	
+
 	private Callback _callback;
 
-	public SocketBehaviour(Agent a, Callback callback){
-		try{
+	public SocketBehaviour(Agent a, Callback callback) {
+		try {
 			_agent = a;
 			_callback = callback;
 			_hbb = new HeartBeartBehaviour(a, 0, this);
+			_gsonParser = new Gson();
 			a.addBehaviour(_hbb);
-			if (!isConnected){
+			if (!isConnected) {
 				connect();
 			}
-		} catch(UnknownHostException e){
+		} catch (UnknownHostException e) {
 			System.out.println("Disconnecting!");
 			Logger.log(e);
-		} catch(IOException e){
+		} catch (IOException e) {
 			System.out.println("Disconnecting!");
 			Logger.log(e);
 		}
@@ -93,41 +98,66 @@ public class SocketBehaviour extends Behaviour implements
 	public boolean done() {
 		return this._stopBehaviour;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see jade.core.behaviours.Behaviour#action()
 	 */
 	@Override
-	public void action(){
-		try{
-			if (!isConnected){
+	public void action() {
+		try {
+			if (!isConnected) {
 				connect();
-			} else{
-				if (inputStream.ready()){
+			} else {
+				if (inputStream.ready()) {
 					String s = inputStream.readLine();
-					if (s.equals("beat")){
+					if (s.equals("beat")) {
 						_hbb.reportHeartBeatAck();
 					}
 				}
 			}
-		} catch(Exception e){
+		} catch (Exception e) {
 			isConnected = false;
-			System.out.println("Agent: "+_agent.getLocalName()+" is disconnected!");
+			System.out.println("Agent: " + _agent.getLocalName()
+					+ " is disconnected!");
 		}
 	}
 
-	public void sent(String msg){
-		try{
+	public void write(String msg) {
+		try {
 			outputStream.println(msg);
-		} catch(Exception e){
+		} catch (Exception e) {
 			isConnected = false;
 		}
 	}
 
-	public void connect() throws UnknownHostException, IOException{
+	public void write(boolean error, String msg, String payload) {
+		try {
+			GUIMessage guiMsg = new GUIMessage();
+			guiMsg.setError(error);
+			guiMsg.setMessage(msg);
+			guiMsg.setPayload(payload);
+			write(guiMsg);
+		} catch (Exception e) {
+			isConnected = false;
+		}
+	}
+
+	public void write(GUIMessage guiMsg) {
+		try {
+			String output = "";
+			output = _gsonParser.toJson(guiMsg, GUIMessage.class);
+			outputStream.println(output);
+		} catch (Exception e) {
+			isConnected = false;
+		}
+	}
+
+	public void connect() throws UnknownHostException, IOException {
 		socket = new Socket();
-		socket.connect(new InetSocketAddress(_callback.getHost(), _callback.getPort()),
+		socket.connect(
+				new InetSocketAddress(_callback.getHost(), _callback.getPort()),
 				(int) TimeUnit.SECONDS.toMillis(10));
 		outputStream = new PrintWriter(socket.getOutputStream(), true);
 		inputStream = new BufferedReader(new InputStreamReader(
@@ -138,36 +168,38 @@ public class SocketBehaviour extends Behaviour implements
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see newDataClasses.HeartbeatReceiver#initHeartbeat()
 	 */
 	@Override
-	public void initHeartbeat(){
-		try{
+	public void initHeartbeat() {
+		try {
 			outputStream.println("heart");
-		} catch(Exception e){
+		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see newDataClasses.HeartbeatReceiver#heartbeatTimeout()
 	 */
 	@Override
-	public void heartbeatTimeout(){
-		try{
+	public void heartbeatTimeout() {
+		try {
 			this.isConnected = false;
 			this.resetConnection();
-		} catch(Exception e){
+		} catch (Exception e) {
 			System.out.println("Error when resetting the connection");
 		}
 	}
 
-	public void resetConnection() throws IOException{
+	public void resetConnection() throws IOException {
 		this.socket.close();
 		this.connect();
 	}
-	
+
 	public void stop() {
 		this._hbb.stopHeartbeating();
 		this._stopBehaviour = true;
