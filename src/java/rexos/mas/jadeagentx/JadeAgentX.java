@@ -57,8 +57,10 @@ import jade.wrapper.StaleProxyException;
 import java.util.ArrayList;
 
 import rexos.libraries.log.Logger;
+import rexos.mas.data.Callback;
 import rexos.mas.data.Position;
 import rexos.mas.data.Product;
+import rexos.mas.data.ProductAgentProperties;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
 
@@ -100,7 +102,7 @@ public class JadeAgentX extends Agent {
 			Object[] ar = new Object[] {
 				logisticsAID
 			};
-			getContainerController().createNewAgent("EQ1", "rexos.mas.equiplet_agent.EquipletAgent", ar).start();
+			//getContainerController().createNewAgent("EQ1", "rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 
 			/**
 			 * Lets make a parameter list
@@ -128,7 +130,19 @@ public class JadeAgentX extends Agent {
 			// stepList.add(stp4);
 
 			Production production = new Production(stepList);
+<<<<<<< HEAD
 			Product product = new Product(production, getAID());
+=======
+			Product product = new Product(production, getAID().toString());
+			
+			Callback callback = new Callback();
+			callback.setHost("127.0.0.1");
+			callback.setPort(1233);
+			
+			ProductAgentProperties pap = new ProductAgentProperties();
+			pap.setCallback(callback);
+			pap.setProduct(product);
+>>>>>>> parent of 2160695... Revert "Updating the OverviewBehaviour.java to the new Architecture."
 
 			/**
 			 * We need to pass an Object[] to the createNewAgent. But we only
@@ -137,7 +151,7 @@ public class JadeAgentX extends Agent {
 
 			Thread.sleep(1000);
 			Object[] args = new Object[1];
-			args[0] = product;
+			args[0] = pap;
 
 			getContainerController().createNewAgent("pa" + count++, "rexos.mas.productAgent.ProductAgent", args)
 					.start();
