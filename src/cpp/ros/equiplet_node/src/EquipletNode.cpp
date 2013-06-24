@@ -73,6 +73,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 
 	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "test", "equipletStepBB");
 	equipletStepSubscription = new Blackboard::FieldUpdateSubscription("status", *this);
+	equipletStepSubscription->addOperation(Blackboard::SET);
 	equipletStepBlackboardClient->subscribe(*equipletStepSubscription);
 	subscriptions.push_back(equipletStepSubscription);
 

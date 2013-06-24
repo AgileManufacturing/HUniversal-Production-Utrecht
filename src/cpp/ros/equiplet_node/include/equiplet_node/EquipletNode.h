@@ -39,6 +39,7 @@
 
 #include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
 #include <rexos_blackboard_cpp_client/BlackboardSubscriber.h>
+#include <rexos_blackboard_cpp_client/FieldUpdateSubscription.h>
 #include <rexos_datatypes/EquipletStep.h>
 #include <rexos_utilities/Utilities.h>
 
@@ -111,7 +112,7 @@ private:
 	 **/
 
 	Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
-	Blackboard::BlackboardSubscription* equipletStepSubscription; 
+	Blackboard::FieldUpdateSubscription* equipletStepSubscription;
 
 	Blackboard::BlackboardCppClient *equipletCommandBlackboardClient;
 	Blackboard::BlackboardSubscription* equipletCommandSubscription; 
