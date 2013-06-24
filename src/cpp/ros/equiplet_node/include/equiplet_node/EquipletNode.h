@@ -50,12 +50,14 @@
 
 #pragma GCC system_header
 #include <libjson/libjson.h>
+
 #include <actionlib/client/simple_action_client.h>
 
 namespace equiplet_node {
 
 typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction> ChangeStateActionClient;
 typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeModeAction> ChangeModeActionClient;
+typedef actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> SetInstructionActionClient;
 
 /**
  * The equipletNode, will manage all modules and keep track of their states
@@ -89,6 +91,8 @@ public:
 
 	void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
 
+	
+
 private:
 	void callLookupHandler(std::string lookupType, std::string lookupID, std::map<std::string, std::string> payloadMap);
 
@@ -105,7 +109,14 @@ private:
 	 * @var BlackboardCppClient  *blackboardClient
 	 * Client to read from blackboard
 	 **/
-	Blackboard::BlackboardCppClient *blackboardClient;
+
+	Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
+	Blackboard::BlackboardSubscription* equipletStepSubscription; 
+
+	Blackboard::BlackboardCppClient *equipletCommandBlackboardClient;
+	Blackboard::BlackboardSubscription* equipletCommandSubscription; 
+
+	Blackboard::BlackboardCppClient *equipletStateBlackboardClient;
 	std::vector<Blackboard::BlackboardSubscription *> subscriptions; 
 
 	MOSTDatabaseClient mostDatabaseclient;

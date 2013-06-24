@@ -1,0 +1,7 @@
+# Define the goal
+string json
+---
+# Define the result
+bool succeed
+---
+# Define a feedback message

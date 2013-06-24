@@ -38,6 +38,7 @@
 #include "rexos_utilities/Utilities.h"
 #include <rexos_statemachine/ChangeStateAction.h>
 #include <rexos_statemachine/ChangeModeAction.h>
+#include <rexos_statemachine/SetInstructionAction.h>
 
 using namespace equiplet_node;
 
@@ -57,11 +58,12 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 		),
 		moduleRegistry(nameFromId(id), id),
 		equipletId(id),
-		blackboardClient(NULL) {
+		equipletStepBlackboardClient(NULL) {
 
 	if (mostDatabaseclient.getAllModuleData().size() > 0) {
 		ROS_WARN("Previous equiplet instance did not cleanup correctly");
 	}
+
 	mostDatabaseclient.clearModuleData();
 	mostDatabaseclient.setSafetyState(rexos_statemachine::STATE_SAFE);
 
@@ -69,10 +71,17 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 //			"/most/equiplet/moduleUpdate", &EquipletNode::moduleUpdateService,
 //			this);
 
-	blackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "test", "equipletStepBB");
-	Blackboard::BasicOperationSubscription * sub = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
-	subscriptions.push_back(sub);
-	blackboardClient->subscribe(*sub);
+	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "test", "equipletStepBB");
+	equipletStepSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
+	equipletStepBlackboardClient->subscribe(*equipletStepSubscription);
+	subscriptions.push_back(equipletStepSubscription);
+
+/*	equipletCommandBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_COMMANDS);
+	equipletCommandSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
+	equipletCommandBlackboardClient->subscribe(*equipletCommandSubscription);
+	subscriptions.push_back(equipletCommandSubscription); */
+
+	//equipletStateBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_STATE);
 
 	moduleRegistry.setNewRegistrationsAllowed(true);
 	moduleRegistry.setModuleRegistryListener(this);
@@ -86,10 +95,13 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
  * Destructor for the EquipletNode
  **/
 EquipletNode::~EquipletNode(){
-	delete blackboardClient;
+	delete equipletCommandBlackboardClient;
+	delete equipletStepBlackboardClient;
+
 	for (std::vector<Blackboard::BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
 		delete *iter;
 	}
+
 	subscriptions.clear();
 }
 
@@ -101,11 +113,34 @@ EquipletNode::~EquipletNode(){
  * @param json The message parsed in the json format
  **/
 void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) {
-        //lets parse a root node from the bb msg.
-	JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
-	std::cout << n.write() << std::endl;
-    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
 
+	if(&subscription == equipletStepSubscription)
+	{
+	    //lets parse a root node from the bb msg.
+		JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
+
+	    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
+	    
+	    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
+
+	    prox->setInstruction(step->getInstructionData().getJsonNode());
+		
+	}
+    else if(&subscription == equipletCommandSubscription)
+	{
+		JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
+		JSONNode::const_iterator i = n.begin();
+
+   /*     while (i != n.end()){
+            const char * node_name = i -> name().c_str();
+            if (strcmp(node_name, "set_desired_state") == 0){
+                changeState((rexos_statemachine::State) atoi(i -> as_string().c_str()));
+            }else if (strcmp(node_name, "set_desired_mode") == 0){
+                changeMode((rexos_statemachine::Mode) atoi(i -> as_string().c_str()));
+            }
+            i++;
+        } */
+	}
 }
 
 std::string EquipletNode::getName() {
@@ -131,6 +166,7 @@ void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupI
 
 	ros::NodeHandle nodeHandle;
 	ros::ServiceClient lookupClient = nodeHandle.serviceClient<lookup_handler::LookupServer>("LookupHandler/lookup");
+
 	if(lookupClient.call(msg)){
 		// TODO
 		// Read message
@@ -188,6 +224,7 @@ void EquipletNode::transitionSetup(rexos_statemachine::TransitionActionServer* a
 	moduleRegistry.setNewRegistrationsAllowed(false);
 
 	std::vector<ModuleProxy*> modules = moduleRegistry.getRigisteredModules();
+
 	for (int i = 0; i < modules.size(); i++) {
 		modules[i]->changeState(rexos_statemachine::STATE_STANDBY);
 	}

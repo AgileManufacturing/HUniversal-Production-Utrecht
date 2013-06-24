@@ -31,6 +31,7 @@
 #include "rexos_datatypes/InstructionData.h"
 
 namespace rexos_datatypes{
+
     InstructionData::InstructionData() {
     }
 
@@ -68,4 +69,13 @@ namespace rexos_datatypes{
     void InstructionData::setPayload(std::map<std::string, std::string> payload){
         this->payload = payload;
     }
+
+    JSONNode InstructionData::getJsonNode(){
+        return this-> jsonNode;
+    }
+
+    void InstructionData::setJsonNode(JSONNode jsonNode){
+        this->jsonNode = jsonNode;
+    }
+
 }

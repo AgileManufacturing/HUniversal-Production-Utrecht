@@ -15,11 +15,17 @@
 
 #include <rexos_statemachine/ChangeStateAction.h>
 #include <rexos_statemachine/ChangeModeAction.h>
+#include <rexos_statemachine/SetInstructionAction.h>
 
 #include <equiplet_node/StateUpdate.h>
 #include <equiplet_node/ModeUpdate.h>
+#include <equiplet_node/SetInstruction.h>
 
 #include "equiplet_node/ModuleProxyListener.h"
+ 
+// GCC system header to suppress libjson warnings
+#pragma GCC system_header
+#include <libjson/libjson.h>
 
 namespace equiplet_node {
 
@@ -27,6 +33,7 @@ class EquipletNode;
 
 typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction> ChangeStateActionClient;
 typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeModeAction> ChangeModeActionClient;
+typedef actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> SetInstructionActionClient;
 
 class ModuleProxy {
 public:
@@ -44,13 +51,14 @@ public:
 
 	void changeState(rexos_statemachine::State state);
 	void changeMode(rexos_statemachine::Mode mode);
-
-	bool setModuleInstruction();
+	void setInstruction(JSONNode n);
 
 private:
 	ModuleProxy(std::string equipletNodeName, std::string moduleNodeName, ModuleProxyListener* mpl = NULL);
+
 	bool onStateChangeServiceCallback(StateUpdateRequest &req, StateUpdateResponse &res);
 	bool onModeChangeServiceCallback(ModeUpdateRequest &req, ModeUpdateResponse &res);
+	bool onInstructionServiceCallback(SetInstructionRequest &req, SetInstructionResponse &res);
 
 	int moduleId;
 
@@ -62,8 +70,11 @@ private:
 
 	ChangeStateActionClient changeStateActionClient;
 	ChangeModeActionClient changeModeActionClient;
+	SetInstructionActionClient setInstructionActionClient;
+
 	ros::ServiceServer stateUpdateServiceServer;
 	ros::ServiceServer modeUpdateServiceServer;
+	ros::ServiceServer instructionUpdateServiceServer;
 
 	rexos_statemachine::State currentState;
 	rexos_statemachine::Mode currentMode;
