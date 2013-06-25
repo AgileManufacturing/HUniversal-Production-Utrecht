@@ -48,7 +48,9 @@ StateMachine::StateMachine(std::string nodeName,std::vector<rexos_statemachine::
 		transitionSetupServer(nodeHandle, nodeName + "/transition_setup", boost::bind(&StateMachine::onTransitionSetupAction, this, &transitionSetupServer), false),
 		transitionShutdownServer(nodeHandle, nodeName + "/transition_shutdown", boost::bind(&StateMachine::onTransitionShutdownAction, this, &transitionShutdownServer), false),
 		transitionStartServer(nodeHandle, nodeName + "/transition_start", boost::bind(&StateMachine::onTransitionStartAction, this, &transitionStartServer), false),
-		transitionStopServer(nodeHandle, nodeName + "/transition_stop", boost::bind(&StateMachine::onTransitionStopAction, this, &transitionStopServer), false)
+		transitionStopServer(nodeHandle, nodeName + "/transition_stop", boost::bind(&StateMachine::onTransitionStopAction, this, &transitionStopServer), false),
+		changeStateActionClient(nodeHandle, nodeName + "/change_state"),
+		changeModeActionClient(nodeHandle, nodeName + "/change_mode")
 {
 
 	StatePair transitionSetupStatePair(STATE_SAFE, STATE_STANDBY);
@@ -122,18 +124,11 @@ Mode StateMachine::getCurrentMode() {
  * @param desiredState is the desiredState
  * @param changeStateActionClient = NULL when not given. By this param it is possilbe to waitForResult and getState when finished(SUCCEEDED/ABORTED)
  **/
-void StateMachine::changeState(State desiredState,ChangeStateActionClient* changeStateActionClient) {
+void StateMachine::changeState(State desiredState) {
 	ROS_INFO("_changeState called with desiredState %s",rexos_statemachine::state_txt[desiredState]);
 	ChangeStateGoal goal;
 	goal.desiredState = desiredState;
-
-	if(changeStateActionClient == NULL){
-		changeStateActionClient = new ChangeStateActionClient(nodeHandle, nodeName + "/change_state"),
-		changeStateActionClient->sendGoal(goal);
-		delete changeStateActionClient;
-	}else{
-		changeStateActionClient->sendGoal(goal);
-	}
+	changeStateActionClient.sendGoal(goal);
 }
 
 /**
@@ -142,18 +137,11 @@ void StateMachine::changeState(State desiredState,ChangeStateActionClient* chang
  * @param desiredMode is the desiredMode
  * @param changeModeActionClient = NULL when not given. By this param it is possilbe to waitForResult and getState when finished(SUCCEEDED/ABORTED)
  **/
-void StateMachine::changeMode(Mode desiredMode,ChangeModeActionClient* changeModeActionClient) {
+void StateMachine::changeMode(Mode desiredMode) {
 	ROS_INFO("_changeMode called with desiredMode %s",rexos_statemachine::state_txt[desiredMode]);
 	ChangeModeGoal goal;
 	goal.desiredMode = desiredMode;
-
-	if(changeModeActionClient == NULL){
-		changeModeActionClient = new ChangeModeActionClient(nodeHandle, nodeName + "/change_mode"),
-		changeModeActionClient->sendGoal(goal);
-		delete changeModeActionClient;
-	}else{
-		changeModeActionClient->sendGoal(goal);
-	}
+	changeModeActionClient.sendGoal(goal);
 }
 
 void StateMachine::onChangeStateAction(const ChangeStateGoalConstPtr& goal){

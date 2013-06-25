@@ -96,9 +96,9 @@ private:
 	void onTransitionStopAction(TransitionActionServer* as);
 
 protected:
-	void changeState(State desiredState,ChangeStateActionClient* changeStateActionClient = NULL);
+	void changeState(State desiredState);
 
-	void changeMode(Mode desiredMode,ChangeModeActionClient* changeModeActionClient = NULL);
+	void changeMode(Mode desiredMode);
 
 	/**
 	 *@var ros::NodeHandle nodeHandle;
@@ -188,6 +188,8 @@ private:
 
 	ChangeStateActionServer changeStateActionServer;
 	ChangeModeActionServer changeModeActionServer;
+	ChangeStateActionClient changeStateActionClient;
+	ChangeModeActionClient changeModeActionClient;
 
 	TransitionActionServer transitionSetupServer;
 	TransitionActionServer transitionShutdownServer;
