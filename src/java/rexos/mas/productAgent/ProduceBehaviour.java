@@ -66,8 +66,6 @@ public class ProduceBehaviour extends Behaviour {
 
 	private BehaviourCallback _bc;
 
-	// private ProductionEquipletMapper _prodEQMap;
-	// ACLMessage msg;
 	/**
 	 * @param myAgent
 	 */
@@ -163,6 +161,9 @@ class ProducingReceiver extends rexos.mas.behaviours.ReceiveBehaviour {
 					ProductStep step = new ProductStep((BasicDBObject)m.getContentObject());
 					ProductAgentstp.setStatus(step.getStatus());
 					switch (step.getStatus()) {
+					case WAITING:
+						// Waiting
+						break;
 					case IN_PROGRESS:
 						// In progress
 						break;
