@@ -64,7 +64,7 @@ void ModuleProxy::changeState(rexos_statemachine::State state) {
 }
 
 void ModuleProxy::changeMode(rexos_statemachine::Mode mode) {
-	ROS_INFO("ModuleProxy of %s send new mode goal %s", moduleNodeName.c_str(), rexos_statemachine::Mode_txt[mode]);
+	ROS_INFO("ModuleProxy of %s send new mode goal %s", moduleNodeName.c_str(), rexos_statemachine::mode_txt[mode]);
 	rexos_statemachine::ChangeModeGoal goal;
 	goal.desiredMode = mode;
 	changeModeActionClient.sendGoal(goal);

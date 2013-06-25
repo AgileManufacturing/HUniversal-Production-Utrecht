@@ -1,5 +1,3 @@
-
-
 /**
  * @file EquipletNode.cpp
  * @brief Symbolizes an entire EquipletNode.
@@ -46,6 +44,9 @@
 
 using namespace equiplet_node;
 
+boost::condition_variable condit;
+boost::mutex mutexit;
+
 /**
  * Create a new EquipletNode
  * @param id The unique identifier of the Equiplet
@@ -61,6 +62,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 			rexos_statemachine::MODE_STEP}
 		),
 		moduleRegistry(nameFromId(id), id),
+        scada(this, &moduleRegistry),
 		changeStateActionClient(nh, nameFromId(id) + "/change_state"),
 		changeModeActionClient(nh, nameFromId(id) + "/change_mode"),
 		equipletId(id),
@@ -103,6 +105,9 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
  * Destructor for the EquipletNode
  **/
 EquipletNode::~EquipletNode(){
+	delete equipletStepBlackboardClient;
+	delete equipletStepSubscription;
+	equipletCommandBlackboardClient->unsubscribe(*equipletCommandSubscription);
 	delete equipletCommandBlackboardClient;
 	delete equipletCommandSubscription;
 	delete equipletStepBlackboardClient;
@@ -147,13 +152,13 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 
 				    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
 				    prox->setInstruction(step->getInstructionData().getJsonNode());
+				    
 	    		} else {
 	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"ERROR\" } } ");
 	    		}
 	    	} else {
-	    		ROS_INFO("Instruction received but current mode is %s", rexos_statemachine::Mode_txt[currentMode]);
-
-	    		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"ERROR\" }  }");
+	    		ROS_INFO("Instruction received but current mode is %s", rexos_statemachine::mode_txt[currentMode]);
+	    		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"ERROR\"");
 	    	}
 		}
 	}
@@ -254,8 +259,7 @@ void EquipletNode::onModeChanged(){
 	rexos_statemachine::Mode currentMode = getCurrentMode();
 	switch(currentMode){
 		case rexos_statemachine::MODE_NORMAL:	
-		case rexos_statemachine::MODE_ERROR:
-		case rexos_statemachine::MODE_CRITICAL_ERROR:
+		case rexos_statemachine::MODE_SERVICE:
 		case rexos_statemachine::MODE_E_STOP:	
 			changeModuleModes = true; break;
 	}
@@ -273,7 +277,7 @@ void EquipletNode::onModuleStateChanged(
 	rexos_statemachine::State newState, 
 	rexos_statemachine::State previousState)
 {
-	//ROS_INFO("EquipletNode received from %s a state change from %d to %d",moduleProxy->getModuleNodeName(),previousState,newState);
+	//ROS_INFO("Module State Changed received from %s a state change from %d to %d",moduleProxy->getModuleNodeName(),previousState,newState);
 	if(rexos_statemachine::is_transition_state[getCurrentState()])
 		finishTransition(moduleRegistry.getRegisteredModules());
 }
@@ -283,21 +287,34 @@ void EquipletNode::onModuleModeChanged(
 	rexos_statemachine::Mode newMode, 
 	rexos_statemachine::Mode previousMode)
 {
-	//ROS_INFO("ModuleRegistry received from %s a mode change from %d to %d",moduleProxy->getModuleNodeName(),previousMode,newMode);
+	//ROS_INFO("Module Mode Changed received from %s a mode change from %d to %d",moduleProxy->getModuleNodeName(),previousMode,newMode);
+	if(newMode == rexos_statemachine::MODE_ERROR)
+		changeMode(rexos_statemachine::MODE_ERROR);
+	else if(newMode == rexos_statemachine::MODE_CRITICAL_ERROR)
+		changeMode(rexos_statemachine::MODE_CRITICAL_ERROR);
 }
 
 void EquipletNode::transitionSetup(rexos_statemachine::TransitionActionServer* as) {
+	ROS_INFO("transitionSetup called");
 	setupTransitionActionServer = as;
 	moduleRegistry.setNewRegistrationsAllowed(false);
 	changeModuleStates(moduleRegistry.getRegisteredModules(),rexos_statemachine::STATE_STANDBY);
-	finishTransition(moduleRegistry.getRegisteredModules());
+	if(!finishTransition(moduleRegistry.getRegisteredModules())){
+		boost::unique_lock<boost::mutex> lock( mutexit );
+		condit.wait( lock );
+	}
+	ROS_INFO("transitionSetup finished");
 }
 
 void EquipletNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as) {
 	shutdownTransitionActionServer = as;
 	moduleRegistry.setNewRegistrationsAllowed(true);
 	changeModuleStates(moduleRegistry.getRegisteredModules(),rexos_statemachine::STATE_SAFE);
-	finishTransition(moduleRegistry.getRegisteredModules());
+
+	if(!finishTransition(moduleRegistry.getRegisteredModules())){
+		boost::unique_lock<boost::mutex> lock( mutexit );
+		condit.wait( lock );
+	}
 }
 
 void EquipletNode::transitionStart(rexos_statemachine::TransitionActionServer* as) {
@@ -306,7 +323,12 @@ void EquipletNode::transitionStart(rexos_statemachine::TransitionActionServer* a
 
 void EquipletNode::transitionStop(rexos_statemachine::TransitionActionServer* as) {
 	stopTransitionActionServer = as;
-	finishTransition(moduleRegistry.getRegisteredModules());
+	changeModuleStates(moduleRegistry.getRegisteredModules(),rexos_statemachine::STATE_STANDBY);
+
+	if(!finishTransition(moduleRegistry.getRegisteredModules())){
+		boost::unique_lock<boost::mutex> lock( mutexit );
+		condit.wait( lock );
+	}
 }
 
 void EquipletNode::changeModuleStates(std::vector<ModuleProxy*> modules, rexos_statemachine::State desiredState){
@@ -337,17 +359,19 @@ bool EquipletNode::finishTransition(std::vector<ModuleProxy*> modules){
 
 	bool allModulesDone = true;
 	for(int i=0; i < modules.size(); i++){
-		if(modules[i]->getCurrentState() == getCurrentState()){
+		if(modules[i]->getCurrentState() != getCurrentState()){
+			ROS_INFO("Not all modules are in state : %s", rexos_statemachine::state_txt[desiredTransitionState]);
 			allModulesDone = false;
 			break;
-		}else if(modules[i]->getCurrentState() != desiredTransitionState){
-			transitionActionServer->setAborted();	
-			return false;
 		}
 	}
 
 	if(allModulesDone){
+		ROS_INFO("All modules have done their transition");
 		transitionActionServer->setSucceeded();
+		condit.notify_one();
+
 		return true;
 	}
+	return false;
 }

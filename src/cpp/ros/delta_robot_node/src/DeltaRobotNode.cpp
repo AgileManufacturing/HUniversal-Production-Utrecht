@@ -73,7 +73,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 	ROS_INFO("Configuring Modbus...");
 
 	ROS_INFO("Advertising ActionServer at : delta_robot_node_1_1");
-	/*
+
 
 	// Initialize modbus for IO controller
 	modbus_t *modbusIO = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
@@ -111,7 +111,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 
 	// Create a deltarobot
 	deltaRobot = new rexos_delta_robot::DeltaRobot(drm, motorManager, motors, modbusIO);
-	*/
+
 	setInstructionActionServer.start();
 	ROS_INFO("DeltaRobot Node initialized without MODBUS.");
 }

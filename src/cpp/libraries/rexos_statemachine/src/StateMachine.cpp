@@ -191,23 +191,33 @@ bool StateMachine::_changeState(rexos_statemachine::State newState) {
 	
 	TransitionActionClient* transitionActionClient = changeStateEntry.transition->transitionActionClient;
 	
-	while( rexos_statemachine::is_transition_state[currentState] ){
-		TransitionGoal goal;
-		transitionActionClient->sendGoal(goal);
-		transitionActionClient->waitForResult();
+	TransitionGoal goal;
+	transitionActionClient->sendGoal(goal);
+	transitionActionClient->waitForResult();
 
+	while( rexos_statemachine::is_transition_state[currentState] ){
 		if(currentState == changeStateEntry.transition->transitionState){
 			if (transitionActionClient->getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
 				_setState(changeStateEntry.statePair.second);
-			}else{
+			} else if(changeStateEntry.abortTransition == NULL) {
+				throw new std::logic_error("Trying to access a null abortTransitions state");
+			} else if(transitionActionClient->getState() == actionlib::SimpleClientGoalState::PREEMPTED) {
+			} else if(transitionActionClient->getState() == actionlib::SimpleClientGoalState::PENDING) {
+			} else{
 				_setState(changeStateEntry.abortTransition->transitionState);
 				transitionActionClient = changeStateEntry.abortTransition->transitionActionClient;
 			}
 		}else if (transitionActionClient->getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
 			_setState(changeStateEntry.statePair.first);
+			TransitionGoal goal;
+			transitionActionClient->sendGoal(goal);
+			transitionActionClient->waitForResult();
 		}else{
 			//ABORT TRANSITION FAILED
 			_setState(changeStateEntry.statePair.first);
+			TransitionGoal goal;
+			transitionActionClient->sendGoal(goal);
+			transitionActionClient->waitForResult();
 		}
 	}
 
@@ -268,7 +278,7 @@ void StateMachine::_setState(State state) {
 }
 
 void StateMachine::_setMode(Mode mode) {
-	ROS_INFO("mode changed to:%s",Mode_txt[mode]);
+	ROS_INFO("mode changed to:%s", mode_txt[mode]);
 	currentMode = mode;
 	if (listener != NULL) {
 		listener->onModeChanged();
