@@ -69,8 +69,6 @@ public class ProduceBehaviour extends Behaviour {
 	private int _producersStarted = 0;
 	private int _producersCompleted = 0;
 
-	// private ProductionEquipletMapper _prodEQMap;
-	// ACLMessage msg;
 	/**
 	 * @param myAgent
 	 */
@@ -87,7 +85,7 @@ public class ProduceBehaviour extends Behaviour {
 				for (ProductionStep stp : _production.getProductionSteps()) {
 					if (stp.getStatus() == StepStatusCode.PLANNED) {
 						myAgent.addBehaviour(new ProducingReceiver(myAgent, -1,
-								MessageTemplate.MatchAll(), stp, this));
+								MessageTemplate.or(MessageTemplate.or(MessageTemplate.MatchOntology("StartStepQuestion"), MessageTemplate.MatchOntology("StatusUpdate" )), MessageTemplate.MatchOntology("EquipletAgentDied")), stp, this));
 						_producersStarted++;
 					} else {
 						this._isError = true;
@@ -168,6 +166,9 @@ class ProducingReceiver extends rexos.mas.behaviours.ReceiveBehaviour {
 					ProductStep step = new ProductStep((BasicDBObject)m.getContentObject());
 					ProductAgentstp.setStatus(step.getStatus());
 					switch (step.getStatus()) {
+					case WAITING:
+						// Waiting
+						break;
 					case IN_PROGRESS:
 						// In progress
 						break;

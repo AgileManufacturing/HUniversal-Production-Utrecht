@@ -1,7 +1,6 @@
 /**
  * @file ProductLog.java
- * @brief Class to create the productionlog which is then able to be pushed to
- *        the remote location.
+ * @brief Class for logging productiondata
  * @date Created: 02-04-2013
  * 
  * @author Theodoor de Graaff
@@ -45,34 +44,77 @@ import jade.core.AID;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.concurrent.atomic.AtomicLong;
 
 import rexos.libraries.log.Logger;
 
 import com.mongodb.BasicDBObject;
 
+/**
+ * @author Theodoor
+ * 
+ */
 public class ProductLog{
 	File logfile;
 	FileWriter writer;
-
+	
 	public ProductLog(){
 	}
 
 	/**
+	 * Add statusdata to ProductLog Writes multiple json-objects into one large
+	 * json-object with an objectnumber.
+	 * 
 	 * @param aid
 	 * @param statusData
+	 * 
 	 */
 	public void add(AID aid, BasicDBObject statusData){
 		try{
+			boolean newFileCreated = false;
 			if (logfile == null){
-				logfile = new File("log " + aid.toString());
+				logfile = new File("log " + aid.toString().replaceAll("[\\/:*?\"<>|]", "") + ".json");
 				logfile.createNewFile();
+				newFileCreated = true;
 			}
 			if (writer == null){
-				writer = new FileWriter(logfile);
+				writer = new FileWriter(logfile, true);
 			}
-			writer.write(statusData.toString());
+			if (newFileCreated){
+				writer.append("{\"" + uniqueCurrentTime() + "\":");
+				writer.flush();
+			} else{
+				try(RandomAccessFile raf = new RandomAccessFile(logfile, "rw")){
+					logfile.length();
+					raf.setLength((logfile.length() - 1));
+					raf.close();
+				}
+				String newObject = new String(",\"" + uniqueCurrentTime()
+						+ "\":");
+				writer.append(newObject);
+				writer.flush();
+			}
+			writer.append(statusData.toString() + "}");
+			writer.flush();
 		} catch(IOException e){
 			Logger.log(e);
 		}
+	}
+	
+	private static final AtomicLong last_time = new AtomicLong();	
+	/**
+	 * Returns uniqueCurrentTime
+	 * @see http://stackoverflow.com/questions/9191288
+	 */
+	public static long uniqueCurrentTime() {
+	    long newCurrentTime = System.currentTimeMillis();
+	    while(true) {
+	        long lastTime = last_time.get();
+	        if (lastTime >= newCurrentTime)
+	        	newCurrentTime = lastTime+1;
+	        if (last_time.compareAndSet(lastTime, newCurrentTime))
+	            return newCurrentTime;
+	    }
 	}
 }
