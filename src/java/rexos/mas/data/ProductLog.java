@@ -54,7 +54,7 @@ public class ProductLog{
 	File logfile;
 	FileWriter writer;
 
-	ProductLog(){
+	public ProductLog(){
 	}
 
 	/**
@@ -64,7 +64,8 @@ public class ProductLog{
 	public void add(AID aid, BasicDBObject statusData){
 		try{
 			if (logfile == null){
-				logfile = new File("/" + aid.toString());
+				logfile = new File("log " + aid.toString());
+				logfile.createNewFile();
 			}
 			if (writer == null){
 				writer = new FileWriter(logfile);
