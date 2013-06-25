@@ -252,12 +252,13 @@ public class SchedulerBehaviour extends Behaviour {
 							}
 						}
 					}
+				
+					if (schedules.length == 0) {
+						freetimeslot.add(new FreeTimeSlot((int) (System
+								.currentTimeMillis() / 2000 + 5), productionstep
+								.getRequiredTimeSlots(), pairs.getKey()));
+					}
 				}
-				if (schedules.length == 0) {
-					freetimeslot.add(new FreeTimeSlot((int) (System
-							.currentTimeMillis() / 2000 + 5), productionstep
-							.getRequiredTimeSlots(), pairs.getKey()));
-				} 
 			}
 		}
 
