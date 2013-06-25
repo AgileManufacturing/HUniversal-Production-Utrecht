@@ -44,6 +44,10 @@ import jade.core.AID;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.Date;
+import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicLong;
 
 import rexos.libraries.log.Logger;
 
@@ -51,17 +55,18 @@ import com.mongodb.BasicDBObject;
 
 /**
  * @author Theodoor
- *
+ * 
  */
 public class ProductLog{
 	File logfile;
 	FileWriter writer;
-
+	
 	public ProductLog(){
 	}
 
 	/**
-	 * Add statusdata to ProductLog
+	 * Add statusdata to ProductLog Writes multiple json-objects into one large
+	 * json-object with an objectnumber.
 	 * 
 	 * @param aid
 	 * @param statusData
@@ -69,18 +74,45 @@ public class ProductLog{
 	 */
 	public void add(AID aid, BasicDBObject statusData){
 		try{
+			boolean newFileCreated = false;
 			if (logfile == null){
 				logfile = new File("log " + aid.toString() + ".json");
 				logfile.createNewFile();
+				newFileCreated = true;
 			}
 			if (writer == null){
-				writer = new FileWriter(logfile);
+				writer = new FileWriter(logfile, true);
 			}
-			writer.write(statusData.toString());
+			if (newFileCreated){
+				writer.append("{\"" + uniqueCurrentTimeMS() + "\":");
+				writer.flush();
+			} else{
+				try(RandomAccessFile raf = new RandomAccessFile(logfile, "rw")){
+					logfile.length();
+					raf.setLength((logfile.length() - 1));
+					raf.close();
+				}
+				String newObject = new String(",\"" + uniqueCurrentTimeMS()
+						+ "\":");
+				writer.append(newObject);
+				writer.flush();
+			}
+			writer.append(statusData.toString() + "}");
+			writer.flush();
 		} catch(IOException e){
 			Logger.log(e);
 		}
 	}
 	
-	
+	private static final AtomicLong LAST_TIME_MS = new AtomicLong();
+	public static long uniqueCurrentTimeMS() {
+	    long now = System.currentTimeMillis();
+	    while(true) {
+	        long lastTime = LAST_TIME_MS.get();
+	        if (lastTime >= now)
+	            now = lastTime+1;
+	        if (LAST_TIME_MS.compareAndSet(lastTime, now))
+	            return now;
+	    }
+	}
 }
