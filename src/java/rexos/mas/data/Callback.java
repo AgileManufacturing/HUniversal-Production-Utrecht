@@ -13,6 +13,9 @@
  */
 package rexos.mas.data;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 /**
  * @author Mike
  *
@@ -22,12 +25,20 @@ package rexos.mas.data;
 
 public class Callback{
 	
+	@Expose
+	@SerializedName("host")
 	private String _host;
 	
+	@Expose
+	@SerializedName("port")
 	private int _port;
 	
+	@Expose
+	@SerializedName("reportLevel")
 	private int _reportLevel;
 	
+	@Expose
+	@SerializedName("protocol")
 	private String _protocol;
 	
 	public Callback() {
@@ -64,6 +75,11 @@ public class Callback{
 	
 	public void setProtocol(String protocol) {
 		this._protocol = protocol;
+	}
+	
+	@Override
+	public String toString() {
+		   return "DataObject [host=" + _host + ", port=" + _port + ", reportLevel="+_reportLevel+", protocol="+_protocol+"]";
 	}
 	
 }

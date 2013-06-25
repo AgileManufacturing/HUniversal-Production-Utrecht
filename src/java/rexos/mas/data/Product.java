@@ -45,9 +45,14 @@ import rexos.libraries.log.Logger;
 import java.util.List;
 import rexos.mas.data.sqldatabase.sqliteDatabase;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import com.mongodb.BasicDBObject;
 
 public class Product{
+	
+	@Expose
+	@SerializedName("production")
 	private Production _production;
 
 
