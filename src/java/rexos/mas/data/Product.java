@@ -43,9 +43,14 @@ package rexos.mas.data;
 import jade.core.AID;
 import rexos.libraries.log.Logger;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import com.mongodb.BasicDBObject;
 
 public class Product{
+	
+	@Expose
+	@SerializedName("production")
 	private Production _production;
 
 

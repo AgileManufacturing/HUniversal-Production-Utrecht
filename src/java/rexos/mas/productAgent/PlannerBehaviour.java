@@ -92,6 +92,7 @@ public class PlannerBehaviour extends Behaviour {
 			// Iterate over all the production steps
 			for (ProductionStep prodStep : psa) {
 				if (prodStep.getStatus() == StepStatusCode.EVALUATING) {
+					
 					int PA_id = prodStep.getId();
 					// Get the type of production step, aka capability
 					long PA_capability = prodStep.getCapability();

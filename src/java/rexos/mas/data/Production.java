@@ -42,8 +42,15 @@ package rexos.mas.data;
 
 import java.util.ArrayList;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 public class Production{
+	
+	@Expose
+	@SerializedName("productionSteps")
 	private ArrayList<ProductionStep> _productionSteps;
+
 	private ProductionEquipletMapper _prodEQMap;
 
 	public Production(){
