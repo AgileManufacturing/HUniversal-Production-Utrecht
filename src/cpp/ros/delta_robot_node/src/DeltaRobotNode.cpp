@@ -113,7 +113,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 	deltaRobot = new rexos_delta_robot::DeltaRobot(drm, motorManager, motors, modbusIO);
 
 	setInstructionActionServer.start();
-	ROS_INFO("DeltaRobot Node initialized without MODBUS.");
+	ROS_INFO("DeltaRobot Node initialized");
 }
 
 

@@ -93,11 +93,6 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 
 	setListener(this);
 
-	changeState(rexos_statemachine::STATE_STANDBY);
-	changeState(rexos_statemachine::STATE_NORMAL);
-	
-	changeMode(rexos_statemachine::MODE_NORMAL);
-
 	std::cout << "Connected!" << std::endl;
 }
 
@@ -152,7 +147,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 
 				    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
 				    prox->setInstruction(step->getInstructionData().getJsonNode());
-				    
+
 	    		} else {
 	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"ERROR\" } } ");
 	    		}
