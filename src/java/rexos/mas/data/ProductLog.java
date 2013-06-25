@@ -41,6 +41,7 @@
 package rexos.mas.data;
 
 import rexos.libraries.log.Logger;
+import rexos.mas.data.sqldatabase.RemoteDatabaseConnection;
 import rexos.mas.data.sqldatabase.sqliteDatabase;
 import jade.core.AID;
 
@@ -53,8 +54,8 @@ public class ProductLog{
 	private boolean writeToRemote = false;
 	private boolean writeToLocal = true;
 	private sqliteDatabase local;
-
-	// TODO_REMOTE private RemoteDatabaseConnection remote;
+	private RemoteDatabaseConnection remote;
+	
 	/**
 	 * @param writeToRemote
 	 * @param writeToLocal
@@ -73,8 +74,8 @@ public class ProductLog{
 			local.insert(msgs);
 		}
 		if (writeToRemote){
-			// TODO_REMOTE remote.insert()
-			throw new UnsupportedOperationException();
+			remote.insert(msgs);
+			
 		}
 	}
 
@@ -94,7 +95,12 @@ public class ProductLog{
 		for(Entry<String, Object> e: statusData.entrySet()){
 			switch(e.getValue().getClass().getCanonicalName()){
 			case "java.lang.String":
-				local.insert(new LogMessage(aid, e.toString()));
+				if(writeToLocal){
+					local.insert(new LogMessage(aid, e.toString()));
+				}
+				if(writeToRemote){
+					remote.insert(new LogMessage(aid, e.toString()));
+				}
 				break;
 			case "com.mongodb.BasicDBObject" :
 				BasicDBObject db = (BasicDBObject) e.getValue();

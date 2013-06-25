@@ -42,12 +42,15 @@ package test.java;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+
 import jade.core.AID;
 import rexos.mas.hardware_agent.*;
 import rexos.mas.data.StepStatusCode;
+
 import org.junit.Test;
 
 import com.mongodb.BasicDBObject;
+
 import rexos.mas.data.Position;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
@@ -115,6 +118,7 @@ public class Logging{
 			BasicDBObject log = new BasicDBObject();
 			BasicDBObject dbEquipletSteps;
 			dbEquipletSteps = new BasicDBObject();
+			@SuppressWarnings("unused")
 			BasicDBObject lookUpParameters = new BasicDBObject();
 			
 			InstructionData instructionData = new InstructionData();
