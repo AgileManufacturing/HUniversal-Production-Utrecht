@@ -314,7 +314,6 @@ void EquipletNode::transitionStart(rexos_statemachine::TransitionActionServer* a
 
 void EquipletNode::transitionStop(rexos_statemachine::TransitionActionServer* as) {
 	stopTransitionActionServer = as;
-	changeModuleStates(moduleRegistry.getRegisteredModules(),rexos_statemachine::STATE_STANDBY);
 
 	if(!finishTransition(moduleRegistry.getRegisteredModules())){
 		boost::unique_lock<boost::mutex> lock( mutexit );
@@ -350,8 +349,9 @@ bool EquipletNode::finishTransition(std::vector<ModuleProxy*> modules){
 
 	bool allModulesDone = true;
 	for(int i=0; i < modules.size(); i++){
-		if(modules[i]->getCurrentState() != getCurrentState()){
-			ROS_INFO("Not all modules are in state : %s", rexos_statemachine::state_txt[desiredTransitionState]);
+		if(modules[i]->getCurrentState() != desiredTransitionState){
+			ROS_INFO("Not all modules are in state : %s, module in state: %s", 
+				rexos_statemachine::state_txt[desiredTransitionState]);
 			allModulesDone = false;
 			break;
 		}
