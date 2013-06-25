@@ -82,7 +82,7 @@ public class ProduceBehaviour extends Behaviour {
 				for (ProductionStep stp : _production.getProductionSteps()) {
 					if (stp.getStatus() == StepStatusCode.PLANNED) {
 						myAgent.addBehaviour(new ProducingReceiver(myAgent, -1,
-								MessageTemplate.MatchAll(), stp, this));
+								MessageTemplate.and(MessageTemplate.and(MessageTemplate.MatchOntology("StartStepQuestion"), MessageTemplate.MatchOntology("StatusUpdate" )), MessageTemplate.MatchOntology("EquipletAgentDied")), stp, this));
 					} else {
 						this._isError = true;
 					}
