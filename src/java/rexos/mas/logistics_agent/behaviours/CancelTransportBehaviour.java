@@ -69,7 +69,9 @@ public class CancelTransportBehaviour extends ReceiveBehaviour {
 			
 			Part[]parts = (Part[]) message.getContentObject();
 			
-			//TODO: cancel the transport of the parts in parts			
+			//TODO: cancel the transport of the parts in parts[]	
+			
+			
 			
 		} catch (Exception e) {
 			

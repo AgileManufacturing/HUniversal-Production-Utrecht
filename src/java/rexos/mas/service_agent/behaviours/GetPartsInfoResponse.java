@@ -151,7 +151,10 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 				
 				Object[] parts = parameters.keySet().toArray();
 								
-				//TODO: sta de parts op op de productstepBB
+				//TODO: sla de parts op op de productstepBB
+				
+				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStep.getId()),
+						new BasicDBObject("$set", new BasicDBObject("inputParts",parts)));
 				
 				Logger.log("%s got partsInfo: %s%n", agent.getLocalName(), parameters.toString());
 
