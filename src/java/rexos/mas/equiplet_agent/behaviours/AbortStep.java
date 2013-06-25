@@ -121,10 +121,7 @@ public class AbortStep extends ReceiveBehaviour {
 				ProductStep productStep = new ProductStep(step);
 	
 				if(productStep.getStatus() == StepStatusCode.PLANNED) {
-					equipletAgent.getProductStepBBClient().updateDocuments(
-							new BasicDBObject("_id", productStepEntryId),
-							new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
-									"statusData", new BasicDBObject("reason", "productagent canceled"))));
+					equipletAgent.cancelAllStepsForProductStep(productStepEntryId, "productagent canceled");
 					equipletAgent.getTimer().reScheduleTimer();
 					
 				} else {

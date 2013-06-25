@@ -57,7 +57,9 @@ import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
+import rexos.mas.data.EquipletState;
 import rexos.mas.data.ProductStep;
+import rexos.mas.data.EquipletCommandEntry;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.service_agent.behaviours.CanDoProductStep;
 import rexos.mas.service_agent.behaviours.GetProductStepDuration;
@@ -66,6 +68,7 @@ import rexos.mas.service_agent.behaviours.ScheduleStep;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.QueryBuilder;
 
 /**
  * This agent manages services and oversees generation and scheduling of
@@ -95,6 +98,12 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 */
 	private BlackboardClient serviceStepBBClient;
 
+	/**
+	 * @var BlackboardClient stateBBClient
+	 * 		The BlackboardClient used to interact with the state blackboard.
+	 */
+	private BlackboardClient stateBBClient;
+	
 	/**
 	 * @var FieldUpdateSubscription statusSubscription
 	 *      The subscription object used to subscribe this agent on a blackboard
@@ -126,6 +135,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 *      The AID of the logistics agent.
 	 */
 	private AID logisticsAID;
+	
+	private int equipletId;
 
 	/**
 	 * @var ServiceFactory serviceFactory
@@ -153,11 +164,12 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			dbData = (DbData) args[0];
 			equipletAgentAID = (AID) args[1];
 			logisticsAID = (AID) args[2];
+			equipletId = (int) args[3];
 		}
 
 		// Create a hardware agent for this equiplet
 		Object[] arguments = new Object[] {
-				dbData, equipletAgentAID, getAID()
+				dbData, equipletAgentAID, getAID(), equipletId
 		};
 		try {
 			AgentController hardwareAgentCnt =
@@ -188,6 +200,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			// Needs to react on status changes
 			serviceStepBBClient.subscribe(statusSubscription);
 			serviceStepBBClient.removeDocuments(new BasicDBObject());
+			
+			stateBBClient = new BlackboardClient("145.89.191.131", 27017);
+			stateBBClient.setDatabase("StateBlackboard");
+			stateBBClient.setCollection("EquipletCommands");
 		} catch(UnknownHostException | GeneralMongoException | InvalidDBNamespaceException e) {
 			Logger.log(e);
 			doDelete();
@@ -241,6 +257,19 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		send(message);
 	} //@formatter:on
 
+	public void cancelAllStepsForProductStep(ObjectId productStepId, String reason) {
+		try {
+			serviceStepBBClient.updateDocuments(
+					new BasicDBObject("productStepId", productStepId),
+					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
+							"statusData", new BasicDBObject("reason", reason))));
+
+			// TODO inform LA to cancel part transport
+		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Maps the specified conversation id with the specified service object.
 	 * Once a service object has been created (by the service factory) it's
@@ -269,8 +298,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	/**
 	 * Removes the mapping of the specified conversation id with the corresponding service object.
 	 * 
-	 * @param conversationId
-	 * 		The conversationId to remove from the mapping.
+	 * @param conversationId The conversationId to remove from the mapping.
 	 */
 	public void RemoveConvIdServiceMapping(String conversationId) {
 		convIdServiceMapping.remove(conversationId);
@@ -323,6 +351,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 											new BasicDBObject("_id", serviceSteps[0].getId()),
 											new BasicDBObject("$set", new BasicDBObject("status", status.name())
 													.append("statusData", productionStep.getStatusData())));
+									
+									EquipletCommandEntry stateEntry = new EquipletCommandEntry(dbData.getName(), EquipletState.NORMAL);
+									stateBBClient.insertDocument(stateEntry.toBasicDBObject());
+									
 									break;
 								case ABORTED:
 									Logger.log("Service agent - prod.Step %s status set to %s%n",
@@ -330,13 +362,9 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 									Logger.log("Service agent - aboring all serviceSteps of prod.Step%n",
 											entry.getTargetObjectId());
-									
-									//TODO inform LA to cancel part transport
-									
-									serviceStepBBClient.updateDocuments(
-											new BasicDBObject("productStepId", entry.getTargetObjectId()),
-											new BasicDBObject("$set", new BasicDBObject("status", status.name())
-													.append("statusData", productionStep.getStatusData())));
+
+									cancelAllStepsForProductStep(entry.getTargetObjectId(), productionStep
+											.getStatusData().getString("reason"));
 									break;
 								default:
 									break;
@@ -347,28 +375,35 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					}
 					break;
 				case "ServiceStepsBlackBoard":
+					ObjectId serviceStepId = entry.getTargetObjectId();
 					ServiceStep serviceStep =
-							new ServiceStep((BasicDBObject) serviceStepBBClient.findDocumentById(entry
-									.getTargetObjectId()));
+							new ServiceStep((BasicDBObject) serviceStepBBClient.findDocumentById(serviceStepId));
 					ObjectId productStepId = serviceStep.getProductStepId();
 					switch(operation) {
 						case UPDATE:
 							StepStatusCode status = serviceStep.getStatus();
 							switch(status) {
 								case DELETED:
-									Logger.log("Service agent - serv.Step %s status set to %s%n", serviceStep.getId(),
-											status);
-									productStepBBClient.updateDocuments(
-											new BasicDBObject("_id", serviceStep.getProductStepId()),
-											new BasicDBObject("$set", new BasicDBObject("status",
-													StepStatusCode.DELETED.name()).append("statusData.log",
-													buildLog(serviceStep.getProductStepId()))));
-									serviceStepBBClient.removeDocuments(new BasicDBObject("_id", serviceStep
-											.getId()));
+									Logger.log("Service agent - serv.Step %s status set to %s%n", serviceStepId, status);
+
+									List<DBObject> unDeletedServiceSteps =
+											serviceStepBBClient.findDocuments(QueryBuilder.start("productStepId")
+													.is(serviceStep.getProductStepId()).and("status")
+													.notEquals(StepStatusCode.DELETED.name()).get());
+
+									if(unDeletedServiceSteps.isEmpty()) {
+										productStepBBClient.updateDocuments(
+												new BasicDBObject("_id", productStepId),
+												new BasicDBObject("$set", new BasicDBObject("status",
+														StepStatusCode.DELETED.name()).append(
+														"statusData",
+														new BasicDBObject("reason", serviceStep.getStatusData().get(
+																"reason")).append("log", buildLog(productStepId)))));
+										serviceStepBBClient.removeDocuments(new BasicDBObject("_id", productStepId));
+									}
 									break;
 								case DONE:
-									Logger.log("Service agent - serv.Step %s status set to %s%n", serviceStep.getId(),
-											status);
+									Logger.log("Service agent - serv.Step %s status set to %s%n", serviceStepId, status);
 
 									if(serviceStep.getNextStep() != null) {
 										Logger.log("Service agent - setting status of next serv.Step %s to %s%n",
@@ -403,6 +438,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 											new BasicDBObject("_id", productStepId),
 											new BasicDBObject("$set", new BasicDBObject("status", status.name())
 													.append("statusData", log)));
+									
+									EquipletCommandEntry stateEntry = new EquipletCommandEntry(dbData.getName(), EquipletState.STANDBY);
+									stateBBClient.insertDocument(stateEntry.toBasicDBObject());
+									
 									break;
 								case IN_PROGRESS:
 								case SUSPENDED_OR_WARNING:

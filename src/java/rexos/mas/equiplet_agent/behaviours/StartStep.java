@@ -33,8 +33,6 @@
  **/
 package rexos.mas.equiplet_agent.behaviours;
 
-import java.util.List;
-
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -46,14 +44,11 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
-import rexos.mas.data.ProductStep;
-import rexos.mas.data.ScheduleData;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.NextProductStepTimer;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 
 /**
  * Receive behaviour for receiving messages with the ontology: "StartStep".

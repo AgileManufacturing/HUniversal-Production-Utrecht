@@ -66,8 +66,8 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 
 	private void initialize() {
 		System.out.println("Creating the SocketBehaviour");
-		_socketBehaviour = new SocketBehaviour(myAgent, _productAgent
-				.getProperties().getCallback());
+		//_socketBehaviour = new SocketBehaviour(myAgent, _productAgent
+		//		.getProperties().getCallback());
 
 		System.out.println("Creating the PlannerBehaviour");
 		_plannerBehaviour = new PlannerBehaviour(myAgent, this);
@@ -88,8 +88,8 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 		_productAgent.addBehaviour(_sequentialBehaviour);
 
 		// Starting the SocketBehaviour, so the agent can communicate with the
-		System.out.println("Add a SocketBehaviour");
-		_productAgent.addBehaviour(_socketBehaviour);
+		//System.out.println("Add a SocketBehaviour");
+		//_productAgent.addBehaviour(_socketBehaviour);
 	}
 
 	/*
@@ -176,6 +176,6 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 
 	public void cleanBehaviour() {
 		System.out.println("Done overview, stopping SocketBehaviour.");
-		_socketBehaviour.stop();
+		//_socketBehaviour.stop();
 	}
 }
