@@ -50,6 +50,7 @@
 
 #include <equiplet_node/ModuleRegistry.h>
 #include <equiplet_node/ModuleProxy.h>
+#include <equiplet_node/scada/EquipletScada.h>
 
 #pragma GCC system_header
 #include <libjson/libjson.h>
@@ -63,9 +64,9 @@ typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeModeAction> Chan
 /**
  * The equipletNode, will manage all modules and keep track of their states
  **/
-class EquipletNode : public 
-	Blackboard::BlackboardSubscriber, 
-	rexos_statemachine::StateMachine, 
+class EquipletNode :
+	public Blackboard::BlackboardSubscriber,
+	public rexos_statemachine::StateMachine,
 	rexos_statemachine::Listener,
 	equiplet_node::ModuleRegistryListener
 {
@@ -129,6 +130,8 @@ private:
 
 	equiplet_node::ModuleRegistry moduleRegistry;
 
+	equiplet_node::scada::EquipletScada scada;
+
 	void changeEquipletState();
 	virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
 	virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
@@ -139,6 +142,10 @@ private:
 	rexos_statemachine::TransitionActionServer* shutdownTransitionActionServer;
 	rexos_statemachine::TransitionActionServer* startTransitionActionServer;
 	rexos_statemachine::TransitionActionServer* stopTransitionActionServer;
+
+	ChangeStateActionClient changeStateActionClient;
+	ChangeModeActionClient changeModeActionClient;
+
 };
 
 }

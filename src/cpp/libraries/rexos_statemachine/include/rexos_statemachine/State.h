@@ -30,6 +30,8 @@
 #ifndef STATES_H
 #define STATES_H
 
+#define STATE_COUNT 7
+
 namespace rexos_statemachine{
 	/**
 	 * @ enum State
