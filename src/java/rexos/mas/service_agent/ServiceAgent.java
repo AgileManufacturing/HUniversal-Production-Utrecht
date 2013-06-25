@@ -338,13 +338,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		try {
 			switch(entry.getNamespace().split("\\.")[1]) {
 				case "ProductStepsBlackBoard":
-					/* TODO: abonnement nakijken.
-					 * Exception in thread "Thread-26" java.lang.NullPointerException
-						at rexos.mas.equiplet_agent.ProductStep.fromBasicDBObject(ProductStep.java:413)
-						at rexos.mas.equiplet_agent.ProductStep.<init>(ProductStep.java:203)
-						at rexos.mas.service_agent.ServiceAgent.onMessage(ServiceAgent.java:291)
-						at rexos.libraries.blackboard_client.OplogMonitorThread.run(OplogMonitorThread.java:120)
-					 */
 					ProductStep productionStep =
 							new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(entry
 									.getTargetObjectId()));
