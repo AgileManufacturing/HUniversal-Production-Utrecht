@@ -26,10 +26,6 @@ ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleName, i
 	modeUpdateServiceServer = nodeHandle.advertiseService(
 			equipletNodeName + "/" + moduleNodeName + "/mode_update",
 			&ModuleProxy::onModeChangeServiceCallback, this);
-
-	instructionUpdateServiceServer = nodeHandle.advertiseService(
-			equipletNodeName + "/" + moduleNodeName + "/instruction_update",
-			&ModuleProxy::onInstructionServiceCallback, this);
 }
 
 ModuleProxy::~ModuleProxy() {
@@ -70,23 +66,15 @@ void ModuleProxy::changeMode(rexos_statemachine::Mode mode) {
 	changeModeActionClient.sendGoal(goal);
 }
 
-void ModuleProxy::setInstruction(JSONNode n) {
+void ModuleProxy::setInstruction(std::string OID, JSONNode n) {
 	std::cout << "JSON van module: " <<  moduleNodeName.c_str() << " verzonden" << std::endl;
 	rexos_statemachine::SetInstructionGoal goal;
+
 	goal.json = n.write();
-	setInstructionActionClient.sendGoal(goal);
+	goal.OID = OID;
+
+	setInstructionActionClient.sendGoal(goal, boost::bind(&ModuleProxy::onInstructionServiceCallback, this, _1, _2), NULL, NULL);
 }
-
-/* bool ModuleProxy::setModuleInstruction(){
-	changeState(rexos_statemachine::STATE_NORMAL);
-	changeStateActionClient.waitForResult();
-	if (changeStateActionClient.getState() != actionlib::SimpleClientGoalState::SUCCEEDED)
-		return false;
-
-	//set instruction data
-
-	changeState(rexos_statemachine::STATE_STANDBY);
-} */
 
 bool ModuleProxy::onStateChangeServiceCallback(StateUpdateRequest &req, StateUpdateResponse &res){
 	//ROS_INFO("ModuleProxy of %s received state change to %s", moduleNodeName.c_str(), rexos_statemachine::state_txt[currentState]);
@@ -114,10 +102,16 @@ bool ModuleProxy::onModeChangeServiceCallback(ModeUpdateRequest &req, ModeUpdate
 	return true;
 }
 
-bool ModuleProxy::onInstructionServiceCallback(SetInstructionRequest &req, SetInstructionResponse &res){
+void ModuleProxy::onInstructionServiceCallback(const actionlib::SimpleClientGoalState& state, const rexos_statemachine::SetInstructionResultConstPtr& result){
 	ROS_INFO("ModuleProxy processed received instruction callbek");
-		//Report back to the proxylistener -> moduleProxyListener->onModuleInstruction(this,currentMode,previousMode);
-	return true;
+	if(result->succeed)
+	{
+		moduleProxyListener->onInstructionStepCompleted(this, result->OID, true);
+	} 
+	else
+	{
+		moduleProxyListener->onInstructionStepCompleted(this, result->OID, false);
+	}
 }
 
 } /* namespace equiplet_node */

@@ -89,4 +89,14 @@ void ModuleRegistry::onModuleModeChanged(
 	}
 }
 
+void ModuleRegistry::onInstructionStepCompleted(
+	ModuleProxy* moduleProxy,
+	std::string id, 
+	bool completed){
+	
+	if(moduleRegistryListener != NULL){
+		moduleRegistryListener->onInstructionStepCompleted(moduleProxy, id, completed);
+	}
+}
+
 } /* namespace equiplet_node */

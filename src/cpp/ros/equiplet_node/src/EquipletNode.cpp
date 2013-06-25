@@ -146,7 +146,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
 
 				    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
-				    prox->setInstruction(step->getInstructionData().getJsonNode());
+				    prox->setInstruction(targetObjectId.toString(), step->getInstructionData().getJsonNode());
 
 	    		} else {
 	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"ERROR\" } } ");
@@ -157,7 +157,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	    	}
 		}
 	}
-    else if(&subscription == equipletCommandSubscription)
+	else if(&subscription == equipletCommandSubscription)
 	{
     	JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
 		JSONNode::const_iterator i = n.begin();
@@ -172,6 +172,10 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
             i++;
         }
 	}
+}
+
+void EquipletNode::onInstructionStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed){
+	std::cout << "received dingen" << std::endl;
 }
 
 std::string EquipletNode::getName() {

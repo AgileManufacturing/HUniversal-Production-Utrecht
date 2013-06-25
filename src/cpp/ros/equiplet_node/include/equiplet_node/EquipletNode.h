@@ -47,6 +47,7 @@
 #include <rexos_statemachine/ChangeStateAction.h>
 #include <rexos_statemachine/ChangeModeAction.h>
 
+
 #include <rexos_most/MOSTDatabaseClient.h>
 
 #include <equiplet_node/ModuleRegistry.h>
@@ -62,8 +63,6 @@ namespace equiplet_node {
 
 typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction> ChangeStateActionClient;
 typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeModeAction> ChangeModeActionClient;
-typedef actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> SetInstructionActionClient;
-
 /**
  * The equipletNode, will manage all modules and keep track of their states
  **/
@@ -96,7 +95,7 @@ public:
 
 	void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
 
-	
+	void onInstructionStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed);
 
 private:
 	void callLookupHandler(std::string lookupType, std::string lookupID, std::map<std::string, std::string> payloadMap);
@@ -136,7 +135,7 @@ private:
 	ros::NodeHandle nh;
 	ros::ServiceServer moduleUpdateServiceServer;
 
-	equiplet_node::ModuleRegistry moduleRegistry;
+	ModuleRegistry moduleRegistry;
 
 	equiplet_node::scada::EquipletScada scada;
 

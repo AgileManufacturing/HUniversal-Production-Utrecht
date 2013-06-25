@@ -51,14 +51,14 @@ public:
 
 	void changeState(rexos_statemachine::State state);
 	void changeMode(rexos_statemachine::Mode mode);
-	void setInstruction(JSONNode n);
+	void setInstruction(std::string OID, JSONNode n);
 
 private:
 	ModuleProxy(std::string equipletNodeName, std::string moduleNodeName, ModuleProxyListener* mpl = NULL);
 
 	bool onStateChangeServiceCallback(StateUpdateRequest &req, StateUpdateResponse &res);
 	bool onModeChangeServiceCallback(ModeUpdateRequest &req, ModeUpdateResponse &res);
-	bool onInstructionServiceCallback(SetInstructionRequest &req, SetInstructionResponse &res);
+	void onInstructionServiceCallback(const actionlib::SimpleClientGoalState& state, const rexos_statemachine::SetInstructionResultConstPtr& result);
 
 	int moduleId;
 

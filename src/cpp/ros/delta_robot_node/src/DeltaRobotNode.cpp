@@ -129,31 +129,25 @@ deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode(){
 
 
 void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
-	ROS_INFO("Received an SetInstruction call @ deltarob0t");
+
 	JSONNode n = libjson::parse(goal->json);
+	std::string dsajfh = goal->OID;
+
     JSONNode::const_iterator i = n.begin();
 
-    //i = JSON of a instructionData
-    //i[0] = command (move)
-    //i[1] destination ( deltarobot )
-	//i[2] lookup
-	//i[3] lookup_params
-	//i[4] payloads
-
 	if (strcmp(i[4].name().c_str(), "payload") == 0){
-			std::cout << "2" << std::endl;
 
 			Point p = parsePoint(i[4]);
 
 			if(moveToPoint(p.x, p.y, p.z, p.maxAcceleration)){
-				ROS_INFO("Moving to point");
+				ROS_INFO("Moved to point");
     			setInstructionActionServer.setSucceeded();
 			} else {
 				ROS_INFO("Failed moving to point");
     			setInstructionActionServer.setAborted();
 			}
+			
     } else {
-		std::cout << "3 " << i[0].name().c_str() << " " << i[4].name().c_str() << " " << std::endl;
     	setInstructionActionServer.setAborted();
     }
 }
