@@ -131,7 +131,7 @@ public class JadeAgentX extends Agent {
 			// stepList.add(stp4);
 
 			Production production = new Production(stepList);
-			Product product = new Product(production, getAID().toString());
+			Product product = new Product(production);
 			
 			Callback callback = new Callback();
 			callback.setHost("127.0.0.1");
