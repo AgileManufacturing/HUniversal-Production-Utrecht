@@ -66,8 +66,6 @@ public class ProduceBehaviour extends Behaviour {
 
 	private BehaviourCallback _bc;
 
-	// private ProductionEquipletMapper _prodEQMap;
-	// ACLMessage msg;
 	/**
 	 * @param myAgent
 	 */

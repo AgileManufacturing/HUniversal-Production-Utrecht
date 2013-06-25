@@ -1,7 +1,6 @@
 /**
  * @file ProductLog.java
- * @brief Class to create the productionlog which is then able to be pushed to
- *        the remote location.
+ * @brief Class for logging productiondata
  * @date Created: 02-04-2013
  * 
  * @author Theodoor de Graaff
@@ -50,6 +49,10 @@ import rexos.libraries.log.Logger;
 
 import com.mongodb.BasicDBObject;
 
+/**
+ * @author Theodoor
+ *
+ */
 public class ProductLog{
 	File logfile;
 	FileWriter writer;
@@ -58,13 +61,16 @@ public class ProductLog{
 	}
 
 	/**
+	 * Add statusdata to ProductLog
+	 * 
 	 * @param aid
 	 * @param statusData
+	 * 
 	 */
 	public void add(AID aid, BasicDBObject statusData){
 		try{
 			if (logfile == null){
-				logfile = new File("log " + aid.toString());
+				logfile = new File("log " + aid.toString() + ".json");
 				logfile.createNewFile();
 			}
 			if (writer == null){
@@ -75,4 +81,6 @@ public class ProductLog{
 			Logger.log(e);
 		}
 	}
+	
+	
 }
