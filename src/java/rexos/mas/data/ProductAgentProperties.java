@@ -22,13 +22,10 @@ import com.google.gson.annotations.SerializedName;
  */
 public class ProductAgentProperties{
 	
-	@Expose
-	@SerializedName("product")
 	private Product _product;
 	
 	//The host to connect to, represented as: IP or Hostname : Port number. eg. 127.0.0.1:253 or localhost:273
-	@Expose
-	@SerializedName("callback")
+
 	private Callback _callback;
 	
 	
