@@ -13,6 +13,9 @@
 #include <utility>
 #include "rexos_datatypes/InstructionData.h"
 #include "rexos_datatypes/TimeData.h"
+
+// GCC system header to suppress libjson warnings
+#pragma GCC system_header
 #include <libjson/libjson.h>
 
 namespace rexos_datatypes{
@@ -37,21 +40,24 @@ namespace rexos_datatypes{
         InstructionData getInstructionData();
         void setInstructionData(InstructionData instructionData);
 
-        int getStatus();
-        void setStatus(int status);
+        std::string getStatus();
+        void setStatus(std::string status);
 
         std::map<std::string, std::string> getStatusData();
         void setStatusData(map<std::string, std::string> statusData);
 
         TimeData getTimeData();
         void setTimeData(TimeData timeData);
+
+        JSONNode getJsonNode();
     private:
+            JSONNode jsonNode;
             std::string _id;
             std::string serviceStepID;
             std::string nextStep;
             int moduleId;
             InstructionData instructionData;
-            int status;
+            std::string status;
             std::map<std::string, std::string> statusData;
             TimeData timeData;
             void setValues(const JSONNode & n);

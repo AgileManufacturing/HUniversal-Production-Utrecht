@@ -22,6 +22,8 @@ LIBRARIES
 CATKIN_DEPENDS roscpp std_msgs rexos_most rexos_statemachine lookup_handler rexos_datatypes rexos_std_msgs rexos_std_srvs rexos_blackboard_cpp_client libjson environment_communication_msgs
 DEPENDS)
 
+SET ( CMAKE_CXX_FLAGS "-std=c++0x" )
+
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 include_directories(include ${catkin_INCLUDE_DIRS} ${LOG4CXX_INCLUDE_DIR})
 add_executable(equiplet_node ${sources})
@@ -29,5 +31,3 @@ add_executable(equiplet_node ${sources})
 
 target_link_libraries(equiplet_node ${catkin_LIBRARIES} ${LOG4CXX_LIBRARIES})
 
-
-add_definitions("-std=c++0x")

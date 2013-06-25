@@ -13,6 +13,10 @@
 #include <iostream>
 #include <map>
 #include <utility>
+
+// GCC system header to suppress libjson warnings
+#pragma GCC system_header
+#include <libjson/libjson.h>
  
 
 using namespace std;
@@ -35,7 +39,11 @@ namespace rexos_datatypes{
 
         std::map<std::string, std::string> getPayload();
         void setPayload(map<std::string, std::string> payload);
+
+        JSONNode getJsonNode();
+        void setJsonNode(JSONNode jsonNode);
     private:
+        JSONNode jsonNode;
         std::string command;
         std::string destination;
         std::string look_up;

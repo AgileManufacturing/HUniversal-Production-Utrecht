@@ -31,11 +31,13 @@
 #include <unistd.h>
 #include "equiplet_node/EquipletNode.h"
 #include "rexos_blackboard_cpp_client/BlackboardCppClient.h"
+#include "rexos_blackboard_cpp_client/FieldUpdateSubscription.h"
 #include "rexos_blackboard_cpp_client/BasicOperationSubscription.h"
 #include "rexos_blackboard_cpp_client/OplogEntry.h"
 #include "rexos_utilities/Utilities.h"
 #include <rexos_statemachine/ChangeStateAction.h>
 #include <rexos_statemachine/ChangeModeAction.h>
+#include <rexos_statemachine/SetInstructionAction.h>
 #include "equiplet_node/StateBlackboard.h"
 
 #include <libjson/libjson.h>
@@ -64,23 +66,25 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 		changeStateActionClient(nh, nameFromId(id) + "/change_state"),
 		changeModeActionClient(nh, nameFromId(id) + "/change_mode"),
 		equipletId(id),
-		equipletStepBlackboardClient(NULL),
-		equipletCommandBlackboardClient(NULL) 
-	{
+		equipletStepBlackboardClient(NULL) {
 
 	if (mostDatabaseclient.getAllModuleData().size() > 0) {
 		ROS_WARN("Previous equiplet instance did not cleanup correctly");
 	}
+
 	mostDatabaseclient.clearModuleData();
 	mostDatabaseclient.setSafetyState(rexos_statemachine::STATE_SAFE);
 
 	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "test", "equipletStepBB");
-	equipletStepSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
+	equipletStepSubscription = new Blackboard::FieldUpdateSubscription("status", *this);
+	equipletStepSubscription->addOperation(Blackboard::SET);
 	equipletStepBlackboardClient->subscribe(*equipletStepSubscription);
+	subscriptions.push_back(equipletStepSubscription);
 
 	equipletCommandBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_COMMANDS);
 	equipletCommandSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
 	equipletCommandBlackboardClient->subscribe(*equipletCommandSubscription);
+	subscriptions.push_back(equipletCommandSubscription);
 
 	equipletStateBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_STATE);
 
@@ -101,6 +105,14 @@ EquipletNode::~EquipletNode(){
 	equipletCommandBlackboardClient->unsubscribe(*equipletCommandSubscription);
 	delete equipletCommandBlackboardClient;
 	delete equipletCommandSubscription;
+	delete equipletStepBlackboardClient;
+
+	for (std::vector<Blackboard::BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
+		delete *iter;
+	}
+
+	subscriptions.clear();
+
 }
 
 /**
@@ -110,60 +122,40 @@ EquipletNode::~EquipletNode(){
  *
  * @param json The message parsed in the json format
  **/
-void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) {
+void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) 
+{
 	if(&subscription == equipletStepSubscription)
 	{
-
-	        //lets parse a root node from the bb msg.
-	JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
-	std::cout << n.write() << std::endl;
+		mongo::OID targetObjectId;
+		oplogEntry.getTargetObjectId(targetObjectId);
+		JSONNode n = libjson::parse(equipletStepBlackboardClient->findDocumentById(targetObjectId).jsonString());
 	    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
-	    
-	    std::cout << "Step completed." << std::endl;
-	    
-	    std::cout << "id " << step->getId() << std::endl;
-	    std::cout << "moduleId " << step->getModuleId() << std::endl;
-	    std::cout << "nextStep " << step->getNextStep() << std::endl;
-	    std::cout << "serviceStep Id " << step->getServiceStepID() << std::endl;
-	    std::cout << "status " << step->getStatus() << std::endl;
-	    
-	    std::cout << "InstructData: command " << step->getInstructionData().getCommand() << std::endl;
-	    std::cout << "InstructData: dest " << step->getInstructionData().getDestination() << std::endl;
-	    std::cout << "InstructData: lookup " << step->getInstructionData().getLook_up() << std::endl;
-	    
-	    std::cout << "InstructData: LookupParams " << step->getInstructionData().getDestination() << std::endl;
-	    for( map<string, string>::iterator ii=step->getInstructionData().getLook_up_parameters().begin(); ii!=step->getInstructionData().getLook_up_parameters().end(); ++ii)
-	    {
-	        cout << (*ii).first << ": " << (*ii).second << endl;
-	    }
-	    
-	    std::cout << "InstructData: payload " << step->getInstructionData().getDestination() << std::endl;
-	    for( map<string, string>::iterator ii=step->getInstructionData().getPayload().begin(); ii!=step->getInstructionData().getPayload().end(); ++ii)
-	    {
-	        cout << (*ii).first << ": " << (*ii).second << endl;
-	    }
-	/*std::cout << "processMessage" << std::endl;
-	JSONNode message = n["message"];
-	//JSONNode::const_iterator messageIt;
-	std::string destination = message["destination"].as_string();
-	//std::cout << "Destination " << destination << std::endl;
 
-	std::string command = message["command"].as_string();
-	//std::cout << "Command " << command << std::endl;
+	    if (step->getStatus().compare("WAITING") == 0) {
+	    	rexos_statemachine::Mode currentMode = getCurrentMode();
 
-	std::string payload = message["payload"].write();
-	std::cout << "Payload " << payload << std::endl;
+	    	std::stringstream query("{ _id : ");
+	    	query << n["_id"].write() << "}";
 
-	// Create the string for the service to call
-	std::stringstream ss;
-	ss << destination;
-	ss << "/";
-	ss << command;
-	std::cout << ss.str() << std::endl; */
+	    	if (currentMode == rexos_statemachine::MODE_NORMAL) {
+	    		rexos_statemachine::State currentState = getCurrentState();
+
+	    		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
+	    			equipletStepBlackboardClient->updateDocuments(query.str(), "{$set : {status: \"IN_PROGRESS\"");	    				    
+				    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
+				    prox->setInstruction(step->getInstructionData().getJsonNode());
+	    		} else {
+	    			equipletStepBlackboardClient->updateDocuments(query.str(), "{$set : {status: \"ERROR\"");
+	    		}
+	    	} else {
+	    		ROS_INFO("Instruction received but current mode is %s", rexos_statemachine::mode_txt[currentMode]);
+	    		equipletStepBlackboardClient->updateDocuments(query.str(), "{$set : {status: \"ERROR\"");
+	    	}
+		}
 	}
-	else if(&subscription == equipletCommandSubscription)
+    else if(&subscription == equipletCommandSubscription)
 	{
-		JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
+    	JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
 		JSONNode::const_iterator i = n.begin();
 
         while (i != n.end()){
@@ -193,14 +185,15 @@ ros::NodeHandle& EquipletNode::getNodeHandle() {
  * @param lookupID the ID of the lookup
  * @param payload the payload, contains data that will get combined with environmentcache data
  **/
-void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupID, environment_communication_msgs::Map payload){
+void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupID, std::map<std::string, std::string> payloadMap){
  	lookup_handler::LookupServer msg;
 	msg.request.lookupMsg.lookupType = lookupType;
 	msg.request.lookupMsg.lookupID = lookupID;
-	msg.request.lookupMsg.payLoad = payload;
+	msg.request.lookupMsg.payLoad = createMapMessage(payloadMap);
 
 	ros::NodeHandle nodeHandle;
 	ros::ServiceClient lookupClient = nodeHandle.serviceClient<lookup_handler::LookupServer>("LookupHandler/lookup");
+
 	if(lookupClient.call(msg)){
 		// TODO
 		// Read message
@@ -208,6 +201,25 @@ void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupI
 		ROS_ERROR("Error in calling lookupHandler/lookup service");
 	}
 }
+/**
+ * Create a Map message from a map with strings as keys and strings as values
+ *
+ * @param Map The map to convert
+ *
+ * @return environment_communication_msgs::Map The map message object
+ **/
+environment_communication_msgs::Map EquipletNode::createMapMessage(std::map<std::string, std::string> &Map){
+	std::map<std::string, std::string>::iterator MapIterator;
+	environment_communication_msgs::Map mapMsg;
+	environment_communication_msgs::KeyValuePair prop;
+	for(MapIterator = Map.begin(); MapIterator != Map.end(); MapIterator++){
+		prop.key = (*MapIterator).first;
+		prop.value = (*MapIterator).second;
+		mapMsg.map.push_back(prop);
+	}
+	return mapMsg;
+}
+
 
 void EquipletNode::updateEquipletStateOnBlackboard(){
 	JSONNode jsonUpdateQuery;
@@ -228,8 +240,9 @@ void EquipletNode::updateEquipletStateOnBlackboard(){
 void EquipletNode::onStateChanged(){
 	updateEquipletStateOnBlackboard();
 }
-	
+
 void EquipletNode::onModeChanged(){
+
 	updateEquipletStateOnBlackboard();
 	
 	bool changeModuleModes = false;

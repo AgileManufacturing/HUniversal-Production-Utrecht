@@ -47,6 +47,10 @@
 #include "delta_robot_node/MoveRelativePath.h"
 #include "delta_robot_node/Motion.h"
 #include "delta_robot_node/Calibrate.h"
+#include "equiplet_node/RegisterModule.h"
+
+#include <actionlib/server/simple_action_server.h>
+#include <rexos_statemachine/SetInstructionAction.h>
 
 // GCC system header to suppress libjson warnings
 #pragma GCC system_header
@@ -55,6 +59,9 @@
 
 
 namespace deltaRobotNodeNamespace{
+
+	typedef actionlib::SimpleActionServer<rexos_statemachine::SetInstructionAction> SetInstructionActionServer;
+
 	/**
 	 * the DeltaRobotNode which is a ModuleStateMachine
 	 **/
@@ -87,8 +94,10 @@ namespace deltaRobotNodeNamespace{
 		bool moveToRelativePoint_json(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res);
 		bool moveRelativePath_json(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res);
 
-		Point parsePoint(std::string json);
+		Point parsePoint(const JSONNode & n);
 		Point *parsePointArray(std::string json, int & size);
+
+		void onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal);
 
 	private:
 		/**
@@ -96,7 +105,7 @@ namespace deltaRobotNodeNamespace{
 		 * The nodeHandle used by ros services and topics
 		 **/
 		ros::NodeHandle nodeHandle;
-
+		SetInstructionActionServer setInstructionActionServer;
 		/**
 		 * @var DeltaRobot::DeltaRobot * deltaRobot
 		 * the deltaRobot

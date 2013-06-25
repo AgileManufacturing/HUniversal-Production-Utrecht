@@ -39,6 +39,7 @@
 
 #include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
 #include <rexos_blackboard_cpp_client/BlackboardSubscriber.h>
+#include <rexos_blackboard_cpp_client/FieldUpdateSubscription.h>
 #include <rexos_datatypes/EquipletStep.h>
 #include <rexos_utilities/Utilities.h>
 
@@ -54,19 +55,21 @@
 
 #pragma GCC system_header
 #include <libjson/libjson.h>
+
 #include <actionlib/client/simple_action_client.h>
 
 namespace equiplet_node {
 
 typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction> ChangeStateActionClient;
 typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeModeAction> ChangeModeActionClient;
+typedef actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> SetInstructionActionClient;
 
 /**
  * The equipletNode, will manage all modules and keep track of their states
  **/
-class EquipletNode :
-	public Blackboard::BlackboardSubscriber,
-	public rexos_statemachine::StateMachine,
+class EquipletNode : 
+	public Blackboard::BlackboardSubscriber, 
+	public rexos_statemachine::StateMachine, 
 	rexos_statemachine::Listener,
 	equiplet_node::ModuleRegistryListener
 {
@@ -93,11 +96,14 @@ public:
 
 	void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
 
+	
+
 private:
-	void callLookupHandler(std::string lookupType, std::string lookupID, environment_communication_msgs::Map payload);
+	void callLookupHandler(std::string lookupType, std::string lookupID, std::map<std::string, std::string> payloadMap);
 
 	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
 
+	environment_communication_msgs::Map createMapMessage(std::map<std::string, std::string> &Map);
 	bool setTransitionDone(rexos_statemachine::State transitionState);
 
 	void updateEquipletStateOnBlackboard();
@@ -115,13 +121,15 @@ private:
 	 * @var BlackboardCppClient  *blackboardClient
 	 * Client to read from blackboard
 	 **/
+
 	Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
-	Blackboard::BlackboardSubscription* equipletStepSubscription; 
+	Blackboard::FieldUpdateSubscription* equipletStepSubscription;
 
 	Blackboard::BlackboardCppClient *equipletCommandBlackboardClient;
 	Blackboard::BlackboardSubscription* equipletCommandSubscription; 
 
 	Blackboard::BlackboardCppClient *equipletStateBlackboardClient;
+	std::vector<Blackboard::BlackboardSubscription *> subscriptions; 
 
 	MOSTDatabaseClient mostDatabaseclient;
 

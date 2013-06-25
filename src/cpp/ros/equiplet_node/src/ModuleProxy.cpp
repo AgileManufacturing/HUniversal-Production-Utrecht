@@ -13,6 +13,7 @@ ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleName, i
 	moduleNodeName(moduleName + "_" + std::to_string(equipletId) + "_" + std::to_string(moduleId)),
 	changeStateActionClient(nodeHandle, moduleNodeName + "/change_state"),
 	changeModeActionClient(nodeHandle, moduleNodeName + "/change_mode"),
+	setInstructionActionClient(nodeHandle, moduleName + "/set_instruction"),
 	currentMode(rexos_statemachine::Mode::MODE_NORMAL),
 	currentState(rexos_statemachine::State::STATE_SAFE),
 	moduleProxyListener(mpl),
@@ -25,6 +26,10 @@ ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleName, i
 	modeUpdateServiceServer = nodeHandle.advertiseService(
 			equipletNodeName + "/" + moduleNodeName + "/mode_update",
 			&ModuleProxy::onModeChangeServiceCallback, this);
+
+	instructionUpdateServiceServer = nodeHandle.advertiseService(
+			equipletNodeName + "/" + moduleNodeName + "/instruction_update",
+			&ModuleProxy::onInstructionServiceCallback, this);
 }
 
 ModuleProxy::~ModuleProxy() {
@@ -65,7 +70,14 @@ void ModuleProxy::changeMode(rexos_statemachine::Mode mode) {
 	changeModeActionClient.sendGoal(goal);
 }
 
-bool ModuleProxy::setModuleInstruction(){
+void ModuleProxy::setInstruction(JSONNode n) {
+	std::cout << "JSON van module: " <<  moduleNodeName.c_str() << " verzonden" << std::endl;
+	rexos_statemachine::SetInstructionGoal goal;
+	goal.json = n.write();
+	setInstructionActionClient.sendGoal(goal);
+}
+
+/* bool ModuleProxy::setModuleInstruction(){
 	changeState(rexos_statemachine::STATE_NORMAL);
 	changeStateActionClient.waitForResult();
 	if (changeStateActionClient.getState() != actionlib::SimpleClientGoalState::SUCCEEDED)
@@ -74,7 +86,7 @@ bool ModuleProxy::setModuleInstruction(){
 	//set instruction data
 
 	changeState(rexos_statemachine::STATE_STANDBY);
-}
+} */
 
 bool ModuleProxy::onStateChangeServiceCallback(StateUpdateRequest &req, StateUpdateResponse &res){
 	//ROS_INFO("ModuleProxy of %s received state change to %s", moduleNodeName.c_str(), rexos_statemachine::state_txt[currentState]);
@@ -99,6 +111,12 @@ bool ModuleProxy::onModeChangeServiceCallback(ModeUpdateRequest &req, ModeUpdate
 		moduleProxyListener->onModuleModeChanged(this,currentMode,previousMode);
 	}
 
+	return true;
+}
+
+bool ModuleProxy::onInstructionServiceCallback(SetInstructionRequest &req, SetInstructionResponse &res){
+	ROS_INFO("ModuleProxy processed received instruction callbek");
+		//Report back to the proxylistener -> moduleProxyListener->onModuleInstruction(this,currentMode,previousMode);
 	return true;
 }
 
