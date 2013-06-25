@@ -204,7 +204,7 @@ public class SchedulerBehaviour extends Behaviour {
 				BlackboardClient bbc = new BlackboardClient(dbDa.getIp(),
 						dbDa.getPort());
 				bbc.setDatabase(dbDa.getName());
-				bbc.setCollection("ProductStepsBlackboard");
+				bbc.setCollection("ProductStepsBlackBoard");
 	
 				List<DBObject> blackBoard = bbc.findDocuments(" ");
 				scheduleCount = blackBoard.size();
