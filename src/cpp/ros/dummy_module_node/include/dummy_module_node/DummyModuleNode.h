@@ -44,7 +44,7 @@
 
 class DummyModuleNode : public rexos_statemachine::ModuleStateMachine{
 public:
-	DummyModuleNode(int equipletID, int moduleID);
+	DummyModuleNode(int equipletID, int moduleID,bool actor = false);
 	virtual ~DummyModuleNode();
 
 	// services

@@ -10,8 +10,7 @@ ModuleStateMachine::ModuleStateMachine(std::string moduleName, int equipletId, i
 :StateMachine(moduleName + "_" + std::to_string(equipletId) + "_" + std::to_string(moduleId),
 		{rexos_statemachine::MODE_NORMAL, 
 		rexos_statemachine::MODE_SERVICE, 
-		rexos_statemachine::MODE_ERROR,
-		rexos_statemachine::MODE_CRITICAL_ERROR, 
+		actorModule ? rexos_statemachine::MODE_CRITICAL_ERROR : rexos_statemachine::MODE_ERROR,
 		rexos_statemachine::MODE_E_STOP}
 	)
 ,moduleName(moduleName)

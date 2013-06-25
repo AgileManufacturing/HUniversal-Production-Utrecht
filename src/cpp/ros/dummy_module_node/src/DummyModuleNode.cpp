@@ -35,8 +35,8 @@
 #define NODE_NAME_BASE "dummy_module_node"
 // @endcond
 
-DummyModuleNode::DummyModuleNode(int equipletID, int moduleID) :
-	rexos_statemachine::ModuleStateMachine(std::string(NODE_NAME_BASE), equipletID, moduleID,false) {
+DummyModuleNode::DummyModuleNode(int equipletID, int moduleID, bool actor) :
+	rexos_statemachine::ModuleStateMachine(std::string(NODE_NAME_BASE), equipletID, moduleID,actor) {
 
 	std::stringstream stringStream;
 	stringStream << NODE_NAME_BASE << "_" << equipletID << "_" << moduleID;
@@ -94,11 +94,15 @@ DummyModuleNode::~DummyModuleNode() {
 int main(int argc, char **argv) {
 	int equipletID = 0;
 	int moduleID = 0;
+	int actor = 0;
 
 	if (argc < 3 || !(rexos_utilities::stringToInt(equipletID, argv[1]) == 0 && rexos_utilities::stringToInt(moduleID, argv[2]) == 0)) {
 		ROS_INFO("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
 		return -1;
 	}
+
+	if(argc > 3)
+		rexos_utilities::stringToInt(actor, argv[3]);
 
 	std::stringstream stringStream;
 	stringStream << NODE_NAME_BASE << "_" << equipletID << "_" << moduleID;
@@ -107,7 +111,7 @@ int main(int argc, char **argv) {
 
 	ROS_INFO("Creating Dummy Module");
 
-	DummyModuleNode dummy(equipletID, moduleID);
+	DummyModuleNode dummy(equipletID, moduleID,actor);
 
 	ROS_INFO("Running StateEngine");
 	ros::spin();
