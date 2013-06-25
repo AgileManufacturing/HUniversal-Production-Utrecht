@@ -205,8 +205,7 @@ int BlackboardCppClient::updateDocuments(
 }
 
 int BlackboardCppClient::updateDocumentById(mongo::OID objectId, std::string updateQueryAsJSON,	mongo::BSONObj * result_out) {
-	std::stringstream query("{ _id : { $oid :");
-	query << objectId.toString() << "}}";
-	return updateDocuments(query.str(), updateQueryAsJSON, result_out, false);
+	mongo::Query query = QUERY("_id" << objectId);
+	return updateDocuments(query.toString(), updateQueryAsJSON, result_out, false);
 }
 
