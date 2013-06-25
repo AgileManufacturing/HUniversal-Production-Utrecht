@@ -40,110 +40,33 @@
 
 package rexos.mas.data;
 
-import rexos.libraries.log.Logger;
-import rexos.mas.data.sqldatabase.RemoteDatabaseConnection;
-import rexos.mas.data.sqldatabase.sqliteDatabase;
 import jade.core.AID;
 
-import java.util.List;
-import java.util.Map.Entry;
-
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import com.mongodb.BasicDBObject;
 
 public class ProductLog{
-	private boolean writeToRemote = false;
-	private boolean writeToLocal = true;
-	private sqliteDatabase local;
-	/**
-	 * @return the local
-	 */
-	public sqliteDatabase getLocal(){
-		return local;
-	}
-
-	/**
-	 * @param local the local to set
-	 */
-	public void setLocal(sqliteDatabase local){
-		this.local = local;
-	}
-
-	/**
-	 * @return the remote
-	 */
-	public RemoteDatabaseConnection getRemote(){
-		return remote;
-	}
-
-	/**
-	 * @param remote the remote to set
-	 */
-	public void setRemote(RemoteDatabaseConnection remote){
-		this.remote = remote;
-	}
-
-	private RemoteDatabaseConnection remote;
-	
-	/**
-	 * @param writeToRemote
-	 * @param writeToLocal
-	 * @param local
-	 */
-	public ProductLog(boolean writeToRemote, boolean writeToLocal,
-			sqliteDatabase local){
-		super();
-		this.writeToRemote = writeToRemote;
-		this.writeToLocal = writeToLocal;
-		this.local = local;
-	}
-
-	public void add(List<LogMessage> msgs){
-		if (writeToLocal){
-			local.insert(msgs);
-		}
-		if (writeToRemote){
-			remote.insert(msgs);
-			
-		}
-	}
-
-	public static void pushLocalToRemote(){
-		// TODO_REMOTE:
-		// get latest remote
-		// get local since latest remote
-		// write to remote
-		throw new UnsupportedOperationException();
-	}
+	File logfile;
+	FileWriter writer;
 
 	/**
 	 * @param aid
 	 * @param statusData
 	 */
-	public void add(AID aid, BasicDBObject statusData, String... s){
-		String prefix = "";
-		if(s.length > 0){
-			prefix = s[0];
-		}
-		
-		for(Entry<String, Object> e: statusData.entrySet()){
-			
-			switch(e.getValue().getClass().getCanonicalName()){
-			case "java.lang.String":
-				if(writeToLocal){
-					local.insert(new LogMessage(aid, prefix + e.toString()));
-				}
-				if(writeToRemote){
-					remote.insert(new LogMessage(aid, prefix + e.toString()));
-				}
-				break;
-			case "com.mongodb.BasicDBObject" :
-				BasicDBObject db = (BasicDBObject) e.getValue();
-				this.add(aid, db, e.getKey());
-				break;
-			default:
-				Logger.log(new UnsupportedOperationException("No log case for "
-						+ e.getValue().getClass().getCanonicalName()));
+	public void add(AID aid, BasicDBObject statusData){
+		try{
+			if (logfile == null){
+				logfile = new File("/" + aid.toString());
 			}
+			if (writer == null){
+				writer = new FileWriter(logfile);
+			}
+			writer.write(statusData.toString());
+		} catch(IOException e){
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }
