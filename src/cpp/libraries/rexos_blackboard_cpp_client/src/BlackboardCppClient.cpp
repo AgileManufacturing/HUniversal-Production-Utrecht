@@ -109,14 +109,15 @@ bool BlackboardCppClient::insertDocument(std::string json, mongo::BSONObj * resu
 	mongo::BSONObj bobj = mongo::fromjson(json);
 	(*connection)->insert(dbNamespace, bobj);
 
-	mongo::BSONObj result = (*connection)->getLastErrorDetailed(dbNamespace);
-	if (result_out != NULL) {
-		*result_out = result;
-	}
+//	mongo::BSONObj result = (*connection)->getLastErrorDetailed();
+//	if (result_out != NULL) {
+//		*result_out = result;
+//	}
 
 	connection->done();
 	delete connection;
-	return result.getBoolField("ok");
+//	return result.getBoolField("ok");
+	return true;
 }
 
 int BlackboardCppClient::removeDocuments(std::string queryAsJSON, mongo::BSONObj * result_out) {
@@ -127,14 +128,15 @@ int BlackboardCppClient::removeDocuments(std::string queryAsJSON, mongo::BSONObj
 	mongo::BSONObj query = mongo::fromjson(queryAsJSON);
 	(*connection)->remove(dbNamespace, query, false);
 
-	mongo::BSONObj result = (*connection)->getLastErrorDetailed(dbNamespace);
-	if (result_out != NULL) {
-		*result_out = result;
-	}
+//	mongo::BSONObj result = (*connection)->getLastErrorDetailed();
+//	if (result_out != NULL) {
+//		*result_out = result;
+//	}
 
 	connection->done();
 	delete connection;
-	return result.getIntField("n");
+//	return result.getIntField("n");
+	return 1;
 }
 
 mongo::BSONObj BlackboardCppClient::findDocumentById(mongo::OID objectId) {
@@ -162,7 +164,10 @@ int BlackboardCppClient::findDocuments(std::string queryAsJSON, std::vector<mong
 	try {
 		while (cursor->more()) {
 			mongo::BSONObj obj = cursor->nextSafe();
-			results.push_back(obj);
+
+			// The returned BSONObj of a cursor is invalidated whenever a new batch of objects is
+			// retrieved, or the cursor dies. In order to return these objects a copy must be made.
+			results.push_back(obj.copy());
 			resultCount++;
 		}
 	} catch (mongo::AssertionException &ex) {
@@ -188,14 +193,15 @@ int BlackboardCppClient::updateDocuments(
 	mongo::BSONObj updateQuery = mongo::fromjson(updateQueryAsJSON);
 	(*connection)->update(dbNamespace, query, updateQuery, false, updateMultiple);
 
-	mongo::BSONObj result = (*connection)->getLastErrorDetailed(dbNamespace);
-	if (result_out != NULL) {
-		*result_out = result;
-	}
+//	mongo::BSONObj result = (*connection)->getLastErrorDetailed(dbNamespace);
+//	if (result_out != NULL) {
+//		*result_out = result;
+//	}
 
 	connection->done();
 	delete connection;
-	return result.getIntField("n");
+//	return result.getIntField("n");
+	return 1;
 }
 
 int BlackboardCppClient::updateDocumentById(mongo::OID objectId, std::string updateQueryAsJSON,	mongo::BSONObj * result_out) {

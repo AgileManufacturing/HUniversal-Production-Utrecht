@@ -44,10 +44,10 @@ OplogMonitor::OplogMonitor(
 		std::string host,
 		std::string oplogDBName,
 		std::string oplogCollectionName) :
+				currentCursorId(0),
 				host(host),
 				oplogNamespace(),
-				currentThread(NULL),
-				currentCursorId(0)
+				currentThread(NULL)
 {
 	std::stringstream nsStream;
 	nsStream << oplogDBName << "." << oplogCollectionName;
@@ -114,12 +114,15 @@ mongo::Query OplogMonitor::createOplogQuery()
 void OplogMonitor::run()
 {
 	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
+	mongo::Query query(mongo::fromjson(createOplogQuery().toString()));
+
+	unsigned long long skipCount = (*connection)->count(oplogNamespace, query.obj);
 
 	std::unique_ptr<mongo::DBClientCursor> tailedCursor((*connection)->query(
 			oplogNamespace,
-			createOplogQuery(),
+			query,
 			0,
-			(*connection)->count(oplogNamespace),
+			skipCount,
 			NULL,
 			mongo::QueryOption_CursorTailable | mongo::QueryOption_AwaitData,
 			0));
