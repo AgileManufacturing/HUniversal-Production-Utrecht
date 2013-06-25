@@ -231,10 +231,14 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(double x, double y, do
 	ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", x, y, z, maxAcceleration);
 
 	if(deltaRobot->checkPath(oldLocation, newLocation)){
-		//ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", x, y, z, maxAcceleration);
+
+		ROS_INFO("path is valid. Trying to move..");
+
 		deltaRobot->moveTo(newLocation, maxAcceleration);
+		
 		return true;
 	}
+
 	return false;
 } 
 
