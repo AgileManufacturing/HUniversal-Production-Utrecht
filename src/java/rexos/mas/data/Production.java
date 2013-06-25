@@ -47,8 +47,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class Production{
 	
-	@Expose
-	@SerializedName("productionSteps")
+
 	private ArrayList<ProductionStep> _productionSteps;
 
 	private ProductionEquipletMapper _prodEQMap;

@@ -49,8 +49,6 @@ import com.mongodb.BasicDBObject;
 
 public class Product{
 	
-	@Expose
-	@SerializedName("production")
 	private Production _production;
 
 
