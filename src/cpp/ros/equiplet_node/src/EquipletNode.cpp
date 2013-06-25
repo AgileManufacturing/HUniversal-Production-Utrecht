@@ -175,7 +175,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 }
 
 void EquipletNode::onInstructionStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed){
-	std::cout << "received dingen" << std::endl;
+	std::cout << "received dingen" << " id: " << id << " completed " << completed << std::endl;
 }
 
 std::string EquipletNode::getName() {
