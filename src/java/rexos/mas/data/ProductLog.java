@@ -44,9 +44,7 @@ import rexos.libraries.log.Logger;
 import rexos.mas.data.sqldatabase.sqliteDatabase;
 import jade.core.AID;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import com.mongodb.BasicDBObject;
@@ -99,13 +97,9 @@ public class ProductLog{
 				local.insert(new LogMessage(aid, e.toString()));
 				break;
 			case "com.mongodb.BasicDBObject" :
-					
-				
+				BasicDBObject db = (BasicDBObject) e.getValue();
+				this.add(aid, db);
 				break;
-			case "java.util.LinkedHashMap.Entry":
-					Object ev = e.getValue();
-									
-					break;
 			default:
 				Logger.log(new UnsupportedOperationException("No log case for "
 						+ e.getValue().getClass().getCanonicalName()));
