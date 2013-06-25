@@ -81,6 +81,9 @@ public class SchedulerBehaviour extends Behaviour {
 	private boolean _isCompleted = false;
 
 	private BehaviourCallback _bc;
+	
+	private int _schedulersStarted = 0;
+	private int _schedulersCompleted = 0;
 
 	public SchedulerBehaviour(Agent myAgent, BehaviourCallback bc) {
 		super(myAgent);
@@ -118,6 +121,7 @@ public class SchedulerBehaviour extends Behaviour {
 				if (equiplets != null && equiplets.size() != 0) {
 					Scheduler(production.getProductionEquipletMapping()
 							.getEquipletsForProductionStep(PA_id).keySet(), ps);
+					_schedulersStarted++;
 				} else {
 					_isError = true;
 					// TODO: THIS SHOULD NOT HAPPEN. THROW EXCEPTION!
@@ -133,7 +137,7 @@ public class SchedulerBehaviour extends Behaviour {
 	@Override
 	public void action() {
 		try {
-			if (_isDone) {
+			if (_schedulersStarted == _schedulersCompleted) {
 				this._bc.handleCallback(BehaviourStatus.COMPLETED);
 				_isCompleted = true;
 			} else if (_isError) {
@@ -301,7 +305,7 @@ public class SchedulerBehaviour extends Behaviour {
 				} else {
 					_prodStep.setStatus(StepStatusCode.PLANNED);
 					_isDone = true;
-					
+					_schedulersCompleted++;
 					System.out.println("received message");
 					// TODO:: Scheduler is done. Make a nice ending pls
 				}
