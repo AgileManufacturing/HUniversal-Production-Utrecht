@@ -321,13 +321,13 @@ bool EquipletNode::finishTransition(std::vector<ModuleProxy*> modules){
 			allModulesDone = false;
 			break;
 		}else if(modules[i]->getCurrentState() != desiredTransitionState){
-			setTransitionResult(false);
+			transitionActionServer->setSucceeded();
 			return false;
 		}
 	}
 
 	if(allModulesDone){
-		setTransitionResult(true);
+		transitionActionServer->setAborted();
 		return true;
 	}
 }
