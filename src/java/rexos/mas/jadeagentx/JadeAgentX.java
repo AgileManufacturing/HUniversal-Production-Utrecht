@@ -103,7 +103,7 @@ public class JadeAgentX extends Agent {
 			Object[] ar = new Object[] {
 				logisticsAID
 			};
-			//getContainerController().createNewAgent("EQ1", "rexos.mas.equiplet_agent.EquipletAgent", ar).start();
+			getContainerController().createNewAgent("EQ1", "rexos.mas.equiplet_agent.EquipletAgent", ar).start();
 
 			/**
 			 * Lets make a parameter list
@@ -150,8 +150,8 @@ public class JadeAgentX extends Agent {
 			Object[] args = new Object[1];
 			args[0] = pap;
 
-			getContainerController().createNewAgent("pa" + count++, "rexos.mas.productAgent.ProductAgent", args)
-					.start();
+//			getContainerController().createNewAgent("pa" + count++, "rexos.mas.productAgent.ProductAgent", args)
+//					.start();
 			addBehaviour(new StartProductAgent(this, args));
 		} catch(Exception e) {
 			Logger.log(e);

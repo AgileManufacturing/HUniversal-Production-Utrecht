@@ -63,22 +63,22 @@ public class Position implements Serializable, MongoSaveable {
 	private static final long serialVersionUID = 7125027379799391886L;
 
 	/**
-	 * @var double x
+	 * @var Double x
 	 *      The x coordinate.
 	 **/
-	private double x;
+	private Double x;
 
 	/**
-	 * @var double y
+	 * @var Double y
 	 *      The y coordinate.
 	 **/
-	private double y;
+	private Double y;
 
 	/**
-	 * @var double z
+	 * @var Double z
 	 *      The z coordinate
 	 **/
-	private double z;
+	private Double z;
 
 	/**
 	 * @var int relativeToPart
@@ -87,10 +87,10 @@ public class Position implements Serializable, MongoSaveable {
 	private Part relativeToPart;
 
 	/**
-	 * Constructs a default Position object with all fields set to -1.
+	 * Constructs a default Position object with all fields set to null.
 	 */
 	public Position() {
-		this(-1, -1, -1, null);
+		this(null, null, null, null);
 	}
 
 	/**
@@ -100,39 +100,39 @@ public class Position implements Serializable, MongoSaveable {
 	 * @param y The y coordinate.
 	 * @param z The z coordinate.
 	 */
-	public Position(double x, double y, double z) {
+	public Position(Double x, Double y, Double z) {
 		this(x, y, z, null);
 	}
 
 	/**
-	 * Constructs a Position object with the specified absolute x and y coordinates. z is initialized to -1.
+	 * Constructs a Position object with the specified absolute x and y coordinates. z is initialized to null.
 	 * 
 	 * @param x The x coordinate.
 	 * @param y The y coordinate.
 	 */
-	public Position(double x, double y) {
-		this(x, y, -1, null);
+	public Position(Double x, Double y) {
+		this(x, y, null, null);
 	}
 
 	/**
-	 * Constructs a Position object with -1 x, y and z coordinates relative to the specified part.
+	 * Constructs a Position object with null x, y and z coordinates relative to the specified part.
 	 * 
 	 * @param relativeToPart The id of the part to which the coordinates are relative.
 	 */
 	public Position(Part relativeToPart) {
-		this(-1, -1, -1, relativeToPart);
+		this(null, null, null, relativeToPart);
 	}
 
 	/**
 	 * Constructs a Position object with the specified x and y coordinates relative to the specified part. z is
-	 * initialized to -1.
+	 * initialized to null.
 	 * 
 	 * @param x The x coordinate.
 	 * @param y The y coordinate.
 	 * @param relativeToPart The id of the part to which the coordinates are relative.
 	 */
-	public Position(double x, double y, Part relativeToPart) {
-		this(x, y, -1, relativeToPart);
+	public Position(Double x, Double y, Part relativeToPart) {
+		this(x, y, null, relativeToPart);
 	}
 
 	/**
@@ -143,7 +143,7 @@ public class Position implements Serializable, MongoSaveable {
 	 * @param z The z coordinate.
 	 * @param relativeToPart The id of the part to which the coordinates are relative.
 	 */
-	public Position(double x, double y, double z, Part relativeToPart) {
+	public Position(Double x, Double y, Double z, Part relativeToPart) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -166,7 +166,7 @@ public class Position implements Serializable, MongoSaveable {
 	 * @param y The y value to add
 	 */
 	public void translate(double x, double y) {
-		translate(x, y, 0);
+		translate(x, y, 0.0);
 	}
 
 	/**
@@ -185,10 +185,16 @@ public class Position implements Serializable, MongoSaveable {
 	 * @param y the y value to add
 	 * @param z the z value to add
 	 */
-	public void translate(double x, double y, double z) {
-		this.x += x;
-		this.y += y;
-		this.z += z;
+	public void translate(Double x, Double y, Double z) {
+		if(x != null && this.x != null){
+			this.x += x;
+		}
+		if(y != null && this.y != null){
+			this.y += y;
+		}
+		if(z != null && this.z != null){
+			this.z += z;
+		}
 	}
 
 	/**
@@ -213,11 +219,11 @@ public class Position implements Serializable, MongoSaveable {
 	public void fromBasicDBObject(BasicDBObject object) {
 		try {
 			BasicDBObject copy = (BasicDBObject) object.copy();
-			x = copy.getDouble("x");
+			x = (Double)copy.get("x");
 			copy.removeField("x");
-			y = copy.getDouble("y");
+			y = (Double)copy.get("y");
 			copy.removeField("y");
-			z = copy.getDouble("z");
+			z = (Double)copy.get("z");
 			copy.removeField("z");
 			if(copy.containsField("relativeToPart")) {
 				relativeToPart = new Part((BasicDBObject) copy.get("relativeToPart"));
@@ -238,7 +244,7 @@ public class Position implements Serializable, MongoSaveable {
 	 * 
 	 * @return The x coordinate.
 	 */
-	public double getX() {
+	public Double getX() {
 		return x;
 	}
 
@@ -247,7 +253,7 @@ public class Position implements Serializable, MongoSaveable {
 	 * 
 	 * @param x The x coordinate that should be set.
 	 */
-	public void setX(double x) {
+	public void setX(Double x) {
 		this.x = x;
 	}
 
@@ -256,7 +262,7 @@ public class Position implements Serializable, MongoSaveable {
 	 * 
 	 * @return The y coordinate.
 	 */
-	public double getY() {
+	public Double getY() {
 		return y;
 	}
 
@@ -265,7 +271,7 @@ public class Position implements Serializable, MongoSaveable {
 	 * 
 	 * @param y The y coordinate that should be set.
 	 */
-	public void setY(double y) {
+	public void setY(Double y) {
 		this.y = y;
 	}
 
@@ -274,7 +280,7 @@ public class Position implements Serializable, MongoSaveable {
 	 * 
 	 * @return The z coordinate.
 	 */
-	public double getZ() {
+	public Double getZ() {
 		return z;
 	}
 
@@ -283,7 +289,7 @@ public class Position implements Serializable, MongoSaveable {
 	 * 
 	 * @param z The z coordinate that should be set.
 	 */
-	public void setZ(double z) {
+	public void setZ(Double z) {
 		this.z = z;
 	}
 

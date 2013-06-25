@@ -108,7 +108,7 @@ public class PenModule extends Module {
 
 					// get the number of steps to perform and the x and y delta for each step.
 					int numberOfSteps = Math.max(1, (int) (lineLength / PEN_SIZE));
-					Position step = new Position(deltaX / numberOfSteps, deltaY / numberOfSteps, 0);
+					Position step = new Position(deltaX / numberOfSteps, deltaY / numberOfSteps);
 
 					// loop over all the steps and create them.
 					for(int i = 0; i <= numberOfSteps; i++) {
@@ -191,7 +191,7 @@ public class PenModule extends Module {
 
 		// get the position of the dot.
 		Position position = new Position((BasicDBObject) parameters.get("position"));
-		position.setZ(0);
+		position.setZ(0.0);
 
 		// create the new parameters
 		BasicDBObject dotParameters = new BasicDBObject("position", position.toBasicDBObject());
