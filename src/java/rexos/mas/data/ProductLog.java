@@ -45,11 +45,17 @@ import jade.core.AID;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import rexos.libraries.log.Logger;
+
 import com.mongodb.BasicDBObject;
 
 public class ProductLog{
 	File logfile;
 	FileWriter writer;
+
+	ProductLog(){
+	}
 
 	/**
 	 * @param aid
@@ -65,8 +71,7 @@ public class ProductLog{
 			}
 			writer.write(statusData.toString());
 		} catch(IOException e){
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.log(e);
 		}
 	}
 }
