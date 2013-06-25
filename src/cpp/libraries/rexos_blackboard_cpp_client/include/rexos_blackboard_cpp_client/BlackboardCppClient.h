@@ -173,7 +173,7 @@ public:
 	 * A return value of 0 can indicate either that no documents match the query, or that an error has occurred.
 	 * To find out if an error has occured, check the ok field in the result object. This will be set to 0 in case of errors.
 	 */
-	int updateDocumentById(mongo::OID objectId, std::string updateQueryAsJSON,	mongo::BSONObj * result_out);
+	int updateDocumentById(mongo::OID objectId, std::string updateQueryAsJSON,	mongo::BSONObj * result_out = NULL);
 
 private:
 	/**
