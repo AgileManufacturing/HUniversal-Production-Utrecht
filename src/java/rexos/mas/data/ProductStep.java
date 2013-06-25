@@ -4,6 +4,7 @@
  * @date Created: 2013-04-03
  * 
  * @author Hessel Meulenbeld
+ * @author Wouter Veen 
  * 
  * @section LICENSE
  *          License: newBSD
@@ -409,36 +410,38 @@ public class ProductStep implements MongoSaveable, Serializable {
 	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
-		BasicDBObject copy = (BasicDBObject) object.copy();
-		_id = (ObjectId) copy.remove("_id");
-		productAgentId = new AID((String) copy.remove("productAgentId"), AID.ISGUID);
-		type = (int) copy.remove("type");
-		parameters = (BasicDBObject) copy.remove("parameters");
-		
-		BasicDBList tempInputParts = ((BasicDBList)copy.remove("inputParts"));
-		inputParts = new Part[tempInputParts.size()];
-		for(int i = 0; i < tempInputParts.size(); i++){
-			inputParts[i] = new Part((BasicDBObject)tempInputParts.get(i));
-		}
-		if(copy.containsField("outputPart")){
-			outputPart = new Part((BasicDBObject)copy.remove("outputPart"));
-		}
-		status = StepStatusCode.valueOf((String) copy.remove("status"));
-
-		if (copy.containsField("statusData")) {
-			statusData = (BasicDBObject) copy.remove("statusData");
-		} else {
-			statusData = new BasicDBObject();
-		}
-		if (copy.containsField("scheduleData")) {
-			scheduleData = new ScheduleData(
-					(BasicDBObject) copy.remove("scheduleData"));
-		} else {
-			scheduleData = new ScheduleData();
-		}
-		if(!copy.isEmpty()){
-			Logger.log(copy);
-			throw new IllegalArgumentException();
+		if(object != null){
+			BasicDBObject copy = (BasicDBObject) object.copy();
+			_id = (ObjectId) copy.remove("_id");
+			productAgentId = new AID((String) copy.remove("productAgentId"), AID.ISGUID);
+			type = (int) copy.remove("type");
+			parameters = (BasicDBObject) copy.remove("parameters");
+			
+			BasicDBList tempInputParts = ((BasicDBList)copy.remove("inputParts"));
+			inputParts = new Part[tempInputParts.size()];
+			for(int i = 0; i < tempInputParts.size(); i++){
+				inputParts[i] = new Part((BasicDBObject)tempInputParts.get(i));
+			}
+			if(copy.containsField("outputPart")){
+				outputPart = new Part((BasicDBObject)copy.remove("outputPart"));
+			}
+			status = StepStatusCode.valueOf((String) copy.remove("status"));
+	
+			if (copy.containsField("statusData")) {
+				statusData = (BasicDBObject) copy.remove("statusData");
+			} else {
+				statusData = new BasicDBObject();
+			}
+			if (copy.containsField("scheduleData")) {
+				scheduleData = new ScheduleData(
+						(BasicDBObject) copy.remove("scheduleData"));
+			} else {
+				scheduleData = new ScheduleData();
+			}
+			if(!copy.isEmpty()){
+				Logger.log(copy);
+				throw new IllegalArgumentException();
+			}
 		}
 	}
 }
