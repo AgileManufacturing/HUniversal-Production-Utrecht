@@ -152,5 +152,6 @@ public class Logging{
 			
 			update.append("statusData", serviceStepStatusData);
 			p.getLog().add(new AID(), statusData);
+			p.getLog().getLocal().toString();
 	}
 }
