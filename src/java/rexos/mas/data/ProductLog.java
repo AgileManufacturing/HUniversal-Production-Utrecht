@@ -46,6 +46,8 @@ import jade.core.AID;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.mongodb.BasicDBObject;
 
@@ -91,19 +93,22 @@ public class ProductLog{
 	 * @param statusData
 	 */
 	public void add(AID aid, BasicDBObject statusData){
-		for(@SuppressWarnings("rawtypes")
-		Iterator i = statusData.toMap().entrySet().iterator(); i.hasNext();){
-			switch(i.getClass().getName()){
+		for(Entry<String, Object> e: statusData.entrySet()){
+			switch(e.getValue().getClass().getCanonicalName()){
 			case "java.lang.String":
-				local.insert(new LogMessage(aid, i.toString()));
+				local.insert(new LogMessage(aid, e.toString()));
 				break;
 			case "com.mongodb.BasicDbObject" :
 				Logger.log(new UnsupportedOperationException(
 						"Not implemented case for "
-								+ i.getClass().getCanonicalName()));
+								+ e.getClass().getCanonicalName()));
+				break;
+			case "java.util.LinkedHashMap.Entry":
+					Object ev = e.getValue();
+					break;
 			default:
 				Logger.log(new UnsupportedOperationException("No log case for "
-						+ i.getClass().getCanonicalName()));
+						+ e.getClass().getCanonicalName()));
 			}
 		}
 	}

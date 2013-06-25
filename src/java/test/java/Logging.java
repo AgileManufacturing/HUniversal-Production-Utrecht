@@ -124,14 +124,14 @@ public class Logging{
 			
 			EquipletStep[] equipletSteps = new EquipletStep[dbEquipletSteps.size()];
 			for(int i = 0; i < dbEquipletSteps.size(); i++) {
-				equipletSteps[i] = new EquipletStep((BasicDBObject) dbEquipletSteps.get(i));
+//				equipletSteps[i] = new EquipletStep((BasicDBObject) dbEquipletSteps.get(i));
 			}
-			equipletSteps = EquipletStep.sort(equipletSteps);
+//			equipletSteps = EquipletStep.sort(equipletSteps);
 
 			// append all equipletsteps to the log
 			for(int i = 0; i < equipletSteps.length; i++) {
-				log.append("step" + i, equipletSteps[i].toBasicDBObject());
-			}
+//				log.append("step" + i, equipletSteps[i].toBasicDBObject());
+		}
 	
 			
 			statusData = new BasicDBObject("source", "service agent").append(
