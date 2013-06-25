@@ -279,10 +279,9 @@ void EquipletNode::onModuleModeChanged(
 	rexos_statemachine::Mode previousMode)
 {
 	//ROS_INFO("Module Mode Changed received from %s a mode change from %d to %d",moduleProxy->getModuleNodeName(),previousMode,newMode);
-	if(newMode == rexos_statemachine::MODE_ERROR)
-		changeMode(rexos_statemachine::MODE_ERROR);
-	else if(newMode == rexos_statemachine::MODE_CRITICAL_ERROR)
-		changeMode(rexos_statemachine::MODE_CRITICAL_ERROR);
+	if(newMode > getCurrentMode()){
+		changeMode(newMode);
+	}
 }
 
 void EquipletNode::transitionSetup(rexos_statemachine::TransitionActionServer* as) {
@@ -350,8 +349,8 @@ bool EquipletNode::finishTransition(std::vector<ModuleProxy*> modules){
 	bool allModulesDone = true;
 	for(int i=0; i < modules.size(); i++){
 		if(modules[i]->getCurrentState() != desiredTransitionState){
-			ROS_INFO("Not all modules are in state : %s, module in state: %s", 
-				rexos_statemachine::state_txt[desiredTransitionState]);
+			// ROS_INFO("Not all modules are in state : %s, module in state: %s", 
+			// 	rexos_statemachine::state_txt[desiredTransitionState]);
 			allModulesDone = false;
 			break;
 		}
