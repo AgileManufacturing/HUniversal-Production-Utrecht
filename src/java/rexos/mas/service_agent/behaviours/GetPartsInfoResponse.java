@@ -148,7 +148,11 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 				}
 
 				HashMap<Part, Position> parameters = (HashMap<Part, Position>) message.getContentObject();
-
+				
+				Object[] parts = parameters.keySet().toArray();
+								
+				//TODO: sta de parts op op de productstepBB
+				
 				Logger.log("%s got partsInfo: %s%n", agent.getLocalName(), parameters.toString());
 
 				for(Entry<Part, Position> e : parameters.entrySet()) {
