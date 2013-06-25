@@ -98,17 +98,17 @@ public class ProductLog{
 			case "java.lang.String":
 				local.insert(new LogMessage(aid, e.toString()));
 				break;
-			case "com.mongodb.BasicDbObject" :
-				Logger.log(new UnsupportedOperationException(
-						"Not implemented case for "
-								+ e.getClass().getCanonicalName()));
+			case "com.mongodb.BasicDBObject" :
+					
+				
 				break;
 			case "java.util.LinkedHashMap.Entry":
 					Object ev = e.getValue();
+									
 					break;
 			default:
 				Logger.log(new UnsupportedOperationException("No log case for "
-						+ e.getClass().getCanonicalName()));
+						+ e.getValue().getClass().getCanonicalName()));
 			}
 		}
 	}
