@@ -74,7 +74,7 @@ public class ProductLog{
 		try{
 			boolean newFileCreated = false;
 			if (logfile == null){
-				logfile = new File("log " + aid.toString() + ".json");
+				logfile = new File("log " + aid.toString().replaceAll("[\\/:*?\"<>|]", "") + ".json");
 				logfile.createNewFile();
 				newFileCreated = true;
 			}
