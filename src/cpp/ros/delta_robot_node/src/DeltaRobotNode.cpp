@@ -235,7 +235,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(double x, double y, do
 		ROS_INFO("path is valid. Trying to move..");
 
 		deltaRobot->moveTo(newLocation, maxAcceleration);
-		
+
 		return true;
 	}
 
@@ -606,7 +606,10 @@ void deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(rexos_statemachine
 	// Calibrate the motors
 	if(!deltaRobot->calibrateMotors()){
 		ROS_ERROR("Calibration FAILED. EXITING.");
-	}
+			as->setAborted();
+	} else {
+	as->setSucceeded();
+}
 }
 
 /**
@@ -618,6 +621,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown(rexos_statemach
 	ROS_INFO("Shutdown transition called");
 	// Should have information about the workspace, calculate a safe spot and move towards it
 	deltaRobot->powerOff();
+	as->setSucceeded();
 }
 
 /**
@@ -628,6 +632,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::transitionStart(rexos_statemachine
 	ROS_INFO("Start transition called");
 	//The service servers should be set, to provide the normal methods for the equiplet
 	startServices();
+		as->setSucceeded();
 }
 /**
  * Transition from Normal to Standby state
@@ -637,6 +642,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::transitionStop(rexos_statemachine:
 	ROS_INFO("Stop transition called");
 	//The service servers should be set off, so the equiplet isn't able to set tasks for the module
 	stopServices();
+		as->setSucceeded();
 	// Go to base (Motors on 0 degrees)
 }
 
