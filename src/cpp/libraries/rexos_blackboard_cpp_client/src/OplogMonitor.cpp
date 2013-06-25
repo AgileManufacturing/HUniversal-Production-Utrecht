@@ -29,6 +29,7 @@
  **/
 
 #include <iostream>
+#include <memory>
 
 #include "rexos_blackboard_cpp_client/OplogMonitor.h"
 #include "mongo/client/connpool.h"
@@ -43,10 +44,10 @@ OplogMonitor::OplogMonitor(
 		std::string host,
 		std::string oplogDBName,
 		std::string oplogCollectionName) :
+				currentCursorId(0),
 				host(host),
 				oplogNamespace(),
-				currentThread(NULL),
-				currentCursorId(0)
+				currentThread(NULL)
 {
 	std::stringstream nsStream;
 	nsStream << oplogDBName << "." << oplogCollectionName;
@@ -113,15 +114,18 @@ mongo::Query OplogMonitor::createOplogQuery()
 void OplogMonitor::run()
 {
 	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
+	mongo::Query query(mongo::fromjson(createOplogQuery().toString()));
 
-	std::auto_ptr<mongo::DBClientCursor> tailedCursor = (*connection)->query(
+	unsigned long long skipCount = (*connection)->count(oplogNamespace, query.obj);
+
+	std::unique_ptr<mongo::DBClientCursor> tailedCursor((*connection)->query(
 			oplogNamespace,
-			createOplogQuery(),
+			query,
 			0,
-			(*connection)->count(oplogNamespace),
+			skipCount,
 			NULL,
 			mongo::QueryOption_CursorTailable | mongo::QueryOption_AwaitData,
-			0);
+			0));
 
 	currentCursorId = tailedCursor->getCursorId();
 	try {

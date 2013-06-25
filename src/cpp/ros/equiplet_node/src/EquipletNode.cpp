@@ -121,11 +121,12 @@ EquipletNode::~EquipletNode(){
  **/
 void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) 
 {
+	
+	//std::cout << n.write() << std::endl;
 	JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
 
 	if(&subscription == equipletStepSubscription)
 	{
-		//std::cout << n.write() << std::endl;
 	    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
 
 	    if (step->getStatus().compare("WAITING") == 0) {
