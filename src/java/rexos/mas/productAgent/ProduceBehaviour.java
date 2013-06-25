@@ -142,7 +142,6 @@ class ProducingReceiver extends rexos.mas.behaviours.ReceiveBehaviour {
 	}
 
 	private static final long serialVersionUID = 1L;
-	ACLMessage msg;
 
 	@Override
 	public void handle(ACLMessage m) {
@@ -186,9 +185,9 @@ class ProducingReceiver extends rexos.mas.behaviours.ReceiveBehaviour {
 						 * Equiplet agent informs the product agent that the
 						 * product step has been executed successfully.
 						 */
-//						((ProductAgent) myAgent).getProduct()
-//								.addStatusDataToLog(msg.getSender(),
-//										step.getStatusData());
+						((ProductAgent) myAgent).getProduct()
+								.addStatusDataToLog(m.getSender(),
+										step.getStatusData());
 						_pb.reportProductStatus(BehaviourStatus.COMPLETED);
 						break;
 					default:
