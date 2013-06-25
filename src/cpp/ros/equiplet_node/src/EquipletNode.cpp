@@ -148,6 +148,8 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 				    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
 				    prox->setInstruction(targetObjectId.toString(), step->getInstructionData().getJsonNode());
 
+				    equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"DONE\" } } ");
+
 	    		} else {
 	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"ERROR\" } } ");
 	    		}
