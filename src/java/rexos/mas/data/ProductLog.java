@@ -45,8 +45,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Date;
-import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicLong;
 
 import rexos.libraries.log.Logger;
@@ -84,7 +82,7 @@ public class ProductLog{
 				writer = new FileWriter(logfile, true);
 			}
 			if (newFileCreated){
-				writer.append("{\"" + uniqueCurrentTimeMS() + "\":");
+				writer.append("{\"" + uniqueCurrentTime() + "\":");
 				writer.flush();
 			} else{
 				try(RandomAccessFile raf = new RandomAccessFile(logfile, "rw")){
@@ -92,7 +90,7 @@ public class ProductLog{
 					raf.setLength((logfile.length() - 1));
 					raf.close();
 				}
-				String newObject = new String(",\"" + uniqueCurrentTimeMS()
+				String newObject = new String(",\"" + uniqueCurrentTime()
 						+ "\":");
 				writer.append(newObject);
 				writer.flush();
@@ -104,15 +102,19 @@ public class ProductLog{
 		}
 	}
 	
-	private static final AtomicLong LAST_TIME_MS = new AtomicLong();
-	public static long uniqueCurrentTimeMS() {
-	    long now = System.currentTimeMillis();
+	private static final AtomicLong last_time = new AtomicLong();	
+	/**
+	 * Returns uniqueCurrentTime
+	 * @see http://stackoverflow.com/questions/9191288
+	 */
+	public static long uniqueCurrentTime() {
+	    long newCurrentTime = System.currentTimeMillis();
 	    while(true) {
-	        long lastTime = LAST_TIME_MS.get();
-	        if (lastTime >= now)
-	            now = lastTime+1;
-	        if (LAST_TIME_MS.compareAndSet(lastTime, now))
-	            return now;
+	        long lastTime = last_time.get();
+	        if (lastTime >= newCurrentTime)
+	        	newCurrentTime = lastTime+1;
+	        if (last_time.compareAndSet(lastTime, newCurrentTime))
+	            return newCurrentTime;
 	    }
 	}
 }
