@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/ProductAgents/lib/jade.jar"/>
+<listEntry value="ProductAgents/lib/jade.jar"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
@@ -14,5 +14,5 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jade.Boot"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-gui -agents &quot;MainAgent :rexos.mas.jadeagentx.JadeAgentX&quot;"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="ProductAgent"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="ProductAgents"/>
 </launchConfiguration>
