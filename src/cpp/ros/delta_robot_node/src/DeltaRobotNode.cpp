@@ -141,10 +141,6 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 	//i[4] payloads
 
 	if (strcmp(i[4].name().c_str(), "payload") == 0){
-		if(getCurrentState() != rexos_statemachine::STATE_NORMAL){
-			ROS_INFO("Cannot move to point, most state is not correct");
-			setInstructionActionServer.setAborted();
-		} else {
 			std::cout << "2" << std::endl;
 
 			Point p = parsePoint(i[4]);
@@ -156,7 +152,6 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 				ROS_INFO("Failed moving to point");
     			setInstructionActionServer.setAborted();
 			}
-		}
     } else {
 		std::cout << "3 " << i[0].name().c_str() << " " << i[4].name().c_str() << " " << std::endl;
     	setInstructionActionServer.setAborted();
