@@ -37,6 +37,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
+import com.mongodb.MongoException;
 import com.mongodb.MongoInterruptedException;
 
 /**
@@ -135,11 +136,18 @@ class OplogMonitorThread extends Thread {
 					}
 				}
 			}
-		} catch (MongoInterruptedException ex) {
+		} catch (MongoInterruptedException | MongoException.CursorNotFound ex) {
 			/*
 			 * MongoInterruptedException is thrown by Mongo when interrupt is called while blocking on the
 			 * tailedCursor's hasNext method. When this happens, return from the run method to kill the thread.
 			 */
+			
+			/*
+			 * MongoException.CursorNotFound indicates the cursor was killed while blocking on hasNext.
+			 * We purposely kill the cursor when the OplogMonitorThread is interrupted, thus expect this to happen.
+			 */
+			
+			rexos.libraries.log.Logger.log("OplogMonitorThread ending due to %s:\n%s", ex.getClass().getName(), ex.getMessage());
 		}
 	}
 }

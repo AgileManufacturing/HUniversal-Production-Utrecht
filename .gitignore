@@ -44,3 +44,5 @@ MTPs-Main-Container.txt
 .classpath
 .project
 .settings/
+doxy
+doc

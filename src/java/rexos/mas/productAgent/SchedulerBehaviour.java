@@ -42,7 +42,7 @@ package rexos.mas.productAgent;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -62,19 +62,23 @@ import rexos.mas.data.DbData;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
+import rexos.mas.data.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
 @SuppressWarnings("serial")
-public class SchedulerBehaviour extends OneShotBehaviour {
+public class SchedulerBehaviour extends Behaviour {
 
 	private ProductAgent _productAgent;
 	private int timeslotsToSchedule = 0;
 	private int debug = 1;
-	private boolean _error = false;
 	private ProductionStep _prodStep;
+	
+	private boolean _isDone = false;
+	private boolean _isError = false;
+	private boolean _isCompleted = false;
 
 	private BehaviourCallback _bc;
 
@@ -82,19 +86,9 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 		super(myAgent);
 		this._bc = bc;
 	}
-	
-	@Override
-	public int onEnd() {
-		if(this._error != false) {
-			this._bc.handleCallback(BehaviourStatus.COMPLETED);
-		} else {
-			this._bc.handleCallback(BehaviourStatus.ERROR);
-		}
-		return 0;
-	}
 
 	@Override
-	public void action() {
+	public void onStart() {
 		try {
 			// Shedule the PA with the equiplet agents in the current list.
 			_productAgent = (ProductAgent) myAgent;
@@ -104,7 +98,7 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			Product product = this._productAgent.getProduct();
 			Production production = product.getProduction();
 			ArrayList<ProductionStep> psa = production.getProductionSteps();
-			
+
 			for (ProductionStep ps : psa) {
 				int PA_id = ps.getId();
 				java.util.HashMap<AID, Long> equiplets = production
@@ -125,14 +119,35 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 					Scheduler(production.getProductionEquipletMapping()
 							.getEquipletsForProductionStep(PA_id).keySet(), ps);
 				} else {
-					//TODO: THIS SHOULD NOT HAPPEN. THROW EXCEPTION!
+					_isError = true;
+					// TODO: THIS SHOULD NOT HAPPEN. THROW EXCEPTION!
 				}
 
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			Logger.log(e);
 		}
-		System.out.println("Done Scheduling");
+	}
+
+	@Override
+	public void action() {
+		try {
+			if (_isDone) {
+				this._bc.handleCallback(BehaviourStatus.COMPLETED);
+				_isCompleted = true;
+			} else if (_isError) {
+				this._bc.handleCallback(BehaviourStatus.ERROR);
+				_isCompleted = true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public boolean done() {
+		return _isCompleted;
 	}
 
 	/**
@@ -149,66 +164,69 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 
 		// load set into arraylist
 		List<AID> equipletlist = new ArrayList<AID>(equipletList);
-
+		//Create Hashmap for database data
 		HashMap<AID, DbData> dbData = new HashMap<AID, DbData>();
 
 		// Change this
-
-		for (AID aid : equipletlist) {
-
-			BlackboardClient bbc = new BlackboardClient("145.89.191.131");
-			bbc.setDatabase("CollectiveDb");
-			bbc.setCollection("EquipletDirectory");
-
-			QueryBuilder qb = QueryBuilder.start("AID").is(aid.getName());
-
-			List<DBObject> aidInfo = bbc.findDocuments(qb.get());
-
-			if (aidInfo.size() > 0) {
-				dbData.put(aid,
-						new DbData((BasicDBObject) aidInfo.get(0).get("db")));
-			} else {
-				// TODO: what to do if list is empty
+		if(equipletlist.size() > 0){
+			for (AID aid : equipletlist) {
+	
+				BlackboardClient bbc = new BlackboardClient("145.89.191.131");
+				bbc.setDatabase("CollectiveDb");
+				bbc.setCollection("EquipletDirectory");
+	
+				QueryBuilder qb = QueryBuilder.start("AID").is(aid.getName());
+	
+				List<DBObject> aidInfo = bbc.findDocuments(qb.get());
+	
+				if (aidInfo.size() > 0) {
+					dbData.put(aid,
+							new DbData((BasicDBObject) aidInfo.get(0).get("db")));
+				} else {
+					// TODO: what to do if list is empty
+				}
 			}
+		}else{
+			System.out.println("No equiplets available.");
 		}
 
 		int scheduleCount = 0;
 		Schedule[] schedules;
 		ArrayList<FreeTimeSlot> freetimeslot = new ArrayList<FreeTimeSlot>();
-
-		Iterator<Entry<AID, DbData>> it = dbData.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry<AID, DbData> pairs = it.next();
-
-			DbData dbDa = pairs.getValue();
-
-			BlackboardClient bbc = new BlackboardClient(dbDa.getIp(),
-					dbDa.getPort());
-			bbc.setDatabase(dbDa.getName());
-			bbc.setCollection("ProductStepsBlackboard");
-
-			List<DBObject> blackBoard = bbc.findDocuments(" ");
-			scheduleCount = blackBoard.size();
-
-			schedules = new Schedule[scheduleCount];
-
-			// Gets planned steps
-			List<DBObject> plannedSteps = bbc.findDocuments(QueryBuilder
-					.start("scheduleData.startTime").greaterThan(-1).get());
-			for (int i = 0; i < plannedSteps.size(); i++) {
-				double b = (Double) plannedSteps.get(i).get("startTime");
-				int stati = (int) b;
-				double c = (Double) plannedSteps.get(i).get("duration");
-				int dur = (int) c;
-				// add scheduled timeslot to array of scheduled timeslots and
-				// mention which equiplet
-				schedules[i] = new Schedule(stati, dur, pairs.getKey());
-			}
-
-			int startTimeSlot = 0;
-			// check within every schedule of the 'schedules' array for free
-			// timeslots and add them to the 'freetimeslot' array
-			if(schedules.length > 0){
+		
+		if(dbData.size() > 0){
+			Iterator<Entry<AID, DbData>> it = dbData.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry<AID, DbData> pairs = it.next();
+	
+				DbData dbDa = pairs.getValue();
+	
+				BlackboardClient bbc = new BlackboardClient(dbDa.getIp(),
+						dbDa.getPort());
+				bbc.setDatabase(dbDa.getName());
+				bbc.setCollection("ProductStepsBlackboard");
+	
+				List<DBObject> blackBoard = bbc.findDocuments(" ");
+				scheduleCount = blackBoard.size();
+	
+				schedules = new Schedule[scheduleCount];
+	
+				// Gets planned steps
+				List<DBObject> plannedSteps = bbc.findDocuments(QueryBuilder
+						.start("scheduleData.startTime").greaterThan(-1).get());
+				for (int i = 0; i < plannedSteps.size(); i++) {
+					double b = (Double) plannedSteps.get(i).get("startTime");
+					int stati = (int) b;
+					double c = (Double) plannedSteps.get(i).get("duration");
+					int dur = (int) c;
+					// add scheduled timeslot to array of scheduled timeslots and
+					// mention which equiplet
+					schedules[i] = new Schedule(stati, dur, pairs.getKey());
+				}
+	
+				int startTimeSlot = 0;
+				// check within every schedule of the 'schedules' array for free
+				// timeslots and add them to the 'freetimeslot' array
 				for (int run = 0; run < schedules.length; run++) {
 					if (schedules[run].getStartTime() > startTimeSlot) {
 						if (schedules.length > (run + 1)) {
@@ -222,23 +240,24 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 								freetimeslot.add(new FreeTimeSlot(
 										timeslotToSchedule, freeTimeSlot,
 										schedules[run].getEquipletName()));
-								if (debug != 0) {
-									// debug
-									System.out.println("Free timeslot: "
-											+ freeTimeSlot
-											+ " starting at timeslot: "
-											+ timeslotToSchedule);
-								}
+								
+								// debug
+								System.out.println("Free timeslot: "
+										+ freeTimeSlot
+										+ " starting at timeslot: "
+										+ timeslotToSchedule);
+								
 							}
 						}
 					}
 				}
-			}else{
-				freetimeslot.add(new FreeTimeSlot((int) (System
-						.currentTimeMillis() / 2000 + 5), productionstep
-						.getRequiredTimeSlots(), pairs.getKey()));
+				if (schedules.length == 0) {
+					freetimeslot.add(new FreeTimeSlot((int) (System
+							.currentTimeMillis() / 2000 + 5), productionstep
+							.getRequiredTimeSlots(), pairs.getKey()));
+				}
+	
 			}
-
 		}
 
 		FreeTimeSlot freetimeslotEq = null;
@@ -260,16 +279,14 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			msg.addReceiver(freetimeslotEq.getEquipletName());
 			myAgent.send(msg);
 		} else {
-			//TODO: Throw exeption
+			// TODO: Throw exeption
 		}
 
 		final MessageTemplate msgtemplate = MessageTemplate.and(MessageTemplate
 				.MatchConversationId(this._prodStep.getConversationId()),
 				MessageTemplate.MatchOntology("Planned"));
-		
-		
 
-		((SequentialBehaviour) parent).addSubBehaviour(new ReceiveBehaviour(
+		myAgent.addBehaviour(new ReceiveBehaviour(
 				myAgent, 10000, msgtemplate) {
 			/**
 					 * 
@@ -280,9 +297,13 @@ public class SchedulerBehaviour extends OneShotBehaviour {
 			public void handle(ACLMessage msg) {
 				if (msg == null) {
 					System.out.println("Null message - Scheduler");
+					_isError = true;
 				} else {
-					//TODO:: Scheduler is done. Make a nice ending pls
-					System.out.println("Scheduled");
+					_prodStep.setStatus(StepStatusCode.PLANNED);
+					_isDone = true;
+					
+					System.out.println("received message");
+					// TODO:: Scheduler is done. Make a nice ending pls
 				}
 			}
 		});

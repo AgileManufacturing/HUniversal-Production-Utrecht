@@ -60,7 +60,7 @@ public class DeltaRobotModule extends Module {
 	 * @var double SAFE_MOVEMENT_PLANE
 	 *      A static value that contains the height of the safe movement plane.
 	 */
-	private static final double SAFE_MOVEMENT_PLANE = 6;
+	private static final double SAFE_MOVEMENT_PLANE = 40;
 
 	/**
 	 * @see Module#getEquipletSteps(int, BasicDBObject)

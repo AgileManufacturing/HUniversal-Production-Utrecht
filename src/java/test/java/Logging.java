@@ -42,12 +42,15 @@ package test.java;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+
 import jade.core.AID;
 import rexos.mas.hardware_agent.*;
 import rexos.mas.data.StepStatusCode;
+
 import org.junit.Test;
 
 import com.mongodb.BasicDBObject;
+
 import rexos.mas.data.Position;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
@@ -115,6 +118,7 @@ public class Logging{
 			BasicDBObject log = new BasicDBObject();
 			BasicDBObject dbEquipletSteps;
 			dbEquipletSteps = new BasicDBObject();
+			@SuppressWarnings("unused")
 			BasicDBObject lookUpParameters = new BasicDBObject();
 			
 			InstructionData instructionData = new InstructionData();
@@ -124,14 +128,14 @@ public class Logging{
 			
 			EquipletStep[] equipletSteps = new EquipletStep[dbEquipletSteps.size()];
 			for(int i = 0; i < dbEquipletSteps.size(); i++) {
-				equipletSteps[i] = new EquipletStep((BasicDBObject) dbEquipletSteps.get(i));
+//				equipletSteps[i] = new EquipletStep((BasicDBObject) dbEquipletSteps.get(i));
 			}
-			equipletSteps = EquipletStep.sort(equipletSteps);
+//			equipletSteps = EquipletStep.sort(equipletSteps);
 
 			// append all equipletsteps to the log
 			for(int i = 0; i < equipletSteps.length; i++) {
-				log.append("step" + i, equipletSteps[i].toBasicDBObject());
-			}
+//				log.append("step" + i, equipletSteps[i].toBasicDBObject());
+		}
 	
 			
 			statusData = new BasicDBObject("source", "service agent").append(
@@ -148,5 +152,6 @@ public class Logging{
 			
 			update.append("statusData", serviceStepStatusData);
 			p.getLog().add(new AID(), statusData);
+			p.getLog().getLocal().toString();
 	}
 }

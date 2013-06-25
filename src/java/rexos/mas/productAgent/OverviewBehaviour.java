@@ -41,10 +41,11 @@ package rexos.mas.productAgent;
 import rexos.mas.data.AgentStatus;
 import rexos.mas.data.BehaviourStatus;
 import jade.core.Agent;
-import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.ParallelBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 
-public class OverviewBehaviour extends OneShotBehaviour implements
+public class OverviewBehaviour extends Behaviour implements
 		BehaviourCallback {
 
 	private static final long serialVersionUID = 1L;
@@ -55,19 +56,28 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 	private InformerBehaviour _informerBehaviour;
 	private SchedulerBehaviour _schedulerBehaviour;
 	private ProduceBehaviour _produceBehaviour;
-	private SequentialBehaviour _sequentialBehaviour;
 	private SocketBehaviour _socketBehaviour;
+
+	private ParallelBehaviour _parallelBehaviour;
+	private SequentialBehaviour _sequentialBehaviour;
+	
+	private boolean _overviewCompleted = false;
 
 	public OverviewBehaviour(Agent myAgent) {
 		super(myAgent);
+		_productAgent = (ProductAgent) myAgent;
 		System.out
 				.println("Overview behaviour created. Starting all behaviours to the agents.");
+		_productAgent.setStatus(AgentStatus.INITIALIZING);
+		this.initialize();
+		_productAgent.setStatus(AgentStatus.DONE_INITIALIZING);
 	}
 
 	private void initialize() {
+
 		System.out.println("Creating the SocketBehaviour");
-		//_socketBehaviour = new SocketBehaviour(myAgent, _productAgent
-		//		.getProperties().getCallback());
+		_socketBehaviour = new SocketBehaviour(myAgent, _productAgent
+				.getProperties().getCallback());
 
 		System.out.println("Creating the PlannerBehaviour");
 		_plannerBehaviour = new PlannerBehaviour(myAgent, this);
@@ -81,15 +91,22 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 		System.out.println("Creating the ProductBehaviour");
 		_produceBehaviour = new ProduceBehaviour(myAgent, this);
 
+		System.out.println("Creating the ParallelBehaviour");
+		_parallelBehaviour = new ParallelBehaviour();
+
 		System.out.println("Creating the SequentialBehaviour");
 		_sequentialBehaviour = new SequentialBehaviour();
-		// Starting a sequentialBehaviour
-		System.out.println("Add a SequentialBehaviour");
-		_productAgent.addBehaviour(_sequentialBehaviour);
 
-		// Starting the SocketBehaviour, so the agent can communicate with the
-		//System.out.println("Add a SocketBehaviour");
-		//_productAgent.addBehaviour(_socketBehaviour);
+		System.out.println("Addding a ParallelBehaviour to the Product Agent");
+		myAgent.addBehaviour(_sequentialBehaviour);
+
+		System.out
+				.println("Addding a SequentialBehaviour to the ParallelBehaviour");
+		myAgent.addBehaviour(_parallelBehaviour);
+
+		System.out
+				.println("Adding the SocketBehaviour to the ParallelBehaviour");
+		_parallelBehaviour.addSubBehaviour(_socketBehaviour);
 	}
 
 	/*
@@ -100,16 +117,38 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 	@Override
 	public void action() {
 		try {
-			_productAgent = (ProductAgent) myAgent;
-			// Initialize all behaviours
-			this.initialize();
-			// Star the planning behaviour. This behaviour will call the
-			// handleCallback function when done,
-			// which in turn create all the other behaviours
-			this.startPlanning();
+			AgentStatus as = _productAgent.getStatus();
+			switch (as) {
+			case INITIALIZING:
+				//THis should never be the case
+				break;
+			case DONE_INITIALIZING:
+				this.startPlanning();				
+				break;
+			case DONE_PLANNING:
+				this.startInforming();
+				break;
+			case DONE_INFORMING:
+				this.startScheduling();
+				break;
+			case DONE_SCHEDULING:
+				this.startProducing();
+				break;
+			case DONE_PRODUCING:
+				this.cleanBehaviour();
+				_overviewCompleted = true;
+				break;
+			default:
+				break;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public boolean done() {
+		return _overviewCompleted;
 	}
 
 	@SuppressWarnings("static-method")
@@ -120,25 +159,25 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 	public void startPlanning() {
 		_productAgent.setStatus(AgentStatus.PLANNING);
 		System.out.println("Add a PlannerBehaviour");
-		_sequentialBehaviour.addSubBehaviour(_plannerBehaviour);
+		myAgent.addBehaviour(_plannerBehaviour);
 	}
 
 	public void startInforming() {
 		_productAgent.setStatus(AgentStatus.INFORMING);
 		System.out.println("Add an InformerBehaviour");
-		_sequentialBehaviour.addSubBehaviour(_informerBehaviour);
+		myAgent.addBehaviour(_informerBehaviour);
 	}
 
 	public void startScheduling() {
 		_productAgent.setStatus(AgentStatus.SCHEDULING);
 		System.out.println("Add a SchedulerBehaviour");
-		_sequentialBehaviour.addSubBehaviour(_schedulerBehaviour);
+		myAgent.addBehaviour(_schedulerBehaviour);
 	}
 
 	public void startProducing() {
 		_productAgent.setStatus(AgentStatus.PRODUCING);
 		System.out.println("Add a ProduceBehaviour");
-		_sequentialBehaviour.addSubBehaviour(_produceBehaviour);
+		myAgent.addBehaviour(_produceBehaviour);
 	}
 
 	/*
@@ -148,25 +187,24 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 	 */
 	@Override
 	public void handleCallback(BehaviourStatus bs) {
-		// USE behaviourstatus to check if behaviour finished nicely
-		// TODO Auto-generated method stub
 		AgentStatus as = _productAgent.getStatus();
 		switch (as) {
 		case PLANNING:
 			System.out.println("Done planning.");
-			this.startInforming();
+			_productAgent.setStatus(AgentStatus.DONE_PLANNING);
+			//Check if there was an error. Do this for all cases
 			break;
 		case INFORMING:
 			System.out.println("Done Informing.");
-			this.startScheduling();
+			_productAgent.setStatus(AgentStatus.DONE_INFORMING);
 			break;
 		case SCHEDULING:
 			System.out.println("Done scheduling.");
-			this.startProducing();
+			_productAgent.setStatus(AgentStatus.DONE_SCHEDULING);
 			break;
 		case PRODUCING:
 			System.out.println("Done producing.");
-			this.cleanBehaviour();
+			_productAgent.setStatus(AgentStatus.DONE_PRODUCING);
 			break;
 		default:
 			System.out.println("Unknown status. Status: " + as.toString());
@@ -175,7 +213,7 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 	}
 
 	public void cleanBehaviour() {
-		System.out.println("Done overview. Stopping SocketBehaviour.");
-		//_socketBehaviour.stop();
+		System.out.println("Done overview, stopping SocketBehaviour.");
+		_socketBehaviour.stop();
 	}
 }

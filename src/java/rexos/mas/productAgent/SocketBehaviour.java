@@ -54,7 +54,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.gson.Gson;
 
-import rexos.libraries.log.Logger;
 import rexos.mas.data.Callback;
 import rexos.mas.data.GUIMessage;
 
@@ -82,7 +81,7 @@ public class SocketBehaviour extends Behaviour implements HeartbeatReceiver {
 			_hbb = new HeartBeartBehaviour(a, 0, this);
 			_gsonParser = new Gson();
 			a.addBehaviour(_hbb);
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -112,8 +111,8 @@ public class SocketBehaviour extends Behaviour implements HeartbeatReceiver {
 			}
 		} catch (Exception e) {
 			isConnected = false;
-			//System.out.println("Agent: " + _agent.getLocalName()
-			//		+ " is disconnected!");
+			// System.out.println("Agent: " + _agent.getLocalName()
+			// + " is disconnected!");
 		}
 	}
 
@@ -167,9 +166,11 @@ public class SocketBehaviour extends Behaviour implements HeartbeatReceiver {
 	@Override
 	public void initHeartbeat() {
 		try {
-			outputStream.println("heart");
+			if (isConnected) {
+				outputStream.println("heart");
+			}
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 

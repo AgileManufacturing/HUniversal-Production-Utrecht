@@ -52,7 +52,6 @@ package rexos.mas.equiplet_agent;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.WakerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
@@ -236,7 +235,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			}
 
 			capabilities = new ArrayList<Integer>();
-			// /Register modules
+			// Register modules
 			KnowledgeDBClient client;
 			try {
 				client = KnowledgeDBClient.getClient();
@@ -253,9 +252,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 			dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 
+			//TODO register this equiplet on the knowledge db and add the equipletId to the arguments for the SA
 			// creates his service agent.
 			Object[] arguments = new Object[] {
-					dbData, getAID(), logisticsAgent
+					dbData, getAID(), logisticsAgent, 1
 			};
 			AgentController serviceAgentCnt =
 					getContainerController().createNewAgent(getLocalName() + "-serviceAgent",
@@ -340,6 +340,17 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		send(deadMessage);
 	}
 
+	public void cancelAllStepsForProductStep(ObjectId productStepId, String reason) {
+		try {
+			productStepBBClient.updateDocuments(
+					new BasicDBObject("_id", productStepId),
+					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
+							"statusData", new BasicDBObject("reason", reason))));
+		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * onMessage function for the equipletAgent. Listens to updates of the
 	 * blackboard clients and handles them.
@@ -373,64 +384,68 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 								// slot make it the next used timeslot.
 								nextProductStep = productStep.getId();
 								ScheduleData scheduleData = productStep.getScheduleData();
-								if(timer.getNextUsedTimeSlot() == 0 || scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
+								if(timer.getNextUsedTimeSlot() == 0
+										|| scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
 									timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 								}
 
 								responseMessage.setOntology("Planned");
 								responseMessage.setContentObject(scheduleData.getStartTime());
 
-								//TODO: after testing delete below
-//								addBehaviour(new WakerBehaviour(this, 75){
-//									
-//									/**
-//									 * 
-//									 */
-//									private static final long serialVersionUID = 1L;
-//
-//									protected void onWake(){
-//			
-//									ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
-//									cancelMessage.addReceiver(getAID());
-//									cancelMessage.setOntology("AbortStep");
-//									cancelMessage.setConversationId(getConversationId(nextProductStep));
-//									send(cancelMessage);
-//									
-//									Logger.log("Equiplet agent - sending message %s%n", ACLMessage.getPerformative(cancelMessage.getPerformative()));
-//									}
-//								});
-								//TODO: after testing delete above
-								
+								// TODO: after testing delete below
+								// addBehaviour(new WakerBehaviour(this, 75){
+								//
+								// /**
+								// *
+								// */
+								// private static final long serialVersionUID = 1L;
+								//
+								// protected void onWake(){
+								//
+								// ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
+								// cancelMessage.addReceiver(getAID());
+								// cancelMessage.setOntology("AbortStep");
+								// cancelMessage.setConversationId(getConversationId(nextProductStep));
+								// send(cancelMessage);
+								//
+								// Logger.log("Equiplet agent - sending message %s%n",
+								// ACLMessage.getPerformative(cancelMessage.getPerformative()));
+								// }
+								// });
+								// TODO: after testing delete above
+
 							} catch(IOException e) {
 								responseMessage.setPerformative(ACLMessage.FAILURE);
 								responseMessage.setContent("An error occured in the planning/please reschedule");
 								Logger.log(e);
 							}
 							break;
+						case WAITING:
 						case IN_PROGRESS:
 						case FAILED:
 						case SUSPENDED_OR_WARNING:
 							responseMessage.setOntology("StatusUpdate");
 							responseMessage.setPerformative(ACLMessage.CONFIRM);
-							responseMessage.setContentObject(productStep.getStatusData());
+							responseMessage.setContentObject(productStep.toBasicDBObject());
 							break;
 						case DONE:
 							responseMessage.setOntology("StatusUpdate");
 							responseMessage.setPerformative(ACLMessage.CONFIRM);
 							productStep.setStatus(StepStatusCode.DONE);
-							responseMessage.setContentObject(productStep);
+							responseMessage.setContentObject(productStep.toBasicDBObject());
 							productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
 							break;
 						case DELETED:
 							responseMessage.setOntology("StatusUpdate");
 							responseMessage.setPerformative(ACLMessage.CONFIRM);
-							responseMessage.setContentObject(productStep.getStatusData());
+							responseMessage.setContentObject(productStep.toBasicDBObject());
 							productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
 							break;
 						default:
 							break;
 					}
-					Logger.log("Equiplet agent - sending message %s%n", ACLMessage.getPerformative(responseMessage.getPerformative()));
+					Logger.log("Equiplet agent - sending message %s%n",
+							ACLMessage.getPerformative(responseMessage.getPerformative()));
 					send(responseMessage);
 				} catch(Exception e1) {
 					Logger.log(e1);

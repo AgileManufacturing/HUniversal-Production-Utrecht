@@ -388,9 +388,11 @@ public class ProductStep implements MongoSaveable, Serializable {
 		object.put("productAgentId", productAgentId.getName());
 		object.put("type", type);
 		object.put("parameters", parameters);
-		BasicDBObject[] tempInputParts = new BasicDBObject[inputParts.length];
+		BasicDBList tempInputParts = new BasicDBList();
+		//BasicDBObject[] tempInputParts = new BasicDBObject[inputParts.length];
 		for(int i = 0; i < inputParts.length; i++){
-			tempInputParts[i] = inputParts[i].toBasicDBObject();
+			//tempInputParts[i] = inputParts[i].toBasicDBObject();
+			tempInputParts.add(inputParts[i].toBasicDBObject());
 		}
 		object.put("inputParts", tempInputParts);
 		if(outputPart != null){
