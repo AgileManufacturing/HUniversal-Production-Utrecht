@@ -65,7 +65,7 @@ public class Product{
 		return log;
 	}
 
-	public Product(Production production, String aid){
+	public Product(Production production){
 		if (production == null)
 			Logger.log(new Exception("Production can't be null"));
 		setProduction(production);
