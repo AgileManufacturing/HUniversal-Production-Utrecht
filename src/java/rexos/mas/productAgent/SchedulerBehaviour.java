@@ -255,7 +255,7 @@ public class SchedulerBehaviour extends Behaviour {
 					freetimeslot.add(new FreeTimeSlot((int) (System
 							.currentTimeMillis() / 2000 + 5), productionstep
 							.getRequiredTimeSlots(), pairs.getKey()));
-				}
+				} 
 	
 			}
 		}
