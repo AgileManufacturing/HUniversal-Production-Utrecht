@@ -43,6 +43,8 @@
 
 package rexos.mas.productAgent;
 
+import com.mongodb.BasicDBObject;
+
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
@@ -159,7 +161,7 @@ class ProducingReceiver extends rexos.mas.behaviours.ReceiveBehaviour {
 					myAgent.send(reply);
 					break;
 				case "StatusUpdate":
-					ProductStep step = (ProductStep) m.getContentObject();
+					ProductStep step = new ProductStep((BasicDBObject)m.getContentObject());
 					ProductAgentstp.setStatus(step.getStatus());
 					switch (step.getStatus()) {
 					case IN_PROGRESS:
@@ -184,14 +186,14 @@ class ProducingReceiver extends rexos.mas.behaviours.ReceiveBehaviour {
 						 * Equiplet agent informs the product agent that the
 						 * product step has been executed successfully.
 						 */
-						((ProductAgent) myAgent).getProduct()
-								.addStatusDataToLog(msg.getSender(),
-										step.getStatusData());
+//						((ProductAgent) myAgent).getProduct()
+//								.addStatusDataToLog(msg.getSender(),
+//										step.getStatusData());
 						_pb.reportProductStatus(BehaviourStatus.COMPLETED);
 						break;
 					default:
 						Logger.log(new UnsupportedOperationException(
-								"No case for " + m.getOntology()));
+								"No case for " + step.getStatus()));
 						break;
 					}
 					break;

@@ -330,32 +330,35 @@ public class EquipletStep implements MongoSaveable {
 	 * @return an array of EquipletStep in the right order.
 	 */
 	public static EquipletStep[] sort(EquipletStep[] unsortedSteps) {
-		// Find the first step
-		EquipletStep firstServiceStep = null;
-		outer: for(EquipletStep serviceStep : unsortedSteps) {
-			for(EquipletStep equipletStep2 : unsortedSteps) {
-				if(equipletStep2.getNextStep() != null && equipletStep2.getNextStep().equals(serviceStep.getId())) {
-					continue outer;
+		if(unsortedSteps.length > 0){
+			// Find the first step
+			EquipletStep firstServiceStep = null;
+			outer: for(EquipletStep serviceStep : unsortedSteps) {
+				for(EquipletStep equipletStep2 : unsortedSteps) {
+					if(equipletStep2.getNextStep() != null && equipletStep2.getNextStep().equals(serviceStep.getId())) {
+						continue outer;
+					}
+				}
+				firstServiceStep = serviceStep;
+				break;
+			}
+	
+			// sort all steps beginning with the one found above
+			int stepsCount = unsortedSteps.length;
+			ObjectId nextStepId;
+			EquipletStep[] sortedSteps = new EquipletStep[stepsCount];
+			sortedSteps[0] = firstServiceStep;
+			for(int i = 1; i < stepsCount; i++) {
+				nextStepId = sortedSteps[i - 1].getNextStep();
+				for(EquipletStep serviceStep : unsortedSteps) {
+					if(serviceStep.getId().equals(nextStepId)) {
+						sortedSteps[i] = serviceStep;
+						break;
+					}
 				}
 			}
-			firstServiceStep = serviceStep;
-			break;
+			return sortedSteps;
 		}
-
-		// sort all steps beginning with the one found above
-		int stepsCount = unsortedSteps.length;
-		ObjectId nextStepId;
-		EquipletStep[] sortedSteps = new EquipletStep[stepsCount];
-		sortedSteps[0] = firstServiceStep;
-		for(int i = 1; i < stepsCount; i++) {
-			nextStepId = sortedSteps[i - 1].getNextStep();
-			for(EquipletStep serviceStep : unsortedSteps) {
-				if(serviceStep.getId().equals(nextStepId)) {
-					sortedSteps[i] = serviceStep;
-					break;
-				}
-			}
-		}
-		return sortedSteps;
+		return unsortedSteps;
 	}
 }

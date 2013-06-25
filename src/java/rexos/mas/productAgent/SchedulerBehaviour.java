@@ -62,6 +62,7 @@ import rexos.mas.data.DbData;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
+import rexos.mas.data.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -281,7 +282,7 @@ public class SchedulerBehaviour extends Behaviour {
 				.MatchConversationId(this._prodStep.getConversationId()),
 				MessageTemplate.MatchOntology("Planned"));
 
-		((SequentialBehaviour) parent).addSubBehaviour(new ReceiveBehaviour(
+		myAgent.addBehaviour(new ReceiveBehaviour(
 				myAgent, 10000, msgtemplate) {
 			/**
 					 * 
@@ -294,7 +295,10 @@ public class SchedulerBehaviour extends Behaviour {
 					System.out.println("Null message - Scheduler");
 					_isError = true;
 				} else {
+					_prodStep.setStatus(StepStatusCode.PLANNED);
 					_isDone = true;
+					
+					System.out.println("received message");
 					// TODO:: Scheduler is done. Make a nice ending pls
 				}
 			}
