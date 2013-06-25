@@ -64,10 +64,7 @@ import rexos.mas.data.Product;
 import rexos.mas.data.ProductAgentProperties;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
-
-import com.google.gson.Gson;
 import com.mongodb.BasicDBObject;
-import com.mongodb.util.JSON;
 
 /**
  *	Test class for testing the equiplet agent, service agent and hardware agent.
@@ -115,16 +112,10 @@ public class JadeAgentX extends Agent {
 //			parameters.append("position", new Position(1.0, 2.0, 3.0, new Part(2)).toBasicDBObject());
 			parameters.append("startPosition", new Position(1.0, 1.0).toBasicDBObject());
 			parameters.append("endPosition", new Position(1.0, 1.0).toBasicDBObject());
-			
-			String json = new Gson().toJson(parameters);
-			
-			BasicDBObject test = (BasicDBObject) JSON.parse(json);
-			
-
-
+								
 			// Next we want to have some production steps
 			ProductionStep stp1 = new ProductionStep(1, 3, parameters);
-//			ProductionStep stp2 = new ProductionStep(2, 1, parameters);
+			ProductionStep stp2 = new ProductionStep(2, 3, parameters);
 //			ProductionStep stp3 = new ProductionStep(3, 1, parameters);
 //			ProductionStep stp4 = new ProductionStep(4, 1, parameters);
 
@@ -135,7 +126,7 @@ public class JadeAgentX extends Agent {
 			 */
 			ArrayList<ProductionStep> stepList = new ArrayList<>();
 			stepList.add(stp1);
-			// stepList.add(stp2);
+			stepList.add(stp2);
 			// stepList.add(stp3);
 			// stepList.add(stp4);
 

@@ -43,7 +43,6 @@ package rexos.mas.productAgent;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -190,7 +189,6 @@ public class SchedulerBehaviour extends Behaviour {
 			System.out.println("No equiplets available.");
 		}
 
-		int scheduleCount = 0;
 		ArrayList<Schedule> schedules = new ArrayList<Schedule>();
 		ArrayList<FreeTimeSlot> freetimeslot = new ArrayList<FreeTimeSlot>();
 		
@@ -222,7 +220,7 @@ public class SchedulerBehaviour extends Behaviour {
 				int startTimeSlot = 0;
 				// check within every schedule of the 'schedules' array for free
 				// timeslots and add them to the 'freetimeslot' array
-				if(schedules.size() >0 && schedules != null){
+				if(schedules.size() >0){
 					for (int run = 0; run < schedules.size(); run++) {
 						if (schedules.get(run).getStartTime() > startTimeSlot) {
 							if (schedules.size() > (run + 1)) {
@@ -247,12 +245,11 @@ public class SchedulerBehaviour extends Behaviour {
 							}
 						}
 					}
-				
-					if (schedules.size() == 0) {
-						freetimeslot.add(new FreeTimeSlot((int) (System
-								.currentTimeMillis() / 2000 + 5), productionstep
-								.getRequiredTimeSlots(), pairs.getKey()));
-					}
+				}
+				if (schedules.size() == 0) {
+					freetimeslot.add(new FreeTimeSlot((int) (System
+							.currentTimeMillis() / 2000 + 5), productionstep
+							.getRequiredTimeSlots(), pairs.getKey()));
 				}
 			}
 		}

@@ -63,7 +63,7 @@ public class PenModule extends Module {
 	 * @var int PEN_OFFSET
 	 *      A static value that contains the offset of the pen in relation to the movement module.
 	 */
-	private static final int PEN_OFFSET = 20;
+	private static final int PEN_OFFSET = 40;
 
 	/**
 	 * @var double PEN_SIZE
@@ -206,8 +206,8 @@ public class PenModule extends Module {
 		// get steps from the movementModule to move on the z axis.
 		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, dotParameters)));
 
-		// get steps from the movementModule to move to the safe movement plane.
-		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, dotParameters)));
+		// get steps from the movementModule to move to the safe movement plane(not needed).
+		//steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, dotParameters)));
 
 		// convert the ArrayList to an array and return it.
 		EquipletStep[] equipletSteps = new EquipletStep[steps.size()];

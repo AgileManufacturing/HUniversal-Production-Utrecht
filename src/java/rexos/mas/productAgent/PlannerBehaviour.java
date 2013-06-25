@@ -94,6 +94,7 @@ public class PlannerBehaviour extends Behaviour {
 				if (prodStep.getStatus() == StepStatusCode.EVALUATING) {
 					
 					int PA_id = prodStep.getId();
+					prodEQmap.addProductionStep(PA_id);
 					// Get the type of production step, aka capability
 					long PA_capability = prodStep.getCapability();
 					// Create the select query for the blackboard
@@ -118,6 +119,7 @@ public class PlannerBehaviour extends Behaviour {
 			this._productAgent.setProduct(product);
 			this._isDone = true;
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Exception PlannerBehaviour - onStart() : " + e);
 			this._isError = true;
 		}
