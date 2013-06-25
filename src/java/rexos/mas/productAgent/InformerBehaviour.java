@@ -38,6 +38,8 @@
 
 package rexos.mas.productAgent;
 
+import java.util.HashMap;
+
 import rexos.libraries.log.Logger;
 import rexos.mas.data.BehaviourStatus;
 import rexos.mas.data.Product;
@@ -108,10 +110,15 @@ public class InformerBehaviour extends Behaviour {
 				ProductionEquipletMapper pem = _production
 						.getProductionEquipletMapping();
 				if (pem != null) {
-					for (AID aid : pem.getEquipletsForProductionStep(
-							stp.getId()).keySet()) {
-						_parBehaviour.addSubBehaviour(new Conversation(aid, stp,
-								_prodEQmap));
+					HashMap<AID, Long> efp = pem.getEquipletsForProductionStep(stp.getId());
+					if(efp != null && efp.size() > 0){
+						for (AID aid : pem.getEquipletsForProductionStep(
+								stp.getId()).keySet()) {
+							_parBehaviour.addSubBehaviour(new Conversation(aid,
+									stp, _prodEQmap));
+						}
+					} else {
+						//THROW ERROR!
 					}
 				} else {
 					// REPORT ERROR

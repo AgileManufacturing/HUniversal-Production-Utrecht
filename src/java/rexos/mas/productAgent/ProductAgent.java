@@ -42,6 +42,7 @@
 package rexos.mas.productAgent;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import rexos.mas.data.AgentStatus;
 import rexos.mas.data.Callback;
@@ -68,7 +69,9 @@ public class ProductAgent extends Agent {
 	private AgentStatus _status;
 
 	public ProductAgent() {
-		_gson = new Gson();
+		_gson = new GsonBuilder()
+        .excludeFieldsWithoutExposeAnnotation()
+        .create();
 		_status = AgentStatus.STARTING;
 	}
 
@@ -104,6 +107,14 @@ public class ProductAgent extends Agent {
 						ProductAgentProperties.class);
 			} else if (args[0].getClass() == ProductAgentProperties.class) {
 				this._properties = (ProductAgentProperties) args[0];
+				try {
+				String outJson =_gson.toJson(this._properties);
+				System.out.println(outJson);
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+				
+				System.out.println("AA");
 			}
 		} else {
 			System.out
