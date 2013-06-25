@@ -5,6 +5,7 @@
  * 
  * @author Alexander Streng
  * @author Mike Schaap
+ * @author Arno Derks
  * 
  *         Copyright © 2013, HU University of Applied Sciences Utrecht. All
  *         rights reserved.
@@ -39,6 +40,7 @@ package rexos.mas.productAgent;
 
 import rexos.mas.data.AgentStatus;
 import rexos.mas.data.BehaviourStatus;
+import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 
@@ -56,7 +58,8 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 	private SequentialBehaviour _sequentialBehaviour;
 	private SocketBehaviour _socketBehaviour;
 
-	public OverviewBehaviour() {
+	public OverviewBehaviour(Agent myAgent) {
+		super(myAgent);
 		System.out
 				.println("Overview behaviour created. Starting all behaviours to the agents.");
 	}
@@ -150,19 +153,19 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 		AgentStatus as = _productAgent.getStatus();
 		switch (as) {
 		case PLANNING:
-			System.out.println("Done planning!!! :D");
+			System.out.println("Done planning.");
 			this.startInforming();
 			break;
 		case INFORMING:
-			System.out.println("Done Informing");
+			System.out.println("Done Informing.");
 			this.startScheduling();
 			break;
 		case SCHEDULING:
-			System.out.println("Done scheduling");
+			System.out.println("Done scheduling.");
 			this.startProducing();
 			break;
 		case PRODUCING:
-			System.out.println("DONE! :)");
+			System.out.println("Done producing.");
 			this.cleanBehaviour();
 			break;
 		default:
@@ -172,6 +175,7 @@ public class OverviewBehaviour extends OneShotBehaviour implements
 	}
 
 	public void cleanBehaviour() {
+		System.out.println("Done overview, stopping SocketBehaviour.");
 		_socketBehaviour.stop();
 	}
 }

@@ -43,7 +43,7 @@ package rexos.mas.productAgent;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.Behaviour;
 
 import rexos.mas.data.BehaviourStatus;
 import rexos.mas.data.Product;
@@ -60,33 +60,26 @@ import rexos.libraries.blackboard_client.BlackboardClient;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
-public class PlannerBehaviour extends OneShotBehaviour{
-	
+public class PlannerBehaviour extends Behaviour {
+
 	private static final long serialVersionUID = 1L;
 	private ProductAgent _productAgent;
 	private BehaviourCallback _bc;
-	
-	private boolean _error = false;
 
-	public PlannerBehaviour(Agent myAgent, BehaviourCallback bc){
+	private boolean _isDone = false;
+	private boolean _isError = false;
+	private boolean _isCompleted = false;
+
+	public PlannerBehaviour(Agent myAgent, BehaviourCallback bc) {
 		super(myAgent);
 		this._bc = bc;
 	}
 
 	@Override
-	public int onEnd(){
-		if(this._error != false) {
-			this._bc.handleCallback(BehaviourStatus.COMPLETED);
-		}
-		this._bc.handleCallback(BehaviourStatus.ERROR);
-		return 0;
-	}
-
-	@Override
-	public void action(){
-		try{
-			// Get the root Agent
+	public void onStart() {
+		try {
 			_productAgent = (ProductAgent) myAgent;
+
 			BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
 			bbc.setDatabase("CollectiveDb");
 			bbc.setCollection("EquipletDirectory");
@@ -95,9 +88,10 @@ public class PlannerBehaviour extends OneShotBehaviour{
 			ArrayList<ProductionStep> psa = production.getProductionSteps();
 			ProductionEquipletMapper prodEQmap = production
 					.getProductionEquipletMapping();
+			
 			// Iterate over all the production steps
-			for(ProductionStep prodStep : psa){
-				if (prodStep.getStatus() == StepStatusCode.EVALUATING){
+			for (ProductionStep prodStep : psa) {
+				if (prodStep.getStatus() == StepStatusCode.EVALUATING) {
 					int PA_id = prodStep.getId();
 					// Get the type of production step, aka capability
 					long PA_capability = prodStep.getCapability();
@@ -106,21 +100,47 @@ public class PlannerBehaviour extends OneShotBehaviour{
 							.start("capabilities").is(PA_capability).get();
 					List<DBObject> equipletDirectory = bbc
 							.findDocuments(equipletCapabilityQuery);
-					for(DBObject DBobj : equipletDirectory){
+					for (DBObject DBobj : equipletDirectory) {
 						DBObject aid = (DBObject) DBobj.get("db");
 						String name = aid.get("name").toString();
 						prodEQmap.addEquipletToProductionStep(PA_id, new AID(
 								name, AID.ISLOCALNAME));
 					}
 				} else {
-					//TODO: Prodstep SHOULD be in evaluatin at this point. If it isn't throw big error!
+					// TODO: Prodstep SHOULD be in evaluatin at this point. If
+					// it isn't throw big error!
 				}
 			}
+			
 			production.setProductionEquipletMapping(prodEQmap);
 			product.setProduction(production);
 			this._productAgent.setProduct(product);
-		} catch(Exception e){
+			this._isDone = true;
+		} catch (Exception e) {
+			System.out.println("Exception PlannerBehaviour - onStart() : " + e);
+			this._isError = true;
+		}
+	}
+
+	@Override
+	public void action() {
+		try {
+			if(this._isDone) {
+				this._bc.handleCallback(BehaviourStatus.COMPLETED);
+				this._isCompleted = true;
+			}else if (this._isError) {
+				this._bc.handleCallback(BehaviourStatus.ERROR);
+				this._isCompleted = true;
+			} else {
+				block();
+			}
+		} catch (Exception e) {
 			System.out.println("Exception PlannerBehaviour: " + e);
 		}
+	}
+
+	@Override
+	public boolean done() {
+		return this._isCompleted;
 	}
 }

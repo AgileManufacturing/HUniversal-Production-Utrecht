@@ -78,7 +78,7 @@ public class ProductAgent extends Agent {
 			// Load all arguments
 			this.loadArguments();
 			// Create the Overview Behaviour and start it
-			_overviewBehaviour = new OverviewBehaviour();
+			_overviewBehaviour = new OverviewBehaviour(this);
 			addBehaviour(_overviewBehaviour);
 			System.out.println("I spawned as a product agent");
 		} catch (Exception e) {
