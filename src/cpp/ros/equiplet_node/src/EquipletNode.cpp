@@ -91,9 +91,12 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 
 	setListener(this);
 
-	std::cout << "Connected!" << std::endl;
-
 	changeState(rexos_statemachine::STATE_STANDBY);
+	changeState(rexos_statemachine::STATE_NORMAL);
+	
+	changeMode(rexos_statemachine::MODE_NORMAL);
+
+	std::cout << "Connected!" << std::endl;
 }
 
 /**
@@ -125,28 +128,32 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	{
 		mongo::OID targetObjectId;
 		oplogEntry.getTargetObjectId(targetObjectId);
+
 		JSONNode n = libjson::parse(equipletStepBlackboardClient->findDocumentById(targetObjectId).jsonString());
 	    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
 
 	    if (step->getStatus().compare("WAITING") == 0) {
 	    	rexos_statemachine::Mode currentMode = getCurrentMode();
 
-	    	std::stringstream query("{ _id : ");
-	    	query << n["_id"].write() << "}";
-
 	    	if (currentMode == rexos_statemachine::MODE_NORMAL) {
+
 	    		rexos_statemachine::State currentState = getCurrentState();
 
+	    		std::cout << "currentState " << currentState << " currentMode " << currentMode << std::endl;
+
 	    		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
-	    			equipletStepBlackboardClient->updateDocuments(query.str(), "{$set : {status: \"IN_PROGRESS\"");	    				    
+
+	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
+
 				    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
 				    prox->setInstruction(step->getInstructionData().getJsonNode());
 	    		} else {
-	    			equipletStepBlackboardClient->updateDocuments(query.str(), "{$set : {status: \"ERROR\"");
+	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"ERROR\" } } ");
 	    		}
 	    	} else {
 	    		ROS_INFO("Instruction received but current mode is %s", rexos_statemachine::Mode_txt[currentMode]);
-	    		equipletStepBlackboardClient->updateDocuments(query.str(), "{$set : {status: \"ERROR\"");
+
+	    		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"ERROR\" }  }");
 	    	}
 		}
 	}
