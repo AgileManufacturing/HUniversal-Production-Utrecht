@@ -139,10 +139,6 @@ private:
 	rexos_statemachine::TransitionActionServer* shutdownTransitionActionServer;
 	rexos_statemachine::TransitionActionServer* startTransitionActionServer;
 	rexos_statemachine::TransitionActionServer* stopTransitionActionServer;
-
-	ChangeStateActionClient changeStateActionClient;
-	ChangeModeActionClient changeModeActionClient;
-
 };
 
 }

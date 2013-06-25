@@ -57,8 +57,6 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 			rexos_statemachine::MODE_STEP}
 		),
 		moduleRegistry(nameFromId(id), id),
-		changeStateActionClient(nh, nameFromId(id) + "/change_state"),
-		changeModeActionClient(nh, nameFromId(id) + "/change_mode"),
 		equipletId(id),
 		equipletStepBlackboardClient(NULL),
 		equipletCommandBlackboardClient(NULL) 
@@ -86,8 +84,6 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 	setListener(this);
 
 	std::cout << "Connected!" << std::endl;
-
-	changeState(rexos_statemachine::STATE_STANDBY);
 }
 
 /**
@@ -325,13 +321,13 @@ bool EquipletNode::finishTransition(std::vector<ModuleProxy*> modules){
 			allModulesDone = false;
 			break;
 		}else if(modules[i]->getCurrentState() != desiredTransitionState){
-			transitionActionServer->setAborted();	
+			setTransitionResult(false);
 			return false;
 		}
 	}
 
 	if(allModulesDone){
-		transitionActionServer->setSucceeded();
+		setTransitionResult(true);
 		return true;
 	}
 }
