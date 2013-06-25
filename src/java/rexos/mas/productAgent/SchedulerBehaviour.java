@@ -206,11 +206,11 @@ public class SchedulerBehaviour extends Behaviour {
 				bbc.setDatabase(dbDa.getName());
 				bbc.setCollection("ProductStepsBlackBoard");
 	
-				List<DBObject> blackBoard = bbc.findDocuments(" ");
+				List<DBObject> blackBoard = bbc.findDocuments("db.EquipletDirectory.find().sort(key:value).limit(300);");
 				scheduleCount = blackBoard.size();
 	
 				schedules = new Schedule[scheduleCount];
-	
+				
 				// Gets planned steps
 				List<DBObject> plannedSteps = bbc.findDocuments(QueryBuilder
 						.start("scheduleData.startTime").greaterThan(-1).get());
