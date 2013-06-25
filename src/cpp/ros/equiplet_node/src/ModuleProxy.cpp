@@ -103,7 +103,8 @@ bool ModuleProxy::onModeChangeServiceCallback(ModeUpdateRequest &req, ModeUpdate
 }
 
 void ModuleProxy::onInstructionServiceCallback(const actionlib::SimpleClientGoalState& state, const rexos_statemachine::SetInstructionResultConstPtr& result){
-	ROS_INFO("ModuleProxy processed received instruction callbek");
+	std::cout << "proxy heeft ontvangen: " << " id: " << result->OID << " completed " << result->succeed << std::endl;
+
 	if(result->succeed)
 	{
 		moduleProxyListener->onInstructionStepCompleted(this, result->OID, true);
