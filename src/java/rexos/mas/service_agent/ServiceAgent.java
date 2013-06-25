@@ -58,6 +58,7 @@ import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
 import rexos.mas.data.EquipletState;
+import rexos.mas.data.Part;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.EquipletCommandEntry;
 import rexos.mas.data.StepStatusCode;
@@ -263,10 +264,32 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					new BasicDBObject("productStepId", productStepId),
 					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
 							"statusData", new BasicDBObject("reason", reason))));
-
-			// TODO inform LA to cancel part transport
+			
+			
+			
+			try {
+				productStepBBClient = new BlackboardClient(dbData.getIp());
+				productStepBBClient.setDatabase(dbData.getName());
+				productStepBBClient.setCollection("ProductStepsBlackBoard");
+				
+				ProductStep productStep = new ProductStep((BasicDBObject)productStepBBClient.findDocumentById(productStepId));
+							
+				Part[]inputParts = productStep.getInputParts();
+				
+				ACLMessage message = new ACLMessage(ACLMessage.CANCEL);
+				message.setContentObject(inputParts);
+				message.addReceiver(logisticsAID);
+				message.setOntology("CancelTransport");
+				send(message);
+				
+			} catch (Exception e) {
+				Logger.log(e);
+			}
+			
+			
+			
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			e.printStackTrace();
+			Logger.log(e);
 		}
 	}
 
