@@ -68,20 +68,21 @@ bool FieldUpdateSubscription::getQuery(mongo::Query * query_out) const {
 
 	for (std::vector<MongoUpdateLogOperation>::const_iterator iter = subscribedOperations.begin(); iter != subscribedOperations.end() ; iter++) {
 		std::stringstream fieldString;
-		fieldString << "\""<< OplogEntry::UPDATE_DOC_FIELD << '.';
+		fieldString << OplogEntry::UPDATE_DOC_FIELD << '.';
 
 		std::string oper = stringForUpdateOperation(*iter);
 		if (!oper.empty()) {
 			fieldString << oper << '.';
 		}
 
-		fieldString << fieldName << "\"";
-
-		orArray.append(BSON(fieldString.str() << BSON("$exists" << true)));
+		fieldString << fieldName;
+		mongo::BSONObj obj = BSON(fieldString.str() << BSON("$exists" << true));
+		orArray.append(obj);
 	}
 
 	andArray.append(BSON("$or" << orArray.arr()));
-	*query_out = QUERY("$and" << andArray.arr());
+	mongo::Query q(BSON("$and" << andArray.arr()));
+	*query_out = q;
 	return true;
 }
 
