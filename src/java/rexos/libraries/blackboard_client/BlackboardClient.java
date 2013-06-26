@@ -230,6 +230,21 @@ public class BlackboardClient {
 		return ObjectId.massageToObjectId(obj.get("_id"));
 	}
 	
+	public ObjectId insertDocumentUnsafe(DBObject obj) throws InvalidDBNamespaceException, GeneralMongoException {
+		if (currentCollection == null) {
+			throw new InvalidDBNamespaceException("No collection has been selected.");
+		}
+		try {
+			WriteConcern oldConcern = currentCollection.getWriteConcern();
+			currentCollection.setWriteConcern(WriteConcern.NORMAL);
+			currentCollection.insert(obj);
+			currentCollection.setWriteConcern(oldConcern);
+		} catch (MongoException mongoException) {
+			throw new GeneralMongoException("An error occurred attempting to insert.", mongoException);
+		}
+		return ObjectId.massageToObjectId(obj.get("_id"));
+	}
+	
 	public void insertDocuments(DBObject... objs) throws InvalidDBNamespaceException, GeneralMongoException {
 		if (currentCollection == null) {
 			throw new InvalidDBNamespaceException("No collection has been selected.");
