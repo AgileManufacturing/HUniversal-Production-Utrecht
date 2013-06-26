@@ -42,6 +42,7 @@ package rexos.mas.data;
 
 import java.io.Serializable;
 
+import com.google.gson.annotations.SerializedName;
 import com.mongodb.BasicDBObject;
 
 public class ProductionStep implements Serializable {
@@ -51,9 +52,13 @@ public class ProductionStep implements Serializable {
 	 */
 	private static final long serialVersionUID = -832835122145455883L;
 	private int _requiredTimeSlots;
+	
 	private int _id;
+	
 	private int _capability;
+	
 	private StepStatusCode _status = StepStatusCode.EVALUATING;
+	
 	private BasicDBObject _parameters;
 	
 	private String _convId;
@@ -108,7 +113,7 @@ public class ProductionStep implements Serializable {
 	
 	@Override
 	public String toString() {
-	   return "DataObject [id=" + _id + ", capability=" + _capability + ", parameter="
+	   return "DataObject [id=" + _id + ", capability=" + _capability + ", parameters="
 		+ _parameters + "]";
 	}
 }

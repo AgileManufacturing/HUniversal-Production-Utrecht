@@ -1,7 +1,6 @@
 /**
  * @file ProductLog.java
- * @brief Class to create the productionlog which is then able to be pushed to
- *        the remote location.
+ * @brief Class for logging productiondata
  * @date Created: 02-04-2013
  * 
  * @author Theodoor de Graaff
@@ -40,71 +39,82 @@
 
 package rexos.mas.data;
 
-import rexos.libraries.log.Logger;
-import rexos.mas.data.sqldatabase.sqliteDatabase;
 import jade.core.AID;
 
-import java.util.Iterator;
-import java.util.List;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.concurrent.atomic.AtomicLong;
+
+import rexos.libraries.log.Logger;
 
 import com.mongodb.BasicDBObject;
 
+/**
+ * @author Theodoor
+ * 
+ */
 public class ProductLog{
-	private boolean writeToRemote = false;
-	private boolean writeToLocal = true;
-	private sqliteDatabase local;
-
-	// TODO_REMOTE private RemoteDatabaseConnection remote;
-	/**
-	 * @param writeToRemote
-	 * @param writeToLocal
-	 * @param local
-	 */
-	public ProductLog(boolean writeToRemote, boolean writeToLocal,
-			sqliteDatabase local){
-		super();
-		this.writeToRemote = writeToRemote;
-		this.writeToLocal = writeToLocal;
-		this.local = local;
-	}
-
-	public void add(List<LogMessage> msgs){
-		if (writeToLocal){
-			local.insert(msgs);
-		}
-		if (writeToRemote){
-			// TODO_REMOTE remote.insert()
-			throw new UnsupportedOperationException();
-		}
-	}
-
-	public static void pushLocalToRemote(){
-		// TODO_REMOTE:
-		// get latest remote
-		// get local since latest remote
-		// write to remote
-		throw new UnsupportedOperationException();
+	File logfile;
+	FileWriter writer;
+	
+	public ProductLog(){
 	}
 
 	/**
+	 * Add statusdata to ProductLog Writes multiple json-objects into one large
+	 * json-object with an objectnumber.
+	 * 
 	 * @param aid
 	 * @param statusData
+	 * 
 	 */
 	public void add(AID aid, BasicDBObject statusData){
-		for(@SuppressWarnings("rawtypes")
-		Iterator i = statusData.toMap().entrySet().iterator(); i.hasNext();){
-			switch(i.getClass().getName()){
-			case "java.lang.String":
-				local.insert(new LogMessage(aid, i.toString()));
-				break;
-			case "com.mongodb.BasicDbObject" :
-				Logger.log(new UnsupportedOperationException(
-						"Not implemented case for "
-								+ i.getClass().getCanonicalName()));
-			default:
-				Logger.log(new UnsupportedOperationException("No log case for "
-						+ i.getClass().getCanonicalName()));
+		try{
+			boolean newFileCreated = false;
+			if (logfile == null){
+				logfile = new File("log " + aid.toString().replaceAll("[\\/:*?\"<>|]", "") + ".json");
+				logfile.createNewFile();
+				newFileCreated = true;
 			}
+			if (writer == null){
+				writer = new FileWriter(logfile, true);
+			}
+			if (newFileCreated){
+				writer.append("{\"" + uniqueCurrentTime() + "\":");
+				writer.flush();
+			} else{
+				try(RandomAccessFile raf = new RandomAccessFile(logfile, "rw")){
+					logfile.length();
+					raf.setLength((logfile.length() - 1));
+					raf.close();
+				}
+				String newObject = new String(",\"" + uniqueCurrentTime()
+						+ "\":");
+				writer.append(newObject);
+				writer.flush();
+			}
+			writer.append(statusData.toString() + "}");
+			writer.flush();
+		} catch(IOException e){
+			Logger.log(e);
 		}
+	}
+	
+	private static final AtomicLong last_time = new AtomicLong();	
+	/**
+	 * Returns uniqueCurrentTime
+	 * @see http://stackoverflow.com/questions/9191288
+	 */
+	public static long uniqueCurrentTime() {
+	    long newCurrentTime = System.currentTimeMillis();
+	    while(true) {
+	        long lastTime = last_time.get();
+	        if (lastTime >= newCurrentTime)
+	        	newCurrentTime = lastTime+1;
+	        if (last_time.compareAndSet(lastTime, newCurrentTime))
+	            return newCurrentTime;
+	    }
 	}
 }

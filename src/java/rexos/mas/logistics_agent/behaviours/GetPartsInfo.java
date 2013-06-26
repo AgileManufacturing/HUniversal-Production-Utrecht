@@ -100,7 +100,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 				int type = 3;
 				for(Part part : parts) {
 					partParameters.put(new Part(part.getType(), id++),
-							new Position(x++, 1, 3, new Part(type++, id + x)));
+							new Position((double)x++, 1.0, 3.0, new Part(type++, id + x)));
 				}
 
 				KnowledgeDBClient client = KnowledgeDBClient.getClient();

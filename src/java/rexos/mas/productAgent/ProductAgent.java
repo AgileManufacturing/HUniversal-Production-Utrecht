@@ -41,12 +41,22 @@
 
 package rexos.mas.productAgent;
 
+import java.util.ArrayList;
+
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.mongodb.BasicDBObject;
+import com.mongodb.util.JSON;
 
 import rexos.mas.data.AgentStatus;
 import rexos.mas.data.Callback;
 import rexos.mas.data.Product;
 import rexos.mas.data.ProductAgentProperties;
+import rexos.mas.data.Production;
+import rexos.mas.data.ProductionStep;
 
 
 import jade.core.Agent;
@@ -98,10 +108,47 @@ public class ProductAgent extends Agent {
 			// Check if the arguments is a string (so we can assume it's JSON)
 			// or if it's a known object
 			if (args[0].getClass() == String.class) {
+				try{
 				// Change the incoming JSON message to also implement the host
 				// to connect to.
-				this._properties = _gson.fromJson((String) args[0],
-						ProductAgentProperties.class);
+				JsonParser parser = new JsonParser();
+				JsonObject obj = (JsonObject)parser.parse((String)args[0]).getAsJsonObject();
+		        JsonElement callbackElement = obj.get("_callback");
+		        
+		        JsonObject productObject = obj.get("_product").getAsJsonObject();
+		        
+		        JsonObject productionObject = productObject.get("_production").getAsJsonObject();
+		        
+		        JsonArray productionStepsArray = productionObject.get("_productionSteps").getAsJsonArray();
+		        
+		        ArrayList<ProductionStep> stepList = new ArrayList<>();
+		        ProductionStep step =  null;
+		        for(int i = 0; i < productionStepsArray.size(); i++) {
+		        	
+		        	JsonObject ele = productionStepsArray.get(i).getAsJsonObject();		        	
+		        	int id = ele.get("_id").getAsInt();
+		        	int capability = ele.get("_capability").getAsInt();
+		        	JsonElement parameterObject = ele.get("_parameters");
+		        	String parameters = parameterObject.toString();
+		        	
+		        	step = new ProductionStep(id, capability, (BasicDBObject)JSON.parse(parameters));
+		        	
+		        	stepList.add(step);	        	
+		        }
+		        
+		        Production production = new Production(stepList);
+				Product product = new Product(production);
+
+				Callback callback = new Gson().fromJson(callbackElement.toString(), Callback.class);
+				
+				ProductAgentProperties pap = new ProductAgentProperties();
+				pap.setCallback(callback);
+				pap.setProduct(product);
+
+				this._properties = pap;
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
 			} else if (args[0].getClass() == ProductAgentProperties.class) {
 				this._properties = (ProductAgentProperties) args[0];
 			}

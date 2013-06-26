@@ -13,6 +13,9 @@
  */
 package rexos.mas.data;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 /**
  * @author Mike
  *
@@ -22,6 +25,7 @@ public class ProductAgentProperties{
 	private Product _product;
 	
 	//The host to connect to, represented as: IP or Hostname : Port number. eg. 127.0.0.1:253 or localhost:273
+
 	private Callback _callback;
 	
 	
@@ -43,6 +47,11 @@ public class ProductAgentProperties{
 	
 	public void setProduct(Product value) {
 		this._product = value;
+	}
+	
+	@Override
+	public String toString() {
+		   return "DataObject [product=" + _product + ", callback=" + _callback + "]";
 	}
 	
 	

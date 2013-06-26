@@ -23,6 +23,8 @@ public enum AgentStatus{
 	
 	DONE_INITIALIZING(1),
 	
+	ERROR_INITIALIZING(2),
+	
 	PLANNING(2),
 	
 	DONE_PLANNING(3),

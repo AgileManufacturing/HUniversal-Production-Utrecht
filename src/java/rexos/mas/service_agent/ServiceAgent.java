@@ -58,6 +58,7 @@ import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
+import rexos.mas.data.Part;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.service_agent.behaviours.CanDoProductStep;
@@ -249,10 +250,32 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					new BasicDBObject("productStepId", productStepId),
 					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
 							"statusData", new BasicDBObject("reason", reason))));
-
-			// TODO inform LA to cancel part transport
+			
+			
+			
+			try {
+				productStepBBClient = new BlackboardClient(dbData.getIp());
+				productStepBBClient.setDatabase(dbData.getName());
+				productStepBBClient.setCollection("ProductStepsBlackBoard");
+				
+				ProductStep productStep = new ProductStep((BasicDBObject)productStepBBClient.findDocumentById(productStepId));
+							
+				Part[]inputParts = productStep.getInputParts();
+				
+				ACLMessage message = new ACLMessage(ACLMessage.CANCEL);
+				message.setContentObject(inputParts);
+				message.addReceiver(logisticsAID);
+				message.setOntology("CancelTransport");
+				send(message);
+				
+			} catch (Exception e) {
+				Logger.log(e);
+			}
+			
+			
+			
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			e.printStackTrace();
+			Logger.log(e);
 		}
 	}
 
@@ -301,13 +324,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		try {
 			switch(entry.getNamespace().split("\\.")[1]) {
 				case "ProductStepsBlackBoard":
-					/* TODO: abonnement nakijken.
-					 * Exception in thread "Thread-26" java.lang.NullPointerException
-						at rexos.mas.equiplet_agent.ProductStep.fromBasicDBObject(ProductStep.java:413)
-						at rexos.mas.equiplet_agent.ProductStep.<init>(ProductStep.java:203)
-						at rexos.mas.service_agent.ServiceAgent.onMessage(ServiceAgent.java:291)
-						at rexos.libraries.blackboard_client.OplogMonitorThread.run(OplogMonitorThread.java:120)
-					 */
 					ProductStep productionStep =
 							new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(entry
 									.getTargetObjectId()));

@@ -58,6 +58,7 @@ import rexos.mas.data.StepStatusCode;
 import rexos.mas.service_agent.ServiceAgent;
 import rexos.mas.service_agent.ServiceStep;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
@@ -148,7 +149,18 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 				}
 
 				HashMap<Part, Position> parameters = (HashMap<Part, Position>) message.getContentObject();
-
+				
+				BasicDBList partList = new BasicDBList();
+				
+				for(Object part : parameters.keySet().toArray()){
+					
+					Part p = (Part)part;
+					partList.add(p.toBasicDBObject());					
+				}							
+				
+				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStep.getId()),
+						new BasicDBObject("$set", new BasicDBObject("inputParts",partList)));
+				
 				Logger.log("%s got partsInfo: %s%n", agent.getLocalName(), parameters.toString());
 
 				for(Entry<Part, Position> e : parameters.entrySet()) {

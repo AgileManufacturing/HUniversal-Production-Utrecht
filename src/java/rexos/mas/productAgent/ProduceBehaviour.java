@@ -66,8 +66,6 @@ public class ProduceBehaviour extends Behaviour {
 
 	private BehaviourCallback _bc;
 
-	// private ProductionEquipletMapper _prodEQMap;
-	// ACLMessage msg;
 	/**
 	 * @param myAgent
 	 */
@@ -84,7 +82,7 @@ public class ProduceBehaviour extends Behaviour {
 				for (ProductionStep stp : _production.getProductionSteps()) {
 					if (stp.getStatus() == StepStatusCode.PLANNED) {
 						myAgent.addBehaviour(new ProducingReceiver(myAgent, -1,
-								MessageTemplate.MatchAll(), stp, this));
+								MessageTemplate.and(MessageTemplate.or(MessageTemplate.or(MessageTemplate.MatchOntology("StartStepQuestion"), MessageTemplate.MatchOntology("StatusUpdate" )), MessageTemplate.MatchOntology("EquipletAgentDied")), MessageTemplate.MatchConversationId(stp.getConversationId())), stp, this));
 					} else {
 						this._isError = true;
 					}
@@ -142,7 +140,6 @@ class ProducingReceiver extends rexos.mas.behaviours.ReceiveBehaviour {
 	}
 
 	private static final long serialVersionUID = 1L;
-	ACLMessage msg;
 
 	@Override
 	public void handle(ACLMessage m) {
@@ -164,6 +161,9 @@ class ProducingReceiver extends rexos.mas.behaviours.ReceiveBehaviour {
 					ProductStep step = new ProductStep((BasicDBObject)m.getContentObject());
 					ProductAgentstp.setStatus(step.getStatus());
 					switch (step.getStatus()) {
+					case WAITING:
+						// Waiting
+						break;
 					case IN_PROGRESS:
 						// In progress
 						break;
@@ -186,9 +186,9 @@ class ProducingReceiver extends rexos.mas.behaviours.ReceiveBehaviour {
 						 * Equiplet agent informs the product agent that the
 						 * product step has been executed successfully.
 						 */
-//						((ProductAgent) myAgent).getProduct()
-//								.addStatusDataToLog(msg.getSender(),
-//										step.getStatusData());
+						((ProductAgent) myAgent).getProduct()
+								.addStatusDataToLog(m.getSender(),
+										step.getStatusData());
 						_pb.reportProductStatus(BehaviourStatus.COMPLETED);
 						break;
 					default:

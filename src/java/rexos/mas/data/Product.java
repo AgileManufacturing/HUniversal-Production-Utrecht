@@ -42,12 +42,13 @@ package rexos.mas.data;
 
 import jade.core.AID;
 import rexos.libraries.log.Logger;
-import java.util.List;
-import rexos.mas.data.sqldatabase.sqliteDatabase;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import com.mongodb.BasicDBObject;
 
 public class Product{
+	
 	private Production _production;
 
 
@@ -67,11 +68,11 @@ public class Product{
 		return log;
 	}
 
-	public Product(Production production, String aid){
+	public Product(Production production){
 		if (production == null)
 			Logger.log(new Exception("Production can't be null"));
 		setProduction(production);
-		log = new ProductLog(false, true, new sqliteDatabase(aid));
+		log = new ProductLog();
 	}
 
 	/**

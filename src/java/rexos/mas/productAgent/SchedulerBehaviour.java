@@ -43,7 +43,6 @@ package rexos.mas.productAgent;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -164,96 +163,95 @@ public class SchedulerBehaviour extends Behaviour {
 
 		// load set into arraylist
 		List<AID> equipletlist = new ArrayList<AID>(equipletList);
-
+		//Create Hashmap for database data
 		HashMap<AID, DbData> dbData = new HashMap<AID, DbData>();
 
 		// Change this
-
-		for (AID aid : equipletlist) {
-
-			BlackboardClient bbc = new BlackboardClient("145.89.191.131");
-			bbc.setDatabase("CollectiveDb");
-			bbc.setCollection("EquipletDirectory");
-
-			QueryBuilder qb = QueryBuilder.start("AID").is(aid.getName());
-
-			List<DBObject> aidInfo = bbc.findDocuments(qb.get());
-
-			if (aidInfo.size() > 0) {
-				dbData.put(aid,
-						new DbData((BasicDBObject) aidInfo.get(0).get("db")));
-			} else {
-				// TODO: what to do if list is empty
+		if(equipletlist.size() > 0){
+			for (AID aid : equipletlist) {
+	
+				BlackboardClient bbc = new BlackboardClient("145.89.191.131");
+				bbc.setDatabase("CollectiveDb");
+				bbc.setCollection("EquipletDirectory");
+	
+				QueryBuilder qb = QueryBuilder.start("AID").is(aid.getName());
+	
+				List<DBObject> aidInfo = bbc.findDocuments(qb.get());
+	
+				if (aidInfo.size() > 0) {
+					dbData.put(aid,
+							new DbData((BasicDBObject) aidInfo.get(0).get("db")));
+				} else {
+					// TODO: what to do if list is empty
+				}
 			}
+		}else{
+			System.out.println("No equiplets available.");
 		}
 
-		int scheduleCount = 0;
-		Schedule[] schedules;
+		ArrayList<Schedule> schedules = new ArrayList<Schedule>();
 		ArrayList<FreeTimeSlot> freetimeslot = new ArrayList<FreeTimeSlot>();
-
-		Iterator<Entry<AID, DbData>> it = dbData.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry<AID, DbData> pairs = it.next();
-
-			DbData dbDa = pairs.getValue();
-
-			BlackboardClient bbc = new BlackboardClient(dbDa.getIp(),
-					dbDa.getPort());
-			bbc.setDatabase(dbDa.getName());
-			bbc.setCollection("ProductStepsBlackboard");
-
-			List<DBObject> blackBoard = bbc.findDocuments(" ");
-			scheduleCount = blackBoard.size();
-
-			schedules = new Schedule[scheduleCount];
-
-			// Gets planned steps
-			List<DBObject> plannedSteps = bbc.findDocuments(QueryBuilder
-					.start("scheduleData.startTime").greaterThan(-1).get());
-			for (int i = 0; i < plannedSteps.size(); i++) {
-				double b = (Double) plannedSteps.get(i).get("startTime");
-				int stati = (int) b;
-				double c = (Double) plannedSteps.get(i).get("duration");
-				int dur = (int) c;
-				// add scheduled timeslot to array of scheduled timeslots and
-				// mention which equiplet
-				schedules[i] = new Schedule(stati, dur, pairs.getKey());
-			}
-
-			int startTimeSlot = 0;
-			// check within every schedule of the 'schedules' array for free
-			// timeslots
-			// and add them to the 'freetimeslot' array
-			for (int run = 0; run < schedules.length; run++) {
-				if (schedules[run].getStartTime() > startTimeSlot) {
-					if (schedules.length > (run + 1)) {
-						if (schedules[run].getDeadline() < schedules[(run + 1)]
-								.getStartTime()) {
-							int freeTimeSlot = schedules[(run + 1)]
-									.getStartTime()
-									- schedules[run].getDeadline() - 1;
-							int timeslotToSchedule = (schedules[run]
-									.getDeadline() + 1);
-							freetimeslot.add(new FreeTimeSlot(
-									timeslotToSchedule, freeTimeSlot,
-									schedules[run].getEquipletName()));
-							if (debug != 0) {
-								// debug
-								System.out.println("Free timeslot: "
-										+ freeTimeSlot
-										+ " starting at timeslot: "
-										+ timeslotToSchedule);
+		
+		if(dbData.size() > 0){
+			Iterator<Entry<AID, DbData>> it = dbData.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry<AID, DbData> pairs = it.next();
+	
+				DbData dbDa = pairs.getValue();
+	
+				BlackboardClient bbc = new BlackboardClient(dbDa.getIp(),
+						dbDa.getPort());
+				bbc.setDatabase(dbDa.getName());
+				bbc.setCollection("ProductStepsBlackBoard");
+				
+				// Gets planned steps
+				List<DBObject> plannedSteps = bbc.findDocuments(QueryBuilder
+						.start("scheduleData.startTime").greaterThan(-1).get());
+				for (int i = 0; i < plannedSteps.size(); i++) {
+					double b = (Double) plannedSteps.get(i).get("startTime");
+					int stati = (int) b;
+					double c = (Double) plannedSteps.get(i).get("duration");
+					int dur = (int) c;
+					// add scheduled timeslot to array of scheduled timeslots and
+					// mention which equiplet
+					schedules.add( new Schedule(stati, dur, pairs.getKey()));
+				}
+	
+				int startTimeSlot = 0;
+				// check within every schedule of the 'schedules' array for free
+				// timeslots and add them to the 'freetimeslot' array
+				if(schedules.size() >0){
+					for (int run = 0; run < schedules.size(); run++) {
+						if (schedules.get(run).getStartTime() > startTimeSlot) {
+							if (schedules.size() > (run + 1)) {
+								if (schedules.get(run).getDeadline() < schedules.get((run + 1))
+										.getStartTime()) {
+									int freeTimeSlot = schedules.get((run + 1))
+											.getStartTime()
+											- schedules.get(run).getDeadline() - 1;
+									int timeslotToSchedule = (schedules.get(run)
+											.getDeadline() + 1);
+									freetimeslot.add(new FreeTimeSlot(
+											timeslotToSchedule, freeTimeSlot,
+											schedules.get(run).getEquipletName()));
+									
+									// debug
+									System.out.println("Free timeslot: "
+											+ freeTimeSlot
+											+ " starting at timeslot: "
+											+ timeslotToSchedule);
+									
+								}
 							}
 						}
 					}
 				}
+				if (schedules.size() == 0) {
+					freetimeslot.add(new FreeTimeSlot((int) (System
+							.currentTimeMillis() / 2000 + 5), productionstep
+							.getRequiredTimeSlots(), pairs.getKey()));
+				}
 			}
-			if (schedules.length == 0) {
-				freetimeslot.add(new FreeTimeSlot((int) (System
-						.currentTimeMillis() / 2000 + 5), productionstep
-						.getRequiredTimeSlots(), pairs.getKey()));
-			}
-
 		}
 
 		FreeTimeSlot freetimeslotEq = null;
