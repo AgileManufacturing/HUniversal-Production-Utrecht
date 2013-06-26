@@ -47,6 +47,8 @@
  **/
 #define MODBUS_PORT 502
 
+#define Z_OFFSET -290
+
 /**
  * Constructor 
  * @param equipletID identifier for the equiplet
@@ -68,9 +70,9 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 	moveToRelativePointService_json(),
 	moveRelativePathService_json(),
 	calibrateService_json(),
-	lastX(0),
-	lastY(0),
-	lastZ(-220){
+	lastX(0.0),
+	lastY(0.0),
+	lastZ(-180.0){
 	ROS_INFO("DeltaRobotnode Constructor entering...");
 
 	ROS_INFO("Configuring Modbus...");
@@ -669,15 +671,17 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
 		{
 			p.x = i->as_float();
 			lastX = p.x;
+			xSet = true;
 		} 
 		else if(node_name == "y")
 		{
 			p.y = i->as_float();
 			lastY = p.y;
+			ySet = true;
 		} 
 		else if(node_name == "z")
 		{
-			p.z = i->as_float();
+			p.z = i->as_float() - Z_OFFSET;
 			lastZ = p.z;
 		} 
 		else if(node_name == "maxAcceleration"){
