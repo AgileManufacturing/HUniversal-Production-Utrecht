@@ -204,6 +204,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 *      The dbData of the equipletAgent.
 	 */
 	private DbData dbData;
+	
+	/**
+	 * 
+	 */
+	private int equipletId;
 
 	/**
 	 * Setup function for the equipletAgent. Configures the IP and database name
@@ -254,6 +259,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 			//TODO register this equiplet on the knowledge db and add the equipletId to the arguments for the SA
 			// creates his service agent.
+			
+			
+			
 			Object[] arguments = new Object[] {
 					dbData, getAID(), logisticsAgent, 1
 			};
