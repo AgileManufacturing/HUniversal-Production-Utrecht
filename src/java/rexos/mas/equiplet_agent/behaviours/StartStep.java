@@ -40,22 +40,29 @@ import jade.lang.acl.MessageTemplate;
 import org.bson.types.ObjectId;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.BlackboardSubscriber;
+import rexos.libraries.blackboard_client.FieldUpdateSubscription;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.blackboard_client.MongoOperation;
+import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.EquipletState;
+import rexos.mas.data.EquipletStateEntry;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.NextProductStepTimer;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 /**
  * Receive behaviour for receiving messages with the ontology: "StartStep".
  * Starts the product step linked to the conversationId.
  * Starts a timer for the next product step.
  */
-public class StartStep extends ReceiveBehaviour {
+public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber {
 	/**
 	 * @var static final long serialVersionUID
 	 *      The serial version UID for this class
@@ -75,50 +82,72 @@ public class StartStep extends ReceiveBehaviour {
 	 */
 	private EquipletAgent equipletAgent;
 
-	/**
-	 * @var BlackboardClient equipletBBClient
-	 *      The blackboard client used for the equiplet blackboard.
-	 */
-	private BlackboardClient equipletBBClient;
+	private FieldUpdateSubscription stateUpdateSubscription;
+
+	private ObjectId productStepId;
 
 	/**
 	 * Instantiates a new can perform step.
 	 * 
-	 * @param a
-	 *            The agent for this behaviour
-	 * @param equipletBBClient
-	 *            The BlackboardClient for this equiplet's blackboard.
+	 * @param a The agent for this behaviour
+	 * @param equipletBBClient The BlackboardClient for this equiplet's blackboard.
 	 */
-	public StartStep(Agent a, BlackboardClient equipletBBClient) {
+	public StartStep(Agent a) {
 		super(a, messageTemplate);
 		equipletAgent = (EquipletAgent) a;
-		this.equipletBBClient = equipletBBClient;
 	}
 
 	/**
-	 * Function to handle the incoming messages for this behaviour.
-	 * Handles the response to the StartStep.
+	 * Function to handle the incoming messages for this behaviour. Handles the response to the StartStep.
 	 * 
-	 * @param message
-	 *            - The received message.
+	 * @param message The received message.
 	 */
 	@Override
 	public void handle(ACLMessage message) {
 		Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
 				message.getOntology());
 
-		// Gets the productStepId and updates all the productsteps on the
-		// blackboard the status to waiting.
+		// Gets the productStepId and updates all the productsteps on the blackboard the status to waiting.
 		try {
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
-			equipletBBClient.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject("$set",
-					new BasicDBObject("status", StepStatusCode.WAITING.name())));
+			if(equipletAgent.getEquipletStateEntry().getEquipletState() != EquipletState.NORMAL) {
+				equipletAgent.setDesiredEquipletState(EquipletState.NORMAL);
+
+				BlackboardClient stateBBClient = equipletAgent.getStateBBClient();
+				stateBBClient.subscribe(stateUpdateSubscription);
+			} else {
+				equipletAgent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
+						new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));
+			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e1) {
 			Logger.log(e1);
+			//TODO handle error
 		}
 
 		// Get the next product step and set the timer for the next product step
 		NextProductStepTimer timer = equipletAgent.getTimer();
-		timer.reScheduleTimer();
+		timer.rescheduleTimer();
+	}
+
+	@Override
+	public void onMessage(MongoOperation operation, OplogEntry entry) {
+		try {
+			BlackboardClient stateBBClient = equipletAgent.getStateBBClient();
+			DBObject dbObject = stateBBClient.findDocumentById(entry.getTargetObjectId());
+			if(dbObject != null) {
+				EquipletStateEntry state = new EquipletStateEntry((BasicDBObject) dbObject);
+				if(state.getEquipletState() == EquipletState.NORMAL) {
+					Logger.log("Equiplet agent - equip. state changed to NORMAL. Starting prod. step.");
+
+					equipletAgent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
+							new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));
+
+					stateBBClient.unsubscribe(stateUpdateSubscription);
+				}
+			}
+		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+			e.printStackTrace();
+			//TODO handle error
+		}
 	}
 }

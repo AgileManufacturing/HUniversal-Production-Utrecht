@@ -33,6 +33,7 @@
  *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  **/
+
 package rexos.mas.service_agent;
 
 import jade.core.AID;
@@ -57,9 +58,7 @@ import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
-import rexos.mas.data.EquipletState;
 import rexos.mas.data.ProductStep;
-import rexos.mas.data.EquipletCommandEntry;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.service_agent.behaviours.CanDoProductStep;
 import rexos.mas.service_agent.behaviours.GetProductStepDuration;
@@ -97,12 +96,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 *      blackboard.
 	 */
 	private BlackboardClient serviceStepBBClient;
-
-	/**
-	 * @var BlackboardClient stateBBClient
-	 * 		The BlackboardClient used to interact with the state blackboard.
-	 */
-	private BlackboardClient stateBBClient;
 	
 	/**
 	 * @var FieldUpdateSubscription statusSubscription
@@ -135,8 +128,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 *      The AID of the logistics agent.
 	 */
 	private AID logisticsAID;
-	
-	private int equipletId;
 
 	/**
 	 * @var ServiceFactory serviceFactory
@@ -164,12 +155,11 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			dbData = (DbData) args[0];
 			equipletAgentAID = (AID) args[1];
 			logisticsAID = (AID) args[2];
-			equipletId = (int) args[3];
 		}
 
 		// Create a hardware agent for this equiplet
 		Object[] arguments = new Object[] {
-				dbData, equipletAgentAID, getAID(), equipletId
+				dbData, equipletAgentAID, getAID()
 		};
 		try {
 			AgentController hardwareAgentCnt =
@@ -183,10 +173,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		}
 
 		try {
-			// create blackboard clients, configure them and subscribe to status
-			// changes of any steps
+			// create blackboard clients, configure them and subscribe to status changes of any steps
 			productStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
+			
 			statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 
@@ -200,10 +190,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			// Needs to react on status changes
 			serviceStepBBClient.subscribe(statusSubscription);
 			serviceStepBBClient.removeDocuments(new BasicDBObject());
-			
-			stateBBClient = new BlackboardClient("145.89.191.131", 27017);
-			stateBBClient.setDatabase("StateBlackboard");
-			stateBBClient.setCollection("EquipletCommands");
 		} catch(UnknownHostException | GeneralMongoException | InvalidDBNamespaceException e) {
 			Logger.log(e);
 			doDelete();
@@ -351,10 +337,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 											new BasicDBObject("_id", serviceSteps[0].getId()),
 											new BasicDBObject("$set", new BasicDBObject("status", status.name())
 													.append("statusData", productionStep.getStatusData())));
-									
-									EquipletCommandEntry stateEntry = new EquipletCommandEntry(dbData.getName(), EquipletState.NORMAL);
-									stateBBClient.insertDocument(stateEntry.toBasicDBObject());
-									
 									break;
 								case ABORTED:
 									Logger.log("Service agent - prod.Step %s status set to %s%n",
@@ -386,12 +368,12 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 								case DELETED:
 									Logger.log("Service agent - serv.Step %s status set to %s%n", serviceStepId, status);
 
-									List<DBObject> unDeletedServiceSteps =
+									List<DBObject> undeletedServiceSteps =
 											serviceStepBBClient.findDocuments(QueryBuilder.start("productStepId")
 													.is(serviceStep.getProductStepId()).and("status")
 													.notEquals(StepStatusCode.DELETED.name()).get());
 
-									if(unDeletedServiceSteps.isEmpty()) {
+									if(undeletedServiceSteps.isEmpty()) {
 										productStepBBClient.updateDocuments(
 												new BasicDBObject("_id", productStepId),
 												new BasicDBObject("$set", new BasicDBObject("status",
@@ -438,10 +420,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 											new BasicDBObject("_id", productStepId),
 											new BasicDBObject("$set", new BasicDBObject("status", status.name())
 													.append("statusData", log)));
-									
-									EquipletCommandEntry stateEntry = new EquipletCommandEntry(dbData.getName(), EquipletState.STANDBY);
-									stateBBClient.insertDocument(stateEntry.toBasicDBObject());
-									
 									break;
 								case IN_PROGRESS:
 								case SUSPENDED_OR_WARNING:
