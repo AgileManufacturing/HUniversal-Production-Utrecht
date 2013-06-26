@@ -100,6 +100,9 @@ namespace deltaRobotNodeNamespace{
 		void onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal);
 
 	private:
+		int lastX;
+		int lastY;
+		int lastZ;
 		/**
 		 * @var ros::NodeHandle node
 		 * The nodeHandle used by ros services and topics

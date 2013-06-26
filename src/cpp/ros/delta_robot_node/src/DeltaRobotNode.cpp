@@ -653,23 +653,47 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
 
 	JSONNode::const_iterator i = n.begin();
 	Point p;
+
+	bool xSet = false;
+	bool ySet = false;
+
 	ROS_INFO("parsing json to point");
 	while(i != n.end()){
 		// get the JSON node name and value as a string
 		std::string node_name = i->name();
 
-		if(node_name == "x"){
+		if(node_name == "x")
+		{
 			p.x = i->as_float();
-		} else if(node_name == "y"){
+			lastX = p.x;
+		} 
+		else if(node_name == "y")
+		{
 			p.y = i->as_float();
-		} else if(node_name == "z"){
+			lastY = p.y;
+		} 
+		else if(node_name == "z")
+		{
 			p.z = i->as_float();
-		} else if(node_name == "maxAcceleration"){
+			lastZ = p.z;
+		} 
+		else if(node_name == "maxAcceleration"){
 			p.maxAcceleration = i->as_float();
 		}
 
 		++i;
 	}
+
+	if(p.x == 0 && !xSet){
+		p.x = lastX;
+	}
+	if(p.y == 0 && !ySet){
+		p.y = lastY;
+	}
+	if(p.z  == 0){
+		p.z = lastZ;
+	}
+
 	return p;
 }
 
