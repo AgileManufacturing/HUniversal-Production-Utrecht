@@ -125,7 +125,7 @@ Mode StateMachine::getCurrentMode() {
  * @param changeStateActionClient = NULL when not given. By this param it is possilbe to waitForResult and getState when finished(SUCCEEDED/ABORTED)
  **/
 void StateMachine::changeState(State desiredState) {
-	ROS_INFO("_changeState called with desiredState %s",rexos_statemachine::state_txt[desiredState]);
+	ROS_INFO("changeState called with desiredState %s",rexos_statemachine::state_txt[desiredState]);
 	ChangeStateGoal goal;
 	goal.desiredState = desiredState;
 	changeStateActionClient.sendGoal(goal);
@@ -176,13 +176,11 @@ bool StateMachine::_changeState(rexos_statemachine::State newState) {
 		return false;
 
 	_setState(changeStateEntry.transition->transitionState);		//set the currentState on the transitionState
-	
 	TransitionActionClient* transitionActionClient = changeStateEntry.transition->transitionActionClient;
-	
 	TransitionGoal goal;
 	transitionActionClient->sendGoal(goal);
 	transitionActionClient->waitForResult();
-
+	ROS_INFO("4");
 	while( rexos_statemachine::is_transition_state[currentState] ){
 		if(currentState == changeStateEntry.transition->transitionState){
 			if (transitionActionClient->getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
@@ -258,7 +256,6 @@ void StateMachine::setListener(Listener* listener) {
 }
 
 void StateMachine::_setState(State state) {
-	ROS_INFO("state changed to:%s",state_txt[state]);
 	currentState = state;
 	if (listener != NULL) {
 		listener->onStateChanged();
@@ -266,7 +263,6 @@ void StateMachine::_setState(State state) {
 }
 
 void StateMachine::_setMode(Mode mode) {
-	ROS_INFO("mode changed to:%s", mode_txt[mode]);
 	currentMode = mode;
 	if (listener != NULL) {
 		listener->onModeChanged();

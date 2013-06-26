@@ -43,15 +43,9 @@
 #include <rexos_datatypes/EquipletStep.h>
 #include <rexos_utilities/Utilities.h>
 
-#include <rexos_statemachine/StateMachine.h>
-#include <rexos_statemachine/ChangeStateAction.h>
-#include <rexos_statemachine/ChangeModeAction.h>
-
-#include <rexos_most/MOSTDatabaseClient.h>
-
+#include <equiplet_node/state_machine/EquipletStateMachine.h>
 #include <equiplet_node/ModuleRegistry.h>
 #include <equiplet_node/ModuleProxy.h>
-#include <equiplet_node/scada/EquipletScada.h>
 
 #pragma GCC system_header
 #include <libjson/libjson.h>
@@ -60,18 +54,10 @@
 
 namespace equiplet_node {
 
-typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction> ChangeStateActionClient;
-typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeModeAction> ChangeModeActionClient;
-typedef actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> SetInstructionActionClient;
-
 /**
  * The equipletNode, will manage all modules and keep track of their states
  **/
-class EquipletNode : 
-	public Blackboard::BlackboardSubscriber, 
-	public rexos_statemachine::StateMachine, 
-	rexos_statemachine::Listener,
-	equiplet_node::ModuleRegistryListener
+class EquipletNode : public EquipletStateMachine
 {
 public:
 	static std::string nameFromId(int id){
@@ -87,35 +73,14 @@ public:
 	std::string getName();
 
 	ros::NodeHandle& getNodeHandle();
-
-	void onStateChanged();
-
-	void onModeChanged();
-
-	void onModuleStateChanged(ModuleProxy* moduleProxy,rexos_statemachine::State newState, rexos_statemachine::State previousState);
-
-	void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
-
 	
 
 private:
 	void callLookupHandler(std::string lookupType, std::string lookupID, std::map<std::string, std::string> payloadMap);
 
-	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
+	virtual void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
 
 	environment_communication_msgs::Map createMapMessage(std::map<std::string, std::string> &Map);
-	bool setTransitionDone(rexos_statemachine::State transitionState);
-
-	void updateEquipletStateOnBlackboard();
-
-	bool finishTransition(std::vector<ModuleProxy*> modules);
-
-	void changeModuleStates(std::vector<ModuleProxy*> modules, rexos_statemachine::State desiredState);
-	/**
-	 * @var int equipletId
-	 * The id of the equiplet
-	 **/
-	int equipletId;
 
 	/**
 	 * @var BlackboardCppClient  *blackboardClient
@@ -124,36 +89,11 @@ private:
 
 	Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
 	Blackboard::FieldUpdateSubscription* equipletStepSubscription;
-
-	Blackboard::BlackboardCppClient *equipletCommandBlackboardClient;
-	Blackboard::BlackboardSubscription* equipletCommandSubscription; 
-
-	Blackboard::BlackboardCppClient *equipletStateBlackboardClient;
-	std::vector<Blackboard::BlackboardSubscription *> subscriptions; 
-
-	MOSTDatabaseClient mostDatabaseclient;
-
-	ros::NodeHandle nh;
-	ros::ServiceServer moduleUpdateServiceServer;
-
-	equiplet_node::ModuleRegistry moduleRegistry;
+	std::vector<Blackboard::BlackboardSubscription *> subscriptions;
 
 	equiplet_node::scada::EquipletScada scada;
 
-	void changeEquipletState();
-	virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
-	virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
-	virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
-	virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
-
-	rexos_statemachine::TransitionActionServer* setupTransitionActionServer;
-	rexos_statemachine::TransitionActionServer* shutdownTransitionActionServer;
-	rexos_statemachine::TransitionActionServer* startTransitionActionServer;
-	rexos_statemachine::TransitionActionServer* stopTransitionActionServer;
-
-	ChangeStateActionClient changeStateActionClient;
-	ChangeModeActionClient changeModeActionClient;
-
+	ros::NodeHandle nh;
 };
 
 }
