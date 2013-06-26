@@ -220,7 +220,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		// gets his IP and sets the equiplet blackboard IP.
 		try {
 			InetAddress IP = InetAddress.getLocalHost();
-			equipletDbIp = IP.getHostAddress();
+			//equipletDbIp = IP.getHostAddress();
+			equipletDbIp = "145.89.191.131";
 		} catch(UnknownHostException e) {
 			Logger.log(e);
 		}
@@ -382,14 +383,15 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 							try {
 								// If the start time of the newly planned productStep is earlier then the next used time
 								// slot make it the next used timeslot.
-								nextProductStep = productStep.getId();
 								ScheduleData scheduleData = productStep.getScheduleData();
 								if(timer.getNextUsedTimeSlot() == 0
 										|| scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
 									timer.setNextUsedTimeSlot(scheduleData.getStartTime());
+									nextProductStep = productStep.getId();
 								}
 
 								responseMessage.setOntology("Planned");
+								responseMessage.setPerformative(ACLMessage.CONFIRM);
 								responseMessage.setContentObject(scheduleData.getStartTime());
 
 								// TODO: after testing delete below
@@ -415,7 +417,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 								// TODO: after testing delete above
 
 							} catch(IOException e) {
-								responseMessage.setPerformative(ACLMessage.FAILURE);
+								responseMessage.setPerformative(ACLMessage.DISCONFIRM);
 								responseMessage.setContent("An error occured in the planning/please reschedule");
 								Logger.log(e);
 							}

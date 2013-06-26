@@ -185,7 +185,7 @@ public class SocketBehaviour extends Behaviour implements HeartbeatReceiver {
 			this.isConnected = false;
 			this.resetConnection();
 		} catch (Exception e) {
-			System.out.println("Error when resetting the connection");
+			//System.out.println("Error when resetting the connection");
 		}
 	}
 

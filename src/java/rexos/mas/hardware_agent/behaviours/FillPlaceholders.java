@@ -156,7 +156,7 @@ public class FillPlaceholders extends ReceiveBehaviour {
 			equipletSteps = module.fillPlaceHolders(equipletSteps, serviceStep.getParameters());
 			Logger.log("Hardware agent - Saving updated instructionData of %d equipletSteps%n", equipletSteps.length);
 			for(EquipletStep step : equipletSteps) {
-				equipletStepBBClient.updateDocuments(new BasicDBObject("_id", step.getId()), new BasicDBObject("$set",
+				equipletStepBBClient.updateDocumentsUnsafe(new BasicDBObject("_id", step.getId()), new BasicDBObject("$set",
 						new BasicDBObject("instructionData", step.getInstructionData().toBasicDBObject())));
 			}
 			// if the serviceStep has a nextStep fill the placeholders for that one to.

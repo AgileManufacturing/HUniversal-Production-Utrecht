@@ -51,6 +51,7 @@ import rexos.mas.data.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.QueryBuilder;
 
 /**
  * Timer for executing the next product step.
@@ -166,18 +167,17 @@ public class NextProductStepTimer extends Timer {
 	 * when this function is called it reschedules the timer to the next step
 	 * 
 	 */
-	public void reScheduleTimer(){
-		
-				
+	public void reScheduleTimer(){	
 		try {
 			BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED.name());
-			query.put("$order_by", new BasicDBObject("scheduleData", new BasicDBObject("startTime", "1")));
-			List<DBObject> objects = equipletAgent.getProductStepBBClient().findDocuments(query);
+			BasicDBObject orderby = new BasicDBObject("scheduleData", new BasicDBObject("startTime", "1"));
+			BasicDBObject findquery = new BasicDBObject("$query", query).append("$orderby", orderby);
+			List<DBObject> objects = equipletAgent.getProductStepBBClient().findDocuments(findquery);
 			if(!objects.isEmpty()) {
 				ProductStep nextProductStep = new ProductStep((BasicDBObject) objects.get(0));
 				equipletAgent.setNextProductStep(nextProductStep.getId());
 				ScheduleData scheduleData = nextProductStep.getScheduleData();
-				if(scheduleData.getStartTime() < getNextUsedTimeSlot()) {
+				if(nextUsedTimeSlot == -1 || scheduleData.getStartTime() <= nextUsedTimeSlot) {
 					setNextUsedTimeSlot(scheduleData.getStartTime());
 				}
 			} else {
@@ -216,6 +216,8 @@ public class NextProductStepTimer extends Timer {
 				answer.setOntology("StartStepQuestion");
 				equipletAgent.send(answer);
 
+				nextUsedTimeSlot = -1;
+				
 				// TODO: delete below after testing
 //				ACLMessage test = new ACLMessage(ACLMessage.QUERY_IF);
 //				test.setConversationId(conversationId);
