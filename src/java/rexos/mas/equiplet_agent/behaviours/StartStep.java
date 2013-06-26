@@ -46,6 +46,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
+import rexos.libraries.blackboard_client.FieldUpdateSubscription.MongoUpdateLogOperation;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.EquipletState;
@@ -95,6 +96,8 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 	public StartStep(Agent a) {
 		super(a, messageTemplate);
 		equipletAgent = (EquipletAgent) a;
+		stateUpdateSubscription = new FieldUpdateSubscription("state", this);
+		stateUpdateSubscription.addOperation(MongoUpdateLogOperation.SET);
 	}
 
 	/**
@@ -104,18 +107,19 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
+		Logger.log("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(),
 				message.getOntology());
 
 		// Gets the productStepId and updates all the productsteps on the blackboard the status to waiting.
 		try {
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
 			if(equipletAgent.getEquipletStateEntry().getEquipletState() != EquipletState.NORMAL) {
-				equipletAgent.setDesiredEquipletState(EquipletState.NORMAL);
+				Logger.log("Equiplet agent - changing state");
 
-				BlackboardClient stateBBClient = equipletAgent.getStateBBClient();
-				stateBBClient.subscribe(stateUpdateSubscription);
+				equipletAgent.getStateBBClient().subscribe(stateUpdateSubscription);
+				equipletAgent.setDesiredEquipletState(EquipletState.NORMAL);
 			} else {
+				Logger.log("Equiplet agent - Starting prod. step.");
 				equipletAgent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
 						new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));
 			}

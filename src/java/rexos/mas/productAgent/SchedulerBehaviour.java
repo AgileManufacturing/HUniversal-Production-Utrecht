@@ -296,7 +296,7 @@ public class SchedulerBehaviour extends Behaviour {
 					_prodStep.setStatus(StepStatusCode.PLANNED);
 					_isDone = true;
 					
-					System.out.println("received message");
+					System.out.println("PA - received message " + msg.getOntology());
 					// TODO:: Scheduler is done. Make a nice ending pls
 				}
 			}

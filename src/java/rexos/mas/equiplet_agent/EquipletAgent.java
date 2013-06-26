@@ -474,10 +474,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 							ACLMessage.getPerformative(responseMessage.getPerformative()));
 					send(responseMessage);
 					break;
-				case "stateBlackboard":
+				case "StateBlackboard":
 					EquipletStateEntry stateEntry =
 							new EquipletStateEntry((BasicDBObject) stateBBClient.findDocumentById(entry
 									.getTargetObjectId()));
+					Logger.log("Equiplet agent - mode changed to %s%n", stateEntry.getEquipletMode());
 					switch(stateEntry.getEquipletMode()) {
 					// TODO handle error stuff
 						case ERROR:

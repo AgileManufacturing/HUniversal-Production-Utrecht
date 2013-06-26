@@ -106,8 +106,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 	}
 
 	/**
-	 * Function to handle the incoming messages for this behaviour. Handles the
-	 * response to the InitialisationFinished.
+	 * Function to handle the incoming messages for this behaviour. Handles the response to the InitialisationFinished.
 	 * 
 	 * @param message The received message.
 	 */
