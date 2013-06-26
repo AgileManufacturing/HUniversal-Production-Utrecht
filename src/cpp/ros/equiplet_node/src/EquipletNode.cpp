@@ -181,7 +181,7 @@ void EquipletNode::onInstructionStepCompleted(ModuleProxy* moduleProxy, std::str
 	if(completed)
     	equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"DONE\" } } ");
 	else
-    	equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"ERROR\" } } ");		
+    	equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\" } } ");		
 
 }
 
