@@ -57,7 +57,7 @@ namespace equiplet_node {
 /**
  * The equipletNode, will manage all modules and keep track of their states
  **/
-class EquipletNode : public EquipletStateMachine
+class EquipletNode : public EquipletStateMachine,public Blackboard::BlackboardSubscriber
 {
 public:
 	static std::string nameFromId(int id){
@@ -76,9 +76,20 @@ public:
 	
 
 private:
+	virtual void onStateChanged();
+	virtual void onModeChanged();
+
+	void updateEquipletStateOnBlackboard();
+
 	void callLookupHandler(std::string lookupType, std::string lookupID, std::map<std::string, std::string> payloadMap);
 
 	virtual void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
+
+	/**
+	 * @var int equipletId
+	 * The id of the equiplet
+	 **/
+	int equipletId;
 
 	environment_communication_msgs::Map createMapMessage(std::map<std::string, std::string> &Map);
 
@@ -90,6 +101,10 @@ private:
 	Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
 	Blackboard::FieldUpdateSubscription* equipletStepSubscription;
 	std::vector<Blackboard::BlackboardSubscription *> subscriptions;
+
+	Blackboard::BlackboardCppClient *equipletCommandBlackboardClient;
+	Blackboard::BlackboardCppClient *equipletStateBlackboardClient;
+	Blackboard::BlackboardSubscription* equipletCommandSubscription;
 
 	equiplet_node::scada::EquipletScada scada;
 

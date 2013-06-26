@@ -182,9 +182,8 @@ private:
 		StatePair statePair;
 	};
 
-	typedef std::pair<StatePair, ChangeStateEntry> transitionMapEntry;
-	typedef std::map<StatePair, ChangeStateEntry> transitionMapType;
-	transitionMapType transitionMap;
+	typedef std::map<StatePair, ChangeStateEntry> TransitionMap;
+	TransitionMap transitionMap;
 
 	ChangeStateActionServer changeStateActionServer;
 	ChangeModeActionServer changeModeActionServer;

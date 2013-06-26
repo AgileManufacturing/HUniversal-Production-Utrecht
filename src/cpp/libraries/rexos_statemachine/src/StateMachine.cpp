@@ -91,7 +91,7 @@ StateMachine::StateMachine(std::string nodeName,std::vector<rexos_statemachine::
 }
 
 StateMachine::~StateMachine() {
-	//TODO pointer values remove
+	delete listener;
 }
 
 void StateMachine::onTransitionSetupAction(TransitionActionServer* as){
@@ -165,7 +165,7 @@ void StateMachine::onChangeModeAction(const ChangeModeGoalConstPtr& goal){
  * @param response Will tell if the state transition was succesfull for the state change
  **/
 bool StateMachine::_changeState(rexos_statemachine::State newState) {
-	transitionMapType::iterator it = transitionMap.find(StatePair(currentState, newState));
+	TransitionMap::iterator it = transitionMap.find(StatePair(currentState, newState));
 	if (it == transitionMap.end()) {
 		return false;
 	}
@@ -180,7 +180,6 @@ bool StateMachine::_changeState(rexos_statemachine::State newState) {
 	TransitionGoal goal;
 	transitionActionClient->sendGoal(goal);
 	transitionActionClient->waitForResult();
-	ROS_INFO("4");
 	while( rexos_statemachine::is_transition_state[currentState] ){
 		if(currentState == changeStateEntry.transition->transitionState){
 			if (transitionActionClient->getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
@@ -223,6 +222,9 @@ bool StateMachine::_changeMode(Mode newMode) {
 		return false;
 
 	_setMode(newMode);
+	if(newMode == MODE_E_STOP)
+		_setState(STATE_SAFE);
+	
 	_forceToAllowedState();
 	return true;
 }

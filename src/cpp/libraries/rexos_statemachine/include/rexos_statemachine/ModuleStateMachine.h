@@ -17,8 +17,8 @@ class ModuleStateMachine : public StateMachine, public Listener {
 public:
 	ModuleStateMachine(std::string moduleName, int equipletId, int moduleId, bool actorModule);
 protected:
-	void onStateChanged();
-	void onModeChanged();
+	virtual void onStateChanged();
+	virtual void onModeChanged();
 
 	void setInError();
 

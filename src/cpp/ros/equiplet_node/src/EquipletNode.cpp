@@ -30,10 +30,12 @@
 
 #include <unistd.h>
 #include "equiplet_node/EquipletNode.h"
+#include "equiplet_node/StateBlackboard.h"
 #include "rexos_blackboard_cpp_client/FieldUpdateSubscription.h"
 #include "rexos_blackboard_cpp_client/BasicOperationSubscription.h"
 #include "rexos_blackboard_cpp_client/OplogEntry.h"
 #include "rexos_utilities/Utilities.h"
+
 
 #include <libjson/libjson.h>
 
@@ -44,15 +46,25 @@ using namespace equiplet_node;
  * @param id The unique identifier of the Equiplet
  **/
 EquipletNode::EquipletNode(int id, std::string blackboardIp) :
-		EquipletStateMachine(nameFromId(id),id,blackboardIp),
+		equipletId(id),
+		EquipletStateMachine(nameFromId(id),id),
 		equipletStepBlackboardClient(NULL),
+		equipletCommandBlackboardClient(NULL),
 		scada(this, &moduleRegistry)
 {
 	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "test", "equipletStepBB");
 	equipletStepSubscription = new Blackboard::FieldUpdateSubscription("status", *this);
 	equipletStepSubscription->addOperation(Blackboard::SET);
 	equipletStepBlackboardClient->subscribe(*equipletStepSubscription);
+
+	equipletCommandBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_COMMANDS);
+	equipletCommandSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
+	equipletCommandBlackboardClient->subscribe(*equipletCommandSubscription);
+
+	equipletStateBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_STATE);
+
 	subscriptions.push_back(equipletStepSubscription);
+	subscriptions.push_back(equipletCommandSubscription);
 
 	std::cout << "Connected!" << std::endl;
 }
@@ -62,15 +74,15 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
  **/
 EquipletNode::~EquipletNode(){
 	delete equipletStepBlackboardClient;
-	delete equipletStepSubscription;
 	delete equipletStepBlackboardClient;
+	delete equipletCommandBlackboardClient;
+	delete equipletStateBlackboardClient;
 
 	for (std::vector<Blackboard::BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
 		delete *iter;
 	}
 
 	subscriptions.clear();
-
 }
 
 /**
@@ -82,8 +94,6 @@ EquipletNode::~EquipletNode(){
  **/
 void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) 
 {
-	EquipletStateMachine::onMessage(subscription, oplogEntry);
-
 	if(&subscription == equipletStepSubscription)
 	{
 		mongo::OID targetObjectId;
@@ -112,7 +122,40 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	    		equipletStepBlackboardClient->updateDocuments(query.str(), "{$set : {status: \"ERROR\"");
 	    	}
 		}
+	}else if(&subscription == equipletCommandSubscription){
+		JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
+		JSONNode::const_iterator i = n.begin();
+
+	    while (i != n.end()){
+	        const char * node_name = i -> name().c_str();
+	        if (strcmp(node_name, "desiredState") == 0){
+	            changeState((rexos_statemachine::State) atoi(i -> as_string().c_str()));
+	        }else if (strcmp(node_name, "desiredMode") == 0){
+	            changeMode((rexos_statemachine::Mode) atoi(i -> as_string().c_str()));
+	        }
+	        i++;
+	    }
 	}
+}
+
+void EquipletNode::onStateChanged(){
+	EquipletStateMachine::onStateChanged();
+	updateEquipletStateOnBlackboard();
+}
+
+void EquipletNode::onModeChanged(){
+	EquipletStateMachine::onModeChanged();
+	updateEquipletStateOnBlackboard();
+}
+
+void EquipletNode::updateEquipletStateOnBlackboard(){
+	JSONNode jsonUpdateQuery;
+	jsonUpdateQuery.push_back(JSONNode("id",equipletId));
+
+	std::ostringstream stringStream;
+	stringStream << "{$set: { state: " << getCurrentState() << ",mode: " << getCurrentMode() << "}}";
+
+	equipletStateBlackboardClient->updateDocuments(jsonUpdateQuery.write().c_str(),stringStream.str());
 }
 
 std::string EquipletNode::getName() {
