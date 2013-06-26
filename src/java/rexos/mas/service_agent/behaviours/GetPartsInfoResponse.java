@@ -156,8 +156,7 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 					
 					Part p = (Part)part;
 					partList.add(p.toBasicDBObject());					
-				}
-								
+				}							
 				
 				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStep.getId()),
 						new BasicDBObject("$set", new BasicDBObject("inputParts",partList)));

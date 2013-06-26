@@ -35,5 +35,30 @@ package rexos.mas.data;
  *
  */
 public enum EquipletMode {
+	NORMAL(0),
+	SERVICE(1),
+	ERROR(2),
+	CRITICAL_ERROR(3),
+	EMERGENCY_STOP(4),
+	LOCK(5),
+	STEP(6);
 
+	private int value;
+	
+	private EquipletMode(int value) {
+		this.value = value;
+	}
+	
+	public int getValue() {
+		return value;
+	}
+
+	public static EquipletMode getState(int value) {
+		for(EquipletMode state : EquipletMode.values()) {
+			if(state.value == value) {
+				return state;
+			}
+		}
+		return null;
+	}
 }

@@ -111,7 +111,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		Logger.log("%s received message from %s%n", equipletAgent.getLocalName(), message.getSender().getLocalName(),
+		Logger.log("%s received message from %s (%s)%n", equipletAgent.getLocalName(), message.getSender().getLocalName(),
 				message.getOntology());
 
 		try {

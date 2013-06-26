@@ -268,7 +268,7 @@ public class SchedulerBehaviour extends Behaviour {
 					}
 					_isDone = true;
 					_schedulersCompleted++;
-					System.out.println("received message");
+					System.out.println("PA - received message " + msg.getOntology());
 					
 				}
 			}

@@ -47,21 +47,31 @@
  **/
 package rexos.mas.equiplet_agent.behaviours;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import rexos.libraries.blackboard_client.BlackboardSubscriber;
+import rexos.libraries.blackboard_client.FieldUpdateSubscription;
+import rexos.libraries.blackboard_client.FieldUpdateSubscription.MongoUpdateLogOperation;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
+import rexos.libraries.blackboard_client.MongoOperation;
+import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
+import rexos.mas.data.EquipletState;
+import rexos.mas.data.EquipletStateEntry;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.EquipletDirectoryEntry;
 
 /**
  * A receive once behaviour for receiving messages with ontology: "InitialisationFinished".
- * When the message is received the equiplet agent of this behaviour posts itself on the EquipletDirectory 
- * to advertise itself for the product agents.
+ * When the message is received the equiplet agent of this behaviour posts itself on the EquipletDirectory to advertise
+ * itself for the product agents.
  */
-public class InitialisationFinished extends ReceiveOnceBehaviour {
+public class InitialisationFinished extends ReceiveOnceBehaviour implements BlackboardSubscriber {
 	/**
 	 * @var static final long serialVersionUID
 	 *      The serial version UID for this class
@@ -70,11 +80,10 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 
 	/**
 	 * @var MessageTemplate messageTemplate
-	 *      The messageTemplate this behaviour listens to. This behaviour
-	 *      listens to the ontology: InitialisationFinished.
+	 *      The messageTemplate this behaviour listens to. This behaviour listens to the ontology:
+	 *      InitialisationFinished.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate
-			.MatchOntology("InitialisationFinished");
+	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("InitialisationFinished");
 
 	/**
 	 * @var EquipletAgent equipletAgent
@@ -82,63 +91,89 @@ public class InitialisationFinished extends ReceiveOnceBehaviour {
 	 */
 	private EquipletAgent equipletAgent;
 
+	private FieldUpdateSubscription stateUpdateSubscription;
+
 	/**
 	 * Instantiates a new can perform step.
 	 * 
-	 * @param a
-	 *            The agent for this behaviour
+	 * @param a The agent for this behaviour
 	 */
 	public InitialisationFinished(EquipletAgent a) {
 		super(a, 2000, messageTemplate);
 		equipletAgent = a;
+		stateUpdateSubscription = new FieldUpdateSubscription("state", this);
+		stateUpdateSubscription.addOperation(MongoUpdateLogOperation.SET);
 	}
 
 	/**
-	 * Function to handle the incoming messages for this behaviour. Handles the
-	 * response to the InitialisationFinished.
+	 * Function to handle the incoming messages for this behaviour. Handles the response to the InitialisationFinished.
 	 * 
-	 * @param message
-	 *            The received message.
+	 * @param message The received message.
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		if (message != null) {
-			Logger.log("%s received message from %s%n", myAgent.getLocalName(),
-					message.getSender().getLocalName(), message.getOntology());
+		if(message != null) {
+			Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
+					message.getOntology());
 
-			// inserts himself on the collective blackboard equiplet directory.
-			EquipletDirectoryEntry entry = new EquipletDirectoryEntry(
-					equipletAgent.getAID(), equipletAgent.getCapabilities(),
-					equipletAgent.getDbData());
 			try {
-				equipletAgent.getCollectiveBBClient().insertDocument(entry.toBasicDBObject());
-			} catch (InvalidDBNamespaceException | GeneralMongoException e) {
+				EquipletStateEntry equipletState = equipletAgent.getEquipletStateEntry();
+				if(equipletState.getEquipletState() != EquipletState.STANDBY && equipletState.getEquipletState() != EquipletState.NORMAL) {
+					equipletAgent.setDesiredEquipletState(EquipletState.STANDBY);
+					equipletAgent.getStateBBClient().subscribe(stateUpdateSubscription);
+				} else {
+					// inserts himself on the collective blackboard equiplet directory.
+					EquipletDirectoryEntry directoryEntry =
+							new EquipletDirectoryEntry(equipletAgent.getAID(), equipletAgent.getCapabilities(),
+									equipletAgent.getDbData());
+					equipletAgent.getCollectiveBBClient().insertDocument(directoryEntry.toBasicDBObject());
+				}
+			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(e);
 				equipletAgent.doDelete();
 			}
 
-			// starts the behaviour for receiving messages with the Ontology
-			// CanPerformStep.
-			equipletAgent.addBehaviour(new CanPerformStep(equipletAgent,
-					equipletAgent.getProductStepBBClient()));
+			// starts the behaviour for receiving messages with the Ontology CanPerformStep.
+			equipletAgent.addBehaviour(new CanPerformStep(equipletAgent, equipletAgent.getProductStepBBClient()));
 
-			// starts the behaviour for receiving messages with the Ontology
-			// GetProductionDuration.
-			equipletAgent
-					.addBehaviour(new GetProductionDuration(equipletAgent));
+			// starts the behaviour for receiving messages with the Ontology GetProductionDuration.
+			equipletAgent.addBehaviour(new GetProductionDuration(equipletAgent));
 
-			// starts the behaviour for receiving messages with the Ontology
-			// ScheduleStep.
+			// starts the behaviour for receiving messages with the Ontology ScheduleStep.
 			equipletAgent.addBehaviour(new ScheduleStep(equipletAgent, equipletAgent.getProductStepBBClient()));
 
-			// starts the behaviour for receiving messages with the Ontology
-			// StartStep.
-			equipletAgent.addBehaviour(new StartStep(equipletAgent,
-					equipletAgent.getProductStepBBClient()));
+			// starts the behaviour for receiving messages with the Ontology StartStep.
+			equipletAgent.addBehaviour(new StartStep(equipletAgent));
 		} else {
-			Logger.log(equipletAgent.getName()
-					+ " - InitialisationFinished timeout!");
+			Logger.log(equipletAgent.getName() + " - InitialisationFinished timeout!");
 			equipletAgent.doDelete();
+		}
+	}
+
+	@Override
+	public void onMessage(MongoOperation operation, OplogEntry entry) {
+		try {
+			// inserts himself on the collective blackboard equiplet directory.
+			DBObject dbObject = equipletAgent.getStateBBClient().findDocumentById(entry.getTargetObjectId());
+			EquipletStateEntry state = new EquipletStateEntry((BasicDBObject) dbObject);
+			switch(state.getEquipletState()) {
+				case STANDBY:
+					Logger.log("EquipletState changed to %s%n", state.getEquipletState().name());
+
+					EquipletDirectoryEntry directoryEntry =
+							new EquipletDirectoryEntry(equipletAgent.getAID(), equipletAgent.getCapabilities(),
+									equipletAgent.getDbData());
+
+					equipletAgent.getCollectiveBBClient().insertDocument(directoryEntry.toBasicDBObject());
+					equipletAgent.getStateBBClient().unsubscribe(stateUpdateSubscription);
+					break;
+				default:
+					Logger.log("EquipletState changed to %s%n", state.getEquipletState().name());
+					break;
+			}
+		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+			e.printStackTrace();
+			// TODO handle error
 		}
 	}
 }
