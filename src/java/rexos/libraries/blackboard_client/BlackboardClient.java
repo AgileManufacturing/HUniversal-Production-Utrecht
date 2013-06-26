@@ -437,6 +437,21 @@ public class BlackboardClient {
 		}
 	}
 	
+	public void updateDocumentsUnsafe(DBObject searchQuery, DBObject updateQuery) throws InvalidDBNamespaceException, GeneralMongoException {
+		if (currentCollection == null) {
+			throw new InvalidDBNamespaceException("No collection has been selected.");
+		}
+		
+		try {
+			WriteConcern oldConcern = currentCollection.getWriteConcern();
+			currentCollection.setWriteConcern(WriteConcern.NORMAL);
+			currentCollection.updateMulti(searchQuery, updateQuery);
+			currentCollection.setWriteConcern(oldConcern);
+		} catch (MongoException mongoException) {
+			throw new GeneralMongoException("An error occurred attempting to update.", mongoException);
+		}
+	}
+	
 	/**
 	 * Updates all documents matching the provided search query within the currently selected collection.
 	 * Documents are updated according to the query specified in updateQuery.
