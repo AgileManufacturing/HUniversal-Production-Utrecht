@@ -230,6 +230,15 @@ public class BlackboardClient {
 		return ObjectId.massageToObjectId(obj.get("_id"));
 	}
 	
+	/**
+	 * Inserts a document into the currently selected collection.
+	 * Does not wait for the server to perform write to disk, nor does it check for errors other than networks errors.
+	 * 
+	 * @param obj DBObject representing the document to be inserted.
+	 * @return ObjectId of the inserted object.
+	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 * @throws GeneralMongoException A MongoException occurred.
+	 **/
 	public ObjectId insertDocumentUnsafe(DBObject obj) throws InvalidDBNamespaceException, GeneralMongoException {
 		if (currentCollection == null) {
 			throw new InvalidDBNamespaceException("No collection has been selected.");
@@ -245,6 +254,13 @@ public class BlackboardClient {
 		return ObjectId.massageToObjectId(obj.get("_id"));
 	}
 	
+	/**
+	 * Inserts a number of documents into the currently selected collection.
+	 * 
+	 * @param objs DBObjects that should be inserted into the database.
+	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 * @throws GeneralMongoException A MongoException occurred.
+	 **/
 	public void insertDocuments(DBObject... objs) throws InvalidDBNamespaceException, GeneralMongoException {
 		if (currentCollection == null) {
 			throw new InvalidDBNamespaceException("No collection has been selected.");
@@ -256,6 +272,14 @@ public class BlackboardClient {
 		}
 	}
 	
+	/**
+	 * Inserts a number of documents into the currently selected collection.
+	 * Does not wait for the server to perform write to disk, nor does it check for errors other than networks errors.
+	 *
+	 * @param objs DBObjects that should be inserted into the database.
+	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 * @throws GeneralMongoException A MongoException occurred.
+	 **/
 	public void insertDocumentsUnsafe(DBObject... objs) throws InvalidDBNamespaceException, GeneralMongoException {
 		if (currentCollection == null) {
 			throw new InvalidDBNamespaceException("No collection has been selected.");
@@ -304,6 +328,29 @@ public class BlackboardClient {
 			throw new GeneralMongoException("An error occurred attempting to remove.", mongoException);
 		}
 		
+	}
+	
+	/**
+	 * Removes all documents matching the provided query from the currently selected collection.
+	 * Does not wait for the server to perform write to disk, nor does it check for errors other than networks errors.
+	 *
+	 * @param query DBObject representing the query used for deleting documents.
+	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 * @throws GeneralMongoException A MongoException occurred.
+	 **/
+	public void removeDocumentsUnsafe(DBObject query) throws InvalidDBNamespaceException, GeneralMongoException {
+		if (currentCollection == null) {
+			throw new InvalidDBNamespaceException("No collection has been selected.");
+		}
+		
+		try {
+			WriteConcern oldConcern = currentCollection.getWriteConcern();
+			currentCollection.setWriteConcern(WriteConcern.NORMAL);
+			currentCollection.remove(query);
+			currentCollection.setWriteConcern(oldConcern);
+		} catch (MongoException mongoException) {
+			throw new GeneralMongoException("An error occurred attempting to remove.", mongoException);
+		}
 	}
 	
 	/**
@@ -437,6 +484,17 @@ public class BlackboardClient {
 		}
 	}
 	
+	/**
+	 * Updates all documents matching the provided search query within the currently selected collection.
+	 * Documents are updated according to the query specified in updateQuery.
+	 * Does not wait for the server to perform write to disk, nor does it check for errors other than networks errors.
+	 * 
+	 * @param searchQuery The query that should be used to select the target documents.
+	 * @param updateQuery The query that should be used to update the target documents.
+	 * @return The amount of documents that have been updated.
+	 * @throws InvalidDBNamespaceException No collection has been selected.
+	 * @throws GeneralMongoException A MongoException occurred.
+	 **/
 	public void updateDocumentsUnsafe(DBObject searchQuery, DBObject updateQuery) throws InvalidDBNamespaceException, GeneralMongoException {
 		if (currentCollection == null) {
 			throw new InvalidDBNamespaceException("No collection has been selected.");
