@@ -119,6 +119,7 @@ public class SchedulerBehaviour extends Behaviour {
 							.intValue();
 				}
 				if (equiplets != null && equiplets.size() != 0) {
+					
 					Scheduler(production.getProductionEquipletMapping()
 							.getEquipletsForProductionStep(PA_id).keySet(), ps);
 					_schedulersStarted++;
