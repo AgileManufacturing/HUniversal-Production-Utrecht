@@ -114,7 +114,7 @@ mongo::Query OplogMonitor::createOplogQuery()
 void OplogMonitor::run()
 {
 	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
-	mongo::Query query(mongo::fromjson(createOplogQuery().toString()));
+	mongo::Query query = createOplogQuery();
 
 	unsigned long long skipCount = (*connection)->count(oplogNamespace, query.obj);
 
