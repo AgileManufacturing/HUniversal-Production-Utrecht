@@ -1,0 +1,14 @@
+<project name="log" default="build" basedir=".">
+
+	<import file="../build.xml"/>
+
+	<target name="build"> 			
+		<!-- defined in the root build.xml -->
+		<buildjava dir="${basedir}"/>  
+	</target>
+
+	<target name="clean">
+		 <cleanjava dir="${basedir}"/>
+	</target>
+
+</project>
