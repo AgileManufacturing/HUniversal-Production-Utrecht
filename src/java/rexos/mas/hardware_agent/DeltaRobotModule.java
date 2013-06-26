@@ -60,7 +60,13 @@ public class DeltaRobotModule extends Module {
 	 * @var double SAFE_MOVEMENT_PLANE
 	 *      A static value that contains the height of the safe movement plane.
 	 */
-	private static final double SAFE_MOVEMENT_PLANE = 40;
+	private static final double SAFE_MOVEMENT_PLANE = 30;
+	
+	/**
+	 * @var double MAX_ACCELERATION
+	 * 		A static value with the max accelaration 
+	 */
+	private static final double MAX_ACCELERATION = 25.0;
 
 	/**
 	 * @see Module#getEquipletSteps(int, BasicDBObject)
@@ -126,6 +132,7 @@ public class DeltaRobotModule extends Module {
 			if(payload.containsField("z") && payload.getString("z").equals("Z-PLACEHOLDER")) {
 				payload.put("z", position.getZ() + extraSize);
 			}
+			payload.put("maxAcceleration", MAX_ACCELERATION);
 		}
 		// returns the filled in steps.
 		return steps;
@@ -155,6 +162,8 @@ public class DeltaRobotModule extends Module {
 		InstructionData instructionData = new InstructionData();
 		// create the payload
 		BasicDBObject payload = new BasicDBObject("z", extraSize + SAFE_MOVEMENT_PLANE);
+		payload.put("maxAcceleration", MAX_ACCELERATION);
+		
 		// create the lookUpParameters
 		if(parameters.containsField("position")) {
 			Position position = new Position((BasicDBObject) parameters.get("position"));
@@ -174,7 +183,7 @@ public class DeltaRobotModule extends Module {
 		// create an EquipletStep and return it.
 		EquipletStep step =
 				new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(),
-						new TimeData(4));
+						new TimeData(10));
 		return step;
 	}
 
@@ -215,6 +224,7 @@ public class DeltaRobotModule extends Module {
 			} else {
 				payload.put("y", position.getY());
 			}
+			payload.put("maxAcceleration", MAX_ACCELERATION);
 			lookUp = "FIND_ID";
 		} else {
 			// fill the payload parameters
@@ -226,7 +236,7 @@ public class DeltaRobotModule extends Module {
 
 		// create the EquipletStep and return it.
 		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(),
-				new TimeData(4));
+				new TimeData(10));
 	}
 
 	/**
@@ -265,6 +275,7 @@ public class DeltaRobotModule extends Module {
 			} else {
 				payload.put("z", position.getZ() + extraSize);
 			}
+			payload.put("maxAcceleration", MAX_ACCELERATION);
 			lookUp = "FIND_ID";
 		} else {
 			// fill in the payload parameters.
@@ -274,7 +285,7 @@ public class DeltaRobotModule extends Module {
 		InstructionData instructionData = new InstructionData("move", "deltarobot", lookUp, lookUpParameters, payload);
 		// create the EquipletStep and return it.
 		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(),
-				new TimeData(4));
+				new TimeData(10));
 	}
 
 }

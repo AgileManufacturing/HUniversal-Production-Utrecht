@@ -243,7 +243,7 @@ public class InformerBehaviour extends Behaviour {
 				}
 			});
 			// 2 - wait for an response. ( handles a 10 sec timeout )
-			addSubBehaviour(new ReceiveBehaviour(myAgent, 10000, msgtemplate) {
+			addSubBehaviour(new ReceiveBehaviour(myAgent, 1000000, msgtemplate) {
 				/**
 				 * 
 				 */
@@ -301,7 +301,7 @@ public class InformerBehaviour extends Behaviour {
 							// 4- waits for the response ( handles a 10 sec
 							// timeout ).
 							addSubBehaviour(new ReceiveBehaviour(myAgent,
-									10000, msgtemplate) {
+									1000000, msgtemplate) {
 								/**
 										 * 
 										 */

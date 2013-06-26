@@ -105,7 +105,7 @@ public class ProductionEquipletMapper{
 		this.equipletList.put(productionStepID, tempTimeslotForEQHashmap);
 	}
 
-	public Long getTimeSlotsForEquiplet(int i, AID equipletID){
+	public long getTimeSlotsForEquiplet(int i, AID equipletID){
 		return this.equipletList.get(i).get(equipletID);
 	}
 }

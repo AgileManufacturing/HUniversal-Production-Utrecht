@@ -89,7 +89,7 @@ public class GetServiceStepsDurationResponse extends ReceiveOnceBehaviour {
 	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
 	 */
 	public GetServiceStepsDurationResponse(ServiceAgent agent, String conversationId) {
-		this(agent, 2000, conversationId);
+		this(agent, 10000, conversationId);
 	}
 
 	/**

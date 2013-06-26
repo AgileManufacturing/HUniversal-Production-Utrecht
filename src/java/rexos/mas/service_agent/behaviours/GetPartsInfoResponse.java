@@ -179,7 +179,7 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 								ServiceStep.sort(serviceSteps));
 
 				ScheduleData scheduleData;
-				int nextStartTime = productStep.getScheduleData().getStartTime();
+				long nextStartTime = productStep.getScheduleData().getStartTime();
 				for(ServiceStep serviceStep : parameterizedSteps) {
 					scheduleData = serviceStep.getScheduleData();
 					scheduleData.setStartTime(nextStartTime);
