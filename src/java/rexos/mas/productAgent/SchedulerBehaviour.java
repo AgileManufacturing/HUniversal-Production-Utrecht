@@ -195,7 +195,7 @@ public class SchedulerBehaviour extends Behaviour {
 		}
 
 		int scheduleCount = 0;
-		Schedule[] schedules;
+		ArrayList<Schedule> schedules = new ArrayList<Schedule>();
 		ArrayList<FreeTimeSlot> freetimeslot = new ArrayList<FreeTimeSlot>();
 		
 		if(dbData.size() > 0){
@@ -208,13 +208,8 @@ public class SchedulerBehaviour extends Behaviour {
 				BlackboardClient bbc = new BlackboardClient(dbDa.getIp(),
 						dbDa.getPort());
 				bbc.setDatabase(dbDa.getName());
-				bbc.setCollection("ProductStepsBlackboard");
-	
-				List<DBObject> blackBoard = bbc.findDocuments(" ");
-				scheduleCount = blackBoard.size();
-	
-				schedules = new Schedule[scheduleCount];
-	
+				bbc.setCollection("ProductStepsBlackBoard");
+				
 				// Gets planned steps
 				List<DBObject> plannedSteps = bbc.findDocuments(QueryBuilder
 						.start("scheduleData.startTime").greaterThan(-1).get());
@@ -225,42 +220,44 @@ public class SchedulerBehaviour extends Behaviour {
 					int dur = (int) c;
 					// add scheduled timeslot to array of scheduled timeslots and
 					// mention which equiplet
-					schedules[i] = new Schedule(stati, dur, pairs.getKey());
+					schedules.add( new Schedule(stati, dur, pairs.getKey()));
 				}
 	
 				int startTimeSlot = 0;
 				// check within every schedule of the 'schedules' array for free
 				// timeslots and add them to the 'freetimeslot' array
-				for (int run = 0; run < schedules.length; run++) {
-					if (schedules[run].getStartTime() > startTimeSlot) {
-						if (schedules.length > (run + 1)) {
-							if (schedules[run].getDeadline() < schedules[(run + 1)]
-									.getStartTime()) {
-								int freeTimeSlot = schedules[(run + 1)]
-										.getStartTime()
-										- schedules[run].getDeadline() - 1;
-								int timeslotToSchedule = (schedules[run]
-										.getDeadline() + 1);
-								freetimeslot.add(new FreeTimeSlot(
-										timeslotToSchedule, freeTimeSlot,
-										schedules[run].getEquipletName()));
-								
-								// debug
-								System.out.println("Free timeslot: "
-										+ freeTimeSlot
-										+ " starting at timeslot: "
-										+ timeslotToSchedule);
-								
+				if(schedules.size() >0 && schedules != null){
+					for (int run = 0; run < schedules.size(); run++) {
+						if (schedules.get(run).getStartTime() > startTimeSlot) {
+							if (schedules.size() > (run + 1)) {
+								if (schedules.get(run).getDeadline() < schedules.get((run + 1))
+										.getStartTime()) {
+									int freeTimeSlot = schedules.get((run + 1))
+											.getStartTime()
+											- schedules.get(run).getDeadline() - 1;
+									int timeslotToSchedule = (schedules.get(run)
+											.getDeadline() + 1);
+									freetimeslot.add(new FreeTimeSlot(
+											timeslotToSchedule, freeTimeSlot,
+											schedules.get(run).getEquipletName()));
+									
+									// debug
+									System.out.println("Free timeslot: "
+											+ freeTimeSlot
+											+ " starting at timeslot: "
+											+ timeslotToSchedule);
+									
+								}
 							}
 						}
 					}
+				
+					if (schedules.size() == 0) {
+						freetimeslot.add(new FreeTimeSlot((int) (System
+								.currentTimeMillis() / 2000 + 5), productionstep
+								.getRequiredTimeSlots(), pairs.getKey()));
+					}
 				}
-				if (schedules.length == 0) {
-					freetimeslot.add(new FreeTimeSlot((int) (System
-							.currentTimeMillis() / 2000 + 5), productionstep
-							.getRequiredTimeSlots(), pairs.getKey()));
-				} 
-	
 			}
 		}
 
