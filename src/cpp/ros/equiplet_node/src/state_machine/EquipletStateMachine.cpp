@@ -40,22 +40,22 @@ void EquipletStateMachine::onStateChanged(){
 
 void EquipletStateMachine::onModeChanged(){
 	ROS_INFO("Mode Changed to %s",rexos_statemachine::mode_txt[getCurrentMode()]);	
-	// bool changeModuleModes = false;
+	bool changeModuleModes = false;
 
 	rexos_statemachine::Mode currentMode = getCurrentMode();
-	// switch(currentMode){
-	// 	case rexos_statemachine::MODE_NORMAL:	
-	// 	case rexos_statemachine::MODE_SERVICE:
-	// 	case rexos_statemachine::MODE_E_STOP:	
-	// 		changeModuleModes = true; break;
-	// }
-
-	// if(changeModuleModes){
-	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
-	for (int i = 0; i < modules.size(); i++) {
-		modules[i]->changeMode(currentMode);
+	switch(currentMode){
+		case rexos_statemachine::MODE_NORMAL:	
+		case rexos_statemachine::MODE_SERVICE:
+		case rexos_statemachine::MODE_E_STOP:	
+			changeModuleModes = true; break;
 	}
-	//}
+
+	if(changeModuleModes){
+		std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
+		for (int i = 0; i < modules.size(); i++) {
+			modules[i]->changeMode(currentMode);
+		}
+	}
 }
 
 void EquipletStateMachine::onModuleStateChanged(ModuleProxy* moduleProxy,rexos_statemachine::State newState, rexos_statemachine::State previousState){
