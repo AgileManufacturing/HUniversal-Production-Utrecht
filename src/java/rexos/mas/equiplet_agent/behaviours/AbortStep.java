@@ -122,7 +122,7 @@ public class AbortStep extends ReceiveBehaviour {
 	
 				if(productStep.getStatus() == StepStatusCode.PLANNED) {
 					equipletAgent.cancelAllStepsForProductStep(productStepEntryId, "productagent canceled");
-					equipletAgent.getTimer().reScheduleTimer();
+					equipletAgent.getTimer().rescheduleTimer();
 					
 				} else {
 					ACLMessage reply = message.createReply();

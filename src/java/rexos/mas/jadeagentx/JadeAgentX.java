@@ -115,7 +115,7 @@ public class JadeAgentX extends Agent {
 								
 			// Next we want to have some production steps
 			ProductionStep stp1 = new ProductionStep(1, 3, parameters);
-			ProductionStep stp2 = new ProductionStep(2, 3, parameters);
+//			ProductionStep stp2 = new ProductionStep(2, 3, parameters);
 //			ProductionStep stp3 = new ProductionStep(3, 1, parameters);
 //			ProductionStep stp4 = new ProductionStep(4, 1, parameters);
 
@@ -126,7 +126,7 @@ public class JadeAgentX extends Agent {
 			 */
 			ArrayList<ProductionStep> stepList = new ArrayList<>();
 			stepList.add(stp1);
-			stepList.add(stp2);
+//			stepList.add(stp2);
 			// stepList.add(stp3);
 			// stepList.add(stp4);
 

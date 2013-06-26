@@ -116,10 +116,12 @@ public class NextProductStepTimer extends Timer {
 			long startPlannedTimeSlot = (nextUsedTimeSlot * timeSlotLength) + firstTimeSlot;
 			long currentTime = System.currentTimeMillis();
 			task = new NextProductStepTask();
-			Logger.log("Equiplet agent - trying to schedule: %d (%d - %d)%n", (startPlannedTimeSlot - currentTime), startPlannedTimeSlot, currentTime);
+			Logger.log("Equiplet agent - trying to schedule: %d (%d - %d)%n", (startPlannedTimeSlot - currentTime),
+					startPlannedTimeSlot, currentTime);
 			if(startPlannedTimeSlot - currentTime > 0) {
 				schedule(task, startPlannedTimeSlot - currentTime);
-				Logger.log("Equiplet agent - schedule set to: %d (%d - %d)%n", (startPlannedTimeSlot - currentTime), startPlannedTimeSlot, currentTime);
+				Logger.log("Equiplet agent - schedule set to: %d (%d - %d)%n", (startPlannedTimeSlot - currentTime),
+						startPlannedTimeSlot, currentTime);
 			} else {
 				Logger.log("");
 			}
@@ -161,14 +163,13 @@ public class NextProductStepTimer extends Timer {
 	public long getFirstTimeSlot() {
 		return firstTimeSlot;
 	}
+
 	/**
 	 * 
 	 * when this function is called it reschedules the timer to the next step
 	 * 
 	 */
-	public void reScheduleTimer(){
-		
-				
+	public void rescheduleTimer() {
 		try {
 			BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED.name());
 			query.put("$order_by", new BasicDBObject("scheduleData", new BasicDBObject("startTime", "1")));
@@ -186,7 +187,7 @@ public class NextProductStepTimer extends Timer {
 		} catch(GeneralMongoException | InvalidDBNamespaceException e) {
 			Logger.log(e);
 		}
-		
+
 	}
 
 	/**
@@ -217,11 +218,11 @@ public class NextProductStepTimer extends Timer {
 				equipletAgent.send(answer);
 
 				// TODO: delete below after testing
-//				ACLMessage test = new ACLMessage(ACLMessage.QUERY_IF);
-//				test.setConversationId(conversationId);
-//				test.addReceiver(equipletAgent.getAID());
-//				test.setOntology("StartStep");
-//				equipletAgent.send(test);
+				// ACLMessage test = new ACLMessage(ACLMessage.QUERY_IF);
+				// test.setConversationId(conversationId);
+				// test.addReceiver(equipletAgent.getAID());
+				// test.setOntology("StartStep");
+				// equipletAgent.send(test);
 			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(e);
 			}
