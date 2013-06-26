@@ -67,7 +67,10 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 	movePathService_json(),
 	moveToRelativePointService_json(),
 	moveRelativePathService_json(),
-	calibrateService_json(){
+	calibrateService_json(),
+	lastX(0),
+	lastY(0),
+	lastZ(-220){
 	ROS_INFO("DeltaRobotnode Constructor entering...");
 
 	ROS_INFO("Configuring Modbus...");
