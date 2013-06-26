@@ -75,7 +75,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 	mostDatabaseclient.clearModuleData();
 	mostDatabaseclient.setSafetyState(rexos_statemachine::STATE_SAFE);
 
-	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "test", "equipletStepBB");
+	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ1", "EquipletStepsBlackBoard");
 	equipletStepSubscription = new Blackboard::FieldUpdateSubscription("status", *this);
 	equipletStepSubscription->addOperation(Blackboard::SET);
 	equipletStepBlackboardClient->subscribe(*equipletStepSubscription);
@@ -148,8 +148,6 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 				    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
 				    prox->setInstruction(targetObjectId.toString(), step->getInstructionData().getJsonNode());
 
-				    equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"DONE\" } } ");
-
 	    		} else {
 	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"ERROR\" } } ");
 	    		}
@@ -177,7 +175,14 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 }
 
 void EquipletNode::onInstructionStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed){
-	//std::cout << "received dingen" << " id: " << id << " completed " << completed << std::endl;
+
+	mongo::OID targetObjectId(id);
+
+	if(completed)
+    	equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"DONE\" } } ");
+	else
+    	equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"ERROR\" } } ");		
+
 }
 
 std::string EquipletNode::getName() {

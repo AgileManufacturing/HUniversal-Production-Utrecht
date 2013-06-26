@@ -103,17 +103,11 @@ bool ModuleProxy::onModeChangeServiceCallback(ModeUpdateRequest &req, ModeUpdate
 }
 
 void ModuleProxy::onInstructionServiceCallback(const actionlib::SimpleClientGoalState& state, const rexos_statemachine::SetInstructionResultConstPtr& result){
-	
-	std::cout << "proxy heeft ontvangen: " << " id: " << result->OID << " state " << (state == actionlib::SimpleClientGoalState::SUCCEEDED) << std::endl;
 
 	if(state == actionlib::SimpleClientGoalState::SUCCEEDED)
-	{
 		moduleProxyListener->onInstructionStepCompleted(this, result->OID, true);
-	} 
 	else
-	{
 		moduleProxyListener->onInstructionStepCompleted(this, result->OID, false);
-	}
 }
 
 } /* namespace equiplet_node */
