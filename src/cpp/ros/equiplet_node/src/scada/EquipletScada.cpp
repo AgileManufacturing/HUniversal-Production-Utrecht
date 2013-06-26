@@ -66,7 +66,7 @@ int EquipletScada::mongooseBeginRequestCallback(mg_connection* connection) {
 	} else if (strcmp(request_info->uri, "/remote/moduleInfo") == 0) {
 		mongooseProcessModuleInfo(connection, request_info);
 	} else if (strcmp(request_info->uri, "/remote/changeModuleMode") == 0) {
-		mongooseProcessChangeModuleModi(connection, request_info);
+		mongooseProcessChangeModuleMode(connection, request_info);
 	} else if (strcmp(request_info->uri, "/remote/changeEquipletMode") == 0) {
 		mongooseProcessChangeEquipletMode(connection, request_info);
 	} else if (strcmp(request_info->uri, "/remote/changeEquipletState") == 0) {
@@ -80,7 +80,7 @@ int EquipletScada::mongooseBeginRequestCallback(mg_connection* connection) {
 	return 1;
 }
 
-void EquipletScada::mongooseProcessChangeModuleModi(mg_connection* conn, mg_request_info* request_info) {
+void EquipletScada::mongooseProcessChangeModuleMode(mg_connection* conn, mg_request_info* request_info) {
 	char moduleId[64], moduleModi[64];
 	const char* query = request_info->query_string;
 	const size_t query_len = strlen(query);

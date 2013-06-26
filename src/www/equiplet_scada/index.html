@@ -10,11 +10,11 @@
 	//Enable the equiplet mode buttons
 	$(document).ready(
 			function() {
-				$("#equiplet_critical_error").click(
+				$("#equiplet_e_stop").click(
 						function() {
 						$.ajax({
 							url : 'remote/changeEquipletMode',
-							data : { mode : 'critical_error'}
+							data : { mode : 'e_stop'}
 							});
 							return false;
 						});
@@ -141,6 +141,11 @@
 												url: "remote/changeModuleMode",
 												data: {id: req_id, mode: 'error'}
 											});
+
+											$.ajax({
+												url: "remote/changeModuleMode",
+												data: {id: req_id, mode: 'critical_error'}
+											});
 											return false;
 										});
 								
@@ -184,7 +189,7 @@
 					<td>Mode: </td>
 					<td><span class="equiplet_mode">...</span></td>
 					<td><input type="button" value="Normal" id="equiplet_normal"/></td>
-					<td><input type="button" value="Emergency Stop (critical error)" id="equiplet_critical_error"/></td>
+					<td><input type="button" value="Emergency Stop" id="equiplet_e_stop"/></td>
 					<td><input type="button" value="Service" id="equiplet_service"/></td>
 					<td><input type="button" value="Lock" id="equiplet_lock"/></td>
 				</tr>

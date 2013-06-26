@@ -20,7 +20,7 @@ private:
 	static int __mongooseBeginRequestCallback(mg_connection* connection);
 	int mongooseBeginRequestCallback(mg_connection* connection);
 
-	void mongooseProcessChangeModuleModi(mg_connection* conn, mg_request_info* request_info);
+	void mongooseProcessChangeModuleMode(mg_connection* conn, mg_request_info* request_info);
 	void mongooseProcessChangeEquipletMode(mg_connection* conn, mg_request_info* request_info);
 	void mongooseProcessChangeEquipletState(mg_connection* conn, mg_request_info* request_info);
 	void mongooseProcessEquipletInfo(mg_connection* conn, mg_request_info* request_info);

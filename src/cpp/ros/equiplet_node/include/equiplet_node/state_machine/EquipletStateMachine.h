@@ -1,14 +1,14 @@
 /**
- * @file DummyModuleNode.h
- * @brief A dummy module!
- * @date Created: 2013-03-13
+ * @file EquipletStateMachine.h
+ * @brief 
+ * @date Created: 2013-06-25
  *
- * @author Arjen van Zanten
- * @author Ammar Abdulamir
+ * @author Gerben Boot & Joris Vergeer
  *
  * @section LICENSE
  * License: newBSD
- * Copyright © 2013, HU University of Applied Sciences Utrecht.
+ *
+ * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,45 +28,62 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef DUMMYMODULENODE_H
-#define DUMMYMODULENODE_H
+#pragma once
 
-#include "ros/ros.h"
-#include "rexos_std_srvs/Module.h"
+#include <ros/ros.h>
 
-#include <rexos_utilities/Utilities.h>
-#include <rexos_statemachine/ModuleStateMachine.h>
+#include <string>
+#include <vector>
 
-// GCC system header to suppress libjson warnings
-#pragma GCC system_header
-#include <libjson/libjson.h>
-// ---------------------------------------------
+#include <rexos_statemachine/StateMachine.h>
+#include <rexos_statemachine/Listener.h>
 
-class DummyModuleNode : public rexos_statemachine::ModuleStateMachine{
+#include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
+#include <rexos_blackboard_cpp_client/BlackboardSubscriber.h>
+
+#include <equiplet_node/ModuleRegistry.h>
+#include <equiplet_node/ModuleProxy.h>
+
+#include <equiplet_node/scada/EquipletScada.h>
+
+namespace equiplet_node{
+
+class EquipletStateMachine : 
+	public rexos_statemachine::StateMachine, 
+	public rexos_statemachine::Listener,
+	ModuleRegistryListener {
+
 public:
-	DummyModuleNode(int equipletID, int moduleID,bool actor = false);
-	virtual ~DummyModuleNode();
+	EquipletStateMachine(std::string name, int id);
 
-	// services
-	bool outputJSON(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res);
+	virtual ~EquipletStateMachine();
+
+protected:
+	virtual void onStateChanged();
+	virtual void onModeChanged();
+
+	void onModuleStateChanged(ModuleProxy* moduleProxy,rexos_statemachine::State newState, rexos_statemachine::State previousState);
+
+	void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
 
 private:
+	bool allModulesInDesiredState(rexos_statemachine::State desiredState);
+
+	void changeModuleStates(rexos_statemachine::State desiredState);
+
 	virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
 	virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
 	virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
 	virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
-	
-	/**
-	 * @var std::string nodeName
-	 * The node's name.
-	 **/
-	 std::string nodeName;
 
-	/**
-	 * @var ros::ServiceServer outputJSON
-	 * Service for outputting coordinates
-	 **/
-	ros::ServiceServer outputJSONService;
+protected:
+	equiplet_node::ModuleRegistry moduleRegistry; 
+
+private:
+	rexos_statemachine::State desiredState;
+
+	boost::condition_variable condit;
+	boost::mutex mutexit;
 };
 
-#endif
+}

@@ -96,9 +96,9 @@ private:
 	void onTransitionStopAction(TransitionActionServer* as);
 
 protected:
-	void changeState(State desiredState,ChangeStateActionClient* changeStateActionClient = NULL);
+	void changeState(State desiredState);
 
-	void changeMode(Mode desiredMode,ChangeModeActionClient* changeModeActionClient = NULL);
+	void changeMode(Mode desiredMode);
 
 	/**
 	 *@var ros::NodeHandle nodeHandle;
@@ -182,12 +182,13 @@ private:
 		StatePair statePair;
 	};
 
-	typedef std::pair<StatePair, ChangeStateEntry> transitionMapEntry;
-	typedef std::map<StatePair, ChangeStateEntry> transitionMapType;
-	transitionMapType transitionMap;
+	typedef std::map<StatePair, ChangeStateEntry> TransitionMap;
+	TransitionMap transitionMap;
 
 	ChangeStateActionServer changeStateActionServer;
 	ChangeModeActionServer changeModeActionServer;
+	ChangeStateActionClient changeStateActionClient;
+	ChangeModeActionClient changeModeActionClient;
 
 	TransitionActionServer transitionSetupServer;
 	TransitionActionServer transitionShutdownServer;
