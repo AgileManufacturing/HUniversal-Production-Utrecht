@@ -3,7 +3,6 @@ string json
 string OID
 ---
 # Define the result
-bool succeed
 string OID
 ---
 # Define a feedback message

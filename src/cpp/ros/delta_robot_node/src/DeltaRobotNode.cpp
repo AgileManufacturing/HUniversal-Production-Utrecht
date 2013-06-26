@@ -131,7 +131,9 @@ deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode(){
 void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
 
 	JSONNode n = libjson::parse(goal->json);
-	std::string dsajfh = goal->OID;
+	rexos_statemachine::SetInstructionResult result_;
+
+	result_.OID = goal->OID;
 
     JSONNode::const_iterator i = n.begin();
 
@@ -141,14 +143,14 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 
 			if(moveToPoint(p.x, p.y, p.z, p.maxAcceleration)){
 				ROS_INFO("Moved to point");
-    			setInstructionActionServer.setSucceeded();
+    			setInstructionActionServer.setSucceeded(result_);
 			} else {
 				ROS_INFO("Failed moving to point");
-    			setInstructionActionServer.setAborted();
+    			setInstructionActionServer.setAborted(result_);
 			}
 			
     } else {
-    	setInstructionActionServer.setAborted();
+    	setInstructionActionServer.setAborted(result_);
     }
 }
 
