@@ -59,6 +59,7 @@ class OplogMonitorThread extends Thread {
 	
 	/**
 	 * Constructor of OplogMonitorThread.
+	 * @param mongo The Mongo database connection that should be used.
 	 * @param oplogDBName The database in which the oplog collection resides.
 	 * @param oplogCollectionName The name of the oplog collection.
 	 * @param query The query that will be used in the tailed cursor.
@@ -77,6 +78,7 @@ class OplogMonitorThread extends Thread {
 	 * Constructs a tailed cursor for the specified query on the oplog collection.
 	 * This constructor should be used when user authentication is required.
 	 * 
+	 * @param mongo The Mongo database connection that should be used.
 	 * @param oplogDBName The database in which the oplog collection resides.
 	 * @param oplogCollectionName The name of the oplog collection.
 	 * @param username Username that will be used to authenticate with the oplog database. This user should have read access.
