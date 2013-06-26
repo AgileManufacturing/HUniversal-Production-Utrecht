@@ -1,13 +1,3 @@
-package rexos.mas.logistics_agent.behaviours;
-
-import jade.core.Agent;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
-import rexos.libraries.log.Logger;
-import rexos.mas.behaviours.ReceiveBehaviour;
-import rexos.mas.data.Part;
-
 /**
  * @file rexos/mas/logistics_agent/behaviours/CancelTransportBehaviour.java
  * @brief Responds to message to cancel transport.
@@ -39,6 +29,16 @@ import rexos.mas.data.Part;
  * 
  **/
 
+package rexos.mas.logistics_agent.behaviours;
+
+import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import rexos.libraries.log.Logger;
+import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.Part;
+
+
 public class CancelTransportBehaviour extends ReceiveBehaviour {
 
 	/**
@@ -69,7 +69,9 @@ public class CancelTransportBehaviour extends ReceiveBehaviour {
 			
 			Part[]parts = (Part[]) message.getContentObject();
 			
-			//TODO: cancel the transport of the parts in parts			
+			//TODO: cancel the transport of the parts in parts[]	
+			
+			
 			
 		} catch (Exception e) {
 			

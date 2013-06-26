@@ -63,7 +63,7 @@ public class PenModule extends Module {
 	 * @var int PEN_OFFSET
 	 *      A static value that contains the offset of the pen in relation to the movement module.
 	 */
-	private static final int PEN_OFFSET = 20;
+	private static final int PEN_OFFSET = 40;
 
 	/**
 	 * @var double PEN_SIZE
@@ -108,7 +108,7 @@ public class PenModule extends Module {
 
 					// get the number of steps to perform and the x and y delta for each step.
 					int numberOfSteps = Math.max(1, (int) (lineLength / PEN_SIZE));
-					Position step = new Position(deltaX / numberOfSteps, deltaY / numberOfSteps, 0);
+					Position step = new Position(deltaX / numberOfSteps, deltaY / numberOfSteps);
 
 					// loop over all the steps and create them.
 					for(int i = 0; i <= numberOfSteps; i++) {
@@ -191,7 +191,7 @@ public class PenModule extends Module {
 
 		// get the position of the dot.
 		Position position = new Position((BasicDBObject) parameters.get("position"));
-		position.setZ(0);
+		position.setZ(0.0);
 
 		// create the new parameters
 		BasicDBObject dotParameters = new BasicDBObject("position", position.toBasicDBObject());
@@ -206,8 +206,8 @@ public class PenModule extends Module {
 		// get steps from the movementModule to move on the z axis.
 		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, dotParameters)));
 
-		// get steps from the movementModule to move to the safe movement plane.
-		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, dotParameters)));
+		// get steps from the movementModule to move to the safe movement plane(not needed).
+		//steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, dotParameters)));
 
 		// convert the ArrayList to an array and return it.
 		EquipletStep[] equipletSteps = new EquipletStep[steps.size()];

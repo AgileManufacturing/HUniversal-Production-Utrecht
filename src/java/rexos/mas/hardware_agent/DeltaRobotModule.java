@@ -100,6 +100,11 @@ public class DeltaRobotModule extends Module {
 	@Override
 	public EquipletStep[] fillPlaceHolders(EquipletStep[] steps, BasicDBObject parameters) {
 		// get the new position parameters from the parameters
+		double extraSize = 0;
+		if(parameters.containsField("extra_size")){
+			extraSize = parameters.getDouble("extra_size");
+		}
+		
 		Position position = new Position((BasicDBObject) parameters.get("position"));
 
 		// loop over the steps.
@@ -119,7 +124,7 @@ public class DeltaRobotModule extends Module {
 				payload.put("y", position.getY());
 			}
 			if(payload.containsField("z") && payload.getString("z").equals("Z-PLACEHOLDER")) {
-				payload.put("z", position.getZ());
+				payload.put("z", position.getZ() + extraSize);
 			}
 		}
 		// returns the filled in steps.
@@ -200,12 +205,12 @@ public class DeltaRobotModule extends Module {
 			}
 
 			// fill the payload parameters
-			if(position.getX() == -1) {
+			if(position.getX() == null) {
 				payload.put("x", "X-PLACEHOLDER");
 			} else {
 				payload.put("x", position.getX());
 			}
-			if(position.getY() == -1) {
+			if(position.getY() == null) {
 				payload.put("y", "Y-PLACEHOLDER");
 			} else {
 				payload.put("y", position.getY());
@@ -231,6 +236,10 @@ public class DeltaRobotModule extends Module {
 	 * @return EquipletStep to move on the z axis.
 	 */
 	private EquipletStep moveZ(BasicDBObject parameters) {
+		double extraSize = 0;
+		if(parameters.containsField("extraSize")) {
+			extraSize = parameters.getDouble("extraSize");
+		}
 		// set look up type
 		String lookUp = "NULL";
 
@@ -251,10 +260,10 @@ public class DeltaRobotModule extends Module {
 			}
 
 			// fill in the payload parameters.
-			if(position.getZ() == -1) {
+			if(position.getZ() == null) {
 				payload.put("z", "Z-PLACEHOLDER");
 			} else {
-				payload.put("z", position.getZ());
+				payload.put("z", position.getZ() + extraSize);
 			}
 			lookUp = "FIND_ID";
 		} else {
