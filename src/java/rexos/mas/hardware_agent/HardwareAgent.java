@@ -246,7 +246,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 								}
 							}
 						} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-							e.printStackTrace();
+							Logger.log(e);
 						}
 						
 						stateBBClient.unsubscribe(stateUpdateSubscription);
@@ -254,7 +254,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 						try {
 							stateBBClient.subscribe(stateUpdateSubscription);
 						} catch(InvalidDBNamespaceException e) {
-							e.printStackTrace();
+							Logger.log(e);
 						}
 					}
 				});
@@ -526,7 +526,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 								}
 							}
 						} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-							e.printStackTrace();
+							Logger.log(e);
 						}
 						break;
 					default:
