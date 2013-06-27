@@ -41,6 +41,7 @@ import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
@@ -96,7 +97,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 *      blackboard.
 	 */
 	private BlackboardClient serviceStepBBClient;
-	
+
 	/**
 	 * @var FieldUpdateSubscription statusSubscription
 	 *      The subscription object used to subscribe this agent on a blackboard
@@ -180,6 +181,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			// changes of any steps
 			productStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
+
 			statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 
@@ -252,31 +254,18 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					new BasicDBObject("productStepId", productStepId),
 					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
 							"statusData", new BasicDBObject("reason", reason))));
-			
-			
-			
-			try {
-				productStepBBClient = new BlackboardClient(dbData.getIp());
-				productStepBBClient.setDatabase(dbData.getName());
-				productStepBBClient.setCollection("ProductStepsBlackBoard");
-				
-				ProductStep productStep = new ProductStep((BasicDBObject)productStepBBClient.findDocumentById(productStepId));
-							
-				Part[]inputParts = productStep.getInputParts();
-				
-				ACLMessage message = new ACLMessage(ACLMessage.CANCEL);
-				message.setContentObject(inputParts);
-				message.addReceiver(logisticsAID);
-				message.setOntology("CancelTransport");
-				send(message);
-				
-			} catch (Exception e) {
-				Logger.log(e);
-			}
-			
-			
-			
-		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+
+			// Cancel parts ordered at LA
+			ProductStep productStep =
+					new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(productStepId));
+			Part[] inputParts = productStep.getInputParts();
+
+			ACLMessage message = new ACLMessage(ACLMessage.CANCEL);
+			message.setContentObject(inputParts);
+			message.addReceiver(logisticsAID);
+			message.setOntology("CancelTransport");
+			send(message);
+		} catch(InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 			Logger.log(e);
 		}
 	}
@@ -399,7 +388,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 														"statusData",
 														new BasicDBObject("reason", serviceStep.getStatusData().get(
 																"reason")).append("log", buildLog(productStepId)))));
-										serviceStepBBClient.removeDocuments(new BasicDBObject("_id", productStepId));
+										serviceStepBBClient.removeDocuments(new BasicDBObject("productStepId", productStepId));
 									}
 									break;
 								case DONE:

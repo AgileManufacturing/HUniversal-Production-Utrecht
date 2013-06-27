@@ -204,6 +204,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 *      The dbData of the equipletAgent.
 	 */
 	private DbData dbData;
+	
+	/**
+	 * 
+	 */
+	private int equipletId;
 
 	/**
 	 * Setup function for the equipletAgent. Configures the IP and database name
@@ -255,6 +260,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 			//TODO register this equiplet on the knowledge db and add the equipletId to the arguments for the SA
 			// creates his service agent.
+			
+			
+			
 			Object[] arguments = new Object[] {
 					dbData, getAID(), logisticsAgent, 1
 			};
@@ -263,11 +271,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 							"rexos.mas.service_agent.ServiceAgent", arguments);
 			serviceAgentCnt.start();
 			serviceAgent = new AID(serviceAgentCnt.getName(), AID.ISGUID);
-
-			// makes connection with the collective blackboard.
-			collectiveBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
-			collectiveBBClient.setDatabase(collectiveDbName);
-			collectiveBBClient.setCollection(equipletDirectoryName);
 
 			// makes connection with the equiplet blackboard.
 			productStepBBClient = new BlackboardClient(equipletDbIp, equipletDbPort);
@@ -283,6 +286,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 			// gets the timedata for synchronizing from the collective
 			// blackboard.
+			// makes connection with the collective blackboard.
+			collectiveBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
+			collectiveBBClient.setDatabase(collectiveDbName);
+
 			collectiveBBClient.setCollection(timeDataName);
 			BasicDBObject timeData = (BasicDBObject) collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
 
@@ -341,7 +348,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		send(deadMessage);
 	}
 
-	public void cancelAllStepsForProductStep(ObjectId productStepId, String reason) {
+	public void cancelProductStep(ObjectId productStepId, String reason) {
 		try {
 			productStepBBClient.updateDocuments(
 					new BasicDBObject("_id", productStepId),
@@ -449,13 +456,47 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					Logger.log("Equiplet agent - sending message %s%n",
 							ACLMessage.getPerformative(responseMessage.getPerformative()));
 					send(responseMessage);
-				} catch(Exception e1) {
-					Logger.log(e1);
-				}
-				break;
-			default:
-				break;
+					break;
+				case "equipletState":
+					EquipletStateEntry stateEntry =
+							new EquipletStateEntry((BasicDBObject) stateBBClient.findDocumentById(entry
+									.getTargetObjectId()));
+					Logger.log("Equiplet agent - mode changed to %s%n", stateEntry.getEquipletMode());
+					switch(stateEntry.getEquipletMode()) {
+					// TODO handle error stuff
+						case ERROR:
+							break;
+						case CRITICAL_ERROR:
+							break;
+						case EMERGENCY_STOP:
+							break;
+						case LOCK:
+							break;
+						default:
+							break;
+					}
+					break;
+				default:
+					Logger.log("Equiplet agent - onMessage Unknown database");
+					break;
+			}
+		} catch(GeneralMongoException | InvalidDBNamespaceException | IOException e) {
+			// TODO handle error
+			Logger.log(e);
 		}
+	}
+
+	public EquipletStateEntry getEquipletStateEntry() throws InvalidDBNamespaceException, GeneralMongoException {
+		List<DBObject> equipletStates = stateBBClient.findDocuments(new BasicDBObject("id", equipletId));
+		return new EquipletStateEntry((BasicDBObject) equipletStates.get(0));
+	}
+
+	public void setDesiredEquipletState(EquipletState state) throws InvalidDBNamespaceException, GeneralMongoException {
+		// desiredStateBBClient.updateDocuments(new BasicDBObject("id", equipletId), new BasicDBObject("$set", new
+		// BasicDBObject(
+		// "desiredState", state.getValue())));
+		desiredStateBBClient.updateDocuments(new BasicDBObject("name", getLocalName()), new BasicDBObject("$set",
+				new BasicDBObject("desiredState", state.getValue())));
 	}
 
 	/**
