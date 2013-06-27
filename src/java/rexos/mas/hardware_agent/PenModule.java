@@ -63,13 +63,13 @@ public class PenModule extends Module {
 	 * @var int PEN_OFFSET
 	 *      A static value that contains the offset of the pen in relation to the movement module.
 	 */
-	private static final int PEN_OFFSET = 30;
+	private static final int PEN_OFFSET = 0;
 
 	/**
 	 * @var double PEN_SIZE
 	 *      A static value that contains the size of the pen in centimeters.
 	 */
-	private static final double PEN_SIZE = 5.0;
+	private static final double PEN_SIZE = 0.4;
 
 	/**
 	 * @var Module movementModule
@@ -115,7 +115,14 @@ public class PenModule extends Module {
 						steps.addAll(Arrays.asList(getStepsForDot(new BasicDBObject("position", startPosition
 								.toBasicDBObject()))));
 						startPosition.translate(step);
-					}
+					}// get the position of the dot.
+					Position position = new Position();
+					position.setZ(0.0);
+
+					// create the new parameters
+					BasicDBObject saveParameters = new BasicDBObject("position", position.toBasicDBObject());
+					saveParameters.put("extraSize", PEN_OFFSET);
+					steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, saveParameters)));
 				}
 
 				// convert the ArrayList to an array and return it.

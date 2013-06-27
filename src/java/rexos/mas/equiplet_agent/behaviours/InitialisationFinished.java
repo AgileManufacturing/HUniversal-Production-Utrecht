@@ -144,6 +144,9 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 
 			// starts the behaviour for receiving messages with the Ontology StartStep.
 			equipletAgent.addBehaviour(new StartStep(equipletAgent));
+			
+			// starts a behaviour which listens to the response of this question.
+			equipletAgent.addBehaviour(new CanDoProductionStepResponse(equipletAgent, equipletAgent.getProductStepBBClient()));
 		} else {
 			Logger.log(equipletAgent.getName() + " - InitialisationFinished timeout!");
 			equipletAgent.doDelete();
