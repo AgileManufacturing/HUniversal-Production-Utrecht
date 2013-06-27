@@ -58,7 +58,6 @@ import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 import java.io.IOException;
-import java.io.ObjectInputStream.GetField;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -199,7 +198,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 *      Table with the combinations conversationID and ObjectId.
 	 */
 	private HashMap<String, ObjectId> communicationTable;
-	
+
 	private ArrayList<Behaviour> behaviours;
 
 	/**
@@ -241,8 +240,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			Logger.log("I spawned as a equiplet agent.");
 			// gets his IP and sets the equiplet blackboard IP.
 			InetAddress IP = InetAddress.getLocalHost();
-			equipletDbIp = IP.getHostAddress();
-			// equipletDbIp = "145.89.191.131";
+			// equipletDbIp = IP.getHostAddress();
+			equipletDbIp = "145.89.191.131";
 
 			equipletDbName = getAID().getLocalName();
 			communicationTable = new HashMap<String, ObjectId>();
@@ -293,7 +292,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 			desiredStateBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
 			desiredStateBBClient.setDatabase("StateBlackboard");
-			desiredStateBBClient.setCollection("EquipletCommands");
+			desiredStateBBClient.setCollection("equipletCommands");
 
 			// makes connection with the collective blackboard.
 			collectiveBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
@@ -362,7 +361,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			for(Behaviour behaviour : behaviours) {
 				removeBehaviour(behaviour);
 			}
-			
+
 			productStepBBClient.updateDocuments(
 					new BasicDBObject("_id", productStepId),
 					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
@@ -503,24 +502,26 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	}
 
 	public EquipletStateEntry getEquipletStateEntry() throws InvalidDBNamespaceException, GeneralMongoException {
-		List<DBObject> equipletStates = stateBBClient.findDocuments(new BasicDBObject("id", equipletId));
+		// List<DBObject> equipletStates = stateBBClient.findDocuments(new BasicDBObject("id", equipletId));
+		List<DBObject> equipletStates = stateBBClient.findDocuments(new BasicDBObject());
 		return new EquipletStateEntry((BasicDBObject) equipletStates.get(0));
 	}
 
 	public void setDesiredEquipletState(EquipletState state) throws InvalidDBNamespaceException, GeneralMongoException {
-		// desiredStateBBClient.updateDocuments(new BasicDBObject("id", equipletId), new BasicDBObject("$set", new
-		// BasicDBObject(
-		// "desiredState", state.getValue())));
-		desiredStateBBClient.updateDocuments(new BasicDBObject("name", getLocalName()), new BasicDBObject("$set",
-				new BasicDBObject("desiredState", state.getValue())));
+		// desiredStateBBClient.updateDocuments(new BasicDBObject("id", equipletId), new BasicDBObject("$set",
+		// new BasicDBObject("desiredState", state.getValue())));
+		desiredStateBBClient.updateDocuments(new BasicDBObject(), new BasicDBObject("$set", new BasicDBObject(
+				"desiredState", state.getValue())));
+		// desiredStateBBClient.updateDocuments(new BasicDBObject("name", getLocalName()), new BasicDBObject("$set",
+		// new BasicDBObject("desiredState", state.getValue())));
 	}
-	
+
 	@Override
 	public void addBehaviour(Behaviour behaviour) {
 		super.addBehaviour(behaviour);
 		behaviours.add(behaviour);
 	}
-	
+
 	@Override
 	public void removeBehaviour(Behaviour behaviour) {
 		super.removeBehaviour(behaviour);

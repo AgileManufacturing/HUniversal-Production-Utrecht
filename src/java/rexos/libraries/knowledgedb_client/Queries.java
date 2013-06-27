@@ -327,11 +327,9 @@ public class Queries {
      * Expects a string parameter corrosonding to the jade_address
      */
     public static final String SELECT_EQUIPLET_ID = "SELECT " + 
-    		"	equiplets.id" +
-    		"	FROM" + 
-    		"	rexos_knowledge_base_equiplets" + 
-    		"	WHERE" + 
-    		"	jade_address =  (?)";
+    		"equiplets.id " +
+    		"FROM equiplets " + 
+    		"WHERE jade_address = (?);";
     /**
      * A private constructor preventing this class to be constructed.
      **/
