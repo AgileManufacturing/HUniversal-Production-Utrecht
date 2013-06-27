@@ -48,6 +48,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.bson.types.ObjectId;
 
@@ -143,7 +144,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 */
 	private HashMap<String, Service> convIdServiceMapping;
 	private HashMap<String, ObjectId> convIdProductStepIdMapping;
-	
+
 	private ArrayList<Behaviour> behaviours;
 
 	/**
@@ -153,7 +154,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	@Override
 	public void setup() {
 		Logger.log("I spawned as a service agent.");
-		
+
 		// handle arguments given to this agent
 		Object[] args = getArguments();
 		DbData dbData = (DbData) args[0];
@@ -179,7 +180,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			// create blackboard clients, configure them and subscribe to status changes of any steps
 			productStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
-			
+
 			statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 
@@ -258,7 +259,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			for(Behaviour behaviour : behaviours) {
 				removeBehaviour(behaviour);
 			}
-			
+
+			removeConvIdServiceMapping(getConvIdforProductStepId(productStepId));
+			removeAllMappingsForProductStepId(productStepId);
+
 			serviceStepBBClient.updateDocuments(
 					new BasicDBObject("productStepId", productStepId),
 					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
@@ -465,19 +469,19 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		}
 		return log;
 	}
-	
+
 	@Override
 	public void addBehaviour(Behaviour behaviour) {
 		super.addBehaviour(behaviour);
 		behaviours.add(behaviour);
 	}
-	
+
 	@Override
 	public void removeBehaviour(Behaviour behaviour) {
 		super.removeBehaviour(behaviour);
 		behaviours.remove(behaviour);
 	}
-	
+
 	public void mapConvIdWithProductStepId(String conversationId, ObjectId productStepId) {
 		convIdProductStepIdMapping.put(conversationId, productStepId);
 	}
@@ -486,17 +490,32 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		return convIdProductStepIdMapping.get(conversationId);
 	}
 
+	public String getConvIdforProductStepId(ObjectId productStepId) {
+		for(Entry<String, ObjectId> mapping : convIdProductStepIdMapping.entrySet()) {
+			if(productStepId.equals(mapping.getValue())) {
+				return mapping.getKey();
+			}
+		}
+		return null;
+	}
+
 	public void removeConvIdProductStepIdMapping(String conversationId) {
 		convIdProductStepIdMapping.remove(conversationId);
 	}
 
+	public void removeAllMappingsForProductStepId(ObjectId productStepId) {
+		for(Entry<String, ObjectId> mapping : convIdProductStepIdMapping.entrySet()) {
+			if(productStepId.equals(mapping.getValue())) {
+				convIdProductStepIdMapping.remove(mapping.getKey());
+			}
+		}
+	}
+
 	/**
-	 * Maps the specified conversation id with the specified service object.
-	 * Once a service object has been created (by the service factory) it's
-	 * mapped with the conversation id of the scheduling negotiation of the
-	 * corresponding product step. With this mapping behaviours that do not have
-	 * a reference to a service object can still get one with
-	 * GetServiceForConvId.
+	 * Maps the specified conversation id with the specified service object. Once a service object has been created (by
+	 * the service factory) it's mapped with the conversation id of the scheduling negotiation of the corresponding
+	 * product step. With this mapping behaviours that do not have a reference to a service object can still get one
+	 * with GetServiceForConvId.
 	 * 
 	 * @param conversationId the conversation id to map the service with.
 	 * @param service the service object that the conversation id will be mapped with.
