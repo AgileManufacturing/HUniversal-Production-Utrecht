@@ -113,7 +113,13 @@ mongo::Query OplogMonitor::createOplogQuery()
 
 void OplogMonitor::run()
 {
+	// An incoming interrupt during getScopedDbConnection seems to be causing a segmentation fault.
+	// This causes problems when a user rapidly adds multiple subscriptions to a client.
+	// Tested with driver version 2.4.2.
+	boost::this_thread::disable_interruption di;
 	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
+	boost::this_thread::restore_interruption ri(di);
+
 	mongo::Query query = createOplogQuery();
 
 	unsigned long long skipCount = (*connection)->count(oplogNamespace, query.obj);
