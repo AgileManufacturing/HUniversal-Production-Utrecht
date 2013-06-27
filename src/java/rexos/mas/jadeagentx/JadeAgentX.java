@@ -146,7 +146,7 @@ public class JadeAgentX extends Agent {
 			//int High = 30;
 			//int R = (generator2.nextInt(High-Low) + Low);
 			
-			for(int i = 0; i < 500; i++) {
+			for(int i = 0; i < 2; i++) {
 				BasicDBObject parameters = new BasicDBObject();
 				Position pos = new Position((Math.random() * 60.0 -30.0), (Math.random() * 60.0 -30.0));
 				parameters.append("startPosition", pos.toBasicDBObject());
