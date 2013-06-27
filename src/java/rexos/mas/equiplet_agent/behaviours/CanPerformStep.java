@@ -150,9 +150,6 @@ public class CanPerformStep extends ReceiveBehaviour {
 			responseMessage.setOntology("CanDoProductionStep");
 			responseMessage.setContentObject(productStepEntryId);
 			equipletAgent.send(responseMessage);
-
-			// starts a behaviour which listens to the response of this question.
-			equipletAgent.addBehaviour(new CanDoProductionStepResponse(equipletAgent, equipletBBClient));
 		} catch(IOException | InvalidDBNamespaceException | GeneralMongoException | NullPointerException e) {
 			Logger.log(e);
 			ACLMessage reply = message.createReply();

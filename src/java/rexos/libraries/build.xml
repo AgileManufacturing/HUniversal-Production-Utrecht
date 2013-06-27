@@ -2,10 +2,10 @@
 	
 	<import file="../build.xml"/>
 
-	<target name="all" depends="blackboard_client, knowledgedb_client, dynamicloader, log"> 
+	<target name="all" depends="blackboard_client, knowledgedb_client"> 
 	</target>
 
-	<target name="blackboard_client">
+	<target name="blackboard_client" depends="log">
 		<ant antfile="build.xml" target="build" dir="blackboard_client" inheritRefs="true" useNativeBasedir="true"/>  
 	</target>
 
@@ -13,19 +13,14 @@
 		<ant antfile="build.xml" target="build" dir="knowledgedb_client" inheritRefs="true" useNativeBasedir="true"/>  
 	</target>
 	
-	<target name="dynamicloader">
-	    <ant antfile="build.xml" target="build" dir="dynamicloader"	inheritRefs="true" useNativeBasedir="true" />
-	</target>
-
 	<target name="log">
 		<ant antfile="build.xml" target="build" dir="log" inheritRefs="true" useNativeBasedir="true"/>  
 	</target>
 
 	<target name="clean">
 		<ant antfile="build.xml" target="clean" dir="blackboard_client" inheritRefs="true" useNativeBasedir="true"/> 
-		<ant antfile="build.xml" target="clean" dir="knowledgedb_client" inheritRefs="true" useNativeBasedir="true"/>  
-		<ant antfile="build.xml" target="clean" dir="dynamicloader" inheritsRefs="true" useNativeBasedir="true"/> 
-		<ant antfile="build.xml" target="clean" dir="log" inheritsRefs="true" useNativeBasedir="true"/> 
+		<ant antfile="build.xml" target="clean" dir="knowledgedb_client" inheritRefs="true" useNativeBasedir="true"/>
+		<ant antfile="build.xml" target="clean" dir="log" inheritRefs="true" useNativeBasedir="true"/> 
 	</target>
 
 </project>

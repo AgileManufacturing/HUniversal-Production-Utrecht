@@ -55,6 +55,7 @@ import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.log.Logger;
@@ -135,17 +136,32 @@ public class JadeAgentX extends Agent {
 			 * product, consists of multiple steps
 			 */
 			ArrayList<ProductionStep> stepList = new ArrayList<>();
-			stepList.add(stp1);
-			stepList.add(stp2);
-			stepList.add(stp3);
-			stepList.add(stp4);
-
+			//stepList.add(stp1);
+			//stepList.add(stp2);
+			//stepList.add(stp3);
+			//stepList.add(stp4);
+			//Random generator2 = new Random( );
+			
+			//int Low = -30;
+			//int High = 30;
+			//int R = (generator2.nextInt(High-Low) + Low);
+			
+			for(int i = 0; i < 2; i++) {
+				BasicDBObject parameters = new BasicDBObject();
+				Position pos = new Position((Math.random() * 60.0 -30.0), (Math.random() * 60.0 -30.0));
+				parameters.append("startPosition", pos.toBasicDBObject());
+				parameters.append("endPosition", pos.toBasicDBObject());
+				ProductionStep stp = new ProductionStep(i, 3, parameters);
+				stepList.add(stp);
+			}
+			
+			
 			Production production = new Production(stepList);
 			Product product = new Product(production);
 
 			Callback callback = new Callback();
-			callback.setHost("127.0.0.1");
-			callback.setPort(1233);
+			callback.setHost("145.89.84.156");
+			callback.setPort(21);
 			
 			ProductAgentProperties pap = new ProductAgentProperties();
 			pap.setCallback(callback);

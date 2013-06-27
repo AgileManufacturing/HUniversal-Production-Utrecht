@@ -40,7 +40,7 @@ import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
-import rexos.mas.behaviours.ReceiveOnceBehaviour;
+import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ProductStep;
 import rexos.mas.equiplet_agent.EquipletAgent;
 
@@ -51,7 +51,7 @@ import com.mongodb.BasicDBObject;
  * Sends a message to the product agent with the ontology: "CanPerformStep",
  * and an <code>ACLMessage.CONFIRM</code> or an <code>ACLMessage.DISCONFIRM</code>.
  */
-public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
+public class CanDoProductionStepResponse extends ReceiveBehaviour {
 	/**
 	 * @var static final long serialVersionUID
 	 *      The serial version UID for this class
@@ -87,7 +87,7 @@ public class CanDoProductionStepResponse extends ReceiveOnceBehaviour {
 	 */
 	public CanDoProductionStepResponse(Agent a,
 			BlackboardClient equipletBBClient) {
-		super(a, 5000, messageTemplate);
+		super(a, messageTemplate);
 		equipletAgent = (EquipletAgent) a;
 		this.equipletBBClient = equipletBBClient;
 	}
