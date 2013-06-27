@@ -22,7 +22,7 @@ import jade.core.behaviours.WakerBehaviour;
  * @author Mike
  *
  */
-public class HeartBeartBehaviour extends WakerBehaviour {
+public class HeartBeatBehaviour extends WakerBehaviour {
 
 	private HeartbeatReceiver _hr;
 	private boolean heartbeatSent = false;
@@ -36,7 +36,7 @@ public class HeartBeartBehaviour extends WakerBehaviour {
 	 * @param a
 	 * @param period
 	 */
-	public HeartBeartBehaviour(Agent a, long period, HeartbeatReceiver hr) {
+	public HeartBeatBehaviour(Agent a, long period, HeartbeatReceiver hr) {
 		super(a, period);
 		_hr = hr;
 		// TODO Auto-generated constructor stub
@@ -49,6 +49,7 @@ public class HeartBeartBehaviour extends WakerBehaviour {
 
 	@Override
 	protected void onWake() {
+		try{
 		if(heartbeatSent && ackReceived) {
 			heartbeatSent = false;
 			ackReceived = false;
@@ -59,9 +60,13 @@ public class HeartBeartBehaviour extends WakerBehaviour {
 		}
 		else {
 			_hr.initHeartbeat();
+			heartbeatSent = true;
+		}
+		} catch(Exception e) {
+			
 		}
 		this.reset(TimeUnit.SECONDS.toMillis(HEARTBEAT_INTERVAL));
-		heartbeatSent = true;
+		
 	}
 	
 	

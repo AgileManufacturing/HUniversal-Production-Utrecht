@@ -60,7 +60,7 @@ public class DeltaRobotModule extends Module {
 	 * @var double SAFE_MOVEMENT_PLANE
 	 *      A static value that contains the height of the safe movement plane.
 	 */
-	private static final double SAFE_MOVEMENT_PLANE = 30;
+	private static final double SAFE_MOVEMENT_PLANE = 15;
 	
 	/**
 	 * @var double MAX_ACCELERATION
@@ -183,7 +183,7 @@ public class DeltaRobotModule extends Module {
 		// create an EquipletStep and return it.
 		EquipletStep step =
 				new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(),
-						new TimeData(10));
+						new TimeData(5));
 		return step;
 	}
 
@@ -236,7 +236,7 @@ public class DeltaRobotModule extends Module {
 
 		// create the EquipletStep and return it.
 		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(),
-				new TimeData(10));
+				new TimeData(7));
 	}
 
 	/**
@@ -285,7 +285,7 @@ public class DeltaRobotModule extends Module {
 		InstructionData instructionData = new InstructionData("move", "deltarobot", lookUp, lookUpParameters, payload);
 		// create the EquipletStep and return it.
 		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(),
-				new TimeData(10));
+				new TimeData(5));
 	}
 
 }
