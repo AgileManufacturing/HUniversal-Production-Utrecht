@@ -326,9 +326,12 @@ public class Queries {
      * SQL statement to insert a equiplet in the database. 
      * Expects a string parameter corrosonding to the jade_address
      */
-    public static final String INSERT_EQUIPLET = "INSERT INTO " + 
-    		"	equiplets(jade_address)" +
-    		"	VALUES((?))";
+    public static final String SELECT_EQUIPLET_ID = "SELECT " + 
+    		"	equiplets.id" +
+    		"	FROM" + 
+    		"	rexos_knowledge_base_equiplets" + 
+    		"	WHERE" + 
+    		"	jade_address =  (?)";
     /**
      * A private constructor preventing this class to be constructed.
      **/
