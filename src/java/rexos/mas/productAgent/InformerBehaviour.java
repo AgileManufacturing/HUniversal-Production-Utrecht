@@ -147,8 +147,9 @@ public class InformerBehaviour extends Behaviour {
 					System.out.println("Not done informing.");
 					_isError = true;
 				}
+				block();
 			}
-		});
+		}); 
 		myAgent.addBehaviour(_seqBehaviour);
 	}
 
@@ -243,7 +244,7 @@ public class InformerBehaviour extends Behaviour {
 				}
 			});
 			// 2 - wait for an response. ( handles a 10 sec timeout )
-			addSubBehaviour(new ReceiveBehaviour(myAgent, 1000000, msgtemplate) {
+			addSubBehaviour(new ReceiveBehaviour(myAgent, -1, msgtemplate) {
 				/**
 				 * 
 				 */
@@ -252,21 +253,10 @@ public class InformerBehaviour extends Behaviour {
 				@Override
 				public void handle(ACLMessage msg) {
 					if (msg == null) {
-						if (debug) {
-							System.out.println("Productagent "
-									+ myAgent.getLocalName()
-									+ " TIMED OUT on waiting for "
-									+ _aid.getLocalName() + " CanPerformStep: "
-									+ _productionStep.getId());
-						}
+
 					} else {
 						if (msg.getPerformative() == ACLMessage.CONFIRM) {
-							if (debug) {
-								System.out.println("Received CONFIRM from: "
-										+ _aid.getLocalName()
-										+ ". He can perform step: "
-										+ _productionStep.getId());
-							}
+
 							// 3 - if the response was a CONFIRM, ask about the
 							// duration.
 							addSubBehaviour(new OneShotBehaviour() {
@@ -285,14 +275,7 @@ public class InformerBehaviour extends Behaviour {
 										message.setOntology("GetProductionDuration");
 										message.setContentObject(_productionStep);
 										_productAgent.send(message);
-										if (debug) {
-											System.out
-													.println("Querying: "
-															+ _aid.getLocalName()
-															+ " how long it would take to perform: "
-															+ _productionStep
-																	.getId());
-										}
+
 									} catch (Exception e) {
 										Logger.log(e);
 									}
@@ -301,7 +284,7 @@ public class InformerBehaviour extends Behaviour {
 							// 4- waits for the response ( handles a 10 sec
 							// timeout ).
 							addSubBehaviour(new ReceiveBehaviour(myAgent,
-									1000000, msgtemplate) {
+									-1, msgtemplate) {
 								/**
 										 * 
 										 */
@@ -310,33 +293,13 @@ public class InformerBehaviour extends Behaviour {
 								@Override
 								public void handle(ACLMessage msg) {
 									if (msg == null) {
-										if (debug) {
-											System.out
-													.println("Productagent "
-															+ myAgent
-																	.getLocalName()
-															+ " TIMED OUT on waiting for "
-															+ _aid.getLocalName()
-															+ " GetProductionDurationStep "
-															+ _productionStep
-																	.getId());
-										}
+
 									} else {
 										try {
 											if (msg.getPerformative() == ACLMessage.INFORM) {
 												long timeSlots = (Long) msg
 														.getContentObject();
-												if (debug) {
-													System.out
-															.println("Received INFORM from: "
-																	+ _aid.getLocalName()
-																	+ ". It can perform step: "
-																	+ _productionStep
-																			.getId()
-																	+ ". This step will take "
-																	+ timeSlots
-																	+ " timeslots.");
-												}
+
 												// Adds the equiplet to the
 												// production step in
 												// the mapper list.
@@ -356,12 +319,7 @@ public class InformerBehaviour extends Behaviour {
 								}
 							});
 						} else {
-							if (debug) {
-								System.out.println("Received DISCONFIRM from: "
-										+ _aid.getLocalName()
-										+ ". It cant perform step: "
-										+ _productionStep.getId());
-							}
+
 						}
 					}
 				}

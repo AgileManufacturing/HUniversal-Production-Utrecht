@@ -42,6 +42,7 @@ package rexos.mas.productAgent;
 
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.WakerBehaviour;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -57,7 +58,8 @@ import com.google.gson.Gson;
 import rexos.mas.data.Callback;
 import rexos.mas.data.GUIMessage;
 
-public class SocketBehaviour extends Behaviour implements HeartbeatReceiver {
+public class SocketBehaviour extends WakerBehaviour implements
+		HeartbeatReceiver {
 	/**
 	 * 
 	 */
@@ -66,7 +68,7 @@ public class SocketBehaviour extends Behaviour implements HeartbeatReceiver {
 	private PrintWriter outputStream = null;
 	private BufferedReader inputStream = null;
 	private boolean isConnected = false;
-	private HeartBeartBehaviour _hbb;
+	private HeartBeatBehaviour _hbb;
 	private Agent _agent;
 	private Gson _gsonParser;
 
@@ -75,29 +77,25 @@ public class SocketBehaviour extends Behaviour implements HeartbeatReceiver {
 	private Callback _callback;
 
 	public SocketBehaviour(Agent a, Callback callback) {
+		super(a, 4500);
 		try {
 			_agent = a;
 			_callback = callback;
-			_hbb = new HeartBeartBehaviour(a, 0, this);
+			//_hbb = hbb;//new HeartBeatBehaviour(a, 5000, this);
 			_gsonParser = new Gson();
-			a.addBehaviour(_hbb);
+			
+			 //a.addBehaviour(_hbb);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
-	@Override
-	public boolean done() {
-		return this._stopBehaviour;
+	
+	public void setHeartBeatBehaviour(HeartBeatBehaviour hbb) {
+		this._hbb = hbb;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jade.core.behaviours.Behaviour#action()
-	 */
 	@Override
-	public void action() {
+	protected void onWake() {
 		try {
 			if (!isConnected) {
 				connect();
@@ -111,14 +109,15 @@ public class SocketBehaviour extends Behaviour implements HeartbeatReceiver {
 			}
 		} catch (Exception e) {
 			isConnected = false;
-			// System.out.println("Agent: " + _agent.getLocalName()
-			// + " is disconnected!");
 		}
+		this.reset(4500);
 	}
 
 	public void write(String msg) {
 		try {
-			outputStream.println(msg);
+			if (isConnected) {
+				outputStream.println(msg);
+			}
 		} catch (Exception e) {
 			isConnected = false;
 		}
@@ -126,11 +125,13 @@ public class SocketBehaviour extends Behaviour implements HeartbeatReceiver {
 
 	public void write(boolean error, String msg, String payload) {
 		try {
-			GUIMessage guiMsg = new GUIMessage();
-			guiMsg.setError(error);
-			guiMsg.setMessage(msg);
-			guiMsg.setPayload(payload);
-			write(guiMsg);
+			if (isConnected) {
+				GUIMessage guiMsg = new GUIMessage();
+				guiMsg.setError(error);
+				guiMsg.setMessage(msg);
+				guiMsg.setPayload(payload);
+				write(guiMsg);
+			}
 		} catch (Exception e) {
 			isConnected = false;
 		}
@@ -138,9 +139,11 @@ public class SocketBehaviour extends Behaviour implements HeartbeatReceiver {
 
 	public void write(GUIMessage guiMsg) {
 		try {
-			String output = "";
-			output = _gsonParser.toJson(guiMsg, GUIMessage.class);
-			outputStream.println(output);
+			if (isConnected) {
+				String output = "";
+				output = _gsonParser.toJson(guiMsg, GUIMessage.class);
+				outputStream.println(output);
+			}
 		} catch (Exception e) {
 			isConnected = false;
 		}
@@ -185,13 +188,13 @@ public class SocketBehaviour extends Behaviour implements HeartbeatReceiver {
 			this.isConnected = false;
 			this.resetConnection();
 		} catch (Exception e) {
-			//System.out.println("Error when resetting the connection");
+			// System.out.println("Error when resetting the connection");
 		}
 	}
 
 	public void resetConnection() throws IOException {
 		this.socket.close();
-		this.connect();
+		//this.connect();
 	}
 
 	public void stop() {

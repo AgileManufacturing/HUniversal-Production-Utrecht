@@ -57,6 +57,7 @@ public class OverviewBehaviour extends Behaviour implements
 	private SchedulerBehaviour _schedulerBehaviour;
 	private ProduceBehaviour _produceBehaviour;
 	private SocketBehaviour _socketBehaviour;
+	private HeartBeatBehaviour _heartBeatBehaviour;
 
 	private ParallelBehaviour _parallelBehaviour;
 	private SequentialBehaviour _sequentialBehaviour;
@@ -75,9 +76,14 @@ public class OverviewBehaviour extends Behaviour implements
 
 	private void initialize() {
 
+
+		
 		System.out.println("Creating the SocketBehaviour");
 		_socketBehaviour = new SocketBehaviour(myAgent, _productAgent
 				.getProperties().getCallback());
+		
+		_heartBeatBehaviour = new HeartBeatBehaviour(myAgent, 5000, _socketBehaviour);
+		_socketBehaviour.setHeartBeatBehaviour(_heartBeatBehaviour);
 
 		System.out.println("Creating the PlannerBehaviour");
 		_plannerBehaviour = new PlannerBehaviour(myAgent, this);
@@ -92,7 +98,7 @@ public class OverviewBehaviour extends Behaviour implements
 		_produceBehaviour = new ProduceBehaviour(myAgent, this);
 
 		System.out.println("Creating the ParallelBehaviour");
-		_parallelBehaviour = new ParallelBehaviour();
+		_parallelBehaviour = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 
 		System.out.println("Creating the SequentialBehaviour");
 		_sequentialBehaviour = new SequentialBehaviour();
@@ -107,6 +113,7 @@ public class OverviewBehaviour extends Behaviour implements
 		System.out
 				.println("Adding the SocketBehaviour to the ParallelBehaviour");
 		_parallelBehaviour.addSubBehaviour(_socketBehaviour);
+		_parallelBehaviour.addSubBehaviour(_heartBeatBehaviour);
 	}
 
 	/*
@@ -160,24 +167,28 @@ public class OverviewBehaviour extends Behaviour implements
 		_productAgent.setStatus(AgentStatus.PLANNING);
 		System.out.println("Add a PlannerBehaviour");
 		myAgent.addBehaviour(_plannerBehaviour);
+		//_parallelBehaviour.addSubBehaviour(_plannerBehaviour);
 	}
 
 	public void startInforming() {
 		_productAgent.setStatus(AgentStatus.INFORMING);
 		System.out.println("Add an InformerBehaviour");
 		myAgent.addBehaviour(_informerBehaviour);
+		//_parallelBehaviour.addSubBehaviour(_informerBehaviour);
 	}
 
 	public void startScheduling() {
 		_productAgent.setStatus(AgentStatus.SCHEDULING);
 		System.out.println("Add a SchedulerBehaviour");
 		myAgent.addBehaviour(_schedulerBehaviour);
+		//_parallelBehaviour.addSubBehaviour(_schedulerBehaviour);
 	}
 
 	public void startProducing() {
 		_productAgent.setStatus(AgentStatus.PRODUCING);
 		System.out.println("Add a ProduceBehaviour");
 		myAgent.addBehaviour(_produceBehaviour);
+		//_parallelBehaviour.addSubBehaviour(_produceBehaviour);
 	}
 
 	/*
