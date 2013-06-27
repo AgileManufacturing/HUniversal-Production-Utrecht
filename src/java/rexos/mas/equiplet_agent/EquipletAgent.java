@@ -82,14 +82,19 @@ import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
+import rexos.mas.data.EquipletMode;
 import rexos.mas.data.EquipletState;
 import rexos.mas.data.EquipletStateEntry;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.equiplet_agent.behaviours.AbortStep;
+import rexos.mas.equiplet_agent.behaviours.CanPerformStep;
+import rexos.mas.equiplet_agent.behaviours.GetProductionDuration;
 import rexos.mas.equiplet_agent.behaviours.InitialisationFinished;
+import rexos.mas.equiplet_agent.behaviours.ScheduleStep;
 import rexos.mas.equiplet_agent.behaviours.ServiceAgentDied;
+import rexos.mas.equiplet_agent.behaviours.StartStep;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -239,7 +244,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		try {
 			Logger.log("I spawned as a equiplet agent.");
 			// gets his IP and sets the equiplet blackboard IP.
-			InetAddress IP = InetAddress.getLocalHost();
+			// InetAddress IP = InetAddress.getLocalHost();
 			// equipletDbIp = IP.getHostAddress();
 			equipletDbIp = "145.89.191.131";
 
@@ -358,10 +363,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 	public void cancelProductStep(ObjectId productStepId, String reason) {
 		try {
-			for(Behaviour behaviour : behaviours) {
-				removeBehaviour(behaviour);
-			}
-
+			//TODO cancel all behaviours started specific for this productStep
+			
 			productStepBBClient.updateDocuments(
 					new BasicDBObject("_id", productStepId),
 					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
@@ -370,121 +373,141 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			e.printStackTrace();
 		}
 	}
+	
+	public void ceaseAllActivity(String reason) {
+		try {
+			for(Behaviour behaviour : behaviours) {
+				removeBehaviour(behaviour);
+			}
+			
+			doSuspend();
+
+			productStepBBClient.updateDocuments(
+					new BasicDBObject(),
+					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
+							"statusData", new BasicDBObject("reason", reason))));
+		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
-	 * onMessage function for the equipletAgent. Listens to updates of the
-	 * blackboard clients and handles them.
+	 * onMessage function for the equipletAgent. Listens to updates of the blackboard clients and handles them.
 	 */
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
 		try {
 			switch(entry.getNamespace().split("\\.")[1]) {
 				case "ProductStepsBlackBoard":
-					// Get the productstep.
-					ObjectId id = entry.getTargetObjectId();
-					ProductStep productStep = new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(id));
-
-					// Gets the conversationId
-					String conversationId = getConversationId(id);
-
-					// Create the responseMessage
-					ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
-					responseMessage.addReceiver(productStep.getProductAgentId());
-					responseMessage.setConversationId(conversationId);
-
-					Logger.log("Equiplet agent - status update: " + productStep.getStatus().toString());
-					switch(productStep.getStatus()) {
-					// Depending on the changed status fills in the responseMessage and sends it to the product agent.
-						case PLANNED:
-							try {
-								// If the start time of the newly planned productStep is earlier then the next used time
-								// slot make it the next used timeslot.
-								ScheduleData scheduleData = productStep.getScheduleData();
-								if(timer.getNextUsedTimeSlot() == 0
-										|| scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
-									timer.setNextUsedTimeSlot(scheduleData.getStartTime());
-									nextProductStep = productStep.getId();
+					if(getState() != AP_SUSPENDED) {
+						// Get the productstep.
+						ObjectId id = entry.getTargetObjectId();
+						ProductStep productStep = new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(id));
+	
+						// Gets the conversationId
+						String conversationId = getConversationId(id);
+	
+						// Create the responseMessage
+						ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
+						responseMessage.addReceiver(productStep.getProductAgentId());
+						responseMessage.setConversationId(conversationId);
+	
+						Logger.log("Equiplet agent - status update: " + productStep.getStatus().toString());
+						switch(productStep.getStatus()) {
+						// Depending on the changed status fills in the responseMessage and sends it to the product agent.
+							case PLANNED:
+								try {
+									// If the start time of the newly planned productStep is earlier then the next used time
+									// slot make it the next used timeslot.
+									ScheduleData scheduleData = productStep.getScheduleData();
+									if(timer.getNextUsedTimeSlot() == 0
+											|| scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
+										timer.setNextUsedTimeSlot(scheduleData.getStartTime());
+										nextProductStep = productStep.getId();
+									}
+	
+									responseMessage.setOntology("Planned");
+									responseMessage.setPerformative(ACLMessage.CONFIRM);
+									responseMessage.setContentObject(scheduleData.getStartTime());
+	
+									// TODO: after testing delete below
+									// addBehaviour(new WakerBehaviour(this, 75){
+									//
+									// /**
+									// *
+									// */
+									// private static final long serialVersionUID = 1L;
+									//
+									// protected void onWake(){
+									//
+									// ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
+									// cancelMessage.addReceiver(getAID());
+									// cancelMessage.setOntology("AbortStep");
+									// cancelMessage.setConversationId(getConversationId(nextProductStep));
+									// send(cancelMessage);
+									//
+									// Logger.log("Equiplet agent - sending message %s%n",
+									// ACLMessage.getPerformative(cancelMessage.getPerformative()));
+									// }
+									// });
+									// TODO: after testing delete above
+	
+								} catch(IOException e) {
+									responseMessage.setPerformative(ACLMessage.DISCONFIRM);
+									responseMessage.setContent("An error occured in the planning/please reschedule");
+									Logger.log(e);
 								}
-
-								responseMessage.setOntology("Planned");
+								break;
+							case WAITING:
+							case IN_PROGRESS:
+							case FAILED:
+							case SUSPENDED_OR_WARNING:
+								setDesiredEquipletState(EquipletState.STANDBY);
+	
+								responseMessage.setOntology("StatusUpdate");
 								responseMessage.setPerformative(ACLMessage.CONFIRM);
-								responseMessage.setContentObject(scheduleData.getStartTime());
-
-								// TODO: after testing delete below
-								// addBehaviour(new WakerBehaviour(this, 75){
-								//
-								// /**
-								// *
-								// */
-								// private static final long serialVersionUID = 1L;
-								//
-								// protected void onWake(){
-								//
-								// ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
-								// cancelMessage.addReceiver(getAID());
-								// cancelMessage.setOntology("AbortStep");
-								// cancelMessage.setConversationId(getConversationId(nextProductStep));
-								// send(cancelMessage);
-								//
-								// Logger.log("Equiplet agent - sending message %s%n",
-								// ACLMessage.getPerformative(cancelMessage.getPerformative()));
-								// }
-								// });
-								// TODO: after testing delete above
-
-							} catch(IOException e) {
-								responseMessage.setPerformative(ACLMessage.DISCONFIRM);
-								responseMessage.setContent("An error occured in the planning/please reschedule");
-								Logger.log(e);
-							}
-							break;
-						case WAITING:
-						case IN_PROGRESS:
-						case FAILED:
-						case SUSPENDED_OR_WARNING:
-							setDesiredEquipletState(EquipletState.STANDBY);
-
-							responseMessage.setOntology("StatusUpdate");
-							responseMessage.setPerformative(ACLMessage.CONFIRM);
-							responseMessage.setContentObject(productStep.toBasicDBObject());
-							break;
-						case DONE:
-							setDesiredEquipletState(EquipletState.STANDBY);
-
-							responseMessage.setOntology("StatusUpdate");
-							responseMessage.setPerformative(ACLMessage.CONFIRM);
-							productStep.setStatus(StepStatusCode.DONE);
-							responseMessage.setContentObject(productStep.toBasicDBObject());
-							productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
-							break;
-						case DELETED:
-							setDesiredEquipletState(EquipletState.STANDBY);
-
-							responseMessage.setOntology("StatusUpdate");
-							responseMessage.setPerformative(ACLMessage.CONFIRM);
-							responseMessage.setContentObject(productStep.toBasicDBObject());
-							productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
-							break;
-						default:
-							break;
+								responseMessage.setContentObject(productStep.toBasicDBObject());
+								break;
+							case DONE:
+								setDesiredEquipletState(EquipletState.STANDBY);
+	
+								responseMessage.setOntology("StatusUpdate");
+								responseMessage.setPerformative(ACLMessage.CONFIRM);
+								productStep.setStatus(StepStatusCode.DONE);
+								responseMessage.setContentObject(productStep.toBasicDBObject());
+								productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
+								break;
+							case DELETED:
+								setDesiredEquipletState(EquipletState.STANDBY);
+	
+								responseMessage.setOntology("StatusUpdate");
+								responseMessage.setPerformative(ACLMessage.CONFIRM);
+								responseMessage.setContentObject(productStep.toBasicDBObject());
+								productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
+								break;
+							default:
+								break;
+						}
+						Logger.log("Equiplet agent - sending message %s%n",
+								ACLMessage.getPerformative(responseMessage.getPerformative()));
+						send(responseMessage);
 					}
-					Logger.log("Equiplet agent - sending message %s%n",
-							ACLMessage.getPerformative(responseMessage.getPerformative()));
-					send(responseMessage);
 					break;
 				case "equipletState":
 					EquipletStateEntry stateEntry =
 							new EquipletStateEntry((BasicDBObject) stateBBClient.findDocumentById(entry
 									.getTargetObjectId()));
 					Logger.log("Equiplet agent - mode changed to %s%n", stateEntry.getEquipletMode());
-					switch(stateEntry.getEquipletMode()) {
+					EquipletMode mode = stateEntry.getEquipletMode();
+					switch(mode) {
 					// TODO handle error stuff
+						case NORMAL:
+						case STEP:
+						case SERVICE:
+							break;
 						case ERROR:
-							break;
 						case CRITICAL_ERROR:
-							break;
 						case EMERGENCY_STOP:
-							break;
 						case LOCK:
 							break;
 						default:
@@ -502,12 +525,14 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	}
 
 	public EquipletStateEntry getEquipletStateEntry() throws InvalidDBNamespaceException, GeneralMongoException {
-		// List<DBObject> equipletStates = stateBBClient.findDocuments(new BasicDBObject("id", equipletId));
-		List<DBObject> equipletStates = stateBBClient.findDocuments(new BasicDBObject());
+		List<DBObject> equipletStates = stateBBClient.findDocuments(new BasicDBObject("id", equipletId));
 		return new EquipletStateEntry((BasicDBObject) equipletStates.get(0));
 	}
 
 	public void setDesiredEquipletState(EquipletState state) throws InvalidDBNamespaceException, GeneralMongoException {
+		// TODO when the equipletCommand blackboard has been updated to have a equipletId like field this search query
+		// should be adapted.
+
 		// desiredStateBBClient.updateDocuments(new BasicDBObject("id", equipletId), new BasicDBObject("$set",
 		// new BasicDBObject("desiredState", state.getValue())));
 		desiredStateBBClient.updateDocuments(new BasicDBObject(), new BasicDBObject("$set", new BasicDBObject(

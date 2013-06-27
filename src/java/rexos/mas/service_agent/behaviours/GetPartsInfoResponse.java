@@ -141,7 +141,7 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 			try {
 				ObjectId productStepId = productStep.getId();
 				List<DBObject> dbServiceSteps =
-						agent.getServiceStepBBClient().findDocuments(new BasicDBObject("productStepId", productStepId));
+						agent.getServiceStepBBClient().findDocuments(new BasicDBObject("productStepId",productStepId));
 				ServiceStep[] serviceSteps = new ServiceStep[dbServiceSteps.size()];
 
 				for(int i = 0; i < dbServiceSteps.size(); i++) {
@@ -205,9 +205,11 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 
 				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStep.getId()),
 						new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.PLANNED.name())));
+								
 			} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 				Logger.log(e);
-				agent.doDelete();
+				agent.doDelete(); //doDelete because of unrecoverable exception
+				
 			}
 		} else {
 			Logger.log(agent.getName() + " - GetPartsInfoResponse timeout!");
