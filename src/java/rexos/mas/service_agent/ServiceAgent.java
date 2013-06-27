@@ -173,7 +173,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			// create blackboard clients, configure them and subscribe to status changes of any steps
 			productStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
-
+			
 			statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 

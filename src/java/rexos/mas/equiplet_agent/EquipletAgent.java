@@ -103,8 +103,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private int equipletId;
-
 	/**
 	 * @var AID serviceAgent
 	 *      AID of the serviceAgent connected to this EquipletAgent.
@@ -218,6 +216,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 *      The dbData of the equipletAgent.
 	 */
 	private DbData dbData;
+	
+	/**
+	 * 
+	 */
+	private int equipletId;
 
 	/**
 	 * Setup function for the equipletAgent. Configures the IP and database name
@@ -254,7 +257,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			// Register modules
 			try {
 				KnowledgeDBClient client = KnowledgeDBClient.getClient();
-				Row[] rows = client.executeSelectQuery(Queries.POSSIBLE_STEPS_PER_EQUIPLET, getLocalName());
+				Row[] rows = client.executeSelectQuery(Queries.POSSIBLE_STEPS_PER_EQUIPLET, getAID().getLocalName());
 				for(Row row : rows) {
 					capabilities.add((int) row.get("id"));
 				}
@@ -270,6 +273,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			// creates his service agent.
 			equipletId = 1;
 
+			
 			Object[] arguments = new Object[] {
 					dbData, getAID(), logisticsAgent
 			};
@@ -305,9 +309,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			// makes connection with the collective blackboard.
 			collectiveBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
 			collectiveBBClient.setDatabase(collectiveDbName);
-
-			// gets the timedata for synchronizing from the collective blackboard.
 			collectiveBBClient.setCollection(timeDataName);
+			
+			// gets the timedata for synchronizing from the collective blackboard.			
 			BasicDBObject timeData = (BasicDBObject) collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
 
 			// initiates the timer to the next product step.
