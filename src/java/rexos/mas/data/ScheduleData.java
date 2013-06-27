@@ -51,19 +51,19 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	 * @var int startTime
 	 * The start time.
 	 **/
-	private int startTime;
+	private long startTime;
 	
 	/**
 	 * @var int duration
 	 * The duration.
 	 **/
-	private int duration;
+	private long duration;
 	
 	/**
 	 * @var int deadline
 	 * The deadline.
 	 **/
-	private int deadline;
+	private long deadline;
 	
 	/**
 	 * Creates a new <code>ScheduleData</code> leaving <code>startTime</code>, <code>duration</code> and <code>deadline</code> uninitialized.
@@ -112,11 +112,11 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		BasicDBObject copy = (BasicDBObject) object.copy();
-		this.startTime = copy.getInt("startTime", -1);
+		this.startTime = copy.getLong("startTime", -1);
 		copy.remove("startTime");
-		this.duration = copy.getInt("duration", -1);
+		this.duration = copy.getLong("duration", -1);
 		copy.remove("duration");
-		this.deadline = copy.getInt("deadline", -1);
+		this.deadline = copy.getLong("deadline", -1);
 		copy.remove("deadline");
 		if(!copy.isEmpty()){
 			throw new IllegalArgumentException();
@@ -127,7 +127,7 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	 * Returns the start time for this object.
 	 * @return The start time
 	 **/
-	public int getStartTime() {
+	public long getStartTime() {
 		return startTime;
 	}
 
@@ -135,7 +135,7 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	 * Sets the start time for this object.
 	 * @param startTime the start time to set
 	 */
-	public void setStartTime(int startTime) {
+	public void setStartTime(long startTime) {
 		this.startTime = startTime;
 	}
 
@@ -143,7 +143,7 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	 * Returns the duration for this object.
 	 * @return the duration
 	 */
-	public int getDuration() {
+	public long getDuration() {
 		return duration;
 	}
 
@@ -151,7 +151,7 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	 * Sets the duration for this object.
 	 * @param duration the duration to set
 	 */
-	public void setDuration(int duration) {
+	public void setDuration(long duration) {
 		this.duration = duration;
 	}
 
@@ -159,7 +159,7 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	 * Returns the deadline for this object.
 	 * @return the deadline
 	 */
-	public int getDeadline() {
+	public long getDeadline() {
 		return deadline;
 	}
 
@@ -167,7 +167,7 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	 * Sets the deadline for this object.
 	 * @param deadline the deadline to set
 	 */
-	public void setDeadline(int deadline) {
+	public void setDeadline(long deadline) {
 		this.deadline = deadline;
 	}
 

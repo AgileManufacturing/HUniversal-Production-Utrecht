@@ -116,7 +116,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 
 		try {
 			// Gets the timeslot out of the message content.
-			int start = (Integer) message.getContentObject();
+			long start = (Long) message.getContentObject();
 			Logger.log("Equiplet agent - scheduling step for timeslot %d%n", start);
 
 			// Gets the scheduledata out of the productstep.
@@ -124,7 +124,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 			ScheduleData scheduleData =
 					new ScheduleData(
 							(BasicDBObject) (productBBClient.findDocumentById(productStepId)).get("scheduleData"));
-			int end = start + scheduleData.getDuration();
+			long end = start + scheduleData.getDuration();
 
 			// Gets planned steps
 			List<DBObject> plannedSteps =
@@ -137,8 +137,8 @@ public class ScheduleStep extends ReceiveBehaviour {
 				ProductStep productStep = new ProductStep((BasicDBObject) plannedStep);
 				ScheduleData stepScheduleData = productStep.getScheduleData();
 
-				int scheduledStepStart = stepScheduleData.getStartTime();
-				int scheduledStepEnd = scheduledStepStart + stepScheduleData.getDuration();
+				long scheduledStepStart = stepScheduleData.getStartTime();
+				long scheduledStepEnd = scheduledStepStart + stepScheduleData.getDuration();
 
 				if(start >= scheduledStepStart && start <= scheduledStepEnd) {
 					fitsInSchedule = false;

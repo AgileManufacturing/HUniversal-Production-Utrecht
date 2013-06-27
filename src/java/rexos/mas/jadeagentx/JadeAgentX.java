@@ -107,17 +107,27 @@ public class JadeAgentX extends Agent {
 			/**
 			 * Lets make a parameter list
 			 */
-			BasicDBObject parameters = new BasicDBObject();
+			BasicDBObject parameters1 = new BasicDBObject();
+			BasicDBObject parameters2 = new BasicDBObject();
+			BasicDBObject parameters3 = new BasicDBObject();
+			BasicDBObject parameters4 = new BasicDBObject();
+			
 //			parameters.append("part", new Part(1).toBasicDBObject());
 //			parameters.append("position", new Position(1.0, 2.0, 3.0, new Part(2)).toBasicDBObject());
-			parameters.append("startPosition", new Position(1.0, 1.0).toBasicDBObject());
-			parameters.append("endPosition", new Position(1.0, 1.0).toBasicDBObject());
+			parameters1.append("startPosition", new Position(30.0, -30.0).toBasicDBObject());
+			parameters1.append("endPosition", new Position(-30.0, -30.0).toBasicDBObject());
 								
 			// Next we want to have some production steps
-			ProductionStep stp1 = new ProductionStep(1, 3, parameters);
-//			ProductionStep stp2 = new ProductionStep(2, 3, parameters);
-//			ProductionStep stp3 = new ProductionStep(3, 1, parameters);
-//			ProductionStep stp4 = new ProductionStep(4, 1, parameters);
+			ProductionStep stp1 = new ProductionStep(1, 3, parameters1);
+			parameters2.append("startPosition", new Position(-30.0, -30.0).toBasicDBObject());
+			parameters2.append("endPosition", new Position(-30.0, 30.0).toBasicDBObject());
+			ProductionStep stp2 = new ProductionStep(2, 3, parameters2);
+			parameters3.append("startPosition", new Position(-30.0, 30.0).toBasicDBObject());
+			parameters3.append("endPosition", new Position(30.0, 30.0).toBasicDBObject());
+			ProductionStep stp3 = new ProductionStep(3, 3, parameters3);
+			parameters4.append("startPosition", new Position(30.0, 30.0).toBasicDBObject());
+			parameters4.append("endPosition", new Position(30.0, -30.0).toBasicDBObject());
+			ProductionStep stp4 = new ProductionStep(4, 3, parameters4);
 
 
 			/**
@@ -126,9 +136,9 @@ public class JadeAgentX extends Agent {
 			 */
 			ArrayList<ProductionStep> stepList = new ArrayList<>();
 			stepList.add(stp1);
-//			stepList.add(stp2);
-			// stepList.add(stp3);
-			// stepList.add(stp4);
+			stepList.add(stp2);
+			stepList.add(stp3);
+			stepList.add(stp4);
 
 			Production production = new Production(stepList);
 			Product product = new Product(production);
@@ -150,8 +160,8 @@ public class JadeAgentX extends Agent {
 			Object[] args = new Object[1];
 			args[0] = pap;
 
-			getContainerController().createNewAgent("pa" + count++, "rexos.mas.productAgent.ProductAgent", args)
-					.start();
+//			getContainerController().createNewAgent("pa" + count++, "rexos.mas.productAgent.ProductAgent", args)
+//					.start();
 			addBehaviour(new StartProductAgent(this, args));
 		} catch(Exception e) {
 			Logger.log(e);
