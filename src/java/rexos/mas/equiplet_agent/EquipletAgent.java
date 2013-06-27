@@ -52,6 +52,7 @@ package rexos.mas.equiplet_agent;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
@@ -198,6 +199,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 *      Table with the combinations conversationID and ObjectId.
 	 */
 	private HashMap<String, ObjectId> communicationTable;
+	
+	private ArrayList<Behaviour> behaviours;
 
 	/**
 	 * @var NextProductStepTimer timer
@@ -217,7 +220,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 *      The dbData of the equipletAgent.
 	 */
 	private DbData dbData;
-	
+
 	/**
 	 * 
 	 */
@@ -234,52 +237,32 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 */
 	@Override
 	public void setup() {
-		Logger.log("I spawned as a equiplet agent.");
-		// gets his IP and sets the equiplet blackboard IP.
 		try {
+			Logger.log("I spawned as a equiplet agent.");
+			// gets his IP and sets the equiplet blackboard IP.
 			InetAddress IP = InetAddress.getLocalHost();
 			equipletDbIp = IP.getHostAddress();
 			// equipletDbIp = "145.89.191.131";
-		} catch(UnknownHostException e) {
-			Logger.log(e);
-		}
 
-		equipletDbName = getAID().getLocalName();
-		communicationTable = new HashMap<String, ObjectId>();
-		try {
-			Object[] args = getArguments();
-			AID logisticsAgent = null;
-			if(args != null && args.length > 0) {
-				logisticsAgent = (AID) args[0];
-			}
+			equipletDbName = getAID().getLocalName();
+			communicationTable = new HashMap<String, ObjectId>();
+			behaviours = new ArrayList<Behaviour>();
+			AID logisticsAgent = (AID) getArguments()[0];
 
 			capabilities = new ArrayList<Integer>();
-			KnowledgeDBClient client = null;
+			KnowledgeDBClient client = KnowledgeDBClient.getClient();
 			// Register modules
-			try {
-				client = KnowledgeDBClient.getClient();
-				Row[] rows = client.executeSelectQuery(Queries.POSSIBLE_STEPS_PER_EQUIPLET, getAID().getLocalName());
-				for(Row row : rows) {
-					capabilities.add((int) row.get("id"));
-				}
-			} catch(KnowledgeException | KeyNotFoundException e1) {
-				doDelete();
-				Logger.log(e1);
+			Row[] steps = client.executeSelectQuery(Queries.POSSIBLE_STEPS_PER_EQUIPLET, getAID().getLocalName());
+			for(Row step : steps) {
+				capabilities.add((int) step.get("id"));
 			}
 			Logger.log("%s %s%n", capabilities, equipletDbName);
 
 			dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
-			
-			
-			try {
-				Row[] rows = client.executeSelectQuery(Queries.SELECT_EQUIPLET_ID, getLocalName());
-				equipletId = (int)rows[0].get("id");
-			} catch (KnowledgeException | KeyNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			
+
+			Row[] equipletEntrys = client.executeSelectQuery(Queries.SELECT_EQUIPLET_ID, getLocalName());
+			equipletId = (int) equipletEntrys[0].get("id");
+
 			Object[] arguments = new Object[] {
 					dbData, getAID(), logisticsAgent
 			};
@@ -316,8 +299,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			collectiveBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
 			collectiveBBClient.setDatabase(collectiveDbName);
 			collectiveBBClient.setCollection(timeDataName);
-			
-			// gets the timedata for synchronizing from the collective blackboard.			
+
+			// gets the timedata for synchronizing from the collective blackboard.
 			BasicDBObject timeData = (BasicDBObject) collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
 
 			// initiates the timer to the next product step.
@@ -325,7 +308,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					new NextProductStepTimer(timeData.getLong("firstTimeSlot"), timeData.getInt("timeSlotLength"), this);
 
 			collectiveBBClient.setCollection(equipletDirectoryName);
-		} catch(GeneralMongoException | InvalidDBNamespaceException | UnknownHostException | StaleProxyException e) {
+		} catch(GeneralMongoException | InvalidDBNamespaceException | UnknownHostException | StaleProxyException
+				| KnowledgeException | KeyNotFoundException e) {
 			Logger.log(e);
 			doDelete();
 		}
@@ -375,6 +359,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 	public void cancelProductStep(ObjectId productStepId, String reason) {
 		try {
+			for(Behaviour behaviour : behaviours) {
+				removeBehaviour(behaviour);
+			}
+			
 			productStepBBClient.updateDocuments(
 					new BasicDBObject("_id", productStepId),
 					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
@@ -525,6 +513,18 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		// "desiredState", state.getValue())));
 		desiredStateBBClient.updateDocuments(new BasicDBObject("name", getLocalName()), new BasicDBObject("$set",
 				new BasicDBObject("desiredState", state.getValue())));
+	}
+	
+	@Override
+	public void addBehaviour(Behaviour behaviour) {
+		super.addBehaviour(behaviour);
+		behaviours.add(behaviour);
+	}
+	
+	@Override
+	public void removeBehaviour(Behaviour behaviour) {
+		super.removeBehaviour(behaviour);
+		behaviours.remove(behaviour);
 	}
 
 	/**

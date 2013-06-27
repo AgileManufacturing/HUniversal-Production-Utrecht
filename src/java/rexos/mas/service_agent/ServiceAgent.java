@@ -247,7 +247,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			for(Behaviour behaviour : behaviours) {
 				removeBehaviour(behaviour);
 			}
-			behaviours.clear();
 			
 			serviceStepBBClient.updateDocuments(
 					new BasicDBObject("productStepId", productStepId),
@@ -460,6 +459,12 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	public void addBehaviour(Behaviour behaviour) {
 		super.addBehaviour(behaviour);
 		behaviours.add(behaviour);
+	}
+	
+	@Override
+	public void removeBehaviour(Behaviour behaviour) {
+		super.removeBehaviour(behaviour);
+		behaviours.remove(behaviour);
 	}
 
 	/**

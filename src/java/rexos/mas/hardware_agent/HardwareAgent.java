@@ -52,9 +52,11 @@ package rexos.mas.hardware_agent;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,6 +148,8 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	private HashMap<Integer, Object> configuration;
 
 	private FieldUpdateSubscription stepStatusSubscription;
+	
+	private ArrayList<Behaviour> behaviours;
 
 	/**
 	 * Function for registering a leading module.
@@ -196,6 +200,8 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		deltaRobotConfiguration.put(3, null);
 		configuration = new HashMap<Integer, Object>();
 		configuration.put(1, deltaRobotConfiguration);
+		
+		behaviours = new ArrayList<Behaviour>();
 
 		// configure the blackboards
 		try {
@@ -283,6 +289,10 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 
 	public void cancelAllStepsForServiceStep(ObjectId serviceStepId, String reason) {
 		try {
+			for(Behaviour behaviour : behaviours) {
+				removeBehaviour(behaviour);
+			}
+			
 			serviceStepBBClient.updateDocuments(
 					new BasicDBObject("_id", serviceStepId),
 					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.DELETED.name()).append(
@@ -443,6 +453,18 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			Logger.log(e);
 		}
 		return log;
+	}
+	
+	@Override
+	public void addBehaviour(Behaviour behaviour) {
+		super.addBehaviour(behaviour);
+		behaviours.add(behaviour);
+	}
+	
+	@Override
+	public void removeBehaviour(Behaviour behaviour) {
+		super.removeBehaviour(behaviour);
+		behaviours.remove(behaviour);
 	}
 
 	/**
