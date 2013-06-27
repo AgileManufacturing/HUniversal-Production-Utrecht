@@ -33,6 +33,7 @@
  *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  **/
+
 package rexos.mas.service_agent;
 
 import jade.core.AID;
@@ -129,8 +130,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 *      The AID of the logistics agent.
 	 */
 	private AID logisticsAID;
-	
-	private int equipletId;
 
 	/**
 	 * @var ServiceFactory serviceFactory
@@ -158,12 +157,11 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			dbData = (DbData) args[0];
 			equipletAgentAID = (AID) args[1];
 			logisticsAID = (AID) args[2];
-			equipletId = (int) args[3];
 		}
 
 		// Create a hardware agent for this equiplet
 		Object[] arguments = new Object[] {
-				dbData, equipletAgentAID, getAID(), equipletId
+				dbData, equipletAgentAID, getAID()
 		};
 		try {
 			AgentController hardwareAgentCnt =
@@ -177,11 +175,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		}
 
 		try {
-			// create blackboard clients, configure them and subscribe to status
-			// changes of any steps
+			// create blackboard clients, configure them and subscribe to status changes of any steps
 			productStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
-
+			
 			statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 
@@ -375,12 +372,12 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 								case DELETED:
 									Logger.log("Service agent - serv.Step %s status set to %s%n", serviceStepId, status);
 
-									List<DBObject> unDeletedServiceSteps =
+									List<DBObject> undeletedServiceSteps =
 											serviceStepBBClient.findDocuments(QueryBuilder.start("productStepId")
 													.is(serviceStep.getProductStepId()).and("status")
 													.notEquals(StepStatusCode.DELETED.name()).get());
 
-									if(unDeletedServiceSteps.isEmpty()) {
+									if(undeletedServiceSteps.isEmpty()) {
 										productStepBBClient.updateDocuments(
 												new BasicDBObject("_id", productStepId),
 												new BasicDBObject("$set", new BasicDBObject("status",

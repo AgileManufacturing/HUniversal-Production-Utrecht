@@ -94,8 +94,9 @@ public class CheckForModules extends ReceiveBehaviour {
 				availableModules.add((Integer) row.get("groupId"));
 			}
 		} catch (KeyNotFoundException | KnowledgeException ex) {
-			// Return the current (possibly empty) arraylist if reading
+			// TODO:(Check this)Return the current (possibly empty) arraylist if reading
 			// from the knowledge db fails for whatever reason.
+			return availableModules;
 		}
 
 		return availableModules;
