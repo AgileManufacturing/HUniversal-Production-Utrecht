@@ -319,6 +319,17 @@ public class Queries {
     		"FROM part_types " +
     		"WHERE (name = (?));";
     
+    
+    /**
+     * @var String INSERT_EQUIPLET
+     * 
+     * SQL statement to insert a equiplet in the database. 
+     * Expects a string parameter corrosonding to the jade_address
+     */
+    public static final String SELECT_EQUIPLET_ID = "SELECT " + 
+    		"equiplets.id " +
+    		"FROM equiplets " + 
+    		"WHERE jade_address = (?);";
     /**
      * A private constructor preventing this class to be constructed.
      **/

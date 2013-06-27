@@ -219,12 +219,9 @@ public class Position implements Serializable, MongoSaveable {
 	public void fromBasicDBObject(BasicDBObject object) {
 		try {
 			BasicDBObject copy = (BasicDBObject) object.copy();
-			x = (Double)copy.get("x");
-			copy.removeField("x");
-			y = (Double)copy.get("y");
-			copy.removeField("y");
-			z = (Double)copy.get("z");
-			copy.removeField("z");
+			x = (Double)copy.removeField("x");
+			y = (Double)copy.removeField("y");
+			z = (Double)copy.removeField("z");
 			if(copy.containsField("relativeToPart")) {
 				relativeToPart = new Part((BasicDBObject) copy.get("relativeToPart"));
 				copy.removeField("relativeToPart");

@@ -65,6 +65,9 @@ public class ProduceBehaviour extends Behaviour {
 	private boolean _isCompleted = false;
 
 	private BehaviourCallback _bc;
+	
+	private int _producersStarted = 0;
+	private int _producersCompleted = 0;
 
 	/**
 	 * @param myAgent
@@ -83,6 +86,7 @@ public class ProduceBehaviour extends Behaviour {
 					if (stp.getStatus() == StepStatusCode.PLANNED) {
 						myAgent.addBehaviour(new ProducingReceiver(myAgent, -1,
 								MessageTemplate.and(MessageTemplate.or(MessageTemplate.or(MessageTemplate.MatchOntology("StartStepQuestion"), MessageTemplate.MatchOntology("StatusUpdate" )), MessageTemplate.MatchOntology("EquipletAgentDied")), MessageTemplate.MatchConversationId(stp.getConversationId())), stp, this));
+						_producersStarted++;
 					} else {
 						this._isError = true;
 					}
@@ -96,7 +100,7 @@ public class ProduceBehaviour extends Behaviour {
 	@Override
 	public void action() {
 		try {
-			if (this._isDone) {
+			if (_producersStarted == _producersCompleted) {
 				this._bc.handleCallback(BehaviourStatus.COMPLETED);
 				this._isCompleted = true;
 			} else if (this._isError) {
@@ -115,7 +119,8 @@ public class ProduceBehaviour extends Behaviour {
 	
 	public void reportProductStatus(BehaviourStatus bs) {
 		if(bs == BehaviourStatus.COMPLETED) {
-			this._isDone = true;
+			//this._isDone = true;
+			_producersCompleted++;
 		} else {
 			this._isError = true;
 		}

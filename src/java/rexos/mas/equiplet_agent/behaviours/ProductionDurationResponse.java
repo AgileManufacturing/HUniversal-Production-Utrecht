@@ -59,7 +59,7 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 	 *            the equiplet blackboard.
 	 */
 	public ProductionDurationResponse(Agent a, BlackboardClient equipletBBClient) {
-		super(a, 2000, messageTemplate);
+		super(a, 10000, messageTemplate);
 		equipletAgent = (EquipletAgent) a;
 		this.equipletBBClient = equipletBBClient;
 	}
@@ -93,6 +93,8 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 				Logger.log(e);
 				equipletAgent.doDelete();
 			}
+		}else{
+			Logger.log("equiplet agent - duration response timed out");
 		}
 	}
 }

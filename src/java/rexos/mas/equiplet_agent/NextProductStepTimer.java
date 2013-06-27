@@ -51,6 +51,7 @@ import rexos.mas.data.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.QueryBuilder;
 
 /**
  * Timer for executing the next product step.
@@ -116,10 +117,12 @@ public class NextProductStepTimer extends Timer {
 			long startPlannedTimeSlot = (nextUsedTimeSlot * timeSlotLength) + firstTimeSlot;
 			long currentTime = System.currentTimeMillis();
 			task = new NextProductStepTask();
-			Logger.log("Equiplet agent - trying to schedule: %d (%d - %d)%n", (startPlannedTimeSlot - currentTime), startPlannedTimeSlot, currentTime);
+			Logger.log("Equiplet agent - trying to schedule: %d (%d - %d)%n", (startPlannedTimeSlot - currentTime),
+					startPlannedTimeSlot, currentTime);
 			if(startPlannedTimeSlot - currentTime > 0) {
 				schedule(task, startPlannedTimeSlot - currentTime);
-				Logger.log("Equiplet agent - schedule set to: %d (%d - %d)%n", (startPlannedTimeSlot - currentTime), startPlannedTimeSlot, currentTime);
+				Logger.log("Equiplet agent - schedule set to: %d (%d - %d)%n", (startPlannedTimeSlot - currentTime),
+						startPlannedTimeSlot, currentTime);
 			} else {
 				Logger.log("");
 			}
@@ -161,23 +164,23 @@ public class NextProductStepTimer extends Timer {
 	public long getFirstTimeSlot() {
 		return firstTimeSlot;
 	}
+
 	/**
 	 * 
 	 * when this function is called it reschedules the timer to the next step
 	 * 
 	 */
-	public void reScheduleTimer(){
-		
-				
+	public void rescheduleTimer() {
 		try {
 			BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED.name());
-			query.put("$order_by", new BasicDBObject("scheduleData", new BasicDBObject("startTime", "1")));
-			List<DBObject> objects = equipletAgent.getProductStepBBClient().findDocuments(query);
+			BasicDBObject orderby = new BasicDBObject("scheduleData", new BasicDBObject("startTime", "1"));
+			BasicDBObject findquery = new BasicDBObject("$query", query).append("$orderby", orderby);
+			List<DBObject> objects = equipletAgent.getProductStepBBClient().findDocuments(findquery);
 			if(!objects.isEmpty()) {
 				ProductStep nextProductStep = new ProductStep((BasicDBObject) objects.get(0));
 				equipletAgent.setNextProductStep(nextProductStep.getId());
 				ScheduleData scheduleData = nextProductStep.getScheduleData();
-				if(scheduleData.getStartTime() < getNextUsedTimeSlot()) {
+				if(nextUsedTimeSlot == -1 || scheduleData.getStartTime() <= nextUsedTimeSlot) {
 					setNextUsedTimeSlot(scheduleData.getStartTime());
 				}
 			} else {
@@ -186,7 +189,7 @@ public class NextProductStepTimer extends Timer {
 		} catch(GeneralMongoException | InvalidDBNamespaceException e) {
 			Logger.log(e);
 		}
-		
+
 	}
 
 	/**
@@ -216,12 +219,14 @@ public class NextProductStepTimer extends Timer {
 				answer.setOntology("StartStepQuestion");
 				equipletAgent.send(answer);
 
+				nextUsedTimeSlot = -1;
+				
 				// TODO: delete below after testing
-//				ACLMessage test = new ACLMessage(ACLMessage.QUERY_IF);
-//				test.setConversationId(conversationId);
-//				test.addReceiver(equipletAgent.getAID());
-//				test.setOntology("StartStep");
-//				equipletAgent.send(test);
+				// ACLMessage test = new ACLMessage(ACLMessage.QUERY_IF);
+				// test.setConversationId(conversationId);
+				// test.addReceiver(equipletAgent.getAID());
+				// test.setOntology("StartStep");
+				// equipletAgent.send(test);
 			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(e);
 			}
