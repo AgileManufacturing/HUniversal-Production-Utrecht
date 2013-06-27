@@ -57,6 +57,7 @@ import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 import java.io.IOException;
+import java.io.ObjectInputStream.GetField;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -253,10 +254,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			}
 
 			capabilities = new ArrayList<Integer>();
-
+			KnowledgeDBClient client = null;
 			// Register modules
 			try {
-				KnowledgeDBClient client = KnowledgeDBClient.getClient();
+				client = KnowledgeDBClient.getClient();
 				Row[] rows = client.executeSelectQuery(Queries.POSSIBLE_STEPS_PER_EQUIPLET, getAID().getLocalName());
 				for(Row row : rows) {
 					capabilities.add((int) row.get("id"));
@@ -268,11 +269,16 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			Logger.log("%s %s%n", capabilities, equipletDbName);
 
 			dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
-
-			// TODO register this equiplet on the knowledge db and add the equipletId to the arguments for the SA
-			// creates his service agent.
-			equipletId = 1;
-
+			
+			
+			try {
+				Row[] rows = client.executeSelectQuery(Queries.SELECT_EQUIPLET_ID, getLocalName());
+				equipletId = (int)rows[0].get("id");
+			} catch (KnowledgeException | KeyNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			
 			Object[] arguments = new Object[] {
 					dbData, getAID(), logisticsAgent
