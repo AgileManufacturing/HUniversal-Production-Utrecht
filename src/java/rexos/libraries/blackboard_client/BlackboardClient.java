@@ -46,6 +46,7 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import com.mongodb.QueryBuilder;
 import com.mongodb.ServerAddress;
+import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 import com.mongodb.util.JSONParseException;
@@ -229,6 +230,46 @@ public class BlackboardClient {
 		return ObjectId.massageToObjectId(obj.get("_id"));
 	}
 	
+	public ObjectId insertDocumentUnsafe(DBObject obj) throws InvalidDBNamespaceException, GeneralMongoException {
+		if (currentCollection == null) {
+			throw new InvalidDBNamespaceException("No collection has been selected.");
+		}
+		try {
+			WriteConcern oldConcern = currentCollection.getWriteConcern();
+			currentCollection.setWriteConcern(WriteConcern.NORMAL);
+			currentCollection.insert(obj);
+			currentCollection.setWriteConcern(oldConcern);
+		} catch (MongoException mongoException) {
+			throw new GeneralMongoException("An error occurred attempting to insert.", mongoException);
+		}
+		return ObjectId.massageToObjectId(obj.get("_id"));
+	}
+	
+	public void insertDocuments(DBObject... objs) throws InvalidDBNamespaceException, GeneralMongoException {
+		if (currentCollection == null) {
+			throw new InvalidDBNamespaceException("No collection has been selected.");
+		}
+		try {
+			currentCollection.insert(objs);
+		} catch (MongoException mongoException) {
+			throw new GeneralMongoException("An error occurred attempting to insert.", mongoException);
+		}
+	}
+	
+	public void insertDocumentsUnsafe(DBObject... objs) throws InvalidDBNamespaceException, GeneralMongoException {
+		if (currentCollection == null) {
+			throw new InvalidDBNamespaceException("No collection has been selected.");
+		}
+		try {
+			WriteConcern oldConcern = currentCollection.getWriteConcern();
+			currentCollection.setWriteConcern(WriteConcern.NORMAL);
+			currentCollection.insert(objs);
+			currentCollection.setWriteConcern(oldConcern);
+		} catch (MongoException mongoException) {
+			throw new GeneralMongoException("An error occurred attempting to insert.", mongoException);
+		}
+	}
+	
 	/**
 	 * Inserts document into the currently selected collection using JSON format.
 	 *
@@ -391,6 +432,21 @@ public class BlackboardClient {
 		try {
 			WriteResult res = currentCollection.updateMulti(searchQuery, updateQuery);
 			return res.getN();
+		} catch (MongoException mongoException) {
+			throw new GeneralMongoException("An error occurred attempting to update.", mongoException);
+		}
+	}
+	
+	public void updateDocumentsUnsafe(DBObject searchQuery, DBObject updateQuery) throws InvalidDBNamespaceException, GeneralMongoException {
+		if (currentCollection == null) {
+			throw new InvalidDBNamespaceException("No collection has been selected.");
+		}
+		
+		try {
+			WriteConcern oldConcern = currentCollection.getWriteConcern();
+			currentCollection.setWriteConcern(WriteConcern.NORMAL);
+			currentCollection.updateMulti(searchQuery, updateQuery);
+			currentCollection.setWriteConcern(oldConcern);
 		} catch (MongoException mongoException) {
 			throw new GeneralMongoException("An error occurred attempting to update.", mongoException);
 		}

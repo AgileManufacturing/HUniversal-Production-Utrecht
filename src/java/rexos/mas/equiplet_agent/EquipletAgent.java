@@ -52,6 +52,7 @@ package rexos.mas.equiplet_agent;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
@@ -61,6 +62,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.bson.types.ObjectId;
@@ -80,19 +82,25 @@ import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
+import rexos.mas.data.EquipletMode;
+import rexos.mas.data.EquipletState;
+import rexos.mas.data.EquipletStateEntry;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.equiplet_agent.behaviours.AbortStep;
+import rexos.mas.equiplet_agent.behaviours.CanPerformStep;
+import rexos.mas.equiplet_agent.behaviours.GetProductionDuration;
 import rexos.mas.equiplet_agent.behaviours.InitialisationFinished;
+import rexos.mas.equiplet_agent.behaviours.ScheduleStep;
 import rexos.mas.equiplet_agent.behaviours.ServiceAgentDied;
+import rexos.mas.equiplet_agent.behaviours.StartStep;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 /**
- * EquipletAgent that communicates with product agents and with its own service
- * agent.
+ * EquipletAgent that communicates with product agents and with its own service agent.
  **/
 public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	/**
@@ -112,7 +120,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 *      IP of the collective database.
 	 */
 	private String collectiveDbIp = "145.89.191.131";
-	// private String collectiveDbIp = "localhost";Logger.log("Hardware agent " + this + " reporting.");
 
 	/**
 	 * @var int collectiveDbPort
@@ -175,6 +182,17 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	private BlackboardClient productStepBBClient;
 
 	/**
+	 * @var BlackboardClient stateStepBBClient
+	 *      The blackboard client for the state blackboard.
+	 */
+	private BlackboardClient stateBBClient;
+	private BlackboardClient desiredStateBBClient;
+
+	private FieldUpdateSubscription statusSubscription;
+
+	private FieldUpdateSubscription modeUpdateSubscription;
+
+	/**
 	 * @var ArrayList<Integer> capabilities
 	 *      List with all the capabilities of this equiplet.
 	 */
@@ -185,6 +203,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 *      Table with the combinations conversationID and ObjectId.
 	 */
 	private HashMap<String, ObjectId> communicationTable;
+
+	private ArrayList<Behaviour> behaviours;
 
 	/**
 	 * @var NextProductStepTimer timer
@@ -206,6 +226,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	private DbData dbData;
 
 	/**
+	 * 
+	 */
+	private int equipletId;
+
+	/**
 	 * Setup function for the equipletAgent. Configures the IP and database name
 	 * of the equiplet. Gets its capabilities from the arguments. Creates its
 	 * service agent. Makes connections with the BlackboardCLients and
@@ -216,46 +241,34 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 */
 	@Override
 	public void setup() {
-		Logger.log("I spawned as a equiplet agent.");
-		// gets his IP and sets the equiplet blackboard IP.
 		try {
-			InetAddress IP = InetAddress.getLocalHost();
-			equipletDbIp = IP.getHostAddress();
-		} catch(UnknownHostException e) {
-			Logger.log(e);
-		}
+			Logger.log("I spawned as a equiplet agent.");
+			// gets his IP and sets the equiplet blackboard IP.
+			// InetAddress IP = InetAddress.getLocalHost();
+			// equipletDbIp = IP.getHostAddress();
+			equipletDbIp = "145.89.191.131";
 
-		equipletDbName = getAID().getLocalName();
-		communicationTable = new HashMap<String, ObjectId>();
-		try {
-			Object[] args = getArguments();
-			AID logisticsAgent = null;
-			if(args != null && args.length > 0) {
-				logisticsAgent = (AID) args[0];
-			}
+			equipletDbName = getAID().getLocalName();
+			communicationTable = new HashMap<String, ObjectId>();
+			behaviours = new ArrayList<Behaviour>();
+			AID logisticsAgent = (AID) getArguments()[0];
 
 			capabilities = new ArrayList<Integer>();
+			KnowledgeDBClient client = KnowledgeDBClient.getClient();
 			// Register modules
-			KnowledgeDBClient client;
-			try {
-				client = KnowledgeDBClient.getClient();
-
-				Row[] rows = client.executeSelectQuery(Queries.POSSIBLE_STEPS_PER_EQUIPLET, getAID().getLocalName());
-				for(Row row : rows) {
-					capabilities.add((int) row.get("id"));
-				}
-			} catch(KnowledgeException | KeyNotFoundException e1) {
-				doDelete();
-				Logger.log(e1);
+			Row[] steps = client.executeSelectQuery(Queries.POSSIBLE_STEPS_PER_EQUIPLET, getAID().getLocalName());
+			for(Row step : steps) {
+				capabilities.add((int) step.get("id"));
 			}
 			Logger.log("%s %s%n", capabilities, equipletDbName);
 
 			dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 
-			//TODO register this equiplet on the knowledge db and add the equipletId to the arguments for the SA
-			// creates his service agent.
+			Row[] equipletEntrys = client.executeSelectQuery(Queries.SELECT_EQUIPLET_ID, getLocalName());
+			equipletId = (int) equipletEntrys[0].get("id");
+
 			Object[] arguments = new Object[] {
-					dbData, getAID(), logisticsAgent, 1
+					dbData, getAID(), logisticsAgent
 			};
 			AgentController serviceAgentCnt =
 					getContainerController().createNewAgent(getLocalName() + "-serviceAgent",
@@ -263,26 +276,35 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			serviceAgentCnt.start();
 			serviceAgent = new AID(serviceAgentCnt.getName(), AID.ISGUID);
 
-			// makes connection with the collective blackboard.
-			collectiveBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
-			collectiveBBClient.setDatabase(collectiveDbName);
-			collectiveBBClient.setCollection(equipletDirectoryName);
-
 			// makes connection with the equiplet blackboard.
 			productStepBBClient = new BlackboardClient(equipletDbIp, equipletDbPort);
 			productStepBBClient.setDatabase(equipletDbName);
 			productStepBBClient.setCollection(productStepsName);
 			productStepBBClient.removeDocuments(new BasicDBObject());
 
-			// subscribes on changes of the status field on the equiplet
-			// blackboard.
-			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
+			// subscribes on changes of the status field on the equiplet blackboard.
+			statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			productStepBBClient.subscribe(statusSubscription);
 
-			// gets the timedata for synchronizing from the collective
-			// blackboard.
+			stateBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
+			stateBBClient.setDatabase("StateBlackboard");
+			stateBBClient.setCollection("equipletState");
+
+			modeUpdateSubscription = new FieldUpdateSubscription("mode", this);
+			modeUpdateSubscription.addOperation(MongoUpdateLogOperation.SET);
+			stateBBClient.subscribe(modeUpdateSubscription);
+
+			desiredStateBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
+			desiredStateBBClient.setDatabase("StateBlackboard");
+			desiredStateBBClient.setCollection("equipletCommands");
+
+			// makes connection with the collective blackboard.
+			collectiveBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
+			collectiveBBClient.setDatabase(collectiveDbName);
 			collectiveBBClient.setCollection(timeDataName);
+
+			// gets the timedata for synchronizing from the collective blackboard.
 			BasicDBObject timeData = (BasicDBObject) collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
 
 			// initiates the timer to the next product step.
@@ -290,7 +312,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					new NextProductStepTimer(timeData.getLong("firstTimeSlot"), timeData.getInt("timeSlotLength"), this);
 
 			collectiveBBClient.setCollection(equipletDirectoryName);
-		} catch(GeneralMongoException | InvalidDBNamespaceException | UnknownHostException | StaleProxyException e) {
+		} catch(GeneralMongoException | InvalidDBNamespaceException | UnknownHostException | StaleProxyException
+				| KnowledgeException | KeyNotFoundException e) {
 			Logger.log(e);
 			doDelete();
 		}
@@ -327,8 +350,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 			// Clears his own blackboard and removes his subscription on that blackboard.
 			productStepBBClient.removeDocuments(new BasicDBObject());
-			FieldUpdateSubscription statusSubscription = new FieldUpdateSubscription("status", this);
-			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			productStepBBClient.unsubscribe(statusSubscription);
 		} catch(InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 			Logger.log(e);
@@ -340,8 +361,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		send(deadMessage);
 	}
 
-	public void cancelAllStepsForProductStep(ObjectId productStepId, String reason) {
+	public void cancelProductStep(ObjectId productStepId, String reason) {
 		try {
+			//TODO cancel all behaviours started specific for this productStep
+			
 			productStepBBClient.updateDocuments(
 					new BasicDBObject("_id", productStepId),
 					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
@@ -350,110 +373,184 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			e.printStackTrace();
 		}
 	}
+	
+	public void ceaseAllActivity(String reason) {
+		try {
+			for(Behaviour behaviour : behaviours) {
+				removeBehaviour(behaviour);
+			}
+			
+			doSuspend();
+
+			productStepBBClient.updateDocuments(
+					new BasicDBObject(),
+					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
+							"statusData", new BasicDBObject("reason", reason))));
+		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
-	 * onMessage function for the equipletAgent. Listens to updates of the
-	 * blackboard clients and handles them.
+	 * onMessage function for the equipletAgent. Listens to updates of the blackboard clients and handles them.
 	 */
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
-		switch(entry.getNamespace().split("\\.")[1]) {
-			case "ProductStepsBlackBoard":
-				try {
-					// Get the productstep.
-					ObjectId id = entry.getTargetObjectId();
-					ProductStep productStep = new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(id));
-
-					// Gets the conversationId if it doesn't exist throws an error.
-					String conversationId = getConversationId(id);
-					if(conversationId == null) {
-						throw new Exception();
-					}
-
-					// Create the responseMessage
-					ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
-					responseMessage.addReceiver(productStep.getProductAgentId());
-					responseMessage.setConversationId(conversationId);
-
-					Logger.log("Equiplet agent - status update: " + productStep.getStatus().toString());
-					switch(productStep.getStatus()) {
-					// Depending on the changed status fills in the responseMessage and sends it to the product agent.
-						case PLANNED:
-							try {
-								// If the start time of the newly planned productStep is earlier then the next used time
-								// slot make it the next used timeslot.
-								nextProductStep = productStep.getId();
-								ScheduleData scheduleData = productStep.getScheduleData();
-								if(timer.getNextUsedTimeSlot() == 0
-										|| scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
-									timer.setNextUsedTimeSlot(scheduleData.getStartTime());
+		try {
+			switch(entry.getNamespace().split("\\.")[1]) {
+				case "ProductStepsBlackBoard":
+					if(getState() != AP_SUSPENDED) {
+						// Get the productstep.
+						ObjectId id = entry.getTargetObjectId();
+						ProductStep productStep = new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(id));
+	
+						// Gets the conversationId
+						String conversationId = getConversationId(id);
+	
+						// Create the responseMessage
+						ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
+						responseMessage.addReceiver(productStep.getProductAgentId());
+						responseMessage.setConversationId(conversationId);
+	
+						Logger.log("Equiplet agent - status update: " + productStep.getStatus().toString());
+						switch(productStep.getStatus()) {
+						// Depending on the changed status fills in the responseMessage and sends it to the product agent.
+							case PLANNED:
+								try {
+									// If the start time of the newly planned productStep is earlier then the next used time
+									// slot make it the next used timeslot.
+									ScheduleData scheduleData = productStep.getScheduleData();
+									if(timer.getNextUsedTimeSlot() == 0
+											|| scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
+										timer.setNextUsedTimeSlot(scheduleData.getStartTime());
+										nextProductStep = productStep.getId();
+									}
+	
+									responseMessage.setOntology("Planned");
+									responseMessage.setPerformative(ACLMessage.CONFIRM);
+									responseMessage.setContentObject(scheduleData.getStartTime());
+	
+									// TODO: after testing delete below
+									// addBehaviour(new WakerBehaviour(this, 75){
+									//
+									// /**
+									// *
+									// */
+									// private static final long serialVersionUID = 1L;
+									//
+									// protected void onWake(){
+									//
+									// ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
+									// cancelMessage.addReceiver(getAID());
+									// cancelMessage.setOntology("AbortStep");
+									// cancelMessage.setConversationId(getConversationId(nextProductStep));
+									// send(cancelMessage);
+									//
+									// Logger.log("Equiplet agent - sending message %s%n",
+									// ACLMessage.getPerformative(cancelMessage.getPerformative()));
+									// }
+									// });
+									// TODO: after testing delete above
+	
+								} catch(IOException e) {
+									responseMessage.setPerformative(ACLMessage.DISCONFIRM);
+									responseMessage.setContent("An error occured in the planning/please reschedule");
+									Logger.log(e);
 								}
-
-								responseMessage.setOntology("Planned");
-								responseMessage.setContentObject(scheduleData.getStartTime());
-
-								// TODO: after testing delete below
-								// addBehaviour(new WakerBehaviour(this, 75){
-								//
-								// /**
-								// *
-								// */
-								// private static final long serialVersionUID = 1L;
-								//
-								// protected void onWake(){
-								//
-								// ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
-								// cancelMessage.addReceiver(getAID());
-								// cancelMessage.setOntology("AbortStep");
-								// cancelMessage.setConversationId(getConversationId(nextProductStep));
-								// send(cancelMessage);
-								//
-								// Logger.log("Equiplet agent - sending message %s%n",
-								// ACLMessage.getPerformative(cancelMessage.getPerformative()));
-								// }
-								// });
-								// TODO: after testing delete above
-
-							} catch(IOException e) {
-								responseMessage.setPerformative(ACLMessage.FAILURE);
-								responseMessage.setContent("An error occured in the planning/please reschedule");
-								Logger.log(e);
-							}
+								break;
+							case WAITING:
+							case IN_PROGRESS:
+							case FAILED:
+							case SUSPENDED_OR_WARNING:
+								setDesiredEquipletState(EquipletState.STANDBY);
+	
+								responseMessage.setOntology("StatusUpdate");
+								responseMessage.setPerformative(ACLMessage.CONFIRM);
+								responseMessage.setContentObject(productStep.toBasicDBObject());
+								break;
+							case DONE:
+								setDesiredEquipletState(EquipletState.STANDBY);
+	
+								responseMessage.setOntology("StatusUpdate");
+								responseMessage.setPerformative(ACLMessage.CONFIRM);
+								productStep.setStatus(StepStatusCode.DONE);
+								responseMessage.setContentObject(productStep.toBasicDBObject());
+								productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
+								break;
+							case DELETED:
+								setDesiredEquipletState(EquipletState.STANDBY);
+	
+								responseMessage.setOntology("StatusUpdate");
+								responseMessage.setPerformative(ACLMessage.CONFIRM);
+								responseMessage.setContentObject(productStep.toBasicDBObject());
+								productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
+								break;
+							default:
+								break;
+						}
+						Logger.log("Equiplet agent - sending message %s%n",
+								ACLMessage.getPerformative(responseMessage.getPerformative()));
+						send(responseMessage);
+					}
+					break;
+				case "equipletState":
+					EquipletStateEntry stateEntry =
+							new EquipletStateEntry((BasicDBObject) stateBBClient.findDocumentById(entry
+									.getTargetObjectId()));
+					Logger.log("Equiplet agent - mode changed to %s%n", stateEntry.getEquipletMode());
+					EquipletMode mode = stateEntry.getEquipletMode();
+					switch(mode) {
+					// TODO handle error stuff
+						case NORMAL:
+						case STEP:
+						case SERVICE:
 							break;
-						case WAITING:
-						case IN_PROGRESS:
-						case FAILED:
-						case SUSPENDED_OR_WARNING:
-							responseMessage.setOntology("StatusUpdate");
-							responseMessage.setPerformative(ACLMessage.CONFIRM);
-							responseMessage.setContentObject(productStep.toBasicDBObject());
-							break;
-						case DONE:
-							responseMessage.setOntology("StatusUpdate");
-							responseMessage.setPerformative(ACLMessage.CONFIRM);
-							productStep.setStatus(StepStatusCode.DONE);
-							responseMessage.setContentObject(productStep.toBasicDBObject());
-							productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
-							break;
-						case DELETED:
-							responseMessage.setOntology("StatusUpdate");
-							responseMessage.setPerformative(ACLMessage.CONFIRM);
-							responseMessage.setContentObject(productStep.toBasicDBObject());
-							productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
+						case ERROR:
+						case CRITICAL_ERROR:
+						case EMERGENCY_STOP:
+						case LOCK:
 							break;
 						default:
 							break;
 					}
-					Logger.log("Equiplet agent - sending message %s%n",
-							ACLMessage.getPerformative(responseMessage.getPerformative()));
-					send(responseMessage);
-				} catch(Exception e1) {
-					Logger.log(e1);
-				}
-				break;
-			default:
-				break;
+					break;
+				default:
+					Logger.log("Equiplet agent - onMessage Unknown database");
+					break;
+			}
+		} catch(GeneralMongoException | InvalidDBNamespaceException | IOException e) {
+			// TODO handle error
+			Logger.log(e);
 		}
+	}
+
+	public EquipletStateEntry getEquipletStateEntry() throws InvalidDBNamespaceException, GeneralMongoException {
+		List<DBObject> equipletStates = stateBBClient.findDocuments(new BasicDBObject("id", equipletId));
+		return new EquipletStateEntry((BasicDBObject) equipletStates.get(0));
+	}
+
+	public void setDesiredEquipletState(EquipletState state) throws InvalidDBNamespaceException, GeneralMongoException {
+		// TODO when the equipletCommand blackboard has been updated to have a equipletId like field this search query
+		// should be adapted.
+
+		// desiredStateBBClient.updateDocuments(new BasicDBObject("id", equipletId), new BasicDBObject("$set",
+		// new BasicDBObject("desiredState", state.getValue())));
+		desiredStateBBClient.updateDocuments(new BasicDBObject(), new BasicDBObject("$set", new BasicDBObject(
+				"desiredState", state.getValue())));
+		// desiredStateBBClient.updateDocuments(new BasicDBObject("name", getLocalName()), new BasicDBObject("$set",
+		// new BasicDBObject("desiredState", state.getValue())));
+	}
+
+	@Override
+	public void addBehaviour(Behaviour behaviour) {
+		super.addBehaviour(behaviour);
+		behaviours.add(behaviour);
+	}
+
+	@Override
+	public void removeBehaviour(Behaviour behaviour) {
+		super.removeBehaviour(behaviour);
+		behaviours.remove(behaviour);
 	}
 
 	/**
@@ -472,6 +569,13 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 */
 	public BlackboardClient getProductStepBBClient() {
 		return productStepBBClient;
+	}
+
+	/**
+	 * @return the stateBBClient
+	 */
+	public BlackboardClient getStateBBClient() {
+		return stateBBClient;
 	}
 
 	/**
