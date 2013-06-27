@@ -351,7 +351,6 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 								}
 								break;
 							default:
-								Logger.log("Hardware Agent - default serv.Step status set to: %s%n", status);
 								break;
 						}
 					}
@@ -398,7 +397,6 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 								serviceStepBBClient.updateDocuments(searchQuery, updateQuery);
 								break;
 							default:
-								Logger.log("Hardware Agent - default equip.Step status set to: %s%n", status);
 								break;
 						}
 					}

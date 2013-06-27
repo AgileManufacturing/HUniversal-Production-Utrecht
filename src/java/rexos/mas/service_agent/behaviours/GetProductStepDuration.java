@@ -105,7 +105,7 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 			Logger.log("%s got message GetProductStepDuration for step type %s%n", agent.getLocalName(),
 					productStepType);
 
-			Service service = agent.GetServiceForConvId(message.getConversationId());
+			Service service = agent.getServiceForConvId(message.getConversationId());
 			BasicDBObject parameters = productStep.getParameters();
 			ServiceStep[] serviceSteps = service.getServiceSteps(productStepType, parameters);
 			for(ServiceStep serviceStep : serviceSteps) {
@@ -128,8 +128,6 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 			askMessage.setConversationId(message.getConversationId());
 			askMessage.setContentObject(serviceStepId);
 			agent.send(askMessage);
-
-			agent.addBehaviour(new GetServiceStepsDurationResponse(agent, message.getConversationId()));
 		} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 			Logger.log(e);
 			agent.doDelete();

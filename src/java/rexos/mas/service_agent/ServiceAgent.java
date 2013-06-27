@@ -64,8 +64,13 @@ import rexos.mas.data.DbData;
 import rexos.mas.data.Part;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.StepStatusCode;
+import rexos.mas.service_agent.behaviours.ArePartsAvailableInTimeResponse;
+import rexos.mas.service_agent.behaviours.ArePartsAvailableResponse;
 import rexos.mas.service_agent.behaviours.CanDoProductStep;
+import rexos.mas.service_agent.behaviours.CheckForModulesResponse;
+import rexos.mas.service_agent.behaviours.GetPartsInfoResponse;
 import rexos.mas.service_agent.behaviours.GetProductStepDuration;
+import rexos.mas.service_agent.behaviours.GetServiceStepsDurationResponse;
 import rexos.mas.service_agent.behaviours.InitialisationFinished;
 import rexos.mas.service_agent.behaviours.ScheduleStep;
 
@@ -137,6 +142,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 *      This maps conversation id's with service objects.
 	 */
 	private HashMap<String, Service> convIdServiceMapping;
+	private HashMap<String, ObjectId> convIdProductStepIdMapping;
 	
 	private ArrayList<Behaviour> behaviours;
 
@@ -193,15 +199,20 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		}
 
 		convIdServiceMapping = new HashMap<String, Service>();
+		convIdProductStepIdMapping = new HashMap<String, ObjectId>();
 		serviceFactory = new ServiceFactory(equipletAgentAID.getLocalName());
 		behaviours = new ArrayList<Behaviour>();
 
 		// Add behaviours
-		addBehaviour(new CanDoProductStep(this, serviceFactory));
-		addBehaviour(new GetProductStepDuration(this));
-		addBehaviour(new ScheduleStep(this));
 		addBehaviour(new InitialisationFinished(this));
-		getState();
+		addBehaviour(new CanDoProductStep(this, serviceFactory));
+		addBehaviour(new CheckForModulesResponse(this));
+		addBehaviour(new GetProductStepDuration(this));
+		addBehaviour(new GetServiceStepsDurationResponse(this));
+		addBehaviour(new ScheduleStep(this));
+		addBehaviour(new ArePartsAvailableResponse(this));
+		addBehaviour(new ArePartsAvailableInTimeResponse(this));
+		addBehaviour(new GetPartsInfoResponse(this));
 	}
 
 	/**
@@ -466,6 +477,18 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		super.removeBehaviour(behaviour);
 		behaviours.remove(behaviour);
 	}
+	
+	public void mapConvIdWithProductStepId(String conversationId, ObjectId productStepId) {
+		convIdProductStepIdMapping.put(conversationId, productStepId);
+	}
+
+	public ObjectId getProductStepIdForConvId(String conversationId) {
+		return convIdProductStepIdMapping.get(conversationId);
+	}
+
+	public void removeConvIdProductStepIdMapping(String conversationId) {
+		convIdProductStepIdMapping.remove(conversationId);
+	}
 
 	/**
 	 * Maps the specified conversation id with the specified service object.
@@ -478,7 +501,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 * @param conversationId the conversation id to map the service with.
 	 * @param service the service object that the conversation id will be mapped with.
 	 */
-	public void MapConvIdWithService(String conversationId, Service service) {
+	public void mapConvIdWithService(String conversationId, Service service) {
 		convIdServiceMapping.put(conversationId, service);
 	}
 
@@ -488,7 +511,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 * @param conversationId the conversation id to use to get the corresponding service object.
 	 * @return the service object mapped to the specified conversation id.
 	 */
-	public Service GetServiceForConvId(String conversationId) {
+	public Service getServiceForConvId(String conversationId) {
 		return convIdServiceMapping.get(conversationId);
 	}
 
@@ -497,7 +520,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 * 
 	 * @param conversationId The conversationId to remove from the mapping.
 	 */
-	public void RemoveConvIdServiceMapping(String conversationId) {
+	public void removeConvIdServiceMapping(String conversationId) {
 		convIdServiceMapping.remove(conversationId);
 	}
 
