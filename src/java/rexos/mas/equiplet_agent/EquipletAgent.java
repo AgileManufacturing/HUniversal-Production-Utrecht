@@ -234,8 +234,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		// gets his IP and sets the equiplet blackboard IP.
 		try {
 			InetAddress IP = InetAddress.getLocalHost();
-			//equipletDbIp = IP.getHostAddress();
-			equipletDbIp = "145.89.191.131";
+			equipletDbIp = IP.getHostAddress();
+			// equipletDbIp = "145.89.191.131";
 		} catch(UnknownHostException e) {
 			Logger.log(e);
 		}

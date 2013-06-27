@@ -38,12 +38,14 @@ package rexos.mas.service_agent;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -107,13 +109,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	private FieldUpdateSubscription statusSubscription;
 
 	/**
-	 * @var DbData dbData
-	 *      Contains connection information for mongoDB database containing the
-	 *      productstep and servicestep blackboards.
-	 */
-	private DbData dbData;
-
-	/**
 	 * @var AID equipletAgentAID
 	 *      The AID of the equiplet agent of this equiplet.
 	 */
@@ -142,6 +137,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 *      This maps conversation id's with service objects.
 	 */
 	private HashMap<String, Service> convIdServiceMapping;
+	
+	private ArrayList<Behaviour> behaviours;
 
 	/**
 	 * Initializes the agent. This includes creating and starting the hardware agent, creating and configuring two
@@ -150,14 +147,12 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	@Override
 	public void setup() {
 		Logger.log("I spawned as a service agent.");
-
+		
 		// handle arguments given to this agent
 		Object[] args = getArguments();
-		if(args != null && args.length > 0) {
-			dbData = (DbData) args[0];
-			equipletAgentAID = (AID) args[1];
-			logisticsAID = (AID) args[2];
-		}
+		DbData dbData = (DbData) args[0];
+		equipletAgentAID = (AID) args[1];
+		logisticsAID = (AID) args[2];
 
 		// Create a hardware agent for this equiplet
 		Object[] arguments = new Object[] {
@@ -199,12 +194,14 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 		convIdServiceMapping = new HashMap<String, Service>();
 		serviceFactory = new ServiceFactory(equipletAgentAID.getLocalName());
+		behaviours = new ArrayList<Behaviour>();
 
 		// Add behaviours
 		addBehaviour(new CanDoProductStep(this, serviceFactory));
 		addBehaviour(new GetProductStepDuration(this));
 		addBehaviour(new ScheduleStep(this));
 		addBehaviour(new InitialisationFinished(this));
+		getState();
 	}
 
 	/**
@@ -247,58 +244,33 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 	public void cancelAllStepsForProductStep(ObjectId productStepId, String reason) {
 		try {
+			for(Behaviour behaviour : behaviours) {
+				removeBehaviour(behaviour);
+			}
+			behaviours.clear();
+			
 			serviceStepBBClient.updateDocuments(
 					new BasicDBObject("productStepId", productStepId),
 					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
 							"statusData", new BasicDBObject("reason", reason))));
 
-			// Cancel parts ordered at LA
 			ProductStep productStep =
 					new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(productStepId));
-			Part[] inputParts = productStep.getInputParts();
 
-			ACLMessage message = new ACLMessage(ACLMessage.CANCEL);
-			message.setContentObject(inputParts);
-			message.addReceiver(logisticsAID);
-			message.setOntology("CancelTransport");
-			send(message);
+			// Cancel parts ordered at LA but only if the productStep already has been planned because only from that
+			// moment all partID's are known.
+			if(productStep.getStatus() != StepStatusCode.EVALUATING) {
+				Part[] inputParts = productStep.getInputParts();
+
+				ACLMessage message = new ACLMessage(ACLMessage.CANCEL);
+				message.setContentObject(inputParts);
+				message.addReceiver(logisticsAID);
+				message.setOntology("CancelTransport");
+				send(message);
+			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 			Logger.log(e);
 		}
-	}
-
-	/**
-	 * Maps the specified conversation id with the specified service object.
-	 * Once a service object has been created (by the service factory) it's
-	 * mapped with the conversation id of the scheduling negotiation of the
-	 * corresponding product step. With this mapping behaviours that do not have
-	 * a reference to a service object can still get one with
-	 * GetServiceForConvId.
-	 * 
-	 * @param conversationId the conversation id to map the service with.
-	 * @param service the service object that the conversation id will be mapped with.
-	 */
-	public void MapConvIdWithService(String conversationId, Service service) {
-		convIdServiceMapping.put(conversationId, service);
-	}
-
-	/**
-	 * Returns the service object mapped to the specified conversation id.
-	 * 
-	 * @param conversationId the conversation id to use to get the corresponding service object.
-	 * @return the service object mapped to the specified conversation id.
-	 */
-	public Service GetServiceForConvId(String conversationId) {
-		return convIdServiceMapping.get(conversationId);
-	}
-
-	/**
-	 * Removes the mapping of the specified conversation id with the corresponding service object.
-	 * 
-	 * @param conversationId The conversationId to remove from the mapping.
-	 */
-	public void RemoveConvIdServiceMapping(String conversationId) {
-		convIdServiceMapping.remove(conversationId);
 	}
 
 	/**
@@ -385,7 +357,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 														"statusData",
 														new BasicDBObject("reason", serviceStep.getStatusData().get(
 																"reason")).append("log", buildLog(productStepId)))));
-										serviceStepBBClient.removeDocuments(new BasicDBObject("productStepId", productStepId));
+										serviceStepBBClient.removeDocuments(new BasicDBObject("productStepId",
+												productStepId));
 									}
 									break;
 								case DONE:
@@ -482,14 +455,45 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		}
 		return log;
 	}
+	
+	@Override
+	public void addBehaviour(Behaviour behaviour) {
+		super.addBehaviour(behaviour);
+		behaviours.add(behaviour);
+	}
 
 	/**
-	 * the DbData containing connection info for the blackboard mongoDB database.
+	 * Maps the specified conversation id with the specified service object.
+	 * Once a service object has been created (by the service factory) it's
+	 * mapped with the conversation id of the scheduling negotiation of the
+	 * corresponding product step. With this mapping behaviours that do not have
+	 * a reference to a service object can still get one with
+	 * GetServiceForConvId.
 	 * 
-	 * @return the DbData containing connection info for the blackboard mongoDB database.
+	 * @param conversationId the conversation id to map the service with.
+	 * @param service the service object that the conversation id will be mapped with.
 	 */
-	public DbData getDbData() {
-		return dbData;
+	public void MapConvIdWithService(String conversationId, Service service) {
+		convIdServiceMapping.put(conversationId, service);
+	}
+
+	/**
+	 * Returns the service object mapped to the specified conversation id.
+	 * 
+	 * @param conversationId the conversation id to use to get the corresponding service object.
+	 * @return the service object mapped to the specified conversation id.
+	 */
+	public Service GetServiceForConvId(String conversationId) {
+		return convIdServiceMapping.get(conversationId);
+	}
+
+	/**
+	 * Removes the mapping of the specified conversation id with the corresponding service object.
+	 * 
+	 * @param conversationId The conversationId to remove from the mapping.
+	 */
+	public void RemoveConvIdServiceMapping(String conversationId) {
+		convIdServiceMapping.remove(conversationId);
 	}
 
 	/**

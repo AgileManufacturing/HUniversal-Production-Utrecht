@@ -30,10 +30,6 @@
  **/
 package rexos.mas.data;
 
-/**
- * @author Peter Bonnema
- *
- */
 public enum EquipletState {
 	/**
 	 * @var EquipletState SAFE
