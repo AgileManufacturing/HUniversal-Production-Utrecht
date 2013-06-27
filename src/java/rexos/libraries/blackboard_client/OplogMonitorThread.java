@@ -72,6 +72,7 @@ class OplogMonitorThread extends Thread {
 		tailedCursor.addOption(Bytes.QUERYOPTION_TAILABLE);
 		tailedCursor.addOption(Bytes.QUERYOPTION_AWAITDATA);
 		tailedCursor.skip(tailedCursor.size());
+		System.out.println("Using query: " + query + "\n");
 	}
 	
 	/**
@@ -107,27 +108,14 @@ class OplogMonitorThread extends Thread {
 	}
 	
 	/**
-	 * Kills the current tailedCursor before invoking Thread.interrupt
-	 * 
-	 * @see java.lang.Thread#interrupt()
-	 **/
-	@Override
-	public void interrupt(){
-		if (tailedCursor != null) {
-			tailedCursor.close();
-		}
-		super.interrupt();
-	}
-	
-	/**
 	 * Run method for the TailedCursorThread.
 	 * This will check for changes within the cursor and calls the onMessage method of its subscriber.
 	 **/
 	@Override
 	public void run() {
 		try {
-			while (!Thread.interrupted() && tailedCursor.getCursorId() == 0) {
-				while (tailedCursor.hasNext()) {
+			while (!Thread.interrupted() && tailedCursor.getCursorId() != 0) {
+				while (!Thread.interrupted() && tailedCursor.hasNext()) {
 					OplogEntry entry = new OplogEntry(tailedCursor.next());
 					MongoOperation operation = entry.getOperation();
 
@@ -137,8 +125,10 @@ class OplogMonitorThread extends Thread {
 						}
 					}
 				}
+				
+				Thread.sleep(100);
 			}
-		} catch (MongoInterruptedException | MongoException.CursorNotFound ex) {
+		} catch (MongoInterruptedException | MongoException.CursorNotFound | InterruptedException ex) {
 			/*
 			 * MongoInterruptedException is thrown by Mongo when interrupt is called while blocking on the
 			 * tailedCursor's hasNext method. When this happens, return from the run method to kill the thread.
@@ -150,6 +140,15 @@ class OplogMonitorThread extends Thread {
 			 */
 			
 			rexos.libraries.log.Logger.log("OplogMonitorThread ending due to %s:\n%s", ex.getClass().getName(), ex.getMessage());
+		} finally {
+			try {
+				if (tailedCursor != null) {
+					tailedCursor.close();
+				}
+			} catch (Throwable t) {
+				// If closing the cursor throws something, it's most likely not something we can fix.
+				rexos.libraries.log.Logger.log("%s thrown while closing cursor:\n%s", t.getClass().getName(), t.getMessage());
+			}
 		}
 	}
 }
