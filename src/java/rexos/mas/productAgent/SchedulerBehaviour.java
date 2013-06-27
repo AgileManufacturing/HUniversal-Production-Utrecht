@@ -165,9 +165,9 @@ public class SchedulerBehaviour extends Behaviour {
 
 
 		ArrayList<FreeTimeSlot> freetimeslots = new ArrayList<FreeTimeSlot>();
+		DbData dbData = null;
 		// Change this
 		for (AID aid : equipletlist) {
-			DbData dbData = null;
 			bbc = new BlackboardClient("145.89.191.131");
 			bbc.setDatabase("CollectiveDb");
 			bbc.setCollection("EquipletDirectory");
@@ -192,7 +192,12 @@ public class SchedulerBehaviour extends Behaviour {
 			int requiredTimeSlots = (int) prodAgent.getProduct().getProduction().getProductionEquipletMapping().getTimeSlotsForEquiplet(_prodStep.getId(), aid);
 
 			// Gets planned steps TODO:: improve query
-			List<DBObject> plannedSteps = bbc.findDocuments(QueryBuilder.start("scheduleData.startTime").greaterThan(-1).get());
+			DBObject query = QueryBuilder.start("scheduleData.startTime").greaterThan(-1).put("scheduleData.startTime").greaterThan(System.currentTimeMillis()/timeSlotLength).get();
+			BasicDBObject orderby = new BasicDBObject("scheduleData", new BasicDBObject("startTime", "1"));
+			BasicDBObject findquery = new BasicDBObject("$query", query).append("$orderby", orderby);
+			List<DBObject> plannedSteps = bbc.findDocuments(findquery);
+			//List<DBObject> plannedSteps = bbc.findDocuments(QueryBuilder.start("scheduleData.startTime").greaterThan(-1).put("scheduleData.startTime").greaterThan(System.currentTimeMillis()/timeSlotLength).get());
+			//List<DBObject> allSteps = bbc.findDocuments("");
 			for (int i = 0; i < plannedSteps.size(); i++) {
 				long startTime = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getLong("startTime");
 				int duration = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getInt("duration");
@@ -211,11 +216,11 @@ public class SchedulerBehaviour extends Behaviour {
 						}
 					} else {
 						Schedule lastSchedule = schedules.get(index);
-						freetimeslots.add(new FreeTimeSlot(lastSchedule.getDeadline(), requiredTimeSlots, aid));
+						freetimeslots.add(new FreeTimeSlot(lastSchedule.getDeadline() + 50, requiredTimeSlots, aid));
 					}
 				}
 			} else {
-				freetimeslots.add(new FreeTimeSlot(System.currentTimeMillis() / timeSlotLength + 20, requiredTimeSlots, aid));
+				freetimeslots.add(new FreeTimeSlot(System.currentTimeMillis() / timeSlotLength + (5000/timeSlotLength), requiredTimeSlots, aid));
 			}
 		}
 		FreeTimeSlot freetimeslotEq = null;
@@ -244,6 +249,11 @@ public class SchedulerBehaviour extends Behaviour {
 		ACLMessage returnMsg = myAgent.blockingReceive();
 		if (returnMsg.getPerformative() == ACLMessage.CONFIRM) {
 			_prodStep.setStatus(StepStatusCode.PLANNED);
+			bbc = new BlackboardClient(dbData.getIp(), dbData.getPort());
+			bbc.setDatabase(dbData.getName());
+			bbc.setCollection("ProductStepsBlackBoard");
+			List<DBObject> allSteps = bbc.findDocuments("");
+			System.out.println("Planned");
 		} else if (returnMsg.getPerformative() == ACLMessage.DISCONFIRM) {
 			System.out.println("Disconfirm.");
 		}
@@ -268,7 +278,7 @@ public class SchedulerBehaviour extends Behaviour {
 					}
 					_isDone = true;
 					_schedulersCompleted++;
-					System.out.println("PA - received message " + msg.getOntology());
+					System.out.println("received message");
 					
 				}
 			}

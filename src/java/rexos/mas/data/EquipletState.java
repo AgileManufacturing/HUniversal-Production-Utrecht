@@ -41,40 +41,15 @@ public enum EquipletState {
 	 */
 	SAFE(0),
 	/**
-	 * @var EquipletState SETUP
-	 *      setup state of the equiplet
-	 */
-	SETUP(1),
-	/**
-	 * @var EquipletState SHUTDOWN
-	 *      shutdown state of the equiplet
-	 */
-	SHUTDOWN(2),
-	/**
 	 * @var EquipletState STANDBY
 	 *      standby state of the equiplet
 	 */
 	STANDBY(3),
 	/**
-	 * @var EquipletState START
-	 *      start state of the equiplet
-	 */
-	START(4),
-	/**
-	 * @var EquipletState STOP
-	 *      stop state of the equiplet
-	 */
-	STOP(5),
-	/**
 	 * @var EquipletState NORMAL
 	 *      normal state of the equiplet
 	 */
-	NORMAL(6),
-	/**
-	 * @var EquipletState NOSTATE
-	 *      nostate state of the equiplet
-	 */
-	NOSTATE(7);
+	NORMAL(6);
 
 	/**
 	 * @var int value

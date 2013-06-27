@@ -40,11 +40,16 @@ import com.mongodb.BasicDBObject;
  */
 public class EquipletStateEntry implements MongoSaveable {
 	private ObjectId _id;
-	private int equipletId;
+	private String equipletId;
 	private EquipletMode equipletMode;
 	private EquipletState equipletState;
 
-	public EquipletStateEntry(int equipletId, EquipletMode equipletMode, EquipletState equipletState) {
+	/**
+	 * @param equipletId
+	 * @param equipletMode
+	 * @param equipletState
+	 */
+	public EquipletStateEntry(String equipletId, EquipletMode equipletMode, EquipletState equipletState) {
 		this.equipletId = equipletId;
 		this.equipletMode = equipletMode;
 		this.equipletState = equipletState;
@@ -54,45 +59,33 @@ public class EquipletStateEntry implements MongoSaveable {
 		fromBasicDBObject(object);
 	}
 
+	/**
+	 * @see rexos.mas.data.MongoSaveable#toBasicDBObject()
+	 */
 	@Override
 	public BasicDBObject toBasicDBObject() {
-		BasicDBObject object = new BasicDBObject();
-		object.put("_id", _id);
-		object.put("id", equipletId);
-		object.put("mode", equipletMode.getValue());
-		object.put("state", equipletState.getValue());
-		return object;
+		return null;
 	}
 
+	/**
+	 * @see rexos.mas.data.MongoSaveable#fromBasicDBObject(com.mongodb.BasicDBObject)
+	 */
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) throws IllegalArgumentException {
-		try {
-			BasicDBObject copy = (BasicDBObject) object.copy();
-			_id = (ObjectId) copy.removeField("_id");
-			equipletId = (int) copy.removeField("id");
-			equipletMode = EquipletMode.getState((int) copy.removeField("mode"));
-			equipletState = EquipletState.getState((int) copy.removeField("state"));
-			
-			if(!copy.isEmpty()) {
-				throw new IllegalArgumentException();
-			}
-		} catch(ClassCastException | NullPointerException e) {
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
+
 	}
 
 	/**
 	 * @return the equipletId
 	 */
-	public int getEquipletId() {
+	public String getEquipletId() {
 		return equipletId;
 	}
 
 	/**
 	 * @param equipletId the equipletId to set
 	 */
-	public void setEquipletId(int equipletId) {
+	public void setEquipletId(String equipletId) {
 		this.equipletId = equipletId;
 	}
 
