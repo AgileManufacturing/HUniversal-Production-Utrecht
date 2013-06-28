@@ -40,10 +40,13 @@ import jade.lang.acl.MessageTemplate;
 
 import java.io.IOException;
 
+import org.bson.types.ObjectId;
+
+import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
-import rexos.mas.behaviours.ReceiveOnceBehaviour;
+import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.service_agent.ServiceAgent;
@@ -58,19 +61,12 @@ import com.mongodb.BasicDBObject;
  * @author Peter Bonnema
  * 
  */
-public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
+public class ArePartsAvailableResponse extends ReceiveBehaviour {
 	/**
 	 * @var long serialVersionUID
 	 *      The serialVersionUID of this class.
 	 */
 	private static final long serialVersionUID = 1L;
-
-	/**
-	 * @var String conversationId
-	 *      The conversationId which the answer will have. Any messages send in response will also have this
-	 *      conversationId.
-	 */
-	private String conversationId;
 
 	/**
 	 * @var ServiceAgent agent
@@ -79,37 +75,13 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 	private ServiceAgent agent;
 
 	/**
-	 * @var ProductStep productStep
-	 *      The productStep from which the parts come.
-	 */
-	private ProductStep productStep;
-
-	/**
-	 * Creates a new ArePartsAvailableResponse instance with the specified parameters. A default value of 2000 ms is
-	 * used for the timeout.
-	 * 
-	 * @param agent the agent this behaviour belongs to.
-	 * @param conversationId the conversationId that any messages sent or received by this behavour will have.
-	 * @param productStep The productStep from which the parts come.
-	 */
-	public ArePartsAvailableResponse(ServiceAgent agent, String conversationId, ProductStep productStep) {
-		this(agent, 2000, conversationId, productStep);
-	}
-
-	/**
 	 * Creates a new ArePartsAvailableInTimeResponse instance with the specified parameters.
 	 * 
 	 * @param agent the agent this behaviour belongs to.
-	 * @param millis the timeout period in milliseconds.
-	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
-	 * @param productStep The productStep from which the parts come.
 	 */
-	public ArePartsAvailableResponse(ServiceAgent agent, int millis, String conversationId, ProductStep productStep) {
-		super(agent, millis, MessageTemplate.and(MessageTemplate.MatchConversationId(conversationId),
-				MessageTemplate.MatchOntology("ArePartsAvailableResponse")));
+	public ArePartsAvailableResponse(ServiceAgent agent) {
+		super(agent, MessageTemplate.MatchOntology("ArePartsAvailableResponse"));
 		this.agent = agent;
-		this.conversationId = conversationId;
-		this.productStep = productStep;
 	}
 
 	/**
@@ -126,16 +98,18 @@ public class ArePartsAvailableResponse extends ReceiveOnceBehaviour {
 		if(message != null) {
 			try {
 				Logger.log("%s ArePartsAvailableResponse%n", agent.getLocalName());
+				
+				BlackboardClient productStepBBClient = agent.getProductStepBBClient();
+				ObjectId productStepId = agent.getProductStepIdForConvId(message.getConversationId());
+				ProductStep productStep = new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(productStepId));
 				if(message.getPerformative() == ACLMessage.CONFIRM) {
 					ACLMessage sendMsg = message.createReply();
 					sendMsg.setOntology("ArePartsAvailableInTime");
 					sendMsg.setPerformative(ACLMessage.QUERY_IF);
 					sendMsg.setContentObject(productStep.getInputParts());
 					agent.send(sendMsg);
-
-					agent.addBehaviour(new ArePartsAvailableInTimeResponse(agent, conversationId, productStep));
 				} else {
-					agent.getProductStepBBClient().updateDocuments(
+					productStepBBClient.updateDocuments(
 							new BasicDBObject("_id", productStep.getId()),
 							new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name())
 									.append("statusData", new BasicDBObject("reason", "missing productStep"))));

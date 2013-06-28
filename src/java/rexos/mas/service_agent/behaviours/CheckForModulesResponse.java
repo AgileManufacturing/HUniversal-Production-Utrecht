@@ -38,7 +38,7 @@ package rexos.mas.service_agent.behaviours;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import rexos.libraries.log.Logger;
-import rexos.mas.behaviours.ReceiveOnceBehaviour;
+import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.service_agent.ServiceAgent;
 
 /**
@@ -49,7 +49,7 @@ import rexos.mas.service_agent.ServiceAgent;
  * @author Peter Bonnema
  * 
  */
-public class CheckForModulesResponse extends ReceiveOnceBehaviour {
+public class CheckForModulesResponse extends ReceiveBehaviour {
 	/**
 	 * @var long serialVersionUID
 	 *      The serialVersionUID of this class.
@@ -63,23 +63,12 @@ public class CheckForModulesResponse extends ReceiveOnceBehaviour {
 	private ServiceAgent agent;
 
 	/**
-	 * Creates a new ArePartsAvailableResponse instance with the specified parameters. A default value of 2000 ms is
-	 * used for the timeout.
+	 * Creates a new ArePartsAvailableResponse instance with the specified parameters.
 	 * 
 	 * @param agent the agent this behaviour belongs to.
 	 */
 	public CheckForModulesResponse(ServiceAgent agent) {
-		this(agent, 2000);
-	}
-
-	/**
-	 * Creates a new ArePartsAvailableResponse instance with the specified parameters.
-	 * 
-	 * @param agent the agent this behaviour belongs to.
-	 * @param millis the timeout period in milliseconds.
-	 */
-	public CheckForModulesResponse(ServiceAgent agent, int millis) {
-		super(agent, millis, MessageTemplate.MatchOntology("CheckForModulesResponse"));
+		super(agent, MessageTemplate.MatchOntology("CheckForModulesResponse"));
 		this.agent = agent;
 	}
 

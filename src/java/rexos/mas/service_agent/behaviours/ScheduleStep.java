@@ -102,6 +102,8 @@ public class ScheduleStep extends ReceiveBehaviour {
 				ProductStep productStep =
 						new ProductStep((BasicDBObject) agent.getProductStepBBClient().findDocumentById(
 								(ObjectId) message.getContentObject()));
+				
+				agent.mapConvIdWithProductStepId(message.getConversationId(), productStep.getId());
 
 				ACLMessage sendMsg = new ACLMessage(ACLMessage.QUERY_IF);
 				sendMsg.setConversationId(message.getConversationId());
@@ -109,8 +111,6 @@ public class ScheduleStep extends ReceiveBehaviour {
 				sendMsg.setOntology("ArePartsAvailable");
 				sendMsg.setContentObject(productStep);
 				agent.send(sendMsg);
-
-				agent.addBehaviour(new ArePartsAvailableResponse(agent, message.getConversationId(), productStep));
 			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException | IOException e) {
 				Logger.log(e);
 				agent.doDelete();

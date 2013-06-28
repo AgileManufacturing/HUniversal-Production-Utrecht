@@ -40,10 +40,13 @@ import jade.lang.acl.MessageTemplate;
 
 import java.io.IOException;
 
+import org.bson.types.ObjectId;
+
+import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
-import rexos.mas.behaviours.ReceiveOnceBehaviour;
+import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.service_agent.ServiceAgent;
@@ -58,7 +61,7 @@ import com.mongodb.BasicDBObject;
  * @author Peter Bonnema
  * 
  */
-public class ArePartsAvailableInTimeResponse extends ReceiveOnceBehaviour {
+public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 	/**
 	 * @var long serialVersionUID
 	 *      The serialVersionUID of this class.
@@ -66,35 +69,10 @@ public class ArePartsAvailableInTimeResponse extends ReceiveOnceBehaviour {
 	private static final long serialVersionUID = -2279562050278151393L;
 
 	/**
-	 * @var String conversationId
-	 *      The conversationId which the answer will have. Any messages send in response will also have this
-	 *      conversationId.
-	 */
-	private String conversationId;
-
-	/**
 	 * @var ServiceAgent agent
 	 *      The service agent this behaviour belongs to.
 	 */
 	private ServiceAgent agent;
-
-	/**
-	 * @var ProductStep productStep
-	 *      The productStep from which the parts come.
-	 */
-	private ProductStep productStep;
-
-	/**
-	 * Creates a new ArePartsAvailableInTimeResponse instance with the specified parameters. A default value of 2000 ms
-	 * is used for the timeout.
-	 * 
-	 * @param agent the agent this behaviour belongs to.
-	 * @param conversationId the conversationId that any messages sent or received by this behavour will have.
-	 * @param productStep The productStep from which the parts come.
-	 */
-	public ArePartsAvailableInTimeResponse(ServiceAgent agent, String conversationId, ProductStep productStep) {
-		this(agent, 2000, conversationId, productStep);
-	}
 
 	/**
 	 * Creates a new ArePartsAvailableInTimeResponse instance with the specified parameters.
@@ -104,13 +82,9 @@ public class ArePartsAvailableInTimeResponse extends ReceiveOnceBehaviour {
 	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
 	 * @param productStep The productStep from which the parts come.
 	 */
-	public ArePartsAvailableInTimeResponse(ServiceAgent agent, int millis, String conversationId,
-			ProductStep productStep) {
-		super(agent, millis, MessageTemplate.and(MessageTemplate.MatchConversationId(conversationId),
-				MessageTemplate.MatchOntology("ArePartsAvailableInTimeResponse")));
+	public ArePartsAvailableInTimeResponse(ServiceAgent agent) {
+		super(agent, MessageTemplate.MatchOntology("ArePartsAvailableInTimeResponse"));
 		this.agent = agent;
-		this.conversationId = conversationId;
-		this.productStep = productStep;
 	}
 
 	/**
@@ -126,14 +100,16 @@ public class ArePartsAvailableInTimeResponse extends ReceiveOnceBehaviour {
 		if(message != null) {
 			try {
 				Logger.log("%s ArePartsAvailableInTimeResponse%n", agent.getLocalName());
+				
+				BlackboardClient productStepBBClient = agent.getProductStepBBClient();
+				ObjectId productStepId = agent.getProductStepIdForConvId(message.getConversationId());
+				ProductStep productStep = new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(productStepId));
 				if(message.getPerformative() == ACLMessage.CONFIRM) {
 					ACLMessage sendMsg = message.createReply();
 					sendMsg.setOntology("GetPartsInfo");
 					sendMsg.setPerformative(ACLMessage.QUERY_IF);
 					sendMsg.setContentObject(productStep.getInputParts());
 					agent.send(sendMsg);
-
-					agent.addBehaviour(new GetPartsInfoResponse(agent, conversationId, productStep));
 				} else {
 					agent.getProductStepBBClient().updateDocuments(
 							new BasicDBObject("_id", productStep.getId()),

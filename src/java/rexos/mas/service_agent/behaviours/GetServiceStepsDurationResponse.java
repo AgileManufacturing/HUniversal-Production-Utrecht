@@ -45,7 +45,7 @@ import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
-import rexos.mas.behaviours.ReceiveOnceBehaviour;
+import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.service_agent.ServiceAgent;
@@ -61,19 +61,12 @@ import com.mongodb.BasicDBObject;
  * @author Peter
  * 
  */
-public class GetServiceStepsDurationResponse extends ReceiveOnceBehaviour {
+public class GetServiceStepsDurationResponse extends ReceiveBehaviour {
 	/**
 	 * @var long serialVersionUID
 	 *      The serialVersionUID of this class.
 	 */
 	private static final long serialVersionUID = -3454535337099894852L;
-
-	/**
-	 * @var String conversationId
-	 *      The conversationId which the answer will have. Any messages send in response will also have this
-	 *      conversationId.
-	 */
-	private String conversationId;
 
 	/**
 	 * @var ServiceAgent agent
@@ -82,28 +75,13 @@ public class GetServiceStepsDurationResponse extends ReceiveOnceBehaviour {
 	private ServiceAgent agent;
 
 	/**
-	 * Creates a new GetServiceStepsDurationResponse instance with the specified parameters. A default value of 2000 ms
-	 * is used for the timeout.
-	 * 
-	 * @param agent the agent this behaviour belongs to.
-	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
-	 */
-	public GetServiceStepsDurationResponse(ServiceAgent agent, String conversationId) {
-		this(agent, 10000, conversationId);
-	}
-
-	/**
 	 * Creates a new GetServiceStepsDurationResponse instance with the specified parameters.
 	 * 
 	 * @param agent the agent this behaviour belongs to.
-	 * @param millis the timeout period in milliseconds.
-	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
 	 */
-	public GetServiceStepsDurationResponse(ServiceAgent agent, int millis, String conversationId) {
-		super(agent, millis, MessageTemplate.and(MessageTemplate.MatchConversationId(conversationId),
-				MessageTemplate.MatchOntology("GetServiceStepDurationResponse")));
+	public GetServiceStepsDurationResponse(ServiceAgent agent) {
+		super(agent, MessageTemplate.MatchOntology("GetServiceStepDurationResponse"));
 		this.agent = agent;
-		this.conversationId = conversationId;
 	}
 
 	/**
@@ -142,7 +120,7 @@ public class GetServiceStepsDurationResponse extends ReceiveOnceBehaviour {
 
 				ACLMessage answer = new ACLMessage(ACLMessage.INFORM);
 				answer.addReceiver(agent.getEquipletAgentAID());
-				answer.setConversationId(conversationId);
+				answer.setConversationId(message.getConversationId());
 				answer.setOntology("ProductionDurationResponse");
 				agent.send(answer);
 

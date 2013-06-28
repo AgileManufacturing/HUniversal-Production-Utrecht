@@ -128,7 +128,7 @@ public class CanDoProductStep extends ReceiveBehaviour {
 				// TODO (out of scope)implement algorithm to intelligently choose a service here
 				Service choosenService = possibleServices.get(0);
 
-				agent.MapConvIdWithService(message.getConversationId(), choosenService);
+				agent.mapConvIdWithService(message.getConversationId(), choosenService);
 
 				ACLMessage msg = new ACLMessage(ACLMessage.QUERY_IF);
 				msg.setConversationId(message.getConversationId());
@@ -136,8 +136,6 @@ public class CanDoProductStep extends ReceiveBehaviour {
 				msg.setOntology("CheckForModules");
 				msg.setContentObject(choosenService.getModuleGroupIds(stepType, parameters));
 				agent.send(msg);
-
-				agent.addBehaviour(new CheckForModulesResponse(agent));
 			} else {
 				ACLMessage reply = message.createReply();
 				reply.setPerformative(ACLMessage.DISCONFIRM);

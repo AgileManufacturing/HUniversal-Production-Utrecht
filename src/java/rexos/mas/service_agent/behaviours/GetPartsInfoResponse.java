@@ -46,10 +46,11 @@ import java.util.Map.Entry;
 
 import org.bson.types.ObjectId;
 
+import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
-import rexos.mas.behaviours.ReceiveOnceBehaviour;
+import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.Part;
 import rexos.mas.data.Position;
 import rexos.mas.data.ProductStep;
@@ -70,7 +71,7 @@ import com.mongodb.DBObject;
  * @author Peter Bonnema
  * 
  */
-public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
+public class GetPartsInfoResponse extends ReceiveBehaviour {
 	/**
 	 * @var long serialVersionUID
 	 *      The serialVersionUID of this class.
@@ -78,35 +79,10 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 	private static final long serialVersionUID = -7419729795873947786L;
 
 	/**
-	 * @var String conversationId
-	 *      The conversationId which the answer will have. Any messages send in response will also have this
-	 *      conversationId.
-	 */
-	private String conversationId;
-
-	/**
 	 * @var ServiceAgent agent
 	 *      The service agent this behaviour belongs to.
 	 */
 	private ServiceAgent agent;
-
-	/**
-	 * @var ProductStep productStep
-	 *      The productStep from which the parts come.
-	 */
-	private ProductStep productStep;
-
-	/**
-	 * Creates a new GetPartsInfoResponse instance with the specified parameters. A default value of 2000 ms
-	 * is used for the timeout.
-	 * 
-	 * @param agent the agent this behaviour belongs to.
-	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
-	 * @param productStep The productStep from which the parts come.
-	 */
-	public GetPartsInfoResponse(ServiceAgent agent, String conversationId, ProductStep productStep) {
-		this(agent, 2000, conversationId, productStep);
-	}
 
 	/**
 	 * Creates a new GetPartsInfoResponse instance with the specified parameters.
@@ -116,12 +92,9 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
 	 * @param productStep The productStep from which the parts come.
 	 */
-	public GetPartsInfoResponse(ServiceAgent agent, int millis, String conversationId, ProductStep productStep) {
-		super(agent, millis, MessageTemplate.and(MessageTemplate.MatchConversationId(conversationId),
-				MessageTemplate.MatchOntology("GetPartsInfoResponse")));
+	public GetPartsInfoResponse(ServiceAgent agent) {
+		super(agent, MessageTemplate.MatchOntology("GetPartsInfoResponse"));
 		this.agent = agent;
-		this.conversationId = conversationId;
-		this.productStep = productStep;
 	}
 
 	/**
@@ -139,9 +112,14 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 	public void handle(ACLMessage message) {
 		if(message != null) {
 			try {
-				ObjectId productStepId = productStep.getId();
+				BlackboardClient productStepBBClient = agent.getProductStepBBClient();
+				BlackboardClient serviceStepBBClient = agent.getServiceStepBBClient();
+
+				String conversationId = message.getConversationId();
+				ObjectId productStepId = agent.getProductStepIdForConvId(conversationId);
+				agent.removeConvIdProductStepIdMapping(conversationId);
 				List<DBObject> dbServiceSteps =
-						agent.getServiceStepBBClient().findDocuments(new BasicDBObject("productStepId",productStepId));
+						serviceStepBBClient.findDocuments(new BasicDBObject("productStepId", productStepId));
 				ServiceStep[] serviceSteps = new ServiceStep[dbServiceSteps.size()];
 
 				for(int i = 0; i < dbServiceSteps.size(); i++) {
@@ -149,36 +127,35 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 				}
 
 				HashMap<Part, Position> parameters = (HashMap<Part, Position>) message.getContentObject();
-				
+
 				BasicDBList partList = new BasicDBList();
-				
-				for(Object part : parameters.keySet().toArray()){
-					
-					Part p = (Part)part;
-					partList.add(p.toBasicDBObject());					
-				}							
-				
-				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStep.getId()),
-						new BasicDBObject("$set", new BasicDBObject("inputParts",partList)));
-				
+				for(Object part : parameters.keySet().toArray()) {
+					Part p = (Part) part;
+					partList.add(p.toBasicDBObject());
+				}
+
+				productStepBBClient.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject("$set",
+						new BasicDBObject("inputParts", partList)));
+
 				Logger.log("%s got partsInfo: %s%n", agent.getLocalName(), parameters.toString());
 
 				for(Entry<Part, Position> e : parameters.entrySet()) {
 					if(e.getValue() == null) {
-						agent.getProductStepBBClient()
-								.updateDocuments(
-										new BasicDBObject("_id", productStepId),
-										new BasicDBObject("$set", new BasicDBObject("outputPart", e.getKey()
-												.toBasicDBObject())));
+						productStepBBClient.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject(
+								"$set", new BasicDBObject("outputPart", e.getKey().toBasicDBObject())));
 						parameters.remove(e.getKey());
 						break;
 					}
 				}
 				ServiceStep[] parameterizedSteps =
-						agent.GetServiceForConvId(conversationId).updateParameters(parameters,
+						agent.getServiceForConvId(conversationId).updateParameters(parameters,
 								ServiceStep.sort(serviceSteps));
+				
+				agent.removeConvIdServiceMapping(conversationId);
 
 				ScheduleData scheduleData;
+				ProductStep productStep =
+						new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(productStepId));
 				long nextStartTime = productStep.getScheduleData().getStartTime();
 				for(ServiceStep serviceStep : parameterizedSteps) {
 					scheduleData = serviceStep.getScheduleData();
@@ -188,12 +165,11 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 
 					nextStartTime += scheduleData.getDuration();
 
-					agent.getServiceStepBBClient().updateDocuments(
+					serviceStepBBClient.updateDocuments(
 							new BasicDBObject("_id", serviceStep.getId()),
-							new BasicDBObject("$set",
-									new BasicDBObject("parameters", serviceStep.getParameters())
-											.append("scheduleData", serviceStep.getScheduleData().toBasicDBObject())
-											.append("status", serviceStep.getStatus().name())));
+							new BasicDBObject("$set", new BasicDBObject("parameters", serviceStep.getParameters())
+									.append("scheduleData", serviceStep.getScheduleData().toBasicDBObject()).append(
+											"status", serviceStep.getStatus().name())));
 				}
 
 				ACLMessage informMsg = new ACLMessage(ACLMessage.INFORM);
@@ -203,13 +179,11 @@ public class GetPartsInfoResponse extends ReceiveOnceBehaviour {
 				informMsg.setContentObject(parameterizedSteps[0].getId());
 				agent.send(informMsg);
 
-				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStep.getId()),
-						new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.PLANNED.name())));
-								
+				productStepBBClient.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject("$set",
+						new BasicDBObject("status", StepStatusCode.PLANNED.name())));
 			} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 				Logger.log(e);
-				agent.doDelete(); //doDelete because of unrecoverable exception
-				
+				agent.doDelete();
 			}
 		} else {
 			Logger.log(agent.getName() + " - GetPartsInfoResponse timeout!");

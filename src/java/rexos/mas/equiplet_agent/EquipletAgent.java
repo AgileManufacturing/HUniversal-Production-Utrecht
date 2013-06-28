@@ -363,27 +363,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 	public void cancelProductStep(ObjectId productStepId, String reason) {
 		try {
-			//TODO cancel all behaviours started specific for this productStep
-			
-			productStepBBClient.updateDocuments(
-					new BasicDBObject("_id", productStepId),
-					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
-							"statusData", new BasicDBObject("reason", reason))));
-		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void ceaseAllActivity(String reason) {
-		try {
-			for(Behaviour behaviour : behaviours) {
-				removeBehaviour(behaviour);
-			}
-			
-			doSuspend();
+			// TODO cancel all behaviours started specific for this productStep
 
 			productStepBBClient.updateDocuments(
-					new BasicDBObject(),
+					new BasicDBObject("_id", productStepId),
 					new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name()).append(
 							"statusData", new BasicDBObject("reason", reason))));
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
@@ -399,99 +382,100 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		try {
 			switch(entry.getNamespace().split("\\.")[1]) {
 				case "ProductStepsBlackBoard":
-					if(getState() != AP_SUSPENDED) {
-						// Get the productstep.
-						ObjectId id = entry.getTargetObjectId();
-						ProductStep productStep = new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(id));
-	
-						// Gets the conversationId
-						String conversationId = getConversationId(id);
-	
-						// Create the responseMessage
-						ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
-						responseMessage.addReceiver(productStep.getProductAgentId());
-						responseMessage.setConversationId(conversationId);
-	
-						Logger.log("Equiplet agent - status update: " + productStep.getStatus().toString());
-						switch(productStep.getStatus()) {
-						// Depending on the changed status fills in the responseMessage and sends it to the product agent.
-							case PLANNED:
-								try {
-									// If the start time of the newly planned productStep is earlier then the next used time
-									// slot make it the next used timeslot.
-									ScheduleData scheduleData = productStep.getScheduleData();
-									if(timer.getNextUsedTimeSlot() == 0
-											|| scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
-										timer.setNextUsedTimeSlot(scheduleData.getStartTime());
-										nextProductStep = productStep.getId();
-									}
-	
-									responseMessage.setOntology("Planned");
-									responseMessage.setPerformative(ACLMessage.CONFIRM);
-									responseMessage.setContentObject(scheduleData.getStartTime());
-	
-									// TODO: after testing delete below
-									// addBehaviour(new WakerBehaviour(this, 75){
-									//
-									// /**
-									// *
-									// */
-									// private static final long serialVersionUID = 1L;
-									//
-									// protected void onWake(){
-									//
-									// ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
-									// cancelMessage.addReceiver(getAID());
-									// cancelMessage.setOntology("AbortStep");
-									// cancelMessage.setConversationId(getConversationId(nextProductStep));
-									// send(cancelMessage);
-									//
-									// Logger.log("Equiplet agent - sending message %s%n",
-									// ACLMessage.getPerformative(cancelMessage.getPerformative()));
-									// }
-									// });
-									// TODO: after testing delete above
-	
-								} catch(IOException e) {
-									responseMessage.setPerformative(ACLMessage.DISCONFIRM);
-									responseMessage.setContent("An error occured in the planning/please reschedule");
-									Logger.log(e);
+					// Get the productstep.
+					ObjectId productStepId = entry.getTargetObjectId();
+					ProductStep productStep = new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(productStepId));
+
+					// Gets the conversationId
+					String conversationId = getConversationId(productStepId);
+
+					// Create the responseMessage
+					ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
+					responseMessage.addReceiver(productStep.getProductAgentId());
+					responseMessage.setConversationId(conversationId);
+
+					Logger.log("Equiplet agent - status update: " + productStep.getStatus().toString());
+					switch(productStep.getStatus()) {
+					// Depending on the changed status fills in the responseMessage and sends it to the product agent.
+						case PLANNED:
+							try {
+								// If the start time of the newly planned productStep is earlier then the next used time
+								// slot make it the next used timeslot.
+								ScheduleData scheduleData = productStep.getScheduleData();
+								if(timer.getNextUsedTimeSlot() == 0
+										|| scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
+									timer.setNextUsedTimeSlot(scheduleData.getStartTime());
+									nextProductStep = productStep.getId();
 								}
-								break;
-							case WAITING:
-							case IN_PROGRESS:
-							case FAILED:
-							case SUSPENDED_OR_WARNING:
-								setDesiredEquipletState(EquipletState.STANDBY);
-	
-								responseMessage.setOntology("StatusUpdate");
+
+								responseMessage.setOntology("Planned");
 								responseMessage.setPerformative(ACLMessage.CONFIRM);
-								responseMessage.setContentObject(productStep.toBasicDBObject());
-								break;
-							case DONE:
-								setDesiredEquipletState(EquipletState.STANDBY);
-	
-								responseMessage.setOntology("StatusUpdate");
-								responseMessage.setPerformative(ACLMessage.CONFIRM);
-								productStep.setStatus(StepStatusCode.DONE);
-								responseMessage.setContentObject(productStep.toBasicDBObject());
-								productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
-								break;
-							case DELETED:
-								setDesiredEquipletState(EquipletState.STANDBY);
-	
-								responseMessage.setOntology("StatusUpdate");
-								responseMessage.setPerformative(ACLMessage.CONFIRM);
-								responseMessage.setContentObject(productStep.toBasicDBObject());
-								productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
-								break;
-							default:
-								break;
-						}
-						Logger.log("Equiplet agent - sending message %s%n",
-								ACLMessage.getPerformative(responseMessage.getPerformative()));
-						send(responseMessage);
+								responseMessage.setContentObject(scheduleData.getStartTime());
+
+								// TODO: after testing delete below
+								// addBehaviour(new WakerBehaviour(this, 75){
+								//
+								// /**
+								// *
+								// */
+								// private static final long serialVersionUID = 1L;
+								//
+								// protected void onWake(){
+								//
+								// ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
+								// cancelMessage.addReceiver(getAID());
+								// cancelMessage.setOntology("AbortStep");
+								// cancelMessage.setConversationId(getConversationId(nextProductStep));
+								// send(cancelMessage);
+								//
+								// Logger.log("Equiplet agent - sending message %s%n",
+								// ACLMessage.getPerformative(cancelMessage.getPerformative()));
+								// }
+								// });
+								// TODO: after testing delete above
+
+							} catch(IOException e) {
+								responseMessage.setPerformative(ACLMessage.DISCONFIRM);
+								responseMessage.setContent("An error occured in the planning/please reschedule");
+								Logger.log(e);
+							}
+							break;
+						case FAILED:
+						case SUSPENDED_OR_WARNING:
+							setDesiredEquipletState(EquipletState.STANDBY);
+							removeCommunicationRelation(productStepId);
+							//$FALL-THROUGH$
+						case IN_PROGRESS:
+						case WAITING:
+							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setPerformative(ACLMessage.CONFIRM);
+							responseMessage.setContentObject(productStep.toBasicDBObject());
+							break;
+						case DONE:
+							setDesiredEquipletState(EquipletState.STANDBY);
+							removeCommunicationRelation(productStepId);
+
+							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setPerformative(ACLMessage.CONFIRM);
+							productStep.setStatus(StepStatusCode.DONE);
+							responseMessage.setContentObject(productStep.toBasicDBObject());
+							productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
+							break;
+						case DELETED:
+							setDesiredEquipletState(EquipletState.STANDBY);
+							removeCommunicationRelation(productStepId);
+
+							responseMessage.setOntology("StatusUpdate");
+							responseMessage.setPerformative(ACLMessage.CONFIRM);
+							responseMessage.setContentObject(productStep.toBasicDBObject());
+							productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
+							break;
+						default:
+							break;
 					}
+					Logger.log("Equiplet agent - sending message %s%n",
+							ACLMessage.getPerformative(responseMessage.getPerformative()));
+					send(responseMessage);
 					break;
 				case "equipletState":
 					EquipletStateEntry stateEntry =
@@ -581,10 +565,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	/**
 	 * Function for adding a new relation between conversationId and objectId
 	 * 
-	 * @param conversationId
-	 *            the conversationId in the new relation.
-	 * @param objectId
-	 *            the objectId in the new relation.
+	 * @param conversationId the conversationId in the new relation.
+	 * @param objectId the objectId in the new relation.
 	 */
 	public void addCommunicationRelation(String conversationId, ObjectId objectId) {
 		communicationTable.put(conversationId, objectId);
@@ -593,8 +575,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	/**
 	 * Getter for getting the objectId by a conversationId.
 	 * 
-	 * @param conversationId
-	 *            the conversationId of which the related objectId is needed.
+	 * @param conversationId the conversationId of which the related objectId is needed.
 	 * @return ObjectId for the given conversationId.
 	 */
 	public ObjectId getRelatedObjectId(String conversationId) {
@@ -604,22 +585,24 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	/**
 	 * Getter for getting the related conversationId for the given ObjectId.
 	 * 
-	 * @param productStepEntry
-	 *            the ObjectId for which the related conversationId is needed.
-	 * @return the related conversationId or null if the relation does not
-	 *         exist.
+	 * @param productStepId the ObjectId for which the related conversationId is needed.
+	 * @return the related conversationId or null if the relation does not exist.
 	 */
-	public String getConversationId(ObjectId productStepEntry) {
-		String conversationId = null;
-		if(communicationTable.containsValue(productStepEntry)) {
-			for(Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
-				if(tableEntry.getValue().equals(productStepEntry)) {
-					conversationId = tableEntry.getKey();
-					break;
-				}
+	public String getConversationId(ObjectId productStepId) {
+		for(Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
+			if(tableEntry.getValue().equals(productStepId)) {
+				return tableEntry.getKey();
 			}
 		}
-		return conversationId;
+		return null;
+	}
+
+	public void removeCommunicationRelation(ObjectId productStepId) {
+		for(Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
+			if(tableEntry.getValue().equals(productStepId)) {
+				communicationTable.remove(tableEntry.getKey());
+			}
+		}
 	}
 
 	/**
