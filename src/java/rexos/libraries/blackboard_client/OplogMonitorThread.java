@@ -46,6 +46,14 @@ import com.mongodb.MongoInterruptedException;
 class OplogMonitorThread extends Thread {
 	
 	/**
+	 * @var int POLL_INTERVAL
+	 * The interval between two checks for new documents in milliseconds. Note that this interval is not used
+	 * when there are multiple documents available. In this case all documents will be retrieved after which
+	 * the thread will sleep for this interval when no more documents are available.
+	 **/
+	private static final int POLL_INTERVAL = 100;
+
+	/**
 	 * @var DBCursor tailedCursor
 	 * Tailed cursor for this thread.
 	 **/
@@ -126,7 +134,7 @@ class OplogMonitorThread extends Thread {
 					}
 				}
 				
-				Thread.sleep(100);
+				Thread.sleep(POLL_INTERVAL);
 			}
 		} catch (MongoInterruptedException | MongoException.CursorNotFound | InterruptedException ex) {
 			/*
