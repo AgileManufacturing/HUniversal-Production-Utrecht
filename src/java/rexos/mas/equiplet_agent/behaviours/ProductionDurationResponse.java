@@ -79,9 +79,9 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 				ProductStep productStep = new ProductStep((BasicDBObject) equipletBBClient.findDocumentById(id));
 
 				ScheduleData schedule = productStep.getScheduleData();
-				schedule.setDuration(schedule.getDuration() + (2000/equipletAgent.getTimer().getTimeSlotLength()));
-				equipletBBClient.updateDocuments(new BasicDBObject("_id", id),
-												new BasicDBObject("$set", new BasicDBObject("scheduleData.duration", schedule.getDuration())));
+				//schedule.setDuration(schedule.getDuration() + (2000/equipletAgent.getTimer().getTimeSlotLength()));
+				//equipletBBClient.updateDocuments(new BasicDBObject("_id", id),
+				//								new BasicDBObject("$set", new BasicDBObject("scheduleData.duration", schedule.getDuration())));
 				// sends a message to the productAgent with the production
 				// duration.
 				ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
