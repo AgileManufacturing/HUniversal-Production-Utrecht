@@ -66,6 +66,12 @@ class OplogMonitorThread extends Thread {
 	private BlackboardSubscription[] subscriptions;
 	
 	/**
+	 * @var OplogCallbackThread callbackThread
+	 * Thread used for executing callbacks.
+	 */
+	OplogCallbackThread callbackThread;
+	
+	/**
 	 * Constructor of OplogMonitorThread.
 	 * @param mongo The Mongo database connection that should be used.
 	 * @param oplogDBName The database in which the oplog collection resides.
@@ -80,7 +86,7 @@ class OplogMonitorThread extends Thread {
 		tailedCursor.addOption(Bytes.QUERYOPTION_TAILABLE);
 		tailedCursor.addOption(Bytes.QUERYOPTION_AWAITDATA);
 		tailedCursor.skip(tailedCursor.size());
-		System.out.println("Using query: " + query + "\n");
+		callbackThread = new OplogCallbackThread();
 	}
 	
 	/**
@@ -104,6 +110,7 @@ class OplogMonitorThread extends Thread {
 		tailedCursor.addOption(Bytes.QUERYOPTION_TAILABLE);
 		tailedCursor.addOption(Bytes.QUERYOPTION_AWAITDATA);
 		tailedCursor.skip(tailedCursor.size());
+		callbackThread = new OplogCallbackThread();
 	}
 	
 	/**
@@ -125,11 +132,10 @@ class OplogMonitorThread extends Thread {
 			do {
 				while (!Thread.interrupted() && tailedCursor.hasNext()) {
 					OplogEntry entry = new OplogEntry(tailedCursor.next());
-					MongoOperation operation = entry.getOperation();
 
 					for (BlackboardSubscription sub : subscriptions) {
 						if (sub.matchesWithEntry(entry)) {
-							sub.getSubscriber().onMessage(operation, entry);
+							callbackThread.addCallback(sub.getSubscriber(), entry);
 						}
 					}
 				}
@@ -147,7 +153,7 @@ class OplogMonitorThread extends Thread {
 			 * We purposely kill the cursor when the OplogMonitorThread is interrupted, thus expect this to happen.
 			 */
 			
-			rexos.libraries.log.Logger.log("OplogMonitorThread ending due to %s:\n%s", ex.getClass().getName(), ex.getMessage());
+			rexos.libraries.log.Logger.log("OplogMonitorThread ending due to %s:\n%s\n", ex.getClass().getName(), ex.getMessage());
 		} finally {
 			try {
 				if (tailedCursor != null) {
@@ -155,8 +161,10 @@ class OplogMonitorThread extends Thread {
 				}
 			} catch (Throwable t) {
 				// If closing the cursor throws something, it's most likely not something we can fix.
-				rexos.libraries.log.Logger.log("%s thrown while closing cursor:\n%s", t.getClass().getName(), t.getMessage());
+				rexos.libraries.log.Logger.log("%s thrown while closing cursor:\n%s\n", t.getClass().getName(), t.getMessage());
 			}
 		}
+		
+		callbackThread.shutdown();
 	}
 }
