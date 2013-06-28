@@ -99,7 +99,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 	 * @param a The agent for this behaviour
 	 */
 	public InitialisationFinished(EquipletAgent a) {
-		super(a, 2000, messageTemplate);
+		super(a, 3000, messageTemplate);
 		equipletAgent = a;
 		stateUpdateSubscription = new FieldUpdateSubscription("state", this);
 		stateUpdateSubscription.addOperation(MongoUpdateLogOperation.SET);
@@ -113,7 +113,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
-			Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
+			Logger.log("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(),
 					message.getOntology());
 
 			try {
