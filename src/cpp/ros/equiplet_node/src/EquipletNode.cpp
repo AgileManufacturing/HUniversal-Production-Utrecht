@@ -62,6 +62,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 	equipletCommandSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
         equipletCommandSubscriptionSet = new Blackboard::BasicOperationSubscription(Blackboard::UPDATE, *this);
 	equipletCommandBlackboardClient->subscribe(*equipletCommandSubscription);
+	sleep(1);
         equipletCommandBlackboardClient->subscribe(*equipletCommandSubscriptionSet);
 	subscriptions.push_back(equipletCommandSubscription);
 	subscriptions.push_back(equipletCommandSubscriptionSet);
@@ -121,26 +122,47 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 				    prox->setInstruction(targetObjectId.toString(), step->getInstructionData().getJsonNode());
 
 	    		} else {
-	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"ERROR\" } } ");
+	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\" } } ");
 	    		}
 	    	} else {
 	    		ROS_INFO("Instruction received but current mode is %s", rexos_statemachine::mode_txt[currentMode]);
-	    		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"ERROR\"");
+	    		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"FAILED\"");
 	    	}
 		}
 	}
-	else if(&subscription == equipletCommandSubscription)
+	else if(&subscription == equipletCommandSubscription || &subscription == equipletCommandSubscriptionSet)
 	{
+	ROS_INFO("Received equiplet sattemachine command");
     	JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
 		JSONNode::const_iterator i = n.begin();
 
         while (i != n.end()){
             const char * node_name = i -> name().c_str();
-            if (strcmp(node_name, "desiredState") == 0){
+	    if (strcmp(node_name, "$set") == 0) {
+		JSONNode set = i->as_node();
+		JSONNode::const_iterator j = set.begin();
+                while ( j != set.end()) {
+			const char * node_name = j -> name().c_str();
+			if (strcmp(node_name, "desiredState") == 0){
+				ROS_INFO("ChangeState to %s", j -> as_string().c_str());
+                		changeState((rexos_statemachine::State) atoi(j -> as_string().c_str()));
+            		}else if (strcmp(node_name, "desiredMode") == 0){
+                		ROS_INFO("ChangeMode to %s", j -> as_string().c_str());
+                		changeMode((rexos_statemachine::Mode) atoi(j -> as_string().c_str()));
+            		} else {
+				ROS_INFO("Unknown field %s", node_name);
+	    		}
+			j++;
+		}
+	    }else if (strcmp(node_name, "desiredState") == 0){
+		ROS_INFO("ChangeState to %s", i -> as_string().c_str());
                 changeState((rexos_statemachine::State) atoi(i -> as_string().c_str()));
             }else if (strcmp(node_name, "desiredMode") == 0){
+                ROS_INFO("ChangeMode to %s", i -> as_string().c_str());
                 changeMode((rexos_statemachine::Mode) atoi(i -> as_string().c_str()));
-            }
+            } else {
+		ROS_INFO("Unknown field %s", node_name);
+	    }
             i++;
         }
 	}
