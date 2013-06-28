@@ -122,7 +122,7 @@ class OplogMonitorThread extends Thread {
 	@Override
 	public void run() {
 		try {
-			while (!Thread.interrupted() && tailedCursor.getCursorId() != 0) {
+			do {
 				while (!Thread.interrupted() && tailedCursor.hasNext()) {
 					OplogEntry entry = new OplogEntry(tailedCursor.next());
 					MongoOperation operation = entry.getOperation();
@@ -135,7 +135,7 @@ class OplogMonitorThread extends Thread {
 				}
 				
 				Thread.sleep(POLL_INTERVAL);
-			}
+			} while (!Thread.interrupted() && tailedCursor.getCursorId() != 0);
 		} catch (MongoInterruptedException | MongoException.CursorNotFound | InterruptedException ex) {
 			/*
 			 * MongoInterruptedException is thrown by Mongo when interrupt is called while blocking on the
