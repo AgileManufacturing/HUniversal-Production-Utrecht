@@ -220,7 +220,7 @@ public class SchedulerBehaviour extends Behaviour {
 					}
 				}
 			} else {
-				freetimeslots.add(new FreeTimeSlot(System.currentTimeMillis() / timeSlotLength + (5000/timeSlotLength), requiredTimeSlots, aid));
+				freetimeslots.add(new FreeTimeSlot((System.currentTimeMillis() - firstTimeSlot) / timeSlotLength + (5000/timeSlotLength), requiredTimeSlots, aid));
 			}
 		}
 		FreeTimeSlot freetimeslotEq = null;
