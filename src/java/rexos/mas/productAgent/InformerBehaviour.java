@@ -38,7 +38,10 @@
 
 package rexos.mas.productAgent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import rexos.libraries.log.Logger;
 import rexos.mas.data.BehaviourStatus;
@@ -47,7 +50,6 @@ import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.StepStatusCode;
-
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
@@ -65,14 +67,14 @@ import jade.lang.acl.UnreadableException;
  * given parameters. If the equipletagent returns with an confirm, the product
  * agent will ask for the duration of the operation ( in timeslots ).
  */
-public class InformerBehaviour extends Behaviour {
+public class InformerBehaviour extends Behaviour implements BehaviourCallback {
 
 	private static final long serialVersionUID = 1L;
 	private ProductAgent _productAgent;
 	private Product _product;
 	private Production _production;
 	private ProductionEquipletMapper _prodEQmap;
-	
+
 	private boolean _isDone = false;;
 	private boolean _isError = false;
 	private boolean _isCompleted = false;
@@ -82,10 +84,17 @@ public class InformerBehaviour extends Behaviour {
 	private SequentialBehaviour _seqBehaviour;
 	private ParallelBehaviour _parBehaviour;
 
+	//private Queue<SubInformerBehaviour> _subInformerBehaviours;
+	
+	private HashMap<SubInformerBehaviour, Boolean> _subInformerBehaviours;
+
+	private int _currentRunningSubInformerBehaviours = 0;
+	private int MAX_RUNNING_SUB_BEHAVIOURS = 5;
+
 	public InformerBehaviour(Agent myAgent, BehaviourCallback bc) {
 		super(myAgent);
 		this._bc = bc;
-		_seqBehaviour = new SequentialBehaviour();
+		_subInformerBehaviours =  new HashMap<SubInformerBehaviour, Boolean>();//new LinkedList<SubInformerBehaviour>();
 	}
 
 	@Override
@@ -95,35 +104,46 @@ public class InformerBehaviour extends Behaviour {
 		_product = this._productAgent.getProduct();
 		_production = _product.getProduction();
 		_prodEQmap = new ProductionEquipletMapper();
-		
+
 		_seqBehaviour = new SequentialBehaviour();
-		_parBehaviour = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 
-		
+		ArrayList<ProductionStep> productionSteps = _production
+				.getProductionSteps();
 
-		for (ProductionStep stp : _production.getProductionSteps()) {
-			if (stp.getStatus() == StepStatusCode.EVALUATING) {
-				// adds the step to te new list (the one that will be
-				// returned
-				// to the scheduler)
-				_prodEQmap.addProductionStep(stp.getId());
+		int productionStepCount = productionSteps.size();
+
+		_parBehaviour = new ParallelBehaviour(productionStepCount);
+
+		for (ProductionStep productionStep : productionSteps) {
+			if (productionStep.getStatus() == StepStatusCode.EVALUATING) {
+				_prodEQmap.addProductionStep(productionStep.getId());
 				ProductionEquipletMapper pem = _production
 						.getProductionEquipletMapping();
 				if (pem != null) {
-					HashMap<AID, Long> efp = pem.getEquipletsForProductionStep(stp.getId());
-					if(efp != null && efp.size() > 0){
-						for (AID aid : pem.getEquipletsForProductionStep(
-								stp.getId()).keySet()) {
-							_parBehaviour.addSubBehaviour(new Conversation(aid,
-									stp, _prodEQmap));
+					// Process all the equiplets capable of executing the
+					// desired productionStep
+					HashMap<AID, Long> efp = pem
+							.getEquipletsForProductionStep(productionStep
+									.getId());
+					if (efp != null && efp.size() > 0) {
+						for (AID aid : efp.keySet()) {
+							// _parBehaviour.addSubBehaviour(new
+							// Conversation(aid, productionStep, _prodEQmap));
+							_subInformerBehaviours
+									.add(new SubInformerBehaviour(myAgent,
+											this, aid));
 						}
 					} else {
-						//THROW ERROR!
+						// THROW ERROR!
 					}
 				} else {
-					// REPORT ERROR
-					System.out.println("Pem is null");
+					Logger.log("Can't find any equiplets that can execute this production step. Capability: "
+							+ productionStep.getCapability());
+					// TODO Should we throw an exception here?
 				}
+			} else {
+				Logger.log("Can't process a productionStep which isn't in the evaluating state");
+				// TODO Should we throw an exception here?
 			}
 		}
 		_seqBehaviour.addSubBehaviour(_parBehaviour);
@@ -149,19 +169,30 @@ public class InformerBehaviour extends Behaviour {
 				}
 				block();
 			}
-		}); 
+		});
 		myAgent.addBehaviour(_seqBehaviour);
 	}
 
 	@Override
 	public void action() {
 		try {
-			if (_isDone) {
-				this._bc.handleCallback(BehaviourStatus.COMPLETED);
-				_isCompleted = true;
-			} else if (_isError) {
-				this._bc.handleCallback(BehaviourStatus.ERROR);
-				_isCompleted = true;
+			if (!_subInformerBehaviours.isEmpty()) {
+				if (_currentRunningSubInformerBehaviours < MAX_RUNNING_SUB_BEHAVIOURS) {
+					_parBehaviour
+							.addSubBehaviour(_subInformerBehaviours.poll());
+					_currentRunningSubInformerBehaviours++;
+				} else {
+					// Do nothing and wait for a behaviours to complete, before
+					// starting a new one
+				}
+			} else {
+				if (_isDone) {
+					this._bc.handleCallback(BehaviourStatus.COMPLETED);
+					_isCompleted = true;
+				} else if (_isError) {
+					this._bc.handleCallback(BehaviourStatus.ERROR);
+					_isCompleted = true;
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -177,6 +208,16 @@ public class InformerBehaviour extends Behaviour {
 	public boolean done() {
 		// TODO Auto-generated method stub
 		return _isCompleted;
+	}
+
+	@Override
+	public void handleCallback(BehaviourStatus bs) {
+		if (bs == BehaviourStatus.COMPLETED) {
+			// Completed
+		} else {
+			// Error
+		}
+		_currentRunningSubInformerBehaviours--;
 	}
 
 	/*
@@ -283,8 +324,8 @@ public class InformerBehaviour extends Behaviour {
 							});
 							// 4- waits for the response ( handles a 10 sec
 							// timeout ).
-							addSubBehaviour(new ReceiveBehaviour(myAgent,
-									-1, msgtemplate) {
+							addSubBehaviour(new ReceiveBehaviour(myAgent, -1,
+									msgtemplate) {
 								/**
 										 * 
 										 */

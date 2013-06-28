@@ -40,7 +40,11 @@
 
 package rexos.mas.data;
 
+import jade.core.AID;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.google.gson.annotations.SerializedName;
 import com.mongodb.BasicDBObject;
@@ -62,10 +66,17 @@ public class ProductionStep implements Serializable {
 	private BasicDBObject _parameters;
 	
 	private String _convId;
+	
+	//List of equiplets capable of executing this productStep
+	private ArrayList<AID> _capableEquiplets;
+	
+	private HashMap<AID, String> _equipletConversationIds;
+	
+	private HashMap<AID, Long> _equipletDuration;
 
 	public ProductionStep() {
 		this._parameters = new BasicDBObject();
-		
+		_equipletConversationIds = new HashMap<AID, String>();
 	}
 	
 	public ProductionStep(int id, int capability, BasicDBObject parameterList) {
@@ -109,6 +120,22 @@ public class ProductionStep implements Serializable {
 	
 	public void setConversationId(String value) {
 		this._convId = value;
+	}
+	
+	public void setConversationIdForEquiplet(AID equipletId, String converdationid) {
+		this._equipletConversationIds.put(equipletId, converdationid);
+	}
+	
+	public String getConversationIdForEquiplet(AID equipletId) {
+		return this._equipletConversationIds.get(equipletId);
+	}
+	
+	public void setDurationForEquiplet(AID equipletId, long timeslots) {
+		this._equipletDuration.put(equipletId, timeslots);
+	}
+	
+	public long getDurationForEquiplet(AID equipletId) {
+		return this._equipletDuration.get(equipletId);
 	}
 	
 	@Override
