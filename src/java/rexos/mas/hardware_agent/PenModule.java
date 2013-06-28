@@ -69,7 +69,7 @@ public class PenModule extends Module {
 	 * @var double PEN_SIZE
 	 *      A static value that contains the size of the pen in centimeters.
 	 */
-	private static final double PEN_SIZE = 0.4;
+	private static final double PEN_SIZE = 2.0;
 
 	/**
 	 * @var Module movementModule
