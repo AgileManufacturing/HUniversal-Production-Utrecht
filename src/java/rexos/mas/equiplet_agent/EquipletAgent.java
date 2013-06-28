@@ -149,7 +149,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 * @var String equipletDbIp
 	 *      IP of the equiplet database.
 	 */
-	private String equipletDbIp = "localhost";
+	private String equipletDbIp;
 
 	/**
 	 * @var int equipletDbPort
@@ -161,7 +161,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 * @var String equipletDbName
 	 *      Name of the equiplet database.
 	 */
-	private String equipletDbName = "";
+	private String equipletDbName;
 
 	/**
 	 * @var String productStepsName
@@ -244,8 +244,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		try {
 			Logger.log("I spawned as a equiplet agent.");
 			// gets his IP and sets the equiplet blackboard IP.
-			// InetAddress IP = InetAddress.getLocalHost();
-			// equipletDbIp = IP.getHostAddress();
+//			InetAddress IP = InetAddress.getLocalHost();
+//			equipletDbIp = IP.getHostAddress();
 			equipletDbIp = "145.89.191.131";
 
 			equipletDbName = getAID().getLocalName();
@@ -280,12 +280,12 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			productStepBBClient = new BlackboardClient(equipletDbIp, equipletDbPort);
 			productStepBBClient.setDatabase(equipletDbName);
 			productStepBBClient.setCollection(productStepsName);
-			productStepBBClient.removeDocuments(new BasicDBObject());
 
 			// subscribes on changes of the status field on the equiplet blackboard.
 			statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			productStepBBClient.subscribe(statusSubscription);
+			productStepBBClient.removeDocuments(new BasicDBObject());
 
 			stateBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
 			stateBBClient.setDatabase("StateBlackboard");
@@ -598,11 +598,14 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	}
 
 	public void removeCommunicationRelation(ObjectId productStepId) {
+		String conversationId = null;
 		for(Entry<String, ObjectId> tableEntry : communicationTable.entrySet()) {
 			if(tableEntry.getValue().equals(productStepId)) {
-				communicationTable.remove(tableEntry.getKey());
+				conversationId = tableEntry.getKey();
+				break;
 			}
 		}
+		communicationTable.remove(conversationId);
 	}
 
 	/**

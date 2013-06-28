@@ -178,20 +178,19 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 		try {
 			// create blackboard clients, configure them and subscribe to status changes of any steps
-			productStepBBClient = new BlackboardClient(dbData.getIp());
-			serviceStepBBClient = new BlackboardClient(dbData.getIp());
-
 			statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 
+			// Needs to react on state changes of production steps to WAITING
+			productStepBBClient = new BlackboardClient(dbData.getIp());
 			productStepBBClient.setDatabase(dbData.getName());
 			productStepBBClient.setCollection("ProductStepsBlackBoard");
-			// Needs to react on state changes of production steps to WAITING
 			productStepBBClient.subscribe(statusSubscription);
 
+			// Needs to react on status changes
+			serviceStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient.setDatabase(dbData.getName());
 			serviceStepBBClient.setCollection("ServiceStepsBlackBoard");
-			// Needs to react on status changes
 			serviceStepBBClient.subscribe(statusSubscription);
 			serviceStepBBClient.removeDocuments(new BasicDBObject());
 		} catch(UnknownHostException | GeneralMongoException | InvalidDBNamespaceException e) {
@@ -504,11 +503,14 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	}
 
 	public void removeAllMappingsForProductStepId(ObjectId productStepId) {
+		String conversationId = null;
 		for(Entry<String, ObjectId> mapping : convIdProductStepIdMapping.entrySet()) {
 			if(productStepId.equals(mapping.getValue())) {
-				convIdProductStepIdMapping.remove(mapping.getKey());
+				conversationId = mapping.getKey();
+				break;
 			}
 		}
+		convIdProductStepIdMapping.remove(conversationId);
 	}
 
 	/**
