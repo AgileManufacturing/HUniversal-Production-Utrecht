@@ -53,12 +53,9 @@ import rexos.mas.data.StepStatusCode;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.ParallelBehaviour;
-import jade.core.behaviours.SequentialBehaviour;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
+
+
 
 /*
  * Version 1.1 Author: Alexander Streng Behaviour for negotiating with the
@@ -67,7 +64,7 @@ import jade.lang.acl.UnreadableException;
  * given parameters. If the equipletagent returns with an confirm, the product
  * agent will ask for the duration of the operation ( in timeslots ).
  */
-public class InformerBehaviour extends Behaviour implements BehaviourCallback {
+public class InformerBehaviour extends Behaviour {
 
 	private static final long serialVersionUID = 1L;
 	private ProductAgent _productAgent;
@@ -81,12 +78,11 @@ public class InformerBehaviour extends Behaviour implements BehaviourCallback {
 
 	private BehaviourCallback _bc;
 
-	private SequentialBehaviour _seqBehaviour;
 	private ParallelBehaviour _parBehaviour;
 
-	//private Queue<SubInformerBehaviour> _subInformerBehaviours;
-	
-	private HashMap<SubInformerBehaviour, Boolean> _subInformerBehaviours;
+	private Queue<SubInformerBehaviour> _subInformerBehaviours;
+
+	// private HashMap<SubInformerBehaviour, Boolean> _subInformerBehaviours;
 
 	private int _currentRunningSubInformerBehaviours = 0;
 	private int MAX_RUNNING_SUB_BEHAVIOURS = 5;
@@ -94,7 +90,7 @@ public class InformerBehaviour extends Behaviour implements BehaviourCallback {
 	public InformerBehaviour(Agent myAgent, BehaviourCallback bc) {
 		super(myAgent);
 		this._bc = bc;
-		_subInformerBehaviours =  new HashMap<SubInformerBehaviour, Boolean>();//new LinkedList<SubInformerBehaviour>();
+		_subInformerBehaviours = new LinkedList<SubInformerBehaviour>();
 	}
 
 	@Override
@@ -104,8 +100,6 @@ public class InformerBehaviour extends Behaviour implements BehaviourCallback {
 		_product = this._productAgent.getProduct();
 		_production = _product.getProduction();
 		_prodEQmap = new ProductionEquipletMapper();
-
-		_seqBehaviour = new SequentialBehaviour();
 
 		ArrayList<ProductionStep> productionSteps = _production
 				.getProductionSteps();
@@ -122,16 +116,18 @@ public class InformerBehaviour extends Behaviour implements BehaviourCallback {
 				if (pem != null) {
 					// Process all the equiplets capable of executing the
 					// desired productionStep
-					HashMap<AID, Long> efp = pem
+					HashMap<AID, Long> equipletList = pem
 							.getEquipletsForProductionStep(productionStep
 									.getId());
-					if (efp != null && efp.size() > 0) {
-						for (AID aid : efp.keySet()) {
+					if (equipletList != null && equipletList.size() > 0) {
+						for (AID aid : equipletList.keySet()) {
+							productionStep.setConversationIdForEquiplet(aid,
+									_productAgent.generateCID());
 							// _parBehaviour.addSubBehaviour(new
 							// Conversation(aid, productionStep, _prodEQmap));
 							_subInformerBehaviours
 									.add(new SubInformerBehaviour(myAgent,
-											this, aid));
+											this, productionStep, aid));
 						}
 					} else {
 						// THROW ERROR!
@@ -146,31 +142,8 @@ public class InformerBehaviour extends Behaviour implements BehaviourCallback {
 				// TODO Should we throw an exception here?
 			}
 		}
-		_seqBehaviour.addSubBehaviour(_parBehaviour);
 
-		_seqBehaviour.addSubBehaviour(new OneShotBehaviour() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void action() {
-				if (_parBehaviour.done()) {
-					System.out.println("Done parallel informing.");
-					try {
-						_production.setProductionEquipletMapping(_prodEQmap);
-						_product.setProduction(_production);
-						_productAgent.setProduct(_product);
-						_isDone = true;
-					} catch (Exception e) {
-						Logger.log(e);
-					}
-				} else {
-					System.out.println("Not done informing.");
-					_isError = true;
-				}
-				block();
-			}
-		});
-		myAgent.addBehaviour(_seqBehaviour);
+		myAgent.addBehaviour(_parBehaviour);
 	}
 
 	@Override
@@ -178,19 +151,19 @@ public class InformerBehaviour extends Behaviour implements BehaviourCallback {
 		try {
 			if (!_subInformerBehaviours.isEmpty()) {
 				if (_currentRunningSubInformerBehaviours < MAX_RUNNING_SUB_BEHAVIOURS) {
-					_parBehaviour
-							.addSubBehaviour(_subInformerBehaviours.poll());
+					SubInformerBehaviour sib = _subInformerBehaviours.poll();
+					sib.restartTimer();
+					_parBehaviour.addSubBehaviour(sib);
 					_currentRunningSubInformerBehaviours++;
-				} else {
-					// Do nothing and wait for a behaviours to complete, before
-					// starting a new one
 				}
 			} else {
 				if (_isDone) {
-					this._bc.handleCallback(BehaviourStatus.COMPLETED);
+					System.out.println("Done parallel informing.");
+					this._bc.handleCallback(BehaviourStatus.COMPLETED, null);
 					_isCompleted = true;
 				} else if (_isError) {
-					this._bc.handleCallback(BehaviourStatus.ERROR);
+					System.out.println("Not done informing.");
+					this._bc.handleCallback(BehaviourStatus.ERROR, null);
 					_isCompleted = true;
 				}
 			}
@@ -210,162 +183,15 @@ public class InformerBehaviour extends Behaviour implements BehaviourCallback {
 		return _isCompleted;
 	}
 
-	@Override
-	public void handleCallback(BehaviourStatus bs) {
+	public void callbackSubInformerBehaviour(BehaviourStatus bs,
+			SubInformerBehaviour subBehaviour) {
 		if (bs == BehaviourStatus.COMPLETED) {
+			
 			// Completed
 		} else {
 			// Error
 		}
+		_parBehaviour.removeSubBehaviour(subBehaviour);
 		_currentRunningSubInformerBehaviours--;
 	}
-
-	/*
-	 * The conversation class holds the behaviour for a conversation with an
-	 * equiplet agent. The sequentialbehaviour it extends consists of 4
-	 * sequences. 1 - Inform if the equiplet can perform the step with the given
-	 * parameters 2 - wait for an response. ( handles a 10 sec timeout ) 3 - if
-	 * the response was a CONFIRM, ask about the duration. 4- waits for the
-	 * response ( handles a 10 sec timeout ).
-	 */
-	private class Conversation extends SequentialBehaviour {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-		private AID _aid;
-		private ProductionStep _productionStep;
-		private boolean debug = true;
-		private ProductionEquipletMapper _prodEQmap;
-
-		public Conversation(AID aid, ProductionStep productionStep,
-				ProductionEquipletMapper pem) {
-			this._aid = aid;
-			this._productionStep = productionStep;
-			this._prodEQmap = pem;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see jade.core.behaviours.Behaviour#onStart() starts the conversation
-		 */
-		@Override
-		public void onStart() {
-			final String ConversationId = _productAgent.generateCID();
-			this._productionStep.setConversationId(ConversationId);
-			final MessageTemplate msgtemplate = MessageTemplate
-					.MatchConversationId(ConversationId);
-			// 1 - Inform if the equiplet can perform the step with the given
-			// parameters
-			addSubBehaviour(new OneShotBehaviour() {
-				/**
-				 * 
-				 */
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public void action() {
-					try {
-						ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-						message.setConversationId(ConversationId);
-						message.addReceiver(_aid);
-						message.setOntology("CanPerformStep");
-						message.setContentObject(_productionStep);
-						_productAgent.send(message);
-						if (debug) {
-							System.out.println("Querying: "
-									+ _aid.getLocalName()
-									+ " if he can perform step: "
-									+ _productionStep.getId());
-						}
-					} catch (Exception e) {
-						Logger.log(e);
-					}
-				}
-			});
-			// 2 - wait for an response. ( handles a 10 sec timeout )
-			addSubBehaviour(new ReceiveBehaviour(myAgent, -1, msgtemplate) {
-				/**
-				 * 
-				 */
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public void handle(ACLMessage msg) {
-					if (msg == null) {
-
-					} else {
-						if (msg.getPerformative() == ACLMessage.CONFIRM) {
-
-							// 3 - if the response was a CONFIRM, ask about the
-							// duration.
-							addSubBehaviour(new OneShotBehaviour() {
-								/**
-								 * 
-								 */
-								private static final long serialVersionUID = 1L;
-
-								@Override
-								public void action() {
-									try {
-										ACLMessage message = new ACLMessage(
-												ACLMessage.REQUEST);
-										message.setConversationId(ConversationId);
-										message.addReceiver(_aid);
-										message.setOntology("GetProductionDuration");
-										message.setContentObject(_productionStep);
-										_productAgent.send(message);
-
-									} catch (Exception e) {
-										Logger.log(e);
-									}
-								}
-							});
-							// 4- waits for the response ( handles a 10 sec
-							// timeout ).
-							addSubBehaviour(new ReceiveBehaviour(myAgent, -1,
-									msgtemplate) {
-								/**
-										 * 
-										 */
-								private static final long serialVersionUID = 1L;
-
-								@Override
-								public void handle(ACLMessage msg) {
-									if (msg == null) {
-
-									} else {
-										try {
-											if (msg.getPerformative() == ACLMessage.INFORM) {
-												long timeSlots = (Long) msg
-														.getContentObject();
-
-												// Adds the equiplet to the
-												// production step in
-												// the mapper list.
-												_prodEQmap
-														.addEquipletToProductionStep(
-																_productionStep
-																		.getId(),
-																_aid, timeSlots);
-											}
-										} catch (UnreadableException e) {
-											System.out
-													.println("Error on receiving timeslots from: "
-															+ _aid.getLocalName()
-															+ " " + e);
-										}
-									}
-								}
-							});
-						} else {
-
-						}
-					}
-				}
-			});
-		}
-	}
-
 }

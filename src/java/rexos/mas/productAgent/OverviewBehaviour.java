@@ -197,7 +197,7 @@ public class OverviewBehaviour extends Behaviour implements
 	 * @see rexos.mas.productAgent.BehaviourCallback#handleCallback()
 	 */
 	@Override
-	public void handleCallback(BehaviourStatus bs) {
+	public void handleCallback(BehaviourStatus bs, Object[] callbackArgs) {
 		AgentStatus as = _productAgent.getStatus();
 		switch (as) {
 		case PLANNING:

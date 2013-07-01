@@ -44,14 +44,9 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
@@ -71,11 +66,8 @@ import com.mongodb.QueryBuilder;
 public class SchedulerBehaviour extends Behaviour {
 
 	private ProductAgent _productAgent;
-	private int timeslotsToSchedule = 0;
-	private int debug = 1;
 	private ProductionStep _prodStep;
 
-	private boolean _isDone = false;
 	private boolean _isError = false;
 	private boolean _isCompleted = false;
 
@@ -110,7 +102,6 @@ public class SchedulerBehaviour extends Behaviour {
 					_schedulersStarted++;
 				} else {
 					_isError = true;
-					// TODO: THIS SHOULD NOT HAPPEN. THROW EXCEPTION!
 				}
 
 			}
@@ -124,10 +115,10 @@ public class SchedulerBehaviour extends Behaviour {
 	public void action() {
 		try {
 			if (_schedulersStarted == _schedulersCompleted) {
-				this._bc.handleCallback(BehaviourStatus.COMPLETED);
+				this._bc.handleCallback(BehaviourStatus.COMPLETED, null);
 				_isCompleted = true;
 			} else if (_isError) {
-				this._bc.handleCallback(BehaviourStatus.ERROR);
+				this._bc.handleCallback(BehaviourStatus.ERROR, null);
 				_isCompleted = true;
 			}
 		} catch (Exception e) {
@@ -196,13 +187,9 @@ public class SchedulerBehaviour extends Behaviour {
 			BasicDBObject orderby = new BasicDBObject("scheduleData", new BasicDBObject("startTime", "1"));
 			BasicDBObject findquery = new BasicDBObject("$query", query).append("$orderby", orderby);
 			List<DBObject> plannedSteps = bbc.findDocuments(findquery);
-			//List<DBObject> plannedSteps = bbc.findDocuments(QueryBuilder.start("scheduleData.startTime").greaterThan(-1).put("scheduleData.startTime").greaterThan(System.currentTimeMillis()/timeSlotLength).get());
-			//List<DBObject> allSteps = bbc.findDocuments("");
 			for (int i = 0; i < plannedSteps.size(); i++) {
 				long startTime = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getLong("startTime");
 				int duration = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getInt("duration");
-				// add scheduled timeslot to array of scheduled timeslots and
-				// mention which equiplet
 				schedules.add(new Schedule(startTime, duration, aid));
 			}
 
@@ -220,7 +207,7 @@ public class SchedulerBehaviour extends Behaviour {
 					}
 				}
 			} else {
-				freetimeslots.add(new FreeTimeSlot(System.currentTimeMillis() / timeSlotLength + (5000/timeSlotLength), requiredTimeSlots, aid));
+				freetimeslots.add(new FreeTimeSlot(System.currentTimeMillis() / timeSlotLength + (5000/timeSlotLength) - firstTimeSlot, requiredTimeSlots, aid));
 			}
 		}
 		FreeTimeSlot freetimeslotEq = null;
@@ -233,58 +220,23 @@ public class SchedulerBehaviour extends Behaviour {
 				}
 			}
 		}
-
-		System.out.println(freetimeslotEq.getStartTime());
 		
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setConversationId(this._prodStep.getConversationId());
+		msg.setConversationId(this._prodStep.getConversationIdForEquiplet(freetimeslotEq.getEquipletName()));
 		msg.setOntology("ScheduleStep");
 		msg.setContentObject(freetimeslotEq.getStartTime());
 		msg.addReceiver(freetimeslotEq.getEquipletName());
 		myAgent.send(msg);
-
-		final MessageTemplate msgtemplate = MessageTemplate.and(MessageTemplate.MatchConversationId(this._prodStep.getConversationId()), MessageTemplate.MatchOntology("Planned"));
-
 		
 		ACLMessage returnMsg = myAgent.blockingReceive();
 		if (returnMsg.getPerformative() == ACLMessage.CONFIRM) {
 			_prodStep.setStatus(StepStatusCode.PLANNED);
-			bbc = new BlackboardClient(dbData.getIp(), dbData.getPort());
-			bbc.setDatabase(dbData.getName());
-			bbc.setCollection("ProductStepsBlackBoard");
-			List<DBObject> allSteps = bbc.findDocuments("");
 			System.out.println("Planned");
 		} else if (returnMsg.getPerformative() == ACLMessage.DISCONFIRM) {
 			System.out.println("Disconfirm.");
 		}
 		_schedulersCompleted++;
 		System.out.println("received message");
-		
-		/*
-		myAgent.addBehaviour(new ReceiveBehaviour(myAgent, 10000, msgtemplate) {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void handle(ACLMessage msg) {
-				if (msg == null) {
-					System.out.println("Null message - Scheduler");
-					_isError = true;
-				} else {
-					if (msg.getPerformative() == ACLMessage.CONFIRM) {
-						_prodStep.setStatus(StepStatusCode.PLANNED);
-					} else if (msg.getPerformative() == ACLMessage.DISCONFIRM) {
-						System.out.println("Disconfirm.");
-					}
-					_isDone = true;
-					_schedulersCompleted++;
-					System.out.println("received message");
-					
-				}
-			}
-		});
-		*/
-
 	}
 
 	private class FreeTimeSlot {
@@ -353,7 +305,7 @@ public class SchedulerBehaviour extends Behaviour {
 
 		@Override
 		public String toString() {
-			return "{ startTime:" + startTime + ", duration:" + duration + ", deadline:" + deadline + ", EquipletName:" + equipletName + " }";
+			return "{ startTime:" + startTime + ", duration:" + duration + ", deadline:" + deadline + ", EquipletName:" + equipletName + getEquipletName() +" }";
 		}
 	}
 }
