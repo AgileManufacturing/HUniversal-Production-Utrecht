@@ -61,7 +61,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 
 	private ParallelBehaviour _parallelBehaviour;
 	private SequentialBehaviour _sequentialBehaviour;
-	
+
 	private boolean _producing = false;
 
 	private boolean _overviewCompleted = false;
@@ -79,12 +79,12 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	private void initialize() {
 
 		System.out.println("Creating the SocketBehaviour");
-		// _socketBehaviour = new SocketBehaviour(myAgent, _productAgent
-		// .getProperties().getCallback());
+		_socketBehaviour = new SocketBehaviour(myAgent, _productAgent
+		 .getProperties().getCallback());
 
-		// _heartBeatBehaviour = new HeartBeatBehaviour(myAgent, 5000,
-		// _socketBehaviour);
-		// _socketBehaviour.setHeartBeatBehaviour(_heartBeatBehaviour);
+		 _heartBeatBehaviour = new HeartBeatBehaviour(myAgent, 5000,
+		 _socketBehaviour);
+		 _socketBehaviour.setHeartBeatBehaviour(_heartBeatBehaviour);
 
 		System.out.println("Creating the PlannerBehaviour");
 		_plannerBehaviour = new PlannerBehaviour(myAgent, this);
@@ -97,7 +97,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 
 		System.out.println("Creating the ProductBehaviour");
 		_produceBehaviour = new ProduceBehaviour(myAgent, this);
-		
+
 		System.out.println("Creating the RescheduleBehaviour");
 		_rescheduleBehaviour = new RescheduleBehaviour(myAgent, this);
 
@@ -116,8 +116,8 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 
 		System.out
 				.println("Adding the SocketBehaviour to the ParallelBehaviour");
-		// _parallelBehaviour.addSubBehaviour(_socketBehaviour);
-		// _parallelBehaviour.addSubBehaviour(_heartBeatBehaviour);
+		 _parallelBehaviour.addSubBehaviour(_socketBehaviour);
+		 _parallelBehaviour.addSubBehaviour(_heartBeatBehaviour);
 	}
 
 	/*
@@ -143,7 +143,8 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 				this.startScheduling();
 				break;
 			case DONE_SCHEDULING:
-				this.startProducing();
+				System.out.println("Done Scheduling");
+				_productAgent.setStatus(AgentStatus.PRODUCING);
 				break;
 			case DONE_PRODUCING:
 				this.cleanBehaviour();
@@ -174,14 +175,12 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 		_productAgent.setStatus(AgentStatus.PLANNING);
 		System.out.println("Add a PlannerBehaviour");
 		myAgent.addBehaviour(_plannerBehaviour);
-		// _parallelBehaviour.addSubBehaviour(_plannerBehaviour);
 	}
 
 	public void startInforming() {
 		_productAgent.setStatus(AgentStatus.INFORMING);
 		System.out.println("Add an InformerBehaviour");
 		myAgent.addBehaviour(_informerBehaviour);
-		// _parallelBehaviour.addSubBehaviour(_informerBehaviour);
 	}
 
 	public void startScheduling() {
@@ -191,11 +190,11 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	}
 
 	public void startProducing() {
-		_productAgent.setStatus(AgentStatus.PRODUCING);
 		System.out.println("Add a ProduceBehaviour");
-		myAgent.addBehaviour(_produceBehaviour);
+		if(_produceBehaviour.done() == false )
+			myAgent.addBehaviour(_produceBehaviour);
 	}
-	
+
 	public void startRescheduling() {
 		_productAgent.setStatus(AgentStatus.RESCHEDULING);
 		_plannerBehaviour.reset();
@@ -226,7 +225,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 				break;
 			case SCHEDULING:
 				System.out.println("Done scheduling.");
-				_productAgent.setStatus(AgentStatus.DONE_SCHEDULING);
+				_productAgent.setStatus(AgentStatus.PRODUCING);
 				break;
 			case PRODUCING:
 				System.out.println("Done producing.");
@@ -240,13 +239,22 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 				System.out.println("Unknown status. Status: " + as.toString());
 				break;
 			}
-		} else if(bs == BehaviourStatus.ERROR){
+		} else if (bs == BehaviourStatus.RUNNING) {
+			switch (as) {
+			case SCHEDULING:
+				startProducing();
+				break;
+			default:
+				break;
+			}
+		} else if (bs == BehaviourStatus.ERROR) {
 			startRescheduling();
 		}
 	}
 
 	public void cleanBehaviour() {
 		System.out.println("Done overview, stopping SocketBehaviour.");
-		// _socketBehaviour.stop();
+		if (_socketBehaviour != null)
+			_socketBehaviour.stop();
 	}
 }

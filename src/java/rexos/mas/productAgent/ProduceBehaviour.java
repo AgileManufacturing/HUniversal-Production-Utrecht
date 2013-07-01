@@ -173,15 +173,15 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 			}
 		} catch (Exception e) {
 			Logger.log(e);
-			_bc.handleCallback(BehaviourStatus.ERROR, null);
-			_stopProduceBehaviour = true;
-		}
-		if(_productionStepsCompleted == _productionStepsCount) {
-			//_bc.handleCallback(BehaviourStatus.COMPLETED, null);
+			//_bc.handleCallback(BehaviourStatus.ERROR, null);
 			//_stopProduceBehaviour = true;
 		}
+		if(_productionStepsCompleted == _productionStepsCount) {
+			_bc.handleCallback(BehaviourStatus.COMPLETED, null);
+			_stopProduceBehaviour = true;
+		}
 		if(_stopProduceBehaviour) {
-			//myAgent.removeBehaviour(this);
+			myAgent.removeBehaviour(this);
 		}
 	}
 }
