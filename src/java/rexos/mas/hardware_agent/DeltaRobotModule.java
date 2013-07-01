@@ -52,6 +52,7 @@ import rexos.mas.data.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 
+
 /**
  * Module class that contains the functions for the deltarobot module.
  */
@@ -68,6 +69,12 @@ public class DeltaRobotModule extends Module {
 	 */
 	private static final double MAX_ACCELERATION = 25.0;
 
+	/**
+	 * @var int TIMESLOTS_NEEDED_PER_STEP
+	 * 		A static value with the timeslots needed per step.
+	 */
+	private static final int TIMESLOTS_NEEDED_PER_STEP = 6;
+	
 	/**
 	 * @see Module#getEquipletSteps(int, BasicDBObject)
 	 */
@@ -183,7 +190,7 @@ public class DeltaRobotModule extends Module {
 		// create an EquipletStep and return it.
 		EquipletStep step =
 				new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(),
-						new TimeData(5));
+						new TimeData(TIMESLOTS_NEEDED_PER_STEP));
 		return step;
 	}
 
@@ -236,7 +243,7 @@ public class DeltaRobotModule extends Module {
 
 		// create the EquipletStep and return it.
 		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(),
-				new TimeData(7));
+				new TimeData(TIMESLOTS_NEEDED_PER_STEP));
 	}
 
 	/**
@@ -285,7 +292,7 @@ public class DeltaRobotModule extends Module {
 		InstructionData instructionData = new InstructionData("move", "deltarobot", lookUp, lookUpParameters, payload);
 		// create the EquipletStep and return it.
 		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(),
-				new TimeData(5));
+				new TimeData(TIMESLOTS_NEEDED_PER_STEP));
 	}
 
 }
