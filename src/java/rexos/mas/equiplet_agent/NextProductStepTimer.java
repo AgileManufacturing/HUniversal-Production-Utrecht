@@ -101,12 +101,13 @@ public class NextProductStepTimer extends Timer {
 		this.firstTimeSlot = firstTimeSlot;
 		this.timeSlotLength = timeSlotLength;
 		equipletAgent = agent;
+		nextUsedTimeSlot = -1;
 	}
 
 	/**
 	 * Function for setting the next used timeslot.
 	 * 
-	 * @param nextUsedTimeSlot the index of the next used timeslot, fill -1 when not used.
+	 * @param nextUsedTimeSlot the index of the next used timeslot, fill 0 when not used.
 	 */
 	public void setNextUsedTimeSlot(long nextUsedTimeSlot) {
 		this.nextUsedTimeSlot = nextUsedTimeSlot;
@@ -117,14 +118,14 @@ public class NextProductStepTimer extends Timer {
 			long startPlannedTimeSlot = (nextUsedTimeSlot * timeSlotLength) + firstTimeSlot;
 			long currentTime = System.currentTimeMillis();
 			task = new NextProductStepTask();
-			Logger.log("Equiplet agent - trying to schedule: %d (%d - %d)%n", (startPlannedTimeSlot - currentTime),
+			Logger.log("%d Equiplet agent - trying to schedule: %d (%d - %d)%n", EquipletAgent.getCurrentTimeSlot(), (startPlannedTimeSlot - currentTime),
 					startPlannedTimeSlot, currentTime);
-			if(startPlannedTimeSlot - currentTime > 0) {
+			if(startPlannedTimeSlot > currentTime) {
 				schedule(task, startPlannedTimeSlot - currentTime);
 				Logger.log("Equiplet agent - schedule set to: %d (%d - %d)%n", (startPlannedTimeSlot - currentTime),
 						startPlannedTimeSlot, currentTime);
 			} else {
-				Logger.log("");
+				Logger.log(new Exception("Equiplet agent - timer startPlannedTimeSlot is in the past " + startPlannedTimeSlot));
 			}
 		}
 	}
@@ -180,10 +181,13 @@ public class NextProductStepTimer extends Timer {
 				ProductStep nextProductStep = new ProductStep((BasicDBObject) objects.get(0));
 				equipletAgent.setNextProductStep(nextProductStep.getId());
 				ScheduleData scheduleData = nextProductStep.getScheduleData();
-				if(nextUsedTimeSlot == -1 || scheduleData.getStartTime() <= nextUsedTimeSlot) {
+				if(nextUsedTimeSlot == -1 || scheduleData.getStartTime() < nextUsedTimeSlot) {
 					setNextUsedTimeSlot(scheduleData.getStartTime());
+				} else {
+					Logger.log("%d Equiplet agent - Earliest step is not before current step (%d)%n", EquipletAgent.getCurrentTimeSlot(), scheduleData.getStartTime());
 				}
 			} else {
+				Logger.log("%d Equiplet agent - no more steps on PLANNED%n", EquipletAgent.getCurrentTimeSlot());
 				setNextUsedTimeSlot(-1);
 			}
 		} catch(GeneralMongoException | InvalidDBNamespaceException e) {
@@ -208,25 +212,26 @@ public class NextProductStepTimer extends Timer {
 				// Gets all the objects needed to start the next step.
 				ObjectId productStepEntry = equipletAgent.getNextProductStep();
 				String conversationId = equipletAgent.getConversationId(productStepEntry);
-				BasicDBObject productStep =
-						(BasicDBObject) equipletAgent.getProductStepBBClient().findDocumentById(productStepEntry);
-				AID productAgent = new AID((String) productStep.get("productAgentId"), AID.ISGUID);
+				ProductStep productStep =
+						new ProductStep((BasicDBObject) equipletAgent.getProductStepBBClient().findDocumentById(productStepEntry));
 
+				Logger.log("%d Equiplet agent - Asking PA to start with step at time (%d)%n", EquipletAgent.getCurrentTimeSlot(), productStep.getScheduleData().getStartTime());
+				
 				// ask the productAgent to start the production of the step.
-				ACLMessage answer = new ACLMessage(ACLMessage.QUERY_IF);
-				answer.setConversationId(conversationId);
-				answer.addReceiver(productAgent);
-				answer.setOntology("StartStepQuestion");
-				equipletAgent.send(answer);
+//				ACLMessage answer = new ACLMessage(ACLMessage.QUERY_IF);
+//				answer.setConversationId(conversationId);
+//				answer.addReceiver(productStep.getProductAgentId());
+//				answer.setOntology("StartStepQuestion");
+//				equipletAgent.send(answer);
 
 				nextUsedTimeSlot = -1;
 				
-				// TODO: delete below after testing
-				// ACLMessage test = new ACLMessage(ACLMessage.QUERY_IF);
-				// test.setConversationId(conversationId);
-				// test.addReceiver(equipletAgent.getAID());
-				// test.setOntology("StartStep");
-				// equipletAgent.send(test);
+//				 TODO: delete below after testing
+				 ACLMessage test = new ACLMessage(ACLMessage.QUERY_IF);
+				 test.setConversationId(conversationId);
+				 test.addReceiver(equipletAgent.getAID());
+				 test.setOntology("StartStep");
+				 equipletAgent.send(test);
 			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(e);
 			}
