@@ -129,7 +129,7 @@ public class SchedulerBehaviour extends Behaviour {
 	public void action() {
 		try {
 			if (_schedulersStarted == _schedulersCompleted && _isError == false) {
-				this._bc.handleCallback(BehaviourStatus.COMPLETED, null);
+				//this._bc.handleCallback(BehaviourStatus.COMPLETED, null);
 				_isCompleted = true;
 			} else if (_isError) {
 				this._bc.handleCallback(BehaviourStatus.ERROR, null);
@@ -299,6 +299,9 @@ public class SchedulerBehaviour extends Behaviour {
 			} else {
 				_prodStep.setStatus(StepStatusCode.PLANNED);
 				_prodStep.setUsedEquiplet(returnMsg.getSender());
+				if(_prodStep.getId() == 0) {
+					this._bc.handleCallback(BehaviourStatus.COMPLETED, null);
+				}
 			}
 
 		} else if (returnMsg.getPerformative() == ACLMessage.DISCONFIRM) {

@@ -125,7 +125,7 @@ public class ProductAgent extends Agent {
 		        	
 		        	JsonObject ele = productionStepsArray.get(i).getAsJsonObject();		        	
 		        	int id = ele.get("id").getAsInt();
-		        	int capability = ele.get("_capability").getAsInt();
+		        	int capability = ele.get("capability").getAsInt();
 		        	JsonElement parameterObject = ele.get("parameters");
 		        	String parameters = parameterObject.toString();
 		        	

@@ -188,20 +188,12 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 		_productAgent.setStatus(AgentStatus.SCHEDULING);
 		System.out.println("Add a SchedulerBehaviour");
 		myAgent.addBehaviour(_schedulerBehaviour);
-		if(_producing == false) {
-			_productAgent.setStatus(AgentStatus.DONE_SCHEDULING);
-			_producing = true;
-		}
-		// _parallelBehaviour.addSubBehaviour(_schedulerBehaviour);
 	}
 
 	public void startProducing() {
 		_productAgent.setStatus(AgentStatus.PRODUCING);
 		System.out.println("Add a ProduceBehaviour");
-		if(_producing == true) {
-			myAgent.addBehaviour(_produceBehaviour);
-			_producing =false;
-		}
+		myAgent.addBehaviour(_produceBehaviour);
 	}
 	
 	public void startRescheduling() {
