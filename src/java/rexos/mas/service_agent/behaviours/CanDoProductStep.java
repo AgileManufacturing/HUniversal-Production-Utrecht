@@ -51,7 +51,6 @@ import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.ProductStep;
 import rexos.mas.service_agent.Service;
 import rexos.mas.service_agent.ServiceAgent;
-import rexos.mas.service_agent.ServiceFactory;
 
 import com.mongodb.BasicDBObject;
 
@@ -76,22 +75,13 @@ public class CanDoProductStep extends ReceiveBehaviour {
 	private ServiceAgent agent;
 
 	/**
-	 * @var ServiceFactory factory
-	 *      The serviceFactory to create a service with that will handle the translation of the productStep to
-	 *      serviceSteps.
-	 */
-	private ServiceFactory factory;
-
-	/**
 	 * Creates a new CanDoProductStep instance with the specified parameters.
 	 * 
 	 * @param agent the agent this behaviour belongs to.
-	 * @param factory the serviceFactory to create a service for this productStep with.
 	 */
-	public CanDoProductStep(ServiceAgent agent, ServiceFactory factory) {
+	public CanDoProductStep(ServiceAgent agent) {
 		super(agent, MessageTemplate.MatchOntology("CanDoProductionStep"));
 		this.agent = agent;
-		this.factory = factory;
 	}
 
 	/**
@@ -115,7 +105,7 @@ public class CanDoProductStep extends ReceiveBehaviour {
 
 			Logger.log("%s got message CanDoProductStep for step type %s%n", agent.getLocalName(), stepType);
 
-			Service[] services = factory.getServicesForStep(stepType);
+			Service[] services = agent.getServiceFactory().getServicesForStep(stepType);
 
 			ArrayList<Service> possibleServices = new ArrayList<Service>();
 			for(Service service : services) {
@@ -126,15 +116,15 @@ public class CanDoProductStep extends ReceiveBehaviour {
 
 			if(!possibleServices.isEmpty()) {
 				// TODO (out of scope)implement algorithm to intelligently choose a service here
-				Service choosenService = possibleServices.get(0);
+				Service chosenService = possibleServices.get(0);
 
-				agent.mapConvIdWithService(message.getConversationId(), choosenService);
+				agent.mapConvIdWithService(message.getConversationId(), chosenService);
 
 				ACLMessage msg = new ACLMessage(ACLMessage.QUERY_IF);
 				msg.setConversationId(message.getConversationId());
 				msg.addReceiver(agent.getHardwareAgentAID());
 				msg.setOntology("CheckForModules");
-				msg.setContentObject(choosenService.getModuleGroupIds(stepType, parameters));
+				msg.setContentObject(chosenService.getModuleGroupIds(stepType, parameters));
 				agent.send(msg);
 			} else {
 				ACLMessage reply = message.createReply();

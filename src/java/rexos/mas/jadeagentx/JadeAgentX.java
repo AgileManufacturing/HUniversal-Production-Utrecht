@@ -55,7 +55,6 @@ import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.log.Logger;
@@ -68,7 +67,7 @@ import rexos.mas.data.ProductionStep;
 import com.mongodb.BasicDBObject;
 
 /**
- *	Test class for testing the equiplet agent, service agent and hardware agent.
+ * Test class for testing the equiplet agent, service agent and hardware agent.
  */
 public class JadeAgentX extends Agent {
 	private static final long serialVersionUID = 1L;
@@ -112,12 +111,12 @@ public class JadeAgentX extends Agent {
 			BasicDBObject parameters2 = new BasicDBObject();
 			BasicDBObject parameters3 = new BasicDBObject();
 			BasicDBObject parameters4 = new BasicDBObject();
-			
-//			parameters.append("part", new Part(1).toBasicDBObject());
-//			parameters.append("position", new Position(1.0, 2.0, 3.0, new Part(2)).toBasicDBObject());
+
+			// parameters.append("part", new Part(1).toBasicDBObject());
+			// parameters.append("position", new Position(1.0, 2.0, 3.0, new Part(2)).toBasicDBObject());
 			parameters1.append("startPosition", new Position(10.0, -10.0).toBasicDBObject());
 			parameters1.append("endPosition", new Position(-10.0, -10.0).toBasicDBObject());
-								
+
 			// Next we want to have some production steps
 			ProductionStep stp1 = new ProductionStep(1, 3, parameters1);
 			parameters2.append("startPosition", new Position(-10.0, -10.0).toBasicDBObject());
@@ -130,47 +129,66 @@ public class JadeAgentX extends Agent {
 			parameters4.append("endPosition", new Position(10.0, -10.0).toBasicDBObject());
 			ProductionStep stp4 = new ProductionStep(4, 3, parameters4);
 
-
 			/**
 			 * Our argument for the product agent. The total production of the
 			 * product, consists of multiple steps
 			 */
 			ArrayList<ProductionStep> stepList = new ArrayList<>();
-			//stepList.add(stp1);
-			////stepList.add(stp2);
-			//stepList.add(stp3);
-			//stepList.add(stp4);
-			//Random generator2 = new Random( );
-			
-			//int Low = -30;
-			//int High = 30;
-			//int R = (generator2.nextInt(High-Low) + Low);
-			
+			// stepList.add(stp1);
+			// stepList.add(stp2);
+			// stepList.add(stp3);
+			// stepList.add(stp4);
+			// Random generator2 = new Random( );
 
-					
-			
-			for(int i = 0; i < 10; i++) {
-				double x1 = (Math.random() * 60.0 -30.0);
-				double x2 = (Math.random() * 60.0 -30.0);
-				double y1 = (Math.random() * 60.0 -30.0);
-				double y2 = (Math.random() * 60.0 -30.0);
+			// int Low = -30;
+			// int High = 30;
+			// int R = (generator2.nextInt(High-Low) + Low);
+
+			// for(int i = 0; i < 10; i++) {
+			// double x1 = (Math.random() * 60.0 -30.0);
+			// double x2 = (Math.random() * 60.0 -30.0);
+			// double y1 = (Math.random() * 60.0 -30.0);
+			// double y2 = (Math.random() * 60.0 -30.0);
+			// BasicDBObject parameters = new BasicDBObject();
+			// Position pos = new Position(x1,y1);
+			// Position pos2 = new Position(x2,y2);
+			// parameters.append("startPosition", pos.toBasicDBObject());
+			// parameters.append("endPosition", pos2.toBasicDBObject());
+			// ProductionStep stp = new ProductionStep(i, 3, parameters);
+			// stepList.add(stp);
+			// }
+
+			double radius = 25;
+			int points = 200;
+			for(int i = 0; i < points; i++) {
+				double x1 = Math.cos(i / (double) points * Math.PI * 2d) * radius;
+				double y1 = Math.sin(i / (double) points * Math.PI * 2d) * radius;
+
+				double x2 = Math.cos((i + 1) / (double) points * Math.PI * 2d) * radius;
+				double y2 = Math.sin((i + 1) / (double) points * Math.PI * 2d) * radius;
+				
+				if(i == 0 || i == points/2) {
+					System.out.println();
+				}
+
+				Position from = new Position(x1, y1);
+				Position to = new Position(x2, y2);
+
 				BasicDBObject parameters = new BasicDBObject();
-				Position pos = new Position(x1,y1);
-				Position pos2 = new Position(x2,y2);
-				parameters.append("startPosition", pos.toBasicDBObject());
-				parameters.append("endPosition", pos2.toBasicDBObject());
+				parameters.append("startPosition", from.toBasicDBObject());
+				parameters.append("endPosition", to.toBasicDBObject());
+
 				ProductionStep stp = new ProductionStep(i, 3, parameters);
 				stepList.add(stp);
 			}
-			
-			
+
 			Production production = new Production(stepList);
 			Product product = new Product(production);
 
 			Callback callback = new Callback();
 			callback.setHost("145.89.84.156");
 			callback.setPort(21);
-			
+
 			ProductAgentProperties pap = new ProductAgentProperties();
 			pap.setCallback(callback);
 			pap.setProduct(product);
@@ -184,8 +202,8 @@ public class JadeAgentX extends Agent {
 			Object[] args = new Object[1];
 			args[0] = pap;
 
-//			getContainerController().createNewAgent("pa" + count++, "rexos.mas.productAgent.ProductAgent", args)
-//					.start();
+			// getContainerController().createNewAgent("pa" + count++, "rexos.mas.productAgent.ProductAgent", args)
+			// .start();
 			addBehaviour(new StartProductAgent(this, args));
 		} catch(Exception e) {
 			Logger.log(e);
@@ -197,7 +215,7 @@ public class JadeAgentX extends Agent {
 
 	/**
 	 * Behaviour for starting a product agent.
-	 *
+	 * 
 	 */
 	public class StartProductAgent extends CyclicBehaviour {
 		private static final long serialVersionUID = 1L;
@@ -208,9 +226,9 @@ public class JadeAgentX extends Agent {
 		 * Constructor for the StartProductAgent behaviour.
 		 * 
 		 * @param a
-		 * 		The agent this behaviour is linked to/this test agent.
+		 *            The agent this behaviour is linked to/this test agent.
 		 * @param args
-		 * 		The arguments for the product agent.
+		 *            The arguments for the product agent.
 		 */
 		public StartProductAgent(Agent a, Object[] args) {
 			super(a);
