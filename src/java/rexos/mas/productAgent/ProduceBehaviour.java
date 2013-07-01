@@ -43,10 +43,11 @@
 
 package rexos.mas.productAgent;
 
+import java.util.HashMap;
+
 import com.mongodb.BasicDBObject;
 
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import rexos.libraries.log.Logger;
@@ -54,26 +55,33 @@ import rexos.mas.data.BehaviourStatus;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
-import rexos.mas.data.StepStatusCode;
 
-public class ProduceBehaviour extends Behaviour {
+public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 	private Production _production;
 
-	private boolean _isDone = false;
-	private boolean _isError = false;
-	private boolean _isCompleted = false;
-
 	private BehaviourCallback _bc;
-	
-	private int _producersStarted = 0;
-	private int _producersCompleted = 0;
+
+	private int _productionStepsCompleted = 0;
+	private int _productionStepsCount = 0;
+	private boolean _stopProduceBehaviour = false;
+
+	private HashMap<String, ProductionStep> _conversationIdToProductionStep;
 
 	/**
 	 * @param myAgent
 	 */
 	public ProduceBehaviour(Agent myAgent, BehaviourCallback bc) {
-		super(myAgent);
+		this(myAgent, bc, MessageTemplate.or(MessageTemplate
+				.MatchOntology("StatusUpdate"), MessageTemplate.or(
+				MessageTemplate.MatchOntology("StartStepQuestion"),
+				MessageTemplate.MatchOntology("EquipletAgentDied"))));
+
+	}
+
+	public ProduceBehaviour(Agent myAgent, BehaviourCallback bc,
+			MessageTemplate template) {
+		super(myAgent, -1, template);
 		this._bc = bc;
 	}
 
@@ -81,74 +89,26 @@ public class ProduceBehaviour extends Behaviour {
 	public void onStart() {
 		try {
 			_production = ((ProductAgent) myAgent).getProduct().getProduction();
-			if (_production != null && _production.getProductionSteps() != null) {
-				for (ProductionStep stp : _production.getProductionSteps()) {
-					if (stp.getStatus() == StepStatusCode.PLANNED) {
-						myAgent.addBehaviour(new ProducingReceiver(myAgent, -1,
-								MessageTemplate.and(MessageTemplate.or(MessageTemplate.or(MessageTemplate.MatchOntology("StartStepQuestion"), MessageTemplate.MatchOntology("StatusUpdate" )), MessageTemplate.MatchOntology("EquipletAgentDied")), MessageTemplate.MatchConversationId(stp.getConversationId())), stp, this));
-						_producersStarted++;
-					} else {
-						this._isError = true;
-					}
-				}
-			}
+			_conversationIdToProductionStep = _production
+					.createConversationIdToProductionStepMapping();
+			_productionStepsCount = _conversationIdToProductionStep.size();
 		} catch (Exception e) {
 			Logger.log(e);
 		}
 	}
 
-	@Override
-	public void action() {
-		try {
-			if (_producersStarted == _producersCompleted) {
-				this._bc.handleCallback(BehaviourStatus.COMPLETED);
-				this._isCompleted = true;
-			} else if (this._isError) {
-				this._bc.handleCallback(BehaviourStatus.ERROR);
-				this._isCompleted = true;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	@Override
-	public boolean done() {
-		return this._isCompleted;
-	}
-	
-	public void reportProductStatus(BehaviourStatus bs) {
-		if(bs == BehaviourStatus.COMPLETED) {
-			//this._isDone = true;
-			_producersCompleted++;
-		} else {
-			this._isError = true;
-		}
-	}
-}
-
-class ProducingReceiver extends rexos.mas.behaviours.ReceiveBehaviour {
-	ProductionStep ProductAgentstp;
-	private ProduceBehaviour _pb;
-
-	/**
-	 * @param agnt
-	 * @param millis
-	 * @param msgtmplt
-	 * @param stp
-	 **/
-	public ProducingReceiver(Agent agnt, int millis, MessageTemplate msgtmplt,
-			ProductionStep stp, ProduceBehaviour pb) {
-		super(agnt, millis, msgtmplt);
-		this.ProductAgentstp = stp;
-		this._pb = pb;
-	}
-
-	private static final long serialVersionUID = 1L;
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage)
+	 */
 	@Override
 	public void handle(ACLMessage m) {
 		try {
+			String conversationId = m.getConversationId();
+			ProductionStep prodStep = _conversationIdToProductionStep
+					.get(conversationId);
 			if (m.getOntology() != null) {
 				switch (m.getOntology()) {
 				case "StartStepQuestion":
@@ -163,8 +123,9 @@ class ProducingReceiver extends rexos.mas.behaviours.ReceiveBehaviour {
 					myAgent.send(reply);
 					break;
 				case "StatusUpdate":
-					ProductStep step = new ProductStep((BasicDBObject)m.getContentObject());
-					ProductAgentstp.setStatus(step.getStatus());
+					ProductStep step = new ProductStep(
+							(BasicDBObject) m.getContentObject());
+					prodStep.setStatus(step.getStatus());
 					switch (step.getStatus()) {
 					case WAITING:
 						// Waiting
@@ -194,7 +155,7 @@ class ProducingReceiver extends rexos.mas.behaviours.ReceiveBehaviour {
 						((ProductAgent) myAgent).getProduct()
 								.addStatusDataToLog(m.getSender(),
 										step.getStatusData());
-						_pb.reportProductStatus(BehaviourStatus.COMPLETED);
+						_productionStepsCompleted++;
 						break;
 					default:
 						Logger.log(new UnsupportedOperationException(
@@ -211,11 +172,19 @@ class ProducingReceiver extends rexos.mas.behaviours.ReceiveBehaviour {
 					break;
 				}
 			} else {
-				_pb.reportProductStatus(BehaviourStatus.ERROR);
+				Logger.log("No ontology set!");
 			}
 		} catch (Exception e) {
 			Logger.log(e);
-			_pb.reportProductStatus(BehaviourStatus.ERROR);
+			_bc.handleCallback(BehaviourStatus.ERROR, null);
+			_stopProduceBehaviour = true;
+		}
+		if(_productionStepsCompleted == _productionStepsCount) {
+			_bc.handleCallback(BehaviourStatus.COMPLETED, null);
+			_stopProduceBehaviour = true;
+		}
+		if(_stopProduceBehaviour) {
+			myAgent.removeBehaviour(this);
 		}
 	}
 }
