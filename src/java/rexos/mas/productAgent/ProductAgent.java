@@ -73,12 +73,10 @@ public class ProductAgent extends Agent {
 	private String _convIDBase;
 	public int prodStep = 0;
 
-	private Gson _gson;
 	private ProductAgentProperties _properties;
 	private AgentStatus _status;
 
 	public ProductAgent() {
-		_gson = new Gson();
 		_status = AgentStatus.STARTING;
 	}
 
@@ -113,22 +111,22 @@ public class ProductAgent extends Agent {
 				// to connect to.
 				JsonParser parser = new JsonParser();
 				JsonObject obj = (JsonObject)parser.parse((String)args[0]).getAsJsonObject();
-		        JsonElement callbackElement = obj.get("_callback");
+		        JsonElement callbackElement = obj.get("callback");
 		        
-		        JsonObject productObject = obj.get("_product").getAsJsonObject();
+		        JsonObject productObject = obj.get("product").getAsJsonObject();
 		        
-		        JsonObject productionObject = productObject.get("_production").getAsJsonObject();
+		        JsonObject productionObject = productObject.get("production").getAsJsonObject();
 		        
-		        JsonArray productionStepsArray = productionObject.get("_productionSteps").getAsJsonArray();
+		        JsonArray productionStepsArray = productionObject.get("productionSteps").getAsJsonArray();
 		        
 		        ArrayList<ProductionStep> stepList = new ArrayList<>();
 		        ProductionStep step =  null;
 		        for(int i = 0; i < productionStepsArray.size(); i++) {
 		        	
 		        	JsonObject ele = productionStepsArray.get(i).getAsJsonObject();		        	
-		        	int id = ele.get("_id").getAsInt();
+		        	int id = ele.get("id").getAsInt();
 		        	int capability = ele.get("_capability").getAsInt();
-		        	JsonElement parameterObject = ele.get("_parameters");
+		        	JsonElement parameterObject = ele.get("parameters");
 		        	String parameters = parameterObject.toString();
 		        	
 		        	step = new ProductionStep(id, capability, (BasicDBObject)JSON.parse(parameters));

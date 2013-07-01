@@ -136,21 +136,29 @@ public class JadeAgentX extends Agent {
 			 * product, consists of multiple steps
 			 */
 			ArrayList<ProductionStep> stepList = new ArrayList<>();
-//			stepList.add(stp1);
-//			stepList.add(stp2);
-//			stepList.add(stp3);
-//			stepList.add(stp4);
+			//stepList.add(stp1);
+			////stepList.add(stp2);
+			//stepList.add(stp3);
+			//stepList.add(stp4);
 			//Random generator2 = new Random( );
 			
 			//int Low = -30;
 			//int High = 30;
 			//int R = (generator2.nextInt(High-Low) + Low);
 			
-			for(int i = 0; i < 50; i++) {
+
+					
+			
+			for(int i = 0; i < 10; i++) {
+				double x1 = (Math.random() * 60.0 -30.0);
+				double x2 = (Math.random() * 60.0 -30.0);
+				double y1 = (Math.random() * 60.0 -30.0);
+				double y2 = (Math.random() * 60.0 -30.0);
 				BasicDBObject parameters = new BasicDBObject();
-				Position pos = new Position((Math.random() * 60.0 -30.0), (Math.random() * 60.0 -30.0));
+				Position pos = new Position(x1,y1);
+				Position pos2 = new Position(x2,y2);
 				parameters.append("startPosition", pos.toBasicDBObject());
-				parameters.append("endPosition", pos.toBasicDBObject());
+				parameters.append("endPosition", pos2.toBasicDBObject());
 				ProductionStep stp = new ProductionStep(i, 3, parameters);
 				stepList.add(stp);
 			}
