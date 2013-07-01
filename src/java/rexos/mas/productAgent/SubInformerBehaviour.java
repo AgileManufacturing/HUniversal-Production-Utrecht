@@ -29,9 +29,17 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 	public SubInformerBehaviour(Agent myAgent,
 			InformerBehaviour parentBehaviour, ProductionStep productionStep,
 			AID targetEquiplet) {
-		super(myAgent, SUBINFORMER_TIMEOUT, MessageTemplate
-				.MatchConversationId(productionStep
-						.getConversationIdForEquiplet(targetEquiplet)));
+		super(
+				myAgent,
+				SUBINFORMER_TIMEOUT,
+				MessageTemplate
+						.and(MessageTemplate.MatchConversationId(productionStep
+								.getConversationIdForEquiplet(targetEquiplet)),
+								MessageTemplate.or(
+										MessageTemplate
+												.MatchOntology("CanPerformStep"),
+										MessageTemplate
+												.MatchOntology("ProductionDuration"))));
 		_parentBehaviour = parentBehaviour;
 		_productionStep = productionStep;
 		_targetEquiplet = targetEquiplet;
@@ -64,10 +72,10 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 					if (message.getPerformative() == ACLMessage.CONFIRM) {
 						ACLMessage newMessage = new ACLMessage(
 								ACLMessage.REQUEST);
-						message.setConversationId(_conversationId);
-						message.addReceiver(_targetEquiplet);
-						message.setOntology("GetProductionDuration");
-						message.setContentObject(_productionStep);
+						newMessage.setConversationId(_conversationId);
+						newMessage.addReceiver(_targetEquiplet);
+						newMessage.setOntology("GetProductionDuration");
+						newMessage.setContentObject(_productionStep);
 						myAgent.send(newMessage);
 						_currentState++;
 					} else {
@@ -102,15 +110,15 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 					BehaviourStatus.ERROR, this);
 		}
 	}
-	
+
 	public long getTimeslotDuration() {
 		return _timeslotDuration;
 	}
-	
+
 	public AID getTargetEquiplet() {
 		return _targetEquiplet;
 	}
-	
+
 	public int getProductionStepId() {
 		return _productionStep.getId();
 	}

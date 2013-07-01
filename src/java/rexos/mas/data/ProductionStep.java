@@ -83,6 +83,7 @@ public class ProductionStep implements Serializable {
 		this._id = id;
 		this._capability = capability;
 		this._parameters = parameterList;
+		_equipletConversationIds = new HashMap<AID, String>();
 	}
 
 
