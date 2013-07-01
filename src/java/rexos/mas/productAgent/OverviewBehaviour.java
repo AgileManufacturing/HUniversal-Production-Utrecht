@@ -79,11 +79,11 @@ public class OverviewBehaviour extends Behaviour implements
 
 		
 		System.out.println("Creating the SocketBehaviour");
-		_socketBehaviour = new SocketBehaviour(myAgent, _productAgent
-				.getProperties().getCallback());
+		//_socketBehaviour = new SocketBehaviour(myAgent, _productAgent
+				//.getProperties().getCallback());
 		
-		_heartBeatBehaviour = new HeartBeatBehaviour(myAgent, 5000, _socketBehaviour);
-		_socketBehaviour.setHeartBeatBehaviour(_heartBeatBehaviour);
+		//_heartBeatBehaviour = new HeartBeatBehaviour(myAgent, 5000, _socketBehaviour);
+		//_socketBehaviour.setHeartBeatBehaviour(_heartBeatBehaviour);
 
 		System.out.println("Creating the PlannerBehaviour");
 		_plannerBehaviour = new PlannerBehaviour(myAgent, this);
@@ -112,8 +112,8 @@ public class OverviewBehaviour extends Behaviour implements
 
 		System.out
 				.println("Adding the SocketBehaviour to the ParallelBehaviour");
-		_parallelBehaviour.addSubBehaviour(_socketBehaviour);
-		_parallelBehaviour.addSubBehaviour(_heartBeatBehaviour);
+		//_parallelBehaviour.addSubBehaviour(_socketBehaviour);
+		//_parallelBehaviour.addSubBehaviour(_heartBeatBehaviour);
 	}
 
 	/*
@@ -181,6 +181,7 @@ public class OverviewBehaviour extends Behaviour implements
 		_productAgent.setStatus(AgentStatus.SCHEDULING);
 		System.out.println("Add a SchedulerBehaviour");
 		myAgent.addBehaviour(_schedulerBehaviour);
+		_productAgent.setStatus(AgentStatus.DONE_SCHEDULING);
 		//_parallelBehaviour.addSubBehaviour(_schedulerBehaviour);
 	}
 
@@ -225,6 +226,6 @@ public class OverviewBehaviour extends Behaviour implements
 
 	public void cleanBehaviour() {
 		System.out.println("Done overview, stopping SocketBehaviour.");
-		_socketBehaviour.stop();
+		//_socketBehaviour.stop();
 	}
 }

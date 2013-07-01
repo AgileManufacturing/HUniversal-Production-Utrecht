@@ -65,6 +65,7 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 	private int _productionStepsCompleted = 0;
 	private int _productionStepsCount = 0;
 	private boolean _stopProduceBehaviour = false;
+	private int _prodCounters = 0;
 
 	private HashMap<String, ProductionStep> _conversationIdToProductionStep;
 
@@ -91,7 +92,7 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 			_production = ((ProductAgent) myAgent).getProduct().getProduction();
 			_conversationIdToProductionStep = _production
 					.createConversationIdToProductionStepMapping();
-			_productionStepsCount = _conversationIdToProductionStep.size();
+			_productionStepsCount = _production.getProductionCount();
 		} catch (Exception e) {
 			Logger.log(e);
 		}
@@ -155,6 +156,7 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 						((ProductAgent) myAgent).getProduct()
 								.addStatusDataToLog(m.getSender(),
 										step.getStatusData());
+						System.out.println("Completed productionStep :"+_prodCounters++);
 						_productionStepsCompleted++;
 						break;
 					default:

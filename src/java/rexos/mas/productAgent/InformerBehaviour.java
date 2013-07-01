@@ -81,6 +81,8 @@ public class InformerBehaviour extends Behaviour {
 	private ParallelBehaviour _parBehaviour;
 
 	private Queue<SubInformerBehaviour> _subInformerBehaviours;
+	private int _subInformersCompleted = 0;
+	private int _totalSubinformers = 0;
 
 	// private HashMap<SubInformerBehaviour, Boolean> _subInformerBehaviours;
 
@@ -121,13 +123,15 @@ public class InformerBehaviour extends Behaviour {
 									.getId());
 					if (equipletList != null && equipletList.size() > 0) {
 						for (AID aid : equipletList.keySet()) {
-							productionStep.setConversationIdForEquiplet(aid,
-									_productAgent.generateCID());
+							String convId = _productAgent.generateCID();
+							productionStep.setConversationIdForEquiplet(aid,convId
+									);
 							// _parBehaviour.addSubBehaviour(new
 							// Conversation(aid, productionStep, _prodEQmap));
 							_subInformerBehaviours
 									.add(new SubInformerBehaviour(myAgent,
 											this, productionStep, aid));
+							_totalSubinformers++;
 						}
 					} else {
 						// THROW ERROR!
@@ -159,6 +163,9 @@ public class InformerBehaviour extends Behaviour {
 			} else {
 				if (_isDone) {
 					System.out.println("Done parallel informing.");
+					_production.setProductionEquipletMapping(_prodEQmap);
+					_product.setProduction(_production);
+					_productAgent.setProduct(_product);
 					this._bc.handleCallback(BehaviourStatus.COMPLETED, null);
 					_isCompleted = true;
 				} else if (_isError) {
@@ -167,6 +174,7 @@ public class InformerBehaviour extends Behaviour {
 					_isCompleted = true;
 				}
 			}
+			//block();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -186,12 +194,15 @@ public class InformerBehaviour extends Behaviour {
 	public void callbackSubInformerBehaviour(BehaviourStatus bs,
 			SubInformerBehaviour subBehaviour) {
 		if (bs == BehaviourStatus.COMPLETED) {
-			
-			// Completed
+			_prodEQmap.setTimeSlotsForEquiplet(subBehaviour.getProductionStepId(), subBehaviour.getTargetEquiplet(), subBehaviour.getTimeslotDuration());
 		} else {
-			// Error
+			System.out.println("Ended with error!");
 		}
 		_parBehaviour.removeSubBehaviour(subBehaviour);
 		_currentRunningSubInformerBehaviours--;
+		_subInformersCompleted++;
+		if(_subInformersCompleted == _totalSubinformers) {
+			_isDone = true;
+		}
 	}
 }

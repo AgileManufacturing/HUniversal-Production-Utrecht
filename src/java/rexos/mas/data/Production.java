@@ -96,7 +96,15 @@ public class Production{
 	   return "DataObject [productionSteps=" + _productionSteps+ "]";
 	}
 	
+	public int getProductionCount() {
+		return this._productionSteps.size();
+	}
+	
 	public HashMap<String, ProductionStep> createConversationIdToProductionStepMapping() {
-		return null;
+		HashMap<String, ProductionStep> outputMap = new HashMap<String, ProductionStep>();
+		for(ProductionStep step : _productionSteps) {
+				outputMap.put(step.getConversationId(), step);
+		}
+		return outputMap;
 	}
 }
