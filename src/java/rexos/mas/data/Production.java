@@ -41,6 +41,7 @@
 package rexos.mas.data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -81,6 +82,10 @@ public class Production{
 			throw new Exception("mapping cant be null");
 		this._prodEQMap = prodEQMap;
 	}
+	
+	public ProductionStep getProductionStep(int id) {
+		return _productionSteps.get(id);
+	}
 
 	public ProductionEquipletMapper getProductionEquipletMapping(){
 		return this._prodEQMap;
@@ -89,5 +94,17 @@ public class Production{
 	@Override
 	public String toString() {
 	   return "DataObject [productionSteps=" + _productionSteps+ "]";
+	}
+	
+	public int getProductionCount() {
+		return this._productionSteps.size();
+	}
+	
+	public HashMap<String, ProductionStep> createConversationIdToProductionStepMapping() {
+		HashMap<String, ProductionStep> outputMap = new HashMap<String, ProductionStep>();
+		for(ProductionStep step : _productionSteps) {
+				outputMap.put(step.getConversationId(), step);
+		}
+		return outputMap;
 	}
 }

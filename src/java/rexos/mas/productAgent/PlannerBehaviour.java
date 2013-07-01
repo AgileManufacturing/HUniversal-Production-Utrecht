@@ -140,10 +140,10 @@ public class PlannerBehaviour extends Behaviour {
 	public void action() {
 		try {
 			if(this._isDone) {
-				this._bc.handleCallback(BehaviourStatus.COMPLETED);
+				this._bc.handleCallback(BehaviourStatus.COMPLETED, null);
 				this._isCompleted = true;
 			}else if (this._isError) {
-				this._bc.handleCallback(BehaviourStatus.ERROR);
+				this._bc.handleCallback(BehaviourStatus.ERROR, null);
 				this._isCompleted = true;
 			} else {
 				block();

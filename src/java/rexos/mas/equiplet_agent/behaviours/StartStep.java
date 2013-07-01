@@ -114,23 +114,27 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 		try {
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
 			if(equipletAgent.getEquipletStateEntry().getEquipletState() != EquipletState.NORMAL) {
-				Logger.log("Equiplet agent - changing state");
+				Logger.log("%d Equiplet agent - changing state%n", EquipletAgent.getCurrentTimeSlot());
 
-				equipletAgent.getStateBBClient().subscribe(stateUpdateSubscription);
-				equipletAgent.setDesiredEquipletState(EquipletState.NORMAL);
-			} else {
-				Logger.log("Equiplet agent - Starting prod. step.");
+				//equipletAgent.getStateBBClient().subscribe(stateUpdateSubscription);
+				//equipletAgent.setDesiredEquipletState(EquipletState.NORMAL);
 				equipletAgent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
 						new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));
+				
+				equipletAgent.getTimer().rescheduleTimer();
+			} else {
+				Logger.log("%d Equiplet agent - Starting prod. step.%n", EquipletAgent.getCurrentTimeSlot());
+				equipletAgent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
+						new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));
+				
+				equipletAgent.getTimer().rescheduleTimer();
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e1) {
 			Logger.log(e1);
 			//TODO handle error
 		}
 
-		// Get the next product step and set the timer for the next product step
-		NextProductStepTimer timer = equipletAgent.getTimer();
-		timer.rescheduleTimer();
+
 	}
 
 	@Override
@@ -141,11 +145,13 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 			if(dbObject != null) {
 				EquipletStateEntry state = new EquipletStateEntry((BasicDBObject) dbObject);
 				if(state.getEquipletState() == EquipletState.NORMAL) {
-					Logger.log("Equiplet agent - equip. state changed to NORMAL. Starting prod. step.");
+					Logger.log("%d Equiplet agent - equip. state changed to NORMAL. Starting prod. step.", EquipletAgent.getCurrentTimeSlot());
 
 					equipletAgent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
 							new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));
 
+					equipletAgent.getTimer().rescheduleTimer();
+					
 					stateBBClient.unsubscribe(stateUpdateSubscription);
 				}
 			}

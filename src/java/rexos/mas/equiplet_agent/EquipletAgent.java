@@ -58,7 +58,6 @@ import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,13 +88,8 @@ import rexos.mas.data.ProductStep;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.equiplet_agent.behaviours.AbortStep;
-import rexos.mas.equiplet_agent.behaviours.CanPerformStep;
-import rexos.mas.equiplet_agent.behaviours.GetProductionDuration;
 import rexos.mas.equiplet_agent.behaviours.InitialisationFinished;
-import rexos.mas.equiplet_agent.behaviours.ScheduleStep;
 import rexos.mas.equiplet_agent.behaviours.ServiceAgentDied;
-import rexos.mas.equiplet_agent.behaviours.StartStep;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
@@ -229,6 +223,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 * 
 	 */
 	private int equipletId;
+	
+	private static long systemStart = System.currentTimeMillis();
 
 	/**
 	 * Setup function for the equipletAgent. Configures the IP and database name
@@ -308,8 +304,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			BasicDBObject timeData = (BasicDBObject) collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
 
 			// initiates the timer to the next product step.
-			timer =
-					new NextProductStepTimer(timeData.getLong("firstTimeSlot"), timeData.getInt("timeSlotLength"), this);
+			timer = new NextProductStepTimer(timeData.getLong("firstTimeSlot"), timeData.getInt("timeSlotLength"), this);
 
 			collectiveBBClient.setCollection(equipletDirectoryName);
 		} catch(GeneralMongoException | InvalidDBNamespaceException | UnknownHostException | StaleProxyException
@@ -402,10 +397,13 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 								// If the start time of the newly planned productStep is earlier then the next used time
 								// slot make it the next used timeslot.
 								ScheduleData scheduleData = productStep.getScheduleData();
-								if(timer.getNextUsedTimeSlot() == 0
-										|| scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
-									timer.setNextUsedTimeSlot(scheduleData.getStartTime());
-									nextProductStep = productStep.getId();
+//								if(timer.getNextUsedTimeSlot() == 0
+//										|| scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
+//									timer.setNextUsedTimeSlot(scheduleData.getStartTime());
+//									nextProductStep = productStep.getId();
+//								}
+								if(timer.getNextUsedTimeSlot() == -1 || scheduleData.getStartTime() < timer.getNextUsedTimeSlot()){
+									timer.rescheduleTimer();
 								}
 
 								responseMessage.setOntology("Planned");
@@ -664,5 +662,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 */
 	public DbData getDbData() {
 		return dbData;
+	}
+	
+	public static long getCurrentTimeSlot(){
+//		return (System.currentTimeMillis() - systemStart)/50;
+		return (System.currentTimeMillis())/50;
 	}
 }
