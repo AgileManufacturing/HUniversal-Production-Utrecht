@@ -74,6 +74,9 @@ public class OverviewBehaviour extends Behaviour implements
 		_productAgent.setStatus(AgentStatus.DONE_INITIALIZING);
 	}
 
+	/**
+	 * Initialize the overview-behaviour which sets the other behaviours.
+	 */
 	private void initialize() {
 
 
@@ -121,6 +124,9 @@ public class OverviewBehaviour extends Behaviour implements
 	 * where the normal flow ( plan, inform, schedule, produce ) is followed,
 	 * and one where it listens to incoming messages. MIST NOG 1 MOGELIJKHEID!
 	 */
+	/**
+	 * In the action a switch statement is used to start the designated behavior.
+	 */
 	@Override
 	public void action() {
 		try {
@@ -153,16 +159,25 @@ public class OverviewBehaviour extends Behaviour implements
 		}
 	}
 	
+	/**
+	 * Return whether the behavior is done.
+	 */
 	@Override
 	public boolean done() {
 		return _overviewCompleted;
 	}
 
+	/**
+	 * Whenever an attempt for scheduling fails, rescheduling is attempted.
+	 */
 	@SuppressWarnings("static-method")
 	public void reschedule() {
 		System.out.println("Rescheduling will be implemented here");
 	}
 
+	/**
+	 * Start planning behavior and sets the agent status to PLANNING
+	 */
 	public void startPlanning() {
 		_productAgent.setStatus(AgentStatus.PLANNING);
 		System.out.println("Add a PlannerBehaviour");
@@ -170,6 +185,9 @@ public class OverviewBehaviour extends Behaviour implements
 		//_parallelBehaviour.addSubBehaviour(_plannerBehaviour);
 	}
 
+	/**
+	 * Start informer behavior and sets the agent status to INFORMING
+	 */
 	public void startInforming() {
 		_productAgent.setStatus(AgentStatus.INFORMING);
 		System.out.println("Add an InformerBehaviour");
@@ -177,6 +195,9 @@ public class OverviewBehaviour extends Behaviour implements
 		//_parallelBehaviour.addSubBehaviour(_informerBehaviour);
 	}
 
+	/**
+	 * Start scheduling behavior and sets the agent status to SCHEDULING
+	 */
 	public void startScheduling() {
 		_productAgent.setStatus(AgentStatus.SCHEDULING);
 		System.out.println("Add a SchedulerBehaviour");
@@ -184,6 +205,9 @@ public class OverviewBehaviour extends Behaviour implements
 		//_parallelBehaviour.addSubBehaviour(_schedulerBehaviour);
 	}
 
+	/**
+	 * Start producing behavior and sets the agent status to PRODUCING
+	 */
 	public void startProducing() {
 		_productAgent.setStatus(AgentStatus.PRODUCING);
 		System.out.println("Add a ProduceBehaviour");
@@ -195,6 +219,9 @@ public class OverviewBehaviour extends Behaviour implements
 	 * (non-Javadoc)
 	 * 
 	 * @see rexos.mas.productAgent.BehaviourCallback#handleCallback()
+	 */
+	/**
+	 * When an behavior is done, set the status to the assigned done status code
 	 */
 	@Override
 	public void handleCallback(BehaviourStatus bs) {
@@ -223,6 +250,9 @@ public class OverviewBehaviour extends Behaviour implements
 		}
 	}
 
+	/**
+	 * When all behaviors are done, close the socket
+	 */
 	public void cleanBehaviour() {
 		System.out.println("Done overview, stopping SocketBehaviour.");
 		_socketBehaviour.stop();

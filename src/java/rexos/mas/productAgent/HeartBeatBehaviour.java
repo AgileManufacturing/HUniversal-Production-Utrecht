@@ -33,6 +33,7 @@ public class HeartBeatBehaviour extends WakerBehaviour {
 	
 	
 	/**
+	 * initiates heartbeat behavior
 	 * @param a
 	 * @param period
 	 */
@@ -47,6 +48,9 @@ public class HeartBeatBehaviour extends WakerBehaviour {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Send and receive heartbeat
+	 */
 	@Override
 	protected void onWake() {
 		try{
@@ -74,12 +78,18 @@ public class HeartBeatBehaviour extends WakerBehaviour {
 	 *  (non-Javadoc)
 	 * @see Report Heartbeat Acknowledge
 	 */
+	/**
+	 * heart beart acknowlodged
+	 */
 	public void reportHeartBeatAck() {
 		this.reset(TimeUnit.SECONDS.toMillis(HEARTBEAT_INTERVAL));
 		ackReceived = true;
 		heartbeatSent = false;
 	}
 	
+	/**
+	 * Start with the heart beat
+	 */
 	public void startHeartbeating() {
 		_hr.initHeartbeat();
 		heartbeatSent = true;
@@ -87,6 +97,9 @@ public class HeartBeatBehaviour extends WakerBehaviour {
 		this.reset(TimeUnit.SECONDS.toMillis(HEARTBEART_TIMEOUT_INTERVAL));
 	}
 	
+	/**
+	 * Stops the heart from beating
+	 */
 	public void stopHeartbeating() {
 		this.stop();
 	}

@@ -76,6 +76,11 @@ public class SocketBehaviour extends WakerBehaviour implements
 
 	private Callback _callback;
 
+	/**
+	 * Initiate Socketbehavior
+	 * @param a
+	 * @param callback
+	 */
 	public SocketBehaviour(Agent a, Callback callback) {
 		super(a, 4500);
 		try {
@@ -90,10 +95,17 @@ public class SocketBehaviour extends WakerBehaviour implements
 		}
 	}
 	
+	/**
+	 * Set the heartbeat behavior
+	 * @param hbb
+	 */
 	public void setHeartBeatBehaviour(HeartBeatBehaviour hbb) {
 		this._hbb = hbb;
 	}
 
+	/**
+	 * Acknowledge the socket is still open
+	 */
 	@Override
 	protected void onWake() {
 		try {
@@ -113,6 +125,10 @@ public class SocketBehaviour extends WakerBehaviour implements
 		this.reset(4500);
 	}
 
+	/**
+	 * Write message which will be send to the GUI
+	 * @param msg
+	 */
 	public void write(String msg) {
 		try {
 			if (isConnected) {
@@ -123,6 +139,12 @@ public class SocketBehaviour extends WakerBehaviour implements
 		}
 	}
 
+	/**
+	 * Write message which will be send to the GUI
+	 * @param error
+	 * @param msg
+	 * @param payload
+	 */
 	public void write(boolean error, String msg, String payload) {
 		try {
 			if (isConnected) {
@@ -137,6 +159,10 @@ public class SocketBehaviour extends WakerBehaviour implements
 		}
 	}
 
+	/**
+	 * Write message which will be send to the GUI
+	 * @param guiMsg
+	 */
 	public void write(GUIMessage guiMsg) {
 		try {
 			if (isConnected) {
@@ -149,6 +175,11 @@ public class SocketBehaviour extends WakerBehaviour implements
 		}
 	}
 
+	/**
+	 * Connects to host(AID)
+	 * @throws UnknownHostException
+	 * @throws IOException
+	 */
 	public void connect() throws UnknownHostException, IOException {
 		socket = new Socket();
 		socket.connect(
@@ -166,6 +197,9 @@ public class SocketBehaviour extends WakerBehaviour implements
 	 * 
 	 * @see newDataClasses.HeartbeatReceiver#initHeartbeat()
 	 */
+	/**
+	 * Print heartbeat to screen.
+	 */
 	@Override
 	public void initHeartbeat() {
 		try {
@@ -182,6 +216,9 @@ public class SocketBehaviour extends WakerBehaviour implements
 	 * 
 	 * @see newDataClasses.HeartbeatReceiver#heartbeatTimeout()
 	 */
+	/**
+	 * Occurs when the heartbeat receives a timeout
+	 */
 	@Override
 	public void heartbeatTimeout() {
 		try {
@@ -192,11 +229,18 @@ public class SocketBehaviour extends WakerBehaviour implements
 		}
 	}
 
+	/**
+	 * Resets the socket connection
+	 * @throws IOException
+	 */
 	public void resetConnection() throws IOException {
 		this.socket.close();
 		//this.connect();
 	}
 
+	/**
+	 * Stops the socket
+	 */
 	public void stop() {
 		this._hbb.stopHeartbeating();
 		this._stopBehaviour = true;

@@ -77,6 +77,9 @@ public class ProduceBehaviour extends Behaviour {
 		this._bc = bc;
 	}
 
+	/**
+	 * Start producing
+	 */
 	@Override
 	public void onStart() {
 		try {
@@ -97,6 +100,9 @@ public class ProduceBehaviour extends Behaviour {
 		}
 	}
 
+	/**
+	 * Run until completion
+	 */
 	@Override
 	public void action() {
 		try {
@@ -112,11 +118,18 @@ public class ProduceBehaviour extends Behaviour {
 		}
 	}
 	
+	/**
+	 * Return true if behavior is completed
+	 */
 	@Override
 	public boolean done() {
 		return this._isCompleted;
 	}
 	
+	/**
+	 * Keeps track of product status
+	 * @param bs
+	 */
 	public void reportProductStatus(BehaviourStatus bs) {
 		if(bs == BehaviourStatus.COMPLETED) {
 			//this._isDone = true;
@@ -146,6 +159,9 @@ class ProducingReceiver extends rexos.mas.behaviours.ReceiveBehaviour {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Handles a message according to a switch statement.
+	 */
 	@Override
 	public void handle(ACLMessage m) {
 		try {

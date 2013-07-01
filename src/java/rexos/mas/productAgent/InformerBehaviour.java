@@ -82,12 +82,20 @@ public class InformerBehaviour extends Behaviour {
 	private SequentialBehaviour _seqBehaviour;
 	private ParallelBehaviour _parBehaviour;
 
+	/**
+	 * Initiate the InformerBehavior
+	 * @param myAgent
+	 * @param bc
+	 */
 	public InformerBehaviour(Agent myAgent, BehaviourCallback bc) {
 		super(myAgent);
 		this._bc = bc;
 		_seqBehaviour = new SequentialBehaviour();
 	}
 
+	/**
+	 * Execute this on start
+	 */
 	@Override
 	public void onStart() {
 
@@ -153,6 +161,9 @@ public class InformerBehaviour extends Behaviour {
 		myAgent.addBehaviour(_seqBehaviour);
 	}
 
+	/**
+	 * While the behavior is active continue else block behavior
+	 */
 	@Override
 	public void action() {
 		try {
@@ -172,6 +183,9 @@ public class InformerBehaviour extends Behaviour {
 	 * (non-Javadoc)
 	 * 
 	 * @see jade.core.behaviours.Behaviour#done()
+	 */
+	/**
+	 * Returns true when the behavior is done
 	 */
 	@Override
 	public boolean done() {
@@ -197,6 +211,12 @@ public class InformerBehaviour extends Behaviour {
 		private boolean debug = true;
 		private ProductionEquipletMapper _prodEQmap;
 
+		/**
+		 * Initiate conversation behavior
+		 * @param aid
+		 * @param productionStep
+		 * @param pem
+		 */
 		public Conversation(AID aid, ProductionStep productionStep,
 				ProductionEquipletMapper pem) {
 			this._aid = aid;
@@ -208,6 +228,9 @@ public class InformerBehaviour extends Behaviour {
 		 * (non-Javadoc)
 		 * 
 		 * @see jade.core.behaviours.Behaviour#onStart() starts the conversation
+		 */
+		/**
+		 * Starts running the behavior
 		 */
 		@Override
 		public void onStart() {

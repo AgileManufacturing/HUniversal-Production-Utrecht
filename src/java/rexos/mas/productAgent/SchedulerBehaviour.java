@@ -89,6 +89,9 @@ public class SchedulerBehaviour extends Behaviour {
 		this._bc = bc;
 	}
 
+	/**
+	 * Enholds the content of the behavior and invokes the content of this method
+	 */
 	@Override
 	public void onStart() {
 		try {
@@ -120,6 +123,9 @@ public class SchedulerBehaviour extends Behaviour {
 		}
 	}
 
+	/**
+	 * The status will be changed when the behavior is completed
+	 */
 	@Override
 	public void action() {
 		try {
@@ -135,6 +141,9 @@ public class SchedulerBehaviour extends Behaviour {
 		}
 	}
 
+	/**
+	 * Return true when the behaviour is completed
+	 */
 	@Override
 	public boolean done() {
 		return _isCompleted;

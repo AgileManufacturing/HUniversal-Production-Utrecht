@@ -70,11 +70,19 @@ public class PlannerBehaviour extends Behaviour {
 	private boolean _isError = false;
 	private boolean _isCompleted = false;
 
+	/**
+	 * For planning a productionstep with the designated equiplet
+	 * @param myAgent
+	 * @param bc
+	 */
 	public PlannerBehaviour(Agent myAgent, BehaviourCallback bc) {
 		super(myAgent);
 		this._bc = bc;
 	}
 
+	/**
+	 * Starts the planning behaviour
+	 */
 	@Override
 	public void onStart() {
 		try {
@@ -125,6 +133,9 @@ public class PlannerBehaviour extends Behaviour {
 		}
 	}
 
+	/**
+	 * Run the behavior or else block this behavior.
+	 */
 	@Override
 	public void action() {
 		try {
@@ -142,6 +153,9 @@ public class PlannerBehaviour extends Behaviour {
 		}
 	}
 
+	/**
+	 * Return true when behavior is done
+	 */
 	@Override
 	public boolean done() {
 		return this._isCompleted;

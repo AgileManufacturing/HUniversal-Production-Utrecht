@@ -15,6 +15,9 @@ public class SideOverviewBehaviour extends CyclicBehaviour{
 		private receiveMsgBehaviour(){
 		}
 
+		/**
+		 * start receive message behavior
+		 */
 		@Override
 		public void action(){
 			ACLMessage msg = myAgent.receive();
@@ -29,10 +32,17 @@ public class SideOverviewBehaviour extends CyclicBehaviour{
 	private class WaitMsgBehaviour extends OneShotBehaviour{
 		ACLMessage msg;
 
+		/**
+		 * Wait message behavior
+		 * @param msg
+		 */
 		public WaitMsgBehaviour(ACLMessage msg){
 			this.msg = msg;
 		}
 
+		/**
+		 * Act based on received message 
+		 */
 		@Override
 		public void action(){
 			try{
@@ -76,6 +86,9 @@ public class SideOverviewBehaviour extends CyclicBehaviour{
 		}
 	}
 
+	/**
+	 * None
+	 */
 	@Override
 	public void action(){
 		// TODO Auto-generated method stub
