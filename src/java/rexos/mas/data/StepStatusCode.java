@@ -68,7 +68,9 @@ public enum StepStatusCode {
 	/**
 	 * Step should be deleted.
 	 */
-	DELETED(8);
+	DELETED(8),
+	
+	RESCHEDULE(9);
 
 	/**
 	 * @var int status

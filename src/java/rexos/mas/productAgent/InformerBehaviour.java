@@ -111,7 +111,7 @@ public class InformerBehaviour extends Behaviour {
 		_parBehaviour = new ParallelBehaviour(productionStepCount);
 
 		for (ProductionStep productionStep : productionSteps) {
-			if (productionStep.getStatus() == StepStatusCode.EVALUATING) {
+			if (productionStep.getStatus() == StepStatusCode.EVALUATING || productionStep.getStatus() == StepStatusCode.RESCHEDULE) {
 				_prodEQmap.addProductionStep(productionStep.getId());
 				ProductionEquipletMapper pem = _production
 						.getProductionEquipletMapping();
@@ -178,6 +178,16 @@ public class InformerBehaviour extends Behaviour {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Override 
+	public void reset() {
+		super.reset();
+		_isDone = false;;
+		_isError = false;
+		_isCompleted = false;
+		_subInformersCompleted = 0;
+		_totalSubinformers = 0;
 	}
 
 	/*

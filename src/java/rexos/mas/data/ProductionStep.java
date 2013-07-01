@@ -73,6 +73,8 @@ public class ProductionStep implements Serializable {
 	private HashMap<AID, String> _equipletConversationIds;
 	
 	private HashMap<AID, Long> _equipletDuration;
+	
+	private AID _usedEquiplet;
 
 	public ProductionStep() {
 		this._parameters = new BasicDBObject();
@@ -137,6 +139,14 @@ public class ProductionStep implements Serializable {
 	
 	public long getDurationForEquiplet(AID equipletId) {
 		return this._equipletDuration.get(equipletId);
+	}
+	
+	public AID getUsedEquiplet() {
+		return _usedEquiplet;
+	}
+	
+	public void setUsedEquiplet(AID value) {
+		_usedEquiplet = value;
 	}
 	
 	@Override

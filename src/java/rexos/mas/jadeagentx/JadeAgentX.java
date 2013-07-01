@@ -149,14 +149,14 @@ public class JadeAgentX extends Agent {
 
 					
 			
-			for(int i = 0; i < 10; i++) {
+			for(int i = 0; i < 30; i++) {
 				double x1 = (Math.random() * 60.0 -30.0);
 				double x2 = (Math.random() * 60.0 -30.0);
 				double y1 = (Math.random() * 60.0 -30.0);
 				double y2 = (Math.random() * 60.0 -30.0);
 				BasicDBObject parameters = new BasicDBObject();
 				Position pos = new Position(x1,y1);
-				Position pos2 = new Position(x2,y2);
+				Position pos2 = new Position(x1,y1);
 				parameters.append("startPosition", pos.toBasicDBObject());
 				parameters.append("endPosition", pos2.toBasicDBObject());
 				ProductionStep stp = new ProductionStep(i, 3, parameters);

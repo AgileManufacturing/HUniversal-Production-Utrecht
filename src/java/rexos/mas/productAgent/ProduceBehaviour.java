@@ -141,12 +141,7 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 						 * solution.
 						 */
 					case FAILED:
-						/*
-						 * Equiplet agent informs the product agent that the
-						 * product step has been aborted or has failed,
-						 * including a reason and source. Product agent
-						 * reschedules or gives up entirely
-						 */
+						_bc.handleCallback(BehaviourStatus.ERROR, null);
 						break;
 					case DONE:
 						/*
@@ -182,11 +177,11 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 			_stopProduceBehaviour = true;
 		}
 		if(_productionStepsCompleted == _productionStepsCount) {
-			_bc.handleCallback(BehaviourStatus.COMPLETED, null);
-			_stopProduceBehaviour = true;
+			//_bc.handleCallback(BehaviourStatus.COMPLETED, null);
+			//_stopProduceBehaviour = true;
 		}
 		if(_stopProduceBehaviour) {
-			myAgent.removeBehaviour(this);
+			//myAgent.removeBehaviour(this);
 		}
 	}
 }
