@@ -65,6 +65,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	private boolean _producing = false;
 
 	private boolean _overviewCompleted = false;
+	private boolean _rescheduling = false;
 
 	public OverviewBehaviour(Agent myAgent) {
 		super(myAgent);
@@ -80,11 +81,11 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 
 		System.out.println("Creating the SocketBehaviour");
 		_socketBehaviour = new SocketBehaviour(myAgent, _productAgent
-		 .getProperties().getCallback());
+				.getProperties().getCallback());
 
-		 _heartBeatBehaviour = new HeartBeatBehaviour(myAgent, 5000,
-		 _socketBehaviour);
-		 _socketBehaviour.setHeartBeatBehaviour(_heartBeatBehaviour);
+		_heartBeatBehaviour = new HeartBeatBehaviour(myAgent, 5000,
+				_socketBehaviour);
+		_socketBehaviour.setHeartBeatBehaviour(_heartBeatBehaviour);
 
 		System.out.println("Creating the PlannerBehaviour");
 		_plannerBehaviour = new PlannerBehaviour(myAgent, this);
@@ -107,17 +108,17 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 		System.out.println("Creating the SequentialBehaviour");
 		_sequentialBehaviour = new SequentialBehaviour();
 
-		System.out.println("Addding a ParallelBehaviour to the Product Agent");
+		System.out
+				.println("Addding a SequentialBehaviour to the Product Agent");
 		myAgent.addBehaviour(_sequentialBehaviour);
 
 		System.out
-				.println("Addding a SequentialBehaviour to the ParallelBehaviour");
-		myAgent.addBehaviour(_parallelBehaviour);
-
-		System.out
 				.println("Adding the SocketBehaviour to the ParallelBehaviour");
-		 _parallelBehaviour.addSubBehaviour(_socketBehaviour);
-		 _parallelBehaviour.addSubBehaviour(_heartBeatBehaviour);
+		_parallelBehaviour.addSubBehaviour(_socketBehaviour);
+		_parallelBehaviour.addSubBehaviour(_heartBeatBehaviour);
+
+		System.out.println("Addding a ParallelBehaviour to the ProductAgent");
+		myAgent.addBehaviour(_parallelBehaviour);
 	}
 
 	/*
@@ -186,7 +187,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 
 	public void startProducing() {
 		System.out.println("Add a ProduceBehaviour");
-		if(_produceBehaviour.done() == false )
+		if (_produceBehaviour.done() == false)
 			myAgent.addBehaviour(_produceBehaviour);
 	}
 
@@ -228,6 +229,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 				break;
 			case RESCHEDULING:
 				System.out.println("Done rescheduling.");
+				_rescheduling = false;
 				_productAgent.setStatus(AgentStatus.DONE_RESCHEDULING);
 				break;
 			default:
@@ -243,11 +245,15 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 				break;
 			}
 		} else if (bs == BehaviourStatus.ERROR) {
-			startRescheduling();
+			if (!_rescheduling) {
+				_rescheduling = true;
+				startRescheduling();
+			}
 		}
 	}
 
 	public void cleanBehaviour() {
+		_socketBehaviour.write(false, "Product Completed.", "1");
 		System.out.println("Done overview, stopping SocketBehaviour.");
 		myAgent.removeBehaviour(_parallelBehaviour);
 		if (_socketBehaviour != null)

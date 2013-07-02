@@ -66,6 +66,7 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 	private int _productionStepsCount = 0;
 	private boolean _stopProduceBehaviour = false;
 	private int _prodCounters = 0;
+	private ProductAgent _productAgent;
 
 	private HashMap<String, ProductionStep> _conversationIdToProductionStep;
 
@@ -84,6 +85,7 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 			MessageTemplate template) {
 		super(myAgent, -1, template);
 		this._bc = bc;
+		_productAgent = (ProductAgent)myAgent;
 	}
 
 	@Override

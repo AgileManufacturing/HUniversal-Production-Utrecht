@@ -202,5 +202,6 @@ public class ProductAgent extends Agent {
 	public void setStatus(AgentStatus status) {
 		this._status = status;
 	}
+	
 
 }
