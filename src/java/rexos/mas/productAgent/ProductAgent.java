@@ -171,10 +171,6 @@ public class ProductAgent extends Agent {
 		return _convIDBase + (_convIDCnt++);
 	}
 
-	public void reschedule() {
-		_overviewBehaviour.reschedule();
-	}
-
 	public ProductAgentProperties getProperties() {
 		return this._properties;
 	}

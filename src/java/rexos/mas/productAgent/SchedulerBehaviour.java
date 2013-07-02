@@ -251,20 +251,6 @@ public class SchedulerBehaviour extends Behaviour {
 								/ timeSlotLength + (5000 / timeSlotLength),
 						requiredTimeSlots, aid));
 			}
-			Schedule lastSchedule = null;
-			if (schedules.size() > 0) {
-				lastSchedule = schedules.get(schedules.size() - 1);
-				FreeTimeSlot slot = freetimeslots.get(0);
-				long last = lastSchedule.getStartTime();
-				long now = slot.getStartTime();
-				long tmp = now - last;
-				if (tmp < requiredTimeSlots) {
-					System.out.println("error");
-				}
-			} else {
-				System.out.println("no schedules");
-			}
-			System.out.println();
 		}
 		FreeTimeSlot freetimeslotEq = null;
 

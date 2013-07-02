@@ -166,11 +166,6 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 		return _overviewCompleted;
 	}
 
-	@SuppressWarnings("static-method")
-	public void reschedule() {
-		System.out.println("Rescheduling will be implemented here");
-	}
-
 	public void startPlanning() {
 		_productAgent.setStatus(AgentStatus.PLANNING);
 		System.out.println("Add a PlannerBehaviour");
@@ -254,6 +249,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 
 	public void cleanBehaviour() {
 		System.out.println("Done overview, stopping SocketBehaviour.");
+		myAgent.removeBehaviour(_parallelBehaviour);
 		if (_socketBehaviour != null)
 			_socketBehaviour.stop();
 	}
