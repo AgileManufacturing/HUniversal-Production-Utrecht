@@ -125,7 +125,7 @@ public class ProductAgent extends Agent {
 		        	
 		        	JsonObject ele = productionStepsArray.get(i).getAsJsonObject();		        	
 		        	int id = ele.get("id").getAsInt();
-		        	int capability = ele.get("_capability").getAsInt();
+		        	int capability = ele.get("capability").getAsInt();
 		        	JsonElement parameterObject = ele.get("parameters");
 		        	String parameters = parameterObject.toString();
 		        	
@@ -171,10 +171,6 @@ public class ProductAgent extends Agent {
 		return _convIDBase + (_convIDCnt++);
 	}
 
-	public void reschedule() {
-		_overviewBehaviour.reschedule();
-	}
-
 	public ProductAgentProperties getProperties() {
 		return this._properties;
 	}
@@ -206,5 +202,6 @@ public class ProductAgent extends Agent {
 	public void setStatus(AgentStatus status) {
 		this._status = status;
 	}
+	
 
 }

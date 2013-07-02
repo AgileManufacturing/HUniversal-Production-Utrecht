@@ -66,6 +66,7 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 	private int _productionStepsCount = 0;
 	private boolean _stopProduceBehaviour = false;
 	private int _prodCounters = 0;
+	private ProductAgent _productAgent;
 
 	private HashMap<String, ProductionStep> _conversationIdToProductionStep;
 
@@ -84,6 +85,7 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 			MessageTemplate template) {
 		super(myAgent, -1, template);
 		this._bc = bc;
+		_productAgent = (ProductAgent)myAgent;
 	}
 
 	@Override
@@ -141,12 +143,7 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 						 * solution.
 						 */
 					case FAILED:
-						/*
-						 * Equiplet agent informs the product agent that the
-						 * product step has been aborted or has failed,
-						 * including a reason and source. Product agent
-						 * reschedules or gives up entirely
-						 */
+						_bc.handleCallback(BehaviourStatus.ERROR, null);
 						break;
 					case DONE:
 						/*
@@ -178,8 +175,8 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 			}
 		} catch (Exception e) {
 			Logger.log(e);
-			_bc.handleCallback(BehaviourStatus.ERROR, null);
-			_stopProduceBehaviour = true;
+			//_bc.handleCallback(BehaviourStatus.ERROR, null);
+			//_stopProduceBehaviour = true;
 		}
 		if(_productionStepsCompleted == _productionStepsCount) {
 			_bc.handleCallback(BehaviourStatus.COMPLETED, null);

@@ -51,7 +51,7 @@ public class Logger {
 	 * @var boolean debugEnabled
 	 * Controls whether or not printing of log messages is enabled.
 	 **/
-	private static final boolean debugEnabled = true;
+	private static final boolean debugEnabled = false;
 	
 	/**
 	 * Returns whether or not debugging is enabled.

@@ -144,8 +144,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 	public void connect() throws UnknownHostException, IOException {
 		socket = new Socket();
 		socket.connect(
-				new InetSocketAddress(_callback.getHost(), _callback.getPort()),
-				(int) TimeUnit.SECONDS.toMillis(10));
+				new InetSocketAddress(_callback.getHost(), _callback.getPort()),500);
 		outputStream = new PrintWriter(socket.getOutputStream(), true);
 		inputStream = new BufferedReader(new InputStreamReader(
 				socket.getInputStream()));
@@ -191,6 +190,5 @@ public class SocketBehaviour extends WakerBehaviour implements
 
 	public void stop() {
 		this._hbb.stopHeartbeating();
-		myAgent.removeBehaviour(this);
 	}
 }

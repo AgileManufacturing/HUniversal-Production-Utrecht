@@ -76,8 +76,6 @@ public class SchedulerBehaviour extends Behaviour {
 
 	private int _schedulersStarted = 0;
 	private int _schedulersCompleted = 0;
-	
-	private int stepsPlanned = 0;
 
 	public SchedulerBehaviour(Agent myAgent, BehaviourCallback bc) {
 		super(myAgent);
@@ -95,20 +93,29 @@ public class SchedulerBehaviour extends Behaviour {
 			Product product = this._productAgent.getProduct();
 			Production production = product.getProduction();
 			ArrayList<ProductionStep> psa = production.getProductionSteps();
+			
+			//Notify the OverviewBehaviour that the scheduler is running. The overview behaviour will start the produceBehaviour so it's possible to
+			//schedule and produce at the same time.
+			this._bc.handleCallback(BehaviourStatus.RUNNING, null);
 
 			for (ProductionStep ps : psa) {
-				int PA_id = ps.getId();
-				java.util.HashMap<AID, Long> equiplets = production
-						.getProductionEquipletMapping()
-						.getEquipletsForProductionStep(PA_id);
+				if ((ps.getStatus() == StepStatusCode.EVALUATING || ps
+						.getStatus() == StepStatusCode.RESCHEDULE)
+						&& _isError == false) {
+					int PA_id = ps.getId();
+					java.util.HashMap<AID, Long> equiplets = production
+							.getProductionEquipletMapping()
+							.getEquipletsForProductionStep(PA_id);
 
-				if (equiplets != null && equiplets.size() != 0) {
+					if (equiplets != null && equiplets.size() != 0) {
 
-					Scheduler(production.getProductionEquipletMapping()
-							.getEquipletsForProductionStep(PA_id).keySet(), ps);
-					_schedulersStarted++;
-				} else {
-					_isError = true;
+						Scheduler(production.getProductionEquipletMapping()
+								.getEquipletsForProductionStep(PA_id).keySet(),
+								ps);
+						_schedulersStarted++;
+					} else {
+						_isError = true;
+					}
 				}
 
 			}
@@ -121,7 +128,7 @@ public class SchedulerBehaviour extends Behaviour {
 	@Override
 	public void action() {
 		try {
-			if (_schedulersStarted == _schedulersCompleted) {
+			if (_schedulersStarted == _schedulersCompleted && _isError == false) {
 				this._bc.handleCallback(BehaviourStatus.COMPLETED, null);
 				_isCompleted = true;
 			} else if (_isError) {
@@ -136,6 +143,16 @@ public class SchedulerBehaviour extends Behaviour {
 	@Override
 	public boolean done() {
 		return _isCompleted;
+	}
+
+	@Override
+	public void reset() {
+		super.reset();
+		_isError = false;
+		_isCompleted = false;
+
+		_schedulersStarted = 0;
+		_schedulersCompleted = 0;
 	}
 
 	/**
@@ -193,19 +210,15 @@ public class SchedulerBehaviour extends Behaviour {
 					.getTimeSlotsForEquiplet(_prodStep.getId(), aid);
 
 			// Gets planned steps TODO:: improve query
-			DBObject query = QueryBuilder
-					.start("scheduleData.startTime")
-					.greaterThan(-1)
-					.put("scheduleData.startTime")
-					.greaterThan(
-							(System.currentTimeMillis())
-									/ timeSlotLength).get();
+			DBObject query = QueryBuilder.start("scheduleData.startTime")
+					.greaterThan(-1).put("scheduleData.startTime")
+					.greaterThan((System.currentTimeMillis()) / timeSlotLength)
+					.get();
 			BasicDBObject orderby = new BasicDBObject("scheduleData",
 					new BasicDBObject("startTime", "1"));
 			BasicDBObject findquery = new BasicDBObject("$query", query)
 					.append("$orderby", orderby);
 			List<DBObject> plannedSteps = bbc.findDocuments(findquery);
-			stepsPlanned++;
 			for (int i = 0; i < plannedSteps.size(); i++) {
 				long startTime = ((BasicDBObject) plannedSteps.get(i).get(
 						"scheduleData")).getLong("startTime");
@@ -238,20 +251,6 @@ public class SchedulerBehaviour extends Behaviour {
 								/ timeSlotLength + (5000 / timeSlotLength),
 						requiredTimeSlots, aid));
 			}
-			Schedule lastSchedule = null;
-			if (schedules.size() > 0) {
-				lastSchedule = schedules.get(schedules.size() - 1);
-				FreeTimeSlot slot = freetimeslots.get(0);
-				long last = lastSchedule.getStartTime();
-				long now = slot.getStartTime();
-				long tmp = now - last;
-				if (tmp < requiredTimeSlots) {
-					System.out.println("error");
-				}
-			} else {
-				System.out.println("no schedules");
-			}
-			System.out.println();
 		}
 		FreeTimeSlot freetimeslotEq = null;
 
@@ -274,23 +273,17 @@ public class SchedulerBehaviour extends Behaviour {
 		msg.addReceiver(freetimeslotEq.getEquipletName());
 		myAgent.send(msg);
 
-		
-		
-		ACLMessage returnMsg = myAgent.blockingReceive(MessageTemplate.MatchOntology("Planned"));
+		ACLMessage returnMsg = myAgent.blockingReceive(MessageTemplate
+				.MatchOntology("Planned"));
 		if (returnMsg.getPerformative() == ACLMessage.CONFIRM) {
 			_prodStep.setStatus(StepStatusCode.PLANNED);
-			// System.out.println("Scheduled productionstep: " +
-			// _prodStep.getId());
-			// _bc.handleCallback(BehaviourStatus.COMPLETED, null);
+			_prodStep.setUsedEquiplet(returnMsg.getSender());
 		} else if (returnMsg.getPerformative() == ACLMessage.DISCONFIRM) {
-			System.out.println("DISCONFIRM!!!!");
+			_isError = true;
+			_bc.handleCallback(BehaviourStatus.ERROR, null);
 		}
-		System.out.println("schedule: starttime: "
-				+ freetimeslotEq.getStartTime() + " duraton: "
-				+ freetimeslotEq.getDuration());
 		_prodStep.setConversationId(returnMsg.getConversationId());
 		_schedulersCompleted++;
-		// System.out.println("received message");
 	}
 
 	private class FreeTimeSlot {

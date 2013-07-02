@@ -91,7 +91,7 @@ public class PlannerBehaviour extends Behaviour {
 			
 			// Iterate over all the production steps
 			for (ProductionStep prodStep : psa) {
-				if (prodStep.getStatus() == StepStatusCode.EVALUATING) {
+				if (prodStep.getStatus() == StepStatusCode.EVALUATING || prodStep.getStatus() == StepStatusCode.RESCHEDULE) {
 					
 					int PA_id = prodStep.getId();
 					prodEQmap.addProductionStep(PA_id);
@@ -109,8 +109,6 @@ public class PlannerBehaviour extends Behaviour {
 								name, AID.ISLOCALNAME));
 					}
 				} else {
-					// TODO: Prodstep SHOULD be in evaluatin at this point. If
-					// it isn't throw big error!
 				}
 			}
 			
@@ -140,6 +138,14 @@ public class PlannerBehaviour extends Behaviour {
 		} catch (Exception e) {
 			System.out.println("Exception PlannerBehaviour: " + e);
 		}
+	}
+	
+	@Override
+	public void reset() {
+		super.reset();
+		_isDone = false;
+		_isError = false;
+		_isCompleted = false;
 	}
 
 	@Override

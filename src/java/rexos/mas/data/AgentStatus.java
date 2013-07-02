@@ -41,7 +41,11 @@ public enum AgentStatus{
 	
 	DONE_PRODUCING(9),
 	
-	STARTING(10);
+	STARTING(10),
+	
+	RESCHEDULING(11),
+	
+	DONE_RESCHEDULING(12);
 	
 	/**
 	 * @var int status
