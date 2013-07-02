@@ -47,11 +47,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
@@ -71,11 +67,8 @@ import com.mongodb.QueryBuilder;
 public class SchedulerBehaviour extends Behaviour {
 
 	private ProductAgent _productAgent;
-	private int timeslotsToSchedule = 0;
-	private int debug = 1;
 	private ProductionStep _prodStep;
 
-	private boolean _isDone = false;
 	private boolean _isError = false;
 	private boolean _isCompleted = false;
 
@@ -83,6 +76,8 @@ public class SchedulerBehaviour extends Behaviour {
 
 	private int _schedulersStarted = 0;
 	private int _schedulersCompleted = 0;
+	
+	private int stepsPlanned = 0;
 
 	public SchedulerBehaviour(Agent myAgent, BehaviourCallback bc) {
 		super(myAgent);
@@ -94,7 +89,8 @@ public class SchedulerBehaviour extends Behaviour {
 		try {
 			// Shedule the PA with the equiplet agents in the current list.
 			_productAgent = (ProductAgent) myAgent;
-			_productAgent.getProduct().getProduction().getProductionEquipletMapping();
+			_productAgent.getProduct().getProduction()
+					.getProductionEquipletMapping();
 
 			Product product = this._productAgent.getProduct();
 			Production production = product.getProduction();
@@ -102,15 +98,17 @@ public class SchedulerBehaviour extends Behaviour {
 
 			for (ProductionStep ps : psa) {
 				int PA_id = ps.getId();
-				java.util.HashMap<AID, Long> equiplets = production.getProductionEquipletMapping().getEquipletsForProductionStep(PA_id);
+				java.util.HashMap<AID, Long> equiplets = production
+						.getProductionEquipletMapping()
+						.getEquipletsForProductionStep(PA_id);
 
 				if (equiplets != null && equiplets.size() != 0) {
 
-					Scheduler(production.getProductionEquipletMapping().getEquipletsForProductionStep(PA_id).keySet(), ps);
+					Scheduler(production.getProductionEquipletMapping()
+							.getEquipletsForProductionStep(PA_id).keySet(), ps);
 					_schedulersStarted++;
 				} else {
 					_isError = true;
-					// TODO: THIS SHOULD NOT HAPPEN. THROW EXCEPTION!
 				}
 
 			}
@@ -124,10 +122,10 @@ public class SchedulerBehaviour extends Behaviour {
 	public void action() {
 		try {
 			if (_schedulersStarted == _schedulersCompleted) {
-				this._bc.handleCallback(BehaviourStatus.COMPLETED);
+				this._bc.handleCallback(BehaviourStatus.COMPLETED, null);
 				_isCompleted = true;
 			} else if (_isError) {
-				this._bc.handleCallback(BehaviourStatus.ERROR);
+				this._bc.handleCallback(BehaviourStatus.ERROR, null);
 				_isCompleted = true;
 			}
 		} catch (Exception e) {
@@ -147,22 +145,23 @@ public class SchedulerBehaviour extends Behaviour {
 	 * @param productionStep
 	 * @throws Exception
 	 */
-	public void Scheduler(Set<AID> equipletList, final ProductionStep productionstep) throws Exception {
+	public void Scheduler(Set<AID> equipletList,
+			final ProductionStep productionstep) throws Exception {
 
 		this._prodStep = productionstep;
 
 		// load set into arraylist
 		List<AID> equipletlist = new ArrayList<AID>(equipletList);
-		//Create Hashmap for database data
-		//HashMap<AID, DbData> dbData = new HashMap<AID, DbData>();
-		
+		// Create Hashmap for database data
+		// HashMap<AID, DbData> dbData = new HashMap<AID, DbData>();
+
 		BlackboardClient bbc = new BlackboardClient("145.89.191.131");
 		bbc.setDatabase("CollectiveDb");
 		bbc.setCollection("TimeData");
-		BasicDBObject dbObject = (BasicDBObject)bbc.findDocuments(new BasicDBObject()).get(0);
+		BasicDBObject dbObject = (BasicDBObject) bbc.findDocuments(
+				new BasicDBObject()).get(0);
 		long firstTimeSlot = dbObject.getLong("firstTimeSlot");
 		int timeSlotLength = dbObject.getInt("timeSlotLength");
-
 
 		ArrayList<FreeTimeSlot> freetimeslots = new ArrayList<FreeTimeSlot>();
 		DbData dbData = null;
@@ -175,34 +174,43 @@ public class SchedulerBehaviour extends Behaviour {
 			QueryBuilder qb = QueryBuilder.start("AID").is(aid.getName());
 
 			List<DBObject> aidInfo = bbc.findDocuments(qb.get());
-			
+
 			if (aidInfo.size() > 0) {
 				dbData = new DbData((BasicDBObject) aidInfo.get(0).get("db"));
 			} else {
 				// TODO: what to do if list is empty
 			}
-			
+
 			ArrayList<Schedule> schedules = new ArrayList<Schedule>();
 			ProductAgent prodAgent = (ProductAgent) myAgent;
 
 			bbc = new BlackboardClient(dbData.getIp(), dbData.getPort());
 			bbc.setDatabase(dbData.getName());
 			bbc.setCollection("ProductStepsBlackBoard");
-			
-			int requiredTimeSlots = (int) prodAgent.getProduct().getProduction().getProductionEquipletMapping().getTimeSlotsForEquiplet(_prodStep.getId(), aid);
+
+			int requiredTimeSlots = (int) prodAgent.getProduct()
+					.getProduction().getProductionEquipletMapping()
+					.getTimeSlotsForEquiplet(_prodStep.getId(), aid);
 
 			// Gets planned steps TODO:: improve query
-			DBObject query = QueryBuilder.start("scheduleData.startTime").greaterThan(-1).put("scheduleData.startTime").greaterThan(System.currentTimeMillis()/timeSlotLength).get();
-			BasicDBObject orderby = new BasicDBObject("scheduleData", new BasicDBObject("startTime", "1"));
-			BasicDBObject findquery = new BasicDBObject("$query", query).append("$orderby", orderby);
+			DBObject query = QueryBuilder
+					.start("scheduleData.startTime")
+					.greaterThan(-1)
+					.put("scheduleData.startTime")
+					.greaterThan(
+							(System.currentTimeMillis())
+									/ timeSlotLength).get();
+			BasicDBObject orderby = new BasicDBObject("scheduleData",
+					new BasicDBObject("startTime", "1"));
+			BasicDBObject findquery = new BasicDBObject("$query", query)
+					.append("$orderby", orderby);
 			List<DBObject> plannedSteps = bbc.findDocuments(findquery);
-			//List<DBObject> plannedSteps = bbc.findDocuments(QueryBuilder.start("scheduleData.startTime").greaterThan(-1).put("scheduleData.startTime").greaterThan(System.currentTimeMillis()/timeSlotLength).get());
-			//List<DBObject> allSteps = bbc.findDocuments("");
+			stepsPlanned++;
 			for (int i = 0; i < plannedSteps.size(); i++) {
-				long startTime = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getLong("startTime");
-				int duration = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getInt("duration");
-				// add scheduled timeslot to array of scheduled timeslots and
-				// mention which equiplet
+				long startTime = ((BasicDBObject) plannedSteps.get(i).get(
+						"scheduleData")).getLong("startTime");
+				int duration = ((BasicDBObject) plannedSteps.get(i).get(
+						"scheduleData")).getInt("duration");
 				schedules.add(new Schedule(startTime, duration, aid));
 			}
 
@@ -211,80 +219,78 @@ public class SchedulerBehaviour extends Behaviour {
 			if (schedules.size() > 0) {
 				for (int index = 0; index < schedules.size(); index++) {
 					if (schedules.size() > (index + 1)) {
-						if((schedules.get((index+1)).getStartTime() - schedules.get(index).getDeadline()) > requiredTimeSlots) {
-							freetimeslots.add(new FreeTimeSlot(schedules.get(index).getDeadline(), requiredTimeSlots, aid));
-						}
+						// if((schedules.get((index+1)).getStartTime() -
+						// schedules.get(index).getDeadline()) >
+						// requiredTimeSlots) {
+						// freetimeslots.add(new
+						// FreeTimeSlot(schedules.get(index).getDeadline(),
+						// requiredTimeSlots, aid));
+						// }
 					} else {
 						Schedule lastSchedule = schedules.get(index);
-						freetimeslots.add(new FreeTimeSlot(lastSchedule.getDeadline() + 50, requiredTimeSlots, aid));
+						freetimeslots.add(new FreeTimeSlot(lastSchedule
+								.getDeadline(), requiredTimeSlots, aid));
 					}
 				}
 			} else {
-				freetimeslots.add(new FreeTimeSlot((System.currentTimeMillis() - firstTimeSlot) / timeSlotLength + (5000/timeSlotLength), requiredTimeSlots, aid));
+				freetimeslots.add(new FreeTimeSlot(
+						(System.currentTimeMillis() - firstTimeSlot)
+								/ timeSlotLength + (5000 / timeSlotLength),
+						requiredTimeSlots, aid));
 			}
+			Schedule lastSchedule = null;
+			if (schedules.size() > 0) {
+				lastSchedule = schedules.get(schedules.size() - 1);
+				FreeTimeSlot slot = freetimeslots.get(0);
+				long last = lastSchedule.getStartTime();
+				long now = slot.getStartTime();
+				long tmp = now - last;
+				if (tmp < requiredTimeSlots) {
+					System.out.println("error");
+				}
+			} else {
+				System.out.println("no schedules");
+			}
+			System.out.println();
 		}
 		FreeTimeSlot freetimeslotEq = null;
 
 		// calculate freetime slot and asign them to the above intialized values
 		if (freetimeslots.size() > 0) {
 			for (FreeTimeSlot fts : freetimeslots) {
-				if (freetimeslotEq == null || freetimeslotEq.getDuration() > fts.getDuration()) {
+				if (freetimeslotEq == null) {
 					freetimeslotEq = fts;
+				} else {
+					System.out.println("BIG ERRROR");
 				}
 			}
 		}
 
-		System.out.println(freetimeslotEq.getStartTime());
-		
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setConversationId(this._prodStep.getConversationId());
+		msg.setConversationId(this._prodStep
+				.getConversationIdForEquiplet(freetimeslotEq.getEquipletName()));
 		msg.setOntology("ScheduleStep");
 		msg.setContentObject(freetimeslotEq.getStartTime());
 		msg.addReceiver(freetimeslotEq.getEquipletName());
 		myAgent.send(msg);
 
-		final MessageTemplate msgtemplate = MessageTemplate.and(MessageTemplate.MatchConversationId(this._prodStep.getConversationId()), MessageTemplate.MatchOntology("Planned"));
-
 		
-		ACLMessage returnMsg = myAgent.blockingReceive();
+		
+		ACLMessage returnMsg = myAgent.blockingReceive(MessageTemplate.MatchOntology("Planned"));
 		if (returnMsg.getPerformative() == ACLMessage.CONFIRM) {
 			_prodStep.setStatus(StepStatusCode.PLANNED);
-			bbc = new BlackboardClient(dbData.getIp(), dbData.getPort());
-			bbc.setDatabase(dbData.getName());
-			bbc.setCollection("ProductStepsBlackBoard");
-			List<DBObject> allSteps = bbc.findDocuments("");
-			System.out.println("Planned");
+			// System.out.println("Scheduled productionstep: " +
+			// _prodStep.getId());
+			// _bc.handleCallback(BehaviourStatus.COMPLETED, null);
 		} else if (returnMsg.getPerformative() == ACLMessage.DISCONFIRM) {
-			System.out.println("Disconfirm.");
+			System.out.println("DISCONFIRM!!!!");
 		}
+		System.out.println("schedule: starttime: "
+				+ freetimeslotEq.getStartTime() + " duraton: "
+				+ freetimeslotEq.getDuration());
+		_prodStep.setConversationId(returnMsg.getConversationId());
 		_schedulersCompleted++;
-		System.out.println("received message");
-		
-		/*
-		myAgent.addBehaviour(new ReceiveBehaviour(myAgent, 10000, msgtemplate) {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void handle(ACLMessage msg) {
-				if (msg == null) {
-					System.out.println("Null message - Scheduler");
-					_isError = true;
-				} else {
-					if (msg.getPerformative() == ACLMessage.CONFIRM) {
-						_prodStep.setStatus(StepStatusCode.PLANNED);
-					} else if (msg.getPerformative() == ACLMessage.DISCONFIRM) {
-						System.out.println("Disconfirm.");
-					}
-					_isDone = true;
-					_schedulersCompleted++;
-					System.out.println("received message");
-					
-				}
-			}
-		});
-		*/
-
+		// System.out.println("received message");
 	}
 
 	private class FreeTimeSlot {
@@ -312,7 +318,9 @@ public class SchedulerBehaviour extends Behaviour {
 
 		@Override
 		public String toString() {
-			return "{Start TimeSlot: " + this.startTimeSlot + ", Duration: " + this.duration + ", EquipletName: " + this.equipletName + "}";
+			return "{Start TimeSlot: " + this.startTimeSlot + ", Duration: "
+					+ this.duration + ", EquipletName: " + this.equipletName
+					+ "}";
 		}
 	}
 
@@ -353,7 +361,9 @@ public class SchedulerBehaviour extends Behaviour {
 
 		@Override
 		public String toString() {
-			return "{ startTime:" + startTime + ", duration:" + duration + ", deadline:" + deadline + ", EquipletName:" + equipletName + " }";
+			return "{ startTime:" + startTime + ", duration:" + duration
+					+ ", deadline:" + deadline + ", EquipletName:"
+					+ equipletName + getEquipletName() + " }";
 		}
 	}
 }

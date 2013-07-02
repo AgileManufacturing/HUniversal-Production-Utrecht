@@ -205,7 +205,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 		// Add behaviours
 		addBehaviour(new InitialisationFinished(this));
-		addBehaviour(new CanDoProductStep(this, serviceFactory));
+		addBehaviour(new CanDoProductStep(this));
 		addBehaviour(new CheckForModulesResponse(this));
 		addBehaviour(new GetProductStepDuration(this));
 		addBehaviour(new GetServiceStepsDurationResponse(this));
@@ -387,29 +387,14 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 										break;
 									}
 
-									// fetch and sort all serviceSteps
-									List<DBObject> dbServiceSteps =
-											serviceStepBBClient.findDocuments(new BasicDBObject("productStepId",
-													productStepId));
-									ServiceStep[] serviceSteps = new ServiceStep[dbServiceSteps.size()];
-									for(int i = 0; i < dbServiceSteps.size(); i++) {
-										serviceSteps[i] = new ServiceStep((BasicDBObject) dbServiceSteps.get(i));
-									}
-									serviceSteps = ServiceStep.sort(serviceSteps);
-
-									// append all serviceSteps to the log
-									BasicDBObject log = new BasicDBObject();
-									for(int i = 0; i < serviceSteps.length; i++) {
-										log.append("step" + i, serviceSteps[i].toBasicDBObject());
-									}
-
 									Logger.log("Service agent - saving log in prod.Step %s%n", productStepId);
 
 									// save the log in the productStep
 									productStepBBClient.updateDocuments(
 											new BasicDBObject("_id", productStepId),
 											new BasicDBObject("$set", new BasicDBObject("status", status.name())
-													.append("statusData", log)));
+													.append("statusData", new BasicDBObject("log",
+															buildLog(productStepId)))));
 									break;
 								case IN_PROGRESS:
 								case SUSPENDED_OR_WARNING:
@@ -421,7 +406,9 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 									productStepBBClient.updateDocuments(
 											new BasicDBObject("_id", productStepId),
 											new BasicDBObject("$set", new BasicDBObject("status", status.name())
-													.append("statusData", serviceStep.getStatusData())));
+													.append("statusData", new BasicDBObject("reason",
+															"Service step status set to " + status.name()).append(
+															"log", buildLog(productStepId)))));
 									break;
 								default:
 									break;
@@ -447,24 +434,20 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 * 
 	 * @return the log as a BasicDBObject
 	 */
-	public BasicDBObject buildLog(ObjectId productStep) {
+	public BasicDBObject buildLog(ObjectId productStep) throws InvalidDBNamespaceException, GeneralMongoException {
+		List<DBObject> dbServiceSteps =
+				serviceStepBBClient.findDocuments(new BasicDBObject("productStepID", productStep));
+
+		ServiceStep[] serviceSteps = new ServiceStep[dbServiceSteps.size()];
+		for(int i = 0; i < dbServiceSteps.size(); i++) {
+			serviceSteps[i] = new ServiceStep((BasicDBObject) dbServiceSteps.get(i));
+		}
+		serviceSteps = ServiceStep.sort(serviceSteps);
+
+		// append all serviceSteps to the log
 		BasicDBObject log = new BasicDBObject();
-		List<DBObject> dbServiceSteps;
-		try {
-			dbServiceSteps = serviceStepBBClient.findDocuments(new BasicDBObject("serviceStepID", productStep));
-
-			ServiceStep[] serviceSteps = new ServiceStep[dbServiceSteps.size()];
-			for(int i = 0; i < dbServiceSteps.size(); i++) {
-				serviceSteps[i] = new ServiceStep((BasicDBObject) dbServiceSteps.get(i));
-			}
-			serviceSteps = ServiceStep.sort(serviceSteps);
-
-			// append all serviceSteps to the log
-			for(int i = 0; i < serviceSteps.length; i++) {
-				log.append("step" + i, serviceSteps[i].toBasicDBObject());
-			}
-		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(e);
+		for(int i = 0; i < serviceSteps.length; i++) {
+			log.append("step" + i, serviceSteps[i].toBasicDBObject());
 		}
 		return log;
 	}
@@ -570,6 +553,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 */
 	public AID getHardwareAgentAID() {
 		return hardwareAgentAID;
+	}
+	
+	public ServiceFactory getServiceFactory() {
+		return serviceFactory;
 	}
 
 	/**

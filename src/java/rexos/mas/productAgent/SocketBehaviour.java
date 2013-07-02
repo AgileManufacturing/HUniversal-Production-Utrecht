@@ -41,7 +41,6 @@
 package rexos.mas.productAgent;
 
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.WakerBehaviour;
 
 import java.io.BufferedReader;
@@ -69,22 +68,15 @@ public class SocketBehaviour extends WakerBehaviour implements
 	private BufferedReader inputStream = null;
 	private boolean isConnected = false;
 	private HeartBeatBehaviour _hbb;
-	private Agent _agent;
 	private Gson _gsonParser;
-
-	private boolean _stopBehaviour = false;
 
 	private Callback _callback;
 
 	public SocketBehaviour(Agent a, Callback callback) {
 		super(a, 4500);
 		try {
-			_agent = a;
 			_callback = callback;
-			//_hbb = hbb;//new HeartBeatBehaviour(a, 5000, this);
 			_gsonParser = new Gson();
-			
-			 //a.addBehaviour(_hbb);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -199,6 +191,6 @@ public class SocketBehaviour extends WakerBehaviour implements
 
 	public void stop() {
 		this._hbb.stopHeartbeating();
-		this._stopBehaviour = true;
+		myAgent.removeBehaviour(this);
 	}
 }
