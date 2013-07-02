@@ -79,13 +79,18 @@ public class SchedulerBehaviour extends Behaviour {
 	
 	private int stepsPlanned = 0;
 
+	/**
+	 * Construct scheudler behavior
+	 * @param myAgent
+	 * @param bc
+	 */
 	public SchedulerBehaviour(Agent myAgent, BehaviourCallback bc) {
 		super(myAgent);
 		this._bc = bc;
 	}
 
 	/**
-	 * Enholds the content of the behavior and invokes the content of this method
+	 * Performs the schedule algorithm
 	 */
 	@Override
 	public void onStart() {
@@ -122,7 +127,7 @@ public class SchedulerBehaviour extends Behaviour {
 	}
 
 	/**
-	 * The status will be changed when the behavior is completed
+	 * Sets the status of the behavior
 	 */
 	@Override
 	public void action() {
@@ -140,7 +145,8 @@ public class SchedulerBehaviour extends Behaviour {
 	}
 
 	/**
-	 * Return true when the behaviour is completed
+	 * Returns true when the behavior is done
+	 * @return
 	 */
 	@Override
 	public boolean done() {
@@ -307,24 +313,45 @@ public class SchedulerBehaviour extends Behaviour {
 		private long duration = -1;
 		private AID equipletName = null;
 
+		/**
+		 * Construct free time slot
+		 * @param start
+		 * @param dura
+		 * @param equiplet
+		 */
 		public FreeTimeSlot(long start, int dura, AID equiplet) {
 			this.startTimeSlot = start;
 			this.duration = dura;
 			this.equipletName = equiplet;
 		}
 
+		/**
+		 * Gets the equiplet name
+		 * @return
+		 */
 		public AID getEquipletName() {
 			return this.equipletName;
 		}
 
+		/**
+		 * Gets the start time of timeslot
+		 * @return
+		 */
 		public long getStartTime() {
 			return this.startTimeSlot;
 		}
 
+		/**
+		 * Gets the duration of the timeslot
+		 * @return
+		 */
 		public long getDuration() {
 			return this.duration;
 		}
 
+		/**
+		 * ToString annotation
+		 */
 		@Override
 		public String toString() {
 			return "{Start TimeSlot: " + this.startTimeSlot + ", Duration: "
@@ -339,6 +366,12 @@ public class SchedulerBehaviour extends Behaviour {
 		private long deadline = -1;
 		private AID equipletName;
 
+		/**
+		 * Constructs Schedule object
+		 * @param start
+		 * @param dura
+		 * @param equiplet
+		 */
 		public Schedule(long start, int dura, AID equiplet) {
 			this.startTime = start;
 			this.duration = dura;
@@ -346,28 +379,51 @@ public class SchedulerBehaviour extends Behaviour {
 			this.equipletName = equiplet;
 		}
 
+		/**
+		 * get starting time
+		 * @return
+		 */
 		public long getStartTime() {
 			return this.startTime;
 		}
 
+		/**
+		 * Set starting time
+		 * @param newStartTime
+		 */
 		@SuppressWarnings("unused")
 		public void setStartTime(int newStartTime) {
 			this.startTime = newStartTime;
 		}
 
+		/**
+		 * Gets equiplet name
+		 * @return
+		 */
 		public AID getEquipletName() {
 			return this.equipletName;
 		}
-
+		
+		/**
+		 * Gets deadline time
+		 * @return
+		 */
 		public long getDeadline() {
 			return this.deadline;
 		}
 
+		/**
+		 * Sets the deadline time
+		 * @param newDeadline
+		 */
 		@SuppressWarnings("unused")
 		public void setDeadline(int newDeadline) {
 			this.deadline = newDeadline;
 		}
 
+		/**
+		 * ToString Annotation
+		 */
 		@Override
 		public String toString() {
 			return "{ startTime:" + startTime + ", duration:" + duration

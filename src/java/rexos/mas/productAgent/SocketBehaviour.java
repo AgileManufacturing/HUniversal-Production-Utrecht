@@ -73,7 +73,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 	private Callback _callback;
 
 	/**
-	 * Initiate Socketbehavior
+	 * Constructs socket behavior
 	 * @param a
 	 * @param callback
 	 */
@@ -88,7 +88,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 	}
 	
 	/**
-	 * Set the heartbeat behavior
+	 * Sets the heartbeat
 	 * @param hbb
 	 */
 	public void setHeartBeatBehaviour(HeartBeatBehaviour hbb) {
@@ -96,7 +96,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 	}
 
 	/**
-	 * Acknowledge the socket is still open
+	 * Keeps track of the heartbeat
 	 */
 	@Override
 	protected void onWake() {
@@ -118,7 +118,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 	}
 
 	/**
-	 * Write message which will be send to the GUI
+	 * Write message through the stream
 	 * @param msg
 	 */
 	public void write(String msg) {
@@ -132,7 +132,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 	}
 
 	/**
-	 * Write message which will be send to the GUI
+	 * Write message through the stream
 	 * @param error
 	 * @param msg
 	 * @param payload
@@ -152,7 +152,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 	}
 
 	/**
-	 * Write message which will be send to the GUI
+	 * Write message through the stream
 	 * @param guiMsg
 	 */
 	public void write(GUIMessage guiMsg) {
@@ -168,7 +168,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 	}
 
 	/**
-	 * Connects to host(AID)
+	 * Connect to socket
 	 * @throws UnknownHostException
 	 * @throws IOException
 	 */
@@ -190,7 +190,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 	 * @see newDataClasses.HeartbeatReceiver#initHeartbeat()
 	 */
 	/**
-	 * Print heartbeat to screen.
+	 * Initialize heartbeat
 	 */
 	@Override
 	public void initHeartbeat() {
@@ -209,7 +209,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 	 * @see newDataClasses.HeartbeatReceiver#heartbeatTimeout()
 	 */
 	/**
-	 * Occurs when the heartbeat receives a timeout
+	 * Defines what to do when heartbeat times out
 	 */
 	@Override
 	public void heartbeatTimeout() {
@@ -222,7 +222,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 	}
 
 	/**
-	 * Resets the socket connection
+	 * Resets socket connection
 	 * @throws IOException
 	 */
 	public void resetConnection() throws IOException {
@@ -231,7 +231,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 	}
 
 	/**
-	 * Stops the socket
+	 * Stops socket and heartbeat.
 	 */
 	public void stop() {
 		this._hbb.stopHeartbeating();

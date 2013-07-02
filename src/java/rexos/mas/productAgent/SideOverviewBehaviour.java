@@ -14,9 +14,8 @@ public class SideOverviewBehaviour extends CyclicBehaviour{
 	private class receiveMsgBehaviour extends CyclicBehaviour{
 		private receiveMsgBehaviour(){
 		}
-
 		/**
-		 * start receive message behavior
+		 * Start wait message behavior
 		 */
 		@Override
 		public void action(){
@@ -33,15 +32,15 @@ public class SideOverviewBehaviour extends CyclicBehaviour{
 		ACLMessage msg;
 
 		/**
-		 * Wait message behavior
+		 * Construct wait message behavior
 		 * @param msg
 		 */
 		public WaitMsgBehaviour(ACLMessage msg){
 			this.msg = msg;
 		}
-
+		
 		/**
-		 * Act based on received message 
+		 * Sets status of behavior
 		 */
 		@Override
 		public void action(){
@@ -87,7 +86,7 @@ public class SideOverviewBehaviour extends CyclicBehaviour{
 	}
 
 	/**
-	 * None
+	 * Parent performs action
 	 */
 	@Override
 	public void action(){

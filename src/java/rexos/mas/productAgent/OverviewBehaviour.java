@@ -64,6 +64,10 @@ public class OverviewBehaviour extends Behaviour implements
 	
 	private boolean _overviewCompleted = false;
 
+	/**
+	 * Constructs the OverviewBehaviour
+	 * @param myAgent
+	 */
 	public OverviewBehaviour(Agent myAgent) {
 		super(myAgent);
 		_productAgent = (ProductAgent) myAgent;
@@ -75,7 +79,7 @@ public class OverviewBehaviour extends Behaviour implements
 	}
 
 	/**
-	 * Initialize the overview-behaviour which sets the other behaviours.
+	 * Initialize the sub behaviors
 	 */
 	private void initialize() {
 
@@ -125,7 +129,7 @@ public class OverviewBehaviour extends Behaviour implements
 	 * and one where it listens to incoming messages. MIST NOG 1 MOGELIJKHEID!
 	 */
 	/**
-	 * In the action a switch statement is used to start the designated behavior.
+	 * Construct the action of the overviewBehavior which sets the status of the overview behavior
 	 */
 	@Override
 	public void action() {
@@ -160,7 +164,8 @@ public class OverviewBehaviour extends Behaviour implements
 	}
 	
 	/**
-	 * Return whether the behavior is done.
+	 * Returns true when the behavior is done
+	 * @return
 	 */
 	@Override
 	public boolean done() {
@@ -168,7 +173,7 @@ public class OverviewBehaviour extends Behaviour implements
 	}
 
 	/**
-	 * Whenever an attempt for scheduling fails, rescheduling is attempted.
+	 * Not used
 	 */
 	@SuppressWarnings("static-method")
 	public void reschedule() {
@@ -176,7 +181,7 @@ public class OverviewBehaviour extends Behaviour implements
 	}
 
 	/**
-	 * Start planning behavior and sets the agent status to PLANNING
+	 * Starts the planning behavior
 	 */
 	public void startPlanning() {
 		_productAgent.setStatus(AgentStatus.PLANNING);
@@ -186,7 +191,7 @@ public class OverviewBehaviour extends Behaviour implements
 	}
 
 	/**
-	 * Start informer behavior and sets the agent status to INFORMING
+	 * Starts the informer behavior
 	 */
 	public void startInforming() {
 		_productAgent.setStatus(AgentStatus.INFORMING);
@@ -196,7 +201,7 @@ public class OverviewBehaviour extends Behaviour implements
 	}
 
 	/**
-	 * Start scheduling behavior and sets the agent status to SCHEDULING
+	 * Starts the scheduling behavior
 	 */
 	public void startScheduling() {
 		_productAgent.setStatus(AgentStatus.SCHEDULING);
@@ -207,7 +212,7 @@ public class OverviewBehaviour extends Behaviour implements
 	}
 
 	/**
-	 * Start producing behavior and sets the agent status to PRODUCING
+	 * Starts the produce behavior
 	 */
 	public void startProducing() {
 		_productAgent.setStatus(AgentStatus.PRODUCING);
@@ -222,7 +227,9 @@ public class OverviewBehaviour extends Behaviour implements
 	 * @see rexos.mas.productAgent.BehaviourCallback#handleCallback()
 	 */
 	/**
-	 * When an behavior is done, set the status to the assigned done status code
+	 * Handles the callback to the parent behaviour
+	 * @param bs
+	 * @param callbackArgs
 	 */
 	@Override
 	public void handleCallback(BehaviourStatus bs, Object[] callbackArgs) {
@@ -252,7 +259,7 @@ public class OverviewBehaviour extends Behaviour implements
 	}
 
 	/**
-	 * When all behaviors are done, close the socket
+	 * Stops the socket
 	 */
 	public void cleanBehaviour() {
 		System.out.println("Done overview, stopping SocketBehaviour.");

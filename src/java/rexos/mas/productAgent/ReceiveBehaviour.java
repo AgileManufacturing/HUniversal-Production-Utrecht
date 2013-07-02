@@ -53,7 +53,7 @@ public class ReceiveBehaviour extends SimpleBehaviour{
 	private ACLMessage msg;
 
 	/**
-	 * Returns the received message
+	 * Get the message
 	 * @return
 	 */
 	public ACLMessage getMessage(){
@@ -61,7 +61,7 @@ public class ReceiveBehaviour extends SimpleBehaviour{
 	}
 
 	/**
-	 * initiates the receive behavior
+	 * Construct the receive behavior
 	 * @param agnt
 	 * @param millis
 	 * @param msgtmplt
@@ -73,7 +73,7 @@ public class ReceiveBehaviour extends SimpleBehaviour{
 	}
 
 	/**
-	 * Start calculating wakeup time
+	 * Perform the receive behavior
 	 */
 	@Override
 	public void onStart(){
@@ -82,7 +82,8 @@ public class ReceiveBehaviour extends SimpleBehaviour{
 	}
 
 	/**
-	 * returns true when the receive behavior is completed
+	 * Return true when the behavior is done
+	 * @return
 	 */
 	@Override
 	public boolean done(){
@@ -90,7 +91,7 @@ public class ReceiveBehaviour extends SimpleBehaviour{
 	}
 
 	/**
-	 * Receive message
+	 * Sets status of behavior
 	 */
 	@Override
 	public void action(){
@@ -120,14 +121,14 @@ public class ReceiveBehaviour extends SimpleBehaviour{
 	 * stuff. } }
 	 */
 	/**
-	 * Will be called in sub class
+	 * Function will be called in sub behavior
 	 * @param m
 	 */
 	public void handle(ACLMessage m){
 	}
 
 	/**
-	 * Resets behavior parameters
+	 * Resets the receive behavior
 	 */
 	@Override
 	public void reset(){
@@ -138,8 +139,7 @@ public class ReceiveBehaviour extends SimpleBehaviour{
 
 	// wat is dt???
 	/**
-	 * Resets timeout
-	 * @param dt
+	 * Resets the receive behavior
 	 */
 	public void reset(int dt){
 		timeOut = dt;

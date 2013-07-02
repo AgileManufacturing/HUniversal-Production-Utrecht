@@ -70,6 +70,7 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 	private HashMap<String, ProductionStep> _conversationIdToProductionStep;
 
 	/**
+	 * Constructs the produce behavior
 	 * @param myAgent
 	 */
 	public ProduceBehaviour(Agent myAgent, BehaviourCallback bc) {
@@ -80,12 +81,21 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 
 	}
 
+	/**
+	 * Constructs the produce behavior
+	 * @param myAgent
+	 * @param bc
+	 * @param template
+	 */
 	public ProduceBehaviour(Agent myAgent, BehaviourCallback bc,
 			MessageTemplate template) {
 		super(myAgent, -1, template);
 		this._bc = bc;
 	}
 
+	/**
+	 * Starts the produce algorithm
+	 */
 	@Override
 	public void onStart() {
 		try {
@@ -103,6 +113,10 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 	 * 
 	 * @see
 	 * rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage)
+	 */
+	/**
+	 * handles the messages the behavior receives
+	 * @param m
 	 */
 	@Override
 	public void handle(ACLMessage m) {

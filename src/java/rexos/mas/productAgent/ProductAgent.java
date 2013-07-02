@@ -76,12 +76,15 @@ public class ProductAgent extends Agent {
 	private ProductAgentProperties _properties;
 	private AgentStatus _status;
 
+	/**
+	 * Constructs the product agent
+	 */
 	public ProductAgent() {
 		_status = AgentStatus.STARTING;
 	}
 
 	/**
-	 * Loads the content of the Agent like behaviors
+	 * Sets up the product agent
 	 */
 	@Override
 	protected void setup() {
@@ -99,13 +102,13 @@ public class ProductAgent extends Agent {
 	}
 
 	/**
-	 * Load the passed arguments into an array and create a product with an array of production steps
+	 * Loads the arguments passed to the product agent
 	 */
 	private void loadArguments() {
 		// Get the arguments passed to the ProductAgent
 		Object[] args = this.getArguments();
 		// Check if there are any arguments. If there aren't any there is a
-		// problem. We need at least one arguments for the product
+		// problem. We need atleast one arguments for the product
 		if (args.length > 0) {
 			// The first argument should be the ProductAgentProperties object,
 			// whether it's in json or as object.
@@ -170,9 +173,8 @@ public class ProductAgent extends Agent {
 	 * objects hashcode and the current time.
 	 */
 	/**
-	 * Generates an unique conversation id based on the agents localname, the
-	 * objects hashcode and the current time.
-	 * @return String
+	 * Generate an communication ID
+	 * @return
 	 */
 	public String generateCID() {
 		if (_convIDBase == null) {
@@ -183,30 +185,30 @@ public class ProductAgent extends Agent {
 	}
 
 	/**
-	 * Calls for the overview behavior method for rescheduling production steps
+	 * Reschedule productionstep
 	 */
 	public void reschedule() {
 		_overviewBehaviour.reschedule();
 	}
 
 	/**
-	 * Get the properties of the Product Agent
-	 * @return ProductAgentProperties (custom class)
+	 * Get properties of the product agent
+	 * @return
 	 */
 	public ProductAgentProperties getProperties() {
 		return this._properties;
 	}
 
 	/**
-	 * Sets the properties of the product agent
-	 * @param ProductaAgentProperties properties
+	 * Sets the product agent properties
+	 * @param properties
 	 */
 	public void setProperties(ProductAgentProperties properties) {
 		this._properties = properties;
 	}
 
 	/**
-	 * I really got no clue
+	 * Gets the callback response of a behavior
 	 * @return
 	 */
 	public Callback getCallback() {
@@ -214,7 +216,7 @@ public class ProductAgent extends Agent {
 	}
 
 	/**
-	 * I wanted to call back but aint got no money
+	 * Sets the callback of a behavior
 	 * @param callback
 	 */
 	public void setCallback(Callback callback) {
@@ -222,7 +224,7 @@ public class ProductAgent extends Agent {
 	}
 
 	/**
-	 * Gets the product which enholds the production steps
+	 * Get the product
 	 * @return
 	 */
 	public Product getProduct() {
@@ -230,7 +232,7 @@ public class ProductAgent extends Agent {
 	}
 
 	/**
-	 * Sets the product which enholds the production information like the production steps
+	 * Set the product
 	 * @param product
 	 */
 	public void setProduct(Product product) {
@@ -238,7 +240,7 @@ public class ProductAgent extends Agent {
 	}
 	
 	/**
-	 * Get the status of the Product Agent
+	 * Get agent status
 	 * @return
 	 */
 	public AgentStatus getStatus(){
@@ -246,7 +248,7 @@ public class ProductAgent extends Agent {
 	}
 	
 	/**
-	 * Sets the status of the Product Agent
+	 * Set the staus of the agent
 	 * @param status
 	 */
 	public void setStatus(AgentStatus status) {
