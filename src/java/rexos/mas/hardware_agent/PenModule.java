@@ -111,7 +111,7 @@ public class PenModule extends Module {
 					Position step = new Position(deltaX / numberOfSteps, deltaY / numberOfSteps);
 
 					// loop over all the steps and create them.
-					for(int i = 0; i <= numberOfSteps; i++) {
+					for(int i = 0; i < numberOfSteps; i++) {
 						steps.addAll(Arrays.asList(getStepsForDot(new BasicDBObject("position", startPosition
 								.toBasicDBObject()))));
 						startPosition.translate(step);
