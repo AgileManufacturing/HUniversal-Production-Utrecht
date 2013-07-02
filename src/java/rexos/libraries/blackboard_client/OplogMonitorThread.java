@@ -1,5 +1,5 @@
 /**
- * @file OplogMonitorThread.java
+ * @file rexos/libraries/blackboard_client/OplogMonitorThread.java
  * @brief Class for the tailed oplog cursor thread within the client
  * @date Created: 18 apr. 2013
  *
@@ -37,6 +37,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
+import com.mongodb.MongoException;
 import com.mongodb.MongoInterruptedException;
 
 /**
@@ -45,19 +46,34 @@ import com.mongodb.MongoInterruptedException;
 class OplogMonitorThread extends Thread {
 	
 	/**
+	 * @var int POLL_INTERVAL
+	 * The interval between two checks for new documents in milliseconds. Note that this interval is not used
+	 * when there are multiple documents available. In this case all documents will be retrieved after which
+	 * the thread will sleep for this interval when no more documents are available.
+	 **/
+	private static final int POLL_INTERVAL = 100;
+
+	/**
 	 * @var DBCursor tailedCursor
 	 * Tailed cursor for this thread.
 	 **/
 	private DBCursor tailedCursor;
 	
 	/**
-	 * @var HashMap<BlackboardSubscription> subscriptions
+	 * @var BlackboardSubscription subscriptions[]
 	 * Link between subscribed topic name and MongoDbs BasicDBObjects
 	 **/
-	BlackboardSubscription[] subscriptions;
+	private BlackboardSubscription[] subscriptions;
+	
+	/**
+	 * @var OplogCallbackThread callbackThread
+	 * Thread used for executing callbacks.
+	 */
+	OplogCallbackThread callbackThread;
 	
 	/**
 	 * Constructor of OplogMonitorThread.
+	 * @param mongo The Mongo database connection that should be used.
 	 * @param oplogDBName The database in which the oplog collection resides.
 	 * @param oplogCollectionName The name of the oplog collection.
 	 * @param query The query that will be used in the tailed cursor.
@@ -70,12 +86,14 @@ class OplogMonitorThread extends Thread {
 		tailedCursor.addOption(Bytes.QUERYOPTION_TAILABLE);
 		tailedCursor.addOption(Bytes.QUERYOPTION_AWAITDATA);
 		tailedCursor.skip(tailedCursor.size());
+		callbackThread = new OplogCallbackThread();
 	}
 	
 	/**
 	 * Constructs a tailed cursor for the specified query on the oplog collection.
 	 * This constructor should be used when user authentication is required.
 	 * 
+	 * @param mongo The Mongo database connection that should be used.
 	 * @param oplogDBName The database in which the oplog collection resides.
 	 * @param oplogCollectionName The name of the oplog collection.
 	 * @param username Username that will be used to authenticate with the oplog database. This user should have read access.
@@ -92,12 +110,13 @@ class OplogMonitorThread extends Thread {
 		tailedCursor.addOption(Bytes.QUERYOPTION_TAILABLE);
 		tailedCursor.addOption(Bytes.QUERYOPTION_AWAITDATA);
 		tailedCursor.skip(tailedCursor.size());
+		callbackThread = new OplogCallbackThread();
 	}
 	
 	/**
 	 * Sets the subscriptions that are used for the query of this oplog monitor.
 	 * @param subscriptions ArrayList containing all the subscriptions this monitor will subscribe to.
-	 */
+	 **/
 	public void setSubscriptions(ArrayList<BlackboardSubscription> subscriptions) {
 		this.subscriptions = new BlackboardSubscription[subscriptions.size()];
 		subscriptions.toArray(this.subscriptions);
@@ -110,23 +129,42 @@ class OplogMonitorThread extends Thread {
 	@Override
 	public void run() {
 		try {
-			while (!Thread.interrupted()) {
-				while (tailedCursor.hasNext()) {
+			do {
+				while (!Thread.interrupted() && tailedCursor.hasNext()) {
 					OplogEntry entry = new OplogEntry(tailedCursor.next());
-					MongoOperation operation = entry.getOperation();
 
 					for (BlackboardSubscription sub : subscriptions) {
 						if (sub.matchesWithEntry(entry)) {
-							sub.getSubscriber().onMessage(operation, entry);
+							callbackThread.addCallback(sub.getSubscriber(), entry);
 						}
 					}
 				}
-			}
-		} catch (MongoInterruptedException ex) {
+				
+				Thread.sleep(POLL_INTERVAL);
+			} while (!Thread.interrupted() && tailedCursor.getCursorId() != 0);
+		} catch (MongoInterruptedException | MongoException.CursorNotFound | InterruptedException ex) {
 			/*
 			 * MongoInterruptedException is thrown by Mongo when interrupt is called while blocking on the
 			 * tailedCursor's hasNext method. When this happens, return from the run method to kill the thread.
 			 */
+			
+			/*
+			 * MongoException.CursorNotFound indicates the cursor was killed while blocking on hasNext.
+			 * We purposely kill the cursor when the OplogMonitorThread is interrupted, thus expect this to happen.
+			 */
+			
+			rexos.libraries.log.Logger.log("OplogMonitorThread ending due to %s:\n%s\n", ex.getClass().getName(), ex.getMessage());
+		} finally {
+			try {
+				if (tailedCursor != null) {
+					tailedCursor.close();
+				}
+			} catch (Throwable t) {
+				// If closing the cursor throws something, it's most likely not something we can fix.
+				rexos.libraries.log.Logger.log("%s thrown while closing cursor:\n%s\n", t.getClass().getName(), t.getMessage());
+			}
 		}
+		
+		callbackThread.shutdown();
 	}
 }
