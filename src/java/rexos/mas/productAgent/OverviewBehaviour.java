@@ -67,6 +67,10 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	private boolean _overviewCompleted = false;
 	private boolean _rescheduling = false;
 
+	/**
+	 * Constructs the OverviewBehaviour
+	 * @param myAgent
+	 */
 	public OverviewBehaviour(Agent myAgent) {
 		super(myAgent);
 		_productAgent = (ProductAgent) myAgent;
@@ -77,6 +81,9 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 		_productAgent.setStatus(AgentStatus.DONE_INITIALIZING);
 	}
 
+	/**
+	 * Initialize the sub behaviors
+	 */
 	private void initialize() {
 
 		System.out.println("Creating the SocketBehaviour");
@@ -126,6 +133,9 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 * where the normal flow ( plan, inform, schedule, produce ) is followed,
 	 * and one where it listens to incoming messages. MIST NOG 1 MOGELIJKHEID!
 	 */
+	/**
+	 * Construct the action of the overviewBehavior which sets the status of the overview behavior
+	 */
 	@Override
 	public void action() {
 		try {
@@ -162,29 +172,48 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 		}
 	}
 
+	/**
+	 * Returns true when the behavior is done
+	 * @return
+	 */
 	@Override
 	public boolean done() {
 		return _overviewCompleted;
 	}
 
+	/**
+	 * Not used
+	 */
+	/**
+	 * Starts the planning behavior
+	 */
 	public void startPlanning() {
 		_productAgent.setStatus(AgentStatus.PLANNING);
 		System.out.println("Add a PlannerBehaviour");
 		myAgent.addBehaviour(_plannerBehaviour);
 	}
 
+	/**
+	 * Starts the informer behavior
+	 */
 	public void startInforming() {
 		_productAgent.setStatus(AgentStatus.INFORMING);
 		System.out.println("Add an InformerBehaviour");
 		myAgent.addBehaviour(_informerBehaviour);
 	}
 
+	/**
+	 * Starts the scheduling behavior
+	 */
 	public void startScheduling() {
 		_productAgent.setStatus(AgentStatus.SCHEDULING);
 		System.out.println("Add a SchedulerBehaviour");
 		myAgent.addBehaviour(_schedulerBehaviour);
 	}
 
+	/**
+	 * Starts the produce behavior
+	 */
 	public void startProducing() {
 		System.out.println("Add a ProduceBehaviour");
 		if (_produceBehaviour.done() == false)
@@ -204,6 +233,11 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 * (non-Javadoc)
 	 * 
 	 * @see rexos.mas.productAgent.BehaviourCallback#handleCallback()
+	 */
+	/**
+	 * Handles the callback to the parent behaviour
+	 * @param bs
+	 * @param callbackArgs
 	 */
 	@Override
 	public void handleCallback(BehaviourStatus bs, Object[] callbackArgs) {
@@ -252,6 +286,9 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 		}
 	}
 
+	/**
+	 * Stops the socket
+	 */
 	public void cleanBehaviour() {
 		_socketBehaviour.write(false, "Product Completed.", "1");
 		System.out.println("Done overview, stopping SocketBehaviour.");

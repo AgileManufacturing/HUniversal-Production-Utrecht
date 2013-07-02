@@ -21,7 +21,11 @@ import rexos.mas.data.BehaviourStatus;
  */
 public interface BehaviourCallback{
 	
-	
+	/**
+	 * Handle Callback to Overview
+	 * @param bs
+	 * @param callbackArgs
+	 */
 	public void handleCallback(BehaviourStatus bs, Object[] callbackArgs);
 	
 }

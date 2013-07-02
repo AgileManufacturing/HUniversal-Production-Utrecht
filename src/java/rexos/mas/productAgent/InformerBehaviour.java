@@ -89,12 +89,20 @@ public class InformerBehaviour extends Behaviour {
 	private int _currentRunningSubInformerBehaviours = 0;
 	private int MAX_RUNNING_SUB_BEHAVIOURS = 5;
 
+	/**
+	 * COnstructs the InformerBehavior
+	 * @param myAgent
+	 * @param bc
+	 */
 	public InformerBehaviour(Agent myAgent, BehaviourCallback bc) {
 		super(myAgent);
 		this._bc = bc;
 		_subInformerBehaviours = new LinkedList<SubInformerBehaviour>();
 	}
 
+	/**
+	 * Starts the behavior
+	 */
 	@Override
 	public void onStart() {
 
@@ -150,6 +158,9 @@ public class InformerBehaviour extends Behaviour {
 		myAgent.addBehaviour(_parBehaviour);
 	}
 
+	/**
+	 * Constructs the actions performed by the informer behavior
+	 */
 	@Override
 	public void action() {
 		try {
@@ -195,12 +206,21 @@ public class InformerBehaviour extends Behaviour {
 	 * 
 	 * @see jade.core.behaviours.Behaviour#done()
 	 */
+	/**
+	 * Returns true when the behavior is done
+	 * @return
+	 */
 	@Override
 	public boolean done() {
 		// TODO Auto-generated method stub
 		return _isCompleted;
 	}
 
+	/**
+	 * The subInformerbehavior let's the next subInformerbehavior know he has been completed
+	 * @param bs
+	 * @param subBehaviour
+	 */
 	public void callbackSubInformerBehaviour(BehaviourStatus bs,
 			SubInformerBehaviour subBehaviour) {
 		if (bs == BehaviourStatus.COMPLETED) {

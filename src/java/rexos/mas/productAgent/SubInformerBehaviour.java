@@ -11,9 +11,7 @@ import rexos.mas.data.BehaviourStatus;
 
 public class SubInformerBehaviour extends ReceiveBehaviour {
 
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 1L;
 
 	private AID _targetEquiplet;
@@ -26,6 +24,13 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 
 	private int _currentState = 0;
 
+	/**
+	 * Constructs SubInformerbehavior
+	 * @param myAgent
+	 * @param parentBehaviour
+	 * @param productionStep
+	 * @param targetEquiplet
+	 */
 	public SubInformerBehaviour(Agent myAgent,
 			InformerBehaviour parentBehaviour, ProductionStep productionStep,
 			AID targetEquiplet) {
@@ -47,6 +52,9 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 				.getConversationIdForEquiplet(_targetEquiplet);
 	}
 
+	/**
+	 * Starts the sub informer behavior
+	 */
 	@Override
 	public void onStart() {
 		super.onStart();
@@ -62,6 +70,10 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 		}
 	}
 
+	/**
+	 * Handles the messages which the behavior receives
+	 * @param message
+	 */
 	@Override
 	public void handle(ACLMessage message) {
 		try {
@@ -111,14 +123,26 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 		}
 	}
 
+	/**
+	 * Get time slot duration
+	 * @return
+	 */
 	public long getTimeslotDuration() {
 		return _timeslotDuration;
 	}
 
+	/**
+	 * Gets the target AID of the equiplet which needs to perform the current production step
+	 * @return
+	 */
 	public AID getTargetEquiplet() {
 		return _targetEquiplet;
 	}
 
+	/**
+	 * Gets the unique production step ID
+	 * @return
+	 */
 	public int getProductionStepId() {
 		return _productionStep.getId();
 	}

@@ -70,11 +70,19 @@ public class PlannerBehaviour extends Behaviour {
 	private boolean _isError = false;
 	private boolean _isCompleted = false;
 
+	/**
+	 * Constructs the planne behavior
+	 * @param myAgent
+	 * @param bc
+	 */
 	public PlannerBehaviour(Agent myAgent, BehaviourCallback bc) {
 		super(myAgent);
 		this._bc = bc;
 	}
 
+	/**
+	 * Starts the planning
+	 */
 	@Override
 	public void onStart() {
 		try {
@@ -123,6 +131,9 @@ public class PlannerBehaviour extends Behaviour {
 		}
 	}
 
+	/**
+	 * Constructs the status of the planner behavior
+	 */
 	@Override
 	public void action() {
 		try {
@@ -148,6 +159,10 @@ public class PlannerBehaviour extends Behaviour {
 		_isCompleted = false;
 	}
 
+	/**
+	 * returns true when the behavior is done
+	 * @return
+	 */
 	@Override
 	public boolean done() {
 		return this._isCompleted;

@@ -33,6 +33,7 @@ public class HeartBeatBehaviour extends WakerBehaviour {
 	
 	
 	/**
+	 * Start HeartBeat over a given period for a specific Agent
 	 * @param a
 	 * @param period
 	 */
@@ -43,10 +44,13 @@ public class HeartBeatBehaviour extends WakerBehaviour {
 	}
 
 	/**
-	 * 
+	 * Serialized
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * When heartbeat is still active
+	 */
 	@Override
 	protected void onWake() {
 		try{
@@ -74,12 +78,18 @@ public class HeartBeatBehaviour extends WakerBehaviour {
 	 *  (non-Javadoc)
 	 * @see Report Heartbeat Acknowledge
 	 */
+	/**
+	 * Report that the heartbeat is acknowledged
+	 */
 	public void reportHeartBeatAck() {
 		this.reset(TimeUnit.SECONDS.toMillis(HEARTBEAT_INTERVAL));
 		ackReceived = true;
 		heartbeatSent = false;
 	}
 	
+	/**
+	 * Starts the heartbeat
+	 */
 	public void startHeartbeating() {
 		_hr.initHeartbeat();
 		heartbeatSent = true;
@@ -87,6 +97,9 @@ public class HeartBeatBehaviour extends WakerBehaviour {
 		this.reset(TimeUnit.SECONDS.toMillis(HEARTBEART_TIMEOUT_INTERVAL));
 	}
 	
+	/**
+	 * Stops the heartbeat
+	 */
 	public void stopHeartbeating() {
 		this.stop();
 	}

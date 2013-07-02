@@ -19,7 +19,13 @@ package rexos.mas.productAgent;
  */
 public interface HeartbeatReceiver {
 	
+	/**
+	 * Initialize heartbeat
+	 */
 	public void initHeartbeat();
 	
+	/**
+	 * Defines what to do when the heartbeat times out
+	 */
 	public void heartbeatTimeout();
 }

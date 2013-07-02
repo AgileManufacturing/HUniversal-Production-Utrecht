@@ -76,10 +76,16 @@ public class ProductAgent extends Agent {
 	private ProductAgentProperties _properties;
 	private AgentStatus _status;
 
+	/**
+	 * Constructs the product agent
+	 */
 	public ProductAgent() {
 		_status = AgentStatus.STARTING;
 	}
 
+	/**
+	 * Sets up the product agent
+	 */
 	@Override
 	protected void setup() {
 		try {
@@ -95,6 +101,9 @@ public class ProductAgent extends Agent {
 		}
 	}
 
+	/**
+	 * Loads the arguments passed to the product agent
+	 */
 	private void loadArguments() {
 		// Get the arguments passed to the ProductAgent
 		Object[] args = this.getArguments();
@@ -163,6 +172,10 @@ public class ProductAgent extends Agent {
 	 * Generates an unique conversation id based on the agents localname, the
 	 * objects hashcode and the current time.
 	 */
+	/**
+	 * Generate an communication ID
+	 * @return
+	 */
 	public String generateCID() {
 		if (_convIDBase == null) {
 			_convIDBase = getLocalName() + hashCode()
@@ -171,34 +184,69 @@ public class ProductAgent extends Agent {
 		return _convIDBase + (_convIDCnt++);
 	}
 
+	/**
+	 * Reschedule productionstep
+	 */
+	/**
+	 * Get properties of the product agent
+	 * @return
+	 */
 	public ProductAgentProperties getProperties() {
 		return this._properties;
 	}
 
+	/**
+	 * Sets the product agent properties
+	 * @param properties
+	 */
 	public void setProperties(ProductAgentProperties properties) {
 		this._properties = properties;
 	}
 
+	/**
+	 * Gets the callback response of a behavior
+	 * @return
+	 */
 	public Callback getCallback() {
 		return this._properties.getCallback();
 	}
 
+	/**
+	 * Sets the callback of a behavior
+	 * @param callback
+	 */
 	public void setCallback(Callback callback) {
 		this._properties.setCallback(callback);
 	}
 
+	/**
+	 * Get the product
+	 * @return
+	 */
 	public Product getProduct() {
 		return this._properties.getProduct();
 	}
 
+	/**
+	 * Set the product
+	 * @param product
+	 */
 	public void setProduct(Product product) {
 		this._properties.setProduct(product);
 	}
 	
+	/**
+	 * Get agent status
+	 * @return
+	 */
 	public AgentStatus getStatus(){
 		return this._status;
 	}
 	
+	/**
+	 * Set the staus of the agent
+	 * @param status
+	 */
 	public void setStatus(AgentStatus status) {
 		this._status = status;
 	}
