@@ -1,5 +1,5 @@
 /**
- * @file SocketBehaviour.java
+ * @file rexos/mas/productAgent/SocketBehaviour.java
  * @brief Behaviour in which the product agent connects to the socket server to
  *        communicate with the web interface.
  * @date Created: 17-04-2013

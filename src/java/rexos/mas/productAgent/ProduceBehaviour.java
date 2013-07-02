@@ -1,5 +1,5 @@
 /**
- * @file ProduceBehaviour.java
+ * @file rexos/mas/productAgent/ProduceBehaviour.java
  * @brief Behaviour in which the product agent remains during de execution of a
  *        step.
  * @date Created: 16-04-2013

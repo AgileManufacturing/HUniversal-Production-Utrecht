@@ -1,5 +1,5 @@
 /**
- * @file GatewayAgent.java
+ * @file rexos/mas/gatewayAgent/GateWayAgent.java
  * @brief
  * @date Created: 02-04-2013
  * 

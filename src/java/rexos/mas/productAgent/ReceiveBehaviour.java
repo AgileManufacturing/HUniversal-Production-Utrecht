@@ -1,5 +1,5 @@
 /**
- * @file ReceiveBehaviour.java
+ * @file rexos/mas/productAgent/ReceiveBehaviour.java
  * @brief class based on the ReceiverBehaviour. instead of polling .done(), this
  *        class will return when either the timeout fires or a msg is received.
  * @date Created: 23-04-2013

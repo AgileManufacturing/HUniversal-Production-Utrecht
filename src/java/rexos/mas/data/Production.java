@@ -1,5 +1,5 @@
 /**
- * @file Production.java
+ * @file rexos/mas/data/Production.java
  * @brief Class where all the data relevant to the production object will be
  *        saved.
  * @date Created: 02-04-2013

@@ -1,5 +1,5 @@
 /**
- * @file OplogCallbackThread.java
+ * @file rexos/libraries/blackboard_client/OplogCallbackThread.java
  * @brief Asynchronously handles callbacks.
  * @date Created: 28 jun. 2013
  *

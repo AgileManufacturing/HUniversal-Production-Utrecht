@@ -1,5 +1,5 @@
 /**
- * @file ProductLog.java
+ * @file rexos/mas/data/ProductLog.java
  * @brief Class for logging productiondata
  * @date Created: 02-04-2013
  * 

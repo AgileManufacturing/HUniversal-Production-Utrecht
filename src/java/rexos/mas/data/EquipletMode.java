@@ -1,5 +1,5 @@
 /**
- * @file EquipletMode.java
+ * @file rexos/mas/data/EquipletMode.java
  * @brief
  * @date Created: 24 jun. 2013
  * 

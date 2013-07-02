@@ -1,5 +1,5 @@
 /**
- * @file EquipletState.java
+ * @file rexos/mas/data/EquipletState.java
  * @brief 
  * @date Created: 24 jun. 2013
  *
