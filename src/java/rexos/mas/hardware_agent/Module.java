@@ -78,7 +78,8 @@ public abstract class Module {
 	 * @var HashMap<Integer, Object> configuration
 	 *      The configuration of the module.
 	 */
-	private HashMap<Integer, Object> configuration;
+	@SuppressWarnings("rawtypes")
+	private HashMap<Integer, HashMap> configuration;
 
 	public Module() {
 	}
@@ -163,7 +164,8 @@ public abstract class Module {
 	 * 
 	 * @return the configuration
 	 */
-	public HashMap<Integer, Object> getConfiguration() {
+	@SuppressWarnings("rawtypes")
+	public HashMap<Integer, HashMap> getConfiguration() {
 		return configuration;
 	}
 
@@ -172,7 +174,8 @@ public abstract class Module {
 	 * 
 	 * @param configuration the configuration to set it to
 	 */
-	public void setConfiguration(HashMap<Integer, Object> configuration) {
+	@SuppressWarnings("rawtypes")
+	public void setConfiguration(HashMap<Integer, HashMap> configuration) {
 		this.configuration = configuration;
 	}
 

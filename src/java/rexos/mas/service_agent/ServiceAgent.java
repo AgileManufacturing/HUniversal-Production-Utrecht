@@ -396,19 +396,22 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 													.append("statusData", new BasicDBObject("log",
 															buildLog(productStepId)))));
 									break;
-								case IN_PROGRESS:
 								case SUSPENDED_OR_WARNING:
 								case FAILED:
+									productStepBBClient.updateDocuments(
+											new BasicDBObject("_id", productStepId),
+											new BasicDBObject("$set", new BasicDBObject("statusData",
+													new BasicDBObject("reason", "Service step status set to "
+															+ status.name()).append("log", buildLog(productStepId)))));
+									//$FALL-THROUGH$
+								case IN_PROGRESS:
 									Logger.log("Service agent - serv.Step %s status set to %s%n", serviceStep.getId(),
 											status);
 									Logger.log("Service agent - setting status of prod.Step %s to %s%n", productStepId,
 											status);
 									productStepBBClient.updateDocuments(
 											new BasicDBObject("_id", productStepId),
-											new BasicDBObject("$set", new BasicDBObject("status", status.name())
-													.append("statusData", new BasicDBObject("reason",
-															"Service step status set to " + status.name()).append(
-															"log", buildLog(productStepId)))));
+											new BasicDBObject("$set", new BasicDBObject("status", status.name())));
 									break;
 								default:
 									break;
@@ -554,7 +557,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	public AID getHardwareAgentAID() {
 		return hardwareAgentAID;
 	}
-	
+
 	public ServiceFactory getServiceFactory() {
 		return serviceFactory;
 	}
