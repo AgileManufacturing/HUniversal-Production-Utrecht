@@ -14,6 +14,8 @@ LIBRARIES rexos_blackboard_cpp_client
 CATKIN_DEPENDS rexos_utilities
 DEPENDS Boost Mongo)
 
+SET ( CMAKE_CXX_FLAGS "-std=c++0x" )
+
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${MONGO_INCLUDE_DIRS})
 add_library(rexos_blackboard_cpp_client ${sources})

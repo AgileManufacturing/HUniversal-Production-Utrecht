@@ -43,21 +43,25 @@
   
   <build_depend>roscpp</build_depend>
   <build_depend>std_msgs</build_depend>
-  <build_depend>rexos_mast</build_depend>
+  <build_depend>rexos_most</build_depend>
+  <build_depend>rexos_statemachine</build_depend>
   <build_depend>lookup_handler</build_depend>
   <build_depend>rexos_std_msgs</build_depend>
   <build_depend>rexos_std_srvs</build_depend>
   <build_depend>rexos_blackboard_cpp_client</build_depend>
   <build_depend>libjson</build_depend>
+  <build_depend>rexos_datatypes</build_depend>
   <build_depend>environment_communication_msgs</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>std_msgs</run_depend>
-  <run_depend>rexos_mast</run_depend>
+  <run_depend>rexos_most</run_depend>
+  <run_depend>rexos_statemachine</run_depend>
   <run_depend>lookup_handler</run_depend>
   <run_depend>rexos_std_msgs</run_depend>
   <run_depend>rexos_std_srvs</run_depend>
   <run_depend>rexos_blackboard_cpp_client</run_depend>
+  <run_depend>rexos_datatypes</run_depend>
   <run_depend>libjson</run_depend>
   <run_depend>environment_communication_msgs</run_depend>
 

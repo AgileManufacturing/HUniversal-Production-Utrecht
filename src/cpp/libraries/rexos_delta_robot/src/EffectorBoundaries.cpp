@@ -78,6 +78,11 @@ namespace rexos_delta_robot{
 	 * @return true if a straight path from parameter 'from' to parameter 'to' is valid.
 	 **/
     bool EffectorBoundaries::checkPath(const rexos_datatypes::Point3D<double>& from, const rexos_datatypes::Point3D<double>& to) const{
+
+    	std::cout << "fromx: " << from.x << " fromy: " << from.y << " fromz: " << from.z << std::endl;
+		std::cout << "tox: " << to.x << " toy: " << to.y << " toz: " << to.z << std::endl;
+
+
     	double x_length = to.x - from.x;
     	double y_length = to.y - from.y;
     	double z_length = to.z - from.z;

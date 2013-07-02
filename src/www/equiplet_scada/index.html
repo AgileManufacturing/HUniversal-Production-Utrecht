@@ -1,0 +1,205 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="script/style.css">
+<title>SCADA Equiplet (...)</title>
+<script type="text/javascript" src="script/jquery.js"></script>
+<script type="text/javascript">
+	var equipletInfo = {};
+	var moduleInfo = {};
+	
+	//Enable the equiplet mode buttons
+	$(document).ready(
+			function() {
+				$("#equiplet_e_stop").click(
+						function() {
+						$.ajax({
+							url : 'remote/changeEquipletMode',
+							data : { mode : 'e_stop'}
+							});
+							return false;
+						});
+			});
+	$(document).ready(
+			function() {
+				$("#equiplet_service").click(
+						function() {
+						$.ajax({
+							url : 'remote/changeEquipletMode',
+							data : { mode : 'service'}
+							});
+							return false;
+						});
+			});
+	$(document).ready(
+			function() {
+				$("#equiplet_lock").click(
+						function() {
+						$.ajax({
+							url : 'remote/changeEquipletMode',
+							data : { mode : 'lock'}
+							});
+							return false;
+						});
+			});
+	$(document).ready(
+			function() {
+				$("#equiplet_normal").click(
+						function() {
+						$.ajax({
+							url : 'remote/changeEquipletMode',
+							data : { mode : 'normal'}
+							});
+							return false;
+						});
+			});
+	
+	$(document).ready(
+			function() {
+				$("#equiplet_safe").click(
+						function() {
+						$.ajax({
+							url : 'remote/changeEquipletState',
+							data : { state : 'safe'}
+							});
+							return false;
+						});
+			});
+	
+	$(document).ready(
+			function() {
+				$("#equiplet_standby").click(
+						function() {
+						$.ajax({
+							url : 'remote/changeEquipletState',
+							data : { state : 'standby'}
+							});
+							return false;
+						});
+			});
+
+	//Start equipletInfo pollig
+	$(document).ready(
+			function() {
+				(function worker() {
+					$.ajax({
+						dataType : "json",
+						url : 'remote/equipletInfo',
+						success : function(data) {
+							equipletInfo = data;
+							document.title = "SCADA Equiplet (" + equipletInfo["name"]
+									+ ")";
+							$(".equiplet_name").text(equipletInfo["name"]);
+							$(".equiplet_state").text(equipletInfo["state"]);
+							$(".equiplet_mode").text(equipletInfo["mode"]);
+						},
+						complete : function() {
+							setTimeout(worker, 5000);
+						}
+					});
+				})();
+			});
+			
+	//Start moduleInfo polling
+	$(document).ready(
+			function() {
+				(function worker() {
+					$.ajax({
+						dataType : "json",
+						url : 'remote/moduleInfo',
+						success : function(data) {
+							moduleInfo = data;
+							
+							var modules = moduleInfo["modules"];
+							$("#content").empty();
+							$.each(modules, function(i, value) {
+								var module = $("#moduleinfotemplate").clone();
+								module.removeClass("hidden");
+								module.addClass("moduleinfo");
+								$(".module_name", module).text(value["name"]);
+								$(".module_id", module).text(value["id"]);
+								$(".module_form_id", module).val(value["id"]);
+								$(".module_state", module).text(value["state"]);
+								$(".module_mode", module).text(value["mode"]);
+								
+								$(".modulechangemode_normal", module).click(
+										function() {
+											form = $(this).closest('form');
+											req_id = $('.module_form_id', form).val();
+											
+											$.ajax({
+												url: "remote/changeModuleMode",
+												data: {id: req_id, mode: 'normal'}
+											});
+											return false;
+										});
+								$(".modulechangemode_error", module).click(
+										function() {
+											form = $(this).closest('form');
+											req_id = $('.module_form_id', form).val();
+											
+											$.ajax({
+												url: "remote/changeModuleMode",
+												data: {id: req_id, mode: 'error'}
+											});
+
+											$.ajax({
+												url: "remote/changeModuleMode",
+												data: {id: req_id, mode: 'critical_error'}
+											});
+											return false;
+										});
+								
+								module.appendTo('#content');
+							});
+						},
+						complete : function() {
+							setTimeout(worker, 5000);
+						}
+					});
+				})();
+			});
+</script>
+</head>
+<body>
+    <div id="moduleinfotemplate" class="hidden">
+		<h3><span class="module_name">...</span></h3>
+		<div>id: <span class="module_id">...</span></div>
+		<div>state: <span class="module_state">...</span></div>
+		<div>mode: <span class="module_mode">...</span></div>
+		<form>
+			<input type="hidden" name="id" class="module_form_id" />
+			<input type="submit" value="Normal" class="modulechangemode_normal"/>
+			<input type="submit" value="Error" class="modulechangemode_error"/>
+		</form>
+	</div>
+	<div id="container">
+		<div id="header" class="border">
+			<div style="font-size:200%">
+				SCADA Equiplet <span class="equiplet_name">...</span> (<span
+					class="equiplet_id">...</span>)
+			</div>
+			<table>
+				<tr>
+					<td>State: </td>
+					<td><span class="equiplet_state">...</span></td>
+					<td><input type="button" value="Safe" id="equiplet_safe"/></td>
+					<td><input type="button" value="Standby" id="equiplet_standby"/></td>
+				</tr>
+				<tr>
+					<td>Mode: </td>
+					<td><span class="equiplet_mode">...</span></td>
+					<td><input type="button" value="Normal" id="equiplet_normal"/></td>
+					<td><input type="button" value="Emergency Stop" id="equiplet_e_stop"/></td>
+					<td><input type="button" value="Service" id="equiplet_service"/></td>
+					<td><input type="button" value="Lock" id="equiplet_lock"/></td>
+				</tr>
+			</table>
+		</div>
+		<div id="content" class="border">Content</div>
+		<div id="sidebar" class="border hidden">
+			<h3>Services</h3>
+		</div>
+		<div id="footer" class="border"></div>
+	</div>
+</body>
+</html>

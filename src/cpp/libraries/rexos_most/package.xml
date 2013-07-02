@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package>
+  <name>rexos_most</name>
+  <version>0.0.0</version>
+  <description>The rexos_most package</description>
+  <maintainer email="daniel.telgen@hu.nl">Daniël Telgen</maintainer>
+  <license>newBSD</license>
+  <url type="website">https://github.com/AgileManufacturing/HUniversal-Production-Utrecht</url>
+  <author email="jorisvergeer1992@gmail.com">Joris Vergeer</author>
+  <author email="boot.gerben@gmail.com">Gerben Boot</author>
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <build_depend>std_msgs</build_depend>
+  <run_depend>std_msgs</run_depend>
+  
+  <build_depend>roscpp</build_depend>
+  <run_depend>roscpp</run_depend>
+  
+  <build_depend>rexos_statemachine</build_depend>
+  <run_depend>rexos_statemachine</run_depend>
+  
+  <export>
+    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lrexos_most"/>
+  </export>
+</package>

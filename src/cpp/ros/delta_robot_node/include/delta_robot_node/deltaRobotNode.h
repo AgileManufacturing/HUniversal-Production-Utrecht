@@ -39,13 +39,18 @@
 #include <rexos_motor/StepperMotor.h>
 #include <delta_robot_node/Services.h>
 #include <delta_robot_node/Point.h>
-#include <rexos_mast/StateMachine.h>
+#include <rexos_statemachine/ModuleStateMachine.h>
+#include <rexos_statemachine/Transitions.h>
 #include "delta_robot_node/MoveToPoint.h"
 #include "delta_robot_node/MovePath.h"
 #include "delta_robot_node/MoveToRelativePoint.h"
 #include "delta_robot_node/MoveRelativePath.h"
 #include "delta_robot_node/Motion.h"
 #include "delta_robot_node/Calibrate.h"
+#include "equiplet_node/RegisterModule.h"
+
+#include <actionlib/server/simple_action_server.h>
+#include <rexos_statemachine/SetInstructionAction.h>
 
 // GCC system header to suppress libjson warnings
 #pragma GCC system_header
@@ -54,18 +59,21 @@
 
 
 namespace deltaRobotNodeNamespace{
+
+	typedef actionlib::SimpleActionServer<rexos_statemachine::SetInstructionAction> SetInstructionActionServer;
+
 	/**
-	 * the DeltaRobotNode which is a StateMachine
+	 * the DeltaRobotNode which is a ModuleStateMachine
 	 **/
-	class DeltaRobotNode : public rexos_mast::StateMachine{
+	class DeltaRobotNode : public rexos_statemachine::ModuleStateMachine{
 	public:
 		DeltaRobotNode(int equipletID, int moduleID);
 		virtual ~DeltaRobotNode();
 		
-		int transitionSetup();
-		int transitionShutdown();
-		int transitionStart();
-		int transitionStop();
+		virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
+		virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
+		virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
+		virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
 			
 		// Main functions to be called from the services
 		bool calibrate();
@@ -86,10 +94,21 @@ namespace deltaRobotNodeNamespace{
 		bool moveToRelativePoint_json(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res);
 		bool moveRelativePath_json(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res);
 
-		Point parsePoint(std::string json);
+		Point parsePoint(const JSONNode & n);
 		Point *parsePointArray(std::string json, int & size);
 
+		void onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal);
+
 	private:
+		float lastX;
+		float lastY;
+		float lastZ;
+		/**
+		 * @var ros::NodeHandle node
+		 * The nodeHandle used by ros services and topics
+		 **/
+		ros::NodeHandle nodeHandle;
+		SetInstructionActionServer setInstructionActionServer;
 		/**
 		 * @var DeltaRobot::DeltaRobot * deltaRobot
 		 * the deltaRobot
@@ -162,6 +181,9 @@ namespace deltaRobotNodeNamespace{
 		 * Service for receiving calibrate commands
 		 **/
 		ros::ServiceServer calibrateService_json;
+
+		void startServices();
+		void stopServices();
 	};
 }
 #endif
