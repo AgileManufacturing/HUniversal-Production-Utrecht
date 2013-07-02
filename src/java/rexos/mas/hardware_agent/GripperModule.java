@@ -181,31 +181,31 @@ public class GripperModule extends Module {
 
 	/**
 	 * Function to find the movementModule of this module in the configuration HashMap.
-	 * @param hashMap A hashMap with the configuration of the module.
+	 * @param configuration A hashMap with the configuration of the module.
 	 * @return The int id of the movementModule.
 	 */
-	private int findMovementModule(HashMap<Integer, Object> hashMap) {
+	@SuppressWarnings({
+			"rawtypes", "cast"
+	})
+	private int findMovementModule(HashMap<Integer, HashMap> configuration) {
 		//check if the id is in this layer, return there is no movementModule(-1).
-		if (hashMap.containsKey(getId())) {
+		if (configuration.containsKey(getId())) {
 			return -1;
 		}
 		
-		for (int key : hashMap.keySet()) {
-			try {
-				//check each value of the HashMap to see if it is a HashMap
-				HashMap<Integer, Object> tempHashMap = (HashMap<Integer, Object>) hashMap.get(key);
-				//check if the new HashMap contains the key of 
-				//this module then return the key of the HashMap(this is the movementModule).
-				if (tempHashMap.containsKey(getId())) {
-					return key;
-				}
-				//if the key isn't found search recursive in the next HashMap.
-				int tempId = findMovementModule(tempHashMap);
-				//if the next HashMap has found the module return it
-				if (tempId != -1) {
-					return tempId;
-				}
-			} catch (ClassCastException e) {/* its no HashMap so do nothing */
+		for (int key : configuration.keySet()) {
+			//check each value of the HashMap to see if it is a HashMap
+			HashMap<Integer, HashMap> subConfiguration = (HashMap<Integer, HashMap>) configuration.get(key);
+			//check if the new HashMap contains the key of 
+			//this module then return the key of the HashMap(this is the movementModule).
+			if (subConfiguration.containsKey(getId())) {
+				return key;
+			}
+			//if the key isn't found search recursive in the next HashMap.
+			int tempId = findMovementModule(subConfiguration);
+			//if the next HashMap has found the module return it
+			if (tempId != -1) {
+				return tempId;
 			}
 		}
 		return -1;

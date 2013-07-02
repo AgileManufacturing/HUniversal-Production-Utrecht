@@ -145,7 +145,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	 *      The configuration of this
 	 *      agent.
 	 */
-	private HashMap<Integer, Object> configuration;
+	private HashMap<Integer, HashMap> configuration;
 
 	private FieldUpdateSubscription stepStatusSubscription;
 	
@@ -177,6 +177,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	/**
 	 * @see Agent#setup()
 	 */
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void setup() {
 		Logger.log("Hardware agent " + this + " reporting.");
@@ -198,7 +199,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		HashMap<Integer, Object> deltaRobotConfiguration = new HashMap<Integer, Object>();
 		deltaRobotConfiguration.put(2, null);
 		deltaRobotConfiguration.put(3, null);
-		configuration = new HashMap<Integer, Object>();
+		configuration = new HashMap<Integer, HashMap>();
 		configuration.put(1, deltaRobotConfiguration);
 		
 		behaviours = new ArrayList<Behaviour>();
@@ -497,7 +498,8 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	 * 
 	 * @return configuration
 	 */
-	public HashMap<Integer, Object> getConfiguration() {
+	@SuppressWarnings("rawtypes")
+	public HashMap<Integer, HashMap> getConfiguration() {
 		return configuration;
 	}
 }

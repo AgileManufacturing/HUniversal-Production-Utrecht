@@ -160,28 +160,28 @@ public class PenModule extends Module {
 	 * @param hashMap A hashMap with the configuration of the module.
 	 * @return The int id of the movementModule.
 	 */
-	private int findMovementModule(HashMap<Integer, Object> hashMap) {
+	@SuppressWarnings({
+			"cast", "rawtypes"
+	})
+	private int findMovementModule(HashMap<Integer, HashMap> hashMap) {
 		// check if the id is in this layer, return there is no movementModule(-1).
 		if(hashMap.containsKey(getId())) {
 			return -1;
 		}
 
 		for(int key : hashMap.keySet()) {
-			try {
-				// check each value of the HashMap to see if it is a HashMap
-				HashMap<Integer, Object> tempHashMap = (HashMap<Integer, Object>) hashMap.get(key);
-				// check if the new HashMap contains the key of
-				// this module then return the key of the HashMap(this is the movementModule).
-				if(tempHashMap.containsKey(getId())) {
-					return key;
-				}
-				// if the key isn't found search recursive in the next HashMap.
-				int tempId = findMovementModule(tempHashMap);
-				// if the next HashMap has found the module return it
-				if(tempId != -1) {
-					return tempId;
-				}
-			} catch(ClassCastException e) {/* its no HashMap so do nothing */
+			// check each value of the HashMap to see if it is a HashMap
+			HashMap<Integer, HashMap> tempHashMap = (HashMap<Integer, HashMap>) hashMap.get(key);
+			// check if the new HashMap contains the key of
+			// this module then return the key of the HashMap(this is the movementModule).
+			if(tempHashMap.containsKey(getId())) {
+				return key;
+			}
+			// if the key isn't found search recursive in the next HashMap.
+			int tempId = findMovementModule(tempHashMap);
+			// if the next HashMap has found the module return it
+			if(tempId != -1) {
+				return tempId;
 			}
 		}
 		return -1;
