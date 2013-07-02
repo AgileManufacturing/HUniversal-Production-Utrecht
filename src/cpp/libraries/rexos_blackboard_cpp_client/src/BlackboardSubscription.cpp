@@ -1,7 +1,7 @@
 /**
- * @file BlackboardSubscriber.h
- * @brief Interface providing callback functions for the blackboard client.
- * @date Created: 2012-11-19
+ * @file BlackboardSubscription.cpp
+ * @brief Abstract base class defining the basic structure a blackboard subscription should adhere to.
+ * @date Created: 3 jun. 2013
  *
  * @author Jan-Willem Willebrands
  *
@@ -28,31 +28,18 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef BLACKBOARD_SUBSCRIBER_H_
-#define BLACKBOARD_SUBSCRIBER_H_
+#include "rexos_blackboard_cpp_client/BlackboardSubscription.h"
 
-namespace Blackboard
+namespace Blackboard {
+
+BlackboardSubscriber& BlackboardSubscription::getSubscriber() const
 {
-class BlackboardSubscription;
-class OplogEntry;
-
-/**
- * Interface providing callback functions for the blackboard client.
- **/
-class BlackboardSubscriber {
-public:
-	/**
-	 * This callback is invoked whenever an oplog entry is parsed matching a subscription.
-	 * @param subscription Reference to the BlackboardSubscription for which this callback was invoked.
-	 * @param oplogEntry Reference to the OplogEntry containing all information about the event.
-	 */
-	virtual void onMessage(BlackboardSubscription & subscription, const OplogEntry & oplogEntry) = 0;
-
-	/**
-	 * Virtual destructor to make sure child classes will be able to clean up.
-	 */
-	virtual ~BlackboardSubscriber(){}
-};
-
+	return subscriber;
 }
-#endif
+
+BlackboardSubscription::BlackboardSubscription(BlackboardSubscriber & subscriber) :
+		subscriber(subscriber)
+{
+}
+
+} /* namespace Blackboard */

@@ -1,7 +1,7 @@
 /**
- * @file BlackboardSubscriber.h
- * @brief Interface providing callback functions for the blackboard client.
- * @date Created: 2012-11-19
+ * @file BasicOperationSubscription.h
+ * @brief Subscription for one of the basic Mongo CRUD operations.
+ * @date Created: 3 jun. 2013
  *
  * @author Jan-Willem Willebrands
  *
@@ -28,31 +28,44 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef BLACKBOARD_SUBSCRIBER_H_
-#define BLACKBOARD_SUBSCRIBER_H_
+#ifndef BASICOPERATIONSUBSCRIPTION_H_
+#define BASICOPERATIONSUBSCRIPTION_H_
 
-namespace Blackboard
-{
-class BlackboardSubscription;
-class OplogEntry;
+#include "rexos_blackboard_cpp_client/BlackboardSubscription.h"
+#include "rexos_blackboard_cpp_client/MongoOperation.h"
+
+namespace Blackboard {
 
 /**
- * Interface providing callback functions for the blackboard client.
- **/
-class BlackboardSubscriber {
+ * Subscription for one of the basic Mongo CRUD operations.
+ */
+class BasicOperationSubscription : public BlackboardSubscription {
 public:
 	/**
-	 * This callback is invoked whenever an oplog entry is parsed matching a subscription.
-	 * @param subscription Reference to the BlackboardSubscription for which this callback was invoked.
-	 * @param oplogEntry Reference to the OplogEntry containing all information about the event.
+	 * Constructs a subscriptions for the specified operation and subscriber.
+	 *
+	 * @param operation The operation to respond to.
+	 * @param subscriber The BlackboardSubscriber that should receive a callback when an event occurs.
 	 */
-	virtual void onMessage(BlackboardSubscription & subscription, const OplogEntry & oplogEntry) = 0;
+	BasicOperationSubscription(MongoOperation operation, BlackboardSubscriber & subscriber);
 
 	/**
-	 * Virtual destructor to make sure child classes will be able to clean up.
+	 * @see BlackboardSubscription::getQuery(mongo::Query *)
 	 */
-	virtual ~BlackboardSubscriber(){}
+	bool getQuery(mongo::Query * query_out) const;
+
+	/**
+	 * @see BlackboardSubscription::matchesWithEntry(const OplogEntry&)
+	 */
+	bool matchesWithEntry(const OplogEntry& entry) const;
+
+private:
+	/**
+	 * @var MongoOperation operation
+	 * The operation to respond to.
+	 */
+	MongoOperation operation;
 };
 
-}
-#endif
+} /* namespace Blackboard */
+#endif /* BASICOPERATIONSUBSCRIPTION_H_ */
