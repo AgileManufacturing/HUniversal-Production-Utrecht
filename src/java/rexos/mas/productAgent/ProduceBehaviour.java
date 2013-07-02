@@ -142,7 +142,7 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 				case "StatusUpdate":
 					ProductStep step = new ProductStep(
 							(BasicDBObject) m.getContentObject());
-					prodStep.setStatus(step.getStatus());
+					//prodStep.setStatus(step.getStatus());
 					switch (step.getStatus()) {
 					case WAITING:
 						// Waiting
