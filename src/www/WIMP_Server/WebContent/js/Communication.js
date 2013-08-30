@@ -20,8 +20,7 @@ function Communication() {
 		}
 	};
 	
-	
-	self.ProductionStep = function(obj) {
+	/* self.ProductionStep = function(obj) {
 		//this.step = null;
 		//this.colorCode = null;
 		//this.shapeCode = null;
@@ -63,9 +62,9 @@ function Communication() {
                 }
             }};
 		
-	};
+	}; */
     
-    /*
+    
      //demo product step
     self.ProductionStep = function(obj) {//TODO: revert back to original design for production steps (see above)
         //this.step = null;
@@ -85,6 +84,7 @@ function Communication() {
                 "y": obj.y
             }
         };
+    };
         /* "parameterGroups": {
          "Shape": {
          "name": obj.shapeName,
