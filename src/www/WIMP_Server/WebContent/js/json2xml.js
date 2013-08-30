@@ -20,7 +20,7 @@ function json2xml(o, tab) {
                xml += " " + m.substr(1) + "=\"" + v[m].toString() + "\"";
             else
                hasChild = true;
-         }
+         } 
          xml += hasChild ? ">" : "/>";
          if (hasChild) {
             for (var m in v) {

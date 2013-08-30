@@ -18,4 +18,3 @@ Debug.log = function(msg, color) {
 
 	}
 };
-
