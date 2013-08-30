@@ -25,7 +25,7 @@ public class PAServer extends ServerSocket  implements Runnable{
 			ServerSocket welcomeSocket = null;
 
 			try {
-				welcomeSocket = new ServerSocket(9999);
+			welcomeSocket = new ServerSocket(9999);
 			}
 			catch (Exception e){
 				e.printStackTrace();

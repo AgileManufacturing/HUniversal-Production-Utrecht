@@ -3,11 +3,11 @@ var WS_IP = "145.89.191.131";
 var WS_SERVER_URL = "ws://"+WS_IP+":8080/WIMP_Server/ProductServlet";
 var WS_URL = "";//is set in init()
 
-var DEFAULT_PAGW_SERVER = "localhost";
-var DEFAULT_PAGW_PORT = 10081;
+var DEFAULT_PAGW_SERVER = "127.0.0.1";
+var DEFAULT_PAGW_PORT = 9999;
 
-var PAINTAPP_ROWS = 30;
-var PAINTAPP_COLUMNS = 30;
+var PAINTAPP_ROWS = 60;
+var PAINTAPP_COLUMNS = 60;
 
 
 
