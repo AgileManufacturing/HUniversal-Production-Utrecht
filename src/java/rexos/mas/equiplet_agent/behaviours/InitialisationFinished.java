@@ -118,7 +118,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 
 			try {
 				EquipletStateEntry equipletState = equipletAgent.getEquipletStateEntry();
-				if(equipletState.getEquipletState() != EquipletState.STANDBY && equipletState.getEquipletState() != EquipletState.NORMAL) {
+				if(equipletState != null && equipletState.getEquipletState() != EquipletState.STANDBY && equipletState.getEquipletState() != EquipletState.NORMAL) {
 					equipletAgent.setDesiredEquipletState(EquipletState.STANDBY);
 					equipletAgent.getStateBBClient().subscribe(stateUpdateSubscription);
 				} else {

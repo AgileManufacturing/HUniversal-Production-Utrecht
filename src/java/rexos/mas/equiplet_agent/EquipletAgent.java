@@ -508,6 +508,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 	public EquipletStateEntry getEquipletStateEntry() throws InvalidDBNamespaceException, GeneralMongoException {
 		List<DBObject> equipletStates = stateBBClient.findDocuments(new BasicDBObject("id", equipletId));
+		
+		if(equipletStates.size() == 0)
+			return null;
+		
 		return new EquipletStateEntry((BasicDBObject) equipletStates.get(0));
 	}
 
