@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html lang="en-US">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/> <!--320-->
+<script src="http://code.jquery.com/jquery-2.0.1.min.js"></script>
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+font-size:2em;
+padding:0;
+margin:5px;
+}
+
+table{
+border:0;
+border-collapse: collapse;
+}
+table tr:nth-child(even) {  
+  background-color: #FFF;
+}
+table tr:nth-child(odd) {  
+  background-color: #F6F4F0;
+}
+
+table tr:hover {  
+  background-color: #ccc;
+  cursor: hand; cursor: pointer;
+}
+
+table tr td{
+padding: 25px;
+padding-top: 3px;
+padding-bottom: 3px;
+}
+
+table tr th{
+padding: 25px;
+padding-top: 0px;
+padding-bottom: 0px;
+}
+
+table tr:nth-child(1) {
+background-color: #555;
+color: white;
+cursor: auto;
+}
+
+canvas{
+border: 1px solid black;
+}
+
+.progressCanvas {
+}
+
+
+table tr td{
+padding: 25px;
+padding-top: 1em;
+padding-bottom: 1em;
+}
+
+@media only screen and (max-width: 1000px) {
+  body{
+  	
+  }
+}
+
+</style>
+
+<script>
+productList = [
+               {"id":1, "name":"one", "status":"Completed", "started": "2013-03-01 10:30", "completed": "2013-03-01 10:30", "progress":100},
+               {"id":2, "name":"two", "status":"Completed", "started": "2013-03-01 10:30", "completed": "2013-03-01 10:30", "progress":100},
+               {"id":3, "name":"three", "status":"Processing", "started": "2013-03-01 10:30", "completed": "", "progress":89},
+               {"id":4, "name":"six", "status":"Waiting", "started": "", "completed": "", "progress":0}
+               ];
+
+
+function refresh(){
+	console.log('refresh')
+	var table=document.getElementById("productOverviewTable");
+	
+	for(var i = table.rows.length - 1; i > 0; i--)
+	{
+	    table.deleteRow(i);
+	}
+	
+	for(val in productList){
+		
+		var row=table.insertRow(-1);
+		row.id = "Row" + val;
+		
+		row.onclick=function(){
+		console.log(this.id); 
+		$("#testLabel").html( productList[this.id.replace("Row","")].name );
+		$(".pop").slideFadeToggle(function() { 
+            $("#email").focus();
+        });};
+		var cell1=row.insertCell(0);
+		cell1.innerHTML=productList[val].name;
+
+	}
+	
+}
+
+function setProgress(canvasID, percentage){
+	
+
+perc=percentage*2;
+var canvas = document.getElementById(canvasID);
+var x = canvas.width / 2;
+var y = canvas.height/4*3;
+
+
+if (canvas.getContext) {
+	var ctx = canvas.getContext("2d");
+	ctx.clearRect(0, 0, canvas.width, canvas.height)
+	ctx.fillStyle = "rgb(150,150,255)";
+	ctx.fillRect (0, 0, perc, canvas.height);
+	
+	ctx.fillStyle = "rgb(0,0,0)";
+	ctx.font=canvas.height*0.75 + "px Arial";
+	ctx.textAlign = 'center';
+	ctx.fillText(percentage + "%", x, y);
+	
+}
+}
+
+</script>
+</head>
+<body onload="refresh()">
+
+<div id="productListViewContainer" >
+<style>
+#refreshbutton {
+	cursor: hand; cursor: pointer;
+	float:right;
+	background-image:url('images/refresh.png');
+	background-repeat:no-repeat;
+	height: 37px;
+	width: 25px;
+}
+#refreshbutton:hover{
+background-image:url('images/refresh_hover.png');
+}
+
+#productOverviewTable{
+	width:100%;
+}
+</style>
+<div id="refreshbutton" onclick="refresh()">
+</div>
+
+<div style="margin-left:50%; position:absolute">
+<div class="messagepop pop" style="width:90%;">
+        <p id="testLabel"></p>
+        <p></p>
+        or <a class="close" href="/">Cancel</a></p>
+
+</div>
+</div>
+<table id="productOverviewTable" class="">
+<thead><tr>
+<th align="left">Product</th>
+</tr>
+</thead>
+<body>
+</tbody></table>
+
+<style>
+a.selected {
+  background-color:#1F75CC;
+  color:white;
+  z-index:100;
+}
+
+.messagepop {
+  background-color:#FFFFFF;
+  border:1px solid #999999;
+  cursor:default;
+  display:none;
+  position:relative;
+  margin-left:-50%;
+  text-align:left;
+  z-index:50;
+  padding: 25px 25px 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 3px;
+  padding-left: 15px;
+  text-indent: -15px;
+}
+
+.messagepop p, .messagepop.div {
+  border-bottom: 1px solid #EFEFEF;
+  padding-bottom: 8px;
+}
+</style>
+<script>
+function deselect() {
+    $(".pop").slideFadeToggle(function() { 
+        $("#contact").removeClass("selected");
+    });    
+}
+
+$(function() {
+    $("#contact").click(function() {
+        if($(this).hasClass("selected")) {
+            deselect();               
+        } else {
+            $(this).addClass("selected");
+            $(".pop").slideFadeToggle(function() { 
+                $("#email").focus();
+            });
+        }
+        return false;
+    });
+
+    $(".close").click( function() {
+        deselect();
+        return false;
+    });
+});
+
+$.fn.slideFadeToggle = function(easing, callback) {
+    return this.animate({ opacity: 'toggle', height: 'toggle' }, "fast", easing, callback);
+};
+</script>
+
+</div>
+</body>
+</html>

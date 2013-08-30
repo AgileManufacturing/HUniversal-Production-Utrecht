@@ -1,0 +1,107 @@
+
+
+
+table{
+border:0;
+border-collapse: collapse;
+}
+table tr:nth-child(even) {  
+  background-color: #FFF;
+}
+table tr:nth-child(odd) {  
+  background-color: #F6F4F0;
+}
+
+table tr:hover {  
+  background-color: #ccc;
+  cursor: hand; cursor: pointer;
+}
+
+table tr td{
+padding: 25px;
+padding-top: 3px;
+padding-bottom: 3px;
+}
+
+table tr th{
+padding: 25px;
+padding-top: 0px;
+padding-bottom: 0px;
+}
+
+table tr:nth-child(1) {
+background-color: #555;
+color: white;
+cursor: auto;
+}
+
+canvas{
+
+}
+
+.progressCanvas {
+	border: 1px solid black;
+}
+
+
+#refreshbutton {
+	cursor: hand; cursor: pointer;
+	float:right;
+	background-image:url('../images/refresh.png');
+	background-repeat:no-repeat;
+	height: 37px;
+	width: 25px;
+}
+#refreshbutton:hover{
+background-image:url('../images/refresh_hover.png');
+}
+
+#productOverviewTable{
+	width:100%;
+}
+
+#swirl {
+position: absolute;
+margin-left:50%;
+margin-top:50%;
+display:none;
+}
+#swirlImage {
+	background-image:url('images/animated_progress.gif');
+	background-repeat:no-repeat;
+	height: 48px;
+	width: 48px;
+	position: relative;
+	margin-left:-50%;
+	margin-top:-50%;
+}
+
+a.selected {
+  background-color:#1F75CC;
+  color:white;
+  z-index:100;
+}
+
+.messagepop {
+  background-color:#FFFFFF;
+  border:1px solid #999999;
+  cursor:default;
+  display:none;
+  margin-left:auto;
+  margin-right:auto;
+  /*text-align:left;*/
+  z-index:50;
+  padding: 25px 25px 20px;
+}
+
+.progressDiv label {
+  display: block;
+  margin-bottom: 3px;
+  padding-left: 15px;
+  text-indent: -15px;
+}
+
+.messagepop p, .messagepop.div {
+  border-bottom: 1px solid #EFEFEF;
+  padding-bottom: 8px;
+}

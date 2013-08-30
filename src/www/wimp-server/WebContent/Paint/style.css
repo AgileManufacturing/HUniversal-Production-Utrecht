@@ -1,0 +1,65 @@
+html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-o-user-select: none;
+}
+
+#spinner {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+}
+
+#topOffset {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	z-index: 2;
+}
+
+#drawingCanvas {
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+	border: 3px solid #000000;
+}
+
+#menuToggle {
+	top: 0;
+	position: absolute;
+	width: 5%;
+	height: 100%;
+}
+
+#menu {
+	top: 0;
+	position: absolute;
+	width: 30%;
+	left: -30%;
+	height: 100%;
+}
+
+.colorItem {
+	-moz-box-shadow: inset 0 0 10px #000000;
+	-webkit-box-shadow: inset 0 0 10px #000000;
+	box-shadow: inset 0 0 10px #000000;
+	width: 90%;
+	height: 20%;
+	/*margin-top: 2%;
+	 margin-left: 2%;
+	 margin-bottom: 2%;*/
+}
+
+#imageLoader {
+	width: 100%;
+	height: 100%;
+}
+
+#menuToggle {
+	background-repeat: no-repeat;
+	background-size: contain;
+}

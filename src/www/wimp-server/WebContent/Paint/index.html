@@ -1,0 +1,36 @@
+<html>
+	<head>
+		<title>WIMP - Paint</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<script src="spinner.js"></script>
+		<script src="my.js"></script>
+		<script src="click.js"></script>
+	</head>
+
+	<body onLoad="initWindow()" onresize="initCanvasSize()">
+
+		<div id="spinner"></div>
+
+		<div id="topOffset"></div>
+
+		<canvas id="drawingCanvas"></canvas>
+
+		<div id="menu">
+			<div onclick='handleColorClick("#0000FF")' class="colorItem" style="background-color: blue;"></div>
+			<div onclick='handleColorClick("#FFFF00")' class="colorItem" style="background-color: yellow;"></div>
+			<div onclick='handleColorClick("#FF0000")' class="colorItem" style="background-color: red;"></div>
+			<div onclick='handleColorClick("#FFFFFF")' class="colorItem" style="background-color: white;"></div>
+			<div class="colorItem" onclick="toggleMenu()">
+				<input type='file' id="imageLoader" />
+			</div>
+		</div>
+		
+		<div id="menuToggle" onclick="toggleMenu()" style="background-image: url(right_arrow.png);"></div>
+
+		<script>
+			var click = new Click();
+			click.init();
+		</script>
+
+	</body>
+</html>

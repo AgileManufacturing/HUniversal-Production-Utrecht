@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - STL</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="styling.css">
+	</head>
+	<body>		
+		<script>
+
+	</script>
+		<script src="build/three.min.js"></script>
+
+		<script src="js/loaders/STLLoader.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<input type="file" id="pickfile"></input>
+        <script>
+            document.getElementById('pickfile').addEventListener('change', readFile, false);
+
+			
+			var camera, cameraTarget, scene, renderer;	
+			var container, stats;
+			var mesh;
+			var controls;
+			
+			            
+			init();
+			animate();
+			
+            function readFile(evt)
+            {
+                var fileObject = evt.target.files[0];
+                var reader = new FileReader();
+                reader.onload = function ()
+                {
+                	scene.remove(mesh);
+                    var loader = new THREE.STLLoader();
+                    //alert(this.result)
+                    var geometry = loader.parse(this.result);
+                    var material = new THREE.MeshLambertMaterial(
+                    {
+                        ambient: 0xE6810E,
+                        color: 0xF08A16,
+                        specular: 0x111111,
+                        shininess: 0
+                    });
+                    mesh = new THREE.Mesh(geometry, material);
+                    mesh.castShadow = true;
+                    mesh.receiveShadow = true;
+                    scene.add(mesh);
+                    mesh.scale.set(25,25,25);
+                }; 
+                reader.readAsText(fileObject)
+            }
+
+		//		document.getElementById('files').addEventListener('change', handleFileSelect, false);
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();	
+			
+			
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth/window.innerHeight, 0.1, 20000);
+				camera.position.set( 0, 0, 50);
+
+				cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
+				
+				controls = new THREE.TrackballControls( camera );
+
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
+				
+				controls.keys = [ 65, 83, 68 ];
+
+
+				scene = new THREE.Scene();
+				
+								//Create debug div
+				var colorbox = document.createElement( 'div' );
+				colorbox.id = 'colorbox';
+				container.appendChild( colorbox );
+
+				var directionalLight = new THREE.DirectionalLight( 0xffffff );
+				directionalLight.position.set( -20, -40, -120).normalize();
+				scene.add( directionalLight );
+				var directionalLight2 = new THREE.DirectionalLight( 0xffffff );
+				directionalLight2.position.set(20,40,120).normalize();
+				scene.add( directionalLight2 );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.physicallyBasedShading = true;
+
+			
+				container.appendChild( renderer.domElement );
+
+				// stats
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '50px';
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+		
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				controls.update();
+				stats.update();
+
+			}
+			
+		
+				
+			(function() {
+			    var _old_alert = window.alert;
+			    window.alert = function() {
+			        _old_alert.apply(window,arguments);
+    				isMouseDown = false;
+					selectMouseDown = false;
+			    };
+			})();		
+	
+
+			function render() {
+
+				var timer = Date.now() * 0.0005;
+
+				camera.lookAt( cameraTarget );
+
+				renderer.render( scene, camera );
+				renderer.setClearColor( 0x8C775F, 1 );
+				
+			//	colorbox.innerHTML = "X: ";
+
+			}
+
+		</script>
+	</body>
+</html>
+

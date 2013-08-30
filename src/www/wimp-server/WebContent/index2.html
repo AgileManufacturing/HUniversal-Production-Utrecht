@@ -1,0 +1,273 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>WIMP Server</title>
+
+		<script src="wimp-client/js/Settings.js" type="text/javascript"></script>
+		<script src="wimp-client/js/Debug.js" type="text/javascript"></script>
+		<script src="wimp-client/js/Communication.js" type="text/javascript"></script>
+	
+		<link rel="stylesheet" type="text/css" href="wimp-client/css/login.css" />
+	
+
+		<style>
+			#debugDiv .info{
+				font-family: "Courier New", Courier, monospace
+			}
+		</style>
+		
+		<script language="Javascript" type="text/javascript">
+			//var iframe = document.getElementById('pickAndPlaceFrame');
+			//var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+			//var input = innerDoc.getElementById('frame_text');
+
+			function startPADemo(){
+				//initTabs();
+			//	var cc = new pa_server.CommandContainer("CREATE_PA");
+			//	cc.product = new pa_server.Product();
+				var port = document.getElementById("gwport").value;
+				var ip = document.getElementById("gwip").value;
+				pa_server.sendString('{"id":0,"data":"'+ip+':'+ port +'","command":"CREATE_PA","product":{"_production":{"_productionSteps":[{"_requiredTimeSlots":0,"_id":1,"_capability":0,"_parameters":{"_parameterGroups":{"Shape":{"_name":"Shape","_parameters":{"Id":{"_key":"Id","_value":"8"}}},"loc":{"_name":"loc","_parameters":{"y":{"_key":"y","_value":"2"},"x":{"_key":"x","_value":"2"}}},"Color":{"_name":"Color","_parameters":{"Id":{"_key":"Id","_value":"7"}}}}}},{"_requiredTimeSlots":0,"_id":2,"_capability":1,"_parameters":{"_parameterGroups":{"Shape":{"_name":"Shape","_parameters":{"Id":{"_key":"Id","_value":"8"}}},"loc":{"_name":"loc","_parameters":{"y":{"_key":"y","_value":"2"},"x":{"_key":"x","_value":"2"}}},"Color":{"_name":"Color","_parameters":{"Id":{"_key":"Id","_value":"7"}}}}}},{"_requiredTimeSlots":0,"_id":3,"_capability":2,"_parameters":{"_parameterGroups":{"Shape":{"_name":"Shape","_parameters":{"Id":{"_key":"Id","_value":"8"}}},"loc":{"_name":"loc","_parameters":{"y":{"_key":"y","_value":"2"},"x":{"_key":"x","_value":"2"}}},"Color":{"_name":"Color","_parameters":{"Id":{"_key":"Id","_value":"7"}}}}}},{"_requiredTimeSlots":0,"_id":4,"_capability":3,"_parameters":{"_parameterGroups":{"Shape":{"_name":"Shape","_parameters":{"Id":{"_key":"Id","_value":"8"}}},"loc":{"_name":"loc","_parameters":{"y":{"_key":"y","_value":"2"},"x":{"_key":"x","_value":"2"}}},"Color":{"_name":"Color","_parameters":{"Id":{"_key":"Id","_value":"7"}}}}}}],"_prodletmap":{"_items":{"1":[],"2":[],"3":[],"4":[]}}}}}');
+			
+			}
+			
+			function login(username, password){
+				var ret = pa_server.sendString('{"command":"LOGIN", "loginData":{"username":"'+username+'","password":"'+password+'"}}');
+				if(ret.error == true){
+					loginMessageAlert("No connection to server");
+				}
+			}
+			function loginCallBack(msg){
+				console.log("loginCallBack: " + msg);
+				if(msg == "LOGIN SUCCEEDED"){
+					document.getElementById("loginMessageBox").style.display = 'none';
+					document.getElementById("login").style.display = 'none';
+					document.getElementById("mainUIDiv").style.display = 'block';
+				}
+				else {
+					loginMessageAlert("Please enter a correct username and password");
+					document.getElementById("username").value = '';
+					document.getElementById("password").value = '';
+				}
+			}
+			
+			function loginMessageAlert(msg){
+				document.getElementById("loginMessageBox").style.display = 'block';
+				document.getElementById("loginMessageText").innerHTML = msg;
+			}
+			
+			function createProductionCommandFromCubeArray() {
+
+				//console.log(productionArray.length);
+
+				if (document.getElementById("pickAndPlaceFrame") == null)
+					alert("null");
+
+				var frame = productionArray = document.getElementById("pickAndPlaceFrame").contentWindow;
+				var cubeArray = frame.cubes;
+				var CrateRows = frame.CrateRows;
+
+				var cc = new pa_server.CommandContainer("CREATE_PA");
+				cc.product = new pa_server.Product();
+				
+				for ( i = 0; i < cubeArray.length; i++) {
+					if (cubeArray[i] != null) {
+						var column = i % CrateRows;
+						var row = Math.round(i / CrateRows);
+						
+						cc.product._production = new pa_server.Production();
+						
+						cc.product._production._productionSteps.push({
+							"_parameters": {"_parameterGroups": [{"aa":"bb"},{"cc":"dd"}]}
+							//"colorCode" : cubeArray[i].material.color.getHex().toString(16),
+							//"location" : {
+							//	"column" : column,
+							//	"row" : row
+							//},
+							//"shapeCode" : 1
+						});
+						Debug.log(JSON.stringify(cc.productionSteps));
+
+					}
+				}
+				
+				pa_server.sendString('{"id":0,"command":"CREATE_PA","product":{"_production":{"_productionSteps":[{"_requiredTimeSlots":0,"_id":1,"_capability":0,"_parameters":{"_parameterGroups":{"Shape":{"_name":"Shape","_parameters":{"Id":{"_key":"Id","_value":"8"}}},"loc":{"_name":"loc","_parameters":{"y":{"_key":"y","_value":"2"},"x":{"_key":"x","_value":"2"}}},"Color":{"_name":"Color","_parameters":{"Id":{"_key":"Id","_value":"7"}}}}}},{"_requiredTimeSlots":0,"_id":2,"_capability":1,"_parameters":{"_parameterGroups":{"Shape":{"_name":"Shape","_parameters":{"Id":{"_key":"Id","_value":"8"}}},"loc":{"_name":"loc","_parameters":{"y":{"_key":"y","_value":"2"},"x":{"_key":"x","_value":"2"}}},"Color":{"_name":"Color","_parameters":{"Id":{"_key":"Id","_value":"7"}}}}}},{"_requiredTimeSlots":0,"_id":3,"_capability":2,"_parameters":{"_parameterGroups":{"Shape":{"_name":"Shape","_parameters":{"Id":{"_key":"Id","_value":"8"}}},"loc":{"_name":"loc","_parameters":{"y":{"_key":"y","_value":"2"},"x":{"_key":"x","_value":"2"}}},"Color":{"_name":"Color","_parameters":{"Id":{"_key":"Id","_value":"7"}}}}}},{"_requiredTimeSlots":0,"_id":4,"_capability":3,"_parameters":{"_parameterGroups":{"Shape":{"_name":"Shape","_parameters":{"Id":{"_key":"Id","_value":"8"}}},"loc":{"_name":"loc","_parameters":{"y":{"_key":"y","_value":"2"},"x":{"_key":"x","_value":"2"}}},"Color":{"_name":"Color","_parameters":{"Id":{"_key":"Id","_value":"7"}}}}}}],"_prodletmap":{"_items":{"1":[],"2":[],"3":[],"4":[]}}}}}');
+				//cc.send();
+			}
+			
+			/*function createProductionCommandFromStackingApp() {
+
+				//console.log(productionArray.length);
+
+				if (document.getElementById("stackingAppFrame") == null)
+					alert("null");
+
+				var frame = productionArray = document.getElementById("stackingAppFrame").contentWindow;
+				var cubeArray = frame.cubes;
+				var CrateRows = frame.CrateRows;
+
+				var cc = new pa_server.CommandContainer("CREATE_PA");
+				cc.product = new pa_server.Product();
+				
+				for ( i = 0; i < cubeArray.length-1; i++) { //ignore the grid (last item in the array)
+					if (cubeArray[i] != null) {
+						var column = i % CrateRows;
+						var row = Math.round(i / CrateRows);
+						
+						cc.product._production = new pa_server.Production();
+						
+						cc.product._production._productionSteps.push({
+							"_parameters": {"_parameterGroups": [{"aa":"bb"},{"cc":"dd"}]}
+							//"colorCode" : cubeArray[i].material.color.getHex().toString(16),
+							//"location" : {
+							//	"column" : column,
+							//	"row" : row
+							//},
+							//"shapeCode" : 1
+						});
+						Debug.log(JSON.stringify(cc.productionSteps));
+
+					}
+				}
+				pa_server.sendString('{"id":0,"command":"CREATE_PA","product":{"_production":{"_productionSteps":[{"_requiredTimeSlots":0,"_id":1,"_capability":0,"_parameters":{"_parameterGroups":{"Shape":{"_name":"Shape","_parameters":{"Id":{"_key":"Id","_value":"8"}}},"loc":{"_name":"loc","_parameters":{"y":{"_key":"y","_value":"2"},"x":{"_key":"x","_value":"2"}}},"Color":{"_name":"Color","_parameters":{"Id":{"_key":"Id","_value":"7"}}}}}},{"_requiredTimeSlots":0,"_id":2,"_capability":1,"_parameters":{"_parameterGroups":{"Shape":{"_name":"Shape","_parameters":{"Id":{"_key":"Id","_value":"8"}}},"loc":{"_name":"loc","_parameters":{"y":{"_key":"y","_value":"2"},"x":{"_key":"x","_value":"2"}}},"Color":{"_name":"Color","_parameters":{"Id":{"_key":"Id","_value":"7"}}}}}},{"_requiredTimeSlots":0,"_id":3,"_capability":2,"_parameters":{"_parameterGroups":{"Shape":{"_name":"Shape","_parameters":{"Id":{"_key":"Id","_value":"8"}}},"loc":{"_name":"loc","_parameters":{"y":{"_key":"y","_value":"2"},"x":{"_key":"x","_value":"2"}}},"Color":{"_name":"Color","_parameters":{"Id":{"_key":"Id","_value":"7"}}}}}},{"_requiredTimeSlots":0,"_id":4,"_capability":3,"_parameters":{"_parameterGroups":{"Shape":{"_name":"Shape","_parameters":{"Id":{"_key":"Id","_value":"8"}}},"loc":{"_name":"loc","_parameters":{"y":{"_key":"y","_value":"2"},"x":{"_key":"x","_value":"2"}}},"Color":{"_name":"Color","_parameters":{"Id":{"_key":"Id","_value":"7"}}}}}}],"_prodletmap":{"_items":{"1":[],"2":[],"3":[],"4":[]}}}}}');
+				//cc.send();
+			}*/
+			
+			function createProductionCommandFromColorArray(){
+				var frame = productionArray = document.getElementById("paintFrame").contentWindow;
+				var pixels = frame.pixels;
+				var columns = frame.columns;
+				
+				var cc = new pa_server.CommandContainer("CREATE_PA");
+				cc.product = new pa_server.Product();
+				
+				cc.product.productionSteps.push(pixels);
+				//cc.send();
+				console.log("\n " + JSON.stringify(cc.product));
+			}
+			
+			function startPAServer(){
+				
+				//document.getElementById("start_PA_server_button").disabled = true;
+				//document.getElementById("stop_PA_server_button").disabled = false;
+				
+				var cc = new pa_server.CommandContainer("START_PA_SERVER");
+				
+				//cc.product = new pa_server.Product();
+				cc.send();
+			}
+			
+			function stopPAServer(){
+				
+				//document.getElementById("stop_PA_server_button").disabled = true;
+				//document.getElementById("start_PA_server_button").disabled = false;
+				
+				var cc = new pa_server.CommandContainer("STOP_PA_SERVER");
+				//cc.product = new pa_server.Product();
+				cc.send();
+			}
+
+			// document.getElementById("pickAndPlaceFrame")
+
+			//productionArray = window.frames['pickAndPlaceFrame'].contentWindow.cubes;
+
+			function init() {
+				Settings.setUp();
+				DEBUG_ENABLED = ( Settings.debug || Settings.localDebug);
+
+				
+				if(Settings.localDebug){
+					WS_URL = WS_LOCAL_URL;
+				}else {WS_URL = WS_SERVER_URL;}
+				
+				if(Settings.login)
+					document.getElementById("login").style.display = 'block';
+				else
+					document.getElementById("login").style.display = 'none';
+				
+				
+				pa_server = new Communication();
+				
+				pa_server.start();
+
+				//document.getElementById("stop_PA_server_button").disabled = true;
+			}
+		</script>
+	</head>
+	<body onload="init()">
+	
+	
+
+		<div id="login" style="display:block">
+				<h2>Login <small>enter your credentials</small></h2>
+				<p>
+					<label for="name">Username: </label>
+					<input type="text" name="username" id="username" value="admin"/>
+				</p>
+
+				<p>
+					<label for="pwd">Password: </label>
+					<input type="password" name="pwd" id="password" value="admin"/>
+				</p>
+
+				<p>
+					<input type="submit" id="submit" value="Login" name="submit" onclick="login(document.getElementById('username').value, document.getElementById('password').value)" />
+				</p>
+				
+				<h4 id="loginMessageBox" class="alert" style="display: none;"><span id="loginMessageText"></span><span class="exit" onclick="document.getElementById('loginMessageBox').style.display='none'">X</span></h4>
+				
+					</div><!--end login-->
+
+
+
+		<br />
+
+		<div id="mainUIDiv" style="display:none">
+
+
+
+    
+    
+    
+    <script>
+    
+    </script>
+    <div id="tabContainer">
+    
+    
+    
+
+		<!--button id="start_PA_server_button" onclick="startPAServer();">
+			Start server
+		</button>
+		
+		<button id="stop_PA_server_button" onclick="stopPAServer();">
+			Stop server
+		</button-->
+		
+		<span class="info">GW ip: </span>
+		<input type="text" id="gwip"></input><br />
+		port:
+		<input type="number" id="gwport"></input>
+		<button id="connect" onclick="startPADemo();">
+			Send
+		</button>
+		<br />
+		
+		<iframe id="appFrame" src="wimp-client/Carousel/index.html" style="width:100%; height:50%;border:0"></iframe>
+		<!-- iframe id="pickAndPlaceFrame" src="wimp-client/PickandPlace/pickAndPlace.html" style="width:100%; height:50%;border:0"></iframe-->
+		<!--iframe id="paintFrame" src="wimp-client/Paint/index.html" style="width:100%; height:500px;border:0"></iframe-->
+		<br />
+
+		<hr />
+
+
+</div>
+
+
+<div id="debugDiv" style="display:none;">
+
+</div>
+	</body>
+</html>

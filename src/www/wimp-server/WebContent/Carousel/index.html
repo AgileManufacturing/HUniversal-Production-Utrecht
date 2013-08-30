@@ -1,0 +1,42 @@
+<html>
+	<head>
+		<title>WIMP - Carousel</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+
+	<body onresize="init()">
+
+		<div id="topoffset"></div>
+
+		<div id="container">
+			<div id="carousel">
+				<div class="figure" style="background-image: url(pickandplace.png);">
+					<img src="left_arrow.png" class="toLeft"/>
+					<img src="right_arrow.png" class="toRight" />
+				</div>
+				<div class="figure" style="background-image: url(stacking.png);">
+					<img src="left_arrow.png" class="toLeft"/>
+					<img src="right_arrow.png" class="toRight" />
+				</div>
+				<div class="figure" style="background-image: url(paint.png);">
+					<img src="left_arrow.png" class="toLeft"/>
+					<img src="right_arrow.png" class="toRight" />
+				</div>
+				<div class="figure" style="background-image: url(stlloader.png);">
+					<img src="left_arrow.png" class="toLeft"/>
+					<img src="right_arrow.png" class="toRight" />
+				</div>
+			</div>
+		</div>
+
+		<script src="utils.js"></script>
+		<script src="my.js"></script>
+		<script src="click.js"></script>
+		<script>
+			var click = new Click();
+			click.init();
+			document.addEventListener('DOMContentLoaded', init, false);
+		</script>
+
+	</body>
+</html>
