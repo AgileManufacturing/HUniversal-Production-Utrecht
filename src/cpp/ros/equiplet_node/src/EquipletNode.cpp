@@ -50,7 +50,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 		EquipletStateMachine(nameFromId(id),id),
 		equipletStepBlackboardClient(NULL),
 		equipletCommandBlackboardClient(NULL),
-		scada(this, &moduleRegistry)
+		scada(this, &moduleRegistry) 
 {
 	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ1", "EquipletStepsBlackBoard");
 	equipletStepSubscription = new Blackboard::FieldUpdateSubscription("status", *this);
@@ -60,16 +60,16 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 
 	equipletCommandBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_COMMANDS);
 	equipletCommandSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
-        equipletCommandSubscriptionSet = new Blackboard::BasicOperationSubscription(Blackboard::UPDATE, *this);
+    equipletCommandSubscriptionSet = new Blackboard::BasicOperationSubscription(Blackboard::UPDATE, *this);
 	equipletCommandBlackboardClient->subscribe(*equipletCommandSubscription);
 	sleep(1);
-        equipletCommandBlackboardClient->subscribe(*equipletCommandSubscriptionSet);
+    equipletCommandBlackboardClient->subscribe(*equipletCommandSubscriptionSet);
 	subscriptions.push_back(equipletCommandSubscription);
 	subscriptions.push_back(equipletCommandSubscriptionSet);
 
 	equipletStateBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_STATE);
 
-	std::cout << "Connected!" << std::endl;
+	std::cout << "Connected equiplet_node." << std::endl;
 }
 
 /**
@@ -194,7 +194,7 @@ void EquipletNode::updateEquipletStateOnBlackboard(){
 	jsonUpdateQuery.push_back(JSONNode("id",equipletId));
 
 	std::ostringstream stringStream;
-	stringStream << "{$set: { state: " << getCurrentState() << ",mode: " << getCurrentMode() << "}}";
+	stringStream << "updating state on blackboard; {$set: { state: " << getCurrentState() << ",mode: " << getCurrentMode() << "}}";
 
 	equipletStateBlackboardClient->updateDocuments(jsonUpdateQuery.write().c_str(),stringStream.str());
 }

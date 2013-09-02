@@ -107,7 +107,7 @@ mongo::Query OplogMonitor::createOplogQuery()
 		query = QUERY("$or" << orArray.arr());
 	}
 
-	std::cout << "Using query: " << query << std::endl;
+	std::cout << "Using query to create oplog: " << query << std::endl;
 	return query;
 }
 
@@ -128,6 +128,7 @@ void OplogMonitor::run()
 			0));
 
 	currentCursorId = tailedCursor->getCursorId();
+
 	try {
 		while(!tailedCursor->isDead()){
 			while (tailedCursor->more()) {
@@ -147,7 +148,7 @@ void OplogMonitor::run()
 		std::cout << "Cursor is dead." << std::endl;
 	} catch (boost::thread_interrupted& e) {
 		// Thread has been interrupted, work is done.
-		std::cout << "Interrupted" << std::endl;
+		std::cout << "Interrupted cursorid: " << currentCursorId << " oplogNamespace : " << oplogNamespace << " query " << query << " skipCount " << skipCount << std::endl;
 	} catch (mongo::AssertionException& ex) {
 		std::cout << "Assertion exception: " << ex.what() << std::endl;
 	}
