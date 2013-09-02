@@ -113,6 +113,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	    		rexos_statemachine::State currentState = getCurrentState();
 
 	    		std::cout << "currentState " << currentState << " currentMode " << currentMode << std::endl;
+	    		std::cout << "if currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY" << (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) << currentMode << std::endl;
 
 	    		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
 
@@ -194,7 +195,8 @@ void EquipletNode::updateEquipletStateOnBlackboard(){
 	jsonUpdateQuery.push_back(JSONNode("id",equipletId));
 
 	std::ostringstream stringStream;
-	stringStream << "updating state on blackboard; {$set: { state: " << getCurrentState() << ",mode: " << getCurrentMode() << "}}";
+	stringStream << "{$set: { state: " << getCurrentState() << ",mode: " << getCurrentMode() << "}}";
+	std::cout << "updating state on blackboard; {$set: { state: " << getCurrentState() << ",mode: " << getCurrentMode() << "}}" << std::endl;
 
 	equipletStateBlackboardClient->updateDocuments(jsonUpdateQuery.write().c_str(),stringStream.str());
 }
