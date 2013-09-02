@@ -148,9 +148,9 @@ void OplogMonitor::run()
 		std::cout << "Cursor is dead." << std::endl;
 	} catch (boost::thread_interrupted& e) {
 		// Thread has been interrupted, work is done.
-		std::cout << "Interrupted cursorid: " << currentCursorId << "\n oplogNamespace : " << oplogNamespace << "\n query " << query << "\n skipCount " << skipCount << std::endl;
+		std::cout << "Interrupted cursorid: " << currentCursorId << "\noplogNamespace: " << oplogNamespace << "\nquery: " << query << "\nskipCount: " << skipCount << std::endl;
 	} catch (mongo::AssertionException& ex) {
-		std::cout << "Assertion exception: " << ex.what() << std::endl;
+		std::cout << "Assertion exception: " << ex.what() << "\noplogNamespace: " << oplogNamespace << "\nquery: " << query << "\nskipCount: " << skipCount << std::endl;
 	}
 
 	connection->done();
