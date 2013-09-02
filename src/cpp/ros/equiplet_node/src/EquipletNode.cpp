@@ -105,10 +105,19 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 		JSONNode n = libjson::parse(equipletStepBlackboardClient->findDocumentById(targetObjectId).jsonString());
 	    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
 
+	    std::cout << "Added steps" << std::endl;
+
 	    if (step->getStatus().compare("WAITING") == 0) {
+
+	    std::cout << "Status compared waiting" << std::endl;
+
 	    	rexos_statemachine::Mode currentMode = getCurrentMode();
 
+	    		    std::cout << "Current mode get" << std::endl;
+
 	    	if (currentMode == rexos_statemachine::MODE_NORMAL) {
+
+	    			    std::cout << "If mode is normal" << std::endl;
 
 	    		rexos_statemachine::State currentState = getCurrentState();
 
@@ -116,7 +125,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	    		std::cout << "Will try to display states " << std::endl;
 	    		std::cout << "rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY" << rexos_statemachine::STATE_NORMAL  << " " <<  rexos_statemachine::STATE_STANDBY << std::endl;
 
-	    		if (true) {
+	    		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
 
 	    			std::cout << "Updating step on BB" << std::endl;
 	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
