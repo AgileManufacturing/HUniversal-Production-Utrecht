@@ -116,7 +116,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	    		std::cout << "Will try to display states " << std::endl;
 	    		std::cout << "rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY" << rexos_statemachine::STATE_NORMAL  << " " <<  rexos_statemachine::STATE_STANDBY << std::endl;
 
-	    		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
+	    		if (true) {
 
 	    			std::cout << "Updating step on BB" << std::endl;
 	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
