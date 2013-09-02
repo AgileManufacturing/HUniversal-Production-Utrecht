@@ -113,7 +113,7 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 		// Gets the productStepId and updates all the productsteps on the blackboard the status to waiting.
 		try {
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
-			if(equipletAgent.getEquipletStateEntry().getEquipletState() != EquipletState.NORMAL) {
+			if(false){//equipletAgent.getEquipletStateEntry().getEquipletState() != EquipletState.NORMAL) {
 				Logger.log("%d Equiplet agent - changing state%n", EquipletAgent.getCurrentTimeSlot());
 
 				//equipletAgent.getStateBBClient().subscribe(stateUpdateSubscription);

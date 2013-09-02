@@ -93,6 +93,7 @@ void EquipletStateMachine::transitionSetup(rexos_statemachine::TransitionActionS
 		boost::unique_lock<boost::mutex> lock( mutexit );
 		condit.wait( lock );
 	}
+	
 	as->setSucceeded();
 }
 

@@ -102,6 +102,7 @@ void BlackboardCppClient::unsubscribe(BlackboardSubscription &sub){
 }
 
 bool BlackboardCppClient::insertDocument(std::string json, mongo::BSONObj * result_out){
+	try {
 	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
 	std::string dbNamespace = database;
 	dbNamespace.append(".");
@@ -117,9 +118,13 @@ bool BlackboardCppClient::insertDocument(std::string json, mongo::BSONObj * resu
 	connection->done();
 	delete connection;
 	return result.getIntField("ok") == 1;
+	}catch(Exception e){
+		std::cout << "Exception inserting document: " << e << std::endl;
+	}
 }
 
 int BlackboardCppClient::removeDocuments(std::string queryAsJSON, mongo::BSONObj * result_out) {
+	try{
 	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
 	std::string dbNamespace = database;
 	dbNamespace.append(".");
@@ -135,9 +140,14 @@ int BlackboardCppClient::removeDocuments(std::string queryAsJSON, mongo::BSONObj
 	connection->done();
 	delete connection;
 	return result.getIntField("n");
+
+	}catch(Exception e){
+		std::cout << "Exception removing document: " << e << std::endl;
+	}
 }
 
 mongo::BSONObj BlackboardCppClient::findDocumentById(mongo::OID objectId) {
+	try{
 	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
 	std::string dbNamespace = database;
 	dbNamespace.append(".");
@@ -147,10 +157,15 @@ mongo::BSONObj BlackboardCppClient::findDocumentById(mongo::OID objectId) {
 	connection->done();
 	delete connection;
 	return document;
+
+	}catch(Exception e){
+		std::cout << "Exception finding document: " << e << std::endl;
+	}
 }
 
 
 int BlackboardCppClient::findDocuments(std::string queryAsJSON, std::vector<mongo::BSONObj> &results) {
+	try{
 	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
 	std::string dbNamespace = database;
 	dbNamespace.append(".");
@@ -170,15 +185,21 @@ int BlackboardCppClient::findDocuments(std::string queryAsJSON, std::vector<mong
 		}
 	} catch (mongo::AssertionException &ex) {
 		// Error occurred at remote server, there will be no more objects.
+		std::cout << "Assertion exception at 188 blackboardclient cpp " << ex << std::endl;
 	}
 
 	connection->done();
 	delete connection;
 	return resultCount;
+
+	}catch(Exception e){
+		std::cout << "Exception finding document by json: " << e << std::endl;
+	}
 }
 
 
 int BlackboardCppClient::updateDocuments(
+	try{
 		std::string queryAsJSON,
 		std::string updateQueryAsJSON,
 		mongo::BSONObj * result_out,
@@ -199,6 +220,9 @@ int BlackboardCppClient::updateDocuments(
 	connection->done();
 	delete connection;
 	return result.getIntField("n");
+		}catch(Exception e){
+		std::cout << "Exception updating documents: " << e << std::endl;
+	}
 }
 
 int BlackboardCppClient::updateDocumentById(mongo::OID objectId, std::string updateQueryAsJSON,	mongo::BSONObj * result_out) {
