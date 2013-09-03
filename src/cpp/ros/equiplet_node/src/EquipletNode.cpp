@@ -52,7 +52,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 		equipletCommandBlackboardClient(NULL),
 		scada(this, &moduleRegistry) 
 {
-	std::cout << "EquipletNode_Constructor called."
+	std::cout << "EquipletNode_Constructor called." << std::endl;
 	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ1", "EquipletStepsBlackBoard");
 	equipletStepSubscription = new Blackboard::FieldUpdateSubscription("status", *this);
 	equipletStepSubscription->addOperation(Blackboard::SET);
@@ -98,6 +98,7 @@ EquipletNode::~EquipletNode(){
  **/
 void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) 
 {
+	std::cout << "Starting EquipletNode::onMessage" << std::endl;
 	if(&subscription == equipletStepSubscription)
 	{
 		mongo::OID targetObjectId;
