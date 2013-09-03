@@ -117,7 +117,6 @@ bool BlackboardCppClient::insertDocument(std::string json, mongo::BSONObj * resu
 	connection->done();
 	delete connection;
 	return result.getIntField("ok") == 1;
-	}
 }
 
 int BlackboardCppClient::removeDocuments(std::string queryAsJSON, mongo::BSONObj * result_out) {
