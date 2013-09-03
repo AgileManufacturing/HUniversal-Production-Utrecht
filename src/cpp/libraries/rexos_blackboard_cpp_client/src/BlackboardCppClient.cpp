@@ -165,7 +165,7 @@ mongo::BSONObj BlackboardCppClient::findDocumentById(mongo::OID objectId) {
 
 
 int BlackboardCppClient::findDocuments(std::string queryAsJSON, std::vector<mongo::BSONObj> &results) {
-	try{
+	try {
 	mongo::ScopedDbConnection* connection = mongo::ScopedDbConnection::getScopedDbConnection(host);
 	std::string dbNamespace = database;
 	dbNamespace.append(".");
@@ -174,6 +174,7 @@ int BlackboardCppClient::findDocuments(std::string queryAsJSON, std::vector<mong
 	std::unique_ptr<mongo::DBClientCursor> cursor((*connection)->query(dbNamespace, query));
 
 	int resultCount = 0;
+
 	try {
 		while (cursor->more()) {
 			mongo::BSONObj obj = cursor->nextSafe();
@@ -185,7 +186,7 @@ int BlackboardCppClient::findDocuments(std::string queryAsJSON, std::vector<mong
 		}
 	} catch (mongo::AssertionException &ex) {
 		// Error occurred at remote server, there will be no more objects.
-		std::cout << "Assertion exception at 188 blackboardclient cpp " << ex << std::endl;
+		std::cout << "Assertion exception at 188 blackboardclient cpp " << ex.what() << std::endl;
 	}
 
 	connection->done();
