@@ -125,14 +125,19 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 
 	    		std::cout << "current-State " << currentState << " current-Mode " << currentMode << std::endl;
 	    		std::cout << "Will try to display states " << std::endl;
-	    		std::cout << "rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY" << rexos_statemachine::STATE_NORMAL  << " " <<  rexos_statemachine::STATE_STANDBY << std::endl;
+	    		std::cout << "rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY state normal = " << rexos_statemachine::STATE_NORMAL  << " state standby = " <<  rexos_statemachine::STATE_STANDBY << std::endl;
 
 	    		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
 
 	    			std::cout << "Updating step on BB" << std::endl;
 	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
 
+
+	    			std::cout << "Gettig proxy " << std::endl;
 				    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
+
+
+	    			std::cout << "Setting instructions" << std::endl;
 				    prox->setInstruction(targetObjectId.toString(), step->getInstructionData().getJsonNode());
 
 	    		} else {
@@ -142,6 +147,8 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	    		ROS_INFO("Instruction received but current mode is %s", rexos_statemachine::mode_txt[currentMode]);
 	    		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"FAILED\"");
 	    	}
+
+	    			std::cout << "Dun" << std::endl;
 		}
 	}
 	else if(&subscription == equipletCommandSubscription || &subscription == equipletCommandSubscriptionSet)
