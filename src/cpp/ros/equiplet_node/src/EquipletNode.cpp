@@ -136,9 +136,14 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	    			std::cout << "Gettig proxy " << std::endl;
 				    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
 
+	    			std::cout << "Getting instructdatetateaa" << std::endl;
+	    			rexos_datatypes::InstructionData instruc = step->getInstructionData();
+
+	    			std::cout << "Getting noadnedend" << std::endl;
+	    			JSONNode node = instruc.getJsonNode();
 
 	    			std::cout << "Setting instructions" << std::endl;
-				    prox->setInstruction(targetObjectId.toString(), step->getInstructionData().getJsonNode());
+				    prox->setInstruction(targetObjectId.toString(), node);
 
 	    		} else {
 	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\" } } ");
