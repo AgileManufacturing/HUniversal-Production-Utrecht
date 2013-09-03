@@ -167,7 +167,7 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 						((ProductAgent) myAgent).getProduct()
 								.addStatusDataToLog(m.getSender(),
 										step.getStatusData());
-						System.out.println("Completed productionStep :"+_prodCounters++);
+						Logger.log("Completed productionStep :"+_prodCounters++);
 						_productionStepsCompleted++;
 						break;
 					default:

@@ -7,7 +7,7 @@
  * @author Alexander Streng
  * @author Mike Schaap
  * 
- *         Copyright © 2013, HU University of Applied Sciences Utrecht. All
+ *         Copyright ï¿½ 2013, HU University of Applied Sciences Utrecht. All
  *         rights reserved.
  * 
  *         Redistribution and use in source and binary forms, with or without
@@ -173,14 +173,12 @@ public class InformerBehaviour extends Behaviour {
 				}
 			} else {
 				if (_isDone) {
-					System.out.println("Done parallel informing.");
 					_production.setProductionEquipletMapping(_prodEQmap);
 					_product.setProduction(_production);
 					_productAgent.setProduct(_product);
 					this._bc.handleCallback(BehaviourStatus.COMPLETED, null);
 					_isCompleted = true;
 				} else if (_isError) {
-					System.out.println("Not done informing.");
 					this._bc.handleCallback(BehaviourStatus.ERROR, null);
 					_isCompleted = true;
 				}
@@ -226,7 +224,7 @@ public class InformerBehaviour extends Behaviour {
 		if (bs == BehaviourStatus.COMPLETED) {
 			_prodEQmap.setTimeSlotsForEquiplet(subBehaviour.getProductionStepId(), subBehaviour.getTargetEquiplet(), subBehaviour.getTimeslotDuration());
 		} else {
-			System.out.println("Ended with error!");
+			Logger.log("callbackSubInformerBehaviour ended with error!");
 		}
 		_parBehaviour.removeSubBehaviour(subBehaviour);
 		_currentRunningSubInformerBehaviours--;

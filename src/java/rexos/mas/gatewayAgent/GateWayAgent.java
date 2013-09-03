@@ -7,7 +7,7 @@
  * 
  * @section LICENSE License: newBSD
  * 
- *          Copyright © 2012, HU University of Applied Sciences Utrecht. All
+ *          Copyright ï¿½ 2012, HU University of Applied Sciences Utrecht. All
  *          rights reserved.
  * 
  *          Redistribution and use in source and binary forms, with or without
@@ -63,7 +63,7 @@ public class GateWayAgent extends Agent{
 			AgentController a = c.createNewAgent(name, "agent.com.Henk", null);
 			a.start();
 		} catch(Exception e){
-			System.out.println(e.getMessage());
+			//TODO Log error
 		}
 	}
 

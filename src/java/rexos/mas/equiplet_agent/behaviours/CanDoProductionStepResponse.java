@@ -103,9 +103,9 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if (message != null) {
-			Logger.log("%s received message from %s (%s)%n",
-					myAgent.getLocalName(), message.getSender().getLocalName(),
-					message.getOntology());
+			//Logger.log("%s received message from %s (%s)%n",
+					//myAgent.getLocalName(), message.getSender().getLocalName(),
+					//message.getOntology());
 
 			ObjectId productStepEntryId = equipletAgent
 					.getRelatedObjectId(message.getConversationId());

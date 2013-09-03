@@ -51,14 +51,13 @@ import com.google.gson.JsonParser;
 import com.mongodb.BasicDBObject;
 import com.mongodb.util.JSON;
 
+import rexos.libraries.log.Logger;
 import rexos.mas.data.AgentStatus;
 import rexos.mas.data.Callback;
 import rexos.mas.data.Product;
 import rexos.mas.data.ProductAgentProperties;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
-
-
 import jade.core.Agent;
 
 public class ProductAgent extends Agent {
@@ -94,9 +93,9 @@ public class ProductAgent extends Agent {
 			// Create the Overview Behaviour and start it
 			_overviewBehaviour = new OverviewBehaviour(this);
 			addBehaviour(_overviewBehaviour);
-			System.out.println("I spawned as a product agent");
+			Logger.log("Product agent spawned.");
 		} catch (Exception e) {
-			System.out.println("Productagent exited with: " + e.getMessage());
+			Logger.log("Productagent died. Exited with: " + e.getMessage());
 			doDelete();
 		}
 	}

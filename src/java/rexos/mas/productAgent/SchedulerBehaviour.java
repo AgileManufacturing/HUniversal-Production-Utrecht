@@ -275,7 +275,7 @@ public class SchedulerBehaviour extends Behaviour {
 				if (freetimeslotEq == null) {
 					freetimeslotEq = fts;
 				} else {
-					System.out.println("BIG ERRROR");
+					//TODO Log error
 				}
 			}
 		}

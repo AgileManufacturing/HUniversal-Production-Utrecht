@@ -168,7 +168,7 @@ public class JadeAgentX extends Agent {
 				double y2 = Math.sin((i + 1) / (double) points * Math.PI * 2d) * radius;
 				
 				if(i == 0 || i == points/2) {
-					System.out.println();
+					
 				}
 
 				Position from = new Position(x1, y1);

@@ -43,7 +43,7 @@ public class RescheduleBehaviour extends Behaviour {
 	 */
 	@Override
 	public void action() {
-		System.out.println("RESCHEDULING!");
+		//System.out.println("RESCHEDULING!");
 		Product product = _productAgent.getProduct();
 		Production prod = product.getProduction();
 		ArrayList<ProductionStep> steps = prod.getProductionSteps();

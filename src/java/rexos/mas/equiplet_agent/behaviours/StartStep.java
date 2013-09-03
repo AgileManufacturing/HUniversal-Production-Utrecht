@@ -107,8 +107,8 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		Logger.log("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(),
-				message.getOntology());
+		//Logger.log("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(),
+				//message.getOntology());
 
 		// Gets the productStepId and updates all the productsteps on the blackboard the status to waiting.
 		try {

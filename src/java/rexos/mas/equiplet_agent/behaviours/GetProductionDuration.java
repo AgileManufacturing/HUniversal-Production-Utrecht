@@ -90,8 +90,8 @@ public class GetProductionDuration extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
-				message.getOntology());
+		//Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
+				//message.getOntology());
 		try {
 			// gets the productstepId and sends it to the service agent with the ontology GetProductionStepDuration.
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());

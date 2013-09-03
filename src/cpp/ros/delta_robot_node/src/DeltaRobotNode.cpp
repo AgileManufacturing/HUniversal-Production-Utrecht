@@ -147,7 +147,6 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 			Point p = parsePoint(i[4]);
 
 			if(moveToPoint(p.x, p.y, p.z, p.maxAcceleration)){
-				ROS_INFO("Moved to point");
     			setInstructionActionServer.setSucceeded(result_);
 			} else {
 				ROS_INFO("Failed moving to point");
@@ -233,8 +232,6 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(double x, double y, do
 
 	if(deltaRobot->checkPath(oldLocation, newLocation)){
 
-		ROS_INFO("path is valid. Trying to move..");
-
 		deltaRobot->moveTo(newLocation, maxAcceleration);
 
 		return true;
@@ -252,8 +249,6 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(double x, double y, do
  * @return always true
  **/
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint_old(delta_robot_node::MoveToPoint::Request &req, delta_robot_node::MoveToPoint::Response &res) {
-	ROS_INFO("moveToPoint_old called");
-
 	if(getCurrentState() != rexos_statemachine::STATE_NORMAL){
 		res.succeeded = false;
 		res.message="Cannot move to point, mast state="+ std::string(rexos_statemachine::state_txt[getCurrentState()]);
@@ -278,7 +273,6 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint_old(delta_robot_node::
  * @return always true
  **/
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint_json(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res){
-	ROS_INFO("moveToPoint_json called");
 
 	if(getCurrentState() != rexos_statemachine::STATE_NORMAL){
 		res.succeeded = false;
@@ -314,7 +308,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(double x, doub
 	newLocation += oldLocation;
 
 	if(deltaRobot->checkPath(oldLocation, newLocation)){
-		ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", x, y, z, maxAcceleration);
+		ROS_INFO("Moving to: (%f, %f, %f) maxAcceleration=%f", x, y, z, maxAcceleration);
 		deltaRobot->moveTo(newLocation, maxAcceleration);
 		return true;
 	} else {
@@ -331,7 +325,6 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(double x, doub
  * @return always returns true
  **/
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint_old(delta_robot_node::MoveToRelativePoint::Request &req, delta_robot_node::MoveToRelativePoint::Response &res){
-	ROS_INFO("moveToRelativePoint_old called");
 
 	if(getCurrentState() != rexos_statemachine::STATE_NORMAL){
 		res.succeeded = false;
@@ -357,7 +350,6 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint_old(delta_robo
  * @return true when the moveToRelativePoint was successful, else false
  **/
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint_json(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res){
-	ROS_INFO("moveToRelativePoint_json called");
 
 	if(getCurrentState() != rexos_statemachine::STATE_NORMAL){
 		res.succeeded = false;
@@ -386,7 +378,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint_json(rexos_std
  * @return always true
  **/
 bool deltaRobotNodeNamespace::DeltaRobotNode::movePath_old(delta_robot_node::MovePath::Request &req, delta_robot_node::MovePath::Response &res) {
-	ROS_INFO("movePath_old called");
+
 	res.succeeded = false;
 	if(getCurrentState() != rexos_statemachine::STATE_NORMAL){
 		res.message="Cannot move path, mast state="+ std::string(rexos_statemachine::state_txt[getCurrentState()]);
@@ -409,7 +401,6 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath_old(delta_robot_node::Mov
 		}
 
 		for(unsigned int i = 0; i < req.motion.size(); i++){	
-			ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", req.motion[i].x, req.motion[i].y, req.motion[i].z, req.motion[i].maxAcceleration);
 			deltaRobot->moveTo(rexos_datatypes::Point3D<double>(req.motion[i].x, req.motion[i].y, req.motion[i].z), req.motion[i].maxAcceleration);
 		}
 		res.succeeded = true;
@@ -426,7 +417,6 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::movePath_old(delta_robot_node::Mov
  * @return always true
  **/
 bool deltaRobotNodeNamespace::DeltaRobotNode::movePath_json(rexos_std_srvs::Module::Request &req, rexos_std_srvs::Module::Response &res){
-	ROS_INFO("movePath_json called");
 
 	res.succeeded = false;
 	if(getCurrentState() != rexos_statemachine::STATE_NORMAL){
@@ -610,7 +600,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(rexos_statemachine
 			as->setAborted();
 	} else {
 	as->setSucceeded();
-}
+	}
 }
 
 /**

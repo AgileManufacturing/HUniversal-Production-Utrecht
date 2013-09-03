@@ -44,7 +44,6 @@ package rexos.mas.productAgent;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
-
 import rexos.mas.data.BehaviourStatus;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
@@ -56,6 +55,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.log.Logger;
 
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
@@ -126,7 +126,7 @@ public class PlannerBehaviour extends Behaviour {
 			this._isDone = true;
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("Exception PlannerBehaviour - onStart() : " + e);
+			Logger.log("Exception PlannerBehaviour - onStart() : " + e);
 			this._isError = true;
 		}
 	}
@@ -147,7 +147,7 @@ public class PlannerBehaviour extends Behaviour {
 				block();
 			}
 		} catch (Exception e) {
-			System.out.println("Exception PlannerBehaviour: " + e);
+			Logger.log("Exception PlannerBehaviour: " + e);
 		}
 	}
 	

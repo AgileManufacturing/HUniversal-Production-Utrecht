@@ -7,7 +7,7 @@
  * @author Mike Schaap
  * @author Arno Derks
  * 
- *         Copyright © 2013, HU University of Applied Sciences Utrecht. All
+ *         Copyright ï¿½ 2013, HU University of Applied Sciences Utrecht. All
  *         rights reserved.
  * 
  *         Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@
 
 package rexos.mas.productAgent;
 
+import rexos.libraries.log.Logger;
 import rexos.mas.data.AgentStatus;
 import rexos.mas.data.BehaviourStatus;
 import jade.core.Agent;
@@ -86,7 +87,6 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 */
 	private void initialize() {
 
-		System.out.println("Creating the SocketBehaviour");
 		_socketBehaviour = new SocketBehaviour(myAgent, _productAgent
 				.getProperties().getCallback());
 
@@ -94,37 +94,27 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 				_socketBehaviour);
 		_socketBehaviour.setHeartBeatBehaviour(_heartBeatBehaviour);
 
-		System.out.println("Creating the PlannerBehaviour");
 		_plannerBehaviour = new PlannerBehaviour(myAgent, this);
 
-		System.out.println("Creating the InformerBehaviour");
 		_informerBehaviour = new InformerBehaviour(myAgent, this);
 
-		System.out.println("Creating the ScheduleBehaviour");
 		_schedulerBehaviour = new SchedulerBehaviour(myAgent, this);
 
-		System.out.println("Creating the ProductBehaviour");
 		_produceBehaviour = new ProduceBehaviour(myAgent, this);
 
-		System.out.println("Creating the RescheduleBehaviour");
 		_rescheduleBehaviour = new RescheduleBehaviour(myAgent, this);
 
-		System.out.println("Creating the ParallelBehaviour");
 		_parallelBehaviour = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 
-		System.out.println("Creating the SequentialBehaviour");
 		_sequentialBehaviour = new SequentialBehaviour();
 
 		System.out
 				.println("Addding a SequentialBehaviour to the Product Agent");
 		myAgent.addBehaviour(_sequentialBehaviour);
 
-		System.out
-				.println("Adding the SocketBehaviour to the ParallelBehaviour");
 		_parallelBehaviour.addSubBehaviour(_socketBehaviour);
 		_parallelBehaviour.addSubBehaviour(_heartBeatBehaviour);
 
-		System.out.println("Addding a ParallelBehaviour to the ProductAgent");
 		myAgent.addBehaviour(_parallelBehaviour);
 	}
 
@@ -154,7 +144,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 				this.startScheduling();
 				break;
 			case DONE_SCHEDULING:
-				System.out.println("Done Scheduling");
+				Logger.log("Done Scheduling");
 				_productAgent.setStatus(AgentStatus.PRODUCING);
 				break;
 			case DONE_PRODUCING:
@@ -189,7 +179,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 */
 	public void startPlanning() {
 		_productAgent.setStatus(AgentStatus.PLANNING);
-		System.out.println("Add a PlannerBehaviour");
+		Logger.log("Started planningbehaviour");
 		myAgent.addBehaviour(_plannerBehaviour);
 	}
 
@@ -198,7 +188,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 */
 	public void startInforming() {
 		_productAgent.setStatus(AgentStatus.INFORMING);
-		System.out.println("Add an InformerBehaviour");
+		Logger.log("Started informingbehaviour");
 		myAgent.addBehaviour(_informerBehaviour);
 	}
 
@@ -207,7 +197,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 */
 	public void startScheduling() {
 		_productAgent.setStatus(AgentStatus.SCHEDULING);
-		System.out.println("Add a SchedulerBehaviour");
+		Logger.log("Started a schedulingbehaviour");
 		myAgent.addBehaviour(_schedulerBehaviour);
 	}
 
@@ -215,7 +205,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 * Starts the produce behavior
 	 */
 	public void startProducing() {
-		System.out.println("Add a ProduceBehaviour");
+		Logger.log("Starting a ProduceBehaviour");
 		if (_produceBehaviour.done() == false)
 			myAgent.addBehaviour(_produceBehaviour);
 	}
@@ -225,7 +215,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 		_plannerBehaviour.reset();
 		_informerBehaviour.reset();
 		_schedulerBehaviour.reset();
-		System.out.println("Add a RescheduleBehaviour");
+		Logger.log("Starting a RescheduleBehaviour");
 		myAgent.addBehaviour(_rescheduleBehaviour);
 	}
 
@@ -245,29 +235,29 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 		if (bs == BehaviourStatus.COMPLETED) {
 			switch (as) {
 			case PLANNING:
-				System.out.println("Done planning.");
+				Logger.log("Done planning.");
 				_productAgent.setStatus(AgentStatus.DONE_PLANNING);
 				// Check if there was an error. Do this for all cases
 				break;
 			case INFORMING:
-				System.out.println("Done Informing.");
+				Logger.log("Done Informing.");
 				_productAgent.setStatus(AgentStatus.DONE_INFORMING);
 				break;
 			case SCHEDULING:
-				System.out.println("Done scheduling.");
+				Logger.log("Done scheduling.");
 				_productAgent.setStatus(AgentStatus.PRODUCING);
 				break;
 			case PRODUCING:
-				System.out.println("Done producing.");
+				Logger.log("Done producing.");
 				_productAgent.setStatus(AgentStatus.DONE_PRODUCING);
 				break;
 			case RESCHEDULING:
-				System.out.println("Done rescheduling.");
+				Logger.log("Done rescheduling.");
 				_rescheduling = false;
 				_productAgent.setStatus(AgentStatus.DONE_RESCHEDULING);
 				break;
 			default:
-				System.out.println("Unknown status. Status: " + as.toString());
+				Logger.log("Unknown status. Status: " + as.toString());
 				break;
 			}
 		} else if (bs == BehaviourStatus.RUNNING) {
@@ -291,7 +281,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 */
 	public void cleanBehaviour() {
 		_socketBehaviour.write(false, "Product Completed.", "1");
-		System.out.println("Done overview, stopping SocketBehaviour.");
+		Logger.log("Done overview, stopping SocketBehaviour.");
 		myAgent.removeBehaviour(_parallelBehaviour);
 		if (_socketBehaviour != null)
 			_socketBehaviour.stop();

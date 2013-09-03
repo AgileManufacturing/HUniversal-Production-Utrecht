@@ -111,8 +111,8 @@ public class ScheduleStep extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		Logger.log("%s received message from %s (%s)%n", equipletAgent.getLocalName(), message.getSender().getLocalName(),
-				message.getOntology());
+		//Logger.log("%s received message from %s (%s)%n", equipletAgent.getLocalName(), message.getSender().getLocalName(),
+				//message.getOntology());
 
 		try {
 			// Gets the timeslot out of the message content.

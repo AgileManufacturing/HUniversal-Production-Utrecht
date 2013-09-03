@@ -102,8 +102,8 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 					new ProductStep((BasicDBObject) agent.getProductStepBBClient().findDocumentById(productStepId));
 			int productStepType = productStep.getType();
 
-			Logger.log("%s got message GetProductStepDuration for step type %s%n", agent.getLocalName(),
-					productStepType);
+			//Logger.log("%s got message GetProductStepDuration for step type %s%n", agent.getLocalName(),
+					//productStepType);
 
 			Service service = agent.getServiceForConvId(message.getConversationId());
 			BasicDBObject parameters = productStep.getParameters();
