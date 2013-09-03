@@ -142,7 +142,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	    			std::cout << "Getting noadnedend" << std::endl;
 	    			JSONNode node = instruc.getJsonNode();
 
-	    			std::cout << "Setting instructions of id:  " << targetObjectId.toString() << std::endl << " moduleProxId: " prox->getModuleId() << std::endl;
+	    			std::cout << "Setting instructions of id:  " << targetObjectId.toString() << "\n moduleProxId: " prox->getModuleId() << std::endl;
 				    prox->setInstruction(targetObjectId.toString(), node);
 
 	    		} else {
