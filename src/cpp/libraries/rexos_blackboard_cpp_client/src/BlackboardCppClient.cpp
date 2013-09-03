@@ -118,7 +118,7 @@ bool BlackboardCppClient::insertDocument(std::string json, mongo::BSONObj * resu
 	connection->done();
 	delete connection;
 	return result.getIntField("ok") == 1;
-	}catch(Exception& e){
+	}catch(...){
 		std::cout << "Exception inserting document: " << e << std::endl;
 	}
 }
@@ -141,7 +141,7 @@ int BlackboardCppClient::removeDocuments(std::string queryAsJSON, mongo::BSONObj
 	delete connection;
 	return result.getIntField("n");
 
-	}catch(Exception& e){
+	}catch(...){
 		std::cout << "Exception removing document: " << e << std::endl;
 	}
 }
@@ -158,7 +158,7 @@ mongo::BSONObj BlackboardCppClient::findDocumentById(mongo::OID objectId) {
 	delete connection;
 	return document;
 
-	}catch(Exception& e){
+	}catch(...){
 		std::cout << "Exception finding document: " << e << std::endl;
 	}
 }
@@ -192,7 +192,7 @@ int BlackboardCppClient::findDocuments(std::string queryAsJSON, std::vector<mong
 	delete connection;
 	return resultCount;
 
-	}catch(Exception& e){
+	}catch(...){
 		std::cout << "Exception finding document by json: " << e << std::endl;
 	}
 }
@@ -220,7 +220,7 @@ int BlackboardCppClient::updateDocuments(
 	connection->done();
 	delete connection;
 	return result.getIntField("n");
-		}catch(Exception& e){
+		}catch(...){
 		std::cout << "Exception updating documents: " << e << std::endl;
 	}
 }
