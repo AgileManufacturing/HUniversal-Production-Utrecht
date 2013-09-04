@@ -263,7 +263,7 @@ public class SchedulerBehaviour extends Behaviour {
 			} else {
 				freetimeslots.add(new FreeTimeSlot(
 						(System.currentTimeMillis() - firstTimeSlot)
-								/ timeSlotLength + (5000 / timeSlotLength),
+								/ timeSlotLength + (10000 / timeSlotLength),
 						requiredTimeSlots, aid));
 			}
 		}

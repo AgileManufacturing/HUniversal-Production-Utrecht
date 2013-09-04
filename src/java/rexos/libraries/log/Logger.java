@@ -31,6 +31,8 @@ package rexos.libraries.log;
 
 import java.io.PrintStream;
 
+import rexos.mas.data.LogLevel;
+
 /**
  * Helper for log messages, providing a single point for controlling program output.
  **/
@@ -53,6 +55,13 @@ public class Logger {
 	 **/
 	private static final boolean debugEnabled = true;
 	
+	
+	/**
+	 * @var int logleveltreshhold
+	 * treshhold for showing log msg
+	 **/
+	
+	public static final LogLevel loglevelThreshold = LogLevel.DEBUG;
 	/**
 	 * Returns whether or not debugging is enabled.
 	 * @return true if debugging is enabled, false otherwise.
@@ -65,20 +74,16 @@ public class Logger {
 	 * Writes the String representation (as returned by obj.toString) of the given object to the output stream.
 	 * @param obj The Object that should be printed.
 	 **/
-	public static void log(Object obj) {
-		if (debugEnabled) {
-			outStream.println(obj.toString());
-		}
+	public static void log(LogLevel level, Object obj) {
+		printToOut(level, obj.toString());
 	}
 	
 	/**
 	 * Writes the specified message to the output stream.
 	 * @param msg The message that should be printed.
 	 **/
-	public static void log(String msg) {
-		if (debugEnabled) {
-			outStream.println(msg);
-		}
+	public static void log(LogLevel level, String msg) {
+		printToOut(level, msg);
 	}
 	
 	/**
@@ -86,19 +91,58 @@ public class Logger {
 	 * @param msg A format string as described in http://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 	 * @param objects Arguments referenced by the format specifiers in the format string.
 	 **/
-	public static void log(String msg, Object... objects) {
-		if (debugEnabled) {
-			outStream.format(msg, objects);
-		}
+	public static void log(LogLevel level, String msg, Object... objects) {
+		printToOut(level, String.format(msg, objects));
 	}
 	
 	/**
 	 * Prints the stacktrace for the specified throwable to the error stream.
 	 * @param throwable The throwable that should be printed.
 	 **/
-	public static void log(Throwable throwable) {
-		if (debugEnabled) {
-			throwable.printStackTrace(errStream);
+	public static void log(LogLevel level, Throwable throwable) {
+		printToOut(level, throwable.toString());
+	}
+	
+	private static void printToOut(LogLevel level, String msg){
+		switch(level){
+		
+		case ALERT:
+			System.out.println("ALERT:\t" + msg);
+			break;
+			
+		case CRITICAL:
+			System.out.println("CRITICAL:\t" + msg);
+			break;
+			
+		case DEBUG:
+			if(debugEnabled)
+				System.out.println("DEBUG:\t" + msg);
+			break;
+			
+		case EMERGENCY:
+			System.out.println("EMERGENCY:\t" + msg);
+			break;
+			
+		case ERROR:
+			System.out.println("ERROR:\t" + msg);
+			break;
+			
+		case INFORMATION:
+			System.out.println("INFORMATION:\t" + msg);
+			break;
+			
+		case NOTIFICATION:
+			System.out.println("NOTIFICATION:\t" + msg);
+			break;
+			
+		case WARNING:
+			System.out.println("WARNING:\t" + msg);
+			break;
+			
+		default:
+			break;
+		
 		}
 	}
+
 }

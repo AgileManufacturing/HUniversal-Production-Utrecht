@@ -65,7 +65,7 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		try {
-			Logger.log("%s ArePartsAvailable%n", myAgent.getLocalName());
+			Logger.log("%s ArePartsAvailable%n", 0, myAgent.getLocalName());
 			
 			Part[] parts = ((ProductStep) message.getContentObject()).getInputParts();
 			ACLMessage reply = message.createReply();
@@ -75,9 +75,9 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 			myAgent.send(reply);
 
 			myAgent.addBehaviour(new ArePartsAvailableInTime(myAgent, message.getConversationId()));
-			Logger.log("PartTypes { %s } are available%n", (Object[]) parts);
+			Logger.log("PartTypes { %s } are available%n", 0, (Object[]) parts);
 		} catch (UnreadableException e) {
-			Logger.log(e);
+			Logger.log(e, 0);
 			myAgent.doDelete();
 		}
 	}

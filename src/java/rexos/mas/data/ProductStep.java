@@ -439,7 +439,7 @@ public class ProductStep implements MongoSaveable, Serializable {
 				scheduleData = new ScheduleData();
 			}
 			if(!copy.isEmpty()){
-				Logger.log(copy);
+				Logger.log(copy, 0);
 				throw new IllegalArgumentException();
 			}
 		}
