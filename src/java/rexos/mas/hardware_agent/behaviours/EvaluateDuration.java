@@ -61,6 +61,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.hardware_agent.EquipletStep;
 import rexos.mas.hardware_agent.HardwareAgent;
@@ -118,7 +119,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 		try {
 			// get the serviceStepId
 			ObjectId serviceStepId = (ObjectId) message.getContentObject();
-			Logger.log("%s received message from %s (%s:%s)%n", myAgent.getLocalName(), message.getSender()
+			Logger.log(LogLevel.DEBUG, "%s received message from %s (%s:%s)%n", myAgent.getLocalName(), message.getSender()
 					.getLocalName(), message.getOntology(), serviceStepId);
 			// Evaluate the duration of the step
 			EvaluateStepDuration(serviceStepId);
@@ -185,7 +186,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 						serviceStep.getParameters()));
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 			myAgent.doDelete();
 		}
 	}

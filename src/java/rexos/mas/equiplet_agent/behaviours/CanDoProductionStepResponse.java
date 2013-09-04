@@ -41,6 +41,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.ProductStep;
 import rexos.mas.equiplet_agent.EquipletAgent;
 
@@ -129,7 +130,7 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour {
 				}
 				myAgent.send(responseMessage);
 			} catch (GeneralMongoException | InvalidDBNamespaceException e) {
-				Logger.log(e);
+				Logger.log(LogLevel.ERROR, e);
 				myAgent.doDelete();
 			}
 		}

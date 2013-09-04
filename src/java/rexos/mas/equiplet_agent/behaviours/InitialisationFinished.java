@@ -63,6 +63,7 @@ import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.data.EquipletState;
 import rexos.mas.data.EquipletStateEntry;
+import rexos.mas.data.LogLevel;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.EquipletDirectoryEntry;
 
@@ -129,7 +130,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 					equipletAgent.getCollectiveBBClient().insertDocument(directoryEntry.toBasicDBObject());
 				}
 			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-				Logger.log(e);
+				Logger.log(LogLevel.ERROR, e);
 				equipletAgent.doDelete();
 			}
 
@@ -148,7 +149,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 			// starts a behaviour which listens to the response of this question.
 			equipletAgent.addBehaviour(new CanDoProductionStepResponse(equipletAgent, equipletAgent.getProductStepBBClient()));
 		} else {
-			Logger.log(equipletAgent.getName() + " - InitialisationFinished timeout!");
+			Logger.log(LogLevel.ERROR, equipletAgent.getName() + " - InitialisationFinished timeout!");
 			equipletAgent.doDelete();
 		}
 	}
@@ -161,7 +162,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 			EquipletStateEntry state = new EquipletStateEntry((BasicDBObject) dbObject);
 			switch(state.getEquipletState()) {
 				case STANDBY:
-					Logger.log("EquipletState changed to %s%n", state.getEquipletState().name());
+					Logger.log(LogLevel.DEBUG, "EquipletState changed to %s%n", state.getEquipletState().name());
 
 					EquipletDirectoryEntry directoryEntry =
 							new EquipletDirectoryEntry(equipletAgent.getAID(), equipletAgent.getCapabilities(),
@@ -171,7 +172,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 					equipletAgent.getStateBBClient().unsubscribe(stateUpdateSubscription);
 					break;
 				default:
-					Logger.log("EquipletState changed to %s%n", state.getEquipletState().name());
+					Logger.log(LogLevel.DEBUG, "EquipletState changed to %s%n", state.getEquipletState().name());
 					break;
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {

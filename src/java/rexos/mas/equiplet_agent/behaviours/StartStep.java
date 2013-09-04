@@ -51,6 +51,7 @@ import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.EquipletState;
 import rexos.mas.data.EquipletStateEntry;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.NextProductStepTimer;
@@ -114,7 +115,7 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 		try {
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
 			if(false){//equipletAgent.getEquipletStateEntry().getEquipletState() != EquipletState.NORMAL) {
-				Logger.log("%d Equiplet agent - changing state%n", EquipletAgent.getCurrentTimeSlot());
+				Logger.log(LogLevel.DEBUG, "%d Equiplet agent - changing state%n", EquipletAgent.getCurrentTimeSlot());
 
 				//equipletAgent.getStateBBClient().subscribe(stateUpdateSubscription);
 				//equipletAgent.setDesiredEquipletState(EquipletState.NORMAL);
@@ -123,14 +124,14 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 				
 				equipletAgent.getTimer().rescheduleTimer();
 			} else {
-				Logger.log("%d Equiplet agent - Starting prod. step.%n", EquipletAgent.getCurrentTimeSlot());
+				Logger.log(LogLevel.DEBUG, "%d Equiplet agent - Starting prod. step.%n", EquipletAgent.getCurrentTimeSlot());
 				equipletAgent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
 						new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));
 				
 				equipletAgent.getTimer().rescheduleTimer();
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e1) {
-			Logger.log(e1);
+			Logger.log(LogLevel.ERROR, e1);
 			//TODO handle error
 		}
 
@@ -145,7 +146,7 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 			if(dbObject != null) {
 				EquipletStateEntry state = new EquipletStateEntry((BasicDBObject) dbObject);
 				if(state.getEquipletState() == EquipletState.NORMAL) {
-					Logger.log("%d Equiplet agent - equip. state changed to NORMAL. Starting prod. step.", EquipletAgent.getCurrentTimeSlot());
+					Logger.log(LogLevel.DEBUG, "%d Equiplet agent - equip. state changed to NORMAL. Starting prod. step.", EquipletAgent.getCurrentTimeSlot());
 
 					equipletAgent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
 							new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));

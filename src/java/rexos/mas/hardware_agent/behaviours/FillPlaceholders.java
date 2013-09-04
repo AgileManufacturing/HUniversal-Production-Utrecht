@@ -63,6 +63,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.hardware_agent.EquipletStep;
 import rexos.mas.hardware_agent.HardwareAgent;
 import rexos.mas.hardware_agent.Module;
@@ -118,11 +119,11 @@ public class FillPlaceholders extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		try {
 			ObjectId serviceStepId = (ObjectId) message.getContentObject();
-			Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
+			Logger.log(LogLevel.DEBUG, "%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
 					message.getOntology());
 			FillStepPlaceholders(serviceStepId);
 		} catch(UnreadableException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 			myAgent.doDelete();
 		}
 	}
@@ -154,7 +155,7 @@ public class FillPlaceholders extends ReceiveBehaviour {
 
 			// Fill the placeholders
 			equipletSteps = module.fillPlaceHolders(equipletSteps, serviceStep.getParameters());
-			Logger.log("Hardware agent - Saving updated instructionData of %d equipletSteps%n", equipletSteps.length);
+			Logger.log(LogLevel.DEBUG, "Hardware agent - Saving updated instructionData of %d equipletSteps%n", equipletSteps.length);
 			for(EquipletStep step : equipletSteps) {
 				equipletStepBBClient.updateDocumentsUnsafe(new BasicDBObject("_id", step.getId()), new BasicDBObject("$set",
 						new BasicDBObject("instructionData", step.getInstructionData().toBasicDBObject())));
@@ -164,7 +165,7 @@ public class FillPlaceholders extends ReceiveBehaviour {
 				FillStepPlaceholders(serviceStep.getNextStep());
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 			myAgent.doDelete();
 		}
 	}

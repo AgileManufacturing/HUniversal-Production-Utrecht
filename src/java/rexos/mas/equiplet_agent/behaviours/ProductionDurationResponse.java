@@ -13,6 +13,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.EquipletAgent;
@@ -90,13 +91,13 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 				responseMessage.setConversationId(message.getConversationId());
 				responseMessage.setContentObject(new Long(schedule.getDuration()));
 				equipletAgent.send(responseMessage);
-				Logger.log("sending message: %s%n", responseMessage.getOntology());
+				Logger.log(LogLevel.DEBUG, "sending message: %s%n", responseMessage.getOntology());
 			} catch(IOException | InvalidDBNamespaceException | GeneralMongoException e) {
-				Logger.log(e);
+				Logger.log(LogLevel.ERROR, e);
 				equipletAgent.doDelete();
 			}
 		}else{
-			Logger.log("equiplet agent - duration response timed out");
+			Logger.log(LogLevel.ERROR, "equiplet agent - duration response timed out");
 		}
 	}
 }

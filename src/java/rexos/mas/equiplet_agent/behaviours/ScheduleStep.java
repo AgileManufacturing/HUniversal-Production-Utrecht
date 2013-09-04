@@ -48,6 +48,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.equiplet_agent.EquipletAgent;
@@ -117,7 +118,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 		try {
 			// Gets the timeslot out of the message content.
 			long start = (Long) message.getContentObject();
-			Logger.log("Equiplet agent - scheduling step for timeslot %d%n", start);
+			Logger.log(LogLevel.DEBUG, "Equiplet agent - scheduling step for timeslot %d%n", start);
 
 			// Gets the scheduledata out of the productstep.
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
@@ -160,13 +161,13 @@ public class ScheduleStep extends ReceiveBehaviour {
 				scheduleMessage.setConversationId(message.getConversationId());
 				equipletAgent.send(scheduleMessage);
 			} else {
-				Logger.log("ScheduleStep disconfirm");
+				Logger.log(LogLevel.ERROR, "ScheduleStep disconfirm");
 				ACLMessage reply = message.createReply();
 				reply.setPerformative(ACLMessage.DISCONFIRM);
 				myAgent.send(reply);
 			}
 		} catch(IOException | InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 		}
 	}
 }

@@ -117,7 +117,6 @@ public class Logger {
 					break;
 					
 				case DEBUG:
-					if(debugEnabled)
 						System.out.println("DEBUG:\t" + msg);
 					break;
 					

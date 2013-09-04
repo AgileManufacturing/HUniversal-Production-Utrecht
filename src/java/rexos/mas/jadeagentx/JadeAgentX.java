@@ -59,11 +59,13 @@ import java.util.ArrayList;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.Callback;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.Position;
 import rexos.mas.data.Product;
 import rexos.mas.data.ProductAgentProperties;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
+
 import com.mongodb.BasicDBObject;
 
 /**
@@ -79,7 +81,7 @@ public class JadeAgentX extends Agent {
 	@Override
 	protected void setup() {
 		try {
-			Logger.log("starting an agent");
+			Logger.log(LogLevel.DEBUG, "starting an agent");
 
 			/**
 			 * Make a new logistics agent
@@ -206,7 +208,7 @@ public class JadeAgentX extends Agent {
 			// .start();
 			addBehaviour(new StartProductAgent(this, args));
 		} catch(Exception e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 			doDelete();
 		}
 	}
@@ -246,7 +248,7 @@ public class JadeAgentX extends Agent {
 					getContainerController()
 							.createNewAgent("pa" + count++, "rexos.mas.productAgent.ProductAgent", args).start();
 				} catch(StaleProxyException e) {
-					Logger.log(e);
+					Logger.log(LogLevel.ERROR, e);
 				}
 			}
 			block();

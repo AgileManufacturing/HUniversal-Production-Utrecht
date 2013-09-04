@@ -43,6 +43,7 @@ import org.bson.types.ObjectId;
 
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.equiplet_agent.EquipletAgent;
 
 /**
@@ -96,7 +97,7 @@ public class GetProductionDuration extends ReceiveBehaviour {
 			// gets the productstepId and sends it to the service agent with the ontology GetProductionStepDuration.
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
 			if(productStepId == null) {
-				Logger.log("Conversation id not known");
+				Logger.log(LogLevel.DEBUG, "Conversation id not known");
 				ACLMessage responseMessage = message.createReply();
 				responseMessage.setPerformative(ACLMessage.DISCONFIRM);
 				responseMessage.setOntology("ConversationIdUnknown");
@@ -114,7 +115,7 @@ public class GetProductionDuration extends ReceiveBehaviour {
 				myAgent.send(responseMessage);
 			}
 		} catch(IOException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 			myAgent.doDelete();
 		}
 	}

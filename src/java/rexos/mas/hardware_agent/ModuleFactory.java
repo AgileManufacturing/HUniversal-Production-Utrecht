@@ -41,6 +41,7 @@ import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
 import rexos.libraries.log.Logger;
+import rexos.mas.data.LogLevel;
 
 /**
  * Creates and caches instances of the software required for modules.
@@ -113,7 +114,7 @@ public class ModuleFactory {
 				}
 			}
 		} catch (InstantiateClassException | KnowledgeException | KeyNotFoundException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 		}
 	}
 	

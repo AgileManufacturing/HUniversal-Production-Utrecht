@@ -56,6 +56,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.equiplet_agent.EquipletAgent;
@@ -131,7 +132,7 @@ public class AbortStep extends ReceiveBehaviour {
 					myAgent.send(reply);
 				}
 			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-				Logger.log(e, 0);
+				Logger.log(LogLevel.ERROR, e);
 				equipletAgent.doDelete();
 			}
 		}

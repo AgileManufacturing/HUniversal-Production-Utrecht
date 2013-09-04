@@ -59,6 +59,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.Part;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.ProductionStep;
@@ -151,13 +152,13 @@ public class CanPerformStep extends ReceiveBehaviour {
 			responseMessage.setContentObject(productStepEntryId);
 			equipletAgent.send(responseMessage);
 		} catch(IOException | InvalidDBNamespaceException | GeneralMongoException | NullPointerException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.FAILURE);
 			reply.setContent("Failed to process the step");
 			equipletAgent.send(reply);
 		} catch(UnreadableException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.FAILURE);
 			reply.setContent("No step given");

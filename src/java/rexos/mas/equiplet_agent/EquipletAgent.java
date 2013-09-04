@@ -84,12 +84,14 @@ import rexos.mas.data.DbData;
 import rexos.mas.data.EquipletMode;
 import rexos.mas.data.EquipletState;
 import rexos.mas.data.EquipletStateEntry;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.equiplet_agent.behaviours.AbortStep;
 import rexos.mas.equiplet_agent.behaviours.InitialisationFinished;
 import rexos.mas.equiplet_agent.behaviours.ServiceAgentDied;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
@@ -238,7 +240,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	@Override
 	public void setup() {
 		try {
-			Logger.log("I spawned as a equiplet agent.");
+			Logger.log(LogLevel.DEBUG, "I spawned as a equiplet agent.");
 			// gets his IP and sets the equiplet blackboard IP.
 //			InetAddress IP = InetAddress.getLocalHost();
 //			equipletDbIp = IP.getHostAddress();
@@ -256,7 +258,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			for(Row step : steps) {
 				capabilities.add((int) step.get("id"));
 			}
-			Logger.log("%s %s%n", capabilities, equipletDbName);
+			Logger.log(LogLevel.DEBUG, "%s %s%n", capabilities, equipletDbName);
 
 			dbData = new DbData(equipletDbIp, equipletDbPort, equipletDbName);
 
@@ -309,7 +311,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			collectiveBBClient.setCollection(equipletDirectoryName);
 		} catch(GeneralMongoException | InvalidDBNamespaceException | UnknownHostException | StaleProxyException
 				| KnowledgeException | KeyNotFoundException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 			doDelete();
 		}
 
@@ -347,7 +349,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			productStepBBClient.removeDocuments(new BasicDBObject());
 			productStepBBClient.unsubscribe(statusSubscription);
 		} catch(InvalidDBNamespaceException | GeneralMongoException | IOException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 		}
 
 		ACLMessage deadMessage = new ACLMessage(ACLMessage.FAILURE);
@@ -389,7 +391,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					responseMessage.addReceiver(productStep.getProductAgentId());
 					responseMessage.setConversationId(conversationId);
 
-					Logger.log("Equiplet agent - status update: " + productStep.getStatus().toString());
+					Logger.log(LogLevel.DEBUG, "Equiplet agent - status update: " + productStep.getStatus().toString());
 					switch(productStep.getStatus()) {
 					// Depending on the changed status fills in the responseMessage and sends it to the product agent.
 						case PLANNED:
@@ -435,7 +437,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 							} catch(IOException e) {
 								responseMessage.setPerformative(ACLMessage.DISCONFIRM);
 								responseMessage.setContent("An error occured in the planning/please reschedule");
-								Logger.log(e);
+								Logger.log(LogLevel.ERROR, e);
 							}
 							break;
 						case FAILED:
@@ -471,7 +473,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 						default:
 							break;
 					}
-					Logger.log("Equiplet agent - sending message %s%n",
+					Logger.log(LogLevel.DEBUG, "Equiplet agent - sending message %s%n",
 							ACLMessage.getPerformative(responseMessage.getPerformative()));
 					send(responseMessage);
 					break;
@@ -479,7 +481,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					EquipletStateEntry stateEntry =
 							new EquipletStateEntry((BasicDBObject) stateBBClient.findDocumentById(entry
 									.getTargetObjectId()));
-					Logger.log("Equiplet agent - mode changed to %s%n", stateEntry.getEquipletMode());
+					Logger.log(LogLevel.DEBUG, "Equiplet agent - mode changed to %s%n", stateEntry.getEquipletMode());
 					EquipletMode mode = stateEntry.getEquipletMode();
 					switch(mode) {
 					// TODO handle error stuff
@@ -497,12 +499,12 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					}
 					break;
 				default:
-					Logger.log("Equiplet agent - onMessage Unknown database");
+					Logger.log(LogLevel.WARNING, "Equiplet agent - onMessage Unknown database");
 					break;
 			}
 		} catch(GeneralMongoException | InvalidDBNamespaceException | IOException e) {
 			// TODO handle error
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 		}
 	}
 
