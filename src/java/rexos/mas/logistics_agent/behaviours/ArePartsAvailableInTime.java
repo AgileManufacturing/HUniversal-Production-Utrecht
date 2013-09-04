@@ -36,6 +36,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.Part;
 
 /**
@@ -88,7 +89,7 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
-				Logger.log("%s ArePartsAvailableInTime%n",
+				Logger.log(LogLevel.DEBUG, "%s ArePartsAvailableInTime%n",
 						myAgent.getLocalName());
 				Part[] parts = (Part[]) message.getContentObject();
 
@@ -100,11 +101,11 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 				myAgent.addBehaviour(new GetPartsInfo(myAgent, message
 						.getConversationId()));
 			} catch (UnreadableException e) {
-				Logger.log(e);
+				Logger.log(LogLevel.ERROR, e);
 				myAgent.doDelete();
 			}
 		} else {
-			Logger.log(myAgent.getLocalName()
+			Logger.log(LogLevel.ERROR, myAgent.getLocalName()
 					+ " - ArePartsAvailableInTime timeout!");
 			myAgent.removeBehaviour(this);
 		}

@@ -41,6 +41,7 @@ package rexos.mas.productAgent;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.AgentStatus;
 import rexos.mas.data.BehaviourStatus;
+import rexos.mas.data.LogLevel;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.ParallelBehaviour;
@@ -144,7 +145,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 				this.startScheduling();
 				break;
 			case DONE_SCHEDULING:
-				Logger.log("Done Scheduling");
+				Logger.log(LogLevel.DEBUG, "Done Scheduling");
 				_productAgent.setStatus(AgentStatus.PRODUCING);
 				break;
 			case DONE_PRODUCING:
@@ -179,7 +180,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 */
 	public void startPlanning() {
 		_productAgent.setStatus(AgentStatus.PLANNING);
-		Logger.log("Started planningbehaviour");
+		Logger.log(LogLevel.DEBUG, "Started planningbehaviour");
 		myAgent.addBehaviour(_plannerBehaviour);
 	}
 
@@ -188,7 +189,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 */
 	public void startInforming() {
 		_productAgent.setStatus(AgentStatus.INFORMING);
-		Logger.log("Started informingbehaviour");
+		Logger.log(LogLevel.DEBUG, "Started informingbehaviour");
 		myAgent.addBehaviour(_informerBehaviour);
 	}
 
@@ -197,7 +198,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 */
 	public void startScheduling() {
 		_productAgent.setStatus(AgentStatus.SCHEDULING);
-		Logger.log("Started a schedulingbehaviour");
+		Logger.log(LogLevel.DEBUG, "Started a schedulingbehaviour");
 		myAgent.addBehaviour(_schedulerBehaviour);
 	}
 
@@ -205,7 +206,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 * Starts the produce behavior
 	 */
 	public void startProducing() {
-		Logger.log("Starting a ProduceBehaviour");
+		Logger.log(LogLevel.DEBUG, "Starting a ProduceBehaviour");
 		if (_produceBehaviour.done() == false)
 			myAgent.addBehaviour(_produceBehaviour);
 	}
@@ -215,7 +216,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 		_plannerBehaviour.reset();
 		_informerBehaviour.reset();
 		_schedulerBehaviour.reset();
-		Logger.log("Starting a RescheduleBehaviour");
+		Logger.log(LogLevel.DEBUG, "Starting a RescheduleBehaviour");
 		myAgent.addBehaviour(_rescheduleBehaviour);
 	}
 
@@ -235,29 +236,29 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 		if (bs == BehaviourStatus.COMPLETED) {
 			switch (as) {
 			case PLANNING:
-				Logger.log("Done planning.");
+				Logger.log(LogLevel.DEBUG, "Done planning.");
 				_productAgent.setStatus(AgentStatus.DONE_PLANNING);
 				// Check if there was an error. Do this for all cases
 				break;
 			case INFORMING:
-				Logger.log("Done Informing.");
+				Logger.log(LogLevel.DEBUG, "Done Informing.");
 				_productAgent.setStatus(AgentStatus.DONE_INFORMING);
 				break;
 			case SCHEDULING:
-				Logger.log("Done scheduling.");
+				Logger.log(LogLevel.DEBUG, "Done scheduling.");
 				_productAgent.setStatus(AgentStatus.PRODUCING);
 				break;
 			case PRODUCING:
-				Logger.log("Done producing.");
+				Logger.log(LogLevel.DEBUG, "Done producing.");
 				_productAgent.setStatus(AgentStatus.DONE_PRODUCING);
 				break;
 			case RESCHEDULING:
-				Logger.log("Done rescheduling.");
+				Logger.log(LogLevel.DEBUG, "Done rescheduling.");
 				_rescheduling = false;
 				_productAgent.setStatus(AgentStatus.DONE_RESCHEDULING);
 				break;
 			default:
-				Logger.log("Unknown status. Status: " + as.toString());
+				Logger.log(LogLevel.ERROR, "Unknown status. Status: " + as.toString());
 				break;
 			}
 		} else if (bs == BehaviourStatus.RUNNING) {
@@ -281,7 +282,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 */
 	public void cleanBehaviour() {
 		_socketBehaviour.write(false, "Product Completed.", "1");
-		Logger.log("Done overview, stopping SocketBehaviour.");
+		Logger.log(LogLevel.DEBUG, "Done overview, stopping SocketBehaviour.");
 		myAgent.removeBehaviour(_parallelBehaviour);
 		if (_socketBehaviour != null)
 			_socketBehaviour.stop();

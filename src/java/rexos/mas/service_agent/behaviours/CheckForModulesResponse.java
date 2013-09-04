@@ -39,6 +39,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.service_agent.ServiceAgent;
 
 /**
@@ -89,10 +90,10 @@ public class CheckForModulesResponse extends ReceiveBehaviour {
 			reply.setPerformative(message.getPerformative());
 			reply.setOntology("CanDoProductionStepResponse");
 			getAgent().send(reply);
-			Logger.log("%s sending step availability (%b)%n", getAgent().getLocalName(),
+			Logger.log(LogLevel.DEBUG, "%s sending step availability (%b)%n", getAgent().getLocalName(),
 					message.getPerformative() == ACLMessage.CONFIRM);
 		} else {
-			Logger.log(agent.getName() + " - CheckForModulesResponse timeout!");
+			Logger.log(LogLevel.DEBUG, agent.getName() + " - CheckForModulesResponse timeout!");
 			agent.doDelete();
 		}
 	}

@@ -52,6 +52,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.BehaviourStatus;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
@@ -106,7 +107,7 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 					.createConversationIdToProductionStepMapping();
 			_productionStepsCount = _production.getProductionCount();
 		} catch (Exception e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 		}
 	}
 
@@ -167,11 +168,11 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 						((ProductAgent) myAgent).getProduct()
 								.addStatusDataToLog(m.getSender(),
 										step.getStatusData());
-						Logger.log("Completed productionStep :"+_prodCounters++);
+						Logger.log(LogLevel.DEBUG, "Completed productionStep :"+_prodCounters++);
 						_productionStepsCompleted++;
 						break;
 					default:
-						Logger.log(new UnsupportedOperationException(
+						Logger.log(LogLevel.ERROR, new UnsupportedOperationException(
 								"No case for " + step.getStatus()));
 						break;
 					}
@@ -180,15 +181,15 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 					/* EquipletAgent taken down */
 					break;
 				default:
-					Logger.log(new UnsupportedOperationException("No case for "
+					Logger.log(LogLevel.ERROR, new UnsupportedOperationException("No case for "
 							+ m.getOntology()));
 					break;
 				}
 			} else {
-				Logger.log("No ontology set!");
+				Logger.log(LogLevel.DEBUG, "No ontology set!");
 			}
 		} catch (Exception e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 			//_bc.handleCallback(BehaviourStatus.ERROR, null);
 			//_stopProduceBehaviour = true;
 		}

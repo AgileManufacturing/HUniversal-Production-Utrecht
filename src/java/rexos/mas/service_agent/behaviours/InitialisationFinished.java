@@ -37,6 +37,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.service_agent.ServiceAgent;
 
 /**
@@ -85,7 +86,7 @@ public class InitialisationFinished extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
-			Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
+			Logger.log(LogLevel.DEBUG, "%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
 					message.getOntology());
 
 			ACLMessage response = new ACLMessage(ACLMessage.CONFIRM);
@@ -93,7 +94,7 @@ public class InitialisationFinished extends ReceiveBehaviour {
 			response.setOntology("InitialisationFinished");
 			serviceAgent.send(response);
 		} else {
-			Logger.log(serviceAgent.getName() + " - InitialisationFinished timeout!");
+			Logger.log(LogLevel.DEBUG, serviceAgent.getName() + " - InitialisationFinished timeout!");
 			serviceAgent.doDelete();
 		}
 	}

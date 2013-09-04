@@ -54,6 +54,7 @@ import com.mongodb.util.JSON;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.AgentStatus;
 import rexos.mas.data.Callback;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.Product;
 import rexos.mas.data.ProductAgentProperties;
 import rexos.mas.data.Production;
@@ -93,9 +94,9 @@ public class ProductAgent extends Agent {
 			// Create the Overview Behaviour and start it
 			_overviewBehaviour = new OverviewBehaviour(this);
 			addBehaviour(_overviewBehaviour);
-			Logger.log("Product agent spawned.");
+			Logger.log(LogLevel.DEBUG, "Product agent spawned.");
 		} catch (Exception e) {
-			Logger.log("Productagent died. Exited with: " + e.getMessage());
+			Logger.log(LogLevel.ERROR, "Productagent died. Exited with: " + e.getMessage());
 			doDelete();
 		}
 	}

@@ -32,6 +32,7 @@ package rexos.mas.logistics_agent;
 
 import jade.core.Agent;
 import rexos.libraries.log.Logger;
+import rexos.mas.data.LogLevel;
 import rexos.mas.logistics_agent.behaviours.ArePartsAvailable;
 
 /**
@@ -51,7 +52,7 @@ public class LogisticsAgent extends Agent {
 	 */
 	@Override
 	public void setup() {
-		Logger.log("I spawned as a logistics agent.");
+		Logger.log(LogLevel.DEBUG, "I spawned as a logistics agent.");
 		addBehaviour(new ArePartsAvailable(this));
 	}
 

@@ -95,6 +95,14 @@ public class Logger {
 		printToOut(level, String.format(msg, objects));
 	}
 	
+	/**
+	 * Writes the specified message to the output stream using the PrintStream format method.
+	 * @param msg A format string as described in http://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
+	 * @param objects Arguments referenced by the format specifiers in the format string.
+	 **/
+	public static void log(LogLevel level, Throwable throwable) {
+		printToOut(level, throwable.getStackTrace().toString());
+	}
 	
 	private static void printToOut(LogLevel level, String msg)
 	{

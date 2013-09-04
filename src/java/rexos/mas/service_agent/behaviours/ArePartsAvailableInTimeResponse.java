@@ -47,6 +47,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.service_agent.ServiceAgent;
@@ -99,7 +100,7 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if(message != null) {
 			try {
-				Logger.log("%s ArePartsAvailableInTimeResponse%n", agent.getLocalName());
+				Logger.log(LogLevel.DEBUG, "%s ArePartsAvailableInTimeResponse%n", agent.getLocalName());
 				
 				BlackboardClient productStepBBClient = agent.getProductStepBBClient();
 				ObjectId productStepId = agent.getProductStepIdForConvId(message.getConversationId());
@@ -118,11 +119,11 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 											"productStep cannot be delivered on time"))));
 				}
 			} catch(IOException | InvalidDBNamespaceException | GeneralMongoException e) {
-				Logger.log(e);
+				Logger.log(LogLevel.ERROR, e);
 				agent.doDelete();
 			}
 		} else {
-			Logger.log(agent.getName() + " - ArePartsAvailableInTimeReponse timeout!");
+			Logger.log(LogLevel.WARNING, agent.getName() + " - ArePartsAvailableInTimeReponse timeout!");
 			agent.doDelete();
 		}
 	}

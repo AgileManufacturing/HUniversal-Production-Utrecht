@@ -48,6 +48,7 @@ import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.Part;
 import rexos.mas.data.Position;
 
@@ -92,7 +93,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 	public void handle(ACLMessage message) {
 		if(message != null) {
 			try {
-				Logger.log("%s GetPartsInfo%n", myAgent.getLocalName());
+				Logger.log(LogLevel.DEBUG, "%s GetPartsInfo%n", myAgent.getLocalName());
 				Part[] parts = (Part[]) message.getContentObject();
 				HashMap<Part, Position> partParameters = new HashMap<Part, Position>();
 				int x = 2;
@@ -115,7 +116,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 				reply.setContentObject(partParameters);
 				myAgent.send(reply);
 			} catch (UnreadableException | IOException | KnowledgeException | KeyNotFoundException e) {
-				Logger.log(e);
+				Logger.log(LogLevel.ERROR, e);
 				myAgent.doDelete();
 			}
 		} else {

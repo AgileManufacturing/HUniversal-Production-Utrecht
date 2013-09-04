@@ -33,6 +33,7 @@ package rexos.mas.service_agent;
 
 import java.util.HashMap;
 
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.Part;
 import rexos.libraries.knowledgedb_client.KeyNotFoundException;
 import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
@@ -88,7 +89,7 @@ public abstract class Service {
 			}
 			return moduleIds;
 		} catch(KnowledgeException | KeyNotFoundException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 		}
 		return null;
 	}

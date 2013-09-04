@@ -41,6 +41,7 @@ import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
 import rexos.libraries.log.Logger;
+import rexos.mas.data.LogLevel;
 
 /**
  * Helper class for creating Service objects based on knowledgebase data.
@@ -97,7 +98,7 @@ public class ServiceFactory {
 				serviceCache.put(description.getId(), service);
 			}
 		} catch (KnowledgeException | InstantiateClassException | KeyNotFoundException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 		}
 		
 		return service;
@@ -125,7 +126,7 @@ public class ServiceFactory {
 				}
 			}
 		} catch (KnowledgeException | KeyNotFoundException ex) {
-			Logger.log(ex);
+			Logger.log(LogLevel.ERROR, ex);
 		}
 		
 		Service[] services = new Service[servicesForStep.size()];

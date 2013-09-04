@@ -54,6 +54,7 @@ import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.BehaviourStatus;
 import rexos.mas.data.DbData;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
@@ -129,7 +130,7 @@ public class SchedulerBehaviour extends Behaviour {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 		}
 	}
 

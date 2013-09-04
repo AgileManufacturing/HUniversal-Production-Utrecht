@@ -51,6 +51,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.Part;
 import rexos.mas.data.Position;
 import rexos.mas.data.ProductStep;
@@ -137,7 +138,7 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 				productStepBBClient.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject("$set",
 						new BasicDBObject("inputParts", partList)));
 
-				Logger.log("%s got partsInfo: %s%n", agent.getLocalName(), parameters.toString());
+				Logger.log(LogLevel.DEBUG, "%s got partsInfo: %s%n", agent.getLocalName(), parameters.toString());
 
 				for(Entry<Part, Position> e : parameters.entrySet()) {
 					if(e.getValue() == null) {
@@ -182,11 +183,11 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 				productStepBBClient.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject("$set",
 						new BasicDBObject("status", StepStatusCode.PLANNED.name())));
 			} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
-				Logger.log(e);
+				Logger.log(LogLevel.ERROR, e);
 				agent.doDelete();
 			}
 		} else {
-			Logger.log(agent.getName() + " - GetPartsInfoResponse timeout!");
+			Logger.log(LogLevel.DEBUG, agent.getName() + " - GetPartsInfoResponse timeout!");
 			agent.doDelete();
 		}
 	}

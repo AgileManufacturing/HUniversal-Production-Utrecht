@@ -45,6 +45,7 @@ import java.util.Queue;
 
 import rexos.libraries.log.Logger;
 import rexos.mas.data.BehaviourStatus;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
@@ -145,12 +146,12 @@ public class InformerBehaviour extends Behaviour {
 						// THROW ERROR!
 					}
 				} else {
-					Logger.log("Can't find any equiplets that can execute this production step. Capability: "
+					Logger.log(LogLevel.ERROR, "Can't find any equiplets that can execute this production step. Capability: "
 							+ productionStep.getCapability());
 					// TODO Should we throw an exception here?
 				}
 			} else {
-				Logger.log("Can't process a productionStep which isn't in the evaluating state");
+				Logger.log(LogLevel.ERROR, "Can't process a productionStep which isn't in the evaluating state");
 				// TODO Should we throw an exception here?
 			}
 		}
@@ -224,7 +225,7 @@ public class InformerBehaviour extends Behaviour {
 		if (bs == BehaviourStatus.COMPLETED) {
 			_prodEQmap.setTimeSlotsForEquiplet(subBehaviour.getProductionStepId(), subBehaviour.getTargetEquiplet(), subBehaviour.getTimeslotDuration());
 		} else {
-			Logger.log("callbackSubInformerBehaviour ended with error!");
+			Logger.log(LogLevel.ERROR, "callbackSubInformerBehaviour ended with error!");
 		}
 		_parBehaviour.removeSubBehaviour(subBehaviour);
 		_currentRunningSubInformerBehaviours--;

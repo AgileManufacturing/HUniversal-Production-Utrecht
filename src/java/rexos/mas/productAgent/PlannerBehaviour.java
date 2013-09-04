@@ -45,6 +45,7 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import rexos.mas.data.BehaviourStatus;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
@@ -125,8 +126,7 @@ public class PlannerBehaviour extends Behaviour {
 			this._productAgent.setProduct(product);
 			this._isDone = true;
 		} catch (Exception e) {
-			e.printStackTrace();
-			Logger.log("Exception PlannerBehaviour - onStart() : " + e);
+			Logger.log(LogLevel.ERROR, "Exception PlannerBehaviour - onStart() : " + e);
 			this._isError = true;
 		}
 	}
@@ -147,7 +147,7 @@ public class PlannerBehaviour extends Behaviour {
 				block();
 			}
 		} catch (Exception e) {
-			Logger.log("Exception PlannerBehaviour: " + e);
+			Logger.log(LogLevel.ERROR, "Exception PlannerBehaviour: " + e);
 		}
 	}
 	

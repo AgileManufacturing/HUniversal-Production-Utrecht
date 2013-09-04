@@ -36,6 +36,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.Part;
 import rexos.mas.data.ProductStep;
 
@@ -65,7 +66,7 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		try {
-			Logger.log("%s ArePartsAvailable%n", 0, myAgent.getLocalName());
+			Logger.log(LogLevel.DEBUG, "ArePartsAvailable%n", 0, myAgent.getLocalName());
 			
 			Part[] parts = ((ProductStep) message.getContentObject()).getInputParts();
 			ACLMessage reply = message.createReply();
@@ -75,9 +76,9 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 			myAgent.send(reply);
 
 			myAgent.addBehaviour(new ArePartsAvailableInTime(myAgent, message.getConversationId()));
-			Logger.log("PartTypes { %s } are available%n", 0, (Object[]) parts);
+			Logger.log(LogLevel.DEBUG, "PartTypes { %s } are available%n", 0, (Object[]) parts);
 		} catch (UnreadableException e) {
-			Logger.log(e, 0);
+			Logger.log(LogLevel.ERROR, e);
 			myAgent.doDelete();
 		}
 	}

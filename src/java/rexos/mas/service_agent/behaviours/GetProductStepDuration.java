@@ -48,6 +48,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.ProductStep;
 import rexos.mas.service_agent.Service;
 import rexos.mas.service_agent.ServiceAgent;
@@ -112,7 +113,7 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 				serviceStep.setProductStepId(productStepId);
 			}
 
-			Logger.log("%s asking %s for duration of %d steps%n", agent.getLocalName(), agent.getHardwareAgentAID()
+			Logger.log(LogLevel.DEBUG, "%s asking %s for duration of %d steps%n", agent.getLocalName(), agent.getHardwareAgentAID()
 					.getLocalName(), serviceSteps.length);
 
 			ObjectId serviceStepId = null;
@@ -129,7 +130,7 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 			askMessage.setContentObject(serviceStepId);
 			agent.send(askMessage);
 		} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 			agent.doDelete();
 		}
 	}

@@ -46,6 +46,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.ScheduleData;
 import rexos.mas.service_agent.ServiceAgent;
@@ -114,7 +115,7 @@ public class GetServiceStepsDurationResponse extends ReceiveBehaviour {
 				ScheduleData scheduleData = productStep.getScheduleData();
 				scheduleData.setDuration(duration);
 
-				Logger.log("Saving duration of %d in prod. step %s%n", duration, productStepId);
+				Logger.log(LogLevel.DEBUG, "Saving duration of %d in prod. step %s%n", duration, productStepId);
 				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
 						new BasicDBObject("$set", new BasicDBObject("scheduleData", scheduleData.toBasicDBObject())));
 
@@ -124,12 +125,12 @@ public class GetServiceStepsDurationResponse extends ReceiveBehaviour {
 				answer.setOntology("ProductionDurationResponse");
 				agent.send(answer);
 
-				Logger.log("%s sending msg (%s)%n", myAgent.getLocalName(), answer.getOntology());
+				Logger.log(LogLevel.DEBUG, "%s sending msg (%s)%n", myAgent.getLocalName(), answer.getOntology());
 			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {
-				Logger.log(e);
+				Logger.log(LogLevel.ERROR, e);
 			}
 		} else {
-			Logger.log(agent.getName() + " - GetServiceStepDurationResponse timeout!");
+			Logger.log(LogLevel.DEBUG, agent.getName() + " - GetServiceStepDurationResponse timeout!");
 			agent.doDelete();
 		}
 	}

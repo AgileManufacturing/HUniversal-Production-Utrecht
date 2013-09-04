@@ -62,6 +62,7 @@ import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.Part;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.StepStatusCode;
@@ -153,7 +154,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 */
 	@Override
 	public void setup() {
-		Logger.log("I spawned as a service agent.");
+		Logger.log(LogLevel.DEBUG, "I spawned as a service agent.");
 
 		// handle arguments given to this agent
 		Object[] args = getArguments();
@@ -172,7 +173,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			hardwareAgentCnt.start();
 			hardwareAgentAID = new AID(hardwareAgentCnt.getName(), AID.ISGUID);
 		} catch(StaleProxyException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 			doDelete();
 		}
 
@@ -194,7 +195,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			serviceStepBBClient.subscribe(statusSubscription);
 			serviceStepBBClient.removeDocuments(new BasicDBObject());
 		} catch(UnknownHostException | GeneralMongoException | InvalidDBNamespaceException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 			doDelete();
 		}
 
@@ -222,7 +223,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	//@formatter:off
 	@Override
 	public void takeDown() {
-		Logger.log("ServiceAgent takedown");
+		Logger.log(LogLevel.DEBUG, "ServiceAgent takedown");
 		
 		productStepBBClient.unsubscribe(statusSubscription);
 		serviceStepBBClient.unsubscribe(statusSubscription);
@@ -244,7 +245,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			
 			serviceStepBBClient.removeDocuments(new BasicDBObject());
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 		}
 
 		ACLMessage message = new ACLMessage(ACLMessage.INFORM);
@@ -282,7 +283,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 				send(message);
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException | IOException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 		}
 	}
 
@@ -305,7 +306,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 							StepStatusCode status = productionStep.getStatus();
 							switch(status) {
 								case WAITING:
-									Logger.log("Service agent - prod.Step %s status set to %s%n",
+									Logger.log(LogLevel.DEBUG, "Service agent - prod.Step %s status set to %s%n",
 											productionStep.getId(), status);
 
 									// fetch and sort all serviceSteps
@@ -318,7 +319,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 									}
 									serviceSteps = ServiceStep.sort(serviceSteps);
 
-									Logger.log("Service agent - setting status of serv.Step %s to %s%n",
+									Logger.log(LogLevel.DEBUG, "Service agent - setting status of serv.Step %s to %s%n",
 											serviceSteps[0].getId(), status);
 
 									// update the status of the first serviceStep to WAITING
@@ -328,10 +329,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 													.append("statusData", productionStep.getStatusData())));
 									break;
 								case ABORTED:
-									Logger.log("Service agent - prod.Step %s status set to %s%n",
+									Logger.log(LogLevel.DEBUG, "Service agent - prod.Step %s status set to %s%n",
 											productionStep.getId(), status);
 
-									Logger.log("Service agent - aboring all serviceSteps of prod.Step%n",
+									Logger.log(LogLevel.DEBUG, "Service agent - aboring all serviceSteps of prod.Step%n",
 											entry.getTargetObjectId());
 
 									cancelAllStepsForProductStep(entry.getTargetObjectId(), productionStep
@@ -355,7 +356,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 							StepStatusCode status = serviceStep.getStatus();
 							switch(status) {
 								case DELETED:
-									Logger.log("Service agent - serv.Step %s status set to %s%n", serviceStepId, status);
+									Logger.log(LogLevel.DEBUG, "Service agent - serv.Step %s status set to %s%n", serviceStepId, status);
 
 									List<DBObject> undeletedServiceSteps =
 											serviceStepBBClient.findDocuments(QueryBuilder.start("productStepId")
@@ -375,10 +376,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 									}
 									break;
 								case DONE:
-									Logger.log("Service agent - serv.Step %s status set to %s%n", serviceStepId, status);
+									Logger.log(LogLevel.DEBUG, "Service agent - serv.Step %s status set to %s%n", serviceStepId, status);
 
 									if(serviceStep.getNextStep() != null) {
-										Logger.log("Service agent - setting status of next serv.Step %s to %s%n",
+										Logger.log(LogLevel.DEBUG, "Service agent - setting status of next serv.Step %s to %s%n",
 												serviceStep.getNextStep(), StepStatusCode.WAITING);
 										serviceStepBBClient.updateDocuments(
 												new BasicDBObject("_id", serviceStep.getNextStep()),
@@ -387,7 +388,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 										break;
 									}
 
-									Logger.log("Service agent - saving log in prod.Step %s%n", productStepId);
+									Logger.log(LogLevel.DEBUG, "Service agent - saving log in prod.Step %s%n", productStepId);
 
 									// save the log in the productStep
 									productStepBBClient.updateDocuments(
@@ -405,9 +406,9 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 															+ status.name()).append("log", buildLog(productStepId)))));
 									//$FALL-THROUGH$
 								case IN_PROGRESS:
-									Logger.log("Service agent - serv.Step %s status set to %s%n", serviceStep.getId(),
+									Logger.log(LogLevel.DEBUG, "Service agent - serv.Step %s status set to %s%n", serviceStep.getId(),
 											status);
-									Logger.log("Service agent - setting status of prod.Step %s to %s%n", productStepId,
+									Logger.log(LogLevel.DEBUG, "Service agent - setting status of prod.Step %s to %s%n", productStepId,
 											status);
 									productStepBBClient.updateDocuments(
 											new BasicDBObject("_id", productStepId),
@@ -425,7 +426,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					break;
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 			doDelete();
 		}
 	}

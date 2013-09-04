@@ -48,6 +48,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.ProductStep;
 import rexos.mas.service_agent.ServiceAgent;
 
@@ -97,7 +98,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if(message != null) {
 			try {
-				Logger.log("%s scheduling step with Logistics%n", agent.getLocalName());
+				Logger.log(LogLevel.DEBUG, "%s scheduling step with Logistics%n", agent.getLocalName());
 
 				ProductStep productStep =
 						new ProductStep((BasicDBObject) agent.getProductStepBBClient().findDocumentById(
@@ -112,7 +113,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 				sendMsg.setContentObject(productStep);
 				agent.send(sendMsg);
 			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException | IOException e) {
-				Logger.log(e);
+				Logger.log(LogLevel.ERROR, e);
 				agent.doDelete();
 			}
 		}

@@ -48,6 +48,7 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.ProductStep;
 import rexos.mas.service_agent.Service;
 import rexos.mas.service_agent.ServiceAgent;
@@ -131,11 +132,11 @@ public class CanDoProductStep extends ReceiveBehaviour {
 				reply.setPerformative(ACLMessage.DISCONFIRM);
 				reply.setOntology("CanDoProductionStepResponse");
 				getAgent().send(reply);
-				Logger.log("%s sending step availability (%b)%n", getAgent().getLocalName(),
+				Logger.log(LogLevel.DEBUG, "%s sending step availability (%b)%n", getAgent().getLocalName(),
 						reply.getPerformative() == ACLMessage.CONFIRM);
 			}
 		} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 			agent.doDelete();
 		}
 	}

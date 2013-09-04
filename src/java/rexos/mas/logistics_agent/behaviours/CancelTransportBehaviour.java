@@ -41,6 +41,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.Part;
 
 public class CancelTransportBehaviour extends ReceiveBehaviour {
@@ -68,9 +69,9 @@ public class CancelTransportBehaviour extends ReceiveBehaviour {
 		try {
 			// TODO (out of scope) cancel the transport of the parts in parts[]
 			Part[] parts = (Part[]) message.getContentObject();
-			Logger.log("Logistics agent - cancelling parts");
+			Logger.log(LogLevel.DEBUG, "Logistics agent - cancelling parts");
 		} catch(UnreadableException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 		}
 	}
 }

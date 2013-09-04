@@ -54,6 +54,7 @@ import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
 import rexos.libraries.log.Logger;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.Part;
 import rexos.mas.data.Position;
 import rexos.mas.data.ScheduleData;
@@ -105,7 +106,7 @@ public class PickAndPlaceService extends Service {
 			Row[] partProperties = client.executeSelectQuery(Queries.PART_PROPERTY, part.getType(), "height");
 			ballHeight = Double.parseDouble((String) partProperties[0].get("value"));
 		} catch(KnowledgeException | KeyNotFoundException e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 		}
 
 		BasicDBObject pickParameters = new BasicDBObject();

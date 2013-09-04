@@ -6,6 +6,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.BehaviourStatus;
 
@@ -66,7 +67,7 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 			message.setContentObject(_productionStep);
 			myAgent.send(message);
 		} catch (Exception e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 		}
 	}
 
@@ -91,7 +92,7 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 						myAgent.send(newMessage);
 						_currentState++;
 					} else {
-						Logger.log("Received something different than Confirm.");
+						Logger.log(LogLevel.DEBUG, "Received something different than Confirm.");
 						_parentBehaviour.callbackSubInformerBehaviour(
 								BehaviourStatus.ERROR, this);
 					}
@@ -103,7 +104,7 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 						_parentBehaviour.callbackSubInformerBehaviour(
 								BehaviourStatus.COMPLETED, this);
 					} else {
-						Logger.log("Received something different than Inform.");
+						Logger.log(LogLevel.DEBUG, "Received something different than Inform.");
 						_parentBehaviour.callbackSubInformerBehaviour(
 								BehaviourStatus.ERROR, this);
 					}
@@ -112,12 +113,12 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 					break;
 				}
 			} else {
-				Logger.log("Message can't be null!");
+				Logger.log(LogLevel.WARNING, "Message can't be null!");
 				_parentBehaviour.callbackSubInformerBehaviour(
 						BehaviourStatus.ERROR, this);
 			}
 		} catch (Exception e) {
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 			_parentBehaviour.callbackSubInformerBehaviour(
 					BehaviourStatus.ERROR, this);
 		}
