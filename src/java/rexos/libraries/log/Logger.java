@@ -61,7 +61,7 @@ public class Logger {
 	 * treshhold for showing log msg
 	 **/
 	
-	public static final LogLevel loglevelThreshold = LogLevel.DEBUG;
+	public static final int loglevelThreshold = LogLevel.DEBUG.getLevel();
 	/**
 	 * Returns whether or not debugging is enabled.
 	 * @return true if debugging is enabled, false otherwise.
@@ -95,53 +95,44 @@ public class Logger {
 		printToOut(level, String.format(msg, objects));
 	}
 	
-	/**
-	 * Prints the stacktrace for the specified throwable to the error stream.
-	 * @param throwable The throwable that should be printed.
-	 **/
-	public static void log(LogLevel level, Throwable throwable) {
-		printToOut(level, throwable.toString());
-	}
 	
-	private static void printToOut(LogLevel level, String msg){
-		switch(level){
-		
-		case ALERT:
-			System.out.println("ALERT:\t" + msg);
-			break;
-			
-		case CRITICAL:
-			System.out.println("CRITICAL:\t" + msg);
-			break;
-			
-		case DEBUG:
-			if(debugEnabled)
-				System.out.println("DEBUG:\t" + msg);
-			break;
-			
-		case EMERGENCY:
-			System.out.println("EMERGENCY:\t" + msg);
-			break;
-			
-		case ERROR:
-			System.out.println("ERROR:\t" + msg);
-			break;
-			
-		case INFORMATION:
-			System.out.println("INFORMATION:\t" + msg);
-			break;
-			
-		case NOTIFICATION:
-			System.out.println("NOTIFICATION:\t" + msg);
-			break;
-			
-		case WARNING:
-			System.out.println("WARNING:\t" + msg);
-			break;
-			
-		default:
-			break;
-		
+	private static void printToOut(LogLevel level, String msg)
+	{
+		if(level.getLevel() >= loglevelThreshold){
+			switch(level){
+				case ALERT:
+					System.err.println("ALERT:\t" + msg);
+					break;
+					
+				case CRITICAL:
+					System.err.println("CRITICAL:\t" + msg);
+					break;
+					
+				case DEBUG:
+					if(debugEnabled)
+						System.out.println("DEBUG:\t" + msg);
+					break;
+					
+				case EMERGENCY:
+					System.err.println("EMERGENCY:\t" + msg);
+					break;
+					
+				case ERROR:
+					System.err.println("ERROR:\t" + msg);
+					break;
+					
+				case INFORMATION:
+					System.out.println("INFORMATION:\t" + msg);
+					break;
+					
+				case NOTIFICATION:
+					System.out.println("NOTIFICATION:\t" + msg);
+					break;
+					
+				case WARNING:
+					System.out.println("WARNING:\t" + msg);
+					break;
+			}
 		}
 	}
 
