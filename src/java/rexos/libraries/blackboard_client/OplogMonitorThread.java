@@ -31,6 +31,8 @@ package rexos.libraries.blackboard_client;
 
 import java.util.ArrayList;
 
+import rexos.mas.data.LogLevel;
+
 import com.mongodb.Bytes;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -153,7 +155,7 @@ class OplogMonitorThread extends Thread {
 			 * We purposely kill the cursor when the OplogMonitorThread is interrupted, thus expect this to happen.
 			 */
 			
-			rexos.libraries.log.Logger.log("OplogMonitorThread ending due to %s:\n%s\n", ex.getClass().getName(), ex.getMessage());
+			rexos.libraries.log.Logger.log(LogLevel.ERROR,"OplogMonitorThread ending due to %s:\n%s\n", ex.getClass().getName(), ex.getMessage());
 		} finally {
 			try {
 				if (tailedCursor != null) {
@@ -161,7 +163,7 @@ class OplogMonitorThread extends Thread {
 				}
 			} catch (Throwable t) {
 				// If closing the cursor throws something, it's most likely not something we can fix.
-				rexos.libraries.log.Logger.log("%s thrown while closing cursor:\n%s\n", t.getClass().getName(), t.getMessage());
+				rexos.libraries.log.Logger.log(LogLevel.ERROR, "%s thrown while closing cursor:\n%s\n", t.getClass().getName(), t.getMessage());
 			}
 		}
 		

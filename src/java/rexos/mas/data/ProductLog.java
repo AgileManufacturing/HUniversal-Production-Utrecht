@@ -98,7 +98,7 @@ public class ProductLog{
 			writer.append(statusData.toString() + "}");
 			writer.flush();
 		} catch(IOException e){
-			Logger.log(e);
+			Logger.log(LogLevel.ERROR, e);
 		}
 	}
 	

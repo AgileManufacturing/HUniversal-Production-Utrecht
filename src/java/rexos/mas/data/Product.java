@@ -69,8 +69,9 @@ public class Product{
 	}
 
 	public Product(Production production){
-		if (production == null)
-			Logger.log(new Exception("Production can't be null"));
+		if (production == null){
+			Logger.log(LogLevel.ERROR, "Production can't be null");
+		}
 		setProduction(production);
 		log = new ProductLog();
 	}
