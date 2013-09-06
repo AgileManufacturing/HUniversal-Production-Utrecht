@@ -71,6 +71,8 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 
 	equipletStateBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_STATE);
 
+	amountOfIncomingMongoDBCalls = 0;
+
 	std::cout << "Connected equiplet_node." << std::endl;
 }
 

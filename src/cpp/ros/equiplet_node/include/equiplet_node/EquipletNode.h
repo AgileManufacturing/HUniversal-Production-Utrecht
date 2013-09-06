@@ -93,7 +93,7 @@ private:
 	/**
 	 * testdata
 	 **/
-	int amountOfIncomingMongoDBCalls = 0;
+	int amountOfIncomingMongoDBCalls;
 
 	/**
 	 * @var int equipletId
