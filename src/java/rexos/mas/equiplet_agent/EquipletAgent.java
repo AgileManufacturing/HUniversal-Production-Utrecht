@@ -391,7 +391,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					responseMessage.addReceiver(productStep.getProductAgentId());
 					responseMessage.setConversationId(conversationId);
 
-					Logger.log(LogLevel.DEBUG, "Equiplet agent - status update: " + productStep.getStatus().toString());
+					Logger.log(LogLevel.INFORMATION, "Equiplet agent - status update: " + productStep.getStatus().toString());
 					switch(productStep.getStatus()) {
 					// Depending on the changed status fills in the responseMessage and sends it to the product agent.
 						case PLANNED:

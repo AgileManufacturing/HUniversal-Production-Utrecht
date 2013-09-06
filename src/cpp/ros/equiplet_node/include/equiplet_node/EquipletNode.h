@@ -91,6 +91,11 @@ private:
 	void updateEquipletStateOnBlackboard();
 
 	/**
+	 * testdata
+	 **/
+	int amountOfIncomingMongoDBCalls = 0;
+
+	/**
 	 * @var int equipletId
 	 * The id of the equiplet
 	 **/

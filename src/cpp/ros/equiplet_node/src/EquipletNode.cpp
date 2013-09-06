@@ -41,6 +41,7 @@
 
 using namespace equiplet_node;
 
+
 /**
  * Create a new EquipletNode
  * @param id The unique identifier of the Equiplet
@@ -98,7 +99,8 @@ EquipletNode::~EquipletNode(){
  **/
 void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) 
 {
-	std::cout << "Received EquipletNode::onMessage" << std::endl;
+	amountOfIncomingMongoDBCalls++;
+	std::cout << "Received EquipletNode::onMessage No:" << amountOfIncomingMongoDBCalls << std::endl;
 	if(&subscription == equipletStepSubscription)
 	{
 		mongo::OID targetObjectId;
@@ -132,7 +134,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	}
 	else if(&subscription == equipletCommandSubscription || &subscription == equipletCommandSubscriptionSet)
 	{
-		ROS_INFO("Received equiplet sattemachine command");
+		ROS_INFO("Received equiplet statemachine command");
     	JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
 		JSONNode::const_iterator i = n.begin();
 
