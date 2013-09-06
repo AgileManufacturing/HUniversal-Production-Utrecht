@@ -107,38 +107,40 @@ public class Logger {
 	private static void printToOut(LogLevel level, String msg)
 	{
 		if(level.getLevel() >= loglevelThreshold){
-			switch(level){
+			switch(level){		
+				case EMERGENCY:
+					System.err.println("EMERGENCY:\t" + msg + "\nAt " + new Exception().getStackTrace()[2]);
+					break;
+					
 				case ALERT:
-					System.err.println("ALERT:\t" + msg);
+					System.err.println("ALERT:\t" + msg + msg + "\nAt " + new Exception().getStackTrace()[2]);
 					break;
 					
 				case CRITICAL:
-					System.err.println("CRITICAL:\t" + msg);
-					break;
-					
-				case DEBUG:
-						System.out.println("DEBUG:\t" + msg);
-					break;
-					
-				case EMERGENCY:
-					System.err.println("EMERGENCY:\t" + msg);
+					System.err.println("CRITICAL:\t" + msg + "\nAt " + new Exception().getStackTrace()[2]);
 					break;
 					
 				case ERROR:
-					System.err.println("ERROR:\t" + msg);
+					System.err.println("ERROR:\t" + msg + "\nAt " + new Exception().getStackTrace()[2]);
 					break;
 					
-				case INFORMATION:
-					System.out.println("INFORMATION:\t" + msg);
+				case WARNING:
+					System.out.println("WARNING:\t" + msg);
 					break;
 					
 				case NOTIFICATION:
 					System.out.println("NOTIFICATION:\t" + msg);
 					break;
 					
-				case WARNING:
-					System.out.println("WARNING:\t" + msg);
+				case INFORMATION:
+					System.out.println("INFORMATION:\t" + msg);
 					break;
+					
+				case DEBUG:
+					System.out.println("DEBUG:\t" + msg);
+					break;
+					
+					
 			}
 		}
 	}
