@@ -139,6 +139,7 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 					ACLMessage reply = m.createReply();
 					reply.setOntology("StartStep");
 					myAgent.send(reply);
+					Logger.logAclMessage(reply);
 					break;
 				case "StatusUpdate":
 					ProductStep step = new ProductStep(

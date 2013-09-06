@@ -29,8 +29,17 @@
  **/
 package rexos.libraries.log;
 
-import java.io.PrintStream;
+import jade.core.AID;
+import jade.lang.acl.ACLMessage;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+
+import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.mas.data.LogLevel;
 
 /**
@@ -55,6 +64,7 @@ public class Logger {
 	 **/
 	private static final boolean debugEnabled = true;
 	
+    private static final String PATH_ENVIROMENT_VARIABLE = "MSGPATH";
 	
 	/**
 	 * @var int logleveltreshhold
@@ -95,6 +105,32 @@ public class Logger {
 		printToOut(level, String.format(msg, objects));
 	}
 	
+	public static void logAclMessage(ACLMessage msg) 
+	{
+        String msgsFilePath = System.getenv(PATH_ENVIROMENT_VARIABLE);
+        
+    	try { 
+    		File dir = new File (msgsFilePath);
+    		File file = new File(dir, msg.getConversationId() + ".txt");
+    		
+    		//if file doesnt exists, then create it
+    		if(!file.exists()){
+    			file.createNewFile();
+    		}    		
+    		FileWriter fileWritter = new FileWriter(file, true);
+	        BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
+	        
+	        bufferWritter.write("Msg from ( sender ): " + msg.getSender().getLocalName() + " -> " + "to ( receiver ): " + ((AID)msg.getAllReceiver().next()).getLocalName() +  "\n" +
+	        		"Performative: " + ACLMessage.getPerformative(msg.getPerformative()) + "\n" +
+	        		"Ontology: " + msg.getOntology()  + "\n\n");
+	        
+	        bufferWritter.close();
+	        
+    	}catch(IOException e){
+    		e.printStackTrace();
+    	}
+	}
+	
 	/**
 	 * Writes the specified message to the output stream using the PrintStream format method.
 	 * @param msg A format string as described in http://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
@@ -104,41 +140,43 @@ public class Logger {
 		printToOut(level, throwable.getStackTrace().toString());
 	}
 	
+	
 	private static void printToOut(LogLevel level, String msg)
 	{
 		if(level.getLevel() >= loglevelThreshold){
-			switch(level){
+			switch(level){		
+				case EMERGENCY:
+					System.err.println("EMERGENCY:\t" + msg + "\nAt " + new Exception().getStackTrace()[2]);
+					break;
+					
 				case ALERT:
-					System.err.println("ALERT:\t" + msg);
+					System.err.println("ALERT:\t" + msg + msg + "\nAt " + new Exception().getStackTrace()[2]);
 					break;
 					
 				case CRITICAL:
-					System.err.println("CRITICAL:\t" + msg);
-					break;
-					
-				case DEBUG:
-						System.out.println("DEBUG:\t" + msg);
-					break;
-					
-				case EMERGENCY:
-					System.err.println("EMERGENCY:\t" + msg);
+					System.err.println("CRITICAL:\t" + msg + "\nAt " + new Exception().getStackTrace()[2]);
 					break;
 					
 				case ERROR:
-					System.err.println("ERROR:\t" + msg);
+					System.err.println("ERROR:\t" + msg + "\nAt " + new Exception().getStackTrace()[2]);
 					break;
 					
-				case INFORMATION:
-					System.out.println("INFORMATION:\t" + msg);
+				case WARNING:
+					System.out.println("WARNING:\t" + msg);
 					break;
 					
 				case NOTIFICATION:
 					System.out.println("NOTIFICATION:\t" + msg);
 					break;
 					
-				case WARNING:
-					System.out.println("WARNING:\t" + msg);
+				case INFORMATION:
+					System.out.println("INFORMATION:\t" + msg);
 					break;
+					
+				case DEBUG:
+					System.out.println("DEBUG:\t" + msg);
+					break;
+					
 			}
 		}
 	}

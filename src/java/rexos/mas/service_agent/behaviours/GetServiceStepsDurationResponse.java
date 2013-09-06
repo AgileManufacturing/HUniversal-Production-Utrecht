@@ -124,6 +124,7 @@ public class GetServiceStepsDurationResponse extends ReceiveBehaviour {
 				answer.setConversationId(message.getConversationId());
 				answer.setOntology("ProductionDurationResponse");
 				agent.send(answer);
+				Logger.logAclMessage(answer);
 
 				Logger.log(LogLevel.DEBUG, "%s sending msg (%s)%n", myAgent.getLocalName(), answer.getOntology());
 			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {

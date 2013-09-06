@@ -36,6 +36,7 @@ package rexos.mas.service_agent.behaviours;
 
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.service_agent.ServiceAgent;
 
@@ -76,6 +77,7 @@ public class OtherAgentDied extends ReceiveBehaviour {
 			msg.addReceiver(agent.getHardwareAgentAID());
 			msg.setOntology("ServiceAgentDied");
 			agent.send(msg);
+			Logger.logAclMessage(msg);
 		} else {
 			agent.doDelete();
 		}

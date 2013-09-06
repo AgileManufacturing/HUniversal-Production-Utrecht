@@ -111,6 +111,7 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 					sendMsg.setPerformative(ACLMessage.QUERY_IF);
 					sendMsg.setContentObject(productStep.getInputParts());
 					agent.send(sendMsg);
+					Logger.logAclMessage(sendMsg);
 				} else {
 					agent.getProductStepBBClient().updateDocuments(
 							new BasicDBObject("_id", productStep.getId()),

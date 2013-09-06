@@ -115,6 +115,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 				reply.setOntology("GetPartsInfoResponse");
 				reply.setContentObject(partParameters);
 				myAgent.send(reply);
+				Logger.logAclMessage(reply);
 			} catch (UnreadableException | IOException | KnowledgeException | KeyNotFoundException e) {
 				Logger.log(LogLevel.ERROR, e);
 				myAgent.doDelete();

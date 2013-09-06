@@ -129,6 +129,7 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 			askMessage.setConversationId(message.getConversationId());
 			askMessage.setContentObject(serviceStepId);
 			agent.send(askMessage);
+			Logger.logAclMessage(askMessage);
 		} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 			Logger.log(LogLevel.ERROR, e);
 			agent.doDelete();

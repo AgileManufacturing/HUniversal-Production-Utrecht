@@ -91,6 +91,7 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 				responseMessage.setConversationId(message.getConversationId());
 				responseMessage.setContentObject(new Long(schedule.getDuration()));
 				equipletAgent.send(responseMessage);
+				Logger.logAclMessage(responseMessage);
 				Logger.log(LogLevel.DEBUG, "sending message: %s%n", responseMessage.getOntology());
 			} catch(IOException | InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(LogLevel.ERROR, e);

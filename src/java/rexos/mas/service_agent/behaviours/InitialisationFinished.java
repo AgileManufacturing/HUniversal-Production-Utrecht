@@ -93,6 +93,7 @@ public class InitialisationFinished extends ReceiveBehaviour {
 			response.addReceiver(serviceAgent.getEquipletAgentAID());
 			response.setOntology("InitialisationFinished");
 			serviceAgent.send(response);
+			Logger.logAclMessage(response);
 		} else {
 			Logger.log(LogLevel.DEBUG, serviceAgent.getName() + " - InitialisationFinished timeout!");
 			serviceAgent.doDelete();

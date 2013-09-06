@@ -15,6 +15,7 @@ package rexos.mas.productAgent;
 
 import java.util.ArrayList;
 
+import rexos.libraries.log.Logger;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
@@ -56,6 +57,7 @@ public class RescheduleBehaviour extends Behaviour {
 				message.setOntology("AbortStep");
 				message.setConversationId(step.getConversationId());
 				myAgent.send(message);
+				Logger.logAclMessage(message);
 			}
 		}	
 		

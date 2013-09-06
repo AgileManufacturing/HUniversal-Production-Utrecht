@@ -102,6 +102,7 @@ public class GetProductionDuration extends ReceiveBehaviour {
 				responseMessage.setPerformative(ACLMessage.DISCONFIRM);
 				responseMessage.setOntology("ConversationIdUnknown");
 				myAgent.send(responseMessage);
+				Logger.logAclMessage(responseMessage);
 			} else {
 				ProductionDurationResponse productionDurationResponseBehaviour =
 						new ProductionDurationResponse(myAgent, equipletAgent.getProductStepBBClient());
@@ -113,6 +114,7 @@ public class GetProductionDuration extends ReceiveBehaviour {
 				responseMessage.setContentObject(productStepId);
 				responseMessage.setOntology("GetProductionStepDuration");
 				myAgent.send(responseMessage);
+				Logger.logAclMessage(responseMessage);
 			}
 		} catch(IOException e) {
 			Logger.log(LogLevel.ERROR, e);

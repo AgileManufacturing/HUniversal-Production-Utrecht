@@ -212,6 +212,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			startedMessage.addReceiver(serviceAgentAID);
 			startedMessage.setOntology("InitialisationFinished");
 			send(startedMessage);
+			Logger.logAclMessage(startedMessage);
 
 			stepStatusSubscription = new FieldUpdateSubscription("status", this);
 			stepStatusSubscription.addOperation(MongoUpdateLogOperation.SET);
@@ -287,6 +288,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		deadMessage.addReceiver(serviceAgentAID);
 		deadMessage.setOntology("HardwareAgentDied");
 		send(deadMessage);
+		Logger.logAclMessage(deadMessage);
 	}
 
 	public void cancelAllStepsForServiceStep(ObjectId serviceStepId, String reason) {

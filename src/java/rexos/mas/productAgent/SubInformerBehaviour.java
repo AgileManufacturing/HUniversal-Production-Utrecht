@@ -66,6 +66,7 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 			message.setOntology("CanPerformStep");
 			message.setContentObject(_productionStep);
 			myAgent.send(message);
+			Logger.logAclMessage(message);
 		} catch (Exception e) {
 			Logger.log(LogLevel.ERROR, e);
 		}
@@ -90,6 +91,7 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 						newMessage.setOntology("GetProductionDuration");
 						newMessage.setContentObject(_productionStep);
 						myAgent.send(newMessage);
+						Logger.logAclMessage(newMessage);
 						_currentState++;
 					} else {
 						Logger.log(LogLevel.DEBUG, "Received something different than Confirm.");
