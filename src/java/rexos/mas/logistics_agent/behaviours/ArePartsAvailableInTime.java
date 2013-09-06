@@ -97,6 +97,7 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 				reply.setOntology("ArePartsAvailableInTimeResponse");
 				reply.setPerformative(ACLMessage.CONFIRM);
 				myAgent.send(reply);
+				Logger.logAclMessage(reply);
 
 				myAgent.addBehaviour(new GetPartsInfo(myAgent, message
 						.getConversationId()));

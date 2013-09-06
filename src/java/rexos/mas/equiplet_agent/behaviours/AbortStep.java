@@ -130,6 +130,7 @@ public class AbortStep extends ReceiveBehaviour {
 					ACLMessage reply = message.createReply();
 					reply.setPerformative(ACLMessage.FAILURE);
 					myAgent.send(reply);
+					Logger.logAclMessage(reply);
 				}
 			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(LogLevel.ERROR, e);

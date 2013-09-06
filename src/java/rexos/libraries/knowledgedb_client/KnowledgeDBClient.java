@@ -51,6 +51,7 @@ public class KnowledgeDBClient {
      **/
     private static final String PROPERTIES_ENVIRONMENT_VARIABLE = "KNOWLEDGE_DB_PROPERTIES";
 
+    
     /**
      * @var rexos.libraries.knowledgedb_client.KnowledgeDBClient client
      *

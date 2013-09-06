@@ -233,6 +233,7 @@ public class NextProductStepTimer extends Timer {
 				 test.addReceiver(equipletAgent.getAID());
 				 test.setOntology("StartStep");
 				 equipletAgent.send(test);
+				 Logger.logAclMessage(test);
 			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(LogLevel.ERROR, e);
 			}

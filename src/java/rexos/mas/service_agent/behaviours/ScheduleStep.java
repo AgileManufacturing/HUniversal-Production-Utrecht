@@ -112,6 +112,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 				sendMsg.setOntology("ArePartsAvailable");
 				sendMsg.setContentObject(productStep);
 				agent.send(sendMsg);
+				Logger.logAclMessage(sendMsg);
 			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException | IOException e) {
 				Logger.log(LogLevel.ERROR, e);
 				agent.doDelete();

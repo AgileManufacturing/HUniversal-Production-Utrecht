@@ -130,6 +130,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 			reply.setContentObject(serviceStepId);
 			reply.setOntology("GetServiceStepDurationResponse");
 			myAgent.send(reply);
+			Logger.logAclMessage(reply);
 		} catch(UnreadableException | IOException e) {
 			e.printStackTrace();
 			myAgent.doDelete();

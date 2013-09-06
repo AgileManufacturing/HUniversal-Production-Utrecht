@@ -1,0 +1,80 @@
+Msg from ( sender ): EQ1-hardwareAgent -> to ( receiver ): EQ1-serviceAgent
+Performative: INFORM
+Ontology: InitialisationFinished
+
+Msg from ( sender ): EQ1-serviceAgent -> to ( receiver ): EQ1
+Performative: CONFIRM
+Ontology: InitialisationFinished
+
+Msg from ( sender ): EQ1-hardwareAgent -> to ( receiver ): EQ1-serviceAgent
+Performative: FAILURE
+Ontology: HardwareAgentDied
+
+Msg from ( sender ): EQ1 -> to ( receiver ): pa49
+Performative: FAILURE
+Ontology: EquipletAgentDied
+
+Msg from ( sender ): EQ1 -> to ( receiver ): EQ1-serviceAgent
+Performative: FAILURE
+Ontology: EquipletAgentDied
+
+Msg from ( sender ): EQ1-serviceAgent -> to ( receiver ): EQ1
+Performative: INFORM
+Ontology: ServiceAgentDied
+
+Msg from ( sender ): EQ1-hardwareAgent -> to ( receiver ): EQ1-serviceAgent
+Performative: INFORM
+Ontology: InitialisationFinished
+
+Msg from ( sender ): EQ1-serviceAgent -> to ( receiver ): EQ1
+Performative: CONFIRM
+Ontology: InitialisationFinished
+
+Msg from ( sender ): EQ1-hardwareAgent -> to ( receiver ): EQ1-serviceAgent
+Performative: FAILURE
+Ontology: HardwareAgentDied
+
+Msg from ( sender ): EQ1 -> to ( receiver ): EQ1-serviceAgent
+Performative: FAILURE
+Ontology: EquipletAgentDied
+
+Msg from ( sender ): EQ1-serviceAgent -> to ( receiver ): EQ1
+Performative: INFORM
+Ontology: ServiceAgentDied
+
+Msg from ( sender ): EQ1-hardwareAgent -> to ( receiver ): EQ1-serviceAgent
+Performative: INFORM
+Ontology: InitialisationFinished
+
+Msg from ( sender ): EQ1-serviceAgent -> to ( receiver ): EQ1
+Performative: CONFIRM
+Ontology: InitialisationFinished
+
+Msg from ( sender ): EQ1-hardwareAgent -> to ( receiver ): EQ1-serviceAgent
+Performative: FAILURE
+Ontology: HardwareAgentDied
+
+Msg from ( sender ): EQ1 -> to ( receiver ): pa50
+Performative: FAILURE
+Ontology: EquipletAgentDied
+
+Msg from ( sender ): EQ1 -> to ( receiver ): pa50
+Performative: FAILURE
+Ontology: EquipletAgentDied
+
+Msg from ( sender ): EQ1 -> to ( receiver ): pa50
+Performative: FAILURE
+Ontology: EquipletAgentDied
+
+Msg from ( sender ): EQ1 -> to ( receiver ): pa50
+Performative: FAILURE
+Ontology: EquipletAgentDied
+
+Msg from ( sender ): EQ1 -> to ( receiver ): EQ1-serviceAgent
+Performative: FAILURE
+Ontology: EquipletAgentDied
+
+Msg from ( sender ): EQ1-serviceAgent -> to ( receiver ): EQ1
+Performative: INFORM
+Ontology: ServiceAgentDied
+

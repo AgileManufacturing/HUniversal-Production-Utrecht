@@ -129,6 +129,7 @@ public class CanDoProductionStepResponse extends ReceiveBehaviour {
 							productStepEntryId));
 				}
 				myAgent.send(responseMessage);
+				Logger.logAclMessage(responseMessage);
 			} catch (GeneralMongoException | InvalidDBNamespaceException e) {
 				Logger.log(LogLevel.ERROR, e);
 				myAgent.doDelete();

@@ -90,6 +90,7 @@ public class CheckForModulesResponse extends ReceiveBehaviour {
 			reply.setPerformative(message.getPerformative());
 			reply.setOntology("CanDoProductionStepResponse");
 			getAgent().send(reply);
+			Logger.logAclMessage(reply);
 			Logger.log(LogLevel.DEBUG, "%s sending step availability (%b)%n", getAgent().getLocalName(),
 					message.getPerformative() == ACLMessage.CONFIRM);
 		} else {

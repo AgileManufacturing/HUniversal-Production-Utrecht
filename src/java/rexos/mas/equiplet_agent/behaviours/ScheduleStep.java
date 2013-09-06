@@ -133,6 +133,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 
 			boolean fitsInSchedule = true;
 
+			Logger.log(LogLevel.NOTIFICATION, "Amount of plannedsteps > -1 : " + plannedSteps.size());
 			// check if other steps not are scheduled.
 			for(DBObject plannedStep : plannedSteps) {
 				ProductStep productStep = new ProductStep((BasicDBObject) plannedStep);
@@ -160,11 +161,15 @@ public class ScheduleStep extends ReceiveBehaviour {
 				scheduleMessage.setContentObject(productStepId);
 				scheduleMessage.setConversationId(message.getConversationId());
 				equipletAgent.send(scheduleMessage);
-			} else {
+				Logger.logAclMessage(scheduleMessage);
+			}
+			else 
+			{
 				Logger.log(LogLevel.ERROR, "ScheduleStep disconfirm");
 				ACLMessage reply = message.createReply();
 				reply.setPerformative(ACLMessage.DISCONFIRM);
 				myAgent.send(reply);
+				Logger.logAclMessage(reply);
 			}
 		} catch(IOException | InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {
 			Logger.log(LogLevel.ERROR, e);

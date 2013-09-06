@@ -343,6 +343,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				responseMessage.setOntology("EquipletAgentDied");
 				responseMessage.setContentObject((BasicDBObject) object.get("statusData"));
 				send(responseMessage);
+				Logger.logAclMessage(responseMessage);
 			}
 
 			// Clears his own blackboard and removes his subscription on that blackboard.
@@ -356,6 +357,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		deadMessage.addReceiver(serviceAgent);
 		deadMessage.setOntology("EquipletAgentDied");
 		send(deadMessage);
+		Logger.logAclMessage(deadMessage);
 	}
 
 	public void cancelProductStep(ObjectId productStepId, String reason) {
@@ -476,6 +478,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					Logger.log(LogLevel.DEBUG, "Equiplet agent - sending message %s%n",
 							ACLMessage.getPerformative(responseMessage.getPerformative()));
 					send(responseMessage);
+					Logger.logAclMessage(responseMessage);
 					break;
 				case "equipletState":
 					EquipletStateEntry stateEntry =
