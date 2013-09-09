@@ -109,8 +109,6 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 
 		_sequentialBehaviour = new SequentialBehaviour();
 
-		System.out
-				.println("Addding a SequentialBehaviour to the Product Agent");
 		myAgent.addBehaviour(_sequentialBehaviour);
 
 		_parallelBehaviour.addSubBehaviour(_socketBehaviour);
@@ -198,7 +196,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 */
 	public void startScheduling() {
 		_productAgent.setStatus(AgentStatus.SCHEDULING);
-		Logger.log(LogLevel.DEBUG, "Started a schedulingbehaviour");
+		Logger.log(LogLevel.INFORMATION, "Started a schedulingbehaviour");
 		myAgent.addBehaviour(_schedulerBehaviour);
 	}
 
@@ -233,43 +231,50 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	@Override
 	public void handleCallback(BehaviourStatus bs, Object[] callbackArgs) {
 		AgentStatus as = _productAgent.getStatus();
-		if (bs == BehaviourStatus.COMPLETED) {
-			switch (as) {
-			case PLANNING:
-				Logger.log(LogLevel.DEBUG, "Done planning.");
-				_productAgent.setStatus(AgentStatus.DONE_PLANNING);
-				// Check if there was an error. Do this for all cases
-				break;
-			case INFORMING:
-				Logger.log(LogLevel.DEBUG, "Done Informing.");
-				_productAgent.setStatus(AgentStatus.DONE_INFORMING);
-				break;
-			case SCHEDULING:
-				Logger.log(LogLevel.DEBUG, "Done scheduling.");
-				_productAgent.setStatus(AgentStatus.PRODUCING);
-				break;
-			case PRODUCING:
-				Logger.log(LogLevel.DEBUG, "Done producing.");
-				_productAgent.setStatus(AgentStatus.DONE_PRODUCING);
-				break;
-			case RESCHEDULING:
-				Logger.log(LogLevel.DEBUG, "Done rescheduling.");
-				_rescheduling = false;
-				_productAgent.setStatus(AgentStatus.DONE_RESCHEDULING);
-				break;
-			default:
-				Logger.log(LogLevel.ERROR, "Unknown status. Status: " + as.toString());
-				break;
+		if (bs == BehaviourStatus.COMPLETED) 
+		{
+			switch (as) 
+			{
+				case PLANNING:
+					Logger.log(LogLevel.DEBUG, "Done planning.");
+					_productAgent.setStatus(AgentStatus.DONE_PLANNING);
+					// Check if there was an error. Do this for all cases
+					break;
+				case INFORMING:
+					Logger.log(LogLevel.DEBUG, "Done Informing.");
+					_productAgent.setStatus(AgentStatus.DONE_INFORMING);
+					break;
+				case SCHEDULING:
+					Logger.log(LogLevel.DEBUG, "Done scheduling.");
+					_productAgent.setStatus(AgentStatus.DONE_SCHEDULING);
+					break;
+				case PRODUCING:
+					Logger.log(LogLevel.DEBUG, "Done producing.");
+					_productAgent.setStatus(AgentStatus.DONE_PRODUCING);
+					break;
+				case RESCHEDULING:
+					Logger.log(LogLevel.DEBUG, "Done rescheduling.");
+					_rescheduling = false;
+					_productAgent.setStatus(AgentStatus.DONE_RESCHEDULING);
+					break;
+				default:
+					Logger.log(LogLevel.ERROR, "Unknown status. Status: " + as.toString());
+					break;
 			}
-		} else if (bs == BehaviourStatus.RUNNING) {
-			switch (as) {
-			case SCHEDULING:
-				startProducing();
-				break;
-			default:
-				break;
+		} 
+		else if (bs == BehaviourStatus.RUNNING) 
+		{
+			switch (as) 
+			{
+				case SCHEDULING:
+					startProducing();
+					break;
+				default:
+					break;
 			}
-		} else if (bs == BehaviourStatus.ERROR) {
+		} 
+		else if (bs == BehaviourStatus.ERROR) 
+		{
 			if (!_rescheduling) {
 				_rescheduling = true;
 				startRescheduling();

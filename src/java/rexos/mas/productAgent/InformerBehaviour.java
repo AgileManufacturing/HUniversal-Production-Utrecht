@@ -133,26 +133,21 @@ public class InformerBehaviour extends Behaviour {
 					if (equipletList != null && equipletList.size() > 0) {
 						for (AID aid : equipletList.keySet()) {
 							String convId = _productAgent.generateCID();
-							productionStep.setConversationIdForEquiplet(aid,convId
-									);
+							productionStep.setConversationIdForEquiplet(aid,convId);
 							// _parBehaviour.addSubBehaviour(new
 							// Conversation(aid, productionStep, _prodEQmap));
-							_subInformerBehaviours
-									.add(new SubInformerBehaviour(myAgent,
-											this, productionStep, aid));
+							_subInformerBehaviours.add(new SubInformerBehaviour(myAgent,this, productionStep, aid));
 							_totalSubinformers++;
 						}
 					} else {
-						// THROW ERROR!
+						Logger.log(LogLevel.ERROR, "PEM is null");
 					}
 				} else {
 					Logger.log(LogLevel.ERROR, "Can't find any equiplets that can execute this production step. Capability: "
 							+ productionStep.getCapability());
-					// TODO Should we throw an exception here?
 				}
 			} else {
 				Logger.log(LogLevel.ERROR, "Can't process a productionStep which isn't in the evaluating state");
-				// TODO Should we throw an exception here?
 			}
 		}
 
@@ -165,28 +160,34 @@ public class InformerBehaviour extends Behaviour {
 	@Override
 	public void action() {
 		try {
-			if (!_subInformerBehaviours.isEmpty()) {
+			if (!_subInformerBehaviours.isEmpty()) 
+			{
 				if (_currentRunningSubInformerBehaviours < MAX_RUNNING_SUB_BEHAVIOURS) {
 					SubInformerBehaviour sib = _subInformerBehaviours.poll();
 					sib.restartTimer();
 					_parBehaviour.addSubBehaviour(sib);
 					_currentRunningSubInformerBehaviours++;
 				}
-			} else {
-				if (_isDone) {
+			} 
+			else 
+			{
+				if (_isDone) 
+				{
 					_production.setProductionEquipletMapping(_prodEQmap);
 					_product.setProduction(_production);
 					_productAgent.setProduct(_product);
 					this._bc.handleCallback(BehaviourStatus.COMPLETED, null);
 					_isCompleted = true;
-				} else if (_isError) {
+				} 
+				else if (_isError) 
+				{
 					this._bc.handleCallback(BehaviourStatus.ERROR, null);
 					_isCompleted = true;
 				}
 			}
 			//block();
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.log(LogLevel.ERROR, e.toString());
 		}
 	}
 	
@@ -200,18 +201,12 @@ public class InformerBehaviour extends Behaviour {
 		_totalSubinformers = 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jade.core.behaviours.Behaviour#done()
-	 */
 	/**
 	 * Returns true when the behavior is done
 	 * @return
 	 */
 	@Override
 	public boolean done() {
-		// TODO Auto-generated method stub
 		return _isCompleted;
 	}
 
@@ -221,16 +216,24 @@ public class InformerBehaviour extends Behaviour {
 	 * @param subBehaviour
 	 */
 	public void callbackSubInformerBehaviour(BehaviourStatus bs,
-			SubInformerBehaviour subBehaviour) {
-		if (bs == BehaviourStatus.COMPLETED) {
+			SubInformerBehaviour subBehaviour) 
+	{
+		if (bs == BehaviourStatus.COMPLETED) 
+		{
+			Logger.log(LogLevel.DEBUG, "Setting time slots for equiplet: " + subBehaviour.getTargetEquiplet() + " duration: " + subBehaviour.getTimeslotDuration());
 			_prodEQmap.setTimeSlotsForEquiplet(subBehaviour.getProductionStepId(), subBehaviour.getTargetEquiplet(), subBehaviour.getTimeslotDuration());
-		} else {
+		} 
+		else 
+		{
 			Logger.log(LogLevel.ERROR, "callbackSubInformerBehaviour ended with error!");
 		}
+		
 		_parBehaviour.removeSubBehaviour(subBehaviour);
 		_currentRunningSubInformerBehaviours--;
 		_subInformersCompleted++;
-		if(_subInformersCompleted == _totalSubinformers) {
+		
+		if(_subInformersCompleted == _totalSubinformers) 
+		{
 			_isDone = true;
 		}
 	}

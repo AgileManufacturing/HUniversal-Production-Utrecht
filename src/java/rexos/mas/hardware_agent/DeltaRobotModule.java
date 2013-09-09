@@ -61,13 +61,13 @@ public class DeltaRobotModule extends Module {
 	 * @var double SAFE_MOVEMENT_PLANE
 	 *      A static value that contains the height of the safe movement plane.
 	 */
-	private static final double SAFE_MOVEMENT_PLANE = 15;
+	private static final double SAFE_MOVEMENT_PLANE = 25;
 	
 	/**
 	 * @var double MAX_ACCELERATION
 	 * 		A static value with the max accelaration 
 	 */
-	private static final double MAX_ACCELERATION = 25.0;
+	private static final double MAX_ACCELERATION = 2555.0;
 
 	/**
 	 * @var int TIMESLOTS_NEEDED_PER_STEP

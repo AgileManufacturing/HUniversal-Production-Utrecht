@@ -71,7 +71,7 @@ public class Logger {
 	 * treshhold for showing log msg
 	 **/
 	
-	public static final int loglevelThreshold = LogLevel.DEBUG.getLevel();
+	public static final int loglevelThreshold = LogLevel.INFORMATION.getLevel();
 	/**
 	 * Returns whether or not debugging is enabled.
 	 * @return true if debugging is enabled, false otherwise.
@@ -150,7 +150,7 @@ public class Logger {
 					break;
 					
 				case ALERT:
-					System.err.println("ALERT:\t" + msg + msg + "\nAt " + new Exception().getStackTrace()[2]);
+					System.err.println("ALERT:\t" + msg + "\nAt " + new Exception().getStackTrace()[2]);
 					break;
 					
 				case CRITICAL:

@@ -2,7 +2,7 @@
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 
 	<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-		<listEntry value="/Huniversal/lib/jade.jar"/>
+		<listEntry value="/HUniversal/lib/jade.jar"/>
 	</listAttribute>
 	
 	<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">

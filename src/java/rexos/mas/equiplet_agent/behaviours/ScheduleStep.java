@@ -111,21 +111,22 @@ public class ScheduleStep extends ReceiveBehaviour {
 	 *            - The received message.
 	 */
 	@Override
-	public void handle(ACLMessage message) {
-		//Logger.log("%s received message from %s (%s)%n", equipletAgent.getLocalName(), message.getSender().getLocalName(),
-				//message.getOntology());
-
-		try {
+	public void handle(ACLMessage message) 
+	{
+		try 
+		{
 			// Gets the timeslot out of the message content.
 			long start = (Long) message.getContentObject();
-			Logger.log(LogLevel.DEBUG, "Equiplet agent - scheduling step for timeslot %d%n", start);
+			Logger.log(LogLevel.INFORMATION, "Equiplet agent received schedulestep request. Trying to schedule ts: %d%n", start);
 
 			// Gets the scheduledata out of the productstep.
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
+			
 			ScheduleData scheduleData =
-					new ScheduleData(
-							(BasicDBObject) (productBBClient.findDocumentById(productStepId)).get("scheduleData"));
+					new ScheduleData((BasicDBObject) (productBBClient.findDocumentById(productStepId)).get("scheduleData"));
+			
 			long end = start + scheduleData.getDuration();
+			Logger.log(LogLevel.INFORMATION, "start: " + start + " duration: " + scheduleData.getDuration() + " end: " + end);
 
 			// Gets planned steps
 			List<DBObject> plannedSteps =
@@ -133,7 +134,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 
 			boolean fitsInSchedule = true;
 
-			Logger.log(LogLevel.NOTIFICATION, "Amount of plannedsteps > -1 : " + plannedSteps.size());
+			Logger.log(LogLevel.INFORMATION, "I currently have " + plannedSteps.size() + " planned steps.");
 			// check if other steps not are scheduled.
 			for(DBObject plannedStep : plannedSteps) {
 				ProductStep productStep = new ProductStep((BasicDBObject) plannedStep);
@@ -142,14 +143,36 @@ public class ScheduleStep extends ReceiveBehaviour {
 				long scheduledStepStart = stepScheduleData.getStartTime();
 				long scheduledStepEnd = scheduledStepStart + stepScheduleData.getDuration();
 
-				if(start >= scheduledStepStart && start <= scheduledStepEnd) {
+				if(start >= scheduledStepStart && start <= scheduledStepEnd) 
+				{
+					Logger.log(LogLevel.ERROR, "FitInSchedule is false!\nstart: " + start + " scheduledStepStart: " + scheduledStepStart +
+							"\nend: " + end + " scheduledStepEnd: " +  scheduledStepEnd + " \nend - start: " + (end - start) + 
+							"\nscheduledEnd - scheduledStart " + (scheduledStepEnd - scheduledStepStart) +
+							"\nend - scheduledStepEnd: " + (end - scheduledStepEnd) + 
+							"\nstart - scheduledStepStart: " + (start - scheduledStepStart));
 					fitsInSchedule = false;
-				} else if(end >= scheduledStepStart && end <= scheduledStepEnd) {
+				} 
+				else if(end >= scheduledStepStart && end <= scheduledStepEnd) 
+				{
+					Logger.log(LogLevel.ERROR, "FitInSchedule is false!\nstart: " + start + " scheduledStepStart: " + scheduledStepStart +
+							"\nend: " + end + " scheduledStepEnd: " +  scheduledStepEnd + " \nend - start: " + (end - start) + 
+							"\nscheduledEnd - scheduledStart " + (scheduledStepEnd - scheduledStepStart) +
+							"\nend - scheduledStepEnd: " + (end - scheduledStepEnd) + 
+							"\nstart - scheduledStepStart: " + (start - scheduledStepStart));
 					fitsInSchedule = false;
-				} else if(start <= scheduledStepStart && end >= scheduledStepEnd) {
+				} 
+				else if(start <= scheduledStepStart && end >= scheduledStepEnd) 
+				{
+					Logger.log(LogLevel.ERROR, "FitInSchedule is false!\nstart: " + start + " scheduledStepStart: " + scheduledStepStart +
+							"\nend: " + end + " scheduledStepEnd: " +  scheduledStepEnd + " \nend - start: " + (end - start) + 
+							"\nscheduledEnd - scheduledStart " + (scheduledStepEnd - scheduledStepStart) +
+							"\nend - scheduledStepEnd: " + (end - scheduledStepEnd) + 
+							"\nstart - scheduledStepStart: " + (start - scheduledStepStart));
 					fitsInSchedule = false;
 				}
+				
 			}
+			
 			if(fitsInSchedule) {
 				scheduleData.setStartTime(start);
 				productBBClient.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject("$set",
@@ -162,6 +185,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 				scheduleMessage.setConversationId(message.getConversationId());
 				equipletAgent.send(scheduleMessage);
 				Logger.logAclMessage(scheduleMessage);
+				Logger.log(LogLevel.INFORMATION, "You fit in my schedule, msg accepted send.");
 			}
 			else 
 			{
@@ -171,7 +195,9 @@ public class ScheduleStep extends ReceiveBehaviour {
 				myAgent.send(reply);
 				Logger.logAclMessage(reply);
 			}
-		} catch(IOException | InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {
+		}
+		catch(IOException | InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) 
+		{
 			Logger.log(LogLevel.ERROR, e);
 		}
 	}
