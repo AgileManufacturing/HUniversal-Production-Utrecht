@@ -120,7 +120,6 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	    		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
 
 					amountOfIncomingMongoDBCalls++;
-					std::cout << "Received EquipletNode::onMessage No:" << amountOfIncomingMongoDBCalls << " EQStepID: " << step->getID() << std::endl;
 
 	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
 				    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
