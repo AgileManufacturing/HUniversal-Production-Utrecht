@@ -41,6 +41,7 @@
 
 using namespace equiplet_node;
 
+
 /**
  * Create a new EquipletNode
  * @param id The unique identifier of the Equiplet
@@ -70,6 +71,8 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 
 	equipletStateBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_STATE);
 
+	amountOfIncomingMongoDBCalls = 0;
+
 	std::cout << "Connected equiplet_node." << std::endl;
 }
 
@@ -98,7 +101,6 @@ EquipletNode::~EquipletNode(){
  **/
 void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) 
 {
-	std::cout << "Received EquipletNode::onMessage" << std::endl;
 	if(&subscription == equipletStepSubscription)
 	{
 		mongo::OID targetObjectId;
@@ -117,6 +119,9 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 
 	    		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
 
+					amountOfIncomingMongoDBCalls++;
+					std::cout << "Received EquipletNode::onMessage No:" << amountOfIncomingMongoDBCalls << " EQStepID: " << step->getID() << std::endl;
+
 	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
 				    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
 				    prox->setInstruction(targetObjectId.toString(), step->getInstructionData().getJsonNode());
@@ -132,7 +137,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	}
 	else if(&subscription == equipletCommandSubscription || &subscription == equipletCommandSubscriptionSet)
 	{
-		ROS_INFO("Received equiplet sattemachine command");
+		ROS_INFO("Received equiplet statemachine command");
     	JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
 		JSONNode::const_iterator i = n.begin();
 

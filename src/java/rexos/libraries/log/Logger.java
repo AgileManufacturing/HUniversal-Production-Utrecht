@@ -111,6 +111,9 @@ public class Logger {
         
     	try { 
     		File dir = new File (msgsFilePath);
+    		if (!dir.exists()){
+    			dir.mkdir();
+    		}
     		File file = new File(dir, msg.getConversationId() + ".txt");
     		
     		//if file doesnt exists, then create it
