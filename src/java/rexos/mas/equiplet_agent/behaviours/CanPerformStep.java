@@ -99,20 +99,20 @@ public class CanPerformStep extends ReceiveBehaviour {
 
 	/**
 	 * @var BlackboardClient equipletBBClient
-	 *      The blackboard client for the Equiplet.
+	 *      The blackboard client for the product steps.
 	 **/
-	private BlackboardClient equipletBBClient;
+	private BlackboardClient productStepBBClient;
 
 	/**
 	 * Instantiates a new can perform step.
 	 * 
 	 * @param a The agent for this behaviour
-	 * @param equipletBBClient The BlackboardClient for the EquipletBlackboard.
+	 * @param productStepBBClient The BlackboardClient for the ProductStepBlackboard.
 	 */
-	public CanPerformStep(EquipletAgent a, BlackboardClient equipletBBClient) {
+	public CanPerformStep(EquipletAgent a, BlackboardClient productStepBBClient) {
 		super(a, messageTemplate);
 		equipletAgent = a;
-		this.equipletBBClient = equipletBBClient;
+		this.productStepBBClient = productStepBBClient;
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class CanPerformStep extends ReceiveBehaviour {
 			ProductStep entry =
 					new ProductStep(message.getSender(), productStep.getCapability(), productStep.getParameters(),
 							inputParts, null, StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
-			productStepEntryId = equipletBBClient.insertDocument(entry.toBasicDBObject());
+			productStepEntryId = productStepBBClient.insertDocument(entry.toBasicDBObject());
 			equipletAgent.addCommunicationRelation(message.getConversationId(), productStepEntryId);
 
 			// asks the service agent if the productionstep can be done.

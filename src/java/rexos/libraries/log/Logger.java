@@ -71,7 +71,7 @@ public class Logger {
 	 * treshhold for showing log msg
 	 **/
 	
-	public static final int loglevelThreshold = LogLevel.INFORMATION.getLevel();
+	public static final int loglevelThreshold = LogLevel.DEBUG.getLevel();
 	/**
 	 * Returns whether or not debugging is enabled.
 	 * @return true if debugging is enabled, false otherwise.
