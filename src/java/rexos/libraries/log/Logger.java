@@ -109,27 +109,31 @@ public class Logger {
 	{
         String msgsFilePath = System.getenv(PATH_ENVIROMENT_VARIABLE);
         
-    	try { 
+    	try 
+    	{ 
     		File dir = new File (msgsFilePath);
-    		if (!dir.exists()){
+    		if (!dir.exists())
+    		{
     			dir.mkdir();
     		}
+    		
     		File file = new File(dir, msg.getConversationId() + ".txt");
     		
     		//if file doesnt exists, then create it
-    		if(!file.exists()){
+    		if(!file.exists())
+    		{
     			file.createNewFile();
-    		}    		
+    		}    
+    		
     		FileWriter fileWritter = new FileWriter(file, true);
 	        BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
 	        
-	        bufferWritter.write("Msg from ( sender ): " + msg.getSender().getLocalName() + " -> " + "to ( receiver ): " + ((AID)msg.getAllReceiver().next()).getLocalName() +  "\n" +
-	        		"Performative: " + ACLMessage.getPerformative(msg.getPerformative()) + "\n" +
-	        		"Ontology: " + msg.getOntology()  + "\n\n");
 	        
 	        bufferWritter.close();
 	        
-    	}catch(IOException e){
+    	}
+    	catch(IOException e)
+    	{
     		e.printStackTrace();
     	}
 	}

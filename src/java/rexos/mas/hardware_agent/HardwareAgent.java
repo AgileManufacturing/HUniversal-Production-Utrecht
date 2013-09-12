@@ -190,7 +190,8 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 
 		// gets the dbData and AID from the arguments.
 		Object[] args = getArguments();
-		if(args != null && args.length > 0) {
+		if(args != null && args.length > 0) 
+		{
 			dbData = (DbData) args[0];
 			equipletAgentAID = (AID) args[1];
 			serviceAgentAID = (AID) args[2];
@@ -206,13 +207,15 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		behaviours = new ArrayList<Behaviour>();
 
 		// configure the blackboards
-		try {
+		try 
+		{
 			// Send a message to the serviceAgent that the hardware agent is ready.
 			ACLMessage startedMessage = new ACLMessage(ACLMessage.INFORM);
 			startedMessage.addReceiver(serviceAgentAID);
 			startedMessage.setOntology("InitialisationFinished");
 			send(startedMessage);
 			Logger.logAclMessage(startedMessage);
+			Logger.log(LogLevel.INFORMATION, "Hardware is ready to use.");
 
 			stepStatusSubscription = new FieldUpdateSubscription("status", this);
 			stepStatusSubscription.addOperation(MongoUpdateLogOperation.SET);
@@ -228,7 +231,9 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			equipletStepBBClient.subscribe(stepStatusSubscription);
 
 			equipletStepBBClient.removeDocuments(new BasicDBObject());
-		} catch(InvalidDBNamespaceException | UnknownHostException | GeneralMongoException e) {
+		}
+		catch(InvalidDBNamespaceException | UnknownHostException | GeneralMongoException e) 
+		{
 			Logger.log(LogLevel.DEBUG, e);
 			doDelete();
 		}
@@ -246,19 +251,25 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		addBehaviour(new ServiceAgentDied(this));
 
 		// Get the modules for the equiplet and register the modules
-		try {
+		try 
+		{
 			KnowledgeDBClient client = KnowledgeDBClient.getClient();
 			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgentAID.getLocalName());
 			Module module;
 			int id;
-			for(Row row : rows) {
+			
+			for(Row row : rows) 
+			{
 				id = (int) row.get("module");
 				module = moduleFactory.getModuleById(id);
-				for(int step : module.isLeadingForServices()) {
+				for(int step : module.isLeadingForServices()) 
+				{
 					registerLeadingModule(step, id);
 				}
 			}
-		} catch(KnowledgeException | KeyNotFoundException e1) {
+		}
+		catch(KnowledgeException | KeyNotFoundException e1) 
+		{
 			Logger.log(LogLevel.ERROR, e1);
 			doDelete();
 		}
@@ -397,7 +408,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 							case SUSPENDED_OR_WARNING:
 							case ABORTED:
 							case FAILED:
-								Logger.log(LogLevel.ERROR, "Hardware Agent - equip.Step status set to: %s%n", status);
+								Logger.log(LogLevel.DEBUG, "Hardware Agent - equip.Step status set to: %s%n", status);
 								BasicDBObject statusData = serviceStep.getStatusData();
 								statusData.putAll((Map<String, Object>) equipletStep.getStatusData());
 								BasicDBObject updateQuery =

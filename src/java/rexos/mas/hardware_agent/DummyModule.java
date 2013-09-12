@@ -56,18 +56,18 @@ import com.mongodb.BasicDBObject;
 /**
  * Module class that contains the functions for the deltarobot module.
  */
-public class DeltaRobotModule extends Module {
+public class DummyModule extends Module {
 	/**
 	 * @var double SAFE_MOVEMENT_PLANE
 	 *      A static value that contains the height of the safe movement plane.
 	 */
-	private static final double SAFE_MOVEMENT_PLANE = 25;
+	private static final double SAFE_MOVEMENT_PLANE = 15;
 	
 	/**
 	 * @var double MAX_ACCELERATION
 	 * 		A static value with the max accelaration 
 	 */
-	private static final double MAX_ACCELERATION = 50.0;
+	private static final double MAX_ACCELERATION = 255.0;
 
 	/**
 	 * @var int TIMESLOTS_NEEDED_PER_STEP
@@ -288,15 +288,11 @@ public class DeltaRobotModule extends Module {
 			}
 
 			// fill in the payload parameters.
-			if(position.getZ() == null) 
-			{
+			if(position.getZ() == null) {
 				payload.put("z", "Z-PLACEHOLDER");
-			} 
-			else 
-			{
+			} else {
 				payload.put("z", position.getZ() + extraSize);
 			}
-			
 			payload.put("maxAcceleration", MAX_ACCELERATION);
 			lookUp = "FIND_ID";
 		} else {

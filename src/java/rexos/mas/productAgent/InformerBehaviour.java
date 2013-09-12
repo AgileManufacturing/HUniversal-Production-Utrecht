@@ -140,7 +140,8 @@ public class InformerBehaviour extends Behaviour {
 							_totalSubinformers++;
 						}
 					} else {
-						Logger.log(LogLevel.ERROR, "PEM is null");
+						Logger.log(LogLevel.ERROR, "Can't find any equiplets that can execute this production step. Capability: "
+								+ productionStep.getCapability());
 					}
 				} else {
 					Logger.log(LogLevel.ERROR, "Can't find any equiplets that can execute this production step. Capability: "

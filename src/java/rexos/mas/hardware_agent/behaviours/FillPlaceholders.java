@@ -133,18 +133,21 @@ public class FillPlaceholders extends ReceiveBehaviour {
 	 * 
 	 * @param serviceStepId The serviceStepId to fill the equipletsSteps for.
 	 */
-	public void FillStepPlaceholders(ObjectId serviceStepId) {
-		try {
+	public void FillStepPlaceholders(ObjectId serviceStepId) 
+	{
+		try 
+		{
 			// Get the serviceStep
-			ServiceStep serviceStep =
-					new ServiceStep((BasicDBObject) hardwareAgent.getServiceStepsBBClient().findDocumentById(
-							serviceStepId));
+			ServiceStep serviceStep = new ServiceStep((BasicDBObject) 
+					hardwareAgent.getServiceStepsBBClient().findDocumentById(serviceStepId));
 			BlackboardClient equipletStepBBClient = hardwareAgent.getEquipletStepsBBClient();
 			BasicDBObject query = new BasicDBObject("serviceStepID", serviceStep.getId());
 			// Get the equipletSteps
 			List<DBObject> steps = equipletStepBBClient.findDocuments(query);
 			EquipletStep[] equipletSteps = new EquipletStep[steps.size()];
-			for(int i = 0; i < steps.size(); i++) {
+			
+			for(int i = 0; i < steps.size(); i++) 
+			{
 				equipletSteps[i] = new EquipletStep((BasicDBObject) steps.get(i));
 			}
 
@@ -156,15 +159,21 @@ public class FillPlaceholders extends ReceiveBehaviour {
 			// Fill the placeholders
 			equipletSteps = module.fillPlaceHolders(equipletSteps, serviceStep.getParameters());
 			Logger.log(LogLevel.DEBUG, "Hardware agent - Saving updated instructionData of %d equipletSteps%n", equipletSteps.length);
-			for(EquipletStep step : equipletSteps) {
+			
+			for(EquipletStep step : equipletSteps)
+			{
 				equipletStepBBClient.updateDocumentsUnsafe(new BasicDBObject("_id", step.getId()), new BasicDBObject("$set",
 						new BasicDBObject("instructionData", step.getInstructionData().toBasicDBObject())));
 			}
+			
 			// if the serviceStep has a nextStep fill the placeholders for that one to.
-			if(serviceStep.getNextStep() != null) {
+			if(serviceStep.getNextStep() != null) 
+			{
 				FillStepPlaceholders(serviceStep.getNextStep());
 			}
-		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+		}
+		catch(InvalidDBNamespaceException | GeneralMongoException e) 
+		{
 			Logger.log(LogLevel.ERROR, e);
 			myAgent.doDelete();
 		}

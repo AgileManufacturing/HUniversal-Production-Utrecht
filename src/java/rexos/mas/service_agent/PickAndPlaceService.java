@@ -101,11 +101,14 @@ public class PickAndPlaceService extends Service {
 	@Override
 	public ServiceStep[] getServiceSteps(int productStepType, BasicDBObject parameters) {
 		Part part = new Part((BasicDBObject) parameters.get("part"));
-		try {
+		try 
+		{
 			KnowledgeDBClient client = KnowledgeDBClient.getClient();
 			Row[] partProperties = client.executeSelectQuery(Queries.PART_PROPERTY, part.getType(), "height");
 			ballHeight = Double.parseDouble((String) partProperties[0].get("value"));
-		} catch(KnowledgeException | KeyNotFoundException e) {
+		} 
+		catch(KnowledgeException | KeyNotFoundException e) 
+		{
 			Logger.log(LogLevel.ERROR, e);
 		}
 

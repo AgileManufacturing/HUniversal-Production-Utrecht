@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import rexos.mas.data.LogLevel;
 import rexos.mas.data.Position;
 
 import com.mongodb.BasicDBObject;
@@ -70,6 +71,23 @@ public class PenModule extends Module {
 	 *      A static value that contains the size of the pen in centimeters.
 	 */
 	private static final double PEN_SIZE = 1.0;
+	/**
+	 * @var double SAFE_MOVEMENT_PLANE
+	 *      A static value that contains the height of the safe movement plane.
+	 */
+	private static final double SAFE_MOVEMENT_PLANE = 15;
+	
+	/**
+	 * @var double MAX_ACCELERATION
+	 * 		A static value with the max accelaration 
+	 */
+	private static final double MAX_ACCELERATION = 255.0;
+
+	/**
+	 * @var int TIMESLOTS_NEEDED_PER_STEP
+	 * 		A static value with the timeslots needed per step.
+	 */
+	private static final int TIMESLOTS_NEEDED_PER_STEP = 6;
 
 	/**
 	 * @var Module movementModule
@@ -82,54 +100,19 @@ public class PenModule extends Module {
 	 */
 	@Override
 	public EquipletStep[] getEquipletSteps(int stepType, BasicDBObject parameters) {
-		EquipletStep[] equipletSteps;
-		ArrayList<EquipletStep> steps;
-
 		// gets the newest code for the movementModule.
 		int movementModuleId = findMovementModule(getConfiguration());
 		movementModule = getModuleFactory().getModuleById(movementModuleId);
 
 		// switch to determine which steps to make.
 		switch(stepType) {
-			case 3: // case for the equiplet function draw line.
-				steps = new ArrayList<EquipletStep>();
-
-				// only get steps when start and end position are available.
-				if(parameters.containsField("startPosition") && parameters.containsField("endPosition")) {
-					// get start position
-					Position startPosition = new Position((BasicDBObject) parameters.get("startPosition"));
-					// get end postion
-					Position endPosition = new Position((BasicDBObject) parameters.get("endPosition"));
-					// get the delta of the x and the y
-					double deltaX = endPosition.getX() - startPosition.getX();
-					double deltaY = endPosition.getY() - startPosition.getY();
-					// get the length of the line.
-					double lineLength = Math.hypot(deltaX, deltaY);
-
-					// get the number of steps to perform and the x and y delta for each step.
-					int numberOfSteps = Math.max(1, (int) (lineLength / PEN_SIZE));
-					Position step = new Position(deltaX / numberOfSteps, deltaY / numberOfSteps);
-
-					// loop over all the steps and create them.
-					for(int i = 0; i < numberOfSteps; i++) {
-						steps.addAll(Arrays.asList(getStepsForDot(new BasicDBObject("position", startPosition
-								.toBasicDBObject()))));
-						startPosition.translate(step);
-					}// get the position of the dot.
-					Position position = new Position();
-					position.setZ(0.0);
-
-					// create the new parameters
-					BasicDBObject saveParameters = new BasicDBObject("position", position.toBasicDBObject());
-					saveParameters.put("extraSize", PEN_OFFSET);
-					steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, saveParameters)));
-				}
-
-				// convert the ArrayList to an array and return it.
-				equipletSteps = new EquipletStep[steps.size()];
-				return steps.toArray(equipletSteps);
-			case 4: // case for the equiplet function put dot.
+		
+			case 3: // case for the equiplet function put dot.
 				return getStepsForDot(parameters);
+				
+			case 4:// case for the equiplet function draw line.
+				return getStepsForLine(parameters);
+				
 			default:
 				break;
 		}
@@ -142,8 +125,56 @@ public class PenModule extends Module {
 	 */
 	@Override
 	public EquipletStep[] fillPlaceHolders(EquipletStep[] steps, BasicDBObject parameters) {
-		// return the filled in steps.
-		return steps;
+		// get the new position parameters from the parameters
+				double extraSize = 0;
+				
+				if(parameters.containsField("extra_size"))
+				{
+					extraSize = parameters.getDouble("extra_size");
+				}
+				
+				Position position = new Position((BasicDBObject) parameters.get("position"));
+
+				// loop over the steps.
+				for(EquipletStep step : steps) {
+					// get the lookUpParameters and the payload and replace the placeholders with real data.
+					InstructionData instructionData = step.getInstructionData();
+					BasicDBObject lookUpParameters = instructionData.getLookUpParameters();
+					BasicDBObject payload = instructionData.getPayload();
+					
+					if(lookUpParameters.containsField("ID")
+							&& lookUpParameters.getString("ID").equals("RELATIVE-TO-PLACEHOLDER")
+							&& position.getRelativeToPart() != null) 
+					{
+						lookUpParameters.put("ID", position.getRelativeToPart().getId());
+					}
+					
+					if(payload.containsField("x") && payload.getString("x").equals("X-PLACEHOLDER")) 
+					{
+						payload.put("x", position.getX());
+					}
+					
+					if(payload.containsField("y") && payload.getString("y").equals("Y-PLACEHOLDER")) 
+					{
+						payload.put("y", position.getY());
+					}
+					
+					if(payload.containsField("z") && payload.getString("z").equals("Z-PLACEHOLDER")) 
+					{
+						if(position.getZ() == null)
+						{
+							payload.put("z", 0 + extraSize);
+						}
+						else
+						{
+							payload.put("z", position.getZ() + extraSize);
+						}
+					}
+					
+					payload.put("maxAcceleration", MAX_ACCELERATION);
+				}
+				// returns the filled in steps.
+				return steps;
 	}
 
 	/**
@@ -187,21 +218,66 @@ public class PenModule extends Module {
 		return -1;
 	}
 
+	private EquipletStep[] getStepsForLine(BasicDBObject parameters)
+	{
+		EquipletStep[] equipletSteps;
+		ArrayList<EquipletStep> steps;
+		steps = new ArrayList<EquipletStep>();
+
+		// only get steps when start and end position are available.
+		if(parameters.containsField("startPosition") && parameters.containsField("endPosition")) {
+			// get start position
+			Position startPosition = new Position((BasicDBObject) parameters.get("startPosition"));
+			// get end postion
+			Position endPosition = new Position((BasicDBObject) parameters.get("endPosition"));
+			// get the delta of the x and the y
+			double deltaX = endPosition.getX() - startPosition.getX();
+			double deltaY = endPosition.getY() - startPosition.getY();
+			// get the length of the line.
+			double lineLength = Math.hypot(deltaX, deltaY);
+
+			// get the number of steps to perform and the x and y delta for each step.
+			int numberOfSteps = Math.max(1, (int) (lineLength / PEN_SIZE));
+			Position step = new Position(deltaX / numberOfSteps, deltaY / numberOfSteps);
+
+			// loop over all the steps and create them.
+			for(int i = 0; i < numberOfSteps; i++) 
+			{
+				steps.addAll(Arrays.asList(getStepsForDot(new BasicDBObject("position", startPosition
+						.toBasicDBObject()))));
+				startPosition.translate(step);
+			}// get the position of the dot.
+			
+			Position position = new Position();
+			position.setZ(0.0);
+
+			// create the new parameters
+			BasicDBObject saveParameters = new BasicDBObject("position", position.toBasicDBObject());
+			saveParameters.put("extraSize", PEN_OFFSET);
+			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, saveParameters)));
+		}
+
+		// convert the ArrayList to an array and return it.
+		equipletSteps = new EquipletStep[steps.size()];
+		return steps.toArray(equipletSteps);
+	}
+	
 	/**
 	 * Function for getting the steps for placing a dot.
 	 * 
 	 * @param parameters The parameters used for placing the dot.
 	 * @return An array of the generated equipletSteps
 	 */
-	private EquipletStep[] getStepsForDot(BasicDBObject parameters) {
+	//{ "point" : { "x" : 4.1 , "y" : 3.1 , "z" :  null }}
+	private EquipletStep[] getStepsForDot(BasicDBObject parameters) 
+	{
 		ArrayList<EquipletStep> steps = new ArrayList<EquipletStep>();
 
 		// get the position of the dot.
-		Position position = new Position((BasicDBObject) parameters.get("position"));
-		position.setZ(0.0);
+		//Position position = new Position((BasicDBObject) parameters.get("point"));
 
 		// create the new parameters
-		BasicDBObject dotParameters = new BasicDBObject("position", position.toBasicDBObject());
+		BasicDBObject dotParameters = new BasicDBObject("position", parameters.get("position"));
 		dotParameters.put("extraSize", PEN_OFFSET);
 
 		// get steps from the movementModule to move to the safe movement plane.
@@ -214,7 +290,7 @@ public class PenModule extends Module {
 		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, dotParameters)));
 
 		// get steps from the movementModule to move to the safe movement plane(not needed).
-		//steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, dotParameters)));
+		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, dotParameters)));
 
 		// convert the ArrayList to an array and return it.
 		EquipletStep[] equipletSteps = new EquipletStep[steps.size()];

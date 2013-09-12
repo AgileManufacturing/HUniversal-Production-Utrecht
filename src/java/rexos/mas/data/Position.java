@@ -199,16 +199,33 @@ public class Position implements Serializable, MongoSaveable {
 
 	/**
 	 * @see rexos.mas.data.IMongoSaveable#toBasicDBObject()
+	 * {y: {key: x, value: 3} , x: {key: y, value: 4}}
 	 **/
 	@Override
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject object = new BasicDBObject();
-		object.put("x", x);
-		object.put("y", y);
-		object.put("z", z);
-		if(relativeToPart != null) {
+		
+		BasicDBObject objectx = new BasicDBObject();
+		objectx.put("key", "x");
+		objectx.put("value", x);
+		
+		BasicDBObject objecty = new BasicDBObject();
+		objecty.put("key", "y");
+		objecty.put("value", y);
+		
+		BasicDBObject objectz = new BasicDBObject();
+		objectz.put("key", "z");
+		objectz.put("value", z);
+		
+		object.put("x", objectx);
+		object.put("y", objecty);
+		object.put("z", objectz);
+		
+		if(relativeToPart != null) 
+		{
 			object.put("relativeToPart", relativeToPart.toBasicDBObject());
 		}
+		
 		return object;
 	}
 
@@ -216,21 +233,47 @@ public class Position implements Serializable, MongoSaveable {
 	 * @see rexos.mas.data.IMongoSaveable#fromBasicDBObject(com.mongodb.BasicDBObject)
 	 **/
 	@Override
-	public void fromBasicDBObject(BasicDBObject object) {
-		try {
+	public void fromBasicDBObject(BasicDBObject object) 
+	{
+		try 
+		{
 			BasicDBObject copy = (BasicDBObject) object.copy();
-			x = (Double)copy.removeField("x");
-			y = (Double)copy.removeField("y");
-			z = (Double)copy.removeField("z");
-			if(copy.containsField("relativeToPart")) {
+			
+			BasicDBObject xval = (BasicDBObject) object.get("x");
+			BasicDBObject yval = (BasicDBObject) object.get("y");
+			BasicDBObject zval = (BasicDBObject) object.get("z");
+			
+			if(xval != null)
+			{
+				x = (Double)xval.removeField("value");
+				xval.removeField("key");
+			}
+			
+			if(yval != null)
+			{
+				y = (Double)yval.removeField("value");
+				yval.removeField("key");
+			}
+			
+			if(zval != null)
+			{
+				z = (Double)zval.removeField("value");
+				zval.removeField("key");
+			}
+			
+			if(copy.containsField("relativeToPart")) 
+			{
 				relativeToPart = new Part((BasicDBObject) copy.get("relativeToPart"));
 				copy.removeField("relativeToPart");
 			}
 
-			if(!copy.isEmpty()) {
+			if(!xval.isEmpty() || !yval.isEmpty()) 
+			{
 				throw new IllegalArgumentException();
 			}
-		} catch(ClassCastException | NullPointerException e) {
+		}
+		catch(ClassCastException | NullPointerException e)
+		{
 			e.printStackTrace();
 			throw new IllegalArgumentException();
 		}

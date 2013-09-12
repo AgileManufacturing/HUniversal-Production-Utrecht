@@ -158,11 +158,14 @@ public class EvaluateDuration extends ReceiveBehaviour {
 			// create the equipletSteps
 			EquipletStep[] equipletSteps = module.getEquipletSteps(serviceStep.getType(), serviceStep.getParameters());
 			
-			if(equipletSteps.length > 0) {
+			if(equipletSteps.length > 0) 
+			{
 				BlackboardClient equipletStepsBBClient = hardwareAgent.getEquipletStepsBBClient();
 				ObjectId next = null;
+				
 				// calculate the duration and put the steps on the blackboard
-				for(int i = equipletSteps.length - 1; i >= 0; i--) {
+				for(int i = equipletSteps.length - 1; i >= 0; i--) 
+				{
 					EquipletStep equipletStep = equipletSteps[i];
 					stepDuration += equipletStep.getTimeData().getDuration();
 					equipletStep.setServiceStepID(serviceStepId);
@@ -181,12 +184,16 @@ public class EvaluateDuration extends ReceiveBehaviour {
 				if(serviceStep.getNextStep() != null) {
 					EvaluateStepDuration(serviceStep.getNextStep());
 				}
-			} else {
+			} 
+			else 
+			{
 				hardwareAgent.cancelAllStepsForServiceStep(serviceStepId, String.format(
 						"%s.getEquipletSteps(%d, %s) returned no steps.", module, serviceStep.getType(),
 						serviceStep.getParameters()));
 			}
-		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+		} 
+		catch(InvalidDBNamespaceException | GeneralMongoException e) 
+		{
 			Logger.log(LogLevel.ERROR, e);
 			myAgent.doDelete();
 		}

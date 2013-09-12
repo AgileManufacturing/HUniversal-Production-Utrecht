@@ -20,11 +20,12 @@ function Communication() {
 		}
 	};
 	
-	/* self.ProductionStep = function(obj) {
+	 self.ProductionStep = function(obj) {
 		//this.step = null;
 		//this.colorCode = null;
 		//this.shapeCode = null;
 		//this.location = {};
+        this.capability = 3;
 		this.id = obj.id;
 		
 		this.parameters = {
@@ -62,11 +63,13 @@ function Communication() {
                 }
             }};
 		
-	}; */
+	}; 
     
-    
+    /*
      //demo product step
-    self.ProductionStep = function(obj) {//TODO: revert back to original design for production steps (see above)
+    self.ProductionStep = function(obj) 
+    {
+    	//TODO: revert back to original design for production steps (see above)
         //this.step = null;
         //this.colorCode = null;
         //this.shapeCode = null;
@@ -74,7 +77,8 @@ function Communication() {
         this.id = obj.id;
         this.capability = 3;
         
-        this.parameters = {
+        this.parameters = 
+        {
             "startPosition" : {
                 "x" : obj.x,
                 "y" : obj.y
@@ -84,42 +88,7 @@ function Communication() {
                 "y": obj.y
             }
         };
-    };
-        /* "parameterGroups": {
-         "Shape": {
-         "name": obj.shapeName,
-         "parameters": {
-         "Id": {
-         "key": "Id",
-         "value": 0
-         }
-         }
-         },
-         "loc": {
-         "name": "loc",
-         "parameters": {
-         "y": {
-         "key": "y",
-         "value": obj.y
-         },
-         "x": {
-         "key": "x",
-         "value": obj.x
-         }
-         }
-         },
-         "Color": {
-         "name": obj.color,
-         "parameters": {
-         "Id": {
-         "key": "Id",
-         "value":0
-         }
-         }
-         }
-         }}; 
-        
-    };*/
+    } */
 
 	self.Production = function(){
 		this.ID = "";
