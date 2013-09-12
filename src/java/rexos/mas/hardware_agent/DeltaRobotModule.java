@@ -81,7 +81,8 @@ public class DeltaRobotModule extends Module {
 	@Override
 	public EquipletStep[] getEquipletSteps(int stepType, BasicDBObject parameters) {
 		// switch to determine which steps to make.
-		switch(stepType) {
+		switch(stepType) 
+		{
 			case 1:
 				// case to move to the safe movement plane.
 				// returns the steps for moving to the safe movement plane.
