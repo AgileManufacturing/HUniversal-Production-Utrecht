@@ -68,6 +68,9 @@ import rexos.mas.data.ProductionStep;
 
 import com.mongodb.BasicDBObject;
 
+import configuration.Configuration;
+import configuration.ConfigurationFiles;
+
 /**
  * Test class for testing the equiplet agent, service agent and hardware agent.
  */
@@ -93,9 +96,12 @@ public class JadeAgentX extends Agent {
 			AID logisticsAID = new AID(logisticsCon.getName(), AID.ISGUID);
 
 			// Empty the equiplet directory before starting the first equiplet agent
-			BlackboardClient collectiveBBClient = new BlackboardClient("145.89.191.131", 27017);
-			collectiveBBClient.setDatabase("CollectiveDb");
-			collectiveBBClient.setCollection("EquipletDirectory");
+			BlackboardClient collectiveBBClient = new BlackboardClient(
+					Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"), 
+					Integer.parseInt(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbPort")));
+			
+			collectiveBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbName"));
+			collectiveBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletDirectoryName"));
 			collectiveBBClient.removeDocuments(new BasicDBObject());
 
 			/**

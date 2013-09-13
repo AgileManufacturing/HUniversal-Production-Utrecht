@@ -64,6 +64,9 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
+import configuration.Configuration;
+import configuration.ConfigurationFiles;
+
 @SuppressWarnings("serial")
 public class SchedulerBehaviour extends Behaviour {
 
@@ -196,9 +199,13 @@ public class SchedulerBehaviour extends Behaviour {
 
 		List<AID> equipletlist = new ArrayList<AID>(equipletList);
 
-		BlackboardClient bbc = new BlackboardClient("145.89.191.131");
-		bbc.setDatabase("CollectiveDb");
-		bbc.setCollection("TimeData");
+		BlackboardClient bbc = new BlackboardClient(
+				Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"), 
+				Integer.parseInt(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbPort")));
+		
+		bbc.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbName"));
+		bbc.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "timeDataCollectionName"));
+		
 		BasicDBObject dbObject = (BasicDBObject) bbc.findDocuments(new BasicDBObject()).get(0);
 		
 		long firstTimeSlot = dbObject.getLong("firstTimeSlot");
@@ -212,9 +219,10 @@ public class SchedulerBehaviour extends Behaviour {
 		for (AID aid : equipletlist) 
 		{
 			Logger.log(LogLevel.INFORMATION, "Trying to reach equiplet: " + aid.getLocalName() + "");
-			bbc = new BlackboardClient("145.89.191.131");
-			bbc.setDatabase("CollectiveDb");
-			bbc.setCollection("EquipletDirectory");
+			
+			bbc = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"));
+			bbc.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbName"));
+			bbc.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletDirectoryName"));
 
 			QueryBuilder qb = QueryBuilder.start("AID").is(aid.getName());
 
@@ -234,7 +242,7 @@ public class SchedulerBehaviour extends Behaviour {
 
 			bbc = new BlackboardClient(dbData.getIp(), dbData.getPort());
 			bbc.setDatabase(dbData.getName());
-			bbc.setCollection("ProductStepsBlackBoard");
+			bbc.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "ProductStepsBlackBoardName", aid.getLocalName()));
 
 			int requiredTimeSlots = (int) prodAgent.getProduct()
 					.getProduction().getProductionEquipletMapping()
