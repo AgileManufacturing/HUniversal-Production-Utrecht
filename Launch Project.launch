@@ -10,7 +10,8 @@
 	</listAttribute>
 	
 	<mapAttribute key="org.eclipse.debug.core.environmentVariables">
-		<mapEntry key="KNOWLEDGE_DB_PROPERTIES" value="${project_loc}/src/java/rexos/libraries/knowledgedb_client/knowledge_db.properties"/>
+		<mapEntry key="KNOWLEDGE_DB_PROPERTIES" value="${project_loc}/src/java/configuration/knowledge_db.properties"/>
+		<mapEntry key="MONGO_DB_PROPERTIES" value="${project_loc}/src/java/configuration/mongo_db.properties"/>
 		<mapEntry key="MSGPATH" value="${project_loc}/ACLMsgs/"/>
 	</mapAttribute>
 	
