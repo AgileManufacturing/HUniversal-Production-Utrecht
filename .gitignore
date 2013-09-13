@@ -28,7 +28,6 @@ libraries/blackboardJavaClient/*.jar
 build/
 devel/
 
-
 # Ignore project file, cmake text file and editor temporary files
 
 .rexos-export
@@ -38,6 +37,7 @@ sync.sh
 *~
 *.class
 *.orig
+*.jar
 
 APDescription.txt
 MTPs-Main-Container.txt
