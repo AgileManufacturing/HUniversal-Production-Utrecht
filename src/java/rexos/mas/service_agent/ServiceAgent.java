@@ -80,6 +80,9 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
+import configuration.Configuration;
+import configuration.ConfigurationFiles;
+
 /**
  * This agent manages services and oversees generation and scheduling of
  * serviceSteps. It also handles communication with the logistics agent.
@@ -185,13 +188,13 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			// Needs to react on state changes of production steps to WAITING
 			productStepBBClient = new BlackboardClient(dbData.getIp());
 			productStepBBClient.setDatabase(dbData.getName());
-			productStepBBClient.setCollection("ProductStepsBlackBoard");
+			productStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ProductStepsBlackBoardName", equipletAgentAID.getLocalName()));
 			productStepBBClient.subscribe(statusSubscription);
 
 			// Needs to react on status changes
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient.setDatabase(dbData.getName());
-			serviceStepBBClient.setCollection("ServiceStepsBlackBoard");
+			serviceStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ServiceStepsBlackBoardName", equipletAgentAID.getLocalName()));
 			serviceStepBBClient.subscribe(statusSubscription);
 			serviceStepBBClient.removeDocuments(new BasicDBObject());
 		} catch(UnknownHostException | GeneralMongoException | InvalidDBNamespaceException e) {

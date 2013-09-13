@@ -61,6 +61,9 @@ import rexos.libraries.log.Logger;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
+import configuration.Configuration;
+import configuration.ConfigurationFiles;
+
 public class PlannerBehaviour extends Behaviour {
 
 	private static final long serialVersionUID = 1L;
@@ -89,9 +92,14 @@ public class PlannerBehaviour extends Behaviour {
 		try {
 			_productAgent = (ProductAgent) myAgent;
 
-			BlackboardClient bbc = new BlackboardClient("145.89.191.131", 27017);
-			bbc.setDatabase("CollectiveDb");
-			bbc.setCollection("EquipletDirectory");
+			BlackboardClient bbc = new BlackboardClient(
+					Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"), 
+					Integer.parseInt(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbPort")));
+			
+			bbc.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbName"));
+			bbc.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletDirectoryName"));
+			
+			
 			Product product = this._productAgent.getProduct();
 			Production production = product.getProduction();
 			ArrayList<ProductionStep> psa = production.getProductionSteps();

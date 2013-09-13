@@ -95,6 +95,9 @@ import rexos.mas.equiplet_agent.behaviours.ServiceAgentDied;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
+import configuration.Configuration;
+import configuration.ConfigurationFiles;
+
 /**
  * EquipletAgent that communicates with product agents and with its own service agent.
  **/
@@ -115,55 +118,55 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 * @var String collectiveDbIp
 	 *      IP of the collective database.
 	 */
-	private String collectiveDbIp = "145.89.191.131";
+	private String collectiveDbIp = Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp");
 
 	/**
 	 * @var int collectiveDbPort
 	 *      Port number of the collective database.
 	 */
-	private int collectiveDbPort = 27017;
+	private int collectiveDbPort = Integer.parseInt(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbPort"));
 
 	/**
 	 * @var String collectiveDbName
 	 *      Name of the collective database.
 	 */
-	private String collectiveDbName = "CollectiveDb";
+	private String collectiveDbName = Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbName");
 
 	/**
 	 * @var String equipletDirectoryName
 	 *      Name of the collection containing the equipletDirectory.
 	 */
-	private String equipletDirectoryName = "EquipletDirectory";
+	private String equipletDirectoryName = Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletDirectoryName");
 
 	/**
 	 * @var String timeDataName
 	 *      Name of the collection containing the timeData.
 	 */
-	private String timeDataName = "TimeData";
+	private String timeDataName = Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "timeDataCollectionName");
 
 	/**
 	 * @var String equipletDbIp
 	 *      IP of the equiplet database.
 	 */
-	private String equipletDbIp;
+	private String equipletDbIp = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbIp", getAID().getLocalName());
 
 	/**
 	 * @var int equipletDbPort
 	 *      Port number of the equiplet database.
 	 */
-	private int equipletDbPort = 27017;
+	private int equipletDbPort = Integer.parseInt(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbPort", getAID().getLocalName()));
 
 	/**
 	 * @var String equipletDbName
 	 *      Name of the equiplet database.
 	 */
-	private String equipletDbName;
+	private String equipletDbName = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbName", getAID().getLocalName());
 
 	/**
 	 * @var String productStepsName
 	 *      Name of the collection containing the productSteps.
 	 */
-	private String productStepsName = "ProductStepsBlackBoard";
+	private String productStepsName = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ProductStepsBlackBoardName", getAID().getLocalName());
 
 	/**
 	 * @var BlackboardClient collectiveBBClient
@@ -241,12 +244,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	public void setup() {
 		try {
 			Logger.log(LogLevel.DEBUG, "I spawned as a equiplet agent.");
-			// gets his IP and sets the equiplet blackboard IP.
-//			InetAddress IP = InetAddress.getLocalHost();
-//			equipletDbIp = IP.getHostAddress();
-			equipletDbIp = "145.89.191.131";
-
-			equipletDbName = getAID().getLocalName();
+			
 			communicationTable = new HashMap<String, ObjectId>();
 			behaviours = new ArrayList<Behaviour>();
 			AID logisticsAgent = (AID) getArguments()[0];
@@ -286,16 +284,16 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			productStepBBClient.removeDocuments(new BasicDBObject());
 
 			stateBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
-			stateBBClient.setDatabase("StateBlackboard");
-			stateBBClient.setCollection("equipletState");
+			stateBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "stateBlackBoardName"));
+			stateBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "stateCollectionName"));
 
 			modeUpdateSubscription = new FieldUpdateSubscription("mode", this);
 			modeUpdateSubscription.addOperation(MongoUpdateLogOperation.SET);
 			stateBBClient.subscribe(modeUpdateSubscription);
 
 			desiredStateBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
-			desiredStateBBClient.setDatabase("StateBlaLogger.logAclMessage(returnMsg, 'r');ckboard");
-			desiredStateBBClient.setCollection("equipletCommands");
+			desiredStateBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "stateBlackBoardName"));
+			desiredStateBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletCommandCollectionName"));
 
 			// makes connection with the collective blackboard.
 			collectiveBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);

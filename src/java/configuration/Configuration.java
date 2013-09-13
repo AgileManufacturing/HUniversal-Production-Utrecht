@@ -40,25 +40,41 @@ import rexos.mas.data.LogLevel;
 public class Configuration {
 	private static Properties mongoDbProperties;
 	private static Properties knowledgeDbProperties;
+	private static Properties equipletDbProperties;
 	
 	public Configuration() {
 		mongoDbProperties = new Properties();
 		knowledgeDbProperties = new Properties();
+		equipletDbProperties = new Properties();
  
     	try {
-    		//Get the environment variables
-            String mongoDbPropertiesFilePath = System.getenv("MONGO_DB_PROPERTIES");
-            String knowledgeDbPropertiesFilePath = System.getenv("KNOWLEDGE_DB_PROPERTIES");
+    		//Get the environment variables and construct the paths
+            String mongoDbPropertiesFilePath = System.getenv("PROPERTIESPATH") + "mongo_db.properties";
+            String knowledgeDbPropertiesFilePath = System.getenv("PROPERTIESPATH") + "knowledge_db.properties";
+            String equipletDbPropertiesFilePath = System.getenv("PROPERTIESPATH") + "equiplet_db.properties";
 
             //load the properties
     		mongoDbProperties.load(new FileInputStream(mongoDbPropertiesFilePath));
     		knowledgeDbProperties.load(new FileInputStream(knowledgeDbPropertiesFilePath));
+    		equipletDbProperties.load(new FileInputStream(equipletDbPropertiesFilePath));
+    		
     	} catch (IOException ex) {
     		Logger.log(LogLevel.ERROR, ex);
         }
     }
 	
 	public static String getProperty(ConfigurationFiles File, String key)
+	{
+		if(File != ConfigurationFiles.EQUIPLET_DB_PROPERTIES){
+			return getProperty(File, key, null);
+		} else {
+			Logger.log(LogLevel.WARNING, "Need a equiplet name to read equiplet db properties");
+			return "";
+		}
+	}
+	
+	
+	public static String getProperty(ConfigurationFiles File, String key, String EquipletName)
 	{
 		switch(File)
 		{
@@ -67,6 +83,9 @@ public class Configuration {
 				
 			case KNOWLEDGE_DB_PROPERTIES:
 				return knowledgeDbProperties.getProperty(key);
+				
+			case EQUIPLET_DB_PROPERTIES:
+				return equipletDbProperties.getProperty(EquipletName + key);
 				
 			default:
 				Logger.log(LogLevel.WARNING, "Property file not know.");

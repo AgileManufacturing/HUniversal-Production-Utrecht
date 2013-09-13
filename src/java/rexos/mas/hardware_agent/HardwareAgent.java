@@ -89,6 +89,9 @@ import rexos.mas.service_agent.ServiceStep;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
+import configuration.Configuration;
+import configuration.ConfigurationFiles;
+
 /**
  * HardwareAgent that communicates with the service agent and creates the messages for the Hardware layer.
  */
@@ -222,12 +225,12 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient.setDatabase(dbData.getName());
-			serviceStepBBClient.setCollection("ServiceStepsBlackBoard");
+			serviceStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EquipletStepsBlackBoardName", equipletAgentAID.getLocalName()));
 			serviceStepBBClient.subscribe(stepStatusSubscription);
 
 			equipletStepBBClient = new BlackboardClient(dbData.getIp());
 			equipletStepBBClient.setDatabase(dbData.getName());
-			equipletStepBBClient.setCollection("EquipletStepsBlackBoard");
+			equipletStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EquipletStepsBlackBoardName", equipletAgentAID.getLocalName()));
 			equipletStepBBClient.subscribe(stepStatusSubscription);
 
 			equipletStepBBClient.removeDocuments(new BasicDBObject());
