@@ -214,7 +214,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			startedMessage.addReceiver(serviceAgentAID);
 			startedMessage.setOntology("InitialisationFinished");
 			send(startedMessage);
-			Logger.logAclMessage(startedMessage);
+			Logger.logAclMessage(startedMessage, 's');
 			Logger.log(LogLevel.INFORMATION, "Hardware is ready to use.");
 
 			stepStatusSubscription = new FieldUpdateSubscription("status", this);
@@ -299,7 +299,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		deadMessage.addReceiver(serviceAgentAID);
 		deadMessage.setOntology("HardwareAgentDied");
 		send(deadMessage);
-		Logger.logAclMessage(deadMessage);
+		Logger.logAclMessage(deadMessage, 's');
 	}
 
 	public void cancelAllStepsForServiceStep(ObjectId serviceStepId, String reason) {

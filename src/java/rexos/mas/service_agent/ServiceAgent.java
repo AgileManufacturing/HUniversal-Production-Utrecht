@@ -252,7 +252,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		message.addReceiver(equipletAgentAID);
 		message.setOntology("ServiceAgentDied");
 		send(message);
-		Logger.logAclMessage(message);
+		Logger.logAclMessage(message, 's');
 	} //@formatter:on
 
 	public void cancelAllStepsForProductStep(ObjectId productStepId, String reason) {
@@ -282,7 +282,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 				message.addReceiver(logisticsAID);
 				message.setOntology("CancelTransport");
 				send(message);
-				Logger.logAclMessage(message);
+				Logger.logAclMessage(message, 's');
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 			Logger.log(LogLevel.ERROR, e);

@@ -120,6 +120,7 @@ public class CheckForModules extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
+		Logger.logAclMessage(message, 'r');
 		boolean modulesPresent = true;
 		try {
 			// check if modules are present
@@ -146,7 +147,7 @@ public class CheckForModules extends ReceiveBehaviour {
 			}
 
 			myAgent.send(reply);
-			Logger.logAclMessage(reply);
+			Logger.logAclMessage(reply, 's');
 		}
 
 	}

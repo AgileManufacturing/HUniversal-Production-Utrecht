@@ -86,6 +86,7 @@ public class InitialisationFinished extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
+			Logger.logAclMessage(message, 'r');
 			Logger.log(LogLevel.DEBUG, "%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
 					message.getOntology());
 
@@ -93,7 +94,7 @@ public class InitialisationFinished extends ReceiveBehaviour {
 			response.addReceiver(serviceAgent.getEquipletAgentAID());
 			response.setOntology("InitialisationFinished");
 			serviceAgent.send(response);
-			Logger.logAclMessage(response);
+			Logger.logAclMessage(response, 's');
 		} else {
 			Logger.log(LogLevel.DEBUG, serviceAgent.getName() + " - InitialisationFinished timeout!");
 			serviceAgent.doDelete();

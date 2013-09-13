@@ -108,6 +108,7 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 	 */
 	@Override
 	public void handle(ACLMessage message) {
+		Logger.logAclMessage(message, 'r');
 		//Logger.log("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(),
 				//message.getOntology());
 

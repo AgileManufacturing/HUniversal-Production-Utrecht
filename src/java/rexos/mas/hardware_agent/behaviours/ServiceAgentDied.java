@@ -95,6 +95,7 @@ public class ServiceAgentDied extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
+		Logger.logAclMessage(message, 'r');
 		//Logger.log("%s received message from %s (%s)%n",
 				//myAgent.getLocalName(), message.getSender().getLocalName(),
 				//message.getOntology());

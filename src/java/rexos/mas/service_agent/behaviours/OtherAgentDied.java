@@ -72,12 +72,13 @@ public class OtherAgentDied extends ReceiveBehaviour {
 	 * @see rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage) */
 	@Override
 	public void handle(ACLMessage message) {
+		Logger.logAclMessage(message, 'r');
 		if(message.getOntology().equals("EquipletAgentDied")) {
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 			msg.addReceiver(agent.getHardwareAgentAID());
 			msg.setOntology("ServiceAgentDied");
 			agent.send(msg);
-			Logger.logAclMessage(msg);
+			Logger.logAclMessage(msg, 's');
 		} else {
 			agent.doDelete();
 		}

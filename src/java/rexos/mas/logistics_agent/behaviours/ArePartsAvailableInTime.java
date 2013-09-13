@@ -87,6 +87,7 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
+		Logger.logAclMessage(message, 'r');
 		if (message != null) {
 			try {
 				Logger.log(LogLevel.DEBUG, "%s ArePartsAvailableInTime%n",
@@ -97,7 +98,7 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 				reply.setOntology("ArePartsAvailableInTimeResponse");
 				reply.setPerformative(ACLMessage.CONFIRM);
 				myAgent.send(reply);
-				Logger.logAclMessage(reply);
+				Logger.logAclMessage(reply, 's');
 
 				myAgent.addBehaviour(new GetPartsInfo(myAgent, message
 						.getConversationId()));

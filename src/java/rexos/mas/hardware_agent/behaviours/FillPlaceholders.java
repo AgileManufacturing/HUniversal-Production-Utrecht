@@ -117,6 +117,7 @@ public class FillPlaceholders extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
+		Logger.logAclMessage(message, 'r');
 		try {
 			ObjectId serviceStepId = (ObjectId) message.getContentObject();
 			Logger.log(LogLevel.DEBUG, "%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),

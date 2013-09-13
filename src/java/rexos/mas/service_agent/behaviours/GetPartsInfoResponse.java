@@ -112,6 +112,7 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
+			Logger.logAclMessage(message, 'r');
 			try {
 				BlackboardClient productStepBBClient = agent.getProductStepBBClient();
 				BlackboardClient serviceStepBBClient = agent.getServiceStepBBClient();
@@ -179,7 +180,7 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 				informMsg.addReceiver(agent.getHardwareAgentAID());
 				informMsg.setContentObject(parameterizedSteps[0].getId());
 				agent.send(informMsg);
-				Logger.logAclMessage(informMsg);
+				Logger.logAclMessage(informMsg, 's');
 				productStepBBClient.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject("$set",
 						new BasicDBObject("status", StepStatusCode.PLANNED.name())));
 			} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {

@@ -97,6 +97,7 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
+		Logger.logAclMessage(message, 'r');
 		try {
 			ObjectId productStepId = (ObjectId) message.getContentObject();
 			ProductStep productStep =
@@ -129,7 +130,7 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 			askMessage.setConversationId(message.getConversationId());
 			askMessage.setContentObject(serviceStepId);
 			agent.send(askMessage);
-			Logger.logAclMessage(askMessage);
+			Logger.logAclMessage(askMessage, 's');
 		} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 			Logger.log(LogLevel.ERROR, e);
 			agent.doDelete();

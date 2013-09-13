@@ -66,7 +66,7 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 			message.setOntology("CanPerformStep");
 			message.setContentObject(_productionStep);
 			myAgent.send(message);
-			Logger.logAclMessage(message);
+			Logger.logAclMessage(message, 's');
 		} catch (Exception e) {
 			Logger.log(LogLevel.ERROR, e);
 		}
@@ -78,8 +78,10 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
+		
 		try {
 			if (message != null) {
+				Logger.logAclMessage(message, 'r');
 				switch (_currentState) {
 				case 0:
 					if (message.getPerformative() == ACLMessage.CONFIRM) 
@@ -91,7 +93,7 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 						newMessage.setOntology("GetProductionDuration");
 						newMessage.setContentObject(_productionStep);
 						myAgent.send(newMessage);
-						Logger.logAclMessage(newMessage);
+						Logger.logAclMessage(newMessage, 's');
 						_currentState++;
 					} 
 					else 

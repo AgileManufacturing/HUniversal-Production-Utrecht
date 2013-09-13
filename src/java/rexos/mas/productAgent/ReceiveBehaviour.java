@@ -8,7 +8,7 @@
  * 
  * @section LICENSE License: newBSD
  * 
- *          Copyright © 2012, HU University of Applied Sciences Utrecht. All
+ *          Copyright ï¿½ 2012, HU University of Applied Sciences Utrecht. All
  *          rights reserved.
  * 
  *          Redistribution and use in source and binary forms, with or without
@@ -40,6 +40,7 @@
 
 package rexos.mas.productAgent;
 
+import rexos.libraries.log.Logger;
 import jade.core.Agent;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -125,6 +126,7 @@ public class ReceiveBehaviour extends SimpleBehaviour{
 	 * @param m
 	 */
 	public void handle(ACLMessage m){
+		Logger.logAclMessage(m, 'r');
 	}
 
 	/**

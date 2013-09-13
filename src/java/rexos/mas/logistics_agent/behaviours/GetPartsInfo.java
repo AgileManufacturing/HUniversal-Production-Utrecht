@@ -92,6 +92,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
+			Logger.logAclMessage(message, 'r');
 			try {
 				Logger.log(LogLevel.DEBUG, "%s GetPartsInfo%n", myAgent.getLocalName());
 				Part[] parts = (Part[]) message.getContentObject();
@@ -115,7 +116,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 				reply.setOntology("GetPartsInfoResponse");
 				reply.setContentObject(partParameters);
 				myAgent.send(reply);
-				Logger.logAclMessage(reply);
+				Logger.logAclMessage(reply, 's');
 			} catch (UnreadableException | IOException | KnowledgeException | KeyNotFoundException e) {
 				Logger.log(LogLevel.ERROR, e);
 				myAgent.doDelete();

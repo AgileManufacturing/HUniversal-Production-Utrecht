@@ -294,7 +294,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			stateBBClient.subscribe(modeUpdateSubscription);
 
 			desiredStateBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
-			desiredStateBBClient.setDatabase("StateBlackboard");
+			desiredStateBBClient.setDatabase("StateBlaLogger.logAclMessage(returnMsg, 'r');ckboard");
 			desiredStateBBClient.setCollection("equipletCommands");
 
 			// makes connection with the collective blackboard.
@@ -343,7 +343,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				responseMessage.setOntology("EquipletAgentDied");
 				responseMessage.setContentObject((BasicDBObject) object.get("statusData"));
 				send(responseMessage);
-				Logger.logAclMessage(responseMessage);
+				Logger.logAclMessage(responseMessage, 's');
 			}
 
 			// Clears his own blackboard and removes his subscription on that blackboard.
@@ -357,7 +357,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		deadMessage.addReceiver(serviceAgent);
 		deadMessage.setOntology("EquipletAgentDied");
 		send(deadMessage);
-		Logger.logAclMessage(deadMessage);
+		Logger.logAclMessage(deadMessage, 's');
 	}
 
 	public void cancelProductStep(ObjectId productStepId, String reason) {
@@ -478,7 +478,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					Logger.log(LogLevel.DEBUG, "Equiplet agent - sending message %s%n",
 							ACLMessage.getPerformative(responseMessage.getPerformative()));
 					send(responseMessage);
-					Logger.logAclMessage(responseMessage);
+					Logger.logAclMessage(responseMessage, 's');
 					break;
 				case "equipletState":
 					EquipletStateEntry stateEntry =

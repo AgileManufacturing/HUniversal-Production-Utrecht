@@ -97,6 +97,7 @@ public class ArePartsAvailableResponse extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
+			Logger.logAclMessage(message, 'r');
 			try {
 				Logger.log(LogLevel.DEBUG, "%s ArePartsAvailableResponse%n", agent.getLocalName());
 				
@@ -109,7 +110,7 @@ public class ArePartsAvailableResponse extends ReceiveBehaviour {
 					sendMsg.setPerformative(ACLMessage.QUERY_IF);
 					sendMsg.setContentObject(productStep.getInputParts());
 					agent.send(sendMsg);
-					Logger.logAclMessage(sendMsg);
+					Logger.logAclMessage(sendMsg, 's');
 				} else {
 					productStepBBClient.updateDocuments(
 							new BasicDBObject("_id", productStep.getId()),

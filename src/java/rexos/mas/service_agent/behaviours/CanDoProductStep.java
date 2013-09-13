@@ -97,6 +97,7 @@ public class CanDoProductStep extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
+		Logger.logAclMessage(message, 'r');
 		try {
 			ObjectId productStepId = (ObjectId) message.getContentObject();
 			ProductStep productStep =
@@ -127,13 +128,13 @@ public class CanDoProductStep extends ReceiveBehaviour {
 				msg.setOntology("CheckForModules");
 				msg.setContentObject(chosenService.getModuleGroupIds(stepType, parameters));
 				agent.send(msg);
-				Logger.logAclMessage(msg);
+				Logger.logAclMessage(msg, 's');
 			} else {
 				ACLMessage reply = message.createReply();
 				reply.setPerformative(ACLMessage.DISCONFIRM);
 				reply.setOntology("CanDoProductionStepResponse");
 				getAgent().send(reply);
-				Logger.logAclMessage(reply);
+				Logger.logAclMessage(reply, 's');
 				Logger.log(LogLevel.DEBUG, "%s sending step availability (%b)%n", getAgent().getLocalName(),
 						reply.getPerformative() == ACLMessage.CONFIRM);
 			}

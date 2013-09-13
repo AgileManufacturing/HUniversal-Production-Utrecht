@@ -84,13 +84,14 @@ public class CheckForModulesResponse extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
+			Logger.logAclMessage(message, 'r');
 			ACLMessage reply = message.createReply();
 			reply.clearAllReceiver();
 			reply.addReceiver(agent.getEquipletAgentAID());
 			reply.setPerformative(message.getPerformative());
 			reply.setOntology("CanDoProductionStepResponse");
 			getAgent().send(reply);
-			Logger.logAclMessage(reply);
+			Logger.logAclMessage(reply, 's');
 			Logger.log(LogLevel.DEBUG, "%s sending step availability (%b)%n", getAgent().getLocalName(),
 					message.getPerformative() == ACLMessage.CONFIRM);
 		} else {

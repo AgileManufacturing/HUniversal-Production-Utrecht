@@ -116,6 +116,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
+		Logger.logAclMessage(message, 'r');
 		try {
 			// get the serviceStepId
 			ObjectId serviceStepId = (ObjectId) message.getContentObject();
@@ -130,7 +131,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 			reply.setContentObject(serviceStepId);
 			reply.setOntology("GetServiceStepDurationResponse");
 			myAgent.send(reply);
-			Logger.logAclMessage(reply);
+			Logger.logAclMessage(reply, 's');
 		} catch(UnreadableException | IOException e) {
 			e.printStackTrace();
 			myAgent.doDelete();

@@ -98,6 +98,7 @@ public class GetServiceStepsDurationResponse extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
+			Logger.logAclMessage(message, 'r');
 			try {
 				BlackboardClient client = agent.getServiceStepBBClient();
 				ServiceStep serviceStep = new ServiceStep();
@@ -124,7 +125,7 @@ public class GetServiceStepsDurationResponse extends ReceiveBehaviour {
 				answer.setConversationId(message.getConversationId());
 				answer.setOntology("ProductionDurationResponse");
 				agent.send(answer);
-				Logger.logAclMessage(answer);
+				Logger.logAclMessage(answer, 's');
 
 				Logger.log(LogLevel.DEBUG, "%s sending msg (%s)%n", myAgent.getLocalName(), answer.getOntology());
 			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {

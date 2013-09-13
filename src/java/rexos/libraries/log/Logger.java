@@ -64,8 +64,9 @@ public class Logger {
 	 * Controls whether or not printing of log messages is enabled.
 	 **/
 	private static final boolean debugEnabled = true;
+	private static final boolean testingEnabled = true;
 	
-    private static final String PATH_ENVIROMENT_VARIABLE = "MSGPATH";
+    private static final String PATH_ENVIRONMENT_VARIABLE = "MSGPATH";
 	
 	/**
 	 * @var int logleveltreshhold
@@ -106,9 +107,63 @@ public class Logger {
 		printToOut(level, String.format(msg, objects));
 	}
 	
-	public static void logAclMessage(ACLMessage msg) 
-	{
-        String msgsFilePath = System.getenv(PATH_ENVIROMENT_VARIABLE);
+	public static void logAclMessage(ACLMessage msg, char type) {
+    	if(testingEnabled) {
+    		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
+    		
+    		try {
+	    		String testlogDir = msgsFilePath + "TestData";
+	    		
+	    		File dir = new File(testlogDir);
+	    		if(!dir.exists()) {
+	    			dir.mkdirs();
+	    		}
+	    		
+	    		File file = new File(dir, msg.getConversationId() + ".log");
+	    		if(!file.exists()) {
+					file.createNewFile();
+	    		}
+	    		
+	    		FileWriter fileWriter = new FileWriter(file, true);
+	    		BufferedWriter writer = new BufferedWriter(fileWriter);
+	    		
+	    		/*
+	    		 * Timestamp
+	    		 * Sent or Received
+	    		 * Sender
+	    		 * Receiver
+	    		 * Ontology
+	    		 * Performative
+	    		 * Content-Length / Size ?
+	    		 */
+	    		
+	    		java.util.Date date = new java.util.Date();
+	    		java.sql.Timestamp timeStamp = new java.sql.Timestamp(date.getTime());
+	    		int contentSize = 0;
+	    		if(msg.getByteSequenceContent() != null) {
+	    			contentSize = msg.getByteSequenceContent().length;
+	    		}
+	    		String typeString = "nothing";
+	    		if(type == 's') {
+	    			typeString = "Sent";
+	    		} else if(type == 'r') {
+	    			typeString = "Received";
+	    		} else {
+	    			typeString = "Weird";
+	    		}
+	    		
+	    		writer.write("$[" + timeStamp + "]~[" + typeString + "]~[" + msg.getSender().getLocalName() + "]~[" + ((AID)msg.getAllReceiver().next()).getLocalName() + "]~[" + ACLMessage.getPerformative(msg.getPerformative()) + "]~[" + msg.getOntology() + "]~[" + contentSize + "]$\r\n");
+	    		
+	    		writer.close();
+    		} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+	}
+	
+	public static void logAclMessage(ACLMessage msg, boolean debug) {
+		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
         
     	try 
     	{ 
@@ -126,11 +181,14 @@ public class Logger {
     			file.createNewFile();
     		}    
     		
-    		FileWriter fileWritter = new FileWriter(file, true);
-	        BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
+    		FileWriter fileWriter = new FileWriter(file, true);
+	        BufferedWriter bufferWriter = new BufferedWriter(fileWriter);
 	        
+	        bufferWriter.write("Msg from ( sender ): " + msg.getSender().getLocalName() + " -> " + "to ( receiver ): " + ((AID)msg.getAllReceiver().next()).getLocalName() +  "\n" +
+	        		"Performative: " + ACLMessage.getPerformative(msg.getPerformative()) + "\n" +
+	        		"Ontology: " + msg.getOntology()  + "\n\n");
 	        
-	        bufferWritter.close();
+	        bufferWriter.close();
 	        
     	}
     	catch(IOException e)
@@ -139,7 +197,7 @@ public class Logger {
     	}
 	}
 	
-	/**
+	/** 
 	 * Writes the specified message to the output stream using the PrintStream format method.
 	 * @param msg A format string as described in http://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 	 * @param objects Arguments referenced by the format specifiers in the format string.
