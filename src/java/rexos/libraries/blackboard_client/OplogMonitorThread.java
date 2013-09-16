@@ -155,7 +155,7 @@ class OplogMonitorThread extends Thread {
 			 * We purposely kill the cursor when the OplogMonitorThread is interrupted, thus expect this to happen.
 			 */
 			
-			rexos.libraries.log.Logger.log(LogLevel.ERROR,"OplogMonitorThread ending due to %s:\n%s\n", ex.getClass().getName(), ex.getMessage());
+			rexos.libraries.log.Logger.log(LogLevel.CRITICAL,"OplogMonitorThread ending due to %s:\n%s\n", ex.getClass().getName(), ex.getMessage());
 		} finally {
 			try {
 				if (tailedCursor != null) {

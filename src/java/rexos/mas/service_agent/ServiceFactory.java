@@ -125,8 +125,8 @@ public class ServiceFactory {
 					
 				}
 			}
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			Logger.log(LogLevel.ERROR, ex);
+		} catch (KnowledgeException | KeyNotFoundException e) {
+			Logger.log(LogLevel.ERROR, e);
 		}
 		
 		Service[] services = new Service[servicesForStep.size()];

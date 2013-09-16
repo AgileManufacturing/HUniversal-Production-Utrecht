@@ -84,7 +84,7 @@ public class JadeAgentX extends Agent {
 	@Override
 	protected void setup() {
 		try {
-			Logger.log(LogLevel.DEBUG, "starting an agent");
+			Logger.log(LogLevel.DEBUG, "starting the main agent");
 
 			/**
 			 * Make a new logistics agent

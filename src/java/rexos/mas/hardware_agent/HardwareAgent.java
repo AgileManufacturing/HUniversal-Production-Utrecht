@@ -184,7 +184,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void setup() {
-		Logger.log(LogLevel.DEBUG, "Hardware agent " + this + " reporting.");
+		Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as an hardware agent.");
 		leadingModules = new HashMap<Integer, Integer>();
 
 		// gets the modulefactory and subscribes to updates.
@@ -237,7 +237,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		}
 		catch(InvalidDBNamespaceException | UnknownHostException | GeneralMongoException e) 
 		{
-			Logger.log(LogLevel.DEBUG, e);
+			Logger.log(LogLevel.ERROR, e);
 			doDelete();
 		}
 
@@ -317,7 +317,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 							"statusData", new BasicDBObject("reason", reason).append("log", buildLog(serviceStepId)))));
 			equipletStepBBClient.removeDocuments(new BasicDBObject("serviceStepID", serviceStepId));
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			e.printStackTrace();
+			Logger.log(LogLevel.ERROR, e);
 		}
 	}
 
@@ -334,9 +334,10 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 					if(dbObject != null) {
 						ServiceStep serviceStep = new ServiceStep((BasicDBObject) dbObject);
 						StepStatusCode status = serviceStep.getStatus();
+						Logger.log(LogLevel.DEBUG, "Hardware Agent - serv.Step status set to: %s%n", status);
+						
 						switch(status) {
 							case ABORTED:
-								Logger.log(LogLevel.DEBUG, "Hardware Agent - serv.Step status set to: %s%n", status);
 								cancelAllStepsForServiceStep(serviceStep.getId(), serviceStep.getStatusData()
 										.getString("reason"));
 								serviceStepBBClient.updateDocuments(
@@ -348,13 +349,11 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 
 								break;
 							case PLANNED:
-								Logger.log(LogLevel.DEBUG, "Hardware Agent - serv.Step status set to PLANNED%nUpdating equipStep to PLANNED");
 								equipletStepBBClient.updateDocuments(
 										new BasicDBObject("serviceStepID", serviceStep.getId()), new BasicDBObject(
 												"$set", new BasicDBObject("status", status.name())));
 								break;
 							case WAITING:
-								Logger.log(LogLevel.DEBUG, "Hardware Agent - serv.Step status set to: %s%n", status);
 								List<DBObject> dbObjects =
 										equipletStepBBClient.findDocuments(new BasicDBObject("serviceStepID",
 												serviceStep.getId()));
@@ -383,13 +382,11 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 										.getServiceStepID()));
 						BasicDBObject searchQuery = new BasicDBObject("_id", serviceStep.getId());
 						StepStatusCode status = equipletStep.getStatus();
-						if ( status == StepStatusCode.DONE && equipletStep.getNextStep() == null){
-							Logger.log(LogLevel.NOTIFICATION, "Did the last Equipletstep of serviceStep '" + serviceStep.getServiceId()+"'");
-						}
+						
+						Logger.log(LogLevel.DEBUG, "Hardware Agent - equip.Step no: %s%n status set to: %s%n", equipletStep.getId(), status);
 						
 						switch(status) {
 							case DONE:
-								Logger.log(LogLevel.DEBUG, "Hardware Agent - equip.Step no: %s%n status set to: %s%n", equipletStep.getId(), status);
 								if(equipletStep.getNextStep() == null) {
 									//Logger.log(LogLevel.DEBUG, "Hardware agent - saving log in serv.Step %s\n%s\n",
 									//		serviceStep.getId(), buildLog(serviceStep.getId()));
@@ -411,7 +408,6 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 							case SUSPENDED_OR_WARNING:
 							case ABORTED:
 							case FAILED:
-								Logger.log(LogLevel.DEBUG, "Hardware Agent - equip.Step status set to: %s%n", status);
 								BasicDBObject statusData = serviceStep.getStatusData();
 								statusData.putAll((Map<String, Object>) equipletStep.getStatusData());
 								BasicDBObject updateQuery =

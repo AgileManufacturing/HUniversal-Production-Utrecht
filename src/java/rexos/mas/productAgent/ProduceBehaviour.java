@@ -101,14 +101,12 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 	 */
 	@Override
 	public void onStart() {
-		try {
-			_production = ((ProductAgent) myAgent).getProduct().getProduction();
-			_conversationIdToProductionStep = _production
-					.createConversationIdToProductionStepMapping();
-			_productionStepsCount = _production.getProductionCount();
-		} catch (Exception e) {
-			Logger.log(LogLevel.ERROR, e);
-		}
+		
+		_production = ((ProductAgent) myAgent).getProduct().getProduction();
+		_conversationIdToProductionStep = _production
+				.createConversationIdToProductionStepMapping();
+		_productionStepsCount = _production.getProductionCount();
+		
 	}
 
 	/*

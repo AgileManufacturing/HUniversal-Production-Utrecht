@@ -243,7 +243,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	@Override
 	public void setup() {
 		try {
-			Logger.log(LogLevel.DEBUG, "I spawned as a equiplet agent.");
+			Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as an equiplet agent.");
 			
 			communicationTable = new HashMap<String, ObjectId>();
 			behaviours = new ArrayList<Behaviour>();
@@ -309,7 +309,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			collectiveBBClient.setCollection(equipletDirectoryName);
 		} catch(GeneralMongoException | InvalidDBNamespaceException | UnknownHostException | StaleProxyException
 				| KnowledgeException | KeyNotFoundException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.CRITICAL, "Could not spawn Equiplet", e);
+			//delete this agent and all opened blackboards / started agents
 			doDelete();
 		}
 
@@ -348,7 +349,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			productStepBBClient.removeDocuments(new BasicDBObject());
 			productStepBBClient.unsubscribe(statusSubscription);
 		} catch(InvalidDBNamespaceException | GeneralMongoException | IOException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "Could not clear blackboards for " + this.getAID().getLocalName(), e);
 		}
 
 		ACLMessage deadMessage = new ACLMessage(ACLMessage.FAILURE);
@@ -412,32 +413,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 								responseMessage.setPerformative(ACLMessage.CONFIRM);
 								responseMessage.setContentObject(scheduleData.getStartTime());
 
-								// TODO: after testing delete below
-								// addBehaviour(new WakerBehaviour(this, 75){
-								//
-								// /**
-								// *
-								// */
-								// private static final long serialVersionUID = 1L;
-								//
-								// protected void onWake(){
-								//
-								// ACLMessage cancelMessage = new ACLMessage(ACLMessage.CANCEL);
-								// cancelMessage.addReceiver(getAID());
-								// cancelMessage.setOntology("AbortStep");
-								// cancelMessage.setConversationId(getConversationId(nextProductStep));
-								// send(cancelMessage);
-								//
-								// Logger.log("Equiplet agent - sending message %s%n",
-								// ACLMessage.getPerformative(cancelMessage.getPerformative()));
-								// }
-								// });
-								// TODO: after testing delete above
 
 							} catch(IOException e) {
 								responseMessage.setPerformative(ACLMessage.DISCONFIRM);
 								responseMessage.setContent("An error occured in the planning/please reschedule");
-								Logger.log(LogLevel.ERROR, e);
+								Logger.log(LogLevel.ERROR, "Could not serialize scheduledata-starttime", e);
 							}
 							break;
 						case FAILED:

@@ -52,10 +52,13 @@ import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.StepStatusCode;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 
 import com.mongodb.DBObject;
@@ -76,6 +79,7 @@ public class PlannerBehaviour extends Behaviour {
 
 	/**
 	 * Constructs the planne behavior
+	 * 
 	 * @param myAgent
 	 * @param bc
 	 */
@@ -105,11 +109,12 @@ public class PlannerBehaviour extends Behaviour {
 			ArrayList<ProductionStep> psa = production.getProductionSteps();
 			ProductionEquipletMapper prodEQmap = production
 					.getProductionEquipletMapping();
-			
+
 			// Iterate over all the production steps
 			for (ProductionStep prodStep : psa) {
-				if (prodStep.getStatus() == StepStatusCode.EVALUATING || prodStep.getStatus() == StepStatusCode.RESCHEDULE) {
-					
+				if (prodStep.getStatus() == StepStatusCode.EVALUATING
+						|| prodStep.getStatus() == StepStatusCode.RESCHEDULE) {
+
 					int PA_id = prodStep.getId();
 					prodEQmap.addProductionStep(PA_id);
 					// Get the type of production step, aka capability
@@ -128,13 +133,15 @@ public class PlannerBehaviour extends Behaviour {
 				} else {
 				}
 			}
-			
+
 			production.setProductionEquipletMapping(prodEQmap);
 			product.setProduction(production);
 			this._productAgent.setProduct(product);
 			this._isDone = true;
-		} catch (Exception e) {
-			Logger.log(LogLevel.ERROR, "Exception PlannerBehaviour - onStart() : " + e);
+		} catch (NullPointerException | InvalidDBNamespaceException
+				| GeneralMongoException | UnknownHostException e) {
+			Logger.log(LogLevel.ERROR,
+					"Exception PlannerBehaviour - onStart() : ", e);
 			this._isError = true;
 		}
 	}
@@ -144,21 +151,18 @@ public class PlannerBehaviour extends Behaviour {
 	 */
 	@Override
 	public void action() {
-		try {
-			if(this._isDone) {
-				this._bc.handleCallback(BehaviourStatus.COMPLETED, null);
-				this._isCompleted = true;
-			}else if (this._isError) {
-				this._bc.handleCallback(BehaviourStatus.ERROR, null);
-				this._isCompleted = true;
-			} else {
-				block();
-			}
-		} catch (Exception e) {
-			Logger.log(LogLevel.ERROR, "Exception PlannerBehaviour: " + e);
+
+		if (this._isDone) {
+			this._bc.handleCallback(BehaviourStatus.COMPLETED, null);
+			this._isCompleted = true;
+		} else if (this._isError) {
+			this._bc.handleCallback(BehaviourStatus.ERROR, null);
+			this._isCompleted = true;
+		} else {
+			block();
 		}
 	}
-	
+
 	@Override
 	public void reset() {
 		super.reset();
@@ -169,6 +173,7 @@ public class PlannerBehaviour extends Behaviour {
 
 	/**
 	 * returns true when the behavior is done
+	 * 
 	 * @return
 	 */
 	@Override

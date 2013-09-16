@@ -131,9 +131,10 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 				
 				equipletAgent.getTimer().rescheduleTimer();
 			}
-		} catch(InvalidDBNamespaceException | GeneralMongoException e1) {
-			Logger.log(LogLevel.ERROR, e1);
+		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+			Logger.log(LogLevel.ERROR, e);
 			//TODO handle error
+			equipletAgent.doDelete();
 		}
 
 
@@ -158,7 +159,7 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 				}
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			e.printStackTrace();
+			Logger.log(LogLevel.ERROR, e);
 			//TODO handle error
 		}
 	}

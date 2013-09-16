@@ -187,8 +187,8 @@ public class InformerBehaviour extends Behaviour {
 				}
 			}
 			//block();
-		} catch (Exception e) {
-			Logger.log(LogLevel.ERROR, e.toString());
+		} catch (NullPointerException e) {
+			Logger.log(LogLevel.ERROR, e);
 		}
 	}
 	

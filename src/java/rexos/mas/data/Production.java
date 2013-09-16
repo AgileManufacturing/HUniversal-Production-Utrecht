@@ -8,7 +8,7 @@
  * 
  * @section LICENSE License: newBSD
  * 
- *          Copyright © 2012, HU University of Applied Sciences Utrecht. All
+ *          Copyright ï¿½ 2012, HU University of Applied Sciences Utrecht. All
  *          rights reserved.
  * 
  *          Redistribution and use in source and binary forms, with or without
@@ -77,9 +77,10 @@ public class Production{
 	}
 
 	public void setProductionEquipletMapping(ProductionEquipletMapper prodEQMap)
-			throws Exception{
-		if (prodEQMap == null)
-			throw new Exception("mapping cant be null");
+			throws NullPointerException{
+		if (prodEQMap == null){
+			throw new NullPointerException("ProductionEquipletMapper can't be null");
+		}
 		this._prodEQMap = prodEQMap;
 	}
 	

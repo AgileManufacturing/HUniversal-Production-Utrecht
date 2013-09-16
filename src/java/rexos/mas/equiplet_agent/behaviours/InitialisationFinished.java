@@ -177,8 +177,9 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 					break;
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			e.printStackTrace();
-			// TODO handle error
+			Logger.log(LogLevel.ERROR, e);
+			// Cannot add myself on the collective BB, so remove the agent since it cannot be found by product agents 
+			myAgent.doDelete();
 		}
 	}
 }

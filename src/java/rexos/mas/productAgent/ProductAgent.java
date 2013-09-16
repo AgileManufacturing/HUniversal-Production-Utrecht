@@ -94,17 +94,16 @@ public class ProductAgent extends Agent {
 			// Create the Overview Behaviour and start it
 			_overviewBehaviour = new OverviewBehaviour(this);
 			addBehaviour(_overviewBehaviour);
-			Logger.log(LogLevel.DEBUG, "Product agent spawned.");
-		} catch (Exception e) {
-			Logger.log(LogLevel.ERROR, "Productagent died. Exited with: " + e.getMessage());
-			doDelete();
+			Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as an product agent.");
+		} catch (IllegalArgumentException e) {
+
 		}
 	}
 
 	/**
 	 * Loads the arguments passed to the product agent
 	 */
-	private void loadArguments() {
+	private void loadArguments() throws IllegalArgumentException {
 		// Get the arguments passed to the ProductAgent
 		Object[] args = this.getArguments();
 		// Check if there are any arguments. If there aren't any there is a
@@ -115,55 +114,62 @@ public class ProductAgent extends Agent {
 			// Check if the arguments is a string (so we can assume it's JSON)
 			// or if it's a known object
 			if (args[0].getClass() == String.class) {
-				try{
-				// Change the incoming JSON message to also implement the host
-				// to connect to.
-				JsonParser parser = new JsonParser();
-				JsonObject obj = (JsonObject)parser.parse((String)args[0]).getAsJsonObject();
-		        JsonElement callbackElement = obj.get("callback");
-		        
-		        JsonObject productObject = obj.get("product").getAsJsonObject();
-		        
-		        JsonObject productionObject = productObject.get("production").getAsJsonObject();
-		        
-		        JsonArray productionStepsArray = productionObject.get("productionSteps").getAsJsonArray();
-		        
-		        ArrayList<ProductionStep> stepList = new ArrayList<>();
-		        ProductionStep step =  null;
-		        for(int i = 0; i < productionStepsArray.size(); i++) {
-		        	
-		        	JsonObject ele = productionStepsArray.get(i).getAsJsonObject();		        	
-		        	int id = ele.get("id").getAsInt();
-		        	int capability = ele.get("capability").getAsInt();
-		        	JsonElement parameterObject = ele.get("parameters");
-		        	String parameters = parameterObject.toString();
-		        	
-		        	step = new ProductionStep(id, capability, (BasicDBObject)JSON.parse(parameters));
-		        	
-		        	stepList.add(step);	        	
-		        }
-		        
-		        Production production = new Production(stepList);
-				Product product = new Product(production);
+				try {
+					// Change the incoming JSON message to also implement the
+					// host
+					// to connect to.
+					JsonParser parser = new JsonParser();
+					JsonObject obj = (JsonObject) parser
+							.parse((String) args[0]).getAsJsonObject();
+					JsonElement callbackElement = obj.get("callback");
 
-				Callback callback = new Gson().fromJson(callbackElement.toString(), Callback.class);
-				
-				ProductAgentProperties pap = new ProductAgentProperties();
-				pap.setCallback(callback);
-				pap.setProduct(product);
+					JsonObject productObject = obj.get("product")
+							.getAsJsonObject();
 
-				this._properties = pap;
-				} catch(Exception e) {
+					JsonObject productionObject = productObject.get(
+							"production").getAsJsonObject();
+
+					JsonArray productionStepsArray = productionObject.get(
+							"productionSteps").getAsJsonArray();
+
+					ArrayList<ProductionStep> stepList = new ArrayList<>();
+					ProductionStep step = null;
+					for (int i = 0; i < productionStepsArray.size(); i++) {
+
+						JsonObject ele = productionStepsArray.get(i)
+								.getAsJsonObject();
+						int id = ele.get("id").getAsInt();
+						int capability = ele.get("capability").getAsInt();
+						JsonElement parameterObject = ele.get("parameters");
+						String parameters = parameterObject.toString();
+
+						step = new ProductionStep(id, capability,
+								(BasicDBObject) JSON.parse(parameters));
+
+						stepList.add(step);
+					}
+
+					Production production = new Production(stepList);
+					Product product = new Product(production);
+
+					Callback callback = new Gson().fromJson(
+							callbackElement.toString(), Callback.class);
+
+					ProductAgentProperties pap = new ProductAgentProperties();
+					pap.setCallback(callback);
+					pap.setProduct(product);
+
+					this._properties = pap;
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			} else if (args[0].getClass() == ProductAgentProperties.class) {
 				this._properties = (ProductAgentProperties) args[0];
 			}
 		} else {
-			System.out
-					.println("No arguments found. ProductAgent needs atleast one ProductAgentPropeties as argument");
-			// TODO: Throw exception. No need to continue if no product is
-			// defined.
+			Logger.log(
+					LogLevel.ERROR,
+					"No arguments found. ProductAgent needs atleast one ProductAgentPropeties as argument");
 			throw new IllegalArgumentException("No argument(s) found.");
 		}
 	}
@@ -174,6 +180,7 @@ public class ProductAgent extends Agent {
 	 */
 	/**
 	 * Generate an communication ID
+	 * 
 	 * @return
 	 */
 	public String generateCID() {
@@ -189,6 +196,7 @@ public class ProductAgent extends Agent {
 	 */
 	/**
 	 * Get properties of the product agent
+	 * 
 	 * @return
 	 */
 	public ProductAgentProperties getProperties() {
@@ -197,6 +205,7 @@ public class ProductAgent extends Agent {
 
 	/**
 	 * Sets the product agent properties
+	 * 
 	 * @param properties
 	 */
 	public void setProperties(ProductAgentProperties properties) {
@@ -205,6 +214,7 @@ public class ProductAgent extends Agent {
 
 	/**
 	 * Gets the callback response of a behavior
+	 * 
 	 * @return
 	 */
 	public Callback getCallback() {
@@ -213,6 +223,7 @@ public class ProductAgent extends Agent {
 
 	/**
 	 * Sets the callback of a behavior
+	 * 
 	 * @param callback
 	 */
 	public void setCallback(Callback callback) {
@@ -221,6 +232,7 @@ public class ProductAgent extends Agent {
 
 	/**
 	 * Get the product
+	 * 
 	 * @return
 	 */
 	public Product getProduct() {
@@ -229,27 +241,29 @@ public class ProductAgent extends Agent {
 
 	/**
 	 * Set the product
+	 * 
 	 * @param product
 	 */
 	public void setProduct(Product product) {
 		this._properties.setProduct(product);
 	}
-	
+
 	/**
 	 * Get agent status
+	 * 
 	 * @return
 	 */
-	public AgentStatus getStatus(){
+	public AgentStatus getStatus() {
 		return this._status;
 	}
-	
+
 	/**
 	 * Set the staus of the agent
+	 * 
 	 * @param status
 	 */
 	public void setStatus(AgentStatus status) {
 		this._status = status;
 	}
-	
 
 }

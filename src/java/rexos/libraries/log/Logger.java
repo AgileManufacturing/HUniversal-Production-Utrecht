@@ -197,34 +197,58 @@ public class Logger {
     	}
 	}
 	
+	public static void log(LogLevel level,String msg,  Throwable throwable) {
+		printToOut(level, msg);
+		printToOut(level, throwable.getStackTrace().toString());
+	}
+	
+	public static void log(LogLevel level, Throwable throwable) {
+		printToOut(level, throwable.getStackTrace().toString());
+	}
+	
 	/** 
 	 * Writes the specified message to the output stream using the PrintStream format method.
 	 * @param msg A format string as described in http://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 	 * @param objects Arguments referenced by the format specifiers in the format string.
 	 **/
-	public static void log(LogLevel level, Throwable throwable) {
-		printToOut(level, throwable.getStackTrace().toString());
-	}
-	
-	
-	private static void printToOut(LogLevel level, String msg)
+	private static void printToOut(LogLevel level, Object msg)
 	{
 		if(level.getLevel() >= loglevelThreshold){
 			switch(level){		
 				case EMERGENCY:
-					System.err.println("EMERGENCY:\t" + msg + "\nAt " + new Exception().getStackTrace()[2]);
+					if(msg.getClass() == Throwable.class){
+						System.err.println("EMERGENCY:\t" + ((Throwable)msg).getStackTrace().toString());
+					}
+					else{
+						System.err.println("EMERGENCY:\t" + msg );
+					}
 					break;
 					
 				case ALERT:
-					System.err.println("ALERT:\t" + msg + "\nAt " + new Exception().getStackTrace()[2]);
+					if(msg.getClass() == Throwable.class){
+						System.err.println("ALERT:\t" + ((Throwable)msg).getStackTrace().toString());
+					}
+					else{
+						System.err.println("ALERT:\t" + msg );
+					}
 					break;
 					
 				case CRITICAL:
-					System.err.println("CRITICAL:\t" + msg + "\nAt " + new Exception().getStackTrace()[2]);
+					if(msg.getClass() == Throwable.class){
+						System.err.println("CRITICAL:\t" + ((Throwable)msg).getStackTrace().toString());
+					}
+					else{
+						System.err.println("CRITICAL:\t" + msg );
+					}
 					break;
 					
 				case ERROR:
-					System.err.println("ERROR:\t" + msg + "\nAt " + new Exception().getStackTrace()[2]);
+					if(msg.getClass() == Throwable.class){
+						System.err.println("ERROR:\t" + ((Throwable)msg).getStackTrace().toString());
+					}
+					else{
+						System.err.println("ERROR:\t" + msg);
+					}
 					break;
 					
 				case WARNING:

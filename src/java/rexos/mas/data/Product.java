@@ -70,7 +70,9 @@ public class Product{
 
 	public Product(Production production){
 		if (production == null){
-			Logger.log(LogLevel.ERROR, "Production can't be null");
+			NullPointerException noProduction = new NullPointerException("Production can't be null");
+			Logger.log(LogLevel.ERROR, noProduction);
+			throw noProduction;
 		}
 		setProduction(production);
 		log = new ProductLog();

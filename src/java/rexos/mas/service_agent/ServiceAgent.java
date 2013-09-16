@@ -157,7 +157,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 */
 	@Override
 	public void setup() {
-		Logger.log(LogLevel.DEBUG, "I spawned as a service agent.");
+		Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as an service agent.");
 
 		// handle arguments given to this agent
 		Object[] args = getArguments();
@@ -309,10 +309,11 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					switch(operation) {
 						case UPDATE:
 							StepStatusCode status = productionStep.getStatus();
+
+							Logger.log(LogLevel.DEBUG, "Service agent - prod.Step %s status set to %s%n",
+									productionStep.getId(), status);
 							switch(status) {
 								case WAITING:
-									Logger.log(LogLevel.DEBUG, "Service agent - prod.Step %s status set to %s%n",
-											productionStep.getId(), status);
 
 									// fetch and sort all serviceSteps
 									List<DBObject> dbServiceSteps =
@@ -334,9 +335,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 													.append("statusData", productionStep.getStatusData())));
 									break;
 								case ABORTED:
-									Logger.log(LogLevel.DEBUG, "Service agent - prod.Step %s status set to %s%n",
-											productionStep.getId(), status);
-
 									Logger.log(LogLevel.DEBUG, "Service agent - aboring all serviceSteps of prod.Step%n",
 											entry.getTargetObjectId());
 
@@ -359,9 +357,9 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					switch(operation) {
 						case UPDATE:
 							StepStatusCode status = serviceStep.getStatus();
+							Logger.log(LogLevel.DEBUG, "Service agent - serv.Step %s status set to %s%n", serviceStepId, status);
 							switch(status) {
 								case DELETED:
-									Logger.log(LogLevel.DEBUG, "Service agent - serv.Step %s status set to %s%n", serviceStepId, status);
 
 									List<DBObject> undeletedServiceSteps =
 											serviceStepBBClient.findDocuments(QueryBuilder.start("productStepId")
@@ -381,7 +379,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 									}
 									break;
 								case DONE:
-									Logger.log(LogLevel.DEBUG, "Service agent - serv.Step %s status set to %s%n", serviceStepId, status);
 
 									if(serviceStep.getNextStep() != null) {
 										Logger.log(LogLevel.DEBUG, "Service agent - setting status of next serv.Step %s to %s%n",
@@ -411,8 +408,6 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 															+ status.name()).append("log", buildLog(productStepId)))));
 									//$FALL-THROUGH$
 								case IN_PROGRESS:
-									Logger.log(LogLevel.DEBUG, "Service agent - serv.Step %s status set to %s%n", serviceStep.getId(),
-											status);
 									Logger.log(LogLevel.DEBUG, "Service agent - setting status of prod.Step %s to %s%n", productStepId,
 											status);
 									productStepBBClient.updateDocuments(

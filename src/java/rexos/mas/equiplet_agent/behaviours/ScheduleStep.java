@@ -127,7 +127,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 					new ScheduleData((BasicDBObject) (productBBClient.findDocumentById(productStepId)).get("scheduleData"));
 			
 			long end = start + scheduleData.getDuration();
-			Logger.log(LogLevel.INFORMATION, "start: " + start + " duration: " + scheduleData.getDuration() + " end: " + end);
+			Logger.log(LogLevel.DEBUG, "start: " + start + " duration: " + scheduleData.getDuration() + " end: " + end);
 
 			// Gets planned steps
 			List<DBObject> plannedSteps =
@@ -135,7 +135,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 
 			boolean fitsInSchedule = true;
 
-			Logger.log(LogLevel.INFORMATION, "I currently have " + plannedSteps.size() + " planned steps.");
+			Logger.log(LogLevel.DEBUG, "I currently have " + plannedSteps.size() + " planned steps.");
 			// check if other steps not are scheduled.
 			for(DBObject plannedStep : plannedSteps) {
 				ProductStep productStep = new ProductStep((BasicDBObject) plannedStep);
@@ -186,7 +186,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 				scheduleMessage.setConversationId(message.getConversationId());
 				equipletAgent.send(scheduleMessage);
 				Logger.logAclMessage(scheduleMessage, 's');
-				Logger.log(LogLevel.INFORMATION, "You fit in my schedule, msg accepted send.");
+				Logger.log(LogLevel.DEBUG, "You fit in my schedule, msg accepted send.");
 			}
 			else 
 			{
@@ -200,6 +200,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 		catch(IOException | InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) 
 		{
 			Logger.log(LogLevel.ERROR, e);
+			myAgent.doDelete();
 		}
 	}
 }

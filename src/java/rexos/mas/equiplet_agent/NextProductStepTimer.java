@@ -192,7 +192,7 @@ public class NextProductStepTimer extends Timer {
 				setNextUsedTimeSlot(-1);
 			}
 		} catch(GeneralMongoException | InvalidDBNamespaceException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "MongoDb failed at " + this.equipletAgent.getAID().getLocalName(), e);
 		}
 
 	}

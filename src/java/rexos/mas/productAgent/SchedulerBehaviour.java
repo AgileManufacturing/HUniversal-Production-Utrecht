@@ -46,11 +46,14 @@ import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
+import rexos.libraries.blackboard_client.GeneralMongoException;
+import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.log.Logger;
 import rexos.mas.data.BehaviourStatus;
 import rexos.mas.data.DbData;
@@ -105,18 +108,20 @@ public class SchedulerBehaviour extends Behaviour {
 			Product product = this._productAgent.getProduct();
 			Production production = product.getProduction();
 			ArrayList<ProductionStep> psa = production.getProductionSteps();
-			
-			//Notify the OverviewBehaviour that the scheduler is running. The overview behaviour will start the produceBehaviour so it's possible to
-			//schedule and produce at the same time.
+
+			// Notify the OverviewBehaviour that the scheduler is running. The
+			// overview behaviour will start the produceBehaviour so it's
+			// possible to
+			// schedule and produce at the same time.
 			this._bc.handleCallback(BehaviourStatus.RUNNING, null);
 
-			for (ProductionStep ps : psa) 
-			{
-				Logger.log(LogLevel.INFORMATION, "Trying to schedule a new step (id " + ps.getId() + "). status: " + ps.getStatus());
-				
-				if ((ps.getStatus() == StepStatusCode.EVALUATING || ps.getStatus() == StepStatusCode.RESCHEDULE)
-						&& _isError == false) 
-				{
+			for (ProductionStep ps : psa) {
+				Logger.log(LogLevel.DEBUG, "Trying to schedule a new step (id "
+						+ ps.getId() + "). status: " + ps.getStatus());
+
+				if ((ps.getStatus() == StepStatusCode.EVALUATING || ps
+						.getStatus() == StepStatusCode.RESCHEDULE)
+						&& _isError == false) {
 					int PA_id = ps.getId();
 					java.util.HashMap<AID, Long> equiplets = production.getProductionEquipletMapping().getEquipletsForProductionStep(PA_id);
 
@@ -146,23 +151,14 @@ public class SchedulerBehaviour extends Behaviour {
 	 */
 	@Override
 	public void action() {
-		try 
-		{
-			if (_schedulersStarted == _schedulersCompleted && _isError == false) 
-			{
-				Logger.log(LogLevel.INFORMATION, "Setting scheduler to complete");
-				this._bc.handleCallback(BehaviourStatus.COMPLETED, null);
-				_isCompleted = true;
-			} 
-			else if (_isError) 
-			{
-				this._bc.handleCallback(BehaviourStatus.ERROR, null);
-				_isCompleted = true;
-			}
-		} 
-		catch (Exception e) 
-		{
-			Logger.log(LogLevel.ERROR, e.toString());
+
+		if (_schedulersStarted == _schedulersCompleted && _isError == false) {
+			Logger.log(LogLevel.INFORMATION, "Setting scheduler to complete");
+			this._bc.handleCallback(BehaviourStatus.COMPLETED, null);
+			_isCompleted = true;
+		} else if (_isError) {
+			this._bc.handleCallback(BehaviourStatus.ERROR, null);
+			_isCompleted = true;
 		}
 	}
 
@@ -192,10 +188,10 @@ public class SchedulerBehaviour extends Behaviour {
 	 * @param productionStep
 	 * @throws Exception
 	 */
-	public void Scheduler(Set<AID> equipletList, final ProductionStep productionstep) throws Exception 
-	{
-
-		this._prodStep = productionstep;
+	public void Scheduler(Set<AID> equipletList,
+			final ProductionStep productionstep) {
+		try {
+			this._prodStep = productionstep;
 
 		List<AID> equipletlist = new ArrayList<AID>(equipletList);
 
@@ -328,21 +324,25 @@ public class SchedulerBehaviour extends Behaviour {
 		myAgent.send(msg);
 		Logger.logAclMessage(msg, 's');
 
-		ACLMessage returnMsg = myAgent.blockingReceive(MessageTemplate.MatchOntology("Planned"));
-		Logger.logAclMessage(returnMsg, 'r');
-		if (returnMsg.getPerformative() == ACLMessage.CONFIRM) 
-		{
-			_prodStep.setStatus(StepStatusCode.PLANNED);
-			_prodStep.setUsedEquiplet(returnMsg.getSender());
-		} 
-		else if (returnMsg.getPerformative() == ACLMessage.DISCONFIRM) 
-		{
-			_isError = true;
-			_bc.handleCallback(BehaviourStatus.ERROR, null);
+			ACLMessage returnMsg = myAgent.blockingReceive(MessageTemplate
+					.MatchOntology("Planned"));
+			if (returnMsg.getPerformative() == ACLMessage.CONFIRM) {
+				_prodStep.setStatus(StepStatusCode.PLANNED);
+				_prodStep.setUsedEquiplet(returnMsg.getSender());
+			} else if (returnMsg.getPerformative() == ACLMessage.DISCONFIRM) {
+				_isError = true;
+				_bc.handleCallback(BehaviourStatus.ERROR, null);
+			}
+
+			_prodStep.setConversationId(returnMsg.getConversationId());
+			_schedulersCompleted++;
+
+		} catch (InvalidDBNamespaceException
+				| GeneralMongoException e) {
+			Logger.log(LogLevel.ERROR, "Database exception at scheduling", e);
+		} catch (IOException e1){
+			Logger.log(LogLevel.ERROR, "Message content exception at scheduling", e1);
 		}
-		
-		_prodStep.setConversationId(returnMsg.getConversationId());
-		_schedulersCompleted++;
 	}
 
 	private class FreeTimeSlot {

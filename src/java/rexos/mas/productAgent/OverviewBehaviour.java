@@ -204,7 +204,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 * Starts the produce behavior
 	 */
 	public void startProducing() {
-		Logger.log(LogLevel.DEBUG, "Starting a ProduceBehaviour");
+		Logger.log(LogLevel.DEBUG, "Started a ProduceBehaviour");
 		if (_produceBehaviour.done() == false)
 			myAgent.addBehaviour(_produceBehaviour);
 	}
@@ -214,7 +214,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 		_plannerBehaviour.reset();
 		_informerBehaviour.reset();
 		_schedulerBehaviour.reset();
-		Logger.log(LogLevel.DEBUG, "Starting a RescheduleBehaviour");
+		Logger.log(LogLevel.DEBUG, "Started a RescheduleBehaviour");
 		myAgent.addBehaviour(_rescheduleBehaviour);
 	}
 
@@ -258,7 +258,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 					_productAgent.setStatus(AgentStatus.DONE_RESCHEDULING);
 					break;
 				default:
-					Logger.log(LogLevel.ERROR, "Unknown status. Status: " + as.toString());
+					Logger.log(LogLevel.WARNING, "Unknown status. Status: " + as.toString());
 					break;
 			}
 		} 

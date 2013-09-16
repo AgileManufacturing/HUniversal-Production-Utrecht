@@ -1,9 +1,12 @@
 package rexos.mas.productAgent;
 
+import java.io.IOException;
+
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.LogLevel;
@@ -67,7 +70,7 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 			message.setContentObject(_productionStep);
 			myAgent.send(message);
 			Logger.logAclMessage(message, 's');
-		} catch (Exception e) {
+		} catch (IOException e) {
 			Logger.log(LogLevel.ERROR, e);
 		}
 	}
@@ -98,7 +101,7 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 					} 
 					else 
 					{
-						Logger.log(LogLevel.DEBUG, "Received something different than Confirm.");
+						Logger.log(LogLevel.ERROR, "Received something different than Confirm.");
 						_parentBehaviour.callbackSubInformerBehaviour(
 								BehaviourStatus.ERROR, this);
 					}
@@ -119,10 +122,10 @@ public class SubInformerBehaviour extends ReceiveBehaviour {
 					break;
 				}
 			} else {
-				Logger.log(LogLevel.WARNING, "Message can't be null!");
+				Logger.log(LogLevel.ERROR, "Message can't be null!");
 				_parentBehaviour.callbackSubInformerBehaviour(BehaviourStatus.ERROR, this);
 			}
-		} catch (Exception e) {
+		} catch (IOException | UnreadableException e) {
 			Logger.log(LogLevel.ERROR, e);
 			_parentBehaviour.callbackSubInformerBehaviour(BehaviourStatus.ERROR, this);
 		}
