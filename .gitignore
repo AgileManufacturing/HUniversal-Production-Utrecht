@@ -38,6 +38,7 @@ sync.sh
 *.class
 *.orig
 *.jar
+*.json
 
 APDescription.txt
 MTPs-Main-Container.txt
