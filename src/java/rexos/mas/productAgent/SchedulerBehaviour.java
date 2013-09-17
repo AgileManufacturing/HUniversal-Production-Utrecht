@@ -238,7 +238,7 @@ public class SchedulerBehaviour extends Behaviour {
 
 			bbc = new BlackboardClient(dbData.getIp(), dbData.getPort());
 			bbc.setDatabase(dbData.getName());
-			bbc.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "ProductStepsBlackBoardName", aid.getLocalName()));
+			bbc.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ProductStepsBlackBoardName", aid.getLocalName()));
 
 			int requiredTimeSlots = (int) prodAgent.getProduct()
 					.getProduction().getProductionEquipletMapping()

@@ -233,6 +233,7 @@ public class ServiceStep implements MongoSaveable {
 		productStepId = (ObjectId) copy.remove("productStepId");
 		parameters = (BasicDBObject) copy.remove("parameters");
 		status = StepStatusCode.valueOf((String) copy.remove("status"));
+		
 		if(copy.containsField("statusData")) {
 			statusData = (BasicDBObject) copy.remove("statusData");
 		} else {

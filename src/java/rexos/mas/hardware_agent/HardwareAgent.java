@@ -193,8 +193,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 
 		// gets the dbData and AID from the arguments.
 		Object[] args = getArguments();
-		if(args != null && args.length > 0) 
-		{
+		if(args != null && args.length > 0) {
 			dbData = (DbData) args[0];
 			equipletAgentAID = (AID) args[1];
 			serviceAgentAID = (AID) args[2];
@@ -210,22 +209,19 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		behaviours = new ArrayList<Behaviour>();
 
 		// configure the blackboards
-		try 
-		{
+		try {
 			// Send a message to the serviceAgent that the hardware agent is ready.
 			ACLMessage startedMessage = new ACLMessage(ACLMessage.INFORM);
 			startedMessage.addReceiver(serviceAgentAID);
 			startedMessage.setOntology("InitialisationFinished");
 			send(startedMessage);
-			Logger.logAclMessage(startedMessage, 's');
-			Logger.log(LogLevel.INFORMATION, "Hardware is ready to use.");
 
 			stepStatusSubscription = new FieldUpdateSubscription("status", this);
 			stepStatusSubscription.addOperation(MongoUpdateLogOperation.SET);
 
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient.setDatabase(dbData.getName());
-			serviceStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EquipletStepsBlackBoardName", equipletAgentAID.getLocalName()));
+			serviceStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ServiceStepsBlackBoardName", equipletAgentAID.getLocalName()));
 			serviceStepBBClient.subscribe(stepStatusSubscription);
 
 			equipletStepBBClient = new BlackboardClient(dbData.getIp());
@@ -254,19 +250,15 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		addBehaviour(new ServiceAgentDied(this));
 
 		// Get the modules for the equiplet and register the modules
-		try 
-		{
+		try {
 			KnowledgeDBClient client = KnowledgeDBClient.getClient();
 			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgentAID.getLocalName());
 			Module module;
 			int id;
-			
-			for(Row row : rows) 
-			{
+			for(Row row : rows) {
 				id = (int) row.get("module");
 				module = moduleFactory.getModuleById(id);
-				for(int step : module.isLeadingForServices()) 
-				{
+				for(int step : module.isLeadingForServices()) {
 					registerLeadingModule(step, id);
 				}
 			}
@@ -363,7 +355,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 										unsortedSteps[i] = new EquipletStep((BasicDBObject) dbObjects.get(i));
 									}
 									ObjectId id = EquipletStep.sort(unsortedSteps)[0].getId();
-									Logger.log(LogLevel.DEBUG, "Updating equipStep to %s", status);
+
 									equipletStepBBClient.updateDocuments(new BasicDBObject("_id", id),
 											new BasicDBObject("$set", new BasicDBObject("status", status.name())));
 								}
@@ -388,8 +380,8 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 						switch(status) {
 							case DONE:
 								if(equipletStep.getNextStep() == null) {
-									//Logger.log(LogLevel.DEBUG, "Hardware agent - saving log in serv.Step %s\n%s\n",
-									//		serviceStep.getId(), buildLog(serviceStep.getId()));
+									Logger.log(LogLevel.DEBUG, "Hardware agent - saving log in serv.Step %s\n%s\n",
+											serviceStep.getId(), buildLog(serviceStep.getId()));
 
 									serviceStepBBClient.updateDocuments(
 											new BasicDBObject("_id", serviceStep.getId()),

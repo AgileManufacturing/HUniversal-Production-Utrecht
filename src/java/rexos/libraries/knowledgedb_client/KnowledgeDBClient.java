@@ -40,17 +40,13 @@ import java.util.Properties;
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.JDBC4PreparedStatement;
 
+import configuration.Configuration;
+import configuration.ConfigurationFiles;
+
 /**
  * A client to communicate with knowledge database.
  **/
 public class KnowledgeDBClient {
-    /**
-     * @var String PROPERTIES_ENVIRONMENT_VARIABLE
-     *
-     * The environment variable that holds the path to the properties file.
-     **/
-    private static final String PROPERTIES_ENVIRONMENT_VARIABLE = "KNOWLEDGE_DB_PROPERTIES";
-
     
     /**
      * @var rexos.libraries.knowledgedb_client.KnowledgeDBClient client
@@ -86,32 +82,16 @@ public class KnowledgeDBClient {
      **/
     private KnowledgeDBClient() throws KnowledgeException {
         try {
-            Properties dbProperties = new Properties();
-            String propertyFilePath = System.getenv(PROPERTIES_ENVIRONMENT_VARIABLE);
-            if (propertyFilePath == null) {
-            	throw new KnowledgeException("Environment variable KNOWLEDGE_DB_PROPERTIES is not set.");
-            }
-            
-            FileInputStream in = new FileInputStream(propertyFilePath);
-            dbProperties.load(in);
 
-            // Check required properties.
-            String[] reqProperties = new String[]{"host", "port", "db", "username", "password"};
-            for (String property : reqProperties) {
-            	if (!dbProperties.containsKey(property)) {
-            		throw new KnowledgeException("Property " + property + " was not found in properties file.");
-            	}
-            }
-            
-            String url = "jdbc:mysql://" + dbProperties.getProperty("host") + ":" + dbProperties.getProperty("port")
-                    + "/" + dbProperties.getProperty("db");
-            in.close();
+            String url = "jdbc:mysql://" + Configuration.getProperty(ConfigurationFiles.KNOWLEDGE_DB_PROPERTIES, "host") +
+            		":" + Configuration.getProperty(ConfigurationFiles.KNOWLEDGE_DB_PROPERTIES, "port")
+                    + "/" + Configuration.getProperty(ConfigurationFiles.KNOWLEDGE_DB_PROPERTIES, "db");
 
-            connection = (Connection) DriverManager.getConnection(url, dbProperties.getProperty("username"), dbProperties.getProperty("password"));
+            connection = (Connection) DriverManager.getConnection(url,
+            		Configuration.getProperty(ConfigurationFiles.KNOWLEDGE_DB_PROPERTIES, "username"), 
+            		Configuration.getProperty(ConfigurationFiles.KNOWLEDGE_DB_PROPERTIES, "password"));
         } catch (SQLException ex) {
             throw new KnowledgeException("Failed to connect to the knowledge server.", ex);
-        } catch (IOException ex) {
-            throw new KnowledgeException("Failed to read from the properties file.", ex);
         }
     }
 

@@ -145,30 +145,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	private String timeDataName = Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "timeDataCollectionName");
 
 	/**
-	 * @var String equipletDbIp
-	 *      IP of the equiplet database.
-	 */
-	private String equipletDbIp = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbIp", getAID().getLocalName());
-
-	/**
-	 * @var int equipletDbPort
-	 *      Port number of the equiplet database.
-	 */
-	private int equipletDbPort = Integer.parseInt(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbPort", getAID().getLocalName()));
-
-	/**
-	 * @var String equipletDbName
-	 *      Name of the equiplet database.
-	 */
-	private String equipletDbName = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbName", getAID().getLocalName());
-
-	/**
-	 * @var String productStepsName
-	 *      Name of the collection containing the productSteps.
-	 */
-	private String productStepsName = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ProductStepsBlackBoardName", getAID().getLocalName());
-
-	/**
 	 * @var BlackboardClient collectiveBBClient
 	 *      Object for communication with the collective blackboard.
 	 */
@@ -228,6 +204,30 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 * 
 	 */
 	private int equipletId;
+	/**
+	 * @var String equipletDbIp
+	 *      IP of the equiplet database.
+	 */
+	private String equipletDbIp;
+
+	/**
+	 * @var int equipletDbPort
+	 *      Port number of the equiplet database.
+	 */
+	private int equipletDbPort;
+
+	/**
+	 * @var String equipletDbName
+	 *      Name of the equiplet database.
+	 */
+	private String equipletDbName;
+
+	/**
+	 * @var String productStepsName
+	 *      Name of the collection containing the productSteps.
+	 */
+	private String productStepsName;
+
 	
 	private static long systemStart = System.currentTimeMillis();
 
@@ -243,6 +243,11 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	@Override
 	public void setup() {
 		try {
+			equipletDbIp = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbIp", getAID().getLocalName());
+			equipletDbPort = Integer.parseInt(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbPort", getAID().getLocalName()));
+		 	equipletDbName = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbName", getAID().getLocalName());
+		 	productStepsName = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ProductStepsBlackBoardName", getAID().getLocalName());
+		 	
 			Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as an equiplet agent.");
 			
 			communicationTable = new HashMap<String, ObjectId>();
@@ -285,7 +290,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 			stateBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
 			stateBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "stateBlackBoardName"));
-			stateBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "stateCollectionName"));
+			stateBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletStateCollectionName"));
 
 			modeUpdateSubscription = new FieldUpdateSubscription("mode", this);
 			modeUpdateSubscription.addOperation(MongoUpdateLogOperation.SET);
@@ -308,10 +313,13 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 			collectiveBBClient.setCollection(equipletDirectoryName);
 		} catch(GeneralMongoException | InvalidDBNamespaceException | UnknownHostException | StaleProxyException
-				| KnowledgeException | KeyNotFoundException e) {
+				| KnowledgeException | KeyNotFoundException  e) {
 			Logger.log(LogLevel.CRITICAL, "Could not spawn Equiplet", e);
 			//delete this agent and all opened blackboards / started agents
 			doDelete();
+		} catch(Exception e){
+			e.printStackTrace();
+			Logger.log(LogLevel.ERROR, e);
 		}
 
 		// starts the behaviour for receiving message when the Service Agent dies.
@@ -656,3 +664,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		return (System.currentTimeMillis())/50;
 	}
 }
+
+
+

@@ -31,6 +31,7 @@
 package configuration;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -38,30 +39,7 @@ import rexos.libraries.log.Logger;
 import rexos.mas.data.LogLevel;
 
 public class Configuration {
-	private static Properties mongoDbProperties;
-	private static Properties knowledgeDbProperties;
-	private static Properties equipletDbProperties;
-	
-	public Configuration() {
-		mongoDbProperties = new Properties();
-		knowledgeDbProperties = new Properties();
-		equipletDbProperties = new Properties();
- 
-    	try {
-    		//Get the environment variables and construct the paths
-            String mongoDbPropertiesFilePath = System.getenv("PROPERTIESPATH") + "mongo_db.properties";
-            String knowledgeDbPropertiesFilePath = System.getenv("PROPERTIESPATH") + "knowledge_db.properties";
-            String equipletDbPropertiesFilePath = System.getenv("PROPERTIESPATH") + "equiplet_db.properties";
-
-            //load the properties
-    		mongoDbProperties.load(new FileInputStream(mongoDbPropertiesFilePath));
-    		knowledgeDbProperties.load(new FileInputStream(knowledgeDbPropertiesFilePath));
-    		equipletDbProperties.load(new FileInputStream(equipletDbPropertiesFilePath));
-    		
-    	} catch (IOException ex) {
-    		Logger.log(LogLevel.ERROR, ex);
-        }
-    }
+	private static String propertiesFilePath = System.getenv("PROPERTIESPATH");
 	
 	public static String getProperty(ConfigurationFiles File, String key)
 	{
@@ -76,36 +54,34 @@ public class Configuration {
 	
 	public static String getProperty(ConfigurationFiles File, String key, String EquipletName)
 	{
-		switch(File)
-		{
-			case MONGO_DB_PROPERTIES:
-				return mongoDbProperties.getProperty(key);
-				
-			case KNOWLEDGE_DB_PROPERTIES:
-				return knowledgeDbProperties.getProperty(key);
-				
-			case EQUIPLET_DB_PROPERTIES:
-				return equipletDbProperties.getProperty(EquipletName + key);
-				
-			default:
-				Logger.log(LogLevel.WARNING, "Property file not know.");
-				return "";
+		Properties p = new Properties();
+		try { 
+			switch(File)
+			{
+				case MONGO_DB_PROPERTIES:
+					p.load(new FileInputStream(propertiesFilePath + "mongo_db.properties"));
+					return p.getProperty(key);
+					
+				case KNOWLEDGE_DB_PROPERTIES:
+					p.load(new FileInputStream(propertiesFilePath + "knowledge_db.properties"));
+					return p.getProperty(key);
+					
+				case EQUIPLET_DB_PROPERTIES:
+					p.load(new FileInputStream(propertiesFilePath + "equiplet_db.properties"));
+					return p.getProperty(EquipletName + key);
+					
+				default:
+					Logger.log(LogLevel.WARNING, "Property file not known.");
+					break;
+			}
+		}catch(NullPointerException e){
+			Logger.log(LogLevel.ERROR, "Property doesnt exist: " + key + " in file " + File.toString(), e);
+		} catch (FileNotFoundException e) {
+			Logger.log(LogLevel.ERROR, "File doesnt exist: " + File.toString(), e);
+		} catch (IOException e) {
+			Logger.log(LogLevel.ERROR, e);
 		}
-	}
-	
-	public static Boolean isProperty(ConfigurationFiles File, String key)
-	{
-		switch(File)
-		{
-			case MONGO_DB_PROPERTIES:
-				return mongoDbProperties.containsKey(key);
-				
-			case KNOWLEDGE_DB_PROPERTIES:
-				return knowledgeDbProperties.containsKey(key);
-				
-			default:
-				return false;
-		}
+		return "";
 	}
 	
 }
