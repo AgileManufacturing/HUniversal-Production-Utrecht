@@ -46,7 +46,7 @@ import rexos.mas.data.LogLevel;
 /**
  * Helper for log messages, providing a single point for controlling program output.
  **/
-public class Logger {
+public class Logger {	
 	/**
 	 * @var PrintStream errStream
 	 * Stream that will be used for writing error messages, i.e. throwables.
@@ -64,7 +64,14 @@ public class Logger {
 	 * Controls whether or not printing of log messages is enabled.
 	 **/
 	private static final boolean debugEnabled = true;
+	
+	/**
+	 * @var boolean testingEnabled
+	 * Controls wether or not logging of test messages is enabled
+	 */
 	private static final boolean testingEnabled = true;
+	
+	private static String TEST_DATA_DIR = "";
 	
     private static final String PATH_ENVIRONMENT_VARIABLE = "MSGPATH";
 	
@@ -74,6 +81,22 @@ public class Logger {
 	 **/
 	
 	public static final int loglevelThreshold = LogLevel.DEBUG.getLevel();
+	
+	static {
+		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
+		File dir = new File (msgsFilePath);
+		if(dir.exists()) {
+			System.out.println("Log Directory detected - Removing old log files");
+			File[] files = dir.listFiles();
+			
+			for(File file : files) {
+				if(file.getName().endsWith(".txt")) {
+					file.delete();
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Returns whether or not debugging is enabled.
 	 * @return true if debugging is enabled, false otherwise.
@@ -111,10 +134,14 @@ public class Logger {
     	if(testingEnabled) {
     		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
     		
-    		try {
-	    		String testlogDir = msgsFilePath + "TestData";
-	    		
-	    		File dir = new File(testlogDir);
+    		java.util.Date date = new java.util.Date();
+    		java.text.DateFormat formatter = java.text.DateFormat.getDateTimeInstance(0, 0);
+    		java.sql.Timestamp timeStamp = new java.sql.Timestamp(date.getTime());
+    		
+    		if(TEST_DATA_DIR == "") { TEST_DATA_DIR = msgsFilePath + "TestData/" + formatter.format(date); }
+    		
+    		try {	    		
+	    		File dir = new File(TEST_DATA_DIR);
 	    		if(!dir.exists()) {
 	    			dir.mkdirs();
 	    		}
@@ -137,8 +164,6 @@ public class Logger {
 	    		 * Content-Length / Size ?
 	    		 */
 	    		
-	    		java.util.Date date = new java.util.Date();
-	    		java.sql.Timestamp timeStamp = new java.sql.Timestamp(date.getTime());
 	    		int contentSize = 0;
 	    		if(msg.getByteSequenceContent() != null) {
 	    			contentSize = msg.getByteSequenceContent().length;
@@ -159,6 +184,41 @@ public class Logger {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+    	}
+    	
+    	if(debugEnabled) {
+	    	String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
+	        
+	    	try 
+	    	{ 
+	    		File dir = new File (msgsFilePath);
+	    		if (!dir.exists())
+	    		{
+	    			dir.mkdir();
+	    		}
+	    		
+	    		File file = new File(dir, msg.getConversationId() + ".txt");
+	    		
+	    		//if file doesnt exists, then create it
+	    		if(!file.exists())
+	    		{
+	    			file.createNewFile();
+	    		}    
+	    		
+	    		FileWriter fileWriter = new FileWriter(file, true);
+		        BufferedWriter bufferWriter = new BufferedWriter(fileWriter);
+		        
+		        bufferWriter.write("Msg from ( sender ): " + msg.getSender().getLocalName() + " -> " + "to ( receiver ): " + ((AID)msg.getAllReceiver().next()).getLocalName() +  "\n" +
+		        		"Performative: " + ACLMessage.getPerformative(msg.getPerformative()) + "\n" +
+		        		"Ontology: " + msg.getOntology()  + "\n\n");
+		        
+		        bufferWriter.close();
+		        
+	    	}
+	    	catch(IOException e)
+	    	{
+	    		e.printStackTrace();
+	    	}
     	}
 	}
 	
