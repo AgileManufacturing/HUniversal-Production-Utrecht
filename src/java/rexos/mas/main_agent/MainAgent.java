@@ -178,7 +178,6 @@ public class MainAgent extends Agent {
 		public void action() {
 			ACLMessage message = receive();
 			if(message != null) {
-				Logger.logAclMessage(message, 'r');
 				try {
 					getContainerController()
 							.createNewAgent("pa" + count++, "rexos.mas.productAgent.ProductAgent", args).start();

@@ -97,7 +97,6 @@ public class ScheduleStep extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
-			Logger.logAclMessage(message, 'r');
 			try {
 				Logger.log(LogLevel.DEBUG, "%s scheduling step with Logistics%n", agent.getLocalName());
 
@@ -113,7 +112,6 @@ public class ScheduleStep extends ReceiveBehaviour {
 				sendMsg.setOntology("ArePartsAvailable");
 				sendMsg.setContentObject(productStep);
 				agent.send(sendMsg);
-				Logger.logAclMessage(sendMsg, 's');
 			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException | IOException e) {
 				Logger.log(LogLevel.ERROR, e);
 				agent.doDelete();

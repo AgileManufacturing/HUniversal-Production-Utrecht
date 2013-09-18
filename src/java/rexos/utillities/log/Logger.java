@@ -42,20 +42,19 @@ import rexos.mas.data.*;
 /**
  * Helper for log messages, providing a single point for controlling program output.
  **/
-public class Logger {
+public class Logger {	
 	/**
 	 * @var boolean debugEnabled
 	 * Controls whether or not printing of log messages is enabled.
 	 **/
 	private static final boolean debugEnabled = true;
-	private static final boolean testingEnabled = true;
-    private static final String PATH_ENVIRONMENT_VARIABLE = "MSGPATH";
 	
 	/**
 	 * @var int logleveltreshhold
 	 * treshhold for showing log msg
 	 **/
 	public static final int loglevelThreshold = LogLevel.DEBUG.getLevel();
+	
 	
 	/**
 	 * Returns whether or not debugging is enabled.
@@ -90,100 +89,7 @@ public class Logger {
 		printToOut(level, String.format(msg, objects));
 	}
 	
-	
-	public static void logAclMessage(ACLMessage msg, char type) {
-    	if(testingEnabled) {
-    		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
-    		
-    		try {
-	    		String testlogDir = msgsFilePath + "TestData";
-	    		
-	    		File dir = new File(testlogDir);
-	    		if(!dir.exists()) {
-	    			dir.mkdirs();
-	    		}
-	    		
-	    		File file = new File(dir, msg.getConversationId() + ".log");
-	    		if(!file.exists()) {
-					file.createNewFile();
-	    		}
-	    		
-	    		FileWriter fileWriter = new FileWriter(file, true);
-	    		BufferedWriter writer = new BufferedWriter(fileWriter);
-	    		
-	    		/*
-	    		 * Timestamp
-	    		 * Sent or Received
-	    		 * Sender
-	    		 * Receiver
-	    		 * Ontology
-	    		 * Performative
-	    		 * Content-Length / Size ?
-	    		 */
-	    		
-	    		java.util.Date date = new java.util.Date();
-	    		java.sql.Timestamp timeStamp = new java.sql.Timestamp(date.getTime());
-	    		int contentSize = 0;
-	    		if(msg.getByteSequenceContent() != null) {
-	    			contentSize = msg.getByteSequenceContent().length;
-	    		}
-	    		String typeString = "nothing";
-	    		if(type == 's') {
-	    			typeString = "Sent";
-	    		} else if(type == 'r') {
-	    			typeString = "Received";
-	    		} else {
-	    			typeString = "Weird";
-	    		}
-	    		
-	    		writer.write("$[" + timeStamp + "]~[" + typeString + "]~[" + msg.getSender().getLocalName() + "]~[" + ((AID)msg.getAllReceiver().next()).getLocalName() + "]~[" + ACLMessage.getPerformative(msg.getPerformative()) + "]~[" + msg.getOntology() + "]~[" + contentSize + "]$\r\n");
-	    		
-	    		writer.close();
-    		} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}
-	}
-	
-	
-	public static void logAclMessage(ACLMessage msg, boolean debug) {
-		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
-        
-    	try 
-    	{ 
-    		File dir = new File (msgsFilePath);
-    		if (!dir.exists())
-    		{
-    			dir.mkdir();
-    		}
-    		
-    		File file = new File(dir, msg.getConversationId() + ".txt");
-    		
-    		//if file doesnt exists, then create it
-    		if(!file.exists())
-    		{
-    			file.createNewFile();
-    		}    
-    		
-    		FileWriter fileWriter = new FileWriter(file, true);
-	        BufferedWriter bufferWriter = new BufferedWriter(fileWriter);
-	        
-	        bufferWriter.write("Msg from ( sender ): " + msg.getSender().getLocalName() + " -> " + "to ( receiver ): " + ((AID)msg.getAllReceiver().next()).getLocalName() +  "\n" +
-	        		"Performative: " + ACLMessage.getPerformative(msg.getPerformative()) + "\n" +
-	        		"Ontology: " + msg.getOntology()  + "\n\n");
-	        
-	        bufferWriter.close();
-	        
-    	}
-    	catch(IOException e)
-    	{
-    		e.printStackTrace();
-    	}
-	}
-	
-	
-	public static void log(LogLevel level, String msg,  Throwable throwable) {
+	public static void log(LogLevel level,String msg,  Throwable throwable) {
 		printToOut(level, msg);
 		printToOut(level, throwable.getStackTrace().toString());
 	}

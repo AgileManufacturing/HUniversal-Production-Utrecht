@@ -66,7 +66,6 @@ public class CancelTransportBehaviour extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		Logger.logAclMessage(message, 'r');
 		try {
 			// TODO (out of scope) cancel the transport of the parts in parts[]
 			Part[] parts = (Part[]) message.getContentObject();

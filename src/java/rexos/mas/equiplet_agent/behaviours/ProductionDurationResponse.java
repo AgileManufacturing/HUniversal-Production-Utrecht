@@ -71,7 +71,6 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
-			Logger.logAclMessage(message, 'r');
 			//Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
 					//message.getOntology());
 
@@ -92,7 +91,6 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 				responseMessage.setConversationId(message.getConversationId());
 				responseMessage.setContentObject(new Long(schedule.getDuration()));
 				equipletAgent.send(responseMessage);
-				Logger.logAclMessage(responseMessage, 's');
 				Logger.log(LogLevel.DEBUG, "sending message: %s%n", responseMessage.getOntology());
 			} catch(IOException | InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(LogLevel.ERROR, e);

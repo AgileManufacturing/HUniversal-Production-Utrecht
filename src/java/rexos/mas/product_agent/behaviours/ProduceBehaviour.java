@@ -123,7 +123,6 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage m) {
-		Logger.logAclMessage(m, 'r');
 		try {
 			String conversationId = m.getConversationId();
 			ProductionStep prodStep = _conversationIdToProductionStep
@@ -140,7 +139,6 @@ public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 					ACLMessage reply = m.createReply();
 					reply.setOntology("StartStep");
 					myAgent.send(reply);
-					Logger.logAclMessage(reply, 's');
 					break;
 				case "StatusUpdate":
 					ProductStep step = new ProductStep(

@@ -65,7 +65,6 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		Logger.logAclMessage(message, 'r');
 		try {
 			Logger.log(LogLevel.DEBUG, "ArePartsAvailable%n", 0, myAgent.getLocalName());
 			
@@ -75,7 +74,6 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 			//TODO (out of scope) determine actual part availability 
 			reply.setPerformative(ACLMessage.CONFIRM);
 			myAgent.send(reply);
-			Logger.logAclMessage(reply, 's');
 
 			myAgent.addBehaviour(new ArePartsAvailableInTime(myAgent, message.getConversationId()));
 			Logger.log(LogLevel.DEBUG, "PartTypes { %s } are available%n", 0, (Object[]) parts);

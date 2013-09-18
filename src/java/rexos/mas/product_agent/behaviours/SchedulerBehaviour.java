@@ -324,7 +324,6 @@ public class SchedulerBehaviour extends Behaviour {
 		msg.setContentObject(freetimeslotEq.getStartTime());
 		msg.addReceiver(freetimeslotEq.getEquipletName());
 		myAgent.send(msg);
-		Logger.logAclMessage(msg, 's');
 
 			ACLMessage returnMsg = myAgent.blockingReceive(MessageTemplate
 					.MatchOntology("Planned"));

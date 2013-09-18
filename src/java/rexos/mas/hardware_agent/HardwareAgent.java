@@ -294,7 +294,6 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		deadMessage.addReceiver(serviceAgentAID);
 		deadMessage.setOntology("HardwareAgentDied");
 		send(deadMessage);
-		Logger.logAclMessage(deadMessage, 's');
 	}
 
 	public void cancelAllStepsForServiceStep(ObjectId serviceStepId, String reason) {
