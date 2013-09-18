@@ -1,13 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project name="dynamicloader" default="build" basedir=".">
+<project name="log" default="build" basedir=".">
 
 	<import file="../build.xml"/>
 	
-	<echo message = "Reading dynamicloader antfile"/> 
+	<echo message = "Reading log antfile"/> 
 
 	<target name="build"> 			
 		<!-- defined in the root build.xml -->
-		<buildjava dir="${basedir}"/>
+		<buildjava dir="${basedir}"/>  
 	</target>
 
 	<target name="clean">

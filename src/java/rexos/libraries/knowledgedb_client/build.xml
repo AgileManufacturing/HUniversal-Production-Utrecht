@@ -1,6 +1,8 @@
 <project name="knowledgedb_client" default="build" basedir=".">
 
 	<import file="../build.xml"/>
+	
+	<echo message = "Reading knowledgedb antfile"/> 
 
 	<target name="build" depends="jars"> 			
 		<!-- defined in the root build.xml -->

@@ -41,7 +41,7 @@
  * 
  **/
 
-package rexos.mas.productAgent;
+package rexos.mas.product_agent.behaviours;
 
 import java.util.HashMap;
 
@@ -50,12 +50,14 @@ import com.mongodb.BasicDBObject;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import rexos.libraries.log.Logger;
 import rexos.mas.data.BehaviourStatus;
 import rexos.mas.data.LogLevel;
 import rexos.mas.data.ProductStep;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
+import rexos.mas.product_agent.BehaviourCallback;
+import rexos.mas.product_agent.ProductAgent;
+import rexos.utillities.log.Logger;
 
 public class ProduceBehaviour extends rexos.mas.behaviours.ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;

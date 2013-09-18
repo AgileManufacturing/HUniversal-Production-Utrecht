@@ -34,11 +34,11 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
-import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.LogLevel;
 import rexos.mas.data.Part;
 import rexos.mas.data.ProductStep;
+import rexos.utillities.log.Logger;
 
 /**
  * Responds to questions whether or not a specific part is available.

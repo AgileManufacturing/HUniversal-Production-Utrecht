@@ -24,7 +24,9 @@
 	-->
 	<macrodef name="buildjava">
    		<attribute name="dir"/>
+		
    		<sequential>
+   			
 			<pathconvert property="relative.dir">
 				<path location="@{dir}"/>
 				<globmapper from="${rexos-java-root}/*" to="*" />
@@ -32,8 +34,17 @@
 
    			<loadfile property="classpath" srcFile="${export-classpath-file}"/>
    			<mkdir dir="${buildpath}/${relative.dir}"/>
-			<javac srcdir="@{dir}" includeantruntime="true" destdir="${buildpath}/${relative.dir}" classpath="${classpath}"/> 
-			<antcall target="add-path-to-classpath"><param name="path" value="${buildpath}/${relative.dir}"/></antcall>
+   			
+			<echo>
+				*** Attempting to compile dir @{dir} in buildpath ${buildpath}/${relative.dir} and classpath: ${classpath} *****${line.separator}
+			</echo>
+   			
+			<javac srcdir="@{dir}" includeantruntime="true" destdir="${buildpath}/${relative.dir}" classpath="${classpath}"/>
+   			
+			<antcall target="add-path-to-classpath">
+				<param name="path" value="${buildpath}/${relative.dir}"/>
+			</antcall>
+   			
 		</sequential>
 	</macrodef>
 
@@ -88,33 +99,43 @@
 	<!-- default target, handles the classpath file and calls the allpackages target -->
 	<target name="all">
 		<mkdir dir="${buildpath}"/>
-		
 		<antcall target="allpackages"/>
 	</target>
 	
 	<!-- allpackages target, add the required targets to depends -->
-	<target name="allpackages" depends="rexos"/>
+	<target name="allpackages" depends="tools, configuration, rexos"/>
 
-	<!-- rexos target, calls rexos/build.xml -->	
+	<!-- rexos target, calls rexos/build.xml -->
 	<target name="rexos" depends="create-base-export-file">
     	<ant antfile="build.xml" target="all" dir="rexos" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
 
-	<!-- tools target, calls tools/build.xml 
-		uncomment when tools actually exists 
-	<target name="tools" depends="rexos">
-   		<ant antfile="build.xml" target="all" dir="tools" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
+	<!-- configuration target, calls configuration/build.xml -->
+	<target name="configuration" depends="rexos">
+   		<ant antfile="build.xml" target="all" dir="configuration" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target> 
-	-->
+
+	<!-- tools target, calls rexos/build.xml -->
+	<target name="tools">
+   		<ant antfile="build.xml" target="all" dir="tools" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
+	</target>
 
 	<!-- clean target, cleans rexos and tools -->
 	<target name="clean">
     	<ant antfile="build.xml" target="clean" dir="rexos" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
     	<delete file="${export-classpath-file}" />
     	<delete dir="${buildpath}" />
-    	<!-- uncomment when tools actually exists 
+    	<ant antfile="build.xml" target="clean" dir="configuration" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
     	<ant antfile="build.xml" target="clean" dir="tools" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
-		-->
     </target>
-
+	
+    <target name="Launch">
+        <java classname="jade.Boot" failonerror="true" fork="yes">
+            <env key="PROPERTIESPATH" value="${project_loc}/src/java/configuration/"/>
+            <env key="MSGPATH" value="${project_loc}/ACLMsgs/"/>
+            <arg line="-agents &quot;MainAgent :rexos.mas.main_agent.MainAgent&quot;"/>
+            <classpath refid="HUniversal-Production-Utrecht.classpath"/>
+        </java>
+    </target>
+	
 </project>

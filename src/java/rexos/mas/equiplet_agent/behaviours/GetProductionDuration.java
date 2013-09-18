@@ -41,10 +41,10 @@ import jade.lang.acl.MessageTemplate;
 
 import org.bson.types.ObjectId;
 
-import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.LogLevel;
 import rexos.mas.equiplet_agent.EquipletAgent;
+import rexos.utillities.log.Logger;
 
 /**
  * The receive behaviour for receiving messages with ontology: "GetProductionDuration".

@@ -49,9 +49,9 @@ package rexos.mas.hardware_agent.behaviours;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.hardware_agent.HardwareAgent;
+import rexos.utillities.log.Logger;
 
 /** The Class ServiceAgentDied. */
 public class ServiceAgentDied extends ReceiveBehaviour {

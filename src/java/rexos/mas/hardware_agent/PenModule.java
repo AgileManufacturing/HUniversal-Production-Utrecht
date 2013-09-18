@@ -74,14 +74,12 @@ public class PenModule extends Module {
 	/**
 	 * @var double SAFE_MOVEMENT_PLANE
 	 *      A static value that contains the height of the safe movement plane.
-	 */
-	private static final double SAFE_MOVEMENT_PLANE = 15;
 	
 	/**
 	 * @var double MAX_ACCELERATION
 	 * 		A static value with the max accelaration 
 	 */
-	private static final double MAX_ACCELERATION = 255.0;
+	private static final double MAX_ACCELERATION = 50.0;
 
 	/**
 	 * @var int TIMESLOTS_NEEDED_PER_STEP

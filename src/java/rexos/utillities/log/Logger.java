@@ -28,7 +28,7 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package rexos.libraries.log;
+package rexos.utillities.log;
 
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
@@ -37,43 +37,26 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-
-import rexos.libraries.knowledgedb_client.KnowledgeException;
-import rexos.mas.data.LogLevel;
+import rexos.mas.data.*;
 
 /**
  * Helper for log messages, providing a single point for controlling program output.
  **/
 public class Logger {
 	/**
-	 * @var PrintStream errStream
-	 * Stream that will be used for writing error messages, i.e. throwables.
-	 **/
-	private static final PrintStream errStream = System.err;
-	
-	/**
-	 * @var PrintStream outStream
-	 * Stream that will be used for writing log messages.
-	 **/
-	private static final PrintStream outStream = System.out;
-	
-	/**
 	 * @var boolean debugEnabled
 	 * Controls whether or not printing of log messages is enabled.
 	 **/
 	private static final boolean debugEnabled = true;
 	private static final boolean testingEnabled = true;
-	
     private static final String PATH_ENVIRONMENT_VARIABLE = "MSGPATH";
 	
 	/**
 	 * @var int logleveltreshhold
 	 * treshhold for showing log msg
 	 **/
-	
 	public static final int loglevelThreshold = LogLevel.DEBUG.getLevel();
+	
 	/**
 	 * Returns whether or not debugging is enabled.
 	 * @return true if debugging is enabled, false otherwise.
@@ -106,6 +89,7 @@ public class Logger {
 	public static void log(LogLevel level, String msg, Object... objects) {
 		printToOut(level, String.format(msg, objects));
 	}
+	
 	
 	public static void logAclMessage(ACLMessage msg, char type) {
     	if(testingEnabled) {
@@ -162,6 +146,7 @@ public class Logger {
     	}
 	}
 	
+	
 	public static void logAclMessage(ACLMessage msg, boolean debug) {
 		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
         
@@ -197,10 +182,12 @@ public class Logger {
     	}
 	}
 	
-	public static void log(LogLevel level,String msg,  Throwable throwable) {
+	
+	public static void log(LogLevel level, String msg,  Throwable throwable) {
 		printToOut(level, msg);
 		printToOut(level, throwable.getStackTrace().toString());
 	}
+	
 	
 	public static void log(LogLevel level, Throwable throwable) {
 		printToOut(level, throwable.getStackTrace().toString());

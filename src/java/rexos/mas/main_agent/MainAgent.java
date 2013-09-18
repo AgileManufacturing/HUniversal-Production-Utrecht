@@ -45,7 +45,7 @@
  *          SUCH DAMAGE.
  **/
 
-package rexos.mas.jadeagentx;
+package rexos.mas.main_agent;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -59,7 +59,6 @@ import jade.wrapper.StaleProxyException;
 import java.util.ArrayList;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
-import rexos.libraries.log.Logger;
 import rexos.mas.data.Callback;
 import rexos.mas.data.LogLevel;
 import rexos.mas.data.Position;
@@ -67,6 +66,7 @@ import rexos.mas.data.Product;
 import rexos.mas.data.ProductAgentProperties;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
+import rexos.utillities.log.Logger;
 
 import com.mongodb.BasicDBObject;
 
@@ -76,7 +76,7 @@ import configuration.ConfigurationFiles;
 /**
  * Test class for testing the equiplet agent, service agent and hardware agent.
  */
-public class JadeAgentX extends Agent {
+public class MainAgent extends Agent {
 	private static final long serialVersionUID = 1L;
 
 	/**

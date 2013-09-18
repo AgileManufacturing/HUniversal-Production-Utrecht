@@ -59,7 +59,6 @@ import org.bson.types.ObjectId;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
-import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.LogLevel;
 import rexos.mas.data.ScheduleData;
@@ -68,6 +67,7 @@ import rexos.mas.hardware_agent.HardwareAgent;
 import rexos.mas.hardware_agent.Module;
 import rexos.mas.hardware_agent.ModuleFactory;
 import rexos.mas.service_agent.ServiceStep;
+import rexos.utillities.log.Logger;
 
 import com.mongodb.BasicDBObject;
 

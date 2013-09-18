@@ -38,7 +38,7 @@
  * 
  **/
 
-package rexos.mas.productAgent;
+package rexos.mas.product_agent.behaviours;
 
 import jade.core.Agent;
 import jade.core.behaviours.WakerBehaviour;

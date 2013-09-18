@@ -59,13 +59,13 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
-import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.data.EquipletState;
 import rexos.mas.data.EquipletStateEntry;
 import rexos.mas.data.LogLevel;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.EquipletDirectoryEntry;
+import rexos.utillities.log.Logger;
 
 /**
  * A receive once behaviour for receiving messages with ontology: "InitialisationFinished".

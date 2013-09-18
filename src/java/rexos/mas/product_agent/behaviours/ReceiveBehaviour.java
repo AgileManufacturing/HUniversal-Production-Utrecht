@@ -38,9 +38,9 @@
  * 
  **/
 
-package rexos.mas.productAgent;
+package rexos.mas.product_agent.behaviours;
 
-import rexos.libraries.log.Logger;
+import rexos.utillities.log.Logger;
 import jade.core.Agent;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;

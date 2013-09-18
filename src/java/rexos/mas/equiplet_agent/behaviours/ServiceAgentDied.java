@@ -49,9 +49,9 @@ package rexos.mas.equiplet_agent.behaviours;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.equiplet_agent.EquipletAgent;
+import rexos.utillities.log.Logger;
 
 /**
  * Receive behaviour for receiving messages with ontology: "ServiceAgendDied".

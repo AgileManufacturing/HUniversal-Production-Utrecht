@@ -1,22 +1,22 @@
 <project name="rexos" default="all">
 	<import file="../build.xml"/>
+	
+	<echo message = "Reading rexos - dir antfile"/> 
 
-	<target name="all" depends="libraries"> 
+	<target name="all" depends="libraries, mas"> 
 	</target>
 
-	<target name="libraries">
+	<target name="mas" depends="libraries">
+		<ant antfile="build.xml" target="all" dir="mas" inheritRefs="true" useNativeBasedir="true"/>  
+	</target>
+
+	<target name="libraries" depends="mas">
 		<ant antfile="build.xml" target="all" dir="libraries" inheritRefs="true" useNativeBasedir="true"/>  
 	</target>
-
-	<!--	Uncomment when mas actually exists. 
-	<target name="mas">
-		<ant antfile="build.xml" target="all" dir="mas" inheritRefs="true" useNativeBasedir="true"/>  
-	</target> -->
-
+	
 	<target name="clean">
 		<ant antfile="build.xml" target="clean" dir="libraries" inheritRefs="true" useNativeBasedir="true"/> 
-		<!--	Uncomment when mas actually exists. 
-			<ant antfile="build.xml" target="clean" dir="mas" inheritRefs="true" useNativeBasedir="true"/>  -->
+		<ant antfile="build.xml" target="clean" dir="mas" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
 
 </project>

@@ -36,9 +36,9 @@ package rexos.mas.service_agent.behaviours;
 
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.service_agent.ServiceAgent;
+import rexos.utillities.log.Logger;
 
 /**
  * Behaviour that receives messages when the equipletAgent or hardwareAgent dies.

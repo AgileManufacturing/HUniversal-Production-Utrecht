@@ -36,12 +36,14 @@
  *         POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package rexos.mas.productAgent;
+package rexos.mas.product_agent.behaviours;
 
-import rexos.libraries.log.Logger;
 import rexos.mas.data.AgentStatus;
 import rexos.mas.data.BehaviourStatus;
 import rexos.mas.data.LogLevel;
+import rexos.mas.product_agent.BehaviourCallback;
+import rexos.mas.product_agent.ProductAgent;
+import rexos.utillities.log.Logger;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.ParallelBehaviour;

@@ -41,7 +41,7 @@
 package rexos.mas.data;
 
 import jade.core.AID;
-import rexos.libraries.log.Logger;
+import rexos.utillities.log.Logger;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

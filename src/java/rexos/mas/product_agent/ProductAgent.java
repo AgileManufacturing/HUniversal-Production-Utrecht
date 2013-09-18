@@ -39,7 +39,7 @@
  * 
  **/
 
-package rexos.mas.productAgent;
+package rexos.mas.product_agent;
 
 import java.util.ArrayList;
 
@@ -51,7 +51,6 @@ import com.google.gson.JsonParser;
 import com.mongodb.BasicDBObject;
 import com.mongodb.util.JSON;
 
-import rexos.libraries.log.Logger;
 import rexos.mas.data.AgentStatus;
 import rexos.mas.data.Callback;
 import rexos.mas.data.LogLevel;
@@ -59,6 +58,8 @@ import rexos.mas.data.Product;
 import rexos.mas.data.ProductAgentProperties;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
+import rexos.mas.product_agent.behaviours.OverviewBehaviour;
+import rexos.utillities.log.Logger;
 import jade.core.Agent;
 
 public class ProductAgent extends Agent {

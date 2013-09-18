@@ -49,9 +49,9 @@ import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
 import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
-import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.hardware_agent.HardwareAgent;
+import rexos.utillities.log.Logger;
 
 /**
  * Class for the receivebehaviour to receive messages with the ontology CheckForModules

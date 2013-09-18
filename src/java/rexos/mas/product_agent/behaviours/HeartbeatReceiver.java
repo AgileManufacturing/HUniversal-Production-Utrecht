@@ -11,7 +11,7 @@
  * Version: 1.0
  *
  */
-package rexos.mas.productAgent;
+package rexos.mas.product_agent.behaviours;
 
 /**
  * @author Mike

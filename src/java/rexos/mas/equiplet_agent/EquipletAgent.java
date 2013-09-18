@@ -79,7 +79,6 @@ import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
 import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
-import rexos.libraries.log.Logger;
 import rexos.mas.data.DbData;
 import rexos.mas.data.EquipletMode;
 import rexos.mas.data.EquipletState;
@@ -91,6 +90,7 @@ import rexos.mas.data.StepStatusCode;
 import rexos.mas.equiplet_agent.behaviours.AbortStep;
 import rexos.mas.equiplet_agent.behaviours.InitialisationFinished;
 import rexos.mas.equiplet_agent.behaviours.ServiceAgentDied;
+import rexos.utillities.log.Logger;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;

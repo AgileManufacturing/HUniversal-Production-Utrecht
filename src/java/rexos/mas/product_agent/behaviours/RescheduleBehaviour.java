@@ -11,11 +11,10 @@
  * Version: 1.0
  *
  */
-package rexos.mas.productAgent;
+package rexos.mas.product_agent.behaviours;
 
 import java.util.ArrayList;
 
-import rexos.libraries.log.Logger;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
@@ -24,6 +23,9 @@ import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.data.BehaviourStatus;
+import rexos.mas.product_agent.BehaviourCallback;
+import rexos.mas.product_agent.ProductAgent;
+import rexos.utillities.log.Logger;
 
 /**
  * @author Mike

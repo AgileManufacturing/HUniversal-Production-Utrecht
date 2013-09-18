@@ -39,7 +39,7 @@
  * 
  **/
 
-package rexos.mas.productAgent;
+package rexos.mas.product_agent.behaviours;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -51,6 +51,9 @@ import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.StepStatusCode;
+import rexos.mas.product_agent.BehaviourCallback;
+import rexos.mas.product_agent.ProductAgent;
+import rexos.utillities.log.Logger;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -59,7 +62,6 @@ import java.util.List;
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
-import rexos.libraries.log.Logger;
 
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;

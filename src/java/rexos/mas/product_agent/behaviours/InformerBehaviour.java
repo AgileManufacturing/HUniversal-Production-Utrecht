@@ -36,14 +36,13 @@
  *         POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package rexos.mas.productAgent;
+package rexos.mas.product_agent.behaviours;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import rexos.libraries.log.Logger;
 import rexos.mas.data.BehaviourStatus;
 import rexos.mas.data.LogLevel;
 import rexos.mas.data.Product;
@@ -51,6 +50,9 @@ import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.StepStatusCode;
+import rexos.mas.product_agent.BehaviourCallback;
+import rexos.mas.product_agent.ProductAgent;
+import rexos.utillities.log.Logger;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;

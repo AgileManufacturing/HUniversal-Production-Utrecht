@@ -35,8 +35,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
-import rexos.libraries.log.Logger;
 import rexos.mas.data.LogLevel;
+import rexos.utillities.log.Logger;
 
 public class Configuration {
 	private static String propertiesFilePath = System.getenv("PROPERTIESPATH");

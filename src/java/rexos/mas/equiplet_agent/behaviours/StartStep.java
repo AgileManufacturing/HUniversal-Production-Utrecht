@@ -47,7 +47,6 @@ import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.libraries.blackboard_client.MongoOperation;
 import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.libraries.blackboard_client.FieldUpdateSubscription.MongoUpdateLogOperation;
-import rexos.libraries.log.Logger;
 import rexos.mas.behaviours.ReceiveBehaviour;
 import rexos.mas.data.EquipletState;
 import rexos.mas.data.EquipletStateEntry;
@@ -55,6 +54,7 @@ import rexos.mas.data.LogLevel;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.NextProductStepTimer;
+import rexos.utillities.log.Logger;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;

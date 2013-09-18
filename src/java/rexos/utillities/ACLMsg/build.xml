@@ -1,6 +1,8 @@
 <project name="log" default="build" basedir=".">
 
 	<import file="../build.xml"/>
+	
+	<echo message = "Reading ACLMsg antfile"/> 
 
 	<target name="build"> 			
 		<!-- defined in the root build.xml -->
