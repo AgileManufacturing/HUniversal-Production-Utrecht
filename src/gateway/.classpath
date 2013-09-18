@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="/home/vor3n/git/HUniversal-Production-Utrecht/src/gateway/lib/gson-2.2.4.jar"/>
+	<classpathentry kind="lib" path="/home/vor3n/git/HUniversal-Production-Utrecht/src/gateway/lib/jade.jar"/>
+	<classpathentry kind="lib" path="/home/vor3n/git/HUniversal-Production-Utrecht/src/gateway/lib/jadeMisc.jar"/>
+	<classpathentry kind="lib" path="/home/vor3n/git/HUniversal-Production-Utrecht/src/gateway/lib/jackson/jackson-annotations-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/home/vor3n/git/HUniversal-Production-Utrecht/src/gateway/lib/jackson/jackson-core-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/home/vor3n/git/HUniversal-Production-Utrecht/src/gateway/lib/jackson/jackson-databind-2.2.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
