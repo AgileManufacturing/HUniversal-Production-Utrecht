@@ -56,13 +56,13 @@ import rexos.libraries.blackboard_client.GeneralMongoException;
 import rexos.libraries.blackboard_client.InvalidDBNamespaceException;
 import rexos.mas.data.BehaviourStatus;
 import rexos.mas.data.DbData;
-import rexos.mas.data.LogLevel;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.product_agent.BehaviourCallback;
 import rexos.mas.product_agent.ProductAgent;
+import rexos.utillities.log.LogLevel;
 import rexos.utillities.log.Logger;
 
 import com.mongodb.BasicDBObject;

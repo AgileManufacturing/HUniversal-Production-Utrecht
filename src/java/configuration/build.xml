@@ -1,9 +1,5 @@
-<project name="configuration" default="all" basedir=".">
-
-	<import file="../build.xml"/>
-	
-	<echo message = "Reading configuration - dir antfile"/> 
-
+<project name="configuration" default="all">
+<import file="../build.xml"/>	
 	<target name="all" depends="build"> 
 	</target>
 	

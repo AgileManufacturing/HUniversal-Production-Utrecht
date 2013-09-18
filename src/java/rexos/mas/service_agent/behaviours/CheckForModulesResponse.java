@@ -38,8 +38,8 @@ package rexos.mas.service_agent.behaviours;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import rexos.mas.behaviours.ReceiveBehaviour;
-import rexos.mas.data.LogLevel;
 import rexos.mas.service_agent.ServiceAgent;
+import rexos.utillities.log.LogLevel;
 import rexos.utillities.log.Logger;
 
 /**

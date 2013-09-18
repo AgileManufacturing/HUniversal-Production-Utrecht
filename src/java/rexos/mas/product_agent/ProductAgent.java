@@ -53,12 +53,12 @@ import com.mongodb.util.JSON;
 
 import rexos.mas.data.AgentStatus;
 import rexos.mas.data.Callback;
-import rexos.mas.data.LogLevel;
 import rexos.mas.data.Product;
 import rexos.mas.data.ProductAgentProperties;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
 import rexos.mas.product_agent.behaviours.OverviewBehaviour;
+import rexos.utillities.log.LogLevel;
 import rexos.utillities.log.Logger;
 import jade.core.Agent;
 

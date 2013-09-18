@@ -31,8 +31,8 @@
 package rexos.mas.logistics_agent;
 
 import jade.core.Agent;
-import rexos.mas.data.LogLevel;
 import rexos.mas.logistics_agent.behaviours.ArePartsAvailable;
+import rexos.utillities.log.LogLevel;
 import rexos.utillities.log.Logger;
 
 /**

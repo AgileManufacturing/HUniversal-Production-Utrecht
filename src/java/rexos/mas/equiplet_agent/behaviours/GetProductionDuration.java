@@ -42,8 +42,8 @@ import jade.lang.acl.MessageTemplate;
 import org.bson.types.ObjectId;
 
 import rexos.mas.behaviours.ReceiveBehaviour;
-import rexos.mas.data.LogLevel;
 import rexos.mas.equiplet_agent.EquipletAgent;
+import rexos.utillities.log.LogLevel;
 import rexos.utillities.log.Logger;
 
 /**

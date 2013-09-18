@@ -53,6 +53,7 @@ import java.io.Serializable;
 
 import org.bson.types.ObjectId;
 
+import rexos.utillities.log.LogLevel;
 import rexos.utillities.log.Logger;
 
 import com.mongodb.BasicDBList;

@@ -1,43 +1,47 @@
 <project name="mas" default="all">
 	
 	<import file="../build.xml"/>
-	
-	<echo message = "Reading MAS - dir antfile"/> 
 
-	<target name="all" depends="behaviours, data, equiplet_agent, hardware_agent, logistics_agent, main_agent, product_agent, service_agent"> 
+	<target name="all" depends="jars, behaviours, data, equiplet_agent, hardware_agent, logistics_agent, main_agent, product_agent, service_agent"> 
 	</target>
 	
-	<target name="behaviours">
-		<ant antfile="build.xml" target="build" dir="behaviours" inheritRefs="true" useNativeBasedir="true"/>  
-	</target>	
+	<target name="jars">
+		<antcall target="add-jar-to-classpath"><param name="jar" value="commons-codec-1.3.jar"/></antcall>
+		<antcall target="add-jar-to-classpath"><param name="jar" value="commons-lang-2.3.jar"/></antcall>
+		<antcall target="add-jar-to-classpath"><param name="jar" value="jade.jar"/></antcall>
+	</target>
 	
 	<target name="data">
 		<ant antfile="build.xml" target="build" dir="data" inheritRefs="true" useNativeBasedir="true"/>  
 	</target>	
 	
-	<target name="equiplet_agent">
-		<ant antfile="build.xml" target="build" dir="equiplet_agent" inheritRefs="true" useNativeBasedir="true"/>  
-	</target>	
-			
-	<target name="hardware_agent">
-		<ant antfile="build.xml" target="build" dir="hardware_agent" inheritRefs="true" useNativeBasedir="true"/>  
+	<target name="behaviours" depends="data">
+		<ant antfile="build.xml" target="build" dir="behaviours" inheritRefs="true" useNativeBasedir="true"/>  
 	</target>	
 	
-	<target name="logistics_agent">
-		<ant antfile="build.xml" target="build" dir="logistics_agent" inheritRefs="true" useNativeBasedir="true"/>  
-	</target>	
-	
-	<target name="main_agent">
+	<target name="main_agent" depends="data, behaviours">
 		<ant antfile="build.xml" target="build" dir="main_agent" inheritRefs="true" useNativeBasedir="true"/>  
 	</target>	
 	
-	<target name="product_agent">
-		<ant antfile="build.xml" target="build" dir="product_agent" inheritRefs="true" useNativeBasedir="true"/>  
+	<target name="equiplet_agent" depends="data, behaviours">
+		<ant antfile="build.xml" target="build" dir="equiplet_agent" inheritRefs="true" useNativeBasedir="true"/>  
 	</target>	
-	
-	<target name="service_agent">
+
+	<target name="service_agent" depends="data, behaviours, equiplet_agent">
 		<ant antfile="build.xml" target="build" dir="service_agent" inheritRefs="true" useNativeBasedir="true"/>  
 	</target>
+			
+	<target name="hardware_agent" depends="data, behaviours, service_agent">
+		<ant antfile="build.xml" target="build" dir="hardware_agent" inheritRefs="true" useNativeBasedir="true"/>  
+	</target>	
+	
+	<target name="logistics_agent" depends="data, behaviours">
+		<ant antfile="build.xml" target="build" dir="logistics_agent" inheritRefs="true" useNativeBasedir="true"/>  
+	</target>	
+	
+	<target name="product_agent" depends="data, behaviours">
+		<ant antfile="build.xml" target="build" dir="product_agent" inheritRefs="true" useNativeBasedir="true"/>  
+	</target>	
 
 	<target name="clean">
 		<ant antfile="build.xml" target="clean" dir="behaviours" inheritRefs="true" useNativeBasedir="true"/> 

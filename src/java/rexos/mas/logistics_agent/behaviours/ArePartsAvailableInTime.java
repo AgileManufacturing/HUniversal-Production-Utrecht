@@ -35,8 +35,8 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
-import rexos.mas.data.LogLevel;
 import rexos.mas.data.Part;
+import rexos.utillities.log.LogLevel;
 import rexos.utillities.log.Logger;
 
 /**

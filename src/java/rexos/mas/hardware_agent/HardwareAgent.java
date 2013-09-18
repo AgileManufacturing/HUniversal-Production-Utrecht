@@ -77,13 +77,13 @@ import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
 import rexos.mas.data.DbData;
-import rexos.mas.data.LogLevel;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.hardware_agent.behaviours.CheckForModules;
 import rexos.mas.hardware_agent.behaviours.EvaluateDuration;
 import rexos.mas.hardware_agent.behaviours.FillPlaceholders;
 import rexos.mas.hardware_agent.behaviours.ServiceAgentDied;
 import rexos.mas.service_agent.ServiceStep;
+import rexos.utillities.log.LogLevel;
 import rexos.utillities.log.Logger;
 
 import com.mongodb.BasicDBObject;

@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.concurrent.atomic.AtomicLong;
 
+import rexos.utillities.log.LogLevel;
 import rexos.utillities.log.Logger;
 
 import com.mongodb.BasicDBObject;

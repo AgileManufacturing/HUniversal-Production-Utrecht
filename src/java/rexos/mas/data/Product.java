@@ -41,6 +41,7 @@
 package rexos.mas.data;
 
 import jade.core.AID;
+import rexos.utillities.log.LogLevel;
 import rexos.utillities.log.Logger;
 
 import com.google.gson.annotations.Expose;

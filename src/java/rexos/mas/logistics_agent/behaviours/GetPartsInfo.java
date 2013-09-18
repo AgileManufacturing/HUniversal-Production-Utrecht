@@ -47,9 +47,9 @@ import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
 import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
-import rexos.mas.data.LogLevel;
 import rexos.mas.data.Part;
 import rexos.mas.data.Position;
+import rexos.utillities.log.LogLevel;
 import rexos.utillities.log.Logger;
 
 /**

@@ -62,9 +62,9 @@ import rexos.libraries.blackboard_client.OplogEntry;
 import rexos.mas.behaviours.ReceiveOnceBehaviour;
 import rexos.mas.data.EquipletState;
 import rexos.mas.data.EquipletStateEntry;
-import rexos.mas.data.LogLevel;
 import rexos.mas.equiplet_agent.EquipletAgent;
 import rexos.mas.equiplet_agent.EquipletDirectoryEntry;
+import rexos.utillities.log.LogLevel;
 import rexos.utillities.log.Logger;
 
 /**

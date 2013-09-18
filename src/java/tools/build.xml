@@ -1,7 +1,5 @@
 <project name="tools" default="all">
-<import file="../build.xml"/>	
-	
-	<echo message = "Reading tools - dir antfile"/> 
+<import file="../build.xml"/>
 
 	<target name="all" depends="build"> 
 	</target>

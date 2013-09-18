@@ -35,9 +35,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
-import rexos.mas.data.LogLevel;
-import rexos.utillities.log.Logger;
-
 public class Configuration {
 	private static String propertiesFilePath = System.getenv("PROPERTIESPATH");
 	
@@ -46,7 +43,7 @@ public class Configuration {
 		if(File != ConfigurationFiles.EQUIPLET_DB_PROPERTIES){
 			return getProperty(File, key, null);
 		} else {
-			Logger.log(LogLevel.WARNING, "Need a equiplet name to read equiplet db properties");
+			System.out.println("Need a equiplet name to read equiplet db properties");
 			return "";
 		}
 	}
@@ -71,15 +68,15 @@ public class Configuration {
 					return p.getProperty(EquipletName + key);
 					
 				default:
-					Logger.log(LogLevel.WARNING, "Property file not known.");
+					System.out.println("Property file not known.");
 					break;
 			}
 		}catch(NullPointerException e){
-			Logger.log(LogLevel.ERROR, "Property doesnt exist: " + key + " in file " + File.toString(), e);
+			System.out.println("Property doesnt exist: " + key + " in file " + File.toString());
 		} catch (FileNotFoundException e) {
-			Logger.log(LogLevel.ERROR, "File doesnt exist: " + File.toString(), e);
+			System.out.println("File doesnt exist: " + File.toString());
 		} catch (IOException e) {
-			Logger.log(LogLevel.ERROR, e);
+			System.out.println(e);
 		}
 		return "";
 	}

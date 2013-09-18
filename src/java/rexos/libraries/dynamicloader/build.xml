@@ -2,8 +2,6 @@
 <project name="dynamicloader" default="build" basedir=".">
 
 	<import file="../build.xml"/>
-	
-	<echo message = "Reading dynamicloader antfile"/> 
 
 	<target name="build"> 			
 		<!-- defined in the root build.xml -->

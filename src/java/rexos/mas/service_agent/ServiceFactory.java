@@ -40,7 +40,7 @@ import rexos.libraries.knowledgedb_client.KnowledgeDBClient;
 import rexos.libraries.knowledgedb_client.KnowledgeException;
 import rexos.libraries.knowledgedb_client.Queries;
 import rexos.libraries.knowledgedb_client.Row;
-import rexos.mas.data.LogLevel;
+import rexos.utillities.log.LogLevel;
 import rexos.utillities.log.Logger;
 
 /**

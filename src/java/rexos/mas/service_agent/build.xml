@@ -3,13 +3,20 @@
 
 	<import file="../build.xml"/>
 
-	<target name="build"> 			
-		<!-- defined in the root build.xml -->
-		<buildjava dir="${basedir}:${basedir}/behaviours"/>
+	<target name="build" depends="src, behaviours">
+	</target>
+	
+	<target name="src" depends="behaviours">
+		<buildjava dir="${basedir}/behaviours"/>
+	</target>
+	
+	<target name="behaviours">
+		<buildjava dir="${basedir}"/>
 	</target>
 
 	<target name="clean">
-		 <cleanjava dir="${basedir}:${basedir}/behaviours"/>
+		 <cleanjava dir="${basedir}"/>
+		 <cleanjava dir="${basedir}/behaviours"/>
 	</target>
 
 </project>

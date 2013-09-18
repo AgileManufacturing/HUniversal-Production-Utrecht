@@ -31,7 +31,7 @@ package rexos.libraries.blackboard_client;
 
 import java.util.ArrayList;
 
-import rexos.mas.data.LogLevel;
+import rexos.utillities.log.LogLevel;
 
 import com.mongodb.Bytes;
 import com.mongodb.DB;

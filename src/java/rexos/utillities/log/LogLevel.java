@@ -1,4 +1,4 @@
-package rexos.mas.data;
+package rexos.utillities.log;
 
 public enum LogLevel {
 

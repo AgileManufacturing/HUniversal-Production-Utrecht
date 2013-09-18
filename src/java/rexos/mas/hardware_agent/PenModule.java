@@ -51,8 +51,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import rexos.mas.data.LogLevel;
 import rexos.mas.data.Position;
+import rexos.utillities.log.LogLevel;
 
 import com.mongodb.BasicDBObject;
 

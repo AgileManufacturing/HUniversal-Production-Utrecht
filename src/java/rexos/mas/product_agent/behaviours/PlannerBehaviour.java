@@ -45,7 +45,6 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import rexos.mas.data.BehaviourStatus;
-import rexos.mas.data.LogLevel;
 import rexos.mas.data.Product;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionEquipletMapper;
@@ -53,6 +52,7 @@ import rexos.mas.data.ProductionStep;
 import rexos.mas.data.StepStatusCode;
 import rexos.mas.product_agent.BehaviourCallback;
 import rexos.mas.product_agent.ProductAgent;
+import rexos.utillities.log.LogLevel;
 import rexos.utillities.log.Logger;
 
 import java.net.UnknownHostException;

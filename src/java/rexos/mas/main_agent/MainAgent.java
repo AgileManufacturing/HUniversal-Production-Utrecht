@@ -60,12 +60,12 @@ import java.util.ArrayList;
 
 import rexos.libraries.blackboard_client.BlackboardClient;
 import rexos.mas.data.Callback;
-import rexos.mas.data.LogLevel;
 import rexos.mas.data.Position;
 import rexos.mas.data.Product;
 import rexos.mas.data.ProductAgentProperties;
 import rexos.mas.data.Production;
 import rexos.mas.data.ProductionStep;
+import rexos.utillities.log.LogLevel;
 import rexos.utillities.log.Logger;
 
 import com.mongodb.BasicDBObject;
@@ -180,7 +180,7 @@ public class MainAgent extends Agent {
 			if(message != null) {
 				try {
 					getContainerController()
-							.createNewAgent("pa" + count++, "rexos.mas.productAgent.ProductAgent", args).start();
+							.createNewAgent("pa" + count++, "rexos.mas.product_agent.ProductAgent", args).start();
 				} catch(StaleProxyException e) {
 					Logger.log(LogLevel.ERROR, e);
 				}

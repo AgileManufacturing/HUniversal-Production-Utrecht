@@ -26,7 +26,9 @@
    		<attribute name="dir"/>
 		
    		<sequential>
-   			
+ 			
+			<echo>*** Attempting to compile dir @{dir} ***${line.separator}</echo>
+   			  			
 			<pathconvert property="relative.dir">
 				<path location="@{dir}"/>
 				<globmapper from="${rexos-java-root}/*" to="*" />
@@ -34,12 +36,8 @@
 
    			<loadfile property="classpath" srcFile="${export-classpath-file}"/>
    			<mkdir dir="${buildpath}/${relative.dir}"/>
-   			
-			<echo>
-				*** Attempting to compile dir @{dir} in buildpath ${buildpath}/${relative.dir} and classpath: ${classpath} *****${line.separator}
-			</echo>
-   			
-			<javac srcdir="@{dir}" includeantruntime="true" destdir="${buildpath}/${relative.dir}" classpath="${classpath}"/>
+  
+			<javac srcdir="@{dir}" includeantruntime="true" destdir="${buildpath}/${relative.dir}" classpath="${classpath}"  encoding="ISO-8859-1"/>
    			
 			<antcall target="add-path-to-classpath">
 				<param name="path" value="${buildpath}/${relative.dir}"/>
@@ -103,17 +101,17 @@
 	</target>
 	
 	<!-- allpackages target, add the required targets to depends -->
-	<target name="allpackages" depends="tools, configuration, rexos"/>
+	<target name="allpackages" depends="rexos, configuration, tools"/>
 
 	<!-- rexos target, calls rexos/build.xml -->
-	<target name="rexos" depends="create-base-export-file">
+	<target name="rexos" depends="configuration">
     	<ant antfile="build.xml" target="all" dir="rexos" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
 
 	<!-- configuration target, calls configuration/build.xml -->
-	<target name="configuration" depends="rexos">
+	<target name="configuration">
    		<ant antfile="build.xml" target="all" dir="configuration" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
-	</target> 
+	</target>
 
 	<!-- tools target, calls rexos/build.xml -->
 	<target name="tools">
@@ -121,10 +119,10 @@
 	</target>
 
 	<!-- clean target, cleans rexos and tools -->
-	<target name="clean">
-    	<ant antfile="build.xml" target="clean" dir="rexos" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
-    	<delete file="${export-classpath-file}" />
+	<target name="clean">    	
+		<delete file="${export-classpath-file}" />
     	<delete dir="${buildpath}" />
+    	<ant antfile="build.xml" target="clean" dir="rexos" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
     	<ant antfile="build.xml" target="clean" dir="configuration" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
     	<ant antfile="build.xml" target="clean" dir="tools" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
     </target>

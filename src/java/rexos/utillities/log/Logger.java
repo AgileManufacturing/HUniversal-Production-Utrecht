@@ -30,15 +30,6 @@
  **/
 package rexos.utillities.log;
 
-import jade.core.AID;
-import jade.lang.acl.ACLMessage;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import rexos.mas.data.*;
-
 /**
  * Helper for log messages, providing a single point for controlling program output.
  **/
