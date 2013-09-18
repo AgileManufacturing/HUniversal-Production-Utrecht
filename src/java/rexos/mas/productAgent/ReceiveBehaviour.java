@@ -126,7 +126,6 @@ public class ReceiveBehaviour extends SimpleBehaviour{
 	 * @param m
 	 */
 	public void handle(ACLMessage m){
-		Logger.logAclMessage(m, 'r');
 	}
 
 	/**

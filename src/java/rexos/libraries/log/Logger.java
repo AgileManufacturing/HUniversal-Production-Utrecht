@@ -66,36 +66,11 @@ public class Logger {
 	private static final boolean debugEnabled = true;
 	
 	/**
-	 * @var boolean testingEnabled
-	 * Controls wether or not logging of test messages is enabled
-	 */
-	private static final boolean testingEnabled = true;
-	
-	private static String TEST_DATA_DIR = "";
-	
-    private static final String PATH_ENVIRONMENT_VARIABLE = "MSGPATH";
-	
-	/**
 	 * @var int logleveltreshhold
 	 * treshhold for showing log msg
 	 **/
 	
 	public static final int loglevelThreshold = LogLevel.DEBUG.getLevel();
-	
-	static {
-		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
-		File dir = new File (msgsFilePath);
-		if(dir.exists()) {
-			System.out.println("Log Directory detected - Removing old log files");
-			File[] files = dir.listFiles();
-			
-			for(File file : files) {
-				if(file.getName().endsWith(".txt")) {
-					file.delete();
-				}
-			}
-		}
-	}
 	
 	/**
 	 * Returns whether or not debugging is enabled.
@@ -128,133 +103,6 @@ public class Logger {
 	 **/
 	public static void log(LogLevel level, String msg, Object... objects) {
 		printToOut(level, String.format(msg, objects));
-	}
-	
-	public static void logAclMessage(ACLMessage msg, char type) {
-    	if(testingEnabled) {
-    		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
-    		
-    		java.util.Date date = new java.util.Date();
-    		java.text.DateFormat formatter = java.text.DateFormat.getDateTimeInstance(0, 0);
-    		java.sql.Timestamp timeStamp = new java.sql.Timestamp(date.getTime());
-    		
-    		if(TEST_DATA_DIR == "") { TEST_DATA_DIR = msgsFilePath + "TestData/" + formatter.format(date); }
-    		
-    		try {	    		
-	    		File dir = new File(TEST_DATA_DIR);
-	    		if(!dir.exists()) {
-	    			dir.mkdirs();
-	    		}
-	    		
-	    		File file = new File(dir, msg.getConversationId() + ".log");
-	    		if(!file.exists()) {
-					file.createNewFile();
-	    		}
-	    		
-	    		FileWriter fileWriter = new FileWriter(file, true);
-	    		BufferedWriter writer = new BufferedWriter(fileWriter);
-	    		
-	    		/*
-	    		 * Timestamp
-	    		 * Sent or Received
-	    		 * Sender
-	    		 * Receiver
-	    		 * Ontology
-	    		 * Performative
-	    		 * Content-Length / Size ?
-	    		 */
-	    		
-	    		int contentSize = 0;
-	    		if(msg.getByteSequenceContent() != null) {
-	    			contentSize = msg.getByteSequenceContent().length;
-	    		}
-	    		String typeString = "nothing";
-	    		if(type == 's') {
-	    			typeString = "Sent";
-	    		} else if(type == 'r') {
-	    			typeString = "Received";
-	    		} else {
-	    			typeString = "Weird";
-	    		}
-	    		
-	    		writer.write("$[" + timeStamp + "]~[" + typeString + "]~[" + msg.getSender().getLocalName() + "]~[" + ((AID)msg.getAllReceiver().next()).getLocalName() + "]~[" + ACLMessage.getPerformative(msg.getPerformative()) + "]~[" + msg.getOntology() + "]~[" + contentSize + "]$\r\n");
-	    		
-	    		writer.close();
-    		} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}
-    	
-    	if(debugEnabled) {
-	    	String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
-	        
-	    	try 
-	    	{ 
-	    		File dir = new File (msgsFilePath);
-	    		if (!dir.exists())
-	    		{
-	    			dir.mkdir();
-	    		}
-	    		
-	    		File file = new File(dir, msg.getConversationId() + ".txt");
-	    		
-	    		//if file doesnt exists, then create it
-	    		if(!file.exists())
-	    		{
-	    			file.createNewFile();
-	    		}    
-	    		
-	    		FileWriter fileWriter = new FileWriter(file, true);
-		        BufferedWriter bufferWriter = new BufferedWriter(fileWriter);
-		        
-		        bufferWriter.write("Msg from ( sender ): " + msg.getSender().getLocalName() + " -> " + "to ( receiver ): " + ((AID)msg.getAllReceiver().next()).getLocalName() +  "\n" +
-		        		"Performative: " + ACLMessage.getPerformative(msg.getPerformative()) + "\n" +
-		        		"Ontology: " + msg.getOntology()  + "\n\n");
-		        
-		        bufferWriter.close();
-		        
-	    	}
-	    	catch(IOException e)
-	    	{
-	    		e.printStackTrace();
-	    	}
-    	}
-	}
-	
-	public static void logAclMessage(ACLMessage msg, boolean debug) {
-		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
-        
-    	try 
-    	{ 
-    		File dir = new File (msgsFilePath);
-    		if (!dir.exists())
-    		{
-    			dir.mkdir();
-    		}
-    		
-    		File file = new File(dir, msg.getConversationId() + ".txt");
-    		
-    		//if file doesnt exists, then create it
-    		if(!file.exists())
-    		{
-    			file.createNewFile();
-    		}    
-    		
-    		FileWriter fileWriter = new FileWriter(file, true);
-	        BufferedWriter bufferWriter = new BufferedWriter(fileWriter);
-	        
-	        bufferWriter.write("Msg from ( sender ): " + msg.getSender().getLocalName() + " -> " + "to ( receiver ): " + ((AID)msg.getAllReceiver().next()).getLocalName() +  "\n" +
-	        		"Performative: " + ACLMessage.getPerformative(msg.getPerformative()) + "\n" +
-	        		"Ontology: " + msg.getOntology()  + "\n\n");
-	        
-	        bufferWriter.close();
-	        
-    	}
-    	catch(IOException e)
-    	{
-    		e.printStackTrace();
-    	}
 	}
 	
 	public static void log(LogLevel level,String msg,  Throwable throwable) {

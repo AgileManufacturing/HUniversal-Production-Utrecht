@@ -110,7 +110,6 @@ public class AbortStep extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
-			Logger.logAclMessage(message, 'r');
 			//Logger.log("%s received message from %s(%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(),
 					//message.getOntology());
 	
@@ -131,7 +130,6 @@ public class AbortStep extends ReceiveBehaviour {
 					ACLMessage reply = message.createReply();
 					reply.setPerformative(ACLMessage.FAILURE);
 					myAgent.send(reply);
-					Logger.logAclMessage(reply, 's');
 				}
 			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(LogLevel.ERROR, e);

@@ -113,7 +113,6 @@ public class ScheduleStep extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) 
 	{
-		Logger.logAclMessage(message, 'r');
 		try 
 		{
 			// Gets the timeslot out of the message content.
@@ -185,7 +184,6 @@ public class ScheduleStep extends ReceiveBehaviour {
 				scheduleMessage.setContentObject(productStepId);
 				scheduleMessage.setConversationId(message.getConversationId());
 				equipletAgent.send(scheduleMessage);
-				Logger.logAclMessage(scheduleMessage, 's');
 				Logger.log(LogLevel.DEBUG, "You fit in my schedule, msg accepted send.");
 			}
 			else 
@@ -194,7 +192,6 @@ public class ScheduleStep extends ReceiveBehaviour {
 				ACLMessage reply = message.createReply();
 				reply.setPerformative(ACLMessage.DISCONFIRM);
 				myAgent.send(reply);
-				Logger.logAclMessage(reply, 's');
 			}
 		}
 		catch(IOException | InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) 

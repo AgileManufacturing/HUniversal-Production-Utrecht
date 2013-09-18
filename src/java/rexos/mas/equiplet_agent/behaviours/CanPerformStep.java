@@ -124,7 +124,6 @@ public class CanPerformStep extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		Logger.logAclMessage(message, 'r');
 		//Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
 				//message.getOntology());
 
@@ -152,21 +151,18 @@ public class CanPerformStep extends ReceiveBehaviour {
 			responseMessage.setOntology("CanDoProductionStep");
 			responseMessage.setContentObject(productStepEntryId);
 			equipletAgent.send(responseMessage);
-			Logger.logAclMessage(responseMessage, 's');
 		} catch(IOException | InvalidDBNamespaceException | GeneralMongoException | NullPointerException e) {
 			Logger.log(LogLevel.ERROR, e);
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.FAILURE);
 			reply.setContent("Failed to process the step");
 			equipletAgent.send(reply);
-			Logger.logAclMessage(reply, 's');
 		} catch(UnreadableException e) {
 			Logger.log(LogLevel.ERROR, e);
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.FAILURE);
 			reply.setContent("No step given");
 			equipletAgent.send(reply);
-			Logger.logAclMessage(reply, 's');
 		}
 	}
 }

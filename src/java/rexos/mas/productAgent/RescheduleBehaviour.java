@@ -57,7 +57,6 @@ public class RescheduleBehaviour extends Behaviour {
 				message.setOntology("AbortStep");
 				message.setConversationId(step.getConversationId());
 				myAgent.send(message);
-				Logger.logAclMessage(message, 's');
 			}
 		}	
 		
