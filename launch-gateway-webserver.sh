@@ -30,7 +30,7 @@ if [ "$msg" = "" ]; then
 fi
 
 # Check wether the class files exist for the gateway server
-# In case they do not, invoke ant to create them
+# In case they do not, invoke ant to create them.
 
 if [ ! -e ./src/GatewayServer/bin/Main.class ]; then
 	echo "Class files do not exist, running ant now"
