@@ -18,11 +18,23 @@ tomcat_run() {
 	sudo sh $tcpath
 }
 
+run_build_script() {
+	echo "\033[36m===== Building JAVA =====\033[0m"
+	ant -buildfile src/java/build.xml
+}
+
 msg=$(sudo netstat -lnp | grep 8080)
-if [ "$msg" = "" ];
-then
+if [ "$msg" = "" ]; then
 	echo "\033[91m===== Tomcat is not running - Starting =====\033[0m"
 	tomcat_run
+fi
+
+# Check wether the class files exist for the gateway server
+# In case they do not, invoke ant to create them
+
+if [ ! -e ./src/GatewayServer/bin/Main.class ]; then
+	echo "Class files do not exist, running ant now"
+	run_build_script
 fi
 
 java -classpath ./src/GatewayServer/bin Main
