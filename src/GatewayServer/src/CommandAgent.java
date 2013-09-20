@@ -14,9 +14,11 @@ import java.util.Vector;
 public class CommandAgent extends CLICommand {
 
 	private String json = "";
+	private String productAgentID;
 	
-	public CommandAgent(String json) {
+	public CommandAgent(String json, String productAgentID) {
 		this.json = json;
+		this.productAgentID = productAgentID;
 	}
 	
 	
@@ -32,7 +34,7 @@ public class CommandAgent extends CLICommand {
 			@Override
 			public void action() {
 				jade.domain.JADEAgentManagement.CreateAgent ca = new jade.domain.JADEAgentManagement.CreateAgent();
-				ca.setAgentName("pa"+Main.getPAID());
+				ca.setAgentName(productAgentID);
 				ca.setClassName("rexos.mas.product_agent.ProductAgent");
 				ca.setContainer(new ContainerID("Main-Container", null));
 				ca.addArguments(json);

@@ -8,7 +8,7 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 tomcat_run() {
-	tcdir=$(sudo find / -type d -name "tomcat")
+	tcdir=$(sudo find / -type d -name "*tomcat*")
 	echo "\033[93mTomcat found at: $tcdir\033[0m"
 	sudo sh $tcdir/bin/startup.sh
 }

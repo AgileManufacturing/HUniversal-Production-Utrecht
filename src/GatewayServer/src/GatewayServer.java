@@ -31,8 +31,13 @@ public class GatewayServer implements Runnable {
 
 	private boolean _stopServer = false;
 
-	public GatewayServer(int port) throws IOException {
+	private int productAgentID = 10;
+	
+	private String agentHost = "";
+	
+	public GatewayServer(int port, String agentHost) throws IOException {
 		super();
+		this.agentHost = agentHost;
 		this._serverSocketPort = port;
 		_clientThreads = new ArrayList<ClientSocketThread>();
 	}
@@ -44,18 +49,14 @@ public class GatewayServer implements Runnable {
 			this._serverSocket = new ServerSocket(this._serverSocketPort, 10);
 			while (this._stopServer == false) {
 				socket = this._serverSocket.accept();
-				ClientSocketThread cst = new ClientSocketThread(socket);
+				ClientSocketThread cst = new ClientSocketThread(this, socket, agentHost);
 				runThread = new Thread(cst);
 				runThread.start();
 			}
 		} catch (IOException ioe) {
-			if (Main.DEBUG) {
 				System.out.println("Exception: " + ioe.getMessage());
-			}
 		} catch (Exception e) {
-			if (Main.DEBUG) {
 				System.out.println("Exception: " + e.getMessage());
-			}
 		}
 	}
 
@@ -66,4 +67,8 @@ public class GatewayServer implements Runnable {
 		}
 	}
 
+	
+	public String getProductAgentID(){
+		return "pa"+ productAgentID++;
+	}
 }

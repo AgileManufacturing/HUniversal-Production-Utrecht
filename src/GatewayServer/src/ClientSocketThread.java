@@ -32,13 +32,17 @@ import com.google.gson.JsonParser;
  */
 public class ClientSocketThread implements Runnable {
 
+	private GatewayServer server; 
+	
 	private boolean _stopSocketThread = false;
-
 	private Socket _clientSocket = null;
-
 	private BufferedReader _clientInSocket = null;
+	
+	private String agentHost;
 
-	public ClientSocketThread(Socket socket) {
+	public ClientSocketThread(GatewayServer server, Socket socket, String agentHost) {
+		this.server = server;
+		this.agentHost = agentHost;
 		this._clientSocket = socket;
 	}
 
@@ -72,13 +76,13 @@ public class ClientSocketThread implements Runnable {
 					
 					if(cmd.getCommand().equals("CREATE_PA")) {
 						String json = cmd.getPayload();											
-						CommandAgent ca = new CommandAgent(json);
+						CommandAgent ca = new CommandAgent(json, server.getProductAgentID());
 						Properties pp = new ExtendedProperties();
-						pp.put("host", Main.getAgentHost());
+						pp.put("host", agentHost);
 						
 						CLIManager.execute(pp, ca.getBehaviour(pp), false);
 					}
-					System.out.println("Sent Message to JADE.");
+					System.out.println("Sent new product agent to JADE.");
 					stop();
 				}
 				catch(Exception e) {
@@ -87,9 +91,7 @@ public class ClientSocketThread implements Runnable {
 				}				
 			}
 		} catch (Exception e) {
-			if (Main.DEBUG) {
-				System.out.println("Exception: " + e.getMessage());
-			}
+			System.out.println("Exception: " + e.getMessage());
 			stop();
 		}
 	}

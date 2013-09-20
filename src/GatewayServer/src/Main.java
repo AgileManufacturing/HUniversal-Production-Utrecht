@@ -1,5 +1,4 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.IOException;
 
 /**
  *
@@ -21,18 +20,17 @@ import java.io.InputStreamReader;
  */
 public class Main {
 	
-	public final static boolean DEBUG = true;
-	private static int paCnt = 10;
 	private static String agentHost = "127.0.0.1";
-
+	private static int port = 10081;
 	
-	//Java -jar GatewayServer.jar 127.0.0.1
+	//usage: Java -jar GatewayServer.jar 127.0.0.1
+	
 	public static void main(String[] args) {
 		try {
 			if(args != null && args.length == 1 && args[0].getClass() == String.class) {
 				agentHost = (String)args[0];
 			}
-			GatewayServer gs = new GatewayServer(10081);
+			GatewayServer gs = new GatewayServer(port, agentHost);
 			Thread gatewayServerThread = new Thread(gs);
 			
 			/*
@@ -57,23 +55,17 @@ public class Main {
 			}
 			*/
 			
-			System.out.println("Server Started!");
+			System.out.println("GatewayServer Started on: " + agentHost + ":" + port);
 			gatewayServerThread.run();
 
 		} catch (IllegalArgumentException uae) {
 			System.out.println("Argument exception");
-		} catch (Exception e) {
+			uae.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Could not start the gatewayserver");
 			e.printStackTrace();
-			System.out.println("Common exception");
-		}
+		} 
 
-	}
-	
-	public static String getAgentHost() {
-		return agentHost;
-	}
-	
-	public static int getPAID() {
-		return paCnt++;
 	}
 }
