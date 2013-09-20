@@ -8,9 +8,14 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 tomcat_run() {
-	tcdir=$(sudo find / -type d -name "tomcat")
-	echo "\033[93mTomcat found at: $tcdir\033[0m"
-	sudo sh $tcdir/bin/startup.sh
+	for match in $(sudo find / -regextype sed -regex ".*/bin/startup\.sh")
+	do
+		if grep -q "Apache" $match
+		then tcpath=$match
+		fi
+	done
+	echo "\033[93mTomcat found at: $tcpath\033[0m"
+	sudo sh $tcpath
 }
 
 msg=$(sudo netstat -lnp | grep 8080)
