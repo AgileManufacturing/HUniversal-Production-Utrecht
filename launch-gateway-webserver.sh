@@ -33,7 +33,7 @@ fi
 # In case they do not, invoke ant to create them.
 
 if [ ! -e ./src/GatewayServer/bin/Main.class ]; then
-	echo "Class files do not exist, running ant now"
+	echo "Class files do not exist in ./src/GatewayServer/bin, running ant now"
 	run_build_script
 fi
 
