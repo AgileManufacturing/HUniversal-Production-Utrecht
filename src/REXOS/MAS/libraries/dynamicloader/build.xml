@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="dynamicloader" default="build" basedir=".">
+
+	<import file="../build.xml"/>
+
+	<target name="build"> 
+		<buildjava dir="${basedir}"/>
+	</target>
+
+	<target name="clean">
+		 <cleanjava dir="${basedir}"/>
+	</target>
+
+</project>

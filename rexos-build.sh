@@ -39,11 +39,11 @@ rospack list > /dev/null
 
 echo ""
 echo -e "\033[36m===== Building JAVA =====\033[0m"
-ant -buildfile src/java/build.xml $REXOS_BUILD_TARGET
+ant -buildfile src/REXOS/MAS/build.xml $REXOS_BUILD_TARGET
 
 if [ "$REXOS_BUILD_TARGET" != "clean" ];
 then
-	. ./build/java/.export-classpath
+	. ./src/REXOS/build/java/.export-classpath
 fi
 
 #Have to clear OPTIND because this file as sourced and OPTIND is only cleared when creating a new shell.
