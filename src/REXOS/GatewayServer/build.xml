@@ -1,4 +1,4 @@
-<project name="gatewayserver" default="all" basedir=".">
+<project name="gatewayserverProject" default="all" basedir=".">
 
 	<!-- java source root -->
 	<property name="gatewayserver-java-root" value="${basedir}"/>

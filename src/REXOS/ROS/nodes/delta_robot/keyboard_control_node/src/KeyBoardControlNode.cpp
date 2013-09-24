@@ -35,122 +35,115 @@
 #include <signal.h>
 #include <string.h>
 #include <cstdlib>
+#include "keyboard_control_node/KeyBoardControlNode.h"
 #include "ros/ros.h"
-#include "delta_robot_node/MovePath.h"
-#include "delta_robot_node/MoveToRelativePoint.h"
 #include "delta_robot_node/Motion.h"
-#include "delta_robot_node/Calibrate.h"
-#include "delta_robot_node/Services.h"
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "KeyBoardControlNode"
 // @endcond
 
-namespace KeyBoardControlNodeNamespace{
-	/**
-	 * @var char KEYCODE_UP
-	 * The ascii representation of the up key on the keyboard.
-	 **/
-	const char KEYCODE_UP = 0x41;
+using namespace keyboard_control_node;
 
-	/**
-	 * @var char KEYCODE_DOWN
-	 * The ascii representation of the down key on the keyboard.
-	 **/
-	const char KEYCODE_DOWN = 0x42;
+/**
+ * Release keyboard safely when Ctrl+C is pressed.
+ *
+ * @param sig The signal received from the Linux OS.
+ **/
+void KeyBoardControlNode::quit(int sig){
+	tcsetattr(keyboardNumber, TCSANOW, &oldTerminalSettings);
+	exit(0);
+}
 
-	/**
-	 * @var char KEYCODE_Q
-	 * The ascii representation of the Q key on the keyboard.
-	 **/
-	const char KEYCODE_Q = 0x71;
+KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp){
+	ROS_INFO("Constructing");
+	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ1", "EquipletStepsBlackBoard");
+	run();
+}
 
-	/**
-	 * @var char KEYCODE_W
-	 * The ascii representation of the W key on the keyboard.
-	 **/
-	const char KEYCODE_W = 0x77;
+KeyBoardControlNode::~KeyBoardControlNode(){
+	ROS_INFO("Destructing");
+}
 
-	/**
-	 * @var char KEYCODE_A
-	 * The ascii representation of the A key on the keyboard.
-	 **/
-	const char KEYCODE_A = 0x61;
-
-	/**
-	 * @var char KEYCODE_S
-	 * The ascii representation of the S key on the keyboard.
-	 **/
-	const char KEYCODE_S = 0x73;
-
-	/**
-	 * @var char KEYCODE_D
-	 * The ascii representation of the D key on the keyboard.
-	 **/
-	const char KEYCODE_D = 0x64;
-
-	/**
-	 * @var char KEYCODE_C
-	 * The ascii representation of the C key on the keyboard.
-	 **/
-	const char KEYCODE_C = 0x63;
-
-	/**
-	 * @var int keyboardNumber
-	 * The number of the keyboard, e.g.: 0 is the primary keyboard.
-	 **/
-	int keyboardNumber = 0;
-
-	/**
-	 * @var double maxAcceleration
-	 * The maxAcceleration of the effector in millimeters per second.
-	 **/
-	double maxAcceleration = 50.0;
-
-	/**
-	 * @var double step
-	 * The size in millimeters per movement.
-	 **/
-	double step = 1.0;
-
-	/**
-	 * A terminal interface data struct.
-	 **/
-	struct termios oldTerminalSettings, newTerminalSettings;
-
-	/**
-	 * Release keyboard safely when Ctrl+C is pressed.
-	 *
-	 * @param sig The signal received from the Linux OS.
-	 **/
-	void quit(int sig){
-		tcsetattr(keyboardNumber, TCSANOW, &oldTerminalSettings);
-		exit(0);
+void KeyBoardControlNode::run(){
+	for(;;){
+		// Get the next event from the keyboard.
+		if(read(keyboardNumber, &inputCharacter, 1) < 0){
+			perror("read():");
+			exit(1);
+		}
+		readInputFromKeyBoard(inputCharacter);
 	}
 }
 
-using namespace KeyBoardControlNodeNamespace;
+void KeyBoardControlNode::readInputFromKeyBoard(int inputCharacter){
+
+
+	/*	moveToRelativePointService.request.motion.x = 0;
+		moveToRelativePointService.request.motion.y = 0;
+		moveToRelativePointService.request.motion.z = 0;
+		moveToRelativePointService.request.motion.maxAcceleration = maxAcceleration; */
+
+	// Check which key was pressed.
+	switch(inputCharacter){
+		case KEYCODE_UP:
+			ROS_INFO("PRESSED UP");
+			//moveToRelativePointService.request.motion.z = step;
+			////deltaRobotClient.call(moveToRelativePointService);
+		break;
+
+		case KEYCODE_DOWN:
+			ROS_INFO("PRESSED DOWN");
+			//moveToRelativePointService.request.motion.z = -step;
+			//deltaRobotClient.call(moveToRelativePointService);
+		break;
+
+		case KEYCODE_W:
+			ROS_INFO("PRESSED W");
+			//moveToRelativePointService.request.motion.y = step;
+			//deltaRobotClient.call(moveToRelativePointService);
+		break;
+
+		case KEYCODE_A:
+			ROS_INFO("PRESSED A");
+			//moveToRelativePointService.request.motion.x = -step;
+			//deltaRobotClient.call(moveToRelativePointService);
+		break;
+
+		case KEYCODE_S:
+			ROS_INFO("PRESSED S");
+			//moveToRelativePointService.request.motion.y = -step;
+			//deltaRobotClient.call(moveToRelativePointService);
+		break;
+
+		case KEYCODE_D:
+			ROS_INFO("PRESSED D");
+			////moveToRelativePointService.request.motion.x = step;
+			//deltaRobotClient.call(moveToRelativePointService);
+		break;
+
+		case KEYCODE_C:
+			//calibrateClient.call(calibrateService);
+		break;
+	}
+}
+
+void KeyBoardControlNode::writeToBlackBoard(delta_robot_node::Motion){
+
+}
 
 /**
- * Starting method for the KeyBoardControlNode.
- *
- * @param argc Argument count.
- * @param argv Argument vector.
- * 
- * @return 1 on keyboard read error.
- **/
+* Starting method for the KeyBoardControlNode.
+*
+* @param argc Argument count.
+* @param argv Argument vector.
+* 
+* @return 1 on keyboard read error.
+**/
 int main(int argc, char** argv){
 	// Ros init.
 	ros::init(argc, argv, NODE_NAME);
 	ros::NodeHandle nodeHandle;
-
-	// Getting MovePath Services.
-	ros::ServiceClient deltaRobotClient = nodeHandle.serviceClient<delta_robot_node::MoveToRelativePoint>(DeltaRobotNodeServices::MOVE_TO_RELATIVE_POINT);
-	delta_robot_node::MoveToRelativePoint moveToRelativePointService;
-
-	// Getting Calibrate Services.
-	ros::ServiceClient calibrateClient = nodeHandle.serviceClient<delta_robot_node::Calibrate>(DeltaRobotNodeServices::CALIBRATE);
-	delta_robot_node::Calibrate calibrateService;
 
 	// Initing the keyboard read and setting up clean shutdown.
 	signal(SIGINT, quit);
@@ -167,56 +160,15 @@ int main(int argc, char** argv){
 	ROS_INFO("Reading from keyboard");
 	ROS_INFO("Start controlling the robot by pressing WASD keys and Up and Down keys");
 
-	delta_robot_node::Motion motion;
-	for(;;){
-		// Get the next event from the keyboard.
-		if(read(keyboardNumber, &inputCharacter, 1) < 0){
-			perror("read():");
-			exit(1);
-		}
+	ros::init(argc, argv, "keyBoardControlNode");
+	KeyBoardControlNode keyBoardControlNode("145.89.191.131");
 
-		moveToRelativePointService.request.motion.x = 0;
-		moveToRelativePointService.request.motion.y = 0;
-		moveToRelativePointService.request.motion.z = 0;
-		moveToRelativePointService.request.motion.maxAcceleration = maxAcceleration;
+	ros::Rate poll_rate(5);
 
-		// Check which key was pressed.
-		switch(inputCharacter){
-			case KEYCODE_UP:
-				ROS_INFO("PRESSED UP");
-				moveToRelativePointService.request.motion.z = step;
-				deltaRobotClient.call(moveToRelativePointService);
-				break;
-			case KEYCODE_DOWN:
-				ROS_INFO("PRESSED DOWN");
-				moveToRelativePointService.request.motion.z = -step;
-				deltaRobotClient.call(moveToRelativePointService);
-				break;
-			case KEYCODE_W:
-				ROS_INFO("PRESSED W");
-				moveToRelativePointService.request.motion.y = step;
-				deltaRobotClient.call(moveToRelativePointService);
-				break;
-			case KEYCODE_A:
-				ROS_INFO("PRESSED A");
-				moveToRelativePointService.request.motion.x = -step;
-				deltaRobotClient.call(moveToRelativePointService);
-				break;
-			case KEYCODE_S:
-				ROS_INFO("PRESSED S");
-				moveToRelativePointService.request.motion.y = -step;
-				deltaRobotClient.call(moveToRelativePointService);
-				break;
-			case KEYCODE_D:
-				ROS_INFO("PRESSED D");
-				moveToRelativePointService.request.motion.x = step;
-				deltaRobotClient.call(moveToRelativePointService);
-				break;
-			case KEYCODE_C:
-				calibrateClient.call(calibrateService);
-				break;
-		}
+	while (ros::ok()) {
+		poll_rate.sleep();
 		ros::spinOnce();
 	}
+
 	return 0;
 }
