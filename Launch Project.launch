@@ -11,6 +11,7 @@
 	
 	<mapAttribute key="org.eclipse.debug.core.environmentVariables">
 		<mapEntry key="PROPERTIESPATH" value="${project_loc}/src/REXOS/MAS/configuration/"/>
+		<mapEntry key="MSGPATH" value="${project_loc}/ACLMsgs/"/>
 	</mapAttribute>
 	
 	<listAttribute key="org.eclipse.debug.ui.favoriteGroups">

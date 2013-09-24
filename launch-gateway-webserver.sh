@@ -20,7 +20,7 @@ tomcat_run() {
 
 run_build_script() {
 	echo "\033[36m===== Building JAVA =====\033[0m"
-	ant -buildfile src/REXOS/MAS/build.xml
+	ant -buildfile src/REXOS/GatewayServer/build.xml
 }
 
 msg=$(sudo netstat -lnp | grep 8080)
