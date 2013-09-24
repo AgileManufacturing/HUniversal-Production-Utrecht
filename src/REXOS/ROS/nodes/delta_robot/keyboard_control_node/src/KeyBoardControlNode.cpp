@@ -51,13 +51,31 @@ using namespace keyboard_control_node;
  * @param sig The signal received from the Linux OS.
  **/
 void KeyBoardControlNode::quit(int sig){
-	tcsetattr(keyboardNumber, TCSANOW, &oldTerminalSettings);
+	//tcsetattr(keyboardNumber, TCSANOW, &oldTerminalSettings);
+	ROS_INFO("Lets quit.");
 	exit(0);
 }
 
 KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp){
 	ROS_INFO("Constructing");
+
 	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ1", "EquipletStepsBlackBoard");
+
+	// Initing the keyboard read and setting up clean shutdown.
+	signal(SIGINT, &KeyBoardControlNode::quit);
+
+	tcgetattr(keyboardNumber, &oldTerminalSettings);
+	memcpy(&newTerminalSettings, &oldTerminalSettings, sizeof(struct termios));
+	newTerminalSettings.c_lflag &=~ (ICANON | ECHO);
+
+	// Setting a new line, then end of file.
+	newTerminalSettings.c_cc[VEOL] = 1;
+	newTerminalSettings.c_cc[VEOF] = 2;
+	tcsetattr(keyboardNumber, TCSANOW, &newTerminalSettings);
+
+	ROS_INFO("Reading from keyboard");
+	ROS_INFO("Start controlling the robot by pressing WASD keys and Up and Down keys");
+
 	run();
 }
 
@@ -129,6 +147,29 @@ void KeyBoardControlNode::readInputFromKeyBoard(int inputCharacter){
 }
 
 void KeyBoardControlNode::writeToBlackBoard(delta_robot_node::Motion){
+	equipletStepBlackboardClient->insertDocument("('_id' : ObjectId('52417406e4b031d5f036416e'),"
+               "'instructionData' : {""
+                              "'command' : 'move',""
+                              "'destination" : 'deltarobot',"
+                              "'look_up' : 'FIND_ID',"
+                              "'look_up_parameters' : {"
+                                            "'ID' : 'RELATIVE-TO-PLACEHOLDER'"
+                              "},"
+                              "'payload' : {"
+                                            "'z' : 25,"
+                                            "'maxAcceleration' : 50"
+                              "}"
+               "},"
+               "'moduleId' : 1,"
+               "'nextStep' : null,"
+               "'serviceStepID' : ObjectId('52417406e4b031d5f036416c'),"
+               "'status' : 'DONE',"
+               "'statusData' : {"
+               "},"
+               "'timeData' : {"
+                              "'duration' : 6"
+               "}"
+		"}");	
 
 }
 
@@ -144,21 +185,6 @@ int main(int argc, char** argv){
 	// Ros init.
 	ros::init(argc, argv, NODE_NAME);
 	ros::NodeHandle nodeHandle;
-
-	// Initing the keyboard read and setting up clean shutdown.
-	signal(SIGINT, quit);
-	char inputCharacter;
-	tcgetattr(keyboardNumber, &oldTerminalSettings);
-	memcpy(&newTerminalSettings, &oldTerminalSettings, sizeof(struct termios));
-	newTerminalSettings.c_lflag &=~ (ICANON | ECHO);
-
-	// Setting a new line, then end of file.
-	newTerminalSettings.c_cc[VEOL] = 1;
-	newTerminalSettings.c_cc[VEOF] = 2;
-	tcsetattr(keyboardNumber, TCSANOW, &newTerminalSettings);
-
-	ROS_INFO("Reading from keyboard");
-	ROS_INFO("Start controlling the robot by pressing WASD keys and Up and Down keys");
 
 	ros::init(argc, argv, "keyBoardControlNode");
 	KeyBoardControlNode keyBoardControlNode("145.89.191.131");

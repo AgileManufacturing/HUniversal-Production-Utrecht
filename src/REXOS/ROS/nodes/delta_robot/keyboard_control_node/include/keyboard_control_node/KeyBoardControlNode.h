@@ -42,9 +42,9 @@ namespace keyboard_control_node {
 		public:
 		KeyBoardControlNode(std::string blackboardIp);
 		virtual ~KeyBoardControlNode();
-		void quit(int sig);
 
 		private:
+		static void quit(int sig);
 		void readInputFromKeyBoard(int inputCharacter);
 		void run();
 		void writeToBlackBoard(delta_robot_node::Motion);
@@ -118,6 +118,8 @@ namespace keyboard_control_node {
 		 * A terminal interface data struct.
 		 **/
 		struct termios oldTerminalSettings, newTerminalSettings;
+		Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
+		char inputCharacter;
 
 	};
 

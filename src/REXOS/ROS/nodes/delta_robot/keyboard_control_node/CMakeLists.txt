@@ -4,7 +4,7 @@ project(keyboard_control_node)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS delta_robot_node)
+find_package(catkin REQUIRED COMPONENTS delta_robot_node rexos_blackboard_cpp_client)
 
 
 
@@ -18,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS delta_robot_node)
 catkin_package(
   #INCLUDE_DIRS include
   LIBRARIES keyboard_control_node
-  CATKIN_DEPENDS delta_robot_node
+  CATKIN_DEPENDS delta_robot_node rexos_blackboard_cpp_client
 )
 
 ###########
