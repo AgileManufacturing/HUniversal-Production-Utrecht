@@ -1,0 +1,21 @@
+<project name="lib" default="build" basedir=".">
+
+	<import file="../build.xml"/>
+
+	<target name="build" depends="jars">
+	</target>
+
+	<target name="jars">
+		<antcall target="add-jar-to-classpath"><param name="jar" value="gson-2.2.4.jar"/></antcall>
+		<antcall target="add-jar-to-classpath"><param name="jar" value="jade.jar"/></antcall>
+		<antcall target="add-jar-to-classpath"><param name="jar" value="jackson-annotations-2.2.0.jar"/></antcall>
+		<antcall target="add-jar-to-classpath"><param name="jar" value="jackson-core-2.2.0.jar"/></antcall>
+		<antcall target="add-jar-to-classpath"><param name="jar" value="jackson-databind-2.2.0.jar"/></antcall>
+		<antcall target="add-jar-to-classpath"><param name="jar" value="jadeMisc.jar"/></antcall>
+	</target>
+
+	<target name="clean">
+		 <cleanjava dir="${basedir}"/>
+	</target>
+
+</project>
