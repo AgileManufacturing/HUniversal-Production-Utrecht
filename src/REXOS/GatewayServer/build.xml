@@ -1,17 +1,13 @@
-<project name="java" default="all" basedir=".">
+<project name="gatewayserver" default="all" basedir=".">
 
 	<!-- java source root -->
-	<property name="rexos-java-root" value="${basedir}"/>
-
+	<property name="gatewayserver-java-root" value="${basedir}"/>
 	<!-- git repo root -->
-	<property name="repo-root" value="${rexos-java-root}/../../.."/>
-	<echo>*** repo-root -- ${rexos-java-root}../../.. ***${line.separator}</echo>
+	<property name="repo-root" value="${gatewayserver-java-root}/../../.."/>
 	<!-- Specify the folder in which the binaries will be placed. -->
-	<property name="buildpath" value="${repo-root}/build/java"/>
-	<echo>*** buildpath -- ${repo-root}/build/java ***${line.separator}</echo>
+	<property name="buildpath" value="${repo-root}/build/REXOS/Gatewayserver"/>
 	<!-- Specify the location of the export classpath file. -->
 	<property name="export-classpath-file" value="${buildpath}/.export-classpath"/>
-	<echo>*** export-classpath-file -- ${buildpath}/.export-classpath ***${line.separator}</echo>
 	<!-- Add a reference to the global environment -->
 	<property environment="env"/>
 
@@ -30,7 +26,7 @@
 
 			<pathconvert property="relative.dir">
 				<path location="@{dir}"/>
-				<globmapper from="${rexos-java-root}/*" to="*" />
+				<globmapper from="${gatewayserver-java-root}/*" to="*" />
 			</pathconvert>
 
    			<loadfile property="classpath" srcFile="${buildpath}/.export-classpath"/>
@@ -53,7 +49,7 @@
    		<sequential>
    			<pathconvert property="relative.dir">
 				<path location="@{dir}"/>
-				<globmapper from="${rexos-java-root}/*" to="*" />
+				<globmapper from="${gatewayserver-java-root}/*" to="*" />
 			</pathconvert>
 			<echo>*** Cleaning:  ${buildpath}/${relative.dir}***${line.separator}</echo>
    			<delete dir="${buildpath}/${relative.dir}"/>
@@ -86,15 +82,17 @@
 
 	<!-- Target for adding a library jar to the export classpath file if it isn't already in there. Requires param jar. -->
 	<target name="add-jar-to-classpath">
-		<echo>*** Adding JAR to classpath ${jar} -- ${rexos-java-root}/external_libraries/${jar} ***${line.separator}</echo>
+		<echo>*** Adding JAR to classpath ${jar} -- ${gatewayserver-java-root}/lib/${jar} ***${line.separator}</echo>
 		<antcall target="add-path-to-classpath">
-			<param name="path" value="${rexos-java-root}/lib/${jar}"/>
+			<param name="path" value="${gatewayserver-java-root}/lib/${jar}"/>
 		</antcall>
 	</target>
 
 	<!-- default target, handles the classpath file and calls the allpackages target -->
 	<target name="all">
 		<mkdir dir="${buildpath}"/>
+		<delete file ="${buildpath}/.export-classpath"/> 
+ 		<touch file ="${buildpath}/.export-classpath"/> 
 		<antcall target="allpackages"/>
 	</target>
 	
@@ -102,11 +100,16 @@
 	<target name="allpackages" depends="src, lib"/>
 
 	<target name="src" depends="lib">
-    	<ant antfile="build.xml" target="all" dir="src" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
+    	<ant antfile="build.xml" target="build" dir="src" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
 
 	<target name="lib">
-   		<ant antfile="build.xml" target="all" dir="lib" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
+		<antcall target="add-jar-to-classpath"><param name="jar" value="gson-2.2.4.jar"/></antcall>
+		<antcall target="add-jar-to-classpath"><param name="jar" value="jade.jar"/></antcall>
+		<antcall target="add-jar-to-classpath"><param name="jar" value="jackson-annotations-2.2.0.jar"/></antcall>
+		<antcall target="add-jar-to-classpath"><param name="jar" value="jackson-core-2.2.0.jar"/></antcall>
+		<antcall target="add-jar-to-classpath"><param name="jar" value="jackson-databind-2.2.0.jar"/></antcall>
+		<antcall target="add-jar-to-classpath"><param name="jar" value="jadeMisc.jar"/></antcall>
 	</target>
 
 	<!-- clean target, cleans rexos and tools -->

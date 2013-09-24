@@ -1,8 +1,8 @@
-<project name="blackboard_client" default="build" basedir=".">
+<project name="dataclasses" default="build" basedir=".">
 
 	<import file="../build.xml"/>
 
-	<target name="build" depends="jars">
+	<target name="build">
 		<buildjava dir="${basedir}"/>  
 	</target>
 

@@ -32,9 +32,9 @@ fi
 # Check wether the class files exist for the gateway server
 # In case they do not, invoke ant to create them.
 
-if [ ! -e ./src/REXOS/GatewayServer/bin/Main.class ]; then
-	echo "Class files do not exist in ./src/GatewayServer/bin, running ant now"
+if [ ! -e ./build/REXOS/Gatewayserver/src/Main.class ]; then
+	echo "Class files do not exist in ./build/REXOS/Gatewayserver/src, running ant now"
 	run_build_script
 fi
 
-java -classpath ./src/REXOS/GatewayServer/bin Main
+java -classpath ./build/REXOS/Gatewayserver/src Main

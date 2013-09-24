@@ -43,7 +43,7 @@ ant -buildfile src/REXOS/MAS/build.xml $REXOS_BUILD_TARGET
 
 if [ "$REXOS_BUILD_TARGET" != "clean" ];
 then
-	. ./src/REXOS/build/java/.export-classpath
+	. ./build/REXOS/MAS/.export-classpath
 fi
 
 #Have to clear OPTIND because this file as sourced and OPTIND is only cleared when creating a new shell.

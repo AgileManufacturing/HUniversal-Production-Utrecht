@@ -1,12 +1,12 @@
-<project name="java" default="all" basedir=".">
+<project name="MAS" default="all" basedir=".">
 
 	<!-- java source root -->
 	<property name="rexos-java-root" value="${basedir}"/>
 
 	<!-- git repo root -->
-	<property name="repo-root" value="${rexos-java-root}../../.."/>
+	<property name="repo-root" value="${rexos-java-root}/../../.."/>
 	<!-- Specify the folder in which the binaries will be placed. -->
-	<property name="buildpath" value="${repo-root}/build/java"/>
+	<property name="buildpath" value="${repo-root}/build/REXOS/MAS"/>
 	<!-- Specify the location of the export classpath file. -->
 	<property name="export-classpath-file" value="${buildpath}/.export-classpath"/>
 	<!-- Add a reference to the global environment -->
@@ -92,6 +92,8 @@
 	<!-- default target, handles the classpath file and calls the allpackages target -->
 	<target name="all">
 		<mkdir dir="${buildpath}"/>
+		<delete file ="${buildpath}/.export-classpath"/> 
+ 		<touch file ="${buildpath}/.export-classpath"/> 
 		<antcall target="allpackages"/>
 	</target>
 	
