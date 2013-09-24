@@ -29,6 +29,8 @@ echo -e "\033[36m===== Setting ROS_PACKAGE_PATH =====\033[0m"
 
 echo -e "\033[36m===== Building C++ =====\033[0m"
 catkin_make $REXOS_BUILD_TARGET
+echo -e "\033[35m===== DONE BUILDING C++ =====\033[0m"
+
 if [ "$REXOS_BUILD_TARGET" != "clean" ];
 then
 	. ./devel/setup.sh
@@ -40,12 +42,13 @@ rospack list > /dev/null
 echo ""
 echo -e "\033[36m===== Building JAVA =====\033[0m"
 ant -buildfile src/REXOS/MAS/build.xml $REXOS_BUILD_TARGET
+echo -e "\033[35m===== DONE BUILDING JAVA =====\033[0m"
+
 
 if [ "$REXOS_BUILD_TARGET" != "clean" ];
 then
 	. ./build/REXOS/MAS/.export-classpath
 fi
-
 #Have to clear OPTIND because this file as sourced and OPTIND is only cleared when creating a new shell.
 OPTIND=0
 unset REXOS_BUILD_TARGET
