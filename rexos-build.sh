@@ -47,7 +47,7 @@ echo -e "\033[35m===== DONE JAVA =====\033[0m"
 
 if [ "$REXOS_BUILD_TARGET" != "clean" ];
 then
-	. ./src/REXOS/build/java/.export-classpath
+	. ./build/REXOS/MAS/.export-classpath
 fi
 
 #Have to clear OPTIND because this file as sourced and OPTIND is only cleared when creating a new shell.
