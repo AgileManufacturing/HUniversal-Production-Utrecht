@@ -124,7 +124,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
 
 
 void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
-	std::cout << "Instruction received on deltarobot. Parsing.." << std::endl;
+	std::cout << "Instruction received on deltarobot. Parsing.." << goal->json << std::endl;
 
 	JSONNode n = libjson::parse(goal->json);
 
