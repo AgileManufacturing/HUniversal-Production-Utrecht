@@ -131,12 +131,13 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 	result_.OID = goal->OID;
 
     JSONNode::const_iterator i = n.begin();
-
     //We want to retrieve the payload from the msg.
 	if (strcmp(i[4].name().c_str(), "payload") == 0){
 
+			std::cout << "Parsing point." << std::endl;
 			Point p = parsePoint(i[4]);
 
+			std::cout << "Moving to point: x " << p.x << " y " << p.y << " z " << p.z << std::endl;
 			if(moveToPoint(p.x, p.y, p.z, p.maxAcceleration)){
 				//Move is succesfull, set the result.
     			setInstructionActionServer.setSucceeded(result_);

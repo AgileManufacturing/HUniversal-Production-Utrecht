@@ -111,42 +111,42 @@ void KeyBoardControlNode::readInputFromKeyBoard(int inputCharacter){
 			ROS_INFO("PRESSED UP");
 			//z + step
 			currentZPos = currentZPos + STEP;
-			writeToBlackBoard("", "", rexos_utilities::doubleToString(currentZPos), maxAcceleration);
+			writeToBlackBoard("", "", rexos_utilities::doubleToString(currentZPos) + ".1", maxAcceleration);
 		break;
 
 		case KEYCODE_DOWN:
 			ROS_INFO("PRESSED DOWN");
 			//z - step
 			currentZPos = currentZPos - STEP;
-			writeToBlackBoard("", "", rexos_utilities::doubleToString(currentZPos), maxAcceleration);
+			writeToBlackBoard("", "", rexos_utilities::doubleToString(currentZPos) + ".1", maxAcceleration);
 		break;
 
 		case KEYCODE_W:
 			ROS_INFO("PRESSED W");
 			//y + step
 			currentYPos = currentYPos + STEP;
-			writeToBlackBoard("", rexos_utilities::doubleToString(currentYPos), "", maxAcceleration);
+			writeToBlackBoard("", rexos_utilities::doubleToString(currentYPos) + ".1", "", maxAcceleration);
 		break;
 
 		case KEYCODE_A:
 			ROS_INFO("PRESSED A");
 			//x - step
 			currentXPos = currentXPos - STEP;
-			writeToBlackBoard(rexos_utilities::doubleToString(currentXPos), "", "", maxAcceleration);
+			writeToBlackBoard(rexos_utilities::doubleToString(currentXPos) + ".1", "", "", maxAcceleration);
 		break;
 
 		case KEYCODE_S:
 			ROS_INFO("PRESSED S");
 			//y - step
 			currentYPos = currentYPos - STEP;
-			writeToBlackBoard("", rexos_utilities::doubleToString(currentYPos), "", maxAcceleration);
+			writeToBlackBoard("", rexos_utilities::doubleToString(currentYPos) + ".1", "", maxAcceleration);
 		break;
 
 		case KEYCODE_D:
 			ROS_INFO("PRESSED D");
 			//x + step
 			currentXPos = currentXPos + STEP;
-			writeToBlackBoard(rexos_utilities::doubleToString(currentXPos), "", "", maxAcceleration);
+			writeToBlackBoard(rexos_utilities::doubleToString(currentXPos) + ".1", "", "", maxAcceleration);
 		break;
 
 		case KEYCODE_C:
