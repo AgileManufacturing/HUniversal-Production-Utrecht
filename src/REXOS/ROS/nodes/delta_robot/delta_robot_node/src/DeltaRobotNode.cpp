@@ -113,7 +113,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 
 
 
-deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode(){
+deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
 	delete deltaRobot;
 	delete motors[0];
 	delete motors[1];
@@ -137,7 +137,11 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 	std::cout << "Iterating." << std::endl;
     JSONNode::const_iterator i = n.begin();
 
-	std::cout << "String comparing" << std::endl;
+
+	std::cout << "Iterator begin: " << n.begin() << " Iterator end: " << n.end() << std::endl;
+
+	std::cout <<  "trying to compare payload: " << std::endl;
+	std::cout << "String comparing: " << i[4].name().c_str() << std::endl;
     //We want to retrieve the payload from the msg.
 	if (strcmp(i[4].name().c_str(), "payload") == 0){
 
