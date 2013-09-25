@@ -35,7 +35,7 @@ public class CommandAgent extends CLICommand {
 			public void action() {
 				jade.domain.JADEAgentManagement.CreateAgent ca = new jade.domain.JADEAgentManagement.CreateAgent();
 				ca.setAgentName(productAgentID);
-				ca.setClassName("rexos.mas.product_agent.ProductAgent");
+				ca.setClassName("agents.product_agent.ProductAgent");
 				ca.setContainer(new ContainerID("Main-Container", null));
 				ca.addArguments(json);
 				
