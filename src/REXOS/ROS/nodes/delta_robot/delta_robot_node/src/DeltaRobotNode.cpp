@@ -124,13 +124,20 @@ deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode(){
 
 
 void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
+	std::cout << "Instruction received on deltarobot. Parsing.." << std::endl;
 
 	JSONNode n = libjson::parse(goal->json);
+
+	std::cout << "Setting result" << std::endl;
 	rexos_statemachine::SetInstructionResult result_;
 
+	std::cout << "Setting result id." << std::endl;
 	result_.OID = goal->OID;
 
+	std::cout << "Iterating." << std::endl;
     JSONNode::const_iterator i = n.begin();
+
+	std::cout << "String comparing" << std::endl;
     //We want to retrieve the payload from the msg.
 	if (strcmp(i[4].name().c_str(), "payload") == 0){
 
