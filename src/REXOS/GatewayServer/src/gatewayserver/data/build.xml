@@ -1,4 +1,4 @@
-<project name="dataclasses" default="build" basedir=".">
+<project name="data" default="build" basedir=".">
 
 	<import file="../build.xml"/>
 

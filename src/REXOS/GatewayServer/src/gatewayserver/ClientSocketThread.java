@@ -1,3 +1,6 @@
+package gatewayserver;
+
+import gatewayserver.data.Command;
 import jade.cli.CLIManager;
 import jade.util.ExtendedProperties;
 import jade.util.leap.Properties;
@@ -7,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-import com.gatewayserver.dataclasses.Command;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

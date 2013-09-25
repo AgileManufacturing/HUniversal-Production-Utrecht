@@ -24,11 +24,12 @@
    		<sequential>
 			<echo>*** Attempting to compile dir @{dir} ***${line.separator}</echo>
 
+
 			<pathconvert property="relative.dir">
 				<path location="@{dir}"/>
 				<globmapper from="${gatewayserver-java-root}/*" to="*" />
 			</pathconvert>
-
+			<echo>TEST dir is: ${buildpath}/${relative.dir}</echo>
    			<loadfile property="classpath" srcFile="${buildpath}/.export-classpath"/>
    			<mkdir dir="${buildpath}/${relative.dir}"/>
   
@@ -117,7 +118,6 @@
 		<delete file="${export-classpath-file}" />
     	<delete dir="${buildpath}" />
     	<ant antfile="build.xml" target="clean" dir="src" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
-    	<ant antfile="build.xml" target="clean" dir="lib" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/> 
     </target>
 	
 </project>

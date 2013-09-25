@@ -37,4 +37,4 @@ if [ ! -e ./build/REXOS/Gatewayserver/src/Main.class ]; then
 	run_build_script
 fi
 
-java -classpath ./build/REXOS/Gatewayserver/src Main
+java -cp ./build/REXOS/Gatewayserver/src/gatewayserver gatewayserver.Main

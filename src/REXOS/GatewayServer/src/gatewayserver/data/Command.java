@@ -1,4 +1,4 @@
-package com.gatewayserver.dataclasses;
+package gatewayserver.data;
 import com.google.gson.annotations.SerializedName;
 
 /**

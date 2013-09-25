@@ -1,3 +1,7 @@
+package gatewayserver;
+
+
+
 import jade.cli.CLICommand;
 import jade.cli.CLIManager;
 import jade.core.ContainerID;
