@@ -114,7 +114,17 @@ namespace rexos_utilities{
         std::istringstream i(s);
         double x;
         if (!(i >> x))
-            return 0;
+            
         return x;
+    }
+
+    std::string doubleToString(double x){
+        std::ostringstream o;
+
+        if (!(o << x)) {
+            return "";
+        }
+
+        return o.str();
     }
 }

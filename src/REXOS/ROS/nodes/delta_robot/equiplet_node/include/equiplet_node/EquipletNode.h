@@ -105,6 +105,9 @@ private:
 	 * @var BlackboardCppClient  *blackboardClient
 	 * Client to read from blackboard
 	 **/
+	Blackboard::BlackboardCppClient *directMoveBlackBoardClient;
+	Blackboard::BlackboardSubscription* directMoveSubscription;
+
 
 	Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
 	Blackboard::FieldUpdateSubscription* equipletStepSubscription;

@@ -31,9 +31,9 @@
 
 #pragma once
 
-#include "ros/ros.h"
-#include "delta_robot_node/Motion.h"
+#include <ros/ros.h>
 #include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
+#include <rexos_datatypes/InstructionData.h>
 
 namespace keyboard_control_node {
 
@@ -47,7 +47,16 @@ namespace keyboard_control_node {
 		static void quit(int sig);
 		void readInputFromKeyBoard(int inputCharacter);
 		void run();
-		void writeToBlackBoard(delta_robot_node::Motion);
+		void writeToBlackBoard(std::string x, std::string y, std::string z, std::string acceleration);
+		float currentXPos;
+		float currentYPos;
+		float currentZPos;
+		
+		/**
+		 * @var double maxAcceleration
+		 * The maxAcceleration of the effector in millimeters per second.
+		 **/
+		std::string maxAcceleration;
 		/**
 		 * @var char KEYCODE_UP
 		 * The ascii representation of the up key on the keyboard.
@@ -100,19 +109,13 @@ namespace keyboard_control_node {
 		 * @var int keyboardNumber
 		 * The number of the keyboard, e.g.: 0 is the primary keyboard.
 		 **/
-		static const int keyboardNumber = 0;
-
-		/**
-		 * @var double maxAcceleration
-		 * The maxAcceleration of the effector in millimeters per second.
-		 **/
-		static const double maxAcceleration = 50.0;
+		static const int KEYBOARDNUMBER = 0;
 
 		/**
 		 * @var double step
 		 * The size in millimeters per movement.
 		 **/
-		static const double step = 1.0;
+		static constexpr double STEP = 1.0;
 
 		/**
 		 * A terminal interface data struct.
@@ -120,6 +123,7 @@ namespace keyboard_control_node {
 		struct termios oldTerminalSettings, newTerminalSettings;
 		Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
 		char inputCharacter;
+		rexos_datatypes::InstructionData * instructionData;
 
 	};
 

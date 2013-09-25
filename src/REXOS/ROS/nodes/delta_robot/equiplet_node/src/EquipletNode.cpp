@@ -51,6 +51,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 		EquipletStateMachine(nameFromId(id),id),
 		equipletStepBlackboardClient(NULL),
 		equipletCommandBlackboardClient(NULL),
+		directMoveBlackBoardClient(NULL),
 		scada(this, &moduleRegistry) 
 {
 	std::cout << "EquipletNode_Constructor called." << std::endl;
@@ -59,15 +60,21 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 	equipletStepSubscription->addOperation(Blackboard::SET);
 	equipletStepBlackboardClient->subscribe(*equipletStepSubscription);
 	subscriptions.push_back(equipletStepSubscription);
+	sleep(1);
 
 	equipletCommandBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_COMMANDS);
 	equipletCommandSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
     equipletCommandSubscriptionSet = new Blackboard::BasicOperationSubscription(Blackboard::UPDATE, *this);
 	equipletCommandBlackboardClient->subscribe(*equipletCommandSubscription);
-	sleep(1);
-    equipletCommandBlackboardClient->subscribe(*equipletCommandSubscriptionSet);
 	subscriptions.push_back(equipletCommandSubscription);
 	subscriptions.push_back(equipletCommandSubscriptionSet);
+	sleep(1);
+
+	directMoveBlackBoardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ1", "DirectMoveStepsBlackBoard");
+	directMoveSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
+	directMoveBlackBoardClient->subscribe(*directMoveSubscription);
+	subscriptions.push_back(directMoveSubscription);
+	sleep(1);
 
 	equipletStateBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_STATE);
 
@@ -169,6 +176,19 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	    }
             i++;
         }
+	}
+	else if(&subscription == directMoveSubscription)
+	{
+		mongo::OID targetObjectId;
+		oplogEntry.getTargetObjectId(targetObjectId);
+		JSONNode n = libjson::parse(directMoveBlackBoardClient->findDocumentById(targetObjectId).jsonString());
+		
+		std::cout << "Got an update! : " << directMoveBlackBoardClient->findDocumentById(targetObjectId).jsonString() << std::endl;
+
+		ModuleProxy *prox = moduleRegistry.getModule(1);
+		prox->setInstruction(targetObjectId.toString(), n);
+
+		//still need to remove the step tho
 	}
 }
 
