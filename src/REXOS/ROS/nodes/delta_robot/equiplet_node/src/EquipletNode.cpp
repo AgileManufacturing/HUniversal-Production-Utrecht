@@ -180,13 +180,14 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	else if(&subscription == directMoveSubscription)
 	{
 		mongo::OID targetObjectId;
-		oplogEntry.getTargetObjectId(targetObjectId);
-		JSONNode n = libjson::parse(directMoveBlackBoardClient->findDocumentById(targetObjectId).jsonString());
+		oplogEntry.getTargetObjectId(targetObjectId);		
+		JSONNode n = libjson::parse(equipletStepBlackboardClient->findDocumentById(targetObjectId).jsonString());
+	    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
 		
 		std::cout << "Got an update! : " << directMoveBlackBoardClient->findDocumentById(targetObjectId).jsonString() << std::endl;
 
 		ModuleProxy *prox = moduleRegistry.getModule(1);
-		prox->setInstruction(targetObjectId.toString(), n);
+		prox->setInstruction(targetObjectId.toString(), step->getInstructionData().getJsonNode());
 
 		//still need to remove the step tho
 	}
