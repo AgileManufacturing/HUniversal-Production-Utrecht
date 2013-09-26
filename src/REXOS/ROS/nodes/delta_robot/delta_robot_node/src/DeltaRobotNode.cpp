@@ -125,38 +125,28 @@ deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
 
 void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
 	std::cout << "Instruction received on deltarobot. Parsing.." << goal->json << std::endl;
-
 	JSONNode n = libjson::parse(goal->json);
-
-	std::cout << "Setting result" << std::endl;
 	rexos_statemachine::SetInstructionResult result_;
-
-	std::cout << "Setting result id." << std::endl;
 	result_.OID = goal->OID;
 
-	std::cout << "Iterating." << std::endl;
     JSONNode::const_iterator i = n.begin();
 
-	std::cout <<  "trying to compare payload: " << std::endl;
-	std::cout << "String comparing: " << i[4].name() << std::endl;
-	std::cout << "String comparing: " << i[4].name().c_str() << std::endl;
-    //We want to retrieve the payload from the msg.
-	if (strcmp(i[4].name().c_str(), "payload") == 0){
+    while (i != n.end()){
+        const char * node_name = i -> name().c_str();
+        
+        if (strcmp(node_name, "payload") == 0){
 
-			std::cout << "Parsing point." << std::endl;
-			Point p = parsePoint(i[4]);
+        	std::cout << "Parsing point." << std::endl;
+			Point p = parsePoint(*i);
 
-			std::cout << "Moving to point: x " << p.x << " y " << p.y << " z " << p.z << std::endl;
 			if(moveToPoint(p.x, p.y, p.z, p.maxAcceleration)){
-				//Move is succesfull, set the result.
     			setInstructionActionServer.setSucceeded(result_);
 			} else {
 				ROS_INFO("Failed moving to point");
     			setInstructionActionServer.setAborted(result_);
 			}
-			
-    } else {
-    	setInstructionActionServer.setAborted(result_);
+        }
+        ++i;
     }
 }
 

@@ -156,8 +156,7 @@ void KeyBoardControlNode::readInputFromKeyBoard(int inputCharacter){
 }
 
 void KeyBoardControlNode::writeToBlackBoard(std::string x, std::string y, std::string z, std::string acceleration){
-	//Need to include delta_robot_node for motion, and 
-	//InstructionData for the instructiondata
+	//Need to include InstructionData for the instructiondata
 	//Dont forget to set in package & makelist!
 
 	std::map<std::string, std::string> look_up_parameters;
