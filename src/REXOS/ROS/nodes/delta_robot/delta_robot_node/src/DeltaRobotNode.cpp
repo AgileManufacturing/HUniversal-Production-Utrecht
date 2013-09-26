@@ -141,13 +141,13 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 
 			if(moveToPoint(p.x, p.y, p.z, p.maxAcceleration)){
     			setInstructionActionServer.setSucceeded(result_);
-			} else {
-				ROS_INFO("Failed moving to point");
-    			setInstructionActionServer.setAborted(result_);
+    			return;
 			}
         }
         ++i;
     }
+	ROS_INFO("Failed moving to point");
+	setInstructionActionServer.setAborted(result_);
 }
 
 
