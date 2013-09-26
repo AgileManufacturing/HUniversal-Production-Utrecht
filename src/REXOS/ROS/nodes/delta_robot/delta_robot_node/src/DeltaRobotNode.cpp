@@ -133,7 +133,8 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 
     while (i != n.end()){
         const char * node_name = i -> name().c_str();
-        
+	    std::cout << "Node name: " << node_name << std::endl;
+
         if (strcmp(node_name, "payload") == 0){
 
         	std::cout << "Parsing point." << std::endl;
