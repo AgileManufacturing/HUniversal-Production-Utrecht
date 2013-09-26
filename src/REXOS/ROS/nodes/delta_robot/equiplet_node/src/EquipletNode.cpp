@@ -185,9 +185,17 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 
 		std::cout << "Got an update! : " << directMoveBlackBoardClient->findDocumentById(targetObjectId).jsonString() << std::endl;
 
-		ModuleProxy *prox = moduleRegistry.getModule(1);
-		prox->setInstruction(targetObjectId.toString(), n);
+		JSONNode::const_iterator i = n.begin();
 
+		ModuleProxy *prox = moduleRegistry.getModule(1);
+
+	    while (i != n.end()){
+	        const char * node_name = i -> name().c_str();
+	        if (strcmp(node_name, "instructionData") == 0){
+	        	prox->setInstruction(targetObjectId.toString(), *i);
+	        }
+	        ++i;
+	    }
 		//still need to remove the step tho
 	}
 }
