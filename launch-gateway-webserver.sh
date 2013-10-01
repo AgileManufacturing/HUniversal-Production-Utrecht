@@ -32,9 +32,26 @@ fi
 # Check wether the class files exist for the gateway server
 # In case they do not, invoke ant to create them.
 
-if [ ! -e ./build/REXOS/Gatewayserver/src/Main.class ]; then
-	echo "Class files do not exist in ./build/REXOS/Gatewayserver/src, running ant now"
-	run_build_script
+#if [ ! -e ./build/REXOS/Gatewayserver/src/Main.class ]; then
+#	echo "Class files do not exist in ./build/REXOS/Gatewayserver/src, running ant now"
+#	run_build_script
+#fi
+
+run_build_script
+
+if [ -e ./gatewayserver.jar ]; then
+	rm ./gatewayserver.jar
 fi
 
-java -cp ./build/REXOS/Gatewayserver/src/gatewayserver gatewayserver.Main
+rootDir=$PWD
+
+cd build/REXOS/Gatewayserver/src/gatewayserver
+
+jar cvfm $rootDir/gatewayserver.jar ../../.manifest gatewayserver
+
+#-C $rootDir/src/REXOS/GatewayServer/lib gson-2.2.4.jar -C $rootDir/src/REXOS/GatewayServer/lib jackson-core-2.2.0.jar -C $rootDir/src/REXOS/GatewayServer/lib jackson-databind-2.2.0.jar -C $rootDir/src/REXOS/GatewayServer/lib jackson-annotations-2.2.0.jar -C $rootDir/src/REXOS/GatewayServer/lib jade.jar -C $rootDir/src/REXOS/GatewayServer/lib jadeMisc.jar
+
+cd $rootDir
+
+#java -cp ./src/REXOS/GatewayServer/lib/*.jar:./gatewayserver.jar gatewayserver.Main
+java -jar ./gatewayserver.jar

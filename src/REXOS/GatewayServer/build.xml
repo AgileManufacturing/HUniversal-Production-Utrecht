@@ -8,6 +8,10 @@
 	<property name="buildpath" value="${repo-root}/build/REXOS/Gatewayserver"/>
 	<!-- Specify the location of the export classpath file. -->
 	<property name="export-classpath-file" value="${buildpath}/.export-classpath"/>
+	<!-- Specify the location of the manifest file. -->
+	<property name="manifest-file" value="${buildpath}/.manifest"/>
+	<!-- Specify the location of the libraries for creating the manifest file. -->
+	<property name="library-directory" value="src/REXOS/GatewayServer/lib" />
 	<!-- Add a reference to the global environment -->
 	<property environment="env"/>
 
@@ -75,10 +79,24 @@
 		<antcall target="write-path-to-export-file"/>
 	</target>
 
+	<!-- Target for adding a path to manifest file if it isn't already in there. Requires param path.-->
+	<target name="add-path-to-manifest">
+		<condition property="path.inFile">	
+			<resourcecontains resource="${manifest-file}" substring="${path}" />
+		</condition>
+		<antcall target="write-path-to-manifest-file"/>
+	</target>
+
 	<!-- Target for writing a path to the export classpath file. Requires param path and path.inFile. -->
 	<target name="write-path-to-export-file" unless="${path.inFile}">
 		<echo file="${export-classpath-file}" append="true" message=":${path}"/>
 		<echo message="adding ${path} to classpath"/>
+	</target>
+
+	<!-- Target for writing a path to the manifest file. Requires param path and path.inFile. -->
+	<target name="write-path-to-manifest-file" unless="${path.inFile}">
+		<echo file="${manifest-file}" append="true" message=" ${path}"/>
+		<echo message="adding ${path} to manifest"/>
 	</target>
 
 	<!-- Target for adding a library jar to the export classpath file if it isn't already in there. Requires param jar. -->
@@ -89,11 +107,34 @@
 		</antcall>
 	</target>
 
+	<!-- Target for adding a library jar to the manifest file if it isn't already in there. Requires param jar. -->
+	<target name="add-jar-to-manifest">
+		<echo>*** Adding JAR to Manifest ${jar} -- ${gatewayserver-java-root}/lib/${jar} ***${line.separator}</echo>
+		<antcall target="add-path-to-manifest">
+			<param name="path" value="${library-directory}/${jar}"/>
+		</antcall>
+	</target>
+
+	<!-- Target for adding static information to the manifest file -->
+	<target name="create-manifest-file">
+		<echo file="${manifest-file}" append="false" message="Class-Path:" />
+		<antcall target="add-jar-to-manifest"><param name="jar" value="gson-2.2.4.jar"/></antcall>
+		<antcall target="add-jar-to-manifest"><param name="jar" value="jade.jar"/></antcall>
+		<antcall target="add-jar-to-manifest"><param name="jar" value="jackson-annotations-2.2.0.jar"/></antcall>
+		<antcall target="add-jar-to-manifest"><param name="jar" value="jackson-core-2.2.0.jar"/></antcall>
+		<antcall target="add-jar-to-manifest"><param name="jar" value="jackson-databind-2.2.0.jar"/></antcall>
+		<antcall target="add-jar-to-manifest"><param name="jar" value="jadeMisc.jar"/></antcall>
+		<echo file="${manifest-file}" append="true" message="${line.separator}Main-Class: gatewayserver.Main${line.separator}" />
+	</target>
+
 	<!-- default target, handles the classpath file and calls the allpackages target -->
 	<target name="all">
 		<mkdir dir="${buildpath}"/>
 		<delete file ="${buildpath}/.export-classpath"/> 
  		<touch file ="${buildpath}/.export-classpath"/> 
+		<delete file="${buildpath}/.manifest"/>
+		<touch file="${buildpath}/.manifest"/>
+		<antcall target="create-manifest-file"/>
 		<antcall target="allpackages"/>
 	</target>
 	
@@ -116,6 +157,7 @@
 	<!-- clean target, cleans rexos and tools -->
 	<target name="clean">    	
 		<delete file="${export-classpath-file}" />
+		<delete file="${manifest-file}" />
     	<delete dir="${buildpath}" />
     	<ant antfile="build.xml" target="clean" dir="src" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
     </target>
