@@ -197,7 +197,7 @@ foundCorners++;
 	
 	
 	
-	for(int i = 0; i < collectionSize; i++){
+/*	for(int i = 0; i < collectionSize; i++){
 		if(message.collection[i].value == "GC4x4MB_1"){
 			Vector2* points = new Vector2[3];
 			for(int j = 0; j < 3; j++){
@@ -250,7 +250,7 @@ foundCorners++;
 	}
 
 
-	writeToBlackBoard(rexos_utilities::doubleToString(currentXPos), rexos_utilities::doubleToString(currentYPos), rexos_utilities::doubleToString(currentZPos), maxAcceleration);
+	writeToBlackBoard(rexos_utilities::doubleToString(currentXPos), rexos_utilities::doubleToString(currentYPos), rexos_utilities::doubleToString(currentZPos), maxAcceleration);*/
 
 
 
@@ -270,7 +270,7 @@ foundCorners++;
 
 
 void PartLocatorNode::writeToBlackBoard(std::string x, std::string y, std::string z, std::string acceleration){
-	//Need to include InstructionData for the instructiondata
+	/*//Need to include InstructionData for the instructiondata
 	//Dont forget to set in package & makelist!
 
 	std::map<std::string, std::string> look_up_parameters;
@@ -299,7 +299,7 @@ void PartLocatorNode::writeToBlackBoard(std::string x, std::string y, std::strin
 
 	if(equipletStepBlackboardClient->insertDocument(instructionData->toJSONString())) {
 		std::cout << "printed: " << instructionData->toJSONString() << "to blackboard." << std::endl;
-	}
+	}*/
 
 }
 

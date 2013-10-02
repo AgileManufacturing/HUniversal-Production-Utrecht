@@ -99,6 +99,52 @@ namespace rexos_vision{
 			return;
 		}
 	}
+	
+	void QRCodeDetector::detectQRCodes(cv::Mat& image, std::vector<rexos_datatypes::QrCode> &qrCodes, cv::TermCriteria criteria){
+		try{
+			// create an image in zbar with:
+			// width
+			// height
+			// fourcc format "y800" (simple, single y plane for monchrome images)
+			// pointer to image.data
+			// area of the image
+			zbar::Image zbarImage(image.cols, image.rows, "Y800", (void*)image.data, image.cols * image.rows);
+
+			int amountOfScannedResults = scanner.scan(zbarImage);
+
+			if(amountOfScannedResults > 0){
+
+				zbar::Image::SymbolIterator it = zbarImage.symbol_begin();
+				for(; it!=zbarImage.symbol_end(); ++it){
+					// Add all "position" corners of a qr code to a vector
+					std::vector<cv::Point2f> corners;
+					corners.push_back(cv::Point2f(it->get_location_x(1), it->get_location_y(1)));
+					corners.push_back(cv::Point2f(it->get_location_x(0), it->get_location_y(0)));
+					corners.push_back(cv::Point2f(it->get_location_x(3), it->get_location_y(3)));
+
+					// windowsSize is half of the sidelength of the window around every coordinate to check by cornerSubPix.
+					// No idea why the distance between two corners is divided by 65.0 (effectively), but the result is:
+					//  65 px distance = (1 x 1) windowsSize > ( 3 x  3) window
+					// 130 px distance = (2 x 2) windowsSize > ( 5 x  5) window
+					// 195 px distance = (3 x 3) windowsSize > ( 7 x  7) window
+					// 260 px distance = (4 x 4) windowsSize > ( 9 x  9) window
+					// 325 px distance = (5 x 5) windowsSize > (11 x 11) window
+					// 390 px distance = (6 x 6) windowsSize > (13 x 13) window
+					// 455 px distance = (7 x 7) windowsSize > (15 x 15) window
+					// 520 px distance = (8 x 8) windowsSize > (17 x 17) window
+					// etc...
+					 float windowsSize = 2.0 * (rexos_datatypes::QrCode::distance(corners[0], corners[2]) / 130.0);
+
+					// The cornerSubPix function iterates to find the sub-pixel accurate location of corners or radial saddle points. Corners is now updated!
+					cv::cornerSubPix(image, corners, cv::Size(windowsSize,windowsSize), cv::Size(-1,-1), criteria);
+
+					qrCodes.push_back(rexos_datatypes::QrCode(it->get_data(), corners));
+				}
+			}
+		} catch (std::exception &e){
+			return;
+		}
+	}
 
 	/**
 	 * Detects zero to multiple reconfigure QR codes and returns their string data.

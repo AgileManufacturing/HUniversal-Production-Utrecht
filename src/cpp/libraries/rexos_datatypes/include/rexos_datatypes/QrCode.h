@@ -1,6 +1,6 @@
 /**
- * @file Crate.h
- * @brief Container class for a single product crate.
+ * @file QrCode.h
+ * @brief Container class for a single product QrCode.
  * @date Created: 2011-11-11
  * @date Revisioned: 2012-10-22
  *
@@ -31,8 +31,8 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef CRATE_H_
-#define CRATE_H_
+#ifndef QrCode_H_
+#define QrCode_H_
 
 #include <stdlib.h>
 #include <opencv2/core/core.hpp>
@@ -41,54 +41,54 @@
 
 namespace rexos_datatypes{
 	/**
-	 * A crate, with name, location and status.
+	 * A QrCode, with name, location and status.
 	 **/
-	class Crate{
+	class QrCode{
 	public:
 		/**
 		 * @var std::string name
-		 * The crate identifier.
+		 * The QrCode identifier.
 		 **/
 		std::string name;
 		/**
 		 * @var bool oldSituation
-		 * Indicates whether the crate has been recognized in the previous cameraFrame.
+		 * Indicates whether the QrCode has been recognized in the previous cameraFrame.
 		 **/
 		bool oldSituation;
 		/**
 		 * @var bool newSituation
-		 * Indicates whether the crate has been recognized in the current cameraFrame.
+		 * Indicates whether the QrCode has been recognized in the current cameraFrame.
 		 **/
 		bool newSituation;
 		/**
 		 * @var bool exists
-		 * Indicates whether the crate has already been found (and not removed since).
+		 * Indicates whether the QrCode has already been found (and not removed since).
 		 **/
 		bool exists;
 		/**
 		 * @var bool stable
-		 * Crate is not in motion if true, in motion if false.
+		 * QrCode is not in motion if true, in motion if false.
 		 **/
 		bool stable;
 		/**
 		 * @var int framesLeft
-		 * Number of frames left for a crate to reach a stable state.
+		 * Number of frames left for a QrCode to reach a stable state.
 		 **/
 		int framesLeft;
 
 		/**
-		 * Indicates whether the crate is on the current cameraFrame, and if whether it is moving or stable.
+		 * Indicates whether the QrCode is on the current cameraFrame, and if whether it is moving or stable.
 		 **/
-		enum crate_state{
+		enum QrCode_state{
 			state_stable = 1, state_moving = 2, state_non_existing = 3
 		};
 
-		Crate();
-		Crate(const std::vector<cv::Point2f>& points);
-		Crate(std::string name, const std::vector<cv::Point2f>& points);
-		Crate(const Crate& crate);
+		QrCode();
+		QrCode(const std::vector<cv::Point2f>& points);
+		QrCode(std::string name, const std::vector<cv::Point2f>& points);
+		QrCode(const QrCode& QrCode);
 
-		virtual ~Crate();
+		virtual ~QrCode();
 
 		/**
 		 * Calculate distance between two fiducial points.
@@ -109,7 +109,7 @@ namespace rexos_datatypes{
 		void setPoints(std::vector<cv::Point2f>& points);
 		void draw(cv::Mat& image);
 
-		crate_state getState();
+		QrCode_state getState();
 
 	private:
 		/**
@@ -119,9 +119,9 @@ namespace rexos_datatypes{
 		cv::RotatedRect bounds;
 		/**
 		 * @var std::vector<cv::Point2f> points
-		 * Fiducial points belonging to the crate.
+		 * Fiducial points belonging to the QrCode.
 		 **/
 		std::vector<cv::Point2f> points;
 	};
 }
-#endif /* CRATE_H_ */
+#endif /* QrCode_H_ */
