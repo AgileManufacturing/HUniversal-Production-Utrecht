@@ -135,7 +135,7 @@ bool CameraNode::autoWhiteBalance(camera_node::AutoWhiteBalance::Request& reques
 	}
 }
 
-bool CameraNode::fishEyeCorrection(camera_node::FishEyeCorrection::Request& request, camera_node::FishEyeCorrection::Response& response) {
+bool CameraNode::fishEyeCorrection(camera_node::fishEyeCorrection::Request& request, camera_node::fishEyeCorrection::Response& response) {
 	std::cout << "[DEBUG] Service fishEyeCorrection " << (bool) request.enable << std::endl;
 	
 	if(cam) {

@@ -51,25 +51,46 @@ namespace Camera {
 		void addPoints(const std::vector<cv::Point2f>& imageCorners, const std::vector<cv::Point3f>& objectCorners);
 		double calibrate(cv::Size &imageSize);
 	public:
-		int createMatrices(const cv::Size &boardSize, const std::vector<cv::Mat*> images);
 		/**
-		 * Creates a matrix from all the images located in imageDir and stores it in the XMl file
+		 * Creates the matrices from all the images in the vector
 		 *
-		 * @param imageDir the directory which contains the image to rectify
 		 * @param boardSize amount of squares horizontally -1, amount of squares vertically -1
-		 * @param XMLName the name of the xml file were the matrix for rectification is written to
+		 * @param images the vector containing all the cv:mat images. The images must be MONO8 format.
 		 * @return the amount of images which are successfully processed
 		 */
+		int createMatrices(const cv::Size &boardSize, const std::vector<cv::Mat*> images);
+		/**
+		 * Loads the cameraMatrix and distCoeffs "matrix" from the params and initializes the rectifier
+		 *
+		 * @param cameraMatrix a 3x3 cv::mat matrix. This is a standard translation/rotation/scale matrix
+		 * @param distCoeffs a 5x1 cv::mat matrix.
+		 */
 		void loadMatrices(const cv::Mat& cameraMatrix, const cv::Mat& distCoeffs);
+		/**
+		 * Sets the image size and initializes the rectifier
+		 *
+		 * @param imageSize the size of the input images
+		 */
 		void setImageSize(const cv::Size &imageSize);
-		bool createXML(const char* imageDir, const char* XMLName);
+		/**
+		 * Creates the matrices from all the images in the vector and writes the xml file containing these matrices
+		 * 
+		 * @param boardSize amount of squares horizontally -1, amount of squares vertically -1
+		 * @param images the vector containing all the cv:mat images. The images must be MONO8 format.
+		 * @param XMLName the path to the xml file which will saved
+		 * @return true if succesful
+		 */
+		bool createXML(const char* XMLName);
+		/**
+		 * Creates the matrices from the xml file containing these matrices
+		 * 
+		 * @param XMLName the path to the xml file which will loaded
+		 * @return true if succesful
+		 */
 		bool loadXML(const char* XMLName);
 		/**
-		 * this function loads a matrix to rectify
+		 * this function initializes the rectifier
 		 *
-		 * @param XMLName the name of the XML
-		 * @param imageSize the size of the image
-		 * @return <i>false</i> if XMLName is not available
 		 */
 		void initRectify();
 		/**

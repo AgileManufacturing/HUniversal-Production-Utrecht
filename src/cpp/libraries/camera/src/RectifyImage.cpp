@@ -56,9 +56,8 @@ namespace Camera {
 	int RectifyImage::createMatrices(const cv::Size &boardSize, const std::vector<cv::Mat*> images) {
 		std::vector<cv::Point2f> imageCorners;
 		std::vector<cv::Point3f> objectCorners;
-
-		std::cout << "Starting" << std::endl;
 		
+		// openCV needs to know the locations of the points on the chessboard.
 		for (int i = 0; i < boardSize.height; i++) {
 			for (int j = 0; j < boardSize.width; j++) {
 				objectCorners.push_back(cv::Point3f(i, j, 0.0f));
@@ -71,9 +70,9 @@ namespace Camera {
 
 			if (image.data) {
 				bool found = findChessboardCorners(image, boardSize, imageCorners);
-				std::cout << "found: " << found << std::endl;
 
 				if (found) {
+					// find a more precise location using subpixel information (color transition)
 					cv::cornerSubPix(image, imageCorners, cv::Size(4, 4), cv::Size(-1, -1),
 					        cv::TermCriteria(cv::TermCriteria::MAX_ITER + cv::TermCriteria::EPS, 30, 0.1));
 
@@ -85,15 +84,13 @@ namespace Camera {
 			}
 		}
 
-		std::cout << "Successes: " << successes << std::endl;
-		if (!successes) {
-			return -1;
+		if (successes == 0) {
+			return successes;
 		}
 
 		cv::Size imageSize(images[0]->cols, images[0]->rows);
-		std::cout << "Calibrating" << std::endl;
+		
 		calibrate(imageSize);
-		//image.release();
 		
 		return successes;
 	}
@@ -106,19 +103,11 @@ namespace Camera {
 
 	void RectifyImage::setImageSize(const cv::Size &imageSize) {
 		this->imageSize = imageSize;
+		initRectify();
 	}
 
 
-	bool RectifyImage::createXML(const char* imageDir, const char* XMLName) {
-
-
-		if (!boost::filesystem::is_directory(imageDir)) {
-			return false;
-		}
-
-
-
-
+	bool RectifyImage::createXML(const char* XMLName) {
 		cv::FileStorage fs(XMLName, cv::FileStorage::WRITE);
 		fs << "cameraMatrix" << cameraMatrix;
 		fs << "distCoeffs" << distCoeffs;

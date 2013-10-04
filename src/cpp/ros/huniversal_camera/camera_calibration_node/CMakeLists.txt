@@ -3,7 +3,7 @@ project(camera_calibration_node)
 
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation camera_control_node camera_node camera image_transport)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation camera_node camera image_transport)
 find_package(OpenCV REQUIRED COMPONENTS)
 find_package(cv_bridge REQUIRED COMPONENTS)
 
@@ -20,7 +20,7 @@ generate_messages (
 catkin_package(
 INCLUDE_DIRS include
 LIBRARIES  
-CATKIN_DEPENDS roscpp std_msgs camera_control_node camera_node camera image_transport
+CATKIN_DEPENDS roscpp std_msgs camera_node camera image_transport
 DEPENDS cv_bridge)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

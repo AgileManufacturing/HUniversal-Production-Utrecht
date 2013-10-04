@@ -1,3 +1,6 @@
+# code lite
+*.session
+
 # Compiled Object files
 *.slo
 *.lo

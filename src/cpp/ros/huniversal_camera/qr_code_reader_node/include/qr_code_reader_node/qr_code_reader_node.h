@@ -37,7 +37,6 @@
 #include <rexos_vision/QRCodeDetector.h> 
 
 #include <camera_node/camera_node.h>
-#include <camera_calibration_node/CalibrateLens.h>
 
 class QrCodeReaderNode {
 public:

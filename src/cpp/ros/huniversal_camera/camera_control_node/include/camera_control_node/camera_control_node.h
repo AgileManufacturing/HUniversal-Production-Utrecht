@@ -59,6 +59,9 @@ private:
 	ros::ServiceClient increaseExposureClient;
 	ros::ServiceClient decreaseExposureClient;
 	ros::ServiceClient autoWhiteBalanceClient;
+	ros::ServiceClient fishEyeCorrectionClient;
+	
+	ros::ServiceClient calibrateLensClient;
 	std_srvs::Empty emptyService;
 };
 

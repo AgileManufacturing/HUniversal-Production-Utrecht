@@ -46,7 +46,7 @@
 #include <camera/RectifyImage.h>
 #include <camera/unicap_cv_bridge.h>
 #include <camera_node/AutoWhiteBalance.h>
-#include <camera_node/FishEyeCorrection.h>
+#include <camera_node/fishEyeCorrection.h>
 #include <camera_node/CorrectionMatrices.h>
 
 #include <iostream>
@@ -62,8 +62,8 @@ public:
 	bool decreaseExposure(std_srvs::Empty::Request &request, std_srvs::Empty::Response &response);
 	bool autoWhiteBalance(camera_node::AutoWhiteBalance::Request &request,
 	        camera_node::AutoWhiteBalance::Response &response);
-	bool fishEyeCorrection(camera_node::FishEyeCorrection::Request& request, 
-			camera_node::FishEyeCorrection::Response& response);
+	bool fishEyeCorrection(camera_node::fishEyeCorrection::Request& request, 
+			camera_node::fishEyeCorrection::Response& response);
 	bool correctionMatrices(camera_node::CorrectionMatrices::Request& request,
 			camera_node::CorrectionMatrices::Response& response);
 

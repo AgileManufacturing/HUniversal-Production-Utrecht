@@ -29,15 +29,18 @@
  **/
 
 #include "camera_calibration_node/camera_calibration_node.h"
+#include "camera_calibration_node/Services.h"
+
 #include "camera_node/Services.h"
 #include "camera_node/CorrectionMatrices.h"
+
 #include <camera/RectifyImage.h>
 
 #include <opencv/cv.h>
-#include <sensor_msgs/image_encodings.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
 
+#include <sensor_msgs/image_encodings.h>
 #include <image_transport/image_transport.h>
 #include "sensor_msgs/Image.h"
 
@@ -47,43 +50,44 @@ CameraCalibrationNode::CameraCalibrationNode() :
 
 	it(nodeHandle)
 {
-	calibrateLensServer = nodeHandle.advertiseService("CalibrateLens", &CameraCalibrationNode::calibrateLens, this);
-	calibrateEffectorServer = nodeHandle.advertiseService("CalibrateEffector", &CameraCalibrationNode::calibrateEffector, this);
+	calibrateLensServer = nodeHandle.advertiseService(camera_calibration_node_services::CALIBRATE_LENS, &CameraCalibrationNode::calibrateLens, this);
+	calibrateEffectorServer = nodeHandle.advertiseService(camera_calibration_node_services::CALIBRATE_EFFECTOR, &CameraCalibrationNode::calibrateEffector, this);
 }
 
 void CameraCalibrationNode::run() {
-	ROS_INFO("Waiting for calibrationStart");
-	ros::spin();
+	while(true){
+		ROS_INFO("Waiting for calibrationStart");
+		ros::spinOnce();
+	}
 }
 
 bool CameraCalibrationNode::calibrateLens(
-	camera_calibration_node::CalibrateLens::Request &request,
-	camera_calibration_node::CalibrateLens::Response &response)
+	camera_calibration_node::calibrateLens::Request &request,
+	camera_calibration_node::calibrateLens::Response &response)
 {
 	framesToCapture = request.frameCount;
 	image_transport::Subscriber sub = it.subscribe("camera/image", 1, &CameraCalibrationNode::handleFrame, this);
 
 	// capture required frames
-	ros::Rate captureRate(2);
+	ros::Rate captureRate(CAPTURE_RATE);
 	while(images.size() < framesToCapture){
 		captureRate.sleep();
 		ros::spinOnce();
 	}
-
+	
 	// createMatrices
-	ROS_INFO("Generating matrices...");
+	ROS_DEBUG("Generating matrices...");
 	Camera::RectifyImage rectifier;
 	rectifier.createMatrices(cv::Size(6, 9), images);
 	
-	ROS_INFO("Sending matrices...");
-	std::cout << "Dist Coeffs: " << rectifier.distCoeffs << std::endl;
-	std::cout << "Camera matrix: " << rectifier.cameraMatrix << std::endl;
+	ROS_DEBUG("Sending matrices...");
+	ROS_INFO_STREAM("Dist Coeffs:" << std::endl		 << rectifier.distCoeffs);
+	ROS_INFO_STREAM("Camera matrix:" << std::endl	 << rectifier.cameraMatrix);
 
 	ros::ServiceClient client = nodeHandle.serviceClient<camera_node::CorrectionMatrices>(camera_node_services::CORRECTION_MATRICES);
 	camera_node::CorrectionMatrices serviceCall;
 	
-	std::cout << "sending: " << rectifier.cameraMatrix.at<double>(0, 0);
-
+	// yeah, this is quite ugly
 	serviceCall.request.distCoeffs.push_back(rectifier.distCoeffs.at<double>(0));
 	serviceCall.request.distCoeffs.push_back(rectifier.distCoeffs.at<double>(1));
 	serviceCall.request.distCoeffs.push_back(rectifier.distCoeffs.at<double>(2));
@@ -100,10 +104,9 @@ bool CameraCalibrationNode::calibrateLens(
 	serviceCall.request.cameraMatrix.values[7] = rectifier.cameraMatrix.at<double>(2, 1);
 	serviceCall.request.cameraMatrix.values[8] = rectifier.cameraMatrix.at<double>(2, 2);
 	
-	std::cout << "sending: " << serviceCall.request.distCoeffs[0];
 	client.call(serviceCall);
 
-	ROS_INFO("Cleaning up...");
+	ROS_DEBUG("Cleaning up...");
 	while(images.size() != 0){
 		cv::Mat* image = images.back();
 		images.pop_back();
@@ -111,30 +114,25 @@ bool CameraCalibrationNode::calibrateLens(
 	}
 	
 	sub.shutdown();
-	ROS_INFO("Done");
+	ROS_DEBUG("Done");
 	return true;
 }
-bool CameraCalibrationNode::calibrateEffector(camera_calibration_node::CalibrateEffector::Request &request, camera_calibration_node::CalibrateEffector::Response &response){
+bool CameraCalibrationNode::calibrateEffector(camera_calibration_node::calibrateEffector::Request &request, camera_calibration_node::calibrateEffector::Response &response){
 	return true;
 }
 
 void CameraCalibrationNode::handleFrame(const sensor_msgs::ImageConstPtr& msg) {
 	cv_bridge::CvImagePtr cv_ptr;
-	try {
-		cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8);
-		cv::Mat* image = new cv::Mat(cv_ptr->image);
-		images.push_back(image);
-		//cv::imwrite("/home/agileman/Desktop/images/image.jpg", *image);
-		ROS_INFO("image processed");
-	}
-	catch (cv_bridge::Exception& e)	{
-		ROS_ERROR("cv_bridge exception: %s", e.what());
-	}
+	cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8);
+	cv::Mat* image = new cv::Mat(cv_ptr->image);
+	
+	images.push_back(image);
+	//cv::imwrite("/home/agileman/Desktop/images/image.jpg", *image);
+	ROS_DEBUG("image captured");
 }
 
 int main(int argc, char* argv[]) {
-	ros::init(argc, argv, "cameraCalibrationNode");
-	ROS_DEBUG("Constructing node");
+	ros::init(argc, argv, "camera_calibration_node");
 
 	CameraCalibrationNode node;
 

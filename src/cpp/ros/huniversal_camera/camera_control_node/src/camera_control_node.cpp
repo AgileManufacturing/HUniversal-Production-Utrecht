@@ -3,11 +3,12 @@
  * @brief Remote interface to adjust the camera settings in runtime.
  * @date Created: 2012-10-18
  *
+ * @author Tommas Bakker
  * @author Koen Braham
  * @author Daan Veltman
  *
  * @section LICENSE
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,13 +30,20 @@
  **/
 
 #include "camera_control_node/camera_control_node.h"
+
 #include "camera_node/Services.h"
+#include "camera_node/fishEyeCorrection.h"
+#include "camera_calibration_node/Services.h"
+#include "camera_calibration_node/calibrateLens.h"
+
 #include <iostream>
 
 CameraControlNode::CameraControlNode(int equipletID, int moduleID) :
 		increaseExposureClient(nodeHandle.serviceClient<std_srvs::Empty>(camera_node_services::INCREASE_EXPOSURE)),
 		decreaseExposureClient(nodeHandle.serviceClient<std_srvs::Empty>(camera_node_services::DECREASE_EXPOSURE)),
 		autoWhiteBalanceClient(nodeHandle.serviceClient<camera_node::AutoWhiteBalance>(camera_node_services::AUTO_WHITE_BALANCE)),
+		fishEyeCorrectionClient(nodeHandle.serviceClient<camera_node::fishEyeCorrection>(camera_node_services::FISH_EYE_CORRECTION)),
+		calibrateLensClient(nodeHandle.serviceClient<camera_calibration_node::calibrateLens>(camera_calibration_node_services::CALIBRATE_LENS)),
 		rexos_statemachine::ModuleStateMachine("camera_control_node",equipletID, moduleID, true)
 {
 }
@@ -80,8 +88,25 @@ void CameraControlNode::run() {
 }
 void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Setup transition called");
+	
+	camera_node::fishEyeCorrection serviceCall;
+	serviceCall.request.enable = false;
+	fishEyeCorrectionClient.call(serviceCall);
 
-//	as->setAborted();
+	camera_calibration_node::calibrateLens serviceCall2;
+	serviceCall2.request.frameCount = 2;
+	serviceCall2.request.boardWidth = 9;
+	serviceCall2.request.boardHeight = 6;
+	fishEyeCorrectionClient.call(serviceCall2);
+	if(serviceCall2.response.processedFrames == 0){
+		// we failed :(
+		as->setAborted();
+	}
+	
+	camera_node::fishEyeCorrection serviceCall3;
+	serviceCall3.request.enable = true;
+	fishEyeCorrectionClient.call(serviceCall3);
+
 	as->setSucceeded();
 }
 void CameraControlNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as){

@@ -3,11 +3,10 @@
  * @brief Remote interface to adjust the camera settings in runtime.
  * @date Created: 2012-10-18
  *
- * @author Koen Braham
- * @author Daan Veltman
+ * @author Tommas Bakker
  *
  * @section LICENSE
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * Copyright © 201, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -31,32 +30,55 @@
 #ifndef CAMERACALIBRATIONNODE_H_
 #define CAMERACALIBRATIONNODE_H_
 
+#define CAPTURE_RATE 2
+
 #include "ros/ros.h"
 
 #include <image_transport/image_transport.h>
 
 #include <camera_node/camera_node.h>
-#include <camera_calibration_node/CalibrateLens.h>
-#include <camera_calibration_node/CalibrateEffector.h>
+#include <camera_calibration_node/calibrateLens.h>
+#include <camera_calibration_node/calibrateEffector.h>
 
+/**
+ * @brief this class uses the camera/RectifyImage library to create and upload a matrix in order to rectify an image.
+ * The matrix is generated using the camera feed, which provides images containing chessboard patterns
+ */
 class CameraCalibrationNode {
 public:
+	/**
+	 * Constructs the node and advertices the services
+	 */
 	CameraCalibrationNode();
+	/**
+	 * This "activates" the node (allowing it to do work). This function never returns.
+	 */
 	void run();
-	bool calibrateLens(camera_calibration_node::CalibrateLens::Request &request, camera_calibration_node::CalibrateLens::Response &response);
-	bool calibrateEffector(camera_calibration_node::CalibrateEffector::Request &request, camera_calibration_node::CalibrateEffector::Response &response);
+	/**
+	 * This is the callback function for the calibrateLens service. 
+	 * This method uses the camera/RectifyImage::createMatrices() to calibrate the lens (fisheye correction).
+	 */
+	bool calibrateLens(camera_calibration_node::calibrateLens::Request &request, camera_calibration_node::calibrateLens::Response &response);
+	/**
+	 * This is the callback function for the calibrateEffector service. (not implemented)
+	 */
+	bool calibrateEffector(camera_calibration_node::calibrateEffector::Request &request, camera_calibration_node::calibrateEffector::Response &response);
+	/**
+	 * This is the callback function for the image feed. Any recieved frame is converted and saved.
+	 */
 	void handleFrame(const sensor_msgs::ImageConstPtr& msg);
 private:
 	ros::NodeHandle nodeHandle;
 	ros::ServiceServer calibrateLensServer;
 	ros::ServiceServer calibrateEffectorServer;
-	std_srvs::Empty emptyService;
-
+	
+	/**
+	 * This is the image transport object (allowing the convertion of images)
+	 */
 	image_transport::ImageTransport it;
 
-	bool calibrationIsDone;
 	int32_t framesToCapture;
 	std::vector<cv::Mat*> images;
 };
 
-#endif /* CAMERACONTROLNODE_H_ */
+#endif /* CAMERACALIBRATIONNODE_H_ */
