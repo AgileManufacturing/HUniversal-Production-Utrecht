@@ -1,0 +1,9 @@
+<launch>
+	<group>
+		<node pkg="camera_node" type="camera_node" name="camera_node" args="0 1 /home/t/alex-kut/HUniversal-Production-Utrecht/HUniversal-Production-Utrecht/src/cpp/ros/huniversal_camera/camera_node"/>
+		<node pkg="camera_calibration_node" type="camera_calibration_node" name="camera_calibration_node"/>
+		<node pkg="qr_code_reader_node" type="qr_code_reader_node" name="qr_code_reader_node"/>
+		<node pkg="part_locator_node" type="part_locator_node" name="part_locator_node"/>
+		<node pkg="camera_control_node" type="camera_control_node" name="camera_control_node"/>
+	</group>
+</launch>
