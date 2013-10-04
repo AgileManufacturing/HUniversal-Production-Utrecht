@@ -55,10 +55,8 @@ CameraCalibrationNode::CameraCalibrationNode() :
 }
 
 void CameraCalibrationNode::run() {
-	while(true){
-		ROS_INFO("Waiting for calibrationStart");
-		ros::spinOnce();
-	}
+	ROS_INFO("Waiting for calibrationStart");
+	ros::spin();
 }
 
 bool CameraCalibrationNode::calibrateLens(
@@ -78,33 +76,35 @@ bool CameraCalibrationNode::calibrateLens(
 	// createMatrices
 	ROS_DEBUG("Generating matrices...");
 	Camera::RectifyImage rectifier;
-	rectifier.createMatrices(cv::Size(6, 9), images);
+	int successes = rectifier.createMatrices(cv::Size(6, 9), images);
 	
-	ROS_DEBUG("Sending matrices...");
-	ROS_INFO_STREAM("Dist Coeffs:" << std::endl		 << rectifier.distCoeffs);
-	ROS_INFO_STREAM("Camera matrix:" << std::endl	 << rectifier.cameraMatrix);
+	if(successes != 0){
+		ROS_DEBUG("Sending matrices...");
+		ROS_INFO_STREAM("Dist Coeffs:" << std::endl		 << rectifier.distCoeffs);
+		ROS_INFO_STREAM("Camera matrix:" << std::endl	 << rectifier.cameraMatrix);
 
-	ros::ServiceClient client = nodeHandle.serviceClient<camera_node::CorrectionMatrices>(camera_node_services::CORRECTION_MATRICES);
-	camera_node::CorrectionMatrices serviceCall;
-	
-	// yeah, this is quite ugly
-	serviceCall.request.distCoeffs.push_back(rectifier.distCoeffs.at<double>(0));
-	serviceCall.request.distCoeffs.push_back(rectifier.distCoeffs.at<double>(1));
-	serviceCall.request.distCoeffs.push_back(rectifier.distCoeffs.at<double>(2));
-	serviceCall.request.distCoeffs.push_back(rectifier.distCoeffs.at<double>(3));
-	serviceCall.request.distCoeffs.push_back(rectifier.distCoeffs.at<double>(4));
+		ros::ServiceClient client = nodeHandle.serviceClient<camera_node::CorrectionMatrices>(camera_node_services::CORRECTION_MATRICES);
+		camera_node::CorrectionMatrices serviceCall;
+		
+		// yeah, this is quite ugly
+		serviceCall.request.distCoeffs.push_back(rectifier.distCoeffs.at<double>(0));
+		serviceCall.request.distCoeffs.push_back(rectifier.distCoeffs.at<double>(1));
+		serviceCall.request.distCoeffs.push_back(rectifier.distCoeffs.at<double>(2));
+		serviceCall.request.distCoeffs.push_back(rectifier.distCoeffs.at<double>(3));
+		serviceCall.request.distCoeffs.push_back(rectifier.distCoeffs.at<double>(4));
 
-	serviceCall.request.cameraMatrix.values[0] = rectifier.cameraMatrix.at<double>(0, 0);
-	serviceCall.request.cameraMatrix.values[1] = rectifier.cameraMatrix.at<double>(0, 1);
-	serviceCall.request.cameraMatrix.values[2] = rectifier.cameraMatrix.at<double>(0, 2);
-	serviceCall.request.cameraMatrix.values[3] = rectifier.cameraMatrix.at<double>(1, 0);
-	serviceCall.request.cameraMatrix.values[4] = rectifier.cameraMatrix.at<double>(1, 1);
-	serviceCall.request.cameraMatrix.values[5] = rectifier.cameraMatrix.at<double>(1, 2);
-	serviceCall.request.cameraMatrix.values[6] = rectifier.cameraMatrix.at<double>(2, 0);
-	serviceCall.request.cameraMatrix.values[7] = rectifier.cameraMatrix.at<double>(2, 1);
-	serviceCall.request.cameraMatrix.values[8] = rectifier.cameraMatrix.at<double>(2, 2);
-	
-	client.call(serviceCall);
+		serviceCall.request.cameraMatrix.values[0] = rectifier.cameraMatrix.at<double>(0, 0);
+		serviceCall.request.cameraMatrix.values[1] = rectifier.cameraMatrix.at<double>(0, 1);
+		serviceCall.request.cameraMatrix.values[2] = rectifier.cameraMatrix.at<double>(0, 2);
+		serviceCall.request.cameraMatrix.values[3] = rectifier.cameraMatrix.at<double>(1, 0);
+		serviceCall.request.cameraMatrix.values[4] = rectifier.cameraMatrix.at<double>(1, 1);
+		serviceCall.request.cameraMatrix.values[5] = rectifier.cameraMatrix.at<double>(1, 2);
+		serviceCall.request.cameraMatrix.values[6] = rectifier.cameraMatrix.at<double>(2, 0);
+		serviceCall.request.cameraMatrix.values[7] = rectifier.cameraMatrix.at<double>(2, 1);
+		serviceCall.request.cameraMatrix.values[8] = rectifier.cameraMatrix.at<double>(2, 2);
+		
+		client.call(serviceCall);
+	}
 
 	ROS_DEBUG("Cleaning up...");
 	while(images.size() != 0){
@@ -114,6 +114,7 @@ bool CameraCalibrationNode::calibrateLens(
 	}
 	
 	sub.shutdown();
+	response.processedFrames = successes;
 	ROS_DEBUG("Done");
 	return true;
 }

@@ -103,7 +103,6 @@ namespace Camera {
 
 	void RectifyImage::setImageSize(const cv::Size &imageSize) {
 		this->imageSize = imageSize;
-		initRectify();
 	}
 
 

@@ -94,12 +94,12 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 	fishEyeCorrectionClient.call(serviceCall);
 
 	camera_calibration_node::calibrateLens serviceCall2;
-	serviceCall2.request.frameCount = 2;
+	serviceCall2.request.frameCount = 20;
 	serviceCall2.request.boardWidth = 9;
 	serviceCall2.request.boardHeight = 6;
-	fishEyeCorrectionClient.call(serviceCall2);
+	calibrateLensClient.call(serviceCall2);
 	if(serviceCall2.response.processedFrames == 0){
-		// we failed :(
+		ROS_WARN_STREAM("calibrateLens failed, processedFrame = " << serviceCall2.response.processedFrames);
 		as->setAborted();
 	}
 	

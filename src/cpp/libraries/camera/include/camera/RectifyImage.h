@@ -67,7 +67,7 @@ namespace Camera {
 		 */
 		void loadMatrices(const cv::Mat& cameraMatrix, const cv::Mat& distCoeffs);
 		/**
-		 * Sets the image size and initializes the rectifier
+		 * Sets the image size. Before the modification takes effect, you must initialize the rectifier
 		 *
 		 * @param imageSize the size of the input images
 		 */
