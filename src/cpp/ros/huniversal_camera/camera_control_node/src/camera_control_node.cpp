@@ -32,10 +32,12 @@
 #include "camera_node/Services.h"
 #include <iostream>
 
-CameraControlNode::CameraControlNode() :
+CameraControlNode::CameraControlNode(int equipletID, int moduleID) :
 		increaseExposureClient(nodeHandle.serviceClient<std_srvs::Empty>(camera_node_services::INCREASE_EXPOSURE)),
 		decreaseExposureClient(nodeHandle.serviceClient<std_srvs::Empty>(camera_node_services::DECREASE_EXPOSURE)),
-		autoWhiteBalanceClient(nodeHandle.serviceClient<camera_node::AutoWhiteBalance>(camera_node_services::AUTO_WHITE_BALANCE)) {
+		autoWhiteBalanceClient(nodeHandle.serviceClient<camera_node::AutoWhiteBalance>(camera_node_services::AUTO_WHITE_BALANCE)),
+		rexos_statemachine::ModuleStateMachine("camera_control_node",equipletID, moduleID, true)
+{
 }
 
 void CameraControlNode::increaseExposureCall() {
@@ -60,6 +62,7 @@ inline std::string CameraControlNode::printResult(bool result) {
 }
 
 void CameraControlNode::run() {
+	ros::spin();
 	char key;
 	while(ros::ok() && !(key == 'q' || key == 'Q')) {
 		std::cin >> key;
@@ -75,11 +78,43 @@ void CameraControlNode::run() {
 		}
 	}
 }
+void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO("Setup transition called");
+
+//	as->setAborted();
+	as->setSucceeded();
+}
+void CameraControlNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO("Shutdown transition called");
+	// Should have information about the workspace, calculate a safe spot and move towards it
+	as->setSucceeded();
+}
+
+/**
+ * Transition from Standby to Normal state
+ * @return will be 0 if everything went ok else error 
+ **/
+void CameraControlNode::transitionStart(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO("Start transition called");
+	//The service servers should be set, to provide the normal methods for the equiplet
+	as->setSucceeded();
+}
+/**
+ * Transition from Normal to Standby state
+ * @return will be 0 if everything went ok else error
+ **/
+void CameraControlNode::transitionStop(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO("Stop transition called");
+	//The service servers should be set off, so the equiplet isn't able to set tasks for the module
+		as->setSucceeded();
+	// Go to base (Motors on 0 degrees)
+}
+
 
 int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "cameraControlNode");
 
-	CameraControlNode node;
+	CameraControlNode node(1, 2);
 
 	std::cout << "Welcome to the camera node controller. Using this tool you can adjust camera settings on the fly :)."
 	        << std::endl << "A\tEnable auto white balance" << std::endl << "Z\tDisable auto white balance" << std::endl

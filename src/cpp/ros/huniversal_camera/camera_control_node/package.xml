@@ -17,6 +17,8 @@
   <build_depend>camera_node</build_depend>
   <run_depend>camera_node</run_depend>
 
+  <build_depend>rexos_statemachine</build_depend>
+  <run_depend>rexos_statemachine</run_depend>
   <export>
   </export>
 </package>

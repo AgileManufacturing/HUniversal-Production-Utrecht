@@ -32,10 +32,14 @@
 
 #include "ros/ros.h"
 #include <camera_node/camera_node.h>
+#include <rexos_statemachine/ModuleStateMachine.h>
+#include <rexos_statemachine/Transitions.h>
+#include "equiplet_node/RegisterModule.h"
 
-class CameraControlNode {
+
+class CameraControlNode : public rexos_statemachine::ModuleStateMachine {
 public:
-	CameraControlNode();
+	CameraControlNode(int equipletID, int moduleID);
 
 	void increaseExposureCall();
 	void decreaseExposureCall();
@@ -44,6 +48,11 @@ public:
 	inline std::string printResult(bool result);
 
 	void run();
+	
+		virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
+		virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
+		virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
+		virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
 
 private:
 	ros::NodeHandle nodeHandle;
