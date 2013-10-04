@@ -36,6 +36,14 @@
 #include "camera_calibration_node/Services.h"
 #include "camera_calibration_node/calibrateLens.h"
 
+
+#include "mysql_connection.h"
+#include <cppconn/driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
+#include <cppconn/prepared_statement.h>
+
 #include <iostream>
 
 CameraControlNode::CameraControlNode(int equipletID, int moduleID) :
@@ -89,25 +97,79 @@ void CameraControlNode::run() {
 void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Setup transition called");
 	
-	camera_node::fishEyeCorrection serviceCall;
-	serviceCall.request.enable = false;
-	fishEyeCorrectionClient.call(serviceCall);
+	sql::Driver *driver;
+	sql::ResultSet *res;
+	sql::PreparedStatement *pstmt;
 
-	camera_calibration_node::calibrateLens serviceCall2;
-	serviceCall2.request.frameCount = 20;
-	serviceCall2.request.boardWidth = 9;
-	serviceCall2.request.boardHeight = 6;
-	calibrateLensClient.call(serviceCall2);
-	if(serviceCall2.response.processedFrames == 0){
-		ROS_WARN_STREAM("calibrateLens failed, processedFrame = " << serviceCall2.response.processedFrames);
-		as->setAborted();
-	}
+	driver = get_driver_instance();
+	/* Create a connection */
+	std::auto_ptr<sql::Connection> apConnection(
+		driver->connect("tcp://192.168.65.175:3306", "rexos", "rexos")
+	);
+	/* Connect to the MySQL test database */
+	apConnection->setSchema("rexos");
 	
-	camera_node::fishEyeCorrection serviceCall3;
-	serviceCall3.request.enable = true;
-	fishEyeCorrectionClient.call(serviceCall3);
+	pstmt = apConnection->prepareStatement("SELECT * FROM calibrationmatrices WHERE lens = ? AND camera = ?");
+	pstmt->setInt(1, 2);
+	pstmt->setInt(2, 4);
+	
+	res = pstmt->executeQuery();
+	
+	if(res->rowsCount() == 1){
+		// we have found a calibrateLens correction matrix
+		ROS_INFO("calibrateLens correction matrix found");
+		
+		ros::ServiceClient client = nodeHandle.serviceClient<camera_node::CorrectionMatrices>(camera_node_services::CORRECTION_MATRICES);
+		camera_node::CorrectionMatrices serviceCall;
+		
+		// set the cursor at the first result
+		res->next(); 
+		
+		// yeah, this is quite ugly
+		serviceCall.request.distCoeffs.push_back(res->getDouble("distCoef_0"));
+		serviceCall.request.distCoeffs.push_back(res->getDouble("distCoef_1"));
+		serviceCall.request.distCoeffs.push_back(res->getDouble("distCoef_2"));
+		serviceCall.request.distCoeffs.push_back(res->getDouble("distCoef_3"));
+		serviceCall.request.distCoeffs.push_back(res->getDouble("distCoef_4"));
 
-	as->setSucceeded();
+		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_0_0");
+		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_0_1");
+		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_0_2");
+		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_1_0");
+		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_1_1");
+		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_1_2");
+		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_2_0");
+		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_2_1");
+		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_2_2");
+		
+		client.call(serviceCall);
+		
+		as->setSucceeded();
+	}
+	else{
+		camera_node::fishEyeCorrection serviceCall;
+		serviceCall.request.enable = false;
+		fishEyeCorrectionClient.call(serviceCall);
+
+		camera_calibration_node::calibrateLens serviceCall2;
+		serviceCall2.request.frameCount = 20;
+		serviceCall2.request.boardWidth = 9;
+		serviceCall2.request.boardHeight = 6;
+		calibrateLensClient.call(serviceCall2);
+		
+		camera_node::fishEyeCorrection serviceCall3;
+		serviceCall3.request.enable = true;
+		fishEyeCorrectionClient.call(serviceCall3);
+		
+		if(serviceCall2.response.processedFrames == 0){
+			ROS_WARN_STREAM("calibrateLens failed, processedFrame = " << serviceCall2.response.processedFrames);
+			as->setAborted();
+		}
+		else{
+			as->setSucceeded();
+		}
+	}
+
 }
 void CameraControlNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Shutdown transition called");
