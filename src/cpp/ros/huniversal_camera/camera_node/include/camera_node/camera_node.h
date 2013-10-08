@@ -47,7 +47,8 @@
 #include <camera/unicap_cv_bridge.h>
 #include <camera_node/AutoWhiteBalance.h>
 #include <camera_node/fishEyeCorrection.h>
-#include <camera_node/CorrectionMatrices.h>
+#include <camera_node/setCorrectionMatrices.h>
+#include <camera_node/getCorrectionMatrices.h>
 
 #include <iostream>
 #include <sstream>
@@ -64,8 +65,10 @@ public:
 	        camera_node::AutoWhiteBalance::Response &response);
 	bool fishEyeCorrection(camera_node::fishEyeCorrection::Request& request, 
 			camera_node::fishEyeCorrection::Response& response);
-	bool correctionMatrices(camera_node::CorrectionMatrices::Request& request,
-			camera_node::CorrectionMatrices::Response& response);
+	bool setCorrectionMatrices(camera_node::setCorrectionMatrices::Request& request,
+			camera_node::setCorrectionMatrices::Response& response);
+	bool getCorrectionMatrices(camera_node::getCorrectionMatrices::Request& request,
+			camera_node::getCorrectionMatrices::Response& response);
 
 private:
 	unicap_cv_bridge::unicap_cv_camera * cam;

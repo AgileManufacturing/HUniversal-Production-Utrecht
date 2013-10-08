@@ -33,6 +33,7 @@
 
 #include "camera_node/Services.h"
 #include "camera_node/fishEyeCorrection.h"
+#include "camera_node/getCorrectionMatrices.h"
 #include "camera_calibration_node/Services.h"
 #include "camera_calibration_node/calibrateLens.h"
 
@@ -51,6 +52,7 @@ CameraControlNode::CameraControlNode(int equipletID, int moduleID) :
 		decreaseExposureClient(nodeHandle.serviceClient<std_srvs::Empty>(camera_node_services::DECREASE_EXPOSURE)),
 		autoWhiteBalanceClient(nodeHandle.serviceClient<camera_node::AutoWhiteBalance>(camera_node_services::AUTO_WHITE_BALANCE)),
 		fishEyeCorrectionClient(nodeHandle.serviceClient<camera_node::fishEyeCorrection>(camera_node_services::FISH_EYE_CORRECTION)),
+		getCorrectionMatricesClient(nodeHandle.serviceClient<camera_node::getCorrectionMatrices>(camera_node_services::GET_CORRECTION_MATRICES)),
 		calibrateLensClient(nodeHandle.serviceClient<camera_calibration_node::calibrateLens>(camera_calibration_node_services::CALIBRATE_LENS)),
 		rexos_statemachine::ModuleStateMachine("camera_control_node",equipletID, moduleID, true)
 {
@@ -97,11 +99,7 @@ void CameraControlNode::run() {
 void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Setup transition called");
 	
-	sql::Driver *driver;
-	sql::ResultSet *res;
-	sql::PreparedStatement *pstmt;
-
-	driver = get_driver_instance();
+	sql::Driver* driver = get_driver_instance();
 	/* Create a connection */
 	std::auto_ptr<sql::Connection> apConnection(
 		driver->connect("tcp://192.168.65.175:3306", "rexos", "rexos")
@@ -109,18 +107,18 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 	/* Connect to the MySQL test database */
 	apConnection->setSchema("rexos");
 	
-	pstmt = apConnection->prepareStatement("SELECT * FROM calibrationmatrices WHERE lens = ? AND camera = ?");
+	sql::PreparedStatement* pstmt = apConnection->prepareStatement("SELECT * FROM calibrationmatrices WHERE lens = ? AND camera = ?");
 	pstmt->setInt(1, 2);
 	pstmt->setInt(2, 4);
 	
-	res = pstmt->executeQuery();
+	sql::ResultSet* res = pstmt->executeQuery();
 	
 	if(res->rowsCount() == 1){
 		// we have found a calibrateLens correction matrix
 		ROS_INFO("calibrateLens correction matrix found");
 		
-		ros::ServiceClient client = nodeHandle.serviceClient<camera_node::CorrectionMatrices>(camera_node_services::CORRECTION_MATRICES);
-		camera_node::CorrectionMatrices serviceCall;
+		ros::ServiceClient client = nodeHandle.serviceClient<camera_node::setCorrectionMatrices>(camera_node_services::SET_CORRECTION_MATRICES);
+		camera_node::setCorrectionMatrices serviceCall;
 		
 		// set the cursor at the first result
 		res->next(); 
@@ -166,6 +164,40 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 			as->setAborted();
 		}
 		else{
+			ROS_INFO("Saving matrices to database");
+			camera_node::getCorrectionMatrices serviceCall4;
+			getCorrectionMatricesClient.call(serviceCall4);
+			
+			sql::PreparedStatement* pstmt2 = apConnection->prepareStatement(
+			"INSERT INTO calibrationmatrices ( \
+				lens, camera, \
+				distCoef_0,  distCoef_1,  distCoef_2, distCoef_3,  distCoef_4, \
+				cameraMatrix_0_0, cameraMatrix_0_1, cameraMatrix_0_2, \
+				cameraMatrix_1_0, cameraMatrix_1_1, cameraMatrix_1_2, \
+				cameraMatrix_2_0, cameraMatrix_2_1, cameraMatrix_2_2 \
+			) VALUES ( \
+				?, ?, \
+				?, ?, ?, ?, ?, \
+				?, ?, ?, \
+				?, ?, ?, \
+				?, ?, ? \
+			);");
+			pstmt->setInt(1, 1);
+			pstmt->setInt(2, 1);
+			
+			int collumIndex = 3;
+			
+			for(int i = 0; i < serviceCall4.response.distCoeffs.size(); i++) {
+				pstmt->setDouble(collumIndex, serviceCall4.response.distCoeffs[i]);
+				collumIndex++;
+			}
+			
+			for(int i = 0; i < 9; i++) {
+				pstmt->setDouble(collumIndex, serviceCall4.response.cameraMatrix.values[i]);
+				collumIndex++;
+			}
+			
+			
 			as->setSucceeded();
 		}
 	}

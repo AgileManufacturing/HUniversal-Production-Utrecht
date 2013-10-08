@@ -707,9 +707,10 @@
               <File Name="src/cpp/ros/huniversal_camera/camera_node/msg/matrix3x3.msg"/>
             </VirtualDirectory>
             <VirtualDirectory Name="srv">
-              <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/CorrectionMatrices.srv"/>
               <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/AutoWhiteBalance.srv"/>
               <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/fishEyeCorrection.srv"/>
+              <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/setCorrectionMatrices.srv"/>
+              <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/getCorrectionMatrices.srv"/>
             </VirtualDirectory>
             <File Name="src/cpp/ros/huniversal_camera/camera_node/CMakeLists.txt"/>
             <File Name="src/cpp/ros/huniversal_camera/camera_node/DeltaLens_2012-01-20.xml"/>

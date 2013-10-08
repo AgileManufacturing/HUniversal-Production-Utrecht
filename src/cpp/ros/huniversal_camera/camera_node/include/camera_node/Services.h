@@ -36,5 +36,6 @@ namespace camera_node_services {
 	const std::string DECREASE_EXPOSURE = "decreaseExposure";
 	const std::string AUTO_WHITE_BALANCE = "autoWhiteBalance";
 	const std::string FISH_EYE_CORRECTION = "fishEyeCorrection";
-	const std::string CORRECTION_MATRICES = "calibrationMatrices";
+	const std::string SET_CORRECTION_MATRICES = "setCalibrationMatrices";
+	const std::string GET_CORRECTION_MATRICES = "getCalibrationMatrices";
 }

@@ -147,8 +147,8 @@ bool CameraNode::fishEyeCorrection(camera_node::fishEyeCorrection::Request& requ
 
 }
 
-bool CameraNode::correctionMatrices(camera_node::CorrectionMatrices::Request& request, camera_node::CorrectionMatrices::Response& response) {
-	std::cout << "[DEBUG] Service CorrectionMatrices " << std::endl;
+bool CameraNode::setCorrectionMatrices(camera_node::setCorrectionMatrices::Request& request, camera_node::setCorrectionMatrices::Response& response) {
+	std::cout << "[DEBUG] Service setCorrectionMatrices " << std::endl;
 	
 	if(cam) {
 		// matrices are stored in row major order
@@ -184,7 +184,24 @@ bool CameraNode::correctionMatrices(camera_node::CorrectionMatrices::Request& re
 	}
 
 }
-
+bool CameraNode::getCorrectionMatrices(camera_node::getCorrectionMatrices::Request& request, camera_node::getCorrectionMatrices::Response& response) {
+	response.distCoeffs.push_back(rectifier->distCoeffs.at<double>(0));
+	response.distCoeffs.push_back(rectifier->distCoeffs.at<double>(1));
+	response.distCoeffs.push_back(rectifier->distCoeffs.at<double>(2));
+	response.distCoeffs.push_back(rectifier->distCoeffs.at<double>(3));
+	response.distCoeffs.push_back(rectifier->distCoeffs.at<double>(4));
+	
+	response.cameraMatrix.values[0] = rectifier->cameraMatrix.at<double>(0, 0);
+	response.cameraMatrix.values[1] = rectifier->cameraMatrix.at<double>(0, 1);
+	response.cameraMatrix.values[2] = rectifier->cameraMatrix.at<double>(0, 2);
+	response.cameraMatrix.values[3] = rectifier->cameraMatrix.at<double>(1, 0);
+	response.cameraMatrix.values[4] = rectifier->cameraMatrix.at<double>(1, 1);
+	response.cameraMatrix.values[5] = rectifier->cameraMatrix.at<double>(1, 2);
+	response.cameraMatrix.values[6] = rectifier->cameraMatrix.at<double>(2, 0);
+	response.cameraMatrix.values[7] = rectifier->cameraMatrix.at<double>(2, 1);
+	response.cameraMatrix.values[8] = rectifier->cameraMatrix.at<double>(2, 2);
+	return true;
+}
 void CameraNode::run() {
 	if(!cam) {
 		std::cerr << "[ERROR] Camera not initialized!" << std::endl;
@@ -244,8 +261,10 @@ int main(int argc, char* argv[]) {
 	        &CameraNode::autoWhiteBalance, &cn);
 	ros::ServiceServer fishEyeCorrectionService = nodeHandle.advertiseService(camera_node_services::FISH_EYE_CORRECTION,
 	        &CameraNode::fishEyeCorrection, &cn);
-	ros::ServiceServer correctionMatricesService = nodeHandle.advertiseService(camera_node_services::CORRECTION_MATRICES,
-	        &CameraNode::correctionMatrices, &cn);
+	ros::ServiceServer setCorrectionMatricesService = nodeHandle.advertiseService(camera_node_services::SET_CORRECTION_MATRICES,
+	        &CameraNode::setCorrectionMatrices, &cn);
+	ros::ServiceServer getCorrectionMatricesService = nodeHandle.advertiseService(camera_node_services::GET_CORRECTION_MATRICES,
+	        &CameraNode::getCorrectionMatrices, &cn);
 
 	cn.run();
 
