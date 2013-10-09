@@ -50,8 +50,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import libraries.blackboard_client.BlackboardClient;
-import libraries.blackboard_client.GeneralMongoException;
-import libraries.blackboard_client.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.GeneralMongoException;
+import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 import agents.data_classes.BehaviourStatus;

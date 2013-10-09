@@ -1,7 +1,7 @@
 /**
- * @file rexos/libraries/blackboard_client/InvalidJSONException.java
- * @brief Thrown when invalid JSON is encountered.
- * @date Created: 2012-04-05
+ * @file rexos/libraries/blackboard_client/BlackboardSubscriber.java
+ * @brief Interface for subscribing to blackboard events.
+ * @date Created: 2013-04-04
  *
  * @author Jan-Willem Willebrands
  *
@@ -29,26 +29,18 @@
  * 
  **/
 
-package libraries.blackboard_client;
-
-import com.mongodb.util.JSONParseException;
+package libraries.blackboard_client.data_classes;
 
 /**
- * Thrown when invalid JSON is encountered.
+ * Interface used for subscribing to blackboard events.
  **/
-public class InvalidJSONException extends Exception {
+public interface BlackboardSubscriber{
+	
 	/**
-	 * @var long serialVersionUID
-	 * Serial version ID of this class.
-	 **/
-	private static final long serialVersionUID = -7981116871524728088L;
-
-	/**
-	 * Constructs an InvalidJSONException storing the JSONParseException as its cause.
+	 * Callback function that is invoked whenever the subscribed event occurs.
 	 * 
-	 * @param ex The JSONParseException that caused this exception.
+	 * @param operation The {@link MongoOperation} that triggered the callback.
+	 * @param entry {@link OplogEntry} object representing the oplog entry.
 	 **/
-	public InvalidJSONException(JSONParseException ex) {
-		super("An error has occurred while parsing the JSON string.", ex);
-	}
+	public void onMessage(MongoOperation operation, OplogEntry entry);
 }

@@ -1,7 +1,7 @@
 /**
- * @file rexos/libraries/blackboard_client/MongoOperation.java
- * @brief Enum representing the different CRUD operations in MongoDB.
- * @date Created: 2012-04-04
+ * @file rexos/libraries/blackboard_client/InvalidJSONException.java
+ * @brief Thrown when invalid JSON is encountered.
+ * @date Created: 2012-04-05
  *
  * @author Jan-Willem Willebrands
  *
@@ -29,64 +29,26 @@
  * 
  **/
 
-package libraries.blackboard_client;
+package libraries.blackboard_client.data_classes;
+
+import com.mongodb.util.JSONParseException;
 
 /**
- * Enum listing the different CRUD operations in MongoDB, as well as their internal representation in the oplog.
- *
+ * Thrown when invalid JSON is encountered.
  **/
-public enum MongoOperation {
+public class InvalidJSONException extends Exception {
 	/**
-	 * Insert operation.
+	 * @var long serialVersionUID
+	 * Serial version ID of this class.
 	 **/
-	INSERT("i"),
-	/**
-	 * Update operation.
-	 **/
-	UPDATE("u"),
-	/**
-	 * NOOP operation.
-	 **/
-	NOOP("n"),
-	/**
-	 * Delete operation.
-	 **/
-	DELETE("d");
-	
-	/**
-	 * @var String opCode
-	 * Internal representation in the "op" field of the oplog for this operation.
-	 **/
-	private final String opCode;
+	private static final long serialVersionUID = -7981116871524728088L;
 
 	/**
-	 * Constructs the MongoOperation with the specified opcode.
-	 * @param opCode Internal representation in the "op" field of the oplog for this operation.
+	 * Constructs an InvalidJSONException storing the JSONParseException as its cause.
+	 * 
+	 * @param ex The JSONParseException that caused this exception.
 	 **/
-	private MongoOperation(String opCode) {
-		this.opCode = opCode;
-	}
-
-	/**
-	 * Returns the opcode for this operation.
-	 * @return The opcode for this operation.
-	 **/
-	public String getOpCode() {
-		return opCode;
-	}
-	
-	/**
-	 * Attempts to find the {@link MongoOperation} corresponding to the given opCode.
-	 * @param opCode The opcode for which to find the MongoOperation
-	 * @return The MongoOperation corresponding to the given opCode or null.
-	 **/
-	public static MongoOperation get(String opCode) {
-		for (MongoOperation op : values()) {
-			if (op.opCode.equals(opCode)) {
-				return op;
-			}
-		}
-		
-		return null;
+	public InvalidJSONException(JSONParseException ex) {
+		super("An error has occurred while parsing the JSON string.", ex);
 	}
 }

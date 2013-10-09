@@ -29,7 +29,7 @@
  * 
  **/
 
-package libraries.blackboard_client;
+package libraries.blackboard_client.data_classes;
 
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;

@@ -42,8 +42,8 @@ import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 
 import libraries.blackboard_client.BlackboardClient;
-import libraries.blackboard_client.GeneralMongoException;
-import libraries.blackboard_client.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.GeneralMongoException;
+import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 

@@ -49,8 +49,8 @@ package agents.equiplet_agent.behaviours;
 
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import libraries.blackboard_client.GeneralMongoException;
-import libraries.blackboard_client.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.GeneralMongoException;
+import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 

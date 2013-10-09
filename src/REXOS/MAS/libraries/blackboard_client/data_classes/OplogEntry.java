@@ -29,7 +29,7 @@
  * 
  **/
 
-package libraries.blackboard_client;
+package libraries.blackboard_client.data_classes;
 
 import org.bson.types.ObjectId;
 

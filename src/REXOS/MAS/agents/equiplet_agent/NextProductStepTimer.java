@@ -39,8 +39,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import libraries.blackboard_client.GeneralMongoException;
-import libraries.blackboard_client.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.GeneralMongoException;
+import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 

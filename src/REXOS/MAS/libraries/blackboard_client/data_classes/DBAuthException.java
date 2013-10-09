@@ -1,7 +1,7 @@
 /**
- * @file rexos/libraries/blackboard_client/GeneralMongoException.java
- * @brief Thrown when connecting to a MongoDB server fails.
- * @date Created: 9 apr. 2013
+ * @file rexos/libraries/blackboard_client/DBAuthException.java
+ * @brief Thrown when authentication with a database fails.
+ * @date Created: 5 apr. 2013
  *
  * @author Jan-Willem Willebrands
  *
@@ -27,25 +27,23 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package libraries.blackboard_client;
+package libraries.blackboard_client.data_classes;
 
 /**
- * Thrown when connecting to a MongoDB server fails.
+ * Thrown when authentication with a database fails.
  **/
-public class GeneralMongoException extends Exception {
-	
+public class DBAuthException extends Exception {
 	/**
 	 * @var long serialVersionUID
-	 * SerialVersionUID for this class.
+	 * SerialVersionUID for the class.
 	 **/
-	private static final long serialVersionUID = 2792870683299145176L;
+	private static final long serialVersionUID = 879715532789750988L;
 
 	/**
-	 * Constructs a new exception with the specified detail message and cause.
+	 * Constructs an exception with the specified message.
 	 * @param msg A message providing additional information about the exception.
-	 * @param cause The cause of this exception.
 	 **/
-	public GeneralMongoException(String msg, Throwable cause) {
-		super(msg, cause);
+	public DBAuthException(String msg) {
+		super(msg);
 	}
 }

@@ -37,6 +37,13 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import libraries.blackboard_client.data_classes.BlackboardSubscription;
+import libraries.blackboard_client.data_classes.DBAuthException;
+import libraries.blackboard_client.data_classes.GeneralMongoException;
+import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.InvalidJSONException;
+import libraries.blackboard_client.data_classes.MongoDBConnection;
+
 import org.bson.types.ObjectId;
 
 import com.mongodb.DB;

@@ -51,13 +51,13 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import libraries.blackboard_client.BlackboardClient;
-import libraries.blackboard_client.BlackboardSubscriber;
-import libraries.blackboard_client.FieldUpdateSubscription;
-import libraries.blackboard_client.FieldUpdateSubscription.MongoUpdateLogOperation;
-import libraries.blackboard_client.GeneralMongoException;
-import libraries.blackboard_client.InvalidDBNamespaceException;
-import libraries.blackboard_client.MongoOperation;
-import libraries.blackboard_client.OplogEntry;
+import libraries.blackboard_client.data_classes.BlackboardSubscriber;
+import libraries.blackboard_client.data_classes.FieldUpdateSubscription;
+import libraries.blackboard_client.data_classes.GeneralMongoException;
+import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.MongoOperation;
+import libraries.blackboard_client.data_classes.OplogEntry;
+import libraries.blackboard_client.data_classes.FieldUpdateSubscription.MongoUpdateLogOperation;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 

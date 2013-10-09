@@ -31,6 +31,9 @@ package libraries.blackboard_client;
 
 import java.util.Stack;
 
+import libraries.blackboard_client.data_classes.BlackboardSubscriber;
+import libraries.blackboard_client.data_classes.OplogEntry;
+
 /**
  * Simple data object used to store information about a callback.
  */

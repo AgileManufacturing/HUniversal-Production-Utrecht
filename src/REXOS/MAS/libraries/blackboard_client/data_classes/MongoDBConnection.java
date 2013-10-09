@@ -28,7 +28,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package libraries.blackboard_client;
+package libraries.blackboard_client.data_classes;
 
 import java.util.Hashtable;
 

@@ -31,6 +31,8 @@ package libraries.blackboard_client;
 
 import java.util.ArrayList;
 
+import libraries.blackboard_client.data_classes.BlackboardSubscription;
+import libraries.blackboard_client.data_classes.OplogEntry;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
