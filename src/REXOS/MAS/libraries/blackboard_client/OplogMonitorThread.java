@@ -58,6 +58,7 @@ class OplogMonitorThread extends Thread {
 	 **/
 	private static final int POLL_INTERVAL = 100;
 
+	private DB database;
 	/**
 	 * @var DBCursor tailedCursor
 	 * Tailed cursor for this thread.
@@ -106,8 +107,8 @@ class OplogMonitorThread extends Thread {
 	 * @param query The query that will be used in the tailed cursor.
 	 **/
 	public OplogMonitorThread(Mongo mongo, String oplogDBName, String oplogCollectionName,
-			String username, String password, DBObject query) {
-		DB database = mongo.getDB(oplogDBName);
+		String username, String password, DBObject query) {
+		database = mongo.getDB(oplogDBName);
 		database.authenticate(username, password.toCharArray());
 		DBCollection collection = database.getCollection(oplogCollectionName);
 
@@ -118,7 +119,7 @@ class OplogMonitorThread extends Thread {
 		callbackThread = new OplogCallbackThread();
 	}
 	
-	/**
+	/**.requestStart()
 	 * Sets the subscriptions that are used for the query of this oplog monitor.
 	 * @param subscriptions ArrayList containing all the subscriptions this monitor will subscribe to.
 	 **/
@@ -133,9 +134,10 @@ class OplogMonitorThread extends Thread {
 	 **/
 	@Override
 	public void run() {
-		try {
-			do {
-				while (!Thread.interrupted() && tailedCursor.hasNext()) {
+		while (!Thread.interrupted() && tailedCursor.getCursorId() != 0){
+			database.requestStart();
+			try {
+				while (tailedCursor.hasNext()) {
 					OplogEntry entry = new OplogEntry(tailedCursor.next());
 
 					for (BlackboardSubscription sub : subscriptions) {
@@ -144,29 +146,28 @@ class OplogMonitorThread extends Thread {
 						}
 					}
 				}
+			} catch (MongoInterruptedException | MongoException.CursorNotFound ex) {
+				/*
+				 * MongoInterruptedException is thrown by Mongo when interrupt is called while blocking on the
+				 * tailedCursor's hasNext method. When this happens, return from the run method to kill the thread.
+				 */
 				
-				Thread.sleep(POLL_INTERVAL);
-			} while (!Thread.interrupted() && tailedCursor.getCursorId() != 0);
-		} catch (MongoInterruptedException | MongoException.CursorNotFound | InterruptedException ex) {
-			/*
-			 * MongoInterruptedException is thrown by Mongo when interrupt is called while blocking on the
-			 * tailedCursor's hasNext method. When this happens, return from the run method to kill the thread.
-			 */
-			
-			/*
-			 * MongoException.CursorNotFound indicates the cursor was killed while blocking on hasNext.
-			 * We purposely kill the cursor when the OplogMonitorThread is interrupted, thus expect this to happen.
-			 */
-			
-			Logger.log(LogLevel.CRITICAL,"OplogMonitorThread ending due to %s:\n%s\n", ex.getClass().getName(), ex.getMessage());
-		} finally {
-			try {
-				if (tailedCursor != null) {
-					tailedCursor.close();
+				/*
+				 * MongoException.CursorNotFound indicates the cursor was killed while blocking on hasNext.
+				 * We purposely kill the cursor when the OplogMonitorThread is interrupted, thus expect this to happen.
+				 */
+				
+				Logger.log(LogLevel.CRITICAL,"OplogMonitorThread ending due to %s:\n%s\n", ex.getClass().getName(), ex.getMessage());
+			} finally {
+				try {
+					if (tailedCursor != null) {
+						tailedCursor.close();
+					}
+				} catch (Throwable t) {
+					// If closing the cursor throws something, it's most likely not something we can fix.
+					Logger.log(LogLevel.ERROR, "%s thrown while closing cursor:\n%s\n", t.getClass().getName(), t.getMessage());
 				}
-			} catch (Throwable t) {
-				// If closing the cursor throws something, it's most likely not something we can fix.
-			Logger.log(LogLevel.ERROR, "%s thrown while closing cursor:\n%s\n", t.getClass().getName(), t.getMessage());
+				database.requestDone();
 			}
 		}
 		
