@@ -39,7 +39,7 @@
 
 class CameraControlNode : public rexos_statemachine::ModuleStateMachine {
 public:
-	CameraControlNode(int equipletID, int moduleID);
+	CameraControlNode(int equipletId, int cameraModuleId, int lensModuleId);
 
 	void increaseExposureCall();
 	void decreaseExposureCall();
@@ -60,10 +60,15 @@ private:
 	ros::ServiceClient decreaseExposureClient;
 	ros::ServiceClient autoWhiteBalanceClient;
 	ros::ServiceClient fishEyeCorrectionClient;
+	ros::ServiceClient enableCameraClient;
 	ros::ServiceClient getCorrectionMatricesClient;
 	
 	ros::ServiceClient calibrateLensClient;
 	std_srvs::Empty emptyService;
+	
+	int equipletId;
+	int cameraModuleId;
+	int lensModuleId;
 };
 
 #endif /* CAMERACONTROLNODE_H_ */

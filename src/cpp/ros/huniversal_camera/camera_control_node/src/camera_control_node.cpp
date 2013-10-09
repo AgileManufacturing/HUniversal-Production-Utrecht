@@ -33,9 +33,11 @@
 
 #include "camera_node/Services.h"
 #include "camera_node/fishEyeCorrection.h"
+#include "camera_node/enableCamera.h"
 #include "camera_node/getCorrectionMatrices.h"
 #include "camera_calibration_node/Services.h"
 #include "camera_calibration_node/calibrateLens.h"
+#include "rexos_utilities/Utilities.h"
 
 
 #include "mysql_connection.h"
@@ -47,14 +49,18 @@
 
 #include <iostream>
 
-CameraControlNode::CameraControlNode(int equipletID, int moduleID) :
-		increaseExposureClient(nodeHandle.serviceClient<std_srvs::Empty>(camera_node_services::INCREASE_EXPOSURE)),
-		decreaseExposureClient(nodeHandle.serviceClient<std_srvs::Empty>(camera_node_services::DECREASE_EXPOSURE)),
-		autoWhiteBalanceClient(nodeHandle.serviceClient<camera_node::AutoWhiteBalance>(camera_node_services::AUTO_WHITE_BALANCE)),
-		fishEyeCorrectionClient(nodeHandle.serviceClient<camera_node::fishEyeCorrection>(camera_node_services::FISH_EYE_CORRECTION)),
-		getCorrectionMatricesClient(nodeHandle.serviceClient<camera_node::getCorrectionMatrices>(camera_node_services::GET_CORRECTION_MATRICES)),
-		calibrateLensClient(nodeHandle.serviceClient<camera_calibration_node::calibrateLens>(camera_calibration_node_services::CALIBRATE_LENS)),
-		rexos_statemachine::ModuleStateMachine("camera_control_node",equipletID, moduleID, true)
+CameraControlNode::CameraControlNode(int equipletId, int cameraModuleId, int lensModuleId) :
+		increaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(							camera_node_services::INCREASE_EXPOSURE)),
+		decreaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(							camera_node_services::DECREASE_EXPOSURE)),
+		autoWhiteBalanceClient(			nodeHandle.serviceClient<camera_node::AutoWhiteBalance>(			camera_node_services::AUTO_WHITE_BALANCE)),
+		fishEyeCorrectionClient(		nodeHandle.serviceClient<camera_node::fishEyeCorrection>(			camera_node_services::FISH_EYE_CORRECTION)),
+		enableCameraClient(				nodeHandle.serviceClient<camera_node::enableCamera>(				camera_node_services::ENABLE_CAMERA)),
+		getCorrectionMatricesClient(	nodeHandle.serviceClient<camera_node::getCorrectionMatrices>(		camera_node_services::GET_CORRECTION_MATRICES)),
+		calibrateLensClient(			nodeHandle.serviceClient<camera_calibration_node::calibrateLens>(	camera_calibration_node_services::CALIBRATE_LENS)),
+		rexos_statemachine::ModuleStateMachine("camera_control_node",equipletId, cameraModuleId, true),
+		equipletId(equipletId),
+		cameraModuleId(cameraModuleId),
+		lensModuleId(lensModuleId)
 {
 }
 
@@ -182,20 +188,25 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 				?, ?, ?, \
 				?, ?, ? \
 			);");
-			pstmt->setInt(1, 1);
-			pstmt->setInt(2, 1);
+			pstmt2->setInt(1, 1);
+			pstmt2->setInt(2, 1);
 			
 			int collumIndex = 3;
-			
+			ROS_ERROR("setting dist");
 			for(int i = 0; i < serviceCall4.response.distCoeffs.size(); i++) {
-				pstmt->setDouble(collumIndex, serviceCall4.response.distCoeffs[i]);
+				ROS_ERROR_STREAM(" collumIndex "  << collumIndex << std::endl);
+				pstmt2->setDouble(collumIndex, serviceCall4.response.distCoeffs[i]);
 				collumIndex++;
 			}
 			
+			ROS_ERROR("setting matrix");
 			for(int i = 0; i < 9; i++) {
-				pstmt->setDouble(collumIndex, serviceCall4.response.cameraMatrix.values[i]);
+				ROS_ERROR_STREAM(" collumIndex "  << collumIndex << std::endl);
+				pstmt2->setDouble(collumIndex, serviceCall4.response.cameraMatrix.values[i]);
 				collumIndex++;
 			}
+			
+			pstmt2->executeQuery();
 			
 			
 			as->setSucceeded();
@@ -215,7 +226,10 @@ void CameraControlNode::transitionShutdown(rexos_statemachine::TransitionActionS
  **/
 void CameraControlNode::transitionStart(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Start transition called");
-	//The service servers should be set, to provide the normal methods for the equiplet
+	camera_node::enableCamera serviceCall;
+	serviceCall.enable = true;
+	enableCameraClient.call(serviceCall);
+	
 	as->setSucceeded();
 }
 /**
@@ -224,16 +238,33 @@ void CameraControlNode::transitionStart(rexos_statemachine::TransitionActionServ
  **/
 void CameraControlNode::transitionStop(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Stop transition called");
-	//The service servers should be set off, so the equiplet isn't able to set tasks for the module
-		as->setSucceeded();
-	// Go to base (Motors on 0 degrees)
+	camera_node::enableCamera serviceCall;
+	serviceCall.enable = true;
+	enableCameraClient.call(serviceCall);
+	
+	as->setSucceeded();
 }
 
 
 int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "cameraControlNode");
+	
+	if(argc < 3){
+		ROS_ERROR("Arguments are not valid");
+		return -1;
+	}
+	
+	int equipletId, cameraModuleId, lensModuleId;
+	try{
+		equipletId = rexos_utilities::stringToInt(argv[1]);
+		cameraModuleId = rexos_utilities::stringToInt(argv[2]);
+		lensModuleId = rexos_utilities::stringToInt(argv[1]);
+	} catch(std::runtime_error ex) {
+		ROS_ERROR("Cannot read equiplet id, camera id, and/or lens id from commandline please use correct values.");
+		return -2;
+	}
 
-	CameraControlNode node(1, 2);
+	CameraControlNode node(equipletId, cameraModuleId, lensModuleId);
 
 	std::cout << "Welcome to the camera node controller. Using this tool you can adjust camera settings on the fly :)."
 	        << std::endl << "A\tEnable auto white balance" << std::endl << "Z\tDisable auto white balance" << std::endl

@@ -1,76 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CodeLite_Project Name="VISIONdevelopment" InternalType="Console">
-  <Description/>
-  <Dependencies/>
-  <Settings Type="Executable">
-    <GlobalSettings>
-      <Compiler Options="">
-        <IncludePath Value="."/>
-      </Compiler>
-      <Linker Options="">
-        <LibraryPath Value="."/>
-      </Linker>
-      <ResourceCompiler Options=""/>
-    </GlobalSettings>
-    <Configuration Name="Debug" CompilerType="gnu gcc" DebuggerType="GNU gdb debugger" Type="" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g" Required="yes" PreCompiledHeader="">
-        <IncludePath Value="."/>
-      </Compiler>
-      <Linker Options="" Required="yes"/>
-      <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
-      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
-      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
-        <PostConnectCommands/>
-        <StartupCommands/>
-      </Debugger>
-      <PreBuild/>
-      <PostBuild/>
-      <CustomBuild Enabled="no">
-        <RebuildCommand/>
-        <CleanCommand/>
-        <BuildCommand/>
-        <PreprocessFileCommand/>
-        <SingleFileCommand/>
-        <MakefileGenerationCommand/>
-        <ThirdPartyToolName>None</ThirdPartyToolName>
-        <WorkingDirectory/>
-      </CustomBuild>
-      <AdditionalRules>
-        <CustomPostBuild/>
-        <CustomPreBuild/>
-      </AdditionalRules>
-    </Configuration>
-    <Configuration Name="Release" CompilerType="gnu gcc" DebuggerType="GNU gdb debugger" Type="" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="" Required="yes" PreCompiledHeader="">
-        <IncludePath Value="."/>
-      </Compiler>
-      <Linker Options="-O2" Required="yes"/>
-      <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
-      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
-      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
-        <PostConnectCommands/>
-        <StartupCommands/>
-      </Debugger>
-      <PreBuild/>
-      <PostBuild/>
-      <CustomBuild Enabled="no">
-        <RebuildCommand/>
-        <CleanCommand/>
-        <BuildCommand/>
-        <PreprocessFileCommand/>
-        <SingleFileCommand/>
-        <MakefileGenerationCommand/>
-        <ThirdPartyToolName>None</ThirdPartyToolName>
-        <WorkingDirectory/>
-      </CustomBuild>
-      <AdditionalRules>
-        <CustomPostBuild/>
-        <CustomPreBuild/>
-      </AdditionalRules>
-    </Configuration>
-  </Settings>
   <VirtualDirectory Name="src">
     <VirtualDirectory Name="www">
       <VirtualDirectory Name="WIMP_Server">
@@ -227,6 +156,18 @@
           </VirtualDirectory>
           <File Name="src/cpp/libraries/libjson/CMakeLists.txt"/>
           <File Name="src/cpp/libraries/libjson/package.xml"/>
+        </VirtualDirectory>
+        <VirtualDirectory Name="rexos_coordinates">
+          <VirtualDirectory Name="include">
+            <VirtualDirectory Name="rexos_coordinates">
+              <File Name="src/cpp/libraries/rexos_coordinates/include/rexos_coordinates/Module.h"/>
+            </VirtualDirectory>
+          </VirtualDirectory>
+          <VirtualDirectory Name="src">
+            <File Name="src/cpp/libraries/rexos_coordinates/src/Module.cpp"/>
+          </VirtualDirectory>
+          <File Name="src/cpp/libraries/rexos_coordinates/CMakeLists.txt"/>
+          <File Name="src/cpp/libraries/rexos_coordinates/package.xml"/>
         </VirtualDirectory>
         <VirtualDirectory Name="rexos_most">
           <VirtualDirectory Name="include">
@@ -607,8 +548,8 @@
             </VirtualDirectory>
             <VirtualDirectory Name="srv">
               <File Name="src/cpp/ros/huniversal_camera/camera_calibration_node/srv/calibrateLens.srv"/>
-              <File Name="src/cpp/ros/huniversal_camera/camera_calibration_node/srv/calibrateEffector.srv"/>
               <File Name="src/cpp/ros/huniversal_camera/camera_calibration_node/srv/calibrateBrightness.srv"/>
+              <File Name="src/cpp/ros/huniversal_camera/camera_calibration_node/srv/calibrateEffector.srv"/>
             </VirtualDirectory>
             <File Name="src/cpp/ros/huniversal_camera/camera_calibration_node/CMakeLists.txt"/>
             <File Name="src/cpp/ros/huniversal_camera/camera_calibration_node/package.xml"/>
@@ -707,10 +648,10 @@
               <File Name="src/cpp/ros/huniversal_camera/camera_node/msg/matrix3x3.msg"/>
             </VirtualDirectory>
             <VirtualDirectory Name="srv">
-              <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/AutoWhiteBalance.srv"/>
-              <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/fishEyeCorrection.srv"/>
               <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/setCorrectionMatrices.srv"/>
+              <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/fishEyeCorrection.srv"/>
               <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/getCorrectionMatrices.srv"/>
+              <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/AutoWhiteBalance.srv"/>
             </VirtualDirectory>
             <File Name="src/cpp/ros/huniversal_camera/camera_node/CMakeLists.txt"/>
             <File Name="src/cpp/ros/huniversal_camera/camera_node/DeltaLens_2012-01-20.xml"/>
@@ -766,7 +707,77 @@
         <File Name="src/cpp/tools/build.xml"/>
       </VirtualDirectory>
     </VirtualDirectory>
-    <File Name="main.c"/>
     <File Name="src/CMakeLists.txt"/>
   </VirtualDirectory>
+  <Description/>
+  <Dependencies/>
+  <Settings Type="Executable">
+    <GlobalSettings>
+      <Compiler Options="">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="">
+        <LibraryPath Value="."/>
+      </Linker>
+      <ResourceCompiler Options=""/>
+    </GlobalSettings>
+    <Configuration Name="Debug" CompilerType="gnu gcc" DebuggerType="GNU gdb debugger" Type="" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g" Required="yes" PreCompiledHeader="">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="" Required="yes"/>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+    </Configuration>
+    <Configuration Name="Release" CompilerType="gnu gcc" DebuggerType="GNU gdb debugger" Type="" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="" Required="yes" PreCompiledHeader="">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="-O2" Required="yes"/>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+    </Configuration>
+  </Settings>
 </CodeLite_Project>
