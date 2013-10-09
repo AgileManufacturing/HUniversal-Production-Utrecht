@@ -55,19 +55,15 @@ public class Configuration {
 		try { 
 			switch(File)
 			{
-				case MONGO_DB_PROPERTIES:
-					p.load(new FileInputStream(propertiesFilePath + "mongo_db.properties"));
-					return p.getProperty(key);
-					
-				case KNOWLEDGE_DB_PROPERTIES:
-					p.load(new FileInputStream(propertiesFilePath + "knowledge_db.properties"));
-					return p.getProperty(key);
-					
 				case EQUIPLET_DB_PROPERTIES:
-					p.load(new FileInputStream(propertiesFilePath + "equiplet_db.properties"));
+					p.load(new FileInputStream(propertiesFilePath + File.getFileName()));
 					return p.getProperty(EquipletName + key);
 					
 				default:
+					if(File != null){
+						p.load(new FileInputStream(propertiesFilePath + File.getFileName()));
+						return p.getProperty(key);
+					}
 					System.out.println("Property file not known.");
 					break;
 			}
