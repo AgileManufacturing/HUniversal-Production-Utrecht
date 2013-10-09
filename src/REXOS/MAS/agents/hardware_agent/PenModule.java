@@ -51,7 +51,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import agents.data.Position;
+import agents.data_classes.Position;
 
 import com.mongodb.BasicDBObject;
 

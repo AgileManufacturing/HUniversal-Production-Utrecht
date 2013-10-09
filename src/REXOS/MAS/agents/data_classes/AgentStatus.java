@@ -1,31 +1,51 @@
 /**
  *
- * Project: ProductAgent
+ * Project: Product Agent
  *
  * Package: rexos.mas.data
  *
- * File: BehaviourStatus.java
+ * File: AgentStatus.java
  *
  * Author: Mike Schaap
  *
  * Version: 1.0
  *
  */
-package agents.data;
+package agents.data_classes;
 
 /**
  * @author Mike
  *
  */
-public enum BehaviourStatus {
-
-	RUNNING(0),
+public enum AgentStatus{
 	
-	COMPLETED(1),
+	INITIALIZING(0),
 	
-	ERROR(2),
+	DONE_INITIALIZING(1),
 	
-	WAITING(3);
+	ERROR_INITIALIZING(2),
+	
+	PLANNING(2),
+	
+	DONE_PLANNING(3),
+	
+	INFORMING(4),
+	
+	DONE_INFORMING(5),
+	
+	SCHEDULING(6),
+	
+	DONE_SCHEDULING(7),
+	
+	PRODUCING(8),
+	
+	DONE_PRODUCING(9),
+	
+	STARTING(10),
+	
+	RESCHEDULING(11),
+	
+	DONE_RESCHEDULING(12);
 	
 	/**
 	 * @var int status
@@ -38,7 +58,7 @@ public enum BehaviourStatus {
 	 * 
 	 * @param status - The status
 	 */
-	private BehaviourStatus(int status){
+	private AgentStatus(int status){
 		this.status = status;
 	}
 	
@@ -50,4 +70,5 @@ public enum BehaviourStatus {
 	public int getStatus(){
 		return status;
 	}
+	
 }

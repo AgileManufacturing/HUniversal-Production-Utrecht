@@ -35,9 +35,9 @@ package agents.service_agent;
 
 import org.bson.types.ObjectId;
 
-import agents.data.MongoSaveable;
-import agents.data.ScheduleData;
-import agents.data.StepStatusCode;
+import agents.data_classes.MongoSaveable;
+import agents.data_classes.ScheduleData;
+import agents.data_classes.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;

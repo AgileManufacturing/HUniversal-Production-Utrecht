@@ -32,10 +32,10 @@ package agents.service_agent;
 
 import java.util.HashMap;
 
-import agents.data.Part;
-import agents.data.Position;
-import agents.data.ScheduleData;
-import agents.data.StepStatusCode;
+import agents.data_classes.Part;
+import agents.data_classes.Position;
+import agents.data_classes.ScheduleData;
+import agents.data_classes.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 

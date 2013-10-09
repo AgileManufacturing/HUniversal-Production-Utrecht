@@ -79,8 +79,8 @@ import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
-import agents.data.DbData;
-import agents.data.StepStatusCode;
+import agents.data_classes.DbData;
+import agents.data_classes.StepStatusCode;
 import agents.hardware_agent.behaviours.CheckForModules;
 import agents.hardware_agent.behaviours.EvaluateDuration;
 import agents.hardware_agent.behaviours.FillPlaceholders;

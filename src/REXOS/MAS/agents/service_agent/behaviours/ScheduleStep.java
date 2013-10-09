@@ -49,7 +49,7 @@ import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
-import agents.data.ProductStep;
+import agents.data_classes.ProductStep;
 import agents.service_agent.ServiceAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 

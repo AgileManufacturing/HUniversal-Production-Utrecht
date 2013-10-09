@@ -51,8 +51,8 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import agents.data.Callback;
-import agents.data.GUIMessage;
+import agents.data_classes.Callback;
+import agents.data_classes.GUIMessage;
 
 import com.google.gson.Gson;
 

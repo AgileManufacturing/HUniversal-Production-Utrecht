@@ -1,9 +1,10 @@
 /**
- * @file rexos/mas/data/ProductLog.java
- * @brief Class for logging productiondata
+ * @file rexos/mas/data/Product.java
+ * @brief Class where the log and production can be retrieved from
+ *        production.java
  * @date Created: 02-04-2013
  * 
- * @author Theodoor de Graaff
+ * @author Mike Schaap
  * 
  * @section LICENSE License: newBSD
  * 
@@ -37,85 +38,72 @@
  * 
  **/
 
-package agents.data;
+package agents.data_classes;
 
 import jade.core.AID;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.concurrent.atomic.AtomicLong;
-
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
 import com.mongodb.BasicDBObject;
 
-/**
- * @author Theodoor
- * 
- */
-public class ProductLog{
-	File logfile;
-	FileWriter writer;
+public class Product{
 	
-	public ProductLog(){
+	private Production _production;
+
+
+	/**
+	 * @param log the log to set
+	 */
+	public void setLog(ProductLog log){
+		this.log = log;
+	}
+
+	private ProductLog log;
+
+	/**
+	 * @return the log
+	 */
+	public ProductLog getLog(){
+		return log;
+	}
+
+	public Product(Production production){
+		if (production == null){
+			NullPointerException noProduction = new NullPointerException("Production can't be null");
+			Logger.log(LogLevel.ERROR, noProduction);
+			throw noProduction;
+		}
+		setProduction(production);
+		log = new ProductLog();
 	}
 
 	/**
-	 * Add statusdata to ProductLog Writes multiple json-objects into one large
-	 * json-object with an objectnumber.
-	 * 
-	 * @param aid
-	 * @param statusData
-	 * 
+	 * @return the _production
 	 */
-	public void add(AID aid, BasicDBObject statusData){
-		try{
-			boolean newFileCreated = false;
-			if (logfile == null){
-				logfile = new File("log " + aid.toString().replaceAll("[\\/:*?\"<>|]", "") + ".json");
-				logfile.createNewFile();
-				newFileCreated = true;
-			}
-			if (writer == null){
-				writer = new FileWriter(logfile, true);
-			}
-			if (newFileCreated){
-				writer.append("{\"" + uniqueCurrentTime() + "\":");
-				writer.flush();
-			} else{
-				try(RandomAccessFile raf = new RandomAccessFile(logfile, "rw")){
-					logfile.length();
-					raf.setLength((logfile.length() - 1));
-					raf.close();
-				}
-				String newObject = new String(",\"" + uniqueCurrentTime()
-						+ "\":");
-				writer.append(newObject);
-				writer.flush();
-			}
-			writer.append(statusData.toString() + "}");
-			writer.flush();
-		} catch(IOException e){
-			Logger.log(LogLevel.ERROR, e);
-		}
+	public Production getProduction(){
+		return _production;
 	}
 	
-	private static final AtomicLong last_time = new AtomicLong();	
+
 	/**
-	 * Returns uniqueCurrentTime
-	 * @see http://stackoverflow.com/questions/9191288
+	 * @param _production
+	 *            the _production to set
 	 */
-	public static long uniqueCurrentTime() {
-	    long newCurrentTime = System.currentTimeMillis();
-	    while(true) {
-	        long lastTime = last_time.get();
-	        if (lastTime >= newCurrentTime)
-	        	newCurrentTime = lastTime+1;
-	        if (last_time.compareAndSet(lastTime, newCurrentTime))
-	            return newCurrentTime;
-	    }
+	public void setProduction(Production production){
+		this._production = production;
+	}
+
+	/**
+	 * @param aid 
+	 * @param statusData
+	 */
+	public void addStatusDataToLog(AID aid, BasicDBObject statusData){
+		log.add(aid, statusData);
+		
+	}
+	
+	@Override
+	public String toString() {
+		return "DataObject [production=" +_production+"]";
 	}
 }

@@ -38,7 +38,7 @@
  * 
  **/
 
-package agents.data;
+package agents.data_classes;
 
 import jade.core.AID;
 

@@ -38,8 +38,8 @@ package agents.hardware_agent;
 
 import org.bson.types.ObjectId;
 
-import agents.data.MongoSaveable;
-import agents.data.StepStatusCode;
+import agents.data_classes.MongoSaveable;
+import agents.data_classes.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 

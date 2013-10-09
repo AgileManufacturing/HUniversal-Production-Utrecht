@@ -82,13 +82,13 @@ import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
-import agents.data.DbData;
-import agents.data.EquipletMode;
-import agents.data.EquipletState;
-import agents.data.EquipletStateEntry;
-import agents.data.ProductStep;
-import agents.data.ScheduleData;
-import agents.data.StepStatusCode;
+import agents.data_classes.DbData;
+import agents.data_classes.EquipletMode;
+import agents.data_classes.EquipletState;
+import agents.data_classes.EquipletStateEntry;
+import agents.data_classes.ProductStep;
+import agents.data_classes.ScheduleData;
+import agents.data_classes.StepStatusCode;
 import agents.equiplet_agent.behaviours.AbortStep;
 import agents.equiplet_agent.behaviours.InitialisationFinished;
 import agents.equiplet_agent.behaviours.ServiceAgentDied;

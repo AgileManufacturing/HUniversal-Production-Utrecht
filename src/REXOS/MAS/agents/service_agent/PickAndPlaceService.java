@@ -55,10 +55,10 @@ import libraries.knowledgedb_client.Queries;
 import libraries.knowledgedb_client.Row;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
-import agents.data.Part;
-import agents.data.Position;
-import agents.data.ScheduleData;
-import agents.data.StepStatusCode;
+import agents.data_classes.Part;
+import agents.data_classes.Position;
+import agents.data_classes.ScheduleData;
+import agents.data_classes.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 

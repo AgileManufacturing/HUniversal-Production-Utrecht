@@ -56,8 +56,8 @@ import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
-import agents.data.ProductStep;
-import agents.data.StepStatusCode;
+import agents.data_classes.ProductStep;
+import agents.data_classes.StepStatusCode;
 import agents.equiplet_agent.EquipletAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 

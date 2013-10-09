@@ -52,8 +52,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import agents.data.Position;
-import agents.data.StepStatusCode;
+import agents.data_classes.Position;
+import agents.data_classes.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 

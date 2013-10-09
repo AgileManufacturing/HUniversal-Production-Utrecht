@@ -45,7 +45,7 @@
  *          SUCH DAMAGE.
  * 
  **/
-package agents.data;
+package agents.data_classes;
 
 import java.io.Serializable;
 

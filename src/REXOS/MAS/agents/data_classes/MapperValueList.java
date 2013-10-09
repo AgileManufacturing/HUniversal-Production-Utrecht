@@ -1,7 +1,6 @@
 /**
- * @file rexos/mas/data/Mapper.java
- * @brief Class where the key and value can be added to/ removed from the
- *        hashmap aswell as the posibility to retrieve the value.
+ * @file rexos/mas/data/MapperValueList.java
+ * @brief
  * @date Created: 02-04-2013
  * 
  * @author Mike Schaap
@@ -38,39 +37,13 @@
  * 
  **/
 
-package agents.data;
+package agents.data_classes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
-public abstract class Mapper<KT, VT> {
-	protected HashMap<KT, ArrayList<VT>> _items;
-
-	protected Mapper(){
-		this._items = new HashMap<>();
-	}
-
-	protected void addMapKey(KT id){
-		this._items.put(id, new ArrayList<VT>());
-	}
-
-	protected void removeMapKey(KT id){
-		this._items.remove(id);
-	}
-
-	protected ArrayList<VT> getMapValues(KT id){
-		return this._items.get(id);
-	}
-
-	protected void addMapValue(KT id, VT value){
-		ArrayList<VT> tmp = this._items.get(id);
-		tmp.add(value);
-		this._items.put(id, tmp);
-	}
-
-	protected void removeMapValue(KT id, VT value){
-		ArrayList<VT> tmp = this._items.get(id);
-		tmp.remove(value);
-		this._items.put(id, tmp);
-	}
+public class MapperValueList<T> extends ArrayList<T>{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 }

@@ -60,11 +60,11 @@ import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
-import agents.data.Part;
-import agents.data.ProductStep;
-import agents.data.ProductionStep;
-import agents.data.ScheduleData;
-import agents.data.StepStatusCode;
+import agents.data_classes.Part;
+import agents.data_classes.ProductStep;
+import agents.data_classes.ProductionStep;
+import agents.data_classes.ScheduleData;
+import agents.data_classes.StepStatusCode;
 import agents.equiplet_agent.EquipletAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 

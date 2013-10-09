@@ -32,7 +32,7 @@
  *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  **/
-package agents.data;
+package agents.data_classes;
 
 public enum EquipletMode {
 	NORMAL(0), LOCK(1), STEP(2), ERROR(3), CRITICAL_ERROR(4), EMERGENCY_STOP(5), SERVICE(6);

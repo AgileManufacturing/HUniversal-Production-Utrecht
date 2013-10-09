@@ -1,4 +1,4 @@
-package agents.data;
+package agents.data_classes;
 import com.google.gson.annotations.SerializedName;
 
 /**

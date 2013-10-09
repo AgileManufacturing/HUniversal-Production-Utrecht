@@ -44,8 +44,8 @@ import jade.core.behaviours.ParallelBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
-import agents.data.AgentStatus;
-import agents.data.BehaviourStatus;
+import agents.data_classes.AgentStatus;
+import agents.data_classes.BehaviourStatus;
 import agents.product_agent.BehaviourCallback;
 import agents.product_agent.ProductAgent;
 

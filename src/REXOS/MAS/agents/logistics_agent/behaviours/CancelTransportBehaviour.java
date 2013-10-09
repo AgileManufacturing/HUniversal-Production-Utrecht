@@ -41,7 +41,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
-import agents.data.Part;
+import agents.data_classes.Part;
 import agents.shared_behaviours.ReceiveBehaviour;
 
 public class CancelTransportBehaviour extends ReceiveBehaviour {

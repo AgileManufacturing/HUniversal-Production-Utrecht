@@ -50,12 +50,12 @@ import java.util.Queue;
 
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
-import agents.data.BehaviourStatus;
-import agents.data.Product;
-import agents.data.Production;
-import agents.data.ProductionEquipletMapper;
-import agents.data.ProductionStep;
-import agents.data.StepStatusCode;
+import agents.data_classes.BehaviourStatus;
+import agents.data_classes.Product;
+import agents.data_classes.Production;
+import agents.data_classes.ProductionEquipletMapper;
+import agents.data_classes.ProductionStep;
+import agents.data_classes.StepStatusCode;
 import agents.product_agent.BehaviourCallback;
 import agents.product_agent.ProductAgent;
 

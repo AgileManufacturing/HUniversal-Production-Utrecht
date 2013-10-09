@@ -10,8 +10,8 @@ import java.io.IOException;
 
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
-import agents.data.BehaviourStatus;
-import agents.data.ProductionStep;
+import agents.data_classes.BehaviourStatus;
+import agents.data_classes.ProductionStep;
 
 public class SubInformerBehaviour extends agents.shared_behaviours.ReceiveBehaviour {
 

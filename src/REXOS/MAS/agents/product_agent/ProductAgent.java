@@ -47,12 +47,12 @@ import java.util.ArrayList;
 
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
-import agents.data.AgentStatus;
-import agents.data.Callback;
-import agents.data.Product;
-import agents.data.ProductAgentProperties;
-import agents.data.Production;
-import agents.data.ProductionStep;
+import agents.data_classes.AgentStatus;
+import agents.data_classes.Callback;
+import agents.data_classes.Product;
+import agents.data_classes.ProductAgentProperties;
+import agents.data_classes.Production;
+import agents.data_classes.ProductionStep;
 import agents.product_agent.behaviours.OverviewBehaviour;
 
 import com.google.gson.Gson;

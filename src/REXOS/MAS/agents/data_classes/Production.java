@@ -1,7 +1,7 @@
 /**
- * @file rexos/mas/data/Product.java
- * @brief Class where the log and production can be retrieved from
- *        production.java
+ * @file rexos/mas/data/Production.java
+ * @brief Class where all the data relevant to the production object will be
+ *        saved.
  * @date Created: 02-04-2013
  * 
  * @author Mike Schaap
@@ -38,72 +38,74 @@
  * 
  **/
 
-package agents.data;
+package agents.data_classes;
 
-import jade.core.AID;
-import libraries.utillities.log.LogLevel;
-import libraries.utillities.log.Logger;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-import com.mongodb.BasicDBObject;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-public class Product{
+public class Production{
 	
-	private Production _production;
 
+	private ArrayList<ProductionStep> _productionSteps;
 
-	/**
-	 * @param log the log to set
-	 */
-	public void setLog(ProductLog log){
-		this.log = log;
+	private ProductionEquipletMapper _prodEQMap;
+
+	public Production(){
+		_prodEQMap = new ProductionEquipletMapper();
 	}
 
-	private ProductLog log;
-
-	/**
-	 * @return the log
-	 */
-	public ProductLog getLog(){
-		return log;
-	}
-
-	public Product(Production production){
-		if (production == null){
-			NullPointerException noProduction = new NullPointerException("Production can't be null");
-			Logger.log(LogLevel.ERROR, noProduction);
-			throw noProduction;
+	public Production(ArrayList<ProductionStep> productionSteps)
+			throws Exception{
+		this();
+		if (productionSteps == null)
+			throw new Exception("Production steps can't be null");
+		this._productionSteps = productionSteps;
+		for(ProductionStep p : this._productionSteps){
+			this._prodEQMap.addProductionStep(p.getId());
 		}
-		setProduction(production);
-		log = new ProductLog();
 	}
 
-	/**
-	 * @return the _production
-	 */
-	public Production getProduction(){
-		return _production;
+	public ArrayList<ProductionStep> getProductionSteps(){
+		return _productionSteps;
 	}
 	
-
-	/**
-	 * @param _production
-	 *            the _production to set
-	 */
-	public void setProduction(Production production){
-		this._production = production;
+	public void setProductionSteps(ArrayList<ProductionStep> prodsteps) {
+		this._productionSteps = prodsteps;
 	}
 
-	/**
-	 * @param aid 
-	 * @param statusData
-	 */
-	public void addStatusDataToLog(AID aid, BasicDBObject statusData){
-		log.add(aid, statusData);
-		
+	public void setProductionEquipletMapping(ProductionEquipletMapper prodEQMap)
+			throws NullPointerException{
+		if (prodEQMap == null){
+			throw new NullPointerException("ProductionEquipletMapper can't be null");
+		}
+		this._prodEQMap = prodEQMap;
+	}
+	
+	public ProductionStep getProductionStep(int id) {
+		return _productionSteps.get(id);
+	}
+
+	public ProductionEquipletMapper getProductionEquipletMapping(){
+		return this._prodEQMap;
 	}
 	
 	@Override
 	public String toString() {
-		return "DataObject [production=" +_production+"]";
+	   return "DataObject [productionSteps=" + _productionSteps+ "]";
+	}
+	
+	public int getProductionCount() {
+		return this._productionSteps.size();
+	}
+	
+	public HashMap<String, ProductionStep> createConversationIdToProductionStepMapping() {
+		HashMap<String, ProductionStep> outputMap = new HashMap<String, ProductionStep>();
+		for(ProductionStep step : _productionSteps) {
+				outputMap.put(step.getConversationId(), step);
+		}
+		return outputMap;
 	}
 }

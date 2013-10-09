@@ -36,8 +36,8 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
-import agents.data.Part;
-import agents.data.ProductStep;
+import agents.data_classes.Part;
+import agents.data_classes.ProductStep;
 import agents.shared_behaviours.ReceiveBehaviour;
 
 /**

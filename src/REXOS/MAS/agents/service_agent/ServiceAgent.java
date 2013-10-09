@@ -63,10 +63,10 @@ import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
-import agents.data.DbData;
-import agents.data.Part;
-import agents.data.ProductStep;
-import agents.data.StepStatusCode;
+import agents.data_classes.DbData;
+import agents.data_classes.Part;
+import agents.data_classes.ProductStep;
+import agents.data_classes.StepStatusCode;
 import agents.service_agent.behaviours.ArePartsAvailableInTimeResponse;
 import agents.service_agent.behaviours.ArePartsAvailableResponse;
 import agents.service_agent.behaviours.CanDoProductStep;
