@@ -227,7 +227,7 @@ void CameraControlNode::transitionShutdown(rexos_statemachine::TransitionActionS
 void CameraControlNode::transitionStart(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Start transition called");
 	camera_node::enableCamera serviceCall;
-	serviceCall.enable = true;
+	serviceCall.request.enable = true;
 	enableCameraClient.call(serviceCall);
 	
 	as->setSucceeded();
@@ -239,7 +239,7 @@ void CameraControlNode::transitionStart(rexos_statemachine::TransitionActionServ
 void CameraControlNode::transitionStop(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Stop transition called");
 	camera_node::enableCamera serviceCall;
-	serviceCall.enable = true;
+	serviceCall.request.enable = false;
 	enableCameraClient.call(serviceCall);
 	
 	as->setSucceeded();
