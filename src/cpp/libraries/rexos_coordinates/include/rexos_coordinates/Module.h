@@ -1,9 +1,9 @@
 /**
- * @file Services.h
- * @brief Containts the services names
- * @date Created: 2012-10-23
+ * @file Module.h
+ * @brief Coordinate system for communication between nodes
+ * @date Created: 2012-01-??  TODO: Date
  *
- * @author Koen Braham
+ * @author Tommas Bakker
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -27,16 +27,44 @@
  *
  **/
 
-#pragma once
+#ifndef MODULE_H
+#define MODULE_H
 
-#include <string>
+#include <Vectors/Vectors.h>
 
-namespace camera_node_services {
-	const std::string INCREASE_EXPOSURE = "increaseExposure";
-	const std::string DECREASE_EXPOSURE = "decreaseExposure";
-	const std::string AUTO_WHITE_BALANCE = "autoWhiteBalance";
-	const std::string FISH_EYE_CORRECTION = "fishEyeCorrection";
-	const std::string ENABLE_CAMERA = "enableCamera";
-	const std::string SET_CORRECTION_MATRICES = "setCalibrationMatrices";
-	const std::string GET_CORRECTION_MATRICES = "getCalibrationMatrices";
+/**
+ * @brief this class provides a system to translate coordinates from module coordinates to equiplet coordinates.
+ */
+namespace rexos_coordinates {
+	class Module {
+	private:
+		int moduleId;
+		Vector3 moduleToEquiplet;
+		Vector3 equipletToModule;
+		
+	protected:
+		Vector3 convertToEquipletCoordinate(Vector3 moduleCoordinate);
+		Vector3 convertToModuleCoordinate(Vector3 equipletCoordinate);
+		
+		/**
+		 * Reads the module information from the database and updates the local properties. \n
+		 * Use this function if you have physically moved the module
+		 *
+		 * @param boardSize amount of squares horizontally -1, amount of squares vertically -1
+		 * @param images the vector containing all the cv:mat images. The images must be MONO8 format.
+		 * @return the amount of images which are successfully processed
+		 */
+		Module(int moduleId);
+	public:
+		/**
+		 * Reads the module information from the database and updates the local properties. \n
+		 * Use this function if you have physically moved the module
+		 *
+		 * @param boardSize amount of squares horizontally -1, amount of squares vertically -1
+		 * @param images the vector containing all the cv:mat images. The images must be MONO8 format.
+		 * @return the amount of images which are successfully processed
+		 */
+		void updateTranslationVectors();
+	};
 }
+#endif /* RECTIFYIMAGE_H */

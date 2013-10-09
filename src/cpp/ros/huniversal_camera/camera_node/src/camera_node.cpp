@@ -33,6 +33,7 @@
 #include "camera_node/Services.h"
 #include "rexos_utilities/Utilities.h"
 
+#include <stdexcept>
 
 CameraNode::CameraNode(int argc, char * argv[]) : it(nodeHandle), exposure(0.015), performFishEyeCorrection(true) {
 	std::vector<std::string> devices;
@@ -49,13 +50,14 @@ CameraNode::CameraNode(int argc, char * argv[]) : it(nodeHandle), exposure(0.015
 		        << std::endl;
 		exit(1);
 	}
-
 	int device_number, format_number;
-	if(rexos_utilities::stringToInt(device_number, argv[1]) != 0) {
+	try{
+		device_number = rexos_utilities::stringToInt(argv[1]);
+	} catch(std::runtime_error ex){
 		std::cerr << "Device number is not a valid number." << std::endl;
 		exit(2);
 	}
-
+	
 	std::vector<std::string> formats;
 	unicap_cv_bridge::list_formats(device_number, formats);
 	std::cout << "Formats:" << std::endl;
@@ -63,11 +65,13 @@ CameraNode::CameraNode(int argc, char * argv[]) : it(nodeHandle), exposure(0.015
 		std::cout << "\t" << formats[i] << std::endl;
 	}
 
-	if(rexos_utilities::stringToInt(format_number, argv[2]) != 0) {
+	try{
+		format_number = rexos_utilities::stringToInt(argv[2]);
+	} catch(std::runtime_error ex){
 		std::cerr << "Format number is not a valid number." << std::endl;
-		exit(3);
+		exit(2);
 	}
-
+	
 	try {
 		// Connect to camera. On failure a exception will be thrown.
 		std::cout << "[DEBUG] Initializing camera" << std::endl;
@@ -140,6 +144,18 @@ bool CameraNode::fishEyeCorrection(camera_node::fishEyeCorrection::Request& requ
 	
 	if(cam) {
 		performFishEyeCorrection = request.enable;
+		return true;
+	} else {
+		return false;
+	}
+
+}
+
+bool CameraNode::enableCamera(camera_node::enableCamera::Request& request, camera_node::enableCamera::Response& response) {
+	std::cout << "[DEBUG] Service enableCamera " << (bool) request.enable << std::endl;
+	
+	if(cam) {
+		isCameraEnabled = request.enable;
 		return true;
 	} else {
 		return false;
@@ -261,6 +277,8 @@ int main(int argc, char* argv[]) {
 	        &CameraNode::autoWhiteBalance, &cn);
 	ros::ServiceServer fishEyeCorrectionService = nodeHandle.advertiseService(camera_node_services::FISH_EYE_CORRECTION,
 	        &CameraNode::fishEyeCorrection, &cn);
+	ros::ServiceServer enableCameraService = nodeHandle.advertiseService(camera_node_services::ENABLE_CAMERA,
+	        &CameraNode::enableCamera, &cn);
 	ros::ServiceServer setCorrectionMatricesService = nodeHandle.advertiseService(camera_node_services::SET_CORRECTION_MATRICES,
 	        &CameraNode::setCorrectionMatrices, &cn);
 	ros::ServiceServer getCorrectionMatricesService = nodeHandle.advertiseService(camera_node_services::GET_CORRECTION_MATRICES,
