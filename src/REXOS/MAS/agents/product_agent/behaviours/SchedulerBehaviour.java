@@ -199,7 +199,7 @@ public class SchedulerBehaviour extends Behaviour {
 
 		BlackboardClient bbc = new BlackboardClient(
 				Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"), 
-				Integer.parseInt(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbPort")));
+				Configuration.getPropertyInt(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbPort"));
 		
 		bbc.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbName"));
 		bbc.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "timeDataCollectionName"));

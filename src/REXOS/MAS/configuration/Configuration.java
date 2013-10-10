@@ -35,6 +35,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.Logger;
+
 public class Configuration {
 	private static String propertiesFilePath = System.getenv("PROPERTIESPATH");
 	
@@ -43,7 +46,7 @@ public class Configuration {
 		if(File != ConfigurationFiles.EQUIPLET_DB_PROPERTIES){
 			return getProperty(File, key, null);
 		} else {
-			System.out.println("Need a equiplet name to read equiplet db properties");
+			Logger.log(LogLevel.ERROR, "Need a equiplet name to read equiplet db properties");
 			return "";
 		}
 	}
@@ -64,17 +67,37 @@ public class Configuration {
 						p.load(new FileInputStream(propertiesFilePath + File.getFileName()));
 						return p.getProperty(key);
 					}
-					System.out.println("Property file not known.");
+					Logger.log(LogLevel.ERROR, "Property file not known.");
 					break;
 			}
-		}catch(NullPointerException e){
-			System.out.println("Property doesnt exist: " + key + " in file " + File.toString());
+		}catch(NullPointerException e) {
+			Logger.log(LogLevel.ERROR, "Property doesnt exist: " + key + " in file " + File.toString());
 		} catch (FileNotFoundException e) {
-			System.out.println("File doesnt exist: " + File.toString());
+			Logger.log(LogLevel.ERROR, "File doesnt exist: " + File.toString());
 		} catch (IOException e) {
-			System.out.println(e);
+			Logger.log(LogLevel.ERROR, e);
 		}
 		return "";
+	}
+	
+	public static int getPropertyInt(ConfigurationFiles File, String key)
+	{
+		if(File != ConfigurationFiles.EQUIPLET_DB_PROPERTIES){
+			return getPropertyInt(File, key, null);
+		} else {
+			Logger.log(LogLevel.ERROR, "Need a equiplet name to read equiplet db properties");
+			return -1;
+		}
+	}
+	
+	public static int getPropertyInt(ConfigurationFiles File, String key, String EquipletName)
+	{
+		try {
+			return Integer.parseInt(getProperty(File, key, EquipletName));
+		} catch(NumberFormatException e){
+			Logger.log(LogLevel.ERROR, "Cant parse integer in configurationfile: " + File, e);
+			return -1;
+		}
 	}
 	
 }

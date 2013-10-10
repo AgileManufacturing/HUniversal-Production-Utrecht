@@ -83,8 +83,8 @@ public class MongoDBConnection {
 			Logger.log(LogLevel.ERROR, "Starting a new mongoclient.");
 			
 			MongoOptions mongoOptions = new MongoOptions();
-			mongoOptions.connectionsPerHost = Integer.parseInt(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "connectionsPerHost"));
-			mongoOptions.threadsAllowedToBlockForConnectionMultiplier = Integer.parseInt(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "threadsAllowedToBlockForConnectionMultiplier"));
+			mongoOptions.connectionsPerHost = Configuration.getPropertyInt(ConfigurationFiles.MONGO_DB_PROPERTIES, "connectionsPerHost");
+			mongoOptions.threadsAllowedToBlockForConnectionMultiplier = Configuration.getPropertyInt(ConfigurationFiles.MONGO_DB_PROPERTIES, "threadsAllowedToBlockForConnectionMultiplier");
 			
 			mongoClient = new Mongo(address, mongoOptions);
 			mongoClient.setWriteConcern(WriteConcern.SAFE);
