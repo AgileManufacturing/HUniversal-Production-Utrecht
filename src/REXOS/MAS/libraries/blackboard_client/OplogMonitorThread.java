@@ -85,9 +85,9 @@ class OplogMonitorThread extends Thread {
 	 * @param query The query that will be used in the tailed cursor.
 	 **/
 	public OplogMonitorThread(Mongo mongo, String oplogDBName, String oplogCollectionName, DBObject query) {
-		DB database = mongo.getDB(oplogDBName);
+		database = mongo.getDB(oplogDBName);
 		DBCollection collection = database.getCollection(oplogCollectionName);
-
+		
 		tailedCursor = collection.find(query);
 		tailedCursor.addOption(Bytes.QUERYOPTION_TAILABLE);
 		tailedCursor.addOption(Bytes.QUERYOPTION_AWAITDATA);
@@ -111,7 +111,7 @@ class OplogMonitorThread extends Thread {
 		database = mongo.getDB(oplogDBName);
 		database.authenticate(username, password.toCharArray());
 		DBCollection collection = database.getCollection(oplogCollectionName);
-
+		
 		tailedCursor = collection.find(query);
 		tailedCursor.addOption(Bytes.QUERYOPTION_TAILABLE);
 		tailedCursor.addOption(Bytes.QUERYOPTION_AWAITDATA);
@@ -127,50 +127,50 @@ class OplogMonitorThread extends Thread {
 		this.subscriptions = new BlackboardSubscription[subscriptions.size()];
 		subscriptions.toArray(this.subscriptions);
 	}
-	
+
 	/**
 	 * Run method for the TailedCursorThread.
 	 * This will check for changes within the cursor and calls the onMessage method of its subscriber.
-	 **/
+	 */
 	@Override
 	public void run() {
-		while (!Thread.interrupted() && tailedCursor.getCursorId() != 0){
-			database.requestStart();
-			try {
-				while (tailedCursor.hasNext()) {
+		Logger.log(LogLevel.ERROR, "trying to use cursor : " + tailedCursor.getCursorId());
+		try{
+			do {
+				while (!Thread.interrupted() && tailedCursor.hasNext()) {
 					OplogEntry entry = new OplogEntry(tailedCursor.next());
-
+	
 					for (BlackboardSubscription sub : subscriptions) {
 						if (sub.matchesWithEntry(entry)) {
 							callbackThread.addCallback(sub.getSubscriber(), entry);
 						}
 					}
 				}
-			} catch (MongoInterruptedException | MongoException.CursorNotFound ex) {
-				/*
-				 * MongoInterruptedException is thrown by Mongo when interrupt is called while blocking on the
-				 * tailedCursor's hasNext method. When this happens, return from the run method to kill the thread.
-				 */
-				
-				/*
-				 * MongoException.CursorNotFound indicates the cursor was killed while blocking on hasNext.
-				 * We purposely kill the cursor when the OplogMonitorThread is interrupted, thus expect this to happen.
-				 */
-				
-				Logger.log(LogLevel.CRITICAL,"OplogMonitorThread ending due to %s:\n%s\n", ex.getClass().getName(), ex.getMessage());
-			} finally {
-				try {
-					if (tailedCursor != null) {
-						tailedCursor.close();
-					}
-				} catch (Throwable t) {
-					// If closing the cursor throws something, it's most likely not something we can fix.
-					Logger.log(LogLevel.ERROR, "%s thrown while closing cursor:\n%s\n", t.getClass().getName(), t.getMessage());
+				Thread.sleep(POLL_INTERVAL);
+			} while (!Thread.interrupted() && tailedCursor.getCursorId() != 0);
+		} catch (MongoInterruptedException | MongoException.CursorNotFound | InterruptedException ex) {
+			/*
+			 * MongoInterruptedException is thrown by Mongo when interrupt is called while blocking on the
+			 * tailedCursor's hasNext method. When this happens, return from the run method to kill the thread.
+			 */
+			
+			/*
+			 * MongoException.CursorNotFound indicates the cursor was killed while blocking on hasNext.
+			 * We purposely kill the cursor when the OplogMonitorThread is interrupted, thus expect this to happen.
+			 */
+			Logger.log(LogLevel.CRITICAL,"OplogMonitorThread ending due to %s:\n%s\n", ex.getClass().getName(), ex.getMessage());
+		} finally {
+			try {
+				if (tailedCursor != null) {
+					tailedCursor.close();
+					Logger.log(LogLevel.ERROR, "Closing cursor");
 				}
-				database.requestDone();
+			} catch (Throwable t) {
+				// If closing the cursor throws something, it's most likely not something we can fix.
+				Logger.log(LogLevel.ERROR, "%s thrown while closing cursor:\n%s\n", t.getClass().getName(), t.getMessage());
 			}
+			//
 		}
-		
 		callbackThread.shutdown();
 	}
 }
