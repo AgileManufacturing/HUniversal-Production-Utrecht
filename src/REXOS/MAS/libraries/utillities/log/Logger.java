@@ -99,36 +99,13 @@ public class Logger {
 	{
 		if(level.getLevel() >= loglevelThreshold){
 			switch(level){		
-				case EMERGENCY:
-					if(msg.getClass() == Throwable.class){
-						System.err.println("EMERGENCY:\t" + ((Throwable)msg).getStackTrace().toString());
-					}
-					else{
-						System.err.println("EMERGENCY:\t" + msg );
-					}
-					break;
-					
+			
+				case EMERGENCY:					
 				case ALERT:
-					if(msg.getClass() == Throwable.class){
-						System.err.println("ALERT:\t" + ((Throwable)msg).getStackTrace().toString());
-					}
-					else{
-						System.err.println("ALERT:\t" + msg );
-					}
-					break;
-					
 				case CRITICAL:
-					if(msg.getClass() == Throwable.class){
-						System.err.println("CRITICAL:\t" + ((Throwable)msg).getStackTrace().toString());
-					}
-					else{
-						System.err.println("CRITICAL:\t" + msg );
-					}
-					break;
-					
 				case ERROR:
 					if(msg.getClass() == Throwable.class){
-						System.err.println("ERROR:\t" + ((Throwable)msg).getStackTrace().toString());
+						System.err.println(level.name() + "\t" + ((Throwable)msg).getStackTrace().toString());
 					}
 					else{
 						System.err.println("ERROR:\t" + msg);
@@ -136,19 +113,10 @@ public class Logger {
 					break;
 					
 				case WARNING:
-					System.out.println("WARNING:\t" + msg);
-					break;
-					
 				case NOTIFICATION:
-					System.out.println("NOTIFICATION:\t" + msg);
-					break;
-					
 				case INFORMATION:
-					System.out.println("INFORMATION:\t" + msg);
-					break;
-					
 				case DEBUG:
-					System.out.println("DEBUG:\t" + msg);
+					System.out.println(level.name() + "\t" + msg);
 					break;
 					
 			}

@@ -32,10 +32,17 @@ package libraries.blackboard_client.data_classes;
 
 import java.util.Hashtable;
 
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.Logger;
+
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
+import com.mongodb.MongoOptions;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
+
+import configuration.Configuration;
+import configuration.ConfigurationFiles;
 
 /**
  * Helper class for managing Mongo connections.
@@ -73,7 +80,13 @@ public class MongoDBConnection {
 	 **/
 	private MongoDBConnection(ServerAddress address) throws GeneralMongoException {
 		try {
-			mongoClient = new Mongo(address);
+			Logger.log(LogLevel.ERROR, "Starting a new mongoclient.");
+			
+			MongoOptions mongoOptions = new MongoOptions();
+			mongoOptions.connectionsPerHost = Configuration.getPropertyInt(ConfigurationFiles.MONGO_DB_PROPERTIES, "connectionsPerHost");
+			mongoOptions.threadsAllowedToBlockForConnectionMultiplier = Configuration.getPropertyInt(ConfigurationFiles.MONGO_DB_PROPERTIES, "threadsAllowedToBlockForConnectionMultiplier");
+			
+			mongoClient = new Mongo(address, mongoOptions);
 			mongoClient.setWriteConcern(WriteConcern.SAFE);
 		} catch (MongoException mongoException) {
 			throw new GeneralMongoException("A mongo exception occurred while connecting.", mongoException);

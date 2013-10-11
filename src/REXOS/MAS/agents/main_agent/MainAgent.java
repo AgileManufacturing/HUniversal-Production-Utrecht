@@ -98,7 +98,7 @@ public class MainAgent extends Agent {
 			// Empty the equiplet directory before starting the first equiplet agent
 			BlackboardClient collectiveBBClient = new BlackboardClient(
 					Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"), 
-					Integer.parseInt(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbPort")));
+					Configuration.getPropertyInt(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbPort"));
 					
 			collectiveBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbName"));
 			collectiveBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletDirectoryName"));
