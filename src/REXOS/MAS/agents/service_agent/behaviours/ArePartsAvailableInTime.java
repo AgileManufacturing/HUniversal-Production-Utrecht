@@ -39,6 +39,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
@@ -48,6 +49,8 @@ import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
+import agents.data_classes.BehaviourCallbackItem;
+import agents.data_classes.ParentBehaviourCallback;
 import agents.data_classes.ProductStep;
 import agents.data_classes.StepStatusCode;
 import agents.service_agent.ServiceAgent;
@@ -63,7 +66,7 @@ import com.mongodb.BasicDBObject;
  * @author Peter Bonnema
  * 
  */
-public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
+public class ArePartsAvailableInTime extends ReceiveBehaviour {
 	/**
 	 * @var long serialVersionUID
 	 *      The serialVersionUID of this class.
@@ -74,7 +77,13 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 	 * @var ServiceAgent agent
 	 *      The service agent this behaviour belongs to.
 	 */
-	private ServiceAgent agent;
+	private ServiceAgent serviceAgent;
+
+	private ParentBehaviourCallback parentBehaviourCallback;
+
+	private ProductStep productStep;
+
+	private String conversationID;
 
 	/**
 	 * Creates a new ArePartsAvailableInTimeResponse instance with the specified parameters.
@@ -84,11 +93,33 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
 	 * @param productStep The productStep from which the parts come.
 	 */
-	public ArePartsAvailableInTimeResponse(ServiceAgent agent) {
-		super(agent, MessageTemplate.MatchOntology("ArePartsAvailableInTimeResponse"));
-		this.agent = agent;
+	public ArePartsAvailableInTime(ServiceAgent serviceAgent, ParentBehaviourCallback parentBehaviourCallback,
+			String conversationID, ProductStep productStep) {
+		super(serviceAgent, MessageTemplate.MatchOntology("ArePartsAvailableInTime"));
+		this.serviceAgent = serviceAgent;
+		
+		this.parentBehaviourCallback = parentBehaviourCallback;
+		
+		this.productStep = productStep;
+		this.conversationID = conversationID;
 	}
 
+	@Override
+	public void onStart(){
+
+		ACLMessage responseMessage = new ACLMessage(ACLMessage.QUERY_IF);
+		responseMessage.addReceiver(serviceAgent.getLogisticsAID());
+		responseMessage.setConversationId(conversationID);
+		if (productStep != null){
+			try {
+				responseMessage.setContentObject(productStep.getInputParts());
+			} catch (IOException e) {
+				Logger.log(LogLevel.ERROR, e);
+			}
+		}
+		responseMessage.setOntology("ArePartsAvailableInTime");
+		serviceAgent.send(responseMessage);
+	}
 	/**
 	 * Handles an incoming message from the logisticsAgent. The message confirms or disconfirms whether all the
 	 * specified parts will be available when the productStep is about to execute. Once a message is received a
@@ -101,31 +132,37 @@ public class ArePartsAvailableInTimeResponse extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if(message != null) {
 			try {
-				Logger.log(LogLevel.DEBUG, "%s ArePartsAvailableInTimeResponse%n", agent.getLocalName());
+				Logger.log(LogLevel.DEBUG, "%s ArePartsAvailableInTimeResponse%n", serviceAgent.getLocalName());
 				
-				BlackboardClient productStepBBClient = agent.getProductStepBBClient();
-				ObjectId productStepId = agent.getProductStepIdForConvId(message.getConversationId());
+				BlackboardClient productStepBBClient = serviceAgent.getProductStepBBClient();
+				ObjectId productStepId = serviceAgent.getProductStepIdForConvId(message.getConversationId());
 				ProductStep productStep = new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(productStepId));
 				if(message.getPerformative() == ACLMessage.CONFIRM) {
-					ACLMessage sendMsg = message.createReply();
-					sendMsg.setOntology("GetPartsInfo");
-					sendMsg.setPerformative(ACLMessage.QUERY_IF);
-					sendMsg.setContentObject(productStep.getInputParts());
-					agent.send(sendMsg);
+					
+					BehaviourCallbackItem arguments = new BehaviourCallbackItem();
+					arguments.addArgument("productStep", productStep);
+					parentBehaviourCallback.callback(message, arguments);
+					
+			//		ACLMessage sendMsg = message.createReply();
+			//		sendMsg.setOntology("GetPartsInfo");
+			//		sendMsg.setPerformative(ACLMessage.QUERY_IF);
+			//		sendMsg.setContentObject(productStep.getInputParts());
+			//		serviceAgent.send(sendMsg);
 				} else {
-					agent.getProductStepBBClient().updateDocuments(
+					serviceAgent.getProductStepBBClient().updateDocuments(
 							new BasicDBObject("_id", productStep.getId()),
 							new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.ABORTED.name())
 									.append("statusData", new BasicDBObject("reason",
 											"productStep cannot be delivered on time"))));
 				}
-			} catch(IOException | InvalidDBNamespaceException | GeneralMongoException e) {
+			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(LogLevel.ERROR, e);
-				agent.doDelete();
+				serviceAgent.doDelete();
 			}
+			serviceAgent.removeBehaviour(this);
 		} else {
-			Logger.log(LogLevel.WARNING, agent.getName() + " - ArePartsAvailableInTimeReponse timeout!");
-			agent.doDelete();
+			Logger.log(LogLevel.WARNING, serviceAgent.getName() + " - ArePartsAvailableInTimeReponse timeout!");
+			serviceAgent.doDelete();
 		}
 	}
 }

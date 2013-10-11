@@ -49,6 +49,8 @@ import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
+import agents.data_classes.BehaviourCallbackItem;
+import agents.data_classes.ParentBehaviourCallback;
 import agents.data_classes.ProductStep;
 import agents.service_agent.Service;
 import agents.service_agent.ServiceAgent;
@@ -64,7 +66,7 @@ import com.mongodb.BasicDBObject;
  * @author Peter Bonnema
  * 
  */
-public class GetProductStepDuration extends ReceiveBehaviour {
+public class ProductStepDuration extends ReceiveBehaviour implements ParentBehaviourCallback{
 	/**
 	 * @var long serialVersionUID
 	 *      The serialVersionUID of this class.
@@ -75,16 +77,16 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 	 * @var ServiceAgent agent
 	 *      The service agent this behaviour belongs to.
 	 */
-	private ServiceAgent agent;
+	private ServiceAgent serviceAgent;
 
 	/**
 	 * Creates a new GetProductStepDuration instance with the specified parameters.
 	 * 
 	 * @param agent the agent this behaviour belongs to.
 	 */
-	public GetProductStepDuration(ServiceAgent agent) {
-		super(agent, MessageTemplate.MatchOntology("GetProductionStepDuration"));
-		this.agent = agent;
+	public ProductStepDuration(ServiceAgent agent) {
+		super(agent, MessageTemplate.MatchOntology("ProductStepDuration"));
+		this.serviceAgent = agent;
 	}
 
 	/**
@@ -101,38 +103,50 @@ public class GetProductStepDuration extends ReceiveBehaviour {
 		try {
 			ObjectId productStepId = (ObjectId) message.getContentObject();
 			ProductStep productStep =
-					new ProductStep((BasicDBObject) agent.getProductStepBBClient().findDocumentById(productStepId));
+					new ProductStep((BasicDBObject) serviceAgent.getProductStepBBClient().findDocumentById(productStepId));
 			int productStepType = productStep.getType();
 
-			//Logger.log("%s got message GetProductStepDuration for step type %s%n", agent.getLocalName(),
-					//productStepType);
+			Logger.log(LogLevel.DEBUG, "%s got message GetProductStepDuration for step type %s%n", serviceAgent.getLocalName(),
+					productStepType);
 
-			Service service = agent.getServiceForConvId(message.getConversationId());
+			Service service = serviceAgent.getServiceForConvId(message.getConversationId());
 			BasicDBObject parameters = productStep.getParameters();
 			ServiceStep[] serviceSteps = service.getServiceSteps(productStepType, parameters);
 			for(ServiceStep serviceStep : serviceSteps) {
 				serviceStep.setProductStepId(productStepId);
 			}
 
-			Logger.log(LogLevel.DEBUG, "%s asking %s for duration of %d steps%n", agent.getLocalName(), agent.getHardwareAgentAID()
+			Logger.log(LogLevel.DEBUG, "%s asking %s for duration of %d steps%n", serviceAgent.getLocalName(), serviceAgent.getHardwareAgentAID()
 					.getLocalName(), serviceSteps.length);
 
 			ObjectId serviceStepId = null;
-			BlackboardClient serviceStepBB = agent.getServiceStepBBClient();
+			BlackboardClient serviceStepBB = serviceAgent.getServiceStepBBClient();
 			for(int i = serviceSteps.length - 1; i >= 0; i--) {
 				serviceSteps[i].setNextStep(serviceStepId);
 				serviceStepId = serviceStepBB.insertDocument(serviceSteps[i].toBasicDBObject());
 			}
 
-			ACLMessage askMessage = new ACLMessage(ACLMessage.QUERY_IF);
-			askMessage.addReceiver(agent.getHardwareAgentAID());
-			askMessage.setOntology("GetServiceStepDuration");
-			askMessage.setConversationId(message.getConversationId());
-			askMessage.setContentObject(serviceStepId);
-			agent.send(askMessage);
-		} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
+			serviceAgent.addBehaviour(new ServiceStepDuration(serviceAgent, this, message.getConversationId(), serviceStepId));
+			
+	//		ACLMessage askMessage = new ACLMessage(ACLMessage.QUERY_IF);
+	//		askMessage.addReceiver(serviceAgent.getHardwareAgentAID());
+	//		askMessage.setOntology("ServiceStepDuration");
+	//		askMessage.setConversationId(message.getConversationId());
+	//		askMessage.setContentObject(serviceStepId);
+	//		serviceAgent.send(askMessage);
+		} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException e) {
 			Logger.log(LogLevel.ERROR, e);
-			agent.doDelete();
+			serviceAgent.doDelete();
 		}
+	}
+
+	@Override
+	public void callback(ACLMessage result, BehaviourCallbackItem arguments) {
+		ACLMessage answer = new ACLMessage(ACLMessage.INFORM);
+		answer.addReceiver(serviceAgent.getEquipletAgentAID());
+		answer.setConversationId(result.getConversationId());
+		answer.setOntology("ProductStepDuration");
+		serviceAgent.send(answer);
+		
 	}
 }

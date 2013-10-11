@@ -81,7 +81,7 @@ import org.bson.types.ObjectId;
 
 import agents.data_classes.DbData;
 import agents.data_classes.StepStatusCode;
-import agents.hardware_agent.behaviours.CheckForModules;
+import agents.hardware_agent.behaviours.RequiredModulesPresent;
 import agents.hardware_agent.behaviours.EvaluateDuration;
 import agents.hardware_agent.behaviours.FillPlaceholders;
 import agents.hardware_agent.behaviours.ServiceAgentDied;
@@ -245,7 +245,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		addBehaviour(new FillPlaceholders(this, moduleFactory));
 
 		// Start the checkForModules
-		addBehaviour(new CheckForModules(this));
+		addBehaviour(new RequiredModulesPresent(this));
 
 		// Start the serviceAgentDied
 		addBehaviour(new ServiceAgentDied(this));

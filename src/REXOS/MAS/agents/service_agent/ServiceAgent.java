@@ -67,13 +67,8 @@ import agents.data_classes.DbData;
 import agents.data_classes.Part;
 import agents.data_classes.ProductStep;
 import agents.data_classes.StepStatusCode;
-import agents.service_agent.behaviours.ArePartsAvailableInTimeResponse;
-import agents.service_agent.behaviours.ArePartsAvailableResponse;
-import agents.service_agent.behaviours.CanDoProductStep;
-import agents.service_agent.behaviours.CheckForModulesResponse;
-import agents.service_agent.behaviours.GetPartsInfoResponse;
-import agents.service_agent.behaviours.GetProductStepDuration;
-import agents.service_agent.behaviours.GetServiceStepsDurationResponse;
+import agents.service_agent.behaviours.CanPerformProductionStep;
+import agents.service_agent.behaviours.ProductStepDuration;
 import agents.service_agent.behaviours.InitialisationFinished;
 import agents.service_agent.behaviours.ScheduleStep;
 
@@ -212,14 +207,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 		// Add behaviours
 		addBehaviour(new InitialisationFinished(this));
-		addBehaviour(new CanDoProductStep(this));
-		addBehaviour(new CheckForModulesResponse(this));
-		addBehaviour(new GetProductStepDuration(this));
-		addBehaviour(new GetServiceStepsDurationResponse(this));
+		addBehaviour(new CanPerformProductionStep(this));
+		//addBehaviour(new CheckForModulesResponse(this));
+		addBehaviour(new ProductStepDuration(this));
 		addBehaviour(new ScheduleStep(this));
-		addBehaviour(new ArePartsAvailableResponse(this));
-		addBehaviour(new ArePartsAvailableInTimeResponse(this));
-		addBehaviour(new GetPartsInfoResponse(this));
 	}
 
 	/**

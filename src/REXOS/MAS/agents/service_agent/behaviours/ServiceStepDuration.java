@@ -35,6 +35,9 @@
  **/
 package agents.service_agent.behaviours;
 
+import java.io.IOException;
+import java.io.Serializable;
+
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
@@ -46,6 +49,7 @@ import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
+import agents.data_classes.ParentBehaviourCallback;
 import agents.data_classes.ProductStep;
 import agents.data_classes.ScheduleData;
 import agents.service_agent.ServiceAgent;
@@ -62,7 +66,7 @@ import com.mongodb.BasicDBObject;
  * @author Peter
  * 
  */
-public class GetServiceStepsDurationResponse extends ReceiveBehaviour {
+public class ServiceStepDuration extends ReceiveBehaviour {
 	/**
 	 * @var long serialVersionUID
 	 *      The serialVersionUID of this class.
@@ -73,18 +77,46 @@ public class GetServiceStepsDurationResponse extends ReceiveBehaviour {
 	 * @var ServiceAgent agent
 	 *      The service agent this behaviour belongs to.
 	 */
-	private ServiceAgent agent;
+	private ServiceAgent serviceAgent;
+
+	private ParentBehaviourCallback parentBehaviourCallback;
+
+	private Object contentObject;
+
+	private String conversationID;
 
 	/**
 	 * Creates a new GetServiceStepsDurationResponse instance with the specified parameters.
 	 * 
-	 * @param agent the agent this behaviour belongs to.
+	 * @param serviceAgent the agent this behaviour belongs to.
 	 */
-	public GetServiceStepsDurationResponse(ServiceAgent agent) {
-		super(agent, MessageTemplate.MatchOntology("GetServiceStepDurationResponse"));
-		this.agent = agent;
+	public ServiceStepDuration(ServiceAgent serviceAgent, ParentBehaviourCallback parentBehaviourCallback,
+			String conversationID, Object contentObject) {
+		super(serviceAgent, MessageTemplate.MatchOntology("ServiceStepDuration"));
+		this.serviceAgent = serviceAgent;
+		
+		this.parentBehaviourCallback = parentBehaviourCallback;
+		
+		this.contentObject = contentObject;
+		this.conversationID = conversationID;
 	}
 
+	@Override
+	public void onStart(){
+		ACLMessage responseMessage = new ACLMessage(ACLMessage.QUERY_REF);
+		responseMessage.addReceiver(serviceAgent.getHardwareAgentAID());
+		responseMessage.setConversationId(conversationID);
+		if (contentObject != null){
+			try {
+				responseMessage.setContentObject((Serializable)contentObject);
+			} catch (IOException e) {
+				Logger.log(LogLevel.ERROR, e);
+			}
+		}
+		responseMessage.setOntology("ServiceStepDuration");
+		serviceAgent.send(responseMessage);
+	}
+	
 	/**
 	 * Handles an incoming message from the hardwareAgent. The message indicates that the duration of the serviceStep
 	 * specified by the GetServiceStepsDurationResponse message and all serviceSteps linked to it are filled in on the
@@ -99,39 +131,34 @@ public class GetServiceStepsDurationResponse extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if(message != null) {
 			try {
-				BlackboardClient client = agent.getServiceStepBBClient();
 				ServiceStep serviceStep = new ServiceStep();
 				ObjectId nextStep = (ObjectId) message.getContentObject();
 				int duration = 0;
 				while(nextStep != null) {
-					serviceStep.fromBasicDBObject((BasicDBObject) client.findDocumentById(nextStep));
+					serviceStep.fromBasicDBObject((BasicDBObject) serviceAgent.getServiceStepBBClient().findDocumentById(nextStep));
 					duration += serviceStep.getScheduleData().getDuration();
 					nextStep = serviceStep.getNextStep();
 				}
 
 				ObjectId productStepId = serviceStep.getProductStepId();
 				ProductStep productStep =
-						new ProductStep((BasicDBObject) agent.getProductStepBBClient().findDocumentById(productStepId));
+						new ProductStep((BasicDBObject) serviceAgent.getProductStepBBClient().findDocumentById(productStepId));
 				ScheduleData scheduleData = productStep.getScheduleData();
 				scheduleData.setDuration(duration);
 
 				Logger.log(LogLevel.DEBUG, "Saving duration of %d in prod. step %s%n", duration, productStepId);
-				agent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
+				serviceAgent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
 						new BasicDBObject("$set", new BasicDBObject("scheduleData", scheduleData.toBasicDBObject())));
 
-				ACLMessage answer = new ACLMessage(ACLMessage.INFORM);
-				answer.addReceiver(agent.getEquipletAgentAID());
-				answer.setConversationId(message.getConversationId());
-				answer.setOntology("ProductionDurationResponse");
-				agent.send(answer);
-
-				Logger.log(LogLevel.DEBUG, "%s sending msg (%s)%n", myAgent.getLocalName(), answer.getOntology());
+				parentBehaviourCallback.callback(message, null);
+				serviceAgent.removeBehaviour(this);
+				
 			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {
 				Logger.log(LogLevel.ERROR, e);
 			}
 		} else {
-			Logger.log(LogLevel.DEBUG, agent.getName() + " - GetServiceStepDurationResponse timeout!");
-			agent.doDelete();
+			Logger.log(LogLevel.DEBUG, serviceAgent.getName() + " - GetServiceStepDurationResponse timeout!");
+			serviceAgent.doDelete();
 		}
 	}
 }
