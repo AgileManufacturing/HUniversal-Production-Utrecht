@@ -46,7 +46,7 @@ public:
 	 * @var environmentAction
 	 * The enum for environment actions that are possible
 	 **/
-	enum environmentAction {ADD, UPDATE, REMOVE};
+	enum environmentAction {ADD, UPDATE, ADD_OR_UPDATE, REMOVE};
 	EnvironmentCache();
 	bool lookupEnvironmentObject(environment_cache::LookupEnvironmentObject::Request &req, environment_cache::LookupEnvironmentObject::Response &res);
 	bool updateEnvironmentCache(environment_cache::UpdateEnvironmentCache::Request &req, environment_cache::UpdateEnvironmentCache::Response &res);

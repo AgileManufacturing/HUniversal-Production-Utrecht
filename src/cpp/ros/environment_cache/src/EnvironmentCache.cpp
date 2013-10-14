@@ -93,6 +93,14 @@ bool EnvironmentCache::updateEnvironmentCache(environment_cache::UpdateEnvironme
 				success = true;
 			}
 			break;
+		case ADD_OR_UPDATE:
+			// Item is added to the cache
+			if(addItemToCache(id, req.cacheUpdate.properties.map)){
+				success = true;
+			} else if(updateItemInCache(id, req.cacheUpdate.properties.map)){
+				success = true;
+			}
+			break;
 		case REMOVE:
 			// Remove item from cache
 			if(removeItemFromCache(id)){
