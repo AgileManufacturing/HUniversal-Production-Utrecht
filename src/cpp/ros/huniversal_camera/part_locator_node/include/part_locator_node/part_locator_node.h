@@ -40,41 +40,33 @@
 
 #include <Matrices/Matrices.h>
 #include <Vectors/Vectors.h>
+#include <rexos_coordinates/Module.h>
 
 
-#include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
-#include <rexos_datatypes/InstructionData.h>
-
-
-using namespace cv;
-
-class PartLocatorNode {
+class PartLocatorNode : rexos_coordinates::Module {
 	
 public:
-	PartLocatorNode(std::string blackboardIp);
+	PartLocatorNode(int equipletId, int moduleId);
 	void run();
 	void getRotationAngle();
 private:
-	Vector2 topLeftCoor;
-	Vector2 topRightCoor;
-	Vector2 bottomRightCoor;
-
-
-		float currentXPos;
-		float currentYPos;
-		float currentZPos;
-		std::string maxAcceleration;
-		double STEP;
-
-		Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
-		rexos_datatypes::InstructionData * instructionData;
-
-
-	ros::NodeHandle nodeHandle;
-	void qrCodeCallback(const qr_code_reader_node::Collection & message);
-
-	void writeToBlackBoard(std::string x, std::string y, std::string z, std::string acceleration);
+	Vector2 originalTopLeftCoor;
+	Vector2 originalTopRightCoor;
+	Vector2 originalBottomRightCoor;
+	Vector2 currentTopLeftCoor;
+	Vector2 currentTopRightCoor;
+	Vector2 currentBottomRightCoor;
+	Matrix3 totalMatrix;
+	int foundCorners;
 	
+	ros::NodeHandle nodeHandle;
+	ros::ServiceClient environmentCacheClient;
+	
+	void qrCodeCallback(const qr_code_reader_node::Collection & message);
+	void updateMatrices();
+	Matrix3 calculateOffsetMatrix();
+	Matrix3 calculateRotationMatrix();
+	Matrix3 calculateScaleMatrix();
 };
 
 #endif /* CAMERACONTROLNODE_H_ */

@@ -3,13 +3,14 @@ project(rexos_coordinates)
 
 ## Find catkin and any catkin packages
 find_package(catkin REQUIRED COMPONENTS Vectors)
+find_package(MYSQLCONNECTORCPP)
 
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include
 LIBRARIES rexos_coordinates
 CATKIN_DEPENDS Vectors
-DEPENDS)
+DEPENDS MYSQLCONNECTORCPP)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 include_directories(include ${catkin_INCLUDE_DIRS})

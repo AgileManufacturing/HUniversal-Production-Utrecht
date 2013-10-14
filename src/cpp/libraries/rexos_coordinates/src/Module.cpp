@@ -1,5 +1,7 @@
 #include <rexos_coordinates/Module.h>
 
+#include "ros/ros.h"
+
 #include "mysql_connection.h"
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
@@ -31,11 +33,11 @@ namespace rexos_coordinates{
 		apConnection->setSchema("rexos");
 		
 		sql::PreparedStatement* pstmt = apConnection->prepareStatement("\
-		SELECT location, mountPointX, mountPointY \
+		SELECT location, mountPointX, mountPointY, module_type \
 		FROM modules \
 		WHERE id = ?;");
 		pstmt->setInt(1, moduleId);
-		
+		ROS_INFO("A");
 		sql::ResultSet* moduleResult = pstmt->executeQuery();
 		if(moduleResult->rowsCount() != 1){
 			throw std::invalid_argument("rexos_coordinates::Module Module does not exist in database");
@@ -51,28 +53,34 @@ namespace rexos_coordinates{
 			pstmt2->setInt(1, equipletId);
 			
 			sql::ResultSet* equipletResult = pstmt2->executeQuery();
+			// set the cursor at the first result
+			equipletResult->next(); 
 			
 			sql::PreparedStatement* pstmt3 = apConnection->prepareStatement("\
 			SELECT midPoint_x, midPoint_y, midPoint_z \
 			FROM module_types \
 			WHERE id = ?;");
-			pstmt3->setInt(1, moduleId);
+			pstmt3->setInt(1, moduleResult->getInt("module_type"));
 			
 			sql::ResultSet* moduleTypeResult = pstmt3->executeQuery();
-			
+			// set the cursor at the first result
+			moduleTypeResult->next(); 
 			
 			double offsetX = 
 			(
 				moduleResult->getDouble("mountPointX") * equipletResult->getDouble("mountPoints_distanceX")
 			) + moduleTypeResult->getDouble("midPoint_x");
-			double offsetY = 
+			double offsetY = moduleTypeResult->getDouble("midPoint_Y");
+			double offsetZ = 
 			(
-				moduleResult->getDouble("mountPointY") * equipletResult->getDouble("mountPoints_distanceY")
-			) + moduleTypeResult->getDouble("midPoint_Y");
-			double offsetZ = moduleTypeResult->getDouble("midPoint_Z");
+				-(moduleResult->getDouble("mountPointY") * equipletResult->getDouble("mountPoints_distanceY"))
+			) + moduleTypeResult->getDouble("midPoint_Z");
+			//double offsetZ = moduleTypeResult->getDouble("midPoint_Z");
 			
 			this->equipletToModule = Vector3(offsetX, offsetY, offsetZ);
 			this->moduleToEquiplet = Vector3(-offsetX, -offsetY, -offsetZ);
+			ROS_INFO_STREAM("equipletToModule: " << equipletToModule);
+			ROS_INFO_STREAM("moduleToEquiplet: " << moduleToEquiplet);
 		}
 	}
 }

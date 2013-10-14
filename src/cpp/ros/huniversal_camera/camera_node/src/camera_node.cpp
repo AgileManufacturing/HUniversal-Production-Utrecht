@@ -90,9 +90,9 @@ CameraNode::CameraNode(int argc, char * argv[]) : it(nodeHandle), exposure(0.015
 				std::cerr << "XML correction file not found or unreadable?" << std::endl;
 				exit(4);
 			}
-			isCameraEnabled = true;
+			performFishEyeCorrection = true;
 		} else {
-			isCameraEnabled = false;
+			performFishEyeCorrection = false;
 		}
 
 		std::cout << "[DEBUG] Opening /camera/image topic" << std::endl;
@@ -181,7 +181,6 @@ bool CameraNode::setCorrectionMatrices(camera_node::setCorrectionMatrices::Reque
 			request.distCoeffs[3], 
 			request.distCoeffs[4]
 		);
-		std::cout << "recieving: " << request.cameraMatrix.values[0];
 		cv::Mat cameraMatrix = (cv::Mat_<double>(3,3) << 
 			request.cameraMatrix.values[0], 
 			request.cameraMatrix.values[1], 
@@ -194,8 +193,8 @@ bool CameraNode::setCorrectionMatrices(camera_node::setCorrectionMatrices::Reque
 			request.cameraMatrix.values[8]
 		);
 
-		std::cout << "Dist Coeffs: " << rectifier->distCoeffs << std::endl;
-		std::cout << "Camera matrix: " << rectifier->cameraMatrix << std::endl;
+		ROS_INFO_STREAM("Dist Coeffs: " << std::endl << rectifier->distCoeffs);
+		ROS_INFO_STREAM("Camera matrix: " << std::endl << rectifier->cameraMatrix);
 		
 		rectifier->loadMatrices(cameraMatrix, distCoeffs);
 
@@ -233,22 +232,24 @@ void CameraNode::run() {
 	ros::Rate frameRate(10);
 
 	while(ros::ok()) {
-		// Read image 
-		cam->get_frame(&camFrame);
-		if(performFishEyeCorrection == true){
-			rectifier->rectify(camFrame, rectifiedCamFrame);
-		} else {
-			rectifiedCamFrame = camFrame;
+		if(isCameraEnabled) {
+			// Read image 
+			cam->get_frame(&camFrame);
+			if(performFishEyeCorrection == true){
+				rectifier->rectify(camFrame, rectifiedCamFrame);
+			} else {
+				rectifiedCamFrame = camFrame;
+			}
+
+			ros::Time time = ros::Time::now();
+			cv_bridge::CvImage cvi;
+			cvi.header.stamp = time;
+			cvi.header.frame_id = "image";
+			cvi.encoding = sensor_msgs::image_encodings::BGR8;
+			cvi.image = rectifiedCamFrame;
+			pub.publish(cvi.toImageMsg());
+
 		}
-
-		ros::Time time = ros::Time::now();
-		cv_bridge::CvImage cvi;
-		cvi.header.stamp = time;
-		cvi.header.frame_id = "image";
-		cvi.encoding = sensor_msgs::image_encodings::BGR8;
-		cvi.image = rectifiedCamFrame;
-		pub.publish(cvi.toImageMsg());
-
 		frameRate.sleep();
 		ros::spinOnce();
 	}

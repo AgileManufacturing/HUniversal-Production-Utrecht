@@ -29,9 +29,8 @@
 #include "ros/ros.h"
 
 #include "part_locator_node/part_locator_node.h"
-#include <opencv/cv.h>
-#include <opencv2/highgui/highgui.hpp>
 #include <qr_code_reader_node/Collection.h>
+#include "environment_cache/EnvironmentCache.h"
 
 #include <iostream>
 #include <string>
@@ -43,28 +42,20 @@
 
 
 
-using namespace cv;
 using namespace std;
 
-struct qrCode {
-	Point2f points[3];
-} ;
-
-
-
-PartLocatorNode::PartLocatorNode(std::string blackboardIp):
-	currentXPos(0.0),
-	currentYPos(0.0),
-	currentZPos(0.0),
-	maxAcceleration("50.0"),
-	STEP(1.0) {
-
+PartLocatorNode::PartLocatorNode(int equipletId, int moduleId):
+		rexos_coordinates::Module(moduleId),
+		originalTopLeftCoor(-1, -1),
+		originalTopRightCoor(-1, -1),
+		originalBottomRightCoor(-1, -1),
+		currentTopLeftCoor(-1, -1),
+		currentTopRightCoor(-1, -1),
+		currentBottomRightCoor(-1, -1),
+		foundCorners(0),
+		environmentCacheClient(			nodeHandle.serviceClient<environment_cache::UpdateEnvironmentCache>(	"updateEnvironmentCache"))
+{
 	ROS_INFO("Constructing");
-
-	//DirectMoveStepsBlackBoard
-	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ1", "DirectMoveStepsBlackBoard");
-
-	equipletStepBlackboardClient->removeDocuments("");
 }
 
 void PartLocatorNode::qrCodeCallback(const qr_code_reader_node::Collection & message){
@@ -73,47 +64,144 @@ void PartLocatorNode::qrCodeCallback(const qr_code_reader_node::Collection & mes
 	string bottomRightValue = "WP_800_400_BR";
 	
 	int collectionSize = message.collection.size();
-	int foundCorners = 0;
 	
+	bool updateMatrices = false;
 	for(int i = 0; i < collectionSize; i++){		
 		if(topLeftValue.compare(message.collection[i].value) == 0){
-			topLeftCoor.x = message.collection[i].corners[1].x;
-			topLeftCoor.y = message.collection[i].corners[1].y;
-foundCorners++;			
-		}else if(topRightValue.compare(message.collection[i].value) == 0){
-			topRightCoor.x = message.collection[i].corners[1].x;
-			topRightCoor.y = message.collection[i].corners[1].y;			
-foundCorners++;			
-		}else if(bottomRightValue.compare(message.collection[i].value) == 0){
-			bottomRightCoor.x = message.collection[i].corners[1].x;
-			bottomRightCoor.y = message.collection[i].corners[1].y;			
-foundCorners++;			
+			currentTopLeftCoor.x = message.collection[i].corners[1].x;
+			currentTopLeftCoor.y = message.collection[i].corners[1].y;
+			updateMatrices = true;
+			if(originalTopLeftCoor.x == -1){
+				originalTopLeftCoor = currentTopLeftCoor;
+				foundCorners++;			
+			}
+		} else if(topRightValue.compare(message.collection[i].value) == 0){
+			currentTopRightCoor.x = message.collection[i].corners[1].x;
+			currentTopRightCoor.y = message.collection[i].corners[1].y;			
+			updateMatrices = true;
+			if(originalTopRightCoor.x == -1){
+				originalTopRightCoor = currentTopRightCoor;
+				foundCorners++;
+			}
+		} else if(bottomRightValue.compare(message.collection[i].value) == 0){
+			currentBottomRightCoor.x = message.collection[i].corners[1].x;
+			currentBottomRightCoor.y = message.collection[i].corners[1].y;			
+			updateMatrices = true;
+			if(originalBottomRightCoor.x == -1){
+				originalBottomRightCoor = currentBottomRightCoor;
+				foundCorners++;
+			}
 		}
 	}
+	if(foundCorners == 3) this->updateMatrices();
 
-
-
-
-
-
-	ROS_INFO_STREAM("topLeftCoor " << topLeftCoor);
-	ROS_INFO_STREAM("topRightCoor " << topRightCoor);
-	ROS_INFO_STREAM("bottomRightCoor " << bottomRightCoor);
+	ROS_DEBUG_STREAM("currentTopLeftCoor " << currentTopLeftCoor);
+	ROS_DEBUG_STREAM("currentTopRightCoor " << currentTopRightCoor);
+	ROS_DEBUG_STREAM("currentBottomRightCoor " << currentBottomRightCoor);
 	
+	if(foundCorners != 3) return;
+	
+	for(int i = 0; i < collectionSize; i++){
+		Vector2* points = new Vector2[3];
+		for(int j = 0; j < 3; j++){
+			Vector3 oldCoor;
+
+			oldCoor.x = message.collection[i].corners[j].x;
+			oldCoor.y = message.collection[i].corners[j].y;
+			oldCoor.z = 1;
+		
+			//ROS_DEBUG_STREAM("QrCode \t" << message.collection[i].value << " corner \t" << j);
+			Vector3 newCoor = totalMatrix * oldCoor;
+			if(message.collection[i].value == "GC4x4MB_1") {
+				ROS_DEBUG_STREAM("QrCode " << message.collection[i].value << "\toldCoor \t" << oldCoor << "newCoor \t" << newCoor);
+			}
+
+			points[j] = Vector2(newCoor.x, newCoor.y);
+		}
+		Vector2 lineA2B = points[1] - points[0];
+		Vector2 lineB2C = points[2] - points[1];
+		
+		//ROS_DEBUG_STREAM("lineA2B \t" << lineA2B << " length " << lineA2B.length());
+		//ROS_DEBUG_STREAM("lineB2C \t" << lineB2C << " length " << lineB2C.length());
+
+		Vector2 centerCoor = Vector2(
+			points[0].x + (lineA2B / 2).x + (lineB2C / 2).x,
+			points[0].y + (lineA2B / 2).y + (lineB2C / 2).y
+		);
+		
+		Vector3 equipletCoor = convertToEquipletCoordinate(Vector3(centerCoor.x, centerCoor.y, 0));
+		if(message.collection[i].value == "GC4x4MB_1") {
+			ROS_DEBUG_STREAM("-equipletCoor \t" << equipletCoor);
+		}
+		
+		Vector2 expectedItemDirection(-1, 0);
+		Vector2 actualItemDirection(lineA2B);
+		actualItemDirection.normalize();
+		
+		// calulate the expected angle (0)
+		double expectedItemAngle = acos(expectedItemDirection.x);
+		if(expectedItemDirection.y < 0) expectedItemAngle = 0 - expectedItemAngle;
+		// calulate the actual angle (0)
+		double actualItemAngle = acos(actualItemDirection.x);
+		if(actualItemDirection.y < 0) actualItemAngle = 0 - actualItemAngle;
+		
+		double angle = actualItemAngle - expectedItemAngle;
+		
+		/*ROS_DEBUG_STREAM("-expectedItemAngle \t" << expectedItemAngle);
+		ROS_DEBUG_STREAM("-actualItemAngle \t" << actualItemAngle);*/
+		if(message.collection[i].value == "GC4x4MB_1") {
+			ROS_DEBUG_STREAM("QrCode " << message.collection[i].value << "\t-angle \t" << angle);
+		}
+		
+		environment_cache::UpdateEnvironmentCache serviceCall;
+		serviceCall.request.cacheUpdate.event = EnvironmentCache::ADD_OR_UPDATE;
+		serviceCall.request.cacheUpdate.id = message.collection[i].value;
+		environment_communication_msgs::Map properties;
+		environment_communication_msgs::KeyValuePair keyValuePair; 
+		
+		keyValuePair.key = "locationX";
+		keyValuePair.value = boost::lexical_cast<string>(equipletCoor.x);
+		properties.map.push_back(environment_communication_msgs::KeyValuePair(keyValuePair));
+		
+		keyValuePair.key = "locationY";
+		keyValuePair.value = boost::lexical_cast<string>(equipletCoor.y);
+		properties.map.push_back(environment_communication_msgs::KeyValuePair(keyValuePair));
+		
+		keyValuePair.key = "locationZ";
+		keyValuePair.value = boost::lexical_cast<string>(equipletCoor.z);
+		properties.map.push_back(environment_communication_msgs::KeyValuePair(keyValuePair));
+		
+		keyValuePair.key = "angle";
+		keyValuePair.value = boost::lexical_cast<string>(angle);
+		properties.map.push_back(environment_communication_msgs::KeyValuePair(keyValuePair));
+		
+		serviceCall.request.cacheUpdate.properties = properties;
+		environmentCacheClient.call(serviceCall);
+		
+		delete points;
+	}
+}
+
+void PartLocatorNode::updateMatrices(){
+	totalMatrix = calculateScaleMatrix() * calculateRotationMatrix() * calculateOffsetMatrix();
+	ROS_INFO_STREAM("totalMatrix " << totalMatrix);
+	
+}
+Matrix3 PartLocatorNode::calculateOffsetMatrix(){
 	////////////
 	// calulate midpoint
 	////////////
 	// line between topLeft and topRight
 	Vector2 lineTl2Tr;
-	lineTl2Tr.x = topRightCoor.x - topLeftCoor.x;
-	lineTl2Tr.y = topRightCoor.y - topLeftCoor.y;
-	//ROS_INFO_STREAM("lineTl2Tr " << lineTl2Tr);
+	lineTl2Tr.x = currentTopRightCoor.x - currentTopLeftCoor.x;
+	lineTl2Tr.y = currentTopRightCoor.y - currentTopLeftCoor.y;
+	ROS_DEBUG_STREAM("lineTl2Tr " << lineTl2Tr);
 	
 	// line between topRight and bottomRight
 	Vector2 lineTr2Br;
-	lineTr2Br.x = bottomRightCoor.x - topRightCoor.x;
-	lineTr2Br.y = bottomRightCoor.y - topRightCoor.y;
-	//ROS_INFO_STREAM("lineTr2Br " << lineTr2Br);
+	lineTr2Br.x = currentBottomRightCoor.x - currentTopRightCoor.x;
+	lineTr2Br.y = currentBottomRightCoor.y - currentTopRightCoor.y;
+	ROS_DEBUG_STREAM("lineTr2Br " << lineTr2Br);
 	
 	// calulate new midpoint by deviding lineTl2Tr and bottomRight and then adding them
 	Vector2 halfLineTl2Tr;
@@ -124,23 +212,27 @@ foundCorners++;
 	halfLineTr2Br.y = lineTr2Br.y / 2;
 	
 	Vector2 midPoint;
-	midPoint.x = topLeftCoor.x + halfLineTl2Tr.x + halfLineTr2Br.x;
-	midPoint.y = topLeftCoor.y + halfLineTl2Tr.y + halfLineTr2Br.y;
-	//ROS_INFO_STREAM("midpoint " << midPoint);
+	midPoint.x = currentTopLeftCoor.x + halfLineTl2Tr.x + halfLineTr2Br.x;
+	midPoint.y = currentTopLeftCoor.y + halfLineTl2Tr.y + halfLineTr2Br.y;
+	ROS_DEBUG_STREAM("midpoint " << midPoint);
 	
-	Matrix3 translationMatrixA;
-	translationMatrixA[2] = -midPoint.x;
-	translationMatrixA[5] = -midPoint.y;
-	Matrix3 translationMatrixB;
-	translationMatrixB[2] = midPoint.x;
-	translationMatrixB[5] = midPoint.y;
-	//ROS_INFO_STREAM("translationMatrixA " << translationMatrixA);
-	//ROS_INFO_STREAM("translationMatrixB " << translationMatrixB);
+	Matrix3 translationMatrix;
+	translationMatrix[2] = -midPoint.x;
+	translationMatrix[5] = -midPoint.y;
+	ROS_DEBUG_STREAM("translationMatrix " << translationMatrix);
 	
-	
+	return translationMatrix;
+}
+Matrix3 PartLocatorNode::calculateRotationMatrix(){
 	////////////
 	// calulate rotation angle
 	////////////
+	// line between topLeft and topRight
+	Vector2 lineTl2Tr;
+	lineTl2Tr.x = currentTopRightCoor.x - currentTopLeftCoor.x;
+	lineTl2Tr.y = currentTopRightCoor.y - currentTopLeftCoor.y;
+	ROS_DEBUG_STREAM("lineTl2Tr " << lineTl2Tr);
+	
 	// the expected vector is horizontal to the left because TR is at the right of TL (eg. walk in this direction to get to TR)
 	Vector2 expectedDirection(-1, 0); 
 	Vector2 actualDirection;
@@ -165,147 +257,42 @@ foundCorners++;
 	rotationMatrix[1] = -sin(correctionAngle);
 	rotationMatrix[3] = sin(correctionAngle);
 	rotationMatrix[4] = cos(correctionAngle);
-/*	ROS_INFO_STREAM("rotationMatrix " << rotationMatrix);
+	ROS_DEBUG_STREAM("rotationMatrix " << rotationMatrix);
 
-	ROS_INFO_STREAM("expectedDirection " << expectedDirection);
-	ROS_INFO_STREAM("actualDirection " << actualDirection);
-	ROS_INFO_STREAM("correctionAngle " << correctionAngle);*/
+	ROS_DEBUG_STREAM("expectedDirection " << expectedDirection);
+	ROS_DEBUG_STREAM("actualDirection " << actualDirection);
+	ROS_DEBUG_STREAM("correctionAngle " << correctionAngle);
 	
+	return rotationMatrix;
+}
+Matrix3 PartLocatorNode::calculateScaleMatrix(){
 	////////////
 	// scale to workplate coor system
 	////////////
+	// line between topLeft and topRight
+	Vector2 lineTl2Tr;
+	lineTl2Tr.x = currentTopRightCoor.x - currentTopLeftCoor.x;
+	lineTl2Tr.y = currentTopRightCoor.y - currentTopLeftCoor.y;
+	ROS_DEBUG_STREAM("lineTl2Tr " << lineTl2Tr);
+	
+	// line between topRight and bottomRight
+	Vector2 lineTr2Br;
+	lineTr2Br.x = currentBottomRightCoor.x - currentTopRightCoor.x;
+	lineTr2Br.y = currentBottomRightCoor.y - currentTopRightCoor.y;
+	ROS_DEBUG_STREAM("lineTr2Br " << lineTr2Br);
+	
+
 	double workplateWidth = 80;
 	double workplateHeight = 80;
 	Matrix3 scaleMatrix;
 	scaleMatrix[0] = -(	(workplateWidth / 1) / (lineTl2Tr.length()));
 	scaleMatrix[4] = -(	(workplateHeight / 1) / (lineTr2Br.length()));
-	/*ROS_INFO_STREAM("lineTl2Tr.length() " << lineTl2Tr.length());
-	ROS_INFO_STREAM("lineTr2Br.length() " << lineTr2Br.length());
-	ROS_INFO_STREAM("scaleMatrix " << scaleMatrix);
+	ROS_DEBUG_STREAM("lineTl2Tr.length() " << lineTl2Tr.length());
+	ROS_DEBUG_STREAM("lineTr2Br.length() " << lineTr2Br.length());
+	ROS_DEBUG_STREAM("scaleMatrix " << scaleMatrix);
 	
-	Matrix3 totalMatrix = scaleMatrix * rotationMatrix * translationMatrixA;
-	ROS_INFO_STREAM("totalMatrix " << totalMatrix);*/
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-/*	for(int i = 0; i < collectionSize; i++){
-		if(message.collection[i].value == "GC4x4MB_1"){
-			Vector2* points = new Vector2[3];
-			for(int j = 0; j < 3; j++){
-				Vector3 oldVector;
-
-				oldVector.x = message.collection[i].corners[j].x;
-				oldVector.y = message.collection[i].corners[j].y;
-				oldVector.z = 1;
-			
-				ROS_INFO_STREAM("QrCode \t" << message.collection[i].value << " corner \t" << j);
-				Vector3 newCoor = oldVector;
-	//			ROS_INFO_STREAM("-old \t\t" << newCoor);
-				newCoor = translationMatrixA * newCoor;
-	//			ROS_INFO_STREAM("-transCoor \t" << newCoor);
-				newCoor = rotationMatrix * newCoor;
-	//			ROS_INFO_STREAM("rotCoor \t" << newCoor);
-				newCoor = scaleMatrix * newCoor;
-				ROS_INFO_STREAM("-scaleCoor \t" << newCoor);
-
-				points[j] = Vector2(newCoor.x, newCoor.y);
-			
-			}
-			
-			Vector2 lineA2B = points[1] - points[0];
-			Vector2 lineB2C = points[2] - points[1];
-		
-			ROS_INFO_STREAM("lineA2B \t" << lineA2B << " length " << lineA2B.length());
-			ROS_INFO_STREAM("lineB2C \t" << lineB2C << " length " << lineB2C.length());
-
-			Vector2 centerCoor = Vector2(
-				points[0].x + (lineA2B / 2).x + (lineB2C / 2).x,
-				points[0].y + (lineA2B / 2).y + (lineB2C / 2).y
-			);
-
-			if(abs(centerCoor.x) < 40 && abs(centerCoor.y) < 40 && abs(centerCoor.x) > 0 && abs(centerCoor.y) > 0){
-				currentXPos = centerCoor.x;
-				currentYPos = centerCoor.y;
-
-				currentZPos = 0;
-				}
-			else{
-				ROS_INFO(" FU ");
-				currentXPos = 0;
-				currentYPos = 0;
-
-				currentZPos = 70;
-			}
-			delete points;
-		}
-	}
-
-
-	writeToBlackBoard(rexos_utilities::doubleToString(currentXPos), rexos_utilities::doubleToString(currentYPos), rexos_utilities::doubleToString(currentZPos), maxAcceleration);*/
-
-
-
+	return scaleMatrix;
 }
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-void PartLocatorNode::writeToBlackBoard(std::string x, std::string y, std::string z, std::string acceleration){
-	/*//Need to include InstructionData for the instructiondata
-	//Dont forget to set in package & makelist!
-
-	std::map<std::string, std::string> look_up_parameters;
-	std::map<std::string, std::string> payload;
-
-	look_up_parameters.insert(pair<string, string>("ID", "RELATIVE-TO-PLACEHOLDER"));
-
-	if(!x.empty()) {
-		payload.insert(pair<string, string>("x", x));
-	}
-
-	if(!y.empty()) {
-		payload.insert(pair<string, string>("y", y));
-	}
-
-	if(!z.empty()) {
-		payload.insert(pair<string, string>("z", z));
-	}
-
-	if(!acceleration.empty()) {
-		payload.insert(pair<string, string>("maxAcceleration", acceleration));
-	}
-
-	instructionData = new rexos_datatypes::InstructionData("move", "deltarobot", "FIND_ID", 
-            look_up_parameters, payload);
-
-	if(equipletStepBlackboardClient->insertDocument(instructionData->toJSONString())) {
-		std::cout << "printed: " << instructionData->toJSONString() << "to blackboard." << std::endl;
-	}*/
-
-}
-
-
-
-
 
 void PartLocatorNode::run() {
 	ROS_INFO("waiting for camera/qr_codes");
@@ -318,7 +305,7 @@ int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "part_locator_node");
 	ROS_DEBUG("Constructing node");
 
-	PartLocatorNode node("145.89.191.131");
+	PartLocatorNode node(rexos_utilities::stringToInt(argv[1]), rexos_utilities::stringToInt(argv[2]));
 	
 	node.run();
 	return 0;

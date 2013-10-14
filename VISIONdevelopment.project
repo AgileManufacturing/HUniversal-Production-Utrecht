@@ -536,6 +536,18 @@
           <File Name="src/cpp/ros/environment_communication_msgs/package.xml"/>
         </VirtualDirectory>
         <VirtualDirectory Name="huniversal_camera">
+          <VirtualDirectory Name="module_detector_node">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="module_detector_node">
+                <File Name="src/cpp/ros/huniversal_camera/module_detector_node/include/module_detector_node/module_detector_node.h"/>
+              </VirtualDirectory>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
+              <File Name="src/cpp/ros/huniversal_camera/module_detector_node/src/module_detector_node.cpp"/>
+            </VirtualDirectory>
+            <File Name="src/cpp/ros/huniversal_camera/module_detector_node/CMakeLists.txt"/>
+            <File Name="src/cpp/ros/huniversal_camera/module_detector_node/package.xml"/>
+          </VirtualDirectory>
           <VirtualDirectory Name="camera_calibration_node">
             <VirtualDirectory Name="include">
               <VirtualDirectory Name="camera_calibration_node">
@@ -652,6 +664,7 @@
               <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/fishEyeCorrection.srv"/>
               <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/getCorrectionMatrices.srv"/>
               <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/AutoWhiteBalance.srv"/>
+              <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/enableCamera.srv"/>
             </VirtualDirectory>
             <File Name="src/cpp/ros/huniversal_camera/camera_node/CMakeLists.txt"/>
             <File Name="src/cpp/ros/huniversal_camera/camera_node/DeltaLens_2012-01-20.xml"/>

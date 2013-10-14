@@ -128,7 +128,7 @@ namespace rexos_datatypes{
 	 * @param image The image to draw on.
 	 **/
 	void QrCode::draw(cv::Mat& image){
-		// Draw the QR marker points
+		// Draw the QR marker points, color in BGR format
 		cv::circle(image, points[0], 1, cv::Scalar(255, 0, 0), 2);
 		cv::circle(image, points[1], 1, cv::Scalar(0, 255, 0), 2);
 		cv::circle(image, points[2], 1, cv::Scalar(0, 0, 255), 2);

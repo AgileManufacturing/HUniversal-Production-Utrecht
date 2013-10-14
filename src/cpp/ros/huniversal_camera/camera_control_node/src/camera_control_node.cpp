@@ -113,9 +113,9 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 	/* Connect to the MySQL test database */
 	apConnection->setSchema("rexos");
 	
-	sql::PreparedStatement* pstmt = apConnection->prepareStatement("SELECT * FROM calibrationmatrices WHERE lens = ? AND camera = ?");
-	pstmt->setInt(1, 2);
-	pstmt->setInt(2, 4);
+	sql::PreparedStatement* pstmt = apConnection->prepareStatement("SELECT * FROM calibrationmatrices WHERE camera = ? AND lens = ?");
+	pstmt->setInt(1, cameraModuleId);
+	pstmt->setInt(2, lensModuleId);
 	
 	sql::ResultSet* res = pstmt->executeQuery();
 	
@@ -135,16 +135,16 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 		serviceCall.request.distCoeffs.push_back(res->getDouble("distCoef_2"));
 		serviceCall.request.distCoeffs.push_back(res->getDouble("distCoef_3"));
 		serviceCall.request.distCoeffs.push_back(res->getDouble("distCoef_4"));
-
+	
 		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_0_0");
-		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_0_1");
-		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_0_2");
-		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_1_0");
-		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_1_1");
-		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_1_2");
-		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_2_0");
-		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_2_1");
-		serviceCall.request.cameraMatrix.values[0] = res->getDouble("cameraMatrix_2_2");
+		serviceCall.request.cameraMatrix.values[1] = res->getDouble("cameraMatrix_0_1");
+		serviceCall.request.cameraMatrix.values[2] = res->getDouble("cameraMatrix_0_2");
+		serviceCall.request.cameraMatrix.values[3] = res->getDouble("cameraMatrix_1_0");
+		serviceCall.request.cameraMatrix.values[4] = res->getDouble("cameraMatrix_1_1");
+		serviceCall.request.cameraMatrix.values[5] = res->getDouble("cameraMatrix_1_2");
+		serviceCall.request.cameraMatrix.values[6] = res->getDouble("cameraMatrix_2_0");
+		serviceCall.request.cameraMatrix.values[7] = res->getDouble("cameraMatrix_2_1");
+		serviceCall.request.cameraMatrix.values[8] = res->getDouble("cameraMatrix_2_2");
 		
 		client.call(serviceCall);
 		
@@ -170,13 +170,13 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 			as->setAborted();
 		}
 		else{
-			ROS_INFO("Saving matrices to database");
+			ROS_INFO_STREAM("Saving matrices to database for cameraId=" << cameraModuleId << " and lensModuleId=" << lensModuleId);
 			camera_node::getCorrectionMatrices serviceCall4;
 			getCorrectionMatricesClient.call(serviceCall4);
 			
 			sql::PreparedStatement* pstmt2 = apConnection->prepareStatement(
 			"INSERT INTO calibrationmatrices ( \
-				lens, camera, \
+				camera, lens, \
 				distCoef_0,  distCoef_1,  distCoef_2, distCoef_3,  distCoef_4, \
 				cameraMatrix_0_0, cameraMatrix_0_1, cameraMatrix_0_2, \
 				cameraMatrix_1_0, cameraMatrix_1_1, cameraMatrix_1_2, \
@@ -188,20 +188,16 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 				?, ?, ?, \
 				?, ?, ? \
 			);");
-			pstmt2->setInt(1, 1);
-			pstmt2->setInt(2, 1);
+			pstmt2->setInt(1, cameraModuleId);
+			pstmt2->setInt(2, lensModuleId);
 			
 			int collumIndex = 3;
-			ROS_ERROR("setting dist");
 			for(int i = 0; i < serviceCall4.response.distCoeffs.size(); i++) {
-				ROS_ERROR_STREAM(" collumIndex "  << collumIndex << std::endl);
 				pstmt2->setDouble(collumIndex, serviceCall4.response.distCoeffs[i]);
 				collumIndex++;
 			}
 			
-			ROS_ERROR("setting matrix");
 			for(int i = 0; i < 9; i++) {
-				ROS_ERROR_STREAM(" collumIndex "  << collumIndex << std::endl);
 				pstmt2->setDouble(collumIndex, serviceCall4.response.cameraMatrix.values[i]);
 				collumIndex++;
 			}
@@ -258,7 +254,7 @@ int main(int argc, char* argv[]) {
 	try{
 		equipletId = rexos_utilities::stringToInt(argv[1]);
 		cameraModuleId = rexos_utilities::stringToInt(argv[2]);
-		lensModuleId = rexos_utilities::stringToInt(argv[1]);
+		lensModuleId = rexos_utilities::stringToInt(argv[3]);
 	} catch(std::runtime_error ex) {
 		ROS_ERROR("Cannot read equiplet id, camera id, and/or lens id from commandline please use correct values.");
 		return -2;

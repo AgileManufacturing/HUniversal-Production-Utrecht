@@ -56,7 +56,6 @@ void QrCodeReaderNode::run() {
 }
 
 void QrCodeReaderNode::handleFrame(const sensor_msgs::ImageConstPtr& msg) {
-	ROS_INFO("Frame recieved");
 	cv_bridge::CvImagePtr cv_ptr;
 	try {
 		cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8);
@@ -117,8 +116,6 @@ void QrCodeReaderNode::handleFrame(const sensor_msgs::ImageConstPtr& msg) {
 		
 		delete image;
 		delete image2;
-
-		ROS_INFO("image processed");
 	}
 	catch (cv_bridge::Exception& e)	{
 		ROS_ERROR("cv_bridge exception: %s", e.what());
