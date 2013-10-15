@@ -73,11 +73,13 @@ private:
 	ros::ServiceServer calibrateEffectorServer;
 	
 	/**
-	 * This is the image transport object (allowing the convertion of images)
+	 * This is the image transport object (allowing the compression of images)
 	 */
-	image_transport::ImageTransport it;
+	image_transport::ImageTransport imageTransport;
 
-	int32_t framesToCapture;
+	/**
+	 * Contains the captured images
+	 */
 	std::vector<cv::Mat*> images;
 };
 

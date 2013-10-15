@@ -58,12 +58,12 @@ PartLocatorNode::PartLocatorNode(int equipletId, int moduleId):
 		currentTopRightCoor(-1, -1),
 		currentBottomRightCoor(-1, -1),
 		foundCorners(0),
-		environmentCacheClient(			nodeHandle.serviceClient<environment_cache::UpdateEnvironmentCache>(	"updateEnvironmentCache"))
+		environmentCacheClient(nodeHandle.serviceClient<environment_cache::UpdateEnvironmentCache>("updateEnvironmentCache"))
 {
 	ROS_INFO("Constructing");
 }
 
-void PartLocatorNode::qrCodeCallback(const qr_code_reader_node::Collection & message){
+void PartLocatorNode::qrCodeCallback(const qr_code_reader_node::Collection & message) {
 	detectCorners(message);
 	
 	// can not do conversion without the corners
@@ -109,7 +109,7 @@ void PartLocatorNode::qrCodeCallback(const qr_code_reader_node::Collection & mes
 		delete points;
 	}
 }
-void PartLocatorNode::detectCorners(const qr_code_reader_node::Collection & message){
+void PartLocatorNode::detectCorners(const qr_code_reader_node::Collection & message) {
 	ROS_DEBUG_STREAM("currentTopLeftCoor " << currentTopLeftCoor);
 	ROS_DEBUG_STREAM("currentTopRightCoor " << currentTopRightCoor);
 	ROS_DEBUG_STREAM("currentBottomRightCoor " << currentBottomRightCoor);
@@ -144,7 +144,7 @@ void PartLocatorNode::detectCorners(const qr_code_reader_node::Collection & mess
 	}
 	if(foundCorners == 3) this->updateMatrices();
 }
-double PartLocatorNode::getItemRotationAngle(Vector2 lineA2B){
+double PartLocatorNode::getItemRotationAngle(Vector2 lineA2B) {
 	Vector2 actualItemDirection(lineA2B);
 	actualItemDirection.normalize();
 	
@@ -164,7 +164,7 @@ double PartLocatorNode::getItemRotationAngle(Vector2 lineA2B){
 	}*/
 	return angle;
 }
-void PartLocatorNode::storeInEnviromentCache(std::string value, Vector3 location, double angle){
+void PartLocatorNode::storeInEnviromentCache(std::string value, Vector3 location, double angle) {
 		environment_cache::UpdateEnvironmentCache serviceCall;
 		serviceCall.request.cacheUpdate.event = EnvironmentCache::ADD_OR_UPDATE;
 		serviceCall.request.cacheUpdate.id = value;
@@ -191,12 +191,12 @@ void PartLocatorNode::storeInEnviromentCache(std::string value, Vector3 location
 		environmentCacheClient.call(serviceCall);
 }
 
-void PartLocatorNode::updateMatrices(){
+void PartLocatorNode::updateMatrices() {
 	totalMatrix = calculateScaleMatrix() * calculateRotationMatrix() * calculateOffsetMatrix();
 	ROS_INFO_STREAM("totalMatrix " << totalMatrix);
 	
 }
-Matrix3 PartLocatorNode::calculateOffsetMatrix(){
+Matrix3 PartLocatorNode::calculateOffsetMatrix() {
 	////////////
 	// calulate midpoint
 	////////////
@@ -232,7 +232,7 @@ Matrix3 PartLocatorNode::calculateOffsetMatrix(){
 	
 	return translationMatrix;
 }
-Matrix3 PartLocatorNode::calculateRotationMatrix(){
+Matrix3 PartLocatorNode::calculateRotationMatrix() {
 	////////////
 	// calulate rotation angle
 	////////////
@@ -272,7 +272,7 @@ Matrix3 PartLocatorNode::calculateRotationMatrix(){
 	
 	return rotationMatrix;
 }
-Matrix3 PartLocatorNode::calculateScaleMatrix(){
+Matrix3 PartLocatorNode::calculateScaleMatrix() {
 	////////////
 	// scale to workplate coor system
 	////////////

@@ -3,8 +3,7 @@
  * @brief Remote interface to adjust the camera settings in runtime.
  * @date Created: 2012-10-18
  *
- * @author Koen Braham
- * @author Daan Veltman
+ * @author Tommas Bakker
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -48,14 +47,14 @@
 
 CameraCalibrationNode::CameraCalibrationNode() :
 
-	it(nodeHandle)
+	imageTransport(nodeHandle)
 {
-	calibrateLensServer = nodeHandle.advertiseService(camera_calibration_node_services::CALIBRATE_LENS, &CameraCalibrationNode::calibrateLens, this);
-	calibrateEffectorServer = nodeHandle.advertiseService(camera_calibration_node_services::CALIBRATE_EFFECTOR, &CameraCalibrationNode::calibrateEffector, this);
+	calibrateLensServer = 		nodeHandle.advertiseService(camera_calibration_node_services::CALIBRATE_LENS, 		&CameraCalibrationNode::calibrateLens, this);
+	calibrateEffectorServer = 	nodeHandle.advertiseService(camera_calibration_node_services::CALIBRATE_EFFECTOR, 	&CameraCalibrationNode::calibrateEffector, this);
 }
 
 void CameraCalibrationNode::run() {
-	ROS_INFO("Waiting for calibrationStart");
+	ROS_DEBUG("Waiting for service calls");
 	ros::spin();
 }
 
@@ -63,8 +62,9 @@ bool CameraCalibrationNode::calibrateLens(
 	camera_calibration_node::calibrateLens::Request &request,
 	camera_calibration_node::calibrateLens::Response &response)
 {
-	framesToCapture = request.frameCount;
-	image_transport::Subscriber sub = it.subscribe("camera/image", 1, &CameraCalibrationNode::handleFrame, this);
+	int32_t framesToCapture = request.frameCount;
+	// subscribe to the camera/image feed. The buffersize of 1 is intentional.
+	image_transport::Subscriber imageSubscriber = imageTransport.subscribe("camera/image", 1, &CameraCalibrationNode::handleFrame, this);
 
 	// capture required frames
 	ros::Rate captureRate(CAPTURE_RATE);
@@ -72,16 +72,18 @@ bool CameraCalibrationNode::calibrateLens(
 		captureRate.sleep();
 		ros::spinOnce();
 	}
+	imageSubscriber.shutdown();
 	
 	// createMatrices
 	ROS_DEBUG("Generating matrices...");
 	Camera::RectifyImage rectifier;
-	int successes = rectifier.createMatrices(cv::Size(6, 9), images);
+	int successes = rectifier.createMatrices(cv::Size(request.boardWidth, request.boardHeight), images);
 	
+	// did we detect a chessboard on any of the captured frames?
 	if(successes != 0){
 		ROS_DEBUG("Sending matrices...");
-		ROS_INFO_STREAM("Dist Coeffs:" << std::endl		 << rectifier.distCoeffs);
-		ROS_INFO_STREAM("Camera matrix:" << std::endl	 << rectifier.cameraMatrix);
+		ROS_INFO_STREAM("Dist Coeffs:" << std::endl << rectifier.distCoeffs);
+		ROS_INFO_STREAM("Camera matrix:" << std::endl << rectifier.cameraMatrix);
 
 		ros::ServiceClient client = nodeHandle.serviceClient<camera_node::setCorrectionMatrices>(camera_node_services::SET_CORRECTION_MATRICES);
 		camera_node::setCorrectionMatrices serviceCall;
@@ -113,12 +115,14 @@ bool CameraCalibrationNode::calibrateLens(
 		delete image;
 	}
 	
-	sub.shutdown();
 	response.processedFrames = successes;
 	ROS_DEBUG("Done");
 	return true;
 }
-bool CameraCalibrationNode::calibrateEffector(camera_calibration_node::calibrateEffector::Request &request, camera_calibration_node::calibrateEffector::Response &response){
+bool CameraCalibrationNode::calibrateEffector(
+		camera_calibration_node::calibrateEffector::Request &request, 
+		camera_calibration_node::calibrateEffector::Response &response)
+{
 	return true;
 }
 
