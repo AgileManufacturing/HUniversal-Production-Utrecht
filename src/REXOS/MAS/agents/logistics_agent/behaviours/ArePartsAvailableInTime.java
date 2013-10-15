@@ -94,11 +94,11 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 				Part[] parts = (Part[]) message.getContentObject();
 
 				ACLMessage reply = message.createReply();
-				reply.setOntology("ArePartsAvailableInTimeResponse");
+				reply.setOntology("ArePartsAvailableInTime");
 				reply.setPerformative(ACLMessage.CONFIRM);
 				myAgent.send(reply);
 
-				myAgent.addBehaviour(new GetPartsInfo(myAgent, message
+				myAgent.addBehaviour(new PartsInfo(myAgent, message
 						.getConversationId()));
 			} catch (UnreadableException e) {
 				Logger.log(LogLevel.ERROR, e);

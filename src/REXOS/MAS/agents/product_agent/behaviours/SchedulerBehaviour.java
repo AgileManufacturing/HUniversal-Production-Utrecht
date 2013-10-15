@@ -194,147 +194,150 @@ public class SchedulerBehaviour extends Behaviour {
 			final ProductionStep productionstep) {
 		try {
 			this._prodStep = productionstep;
-
-		List<AID> equipletlist = new ArrayList<AID>(equipletList);
-
-		BlackboardClient bbc = new BlackboardClient(
-				Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"), 
-				Configuration.getPropertyInt(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbPort"));
-		
-		bbc.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbName"));
-		bbc.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "timeDataCollectionName"));
-		
-		BasicDBObject dbObject = (BasicDBObject) bbc.findDocuments(new BasicDBObject()).get(0);
-		
-		long firstTimeSlot = dbObject.getLong("firstTimeSlot");
-		int timeSlotLength = dbObject.getInt("timeSlotLength");
-
-		Logger.log(LogLevel.INFORMATION, "First Timeslot: " + firstTimeSlot + " timeslotLength: " + timeSlotLength);
-		
-		ArrayList<FreeTimeSlot> freetimeslots = new ArrayList<FreeTimeSlot>();
-		DbData dbData = null;
-		// Change this
-		for (AID aid : equipletlist) 
-		{
-			Logger.log(LogLevel.INFORMATION, "Trying to reach equiplet: " + aid.getLocalName() + "");
+	
+			List<AID> equipletlist = new ArrayList<AID>(equipletList);
+	
+			BlackboardClient bbc = new BlackboardClient(
+					Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"), 
+					Integer.parseInt(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbPort")));
 			
-			bbc = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"));
 			bbc.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbName"));
-			bbc.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletDirectoryName"));
-
-			QueryBuilder qb = QueryBuilder.start("AID").is(aid.getName());
-
-			List<DBObject> aidInfo = bbc.findDocuments(qb.get());
-
-			if (aidInfo.size() > 0) 
+			bbc.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "timeDataCollectionName"));
+			
+			BasicDBObject dbObject = (BasicDBObject) bbc.findDocuments(new BasicDBObject()).get(0);
+			
+			long firstTimeSlot = dbObject.getLong("firstTimeSlot");
+			int timeSlotLength = dbObject.getInt("timeSlotLength");
+	
+			Logger.log(LogLevel.INFORMATION, "First Timeslot: " + firstTimeSlot + " timeslotLength: " + timeSlotLength);
+			
+			ArrayList<FreeTimeSlot> freetimeslots = new ArrayList<FreeTimeSlot>();
+			DbData dbData = null;
+			// Change this
+			for (AID aid : equipletlist) 
 			{
-				dbData = new DbData((BasicDBObject) aidInfo.get(0).get("db"));
-			} 
-			else 
-			{
-				Logger.log(LogLevel.ERROR, "There doesnt seem to be any equiplets available..");
-			}
-
-			ArrayList<Schedule> schedules = new ArrayList<Schedule>();
-			ProductAgent prodAgent = (ProductAgent) myAgent;
-
-			bbc = new BlackboardClient(dbData.getIp(), dbData.getPort());
-			bbc.setDatabase(dbData.getName());
-			bbc.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ProductStepsBlackBoardName", aid.getLocalName()));
-
-			int requiredTimeSlots = (int) prodAgent.getProduct()
-					.getProduction().getProductionEquipletMapping()
-					.getTimeSlotsForEquiplet(_prodStep.getId(), aid);
-
-			// Gets planned steps TODO: improve query
-			DBObject query = QueryBuilder.start("scheduleData.startTime")
-					.greaterThan(-1).put("scheduleData.startTime")
-					.get();
-			
-			BasicDBObject orderby = new BasicDBObject("scheduleData",
-					new BasicDBObject("startTime", "1"));
-			
-			BasicDBObject findquery = new BasicDBObject("$query", query)
-					.append("$orderby", orderby);
-			
-			List<DBObject> plannedSteps = bbc.findDocuments(findquery);
-			
-			Logger.log(LogLevel.INFORMATION, "Planned steps count: " + plannedSteps.size() + " requiredSlots: " + requiredTimeSlots);
-			
-			for (int i = 0; i < plannedSteps.size(); i++) 
-			{
-				long startTime = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getLong("startTime");
-				int duration = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getInt("duration");
-				schedules.add(new Schedule(startTime, duration, aid));
-			}
-
-			// check within every schedule of the 'schedules' array for free
-			// timeslots and add them to the 'freetimeslot' array
-			
-			if (schedules.size() > 0) {
-				for (int index = 0; index < schedules.size(); index++) {
-					if (schedules.size() > (index + 1)) 
-					{
-						// if((schedules.get((index+1)).getStartTime() -
-						// schedules.get(index).getDeadline()) >
-						// requiredTimeSlots) {
-						// freetimeslots.add(new
-						// FreeTimeSlot(schedules.get(index).getDeadline(),
-						// requiredTimeSlots, aid));
-						// }
-					} 
-					else 
-					{
-						Schedule lastSchedule = schedules.get(index);
-						freetimeslots.add(new FreeTimeSlot(lastSchedule.getDeadline(), requiredTimeSlots * timeSlotLength, aid));
-						Logger.log(LogLevel.INFORMATION, "Adding new timeslot to freetimeslot start: " + lastSchedule.getDeadline() + " timeslots: " + requiredTimeSlots);
-					}
-				}
-			} 
-			else 
-			{
-				freetimeslots.add(new FreeTimeSlot((System.currentTimeMillis() - firstTimeSlot) / timeSlotLength + (1000 / timeSlotLength),
-						requiredTimeSlots, aid));
-				Logger.log(LogLevel.INFORMATION, "Adding new timeslot to freetimeslot start: " + (System.currentTimeMillis() - firstTimeSlot) / timeSlotLength + (1000 / timeSlotLength) + " timeslots: " + requiredTimeSlots + 
-						" length: " + requiredTimeSlots);
-			}
-		}
-		
-		FreeTimeSlot freetimeslotEq = null;
-
-		// calculate freetime slot and asign them to the above intialized values
-		if (freetimeslots.size() > 0) 
-		{
-			for (FreeTimeSlot fts : freetimeslots)
-			{
-				if (freetimeslotEq == null) 
+				Logger.log(LogLevel.INFORMATION, "Trying to reach equiplet: " + aid.getLocalName() + "");
+				
+				bbc = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"));
+				bbc.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbName"));
+				bbc.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletDirectoryName"));
+	
+				QueryBuilder qb = QueryBuilder.start("AID").is(aid.getName());
+	
+				List<DBObject> aidInfo = bbc.findDocuments(qb.get());
+	
+				if (aidInfo.size() > 0) 
 				{
-					freetimeslotEq = fts;
+					dbData = new DbData((BasicDBObject) aidInfo.get(0).get("db"));
 				} 
 				else 
 				{
-					Logger.log(LogLevel.ERROR, "FreeTimeSlotEq != null");
+					Logger.log(LogLevel.ERROR, "There doesnt seem to be any equiplets available..");
+				}
+	
+				ArrayList<Schedule> schedules = new ArrayList<Schedule>();
+				ProductAgent prodAgent = (ProductAgent) myAgent;
+	
+				bbc = new BlackboardClient(dbData.getIp(), dbData.getPort());
+				bbc.setDatabase(dbData.getName());
+				bbc.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ProductStepsBlackBoardName", aid.getLocalName()));
+	
+				int requiredTimeSlots = (int) prodAgent.getProduct()
+						.getProduction().getProductionEquipletMapping()
+						.getTimeSlotsForEquiplet(_prodStep.getId(), aid);
+	
+				// Gets planned steps TODO: improve query
+				DBObject query = QueryBuilder.start("scheduleData.startTime")
+						.greaterThan(-1).put("scheduleData.startTime")
+						.get();
+				
+				BasicDBObject orderby = new BasicDBObject("scheduleData",
+						new BasicDBObject("startTime", "1"));
+				
+				BasicDBObject findquery = new BasicDBObject("$query", query)
+						.append("$orderby", orderby);
+				
+				List<DBObject> plannedSteps = bbc.findDocuments(findquery);
+				
+				Logger.log(LogLevel.INFORMATION, "Planned steps count: " + plannedSteps.size() + " requiredSlots: " + requiredTimeSlots);
+				
+				for (int i = 0; i < plannedSteps.size(); i++) 
+				{
+					long startTime = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getLong("startTime");
+					int duration = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getInt("duration");
+					schedules.add(new Schedule(startTime, duration, aid));
+				}
+	
+				// check within every schedule of the 'schedules' array for free
+				// timeslots and add them to the 'freetimeslot' array
+				
+				if (schedules.size() > 0) {
+					for (int index = 0; index < schedules.size(); index++) {
+						if (schedules.size() > (index + 1)) 
+						{
+							// if((schedules.get((index+1)).getStartTime() -
+							// schedules.get(index).getDeadline()) >
+							// requiredTimeSlots) {
+							// freetimeslots.add(new
+							// FreeTimeSlot(schedules.get(index).getDeadline(),
+							// requiredTimeSlots, aid));
+							// }
+						} 
+						else 
+						{
+							Schedule lastSchedule = schedules.get(index);
+							freetimeslots.add(new FreeTimeSlot(lastSchedule.getDeadline(), requiredTimeSlots * timeSlotLength, aid));
+							Logger.log(LogLevel.INFORMATION, "Adding new timeslot to freetimeslot start: " + lastSchedule.getDeadline() + " timeslots: " + requiredTimeSlots);
+						}
+					}
+				} 
+				else 
+				{
+					freetimeslots.add(new FreeTimeSlot((System.currentTimeMillis() - firstTimeSlot) / timeSlotLength + (1000 / timeSlotLength),
+							requiredTimeSlots, aid));
+					Logger.log(LogLevel.INFORMATION, "Adding new timeslot to freetimeslot start: " + (System.currentTimeMillis() - firstTimeSlot) / timeSlotLength + (1000 / timeSlotLength) + " timeslots: " + requiredTimeSlots + 
+							" length: " + requiredTimeSlots);
 				}
 			}
-		}
-
-		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setConversationId(this._prodStep.getConversationIdForEquiplet(freetimeslotEq.getEquipletName()));
-		msg.setOntology("ScheduleStep");
-		msg.setContentObject(freetimeslotEq.getStartTime());
-		msg.addReceiver(freetimeslotEq.getEquipletName());
-		myAgent.send(msg);
-
-			ACLMessage returnMsg = myAgent.blockingReceive(MessageTemplate
-					.MatchOntology("Planned"));
-			if (returnMsg.getPerformative() == ACLMessage.CONFIRM) {
-				_prodStep.setStatus(StepStatusCode.PLANNED);
-				_prodStep.setUsedEquiplet(returnMsg.getSender());
-			} else if (returnMsg.getPerformative() == ACLMessage.DISCONFIRM) {
-				_isError = true;
-				_bc.handleCallback(BehaviourStatus.ERROR, null);
+			
+			FreeTimeSlot freetimeslotEq = null;
+	
+			// calculate freetime slot and asign them to the above intialized values
+			if (freetimeslots.size() > 0) 
+			{
+				for (FreeTimeSlot fts : freetimeslots)
+				{
+					if (freetimeslotEq == null) 
+					{
+						freetimeslotEq = fts;
+					} 
+					else 
+					{
+						Logger.log(LogLevel.ERROR, "FreeTimeSlotEq != null");
+					}
+				}
 			}
+	
+			ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+			msg.setConversationId(this._prodStep.getConversationIdForEquiplet(freetimeslotEq.getEquipletName()));
+			msg.setOntology("ScheduleStep");
+			msg.setContentObject(freetimeslotEq.getStartTime());
+			msg.addReceiver(freetimeslotEq.getEquipletName());
+			myAgent.send(msg);
 
+			ACLMessage returnMsg = myAgent.blockingReceive(MessageTemplate.MatchOntology("Planned"), 10000);
+			if (returnMsg != null){
+				if (returnMsg.getPerformative() == ACLMessage.CONFIRM) {
+					_prodStep.setStatus(StepStatusCode.PLANNED);
+					_prodStep.setUsedEquiplet(returnMsg.getSender());
+				} else if (returnMsg.getPerformative() == ACLMessage.DISCONFIRM) {
+					_isError = true;
+					_bc.handleCallback(BehaviourStatus.ERROR, null);
+				}	
+			}
+			else{
+				//TODO: error handling
+			}
 			_prodStep.setConversationId(returnMsg.getConversationId());
 			_schedulersCompleted++;
 

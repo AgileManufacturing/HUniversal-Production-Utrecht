@@ -55,7 +55,7 @@ import agents.shared_behaviours.ReceiveBehaviour;
 /**
  * Class for the receivebehaviour to receive messages with the ontology CheckForModules
  */
-public class CheckForModules extends ReceiveBehaviour {
+public class RequiredModulesPresent extends ReceiveBehaviour {
 	/**
 	 * @var long serialVersionUID
 	 *      The serialVersionUID.
@@ -66,7 +66,7 @@ public class CheckForModules extends ReceiveBehaviour {
 	 * @var MessageTemplate messageTemplate
 	 *      Contains the MessageTemplate to match.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CheckForModules");
+	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("RequiredModulesPresent");
 
 	/**
 	 * @var HardwareAgent hardwareAgent
@@ -79,8 +79,8 @@ public class CheckForModules extends ReceiveBehaviour {
 	 * 
 	 * @param a The agent of this behaviour.
 	 */
-	public CheckForModules(Agent a) {
-		super(a, messageTemplate);
+	public RequiredModulesPresent(Agent a) {
+		super(a, MESSAGE_TEMPLATE);
 		hardwareAgent = (HardwareAgent) a;
 	}
 
@@ -119,32 +119,35 @@ public class CheckForModules extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		boolean modulesPresent = true;
-		try {
-			// check if modules are present
-			int[] moduleGroupIds = (int[]) message.getContentObject();
-			ArrayList<Integer> availableModuleGroups = getAvailableModuleGroups();
-
-			for(int groupId : moduleGroupIds) {
-				if(!availableModuleGroups.contains(groupId)) {
-					modulesPresent = false;
-					break;
+		
+		if ( message.getPerformative() == ACLMessage.QUERY_IF){
+			boolean modulesPresent = true;
+			try {
+				// check if modules are present
+				int[] moduleGroupIds = (int[]) message.getContentObject();
+				ArrayList<Integer> availableModuleGroups = getAvailableModuleGroups();
+	
+				for(int groupId : moduleGroupIds) {
+					if(!availableModuleGroups.contains(groupId)) {
+						modulesPresent = false;
+						break;
+					}
 				}
+			} catch(UnreadableException ex) {
+				modulesPresent = false;
+			} finally {
+				// send reply; confirm if modules are present, disconfirm if not.
+				ACLMessage reply;
+				reply = message.createReply();
+				reply.setOntology("RequiredModulesPresent");
+				if(modulesPresent) {
+					reply.setPerformative(ACLMessage.CONFIRM);
+				} else {
+					reply.setPerformative(ACLMessage.DISCONFIRM);
+				}
+	
+				myAgent.send(reply);
 			}
-		} catch(UnreadableException ex) {
-			modulesPresent = false;
-		} finally {
-			// send reply; confirm if modules are present, disconfirm if not.
-			ACLMessage reply;
-			reply = message.createReply();
-			reply.setOntology("CheckForModulesResponse");
-			if(modulesPresent) {
-				reply.setPerformative(ACLMessage.CONFIRM);
-			} else {
-				reply.setPerformative(ACLMessage.DISCONFIRM);
-			}
-
-			myAgent.send(reply);
 		}
 	}
 }

@@ -19,7 +19,7 @@
 	</listAttribute>
 	
 	<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jade.Boot"/>
-	<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-agents &quot;MainAgent :agents.main_agent.MainAgent&quot;"/>
+	<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-gui -agents &quot;MainAgent :agents.main_agent.MainAgent&quot;"/>
 	<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="HUniversal-Production-Utrecht"/>
 	
 </launchConfiguration>

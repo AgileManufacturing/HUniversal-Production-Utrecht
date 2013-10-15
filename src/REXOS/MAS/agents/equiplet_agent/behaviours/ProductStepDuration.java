@@ -1,10 +1,10 @@
 package agents.equiplet_agent.behaviours;
 
-import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
@@ -14,6 +14,8 @@ import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
+import agents.data_classes.BehaviourCallbackItem;
+import agents.data_classes.ParentBehaviourCallback;
 import agents.data_classes.ProductStep;
 import agents.data_classes.ScheduleData;
 import agents.equiplet_agent.EquipletAgent;
@@ -26,7 +28,7 @@ import com.mongodb.BasicDBObject;
  * Receives the message from its service agent and sends the productduration to the product agent.
  * The message send to the product agent has the ontology: "ProductionDuration".
  */
-public class ProductionDurationResponse extends ReceiveOnceBehaviour {
+public class ProductStepDuration extends ReceiveOnceBehaviour {
 	/**
 	 * @var long serialVersionUID
 	 *      The serialVersionUID for this class.
@@ -38,7 +40,7 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 	 *      The MessageTemplate indicating the messages this behaviour wishes to
 	 *      receive.
 	 **/
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("ProductionDurationResponse");
+	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("ProductStepDuration");
 
 	/**
 	 * @var EquipletAgent equipletAgent
@@ -50,7 +52,13 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 	 * @var BlackboardClient equipletBBClient
 	 *      The blackboardclient for this equiplet's blackboard.
 	 **/
-	private BlackboardClient equipletBBClient;
+	private BlackboardClient productStepBB;
+
+	private ParentBehaviourCallback parentBehaviourCallback;
+
+	private Object contentObject;
+
+	private String conversationID;
 
 	/**
 	 * Instantiates a new production duration response.
@@ -58,12 +66,34 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 	 * @param a
 	 *            the agent
 	 * @param equipletBBClient
-	 *            the equiplet blackboard.
+	 *            the productSteps blackboard for the equiplet.
 	 */
-	public ProductionDurationResponse(Agent a, BlackboardClient equipletBBClient) {
-		super(a, 10000, messageTemplate);
-		equipletAgent = (EquipletAgent) a;
-		this.equipletBBClient = equipletBBClient;
+	public ProductStepDuration(EquipletAgent equipletAgent, BlackboardClient productStepBB, ParentBehaviourCallback parentBehaviourCallback,
+			String conversationID, Object contentObject) {
+		super(equipletAgent, 10000, messageTemplate);
+		this.equipletAgent =  equipletAgent;
+		this.productStepBB = productStepBB;
+		
+		this.parentBehaviourCallback = parentBehaviourCallback;
+		
+		this.contentObject = contentObject;
+		this.conversationID = conversationID;
+	}
+	
+	@Override
+	public void onStart(){
+		ACLMessage responseMessage = new ACLMessage(ACLMessage.QUERY_REF);
+		responseMessage.addReceiver(equipletAgent.getServiceAgent());
+		responseMessage.setConversationId(conversationID);
+		if (contentObject != null){
+			try {
+				responseMessage.setContentObject((Serializable)contentObject);
+			} catch (IOException e) {
+				Logger.log(LogLevel.ERROR, e);
+			}
+		}
+		responseMessage.setOntology("ProductStepDuration");
+		equipletAgent.send(responseMessage);
 	}
 
 	/**
@@ -77,23 +107,24 @@ public class ProductionDurationResponse extends ReceiveOnceBehaviour {
 
 			try {
 				// gets the productstep
-				ObjectId id = equipletAgent.getRelatedObjectId(message.getConversationId());
-				ProductStep productStep = new ProductStep((BasicDBObject) equipletBBClient.findDocumentById(id));
+				ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
+				ProductStep productStep = new ProductStep((BasicDBObject) productStepBB.findDocumentById(productStepId));
 
 				ScheduleData schedule = productStep.getScheduleData();
 //				schedule.setDuration(schedule.getDuration() + (6000/equipletAgent.getTimer().getTimeSlotLength()));
 //				equipletBBClient.updateDocuments(new BasicDBObject("_id", id),
 //												new BasicDBObject("$set", new BasicDBObject("scheduleData.duration", schedule.getDuration())));
-				// sends a message to the productAgent with the production
-				// duration.
-				ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
-				responseMessage.addReceiver(productStep.getProductAgentId());
-				responseMessage.setOntology("ProductionDuration");
-				responseMessage.setConversationId(message.getConversationId());
-				responseMessage.setContentObject(new Long(schedule.getDuration()));
-				equipletAgent.send(responseMessage);
-				Logger.log(LogLevel.DEBUG, "sending message: %s%n", responseMessage.getOntology());
-			} catch(IOException | InvalidDBNamespaceException | GeneralMongoException e) {
+				
+				
+				BehaviourCallbackItem scheduleArguments = new BehaviourCallbackItem();
+				scheduleArguments.addArgument("schedule", schedule);
+				scheduleArguments.addArgument("productStep", productStep);
+				
+				parentBehaviourCallback.callback(message, scheduleArguments);
+				equipletAgent.removeBehaviour(this);
+				
+		//		Logger.log(LogLevel.DEBUG, "sending message: %s%n", responseMessage.getOntology());
+			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(LogLevel.ERROR, e);
 				equipletAgent.doDelete();
 			}

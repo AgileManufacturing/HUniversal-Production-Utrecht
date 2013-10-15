@@ -52,6 +52,8 @@ import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
+import agents.data_classes.BehaviourCallbackItem;
+import agents.data_classes.ParentBehaviourCallback;
 import agents.data_classes.Part;
 import agents.data_classes.Position;
 import agents.data_classes.ProductStep;
@@ -73,7 +75,7 @@ import com.mongodb.DBObject;
  * @author Peter Bonnema
  * 
  */
-public class GetPartsInfoResponse extends ReceiveBehaviour {
+public class PartsInfo extends ReceiveBehaviour {
 	/**
 	 * @var long serialVersionUID
 	 *      The serialVersionUID of this class.
@@ -84,7 +86,13 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 	 * @var ServiceAgent agent
 	 *      The service agent this behaviour belongs to.
 	 */
-	private ServiceAgent agent;
+	private ServiceAgent serviceAgent;
+
+	private ParentBehaviourCallback parentBehaviourCallback;
+
+	private ProductStep productStep;
+
+	private String conversationID;
 
 	/**
 	 * Creates a new GetPartsInfoResponse instance with the specified parameters.
@@ -94,11 +102,33 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
 	 * @param productStep The productStep from which the parts come.
 	 */
-	public GetPartsInfoResponse(ServiceAgent agent) {
-		super(agent, MessageTemplate.MatchOntology("GetPartsInfoResponse"));
-		this.agent = agent;
+	public PartsInfo(ServiceAgent serviceAgent, ParentBehaviourCallback parentBehaviourCallback,
+			String conversationID, ProductStep productStep) {
+		super(serviceAgent, MessageTemplate.MatchOntology("PartsInfo"));
+		this.serviceAgent = serviceAgent;
+		
+		this.parentBehaviourCallback = parentBehaviourCallback;
+		
+		this.productStep = productStep;
+		this.conversationID = conversationID;
 	}
 
+	@Override
+	public void onStart(){
+		ACLMessage responseMessage = new ACLMessage(ACLMessage.QUERY_REF);
+		responseMessage.addReceiver(serviceAgent.getLogisticsAID());
+		responseMessage.setConversationId(conversationID);
+		if (productStep != null){
+			try {
+				responseMessage.setContentObject(productStep.getInputParts());
+			} catch (IOException e) {
+				Logger.log(LogLevel.ERROR, e);
+			}
+		}
+		responseMessage.setOntology("PartsInfo");
+		serviceAgent.send(responseMessage);
+	}
+	
 	/**
 	 * Handles an incoming message from the logisticsAgent. The message contains positional information about the
 	 * specified parts. The message also contains the partId and partType of the output part of the productStep. Once a
@@ -114,12 +144,12 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if(message != null) {
 			try {
-				BlackboardClient productStepBBClient = agent.getProductStepBBClient();
-				BlackboardClient serviceStepBBClient = agent.getServiceStepBBClient();
+				BlackboardClient productStepBBClient = serviceAgent.getProductStepBBClient();
+				BlackboardClient serviceStepBBClient = serviceAgent.getServiceStepBBClient();
 
 				String conversationId = message.getConversationId();
-				ObjectId productStepId = agent.getProductStepIdForConvId(conversationId);
-				agent.removeConvIdProductStepIdMapping(conversationId);
+				ObjectId productStepId = serviceAgent.getProductStepIdForConvId(conversationId);
+				serviceAgent.removeConvIdProductStepIdMapping(conversationId);
 				List<DBObject> dbServiceSteps =
 						serviceStepBBClient.findDocuments(new BasicDBObject("productStepId", productStepId));
 				ServiceStep[] serviceSteps = new ServiceStep[dbServiceSteps.size()];
@@ -139,7 +169,7 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 				productStepBBClient.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject("$set",
 						new BasicDBObject("inputParts", partList)));
 
-				Logger.log(LogLevel.DEBUG, "%s got partsInfo: %s%n", agent.getLocalName(), parameters.toString());
+				Logger.log(LogLevel.DEBUG, "%s got partsInfo: %s%n", serviceAgent.getLocalName(), parameters.toString());
 
 				for(Entry<Part, Position> e : parameters.entrySet()) {
 					if(e.getValue() == null) {
@@ -150,10 +180,10 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 					}
 				}
 				ServiceStep[] parameterizedSteps =
-						agent.getServiceForConvId(conversationId).updateParameters(parameters,
+						serviceAgent.getServiceForConvId(conversationId).updateParameters(parameters,
 								ServiceStep.sort(serviceSteps));
 				
-				agent.removeConvIdServiceMapping(conversationId);
+				serviceAgent.removeConvIdServiceMapping(conversationId);
 
 				ScheduleData scheduleData;
 				ProductStep productStep =
@@ -173,22 +203,22 @@ public class GetPartsInfoResponse extends ReceiveBehaviour {
 									.append("scheduleData", serviceStep.getScheduleData().toBasicDBObject()).append(
 											"status", serviceStep.getStatus().name())));
 				}
-
-				ACLMessage informMsg = new ACLMessage(ACLMessage.INFORM);
-				informMsg.setOntology("FillPlaceholders");
-				informMsg.setConversationId(message.getConversationId());
-				informMsg.addReceiver(agent.getHardwareAgentAID());
-				informMsg.setContentObject(parameterizedSteps[0].getId());
-				agent.send(informMsg);
+				
+				BehaviourCallbackItem arguments = new BehaviourCallbackItem();
+				arguments.addArgument("stepId", parameterizedSteps[0].getId());
+				parentBehaviourCallback.callback(message, arguments);
+				
+				
 				productStepBBClient.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject("$set",
 						new BasicDBObject("status", StepStatusCode.PLANNED.name())));
-			} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
+			} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException e) {
 				Logger.log(LogLevel.ERROR, e);
-				agent.doDelete();
+				serviceAgent.doDelete();
 			}
+			serviceAgent.removeBehaviour(this);
 		} else {
-			Logger.log(LogLevel.DEBUG, agent.getName() + " - GetPartsInfoResponse timeout!");
-			agent.doDelete();
+			Logger.log(LogLevel.DEBUG, serviceAgent.getName() + " - GetPartsInfoResponse timeout!");
+			serviceAgent.doDelete();
 		}
 	}
 }

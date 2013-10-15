@@ -44,6 +44,10 @@ import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
+import agents.data_classes.BehaviourCallbackItem;
+import agents.data_classes.ParentBehaviourCallback;
+import agents.data_classes.ProductStep;
+import agents.data_classes.ScheduleData;
 import agents.equiplet_agent.EquipletAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 
@@ -53,7 +57,7 @@ import agents.shared_behaviours.ReceiveBehaviour;
  * If not it sends a message to the sender with ontology:"ConversationIdUnknown".
  * When it can handle the message, it sends a message to the serviceAgent with ontology: "GetProductionStepDuration".
  */
-public class GetProductionDuration extends ReceiveBehaviour {
+public class ProductionDuration extends ReceiveBehaviour implements ParentBehaviourCallback {
 	/**
 	 * @var static final long serialVersionUID
 	 *      The serial version UID for this class
@@ -65,7 +69,7 @@ public class GetProductionDuration extends ReceiveBehaviour {
 	 *      The messageTemplate this behaviour listens to.
 	 *      This behaviour listens to the ontology: GetProductStepDuration.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("GetProductionDuration");
+	private static MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("ProductionDuration");
 
 	/**
 	 * @var EquipletAgent equipletAgent
@@ -79,8 +83,8 @@ public class GetProductionDuration extends ReceiveBehaviour {
 	 * @param a The agent for this behaviour
 	 * 
 	 */
-	public GetProductionDuration(Agent a) {
-		super(a, messageTemplate);
+	public ProductionDuration(Agent a) {
+		super(a, MESSAGE_TEMPLATE);
 		equipletAgent = (EquipletAgent) a;
 	}
 
@@ -92,8 +96,8 @@ public class GetProductionDuration extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		//Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
-				//message.getOntology());
+		Logger.log(LogLevel.DEBUG, "%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
+				message.getOntology());
 		try {
 			// gets the productstepId and sends it to the service agent with the ontology GetProductionStepDuration.
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
@@ -101,23 +105,48 @@ public class GetProductionDuration extends ReceiveBehaviour {
 				Logger.log(LogLevel.DEBUG, "Conversation id not known");
 				ACLMessage responseMessage = message.createReply();
 				responseMessage.setPerformative(ACLMessage.DISCONFIRM);
+				//TODO: why change the ontology ?
 				responseMessage.setOntology("ConversationIdUnknown");
 				myAgent.send(responseMessage);
 			} else {
-				ProductionDurationResponse productionDurationResponseBehaviour =
-						new ProductionDurationResponse(myAgent, equipletAgent.getProductStepBBClient());
-				myAgent.addBehaviour(productionDurationResponseBehaviour);
+				
+				equipletAgent.addBehaviour(new ProductStepDuration(equipletAgent, equipletAgent.getProductStepBBClient(),
+																	this, message.getConversationId(), productStepId));
+		//		ProductionDurationResponse productionDurationResponseBehaviour =
+		//				new ProductionDurationResponse(myAgent, equipletAgent.getProductStepBBClient());
+		//		myAgent.addBehaviour(productionDurationResponseBehaviour);
 
-				ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
-				responseMessage.addReceiver(equipletAgent.getServiceAgent());
-				responseMessage.setConversationId(message.getConversationId());
-				responseMessage.setContentObject(productStepId);
-				responseMessage.setOntology("GetProductionStepDuration");
-				myAgent.send(responseMessage);
+		//		ACLMessage responseMessage = new ACLMessage(ACLMessage.QUERY_REF);
+		//		responseMessage.addReceiver(equipletAgent.getServiceAgent());
+		//		responseMessage.setConversationId(message.getConversationId());
+		//		responseMessage.setContentObject(productStepId);
+		//		responseMessage.setOntology("ProductStepDuration");
+		//		myAgent.send(responseMessage);
 			}
-		} catch(IOException e) {
+		} catch(Exception e) {
 			Logger.log(LogLevel.ERROR, e);
 			myAgent.doDelete();
 		}
+	}
+
+	@Override
+	public void callback(ACLMessage result, BehaviourCallbackItem arguments) {
+		// sends a message to the productAgent with the production
+		// duration.
+		
+		ProductStep productStep = (ProductStep)arguments.getArgument("productStep");
+		ScheduleData schedule = (ScheduleData)arguments.getArgument("schedule");
+		
+		ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
+		responseMessage.addReceiver(productStep.getProductAgentId());
+		responseMessage.setOntology("ProductionDuration");
+		responseMessage.setConversationId(result.getConversationId());
+		try {
+			responseMessage.setContentObject(new Long(schedule.getDuration()));
+		} catch (IOException e) {
+			Logger.log(LogLevel.ERROR, e);
+		}
+		equipletAgent.send(responseMessage);
+		
 	}
 }

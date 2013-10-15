@@ -49,6 +49,8 @@ import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
+import agents.data_classes.BehaviourCallbackItem;
+import agents.data_classes.ParentBehaviourCallback;
 import agents.data_classes.ProductStep;
 import agents.service_agent.Service;
 import agents.service_agent.ServiceAgent;
@@ -63,7 +65,7 @@ import com.mongodb.BasicDBObject;
  * @author Peter Bonnema
  * 
  */
-public class CanDoProductStep extends ReceiveBehaviour {
+public class CanPerformProductionStep extends ReceiveBehaviour implements ParentBehaviourCallback{
 	/**
 	 * @var long serialVersionUID
 	 *      The serialVersionUID of this class.
@@ -74,16 +76,16 @@ public class CanDoProductStep extends ReceiveBehaviour {
 	 * @var ServiceAgent agent
 	 *      The service agent this behaviour belongs to.
 	 */
-	private ServiceAgent agent;
+	private ServiceAgent serviceAgent;
 
 	/**
 	 * Creates a new CanDoProductStep instance with the specified parameters.
 	 * 
 	 * @param agent the agent this behaviour belongs to.
 	 */
-	public CanDoProductStep(ServiceAgent agent) {
-		super(agent, MessageTemplate.MatchOntology("CanDoProductionStep"));
-		this.agent = agent;
+	public CanPerformProductionStep(ServiceAgent agent) {
+		super(agent, MessageTemplate.MatchOntology("CanPerformProductionStep"));
+		this.serviceAgent = agent;
 	}
 
 	/**
@@ -98,47 +100,60 @@ public class CanDoProductStep extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		try {
-			ObjectId productStepId = (ObjectId) message.getContentObject();
-			ProductStep productStep =
-					new ProductStep((BasicDBObject) agent.getProductStepBBClient().findDocumentById(productStepId));
-			int stepType = productStep.getType();
-			BasicDBObject parameters = productStep.getParameters();
-
-			//Logger.log("%s got message CanDoProductStep for step type %s%n", agent.getLocalName(), stepType);
-
-			Service[] services = agent.getServiceFactory().getServicesForStep(stepType);
-
-			ArrayList<Service> possibleServices = new ArrayList<Service>();
-			for(Service service : services) {
-				if(service.canDoStep(stepType, parameters)) {
-					possibleServices.add(service);
+		
+		if ( message.getPerformative() == ACLMessage.QUERY_IF){
+			try {
+				ObjectId productStepId = (ObjectId) message.getContentObject();
+				ProductStep productStep =
+						new ProductStep((BasicDBObject) serviceAgent.getProductStepBBClient().findDocumentById(productStepId));
+				int stepType = productStep.getType();
+				BasicDBObject parameters = productStep.getParameters();
+	
+				//Logger.log("%s got message CanDoProductStep for step type %s%n", agent.getLocalName(), stepType);
+	
+				Service[] services = serviceAgent.getServiceFactory().getServicesForStep(stepType);
+	
+				ArrayList<Service> possibleServices = new ArrayList<Service>();
+				for(Service service : services) {
+					if(service.canDoStep(stepType, parameters)) {
+						possibleServices.add(service);
+					}
 				}
+	
+				if(!possibleServices.isEmpty()) {
+					// TODO (out of scope)implement algorithm to intelligently choose a service here
+					Service chosenService = possibleServices.get(0);
+	
+					serviceAgent.mapConvIdWithService(message.getConversationId(), chosenService);
+	
+					serviceAgent.addBehaviour(new RequiredModulesPresent(serviceAgent, this, message.getConversationId(), 
+																		chosenService.getModuleGroupIds(stepType, parameters) ));
+			//		ACLMessage queryIfHWA = new ACLMessage(ACLMessage.QUERY_IF);
+			//		queryIfHWA.setConversationId(message.getConversationId());
+			//		queryIfHWA.addReceiver(serviceAgent.getHardwareAgentAID());
+			//		queryIfHWA.setOntology("RequiredModulesPresent");
+			//		queryIfHWA.setContentObject(chosenService.getModuleGroupIds(stepType, parameters));
+			//		serviceAgent.send(queryIfHWA);
+				} else {
+					ACLMessage disconfirmReply = message.createReply();
+					disconfirmReply.setPerformative(ACLMessage.DISCONFIRM);
+					disconfirmReply.setOntology("CanPerformProductionStep");
+					getAgent().send(disconfirmReply);
+					Logger.log(LogLevel.DEBUG, "%s sending step availability (%b)%n", getAgent().getLocalName(),
+							disconfirmReply.getPerformative() == ACLMessage.CONFIRM);
+				}
+			} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException e) {
+				Logger.log(LogLevel.ERROR, e);
 			}
-
-			if(!possibleServices.isEmpty()) {
-				// TODO (out of scope)implement algorithm to intelligently choose a service here
-				Service chosenService = possibleServices.get(0);
-
-				agent.mapConvIdWithService(message.getConversationId(), chosenService);
-
-				ACLMessage msg = new ACLMessage(ACLMessage.QUERY_IF);
-				msg.setConversationId(message.getConversationId());
-				msg.addReceiver(agent.getHardwareAgentAID());
-				msg.setOntology("CheckForModules");
-				msg.setContentObject(chosenService.getModuleGroupIds(stepType, parameters));
-				agent.send(msg);
-			} else {
-				ACLMessage reply = message.createReply();
-				reply.setPerformative(ACLMessage.DISCONFIRM);
-				reply.setOntology("CanDoProductionStepResponse");
-				getAgent().send(reply);
-				Logger.log(LogLevel.DEBUG, "%s sending step availability (%b)%n", getAgent().getLocalName(),
-						reply.getPerformative() == ACLMessage.CONFIRM);
-			}
-		} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException | IOException e) {
-			Logger.log(LogLevel.ERROR, e);
-			agent.doDelete();
 		}
+	}
+
+	@Override
+	public void callback(ACLMessage result, BehaviourCallbackItem arguments) {
+		ACLMessage reply = new ACLMessage(result.getPerformative());
+		reply.setConversationId(result.getConversationId());
+		reply.addReceiver(serviceAgent.getEquipletAgentAID());
+		reply.setOntology("CanPerformProductionStep");
+		serviceAgent.send(reply);
 	}
 }

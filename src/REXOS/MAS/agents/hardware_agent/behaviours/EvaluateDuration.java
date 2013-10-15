@@ -86,7 +86,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 	 * @var MessageTemplate messageTemplate
 	 *      The messageTemplate to match the messages.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("GetServiceStepDuration");
+	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("ServiceStepDuration");
 
 	/**
 	 * @var HardwareAgent hardwareAgent
@@ -128,8 +128,9 @@ public class EvaluateDuration extends ReceiveBehaviour {
 			// Send a message to the serviceAgent with the serviceStepId
 			ACLMessage reply;
 			reply = message.createReply();
+			reply.setPerformative(ACLMessage.INFORM);
 			reply.setContentObject(serviceStepId);
-			reply.setOntology("GetServiceStepDurationResponse");
+			reply.setOntology("ServiceStepDuration");
 			myAgent.send(reply);
 		} catch(UnreadableException | IOException e) {
 			e.printStackTrace();

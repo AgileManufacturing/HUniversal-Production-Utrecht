@@ -2,9 +2,9 @@
  * @file rexos/mas/service_agent/behaviours/CheckForModulesResponse.java
  * @brief Handles the CheckForModulesResponse message from the hardwareAgent that indicates whether all required modules
  *        for a service are present.
- * @date Created: 18 apr. 2013
+ * @date Created: 10 oct. 2013
  * 
- * @author Peter Bonnema
+ * @author Roy Scheefhals
  * 
  * @section LICENSE
  *          License: newBSD
@@ -35,10 +35,14 @@
  **/
 package agents.service_agent.behaviours;
 
+import java.io.IOException;
+import java.io.Serializable;
+
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
+import agents.data_classes.ParentBehaviourCallback;
 import agents.service_agent.ServiceAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 
@@ -50,29 +54,57 @@ import agents.shared_behaviours.ReceiveBehaviour;
  * @author Peter Bonnema
  * 
  */
-public class CheckForModulesResponse extends ReceiveBehaviour {
+public class RequiredModulesPresent extends ReceiveBehaviour {
 	/**
 	 * @var long serialVersionUID
 	 *      The serialVersionUID of this class.
 	 */
 	private static final long serialVersionUID = -7514590874724120963L;
 	
+	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("RequiredModulesPresent");
 	/**
 	 * @var ServiceAgent agent
 	 *      The service agent this behaviour belongs to.
 	 */
-	private ServiceAgent agent;
+	private ServiceAgent serviceAgent;
+
+	private ParentBehaviourCallback parentBehaviourCallback;
+	
+	private Object contentObject;
+	
+	private String conversationID;
 
 	/**
 	 * Creates a new ArePartsAvailableResponse instance with the specified parameters.
 	 * 
 	 * @param agent the agent this behaviour belongs to.
 	 */
-	public CheckForModulesResponse(ServiceAgent agent) {
-		super(agent, MessageTemplate.MatchOntology("CheckForModulesResponse"));
-		this.agent = agent;
+	public RequiredModulesPresent(ServiceAgent agent, ParentBehaviourCallback parentBehaviourCallback,
+			String conversationID, Object contentObject) {
+		super(agent, MESSAGE_TEMPLATE);
+		this.serviceAgent = agent;
+		this.parentBehaviourCallback = parentBehaviourCallback;
+		
+		this.contentObject = contentObject;
+		this.conversationID = conversationID;
 	}
 
+	@Override
+	public void onStart(){
+		ACLMessage queryIFMessage = new ACLMessage(ACLMessage.QUERY_IF);
+		queryIFMessage.setConversationId(conversationID);
+		queryIFMessage.addReceiver(serviceAgent.getHardwareAgentAID());
+		queryIFMessage.setOntology("RequiredModulesPresent");
+		if (contentObject != null){
+			try {
+				queryIFMessage.setContentObject((Serializable)contentObject);
+			} catch (IOException e) {
+				Logger.log(LogLevel.ERROR, e);
+			}
+		}
+		serviceAgent.send(queryIFMessage);
+	
+	}
 	/**
 	 * Handles an incoming message from the hardwareAgent. The message confirms or disconfirms whether all modules
 	 * required for a service are present. Once a message is received a CanDoProductionStepResponse message is send to
@@ -84,17 +116,10 @@ public class CheckForModulesResponse extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
-			ACLMessage reply = message.createReply();
-			reply.clearAllReceiver();
-			reply.addReceiver(agent.getEquipletAgentAID());
-			reply.setPerformative(message.getPerformative());
-			reply.setOntology("CanDoProductionStepResponse");
-			getAgent().send(reply);
-			Logger.log(LogLevel.DEBUG, "%s sending step availability (%b)%n", getAgent().getLocalName(),
-					message.getPerformative() == ACLMessage.CONFIRM);
+			parentBehaviourCallback.callback(message, null);
+			serviceAgent.removeBehaviour(this);
 		} else {
-			Logger.log(LogLevel.DEBUG, agent.getName() + " - CheckForModulesResponse timeout!");
-			agent.doDelete();
+			Logger.log(LogLevel.WARNING, serviceAgent.getName() + " - CheckForModulesResponse timeout!");
 		}
 	}
 }

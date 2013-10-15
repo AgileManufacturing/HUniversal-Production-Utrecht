@@ -55,7 +55,7 @@ import agents.shared_behaviours.ReceiveOnceBehaviour;
 /**
  * Responds to GetPartsInfo messages, returning a mapping of part id to type and position.
  */
-public class GetPartsInfo extends ReceiveOnceBehaviour {
+public class PartsInfo extends ReceiveOnceBehaviour {
 	/**
 	 * @var long serialVersionUID
 	 *      The serialVersionUID for this class.
@@ -68,7 +68,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 	 * @param a The agent associated with this behaviour.
 	 * @param conversationId The conversationId that should be used for this behaviour.
 	 */
-	public GetPartsInfo(Agent a, String conversationId) {
+	public PartsInfo(Agent a, String conversationId) {
 		this(a, 2000, conversationId);
 	}
 
@@ -79,8 +79,8 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 	 * @param millis Timeout in milliseconds.
 	 * @param conversationId The conversationId that should be used for this behaviour.
 	 */
-	public GetPartsInfo(Agent a, int millis, String conversationId) {
-		super(a, millis, MessageTemplate.and(MessageTemplate.MatchOntology("GetPartsInfo"),
+	public PartsInfo(Agent a, int millis, String conversationId) {
+		super(a, millis, MessageTemplate.and(MessageTemplate.MatchOntology("PartsInfo"),
 				MessageTemplate.MatchConversationId(conversationId)));
 	}
 
@@ -112,7 +112,7 @@ public class GetPartsInfo extends ReceiveOnceBehaviour {
 
 				ACLMessage reply = message.createReply();
 				reply.setPerformative(ACLMessage.INFORM);
-				reply.setOntology("GetPartsInfoResponse");
+				reply.setOntology("PartsInfo");
 				reply.setContentObject(partParameters);
 				myAgent.send(reply);
 			} catch (UnreadableException | IOException | KnowledgeException | KeyNotFoundException e) {

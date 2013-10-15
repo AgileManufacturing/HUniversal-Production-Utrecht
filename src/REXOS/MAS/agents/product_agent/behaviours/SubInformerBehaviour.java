@@ -63,7 +63,7 @@ public class SubInformerBehaviour extends agents.shared_behaviours.ReceiveBehavi
 	public void onStart() {
 		super.onStart();
 		try {
-			ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+			ACLMessage message = new ACLMessage(ACLMessage.QUERY_IF);
 			message.setConversationId(_conversationId);
 			message.addReceiver(_targetEquiplet);
 			message.setOntology("CanPerformStep");
@@ -84,14 +84,15 @@ public class SubInformerBehaviour extends agents.shared_behaviours.ReceiveBehavi
 		try {
 			if (message != null) {
 				switch (_currentState) {
+				
 				case 0:
 					if (message.getPerformative() == ACLMessage.CONFIRM) 
 					{
 						ACLMessage newMessage = new ACLMessage(
-								ACLMessage.REQUEST);
+								ACLMessage.QUERY_REF);
 						newMessage.setConversationId(_conversationId);
 						newMessage.addReceiver(_targetEquiplet);
-						newMessage.setOntology("GetProductionDuration");
+						newMessage.setOntology("ProductionDuration");
 						newMessage.setContentObject(_productionStep);
 						myAgent.send(newMessage);
 						_currentState++;
