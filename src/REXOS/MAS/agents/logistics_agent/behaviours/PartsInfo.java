@@ -40,6 +40,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import libraries.knowledgedb_client.KeyNotFoundException;
@@ -82,7 +83,16 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 	public PartsInfo(Agent a, int millis, String conversationId) {
 		super(a, millis, MessageTemplate.and(MessageTemplate.MatchOntology("PartsInfo"),
 				MessageTemplate.MatchConversationId(conversationId)));
+		
+		for(int i = 0; i < 4; i++) {
+			for(int j = 0; j < 4; j++) {
+				supplyCrateContent.put(new Part(1, (i * 4) + j), new Position(j + 0.0, i + 0.0, supplyCratePart));
+			}
+		}
 	}
+	
+	private Part supplyCratePart = new Part(2, 100, "GC4x4MB_1");
+	private HashMap<Part, Position> supplyCrateContent = new HashMap<Part, Position>();
 
 	/**
 	 * Handles GetPartsInfo messages and responds with a GetPartsInfoResponse.
@@ -96,12 +106,29 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 				Logger.log(LogLevel.DEBUG, "%s GetPartsInfo%n", myAgent.getLocalName());
 				Part[] parts = (Part[]) message.getContentObject();
 				HashMap<Part, Position> partParameters = new HashMap<Part, Position>();
+				
 				int x = 2;
 				int id = 1;
 				int type = 3;
+				
+				String supplyCrate = "GC4x4MB_1";
+				String productionCrate = "GC4x4MB_2";
+				
 				for(Part part : parts) {
-					partParameters.put(new Part(part.getType(), id++),
-							new Position((double)x++, 1.0, 3.0, new Part(type++, id + x)));
+					Logger.log(LogLevel.DEBUG, "PartNo: " + part.getType());
+					switch(part.getType()) {
+					case 1: // Red ball
+						partParameters.putAll(supplyCrateContent);
+						break;
+					case 2: // Crate
+						partParameters.put(new Part(part.getType(), 100, supplyCrate), null); 
+						partParameters.put(new Part(part.getType(), 101, productionCrate), null); 
+						break;
+					default:
+						partParameters.put(new Part(part.getType(), id++),
+								new Position((double)x++, 1.0, 3.0, new Part(type++, id + x)));
+						break;					
+					}
 				}
 
 				KnowledgeDBClient client = KnowledgeDBClient.getClient();

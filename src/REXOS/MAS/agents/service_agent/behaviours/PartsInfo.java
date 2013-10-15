@@ -158,10 +158,10 @@ public class PartsInfo extends ReceiveBehaviour {
 					serviceSteps[i] = new ServiceStep((BasicDBObject) dbServiceSteps.get(i));
 				}
 
-				HashMap<Part, Position> parameters = (HashMap<Part, Position>) message.getContentObject();
+				HashMap<Part, Position> partParameters = (HashMap<Part, Position>) message.getContentObject();
 
 				BasicDBList partList = new BasicDBList();
-				for(Object part : parameters.keySet().toArray()) {
+				for(Object part : partParameters.keySet().toArray()) {
 					Part p = (Part) part;
 					partList.add(p.toBasicDBObject());
 				}
@@ -169,18 +169,18 @@ public class PartsInfo extends ReceiveBehaviour {
 				productStepBBClient.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject("$set",
 						new BasicDBObject("inputParts", partList)));
 
-				Logger.log(LogLevel.DEBUG, "%s got partsInfo: %s%n", serviceAgent.getLocalName(), parameters.toString());
+				Logger.log(LogLevel.DEBUG, "%s got partsInfo: %s%n", serviceAgent.getLocalName(), partParameters.toString());
 
-				for(Entry<Part, Position> e : parameters.entrySet()) {
+				for(Entry<Part, Position> e : partParameters.entrySet()) {
 					if(e.getValue() == null) {
 						productStepBBClient.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject(
 								"$set", new BasicDBObject("outputPart", e.getKey().toBasicDBObject())));
-						parameters.remove(e.getKey());
+						partParameters.remove(e.getKey());
 						break;
 					}
 				}
 				ServiceStep[] parameterizedSteps =
-						serviceAgent.getServiceForConvId(conversationId).updateParameters(parameters,
+						serviceAgent.getServiceForConvId(conversationId).updateParameters(partParameters,
 								ServiceStep.sort(serviceSteps));
 				
 				serviceAgent.removeConvIdServiceMapping(conversationId);

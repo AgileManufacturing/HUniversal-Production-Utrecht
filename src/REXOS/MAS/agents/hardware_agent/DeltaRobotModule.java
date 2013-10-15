@@ -101,6 +101,12 @@ public class DeltaRobotModule extends Module {
 				return new EquipletStep[] {
 					moveZ(parameters)
 				};
+			case 4:
+				// case to move to a position relative to a crate
+				// returns the steps for the movement on the x and y axis.
+				return new EquipletStep[] {
+						moveToRowColumnInCrate(parameters)
+				};
 			default:
 				break;
 		}
@@ -120,6 +126,7 @@ public class DeltaRobotModule extends Module {
 		{
 			extraSize = parameters.getDouble("extra_size");
 		}
+		
 		
 		Position position = new Position((BasicDBObject) parameters.get("position"));
 
@@ -163,6 +170,63 @@ public class DeltaRobotModule extends Module {
 	@Override
 	public int[] isLeadingForServices() {
 		return new int[] {};
+	}
+	
+	/**
+	 * Function that builds the step for moving to a position relative to a crate.
+	 * 
+	 * @param parameters The parameters to use by this step.
+	 * @return EquipletStep to move to the crate along the x and y axis.
+	 */
+	private EquipletStep moveToRowColumnInCrate(BasicDBObject parameters) {
+		// set lookup type
+		String lookUp = "NULL";
+					
+		double extraSize = 0;
+		if(parameters.containsField("extraSize")) {
+			extraSize = parameters.getDouble("extraSize");
+		}
+		BasicDBObject lookUpParameters = new BasicDBObject();
+		
+		// Create the payload
+		BasicDBObject payload = new BasicDBObject();
+		
+		if(parameters.containsField("position")) {
+			Position position = new Position((BasicDBObject)parameters.get("position"));
+			
+			// fill the lookUpParameters
+			if(position.getRelativeToPart() == null) {
+				lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
+			} else {
+				lookUpParameters.put("ID", position.getRelativeToPart().getId());
+			}
+
+			// fill the payload parameters
+			if(position.getX() == null) {
+				payload.put("x", "X-PLACEHOLDER");
+			} else {
+				payload.put("x", position.getX());
+			}
+			if(position.getY() == null) {
+				payload.put("y", "Y-PLACEHOLDER");
+			} else {
+				payload.put("y", position.getY());
+			}
+			payload.put("maxAcceleration", MAX_ACCELERATION);
+			lookUp = "FIND_ID";
+		} else {
+			payload.put("x", "X-PLACEHOLDER");
+			payload.put("y", "Y-PLACEHOLDER");
+		}
+		
+		// create the instructionData
+		InstructionData instructionData = new InstructionData("move", "deltarobot", lookUp, lookUpParameters, payload);
+		
+		// create an EquipletStep and return it.
+		EquipletStep step =
+				new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(),
+						new TimeData(TIMESLOTS_NEEDED_PER_STEP));
+		return step;
 	}
 
 	/**
