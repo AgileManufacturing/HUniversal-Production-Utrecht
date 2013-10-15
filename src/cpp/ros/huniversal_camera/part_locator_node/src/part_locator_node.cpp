@@ -32,8 +32,6 @@
 #include <qr_code_reader_node/Collection.h>
 #include "environment_cache/EnvironmentCache.h"
 
-#include <iostream>
-#include <string>
 
 
 
@@ -43,6 +41,13 @@
 
 
 using namespace std;
+
+const Vector2 PartLocatorNode::EXPECTED_DIRECTION = Vector2(-1, 0);
+const Vector2 PartLocatorNode::EXPECTED_ITEM_DIRECTION = Vector2(-1, 0);
+const string PartLocatorNode::TOP_LEFT_VALUE = "WP_800_400_TL";
+const string PartLocatorNode::TOP_RIGHT_VALUE = "WP_800_400_TR";
+const string PartLocatorNode::BOTTOM_RIGHT_VALUE = "WP_800_400_BR";
+
 
 PartLocatorNode::PartLocatorNode(int equipletId, int moduleId):
 		rexos_coordinates::Module(moduleId),
@@ -59,48 +64,12 @@ PartLocatorNode::PartLocatorNode(int equipletId, int moduleId):
 }
 
 void PartLocatorNode::qrCodeCallback(const qr_code_reader_node::Collection & message){
-	string topLeftValue = "WP_800_400_TL";
-	string topRightValue = "WP_800_400_TR";
-	string bottomRightValue = "WP_800_400_BR";
+	detectCorners(message);
 	
-	int collectionSize = message.collection.size();
-	
-	bool updateMatrices = false;
-	for(int i = 0; i < collectionSize; i++){		
-		if(topLeftValue.compare(message.collection[i].value) == 0){
-			currentTopLeftCoor.x = message.collection[i].corners[1].x;
-			currentTopLeftCoor.y = message.collection[i].corners[1].y;
-			updateMatrices = true;
-			if(originalTopLeftCoor.x == -1){
-				originalTopLeftCoor = currentTopLeftCoor;
-				foundCorners++;			
-			}
-		} else if(topRightValue.compare(message.collection[i].value) == 0){
-			currentTopRightCoor.x = message.collection[i].corners[1].x;
-			currentTopRightCoor.y = message.collection[i].corners[1].y;			
-			updateMatrices = true;
-			if(originalTopRightCoor.x == -1){
-				originalTopRightCoor = currentTopRightCoor;
-				foundCorners++;
-			}
-		} else if(bottomRightValue.compare(message.collection[i].value) == 0){
-			currentBottomRightCoor.x = message.collection[i].corners[1].x;
-			currentBottomRightCoor.y = message.collection[i].corners[1].y;			
-			updateMatrices = true;
-			if(originalBottomRightCoor.x == -1){
-				originalBottomRightCoor = currentBottomRightCoor;
-				foundCorners++;
-			}
-		}
-	}
-	if(foundCorners == 3) this->updateMatrices();
-
-	ROS_DEBUG_STREAM("currentTopLeftCoor " << currentTopLeftCoor);
-	ROS_DEBUG_STREAM("currentTopRightCoor " << currentTopRightCoor);
-	ROS_DEBUG_STREAM("currentBottomRightCoor " << currentBottomRightCoor);
-	
+	// can not do conversion without the corners
 	if(foundCorners != 3) return;
 	
+	int collectionSize = message.collection.size();
 	for(int i = 0; i < collectionSize; i++){
 		Vector2* points = new Vector2[3];
 		for(int j = 0; j < 3; j++){
@@ -112,9 +81,9 @@ void PartLocatorNode::qrCodeCallback(const qr_code_reader_node::Collection & mes
 		
 			//ROS_DEBUG_STREAM("QrCode \t" << message.collection[i].value << " corner \t" << j);
 			Vector3 newCoor = totalMatrix * oldCoor;
-			if(message.collection[i].value == "GC4x4MB_1") {
+			/*if(message.collection[i].value == "GC4x4MB_1") {
 				ROS_DEBUG_STREAM("QrCode " << message.collection[i].value << "\toldCoor \t" << oldCoor << "newCoor \t" << newCoor);
-			}
+			}*/
 
 			points[j] = Vector2(newCoor.x, newCoor.y);
 		}
@@ -130,45 +99,88 @@ void PartLocatorNode::qrCodeCallback(const qr_code_reader_node::Collection & mes
 		);
 		
 		Vector3 equipletCoor = convertToEquipletCoordinate(Vector3(centerCoor.x, centerCoor.y, 0));
-		if(message.collection[i].value == "GC4x4MB_1") {
+		/*if(message.collection[i].value == "GC4x4MB_1") {
 			ROS_DEBUG_STREAM("-equipletCoor \t" << equipletCoor);
+		}*/
+		
+		double angle = getItemRotationAngle(lineA2B);
+		storeInEnviromentCache(message.collection[i].value, equipletCoor, angle);
+		
+		delete points;
+	}
+}
+void PartLocatorNode::detectCorners(const qr_code_reader_node::Collection & message){
+	ROS_DEBUG_STREAM("currentTopLeftCoor " << currentTopLeftCoor);
+	ROS_DEBUG_STREAM("currentTopRightCoor " << currentTopRightCoor);
+	ROS_DEBUG_STREAM("currentBottomRightCoor " << currentBottomRightCoor);
+	
+	bool updateMatrices = false;
+	for(int i = 0; i < message.collection.size(); i++){		
+		if(TOP_LEFT_VALUE.compare(message.collection[i].value) == 0){
+			currentTopLeftCoor.x = message.collection[i].corners[1].x;
+			currentTopLeftCoor.y = message.collection[i].corners[1].y;
+			updateMatrices = true;
+			if(originalTopLeftCoor.x == -1){
+				originalTopLeftCoor = currentTopLeftCoor;
+				foundCorners++;			
+			}
+		} else if(TOP_RIGHT_VALUE.compare(message.collection[i].value) == 0){
+			currentTopRightCoor.x = message.collection[i].corners[1].x;
+			currentTopRightCoor.y = message.collection[i].corners[1].y;			
+			updateMatrices = true;
+			if(originalTopRightCoor.x == -1){
+				originalTopRightCoor = currentTopRightCoor;
+				foundCorners++;
+			}
+		} else if(BOTTOM_RIGHT_VALUE.compare(message.collection[i].value) == 0){
+			currentBottomRightCoor.x = message.collection[i].corners[1].x;
+			currentBottomRightCoor.y = message.collection[i].corners[1].y;			
+			updateMatrices = true;
+			if(originalBottomRightCoor.x == -1){
+				originalBottomRightCoor = currentBottomRightCoor;
+				foundCorners++;
+			}
 		}
-		
-		Vector2 expectedItemDirection(-1, 0);
-		Vector2 actualItemDirection(lineA2B);
-		actualItemDirection.normalize();
-		
-		// calulate the expected angle (0)
-		double expectedItemAngle = acos(expectedItemDirection.x);
-		if(expectedItemDirection.y < 0) expectedItemAngle = 0 - expectedItemAngle;
-		// calulate the actual angle (0)
-		double actualItemAngle = acos(actualItemDirection.x);
-		if(actualItemDirection.y < 0) actualItemAngle = 0 - actualItemAngle;
-		
-		double angle = actualItemAngle - expectedItemAngle;
-		
-		/*ROS_DEBUG_STREAM("-expectedItemAngle \t" << expectedItemAngle);
-		ROS_DEBUG_STREAM("-actualItemAngle \t" << actualItemAngle);*/
-		if(message.collection[i].value == "GC4x4MB_1") {
-			ROS_DEBUG_STREAM("QrCode " << message.collection[i].value << "\t-angle \t" << angle);
-		}
-		
+	}
+	if(foundCorners == 3) this->updateMatrices();
+}
+double PartLocatorNode::getItemRotationAngle(Vector2 lineA2B){
+	Vector2 actualItemDirection(lineA2B);
+	actualItemDirection.normalize();
+	
+	// calulate the expected angle (0)
+	double expectedItemAngle = acos(EXPECTED_ITEM_DIRECTION.x);
+	if(EXPECTED_ITEM_DIRECTION.y < 0) expectedItemAngle = 0 - expectedItemAngle;
+	// calulate the actual angle (0)
+	double actualItemAngle = acos(actualItemDirection.x);
+	if(actualItemDirection.y < 0) actualItemAngle = 0 - actualItemAngle;
+	
+	double angle = actualItemAngle - expectedItemAngle;
+	
+	//ROS_DEBUG_STREAM("-expectedItemAngle \t" << expectedItemAngle);
+	//ROS_DEBUG_STREAM("-actualItemAngle \t" << actualItemAngle);
+	/*if(message.collection[i].value == "GC4x4MB_1") {
+		ROS_DEBUG_STREAM("QrCode " << message.collection[i].value << "\t-angle \t" << angle);
+	}*/
+	return angle;
+}
+void PartLocatorNode::storeInEnviromentCache(std::string value, Vector3 location, double angle){
 		environment_cache::UpdateEnvironmentCache serviceCall;
 		serviceCall.request.cacheUpdate.event = EnvironmentCache::ADD_OR_UPDATE;
-		serviceCall.request.cacheUpdate.id = message.collection[i].value;
+		serviceCall.request.cacheUpdate.id = value;
 		environment_communication_msgs::Map properties;
 		environment_communication_msgs::KeyValuePair keyValuePair; 
 		
 		keyValuePair.key = "locationX";
-		keyValuePair.value = boost::lexical_cast<string>(equipletCoor.x);
+		keyValuePair.value = boost::lexical_cast<string>(location.x);
 		properties.map.push_back(environment_communication_msgs::KeyValuePair(keyValuePair));
 		
 		keyValuePair.key = "locationY";
-		keyValuePair.value = boost::lexical_cast<string>(equipletCoor.y);
+		keyValuePair.value = boost::lexical_cast<string>(location.y);
 		properties.map.push_back(environment_communication_msgs::KeyValuePair(keyValuePair));
 		
 		keyValuePair.key = "locationZ";
-		keyValuePair.value = boost::lexical_cast<string>(equipletCoor.z);
+		keyValuePair.value = boost::lexical_cast<string>(location.z);
 		properties.map.push_back(environment_communication_msgs::KeyValuePair(keyValuePair));
 		
 		keyValuePair.key = "angle";
@@ -177,9 +189,6 @@ void PartLocatorNode::qrCodeCallback(const qr_code_reader_node::Collection & mes
 		
 		serviceCall.request.cacheUpdate.properties = properties;
 		environmentCacheClient.call(serviceCall);
-		
-		delete points;
-	}
 }
 
 void PartLocatorNode::updateMatrices(){
@@ -234,7 +243,6 @@ Matrix3 PartLocatorNode::calculateRotationMatrix(){
 	ROS_DEBUG_STREAM("lineTl2Tr " << lineTl2Tr);
 	
 	// the expected vector is horizontal to the left because TR is at the right of TL (eg. walk in this direction to get to TR)
-	Vector2 expectedDirection(-1, 0); 
 	Vector2 actualDirection;
 	actualDirection.x = lineTl2Tr.x;
 	actualDirection.y = lineTl2Tr.y;
@@ -242,8 +250,8 @@ Matrix3 PartLocatorNode::calculateRotationMatrix(){
 	
 	// we could calulate the angle by calulating the dot product and convert it to radians. But this is a more fancy approach (it actually aint)
 	// calulate the expected angle (0)
-	double expectedAngle = acos(expectedDirection.x);
-	if(expectedDirection.y < 0) expectedAngle = 0 - expectedAngle;
+	double expectedAngle = acos(EXPECTED_DIRECTION.x);
+	if(EXPECTED_DIRECTION.y < 0) expectedAngle = 0 - expectedAngle;
 	
 	// calulate the actual angle
 	double actualAngle = acos(actualDirection.x);
@@ -259,7 +267,6 @@ Matrix3 PartLocatorNode::calculateRotationMatrix(){
 	rotationMatrix[4] = cos(correctionAngle);
 	ROS_DEBUG_STREAM("rotationMatrix " << rotationMatrix);
 
-	ROS_DEBUG_STREAM("expectedDirection " << expectedDirection);
 	ROS_DEBUG_STREAM("actualDirection " << actualDirection);
 	ROS_DEBUG_STREAM("correctionAngle " << correctionAngle);
 	
