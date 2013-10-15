@@ -5,6 +5,7 @@
  *
  * @author Koen Braham
  * @author Dick vd Steen
+ * @author Alexander Streng
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -30,29 +31,42 @@
 #ifndef GRIPPERNODE_H_
 #define GRIPPERNODE_H_
 
-#include <rosMast/StateMachine.h>
+#include "rexos_std_srvs/Module.h"
 #include "ros/ros.h"
 #include "gripperNode/Grip.h"
 #include "gripperNode/Release.h"
 #include "Services.h"
 #include "iostream"
+#include <rexos_statemachine/ModuleStateMachine.h>
 #include <InputOutput/OutputDevices/Gripper.h>
+#include "equiplet_node/RegisterModule.h"
+
+#include <actionlib/server/simple_action_server.h>
+#include <rexos_statemachine/SetInstructionAction.h>
 
 /**
  * Gripper node that provides services to control the gripper valve
  **/
-class GripperNode: public rosMast::StateMachine {
+typedef actionlib::SimpleActionServer<rexos_statemachine::SetInstructionAction> SetInstructionActionServer;
+
+class GripperNode : public rexos_statemachine::ModuleStateMachine  {
 public:
+
 	GripperNode(int equipletID, int moduleID);
-	virtual ~GripperNode( );
-	int transitionSetup( );
-	int transitionShutdown( );
-	int transitionStart( );
-	int transitionStop( );
-	void error( );
+	virtual ~GripperNode();
+
+	virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
+	virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
+	virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
+	virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
+
+	void error();
 	static void wrapperForGripperError(void* gripperNodeObject);
+	
 	bool grip(gripperNode::Grip::Request &req, gripperNode::Grip::Response &res);
 	bool release(gripperNode::Release::Request &req, gripperNode::Release::Response &res);
+
+	void onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal);
 
 private:
 	/**
@@ -60,6 +74,9 @@ private:
 	 * Connection to the IO modbus
 	 **/
 	modbus_t* modbusContext;
+
+
+	SetInstructionActionServer setInstructionActionServer;
 
 	/**
 	 * @var InputOutput::OutputDevices::Gripper* gripper

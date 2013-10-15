@@ -28,7 +28,7 @@
 #ifndef GRIPPER_H
 #define GRIPPER_H
 
-#include <InputOutput/OutputDevice.h>
+#include <rexos_gripper/OutputDevice.h>
 #include <boost/thread.hpp>
 
 namespace InputOutput {

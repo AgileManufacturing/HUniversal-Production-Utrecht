@@ -27,8 +27,8 @@
  **/
 
 #include <iostream>
-#include <InputOutput/OutputDevices/Gripper.h>
-#include <Utilities/Utilities.h>
+#include <rexos_gripper/Gripper.h>
+#include <rexos_utilities/Utilities.h>
 
 namespace InputOutput {
 	namespace OutputDevices {
@@ -95,22 +95,22 @@ namespace InputOutput {
 					}
 
 					// Semi correcting the loop time by calculating the run time of the loop.
-					long nextRunTime = Utilities::timeNow() + GRIPPER_TIME_WATCHDOG_INTERVAL;
+					long nextRunTime = rexos_utilities::timeNow() + GRIPPER_TIME_WATCHDOG_INTERVAL;
 
 					// The device has been turned on
 					if (!device->previousState && device->state) {
-						device->timeEnabled = Utilities::timeNow();
+						device->timeEnabled = rexos_utilities::timeNow();
 						device->warned = false;
 
 					// If devices stays on
 					} else if (device->previousState && device->state) {
-						long timeEnabled = Utilities::timeNow() - device->timeEnabled;
+						long timeEnabled = rexos_utilities::timeNow() - device->timeEnabled;
 
 						// Test for max time, and close valve when reached.
 						if (timeEnabled > GRIPPER_TIME_ENABLED_MAX) {
 							std::cerr << "[GRIPPER WATCHDOG] Valve open time has reached the limit of " << GRIPPER_TIME_ENABLED_MAX << " milliseconds. Gripper will go in cooldown mode now." << std::endl;
 							device->overheated = true;
-							device->timeCooldownStarted = Utilities::timeNow();
+							device->timeCooldownStarted = rexos_utilities::timeNow();
 							device->disable();
 							device->previousState = device->state = false;
 
@@ -122,14 +122,14 @@ namespace InputOutput {
 						}
 
 					// If device was cooling down, check if the time has been passed.
-					} else if (device->overheated && ((Utilities::timeNow() - device->timeCooldownStarted) > GRIPPER_TIME_COOLDOWN)) {
+					} else if (device->overheated && ((rexos_utilities::timeNow() - device->timeCooldownStarted) > GRIPPER_TIME_COOLDOWN)) {
 						std::cerr << "[GRIPPER WATCHDOG] Valve cooled down. Returning to normal mode." << std::endl;
 						device->overheated = false;
 					}
 
 					// Save the original state and wait for the next check.
 					device->previousState = device->state;
-					Utilities::sleep(nextRunTime - Utilities::timeNow());
+					rexos_utilities::sleep(nextRunTime - rexos_utilities::timeNow());
 				}
 			} catch (boost::thread_interrupted& ignored) {
 				// Ignore interrupt and exit thread.

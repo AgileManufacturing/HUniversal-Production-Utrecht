@@ -26,7 +26,7 @@
 * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#include <InputOutput/OutputDevice.h>
+#include <rexos_gripper/OutputDevice.h>
 
 namespace InputOutput {
 	/**
@@ -44,7 +44,6 @@ namespace InputOutput {
 	 * Virtual destructor for extensions of OutputDevice.
 	 */
 	OutputDevice::~OutputDevice(){
-
 	}
 
 	/**

@@ -26,7 +26,7 @@
 * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#include <ModbusController/ModbusController.h>
+#include <rexos_modbus/ModbusController.h>
 
 namespace InputOutput
 {
@@ -37,7 +37,7 @@ namespace InputOutput
 	class InputOutputController {
 		
 	public:
-		InputOutputController(ModbusController::ModbusController* modbus);
+		InputOutputController(rexos_modbus::ModbusController* modbus);
 
 		void pinHigh(uint32_t address, uint8_t pin);
 		void pinLow(uint32_t address, uint8_t pin);
@@ -47,6 +47,6 @@ namespace InputOutput
 		 * @var ModbusController::ModbusController* modbus
 		 * Pointer to an established modbus connection.
 		 **/
-		ModbusController::ModbusController* modbus;
+		rexos_modbus::ModbusController* modbus;
 	};
 }

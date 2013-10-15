@@ -26,7 +26,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <InputOutput/InputOutputController.h>
+#include <rexos_gripper/InputOutputController.h>
 
 namespace InputOutput {
 	/**
@@ -34,7 +34,7 @@ namespace InputOutput {
 	 *
 	 * @param modbus Pointer to an established modbus connection.
 	 */
-	InputOutputController::InputOutputController(ModbusController::ModbusController* modbus) :
+	InputOutputController::InputOutputController(rexos_modbus::ModbusController* modbus) :
 			modbus(modbus) {
 	}
 
