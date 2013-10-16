@@ -4,6 +4,7 @@
  *
  * @author Koen Braham
  * @author Daan Veltman
+ * @author Tommas Bakker
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -35,24 +36,49 @@
 #include <rexos_statemachine/ModuleStateMachine.h>
 #include <rexos_statemachine/Transitions.h>
 #include "equiplet_node/RegisterModule.h"
+#include <rexos_knowledge_database/rexos_knowledge_database.h>
 
 
 class CameraControlNode : public rexos_statemachine::ModuleStateMachine {
 public:
 	CameraControlNode(int equipletId, int cameraModuleId, int lensModuleId);
-
+	
+	/**
+	 * calls increaseExposure service of the camera_node
+	 **/
 	void increaseExposureCall();
+	/**
+	 * calls decreaseExposure service of the camera_node
+	 **/
 	void decreaseExposureCall();
+	/**
+	 * calls autoWhiteBalance service of the camera_node
+	 * @param enable auto white balance
+	 **/
 	void autoWhiteBalanceCall(bool enabled);
-
-	inline std::string printResult(bool result);
 
 	void run();
 	
-		virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
-		virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
-		virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
-		virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
+	/**
+	 * MAST transition from safe to standby is handled by this method. 
+	 * see http://wiki.agilemanufacturing.nl/index.php/Vision_system#camera_control_node
+	 **/
+	virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
+	/**
+	 * MAST transition from standby to safe is handled by this method. 
+	 * see http://wiki.agilemanufacturing.nl/index.php/Vision_system#camera_control_node
+	 **/
+	virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
+	/**
+	 * MAST transition from standby to normal is handled by this method. 
+	 * see http://wiki.agilemanufacturing.nl/index.php/Vision_system#camera_control_node
+	 **/
+	virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
+	/**
+	 * MAST transition from normal to standby is handled by this method. 
+	 * see http://wiki.agilemanufacturing.nl/index.php/Vision_system#camera_control_node
+	 **/
+	virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
 
 private:
 	ros::NodeHandle nodeHandle;
@@ -64,6 +90,9 @@ private:
 	ros::ServiceClient getCorrectionMatricesClient;
 	
 	ros::ServiceClient calibrateLensClient;
+	/**
+	 * Used for calling some services of the camera_node which have no srv file specified
+	 **/
 	std_srvs::Empty emptyService;
 	
 	int equipletId;
