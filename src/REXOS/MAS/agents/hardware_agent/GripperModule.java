@@ -52,6 +52,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.Logger;
+import agents.data_classes.Part;
 import agents.data_classes.Position;
 import agents.data_classes.StepStatusCode;
 
@@ -78,62 +81,50 @@ public class GripperModule extends Module {
 	 */
 	@Override
 	public EquipletStep[] getEquipletSteps(int stepType, BasicDBObject parameters) {
+		Logger.log(LogLevel.DEBUG, "Getting Equiplet steps");
 		EquipletStep[] equipletSteps;
 		ArrayList<EquipletStep> steps;
 
 		//gets the newest code for the movementModule.
 		int movementModuleId = findMovementModule(getConfiguration());
 		movementModule = getModuleFactory().getModuleById(movementModuleId);
+		
+		steps = new ArrayList<EquipletStep>();
+
+		//get the parameters and put extra values in it.
+		BasicDBObject moveParameters = (BasicDBObject) parameters.copy();
+		moveParameters.put("extraSize", GRIPPER_SIZE);
+		moveParameters.put("position", new Position().toBasicDBObject());
+
+		//get steps from the movementModule to move to the safe movement plane.
+		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));
+		//get steps from the movementModule to move on the x and y axis relative to a crate.
+		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(4, moveParameters)));
+		//get steps from the movementModule to move on the z axis.
+		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, moveParameters)));
 
 		//switch to determine which steps to make.
 		switch (stepType) {
 		case 1: //case for the equiplet function pick.
-			steps = new ArrayList<EquipletStep>();
-
-			//get the parameters and put extra values in it.
-			BasicDBObject moveParameters = (BasicDBObject) parameters.copy();
-			moveParameters.put("extraSize", GRIPPER_SIZE);
-
-			//get steps from the movementModule to move to the safe movement plane.
-			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));
-			//get steps from the movementModule to move on the x and y axis.
-			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(2, moveParameters)));
-			//get steps from the movementModule to move on the z axis.
-			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, moveParameters)));
 			//get step for activating the gripper.
 			steps.add(activateGripper(moveParameters));
-			//get steps from the movementModule to move to the safe movement plane.
-			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));
-
-			//convert the ArrayList to an array and return it.
-			equipletSteps = new EquipletStep[steps.size()];
-			return steps.toArray(equipletSteps);
+			break;
 		case 2: //case for the equiplet function place. 
-			steps = new ArrayList<EquipletStep>();
-
-			//get the parameters and put extra values in it.
-			moveParameters = (BasicDBObject) parameters.copy();
-			moveParameters.put("extraSize", GRIPPER_SIZE);
-
-			//get steps from the movementModule to move to the safe movement plane.
-			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));
-			//get steps from the movementModule to move on the x and y axis.
-			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(2, moveParameters)));
-			//get steps from the movementModule to move on the z axis.
-			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, moveParameters)));
 			//get step for deactivating the gripper.
 			steps.add(deactivateGripper(moveParameters));
-			//get steps from the movementModule to move to the safe movement plane.
-			steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));
-
-			//convert the ArrayList to an array and return it.
-			equipletSteps = new EquipletStep[steps.size()];
-			return steps.toArray(equipletSteps);
-		default:
 			break;
+		default:
+			//if this module can't handle the stepType return no steps. 
+			return new EquipletStep[0];
 		}
-		//if this module can't handle the stepType return no steps. 
-		return new EquipletStep[0];
+		
+		//get steps from the movementModule to move to the safe movement plane.
+		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));
+
+		//convert the ArrayList to an array and return it.
+		equipletSteps = new EquipletStep[steps.size()];
+		Logger.log(LogLevel.DEBUG, "# of EQ steps: " + steps.size());
+		return steps.toArray(equipletSteps);
 	}
 
 	/**
@@ -141,9 +132,19 @@ public class GripperModule extends Module {
 	 */
 	@Override
 	public EquipletStep[] fillPlaceHolders(EquipletStep[] steps, BasicDBObject parameters) {
-		//get the new position parameters from the parameters
-		Position position = new Position((BasicDBObject) parameters.get("position"));
-
+		Logger.log(LogLevel.DEBUG, "parameters: " + parameters.keySet());
+		
+		//You have your crateID from the DBObject parameters.
+		//Get the cratePart from the knowledgeDB -- maybe store crate object instead of string.
+		//actually we have to get the specific crate dimensions etc. WE CAN HARDCODE THIS FOR THE MOMENT!
+		//translate the row/col to X,Y,Z ACCORDING to the crate dimensions.
+		
+		Part part = new Part((BasicDBObject)parameters.get("crate"));
+		Position position = new Position(parameters.getDouble("row"), parameters.getDouble("column"), part);
+		BasicDBObject newParameters = (BasicDBObject) parameters.copy();
+		newParameters.put("position", position.toBasicDBObject());
+		newParameters.put("relative_to_crate", part.getPartName());
+		
 		//get the newest code of the movementModule.
 		int movementModuleId = findMovementModule(getConfiguration());
 		movementModule = getModuleFactory().getModuleById(movementModuleId);
@@ -155,18 +156,11 @@ public class GripperModule extends Module {
 			//If the step is made by the movementModule add it to the ArrayList.
 			if (step.getModuleId() == movementModule.getId()){
 				movementModuleSteps.add(step);
-			}else {
-				//fill the placeholder of the look_up_parameters if needed.
-				InstructionData instructionData = step.getInstructionData();
-				BasicDBObject lookUpParameters = instructionData.getLookUpParameters();
-				if (lookUpParameters.getString("ID").equals("RELATIVE-TO-PLACEHOLDER")) {
-					lookUpParameters.put("ID", position.getRelativeToPart().getId());
-				}
 			}
 		}
 		//let the movementModule fill in his steps.
 		EquipletStep[] temp = new EquipletStep[movementModuleSteps.size()];
-		movementModule.fillPlaceHolders(movementModuleSteps.toArray(temp), parameters);
+		movementModule.fillPlaceHolders(movementModuleSteps.toArray(temp), newParameters);
 		//return the filled in steps.
 		return steps;
 	}
@@ -217,16 +211,8 @@ public class GripperModule extends Module {
 	 * @return EquipletStep to activate the gripper.
 	 */
 	private EquipletStep activateGripper(BasicDBObject parameters) {
-		//get the position parameters from the parameters.
-		Position position = new Position((BasicDBObject) parameters.get("position"));
-		
-		//fill int het lookUpParameters with values or placeholders
 		BasicDBObject lookUpParameters = new BasicDBObject();
-		if (position.getRelativeToPart() == null || position.getRelativeToPart().getId() == -1) {
-			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
-		} else {
-			lookUpParameters.put("ID", position.getRelativeToPart().getId());
-		}
+		lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
 		
 		//create the instruction data.
 		InstructionData instructionData = new InstructionData("activate", "gripper", "FIND_ID", lookUpParameters, new BasicDBObject());
@@ -240,17 +226,9 @@ public class GripperModule extends Module {
 	 * @return EquipletStep to deactivate the gripper.
 	 */
 	private EquipletStep deactivateGripper(BasicDBObject parameters) {
-		//get the position parameters from the parameters.
-		Position position = new Position((BasicDBObject) parameters.get("position"));
-		
-		//fill in the lookUpParameters with values or placeholders.
 		BasicDBObject lookUpParameters = new BasicDBObject();
-		if (position.getRelativeToPart() == null || position.getRelativeToPart().getId() == -1) {
-			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
-		} else {
-			lookUpParameters.put("ID", position.getRelativeToPart().getId());
-		}
-
+		lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
+		
 		//create instruction data.
 		InstructionData instructionData = new InstructionData("deactivate", "gripper", "FIND_ID", lookUpParameters, new BasicDBObject());
 		//create and return the step.

@@ -49,6 +49,8 @@ package agents.data_classes;
 
 import java.io.Serializable;
 
+import javax.sound.midi.Patch;
+
 import com.mongodb.BasicDBObject;
 
 /**
@@ -74,13 +76,17 @@ public class Part implements Serializable, MongoSaveable {
 	private int type;
 
 	/**
+	 * @var String partName
+	 * 		The name of the part ( for crate at the moment )
+	 */
+	private String partName;
+	/**
 	 * Basic constructor for a part with parameter type.
 	 * 
 	 * @param type The type of the part
 	 */
 	public Part(int type) {
-		this.type = type;
-		this.id = -1;
+		this(type, -1);
 	}
 
 	/**
@@ -90,10 +96,22 @@ public class Part implements Serializable, MongoSaveable {
 	 * @param id The id of the part
 	 */
 	public Part(int type, int id) {
-		this.type = type;
-		this.id = id;
+		this(type, id, "");
 	}
 
+	/**
+	 * constructor for a part with parameters type, id and partName.
+	 * 
+	 * @param type The type of the part
+	 * @param id The id of the part
+	 * @param partName The name of the part
+	 */
+	public Part(int type, int id, String partName){
+		this.type = type;
+		this.id = id;
+		this.partName = partName;
+	}
+	
 	/**
 	 * constructor for a part accepting a BasicDBObject.
 	 * 
@@ -138,6 +156,24 @@ public class Part implements Serializable, MongoSaveable {
 	public int getId() {
 		return id;
 	}
+	
+	/**
+	 * Getter for the partName
+	 * 
+	 * @return The name of the part
+	 */
+	public String getPartName(){
+		return partName;
+	}
+	
+	/**
+	 * Setter for the partName
+	 * 
+	 * @param partName The name of the part
+	 */
+	public void setPartName(String partName){
+		this.partName = partName;
+	}
 
 	/**
 	 * @see rexos.mas.data.IMongoSaveable#toBasicDBObject(com.mongodb.BasicDBObject)
@@ -147,6 +183,7 @@ public class Part implements Serializable, MongoSaveable {
 		BasicDBObject object = new BasicDBObject();
 		object.put("type", type);
 		object.put("id", id);
+		object.put("partName", partName);
 		return object;
 	}
 
@@ -159,6 +196,7 @@ public class Part implements Serializable, MongoSaveable {
 		try {
 			type = (int) copy.remove("type");
 			id = (int) copy.remove("id");
+			partName = (String) copy.remove("partName");
 			if(!copy.isEmpty()){
 				throw new IllegalArgumentException();
 			}
@@ -172,6 +210,6 @@ public class Part implements Serializable, MongoSaveable {
 	 */
 	@Override
 	public String toString() {
-		return String.format("Part [id=%s, type=%s]", id, type);
+		return String.format("Part [id=%s, type=%s, name=%s]", id, type, partName);
 	}
 }

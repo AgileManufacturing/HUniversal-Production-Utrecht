@@ -40,7 +40,10 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
@@ -82,7 +85,17 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 	public PartsInfo(Agent a, int millis, String conversationId) {
 		super(a, millis, MessageTemplate.and(MessageTemplate.MatchOntology("PartsInfo"),
 				MessageTemplate.MatchConversationId(conversationId)));
+		
+		for(int i = 0; i < 4; i++) {
+			for(int j = 0; j < 4; j++) {
+				supplyCrateContent.put(new Part(1, (i * 4) + j), new Position(j + 0.0, i + 0.0, supplyCratePart));
+			}
+		}
 	}
+	
+	private Part supplyCratePart = new Part(2, 100, "GC4x4MB_1");
+	private Part productCratePart = new Part(2, 101, "GC4x4MB_2");
+	public static HashMap<Part, Position> supplyCrateContent = new HashMap<Part, Position>();
 
 	/**
 	 * Handles GetPartsInfo messages and responds with a GetPartsInfoResponse.
@@ -96,12 +109,33 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 				Logger.log(LogLevel.DEBUG, "%s GetPartsInfo%n", myAgent.getLocalName());
 				Part[] parts = (Part[]) message.getContentObject();
 				HashMap<Part, Position> partParameters = new HashMap<Part, Position>();
+				
 				int x = 2;
 				int id = 1;
 				int type = 3;
+				
 				for(Part part : parts) {
-					partParameters.put(new Part(part.getType(), id++),
-							new Position((double)x++, 1.0, 3.0, new Part(type++, id + x)));
+					Logger.log(LogLevel.DEBUG, "PartNo: " + part.getType());
+					switch(part.getType()) {
+					case 1: // Red ball
+						// Grab a ball
+						Iterator<Entry<Part, Position>> it = supplyCrateContent.entrySet().iterator();
+						if(it.hasNext()) {
+							Part ball = it.next().getKey();
+							Position ballPosition = partParameters.remove(ball);
+							
+							partParameters.put(ball, ballPosition);
+						}
+						break;
+					case 2: // Crate
+						partParameters.put(supplyCratePart, null);
+						partParameters.put(productCratePart, null);
+						break;
+					default:
+						partParameters.put(new Part(part.getType(), id++),
+								new Position((double)x++, 1.0, 3.0, new Part(type++, id + x)));
+						break;					
+					}
 				}
 
 				KnowledgeDBClient client = KnowledgeDBClient.getClient();

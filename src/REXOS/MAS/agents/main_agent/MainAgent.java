@@ -115,7 +115,25 @@ public class MainAgent extends Agent {
 
 			Logger.log(LogLevel.DEBUG, "Started equiplet AGNT");
 
+			// Create parameters
+			BasicDBObject placeParameters1 = new BasicDBObject();
+			placeParameters1.append("part", 1); // 1: Red Ball
+			placeParameters1.append("row", 0); // First row in a crate
+			placeParameters1.append("column", 0); // First column in a crate
+			
+			BasicDBObject placeParameters2 = new BasicDBObject();
+			placeParameters2.append("part", 1); // 1: Red Ball
+			placeParameters2.append("row", 3); // Fourth row in a crate
+			placeParameters2.append("column", 3); // Fourth column in a crate
+			
+			// Create steps
+			ProductionStep place1 = new ProductionStep(1, 1, placeParameters1);
+			ProductionStep place2 = new ProductionStep(2, 1, placeParameters2);
+			
+			// Add them to stepList
 			ArrayList<ProductionStep> stepList = new ArrayList<>();
+			stepList.add(place1);
+			stepList.add(place2);
 
 			Production production = new Production(stepList);
 			Product product = new Product(production);
@@ -177,7 +195,7 @@ public class MainAgent extends Agent {
 			if(message != null) {
 				try {
 					getContainerController()
-							.createNewAgent("pa" + count++, "rexos.mas.product_agent.ProductAgent", args).start();
+							.createNewAgent("pa" + count++, "agents.product_agent.ProductAgent", args).start();
 				} catch(StaleProxyException e) {
 					Logger.log(LogLevel.ERROR, e);
 				}
