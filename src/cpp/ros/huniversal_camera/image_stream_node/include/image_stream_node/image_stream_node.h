@@ -46,6 +46,10 @@
 #include <iostream>
 #include <sstream>
 
+/**
+ * @brief This class enables the abillity to simulate a camera by streaming a specific image. 
+ * This makes debugging without using the camera possible.
+ */
 class ImageStreamNode {
 public:
 	ImageStreamNode(int argc, char * argv[]);
@@ -54,8 +58,8 @@ public:
 
 private:
 	ros::NodeHandle nodeHandle;
-	image_transport::ImageTransport it;
-	image_transport::Publisher pub;
+	image_transport::ImageTransport imageTransport;
+	image_transport::Publisher publisher;
 	
 	char* pathToImageFile;
 };

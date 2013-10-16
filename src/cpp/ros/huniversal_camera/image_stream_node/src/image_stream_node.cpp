@@ -34,13 +34,13 @@
 
 #include <boost/filesystem.hpp>
 
-ImageStreamNode::ImageStreamNode(int argc, char * argv[]) : it(nodeHandle) {
+ImageStreamNode::ImageStreamNode(int argc, char * argv[]) : imageTransport(nodeHandle) {
 	if(argc != 2){
 		std::cout << "Usage: image_stream_node <pathToImageFile>" << std::endl;
 		exit(-1);
 	}
 	pathToImageFile = argv[1];
-	pub = it.advertise("camera/image", 1);
+	publisher = imageTransport.advertise("camera/image", 1);
 	
 //	boost::filesystem::is_directory(imageDir)
 }
@@ -64,7 +64,7 @@ void ImageStreamNode::run() {
 		cvi.encoding = sensor_msgs::image_encodings::BGR8;
 		cvi.image = img;
 		
-		pub.publish(cvi.toImageMsg());
+		publisher.publish(cvi.toImageMsg());
 
 		frameRate.sleep();
 		ros::spinOnce();
