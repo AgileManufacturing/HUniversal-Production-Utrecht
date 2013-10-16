@@ -160,6 +160,7 @@ public class PickAndPlaceService extends Service {
 						if(part.getType() == 1) {
 							ball = part;
 							ballPosition = partParameters.get(ball);
+							Logger.log(LogLevel.DEBUG, "Part: {" + ball + "}, PartPosition: {" + ballPosition + "}");
 						}
 					}
 					
@@ -198,7 +199,7 @@ public class PickAndPlaceService extends Service {
 					break;
 			}
 			
-			Logger.log(LogLevel.DEBUG, "After updating service step parameters: " + newParameters.keySet());
+			Logger.log(LogLevel.DEBUG, "New Parameters: " + newParameters);
 			
 			ss.setParameters(newParameters);
 		}
