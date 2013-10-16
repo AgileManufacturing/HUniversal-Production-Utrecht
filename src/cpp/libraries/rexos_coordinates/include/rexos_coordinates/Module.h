@@ -50,19 +50,13 @@ namespace rexos_coordinates {
 		 * Reads the module information from the database and updates the local properties. \n
 		 * Use this function if you have physically moved the module
 		 *
-		 * @param boardSize amount of squares horizontally -1, amount of squares vertically -1
-		 * @param images the vector containing all the cv:mat images. The images must be MONO8 format.
-		 * @return the amount of images which are successfully processed
+		 * @param moduleId id of the module in the knowledge database.
 		 */
 		Module(int moduleId);
 	public:
 		/**
 		 * Reads the module information from the database and updates the local properties. \n
 		 * Use this function if you have physically moved the module
-		 *
-		 * @param boardSize amount of squares horizontally -1, amount of squares vertically -1
-		 * @param images the vector containing all the cv:mat images. The images must be MONO8 format.
-		 * @return the amount of images which are successfully processed
 		 */
 		void updateTranslationVectors();
 	};

@@ -2,8 +2,7 @@
 
 #include "ros/ros.h"
 
-#include "mysql_connection.h"
-#include <cppconn/driver.h>
+#include <rexos_knowledge_database/rexos_knowledge_database.h>
 #include <cppconn/exception.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
@@ -24,21 +23,17 @@ namespace rexos_coordinates{
 		updateTranslationVectors();
 	}
 	void Module::updateTranslationVectors(){
-		sql::Driver* driver = get_driver_instance();
-		/* Create a connection */
-		std::auto_ptr<sql::Connection> apConnection(
-			driver->connect("tcp://192.168.65.175:3306", "rexos", "rexos")
-		);
-		/* Connect to the MySQL test database */
-		apConnection->setSchema("rexos");
+		std::auto_ptr<sql::Connection> apConnection = rexos_knowledge_database::connect();
 		
-		sql::PreparedStatement* pstmt = apConnection->prepareStatement("\
+		// stmt = statement
+		// pstmt = prepared statement
+		sql::PreparedStatement* modulePStmt = apConnection->prepareStatement("\
 		SELECT location, mountPointX, mountPointY, module_type \
 		FROM modules \
 		WHERE id = ?;");
-		pstmt->setInt(1, moduleId);
-		ROS_INFO("A");
-		sql::ResultSet* moduleResult = pstmt->executeQuery();
+		modulePStmt->setInt(1, moduleId);
+		
+		sql::ResultSet* moduleResult = modulePStmt->executeQuery();
 		if(moduleResult->rowsCount() != 1){
 			throw std::invalid_argument("rexos_coordinates::Module Module does not exist in database");
 		} else {
@@ -46,23 +41,23 @@ namespace rexos_coordinates{
 			moduleResult->next(); 
 			int equipletId = moduleResult->getInt("location");
 			
-			sql::PreparedStatement* pstmt2 = apConnection->prepareStatement("\
+			sql::PreparedStatement* equipletPStmt = apConnection->prepareStatement("\
 			SELECT mountPoints_distanceX, mountPoints_distanceY \
 			FROM equiplets \
 			WHERE id = ?;");
-			pstmt2->setInt(1, equipletId);
+			equipletPStmt->setInt(1, equipletId);
 			
-			sql::ResultSet* equipletResult = pstmt2->executeQuery();
+			sql::ResultSet* equipletResult = equipletPStmt->executeQuery();
 			// set the cursor at the first result
 			equipletResult->next(); 
 			
-			sql::PreparedStatement* pstmt3 = apConnection->prepareStatement("\
+			sql::PreparedStatement* moduleTypePStmt = apConnection->prepareStatement("\
 			SELECT midPoint_x, midPoint_y, midPoint_z \
 			FROM module_types \
 			WHERE id = ?;");
-			pstmt3->setInt(1, moduleResult->getInt("module_type"));
+			moduleTypePStmt->setInt(1, moduleResult->getInt("module_type"));
 			
-			sql::ResultSet* moduleTypeResult = pstmt3->executeQuery();
+			sql::ResultSet* moduleTypeResult = moduleTypePStmt->executeQuery();
 			// set the cursor at the first result
 			moduleTypeResult->next(); 
 			
