@@ -131,7 +131,9 @@ namespace Camera {
 		initUndistortRectifyMap(cameraMatrix, distCoeffs, cv::Mat(), cv::Mat(), imageSize, CV_32FC1, map1, map2);
 	}
 
-	void RectifyImage::rectify(const cv::Mat &input, cv::Mat &output) {
+	void RectifyImage::rectify(const cv::Mat &input) {
+		cv::Mat output;
 		cv::remap(input, output, map1, map2, cv::INTER_LINEAR);
+		return output;
 	}
 }

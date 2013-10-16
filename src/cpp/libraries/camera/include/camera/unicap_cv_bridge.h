@@ -44,23 +44,23 @@
 namespace unicap_cv_bridge {
 	/**
 	 * @brief obtain a list of device names
-	 * @param devices output parameter. will contain device names
+	 * @return devices will contain device names
 	 **/
-	void list_devices(std::vector<std::string>& devices);
+	std::vector<std::string> list_devices();
 
 	/**
 	 * @brief obtain a list of formats
 	 * @param dev the device number
-	 * @param formats output parameter. will contain format desciptions
+	 * @return formats will contain format desciptions
 	 **/
-	void list_formats(int dev, std::vector<std::string>& formats);
+	std::vector<std::string> list_formats(int dev);
 
 	/**
 	 * @brief obtain a list of properties
 	 * @param dev the device number
-	 * @param properties output parameter. will contain properties
+	 * @return properties will contain properties
 	 **/
-	void list_properties(int dev, std::vector<std::string>& properties);
+	std::vector<std::string> list_properties(int dev);
 	/**
 	 * @brief print a list of all connected devices with it's formats
 	 * @param out the output stream. Defaults to standard out
