@@ -138,6 +138,10 @@ public class PickAndPlaceService extends Service {
 			}
 		}
 		
+		if(supplyCrate == null || productCrate == null) {
+			// error = one or more crates were not returned
+		}
+		
 		for(ServiceStep ss : serviceSteps) {			
 			BasicDBObject oldParameters = ss.getParameters();
 			BasicDBObject newParameters = new BasicDBObject();
@@ -146,27 +150,41 @@ public class PickAndPlaceService extends Service {
 			switch(ss.getType()) {
 				case 1: // Pick - Supply
 					// Grab a ball
-					Part ball = partParameters.entrySet().iterator().next().getKey();
-					Position ballPosition = partParameters.remove(ball);
+					//Part ball = partParameters.entrySet().iterator().next().getKey();
+					//Position ballPosition = partParameters.remove(ball);
 					
-					if(oldParameters.containsField("crate") && oldParameters.getString("crate").equals("CRATE-PLACEHOLDER")) {
-						newParameters.put("crate", supplyCrate.toBasicDBObject());
-					} else {
-						newParameters.put("crate", oldParameters.get("crate"));
+					Part ball = null;
+					Position ballPosition = null;
+					
+					for(Part part : parts) {
+						if(part.getType() == 1) {
+							ball = part;
+							ballPosition = partParameters.get(ball);
+						}
 					}
 					
-					if(oldParameters.containsField("row") && oldParameters.getString("row").equals("ROW-PLACEHOLDER")) {
-						newParameters.put("row", ballPosition.getY());
-					} else {
-						newParameters.put("row", oldParameters.getDouble("row"));
-					}
+					if(ball != null && ballPosition != null) {
 					
-					if(oldParameters.containsField("column") && oldParameters.getString("column").equals("COLUMN-PLACEHOLDER")) {
-						newParameters.put("column", ballPosition.getX());
+						if(oldParameters.containsField("crate") && oldParameters.getString("crate").equals("CRATE-PLACEHOLDER")) {
+							newParameters.put("crate", supplyCrate.toBasicDBObject());
+						} else {
+							newParameters.put("crate", oldParameters.get("crate"));
+						}
+						
+						if(oldParameters.containsField("row") && oldParameters.getString("row").equals("ROW-PLACEHOLDER")) {
+							newParameters.put("row", ballPosition.getY());
+						} else {
+							newParameters.put("row", oldParameters.getDouble("row"));
+						}
+						
+						if(oldParameters.containsField("column") && oldParameters.getString("column").equals("COLUMN-PLACEHOLDER")) {
+							newParameters.put("column", ballPosition.getX());
+						} else {
+							newParameters.put("column", oldParameters.getDouble("column"));
+						}
 					} else {
-						newParameters.put("column", oldParameters.getDouble("column"));
+						// error - no ball part
 					}
-					
 					break;
 				case 2: // Place - Product
 					if(oldParameters.containsField("crate") && oldParameters.getString("crate").equals("CRATE-PLACEHOLDER")) {

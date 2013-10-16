@@ -42,6 +42,8 @@ import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
@@ -92,7 +94,8 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 	}
 	
 	private Part supplyCratePart = new Part(2, 100, "GC4x4MB_1");
-	private HashMap<Part, Position> supplyCrateContent = new HashMap<Part, Position>();
+	private Part productCratePart = new Part(2, 101, "GC4x4MB_2");
+	public static HashMap<Part, Position> supplyCrateContent = new HashMap<Part, Position>();
 
 	/**
 	 * Handles GetPartsInfo messages and responds with a GetPartsInfoResponse.
@@ -111,18 +114,22 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 				int id = 1;
 				int type = 3;
 				
-				String supplyCrate = "GC4x4MB_1";
-				String productionCrate = "GC4x4MB_2";
-				
 				for(Part part : parts) {
 					Logger.log(LogLevel.DEBUG, "PartNo: " + part.getType());
 					switch(part.getType()) {
 					case 1: // Red ball
-						partParameters.putAll(supplyCrateContent);
+						// Grab a ball
+						Iterator<Entry<Part, Position>> it = supplyCrateContent.entrySet().iterator();
+						if(it.hasNext()) {
+							Part ball = it.next().getKey();
+							Position ballPosition = partParameters.remove(ball);
+							
+							partParameters.put(ball, ballPosition);
+						}
 						break;
 					case 2: // Crate
-						partParameters.put(new Part(part.getType(), 100, supplyCrate), null); 
-						partParameters.put(new Part(part.getType(), 101, productionCrate), null); 
+						partParameters.put(supplyCratePart, null);
+						partParameters.put(productCratePart, null);
 						break;
 					default:
 						partParameters.put(new Part(part.getType(), id++),

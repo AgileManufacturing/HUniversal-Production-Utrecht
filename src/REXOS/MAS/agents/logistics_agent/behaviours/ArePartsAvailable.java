@@ -30,6 +30,9 @@
  **/
 package agents.logistics_agent.behaviours;
 
+import java.util.Iterator;
+import java.util.Map.Entry;
+
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -37,6 +40,7 @@ import jade.lang.acl.UnreadableException;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 import agents.data_classes.Part;
+import agents.data_classes.Position;
 import agents.data_classes.ProductStep;
 import agents.shared_behaviours.ReceiveBehaviour;
 
@@ -69,11 +73,33 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 			Logger.log(LogLevel.DEBUG, "ArePartsAvailable%n", 0, myAgent.getLocalName());
 			
 			Part[] parts = ((ProductStep) message.getContentObject()).getInputParts();
-			ACLMessage reply = message.createReply();
-			reply.setOntology("ArePartsAvailable");
-			//TODO (out of scope) determine actual part availability 
-			reply.setPerformative(ACLMessage.CONFIRM);
-			myAgent.send(reply);
+			
+			for(Part part : parts) {
+				switch(part.getType()) {
+				case 1: // Red ball
+					// Grab a ball
+					Iterator<Entry<Part, Position>> it = PartsInfo.supplyCrateContent.entrySet().iterator();
+					if(it.hasNext()) {
+						ACLMessage reply = message.createReply();
+						reply.setOntology("ArePartsAvailable");
+						reply.setPerformative(ACLMessage.CONFIRM);
+						myAgent.send(reply);
+					} else {
+						ACLMessage reply = message.createReply();
+						reply.setOntology("ArePartsAvailable");
+						reply.setPerformative(ACLMessage.DISCONFIRM);
+						myAgent.send(reply);
+					}
+					break;
+					default:
+						ACLMessage reply = message.createReply();
+						reply.setOntology("ArePartsAvailable");
+						//TODO (out of scope) determine actual part availability 
+						reply.setPerformative(ACLMessage.CONFIRM);
+						myAgent.send(reply);
+						break;
+				}
+			}
 
 			myAgent.addBehaviour(new ArePartsAvailableInTime(myAgent, message.getConversationId()));
 			Logger.log(LogLevel.DEBUG, "PartTypes { %s } are available%n", 0, (Object[]) parts);
