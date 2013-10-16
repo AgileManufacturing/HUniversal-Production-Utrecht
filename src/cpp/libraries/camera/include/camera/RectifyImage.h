@@ -97,9 +97,8 @@ namespace Camera {
 		 * Returns the given image rectified
 		 *
 		 * @param input The image that needs to be rectified
-		 * @param output The rectified image
 		 */
-		void rectify(const cv::Mat &input, cv::Mat &output);
+		cv::Mat rectify(const cv::Mat &input);
 	};
 }
 #endif /* RECTIFYIMAGE_H */
