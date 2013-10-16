@@ -58,7 +58,7 @@ namespace equiplet_node {
 /**
  * The equipletNode, will manage all modules and keep track of their states
  **/
-class EquipletNode : public EquipletStateMachine,public Blackboard::BlackboardSubscriber
+class EquipletNode : public EquipletStateMachine, public Blackboard::BlackboardSubscriber
 {
 public:
 	static std::string nameFromId(int id){
@@ -90,10 +90,9 @@ private:
 
 	void updateEquipletStateOnBlackboard();
 
-	/**
-	 * testdata
-	 **/
-	int amountOfIncomingMongoDBCalls;
+	void handleEquipletCommand(JSONNode n);
+
+	void handleEquipletStep(rexos_datatypes::EquipletStep * step, mongo::OID targetObjectId);
 
 	/**
 	 * @var int equipletId

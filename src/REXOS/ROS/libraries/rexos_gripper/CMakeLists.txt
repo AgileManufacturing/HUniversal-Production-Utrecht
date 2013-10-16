@@ -8,7 +8,7 @@ find_package(Boost)
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include 
-LIBRARIES rexos_delta_robot 
+LIBRARIES rexos_gripper 
 CATKIN_DEPENDS rexos_modbus rexos_utilities
 DEPENDS Boost)
 

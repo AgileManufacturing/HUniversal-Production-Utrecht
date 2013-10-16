@@ -1,29 +1,37 @@
-##############################################################
-# CMakeLists.txt for a ROS package within the rexos
-# build system.
-#
-# Created by Koen Braham
-#
-# 05-11-2012 Initial version
-#
-#############################################################
+cmake_minimum_required(VERSION 2.8.3)
+project(gripper_node)
 
-cmake_minimum_required(VERSION 2.4.6)
-# Include all rosbuild macros
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+## Find catkin and any catkin packages
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation rexos_statemachine rexos_modbus rexos_std_msgs rexos_std_srvs rexos_utilities rexos_datatypes rexos_gripper libjson)
+find_package(Log4cxx)
 
-# Initialize ROS package to be in our build system.
-rexos_rospack_init("gripperNode" false true)
+file(GLOB_RECURSE msgs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/msg" "*.msg")
+add_message_files(
+DIRECTORY msg
+FILES ${msgs} )
+  	
+file(GLOB_RECURSE srvs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/srv" "*.srv")
+add_service_files(
+DIRECTORY srv
+FILES ${srvs} )
 
-# Add executables as documented by ROS
-rosbuild_add_executable(gripperNode src/GripperNode.cpp)
+generate_messages (
+	DEPENDENCIES std_msgs
+)
 
-# Include our libraries, they are all exported in Libraries/LibrariesExport.cmake
+## Declare a catkin package
+catkin_package(
+INCLUDE_DIRS include 
+LIBRARIES  
+CATKIN_DEPENDS rexos_statemachine rexos_modbus rexos_std_msgs rexos_std_srvs rexos_utilities rexos_datatypes rexos_gripper libjson roscpp std_msgs
+DEPENDS)
 
-include_directories(${MODBUS_INCLUDE_DIRS} ${LIB_MODBUS_CONTROLLER_INCLUDE} ${LIB_INPUT_OUTPUT_INCLUDE} ${LIB_UTILITIES_INCLUDE})
+file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
+include_directories(include ${catkin_INCLUDE_DIRS} ${LOG4CXX_INCLUDE_DIR})
+add_executable(gripper_node src/GripperNode.cpp)
 
-target_link_libraries(gripperNode ${MODBUS_LIBRARIES} inputOutput utilities)
 
-# MUST be called after lcv_rospack_init to clean up after ROSBUILD!
-rexos_rospack_end()
+target_link_libraries(gripper_node ${catkin_LIBRARIES} ${LOG4CXX_LIBRARIES})
+add_dependencies(gripper_node gripper_node_gencpp)
+
 

@@ -33,17 +33,22 @@
 
 #include "rexos_std_srvs/Module.h"
 #include "ros/ros.h"
-#include "gripperNode/Grip.h"
-#include "gripperNode/Release.h"
+#include "gripper_node/Grip.h"
+#include "gripper_node/Release.h"
 #include "Services.h"
 #include "iostream"
+#include <rexos_gripper/Gripper.h>
 #include <rexos_statemachine/ModuleStateMachine.h>
-#include <InputOutput/OutputDevices/Gripper.h>
+#include <rexos_statemachine/Transitions.h>
 #include "equiplet_node/RegisterModule.h"
 
 #include <actionlib/server/simple_action_server.h>
 #include <rexos_statemachine/SetInstructionAction.h>
 
+
+// GCC system header to suppress libjson warnings
+#pragma GCC system_header
+#include <libjson/libjson.h>
 /**
  * Gripper node that provides services to control the gripper valve
  **/
@@ -63,8 +68,8 @@ public:
 	void error();
 	static void wrapperForGripperError(void* gripperNodeObject);
 	
-	bool grip(gripperNode::Grip::Request &req, gripperNode::Grip::Response &res);
-	bool release(gripperNode::Release::Request &req, gripperNode::Release::Response &res);
+	bool grip(gripper_node::Grip::Request &req, gripper_node::Grip::Response &res);
+	bool release(gripper_node::Release::Request &req, gripper_node::Release::Response &res);
 
 	void onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal);
 
@@ -82,19 +87,19 @@ private:
 	 * @var InputOutput::OutputDevices::Gripper* gripper
 	 * The gripper device
 	 **/
-	InputOutput::OutputDevices::Gripper* gripper;
+	rexos_gripper::Gripper* gripper;
 
 	/**
 	 * @var ModbusController::ModbusController* modbus
 	 * Connection to the IO modbus controller
 	 **/
-	ModbusController::ModbusController* modbus;
+	rexos_modbus::ModbusController* modbus;
 
 	/**
 	 * @var InputOutput::InputOutputController* controller;
 	 * Input output controller that contains the logic to switch devices
 	 */
-	InputOutput::InputOutputController* controller;
+	rexos_gripper::InputOutputController* controller;
 
 	/**
 	 * @var ros::ServiceServer gripService

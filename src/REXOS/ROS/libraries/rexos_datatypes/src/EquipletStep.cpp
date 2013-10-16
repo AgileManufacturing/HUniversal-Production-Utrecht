@@ -183,12 +183,10 @@ namespace rexos_datatypes{
             timeData->setDuration(i-> as_int());
             i++;
         }
-        
         return *timeData;
     }
     
-    std::map<std::string, std::string> EquipletStep::setMapFromNode(const JSONNode & n)
-    {
+    std::map<std::string, std::string> EquipletStep::setMapFromNode(const JSONNode & n) {
         std::map<std::string, std::string> * newMap = new std::map<std::string, std::string>();
         
         JSONNode::const_iterator i = n.begin();
