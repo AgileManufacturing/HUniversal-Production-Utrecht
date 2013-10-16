@@ -40,38 +40,38 @@
 
 FiducialReaderNode::FiducialReaderNode() :
 
-	it(nodeHandle),
-	fiducial(8, 35)
+	imageTransport(nodeHandle),
+	fiducialDetector(8, 35)
 {
 	fiducialPublisher = nodeHandle.advertise<fiducial_reader_node::Fiducials>("camera/fiducials", 10);
-	pub = it.advertise("camera/fiducial_debug_image", 1);
+	publisher = imageTransport.advertise("camera/fiducial_debug_image", 1);
 }
 
 void FiducialReaderNode::run() {
-	image_transport::Subscriber sub = it.subscribe("camera/image", 1, &FiducialReaderNode::handleFrame, this);
+	image_transport::Subscriber sub = imageTransport.subscribe("camera/image", 1, &FiducialReaderNode::handleFrame, this);
 	ROS_INFO("Waiting for frames");
 	ros::spin();
 }
 
 void FiducialReaderNode::handleFrame(const sensor_msgs::ImageConstPtr& msg) {
-	//ROS_INFO("Frame recieved");
-	cv_bridge::CvImagePtr cv_ptr;
-	cv_bridge::CvImagePtr cv_ptr2;
+	ROS_DEBUG("Frame recieved");
+	cv_bridge::CvImagePtr debugCvPtr;
+	cv_bridge::CvImagePtr inputCvPtr;
 	try {
-		cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-		cv_ptr2 = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8);
-		cv::Mat* image = new cv::Mat(cv_ptr->image);
-		cv::Mat* image2 = new cv::Mat(cv_ptr2->image);
-
-		//Insert code here!
+		debugCvPtr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+		inputCvPtr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8);
+		cv::Mat* debugImage = new cv::Mat(debugCvPtr->image);
+		cv::Mat* inputImage = new cv::Mat(inputCvPtr->image);
+		
+		// detect fiducials
+		std::vector<cv::Point2f> points;
+		fiducialDetector.detect(*inputImage, points, debugImage);
+		ROS_DEBUG_STREAM("size= " << points.size());
+		
+		// output message
 		fiducial_reader_node::Fiducials message;
 		
-		std::vector<cv::Point2f> points;
-		
-		fiducial.detect(*image2, points, image); //
-		
 		fiducial_reader_node::point64 fPoint;
-		ROS_INFO_STREAM("size= " << points.size());
 		for(int i = 0; i < points.size(); i++) {
 			fPoint.x = points[i].x;
 			fPoint.y = points[i].y;
@@ -81,26 +81,25 @@ void FiducialReaderNode::handleFrame(const sensor_msgs::ImageConstPtr& msg) {
 		//
 		}
 		
-		ros::Rate frameRate(10);
 		ros::Time time = ros::Time::now();
 		
 		cv_bridge::CvImage cvi;
 		cvi.header.stamp = time;
 		cvi.header.frame_id = "fiducial_debug_image";
 		cvi.encoding = sensor_msgs::image_encodings::BGR8;
-		cvi.image = *image;
+		cvi.image = *debugImage;
 		
-		pub.publish(cvi.toImageMsg());
+		publisher.publish(cvi.toImageMsg());
 		//cv::imwrite("/home/blagtoof/Desktop/test_results/trollolololol2.png", *image);
-		frameRate.sleep();
 		
-		delete image;
-		delete image2;
+		delete debugImage;
+		delete inputImage;
 		
 		fiducialPublisher.publish(message);
-		//ROS_INFO("image processed");
+		//ROS_DEBUG("image processed");
 	}
 	catch (cv_bridge::Exception& e)	{
+		// why this catch??
 		ROS_ERROR("cv_bridge exception: %s", e.what());
 	}
 }

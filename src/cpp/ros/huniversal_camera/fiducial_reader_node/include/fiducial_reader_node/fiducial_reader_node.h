@@ -38,6 +38,9 @@
 
 #include <camera_node/camera_node.h>
 
+/**
+ * @brief This class detects fiducials (black circles with a white crosshair).
+ */
 class FiducialReaderNode {
 public:
 	FiducialReaderNode();
@@ -47,10 +50,13 @@ private:
 	ros::NodeHandle nodeHandle;
   	ros::Publisher fiducialPublisher;
 
-	rexos_vision::FiducialDetector fiducial;
-
-	image_transport::ImageTransport it;
-	image_transport::Publisher pub;
+	rexos_vision::FiducialDetector fiducialDetector;
+	image_transport::ImageTransport imageTransport;
+	
+	/**
+	 * Publisher the debug image
+	 **/
+	image_transport::Publisher publisher;
 };
 
 #endif /* FIDUCIALREADERNODE_H_ */
