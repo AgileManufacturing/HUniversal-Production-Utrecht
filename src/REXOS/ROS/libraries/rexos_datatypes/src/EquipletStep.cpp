@@ -32,6 +32,10 @@
 
 namespace rexos_datatypes{
 
+    EquipletStep::EquipletStep(JSONNode n) {
+        setValues(n);
+    }
+
     std::string EquipletStep::getId(){
         return this->_id;
     }
@@ -94,11 +98,6 @@ namespace rexos_datatypes{
     
     void EquipletStep::setTimeData(TimeData timeData){
         this->timeData = timeData;
-    }
-    
-    EquipletStep::EquipletStep(JSONNode n) {
-        std::cout << "Equipletstep called." << std::endl;
-        setValues(n);
     }
 
     EquipletStep::~EquipletStep() {

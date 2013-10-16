@@ -42,7 +42,7 @@ namespace rexos_utilities{
     void sleep(long milliseconds);
     double radiansToDegrees(double radians);
     double degreesToRadians(double degrees);
-    int stringToInt(int &i, char const *s, int base = 0);
+    int stringToInt(const std::string s, int base=0);
     double stringToDouble(const std::string& s);
 
     /**

@@ -54,7 +54,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 		scada(this, &moduleRegistry) 
 {
 	std::cout << "EquipletNode_Constructor called." << std::endl;
-	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ1", "EquipletStepsBlackBoard");
+	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ10", "EquipletStepsBlackBoard");
 	equipletStepSubscription = new Blackboard::FieldUpdateSubscription("status", *this);
 	equipletStepSubscription->addOperation(Blackboard::SET);
 	equipletStepBlackboardClient->subscribe(*equipletStepSubscription);
