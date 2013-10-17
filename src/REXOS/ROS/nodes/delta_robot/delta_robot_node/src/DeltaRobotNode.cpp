@@ -362,10 +362,19 @@ int main(int argc, char **argv){
 	int equipletID = 0;
 	int moduleID = 0;
 
-	if(argc < 3 || !(rexos_utilities::stringToInt(equipletID, argv[1]) == 0 && rexos_utilities::stringToInt(moduleID, argv[2]) == 0)){ 	 	
+	if (argc < 3) {
 		ROS_INFO("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
 		return -1;
 	}
+
+	try{
+		equipletID = rexos_utilities::stringToInt(argv[1]);
+		moduleID = rexos_utilities::stringToInt(argv[2]);
+	} catch(std::runtime_error ex) {
+		ROS_ERROR("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
+		return -2;
+	}
+
 
 	ros::init(argc, argv, NODE_NAME);
 
