@@ -136,11 +136,8 @@ void EquipletNode::handleEquipletStep(rexos_datatypes::EquipletStep * step, mong
 	if (currentMode == rexos_statemachine::MODE_NORMAL) {
 		rexos_statemachine::State currentState = getCurrentState();
 		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
-
 			//pass payload to lookup with given params.
-
 			//pass payload to proxy.
-
 			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
 		    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
 		    prox->setInstruction(targetObjectId.toString(), step->getInstructionData().getJsonNode());
@@ -153,21 +150,10 @@ void EquipletNode::handleEquipletStep(rexos_datatypes::EquipletStep * step, mong
 	}
 }
 
-void EquipletNode::handleDirectMoveCommand(JSONNode n, mongo::OID targetObjectId){
-
+void EquipletNode::handleDirectMoveCommand(rexos_datatypes::EquipletStep * step, mongo::OID targetObjectId){
 		std::cout << "Got an update! : " << directMoveBlackBoardClient->findDocumentById(targetObjectId).jsonString() << std::endl;
-
-		JSONNode::const_iterator i = n.begin();
-
 		ModuleProxy *prox = moduleRegistry.getModule(1);
-
-	    while (i != n.end()){
-	        const char * node_name = i -> name().c_str();
-	        if (strcmp(node_name, "instructionData") == 0){
-	        	prox->setInstruction(targetObjectId.toString(), *i);
-	        }
-	        ++i;
-	    }
+	    prox->setInstruction(targetObjectId.toString(), step->getInstructionData().getJsonNode());
 		//still need to remove the step tho
 }
 
