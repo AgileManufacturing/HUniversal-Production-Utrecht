@@ -44,7 +44,7 @@ namespace rexos_utilities{
     double degreesToRadians(double degrees);
     int stringToInt(const std::string s, int base=0);
     double stringToDouble(const std::string& s);
-
+    std::string doubleToString(double x);
     /**
      * Utility class to time stuff.
      **/

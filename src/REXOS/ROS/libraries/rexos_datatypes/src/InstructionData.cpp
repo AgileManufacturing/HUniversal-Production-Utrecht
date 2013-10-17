@@ -87,20 +87,7 @@ namespace rexos_datatypes{
     }
 
     std::string InstructionData::toJSONString(){
-        /*
-        "instructionData" : {
-                              "command" : "move",
-                              "destination" : "deltarobot",
-                              "look_up" : "FIND_ID",
-                              "look_up_parameters" : {
-                                            "ID" : "RELATIVE-TO-PLACEHOLDER"
-                              },
-                              "payload" : {
-                                            "z" : 25,
-                                            "maxAcceleration" : 50
-                              }
-               }
-        */
+
         std::stringstream ss;
 
         ss << "{ 'instructionData' : { ";

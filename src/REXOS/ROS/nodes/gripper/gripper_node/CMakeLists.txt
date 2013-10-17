@@ -9,14 +9,14 @@ file(GLOB_RECURSE msgs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/msg" "*.msg")
 add_message_files(
 DIRECTORY msg
 FILES ${msgs} )
-  	
+          
 file(GLOB_RECURSE srvs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/srv" "*.srv")
 add_service_files(
 DIRECTORY srv
 FILES ${srvs} )
 
 generate_messages (
-	DEPENDENCIES std_msgs
+        DEPENDENCIES std_msgs
 )
 
 ## Declare a catkin package
@@ -33,5 +33,3 @@ add_executable(gripper_node src/GripperNode.cpp)
 
 target_link_libraries(gripper_node ${catkin_LIBRARIES} ${LOG4CXX_LIBRARIES})
 add_dependencies(gripper_node gripper_node_gencpp)
-
-
