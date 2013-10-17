@@ -74,7 +74,7 @@ public:
 			camera_node::getCorrectionMatrices::Response& response);
 
 private:
-	unicap_cv_bridge::unicap_cv_camera * cam;
+	unicap_cv_bridge::UnicapCvCamera * cam;
 	Camera::RectifyImage * rectifier;
 
 	cv::Mat camFrame;

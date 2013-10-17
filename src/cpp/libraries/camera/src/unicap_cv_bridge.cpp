@@ -44,7 +44,7 @@ namespace unicap_cv_bridge {
 			devices.push_back(std::string(device.identifier));
 		}
 		
-		return devices
+		return devices;
 	}
 
 	std::vector<std::string> listFormats(int deviceIndex) {
@@ -77,7 +77,7 @@ namespace unicap_cv_bridge {
 		}
 	}
 
-	std::vector<std::string> void listProperties(int deviceIndex) {
+	std::vector<std::string> listProperties(int deviceIndex) {
 		std::vector<std::string> properties;
 	
 		unicap_handle_t handle;
@@ -190,7 +190,7 @@ namespace unicap_cv_bridge {
 	}
 
 	static void newFrameCallback(unicap_event_t event, unicap_handle_t handle, unicap_data_buffer_t* buffer, void *owner) {
-		((unicap_cv_camera*) owner)->newFrameCallback(buffer);
+		((UnicapCvCamera*) owner)->newFrameCallback(buffer);
 	}
 
 	UnicapCvCamera::UnicapCvCamera(int deviceIndex, int formatIndex) :
@@ -217,7 +217,7 @@ namespace unicap_cv_bridge {
 
 		format.buffer_type = UNICAP_BUFFER_TYPE_SYSTEM;
 
-		if (!SUCCESS(unicapSetFormat( handle, &format))) {
+		if (!SUCCESS(unicap_set_format( handle, &format))) {
 			throw UnicapCvException("Failed setting video format");
 		}
 
@@ -226,7 +226,7 @@ namespace unicap_cv_bridge {
 			throw UnicapCvException("Invalid bits per pixel");
 		}
 
-		unicap_register_callback(handle, UNICAP_EVENT_NEW_FRAME, (unicap_callback_t) (unicap_cv_bridge::new_frame_cb),
+		unicap_register_callback(handle, UNICAP_EVENT_NEW_FRAME, (unicap_callback_t) (unicap_cv_bridge::newFrameCallback),
 		        this);
 		if (!SUCCESS(unicap_start_capture(handle))) {
 			throw UnicapCvException("Failed to start capture");
@@ -331,7 +331,7 @@ namespace unicap_cv_bridge {
 		state = FCSTATE_COPY;
 		this->mat = mat;
 		cond.wait(lock);
-		frame_cap_state _state = state;
+		frameCapState _state = state;
 		state = FCSTATE_DONT_COPY;
 		if (_state == FCSTATE_FAILURE) {
 			throw UnicapCvException("Failed to get frame");

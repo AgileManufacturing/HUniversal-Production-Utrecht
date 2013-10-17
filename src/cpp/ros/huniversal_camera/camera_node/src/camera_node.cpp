@@ -75,7 +75,7 @@ CameraNode::CameraNode(int argc, char * argv[]) : imgTransport(nodeHandle), expo
 	try {
 		// Connect to camera. On failure a exception will be thrown.
 		std::cout << "[DEBUG] Initializing camera" << std::endl;
-		cam = new unicap_cv_bridge::unicapCvCamera(deviceNumber, formatNumber);
+		cam = new unicap_cv_bridge::UnicapCvCamera(deviceNumber, formatNumber);
 		cam->setAutoWhiteBalance(true);
 		cam->setExposure(0.015);
 		camFrame = cv::Mat(cam->getImgHeight(), cam->getImgWidth(), cam->getImgFormat());
@@ -236,7 +236,7 @@ void CameraNode::run() {
 			// Read image 
 			cam->getFrame(&camFrame);
 			if(performFishEyeCorrection == true){
-				rectifier->rectify(camFrame, rectifiedCamFrame);
+				rectifiedCamFrame = rectifier->rectify(camFrame);
 			} else {
 				rectifiedCamFrame = camFrame;
 			}
