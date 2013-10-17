@@ -31,8 +31,7 @@
 #include <rexos_gripper/OutputDevice.h>
 #include <boost/thread.hpp>
 
-namespace InputOutput {
-	namespace OutputDevices {
+namespace rexos_gripper {
 
 		/**
 		 * Gripper device
@@ -105,8 +104,9 @@ namespace InputOutput {
 			/**
 			 * Turn the gripper off
 			 **/
-			void release( ) {
+			bool release( ) {
 				state = false;
+				return !state; //return whether or not turning off succeeded.
 			}
 
 		private:
@@ -177,6 +177,5 @@ namespace InputOutput {
 			static void watchdogFunction(Gripper* device);
 		};
 	}
-}
 
 #endif

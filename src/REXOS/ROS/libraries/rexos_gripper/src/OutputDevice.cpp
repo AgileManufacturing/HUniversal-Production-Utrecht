@@ -28,7 +28,7 @@
 
 #include <rexos_gripper/OutputDevice.h>
 
-namespace InputOutput {
+namespace rexos_gripper {
 	/**
 	 * Constructor for OutputDevice
 	 *

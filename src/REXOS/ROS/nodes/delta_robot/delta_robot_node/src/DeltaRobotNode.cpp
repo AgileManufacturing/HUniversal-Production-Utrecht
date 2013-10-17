@@ -41,7 +41,7 @@
 /**
  * The IP of the modbus we are connecting to
  **/
-#define MODBUS_IP "192.168.0.2"
+#define MODBUS_IP "192.168.0.12"
 /** 
  * The port we are connecting to
  **/
@@ -113,7 +113,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 
 
 
-deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode(){
+deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
 	delete deltaRobot;
 	delete motors[0];
 	delete motors[1];
@@ -124,30 +124,31 @@ deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode(){
 
 
 void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
-
+	std::cout << "Instruction received on deltarobot. Parsing.." << goal->json << std::endl;
 	JSONNode n = libjson::parse(goal->json);
 	rexos_statemachine::SetInstructionResult result_;
-
 	result_.OID = goal->OID;
 
     JSONNode::const_iterator i = n.begin();
 
-    //We want to retrieve the payload from the msg.
-	if (strcmp(i[4].name().c_str(), "payload") == 0){
+    while (i != n.end()){
+        const char * node_name = i -> name().c_str();
+	    std::cout << "Node name: " << node_name << std::endl;
 
-			Point p = parsePoint(i[4]);
+        if (strcmp(node_name, "payload") == 0){
+
+        	std::cout << "Parsing point." << std::endl;
+			Point p = parsePoint(*i);
 
 			if(moveToPoint(p.x, p.y, p.z, p.maxAcceleration)){
-				//Move is succesfull, set the result.
     			setInstructionActionServer.setSucceeded(result_);
-			} else {
-				ROS_INFO("Failed moving to point");
-    			setInstructionActionServer.setAborted(result_);
+    			return;
 			}
-			
-    } else {
-    	setInstructionActionServer.setAborted(result_);
+        }
+        ++i;
     }
+	ROS_INFO("Failed moving to point");
+	setInstructionActionServer.setAborted(result_);
 }
 
 
@@ -362,10 +363,19 @@ int main(int argc, char **argv){
 	int equipletID = 0;
 	int moduleID = 0;
 
-	if(argc < 3 || !(rexos_utilities::stringToInt(equipletID, argv[1]) == 0 && rexos_utilities::stringToInt(moduleID, argv[2]) == 0)){ 	 	
+	if (argc < 3) {
 		ROS_INFO("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
 		return -1;
 	}
+
+	try{
+		equipletID = rexos_utilities::stringToInt(argv[1]);
+		moduleID = rexos_utilities::stringToInt(argv[2]);
+	} catch(std::runtime_error ex) {
+		ROS_ERROR("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
+		return -2;
+	}
+
 
 	ros::init(argc, argv, NODE_NAME);
 

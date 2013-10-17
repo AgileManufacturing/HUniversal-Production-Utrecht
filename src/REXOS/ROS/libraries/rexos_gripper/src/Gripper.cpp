@@ -30,8 +30,7 @@
 #include <rexos_gripper/Gripper.h>
 #include <rexos_utilities/Utilities.h>
 
-namespace InputOutput {
-	namespace OutputDevices {
+namespace rexos_gripper {
 		/**
 		 * Constructor for Gripper
 		 *
@@ -137,5 +136,4 @@ namespace InputOutput {
 			std::cout << "[GRIPPER WATCHDOG] Watchdog stopped" << std::endl;
 		}
 
-	}
 }

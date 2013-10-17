@@ -9,9 +9,19 @@
   <author email="dickvandersteen@gmail.com">Dickvdsteen</author>
   <author email="koenbraham@gmail.com">KBraham</author>
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>delta_robot_node</build_depend>
-  <run_depend>delta_robot_node</run_depend>
+
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>rexos_blackboard_cpp_client</build_depend>
+  <build_depend>rexos_datatypes</build_depend>
+  <build_depend>rexos_utilities</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>rexos_blackboard_cpp_client</run_depend>
+  <run_depend>rexos_datatypes</run_depend>
+  <run_depend>rexos_utilities</run_depend>
 
   <export>
+    <cpp cflags="-I${prefix}/include"/>
   </export>
 </package>

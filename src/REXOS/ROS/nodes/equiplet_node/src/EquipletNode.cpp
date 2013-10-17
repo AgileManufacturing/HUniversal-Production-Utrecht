@@ -51,6 +51,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 		EquipletStateMachine(nameFromId(id),id),
 		equipletStepBlackboardClient(NULL),
 		equipletCommandBlackboardClient(NULL),
+		directMoveBlackBoardClient(NULL),
 		scada(this, &moduleRegistry) 
 {
 	std::cout << "EquipletNode_Constructor called." << std::endl;
@@ -59,6 +60,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 	equipletStepSubscription->addOperation(Blackboard::SET);
 	equipletStepBlackboardClient->subscribe(*equipletStepSubscription);
 	subscriptions.push_back(equipletStepSubscription);
+	sleep(1);
 
 	equipletCommandBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_COMMANDS);
 	equipletCommandSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
@@ -68,10 +70,17 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
     equipletCommandBlackboardClient->subscribe(*equipletCommandSubscriptionSet);
 	subscriptions.push_back(equipletCommandSubscription);
 	subscriptions.push_back(equipletCommandSubscriptionSet);
+	sleep(1);
+
+	directMoveBlackBoardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ1", "DirectMoveStepsBlackBoard");
+	directMoveSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
+	directMoveBlackBoardClient->subscribe(*directMoveSubscription);
+	subscriptions.push_back(directMoveSubscription);
+	sleep(1);
 
 	equipletStateBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_STATE);
 
-	amountOfIncomingMongoDBCalls = 0;
+
 
 	std::cout << "Connected equiplet_node." << std::endl;
 }
@@ -99,79 +108,104 @@ EquipletNode::~EquipletNode(){
  *
  * @param json The message parsed in the json format
  **/
-void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) 
-{
+void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) {
+	mongo::OID targetObjectId;
+	oplogEntry.getTargetObjectId(targetObjectId);
+	JSONNode n = libjson::parse(directMoveBlackBoardClient->findDocumentById(targetObjectId).jsonString());
+
 	if(&subscription == equipletStepSubscription)
 	{
-		mongo::OID targetObjectId;
-		oplogEntry.getTargetObjectId(targetObjectId);
-
-		JSONNode n = libjson::parse(equipletStepBlackboardClient->findDocumentById(targetObjectId).jsonString());
 	    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
 
+	    //We only need to handle the step if its status is 'WAITING'
 	    if (step->getStatus().compare("WAITING") == 0) {
-
-	    	rexos_statemachine::Mode currentMode = getCurrentMode();
-
-	    	if (currentMode == rexos_statemachine::MODE_NORMAL) {
-
-	    		rexos_statemachine::State currentState = getCurrentState();
-
-	    		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
-
-					amountOfIncomingMongoDBCalls++;
-					
-	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
-				    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
-				    prox->setInstruction(targetObjectId.toString(), step->getInstructionData().getJsonNode());
-
-	    		} else {
-	    			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\" } } ");
-	    		}
-	    	} else {
-	    		ROS_INFO("Instruction received but current mode is %s", rexos_statemachine::mode_txt[currentMode]);
-	    		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"FAILED\"");
-	    	}
+    		handleEquipletStep(step, targetObjectId);
 		}
 	}
 	else if(&subscription == equipletCommandSubscription || &subscription == equipletCommandSubscriptionSet)
 	{
 		ROS_INFO("Received equiplet statemachine command");
-    	JSONNode n = libjson::parse(oplogEntry.getUpdateDocument().jsonString());
-		JSONNode::const_iterator i = n.begin();
-
-        while (i != n.end()){
-            const char * node_name = i -> name().c_str();
-	    if (strcmp(node_name, "$set") == 0) {
-		JSONNode set = i->as_node();
-		JSONNode::const_iterator j = set.begin();
-                while ( j != set.end()) {
-			const char * node_name = j -> name().c_str();
-			if (strcmp(node_name, "desiredState") == 0){
-				ROS_INFO("ChangeState to %s", j -> as_string().c_str());
-                		changeState((rexos_statemachine::State) atoi(j -> as_string().c_str()));
-            		}else if (strcmp(node_name, "desiredMode") == 0){
-                		ROS_INFO("ChangeMode to %s", j -> as_string().c_str());
-                		changeMode((rexos_statemachine::Mode) atoi(j -> as_string().c_str()));
-            		} else {
-				ROS_INFO("Unknown field %s", node_name);
-	    		}
-			j++;
-		}
-	    }else if (strcmp(node_name, "desiredState") == 0){
-		ROS_INFO("ChangeState to %s", i -> as_string().c_str());
-                changeState((rexos_statemachine::State) atoi(i -> as_string().c_str()));
-            }else if (strcmp(node_name, "desiredMode") == 0){
-                ROS_INFO("ChangeMode to %s", i -> as_string().c_str());
-                changeMode((rexos_statemachine::Mode) atoi(i -> as_string().c_str()));
-            } else {
-		ROS_INFO("Unknown field %s", node_name);
-	    }
-            i++;
-        }
+    	handleEquipletCommand(libjson::parse(oplogEntry.getUpdateDocument().jsonString()));
+	} else if(&subscription == directMoveSubscription) {
+		handleDirectMoveCommand(n, targetObjectId);
 	}
 }
 
+void EquipletNode::handleEquipletStep(rexos_datatypes::EquipletStep * step, mongo::OID targetObjectId){
+	rexos_statemachine::Mode currentMode = getCurrentMode();
+	if (currentMode == rexos_statemachine::MODE_NORMAL) {
+		rexos_statemachine::State currentState = getCurrentState();
+		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
+
+			//pass payload to lookup with given params.
+
+			//pass payload to proxy.
+
+			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
+		    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
+		    prox->setInstruction(targetObjectId.toString(), step->getInstructionData().getJsonNode());
+		} else {
+			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\" } } ");
+		}
+	} else {
+		ROS_INFO("Instruction received but current mode is %s", rexos_statemachine::mode_txt[currentMode]);
+		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"FAILED\"");
+	}
+}
+
+void EquipletNode::handleDirectMoveCommand(JSONNode n, mongo::OID targetObjectId){
+
+		std::cout << "Got an update! : " << directMoveBlackBoardClient->findDocumentById(targetObjectId).jsonString() << std::endl;
+
+		JSONNode::const_iterator i = n.begin();
+
+		ModuleProxy *prox = moduleRegistry.getModule(1);
+
+	    while (i != n.end()){
+	        const char * node_name = i -> name().c_str();
+	        if (strcmp(node_name, "instructionData") == 0){
+	        	prox->setInstruction(targetObjectId.toString(), *i);
+	        }
+	        ++i;
+	    }
+		//still need to remove the step tho
+}
+
+void EquipletNode::handleEquipletCommand(JSONNode n){
+	JSONNode::const_iterator i = n.begin();
+
+    while (i != n.end()){
+        const char * node_name = i -> name().c_str();
+    if (strcmp(node_name, "$set") == 0) {
+	JSONNode set = i->as_node();
+	JSONNode::const_iterator j = set.begin();
+        while ( j != set.end()) {
+		const char * node_name = j -> name().c_str();
+		if (strcmp(node_name, "desiredState") == 0){
+			ROS_INFO("ChangeState to %s", j -> as_string().c_str());
+            		changeState((rexos_statemachine::State) atoi(j -> as_string().c_str()));
+        		}else if (strcmp(node_name, "desiredMode") == 0){
+            		ROS_INFO("ChangeMode to %s", j -> as_string().c_str());
+            		changeMode((rexos_statemachine::Mode) atoi(j -> as_string().c_str()));
+        		} else {
+			ROS_INFO("Unknown field %s", node_name);
+    		}
+		j++;
+	}
+    } else if (strcmp(node_name, "desiredState") == 0){
+	ROS_INFO("ChangeState to %s", i -> as_string().c_str());
+            changeState((rexos_statemachine::State) atoi(i -> as_string().c_str()));
+        }else if (strcmp(node_name, "desiredMode") == 0){
+            ROS_INFO("ChangeMode to %s", i -> as_string().c_str());
+            changeMode((rexos_statemachine::Mode) atoi(i -> as_string().c_str()));
+        } else {
+	ROS_INFO("Unknown field %s", node_name);
+    }
+        i++;
+    }
+}
+
+//needed for callback ( from proxy )
 void EquipletNode::onInstructionStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed){
 
 	mongo::OID targetObjectId(id);
@@ -180,9 +214,7 @@ void EquipletNode::onInstructionStepCompleted(ModuleProxy* moduleProxy, std::str
 	{
     	equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"DONE\" } } ");
     	std::cout << "Done with step. Update status on BB to done." << std::endl;
-	} 
-	else 
-	{
+	} else {
     	equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\" } } ");
 	}
 

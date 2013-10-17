@@ -32,7 +32,15 @@
 
 namespace rexos_datatypes{
 
-    InstructionData::InstructionData() {
+    InstructionData::InstructionData(){}
+
+    InstructionData::InstructionData(std::string command, std::string destination, std::string look_up, 
+            std::map<std::string, std::string> look_up_parameters, std::map<std::string, std::string> payload) {
+        this->command = command;
+        this->destination = destination;
+        this->look_up = look_up;
+        this->look_up_parameters = look_up_parameters;
+        this->payload = payload;
     }
 
     std::string InstructionData::getCommand(){
@@ -78,4 +86,33 @@ namespace rexos_datatypes{
         this->jsonNode = jsonNode;
     }
 
+    std::string InstructionData::toJSONString(){
+
+        std::stringstream ss;
+
+        ss << "{ 'instructionData' : { ";
+        ss << "'command' : '" << this->command << "', ";
+        ss << "'destination' : '" << this->destination << "', ";
+        ss << "'look_up' : '" << this->look_up << "', ";
+        ss << "'look_up_parameters' : { " << mapToJsonString(this->look_up_parameters) << " }, ";
+        ss << "'payload' : { " << mapToJsonString(this->payload) << " } ";
+        ss << " } }";
+
+        return ss.str();
+    }
+
+    std::string InstructionData::mapToJsonString(std::map<std::string, std::string> map){
+
+        std::stringstream mapStream;
+        std::map<std::string, std::string>::iterator iter;
+
+        for (iter = map.begin(); iter != map.end(); ++iter) {
+            if ((iter != map.end()) && (iter == --map.end())) {
+                mapStream << "'" << iter->first << "' : '" << iter->second << "' ";
+            } else {
+                mapStream << "'" << iter->first << "' : '" << iter->second << "', ";
+            }
+        }
+        return mapStream.str();
+    }
 }

@@ -28,7 +28,7 @@
 
 #include <rexos_modbus/ModbusController.h>
 
-namespace InputOutput
+namespace rexos_gripper
 {
 	/**
 	 * Input output modbus communication interface

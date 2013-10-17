@@ -27,8 +27,9 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include "GripperNode/GripperNode.h"
-#include "Utilities/Utilities.h"
+#include "gripper_node/GripperNode.h"
+#include "rexos_utilities/Utilities.h"
+ #include <boost/bind.hpp>
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "GripperNode"
@@ -47,9 +48,9 @@
  * Constructor
  **/
 GripperNode::GripperNode(int equipletID, int moduleID) :
-		rosMast::StateMachine(equipletID, moduleID) {
+	rexos_statemachine::ModuleStateMachine("gripper_node", equipletID, moduleID, true),
+	setInstructionActionServer(nodeHandle, "gripper_node/set_instruction", boost::bind(&GripperNode::onSetInstruction, this, _1), false) {
 
-	// Initialize modbus for IO controller
 	std::cout << "[DEBUG] Opening modbus connection" << std::endl;
 	modbusContext = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
 
@@ -63,14 +64,14 @@ GripperNode::GripperNode(int equipletID, int moduleID) :
 
 	assert(modbusContext != NULL);
 
-	modbus = new ModbusController::ModbusController(modbusContext);
+	modbus = new rexos_modbus::ModbusController(modbusContext);
 
 	std::cout << "[DEBUG] Opening IO Controller" << std::endl;
-	controller = new InputOutput::InputOutputController(modbus);
+	controller = new rexos_gripper::InputOutputController(modbus);
 
 	std::cout << "[DEBUG] Starting gripper" << std::endl;
 	
-	gripper = new InputOutput::OutputDevices::Gripper(controller, this, wrapperForGripperError);
+	gripper = new rexos_gripper::Gripper(controller, this, wrapperForGripperError);
 
 	// Advertise the services
 	std::cout << "[DEBUG] Advertising the services" << std::endl;
@@ -87,12 +88,31 @@ GripperNode::~GripperNode() {
 }
 
 void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
-	if (true) {
-		setInstructionActionServer.setAborted(false);
-    } else {
-    	setInstructionActionServer.setAborted(true);
-    }
+
+	JSONNode n = libjson::parse(goal->json);
+	rexos_statemachine::SetInstructionResult result_;
+
+	result_.OID = goal->OID;
+
+    JSONNode::const_iterator i = n.begin();
+
+    //We want to retrieve the payload from the msg.
+	if (strcmp(i[4].name().c_str(), "payload") == 0){
+		if(true) { //if(grip) else (grab) ? lol ? parse msg and grip or grab
+			if(gripper->grab()){
+				setInstructionActionServer.setSucceeded(result_);
+				return;
+			}
+		} else {
+			if(gripper->release()) {
+				setInstructionActionServer.setSucceeded(result_);
+				return;
+			}
+		}
+	}
+	setInstructionActionServer.setAborted(result_);
 }
+
 
 /**
  * A wrapper for the gripper error handler so that we can use a member function
@@ -107,7 +127,7 @@ void GripperNode::wrapperForGripperError(void* gripperNodeObject) {
  * Sends error message to equipletNode with an errorcode
  **/
 void GripperNode::error() {
-	sendErrorMessage(-1);
+	//sendErrorMessage(-1);
 }
 
 /**
@@ -116,7 +136,7 @@ void GripperNode::error() {
  **/
 void GripperNode::transitionSetup(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Setup transition called");
-	setState(rosMast::setup);
+	//The service servers should be set, to provide the normal methods for the equiplet
 	as->setSucceeded();
 }
 
@@ -126,7 +146,6 @@ void GripperNode::transitionSetup(rexos_statemachine::TransitionActionServer* as
  **/
 void GripperNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Shutdown transition called");
-	setState(rosMast::shutdown);
 	as->setSucceeded();
 }
 
@@ -138,7 +157,6 @@ void GripperNode::transitionStart(rexos_statemachine::TransitionActionServer* as
 	ROS_INFO("Start transition called");
 
 	// Set currentState to start
-	setState(rosMast::start);
 	gripper->startWatchdog();
 	as->setSucceeded();
 }
@@ -150,7 +168,6 @@ void GripperNode::transitionStop(rexos_statemachine::TransitionActionServer* as)
 	ROS_INFO("Stop transition called");
 
 	// Set currentState to stop
-	setState(rosMast::stop);
 	gripper->stopWatchdog();
 	gripper->release();
 	gripper->disable();
@@ -165,7 +182,7 @@ void GripperNode::transitionStop(rexos_statemachine::TransitionActionServer* as)
  *
  * @return true if gripper is put on else return false.
  **/
-bool GripperNode::grip() {
+bool GripperNode::grip(gripper_node::Grip::Request &req, gripper_node::Grip::Response &res) {
 	return gripper->grab();
 }
 
@@ -177,7 +194,7 @@ bool GripperNode::grip() {
  *
  * @return true if gripper is put off else return false.
  **/
-bool GripperNode::release() {
+bool GripperNode::release(gripper_node::Release::Request &req, gripper_node::Release::Response &res) {
 	return gripper->release();
 }
 
@@ -190,9 +207,18 @@ int main(int argc, char** argv) {
 	ros::init(argc, argv, NODE_NAME);
 	int equipletID = 0;
 	int moduleID = 0;
-	if (argc < 3 || !(Utilities::stringToInt(equipletID, argv[1]) == 0 && Utilities::stringToInt(moduleID, argv[2]) == 0)) {
-		std::cerr << "Cannot read equiplet id and/or moduleId from commandline please use correct values." << std::endl;
+	
+	if (argc < 3) {
+		ROS_INFO("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
 		return -1;
+	}
+
+	try{
+		equipletID = rexos_utilities::stringToInt(argv[1]);
+		moduleID = rexos_utilities::stringToInt(argv[2]);
+	} catch(std::runtime_error ex) {
+		ROS_ERROR("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
+		return -2;
 	}
 
 	std::cout << "Starting gripper node" << std::endl;
