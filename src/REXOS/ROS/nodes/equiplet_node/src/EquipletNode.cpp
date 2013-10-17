@@ -127,7 +127,8 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 		ROS_INFO("Received equiplet statemachine command");
     	handleEquipletCommand(libjson::parse(oplogEntry.getUpdateDocument().jsonString()));
 	} else if(&subscription == directMoveSubscription) {
-		handleDirectMoveCommand(n, targetObjectId);
+		rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
+		handleDirectMoveCommand(step, targetObjectId);
 	}
 }
 
