@@ -107,6 +107,7 @@ public class ArePartsAvailableInTime extends ReceiveBehaviour {
 	@Override
 	public void onStart(){
 
+		Logger.log(LogLevel.DEBUG, "Sent message arepartsavailableintime SERVICEAGENT!!");
 		ACLMessage responseMessage = new ACLMessage(ACLMessage.QUERY_IF);
 		responseMessage.addReceiver(serviceAgent.getLogisticsAID());
 		responseMessage.setConversationId(conversationID);

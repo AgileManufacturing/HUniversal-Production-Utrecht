@@ -78,25 +78,27 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 				switch(part.getType()) {
 				case 1: // Red ball
 					// Grab a ball
-					Iterator<Entry<Part, Position>> it = PartsInfo.supplyCrateContent.entrySet().iterator();
-					if(it.hasNext()) {
+					//Iterator<Entry<Part, Position>> it = PartsInfo.supplyCrateContent.entrySet().iterator();
+					//if(it.hasNext()) {
 						ACLMessage reply = message.createReply();
 						reply.setOntology("ArePartsAvailable");
 						reply.setPerformative(ACLMessage.CONFIRM);
+						reply.setConversationId(message.getConversationId());
 						myAgent.send(reply);
-					} else {
-						ACLMessage reply = message.createReply();
-						reply.setOntology("ArePartsAvailable");
-						reply.setPerformative(ACLMessage.DISCONFIRM);
-						myAgent.send(reply);
-					}
-					break;
+					//} else {
+					//	ACLMessage reply = message.createReply();
+					//	reply.setOntology("ArePartsAvailable");
+					//	reply.setPerformative(ACLMessage.DISCONFIRM);
+					//	myAgent.send(reply);
+					//}
+						break;
 					default:
-						ACLMessage reply = message.createReply();
-						reply.setOntology("ArePartsAvailable");
+					//	reply = message.createReply();
+					//	reply.setOntology("ArePartsAvailable");
 						//TODO (out of scope) determine actual part availability 
-						reply.setPerformative(ACLMessage.CONFIRM);
-						myAgent.send(reply);
+					//	reply.setConversationId(message.getConversationId());
+					//	reply.setPerformative(ACLMessage.CONFIRM);
+					//	myAgent.send(reply);
 						break;
 				}
 			}
