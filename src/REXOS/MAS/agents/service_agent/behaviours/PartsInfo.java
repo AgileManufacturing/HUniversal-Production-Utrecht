@@ -173,7 +173,6 @@ public class PartsInfo extends ReceiveBehaviour {
 
 				for(Entry<Part, Position> e : partParameters.entrySet()) {
 					if(e.getValue() == null) {
-						Logger.log(LogLevel.DEBUG, "");
 						productStepBBClient.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject(
 								"$set", new BasicDBObject("outputPart", e.getKey().toBasicDBObject())));
 						partParameters.remove(e.getKey());
