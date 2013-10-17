@@ -1,6 +1,6 @@
 /**
- * @file rexos/mas/service_agent/behaviours/GetProductStepDuration.java
- * @brief Handles the GetProductionStepDuration message which the equipletAgent sends to ask for the duration of a
+ * @file rexos/mas/service_agent/behaviours/ProductStepDuration.java
+ * @brief Handles the ProductStepDuration message which the equipletAgent sends to ask for the duration of a
  *        certain productStep.
  * @date Created: 23 apr. 2013
  * 
@@ -74,6 +74,12 @@ public class ProductStepDuration extends ReceiveBehaviour implements ParentBehav
 	private static final long serialVersionUID = -9066154686608658310L;
 
 	/**
+	 * @var MessageTemplate MESSAGE_TEMPLATE
+	 *      The messageTemplate to match the messages.
+	 */
+	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("ProductStepDuration");
+	
+	/**
 	 * @var ServiceAgent agent
 	 *      The service agent this behaviour belongs to.
 	 */
@@ -82,11 +88,11 @@ public class ProductStepDuration extends ReceiveBehaviour implements ParentBehav
 	/**
 	 * Creates a new GetProductStepDuration instance with the specified parameters.
 	 * 
-	 * @param agent the agent this behaviour belongs to.
+	 * @param serviceAgent the agent this behaviour belongs to.
 	 */
-	public ProductStepDuration(ServiceAgent agent) {
-		super(agent, MessageTemplate.MatchOntology("ProductStepDuration"));
-		this.serviceAgent = agent;
+	public ProductStepDuration(ServiceAgent serviceAgent) {
+		super(serviceAgent, MESSAGE_TEMPLATE);
+		this.serviceAgent = serviceAgent;
 	}
 
 	/**

@@ -1,6 +1,6 @@
 /**
- * @file rexos/mas/service_agent/behaviours/ArePartsAvailableResponse.java
- * @brief Handles the ArePartsAvailableResponse message which is an answer to ArePartsAvailable and indicates
+ * @file rexos/mas/service_agent/behaviours/ArePartsAvailable.java
+ * @brief Handles the ArePartsAvailable message which is an answer to ArePartsAvailable and indicates
  *        whether the specified parts are present and available in general.
  * @date Created: 23 apr. 2013
  * 
@@ -74,16 +74,34 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var ServiceAgent agent
+	 * @var MessageTemplate MESSAGE_TEMPLATE
+	 *      The messageTemplate to match the messages.
+	 */
+	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("ArePartsAvailable");
+	
+	/**
+	 * @var ServiceAgent serviceAgent
 	 *      The service agent this behaviour belongs to.
 	 */
 	private ServiceAgent serviceAgent;
 
+	/**
+	 * @var ParentBehaviourCallback parentBehaviourCallback
+	 * 		The parentbehaviour callback this redirect calls back to
+	 */
 	private ParentBehaviourCallback parentBehaviourCallback;
 
+	/**
+	 * @var ProductStep productStep
+	 * 		The ProductStep object used for the message
+	 */
 	private ProductStep productStep;
 
-	private String conversationID;
+	/**
+	 * @var String conversationId
+	 * 		The conversationId used for the message
+	 */
+	private String conversationId;
 
 	/**
 	 * Creates a new ArePartsAvailableInTimeResponse instance with the specified parameters.
@@ -91,14 +109,14 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 	 * @param serviceAgent the agent this behaviour belongs to.
 	 */
 	public ArePartsAvailable(ServiceAgent serviceAgent, ParentBehaviourCallback parentBehaviourCallback,
-			String conversationID, ProductStep productStep) {
-		super(serviceAgent, MessageTemplate.MatchOntology("ArePartsAvailable"));
+			String conversationId, ProductStep productStep) {
+		super(serviceAgent, MESSAGE_TEMPLATE);
 		this.serviceAgent = serviceAgent;
 		
 		this.parentBehaviourCallback = parentBehaviourCallback;
 		
 		this.productStep = productStep;
-		this.conversationID = conversationID;
+		this.conversationId = conversationId;
 	}
 
 	
@@ -106,7 +124,7 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 	public void onStart(){
 		ACLMessage responseMessage = new ACLMessage(ACLMessage.QUERY_IF);
 		responseMessage.addReceiver(serviceAgent.getLogisticsAID());
-		responseMessage.setConversationId(conversationID);
+		responseMessage.setConversationId(conversationId);
 		if (productStep != null){
 			try {
 				responseMessage.setContentObject(productStep);

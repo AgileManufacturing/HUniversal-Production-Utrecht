@@ -33,7 +33,6 @@
  **/
 package agents.equiplet_agent.behaviours;
 
-import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
@@ -72,11 +71,11 @@ public class ScheduleStep extends ReceiveBehaviour {
 	private static final long serialVersionUID = -3574738583814321426L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
+	 * @var MessageTemplate MESSAGE_TEMPLATE
 	 *      The messageTemplate this behaviour listens to. This behaviour
 	 *      listens to the ontology: ScheduleStep.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("ScheduleStep");
+	private static MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("ScheduleStep");
 
 	/**
 	 * @var EquipletAgent equipletAgent
@@ -85,23 +84,23 @@ public class ScheduleStep extends ReceiveBehaviour {
 	private EquipletAgent equipletAgent;
 
 	/**
-	 * @var Blackboard productBBClient
-	 *      The productBBClient for this behaviour.
+	 * @var BlackboardClient productStepsBlackboard
+	 *      The productStepsBlackboard for this behaviour.
 	 */
-	private BlackboardClient productBBClient;
+	private BlackboardClient productStepsBlackboard;
 
 	/**
 	 * Instantiates a new schedule step.
 	 * 
-	 * @param a
-	 *      The agent for this behaviour
-	 * @param productBBClient
-	 * 		The blackboardClient for the productSteps.
+	 * @param equipletAgent
+	 *      The equipletAgent for this behaviour
+	 * @param productStepsBlackboard
+	 * 		The blackboardClient for the productStepsBlackboard.
 	 */
-	public ScheduleStep(Agent a, BlackboardClient productBBClient) {
-		super(a, messageTemplate);
-		equipletAgent = (EquipletAgent) a;
-		this.productBBClient = productBBClient;
+	public ScheduleStep(EquipletAgent equipletAgent, BlackboardClient productStepsBlackboard) {
+		super(equipletAgent, MESSAGE_TEMPLATE);
+		this.equipletAgent = equipletAgent;
+		this.productStepsBlackboard = productStepsBlackboard;
 	}
 
 	/**
@@ -124,14 +123,14 @@ public class ScheduleStep extends ReceiveBehaviour {
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
 			
 			ScheduleData scheduleData =
-					new ScheduleData((BasicDBObject) (productBBClient.findDocumentById(productStepId)).get("scheduleData"));
+					new ScheduleData((BasicDBObject) (productStepsBlackboard.findDocumentById(productStepId)).get("scheduleData"));
 			
 			long end = start + scheduleData.getDuration();
 			Logger.log(LogLevel.DEBUG, "start: " + start + " duration: " + scheduleData.getDuration() + " end: " + end);
 
 			// Gets planned steps
 			List<DBObject> plannedSteps =
-					productBBClient.findDocuments(QueryBuilder.start("scheduleData.startTime").greaterThan(-1).get());
+					productStepsBlackboard.findDocuments(QueryBuilder.start("scheduleData.startTime").greaterThan(-1).get());
 
 			boolean fitsInSchedule = true;
 
@@ -176,7 +175,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 			
 			if(fitsInSchedule) {
 				scheduleData.setStartTime(start);
-				productBBClient.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject("$set",
+				productStepsBlackboard.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject("$set",
 						new BasicDBObject("scheduleData", scheduleData.toBasicDBObject())));
 
 				ACLMessage scheduleMessage = new ACLMessage(ACLMessage.REQUEST);

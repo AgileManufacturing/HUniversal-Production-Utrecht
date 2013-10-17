@@ -42,6 +42,7 @@ import libraries.utillities.log.Logger;
 import agents.data_classes.Part;
 import agents.data_classes.Position;
 import agents.data_classes.ProductStep;
+import agents.logistics_agent.LogisticsAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 
 /**
@@ -55,11 +56,24 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * @var MessageTemplate MESSAGE_TEMPLATE
+	 *      The messageTemplate to match the messages.
+	 */
+	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("ArePartsAvailable");
+	
+	/**
+	 * @var LogisticsAgent logisticsAgent
+	 *      The logisticsAgent of this behaviour.
+	 */
+	private LogisticsAgent logisticsAgent;
+	
+	/**
 	 * Constructs the behaviour for the given agent.
 	 * @param a The agent associated with this behaviour.
 	 */
-	public ArePartsAvailable(Agent a) {
-		super(a, MessageTemplate.MatchOntology("ArePartsAvailable"));
+	public ArePartsAvailable(LogisticsAgent logisticsAgent) {
+		super(logisticsAgent, MESSAGE_TEMPLATE);
+		this.logisticsAgent = logisticsAgent;
 	}
 
 	/**
@@ -70,7 +84,7 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		try {
-			Logger.log(LogLevel.DEBUG, "ArePartsAvailable%n", 0, myAgent.getLocalName());
+			Logger.log(LogLevel.DEBUG, "ArePartsAvailable%n", 0, logisticsAgent.getLocalName());
 			
 			Part[] parts = ((ProductStep) message.getContentObject()).getInputParts();
 			
@@ -102,12 +116,11 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 						break;
 				}
 			}
-
-			myAgent.addBehaviour(new ArePartsAvailableInTime(myAgent, message.getConversationId()));
+			logisticsAgent.addBehaviour(new ArePartsAvailableInTime(logisticsAgent, message.getConversationId()));
 			Logger.log(LogLevel.DEBUG, "PartTypes { %s } are available%n", 0, (Object[]) parts);
 		} catch (UnreadableException e) {
 			Logger.log(LogLevel.ERROR, e);
-			myAgent.doDelete();
+			logisticsAgent.doDelete();
 		}
 	}
 }

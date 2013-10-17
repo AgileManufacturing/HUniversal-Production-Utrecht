@@ -1,5 +1,3 @@
-package agents.hardware_agent.behaviours;
-
 /**
  * @file rexos/mas/hardware_agent/behaviours/EvaluateDuration.java
  * @brief Handles the GetServiceStepDuratation Message.
@@ -46,6 +44,7 @@ package agents.hardware_agent.behaviours;
  *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *          SUCH DAMAGE.
  **/
+package agents.hardware_agent.behaviours;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
@@ -83,10 +82,10 @@ public class EvaluateDuration extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
+	 * @var MessageTemplate MESSAGE_TEMPLATE
 	 *      The messageTemplate to match the messages.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("ServiceStepDuration");
+	private static MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("ServiceStepDuration");
 
 	/**
 	 * @var HardwareAgent hardwareAgent
@@ -103,12 +102,12 @@ public class EvaluateDuration extends ReceiveBehaviour {
 	/**
 	 * Constructory
 	 * 
-	 * @param a The agent
+	 * @param hardwareAgent The hardwareAgent
 	 * @param moduleFactory The moduleFactory
 	 */
-	public EvaluateDuration(Agent a, ModuleFactory moduleFactory) {
-		super(a, messageTemplate);
-		hardwareAgent = (HardwareAgent) a;
+	public EvaluateDuration(HardwareAgent hardwareAgent, ModuleFactory moduleFactory) {
+		super(hardwareAgent, MESSAGE_TEMPLATE);
+		this.hardwareAgent = hardwareAgent;
 		this.moduleFactory = moduleFactory;
 	}
 
@@ -120,7 +119,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 		try {
 			// get the serviceStepId
 			ObjectId serviceStepId = (ObjectId) message.getContentObject();
-			Logger.log(LogLevel.DEBUG, "%s received message from %s (%s:%s)%n", myAgent.getLocalName(), message.getSender()
+			Logger.log(LogLevel.DEBUG, "%s received message from %s (%s:%s)%n", hardwareAgent.getLocalName(), message.getSender()
 					.getLocalName(), message.getOntology(), serviceStepId);
 			// Evaluate the duration of the step
 			EvaluateStepDuration(serviceStepId);
@@ -131,10 +130,10 @@ public class EvaluateDuration extends ReceiveBehaviour {
 			reply.setPerformative(ACLMessage.INFORM);
 			reply.setContentObject(serviceStepId);
 			reply.setOntology("ServiceStepDuration");
-			myAgent.send(reply);
+			hardwareAgent.send(reply);
 		} catch(UnreadableException | IOException e) {
 			e.printStackTrace();
-			myAgent.doDelete();
+			hardwareAgent.doDelete();
 		}
 	}
 
@@ -196,7 +195,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 		catch(InvalidDBNamespaceException | GeneralMongoException e) 
 		{
 			Logger.log(LogLevel.ERROR, e);
-			myAgent.doDelete();
+			hardwareAgent.doDelete();
 		}
 	}
 }

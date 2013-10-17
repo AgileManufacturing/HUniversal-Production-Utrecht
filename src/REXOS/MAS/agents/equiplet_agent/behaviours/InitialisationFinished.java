@@ -80,11 +80,11 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
-	 *      The messageTemplate this behaviour listens to. This behaviour listens to the ontology:
-	 *      InitialisationFinished.
+	 * @var MessageTemplate MESSAGE_TEMPLATE
+	 *      The messageTemplate this behaviour listens to.
+	 *		This behaviour listens to the ontology: InitialisationFinished.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("InitialisationFinished");
+	private static MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("InitialisationFinished");
 
 	/**
 	 * @var EquipletAgent equipletAgent
@@ -97,11 +97,11 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 	/**
 	 * Instantiates a new can perform step.
 	 * 
-	 * @param a The agent for this behaviour
+	 * @param equipletAgent The agent for this behaviour
 	 */
-	public InitialisationFinished(EquipletAgent a) {
-		super(a, 3000, messageTemplate);
-		equipletAgent = a;
+	public InitialisationFinished(EquipletAgent equipletAgent) {
+		super(equipletAgent, 3000, MESSAGE_TEMPLATE);
+		this.equipletAgent = equipletAgent;
 		stateUpdateSubscription = new FieldUpdateSubscription("state", this);
 		stateUpdateSubscription.addOperation(MongoUpdateLogOperation.SET);
 	}
@@ -137,7 +137,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 			// starts the behaviour for receiving messages with the Ontology CanPerformStep.
 			equipletAgent.addBehaviour(new CanPerformStep(equipletAgent, equipletAgent.getProductStepBBClient()));
 
-			// starts the behaviour for receiving messages with the Ontology GetProductionDuration.
+			// starts the behaviour for receiving messages with the Ontology ProductionDuration.
 			equipletAgent.addBehaviour(new ProductionDuration(equipletAgent));
 
 			// starts the behaviour for receiving messages with the Ontology ScheduleStep.
@@ -176,7 +176,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
 			Logger.log(LogLevel.ERROR, e);
 			// Cannot add myself on the collective BB, so remove the agent since it cannot be found by product agents 
-			myAgent.doDelete();
+			equipletAgent.doDelete();
 		}
 	}
 }

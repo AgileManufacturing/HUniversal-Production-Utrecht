@@ -1,6 +1,6 @@
 /**
- * @file rexos/mas/service_agent/behaviours/CheckForModulesResponse.java
- * @brief Handles the CheckForModulesResponse message from the hardwareAgent that indicates whether all required modules
+ * @file rexos/mas/service_agent/behaviours/RequiredModulesPresent.java
+ * @brief Handles the RequiredModulesPresent message from the hardwareAgent that indicates whether all required modules
  *        for a service are present.
  * @date Created: 10 oct. 2013
  * 
@@ -61,43 +61,63 @@ public class RequiredModulesPresent extends ReceiveBehaviour {
 	 */
 	private static final long serialVersionUID = -7514590874724120963L;
 	
+	/**
+	 * @var MessageTemplate MESSAGE_TEMPLATE
+	 *      The messageTemplate to match the messages.
+	 */
 	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("RequiredModulesPresent");
+	
 	/**
 	 * @var ServiceAgent agent
 	 *      The service agent this behaviour belongs to.
 	 */
 	private ServiceAgent serviceAgent;
 
+	/**
+	 * @var ParentBehaviourCallback parentBehaviourCallback
+	 * 		The parentbehaviour callback this redirect calls back to
+	 */
 	private ParentBehaviourCallback parentBehaviourCallback;
 	
-	private Object contentObject;
+	/**
+	 * @var int[] moduleGroupIds
+	 * 		The ModuleGroup Ids used to check required modules
+	 */
+	private int[] moduleGroupIds;
 	
-	private String conversationID;
+	/**
+	 * @var String conversationId
+	 * 		The conversationId used for the message
+	 */
+	private String conversationId;
 
 	/**
-	 * Creates a new ArePartsAvailableResponse instance with the specified parameters.
+	 * Creates a new RequiredModulesPresentfffvc instance with the specified parameters.
 	 * 
-	 * @param agent the agent this behaviour belongs to.
+	 * @param serviceAgent the agent this behaviour belongs to.
+	 * @param parentBehaviourCallback the parentbehaviour this behaviour calls back to 
+	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
+	 * @param moduleGroupIds The ModuleGroup Ids used to check required modules
 	 */
-	public RequiredModulesPresent(ServiceAgent agent, ParentBehaviourCallback parentBehaviourCallback,
-			String conversationID, Object contentObject) {
-		super(agent, MESSAGE_TEMPLATE);
-		this.serviceAgent = agent;
+	public RequiredModulesPresent(ServiceAgent serviceAgent, ParentBehaviourCallback parentBehaviourCallback,
+			String conversationId, int[] moduleGroupIds) {
+		super(serviceAgent, MESSAGE_TEMPLATE);
+		this.serviceAgent = serviceAgent;
 		this.parentBehaviourCallback = parentBehaviourCallback;
 		
-		this.contentObject = contentObject;
-		this.conversationID = conversationID;
+		this.moduleGroupIds = moduleGroupIds;
+		this.conversationId = conversationId;
 	}
 
 	@Override
 	public void onStart(){
 		ACLMessage queryIFMessage = new ACLMessage(ACLMessage.QUERY_IF);
-		queryIFMessage.setConversationId(conversationID);
+		queryIFMessage.setConversationId(conversationId);
 		queryIFMessage.addReceiver(serviceAgent.getHardwareAgentAID());
 		queryIFMessage.setOntology("RequiredModulesPresent");
-		if (contentObject != null){
+		if (moduleGroupIds != null){
 			try {
-				queryIFMessage.setContentObject((Serializable)contentObject);
+				queryIFMessage.setContentObject(moduleGroupIds);
 			} catch (IOException e) {
 				Logger.log(LogLevel.ERROR, e);
 			}
@@ -106,10 +126,8 @@ public class RequiredModulesPresent extends ReceiveBehaviour {
 	
 	}
 	/**
-	 * Handles an incoming message from the hardwareAgent. The message confirms or disconfirms whether all modules
-	 * required for a service are present. Once a message is received a CanDoProductionStepResponse message is send to
-	 * the equipletAgent as an answer to the previously received CanDoProductionStep message. If a timeout occurs this
-	 * method will call doDelete() on the service agent.
+	 * Handles an incoming message from the hardwareAgent. Doens't do any logic and will callback to the parentbehaviour.
+	 * If a timeout occurs this method will call doDelete() on the service agent.
 	 * 
 	 * @param message the message to handle or null on timeout.
 	 */
@@ -120,6 +138,7 @@ public class RequiredModulesPresent extends ReceiveBehaviour {
 			serviceAgent.removeBehaviour(this);
 		} else {
 			Logger.log(LogLevel.WARNING, serviceAgent.getName() + " - CheckForModulesResponse timeout!");
+			serviceAgent.doDelete();
 		}
 	}
 }
