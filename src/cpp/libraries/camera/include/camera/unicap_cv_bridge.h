@@ -46,47 +46,47 @@ namespace unicap_cv_bridge {
 	 * @brief obtain a list of device names
 	 * @return devices will contain device names
 	 **/
-	std::vector<std::string> list_devices();
+	std::vector<std::string> listDevices();
 
 	/**
 	 * @brief obtain a list of formats
-	 * @param dev the device number
+	 * @param deviceIndex the device number
 	 * @return formats will contain format desciptions
 	 **/
-	std::vector<std::string> list_formats(int dev);
+	std::vector<std::string> listFormats(int deviceIndex);
 
 	/**
 	 * @brief obtain a list of properties
-	 * @param dev the device number
+	 * @param deviceIndex the device number
 	 * @return properties will contain properties
 	 **/
-	std::vector<std::string> list_properties(int dev);
+	std::vector<std::string> listProperties(int deviceIndex);
 	/**
 	 * @brief print a list of all connected devices with it's formats
 	 * @param out the output stream. Defaults to standard out
 	 **/
-	void print_devices_inventory(std::ostream& out = std::cout);
+	void printDevicesInventory(std::ostream& out = std::cout);
 
 	/**
 	 * @brief unicap exception
 	 **/
-	class unicap_cv_exception: public std::runtime_error {
+	class UnicapCvException: public std::runtime_error {
 	public:
-		unicap_cv_exception(const std::string& msg) :
+		UnicapCvException(const std::string& msg) :
 				std::runtime_error(msg) {
 		}
-		virtual ~unicap_cv_exception(void) throw () {
+		virtual ~UnicapCvException(void) throw () {
 		}
 	};
 
 	/**
 	 * @brief handle to unicap camera
 	 **/
-	class unicap_cv_camera {
+	class UnicapCvCamera {
 	private:
-		typedef enum _frame_cap_state {
+		typedef enum frameCapState {
 			FCSTATE_DONT_COPY, FCSTATE_COPY, FCSTATE_SUCCESS, FCSTATE_FAILURE
-		} frame_cap_state;
+		} frameCapState;
 
 		bool tripmode;
 
@@ -96,71 +96,71 @@ namespace unicap_cv_bridge {
 
 		boost::mutex mut;
 		boost::condition_variable cond;
-		frame_cap_state state;
+		frameCapState state;
 		cv::Mat* mat;
 
 	public:
 		/**
 		 * @brief constructs a unicap camera
 		 * @param dev device number
-		 * @param format format number
+		 * @param formatIndex format number
 		 **/
-		unicap_cv_camera(int dev, int format);
+		UnicapCvCamera(int dev, int formatIndex);
 
-		~unicap_cv_camera(void);
+		~UnicapCvCamera(void);
 
-		void set_trip_mode(bool tripmode);
+		void setTripMode(bool tripmode);
 
 		/**
 		 * @brief get white balance settings
 		 * @param blue out parameter
 		 * @param red out parameter
 		 **/
-		void get_white_balance(double& blue, double& red);
+		void getWhiteBalance(double& blue, double& red);
 
 		/**
 		 * @brief set white balance settings
 		 * @param blue blue
 		 * @param red red
 		 **/
-		void set_white_balance(double blue, double red);
+		void setWhiteBalance(double blue, double red);
 
 		/**
 		 * @brief set exposure
 		 * @param exposure exposure
 		 **/
-		void set_exposure(double exposure);
+		void setExposure(double exposure);
 
 		/**
 		 * @brief set auto white balance
 		 * @param automatic true for on, false otherwise
 		 **/
-		void set_auto_white_balance(bool automatic);
+		void setAutoWhiteBalance(bool automatic);
 
 		/**
 		 * @brief get outputed image width
 		 * @return image width
 		 **/
-		int get_img_width(void);
+		int getImgWidth(void);
 
 		/**
 		 * @brief get outputed image height
 		 * @return image height
 		 **/
-		int get_img_height(void);
+		int getImgHeight(void);
 
 		/**
 		 * @brief get outputed image format
 		 * @return image format
 		 **/
-		int get_img_format(void);
+		int getImgFormat(void);
 
 		/**
 		 * @brief callback function which gets called when a new frame is captured
 		 * @note should not be called by user
 		 * @param buffer buffer which holds the frame
 		 **/
-		void new_frame_cb(unicap_data_buffer_t* buffer);
+		void newFrameCallback(unicap_data_buffer_t* buffer);
 
 		/**
 		 * @brief get a frame
@@ -168,6 +168,6 @@ namespace unicap_cv_bridge {
 		 * this function blocks until a new frame is captured
 		 * @param mat the frame is copied into this matrix
 		 **/
-		void get_frame(cv::Mat* mat);
+		void getFrame(cv::Mat* mat);
 	};
 }
