@@ -35,9 +35,9 @@
 
 #include <stdexcept>
 
-CameraNode::CameraNode(int argc, char * argv[]) : it(nodeHandle), exposure(0.015), performFishEyeCorrection(true) {
+CameraNode::CameraNode(int argc, char * argv[]) : imgTransport(nodeHandle), exposure(0.015), performFishEyeCorrection(true) {
 	std::vector<std::string> devices;
-	unicap_cv_bridge::list_devices(devices);
+	devices = unicap_cv_bridge::listDevices();
 	std::cout << "Devices:" << std::endl;
 	for(int i = 0; i < devices.size(); i++){
 		std::cout << "\t" << devices[i] << std::endl;
@@ -50,23 +50,23 @@ CameraNode::CameraNode(int argc, char * argv[]) : it(nodeHandle), exposure(0.015
 		        << std::endl;
 		exit(1);
 	}
-	int device_number, format_number;
+	int deviceNumber, formatNumber;
 	try{
-		device_number = rexos_utilities::stringToInt(argv[1]);
+		deviceNumber = rexos_utilities::stringToInt(argv[1]);
 	} catch(std::runtime_error ex){
 		std::cerr << "Device number is not a valid number." << std::endl;
 		exit(2);
 	}
 	
 	std::vector<std::string> formats;
-	unicap_cv_bridge::list_formats(device_number, formats);
+	formats = unicap_cv_bridge::listFormats(deviceNumber);
 	std::cout << "Formats:" << std::endl;
 	for(int i = 0; i < formats.size(); i++){
 		std::cout << "\t" << formats[i] << std::endl;
 	}
 
 	try{
-		format_number = rexos_utilities::stringToInt(argv[2]);
+		formatNumber = rexos_utilities::stringToInt(argv[2]);
 	} catch(std::runtime_error ex){
 		std::cerr << "Format number is not a valid number." << std::endl;
 		exit(2);
@@ -75,15 +75,15 @@ CameraNode::CameraNode(int argc, char * argv[]) : it(nodeHandle), exposure(0.015
 	try {
 		// Connect to camera. On failure a exception will be thrown.
 		std::cout << "[DEBUG] Initializing camera" << std::endl;
-		cam = new unicap_cv_bridge::unicap_cv_camera(device_number, format_number);
-		cam->set_auto_white_balance(true);
-		cam->set_exposure(0.015);
-		camFrame = cv::Mat(cam->get_img_height(), cam->get_img_width(), cam->get_img_format());
+		cam = new unicap_cv_bridge::unicapCvCamera(deviceNumber, formatNumber);
+		cam->setAutoWhiteBalance(true);
+		cam->setExposure(0.015);
+		camFrame = cv::Mat(cam->getImgHeight(), cam->getImgWidth(), cam->getImgFormat());
 
 		std::cout << "[DEBUG] Starting camera lens distortion corrector" << std::endl;
 		rectifier = new Camera::RectifyImage();
 		
-		rectifier->setImageSize(cv::Size(cam->get_img_width(), cam->get_img_height()));
+		rectifier->setImageSize(cv::Size(cam->getImgWidth(), cam->getImgHeight()));
 		// xml file is optional, load if provided and start camera
 		if(argc >= 4){
 			if(!rectifier->loadXML(argv[3])) {
@@ -96,9 +96,9 @@ CameraNode::CameraNode(int argc, char * argv[]) : it(nodeHandle), exposure(0.015
 		}
 
 		std::cout << "[DEBUG] Opening /camera/image topic" << std::endl;
-		pub = it.advertise("camera/image", 1);
+		pub = imgTransport.advertise("camera/image", 1);
 
-	} catch(const unicap_cv_bridge::unicap_cv_exception & exception) {
+	} catch(const unicap_cv_bridge::UnicapCvException & exception) {
 		std::cerr << "unicap error: " << exception.what() << std::endl;
 		exit(5);
 	}
@@ -114,7 +114,7 @@ bool CameraNode::increaseExposure(std_srvs::Empty::Request &request, std_srvs::E
 	std::cout << exposure << std::endl;
 
 	if(cam) {
-		cam->set_exposure(exposure);
+		cam->setExposure(exposure);
 		return true;
 	} else {
 		return false;
@@ -127,7 +127,7 @@ bool CameraNode::decreaseExposure(std_srvs::Empty::Request &request, std_srvs::E
 	std::cout << exposure << std::endl;
 
 	if(cam) {
-		cam->set_exposure(exposure);
+		cam->setExposure(exposure);
 		return true;
 	} else {
 		return false;
@@ -138,7 +138,7 @@ bool CameraNode::decreaseExposure(std_srvs::Empty::Request &request, std_srvs::E
 bool CameraNode::autoWhiteBalance(camera_node::AutoWhiteBalance::Request& request, camera_node::AutoWhiteBalance::Response& response) {
 	std::cout << "[DEBUG] Service autoWhiteBalance " << (bool) request.enable << std::endl;
 	if(cam) {
-		cam->set_auto_white_balance(request.enable);
+		cam->setAutoWhiteBalance(request.enable);
 		return true;
 	} else {
 		return false;
@@ -234,7 +234,7 @@ void CameraNode::run() {
 	while(ros::ok()) {
 		if(isCameraEnabled) {
 			// Read image 
-			cam->get_frame(&camFrame);
+			cam->getFrame(&camFrame);
 			if(performFishEyeCorrection == true){
 				rectifier->rectify(camFrame, rectifiedCamFrame);
 			} else {

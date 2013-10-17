@@ -81,7 +81,7 @@ private:
 	cv::Mat rectifiedCamFrame;
 
 	ros::NodeHandle nodeHandle;
-	image_transport::ImageTransport it;
+	image_transport::ImageTransport imgTransport;
 	image_transport::Publisher pub;
 
 	int numberOfStableFrames;
