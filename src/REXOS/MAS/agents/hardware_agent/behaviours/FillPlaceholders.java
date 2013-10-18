@@ -1,5 +1,3 @@
-package agents.hardware_agent.behaviours;
-
 /**
  * @file rexos/mas/hardware_agent/behaviours/FillPlaceholders.java
  * @brief
@@ -48,6 +46,7 @@ package agents.hardware_agent.behaviours;
  *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *          SUCH DAMAGE.
  **/
+package agents.hardware_agent.behaviours;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
@@ -85,10 +84,10 @@ public class FillPlaceholders extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
+	 * @var MessageTemplate MESSAGE_TEMPLATE
 	 *      The messageTemplate to match the messages to.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("FillPlaceholders");
+	private static MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("FillPlaceholders");
 
 	/**
 	 * @var HardwareAgent hardwareAgent
@@ -107,9 +106,9 @@ public class FillPlaceholders extends ReceiveBehaviour {
 	 * @param a the agent
 	 * @param moduleFactory the moduleFactory
 	 */
-	public FillPlaceholders(Agent a, ModuleFactory moduleFactory) {
-		super(a, messageTemplate);
-		hardwareAgent = (HardwareAgent) a;
+	public FillPlaceholders(HardwareAgent hardwareAgent, ModuleFactory moduleFactory) {
+		super(hardwareAgent, MESSAGE_TEMPLATE);
+		this.hardwareAgent = hardwareAgent;
 		this.moduleFactory = moduleFactory;
 	}
 
@@ -176,7 +175,7 @@ public class FillPlaceholders extends ReceiveBehaviour {
 		catch(InvalidDBNamespaceException | GeneralMongoException e) 
 		{
 			Logger.log(LogLevel.ERROR, e);
-			myAgent.doDelete();
+			hardwareAgent.doDelete();
 		}
 	}
 }

@@ -50,21 +50,21 @@ public class OtherAgentDied extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 	
 	/**
-	 * @var ServicAgent agent
+	 * @var ServicAgent serviceAgent
 	 * 		The serviceAgent linked to this behaviour.
 	 */
-	private ServiceAgent agent;
+	private ServiceAgent serviceAgent;
 
 	/**
 	 * Constructor for this behaviour.
 	 * 
-	 * @param agent
-	 * 		The agent linked to this behaviour
+	 * @param serviceAgent
+	 * 		The serviceAgent linked to this behaviour
 	 */
-	public OtherAgentDied(ServiceAgent agent) {
-		super(agent, MessageTemplate.or(MessageTemplate.MatchOntology("EquipletAgentDied"),
+	public OtherAgentDied(ServiceAgent serviceAgent) {
+		super(serviceAgent, MessageTemplate.or(MessageTemplate.MatchOntology("EquipletAgentDied"),
 				MessageTemplate.MatchOntology("HardwareAgentDied")));
-		this.agent = agent;
+		this.serviceAgent = serviceAgent;
 	}
 
 	/* (non-Javadoc)
@@ -73,11 +73,11 @@ public class OtherAgentDied extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if(message.getOntology().equals("EquipletAgentDied")) {
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-			msg.addReceiver(agent.getHardwareAgentAID());
+			msg.addReceiver(serviceAgent.getHardwareAgentAID());
 			msg.setOntology("ServiceAgentDied");
-			agent.send(msg);
+			serviceAgent.send(msg);
 		} else {
-			agent.doDelete();
+			serviceAgent.doDelete();
 		}
 	}
 }

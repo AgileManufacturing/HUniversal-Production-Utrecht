@@ -1,3 +1,34 @@
+/**
+* @file REXOS/MAS/equiplet_agent/behaviours/CanPerformProductionStep.java
+* @brief Redirecting behaviour for handling the messages with the ontology CanPerformProductionStep
+* @date Created: 2013-04-02
+*
+* @author Hessel Meulenbeld
+* 		  Roy Scheefhals
+*
+* @section LICENSE
+* License: newBSD
+*
+* Copyright � 2013, HU University of Applied Sciences Utrecht.
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+* - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+* - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+* - Neither the name of the HU University of Applied Sciences Utrecht nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+* "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+* THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT
+* BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+* GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+* LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+* OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**/
+
 package agents.equiplet_agent.behaviours;
 
 import java.io.IOException;
@@ -28,9 +59,9 @@ public class CanPerformProductionStep extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
+	 * @var MessageTemplate MESSAGE_TEMPLATE
 	 *      The messageTemplate this behaviour listens to.
-	 *      This behaviour listens to the ontology: CanDoProductionStepResponse.
+	 *      This behaviour listens to the ontology: CanPerformProductionStep.
 	 */
 	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("CanPerformProductionStep");
 
@@ -40,45 +71,59 @@ public class CanPerformProductionStep extends ReceiveBehaviour {
 	 */
 	private EquipletAgent equipletAgent;
 	/**
-	 * @var BlackboardClient equipletBBClient
-	 * BlackboardClient for the product step blackboard.
+	 * @var BlackboardClient productStepsBlackboard
+	 * 		BlackboardClient for the product step blackboard.
 	 */
-	private BlackboardClient productStepBB;
+	private BlackboardClient productStepsBlackboard;
 
+	/**
+	 * @var ParentBehaviourCallback parentBehaviourCallback
+	 * 		The behaviour this behaviour calls back to
+	 */
 	private ParentBehaviourCallback parentBehaviourCallback;
 	
-	private Object contentObject;
-	private String conversationID;
+	/**
+	 * @var ObjectId objectId
+	 * 		The ObjectId used to check the production step
+	 */
+	private ObjectId objectId;
+	
+	/**
+	 * @var String conversationID
+	 * 		The ConversationId used for the message sent
+	 */
+	private String conversationId;
+	
 	/**
 	 * Instantiates a new can do production step response.
 	 * 
-	 * @param a
+	 * @param equipletAgent
 	 *      The agent for this behaviour
-	 * @param productStepBB
+	 * @param productStepBlackBoard
 	 * 		BlackboardClient for the product step blackboard.            
 	 * @throws IOException Throws IOException when contentObject cannot be serialized
 	 */
 	public CanPerformProductionStep(EquipletAgent equipletAgent,
-			BlackboardClient productStepBB, ParentBehaviourCallback parentBehaviourCallback,
-			String conversationID, Object contentObject){
+			BlackboardClient productStepsBlackboard, ParentBehaviourCallback parentBehaviourCallback,
+			String conversationID, ObjectId objectId){
 		super(equipletAgent, MESSAGE_TEMPLATE);
 		this.equipletAgent =  equipletAgent;
-		this.productStepBB = productStepBB;
+		this.productStepsBlackboard = productStepsBlackboard;
 		this.parentBehaviourCallback = parentBehaviourCallback;
 		
-		this.contentObject = contentObject;
-		this.conversationID = conversationID;
+		this.objectId = objectId;
+		this.conversationId = conversationID;
 	}
 	
 	@Override
 	public void onStart(){
 		ACLMessage queryIFMessage = new ACLMessage(ACLMessage.QUERY_IF);
-		queryIFMessage.setConversationId(conversationID);
+		queryIFMessage.setConversationId(conversationId);
 		queryIFMessage.addReceiver(equipletAgent.getServiceAgent());
 		queryIFMessage.setOntology("CanPerformProductionStep");
-		if (contentObject != null){
+		if (objectId != null){
 			try {
-				queryIFMessage.setContentObject((Serializable)contentObject);
+				queryIFMessage.setContentObject(objectId);
 			} catch (IOException e) {
 				Logger.log(LogLevel.ERROR, e);
 			}
@@ -111,7 +156,7 @@ public class CanPerformProductionStep extends ReceiveBehaviour {
 			// if the productstep can not be done by this equiplet remove it from the blackboard.
 			else if (message.getPerformative() == ACLMessage.DISCONFIRM){
 				try{
-				productStepBB.removeDocuments(new BasicDBObject("_id",
+				productStepsBlackboard.removeDocuments(new BasicDBObject("_id",
 						productStepEntryId));
 				}catch (GeneralMongoException | InvalidDBNamespaceException e) {
 					Logger.log(LogLevel.ERROR, e);

@@ -1,6 +1,6 @@
 /**
- * @file rexos/mas/service_agent/behaviours/CanDoProductStep.java
- * @brief Handles the CanDoProductStep message that the equipletAgent sends to ask whether the equiplet is able to
+ * @file rexos/mas/service_agent/behaviours/CanPerformProductionStep.java
+ * @brief Handles the CanPerformProductionStep message that the equipletAgent sends to ask whether the equiplet is able to
  *        perform a certain productStep.
  * @date Created: 20 apr. 2013
  * 
@@ -59,7 +59,7 @@ import agents.shared_behaviours.ReceiveBehaviour;
 import com.mongodb.BasicDBObject;
 
 /**
- * This behaviour handles the CanDoProductStep message. The equipletAgent sends this message to ask whether the equiplet
+ * This behaviour handles the CanPerformProductionStep message. The equipletAgent sends this message to ask whether the equiplet
  * is able to perform a certain productStep. It will generate a timeout after 2 seconds if no message is received.
  * 
  * @author Peter Bonnema
@@ -73,6 +73,12 @@ public class CanPerformProductionStep extends ReceiveBehaviour implements Parent
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * @var MessageTemplate MESSAGE_TEMPLATE
+	 *      The messageTemplate to match the messages.
+	 */
+	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("CanPerformProductionStep");
+	
+	/**
 	 * @var ServiceAgent agent
 	 *      The service agent this behaviour belongs to.
 	 */
@@ -81,11 +87,11 @@ public class CanPerformProductionStep extends ReceiveBehaviour implements Parent
 	/**
 	 * Creates a new CanDoProductStep instance with the specified parameters.
 	 * 
-	 * @param agent the agent this behaviour belongs to.
+	 * @param serviceAgent the agent this behaviour belongs to.
 	 */
-	public CanPerformProductionStep(ServiceAgent agent) {
-		super(agent, MessageTemplate.MatchOntology("CanPerformProductionStep"));
-		this.serviceAgent = agent;
+	public CanPerformProductionStep(ServiceAgent serviceAgent) {
+		super(serviceAgent, MESSAGE_TEMPLATE);
+		this.serviceAgent = serviceAgent;
 	}
 
 	/**
@@ -147,9 +153,13 @@ public class CanPerformProductionStep extends ReceiveBehaviour implements Parent
 			}
 		}
 	}
-
+	/**Handles the callback of the RequiredModulesPresent. The message confirms or disconfirms whether all modules
+	 * required for a service are present. Once a message is received a CanPerformProductionStep message is send to
+	 * the equipletAgent as an answer to the previously received CanPerformProductionStep message.
+	 **/
 	@Override
 	public void callback(ACLMessage result, BehaviourCallbackItem arguments) {
+		
 		ACLMessage reply = new ACLMessage(result.getPerformative());
 		reply.setConversationId(result.getConversationId());
 		reply.addReceiver(serviceAgent.getEquipletAgentAID());

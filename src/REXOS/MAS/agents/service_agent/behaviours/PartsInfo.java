@@ -1,6 +1,6 @@
 /**
- * @file rexos/mas/service_agent/behaviours/GetPartsInfoResponse.java
- * @brief Handles the GetPartsInfoResponse message which is an answer to GetPartsInfo and contains positional
+ * @file rexos/mas/service_agent/behaviours/PartsInfo.java
+ * @brief Handles the PartsInfo message which is an answer to PartsInfo and contains positional
  *        information about the specified parts.
  * @date Created: 23 apr. 2013
  * 
@@ -68,8 +68,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 /**
- * This behaviour handles the GetPartsInfoResponse message. This is an answer from the logistics agent for
- * the message GetPartsInfo. The answer will contain positional information about the specified parts. It will generate
+ * This behaviour handles the PartsInfo message. This is an answer from the logistics agent for
+ * the message PartsInfo. The answer will contain positional information about the specified parts. It will generate
  * a timeout after a specified period if no message is received.
  * 
  * @author Peter Bonnema
@@ -81,30 +81,48 @@ public class PartsInfo extends ReceiveBehaviour {
 	 *      The serialVersionUID of this class.
 	 */
 	private static final long serialVersionUID = -7419729795873947786L;
-
+	
 	/**
-	 * @var ServiceAgent agent
+	 * @var MessageTemplate MESSAGE_TEMPLATE
+	 *      The messageTemplate to match the messages.
+	 */
+	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("PartsInfo");
+	
+	/**
+	 * @var ServiceAgent serviceAgent
 	 *      The service agent this behaviour belongs to.
 	 */
 	private ServiceAgent serviceAgent;
 
+	/**
+	 * @var ParentBehaviourCallback parentBehaviourCallback
+	 * 		The parentbehaviour callback this redirect calls back to
+	 */
 	private ParentBehaviourCallback parentBehaviourCallback;
-
+	
+	/**
+	 * @var ProductStep productStep
+	 * 		The ProductStep object used for the message
+	 */
 	private ProductStep productStep;
 
+	/**
+	 * @var String conversationId
+	 * 		The conversationId used for the message
+	 */
 	private String conversationID;
 
 	/**
 	 * Creates a new GetPartsInfoResponse instance with the specified parameters.
 	 * 
-	 * @param agent the agent this behaviour belongs to.
-	 * @param millis the timeout period in milliseconds.
+	 * @param serviceAgent the serviceAgent this behaviour belongs to.
+	 * @param parentBehaviourCallback the behaviour callback to.
 	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
 	 * @param productStep The productStep from which the parts come.
 	 */
 	public PartsInfo(ServiceAgent serviceAgent, ParentBehaviourCallback parentBehaviourCallback,
 			String conversationID, ProductStep productStep) {
-		super(serviceAgent, MessageTemplate.MatchOntology("PartsInfo"));
+		super(serviceAgent, MESSAGE_TEMPLATE);
 		this.serviceAgent = serviceAgent;
 		
 		this.parentBehaviourCallback = parentBehaviourCallback;
@@ -173,7 +191,6 @@ public class PartsInfo extends ReceiveBehaviour {
 
 				for(Entry<Part, Position> e : partParameters.entrySet()) {
 					if(e.getValue() == null) {
-						Logger.log(LogLevel.DEBUG, "");
 						productStepBBClient.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject(
 								"$set", new BasicDBObject("outputPart", e.getKey().toBasicDBObject())));
 						partParameters.remove(e.getKey());

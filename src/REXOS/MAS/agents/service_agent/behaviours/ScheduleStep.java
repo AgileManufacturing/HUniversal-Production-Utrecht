@@ -73,6 +73,12 @@ public class ScheduleStep extends ReceiveBehaviour implements ParentBehaviourCal
 	private static final long serialVersionUID = -346155137703956948L;
 
 	/**
+	 * @var MessageTemplate MESSAGE_TEMPLATE
+	 *      The messageTemplate to match the messages.
+	 */
+	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("ScheduleStep");
+	
+	/**
 	 * @var ServiceAgent agent
 	 *      The service agent this behaviour belongs to.
 	 */
@@ -81,10 +87,10 @@ public class ScheduleStep extends ReceiveBehaviour implements ParentBehaviourCal
 	/**
 	 * Creates a new ScheduleStep instance with the specified parameters.
 	 * 
-	 * @param serviceAgent the agent this behaviour belongs to.
+	 * @param serviceAgent the service agent this behaviour belongs to.
 	 */
 	public ScheduleStep(ServiceAgent serviceAgent) {
-		super(serviceAgent, MessageTemplate.MatchOntology("ScheduleStep"));
+		super(serviceAgent, MESSAGE_TEMPLATE);
 		this.serviceAgent = serviceAgent;
 	}
 
@@ -135,12 +141,15 @@ public class ScheduleStep extends ReceiveBehaviour implements ParentBehaviourCal
 			break;
 			
 		case "ArePartsAvailableInTime":
+			ProductStep test = (ProductStep) arguments.getArgument("productStep");
+			Logger.log(LogLevel.DEBUG, "Productstep: " + test);
 			serviceAgent.addBehaviour(new PartsInfo(serviceAgent, this, result.getConversationId(),
 					(ProductStep) arguments.getArgument("productStep")));
 			break;
-			//TODO: Fillplaceholders message has to be sent, but there is no response.. so creating a new behaviour is quite too much..
-			//for now we just send the message.
+			
 		case "PartsInfo":
+			//TODO: Fillplaceholders message has to be sent, but there is no response.. so creating a new behaviour is now not viable..
+			//for now we just send the message.
 			System.out.println("message sent: Fillplaceholders");
 			ACLMessage informMsg = new ACLMessage(ACLMessage.INFORM);
 			informMsg.setOntology("FillPlaceholders");

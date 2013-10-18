@@ -75,11 +75,11 @@ public class AbortStep extends ReceiveBehaviour {
 	private static final long serialVersionUID = -9022585847666136289L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
+	 * @var MessageTemplate MESSAGE_TEMPLATE
 	 *      The messageTemplate this behaviour
 	 *      listens to. This behaviour listens to the ontology: AbortStep.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("AbortStep");
+	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("AbortStep");
 
 	/**
 	 * @var EquipletAgent equipletAgent
@@ -91,11 +91,11 @@ public class AbortStep extends ReceiveBehaviour {
 	/**
 	 * Instantiates a new can perform step.
 	 * 
-	 * @param agent The agent for this behaviour
+	 * @param equipletAgent The EsquipletAgent for this behaviour
 	 */
-	public AbortStep(EquipletAgent agent) {
-		super(agent, messageTemplate);
-		equipletAgent = agent;
+	public AbortStep(EquipletAgent equipletAgent) {
+		super(equipletAgent, MESSAGE_TEMPLATE);
+		this.equipletAgent = equipletAgent;
 	}
 
 	/**

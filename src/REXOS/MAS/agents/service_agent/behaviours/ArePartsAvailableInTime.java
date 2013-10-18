@@ -1,6 +1,6 @@
 /**
- * @file rexos/mas/service_agent/behaviours/ArePartsAvailableInTimeResponse.java
- * @brief Handles the ArePartsAvailableInTimeResponse message which is an answer to ArePartsAvailableInTime and
+ * @file rexos/mas/service_agent/behaviours/ArePartsAvailableInTime.java
+ * @brief Handles the ArePartsAvailableInTime message which is an answer to ArePartsAvailableInTime and
  *        indicates whether the specified parts will be available in time.
  * @date Created: 23 apr. 2013
  * 
@@ -39,8 +39,6 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.io.IOException;
-import java.io.Serializable;
-
 import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
@@ -59,7 +57,7 @@ import agents.shared_behaviours.ReceiveBehaviour;
 import com.mongodb.BasicDBObject;
 
 /**
- * This behaviour handles the ArePartsAvailableInTimeResponse message. This is an answer from the logistics agent for
+ * This behaviour handles the ArePartsAvailableInTime message. This is an answer from the logistics agent for
  * the message ArePartsAvailableInTime. The answer will indicate whether the specified parts will be available to
  * the equiplet in time. It will generate a timeout after a specified period if no message is received.
  * 
@@ -74,42 +72,61 @@ public class ArePartsAvailableInTime extends ReceiveBehaviour {
 	private static final long serialVersionUID = -2279562050278151393L;
 
 	/**
+	 * @var MessageTemplate MESSAGE_TEMPLATE
+	 *      The messageTemplate to match the messages.
+	 */
+	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("ArePartsAvailableInTime");
+	
+	/**
 	 * @var ServiceAgent agent
 	 *      The service agent this behaviour belongs to.
 	 */
 	private ServiceAgent serviceAgent;
 
+	/**
+	 * @var ParentBehaviourCallback parentBehaviourCallback
+	 * 		The parentbehaviour callback this redirect calls back to
+	 */
 	private ParentBehaviourCallback parentBehaviourCallback;
 
+	/**
+	 * @var ProductStep productStep
+	 * 		The ProductStep object used for the message
+	 */
 	private ProductStep productStep;
 
-	private String conversationID;
+	/**
+	 * @var String conversationId
+	 * 		The conversationId used for the message
+	 */
+	private String conversationId;
 
 	/**
-	 * Creates a new ArePartsAvailableInTimeResponse instance with the specified parameters.
+	 * Creates a new ArePartsAvailableInTime instance with the specified parameters.
 	 * 
-	 * @param agent the agent this behaviour belongs to.
-	 * @param millis the timeout period in milliseconds.
+	 * @param serviceAgent the agent this behaviour belongs to.
+	 * @param parentBehaviourCallback the parentbehaviour this behaviour calls back to 
 	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
 	 * @param productStep The productStep from which the parts come.
 	 */
 	public ArePartsAvailableInTime(ServiceAgent serviceAgent, ParentBehaviourCallback parentBehaviourCallback,
-			String conversationID, ProductStep productStep) {
-		super(serviceAgent, MessageTemplate.MatchOntology("ArePartsAvailableInTime"));
+			String conversationId, ProductStep productStep) {
+		super(serviceAgent, MESSAGE_TEMPLATE);
 		this.serviceAgent = serviceAgent;
 		
 		this.parentBehaviourCallback = parentBehaviourCallback;
 		
 		this.productStep = productStep;
-		this.conversationID = conversationID;
+		this.conversationId = conversationId;
 	}
-
+	
 	@Override
 	public void onStart(){
 
+		Logger.log(LogLevel.DEBUG, "Sent message arepartsavailableintime SERVICEAGENT!!");
 		ACLMessage responseMessage = new ACLMessage(ACLMessage.QUERY_IF);
 		responseMessage.addReceiver(serviceAgent.getLogisticsAID());
-		responseMessage.setConversationId(conversationID);
+		responseMessage.setConversationId(conversationId);
 		if (productStep != null){
 			try {
 				responseMessage.setContentObject(productStep.getInputParts());
