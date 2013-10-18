@@ -129,6 +129,8 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 	rexos_statemachine::SetInstructionResult result_;
 	result_.OID = goal->OID;
 
+	//TODOOO : check for added env. cache data in payload..
+
     JSONNode::const_iterator i = n.begin();
 
     while (i != n.end()){

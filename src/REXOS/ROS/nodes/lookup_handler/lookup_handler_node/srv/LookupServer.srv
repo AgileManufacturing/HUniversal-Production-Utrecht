@@ -1,4 +1,3 @@
 LookupMessage lookupMsg
 ---
-
-bool succeeded
+LookupMessage lookupMsg

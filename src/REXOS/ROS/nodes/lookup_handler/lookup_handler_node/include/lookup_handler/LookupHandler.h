@@ -38,9 +38,11 @@
 #include "lookup_handler/LookupMessage.h"
 
 namespace EnvironmentCommunication{
+	
 	/** 
 	 * Will request data from environmentcache, and combine the data with the data in the lookupRequest. After combining it, send it back to equipletNode
 	 **/
+
 	class LookupHandler{
 		public:
 			LookupHandler();
@@ -50,14 +52,15 @@ namespace EnvironmentCommunication{
 			 * @var ros::ServiceClient lookupClient
 			 * the client that will call the service in environmentCache
 			 **/
-			ros::ServiceClient lookupClient;
+			ros::ServiceClient lookupEnvironmentClient;
 			/**
 			 * @var ros::ServiceServer lookupServer
 			 * the service for the equipletNode
 			 **/
 			ros::ServiceServer lookupServer;
 
-			void createMapFromVector(const std::vector<environment_communication_msgs::KeyValuePair> &vector, std::map<std::string, std::string> &map);
+			environment_communication_msgs::Map createMessageFromMap(std::map<std::string, std::string> &Map);
+			std::map<std::string, std::string> createMapFromVector(const std::vector<environment_communication_msgs::KeyValuePair> &vector);
 	};
 }
 #endif
