@@ -88,7 +88,7 @@ namespace rexos_delta_robot{
 		 * @var double BOUNDARY_BOX_MAX_X
 		 * The max x-coordinate of the effector boundary box in millimeters.
 		 **/
- 		const double BOUNDARY_BOX_MAX_X = 500;
+ 		const double BOUNDARY_BOX_MAX_X = 50;
 
  		/**
 		 * @var double BOUNDARY_BOX_MAX_Y
