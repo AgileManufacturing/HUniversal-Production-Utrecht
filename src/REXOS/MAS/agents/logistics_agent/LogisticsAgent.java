@@ -4,6 +4,7 @@
  * @date Created: 22 apr. 2013
  *
  * @author Peter Bonnema
+ * @author Roy Scheefhals
  *
  * @section LICENSE
  * License: newBSD
@@ -76,12 +77,22 @@ public class LogisticsAgent extends Agent {
 		}
 	}	
 	
-	public synchronized Part getBallPart(){
+	public synchronized Entry<Part, Position> getBallPart(){
 		Iterator<Entry<Part, Position>> it = supplyCrateContent.entrySet().iterator();
 		if(it.hasNext()) {
-			return it.next().getKey();
+			Entry<Part, Position> ball = it.next();
+			supplyCrateContent.remove(ball.getKey());
+			return ball;
 		}
 		return null;
+	}
+	
+	public synchronized boolean isBallPartAvailable(){
+		Iterator<Entry<Part, Position>> it = supplyCrateContent.entrySet().iterator();
+		if(it.hasNext()) {
+			return true;
+		}
+		return false;
 	}
 	
 	public synchronized Part getSupplyCrate(){

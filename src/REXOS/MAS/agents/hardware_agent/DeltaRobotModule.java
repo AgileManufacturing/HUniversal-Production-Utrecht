@@ -195,10 +195,10 @@ public class DeltaRobotModule extends Module {
 			Position position = new Position((BasicDBObject)parameters.get("position"));
 			
 			// fill the lookUpParameters
-			if(position.getRelativeToPart() == null) {
-				lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
-			} else {
+			if(position.getRelativeToPart() != null && position.getRelativeToPart().getId() != -1) {
 				lookUpParameters.put("ID", position.getRelativeToPart().getId());
+			} else {
+				lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
 			}
 
 			// fill the payload parameters
@@ -290,10 +290,10 @@ public class DeltaRobotModule extends Module {
 			Position position = new Position((BasicDBObject) parameters.get("position"));
 
 			// fill the lookUpParameters
-			if(position.getRelativeToPart() == null) {
-				lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
-			} else {
+			if(position.getRelativeToPart() != null && position.getRelativeToPart().getId() != -1) {
 				lookUpParameters.put("ID", position.getRelativeToPart().getId());
+			} else {
+				lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
 			}
 
 			// fill the payload parameters
@@ -346,10 +346,10 @@ public class DeltaRobotModule extends Module {
 			Position position = new Position((BasicDBObject) parameters.get("position"));
 
 			// fill in the lookUpParameters.
-			if(position.getRelativeToPart() == null || position.getRelativeToPart().getId() == -1) {
-				lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
-			} else {
+			if(position.getRelativeToPart() != null && position.getRelativeToPart().getId() != -1) {
 				lookUpParameters.put("ID", position.getRelativeToPart().getId());
+			} else {
+				lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
 			}
 
 			// fill in the payload parameters.

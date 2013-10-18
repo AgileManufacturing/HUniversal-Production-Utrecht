@@ -5,6 +5,7 @@
  * 
  * @author Thierry Gerritse
  * @author Hessel Meulenbeld
+ * @author Duncan Jenkins
  * 
  * @section LICENSE
  *          License: newBSD
@@ -81,7 +82,6 @@ public class GripperModule extends Module {
 	 */
 	@Override
 	public EquipletStep[] getEquipletSteps(int stepType, BasicDBObject parameters) {
-		Logger.log(LogLevel.DEBUG, "Getting Equiplet steps");
 		EquipletStep[] equipletSteps;
 		ArrayList<EquipletStep> steps;
 
@@ -92,7 +92,7 @@ public class GripperModule extends Module {
 		steps = new ArrayList<EquipletStep>();
 
 		//get the parameters and put extra values in it.
-		BasicDBObject moveParameters = (BasicDBObject) parameters.copy();
+		BasicDBObject moveParameters = new BasicDBObject();
 		moveParameters.put("extraSize", GRIPPER_SIZE);
 		moveParameters.put("position", new Position().toBasicDBObject());
 
@@ -123,7 +123,6 @@ public class GripperModule extends Module {
 
 		//convert the ArrayList to an array and return it.
 		equipletSteps = new EquipletStep[steps.size()];
-		Logger.log(LogLevel.DEBUG, "# of EQ steps: " + steps.size());
 		return steps.toArray(equipletSteps);
 	}
 
@@ -132,18 +131,21 @@ public class GripperModule extends Module {
 	 */
 	@Override
 	public EquipletStep[] fillPlaceHolders(EquipletStep[] steps, BasicDBObject parameters) {
-		Logger.log(LogLevel.DEBUG, "parameters: " + parameters.keySet());
+		//Logger.log(LogLevel.DEBUG, "parameters: " + parameters.keySet());
 		
 		//You have your crateID from the DBObject parameters.
 		//Get the cratePart from the knowledgeDB -- maybe store crate object instead of string.
 		//actually we have to get the specific crate dimensions etc. WE CAN HARDCODE THIS FOR THE MOMENT!
 		//translate the row/col to X,Y,Z ACCORDING to the crate dimensions.
 		
+		double crateDimension = 46; // 46mm x 46mm
+        double crateSlots = 4;
+        double crateSlotDimension = 11.5;
+        double crateSlotMidPoint = 5.75;
+        double extraSize = GRIPPER_SIZE;
+		
 		Part part = new Part((BasicDBObject)parameters.get("crate"));
-		Position position = new Position(parameters.getDouble("row"), parameters.getDouble("column"), part);
-		BasicDBObject newParameters = (BasicDBObject) parameters.copy();
-		newParameters.put("position", position.toBasicDBObject());
-		newParameters.put("relative_to_crate", part.getPartName());
+		Position position = new Position((parameters.getDouble("row") * crateSlotDimension + crateSlotMidPoint) - 23, (parameters.getDouble("column") * crateSlotDimension + crateSlotMidPoint) - 23, 5.0, part);
 		
 		//get the newest code of the movementModule.
 		int movementModuleId = findMovementModule(getConfiguration());
@@ -153,16 +155,43 @@ public class GripperModule extends Module {
 		ArrayList<EquipletStep> movementModuleSteps = new ArrayList<EquipletStep>();
 		//loop over all the given EquipletSteps.
 		for (EquipletStep step : steps) {
+			InstructionData instructionData = step.getInstructionData();
+			BasicDBObject lookUpParameters = instructionData.getLookUpParameters();
+			BasicDBObject payload = instructionData.getPayload();
+			
+			if(lookUpParameters.containsField("ID")) {
+				if(lookUpParameters.getString("ID").equals("RELATIVE-TO-PLACEHOLDER") && position.getRelativeToPart() != null) {
+					lookUpParameters.put("ID", position.getRelativeToPart().getPartName());
+				}
+			}
+
+			if(payload.containsField("x") && payload.getString("x").equals("X-PLACEHOLDER")) {
+				payload.put("x", position.getX());
+			}
+			
+			if(payload.containsField("y") && payload.getString("y").equals("Y-PLACEHOLDER")) {
+				payload.put("y", position.getY());
+			}
+			
+			if(payload.containsField("z") && payload.getString("z").equals("Z-PLACEHOLDER")) {
+				if(position.getZ() == null)	{
+					payload.put("z", 0 + extraSize);
+				} else {
+					payload.put("z", position.getZ() + extraSize);
+				}
+			}
+			
 			//If the step is made by the movementModule add it to the ArrayList.
-			if (step.getModuleId() == movementModule.getId()){
+			if (step.getModuleId() == movementModule.getId()) {
 				movementModuleSteps.add(step);
 			}
 		}
 		//let the movementModule fill in his steps.
-		EquipletStep[] temp = new EquipletStep[movementModuleSteps.size()];
-		movementModule.fillPlaceHolders(movementModuleSteps.toArray(temp), newParameters);
+		//EquipletStep[] temp = new EquipletStep[movementModuleSteps.size()];
+		//movementModule.fillPlaceHolders(movementModuleSteps.toArray(temp), newParameters);
 		//return the filled in steps.
-		return steps;
+		EquipletStep[] temp = new EquipletStep[movementModuleSteps.size()];
+		return movementModuleSteps.toArray(temp);
 	}
 
 	/**
@@ -212,10 +241,9 @@ public class GripperModule extends Module {
 	 */
 	private EquipletStep activateGripper(BasicDBObject parameters) {
 		BasicDBObject lookUpParameters = new BasicDBObject();
-		lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
 		
 		//create the instruction data.
-		InstructionData instructionData = new InstructionData("activate", "gripper", "FIND_ID", lookUpParameters, new BasicDBObject());
+		InstructionData instructionData = new InstructionData("activate", "gripper", "NULL", lookUpParameters, new BasicDBObject());
 		//create and return the step.
 		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(), new TimeData(1));
 	}
@@ -227,10 +255,9 @@ public class GripperModule extends Module {
 	 */
 	private EquipletStep deactivateGripper(BasicDBObject parameters) {
 		BasicDBObject lookUpParameters = new BasicDBObject();
-		lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
 		
 		//create instruction data.
-		InstructionData instructionData = new InstructionData("deactivate", "gripper", "FIND_ID", lookUpParameters, new BasicDBObject());
+		InstructionData instructionData = new InstructionData("deactivate", "gripper", "NULL", lookUpParameters, new BasicDBObject());
 		//create and return the step.
 		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(), new TimeData(1));
 	}

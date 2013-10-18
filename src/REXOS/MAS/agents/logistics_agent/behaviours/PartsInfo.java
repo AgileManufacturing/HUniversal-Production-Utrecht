@@ -4,6 +4,7 @@
  * @date Created: 22 apr. 2013
  * 
  * @author Peter Bonnema
+ * @author Duncan Jenkins
  * 
  * @section LICENSE
  *          License: newBSD
@@ -127,13 +128,12 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 					switch(part.getType()) {
 					case 1: // Red ball
 						// Grab a ball
-					//	Iterator<Entry<Part, Position>> it = supplyCrateContent.entrySet().iterator();
-					//	if(it.hasNext()) {
-					//		Part ball = it.next().getKey();
-					//		Position ballPosition = partParameters.remove(ball);
-							
-					//		partParameters.put(ball, ballPosition);
-					//	}
+						if(logisticsAgent.isBallPartAvailable()) {
+							Entry<Part, Position> ball = logisticsAgent.getBallPart();
+							partParameters.put(ball.getKey(), ball.getValue());
+						} else {
+							// Throw error
+						}
 						break;
 					case 2: // Crate
 						partParameters.put(logisticsAgent.getSupplyCrate(), new Position());
