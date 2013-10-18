@@ -70,19 +70,19 @@ namespace rexos_delta_robot{
 		 * @var double MOTOR_ROT_MIN
 		 * Mathematical minimum angle the motor is allowed to move to in radians.
 		 **/
-		const double MOTOR_ROT_MIN = rexos_utilities::degreesToRadians(-42);
+		const double MOTOR_ROT_MIN = rexos_utilities::degreesToRadians(-18);
 
 		/**
 		 * @var double MOTOR_ROT_MAX
 		 * Mathematical maximum angle the motor is allowed to move to in radians.
 		 **/
-		const double MOTOR_ROT_MAX = rexos_utilities::degreesToRadians(55);
+		const double MOTOR_ROT_MAX = rexos_utilities::degreesToRadians(43);
 		
 		/**
 		 * @var double MOTORS_FROM_ZERO_TO_TOP_POSITION
 		 * The angle from zero (horizontal) to the top position in radians.
 		 **/
-		const double MOTORS_FROM_ZERO_TO_TOP_POSITION = rexos_utilities::degreesToRadians(42.5); 
+		const double MOTORS_FROM_ZERO_TO_TOP_POSITION = rexos_utilities::degreesToRadians(20); 
 
 		/**
 		 * @var double BOUNDARY_BOX_MAX_X
