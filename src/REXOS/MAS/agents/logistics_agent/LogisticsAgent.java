@@ -30,9 +30,15 @@
  **/
 package agents.logistics_agent;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
+
 import jade.core.Agent;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
+import agents.data_classes.Part;
+import agents.data_classes.Position;
 import agents.logistics_agent.behaviours.ArePartsAvailable;
 
 /**
@@ -50,12 +56,41 @@ public class LogisticsAgent extends Agent {
 	 * Instantiates the agent and starts its behaviours.
 	 * @see jade.core.Agent#setup()
 	 */
+	
+
+	private Part supplyCratePart = new Part(2, 100, "GC4x4MB_1");
+	private Part productCratePart = new Part(2, 101, "GC4x4MB_2");
+	
+	private HashMap<Part, Position> supplyCrateContent = new HashMap<Part, Position>();
+	
 	@Override
 	public void setup() {
 		Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as a logistics agent.");
 		addBehaviour(new ArePartsAvailable(this));
+		
+		//fill the crate
+		for(int i = 0; i < 4; i++) {
+			for(int j = 0; j < 4; j++) {
+				supplyCrateContent.put(new Part(1, (i * 4) + j), new Position(j + 0.0, i + 0.0, supplyCratePart));
+			}
+		}
+	}	
+	
+	public synchronized Part getBallPart(){
+		Iterator<Entry<Part, Position>> it = supplyCrateContent.entrySet().iterator();
+		if(it.hasNext()) {
+			return it.next().getKey();
+		}
+		return null;
 	}
-
+	
+	public synchronized Part getSupplyCrate(){
+		return supplyCratePart;
+	}
+	
+	public synchronized Part getProductCrate(){
+		return productCratePart;
+	}
 	/**
 	 * 
 	 * @see jade.core.Agent#takeDown()

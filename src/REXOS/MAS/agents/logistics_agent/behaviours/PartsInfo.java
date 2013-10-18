@@ -101,16 +101,9 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 		super(logisticsAgent, millis, MessageTemplate.and(MESSAGE_TEMPLATE,
 				MessageTemplate.MatchConversationId(conversationId)));
 		this.logisticsAgent = logisticsAgent;
-		for(int i = 0; i < 4; i++) {
-			for(int j = 0; j < 4; j++) {
-				supplyCrateContent.put(new Part(1, (i * 4) + j), new Position(j + 0.0, i + 0.0, supplyCratePart));
-			}
-		}
+		
 	}
 	
-	private Part supplyCratePart = new Part(2, 100, "GC4x4MB_1");
-	private Part productCratePart = new Part(2, 101, "GC4x4MB_2");
-	public static HashMap<Part, Position> supplyCrateContent = new HashMap<Part, Position>();
 
 	/**
 	 * Handles GetPartsInfo messages and responds with a GetPartsInfoResponse.
@@ -143,8 +136,8 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 					//	}
 						break;
 					case 2: // Crate
-						partParameters.put(supplyCratePart, null);
-						partParameters.put(productCratePart, null);
+						partParameters.put(logisticsAgent.getSupplyCrate(), new Position());
+						partParameters.put(logisticsAgent.getProductCrate(), new Position());
 						break;
 					default:
 						partParameters.put(new Part(part.getType(), id++),
