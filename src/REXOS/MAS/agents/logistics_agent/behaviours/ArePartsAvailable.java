@@ -4,6 +4,8 @@
  * @date Created: 20 apr. 2013
  *
  * @author Peter Bonnema
+ * @author Roy Scheefhals
+ * @author Duncan Jenkins
  *
  * @section LICENSE
  * License: newBSD
@@ -93,8 +95,7 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 				switch(part.getType()) {
 				case 1: // Red ball needed
 					// check for balls available
-					Part ball = logisticsAgent.getBallPart();
-					if(ball == null) {
+					if(!logisticsAgent.isBallPartAvailable()) {
 						allPartsAvailable = false;
 					}
 					break;
@@ -124,7 +125,7 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 			logisticsAgent.send(reply);
 			
 			logisticsAgent.addBehaviour(new ArePartsAvailableInTime(logisticsAgent, message.getConversationId()));
-			Logger.log(LogLevel.DEBUG, "PartTypes { %s } are available%n", 0, (Object[]) parts);
+			//Logger.log(LogLevel.DEBUG, "PartTypes { %s } are available%n", 0, (Object[]) parts);
 		} catch (UnreadableException e) {
 			Logger.log(LogLevel.ERROR, e);
 			logisticsAgent.doDelete();
