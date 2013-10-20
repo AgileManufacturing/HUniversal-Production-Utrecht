@@ -144,10 +144,10 @@ namespace rexos_delta_robot{
 		int depth;
 
 		/**
-		 * @var bool* boundariesBitmap
+		 * @var int8_t* boundariesBitmap
 		 * A pointer to the boundaries bitmap. This bitmap is a one dimensional array of booleans, defaulted to false, where voxels are checked and set to true if they are reachable.
 		 **/
-		bool* boundariesBitmap;
+		int8_t* boundariesBitmap;
 
 		/**
 		 * @var InverseKinematicsModel& kinematics

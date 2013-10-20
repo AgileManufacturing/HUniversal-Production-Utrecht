@@ -60,9 +60,9 @@ namespace rexos_delta_robot{
         boundaries->depth = (Measures::BOUNDARY_BOX_MAX_Y  - Measures::BOUNDARY_BOX_MIN_Y) / voxelSize;
         
         // Create bitmap with value false for all voxels
-        boundaries->boundariesBitmap = new bool[boundaries->width * boundaries->height * boundaries->depth];
+        boundaries->boundariesBitmap = new int8_t[boundaries->width * boundaries->height * boundaries->depth];
         for(int i = 0; i < boundaries->width * boundaries->height * boundaries->depth; i++){
-        	boundaries->boundariesBitmap[i] = false;
+        	boundaries->boundariesBitmap[i] = -1;
         }
         boundaries->generateBoundariesBitmap();
         return boundaries;
@@ -107,7 +107,7 @@ namespace rexos_delta_robot{
 				|| temp.y > depth
 				|| temp.z < 0
 				|| temp.z > height
-				|| !boundariesBitmap[index]){
+				|| boundariesBitmap[index] != 0){
 				return false;
 			}
 		}
@@ -254,7 +254,7 @@ namespace rexos_delta_robot{
 				point.x -= voxelSize;
 				BitmapCoordinate startingVoxel = fromRealCoordinate(point);
 				cstack.push(startingVoxel);
-				boundariesBitmap[startingVoxel.x + startingVoxel.y * width + startingVoxel.z * width * depth] = true;
+				boundariesBitmap[startingVoxel.x + startingVoxel.y * width + startingVoxel.z * width * depth] = 1;
 				break;
 			}
 		}
@@ -263,7 +263,7 @@ namespace rexos_delta_robot{
 			point.x -= voxelSize;
 			BitmapCoordinate startingVoxel = fromRealCoordinate(point);
 			cstack.push(startingVoxel);
-			boundariesBitmap[startingVoxel.x + startingVoxel.y * width + startingVoxel.z * width * depth] = true;
+			boundariesBitmap[startingVoxel.x + startingVoxel.y * width + startingVoxel.z * width * depth] = 1;
 		}
 
 		// Start with the last added voxel on the stack and add new voxels to the stack. Do this until the valid borders (all valid voxels bordering unvalid voxels or the BOUNDARY_BOX_MAX/BOUNDARY_BOX_MIN_X/Y/Z box) of the valid voxel area are known (stack = empty).
@@ -287,7 +287,7 @@ namespace rexos_delta_robot{
 								    && hasInvalidNeighbours(BitmapCoordinate(x, y, z), pointValidityCache)){
 								BitmapCoordinate bitmapCoordinate = BitmapCoordinate(x, y, z);
 								cstack.push(bitmapCoordinate);
-								boundariesBitmap[index] = true;
+								boundariesBitmap[index] = 1;
 							}
 						}
 					}
@@ -320,8 +320,8 @@ namespace rexos_delta_robot{
 
 			for(unsigned int i = 0; i < ( sizeof(indices) / sizeof(indices[0]) ); i++){
 				if(indices[i] < ((width*height*depth))){
-					if(boundariesBitmap[indices[i]] == false){
-						boundariesBitmap[indices[i]] = true;
+					if(boundariesBitmap[indices[i]] == -1){
+						boundariesBitmap[indices[i]] = 0;
 						cstack.push(BitmapCoordinate(indices[i] % width, (indices[i] % (width * depth)) / width, indices[i] / (width * depth)));
 					}
 				}
