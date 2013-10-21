@@ -127,6 +127,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 	JSONNode instructionDataNode = libjson::parse(goal->json);
 	rexos_statemachine::SetInstructionResult result_;
 	result_.OID = goal->OID;
+	bool lookupIsSet = false;
 
     //construct a payload
     //construct lookupvalues.
@@ -136,8 +137,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
     JSONNode::const_iterator i = instructionDataNode.begin();
     while (i != instructionDataNode.end()){
         const char * nodeName = i -> name().c_str();
-
-	    //parse payload
+	    // parse payload
 	    // keep in mind that a payload may or may not contain all values. Use lastXYZ to determine these values if they are not set.
         if (strcmp(nodeName, "payload") == 0){
 			payloadPoint = parsePoint(*i);	
@@ -146,34 +146,27 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
         //Set lookup result
         //you can use parseNode(desiredName) to retrieve the value.
         if (strcmp(nodeName, "look_up_result") == 0){
-
-        	std::cout << "Parsing point." << std::endl;
-			Point p = parsePoint(*i);
 			normalX = rexos_utilities::stringToDouble(parseNodeValue("locationX", *i));
 			normalY = rexos_utilities::stringToDouble(parseNodeValue("locationY", *i));
 			angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *i));
-
+			lookupIsSet = true;
         }
-
         ++i;
     }
-
+    
     //we now have an angle, and 2 points. Lets work some magic.
 
-	//theta = deg2rad(angle); 
+    if(lookupIsSet) {
+		double cs = cos(angle);
+		double sn = sin(angle);
 
-	//TODO; make sure all this costly calculation doesnt happen when theres no lookup stuff happening.
+		rotatedX = normalX * cs - normalY * sn;
+		rotatedY = normalX * sn + normalY * cs;
 
-	double cs = cos(angle);
-	double sn = sin(angle);
+		payloadPoint.x += rotatedX;
+		payloadPoint.y += rotatedY;
+	}
 
-	rotatedX = normalX * cs - normalY * sn;
-	rotatedY = normalX * sn + normalY * cs;
-
-	payloadPoint.x += rotatedX;
-	payloadPoint.y += rotatedY;
-
-    //still need to add the 2 payloads, and calculate rotation.
 	if(moveToPoint(payloadPoint.x, payloadPoint.y, payloadPoint.z, payloadPoint.maxAcceleration)){
 		setInstructionActionServer.setSucceeded(result_);
 		return;

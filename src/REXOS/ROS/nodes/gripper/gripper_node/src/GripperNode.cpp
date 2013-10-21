@@ -88,28 +88,28 @@ GripperNode::~GripperNode() {
 }
 
 void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
-
-	JSONNode n = libjson::parse(goal->json);
+	JSONNode instructionDataNode = libjson::parse(goal->json);
 	rexos_statemachine::SetInstructionResult result_;
-
 	result_.OID = goal->OID;
 
-    JSONNode::const_iterator i = n.begin();
+    JSONNode::const_iterator i = instructionDataNode.begin();
 
-    //We want to retrieve the payload from the msg.
-	if (strcmp(i[4].name().c_str(), "payload") == 0){
-		if(true) { //if(grip) else (grab) ? lol ? parse msg and grip or grab
-			if(gripper->grab()){
+    while (i != instructionDataNode.end()){
+        const char * nodeName = i -> name().c_str();
+
+		if(strcmp(nodeName, "command") == 0) { 
+			if(strcmp(parseNodeValue("command", *i), "activate") == 0) {
+				gripper->grab();
 				setInstructionActionServer.setSucceeded(result_);
 				return;
-			}
-		} else {
-			if(gripper->release()) {
+			} else if(strcmp(parseNodeValue("command", *i), "deactivate") == 0)
+				gripper->release();
 				setInstructionActionServer.setSucceeded(result_);
 				return;
-			}
 		}
+    	++i;
 	}
+	std::cout << "Failed setting gripper" << std::enl;
 	setInstructionActionServer.setAborted(result_);
 }
 
@@ -198,6 +198,24 @@ bool GripperNode::release(gripper_node::Release::Request &req, gripper_node::Rel
 	return gripper->release();
 }
 
+std::string GripperNode::parseNodeValue(const std::string nodeName, const JSONNode & n){
+
+	JSONNode::const_iterator i = n.begin();
+	std::string result;
+	while(i != n.end()){
+		// get the JSON node name and value as a string
+		std::string node_name = i->name();
+
+		if(node_name == nodeName)
+		{
+			result = i->as_string();
+		} 
+
+		++i;
+	}
+
+	return result;
+}
 
 /**
  * Main that starts the gripper node and its statemachine.
