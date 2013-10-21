@@ -124,31 +124,62 @@ deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
 
 
 void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
-	std::cout << "Instruction received on deltarobot. Parsing.." << goal->json << std::endl;
-	JSONNode n = libjson::parse(goal->json);
+	JSONNode instructionDataNode = libjson::parse(goal->json);
 	rexos_statemachine::SetInstructionResult result_;
 	result_.OID = goal->OID;
 
-	//TODOOO : check for added env. cache data in payload..
+    //construct a payload
+    //construct lookupvalues.
+	Point payloadPoint;
+	double angle, normalX, normalY, rotatedX, rotatedY;
 
-    JSONNode::const_iterator i = n.begin();
+    JSONNode::const_iterator i = instructionDataNode.begin();
+    while (i != instructionDataNode.end()){
+        const char * nodeName = i -> name().c_str();
 
-    while (i != n.end()){
-        const char * node_name = i -> name().c_str();
-	    std::cout << "Node name: " << node_name << std::endl;
+	    //parse payload
+	    // keep in mind that a payload may or may not contain all values. Use lastXYZ to determine these values if they are not set.
+        if (strcmp(nodeName, "payload") == 0){
+			payloadPoint = parsePoint(*i);	
+        }
 
-        if (strcmp(node_name, "payload") == 0){
+        //Set lookup result
+        //you can use parseNode(desiredName) to retrieve the value.
+        if (strcmp(nodeName, "look_up_result") == 0){
 
         	std::cout << "Parsing point." << std::endl;
 			Point p = parsePoint(*i);
+			normalX = rexos_utilities::stringToDouble(parseNodeValue("locationX", *i));
+			normalY = rexos_utilities::stringToDouble(parseNodeValue("locationY", *i));
+			angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *i));
 
-			if(moveToPoint(p.x, p.y, p.z, p.maxAcceleration)){
-    			setInstructionActionServer.setSucceeded(result_);
-    			return;
-			}
         }
+
         ++i;
     }
+
+    //we now have an angle, and 2 points. Lets work some magic.
+
+	//theta = deg2rad(angle); 
+
+	//TODO; make sure all this costly calculation doesnt happen when theres no lookup stuff happening.
+
+	double cs = cos(angle);
+	double sn = sin(angle);
+
+	rotatedX = normalX * cs - normalY * sn;
+	rotatedY = normalX * sn + normalY * cs;
+
+	payloadPoint.x += rotatedX;
+	payloadPoint.y += rotatedY;
+
+    //still need to add the 2 payloads, and calculate rotation.
+	if(moveToPoint(payloadPoint.x, payloadPoint.y, payloadPoint.z, payloadPoint.maxAcceleration)){
+		setInstructionActionServer.setSucceeded(result_);
+		return;
+	}
+
+  	//finally move to point.
 	ROS_INFO("Failed moving to point");
 	setInstructionActionServer.setAborted(result_);
 }
@@ -291,27 +322,20 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
 		// get the JSON node name and value as a string
 		std::string node_name = i->name();
 
-		if(node_name == "x")
-		{
+		if(node_name == "x") {
 			p.x = i->as_float();
 			lastX = p.x;
 			xSet = true;
-		} 
-		else if(node_name == "y")
-		{
+		} else if(node_name == "y") {
 			p.y = i->as_float();
 			lastY = p.y;
 			ySet = true;
-		} 
-		else if(node_name == "z")
-		{
+		} else if(node_name == "z") {
 			p.z = i->as_float() + Z_OFFSET;
 			lastZ = p.z;
-		} 
-		else if(node_name == "maxAcceleration"){
+		} else if(node_name == "maxAcceleration"){
 			p.maxAcceleration = i->as_float();
 		}
-
 		++i;
 	}
 
@@ -324,9 +348,48 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
 	if(p.z  == 0){
 		p.z = lastZ;
 	}
-
 	return p;
 }
+
+deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parseLookup(const JSONNode & n){
+
+	Point p;
+	JSONNode::const_iterator i = n.begin();
+	while(i != n.end()){
+		// get the JSON node name and value as a string
+		std::string node_name = i->name();
+
+		if(node_name == "locationX") {
+			p.x = i->as_float();
+		} else if(node_name == "locationY") {
+			p.y = i->as_float();
+		} else if(node_name == "locationZ") {
+			p.z = i->as_float();
+		}
+		++i;
+	}
+	return p;
+}
+
+std::string deltaRobotNodeNamespace::DeltaRobotNode::parseNodeValue(const std::string nodeName, const JSONNode & n){
+
+	JSONNode::const_iterator i = n.begin();
+	std::string result;
+	while(i != n.end()){
+		// get the JSON node name and value as a string
+		std::string node_name = i->name();
+
+		if(node_name == nodeName)
+		{
+			result = i->as_string();
+		} 
+
+		++i;
+	}
+
+	return result;
+}
+
 
 /**
  * Parse a JSON string to a Point object

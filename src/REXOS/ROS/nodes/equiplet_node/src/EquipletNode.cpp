@@ -141,7 +141,6 @@ void EquipletNode::handleEquipletStep(rexos_datatypes::EquipletStep * step, mong
 				map<std::string, std::string> newPayload = callLookupHandler(instructionData.getLook_up(), instructionData.getLook_up_parameters(), instructionData.getPayload());
 				instructionData.setPayload(newPayload);
 			}
-
 			//we might still need to update the payload on the bb
 		    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
 

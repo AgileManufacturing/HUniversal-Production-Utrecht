@@ -49,13 +49,22 @@ EnvironmentCommunication::LookupHandler::LookupHandler(){
 bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookup_handler::LookupServer::Request &request, lookup_handler::LookupServer::Response &response){
 	// Construct a message for LookupEnvironmentObject service
 	environment_cache::LookupEnvironmentObject msg;
-	std::map<std::string, std::string>::iterator it;
 
 	std::map<std::string, std::string> payloadMap = createMapFromVector(request.lookupMsg.payLoad.map);
-	
+	std::map<std::string, std::string> lookupParametersMap = createMapFromVector(request.lookupMsg.lookupParameters.map);
+
+	//also need to return the normal payload if no data is appended.
+	response.lookupMsg.payLoad = request.lookupMsg.payLoad;
+
 	if(request.lookupMsg.lookupType.compare("LOOKUP-ID")) {
-		//TODO set the parameters for the lookup. ( eg lookupId )
-		msg.request.lookupID = "IAGK#4_CM2"; //lookup id from request.
+		std::map<std::string, std::string>::iterator iterator = lookupParametersMap.find("ID");
+		if (iterator == lookupParametersMap.end()) { 
+			return false; //nothing found.
+		}
+		else { 
+			msg.request.lookupID = iterator->first; //lookup id from request.
+		}
+
 		if(lookupEnvironmentClient.call(msg)) {
 			if(msg.response.found) {
 				//only need to append the environment data. The module itself will handle the appended data.
