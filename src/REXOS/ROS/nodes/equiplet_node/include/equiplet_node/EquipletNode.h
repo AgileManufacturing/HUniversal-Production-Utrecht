@@ -81,11 +81,14 @@ private:
 	virtual void onStateChanged();
 	virtual void onModeChanged();
 
-	void callLookupHandler(std::string lookupType, std::string lookupID, std::map<std::string, std::string> payloadMap);
+	std::map<std::string, std::string> callLookupHandler(std::string lookupType, std::map<std::string, std::string> lookupParameters, std::map<std::string, std::string> payloadMap);
 
 	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
 
-	environment_communication_msgs::Map createMapMessage(std::map<std::string, std::string> &Map);
+	environment_communication_msgs::Map createMessageFromMap(std::map<std::string, std::string> &Map);
+	map<std::string, std::string> createMapFromMessage(environment_communication_msgs::Map Message);
+
+
 	bool setTransitionDone(rexos_statemachine::State transitionState);
 
 	void updateEquipletStateOnBlackboard();

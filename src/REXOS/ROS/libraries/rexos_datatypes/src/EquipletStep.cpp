@@ -137,9 +137,23 @@ namespace rexos_datatypes{
             else if (strcmp(node_name, "timeData") == 0){
                 setTimeData(setTimeDataFromNode(*i));
             }
-            //increment the iterator
             ++i;
         }        
+    }
+
+    std::string EquipletStep::toJSONString(){
+
+        std::stringstream ss;
+
+        ss << "{ "
+        ss << "'serviceStepID' : '" << this->serviceStepID << "', ";
+        ss << "'nextStep' : '" << this->nextStep << "', ";
+        ss << "'moduleId' : '" << this->moduleId << "', ";
+        ss << "'instructionData' : '" << this->instructionData.toJSONString() << "', ";
+        ss << "'status' : { " << this->status << " }, ";
+        ss << " } ";
+
+        return ss.str();
     }
     
     InstructionData EquipletStep::setInstructionDataFromNode(const JSONNode & n){

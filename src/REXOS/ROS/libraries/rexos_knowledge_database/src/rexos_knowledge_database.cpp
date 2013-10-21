@@ -13,7 +13,7 @@ namespace rexos_knowledge_database{
 	std::auto_ptr<sql::Connection> connect(){
 		sql::Driver* driver = get_driver_instance();
 		std::auto_ptr<sql::Connection> apConnection(
-			driver->connect(MYSQL_DATABASE, MYSQL_USERNAME, MYSQL_PASSWORD)
+			driver->connect(MYSQL_SERVER, MYSQL_USERNAME, MYSQL_PASSWORD)
 		);
 		apConnection->setSchema(MYSQL_DATABASE);
 		return apConnection;

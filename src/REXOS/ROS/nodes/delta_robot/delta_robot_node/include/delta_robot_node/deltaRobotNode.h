@@ -77,6 +77,8 @@ namespace deltaRobotNodeNamespace{
 		bool moveToRelativePoint(double x, double y, double z, double maxAcceleration);
 
 		Point parsePoint(const JSONNode & n);
+		std::string parseNodeValue(const std::string nodeName, const JSONNode & n);
+		Point parseLookup(const JSONNode & n);
 		Point *parsePointArray(std::string json, int & size);
 
 		void onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal);

@@ -91,6 +91,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 EquipletNode::~EquipletNode(){
 	delete equipletStepBlackboardClient;
 	delete equipletStepBlackboardClient;
+	delete directMoveBlackBoardClient;
 	delete equipletCommandBlackboardClient;
 	delete equipletStateBlackboardClient;
 
@@ -111,22 +112,19 @@ EquipletNode::~EquipletNode(){
 void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) {
 	mongo::OID targetObjectId;
 	oplogEntry.getTargetObjectId(targetObjectId);
-	JSONNode n = libjson::parse(directMoveBlackBoardClient->findDocumentById(targetObjectId).jsonString());
 
-	if(&subscription == equipletStepSubscription)
-	{
+	if(&subscription == equipletStepSubscription) {
+		JSONNode n = libjson::parse(equipletStepBlackboardClient->findDocumentById(targetObjectId).jsonString());
 	    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
-
 	    //We only need to handle the step if its status is 'WAITING'
 	    if (step->getStatus().compare("WAITING") == 0) {
     		handleEquipletStep(step, targetObjectId);
 		}
-	}
-	else if(&subscription == equipletCommandSubscription || &subscription == equipletCommandSubscriptionSet)
-	{
+	} else if(&subscription == equipletCommandSubscription || &subscription == equipletCommandSubscriptionSet) {
 		ROS_INFO("Received equiplet statemachine command");
     	handleEquipletCommand(libjson::parse(oplogEntry.getUpdateDocument().jsonString()));
 	} else if(&subscription == directMoveSubscription) {
+		JSONNode n = libjson::parse(directMoveBlackBoardClient->findDocumentById(targetObjectId).jsonString());
 		rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
 		handleDirectMoveCommand(step, targetObjectId);
 	}
@@ -137,11 +135,20 @@ void EquipletNode::handleEquipletStep(rexos_datatypes::EquipletStep * step, mong
 	if (currentMode == rexos_statemachine::MODE_NORMAL) {
 		rexos_statemachine::State currentState = getCurrentState();
 		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
-			//pass payload to lookup with given params.
-			//pass payload to proxy.
-			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
+			
+			rexos_datatypes::InstructionData instructionData = step->getInstructionData();
+
+			//we need to call the lookup handler first
+			if(instructionData.getLook_up().length() >= 0) {
+				map<std::string, std::string> newPayload = callLookupHandler(instructionData.getLook_up(), instructionData.getLook_up_parameters(), instructionData.getPayload());
+				instructionData.setPayload(newPayload);
+			}
+			//we might still need to update the payload on the bb
 		    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
-		    prox->setInstruction(targetObjectId.toString(), step->getInstructionData().getJsonNode());
+
+		    equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
+		    prox->setInstruction(targetObjectId.toString(), instructionData.getJsonNode());
+
 		} else {
 			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\" } } ");
 		}
@@ -197,8 +204,7 @@ void EquipletNode::onInstructionStepCompleted(ModuleProxy* moduleProxy, std::str
 
 	mongo::OID targetObjectId(id);
 
-	if(completed) 
-	{
+	if(completed) {
     	equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"DONE\" } } ");
     	std::cout << "Done with step. Update status on BB to done." << std::endl;
 	} else {
@@ -243,18 +249,20 @@ ros::NodeHandle& EquipletNode::getNodeHandle() {
  * @param lookupID the ID of the lookup
  * @param payload the payload, contains data that will get combined with environmentcache data
  **/
-void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupID, std::map<std::string, std::string> payloadMap){
+std::map<std::string, std::string> EquipletNode::callLookupHandler(std::string lookupType, std::map<std::string, std::string> lookupParameters, std::map<std::string, std::string> payloadMap){
+ 	
  	lookup_handler::LookupServer msg;
+
 	msg.request.lookupMsg.lookupType = lookupType;
-	msg.request.lookupMsg.lookupID = lookupID;
-	msg.request.lookupMsg.payLoad = createMapMessage(payloadMap);
+	msg.request.lookupMsg.lookupParameters = createMessageFromMap(lookupParameters);
+	msg.request.lookupMsg.payLoad = createMessageFromMap(payloadMap);
 
 	ros::NodeHandle nodeHandle;
 	ros::ServiceClient lookupClient = nodeHandle.serviceClient<lookup_handler::LookupServer>("LookupHandler/lookup");
 
 	if(lookupClient.call(msg)){
-		// TODO
-		// Read message
+		environment_communication_msgs::Map map = msg.response.lookupMsg.payLoad;
+		return createMapFromMessage(map);
 	} else {
 		ROS_ERROR("Error in calling lookupHandler/lookup service");
 	}
@@ -266,14 +274,26 @@ void EquipletNode::callLookupHandler(std::string lookupType, std::string lookupI
  *
  * @return environment_communication_msgs::Map The map message object
  **/
-environment_communication_msgs::Map EquipletNode::createMapMessage(std::map<std::string, std::string> &Map){
+environment_communication_msgs::Map EquipletNode::createMessageFromMap(std::map<std::string, std::string> &Map){
 	std::map<std::string, std::string>::iterator MapIterator;
 	environment_communication_msgs::Map mapMsg;
 	environment_communication_msgs::KeyValuePair prop;
+
 	for(MapIterator = Map.begin(); MapIterator != Map.end(); MapIterator++){
 		prop.key = (*MapIterator).first;
 		prop.value = (*MapIterator).second;
 		mapMsg.map.push_back(prop);
 	}
+
 	return mapMsg;
+}
+
+map<std::string, std::string> EquipletNode::createMapFromMessage(environment_communication_msgs::Map Message){
+    std::map<std::string, std::string> msgMap;    
+
+	for(int i = 0; i < (int)(Message.map.size()); i++){
+		msgMap.insert(std::pair<std::string, std::string>(Message.map[i].key, Message.map[i].value));
+	}
+
+    return msgMap;
 }

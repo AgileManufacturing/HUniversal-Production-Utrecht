@@ -75,6 +75,7 @@ namespace unicap_cv_bridge {
 		if (!SUCCESS(unicap_close(handle))) {
 			throw UnicapCvException("Failed to close the device");
 		}
+return formats;
 	}
 
 	std::vector<std::string> listProperties(int deviceIndex) {
