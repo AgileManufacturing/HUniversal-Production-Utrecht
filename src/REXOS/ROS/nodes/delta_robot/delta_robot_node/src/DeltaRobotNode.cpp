@@ -47,7 +47,7 @@
  **/
 #define MODBUS_PORT 502
 
-#define Z_OFFSET -275
+#define Z_OFFSET 0
 
 /**
  * Constructor 
@@ -56,6 +56,7 @@
  **/
 deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) :
 	rexos_statemachine::ModuleStateMachine("delta_robot_node",equipletID, moduleID, true),
+	rexos_coordinates::Module(moduleID),
 	deltaRobot(NULL),
 	modbus(NULL),
 	motorManager(NULL),
@@ -322,6 +323,9 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
 	if(p.z  == 0){
 		p.z = lastZ;
 	}
+	Vector3 vector(p.x, p.y, p.z);
+	Vector3 translatedVector = convertToModuleCoordinate(vector);
+	std::cout << "translatedVector" << translatedVector << std::endl;
 
 	return p;
 }

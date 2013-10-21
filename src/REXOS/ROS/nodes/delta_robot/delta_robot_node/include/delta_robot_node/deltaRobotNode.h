@@ -41,6 +41,7 @@
 #include <delta_robot_node/Point.h>
 #include <rexos_statemachine/ModuleStateMachine.h>
 #include <rexos_statemachine/Transitions.h>
+#include <rexos_coordinates/Module.h>
 #include "equiplet_node/RegisterModule.h"
 
 #include <actionlib/server/simple_action_server.h>
@@ -59,7 +60,8 @@ namespace deltaRobotNodeNamespace{
 	/**
 	 * the DeltaRobotNode which is a ModuleStateMachine
 	 **/
-	class DeltaRobotNode : public rexos_statemachine::ModuleStateMachine{
+	class DeltaRobotNode : public rexos_statemachine::ModuleStateMachine, 
+	public rexos_coordinates::Module{
 	public:
 		DeltaRobotNode(int equipletID, int moduleID);
 		virtual ~DeltaRobotNode();
