@@ -102,10 +102,12 @@ void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalC
 			std::string value = parseNodeValue("command", *i);
 
 			if(strcmp(value.c_str(), "activate") == 0) {
+				std::cout << "Activating gripper" << std::endl;
 				gripper->grab();
 				setInstructionActionServer.setSucceeded(result_);
 				return;
 			} else if(strcmp(value.c_str(), "deactivate") == 0) {
+				std::cout << "Deactivating gripper" << std::endl;
 				gripper->release();
 				setInstructionActionServer.setSucceeded(result_);
 				return;
