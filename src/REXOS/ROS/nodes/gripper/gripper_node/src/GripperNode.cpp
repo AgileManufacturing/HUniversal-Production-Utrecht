@@ -95,21 +95,26 @@ void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalC
     JSONNode::const_iterator i = instructionDataNode.begin();
 
     while (i != instructionDataNode.end()){
+
         const char * nodeName = i -> name().c_str();
 
-		if(strcmp(nodeName, "command") == 0) { 
-			if(strcmp(parseNodeValue("command", *i), "activate") == 0) {
+		if(strcmp(nodeName, "command") == 0) {
+			std::string value = parseNodeValue("command", *i);
+
+			if(strcmp(value.c_str(), "activate") == 0) {
 				gripper->grab();
 				setInstructionActionServer.setSucceeded(result_);
 				return;
-			} else if(strcmp(parseNodeValue("command", *i), "deactivate") == 0)
+			} else if(strcmp(value.c_str(), "deactivate") == 0) {
 				gripper->release();
 				setInstructionActionServer.setSucceeded(result_);
 				return;
+			}
 		}
     	++i;
 	}
-	std::cout << "Failed setting gripper" << std::enl;
+
+	std::cout << "Failed setting gripper" << std::endl;
 	setInstructionActionServer.setAborted(result_);
 }
 
@@ -199,21 +204,18 @@ bool GripperNode::release(gripper_node::Release::Request &req, gripper_node::Rel
 }
 
 std::string GripperNode::parseNodeValue(const std::string nodeName, const JSONNode & n){
-
 	JSONNode::const_iterator i = n.begin();
 	std::string result;
-	while(i != n.end()){
+	while(i != n.end()) {
 		// get the JSON node name and value as a string
 		std::string node_name = i->name();
 
-		if(node_name == nodeName)
-		{
+		if(node_name == nodeName) {
 			result = i->as_string();
 		} 
 
 		++i;
 	}
-
 	return result;
 }
 

@@ -72,7 +72,7 @@ public:
 	bool release(gripper_node::Release::Request &req, gripper_node::Release::Response &res);
 
 	void onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal);
-	void parseNodeValue(const std::string nodeName, const JSONNode & n);
+	std::string parseNodeValue(const std::string nodeName, const JSONNode & n);
 
 private:
 	/**
