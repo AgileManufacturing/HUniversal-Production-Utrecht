@@ -1,9 +1,10 @@
 /**
- * @file rexos/mas/logistics_agent/behaviours/GetPartsInfo.java
- * @brief Responds to GetPartsInfo messages, returning a mapping of part id to type and position.
+ * @file rexos/mas/logistics_agent/behaviours/PartsInfo.java
+ * @brief Responds to PartsInfo messages, returning a mapping of part id to type and position.
  * @date Created: 22 apr. 2013
  * 
  * @author Peter Bonnema
+ * @author Duncan Jenkins
  * 
  * @section LICENSE
  *          License: newBSD
@@ -45,6 +46,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import com.mysql.jdbc.log.Log;
+
 import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;
@@ -53,6 +56,7 @@ import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 import agents.data_classes.Part;
 import agents.data_classes.Position;
+import agents.logistics_agent.LogisticsAgent;
 import agents.shared_behaviours.ReceiveOnceBehaviour;
 
 /**
@@ -66,13 +70,25 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * @var MessageTemplate MESSAGE_TEMPLATE
+	 *      The messageTemplate to match the messages.
+	 */
+	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("PartsInfo");
+	
+	/**
+	 * @var LogisticsAgent logisticsAgent
+	 *      The logisticsAgent of this behaviour.
+	 */
+	private LogisticsAgent logisticsAgent;
+	
+	/**
 	 * Constructs the behaviour for the given agent.
 	 * 
 	 * @param a The agent associated with this behaviour.
 	 * @param conversationId The conversationId that should be used for this behaviour.
 	 */
-	public PartsInfo(Agent a, String conversationId) {
-		this(a, 2000, conversationId);
+	public PartsInfo(LogisticsAgent logisticsAgent, String conversationId) {
+		this(logisticsAgent, 2000, conversationId);
 	}
 
 	/**
@@ -82,14 +98,13 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 	 * @param millis Timeout in milliseconds.
 	 * @param conversationId The conversationId that should be used for this behaviour.
 	 */
-	public PartsInfo(Agent a, int millis, String conversationId) {
-		super(a, millis, MessageTemplate.and(MessageTemplate.MatchOntology("PartsInfo"),
+	public PartsInfo(LogisticsAgent logisticsAgent, int millis, String conversationId) {
+		super(logisticsAgent, millis, MessageTemplate.and(MESSAGE_TEMPLATE,
 				MessageTemplate.MatchConversationId(conversationId)));
+		this.logisticsAgent = logisticsAgent;
+		
 	}
 	
-	public static Part supplyCratePart = new Part(2, 100, "GC4x4MB_1");
-	public static Part productCratePart = new Part(2, 101, "GC4x4MB_2");
-	public static HashMap<Part, Position> Inventory = new HashMap<Part, Position>();
 
 	/**
 	 * Handles GetPartsInfo messages and responds with a GetPartsInfoResponse.
@@ -100,7 +115,7 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 	public void handle(ACLMessage message) {
 		if(message != null) {
 			try {
-				Logger.log(LogLevel.DEBUG, "%s GetPartsInfo%n", myAgent.getLocalName());
+				Logger.log(LogLevel.DEBUG, "%s GetPartsInfo%n", logisticsAgent.getLocalName());
 				Part[] parts = (Part[]) message.getContentObject();
 				HashMap<Part, Position> partParameters = new HashMap<Part, Position>();
 				
@@ -109,21 +124,20 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 				int type = 3;
 				
 				for(Part part : parts) {
+					Logger.log(LogLevel.DEBUG, "PartNo: " + part.getType());
 					switch(part.getType()) {
-					case 1: // Red ball						
-						// Grab a ball from the predefined inventory
-						Iterator<Entry<Part, Position>> it = Inventory.entrySet().iterator();
-						if(it.hasNext()) {
-							Part ball = it.next().getKey();
-							Position ballPosition = Inventory.remove(ball);
-							
-							partParameters.put(ball, ballPosition);
+					case 1: // Red ball
+						// Grab a ball
+						if(logisticsAgent.isBallPartAvailable()) {
+							Entry<Part, Position> ball = logisticsAgent.getBallPart();
+							partParameters.put(ball.getKey(), ball.getValue());
+						} else {
+							// Throw error
 						}
-						
 						break;
 					case 2: // Crate
-						partParameters.put(supplyCratePart, new Position());
-						partParameters.put(productCratePart, new Position());
+						partParameters.put(logisticsAgent.getSupplyCrate(), new Position());
+						partParameters.put(logisticsAgent.getProductCrate(), new Position());
 						break;
 					default:
 						partParameters.put(new Part(part.getType(), id++),
@@ -142,13 +156,13 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 				reply.setPerformative(ACLMessage.INFORM);
 				reply.setOntology("PartsInfo");
 				reply.setContentObject(partParameters);
-				myAgent.send(reply);
+				logisticsAgent.send(reply);
 			} catch (UnreadableException | IOException | KnowledgeException | KeyNotFoundException e) {
 				Logger.log(LogLevel.ERROR, e);
-				myAgent.doDelete();
+				logisticsAgent.doDelete();
 			}
 		} else {
-			myAgent.removeBehaviour(this);
+			logisticsAgent.removeBehaviour(this);
 		}
 	}
 }

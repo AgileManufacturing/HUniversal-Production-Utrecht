@@ -1,8 +1,6 @@
-package agents.hardware_agent.behaviours;
-
 /**
- * @file rexos/mas/hardware_agent/behaviours/CheckForModules.java
- * @brief Handles the CheckForModules message
+ * @file rexos/mas/hardware_agent/behaviours/RequiredModulesPresent.java
+ * @brief Handles the RequiredModulesPresent message
  * @date Created: 12-04-13
  * 
  * @author Thierry Gerritse
@@ -36,6 +34,7 @@ package agents.hardware_agent.behaviours;
  * 
  * @note 2013-05-14 JWW: This should be adapted to use MOST once it's done.
  **/
+package agents.hardware_agent.behaviours;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
@@ -53,7 +52,7 @@ import agents.hardware_agent.HardwareAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 
 /**
- * Class for the receivebehaviour to receive messages with the ontology CheckForModules
+ * Class for the receivebehaviour to receive messages with the ontology RequiredModulesPresent
  */
 public class RequiredModulesPresent extends ReceiveBehaviour {
 	/**
@@ -63,7 +62,7 @@ public class RequiredModulesPresent extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
+	 * @var MessageTemplate MESSAGE_TEMPLATE
 	 *      Contains the MessageTemplate to match.
 	 */
 	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("RequiredModulesPresent");
@@ -77,11 +76,12 @@ public class RequiredModulesPresent extends ReceiveBehaviour {
 	/**
 	 * Instantiates a new check for module.
 	 * 
-	 * @param a The agent of this behaviour.
+	 * @param hardwareAgent
+	 * 		  The hardwareagent of this behaviour.
 	 */
-	public RequiredModulesPresent(Agent a) {
-		super(a, MESSAGE_TEMPLATE);
-		hardwareAgent = (HardwareAgent) a;
+	public RequiredModulesPresent(HardwareAgent hardwareAgent) {
+		super(hardwareAgent, MESSAGE_TEMPLATE);
+		this.hardwareAgent = hardwareAgent;
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class RequiredModulesPresent extends ReceiveBehaviour {
 
 	/**
 	 * Responds to incoming messages querying whether a module is available for a set of module group ids. This method
-	 * will respond with a CheckForModulesResponse message. If all modules are available, a CONFIRM will be sent. If one
+	 * will respond with a RequiredModulesPresent message. If all modules are available, a CONFIRM will be sent. If one
 	 * or more modules
 	 * are missing, a DISCONFIRM will be sent.
 	 * 
@@ -146,7 +146,7 @@ public class RequiredModulesPresent extends ReceiveBehaviour {
 					reply.setPerformative(ACLMessage.DISCONFIRM);
 				}
 	
-				myAgent.send(reply);
+				hardwareAgent.send(reply);
 			}
 		}
 	}

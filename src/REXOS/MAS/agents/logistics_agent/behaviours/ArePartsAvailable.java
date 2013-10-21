@@ -4,6 +4,8 @@
  * @date Created: 20 apr. 2013
  *
  * @author Peter Bonnema
+ * @author Roy Scheefhals
+ * @author Duncan Jenkins
  *
  * @section LICENSE
  * License: newBSD
@@ -42,6 +44,7 @@ import libraries.utillities.log.Logger;
 import agents.data_classes.Part;
 import agents.data_classes.Position;
 import agents.data_classes.ProductStep;
+import agents.logistics_agent.LogisticsAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 
 /**
@@ -55,21 +58,24 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * @var MessageTemplate MESSAGE_TEMPLATE
+	 *      The messageTemplate to match the messages.
+	 */
+	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("ArePartsAvailable");
+	
+	/**
+	 * @var LogisticsAgent logisticsAgent
+	 *      The logisticsAgent of this behaviour.
+	 */
+	private LogisticsAgent logisticsAgent;
+	
+	/**
 	 * Constructs the behaviour for the given agent.
 	 * @param a The agent associated with this behaviour.
 	 */
-	public ArePartsAvailable(Agent a) {
-		super(a, MessageTemplate.MatchOntology("ArePartsAvailable"));
-		synchronized(this) {
-			if(PartsInfo.Inventory.isEmpty()) {
-				for(int i = 0; i < 4; i++) {
-					for(int j = 0; j < 4; j++) {
-						int nr = (i * 4) + j;
-						PartsInfo.Inventory.put(new Part(1, nr, "Red Ball " + nr), new Position(j + 0.0, i + 0.0, PartsInfo.supplyCratePart));
-					}
-				}
-			}
-		}
+	public ArePartsAvailable(LogisticsAgent logisticsAgent) {
+		super(logisticsAgent, MESSAGE_TEMPLATE);
+		this.logisticsAgent = logisticsAgent;
 	}
 
 	/**
@@ -78,40 +84,51 @@ public class ArePartsAvailable extends ReceiveBehaviour {
 	 * rexos.mas.behaviours.ReceiveBehaviour#handle(jade.lang.acl.ACLMessage)
 	 */
 	@Override
-	public void handle(ACLMessage message) {		
+	public void handle(ACLMessage message) {
 		try {
-			Logger.log(LogLevel.DEBUG, "ArePartsAvailable%n", 0, myAgent.getLocalName());
-			
+			Logger.log(LogLevel.DEBUG, "ArePartsAvailable%n", 0, logisticsAgent.getLocalName());
 			Part[] parts = ((ProductStep) message.getContentObject()).getInputParts();
+			boolean allPartsAvailable = true;
 			
-			ACLMessage reply = message.createReply();
-			reply.setOntology("ArePartsAvailable");
-			
+			//check for parts needed
 			for(Part part : parts) {
 				switch(part.getType()) {
-					case 1: // Red ball
-						// Grab a ball
-						Iterator<Entry<Part, Position>> it = PartsInfo.Inventory.entrySet().iterator();
-						if(it.hasNext()) {
-							reply.setPerformative(ACLMessage.CONFIRM);
-						} else {
-							reply.setPerformative(ACLMessage.DISCONFIRM);
-						}
-						break;
-					default:
-						//TODO (out of scope) determine actual part availability 
-						reply.setPerformative(ACLMessage.CONFIRM);
-						break;
+				case 1: // Red ball needed
+					// check for balls available
+					if(!logisticsAgent.isBallPartAvailable()) {
+						allPartsAvailable = false;
+					}
+					break;
+				default:
+					
+					//TODO (out of scope) determine actual part availability 
+					
+					break;
+				}
+				// we are missing one part, so we cannot continue production
+				if(!allPartsAvailable){
+					break;
 				}
 			}
 			
-			myAgent.send(reply);
-
-			myAgent.addBehaviour(new ArePartsAvailableInTime(myAgent, message.getConversationId()));
-			Logger.log(LogLevel.DEBUG, "PartTypes { %s } are available%n", 0, (Object[]) parts);
+			//send the message
+			ACLMessage reply = message.createReply();
+			reply.setOntology("ArePartsAvailable");
+			reply.setConversationId(message.getConversationId());
+			if ( allPartsAvailable) {
+				reply.setPerformative(ACLMessage.CONFIRM);
+			}
+			else{
+				reply.setPerformative(ACLMessage.DISCONFIRM);
+			}
+			
+			logisticsAgent.send(reply);
+			
+			logisticsAgent.addBehaviour(new ArePartsAvailableInTime(logisticsAgent, message.getConversationId()));
+			//Logger.log(LogLevel.DEBUG, "PartTypes { %s } are available%n", 0, (Object[]) parts);
 		} catch (UnreadableException e) {
 			Logger.log(LogLevel.ERROR, e);
-			myAgent.doDelete();
+			logisticsAgent.doDelete();
 		}
 	}
 }

@@ -1,6 +1,6 @@
 /**
- * @file rexos/mas/service_agent/behaviours/GetServiceStepsDurationResponse.java
- * @brief Handles the GetServiceStepsDurationResponse message from the hardwareAgent that indicates that the duration of
+ * @file rexos/mas/service_agent/behaviours/ServiceStepDuration.java
+ * @brief Handles the ServiceStepDuration message from the hardwareAgent that indicates that the duration of
  *        all serviceSteps have been saved on the serviceStepsBlackBoard.
  * @date Created: 11 apr. 2013
  * 
@@ -59,8 +59,8 @@ import agents.shared_behaviours.ReceiveBehaviour;
 import com.mongodb.BasicDBObject;
 
 /**
- * This behaviour handles the GetServiceStepsDurationResponse message. The hardwareAgent sends this message in response
- * to the GetServiceStepsDurationResponse message to indicate that it saved the duration of all serviceSteps on the
+ * This behaviour handles the ServiceStepDuration message. The hardwareAgent sends this message in response
+ * to the ServiceStepDuration message to indicate that it saved the duration of all serviceSteps on the
  * serviceStepBlackboard. It will generate a timeout after a specified period if no message is received.
  * 
  * @author Peter
@@ -79,36 +79,51 @@ public class ServiceStepDuration extends ReceiveBehaviour {
 	 */
 	private ServiceAgent serviceAgent;
 
+	/**
+	 * @var ParentBehaviourCallback parentBehaviourCallback
+	 * 		The parentbehaviour callback this redirect calls back to
+	 */
 	private ParentBehaviourCallback parentBehaviourCallback;
 
-	private Object contentObject;
-
-	private String conversationID;
+	/**
+	 * @var ObjectId objectId
+	 * 		The ObjectId used for the message
+	 */
+	private ObjectId objectId;
 
 	/**
-	 * Creates a new GetServiceStepsDurationResponse instance with the specified parameters.
+	 * @var String conversationId
+	 * 		The conversationId used for the message
+	 */
+	private String conversationId;
+
+	/**
+	 * Creates a new ServiceStepDuration instance with the specified parameters.
 	 * 
-	 * @param serviceAgent the agent this behaviour belongs to.
+	 * @param serviceAgent the service agent this behaviour belongs to.
+	 * @param parentBehaviourCallback the parentbehaviour this behaviour calls back to 
+	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
+	 * @param objectId The objectId used to check the duration
 	 */
 	public ServiceStepDuration(ServiceAgent serviceAgent, ParentBehaviourCallback parentBehaviourCallback,
-			String conversationID, Object contentObject) {
+			String conversationId, ObjectId objectId) {
 		super(serviceAgent, MessageTemplate.MatchOntology("ServiceStepDuration"));
 		this.serviceAgent = serviceAgent;
 		
 		this.parentBehaviourCallback = parentBehaviourCallback;
 		
-		this.contentObject = contentObject;
-		this.conversationID = conversationID;
+		this.objectId = objectId;
+		this.conversationId = conversationId;
 	}
 
 	@Override
 	public void onStart(){
 		ACLMessage responseMessage = new ACLMessage(ACLMessage.QUERY_REF);
 		responseMessage.addReceiver(serviceAgent.getHardwareAgentAID());
-		responseMessage.setConversationId(conversationID);
-		if (contentObject != null){
+		responseMessage.setConversationId(conversationId);
+		if (objectId != null){
 			try {
-				responseMessage.setContentObject((Serializable)contentObject);
+				responseMessage.setContentObject(objectId);
 			} catch (IOException e) {
 				Logger.log(LogLevel.ERROR, e);
 			}

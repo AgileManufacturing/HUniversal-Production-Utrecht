@@ -71,11 +71,11 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
+	 * @var MessageTemplate MESSAGE_TEMPLATE
 	 *      The messageTemplate this behaviour listens to.
 	 *      This behaviour listens to the ontology: StartStep.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("StartStep");
+	private static MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("StartStep");
 
 	/**
 	 * @var EquipletAgent equipletAgent
@@ -90,12 +90,12 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 	/**
 	 * Instantiates a new can perform step.
 	 * 
-	 * @param a The agent for this behaviour
+	 * @param equipletAgent The agent for this behaviour
 	 * @param equipletBBClient The BlackboardClient for this equiplet's blackboard.
 	 */
-	public StartStep(Agent a) {
-		super(a, messageTemplate);
-		equipletAgent = (EquipletAgent) a;
+	public StartStep(EquipletAgent equipletAgent) {
+		super(equipletAgent, MESSAGE_TEMPLATE);
+		this.equipletAgent = equipletAgent;
 		stateUpdateSubscription = new FieldUpdateSubscription("state", this);
 		stateUpdateSubscription.addOperation(MongoUpdateLogOperation.SET);
 	}

@@ -1,9 +1,10 @@
 /**
- * @file rexos/mas/equiplet_agent/behaviours/GetProductionDuration.java
- * @brief Behaviour for handling the messages with the ontology GetProductStepDuration
- * @date Created: 2013-04-02
+ * @file rexos/mas/equiplet_agent/behaviours/ProductionDuration.java
+ * @brief Behaviour for handling the messages with the ontology ProductionDuration
+ * @date Created: 2013-14-10
  * 
  * @author Hessel Meulenbeld
+ * 		   Roy Scheefhals
  * 
  * @section LICENSE
  *          License: newBSD
@@ -52,10 +53,10 @@ import agents.equiplet_agent.EquipletAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 
 /**
- * The receive behaviour for receiving messages with ontology: "GetProductionDuration".
+ * The receive behaviour for receiving messages with ontology: "ProductionDuration".
  * When a message is received it checks if it can handle it.
  * If not it sends a message to the sender with ontology:"ConversationIdUnknown".
- * When it can handle the message, it sends a message to the serviceAgent with ontology: "GetProductionStepDuration".
+ * When it can handle the message, it sends a message to the serviceAgent with ontology: "ProductionDuration".
  */
 public class ProductionDuration extends ReceiveBehaviour implements ParentBehaviourCallback {
 	/**
@@ -65,9 +66,9 @@ public class ProductionDuration extends ReceiveBehaviour implements ParentBehavi
 	private static final long serialVersionUID = 2502684423295372637L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
+	 * @var MessageTemplate MESSAGE_TEMPLATE
 	 *      The messageTemplate this behaviour listens to.
-	 *      This behaviour listens to the ontology: GetProductStepDuration.
+	 *      This behaviour listens to the ontology: ProductionDuration.
 	 */
 	private static MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("ProductionDuration");
 
@@ -83,9 +84,9 @@ public class ProductionDuration extends ReceiveBehaviour implements ParentBehavi
 	 * @param a The agent for this behaviour
 	 * 
 	 */
-	public ProductionDuration(Agent a) {
-		super(a, MESSAGE_TEMPLATE);
-		equipletAgent = (EquipletAgent) a;
+	public ProductionDuration(EquipletAgent equipletAgent) {
+		super(equipletAgent, MESSAGE_TEMPLATE);
+		this.equipletAgent = equipletAgent;
 	}
 
 	/**
@@ -96,7 +97,7 @@ public class ProductionDuration extends ReceiveBehaviour implements ParentBehavi
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		Logger.log(LogLevel.DEBUG, "%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
+		Logger.log(LogLevel.DEBUG, "%s received message from %s%n", equipletAgent.getLocalName(), message.getSender().getLocalName(),
 				message.getOntology());
 		try {
 			// gets the productstepId and sends it to the service agent with the ontology GetProductionStepDuration.
@@ -107,7 +108,7 @@ public class ProductionDuration extends ReceiveBehaviour implements ParentBehavi
 				responseMessage.setPerformative(ACLMessage.DISCONFIRM);
 				//TODO: why change the ontology ?
 				responseMessage.setOntology("ConversationIdUnknown");
-				myAgent.send(responseMessage);
+				equipletAgent.send(responseMessage);
 			} else {
 				
 				equipletAgent.addBehaviour(new ProductStepDuration(equipletAgent, equipletAgent.getProductStepBBClient(),
@@ -125,7 +126,7 @@ public class ProductionDuration extends ReceiveBehaviour implements ParentBehavi
 			}
 		} catch(Exception e) {
 			Logger.log(LogLevel.ERROR, e);
-			myAgent.doDelete();
+			equipletAgent.doDelete();
 		}
 	}
 

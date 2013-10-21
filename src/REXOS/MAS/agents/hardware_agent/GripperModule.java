@@ -5,6 +5,7 @@
  * 
  * @author Thierry Gerritse
  * @author Hessel Meulenbeld
+ * @author Duncan Jenkins
  * 
  * @section LICENSE
  *          License: newBSD
@@ -91,9 +92,9 @@ public class GripperModule extends Module {
 		steps = new ArrayList<EquipletStep>();
 
 		//get the parameters and put extra values in it.
-		BasicDBObject moveParameters = (BasicDBObject) parameters.copy();
+		BasicDBObject moveParameters = new BasicDBObject();
 		moveParameters.put("extraSize", GRIPPER_SIZE);
-		moveParameters.put("position", new Position().toBasicDBObject()); // Just using this to create placeholders in the deltarobot steps
+		moveParameters.put("position", new Position().toBasicDBObject());
 
 		//get steps from the movementModule to move to the safe movement plane.
 		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));
@@ -138,15 +139,13 @@ public class GripperModule extends Module {
 		//translate the row/col to X,Y,Z ACCORDING to the crate dimensions.
 		
 		double crateDimension = 46; // 46mm x 46mm
-		double crateSlots = 4;
-		double crateSlotDimension = 11.5;
-		double crateSlotMidPoint = 5.75;
+        double crateSlots = 4;
+        double crateSlotDimension = 11.5;
+        double crateSlotMidPoint = 5.75;
+        double extraSize = GRIPPER_SIZE;
 		
 		Part part = new Part((BasicDBObject)parameters.get("crate"));
-		Position newPos = new Position((parameters.getDouble("row") * crateSlotDimension + crateSlotMidPoint) - 23, (parameters.getDouble("column") * crateSlotDimension + crateSlotMidPoint) - 23, 5.0, part);
-		BasicDBObject newParameters = (BasicDBObject) parameters.copy();
-		newParameters.put("position", newPos.toBasicDBObject());
-		//part.getPartName()
+		Position position = new Position((parameters.getDouble("row") * crateSlotDimension + crateSlotMidPoint) - 23, (parameters.getDouble("column") * crateSlotDimension + crateSlotMidPoint) - 23, 5.0, part);
 		
 		//get the newest code of the movementModule.
 		int movementModuleId = findMovementModule(getConfiguration());
@@ -156,20 +155,43 @@ public class GripperModule extends Module {
 		ArrayList<EquipletStep> movementModuleSteps = new ArrayList<EquipletStep>();
 		//loop over all the given EquipletSteps.
 		for (EquipletStep step : steps) {
-			// Get instruction data
-			// Update payload with data in newParameters
+			InstructionData instructionData = step.getInstructionData();
+			BasicDBObject lookUpParameters = instructionData.getLookUpParameters();
+			BasicDBObject payload = instructionData.getPayload();
+			
+			if(lookUpParameters.containsField("ID")) {
+				if(lookUpParameters.getString("ID").equals("RELATIVE-TO-PLACEHOLDER") && position.getRelativeToPart() != null) {
+					lookUpParameters.put("ID", position.getRelativeToPart().getPartName());
+				}
+			}
+
+			if(payload.containsField("x") && payload.getString("x").equals("X-PLACEHOLDER")) {
+				payload.put("x", position.getX());
+			}
+			
+			if(payload.containsField("y") && payload.getString("y").equals("Y-PLACEHOLDER")) {
+				payload.put("y", position.getY());
+			}
+			
+			if(payload.containsField("z") && payload.getString("z").equals("Z-PLACEHOLDER")) {
+				if(position.getZ() == null)	{
+					payload.put("z", 0 + extraSize);
+				} else {
+					payload.put("z", position.getZ() + extraSize);
+				}
+			}
 			
 			//If the step is made by the movementModule add it to the ArrayList.
-			if (step.getModuleId() == movementModule.getId()){
+			if (step.getModuleId() == movementModule.getId()) {
 				movementModuleSteps.add(step);
 			}
 		}
-		
 		//let the movementModule fill in his steps.
-		EquipletStep[] temp = new EquipletStep[movementModuleSteps.size()];
-		movementModule.fillPlaceHolders(movementModuleSteps.toArray(temp), newParameters);
+		//EquipletStep[] temp = new EquipletStep[movementModuleSteps.size()];
+		//movementModule.fillPlaceHolders(movementModuleSteps.toArray(temp), newParameters);
 		//return the filled in steps.
-		return steps;
+		EquipletStep[] temp = new EquipletStep[movementModuleSteps.size()];
+		return movementModuleSteps.toArray(temp);
 	}
 
 	/**

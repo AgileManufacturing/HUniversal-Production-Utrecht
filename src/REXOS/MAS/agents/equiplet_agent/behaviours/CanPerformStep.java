@@ -89,7 +89,7 @@ public class CanPerformStep extends ReceiveBehaviour implements ParentBehaviourC
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
+	 * @var MessageTemplate MESSAGE_TEMPLATE
 	 *      The messageTemplate this behaviour listens to. This behaviour
 	 *      listens to the ontology: CanPeformStep.
 	 */
@@ -103,10 +103,10 @@ public class CanPerformStep extends ReceiveBehaviour implements ParentBehaviourC
 	private EquipletAgent equipletAgent;
 
 	/**
-	 * @var BlackboardClient equipletBBClient
-	 *      The blackboard client for the Equiplet.
+	 * @var BlackboardClient productStepsBlackBoard
+	 *      The productStepsBlackBoard client for the Equiplet.
 	 **/
-	private BlackboardClient productStepBB;
+	private BlackboardClient productStepsBlackboard;
 
 	/**
 	 * @var ProductStep currentProductStep
@@ -117,13 +117,13 @@ public class CanPerformStep extends ReceiveBehaviour implements ParentBehaviourC
 	/**
 	 * Instantiates a new can perform step.
 	 * 
-	 * @param a The agent for this behaviour
-	 * @param equipletBBClient The BlackboardClient for the EquipletBlackboard.
+	 * @param equipletAgent The agent for this behaviour
+	 * @param productStepsBlackBoard The BlackboardClient for the EquipletBlackboard.
 	 */
-	public CanPerformStep(EquipletAgent a, BlackboardClient equipletBBClient) {
-		super(a, MESSAGE_TEMPLATE);
-		equipletAgent = a;
-		this.productStepBB = equipletBBClient;
+	public CanPerformStep(EquipletAgent equipletAgent, BlackboardClient productStepsBlackBoard) {
+		super(equipletAgent, MESSAGE_TEMPLATE);
+		this.equipletAgent = equipletAgent;
+		this.productStepsBlackboard = productStepsBlackBoard;
 	}
 
 	/**
@@ -155,11 +155,11 @@ public class CanPerformStep extends ReceiveBehaviour implements ParentBehaviourC
 				currentProductStep =
 						new ProductStep(message.getSender(), productStep.getCapability(), productStep.getParameters(),
 								inputParts, null, StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
-				productStepEntryId = productStepBB.insertDocument(currentProductStep.toBasicDBObject());
+				productStepEntryId = productStepsBlackboard.insertDocument(currentProductStep.toBasicDBObject());
 				equipletAgent.addCommunicationRelation(message.getConversationId(), productStepEntryId);
 				
 				// start behaviour to ask the service agent if the productionstep can be done.
-				equipletAgent.addBehaviour(new CanPerformProductionStep(equipletAgent, productStepBB, this,
+				equipletAgent.addBehaviour(new CanPerformProductionStep(equipletAgent, productStepsBlackboard, this,
 																		message.getConversationId(), productStepEntryId));
 				
 				
