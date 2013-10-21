@@ -52,32 +52,24 @@ GripperNode::GripperNode(int equipletID, int moduleID) :
 	setInstructionActionServer(nodeHandle, "gripper_node/set_instruction", boost::bind(&GripperNode::onSetInstruction, this, _1), false) {
 
 	std::cout << "[DEBUG] Opening modbus connection" << std::endl;
-	modbusContext = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
 
-	if (modbusContext == NULL) {
-		throw std::runtime_error("Unable to allocate libmodbus context");
-	}
+	/*
+		modbusContext = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
 
-	if (modbus_connect(modbusContext) == -1) {
-		throw std::runtime_error("Modbus connection to IO controller failed");
-	}
+		if (modbusContext == NULL) {
+			throw std::runtime_error("Unable to allocate libmodbus context");
+		}
 
-	assert(modbusContext != NULL);
+		if (modbus_connect(modbusContext) == -1) {
+			throw std::runtime_error("Modbus connection to IO controller failed");
+		}
 
-	modbus = new rexos_modbus::ModbusController(modbusContext);
+		assert(modbusContext != NULL);
 
-	std::cout << "[DEBUG] Opening IO Controller" << std::endl;
-	controller = new rexos_gripper::InputOutputController(modbus);
-
-	std::cout << "[DEBUG] Starting gripper" << std::endl;
-	
-	gripper = new rexos_gripper::Gripper(controller, this, wrapperForGripperError);
-
-	// Advertise the services
-	std::cout << "[DEBUG] Advertising the services" << std::endl;
-	ros::NodeHandle nodeHandle;
-	gripService = nodeHandle.advertiseService(GripperNodeServices::GRIP, &GripperNode::grip, this);
-	releaseService = nodeHandle.advertiseService(GripperNodeServices::RELEASE, &GripperNode::release, this);
+		modbus = new rexos_modbus::ModbusController(modbusContext);
+		controller = new rexos_gripper::InputOutputController(modbus);
+		gripper = new rexos_gripper::Gripper(controller, this, wrapperForGripperError);
+	*/
 }
 
 GripperNode::~GripperNode() {
