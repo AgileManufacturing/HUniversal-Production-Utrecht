@@ -99,7 +99,7 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 	// stmt = statement
 	// pstmt = prepared statement
 	sql::PreparedStatement* selectCalibrationMatricesPStmt = apConnection->prepareStatement("\
-	SELECT calibrationmatrices.* FROM calibrationmatrices \
+	SELECT calibrationMatrices.* FROM calibrationMatrices \
 	JOIN modules AS lensModules ON lensModules.module_type = calibrationMatrices.lens \
 	JOIN modules AS cameraModules ON cameraModules.module_type = calibrationMatrices.camera \
 	WHERE lensModules.id = ? AND cameraModules.id = ?;");
@@ -165,7 +165,7 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 			getCorrectionMatricesClient.call(getCalibrationMatricesServiceCall);
 			
 			sql::PreparedStatement* insertCalibrationMatricesPStmt = apConnection->prepareStatement(
-			"INSERT INTO calibrationmatrices ( \
+			"INSERT INTO calibrationMatrices ( \
 				camera, \
 				lens, \
 				distCoef_0,  distCoef_1,  distCoef_2, distCoef_3,  distCoef_4, \
@@ -173,8 +173,8 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 				cameraMatrix_1_0, cameraMatrix_1_1, cameraMatrix_1_2, \
 				cameraMatrix_2_0, cameraMatrix_2_1, cameraMatrix_2_2 \
 			) VALUES ( \
-				(SELECT module_type FROM modules WHERE id = ?), (SELECT module_type FROM modules WHERE id = ?), \
-				(SELECT module_type FROM modules WHERE id = ?), (SELECT module_type FROM modules WHERE id = ?), \
+				(SELECT module_type FROM modules WHERE id = ?), \
+				(SELECT module_type FROM modules WHERE id = ?), \
 				?, ?, ?, ?, ?, \
 				?, ?, ?, \
 				?, ?, ?, \
