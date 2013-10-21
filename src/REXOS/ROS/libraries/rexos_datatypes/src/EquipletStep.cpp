@@ -145,7 +145,7 @@ namespace rexos_datatypes{
 
         std::stringstream ss;
 
-        ss << "{ 'serviceStepID' : " << this.serviceStepID << "', ";
+        ss << "{ 'serviceStepID' : " << this->serviceStepID << "', ";
         ss << "'nextStep' : '" << this->nextStep << "', ";
         ss << "'moduleId' : '" << this->moduleId << "', ";
         ss << "'instructionData' : '" << this->instructData.toJSONString() << "', ";
