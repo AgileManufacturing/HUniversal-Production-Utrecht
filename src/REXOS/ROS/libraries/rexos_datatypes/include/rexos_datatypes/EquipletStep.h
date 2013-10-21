@@ -50,6 +50,7 @@ namespace rexos_datatypes{
         void setTimeData(TimeData timeData);
 
         JSONNode getJsonNode();
+        std::string toJSONString();
     private:
             JSONNode jsonNode;
             std::string _id;
