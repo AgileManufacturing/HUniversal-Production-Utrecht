@@ -91,6 +91,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 EquipletNode::~EquipletNode(){
 	delete equipletStepBlackboardClient;
 	delete equipletStepBlackboardClient;
+	delete directMoveBlackBoardClient;
 	delete equipletCommandBlackboardClient;
 	delete equipletStateBlackboardClient;
 
@@ -111,9 +112,9 @@ EquipletNode::~EquipletNode(){
 void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) {
 	mongo::OID targetObjectId;
 	oplogEntry.getTargetObjectId(targetObjectId);
-	JSONNode n = libjson::parse(directMoveBlackBoardClient->findDocumentById(targetObjectId).jsonString());
 
 	if(&subscription == equipletStepSubscription) {
+		JSONNode n = libjson::parse(equipletStepBlackboardClient->findDocumentById(targetObjectId).jsonString());
 	    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
 	    //We only need to handle the step if its status is 'WAITING'
 	    if (step->getStatus().compare("WAITING") == 0) {
@@ -123,6 +124,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 		ROS_INFO("Received equiplet statemachine command");
     	handleEquipletCommand(libjson::parse(oplogEntry.getUpdateDocument().jsonString()));
 	} else if(&subscription == directMoveSubscription) {
+		JSONNode n = libjson::parse(directMoveBlackBoardClient->findDocumentById(targetObjectId).jsonString());
 		rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
 		handleDirectMoveCommand(step, targetObjectId);
 	}
