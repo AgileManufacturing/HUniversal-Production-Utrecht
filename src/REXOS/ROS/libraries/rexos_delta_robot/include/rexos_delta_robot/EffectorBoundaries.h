@@ -119,10 +119,11 @@ namespace rexos_delta_robot{
 		/**
 		 * An enum holding the values an entry in the pointValidityCache can have. They indicate whether a point fits within the boundaries or not, or if this has not yet been determined.
 		 **/
-		enum cacheEntry{
+		enum entry{
 			UNKNOWN,
 			VALID,
-			INVALID
+			INVALID,
+			BORDER
 		};
 
 		/**
@@ -147,7 +148,7 @@ namespace rexos_delta_robot{
 		 * @var int8_t* boundariesBitmap
 		 * A pointer to the boundaries bitmap. This bitmap is a one dimensional array of booleans, defaulted to false, where voxels are checked and set to true if they are reachable.
 		 **/
-		int8_t* boundariesBitmap;
+		entry* boundariesBitmap;
 
 		/**
 		 * @var InverseKinematicsModel& kinematics
