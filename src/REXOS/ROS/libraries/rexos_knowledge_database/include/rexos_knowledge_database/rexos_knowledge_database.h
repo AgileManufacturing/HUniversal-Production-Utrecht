@@ -35,10 +35,10 @@
 #include <cppconn/exception.h>
 
 // TEMP!
-#define MYSQL_SERVER "tcp://127.0.0.1:3306"
-#define MYSQL_DATABASE "rexos_knowledge_base"
-#define MYSQL_USERNAME "root"
-#define MYSQL_PASSWORD "mysqlForVisionCore"
+#define MYSQL_SERVER "tcp://145.89.191.131:3306"
+#define MYSQL_DATABASE "rexos_knowledge_base_test"
+#define MYSQL_USERNAME "rexos"
+#define MYSQL_PASSWORD "soxer"
 
 /**
  * @brief this class provides a system to translate coordinates from module coordinates to equiplet coordinates.
