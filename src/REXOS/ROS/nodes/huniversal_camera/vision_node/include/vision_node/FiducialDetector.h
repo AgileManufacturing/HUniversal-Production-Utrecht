@@ -1,9 +1,10 @@
 /**
- * @file part_locator_node.cpp
- * @brief locates objects and rotates points.
- * @date Created: 2013-09-20
+ * @file CameraCalibrationNode.h
+ * @brief Remote interface to adjust the camera settings in runtime.
+ * @date Created: 2012-10-18
  *
- * @author Garik hakopian
+ * @author Koen Braham
+ * @author Daan Veltman
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -27,30 +28,31 @@
  *
  **/
 
-#ifndef MODULEDETECTORNODE_H_
-#define MODULEDETECTORNODE_H_
+#ifndef FIDUCIALREADERNODE_H_
+#define FIDUCIALREADERNODE_H_
 
 #include "ros/ros.h"
 
-#include <string>
-#include <iostream>
-#include <map>
+#include <image_transport/image_transport.h>
+#include <rexos_vision/FiducialDetector.h> 
 
-#include <vision_node/QrCodes.h>
-#include "std_msgs/String.h"
-
-class ModuleDetectorNode {
-	
+/**
+ * @brief This class detects fiducials (black circles with a white crosshair).
+ */
+class FiducialDetector {
 public:
-	ModuleDetectorNode();
-	void run();
+	FiducialDetector(ros::NodeHandle nodeHandle);
+	void handleFrame(cv::Mat& frame, cv::Mat* debugFrame = NULL);
 private:
-	ros::NodeHandle nodeHandle;
-  	ros::Publisher modulesPublisher;
+  	ros::Publisher fiducialPublisher;
+
+	rexos_vision::FiducialDetector fiducialDetector;
+	image_transport::ImageTransport imageTransport;
 	
-	std::map<std::string, ros::Time> pendingQrCodes;
-	
-	void qrCodeCallback(const vision_node::QrCodes & message);
+	/**
+	 * Publisher the debug image
+	 **/
+	image_transport::Publisher debugImagePublisher;
 };
 
-#endif /* MODULEDETECTORNODE_H_ */
+#endif /* FIDUCIALREADERNODE_H_ */

@@ -1,1 +1,0 @@
-qrCode[] collection

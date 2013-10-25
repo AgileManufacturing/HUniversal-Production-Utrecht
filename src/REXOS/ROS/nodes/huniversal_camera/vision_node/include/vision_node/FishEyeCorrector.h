@@ -1,9 +1,10 @@
 /**
- * @file part_locator_node.cpp
- * @brief locates objects and rotates points.
- * @date Created: 2013-09-20
+ * @file CameraCalibrationNode.h
+ * @brief Remote interface to adjust the camera settings in runtime.
+ * @date Created: 2012-10-18
  *
- * @author Garik hakopian
+ * @author Koen Braham
+ * @author Daan Veltman
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -27,30 +28,28 @@
  *
  **/
 
-#ifndef MODULEDETECTORNODE_H_
-#define MODULEDETECTORNODE_H_
+#pragma once
 
 #include "ros/ros.h"
 
-#include <string>
-#include <iostream>
-#include <map>
+#include <camera/RectifyImage.h>
 
-#include <vision_node/QrCodes.h>
-#include "std_msgs/String.h"
+#include <vision_node/setCorrectionMatrices.h>
+#include <vision_node/getCorrectionMatrices.h>
 
-class ModuleDetectorNode {
-	
+class FishEyeCorrector {
 public:
-	ModuleDetectorNode();
-	void run();
+	FishEyeCorrector(ros::NodeHandle& nodeHandle);
+	cv::Mat handleFrame(cv::Mat& frame);
+	
+	bool setCorrectionMatrices(vision_node::setCorrectionMatrices::Request& request,
+                        vision_node::setCorrectionMatrices::Response& response);
+	bool getCorrectionMatrices(vision_node::getCorrectionMatrices::Request& request,
+					vision_node::getCorrectionMatrices::Response& response);
+	void setFrameSize(cv::Size);
+	bool isReady();
 private:
-	ros::NodeHandle nodeHandle;
-  	ros::Publisher modulesPublisher;
-	
-	std::map<std::string, ros::Time> pendingQrCodes;
-	
-	void qrCodeCallback(const vision_node::QrCodes & message);
+        Camera::RectifyImage* rectifier;
+		bool areMatricesSet;
+		bool isFrameSizeSet;
 };
-
-#endif /* MODULEDETECTORNODE_H_ */

@@ -39,9 +39,9 @@ ModuleDetectorNode::ModuleDetectorNode() {
 	ROS_INFO("Constructing");
 }
 
-void ModuleDetectorNode::qrCodeCallback(const qr_code_reader_node::Collection & message) {
+void ModuleDetectorNode::qrCodeCallback(const vision_node::QrCodes & message) {
 	
-	int collectionSize = message.collection.size();
+	int collectionSize = message.qrCodes.size();
 	int moduleQrCodePrefixLength = strlen(MODULE_QR_CODE_PREFIX);
 	
 	// clean up deprecated QR codes
@@ -57,9 +57,9 @@ void ModuleDetectorNode::qrCodeCallback(const qr_code_reader_node::Collection & 
 	}
 	
 	for(int i = 0; i < collectionSize; i++){
-		if(message.collection[i].value.substr(0, moduleQrCodePrefixLength) == std::string(MODULE_QR_CODE_PREFIX)) {
+		if(message.qrCodes[i].value.substr(0, moduleQrCodePrefixLength) == std::string(MODULE_QR_CODE_PREFIX)) {
 			// we have found a QR code of a module.
-			std::string data = message.collection[i].value.substr(moduleQrCodePrefixLength);
+			std::string data = message.qrCodes[i].value.substr(moduleQrCodePrefixLength);
 			
 			// have we previously scanned this QR code?
 			if(pendingQrCodes.count(data) == 0){

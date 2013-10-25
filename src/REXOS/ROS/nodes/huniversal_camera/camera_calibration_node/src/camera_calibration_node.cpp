@@ -30,8 +30,8 @@
 #include "camera_calibration_node/camera_calibration_node.h"
 #include "camera_calibration_node/Services.h"
 
-#include "camera_node/Services.h"
-#include "camera_node/setCorrectionMatrices.h"
+#include "vision_node/Services.h"
+#include "vision_node/setCorrectionMatrices.h"
 
 #include <camera/RectifyImage.h>
 
@@ -85,8 +85,8 @@ bool CameraCalibrationNode::calibrateLens(
 		ROS_INFO_STREAM("Dist Coeffs:" << std::endl << rectifier.distCoeffs);
 		ROS_INFO_STREAM("Camera matrix:" << std::endl << rectifier.cameraMatrix);
 
-		ros::ServiceClient client = nodeHandle.serviceClient<camera_node::setCorrectionMatrices>(camera_node_services::SET_CORRECTION_MATRICES);
-		camera_node::setCorrectionMatrices serviceCall;
+		ros::ServiceClient client = nodeHandle.serviceClient<vision_node::setCorrectionMatrices>(vision_node_services::SET_CORRECTION_MATRICES);
+		vision_node::setCorrectionMatrices serviceCall;
 		
 		// yeah, this is quite ugly
 		serviceCall.request.distCoeffs.push_back(rectifier.distCoeffs.at<double>(0));

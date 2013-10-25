@@ -29,16 +29,9 @@
 #include "ros/ros.h"
 
 #include "part_locator_node/part_locator_node.h"
-#include <qr_code_reader_node/Collection.h>
 #include "environment_cache/EnvironmentCache.h"
 
-
-
-
-
 #include "rexos_utilities/Utilities.h"
-
-
 
 using namespace std;
 
@@ -63,26 +56,26 @@ PartLocatorNode::PartLocatorNode(int equipletId, int moduleId):
 	ROS_INFO("Constructing");
 }
 
-void PartLocatorNode::qrCodeCallback(const qr_code_reader_node::Collection & message) {
+void PartLocatorNode::qrCodeCallback(const vision_node::QrCodes & message) {
 	detectCorners(message);
 	
 	// can not do conversion without the corners
 	if(foundCorners != 3) return;
 	
-	int collectionSize = message.collection.size();
+	int collectionSize = message.qrCodes.size();
 	for(int i = 0; i < collectionSize; i++){
 		Vector2* points = new Vector2[3];
 		for(int j = 0; j < 3; j++){
 			Vector3 oldCoor;
 
-			oldCoor.x = message.collection[i].corners[j].x;
-			oldCoor.y = message.collection[i].corners[j].y;
+			oldCoor.x = message.qrCodes[i].corners[j].x;
+			oldCoor.y = message.qrCodes[i].corners[j].y;
 			oldCoor.z = 1;
 		
-			//ROS_DEBUG_STREAM("QrCode \t" << message.collection[i].value << " corner \t" << j);
+			//ROS_DEBUG_STREAM("QrCode \t" << message.qrCodes[i].value << " corner \t" << j);
 			Vector3 newCoor = totalMatrix * oldCoor;
-			/*if(message.collection[i].value == "GC4x4MB_1") {
-				ROS_DEBUG_STREAM("QrCode " << message.collection[i].value << "\toldCoor \t" << oldCoor << "newCoor \t" << newCoor);
+			/*if(message.qrCodes[i].value == "GC4x4MB_1") {
+				ROS_DEBUG_STREAM("QrCode " << message.qrCodes[i].value << "\toldCoor \t" << oldCoor << "newCoor \t" << newCoor);
 			}*/
 
 			points[j] = Vector2(newCoor.x, newCoor.y);
@@ -99,42 +92,42 @@ void PartLocatorNode::qrCodeCallback(const qr_code_reader_node::Collection & mes
 		);
 		
 		Vector3 equipletCoor = convertToEquipletCoordinate(Vector3(centerCoor.x, centerCoor.y, 0));
-		/*if(message.collection[i].value == "GC4x4MB_1") {
+		/*if(message.qrCodes[i].value == "GC4x4MB_1") {
 			ROS_DEBUG_STREAM("-equipletCoor \t" << equipletCoor);
 		}*/
 		
 		double angle = getItemRotationAngle(lineA2B);
-		storeInEnviromentCache(message.collection[i].value, equipletCoor, angle);
+		storeInEnviromentCache(message.qrCodes[i].value, equipletCoor, angle);
 		
 		delete points;
 	}
 }
-void PartLocatorNode::detectCorners(const qr_code_reader_node::Collection & message) {
+void PartLocatorNode::detectCorners(const vision_node::QrCodes & message) {
 	ROS_DEBUG_STREAM("currentTopLeftCoor " << currentTopLeftCoor);
 	ROS_DEBUG_STREAM("currentTopRightCoor " << currentTopRightCoor);
 	ROS_DEBUG_STREAM("currentBottomRightCoor " << currentBottomRightCoor);
 	
 	bool updateMatrices = false;
-	for(int i = 0; i < message.collection.size(); i++){		
-		if(TOP_LEFT_VALUE.compare(message.collection[i].value) == 0){
-			currentTopLeftCoor.x = message.collection[i].corners[1].x;
-			currentTopLeftCoor.y = message.collection[i].corners[1].y;
+	for(int i = 0; i < message.qrCodes.size(); i++){		
+		if(TOP_LEFT_VALUE.compare(message.qrCodes[i].value) == 0){
+			currentTopLeftCoor.x = message.qrCodes[i].corners[1].x;
+			currentTopLeftCoor.y = message.qrCodes[i].corners[1].y;
 			updateMatrices = true;
 			if(originalTopLeftCoor.x == -1){
 				originalTopLeftCoor = currentTopLeftCoor;
 				foundCorners++;			
 			}
-		} else if(TOP_RIGHT_VALUE.compare(message.collection[i].value) == 0){
-			currentTopRightCoor.x = message.collection[i].corners[1].x;
-			currentTopRightCoor.y = message.collection[i].corners[1].y;			
+		} else if(TOP_RIGHT_VALUE.compare(message.qrCodes[i].value) == 0){
+			currentTopRightCoor.x = message.qrCodes[i].corners[1].x;
+			currentTopRightCoor.y = message.qrCodes[i].corners[1].y;			
 			updateMatrices = true;
 			if(originalTopRightCoor.x == -1){
 				originalTopRightCoor = currentTopRightCoor;
 				foundCorners++;
 			}
-		} else if(BOTTOM_RIGHT_VALUE.compare(message.collection[i].value) == 0){
-			currentBottomRightCoor.x = message.collection[i].corners[1].x;
-			currentBottomRightCoor.y = message.collection[i].corners[1].y;			
+		} else if(BOTTOM_RIGHT_VALUE.compare(message.qrCodes[i].value) == 0){
+			currentBottomRightCoor.x = message.qrCodes[i].corners[1].x;
+			currentBottomRightCoor.y = message.qrCodes[i].corners[1].y;			
 			updateMatrices = true;
 			if(originalBottomRightCoor.x == -1){
 				originalBottomRightCoor = currentBottomRightCoor;
@@ -159,8 +152,8 @@ double PartLocatorNode::getItemRotationAngle(Vector2 lineA2B) {
 	
 	//ROS_DEBUG_STREAM("-expectedItemAngle \t" << expectedItemAngle);
 	//ROS_DEBUG_STREAM("-actualItemAngle \t" << actualItemAngle);
-	/*if(message.collection[i].value == "GC4x4MB_1") {
-		ROS_DEBUG_STREAM("QrCode " << message.collection[i].value << "\t-angle \t" << angle);
+	/*if(message.qrCodes[i].value == "GC4x4MB_1") {
+		ROS_DEBUG_STREAM("QrCode " << message.qrCodes[i].value << "\t-angle \t" << angle);
 	}*/
 	return angle;
 }

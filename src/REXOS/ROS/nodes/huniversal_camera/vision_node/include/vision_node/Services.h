@@ -1,9 +1,9 @@
 /**
- * @file part_locator_node.cpp
- * @brief locates objects and rotates points.
- * @date Created: 2013-09-20
+ * @file Services.h
+ * @brief Containts the services names
+ * @date Created: 2012-10-23
  *
- * @author Garik hakopian
+ * @author Koen Braham
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -27,30 +27,18 @@
  *
  **/
 
-#ifndef MODULEDETECTORNODE_H_
-#define MODULEDETECTORNODE_H_
-
-#include "ros/ros.h"
+#pragma once
 
 #include <string>
-#include <iostream>
-#include <map>
 
-#include <vision_node/QrCodes.h>
-#include "std_msgs/String.h"
-
-class ModuleDetectorNode {
-	
-public:
-	ModuleDetectorNode();
-	void run();
-private:
-	ros::NodeHandle nodeHandle;
-  	ros::Publisher modulesPublisher;
-	
-	std::map<std::string, ros::Time> pendingQrCodes;
-	
-	void qrCodeCallback(const vision_node::QrCodes & message);
-};
-
-#endif /* MODULEDETECTORNODE_H_ */
+namespace vision_node_services {
+	const std::string INCREASE_EXPOSURE = "increaseExposure";
+	const std::string DECREASE_EXPOSURE = "decreaseExposure";
+	const std::string AUTO_WHITE_BALANCE = "autoWhiteBalance";
+	const std::string FISH_EYE_CORRECTION = "fishEyeCorrection";
+	const std::string ENABLE_CAMERA = "enableCamera";
+	const std::string ENABLE_QR_CODE_READER = "enableQrCodeReader";
+	const std::string ENABLE_FISH_EYE_CORRECTOR = "enableFishEyeCorrector";
+	const std::string SET_CORRECTION_MATRICES = "setCalibrationMatrices";
+	const std::string GET_CORRECTION_MATRICES = "getCalibrationMatrices";
+}

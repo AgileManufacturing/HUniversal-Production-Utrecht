@@ -31,10 +31,11 @@
 
 #include "camera_control_node/camera_control_node.h"
 
-#include "camera_node/Services.h"
-#include "camera_node/fishEyeCorrection.h"
-#include "camera_node/enableCamera.h"
-#include "camera_node/getCorrectionMatrices.h"
+#include "vision_node/Services.h"
+#include <vision_node/autoWhiteBalance.h>
+#include <vision_node/enableComponent.h>
+#include <vision_node/setCorrectionMatrices.h>
+#include <vision_node/getCorrectionMatrices.h>
 #include "camera_calibration_node/Services.h"
 #include "camera_calibration_node/calibrateLens.h"
 #include "rexos_utilities/Utilities.h"
@@ -46,12 +47,12 @@
 #include <iostream>
 
 CameraControlNode::CameraControlNode(int equipletId, int cameraModuleId, int lensModuleId) :
-		increaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(							camera_node_services::INCREASE_EXPOSURE)),
-		decreaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(							camera_node_services::DECREASE_EXPOSURE)),
-		autoWhiteBalanceClient(			nodeHandle.serviceClient<camera_node::AutoWhiteBalance>(			camera_node_services::AUTO_WHITE_BALANCE)),
-		fishEyeCorrectionClient(		nodeHandle.serviceClient<camera_node::fishEyeCorrection>(			camera_node_services::FISH_EYE_CORRECTION)),
-		enableCameraClient(				nodeHandle.serviceClient<camera_node::enableCamera>(				camera_node_services::ENABLE_CAMERA)),
-		getCorrectionMatricesClient(	nodeHandle.serviceClient<camera_node::getCorrectionMatrices>(		camera_node_services::GET_CORRECTION_MATRICES)),
+		increaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(							vision_node_services::INCREASE_EXPOSURE)),
+		decreaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(							vision_node_services::DECREASE_EXPOSURE)),
+		autoWhiteBalanceClient(			nodeHandle.serviceClient<vision_node::autoWhiteBalance>(			vision_node_services::AUTO_WHITE_BALANCE)),
+		fishEyeCorrectionClient(		nodeHandle.serviceClient<vision_node::enableComponent>(				vision_node_services::FISH_EYE_CORRECTION)),
+		enableCameraClient(				nodeHandle.serviceClient<vision_node::enableComponent>(				vision_node_services::ENABLE_CAMERA)),
+		getCorrectionMatricesClient(	nodeHandle.serviceClient<vision_node::getCorrectionMatrices>(		vision_node_services::GET_CORRECTION_MATRICES)),
 		calibrateLensClient(			nodeHandle.serviceClient<camera_calibration_node::calibrateLens>(	camera_calibration_node_services::CALIBRATE_LENS)),
 		rexos_statemachine::ModuleStateMachine("camera_control_node",equipletId, cameraModuleId, true),
 		equipletId(equipletId),
@@ -69,7 +70,7 @@ void CameraControlNode::decreaseExposureCall() {
 }
 
 void CameraControlNode::autoWhiteBalanceCall(bool enabled) {
-	camera_node::AutoWhiteBalance autoWhiteBalance;
+	vision_node::autoWhiteBalance autoWhiteBalance;
 	autoWhiteBalance.request.enable = enabled;
 	ROS_INFO_STREAM("Calling service autoWhiteBalanceClient " << enabled << " " << autoWhiteBalanceClient.call(autoWhiteBalance));
 }
@@ -112,8 +113,8 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 		// we have found a calibrateLens correction matrix
 		ROS_INFO("calibrateLens correction matrix found");
 		
-		ros::ServiceClient client = nodeHandle.serviceClient<camera_node::setCorrectionMatrices>(camera_node_services::SET_CORRECTION_MATRICES);
-		camera_node::setCorrectionMatrices serviceCall;
+		ros::ServiceClient client = nodeHandle.serviceClient<vision_node::setCorrectionMatrices>(vision_node_services::SET_CORRECTION_MATRICES);
+		vision_node::setCorrectionMatrices serviceCall;
 		
 		// set the cursor at the first result
 		calibrationMatricesResult->next(); 
@@ -141,7 +142,7 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 	}
 	else{
 		// disable the fishEyeCorrection while doing the calibration
-		camera_node::fishEyeCorrection fishEyeServiceCall;
+		vision_node::enableComponent fishEyeServiceCall;
 		fishEyeServiceCall.request.enable = false;
 		fishEyeCorrectionClient.call(fishEyeServiceCall);
 
@@ -161,7 +162,7 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 		}
 		else{
 			ROS_INFO_STREAM("Saving matrices to database for cameraId=" << cameraModuleId << " and lensModuleId=" << lensModuleId);
-			camera_node::getCorrectionMatrices getCalibrationMatricesServiceCall;
+			vision_node::getCorrectionMatrices getCalibrationMatricesServiceCall;
 			getCorrectionMatricesClient.call(getCalibrationMatricesServiceCall);
 			
 			sql::PreparedStatement* insertCalibrationMatricesPStmt = apConnection->prepareStatement(
@@ -213,7 +214,7 @@ void CameraControlNode::transitionShutdown(rexos_statemachine::TransitionActionS
  **/
 void CameraControlNode::transitionStart(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Start transition called");
-	camera_node::enableCamera serviceCall;
+	vision_node::enableComponent serviceCall;
 	serviceCall.request.enable = true;
 	enableCameraClient.call(serviceCall);
 	
@@ -225,7 +226,7 @@ void CameraControlNode::transitionStart(rexos_statemachine::TransitionActionServ
  **/
 void CameraControlNode::transitionStop(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Stop transition called");
-	camera_node::enableCamera serviceCall;
+	vision_node::enableComponent serviceCall;
 	serviceCall.request.enable = false;
 	enableCameraClient.call(serviceCall);
 	

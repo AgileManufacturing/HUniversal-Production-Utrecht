@@ -15,8 +15,8 @@
   <run_depend>std_msgs</run_depend>
   <build_depend>message_generation</build_depend>
   <run_depend>message_runtime</run_depend>
-<build_depend>qr_code_reader_node</build_depend>
-  <run_depend>qr_code_reader_node</run_depend>
+<build_depend>vision_node</build_depend>
+  <run_depend>vision_node</run_depend>
 
 <build_depend>Vectors</build_depend>
   <run_depend>Vectors</run_depend>
