@@ -156,7 +156,6 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
     }
     
     //we now have an angle, and 2 points. Lets work some magic.
-
     if(lookupIsSet) {
 		double cs = cos(angle);
 		double sn = sin(angle);
@@ -168,7 +167,12 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 		payloadPoint.y += rotatedY;
 	}
 
-	if(moveToPoint(payloadPoint.x, payloadPoint.y, payloadPoint.z, payloadPoint.maxAcceleration)){
+
+	Vector3 vector(payloadPoint.x, payloadPoint.y, payloadPoint.z);
+	Vector3 translatedVector = convertToModuleCoordinate(vector);
+	std::cout << "translatedVector" << translatedVector << std::endl;
+
+	if(moveToPoint(translatedVector.x, translatedVector.y, translatedVector.z, payloadPoint.maxAcceleration)){
 		setInstructionActionServer.setSucceeded(result_);
 		return;
 	}
@@ -343,9 +347,6 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
 	if(p.z  == 0){
 		p.z = lastZ;
 	}
-	Vector3 vector(p.x, p.y, p.z);
-	Vector3 translatedVector = convertToModuleCoordinate(vector);
-	std::cout << "translatedVector" << translatedVector << std::endl;
 	
 	return p;
 }
