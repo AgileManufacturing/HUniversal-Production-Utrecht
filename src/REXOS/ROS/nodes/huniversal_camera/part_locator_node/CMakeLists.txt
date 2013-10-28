@@ -3,7 +3,7 @@ project(part_locator_node)
 
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation qr_code_reader_node Vectors Matrices rexos_coordinates rexos_utilities environment_cache environment_communication_msgs)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation vision_node Vectors Matrices rexos_coordinates rexos_utilities environment_cache environment_communication_msgs)
 find_package(OpenCV REQUIRED COMPONENTS)
 find_package(Mongo)
 
@@ -26,7 +26,7 @@ generate_messages (
 catkin_package(
 INCLUDE_DIRS include
 LIBRARIES  
-CATKIN_DEPENDS message_runtime roscpp std_msgs qr_code_reader_node Vectors Matrices rexos_coordinates environment_cache environment_communication_msgs
+CATKIN_DEPENDS message_runtime roscpp std_msgs vision_node Vectors Matrices rexos_coordinates environment_cache environment_communication_msgs
 DEPENDS OpenCV)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

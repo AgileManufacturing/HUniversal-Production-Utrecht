@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(module_detector_node)
+project(vision_node)
 
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation vision_node)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation camera rexos_vision rexos_utilities image_transport)
 find_package(OpenCV REQUIRED COMPONENTS)
-find_package(Mongo)
+find_package(cv_bridge REQUIRED COMPONENTS)
 
 file(GLOB_RECURSE msgs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/msg" "*.msg")
 add_message_files(
@@ -26,11 +26,11 @@ generate_messages (
 catkin_package(
 INCLUDE_DIRS include
 LIBRARIES  
-CATKIN_DEPENDS message_runtime roscpp std_msgs vision_node
-DEPENDS OpenCV)
+CATKIN_DEPENDS message_runtime roscpp std_msgs camera rexos_vision rexos_utilities image_transport
+DEPENDS cv_bridge)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 include_directories(include ${catkin_INCLUDE_DIRS})
-add_executable(module_detector_node src/module_detector_node.cpp)
-add_dependencies(module_detector_node module_detector_node_gencpp)
-target_link_libraries(module_detector_node ${catkin_LIBRARIES})
+add_executable(vision_node ${sources})
+add_dependencies(vision_node vision_node_gencpp )
+target_link_libraries(vision_node ${catkin_LIBRARIES} ${cv_bridge_LIBRARIES})

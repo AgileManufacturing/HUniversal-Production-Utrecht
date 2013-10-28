@@ -36,9 +36,10 @@
 
 #include <image_transport/image_transport.h>
 
-#include <camera_node/camera_node.h>
 #include <camera_calibration_node/calibrateLens.h>
 #include <camera_calibration_node/calibrateEffector.h>
+
+#include <opencv2/imgproc/imgproc.hpp>
 
 /**
  * @brief this class uses the camera/RectifyImage library to create and upload a matrix in order to rectify an image.

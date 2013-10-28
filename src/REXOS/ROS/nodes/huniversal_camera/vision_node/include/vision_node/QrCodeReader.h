@@ -1,9 +1,10 @@
 /**
- * @file part_locator_node.cpp
- * @brief locates objects and rotates points.
- * @date Created: 2013-09-20
+ * @file CameraCalibrationNode.h
+ * @brief Remote interface to adjust the camera settings in runtime.
+ * @date Created: 2012-10-18
  *
- * @author Garik hakopian
+ * @author Koen Braham
+ * @author Daan Veltman
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -27,30 +28,25 @@
  *
  **/
 
-#ifndef MODULEDETECTORNODE_H_
-#define MODULEDETECTORNODE_H_
+#ifndef QRCODEREADER_H_
+#define QRCODEREADER_H_
 
 #include "ros/ros.h"
 
-#include <string>
-#include <iostream>
-#include <map>
+#include <image_transport/image_transport.h>
+#include <rexos_vision/QRCodeDetector.h> 
 
-#include <vision_node/QrCodes.h>
-#include "std_msgs/String.h"
-
-class ModuleDetectorNode {
-	
+class QrCodeReader {
 public:
-	ModuleDetectorNode();
-	void run();
+	QrCodeReader(ros::NodeHandle& nodeHandle);
+	void handleFrame(cv::Mat& frame, cv::Mat* debugFrame = NULL);
 private:
-	ros::NodeHandle nodeHandle;
-  	ros::Publisher modulesPublisher;
-	
-	std::map<std::string, ros::Time> pendingQrCodes;
-	
-	void qrCodeCallback(const vision_node::QrCodes & message);
+  	ros::Publisher qrCodesPublisher;
+
+	rexos_vision::QRCodeDetector qrCodeDetector;
+
+	image_transport::ImageTransport imageTransport;
+	image_transport::Publisher debugImagePublisher;
 };
 
-#endif /* MODULEDETECTORNODE_H_ */
+#endif /* QRCODEREADERNODE_H_ */

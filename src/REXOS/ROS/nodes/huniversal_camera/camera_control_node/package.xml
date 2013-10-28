@@ -14,8 +14,8 @@
   <build_depend>camera</build_depend>
   <run_depend>camera</run_depend>
 
-  <build_depend>camera_node</build_depend>
-  <run_depend>camera_node</run_depend>
+  <build_depend>vision_node</build_depend>
+  <run_depend>vision_node</run_depend>
 
   <build_depend>camera_calibration_node</build_depend>
   <run_depend>camera_calibration_node</run_depend>

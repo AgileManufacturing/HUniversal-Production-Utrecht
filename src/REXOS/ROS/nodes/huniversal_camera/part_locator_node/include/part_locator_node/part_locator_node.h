@@ -34,7 +34,7 @@
 
 #include <opencv/cv.h>
 #include <opencv2/highgui/highgui.hpp>
-#include <qr_code_reader_node/Collection.h>
+#include <vision_node/QrCodes.h>
 
 #include <iostream>
 #include <string>
@@ -43,6 +43,7 @@
 #include <Vectors/Vectors.h>
 #include <rexos_coordinates/Module.h>
 
+#include <vision_node/QrCodes.h>
 
 class PartLocatorNode : rexos_coordinates::Module {
 protected:
@@ -95,15 +96,15 @@ private:
 	ros::ServiceClient environmentCacheClient;
 	
 	/**
-	 * Handles the input from the qr_code_reader_node
+	 * Handles the input from the vision_node
 	 * It converts the QR code coordinates from screen space to workplane space (by multiplying it with totalMatrix). 
 	 **/
-	void qrCodeCallback(const qr_code_reader_node::Collection & message);
+	void qrCodeCallback(const vision_node::QrCodes & message);
 	
 	/**
 	 * Extracts the QR codes from the message and selects the QR codes of the corners (if present). If so, it will call updateMatrices().
 	 **/
-	void detectCorners(const qr_code_reader_node::Collection & message);
+	void detectCorners(const vision_node::QrCodes & message);
 	/**
 	 * Submits the QR code to the enviroment_cache
 	 * @param the value on the QR code
