@@ -149,12 +149,7 @@ public class CanPerformProductionStep extends ReceiveBehaviour {
 			ObjectId productStepEntryId = equipletAgent
 					.getRelatedObjectId(message.getConversationId());
 			
-			if ( message.getPerformative() == ACLMessage.CONFIRM){
-				//nothing special to do when the response is CONFIRM
-			}
-			
-			// if the productstep can not be done by this equiplet remove it from the blackboard.
-			else if (message.getPerformative() == ACLMessage.DISCONFIRM){
+			if (message.getPerformative() == ACLMessage.DISCONFIRM){
 				try{
 				productStepsBlackboard.removeDocuments(new BasicDBObject("_id",
 						productStepEntryId));

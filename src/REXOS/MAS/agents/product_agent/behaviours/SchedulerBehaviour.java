@@ -232,7 +232,7 @@ public class SchedulerBehaviour extends Behaviour {
 				} 
 				else 
 				{
-					Logger.log(LogLevel.ERROR, "There doesnt seem to be any equiplets available..");
+					Logger.log(LogLevel.ERROR, "There doesnt seem to be any equiplet available..");
 				}
 	
 				ArrayList<Schedule> schedules = new ArrayList<Schedule>();
