@@ -264,7 +264,7 @@ std::map<std::string, std::string> EquipletNode::callLookupHandler(std::string l
 		environment_communication_msgs::Map map = msg.response.lookupMsg.payLoad;
 		return createMapFromMessage(map);
 	} else {
-		ROS_ERROR("Error in calling lookupHandler/lookup service");
+		ROS_INFO("Error in calling lookupHandler/lookup service");
 	}
 }
 /**
