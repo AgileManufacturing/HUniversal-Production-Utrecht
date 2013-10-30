@@ -348,7 +348,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					ObjectId productStepId = serviceStep.getProductStepId();
 					switch(operation) {
 						case UPDATE:
-							StepStatusCode status = serviceStep.getStatus();
+							StepStatusCode status = serviceStep.getServiceStepStatus();
 							Logger.log(LogLevel.DEBUG, "Service agent - serv.Step %s status set to %s%n", serviceStepId, status);
 							switch(status) {
 								case DELETED:
@@ -372,11 +372,11 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 									break;
 								case DONE:
 
-									if(serviceStep.getNextStep() != null) {
+									if(serviceStep.getNextServiceStep() != null) {
 										Logger.log(LogLevel.DEBUG, "Service agent - setting status of next serv.Step %s to %s%n",
-												serviceStep.getNextStep(), StepStatusCode.WAITING);
+												serviceStep.getNextServiceStep(), StepStatusCode.WAITING);
 										serviceStepBBClient.updateDocuments(
-												new BasicDBObject("_id", serviceStep.getNextStep()),
+												new BasicDBObject("_id", serviceStep.getNextServiceStep()),
 												new BasicDBObject("$set", new BasicDBObject("status",
 														StepStatusCode.WAITING.name())));
 										break;
