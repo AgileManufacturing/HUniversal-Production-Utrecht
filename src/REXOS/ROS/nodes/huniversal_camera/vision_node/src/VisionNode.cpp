@@ -58,17 +58,17 @@ VisionNode::VisionNode(int deviceNumber, int formatNumber, std::string pathToXml
 
 	ROS_INFO("Advertising services");
 	// Advertise the services.
-	ros::ServiceServer increaseExposureService = nodeHandle.advertiseService(vision_node_services::INCREASE_EXPOSURE,
+	increaseExposureService = nodeHandle.advertiseService(vision_node_services::INCREASE_EXPOSURE,
 	        &VisionNode::increaseExposure, this);
-	ros::ServiceServer decreaseExposureService = nodeHandle.advertiseService(vision_node_services::DECREASE_EXPOSURE,
+	decreaseExposureService = nodeHandle.advertiseService(vision_node_services::DECREASE_EXPOSURE,
 	        &VisionNode::decreaseExposure, this);
-	ros::ServiceServer autoWhiteBalanceService = nodeHandle.advertiseService(vision_node_services::AUTO_WHITE_BALANCE,
+	autoWhiteBalanceService = nodeHandle.advertiseService(vision_node_services::AUTO_WHITE_BALANCE,
 	        &VisionNode::autoWhiteBalance, this);
-	ros::ServiceServer enableCameraService = nodeHandle.advertiseService(vision_node_services::ENABLE_CAMERA,
+	enableCameraService = nodeHandle.advertiseService(vision_node_services::ENABLE_CAMERA,
 	        &VisionNode::enableCamera, this);
-	ros::ServiceServer enableQrCodeReaderService = nodeHandle.advertiseService(vision_node_services::ENABLE_QR_CODE_READER,
+	enableQrCodeReaderService = nodeHandle.advertiseService(vision_node_services::ENABLE_QR_CODE_READER,
 	        &VisionNode::enableQrCodeReader, this);
-	ros::ServiceServer enableFishEyeCorrectorService = nodeHandle.advertiseService(vision_node_services::ENABLE_FISH_EYE_CORRECTOR,
+	enableFishEyeCorrectorService = nodeHandle.advertiseService(vision_node_services::ENABLE_FISH_EYE_CORRECTOR,
 	        &VisionNode::enableFishEyeCorrector, this);
 	
 	cameraFeedPublisher = imgTransport.advertise("camera/image", 1);

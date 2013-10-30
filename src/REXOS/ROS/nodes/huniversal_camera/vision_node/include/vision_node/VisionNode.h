@@ -79,6 +79,13 @@ private:
 	bool isFudicialDetectorEnabled;
 	bool isCameraEnabled;
 	
+	ros::ServiceServer increaseExposureService;
+	ros::ServiceServer decreaseExposureService;
+	ros::ServiceServer autoWhiteBalanceService;
+	ros::ServiceServer enableCameraService;
+	ros::ServiceServer enableQrCodeReaderService;
+	ros::ServiceServer enableFishEyeCorrectorService;
+	
 	image_transport::ImageTransport imgTransport;
 	image_transport::Publisher cameraFeedPublisher;
 	QrCodeReader qrCodeReader;
