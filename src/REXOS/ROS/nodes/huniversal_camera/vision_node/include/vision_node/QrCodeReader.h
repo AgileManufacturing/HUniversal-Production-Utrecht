@@ -38,14 +38,13 @@
 
 class QrCodeReader {
 public:
-	QrCodeReader(ros::NodeHandle& nodeHandle);
+	QrCodeReader(ros::NodeHandle& nodeHandle, image_transport::ImageTransport& imageTransport);
 	void handleFrame(cv::Mat& frame, cv::Mat* debugFrame = NULL);
 private:
   	ros::Publisher qrCodesPublisher;
 
 	rexos_vision::QRCodeDetector qrCodeDetector;
 
-	image_transport::ImageTransport imageTransport;
 	image_transport::Publisher debugImagePublisher;
 };
 

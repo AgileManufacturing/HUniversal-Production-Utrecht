@@ -42,7 +42,7 @@ FishEyeCorrector::FishEyeCorrector(ros::NodeHandle& nodeHandle) :
 		&FishEyeCorrector::getCorrectionMatrices, this);
 }
 void FishEyeCorrector::setFrameSize(cv::Size imageSize){
-	rectifier->setImageSize(imageSize);
+	rectifier.setImageSize(imageSize);
 	isFrameSizeSet = true;
 }
 bool FishEyeCorrector::isReady(){
@@ -50,7 +50,7 @@ bool FishEyeCorrector::isReady(){
 }
 
 cv::Mat FishEyeCorrector::handleFrame(cv::Mat& frame) {
-	rectifier->rectify(frame);
+	rectifier.rectify(frame);
 }
 
 bool FishEyeCorrector::setCorrectionMatrices(vision_node::setCorrectionMatrices::Request& request, vision_node::setCorrectionMatrices::Response& response) {
@@ -75,31 +75,31 @@ bool FishEyeCorrector::setCorrectionMatrices(vision_node::setCorrectionMatrices:
 			request.cameraMatrix.values[8]
 	);
 
-	ROS_INFO_STREAM("Dist Coeffs: " << std::endl << rectifier->distCoeffs);
-	ROS_INFO_STREAM("Camera matrix: " << std::endl << rectifier->cameraMatrix);
+	ROS_INFO_STREAM("Dist Coeffs: " << std::endl << rectifier.distCoeffs);
+	ROS_INFO_STREAM("Camera matrix: " << std::endl << rectifier.cameraMatrix);
 	
-	rectifier->loadMatrices(cameraMatrix, distCoeffs);
+	rectifier.loadMatrices(cameraMatrix, distCoeffs);
 	areMatricesSet = true;
 	return true;
 }
 
 bool FishEyeCorrector::getCorrectionMatrices(vision_node::getCorrectionMatrices::Request& request, vision_node::getCorrectionMatrices::Response& response) {
 	if(areMatricesSet == true) {
-		response.distCoeffs.push_back(rectifier->distCoeffs.at<double>(0));
-		response.distCoeffs.push_back(rectifier->distCoeffs.at<double>(1));
-		response.distCoeffs.push_back(rectifier->distCoeffs.at<double>(2));
-		response.distCoeffs.push_back(rectifier->distCoeffs.at<double>(3));
-		response.distCoeffs.push_back(rectifier->distCoeffs.at<double>(4));
+		response.distCoeffs.push_back(rectifier.distCoeffs.at<double>(0));
+		response.distCoeffs.push_back(rectifier.distCoeffs.at<double>(1));
+		response.distCoeffs.push_back(rectifier.distCoeffs.at<double>(2));
+		response.distCoeffs.push_back(rectifier.distCoeffs.at<double>(3));
+		response.distCoeffs.push_back(rectifier.distCoeffs.at<double>(4));
 		
-		response.cameraMatrix.values[0] = rectifier->cameraMatrix.at<double>(0, 0);
-		response.cameraMatrix.values[1] = rectifier->cameraMatrix.at<double>(0, 1);
-		response.cameraMatrix.values[2] = rectifier->cameraMatrix.at<double>(0, 2);
-		response.cameraMatrix.values[3] = rectifier->cameraMatrix.at<double>(1, 0);
-		response.cameraMatrix.values[4] = rectifier->cameraMatrix.at<double>(1, 1);
-		response.cameraMatrix.values[5] = rectifier->cameraMatrix.at<double>(1, 2);
-		response.cameraMatrix.values[6] = rectifier->cameraMatrix.at<double>(2, 0);
-		response.cameraMatrix.values[7] = rectifier->cameraMatrix.at<double>(2, 1);
-		response.cameraMatrix.values[8] = rectifier->cameraMatrix.at<double>(2, 2);
+		response.cameraMatrix.values[0] = rectifier.cameraMatrix.at<double>(0, 0);
+		response.cameraMatrix.values[1] = rectifier.cameraMatrix.at<double>(0, 1);
+		response.cameraMatrix.values[2] = rectifier.cameraMatrix.at<double>(0, 2);
+		response.cameraMatrix.values[3] = rectifier.cameraMatrix.at<double>(1, 0);
+		response.cameraMatrix.values[4] = rectifier.cameraMatrix.at<double>(1, 1);
+		response.cameraMatrix.values[5] = rectifier.cameraMatrix.at<double>(1, 2);
+		response.cameraMatrix.values[6] = rectifier.cameraMatrix.at<double>(2, 0);
+		response.cameraMatrix.values[7] = rectifier.cameraMatrix.at<double>(2, 1);
+		response.cameraMatrix.values[8] = rectifier.cameraMatrix.at<double>(2, 2);
 		return true;
 	} else {
 		return false;

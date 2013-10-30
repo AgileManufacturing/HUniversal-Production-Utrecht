@@ -43,7 +43,9 @@ VisionNode::VisionNode(int deviceNumber, int formatNumber, std::string pathToXml
 		exposure(0.015), 
 		isCameraEnabled(true), isFishEyeCorrectorEnabled(false),
 		isQrCodeReaderEnabled(true), isFudicialDetectorEnabled(false),
-		qrCodeReader(nodeHandle), fishEyeCorrector(nodeHandle)
+		qrCodeReader(nodeHandle, imgTransport),
+		fishEyeCorrector(nodeHandle)
+		
 {
 	// Connect to camera. On failure a exception will be thrown.
 	ROS_INFO("Initializing camera");
@@ -108,7 +110,7 @@ bool VisionNode::autoWhiteBalance(vision_node::autoWhiteBalance::Request& reques
 		return false;
 	}
 }
-bool VisionNode::enableFishEyeCorrector(vision_node::enableComponent::Request& request, std_srvs::Empty::Response& response) {
+bool VisionNode::enableFishEyeCorrector(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response) {
 	ROS_DEBUG_STREAM("Service fishEyeCorrection " << request.enable);
 	if(cam && fishEyeCorrector.isReady() == true) {
 		isFishEyeCorrectorEnabled = request.enable;
@@ -118,7 +120,7 @@ bool VisionNode::enableFishEyeCorrector(vision_node::enableComponent::Request& r
 	}
 
 }
-bool VisionNode::enableCamera(vision_node::enableComponent::Request& request, std_srvs::Empty::Response& response) {
+bool VisionNode::enableCamera(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response) {
 	ROS_DEBUG_STREAM("Service enableCamera " << request.enable);
 	if(cam) {
 		isCameraEnabled = request.enable;
@@ -127,7 +129,7 @@ bool VisionNode::enableCamera(vision_node::enableComponent::Request& request, st
 		return false;
 	}
 }
-bool VisionNode::enableQrCodeReader(vision_node::enableComponent::Request& request, std_srvs::Empty::Response& response) {
+bool VisionNode::enableQrCodeReader(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response) {
 	ROS_DEBUG_STREAM("Service enableQrCodeReader " << request.enable);
 	if(cam) {
 		isQrCodeReaderEnabled = request.enable;
@@ -158,16 +160,16 @@ void VisionNode::run() {
 			if(isQrCodeReaderEnabled == true){
 				qrCodeReader.handleFrame(grayScaleFrame, &camFrame);
 			}
-		}
 		
-		if(cameraFeedPublisher.getNumSubscribers() != 0){
-			ros::Time time = ros::Time::now();
-			cv_bridge::CvImage cvi;
-			cvi.header.stamp = time;
-			cvi.header.frame_id = "image";
-			cvi.encoding = sensor_msgs::image_encodings::BGR8;
-			cvi.image = camFrame;
-			cameraFeedPublisher.publish(cvi.toImageMsg());
+			if(cameraFeedPublisher.getNumSubscribers() != 0){
+				ros::Time time = ros::Time::now();
+				cv_bridge::CvImage cvi;
+				cvi.header.stamp = time;
+				cvi.header.frame_id = "image";
+				cvi.encoding = sensor_msgs::image_encodings::BGR8;
+				cvi.image = camFrame;
+				cameraFeedPublisher.publish(cvi.toImageMsg());
+			}
 		}
 		
 		frameRate.sleep();

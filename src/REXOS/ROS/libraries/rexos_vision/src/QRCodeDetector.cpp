@@ -113,9 +113,7 @@ namespace rexos_vision{
 			int amountOfScannedResults = scanner.scan(zbarImage);
 
 			if(amountOfScannedResults > 0){
-
-				zbar::Image::SymbolIterator it = zbarImage.symbol_begin();
-				for(; it!=zbarImage.symbol_end(); ++it){
+				for(zbar::Image::SymbolIterator it = zbarImage.symbol_begin(); it!=zbarImage.symbol_end(); ++it){
 					// Add all "position" corners of a qr code to a vector
 					std::vector<cv::Point2f> corners;
 					corners.push_back(cv::Point2f(it->get_location_x(1), it->get_location_y(1)));

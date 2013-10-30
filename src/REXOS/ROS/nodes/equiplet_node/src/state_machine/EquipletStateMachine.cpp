@@ -73,6 +73,10 @@ void EquipletStateMachine::onModuleModeChanged(ModuleProxy* moduleProxy, rexos_s
 	}
 }
 
+void EquipletStateMachine::onModuleDied(ModuleProxy* moduleProxy){
+	ROS_ERROR("module has died!");
+}
+
 bool EquipletStateMachine::allModulesInDesiredState(rexos_statemachine::State desiredState){
 	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
 	for(int i=0; i < modules.size(); i++){

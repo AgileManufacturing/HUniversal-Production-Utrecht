@@ -62,10 +62,10 @@ public:
 	bool increaseExposure(std_srvs::Empty::Request &request, std_srvs::Empty::Response &response);
 	bool decreaseExposure(std_srvs::Empty::Request &request, std_srvs::Empty::Response &response);
 	bool autoWhiteBalance(vision_node::autoWhiteBalance::Request &request, vision_node::autoWhiteBalance::Response &response);
-	bool enableFishEyeCorrector(vision_node::enableComponent::Request& request, std_srvs::Empty::Response& response);
-	bool enableQrCodeReader(vision_node::enableComponent::Request& request, std_srvs::Empty::Response& response);
-	bool enableFudicialDetector(vision_node::enableComponent::Request& request, std_srvs::Empty::Response& response);
-	bool enableCamera(vision_node::enableComponent::Request& request, std_srvs::Empty::Response& response);
+	bool enableFishEyeCorrector(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response);
+	bool enableQrCodeReader(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response);
+	bool enableFudicialDetector(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response);
+	bool enableCamera(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response);
 	
 private:
 	unicap_cv_bridge::UnicapCvCamera * cam;

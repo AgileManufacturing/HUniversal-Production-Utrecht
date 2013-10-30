@@ -43,10 +43,7 @@
 
 #include <iostream>
 
-QrCodeReader::QrCodeReader(ros::NodeHandle& nodeHandle) :
-
-	imageTransport(nodeHandle)
-{
+QrCodeReader::QrCodeReader(ros::NodeHandle& nodeHandle, image_transport::ImageTransport& imageTransport) {
 	ROS_INFO("Advertising topic");
 	qrCodesPublisher = nodeHandle.advertise<vision_node::QrCodes>("camera/qr_codes", 10);
 	debugImagePublisher = imageTransport.advertise("camera/qr_debug_image", 1);

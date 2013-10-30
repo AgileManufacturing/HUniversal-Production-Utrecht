@@ -10,6 +10,8 @@
 
 #include <actionlib/client/simple_action_client.h>
 
+#include <bondcpp/bond.h>
+
 #include <rexos_statemachine/State.h>
 #include <rexos_statemachine/Mode.h>
 
@@ -78,6 +80,11 @@ private:
 
 	rexos_statemachine::State currentState;
 	rexos_statemachine::Mode currentMode;
+	
+	/**
+	 * The bond to bind the module with the equiplet
+	 **/
+	bond::Bond* bond;
 };
 
 } /* namespace equiplet_node */

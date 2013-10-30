@@ -41,9 +41,7 @@
 
 #include <iostream>
 
-FiducialDetector::FiducialDetector(ros::NodeHandle nodeHandle) :
-
-	imageTransport(nodeHandle),
+FiducialDetector::FiducialDetector(ros::NodeHandle nodeHandle, image_transport::ImageTransport& imageTransport) :
 	fiducialDetector(8, 35)
 {
 	fiducialPublisher = nodeHandle.advertise<vision_node::Fiducials>("camera/fiducials", 10);

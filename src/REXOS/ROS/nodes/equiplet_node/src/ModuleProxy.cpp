@@ -17,7 +17,8 @@ ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleName, i
 	currentMode(rexos_statemachine::Mode::MODE_NORMAL),
 	currentState(rexos_statemachine::State::STATE_SAFE),
 	moduleProxyListener(mpl),
-	moduleId(moduleId)
+	moduleId(moduleId),
+	bond(NULL)
 {
 	stateUpdateServiceServer = nodeHandle.advertiseService(
 			equipletNodeName + "/" + moduleNodeName + "/state_update",
@@ -26,6 +27,7 @@ ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleName, i
 	modeUpdateServiceServer = nodeHandle.advertiseService(
 			equipletNodeName + "/" + moduleNodeName + "/mode_update",
 			&ModuleProxy::onModeChangeServiceCallback, this);
+	bond = new bond::Bond(moduleName + "/bond", std::to_string(moduleId));
 }
 
 ModuleProxy::~ModuleProxy() {

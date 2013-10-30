@@ -66,6 +66,7 @@ protected:
 
 	void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
 
+	void onModuleDied(ModuleProxy* moduleProxy);
 private:
 	bool allModulesInDesiredState(rexos_statemachine::State desiredState);
 

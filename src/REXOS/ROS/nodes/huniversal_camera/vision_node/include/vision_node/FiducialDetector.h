@@ -41,13 +41,12 @@
  */
 class FiducialDetector {
 public:
-	FiducialDetector(ros::NodeHandle nodeHandle);
+	FiducialDetector(ros::NodeHandle nodeHandle, image_transport::ImageTransport& imageTransport);
 	void handleFrame(cv::Mat& frame, cv::Mat* debugFrame = NULL);
 private:
   	ros::Publisher fiducialPublisher;
 
 	rexos_vision::FiducialDetector fiducialDetector;
-	image_transport::ImageTransport imageTransport;
 	
 	/**
 	 * Publisher the debug image

@@ -49,7 +49,7 @@ public:
 	void setFrameSize(cv::Size);
 	bool isReady();
 private:
-        Camera::RectifyImage* rectifier;
+        Camera::RectifyImage rectifier;
 		bool areMatricesSet;
 		bool isFrameSizeSet;
 };

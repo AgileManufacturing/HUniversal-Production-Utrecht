@@ -42,8 +42,15 @@ namespace Camera {
 		cv::Mat distCoeffs;
 		cv::Mat cameraMatrix;
 	private:
+		/**
+		 * A collection of points of the object (usually a perfect 1, 1 grid)
+		 */
 		std::vector<std::vector<cv::Point3f> > objectPoints;
+		/**
+		 * A collection of points of the object as seen on the screen
+		 */
 		std::vector<std::vector<cv::Point2f> > imagePoints;
+		
 		cv::Mat map1;
 		cv::Mat map2;
 		cv::Size imageSize;
