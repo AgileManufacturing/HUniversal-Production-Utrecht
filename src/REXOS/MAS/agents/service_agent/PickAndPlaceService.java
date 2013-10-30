@@ -147,7 +147,7 @@ public class PickAndPlaceService extends Service {
 			BasicDBObject newParameters = new BasicDBObject();
 			
 			// fill crate Ids
-			switch(ss.getType()) {
+			switch(ss.getServiceStepType()) {
 				case 1: // Pick - Supply
 					// Grab a ball
 					//Part ball = partParameters.entrySet().iterator().next().getKey();

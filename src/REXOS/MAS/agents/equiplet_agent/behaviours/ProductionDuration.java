@@ -91,7 +91,7 @@ public class ProductionDuration extends ReceiveBehaviour implements ParentBehavi
 
 	/**
 	 * Function to handle the incoming messages for this behaviour.
-	 * Handles the response to the GetProductStepDuration question and asks the service agent the same question.
+	 * Handles the response to the ProductionDuration question and asks the service agent the same question.
 	 * 
 	 * @param message - The received message.
 	 */

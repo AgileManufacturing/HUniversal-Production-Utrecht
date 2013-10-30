@@ -66,7 +66,7 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	private long deadline;
 	
 	/**
-	 * Creates a new <code>ScheduleData</code> leaving <code>startTime</code>, <code>duration</code> and <code>deadline</code> uninitialized.
+	 * Creates a new <code>ScheduleData</code> leaving <code>startTime</code>, <code>duration</code> and <code>deadline</code> initialized to -1.
 	 */
 	public ScheduleData() {
 		startTime = -1;

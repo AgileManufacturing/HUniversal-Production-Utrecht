@@ -156,7 +156,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 			Module module = moduleFactory.getModuleById(leadingModule);
 			module.setConfiguration(hardwareAgent.getConfiguration());
 			// create the equipletSteps
-			EquipletStep[] equipletSteps = module.getEquipletSteps(serviceStep.getType(), serviceStep.getParameters());
+			EquipletStep[] equipletSteps = module.getEquipletSteps(serviceStep.getServiceStepType(), serviceStep.getParameters());
 			
 			if(equipletSteps.length > 0) 
 			{
@@ -169,7 +169,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 					EquipletStep equipletStep = equipletSteps[i];
 					stepDuration += equipletStep.getTimeData().getDuration();
 					equipletStep.setServiceStepID(serviceStepId);
-					equipletStep.setNextStep(next);
+					equipletStep.setNextEquipletStep(next);
 					next = equipletStepsBBClient.insertDocumentUnsafe(equipletStep.toBasicDBObject());
 				}
 				
@@ -181,14 +181,14 @@ public class EvaluateDuration extends ReceiveBehaviour {
 				hardwareAgent.getServiceStepsBBClient().updateDocuments(new BasicDBObject("_id", serviceStepId),
 						new BasicDBObject("$set", new BasicDBObject("scheduleData", schedule.toBasicDBObject())));
 				// if the serviceStep has an next step calculate the duration for that one too.
-				if(serviceStep.getNextStep() != null) {
-					EvaluateStepDuration(serviceStep.getNextStep());
+				if(serviceStep.getNextServiceStep() != null) {
+					EvaluateStepDuration(serviceStep.getNextServiceStep());
 				}
 			} 
 			else 
 			{
 				hardwareAgent.cancelAllStepsForServiceStep(serviceStepId, String.format(
-						"%s.getEquipletSteps(%d, %s) returned no steps.", module, serviceStep.getType(),
+						"%s.getEquipletSteps(%d, %s) returned no steps.", module, serviceStep.getServiceStepType(),
 						serviceStep.getParameters()));
 			}
 		} 

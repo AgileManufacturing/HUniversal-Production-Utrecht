@@ -82,6 +82,7 @@ import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
+import sun.security.krb5.Config;
 import agents.data_classes.DbData;
 import agents.data_classes.EquipletMode;
 import agents.data_classes.EquipletState;
@@ -164,6 +165,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	private BlackboardClient stateBBClient;
 	private BlackboardClient desiredStateBBClient;
 
+	private BlackboardClient planningBlackBoard;
+	
 	private FieldUpdateSubscription statusSubscription;
 
 	private FieldUpdateSubscription modeUpdateSubscription;
@@ -229,6 +232,12 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 */
 	private String productStepsName;
 
+	/**
+	 * @var String planningName
+	 * 		Name of the collection for the planning blackboard.
+	 */
+	private String planningName;
+	
 	
 	private static long systemStart = System.currentTimeMillis();
 
@@ -248,6 +257,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			equipletDbPort = Configuration.getPropertyInt(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbPort", getAID().getLocalName());
 		 	equipletDbName = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbName", getAID().getLocalName());
 		 	productStepsName = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ProductStepsBlackBoardName", getAID().getLocalName());
+		 	planningName = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "PlanningBlackBoardName", getAID().getLocalName());
 		 	
 			Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as an equiplet agent.");
 			
@@ -301,6 +311,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			desiredStateBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "stateBlackBoardName"));
 			desiredStateBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletCommandCollectionName"));
 
+			planningBlackBoard = new BlackboardClient(equipletDbIp, equipletDbPort);
+			planningBlackBoard.setDatabase(equipletDbName);
+			planningBlackBoard.setCollection(planningName);
+			
 			// makes connection with the collective blackboard.
 			collectiveBBClient = new BlackboardClient(collectiveDbIp, collectiveDbPort);
 			collectiveBBClient.setDatabase(collectiveDbName);
