@@ -152,7 +152,7 @@ public class ServiceStepDuration extends ReceiveBehaviour {
 				while(nextStep != null) {
 					serviceStep.fromBasicDBObject((BasicDBObject) serviceAgent.getServiceStepBBClient().findDocumentById(nextStep));
 					duration += serviceStep.getScheduleData().getDuration();
-					nextStep = serviceStep.getNextStep();
+					nextStep = serviceStep.getNextServiceStep();
 				}
 
 				ObjectId productStepId = serviceStep.getProductStepId();

@@ -167,9 +167,9 @@ public class FillPlaceholders extends ReceiveBehaviour {
 			}
 			
 			// if the serviceStep has a nextStep fill the placeholders for that one to.
-			if(serviceStep.getNextStep() != null) 
+			if(serviceStep.getNextServiceStep() != null) 
 			{
-				FillStepPlaceholders(serviceStep.getNextStep());
+				FillStepPlaceholders(serviceStep.getNextServiceStep());
 			}
 		}
 		catch(InvalidDBNamespaceException | GeneralMongoException e) 

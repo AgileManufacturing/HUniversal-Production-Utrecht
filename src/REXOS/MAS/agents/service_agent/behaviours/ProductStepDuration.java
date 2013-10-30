@@ -128,7 +128,7 @@ public class ProductStepDuration extends ReceiveBehaviour implements ParentBehav
 			ObjectId serviceStepId = null;
 			BlackboardClient serviceStepBB = serviceAgent.getServiceStepBBClient();
 			for(int i = serviceSteps.length - 1; i >= 0; i--) {
-				serviceSteps[i].setNextStep(serviceStepId);
+				serviceSteps[i].setNextServiceStep(serviceStepId);
 				serviceStepId = serviceStepBB.insertDocument(serviceSteps[i].toBasicDBObject());
 			}
 
