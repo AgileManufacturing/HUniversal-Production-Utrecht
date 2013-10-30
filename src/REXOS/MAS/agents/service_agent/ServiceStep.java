@@ -57,10 +57,10 @@ public class ServiceStep implements MongoSaveable {
 	private ObjectId _id;
 
 	/**
-	 * @var ObjectId nextStep
+	 * @var ObjectId nextServiceStep
 	 *      The ObjectId of the next serviceStep to be executed.
 	 */
-	private ObjectId nextStep;
+	private ObjectId nextServiceStep;
 
 	/**
 	 * @var int serviceId
@@ -72,7 +72,7 @@ public class ServiceStep implements MongoSaveable {
 	 * @var int type
 	 *      The type of this serviceStep. It stands for things like "Pick" or "Place".
 	 */
-	private int type;
+	private int serviceStepType;
 
 	/**
 	 * @var ObjectId productStepId
@@ -87,10 +87,10 @@ public class ServiceStep implements MongoSaveable {
 	private BasicDBObject parameters;
 
 	/**
-	 * @var StepStatusCode status
-	 *      The status of this step.
+	 * @var StepStatusCode serviceStepStatus
+	 *      The status of this service step.
 	 */
-	private StepStatusCode status;
+	private StepStatusCode serviceStepStatus;
 
 	/**
 	 * @var BasicDBObject statusData
@@ -141,12 +141,12 @@ public class ServiceStep implements MongoSaveable {
 	 */
 	public ServiceStep(ObjectId productStepId, int serviceId, int type, BasicDBObject parameters,
 			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
-		this.nextStep = null;
+		this.nextServiceStep = null;
 		this.serviceId = serviceId;
-		this.type = type;
+		this.serviceStepType = type;
 		this.productStepId = productStepId;
 		this.parameters = parameters;
-		this.status = status;
+		this.serviceStepStatus = status;
 		this.statusData = statusData;
 		this.scheduleData = scheduleData;
 	}
@@ -173,7 +173,7 @@ public class ServiceStep implements MongoSaveable {
 			ServiceStep firstServiceStep = null;
 			outer: for(ServiceStep serviceStep : unsortedSteps) {
 				for(ServiceStep serviceStep2 : unsortedSteps) {
-					if(serviceStep2.getNextStep() != null && serviceStep2.getNextStep().equals(serviceStep.getId())) {
+					if(serviceStep2.getNextServiceStep() != null && serviceStep2.getNextServiceStep().equals(serviceStep.getId())) {
 						continue outer;
 					}
 				}
@@ -187,7 +187,7 @@ public class ServiceStep implements MongoSaveable {
 			ServiceStep[] sortedSteps = new ServiceStep[stepsCount];
 			sortedSteps[0] = firstServiceStep;
 			for(int i = 1; i < stepsCount; i++) {
-				nextStepId = sortedSteps[i - 1].getNextStep();
+				nextStepId = sortedSteps[i - 1].getNextServiceStep();
 				for(ServiceStep serviceStep : unsortedSteps) {
 					if(serviceStep.getId().equals(nextStepId)) {
 						sortedSteps[i] = serviceStep;
@@ -208,12 +208,12 @@ public class ServiceStep implements MongoSaveable {
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject dbObject =
 				(BasicDBObject) BasicDBObjectBuilder.start()
-					.add("nextStep", nextStep)
+					.add("nextStep", nextServiceStep)
 					.add("serviceId", serviceId)
-					.add("type", type)
+					.add("type", serviceStepType)
 					.add("productStepId", productStepId)
 					.add("parameters", parameters)
-					.add("status", status.name())
+					.add("status", serviceStepStatus.name())
 					.add("statusData", statusData)
 					.add("scheduleData", scheduleData.toBasicDBObject()).get();
 
@@ -227,12 +227,12 @@ public class ServiceStep implements MongoSaveable {
 	public void fromBasicDBObject(BasicDBObject object) {
 		BasicDBObject copy = (BasicDBObject) object.copy();
 		_id = (ObjectId) copy.remove("_id");
-		nextStep = (ObjectId) copy.remove("nextStep");
+		nextServiceStep = (ObjectId) copy.remove("nextStep");
 		serviceId = (int) copy.remove("serviceId");
-		type = (int) copy.remove("type");
+		serviceStepType = (int) copy.remove("type");
 		productStepId = (ObjectId) copy.remove("productStepId");
 		parameters = (BasicDBObject) copy.remove("parameters");
-		status = StepStatusCode.valueOf((String) copy.remove("status"));
+		serviceStepStatus = StepStatusCode.valueOf((String) copy.remove("status"));
 		
 		if(copy.containsField("statusData")) {
 			statusData = (BasicDBObject) copy.remove("statusData");
@@ -265,8 +265,8 @@ public class ServiceStep implements MongoSaveable {
 	 * 
 	 * @return the ObjectId of the next step to be executed.
 	 */
-	public ObjectId getNextStep() {
-		return nextStep;
+	public ObjectId getNextServiceStep() {
+		return nextServiceStep;
 	}
 
 	/**
@@ -275,8 +275,8 @@ public class ServiceStep implements MongoSaveable {
 	 * 
 	 * @param nextStep the ObjectId of the next step to be executed.
 	 */
-	public void setNextStep(ObjectId nextStep) {
-		this.nextStep = nextStep;
+	public void setNextServiceStep(ObjectId nextStep) {
+		this.nextServiceStep = nextStep;
 	}
 
 	/**
@@ -302,8 +302,8 @@ public class ServiceStep implements MongoSaveable {
 	 * 
 	 * @return the type of this step.
 	 */
-	public int getType() {
-		return type;
+	public int getServiceStepType() {
+		return serviceStepType;
 	}
 
 	/**
@@ -311,8 +311,8 @@ public class ServiceStep implements MongoSaveable {
 	 * 
 	 * @param type the type of this step.
 	 */
-	public void setType(int type) {
-		this.type = type;
+	public void setServiceStepType(int type) {
+		this.serviceStepType = type;
 	}
 
 	/**
@@ -356,8 +356,8 @@ public class ServiceStep implements MongoSaveable {
 	 * 
 	 * @return the status
 	 */
-	public StepStatusCode getStatus() {
-		return status;
+	public StepStatusCode getServiceStepStatus() {
+		return serviceStepStatus;
 	}
 
 	/**
@@ -365,8 +365,8 @@ public class ServiceStep implements MongoSaveable {
 	 * 
 	 * @param status the status to set
 	 */
-	public void setStatus(StepStatusCode status) {
-		this.status = status;
+	public void setServiceStepStatus(StepStatusCode status) {
+		this.serviceStepStatus = status;
 	}
 
 	/**
