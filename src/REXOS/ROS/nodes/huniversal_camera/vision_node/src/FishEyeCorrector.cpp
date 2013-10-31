@@ -49,8 +49,8 @@ bool FishEyeCorrector::isReady(){
 	return isFrameSizeSet && areMatricesSet;
 }
 
-void FishEyeCorrector::handleFrame(cv::Mat& frame) {
-	rectifier.rectify(frame);
+cv::Mat FishEyeCorrector::handleFrame(cv::Mat& frame) {
+	return rectifier.rectify(frame);
 }
 
 bool FishEyeCorrector::setCorrectionMatrices(vision_node::setCorrectionMatrices::Request& request, vision_node::setCorrectionMatrices::Response& response) {

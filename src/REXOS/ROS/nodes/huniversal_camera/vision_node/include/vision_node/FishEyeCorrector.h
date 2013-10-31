@@ -40,7 +40,7 @@
 class FishEyeCorrector {
 public:
 	FishEyeCorrector(ros::NodeHandle& nodeHandle);
-	void handleFrame(cv::Mat& frame);
+	cv::Mat handleFrame(cv::Mat& frame);
 	
 	bool setCorrectionMatrices(vision_node::setCorrectionMatrices::Request& request,
                         vision_node::setCorrectionMatrices::Response& response);
