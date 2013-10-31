@@ -49,7 +49,7 @@ bool FishEyeCorrector::isReady(){
 	return isFrameSizeSet && areMatricesSet;
 }
 
-cv::Mat FishEyeCorrector::handleFrame(cv::Mat& frame) {
+void FishEyeCorrector::handleFrame(cv::Mat& frame) {
 	rectifier.rectify(frame);
 }
 
@@ -75,11 +75,12 @@ bool FishEyeCorrector::setCorrectionMatrices(vision_node::setCorrectionMatrices:
 			request.cameraMatrix.values[8]
 	);
 
+	rectifier.loadMatrices(cameraMatrix, distCoeffs);
+	areMatricesSet = true;
+	
 	ROS_INFO_STREAM("Dist Coeffs: " << std::endl << rectifier.distCoeffs);
 	ROS_INFO_STREAM("Camera matrix: " << std::endl << rectifier.cameraMatrix);
 	
-	rectifier.loadMatrices(cameraMatrix, distCoeffs);
-	areMatricesSet = true;
 	return true;
 }
 

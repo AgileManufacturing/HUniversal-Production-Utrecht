@@ -148,7 +148,7 @@ void VisionNode::run() {
 			// Read image 
 			cam->getFrame(&camFrame);
 			if(isFishEyeCorrectorEnabled == true){
-				camFrame = fishEyeCorrector.handleFrame(camFrame);
+				fishEyeCorrector.handleFrame(camFrame);
 			}
 			
 			cv::Mat grayScaleFrame;
