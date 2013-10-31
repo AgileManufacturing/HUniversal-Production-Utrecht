@@ -36,9 +36,9 @@
 FishEyeCorrector::FishEyeCorrector(ros::NodeHandle& nodeHandle) :
 		rectifier()
 {
-	ros::ServiceServer setCorrectionMatricesService = nodeHandle.advertiseService(vision_node_services::SET_CORRECTION_MATRICES,
+	setCorrectionMatricesService = nodeHandle.advertiseService(vision_node_services::SET_CORRECTION_MATRICES,
 		&FishEyeCorrector::setCorrectionMatrices, this);
-	ros::ServiceServer getCorrectionMatricesService = nodeHandle.advertiseService(vision_node_services::GET_CORRECTION_MATRICES,
+	getCorrectionMatricesService = nodeHandle.advertiseService(vision_node_services::GET_CORRECTION_MATRICES,
 		&FishEyeCorrector::getCorrectionMatrices, this);
 }
 void FishEyeCorrector::setFrameSize(cv::Size imageSize){

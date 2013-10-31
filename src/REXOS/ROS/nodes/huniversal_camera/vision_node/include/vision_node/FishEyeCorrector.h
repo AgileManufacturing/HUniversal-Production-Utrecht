@@ -52,4 +52,7 @@ private:
         Camera::RectifyImage rectifier;
 		bool areMatricesSet;
 		bool isFrameSizeSet;
+		
+		ros::ServiceServer setCorrectionMatricesService;
+		ros::ServiceServer getCorrectionMatricesService;
 };
