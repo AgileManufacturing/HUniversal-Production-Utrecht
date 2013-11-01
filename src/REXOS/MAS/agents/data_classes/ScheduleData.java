@@ -48,19 +48,19 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	private static final long serialVersionUID = 8380622365668923276L;
 	
 	/**
-	 * @var int startTime
+	 * @var long startTime
 	 * The start time.
 	 **/
 	private long startTime;
 	
 	/**
-	 * @var int duration
+	 * @var long duration
 	 * The duration.
 	 **/
 	private long duration;
 	
 	/**
-	 * @var int deadline
+	 * @var long deadline
 	 * The deadline.
 	 **/
 	private long deadline;
@@ -89,7 +89,7 @@ public class ScheduleData implements MongoSaveable, Serializable {
 	 * @param duration How long it will take to complete the <code>ProductionStep</code>.
 	 * @param deadline The <code>ProductionStep</code> with this <code>ScheduleData</code> should be finished after this timeslot.
 	 */
-	public ScheduleData(int startTime, int duration, int deadline) {
+	public ScheduleData(long startTime, long duration, long deadline) {
 		this.startTime = startTime;
 		this.duration = duration;
 		this.deadline = deadline;

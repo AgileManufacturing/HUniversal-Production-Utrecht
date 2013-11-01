@@ -264,7 +264,7 @@ public class SchedulerBehaviour extends Behaviour {
 				for (int i = 0; i < plannedSteps.size(); i++) 
 				{
 					long startTime = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getLong("startTime");
-					int duration = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getInt("duration");
+					long duration = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getLong("duration");
 					schedules.add(new Schedule(startTime, duration, aid));
 				}
 	
@@ -341,8 +341,7 @@ public class SchedulerBehaviour extends Behaviour {
 			_prodStep.setConversationId(returnMsg.getConversationId());
 			_schedulersCompleted++;
 
-		} catch (InvalidDBNamespaceException
-				| GeneralMongoException e) {
+		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 			Logger.log(LogLevel.ERROR, "Database exception at scheduling", e);
 		} catch (IOException e1){
 			Logger.log(LogLevel.ERROR, "Message content exception at scheduling", e1);
@@ -356,14 +355,14 @@ public class SchedulerBehaviour extends Behaviour {
 
 		/**
 		 * Construct free time slot
-		 * @param start
-		 * @param dura
-		 * @param equiplet
+		 * @param startTime
+		 * @param duration
+		 * @param equipletName
 		 */
-		public FreeTimeSlot(long start, int dura, AID equiplet) {
-			this.startTimeSlot = start;
-			this.duration = dura;
-			this.equipletName = equiplet;
+		public FreeTimeSlot(long startTime, long duration, AID equipletName) {
+			this.startTimeSlot = startTime;
+			this.duration = duration;
+			this.equipletName = equipletName;
 		}
 
 		/**
@@ -403,21 +402,21 @@ public class SchedulerBehaviour extends Behaviour {
 
 	private class Schedule {
 		private long startTime = -1;
-		private int duration = -1;
+		private long duration = -1;
 		private long deadline = -1;
 		private AID equipletName;
 
 		/**
 		 * Constructs Schedule object
-		 * @param start
-		 * @param dura
-		 * @param equiplet
+		 * @param startTime
+		 * @param duration
+		 * @param equipletName
 		 */
-		public Schedule(long start, int dura, AID equiplet) {
-			this.startTime = start;
-			this.duration = dura;
-			this.deadline = start + dura + 1;
-			this.equipletName = equiplet;
+		public Schedule(long startTime, long duration, AID equipletName) {
+			this.startTime = startTime;
+			this.duration = duration;
+			this.deadline = startTime + duration + 1;
+			this.equipletName = equipletName;
 		}
 
 		/**

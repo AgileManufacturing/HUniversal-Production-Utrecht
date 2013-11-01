@@ -37,6 +37,7 @@ package agents.service_agent.behaviours;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
 
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -49,6 +50,7 @@ import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
+import agents.data_classes.BehaviourCallbackItem;
 import agents.data_classes.ParentBehaviourCallback;
 import agents.data_classes.ProductStep;
 import agents.data_classes.ScheduleData;
@@ -89,7 +91,7 @@ public class ServiceStepDuration extends ReceiveBehaviour {
 	 * @var ObjectId objectId
 	 * 		The ObjectId used for the message
 	 */
-	private ObjectId objectId;
+	private ObjectId[] serviceStepIds;
 
 	/**
 	 * @var String conversationId
@@ -103,16 +105,16 @@ public class ServiceStepDuration extends ReceiveBehaviour {
 	 * @param serviceAgent the service agent this behaviour belongs to.
 	 * @param parentBehaviourCallback the parentbehaviour this behaviour calls back to 
 	 * @param conversationId the conversationId that any messages sent or received by this behaviour will have.
-	 * @param objectId The objectId used to check the duration
+	 * @param serviceStepIds The service step ids used to check the duration
 	 */
 	public ServiceStepDuration(ServiceAgent serviceAgent, ParentBehaviourCallback parentBehaviourCallback,
-			String conversationId, ObjectId objectId) {
+			String conversationId, ObjectId[] serviceStepIds) {
 		super(serviceAgent, MessageTemplate.MatchOntology("ServiceStepDuration"));
 		this.serviceAgent = serviceAgent;
 		
 		this.parentBehaviourCallback = parentBehaviourCallback;
 		
-		this.objectId = objectId;
+		this.serviceStepIds = serviceStepIds;
 		this.conversationId = conversationId;
 	}
 
@@ -121,9 +123,9 @@ public class ServiceStepDuration extends ReceiveBehaviour {
 		ACLMessage responseMessage = new ACLMessage(ACLMessage.QUERY_REF);
 		responseMessage.addReceiver(serviceAgent.getHardwareAgentAID());
 		responseMessage.setConversationId(conversationId);
-		if (objectId != null){
+		if (serviceStepIds != null){
 			try {
-				responseMessage.setContentObject(objectId);
+				responseMessage.setContentObject(serviceStepIds);
 			} catch (IOException e) {
 				Logger.log(LogLevel.ERROR, e);
 			}
@@ -146,29 +148,34 @@ public class ServiceStepDuration extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if(message != null) {
 			try {
-				ServiceStep serviceStep = new ServiceStep();
-				ObjectId nextStep = (ObjectId) message.getContentObject();
-				int duration = 0;
-				while(nextStep != null) {
-					serviceStep.fromBasicDBObject((BasicDBObject) serviceAgent.getServiceStepBBClient().findDocumentById(nextStep));
-					duration += serviceStep.getScheduleData().getDuration();
-					nextStep = serviceStep.getNextServiceStep();
+				HashMap<ObjectId, Long> serviceStepDurations = (HashMap<ObjectId, Long>) message.getContentObject();
+				//ObjectId nextStep = (ObjectId) message.getContentObject();
+				long duration = 0;
+				for ( ObjectId serviceStep: serviceStepDurations.keySet()){
+					duration += serviceStepDurations.get(serviceStep);
 				}
+			//	while(nextStep != null) {
+			//		serviceStep.fromBasicDBObject((BasicDBObject) serviceAgent.getServiceStepBBClient().findDocumentById(nextStep));
+			//		duration += serviceStep.getScheduleData().getDuration();
+			//		nextStep = serviceStep.getNextServiceStep();
+			//	}
 
-				ObjectId productStepId = serviceStep.getProductStepId();
-				ProductStep productStep =
-						new ProductStep((BasicDBObject) serviceAgent.getProductStepBBClient().findDocumentById(productStepId));
-				ScheduleData scheduleData = productStep.getScheduleData();
-				scheduleData.setDuration(duration);
+		//		ObjectId productStepId = serviceStep.getProductStepId();
+		//		ProductStep productStep =
+		//				new ProductStep((BasicDBObject) serviceAgent.getProductStepBBClient().findDocumentById(productStepId));
+		//		ScheduleData scheduleData = productStep.getScheduleData();
+		//		scheduleData.setDuration(duration);
 
-				Logger.log(LogLevel.DEBUG, "Saving duration of %d in prod. step %s%n", duration, productStepId);
-				serviceAgent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
-						new BasicDBObject("$set", new BasicDBObject("scheduleData", scheduleData.toBasicDBObject())));
-
-				parentBehaviourCallback.callback(message, null);
+		//		Logger.log(LogLevel.DEBUG, "Saving duration of %d in prod. step %s%n", duration, productStepId);
+		//		serviceAgent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
+		//				new BasicDBObject("$set", new BasicDBObject("scheduleData", scheduleData.toBasicDBObject())));
+				
+				BehaviourCallbackItem arguments = new BehaviourCallbackItem();
+				arguments.addArgument("duration", duration);
+				parentBehaviourCallback.callback(message, arguments);
 				serviceAgent.removeBehaviour(this);
 				
-			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {
+			} catch(UnreadableException e) {
 				Logger.log(LogLevel.ERROR, e);
 			}
 		} else {

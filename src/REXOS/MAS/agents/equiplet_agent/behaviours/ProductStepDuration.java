@@ -35,6 +35,7 @@ package agents.equiplet_agent.behaviours;
 
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -156,21 +157,21 @@ public class ProductStepDuration extends ReceiveBehaviour {
 				ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
 				ProductStep productStep = new ProductStep((BasicDBObject) productStepsBlackboard.findDocumentById(productStepId));
 
+				long duration = (Long) message.getContentObject();
+				
 				ScheduleData schedule = productStep.getScheduleData();
 //				schedule.setDuration(schedule.getDuration() + (6000/equipletAgent.getTimer().getTimeSlotLength()));
 //				equipletBBClient.updateDocuments(new BasicDBObject("_id", id),
 //												new BasicDBObject("$set", new BasicDBObject("scheduleData.duration", schedule.getDuration())));
-				
-				
 				BehaviourCallbackItem scheduleArguments = new BehaviourCallbackItem();
 				scheduleArguments.addArgument("schedule", schedule);
 				scheduleArguments.addArgument("productStep", productStep);
-				
+				scheduleArguments.addArgument("duration", duration);
 				parentBehaviourCallback.callback(message, scheduleArguments);
 				equipletAgent.removeBehaviour(this);
 				
 		//		Logger.log(LogLevel.DEBUG, "sending message: %s%n", responseMessage.getOntology());
-			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
+			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {
 				Logger.log(LogLevel.ERROR, e);
 				equipletAgent.doDelete();
 			}

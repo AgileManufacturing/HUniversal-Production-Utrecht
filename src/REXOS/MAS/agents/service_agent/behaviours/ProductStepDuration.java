@@ -40,6 +40,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
@@ -124,15 +125,17 @@ public class ProductStepDuration extends ReceiveBehaviour implements ParentBehav
 
 			Logger.log(LogLevel.DEBUG, "%s asking %s for duration of %d steps%n", serviceAgent.getLocalName(), serviceAgent.getHardwareAgentAID()
 					.getLocalName(), serviceSteps.length);
-
+			ObjectId[]serviceStepIds = new ObjectId[serviceSteps.length];
 			ObjectId serviceStepId = null;
 			BlackboardClient serviceStepBB = serviceAgent.getServiceStepBBClient();
+			//link all the service steps to eachother
 			for(int i = serviceSteps.length - 1; i >= 0; i--) {
 				serviceSteps[i].setNextServiceStep(serviceStepId);
 				serviceStepId = serviceStepBB.insertDocument(serviceSteps[i].toBasicDBObject());
+				serviceStepIds[i] = serviceStepId;
 			}
 
-			serviceAgent.addBehaviour(new ServiceStepDuration(serviceAgent, this, message.getConversationId(), serviceStepId));
+			serviceAgent.addBehaviour(new ServiceStepDuration(serviceAgent, this, message.getConversationId(), serviceStepIds	));
 			
 	//		ACLMessage askMessage = new ACLMessage(ACLMessage.QUERY_IF);
 	//		askMessage.addReceiver(serviceAgent.getHardwareAgentAID());
@@ -148,9 +151,18 @@ public class ProductStepDuration extends ReceiveBehaviour implements ParentBehav
 
 	@Override
 	public void callback(ACLMessage result, BehaviourCallbackItem arguments) {
+		
+		long duration = (long) arguments.getArgument("duration");
+		
 		ACLMessage answer = new ACLMessage(ACLMessage.INFORM);
 		answer.addReceiver(serviceAgent.getEquipletAgentAID());
 		answer.setConversationId(result.getConversationId());
+		try{
+			answer.setContentObject(duration);
+		}catch (IOException e){
+			Logger.log(LogLevel.DEBUG, duration);
+			serviceAgent.doDelete();
+		}
 		answer.setOntology("ProductStepDuration");
 		serviceAgent.send(answer);
 		

@@ -52,6 +52,8 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
@@ -118,39 +120,47 @@ public class EvaluateDuration extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		try {
 			// get the serviceStepId
-			ObjectId serviceStepId = (ObjectId) message.getContentObject();
+			ObjectId[] serviceStepIds = (ObjectId[]) message.getContentObject();
+			for (int i = 0 ; i < serviceStepIds.length; i++){
+				System.out.println("servicestepid: " + serviceStepIds[i]);
+			}
 			Logger.log(LogLevel.DEBUG, "%s received message from %s (%s:%s)%n", hardwareAgent.getLocalName(), message.getSender()
-					.getLocalName(), message.getOntology(), serviceStepId);
+					.getLocalName(), message.getOntology(), serviceStepIds);
 			// Evaluate the duration of the step
-			EvaluateStepDuration(serviceStepId);
+			HashMap<ObjectId, Long> serviceStepDurations = new HashMap<ObjectId, Long>();
+			for ( ObjectId curServiceStepId : serviceStepIds){
+				long duration = EvaluateStepDuration(curServiceStepId);
+				serviceStepDurations.put(curServiceStepId, duration);
+			}
 
 			// Send a message to the serviceAgent with the serviceStepId
-			ACLMessage reply;
-			reply = message.createReply();
+			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.INFORM);
-			reply.setContentObject(serviceStepId);
+			reply.setContentObject(serviceStepDurations);
 			reply.setOntology("ServiceStepDuration");
 			hardwareAgent.send(reply);
 		} catch(UnreadableException | IOException e) {
-			e.printStackTrace();
+			Logger.log(LogLevel.ERROR, e);
 			hardwareAgent.doDelete();
 		}
 	}
 
 	/**
-	 * Function for evaluating the step duration
+	 * Function for evaluating the step duration in amount of timeslots
 	 * 
 	 * @param serviceStepId the serviceStep to evaluate.
+	 * @return returns the calculated duration of all equipletsteps for the given servicestep
 	 */
-	public void EvaluateStepDuration(ObjectId serviceStepId) {
+	public long EvaluateStepDuration(ObjectId serviceStepId) {
 		try {
+			
 			// get the serviceStep
 			BasicDBObject dbServiceStep =
 					(BasicDBObject) hardwareAgent.getServiceStepsBBClient().findDocumentById(serviceStepId);
 
 			ServiceStep serviceStep = new ServiceStep(dbServiceStep);
 
-			int stepDuration = 0;
+			long serviceStepDuration = 0;
 			// get the leading module
 			int leadingModule = hardwareAgent.getLeadingModule(serviceStep.getServiceId());
 			Module module = moduleFactory.getModuleById(leadingModule);
@@ -167,23 +177,20 @@ public class EvaluateDuration extends ReceiveBehaviour {
 				for(int i = equipletSteps.length - 1; i >= 0; i--) 
 				{
 					EquipletStep equipletStep = equipletSteps[i];
-					stepDuration += equipletStep.getTimeData().getDuration();
+					serviceStepDuration += equipletStep.getTimeData().getDuration();
 					equipletStep.setServiceStepID(serviceStepId);
 					equipletStep.setNextEquipletStep(next);
 					next = equipletStepsBBClient.insertDocumentUnsafe(equipletStep.toBasicDBObject());
 				}
 				
 				// get the scheduleData and add the duration.
-				ScheduleData schedule = serviceStep.getScheduleData();
-				schedule.setDuration(stepDuration);
+			//	ScheduleData schedule = serviceStep.getScheduleData();
+			//	schedule.setDuration(serviceStepDuration);
 
 				// update the serviceStep
-				hardwareAgent.getServiceStepsBBClient().updateDocuments(new BasicDBObject("_id", serviceStepId),
-						new BasicDBObject("$set", new BasicDBObject("scheduleData", schedule.toBasicDBObject())));
+			//	hardwareAgent.getServiceStepsBBClient().updateDocuments(new BasicDBObject("_id", serviceStepId),
+			//			new BasicDBObject("$set", new BasicDBObject("scheduleData", schedule.toBasicDBObject())));
 				// if the serviceStep has an next step calculate the duration for that one too.
-				if(serviceStep.getNextServiceStep() != null) {
-					EvaluateStepDuration(serviceStep.getNextServiceStep());
-				}
 			} 
 			else 
 			{
@@ -191,11 +198,13 @@ public class EvaluateDuration extends ReceiveBehaviour {
 						"%s.getEquipletSteps(%d, %s) returned no steps.", module, serviceStep.getServiceStepType(),
 						serviceStep.getParameters()));
 			}
+			return serviceStepDuration;
 		} 
 		catch(InvalidDBNamespaceException | GeneralMongoException e) 
 		{
 			Logger.log(LogLevel.ERROR, e);
 			hardwareAgent.doDelete();
+			return 0;
 		}
 	}
 }

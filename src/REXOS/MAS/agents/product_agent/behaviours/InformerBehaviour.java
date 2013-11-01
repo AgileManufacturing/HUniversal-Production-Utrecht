@@ -70,7 +70,7 @@ import agents.product_agent.ProductAgent;
  */
 public class InformerBehaviour extends Behaviour {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;	
 	private ProductAgent _productAgent;
 	private Product _product;
 	private Production _production;

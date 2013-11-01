@@ -47,7 +47,6 @@ public class DrawLineService extends Service {
 	/**
 	 * @see rexos.mas.service_agent.Service#canDoStep(int, com.mongodb.BasicDBObject)
 	 */
-	@SuppressWarnings("unused")
 	@Override
 	public boolean canDoStep(int productStepType, BasicDBObject parameters) {
 		try {
