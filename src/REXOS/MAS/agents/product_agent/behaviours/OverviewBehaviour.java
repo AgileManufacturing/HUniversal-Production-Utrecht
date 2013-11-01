@@ -78,8 +78,9 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	public OverviewBehaviour(Agent myAgent) {
 		super(myAgent);
 		_productAgent = (ProductAgent) myAgent;
-		System.out
-				.println("Overview behaviour created. Starting all behaviours to the agents.");
+		//System.out.println("Overview behaviour created. Starting all behaviours to the agents.");
+		Logger.log(LogLevel.DEBUG, "Overview behaviour created. Starting all behaviours to the agents.");		
+		
 		_productAgent.setStatus(AgentStatus.INITIALIZING);
 		this.initialize();
 		_productAgent.setStatus(AgentStatus.DONE_INITIALIZING);
@@ -159,7 +160,8 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 				break;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.log(LogLevel.ERROR, "gotta catch 'em all!", e);
+			//e.printStackTrace();
 		}
 	}
 

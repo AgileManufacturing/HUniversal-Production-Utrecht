@@ -143,7 +143,6 @@ public class SchedulerBehaviour extends Behaviour {
 		} 
 		catch (Exception e) 
 		{
-			e.printStackTrace();
 			Logger.log(LogLevel.ERROR, e.toString());
 		}
 	}
