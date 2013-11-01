@@ -156,6 +156,8 @@ function createProductionCommand() {
 			window.parent.showNotification('success', 'Done', 3000);
 			break;
 		case 'pickAndPlace':
+			createProductionCommandFromCrateObject();
+			window.parent.showNotification('success', 'Done', 3000);
 			break;
 		case 'stacking':
 			break;
@@ -164,6 +166,42 @@ function createProductionCommand() {
 			break;
 	}
 
+}
+
+function createProductionCommandFromCrateObject() {
+	var frame = productionArray = document.getElementById("currentApplication").contentWindow;
+	var cubeArray = frame.cubes;
+	var crateRows = frame.CrateRows;
+	var crateColumns = frame.CrateColumns;
+
+	var cc = new pa_server.CommandContainer("CREATE_PA");
+
+	cc.data = document.getElementsById("gwip").value + ":" + document.getElementById("gwport").value;
+
+	for(var i = 0; i < cubes.length; i++) {
+		if(cubes[i] === undefined) {
+			continue;
+		}
+
+		var row = i / crateColumns;
+		var color; // TODO-Duncan: Get color from ((Three.MeshLambertMaterial)cubes[i]).color ?
+		var column = i % crateColumns;
+
+		var step = new pa_server.ProductionStep({
+			"id" : i,
+			"type" : "Place",
+			"row" : row,
+			"column" : column,
+			"color" : color
+		});
+		cc.payload.product.production.productionSteps.push(step);
+	}
+	cc.send();
+	var xml = json2xml(cc.payload.product," ");
+	cc.payload="";
+	cc.command="SAVE_DATA";
+	cc.data = xml;
+	cc.send();
 }
 
 function createProductionCommandFromColorArray() {
