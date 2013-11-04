@@ -56,8 +56,9 @@ bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookup_handl
 	//also need to return the normal payload if no data is appended.
 	response.lookupMsg.payLoad = request.lookupMsg.payLoad;
 
-	if(request.lookupMsg.lookupType.compare("LOOKUP-ID")) {
+	if(request.lookupMsg.lookupType.compare("FIND-ID")) {
 		std::map<std::string, std::string>::iterator iterator = lookupParametersMap.find("ID");
+
 		if (iterator == lookupParametersMap.end()) { 
 			return false; //nothing found.
 		}
