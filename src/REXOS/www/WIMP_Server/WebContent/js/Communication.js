@@ -25,43 +25,87 @@ function Communication() {
 		//this.colorCode = null;
 		//this.shapeCode = null;
 		//this.location = {};
-        this.capability = 3;
+        this.capability = obj.capability;
 		this.id = obj.id;
 		
-		this.parameters = {
-            "parameterGroups": {
-                "Shape": {
-                    "name": obj.shapeName,
-                    "parameters": {
-                        "Id": {
-                            "key": "Id",
-                            "value": 0
-                        }
-                    }
-                },
-                "loc": {
-                    "name": "loc",
-                    "parameters": {
-                        "y": {
-                            "key": "y",
-                            "value": obj.y
-                        },
-                        "x": {
-                            "key": "x",
-                            "value": obj.x
-                        }
-                    }
-                },
-                "Color": {
-                    "name": obj.color,
-                    "parameters": {
-                        "Id": {
-                            "key": "Id",
-                            "value":0
-                        }
-                    }
-                }
-            }};
+		
+		switch(obj.capability){
+		default:
+			//Nothing to do here
+			break;
+		case 1:
+			this.parameters = {
+	            "parameterGroups": {
+	                "loc": {
+	                    "parameters": {
+	                        "row": {
+	                            "key": "row",
+	                            "value": obj.row
+	                        },
+	                        "column": {
+	                            "key": "column",
+	                            "value": obj.column
+	                        }
+	                    }
+	                },
+	                "part": {
+	                    "name": "part",
+	                    "parameters": {
+	                        "type": {
+	                            "key": "type",
+	                            "value": obj.part
+	                        },
+	                        "id" : {
+	                            "key": "id",
+	                            "value": obj.part
+	                        },
+	                        "partName" : {
+	                            "key": "partName",
+	                            "value": obj.part
+	                        }
+	                    }
+	                },
+	                "color": {
+	                    "name": obj.color,
+	                    "parameters": {
+	                        "Id": {
+	                            "key": "Id",
+	                            "value":0
+	                        }
+	                    }
+	                }
+	            }};
+			break;	
+			
+			
+		case 3:
+			this.parameters = {
+	            "parameterGroups": {
+	                "loc": {
+	                    "name": "loc",
+	                    "parameters": {
+	                        "y": {
+	                            "key": "y",
+	                            "value": obj.y
+	                        },
+	                        "x": {
+	                            "key": "x",
+	                            "value": obj.x
+	                        }
+	                    }
+	                },
+	                "color": {
+	                    "name": obj.color,
+	                    "parameters": {
+	                        "Id": {
+	                            "key": "Id",
+	                            "value": 0
+	                        }
+	                    }
+	                }
+	            }};
+			break;	
+		}
 		
 	}; 
     

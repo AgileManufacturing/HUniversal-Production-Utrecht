@@ -44,41 +44,38 @@ import com.mongodb.BasicDBObject;
 
 /**
  * @author Alexander Streng
- *
+ * 
  */
 public class DrawPointService extends Service {
 	/**
-	 * @see rexos.mas.service_agent.Service#canDoStep(int, com.mongodb.BasicDBObject)
+	 * @see rexos.mas.service_agent.Service#canDoStep(int,
+	 *      com.mongodb.BasicDBObject)
 	 */
 	@SuppressWarnings("unused")
 	@Override
 	public boolean canDoStep(int productStepType, BasicDBObject parameters) {
-		try 
-		{
-			if(parameters.containsField("parameterGroups")) 
-			{
-				BasicDBObject parameterGroups = (BasicDBObject) parameters.get("parameterGroups");
-				
-				if(parameters.containsField("loc"))
-				{
-					BasicDBObject location = (BasicDBObject) parameters.get("loc");
-					
-					if(parameters.containsField("parameters"))
-					{
-						new Position((BasicDBObject) parameters.get("parameters"));
+		try {
+			if (parameters.containsField("parameterGroups")) {
+				BasicDBObject parameterGroups = (BasicDBObject) parameters
+						.get("parameterGroups");
+
+				if (parameterGroups.containsField("loc")) {
+					BasicDBObject location = (BasicDBObject) parameterGroups
+							.get("loc");
+
+					if (location.containsField("parameters")) {
+						new Position((BasicDBObject) location.get("parameters"));
+						return true;
 					}
 				}
-			}
-			else 
-			{
+			} else {
 				return false;
 			}
-		}
-		catch (IllegalArgumentException e) 
-		{
+		} catch (IllegalArgumentException e) {
 			return false;
 		}
-		return true;
+
+		return false;
 	}
 
 	/**

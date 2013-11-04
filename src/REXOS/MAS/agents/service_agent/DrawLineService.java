@@ -41,52 +41,58 @@ import com.mongodb.BasicDBObject;
 
 /**
  * @author Peter Bonnema
- *
+ * 
  */
 public class DrawLineService extends Service {
 	/**
-	 * @see rexos.mas.service_agent.Service#canDoStep(int, com.mongodb.BasicDBObject)
+	 * @see rexos.mas.service_agent.Service#canDoStep(int,
+	 *      com.mongodb.BasicDBObject)
 	 */
 	@SuppressWarnings("unused")
 	@Override
 	public boolean canDoStep(int productStepType, BasicDBObject parameters) {
 		try {
-			if(parameters.containsField("startPosition") && parameters.containsField("endPosition")) {
+			if (parameters.containsField("startPosition")
+					&& parameters.containsField("endPosition")) {
 				new Position((BasicDBObject) parameters.get("startPosition"));
 				new Position((BasicDBObject) parameters.get("endPosition"));
+				return true;
 			} else {
 				return false;
 			}
 		} catch (IllegalArgumentException e) {
 			return false;
 		}
-		return true;
 	}
 
 	/**
-	 * @see rexos.mas.service_agent.Service#getServiceSteps(int, com.mongodb.BasicDBObject)
+	 * @see rexos.mas.service_agent.Service#getServiceSteps(int,
+	 *      com.mongodb.BasicDBObject)
 	 */
 	@Override
-	public ServiceStep[] getServiceSteps(int productStepType, BasicDBObject parameters) 
-	{
-		Position from = new Position((BasicDBObject) parameters.get("startPosition"));
-		Position to = new Position((BasicDBObject) parameters.get("endPosition"));
+	public ServiceStep[] getServiceSteps(int productStepType,
+			BasicDBObject parameters) {
+		Position from = new Position(
+				(BasicDBObject) parameters.get("startPosition"));
+		Position to = new Position(
+				(BasicDBObject) parameters.get("endPosition"));
 
 		BasicDBObject serviceStepParameters = new BasicDBObject();
 		serviceStepParameters.put("startPosition", from.toBasicDBObject());
 		serviceStepParameters.put("endPosition", to.toBasicDBObject());
 
-		return new ServiceStep[]
-		{
-				new ServiceStep(getId(), 3, serviceStepParameters, StepStatusCode.EVALUATING, null, new ScheduleData())
-		};
+		return new ServiceStep[] { new ServiceStep(getId(), 3,
+				serviceStepParameters, StepStatusCode.EVALUATING, null,
+				new ScheduleData()) };
 	}
 
 	/**
-	 * @see rexos.mas.service_agent.Service#updateParameters(java.util.HashMap, rexos.mas.service_agent.ServiceStep[])
+	 * @see rexos.mas.service_agent.Service#updateParameters(java.util.HashMap,
+	 *      rexos.mas.service_agent.ServiceStep[])
 	 */
 	@Override
-	public ServiceStep[] updateParameters(HashMap<Part, Position> partParameters, ServiceStep[] serviceSteps) {
+	public ServiceStep[] updateParameters(
+			HashMap<Part, Position> partParameters, ServiceStep[] serviceSteps) {
 		return serviceSteps;
 	}
 }
