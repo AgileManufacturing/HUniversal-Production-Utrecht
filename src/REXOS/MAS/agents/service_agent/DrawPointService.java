@@ -41,70 +41,70 @@ import com.mongodb.BasicDBObject;
 
 /**
  * @author Alexander Streng
- *
+ * 
  */
 public class DrawPointService extends Service {
 	/**
-	 * @see rexos.mas.service_agent.Service#canDoStep(int, com.mongodb.BasicDBObject)
+	 * @see rexos.mas.service_agent.Service#canDoStep(int,
+	 *      com.mongodb.BasicDBObject)
 	 */
 	@SuppressWarnings("unused")
 	@Override
 	public boolean canDoStep(int productStepType, BasicDBObject parameters) {
-		try 
-		{
-			if(parameters.containsField("parameterGroups")) 
-			{
-				BasicDBObject parameterGroups = (BasicDBObject) parameters.get("parameterGroups");
-				
-				if(parameters.containsField("loc"))
-				{
-					BasicDBObject location = (BasicDBObject) parameters.get("loc");
-					
-					if(parameters.containsField("parameters"))
-					{
-						new Position((BasicDBObject) parameters.get("parameters"));
+		try {
+			if (parameters.containsField("parameterGroups")) {
+				BasicDBObject parameterGroups = (BasicDBObject) parameters
+						.get("parameterGroups");
+
+				if (parameterGroups.containsField("loc")) {
+					BasicDBObject location = (BasicDBObject) parameterGroups
+							.get("loc");
+
+					if (location.containsField("parameters")) {
+						new Position((BasicDBObject) location.get("parameters"));
+						return true;
 					}
 				}
-			}
-			else 
-			{
+			} else {
 				return false;
 			}
-		}
-		catch (IllegalArgumentException e) 
-		{
+		} catch (IllegalArgumentException e) {
 			return false;
 		}
-		return true;
+
+		return false;
 	}
 
 	/**
-	 * @see rexos.mas.service_agent.Service#getServiceSteps(int, com.mongodb.BasicDBObject)
+	 * @see rexos.mas.service_agent.Service#getServiceSteps(int,
+	 *      com.mongodb.BasicDBObject)
 	 */
 	@Override
-	public ServiceStep[] getServiceSteps(int productStepType, BasicDBObject parameters) 
-	{
-		BasicDBObject parameterGroups = (BasicDBObject) parameters.get("parameterGroups");
+	public ServiceStep[] getServiceSteps(int productStepType,
+			BasicDBObject parameters) {
+		BasicDBObject parameterGroups = (BasicDBObject) parameters
+				.get("parameterGroups");
 		BasicDBObject location = (BasicDBObject) parameterGroups.get("loc");
-		
-		Position point = new Position((BasicDBObject) location.get("parameters"));
+
+		Position point = new Position(
+				(BasicDBObject) location.get("parameters"));
 		point.setZ(0.0);
 
 		BasicDBObject serviceStepParameters = new BasicDBObject();
 		serviceStepParameters.put("position", point.toBasicDBObject());
 
-		return new ServiceStep[]
-		{
-			new ServiceStep(getId(), 3, serviceStepParameters, StepStatusCode.EVALUATING, null, new ScheduleData())
-		};
+		return new ServiceStep[] { new ServiceStep(getId(), 3,
+				serviceStepParameters, StepStatusCode.EVALUATING, null,
+				new ScheduleData()) };
 	}
 
 	/**
-	 * @see rexos.mas.service_agent.Service#updateParameters(java.util.HashMap, rexos.mas.service_agent.ServiceStep[])
+	 * @see rexos.mas.service_agent.Service#updateParameters(java.util.HashMap,
+	 *      rexos.mas.service_agent.ServiceStep[])
 	 */
 	@Override
-	public ServiceStep[] updateParameters(HashMap<Part, Position> partParameters, ServiceStep[] serviceSteps) 
-	{
+	public ServiceStep[] updateParameters(
+			HashMap<Part, Position> partParameters, ServiceStep[] serviceSteps) {
 		return serviceSteps;
 	}
 }

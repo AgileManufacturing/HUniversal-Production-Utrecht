@@ -152,6 +152,7 @@ public class CanPerformStep extends ReceiveBehaviour implements ParentBehaviourC
 				Part[] inputParts = {
 						new Part(1), new Part(2)
 				};
+				
 				currentProductStep =
 						new ProductStep(message.getSender(), productStep.getCapability(), productStep.getParameters(),
 								inputParts, null, StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());

@@ -176,26 +176,29 @@ function createProductionCommandFromCrateObject() {
 
 	var cc = new pa_server.CommandContainer("CREATE_PA");
 
-	cc.data = document.getElementsById("gwip").value + ":" + document.getElementById("gwport").value;
+	cc.data = document.getElementById("gwip").value + ":" + document.getElementById("gwport").value;
 
-	for(var i = 0; i < cubes.length; i++) {
-		if(cubes[i] === undefined) {
+	for(var i = 0; i < cubeArray.length; i++) {
+		if(cubeArray[i] === undefined) {
 			continue;
 		}
 
-		var row = i / crateColumns;
 		var color; // TODO-Duncan: Get color from ((Three.MeshLambertMaterial)cubes[i]).color ?
-		var column = i % crateColumns;
+		var row = arrayNumberToRow(i, crateRows);
+		var column = arrayNumberToColumn(i, crateColumns);
 
 		var step = new pa_server.ProductionStep({
+			"capability" : 1,
 			"id" : i,
-			"type" : "Place",
 			"row" : row,
 			"column" : column,
-			"color" : color
+			"color" : color,
+			"part" : 1
 		});
+		
 		cc.payload.product.production.productionSteps.push(step);
 	}
+	
 	cc.send();
 	var xml = json2xml(cc.payload.product," ");
 	cc.payload="";
@@ -230,6 +233,7 @@ function createProductionCommandFromColorArray() {
 		x = x + 0.1;
 		
 		var step = new pa_server.ProductionStep({
+			"capability" : 3,
 			"id" : i,
 			"shapeName" : "dot",
 			"color" : pixels[x],
