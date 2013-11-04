@@ -139,6 +139,8 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 						partParameters.put(logisticsAgent.getSupplyCrate(), new Position());
 						partParameters.put(logisticsAgent.getProductCrate(), new Position());
 						break;
+					case 3: // Paper
+						partParameters.put(logisticsAgent.getWhitePaper(), new Position());
 					default:
 						partParameters.put(new Part(part.getType(), id++),
 								new Position((double)x++, 1.0, 3.0, new Part(type++, id + x)));

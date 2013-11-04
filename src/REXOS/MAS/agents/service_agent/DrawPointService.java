@@ -31,7 +31,10 @@
 package agents.service_agent;
 
 import java.util.HashMap;
+import java.util.Set;
 
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.Logger;
 import agents.data_classes.Part;
 import agents.data_classes.Position;
 import agents.data_classes.ScheduleData;
@@ -76,35 +79,63 @@ public class DrawPointService extends Service {
 	}
 
 	/**
-	 * @see rexos.mas.service_agent.Service#getServiceSteps(int,
-	 *      com.mongodb.BasicDBObject)
+	 * @see rexos.mas.service_agent.Service#getServiceSteps(int, com.mongodb.BasicDBObject)
 	 */
 	@Override
-	public ServiceStep[] getServiceSteps(int productStepType,
-			BasicDBObject parameters) {
-		BasicDBObject parameterGroups = (BasicDBObject) parameters
-				.get("parameterGroups");
+	public ServiceStep[] getServiceSteps(int productStepType, BasicDBObject parameters) 
+	{
+		BasicDBObject parameterGroups = (BasicDBObject) parameters.get("parameterGroups");
 		BasicDBObject location = (BasicDBObject) parameterGroups.get("loc");
-
-		Position point = new Position(
-				(BasicDBObject) location.get("parameters"));
+		
+		Position point = new Position((BasicDBObject) location.get("parameters"));
 		point.setZ(0.0);
+		point.setRelativeToPart(new Part(3));
 
 		BasicDBObject serviceStepParameters = new BasicDBObject();
 		serviceStepParameters.put("position", point.toBasicDBObject());
+		
+		Logger.log(LogLevel.DEBUG, "serviceStepParameters: " + serviceStepParameters);
 
-		return new ServiceStep[] { new ServiceStep(getId(), 3,
-				serviceStepParameters, StepStatusCode.EVALUATING, null,
-				new ScheduleData()) };
+		return new ServiceStep[]
+		{
+			new ServiceStep(getId(), 3, serviceStepParameters, StepStatusCode.EVALUATING, null, new ScheduleData())
+		};
 	}
 
 	/**
-	 * @see rexos.mas.service_agent.Service#updateParameters(java.util.HashMap,
-	 *      rexos.mas.service_agent.ServiceStep[])
+	 * @see rexos.mas.service_agent.Service#updateParameters(java.util.HashMap, rexos.mas.service_agent.ServiceStep[])
 	 */
 	@Override
-	public ServiceStep[] updateParameters(
-			HashMap<Part, Position> partParameters, ServiceStep[] serviceSteps) {
+	public ServiceStep[] updateParameters(HashMap<Part, Position> partParameters, ServiceStep[] serviceSteps) 
+	{
+		Set<Part> parts = partParameters.keySet();
+		Part whitePaper = null;
+		for (Part part : parts){
+			Logger.log(LogLevel.DEBUG, "parts in partParameter: " + part);
+			if (part.getId() == 102){
+				whitePaper = part;
+			}
+		}
+		
+		if(whitePaper == null) {
+			// error here
+		}
+		
+		for(ServiceStep ss : serviceSteps) {			
+			BasicDBObject oldParameters = ss.getParameters();
+			BasicDBObject newParameters = new BasicDBObject();
+			
+			if(oldParameters.containsField("position")) {
+				Position position = new Position((BasicDBObject)oldParameters.get("position"));
+				if(position.getRelativeToPart() != null) {
+					position.setRelativeToPart(whitePaper);
+					newParameters.put("position", position.toBasicDBObject());
+				}
+			}
+			
+			ss.setParameters(newParameters);
+		}
+
 		return serviceSteps;
 	}
 }

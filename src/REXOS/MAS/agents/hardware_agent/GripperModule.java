@@ -99,7 +99,7 @@ public class GripperModule extends Module {
 		//get steps from the movementModule to move to the safe movement plane.
 		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));
 		//get steps from the movementModule to move on the x and y axis relative to a crate.
-		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(4, moveParameters)));
+		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(2, moveParameters)));
 		//get steps from the movementModule to move on the z axis.
 		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, moveParameters)));
 
