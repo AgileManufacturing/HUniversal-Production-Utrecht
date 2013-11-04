@@ -31,7 +31,10 @@
 package agents.service_agent;
 
 import java.util.HashMap;
+import java.util.Set;
 
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.Logger;
 import agents.data_classes.Part;
 import agents.data_classes.Position;
 import agents.data_classes.ScheduleData;
@@ -89,6 +92,7 @@ public class DrawPointService extends Service {
 		
 		Position point = new Position((BasicDBObject) location.get("parameters"));
 		point.setZ(0.0);
+		point.setRelativeToPart(new Part(3));
 
 		BasicDBObject serviceStepParameters = new BasicDBObject();
 		serviceStepParameters.put("position", point.toBasicDBObject());
@@ -105,6 +109,34 @@ public class DrawPointService extends Service {
 	@Override
 	public ServiceStep[] updateParameters(HashMap<Part, Position> partParameters, ServiceStep[] serviceSteps) 
 	{
+		Set<Part> parts = partParameters.keySet();
+		Part whitePaper = null;
+		for (Part part : parts){
+			Logger.log(LogLevel.DEBUG, "parts in partParameter: " + part);
+			if (part.getId() == 103){
+				whitePaper = part;
+			}
+		}
+		
+		if(whitePaper == null) {
+			// error here
+		}
+		
+		for(ServiceStep ss : serviceSteps) {			
+			BasicDBObject oldParameters = ss.getParameters();
+			BasicDBObject newParameters = new BasicDBObject();
+			
+			if(oldParameters.containsField("position")) {
+				Position position = new Position((BasicDBObject)oldParameters.get("position"));
+				if(position.getRelativeToPart() != null) {
+					position.setRelativeToPart(whitePaper);
+					newParameters.put("position", position.toBasicDBObject());
+				}
+			}
+			
+			ss.setParameters(newParameters);
+		}
+
 		return serviceSteps;
 	}
 }

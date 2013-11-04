@@ -149,9 +149,23 @@ public class CanPerformStep extends ReceiveBehaviour implements ParentBehaviourC
 	
 				// puts the productstep on the blackboard.
 				// TODO: get inputParts instead of dummy data (overleggen met productagent)
-				Part[] inputParts = {
-						new Part(1), new Part(2)
-				};
+				
+				// Set up inputParts depending on capability
+				Part[] inputParts = null;
+				
+				if(productStep != null) {
+					if(productStep.getCapability() == 1) {
+						inputParts = new Part[]{
+							new Part(1), new Part(2)
+						};
+					} else if(productStep.getCapability() == 3) {
+						inputParts = new Part[]{
+							new Part(3)
+						};
+					}
+				} else {
+					// error
+				}
 				currentProductStep =
 						new ProductStep(message.getSender(), productStep.getCapability(), productStep.getParameters(),
 								inputParts, null, StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
