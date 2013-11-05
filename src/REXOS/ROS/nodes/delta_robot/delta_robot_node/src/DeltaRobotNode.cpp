@@ -147,19 +147,20 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 
    			JSONNode::const_iterator j = payloadNode.begin();
 		    while (j != payloadNode.end()) {
-			    if (strcmp(nodeName, "locationX") == 0){
+		    	const char * payloadNodeName = j -> name().c_str();
+			    if (strcmp(payloadNodeName, "locationX") == 0){
 					rotatedLookUpX = rexos_utilities::stringToDouble(parseNodeValue("locationX", *j));
 			    	std::cout << "found locationx " << rotatedLookUpX << std::endl;
 					lookupIsSet = true;
 				}
 
-			    if (strcmp(nodeName, "locationY") == 0){
+			    if (strcmp(payloadNodeName, "locationY") == 0){
 					rotatedLookupY = rexos_utilities::stringToDouble(parseNodeValue("locationY", *j));
 			    	std::cout << "found locationx " << rotatedLookupY << std::endl;
 					lookupIsSet = true;
 				}
 
-			    if (strcmp(nodeName, "angle") == 0){
+			    if (strcmp(payloadNodeName, "angle") == 0){
 					angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *j));
 			    	std::cout << "found angle " << angle << std::endl;
 					lookupIsSet = true;
