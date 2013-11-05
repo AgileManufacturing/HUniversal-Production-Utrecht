@@ -27,24 +27,23 @@
  *
  **/
 
-#ifndef REXOS_KNOWLEDGE_DATABASE_H
-#define REXOS_KNOWLEDGE_DATABASE_H
+#pragma once
+
+#include <string>
 
 #include "mysql_connection.h"
-#include <cppconn/driver.h>
-#include <cppconn/exception.h>
 
-// TEMP!
-#define MYSQL_SERVER "tcp://127.0.0.1:3306"
-#define MYSQL_DATABASE "equiplet"
-#define MYSQL_USERNAME "rexos"
-#define MYSQL_PASSWORD "soxer"
-
-/**
- * @brief this class provides a system to translate coordinates from module coordinates to equiplet coordinates.
- */
 namespace rexos_knowledge_database {
-	std::auto_ptr<sql::Connection> connect();
-	
+	class Equiplet{
+	public:
+		Equiplet(std::string name);
+		
+		int getMointPointsX();
+		int getMointPointsY();
+		double getMointPointDistanceX();
+		double getMointPointDistanceY();
+	private:
+		std::string name;
+		std::auto_ptr<sql::Connection> connection;
+	};
 }
-#endif /* REXOS_KNOWLEDGE_DATABASE_H */
