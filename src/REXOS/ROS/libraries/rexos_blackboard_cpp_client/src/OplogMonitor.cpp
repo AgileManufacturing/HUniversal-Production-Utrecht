@@ -106,8 +106,6 @@ mongo::Query OplogMonitor::createOplogQuery()
 	} else {
 		query = QUERY("$or" << orArray.arr());
 	}
-
-	std::cout << "Using query to create oplog: " << query << std::endl;
 	return query;
 }
 
