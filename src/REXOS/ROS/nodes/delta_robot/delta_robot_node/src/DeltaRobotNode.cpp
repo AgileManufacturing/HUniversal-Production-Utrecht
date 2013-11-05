@@ -35,6 +35,7 @@
 #include <boost/bind.hpp>
 #include <execinfo.h>
 #include <signal.h>
+#include <algorithm>
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "DeltaRobotNode"
@@ -395,9 +396,16 @@ std::string deltaRobotNodeNamespace::DeltaRobotNode::parseNodeValue(const std::s
 		{
 			result = i->as_string();
 		} 
-
 		++i;
 	}
+
+	//we want to remove all the ' characters.
+   char chars[] = "'";
+   for (unsigned int i = 0; i < strlen(chars); ++i)
+   {
+      // you need include <algorithm> to use general algorithms like std::remove()
+      result.erase (std::remove(result.begin(), result.end(), chars[i]), result.end());
+   }
 
 	return result;
 }
