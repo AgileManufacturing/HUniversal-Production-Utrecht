@@ -127,7 +127,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
 
 void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
 	JSONNode instructionDataNode = libjson::parse(goal->json);
-	std::cout << "Json ontvangen op deltarobot " << instructionDataNode.wirte() << std::endl;
+	std::cout << "Json ontvangen op deltarobot " << instructionDataNode.write() << std::endl;
 	rexos_statemachine::SetInstructionResult result_;
 	result_.OID = goal->OID;
 	bool lookupIsSet = false;
@@ -142,15 +142,25 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
         const char * nodeName = i -> name().c_str();
 	    // keep in mind that a payload may or may not contain all values. Use lastXYZ to determine these values if they are not set.
         if (strcmp(nodeName, "payload") == 0){
-			payloadPoint = parsePoint(*i);	
-        }
-        //Set lookup result
-        //you can use parseNode(desiredName) to retrieve the value.
-        if (strcmp(nodeName, "look_up_result") == 0){
-			rotatedLookUpX = rexos_utilities::stringToDouble(parseNodeValue("locationX", *i));
-			rotatedLookupY = rexos_utilities::stringToDouble(parseNodeValue("locationY", *i));
-			angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *i));
-			lookupIsSet = true;
+        	JSONNode payloadNode = *i;
+			payloadPoint = parsePoint(payloadNode);
+
+   			JSONNode::const_iterator j = payloadNode.begin();
+		    while (j != payloadNode.end()){
+			    if (strcmp(nodeName, "locationX") == 0){
+					rotatedLookUpX = rexos_utilities::stringToDouble(parseNodeValue("locationX", *j));
+					lookupIsSet = true;
+				}
+			    if (strcmp(nodeName, "locationY") == 0){
+					rotatedLookupY = rexos_utilities::stringToDouble(parseNodeValue("locationY", *j));
+					lookupIsSet = true;
+				}
+			    if (strcmp(nodeName, "angle") == 0){
+					angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *j));
+					lookupIsSet = true;
+				}
+			    j++;
+		    }
         }
         ++i;
     }
