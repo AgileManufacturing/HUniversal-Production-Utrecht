@@ -35,7 +35,7 @@ namespace rexos_datatypes{
     InstructionData::InstructionData(){}
 
     InstructionData::InstructionData(std::string command, std::string destination, std::string look_up, 
-            std::map<std::string, std::string> look_up_parameters, std::map<std::string, std::string> payload) {
+        std::map<std::string, std::string> look_up_parameters, std::map<std::string, std::string> payload) {
         this->command = command;
         this->destination = destination;
         this->look_up = look_up;

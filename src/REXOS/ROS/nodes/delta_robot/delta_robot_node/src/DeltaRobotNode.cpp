@@ -134,7 +134,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
     //construct a payload
     //construct lookupvalues.
 	Point payloadPoint;
-	double angle, normalLookupX, normalLookupX, rotatedLookUpX, rotatedLookupY;
+	double angle, normalLookupX, normalLookupY, rotatedLookUpX, rotatedLookupY;
 
     JSONNode::const_iterator i = instructionDataNode.begin();
     while (i != instructionDataNode.end()){
@@ -161,10 +161,9 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 		normalLookupX = rotatedLookUpX * sn + rotatedLookupY * cs;
 	}
 
-
     //translate the relative point to real equiplet coordinates.
 	Vector3 lookupVector(normalLookupX, normalLookupY, 0);
-	Vector3 translatedVector = convertToModuleCoordinate(lokkupVector);
+	Vector3 translatedVector = convertToModuleCoordinate(lookupVector);
 
 	std::cout << "translatedVector" << translatedVector << std::endl;
 
