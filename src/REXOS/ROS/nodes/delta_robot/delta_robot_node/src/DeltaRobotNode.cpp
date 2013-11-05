@@ -127,6 +127,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
 
 void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
 	JSONNode instructionDataNode = libjson::parse(goal->json);
+	std::cout << "Json ontvangen op deltarobot " << instructionDataNode.wirte() << std::endl;
 	rexos_statemachine::SetInstructionResult result_;
 	result_.OID = goal->OID;
 	bool lookupIsSet = false;

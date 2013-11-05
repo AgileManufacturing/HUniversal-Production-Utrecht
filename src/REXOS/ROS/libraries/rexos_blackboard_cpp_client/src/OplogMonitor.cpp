@@ -131,7 +131,6 @@ void OplogMonitor::run()
 		while(!tailedCursor->isDead()){
 			while (tailedCursor->more()) {
 				const OplogEntry oplogEntry(tailedCursor->nextSafe());
-				std::cout << oplogEntry.toString() << std::endl;
 				subscriptionsMutex.lock();
 				for (std::vector<BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
 					if ((*iter)->matchesWithEntry(oplogEntry)) {
