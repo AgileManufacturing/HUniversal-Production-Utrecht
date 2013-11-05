@@ -146,15 +146,17 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 			payloadPoint = parsePoint(payloadNode);
 
    			JSONNode::const_iterator j = payloadNode.begin();
-		    while (j != payloadNode.end()){
+		    while (j != payloadNode.end()) {
 			    if (strcmp(nodeName, "locationX") == 0){
 					rotatedLookUpX = rexos_utilities::stringToDouble(parseNodeValue("locationX", *j));
 					lookupIsSet = true;
 				}
+
 			    if (strcmp(nodeName, "locationY") == 0){
 					rotatedLookupY = rexos_utilities::stringToDouble(parseNodeValue("locationY", *j));
 					lookupIsSet = true;
 				}
+
 			    if (strcmp(nodeName, "angle") == 0){
 					angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *j));
 					lookupIsSet = true;
