@@ -99,7 +99,6 @@ EquipletNode::~EquipletNode(){
 	for (std::vector<Blackboard::BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
 		delete *iter;
 	}
-
 	subscriptions.clear();
 }
 
