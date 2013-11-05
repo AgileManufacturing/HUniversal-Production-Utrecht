@@ -38,7 +38,6 @@ EnvironmentCommunication::LookupHandler::LookupHandler(){
 	lookupServer = nodeHandle.advertiseService("LookupHandler/lookup", &LookupHandler::lookupServiceCallback, this);
 	ROS_INFO("LookupHandler constructor called");
 }
-
 /**
  * Call back for lookupHandler/lookup service
  * Will lookup data in environmentcache and use the payload of request on the data
@@ -63,7 +62,7 @@ bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookup_handl
 			return false; //nothing found.
 		}
 		else { 
-			msg.request.lookupID = iterator->first; //lookup id from request.
+			msg.request.lookupID = iterator->second; //lookup id from request.
 		}
 
 		if(lookupEnvironmentClient.call(msg)) {

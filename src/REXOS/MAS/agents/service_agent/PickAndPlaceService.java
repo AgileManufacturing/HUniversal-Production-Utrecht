@@ -186,9 +186,7 @@ public class PickAndPlaceService extends Service {
 						ballPosition = partParameters.get(ball);
 					}
 				}
-
 				if (ball != null && ballPosition != null) {
-
 					if (oldParameters.containsField("crate")
 							&& oldParameters.getString("crate").equals(
 									"CRATE-PLACEHOLDER")) {

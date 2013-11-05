@@ -5,6 +5,7 @@
  *
  * @author Dick van der Steen
  * @author Dennis Koole
+ * @authore Alexander Streng
  *
  * @section LICENSE
  * License: newBSD
@@ -133,46 +134,41 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
     //construct a payload
     //construct lookupvalues.
 	Point payloadPoint;
-	double angle, normalX, normalY, rotatedX, rotatedY;
+	double angle, normalLookupX, normalLookupX, rotatedLookUpX, rotatedLookupY;
 
     JSONNode::const_iterator i = instructionDataNode.begin();
     while (i != instructionDataNode.end()){
         const char * nodeName = i -> name().c_str();
-	    // parse payload
 	    // keep in mind that a payload may or may not contain all values. Use lastXYZ to determine these values if they are not set.
         if (strcmp(nodeName, "payload") == 0){
 			payloadPoint = parsePoint(*i);	
         }
-
         //Set lookup result
         //you can use parseNode(desiredName) to retrieve the value.
         if (strcmp(nodeName, "look_up_result") == 0){
-			normalX = rexos_utilities::stringToDouble(parseNodeValue("locationX", *i));
-			normalY = rexos_utilities::stringToDouble(parseNodeValue("locationY", *i));
+			rotatedLookUpX = rexos_utilities::stringToDouble(parseNodeValue("locationX", *i));
+			rotatedLookupY = rexos_utilities::stringToDouble(parseNodeValue("locationY", *i));
 			angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *i));
 			lookupIsSet = true;
         }
         ++i;
     }
-    
-    //we now have an angle, and 2 points. Lets work some magic.
+
     if(lookupIsSet) {
 		double cs = cos(angle);
 		double sn = sin(angle);
-
-		rotatedX = normalX * cs - normalY * sn;
-		rotatedY = normalX * sn + normalY * cs;
-
-		payloadPoint.x += rotatedX;
-		payloadPoint.y += rotatedY;
+		normalLookupX = rotatedLookUpX * cs - rotatedLookupY * sn;
+		normalLookupX = rotatedLookUpX * sn + rotatedLookupY * cs;
 	}
 
 
-	Vector3 vector(payloadPoint.x, payloadPoint.y, payloadPoint.z);
-	Vector3 translatedVector = convertToModuleCoordinate(vector);
+    //translate the relative point to real equiplet coordinates.
+	Vector3 lookupVector(normalLookupX, normalLookupY, 0);
+	Vector3 translatedVector = convertToModuleCoordinate(lokkupVector);
+
 	std::cout << "translatedVector" << translatedVector << std::endl;
 
-	if(moveToPoint(translatedVector.x, translatedVector.y, translatedVector.z, payloadPoint.maxAcceleration)){
+	if(moveToPoint((translatedVector.x + payloadPoint.x), (translatedVector.y + payloadPoint.y), payloadPoint.z, payloadPoint.maxAcceleration)){
 		setInstructionActionServer.setSucceeded(result_);
 		return;
 	}

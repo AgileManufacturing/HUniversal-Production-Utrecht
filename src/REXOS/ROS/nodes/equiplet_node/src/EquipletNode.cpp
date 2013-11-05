@@ -4,6 +4,7 @@
  * @date Created: 2012-10-12
  *
  * @author Dennis Koole
+ * @author Alexander Streng
  *
  * @section LICENSE
  * License: newBSD
@@ -145,7 +146,6 @@ void EquipletNode::handleEquipletStep(rexos_datatypes::EquipletStep * step, mong
 			}
 			//we might still need to update the payload on the bb
 		    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
-
 		    equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
 		    prox->setInstruction(targetObjectId.toString(), instructionData.getJsonNode());
 
