@@ -99,6 +99,7 @@ EquipletNode::~EquipletNode(){
 	for (std::vector<Blackboard::BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
 		delete *iter;
 	}
+
 	subscriptions.clear();
 }
 
@@ -137,16 +138,19 @@ void EquipletNode::handleEquipletStep(rexos_datatypes::EquipletStep * step, mong
 		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
 			
 			rexos_datatypes::InstructionData instructionData = step->getInstructionData();
+			std::cout << "instructionData pre- lookuphandler" << instructionData.toJSONString() << std::endl;
 			//we need to call the lookup handler first
 			if(instructionData.getLook_up().length() >= 0) {
 				map<std::string, std::string> newPayload = callLookupHandler(instructionData.getLook_up(), instructionData.getLook_up_parameters(), instructionData.getPayload());
 				instructionData.setPayload(newPayload);
 			}
+
+
+			std::cout << "instructionData post- lookuphandler" << instructionData.toJSONString() << std::endl;
 			//we might still need to update the payload on the bb
 		    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
 		    equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
 		    prox->setInstruction(targetObjectId.toString(), libjson::parse(instructionData.toJSONString()));
-
 		} else {
 			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\" } } ");
 		}
