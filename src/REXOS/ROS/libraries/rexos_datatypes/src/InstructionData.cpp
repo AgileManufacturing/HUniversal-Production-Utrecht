@@ -124,13 +124,13 @@ namespace rexos_datatypes{
 
         std::stringstream ss;
 
-        ss << "{ 'instructionData' : { ";
+        ss << "{";
         ss << "'command' : '" << this->command << "', ";
         ss << "'destination' : '" << this->destination << "', ";
         ss << "'look_up' : '" << this->look_up << "', ";
         ss << "'look_up_parameters' : { " << rexos_utilities::mapToJsonString(this->look_up_parameters) << " }, ";
         ss << "'payload' : { " << rexos_utilities::mapToJsonString(this->payload) << " } ";
-        ss << " } }";
+        ss << " }";
 
         return ss.str();
     }

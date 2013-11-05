@@ -128,7 +128,6 @@ deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
 
 void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
 	JSONNode instructionDataNode = libjson::parse(goal->json);
-	std::cout << "Json ontvangen op deltarobot " << instructionDataNode.write() << std::endl;
 	rexos_statemachine::SetInstructionResult result_;
 	result_.OID = goal->OID;
 	bool lookupIsSet = false;
@@ -145,25 +144,26 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
         if (strcmp(nodeName, "payload") == 0){
         	JSONNode payloadNode = *i;
 			payloadPoint = parsePoint(payloadNode);
-
    			JSONNode::const_iterator j = payloadNode.begin();
 		    while (j != payloadNode.end()) {
+
 		    	const char * payloadNodeName = j -> name().c_str();
+
 			    if (strcmp(payloadNodeName, "locationX") == 0){
-					rotatedLookUpX = rexos_utilities::stringToDouble(parseNodeValue("locationX", *j));
-			    	std::cout << "found locationx " << rotatedLookUpX << std::endl;
+					rotatedLookUpX = j->as_double();
+			    	std::cout << "found locationX " << j->as_double() << " stringToDouble " << rotatedLookUpX << std::endl;
 					lookupIsSet = true;
 				}
 
 			    if (strcmp(payloadNodeName, "locationY") == 0){
-					rotatedLookupY = rexos_utilities::stringToDouble(parseNodeValue("locationY", *j));
-			    	std::cout << "found locationx " << rotatedLookupY << std::endl;
+					rotatedLookupY = j->as_double();
+			    	std::cout << "found locationY " << j->as_double() << " stringToDouble " << rotatedLookupY << std::endl;
 					lookupIsSet = true;
 				}
 
 			    if (strcmp(payloadNodeName, "angle") == 0){
-					angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *j));
-			    	std::cout << "found angle " << angle << std::endl;
+					angle = j->as_double();
+			    	std::cout << "found angle " << j->as_double() << " stringToDouble " << angle << std::endl;
 					lookupIsSet = true;
 				}
 			    j++;
