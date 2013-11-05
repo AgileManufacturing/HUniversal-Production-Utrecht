@@ -263,7 +263,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			
 			communicationTable = new HashMap<String, ObjectId>();
 			behaviours = new ArrayList<Behaviour>();
-			AID logisticsAgent = (AID) getArguments()[0];
+			
+			AID logisticsAgent = new AID(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "LogisticsAgentAID", getAID().getLocalName()), AID.ISGUID);
 
 			capabilities = new ArrayList<Integer>();
 			KnowledgeDBClient client = KnowledgeDBClient.getClient();
@@ -334,7 +335,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			doDelete();
 		} catch(Exception e){
 			e.printStackTrace();
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "Caught general exception in EQ setup(): " + e);
 		}
 
 		// starts the behaviour for receiving message when the Service Agent dies.
