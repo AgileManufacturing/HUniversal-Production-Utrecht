@@ -149,16 +149,19 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 		    while (j != payloadNode.end()) {
 			    if (strcmp(nodeName, "locationX") == 0){
 					rotatedLookUpX = rexos_utilities::stringToDouble(parseNodeValue("locationX", *j));
+			    	std::cout << "found locationx " << rotatedLookUpX << std::endl;
 					lookupIsSet = true;
 				}
 
 			    if (strcmp(nodeName, "locationY") == 0){
 					rotatedLookupY = rexos_utilities::stringToDouble(parseNodeValue("locationY", *j));
+			    	std::cout << "found locationx " << rotatedLookupY << std::endl;
 					lookupIsSet = true;
 				}
 
 			    if (strcmp(nodeName, "angle") == 0){
 					angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *j));
+			    	std::cout << "found angle " << angle << std::endl;
 					lookupIsSet = true;
 				}
 			    j++;
