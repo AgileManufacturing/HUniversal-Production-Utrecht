@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rexos_utilities)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS)
+find_package(catkin REQUIRED COMPONENTS libjson)
 find_package(Boost)
 
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include 
 LIBRARIES rexos_utilities 
-CATKIN_DEPENDS 
+CATKIN_DEPENDS libjson
 DEPENDS Boost)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

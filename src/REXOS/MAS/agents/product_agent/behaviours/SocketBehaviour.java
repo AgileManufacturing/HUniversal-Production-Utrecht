@@ -54,6 +54,9 @@ import java.net.UnknownHostException;
 import agents.data_classes.Callback;
 import agents.data_classes.GUIMessage;
 
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.Logger;
+
 import com.google.gson.Gson;
 
 public class SocketBehaviour extends WakerBehaviour implements
@@ -82,7 +85,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 			_callback = callback;
 			_gsonParser = new Gson();
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.log(LogLevel.ERROR, "gotta catch 'em all!", e);
 		}
 	}
 	
@@ -112,6 +115,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 			}
 		} catch (Exception e) {
 			isConnected = false;
+			Logger.log(LogLevel.ERROR, "Connection lost...", e);
 		}
 		this.reset(4500);
 	}
@@ -147,6 +151,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 			}
 		} catch (Exception e) {
 			isConnected = false;
+			Logger.log(LogLevel.ERROR, "Connection lost...", e);
 		}
 	}
 
@@ -163,6 +168,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 			}
 		} catch (Exception e) {
 			isConnected = false;
+			Logger.log(LogLevel.ERROR, "Connection lost...", e);
 		}
 	}
 
@@ -197,7 +203,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 				outputStream.println("heart");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.log(LogLevel.ERROR, "gotta catch 'em all!", e);
 		}
 	}
 
@@ -215,6 +221,7 @@ public class SocketBehaviour extends WakerBehaviour implements
 			this.isConnected = false;
 			this.resetConnection();
 		} catch (Exception e) {
+			Logger.log(LogLevel.ERROR, "Resetting connection failed!", e);
 			//TODO Log error
 		}
 	}
@@ -225,6 +232,8 @@ public class SocketBehaviour extends WakerBehaviour implements
 	 */
 	public void resetConnection() throws IOException {
 		this.socket.close();
+		
+		//Why is this commented..?
 		//this.connect();
 	}
 

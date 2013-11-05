@@ -80,7 +80,7 @@ public class MongoDBConnection {
 	 **/
 	private MongoDBConnection(ServerAddress address) throws GeneralMongoException {
 		try {
-			Logger.log(LogLevel.ERROR, "Starting a new mongoclient.");
+			Logger.log(LogLevel.NOTIFICATION, "Starting a new mongoclient.");
 			
 			MongoOptions mongoOptions = new MongoOptions();
 			mongoOptions.connectionsPerHost = Configuration.getPropertyInt(ConfigurationFiles.MONGO_DB_PROPERTIES, "connectionsPerHost");

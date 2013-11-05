@@ -5,6 +5,7 @@
  *
  * @author Dick van der Steen
  * @author Dennis Koole
+ * @authore Alexander Streng
  *
  * @section LICENSE
  * License: newBSD
@@ -41,7 +42,7 @@
 /**
  * The IP of the modbus we are connecting to
  **/
-#define MODBUS_IP "192.168.0.12"
+#define MODBUS_IP "192.168.0.22"
 /** 
  * The port we are connecting to
  **/
@@ -126,6 +127,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
 
 void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
 	JSONNode instructionDataNode = libjson::parse(goal->json);
+	std::cout << "Json ontvangen op deltarobot " << instructionDataNode.write() << std::endl;
 	rexos_statemachine::SetInstructionResult result_;
 	result_.OID = goal->OID;
 	bool lookupIsSet = false;
@@ -133,46 +135,56 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
     //construct a payload
     //construct lookupvalues.
 	Point payloadPoint;
-	double angle, normalX, normalY, rotatedX, rotatedY;
+	double angle, normalLookupX, normalLookupY, rotatedLookUpX, rotatedLookupY;
 
     JSONNode::const_iterator i = instructionDataNode.begin();
     while (i != instructionDataNode.end()){
         const char * nodeName = i -> name().c_str();
-	    // parse payload
 	    // keep in mind that a payload may or may not contain all values. Use lastXYZ to determine these values if they are not set.
         if (strcmp(nodeName, "payload") == 0){
-			payloadPoint = parsePoint(*i);	
-        }
+        	JSONNode payloadNode = *i;
+			payloadPoint = parsePoint(payloadNode);
 
-        //Set lookup result
-        //you can use parseNode(desiredName) to retrieve the value.
-        if (strcmp(nodeName, "look_up_result") == 0){
-			normalX = rexos_utilities::stringToDouble(parseNodeValue("locationX", *i));
-			normalY = rexos_utilities::stringToDouble(parseNodeValue("locationY", *i));
-			angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *i));
-			lookupIsSet = true;
+   			JSONNode::const_iterator j = payloadNode.begin();
+		    while (j != payloadNode.end()) {
+		    	const char * payloadNodeName = j -> name().c_str();
+			    if (strcmp(payloadNodeName, "locationX") == 0){
+					rotatedLookUpX = rexos_utilities::stringToDouble(parseNodeValue("locationX", *j));
+			    	std::cout << "found locationx " << rotatedLookUpX << std::endl;
+					lookupIsSet = true;
+				}
+
+			    if (strcmp(payloadNodeName, "locationY") == 0){
+					rotatedLookupY = rexos_utilities::stringToDouble(parseNodeValue("locationY", *j));
+			    	std::cout << "found locationx " << rotatedLookupY << std::endl;
+					lookupIsSet = true;
+				}
+
+			    if (strcmp(payloadNodeName, "angle") == 0){
+					angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *j));
+			    	std::cout << "found angle " << angle << std::endl;
+					lookupIsSet = true;
+				}
+			    j++;
+		    }
         }
         ++i;
     }
-    
-    //we now have an angle, and 2 points. Lets work some magic.
+
     if(lookupIsSet) {
 		double cs = cos(angle);
 		double sn = sin(angle);
-
-		rotatedX = normalX * cs - normalY * sn;
-		rotatedY = normalX * sn + normalY * cs;
-
-		payloadPoint.x += rotatedX;
-		payloadPoint.y += rotatedY;
+		normalLookupX = rotatedLookUpX * cs - rotatedLookupY * sn;
+		normalLookupX = rotatedLookUpX * sn + rotatedLookupY * cs;
 	}
 
+    //translate the relative point to real equiplet coordinates.
+	Vector3 lookupVector(normalLookupX, normalLookupY, 0);
+	Vector3 translatedVector = convertToModuleCoordinate(lookupVector);
 
-	Vector3 vector(payloadPoint.x, payloadPoint.y, payloadPoint.z);
-	Vector3 translatedVector = convertToModuleCoordinate(vector);
 	std::cout << "translatedVector" << translatedVector << std::endl;
 
-	if(moveToPoint(translatedVector.x, translatedVector.y, translatedVector.z, payloadPoint.maxAcceleration)){
+	if(moveToPoint((translatedVector.x + payloadPoint.x), (translatedVector.y + payloadPoint.y), payloadPoint.z, payloadPoint.maxAcceleration)){
 		setInstructionActionServer.setSucceeded(result_);
 		return;
 	}

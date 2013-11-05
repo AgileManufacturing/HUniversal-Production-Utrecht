@@ -126,13 +126,48 @@
     	<ant antfile="build.xml" target="clean" dir="tools" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
     </target>
 	
-    <target name="Launch">
-        <java classname="jade.Boot" failonerror="true" fork="yes">
-            <env key="PROPERTIESPATH" value="${project_loc}/src/java/configuration/"/>
-            <env key="MSGPATH" value="${project_loc}/ACLMsgs/"/>
-            <arg line="-agents &quot;MainAgent :rexos.mas.main_agent.MainAgent&quot;"/>
-            <classpath refid="HUniversal-Production-Utrecht.classpath"/>
-        </java>
-    </target>
+    <target name="Launch-Grid">
+		<loadfile property="classpath-file-content" srcfile="${export-classpath-file}"/>
+		<java classname="jade.Boot" failonerror="true" fork="yes">
+			<env key="PROPERTIESPATH" value="${repo-root}/src/REXOS/MAS/configuration/"/>
+			<env key="MSGPATH" value="${repo-root}/ACLMsgs/"/>
+			<arg line="-platform-id Grid -container-name GridAgents -gui -agents Logistics:agents.logistics_agent.LogisticsAgent"/>
+			<classpath refid="java" />
+			<classpath>
+				<pathelement path="${classpath-file-content}" />
+			</classpath>
+		</java>
+	</target>
+	
+	<target name="Launch-EQ">
+		<property name="gridhost" value="${gridhost}"/>
+		<property name="equipletnumber" value="${equipletnumber}"/>
+		<property name="localip" value="${localip}"/>
+		<property name="gridip" value=""/>
+		<property name="gridport" value=""/>
+		<script language="javascript">
+			var gridhostport = project.getProperty("gridhost");
+			project.setProperty("gridip", gridhostport.split(":")[0]);
+			project.setProperty("gridport", gridhostport.split(":")[1]);
+		</script>
+		<loadfile property="classpath-file-content" srcfile="${export-classpath-file}"/>
+		<java classname="jade.Boot" failonerror="true" fork="yes">
+			<env key="PROPERTIESPATH" value="${repo-root}/src/REXOS/MAS/configuration/"/>
+			<env key="MSGPATH" value="${repo-root}/ACLMsgs/"/>
+			<arg line="-container -container-name 'Equiplet ${equipletnumber}' -local-host ${localip} -host ${gridip} -port ${gridport} EQ${equipletnumber}:agents.equiplet_agent.EquipletAgent"/>
+			<!-- get local public ip? Probably from a config file / run script to get it for the first time -->
+			<classpath refid="java" />
+			<classpath>
+				<pathelement path="${classpath-file-content}" />
+			</classpath>
+		</java>
+	</target>
+
+	<path id="java">
+		<pathelement location="${output}"/>
+		<fileset dir="external_libraries">
+		    <include name="*.jar"/>
+		</fileset>
+	</path>
 	
 </project>

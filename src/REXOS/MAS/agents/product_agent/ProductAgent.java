@@ -98,7 +98,10 @@ public class ProductAgent extends Agent {
 			addBehaviour(_overviewBehaviour);
 			Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as an product agent.");
 		} catch (IllegalArgumentException e) {
-
+		Logger.log(
+			LogLevel.ERROR,
+			"No arguments found. ProductAgent needs atleast one ProductAgentPropeties as argument",
+			e );
 		}
 	}
 
@@ -118,8 +121,7 @@ public class ProductAgent extends Agent {
 			if (args[0].getClass() == String.class) {
 				try {
 					// Change the incoming JSON message to also implement the
-					// host
-					// to connect to.
+					// host to connect to.
 					JsonParser parser = new JsonParser();
 					JsonObject obj = (JsonObject) parser
 							.parse((String) args[0]).getAsJsonObject();
@@ -163,21 +165,18 @@ public class ProductAgent extends Agent {
 
 					this._properties = pap;
 				} catch (Exception e) {
-					e.printStackTrace();
+					Logger.log(LogLevel.ERROR, "[temp] gotta catch 'em all!", e);
 				}
 			} else if (args[0].getClass() == ProductAgentProperties.class) {
 				this._properties = (ProductAgentProperties) args[0];
 			}
 		} else {
-			Logger.log(
-					LogLevel.ERROR,
-					"No arguments found. ProductAgent needs atleast one ProductAgentPropeties as argument");
 			throw new IllegalArgumentException("No argument(s) found.");
 		}
 	}
 
 	/*
-	 * Generates an unique conversation id based on the agents localname, the
+	 * Generates a unique conversation id based on the agents localname, the
 	 * objects hashcode and the current time.
 	 */
 	/**

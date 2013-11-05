@@ -143,7 +143,7 @@ public class PenModule extends Module {
 							&& lookUpParameters.getString("ID").equals("RELATIVE-TO-PLACEHOLDER")
 							&& position.getRelativeToPart() != null) 
 					{
-						lookUpParameters.put("ID", position.getRelativeToPart().getId());
+						lookUpParameters.put("ID", position.getRelativeToPart().getPartName());
 					}
 					
 					if(payload.containsField("x") && payload.getString("x").equals("X-PLACEHOLDER")) 

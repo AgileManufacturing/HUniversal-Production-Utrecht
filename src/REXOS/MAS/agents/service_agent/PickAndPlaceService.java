@@ -45,7 +45,7 @@
  *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *          SUCH DAMAGE.
  **/
-package agents.service_agent; 				
+package agents.service_agent;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -65,27 +65,34 @@ import agents.data_classes.StepStatusCode;
 import com.mongodb.BasicDBObject;
 
 /**
- * Instances of this class represent the pick & place service and is meant to pick up objects like a cube and put them
- * somewhere else on the working field. It produces 2 service steps: "pick" and "place".
+ * Instances of this class represent the pick & place service and is meant to
+ * pick up objects like a cube and put them somewhere else on the working field.
+ * It produces 2 service steps: "pick" and "place".
  */
 public class PickAndPlaceService extends Service {
 	/**
-	 * @see agents.service_agent.Service#canDoStep(int, com.mongodb.BasicDBObject)
+	 * @see agents.service_agent.Service#canDoStep(int,
+	 *      com.mongodb.BasicDBObject)
 	 */
 	@Override
 	public boolean canDoStep(int productStepType, BasicDBObject parameters) {
 		try {
-			if(parameters.containsField("part")) {
-				new Part((int)parameters.get("part"));
-				
-				if(parameters.containsField("row")) {
-					if(parameters.containsField("column")) {
-					
-					} else {
-						return false;
+			if (parameters.containsField("parameterGroups")) {
+				BasicDBObject parameterGroups = (BasicDBObject) parameters
+						.get("parameterGroups");
+
+				if (parameterGroups.containsField("loc")) {
+					BasicDBObject location = (BasicDBObject) parameterGroups
+							.get("loc");
+
+					if (location.containsField("parameters")) {
+						BasicDBObject locParameters = (BasicDBObject) location
+								.get("parameters");
+						if (locParameters.containsField("row")
+								&& locParameters.containsField("column")) {
+							return true;
+						}
 					}
-				} else {
-					return false;
 				}
 			} else {
 				return false;
@@ -93,117 +100,146 @@ public class PickAndPlaceService extends Service {
 		} catch (IllegalArgumentException e) {
 			return false;
 		}
-		return true;
+		return false;
 	}
 
 	/**
-	 * @see agents.service_agent.Service#getServiceSteps(int, com.mongodb.BasicDBObject)
+	 * @see agents.service_agent.Service#getServiceSteps(int,
+	 *      com.mongodb.BasicDBObject)
 	 */
 	@Override
-	public ServiceStep[] getServiceSteps(int productStepType, BasicDBObject parameters) {
-		Part part = new Part((int)parameters.get("part"));
+	public ServiceStep[] getServiceSteps(int productStepType,
+			BasicDBObject parameters) {
+		BasicDBObject parameterGroups = (BasicDBObject) parameters
+				.get("parameterGroups");
+
+		BasicDBObject partGroup = (BasicDBObject) parameterGroups.get("part");
+		BasicDBObject partParams = (BasicDBObject) partGroup.get("parameters");
+		BasicDBObject partType = (BasicDBObject) partParams.get("type");
+
+		Part part = new Part((int) (partType.get("value")));
 
 		BasicDBObject pickParameters = new BasicDBObject();
 		pickParameters.put("part", part.toBasicDBObject());
 		pickParameters.put("row", "ROW-PLACEHOLDER");
 		pickParameters.put("column", "COLUMN-PLACEHOLDER");
 		pickParameters.put("crate", "CRATE-PLACEHOLDER");
-		
+
+		BasicDBObject loc = (BasicDBObject) parameterGroups.get("loc");
+		BasicDBObject locParameters = (BasicDBObject) loc.get("parameters");
+		BasicDBObject locColumn = (BasicDBObject) locParameters.get("column");
+		BasicDBObject locRow = (BasicDBObject) locParameters.get("row");
+
 		BasicDBObject placeParameters = new BasicDBObject();
 		placeParameters.put("part", part.toBasicDBObject());
-		placeParameters.put("row", parameters.get("row"));
-		placeParameters.put("column", parameters.get("column"));
+		placeParameters.put("row", locRow.get("value"));
+		placeParameters.put("column", locColumn.get("value"));
 		placeParameters.put("crate", "CRATE-PLACEHOLDER");
 
 		return new ServiceStep[] {
-				new ServiceStep(getId(), 1, pickParameters, StepStatusCode.EVALUATING, null, new ScheduleData()),
-				new ServiceStep(getId(), 2, placeParameters, StepStatusCode.EVALUATING, null, new ScheduleData())
-		};
+				new ServiceStep(getId(), 1, pickParameters,
+						StepStatusCode.EVALUATING, null, new ScheduleData()),
+				new ServiceStep(getId(), 2, placeParameters,
+						StepStatusCode.EVALUATING, null, new ScheduleData()) };
 	}
 
 	/**
-	 * @see agents.service_agent.Service#updateParameters(java.util.HashMap, rexos.mas.service_agent.ServiceStep[])
+	 * @see agents.service_agent.Service#updateParameters(java.util.HashMap,
+	 *      rexos.mas.service_agent.ServiceStep[])
 	 */
 	@Override
-	public ServiceStep[] updateParameters(HashMap<Part, Position> partParameters, ServiceStep[] serviceSteps) {
+	public ServiceStep[] updateParameters(
+			HashMap<Part, Position> partParameters, ServiceStep[] serviceSteps) {
 		Set<Part> parts = partParameters.keySet();
 		Part supplyCrate = null, productCrate = null;
-		for (Part part : parts){
+		for (Part part : parts) {
 			Logger.log(LogLevel.DEBUG, "parts in partParameter: " + part);
-			if (part.getId() == 100){
+			if (part.getId() == 100) {
 				supplyCrate = part;
-			}
-			else if (part.getId() == 101){
+			} else if (part.getId() == 101) {
 				productCrate = part;
 			}
 		}
-		
-		if(supplyCrate == null || productCrate == null) {
+
+		if (supplyCrate == null || productCrate == null) {
 			// error = one or more crates were not returned
 		}
-		
-		for(ServiceStep ss : serviceSteps) {			
+
+		for (ServiceStep ss : serviceSteps) {
 			BasicDBObject oldParameters = ss.getParameters();
 			BasicDBObject newParameters = new BasicDBObject();
-			
+
 			// fill crate Ids
-			switch(ss.getServiceStepType()) {
-				case 1: // Pick - Supply
-					// Grab a ball
-					//Part ball = partParameters.entrySet().iterator().next().getKey();
-					//Position ballPosition = partParameters.remove(ball);
-					
-					Part ball = null;
-					Position ballPosition = null;
-					
-					for(Part part : parts) {
-						if(part.getType() == 1) {
-							ball = part;
-							ballPosition = partParameters.get(ball);
-						}
+			switch (ss.getServiceStepType()) {
+			case 1: // Pick - Supply
+				// Grab a ball
+				// Part ball =
+				// partParameters.entrySet().iterator().next().getKey();
+				// Position ballPosition = partParameters.remove(ball);
+
+				Part ball = null;
+				Position ballPosition = null;
+
+				for (Part part : parts) {
+					if (part.getType() == 1) {
+						ball = part;
+						ballPosition = partParameters.get(ball);
 					}
-					
-					if(ball != null && ballPosition != null) {
-					
-						if(oldParameters.containsField("crate") && oldParameters.getString("crate").equals("CRATE-PLACEHOLDER")) {
-							newParameters.put("crate", supplyCrate.toBasicDBObject());
-						} else {
-							newParameters.put("crate", oldParameters.get("crate"));
-						}
-						
-						if(oldParameters.containsField("row") && oldParameters.getString("row").equals("ROW-PLACEHOLDER")) {
-							newParameters.put("row", ballPosition.getY());
-						} else {
-							newParameters.put("row", oldParameters.getDouble("row"));
-						}
-						
-						if(oldParameters.containsField("column") && oldParameters.getString("column").equals("COLUMN-PLACEHOLDER")) {
-							newParameters.put("column", ballPosition.getX());
-						} else {
-							newParameters.put("column", oldParameters.getDouble("column"));
-						}
-					} else {
-						// error - no ball part
-					}
-					break;
-				case 2: // Place - Product
-					if(oldParameters.containsField("crate") && oldParameters.getString("crate").equals("CRATE-PLACEHOLDER")) {
-						newParameters.put("crate", productCrate.toBasicDBObject());
+				}
+				if (ball != null && ballPosition != null) {
+					if (oldParameters.containsField("crate")
+							&& oldParameters.getString("crate").equals(
+									"CRATE-PLACEHOLDER")) {
+						newParameters.put("crate",
+								supplyCrate.toBasicDBObject());
 					} else {
 						newParameters.put("crate", oldParameters.get("crate"));
 					}
-					
-					newParameters.put("row", oldParameters.getDouble("row"));
-					newParameters.put("column", oldParameters.getDouble("column"));
-					break;
+
+					if (oldParameters.containsField("row")
+							&& oldParameters.getString("row").equals(
+									"ROW-PLACEHOLDER")) {
+						newParameters.put("row", ballPosition.getY());
+					} else {
+						newParameters
+								.put("row", oldParameters.getDouble("row"));
+					}
+
+					if (oldParameters.containsField("column")
+							&& oldParameters.getString("column").equals(
+									"COLUMN-PLACEHOLDER")) {
+						newParameters.put("column", ballPosition.getX());
+					} else {
+						newParameters.put("column",
+								oldParameters.getDouble("column"));
+					}
+				} else {
+					// error - no ball part
+				}
+				break;
+			case 2: // Place - Product
+				if (oldParameters.containsField("crate")
+						&& oldParameters.getString("crate").equals(
+								"CRATE-PLACEHOLDER")) {
+					newParameters.put("crate", productCrate.toBasicDBObject());
+				} else {
+					newParameters.put("crate", oldParameters.get("crate"));
+				}
+
+				newParameters.put("row", oldParameters.getDouble("row"));
+				newParameters.put("column", oldParameters.getDouble("column"));
+				break;
 			}
-			
-			Logger.log(LogLevel.DEBUG, "After updating service step parameters: " + newParameters.keySet());
-			
+
+			Logger.log(
+					LogLevel.DEBUG,
+					"After updating service step parameters: "
+							+ newParameters.keySet());
+
 			ss.setParameters(newParameters);
 		}
 
 		return serviceSteps;
 	}
-	
+
 }

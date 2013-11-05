@@ -27,6 +27,9 @@ import agents.data_classes.StepStatusCode;
 import agents.product_agent.BehaviourCallback;
 import agents.product_agent.ProductAgent;
 
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.Logger;
+
 /**
  * @author Mike
  *
@@ -46,7 +49,7 @@ public class RescheduleBehaviour extends Behaviour {
 	 */
 	@Override
 	public void action() {
-		//System.out.println("RESCHEDULING!");
+		Logger.log(LogLevel.INFORMATION, "RESCHEDULING!");
 		Product product = _productAgent.getProduct();
 		Production prod = product.getProduction();
 		ArrayList<ProductionStep> steps = prod.getProductionSteps();

@@ -89,7 +89,7 @@ public class MainAgent extends Agent {
 			 * Make a new logistics agent
 			 */
 			AgentController logisticsCon =
-					getContainerController().createNewAgent("logistics", "agents.logistics_agent.LogisticsAgent",
+					getContainerController().createNewAgent("Logistics", "agents.logistics_agent.LogisticsAgent",
 							new Object[0]);
 			
 			logisticsCon.start();

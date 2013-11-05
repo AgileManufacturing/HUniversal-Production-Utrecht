@@ -101,12 +101,13 @@ public class DeltaRobotModule extends Module {
 				return new EquipletStep[] {
 					moveZ(parameters)
 				};
+				/*
 			case 4:
 				// case to move to a position relative to a crate
 				// returns the steps for the movement on the x and y axis.
 				return new EquipletStep[] {
 						moveToRowColumnInCrate(parameters)
-				};
+				}; */
 			default:
 				break;
 		}
@@ -137,10 +138,12 @@ public class DeltaRobotModule extends Module {
 			BasicDBObject lookUpParameters = instructionData.getLookUpParameters();
 			BasicDBObject payload = instructionData.getPayload();
 			
-			if(lookUpParameters.containsField("ID")
-					&& lookUpParameters.getString("ID").equals("RELATIVE-TO-PLACEHOLDER")) 
-			{
-				lookUpParameters.put("ID", position.getRelativeToPart().getId());
+			if(lookUpParameters.containsField("ID") && lookUpParameters.getString("ID").equals("RELATIVE-TO-PLACEHOLDER")) {
+				if(position.getRelativeToPart() != null && position.getRelativeToPart().getId() != -1) {
+					lookUpParameters.put("ID", position.getRelativeToPart().getId());
+				} else {
+					lookUpParameters.clear();
+				}
 			}
 			
 			if(payload.containsField("x") && payload.getString("x").equals("X-PLACEHOLDER")) 
@@ -171,17 +174,15 @@ public class DeltaRobotModule extends Module {
 	public int[] isLeadingForServices() {
 		return new int[] {};
 	}
-	
+	/*
 	/**
 	 * Function that builds the step for moving to a position relative to a crate.
 	 * 
 	 * @param parameters The parameters to use by this step.
 	 * @return EquipletStep to move to the crate along the x and y axis.
-	 */
-	private EquipletStep moveToRowColumnInCrate(BasicDBObject parameters) {
-		// set lookup type
-		String lookUp = "";
-					
+	 *
+	private EquipletStep moveToRowColumnInCrate(BasicDBObject parameters) {					
+		@SuppressWarnings("unused")
 		double extraSize = 0;
 		if(parameters.containsField("extraSize")) {
 			extraSize = parameters.getDouble("extraSize");
@@ -195,10 +196,7 @@ public class DeltaRobotModule extends Module {
 			Position position = new Position((BasicDBObject)parameters.get("position"));
 			
 			// fill the lookUpParameters
-			if(position.getRelativeToPart() != null && position.getRelativeToPart().getId() != -1) {
-				lookUp = "FIND_ID";
-				lookUpParameters.put("ID", position.getRelativeToPart().getId());
-			}
+			lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
 
 			// fill the payload parameters
 			if(position.getX() == null) {
@@ -212,14 +210,13 @@ public class DeltaRobotModule extends Module {
 				payload.put("y", position.getY());
 			}
 			payload.put("maxAcceleration", MAX_ACCELERATION);
-
 		} else {
 			payload.put("x", "X-PLACEHOLDER");
 			payload.put("y", "Y-PLACEHOLDER");
 		}
 		
 		// create the instructionData
-		InstructionData instructionData = new InstructionData("move", "deltarobot", lookUp, lookUpParameters, payload);
+		InstructionData instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
 		
 		// create an EquipletStep and return it.
 		EquipletStep step =
@@ -227,7 +224,7 @@ public class DeltaRobotModule extends Module {
 						new TimeData(TIMESLOTS_NEEDED_PER_STEP));
 		return step;
 	}
-
+	*/
 	/**
 	 * Function that builds the step for moving to the safe plane.
 	 * 
@@ -249,11 +246,17 @@ public class DeltaRobotModule extends Module {
 		// create the lookUpParameters
 		if(parameters.containsField("position")) {
 			Position position = new Position((BasicDBObject) parameters.get("position"));
+
+			if(position.getRelativeToPart() != null && position.getRelativeToPart().getId() != -1) {
+				lookUpParameters.put("ID", position.getRelativeToPart().getId());
+			} else {
+				lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
+			}
 			// create the instruction data
-			instructionData = new InstructionData("move", "deltarobot", "", lookUpParameters, payload);
+			instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
 		} else {
 			// create the instruction data
-			instructionData = new InstructionData("move", "deltarobot", "", lookUpParameters, payload);
+			instructionData = new InstructionData("move", "deltarobot", "NULL", lookUpParameters, payload);
 		}
 
 		// create an EquipletStep and return it.
@@ -271,7 +274,7 @@ public class DeltaRobotModule extends Module {
 	 */
 	private EquipletStep moveXY(BasicDBObject parameters) {
 		// set lookup type
-		String lookUp = "";
+		String lookUp = "NULL";
 
 		// create the lookUpParameters
 		BasicDBObject lookUpParameters = new BasicDBObject();
@@ -284,10 +287,11 @@ public class DeltaRobotModule extends Module {
 
 			// fill the lookUpParameters
 			if(position.getRelativeToPart() != null && position.getRelativeToPart().getId() != -1) {
-				lookUp = "FIND_ID";
 				lookUpParameters.put("ID", position.getRelativeToPart().getId());
+			} else {
+				lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
 			}
-			
+
 			// fill the payload parameters
 			if(position.getX() == null) {
 				payload.put("x", "X-PLACEHOLDER");
@@ -300,6 +304,7 @@ public class DeltaRobotModule extends Module {
 				payload.put("y", position.getY());
 			}
 			payload.put("maxAcceleration", MAX_ACCELERATION);
+			lookUp = "FIND_ID";
 		} else {
 			// fill the payload parameters
 			payload.put("x", "X-PLACEHOLDER");
@@ -325,7 +330,7 @@ public class DeltaRobotModule extends Module {
 			extraSize = parameters.getDouble("extraSize");
 		}
 		// set look up type
-		String lookUp = "";
+		String lookUp = "NULL";
 
 		// create the lookup parameters
 		BasicDBObject lookUpParameters = new BasicDBObject();
@@ -338,8 +343,9 @@ public class DeltaRobotModule extends Module {
 
 			// fill in the lookUpParameters.
 			if(position.getRelativeToPart() != null && position.getRelativeToPart().getId() != -1) {
-				lookUp = "FIND_ID";
 				lookUpParameters.put("ID", position.getRelativeToPart().getId());
+			} else {
+				lookUpParameters.put("ID", "RELATIVE-TO-PLACEHOLDER");
 			}
 
 			// fill in the payload parameters.
@@ -353,6 +359,7 @@ public class DeltaRobotModule extends Module {
 			}
 			
 			payload.put("maxAcceleration", MAX_ACCELERATION);
+			lookUp = "FIND_ID";
 		} else {
 			// fill in the payload parameters.
 			payload.put("z", "Z-PLACEHOLDER");

@@ -80,7 +80,7 @@ public class Logger {
 		printToOut(level, String.format(msg, objects));
 	}
 	
-	public static void log(LogLevel level,String msg,  Throwable throwable) {
+	public static void log(LogLevel level, String msg, Throwable throwable) {
 		printToOut(level, msg);
 		printToOut(level, throwable.getStackTrace().toString());
 	}
