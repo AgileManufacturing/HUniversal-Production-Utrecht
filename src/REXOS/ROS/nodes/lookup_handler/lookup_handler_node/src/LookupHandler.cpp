@@ -48,21 +48,22 @@ EnvironmentCommunication::LookupHandler::LookupHandler(){
 bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookup_handler::LookupServer::Request &request, lookup_handler::LookupServer::Response &response){
 	// Construct a message for LookupEnvironmentObject service
 	environment_cache::LookupEnvironmentObject msg;
-
+	std::cout << "lookupservice callback. LookupType: " << request.lookupMsg.lookupType << std::endl;
 	std::map<std::string, std::string> payloadMap = createMapFromVector(request.lookupMsg.payLoad.map);
 	std::map<std::string, std::string> lookupParametersMap = createMapFromVector(request.lookupMsg.lookupParameters.map);
 
 	//also need to return the normal payload if no data is appended.
 	response.lookupMsg.payLoad = request.lookupMsg.payLoad;
 
-	if(request.lookupMsg.lookupType.compare("FIND-ID")) {
+	if(request.lookupMsg.lookupType.compare("FIND_ID") == 0) {
 		std::map<std::string, std::string>::iterator iterator = lookupParametersMap.find("ID");
 
-		if (iterator == lookupParametersMap.end()) { 
+		if (iterator == lookupParametersMap.end()) {
+			std::cout << "nothing found " << std::endl;
 			return false; //nothing found.
-		}
-		else { 
+		} else { 
 			msg.request.lookupID = iterator->second; //lookup id from request.
+			std::cout << "found ID. " << msg.request.lookupID  << std::endl;
 		}
 
 		if(lookupEnvironmentClient.call(msg)) {
@@ -75,7 +76,6 @@ bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookup_handl
 			}
 		}
 	}
-
 	return false;
 }
 
