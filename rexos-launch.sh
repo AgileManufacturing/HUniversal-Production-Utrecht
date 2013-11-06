@@ -30,9 +30,7 @@ function runros() {
 
 function run() {
 	# Start MAS (using ant)
-	echo ""
-	echo -e "\033[36m===== Launching MAS =====\033[0m"
-	ant -buildfile src/REXOS/MAS/build.xml $REXOS_MAS_TARGET -Dgridhost=$REXOS_GRID_HOST -Dequipletnumber=$REXOS_EQ_ID -Dlocalip=$REXOS_LOCALIP
+	gnome-terminal -e "bash -c \"echo -e '\033[36m===== Launching MAS =====\033[0m'; ant -buildfile src/REXOS/MAS/build.xml $REXOS_MAS_TARGET -Dgridhost=$REXOS_GRID_HOST -Dequipletnumber=$REXOS_EQ_ID -Dlocalip=$REXOS_LOCALIP; read -n1\""
 }
 
 OPTIND=0
