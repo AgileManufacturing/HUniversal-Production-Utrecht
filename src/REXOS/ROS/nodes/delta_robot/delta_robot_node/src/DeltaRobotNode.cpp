@@ -35,7 +35,6 @@
 #include <boost/bind.hpp>
 #include <execinfo.h>
 #include <signal.h>
-#include <algorithm>
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "DeltaRobotNode"
@@ -144,26 +143,26 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
         if (strcmp(nodeName, "payload") == 0){
         	JSONNode payloadNode = *i;
 			payloadPoint = parsePoint(payloadNode);
+
    			JSONNode::const_iterator j = payloadNode.begin();
 		    while (j != payloadNode.end()) {
-
 		    	const char * payloadNodeName = j -> name().c_str();
-
+		    	std::cout << payloadNodeName << std::endl;
 			    if (strcmp(payloadNodeName, "locationX") == 0){
-					rotatedLookUpX = j->as_double();
-			    	std::cout << "found locationX " << j->as_double() << " stringToDouble " << rotatedLookUpX << std::endl;
+					rotatedLookUpX = rexos_utilities::stringToDouble(parseNodeValue("locationX", *j));
+			    	std::cout << "found locationx " << rotatedLookUpX << std::endl;
 					lookupIsSet = true;
 				}
 
 			    if (strcmp(payloadNodeName, "locationY") == 0){
-					rotatedLookupY = j->as_double();
-			    	std::cout << "found locationY " << j->as_double() << " stringToDouble " << rotatedLookupY << std::endl;
+					rotatedLookupY = rexos_utilities::stringToDouble(parseNodeValue("locationY", *j));
+			    	std::cout << "found locationx " << rotatedLookupY << std::endl;
 					lookupIsSet = true;
 				}
 
 			    if (strcmp(payloadNodeName, "angle") == 0){
-					angle = j->as_double();
-			    	std::cout << "found angle " << j->as_double() << " stringToDouble " << angle << std::endl;
+					angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *j));
+			    	std::cout << "found angle " << angle << std::endl;
 					lookupIsSet = true;
 				}
 			    j++;
