@@ -24,7 +24,8 @@ using namespace std;
 namespace rexos_datatypes{
     class InstructionData {
     public:
-        InstructionData();  
+        InstructionData();
+        InstructionData(JSONNode n); 
         InstructionData(std::string command, std::string destination, std::string look_up, 
             std::map<std::string, std::string> look_up_parameters, std::map<std::string, std::string> payload); 
 
@@ -47,6 +48,8 @@ namespace rexos_datatypes{
         void setJsonNode(JSONNode jsonNode);
 
         std::string toJSONString();
+
+        void setInstructionData(const JSONNode & n);
     private:
         JSONNode jsonNode;
         std::string command;
@@ -54,7 +57,6 @@ namespace rexos_datatypes{
         std::string look_up;
         std::map<std::string, std::string> look_up_parameters;
         std::map<std::string, std::string> payload;
-        std::string mapToJsonString(std::map<std::string, std::string> map);
     };
 }
 

@@ -35,6 +35,7 @@
 #include <boost/bind.hpp>
 #include <execinfo.h>
 #include <signal.h>
+#include <algorithm>
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "DeltaRobotNode"
@@ -127,7 +128,6 @@ deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
 
 void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
 	JSONNode instructionDataNode = libjson::parse(goal->json);
-	std::cout << "Json ontvangen op deltarobot " << instructionDataNode.wirte() << std::endl;
 	rexos_statemachine::SetInstructionResult result_;
 	result_.OID = goal->OID;
 	bool lookupIsSet = false;
@@ -142,15 +142,32 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
         const char * nodeName = i -> name().c_str();
 	    // keep in mind that a payload may or may not contain all values. Use lastXYZ to determine these values if they are not set.
         if (strcmp(nodeName, "payload") == 0){
-			payloadPoint = parsePoint(*i);	
-        }
-        //Set lookup result
-        //you can use parseNode(desiredName) to retrieve the value.
-        if (strcmp(nodeName, "look_up_result") == 0){
-			rotatedLookUpX = rexos_utilities::stringToDouble(parseNodeValue("locationX", *i));
-			rotatedLookupY = rexos_utilities::stringToDouble(parseNodeValue("locationY", *i));
-			angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *i));
-			lookupIsSet = true;
+        	JSONNode payloadNode = *i;
+			payloadPoint = parsePoint(payloadNode);
+   			JSONNode::const_iterator j = payloadNode.begin();
+		    while (j != payloadNode.end()) {
+
+		    	const char * payloadNodeName = j -> name().c_str();
+
+			    if (strcmp(payloadNodeName, "locationX") == 0){
+					rotatedLookUpX = j->as_double();
+			    	std::cout << "found locationX " << j->as_double() << " stringToDouble " << rotatedLookUpX << std::endl;
+					lookupIsSet = true;
+				}
+
+			    if (strcmp(payloadNodeName, "locationY") == 0){
+					rotatedLookupY = j->as_double();
+			    	std::cout << "found locationY " << j->as_double() << " stringToDouble " << rotatedLookupY << std::endl;
+					lookupIsSet = true;
+				}
+
+			    if (strcmp(payloadNodeName, "angle") == 0){
+					angle = j->as_double();
+			    	std::cout << "found angle " << j->as_double() << " stringToDouble " << angle << std::endl;
+					lookupIsSet = true;
+				}
+			    j++;
+		    }
         }
         ++i;
     }
@@ -379,9 +396,16 @@ std::string deltaRobotNodeNamespace::DeltaRobotNode::parseNodeValue(const std::s
 		{
 			result = i->as_string();
 		} 
-
 		++i;
 	}
+
+	//we want to remove all the ' characters.
+   char chars[] = "'";
+   for (unsigned int i = 0; i < strlen(chars); ++i)
+   {
+      // you need include <algorithm> to use general algorithms like std::remove()
+      result.erase (std::remove(result.begin(), result.end(), chars[i]), result.end());
+   }
 
 	return result;
 }

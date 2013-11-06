@@ -29,10 +29,15 @@
  **/
 
 #include "rexos_datatypes/InstructionData.h"
+#include "rexos_utilities/Utilities.h"
 
 namespace rexos_datatypes{
 
     InstructionData::InstructionData(){}
+
+    InstructionData::InstructionData(JSONNode n){
+        setInstructionData(n);
+    }
 
     InstructionData::InstructionData(std::string command, std::string destination, std::string look_up, 
         std::map<std::string, std::string> look_up_parameters, std::map<std::string, std::string> payload) {
@@ -86,33 +91,47 @@ namespace rexos_datatypes{
         this->jsonNode = jsonNode;
     }
 
+    void InstructionData::setInstructionData(const JSONNode & n){
+         //Iterate them nodes.
+        JSONNode::const_iterator i = n.begin();
+        setJsonNode(n);
+        
+        while (i != n.end()){
+            
+            const char * node_name = i -> name().c_str();
+            
+            if (strcmp(node_name, "command") == 0){
+                setCommand(i -> as_string());
+            }
+            else if (strcmp(node_name, "destination") == 0){
+                setDestination(i -> as_string());
+            }
+            else if (strcmp(node_name, "look_up") == 0){
+                setLook_up(i -> as_string());
+            }
+            else if (strcmp(node_name, "look_up_parameters") == 0){
+                setLook_up_parameters(rexos_utilities::setMapFromNode(*i));
+            }
+            else if (strcmp(node_name, "payload") == 0){
+                setPayload(rexos_utilities::setMapFromNode(*i));
+            }
+            //increment the iterator
+            ++i;
+        }
+    }
+
     std::string InstructionData::toJSONString(){
 
         std::stringstream ss;
 
-        ss << "{ 'instructionData' : { ";
+        ss << "{";
         ss << "'command' : '" << this->command << "', ";
         ss << "'destination' : '" << this->destination << "', ";
         ss << "'look_up' : '" << this->look_up << "', ";
-        ss << "'look_up_parameters' : { " << mapToJsonString(this->look_up_parameters) << " }, ";
-        ss << "'payload' : { " << mapToJsonString(this->payload) << " } ";
-        ss << " } }";
+        ss << "'look_up_parameters' : { " << rexos_utilities::mapToJsonString(this->look_up_parameters) << " }, ";
+        ss << "'payload' : { " << rexos_utilities::mapToJsonString(this->payload) << " } ";
+        ss << " }";
 
         return ss.str();
-    }
-
-    std::string InstructionData::mapToJsonString(std::map<std::string, std::string> map){
-
-        std::stringstream mapStream;
-        std::map<std::string, std::string>::iterator iter;
-
-        for (iter = map.begin(); iter != map.end(); ++iter) {
-            if ((iter != map.end()) && (iter == --map.end())) {
-                mapStream << "'" << iter->first << "' : '" << iter->second << "' ";
-            } else {
-                mapStream << "'" << iter->first << "' : '" << iter->second << "', ";
-            }
-        }
-        return mapStream.str();
     }
 }
