@@ -133,7 +133,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 
     //construct a payload
     //construct lookupvalues.
-	Point payloadPoint;
+	Point payloadPoint, lookupResultPoint;
 	double angle, normalLookupX, normalLookupY, rotatedLookUpX, rotatedLookupY;
 
     JSONNode::const_iterator i = instructionDataNode.begin();
@@ -141,10 +141,12 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
         const char * nodeName = i -> name().c_str();
 	    // keep in mind that a payload may or may not contain all values. Use lastXYZ to determine these values if they are not set.
         if (strcmp(nodeName, "payload") == 0){
+        	
 			payloadPoint = parsePoint(*i);
-			rotatedLookUpX = rexos_utilities::stringToDouble(parseNodeValue("locationX", *i));
-			rotatedLookupY = rexos_utilities::stringToDouble(parseNodeValue("rotatedLookupY", *i));
+			lookupResultPoint = parseLookup(*i);
+
 			angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *i));
+
 			lookupIsSet = true;
         }
         ++i;
