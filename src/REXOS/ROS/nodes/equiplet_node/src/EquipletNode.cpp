@@ -140,8 +140,9 @@ void EquipletNode::handleEquipletStep(rexos_datatypes::EquipletStep * step, mong
 			rexos_datatypes::InstructionData instructionData = step->getInstructionData();
 
 			std::cout << "pre-lookup: " << step->getInstructionData().toJSONString() << std::endl;
+
 			//we need to call the lookup handler first
-			if(instructionData.getLook_up().length() >= 0) {
+			if(instructionData.getLook_up().length() > 0) {
 				map<std::string, std::string> newPayload = callLookupHandler(instructionData.getLook_up(), instructionData.getLook_up_parameters(), instructionData.getPayload());
 				instructionData.setPayload(newPayload);
 			}

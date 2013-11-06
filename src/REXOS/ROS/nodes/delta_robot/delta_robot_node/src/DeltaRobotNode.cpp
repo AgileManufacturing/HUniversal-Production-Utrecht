@@ -35,7 +35,6 @@
 #include <boost/bind.hpp>
 #include <execinfo.h>
 #include <signal.h>
-#include <algorithm>
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "DeltaRobotNode"
@@ -142,32 +141,11 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
         const char * nodeName = i -> name().c_str();
 	    // keep in mind that a payload may or may not contain all values. Use lastXYZ to determine these values if they are not set.
         if (strcmp(nodeName, "payload") == 0){
-        	JSONNode payloadNode = *i;
-			payloadPoint = parsePoint(payloadNode);
-   			JSONNode::const_iterator j = payloadNode.begin();
-		    while (j != payloadNode.end()) {
-
-		    	const char * payloadNodeName = j -> name().c_str();
-
-			    if (strcmp(payloadNodeName, "locationX") == 0){
-					rotatedLookUpX = j->as_double();
-			    	std::cout << "found locationX " << j->as_double() << " stringToDouble " << rotatedLookUpX << std::endl;
-					lookupIsSet = true;
-				}
-
-			    if (strcmp(payloadNodeName, "locationY") == 0){
-					rotatedLookupY = j->as_double();
-			    	std::cout << "found locationY " << j->as_double() << " stringToDouble " << rotatedLookupY << std::endl;
-					lookupIsSet = true;
-				}
-
-			    if (strcmp(payloadNodeName, "angle") == 0){
-					angle = j->as_double();
-			    	std::cout << "found angle " << j->as_double() << " stringToDouble " << angle << std::endl;
-					lookupIsSet = true;
-				}
-			    j++;
-		    }
+			payloadPoint = parsePoint(*i);
+			rotatedLookUpX = rexos_utilities::stringToDouble(parseNodeValue("locationX", *i));
+			rotatedLookupY = rexos_utilities::stringToDouble(parseNodeValue("rotatedLookupY", *i));
+			angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *i));
+			lookupIsSet = true;
         }
         ++i;
     }
@@ -387,27 +365,28 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parseLoo
 std::string deltaRobotNodeNamespace::DeltaRobotNode::parseNodeValue(const std::string nodeName, const JSONNode & n){
 
 	JSONNode::const_iterator i = n.begin();
-	std::string result;
+	float result;
 	while(i != n.end()){
 		// get the JSON node name and value as a string
 		std::string node_name = i->name();
-
+		std::cout << "parsnodeValueNodeName: " << node_name << " & nodeName " << nodeName << std::endl;
 		if(node_name == nodeName)
 		{
-			result = i->as_string();
+			result = i->as_float();
+			std::cout << "Found!: " << result << std::endl;
 		} 
 		++i;
 	}
-
 	//we want to remove all the ' characters.
+	/*
    char chars[] = "'";
    for (unsigned int i = 0; i < strlen(chars); ++i)
    {
       // you need include <algorithm> to use general algorithms like std::remove()
       result.erase (std::remove(result.begin(), result.end(), chars[i]), result.end());
    }
-
-	return result;
+   */
+	return "result";
 }
 
 
