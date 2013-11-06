@@ -60,7 +60,7 @@ bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookup_handl
 
 		if (iterator == lookupParametersMap.end()) {
 			std::cout << "nothing found " << std::endl;
-			return false; //nothing found.
+			return false;
 		} else { 
 			msg.request.lookupID = iterator->second; //lookup id from request.
 			std::cout << "found ID. " << msg.request.lookupID  << std::endl;

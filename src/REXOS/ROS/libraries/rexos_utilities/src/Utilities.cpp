@@ -132,9 +132,9 @@ namespace rexos_utilities{
 
         for (iter = map.begin(); iter != map.end(); ++iter) {
             if ((iter != map.end()) && (iter == --map.end())) {
-                mapStream << "'" << iter->first << "' : '" << iter->second << "' ";
+                mapStream << "\"" << iter->first << "\" : \"" << iter->second << "\" ";
             } else {
-                mapStream << "'" << iter->first << "' : '" << iter->second << "', ";
+                mapStream << "\"" << iter->first << "\" : \"" << iter->second << "\", ";
             }
         }
         return mapStream.str();

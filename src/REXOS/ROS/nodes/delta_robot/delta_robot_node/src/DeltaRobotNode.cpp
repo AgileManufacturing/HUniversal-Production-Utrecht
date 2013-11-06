@@ -134,38 +134,43 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
     //construct a payload
     //construct lookupvalues.
 	Point payloadPoint, lookupResultPoint;
-	double angle, normalLookupX, normalLookupY, rotatedLookUpX, rotatedLookupY;
+	double angle, lookupX, lookupY;
 
     JSONNode::const_iterator i = instructionDataNode.begin();
     while (i != instructionDataNode.end()){
         const char * nodeName = i -> name().c_str();
 	    // keep in mind that a payload may or may not contain all values. Use lastXYZ to determine these values if they are not set.
         if (strcmp(nodeName, "payload") == 0){
-        	
 			payloadPoint = parsePoint(*i);
 			lookupResultPoint = parseLookup(*i);
-
 			angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *i));
 
+			std::cout << "lookupX " << lookupResultPoint.x << " lookupY " << lookupResultPoint.y << " angle " << angle << std::endl;
+			std::cout << "payloadX " << payloadPoint.x << " payloadY " << payloadPoint.y << " payloadZ " << payloadPoint.z << std::endl; 
+			
 			lookupIsSet = true;
         }
         ++i;
     }
 
+	Vector3 payloadVector(payloadPoint.x, payloadPoint.y, payloadPoint.z);
+	Vector3 lookupVector(lookupResultPoint.x, lookupResultPoint.y, 0);
+
     if(lookupIsSet) {
-		double cs = cos(angle);
-		double sn = sin(angle);
-		normalLookupX = rotatedLookUpX * cs - rotatedLookupY * sn;
-		normalLookupX = rotatedLookUpX * sn + rotatedLookupY * cs;
+    	double theta = angle * 3.141592653589793 / 180.0;
+		double cs = cos(theta);
+		double sn = sin(theta);
+		lookupX = lookupVector.x * cs - lookupVector.y * sn;
+		lookupY = lookupVector.x * sn + lookupVector.y * cs;
+
 	}
-
     //translate the relative point to real equiplet coordinates.
-	Vector3 lookupVector(normalLookupX, normalLookupY, 0);
-	Vector3 translatedVector = convertToModuleCoordinate(lookupVector);
+	Vector3 lookupVectorRotated(lookupX, lookupY, 0);
+	Vector3 translatedVector = convertToModuleCoordinate(lookupVectorRotated);
 
-	std::cout << "translatedVector" << translatedVector << std::endl;
+	std::cout << " payloadVector " << payloadVector << std::endl  << " lookupVector " << lookupVector << std::endl  << " lookupVectorRotated " << lookupVectorRotated << std::endl << " translatedVector " << translatedVector << std::endl;
 
-	if(moveToPoint((translatedVector.x + payloadPoint.x), (translatedVector.y + payloadPoint.y), payloadPoint.z, payloadPoint.maxAcceleration)){
+	if(moveToPoint((translatedVector.x + payloadPoint.x), (translatedVector.y + payloadPoint.y), payloadPoint.z - 260, payloadPoint.maxAcceleration)){
 		setInstructionActionServer.setSucceeded(result_);
 		return;
 	}
@@ -203,8 +208,6 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate(){
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(double x, double y, double z, double maxAcceleration){
 	rexos_datatypes::Point3D<double> oldLocation(deltaRobot->getEffectorLocation());
 	rexos_datatypes::Point3D<double> newLocation(x,y,z);
-
-	ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", x, y, z, maxAcceleration);
 
 	if(deltaRobot->checkPath(oldLocation, newLocation)){
 
@@ -308,7 +311,6 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
 	bool xSet = false;
 	bool ySet = false;
 
-	ROS_INFO("parsing json to point");
 	while(i != n.end()){
 		// get the JSON node name and value as a string
 		std::string node_name = i->name();
@@ -348,10 +350,9 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parseLoo
 
 	Point p;
 	JSONNode::const_iterator i = n.begin();
-	while(i != n.end()){
+	while(i != n.end()) {
 		// get the JSON node name and value as a string
 		std::string node_name = i->name();
-
 		if(node_name == "locationX") {
 			p.x = i->as_float();
 		} else if(node_name == "locationY") {
@@ -367,28 +368,17 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parseLoo
 std::string deltaRobotNodeNamespace::DeltaRobotNode::parseNodeValue(const std::string nodeName, const JSONNode & n){
 
 	JSONNode::const_iterator i = n.begin();
-	float result;
+	std::string result;
 	while(i != n.end()){
 		// get the JSON node name and value as a string
 		std::string node_name = i->name();
-		std::cout << "parsnodeValueNodeName: " << node_name << " & nodeName " << nodeName << std::endl;
 		if(node_name == nodeName)
 		{
-			result = i->as_float();
-			std::cout << "Found!: " << result << std::endl;
+			result = i->as_string();
 		} 
 		++i;
 	}
-	//we want to remove all the ' characters.
-	/*
-   char chars[] = "'";
-   for (unsigned int i = 0; i < strlen(chars); ++i)
-   {
-      // you need include <algorithm> to use general algorithms like std::remove()
-      result.erase (std::remove(result.begin(), result.end(), chars[i]), result.end());
-   }
-   */
-	return "result";
+	return result;
 }
 
 
