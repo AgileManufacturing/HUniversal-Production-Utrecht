@@ -15,7 +15,10 @@ function usage() {
 function runros() {
 	# Start essential nodes (equiplet node)
 	# roslaunch -- launchfile
-	roslaunch essentials.launch
+	gnome-terminal -e "bash -c 'roslaunch essentials.launch'"
+
+	# Delay for 5 seconds to allow the essential nodes to start
+	sleep 5
 
 	# *Determine installed modules (database)* // Not going to happen now
 	# roslaunch -- launchfile
