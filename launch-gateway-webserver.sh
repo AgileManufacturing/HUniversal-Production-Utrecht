@@ -2,10 +2,10 @@
 # Assumes this file is run from the HUnivarsal-Production-Utrecht root
 # and that the gateway server jar is also present in this folder.
 
-if [ "$(id -u)" != "0" ]; then
-   echo "\033[91mThis script must be run as root\033[0m" 1>&2
-   exit 1
-fi
+#if [ "$(id -u)" != "0" ]; then
+#   echo "\033[91mThis script must be run as root\033[0m" 1>&2
+#   exit 1
+#fi
 
 tomcat_run() {
 	for match in $(sudo find / -regextype sed -regex ".*/bin/startup\.sh")
@@ -40,7 +40,7 @@ fi
 run_build_script
 
 if [ -e ./gatewayserver.jar ]; then
-	rm ./gatewayserver.jar
+	sudo rm ./gatewayserver.jar
 fi
 
 rootDir=$PWD
