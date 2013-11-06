@@ -104,7 +104,11 @@ function UpEventHandler(event) {
 function MoveEventHandler(event) {
 	if (mouseDown) {
 		var array = getSelectedRowAndColumn(event);
-		pixels[rowAndColumnToArrayNumber(array[0], array[1])] = pixelColor;
+		if(pixelColor != backgroundPixelColor) {
+			pixels[rowAndColumnToArrayNumber(array[0], array[1])] = pixelColor;
+		} else {
+			pixels[rowAndColumnToArrayNumber(array[0], array[1])] = undefined;
+		}
 		drawPixel(array[0], array[1], pixelColor);
 	}
 }
@@ -112,7 +116,12 @@ function MoveEventHandler(event) {
 function DownEventHandler(event) {
 	mouseDown = true;
 	var array = getSelectedRowAndColumn(event);
-	pixels[rowAndColumnToArrayNumber(array[0], array[1])] = pixelColor;
+	if(pixelColor != backgroundPixelColor) {
+		pixels[rowAndColumnToArrayNumber(array[0], array[1])] = pixelColor;
+	} else {
+		pixels[rowAndColumnToArrayNumber(array[0], array[1])] = undefined;
+	}
+	
 	drawPixel(array[0], array[1], pixelColor);
 }
 
