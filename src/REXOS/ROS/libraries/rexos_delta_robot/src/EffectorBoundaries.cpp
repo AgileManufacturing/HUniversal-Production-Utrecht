@@ -101,13 +101,25 @@ namespace rexos_delta_robot{
 			BitmapCoordinate temp = fromRealCoordinate(rexos_datatypes::Point3D<double>(x, y, z));
 			int index = temp.x + temp.y * width + temp.z * width * depth;
 
-			if(temp.x < 0
-				|| temp.x > width
-				|| temp.y < 0
-				|| temp.y > depth
-				|| temp.z < 0
-				|| temp.z > height
-				|| boundariesBitmap[index] != VALID){
+			if(temp.x < 0 || temp.y < 0 || temp.z < 0) {
+				std::cout << "temp.x: " << temp.x << " or temp.y: " << temp.y << std::endl;
+				return false;
+			}
+
+			if(temp.x > width){
+				std::cout << "temp.x: " << temp.x << " > width: " << width << std::endl;
+				return false;
+			}
+			if(temp.y > depth){
+				std::cout << "temp.y: " << temp.y << " > depth: " << depth << std::endl;
+				return false;
+			}
+			if(temp.z > height){
+				std::cout << "temp.z: " << temp.z << " > height: " << height << std::endl;
+				return false;
+			}
+			if(boundariesBitmap[index] != VALID){
+				std::cout << "boundariesBitmap[index]: " << boundariesBitmap[index] << "!= VALID: " << VALID << std::endl;
 				return false;
 			}
 		}
