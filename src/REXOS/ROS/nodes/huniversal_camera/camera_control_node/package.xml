@@ -26,6 +26,9 @@
   <build_depend>rexos_knowledge_database</build_depend>
   <run_depend>rexos_knowledge_database</run_depend>
   
+  <build_depend>libjson</build_depend>
+  <run_depend>libjson</run_depend>
+  
   <build_depend>MYSQLCONNECTORCPP</build_depend>
   <run_depend>MYSQLCONNECTORCPP</run_depend>
   <export>
