@@ -9,12 +9,19 @@ insert into ModuleType(
 ) values 
 ("The_Imaging_Source_Europe_GmbH", "DFK_22AUC03", "", 1, "", 1, ""),
 ("The_Imaging_Source_Europe_GmbH", "Cheap_ass_lens", "", 1, "", 1, ""),
-("HU", "delta_robot_type_A", "", 1, "", 1, ""),
+("HU", "delta_robot_type_A", "{
+	\"midPointX\" : 75.0,
+	\"midPointY\" : -200.0,
+	\"midPointZ\" : -35.0
+}", 1, "", 1, ""),
 ("HU", "work_plane_type_A", "{
+	\"midPointX\" : 175.0,
+	\"midPointY\" : -200.0,
+	\"midPointZ\" : 35.0,
 	\"topLeftValue\" : \"_WP_TL\",
 	\"topRightValue\" : \"_WP_TR\",
 	\"bottomRightValue\" : \"_WP_BR\",
-	\"workPlandeWidth\" : 80.0,
+	\"workPlaneWidth\" : 80.0,
 	\"workPlaneHeight\" : 80.0
 }", 1, "", 1, "");
 
