@@ -47,6 +47,8 @@
 #include <actionlib/server/simple_action_server.h>
 #include <rexos_statemachine/SetInstructionAction.h>
 
+#include <string>
+
 // GCC system header to suppress libjson warnings
 #pragma GCC system_header
 #include <libjson/libjson.h>
@@ -61,9 +63,10 @@ namespace deltaRobotNodeNamespace{
 	 * the DeltaRobotNode which is a ModuleStateMachine
 	 **/
 	class DeltaRobotNode : public rexos_statemachine::ModuleStateMachine, 
-	public rexos_coordinates::Module{
+			public rexos_knowledge_database::Module, 
+			public rexos_coordinates::Module{
 	public:
-		DeltaRobotNode(int equipletID, int moduleID);
+		DeltaRobotNode(int equipletID, int moduleID, std::string manufacturer, std::string typeNumber, std::string serialNumber);
 		virtual ~DeltaRobotNode();
 		
 		virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
