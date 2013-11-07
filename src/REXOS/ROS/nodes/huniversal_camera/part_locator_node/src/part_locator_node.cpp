@@ -70,28 +70,27 @@ PartLocatorNode::PartLocatorNode(int equipletId, std::string cameraManufacturer,
 	
 	for(JSONNode::const_iterator it = jsonNode.begin(); it != jsonNode.end(); it++) {
 		if(it->name() == "topLeftValue"){
-			topLeftValue = it->as_float();
-			ROS_INFO("found topLeftValue");
+			topLeftValue = it->as_string();
+			ROS_INFO_STREAM("found topLeftValue " << topLeftValue);
 		} else if(it->name() == "topRightValue"){
-			topRightValue = it->as_float();
-			ROS_INFO("found topRightValue");
+			topRightValue = it->as_string();
+			ROS_INFO_STREAM("found topRightValue " << topRightValue);
 		} else if(it->name() == "bottomRightValue"){
 			bottomRightValue = it->as_string();
-			ROS_INFO("found bottomRightValue");
+			ROS_INFO_STREAM("found bottomRightValue " << bottomRightValue);
 		} else if(it->name() == "workPlaneWidth"){
-			bottomRightValue = it->as_string();
-			ROS_INFO("found workPlaneWidth");
+			workPlaneWidth = it->as_float();
+			ROS_INFO_STREAM("found workPlaneWidth " << workPlaneWidth);
 		} else if(it->name() == "workPlaneHeight"){
-			bottomRightValue = it->as_string();
-			ROS_INFO("found workPlaneHeight");
+			workPlaneHeight = it->as_float();
+			ROS_INFO_STREAM("found workPlaneHeight " << workPlaneHeight);
 		} else {
 			// some other property, ignore it
 		}
 	}
 	if(std::isnan(workPlaneWidth) || std::isnan(workPlaneHeight) || 
 			topLeftValue.length() == 0 || topRightValue.length() == 0 || bottomRightValue.length() == 0) {
-		throw std::runtime_error("The properties do not contain the top/bottom left/right values \
-				or do not contain the workplane width/height");
+		throw std::runtime_error("The properties do not contain the top/bottom left/right values or do not contain the workplane width/height");
 	}
 }
 
@@ -355,7 +354,7 @@ int main(int argc, char* argv[]) {
 		ROS_ERROR("Cannot read equiplet id from commandline please use correct values.");
 		return -2;
 	}
-	
+	ROS_INFO("Constructing node");
 	PartLocatorNode node(equipletId, argv[2], argv[3], argv[4]);
 	
 	node.run();

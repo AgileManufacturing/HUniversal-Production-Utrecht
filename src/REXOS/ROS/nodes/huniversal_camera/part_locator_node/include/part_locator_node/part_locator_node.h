@@ -44,7 +44,8 @@
 
 #include <vision_node/QrCodes.h>
 
-class PartLocatorNode : public rexos_coordinates::Module, public rexos_knowledge_database::Module {
+class PartLocatorNode : public rexos_knowledge_database::Module,
+		public rexos_coordinates::Module {
 protected:
 	static const Vector2 EXPECTED_DIRECTION;
 	static const Vector2 EXPECTED_ITEM_DIRECTION;

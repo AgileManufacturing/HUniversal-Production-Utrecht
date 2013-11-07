@@ -65,11 +65,9 @@ CameraControlNode::CameraControlNode(int equipletId, std::string cameraManufactu
 void CameraControlNode::increaseExposureCall() {
 	ROS_INFO_STREAM("Calling service increaseExposureClient " << increaseExposureClient.call(emptyService));
 }
-
 void CameraControlNode::decreaseExposureCall() {
 	ROS_INFO_STREAM("Calling service decreaseExposureClient " << decreaseExposureClient.call(emptyService));
 }
-
 void CameraControlNode::autoWhiteBalanceCall(bool enabled) {
 	vision_node::autoWhiteBalance autoWhiteBalance;
 	autoWhiteBalance.request.enable = enabled;
@@ -78,7 +76,7 @@ void CameraControlNode::autoWhiteBalanceCall(bool enabled) {
 
 void CameraControlNode::run() {
 	ros::spin();
-/*	char key;
+	char key;
 	while(ros::ok() && !(key == 'q' || key == 'Q')) {
 		std::cin >> key;
 
@@ -91,8 +89,63 @@ void CameraControlNode::run() {
 		} else if(key == 'x' || key == 'X') {
 			decreaseExposureCall();
 		}
-	}*/
+	}
 }
+bool CameraControlNode::mannuallyCalibrateLens(){
+	// we have no calibration data for this combination, generate it
+	// disable the fishEyeCorrection while doing the calibration
+	vision_node::enableComponent fishEyeServiceCall;
+	fishEyeServiceCall.request.enable = false;
+	fishEyeCorrectionClient.call(fishEyeServiceCall);
+
+	camera_calibration_node::calibrateLens calibrateLensServiceCall;
+	calibrateLensServiceCall.request.frameCount = 20;
+	calibrateLensServiceCall.request.boardWidth = 9;
+	calibrateLensServiceCall.request.boardHeight = 6;
+	calibrateLensClient.call(calibrateLensServiceCall);
+	
+	fishEyeServiceCall.request.enable = true;
+	fishEyeCorrectionClient.call(fishEyeServiceCall);
+	
+	// did we see a chessboard?
+	if(calibrateLensServiceCall.response.processedFrames == 0){
+		ROS_WARN_STREAM("calibrateLens failed, processedFrame = " << calibrateLensServiceCall.response.processedFrames);
+		return false;
+	}
+	
+	ROS_INFO("Saving matrices to database");
+	vision_node::getCorrectionMatrices getCalibrationMatricesServiceCall;
+	getCorrectionMatricesClient.call(getCalibrationMatricesServiceCall);
+	
+	// copy all the distCoeffs from the service
+	JSONNode distCoeffs;
+	distCoeffs.set_name("distCoeffs");
+	for(int i = 0; i < getCalibrationMatricesServiceCall.response.distCoeffs.size(); i++) {
+		distCoeffs.push_back(JSONNode("", getCalibrationMatricesServiceCall.response.distCoeffs.at(i)));
+	}
+	// copy all the distCoeffs from the service
+	JSONNode cameraMatrix;
+	cameraMatrix.set_name("cameraMatrix");
+	for(int i = 0; i < 9; i++) {
+		cameraMatrix.push_back(JSONNode("", getCalibrationMatricesServiceCall.response.cameraMatrix.values[i]));
+	}
+	
+	// merge the distCoeffs and cameraMatrix in the already existing calibration data
+	JSONNode jsonNode;
+	try{
+		std::string properties = this->getCalibrationDataForModuleAndChilds();
+		jsonNode = libjson::parse(properties);
+	} catch(rexos_knowledge_database::KnowledgeDatabaseException ex) {
+		// there is no calibration data, so we start with a new node (which we created above)
+	}
+	jsonNode.push_back(distCoeffs);
+	jsonNode.push_back(cameraMatrix);
+	
+	ROS_INFO_STREAM("JSON=" << std::cout << jsonNode.write_formatted());
+	this->setCalibrationDataForModuleAndChilds(jsonNode.write_formatted());
+	return true;
+}
+
 void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Setup transition called");
 	
@@ -154,70 +207,11 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 	}
 	
 }
-bool CameraControlNode::mannuallyCalibrateLens(){
-	// we have no calibration data for this combination, generate it
-	// disable the fishEyeCorrection while doing the calibration
-	vision_node::enableComponent fishEyeServiceCall;
-	fishEyeServiceCall.request.enable = false;
-	fishEyeCorrectionClient.call(fishEyeServiceCall);
-
-	camera_calibration_node::calibrateLens calibrateLensServiceCall;
-	calibrateLensServiceCall.request.frameCount = 20;
-	calibrateLensServiceCall.request.boardWidth = 9;
-	calibrateLensServiceCall.request.boardHeight = 6;
-	calibrateLensClient.call(calibrateLensServiceCall);
-	
-	fishEyeServiceCall.request.enable = true;
-	fishEyeCorrectionClient.call(fishEyeServiceCall);
-	
-	// did we see a chessboard?
-	if(calibrateLensServiceCall.response.processedFrames == 0){
-		ROS_WARN_STREAM("calibrateLens failed, processedFrame = " << calibrateLensServiceCall.response.processedFrames);
-		return false;
-	}
-	
-	ROS_INFO("Saving matrices to database");
-	vision_node::getCorrectionMatrices getCalibrationMatricesServiceCall;
-	getCorrectionMatricesClient.call(getCalibrationMatricesServiceCall);
-	
-	// copy all the distCoeffs from the service
-	JSONNode distCoeffs;
-	distCoeffs.set_name("distCoeffs");
-	for(int i = 0; i < getCalibrationMatricesServiceCall.response.distCoeffs.size(); i++) {
-		distCoeffs.push_back(JSONNode("", getCalibrationMatricesServiceCall.response.distCoeffs.at(i)));
-	}
-	// copy all the distCoeffs from the service
-	JSONNode cameraMatrix;
-	cameraMatrix.set_name("cameraMatrix");
-	for(int i = 0; i < 9; i++) {
-		cameraMatrix.push_back(JSONNode("", getCalibrationMatricesServiceCall.response.cameraMatrix.values[i]));
-	}
-	
-	// merge the distCoeffs and cameraMatrix in the already existing calibration data
-	JSONNode jsonNode;
-	try{
-		std::string properties = this->getCalibrationDataForModuleAndChilds();
-		jsonNode = libjson::parse(properties);
-	} catch(rexos_knowledge_database::KnowledgeDatabaseException ex) {
-		// there is no calibration data, so we start with a new node (which we created above)
-	}
-	jsonNode.push_back(distCoeffs);
-	jsonNode.push_back(cameraMatrix);
-	
-	ROS_INFO_STREAM("JSON=" << std::cout << jsonNode.write_formatted());
-	this->setCalibrationDataForModuleAndChilds(jsonNode.write_formatted());
-	return true;
-}
 void CameraControlNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Shutdown transition called");
 	// Should have information about the workspace, calculate a safe spot and move towards it
 	as->setSucceeded();
 }
-
-/**
- * Transition from Standby to Normal state
- * @return will be 0 if everything went ok else error 
- **/
 void CameraControlNode::transitionStart(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Start transition called");
 	vision_node::enableComponent serviceCall;
@@ -226,10 +220,6 @@ void CameraControlNode::transitionStart(rexos_statemachine::TransitionActionServ
 	
 	as->setSucceeded();
 }
-/**
- * Transition from Normal to Standby state
- * @return will be 0 if everything went ok else error
- **/
 void CameraControlNode::transitionStop(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Stop transition called");
 	vision_node::enableComponent serviceCall;
@@ -239,12 +229,11 @@ void CameraControlNode::transitionStop(rexos_statemachine::TransitionActionServe
 	as->setSucceeded();
 }
 
-
 int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "camera_control_node");
 	
-	if(argc < 5){
-		ROS_ERROR("Arguments are not valid");
+if(argc < 5){
+		ROS_ERROR("Usage: camera_control_node equipletId, manufacturer, typeNumber, serialNumber");
 		return -1;
 	}
 	
@@ -255,7 +244,7 @@ int main(int argc, char* argv[]) {
 		ROS_ERROR("Cannot read equiplet id from commandline please use correct values.");
 		return -2;
 	}
-
+	
 	CameraControlNode node(equipletId, argv[2], argv[3], argv[4]);
 
 	std::cout << "Welcome to the camera node controller. Using this tool you can adjust camera settings on the fly :)."
