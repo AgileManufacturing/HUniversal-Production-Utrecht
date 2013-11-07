@@ -33,17 +33,20 @@
 
 #include "rexos_utilities/Utilities.h"
 
+#include <libjson/libjson.h>
+
 using namespace std;
 
 const Vector2 PartLocatorNode::EXPECTED_DIRECTION = Vector2(-1, 0);
 const Vector2 PartLocatorNode::EXPECTED_ITEM_DIRECTION = Vector2(-1, 0);
-const string PartLocatorNode::TOP_LEFT_VALUE = "WP_800_400_TL";
+/*const string PartLocatorNode::TOP_LEFT_VALUE = "WP_800_400_TL";
 const string PartLocatorNode::TOP_RIGHT_VALUE = "WP_800_400_TR";
-const string PartLocatorNode::BOTTOM_RIGHT_VALUE = "WP_800_400_BR";
+const string PartLocatorNode::BOTTOM_RIGHT_VALUE = "WP_800_400_BR";*/
 
 
-PartLocatorNode::PartLocatorNode(int equipletId, int moduleId):
-		rexos_coordinates::Module(moduleId),
+PartLocatorNode::PartLocatorNode(int equipletId, std::string cameraManufacturer, std::string cameraTypeNumber, std::string cameraSerialNumber):
+		rexos_knowledge_database::Module(cameraManufacturer, cameraTypeNumber, cameraSerialNumber),
+		rexos_coordinates::Module(this),
 		originalTopLeftCoor(-1, -1),
 		originalTopRightCoor(-1, -1),
 		originalBottomRightCoor(-1, -1),
@@ -54,6 +57,42 @@ PartLocatorNode::PartLocatorNode(int equipletId, int moduleId):
 		environmentCacheClient(nodeHandle.serviceClient<environment_cache::UpdateEnvironmentCache>("updateEnvironmentCache"))
 {
 	ROS_INFO("Constructing");
+	
+	rexos_knowledge_database::ModuleType* moduleType = this->getModuleType();
+	std::string properties = moduleType->getModuleTypeProperties();
+	JSONNode jsonNode = libjson::parse(properties);
+	
+	topLeftValue = std::string();
+	topRightValue = std::string();
+	bottomRightValue = std::string();
+	double workPlaneWidth = std::numeric_limits<double>::quiet_NaN();
+	double workPlaneHeight = std::numeric_limits<double>::quiet_NaN();
+	
+	for(JSONNode::const_iterator it = jsonNode.begin(); it != jsonNode.end(); it++) {
+		if(it->name() == "topLeftValue"){
+			topLeftValue = it->as_float();
+			ROS_INFO("found topLeftValue");
+		} else if(it->name() == "topRightValue"){
+			topRightValue = it->as_float();
+			ROS_INFO("found topRightValue");
+		} else if(it->name() == "bottomRightValue"){
+			bottomRightValue = it->as_string();
+			ROS_INFO("found bottomRightValue");
+		} else if(it->name() == "workPlaneWidth"){
+			bottomRightValue = it->as_string();
+			ROS_INFO("found workPlaneWidth");
+		} else if(it->name() == "workPlaneHeight"){
+			bottomRightValue = it->as_string();
+			ROS_INFO("found workPlaneHeight");
+		} else {
+			// some other property, ignore it
+		}
+	}
+	if(std::isnan(workPlaneWidth) || std::isnan(workPlaneHeight) || 
+			topLeftValue.length() == 0 || topRightValue.length() == 0 || bottomRightValue.length() == 0) {
+		throw std::runtime_error("The properties do not contain the top/bottom left/right values \
+				or do not contain the workplane width/height");
+	}
 }
 
 void PartLocatorNode::qrCodeCallback(const vision_node::QrCodes & message) {
@@ -109,7 +148,7 @@ void PartLocatorNode::detectCorners(const vision_node::QrCodes & message) {
 	
 	bool updateMatrices = false;
 	for(int i = 0; i < message.qrCodes.size(); i++){		
-		if(TOP_LEFT_VALUE.compare(message.qrCodes[i].value) == 0){
+		if(topLeftValue.compare(message.qrCodes[i].value) == 0){
 			currentTopLeftCoor.x = message.qrCodes[i].corners[1].x;
 			currentTopLeftCoor.y = message.qrCodes[i].corners[1].y;
 			updateMatrices = true;
@@ -117,7 +156,7 @@ void PartLocatorNode::detectCorners(const vision_node::QrCodes & message) {
 				originalTopLeftCoor = currentTopLeftCoor;
 				foundCorners++;			
 			}
-		} else if(TOP_RIGHT_VALUE.compare(message.qrCodes[i].value) == 0){
+		} else if(topRightValue.compare(message.qrCodes[i].value) == 0){
 			currentTopRightCoor.x = message.qrCodes[i].corners[1].x;
 			currentTopRightCoor.y = message.qrCodes[i].corners[1].y;			
 			updateMatrices = true;
@@ -125,7 +164,7 @@ void PartLocatorNode::detectCorners(const vision_node::QrCodes & message) {
 				originalTopRightCoor = currentTopRightCoor;
 				foundCorners++;
 			}
-		} else if(BOTTOM_RIGHT_VALUE.compare(message.qrCodes[i].value) == 0){
+		} else if(bottomRightValue.compare(message.qrCodes[i].value) == 0){
 			currentBottomRightCoor.x = message.qrCodes[i].corners[1].x;
 			currentBottomRightCoor.y = message.qrCodes[i].corners[1].y;			
 			updateMatrices = true;
@@ -303,9 +342,21 @@ void PartLocatorNode::run() {
 
 int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "part_locator_node");
-	ROS_DEBUG("Constructing node");
-
-	PartLocatorNode node(rexos_utilities::stringToInt(argv[1]), rexos_utilities::stringToInt(argv[2]));
+	
+	if(argc < 5){
+		ROS_ERROR("Usage: camera_control_node equipletId, manufacturer, typeNumber, serialNumber");
+		return -1;
+	}
+	
+	int equipletId;
+	try{
+		equipletId = rexos_utilities::stringToInt(argv[1]);
+	} catch(std::runtime_error ex) {
+		ROS_ERROR("Cannot read equiplet id from commandline please use correct values.");
+		return -2;
+	}
+	
+	PartLocatorNode node(equipletId, argv[2], argv[3], argv[4]);
 	
 	node.run();
 	return 0;

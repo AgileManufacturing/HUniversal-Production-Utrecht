@@ -27,8 +27,7 @@
  *
  **/
 
-#ifndef PARTLOCATORNODE_H_
-#define PARTLOCATORNODE_H_
+#pragma once
 
 #include "ros/ros.h"
 
@@ -45,17 +44,19 @@
 
 #include <vision_node/QrCodes.h>
 
-class PartLocatorNode : rexos_coordinates::Module {
+class PartLocatorNode : public rexos_coordinates::Module, public rexos_knowledge_database::Module {
 protected:
 	static const Vector2 EXPECTED_DIRECTION;
 	static const Vector2 EXPECTED_ITEM_DIRECTION;
-	static const std::string TOP_LEFT_VALUE;
-	static const std::string TOP_RIGHT_VALUE;
-	static const std::string BOTTOM_RIGHT_VALUE;
+	std::string topLeftValue;
+	std::string topRightValue;
+	std::string bottomRightValue;
+	double workPlaneWidth;
+	double workPlaneHeight;
 	
 
 public:
-	PartLocatorNode(int equipletId, int moduleId);
+	PartLocatorNode(int equipletId, std::string cameraManufacturer, std::string cameraTypeNumber, std::string cameraSerialNumber);
 	void run();
 private:
 	/**
@@ -139,5 +140,3 @@ private:
 	 **/
 	Matrix3 calculateScaleMatrix();
 };
-
-#endif /* PARTLOCATORNODE_H_ */
