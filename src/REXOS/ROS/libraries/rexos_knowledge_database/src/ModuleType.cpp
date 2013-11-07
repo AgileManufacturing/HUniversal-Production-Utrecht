@@ -11,6 +11,7 @@ namespace rexos_knowledge_database{
 	{
 		connection = rexos_knowledge_database::connect();
 	}
+	
 	std::string ModuleType::getModuleTypeProperties(){
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT moduleTypeProperties \

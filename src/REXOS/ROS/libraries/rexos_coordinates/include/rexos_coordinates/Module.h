@@ -31,6 +31,7 @@
 #define MODULE_H
 
 #include <Vectors/Vectors.h>
+#include <rexos_knowledge_database/Module.h>
 
 /**
  * @brief this class provides a system to translate coordinates from module coordinates to equiplet coordinates.
@@ -38,21 +39,27 @@
 namespace rexos_coordinates {
 	class Module {
 	private:
-		int moduleId;
+		rexos_knowledge_database::Module* module;
+		
 		Vector3 moduleToEquiplet;
 		Vector3 equipletToModule;
 		
 	protected:
+		/**
+		 * Converts a module coordinate to an equiplet coordinate, using the moduleToEquiplet vector
+		 */
 		Vector3 convertToEquipletCoordinate(Vector3 moduleCoordinate);
+		/**
+		 * Converts an equiplet coordinate to a module coordinate, using the equipletToModule vector
+		 */
 		Vector3 convertToModuleCoordinate(Vector3 equipletCoordinate);
 		
 		/**
-		 * Reads the module information from the database and updates the local properties. \n
-		 * Use this function if you have physically moved the module
+		 * Constructor, reads the module information from the database and updates the local properties. \n
 		 *
-		 * @param moduleId id of the module in the knowledge database.
+		 * @param representation of the module in the knowledge database.
 		 */
-		Module(int moduleId);
+		Module(rexos_knowledge_database::Module* module);
 	public:
 		/**
 		 * Reads the module information from the database and updates the local properties. \n
