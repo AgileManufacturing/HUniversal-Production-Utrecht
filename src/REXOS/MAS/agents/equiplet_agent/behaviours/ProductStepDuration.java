@@ -159,14 +159,13 @@ public class ProductStepDuration extends ReceiveBehaviour {
 
 				long duration = (Long) message.getContentObject();
 				
-				ScheduleData schedule = productStep.getScheduleData();
 //				schedule.setDuration(schedule.getDuration() + (6000/equipletAgent.getTimer().getTimeSlotLength()));
 //				equipletBBClient.updateDocuments(new BasicDBObject("_id", id),
 //												new BasicDBObject("$set", new BasicDBObject("scheduleData.duration", schedule.getDuration())));
 				BehaviourCallbackItem scheduleArguments = new BehaviourCallbackItem();
-				scheduleArguments.addArgument("schedule", schedule);
 				scheduleArguments.addArgument("productStep", productStep);
 				scheduleArguments.addArgument("duration", duration);
+				
 				parentBehaviourCallback.callback(message, scheduleArguments);
 				equipletAgent.removeBehaviour(this);
 				

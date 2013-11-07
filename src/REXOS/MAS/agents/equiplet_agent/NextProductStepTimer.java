@@ -180,12 +180,12 @@ public class NextProductStepTimer extends Timer {
 			if(!objects.isEmpty()) {
 				ProductStep nextProductStep = new ProductStep((BasicDBObject) objects.get(0));
 				equipletAgent.setNextProductStep(nextProductStep.getId());
-				ScheduleData scheduleData = nextProductStep.getScheduleData();
-				if(nextUsedTimeSlot == -1 || scheduleData.getStartTime() < nextUsedTimeSlot) {
-					setNextUsedTimeSlot(scheduleData.getStartTime());
-				} else {
-					Logger.log(LogLevel.DEBUG, "%d Equiplet agent - Earliest step is not before current step (%d)%n", EquipletAgent.getCurrentTimeSlot(), scheduleData.getStartTime());
-				}
+			//	ScheduleData scheduleData = nextProductStep.getScheduleData();
+			//	if(nextUsedTimeSlot == -1 || scheduleData.getStartTime() < nextUsedTimeSlot) {
+			//		setNextUsedTimeSlot(scheduleData.getStartTime());
+			//	} else {
+			//		Logger.log(LogLevel.DEBUG, "%d Equiplet agent - Earliest step is not before current step (%d)%n", EquipletAgent.getCurrentTimeSlot(), scheduleData.getStartTime());
+			//	}
 			} else {
 				Logger.log(LogLevel.DEBUG, "%d Equiplet agent - no more steps on PLANNED%n", EquipletAgent.getCurrentTimeSlot());
 				setNextUsedTimeSlot(-1);
@@ -215,7 +215,7 @@ public class NextProductStepTimer extends Timer {
 				ProductStep productStep =
 						new ProductStep((BasicDBObject) equipletAgent.getProductStepBBClient().findDocumentById(productStepEntry));
 
-				Logger.log(LogLevel.DEBUG, "%d Equiplet agent - Asking PA to start with step at time (%d)%n", EquipletAgent.getCurrentTimeSlot(), productStep.getScheduleData().getStartTime());
+			//	Logger.log(LogLevel.DEBUG, "%d Equiplet agent - Asking PA to start with step at time (%d)%n", EquipletAgent.getCurrentTimeSlot(), productStep.getScheduleData().getStartTime());
 				
 				// ask the productAgent to start the production of the step.
 //				ACLMessage answer = new ACLMessage(ACLMessage.QUERY_IF);

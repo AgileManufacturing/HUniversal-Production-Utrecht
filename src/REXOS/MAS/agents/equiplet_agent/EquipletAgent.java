@@ -238,9 +238,14 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 */
 	private String planningName;
 	
-	
+	/**
+	 * @var long systemStart
+	 * 		The starttime of the equiplet
+	 */
 	private static long systemStart = System.currentTimeMillis();
 
+	private ScheduleLock scheduleLock;
+	
 	/**
 	 * Setup function for the equipletAgent. Configures the IP and database name
 	 * of the equiplet. Gets its capabilities from the arguments. Creates its
@@ -253,6 +258,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	@Override
 	public void setup() {
 		try {
+			scheduleLock = new ScheduleLock();
+			
 			equipletDbIp = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbIp", getAID().getLocalName());
 			equipletDbPort = Configuration.getPropertyInt(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbPort", getAID().getLocalName());
 		 	equipletDbName = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbName", getAID().getLocalName());
@@ -367,8 +374,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 				send(responseMessage);
 			}
 
-			// Clears his own blackboard and removes his subscription on that blackboard.
+			// Clear the productstepsblackboard and planningblackboard and remove the subscriptions.
 			productStepBBClient.removeDocuments(new BasicDBObject());
+			planningBlackBoard.removeDocuments(new BasicDBObject());
+			
 			productStepBBClient.unsubscribe(statusSubscription);
 		} catch(InvalidDBNamespaceException | GeneralMongoException | IOException e) {
 			Logger.log(LogLevel.ERROR, "Could not clear blackboards for " + this.getAID().getLocalName(), e);
@@ -417,29 +426,29 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					switch(productStep.getStatus()) {
 					// Depending on the changed status fills in the responseMessage and sends it to the product agent.
 						case PLANNED:
-							try {
+							//try {
 								// If the start time of the newly planned productStep is earlier then the next used time
 								// slot make it the next used timeslot.
-								ScheduleData scheduleData = productStep.getScheduleData();
+							//	ScheduleData scheduleData = productStep.getScheduleData();
 //								if(timer.getNextUsedTimeSlot() == 0
 //										|| scheduleData.getStartTime() < timer.getNextUsedTimeSlot()) {
 //									timer.setNextUsedTimeSlot(scheduleData.getStartTime());
 //									nextProductStep = productStep.getId();
 //								}
-								if(timer.getNextUsedTimeSlot() == -1 || scheduleData.getStartTime() < timer.getNextUsedTimeSlot()){
-									timer.rescheduleTimer();
-								}
+							//	if(timer.getNextUsedTimeSlot() == -1 || scheduleData.getStartTime() < timer.getNextUsedTimeSlot()){
+							//		timer.rescheduleTimer();
+							//	}
 
 								responseMessage.setOntology("Planned");
 								responseMessage.setPerformative(ACLMessage.CONFIRM);
-								responseMessage.setContentObject(scheduleData.getStartTime());
+							//	responseMessage.setContentObject(scheduleData.getStartTime());
 
 
-							} catch(IOException e) {
-								responseMessage.setPerformative(ACLMessage.DISCONFIRM);
-								responseMessage.setContent("An error occured in the planning/please reschedule");
-								Logger.log(LogLevel.ERROR, "Could not serialize scheduledata-starttime", e);
-							}
+							//} catch(Exception e) {
+							//	responseMessage.setPerformative(ACLMessage.DISCONFIRM);
+							//	responseMessage.setContent("An error occured in the planning/please reschedule");
+							//	Logger.log(LogLevel.ERROR, "Could not serialize scheduledata-starttime", e);
+							//}
 							break;
 						case FAILED:
 						case SUSPENDED_OR_WARNING:
@@ -566,6 +575,10 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	public BlackboardClient getStateBBClient() {
 		return stateBBClient;
 	}
+	
+	public BlackboardClient getPlanningBBClient(){
+		return planningBlackBoard;
+	}
 
 	/**
 	 * Function for adding a new relation between conversationId and objectId
@@ -671,8 +684,13 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		return dbData;
 	}
 	
+	public synchronized ScheduleLock getScheduleLock(){
+		return scheduleLock;
+	}
+	
 	public static long getCurrentTimeSlot(){
 //		return (System.currentTimeMillis() - systemStart)/50;
+		
 		return (System.currentTimeMillis())/50;
 	}
 }

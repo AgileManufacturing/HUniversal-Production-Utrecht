@@ -98,11 +98,6 @@ public class ServiceStep implements MongoSaveable {
 	 */
 	private BasicDBObject statusData;
 
-	/**
-	 * @var ScheduleData scheduleData
-	 *      The scheduleData containing startTime, duration and deadline.
-	 */
-	private ScheduleData scheduleData;
 
 	/**
 	 * Creates an empty ServiceStep.
@@ -148,7 +143,6 @@ public class ServiceStep implements MongoSaveable {
 		this.parameters = parameters;
 		this.serviceStepStatus = status;
 		this.statusData = statusData;
-		this.scheduleData = scheduleData;
 	}
 
 	/**
@@ -214,8 +208,7 @@ public class ServiceStep implements MongoSaveable {
 					.add("productStepId", productStepId)
 					.add("parameters", parameters)
 					.add("status", serviceStepStatus.name())
-					.add("statusData", statusData)
-					.add("scheduleData", scheduleData.toBasicDBObject()).get();
+					.add("statusData", statusData).get();
 
 		return dbObject;
 	} //@formatter:on
@@ -238,11 +231,6 @@ public class ServiceStep implements MongoSaveable {
 			statusData = (BasicDBObject) copy.remove("statusData");
 		} else {
 			statusData = new BasicDBObject();
-		}
-		if(copy.containsField("scheduleData")) {
-			scheduleData = new ScheduleData((BasicDBObject) copy.remove("scheduleData"));
-		} else {
-			scheduleData = new ScheduleData();
 		}
 		if(!copy.isEmpty()){
 			throw new IllegalArgumentException();
@@ -385,23 +373,5 @@ public class ServiceStep implements MongoSaveable {
 	 */
 	public void setStatusData(BasicDBObject statusData) {
 		this.statusData = statusData;
-	}
-
-	/**
-	 * Returns the schedule data.
-	 * 
-	 * @return the scheduleData
-	 */
-	public ScheduleData getScheduleData() {
-		return scheduleData;
-	}
-
-	/**
-	 * Sets the schedule data.
-	 * 
-	 * @param scheduleData the scheduleData to set
-	 */
-	public void setScheduleData(ScheduleData scheduleData) {
-		this.scheduleData = scheduleData;
 	}
 }

@@ -101,19 +101,19 @@ public class SubInformerBehaviour extends agents.shared_behaviours.ReceiveBehavi
 					{
 						Logger.log(LogLevel.ERROR, "Received something different than Confirm.");
 						_parentBehaviour.callbackSubInformerBehaviour(
-								BehaviourStatus.ERROR, this);
+								BehaviourStatus.ERROR, this, _parentBehaviour);
 					}
 					break;
 				case 1:
 					if (message.getPerformative() == ACLMessage.INFORM) 
 					{
 						this._timeslotDuration = (Long) message.getContentObject();
-						_parentBehaviour.callbackSubInformerBehaviour(BehaviourStatus.COMPLETED, this);
+						_parentBehaviour.callbackSubInformerBehaviour(BehaviourStatus.COMPLETED, this, _parentBehaviour);
 					} 
 					else 
 					{
 						Logger.log(LogLevel.ERROR, "Received something different than Inform.");
-						_parentBehaviour.callbackSubInformerBehaviour(BehaviourStatus.ERROR, this);
+						_parentBehaviour.callbackSubInformerBehaviour(BehaviourStatus.ERROR, this, _parentBehaviour);
 					}
 					break;
 				default:
@@ -121,11 +121,11 @@ public class SubInformerBehaviour extends agents.shared_behaviours.ReceiveBehavi
 				}
 			} else {
 				Logger.log(LogLevel.ERROR, "Message can't be null!");
-				_parentBehaviour.callbackSubInformerBehaviour(BehaviourStatus.ERROR, this);
+				_parentBehaviour.callbackSubInformerBehaviour(BehaviourStatus.ERROR, this, _parentBehaviour);
 			}
 		} catch (IOException | UnreadableException e) {
 			Logger.log(LogLevel.ERROR, e);
-			_parentBehaviour.callbackSubInformerBehaviour(BehaviourStatus.ERROR, this);
+			_parentBehaviour.callbackSubInformerBehaviour(BehaviourStatus.ERROR, this, _parentBehaviour);
 		}
 	}
 

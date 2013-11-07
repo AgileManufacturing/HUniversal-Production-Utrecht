@@ -206,20 +206,19 @@ public class PartsInfo extends ReceiveBehaviour {
 				ScheduleData scheduleData;
 				ProductStep productStep =
 						new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(productStepId));
-				long nextStartTime = productStep.getScheduleData().getStartTime();
+				//long nextStartTime = productStep.getScheduleData().getStartTime();
 				for(ServiceStep serviceStep : parameterizedSteps) {
-					scheduleData = serviceStep.getScheduleData();
-					scheduleData.setStartTime(nextStartTime);
-					serviceStep.setScheduleData(scheduleData);
+					
+				//	scheduleData.setStartTime(nextStartTime);
 					serviceStep.setServiceStepStatus(StepStatusCode.PLANNED);
+					
+				//	nextStartTime += scheduleData.getDuration();
 
-					nextStartTime += scheduleData.getDuration();
-
-					serviceStepBBClient.updateDocuments(
-							new BasicDBObject("_id", serviceStep.getId()),
-							new BasicDBObject("$set", new BasicDBObject("parameters", serviceStep.getParameters())
-									.append("scheduleData", serviceStep.getScheduleData().toBasicDBObject()).append(
-											"status", serviceStep.getServiceStepStatus().name())));
+				//	serviceStepBBClient.updateDocuments(
+				//			new BasicDBObject("_id", serviceStep.getId()),
+				//			new BasicDBObject("$set", new BasicDBObject("parameters", serviceStep.getParameters())
+				//					.append("scheduleData", serviceStep.getScheduleData().toBasicDBObject()).append(
+				//							"status", serviceStep.getServiceStepStatus().name())));
 				}
 				
 				BehaviourCallbackItem arguments = new BehaviourCallbackItem();

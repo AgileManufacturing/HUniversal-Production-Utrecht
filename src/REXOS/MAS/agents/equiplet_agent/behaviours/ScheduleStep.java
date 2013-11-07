@@ -138,9 +138,9 @@ public class ScheduleStep extends ReceiveBehaviour {
 			// check if other steps not are scheduled.
 			for(DBObject plannedStep : plannedSteps) {
 				ProductStep productStep = new ProductStep((BasicDBObject) plannedStep);
-				ScheduleData stepScheduleData = productStep.getScheduleData();
+			//	ScheduleData stepScheduleData = productStep.getScheduleData();
 
-				long scheduledStepStart = stepScheduleData.getStartTime();
+			/*	long scheduledStepStart = stepScheduleData.getStartTime();
 				long scheduledStepEnd = scheduledStepStart + stepScheduleData.getDuration();
 
 				if(start >= scheduledStepStart && start <= scheduledStepEnd) 
@@ -169,7 +169,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 							"\nend - scheduledStepEnd: " + (end - scheduledStepEnd) + 
 							"\nstart - scheduledStepStart: " + (start - scheduledStepStart));
 					fitsInSchedule = false;
-				}
+				}*/
 				
 			}
 			

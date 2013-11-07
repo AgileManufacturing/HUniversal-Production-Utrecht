@@ -81,6 +81,12 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	private ACLMessage msg;
 
 	/**
+	 * @var boolean timeoutThrown
+	 * Indicator whether the timeout has been thrown yes or no
+	 */
+	private boolean timeoutThrown = false;
+	
+	/**
 	 * Instantiates a new <code>ReceiveBehaviour</code> without a
 	 * <code>MessageTemplate</code> and no timeout (-1).
 	 * 
@@ -156,6 +162,7 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 			if (dt > 0)
 				block(dt);
 			else {
+				timeoutThrown = true;
 				clearTimer();
 				handle((ACLMessage) null);
 			}
@@ -180,7 +187,7 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	 */
 	public void clearTimer() {
 		timeout = -1;
-		restartTimer();
+		wakeupTime = 0;
 	}
 
 	/**
@@ -188,6 +195,7 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	 */
 	public void restartTimer() {
 		wakeupTime = (timeout < 0 ? 0 : System.currentTimeMillis() + timeout);
+		timeoutThrown = false;
 	}
 
 	/**
@@ -236,6 +244,10 @@ public abstract class ReceiveBehaviour extends CyclicBehaviour {
 	 */
 	public long getWakeupTime() {
 		return wakeupTime;
+	}
+	
+	public boolean getTimeoutThrown(){
+		return timeoutThrown;
 	}
 
 	/**

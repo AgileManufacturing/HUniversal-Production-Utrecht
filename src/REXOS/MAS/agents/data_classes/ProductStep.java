@@ -120,12 +120,6 @@ public class ProductStep implements MongoSaveable, Serializable {
 	private BasicDBObject statusData;
 
 	/**
-	 * @var ScheduleData scheduleData
-	 *      The schedule for this product step.
-	 */
-	private ScheduleData scheduleData;
-
-	/**
 	 * The constructor for the product step entry.
 	 * 
 	 * @param productAgentId
@@ -142,8 +136,6 @@ public class ProductStep implements MongoSaveable, Serializable {
 	 *            The status for the product step
 	 * @param statusData
 	 *            The additional data for the status
-	 * @param scheduleData
-	 *            The schedule data
 	 */
 	public ProductStep(AID productAgentId, int type,
 			BasicDBObject parameters, Part[] inputParts,
@@ -188,7 +180,6 @@ public class ProductStep implements MongoSaveable, Serializable {
 		this.outputPart = outputPart;
 		this.status = status;
 		this.statusData = statusData;
-		this.scheduleData = scheduleData;
 	}
 
 	/**
@@ -359,25 +350,6 @@ public class ProductStep implements MongoSaveable, Serializable {
 	}
 
 	/**
-	 * Returns the scheduling data for this setp.
-	 * 
-	 * @return the scheduleData
-	 */
-	public ScheduleData getScheduleData() {
-		return scheduleData;
-	}
-
-	/**
-	 * Set the scheduling data for this step.
-	 * 
-	 * @param scheduleData
-	 *            the scheduleData to set
-	 */
-	public void setScheduleData(ScheduleData scheduleData) {
-		this.scheduleData = scheduleData;
-	}
-
-	/**
 	 * Creates a BasicDBObject representing the data contained in this object.
 	 * 
 	 * @return the created BasicDBObject.
@@ -402,7 +374,6 @@ public class ProductStep implements MongoSaveable, Serializable {
 		}
 		object.put("status", status.toString());
 		object.put("statusData", statusData);
-		object.put("scheduleData", scheduleData.toBasicDBObject());
 		return object;
 	}
 
@@ -433,12 +404,7 @@ public class ProductStep implements MongoSaveable, Serializable {
 			} else {
 				statusData = new BasicDBObject();
 			}
-			if (copy.containsField("scheduleData")) {
-				scheduleData = new ScheduleData(
-						(BasicDBObject) copy.remove("scheduleData"));
-			} else {
-				scheduleData = new ScheduleData();
-			}
+			
 			if(!copy.isEmpty()){
 				Logger.log(LogLevel.ERROR,copy);
 				throw new IllegalArgumentException();

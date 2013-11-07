@@ -136,7 +136,6 @@ public class ProductionDuration extends ReceiveBehaviour implements ParentBehavi
 		// duration.
 		
 		ProductStep productStep = (ProductStep)arguments.getArgument("productStep");
-		ScheduleData schedule = (ScheduleData)arguments.getArgument("schedule");
 		long duration = (Long)arguments.getArgument("duration");
 		
 		ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);

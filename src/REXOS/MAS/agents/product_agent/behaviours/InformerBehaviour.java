@@ -175,6 +175,7 @@ public class InformerBehaviour extends Behaviour {
 			} 
 			else 
 			{
+				//all of the subinformers are done, the durations of all the product steps for all the equiplets are done
 				if (_isDone) 
 				{
 					_production.setProductionEquipletMapping(_prodEQmap);
@@ -189,7 +190,8 @@ public class InformerBehaviour extends Behaviour {
 					_isCompleted = true;
 				}
 			}
-			//block();
+			//iteration is done, stay blocked waiting for the next subinformer
+			block();
 		} catch (NullPointerException e) {
 			Logger.log(LogLevel.ERROR, e);
 		}
@@ -198,7 +200,17 @@ public class InformerBehaviour extends Behaviour {
 	@Override 
 	public void reset() {
 		super.reset();
-		_isDone = false;;
+		//_isDone = false;
+		//_isError = false;
+		//_isCompleted = false;
+		//_subInformersCompleted = 0;
+		//_totalSubinformers = 0;
+	}
+	
+	@Override
+	public void restart(){
+		super.restart();
+		_isDone = false;
 		_isError = false;
 		_isCompleted = false;
 		_subInformersCompleted = 0;
@@ -220,7 +232,7 @@ public class InformerBehaviour extends Behaviour {
 	 * @param subBehaviour
 	 */
 	public void callbackSubInformerBehaviour(BehaviourStatus bs,
-			SubInformerBehaviour subBehaviour) 
+			SubInformerBehaviour subBehaviour, InformerBehaviour informerBehaviour) 
 	{
 		if (bs == BehaviourStatus.COMPLETED) 
 		{
@@ -240,5 +252,6 @@ public class InformerBehaviour extends Behaviour {
 		{
 			_isDone = true;
 		}
+		informerBehaviour.reset();
 	}
 }

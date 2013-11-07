@@ -101,7 +101,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 
 		_informerBehaviour = new InformerBehaviour(myAgent, this);
 
-		_schedulerBehaviour = new SchedulerBehaviour(myAgent, this);
+		_schedulerBehaviour = new SchedulerBehaviour((ProductAgent) myAgent, this);
 
 		_produceBehaviour = new ProduceBehaviour(myAgent, this);
 
@@ -213,9 +213,9 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 
 	public void startRescheduling() {
 		_productAgent.setStatus(AgentStatus.RESCHEDULING);
-		_plannerBehaviour.reset();
-		_informerBehaviour.reset();
-		_schedulerBehaviour.reset();
+		_plannerBehaviour.restart();
+		_informerBehaviour.restart();
+		_schedulerBehaviour.restart();
 		Logger.log(LogLevel.DEBUG, "Started a RescheduleBehaviour");
 		myAgent.addBehaviour(_rescheduleBehaviour);
 	}
