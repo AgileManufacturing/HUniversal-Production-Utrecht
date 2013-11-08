@@ -200,11 +200,6 @@ public class InformerBehaviour extends Behaviour {
 	@Override 
 	public void reset() {
 		super.reset();
-		//_isDone = false;
-		//_isError = false;
-		//_isCompleted = false;
-		//_subInformersCompleted = 0;
-		//_totalSubinformers = 0;
 	}
 	
 	@Override

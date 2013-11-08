@@ -121,9 +121,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 		try {
 			// get the serviceStepId
 			ObjectId[] serviceStepIds = (ObjectId[]) message.getContentObject();
-			for (int i = 0 ; i < serviceStepIds.length; i++){
-				System.out.println("servicestepid: " + serviceStepIds[i]);
-			}
+			
 			Logger.log(LogLevel.DEBUG, "%s received message from %s (%s:%s)%n", hardwareAgent.getLocalName(), message.getSender()
 					.getLocalName(), message.getOntology(), serviceStepIds);
 			// Evaluate the duration of the step

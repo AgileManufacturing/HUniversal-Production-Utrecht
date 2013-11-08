@@ -197,6 +197,7 @@ public class SchedulerBehaviour extends Behaviour {
 			//now start the logic to choose the equiplets
 			
 			//TODO: current logic is to choose the first equiplet. improve it.
+			AID chosenEquiplet = equipletSchedules.keySet().iterator().next();
 			
 			
 		}
