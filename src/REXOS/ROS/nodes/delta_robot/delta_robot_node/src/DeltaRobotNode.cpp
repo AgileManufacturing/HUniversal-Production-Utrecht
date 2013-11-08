@@ -156,6 +156,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
     }
 
     Vector3 moveVector;
+    //lookup is set, so transform the (rotated) crate to a normal position.
     if(lookupIsSet) {
 		Vector3 lookupVector(lookupResultPoint.x, lookupResultPoint.y, 0);
 
@@ -168,16 +169,14 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 	    //translate the relative point to real equiplet coordinates.
 		Vector3 lookupVectorRotated(lookupX, lookupY, 0);
 		Vector3 translatedVector = convertToModuleCoordinate(lookupVectorRotated);
-		moveVector.set((translatedVector.x + payloadPoint.x), (translatedVector.y + payloadPoint.y), payloadPoint.z - 260, payloadPoint.maxAcceleration);
+		moveVector.set((translatedVector.x + payloadPoint.x), (translatedVector.y + payloadPoint.y), payloadPoint.z - 260);
 	} else {
-		moveVector.set(payloadPoint.x, payloadPoint.y, payloadPoint.z - 260, payloadPoint.maxAcceleration);
+		moveVector.set(payloadPoint.x, payloadPoint.y, payloadPoint.z - 260);
 	}
-
-
 
 	std::cout << " payloadVector " << payloadVector << std::endl  << " lookupVector " << lookupVector << std::endl  << " lookupVectorRotated " << lookupVectorRotated << std::endl << " translatedVector " << translatedVector << std::endl;
 
-	if(moveToPoint(){
+	if(moveToPoint(moveVector.x, moveVector.y, moveVector.z, payloadPoint.maxAcceleration){
 		setInstructionActionServer.setSucceeded(result_);
 		return;
 	}
