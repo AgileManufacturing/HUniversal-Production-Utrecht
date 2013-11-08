@@ -7,7 +7,23 @@ insert into ModuleType(
 	masSoftwareBuildNumber,
 	masSoftware
 ) values 
-("ManA", "TypeA", "", 1, "", 1, "");
+("The_Imaging_Source_Europe_GmbH", "DFK_22AUC03", "", 1, "", 1, ""),
+("The_Imaging_Source_Europe_GmbH", "Cheap_ass_lens", "", 1, "", 1, ""),
+("HU", "delta_robot_type_A", "{
+	\"midPointX\" : 75.0,
+	\"midPointY\" : -200.0,
+	\"midPointZ\" : -35.0
+}", 1, "", 1, ""),
+("HU", "work_plane_type_A", "{
+	\"midPointX\" : 175.0,
+	\"midPointY\" : -200.0,
+	\"midPointZ\" : 35.0,
+	\"topLeftValue\" : \"_WP_TL\",
+	\"topRightValue\" : \"_WP_TR\",
+	\"bottomRightValue\" : \"_WP_BR\",
+	\"workPlaneWidth\" : 80.0,
+	\"workPlaneHeight\" : 80.0
+}", 1, "", 1, "");
 
 insert into Module(
 	manufacturer,
@@ -20,8 +36,9 @@ insert into Module(
 	attachedToSerialNumber,
 	moduleProperties
 ) values 
-("ManA", "TypeA", "SerA", 3, 2, null, null, null, ""),
-("ManA", "TypeA", "SerB", 6, 4, "ManA", "TypeA", "SerA", ""),
-("ManA", "TypeA", "SerC", 12, 8, "ManA", "TypeA", "SerA", "");
+("The_Imaging_Source_Europe_GmbH", "DFK_22AUC03", "26210035", 3, 2, null, null, null, ""),
+("The_Imaging_Source_Europe_GmbH", "Cheap_ass_lens", "1", 6, 4, "The_Imaging_Source_Europe_GmbH", "DFK_22AUC03", "26210035", ""),
+("HU", "delta_robot_type_A", "1", 3, 2, null, null, null, ""),
+("HU", "work_plane_type_A", "1", 3, 2, null, null, null, "");
 
 

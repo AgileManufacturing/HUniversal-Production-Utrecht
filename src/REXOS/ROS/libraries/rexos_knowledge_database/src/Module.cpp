@@ -5,12 +5,30 @@
 #include <cppconn/resultset.h>
 #include <cppconn/prepared_statement.h>
 
+#include "ros/ros.h"
+
 namespace rexos_knowledge_database{
 	Module::Module(std::string manufacturer, std::string typeNumber, std::string serialNumber) :
 				manufacturer(manufacturer), typeNumber(typeNumber), serialNumber(serialNumber)
 	{
+		ROS_INFO_STREAM("Construction module with manufacturer=" << manufacturer << 
+				" typeNumber=" << typeNumber << " serialNumber=" << serialNumber);
 		connection = rexos_knowledge_database::connect();
 		
+		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		SELECT * \
+		FROM Module \
+		WHERE manufacturer = ? AND \
+		typeNumber = ? AND \
+		serialNumber = ?;");
+		preparedStmt->setString(1, manufacturer);
+		preparedStmt->setString(2, typeNumber);
+		preparedStmt->setString(3, serialNumber);
+
+		sql::ResultSet* result = preparedStmt->executeQuery();
+		if(result->rowsCount() != 1){
+			throw KnowledgeDatabaseException("This module does not exist");
+		}
 		
 	}
 	ModuleType* Module::getModuleType(){
@@ -105,6 +123,80 @@ namespace rexos_knowledge_database{
 		return childModules;
 	}
 
+	int Module::getMountPointX(){
+		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		SELECT mountPointX \
+		FROM Module \
+		WHERE manufacturer = ? AND \
+		typeNumber = ? AND \
+		serialNumber = ?;");
+		preparedStmt->setString(1, manufacturer);
+		preparedStmt->setString(2, typeNumber);
+		preparedStmt->setString(3, serialNumber);
+		
+		sql::ResultSet* result = preparedStmt->executeQuery();
+		if(result->rowsCount() != 1){
+			throw std::runtime_error("Unable to find current module (someone deleted this instance in the database)");
+		}
+		// set the cursor at the first result
+		result->next();
+		int mountPointX = result->getInt("mountPointX");
+		
+		delete preparedStmt;
+		return mountPointX;
+	}
+	void Module::setMountPointX(int mountPointX){
+		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		UPDATE Module \
+		SET mountPointY = ? \
+		WHERE manufacturer = ? AND \
+		typeNumber = ? AND \
+		serialNumber = ?;");
+		preparedStmt->setInt(1, mountPointX);
+		preparedStmt->setString(2, manufacturer);
+		preparedStmt->setString(3, typeNumber);
+		preparedStmt->setString(4, serialNumber);
+		
+		preparedStmt->executeQuery();
+		delete preparedStmt;
+	}
+	int Module::getMountPointY(){
+		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		SELECT mountPointY \
+		FROM Module \
+		WHERE manufacturer = ? AND \
+		typeNumber = ? AND \
+		serialNumber = ?;");
+		preparedStmt->setString(1, manufacturer);
+		preparedStmt->setString(2, typeNumber);
+		preparedStmt->setString(3, serialNumber);
+		
+		sql::ResultSet* result = preparedStmt->executeQuery();
+		if(result->rowsCount() != 1){
+			throw std::runtime_error("Unable to find current module (someone deleted this instance in the database)");
+		}
+		// set the cursor at the first result
+		result->next();
+		int mountPointY = result->getInt("mountPointY");
+		
+		delete preparedStmt;
+		return mountPointY;		
+	}
+	void Module::setMountPointY(int mountPointY){
+		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		UPDATE Module \
+		SET mountPointY = ? \
+		WHERE manufacturer = ? AND \
+		typeNumber = ? AND \
+		serialNumber = ?;");
+		preparedStmt->setInt(1, mountPointY);
+		preparedStmt->setString(2, manufacturer);
+		preparedStmt->setString(3, typeNumber);
+		preparedStmt->setString(4, serialNumber);
+		
+		preparedStmt->executeQuery();
+		delete preparedStmt;
+	}
 
 	std::string Module::getCalibrationDataForModuleOnly(){
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\

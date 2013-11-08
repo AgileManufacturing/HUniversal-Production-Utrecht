@@ -47,6 +47,11 @@ namespace rexos_knowledge_database {
 		Module* getParentModule();
 		std::vector<Module*> getChildModules();
 		
+		int getMountPointX();
+		void setMountPointX(int mountPointX);
+		int getMountPointY();
+		void setMountPointY(int mountPointY);
+		
 		std::string getCalibrationDataForModuleOnly();
 		std::string getCalibrationDataForModuleAndChilds();
 		std::string getCalibrationDataForModuleAndOtherModules(std::vector<Module*> modules);

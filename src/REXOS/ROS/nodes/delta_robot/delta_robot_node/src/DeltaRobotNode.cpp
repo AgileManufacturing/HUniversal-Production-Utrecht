@@ -55,9 +55,10 @@
  * @param equipletID identifier for the equiplet
  * @param moduleID identifier for the deltarobot
  **/
-deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) :
+deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID, std::string manufacturer, std::string typeNumber, std::string serialNumber) :
+	rexos_knowledge_database::Module(manufacturer, typeNumber, serialNumber),
 	rexos_statemachine::ModuleStateMachine("delta_robot_node",equipletID, moduleID, true),
-	rexos_coordinates::Module(moduleID),
+	rexos_coordinates::Module(this),
 	deltaRobot(NULL),
 	modbus(NULL),
 	motorManager(NULL),
@@ -422,14 +423,16 @@ deltaRobotNodeNamespace::Point* deltaRobotNodeNamespace::DeltaRobotNode::parsePo
  * Main that creates the deltaRobotNode and starts the statemachine
  **/
 int main(int argc, char **argv){
-	int equipletID = 0;
-	int moduleID = 0;
-
-	if (argc < 3) {
-		ROS_INFO("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
+	ros::init(argc, argv, NODE_NAME);
+	
+	if(argc < 6){
+		ROS_ERROR("Usage: delta_robot_node equipletId, moduleId, manufacturer, typeNumber, serialNumber");
 		return -1;
 	}
-
+	
+	
+	int equipletID;
+	int moduleID;
 	try{
 		equipletID = rexos_utilities::stringToInt(argv[1]);
 		moduleID = rexos_utilities::stringToInt(argv[2]);
@@ -437,13 +440,10 @@ int main(int argc, char **argv){
 		ROS_ERROR("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
 		return -2;
 	}
-
-
-	ros::init(argc, argv, NODE_NAME);
-
+	
 	ROS_INFO("Creating DeltaRobotNode");
 
-	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID);
+	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID, argv[3], argv[4], argv[5]);
 
 	ROS_INFO("Running StateEngine");
 	ros::spin();

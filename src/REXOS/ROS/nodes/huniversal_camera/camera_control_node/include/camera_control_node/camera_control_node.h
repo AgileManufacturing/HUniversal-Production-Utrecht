@@ -39,12 +39,14 @@
 #include <rexos_statemachine/Transitions.h>
 #include "equiplet_node/RegisterModule.h"
 #include <rexos_knowledge_database/rexos_knowledge_database.h>
+#include <rexos_knowledge_database/Module.h>
 
 
 
-class CameraControlNode : public rexos_statemachine::ModuleStateMachine {
+class CameraControlNode : public rexos_statemachine::ModuleStateMachine, 
+		public rexos_knowledge_database::Module{
 public:
-	CameraControlNode(int equipletId, int cameraModuleId, int lensModuleId);
+	CameraControlNode(int equipletId, std::string cameraManufacturer, std::string cameraTypeNumber, std::string cameraSerialNumber);
 	
 	/**
 	 * calls increaseExposure service of the camera_node
@@ -84,6 +86,8 @@ public:
 	virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
 
 private:
+	bool mannuallyCalibrateLens();
+	
 	ros::NodeHandle nodeHandle;
 	ros::ServiceClient increaseExposureClient;
 	ros::ServiceClient decreaseExposureClient;
