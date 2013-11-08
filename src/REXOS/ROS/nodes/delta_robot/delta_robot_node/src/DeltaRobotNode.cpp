@@ -170,13 +170,13 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 		Vector3 lookupVectorRotated(lookupX, lookupY, 0);
 		Vector3 translatedVector = convertToModuleCoordinate(lookupVectorRotated);
 		moveVector.set((translatedVector.x + payloadPoint.x), (translatedVector.y + payloadPoint.y), payloadPoint.z - 260);
+
 	} else {
 		moveVector.set(payloadPoint.x, payloadPoint.y, payloadPoint.z - 260);
 	}
 
-	std::cout << " payloadVector " << payloadVector << std::endl  << " lookupVector " << lookupVector << std::endl  << " lookupVectorRotated " << lookupVectorRotated << std::endl << " translatedVector " << translatedVector << std::endl;
-
-	if(moveToPoint(moveVector.x, moveVector.y, moveVector.z, payloadPoint.maxAcceleration){
+	std::cout << "trying to move to x: " << moveVector.x << " y: " << moveVector.y << " z: " <<  moveVector.z << " with acceleration: " << payloadPoint.maxAcceleration << std::endl;
+	if(moveToPoint(moveVector.x, moveVector.y, moveVector.z, payloadPoint.maxAcceleration)){
 		setInstructionActionServer.setSucceeded(result_);
 		return;
 	}
