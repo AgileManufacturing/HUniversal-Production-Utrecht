@@ -62,7 +62,9 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 
 	ROS_INFO("Advertising ActionServer at : delta_robot_node_1_1");
 
-
+	rexos_knowledge_database::ModuleType* moduleType = this->getModuleType();
+	std::string properties = moduleType->getModuleTypeProperties();
+	JSONNode jsonNode = libjson::parse(properties);
 
 	// Create a deltarobot
 	deltaRobot = new rexos_delta_robot::DeltaRobot(jsonNode);
@@ -287,7 +289,7 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
 			lastY = p.y;
 			ySet = true;
 		} else if(node_name == "z") {
-			p.z = i->as_float() + Z_OFFSET;
+			p.z = i->as_float();
 			lastZ = p.z;
 		} else if(node_name == "maxAcceleration"){
 			p.maxAcceleration = i->as_float();
