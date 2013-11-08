@@ -50,8 +50,6 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 		rexos_statemachine::ModuleStateMachine("delta_robot_node",equipletID, moduleID, true),
 		rexos_coordinates::Module(this),
 		deltaRobot(NULL),
-		modbus(NULL),
-		motorManager(NULL),
 		setInstructionActionServer(nodeHandle, "delta_robot_node/set_instruction", boost::bind(&deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction, this, _1), false),
 		lastX(0.0),
 		lastY(0.0),
@@ -77,11 +75,6 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 
 deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
 	delete deltaRobot;
-	delete motors[0];
-	delete motors[1];
-	delete motors[2];
-	delete modbus;
-	delete motorManager;	
 }
 
 

@@ -112,22 +112,6 @@ namespace deltaRobotNodeNamespace{
 		 * the deltaRobot
 		 **/
 		rexos_delta_robot::DeltaRobot * deltaRobot;
-		/**
-		 * @var Motor::StepperMotor* motors[3]
-		 * the collection of motors
-		 **/
-		rexos_motor::StepperMotor* motors[3];
-		/**
-		 *
-		 * @var ModbusController::ModbusController* modbus
-		 * the modbuscontroller
-		 **/
-		rexos_modbus::ModbusController* modbus;
-		/**
-		 * @var Motor::MotorManager* motorManager
-		 * The motor manager
-		 **/
-		rexos_motor::MotorManager* motorManager;
 	};
 }
 #endif
