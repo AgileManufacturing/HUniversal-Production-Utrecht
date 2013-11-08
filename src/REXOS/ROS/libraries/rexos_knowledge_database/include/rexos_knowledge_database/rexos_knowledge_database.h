@@ -35,8 +35,8 @@
 #include <cppconn/exception.h>
 
 // TEMP!
-#define MYSQL_SERVER "tcp://145.89.191.131:3306"
-#define MYSQL_DATABASE "rexos_knowledge_base_test"
+#define MYSQL_SERVER "tcp://127.0.0.1:3306"
+#define MYSQL_DATABASE "equiplet"
 #define MYSQL_USERNAME "rexos"
 #define MYSQL_PASSWORD "soxer"
 

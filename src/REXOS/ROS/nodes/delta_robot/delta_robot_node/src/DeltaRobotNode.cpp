@@ -56,23 +56,11 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 		lastX(0.0),
 		lastY(0.0),
 		lastZ(-180.0){
-	modbusIp = std::string();
-	modbusPort = -1;
-	
-	
-	
 	ROS_INFO("DeltaRobotnode Constructor entering...");
-	
-	rexos_knowledge_database::ModuleType* moduleType = this->getModuleType();
-	std::string properties = moduleType->getModuleTypeProperties();
-	JSONNode jsonNode = libjson::parse(properties);
-	
-	
+
+	ROS_INFO("Configuring Modbus...");
 
 	ROS_INFO("Advertising ActionServer at : delta_robot_node_1_1");
-
-
-
 
 
 
@@ -111,36 +99,41 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
         const char * nodeName = i -> name().c_str();
 	    // keep in mind that a payload may or may not contain all values. Use lastXYZ to determine these values if they are not set.
         if (strcmp(nodeName, "payload") == 0){
+
 			payloadPoint = parsePoint(*i);
 			lookupResultPoint = parseLookup(*i);
 			angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *i));
 
-			std::cout << "lookupX " << lookupResultPoint.x << " lookupY " << lookupResultPoint.y << " angle " << angle << std::endl;
-			std::cout << "payloadX " << payloadPoint.x << " payloadY " << payloadPoint.y << " payloadZ " << payloadPoint.z << std::endl; 
-			
-			lookupIsSet = true;
+			//check whether lookup is set. If all values are 0, we can presume the lookup isnt set.
+			if(!(lookupResultPoint.x == 0 && lookupResultPoint.y == 0 && angle == 0)){
+				lookupIsSet = true;
+			}
         }
         ++i;
     }
 
-	Vector3 payloadVector(payloadPoint.x, payloadPoint.y, payloadPoint.z);
-	Vector3 lookupVector(lookupResultPoint.x, lookupResultPoint.y, 0);
-
+    Vector3 moveVector;
+    //lookup is set, so transform the (rotated) crate to a normal position.
     if(lookupIsSet) {
-    	double theta = angle * 3.141592653589793 / 180.0;
+		Vector3 lookupVector(lookupResultPoint.x, lookupResultPoint.y, 0);
+
+		double theta = angle * 3.141592653589793 / 180.0;
 		double cs = cos(theta);
 		double sn = sin(theta);
 		lookupX = lookupVector.x * cs - lookupVector.y * sn;
 		lookupY = lookupVector.x * sn + lookupVector.y * cs;
 
+	    //translate the relative point to real equiplet coordinates.
+		Vector3 lookupVectorRotated(lookupX, lookupY, 0);
+		Vector3 translatedVector = convertToModuleCoordinate(lookupVectorRotated);
+		moveVector.set((translatedVector.x + payloadPoint.x), (translatedVector.y + payloadPoint.y), payloadPoint.z - 260);
+
+	} else {
+		moveVector.set(payloadPoint.x, payloadPoint.y, payloadPoint.z - 260);
 	}
-    //translate the relative point to real equiplet coordinates.
-	Vector3 lookupVectorRotated(lookupX, lookupY, 0);
-	Vector3 translatedVector = convertToModuleCoordinate(lookupVectorRotated);
 
-	std::cout << " payloadVector " << payloadVector << std::endl  << " lookupVector " << lookupVector << std::endl  << " lookupVectorRotated " << lookupVectorRotated << std::endl << " translatedVector " << translatedVector << std::endl;
-
-	if(moveToPoint((translatedVector.x + payloadPoint.x), (translatedVector.y + payloadPoint.y), payloadPoint.z - 260, payloadPoint.maxAcceleration)){
+	std::cout << "trying to move to x: " << moveVector.x << " y: " << moveVector.y << " z: " <<  moveVector.z << " with acceleration: " << payloadPoint.maxAcceleration << std::endl;
+	if(moveToPoint(moveVector.x, moveVector.y, moveVector.z, payloadPoint.maxAcceleration)){
 		setInstructionActionServer.setSucceeded(result_);
 		return;
 	}
@@ -294,7 +287,7 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
 			lastY = p.y;
 			ySet = true;
 		} else if(node_name == "z") {
-			p.z = i->as_float();
+			p.z = i->as_float() + Z_OFFSET;
 			lastZ = p.z;
 		} else if(node_name == "maxAcceleration"){
 			p.maxAcceleration = i->as_float();
