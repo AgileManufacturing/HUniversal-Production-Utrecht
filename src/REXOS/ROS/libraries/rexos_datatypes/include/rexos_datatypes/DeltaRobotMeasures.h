@@ -30,6 +30,8 @@
 
 #pragma once
 
+#include <libjson/libjson.h>
+
 namespace rexos_datatypes{
 	/**
 	 * A class that holds all measures for the DeltaRobot.
@@ -65,5 +67,44 @@ namespace rexos_datatypes{
 		 * Maximum angle between hip and ankle when moving the ankle sideways.
 		 **/
 		double maxAngleHipAnkle;
+		/**
+		 * @var double MOTORS_FROM_ZERO_TO_TOP_POSITION
+		 * The angle from zero (horizontal) to the top position in radians.
+		 **/
+		double motorFromZeroToTopAngle;
+		
+		/**
+		 * @var double boundaryBoxMinX
+		 * The max x-coordinate of the effector boundary box in millimeters.
+		 **/
+		double boundaryBoxMinX;
+ 		/**
+		 * @var double boundaryBoxMaxX
+		 * The max y-coordinate of the effector boundary box in millimeters.
+		 **/
+		double boundaryBoxMaxX;
+		/**
+		 * @var double BOUNDARY_BOX_MIN_X
+		 * The min x-coordinate of the effector boundary box in millimeters.
+		 **/
+		double boundaryBoxMinY;
+		/**
+		 * @var double BOUNDARY_BOX_MIN_Y
+		 * The min y-coordinate of the effector boundary box in millimeters.
+		 **/
+		double boundaryBoxMaxY;
+		/**
+		 * @var double BOUNDARY_BOX_MIN_Z
+		 * The min z-coordinate of the effector boundary box in millimeters.
+		 **/
+		double boundaryBoxMinZ;
+		/**
+		 * @var double BOUNDARY_BOX_MAX_Z
+		 * The max z-coordinate of the effector boundary box in millimeters.
+		 **/
+		double boundaryBoxMaxZ;
+		
+		
+		DeltaRobotMeasures(JSONNode properties);
 	};
 }

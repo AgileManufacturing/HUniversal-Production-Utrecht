@@ -37,6 +37,7 @@
 #include <rexos_datatypes/Point3D.h>
 #include <rexos_delta_robot/DeltaRobot.h>
 #include <rexos_motor/StepperMotor.h>
+#include <rexos_motor/StepperMotorProperties.h>
 #include <delta_robot_node/Services.h>
 #include <delta_robot_node/Point.h>
 #include <rexos_statemachine/ModuleStateMachine.h>
@@ -65,6 +66,16 @@ namespace deltaRobotNodeNamespace{
 	class DeltaRobotNode : public rexos_statemachine::ModuleStateMachine, 
 			public rexos_knowledge_database::Module, 
 			public rexos_coordinates::Module{
+	protected:
+		rexos_motor::StepperMotorProperties* stepperMotorProperties;
+		rexos_datatypes::DeltaRobotMeasures* deltaRobotMeasures;
+	
+		std::string modbusIp;
+		int modbusPort;
+		
+		int calibrationBigStepFactor;
+		
+		
 	public:
 		DeltaRobotNode(int equipletID, int moduleID, std::string manufacturer, std::string typeNumber, std::string serialNumber);
 		virtual ~DeltaRobotNode();

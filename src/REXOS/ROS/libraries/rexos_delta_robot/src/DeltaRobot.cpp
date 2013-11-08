@@ -45,6 +45,8 @@
 #include <rexos_motor/MotorInterface.h>
 #include <rexos_utilities/Utilities.h>
 
+#include "ros/ros.h"
+
 namespace rexos_delta_robot{
     /**
      * Constructor of a deltarobot.
@@ -54,25 +56,40 @@ namespace rexos_delta_robot{
      * @param motors The motor array with the three motor objects.
      * @param modbusIO The TCP modbus connection for the IO controller.
      **/
-    DeltaRobot::DeltaRobot(rexos_datatypes::DeltaRobotMeasures& deltaRobotMeasures, rexos_motor::MotorManager* motorManager, rexos_motor::StepperMotor* (&motors)[3], modbus_t* modbusIO) :
-        kinematics(NULL),
-        motors(motors),
-        motorManager(NULL),
-        boundaries(NULL),
-        effectorLocation(rexos_datatypes::Point3D<double>(0, 0, 0)), 
-        boundariesGenerated(false),
-        modbusIO(modbusIO),
-        currentMotionSlot(1){
+    DeltaRobot::DeltaRobot(JSONNode node) :
+			kinematics(NULL),
+			motorManager(NULL),
+			boundaries(NULL),
+			effectorLocation(rexos_datatypes::Point3D<double>(0, 0, 0)), 
+			boundariesGenerated(false),
+			currentMotionSlot(1){
+		ROS_INFO("DeltaRobot constructor entering...");
+		readJSONNode(node);
+		
+		ROS_INFO("Configuring Modbus...");
+		// Initialize modbus for IO controller
+		modbusIO = modbus_new_tcp(modbusIp.c_str(), modbusPort);
+		if(modbusIO == NULL){
+			throw std::runtime_error("Unable to allocate libmodbus context");
+		}
+		if(modbus_connect(modbusIO) == -1) {
+			throw std::runtime_error("Modbus connection to IO controller failed");
+		}
+		assert(modbusIO != NULL);
+		
+		// initialize motors
+		modbus = new rexos_modbus::ModbusController(modbus_new_rtu(
+			"/dev/ttyS0",
+			rexos_motor::CRD514KD::RtuConfig::BAUDRATE,
+			rexos_motor::CRD514KD::RtuConfig::PARITY,
+			rexos_motor::CRD514KD::RtuConfig::DATA_BITS,
+			rexos_motor::CRD514KD::RtuConfig::STOP_BITS));
+		
+		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_0, *stepperMotorProperties));
+		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_1, *stepperMotorProperties));
+		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_2, *stepperMotorProperties));
 
-        if(modbusIO == NULL){
-            throw std::runtime_error("Unable to open modbusIO");
-        }
-        kinematics = new InverseKinematics(deltaRobotMeasures);
-
-        if(motorManager == NULL){
-            throw std::runtime_error("No motorManager given");
-        }
-        this->motorManager = motorManager;
+		motorManager = new rexos_motor::MotorManager(modbus, motors);
     }
 
     /**
@@ -85,16 +102,42 @@ namespace rexos_delta_robot{
         delete kinematics;
     }
     
+	void DeltaRobot::readJSONNode(JSONNode node){
+		for(JSONNode::const_iterator it = node.begin(); it != node.end(); it++) {
+			if(it->name() == "modbusIp"){
+				modbusIp = it->as_float();
+				ROS_INFO_STREAM("found modbusIp " << modbusIp);
+			} else if(it->name() == "modbusPort"){
+				modbusPort = it->as_float();
+				ROS_INFO_STREAM("found modbusPort " << modbusPort);
+			
+			} else if(it->name() == "calibrationBigStepFactor"){
+				calibrationBigStepFactor = it->as_int();
+				ROS_INFO_STREAM("found calibrationBigStepFactor " << calibrationBigStepFactor);
+			
+			
+			} else if(it->name() == "stepperMotorProperties"){
+				JSONNode node = it->as_node();
+				stepperMotorProperties = new rexos_motor::StepperMotorProperties(node);
+				ROS_INFO_STREAM("found stepperMotorProperties");
+			} else if(it->name() == "deltaRobotMeasures"){
+				JSONNode node = it->as_node();
+				deltaRobotMeasures = new rexos_datatypes::DeltaRobotMeasures(node);
+				ROS_INFO_STREAM("found deltraRobotMeasures");
+			} else {
+				// some other property, ignore it
+			}
+		}
+		
+	}
     /**
      * Generates the effectorBoundaries for the given voxelSize.
      *
      * @param voxelSize The size in millimeters of a side of a voxel in the boundaries.
      **/
     void DeltaRobot::generateBoundaries(double voxelSize){
-        double motorMinAngles[3] = {Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MIN, Measures::MOTOR_ROT_MIN};
-        double motorMaxAngles[3] = {Measures::MOTOR_ROT_MAX, Measures::MOTOR_ROT_MAX, Measures::MOTOR_ROT_MAX};
-        boundaries = EffectorBoundaries::generateEffectorBoundaries((*kinematics), motorMinAngles, motorMaxAngles, voxelSize);
-        boundariesGenerated = true;
+		boundaries = EffectorBoundaries::generateEffectorBoundaries((*kinematics), deltaRobotMeasures, motors, voxelSize);
+		boundariesGenerated = true;
     }
 
     /**
@@ -354,7 +397,7 @@ namespace rexos_delta_robot{
         // Setup for incremental motion in big steps, to get to the sensor quickly.
         motors[motorIndex]->setIncrementalMode(1);
         rexos_datatypes::MotorRotation motorRotation;
-        motorRotation.angle = -Measures::CALIBRATION_STEP_BIG;
+        motorRotation.angle = -motors.at(motorIndex)->getMicroStepAngle() * calibrationBigStepFactor;
         
         // Move to the sensor in large steps until it is pushed
         // actualAngleInSteps keeps track of how many motor steps the motor has moved. This is necessary to avoid accummulating errors.
@@ -365,11 +408,11 @@ namespace rexos_delta_robot{
         actualAngleInSteps += moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, false);
         
         // Move back to the sensor in small steps until it is pushed.
-        motorRotation.angle = -Measures::CALIBRATION_STEP_SMALL;
+        motorRotation.angle = -motors.at(motorIndex)->getMicroStepAngle();
         actualAngleInSteps += moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, true);
 
         // calculate and set the deviation.
-        double deviation = (actualAngleInSteps * rexos_motor::CRD514KD::MOTOR_STEP_ANGLE) + Measures::MOTORS_FROM_ZERO_TO_TOP_POSITION;
+        double deviation = (actualAngleInSteps * motors.at(motorIndex)->getMicroStepAngle()) + deltaRobotMeasures->motorFromZeroToTopAngle;
         motors[motorIndex]->setDeviationAndWriteMotorLimits(deviation);
         
         // Move back to the new 0.
@@ -444,9 +487,9 @@ namespace rexos_delta_robot{
 
         effectorLocation.x = 0;
         effectorLocation.y = 0;
-        effectorLocation.z = -sqrt((Measures::ANKLE * Measures::ANKLE) - ((
-                Measures::BASE + Measures::HIP - Measures::EFFECTOR) * (
-                Measures::BASE + Measures::HIP - Measures::EFFECTOR))
+        effectorLocation.z = -sqrt((deltaRobotMeasures->ankle * deltaRobotMeasures->ankle) - ((
+                deltaRobotMeasures->base + deltaRobotMeasures->hip - deltaRobotMeasures->effector) * (
+                deltaRobotMeasures->base + deltaRobotMeasures->hip - deltaRobotMeasures->effector))
         );
         std::cout << "[DEBUG] effector location z: " << effectorLocation.z << std::endl; 
 

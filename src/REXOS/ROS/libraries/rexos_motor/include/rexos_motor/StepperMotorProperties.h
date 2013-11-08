@@ -1,10 +1,9 @@
 /**
- * @file MotorManager.h
- * @brief Motor management for concurrent movement.
+ * @file StepperMotorProperties.cpp
+ * @brief Contains the properties of a stepper motor.
  * @date Created: 2012-10-02
  *
- * @author Koen Braham
- * @author Dennis Koole
+ * @author Tommas Bakker
  *
  * @section LICENSE
  * License: newBSD
@@ -31,61 +30,63 @@
 
 #pragma once
 
-#include <rexos_modbus/ModbusController.h>
-#include <rexos_motor/StepperMotor.h>
+#include <queue>
+#include <boost/thread.hpp>
 
-#include <vector>
+#include <rexos_datatypes/MotorRotation.h>
+#include <rexos_modbus/ModbusException.h>
+#include <rexos_modbus/ModbusController.h>
+#include <rexos_motor/CRD514KD.h>
+#include <rexos_motor/MotorInterface.h>
+
+#include <libjson/libjson.h>
 
 namespace rexos_motor{
-
-	/**
-	 * Motor management for concurrent movement.
-	 **/
-	class MotorManager{
+	class StepperMotorProperties{
 	public:
 		/**
-		 * Constructor for the motor manager
-		 *
-		 * @param modbus Pointer to an established modbus connection.
-		 * @param motors Pointer array containing all motors for this manager.
-		 * @param numberOfMotors Number of motors in the pointer array.
+		 * @var double MOTOR_ROT_MIN
+		 * Mathematical minimum angle the motor is allowed to move to in radians.
 		 **/
-		MotorManager(rexos_modbus::ModbusController* modbus, std::vector<StepperMotor*> motors) :
-			modbus(modbus), motors(motors), poweredOn(false){}
-
-		void powerOn(void);
-		void powerOff(void);
+		double motorMinAngle;
+		/**
+		 * @var double MOTOR_ROT_MAX
+		 * Mathematical maximum angle the motor is allowed to move to in radians.
+		 **/
+		double motorMaxAngle;
+		
+		/**
+		 * @var double MOTOR_STEP_ANGLE
+		 * The angle of a single motor microstep in radians
+		 **/
+		double microStepAngle;
+		/**
+		 * @var double MOTOR_MIN_ACCELERATION
+		 * The minimum acceleration in radians per second per second. This same value counts for the minimum deceleration.
+		 **/
+		double minAcceleration;
 
 		/**
-		 * Check whether the motormanager has been initiated.
-		 * @return bool PowerOn state.
+		 * @var double MOTOR_MAX_ACCELERATION
+		 * The maximum acceleration in radians per second per second. This same value counts for the maximum deceleration.
 		 **/
-		bool isPoweredOn(void){ return poweredOn; }
-		void startMovement(int motionSlot);
-
-	private:
-		/**
-		 * @var ModbusController::ModbusController* modbus
-		 * Pointer to an established modbus connection.
-		 **/
-		rexos_modbus::ModbusController* modbus;
+		double maxAcceleration;
 
 		/**
-		 * @var StepperMotor** motors
-		 * Pointer array containing all motors for this manager.
-		 **/
-		std::vector<StepperMotor*> motors;
+		 * @var double MOTOR_MIN_SPEED
+		 * The minimum speed in radians per second that the motor can travel at, based on the minimum value in the CRD514KD speed register.
+		 **/		
+		double minSpeed;
 
 		/**
-		 * @var int numberOfMotors
-		 * Number of motors in the pointer array.
+		 * @var double MOTOR_MAX_SPEED
+		 * The maximum speed in radians per second that the motor can travel at, based on the maximum value in the CRD514KD speed register.
 		 **/
-		int numberOfMotors;
-
-		/**
-		 * @var bool poweredOn
-		 * Stores whether the motor manager has been turned on.
-		 **/
-		bool poweredOn;
+		double maxSpeed;
+	public:
+		StepperMotorProperties(JSONNode properties);
+		
+	/*private:
+		JSONNode findJsonNode(JSONNode input, std::string name);*/
 	};
 }

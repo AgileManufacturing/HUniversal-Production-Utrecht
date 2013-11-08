@@ -30,7 +30,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include "delta_robot_node/deltaRobotNode.h"
+#include "delta_robot_node/DeltaRobotNode.h"
 #include "delta_robot_node/Point.h"
 #include <boost/bind.hpp>
 #include <execinfo.h>
@@ -39,16 +39,6 @@
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "DeltaRobotNode"
 // @endcond
-/**
- * The IP of the modbus we are connecting to
- **/
-#define MODBUS_IP "192.168.0.22"
-/** 
- * The port we are connecting to
- **/
-#define MODBUS_PORT 502
-
-#define Z_OFFSET 0
 
 /**
  * Constructor 
@@ -56,59 +46,38 @@
  * @param moduleID identifier for the deltarobot
  **/
 deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID, std::string manufacturer, std::string typeNumber, std::string serialNumber) :
-	rexos_knowledge_database::Module(manufacturer, typeNumber, serialNumber),
-	rexos_statemachine::ModuleStateMachine("delta_robot_node",equipletID, moduleID, true),
-	rexos_coordinates::Module(this),
-	deltaRobot(NULL),
-	modbus(NULL),
-	motorManager(NULL),
-	setInstructionActionServer(nodeHandle, "delta_robot_node/set_instruction", boost::bind(&deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction, this, _1), false),
-	lastX(0.0),
-	lastY(0.0),
-	lastZ(-180.0){
+		rexos_knowledge_database::Module(manufacturer, typeNumber, serialNumber),
+		rexos_statemachine::ModuleStateMachine("delta_robot_node",equipletID, moduleID, true),
+		rexos_coordinates::Module(this),
+		deltaRobot(NULL),
+		modbus(NULL),
+		motorManager(NULL),
+		setInstructionActionServer(nodeHandle, "delta_robot_node/set_instruction", boost::bind(&deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction, this, _1), false),
+		lastX(0.0),
+		lastY(0.0),
+		lastZ(-180.0){
+	modbusIp = std::string();
+	modbusPort = -1;
+	
+	
+	
 	ROS_INFO("DeltaRobotnode Constructor entering...");
-
-	ROS_INFO("Configuring Modbus...");
+	
+	rexos_knowledge_database::ModuleType* moduleType = this->getModuleType();
+	std::string properties = moduleType->getModuleTypeProperties();
+	JSONNode jsonNode = libjson::parse(properties);
+	
+	
 
 	ROS_INFO("Advertising ActionServer at : delta_robot_node_1_1");
 
 
-	// Initialize modbus for IO controller
-	modbus_t *modbusIO = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
 
-	if(modbusIO == NULL){
-		throw std::runtime_error("Unable to allocate libmodbus context");
-	}
 
-	if(modbus_connect(modbusIO) == -1) {
-		throw std::runtime_error("Modbus connection to IO controller failed");
-	}
 
-	assert(modbusIO != NULL);
-
-	rexos_datatypes::DeltaRobotMeasures drm;
-	drm.base = rexos_delta_robot::Measures::BASE;
-	drm.hip = rexos_delta_robot::Measures::HIP;
-	drm.effector = rexos_delta_robot::Measures::EFFECTOR;
-	drm.ankle = rexos_delta_robot::Measures::ANKLE;
-	drm.maxAngleHipAnkle = rexos_delta_robot::Measures::HIP_ANKLE_ANGLE_MAX;
-
-	modbus = new rexos_modbus::ModbusController(modbus_new_rtu(
-		"/dev/ttyS0",
-		rexos_motor::CRD514KD::RtuConfig::BAUDRATE,
-		rexos_motor::CRD514KD::RtuConfig::PARITY,
-		rexos_motor::CRD514KD::RtuConfig::DATA_BITS,
-		rexos_motor::CRD514KD::RtuConfig::STOP_BITS));
-
-	// Motors is declared in the header file, size = 3
-	motors[0] = new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_0, rexos_delta_robot::Measures::MOTOR_ROT_MIN, rexos_delta_robot::Measures::MOTOR_ROT_MAX);
-	motors[1] = new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_1, rexos_delta_robot::Measures::MOTOR_ROT_MIN, rexos_delta_robot::Measures::MOTOR_ROT_MAX);
-	motors[2] = new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_2, rexos_delta_robot::Measures::MOTOR_ROT_MIN, rexos_delta_robot::Measures::MOTOR_ROT_MAX);
-
-	motorManager = new rexos_motor::MotorManager(modbus, motors, 3);
 
 	// Create a deltarobot
-	deltaRobot = new rexos_delta_robot::DeltaRobot(drm, motorManager, motors, modbusIO);
+	deltaRobot = new rexos_delta_robot::DeltaRobot(jsonNode);
 
 	setInstructionActionServer.start();
 	ROS_INFO("DeltaRobot Node initialized");
@@ -325,7 +294,7 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
 			lastY = p.y;
 			ySet = true;
 		} else if(node_name == "z") {
-			p.z = i->as_float() + Z_OFFSET;
+			p.z = i->as_float();
 			lastZ = p.z;
 		} else if(node_name == "maxAcceleration"){
 			p.maxAcceleration = i->as_float();

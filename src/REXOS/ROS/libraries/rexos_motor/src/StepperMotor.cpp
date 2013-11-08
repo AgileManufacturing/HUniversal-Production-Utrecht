@@ -50,8 +50,9 @@ namespace rexos_motor {
 	 * @param minAngle Minimum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
 	 * @param maxAngle Maximum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
 	 **/
-	StepperMotor::StepperMotor(rexos_modbus::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle):
-		MotorInterface(), currentAngle(0), setAngle(0), deviation(0), minAngle(minAngle), maxAngle(maxAngle), modbus(modbusController), motorIndex(motorIndex), anglesLimited(true), poweredOn(false){}
+	StepperMotor::StepperMotor(rexos_modbus::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, StepperMotorProperties properties):
+			MotorInterface(), currentAngle(0), setAngle(0), deviation(0), 
+			modbus(modbusController), motorIndex(motorIndex), properties(properties), anglesLimited(true), poweredOn(false){}
 
 	/**
 	 * Deconstructor of StepperMotor. Tries to turn to power off.
@@ -86,8 +87,8 @@ namespace rexos_motor {
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 			
 			// Set motor limits
-			modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((maxAngle - deviation) / CRD514KD::MOTOR_STEP_ANGLE));
-			modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((minAngle - deviation) / CRD514KD::MOTOR_STEP_ANGLE));
+			modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((getMaxAngle() - deviation) / CRD514KD::MOTOR_STEP_ANGLE));
+			modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((getMinAngle() - deviation) / CRD514KD::MOTOR_STEP_ANGLE));
 			modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_START_SPEED, 1);
 			
 			// Clear counter
@@ -179,7 +180,7 @@ namespace rexos_motor {
 
 		checkMotionSlot(motionSlot);
 
-		if(anglesLimited && (motorRotation.angle <= minAngle || motorRotation.angle >= maxAngle)){
+		if(anglesLimited && isValidAngle(motorRotation.angle) == false) {
 			throw std::out_of_range("one or more angles out of range");
 		}
 
@@ -243,7 +244,11 @@ namespace rexos_motor {
 			}
 		}
 	}
-
+	
+	bool StepperMotor::isValidAngle(double angle){
+		return (angle >= getMinAngle() && angle <= getMaxAngle());
+	}
+	
 	/**
 	 * Sets the deviation between the motors 0 degrees and the horizontal 0 degrees, then writes the new motor limits to the motor controllers.
 	 *
@@ -251,8 +256,8 @@ namespace rexos_motor {
 	 **/
 	void StepperMotor::setDeviationAndWriteMotorLimits(double deviation){
 		this->deviation = deviation;
-		modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((minAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
-		modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((maxAngle + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
+		modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((getMinAngle() + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
+		modbus->writeU32(motorIndex, CRD514KD::Registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((getMaxAngle() + deviation) / CRD514KD::MOTOR_STEP_ANGLE));
 	}
 
 	/**

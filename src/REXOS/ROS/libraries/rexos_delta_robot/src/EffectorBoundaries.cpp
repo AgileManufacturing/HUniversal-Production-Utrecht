@@ -51,21 +51,23 @@ namespace rexos_delta_robot{
 	 * 
 	 * @return Pointer to the object.
 	 **/
-	EffectorBoundaries* EffectorBoundaries::generateEffectorBoundaries(const InverseKinematicsModel& model, double motorMinAngles[3], double motorMaxAngles[3], double voxelSize){
-		EffectorBoundaries* boundaries = new EffectorBoundaries(model, motorMinAngles, motorMaxAngles, voxelSize);
+	EffectorBoundaries* EffectorBoundaries::generateEffectorBoundaries(const InverseKinematicsModel& model, 
+				const rexos_datatypes::DeltaRobotMeasures* deltaRobotMeasures, 
+				const std::vector<rexos_motor::StepperMotor*> motors, double voxelSize){
+		EffectorBoundaries* boundaries = new EffectorBoundaries(model, deltaRobotMeasures, motors, voxelSize);
 		
 		// Create boundaries variables in voxel space by dividing real space variables with the voxel size
-		boundaries->width = (Measures::BOUNDARY_BOX_MAX_X  - Measures::BOUNDARY_BOX_MIN_X) / voxelSize;
-        boundaries->height = (Measures::BOUNDARY_BOX_MAX_Z - Measures::BOUNDARY_BOX_MIN_Z) / voxelSize;
-        boundaries->depth = (Measures::BOUNDARY_BOX_MAX_Y  - Measures::BOUNDARY_BOX_MIN_Y) / voxelSize;
-        
-        // Create bitmap with value false for all voxels
-        boundaries->boundariesBitmap = new entry[boundaries->width * boundaries->height * boundaries->depth];
-        for(int i = 0; i < boundaries->width * boundaries->height * boundaries->depth; i++){
-        	boundaries->boundariesBitmap[i] = UNKNOWN;
-        }
-        boundaries->generateBoundariesBitmap();
-        return boundaries;
+		boundaries->width = (deltaRobotMeasures->boundaryBoxMaxX  - deltaRobotMeasures->boundaryBoxMinX) / voxelSize;
+		boundaries->height = (deltaRobotMeasures->boundaryBoxMaxZ - deltaRobotMeasures->boundaryBoxMinZ) / voxelSize;
+		boundaries->depth = (deltaRobotMeasures->boundaryBoxMaxY  - deltaRobotMeasures->boundaryBoxMinY) / voxelSize;
+
+		// Create bitmap with value false for all voxels
+		boundaries->boundariesBitmap = new entry[boundaries->width * boundaries->height * boundaries->depth];
+		for(int i = 0; i < boundaries->width * boundaries->height * boundaries->depth; i++){
+			boundaries->boundariesBitmap[i] = UNKNOWN;
+		}
+		boundaries->generateBoundariesBitmap();
+		return boundaries;
     }
 
 	/**
@@ -134,18 +136,14 @@ namespace rexos_delta_robot{
 	 * @param motorMaxAngles An array holding the maximum angle of each of the three motors.
 	 * @param voxelSize The size of the voxels.
 	 **/
-    EffectorBoundaries::EffectorBoundaries(const InverseKinematicsModel& model, double motorMinAngles[3], double motorMaxAngles[3], double voxelSize) : 
-    	width(0), 
-    	height(0), 
-    	depth(0), 
-    	boundariesBitmap(NULL), 
-    	kinematics(model),  
-    	voxelSize(voxelSize) {
-    		for(int i = 0; i < 3; i++){
-    			this->motorMinAngles[i] = motorMinAngles[i];
-    			this->motorMaxAngles[i] = motorMaxAngles[i];
-    		}
-    	}
+    EffectorBoundaries::EffectorBoundaries(const InverseKinematicsModel& model, const rexos_datatypes::DeltaRobotMeasures* deltaRobotMeasures, 
+			const std::vector<rexos_motor::StepperMotor*> motors, double voxelSize) : 
+			width(0), 
+			height(0), 
+			depth(0), 
+			boundariesBitmap(NULL), 
+			kinematics(model),  
+			voxelSize(voxelSize) { }
 
     EffectorBoundaries::~EffectorBoundaries(){
     	delete[] boundariesBitmap;
@@ -218,16 +216,15 @@ namespace rexos_delta_robot{
 			}
 
 			// Check motor angles.
-			if(rotations[0]->angle <= motorMinAngles[0] || rotations[0]->angle >= motorMaxAngles[0] 
-			|| rotations[1]->angle <= motorMinAngles[1] || rotations[1]->angle >= motorMaxAngles[1] 
-			|| rotations[2]->angle <= motorMinAngles[2] || rotations[2]->angle >= motorMaxAngles[2]){
-			  	*fromCache = INVALID;
-				delete rotations[0];
-				delete rotations[1];
-				delete rotations[2];
-			  	return false;
+			for(int i = 0; i < motors.size(); i++) {
+				if(motors.at(i)->isValidAngle(rotations[i]->angle) == false) {
+					*fromCache = INVALID;
+					delete rotations[0];
+					delete rotations[1];
+					delete rotations[2];
+					return false;
+				}
 			}
-
 			*fromCache = VALID;
 
 			delete rotations[0];
@@ -248,7 +245,7 @@ namespace rexos_delta_robot{
     	std::stack<BitmapCoordinate> cstack;
 
     	// Determine the center of the box.
-    	rexos_datatypes::Point3D<double> point (0, 0, Measures::BOUNDARY_BOX_MIN_Z + (Measures::BOUNDARY_BOX_MAX_Z - Measures::BOUNDARY_BOX_MIN_Z) / 2);
+    	rexos_datatypes::Point3D<double> point (0, 0, deltaRobotMeasures->boundaryBoxMinZ + (deltaRobotMeasures->boundaryBoxMaxZ - deltaRobotMeasures->boundaryBoxMinZ) / 2);
     	
     	// If point pixel is not part of a valid voxel the box dimensions are incorrect.
     	if(!isValid(fromRealCoordinate(point), pointValidityCache)){
@@ -256,7 +253,7 @@ namespace rexos_delta_robot{
     	}
     	
     	// Scan towards the right.
-		for(; point.x < Measures::BOUNDARY_BOX_MAX_X; point.x += voxelSize){
+		for(; point.x < deltaRobotMeasures->boundaryBoxMaxX; point.x += voxelSize){
 			// If an invalid voxel is found:
 			// - step back to the last valid voxel
 			// - push the voxel on the empty stack
@@ -271,7 +268,7 @@ namespace rexos_delta_robot{
 			}
 		}
 		// If the right-most voxel is in reach and an invalid voxel is never found, the position of point.x will be outside of the box limits. Step back inside the box and add that voxel to the stack and set it as true in the bitmap.
-		if(point.x >= Measures::BOUNDARY_BOX_MAX_X){
+		if(point.x >= deltaRobotMeasures->boundaryBoxMaxX){
 			point.x -= voxelSize;
 			BitmapCoordinate startingVoxel = fromRealCoordinate(point);
 			cstack.push(startingVoxel);
@@ -311,7 +308,7 @@ namespace rexos_delta_robot{
 		pointValidityCache = NULL;
 		
 		// Adds all the points within the boundaries.
-		cstack.push(fromRealCoordinate(rexos_datatypes::Point3D<double>(0, 0, Measures::BOUNDARY_BOX_MIN_Z + (Measures::BOUNDARY_BOX_MAX_Z - Measures::BOUNDARY_BOX_MIN_Z) / 2)));
+		cstack.push(fromRealCoordinate(rexos_datatypes::Point3D<double>(0, 0, deltaRobotMeasures->boundaryBoxMinZ + (deltaRobotMeasures->boundaryBoxMaxZ - deltaRobotMeasures->boundaryBoxMinZ) / 2)));
 		while(!cstack.empty()){
 			BitmapCoordinate validVoxel = cstack.top();
 			cstack.pop();
