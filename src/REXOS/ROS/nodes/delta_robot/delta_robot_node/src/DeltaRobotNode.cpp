@@ -141,36 +141,42 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
         const char * nodeName = i -> name().c_str();
 	    // keep in mind that a payload may or may not contain all values. Use lastXYZ to determine these values if they are not set.
         if (strcmp(nodeName, "payload") == 0){
+
 			payloadPoint = parsePoint(*i);
 			lookupResultPoint = parseLookup(*i);
 			angle = rexos_utilities::stringToDouble(parseNodeValue("angle", *i));
 
-			std::cout << "lookupX " << lookupResultPoint.x << " lookupY " << lookupResultPoint.y << " angle " << angle << std::endl;
-			std::cout << "payloadX " << payloadPoint.x << " payloadY " << payloadPoint.y << " payloadZ " << payloadPoint.z << std::endl; 
-			
-			lookupIsSet = true;
+			//check whether lookup is set. If all values are 0, we can presume the lookup isnt set.
+			if(!(lookupResultPoint.x == 0 && lookupResultPoint.y == 0 && angle == 0)){
+				lookupIsSet = true;
+			}
         }
         ++i;
     }
 
-	Vector3 payloadVector(payloadPoint.x, payloadPoint.y, payloadPoint.z);
-	Vector3 lookupVector(lookupResultPoint.x, lookupResultPoint.y, 0);
-
+    Vector3 moveVector;
     if(lookupIsSet) {
-    	double theta = angle * 3.141592653589793 / 180.0;
+		Vector3 lookupVector(lookupResultPoint.x, lookupResultPoint.y, 0);
+
+		double theta = angle * 3.141592653589793 / 180.0;
 		double cs = cos(theta);
 		double sn = sin(theta);
 		lookupX = lookupVector.x * cs - lookupVector.y * sn;
 		lookupY = lookupVector.x * sn + lookupVector.y * cs;
 
+	    //translate the relative point to real equiplet coordinates.
+		Vector3 lookupVectorRotated(lookupX, lookupY, 0);
+		Vector3 translatedVector = convertToModuleCoordinate(lookupVectorRotated);
+		moveVector.set((translatedVector.x + payloadPoint.x), (translatedVector.y + payloadPoint.y), payloadPoint.z - 260, payloadPoint.maxAcceleration);
+	} else {
+		moveVector.set(payloadPoint.x, payloadPoint.y, payloadPoint.z - 260, payloadPoint.maxAcceleration);
 	}
-    //translate the relative point to real equiplet coordinates.
-	Vector3 lookupVectorRotated(lookupX, lookupY, 0);
-	Vector3 translatedVector = convertToModuleCoordinate(lookupVectorRotated);
+
+
 
 	std::cout << " payloadVector " << payloadVector << std::endl  << " lookupVector " << lookupVector << std::endl  << " lookupVectorRotated " << lookupVectorRotated << std::endl << " translatedVector " << translatedVector << std::endl;
 
-	if(moveToPoint((translatedVector.x + payloadPoint.x), (translatedVector.y + payloadPoint.y), payloadPoint.z - 260, payloadPoint.maxAcceleration)){
+	if(moveToPoint(){
 		setInstructionActionServer.setSucceeded(result_);
 		return;
 	}
