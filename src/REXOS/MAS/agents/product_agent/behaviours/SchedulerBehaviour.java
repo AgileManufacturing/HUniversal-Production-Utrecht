@@ -95,6 +95,7 @@ public class SchedulerBehaviour extends Behaviour {
 	private HashMap<AID, EquipletScheduleInformation> equipletSchedules = new HashMap<AID, EquipletScheduleInformation>();
 	private ArrayList<AID> refusedEquiplets = new ArrayList<AID>();
 	
+	private ArrayList<ProductionStep> productionSteps;
 	/**
 	 * Construct scheudler behavior
 	 * @param myAgent
@@ -121,11 +122,11 @@ public class SchedulerBehaviour extends Behaviour {
 
 			Product product = this.productAgent.getProduct();
 			Production production = product.getProduction();
-			ArrayList<ProductionStep> psa = production.getProductionSteps();
+			productionSteps = production.getProductionSteps();
 			
 			//get a list of equiplets we need to get the schedule of
 			ArrayList<AID> equipletSchedulesToGet = new ArrayList<AID>();
-			for ( ProductionStep productStep : psa){
+			for ( ProductionStep productStep : productionSteps){
 				int productStepId = productStep.getId();
 				HashMap <AID, Long> equipletMapping = pem.getEquipletsForProductionStep(productStepId);
 				
@@ -197,17 +198,25 @@ public class SchedulerBehaviour extends Behaviour {
 			//now start the logic to choose the equiplets
 			
 			//TODO: current logic is to choose the first equiplet. improve it.
+			//TODO: ALso the logic currently only expects one kind of product step, 
+			//it does not support multiple kinds of steps
 			AID chosenEquiplet = equipletSchedules.keySet().iterator().next();
+			
+			for ( ProductionStep productStep : productionSteps){
+				productStep.setUsedEquiplet(chosenEquiplet);
+				long duration = productStep.getDurationForEquiplet(chosenEquiplet);
+				System.out.println("DURATION EQUIPLET: " + duration);
+			}
 			
 			
 		}
 	//	if ( schedulersStarted == schedulersCompleted && isError == false) {
 	//		Logger.log(LogLevel.INFORMATION, "Setting scheduler to complete");
 	//		behaviourCallback.handleCallback(BehaviourStatus.COMPLETED, null);
-		//	isCompleted = true;
+	//		isCompleted = true;
 	//	} else if (isError) {
 	//		behaviourCallback.handleCallback(BehaviourStatus.ERROR, null);
-		//	isCompleted = true;
+	//		isCompleted = true;
 	//	}
 	}
 
@@ -223,16 +232,16 @@ public class SchedulerBehaviour extends Behaviour {
 	@Override
 	public void reset() {
 		super.reset();
-	}
-	
-	@Override
-	public void restart(){
-		super.restart();
 		isError = false;
         isCompleted = false;
 
         schedulersStarted = 0;
         schedulersCompleted = 0;
+	}
+	
+	@Override
+	public void restart(){
+		super.restart();
 	}
 
 	public void callbackScheduleInformation(HashMap<AID, EquipletScheduleInformation> equipletSchedules, ArrayList<AID> refusedEquiplets, 
@@ -242,7 +251,7 @@ public class SchedulerBehaviour extends Behaviour {
 		
 		Logger.log(LogLevel.DEBUG, "ScheduleInformationBehaviour is done, continuing the ScheduleBehaviour");
 		scheduleInformationDone = true;
-		scheduleBehaviourThread.reset();
+		scheduleBehaviourThread.restart();
 	}
 	
 	
@@ -259,7 +268,7 @@ public class SchedulerBehaviour extends Behaviour {
 			this.prodStep = productionstep;
 	
 			List<AID> equipletlist = new ArrayList<AID>(equipletList);
-	
+
 			BlackboardClient bbc = new BlackboardClient(
 					Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"), 
 					Integer.parseInt(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbPort")));
