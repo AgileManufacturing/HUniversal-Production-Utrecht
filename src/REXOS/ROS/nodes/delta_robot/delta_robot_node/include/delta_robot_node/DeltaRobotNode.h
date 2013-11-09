@@ -63,7 +63,7 @@ namespace deltaRobotNodeNamespace{
 	/**
 	 * the DeltaRobotNode which is a ModuleStateMachine
 	 **/
-	class DeltaRobotNode : public rexos_statemachine::ModuleStateMachine, 
+	class DeltaRobotNode : //public rexos_statemachine::ModuleStateMachine, 
 			public rexos_knowledge_database::Module, 
 			public rexos_coordinates::Module{
 	protected:

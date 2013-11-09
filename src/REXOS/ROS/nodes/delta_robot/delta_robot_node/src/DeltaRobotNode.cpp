@@ -47,7 +47,7 @@
  **/
 deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID, std::string manufacturer, std::string typeNumber, std::string serialNumber) :
 		rexos_knowledge_database::Module(manufacturer, typeNumber, serialNumber),
-		rexos_statemachine::ModuleStateMachine("delta_robot_node",equipletID, moduleID, true),
+		//rexos_statemachine::ModuleStateMachine("delta_robot_node",equipletID, moduleID, true),
 		rexos_coordinates::Module(this),
 		deltaRobot(NULL),
 		modbus(NULL),

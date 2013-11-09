@@ -11,8 +11,6 @@ namespace rexos_knowledge_database{
 	Module::Module(std::string manufacturer, std::string typeNumber, std::string serialNumber) :
 				manufacturer(manufacturer), typeNumber(typeNumber), serialNumber(serialNumber)
 	{
-		ROS_INFO_STREAM("Construction module with manufacturer=" << manufacturer << 
-				" typeNumber=" << typeNumber << " serialNumber=" << serialNumber);
 		connection = rexos_knowledge_database::connect();
 		
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
@@ -29,7 +27,8 @@ namespace rexos_knowledge_database{
 		if(result->rowsCount() != 1){
 			throw KnowledgeDatabaseException("This module does not exist");
 		}
-		
+		ROS_INFO_STREAM("Constructed module with manufacturer=" << manufacturer << 
+				" typeNumber=" << typeNumber << " serialNumber=" << serialNumber);
 	}
 	ModuleType* Module::getModuleType(){
 		return new rexos_knowledge_database::ModuleType(manufacturer, typeNumber);
