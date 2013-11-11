@@ -66,7 +66,6 @@ import agents.data_classes.ParentBehaviourCallback;
 import agents.data_classes.Part;
 import agents.data_classes.ProductStep;
 import agents.data_classes.ProductionStep;
-import agents.data_classes.ScheduleData;
 import agents.data_classes.StepStatusCode;
 import agents.equiplet_agent.EquipletAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
@@ -154,7 +153,7 @@ public class CanPerformStep extends ReceiveBehaviour implements ParentBehaviourC
 				};
 				currentProductStep =
 						new ProductStep(message.getSender(), productStep.getCapability(), productStep.getParameters(),
-								inputParts, null, StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
+								inputParts, null, StepStatusCode.EVALUATING, new BasicDBObject());
 				productStepEntryId = productStepsBlackboard.insertDocument(currentProductStep.toBasicDBObject());
 				equipletAgent.addCommunicationRelation(message.getConversationId(), productStepEntryId);
 				

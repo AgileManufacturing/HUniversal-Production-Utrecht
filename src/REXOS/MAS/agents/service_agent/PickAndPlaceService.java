@@ -59,7 +59,6 @@ import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 import agents.data_classes.Part;
 import agents.data_classes.Position;
-import agents.data_classes.ScheduleData;
 import agents.data_classes.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
@@ -116,8 +115,8 @@ public class PickAndPlaceService extends Service {
 		placeParameters.put("crate", "CRATE-PLACEHOLDER");
 
 		return new ServiceStep[] {
-				new ServiceStep(getId(), 1, pickParameters, StepStatusCode.EVALUATING, null, new ScheduleData()),
-				new ServiceStep(getId(), 2, placeParameters, StepStatusCode.EVALUATING, null, new ScheduleData())
+				new ServiceStep(getId(), 1, pickParameters, StepStatusCode.EVALUATING, null),
+				new ServiceStep(getId(), 2, placeParameters, StepStatusCode.EVALUATING, null)
 		};
 	}
 

@@ -34,7 +34,6 @@ import java.util.HashMap;
 
 import agents.data_classes.Part;
 import agents.data_classes.Position;
-import agents.data_classes.ScheduleData;
 import agents.data_classes.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
@@ -95,7 +94,7 @@ public class DrawPointService extends Service {
 
 		return new ServiceStep[]
 		{
-			new ServiceStep(getId(), 3, serviceStepParameters, StepStatusCode.EVALUATING, null, new ScheduleData())
+			new ServiceStep(getId(), 3, serviceStepParameters, StepStatusCode.EVALUATING, null)
 		};
 	}
 

@@ -48,7 +48,6 @@ import org.bson.types.ObjectId;
 import agents.data_classes.BehaviourCallbackItem;
 import agents.data_classes.ParentBehaviourCallback;
 import agents.data_classes.ProductStep;
-import agents.data_classes.ScheduleData;
 import agents.equiplet_agent.EquipletAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 

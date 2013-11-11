@@ -47,7 +47,7 @@ import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import agents.data_classes.EquipletScheduleInformation;
-import agents.data_classes.ProductStepSchedule;
+import agents.data_classes.ProductStepScheduleData;
 import agents.equiplet_agent.EquipletAgent;
 import agents.equiplet_agent.ScheduleLock;
 import agents.shared_behaviours.ReceiveBehaviour;
@@ -92,7 +92,7 @@ public class ScheduleInformation extends ReceiveBehaviour {
 						//without having to get all the data every time from the blackboard
 						List<DBObject> results =  planningBlackboard.findDocuments(new BasicDBObject());
 						for (DBObject result : results){
-							ProductStepSchedule prodSchedule = new ProductStepSchedule((BasicDBObject) result);
+							ProductStepScheduleData prodSchedule = new ProductStepScheduleData((BasicDBObject) result);
 						}
 						// get schedule and calculate load
 						double load = 50.0d;
@@ -118,7 +118,7 @@ public class ScheduleInformation extends ReceiveBehaviour {
 					//without having to get all the data every time from the blackboard
 					List<DBObject> results =  planningBlackboard.findDocuments(new BasicDBObject());
 					for (DBObject result : results){
-						ProductStepSchedule prodSchedule = new ProductStepSchedule((BasicDBObject) result);
+						ProductStepScheduleData prodSchedule = new ProductStepScheduleData((BasicDBObject) result);
 					}
 					// get schedule and calculate load
 					double load = 50.0d;

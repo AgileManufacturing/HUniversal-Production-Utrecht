@@ -70,26 +70,25 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 	
 	private int totalFinishedEquiplets;
 	
-	private SchedulerBehaviour testThread;
-	
-	public ScheduleInformationBehaviour(ProductAgent productAgent, SchedulerBehaviour schedulerBehaviour, AID[] equipletAgents, SchedulerBehaviour scheduleBehaviourThread) {
+	public ScheduleInformationBehaviour(ProductAgent productAgent, SchedulerBehaviour schedulerBehaviour, AID[] equipletAgents) {
 		super(productAgent, TIMEOUT, MESSAGE_TEMPLATE);
 		this.productAgent = productAgent;
-		this.schedulerBehaviour = schedulerBehaviour;
 		this.equipletAgents = equipletAgents;
+		this.schedulerBehaviour = schedulerBehaviour;
 		
 		equipletSchedules = new HashMap<AID, EquipletScheduleInformation>();
 		refusedEquiplets = new ArrayList<AID>();
 		totalFinishedEquiplets = 0;
 		
-		this.testThread = scheduleBehaviourThread;
 	}
 
 	@Override
 	public void onStart() {
-		System.out.println("Sent message to equiplets");
+		Logger.log(LogLevel.DEBUG, "Starting a new ScheduleInformationBehaviour");
 		ACLMessage request = new ACLMessage(ACLMessage.QUERY_REF);
 		request.setOntology("ScheduleInformation");
+		//add the lock request to the message
+		request.setContent("lock");
 		for (AID equipletAgent : equipletAgents) {
 			request.addReceiver(equipletAgent);
 		}
@@ -100,7 +99,7 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
-				
+				System.out.println("MESSAGE PERF: " + message.getPerformative());
 				if (message.getPerformative() == ACLMessage.REFUSE){
 					refusedEquiplets.add(message.getSender());
 					totalFinishedEquiplets ++;
@@ -113,11 +112,10 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 					equipletSchedules.put(message.getSender(), eqSchedule);
 					
 					if (totalFinishedEquiplets == equipletAgents.length){ 
-						System.out.println("GOT ALL EQ responses");
 						// and we have all the refused ,inform responses and timeouted equiplets
 						// so all the equiplets are done
 						// remove this behaviour and callback to the scheduler with results and remove this behaviour
-						schedulerBehaviour.callbackScheduleInformation(equipletSchedules, refusedEquiplets, testThread);
+						schedulerBehaviour.callbackScheduleInformation(equipletSchedules, refusedEquiplets, schedulerBehaviour);
 						productAgent.removeBehaviour(this);
 					}
 				}
@@ -133,7 +131,7 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 					refusedEquiplets.add(equiplet);
 				}
 			}
-			schedulerBehaviour.callbackScheduleInformation(equipletSchedules, refusedEquiplets, testThread);
+			schedulerBehaviour.callbackScheduleInformation(equipletSchedules, refusedEquiplets, schedulerBehaviour);
 			productAgent.removeBehaviour(this);
 		}
 

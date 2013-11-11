@@ -140,9 +140,9 @@ public class ProductStep implements MongoSaveable, Serializable {
 	public ProductStep(AID productAgentId, int type,
 			BasicDBObject parameters, Part[] inputParts,
 			Part outputPart, StepStatusCode status,
-			BasicDBObject statusData, ScheduleData scheduleData) {
+			BasicDBObject statusData) {
 		this(null, productAgentId, type, parameters, inputParts,
-				outputPart, status, statusData, scheduleData);
+				outputPart, status, statusData);
 	}
 
 	/**
@@ -165,13 +165,11 @@ public class ProductStep implements MongoSaveable, Serializable {
 	 *            The status for the product step
 	 * @param statusData
 	 *            The additional data for the status
-	 * @param scheduleData
-	 *            The schedule data
 	 */
 	public ProductStep(ObjectId _id, AID productAgentId, int type,
 			BasicDBObject parameters, Part[] inputParts,
 			Part outputPart, StepStatusCode status,
-			BasicDBObject statusData, ScheduleData scheduleData) {
+			BasicDBObject statusData) {
 		this._id = _id;
 		this.productAgentId = productAgentId;
 		this.type = type;

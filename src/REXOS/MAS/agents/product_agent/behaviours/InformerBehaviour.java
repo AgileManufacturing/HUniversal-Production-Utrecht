@@ -229,13 +229,13 @@ public class InformerBehaviour extends Behaviour {
 	 * @param subBehaviour
 	 */
 	public void callbackSubInformerBehaviour(BehaviourStatus bs,
-			SubInformerBehaviour subBehaviour ) 
+			SubInformerBehaviour subBehaviour )
 	{
 		if (bs == BehaviourStatus.COMPLETED) 
 		{
 			Logger.log(LogLevel.DEBUG, "Setting time slots for equiplet: " + subBehaviour.getTargetEquiplet() + " duration: " + subBehaviour.getTimeslotDuration());
 			_prodEQmap.setTimeSlotsForEquiplet(subBehaviour.getProductionStepId(), subBehaviour.getTargetEquiplet(), subBehaviour.getTimeslotDuration());
-		} 
+		}
 		else 
 		{
 			Logger.log(LogLevel.ERROR, "callbackSubInformerBehaviour ended with error!");

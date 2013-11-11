@@ -57,7 +57,6 @@ import agents.data_classes.ParentBehaviourCallback;
 import agents.data_classes.Part;
 import agents.data_classes.Position;
 import agents.data_classes.ProductStep;
-import agents.data_classes.ScheduleData;
 import agents.data_classes.StepStatusCode;
 import agents.service_agent.ServiceAgent;
 import agents.service_agent.ServiceStep;
@@ -203,7 +202,6 @@ public class PartsInfo extends ReceiveBehaviour {
 				
 				serviceAgent.removeConvIdServiceMapping(conversationId);
 
-				ScheduleData scheduleData;
 				ProductStep productStep =
 						new ProductStep((BasicDBObject) productStepBBClient.findDocumentById(productStepId));
 				//long nextStartTime = productStep.getScheduleData().getStartTime();

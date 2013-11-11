@@ -63,7 +63,6 @@ import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
-import agents.data_classes.ScheduleData;
 import agents.hardware_agent.EquipletStep;
 import agents.hardware_agent.HardwareAgent;
 import agents.hardware_agent.Module;

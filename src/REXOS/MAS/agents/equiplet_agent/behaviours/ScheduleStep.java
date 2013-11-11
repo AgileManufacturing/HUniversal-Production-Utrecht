@@ -49,7 +49,6 @@ import libraries.utillities.log.Logger;
 import org.bson.types.ObjectId;
 
 import agents.data_classes.ProductStep;
-import agents.data_classes.ScheduleData;
 import agents.equiplet_agent.EquipletAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 
@@ -122,11 +121,11 @@ public class ScheduleStep extends ReceiveBehaviour {
 			// Gets the scheduledata out of the productstep.
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
 			
-			ScheduleData scheduleData =
-					new ScheduleData((BasicDBObject) (productStepsBlackboard.findDocumentById(productStepId)).get("scheduleData"));
+	//		ScheduleData scheduleData =
+	//				new ScheduleData((BasicDBObject) (productStepsBlackboard.findDocumentById(productStepId)).get("scheduleData"));
 			
-			long end = start + scheduleData.getDuration();
-			Logger.log(LogLevel.DEBUG, "start: " + start + " duration: " + scheduleData.getDuration() + " end: " + end);
+	//		long end = start + scheduleData.getDuration();
+	//		Logger.log(LogLevel.DEBUG, "start: " + start + " duration: " + scheduleData.getDuration() + " end: " + end);
 
 			// Gets planned steps
 			List<DBObject> plannedSteps =
@@ -174,9 +173,9 @@ public class ScheduleStep extends ReceiveBehaviour {
 			}
 			
 			if(fitsInSchedule) {
-				scheduleData.setStartTime(start);
-				productStepsBlackboard.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject("$set",
-						new BasicDBObject("scheduleData", scheduleData.toBasicDBObject())));
+	//			scheduleData.setStartTime(start);
+	//			productStepsBlackboard.updateDocuments(new BasicDBObject("_id", productStepId), new BasicDBObject("$set",
+	//					new BasicDBObject("scheduleData", scheduleData.toBasicDBObject())));
 
 				ACLMessage scheduleMessage = new ACLMessage(ACLMessage.REQUEST);
 				scheduleMessage.addReceiver(equipletAgent.getServiceAgent());

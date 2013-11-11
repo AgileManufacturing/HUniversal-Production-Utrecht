@@ -41,9 +41,7 @@
 package agents.product_agent.behaviours;
 
 import jade.core.AID;
-import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -117,10 +115,9 @@ public class SchedulerBehaviour extends Behaviour {
 					.getProductionEquipletMapping();
 			
 			// Shedule the PA with the equiplet agents in the current list.
-			productAgent.getProduct().getProduction()
-					.getProductionEquipletMapping();
+			
 
-			Product product = this.productAgent.getProduct();
+			Product product = productAgent.getProduct();
 			Production production = product.getProduction();
 			productionSteps = production.getProductionSteps();
 			
@@ -137,7 +134,7 @@ public class SchedulerBehaviour extends Behaviour {
 				}
 			}
 
-			productAgent.addBehaviour(new ScheduleInformationBehaviour(productAgent, this, equipletSchedulesToGet.toArray(new AID[equipletSchedulesToGet.size()]), this));
+			productAgent.addBehaviour(new ScheduleInformationBehaviour(productAgent, this, equipletSchedulesToGet.toArray(new AID[equipletSchedulesToGet.size()])));
 			//here we have the schedules of the equiplets
 			//choose the right equiplet for the steps
 			
@@ -191,7 +188,7 @@ public class SchedulerBehaviour extends Behaviour {
 			isCompleted = true;
 		}
 		
-		//we need to be blocked waiting until we have the scheduleinformation
+		//we need to wait until we have the scheduleinformation
 		if ( !scheduleInformationDone){
 			block();
 		}
@@ -203,11 +200,11 @@ public class SchedulerBehaviour extends Behaviour {
 			//TODO: ALso the logic currently only expects one kind of product step, 
 			//it does not support multiple kinds of steps
 			AID chosenEquiplet = equipletSchedules.keySet().iterator().next();
-			
+			ProductionEquipletMapper timeslotsForProductStep = productAgent.getProduct().getProduction().getProductionEquipletMapping();
 			for ( ProductionStep productStep : productionSteps){
 				productStep.setUsedEquiplet(chosenEquiplet);
-				long duration = productStep.getDurationForEquiplet(chosenEquiplet);
-				System.out.println("DURATION EQUIPLET: " + duration);
+				long duration = timeslotsForProductStep.getTimeSlotsForEquiplet(productStep.getId(), chosenEquiplet);
+				
 			}
 			
 			
@@ -246,14 +243,12 @@ public class SchedulerBehaviour extends Behaviour {
 		super.restart();
 	}
 
-	public void callbackScheduleInformation(HashMap<AID, EquipletScheduleInformation> equipletSchedules, ArrayList<AID> refusedEquiplets, 
-											SchedulerBehaviour scheduleBehaviourThread){
-		this.equipletSchedules = equipletSchedules;
-		this.refusedEquiplets = refusedEquiplets;
+	public void callbackScheduleInformation(HashMap<AID, EquipletScheduleInformation> equipletSchedules, ArrayList<AID> refusedEquiplets, SchedulerBehaviour schedulerBehaviour){
+		schedulerBehaviour.equipletSchedules = equipletSchedules;
 		
 		Logger.log(LogLevel.DEBUG, "ScheduleInformationBehaviour is done, continuing the ScheduleBehaviour");
 		scheduleInformationDone = true;
-		scheduleBehaviourThread.restart();
+		restart();
 	}
 	
 	

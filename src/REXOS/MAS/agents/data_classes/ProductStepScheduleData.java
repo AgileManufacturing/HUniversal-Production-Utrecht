@@ -46,32 +46,59 @@ import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
 
-public class ProductStepSchedule implements MongoSaveable, Serializable {
+public class ProductStepScheduleData implements MongoSaveable, Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 5464110443463847485L;
 
+	/**
+	 * @var ObjectId objectId
+	 * 		the objectId of the productStepId
+	 */
 	private ObjectId objectId;
 	
-	private ScheduleData scheduleData;
+	/**
+	 * @var long startTime
+	 * The start time.
+	 **/
+	private long startTime;
 	
-	public ProductStepSchedule(ObjectId objectId, ScheduleData scheduleData){
-		this.objectId = objectId;
-		this.scheduleData = scheduleData;
+	/**
+	 * @var long duration
+	 * The duration.
+	 **/
+	private long duration;
+	
+	/**
+	 * @var long deadline
+	 * The deadline.
+	 **/
+	private long deadline;
+	
+	public ProductStepScheduleData(ObjectId objectid, long startTime, long duration, long deadline){
+		this.objectId = objectid;
+		this.startTime = startTime;
+		this.duration = duration;
+		this.deadline = deadline;
 	}
 	
-	public ProductStepSchedule(BasicDBObject basicDBObject){
+	public ProductStepScheduleData(ObjectId objectId){
+		this(objectId, -1, -1, -1);
+	}
+	
+	public ProductStepScheduleData(BasicDBObject basicDBObject){
 		fromBasicDBObject(basicDBObject);
 	}
 	
 	@Override
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject productStepScheduleDBObject = new BasicDBObject();
-		
 		productStepScheduleDBObject.put("objectId", objectId);
-		productStepScheduleDBObject.put("scheduleData", scheduleData.toBasicDBObject());
+		productStepScheduleDBObject.put("startTime", startTime);
+		productStepScheduleDBObject.put("duration", duration);
+		productStepScheduleDBObject.put("deadline", deadline);
 		return productStepScheduleDBObject;
 	}
 
@@ -81,10 +108,14 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 		if (object != null){
 			BasicDBObject dBObjectCopy= (BasicDBObject) object.copy();
 			
-			
 			this.objectId = (ObjectId) dBObjectCopy.remove("objectId");
 			
-			this.scheduleData = new ScheduleData((BasicDBObject) dBObjectCopy.remove("scheduleData"));
+			this.startTime = dBObjectCopy.getLong("startTime", -1);
+			dBObjectCopy.remove("startTime");
+			this.duration = dBObjectCopy.getLong("duration", -1);
+			dBObjectCopy.remove("duration");
+			this.deadline = dBObjectCopy.getLong("deadline", -1);
+			dBObjectCopy.remove("deadline");
 			
 			if (!dBObjectCopy.isEmpty()){
 				throw new IllegalArgumentException("BasicDBObject not parsed completely");

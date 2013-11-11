@@ -36,7 +36,6 @@ package agents.service_agent;
 import org.bson.types.ObjectId;
 
 import agents.data_classes.MongoSaveable;
-import agents.data_classes.ScheduleData;
 import agents.data_classes.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
@@ -117,8 +116,8 @@ public class ServiceStep implements MongoSaveable {
 	 *            unused.
 	 */
 	public ServiceStep(int serviceId, int type, BasicDBObject parameters, StepStatusCode status,
-			BasicDBObject statusData, ScheduleData scheduleData) {
-		this(null, serviceId, type, parameters, status, statusData, scheduleData);
+			BasicDBObject statusData) {
+		this(null, serviceId, type, parameters, status, statusData);
 	}
 
 	/**
@@ -135,7 +134,7 @@ public class ServiceStep implements MongoSaveable {
 	 *            unused.
 	 */
 	public ServiceStep(ObjectId productStepId, int serviceId, int type, BasicDBObject parameters,
-			StepStatusCode status, BasicDBObject statusData, ScheduleData scheduleData) {
+			StepStatusCode status, BasicDBObject statusData) {
 		this.nextServiceStep = null;
 		this.serviceId = serviceId;
 		this.serviceStepType = type;
