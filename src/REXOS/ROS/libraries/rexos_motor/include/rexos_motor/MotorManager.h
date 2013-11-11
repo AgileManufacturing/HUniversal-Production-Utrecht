@@ -77,12 +77,6 @@ namespace rexos_motor{
 		std::vector<StepperMotor*> motors;
 
 		/**
-		 * @var int numberOfMotors
-		 * Number of motors in the pointer array.
-		 **/
-		int numberOfMotors;
-
-		/**
 		 * @var bool poweredOn
 		 * Stores whether the motor manager has been turned on.
 		 **/

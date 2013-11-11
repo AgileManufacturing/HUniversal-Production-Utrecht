@@ -142,7 +142,9 @@ namespace rexos_delta_robot{
 			height(0), 
 			depth(0), 
 			boundariesBitmap(NULL), 
-			kinematics(model),  
+			kinematics(model), 
+			motors(motors), 
+			deltaRobotMeasures(deltaRobotMeasures), 
 			voxelSize(voxelSize) { }
 
     EffectorBoundaries::~EffectorBoundaries(){

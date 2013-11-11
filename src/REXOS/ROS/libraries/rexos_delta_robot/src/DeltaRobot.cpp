@@ -90,6 +90,8 @@ namespace rexos_delta_robot{
 		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_2, *stepperMotorProperties));
 
 		motorManager = new rexos_motor::MotorManager(modbus, motors);
+
+        kinematics = new InverseKinematics(*deltaRobotMeasures);
     }
 
     /**

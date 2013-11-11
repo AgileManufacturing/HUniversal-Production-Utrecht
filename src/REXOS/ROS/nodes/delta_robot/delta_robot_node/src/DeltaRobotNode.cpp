@@ -47,7 +47,7 @@
  **/
 deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID, std::string manufacturer, std::string typeNumber, std::string serialNumber) :
 		rexos_knowledge_database::Module(manufacturer, typeNumber, serialNumber),
-		//rexos_statemachine::ModuleStateMachine("delta_robot_node",equipletID, moduleID, true),
+		rexos_statemachine::ModuleStateMachine("delta_robot_node",equipletID, moduleID, true),
 		rexos_coordinates::Module(this),
 		deltaRobot(NULL),
 		setInstructionActionServer(nodeHandle, "delta_robot_node/set_instruction", boost::bind(&deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction, this, _1), false),
@@ -208,7 +208,6 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(double x, doub
  **/
 void deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Setup transition called");
-
 	// Generate the effector boundaries with voxel size 2
 	deltaRobot->generateBoundaries(2);
 	// Power on the deltarobot and calibrate the motors.
@@ -218,7 +217,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(rexos_statemachine
 		ROS_ERROR("Calibration FAILED. EXITING.");
 			as->setAborted();
 	} else {
-	as->setSucceeded();
+		as->setSucceeded();
 	}
 }
 
