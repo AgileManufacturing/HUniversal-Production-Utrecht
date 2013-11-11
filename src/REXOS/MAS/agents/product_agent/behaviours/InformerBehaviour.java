@@ -139,8 +139,10 @@ public class InformerBehaviour extends Behaviour {
 							productionStep.setConversationIdForEquiplet(aid,convId);
 							// _parBehaviour.addSubBehaviour(new
 							// Conversation(aid, productionStep, _prodEQmap));
-							_subInformerBehaviours.add(new SubInformerBehaviour(myAgent,this, productionStep, aid));
 							_totalSubinformers++;
+							_subInformerBehaviours.add(new SubInformerBehaviour(myAgent,this, productionStep, aid));
+							
+							
 						}
 					} else {
 						Logger.log(LogLevel.ERROR, "Can't find any equiplets that can execute this production step. Capability: "
@@ -200,16 +202,16 @@ public class InformerBehaviour extends Behaviour {
 	@Override 
 	public void reset() {
 		super.reset();
-	}
-	
-	@Override
-	public void restart(){
-		super.restart();
 		_isDone = false;
 		_isError = false;
 		_isCompleted = false;
 		_subInformersCompleted = 0;
 		_totalSubinformers = 0;
+	}
+	
+	@Override
+	public void restart(){
+		super.restart();
 	}
 
 	/**
@@ -227,7 +229,7 @@ public class InformerBehaviour extends Behaviour {
 	 * @param subBehaviour
 	 */
 	public void callbackSubInformerBehaviour(BehaviourStatus bs,
-			SubInformerBehaviour subBehaviour, InformerBehaviour informerBehaviour) 
+			SubInformerBehaviour subBehaviour ) 
 	{
 		if (bs == BehaviourStatus.COMPLETED) 
 		{
@@ -239,14 +241,14 @@ public class InformerBehaviour extends Behaviour {
 			Logger.log(LogLevel.ERROR, "callbackSubInformerBehaviour ended with error!");
 		}
 		
-		_parBehaviour.removeSubBehaviour(subBehaviour);
+		
 		_currentRunningSubInformerBehaviours--;
 		_subInformersCompleted++;
-		
 		if(_subInformersCompleted == _totalSubinformers) 
 		{
 			_isDone = true;
 		}
-		informerBehaviour.reset();
+		_parBehaviour.removeSubBehaviour(subBehaviour);
+		restart();
 	}
 }

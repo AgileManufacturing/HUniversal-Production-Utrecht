@@ -213,9 +213,9 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 
 	public void startRescheduling() {
 		_productAgent.setStatus(AgentStatus.RESCHEDULING);
-		_plannerBehaviour.restart();
-		_informerBehaviour.restart();
-		_schedulerBehaviour.restart();
+		_plannerBehaviour.reset();
+		_informerBehaviour.reset();
+		_schedulerBehaviour.reset();
 		Logger.log(LogLevel.DEBUG, "Started a RescheduleBehaviour");
 		myAgent.addBehaviour(_rescheduleBehaviour);
 	}
