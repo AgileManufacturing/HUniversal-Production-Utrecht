@@ -12,7 +12,33 @@ insert into ModuleType(
 ("HU", "delta_robot_type_A", "{
 	\"midPointX\" : 75.0,
 	\"midPointY\" : -200.0,
-	\"midPointZ\" : -35.0
+	\"midPointZ\" : -35.0,
+	\"modbusIp\" : \"192.168.0.12\",
+	\"modbusPort\" : 502,
+	\"deltaRobotMeasures\" : {
+		\"baseRadius\" : 101.3,
+		\"hipLength\" : 100.0,
+		\"effectorRadius\" : 46.19,
+		\"ankleLength\" : 250.0,
+		\"hipAnleMaxAngleDegrees\" : 22.0,
+		\"motorFromZeroToTopAngleDegrees\" : 20.0,
+		\"boundaryBoxMinX\" : -200.0,
+		\"boundaryBoxMaxX\" : 200.0,
+		\"boundaryBoxMinY\" : -200.0,
+		\"boundaryBoxMaxY\" : 200.0,
+		\"boundaryBoxMinZ\" : -275.0,
+		\"boundaryBoxMaxZ\" : -180.0
+	}, 
+	\"calibrationBigStepFactor\" : 20,
+	\"stepperMotorProperties\" : {
+		\"motorMinAngleDegrees\" : -18.0,
+		\"motorMaxAngleDegrees\" : 43.0,
+		\"microStepAngleDegrees\" : 0.036,
+		\"minAccelerationDegrees\" : 36,
+		\"maxAccelerationDegrees\" : 36000,
+		\"minSpeedDegrees\" : 0.036,
+		\"maxSpeedDegrees\" : 18000
+	}
 }", 1, "", 1, ""),
 ("HU", "work_plane_type_A", "{
 	\"midPointX\" : 175.0,

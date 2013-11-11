@@ -21,9 +21,9 @@ namespace rexos_coordinates{
 			module(module)
 	{
 		updateTranslationVectors();
+		ROS_INFO_STREAM("rexos_coordinates: Constructed module");
 	}
-	void Module::updateTranslationVectors(){
-		
+	void Module::updateTranslationVectors() {
 		int mountPointX = module->getMountPointX();
 		int mountPointY = module->getMountPointY();
 		
@@ -34,6 +34,8 @@ namespace rexos_coordinates{
 		double midPointX = std::numeric_limits<double>::quiet_NaN();
 		double midPointY = std::numeric_limits<double>::quiet_NaN();
 		double midPointZ = std::numeric_limits<double>::quiet_NaN();
+		ROS_INFO_STREAM(properties);
+		//ROS_INFO_STREAM(jsonNode.write_formatted());
 		for(JSONNode::const_iterator it = jsonNode.begin(); it != jsonNode.end(); it++) {
 			if(it->name() == "midPointX"){
 				midPointX = it->as_float();

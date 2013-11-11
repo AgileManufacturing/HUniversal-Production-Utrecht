@@ -47,7 +47,7 @@ namespace rexos_motor{
 		 * @var double MOTOR_FULL_STEP_IN_DEGREES
 		 * The angle of a single motor full step in degrees
 		 **/
-		const double MOTOR_FULL_STEP_IN_DEGREES = 0.36;
+		//const double MOTOR_FULL_STEP_IN_DEGREES = 0.36;
 
 		/**
 		 * @var double MOTOR_MIN_ACCELERATION

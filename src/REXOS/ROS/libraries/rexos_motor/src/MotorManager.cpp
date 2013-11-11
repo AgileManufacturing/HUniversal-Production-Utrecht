@@ -43,7 +43,7 @@ namespace rexos_motor{
 	 **/
 	void MotorManager::powerOn(void){
 		if(!poweredOn){
-			for(int i = 0; i < numberOfMotors; ++i){
+			for(int i = 0; i < motors.size(); ++i){
 				motors[i]->powerOn();
 			}
 		}
@@ -55,7 +55,7 @@ namespace rexos_motor{
 	 **/
 	void MotorManager::powerOff(void){
 		if(poweredOn){
-			for(int i = 0; i < numberOfMotors; ++i){
+			for(int i = 0; i < motors.size(); ++i){
 				motors[i]->powerOff();
 			}
 		}

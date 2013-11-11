@@ -38,7 +38,11 @@
 #include <rexos_motor/MotorInterface.h>
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/MotorManager.h>
+#include <rexos_motor/StepperMotorProperties.h>
+#include <rexos_datatypes/DeltaRobotMeasures.h>
 #include <rexos_delta_robot/EffectorBoundaries.h>
+
+#include <vector>
 
 namespace rexos_delta_robot{
 	class InverseKinematicsModel;
@@ -47,8 +51,10 @@ namespace rexos_delta_robot{
 	 **/
 	class DeltaRobot{
 	public:
-		DeltaRobot(rexos_datatypes::DeltaRobotMeasures& deltaRobotMeasures, rexos_motor::MotorManager* motorManager, rexos_motor::StepperMotor* (&motors)[3], modbus_t* modbusIO);
+		DeltaRobot(JSONNode node);
 		~DeltaRobot();
+		
+		void readJSONNode(JSONNode node);
 
 		/**
 		 * Gets the EffectorBoundaries of the deltarobot.
@@ -80,11 +86,15 @@ namespace rexos_delta_robot{
 		 **/
 		InverseKinematicsModel* kinematics;
 
+		rexos_datatypes::DeltaRobotMeasures* deltaRobotMeasures;
+		rexos_motor::StepperMotorProperties* stepperMotorProperties;
+	
+		int calibrationBigStepFactor;
 		/**
 		 * @var StepperMotor* motors
 		 * An array holding pointers to the three StepperMotors that are connected to the DeltaRobot. This array HAS to be of size 3.
 		 **/
-		rexos_motor::StepperMotor* (&motors)[3];
+		std::vector<rexos_motor::StepperMotor*> motors;
 
 		/**
 		 * @var MotorManager* motorManager
@@ -110,11 +120,19 @@ namespace rexos_delta_robot{
 		 **/
 		bool boundariesGenerated;
 
+		std::string modbusIp;
+		int modbusPort;
 		/**
 		 * @var modbus_t* modbusIO
 		 * A pointer to the TCP modbus connection for the IO controller.
 		 **/
 		modbus_t* modbusIO;
+		/**
+		 *
+		 * @var ModbusController::ModbusController* modbus
+		 * the modbuscontroller
+		 **/
+		rexos_modbus::ModbusController* modbus;
 
 		/**
 		 * @var int currentMotionSlot
