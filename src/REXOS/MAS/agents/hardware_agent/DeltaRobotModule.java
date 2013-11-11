@@ -121,11 +121,11 @@ public class DeltaRobotModule extends Module {
 	@Override
 	public EquipletStep[] fillPlaceHolders(EquipletStep[] steps, BasicDBObject parameters) {
 		// get the new position parameters from the parameters
-		double extraSize = 15;
+		double extraSize = 15;	//temp value
 		
-		if(parameters.containsField("extra_size"))
+		if(parameters.containsField("extraSize"))
 		{
-			extraSize = parameters.getDouble("extra_size");
+			extraSize = parameters.getDouble("extraSize");
 		}
 		
 		
