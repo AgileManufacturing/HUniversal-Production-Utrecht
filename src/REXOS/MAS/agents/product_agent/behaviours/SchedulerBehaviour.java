@@ -96,7 +96,7 @@ public class SchedulerBehaviour extends Behaviour {
 	private ArrayList<AID> refusedEquiplets = new ArrayList<AID>();
 	
 	/**
-	 * Construct scheudler behavior
+	 * Construct scheduler behavior
 	 * @param myAgent
 	 * @param bc
 	 */
@@ -170,6 +170,8 @@ public class SchedulerBehaviour extends Behaviour {
 				}
 			}
 		*/
+			
+			// Assuming we have chosen 
 		}
 		catch (Exception e) 
 		{

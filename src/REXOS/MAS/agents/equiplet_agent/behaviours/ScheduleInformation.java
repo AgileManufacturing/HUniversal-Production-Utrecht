@@ -74,16 +74,42 @@ public class ScheduleInformation extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
-				//TODO: Make the lock optional by extra arguments in the message
-				ScheduleLock scheduleLock = equipletAgent.getScheduleLock();
-				boolean haveLock = scheduleLock.acquireScheduleLock(message.getSender());
+				ACLMessage response = message.createReply();
 				
-				if(haveLock){
-					//send agree message according to the FIPA standard
-					ACLMessage response = message.createReply();
-					response.setPerformative(ACLMessage.AGREE);
-					response.setOntology("ScheduleInformation");
-					equipletAgent.send(response);
+				if(message.getContent() == "lock") {
+					ScheduleLock scheduleLock = equipletAgent.getScheduleLock();
+					boolean haveLock = scheduleLock.acquireScheduleLock(message.getSender());
+					
+					if(haveLock){
+						//send agree message according to the FIPA standard
+						response.setPerformative(ACLMessage.AGREE);
+						equipletAgent.send(response);
+						
+						EquipletScheduleInformation scheduleInformation = new EquipletScheduleInformation();
+						BlackboardClient planningBlackboard = equipletAgent.getPlanningBBClient();
+						
+						//TODO: Improve this, build a mechanism that will always provide up to date schedule information
+						//without having to get all the data every time from the blackboard
+						List<DBObject> results =  planningBlackboard.findDocuments(new BasicDBObject());
+						for (DBObject result : results){
+							ProductStepSchedule prodSchedule = new ProductStepSchedule((BasicDBObject) result);
+						}
+						// get schedule and calculate load
+						double load = 50.0d;
+						scheduleInformation.setLoad(load);
+						
+						//message the questioning agent with the equiplet's schedule
+						response = message.createReply();
+						response.setPerformative(ACLMessage.INFORM);
+						response.setContentObject(scheduleInformation);
+					}				
+					// schedule is locked, send refuse message
+					else {
+						response.setPerformative(ACLMessage.REFUSE);
+					}
+				} else {
+					// Don't lock the the schedule, just get and send it
+					response.setPerformative(ACLMessage.INFORM);
 					
 					EquipletScheduleInformation scheduleInformation = new EquipletScheduleInformation();
 					BlackboardClient planningBlackboard = equipletAgent.getPlanningBBClient();
@@ -98,21 +124,11 @@ public class ScheduleInformation extends ReceiveBehaviour {
 					double load = 50.0d;
 					scheduleInformation.setLoad(load);
 					
-					//message the questioning agent with the equiplet's schedule
-					response = message.createReply();
-					response.setPerformative(ACLMessage.INFORM);
-					response.setOntology("ScheduleInformation");
 					response.setContentObject(scheduleInformation);
-					equipletAgent.send(response);
 				}
 				
-				// schedule is locked, send refuse message
-				else {
-					ACLMessage refuseResponse = new ACLMessage(ACLMessage.REFUSE);
-					refuseResponse.addReceiver(message.getSender());
-					refuseResponse.setOntology("ScheduleInformation");
-					equipletAgent.send(refuseResponse);
-				}
+				// Send the response
+				equipletAgent.send(response);
 			} catch (IOException | InvalidDBNamespaceException | GeneralMongoException e) {
 				e.printStackTrace();
 			}
