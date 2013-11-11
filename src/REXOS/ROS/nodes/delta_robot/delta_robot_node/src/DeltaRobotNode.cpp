@@ -48,8 +48,6 @@
  **/
 #define MODBUS_PORT 502
 
-#define Z_OFFSET 0
-
 /**
  * Constructor 
  * @param equipletID identifier for the equiplet
@@ -330,12 +328,11 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
 			lastY = p.y;
 			ySet = true;
 		} else if(node_name == "z") {
-			p.z = i->as_float() + Z_OFFSET;
+			p.z = i->as_float();
 			lastZ = p.z;
 		} else if(node_name == "maxAcceleration"){
 			p.maxAcceleration = i->as_float();
 		}
-
 		++i;
 	}
 

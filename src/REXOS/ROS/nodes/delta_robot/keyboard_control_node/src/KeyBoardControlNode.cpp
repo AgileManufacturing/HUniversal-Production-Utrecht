@@ -60,7 +60,7 @@ KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp) :
 	currentXPos(0.0),
 	currentYPos(0.0),
 	currentZPos(0.0),
-	maxAcceleration("50.15") {
+	maxAcceleration("50.00") {
 
 	ROS_INFO("Constructing");
 
