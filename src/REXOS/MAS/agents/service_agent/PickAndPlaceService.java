@@ -75,7 +75,7 @@ public class PickAndPlaceService extends Service {
 	 * @var int CRATE_HEIGHT
 	 * A static value that contains the height of the crate.
 	 */
-	private static final int CRATE_HEIGHT = 20;
+	private static final int CRATE_HEIGHT = 15;
 	
 	/**
 	 * @see agents.service_agent.Service#canDoStep(int,
