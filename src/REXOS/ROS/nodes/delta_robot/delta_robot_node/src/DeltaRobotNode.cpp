@@ -60,8 +60,6 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 	std::string properties = this->getModuleProperties();
 	std::string typeProperties = moduleType->getModuleTypeProperties();
 	
-	rexos_knowledge_database::ModuleType* moduleType = this->getModuleType();
-	std::string properties = moduleType->getModuleTypeProperties();
 	JSONNode jsonNode = libjson::parse(properties);
 	JSONNode typeJsonNode = libjson::parse(typeProperties);
 	jsonNode.push_back(typeJsonNode);
