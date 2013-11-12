@@ -57,9 +57,9 @@ void KeyBoardControlNode::quit(int sig){
 }
 
 KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp) :
-	currentXPos(0.0),
-	currentYPos(0.0),
-	currentZPos(0.0),
+	currentXPos(240.0),
+	currentYPos(-175.0),
+	currentZPos(-360.0),
 	maxAcceleration("50.0") {
 
 	ROS_INFO("Constructing");
@@ -157,8 +157,6 @@ void KeyBoardControlNode::writeToBlackBoard(std::string x, std::string y, std::s
 	std::map<std::string, std::string> look_up_parameters;
 	std::map<std::string, std::string> payload;
 
-	look_up_parameters.insert(pair<string, string>("ID", "RELATIVE-TO-PLACEHOLDER"));
-
 	if(!x.empty()) {
 		payload.insert(pair<string, string>("x", x));
 	}
@@ -175,7 +173,7 @@ void KeyBoardControlNode::writeToBlackBoard(std::string x, std::string y, std::s
 		payload.insert(pair<string, string>("maxAcceleration", acceleration));
 	}
 
-	instructionData = new rexos_datatypes::InstructionData("move", "deltarobot", "FIND_ID", 
+	instructionData = new rexos_datatypes::InstructionData("move", "deltarobot", "", 
             look_up_parameters, payload);
 
 	if(equipletStepBlackboardClient->insertDocument(instructionData->toJSONString())) {
