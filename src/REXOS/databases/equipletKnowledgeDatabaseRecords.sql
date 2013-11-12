@@ -13,7 +13,7 @@ insert into ModuleType(
 	\"midPointX\" : 75.0,
 	\"midPointY\" : -200.0,
 	\"midPointZ\" : -35.0,
-	\"modbusIp\" : \"192.168.0.12\",
+	\"modbusIp\" : \"192.168.0.22\",
 	\"modbusPort\" : 502,
 	\"deltaRobotMeasures\" : {
 		\"baseRadius\" : 101.3,
@@ -26,13 +26,13 @@ insert into ModuleType(
 		\"boundaryBoxMaxX\" : 200.0,
 		\"boundaryBoxMinY\" : -200.0,
 		\"boundaryBoxMaxY\" : 200.0,
-		\"boundaryBoxMinZ\" : -275.0,
+		\"boundaryBoxMinZ\" : -330.0,
 		\"boundaryBoxMaxZ\" : -180.0
 	}, 
 	\"calibrationBigStepFactor\" : 20,
 	\"stepperMotorProperties\" : {
 		\"motorMinAngleDegrees\" : -18.0,
-		\"motorMaxAngleDegrees\" : 43.0,
+		\"motorMaxAngleDegrees\" : 80.0,
 		\"microStepAngleDegrees\" : 0.036,
 		\"minAccelerationDegrees\" : 36,
 		\"maxAccelerationDegrees\" : 36000,
@@ -65,6 +65,6 @@ insert into Module(
 ("The_Imaging_Source_Europe_GmbH", "DFK_22AUC03", "26210035", 3, 2, null, null, null, ""),
 ("The_Imaging_Source_Europe_GmbH", "Cheap_ass_lens", "1", 6, 4, "The_Imaging_Source_Europe_GmbH", "DFK_22AUC03", "26210035", ""),
 ("HU", "delta_robot_type_A", "1", 3, 2, null, null, null, ""),
-("HU", "work_plane_type_A", "1", 3, 2, null, null, null, "");
+("HU", "work_plane_type_A", "1", 1, 10, null, null, null, "");
 
 
