@@ -13,8 +13,6 @@ insert into ModuleType(
 	\"midPointX\" : 75.0,
 	\"midPointY\" : -200.0,
 	\"midPointZ\" : -35.0,
-	\"modbusIp\" : \"192.168.0.12\",
-	\"modbusPort\" : 502,
 	\"deltaRobotMeasures\" : {
 		\"baseRadius\" : 101.3,
 		\"hipLength\" : 100.0,

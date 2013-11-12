@@ -17,6 +17,7 @@ ModuleStateMachine::ModuleStateMachine(std::string moduleName, int equipletId, i
 ,moduleId(moduleId)
 ,equipletId(equipletId)
 ,actorModule(actorModule)
+,bond(NULL)
 {
 	std::string moduleNamespaceName = moduleName + "_" + std::to_string(equipletId) + "_" + std::to_string(moduleId);
 	std::string equipletNamespaceName = "equiplet_" + std::to_string(equipletId);
@@ -35,6 +36,14 @@ ModuleStateMachine::ModuleStateMachine(std::string moduleName, int equipletId, i
 	changeStateNotificationClient = nodeHandle.serviceClient<rexos_statemachine_srvs::StateUpdate>(equipletNamespaceName + "/" + moduleNamespaceName + "/state_update");
 	changeModeNotificationClient = nodeHandle.serviceClient<rexos_statemachine_srvs::ModeUpdate>(equipletNamespaceName + "/" + moduleNamespaceName + "/mode_update");
 	setListener(this);
+	
+	ROS_ERROR_STREAM("binding A on " << (moduleName + "/bond")<< " id " << std::to_string(moduleId));
+	bond = new bond::Bond(moduleName + "/bond", std::to_string(moduleId));
+	bond->start();
+}
+
+ModuleStateMachine::~ModuleStateMachine(){
+	delete bond;
 }
 
 void ModuleStateMachine::onStateChanged() {

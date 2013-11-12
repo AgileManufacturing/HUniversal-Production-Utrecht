@@ -104,7 +104,7 @@ namespace rexos_delta_robot{
         delete kinematics;
     }
     
-	void DeltaRobot::readJSONNode(JSONNode node){
+	void DeltaRobot::readJSONNode(const JSONNode node) {
 		for(JSONNode::const_iterator it = node.begin(); it != node.end(); it++) {
 			if(it->name() == "modbusIp"){
 				modbusIp = it->as_string();
@@ -137,7 +137,7 @@ namespace rexos_delta_robot{
      *
      * @param voxelSize The size in millimeters of a side of a voxel in the boundaries.
      **/
-    void DeltaRobot::generateBoundaries(double voxelSize){
+    void DeltaRobot::generateBoundaries(double voxelSize) {
 		boundaries = EffectorBoundaries::generateEffectorBoundaries((*kinematics), deltaRobotMeasures, motors, voxelSize);
 		boundariesGenerated = true;
     }
@@ -150,7 +150,7 @@ namespace rexos_delta_robot{
      *
      * @return If the angle is valid for the motor.
      **/
-    bool DeltaRobot::isValidAngle(int motorIndex, double angle){
+    bool DeltaRobot::isValidAngle(int motorIndex, double angle) {
         assert(motorIndex >= 0 && motorIndex < 3);
         return angle > motors[motorIndex]->getMinAngle() && angle < motors[motorIndex]->getMaxAngle();
     }

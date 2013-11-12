@@ -55,18 +55,19 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 		lastY(0.0),
 		lastZ(-180.0){
 	ROS_INFO("DeltaRobotnode Constructor entering...");
-
-	ROS_INFO("Configuring Modbus...");
-
-	ROS_INFO("Advertising ActionServer at : delta_robot_node_1_1");
-
+	// get the properties and combine them for the deltarobot
 	rexos_knowledge_database::ModuleType* moduleType = this->getModuleType();
-	std::string properties = moduleType->getModuleTypeProperties();
+	std::string properties = this->getModuleProperties();
+	std::string typeProperties = moduleType->getModuleTypeProperties();
+	
 	JSONNode jsonNode = libjson::parse(properties);
-
+	JSONNode typeJsonNode = libjson::parse(typeProperties);
+	jsonNode.push_back(typeJsonNode);
+	
 	// Create a deltarobot
 	deltaRobot = new rexos_delta_robot::DeltaRobot(jsonNode);
 
+	ROS_INFO("Advertising ActionServer at : delta_robot_node_1_1");
 	setInstructionActionServer.start();
 	ROS_INFO("DeltaRobot Node initialized");
 }
