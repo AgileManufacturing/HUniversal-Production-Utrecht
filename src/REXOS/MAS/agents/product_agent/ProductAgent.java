@@ -108,8 +108,9 @@ public class ProductAgent extends Agent {
 	/**
 	 * Loads the arguments passed to the product agent
 	 */
-	private void loadArguments() throws IllegalArgumentException {
+	private void loadArguments() throws IllegalArgumentException{
 		// Get the arguments passed to the ProductAgent
+		System.out.println("LOADING ARGUMENTS");
 		Object[] args = this.getArguments();
 		// Check if there are any arguments. If there aren't any there is a
 		// problem. We need atleast one arguments for the product
@@ -119,7 +120,7 @@ public class ProductAgent extends Agent {
 			// Check if the arguments is a string (so we can assume it's JSON)
 			// or if it's a known object
 			if (args[0].getClass() == String.class) {
-				try {
+				try{
 					// Change the incoming JSON message to also implement the
 					// host to connect to.
 					JsonParser parser = new JsonParser();
@@ -147,8 +148,31 @@ public class ProductAgent extends Agent {
 						JsonElement parameterObject = ele.get("parameters");
 						String parameters = parameterObject.toString();
 
+					//	System.out.println(parameters);
+						BasicDBObject DBParameters = (BasicDBObject) JSON.parse(parameters);
+						BasicDBObject positionParameters =(BasicDBObject)((BasicDBObject)((BasicDBObject)DBParameters.get("parameterGroups")).get("loc")).get("parameters");
+						//make sure the x, y and z values are doubles
+						//convert them when needed						
+						if (positionParameters.containsField("x")){
+							BasicDBObject xval = (BasicDBObject) positionParameters.get("x");
+							Double newXval = convertInputParameterToDouble(xval.get("value"));
+							xval.put("value", newXval);
+						}
+						
+						if(positionParameters.containsField("y")){
+							BasicDBObject yval = (BasicDBObject) positionParameters.get("y");
+							Double newYval = convertInputParameterToDouble(yval.get("value"));
+							yval.put("value", newYval);
+						}
+						
+						if(positionParameters.containsField("z")){
+							BasicDBObject zval = (BasicDBObject) positionParameters.get("z");
+							Double newZval = convertInputParameterToDouble(zval.get("value"));
+							zval.put("value", newZval);
+						}
+						
 						step = new ProductionStep(id, capability,
-								(BasicDBObject) JSON.parse(parameters));
+								DBParameters);
 
 						stepList.add(step);
 					}
@@ -164,8 +188,9 @@ public class ProductAgent extends Agent {
 					pap.setProduct(product);
 
 					this._properties = pap;
-				} catch (Exception e) {
-					Logger.log(LogLevel.ERROR, "[temp] gotta catch 'em all!", e);
+				}catch(NullPointerException | IllegalArgumentException e){
+					Logger.log(LogLevel.ERROR, "Error when parsing the arguments");
+					e.printStackTrace();
 				}
 			} else if (args[0].getClass() == ProductAgentProperties.class) {
 				this._properties = (ProductAgentProperties) args[0];
@@ -175,6 +200,30 @@ public class ProductAgent extends Agent {
 		}
 	}
 
+	/**
+	 * 
+	 * @param input
+	 * @return
+	 * @throws IllegalArgumentException 
+	 */
+	private Double convertInputParameterToDouble(Object input) throws IllegalArgumentException{
+		double result = 0.0;
+		if ( input instanceof String){
+			try{
+				result = Double.parseDouble((String)input);
+			}catch(NumberFormatException e){
+				throw new IllegalArgumentException("Could not parse input position string to double");
+			}
+		}
+		else if (input instanceof Integer){
+			result = (int) input;
+		}
+		else{
+			throw new IllegalArgumentException("Could not parse input position object to double");
+		}
+		return result;
+	}
+	
 	/*
 	 * Generates a unique conversation id based on the agents localname, the
 	 * objects hashcode and the current time.
