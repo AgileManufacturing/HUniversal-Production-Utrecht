@@ -117,6 +117,7 @@ public class ScheduleInformation extends ReceiveBehaviour {
 					//TODO: Improve this, build a mechanism that will always provide up to date schedule information
 					//without having to get all the data every time from the blackboard
 					List<DBObject> results =  planningBlackboard.findDocuments(new BasicDBObject());
+					
 					for (DBObject result : results){
 						ProductStepScheduleData prodSchedule = new ProductStepScheduleData((BasicDBObject) result);
 					}

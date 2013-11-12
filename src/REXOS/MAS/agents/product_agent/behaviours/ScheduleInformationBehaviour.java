@@ -99,7 +99,6 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
-				System.out.println("MESSAGE PERF: " + message.getPerformative());
 				if (message.getPerformative() == ACLMessage.REFUSE){
 					refusedEquiplets.add(message.getSender());
 					totalFinishedEquiplets ++;

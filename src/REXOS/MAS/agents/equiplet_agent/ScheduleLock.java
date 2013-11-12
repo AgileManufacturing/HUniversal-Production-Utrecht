@@ -62,7 +62,7 @@ public class ScheduleLock {
 	 * @param agent The AID of the agent asking for the lock.
 	 * @return True if the lock is given or already had the lock, false if the lock is not given
 	 */
-	public synchronized boolean acquireScheduleLock(AID agent){
+	public boolean acquireScheduleLock(AID agent){
 		if (this.lockGivenTo.equals(agent)){
 			return true;
 		}
@@ -81,7 +81,7 @@ public class ScheduleLock {
 	 * @return True if the lock is succesfully released or was already released, 
 	 * 		   false if the asker is not the current owner 
 	 */
-	public synchronized boolean releaseLock(AID agent){
+	public boolean releaseLock(AID agent){
 		if (!scheduleLock){
 			return true;
 		}
@@ -97,7 +97,7 @@ public class ScheduleLock {
 	 * Gets the current owner of the lock, don't use this to get the current lock owner to release the lock
 	 * @return the AID of the current lockowner, null if there is no current owner.
 	 */
-	public synchronized AID getCurrentOwnerOfLock(){
+	public AID getCurrentOwnerOfLock(){
 		if (scheduleLock){
 			return lockGivenTo;
 		}

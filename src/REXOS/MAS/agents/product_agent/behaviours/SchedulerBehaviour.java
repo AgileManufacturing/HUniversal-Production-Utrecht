@@ -64,6 +64,7 @@ import agents.data_classes.Production;
 import agents.data_classes.ProductionEquipletMapper;
 import agents.data_classes.ProductionStep;
 import agents.data_classes.StepStatusCode;
+import agents.equiplet_agent.NextProductStepTimer;
 import agents.product_agent.BehaviourCallback;
 import agents.product_agent.ProductAgent;
 
@@ -196,15 +197,25 @@ public class SchedulerBehaviour extends Behaviour {
 			//we have our scheduleinformation
 			//now start the logic to choose the equiplets
 			
-			//TODO: current logic is to choose the first equiplet. improve it.
-			//TODO: ALso the logic currently only expects one kind of product step, 
-			//it does not support multiple kinds of steps
+			//TODO: choose EQ on base of load
 			AID chosenEquiplet = equipletSchedules.keySet().iterator().next();
+			
+			//int[][] productStepCapabilityMatrix
+			
 			ProductionEquipletMapper timeslotsForProductStep = productAgent.getProduct().getProduction().getProductionEquipletMapping();
 			for ( ProductionStep productStep : productionSteps){
+				
 				productStep.setUsedEquiplet(chosenEquiplet);
 				long duration = timeslotsForProductStep.getTimeSlotsForEquiplet(productStep.getId(), chosenEquiplet);
+				long startTime = System.currentTimeMillis();
+				//start schedule function with productstep, equiplet, duration and starttime 
+				//iterate starttime
 				
+				
+				// gets the timedata for synchronizing from the collective blackboard.
+				//BasicDBObject timeData = (BasicDBObject) collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
+				// initiates the timer to the next product step.
+				//timer = new NextProductStepTimer(timeData.getLong("firstTimeSlot"), timeData.getInt("timeSlotLength"), this);
 			}
 			
 			
