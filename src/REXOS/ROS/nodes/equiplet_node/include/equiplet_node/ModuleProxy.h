@@ -61,6 +61,7 @@ private:
 	bool onStateChangeServiceCallback(StateUpdateRequest &req, StateUpdateResponse &res);
 	bool onModeChangeServiceCallback(ModeUpdateRequest &req, ModeUpdateResponse &res);
 	void onInstructionServiceCallback(const actionlib::SimpleClientGoalState& state, const rexos_statemachine::SetInstructionResultConstPtr& result);
+	void onModuleDied();
 
 	int moduleId;
 

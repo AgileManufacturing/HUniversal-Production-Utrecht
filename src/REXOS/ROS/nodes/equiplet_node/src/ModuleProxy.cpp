@@ -8,7 +8,10 @@
 #include "equiplet_node/ModuleProxy.h"
 
 namespace equiplet_node {
-
+void aap(){
+	
+}
+	
 ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleName, int equipletId, int moduleId, ModuleProxyListener* mpl):
 	moduleNodeName(moduleName + "_" + std::to_string(equipletId) + "_" + std::to_string(moduleId)),
 	changeStateActionClient(nodeHandle, moduleNodeName + "/change_state"),
@@ -27,10 +30,15 @@ ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleName, i
 	modeUpdateServiceServer = nodeHandle.advertiseService(
 			equipletNodeName + "/" + moduleNodeName + "/mode_update",
 			&ModuleProxy::onModeChangeServiceCallback, this);
+	
+	ROS_ERROR_STREAM("binding B on " << (moduleName + "/bond")<< " id " << std::to_string(moduleId));
 	bond = new bond::Bond(moduleName + "/bond", std::to_string(moduleId));
+	bond->setBrokenCallback(&aap);
+	bond->start();
 }
 
 ModuleProxy::~ModuleProxy() {
+	delete bond;
 	// TODO Auto-generated destructor stub
 }
 

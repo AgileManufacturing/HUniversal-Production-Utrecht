@@ -1,7 +1,5 @@
 package gatewayserver;
 
-
-
 import jade.cli.CLICommand;
 import jade.cli.CLIManager;
 import jade.core.ContainerID;
@@ -11,7 +9,6 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.FIPAException;
 import jade.domain.FIPAService;
 import jade.lang.acl.ACLMessage;
-
 import java.util.Properties;
 import java.util.Vector;
 
@@ -24,8 +21,6 @@ public class CommandAgent extends CLICommand {
 		this.json = json;
 		this.productAgentID = productAgentID;
 	}
-	
-	
 
 	@Override
 	public Behaviour getBehaviour(final Properties pp) throws IllegalArgumentException {
@@ -40,7 +35,7 @@ public class CommandAgent extends CLICommand {
 				jade.domain.JADEAgentManagement.CreateAgent ca = new jade.domain.JADEAgentManagement.CreateAgent();
 				ca.setAgentName(productAgentID);
 				ca.setClassName("agents.product_agent.ProductAgent");
-				ca.setContainer(new ContainerID("Main-Container", null));
+				ca.setContainer(new ContainerID("GridAgents", null));
 				ca.addArguments(json);
 				
 				

@@ -80,9 +80,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 	sleep(1);
 
 	equipletStateBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_STATE);
-
-
-
+	
 	std::cout << "Connected equiplet_node." << std::endl;
 }
 

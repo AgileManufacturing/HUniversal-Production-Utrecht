@@ -99,4 +99,8 @@ void ModuleRegistry::onInstructionStepCompleted(
 	}
 }
 
+void ModuleRegistry::onModuleDied(ModuleProxy* moduleProxy){
+	ROS_WARN("Module has died! :(");
+}
+
 } /* namespace equiplet_node */
