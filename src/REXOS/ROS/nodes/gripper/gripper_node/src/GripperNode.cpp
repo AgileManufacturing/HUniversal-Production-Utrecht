@@ -29,7 +29,7 @@
 
 #include "gripper_node/GripperNode.h"
 #include "rexos_utilities/Utilities.h"
- #include <boost/bind.hpp>
+#include <boost/bind.hpp>
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "GripperNode"
@@ -38,7 +38,7 @@
 /**
  * The IP of the modbus we are connecting to
  **/
-#define MODBUS_IP "192.168.0.2"
+#define MODBUS_IP "192.168.0.22"
 /**
  * The port we are connecting to
  **/
@@ -49,27 +49,30 @@
  **/
 GripperNode::GripperNode(int equipletID, int moduleID) :
 	rexos_statemachine::ModuleStateMachine("gripper_node", equipletID, moduleID, true),
-	setInstructionActionServer(nodeHandle, "gripper_node/set_instruction", boost::bind(&GripperNode::onSetInstruction, this, _1), false) {
+	moduleNodeName("gripper_node_" + std::to_string(equipletID) + "_" + std::to_string(moduleID)),
+	setInstructionActionServer(nodeHandle, moduleNodeName + "/set_instruction", boost::bind(&GripperNode::onSetInstruction, this, _1), false) {
+	
+	ROS_INFO("[DEBUG] Opening modbus connection");
+	
+	modbusContext = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
 
-	std::cout << "[DEBUG] Opening modbus connection" << std::endl;
+	if (modbusContext == NULL) {
+		throw std::runtime_error("Unable to allocate libmodbus context");
+	}
 
-	/*
-		modbusContext = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
+	if (modbus_connect(modbusContext) == -1) {
+		throw std::runtime_error("Modbus connection to IO controller failed");
+	}
 
-		if (modbusContext == NULL) {
-			throw std::runtime_error("Unable to allocate libmodbus context");
-		}
+	assert(modbusContext != NULL);
 
-		if (modbus_connect(modbusContext) == -1) {
-			throw std::runtime_error("Modbus connection to IO controller failed");
-		}
+	modbus = new rexos_modbus::ModbusController(modbusContext);
+	controller = new rexos_gripper::InputOutputController(modbus);
+	gripper = new rexos_gripper::Gripper(controller, this, wrapperForGripperError);
 
-		assert(modbusContext != NULL);
+	setInstructionActionServer.start();
 
-		modbus = new rexos_modbus::ModbusController(modbusContext);
-		controller = new rexos_gripper::InputOutputController(modbus);
-		gripper = new rexos_gripper::Gripper(controller, this, wrapperForGripperError);
-	*/
+	ROS_INFO_STREAM("GripperNode initialized. Advertising actionserver on " << moduleNodeName << "/set_instruction");
 }
 
 GripperNode::~GripperNode() {
@@ -83,31 +86,30 @@ void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalC
 	JSONNode instructionDataNode = libjson::parse(goal->json);
 	rexos_statemachine::SetInstructionResult result_;
 	result_.OID = goal->OID;
+    ROS_INFO_STREAM("Received msg " << instructionDataNode.write_formatted());
 
     JSONNode::const_iterator i = instructionDataNode.begin();
-
     while (i != instructionDataNode.end()){
 
         const char * nodeName = i -> name().c_str();
+        std::cout << nodeName << std::endl;
 
 		if(strcmp(nodeName, "command") == 0) {
-			std::string value = parseNodeValue("command", *i);
-
-			if(strcmp(value.c_str(), "activate") == 0) {
+			if(strcmp(i->as_string().c_str(), "activate") == 0) {
 				std::cout << "Activating gripper" << std::endl;
 				gripper->grab();
 				setInstructionActionServer.setSucceeded(result_);
 				return;
-			} else if(strcmp(value.c_str(), "deactivate") == 0) {
+			} else if(strcmp(i->as_string().c_str(), "deactivate") == 0) {
 				std::cout << "Deactivating gripper" << std::endl;
 				gripper->release();
 				setInstructionActionServer.setSucceeded(result_);
 				return;
 			}
 		}
+
     	++i;
 	}
-
 	std::cout << "Failed setting gripper" << std::endl;
 	setInstructionActionServer.setAborted(result_);
 }
@@ -196,23 +198,6 @@ bool GripperNode::grip(gripper_node::Grip::Request &req, gripper_node::Grip::Res
 bool GripperNode::release(gripper_node::Release::Request &req, gripper_node::Release::Response &res) {
 	return gripper->release();
 }
-
-std::string GripperNode::parseNodeValue(const std::string nodeName, const JSONNode & n){
-	JSONNode::const_iterator i = n.begin();
-	std::string result;
-	while(i != n.end()) {
-		// get the JSON node name and value as a string
-		std::string node_name = i->name();
-
-		if(node_name == nodeName) {
-			result = i->as_string();
-		} 
-
-		++i;
-	}
-	return result;
-}
-
 /**
  * Main that starts the gripper node and its statemachine.
  **/

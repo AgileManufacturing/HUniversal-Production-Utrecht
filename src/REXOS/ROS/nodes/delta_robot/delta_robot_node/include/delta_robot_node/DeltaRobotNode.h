@@ -48,8 +48,6 @@
 #include <actionlib/server/simple_action_server.h>
 #include <rexos_statemachine/SetInstructionAction.h>
 
-#include <string>
-
 // GCC system header to suppress libjson warnings
 #pragma GCC system_header
 #include <libjson/libjson.h>
@@ -101,6 +99,7 @@ namespace deltaRobotNodeNamespace{
 		float lastX;
 		float lastY;
 		float lastZ;
+		std::string moduleNodeName;
 		/**
 		 * @var ros::NodeHandle node
 		 * The nodeHandle used by ros services and topics

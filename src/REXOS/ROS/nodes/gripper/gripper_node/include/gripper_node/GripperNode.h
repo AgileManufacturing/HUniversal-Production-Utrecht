@@ -72,8 +72,6 @@ public:
 	bool release(gripper_node::Release::Request &req, gripper_node::Release::Response &res);
 
 	void onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal);
-	std::string parseNodeValue(const std::string nodeName, const JSONNode & n);
-
 private:
 	/**
 	 * @var modbus_t* modbusContext
@@ -82,6 +80,12 @@ private:
 	modbus_t* modbusContext;
 
 
+	std::string moduleNodeName;
+	/**
+	 * @var ros::NodeHandle node
+	 * The nodeHandle used by ros services and topics
+	 **/
+	ros::NodeHandle nodeHandle;
 	SetInstructionActionServer setInstructionActionServer;
 
 	/**

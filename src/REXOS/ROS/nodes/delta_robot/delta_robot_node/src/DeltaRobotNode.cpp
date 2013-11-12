@@ -47,29 +47,36 @@
  **/
 deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID, std::string manufacturer, std::string typeNumber, std::string serialNumber) :
 		rexos_knowledge_database::Module(manufacturer, typeNumber, serialNumber),
-		rexos_statemachine::ModuleStateMachine("delta_robot_node",equipletID, moduleID, true),
+		rexos_statemachine::ModuleStateMachine("delta_robot_node", equipletID, moduleID, true),
 		rexos_coordinates::Module(this),
 		deltaRobot(NULL),
-		setInstructionActionServer(nodeHandle, "delta_robot_node/set_instruction", boost::bind(&deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction, this, _1), false),
+		moduleNodeName("delta_robot_node_" + std::to_string(equipletID) + "_" + std::to_string(moduleID)),
+		setInstructionActionServer(nodeHandle, moduleNodeName + "/set_instruction", boost::bind(&deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction, this, _1), false),
 		lastX(0.0),
 		lastY(0.0),
-		lastZ(-180.0){
+		lastZ(0.0){
 	ROS_INFO("DeltaRobotnode Constructor entering...");
 	// get the properties and combine them for the deltarobot
 	rexos_knowledge_database::ModuleType* moduleType = this->getModuleType();
 	std::string properties = this->getModuleProperties();
 	std::string typeProperties = moduleType->getModuleTypeProperties();
-	
+
+
 	JSONNode jsonNode = libjson::parse(properties);
 	JSONNode typeJsonNode = libjson::parse(typeProperties);
-	jsonNode.push_back(typeJsonNode);
+
+	for(JSONNode::const_iterator it = typeJsonNode.begin(); it != typeJsonNode.end(); it++) {
+		jsonNode.push_back(*it);
+	}
+
+	ROS_INFO(jsonNode.write_formatted().c_str());
 	
 	// Create a deltarobot
 	deltaRobot = new rexos_delta_robot::DeltaRobot(jsonNode);
 
-	ROS_INFO("Advertising ActionServer at : delta_robot_node_1_1");
 	setInstructionActionServer.start();
-	ROS_INFO("DeltaRobot Node initialized");
+
+	ROS_INFO_STREAM("DeltaRobotNode initialized. Advertising actionserver on " << moduleNodeName << "/set_instruction");
 }
 
 
