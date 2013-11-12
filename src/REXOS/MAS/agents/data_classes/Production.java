@@ -58,10 +58,10 @@ public class Production{
 	}
 
 	public Production(ArrayList<ProductionStep> productionSteps)
-			throws Exception{
+			throws NullPointerException{
 		this();
 		if (productionSteps == null)
-			throw new Exception("Production steps can't be null");
+			throw new NullPointerException("Production steps can't be null");
 		this._productionSteps = productionSteps;
 		for(ProductionStep p : this._productionSteps){
 			this._prodEQMap.addProductionStep(p.getId());
