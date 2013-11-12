@@ -50,35 +50,24 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 		rexos_statemachine::ModuleStateMachine("delta_robot_node",equipletID, moduleID, true),
 		rexos_coordinates::Module(this),
 		deltaRobot(NULL),
-		modbus(NULL),
-		motorManager(NULL),
 		setInstructionActionServer(nodeHandle, "delta_robot_node/set_instruction", boost::bind(&deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction, this, _1), false),
 		lastX(0.0),
 		lastY(0.0),
 		lastZ(-180.0){
-	modbusIp = std::string();
-	modbusPort = -1;
-	
-	
-	
 	ROS_INFO("DeltaRobotnode Constructor entering...");
-	
+	// get the properties and combine them for the deltarobot
 	rexos_knowledge_database::ModuleType* moduleType = this->getModuleType();
-	std::string properties = moduleType->getModuleTypeProperties();
+	std::string properties = this->getModuleProperties();
+	std::string typeProperties = moduleType->getModuleTypeProperties();
+	
 	JSONNode jsonNode = libjson::parse(properties);
+	JSONNode typeJsonNode = libjson::parse(typeProperties);
+	jsonNode.push_back(typeJsonNode);
 	
-	
-
-	ROS_INFO("Advertising ActionServer at : delta_robot_node_1_1");
-
-
-
-
-
-
 	// Create a deltarobot
 	deltaRobot = new rexos_delta_robot::DeltaRobot(jsonNode);
 
+	ROS_INFO("Advertising ActionServer at : delta_robot_node_1_1");
 	setInstructionActionServer.start();
 	ROS_INFO("DeltaRobot Node initialized");
 }
@@ -87,11 +76,6 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 
 deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
 	delete deltaRobot;
-	delete motors[0];
-	delete motors[1];
-	delete motors[2];
-	delete modbus;
-	delete motorManager;	
 }
 
 
