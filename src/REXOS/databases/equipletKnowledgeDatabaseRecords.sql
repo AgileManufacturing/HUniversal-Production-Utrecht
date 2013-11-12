@@ -62,10 +62,7 @@ insert into Module(
 ) values 
 ("The_Imaging_Source_Europe_GmbH", "DFK_22AUC03", "26210035", 3, 2, null, null, null, ""),
 ("The_Imaging_Source_Europe_GmbH", "Cheap_ass_lens", "1", 6, 4, "The_Imaging_Source_Europe_GmbH", "DFK_22AUC03", "26210035", ""),
-("HU", "delta_robot_type_A", "1", 3, 2, null, null, null, "{
-	\"modbusIp\" : \"192.168.0.22\",
-	\"modbusPort\" : 502
-}"),
+("HU", "delta_robot_type_A", "1", 3, 2, null, null, null, ""),
 ("HU", "work_plane_type_A", "1", 3, 2, null, null, null, "");
 
 

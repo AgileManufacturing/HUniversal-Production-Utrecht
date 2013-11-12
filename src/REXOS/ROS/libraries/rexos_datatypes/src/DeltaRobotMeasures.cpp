@@ -54,8 +54,8 @@ namespace rexos_datatypes {
 				ROS_INFO_STREAM("found ankleLength " << ankle);
 			
 			} else if(it->name() == "hipAnleMaxAngleDegrees"){
-				maxAngleHipAnkle = it->as_float();
-				ROS_INFO_STREAM("found hipAnleMaxAngleDegrees " << maxAngleHipAnkle);
+				maxAngleHipAnkle = rexos_utilities::degreesToRadians(it->as_float());
+				ROS_INFO_STREAM("found maxAngleHipAnkle " << maxAngleHipAnkle);
 			} else if(it->name() == "motorFromZeroToTopAngleDegrees"){
 				motorFromZeroToTopAngle = rexos_utilities::degreesToRadians(it->as_float());
 				ROS_INFO_STREAM("found motorFromZeroToTopAngle " << motorFromZeroToTopAngle);

@@ -121,6 +121,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	    if (step->getStatus().compare("WAITING") == 0) {
     		handleEquipletStep(step, targetObjectId);
 		}
+		
 	} else if(&subscription == equipletCommandSubscription || &subscription == equipletCommandSubscriptionSet) {
 		ROS_INFO("Received equiplet statemachine command");
     	handleEquipletCommand(libjson::parse(oplogEntry.getUpdateDocument().jsonString()));
@@ -161,7 +162,7 @@ void EquipletNode::handleEquipletStep(rexos_datatypes::EquipletStep * step, mong
 void EquipletNode::handleDirectMoveCommand(rexos_datatypes::EquipletStep * step, mongo::OID targetObjectId){
 		std::cout << "Got an update! : " << directMoveBlackBoardClient->findDocumentById(targetObjectId).jsonString() << std::endl;
 		ModuleProxy *prox = moduleRegistry.getModule(1);
-	    prox->setInstruction(targetObjectId.toString(), step->getInstructionData().getJsonNode());
+	    prox->setInstruction(targetObjectId.toString(), libjson::parse(directMoveBlackBoardClient->findDocumentById(targetObjectId).jsonString()));
 		//still need to remove the step tho
 }
 

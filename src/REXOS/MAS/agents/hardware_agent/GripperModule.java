@@ -90,10 +90,15 @@ public class GripperModule extends Module {
 		movementModule = getModuleFactory().getModuleById(movementModuleId);
 		
 		steps = new ArrayList<EquipletStep>();
+		
+		int crateHeight = 0;
+		if(parameters.containsField("height")){
+			crateHeight = parameters.getInt("height");
+		}
 
 		//get the parameters and put extra values in it.
 		BasicDBObject moveParameters = new BasicDBObject();
-		moveParameters.put("extraSize", GRIPPER_SIZE);
+		moveParameters.put("extraSize", GRIPPER_SIZE + crateHeight);
 		moveParameters.put("position", new Position().toBasicDBObject());
 
 		//get steps from the movementModule to move to the safe movement plane.
@@ -137,12 +142,16 @@ public class GripperModule extends Module {
 		//Get the cratePart from the knowledgeDB -- maybe store crate object instead of string.
 		//actually we have to get the specific crate dimensions etc. WE CAN HARDCODE THIS FOR THE MOMENT!
 		//translate the row/col to X,Y,Z ACCORDING to the crate dimensions.
+		int crateHeight = 0;
+		if(parameters.containsField("height")){
+			crateHeight = parameters.getInt("height");
+		}
 		
 		double crateDimension = 46; // 46mm x 46mm
         double crateSlots = 4;
         double crateSlotDimension = 11.5;
         double crateSlotMidPoint = 5.75;
-        double extraSize = GRIPPER_SIZE;
+        double extraSize = GRIPPER_SIZE + crateHeight;
 		
 		Part part = new Part((BasicDBObject)parameters.get("crate"));
 		Position position = new Position((parameters.getDouble("row") * crateSlotDimension + crateSlotMidPoint) - 23, (parameters.getDouble("column") * crateSlotDimension + crateSlotMidPoint) - 23, 5.0, part);

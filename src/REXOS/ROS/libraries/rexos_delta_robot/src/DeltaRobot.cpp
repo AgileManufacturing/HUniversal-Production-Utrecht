@@ -90,6 +90,8 @@ namespace rexos_delta_robot{
 		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_2, *stepperMotorProperties));
 
 		motorManager = new rexos_motor::MotorManager(modbus, motors);
+
+        kinematics = new InverseKinematics(*deltaRobotMeasures);
     }
 
     /**
@@ -105,10 +107,10 @@ namespace rexos_delta_robot{
 	void DeltaRobot::readJSONNode(const JSONNode node) {
 		for(JSONNode::const_iterator it = node.begin(); it != node.end(); it++) {
 			if(it->name() == "modbusIp"){
-				modbusIp = it->as_float();
+				modbusIp = it->as_string();
 				ROS_INFO_STREAM("found modbusIp " << modbusIp);
 			} else if(it->name() == "modbusPort"){
-				modbusPort = it->as_float();
+				modbusPort = it->as_int();
 				ROS_INFO_STREAM("found modbusPort " << modbusPort);
 			
 			} else if(it->name() == "calibrationBigStepFactor"){
