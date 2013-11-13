@@ -1,0 +1,17 @@
+<project name="schedule" default="build" basedir=".">
+
+	<import file="../build.xml"/>
+
+	<target name="build" depends="data_classes"> 
+		<buildjava dir="${basedir}"/>  
+	</target>
+			
+	<target name="data_classes">
+		<buildjava dir="${basedir}/data_classes"/>  
+	</target>		
+
+	<target name="clean">
+		 <cleanjava dir="${basedir}"/>
+	</target>
+
+</project>

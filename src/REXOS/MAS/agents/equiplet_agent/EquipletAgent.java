@@ -77,6 +77,8 @@ import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.knowledgedb_client.Queries;
 import libraries.knowledgedb_client.Row;
+import libraries.schedule.EquipletSchedule;
+import libraries.schedule.data_classes.Schedule;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
@@ -246,6 +248,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 	private ScheduleLock scheduleLock;
 	
+	private EquipletSchedule equipletSchedule;
+	
 	/**
 	 * Setup function for the equipletAgent. Configures the IP and database name
 	 * of the equiplet. Gets its capabilities from the arguments. Creates its
@@ -258,7 +262,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	@Override
 	public void setup() {
 		try {
-			scheduleLock = new ScheduleLock();
+			
 			
 			equipletDbIp = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbIp", getAID().getLocalName());
 			equipletDbPort = Configuration.getPropertyInt(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbPort", getAID().getLocalName());
@@ -267,6 +271,9 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		 	planningName = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "PlanningBlackBoardName", getAID().getLocalName());
 		 	
 			Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as an equiplet agent.");
+			
+			equipletSchedule = new EquipletSchedule(equipletDbIp, equipletDbPort, true);
+			scheduleLock = new ScheduleLock();
 			
 			communicationTable = new HashMap<String, ObjectId>();
 			behaviours = new ArrayList<Behaviour>();
