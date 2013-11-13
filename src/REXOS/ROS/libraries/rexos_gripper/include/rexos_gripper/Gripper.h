@@ -31,8 +31,9 @@
 #include <rexos_gripper/OutputDevice.h>
 #include <boost/thread.hpp>
 
-namespace rexos_gripper {
+#include <libjson/libjson.h>
 
+namespace rexos_gripper {
 		/**
 		 * Gripper device
 		 * Gripper valve could be overheated. A watchdog is running to check the valve is not opened for too long.
@@ -52,41 +53,43 @@ namespace rexos_gripper {
 			 * Register containing the bit (port) for the gripper device
 			 * TODO: Should be moved into a dynamic location? QRCODE / Database?
 			 **/
-			const static int GRIPPER_MODBUS_ADRESS = 8001;
+			//const static int GRIPPER_MODBUS_ADRESS = 8001;
 
 			/**
 			 * @var static int GRIPPER_DEVICE_PIN
 			 * Pin (port / bit) of the gripper device
 			 * TODO: Should be moved into a dynamic location? QRCODE / Database?
 			 **/
-			const static int GRIPPER_DEVICE_PIN = 0;
+			//const static int GRIPPER_DEVICE_PIN = 0;
 
 			/**
 			 * @var static int GRIPPER_TIME_ENABLED_MAX
 			 * Maximum time for the gripper valve to be opened
 			 **/
-			const static int GRIPPER_TIME_ENABLED_MAX = 60 * 1000;
+			//const static int GRIPPER_TIME_ENABLED_MAX = 60 * 1000;
 
 			/**
 			 * @var static int GRIPPER_TIME_ENABLED_WARNING
 			 * Maximum time before a warning is thrown
 			 **/
-			const static int GRIPPER_TIME_ENABLED_WARNING = 50 * 1000;
+			//const static int GRIPPER_TIME_ENABLED_WARNING = 50 * 1000;
 
 			/**
 			 * @var static int GRIPPER_TIME_COOLDOWN
 			 * Cooldown time for the gripper valve
 			 **/
-			const static int GRIPPER_TIME_COOLDOWN = 3 * 60 * 1000;
+			//const static int GRIPPER_TIME_COOLDOWN = 3 * 60 * 1000;
 
 			/**
 			 * @var static int GRIPPER_TIME_WATCHDOG_INTERVAL
 			 * Watchdog loop interval.
 			 * TODO: tune for optimal performance?
 			 **/
-			const static int GRIPPER_TIME_WATCHDOG_INTERVAL = 100;
+			//const static int GRIPPER_TIME_WATCHDOG_INTERVAL = 100;
 
-			Gripper(InputOutputController* ioController, void* GripperNode, watchdogWarningHandler warningHandler);
+			Gripper(JSONNode node, void* GripperNode, watchdogWarningHandler warningHandler);
+			
+			//InputOutputController* ioController, void* GripperNode, watchdogWarningHandler warningHandler);
 			virtual ~Gripper( );
 
 			void startWatchdog( );
@@ -110,6 +113,13 @@ namespace rexos_gripper {
 			}
 
 		private:
+			void readJSONNode(JSONNode node);
+			
+			int gripperEnabledMax;
+			int gripperEnabledWarning;
+			int gripperEnabledCooldown;
+			int watchdogInterval;
+			
 			/**
 			 * @var boost::thread* watchdogThread
 			 * The thread that checks the watchdog

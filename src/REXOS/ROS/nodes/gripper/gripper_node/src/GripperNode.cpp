@@ -38,23 +38,22 @@
 /**
  * The IP of the modbus we are connecting to
  **/
-#define MODBUS_IP "192.168.0.22"
+//#define MODBUS_IP "192.168.0.22"
 /**
  * The port we are connecting to
  **/
-#define MODBUS_PORT 502
+//#define MODBUS_PORT 502
 
 /**
  * Constructor
  **/
-GripperNode::GripperNode(int equipletID, int moduleID) :
-	rexos_statemachine::ModuleStateMachine("gripper_node", equipletID, moduleID, true),
-	moduleNodeName("gripper_node_" + std::to_string(equipletID) + "_" + std::to_string(moduleID)),
-	setInstructionActionServer(nodeHandle, moduleNodeName + "/set_instruction", boost::bind(&GripperNode::onSetInstruction, this, _1), false) {
+GripperNode::GripperNode(int equipletID, int moduleID, std::string manufacturer, std::string typeNumber, std::string serialNumber) :
+		rexos_knowledge_database::Module(manufacturer, typeNumber, serialNumber),
+		rexos_statemachine::ModuleStateMachine("gripper_node", equipletID, moduleID, true),
+		moduleNodeName("gripper_node_" + std::to_string(equipletID) + "_" + std::to_string(moduleID)),
+		setInstructionActionServer(nodeHandle, moduleNodeName + "/set_instruction", boost::bind(&GripperNode::onSetInstruction, this, _1), false) {
 	
-	ROS_INFO("[DEBUG] Opening modbus connection");
-	
-	modbusContext = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
+	/*modbusContext = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
 
 	if (modbusContext == NULL) {
 		throw std::runtime_error("Unable to allocate libmodbus context");
@@ -67,8 +66,21 @@ GripperNode::GripperNode(int equipletID, int moduleID) :
 	assert(modbusContext != NULL);
 
 	modbus = new rexos_modbus::ModbusController(modbusContext);
-	controller = new rexos_gripper::InputOutputController(modbus);
-	gripper = new rexos_gripper::Gripper(controller, this, wrapperForGripperError);
+	controller = new rexos_gripper::InputOutputController(modbus);*/
+	// get the properties and combine them for the deltarobot
+	rexos_knowledge_database::ModuleType* moduleType = this->getModuleType();
+	std::string properties = this->getModuleProperties();
+	std::string typeProperties = moduleType->getModuleTypeProperties();
+
+
+	JSONNode jsonNode = libjson::parse(properties);
+	JSONNode typeJsonNode = libjson::parse(typeProperties);
+
+	for(JSONNode::const_iterator it = typeJsonNode.begin(); it != typeJsonNode.end(); it++) {
+		jsonNode.push_back(*it);
+	}
+	
+	gripper = new rexos_gripper::Gripper(jsonNode, this, wrapperForGripperError);
 
 	setInstructionActionServer.start();
 
@@ -79,7 +91,7 @@ GripperNode::~GripperNode() {
 	std::cout << "~GripperNode" << std::endl;
 	delete gripper;
 	// Destructor of modbus will close the modbus connection!
-	delete modbus;
+	//delete modbus;
 }
 
 void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
@@ -204,14 +216,14 @@ bool GripperNode::release(gripper_node::Release::Request &req, gripper_node::Rel
 int main(int argc, char** argv) {
 
 	ros::init(argc, argv, NODE_NAME);
-	int equipletID = 0;
-	int moduleID = 0;
 	
-	if (argc < 3) {
-		ROS_INFO("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
+	if(argc < 6){
+		ROS_ERROR("Usage: gripper_node equipletId, moduleId, manufacturer, typeNumber, serialNumber");
 		return -1;
 	}
 
+	int equipletID;
+	int moduleID;
 	try{
 		equipletID = rexos_utilities::stringToInt(argv[1]);
 		moduleID = rexos_utilities::stringToInt(argv[2]);
@@ -219,10 +231,10 @@ int main(int argc, char** argv) {
 		ROS_ERROR("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
 		return -2;
 	}
-
+	
 	std::cout << "Starting gripper node" << std::endl;
 
-	GripperNode gripperNode(equipletID, moduleID);
+	GripperNode gripperNode(equipletID, moduleID, argv[3], argv[4], argv[5]);
 
 	ros::spin();
 	return 0;

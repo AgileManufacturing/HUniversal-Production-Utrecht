@@ -47,6 +47,14 @@ insert into ModuleType(
 	\"bottomRightValue\" : \"_WP_BR\",
 	\"workPlaneWidth\" : 80.0,
 	\"workPlaneHeight\" : 80.0
+}", 1, "", 1, ""), 
+("HU", "gripper_type_A", "{
+	\"modbusAddress\" : 8001,
+	\"modbusDevicePin\" : 0,
+	\"gripperEnabledMaxSeconds\" : 60,
+	\"gripperEnabledWarningSeconds\" : 50,
+	\"gripperEnabledCooldownSeconds\" : 180,
+	\"watchdogInterval\" : 100
 }", 1, "", 1, "");
 
 insert into Module(
@@ -66,6 +74,10 @@ insert into Module(
 	\"modbusIp\" : \"192.168.0.22\",
 	\"modbusPort\" : 502
 }"),
-("HU", "work_plane_type_A", "1", 1, 10, null, null, null, "");
+("HU", "work_plane_type_A", "1", 1, 10, null, null, null, ""),
+("HU", "gripper_type_A", "1", 1, 10, null, null, null, "{
+	\"modbusIp\" : \"192.168.0.22\",
+	\"modbusPort\" : 502
+}");
 
 

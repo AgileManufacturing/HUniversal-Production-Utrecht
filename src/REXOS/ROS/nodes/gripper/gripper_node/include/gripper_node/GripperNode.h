@@ -41,6 +41,7 @@
 #include <rexos_statemachine/ModuleStateMachine.h>
 #include <rexos_statemachine/Transitions.h>
 #include "equiplet_node/RegisterModule.h"
+#include <rexos_knowledge_database/Module.h>
 
 #include <actionlib/server/simple_action_server.h>
 #include <rexos_statemachine/SetInstructionAction.h>
@@ -54,10 +55,11 @@
  **/
 typedef actionlib::SimpleActionServer<rexos_statemachine::SetInstructionAction> SetInstructionActionServer;
 
-class GripperNode : public rexos_statemachine::ModuleStateMachine  {
+class GripperNode : public rexos_statemachine::ModuleStateMachine, 
+		public rexos_knowledge_database::Module {
 public:
 
-	GripperNode(int equipletID, int moduleID);
+	GripperNode(int equipletID, int moduleID, std::string manufacturer, std::string typeNumber, std::string serialNumber);
 	virtual ~GripperNode();
 
 	virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
@@ -77,7 +79,7 @@ private:
 	 * @var modbus_t* modbusContext
 	 * Connection to the IO modbus
 	 **/
-	modbus_t* modbusContext;
+	//modbus_t* modbusContext;
 
 
 	std::string moduleNodeName;
@@ -98,13 +100,13 @@ private:
 	 * @var ModbusController::ModbusController* modbus
 	 * Connection to the IO modbus controller
 	 **/
-	rexos_modbus::ModbusController* modbus;
+	//rexos_modbus::ModbusController* modbus;
 
 	/**
 	 * @var InputOutput::InputOutputController* controller;
 	 * Input output controller that contains the logic to switch devices
 	 */
-	rexos_gripper::InputOutputController* controller;
+	//rexos_gripper::InputOutputController* controller;
 
 	/**
 	 * @var ros::ServiceServer gripService
