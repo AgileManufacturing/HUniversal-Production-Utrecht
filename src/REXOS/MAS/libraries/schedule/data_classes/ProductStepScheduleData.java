@@ -38,11 +38,13 @@
  **/
 
 
-package agents.data_classes;
+package libraries.schedule.data_classes;
 
 import java.io.Serializable;
 
 import org.bson.types.ObjectId;
+
+import agents.data_classes.MongoSaveable;
 
 import com.mongodb.BasicDBObject;
 

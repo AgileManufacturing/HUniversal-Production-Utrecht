@@ -272,7 +272,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		 	
 			Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as an equiplet agent.");
 			
-			equipletSchedule = new EquipletSchedule(equipletDbIp, equipletDbPort, true);
+			equipletSchedule = new EquipletSchedule(equipletDbIp, equipletDbPort, equipletDbName, true);
 			scheduleLock = new ScheduleLock();
 			
 			communicationTable = new HashMap<String, ObjectId>();

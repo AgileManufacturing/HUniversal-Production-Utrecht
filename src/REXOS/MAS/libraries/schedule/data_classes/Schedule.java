@@ -4,9 +4,9 @@ import java.util.UUID;
 
 public abstract class Schedule{
 	
-	private final String PLANNING_NAME= "Planning";
-	private final String FREETIMESLOT_NAME= "FreeTimeSlot";
-	private final String REALTIMESCHEDULE_NAME = "RealtimeSchedule";
+	protected final String PLANNING_NAME= "Planning";
+	protected final String FREETIMESLOT_NAME= "FreeTimeSlot";
+	protected final String REALTIMESCHEDULE_NAME = "RealtimeSchedule";
 	
 	protected String scheduleHostName;
 	protected int schedulePort;
@@ -27,7 +27,7 @@ public abstract class Schedule{
 		}
 	}
 	
-	protected void ScheduleOn(UUID lockKey) throws ScheduleAccessException{
+	protected void ScheduleOn(UUID lockKey, ProductStepScheduleData scheduleData) throws ScheduleAccessException{
 		if (! scheduleLock.isCurrentOwner(lockKey)){
 			throw new ScheduleAccessException("not owner of lock");
 		}
