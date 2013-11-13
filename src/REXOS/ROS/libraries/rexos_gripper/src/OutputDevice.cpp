@@ -28,6 +28,8 @@
 
 #include <rexos_gripper/OutputDevice.h>
 
+#include "ros/ros.h"
+
 namespace rexos_gripper {
 	/**
 	 * Constructor for OutputDevice
@@ -36,8 +38,27 @@ namespace rexos_gripper {
 	 * @param address Register address that contains the device boolean.
 	 * @param pin The pin (bit) that is connected to the device.
 	 **/
-	OutputDevice::OutputDevice(InputOutputController* ioController, uint32_t address, uint8_t pin) :
-		ioController(ioController), address(address), pin(pin) {}
+	OutputDevice::OutputDevice(JSONNode node) {
+		readJSONNode(node);
+		
+		ioController = new InputOutputController(node);
+	}
+	void OutputDevice::readJSONNode(const JSONNode node) {
+		for(JSONNode::const_iterator it = node.begin(); it != node.end(); it++) {
+			if(it->name() == "modbusAddress"){
+				address = it->as_int();
+				ROS_INFO_STREAM("found modbusAddress " << address);
+			} else if(it->name() == "modbusDevicePin"){
+				pin = it->as_int();
+				ROS_INFO_STREAM("found modbusDevicePin " << pin);
+			} else {
+				// some other property, ignore it
+			}
+		}
+	}
+	
+	/*OutputDevice::OutputDevice(InputOutputController* ioController, uint32_t address, uint8_t pin) :
+		ioController(ioController), address(address), pin(pin) {}*/
 
 
 	/**

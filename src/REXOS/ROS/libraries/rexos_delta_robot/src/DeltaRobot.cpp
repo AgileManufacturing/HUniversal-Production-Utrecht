@@ -130,7 +130,6 @@ namespace rexos_delta_robot{
 				// some other property, ignore it
 			}
 		}
-		
 	}
     /**
      * Generates the effectorBoundaries for the given voxelSize.
