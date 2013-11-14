@@ -244,7 +244,7 @@ public class DeltaRobotModule extends Module {
 		payload.put("maxAcceleration", MAX_ACCELERATION);
 		
 		// create the lookUpParameters
-		if(parameters.containsField("position")) {
+		/*if(parameters.containsField("position")) {
 			Position position = new Position((BasicDBObject) parameters.get("position"));
 
 			if(position.getRelativeToPart() != null && position.getRelativeToPart().getId() != -1) {
@@ -254,10 +254,10 @@ public class DeltaRobotModule extends Module {
 			}
 			// create the instruction data
 			instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
-		} else {
+		} else {*/
 			// create the instruction data
 			instructionData = new InstructionData("move", "deltarobot", "NULL", lookUpParameters, payload);
-		}
+		//}
 
 		// create an EquipletStep and return it.
 		EquipletStep step =

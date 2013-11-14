@@ -10,8 +10,8 @@
   <author email="koenbraham@gmail.com">KBraham</author>
   <buildtool_depend>catkin</buildtool_depend>
   
-  <build_depend>Vectors</build_depend>
-  <run_depend>Vectors</run_depend>
+  <build_depend>vectors</build_depend>
+  <run_depend>vectors</run_depend>
   
   <build_depend>rexos_knowledge_database</build_depend>
   <run_depend>rexos_knowledge_database</run_depend>
