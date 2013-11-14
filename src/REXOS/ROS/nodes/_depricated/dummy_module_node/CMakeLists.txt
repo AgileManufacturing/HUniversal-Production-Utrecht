@@ -5,10 +5,6 @@ project(dummy_module_node)
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation rexos_statemachine rexos_std_msgs rexos_std_srvs libjson rexos_utilities)
 find_package(Log4cxx)
 
-generate_messages (
-	DEPENDENCIES std_msgs
-)
-
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include 

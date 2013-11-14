@@ -334,7 +334,7 @@ Matrix3 PartLocatorNode::calculateScaleMatrix() {
 
 void PartLocatorNode::run() {
 	ROS_INFO("waiting for camera/qr_codes");
-	ros::Subscriber sub = nodeHandle.subscribe("camera/qr_codes", 10, &PartLocatorNode::qrCodeCallback,this);
+	ros::Subscriber sub = nodeHandle.subscribe("camera/qr_codes", 10, &PartLocatorNode::qrCodeCallback, this);
 	
 	ros::spin();
 }

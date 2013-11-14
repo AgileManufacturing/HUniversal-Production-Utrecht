@@ -18,11 +18,11 @@
 <build_depend>vision_node</build_depend>
   <run_depend>vision_node</run_depend>
 
-<build_depend>Vectors</build_depend>
-  <run_depend>Vectors</run_depend>
+<build_depend>vectors</build_depend>
+  <run_depend>vectors</run_depend>
 
-<build_depend>Matrices</build_depend>
-  <run_depend>Matrices</run_depend>
+<build_depend>matrices</build_depend>
+  <run_depend>matrices</run_depend>
  
 <build_depend>rexos_coordinates</build_depend>
   <run_depend>rexos_coordinates</run_depend>
