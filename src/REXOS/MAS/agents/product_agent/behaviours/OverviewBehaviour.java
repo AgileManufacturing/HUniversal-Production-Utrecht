@@ -182,7 +182,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 */
 	public void startPlanning() {
 		_productAgent.setStatus(AgentStatus.PLANNING);
-		Logger.log(LogLevel.DEBUG, "Started planningbehaviour");
+		Logger.log(LogLevel.INFORMATION, "Started a Planningbehaviour");
 		myAgent.addBehaviour(_plannerBehaviour);
 	}
 
@@ -191,7 +191,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 */
 	public void startInforming() {
 		_productAgent.setStatus(AgentStatus.INFORMING);
-		Logger.log(LogLevel.DEBUG, "Started informingbehaviour");
+		Logger.log(LogLevel.INFORMATION, "Started a Informingbehaviour");
 		myAgent.addBehaviour(_informerBehaviour);
 	}
 
@@ -200,7 +200,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 */
 	public void startScheduling() {
 		_productAgent.setStatus(AgentStatus.SCHEDULING);
-		Logger.log(LogLevel.INFORMATION, "Started a schedulingbehaviour");
+		Logger.log(LogLevel.INFORMATION, "Started a Schedulingbehaviour");
 		myAgent.addBehaviour(_schedulerBehaviour);
 	}
 
@@ -208,7 +208,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 * Starts the produce behavior
 	 */
 	public void startProducing() {
-		Logger.log(LogLevel.DEBUG, "Started a ProduceBehaviour");
+		Logger.log(LogLevel.INFORMATION, "Started a ProduceBehaviour");
 		if (_produceBehaviour.done() == false)
 			myAgent.addBehaviour(_produceBehaviour);
 	}
@@ -218,7 +218,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 		_plannerBehaviour.reset();
 		_informerBehaviour.reset();
 		_schedulerBehaviour.reset();
-		Logger.log(LogLevel.DEBUG, "Started a RescheduleBehaviour");
+		Logger.log(LogLevel.INFORMATION, "Started a RescheduleBehaviour");
 		myAgent.addBehaviour(_rescheduleBehaviour);
 	}
 
@@ -240,24 +240,24 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 			switch (as) 
 			{
 				case PLANNING:
-					Logger.log(LogLevel.DEBUG, "Done planning.");
+					Logger.log(LogLevel.INFORMATION, "Done planning.");
 					_productAgent.setStatus(AgentStatus.DONE_PLANNING);
 					// Check if there was an error. Do this for all cases
 					break;
 				case INFORMING:
-					Logger.log(LogLevel.DEBUG, "Done Informing.");
+					Logger.log(LogLevel.INFORMATION, "Done Informing.");
 					_productAgent.setStatus(AgentStatus.DONE_INFORMING);
 					break;
 				case SCHEDULING:
-					Logger.log(LogLevel.DEBUG, "Done scheduling.");
+					Logger.log(LogLevel.INFORMATION, "Done scheduling.");
 					_productAgent.setStatus(AgentStatus.DONE_SCHEDULING);
 					break;
 				case PRODUCING:
-					Logger.log(LogLevel.DEBUG, "Done producing.");
+					Logger.log(LogLevel.INFORMATION, "Done producing.");
 					_productAgent.setStatus(AgentStatus.DONE_PRODUCING);
 					break;
 				case RESCHEDULING:
-					Logger.log(LogLevel.DEBUG, "Done rescheduling.");
+					Logger.log(LogLevel.INFORMATION, "Done rescheduling.");
 					_rescheduling = false;
 					_productAgent.setStatus(AgentStatus.DONE_RESCHEDULING);
 					break;

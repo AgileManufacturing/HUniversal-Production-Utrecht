@@ -70,7 +70,7 @@ public class SubInformerBehaviour extends agents.shared_behaviours.ReceiveBehavi
 			message.setContentObject(_productionStep);
 			myAgent.send(message);
 		} catch (IOException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 		}
 	}
 
@@ -124,7 +124,7 @@ public class SubInformerBehaviour extends agents.shared_behaviours.ReceiveBehavi
 				_parentBehaviour.callbackSubInformerBehaviour(BehaviourStatus.ERROR, this);
 			}
 		} catch (IOException | UnreadableException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 			_parentBehaviour.callbackSubInformerBehaviour(BehaviourStatus.ERROR, this);
 		}
 	}

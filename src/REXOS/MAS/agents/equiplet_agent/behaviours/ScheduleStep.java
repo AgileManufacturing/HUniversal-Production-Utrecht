@@ -196,7 +196,7 @@ public class ScheduleStep extends ReceiveBehaviour {
 		}
 		catch(IOException | InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) 
 		{
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 			myAgent.doDelete();
 		}
 	}

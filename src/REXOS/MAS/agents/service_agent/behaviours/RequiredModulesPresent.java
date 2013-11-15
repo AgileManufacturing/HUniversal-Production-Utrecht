@@ -119,7 +119,7 @@ public class RequiredModulesPresent extends ReceiveBehaviour {
 			try {
 				queryIFMessage.setContentObject(moduleGroupIds);
 			} catch (IOException e) {
-				Logger.log(LogLevel.ERROR, e);
+				Logger.log(LogLevel.ERROR, "", e);
 			}
 		}
 		serviceAgent.send(queryIFMessage);
@@ -137,7 +137,7 @@ public class RequiredModulesPresent extends ReceiveBehaviour {
 			parentBehaviourCallback.callback(message, null);
 			serviceAgent.removeBehaviour(this);
 		} else {
-			Logger.log(LogLevel.WARNING, serviceAgent.getName() + " - CheckForModulesResponse timeout!");
+			Logger.log(LogLevel.WARNING, "" + serviceAgent.getName() + " - CheckForModulesResponse timeout!");
 			serviceAgent.doDelete();
 		}
 	}

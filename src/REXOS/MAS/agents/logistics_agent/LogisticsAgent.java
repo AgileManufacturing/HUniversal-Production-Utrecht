@@ -67,7 +67,7 @@ public class LogisticsAgent extends Agent {
 	
 	@Override
 	public void setup() {
-		Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as a logistics agent.");
+		Logger.log(LogLevel.NOTIFICATION, "" + this.getAID().getLocalName() + " spawned as a logistics agent.");
 		addBehaviour(new ArePartsAvailable(this));
 		
 		//fill the crate

@@ -99,7 +99,7 @@ public class ProductLog{
 			writer.append(statusData.toString() + "}");
 			writer.flush();
 		} catch(IOException e){
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 		}
 	}
 	

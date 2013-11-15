@@ -194,7 +194,7 @@ public class EvaluateDuration extends ReceiveBehaviour {
 		} 
 		catch(InvalidDBNamespaceException | GeneralMongoException e) 
 		{
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 			hardwareAgent.doDelete();
 		}
 	}

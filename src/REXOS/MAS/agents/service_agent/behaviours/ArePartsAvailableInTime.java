@@ -131,7 +131,7 @@ public class ArePartsAvailableInTime extends ReceiveBehaviour {
 			try {
 				responseMessage.setContentObject(productStep.getInputParts());
 			} catch (IOException e) {
-				Logger.log(LogLevel.ERROR, e);
+				Logger.log(LogLevel.ERROR, "", e);
 			}
 		}
 		responseMessage.setOntology("ArePartsAvailableInTime");
@@ -173,12 +173,12 @@ public class ArePartsAvailableInTime extends ReceiveBehaviour {
 											"productStep cannot be delivered on time"))));
 				}
 			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-				Logger.log(LogLevel.ERROR, e);
+				Logger.log(LogLevel.ERROR, "", e);
 				serviceAgent.doDelete();
 			}
 			serviceAgent.removeBehaviour(this);
 		} else {
-			Logger.log(LogLevel.WARNING, serviceAgent.getName() + " - ArePartsAvailableInTimeReponse timeout!");
+			Logger.log(LogLevel.WARNING, "" + serviceAgent.getName() + " - ArePartsAvailableInTimeReponse timeout!");
 			serviceAgent.doDelete();
 		}
 	}

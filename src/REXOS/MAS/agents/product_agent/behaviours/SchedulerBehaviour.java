@@ -143,7 +143,7 @@ public class SchedulerBehaviour extends Behaviour {
 		} 
 		catch (Exception e) 
 		{
-			Logger.log(LogLevel.ERROR, e.toString());
+			Logger.log(LogLevel.ERROR, "", e.toString());
 		}
 	}
 
@@ -265,6 +265,7 @@ public class SchedulerBehaviour extends Behaviour {
 					long startTime = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getLong("startTime");
 					int duration = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getInt("duration");
 					schedules.add(new Schedule(startTime, duration, aid));
+					Logger.log(LogLevel.NOTIFICATION, "@ SchedulerBehaviour duration ... : " + duration);
 				}
 	
 				// check within every schedule of the 'schedules' array for free
@@ -294,7 +295,7 @@ public class SchedulerBehaviour extends Behaviour {
 				{
 					freetimeslots.add(new FreeTimeSlot((System.currentTimeMillis() - firstTimeSlot) / timeSlotLength + (1000 / timeSlotLength),
 							requiredTimeSlots, aid));
-					Logger.log(LogLevel.INFORMATION, "Adding new timeslot to freetimeslot start: " + (System.currentTimeMillis() - firstTimeSlot) / timeSlotLength + (1000 / timeSlotLength) + " timeslots: " + requiredTimeSlots + 
+					Logger.log(LogLevel.INFORMATION, "Adding new timeslot to freetimeslot start: " + ( (System.currentTimeMillis() - firstTimeSlot) / timeSlotLength + (1000 / timeSlotLength) )+ " timeslots: " + requiredTimeSlots + 
 							" length: " + requiredTimeSlots);
 				}
 			}

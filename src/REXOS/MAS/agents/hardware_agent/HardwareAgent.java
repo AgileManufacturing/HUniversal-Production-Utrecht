@@ -185,7 +185,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void setup() {
-		Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as an hardware agent.");
+		Logger.log(LogLevel.NOTIFICATION, "" + this.getAID().getLocalName() + " spawned as an hardware agent.");
 		leadingModules = new HashMap<Integer, Integer>();
 
 		// gets the modulefactory and subscribes to updates.
@@ -234,7 +234,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		}
 		catch(InvalidDBNamespaceException | UnknownHostException | GeneralMongoException e) 
 		{
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 			doDelete();
 		}
 
@@ -264,9 +264,9 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 				}
 			}
 		}
-		catch(KnowledgeException | KeyNotFoundException e1) 
+		catch(KnowledgeException | KeyNotFoundException e) 
 		{
-			Logger.log(LogLevel.ERROR, e1);
+			Logger.log(LogLevel.ERROR, "", e);
 			doDelete();
 		}
 	}
@@ -287,7 +287,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 			equipletStepBBClient.unsubscribe(stepStatusSubscription);
 			serviceStepBBClient.unsubscribe(stepStatusSubscription);
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 		}
 
 		// Send the serviceAgent that he died.
@@ -309,7 +309,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 							"statusData", new BasicDBObject("reason", reason).append("log", buildLog(serviceStepId)))));
 			equipletStepBBClient.removeDocuments(new BasicDBObject("serviceStepID", serviceStepId));
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 		}
 	}
 
@@ -326,7 +326,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 					if(dbObject != null) {
 						ServiceStep serviceStep = new ServiceStep((BasicDBObject) dbObject);
 						StepStatusCode status = serviceStep.getServiceStepStatus();
-						Logger.log(LogLevel.DEBUG, "Hardware Agent - serv.Step status set to: %s%n", status);
+						Logger.log(LogLevel.DEBUG, "serv.Step status set to: %s%n", status);
 						
 						switch(status) {
 							case ABORTED:
@@ -375,12 +375,12 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 						BasicDBObject searchQuery = new BasicDBObject("_id", serviceStep.getId());
 						StepStatusCode status = equipletStep.getEquipletStepStatus();
 						
-						Logger.log(LogLevel.DEBUG, "Hardware Agent - equip.Step no: %s%n status set to: %s%n", equipletStep.getId(), status);
+						Logger.log(LogLevel.DEBUG, "equip.Step no: %s%n status set to: %s%n", equipletStep.getId(), status);
 						
 						switch(status) {
 							case DONE:
 								if(equipletStep.getNextEquipletStep() == null) {
-									Logger.log(LogLevel.DEBUG, "Hardware agent - saving log in serv.Step %s\n%s\n",
+									Logger.log(LogLevel.DEBUG, "saving log in serv.Step %s\n%s\n",
 											serviceStep.getId(), buildLog(serviceStep.getId()));
 
 									serviceStepBBClient.updateDocuments(
@@ -388,7 +388,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 											new BasicDBObject("$set", new BasicDBObject("statusData",
 													buildLog(serviceStep.getId())).append("status",
 													StepStatusCode.DONE.name())));
-									Logger.log(LogLevel.DEBUG, "Hardware Agent - setting service step on DONE");
+									Logger.log(LogLevel.DEBUG, "setting service step on DONE");
 								} else {
 									equipletStepBBClient
 											.updateDocuments(new BasicDBObject("_id", equipletStep.getNextEquipletStep()),
@@ -416,7 +416,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 					break;
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 		}
 	}
 
@@ -459,7 +459,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 				log.append("step" + i, equipletSteps[i].toBasicDBObject());
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 		}
 		return log;
 	}

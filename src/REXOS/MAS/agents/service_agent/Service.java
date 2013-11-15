@@ -89,7 +89,7 @@ public abstract class Service {
 			}
 			return moduleIds;
 		} catch(KnowledgeException | KeyNotFoundException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 		}
 		return null;
 	}

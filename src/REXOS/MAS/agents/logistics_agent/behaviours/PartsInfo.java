@@ -160,7 +160,7 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 				reply.setContentObject(partParameters);
 				logisticsAgent.send(reply);
 			} catch (UnreadableException | IOException | KnowledgeException | KeyNotFoundException e) {
-				Logger.log(LogLevel.ERROR, e);
+				Logger.log(LogLevel.ERROR, "", e);
 				logisticsAgent.doDelete();
 			}
 		} else {

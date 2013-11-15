@@ -114,11 +114,11 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 				logisticsAgent.addBehaviour(new PartsInfo(logisticsAgent, message
 						.getConversationId()));
 			} catch (UnreadableException e) {
-				Logger.log(LogLevel.ERROR, e);
+				Logger.log(LogLevel.ERROR, "", e);
 				logisticsAgent.doDelete();
 			}
 		} else {
-			Logger.log(LogLevel.ERROR, logisticsAgent.getLocalName()
+			Logger.log(LogLevel.ERROR, "" + logisticsAgent.getLocalName()
 					+ " - ArePartsAvailableInTime timeout!");
 			logisticsAgent.removeBehaviour(this);
 		}

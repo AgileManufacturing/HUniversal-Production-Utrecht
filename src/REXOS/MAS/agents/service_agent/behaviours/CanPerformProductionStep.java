@@ -115,8 +115,6 @@ public class CanPerformProductionStep extends ReceiveBehaviour implements Parent
 				int stepType = productStep.getType();
 				BasicDBObject parameters = productStep.getParameters();
 	
-				//Logger.log("%s got message CanDoProductStep for step type %s%n", agent.getLocalName(), stepType);
-	
 				Service[] services = serviceAgent.getServiceFactory().getServicesForStep(stepType);
 	
 				ArrayList<Service> possibleServices = new ArrayList<Service>();
@@ -149,7 +147,7 @@ public class CanPerformProductionStep extends ReceiveBehaviour implements Parent
 							disconfirmReply.getPerformative() == ACLMessage.CONFIRM);
 				}
 			} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException e) {
-				Logger.log(LogLevel.ERROR, e);
+				Logger.log(LogLevel.ERROR, "", e);
 			}
 		}
 	}

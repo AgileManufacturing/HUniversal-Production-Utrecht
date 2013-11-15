@@ -238,6 +238,18 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 */
 	private String planningName;
 	
+	/**
+	 * @var int timeSlotLength
+	 * 		The length of a single time slot from the blackboard.
+	 */
+	private int timeSlotLength; 
+	
+	/**
+	 * @var long firstTimeSlot
+	 * 		The time since epoch of the first time slot (in ms).
+	 */
+	private long firstTimeSlot;
+	
 	
 	private static long systemStart = System.currentTimeMillis();
 
@@ -259,7 +271,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		 	productStepsName = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ProductStepsBlackBoardName", getAID().getLocalName());
 		 	planningName = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "PlanningBlackBoardName", getAID().getLocalName());
 		 	
-			Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as an equiplet agent.");
+			Logger.log(LogLevel.NOTIFICATION, "", this.getAID().getLocalName() + " spawned as an equiplet agent.");
 			
 			communicationTable = new HashMap<String, ObjectId>();
 			behaviours = new ArrayList<Behaviour>();
@@ -324,6 +336,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			// gets the timedata for synchronizing from the collective blackboard.
 			BasicDBObject timeData = (BasicDBObject) collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
 
+			timeSlotLength = timeData.getInt("timeSlotLength");
+			firstTimeSlot = timeData.getLong("firstTimeSlot");
 			// initiates the timer to the next product step.
 			timer = new NextProductStepTimer(timeData.getLong("firstTimeSlot"), timeData.getInt("timeSlotLength"), this);
 
@@ -414,7 +428,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					responseMessage.addReceiver(productStep.getProductAgentId());
 					responseMessage.setConversationId(conversationId);
 
-					Logger.log(LogLevel.INFORMATION, "Equiplet agent - status update: " + productStep.getStatus().toString());
+					Logger.log(LogLevel.INFORMATION, "status update: " + productStep.getStatus().toString());
 					switch(productStep.getStatus()) {
 					// Depending on the changed status fills in the responseMessage and sends it to the product agent.
 						case PLANNED:
@@ -475,7 +489,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 						default:
 							break;
 					}
-					Logger.log(LogLevel.DEBUG, "Equiplet agent - sending message %s%n",
+					Logger.log(LogLevel.DEBUG, "sending message %s%n",
 							ACLMessage.getPerformative(responseMessage.getPerformative()));
 					send(responseMessage);
 					break;
@@ -483,7 +497,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					EquipletStateEntry stateEntry =
 							new EquipletStateEntry((BasicDBObject) stateBBClient.findDocumentById(entry
 									.getTargetObjectId()));
-					Logger.log(LogLevel.DEBUG, "Equiplet agent - mode changed to %s%n", stateEntry.getEquipletMode());
+					Logger.log(LogLevel.DEBUG, "mode changed to %s%n", stateEntry.getEquipletMode());
 					EquipletMode mode = stateEntry.getEquipletMode();
 					switch(mode) {
 					// TODO handle error stuff
@@ -501,12 +515,12 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 					}
 					break;
 				default:
-					Logger.log(LogLevel.WARNING, "Equiplet agent - onMessage Unknown database");
+					Logger.log(LogLevel.WARNING, "onMessage Unknown database");
 					break;
 			}
 		} catch(GeneralMongoException | InvalidDBNamespaceException | IOException e) {
 			// TODO handle error
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 		}
 	}
 
@@ -672,9 +686,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		return dbData;
 	}
 	
-	public static long getCurrentTimeSlot(){
-//		return (System.currentTimeMillis() - systemStart)/50;
-		return (System.currentTimeMillis())/50;
+	public long getCurrentTimeSlot(){
+		return (System.currentTimeMillis() - firstTimeSlot) / timeSlotLength;
 	}
 }
 

@@ -82,9 +82,9 @@ public class CancelTransportBehaviour extends ReceiveBehaviour {
 		try {
 			// TODO (out of scope) cancel the transport of the parts in parts[]
 			Part[] parts = (Part[]) message.getContentObject();
-			Logger.log(LogLevel.DEBUG, "Logistics agent - cancelling parts");
+			Logger.log(LogLevel.DEBUG, "cancelling parts");
 		} catch(UnreadableException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 		}
 	}
 }

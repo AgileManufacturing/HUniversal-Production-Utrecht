@@ -114,8 +114,6 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
-			//Logger.log("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(),
-					//message.getOntology());
 
 			try {
 				EquipletStateEntry equipletState = equipletAgent.getEquipletStateEntry();
@@ -130,7 +128,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 					equipletAgent.getCollectiveBBClient().insertDocument(directoryEntry.toBasicDBObject());
 				}
 			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-				Logger.log(LogLevel.ERROR, e);
+				Logger.log(LogLevel.ERROR, "", e);
 				equipletAgent.doDelete();
 			}
 
@@ -147,7 +145,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 			equipletAgent.addBehaviour(new StartStep(equipletAgent));
 			
 		} else {
-			Logger.log(LogLevel.ERROR, equipletAgent.getName() + " - InitialisationFinished timeout!");
+			Logger.log(LogLevel.ERROR, "timeout!");
 			equipletAgent.doDelete();
 		}
 	}
@@ -174,7 +172,7 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 					break;
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 			// Cannot add myself on the collective BB, so remove the agent since it cannot be found by product agents 
 			equipletAgent.doDelete();
 		}

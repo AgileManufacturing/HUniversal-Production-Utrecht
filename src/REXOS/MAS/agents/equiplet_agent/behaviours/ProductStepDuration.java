@@ -135,7 +135,7 @@ public class ProductStepDuration extends ReceiveBehaviour {
 			try {
 				responseMessage.setContentObject(objectId);
 			} catch (IOException e) {
-				Logger.log(LogLevel.ERROR, e);
+				Logger.log(LogLevel.ERROR, "", e);
 			}
 		}
 		responseMessage.setOntology("ProductStepDuration");
@@ -148,8 +148,6 @@ public class ProductStepDuration extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
-			//Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
-					//message.getOntology());
 
 			try {
 				// gets the productstep
@@ -169,13 +167,12 @@ public class ProductStepDuration extends ReceiveBehaviour {
 				parentBehaviourCallback.callback(message, scheduleArguments);
 				equipletAgent.removeBehaviour(this);
 				
-		//		Logger.log(LogLevel.DEBUG, "sending message: %s%n", responseMessage.getOntology());
 			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-				Logger.log(LogLevel.ERROR, e);
+				Logger.log(LogLevel.ERROR, "", e);
 				equipletAgent.doDelete();
 			}
 		}else{
-			Logger.log(LogLevel.ERROR, "equiplet agent - duration response timed out");
+			Logger.log(LogLevel.ERROR, "response timed out");
 		}
 	}
 }

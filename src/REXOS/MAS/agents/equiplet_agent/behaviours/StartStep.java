@@ -107,14 +107,12 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		//Logger.log("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(),
-				//message.getOntology());
 
 		// Gets the productStepId and updates all the productsteps on the blackboard the status to waiting.
 		try {
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
 			if(false){//equipletAgent.getEquipletStateEntry().getEquipletState() != EquipletState.NORMAL) {
-				Logger.log(LogLevel.DEBUG, "%d Equiplet agent - changing state%n", EquipletAgent.getCurrentTimeSlot());
+				Logger.log(LogLevel.DEBUG, "%d Equiplet Agent-changing state%n", equipletAgent.getCurrentTimeSlot());
 
 				//equipletAgent.getStateBBClient().subscribe(stateUpdateSubscription);
 				//equipletAgent.setDesiredEquipletState(EquipletState.NORMAL);
@@ -123,14 +121,14 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 				
 				equipletAgent.getTimer().rescheduleTimer();
 			} else {
-				Logger.log(LogLevel.DEBUG, "%d Equiplet agent - Starting prod. step.%n", EquipletAgent.getCurrentTimeSlot());
+				Logger.log(LogLevel.DEBUG, "%d Equiplet Agent-Starting prod. step.%n", equipletAgent.getCurrentTimeSlot());
 				equipletAgent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
 						new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));
 				
 				equipletAgent.getTimer().rescheduleTimer();
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 			//TODO handle error
 			equipletAgent.doDelete();
 		}
@@ -146,7 +144,7 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 			if(dbObject != null) {
 				EquipletStateEntry state = new EquipletStateEntry((BasicDBObject) dbObject);
 				if(state.getEquipletState() == EquipletState.NORMAL) {
-					Logger.log(LogLevel.DEBUG, "%d Equiplet agent - equip. state changed to NORMAL. Starting prod. step.", EquipletAgent.getCurrentTimeSlot());
+					Logger.log(LogLevel.DEBUG, "%d Equiplet Agent-equip. state changed to NORMAL. Starting prod. step.", equipletAgent.getCurrentTimeSlot());
 
 					equipletAgent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
 							new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));
@@ -157,7 +155,7 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 				}
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 			//TODO handle error
 		}
 	}

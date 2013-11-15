@@ -69,7 +69,7 @@ public class GripperModule extends Module {
 	 * @var int GRIPPER_SIZE
 	 * A static value that contains the size of the gripper.
 	 */
-	private static final int GRIPPER_SIZE = 20;
+	private static final double GRIPPER_SIZE = 18.24;
 
 	/**
 	 * @var Module movementModule
@@ -91,9 +91,9 @@ public class GripperModule extends Module {
 		
 		steps = new ArrayList<EquipletStep>();
 		
-		int crateHeight = 0;
+		double crateHeight = 0;
 		if(parameters.containsField("height")){
-			crateHeight = parameters.getInt("height");
+			crateHeight = parameters.getDouble("height");
 		}
 
 		//get the parameters and put extra values in it.
@@ -136,15 +136,14 @@ public class GripperModule extends Module {
 	 */
 	@Override
 	public EquipletStep[] fillPlaceHolders(EquipletStep[] steps, BasicDBObject parameters) {
-		//Logger.log(LogLevel.DEBUG, "parameters: " + parameters.keySet());
 		
 		//You have your crateID from the DBObject parameters.
 		//Get the cratePart from the knowledgeDB -- maybe store crate object instead of string.
 		//actually we have to get the specific crate dimensions etc. WE CAN HARDCODE THIS FOR THE MOMENT!
 		//translate the row/col to X,Y,Z ACCORDING to the crate dimensions.
-		int crateHeight = 0;
+		double crateHeight = 0;
 		if(parameters.containsField("height")){
-			crateHeight = parameters.getInt("height");
+			crateHeight = parameters.getDouble("height");
 		}
 		
 		double crateDimension = 46; // 46mm x 46mm
@@ -184,9 +183,9 @@ public class GripperModule extends Module {
 			
 			if(payload.containsField("z") && payload.getString("z").equals("Z-PLACEHOLDER")) {
 				if(position.getZ() == null)	{
-					payload.put("z", 0 + extraSize);
+					payload.put("z", 0 - extraSize);
 				} else {
-					payload.put("z", position.getZ() + extraSize);
+					payload.put("z", position.getZ() - extraSize);
 				}
 			}
 			

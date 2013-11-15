@@ -94,7 +94,7 @@ public class InitialisationFinished extends ReceiveBehaviour {
 			response.setOntology("InitialisationFinished");
 			serviceAgent.send(response);
 		} else {
-			Logger.log(LogLevel.DEBUG, serviceAgent.getName() + " - InitialisationFinished timeout!");
+			Logger.log(LogLevel.DEBUG, "" + serviceAgent.getName() + " - InitialisationFinished timeout!");
 			serviceAgent.doDelete();
 		}
 	}

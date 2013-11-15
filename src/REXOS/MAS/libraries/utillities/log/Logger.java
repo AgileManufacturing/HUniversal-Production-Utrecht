@@ -1,6 +1,6 @@
 /**
  * @file rexos/libraries/log/Logger.java
- * @brief Helper for log messages, providing a single point for controlling program output.
+ * @brief Helper for log messages, providing a single point for controlling program origin.
  * @date Created: 17 mei 2013
  *
  * @author Jan-Willem Willebrands
@@ -30,8 +30,14 @@
  **/
 package libraries.utillities.log;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 /**
- * Helper for log messages, providing a single point for controlling program output.
+ * Helper for log messages, providing a single point for controlling program origin.
  **/
 public class Logger {	
 	/**
@@ -39,14 +45,22 @@ public class Logger {
 	 * Controls whether or not printing of log messages is enabled.
 	 **/
 	private static final boolean debugEnabled = true;
-	
+
+	/**
+	 * @var boolean logToFileEnabled
+	 * Controls whether or not to write log messages to a text-file.
+	 **/
+	private static final boolean logToFileEnabled = true;
+
+	private static final File logFile = new File("gridLog.txt");
+
 	/**
 	 * @var int logleveltreshhold
 	 * treshhold for showing log msg
 	 **/
 	public static final int loglevelThreshold = LogLevel.DEBUG.getLevel();
-	
-	
+
+
 	/**
 	 * Returns whether or not debugging is enabled.
 	 * @return true if debugging is enabled, false otherwise.
@@ -54,44 +68,52 @@ public class Logger {
 	public static boolean isDebugEnabled() {
 		return debugEnabled;
 	}
-	
+
 	/**
-	 * Writes the String representation (as returned by obj.toString) of the given object to the output stream.
+	 * Returns whether or not debugging is enabled.
+	 * @return true if debugging is enabled, false otherwise.
+	 **/
+	public static boolean islogToFileEnabled() {
+		return logToFileEnabled;
+	}
+
+	/**
+	 * Writes the String representation (as returned by obj.toString) of the given object to the origin stream.
 	 * @param obj The Object that should be printed.
 	 **/
 	public static void log(LogLevel level, Object obj) {
 		printToOut(level, obj.toString());
 	}
-	
+
 	/**
-	 * Writes the specified message to the output stream.
+	 * Writes the specified message to the origin stream.
 	 * @param msg The message that should be printed.
 	 **/
 	public static void log(LogLevel level, String msg) {
 		printToOut(level, msg);
 	}
-	
+
 	/**
-	 * Writes the specified message to the output stream using the PrintStream format method.
+	 * Writes the specified message to the origin stream using the PrintStream format method.
 	 * @param msg A format string as described in http://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 	 * @param objects Arguments referenced by the format specifiers in the format string.
 	 **/
 	public static void log(LogLevel level, String msg, Object... objects) {
 		printToOut(level, String.format(msg, objects));
 	}
-	
+
 	public static void log(LogLevel level, String msg, Throwable throwable) {
 		printToOut(level, msg);
 		printToOut(level, throwable.getStackTrace().toString());
 	}
-	
-	
+
+
 	public static void log(LogLevel level, Throwable throwable) {
 		printToOut(level, throwable.getStackTrace().toString());
 	}
-	
+
 	/** 
-	 * Writes the specified message to the output stream using the PrintStream format method.
+	 * Writes the specified message to the origin stream using the PrintStream format method.
 	 * @param msg A format string as described in http://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 	 * @param objects Arguments referenced by the format specifiers in the format string.
 	 **/
@@ -99,28 +121,112 @@ public class Logger {
 	{
 		if(level.getLevel() >= loglevelThreshold){
 			switch(level){		
-			
-				case EMERGENCY:					
-				case ALERT:
-				case CRITICAL:
-				case ERROR:
-					if(msg.getClass() == Throwable.class){
-						System.err.println(level.name() + "\t" + ((Throwable)msg).getStackTrace().toString());
-					}
-					else{
-						System.err.println("ERROR:\t" + msg);
-					}
-					break;
-					
-				case WARNING:
-				case NOTIFICATION:
-				case INFORMATION:
-				case DEBUG:
-					System.out.println(level.name() + "\t" + msg);
-					break;
-					
+
+			case EMERGENCY:					
+			case ALERT:
+			case CRITICAL:
+			case ERROR:
+
+				if(msg.getClass() == Throwable.class){
+					System.err.println(level.name() + "\t" + ((Throwable)msg).getStackTrace().toString());
+					if(logToFileEnabled)	printToFile(level, msg, true);
+				}
+				else{
+					System.err.println("ERROR:\t" + msg);
+					if(logToFileEnabled)	printToFile(level, msg, false);
+				}
+				break;
+
+			case WARNING:
+			case NOTIFICATION:
+			case INFORMATION:
+			case DEBUG:
+				System.out.println(level.name() + "\t" + msg);
+				if(logToFileEnabled)		printToFile(level, msg, false);
+				break;
+
 			}
 		}
 	}
 
+	/** 
+	 * Writes the specified message to the gridLog.txt using the BufferedWriter and FileWriter, also adding the class the Logger was called from.
+	 * @param level The LoggerLevel of the message
+	 * @param msg A format string as described in http://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
+	 * @param hasThrowable PrintToOut already looks for a Throwable, it sets a boolean 
+	 **/
+	private static void printToFile(LogLevel level, Object msg, boolean hasThrowable){
+		//Set date format
+		String timeLog = new SimpleDateFormat("MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
+
+		//when logToFileEnabled is true write to gridLog.txt
+		if(logToFileEnabled){
+			
+			BufferedWriter writer = null;
+			try
+			{
+				if(logFile.exists()){
+					//if the file exists write to it, not overwriting old data.
+					writer = new BufferedWriter(new FileWriter(logFile, true));
+					
+					//logs date, time and LoggerLevel
+					writer.write("[" + timeLog + "][" + level + "]\t");
+					
+					//if the LogLevel is DEBUG, ERROR or ALERT we add an extra indention for more structure
+					if(level == LogLevel.DEBUG || level == LogLevel.ALERT || level == LogLevel.ERROR){
+						writer.write("\t");
+					}
+
+					//track from where the Logger has been called, and add it to the gridLog.txt
+					String[] stack = Thread.currentThread().getStackTrace()[4].getClassName().split("\\.");
+					String origin = "";
+					
+					//if this segment of stack equals to "behaviours" you should print an additional part of the path
+					if(stack[stack.length-1].equals("behaviours")){
+						origin = "@" + stack[stack.length-3] + "/" + stack[stack.length-2] + "/" + stack[stack.length-1] + ":";
+					} else {
+						origin = "@" + stack[stack.length-2] + "/" + stack[stack.length-1] + ":";
+					}				
+
+					//to outline the gridLog.txt we want to add different amounts of tabs according to the length of the origin
+					if(origin.length() < 24){
+						origin += "\t\t\t";
+					} else if(origin.length() < 32){
+						origin += "\t\t";
+					} else if(origin.length() < 40){
+						origin += "\t";
+					}
+
+					writer.write(origin);
+					
+					if(hasThrowable)					writer.write(((Throwable)msg).getStackTrace().toString());
+					else								writer.write(msg.toString());
+
+					//if the message already ends with a line break we shouldn't add a new one
+					//if(!msg.toString().endsWith("\n"))	writer.write("\n");
+					writer.write((msg.toString().replace("%n", "; ")).replace("\n", "; ") + "\n");
+					
+					//close the writer
+					writer.close();
+				} else {
+					//if the file doesn't exist create it
+					logFile.createNewFile();
+				}
+			} catch(Exception e) {
+				e.printStackTrace();
+			} finally {
+				try {
+					//Close the writer regardless of what happens...
+					writer.close();
+				} catch (Exception e) {
+					//Well ... we tried ...
+				}
+			}
+		}
+	}
+
+	public static boolean eraseLogFile(){
+		if(logFile.exists())	return logFile.delete();
+		else					return false;
+	}
 }

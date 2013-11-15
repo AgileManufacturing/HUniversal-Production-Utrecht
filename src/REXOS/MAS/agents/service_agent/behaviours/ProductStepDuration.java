@@ -141,7 +141,7 @@ public class ProductStepDuration extends ReceiveBehaviour implements ParentBehav
 	//		askMessage.setContentObject(serviceStepId);
 	//		serviceAgent.send(askMessage);
 		} catch(UnreadableException | InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 			serviceAgent.doDelete();
 		}
 	}

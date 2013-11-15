@@ -158,7 +158,7 @@ public class DeltaRobotModule extends Module {
 			
 			if(payload.containsField("z") && payload.getString("z").equals("Z-PLACEHOLDER")) 
 			{
-				payload.put("z", position.getZ() + extraSize);
+				payload.put("z", position.getZ() - extraSize);
 			}
 			
 			payload.put("maxAcceleration", MAX_ACCELERATION);
@@ -243,7 +243,7 @@ public class DeltaRobotModule extends Module {
 		BasicDBObject payload = new BasicDBObject("z", extraSize + SAFE_MOVEMENT_PLANE);
 		payload.put("maxAcceleration", MAX_ACCELERATION);
 		
-		// create the lookUpParameters
+		// create the lookUpParametersextraSize
 		if(parameters.containsField("position")) {
 			Position position = new Position((BasicDBObject) parameters.get("position"));
 
@@ -355,7 +355,7 @@ public class DeltaRobotModule extends Module {
 			} 
 			else 
 			{
-				payload.put("z", position.getZ() + extraSize);
+				payload.put("z", position.getZ() - extraSize);
 			}
 			
 			payload.put("maxAcceleration", MAX_ACCELERATION);

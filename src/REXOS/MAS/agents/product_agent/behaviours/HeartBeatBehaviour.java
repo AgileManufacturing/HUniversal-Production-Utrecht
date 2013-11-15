@@ -15,9 +15,9 @@ package agents.product_agent.behaviours;
 
 import java.util.concurrent.TimeUnit;
 
+import agents.logistics_agent.behaviours.ArePartsAvailable;
 import jade.core.Agent;
 import jade.core.behaviours.WakerBehaviour;
-
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 

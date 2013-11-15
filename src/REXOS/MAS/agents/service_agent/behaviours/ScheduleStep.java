@@ -124,7 +124,7 @@ public class ScheduleStep extends ReceiveBehaviour implements ParentBehaviourCal
 			//	sendMsg.setContentObject(productStep);
 			//	agent.send(sendMsg);
 			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {
-				Logger.log(LogLevel.ERROR, e);
+				Logger.log(LogLevel.ERROR, "", e);
 				serviceAgent.doDelete();
 			}
 		}
@@ -158,7 +158,7 @@ public class ScheduleStep extends ReceiveBehaviour implements ParentBehaviourCal
 			try {
 				informMsg.setContentObject((Serializable) arguments.getArgument("stepId"));
 			} catch (IOException e) {
-				Logger.log(LogLevel.ERROR, e);
+				Logger.log(LogLevel.ERROR, "", e);
 			}
 			serviceAgent.send(informMsg);
 			break;

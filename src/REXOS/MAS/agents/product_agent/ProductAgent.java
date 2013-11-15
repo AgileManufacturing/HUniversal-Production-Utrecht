@@ -96,7 +96,7 @@ public class ProductAgent extends Agent {
 			// Create the Overview Behaviour and start it
 			_overviewBehaviour = new OverviewBehaviour(this);
 			addBehaviour(_overviewBehaviour);
-			Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as an product agent.");
+			Logger.log(LogLevel.NOTIFICATION, "" + this.getAID().getLocalName() + " spawned as an product agent.");
 		} catch (IllegalArgumentException e) {
 		Logger.log(
 			LogLevel.ERROR,
@@ -165,7 +165,7 @@ public class ProductAgent extends Agent {
 
 					this._properties = pap;
 				} catch (Exception e) {
-					Logger.log(LogLevel.ERROR, "[temp] gotta catch 'em all!", e);
+					Logger.log(LogLevel.ERROR, "gotta catch 'em all!", e);
 				}
 			} else if (args[0].getClass() == ProductAgentProperties.class) {
 				this._properties = (ProductAgentProperties) args[0];

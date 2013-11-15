@@ -125,7 +125,7 @@ public class ProductionDuration extends ReceiveBehaviour implements ParentBehavi
 		//		myAgent.send(responseMessage);
 			}
 		} catch(Exception e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 			equipletAgent.doDelete();
 		}
 	}
@@ -145,7 +145,7 @@ public class ProductionDuration extends ReceiveBehaviour implements ParentBehavi
 		try {
 			responseMessage.setContentObject(new Long(schedule.getDuration()));
 		} catch (IOException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 		}
 		equipletAgent.send(responseMessage);
 		

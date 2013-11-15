@@ -53,7 +53,6 @@ import java.net.UnknownHostException;
 
 import agents.data_classes.Callback;
 import agents.data_classes.GUIMessage;
-
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 

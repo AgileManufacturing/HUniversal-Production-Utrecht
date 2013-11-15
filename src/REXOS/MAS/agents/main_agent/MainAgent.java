@@ -64,6 +64,7 @@ import agents.data_classes.Product;
 import agents.data_classes.ProductAgentProperties;
 import agents.data_classes.Production;
 import agents.data_classes.ProductionStep;
+import agents.logistics_agent.behaviours.ArePartsAvailable;
 
 import com.mongodb.BasicDBObject;
 
@@ -113,7 +114,7 @@ public class MainAgent extends Agent {
 			
 			getContainerController().createNewAgent("EQ1", "agents.equiplet_agent.EquipletAgent", ar).start();
 
-			Logger.log(LogLevel.DEBUG, "Started equiplet AGNT");
+			Logger.log(LogLevel.DEBUG, "Started equiplet agent");
 
 			// Create parameters
 			BasicDBObject placeParameters1 = new BasicDBObject();
@@ -197,7 +198,7 @@ public class MainAgent extends Agent {
 					getContainerController()
 							.createNewAgent("pa" + count++, "agents.product_agent.ProductAgent", args).start();
 				} catch(StaleProxyException e) {
-					Logger.log(LogLevel.ERROR, e);
+					Logger.log(LogLevel.ERROR, "", e);
 				}
 			}
 			block();
