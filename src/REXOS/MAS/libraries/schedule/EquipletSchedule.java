@@ -1,21 +1,20 @@
 package libraries.schedule;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-import org.bson.types.ObjectId;
-
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import com.mongodb.QueryBuilder;
 
 import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
-import libraries.schedule.data_classes.ProductStepScheduleData;
-import libraries.schedule.data_classes.Schedule;
-import libraries.schedule.data_classes.ScheduleAccessException;
+import libraries.schedule.data_classes.*;
 
 public class EquipletSchedule extends Schedule {
-	
 	
 	
 	private BlackboardClient planningBlackboard;
@@ -43,6 +42,8 @@ public class EquipletSchedule extends Schedule {
 		FreeTimeSlotBlackboard = new BlackboardClient(scheduleHostName, schedulePort);
 		RealtimeBlackboard = new BlackboardClient(scheduleHostName, schedulePort);
 		
+		
+		
 		planningBlackboard.setDatabase(databaseName);
 		FreeTimeSlotBlackboard.setDatabase(databaseName);
 		RealtimeBlackboard.setDatabase(databaseName);
@@ -56,18 +57,45 @@ public class EquipletSchedule extends Schedule {
 		planningBlackboard.removeDocuments(new BasicDBObject());
 		FreeTimeSlotBlackboard.removeDocuments(new BasicDBObject());
 		RealtimeBlackboard.removeDocuments(new BasicDBObject());
+		
+		//insert new freetimeslot indef
+		
+		
 	}
 
-	@Override
-	public void GetFreeTimeSlots(UUID lockKey) throws ScheduleAccessException {
-		super.GetFreeTimeSlots(lockKey);
-		// TODO Auto-generated method stub
+	public ArrayList<FreeTimeSlot> GetFreeTimeSlots(UUID lockKey, Long duration, Long deadline) throws ScheduleAccessException, InvalidDBNamespaceException, GeneralMongoException {
+		super.checkLock(lockKey);
+		
+		ArrayList<FreeTimeSlot> freeTimeSlots = new ArrayList<FreeTimeSlot>();
+		
+		//filter freetimeslots on not shorter than given duration
+		if (duration != null){
+			
+		}
+		//filter results on times before the deadline
+		if (deadline != null){
+			
+		}
+		//create search query
+		//DBObject filterquery = QueryBuilder.start("startTimeSlot").lessThan(deadline).get();
+		BasicDBObject orderBy = new BasicDBObject("startTimeSlot", "1");
+		
+		BasicDBObject findquery = new BasicDBObject("$orderby", orderBy);
+		
+		List<DBObject> freeTimeSlotDBObjects = FreeTimeSlotBlackboard.findDocuments(findquery);
+		
+		for(DBObject freeTimeSlotDBObject : freeTimeSlotDBObjects){
+			freeTimeSlots.add(new FreeTimeSlot((BasicDBObject) freeTimeSlotDBObject));
+		}
+		
+		return freeTimeSlots; 
 	}
-
-	@Override
+	
 	public void ScheduleOn(UUID lockKey, ProductStepScheduleData scheduleData) throws ScheduleAccessException {
-		super.ScheduleOn(lockKey, scheduleData);
+		super.checkLock(lockKey);
 		// TODO Auto-generated method stub
+		
+		
 		
 	}
 

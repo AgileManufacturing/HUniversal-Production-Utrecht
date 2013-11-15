@@ -53,6 +53,7 @@ import java.io.Serializable;
 
 import org.bson.types.ObjectId;
 
+import libraries.blackboard_client.data_classes.MongoSaveable;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 

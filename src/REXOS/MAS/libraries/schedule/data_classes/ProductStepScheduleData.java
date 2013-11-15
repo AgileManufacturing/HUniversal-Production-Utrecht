@@ -42,11 +42,12 @@ package libraries.schedule.data_classes;
 
 import java.io.Serializable;
 
+import libraries.blackboard_client.data_classes.MongoSaveable;
+import com.mongodb.BasicDBObject;
+
 import org.bson.types.ObjectId;
 
-import agents.data_classes.MongoSaveable;
 
-import com.mongodb.BasicDBObject;
 
 public class ProductStepScheduleData implements MongoSaveable, Serializable {
 

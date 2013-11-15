@@ -21,14 +21,8 @@ public abstract class Schedule{
 		this.scheduleLock = new ScheduleLock();
 	}
 	
-	protected void GetFreeTimeSlots(UUID lockKey) throws ScheduleAccessException{
-		if (! scheduleLock.isCurrentOwner(lockKey)){
-			throw new ScheduleAccessException("not owner of lock");
-		}
-	}
-	
-	protected void ScheduleOn(UUID lockKey, ProductStepScheduleData scheduleData) throws ScheduleAccessException{
-		if (! scheduleLock.isCurrentOwner(lockKey)){
+	public void checkLock(UUID key) throws ScheduleAccessException{
+		if (! scheduleLock.isCurrentOwner(key)){
 			throw new ScheduleAccessException("not owner of lock");
 		}
 	}

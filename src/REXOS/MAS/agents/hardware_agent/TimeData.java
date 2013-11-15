@@ -29,7 +29,7 @@
  **/
 package agents.hardware_agent;
 
-import agents.data_classes.MongoSaveable;
+import libraries.blackboard_client.data_classes.MongoSaveable;
 
 import com.mongodb.BasicDBObject;
 

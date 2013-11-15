@@ -35,7 +35,7 @@ package agents.hardware_agent;
  *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-import agents.data_classes.MongoSaveable;
+import libraries.blackboard_client.data_classes.MongoSaveable;
 
 import com.mongodb.BasicDBObject;
 

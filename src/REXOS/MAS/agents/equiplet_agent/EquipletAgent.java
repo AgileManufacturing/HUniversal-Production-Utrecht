@@ -245,8 +245,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 * 		The starttime of the equiplet
 	 */
 	private static long systemStart = System.currentTimeMillis();
-
-	private ScheduleLock scheduleLock;
 	
 	private EquipletSchedule equipletSchedule;
 	
@@ -273,7 +271,6 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as an equiplet agent.");
 			
 			equipletSchedule = new EquipletSchedule(equipletDbIp, equipletDbPort, equipletDbName, true);
-			scheduleLock = new ScheduleLock();
 			
 			communicationTable = new HashMap<String, ObjectId>();
 			behaviours = new ArrayList<Behaviour>();
@@ -689,8 +686,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		return dbData;
 	}
 	
-	public synchronized ScheduleLock getScheduleLock(){
-		return scheduleLock;
+	public EquipletSchedule getSchedule(){
+		return equipletSchedule;
 	}
 	
 	public static long getCurrentTimeSlot(){
