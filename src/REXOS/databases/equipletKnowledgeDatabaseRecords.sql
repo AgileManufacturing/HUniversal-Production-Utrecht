@@ -81,3 +81,33 @@ insert into Module(
 }");
 
 
+
+
+
+
+
+insert into ModuleCalibration (id, properties) values
+(1, "{
+\"distCoeffs\" : {
+	\"\" : -0.584008,
+	\"\" : -4.858694,
+	\"\" : -0.009096,
+	\"\" : -0.016636,
+	\"\" : 40.603377
+},
+\"cameraMatrix\" : {
+	\"\" : 846.623497,
+	\"\" : 0,
+	\"\" : 358.965449,
+	\"\" : 0,
+	\"\" : 851.128986,
+	\"\" : 222.244692,
+	\"\" : 0,
+	\"\" : 0,
+	\"\" : 1
+}");
+
+insert into ModuleCalibrationGroup (ModuleCalibration, manufacturer, typeNumber, serialNumber) values
+(1, "The_Imaging_Source_Europe_GmbH", "Cheap_ass_lens", "1"), 
+(1, "The_Imaging_Source_Europe_GmbH", "DFK_22AUC03", "26210035");
+

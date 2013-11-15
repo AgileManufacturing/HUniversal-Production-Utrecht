@@ -7,21 +7,6 @@ find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation visio
 find_package(OpenCV REQUIRED COMPONENTS)
 find_package(Mongo)
 
-file(GLOB_RECURSE msgs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/msg" "*.msg")
-add_message_files(
-DIRECTORY msg
-FILES ${msgs} )
-  	
-file(GLOB_RECURSE srvs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/srv" "*.srv")
-add_service_files(
-DIRECTORY srv
-FILES ${srvs} )
-
-generate_messages (
-	DEPENDENCIES std_msgs
-)
-
-
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include

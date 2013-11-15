@@ -145,6 +145,7 @@ void EquipletNode::handleEquipletStep(rexos_datatypes::EquipletStep * step, mong
 
 						//we need to call the lookup handler first
 			if(instructionData.getLook_up().length() > 0 && instructionData.getLook_up().compare("NULL") != 0) {
+				std::cout << "Calling lookuphandler" << std::endl;
 				map<std::string, std::string> newPayload = callLookupHandler(instructionData.getLook_up(), instructionData.getLook_up_parameters(), instructionData.getPayload());
 				instructionData.setPayload(newPayload);
 			}
