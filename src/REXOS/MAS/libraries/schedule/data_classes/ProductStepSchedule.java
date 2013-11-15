@@ -49,7 +49,7 @@ import org.bson.types.ObjectId;
 
 
 
-public class ProductStepScheduleData implements MongoSaveable, Serializable {
+public class ProductStepSchedule implements MongoSaveable, Serializable {
 
 	/**
 	 * 
@@ -80,18 +80,18 @@ public class ProductStepScheduleData implements MongoSaveable, Serializable {
 	 **/
 	private long deadline;
 	
-	public ProductStepScheduleData(ObjectId objectid, long startTime, long duration, long deadline){
+	public ProductStepSchedule(ObjectId objectid, long startTime, long duration, long deadline){
 		this.objectId = objectid;
 		this.startTime = startTime;
 		this.duration = duration;
 		this.deadline = deadline;
 	}
 	
-	public ProductStepScheduleData(ObjectId objectId){
+	public ProductStepSchedule(ObjectId objectId){
 		this(objectId, -1, -1, -1);
 	}
 	
-	public ProductStepScheduleData(BasicDBObject basicDBObject){
+	public ProductStepSchedule(BasicDBObject basicDBObject){
 		fromBasicDBObject(basicDBObject);
 	}
 	

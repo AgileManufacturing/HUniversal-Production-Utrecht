@@ -79,6 +79,7 @@ import libraries.knowledgedb_client.Queries;
 import libraries.knowledgedb_client.Row;
 import libraries.schedule.EquipletSchedule;
 import libraries.schedule.data_classes.Schedule;
+import libraries.schedule.data_classes.TimeSlotSynchronization;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
@@ -270,7 +271,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		 	
 			Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as an equiplet agent.");
 			
-			equipletSchedule = new EquipletSchedule(equipletDbIp, equipletDbPort, equipletDbName, true);
+			
 			
 			communicationTable = new HashMap<String, ObjectId>();
 			behaviours = new ArrayList<Behaviour>();
@@ -333,11 +334,16 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 
 			// gets the timedata for synchronizing from the collective blackboard.
 			BasicDBObject timeData = (BasicDBObject) collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
-
+			long firstTimeSlot = timeData.getLong("firstTimeSlot");
+			int timeSlotLength = timeData.getInt("timeSlotLength");
+			
 			// initiates the timer to the next product step.
-			timer = new NextProductStepTimer(timeData.getLong("firstTimeSlot"), timeData.getInt("timeSlotLength"), this);
+			timer = new NextProductStepTimer(firstTimeSlot, timeSlotLength, this);
 
 			collectiveBBClient.setCollection(equipletDirectoryName);
+			
+			TimeSlotSynchronization timeSlotSynchronization = new TimeSlotSynchronization(firstTimeSlot, timeSlotLength);
+			equipletSchedule = new EquipletSchedule(equipletDbIp, equipletDbPort, equipletDbName, timeSlotSynchronization, true);
 		} catch(GeneralMongoException | InvalidDBNamespaceException | UnknownHostException | StaleProxyException
 				| KnowledgeException | KeyNotFoundException  e) {
 			Logger.log(LogLevel.CRITICAL, "Could not spawn Equiplet", e);

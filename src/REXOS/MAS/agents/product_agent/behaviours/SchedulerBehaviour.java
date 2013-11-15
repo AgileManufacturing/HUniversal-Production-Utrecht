@@ -50,15 +50,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
+import libraries.schedule.data_classes.EquipletFreeTimeData;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 import agents.data_classes.BehaviourStatus;
 import agents.data_classes.DbData;
-import agents.data_classes.EquipletScheduleInformation;
 import agents.data_classes.Product;
 import agents.data_classes.Production;
 import agents.data_classes.ProductionEquipletMapper;
@@ -91,10 +92,12 @@ public class SchedulerBehaviour extends Behaviour {
 	
 	private boolean scheduleInformationDone = false;
 	
-	private HashMap<AID, EquipletScheduleInformation> equipletSchedules = new HashMap<AID, EquipletScheduleInformation>();
+	private HashMap<AID, EquipletFreeTimeData> equipletSchedules = new HashMap<AID, EquipletFreeTimeData>();
 	private ArrayList<AID> refusedEquiplets = new ArrayList<AID>();
 	
 	private ArrayList<ProductionStep> productionSteps;
+	private HashMap<AID, UUID> equipletKeys;
+	
 	/**
 	 * Construct scheduler behavior
 	 * @param myAgent
@@ -254,8 +257,10 @@ public class SchedulerBehaviour extends Behaviour {
 		super.restart();
 	}
 
-	public void callbackScheduleInformation(HashMap<AID, EquipletScheduleInformation> equipletSchedules, ArrayList<AID> refusedEquiplets, SchedulerBehaviour schedulerBehaviour){
+	public void callbackScheduleInformation(HashMap<AID, EquipletFreeTimeData> equipletSchedules, ArrayList<AID> refusedEquiplets,
+			SchedulerBehaviour schedulerBehaviour, HashMap<AID, UUID> equipletKeys){
 		schedulerBehaviour.equipletSchedules = equipletSchedules;
+		schedulerBehaviour.equipletKeys = equipletKeys;
 		
 		Logger.log(LogLevel.DEBUG, "ScheduleInformationBehaviour is done, continuing the ScheduleBehaviour");
 		scheduleInformationDone = true;

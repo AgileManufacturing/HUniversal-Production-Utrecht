@@ -1,7 +1,7 @@
 /**
  * @file REXOS/MAS/agents/equiplet_agent/behaviours/ScheduleInformation.java
  * @brief Behaviour for giving information about the current schedule of this equiplet.
- * 			Will also set the lock on the schedule of this equiplet
+ * 			Can also set the lock on demand on the schedule of this equiplet 
  * @date Created: 04 nov. 2013
  * 
  * @author Roy Scheefhals
@@ -35,30 +35,28 @@
  **/
 package agents.equiplet_agent.behaviours;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.UUID;
-
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import libraries.blackboard_client.BlackboardClient;
+
+import java.io.IOException;
+import java.util.UUID;
+
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
-import libraries.schedule.data_classes.ProductStepScheduleData;
-import agents.data_classes.EquipletScheduleInformation;
+import libraries.schedule.data_classes.EquipletFreeTimeData;
+import libraries.schedule.data_classes.ScheduleException;
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.Logger;
 import agents.equiplet_agent.EquipletAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 
 public class ScheduleInformation extends ReceiveBehaviour {
 
 	/**
-	 * @var static final long serialVersionUID The serial version UID for this
-	 *      class
+	 * @var static final long serialVersionUID 
+	 * 		The serial version UID for this class
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -1997392331052927657L;
 
 	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("ScheduleInformation");
 
@@ -85,25 +83,15 @@ public class ScheduleInformation extends ReceiveBehaviour {
 						response.setContentObject(scheduleKey);
 						equipletAgent.send(response);
 						
-						EquipletScheduleInformation scheduleInformation = new EquipletScheduleInformation();
-					//	BlackboardClient planningBlackboard = equipletAgent.getPlanningBBClient();
-						
-						//TODO: Improve this, build a mechanism that will always provide up to date schedule information
-						//without having to get all the data every time from the blackboard
-					//	List<DBObject> results =  planningBlackboard.findDocuments(new BasicDBObject());
-					//	for (DBObject result : results){
-					//		ProductStepScheduleData prodSchedule = new ProductStepScheduleData((BasicDBObject) result);
-					//	}
+						EquipletFreeTimeData freeTimeData =  equipletAgent.getSchedule().GetFreeTimeSlots(null, null);
 						
 						
 						// get schedule and calculate load
-						double load = 50.0d;
-						scheduleInformation.setLoad(load);
 						
 						//message the questioning agent with the equiplet's schedule
 						response = message.createReply();
 						response.setPerformative(ACLMessage.INFORM);
-						response.setContentObject(scheduleInformation);
+						response.setContentObject(freeTimeData);
 					}				
 					// schedule is locked, send refuse message
 					else {
@@ -113,27 +101,19 @@ public class ScheduleInformation extends ReceiveBehaviour {
 					// Don't lock the the schedule, just get and send it
 					response.setPerformative(ACLMessage.INFORM);
 					
-					EquipletScheduleInformation scheduleInformation = new EquipletScheduleInformation();
-					BlackboardClient planningBlackboard = equipletAgent.getPlanningBBClient();
+					EquipletFreeTimeData freeTimeData =  equipletAgent.getSchedule().GetFreeTimeSlots(null, null);
 					
-					//TODO: Improve this, build a mechanism that will always provide up to date schedule information
-					//without having to get all the data every time from the blackboard
-					List<DBObject> results =  planningBlackboard.findDocuments(new BasicDBObject());
-					
-					for (DBObject result : results){
-						ProductStepScheduleData prodSchedule = new ProductStepScheduleData((BasicDBObject) result);
-					}
-					// get schedule and calculate load
-					double load = 50.0d;
-					scheduleInformation.setLoad(load);
-					
-					response.setContentObject(scheduleInformation);
+					response.setContentObject(freeTimeData);
 				}
 				
 				// Send the response
 				equipletAgent.send(response);
 			} catch (IOException | InvalidDBNamespaceException | GeneralMongoException e) {
-				e.printStackTrace();
+				Logger.log(LogLevel.ERROR, e);
+			} catch (ScheduleException e) {
+				ACLMessage response = message.createReply();
+				response.setPerformative(ACLMessage.FAILURE);
+				equipletAgent.send(response);
 			}
 
 		}

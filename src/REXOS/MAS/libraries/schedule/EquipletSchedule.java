@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import com.mongodb.QueryBuilder;
 
 import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
@@ -25,10 +24,13 @@ public class EquipletSchedule extends Schedule {
 	
 	private String databaseName;
 	
-	public EquipletSchedule(String scheduleHostName, int schedulePort, String databaseName, boolean clearSchedule) 
+	private TimeSlotSynchronization timeSlotSynchronization;
+	
+	public EquipletSchedule(String scheduleHostName, int schedulePort, String databaseName, TimeSlotSynchronization timeSlotSynchronization, boolean clearSchedule) 
 			throws UnknownHostException, GeneralMongoException, InvalidDBNamespaceException{
 		super(scheduleHostName, schedulePort);
 		this.databaseName = databaseName;
+		this.timeSlotSynchronization = timeSlotSynchronization;
 		
 		Setup();
 		
@@ -41,8 +43,6 @@ public class EquipletSchedule extends Schedule {
 		planningBlackboard = new BlackboardClient(scheduleHostName, schedulePort);
 		FreeTimeSlotBlackboard = new BlackboardClient(scheduleHostName, schedulePort);
 		RealtimeBlackboard = new BlackboardClient(scheduleHostName, schedulePort);
-		
-		
 		
 		planningBlackboard.setDatabase(databaseName);
 		FreeTimeSlotBlackboard.setDatabase(databaseName);
@@ -59,15 +59,17 @@ public class EquipletSchedule extends Schedule {
 		RealtimeBlackboard.removeDocuments(new BasicDBObject());
 		
 		//insert new freetimeslot indef
+		long currentTimeSlot = timeSlotSynchronization.getCurrentTimeSlot();
+		FreeTimeSlot freeTimeSlot = new FreeTimeSlot(currentTimeSlot, null);
 		
-		
+		FreeTimeSlotBlackboard.insertDocument(freeTimeSlot.toBasicDBObject());
 	}
 
-	public ArrayList<FreeTimeSlot> GetFreeTimeSlots(UUID lockKey, Long duration, Long deadline) throws ScheduleAccessException, InvalidDBNamespaceException, GeneralMongoException {
-		super.checkLock(lockKey);
+	public EquipletFreeTimeData GetFreeTimeSlots(Long duration, Long deadline) throws InvalidDBNamespaceException, GeneralMongoException, ScheduleException {
+		
 		
 		ArrayList<FreeTimeSlot> freeTimeSlots = new ArrayList<FreeTimeSlot>();
-		
+		Long infiniteFreeTimeSlot = null;
 		//filter freetimeslots on not shorter than given duration
 		if (duration != null){
 			
@@ -85,13 +87,25 @@ public class EquipletSchedule extends Schedule {
 		List<DBObject> freeTimeSlotDBObjects = FreeTimeSlotBlackboard.findDocuments(findquery);
 		
 		for(DBObject freeTimeSlotDBObject : freeTimeSlotDBObjects){
-			freeTimeSlots.add(new FreeTimeSlot((BasicDBObject) freeTimeSlotDBObject));
+			FreeTimeSlot newFreeTimeSlot = new FreeTimeSlot((BasicDBObject) freeTimeSlotDBObject); 
+			if ( newFreeTimeSlot.getDuration() != null){
+				freeTimeSlots.add(newFreeTimeSlot);
+			}
+			else{
+				infiniteFreeTimeSlot = newFreeTimeSlot.getStartTimeSlot();
+			}
+			
+		}
+		if (infiniteFreeTimeSlot == null){
+			throw new ScheduleException("InfiniteFreeTimeSlot not found, Schedule is full or the FreeTimeSlotBlackboard has failed");
 		}
 		
-		return freeTimeSlots; 
+		EquipletFreeTimeData freeTimeData = new EquipletFreeTimeData(freeTimeSlots, infiniteFreeTimeSlot, 50.0d);
+		
+		return freeTimeData; 
 	}
 	
-	public void ScheduleOn(UUID lockKey, ProductStepScheduleData scheduleData) throws ScheduleAccessException {
+	public void ScheduleOn(UUID lockKey, ProductStepSchedule scheduleData) throws ScheduleAccessException {
 		super.checkLock(lockKey);
 		// TODO Auto-generated method stub
 		

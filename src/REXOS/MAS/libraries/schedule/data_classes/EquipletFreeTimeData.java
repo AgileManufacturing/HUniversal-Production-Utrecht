@@ -1,15 +1,23 @@
 package libraries.schedule.data_classes;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class FreeTimeData {
+public class EquipletFreeTimeData implements Serializable {
 
-	
+	/**
+	 * @var long serialVersionUID
+	 * 		The serialization UID of this class
+	 */
+	private static final long serialVersionUID = 6144606966764813921L;
+
 	private ArrayList<FreeTimeSlot> freeTimeSlots = new ArrayList<FreeTimeSlot>();
 	
 	private long infiniteFreeTimeSlot;
 	
-	public FreeTimeData(ArrayList<FreeTimeSlot> freeTimeSlots, long infiniteFreeTimeSlot){
+	private double load;
+	
+	public EquipletFreeTimeData(ArrayList<FreeTimeSlot> freeTimeSlots, long infiniteFreeTimeSlot, double load){
 		this.freeTimeSlots = freeTimeSlots;
 		this.infiniteFreeTimeSlot = infiniteFreeTimeSlot;
 	}
@@ -20,5 +28,9 @@ public class FreeTimeData {
 	
 	public long getinfiniteFreeTimeSlot(){
 		return infiniteFreeTimeSlot;
+	}
+	
+	public double getLoad(){
+		return load;
 	}
 }
