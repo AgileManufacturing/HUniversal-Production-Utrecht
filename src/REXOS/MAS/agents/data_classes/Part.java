@@ -51,6 +51,8 @@ import java.io.Serializable;
 
 import javax.sound.midi.Patch;
 
+import libraries.blackboard_client.data_classes.MongoSaveable;
+
 import com.mongodb.BasicDBObject;
 
 /**

@@ -33,9 +33,10 @@
  **/
 package agents.service_agent;
 
+import libraries.blackboard_client.data_classes.MongoSaveable;
+
 import org.bson.types.ObjectId;
 
-import agents.data_classes.MongoSaveable;
 import agents.data_classes.StepStatusCode;
 
 import com.mongodb.BasicDBObject;

@@ -31,9 +31,9 @@
  *          LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package agents.equiplet_agent;
+package libraries.schedule.data_classes;
 
-import jade.core.AID;
+import java.util.UUID;
 
 public class ScheduleLock {
 	
@@ -47,32 +47,27 @@ public class ScheduleLock {
 	 * @var AID lockGivenTo
 	 * 		the AID of an agent the lock is given to
 	 */
-	private AID lockGivenTo;
+	private UUID currentKey;
 	
 	/**
 	 * Basic constructor.
 	 */
 	public ScheduleLock(){
 		scheduleLock = false;
-		lockGivenTo = null;
+		currentKey = null;
 	}
 	
 	/**
-	 * Function for acquiring a lock for a given agent.
-	 * @param agent The AID of the agent asking for the lock.
-	 * @return True if the lock is given or already had the lock, false if the lock is not given
+	 * Function for acquiring a lock.
+	 * @return null if the schedule could not be locked, or a new UUID will be given as key to this lock
 	 */
-	public boolean acquireScheduleLock(AID agent){
-		if (this.lockGivenTo.equals(agent)){
-			return true;
+	public UUID acquireScheduleLock(){
+		if ( scheduleLock ){
+			return null;
 		}
-		else if (scheduleLock){
-			return false;
-		}
-		else {
-			lockGivenTo = agent;
-			return true;
-		}
+		currentKey = UUID.randomUUID();
+		scheduleLock = true;
+		return currentKey;
 	}
 	
 	/**
@@ -81,26 +76,27 @@ public class ScheduleLock {
 	 * @return True if the lock is succesfully released or was already released, 
 	 * 		   false if the asker is not the current owner 
 	 */
-	public boolean releaseLock(AID agent){
+	public boolean releaseLock(UUID key){
 		if (!scheduleLock){
 			return true;
 		}
-		if (agent.equals(lockGivenTo)){
+		if (key.equals(currentKey)){
 			scheduleLock = false;
-			lockGivenTo = null;
+			currentKey = null;
 			return true;
 		}
 		return false;
 	}
 	
 	/**
-	 * Gets the current owner of the lock, don't use this to get the current lock owner to release the lock
-	 * @return the AID of the current lockowner, null if there is no current owner.
+	 * checks the current owner of the lock
+	 * @param key the key used to check the ownership
+	 * @return true if the given key is the right one
 	 */
-	public AID getCurrentOwnerOfLock(){
-		if (scheduleLock){
-			return lockGivenTo;
+	public boolean isCurrentOwner(UUID key){
+		if (currentKey.equals(key)){
+			return true;
 		}
-		return null;
+		return false;
 	}
 }

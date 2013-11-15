@@ -30,6 +30,8 @@
  **/
 package agents.data_classes;
 
+import libraries.blackboard_client.data_classes.MongoSaveable;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 

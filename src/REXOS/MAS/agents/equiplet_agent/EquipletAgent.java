@@ -77,6 +77,8 @@ import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.knowledgedb_client.Queries;
 import libraries.knowledgedb_client.Row;
+import libraries.schedule.EquipletSchedule;
+import libraries.schedule.data_classes.Schedule;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
@@ -243,8 +245,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 * 		The starttime of the equiplet
 	 */
 	private static long systemStart = System.currentTimeMillis();
-
-	private ScheduleLock scheduleLock;
+	
+	private EquipletSchedule equipletSchedule;
 	
 	/**
 	 * Setup function for the equipletAgent. Configures the IP and database name
@@ -258,7 +260,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	@Override
 	public void setup() {
 		try {
-			scheduleLock = new ScheduleLock();
+			
 			
 			equipletDbIp = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbIp", getAID().getLocalName());
 			equipletDbPort = Configuration.getPropertyInt(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbPort", getAID().getLocalName());
@@ -267,6 +269,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		 	planningName = Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "PlanningBlackBoardName", getAID().getLocalName());
 		 	
 			Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as an equiplet agent.");
+			
+			equipletSchedule = new EquipletSchedule(equipletDbIp, equipletDbPort, equipletDbName, true);
 			
 			communicationTable = new HashMap<String, ObjectId>();
 			behaviours = new ArrayList<Behaviour>();
@@ -682,8 +686,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 		return dbData;
 	}
 	
-	public synchronized ScheduleLock getScheduleLock(){
-		return scheduleLock;
+	public EquipletSchedule getSchedule(){
+		return equipletSchedule;
 	}
 	
 	public static long getCurrentTimeSlot(){

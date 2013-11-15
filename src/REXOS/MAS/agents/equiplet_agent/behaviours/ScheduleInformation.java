@@ -37,6 +37,7 @@ package agents.equiplet_agent.behaviours;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -46,10 +47,9 @@ import jade.lang.acl.MessageTemplate;
 import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
+import libraries.schedule.data_classes.ProductStepScheduleData;
 import agents.data_classes.EquipletScheduleInformation;
-import agents.data_classes.ProductStepScheduleData;
 import agents.equiplet_agent.EquipletAgent;
-import agents.equiplet_agent.ScheduleLock;
 import agents.shared_behaviours.ReceiveBehaviour;
 
 public class ScheduleInformation extends ReceiveBehaviour {
@@ -77,23 +77,25 @@ public class ScheduleInformation extends ReceiveBehaviour {
 				ACLMessage response = message.createReply();
 				
 				if(message.getContent() == "lock") {
-					ScheduleLock scheduleLock = equipletAgent.getScheduleLock();
-					boolean haveLock = scheduleLock.acquireScheduleLock(message.getSender());
+					UUID scheduleKey = equipletAgent.getSchedule().getScheduleLock();
 					
-					if(haveLock){
+					if(scheduleKey != null){
 						//send agree message according to the FIPA standard
 						response.setPerformative(ACLMessage.AGREE);
+						response.setContentObject(scheduleKey);
 						equipletAgent.send(response);
 						
 						EquipletScheduleInformation scheduleInformation = new EquipletScheduleInformation();
-						BlackboardClient planningBlackboard = equipletAgent.getPlanningBBClient();
+					//	BlackboardClient planningBlackboard = equipletAgent.getPlanningBBClient();
 						
 						//TODO: Improve this, build a mechanism that will always provide up to date schedule information
 						//without having to get all the data every time from the blackboard
-						List<DBObject> results =  planningBlackboard.findDocuments(new BasicDBObject());
-						for (DBObject result : results){
-							ProductStepScheduleData prodSchedule = new ProductStepScheduleData((BasicDBObject) result);
-						}
+					//	List<DBObject> results =  planningBlackboard.findDocuments(new BasicDBObject());
+					//	for (DBObject result : results){
+					//		ProductStepScheduleData prodSchedule = new ProductStepScheduleData((BasicDBObject) result);
+					//	}
+						
+						
 						// get schedule and calculate load
 						double load = 50.0d;
 						scheduleInformation.setLoad(load);
