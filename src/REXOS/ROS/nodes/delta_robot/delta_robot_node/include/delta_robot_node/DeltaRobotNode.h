@@ -88,7 +88,7 @@ namespace deltaRobotNodeNamespace{
 		bool moveToPoint(double x, double y, double z, double maxAcceleration);
 		bool moveToRelativePoint(double x, double y, double z, double maxAcceleration);
 
-		Point parsePoint(const JSONNode & n);
+		Point parsePoint(const JSONNode & n, std::string * valuesSet);
 		std::string parseNodeValue(const std::string nodeName, const JSONNode & n);
 		Point parseLookup(const JSONNode & n);
 		Point *parsePointArray(std::string json, int & size);
