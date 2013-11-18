@@ -1,6 +1,6 @@
 /**
- * @file REXOS/MAS/libraries/schedule/data_classes/ScheduleAccessException.java
- * @brief Exception used for schedule lock access errors
+ * @file REXOS/MAS/libraries/schedule/data_classes/EquipletFreeTimeData.java
+ * @brief Data object for the representation of freetimeslots for the EquipletSchedule. 
  * @date Created: 15 nov 2013
  * 
  * @author Roy Scheefhals
@@ -36,24 +36,76 @@
  *          OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  **/
-
-
 package libraries.schedule.data_classes;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+
 /**
- * exception class used for schedule lock related errors 
+ * Data class for representation of FreeTimeSlots in a equiplet's schedule
+ * Can be used to pass on to product agents for scheduling of steps
  * @author Roy Scheefhals
  *
  */
-public class ScheduleAccessException extends Exception{
+public class EquipletScheduleInformation implements Serializable {
 
 	/**
 	 * @var long serialVersionUID
-	 * 		the serialization of this class
+	 * 		The serialization UID of this class
 	 */
-	private static final long serialVersionUID = -1784579495774738933L;
+	private static final long serialVersionUID = 6144606966764813921L;
+
+	/**
+	 * @var ArrayList<FreeTimeSlot> freeTimeSlots
+	 * 		Freetimeslots representing gaps in the schedule of the equiplet
+	 */
+	private ArrayList<FreeTimeSlot> freeTimeSlots = new ArrayList<FreeTimeSlot>();
 	
-	public ScheduleAccessException(String message){
-		super(message);
+	/**
+	 * @var long infiniteFreeTimeSlot
+	 * 		The folling timeslot of the last scheduled step in an equipletschedule
+	 */
+	private long infiniteFreeTimeSlot;
+	
+	/**
+	 * @var double load
+	 * 		The load of an equiplet.
+	 * 		value set from the EquipletSchedule will be between 0 and 1
+	 */
+	private double load;
+	
+	/**
+	 * Constructor of this dataclass
+	 * @param freeTimeSlots The freetimeslots available for the equiplet
+	 * @param infiniteFreeTimeSlot The timeslot after the last scheduled step
+	 * @param load the load of the current EquipletSchedule
+	 */
+	public EquipletScheduleInformation(ArrayList<FreeTimeSlot> freeTimeSlots, long infiniteFreeTimeSlot, double load){
+		this.freeTimeSlots = freeTimeSlots;
+		this.infiniteFreeTimeSlot = infiniteFreeTimeSlot;
+	}
+	
+	/**
+	 * gets the freetimeslots available in the equiplet's schedule
+	 * @return the freetimeslots available
+	 */
+	public ArrayList<FreeTimeSlot> getFreeTimeSlots(){
+		return freeTimeSlots;
+	}
+	
+	/**
+	 * gets the first timeslot available after the last scheduled step
+	 * @return the timeslot 
+	 */
+	public long getinfiniteFreeTimeSlot(){
+		return infiniteFreeTimeSlot;
+	}
+	
+	/**
+	 * gets the load of the equiplet in normalized form
+	 * @return a normalized form of the load
+	 */
+	public double getLoad(){
+		return load;
 	}
 }

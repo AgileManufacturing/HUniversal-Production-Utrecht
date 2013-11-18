@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
@@ -88,14 +89,13 @@ public class SchedulerBehaviour extends Behaviour {
 
 	private BehaviourCallback behaviourCallback;
 
-	//private int schedulersStarted = 0;
-	//rivate int schedulersCompleted = 0;
+	private int schedulersStarted = 0;
+	private int schedulersCompleted = 0;
 	
 	private boolean scheduleInformationDone = false;
 	
 	private HashMap<AID, EquipletScheduleInformation> equipletSchedules = new HashMap<AID, EquipletScheduleInformation>();
-	//private ArrayList<AID> refusedEquiplets = new ArrayList<AID>();
-	
+
 	private ArrayList<ProductionStep> productionSteps;
 	/**
 	 * Construct scheduler behavior
@@ -248,8 +248,8 @@ public class SchedulerBehaviour extends Behaviour {
 		isError = false;
         isCompleted = false;
 
-        int schedulersStarted = 0;
-        int schedulersCompleted = 0;
+        schedulersStarted = 0;
+        schedulersCompleted = 0;
 	}
 	
 	@Override
@@ -259,6 +259,7 @@ public class SchedulerBehaviour extends Behaviour {
 
 	public void callbackScheduleInformation(HashMap<AID, EquipletScheduleInformation> equipletSchedules, ArrayList<AID> refusedEquiplets, SchedulerBehaviour schedulerBehaviour){
 		schedulerBehaviour.equipletSchedules = equipletSchedules;
+		schedulerBehaviour.equipletKeys = equipletKeys;
 		
 		Logger.log(LogLevel.DEBUG, "ScheduleInformationBehaviour is done, continuing the ScheduleBehaviour");
 		scheduleInformationDone = true;

@@ -37,23 +37,23 @@ package agents.product_agent.behaviours;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 
-import agents.data_classes.EquipletScheduleInformation;
 import agents.product_agent.ProductAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
-import agents.shared_behaviours.ReceiveOnceBehaviour;
 import jade.core.AID;
-import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import libraries.schedule.data_classes.EquipletScheduleInformation;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
 public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 
 	/**
-	 * 
+	 * @var long serialVersionUID
+	 * 		The serialization UID of this class
 	 */
 	private static final long serialVersionUID = -7266342229623842111L;
 
@@ -66,7 +66,9 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 	private AID[] equipletAgents;
 
 	private HashMap<AID, EquipletScheduleInformation> equipletSchedules;
+	private HashMap<AID, UUID> equipletKeys;
 	private ArrayList<AID> refusedEquiplets;
+	
 	
 	private int totalFinishedEquiplets;
 	
@@ -99,30 +101,33 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if (message != null) {
 			try {
-				if (message.getPerformative() == ACLMessage.REFUSE){
+				if (message.getPerformative() == ACLMessage.AGREE){
+					//agree message has the key to the schedule lock, save it and pass to the schedulebehaviour
+					UUID key = (UUID) message.getContentObject();
+					equipletKeys.put(message.getSender(), key);
+				
+				} else if (message.getPerformative() == ACLMessage.REFUSE){
+					//equiplet is already locked when refused, add to the refusedList
 					refusedEquiplets.add(message.getSender());
 					totalFinishedEquiplets ++;
-				}
-				else if (message.getPerformative() == ACLMessage.INFORM){
+				} else if (message.getPerformative() == ACLMessage.INFORM){
+					//inform message contains the schedule data, add and check if all is dones
 					totalFinishedEquiplets ++;
 					EquipletScheduleInformation eqSchedule = (EquipletScheduleInformation) message.getContentObject();
 					
-					//add to the schedules
 					equipletSchedules.put(message.getSender(), eqSchedule);
 					
 					if (totalFinishedEquiplets == equipletAgents.length){ 
-						// and we have all the refused ,inform responses and timeouted equiplets
-						// so all the equiplets are done
-						// remove this behaviour and callback to the scheduler with results and remove this behaviour
-						schedulerBehaviour.callbackScheduleInformation(equipletSchedules, refusedEquiplets, schedulerBehaviour);
+						// all equiplets have responded, 
+						//callback to the scheduler with results and remove this behaviour
+						schedulerBehaviour.callbackScheduleInformation(equipletSchedules, refusedEquiplets, schedulerBehaviour, equipletKeys);
 						productAgent.removeBehaviour(this);
 					}
 				}
 			} catch (UnreadableException e) {
 				Logger.log(LogLevel.ERROR, e);
 			}
-		}
-		else if (getTimeoutThrown()) {
+		} else if (getTimeoutThrown()) {
 			//we are missing responses from the rest of the equiplets
 			//callback and remove the behaviour
 			for ( AID equiplet : equipletAgents){
@@ -130,7 +135,7 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 					refusedEquiplets.add(equiplet);
 				}
 			}
-			schedulerBehaviour.callbackScheduleInformation(equipletSchedules, refusedEquiplets, schedulerBehaviour);
+			schedulerBehaviour.callbackScheduleInformation(equipletSchedules, refusedEquiplets, schedulerBehaviour, equipletKeys);
 			productAgent.removeBehaviour(this);
 		}
 

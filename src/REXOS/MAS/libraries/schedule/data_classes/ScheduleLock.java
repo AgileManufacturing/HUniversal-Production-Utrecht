@@ -1,6 +1,6 @@
 /**
- * @file rexos/mas/equiplet_agent/ScheduleLock.java
- * @brief Class used as a lock for the schedule of an equiplet
+ * @file REXOS/MAS/libraries/schedule/data_classes/ScheduleLock.java
+ * @brief Class used as a lock for a schedule
  * @date Created: 2013-11-08
  * 
  * @author Roy Scheefhals

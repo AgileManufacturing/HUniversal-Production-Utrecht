@@ -1,6 +1,6 @@
 /**
- * @file REXOS/MAS/libraries/schedule/data_classes/ScheduleAccessException.java
- * @brief Exception used for schedule lock access errors
+ * @file REXOS/MAS/libraries/schedule/data_classes/ScheduleException.java
+ * @brief Exception used for general schedule exceptions
  * @date Created: 15 nov 2013
  * 
  * @author Roy Scheefhals
@@ -36,24 +36,18 @@
  *          OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  **/
-
-
 package libraries.schedule.data_classes;
 
-/**
- * exception class used for schedule lock related errors 
- * @author Roy Scheefhals
- *
- */
-public class ScheduleAccessException extends Exception{
+public class ScheduleException extends Exception{
 
 	/**
 	 * @var long serialVersionUID
-	 * 		the serialization of this class
+	 * 		The serialization UID of this class
 	 */
-	private static final long serialVersionUID = -1784579495774738933L;
+	private static final long serialVersionUID = 6623350352232864851L;
 	
-	public ScheduleAccessException(String message){
-		super(message);
+	public ScheduleException(String msg){
+		super(msg);
 	}
+
 }

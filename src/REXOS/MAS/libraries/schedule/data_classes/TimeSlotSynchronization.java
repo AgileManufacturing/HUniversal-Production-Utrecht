@@ -1,7 +1,7 @@
 /**
- * @file REXOS/MAS/libraries/schedule/data_classes/ScheduleAccessException.java
- * @brief Exception used for schedule lock access errors
- * @date Created: 15 nov 2013
+ * @file REXOS/MAS/libraries/schedule/data_classes/TimeSlotSynchronization.java
+ * @brief Data class representing the synchronization of timeslots
+ * @date Created: 14 nov 2013
  * 
  * @author Roy Scheefhals
  * 
@@ -39,21 +39,58 @@
 
 
 package libraries.schedule.data_classes;
-
 /**
- * exception class used for schedule lock related errors 
- * @author Roy Scheefhals
- *
+ * data class representing the synchronization of timeslots.
+ * Timeslots will be synchronized in terms of milliseconds and the firsttimeslot in the grid. 
+ * @author Roy Scheefhals 
+ * 
  */
-public class ScheduleAccessException extends Exception{
-
-	/**
-	 * @var long serialVersionUID
-	 * 		the serialization of this class
-	 */
-	private static final long serialVersionUID = -1784579495774738933L;
+public class TimeSlotSynchronization {
 	
-	public ScheduleAccessException(String message){
-		super(message);
+	/**
+	 * @var long firstTimeSlot
+	 * 		The amount of milliseconds since the epoch ( 1970-01-01 )
+	 * 		lets every schedule use this timeslot as the first timeslot
+	 */
+	private long firstTimeSlot;
+	
+	/**
+	 * @var long timeSlotLength
+	 * 		the length of the timeslot in milliseconds
+	 */
+	private long timeSlotLength;
+	
+	/**
+	 * basic constructor for this class
+	 * @param firstTimeSlot the firstTimeSlot in milliseconds since the epoch
+	 * @param timeSlotLength the length of every timeslot in milliseconds
+	 */
+	public TimeSlotSynchronization(long firstTimeSlot, long timeSlotLength){
+		this.firstTimeSlot = firstTimeSlot;
+		this.timeSlotLength = timeSlotLength;		
+	}
+	
+	/**
+	 * getter for the first timeslot in milliseconds
+	 * @return the firsttimeslot in milliseconds
+	 */
+	public long getFirstTimeSlot(){
+		return firstTimeSlot;
+	}
+	
+	/**
+	 * getter for the length of a timeslot in milliseconds
+	 * @return the timeslotlength in milliseconds
+	 */
+	public long getTimeSlotLength(){
+		return timeSlotLength;
+	}
+	
+	/**
+	 * gets the timeslot with the current systemtime, synchronized with the firsttimeslot
+	 * @return the currenttimeslot in de grid
+	 */
+	public long getCurrentTimeSlot(){
+		return (System.currentTimeMillis() - firstTimeSlot) / timeSlotLength;
 	}
 }
