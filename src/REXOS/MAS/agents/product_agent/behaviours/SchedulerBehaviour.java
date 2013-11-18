@@ -46,6 +46,7 @@ import jade.core.behaviours.Behaviour;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import libraries.schedule.data_classes.EquipletScheduleInformation;
 import libraries.utillities.log.LogLevel;
@@ -75,7 +76,7 @@ public class SchedulerBehaviour extends Behaviour {
 	
 	private boolean scheduleInformationDone = false;
 	
-	private HashMap<AID, EquipletScheduleInformation> equipletSchedules = new HashMap<AID, EquipletScheduleInformation>();
+	private LinkedHashMap<AID, EquipletScheduleInformation> equipletSchedules = new LinkedHashMap<AID, EquipletScheduleInformation>();
 
 	private ArrayList<ProductionStep> productionSteps;
 	/**
@@ -147,15 +148,11 @@ public class SchedulerBehaviour extends Behaviour {
 			//start scheduling
 			if(schedule(scheduleMatrix)){
 				//scheduling is done
+				//smth like set callback behaviour
 			} else {
 				//Need to reschedule?
 			}
 		}
-	}
-	
-	private boolean schedule(Matrix scheduleMatrix) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	/**
@@ -203,6 +200,31 @@ public class SchedulerBehaviour extends Behaviour {
 		return scheduleMatrix;
 	}
 	
+	
+	private boolean schedule(Matrix scheduleMatrix) {
+		// Read the matrix. Write function to iterate each seperate row ( equiplet ) and pick each equiplet 
+		for (int row = 0; row < scheduleMatrix.getNumberOfRows(); row++) { //Productsteps 
+			for (int column = 0; column < scheduleMatrix.getNumberOfColumns(); column++) { //AID'S
+				
+				//iterate the row, and check the most feasible equiplet.
+				
+				AID equipletId = equipletSchedules[column]
+				
+				// Check the equiplets schedule. Lets check if the schedule fits. Keep in mind that the deadline is met.
+				
+				// If the schedule fits, save the equiplet with corresponding step(s) ( maybe equipletmapper? )
+				
+
+				
+				
+			}
+		}
+		
+		// Message all the equiplets with their correspondig equiplet steps
+		
+		
+		return false;
+	}
 	/**
 	 * Sets the value of the sequences. @ref to paper Multiagent-based agile manufacturing: from user requirements to product leo van moergestel
 	 * section 3.2 
@@ -239,7 +261,7 @@ public class SchedulerBehaviour extends Behaviour {
 	}
 
 	public void callbackScheduleInformation(HashMap<AID, libraries.schedule.data_classes.EquipletScheduleInformation> equipletSchedules, ArrayList<AID> refusedEquiplets, SchedulerBehaviour schedulerBehaviour){
-		schedulerBehaviour.equipletSchedules = equipletSchedules;		
+		schedulerBehaviour.equipletSchedules = (LinkedHashMap)equipletSchedules;		
 		Logger.log(LogLevel.DEBUG, "ScheduleInformationBehaviour is done, continuing the ScheduleBehaviour");
 		scheduleInformationDone = true;
 		restart();

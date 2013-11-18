@@ -175,7 +175,13 @@ final public class Matrix {
         return x;
    
     }
-
+    public int getNumberOfRows(){
+    	return M;
+    }
+    
+    public int getNumberOfColumns(){
+    	return N;
+    }
     // print matrix to standard output
     public void show() {
         for (int i = 0; i < M; i++) {
