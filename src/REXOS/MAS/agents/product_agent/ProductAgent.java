@@ -218,6 +218,9 @@ public class ProductAgent extends Agent {
 		else if (input instanceof Integer){
 			result = (int) input;
 		}
+		else if (input instanceof Double){
+			result = (double) input;
+		}
 		else{
 			throw new IllegalArgumentException("Could not parse input position object to double");
 		}
