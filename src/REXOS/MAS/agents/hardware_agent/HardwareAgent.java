@@ -400,11 +400,13 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 							case SUSPENDED_OR_WARNING:
 							case ABORTED:
 							case FAILED:
-								BasicDBObject statusData = serviceStep.getStatusData();
-								statusData.putAll((Map<String, Object>) equipletStep.getStatusData());
+								BasicDBObject serviceStepStatusData = serviceStep.getStatusData();
+								if ( serviceStepStatusData != null && equipletStep.getStatusData() != null){
+									serviceStepStatusData.putAll((Map<String, Object>) equipletStep.getStatusData());
+								}
 								BasicDBObject updateQuery =
 												new BasicDBObject("$set", new BasicDBObject("status", status.name()).append(
-												"statusData", statusData));
+												"statusData", serviceStepStatusData));
 								serviceStepBBClient.updateDocuments(searchQuery, updateQuery);
 								break;
 							default:
