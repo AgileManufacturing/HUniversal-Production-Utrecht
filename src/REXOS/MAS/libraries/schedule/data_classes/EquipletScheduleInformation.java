@@ -40,6 +40,7 @@ package libraries.schedule.data_classes;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Data class for representation of FreeTimeSlots in a equiplet's schedule
@@ -74,6 +75,10 @@ public class EquipletScheduleInformation implements Serializable {
 	 */
 	private double load;
 	
+	private boolean hasEquipletScheduleLock;
+	
+	private UUID equipletScheduleKey;
+	
 	/**
 	 * Constructor of this dataclass
 	 * @param freeTimeSlots The freetimeslots available for the equiplet
@@ -83,6 +88,8 @@ public class EquipletScheduleInformation implements Serializable {
 	public EquipletScheduleInformation(ArrayList<FreeTimeSlot> freeTimeSlots, long infiniteFreeTimeSlot, double load){
 		this.freeTimeSlots = freeTimeSlots;
 		this.infiniteFreeTimeSlot = infiniteFreeTimeSlot;
+		this.equipletScheduleKey = null;
+		this.hasEquipletScheduleLock = false;
 	}
 	
 	/**
@@ -107,5 +114,18 @@ public class EquipletScheduleInformation implements Serializable {
 	 */
 	public double getLoad(){
 		return load;
+	}
+	
+	public boolean getIsEquipletScheduleLocked(){
+		return hasEquipletScheduleLock;
+	}
+	
+	public void setEquipletScheduleKey(UUID key){
+		this.equipletScheduleKey = key;
+		this.hasEquipletScheduleLock = true;
+	}
+	
+	public UUID getEquipletScheduleKey(){
+		return equipletScheduleKey;
 	}
 }

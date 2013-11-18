@@ -238,7 +238,7 @@ public class SchedulerBehaviour extends Behaviour {
 		super.restart();
 	}
 
-	public void callbackScheduleInformation(HashMap<AID, libraries.schedule.data_classes.EquipletScheduleInformation> equipletSchedules, ArrayList<AID> refusedEquiplets, SchedulerBehaviour schedulerBehaviour){
+	public void callbackScheduleInformation(HashMap<AID, EquipletScheduleInformation> equipletSchedules, SchedulerBehaviour schedulerBehaviour){
 		schedulerBehaviour.equipletSchedules = equipletSchedules;		
 		Logger.log(LogLevel.DEBUG, "ScheduleInformationBehaviour is done, continuing the ScheduleBehaviour");
 		scheduleInformationDone = true;
