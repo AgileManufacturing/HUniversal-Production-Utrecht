@@ -43,40 +43,21 @@ package agents.product_agent.behaviours;
 
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
-import libraries.blackboard_client.BlackboardClient;
-import libraries.blackboard_client.data_classes.GeneralMongoException;
-import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
+import libraries.schedule.data_classes.EquipletScheduleInformation;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 import agents.data_classes.BehaviourStatus;
-import agents.data_classes.DbData;
-import agents.data_classes.EquipletScheduleInformation;
 import agents.data_classes.Matrix;
 import agents.data_classes.Product;
 import agents.data_classes.Production;
 import agents.data_classes.ProductionEquipletMapper;
 import agents.data_classes.ProductionStep;
-import agents.data_classes.StepStatusCode;
-import agents.equiplet_agent.NextProductStepTimer;
 import agents.product_agent.BehaviourCallback;
 import agents.product_agent.ProductAgent;
-
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.QueryBuilder;
-
-import configuration.Configuration;
-import configuration.ConfigurationFiles;
 
 @SuppressWarnings("serial")
 public class SchedulerBehaviour extends Behaviour {
@@ -257,10 +238,8 @@ public class SchedulerBehaviour extends Behaviour {
 		super.restart();
 	}
 
-	public void callbackScheduleInformation(HashMap<AID, EquipletScheduleInformation> equipletSchedules, ArrayList<AID> refusedEquiplets, SchedulerBehaviour schedulerBehaviour){
-		schedulerBehaviour.equipletSchedules = equipletSchedules;
-		schedulerBehaviour.equipletKeys = equipletKeys;
-		
+	public void callbackScheduleInformation(HashMap<AID, libraries.schedule.data_classes.EquipletScheduleInformation> equipletSchedules, ArrayList<AID> refusedEquiplets, SchedulerBehaviour schedulerBehaviour){
+		schedulerBehaviour.equipletSchedules = equipletSchedules;		
 		Logger.log(LogLevel.DEBUG, "ScheduleInformationBehaviour is done, continuing the ScheduleBehaviour");
 		scheduleInformationDone = true;
 		restart();

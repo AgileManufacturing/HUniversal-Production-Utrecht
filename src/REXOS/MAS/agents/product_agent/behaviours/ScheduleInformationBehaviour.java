@@ -120,7 +120,7 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 					if (totalFinishedEquiplets == equipletAgents.length){ 
 						// all equiplets have responded, 
 						//callback to the scheduler with results and remove this behaviour
-						schedulerBehaviour.callbackScheduleInformation(equipletSchedules, refusedEquiplets, schedulerBehaviour, equipletKeys);
+						schedulerBehaviour.callbackScheduleInformation(equipletSchedules, refusedEquiplets, schedulerBehaviour);
 						productAgent.removeBehaviour(this);
 					}
 				}
@@ -135,7 +135,7 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 					refusedEquiplets.add(equiplet);
 				}
 			}
-			schedulerBehaviour.callbackScheduleInformation(equipletSchedules, refusedEquiplets, schedulerBehaviour, equipletKeys);
+			schedulerBehaviour.callbackScheduleInformation(equipletSchedules, refusedEquiplets, schedulerBehaviour);
 			productAgent.removeBehaviour(this);
 		}
 
