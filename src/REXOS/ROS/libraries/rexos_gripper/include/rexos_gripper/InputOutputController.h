@@ -26,7 +26,12 @@
 * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
+#pragma once
+
+#include <modbus/modbus.h>
 #include <rexos_modbus/ModbusController.h>
+
+#include <libjson/libjson.h>
 
 namespace rexos_gripper
 {
@@ -37,16 +42,22 @@ namespace rexos_gripper
 	class InputOutputController {
 		
 	public:
-		InputOutputController(rexos_modbus::ModbusController* modbus);
+		InputOutputController(JSONNode node);
+		void readJSONNode(const JSONNode node);
+		//InputOutputController(rexos_modbus::ModbusController* modbus);
 
 		void pinHigh(uint32_t address, uint8_t pin);
 		void pinLow(uint32_t address, uint8_t pin);
 
 	private:
+		std::string modbusIp;
+		int modbusPort;
+		
 		/**
 		 * @var ModbusController::ModbusController* modbus
 		 * Pointer to an established modbus connection.
 		 **/
 		rexos_modbus::ModbusController* modbus;
+		modbus_t* modbusIO;
 	};
 }

@@ -119,10 +119,6 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 				Part[] parts = (Part[]) message.getContentObject();
 				HashMap<Part, Position> partParameters = new HashMap<Part, Position>();
 				
-				int x = 2;
-				int id = 1;
-				int type = 3;
-				
 				for(Part part : parts) {
 					Logger.log(LogLevel.DEBUG, "PartNo: " + part.getType());
 					switch(part.getType()) {
@@ -142,24 +138,16 @@ public class PartsInfo extends ReceiveOnceBehaviour {
 					case 3: // Paper
 						partParameters.put(logisticsAgent.getWhitePaper(), new Position());
 					default:
-						partParameters.put(new Part(part.getType(), id++),
-								new Position((double)x++, 1.0, 3.0, new Part(type++, id + x)));
 						break;					
 					}
 				}
-
-				KnowledgeDBClient client = KnowledgeDBClient.getClient();
-				int outputPartType = (int) client.executeSelectQuery(Queries.GET_PART_TYPE, "OutputPart")[0].get("id");
-				int outputPartId = client.executeUpdateQuery(Queries.INSERT_PART, outputPartType);
-
-				partParameters.put(new Part(outputPartType, outputPartId), null);
 
 				ACLMessage reply = message.createReply();
 				reply.setPerformative(ACLMessage.INFORM);
 				reply.setOntology("PartsInfo");
 				reply.setContentObject(partParameters);
 				logisticsAgent.send(reply);
-			} catch (UnreadableException | IOException | KnowledgeException | KeyNotFoundException e) {
+			} catch (UnreadableException | IOException e) {
 				Logger.log(LogLevel.ERROR, "", e);
 				logisticsAgent.doDelete();
 			}

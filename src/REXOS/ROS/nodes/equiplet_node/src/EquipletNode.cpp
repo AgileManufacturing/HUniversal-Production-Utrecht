@@ -56,6 +56,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 		scada(this, &moduleRegistry) 
 {
 	std::cout << "EquipletNode_Constructor called." << std::endl;
+
 	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ1", "EquipletStepsBlackBoard");
 	equipletStepSubscription = new Blackboard::FieldUpdateSubscription("status", *this);
 	equipletStepSubscription->addOperation(Blackboard::SET);
@@ -68,6 +69,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
     equipletCommandSubscriptionSet = new Blackboard::BasicOperationSubscription(Blackboard::UPDATE, *this);
 	equipletCommandBlackboardClient->subscribe(*equipletCommandSubscription);
 	sleep(1);
+
     equipletCommandBlackboardClient->subscribe(*equipletCommandSubscriptionSet);
 	subscriptions.push_back(equipletCommandSubscription);
 	subscriptions.push_back(equipletCommandSubscriptionSet);
@@ -80,9 +82,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 	sleep(1);
 
 	equipletStateBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_STATE);
-
-
-
+	
 	std::cout << "Connected equiplet_node." << std::endl;
 }
 
@@ -119,6 +119,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
 	    //We only need to handle the step if its status is 'WAITING'
 	    if (step->getStatus().compare("WAITING") == 0) {
+	    	std::cout << "handling step: " << n.write_formatted() << std::endl;
     		handleEquipletStep(step, targetObjectId);
 		}
 		
@@ -133,21 +134,25 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 }
 
 void EquipletNode::handleEquipletStep(rexos_datatypes::EquipletStep * step, mongo::OID targetObjectId){
+	
 	rexos_statemachine::Mode currentMode = getCurrentMode();
 	if (currentMode == rexos_statemachine::MODE_NORMAL) {
+
 		rexos_statemachine::State currentState = getCurrentState();
 		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
 			
 			rexos_datatypes::InstructionData instructionData = step->getInstructionData();
 
-			std::cout << "Sending instructionData: " << libjson::parse(instructionData.toJSONString()).write_formatted() << std::endl;
-			//we need to call the lookup handler first
+						//we need to call the lookup handler first
 			if(instructionData.getLook_up().length() > 0 && instructionData.getLook_up().compare("NULL") != 0) {
+				std::cout << "Calling lookuphandler" << std::endl;
 				map<std::string, std::string> newPayload = callLookupHandler(instructionData.getLook_up(), instructionData.getLook_up_parameters(), instructionData.getPayload());
 				instructionData.setPayload(newPayload);
 			}
-			//we might still need to update the payload on the bb
-		    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
+			
+				//we might still need to update the payload on the bb
+		    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());    
+			//prox->changeState(rexos_statemachine::STATE_NORMAL);
 		    equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
 		    prox->setInstruction(targetObjectId.toString(), libjson::parse(instructionData.toJSONString()));
 		} else {
@@ -161,7 +166,8 @@ void EquipletNode::handleEquipletStep(rexos_datatypes::EquipletStep * step, mong
 
 void EquipletNode::handleDirectMoveCommand(rexos_datatypes::EquipletStep * step, mongo::OID targetObjectId){
 		std::cout << "Got an update! : " << directMoveBlackBoardClient->findDocumentById(targetObjectId).jsonString() << std::endl;
-		ModuleProxy *prox = moduleRegistry.getModule(1);
+		ModuleProxy *prox = moduleRegistry.getModule(step->getModuleId());
+		prox->changeState(rexos_statemachine::STATE_NORMAL);
 	    prox->setInstruction(targetObjectId.toString(), libjson::parse(directMoveBlackBoardClient->findDocumentById(targetObjectId).jsonString()));
 		//still need to remove the step tho
 }
@@ -203,6 +209,7 @@ void EquipletNode::handleEquipletCommand(JSONNode n){
 //needed for callback ( from proxy )
 void EquipletNode::onInstructionStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed){
 
+	//moduleProxy->changeState(rexos_statemachine::STATE_STANDBY);
 	mongo::OID targetObjectId(id);
 
 	if(completed) {

@@ -146,14 +146,13 @@ public class GripperModule extends Module {
 			crateHeight = parameters.getDouble("height");
 		}
 		
-		double crateDimension = 46; // 46mm x 46mm
-        double crateSlots = 4;
-        double crateSlotDimension = 11.5;
-        double crateSlotMidPoint = 5.75;
+		double crateDimension = 45.75;
+        double crateSlotDimension = 11;
+        double crateSlotMidPoint = 6;
         double extraSize = GRIPPER_SIZE + crateHeight;
 		
 		Part part = new Part((BasicDBObject)parameters.get("crate"));
-		Position position = new Position((parameters.getDouble("row") * crateSlotDimension + crateSlotMidPoint) - 23, (parameters.getDouble("column") * crateSlotDimension + crateSlotMidPoint) - 23, 5.0, part);
+		Position position = new Position((parameters.getDouble("row") * crateSlotDimension + crateSlotMidPoint) - (crateDimension / 2), (parameters.getDouble("column") * crateSlotDimension + crateSlotMidPoint) - (crateDimension / 2), 5.0, part);
 		
 		//get the newest code of the movementModule.
 		int movementModuleId = findMovementModule(getConfiguration());

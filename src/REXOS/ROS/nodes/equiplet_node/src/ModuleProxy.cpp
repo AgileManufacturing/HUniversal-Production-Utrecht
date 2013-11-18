@@ -8,12 +8,15 @@
 #include "equiplet_node/ModuleProxy.h"
 
 namespace equiplet_node {
-
+void aap(){
+	
+}
+	
 ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleName, int equipletId, int moduleId, ModuleProxyListener* mpl):
 	moduleNodeName(moduleName + "_" + std::to_string(equipletId) + "_" + std::to_string(moduleId)),
 	changeStateActionClient(nodeHandle, moduleNodeName + "/change_state"),
 	changeModeActionClient(nodeHandle, moduleNodeName + "/change_mode"),
-	setInstructionActionClient(nodeHandle, moduleName + "/set_instruction"),
+	setInstructionActionClient(nodeHandle, moduleNodeName + "/set_instruction"),
 	currentMode(rexos_statemachine::Mode::MODE_NORMAL),
 	currentState(rexos_statemachine::State::STATE_SAFE),
 	moduleProxyListener(mpl),
@@ -27,10 +30,18 @@ ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleName, i
 	modeUpdateServiceServer = nodeHandle.advertiseService(
 			equipletNodeName + "/" + moduleNodeName + "/mode_update",
 			&ModuleProxy::onModeChangeServiceCallback, this);
-	bond = new bond::Bond(moduleName + "/bond", std::to_string(moduleId));
+	
+	ROS_INFO_STREAM("Setting state action client: " << moduleNodeName << "/change_state");
+	ROS_INFO_STREAM("Setting mode action client: " << moduleNodeName << "/change_mode");
+	ROS_INFO_STREAM("Setting instruction action client: " << moduleNodeName << "/set_instruction");
+
+	bond = new bond::Bond(moduleNodeName + "/bond", std::to_string(moduleId));
+	bond->setBrokenCallback(&aap);
+	bond->start();
 }
 
 ModuleProxy::~ModuleProxy() {
+	delete bond;
 	// TODO Auto-generated destructor stub
 }
 
@@ -69,7 +80,7 @@ void ModuleProxy::changeMode(rexos_statemachine::Mode mode) {
 }
 
 void ModuleProxy::setInstruction(std::string OID, JSONNode n) {
-	std::cout << "JSON van module: " <<  moduleNodeName.c_str() << " verzonden" << std::endl;
+	std::cout << "Sent Instruction to module: " <<  moduleNodeName.c_str() << "" << std::endl;
 	rexos_statemachine::SetInstructionGoal goal;
 
 	goal.json = n.write();

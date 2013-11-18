@@ -61,7 +61,8 @@ public class DeltaRobotModule extends Module {
 	 * @var double SAFE_MOVEMENT_PLANE
 	 *      A static value that contains the height of the safe movement plane.
 	 */
-	private static final double SAFE_MOVEMENT_PLANE = 25;
+	//private static final double SAFE_MOVEMENT_PLANE = 25;
+	private static final double SAFE_MOVEMENT_PLANE = -250;
 	
 	/**
 	 * @var double MAX_ACCELERATION
@@ -158,7 +159,7 @@ public class DeltaRobotModule extends Module {
 			
 			if(payload.containsField("z") && payload.getString("z").equals("Z-PLACEHOLDER")) 
 			{
-				payload.put("z", position.getZ() - extraSize);
+				payload.put("z", position.getZ() + extraSize);
 			}
 			
 			payload.put("maxAcceleration", MAX_ACCELERATION);
@@ -243,8 +244,8 @@ public class DeltaRobotModule extends Module {
 		BasicDBObject payload = new BasicDBObject("z", extraSize + SAFE_MOVEMENT_PLANE);
 		payload.put("maxAcceleration", MAX_ACCELERATION);
 		
-		// create the lookUpParametersextraSize
-		if(parameters.containsField("position")) {
+		// create the lookUpParameters
+		/*if(parameters.containsField("position")) {
 			Position position = new Position((BasicDBObject) parameters.get("position"));
 
 			if(position.getRelativeToPart() != null && position.getRelativeToPart().getId() != -1) {
@@ -254,10 +255,10 @@ public class DeltaRobotModule extends Module {
 			}
 			// create the instruction data
 			instructionData = new InstructionData("move", "deltarobot", "FIND_ID", lookUpParameters, payload);
-		} else {
+		} else {*/
 			// create the instruction data
 			instructionData = new InstructionData("move", "deltarobot", "NULL", lookUpParameters, payload);
-		}
+		//}
 
 		// create an EquipletStep and return it.
 		EquipletStep step =
@@ -355,7 +356,7 @@ public class DeltaRobotModule extends Module {
 			} 
 			else 
 			{
-				payload.put("z", position.getZ() - extraSize);
+				payload.put("z", position.getZ() + extraSize);
 			}
 			
 			payload.put("maxAcceleration", MAX_ACCELERATION);

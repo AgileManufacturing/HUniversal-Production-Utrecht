@@ -5,10 +5,6 @@ project(rexos_most)
 find_package(catkin REQUIRED COMPONENTS roscpp rexos_statemachine std_msgs genmsg message_generation)
 find_package(Mongo)
 
-generate_messages (
-	DEPENDENCIES std_msgs
-)
-
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include 

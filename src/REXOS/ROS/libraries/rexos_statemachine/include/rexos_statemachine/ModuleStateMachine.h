@@ -2,6 +2,8 @@
 
 #include <ros/ros.h>
 
+#include <bondcpp/bond.h>
+
 #include <rexos_statemachine/StateMachine.h>
 #include <rexos_statemachine/Listener.h>
 
@@ -16,6 +18,7 @@ class ModuleStateMachine : public StateMachine, public Listener {
 	ros::ServiceClient changeModeNotificationClient;
 public:
 	ModuleStateMachine(std::string moduleName, int equipletId, int moduleId, bool actorModule);
+	~ModuleStateMachine();
 protected:
 	virtual void onStateChanged();
 	virtual void onModeChanged();
@@ -23,6 +26,12 @@ protected:
 	void setInError();
 
 	bool actorModule;
+
+private:
+	/**
+	 * The bond to bind the module with the equiplet
+	 **/
+	bond::Bond* bond;
 };
 
 }

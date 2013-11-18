@@ -278,7 +278,7 @@ public class Position implements Serializable, MongoSaveable {
 			throw new IllegalArgumentException();
 		}
 	}
-
+		
 	/**
 	 * Returns the x coordinate for this Position.
 	 * 

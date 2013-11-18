@@ -110,7 +110,7 @@ namespace rexos_utilities{
      **/
     double stringToDouble(const std::string& s){
         std::istringstream i(s);
-        double x;
+        double x = 0;
         if (!(i >> x))
             
         return x;

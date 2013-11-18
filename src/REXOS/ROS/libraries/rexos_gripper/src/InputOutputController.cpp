@@ -27,6 +27,9 @@
  **/
 
 #include <rexos_gripper/InputOutputController.h>
+#include <modbus/modbus.h>
+
+#include "ros/ros.h"
 
 namespace rexos_gripper {
 	/**
@@ -34,9 +37,40 @@ namespace rexos_gripper {
 	 *
 	 * @param modbus Pointer to an established modbus connection.
 	 */
-	InputOutputController::InputOutputController(rexos_modbus::ModbusController* modbus) :
-			modbus(modbus) {
+	InputOutputController::InputOutputController(JSONNode node) {
+		readJSONNode(node);
+
+		ROS_INFO("[DEBUG] Opening modbus connection");
+		
+		modbusIO = modbus_new_tcp(modbusIp.c_str(), modbusPort);
+		if(modbusIO == NULL){
+			throw std::runtime_error("Unable to allocate libmodbus context");
+		}
+		if(modbus_connect(modbusIO) == -1) {
+			throw std::runtime_error("Modbus connection to IO controller failed");
+		}
+		assert(modbusIO != NULL);
+		
+		modbus = new rexos_modbus::ModbusController(modbusIO);
 	}
+	void InputOutputController::readJSONNode(const JSONNode node) {
+		for(JSONNode::const_iterator it = node.begin(); it != node.end(); it++) {
+			if(it->name() == "modbusIp"){
+				modbusIp = it->as_string();
+				ROS_INFO_STREAM("found modbusIp " << modbusIp);
+			} else if(it->name() == "modbusPort"){
+				modbusPort = it->as_int();
+				ROS_INFO_STREAM("found modbusPort " << modbusPort);
+				
+			} else {
+				// some other property, ignore it
+			}
+		}
+	}
+	
+	/*InputOutputController::InputOutputController(rexos_modbus::ModbusController* modbus) :
+			modbus(modbus) {
+	}*/
 
 	/**
 	 * Sets a pin (bit) in a register high (active?)
