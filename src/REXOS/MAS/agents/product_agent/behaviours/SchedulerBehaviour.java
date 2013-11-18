@@ -55,7 +55,7 @@ import java.util.UUID;
 import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
-import libraries.schedule.data_classes.EquipletFreeTimeData;
+import libraries.schedule.data_classes.EquipletScheduleInformation;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 import agents.data_classes.BehaviourStatus;
@@ -92,7 +92,7 @@ public class SchedulerBehaviour extends Behaviour {
 	
 	private boolean scheduleInformationDone = false;
 	
-	private HashMap<AID, EquipletFreeTimeData> equipletSchedules = new HashMap<AID, EquipletFreeTimeData>();
+	private HashMap<AID, EquipletScheduleInformation> equipletSchedules = new HashMap<AID, EquipletScheduleInformation>();
 	private ArrayList<AID> refusedEquiplets = new ArrayList<AID>();
 	
 	private ArrayList<ProductionStep> productionSteps;
@@ -257,7 +257,7 @@ public class SchedulerBehaviour extends Behaviour {
 		super.restart();
 	}
 
-	public void callbackScheduleInformation(HashMap<AID, EquipletFreeTimeData> equipletSchedules, ArrayList<AID> refusedEquiplets,
+	public void callbackScheduleInformation(HashMap<AID, EquipletScheduleInformation> equipletSchedules, ArrayList<AID> refusedEquiplets,
 			SchedulerBehaviour schedulerBehaviour, HashMap<AID, UUID> equipletKeys){
 		schedulerBehaviour.equipletSchedules = equipletSchedules;
 		schedulerBehaviour.equipletKeys = equipletKeys;

@@ -43,7 +43,7 @@ import java.util.UUID;
 
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
-import libraries.schedule.data_classes.EquipletFreeTimeData;
+import libraries.schedule.data_classes.EquipletScheduleInformation;
 import libraries.schedule.data_classes.ScheduleException;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
@@ -83,7 +83,7 @@ public class ScheduleInformation extends ReceiveBehaviour {
 						response.setContentObject(scheduleKey);
 						equipletAgent.send(response);
 						
-						EquipletFreeTimeData freeTimeData =  equipletAgent.getSchedule().GetFreeTimeSlots(null, null);
+						EquipletScheduleInformation freeTimeData =  equipletAgent.getSchedule().GetFreeTimeSlots(null, null);
 						
 						
 						// get schedule and calculate load
@@ -101,7 +101,7 @@ public class ScheduleInformation extends ReceiveBehaviour {
 					// Don't lock the the schedule, just get and send it
 					response.setPerformative(ACLMessage.INFORM);
 					
-					EquipletFreeTimeData freeTimeData =  equipletAgent.getSchedule().GetFreeTimeSlots(null, null);
+					EquipletScheduleInformation freeTimeData =  equipletAgent.getSchedule().GetFreeTimeSlots(null, null);
 					
 					response.setContentObject(freeTimeData);
 				}

@@ -45,7 +45,7 @@ import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
-import libraries.schedule.data_classes.EquipletFreeTimeData;
+import libraries.schedule.data_classes.EquipletScheduleInformation;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
@@ -65,7 +65,7 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 	private SchedulerBehaviour schedulerBehaviour;
 	private AID[] equipletAgents;
 
-	private HashMap<AID, EquipletFreeTimeData> equipletSchedules;
+	private HashMap<AID, EquipletScheduleInformation> equipletSchedules;
 	private HashMap<AID, UUID> equipletKeys;
 	private ArrayList<AID> refusedEquiplets;
 	
@@ -78,7 +78,7 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 		this.equipletAgents = equipletAgents;
 		this.schedulerBehaviour = schedulerBehaviour;
 		
-		equipletSchedules = new HashMap<AID, EquipletFreeTimeData>();
+		equipletSchedules = new HashMap<AID, EquipletScheduleInformation>();
 		refusedEquiplets = new ArrayList<AID>();
 		totalFinishedEquiplets = 0;
 		
@@ -113,7 +113,7 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 				} else if (message.getPerformative() == ACLMessage.INFORM){
 					//inform message contains the schedule data, add and check if all is dones
 					totalFinishedEquiplets ++;
-					EquipletFreeTimeData eqSchedule = (EquipletFreeTimeData) message.getContentObject();
+					EquipletScheduleInformation eqSchedule = (EquipletScheduleInformation) message.getContentObject();
 					
 					equipletSchedules.put(message.getSender(), eqSchedule);
 					

@@ -1,5 +1,5 @@
 /**
- * @file REXOS/MAS/agents/data_classes/ProductStepSchedule.java
+ * @file REXOS/MAS/libraries/schedule/data_classes/ProductStepSchedule.java
  * @brief Data object for the schedule of a product step primarily in the planningblackboard
  * @date Created: 04 nov 2013
  * 
@@ -48,7 +48,12 @@ import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 
 
-
+/**
+ * Data class representing a product step scheduled in  the scheduleboard.
+ * implements mongosavable for saving in blackboards.
+ * @author roy
+ *
+ */
 public class ProductStepSchedule implements MongoSaveable, Serializable {
 
 	/**
@@ -64,22 +69,29 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 	
 	/**
 	 * @var long startTime
-	 * The start time.
+	 * 		The start time in timeslots.
 	 **/
 	private long startTime;
 	
 	/**
 	 * @var long duration
-	 * The duration.
+	 * The duration of the step in timeslots.
 	 **/
 	private long duration;
 	
 	/**
 	 * @var long deadline
-	 * The deadline.
+	 * The deadline in timeslots.
 	 **/
 	private long deadline;
 	
+	/**
+	 * Standard constructor
+	 * @param objectid the objectId of the productStep to be scheduled
+	 * @param startTime the starttime of the scheduled step. In timeslots
+	 * @param duration the duration of this productStep. In timeslots
+	 * @param deadline the deadline of this productStep. In timeslots
+	 */
 	public ProductStepSchedule(ObjectId objectid, long startTime, long duration, long deadline){
 		this.objectId = objectid;
 		this.startTime = startTime;
@@ -87,10 +99,18 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 		this.deadline = deadline;
 	}
 	
+	/**
+	 * Constructor witch sets the timedata to -1
+	 * @param objectId the objectId of the productstep
+	 */
 	public ProductStepSchedule(ObjectId objectId){
 		this(objectId, -1, -1, -1);
 	}
 	
+	/**
+	 * constructor for converting a mongo DBObject to a ProductStepSchedule
+	 * @param basicDBObject the mongo DBObject
+	 */
 	public ProductStepSchedule(BasicDBObject basicDBObject){
 		fromBasicDBObject(basicDBObject);
 	}
