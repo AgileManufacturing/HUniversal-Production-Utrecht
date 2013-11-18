@@ -59,6 +59,7 @@ public class EquipletScheduleInformation implements Serializable {
 	}
 	
 	public double getLoad (){
+		//calculate load here (smt like (1-(totalTimeslots/timeslotsPlanned) )
 		return load;
 	}
 }

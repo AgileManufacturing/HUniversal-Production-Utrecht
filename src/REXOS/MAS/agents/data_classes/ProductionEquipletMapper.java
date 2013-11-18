@@ -91,6 +91,11 @@ public class ProductionEquipletMapper{
 		tempEQHashmap.remove(equipletID);
 		this.equipletList.put(productionStepId, tempEQHashmap);
 	}
+	
+	public boolean canEquipletPerformProductStep(int productStepId, AID equipletAID){
+		HashMap<AID, Long> equipletForProductStep = getEquipletsForProductionStep(productStepId);
+		return equipletForProductStep.containsKey(equipletAID);
+	}
 
 	public HashMap<AID, Long> getEquipletsForProductionStep(int productionStepId){
 		// HashMap<AID, Long> s2 = this.equipletList.get(pA_id);

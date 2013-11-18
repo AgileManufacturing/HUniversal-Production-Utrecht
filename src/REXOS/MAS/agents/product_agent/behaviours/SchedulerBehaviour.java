@@ -5,6 +5,7 @@
  * 
  * @author Ricky van Rijn
  * @author Mike Schaap
+ * @author Alexander Streng
  * 
  * @section LICENSE License: newBSD
  * 
@@ -59,6 +60,7 @@ import libraries.utillities.log.Logger;
 import agents.data_classes.BehaviourStatus;
 import agents.data_classes.DbData;
 import agents.data_classes.EquipletScheduleInformation;
+import agents.data_classes.Matrix;
 import agents.data_classes.Product;
 import agents.data_classes.Production;
 import agents.data_classes.ProductionEquipletMapper;
@@ -86,13 +88,13 @@ public class SchedulerBehaviour extends Behaviour {
 
 	private BehaviourCallback behaviourCallback;
 
-	private int schedulersStarted = 0;
-	private int schedulersCompleted = 0;
+	//private int schedulersStarted = 0;
+	//rivate int schedulersCompleted = 0;
 	
 	private boolean scheduleInformationDone = false;
 	
 	private HashMap<AID, EquipletScheduleInformation> equipletSchedules = new HashMap<AID, EquipletScheduleInformation>();
-	private ArrayList<AID> refusedEquiplets = new ArrayList<AID>();
+	//private ArrayList<AID> refusedEquiplets = new ArrayList<AID>();
 	
 	private ArrayList<ProductionStep> productionSteps;
 	/**
@@ -116,61 +118,26 @@ public class SchedulerBehaviour extends Behaviour {
 					.getProductionEquipletMapping();
 			
 			// Shedule the PA with the equiplet agents in the current list.
-			
-
 			Product product = productAgent.getProduct();
 			Production production = product.getProduction();
 			productionSteps = production.getProductionSteps();
 			
 			//get a list of equiplets we need to get the schedule of
 			ArrayList<AID> equipletSchedulesToGet = new ArrayList<AID>();
-			for ( ProductionStep productStep : productionSteps){
+			for (ProductionStep productStep : productionSteps){
 				int productStepId = productStep.getId();
 				HashMap <AID, Long> equipletMapping = pem.getEquipletsForProductionStep(productStepId);
 				
-				for ( AID equiplet : equipletMapping.keySet()){
-					if (! equipletSchedulesToGet.contains(equiplet)){
+				for (AID equiplet : equipletMapping.keySet()) {
+					if (!equipletSchedulesToGet.contains(equiplet)){
 						equipletSchedulesToGet.add(equiplet);
 					}
 				}
 			}
 
 			productAgent.addBehaviour(new ScheduleInformationBehaviour(productAgent, this, equipletSchedulesToGet.toArray(new AID[equipletSchedulesToGet.size()])));
-			//here we have the schedules of the equiplets
-			//choose the right equiplet for the steps
-			
-			// Notify the OverviewBehaviour that the scheduler is running. The
-			// overview behaviour will start the produceBehaviour so it's
-			// possible to
-			// schedule and produce at the same time.
+
 			this.behaviourCallback.handleCallback(BehaviourStatus.RUNNING, null);
-
-		/*	for (ProductionStep ps : psa) {
-				Logger.log(LogLevel.DEBUG, "Trying to schedule a new step (id "
-						+ ps.getId() + "). status: " + ps.getStatus());
-
-				if ((ps.getStatus() == StepStatusCode.EVALUATING || ps
-						.getStatus() == StepStatusCode.RESCHEDULE)
-						&& isError == false) {
-					int PS_Id = ps.getId();
-					java.util.HashMap<AID, Long> equiplets = production.getProductionEquipletMapping().getEquipletsForProductionStep(PS_Id);
-
-					if (equiplets != null && equiplets.size() != 0) 
-					{
-						Logger.log(LogLevel.INFORMATION, "Added scheduler");
-						Scheduler(equiplets.keySet(), ps);
-						schedulersStarted++;
-					} 
-					else 
-					{
-						Logger.log(LogLevel.ERROR, "Equiplets are null ( or size is 0 )");
-						isError = true;
-					}
-				}
-			}
-		*/
-			
-			// Assuming we have chosen 
 		}
 		catch (Exception e) 
 		{
@@ -190,46 +157,82 @@ public class SchedulerBehaviour extends Behaviour {
 		}
 		
 		//we need to wait until we have the scheduleinformation
-		if ( !scheduleInformationDone){
+		if (!scheduleInformationDone){
 			block();
-		}
-		else if ( scheduleInformationDone){
-			//we have our scheduleinformation
-			//now start the logic to choose the equiplets
+		} else if (scheduleInformationDone){
+			//Generate the scheduleMatrix
+			Matrix scheduleMatrix = generateScheduleMatrix();
 			
-			//TODO: choose EQ on base of load
-			AID chosenEquiplet = equipletSchedules.keySet().iterator().next();
-			
-			//int[][] productStepCapabilityMatrix
-			
-			ProductionEquipletMapper timeslotsForProductStep = productAgent.getProduct().getProduction().getProductionEquipletMapping();
-			for ( ProductionStep productStep : productionSteps){
-				
-				productStep.setUsedEquiplet(chosenEquiplet);
-				long duration = timeslotsForProductStep.getTimeSlotsForEquiplet(productStep.getId(), chosenEquiplet);
-				long startTime = System.currentTimeMillis();
-				//start schedule function with productstep, equiplet, duration and starttime 
-				//iterate starttime
-				
-				
-				// gets the timedata for synchronizing from the collective blackboard.
-				//BasicDBObject timeData = (BasicDBObject) collectiveBBClient.findDocuments(new BasicDBObject()).get(0);
-				// initiates the timer to the next product step.
-				//timer = new NextProductStepTimer(timeData.getLong("firstTimeSlot"), timeData.getInt("timeSlotLength"), this);
+			//start scheduling
+			if(schedule(scheduleMatrix)){
+				//scheduling is done
+			} else {
+				//Need to reschedule?
 			}
-			
-			
 		}
-	//	if ( schedulersStarted == schedulersCompleted && isError == false) {
-	//		Logger.log(LogLevel.INFORMATION, "Setting scheduler to complete");
-	//		behaviourCallback.handleCallback(BehaviourStatus.COMPLETED, null);
-	//		isCompleted = true;
-	//	} else if (isError) {
-	//		behaviourCallback.handleCallback(BehaviourStatus.ERROR, null);
-	//		isCompleted = true;
-	//	}
+	}
+	
+	private boolean schedule(Matrix scheduleMatrix) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
+	/**
+	 * Generates the scheduleMatrix for all productsteps & equiplets. For more information see 
+	 * @ref to paper 'Multiagent-based agile manufacturing: from user requirements to product' - Leo van Moergestel section 3.2 
+	 * @return the generated scheduleMatrix
+	 */
+	private Matrix generateScheduleMatrix() {
+		ProductionEquipletMapper equipletMapper = productAgent.getProduct().getProduction().getProductionEquipletMapping();
+		
+		//construct a new matrices to perform a neat-o selection
+		Matrix scheduleMatrix = new Matrix(equipletSchedules.size(), productionSteps.size());
+		
+		int row = 0, column = 0, sequenceLength, firstInSequence;
+			//Iterate through them steps to fill the matrix
+			for (AID equiplet : equipletSchedules.keySet()) { // row
+				sequenceLength = 0; firstInSequence = -1; // always set sequenceLength to 0 and firstInsequence to -1 when doing a new row.
+				for (ProductionStep productStep : productionSteps) { // column
+				
+				double canPerformStepValue = (equipletMapper.canEquipletPerformProductStep(productStep.getId(), equiplet)) ? 1.0 : 0.0;
+			
+				if(canPerformStepValue == 1.0) {   //increase sequence counter.
+					if(firstInSequence < 0){	  //set the first item in the sequence.
+						firstInSequence = column;
+					}
+					sequenceLength++;
+					if(column == productionSteps.size()){ // end of row
+						setSequenceValues(row, firstInSequence, sequenceLength, scheduleMatrix);
+					}
+				} else if(canPerformStepValue == 0.0 && sequenceLength > 0) { // end of sequence
+					setSequenceValues(row, firstInSequence, sequenceLength, scheduleMatrix);
+					sequenceLength = 0;
+					firstInSequence = -1;
+				}
+				
+				//value might have changed since we added sequence multiplier
+				double loadValue = ((EquipletScheduleInformation)equipletSchedules.get(equiplet)).getLoad();
+				
+				//TODO: perform supermagic calculation of currentValue * load here
+				scheduleMatrix.set(row, column, (scheduleMatrix.get(row, column) * loadValue));
+				column++;
+			}
+			row++;
+		}
+		return scheduleMatrix;
+	}
+	
+	/**
+	 * Sets the value of the sequences. @ref to paper Multiagent-based agile manufacturing: from user requirements to product leo van moergestel
+	 * section 3.2 
+	 */
+	private void setSequenceValues(int row, int firstInSequence, int sequenceLength, Matrix matrix){
+		int value = sequenceLength -1;
+		for(int i = firstInSequence; i <= sequenceLength; i++){
+			matrix.set(row, i, (matrix.get(row, i) + value));
+		}
+	}
+	
 	/**
 	 * Returns true when the behavior is done
 	 * @return
@@ -245,8 +248,8 @@ public class SchedulerBehaviour extends Behaviour {
 		isError = false;
         isCompleted = false;
 
-        schedulersStarted = 0;
-        schedulersCompleted = 0;
+        int schedulersStarted = 0;
+        int schedulersCompleted = 0;
 	}
 	
 	@Override
@@ -261,8 +264,9 @@ public class SchedulerBehaviour extends Behaviour {
 		scheduleInformationDone = true;
 		restart();
 	}
-	
-	
+}
+	/*
+	public 
 	/**
 	 * Scheduler function schedules the given production step
 	 * 
@@ -270,6 +274,7 @@ public class SchedulerBehaviour extends Behaviour {
 	 * @param productionStep
 	 * @throws Exception
 	 */
+	/*
 	public void Scheduler(Set<AID> equipletList,
 			final ProductionStep productionstep) {
 		try {
@@ -426,129 +431,4 @@ public class SchedulerBehaviour extends Behaviour {
 		} catch (IOException e1){
 			Logger.log(LogLevel.ERROR, "Message content exception at scheduling", e1);
 		}
-	}
-
-	private class FreeTimeSlot {
-		private long startTimeSlot = -1;
-		private long duration = -1;
-		private AID equipletName = null;
-
-		/**
-		 * Construct free time slot
-		 * @param startTime
-		 * @param duration
-		 * @param equipletName
-		 */
-		public FreeTimeSlot(long startTime, long duration, AID equipletName) {
-			this.startTimeSlot = startTime;
-			this.duration = duration;
-			this.equipletName = equipletName;
-		}
-
-		/**
-		 * Gets the equiplet name
-		 * @return
-		 */
-		public AID getEquipletName() {
-			return this.equipletName;
-		}
-
-		/**
-		 * Gets the start time of timeslot
-		 * @return
-		 */
-		public long getStartTime() {
-			return this.startTimeSlot;
-		}
-
-		/**
-		 * Gets the duration of the timeslot
-		 * @return
-		 */
-		public long getDuration() {
-			return this.duration;
-		}
-
-		/**
-		 * ToString annotation
-		 */
-		@Override
-		public String toString() {
-			return "{Start TimeSlot: " + this.startTimeSlot + ", Duration: "
-					+ this.duration + ", EquipletName: " + this.equipletName
-					+ "}";
-		}
-	}
-
-	private class Schedule {
-		private long startTime = -1;
-		private long duration = -1;
-		private long deadline = -1;
-		private AID equipletName;
-
-		/**
-		 * Constructs Schedule object
-		 * @param startTime
-		 * @param duration
-		 * @param equipletName
-		 */
-		public Schedule(long startTime, long duration, AID equipletName) {
-			this.startTime = startTime;
-			this.duration = duration;
-			this.deadline = startTime + duration + 1;
-			this.equipletName = equipletName;
-		}
-
-		/**
-		 * get starting time
-		 * @return
-		 */
-		public long getStartTime() {
-			return this.startTime;
-		}
-
-		/**
-		 * Set starting time
-		 * @param newStartTime
-		 */
-		@SuppressWarnings("unused")
-		public void setStartTime(int newStartTime) {
-			this.startTime = newStartTime;
-		}
-
-		/**
-		 * Gets equiplet name
-		 * @return
-		 */
-		public AID getEquipletName() {
-			return this.equipletName;
-		}
-		
-		/**
-		 * Gets deadline time
-		 * @return
-		 */
-		public long getDeadline() {
-			return this.deadline;
-		}
-
-		/**
-		 * Sets the deadline time
-		 * @param newDeadline
-		 */
-		@SuppressWarnings("unused")
-		public void setDeadline(int newDeadline) {
-			this.deadline = newDeadline;
-		}
-
-		/**
-		 * ToString Annotation
-		 */
-		@Override
-		public String toString() {
-			return "{ startTime:" + startTime + ", duration:" + duration
-					+ ", deadline:" + deadline + ", EquipletName:"
-					+ equipletName + getEquipletName() + " }";
-		}
-	}
-}
+	} */
