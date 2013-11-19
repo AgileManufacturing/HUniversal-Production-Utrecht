@@ -55,8 +55,6 @@ import com.mongodb.BasicDBObject;
 public class FreeTimeSlot implements MongoSaveable{
 	
 	private TimeSlot timeSlot;
-
-	private ObjectId id;
 	
 	/**
 	 * Constructor for making a mongo blackboard entry to a FreeTimeSlot
@@ -108,7 +106,6 @@ public class FreeTimeSlot implements MongoSaveable{
 		
 		BasicDBObject dbObjectCopy= (BasicDBObject) object.copy();
 		
-		this.id = (ObjectId) dbObjectCopy.remove("_id");
 		this.timeSlot.setStartTimeSlot(dbObjectCopy.getLong("statTimeSlot"));
 		dbObjectCopy.remove("startTimeSlot");
 		this.timeSlot.setDuration(dbObjectCopy.getLong("duration"));

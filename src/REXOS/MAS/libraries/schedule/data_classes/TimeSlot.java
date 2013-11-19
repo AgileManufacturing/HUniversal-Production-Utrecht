@@ -3,7 +3,7 @@ package libraries.schedule.data_classes;
 public class TimeSlot {
 
 	/**
-	 * @var long startTime 
+	 * @var long startTimeSlot 
 	 * 		The start time in timeslots.
 	 **/
 	private long startTimeSlot;

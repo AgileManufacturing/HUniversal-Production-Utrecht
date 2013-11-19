@@ -44,12 +44,16 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
+import org.bson.BSONObject;
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.QueryBuilder;
 import com.sun.org.apache.bcel.internal.generic.NEW;
 import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 
@@ -62,6 +66,7 @@ import libraries.utillities.log.Logger;
 
 public class EquipletSchedule extends Schedule {
 	
+	private int freeTimeSlotDurationThreshold = 25;
 	
 	private BlackboardClient planningBlackboard;
 	
@@ -83,14 +88,14 @@ public class EquipletSchedule extends Schedule {
 		this.databaseName = databaseName;
 		this.timeSlotSynchronization = timeSlotSynchronization;
 		
-		Setup();
+		setup();
 		
 		if (clearSchedule){
-			ClearSchedule();
+			clearSchedule();
 		}
 	}
 	
-	private void Setup() throws UnknownHostException, GeneralMongoException, InvalidDBNamespaceException{
+	private void setup() throws UnknownHostException, GeneralMongoException, InvalidDBNamespaceException{
 		planningBlackboard = new BlackboardClient(scheduleHostName, schedulePort);
 		FreeTimeSlotBlackboard = new BlackboardClient(scheduleHostName, schedulePort);
 		RealtimeBlackboard = new BlackboardClient(scheduleHostName, schedulePort);
@@ -104,7 +109,7 @@ public class EquipletSchedule extends Schedule {
 		RealtimeBlackboard.setCollection(REALTIMESCHEDULE_NAME + "Blackboard");
 	}
 	
-	private void ClearSchedule() throws InvalidDBNamespaceException, GeneralMongoException{
+	private void clearSchedule() throws InvalidDBNamespaceException, GeneralMongoException{
 		planningBlackboard.removeDocuments(new BasicDBObject());
 		FreeTimeSlotBlackboard.removeDocuments(new BasicDBObject());
 		RealtimeBlackboard.removeDocuments(new BasicDBObject());
@@ -116,7 +121,7 @@ public class EquipletSchedule extends Schedule {
 		infiniteTimeSlotObjectId = FreeTimeSlotBlackboard.insertDocument(freeTimeSlot.toBasicDBObject());
 	}
 
-	public EquipletScheduleInformation GetFreeTimeSlots(Long duration, Long deadline) throws InvalidDBNamespaceException, GeneralMongoException, ScheduleException {
+	public EquipletScheduleInformation getFreeTimeSlots(Long duration, Long deadline) throws InvalidDBNamespaceException, GeneralMongoException, ScheduleException {
 		
 		ArrayList<FreeTimeSlot> freeTimeSlots = new ArrayList<FreeTimeSlot>();
 		Long infiniteFreeTimeSlot = null;
@@ -140,7 +145,7 @@ public class EquipletSchedule extends Schedule {
 		for(DBObject freeTimeSlotDBObject : freeTimeSlotDBObjects){
 			
 			FreeTimeSlot newFreeTimeSlot = new FreeTimeSlot((BasicDBObject) freeTimeSlotDBObject); 
-			if ( newFreeTimeSlot.getDuration() != null){
+			if ( newFreeTimeSlot.getEndTimeSlot() != null){
 				freeTimeSlots.add(newFreeTimeSlot);
 			}
 			else{
@@ -157,67 +162,54 @@ public class EquipletSchedule extends Schedule {
 		return equipletFreeTimeData; 
 	}
 	
-	public void ScheduleOn(UUID lockKey, ArrayList<ProductStepSchedule> scheduleData) throws ScheduleAccessException, 
+	public void scheduleProductSteps(UUID lockKey, ArrayList<ProductStepSchedule> scheduleData) throws ScheduleAccessException, 
 			ScheduleException, InvalidDBNamespaceException, GeneralMongoException {
 		super.checkLock(lockKey);
 		
-		java.util.Collections.sort(scheduleData, new Comparator<ProductStepSchedule>() {
-			@Override
-			public int compare(ProductStepSchedule o1, ProductStepSchedule o2) {
-				if(o1.getStartTime() < o2.getStartTime()){
-					return -1;
-				}else if(o1.getStartTime() == o2.getStartTime()){
-					Logger.log(LogLevel.ERROR, "There are productsteps with the same starttime");
-					return 0;
-				}else{
-					return 1;
-				}
-			}
-		});
-		
-		ArrayList<FreeTimeSlot> newFreeTimeSlots = new ArrayList<FreeTimeSlot>();
-		ArrayList<FreeTimeSlot> freeTimeSlotsTobeUpdated = new ArrayList<FreeTimeSlot>();
-		long newInfitineTimeSlot = -1L;
-		
-		//validate if the schedulestep  
+		//validate the productsteps
 		if (!validateScheduleData(scheduleData)){
 			throw new ScheduleException("Given scheduleData does not fit in the current schedule");
 		}
 		
 		for (ProductStepSchedule productStepSchedule : scheduleData){
-			//every step does fit in the schedule.
 			planningBlackboard.insertDocument(productStepSchedule.toBasicDBObject());
-			
-			if (productStepSchedule.getStartTime() >= equipletFreeTimeData.getinfiniteFreeTimeSlot()){
-				//if the schedule will be after the last current scheduled step
-				//just schedule the step and add possible new freetimeslots
-				
-				newInfitineTimeSlot = productStepSchedule.getStartTime() + productStepSchedule.getDuration() + 1;
-				
-				//if the new step is in the future, add a new freetimeslot
-				if ( productStepSchedule.getStartTime() > equipletFreeTimeData.getinfiniteFreeTimeSlot()){
-					newFreeTimeSlots.add(new FreeTimeSlot(equipletFreeTimeData.getinfiniteFreeTimeSlot(), 
-							productStepSchedule.getStartTime() - equipletFreeTimeData.getinfiniteFreeTimeSlot()));
-				}
+		}
+		
+		recalculateFreeTimeSlots();
+	}
+	
+	private void recalculateFreeTimeSlots() throws InvalidDBNamespaceException, GeneralMongoException{
+
+		long currentTimeSlot = timeSlotSynchronization.getCurrentTimeSlot();
+		
+		List<DBObject> plannedDBObjects =  planningBlackboard.findDocuments(new BasicDBObject());
+		
+		ArrayList<FreeTimeSlot> newFreeTimeSlots = new ArrayList<FreeTimeSlot>();
+		
+		if (plannedDBObjects.size() == 0){
+			//there are no slots, add new inf timeslot
+			newFreeTimeSlots.add(new FreeTimeSlot(currentTimeSlot, null));
+		}else if (plannedDBObjects.size() == 1){
+			//only one slot, add new possible freetimeslot and add inf timeslot
+			ProductStepSchedule prodStepSchedule =  new ProductStepSchedule((BasicDBObject)plannedDBObjects.get(0));
+			if (prodStepSchedule.getStartTime() > currentTimeSlot){
+				newFreeTimeSlots.add(new FreeTimeSlot(currentTimeSlot, prodStepSchedule.getStartTime() - currentTimeSlot));
 			}
-			else{
-				for (FreeTimeSlot freeTimeSlot : equipletFreeTimeData.getFreeTimeSlots()){
-					//is the current productstep within this freetimeslot
-					if (productStepSchedule.getStartTime() >= freeTimeSlot.getStartTimeSlot() &&
-							(productStepSchedule.getStartTime() + productStepSchedule.getDuration()) <= 
-							(freeTimeSlot.getStartTimeSlot()+ freeTimeSlot.getDuration())){
-						//the productstep can fill the whole freetimeslot
-						long lengthNewStartingFreeTimeSlot = productStepSchedule.getStartTime() - freeTimeSlot.getStartTimeSlot();
-						if ( lengthNewStartingFreeTimeSlot > 0 ){
-							//create new freetimeslot
-						}
-						
-					}
+			newFreeTimeSlots.add(new FreeTimeSlot(prodStepSchedule.getStartTime() + prodStepSchedule.getDuration(), null));
+		}
+		else if (plannedDBObjects.size() > 1){
+			ProductStepSchedule curProdStepSchedule;
+			ProductStepSchedule prevProdStepSchedule = new ProductStepSchedule((BasicDBObject)plannedDBObjects.get(0));
+			for (int iPlannedDBObject = 1; iPlannedDBObject <plannedDBObjects.size(); iPlannedDBObject++){
+				curProdStepSchedule = new ProductStepSchedule((BasicDBObject)plannedDBObjects.get(iPlannedDBObject));
+				
+				// if the 2 prodSteps have a gap between them, and this gap is bigger than the threshhold, add a new freetimeslot
+				if (curProdStepSchedule.getStartTime() + 1 - prevProdStepSchedule.getStartTime()+ prevProdStepSchedule.getDuration() > freeTimeSlotDurationThreshold ){
+					newFreeTimeSlots.add(new FreeTimeSlot(prevProdStepSchedule.getStartTime()+ prevProdStepSchedule.getDuration() + 1, 
+							curProdStepSchedule.getStartTime() - prevProdStepSchedule.getStartTime()+ prevProdStepSchedule.getDuration()));
 				}
 			}
 		}
-		
-		
 		
 	}
 
@@ -238,7 +230,8 @@ public class EquipletSchedule extends Schedule {
 		}
 		for (FreeTimeSlot freeTimeSlot : equipletFreeTimeData.getFreeTimeSlots()){
 			if (productStepSchedule.getStartTime() >= freeTimeSlot.getStartTimeSlot() && 
-					productStepSchedule.getDuration() <= freeTimeSlot.getDuration()){
+					productStepSchedule.getDuration() <= freeTimeSlot.getEndTimeSlot() && 
+					productStepSchedule.getStartTime() + productStepSchedule.getDuration() <= freeTimeSlot.getStartTimeSlot() + freeTimeSlot.getEndTimeSlot()){
 				return true;
 			}
 		}
