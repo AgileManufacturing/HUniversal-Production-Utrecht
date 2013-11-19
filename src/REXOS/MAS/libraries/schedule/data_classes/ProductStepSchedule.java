@@ -66,18 +66,8 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 	 * 		the objectId of the productStepId
 	 */
 	private ObjectId objectId;
-	
-	/**
-	 * @var long startTime
-	 * 		The start time in timeslots.
-	 **/
-	private long startTime;
-	
-	/**
-	 * @var long duration
-	 * The duration of the step in timeslots.
-	 **/
-	private long duration;
+
+	private TimeSlot timeSlot;
 	
 	/**
 	 * @var long deadline
@@ -94,8 +84,7 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 	 */
 	public ProductStepSchedule(ObjectId objectid, long startTime, long duration, long deadline){
 		this.objectId = objectid;
-		this.startTime = startTime;
-		this.duration = duration;
+		this.timeSlot = new TimeSlot(startTime, duration);
 		this.deadline = deadline;
 	}
 	
@@ -119,8 +108,8 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject productStepScheduleDBObject = new BasicDBObject();
 		productStepScheduleDBObject.put("objectId", objectId);
-		productStepScheduleDBObject.put("startTime", startTime);
-		productStepScheduleDBObject.put("duration", duration);
+		productStepScheduleDBObject.put("startTime", timeSlot.getStartTimeSlot());
+		productStepScheduleDBObject.put("duration", timeSlot.getDuration());
 		productStepScheduleDBObject.put("deadline", deadline);
 		return productStepScheduleDBObject;
 	}
@@ -133,9 +122,9 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 			
 			this.objectId = (ObjectId) dBObjectCopy.remove("objectId");
 			
-			this.startTime = dBObjectCopy.getLong("startTime", -1);
+			this.timeSlot.setStartTimeSlot(dBObjectCopy.getLong("startTime", -1));
 			dBObjectCopy.remove("startTime");
-			this.duration = dBObjectCopy.getLong("duration", -1);
+			this.timeSlot.setDuration(dBObjectCopy.getLong("duration", -1));
 			dBObjectCopy.remove("duration");
 			this.deadline = dBObjectCopy.getLong("deadline", -1);
 			dBObjectCopy.remove("deadline");
@@ -147,11 +136,11 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 	}
 
 	public long getStartTime(){
-		return startTime;
+		return timeSlot.getStartTimeSlot();
 	}
 	
 	public long getDuration(){
-		return duration;
+		return timeSlot.getDuration();
 	}
 	
 	public long getDeadline(){

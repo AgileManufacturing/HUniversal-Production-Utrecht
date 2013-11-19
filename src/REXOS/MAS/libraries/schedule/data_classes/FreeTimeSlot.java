@@ -40,6 +40,8 @@
 
 package libraries.schedule.data_classes;
 
+import org.bson.types.ObjectId;
+
 import libraries.blackboard_client.data_classes.MongoSaveable;
 
 import com.mongodb.BasicDBObject;
@@ -52,19 +54,9 @@ import com.mongodb.BasicDBObject;
  */
 public class FreeTimeSlot implements MongoSaveable{
 	
-	/**
-	 * @var long startTimeSlot
-	 * 		the starting timeslot of this freetimeslot
-	 */
-	private long startTimeSlot;
-	
-	/**
-	 * @var Long duration
-	 * 		the duration of this freetimeslot.
-	 * 		Can be null! if it is, the starttime of this freetimeslot 
-	 *		will be the the first timeslot after the last scheduled step.
-	 */
-	private Long duration;
+	private TimeSlot timeSlot;
+
+	private ObjectId id;
 	
 	/**
 	 * Constructor for making a mongo blackboard entry to a FreeTimeSlot
@@ -80,8 +72,8 @@ public class FreeTimeSlot implements MongoSaveable{
 	 * @param duration
 	 */
 	public FreeTimeSlot(long startTimeSlot, Long duration){
-		this.startTimeSlot = startTimeSlot;
-		this.duration = duration;
+		this.timeSlot.setStartTimeSlot(startTimeSlot);
+		this.timeSlot.setDuration(duration);
 	}
 
 	/**
@@ -89,7 +81,7 @@ public class FreeTimeSlot implements MongoSaveable{
 	 * @return the starttime in timeslots
 	 */
 	public long getStartTimeSlot(){
-		return startTimeSlot;
+		return timeSlot.getStartTimeSlot();
 	}
 	
 	/**
@@ -97,14 +89,14 @@ public class FreeTimeSlot implements MongoSaveable{
 	 * @return the duration in timeslots, can be null!
 	 */
 	public Long getDuration(){
-		return duration;
+		return timeSlot.getDuration();
 	}
 	
 	@Override
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject freeTimeSlotDBObject = new BasicDBObject();
-		freeTimeSlotDBObject.put("startTimeSlot", startTimeSlot);
-		freeTimeSlotDBObject.put("duration", duration);
+		freeTimeSlotDBObject.put("startTimeSlot", timeSlot.getStartTimeSlot());
+		freeTimeSlotDBObject.put("duration", timeSlot.getDuration());
 		return freeTimeSlotDBObject;
 	}
 
@@ -112,11 +104,14 @@ public class FreeTimeSlot implements MongoSaveable{
 	public void fromBasicDBObject(BasicDBObject object)
 			throws IllegalArgumentException {
 		
+		this.timeSlot = new TimeSlot();
+		
 		BasicDBObject dbObjectCopy= (BasicDBObject) object.copy();
 		
-		this.startTimeSlot = dbObjectCopy.getLong("statTimeSlot");
+		this.id = (ObjectId) dbObjectCopy.remove("_id");
+		this.timeSlot.setStartTimeSlot(dbObjectCopy.getLong("statTimeSlot"));
 		dbObjectCopy.remove("startTimeSlot");
-		this.duration = dbObjectCopy.getLong("duration");
+		this.timeSlot.setDuration(dbObjectCopy.getLong("duration"));
 		dbObjectCopy.remove("duration");
 
 		if (!dbObjectCopy.isEmpty()){

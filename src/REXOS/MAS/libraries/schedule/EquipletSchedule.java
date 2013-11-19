@@ -57,6 +57,8 @@ import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.schedule.data_classes.*;
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.Logger;
 
 public class EquipletSchedule extends Schedule {
 	
@@ -116,7 +118,6 @@ public class EquipletSchedule extends Schedule {
 
 	public EquipletScheduleInformation GetFreeTimeSlots(Long duration, Long deadline) throws InvalidDBNamespaceException, GeneralMongoException, ScheduleException {
 		
-		
 		ArrayList<FreeTimeSlot> freeTimeSlots = new ArrayList<FreeTimeSlot>();
 		Long infiniteFreeTimeSlot = null;
 		//filter freetimeslots on not shorter than given duration
@@ -137,6 +138,7 @@ public class EquipletSchedule extends Schedule {
 		List<DBObject> freeTimeSlotDBObjects = FreeTimeSlotBlackboard.findDocuments(findquery);
 		
 		for(DBObject freeTimeSlotDBObject : freeTimeSlotDBObjects){
+			
 			FreeTimeSlot newFreeTimeSlot = new FreeTimeSlot((BasicDBObject) freeTimeSlotDBObject); 
 			if ( newFreeTimeSlot.getDuration() != null){
 				freeTimeSlots.add(newFreeTimeSlot);
@@ -165,6 +167,7 @@ public class EquipletSchedule extends Schedule {
 				if(o1.getStartTime() < o2.getStartTime()){
 					return -1;
 				}else if(o1.getStartTime() == o2.getStartTime()){
+					Logger.log(LogLevel.ERROR, "There are productsteps with the same starttime");
 					return 0;
 				}else{
 					return 1;
@@ -182,24 +185,34 @@ public class EquipletSchedule extends Schedule {
 		}
 		
 		for (ProductStepSchedule productStepSchedule : scheduleData){
+			//every step does fit in the schedule.
+			planningBlackboard.insertDocument(productStepSchedule.toBasicDBObject());
 			
 			if (productStepSchedule.getStartTime() >= equipletFreeTimeData.getinfiniteFreeTimeSlot()){
 				//if the schedule will be after the last current scheduled step
 				//just schedule the step and add possible new freetimeslots
 				
-				planningBlackboard.insertDocument(productStepSchedule.toBasicDBObject());
-				
 				newInfitineTimeSlot = productStepSchedule.getStartTime() + productStepSchedule.getDuration() + 1;
-				//update the latest timeslot
-				//FreeTimeSlotBlackboard.updateDocuments(
-				//		new BasicDBObject("_id", infiniteTimeSlotObjectId),
-				//		new BasicDBObject("$set", new BasicDBObject("startTimeSlot", productStepSchedule.getStartTime() + productStepSchedule.getDuration() + 1)));
 				
-				//we need to add a new freetimeslot to fill up the space inbetween
+				//if the new step is in the future, add a new freetimeslot
 				if ( productStepSchedule.getStartTime() > equipletFreeTimeData.getinfiniteFreeTimeSlot()){
 					newFreeTimeSlots.add(new FreeTimeSlot(equipletFreeTimeData.getinfiniteFreeTimeSlot(), 
 							productStepSchedule.getStartTime() - equipletFreeTimeData.getinfiniteFreeTimeSlot()));
-					
+				}
+			}
+			else{
+				for (FreeTimeSlot freeTimeSlot : equipletFreeTimeData.getFreeTimeSlots()){
+					//is the current productstep within this freetimeslot
+					if (productStepSchedule.getStartTime() >= freeTimeSlot.getStartTimeSlot() &&
+							(productStepSchedule.getStartTime() + productStepSchedule.getDuration()) <= 
+							(freeTimeSlot.getStartTimeSlot()+ freeTimeSlot.getDuration())){
+						//the productstep can fill the whole freetimeslot
+						long lengthNewStartingFreeTimeSlot = productStepSchedule.getStartTime() - freeTimeSlot.getStartTimeSlot();
+						if ( lengthNewStartingFreeTimeSlot > 0 ){
+							//create new freetimeslot
+						}
+						
+					}
 				}
 			}
 		}
