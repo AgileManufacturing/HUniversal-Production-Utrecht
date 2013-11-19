@@ -48,17 +48,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
-
-import libraries.schedule.EquipletSchedule;
 import libraries.schedule.data_classes.EquipletScheduleInformation;
 import libraries.schedule.data_classes.FreeTimeSlot;
+import libraries.schedule.data_classes.ProductStepSchedule;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 import agents.data_classes.BehaviourStatus;
 import agents.data_classes.Matrix;
 import agents.data_classes.Product;
-import agents.data_classes.ProductStepSchedule;
 import agents.data_classes.ProductStepScheduleInformation;
 import agents.data_classes.Production;
 import agents.data_classes.ProductionEquipletMapper;
@@ -209,35 +206,40 @@ public class SchedulerBehaviour extends Behaviour {
 	
 	@SuppressWarnings("unchecked")
 	private boolean schedule(Matrix scheduleMatrix) {
-		// < productStep Id, <equiplet AID, equiplet Schedule > > 
 		ArrayList<ProductStepScheduleInformation> finalSchedules = new ArrayList<ProductStepScheduleInformation>();
 		// Read the matrix. Write function to iterate each seperate row ( productsteps ) and pick each equiplet 
+		
 		for (int column = 0; column < scheduleMatrix.getNumberOfColumns(); column++) { //Productsteps 
 			int highestEquipletScoreIndex = -1;
 			ProductionStep productionStep = productionSteps.get(column);
 			
 			for (int row = 0; row < scheduleMatrix.getNumberOfRows(); row++) { //AID'S
-				//iterate the row, and check the most feasible equiplet.				
 				highestEquipletScoreIndex = (scheduleMatrix.get(row, column) > scheduleMatrix.get(highestEquipletScoreIndex, column)) ? row : highestEquipletScoreIndex;
-				
 			}
 			
 			if(highestEquipletScoreIndex < 0){
-				Logger.log(LogLevel.ERROR, "No equiplet found for this step! Scheduling has gone wrong.. Reschedule?");
+				Logger.log(LogLevel.ERROR, "No suitable equiplet found for this step! Scheduling has gone wrong.. Reschedule?");
 				return false;
 			}
 			
-			finalSchedules.add(
-					new ProductStepScheduleInformation(productionStep, 
-					((ArrayList<AID>)equipletSchedules.keySet()).get(highestEquipletScoreIndex), 
-					((ArrayList<EquipletScheduleInformation>)equipletSchedules.values()).get(highestEquipletScoreIndex)));
-			
-			
 			//Can we assume that all productSteps are ordered? What about parallel steps?
+			EquipletScheduleInformation scheduleInformation = ((ArrayList<EquipletScheduleInformation>)equipletSchedules.values()).get(highestEquipletScoreIndex);
+			AID equipletId = ((ArrayList<AID>)equipletSchedules.keySet()).get(highestEquipletScoreIndex);
+			
+			//Get first free timeslot
+			FreeTimeSlot freeTimeSlot = scheduleInformation.getFreeTimeSlots(productionStep.getDurationForEquiplet(equipletId)).get(0);
+			
 			//Check the equiplets schedule. Lets check if the schedule fits. Keep in mind that the deadline is met.
-			//Get first free timeslot, and make an list (array?)
-			//FreeTimeSlot firstSlot = equipletScheduleInformation.getFreeTimeSlots(timeSlotsRequired).get(0);
-			//No way this works
+			if(scheduleInformation.getIsEquipletScheduleLocked() && freeTimeSlot != null) {
+				
+				//Get first free timeslot, and make an list (array?)
+				finalSchedules.add(new ProductStepScheduleInformation(productionStep, equipletId, 
+						new ProductStepSchedule(productionStep.getConversationId(), freeTimeSlot.getTimeSlot(), 5l)));
+				
+				//plan the timeslot
+				scheduleInformation.planTimeSlot(freeTimeSlot);
+			}
+			
 			
 			
 			

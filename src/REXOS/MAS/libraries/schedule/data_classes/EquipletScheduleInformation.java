@@ -4,7 +4,6 @@
  * @date Created: 15 nov 2013
  * 
  * @author Roy Scheefhals
- * @author Alexander Streng
  * 
  * @section LICENSE License: newBSD
  * 
@@ -64,8 +63,14 @@ public class EquipletScheduleInformation implements Serializable {
 	private ArrayList<FreeTimeSlot> freeTimeSlots = new ArrayList<FreeTimeSlot>();
 	
 	/**
+	 * @var ArrayList<TimeSlot> plannedTimeSlots 
+	 * 		Freetimeslots representing gaps in the schedule of the equiplet
+	 */
+	private ArrayList<TimeSlot> plannedTimeSlots = new ArrayList<TimeSlot>();
+	
+	/**
 	 * @var long infiniteFreeTimeSlot
-	 * 		The folling timeslot of the last scheduled step in an equipletschedule
+	 * 		The folling start timeslot of the last scheduled step in an equipletschedule
 	 */
 	private long infiniteFreeTimeSlot;
 	
@@ -113,12 +118,17 @@ public class EquipletScheduleInformation implements Serializable {
 		
 		for (FreeTimeSlot freeTimeSlot : freeTimeSlots) {
 			if(freeTimeSlot.getDuration() >= dur){
-				resultList.add(freeTimeSlot);
+				if(!plannedTimeSlots.contains(freeTimeSlot.getTimeSlot())){
+					resultList.add(freeTimeSlot);
+				}
 			}
 		}
-		
 		return resultList;
 	}
+	
+	public void planTimeSlot(FreeTimeSlot freeTimeSlot){
+		plannedTimeSlots.add(new TimeSlot(freeTimeSlot.getStartTimeSlot(), freeTimeSlot.getDuration()));
+	} 
 	
 	/**
 	 * gets the first timeslot available after the last scheduled step
