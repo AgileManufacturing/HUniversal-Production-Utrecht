@@ -178,7 +178,7 @@ public class EquipletSchedule extends Schedule {
 		recalculateFreeTimeSlots();
 	}
 	
-	private void recalculateFreeTimeSlots() throws InvalidDBNamespaceException, GeneralMongoException{
+	public void recalculateFreeTimeSlots() throws InvalidDBNamespaceException, GeneralMongoException{
 
 		long currentTimeSlot = timeSlotSynchronization.getCurrentTimeSlot();
 		
@@ -186,31 +186,63 @@ public class EquipletSchedule extends Schedule {
 		
 		ArrayList<FreeTimeSlot> newFreeTimeSlots = new ArrayList<FreeTimeSlot>();
 		
+		//convert to productstepschedule objects
+		ArrayList<ProductStepSchedule> plannedProductSteps = new ArrayList<ProductStepSchedule>();
+		for (DBObject plannedDbObject : plannedDBObjects){
+			plannedProductSteps.add(new ProductStepSchedule((BasicDBObject) plannedDbObject ));
+		}
+		
+		//sort the array from low starttime to high  
+		java.util.Collections.sort(plannedProductSteps, new Comparator<ProductStepSchedule>() {
+			@Override
+			public int compare(ProductStepSchedule o1, ProductStepSchedule o2) {
+				if (o1.getStartTime() < o2.getStartTime()){
+					return -1;
+				}
+				else if (o1.getStartTime() == o2.getStartTime()){
+					return 0;
+				}
+				else {
+					return 1;
+				}
+			}
+		});
+		
 		if (plannedDBObjects.size() == 0){
 			//there are no slots, add new inf timeslot
 			newFreeTimeSlots.add(new FreeTimeSlot(currentTimeSlot, null));
-		}else if (plannedDBObjects.size() == 1){
-			//only one slot, add new possible freetimeslot and add inf timeslot
-			ProductStepSchedule prodStepSchedule =  new ProductStepSchedule((BasicDBObject)plannedDBObjects.get(0));
-			if (prodStepSchedule.getStartTime() > currentTimeSlot){
-				newFreeTimeSlots.add(new FreeTimeSlot(currentTimeSlot, prodStepSchedule.getStartTime() - currentTimeSlot));
+		}else if (plannedDBObjects.size() >= 1){
+
+			//add possible in the future planned first scheduled prod step's free timeslot
+			ProductStepSchedule curProdStepSchedule =  new ProductStepSchedule((BasicDBObject)plannedDBObjects.get(0));
+			if (curProdStepSchedule.getStartTime() - currentTimeSlot  > freeTimeSlotDurationThreshold){
+				newFreeTimeSlots.add(new FreeTimeSlot(currentTimeSlot, curProdStepSchedule.getStartTime() - currentTimeSlot));
 			}
-			newFreeTimeSlots.add(new FreeTimeSlot(prodStepSchedule.getStartTime() + prodStepSchedule.getDuration(), null));
-		}
-		else if (plannedDBObjects.size() > 1){
-			ProductStepSchedule curProdStepSchedule;
-			ProductStepSchedule prevProdStepSchedule = new ProductStepSchedule((BasicDBObject)plannedDBObjects.get(0));
-			for (int iPlannedDBObject = 1; iPlannedDBObject <plannedDBObjects.size(); iPlannedDBObject++){
+			
+			ProductStepSchedule prevProdStepSchedule = curProdStepSchedule;
+			for (int iPlannedDBObject = 1; iPlannedDBObject < plannedDBObjects.size(); iPlannedDBObject++){
 				curProdStepSchedule = new ProductStepSchedule((BasicDBObject)plannedDBObjects.get(iPlannedDBObject));
 				
-				// if the 2 prodSteps have a gap between them, and this gap is bigger than the threshhold, add a new freetimeslot
-				if (curProdStepSchedule.getStartTime() +1 - prevProdStepSchedule.getStartTime()+ prevProdStepSchedule.getDuration() > freeTimeSlotDurationThreshold ){
+				// if the 2 prodSteps have a gap between them, and this gap is bigger than the threshold, add a new freetimeslot
+				if (curProdStepSchedule.getStartTime() - prevProdStepSchedule.getStartTime()+ prevProdStepSchedule.getDuration() > freeTimeSlotDurationThreshold ){
 					newFreeTimeSlots.add(new FreeTimeSlot(prevProdStepSchedule.getStartTime()+ prevProdStepSchedule.getDuration() + 1, 
 							curProdStepSchedule.getStartTime() - prevProdStepSchedule.getStartTime()+ prevProdStepSchedule.getDuration()));
+				}else if (curProdStepSchedule.getStartTime() - prevProdStepSchedule.getStartTime()+ prevProdStepSchedule.getDuration() < 0 ){
+					Logger.log(LogLevel.ERROR, "We have overlapping planned steps");
 				}
+				
+				prevProdStepSchedule = curProdStepSchedule;
 			}
+			
+			newFreeTimeSlots.add(new FreeTimeSlot(curProdStepSchedule.getStartTime() + curProdStepSchedule.getDuration(), null));
 		}
 		
+
+		FreeTimeSlotBlackboard.removeDocuments(new BasicDBObject());
+		
+		for (FreeTimeSlot freeTimeSlot : newFreeTimeSlots){
+			FreeTimeSlotBlackboard.insertDocument(freeTimeSlot.toBasicDBObject());
+		}
 	}
 
 	private boolean validateScheduleData(ArrayList<ProductStepSchedule> scheduleData){
