@@ -78,13 +78,13 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 	/**
 	 * Standard constructor
 	 * @param objectid the objectId of the productStep to be scheduled
-	 * @param startTimeSlot the starttime of the scheduled step. In timeslots
+	 * @param startTime the starttime of the scheduled step. In timeslots
 	 * @param duration the duration of this productStep. In timeslots
 	 * @param deadline the deadline of this productStep. In timeslots
 	 */
-	public ProductStepSchedule(ObjectId objectid, long startTimeSlot, long duration, long deadline){
+	public ProductStepSchedule(ObjectId objectid, long startTime, long duration, long deadline){
 		this.objectId = objectid;
-		this.timeSlot = new TimeSlot(startTimeSlot, duration);
+		this.timeSlot = new TimeSlot(startTime, duration);
 		this.deadline = deadline;
 	}
 	

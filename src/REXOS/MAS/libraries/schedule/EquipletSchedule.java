@@ -145,7 +145,7 @@ public class EquipletSchedule extends Schedule {
 		for(DBObject freeTimeSlotDBObject : freeTimeSlotDBObjects){
 			
 			FreeTimeSlot newFreeTimeSlot = new FreeTimeSlot((BasicDBObject) freeTimeSlotDBObject); 
-			if ( newFreeTimeSlot.getEndTimeSlot() != null){
+			if ( newFreeTimeSlot.getDuration() != null){
 				freeTimeSlots.add(newFreeTimeSlot);
 			}
 			else{
@@ -204,7 +204,7 @@ public class EquipletSchedule extends Schedule {
 				curProdStepSchedule = new ProductStepSchedule((BasicDBObject)plannedDBObjects.get(iPlannedDBObject));
 				
 				// if the 2 prodSteps have a gap between them, and this gap is bigger than the threshhold, add a new freetimeslot
-				if (curProdStepSchedule.getStartTime() + 1 - prevProdStepSchedule.getStartTime()+ prevProdStepSchedule.getDuration() > freeTimeSlotDurationThreshold ){
+				if (curProdStepSchedule.getStartTime() +1 - prevProdStepSchedule.getStartTime()+ prevProdStepSchedule.getDuration() > freeTimeSlotDurationThreshold ){
 					newFreeTimeSlots.add(new FreeTimeSlot(prevProdStepSchedule.getStartTime()+ prevProdStepSchedule.getDuration() + 1, 
 							curProdStepSchedule.getStartTime() - prevProdStepSchedule.getStartTime()+ prevProdStepSchedule.getDuration()));
 				}
@@ -230,8 +230,8 @@ public class EquipletSchedule extends Schedule {
 		}
 		for (FreeTimeSlot freeTimeSlot : equipletFreeTimeData.getFreeTimeSlots()){
 			if (productStepSchedule.getStartTime() >= freeTimeSlot.getStartTimeSlot() && 
-					productStepSchedule.getDuration() <= freeTimeSlot.getEndTimeSlot() && 
-					productStepSchedule.getStartTime() + productStepSchedule.getDuration() <= freeTimeSlot.getStartTimeSlot() + freeTimeSlot.getEndTimeSlot()){
+					productStepSchedule.getDuration() <= freeTimeSlot.getDuration() && 
+					productStepSchedule.getStartTime() + productStepSchedule.getDuration() <= freeTimeSlot.getStartTimeSlot() + freeTimeSlot.getDuration()){
 				return true;
 			}
 		}
