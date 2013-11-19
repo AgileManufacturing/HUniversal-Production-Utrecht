@@ -62,10 +62,10 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 	private static final long serialVersionUID = 5464110443463847485L;
 
 	/**
-	 * @var ObjectId objectId
-	 * 		the objectId of the productStepId
+	 * @var String ConversationId
+	 * 		the conversationId to link the correct productStep
 	 */
-	private ObjectId objectId;
+	private String ConversationId;
 
 	private TimeSlot timeSlot;
 	
@@ -77,14 +77,26 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 	
 	/**
 	 * Standard constructor
-	 * @param objectid the objectId of the productStep to be scheduled
+	 * @param conversationId conversationId to link the correct productStep
 	 * @param startTime the starttime of the scheduled step. In timeslots
 	 * @param duration the duration of this productStep. In timeslots
 	 * @param deadline the deadline of this productStep. In timeslots
 	 */
-	public ProductStepSchedule(ObjectId objectid, long startTime, long duration, long deadline){
-		this.objectId = objectid;
+	public ProductStepSchedule(String conversationId, long startTime, long duration, long deadline){
+		this.ConversationId = conversationId;
 		this.timeSlot = new TimeSlot(startTime, duration);
+		this.deadline = deadline;
+	}
+	
+	/**
+	 * constructor
+	 * @param conversationId conversationId to link the correct productStep
+	 * @param timeslot the timeslot on which to plan on.
+	 * @param deadline the deadline of this productStep. In timeslots
+	 */
+	public ProductStepSchedule(String conversationId, TimeSlot timeSlot, long deadline){
+		this.ConversationId = conversationId;
+		this.timeSlot = timeSlot;
 		this.deadline = deadline;
 	}
 	
@@ -92,8 +104,8 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 	 * Constructor witch sets the timedata to -1
 	 * @param objectId the objectId of the productstep
 	 */
-	public ProductStepSchedule(ObjectId objectId){
-		this(objectId, -1, -1, -1);
+	public ProductStepSchedule(String conversationId){
+		this(conversationId, -1, -1, -1);
 	}
 	
 	/**
@@ -107,7 +119,7 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 	@Override
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject productStepScheduleDBObject = new BasicDBObject();
-		productStepScheduleDBObject.put("objectId", objectId);
+		productStepScheduleDBObject.put("objectId", ConversationId);
 		productStepScheduleDBObject.put("startTimeSlot", timeSlot.getStartTimeSlot());
 		productStepScheduleDBObject.put("duration", timeSlot.getDuration());
 		productStepScheduleDBObject.put("deadline", deadline);
@@ -120,7 +132,7 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 		if (object != null){
 			BasicDBObject dBObjectCopy= (BasicDBObject) object.copy();
 			
-			this.objectId = (ObjectId) dBObjectCopy.remove("objectId");
+			this.ConversationId = (String) dBObjectCopy.remove("conversationId");
 			
 			this.timeSlot.setStartTimeSlot(dBObjectCopy.getLong("startTimeSlot", -1));
 			dBObjectCopy.remove("startTimeSlot");

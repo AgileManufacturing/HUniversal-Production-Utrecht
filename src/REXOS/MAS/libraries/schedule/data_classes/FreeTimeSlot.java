@@ -57,6 +57,13 @@ public class FreeTimeSlot implements MongoSaveable{
 	private TimeSlot timeSlot;
 	
 	/**
+	 * @return the timeSlot
+	 */
+	public TimeSlot getTimeSlot() {
+		return timeSlot;
+	}
+
+	/**
 	 * Constructor for making a mongo blackboard entry to a FreeTimeSlot
 	 * @param dbObject the monogoDB object
 	 */

@@ -41,6 +41,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.UUID;
 
 import libraries.schedule.data_classes.EquipletScheduleInformation;
@@ -65,7 +66,7 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 	private SchedulerBehaviour schedulerBehaviour;
 	private AID[] equipletAgents;
 
-	private HashMap<AID, EquipletScheduleInformation> equipletSchedules;
+	private LinkedHashMap<AID, EquipletScheduleInformation> equipletSchedules;
 	
 	private int totalFinishedEquiplets;
 	
@@ -75,7 +76,7 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 		this.equipletAgents = equipletAgents;
 		this.schedulerBehaviour = schedulerBehaviour;
 		
-		equipletSchedules = new HashMap<AID, EquipletScheduleInformation>();
+		equipletSchedules = new LinkedHashMap<AID, EquipletScheduleInformation>();
 		totalFinishedEquiplets = 0;
 		
 	}

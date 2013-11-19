@@ -594,8 +594,8 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 	 * @param conversationId the conversationId in the new relation.
 	 * @param objectId the objectId in the new relation.
 	 */
-	public void addCommunicationRelation(String conversationId, ObjectId objectId) {
-		communicationTable.put(conversationId, objectId);
+		public void addCommunicationRelation(String conversationId, ObjectId objectId) {
+			communicationTable.put(conversationId, objectId);
 	}
 
 	/**

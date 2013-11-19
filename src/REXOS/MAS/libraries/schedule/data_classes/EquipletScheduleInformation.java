@@ -63,8 +63,14 @@ public class EquipletScheduleInformation implements Serializable {
 	private ArrayList<FreeTimeSlot> freeTimeSlots = new ArrayList<FreeTimeSlot>();
 	
 	/**
+	 * @var ArrayList<TimeSlot> plannedTimeSlots 
+	 * 		Freetimeslots representing gaps in the schedule of the equiplet
+	 */
+	private ArrayList<TimeSlot> plannedTimeSlots = new ArrayList<TimeSlot>();
+	
+	/**
 	 * @var long infiniteFreeTimeSlot
-	 * 		The folling timeslot of the last scheduled step in an equipletschedule
+	 * 		The folling start timeslot of the last scheduled step in an equipletschedule
 	 */
 	private long infiniteFreeTimeSlot;
 	
@@ -92,6 +98,8 @@ public class EquipletScheduleInformation implements Serializable {
 		this.hasEquipletScheduleLock = false;
 	}
 	
+	
+	
 	/**
 	 * gets the freetimeslots available in the equiplet's schedule
 	 * @return the freetimeslots available
@@ -99,6 +107,28 @@ public class EquipletScheduleInformation implements Serializable {
 	public ArrayList<FreeTimeSlot> getFreeTimeSlots(){
 		return freeTimeSlots;
 	}
+	
+	/**
+	 * gets the freetimeslots available in the equiplet's schedule that are equal or greather then the given dur
+	 * @param dur the given duration to match the free timeslot.
+	 * @return the freetimeslots available
+	 */
+	public ArrayList<FreeTimeSlot> getFreeTimeSlots(long dur) {
+		ArrayList<FreeTimeSlot> resultList = new ArrayList<FreeTimeSlot>();
+		
+		for (FreeTimeSlot freeTimeSlot : freeTimeSlots) {
+			if(freeTimeSlot.getDuration() >= dur){
+				if(!plannedTimeSlots.contains(freeTimeSlot.getTimeSlot())){
+					resultList.add(freeTimeSlot);
+				}
+			}
+		}
+		return resultList;
+	}
+	
+	public void planTimeSlot(FreeTimeSlot freeTimeSlot){
+		plannedTimeSlots.add(new TimeSlot(freeTimeSlot.getStartTimeSlot(), freeTimeSlot.getDuration()));
+	} 
 	
 	/**
 	 * gets the first timeslot available after the last scheduled step

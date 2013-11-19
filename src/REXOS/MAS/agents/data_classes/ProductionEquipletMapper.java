@@ -44,6 +44,9 @@ import jade.core.AID;
 
 import java.util.HashMap;
 
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.Logger;
+
 public class ProductionEquipletMapper{
 	private HashMap<Integer, HashMap<AID, Long>> equipletList;
 
@@ -59,7 +62,7 @@ public class ProductionEquipletMapper{
 		if (this.equipletList.containsKey(productionStepId) == false){
 			this.equipletList.put(productionStepId, new HashMap<AID, Long>());
 		} else{
-			// DEBUG: Production step already exists
+			Logger.log(LogLevel.ERROR, "Production step already exists in this mapper!");
 		}
 	}
 
@@ -67,7 +70,7 @@ public class ProductionEquipletMapper{
 		if (this.equipletList.containsKey(productionStepId) == true){
 			this.equipletList.remove(productionStepId);
 		} else{
-			// DEBUG: Production step doesn't exist
+			Logger.log(LogLevel.ERROR, "Production step doenst exist in this mapper!");
 		}
 	}
 

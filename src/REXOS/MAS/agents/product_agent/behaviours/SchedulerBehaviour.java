@@ -46,13 +46,17 @@ import jade.core.behaviours.Behaviour;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import libraries.schedule.data_classes.EquipletScheduleInformation;
+import libraries.schedule.data_classes.FreeTimeSlot;
+import libraries.schedule.data_classes.ProductStepSchedule;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 import agents.data_classes.BehaviourStatus;
 import agents.data_classes.Matrix;
 import agents.data_classes.Product;
+import agents.data_classes.ProductStepScheduleInformation;
 import agents.data_classes.Production;
 import agents.data_classes.ProductionEquipletMapper;
 import agents.data_classes.ProductionStep;
@@ -75,7 +79,7 @@ public class SchedulerBehaviour extends Behaviour {
 	
 	private boolean scheduleInformationDone = false;
 	
-	private HashMap<AID, EquipletScheduleInformation> equipletSchedules = new HashMap<AID, EquipletScheduleInformation>();
+	private LinkedHashMap<AID, EquipletScheduleInformation> equipletSchedules = new LinkedHashMap<AID, EquipletScheduleInformation>();
 
 	private ArrayList<ProductionStep> productionSteps;
 	/**
@@ -147,15 +151,11 @@ public class SchedulerBehaviour extends Behaviour {
 			//start scheduling
 			if(schedule(scheduleMatrix)){
 				//scheduling is done
+				//smth like set callback behaviour
 			} else {
 				//Need to reschedule?
 			}
 		}
-	}
-	
-	private boolean schedule(Matrix scheduleMatrix) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	/**
@@ -203,6 +203,55 @@ public class SchedulerBehaviour extends Behaviour {
 		return scheduleMatrix;
 	}
 	
+	
+	@SuppressWarnings("unchecked")
+	private boolean schedule(Matrix scheduleMatrix) {
+		ArrayList<ProductStepScheduleInformation> finalSchedules = new ArrayList<ProductStepScheduleInformation>();
+		// Read the matrix. Write function to iterate each seperate row ( productsteps ) and pick each equiplet 
+		
+		for (int column = 0; column < scheduleMatrix.getNumberOfColumns(); column++) { //Productsteps 
+			int highestEquipletScoreIndex = -1;
+			ProductionStep productionStep = productionSteps.get(column);
+			
+			for (int row = 0; row < scheduleMatrix.getNumberOfRows(); row++) { //AID'S
+				highestEquipletScoreIndex = (scheduleMatrix.get(row, column) > scheduleMatrix.get(highestEquipletScoreIndex, column)) ? row : highestEquipletScoreIndex;
+			}
+			
+			if(highestEquipletScoreIndex < 0){
+				Logger.log(LogLevel.ERROR, "No suitable equiplet found for this step! Scheduling has gone wrong.. Reschedule?");
+				return false;
+			}
+			
+			//Can we assume that all productSteps are ordered? What about parallel steps?
+			EquipletScheduleInformation scheduleInformation = ((ArrayList<EquipletScheduleInformation>)equipletSchedules.values()).get(highestEquipletScoreIndex);
+			AID equipletId = ((ArrayList<AID>)equipletSchedules.keySet()).get(highestEquipletScoreIndex);
+			
+			//Get first free timeslot
+			FreeTimeSlot freeTimeSlot = scheduleInformation.getFreeTimeSlots(productionStep.getDurationForEquiplet(equipletId)).get(0);
+			
+			//Check the equiplets schedule. Lets check if the schedule fits. Keep in mind that the deadline is met.
+			if(scheduleInformation.getIsEquipletScheduleLocked() && freeTimeSlot != null) {
+				
+				//Get first free timeslot, and make an list (array?)
+				finalSchedules.add(new ProductStepScheduleInformation(productionStep, equipletId, 
+						new ProductStepSchedule(productionStep.getConversationId(), freeTimeSlot.getTimeSlot(), 5l)));
+				
+				//plan the timeslot
+				scheduleInformation.planTimeSlot(freeTimeSlot);
+			}
+			
+			
+			
+			
+			
+			// If the schedule fits, save the equiplet with corresponding step(s) ( maybe equipletmapper? )
+		}
+		
+		// Message all the equiplets with their correspondig equiplet steps
+		
+		
+		return false;
+	}
 	/**
 	 * Sets the value of the sequences. @ref to paper Multiagent-based agile manufacturing: from user requirements to product leo van moergestel
 	 * section 3.2 
@@ -238,7 +287,7 @@ public class SchedulerBehaviour extends Behaviour {
 		super.restart();
 	}
 
-	public void callbackScheduleInformation(HashMap<AID, EquipletScheduleInformation> equipletSchedules, SchedulerBehaviour schedulerBehaviour){
+	public void callbackScheduleInformation(LinkedHashMap<AID, EquipletScheduleInformation> equipletSchedules, SchedulerBehaviour schedulerBehaviour){
 		schedulerBehaviour.equipletSchedules = equipletSchedules;		
 		Logger.log(LogLevel.DEBUG, "ScheduleInformationBehaviour is done, continuing the ScheduleBehaviour");
 		scheduleInformationDone = true;
