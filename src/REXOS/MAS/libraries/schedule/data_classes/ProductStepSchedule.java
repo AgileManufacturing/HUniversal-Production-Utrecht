@@ -146,4 +146,15 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 		}
 	}
 
+	public long getStartTime(){
+		return startTime;
+	}
+	
+	public long getDuration(){
+		return duration;
+	}
+	
+	public long getDeadline(){
+		return deadline;
+	}
 }

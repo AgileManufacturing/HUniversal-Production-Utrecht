@@ -58,7 +58,7 @@ final public class Matrix {
     public double[] getRow(int row) {
     	return data[row];
     }
-
+    
     // create and return the N-by-N identity matrix
     public static Matrix identity(int N) {
         Matrix I = new Matrix(N, N);

@@ -1,5 +1,5 @@
 /**
- * @file REXOS/MAS/agents/product_agent/behaviours/ScheduleInformation.java
+ * @file REXOS/MAS/agents/product_agent/behaviours/ScheduleInformationBehaviour.java
  * @brief Behaviour for getting information about the current schedule of the given equiplets
  * 			Will also set the lock on the schedule of this equiplet
  * @date Created: 04 nov. 2013
@@ -35,19 +35,20 @@
  **/
 package agents.product_agent.behaviours;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
-
-import agents.product_agent.ProductAgent;
-import agents.shared_behaviours.ReceiveBehaviour;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.UUID;
+
 import libraries.schedule.data_classes.EquipletScheduleInformation;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
+import agents.product_agent.ProductAgent;
+import agents.shared_behaviours.ReceiveBehaviour;
 
 public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 
@@ -65,10 +66,7 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 	private SchedulerBehaviour schedulerBehaviour;
 	private AID[] equipletAgents;
 
-	private HashMap<AID, EquipletScheduleInformation> equipletSchedules;
-	private HashMap<AID, UUID> equipletKeys;
-	private ArrayList<AID> refusedEquiplets;
-	
+	private LinkedHashMap<AID, EquipletScheduleInformation> equipletSchedules;
 	
 	private int totalFinishedEquiplets;
 	
@@ -78,8 +76,7 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 		this.equipletAgents = equipletAgents;
 		this.schedulerBehaviour = schedulerBehaviour;
 		
-		equipletSchedules = new HashMap<AID, EquipletScheduleInformation>();
-		refusedEquiplets = new ArrayList<AID>();
+		equipletSchedules = new LinkedHashMap<AID, EquipletScheduleInformation>();
 		totalFinishedEquiplets = 0;
 		
 	}
@@ -104,11 +101,10 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 				if (message.getPerformative() == ACLMessage.AGREE){
 					//agree message has the key to the schedule lock, save it and pass to the schedulebehaviour
 					UUID key = (UUID) message.getContentObject();
-					equipletKeys.put(message.getSender(), key);
 				
 				} else if (message.getPerformative() == ACLMessage.REFUSE){
 					//equiplet is already locked when refused, add to the refusedList
-					refusedEquiplets.add(message.getSender());
+					equipletSchedules.put(message.getSender(), null);
 					totalFinishedEquiplets ++;
 				} else if (message.getPerformative() == ACLMessage.INFORM){
 					//inform message contains the schedule data, add and check if all is dones
@@ -120,7 +116,7 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 					if (totalFinishedEquiplets == equipletAgents.length){ 
 						// all equiplets have responded, 
 						//callback to the scheduler with results and remove this behaviour
-						schedulerBehaviour.callbackScheduleInformation(equipletSchedules, refusedEquiplets, schedulerBehaviour);
+						schedulerBehaviour.callbackScheduleInformation(equipletSchedules, schedulerBehaviour);
 						productAgent.removeBehaviour(this);
 					}
 				}
@@ -128,14 +124,14 @@ public class ScheduleInformationBehaviour extends ReceiveBehaviour {
 				Logger.log(LogLevel.ERROR, e);
 			}
 		} else if (getTimeoutThrown()) {
-			//we are missing responses from the rest of the equiplets
+			//we are missing responses from the rest of the equiplets, add them to the list
 			//callback and remove the behaviour
 			for ( AID equiplet : equipletAgents){
-				if ( !equipletSchedules.keySet().contains(equiplet) && !refusedEquiplets.contains(equiplet)){
-					refusedEquiplets.add(equiplet);
+				if ( !equipletSchedules.keySet().contains(equiplet)){
+					equipletSchedules.put(equiplet, null);
 				}
 			}
-			schedulerBehaviour.callbackScheduleInformation(equipletSchedules, refusedEquiplets, schedulerBehaviour);
+			schedulerBehaviour.callbackScheduleInformation(equipletSchedules, schedulerBehaviour);
 			productAgent.removeBehaviour(this);
 		}
 

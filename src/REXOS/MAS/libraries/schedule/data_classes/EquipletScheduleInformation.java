@@ -4,6 +4,7 @@
  * @date Created: 15 nov 2013
  * 
  * @author Roy Scheefhals
+ * @author Alexander Streng
  * 
  * @section LICENSE License: newBSD
  * 
@@ -40,6 +41,7 @@ package libraries.schedule.data_classes;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Data class for representation of FreeTimeSlots in a equiplet's schedule
@@ -74,6 +76,10 @@ public class EquipletScheduleInformation implements Serializable {
 	 */
 	private double load;
 	
+	private boolean hasEquipletScheduleLock;
+	
+	private UUID equipletScheduleKey;
+	
 	/**
 	 * Constructor of this dataclass
 	 * @param freeTimeSlots The freetimeslots available for the equiplet
@@ -83,7 +89,11 @@ public class EquipletScheduleInformation implements Serializable {
 	public EquipletScheduleInformation(ArrayList<FreeTimeSlot> freeTimeSlots, long infiniteFreeTimeSlot, double load){
 		this.freeTimeSlots = freeTimeSlots;
 		this.infiniteFreeTimeSlot = infiniteFreeTimeSlot;
+		this.equipletScheduleKey = null;
+		this.hasEquipletScheduleLock = false;
 	}
+	
+	
 	
 	/**
 	 * gets the freetimeslots available in the equiplet's schedule
@@ -91,6 +101,23 @@ public class EquipletScheduleInformation implements Serializable {
 	 */
 	public ArrayList<FreeTimeSlot> getFreeTimeSlots(){
 		return freeTimeSlots;
+	}
+	
+	/**
+	 * gets the freetimeslots available in the equiplet's schedule that are equal or greather then the given dur
+	 * @param dur the given duration to match the free timeslot.
+	 * @return the freetimeslots available
+	 */
+	public ArrayList<FreeTimeSlot> getFreeTimeSlots(long dur) {
+		ArrayList<FreeTimeSlot> resultList = new ArrayList<FreeTimeSlot>();
+		
+		for (FreeTimeSlot freeTimeSlot : freeTimeSlots) {
+			if(freeTimeSlot.getDuration() >= dur){
+				resultList.add(freeTimeSlot);
+			}
+		}
+		
+		return resultList;
 	}
 	
 	/**
@@ -107,5 +134,18 @@ public class EquipletScheduleInformation implements Serializable {
 	 */
 	public double getLoad(){
 		return load;
+	}
+	
+	public boolean getIsEquipletScheduleLocked(){
+		return hasEquipletScheduleLock;
+	}
+	
+	public void setEquipletScheduleKey(UUID key){
+		this.equipletScheduleKey = key;
+		this.hasEquipletScheduleLock = true;
+	}
+	
+	public UUID getEquipletScheduleKey(){
+		return equipletScheduleKey;
 	}
 }

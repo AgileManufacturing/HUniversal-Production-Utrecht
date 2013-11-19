@@ -42,11 +42,16 @@ package libraries.schedule;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
+import org.bson.types.ObjectId;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.sun.org.apache.bcel.internal.generic.NEW;
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 
 import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
@@ -67,6 +72,8 @@ public class EquipletSchedule extends Schedule {
 	private TimeSlotSynchronization timeSlotSynchronization;
 	
 	private EquipletScheduleInformation equipletFreeTimeData;
+	
+	private ObjectId infiniteTimeSlotObjectId;
 	
 	public EquipletSchedule(String scheduleHostName, int schedulePort, String databaseName, TimeSlotSynchronization timeSlotSynchronization, boolean clearSchedule) 
 			throws UnknownHostException, GeneralMongoException, InvalidDBNamespaceException{
@@ -104,7 +111,7 @@ public class EquipletSchedule extends Schedule {
 		long currentTimeSlot = timeSlotSynchronization.getCurrentTimeSlot();
 		FreeTimeSlot freeTimeSlot = new FreeTimeSlot(currentTimeSlot, null);
 		
-		FreeTimeSlotBlackboard.insertDocument(freeTimeSlot.toBasicDBObject());
+		infiniteTimeSlotObjectId = FreeTimeSlotBlackboard.insertDocument(freeTimeSlot.toBasicDBObject());
 	}
 
 	public EquipletScheduleInformation GetFreeTimeSlots(Long duration, Long deadline) throws InvalidDBNamespaceException, GeneralMongoException, ScheduleException {
@@ -148,12 +155,80 @@ public class EquipletSchedule extends Schedule {
 		return equipletFreeTimeData; 
 	}
 	
-	public void ScheduleOn(UUID lockKey, ProductStepSchedule scheduleData) throws ScheduleAccessException {
+	public void ScheduleOn(UUID lockKey, ArrayList<ProductStepSchedule> scheduleData) throws ScheduleAccessException, 
+			ScheduleException, InvalidDBNamespaceException, GeneralMongoException {
 		super.checkLock(lockKey);
-		// TODO Auto-generated method stub
+		
+		java.util.Collections.sort(scheduleData, new Comparator<ProductStepSchedule>() {
+			@Override
+			public int compare(ProductStepSchedule o1, ProductStepSchedule o2) {
+				if(o1.getStartTime() < o2.getStartTime()){
+					return -1;
+				}else if(o1.getStartTime() == o2.getStartTime()){
+					return 0;
+				}else{
+					return 1;
+				}
+			}
+		});
+		
+		ArrayList<FreeTimeSlot> newFreeTimeSlots = new ArrayList<FreeTimeSlot>();
+		ArrayList<FreeTimeSlot> freeTimeSlotsTobeUpdated = new ArrayList<FreeTimeSlot>();
+		long newInfitineTimeSlot = -1L;
+		
+		//validate if the schedulestep  
+		if (!validateScheduleData(scheduleData)){
+			throw new ScheduleException("Given scheduleData does not fit in the current schedule");
+		}
+		
+		for (ProductStepSchedule productStepSchedule : scheduleData){
+			
+			if (productStepSchedule.getStartTime() >= equipletFreeTimeData.getinfiniteFreeTimeSlot()){
+				//if the schedule will be after the last current scheduled step
+				//just schedule the step and add possible new freetimeslots
+				
+				planningBlackboard.insertDocument(productStepSchedule.toBasicDBObject());
+				
+				newInfitineTimeSlot = productStepSchedule.getStartTime() + productStepSchedule.getDuration() + 1;
+				//update the latest timeslot
+				//FreeTimeSlotBlackboard.updateDocuments(
+				//		new BasicDBObject("_id", infiniteTimeSlotObjectId),
+				//		new BasicDBObject("$set", new BasicDBObject("startTimeSlot", productStepSchedule.getStartTime() + productStepSchedule.getDuration() + 1)));
+				
+				//we need to add a new freetimeslot to fill up the space inbetween
+				if ( productStepSchedule.getStartTime() > equipletFreeTimeData.getinfiniteFreeTimeSlot()){
+					newFreeTimeSlots.add(new FreeTimeSlot(equipletFreeTimeData.getinfiniteFreeTimeSlot(), 
+							productStepSchedule.getStartTime() - equipletFreeTimeData.getinfiniteFreeTimeSlot()));
+					
+				}
+			}
+		}
 		
 		
 		
 	}
 
+	private boolean validateScheduleData(ArrayList<ProductStepSchedule> scheduleData){
+		
+		for (ProductStepSchedule productStepSchedule : scheduleData){
+			if(!validateProductStepSchedule(productStepSchedule)){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private boolean validateProductStepSchedule(ProductStepSchedule productStepSchedule){
+		
+		if (productStepSchedule.getStartTime() >= equipletFreeTimeData.getinfiniteFreeTimeSlot()){
+			return true;
+		}
+		for (FreeTimeSlot freeTimeSlot : equipletFreeTimeData.getFreeTimeSlots()){
+			if (productStepSchedule.getStartTime() >= freeTimeSlot.getStartTimeSlot() && 
+					productStepSchedule.getDuration() <= freeTimeSlot.getDuration()){
+				return true;
+			}
+		}
+		return false;
+	}
 }

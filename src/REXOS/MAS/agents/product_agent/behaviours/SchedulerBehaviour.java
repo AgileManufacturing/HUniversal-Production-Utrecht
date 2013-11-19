@@ -48,12 +48,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
+
+import libraries.schedule.EquipletSchedule;
 import libraries.schedule.data_classes.EquipletScheduleInformation;
+import libraries.schedule.data_classes.FreeTimeSlot;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 import agents.data_classes.BehaviourStatus;
 import agents.data_classes.Matrix;
 import agents.data_classes.Product;
+import agents.data_classes.ProductStepSchedule;
+import agents.data_classes.ProductStepScheduleInformation;
 import agents.data_classes.Production;
 import agents.data_classes.ProductionEquipletMapper;
 import agents.data_classes.ProductionStep;
@@ -201,23 +207,42 @@ public class SchedulerBehaviour extends Behaviour {
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	private boolean schedule(Matrix scheduleMatrix) {
-		// Read the matrix. Write function to iterate each seperate row ( equiplet ) and pick each equiplet 
-		for (int row = 0; row < scheduleMatrix.getNumberOfRows(); row++) { //Productsteps 
-			for (int column = 0; column < scheduleMatrix.getNumberOfColumns(); column++) { //AID'S
-				
-				//iterate the row, and check the most feasible equiplet.
-				
-				AID equipletId = equipletSchedules[column]
-				
-				// Check the equiplets schedule. Lets check if the schedule fits. Keep in mind that the deadline is met.
-				
-				// If the schedule fits, save the equiplet with corresponding step(s) ( maybe equipletmapper? )
-				
-
-				
+		// < productStep Id, <equiplet AID, equiplet Schedule > > 
+		ArrayList<ProductStepScheduleInformation> finalSchedules = new ArrayList<ProductStepScheduleInformation>();
+		// Read the matrix. Write function to iterate each seperate row ( productsteps ) and pick each equiplet 
+		for (int column = 0; column < scheduleMatrix.getNumberOfColumns(); column++) { //Productsteps 
+			int highestEquipletScoreIndex = -1;
+			ProductionStep productionStep = productionSteps.get(column);
+			
+			for (int row = 0; row < scheduleMatrix.getNumberOfRows(); row++) { //AID'S
+				//iterate the row, and check the most feasible equiplet.				
+				highestEquipletScoreIndex = (scheduleMatrix.get(row, column) > scheduleMatrix.get(highestEquipletScoreIndex, column)) ? row : highestEquipletScoreIndex;
 				
 			}
+			
+			if(highestEquipletScoreIndex < 0){
+				Logger.log(LogLevel.ERROR, "No equiplet found for this step! Scheduling has gone wrong.. Reschedule?");
+				return false;
+			}
+			
+			finalSchedules.add(
+					new ProductStepScheduleInformation(productionStep, 
+					((ArrayList<AID>)equipletSchedules.keySet()).get(highestEquipletScoreIndex), 
+					((ArrayList<EquipletScheduleInformation>)equipletSchedules.values()).get(highestEquipletScoreIndex)));
+			
+			
+			//Can we assume that all productSteps are ordered? What about parallel steps?
+			//Check the equiplets schedule. Lets check if the schedule fits. Keep in mind that the deadline is met.
+			//Get first free timeslot, and make an list (array?)
+			//FreeTimeSlot firstSlot = equipletScheduleInformation.getFreeTimeSlots(timeSlotsRequired).get(0);
+			//No way this works
+			
+			
+			
+			
+			// If the schedule fits, save the equiplet with corresponding step(s) ( maybe equipletmapper? )
 		}
 		
 		// Message all the equiplets with their correspondig equiplet steps
@@ -260,8 +285,8 @@ public class SchedulerBehaviour extends Behaviour {
 		super.restart();
 	}
 
-	public void callbackScheduleInformation(HashMap<AID, libraries.schedule.data_classes.EquipletScheduleInformation> equipletSchedules, ArrayList<AID> refusedEquiplets, SchedulerBehaviour schedulerBehaviour){
-		schedulerBehaviour.equipletSchedules = (LinkedHashMap)equipletSchedules;		
+	public void callbackScheduleInformation(LinkedHashMap<AID, EquipletScheduleInformation> equipletSchedules, SchedulerBehaviour schedulerBehaviour){
+		schedulerBehaviour.equipletSchedules = equipletSchedules;		
 		Logger.log(LogLevel.DEBUG, "ScheduleInformationBehaviour is done, continuing the ScheduleBehaviour");
 		scheduleInformationDone = true;
 		restart();
