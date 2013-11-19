@@ -207,8 +207,8 @@ public class SchedulerBehaviour extends Behaviour {
 	@SuppressWarnings("unchecked")
 	private boolean schedule(Matrix scheduleMatrix) {
 		ArrayList<ProductStepScheduleInformation> finalSchedules = new ArrayList<ProductStepScheduleInformation>();
-		// Read the matrix. Write function to iterate each seperate row ( productsteps ) and pick each equiplet 
 		
+		// Read the matrix. Write function to iterate each seperate row ( productsteps ) and pick each equiplet 
 		for (int column = 0; column < scheduleMatrix.getNumberOfColumns(); column++) { //Productsteps 
 			int highestEquipletScoreIndex = -1;
 			ProductionStep productionStep = productionSteps.get(column);
@@ -240,13 +240,8 @@ public class SchedulerBehaviour extends Behaviour {
 				scheduleInformation.planTimeSlot(freeTimeSlot);
 			}
 			
-			
-			
-			
-			
 			// If the schedule fits, save the equiplet with corresponding step(s) ( maybe equipletmapper? )
 		}
-		
 		// Message all the equiplets with their correspondig equiplet steps
 		
 		
