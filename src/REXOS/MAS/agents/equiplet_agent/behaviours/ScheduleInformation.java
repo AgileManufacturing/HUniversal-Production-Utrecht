@@ -83,7 +83,7 @@ public class ScheduleInformation extends ReceiveBehaviour {
 						response.setContentObject(scheduleKey);
 						equipletAgent.send(response);
 						
-						EquipletScheduleInformation freeTimeData =  equipletAgent.getSchedule().GetFreeTimeSlots(null, null);
+						EquipletScheduleInformation freeTimeData =  equipletAgent.getSchedule().getFreeTimeSlots(null, null);
 						
 						
 						// get schedule and calculate load
@@ -101,7 +101,7 @@ public class ScheduleInformation extends ReceiveBehaviour {
 					// Don't lock the the schedule, just get and send it
 					response.setPerformative(ACLMessage.INFORM);
 					
-					EquipletScheduleInformation freeTimeData =  equipletAgent.getSchedule().GetFreeTimeSlots(null, null);
+					EquipletScheduleInformation freeTimeData =  equipletAgent.getSchedule().getFreeTimeSlots(null, null);
 					
 					response.setContentObject(freeTimeData);
 				}

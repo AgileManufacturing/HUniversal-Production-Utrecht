@@ -78,13 +78,13 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 	/**
 	 * Standard constructor
 	 * @param objectid the objectId of the productStep to be scheduled
-	 * @param startTime the starttime of the scheduled step. In timeslots
+	 * @param startTimeSlot the starttime of the scheduled step. In timeslots
 	 * @param duration the duration of this productStep. In timeslots
 	 * @param deadline the deadline of this productStep. In timeslots
 	 */
-	public ProductStepSchedule(ObjectId objectid, long startTime, long duration, long deadline){
+	public ProductStepSchedule(ObjectId objectid, long startTimeSlot, long duration, long deadline){
 		this.objectId = objectid;
-		this.timeSlot = new TimeSlot(startTime, duration);
+		this.timeSlot = new TimeSlot(startTimeSlot, duration);
 		this.deadline = deadline;
 	}
 	
@@ -108,7 +108,7 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 	public BasicDBObject toBasicDBObject() {
 		BasicDBObject productStepScheduleDBObject = new BasicDBObject();
 		productStepScheduleDBObject.put("objectId", objectId);
-		productStepScheduleDBObject.put("startTime", timeSlot.getStartTimeSlot());
+		productStepScheduleDBObject.put("startTimeSlot", timeSlot.getStartTimeSlot());
 		productStepScheduleDBObject.put("duration", timeSlot.getDuration());
 		productStepScheduleDBObject.put("deadline", deadline);
 		return productStepScheduleDBObject;
@@ -122,8 +122,8 @@ public class ProductStepSchedule implements MongoSaveable, Serializable {
 			
 			this.objectId = (ObjectId) dBObjectCopy.remove("objectId");
 			
-			this.timeSlot.setStartTimeSlot(dBObjectCopy.getLong("startTime", -1));
-			dBObjectCopy.remove("startTime");
+			this.timeSlot.setStartTimeSlot(dBObjectCopy.getLong("startTimeSlot", -1));
+			dBObjectCopy.remove("startTimeSlot");
 			this.timeSlot.setDuration(dBObjectCopy.getLong("duration", -1));
 			dBObjectCopy.remove("duration");
 			this.deadline = dBObjectCopy.getLong("deadline", -1);
