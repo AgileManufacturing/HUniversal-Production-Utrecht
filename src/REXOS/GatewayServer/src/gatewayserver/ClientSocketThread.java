@@ -4,11 +4,14 @@ import gatewayserver.data.Command;
 import jade.cli.CLIManager;
 import jade.util.ExtendedProperties;
 import jade.util.leap.Properties;
+import jade.wrapper.ControllerException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+
+import javax.management.monitor.Monitor;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -32,73 +35,76 @@ import com.google.gson.JsonParser;
  * @author Mike
  * 
  */
-public class ClientSocketThread implements Runnable {
+public class ClientSocketThread extends Thread implements Runnable {
 
-	private GatewayServer server; 
-	
+	private String productAgentId;
+
 	private boolean _stopSocketThread = false;
 	private Socket _clientSocket = null;
 	private BufferedReader _clientInSocket = null;
-	
-	private String agentHost;
 
-	public ClientSocketThread(GatewayServer server, Socket socket, String agentHost) {
-		this.server = server;
+	private String agentHost;
+	private int cooldown;
+
+	public ClientSocketThread(String productAgentId, Socket socket,
+			String agentHost, int cooldown) {
+		this.productAgentId = productAgentId;
 		this.agentHost = agentHost;
 		this._clientSocket = socket;
+		this.cooldown = cooldown;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Runnable#run()
-	 */
 	@Override
 	public void run() {
 		try {
-			//this._clientOutSocket = new PrintWriter(
-			//		this._clientSocket.getOutputStream(), true);
 			this._clientInSocket = new BufferedReader(new InputStreamReader(
 					this._clientSocket.getInputStream()));
+
 			Command cmd = null;
 			JsonParser parser = new JsonParser();
-			while(this._stopSocketThread == false) {
-				try{
-					String data = this._clientInSocket.readLine();
-					JsonObject obj = (JsonObject)parser.parse(data).getAsJsonObject();
-			        JsonElement idElement = obj.get("id");
-			        JsonElement commandElement = obj.get("command");
-			        JsonElement  productElement = obj.get("payload");
-			        
-			        int id = idElement.getAsInt();
-			        String command = commandElement.getAsString();
-			        String payload = productElement.toString();
-			        
-			        cmd = new Command(id,command,payload);
-					
-					if(cmd.getCommand().equals("CREATE_PA")) {
-						String json = cmd.getPayload();											
-						CommandAgent ca = new CommandAgent(json, server.getProductAgentID());
-						Properties pp = new ExtendedProperties();
-						pp.put("host", agentHost);
-						
-						CLIManager.execute(pp, ca.getBehaviour(pp), false);
+			String data = this._clientInSocket.readLine();
+			JsonObject obj = (JsonObject) parser.parse(data).getAsJsonObject();
+			JsonElement idElement = obj.get("id");
+			JsonElement commandElement = obj.get("command");
+			JsonElement productElement = obj.get("payload");
+
+			int id = idElement.getAsInt();
+			String command = commandElement.getAsString();
+			String payload = productElement.toString();
+			
+			cmd = new Command(id, command, payload);
+			
+			stopClient();
+			
+			if (cmd.getCommand().equals("CREATE_PA")) {
+				String json = cmd.getPayload();
+				if (cooldown > 0) {
+					System.out.println("Waiting : " + cooldown + " millis"
+							+ Thread.currentThread());
+					try {
+						Thread.sleep(cooldown);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
-					System.out.println("Sent new product agent to JADE.");
-					stop();
 				}
-				catch(Exception e) {
-					e.printStackTrace();
-					stop();
-				}				
+				CommandAgent ca = new CommandAgent(json, productAgentId);
+				Properties pp = new ExtendedProperties();
+				pp.put("host", agentHost);
+
+				try {
+					CLIManager.execute(pp, ca.getBehaviour(pp), false);
+				} catch (IllegalArgumentException | ControllerException e) {
+				}
 			}
-		} catch (Exception e) {
-			System.out.println("Exception: " + e.getMessage());
-			stop();
+			System.out.println("Sent new product agent to JADE.");
+			
+
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
 	}
 
-	public void stop() {
+	public void stopClient() {
 		this._stopSocketThread = true;
 		try {
 			_clientSocket.close();

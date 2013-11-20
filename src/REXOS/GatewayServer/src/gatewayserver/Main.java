@@ -35,28 +35,6 @@ public class Main {
 			GatewayServer gs = new GatewayServer(port, agentHost);
 			Thread gatewayServerThread = new Thread(gs);
 			
-			/*
-			InputStreamReader isr = new InputStreamReader(System.in);
-			BufferedReader br = new BufferedReader(isr);
-			String line = "";
-			System.out.println("Typ 'Start' to run the GatewayServer");
-			while ((line = br.readLine()) != null) {
-				String option = line.trim().toLowerCase();
-				if(option.equals("start")){
-					System.out.println("Server is starting!");
-					gatewayServerThread.run();
-				} else if(option.equals("stop")) {
-					System.out.println("Server is stopping!");
-					gs.stopServer();
-				} else if(option.equals("quit")) {
-					gs.stopServer();
-					System.exit(0);		
-				} else {
-					System.out.println("Unknown command");
-				}
-			}
-			*/
-			
 			System.out.println("GatewayServer Started on: " + agentHost + ":" + port);
 			gatewayServerThread.run();
 

@@ -29,7 +29,6 @@ public class GatewayServer implements Runnable {
 
 	private ServerSocket _serverSocket;
 
-	private ArrayList<ClientSocketThread> _clientThreads;
 
 	private boolean _stopServer = false;
 
@@ -37,40 +36,46 @@ public class GatewayServer implements Runnable {
 	
 	private String agentHost = "";
 	
+	private int cooldown = 0;
+	
+	private long lastTimeOfCooldown = 0;
+	
+	private final int cooldownLength = 10000;
+	
 	public GatewayServer(int port, String agentHost) throws IOException {
 		super();
 		this.agentHost = agentHost;
 		this._serverSocketPort = port;
-		_clientThreads = new ArrayList<ClientSocketThread>();
 	}
 
 	public void run() {
 		try {
 			Socket socket = null;
-			Thread runThread = null;
-			this._serverSocket = new ServerSocket(this._serverSocketPort, 10);
+			this._serverSocket = new ServerSocket(this._serverSocketPort);
 			while (this._stopServer == false) {
 				socket = this._serverSocket.accept();
-				ClientSocketThread cst = new ClientSocketThread(this, socket, agentHost);
-				runThread = new Thread(cst);
-				runThread.start();
+				
+				long currentTime = System.currentTimeMillis();
+				long differenceCooldown = currentTime - lastTimeOfCooldown;
+				cooldown = cooldown - (int)differenceCooldown;
+				if (  cooldown < 0 ) {
+					cooldown = 0;
+				}
+				
+				System.out.println("Adding new client with cooldown: " + cooldown + Thread.currentThread());
+				ClientSocketThread cst = new ClientSocketThread(getProductAgentID(), socket, agentHost, cooldown);
+				cst.start();
+				this.cooldown += cooldownLength;
+				socket = null;
+				cst = null;
+				lastTimeOfCooldown = System.currentTimeMillis();
 			}
 		} catch (IOException ioe) {
 				System.out.println("Exception: " + ioe.getMessage());
-		} catch (Exception e) {
-				System.out.println("Exception: " + e.getMessage());
 		}
 	}
-
-	public void stopServer() {
-		this._stopServer = true;
-		for (ClientSocketThread sct : this._clientThreads) {
-			sct.stop();
-		}
-	}
-
 	
-	public String getProductAgentID(){
+	private String getProductAgentID(){
 		return "pa"+ productAgentID++;
 	}
 }
