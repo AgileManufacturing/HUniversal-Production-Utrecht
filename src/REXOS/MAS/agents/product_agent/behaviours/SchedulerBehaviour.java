@@ -43,9 +43,13 @@ package agents.product_agent.behaviours;
 
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import libraries.schedule.data_classes.EquipletScheduleInformation;
@@ -60,6 +64,7 @@ import agents.data_classes.ProductStepScheduleInformation;
 import agents.data_classes.Production;
 import agents.data_classes.ProductionEquipletMapper;
 import agents.data_classes.ProductionStep;
+import agents.data_classes.StepStatusCode;
 import agents.product_agent.BehaviourCallback;
 import agents.product_agent.ProductAgent;
 
@@ -232,7 +237,7 @@ public class SchedulerBehaviour extends Behaviour {
 			//Check the equiplets schedule. Lets check if the schedule fits. Keep in mind that the deadline is met.
 			if(scheduleInformation.getIsEquipletScheduleLocked() && freeTimeSlot != null) {
 				
-				//Get first free timeslot, and make an list (array?)
+				//We should still set the proper deadline. ( none is given for now )
 				finalSchedules.add(new ProductStepScheduleInformation(productionStep, equipletId, 
 						new ProductStepSchedule(productionStep.getConversationId(), freeTimeSlot.getTimeSlot(), 5l)));
 				
@@ -243,10 +248,63 @@ public class SchedulerBehaviour extends Behaviour {
 			// If the schedule fits, save the equiplet with corresponding step(s) ( maybe equipletmapper? )
 		}
 		// Message all the equiplets with their correspondig equiplet steps
-		
-		
-		return false;
+		return sendScheduleMessages(finalSchedules);
 	}
+	
+	private boolean sendScheduleMessages(ArrayList<ProductStepScheduleInformation> productStepScheduleInformations){
+		
+		HashMap<AID, ArrayList<ProductStepSchedule>> sendMap = new HashMap<>();
+		ArrayList<ProductStepSchedule> tempList;
+		
+		for (ProductStepScheduleInformation productStepScheduleInformation : productStepScheduleInformations) {
+			AID equipletAid = productStepScheduleInformation.getEquipletAid();
+			
+			if(sendMap.keySet().contains(equipletAid)){
+				//item already exists. Get the list and insert the productStep schedule
+				tempList = sendMap.get(equipletAid);
+			} else {
+				//its a new entry!
+				tempList = new ArrayList<>();
+			}
+
+			tempList.add(productStepScheduleInformation.getProductStepSchedule());
+			sendMap.put(equipletAid, tempList);
+		}
+		
+		for (AID equipletAid : sendMap.keySet()) {
+			
+			ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+			msg.setConversationId(this.prodStep.getConversationIdForEquiplet(equipletAid));
+			msg.setOntology("ScheduleStep");
+			
+			try {
+				msg.setContentObject(sendMap.get(equipletAid));
+			} catch (IOException e) {
+				Logger.log(LogLevel.ERROR, "Could not parse productStep schedule array: ", e);
+			}
+			
+			msg.addReceiver(equipletAid);
+			myAgent.send(msg);
+
+			ACLMessage returnMsg = myAgent.blockingReceive(MessageTemplate.MatchOntology("Planned"), 10000);
+			if (returnMsg != null){
+				if (returnMsg.getPerformative() == ACLMessage.CONFIRM) {
+					prodStep.setStatus(StepStatusCode.PLANNED);
+					prodStep.setUsedEquiplet(returnMsg.getSender());
+				} else if (returnMsg.getPerformative() == ACLMessage.DISCONFIRM) {
+					isError = true;
+					//behaviourCallback.handleCallback(BehaviourStatus.ERROR, null);
+				}	
+			}
+			else {
+				//TODO: error handling
+			}
+			prodStep.setConversationId(returnMsg.getConversationId());
+			
+		}
+		return isError;
+	}
+	
 	/**
 	 * Sets the value of the sequences. @ref to paper Multiagent-based agile manufacturing: from user requirements to product leo van moergestel
 	 * section 3.2 
