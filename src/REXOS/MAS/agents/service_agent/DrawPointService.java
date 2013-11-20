@@ -88,7 +88,7 @@ public class DrawPointService extends Service {
 		BasicDBObject location = (BasicDBObject) parameterGroups.get("loc");
 		
 		Position point = new Position((BasicDBObject) location.get("parameters"));
-		point.setZ(0.0);
+		//point.setZ(0.0);
 		point.setRelativeToPart(new Part(3));
 
 		BasicDBObject serviceStepParameters = new BasicDBObject();
