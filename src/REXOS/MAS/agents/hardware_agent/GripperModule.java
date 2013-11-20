@@ -53,8 +53,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import libraries.utillities.log.LogLevel;
-import libraries.utillities.log.Logger;
 import agents.data_classes.Part;
 import agents.data_classes.Position;
 import agents.data_classes.StepStatusCode;
@@ -70,6 +68,12 @@ public class GripperModule extends Module {
 	 * A static value that contains the size of the gripper.
 	 */
 	private static final double GRIPPER_SIZE = 18.24;
+	
+	/**
+	 * @var int TIMESLOTS_NEEDED_PER_STEP
+	 * 		A static value with the timeslots needed per step.
+	 */
+	private static final int TIMESLOTS_NEEDED_PER_STEP = 1;
 
 	/**
 	 * @var Module movementModule
@@ -101,12 +105,12 @@ public class GripperModule extends Module {
 		moveParameters.put("extraSize", GRIPPER_SIZE + crateHeight);
 		moveParameters.put("position", new Position().toBasicDBObject());
 
-		//get steps from the movementModule to move to the safe movement plane.
-		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));
 		//get steps from the movementModule to move on the x and y axis relative to a crate.
 		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(2, moveParameters)));
 		//get steps from the movementModule to move on the z axis.
 		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, moveParameters)));
+		//get steps from the movementModule to move to the safe movement plane.
+		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));
 
 		//switch to determine which steps to make.
 		switch (stepType) {
@@ -152,7 +156,11 @@ public class GripperModule extends Module {
         double extraSize = GRIPPER_SIZE + crateHeight;
 		
 		Part part = new Part((BasicDBObject)parameters.get("crate"));
-		Position position = new Position((parameters.getDouble("row") * crateSlotDimension + crateSlotMidPoint) - (crateDimension / 2), (parameters.getDouble("column") * crateSlotDimension + crateSlotMidPoint) - (crateDimension / 2), 5.0, part);
+		
+		double x = (parameters.getDouble("column") * crateSlotDimension + crateSlotMidPoint) - (crateDimension / 2);
+		double y = ((parameters.getDouble("row") * crateSlotDimension + crateSlotMidPoint) - (crateDimension / 2)) * -1;
+		
+		Position position = new Position(x, y, 5.0, part);
 		
 		//get the newest code of the movementModule.
 		int movementModuleId = findMovementModule(getConfiguration());
@@ -182,9 +190,9 @@ public class GripperModule extends Module {
 			
 			if(payload.containsField("z") && payload.getString("z").equals("Z-PLACEHOLDER")) {
 				if(position.getZ() == null)	{
-					payload.put("z", 0 - extraSize);
+					payload.put("z",  extraSize);
 				} else {
-					payload.put("z", position.getZ() - extraSize);
+					payload.put("z", position.getZ() + extraSize);
 				}
 			}
 			
@@ -252,7 +260,7 @@ public class GripperModule extends Module {
 		//create the instruction data.
 		InstructionData instructionData = new InstructionData("activate", "gripper", "NULL", lookUpParameters, new BasicDBObject());
 		//create and return the step.
-		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(), new TimeData(1));
+		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(), new TimeData(TIMESLOTS_NEEDED_PER_STEP));
 	}
 
 	/**
@@ -266,7 +274,7 @@ public class GripperModule extends Module {
 		//create instruction data.
 		InstructionData instructionData = new InstructionData("deactivate", "gripper", "NULL", lookUpParameters, new BasicDBObject());
 		//create and return the step.
-		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(), new TimeData(1));
+		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(), new TimeData(TIMESLOTS_NEEDED_PER_STEP));
 	}
 
 }

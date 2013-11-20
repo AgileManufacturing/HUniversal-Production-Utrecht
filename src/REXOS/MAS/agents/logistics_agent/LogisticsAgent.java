@@ -71,12 +71,12 @@ public class LogisticsAgent extends Agent {
 		addBehaviour(new ArePartsAvailable(this));
 		
 		//fill the crate
-		/*for(int i = 0; i < 4; i++) {
+		for(int i = 0; i < 4; i++) {
 			for(int j = 0; j < 4; j++) {
 				supplyCrateContent.put(new Part(1, (i * 4) + j), new Position(j + 0.0, i + 0.0, supplyCratePart));
 			}
-		}*/
-		supplyCrateContent.put(new Part(1, 1), new Position(0.0, 0.0, supplyCratePart));
+		}
+		//supplyCrateContent.put(new Part(1, 1), new Position(0.0, 0.0, supplyCratePart));
 	}	
 	
 	public synchronized Entry<Part, Position> getBallPart(){

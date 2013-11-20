@@ -50,11 +50,6 @@ package agents.service_agent;
 import java.util.HashMap;
 import java.util.Set;
 
-import libraries.knowledgedb_client.KeyNotFoundException;
-import libraries.knowledgedb_client.KnowledgeDBClient;
-import libraries.knowledgedb_client.KnowledgeException;
-import libraries.knowledgedb_client.Queries;
-import libraries.knowledgedb_client.Row;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 import agents.data_classes.Part;

@@ -114,7 +114,7 @@ public class ModuleFactory {
 				}
 			}
 		} catch (InstantiateClassException | KnowledgeException | KeyNotFoundException e) {
-			Logger.log(LogLevel.ERROR, "", e);
+			Logger.log(LogLevel.ERROR, "Error at moduleFactory", e);
 		}
 	}
 	
