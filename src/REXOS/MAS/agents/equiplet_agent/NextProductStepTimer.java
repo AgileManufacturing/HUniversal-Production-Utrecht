@@ -41,6 +41,7 @@ import java.util.TimerTask;
 
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
+import libraries.schedule.data_classes.TimeSlotSynchronization;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
@@ -69,17 +70,10 @@ public class NextProductStepTimer extends Timer {
 	private long nextUsedTimeSlot;
 
 	/**
-	 * @var long firstTimeSlot
-	 *      The first time slot of the grid.
+	 * @var TimeSlotSynchronization timeSlotSynchronization
+	 * 		The timeslotSynchronization of this timer
 	 */
-	private long firstTimeSlot;
-
-	/**
-	 * @var long timeSlotLength
-	 *      The length of a time slot in milliseconds.
-	 */
-	private long timeSlotLength;
-
+	private TimeSlotSynchronization timeSlotSynchronization;
 	/**
 	 * @var NextProductStepTask task
 	 *      The task for this timer
@@ -93,13 +87,12 @@ public class NextProductStepTimer extends Timer {
 	 *            the first time slot from the grid/equiplet.
 	 * @param timeSlotLength
 	 *            the length of a time slot.
-	 * @param agent
+	 * @param equipletAgent
 	 *            The equipletAgent to which the timer belongs.
 	 */
-	public NextProductStepTimer(long firstTimeSlot, int timeSlotLength, EquipletAgent agent) {
-		this.firstTimeSlot = firstTimeSlot;
-		this.timeSlotLength = timeSlotLength;
-		equipletAgent = agent;
+	public NextProductStepTimer(TimeSlotSynchronization timeSlotSynchronization, EquipletAgent equipletAgent) {
+		this.timeSlotSynchronization = timeSlotSynchronization;
+		this.equipletAgent = equipletAgent;
 		nextUsedTimeSlot = -1;
 	}
 
@@ -114,7 +107,7 @@ public class NextProductStepTimer extends Timer {
 			task.cancel();
 		}
 		if(nextUsedTimeSlot != -1) {
-			long startPlannedTimeSlot = (nextUsedTimeSlot * timeSlotLength) + firstTimeSlot;
+			long startPlannedTimeSlot = (nextUsedTimeSlot * timeSlotSynchronization.getTimeSlotLength()) + timeSlotSynchronization.getFirstTimeSlot();
 			long currentTime = System.currentTimeMillis();
 			task = new NextProductStepTask();
 			Logger.log(LogLevel.DEBUG, "%d Equiplet agent - trying to schedule: %d (%d - %d)%n", EquipletAgent.getCurrentTimeSlot(), (startPlannedTimeSlot - currentTime),
@@ -137,32 +130,21 @@ public class NextProductStepTimer extends Timer {
 	public long getNextUsedTimeSlot() {
 		return nextUsedTimeSlot;
 	}
-
+	
 	/**
-	 * Function for getting the timeSlotLength
-	 * 
-	 * @return the timeSlotLength
+	 * Getter for the timeSlotSynchronization
+	 * @return the timeSlotSynchronization
 	 */
-	public long getTimeSlotLength() {
-		return timeSlotLength;
+	public TimeSlotSynchronization getTimeSlotSynchronization(){
+		return timeSlotSynchronization;
 	}
-
+	
 	/**
-	 * Function for setting the timeSlotLength
-	 * 
-	 * @param timeSlotLength the timeSlotLength to set
+	 * Setter for the timeSlotSynchronization
+	 * @param timeSlotSynchronization the new timeSlotSynchronization
 	 */
-	public void setTimeSlotLength(int timeSlotLength) {
-		this.timeSlotLength = timeSlotLength;
-	}
-
-	/**
-	 * Getter for the first time slot
-	 * 
-	 * @return the first time slot
-	 */
-	public long getFirstTimeSlot() {
-		return firstTimeSlot;
+	public void setTimeSlotSynchronization(TimeSlotSynchronization timeSlotSynchronization){
+		this.timeSlotSynchronization = timeSlotSynchronization;
 	}
 
 	/**

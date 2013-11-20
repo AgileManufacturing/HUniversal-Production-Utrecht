@@ -338,11 +338,13 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			int timeSlotLength = timeData.getInt("timeSlotLength");
 			
 			// initiates the timer to the next product step.
-			timer = new NextProductStepTimer(firstTimeSlot, timeSlotLength, this);
-
+			
 			collectiveBBClient.setCollection(equipletDirectoryName);
 			
 			TimeSlotSynchronization timeSlotSynchronization = new TimeSlotSynchronization(firstTimeSlot, timeSlotLength);
+			
+			timer = new NextProductStepTimer(timeSlotSynchronization, this);
+
 			equipletSchedule = new EquipletSchedule(equipletDbIp, equipletDbPort, equipletDbName, timeSlotSynchronization, true);
 		} catch(GeneralMongoException | InvalidDBNamespaceException | UnknownHostException | StaleProxyException
 				| KnowledgeException | KeyNotFoundException  e) {
