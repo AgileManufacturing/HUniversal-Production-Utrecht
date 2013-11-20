@@ -97,7 +97,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
     //construct a payload
     //construct lookupvalues.
 	Point payloadPoint, lookupResultPoint;
-	double angle, lookupX, lookupY;
+	double angle, rotatedX, rotatedY;
     JSONNode::const_iterator i = instructionDataNode.begin();
     while (i != instructionDataNode.end()){
         const char * nodeName = i -> name().c_str();
@@ -139,19 +139,21 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 		double theta = angle * 3.141592653589793 / 180.0;
 		double cs = cos(theta);
 		double sn = sin(theta);
-		lookupX = lookupVector.x * cs - lookupVector.y * sn;
-		lookupY = lookupVector.x * sn + lookupVector.y * cs;
+		rotatedX = payloadPoint.x * cs - payloadPoint.y * sn;
+		rotatedY = payloadPoint.x * sn + payloadPoint.y * cs;
 
 	    //translate the relative point to real equiplet coordinates.
-		Vector3 lookupVectorRotated(lookupX, lookupY, lookupVector.z);
-		Vector3 translatedVector = convertToModuleCoordinate(lookupVectorRotated);
+		Vector3 translatedVector = convertToModuleCoordinate(lookupVector);
+
+		std::cout << "[TranslatedVectorX]: \t" << translatedVector.x << "\n[TranslatedVectorY]: \t" << translatedVector.y << std::endl;
 
 		if(movementZ) {
 			// Z Movement
 			moveVector.set(payloadPoint.x, payloadPoint.y, (translatedVector.z + payloadPoint.z));
 		} else {
 			// XY Movement
-			moveVector.set((translatedVector.x + payloadPoint.x), (translatedVector.y + payloadPoint.y), payloadPoint.z);
+			moveVector.set((translatedVector.x + rotatedX), (translatedVector.y + rotatedY), payloadPoint.z);
+			std::cout << "[MoveVectorX]: \t" << moveVector.x << "\n[MoveVectorY]: \t" << moveVector.y << std::endl;
 		}
 
 	} else {
@@ -159,7 +161,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 		moveVector.set(payloadPoint.x, payloadPoint.y, payloadPoint.z);
 	}
 
-	std::cout << "trying to move to x: " << moveVector.x << " y: " << moveVector.y << " z: " <<  moveVector.z << " with acceleration: " << payloadPoint.maxAcceleration << std::endl;
+	//std::cout << "trying to move to x: " << moveVector.x << " y: " << moveVector.y << " z: " <<  moveVector.z << " with acceleration: " << payloadPoint.maxAcceleration << std::endl;
 	if(moveToPoint(moveVector.x, moveVector.y, moveVector.z, payloadPoint.maxAcceleration)){
 		setInstructionActionServer.setSucceeded(result_);
 		return;
