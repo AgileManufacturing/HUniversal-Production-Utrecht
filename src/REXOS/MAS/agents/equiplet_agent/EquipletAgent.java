@@ -475,7 +475,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 							responseMessage.setPerformative(ACLMessage.CONFIRM);
 							productStep.setStatus(StepStatusCode.DONE);
 							responseMessage.setContentObject(productStep.toBasicDBObject());
-							productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
+						//	productStepBBClient.removeDocuments(new BasicDBObject("_id", productStep.getId()));
 							break;
 						case DELETED:
 							setDesiredEquipletState(EquipletState.STANDBY);

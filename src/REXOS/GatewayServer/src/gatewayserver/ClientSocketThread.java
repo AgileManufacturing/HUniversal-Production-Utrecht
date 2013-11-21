@@ -79,8 +79,7 @@ public class ClientSocketThread extends Thread implements Runnable {
 			if (cmd.getCommand().equals("CREATE_PA")) {
 				String json = cmd.getPayload();
 				if (cooldown > 0) {
-					System.out.println("Waiting : " + cooldown + " millis"
-							+ Thread.currentThread());
+					System.out.println("Starting new productAgent after: " + cooldown + "milliseconds");
 					try {
 						Thread.sleep(cooldown);
 					} catch (InterruptedException e) {

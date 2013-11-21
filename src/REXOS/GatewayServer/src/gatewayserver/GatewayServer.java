@@ -62,7 +62,6 @@ public class GatewayServer implements Runnable {
 					cooldown = 0;
 				}
 				
-				System.out.println("Adding new client with cooldown: " + cooldown + Thread.currentThread());
 				ClientSocketThread cst = new ClientSocketThread(getProductAgentID(), socket, agentHost, cooldown);
 				cst.start();
 				this.cooldown += cooldownLength;
