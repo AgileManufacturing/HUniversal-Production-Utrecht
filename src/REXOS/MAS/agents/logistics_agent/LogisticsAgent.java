@@ -61,7 +61,7 @@ public class LogisticsAgent extends Agent {
 
 	private Part supplyCratePart = new Part(2, 100, "GC4x4MB_1");
 	private Part productCratePart = new Part(2, 101, "GC4x4MB_2");
-	private Part whitePaper = new Part(3, 102, "WhitePaper");
+	private Part paper = new Part(3, 102, "Paper");
 	
 	private HashMap<Part, Position> supplyCrateContent = new HashMap<Part, Position>();
 	
@@ -106,7 +106,7 @@ public class LogisticsAgent extends Agent {
 	}
 	
 	public synchronized Part getWhitePaper(){
-		return whitePaper;
+		return paper;
 	}
 	
 	/**
