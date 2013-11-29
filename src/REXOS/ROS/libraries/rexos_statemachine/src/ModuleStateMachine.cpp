@@ -37,8 +37,8 @@ ModuleStateMachine::ModuleStateMachine(std::string moduleName, int equipletId, i
 	changeModeNotificationClient = nodeHandle.serviceClient<rexos_statemachine_srvs::ModeUpdate>(equipletNamespaceName + "/" + moduleNamespaceName + "/mode_update");
 	setListener(this);
 	
-	ROS_ERROR_STREAM("binding A on " << (moduleName + "/bond")<< " id " << std::to_string(moduleId));
-	bond = new bond::Bond(moduleName + "/bond", std::to_string(moduleId));
+	ROS_INFO_STREAM("binding A on " << (moduleName + "/bond")<< " id " << std::to_string(moduleId));
+	bond = new rexos_bond::Bond(moduleName + "/bond", std::to_string(moduleId), this);
 	bond->start();
 }
 
@@ -65,4 +65,12 @@ void ModuleStateMachine::setInError(){
 		changeMode(rexos_statemachine::MODE_CRITICAL_ERROR);
 	else
 		changeMode(rexos_statemachine::MODE_ERROR);
+}
+void ModuleStateMachine::onBondCallback(rexos_bond::Bond* bond, Event event){
+	if(event == FORMED) {
+		ROS_INFO("Bond has been formed");
+	} else {
+		ROS_WARN("Bond has been broken, initiate gracefull shutdown");
+		// TODO: implement gracefull shutdown
+	}
 }

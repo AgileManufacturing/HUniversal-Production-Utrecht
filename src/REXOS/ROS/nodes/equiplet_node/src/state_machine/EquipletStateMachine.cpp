@@ -2,7 +2,7 @@
 
 using namespace equiplet_node;
 
-EquipletStateMachine::EquipletStateMachine(std::string name,int id):
+EquipletStateMachine::EquipletStateMachine(std::string name, int id):
 	StateMachine(name,
 		{
 			rexos_statemachine::MODE_NORMAL, 

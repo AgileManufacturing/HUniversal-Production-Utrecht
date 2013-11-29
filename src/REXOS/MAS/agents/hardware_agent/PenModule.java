@@ -63,7 +63,7 @@ public class PenModule extends Module {
 	 * @var int PEN_OFFSET
 	 *      A static value that contains the offset of the pen in relation to the movement module.
 	 */
-	private static final double PEN_OFFSET = 20;
+	private static final double PEN_OFFSET = 96.6;
 
 	/**
 	 * @var double PEN_SIZE
@@ -270,7 +270,14 @@ public class PenModule extends Module {
 		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, dotParameters)));
 
 		// get steps from the movementModule to move to the safe movement plane(not needed).
-		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, dotParameters)));
+		// L33T HACKING !!!!!!!!!!!!!
+		BasicDBObject moveParameters2 = new BasicDBObject();
+		moveParameters2.put("extraSize", PEN_OFFSET);
+		Position p = new Position();
+		p.setZ(20.0);
+		moveParameters2.put("position", p.toBasicDBObject());
+		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, moveParameters2)));
+		//steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, dotParameters)));
 
 		// convert the ArrayList to an array and return it.
 		EquipletStep[] equipletSteps = new EquipletStep[steps.size()];

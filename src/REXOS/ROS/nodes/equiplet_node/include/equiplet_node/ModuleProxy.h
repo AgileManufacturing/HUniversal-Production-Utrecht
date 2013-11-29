@@ -10,7 +10,7 @@
 
 #include <actionlib/client/simple_action_client.h>
 
-#include <bondcpp/bond.h>
+#include <rexos_bond/Bond.h>
 
 #include <rexos_statemachine/State.h>
 #include <rexos_statemachine/Mode.h>
@@ -37,7 +37,7 @@ typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction> Cha
 typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeModeAction> ChangeModeActionClient;
 typedef actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> SetInstructionActionClient;
 
-class ModuleProxy {
+class ModuleProxy : public rexos_bond::BondListener{
 public:
 	ModuleProxy(std::string equipletNodeName, std::string moduleName, int equipletId, int moduleId, ModuleProxyListener* mpl = NULL);
 	virtual ~ModuleProxy();
@@ -85,7 +85,9 @@ private:
 	/**
 	 * The bond to bind the module with the equiplet
 	 **/
-	bond::Bond* bond;
+	rexos_bond::Bond* bond;
+protected:
+	virtual void onBondCallback(rexos_bond::Bond* bond, Event event);
 };
 
 } /* namespace equiplet_node */

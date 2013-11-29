@@ -9,7 +9,7 @@ namespace rexos_knowledge_database{
 	Equiplet::Equiplet(std::string name) :
 				name(name)
 	{
-		connection = rexos_knowledge_database::connect();
+		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
 	}
 	
 	int Equiplet::getMointPointsX(){

@@ -11,7 +11,7 @@ namespace rexos_knowledge_database{
 	Module::Module(std::string manufacturer, std::string typeNumber, std::string serialNumber) :
 				manufacturer(manufacturer), typeNumber(typeNumber), serialNumber(serialNumber)
 	{
-		connection = rexos_knowledge_database::connect();
+		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
 		
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT * \

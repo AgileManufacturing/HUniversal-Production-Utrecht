@@ -73,6 +73,7 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 	 */
 	public ArePartsAvailableInTime(LogisticsAgent logisticsAgent, String conversationId) {
 		this(logisticsAgent, 2000, conversationId);
+		Logger.log(LogLevel.DEBUG, "ArePartsAvailableInTime behaviour started.");
 	}
 
 	/**
@@ -101,26 +102,24 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if (message != null) {
+			Logger.log(LogLevel.DEBUG, "Received message.");
 			try {
-				Logger.log(LogLevel.DEBUG, "%s ArePartsAvailableInTime%n",
-						logisticsAgent.getLocalName());
 				Part[] parts = (Part[]) message.getContentObject();
 
 				ACLMessage reply = message.createReply();
 				reply.setOntology("ArePartsAvailableInTime");
 				reply.setPerformative(ACLMessage.CONFIRM);
 				logisticsAgent.send(reply);
-
 				logisticsAgent.addBehaviour(new PartsInfo(logisticsAgent, message
 						.getConversationId()));
+				Logger.log(LogLevel.INFORMATION, "Parts are available in time.");
 			} catch (UnreadableException e) {
-				Logger.log(LogLevel.ERROR, "", e);
+				Logger.log(LogLevel.ERROR, "Message unreadable!", e);
 				logisticsAgent.doDelete();
 			}
 		} else {
-			Logger.log(LogLevel.ERROR, "" + logisticsAgent.getLocalName()
-					+ " - ArePartsAvailableInTime timeout!");
 			logisticsAgent.removeBehaviour(this);
+			Logger.log(LogLevel.ALERT, "Parts are NOT available in time.");
 		}
 	}
 }

@@ -44,7 +44,6 @@ namespace keyboard_control_node {
 		virtual ~KeyBoardControlNode();
 
 		private:
-		static void quit(int sig);
 		void readInputFromKeyBoard(int inputCharacter);
 		void run();
 		void writeToBlackBoard(std::string x, std::string y, std::string z, std::string acceleration);

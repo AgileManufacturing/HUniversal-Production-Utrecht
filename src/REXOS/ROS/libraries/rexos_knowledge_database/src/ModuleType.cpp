@@ -9,7 +9,7 @@ namespace rexos_knowledge_database{
 	ModuleType::ModuleType(std::string manufacturer, std::string typeNumber) :
 				manufacturer(manufacturer), typeNumber(typeNumber)
 	{
-		connection = rexos_knowledge_database::connect();
+		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
 	}
 	
 	std::string ModuleType::getModuleTypeProperties(){

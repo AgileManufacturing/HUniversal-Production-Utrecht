@@ -31,6 +31,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <rexos_knowledge_database/ModuleType.h>
 
@@ -63,6 +64,6 @@ namespace rexos_knowledge_database {
 		
 	private:
 		std::string manufacturer, typeNumber, serialNumber;
-		std::auto_ptr<sql::Connection> connection;
+		std::unique_ptr<sql::Connection> connection;
 	};
 }

@@ -34,6 +34,8 @@
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
 
+#include <memory>
+
 // TEMP!
 #define MYSQL_SERVER "tcp://127.0.0.1:3306"
 #define MYSQL_DATABASE "equiplet"
@@ -44,7 +46,7 @@
  * @brief this class provides a system to translate coordinates from module coordinates to equiplet coordinates.
  */
 namespace rexos_knowledge_database {
-	std::auto_ptr<sql::Connection> connect();
+	std::unique_ptr<sql::Connection> connect();
 	
 }
 #endif /* REXOS_KNOWLEDGE_DATABASE_H */

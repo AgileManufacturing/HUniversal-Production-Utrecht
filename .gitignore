@@ -47,6 +47,7 @@ sync.sh
 APDescription.txt
 MTPs-Main-Container.txt
 MTPs-GridAgents.txt
+gridLog.txt
 .classpath
 .project
 .settings/

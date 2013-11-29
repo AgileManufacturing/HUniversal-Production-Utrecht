@@ -44,17 +44,28 @@
 
 #include <vision_node/QrCodes.h>
 
+#include <boost/circular_buffer.hpp>
+#include <map>
+
 class PartLocatorNode : public rexos_knowledge_database::Module,
 		public rexos_coordinates::Module {
+public:
+	struct QrCode {
+		Vector2 location;
+		double angle;
+	};
 protected:
 	static const Vector2 EXPECTED_DIRECTION;
 	static const Vector2 EXPECTED_ITEM_DIRECTION;
+	static const int minCornerSamples;
+	static const int minItemSamples;
 	std::string topLeftValue;
 	std::string topRightValue;
 	std::string bottomRightValue;
 	double workPlaneWidth;
 	double workPlaneHeight;
 	
+	std::map<std::string, boost::circular_buffer<QrCode> > smoothBuffer;
 
 public:
 	PartLocatorNode(int equipletId, std::string cameraManufacturer, std::string cameraTypeNumber, std::string cameraSerialNumber);
@@ -63,33 +74,32 @@ private:
 	/**
 	 * The first known position of the top left corner
 	 **/
-	Vector2 originalTopLeftCoor;
+	QrCode originalTopLeftCoor;
 	/**
 	 * The first known position of the top right corner
 	 **/
-	Vector2 originalTopRightCoor;
+	QrCode originalTopRightCoor;
 	/**
 	 * The first known position of the bottom right corner
 	 **/
-	Vector2 originalBottomRightCoor;
+	QrCode originalBottomRightCoor;
 	/**
 	 * The last known position of the top left corner
 	 **/
-	Vector2 currentTopLeftCoor;
+	QrCode currentTopLeftCoor;
 	/**
 	 * The last known position of the top right corner
 	 **/
-	Vector2 currentTopRightCoor;
+	QrCode currentTopRightCoor;
 	/**
 	 * The last known position of the bottom right corner
 	 **/
-	Vector2 currentBottomRightCoor;
+	QrCode currentBottomRightCoor;
 	Matrix3 totalMatrix;
-	/**
-	 * TEMP: If this nodes starts, none of the corners have been detected, making conversion impossible. 
-	 * Only after all three corners have been detected, conversion can be done.
-	 **/
-	int foundCorners;
+	
+	boost::circular_buffer<QrCode> samplesTopLeft;
+	boost::circular_buffer<QrCode> samplesTopRight;
+	boost::circular_buffer<QrCode> samplesBottomRight;
 	
 	ros::NodeHandle nodeHandle;
 	/**
@@ -140,4 +150,7 @@ private:
 	 * @return The scale matrix
 	 **/
 	Matrix3 calculateScaleMatrix();
+	
+	QrCode calculateSmoothPos(std::string name, QrCode lastPosition);
+	QrCode calculateSmoothPos(boost::circular_buffer<QrCode> buffer);
 };

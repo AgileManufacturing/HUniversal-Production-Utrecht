@@ -65,8 +65,8 @@
   <run_depend>libjson</run_depend>
   <run_depend>environment_communication_msgs</run_depend>
 
-  <build_depend>bondcpp</build_depend>
-  <run_depend>bondcpp</run_depend>
+  <build_depend>rexos_bond</build_depend>
+  <run_depend>rexos_bond</run_depend>
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- You can specify that this package is a metapackage here: -->

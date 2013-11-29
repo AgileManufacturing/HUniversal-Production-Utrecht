@@ -81,6 +81,7 @@ import org.bson.types.ObjectId;
 
 import agents.data_classes.DbData;
 import agents.data_classes.StepStatusCode;
+import agents.hardware_agent.behaviours.RemoveEquipletStepBehaviour;
 import agents.hardware_agent.behaviours.RequiredModulesPresent;
 import agents.hardware_agent.behaviours.EvaluateDuration;
 import agents.hardware_agent.behaviours.FillPlaceholders;
@@ -249,6 +250,8 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 
 		// Start the serviceAgentDied
 		addBehaviour(new ServiceAgentDied(this));
+		
+		addBehaviour(new RemoveEquipletStepBehaviour(this));
 
 		// Get the modules for the equiplet and register the modules
 		try {
@@ -422,6 +425,12 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 		}
 	}
 
+	public void removeEquipletStepsByServiceStepId(ObjectId serviceStepId) throws InvalidDBNamespaceException, GeneralMongoException{
+		
+		int removedSteps = equipletStepBBClient.removeDocuments(new BasicDBObject("serviceStepID", serviceStepId));
+		Logger.log(LogLevel.DEBUG, "Removing equiplet steps: " + removedSteps);
+	}
+	
 	/**
 	 * @see ModuleUpdateListener#onModuleUpdate(int, Module, Module)
 	 */

@@ -246,9 +246,7 @@ void Bond::breakBond()
       publishStatus(false);
     }
   }
-  if(callbackListener != NULL) {
-    callbackListener->onBondCallback(this, BondListener::BROKEN);
-  }
+  flushPendingCallbacks();
 }
 
 
@@ -258,9 +256,7 @@ void Bond::onConnectTimeout()
     boost::mutex::scoped_lock lock(mutex_);
     sm_.ConnectTimeout();
   }
-  if(callbackListener != NULL) {
-    callbackListener->onBondCallback(this, BondListener::FORMED);
-  }
+  flushPendingCallbacks();
 }
 void Bond::onHeartbeatTimeout()
 {
@@ -277,9 +273,7 @@ void Bond::onHeartbeatTimeout()
     boost::mutex::scoped_lock lock(mutex_);
     sm_.HeartbeatTimeout();
   }
-  if(callbackListener != NULL) {
-    callbackListener->onBondCallback(this, BondListener::BROKEN);
-  }
+  flushPendingCallbacks();
 }
 void Bond::onDisconnectTimeout()
 {
@@ -287,9 +281,7 @@ void Bond::onDisconnectTimeout()
     boost::mutex::scoped_lock lock(mutex_);
     sm_.DisconnectTimeout();
   }
-  if(callbackListener != NULL) {
-    callbackListener->onBondCallback(this, BondListener::BROKEN);
-  }
+  flushPendingCallbacks();
 }
 
 void Bond::bondStatusCB(const bond::Status::ConstPtr &msg)
@@ -322,9 +314,7 @@ void Bond::bondStatusCB(const bond::Status::ConstPtr &msg)
           publishStatus(false);
       }
     }
-    if(callbackListener != NULL) {
-      callbackListener->onBondCallback(this, BondListener::BROKEN);
-    }
+    flushPendingCallbacks();
   }
 }
 
@@ -359,6 +349,20 @@ void Bond::publishStatus(bool active)
   pub_.publish(msg);
 }
 
+void Bond::flushPendingCallbacks()
+{
+  std::vector<BondListener::Event> callbacks;
+  {
+    boost::mutex::scoped_lock lock(mutex_);
+    callbacks = pending_callbacks_;
+    pending_callbacks_.clear();
+  }
+  if(callbackListener != NULL)
+  {
+    for (size_t i = 0; i < callbacks.size(); ++i)
+      callbackListener->onBondCallback(this, callbacks[i]);
+  }
+}
 
 } // namespace
 
@@ -367,6 +371,7 @@ void BondSM::Connected()
 {
   b->connect_timer_.cancel();
   b->condition_.notify_all();
+  b->pending_callbacks_.push_back(rexos_bond::BondListener::FORMED);
 }
 
 void BondSM::SisterDied()
@@ -379,6 +384,7 @@ void BondSM::Death()
   b->condition_.notify_all();
   b->heartbeat_timer_.cancel();
   b->disconnect_timer_.cancel();
+  b->pending_callbacks_.push_back(rexos_bond::BondListener::BROKEN);
 }
 
 void BondSM::Heartbeat()

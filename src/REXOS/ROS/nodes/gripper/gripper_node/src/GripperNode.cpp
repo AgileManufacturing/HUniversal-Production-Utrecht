@@ -53,21 +53,6 @@ GripperNode::GripperNode(int equipletID, int moduleID, std::string manufacturer,
 		moduleNodeName("gripper_node_" + std::to_string(equipletID) + "_" + std::to_string(moduleID)),
 		setInstructionActionServer(nodeHandle, moduleNodeName + "/set_instruction", boost::bind(&GripperNode::onSetInstruction, this, _1), false) {
 	
-	/*modbusContext = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
-
-	if (modbusContext == NULL) {
-		throw std::runtime_error("Unable to allocate libmodbus context");
-	}
-
-	if (modbus_connect(modbusContext) == -1) {
-		throw std::runtime_error("Modbus connection to IO controller failed");
-	}
-
-	assert(modbusContext != NULL);
-
-	modbus = new rexos_modbus::ModbusController(modbusContext);
-	controller = new rexos_gripper::InputOutputController(modbus);*/
-	// get the properties and combine them for the deltarobot
 	rexos_knowledge_database::ModuleType* moduleType = this->getModuleType();
 	std::string properties = this->getModuleProperties();
 	std::string typeProperties = moduleType->getModuleTypeProperties();

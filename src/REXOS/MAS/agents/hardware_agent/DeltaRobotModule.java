@@ -47,6 +47,8 @@
  **/
 package agents.hardware_agent;
 
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.Logger;
 import agents.data_classes.Position;
 import agents.data_classes.StepStatusCode;
 
@@ -74,7 +76,15 @@ public class DeltaRobotModule extends Module {
 	 * @var int TIMESLOTS_NEEDED_PER_STEP
 	 * 		A static value with the timeslots needed per step.
 	 */
-	private static final int TIMESLOTS_NEEDED_PER_STEP = 3;
+	private static final int TIMESLOTS_NEEDED_PER_STEP = 59; // 60 pl0x
+	
+	/**
+	 * Default constructor for DeltaRobotModule
+	 * 		This has only been added to be able to add a log line
+	 */
+	public DeltaRobotModule(){
+		Logger.log(LogLevel.DEBUG, "DeltaRobotModule created.");
+	}
 	
 	/**
 	 * @see Module#getEquipletSteps(int, BasicDBObject)
@@ -123,6 +133,7 @@ public class DeltaRobotModule extends Module {
 	public EquipletStep[] fillPlaceHolders(EquipletStep[] steps, BasicDBObject parameters) {
 		// get the new position parameters from the parameters
 		double extraSize = 15;	//temp value
+		Logger.log(LogLevel.DEBUG, "Filling placeholders.");
 		
 		if(parameters.containsField("extraSize"))
 		{
@@ -234,6 +245,8 @@ public class DeltaRobotModule extends Module {
 	 */
 	private EquipletStep moveToSafePlane(BasicDBObject parameters) {
 		// get the extraSize from the parameters(e.g. Size of the module on this module)
+		Logger.log(LogLevel.INFORMATION, "Moving to safe movement plane.");
+		
 		double extraSize = 0;
 		if(parameters.containsField("extraSize")) {
 			extraSize = parameters.getDouble("extraSize");
@@ -306,6 +319,9 @@ public class DeltaRobotModule extends Module {
 			}
 			payload.put("maxAcceleration", MAX_ACCELERATION);
 			lookUp = "FIND_ID";
+			
+			Logger.log(LogLevel.INFORMATION, "Moving to x: %f, y: %f.", position.getX(), position.getY());
+			
 		} else {
 			// fill the payload parameters
 			payload.put("x", "X-PLACEHOLDER");
@@ -313,7 +329,7 @@ public class DeltaRobotModule extends Module {
 		}
 		// create the instructionData
 		InstructionData instructionData = new InstructionData("move", "deltarobot", lookUp, lookUpParameters, payload);
-
+		
 		// create the EquipletStep and return it.
 		return new EquipletStep(null, getId(), instructionData, StepStatusCode.EVALUATING, new BasicDBObject(),
 				new TimeData(TIMESLOTS_NEEDED_PER_STEP));
@@ -361,6 +377,9 @@ public class DeltaRobotModule extends Module {
 			
 			payload.put("maxAcceleration", MAX_ACCELERATION);
 			lookUp = "FIND_ID";
+			
+
+			Logger.log(LogLevel.INFORMATION, "Moving to z: %f", position.getZ());
 		} else {
 			// fill in the payload parameters.
 			payload.put("z", "Z-PLACEHOLDER");

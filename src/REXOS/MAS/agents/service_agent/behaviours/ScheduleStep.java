@@ -150,7 +150,6 @@ public class ScheduleStep extends ReceiveBehaviour implements ParentBehaviourCal
 		case "PartsInfo":
 			//TODO: Fillplaceholders message has to be sent, but there is no response.. so creating a new behaviour is now not viable..
 			//for now we just send the message.
-			System.out.println("message sent: Fillplaceholders");
 			ACLMessage informMsg = new ACLMessage(ACLMessage.INFORM);
 			informMsg.setOntology("FillPlaceholders");
 			informMsg.setConversationId(result.getConversationId());

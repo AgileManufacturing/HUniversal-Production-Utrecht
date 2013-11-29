@@ -196,7 +196,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			serviceStepBBClient.subscribe(statusSubscription);
 			serviceStepBBClient.removeDocuments(new BasicDBObject());
 		} catch(UnknownHostException | GeneralMongoException | InvalidDBNamespaceException e) {
-			Logger.log(LogLevel.ERROR, "", e);
+			Logger.log(LogLevel.CRITICAL, "Database connection error. Deleting ServiceAgent.", e);
 			doDelete();
 		}
 
@@ -208,9 +208,9 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 		// Add behaviours
 		addBehaviour(new InitialisationFinished(this));
 		addBehaviour(new CanPerformProductionStep(this));
-		//addBehaviour(new CheckForModulesResponse(this));
 		addBehaviour(new ProductStepDuration(this));
 		addBehaviour(new ScheduleStep(this));
+		addBehaviour(new RemoveServiceStepBehaviour(this));
 	}
 
 	/**
@@ -242,7 +242,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			
 			serviceStepBBClient.removeDocuments(new BasicDBObject());
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(LogLevel.ERROR, "", e);
+			Logger.log(LogLevel.CRITICAL, "Database connection error.", e);
 		}
 
 		ACLMessage message = new ACLMessage(ACLMessage.INFORM);
@@ -280,7 +280,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 				send(message);
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException | IOException e) {
-			Logger.log(LogLevel.ERROR, "", e);
+			Logger.log(LogLevel.CRITICAL, "Database connection error.", e);
 		}
 	}
 
@@ -381,9 +381,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 														StepStatusCode.WAITING.name())));
 										break;
 									}
-
 									Logger.log(LogLevel.DEBUG, "saving log in prod.Step %s%n", productStepId);
-
 									// save the log in the productStep
 									productStepBBClient.updateDocuments(
 											new BasicDBObject("_id", productStepId),
@@ -418,7 +416,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					break;
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(LogLevel.ERROR, "", e);
+			Logger.log(LogLevel.CRITICAL, "Database connection error. Deleting ServiceAgent.", e);
 			doDelete();
 		}
 	}
@@ -482,16 +480,26 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	}
 
 	public void removeAllMappingsForProductStepId(ObjectId productStepId) {
-		String conversationId = null;
-		for(Entry<String, ObjectId> mapping : convIdProductStepIdMapping.entrySet()) {
-			if(productStepId.equals(mapping.getValue())) {
-				conversationId = mapping.getKey();
-				break;
-			}
-		}
-		convIdProductStepIdMapping.remove(conversationId);
+		String conversationId = getConvIdforProductStepId(productStepId);
+		removeConvIdProductStepIdMapping(conversationId);
 	}
 
+	public ArrayList<ObjectId> getServiceStepIdsByProductStepId(ObjectId productStepId) throws InvalidDBNamespaceException, GeneralMongoException{
+		List<DBObject> resultDbObjects = serviceStepBBClient.findDocuments(new BasicDBObject("productStepId", productStepId));
+		ArrayList<ObjectId> serviceSteps = new ArrayList<ObjectId>();
+		for ( DBObject dbObject: resultDbObjects){
+			serviceSteps.add(new ServiceStep((BasicDBObject)dbObject).getId());
+		}
+		return serviceSteps;
+	}
+	
+	public void removeServiceStepsByProductStepId(ObjectId productStepId) throws InvalidDBNamespaceException, GeneralMongoException{
+		
+		int removedSteps = serviceStepBBClient.removeDocuments(new BasicDBObject("productStepId", productStepId));
+		Logger.log(LogLevel.DEBUG, "Removing service steps: " + removedSteps);
+		removeAllMappingsForProductStepId(productStepId);
+	}
+	
 	/**
 	 * Maps the specified conversation id with the specified service object. Once a service object has been created (by
 	 * the service factory) it's mapped with the conversation id of the scheduling negotiation of the corresponding

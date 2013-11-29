@@ -35,10 +35,15 @@
 
 #include <libjson/libjson.h>
 
+#include <algorithm>
+#include <vector>
+
 using namespace std;
 
 const Vector2 PartLocatorNode::EXPECTED_DIRECTION = Vector2(-1, 0);
 const Vector2 PartLocatorNode::EXPECTED_ITEM_DIRECTION = Vector2(-1, 0);
+const int PartLocatorNode::minCornerSamples = 101;
+const int PartLocatorNode::minItemSamples = 11;
 /*const string PartLocatorNode::TOP_LEFT_VALUE = "WP_800_400_TL";
 const string PartLocatorNode::TOP_RIGHT_VALUE = "WP_800_400_TR";
 const string PartLocatorNode::BOTTOM_RIGHT_VALUE = "WP_800_400_BR";*/
@@ -47,14 +52,10 @@ const string PartLocatorNode::BOTTOM_RIGHT_VALUE = "WP_800_400_BR";*/
 PartLocatorNode::PartLocatorNode(int equipletId, std::string cameraManufacturer, std::string cameraTypeNumber, std::string cameraSerialNumber):
 		rexos_knowledge_database::Module(cameraManufacturer, cameraTypeNumber, cameraSerialNumber),
 		rexos_coordinates::Module(this),
-		originalTopLeftCoor(-1, -1),
-		originalTopRightCoor(-1, -1),
-		originalBottomRightCoor(-1, -1),
-		currentTopLeftCoor(-1, -1),
-		currentTopRightCoor(-1, -1),
-		currentBottomRightCoor(-1, -1),
-		foundCorners(0),
-		environmentCacheClient(nodeHandle.serviceClient<environment_cache::UpdateEnvironmentCache>("updateEnvironmentCache"))
+		environmentCacheClient(nodeHandle.serviceClient<environment_cache::UpdateEnvironmentCache>("updateEnvironmentCache")),
+		samplesTopLeft(minCornerSamples),
+		samplesTopRight(minCornerSamples),
+		samplesBottomRight(minCornerSamples)
 {
 	ROS_INFO("Constructing");
 	
@@ -98,7 +99,12 @@ void PartLocatorNode::qrCodeCallback(const vision_node::QrCodes & message) {
 	detectCorners(message);
 	
 	// can not do conversion without the corners
-	if(foundCorners != 3) return;
+	if(
+		samplesTopLeft.size() < minCornerSamples || 
+		samplesTopRight.size() < minCornerSamples || 
+		samplesBottomRight.size() < minCornerSamples) {
+		return;
+	}
 	
 	int collectionSize = message.qrCodes.size();
 	for(int i = 0; i < collectionSize; i++){
@@ -123,57 +129,96 @@ void PartLocatorNode::qrCodeCallback(const vision_node::QrCodes & message) {
 		
 		//ROS_DEBUG_STREAM("lineA2B \t" << lineA2B << " length " << lineA2B.length());
 		//ROS_DEBUG_STREAM("lineB2C \t" << lineB2C << " length " << lineB2C.length());
-
-		Vector2 centerCoor = Vector2(
+		
+		QrCode qrCode;
+		qrCode.location = Vector2(
 			points[0].x + (lineA2B / 2).x + (lineB2C / 2).x,
 			points[0].y + (lineA2B / 2).y + (lineB2C / 2).y
 		);
+		qrCode.angle = getItemRotationAngle(lineA2B);
 		
-		Vector3 equipletCoor = convertToEquipletCoordinate(Vector3(centerCoor.x, centerCoor.y, 0));
+		QrCode smoothCenterCoor = calculateSmoothPos(message.qrCodes[i].value, qrCode);
+		
+		Vector3 equipletCoor = convertToEquipletCoordinate(Vector3(smoothCenterCoor.location.x, smoothCenterCoor.location.y, 0));
 		/*if(message.qrCodes[i].value == "GC4x4MB_1") {
 			ROS_DEBUG_STREAM("-equipletCoor \t" << equipletCoor);
 		}*/
 		
-		double angle = getItemRotationAngle(lineA2B);
-		storeInEnviromentCache(message.qrCodes[i].value, equipletCoor, angle);
+		storeInEnviromentCache(message.qrCodes[i].value, equipletCoor, qrCode.angle);
 		
 		delete points;
 	}
 }
+PartLocatorNode::QrCode PartLocatorNode::calculateSmoothPos(std::string name, PartLocatorNode::QrCode lastPosition) {
+	boost::circular_buffer<QrCode> buffer;
+	try{
+		buffer = smoothBuffer.at(name);
+	} catch(std::out_of_range ex) {
+		buffer = boost::circular_buffer<QrCode>(minItemSamples);
+	}
+	buffer.push_back(lastPosition);
+	
+	return calculateSmoothPos(buffer);
+}
+PartLocatorNode::QrCode PartLocatorNode::calculateSmoothPos(boost::circular_buffer<PartLocatorNode::QrCode> buffer) {
+	QrCode* points = buffer.linearize();
+	std::vector<double> xArray;
+	std::vector<double> yArray;
+	std::vector<double> angleArray;
+	for(int i = 0; i < buffer.size(); i++) {
+		xArray.push_back(points[i].location.x);
+		yArray.push_back(points[i].location.y);
+		angleArray.push_back(points[i].angle);
+	}
+	
+	double sumX = std::accumulate(xArray.begin(), xArray.end(), 0.0);
+	double sumY = std::accumulate(yArray.begin(), yArray.end(), 0.0);
+	double sumAngle = std::accumulate(angleArray.begin(), angleArray.end(), 0.0);
+	
+	QrCode output;
+	output.location = Vector2(sumX / buffer.size(), sumY / buffer.size());
+	output.angle = sumAngle / buffer.size();
+	return output;
+}
+
 void PartLocatorNode::detectCorners(const vision_node::QrCodes & message) {
-	ROS_DEBUG_STREAM("currentTopLeftCoor " << currentTopLeftCoor);
-	ROS_DEBUG_STREAM("currentTopRightCoor " << currentTopRightCoor);
-	ROS_DEBUG_STREAM("currentBottomRightCoor " << currentBottomRightCoor);
+	ROS_DEBUG_STREAM("currentTopLeftCoor " << currentTopLeftCoor.location);
+	ROS_DEBUG_STREAM("currentTopRightCoor " << currentTopRightCoor.location);
+	ROS_DEBUG_STREAM("currentBottomRightCoor " << currentBottomRightCoor.location);
 	
 	bool updateMatrices = false;
 	for(int i = 0; i < message.qrCodes.size(); i++){		
+		QrCode qrCode;
+		qrCode.location.x = message.qrCodes[i].corners[1].x;
+		qrCode.location.y = message.qrCodes[i].corners[1].y;
+		
 		if(topLeftValue.compare(message.qrCodes[i].value) == 0){
-			currentTopLeftCoor.x = message.qrCodes[i].corners[1].x;
-			currentTopLeftCoor.y = message.qrCodes[i].corners[1].y;
-			updateMatrices = true;
-			if(originalTopLeftCoor.x == -1){
-				originalTopLeftCoor = currentTopLeftCoor;
-				foundCorners++;			
+			samplesTopLeft.push_back(qrCode);
+			if(samplesTopLeft.size() == minCornerSamples - 1) {
+				originalTopLeftCoor = calculateSmoothPos(samplesTopLeft);
+			} else if(samplesTopLeft.size() == minCornerSamples) {
+				currentTopLeftCoor = calculateSmoothPos(samplesTopLeft);
+				updateMatrices = true;
 			}
 		} else if(topRightValue.compare(message.qrCodes[i].value) == 0){
-			currentTopRightCoor.x = message.qrCodes[i].corners[1].x;
-			currentTopRightCoor.y = message.qrCodes[i].corners[1].y;			
-			updateMatrices = true;
-			if(originalTopRightCoor.x == -1){
-				originalTopRightCoor = currentTopRightCoor;
-				foundCorners++;
+			samplesTopRight.push_back(qrCode);
+			if(samplesTopRight.size() == minCornerSamples - 1) {
+				originalTopRightCoor = calculateSmoothPos(samplesTopRight);
+			} else if(samplesTopRight.size() == minCornerSamples) {
+				currentTopRightCoor = calculateSmoothPos(samplesTopRight);
+				updateMatrices = true;
 			}
 		} else if(bottomRightValue.compare(message.qrCodes[i].value) == 0){
-			currentBottomRightCoor.x = message.qrCodes[i].corners[1].x;
-			currentBottomRightCoor.y = message.qrCodes[i].corners[1].y;			
-			updateMatrices = true;
-			if(originalBottomRightCoor.x == -1){
-				originalBottomRightCoor = currentBottomRightCoor;
-				foundCorners++;
+			samplesBottomRight.push_back(qrCode);
+			if(samplesBottomRight.size() == minCornerSamples - 1) {
+				originalBottomRightCoor = calculateSmoothPos(samplesBottomRight);
+			} else if(samplesBottomRight.size() == minCornerSamples) {
+				currentBottomRightCoor = calculateSmoothPos(samplesBottomRight);
+				updateMatrices = true;
 			}
 		}
 	}
-	if(foundCorners == 3) this->updateMatrices();
+	if(updateMatrices == true) this->updateMatrices();
 }
 double PartLocatorNode::getItemRotationAngle(Vector2 lineA2B) {
 	Vector2 actualItemDirection(lineA2B);
@@ -233,14 +278,14 @@ Matrix3 PartLocatorNode::calculateOffsetMatrix() {
 	////////////
 	// line between topLeft and topRight
 	Vector2 lineTl2Tr;
-	lineTl2Tr.x = currentTopRightCoor.x - currentTopLeftCoor.x;
-	lineTl2Tr.y = currentTopRightCoor.y - currentTopLeftCoor.y;
+	lineTl2Tr.x = currentTopRightCoor.location.x - currentTopLeftCoor.location.x;
+	lineTl2Tr.y = currentTopRightCoor.location.y - currentTopLeftCoor.location.y;
 	ROS_DEBUG_STREAM("lineTl2Tr " << lineTl2Tr);
 	
 	// line between topRight and bottomRight
 	Vector2 lineTr2Br;
-	lineTr2Br.x = currentBottomRightCoor.x - currentTopRightCoor.x;
-	lineTr2Br.y = currentBottomRightCoor.y - currentTopRightCoor.y;
+	lineTr2Br.x = currentBottomRightCoor.location.x - currentTopRightCoor.location.x;
+	lineTr2Br.y = currentBottomRightCoor.location.y - currentTopRightCoor.location.y;
 	ROS_DEBUG_STREAM("lineTr2Br " << lineTr2Br);
 	
 	// calulate new midpoint by deviding lineTl2Tr and bottomRight and then adding them
@@ -252,8 +297,8 @@ Matrix3 PartLocatorNode::calculateOffsetMatrix() {
 	halfLineTr2Br.y = lineTr2Br.y / 2;
 	
 	Vector2 midPoint;
-	midPoint.x = currentTopLeftCoor.x + halfLineTl2Tr.x + halfLineTr2Br.x;
-	midPoint.y = currentTopLeftCoor.y + halfLineTl2Tr.y + halfLineTr2Br.y;
+	midPoint.x = currentTopLeftCoor.location.x + halfLineTl2Tr.x + halfLineTr2Br.x;
+	midPoint.y = currentTopLeftCoor.location.y + halfLineTl2Tr.y + halfLineTr2Br.y;
 	ROS_DEBUG_STREAM("midpoint " << midPoint);
 	
 	Matrix3 translationMatrix;
@@ -269,8 +314,8 @@ Matrix3 PartLocatorNode::calculateRotationMatrix() {
 	////////////
 	// line between topLeft and topRight
 	Vector2 lineTl2Tr;
-	lineTl2Tr.x = currentTopRightCoor.x - currentTopLeftCoor.x;
-	lineTl2Tr.y = currentTopRightCoor.y - currentTopLeftCoor.y;
+	lineTl2Tr.x = currentTopRightCoor.location.x - currentTopLeftCoor.location.x;
+	lineTl2Tr.y = currentTopRightCoor.location.y - currentTopLeftCoor.location.y;
 	ROS_DEBUG_STREAM("lineTl2Tr " << lineTl2Tr);
 	
 	// the expected vector is horizontal to the left because TR is at the right of TL (eg. walk in this direction to get to TR)
@@ -309,14 +354,14 @@ Matrix3 PartLocatorNode::calculateScaleMatrix() {
 	////////////
 	// line between topLeft and topRight
 	Vector2 lineTl2Tr;
-	lineTl2Tr.x = currentTopRightCoor.x - currentTopLeftCoor.x;
-	lineTl2Tr.y = currentTopRightCoor.y - currentTopLeftCoor.y;
+	lineTl2Tr.x = currentTopRightCoor.location.x - currentTopLeftCoor.location.x;
+	lineTl2Tr.y = currentTopRightCoor.location.y - currentTopLeftCoor.location.y;
 	ROS_DEBUG_STREAM("lineTl2Tr " << lineTl2Tr);
 	
 	// line between topRight and bottomRight
 	Vector2 lineTr2Br;
-	lineTr2Br.x = currentBottomRightCoor.x - currentTopRightCoor.x;
-	lineTr2Br.y = currentBottomRightCoor.y - currentTopRightCoor.y;
+	lineTr2Br.x = currentBottomRightCoor.location.x - currentTopRightCoor.location.x;
+	lineTr2Br.y = currentBottomRightCoor.location.y - currentTopRightCoor.location.y;
 	ROS_DEBUG_STREAM("lineTr2Br " << lineTr2Br);
 	
 

@@ -2,7 +2,7 @@
 	<group>
 		<node pkg="vision_node" type="vision_node" name="vision_node" args="0 1"/>
 		<node pkg="camera_calibration_node" type="camera_calibration_node" name="camera_calibration_node"/>
-		<node pkg="part_locator_node" type="part_locator_node" name="part_locator_node" args="1 HU work_plane_type_A 1"/>
-		<node pkg="camera_control_node" type="camera_control_node" name="camera_control_node" args="1 The_Imaging_Source_Europe_GmbH DFK_22AUC03 26210035"/>
+		<node pkg="part_locator_node" type="part_locator_node" name="part_locator_node" args="2 HU work_plane_type_A 1"/>
+		<node pkg="camera_control_node" type="camera_control_node" name="camera_control_node" args="2 The_Imaging_Source_Europe_GmbH DFK_22AUC03 26210035"/>
 	</group>
 </launch>

@@ -166,6 +166,9 @@ private:
 
   void doPublishing(const ros::WallTimerEvent &e);
   void publishStatus(bool active);
+  
+  std::vector<BondListener::Event> pending_callbacks_;
+  void flushPendingCallbacks();
 };
 
 }// namespace

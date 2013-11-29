@@ -91,12 +91,12 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 	 */
 	private void initialize() {
 
-		_socketBehaviour = new SocketBehaviour(myAgent, _productAgent
-				.getProperties().getCallback());
+		//_socketBehaviour = new SocketBehaviour(myAgent, _productAgent
+		//		.getProperties().getCallback());
 
-		_heartBeatBehaviour = new HeartBeatBehaviour(myAgent, 5000,
-				_socketBehaviour);
-		_socketBehaviour.setHeartBeatBehaviour(_heartBeatBehaviour);
+		//_heartBeatBehaviour = new HeartBeatBehaviour(myAgent, 5000,
+				//_socketBehaviour);
+		//_socketBehaviour.setHeartBeatBehaviour(_heartBeatBehaviour);
 
 		_plannerBehaviour = new PlannerBehaviour(myAgent, this);
 
@@ -114,8 +114,8 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 
 		myAgent.addBehaviour(_sequentialBehaviour);
 
-		_parallelBehaviour.addSubBehaviour(_socketBehaviour);
-		_parallelBehaviour.addSubBehaviour(_heartBeatBehaviour);
+		//_parallelBehaviour.addSubBehaviour(_socketBehaviour);
+		//_parallelBehaviour.addSubBehaviour(_heartBeatBehaviour);
 
 		myAgent.addBehaviour(_parallelBehaviour);
 	}
@@ -293,7 +293,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 		_socketBehaviour.write(false, "Product Completed.", "1");
 		Logger.log(LogLevel.DEBUG, "Done overview, stopping SocketBehaviour.");
 		myAgent.removeBehaviour(_parallelBehaviour);
-		if (_socketBehaviour != null)
-			_socketBehaviour.stop();
+		//if (_socketBehaviour != null)
+		//	_socketBehaviour.stop();
 	}
 }

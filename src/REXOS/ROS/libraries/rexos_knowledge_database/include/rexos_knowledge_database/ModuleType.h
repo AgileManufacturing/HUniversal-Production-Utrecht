@@ -31,6 +31,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "mysql_connection.h"
 
@@ -42,6 +43,6 @@ namespace rexos_knowledge_database {
 		std::string getModuleTypeProperties();
 	private:
 		std::string manufacturer, typeNumber;
-		std::auto_ptr<sql::Connection> connection;
+		std::unique_ptr<sql::Connection> connection;
 	};
 }

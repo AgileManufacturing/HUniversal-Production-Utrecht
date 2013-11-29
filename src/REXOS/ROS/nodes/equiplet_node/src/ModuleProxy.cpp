@@ -35,8 +35,8 @@ ModuleProxy::ModuleProxy(std::string equipletNodeName, std::string moduleName, i
 	ROS_INFO_STREAM("Setting mode action client: " << moduleNodeName << "/change_mode");
 	ROS_INFO_STREAM("Setting instruction action client: " << moduleNodeName << "/set_instruction");
 
-	bond = new bond::Bond(moduleNodeName + "/bond", std::to_string(moduleId));
-	bond->setBrokenCallback(&aap);
+	ROS_INFO_STREAM("binding B on " << (moduleName + "/bond")<< " id " << std::to_string(moduleId));
+	bond = new rexos_bond::Bond(moduleName + "/bond", std::to_string(moduleId), this);
 	bond->start();
 }
 
@@ -122,5 +122,12 @@ void ModuleProxy::onInstructionServiceCallback(const actionlib::SimpleClientGoal
 	else
 		moduleProxyListener->onInstructionStepCompleted(this, result->OID, false);
 }
-
+void ModuleProxy::onBondCallback(rexos_bond::Bond* bond, Event event){
+	if(event == FORMED) {
+		ROS_INFO("Bond has been formed");
+	} else {
+		ROS_WARN("Bond has been broken");
+		moduleProxyListener->onModuleDied(this);
+	}
+}
 } /* namespace equiplet_node */

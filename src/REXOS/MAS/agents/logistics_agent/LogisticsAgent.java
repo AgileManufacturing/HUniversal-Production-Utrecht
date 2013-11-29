@@ -41,6 +41,7 @@ import libraries.utillities.log.Logger;
 import agents.data_classes.Part;
 import agents.data_classes.Position;
 import agents.logistics_agent.behaviours.ArePartsAvailable;
+import agents.logistics_agent.behaviours.FillSupplyCrate;
 
 /**
  * Agent charged with handling the logistics.
@@ -61,23 +62,34 @@ public class LogisticsAgent extends Agent {
 
 	private Part supplyCratePart = new Part(2, 100, "GC4x4MB_1");
 	private Part productCratePart = new Part(2, 101, "GC4x4MB_2");
-	private Part paper = new Part(3, 102, "Paper");
+	private Part whitePaper = new Part(3, 102, "Paper");
 	
 	private HashMap<Part, Position> supplyCrateContent = new HashMap<Part, Position>();
 	
 	@Override
 	public void setup() {
-		Logger.log(LogLevel.NOTIFICATION, "" + this.getAID().getLocalName() + " spawned as a logistics agent.");
+		
+		Logger.log(LogLevel.DEBUG, "LogisticsAgent created.");
+		
 		addBehaviour(new ArePartsAvailable(this));
 		
-		//fill the crate
-		for(int i = 0; i < 4; i++) {
-			for(int j = 0; j < 4; j++) {
-				supplyCrateContent.put(new Part(1, (i * 4) + j), new Position(j + 0.0, i + 0.0, supplyCratePart));
-			}
-		}
+		addBehaviour(new FillSupplyCrate(this));
+		
+		fillSupplyCrate();
 		//supplyCrateContent.put(new Part(1, 1), new Position(0.0, 0.0, supplyCratePart));
 	}	
+	
+	public synchronized void fillSupplyCrate(){
+		//TODO: do we need this line ? 
+		synchronized (supplyCrateContent) {
+			supplyCrateContent.clear();
+			for(int i = 0; i < 4; i++) {
+				for(int j = 0; j < 4; j++) {
+					supplyCrateContent.put(new Part(1, (i * 4) + j), new Position(j + 0.0, i + 0.0, supplyCratePart));
+				}
+			}
+		}
+	}
 	
 	public synchronized Entry<Part, Position> getBallPart(){
 		Iterator<Entry<Part, Position>> it = supplyCrateContent.entrySet().iterator();
@@ -106,7 +118,7 @@ public class LogisticsAgent extends Agent {
 	}
 	
 	public synchronized Part getWhitePaper(){
-		return paper;
+		return whitePaper;
 	}
 	
 	/**

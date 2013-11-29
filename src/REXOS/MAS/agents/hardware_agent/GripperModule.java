@@ -53,6 +53,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.Logger;
 import agents.data_classes.Part;
 import agents.data_classes.Position;
 import agents.data_classes.StepStatusCode;
@@ -73,14 +75,22 @@ public class GripperModule extends Module {
 	 * @var int TIMESLOTS_NEEDED_PER_STEP
 	 * 		A static value with the timeslots needed per step.
 	 */
-	private static final int TIMESLOTS_NEEDED_PER_STEP = 1;
+	private static final int TIMESLOTS_NEEDED_PER_STEP = 100;
 
 	/**
 	 * @var Module movementModule
 	 * The module that moves this module.
 	 */
 	private Module movementModule;
-
+	
+	/**
+	 * Default constructor for GripperModule
+	 * 		This has only been added to be able to add a log line
+	 */
+	public GripperModule(){
+		Logger.log(LogLevel.DEBUG, "GripperModule created.");
+	}
+	
 	/**
 	 * @see Module#getEquipletSteps(int, BasicDBObject)
 	 */
@@ -109,8 +119,6 @@ public class GripperModule extends Module {
 		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(2, moveParameters)));
 		//get steps from the movementModule to move on the z axis.
 		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, moveParameters)));
-		//get steps from the movementModule to move to the safe movement plane.
-		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, moveParameters)));
 
 		//switch to determine which steps to make.
 		switch (stepType) {
@@ -149,6 +157,8 @@ public class GripperModule extends Module {
 		if(parameters.containsField("height")){
 			crateHeight = parameters.getDouble("height");
 		}
+		
+		Logger.log(LogLevel.DEBUG, "Filling placeholders.");
 		
 		double crateDimension = 45.75;
         double crateSlotDimension = 11;
@@ -257,6 +267,8 @@ public class GripperModule extends Module {
 	private EquipletStep activateGripper(BasicDBObject parameters) {
 		BasicDBObject lookUpParameters = new BasicDBObject();
 		
+		Logger.log(LogLevel.INFORMATION, "Activating gripper.");
+		
 		//create the instruction data.
 		InstructionData instructionData = new InstructionData("activate", "gripper", "NULL", lookUpParameters, new BasicDBObject());
 		//create and return the step.
@@ -270,6 +282,8 @@ public class GripperModule extends Module {
 	 */
 	private EquipletStep deactivateGripper(BasicDBObject parameters) {
 		BasicDBObject lookUpParameters = new BasicDBObject();
+		
+		Logger.log(LogLevel.INFORMATION, "Deactivating gripper.");
 		
 		//create instruction data.
 		InstructionData instructionData = new InstructionData("deactivate", "gripper", "NULL", lookUpParameters, new BasicDBObject());

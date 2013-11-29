@@ -199,7 +199,11 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 			serviceCall.request.cameraMatrix.values[i] = cameraMatrix->at(i).as_float();
 		}
 		client.call(serviceCall);
-		
+
+		vision_node::enableComponent fishEyeServiceCall;
+		fishEyeServiceCall.request.enable = true;
+		fishEyeCorrectionClient.call(fishEyeServiceCall);
+
 		as->setSucceeded();
 	} catch(rexos_knowledge_database::KnowledgeDatabaseException ex) {
 		if(mannuallyCalibrateLens() == false) as->setAborted();

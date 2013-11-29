@@ -126,6 +126,19 @@
     	<ant antfile="build.xml" target="clean" dir="tools" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
     </target>
 	
+    <target name="Launch">
+        <loadfile property="classpath-file-content" srcfile="${export-classpath-file}"/>
+        <java classname="jade.Boot" failonerror="true" fork="yes">
+                    <env key="PROPERTIESPATH" value="${repo-root}/src/REXOS/MAS/configuration/"/>
+                    <env key="MSGPATH" value="${repo-root}/ACLMsgs/"/>
+                    <arg line="-platform-id Grid -container-name GridAgents -gui -agents &quot;MainAgent :agents.main_agent.MainAgent&quot;"/>
+            <classpath refid="java" />
+                    <classpath>
+                <pathelement path="${classpath-file-content}" />
+            </classpath>
+            </java>
+    </target>
+	
     <target name="Launch-Grid">
 		<loadfile property="classpath-file-content" srcfile="${export-classpath-file}"/>
 		<java classname="jade.Boot" failonerror="true" fork="yes">

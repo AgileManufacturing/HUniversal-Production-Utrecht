@@ -11,6 +11,6 @@ namespace rexos_bond{
 			BROKEN
 		};
 	protected:
-		void onBondCallback(Bond* bond, Event event);
+		virtual void onBondCallback(Bond* bond, Event event) = 0;
 	};
 }

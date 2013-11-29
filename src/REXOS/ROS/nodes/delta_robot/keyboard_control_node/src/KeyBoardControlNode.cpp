@@ -45,30 +45,18 @@
 // @endcond
 
 using namespace keyboard_control_node;
-/**
- * Release keyboard safely when Ctrl+C is pressed.
- *
- * @param sig The signal received from the Linux OS.
- **/
-void KeyBoardControlNode::quit(int sig){
-	//tcsetattr(keyboardNumber, TCSANOW, &oldTerminalSettings);
-	ROS_INFO("Lets quit.");
-	exit(0);
-}
+
 
 KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp) :
-	currentXPos(240.0),
-	currentYPos(-175.0),
-	currentZPos(-360.0),
+	currentXPos(0.0),
+	currentYPos(-0.0),
+	currentZPos(-200.0),
 	maxAcceleration("50.0") {
 
 	ROS_INFO("Constructing");
 
 	//DirectMoveStepsBlackBoard
-	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ1", "DirectMoveStepsBlackBoard");
-
-	// Initing the keyboard read and setting up clean shutdown.
-	signal(SIGINT, &KeyBoardControlNode::quit);
+	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ2", "DirectMoveStepsBlackBoard");
 
 	tcgetattr(KEYBOARDNUMBER, &oldTerminalSettings);
 	memcpy(&newTerminalSettings, &oldTerminalSettings, sizeof(struct termios));
@@ -173,7 +161,7 @@ void KeyBoardControlNode::writeToBlackBoard(std::string x, std::string y, std::s
 		payload.insert(pair<string, string>("maxAcceleration", acceleration));
 	}
 
-	instructionData = new rexos_datatypes::InstructionData("move", "deltarobot", "", 
+	instructionData = new rexos_datatypes::InstructionData("move", "deltarobot", "NULL", 
             look_up_parameters, payload);
 
 	if(equipletStepBlackboardClient->insertDocument(instructionData->toJSONString())) {
