@@ -70,6 +70,7 @@ import agents.data_classes.StepStatusCode;
 import agents.service_agent.behaviours.CanPerformProductionStep;
 import agents.service_agent.behaviours.ProductStepDuration;
 import agents.service_agent.behaviours.InitialisationFinished;
+import agents.service_agent.behaviours.RemoveServiceStepBehaviour;
 import agents.service_agent.behaviours.ScheduleStep;
 
 import com.mongodb.BasicDBObject;

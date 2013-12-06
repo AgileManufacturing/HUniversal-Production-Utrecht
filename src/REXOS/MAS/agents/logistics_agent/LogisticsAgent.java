@@ -41,7 +41,7 @@ import libraries.utillities.log.Logger;
 import agents.data_classes.Part;
 import agents.data_classes.Position;
 import agents.logistics_agent.behaviours.ArePartsAvailable;
-import agents.logistics_agent.behaviours.FillSupplyCrate;
+//import agents.logistics_agent.behaviours.FillSupplyCrate;
 
 /**
  * Agent charged with handling the logistics.
@@ -73,9 +73,9 @@ public class LogisticsAgent extends Agent {
 		
 		addBehaviour(new ArePartsAvailable(this));
 		
-		addBehaviour(new FillSupplyCrate(this));
+		//addBehaviour(new FillSupplyCrate(this));
 		
-		fillSupplyCrate();
+		//fillSupplyCrate();
 		//supplyCrateContent.put(new Part(1, 1), new Position(0.0, 0.0, supplyCratePart));
 	}	
 	
