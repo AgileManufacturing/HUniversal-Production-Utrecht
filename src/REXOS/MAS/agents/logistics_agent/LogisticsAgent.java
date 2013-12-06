@@ -75,8 +75,8 @@ public class LogisticsAgent extends Agent {
 		
 		//addBehaviour(new FillSupplyCrate(this));
 		
-		//fillSupplyCrate();
-		//supplyCrateContent.put(new Part(1, 1), new Position(0.0, 0.0, supplyCratePart));
+		fillSupplyCrate();
+		supplyCrateContent.put(new Part(1, 1), new Position(0.0, 0.0, supplyCratePart));
 	}	
 	
 	public synchronized void fillSupplyCrate(){
