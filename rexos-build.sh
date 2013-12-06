@@ -5,8 +5,8 @@ MAS_ONLY=false
 
 function usage() {
 	echo "Builds or cleans the cpp and java parts for the REXOS project."
-	echo "Usage: source rexos-build.sh [-c]"
-	echo "Defaults to build, use -c to clean."
+	echo "Usage: source rexos-build.sh [-c] [-r] [-m]"
+	echo "Defaults to build both ROS and MAS. Use -c to clean, -r to only build ROS, and -m to only build MAS."
 }
 
 
@@ -36,7 +36,7 @@ done
 
 echo -e "\033[36m===== Setting ROS_PACKAGE_PATH =====\033[0m"
 . ./.export-rospath
-if [ "$MAS_ONLY" == false ];
+if [ "$MAS_ONLY" == false ] || [ "$ROS_ONLY" == true ];
 then
 	echo -e "\033[36m===== Building C++ =====\033[0m"
 	catkin_make $REXOS_BUILD_TARGET
@@ -52,7 +52,7 @@ then
 fi
 
 echo ""
-if [ "$ROS_ONLY" == false ];
+if [ "$ROS_ONLY" == false ] || [ "$MAS_ONLY" == true ];
 then
 	echo -e "\033[36m===== Building JAVA =====\033[0m"
 	ant -buildfile src/REXOS/MAS/build.xml $REXOS_BUILD_TARGET
