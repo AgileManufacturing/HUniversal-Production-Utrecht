@@ -95,11 +95,14 @@ void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalC
 			if(strcmp(i->as_string().c_str(), "activate") == 0) {
 				std::cout << "Activating gripper" << std::endl;
 				gripper->grab();
+				ros::Duration(1.0).sleep(); // sleep for a bit
 				setInstructionActionServer.setSucceeded(result_);
 				return;
 			} else if(strcmp(i->as_string().c_str(), "deactivate") == 0) {
 				std::cout << "Deactivating gripper" << std::endl;
+				ros::Duration(1.0).sleep(); // sleep for 0.2 second
 				gripper->release();
+				ros::Duration(1.0).sleep(); // sleep for 0.2 second
 				setInstructionActionServer.setSucceeded(result_);
 				return;
 			}
