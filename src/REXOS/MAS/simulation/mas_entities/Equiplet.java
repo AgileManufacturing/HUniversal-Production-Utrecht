@@ -1,10 +1,13 @@
 package simulation.mas_entities;
 
+import java.util.Arrays;
 import java.util.StringTokenizer;
+
+import simulation.data.Capability;
 
 public class Equiplet {
 
-	private int[] capabilities;
+	private Capability[] capabilities;
 	
 	
 	
@@ -16,17 +19,24 @@ public class Equiplet {
 		
 	}
 	
-	public void schedule(){
-		
+	public boolean canPerformStep(Capability capability){
+		return Arrays.asList(capabilities).contains(capability);
 	}
 	
-	private void parseCapabilitiesCSV(String capabilitiesCSV){
-		StringTokenizer stringTokenizer = new StringTokenizer(capabilitiesCSV, ",");
-		capabilities = new int[stringTokenizer.countTokens()];
-		int iCapabilities = 0;
-		while (stringTokenizer.hasMoreTokens()){
-			
-		}
+	public double getLoad(){
+		return 0.0;
+	}
+	
+	public long getFirstFreeTimeSlot(){
+		return 0l;
+	}
+	
+	public boolean isScheduleLocked(){
+		return true;
+	}
+	
+	public void schedule(){
+		
 	}
 	
 	private void parseInterruptions(){
