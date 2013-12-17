@@ -39,14 +39,7 @@ public class Equiplet {
 		
 	}
 	
-	private void parseCapabilitiesCSV(String capabilitiesCSV){
-		StringTokenizer stringTokenizer = new StringTokenizer(capabilitiesCSV, ",");
-		//capabilities = new int[stringTokenizer.countTokens()];
-		int iCapabilities = 0;
-		while (stringTokenizer.hasMoreTokens()){
-			
-		}
-	}
+	
 	
 	private void parseInterruptions(){
 		
