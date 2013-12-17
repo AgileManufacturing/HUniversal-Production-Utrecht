@@ -1,11 +1,13 @@
 package simulation;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Simulation implements Runnable{
 	private boolean isRunning = false;
 	private double interval = 0; // seconds
+	private double turnTime = 0.5; // seconds
 	
 	private long turn = 0;
 	private Date startDate = new Date();
@@ -30,9 +32,13 @@ public class Simulation implements Runnable{
 				}
 			}
 			
-			// update simulation
-			Date time = new Date();
+			// update the time
+			Calendar calender = Calendar.getInstance();
+			calender.setTime(startDate);
+			calender.add(Calendar.MILLISECOND, (int)(turnTime * turn));
+			Date time = calender.getTime();
 			
+			// update simulation
 			for (Updateable updateable : updateables) {
 				updateable.update(time);
 			}

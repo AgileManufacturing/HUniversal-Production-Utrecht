@@ -1,6 +1,6 @@
 package simulation;
 
-import java.sql.Date;
+import java.util.Date;
 
 public interface Updateable {
 	public void update(Date time);
