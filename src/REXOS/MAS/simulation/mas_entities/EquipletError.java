@@ -1,6 +1,6 @@
 package simulation.mas_entities;
 
-public class EquipletInterrupt {
+public class EquipletError {
 
 	public int type;  // 0 == hardware error , 1 == software error ( schedule lost ) 
 	
@@ -8,7 +8,7 @@ public class EquipletInterrupt {
 	
 	public long timeOfInterrupt;
 	
-	public EquipletInterrupt(int type, long duration, long timeOfInterrupt){
+	public EquipletError(int type, long duration, long timeOfInterrupt){
 		this.type = type;
 		this.duration = duration;
 		this.timeOfInterrupt = timeOfInterrupt;
