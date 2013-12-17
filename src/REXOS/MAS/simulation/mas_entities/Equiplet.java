@@ -8,7 +8,8 @@ public class Equiplet {
 	
 	
 	
-	public Equiplet(String capabilitesCSV, String InterruptionsCSV){
+	public Equiplet(int[] capabilitiesCSV, String InterruptionsCSV){
+		this.capabilities = capabilitiesCSV;
 		
 	}
 	
@@ -20,14 +21,7 @@ public class Equiplet {
 		
 	}
 	
-	private void parseCapabilitiesCSV(String capabilitiesCSV){
-		StringTokenizer stringTokenizer = new StringTokenizer(capabilitiesCSV, ",");
-		capabilities = new int[stringTokenizer.countTokens()];
-		int iCapabilities = 0;
-		while (stringTokenizer.hasMoreTokens()){
-			
-		}
-	}
+	
 	
 	private void parseInterruptions(){
 		
