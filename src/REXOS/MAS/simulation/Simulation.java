@@ -40,7 +40,7 @@ public class Simulation implements Runnable{
 			
 			// update simulation
 			for (Updateable updateable : updateables) {
-				updateable.update(time);
+			//	updateable.update(time);
 			}
 			
 			turn++;
