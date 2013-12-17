@@ -207,8 +207,7 @@ public class SchedulerBehaviour extends Behaviour {
 		}
 		return scheduleMatrix;
 	}
-	
-	
+
 	@SuppressWarnings("unchecked")
 	private boolean schedule(Matrix scheduleMatrix) {
 		ArrayList<ProductStepScheduleInformation> finalSchedules = new ArrayList<ProductStepScheduleInformation>();

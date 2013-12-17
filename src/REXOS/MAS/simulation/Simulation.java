@@ -34,7 +34,7 @@ public class Simulation implements Runnable{
 			Date time = new Date();
 			
 			for (Updateable updateable : updateables) {
-				updateable.update(time);
+			//	updateable.update(time);
 			}
 			
 			turn++;
