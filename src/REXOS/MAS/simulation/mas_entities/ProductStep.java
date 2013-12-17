@@ -18,4 +18,8 @@ public class ProductStep {
 		this.duration = duration;
 	}
 	
+	public Capability getCapability(){
+		return capability;
+	}
+	
 }
