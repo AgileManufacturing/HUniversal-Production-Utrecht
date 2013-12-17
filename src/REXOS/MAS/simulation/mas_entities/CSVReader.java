@@ -5,13 +5,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
+
+import simulation.data.Capability;
 
 public class CSVReader {
 	
-	//example : "1,1,3,4,5,2"
+	//example : "1;name,1;name,3;appel,4;peer,5;hurp,2;durp"
 	
-	public static int[] parseCapabilitiesCSV(String equipletCapabilitiesFilePathName){
+	
+	private static Capability[] availableCapabilities;
+		
+	public static void parseCapabilitiesCSV(String equipletCapabilitiesFilePathName){
 		
 		File csvFile = new File(equipletCapabilitiesFilePathName);
 		String capabilitiesCSV = "";
@@ -19,6 +25,7 @@ public class CSVReader {
 			BufferedReader bReader = new BufferedReader(new FileReader(csvFile));
 			
 			capabilitiesCSV = bReader.readLine();
+			bReader.close();
 		} catch (FileNotFoundException e1) {
 			System.err.println("Could not find file: " + equipletCapabilitiesFilePathName);
 			e1.printStackTrace();
@@ -27,20 +34,36 @@ public class CSVReader {
 			e.printStackTrace();
 		}
 		
-		
-		StringTokenizer stringTokenizer = new StringTokenizer(capabilitiesCSV, ",");
-		int[] capabilities = new int[stringTokenizer.countTokens()];
+		StringTokenizer commaTokenizer = new StringTokenizer(capabilitiesCSV, ",");
+		availableCapabilities = new Capability[commaTokenizer.countTokens()];
 		int iCapabilities = 0;
-		while (stringTokenizer.hasMoreTokens()){
+		while (commaTokenizer.hasMoreTokens()){
 			try{
-			capabilities[iCapabilities] = Integer.parseInt(stringTokenizer.nextToken());
+				StringTokenizer semicolonTokenizer = new StringTokenizer(commaTokenizer.nextToken(), ";");
+				
+				int capabilityId = Integer.parseInt(semicolonTokenizer.nextToken());
+				String capabiityName = semicolonTokenizer.nextToken();
+				availableCapabilities[iCapabilities] = new Capability(capabilityId, capabiityName);
+				
+				iCapabilities ++;
 			}
 			catch(NumberFormatException e){
 				System.err.println("Could not parse capabilties");
 				e.printStackTrace();
-				return null;
+			}
+			catch(NoSuchElementException e1){
+				System.err.println("wrong amount of elements when parsing capabilities");
+				e1.printStackTrace();
 			}
 		}
-		return capabilities;
+		printAvailableCapabilities();
 	}
+	
+	private static void printAvailableCapabilities(){
+		for ( Capability c1 : availableCapabilities){
+			System.out.println("id: " + c1.getId() + ", name: " + c1.getName());
+		}
+	}
+	
+	
 }
