@@ -39,8 +39,6 @@ public class Equiplet {
 		
 	}
 	
-	
-	
 	private void parseInterruptions(){
 		
 	}
