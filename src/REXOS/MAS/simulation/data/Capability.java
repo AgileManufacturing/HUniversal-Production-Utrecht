@@ -5,15 +5,24 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
+
+import simulation.CSVReader;
 
 
 public class Capability {
 	private int id;
 	private String name;
 	
-	private static Capability[] availableCapabilities;
+	private static HashMap<Integer, Capability> availableCapabilities = new HashMap<Integer, Capability>();
+	
+	public static void loadCapabilities(String capabilitiesFilePath) {
+		String[][] fields = CSVReader.parseCsvFile(capabilitiesFilePath);
+		parseCapabilitiesCSV(fields);
+	}
 	
 	public Capability(int id, String name){
 		this.id = id;
@@ -28,49 +37,31 @@ public class Capability {
 		return name;
 	}
 	
-	public static void parseCapabilitiesCSV(String capabilitiesFilePath){
-		
-		File csvFile = new File(capabilitiesFilePath);
-		String capabilitiesCSV = "";
-		try {
-			BufferedReader bReader = new BufferedReader(new FileReader(csvFile));
-			
-			capabilitiesCSV = bReader.readLine();
-			bReader.close();
-		} catch (FileNotFoundException e1) {
-			System.err.println("Could not find file: " + capabilitiesFilePath);
-			e1.printStackTrace();
-		} catch (IOException e) {
-			System.err.println("Error when reading from file: " + capabilitiesFilePath);
-			e.printStackTrace();
-		}
-		
-		StringTokenizer commaTokenizer = new StringTokenizer(capabilitiesCSV, ",");
-		Capability[] capabilities = new Capability[commaTokenizer.countTokens()];
-		int iCapabilities = 0;
-		while (commaTokenizer.hasMoreTokens()){
-			try{
-				StringTokenizer semicolonTokenizer = new StringTokenizer(commaTokenizer.nextToken());
-				int capabilityId = Integer.parseInt(semicolonTokenizer.nextToken());
-				String capabiityName = semicolonTokenizer.nextToken();
-				availableCapabilities[iCapabilities] = new Capability(capabilityId, capabiityName);
+	public static void parseCapabilitiesCSV(String[][] fields){
+		try{
+			for(int i = 0; i < fields.length; i++) {
+				int capabilityId = Integer.parseInt(fields[i][0]);
+				String capabiityName = fields[i][1];
 				
-				iCapabilities ++;
+				availableCapabilities.put(capabilityId, new Capability(capabilityId, capabiityName));
 			}
-			catch(NumberFormatException e){
-				System.err.println("Could not parse capabilties");
-				e.printStackTrace();
-			}
-			catch(NoSuchElementException e1){
-				System.err.println("wrong amount of elements when parsing capabilities");
-				e1.printStackTrace();
-			}
+		} catch(NumberFormatException e){
+			System.err.println("Could not parse capabilties");
+			e.printStackTrace();
+		} catch(NoSuchElementException e1){
+			System.err.println("wrong amount of elements when parsing capabilities");
+			e1.printStackTrace();
 		}
-		
-		availableCapabilities = capabilities;
+		printAvailableCapabilities();
 	}
 	
 	public static Capability getAvailableCapabilitiesById(int id){
-		return availableCapabilities[id];
+		return availableCapabilities.get(id);
+	}
+	private static void printAvailableCapabilities(){
+		Collection<Capability> values = availableCapabilities.values();
+		for ( Capability c1 : values){
+			System.out.println("id: " + c1.getId() + ", name: " + c1.getName());
+		}
 	}
 }
