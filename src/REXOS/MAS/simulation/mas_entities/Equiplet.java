@@ -16,7 +16,7 @@
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	@section LICENSE
  *  MMMMMM@        dMMMMM, ?MMMMMMMMMF    	License:	newBSD
  *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	
- *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		Copyright © 2013, HU University of Applied Sciences Utrecht. 
+ *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		Copyright ï¿½ 2013, HU University of Applied Sciences Utrecht. 
  *   WMMMMMMMMNNN,.TMMM@ .MMMMMMMM#`.M  	All rights reserved.
  *    JMMMMMMMMMMMN,?MD  TYYYYYYY= dM     
  *                                        
@@ -52,12 +52,8 @@ public class Equiplet implements Updateable{
 	
 	
 	
-	public Equiplet(String capabilitesCSV, String InterruptionsCSV){
-		
-	}
-	
-	public Equiplet(Capability[] capabilities) {
-		this.capabilities = capabilities; 
+	public Equiplet(String[][] csvArguments){
+		parseEquipletCSV(csvArguments);
 	}
 	
 	public void getFreeTimeSlots(){
@@ -84,7 +80,7 @@ public class Equiplet implements Updateable{
 		
 	}
 	
-	private void parseInterruptions(){
+	private void parseEquipletCSV(String[][] fields){
 		
 	}
 
