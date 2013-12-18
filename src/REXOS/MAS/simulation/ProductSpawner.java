@@ -15,7 +15,7 @@
  *  .MMMMMMF        JMMm.?T!   JMMMMM#		@section LICENSE
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	License:	newBSD
  *  MMMMMM@        dMMMMM, ?MMMMMMMMMF    
- *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright © 2013, HU University of Applied Sciences Utrecht. 
+ *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright ï¿½ 2013, HU University of Applied Sciences Utrecht. 
  *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		All rights reserved.
  *   WMMMMMMMMNNN,.TMMM@ .MMMMMMMM#`.M  
  *    JMMMMMMMMMMMN,?MD  TYYYYYYY= dM     
@@ -39,19 +39,66 @@
 
 package simulation;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
-public class ProductSpawner implements Updateable {
-	Date startDate;
-	Date nextSpawn;
-	double interval;
+import simulation.data.Capability;
+import simulation.mas_entities.Product;
+import simulation.mas_entities.ProductStep;
+
+public class ProductSpawner implements Updatable {
+	private static final String pathToProductCsvFile = "/home/t/sim/productA.csv";
+	
+	long nextSpawnTime;
+	
+	String productName;
+	long productDeadline;
+	ProductStep[] productSteps;
+	int amountPerSpawn;
+	double spawnInterval;
+	
+	Simulation simulation;
+	
+	public ProductSpawner(Simulation simulation) throws ParseException {
+		this.simulation = simulation;
+		
+		String[][] fields = CSVReader.parseCsvFile(pathToProductCsvFile);
+		
+		productName = fields[0][0];
+		productDeadline = Duration.parseDurationString(fields[1][0]);
+		long start = Duration.parseDurationString(fields[2][0]);
+		nextSpawnTime = simulation.getCurrentSimulationTime() + start;
+		
+		amountPerSpawn = Integer.parseInt(fields[3][0]);
+		spawnInterval = Integer.parseInt(fields[4][0]);
+		
+		productSteps = new ProductStep[fields.length - 5];
+		for(int i = 5; i < fields.length; i++) {
+			productSteps[i - 5] = new ProductStep(Capability.getAvailableCapabilitiesById(Integer.parseInt(fields[i][0])));
+		}		
+	}
 	
 	@Override
-	public void update(Date time) {
-		if(time.after(startDate)) {
+	public void update(long time) {
+		if(time >= nextSpawnTime) {
+			Product[] products = spawnProducts();
+			for(int i = 0; i < products.length; i++) {
+				simulation.addUpdateable(products[i]);
+			}
 			
+			nextSpawnTime += spawnInterval * 1000;
+			System.out.println("Spawned products " + spawnInterval + " " + nextSpawnTime);
 		}
 
 	}
-
+	private Product[] spawnProducts() {
+		Product[] products = new Product[amountPerSpawn];
+		for(int i = 0; i < products.length; i++) {
+			products[i] = new Product(productSteps, simulation.getCurrentSimulationTime() + productDeadline);
+		}
+		return products; 
+	}
 }

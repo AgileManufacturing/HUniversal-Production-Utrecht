@@ -15,7 +15,7 @@
  *  .MMMMMMF        JMMm.?T!   JMMMMM#		@section LICENSE
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	License:	newBSD
  *  MMMMMM@        dMMMMM, ?MMMMMMMMMF    
- *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright © 2013, HU University of Applied Sciences Utrecht. 
+ *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright ï¿½ 2013, HU University of Applied Sciences Utrecht. 
  *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		All rights reserved.
  *   WMMMMMMMMNNN,.TMMM@ .MMMMMMMM#`.M  
  *    JMMMMMMMMMMMN,?MD  TYYYYYYY= dM     
@@ -45,11 +45,11 @@ import java.util.Date;
 
 import agents.data_classes.Matrix;
 import simulation.CSVReader;
-import simulation.Updateable;
+import simulation.Updatable;
 import simulation.data.Capability;
 
 
-public class Grid implements Updateable{
+public class Grid implements Updatable{
 	private static final double defaultDistance = 1.0;
 	
 	private Equiplet[][] equiplets;
@@ -58,15 +58,14 @@ public class Grid implements Updateable{
 	
 	public Grid(Equiplet[][] equiplets) {
 		this.equiplets = equiplets;
-		distanceMatrix = new Matrix(equiplets.length * equiplets[0].length, equiplets.length * equiplets[0].length);
 	}
 	public Grid(String equipletLayoutCsvFilePath) {
 		String[][] fields = CSVReader.parseCsvFile(equipletLayoutCsvFilePath);
 		
-		distanceMatrix = new Matrix(fields.length * fields[0].length, fields.length * fields[0].length);
+		equiplets = new Equiplet[fields.length][fields[0].length];
+		
 		initializeDistanceMatrix();
 		
-		equiplets = new Equiplet[fields.length][fields[0].length];
 		try {
 			for(int i = 0; i < fields.length; i++) {
 				for(int j = 0; j < fields[i].length; j++) {
@@ -82,6 +81,7 @@ public class Grid implements Updateable{
 		}
 	}
 	private void initializeDistanceMatrix() {
+		distanceMatrix = new Matrix(equiplets.length * equiplets[0].length, equiplets.length * equiplets[0].length);
 		for(int i = 0; i < distanceMatrix.getNumberOfRows(); i++) {
 			int sourceEquipletY = i / equiplets.length; 
 			int sourceEquipletX = i % equiplets.length;
@@ -93,6 +93,8 @@ public class Grid implements Updateable{
 						Math.abs(targetEquipletY - sourceEquipletY) * defaultDistance + 
 						Math.abs(targetEquipletX - sourceEquipletX) * defaultDistance;
 				distanceMatrix.set(i, j, distance);
+				
+				//System.out.println(i + " " + j + " " + distance);
 			}
 		}
 	}
@@ -101,8 +103,31 @@ public class Grid implements Updateable{
 		return distanceMatrix;
 	}
 	
+	public double getDistanceBetweenEquiplets(Equiplet from, Equiplet to) {
+		int fromIndex = -1;
+		for(int i = 0; i < equiplets.length; i++) {
+			for(int j = 0; j < equiplets[i].length; j++) {
+				if(equiplets[i][j] == from) {
+					fromIndex = i * equiplets[0].length + j;
+					break;
+				}
+			}
+		}
+		int toIndex = -1;
+		for(int i = 0; i < equiplets.length; i++) {
+			for(int j = 0; j < equiplets[i].length; j++) {
+				if(equiplets[i][j] == to) {
+					toIndex = i * equiplets[0].length + j;
+					break;
+				}
+			}
+		}
+		
+		return distanceMatrix.get(fromIndex, toIndex);
+	}
+	
 	@Override
-	public void update(Date time) {
+	public void update(long time) {
 		for(int i = 0; i < equiplets.length; i++) {
 			for(int j = 0; j < equiplets[i].length; j++) {
 				equiplets[i][j].update(time);

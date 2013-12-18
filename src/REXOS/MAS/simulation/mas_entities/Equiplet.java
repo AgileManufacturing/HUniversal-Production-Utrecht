@@ -43,11 +43,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.StringTokenizer;
 
-import simulation.Updateable;
+import simulation.Updatable;
 import simulation.data.Capability;
 import simulation.data.TimeSlot;
 
-public class Equiplet implements Updateable{
+public class Equiplet implements Updatable{
 
 	private Capability[] capabilities;
 	
@@ -55,6 +55,10 @@ public class Equiplet implements Updateable{
 	
 	public Equiplet(String[][] csvArguments){
 		parseEquipletCSV(csvArguments);
+	}
+	
+	public Equiplet(Capability[] capabilities) {
+		this.capabilities = capabilities;
 	}
 	
 	public void getFreeTimeSlots(){
@@ -90,7 +94,7 @@ public class Equiplet implements Updateable{
 	}
 
 	@Override
-	public void update(Date time) {
+	public void update(long time) {
 		// TODO Auto-generated method stub
 		
 	}

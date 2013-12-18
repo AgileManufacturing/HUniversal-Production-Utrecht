@@ -15,7 +15,7 @@
  *  .MMMMMMF        JMMm.?T!   JMMMMM#		@section LICENSE
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	License:	newBSD
  *  MMMMMM@        dMMMMM, ?MMMMMMMMMF    
- *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright © 2013, HU University of Applied Sciences Utrecht. 
+ *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright ï¿½ 2013, HU University of Applied Sciences Utrecht. 
  *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		All rights reserved.
  *   WMMMMMMMMNNN,.TMMM@ .MMMMMMMM#`.M  
  *    JMMMMMMMMMMMN,?MD  TYYYYYYY= dM     
@@ -45,12 +45,13 @@ import java.util.Date;
 
 public class Simulation implements Runnable{
 	private boolean isRunning = false;
-	private double interval = 0; // seconds
-	private double turnTime = 0.5; // seconds
+	private double interval = 0.01; // seconds
+	private double turnTime = 0.01; // seconds
 	
 	private long turn = 0;
-	private Date startDate = new Date();
-	private ArrayList<Updateable> updateables = new ArrayList<Updateable>();
+	private long startSimulationTime;
+	private long currentSimulationTime;
+	private ArrayList<Updatable> updateables = new ArrayList<Updatable>();
 	private Thread thread;
 	
 	public void pauseSimulation(){
@@ -62,11 +63,21 @@ public class Simulation implements Runnable{
 	}
 	
 	public Simulation() {
+		startSimulationTime = System.currentTimeMillis();
+		
 		thread = new Thread(this);
 		thread.start();
 	}
 	
-	public void addUpdateable(Updateable updateable) {
+	public long getCurrentSimulationTime() {
+		return currentSimulationTime;
+	}
+	
+	public long getStartSimulationTime() {
+		return startSimulationTime;
+	}
+	
+	public void addUpdateable(Updatable updateable) {
 		updateables.add(updateable);
 	}
 	
@@ -83,17 +94,14 @@ public class Simulation implements Runnable{
 					}
 				}
 				
-				System.out.println("--- Simulation: turn " + turn);
-				
 				// update the time
-				Calendar calender = Calendar.getInstance();
-				calender.setTime(startDate);
-				calender.add(Calendar.MILLISECOND, (int)(turnTime * turn));
-				Date time = calender.getTime();
+				currentSimulationTime += turnTime * 1000;
+				
+				System.out.println("--- Simulation: turn " + turn + " time " + currentSimulationTime);
 				
 				// update simulation
-				for (Updateable updateable : updateables) {
-					updateable.update(time);
+				for (Updatable updateable : updateables) {
+					updateable.update(currentSimulationTime);
 				}
 				
 				turn++;
@@ -109,13 +117,6 @@ public class Simulation implements Runnable{
 				} else {
 					// no need to sleep at all
 				}
-			}
-			// TODO remove this
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
 		// exit simulation thread
