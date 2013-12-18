@@ -43,7 +43,7 @@ import java.util.Date;
 
 public class TimeSlot {
 
-	public static long firstTimeSlot = 1387360454938;
+	public static long firstTimeSlot = 1387360454938l;
 	public static long timeSlotLength = 0;
 
 	private long timeSlot;
