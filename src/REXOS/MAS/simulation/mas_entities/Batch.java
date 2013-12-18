@@ -15,7 +15,7 @@
  *  .MMMMMMF        JMMm.?T!   JMMMMM#		@section LICENSE
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	License:	newBSD
  *  MMMMMM@        dMMMMM, ?MMMMMMMMMF    
- *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright © 2013, HU University of Applied Sciences Utrecht. 
+ *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright ï¿½ 2013, HU University of Applied Sciences Utrecht. 
  *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		All rights reserved.
  *   WMMMMMMMMNNN,.TMMM@ .MMMMMMMM#`.M  
  *    JMMMMMMMMMMMN,?MD  TYYYYYYY= dM     
@@ -39,10 +39,16 @@
 
 package simulation.mas_entities;
 
+
 public class Batch {
 	private Product[] products;
 	
-	public Batch(Product[] products){
+	public Batch(int id, Product[] products){
 		this.products = products;
+	}
+	
+	//batch schedule
+	public void Schedule(){
+		
 	}
 }

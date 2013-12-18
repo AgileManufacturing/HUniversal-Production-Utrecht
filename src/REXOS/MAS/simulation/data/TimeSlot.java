@@ -6,18 +6,18 @@
  *           .MMMMMMM#=`.gNMMMMM.       \_| \_|\____/\/   \/ \___/ \____/
  *             7HMM9`   .MMMMMM#`		
  *                     ...MMMMMF .      
- *         dN.       .jMN, TMMM`.MM     	@file 	Equiplet.java
- *         .MN.      MMMMM;  ?^ ,THM		@brief 	...
- *          dM@      dMMM3  .ga...g,    	@date Created:	2013-12-17
+ *         dN.       .jMN, TMMM`.MM     	@file 	TimeSlot.java
+ *         .MN.      MMMMM;  ?^ ,THM		@brief 	DataClass for TimeSlots
+ *          dM@      dMMM3  .ga...g,    	@date Created:	2013-12-18
  *       ..MMM#      ,MMr  .MMMMMMMMr   
- *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Roy Scheefhals
- *   .dMMMMMF           7Y=d9  dMMMMMr    	@author	Alexander Streng
- *  .MMMMMMF        JMMm.?T!   JMMMMM#		
- *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	@section LICENSE
- *  MMMMMM@        dMMMMM, ?MMMMMMMMMF    	License:	newBSD
- *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	
- *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		Copyright � 2013, HU University of Applied Sciences Utrecht. 
- *   WMMMMMMMMNNN,.TMMM@ .MMMMMMMM#`.M  	All rights reserved.
+ *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Alexander Hustinx
+ *   .dMMMMMF           7Y=d9  dMMMMMr    
+ *  .MMMMMMF        JMMm.?T!   JMMMMM#		@section LICENSE
+ *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	License:	newBSD
+ *  MMMMMM@        dMMMMM, ?MMMMMMMMMF    
+ *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright © 2013, HU University of Applied Sciences Utrecht. 
+ *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		All rights reserved.
+ *   WMMMMMMMMNNN,.TMMM@ .MMMMMMMM#`.M  
  *    JMMMMMMMMMMMN,?MD  TYYYYYYY= dM     
  *                                        
  *	Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -37,65 +37,50 @@
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package simulation.mas_entities;
+package simulation.data;
 
-import java.util.Arrays;
 import java.util.Date;
-import java.util.StringTokenizer;
 
-import simulation.Updateable;
-import simulation.data.Capability;
-import simulation.data.TimeSlot;
+public class TimeSlot {
 
-public class Equiplet implements Updateable{
+	public static long firstTimeSlot = 1387360454938;
+	public static long timeSlotLength = 0;
 
-	private Capability[] capabilities;
-	
-	
-	
-	public Equiplet(String capabilitesCSV, String InterruptionsCSV){
-		
+	private long timeSlot;
+	private Date timeSlotDate;
+
+	/**
+	*	It is important that before using the TimeSlot class, you first set the firstTimeSlot and timeSlotLength to the correct values!
+	**/
+	public TimeSlot(){
+		timeSlot = (System.currentTimeMillis() - firstTimeSlot) / timeSlotLength;
+		timeSlotDate = new Date(System.currentTimeMillis());
+	}
+
+	public TimeSlot(TimeSlot timeSlot){
+		this.timeSlot = timeSlot.getTimeSlot();
+		this.timeSlotDate = timeSlot.getDate();
+	}
+
+	public TimeSlot(long timeSlot){
+		this.timeSlot = timeSlot;
+		timeSlotDate = getDate();
 	}
 	
-	public Equiplet(Capability[] capabilities) {
-		this.capabilities = capabilities; 
+	public TimeSlot(Date timeSlot){
+		this.timeSlot = (timeSlot.getTime() - firstTimeSlot) / timeSlotLength;
+		timeSlotDate = timeSlot;
 	}
-	
-	public void getFreeTimeSlots(){
-		
-	}
-	
-	public boolean canPerformStep(Capability capability){
-		return Arrays.asList(capabilities).contains(capability);
-	}
-	
-	public double getLoad(){
-		return 0.0;
-	}
-	
-	public TimeSlot getFirstFreeTimeSlot(int duration){
+
+	public static TimeSlot getCurrentTimeSlot(){
 		return new TimeSlot();
 	}
-	
-	public boolean isScheduleLocked(){
-		return true;
-	}
-	
-	public void schedule(ProductStep step, TimeSlot timeslot){
-		
-	}
-	
-	public void removeFromSchedule(ProductStep step){
-		
-	}
-	
-	private void parseInterruptions(){
-		
+
+	public Date getDate(){
+		return timeSlotDate;
 	}
 
-	@Override
-	public void update(Date time) {
-		// TODO Auto-generated method stub
-		
+	public long getTimeSlot(){
+		return timeSlot;
 	}
 }

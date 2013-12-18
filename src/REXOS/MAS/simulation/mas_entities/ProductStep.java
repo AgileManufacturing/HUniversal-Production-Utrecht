@@ -15,7 +15,7 @@
  *  .MMMMMMF        JMMm.?T!   JMMMMM#		@section LICENSE
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	License:	newBSD
  *  MMMMMM@        dMMMMM, ?MMMMMMMMMF    
- *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright © 2013, HU University of Applied Sciences Utrecht. 
+ *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright ï¿½ 2013, HU University of Applied Sciences Utrecht. 
  *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		All rights reserved.
  *   WMMMMMMMMNNN,.TMMM@ .MMMMMMMM#`.M  
  *    JMMMMMMMMMMMN,?MD  TYYYYYYY= dM     
@@ -43,17 +43,28 @@ import simulation.data.Capability;
 
 public class ProductStep {
 	private Capability capability;
-	private long duration;
+	private int duration;
+	private boolean finished;
 	
+
 	public ProductStep(Capability capability){
 		this.capability = capability;
+		finished = false;
+	}
+	
+	public boolean isFinished() {
+		return finished;
 	}
 
-	public long getDuration() {
+	public void setFinished(boolean finished) {
+		this.finished = finished;
+	}
+
+	public int getDuration() {
 		return duration;
 	}
 
-	public void setDuration(long duration) {
+	public void setDuration(int duration) {
 		this.duration = duration;
 	}
 	

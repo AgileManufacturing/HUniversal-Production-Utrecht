@@ -15,7 +15,7 @@
  *  .MMMMMMF        JMMm.?T!   JMMMMM#		@section LICENSE
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	License:	newBSD
  *  MMMMMM@        dMMMMM, ?MMMMMMMMMF    
- *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright © 2013, HU University of Applied Sciences Utrecht. 
+ *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright ï¿½ 2013, HU University of Applied Sciences Utrecht. 
  *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		All rights reserved.
  *   WMMMMMMMMNNN,.TMMM@ .MMMMMMMM#`.M  
  *    JMMMMMMMMMMMN,?MD  TYYYYYYY= dM     
@@ -40,9 +40,10 @@
 package simulation.mas_entities;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
-import libraries.schedule.data_classes.FreeTimeSlot;
-import libraries.schedule.data_classes.ProductStepSchedule;
+import simulation.data.Schedule;
+import simulation.data.TimeSlot;
 import agents.data_classes.Matrix;
 
 public class Product {
@@ -51,15 +52,17 @@ public class Product {
 	private Equiplet[] equiplets;
 	private long deadline;
 	
+	private ArrayList<Schedule> finalSchedules;
+	
 	public Product(ProductStep[] productSteps, long deadline){
 		this.productSteps = productSteps;
 		this.deadline = deadline;
+		
 	}
 	
-	//Get all the feasable equiplets from the 'index' and maybe even start planning
+	//We first need to get all equiplets with possible available timeslots.
 	private void plan(){
-		//iterate all steps, and find feasible equiplets.
-		//save them, and use them for the next step.
+		
 	}
 
 	/**
@@ -104,9 +107,8 @@ public class Product {
 		return scheduleMatrix;
 	}
 
-	@SuppressWarnings("unchecked")
-	private boolean schedule(Matrix scheduleMatrix) {
-		
+	private void schedule(Matrix scheduleMatrix) {
+		finalSchedules = new ArrayList<Schedule>();
 		// Read the matrix. Write function to iterate each seperate row ( productsteps ) and pick each equiplet 
 		for (int column = 0; column < scheduleMatrix.getNumberOfColumns(); column++) { //Productsteps 
 			int highestEquipletScoreIndex = -1;
@@ -118,29 +120,26 @@ public class Product {
 			
 			if(highestEquipletScoreIndex < 0){
 				System.out.println("No suitable equiplet found for this step! Scheduling has gone wrong.. Reschedule?");
-				return false;
+				return;
 			}
 			
 			//Can we assume that all productSteps are ordered? What about parallel steps? Lets get the equiplet.
-			Equiplet equiplet = equiplets[highestEquipletScoreIndex]; //?lol? this might not work.
+			Equiplet equiplet = equiplets[highestEquipletScoreIndex]; //this might not work.
 			
 			//Get first free timeslot
-			long ts = equiplet.getFirstFreeTimeSlot();
+			TimeSlot timeSlot = equiplet.getFirstFreeTimeSlot(productStep.getDuration());
 			
 			//Check the equiplets schedule. Lets check if the schedule fits. Keep in mind that the deadline is met.
-			if(equiplet.isScheduleLocked() && ts > 0) {
-				
-				//We should still set the proper deadline. ( none is given for now )
-				//finalSchedules.add();
-				
-				//plan the timeslot
-				//scheduleInformation.planTimeSlot(freeTimeSlot);
+			if(equiplet.isScheduleLocked() && timeSlot != null) {
+				finalSchedules.add(new Schedule(productStep, timeSlot, equiplet));
 			}
-			
-			// If the schedule fits, save the equiplet with corresponding step(s) ( maybe equipletmapper? )
 		}
 		// Message all the equiplets with their correspondig equiplet steps
-		return false;//sendScheduleMessages(finalSchedules);
+		for (Schedule schedule : finalSchedules) {
+			schedule.getEquiplet().schedule(schedule.getProductStep(), schedule.getTimeSlot());
+		}
+		
+		return;//sendScheduleMessages(finalSchedules);
 	}
 	
 	private void setSequenceValues(int row, int firstInSequence, int sequenceLength, Matrix matrix){
