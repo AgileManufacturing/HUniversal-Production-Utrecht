@@ -6,16 +6,16 @@
  *           .MMMMMMM#=`.gNMMMMM.       \_| \_|\____/\/   \/ \___/ \____/
  *             7HMM9`   .MMMMMM#`		
  *                     ...MMMMMF .      
- *         dN.       .jMN, TMMM`.MM     	@file 	ProductSpawner.java
- *         .MN.      MMMMM;  ?^ ,THM		@brief 	...
+ *         dN.       .jMN, TMMM`.MM     	@file 	TimeSlot.java
+ *         .MN.      MMMMM;  ?^ ,THM		@brief 	DataClass for TimeSlots
  *          dM@      dMMM3  .ga...g,    	@date Created:	2013-12-18
  *       ..MMM#      ,MMr  .MMMMMMMMr   
- *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Tommas Bakker
+ *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Alexander Hustinx
  *   .dMMMMMF           7Y=d9  dMMMMMr    
  *  .MMMMMMF        JMMm.?T!   JMMMMM#		@section LICENSE
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	License:	newBSD
  *  MMMMMM@        dMMMMM, ?MMMMMMMMMF    
- *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright © 2013, HU University of Applied Sciences Utrecht. 
+ *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright Â© 2013, HU University of Applied Sciences Utrecht. 
  *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		All rights reserved.
  *   WMMMMMMMMNNN,.TMMM@ .MMMMMMMM#`.M  
  *    JMMMMMMMMMMMN,?MD  TYYYYYYY= dM     
@@ -37,21 +37,50 @@
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package simulation;
+package simulation.data;
 
 import java.util.Date;
 
-public class ProductSpawner implements Updateable {
-	Date startDate;
-	Date nextSpawn;
-	double interval;
-	
-	@Override
-	public void update(Date time) {
-		if(time.after(startDate)) {
-			
-		}
+public class TimeSlot {
 
+	public static long firstTimeSlot = 1387360454938l;
+	public static long timeSlotLength = 0;
+
+	private long timeSlot;
+	private Date timeSlotDate;
+
+	/**
+	*	It is important that before using the TimeSlot class, you first set the firstTimeSlot and timeSlotLength to the correct values!
+	**/
+	public TimeSlot(){
+		timeSlot = (System.currentTimeMillis() - firstTimeSlot) / timeSlotLength;
+		timeSlotDate = new Date(System.currentTimeMillis());
 	}
 
+	public TimeSlot(TimeSlot timeSlot){
+		this.timeSlot = timeSlot.getTimeSlot();
+		this.timeSlotDate = timeSlot.getDate();
+	}
+
+	public TimeSlot(long timeSlot){
+		this.timeSlot = timeSlot;
+		timeSlotDate = getDate();
+	}
+	
+	public TimeSlot(Date timeSlot){
+		this.timeSlot = (timeSlot.getTime() - firstTimeSlot) / timeSlotLength;
+		timeSlotDate = timeSlot;
+	}
+
+	public static TimeSlot getCurrentTimeSlot(){
+		return new TimeSlot();
+	}
+
+	public Date getDate(){
+		return timeSlotDate;
+	}
+
+	public long getTimeSlot(){
+		return timeSlot;
+	}
 }

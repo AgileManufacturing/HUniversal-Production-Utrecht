@@ -299,8 +299,8 @@ public class SchedulerBehaviour extends Behaviour {
 				//TODO: error handling
 			}
 			prodStep.setConversationId(returnMsg.getConversationId());
-			
 		}
+		
 		return isError;
 	}
 	
