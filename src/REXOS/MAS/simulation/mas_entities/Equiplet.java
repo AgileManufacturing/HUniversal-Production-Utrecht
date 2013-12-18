@@ -65,12 +65,12 @@ public class Equiplet implements Updateable{
 		return Arrays.asList(capabilities).contains(capability);
 	}
 	
-	public double getLoad(){
+	public double getLoad(TimeSlot timeSlot){
 		return 0.0;
 	}
 	
-	public TimeSlot getFirstFreeTimeSlot(int duration){
-		return new TimeSlot();
+	public TimeSlot getFirstFreeTimeSlot(long currentTimeSlot, long duration){
+		return null;
 	}
 	
 	public boolean isScheduleLocked(){

@@ -43,7 +43,7 @@ import simulation.data.Capability;
 
 public class ProductStep {
 	private Capability capability;
-	private int duration;
+	private long duration;
 	private boolean finished;
 	
 
@@ -60,7 +60,7 @@ public class ProductStep {
 		this.finished = finished;
 	}
 
-	public int getDuration() {
+	public long getDuration() {
 		return duration;
 	}
 

@@ -43,12 +43,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 
+import javax.xml.datatype.Duration;
+
 import simulation.CSVReader;
 
 
 public class Capability {
 	private int id;
 	private String name;
+	private int duration;
 	
 	private static HashMap<Integer, Capability> availableCapabilities = new HashMap<Integer, Capability>();
 	
@@ -68,6 +71,10 @@ public class Capability {
 
 	public String getName() {
 		return name;
+	}
+	
+	public int getDuration() {
+		return duration;
 	}
 	
 	public static void parseCapabilitiesCSV(String[][] fields){

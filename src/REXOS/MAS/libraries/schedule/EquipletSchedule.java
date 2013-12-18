@@ -148,7 +148,7 @@ public class EquipletSchedule extends Schedule {
 			if ( newFreeTimeSlot.getDuration() != null){
 				freeTimeSlots.add(newFreeTimeSlot);
 			}
-			else{
+			else {
 				infiniteFreeTimeSlot = newFreeTimeSlot.getStartTimeSlot();
 			}
 			
