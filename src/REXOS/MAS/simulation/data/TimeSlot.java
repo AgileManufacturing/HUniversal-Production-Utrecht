@@ -41,46 +41,39 @@ package simulation.data;
 
 import java.util.Date;
 
+import simulation.Simulation;
+
 public class TimeSlot {
 
-	public static long firstTimeSlot = 1387360454938l;
-	public static long timeSlotLength = 0;
-
-	private long timeSlot;
-	private Date timeSlotDate;
-
-	/**
-	*	It is important that before using the TimeSlot class, you first set the firstTimeSlot and timeSlotLength to the correct values!
-	**/
-	public TimeSlot(){
-		timeSlot = (System.currentTimeMillis() - firstTimeSlot) / timeSlotLength;
-		timeSlotDate = new Date(System.currentTimeMillis());
-	}
+	public static long FIRST_TIMESLOT = 1387360454938l;
+	public static long TIMESLOT_LENGTH = 10l;
+	
+	private long startTimeSlot;
+	private Long duration;
 
 	public TimeSlot(TimeSlot timeSlot){
-		this.timeSlot = timeSlot.getTimeSlot();
-		this.timeSlotDate = timeSlot.getDate();
+		this.startTimeSlot = timeSlot.getStartTimeSlot();
+		this.duration = timeSlot.getDuration();
 	}
 
-	public TimeSlot(long timeSlot){
-		this.timeSlot = timeSlot;
-		timeSlotDate = getDate();
+	public TimeSlot(long timeSlot, Long duration){
+		this.startTimeSlot = timeSlot;
+		this.duration = duration;
+	}
+
+	public static long getCurrentTimeSlot(){
+		return Simulation.getCurrentTime() * TIMESLOT_LENGTH;
 	}
 	
-	public TimeSlot(Date timeSlot){
-		this.timeSlot = (timeSlot.getTime() - firstTimeSlot) / timeSlotLength;
-		timeSlotDate = timeSlot;
-	}
-
-	public static TimeSlot getCurrentTimeSlot(){
-		return new TimeSlot();
-	}
-
 	public Date getDate(){
-		return timeSlotDate;
+		return new Date(startTimeSlot + FIRST_TIMESLOT * TIMESLOT_LENGTH);
 	}
-
-	public long getTimeSlot(){
-		return timeSlot;
+	
+	public long getStartTimeSlot(){
+		return startTimeSlot;
+	}
+	
+	public Long getDuration(){
+		return duration;
 	}
 }
