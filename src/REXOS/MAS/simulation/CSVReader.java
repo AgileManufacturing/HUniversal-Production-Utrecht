@@ -15,7 +15,7 @@
  *  .MMMMMMF        JMMm.?T!   JMMMMM#		@section LICENSE
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	License:	newBSD
  *  MMMMMM@        dMMMMM, ?MMMMMMMMMF    
- *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright © 2013, HU University of Applied Sciences Utrecht. 
+ *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright ï¿½ 2013, HU University of Applied Sciences Utrecht. 
  *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		All rights reserved.
  *   WMMMMMMMMNNN,.TMMM@ .MMMMMMMM#`.M  
  *    JMMMMMMMMMMMN,?MD  TYYYYYYY= dM     
@@ -52,6 +52,9 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import simulation.data.Capability;
 
 public class CSVReader {
@@ -60,13 +63,10 @@ public class CSVReader {
 	
 	
 	private static Capability[] availableCapabilities;
-		
+
 	public static String[][] parseCsvFile(String csvFilePath) {
 		System.out.println("reading " + csvFilePath);
 		
-		
-		
-		File csvFile = new File(csvFilePath);
 		String fileString = "";
 		try {
 			byte[] fileContent = Files.readAllBytes(Paths.get(csvFilePath));
@@ -89,13 +89,39 @@ public class CSVReader {
 			return new String[0][0];
 		}
 		// assuming every row has the same number of cols 
-		int colCount = lines[0].split(";").length;
+		int colCount = lines[0].split(",").length;
 		
 		String[][] output = new String[rowCount][colCount];
 		for(int i = 0; i < lines.length; i++) {
-			String[] fields = lines[i].split(";");
+			String[] fields = lines[i].split(",");
 			output[i] = fields;
 		}
 		return output;
+	}
+	
+	public static JsonObject parseJsonObjectFile(String JsonFilePath){
+		
+		String fileString = "";
+		try {
+			byte[] fileContent = Files.readAllBytes(Paths.get(JsonFilePath));
+			fileString = Charset.defaultCharset().decode(ByteBuffer.wrap(fileContent)).toString();
+		} catch (FileNotFoundException ex) {
+			System.err.println("Could not find file: " + JsonFilePath);
+			ex.printStackTrace();
+		} catch (IOException ex) {
+			System.err.println("Error when reading from file: " + JsonFilePath);
+			ex.printStackTrace();
+		}
+		if (fileString.equals("")){
+			System.err.println("File: " + JsonFilePath + ", is empty!");
+		}
+		return parseJsonObjectString(fileString);
+	}
+	
+	public static JsonObject parseJsonObjectString(String jsonString){
+		JsonParser parser = new JsonParser();
+		JsonObject obj = (JsonObject) parser
+				.parse(jsonString).getAsJsonObject();
+		return obj;
 	}
 }

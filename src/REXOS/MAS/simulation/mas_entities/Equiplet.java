@@ -53,12 +53,8 @@ public class Equiplet implements Updateable{
 	
 	
 	
-	public Equiplet(String capabilitesCSV, String InterruptionsCSV){
-		
-	}
-	
-	public Equiplet(Capability[] capabilities) {
-		this.capabilities = capabilities; 
+	public Equiplet(String[][] csvArguments){
+		parseEquipletCSV(csvArguments);
 	}
 	
 	public void getFreeTimeSlots(){
@@ -89,7 +85,7 @@ public class Equiplet implements Updateable{
 		
 	}
 	
-	private void parseInterruptions(){
+	private void parseEquipletCSV(String[][] fields){
 		
 	}
 
