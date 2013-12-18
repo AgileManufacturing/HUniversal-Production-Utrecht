@@ -1,11 +1,13 @@
 package simulation.mas_entities;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.StringTokenizer;
 
+import simulation.Updateable;
 import simulation.data.Capability;
 
-public class Equiplet {
+public class Equiplet implements Updateable{
 
 	private Capability[] capabilities;
 	
@@ -13,6 +15,10 @@ public class Equiplet {
 	
 	public Equiplet(String capabilitesCSV, String InterruptionsCSV){
 		
+	}
+	
+	public Equiplet(Capability[] capabilities) {
+		this.capabilities = capabilities; 
 	}
 	
 	public void getFreeTimeSlots(){
@@ -40,6 +46,12 @@ public class Equiplet {
 	}
 	
 	private void parseInterruptions(){
+		
+	}
+
+	@Override
+	public void update(Date time) {
+		// TODO Auto-generated method stub
 		
 	}
 }
