@@ -88,11 +88,11 @@ public class CSVReader {
 			// if input is empty, so is output
 			return new String[0][0];
 		}
-		// assuming every row has the same number of cols 
-		int colCount = lines[0].split(",").length;
 		
-		String[][] output = new String[rowCount][colCount];
+		String[][] output = new String[rowCount][];
 		for(int i = 0; i < lines.length; i++) {
+			int colCount = lines[i].split(",").length;
+			output[i] = new String[colCount];
 			String[] fields = lines[i].split(",");
 			output[i] = fields;
 		}

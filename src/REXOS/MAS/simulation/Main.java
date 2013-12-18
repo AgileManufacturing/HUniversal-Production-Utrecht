@@ -15,7 +15,7 @@
  *  .MMMMMMF        JMMm.?T!   JMMMMM#		@section LICENSE
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	License:	newBSD
  *  MMMMMM@        dMMMMM, ?MMMMMMMMMF    
- *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright © 2013, HU University of Applied Sciences Utrecht. 
+ *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright ï¿½ 2013, HU University of Applied Sciences Utrecht. 
  *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		All rights reserved.
  *   WMMMMMMMMNNN,.TMMM@ .MMMMMMMM#`.M  
  *    JMMMMMMMMMMMN,?MD  TYYYYYYY= dM     
@@ -39,8 +39,16 @@
 
 package simulation;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 import simulation.data.Capability;
 import simulation.mas_entities.Grid;
+
+import javax.xml.datatype.Duration;
 
 public class Main {
 
@@ -51,13 +59,15 @@ public class Main {
 	public static Grid grid;
 	
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		Capability.loadCapabilities(pathToCapabilitiesCsv);
 		
 		simulation = new Simulation();
 		
 		grid = new Grid(pathToEquipletLayoutCsv);
 		simulation.addUpdateable(grid);
+		ProductSpawner ps1 = new ProductSpawner(simulation);
+		simulation.addUpdateable(ps1);
 		
 		simulation.resumeSimulation();
 		

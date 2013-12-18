@@ -43,15 +43,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 
-import javax.xml.datatype.Duration;
-
 import simulation.CSVReader;
 
 
 public class Capability {
 	private int id;
 	private String name;
-	private int duration;
+	private int durationInTimeslots;
 	
 	private static HashMap<Integer, Capability> availableCapabilities = new HashMap<Integer, Capability>();
 	
@@ -60,9 +58,10 @@ public class Capability {
 		parseCapabilitiesCSV(fields);
 	}
 	
-	public Capability(int id, String name){
+	public Capability(int id, String name, int durationInTimeSlots){
 		this.id = id;
 		this.name = name;
+		this.durationInTimeslots = durationInTimeSlots;
 	}
 
 	public int getId() {
@@ -74,7 +73,7 @@ public class Capability {
 	}
 	
 	public int getDuration() {
-		return duration;
+		return durationInTimeslots;
 	}
 	
 	public static void parseCapabilitiesCSV(String[][] fields){
@@ -82,8 +81,9 @@ public class Capability {
 			for(int i = 0; i < fields.length; i++) {
 				int capabilityId = Integer.parseInt(fields[i][0]);
 				String capabiityName = fields[i][1];
+				int capabilityDuration = Integer.parseInt(fields[i][2].trim());
 				
-				availableCapabilities.put(capabilityId, new Capability(capabilityId, capabiityName));
+				availableCapabilities.put(capabilityId, new Capability(capabilityId, capabiityName, capabilityDuration));
 			}
 		} catch(NumberFormatException e){
 			System.err.println("Could not parse capabilties");
@@ -101,7 +101,7 @@ public class Capability {
 	private static void printAvailableCapabilities(){
 		Collection<Capability> values = availableCapabilities.values();
 		for ( Capability c1 : values){
-			System.out.println("id: " + c1.getId() + ", name: " + c1.getName());
+			System.out.println("id: " + c1.getId() + ", name: " + c1.getName() + ", duration: " + c1.getDuration());
 		}
 	}
 }
