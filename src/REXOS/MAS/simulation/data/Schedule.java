@@ -8,19 +8,12 @@ public class Schedule {
 	private TimeSlot timeSlot;
 	private Equiplet equiplet;
 	
-	public Schedule(ProductStep productStep, TimeSlot timeSlot,
+	public Schedule(TimeSlot timeSlot,
 			Equiplet equiplet) {
-		this.productStep = productStep;
 		this.timeSlot = timeSlot;
 		this.equiplet = equiplet;
 	}
 	
-	public ProductStep getProductStep() {
-		return productStep;
-	}
-	public void setProductStep(ProductStep productStep) {
-		this.productStep = productStep;
-	}
 	public TimeSlot getTimeSlot() {
 		return timeSlot;
 	}
