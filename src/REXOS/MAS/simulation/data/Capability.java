@@ -16,7 +16,7 @@
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	@section LICENSE
  *  MMMMMM@        dMMMMM, ?MMMMMMMMMF    	License:	newBSD
  *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	
- *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		Copyright © 2013, HU University of Applied Sciences Utrecht. 
+ *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		Copyright ï¿½ 2013, HU University of Applied Sciences Utrecht. 
  *   WMMMMMMMMNNN,.TMMM@ .MMMMMMMM#`.M  	All rights reserved.
  *    JMMMMMMMMMMMN,?MD  TYYYYYYY= dM     
  *                                        
@@ -39,15 +39,9 @@
 
 package simulation.data;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
 
 import simulation.CSVReader;
 
@@ -101,7 +95,7 @@ public class Capability {
 		printAvailableCapabilities();
 	}
 	
-	public static Capability getAvailableCapabilitiesById(int id){
+	public static Capability getCapabilityById(int id){
 		return availableCapabilities.get(id);
 	}
 	private static void printAvailableCapabilities(){
