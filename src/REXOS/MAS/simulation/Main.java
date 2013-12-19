@@ -52,7 +52,7 @@ import javax.xml.datatype.Duration;
 
 public class Main {
 
-	public final static String pathToEquipletLayoutCsv = "/home/t/sim/equipletLayout.csv";
+	public final static String pathToEquipletLayoutJson = "/home/t/sim/equipletLayout.json";
 	public final static String pathToCapabilitiesCsv = "/home/t/sim/capabilities.csv";
 	
 	public static Simulation simulation;
@@ -64,7 +64,9 @@ public class Main {
 		
 		simulation = new Simulation();
 		
-		grid = new Grid(pathToEquipletLayoutCsv);
+		grid = new Grid(pathToEquipletLayoutJson, simulation);
+		System.out.println(grid);
+		
 		simulation.addUpdateable(grid);
 		ProductSpawner ps1 = new ProductSpawner(simulation, grid);
 		simulation.addUpdateable(ps1);

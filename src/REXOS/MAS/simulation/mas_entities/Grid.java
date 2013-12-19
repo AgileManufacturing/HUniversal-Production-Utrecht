@@ -43,8 +43,12 @@ import java.io.File;
 import java.io.Reader;
 import java.util.Date;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import agents.data_classes.Matrix;
 import simulation.CSVReader;
+import simulation.Simulation;
 import simulation.Updatable;
 import simulation.data.Capability;
 
@@ -59,26 +63,27 @@ public class Grid implements Updatable{
 	public Grid(Equiplet[][] equiplets) {
 		this.equiplets = equiplets;
 	}
-	public Grid(String equipletLayoutCsvFilePath) {
-		String[][] fields = CSVReader.parseCsvFile(equipletLayoutCsvFilePath);
+	public Grid(String equipletLayoutJsonFilePath, Simulation simulation) {
 		
-		equiplets = new Equiplet[fields.length][fields[0].length];
+		JsonObject jsonObject = CSVReader.parseJsonObjectFile(equipletLayoutJsonFilePath);
+		JsonArray jsonEquipletsArray2D = jsonObject.get("grid").getAsJsonArray();
 		
-		initializeDistanceMatrix();
-		
+		equiplets = new Equiplet[jsonEquipletsArray2D.size()][];
 		try {
-			for(int i = 0; i < fields.length; i++) {
-				for(int j = 0; j < fields[i].length; j++) {
-					int capabilityId = Integer.parseInt(fields[i][j].trim());
-					Capability cap = Capability.getCapabilityById(capabilityId);
-					// TODO: Allow for more than 1 capability
-					equiplets[i][j] = new Equiplet(new Capability[] {cap});
+			for(int i = 0; i < jsonEquipletsArray2D.size(); i++) {
+				JsonArray jsonEquipletArray = jsonEquipletsArray2D.get(i).getAsJsonArray();
+				equiplets[i] = new Equiplet[jsonEquipletArray.size()];
+				
+				for(int j = 0; j < jsonEquipletArray.size(); j++) {
+					equiplets[i][j] = new Equiplet(jsonEquipletArray.get(j).getAsJsonObject(), simulation);
 				}
 			}
 		} catch (NumberFormatException ex) {
 			System.err.println("equipletLayoutCsv has an entry which could not be converted to int");
 			throw ex;
 		}
+		
+		initializeDistanceMatrix();
 	}
 	private void initializeDistanceMatrix() {
 		distanceMatrix = new Matrix(equiplets.length * equiplets[0].length, equiplets.length * equiplets[0].length);
@@ -146,6 +151,17 @@ public class Grid implements Updatable{
 			for(int j = 0; j < equiplets[i].length; j++) {
 				output[i * equiplets[0].length + j] = equiplets[i][j];
 			}
+		}
+		return output;
+	}
+	
+	public String toString() {
+		String output = "Grid layout:\n";
+		for(int i = 0; i < equiplets.length; i++) {
+			for(int j = 0; j < equiplets[i].length; j++) {
+				output += equiplets[i][j] + "\t";
+			}
+			output += "\n";
 		}
 		return output;
 	}
