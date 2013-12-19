@@ -107,21 +107,20 @@ public class Equiplet implements Updatable{
 		return Arrays.asList(capabilities).contains(capability);
 	}
 	
-	public double getLoad(long startingTimeSlot){
+	public double getLoad(TimeSlot timeSlot){
 		
 		long amountOfTimeSlotsBusy = 0;
 		
 		for (ProductStepSchedule productStepSchedule : schedule){
-			if (productStepSchedule.getStartTimeSlot() + productStepSchedule.getDuration() > startingTimeSlot && 
-					productStepSchedule.getStartTimeSlot() < (startingTimeSlot + gridProperties.getEquipletLoadWindow())){
-				if(productStepSchedule.getStartTimeSlot() - startingTimeSlot < 0){
-					amountOfTimeSlotsBusy +=  productStepSchedule.getDuration() - (productStepSchedule.getStartTimeSlot() - startingTimeSlot);
+			if (productStepSchedule.getStartTimeSlot() + productStepSchedule.getDuration() > timeSlot.getStartTimeSlot() && 
+					productStepSchedule.getStartTimeSlot() < (timeSlot.getStartTimeSlot() + gridProperties.getEquipletLoadWindow())){
+				if(productStepSchedule.getStartTimeSlot() - timeSlot.getStartTimeSlot() < 0){
+					amountOfTimeSlotsBusy +=  productStepSchedule.getDuration() - (productStepSchedule.getStartTimeSlot() - timeSlot.getStartTimeSlot());
 				}
-				if(productStepSchedule.getStartTimeSlot() + productStepSchedule.getDuration() - (startingTimeSlot + gridProperties.getEquipletLoadWindow())> 0){
-					amountOfTimeSlotsBusy +=  productStepSchedule.getDuration() - (productStepSchedule.getStartTimeSlot() - startingTimeSlot);
+				if(productStepSchedule.getStartTimeSlot() + productStepSchedule.getDuration() - (timeSlot.getStartTimeSlot() + gridProperties.getEquipletLoadWindow())> 0){
+					amountOfTimeSlotsBusy +=  productStepSchedule.getDuration() - (productStepSchedule.getStartTimeSlot() - timeSlot.getStartTimeSlot());
 					break;
 				}
-				
 				else{
 					amountOfTimeSlotsBusy += productStepSchedule.getDuration();
 				}

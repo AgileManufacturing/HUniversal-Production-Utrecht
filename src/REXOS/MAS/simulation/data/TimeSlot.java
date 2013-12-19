@@ -58,16 +58,16 @@ public class TimeSlot {
 		this.duration = duration;
 	}
 
-	public static long getCurrentTimeSlot(Simulation simulation){
-		return (simulation.getCurrentSimulationTime() - simulation.getFirstTimeSlot()) / simulation.getTimeSlotLength();
+	public static long getCurrentTimeSlot(Simulation simulation, GridProperties gridProperties){
+		return (simulation.getCurrentSimulationTime() - gridProperties.getFirstTimeSlot()) / gridProperties.getTimeSlotLength();
 	}
 	
 	public static long getTimeSlotFromMillis(GridProperties gridProperties, long millis){
 		return (millis - gridProperties.getFirstTimeSlot()) / gridProperties.getTimeSlotLength();
 	}
 	
-	public Date getDate(Simulation simulation){
-		return new Date(startTimeSlot + simulation.getFirstTimeSlot() * simulation.getTimeSlotLength());
+	public Date getDate(Simulation simulation, GridProperties gridProperties){
+		return new Date(startTimeSlot + gridProperties.getFirstTimeSlot() * gridProperties.getTimeSlotLength());
 	}
 	
 	public long getStartTimeSlot(){

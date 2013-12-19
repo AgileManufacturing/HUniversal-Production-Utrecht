@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 
 import simulation.Simulation;
 import simulation.Updatable;
+import simulation.data.GridProperties;
 import simulation.data.ProductStep;
 import simulation.data.Schedule;
 import simulation.data.TimeSlot;
@@ -27,7 +28,7 @@ public class Product implements Updatable{
 		this.equiplets = grid.getEquiplets();
 		finalSchedules = new LinkedHashMap<ProductStep, Schedule>();
 		
-		long currentTimeSlot = TimeSlot.getCurrentTimeSlot(simulation);
+		long currentTimeSlot = TimeSlot.getCurrentTimeSlot(simulation, grid.getGridProperties());
 		//We need to pass the current timeslot, to prevent synchronisation issues.
 		schedule(currentTimeSlot, generateScheduleMatrix(equiplets, productSteps, currentTimeSlot));
 	}
@@ -77,7 +78,7 @@ public class Product implements Updatable{
 				}
 				scheduleMatrix.show();
 				
-				//value might have changed since we added sequence multiplier
+				//value might have changed since we added sequence multiplier 
 				double loadValue = equiplets[row].getLoad(equiplets[row].getFirstFreeTimeSlot(scheduleTimeSlot, productSteps[column].getDuration()));
 				System.out.println("loadValue " + loadValue);
 				
@@ -157,7 +158,7 @@ public class Product implements Updatable{
 				newProductSteps.add(step);
 			}
 		}
-		long currentTimeSlot = TimeSlot.getCurrentTimeSlot(simulation);
+		long currentTimeSlot = TimeSlot.getCurrentTimeSlot(simulation, grid.getGridProperties());
 		//so now we have a newProductSteps and finalSchedules. Lets try to schedule again.
 		schedule(currentTimeSlot, generateScheduleMatrix(equiplets, (ProductStep[])newProductSteps.toArray(), currentTimeSlot));
 	}

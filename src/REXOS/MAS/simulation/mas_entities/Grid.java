@@ -51,6 +51,7 @@ import simulation.CSVReader;
 import simulation.Simulation;
 import simulation.Updatable;
 import simulation.data.Capability;
+import simulation.data.GridProperties;
 
 
 public class Grid implements Updatable{
@@ -60,6 +61,8 @@ public class Grid implements Updatable{
 	
 	private Matrix distanceMatrix;
 	
+	private GridProperties gridProperties;
+	
 	public Grid(Equiplet[][] equiplets) {
 		this.equiplets = equiplets;
 	}
@@ -68,6 +71,10 @@ public class Grid implements Updatable{
 		JsonObject jsonObject = CSVReader.parseJsonObjectFile(equipletLayoutJsonFilePath);
 		JsonArray jsonEquipletsArray2D = jsonObject.get("grid").getAsJsonArray();
 		
+		gridProperties = new GridProperties(jsonObject.get("firstTimeSlot").getAsLong(), 
+														   jsonObject.get("timeSlotLength").getAsLong(), 
+														   jsonObject.get("equipletLoadWindow").getAsLong());
+		
 		equiplets = new Equiplet[jsonEquipletsArray2D.size()][];
 		try {
 			for(int i = 0; i < jsonEquipletsArray2D.size(); i++) {
@@ -75,7 +82,7 @@ public class Grid implements Updatable{
 				equiplets[i] = new Equiplet[jsonEquipletArray.size()];
 				
 				for(int j = 0; j < jsonEquipletArray.size(); j++) {
-					equiplets[i][j] = new Equiplet(jsonEquipletArray.get(j).getAsJsonObject(), simulation);
+					equiplets[i][j] = new Equiplet(jsonEquipletArray.get(j).getAsJsonObject(), gridProperties);
 				}
 			}
 		} catch (NumberFormatException ex) {
@@ -153,6 +160,10 @@ public class Grid implements Updatable{
 			}
 		}
 		return output;
+	}
+	
+	public GridProperties getGridProperties(){
+		return gridProperties;
 	}
 	
 	public String toString() {
