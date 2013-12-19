@@ -62,8 +62,8 @@ public class TimeSlot {
 		return (simulation.getCurrentSimulationTime() - simulation.getFirstTimeSlot()) / simulation.getTimeSlotLength();
 	}
 	
-	public static long getTimeSlotFromMillis(Simulation simulation, long millis){
-		return (millis - simulation.getFirstTimeSlot()) / simulation.getTimeSlotLength();
+	public static long getTimeSlotFromMillis(GridProperties gridProperties, long millis){
+		return (millis - gridProperties.getFirstTimeSlot()) / gridProperties.getTimeSlotLength();
 	}
 	
 	public Date getDate(Simulation simulation){
