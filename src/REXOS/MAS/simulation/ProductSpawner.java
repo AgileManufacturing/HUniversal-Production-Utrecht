@@ -46,6 +46,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import simulation.data.Capability;
+import simulation.mas_entities.Grid;
 import simulation.mas_entities.Product;
 import simulation.mas_entities.ProductStep;
 
@@ -61,9 +62,11 @@ public class ProductSpawner implements Updatable {
 	double spawnInterval;
 	
 	Simulation simulation;
+	Grid grid;
 	
-	public ProductSpawner(Simulation simulation) throws ParseException {
+	public ProductSpawner(Simulation simulation, Grid grid) throws ParseException {
 		this.simulation = simulation;
+		this.grid = grid;
 		
 		String[][] fields = CSVReader.parseCsvFile(pathToProductCsvFile);
 		
@@ -97,7 +100,7 @@ public class ProductSpawner implements Updatable {
 	private Product[] spawnProducts() {
 		Product[] products = new Product[amountPerSpawn];
 		for(int i = 0; i < products.length; i++) {
-			products[i] = new Product(productSteps, simulation.getCurrentSimulationTime() + productDeadline);
+			products[i] = new Product(simulation, grid, productSteps, simulation.getCurrentSimulationTime() + productDeadline);
 		}
 		return products; 
 	}

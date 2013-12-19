@@ -140,4 +140,13 @@ public class Grid implements Updatable{
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	public Equiplet[] getEquiplets() {
+		Equiplet[] output = new Equiplet[equiplets.length * equiplets[0].length];
+		for(int i = 0; i < equiplets.length; i++) {
+			for(int j = 0; j < equiplets[i].length; j++) {
+				output[i * equiplets[0].length + j] = equiplets[i][j];
+			}
+		}
+		return output;
+	}
 }

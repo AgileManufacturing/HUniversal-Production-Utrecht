@@ -70,7 +70,8 @@ public class Equiplet implements Updatable{
 	}
 	
 	public double getLoad(TimeSlot timeSlot){
-		return 0.0;
+		// TODO do something 
+		return 0.5;
 	}
 	
 	public TimeSlot getFirstFreeTimeSlot(long currentTimeSlot, long duration){

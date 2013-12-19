@@ -66,7 +66,7 @@ public class Main {
 		
 		grid = new Grid(pathToEquipletLayoutCsv);
 		simulation.addUpdateable(grid);
-		ProductSpawner ps1 = new ProductSpawner(simulation);
+		ProductSpawner ps1 = new ProductSpawner(simulation, grid);
 		simulation.addUpdateable(ps1);
 		
 		simulation.resumeSimulation();

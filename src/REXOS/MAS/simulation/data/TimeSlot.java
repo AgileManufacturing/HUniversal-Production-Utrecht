@@ -61,8 +61,8 @@ public class TimeSlot {
 		this.duration = duration;
 	}
 
-	public static long getCurrentTimeSlot(){
-		return Simulation.getCurrentTime() * TIMESLOT_LENGTH;
+	public static long getCurrentTimeSlot(Simulation simulation){
+		return (simulation.getCurrentSimulationTime() - FIRST_TIMESLOT) / TIMESLOT_LENGTH;
 	}
 	
 	public Date getDate(){

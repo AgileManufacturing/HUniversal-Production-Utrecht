@@ -45,13 +45,14 @@ import java.util.Date;
 
 public class Simulation implements Runnable{
 	private boolean isRunning = false;
-	private double interval = 0.01; // seconds
+	private double interval = 0.0; // seconds
 	private double turnTime = 0.01; // seconds
 	
 	private long turn = 0;
 	private long startSimulationTime;
 	private long currentSimulationTime;
 	private ArrayList<Updatable> updateables = new ArrayList<Updatable>();
+	private ArrayList<Updatable> updateablesToBeAdded = new ArrayList<Updatable>();
 	private Thread thread;
 	
 	public void pauseSimulation(){
@@ -78,7 +79,7 @@ public class Simulation implements Runnable{
 	}
 	
 	public void addUpdateable(Updatable updateable) {
-		updateables.add(updateable);
+		updateablesToBeAdded.add(updateable);
 	}
 	
 	public void run(){
@@ -97,7 +98,7 @@ public class Simulation implements Runnable{
 				// update the time
 				currentSimulationTime += turnTime * 1000;
 				
-				System.out.println("--- Simulation: turn " + turn + " time " + currentSimulationTime);
+				//System.out.println("--- Simulation: turn " + turn + " time " + currentSimulationTime);
 				
 				// update simulation
 				for (Updatable updateable : updateables) {
@@ -117,6 +118,7 @@ public class Simulation implements Runnable{
 				} else {
 					// no need to sleep at all
 				}
+				updateables.addAll(updateablesToBeAdded);
 			}
 		}
 		// exit simulation thread
