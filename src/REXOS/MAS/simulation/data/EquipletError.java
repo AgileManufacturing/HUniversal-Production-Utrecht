@@ -39,17 +39,48 @@
 
 package simulation.data;
 
-public class EquipletError {
+import simulation.Duration;
 
-	public int type;  // 0 == hardware error , 1 == software error ( schedule lost ) 
+import com.google.gson.JsonObject;
+
+public class EquipletError {
+	enum ErrorType {
+		hardware,
+		software
+	}
+	public ErrorType type; 
+	public boolean damagesProduct;
 	
 	public long duration;
+	public long interval;
+	public long startTime;
 	
-	public long timeOfInterrupt;
-	
-	public EquipletError(int type, long duration, long timeOfInterrupt){
+	public EquipletError(ErrorType type, long duration, long startTime, long interval, boolean damagesProduct){
 		this.type = type;
 		this.duration = duration;
-		this.timeOfInterrupt = timeOfInterrupt;
+		this.startTime = startTime;
+		this.interval = interval;
+		this.damagesProduct = damagesProduct;
+	}
+	
+	public EquipletError(JsonObject input) {
+		this.type = ErrorType.valueOf(input.get("type").getAsString());
+		this.duration = Duration.parseDurationString(input.get("duration").getAsString());
+		this.startTime = Duration.parseDurationString(input.get("startTime").getAsString());
+		this.interval = Duration.parseDurationString(input.get("interval").getAsString());
+		this.damagesProduct = input.get("damagesProduct").getAsBoolean();
+	}
+	
+	public boolean isActive(long time) {
+		if(time < startTime) {
+			return false;
+		} 
+		long relativeTime = time - startTime;
+		long phaseTime = relativeTime % (duration + interval);
+		if(phaseTime < duration) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
