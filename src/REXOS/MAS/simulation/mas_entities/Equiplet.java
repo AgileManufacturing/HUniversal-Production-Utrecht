@@ -105,25 +105,40 @@ public class Equiplet implements Updatable{
 	}
 	
 	public double getLoad(TimeSlot timeSlot){
-		return 0.0;
+		return 0.5;
 	}
 	
 	public TimeSlot getFirstFreeTimeSlot(long startTimeSlot, long duration){
 		
+		//we want to have the first schedule available ... we expect here that the schedule 
+		//is sorted from lowest starttimeslot to highest starttimeslot
 		
+		//nothing is scheduled so just give it back with indefinite duration
 		if (schedule.size() == 0 ) {
-			return new TimeSlot(TimeSlot.getCurrentTimeSlot(simulation), null);
+			return new TimeSlot(startTimeSlot + 1, null);
 		}
 		else{
-			int iScheduledStep = 0;
-			
-			
-			long currentTimeSlot = TimeSlot.getCurrentTimeSlot(simulation);
 			ProductStepSchedule curProductStepSchedule = schedule.get(0);
+			
+			//unit before the schedule
+			if ((startTimeSlot + duration ) < curProductStepSchedule.getStartTimeSlot()){
+				return new TimeSlot(startTimeSlot + 1, curProductStepSchedule.getStartTimeSlot() - startTimeSlot + 1);
+			}
 			ProductStepSchedule prevProductStepSchedule = curProductStepSchedule;
+			
+			//unit somewhere in between the schedule
+			for (int iPlannedSteps = 1; iPlannedSteps < schedule.size() ; iPlannedSteps++){
+				curProductStepSchedule = schedule.get(iPlannedSteps);
+				
+				if ( curProductStepSchedule.getStartTimeSlot() - (prevProductStepSchedule.getStartTimeSlot() + prevProductStepSchedule.getDuration()) >= duration ){
+					return new TimeSlot(prevProductStepSchedule.getStartTimeSlot() + prevProductStepSchedule.getDuration(), 
+							curProductStepSchedule.getStartTimeSlot() - (prevProductStepSchedule.getStartTimeSlot() + prevProductStepSchedule.getDuration()));
+				}
+			}
+			
+			//we have no other space then at the end of the schedule
+			return new TimeSlot(schedule.get(schedule.size()-1).getStartTimeSlot() + schedule.get(schedule.size()-1).getDuration(), null);
 		}
-		
-		return null;
 	}
 	
 	public boolean isScheduleLocked(){
@@ -138,18 +153,11 @@ public class Equiplet implements Updatable{
 			return;
 		}
 		
-		//new schedule is after all the other scheduled steps
-		if(newPSS.getStartTimeSlot() > schedule.get(schedule.size()-1).getStartTimeSlot()){
-			schedule.add(newPSS);
-			return;
-		}
-		
 		//new step is at the first time
 		if (newPSS.getStartTimeSlot() < schedule.get(0).getStartTimeSlot()){
 			schedule.add(0,newPSS);
 			return;
 		}
-		
 		
 		// new step has to be somewhere in between the rest of the planned steps
 		ProductStepSchedule curProductStepSchedule = schedule.get(0);
@@ -163,6 +171,12 @@ public class Equiplet implements Updatable{
 					return;
 			}
 			prevProductStepSchedule = curProductStepSchedule;
+		}
+		
+		//new schedule is after all the other scheduled steps
+		if(newPSS.getStartTimeSlot() > schedule.get(schedule.size()-1).getStartTimeSlot()){
+			schedule.add(newPSS);
+			return;
 		}
 		
 		System.err.println("A step could not be added to the schedule, it does not fit anywhere in the schedule.");
