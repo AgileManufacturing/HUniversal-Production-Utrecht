@@ -3,6 +3,7 @@ package simulation.mas_entities;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import simulation.Simulation;
 import simulation.Updatable;
 import simulation.data.Schedule;
 import simulation.data.TimeSlot;
@@ -14,15 +15,18 @@ public class Product implements Updatable{
 	private Equiplet[] equiplets;
 	private long deadline;
 	private LinkedHashMap<ProductStep, Schedule> finalSchedules; //We might want to keep the order of the list.
+	private Simulation simulation;
 	private Grid grid;
 	
-	public Product(Grid grid, ProductStep[] productSteps, long deadline){
+	public Product(Simulation simulation, Grid grid, ProductStep[] productSteps, long deadline){
 		this.productSteps = productSteps;
 		this.deadline = deadline;
+		this.simulation = simulation;
 		this.grid = grid;
+		this.equiplets = grid.getEquiplets();
 		finalSchedules = new LinkedHashMap<ProductStep, Schedule>();
 		
-		long currentTimeSlot = TimeSlot.getCurrentTimeSlot();
+		long currentTimeSlot = TimeSlot.getCurrentTimeSlot(simulation);
 		//We need to pass the current timeslot, to prevent synchronisation issues.
 		schedule(currentTimeSlot, generateScheduleMatrix(equiplets, productSteps, currentTimeSlot));
 	}
@@ -39,43 +43,54 @@ public class Product implements Updatable{
 		
 		int sequenceLength, firstInSequence;
 		
-			//Iterate through them steps to fill the matrix
-			for (int row = 0; row < equiplets.length; row++) { // row ( equiplets )
-				sequenceLength = 0; firstInSequence = -1; // always set sequenceLength to 0 and firstInsequence to -1 when doing a new row.
+		//Iterate through them steps to fill the matrix
+		for (int row = 0; row < equiplets.length; row++) { // row ( equiplets )
+			System.out.println("row " + row);
+			sequenceLength = 0; firstInSequence = -1; // always set sequenceLength to 0 and firstInsequence to -1 when doing a new row.
+			
+			long scheduleTimeSlot = currentTimeSlot; // scheduletimeslot has to be the same for each equiplet.
+			
+			for (int column = 0; column < productSteps.length; column++) { // column ( product steps
+				System.out.println("col " + column);
 				
-				long scheduleTimeSlot = currentTimeSlot; // scheduletimeslot has to be the same for each equiplet.
+				double canPerformStepValue = equiplets[row].canPerformStep(productSteps[column].getCapability()) ? 1.0 : 0.0;
+				System.out.println("canPerformStepValue " + canPerformStepValue);
 				
-				for (int column = 0; column < equiplets.length; column++) { // column ( product steps
-					
-					double canPerformStepValue = equiplets[row].canPerformStep(productSteps[column].getCapability()) ? 1.0 : 0.0;
-				
-					if(canPerformStepValue == 1.0) {   //increase sequence counter.
-						if(firstInSequence < 0){	  //set the first item in the sequence.
-							firstInSequence = column;
-						}
-						sequenceLength++;
-						if(column == productSteps.length){ // end of row
-							setSequenceValues(row, firstInSequence, sequenceLength, scheduleMatrix);
-						}
-					} else if(canPerformStepValue == 0.0 && sequenceLength > 0) { // end of sequence
-						setSequenceValues(row, firstInSequence, sequenceLength, scheduleMatrix);
-						sequenceLength = 0;
-						firstInSequence = -1;
+				if(canPerformStepValue == 1.0) {   //increase sequence counter.
+					scheduleMatrix.set(row, column, canPerformStepValue);
+					if(firstInSequence < 0){	  //set the first item in the sequence.
+						firstInSequence = column;
 					}
-					
-					//value might have changed since we added sequence multiplier
-					double loadValue = equiplets[row].getLoad(equiplets[row].getFirstFreeTimeSlot(scheduleTimeSlot, productSteps[column].getDuration()));
-					
-					//Multiply with load value ( e.g. the load of the equiplet )
-					scheduleMatrix.set(row, column, (scheduleMatrix.get(row, column) * loadValue));
-					
-					//we still need a transportstep?
-					scheduleTimeSlot += grid.GetMeanDistance(); // this isnt the way it should be done. but it should suffice for now.
-					
-					//add the time to the scheduleTimeSlot
-					scheduleTimeSlot += productSteps[column].getCapability().getDuration();
+					System.out.println("firstInSequence " + firstInSequence);
+					sequenceLength++;
+					System.out.println("sequenceLength " + sequenceLength);
+					if(column == productSteps.length - 1){ // end of row
+						System.out.println("at end of row" );
+						setSequenceValues(row, firstInSequence, sequenceLength, scheduleMatrix);
+					}
+				} else if(canPerformStepValue == 0.0 && sequenceLength > 0) { // end of sequence
+					System.out.println("at end of squence" );
+					setSequenceValues(row, firstInSequence, sequenceLength, scheduleMatrix);
+					sequenceLength = 0;
+					firstInSequence = -1;
 				}
+				scheduleMatrix.show();
+				
+				//value might have changed since we added sequence multiplier
+				double loadValue = equiplets[row].getLoad(equiplets[row].getFirstFreeTimeSlot(scheduleTimeSlot, productSteps[column].getDuration()));
+				System.out.println("loadValue " + loadValue);
+				
+				//Multiply with load value ( e.g. the load of the equiplet )
+				scheduleMatrix.set(row, column, (scheduleMatrix.get(row, column) * (1 - loadValue)));
+				
+				//we still need a transportstep?
+				scheduleTimeSlot += grid.GetMeanDistance(); // this isnt the way it should be done. but it should suffice for now.
+				
+				//add the time to the scheduleTimeSlot
+				scheduleTimeSlot += productSteps[column].getCapability().getDuration();
+			}
 		}
+		scheduleMatrix.show();
 		return scheduleMatrix;
 	}
 
@@ -88,7 +103,13 @@ public class Product implements Updatable{
 			ProductStep productStep = productSteps[column];
 			
 			for (int row = 0; row < scheduleMatrix.getNumberOfRows(); row++) { //AID'S
-				highestEquipletScoreIndex = (scheduleMatrix.get(row, column) > scheduleMatrix.get(highestEquipletScoreIndex, column)) ? row : highestEquipletScoreIndex;
+				if(highestEquipletScoreIndex == -1) {
+					if(scheduleMatrix.get(row, column) > 0) {
+						highestEquipletScoreIndex = row;
+					}
+				} else {
+					highestEquipletScoreIndex = (scheduleMatrix.get(row, column) > scheduleMatrix.get(highestEquipletScoreIndex, column)) ? row : highestEquipletScoreIndex;
+				}
 			}
 			
 			if(highestEquipletScoreIndex < 0){
@@ -96,7 +117,7 @@ public class Product implements Updatable{
 				return;
 			}
 			
-			//Can we assume that all pro-ductSteps are ordered? What about parallel steps? Lets get the equiplet.
+			//Can we assume that all productSteps are ordered? What about parallel steps? Lets get the equiplet.
 			currentEquiplet = equiplets[highestEquipletScoreIndex]; //this might not work.
 			
 			//Get first free timeslot
@@ -118,7 +139,8 @@ public class Product implements Updatable{
 	
 	private void setSequenceValues(int row, int firstInSequence, int sequenceLength, Matrix matrix){
 		int value = sequenceLength -1;
-		for(int i = firstInSequence; i <= sequenceLength; i++){
+		for(int i = firstInSequence; i < firstInSequence + sequenceLength; i++){
+			System.out.println("setting " + row + " " + i + " to " + (matrix.get(row, i) + value));
 			matrix.set(row, i, (matrix.get(row, i) + value));
 		}
 	}
@@ -134,7 +156,7 @@ public class Product implements Updatable{
 				newProductSteps.add(step);
 			}
 		}
-		long currentTimeSlot = TimeSlot.getCurrentTimeSlot();
+		long currentTimeSlot = TimeSlot.getCurrentTimeSlot(simulation);
 		//so now we have a newProductSteps and finalSchedules. Lets try to schedule again.
 		schedule(currentTimeSlot, generateScheduleMatrix(equiplets, (ProductStep[])newProductSteps.toArray(), currentTimeSlot));
 	}
