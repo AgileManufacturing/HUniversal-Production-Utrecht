@@ -39,42 +39,89 @@
 
 package simulation.mas_entities;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.StringTokenizer;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import simulation.Simulation;
 import simulation.Updatable;
 import simulation.data.Capability;
+import simulation.data.ProductStepSchedule;
 import simulation.data.TimeSlot;
 
 public class Equiplet implements Updatable{
-
+	
+	public enum EquipletState{
+		Idle,
+		Error,
+		Working
+	}
+	
+	private EquipletState equipletState = EquipletState.Idle;
+	
 	private Capability[] capabilities;
+	private String equipletName;
+	private int reservedFor = 0;
 	
+	private Simulation simulation;
 	
+	ArrayList<ProductStepSchedule> schedule = new ArrayList<ProductStepSchedule>();
 	
-	public Equiplet(String[][] csvArguments){
-		parseEquipletCSV(csvArguments);
+	public Equiplet(JsonObject jsonArguments, Simulation simulation){
+		parseEquipletJson(jsonArguments);
+		this.simulation = simulation;
 	}
 	
-	public Equiplet(Capability[] capabilities) {
-		this.capabilities = capabilities;
-	}
-	
-	public void getFreeTimeSlots(){
+	/*public ArrayList<FreeTimeSlot> getFreeTimeSlots(){
+		ArrayList<FreeTimeSlot> freeTimeSlots = new ArrayList<FreeTimeSlot>();
 		
-	}
+		java.util.Collections.sort(schedule, new Comparator<ProductStepSchedule>() {
+			@Override
+			public int compare(ProductStepSchedule o1, ProductStepSchedule o2) {
+				if (o1.getStartTimeSlot() < o2.getStartTimeSlot()){
+					return -1;
+				}
+				else if(o1.getStartTimeSlot() == o2.getStartTimeSlot()){
+					return 0;
+				}
+				else {
+					return 1;
+				}
+			}
+		});
+		
+		if (schedule.size() == 0 ) {
+			//TODO: setup the CURRENT timeslot
+			freeTimeSlots.add(new FreeTimeSlot(1l,null));
+		}
+	}*/
 	
 	public boolean canPerformStep(Capability capability){
 		return Arrays.asList(capabilities).contains(capability);
 	}
 	
 	public double getLoad(TimeSlot timeSlot){
-		// TODO do something 
-		return 0.5;
+		return 0.0;
 	}
 	
-	public TimeSlot getFirstFreeTimeSlot(long currentTimeSlot, long duration){
+	public TimeSlot getFirstFreeTimeSlot(long startTimeSlot, long duration){
+		
+		
+		if (schedule.size() == 0 ) {
+			return new TimeSlot(TimeSlot.getCurrentTimeSlot(simulation), null);
+		}
+		else{
+			int iScheduledStep = 0;
+			
+			
+			long currentTimeSlot = TimeSlot.getCurrentTimeSlot(simulation);
+			ProductStepSchedule curProductStepSchedule = schedule.get(0);
+			ProductStepSchedule prevProductStepSchedule = curProductStepSchedule;
+		}
+		
 		return null;
 	}
 	
@@ -83,20 +130,96 @@ public class Equiplet implements Updatable{
 	}
 	
 	public void schedule(ProductStep step, TimeSlot timeslot){
+		ProductStepSchedule newPSS= new ProductStepSchedule(step, timeslot);
 		
+		if (schedule.size() == 0 ){
+			schedule.add(newPSS);
+			return;
+		}
+		
+		
+		//new schedule is after all the other scheduled steps
+		if(newPSS.getStartTimeSlot() > schedule.get(schedule.size()-1).getStartTimeSlot()){
+			schedule.add(newPSS);
+			return;
+		}
+		
+		//new step is at the first time
+		if (newPSS.getStartTimeSlot() < schedule.get(0).getStartTimeSlot()){
+			schedule.add(0,newPSS);
+			return;
+		}
+		
+		
+		// new step has to be somewhere in between the rest of the planned steps
+		ProductStepSchedule curProductStepSchedule = schedule.get(0);
+		ProductStepSchedule prevProductStepSchedule = curProductStepSchedule;
+		
+		for ( int iPlannedSteps = 1; iPlannedSteps < schedule.size(); iPlannedSteps++){
+			curProductStepSchedule = schedule.get(iPlannedSteps);
+			if (newPSS.getStartTimeSlot() < curProductStepSchedule.getStartTimeSlot() && 
+					newPSS.getStartTimeSlot() > prevProductStepSchedule.getStartTimeSlot() + prevProductStepSchedule.getDuration() -1){
+					schedule.add(iPlannedSteps, newPSS);
+					return;
+			}
+			prevProductStepSchedule = curProductStepSchedule;
+		}
+		
+		System.err.println("A step could not be added to the schedule, it does not fit anywhere in the schedule.");
 	}
 	
 	public void removeFromSchedule(ProductStep step){
-		
+		schedule.remove(step);
 	}
 	
-	private void parseEquipletCSV(String[][] fields){
-		
-	}
-
 	@Override
 	public void update(long time) {
-		// TODO Auto-generated method stub
 		
+		long currentTimeSlot = TimeSlot.getTimeSlotFromMillis(simulation, time);
+		//update the schedule 
+		if (schedule.size() > 0){
+			if (equipletState == EquipletState.Working){
+				ProductStepSchedule curProductStepSchedule = schedule.get(0);
+				if (curProductStepSchedule.getStartTimeSlot() + curProductStepSchedule.getDuration() -1 < currentTimeSlot){
+					//the step is done
+					schedule.remove(0);
+					equipletState = EquipletState.Idle;
+					//TODO: Set the product step on done 
+					//notify the product object?
+				}
+			}
+			if (equipletState == EquipletState.Idle){
+				ProductStepSchedule curProductStepSchedule = schedule.get(0);
+				if ( currentTimeSlot == curProductStepSchedule.getStartTimeSlot()){
+					equipletState = EquipletState.Working;
+					//TODO: set the product step on working
+				}
+			}
+		}
+		
+		//TODO: check if an error has to be initiated 
+	}
+	
+	@Override
+	public String toString(){
+		String result = "name: " + equipletName + ", capabilities: [";
+		for (Capability cap : capabilities){
+			result += cap.getName() + ",";
+		}
+		result += "], reservedFor: " + reservedFor;
+		return result;
+	}
+	
+
+	private void parseEquipletJson(JsonObject arguments){
+		System.out.println("Parsing");
+		equipletName = arguments.get("name").getAsString();
+		
+		JsonArray caps= arguments.get("capabilities").getAsJsonArray();
+		capabilities = new Capability[caps.size()];
+		for ( int iCaps = 0; iCaps < caps.size(); iCaps ++){
+			capabilities[iCaps] =  Capability.getCapabilityById(caps.get(iCaps).getAsInt());
+		}
+		reservedFor = arguments.get("reservedFor").getAsInt();
 	}
 }

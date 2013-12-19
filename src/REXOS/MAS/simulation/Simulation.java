@@ -44,6 +44,10 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class Simulation implements Runnable{
+	
+	private long firstTimeSlot = 1387360454938l;
+	private long timeSlotLength = 10l;
+	
 	private boolean isRunning = false;
 	private double interval = 0.0; // seconds
 	private double turnTime = 0.01; // seconds
@@ -122,5 +126,13 @@ public class Simulation implements Runnable{
 			}
 		}
 		// exit simulation thread
+	}
+	
+	public long getFirstTimeSlot() {
+		return firstTimeSlot;
+	}
+	
+	public long getTimeSlotLength() {
+		return timeSlotLength;
 	}
 }

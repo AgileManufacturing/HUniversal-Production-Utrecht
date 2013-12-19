@@ -44,9 +44,6 @@ import java.util.Date;
 import simulation.Simulation;
 
 public class TimeSlot {
-
-	public static long FIRST_TIMESLOT = 1387360454938l;
-	public static long TIMESLOT_LENGTH = 10l;
 	
 	private long startTimeSlot;
 	private Long duration;
@@ -62,11 +59,15 @@ public class TimeSlot {
 	}
 
 	public static long getCurrentTimeSlot(Simulation simulation){
-		return (simulation.getCurrentSimulationTime() - FIRST_TIMESLOT) / TIMESLOT_LENGTH;
+		return (simulation.getCurrentSimulationTime() - simulation.getFirstTimeSlot()) / simulation.getTimeSlotLength();
 	}
 	
-	public Date getDate(){
-		return new Date(startTimeSlot + FIRST_TIMESLOT * TIMESLOT_LENGTH);
+	public static long getTimeSlotFromMillis(Simulation simulation, long millis){
+		return (millis - simulation.getFirstTimeSlot()) / simulation.getTimeSlotLength();
+	}
+	
+	public Date getDate(Simulation simulation){
+		return new Date(startTimeSlot + simulation.getFirstTimeSlot() * simulation.getTimeSlotLength());
 	}
 	
 	public long getStartTimeSlot(){
