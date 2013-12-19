@@ -46,9 +46,9 @@ import java.util.Calendar;
 import java.util.Date;
 
 import simulation.data.Capability;
+import simulation.data.ProductStep;
 import simulation.mas_entities.Grid;
 import simulation.mas_entities.Product;
-import simulation.mas_entities.ProductStep;
 
 public class ProductSpawner implements Updatable {
 	private static final String pathToProductCsvFile = "/home/t/sim/productA.csv";

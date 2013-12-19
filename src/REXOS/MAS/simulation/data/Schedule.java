@@ -1,7 +1,6 @@
 package simulation.data;
 
 import simulation.mas_entities.Equiplet;
-import simulation.mas_entities.ProductStep;
 
 public class Schedule {
 	private ProductStep productStep;

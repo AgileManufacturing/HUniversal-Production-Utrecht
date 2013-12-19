@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 
 import simulation.Simulation;
 import simulation.Updatable;
+import simulation.data.ProductStep;
 import simulation.data.Schedule;
 import simulation.data.TimeSlot;
 import agents.data_classes.Matrix;

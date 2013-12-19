@@ -37,9 +37,8 @@
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package simulation.mas_entities;
+package simulation.data;
 
-import simulation.data.Capability;
 
 public class ProductStep {
 	private Capability capability;

@@ -49,6 +49,7 @@ import com.google.gson.JsonObject;
 import simulation.Simulation;
 import simulation.Updatable;
 import simulation.data.Capability;
+import simulation.data.ProductStep;
 import simulation.data.ProductStepSchedule;
 import simulation.data.TimeSlot;
 
@@ -137,7 +138,6 @@ public class Equiplet implements Updatable{
 			return;
 		}
 		
-		
 		//new schedule is after all the other scheduled steps
 		if(newPSS.getStartTimeSlot() > schedule.get(schedule.size()-1).getStartTimeSlot()){
 			schedule.add(newPSS);
@@ -209,7 +209,6 @@ public class Equiplet implements Updatable{
 		result += "], reservedFor: " + reservedFor;
 		return result;
 	}
-	
 
 	private void parseEquipletJson(JsonObject arguments){
 		System.out.println("Parsing");

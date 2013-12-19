@@ -1,6 +1,5 @@
 package simulation.data;
 
-import simulation.mas_entities.ProductStep;
 
 public class ProductStepSchedule {
 	
