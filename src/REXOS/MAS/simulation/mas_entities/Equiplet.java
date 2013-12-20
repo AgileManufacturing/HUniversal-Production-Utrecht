@@ -48,6 +48,7 @@ import com.google.gson.JsonObject;
 import simulation.Simulation;
 import simulation.Updatable;
 import simulation.data.Capability;
+import simulation.data.EquipletError;
 import simulation.data.GridProperties;
 import simulation.data.ProductStep;
 import simulation.data.ProductStepSchedule;
@@ -66,6 +67,8 @@ public class Equiplet implements Updatable{
 	private Capability[] capabilities;
 	private String equipletName;
 	private int reservedFor = 0;
+	
+	private EquipletError[] equipletErrors;
 	
 	private GridProperties gridProperties;
 	
@@ -140,7 +143,7 @@ public class Equiplet implements Updatable{
 		
 		//nothing is scheduled so just give it back with indefinite duration
 		if (schedule.size() == 0 ) {
-			return new TimeSlot(startTimeSlot + 1, null);
+			return new TimeSlot(startTimeSlot + 1, -1);
 		}
 		else{
 			ProductStepSchedule curProductStepSchedule = schedule.get(0);
@@ -162,7 +165,7 @@ public class Equiplet implements Updatable{
 			}
 			
 			//we have no other space then at the end of the schedule
-			return new TimeSlot(schedule.get(schedule.size()-1).getStartTimeSlot() + schedule.get(schedule.size()-1).getDuration(), null);
+			return new TimeSlot(schedule.get(schedule.size()-1).getStartTimeSlot() + schedule.get(schedule.size()-1).getDuration(), -1);
 		}
 	}
 	
@@ -215,6 +218,13 @@ public class Equiplet implements Updatable{
 	public void update(long time) {
 		
 		long currentTimeSlot = TimeSlot.getTimeSlotFromMillis(gridProperties, time);
+		//check if an error has occurred
+		for (EquipletError eqError : equipletErrors){
+			if (eqError.startTime == currentTimeSlot){
+				
+			}
+		}
+		
 		//update the schedule 
 		if (schedule.size() > 0){
 			if (equipletState == EquipletState.Working){
@@ -236,7 +246,6 @@ public class Equiplet implements Updatable{
 			}
 		}
 		
-		//TODO: check if an error has to be initiated 
 	}
 	
 	@Override
@@ -259,5 +268,11 @@ public class Equiplet implements Updatable{
 			capabilities[iCaps] =  Capability.getCapabilityById(caps.get(iCaps).getAsInt());
 		}
 		reservedFor = arguments.get("reservedFor").getAsInt();
+		
+		JsonArray errors = arguments.get("equipletErrors").getAsJsonArray();
+		equipletErrors = new EquipletError[errors.size()];
+		for (int iErrors = 0 ; iErrors < errors.size(); iErrors++){
+			equipletErrors[iErrors] = new EquipletError(errors.get(iErrors).getAsJsonObject());
+		}
 	}
 }

@@ -46,14 +46,14 @@ import simulation.Simulation;
 public class TimeSlot {
 	
 	private long startTimeSlot;
-	private Long duration;
+	private long duration;
 
 	public TimeSlot(TimeSlot timeSlot){
 		this.startTimeSlot = timeSlot.getStartTimeSlot();
 		this.duration = timeSlot.getDuration();
 	}
 
-	public TimeSlot(long timeSlot, Long duration){
+	public TimeSlot(long timeSlot, long duration){
 		this.startTimeSlot = timeSlot;
 		this.duration = duration;
 	}
@@ -74,7 +74,7 @@ public class TimeSlot {
 		return startTimeSlot;
 	}
 	
-	public Long getDuration(){
+	public long getDuration(){
 		return duration;
 	}
 }
