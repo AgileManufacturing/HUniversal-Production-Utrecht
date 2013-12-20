@@ -229,14 +229,16 @@ public class Equiplet implements Updatable{
 		if (schedule.size() > 0){
 			if (equipletState == EquipletState.Working){
 				ProductStepSchedule curProductStepSchedule = schedule.get(0);
-				if (curProductStepSchedule.getStartTimeSlot() + curProductStepSchedule.getDuration() -1 < currentTimeSlot){
+				if (curProductStepSchedule.getStartTimeSlot() + curProductStepSchedule.getDuration() < currentTimeSlot){
 					//the step is done
 					schedule.remove(0);
 					equipletState = EquipletState.Idle;
-					//TODO: Set the product step on done 
-					//notify the product object?
+					//notify the product object
+					curProductStepSchedule.getProductStep().setFinished(true);
 				}
 			}
+		}
+		if (schedule.size() > 0){
 			if (equipletState == EquipletState.Idle){
 				ProductStepSchedule curProductStepSchedule = schedule.get(0);
 				if ( currentTimeSlot == curProductStepSchedule.getStartTimeSlot()){

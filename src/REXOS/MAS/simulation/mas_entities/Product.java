@@ -7,6 +7,7 @@ import simulation.Simulation;
 import simulation.Updatable;
 import simulation.data.GridProperties;
 import simulation.data.ProductStep;
+import simulation.data.ProductStep.StepState;
 import simulation.data.Schedule;
 import simulation.data.TimeSlot;
 import agents.data_classes.Matrix;
@@ -161,6 +162,12 @@ public class Product implements Updatable{
 		long currentTimeSlot = TimeSlot.getCurrentTimeSlot(simulation, grid.getGridProperties());
 		//so now we have a newProductSteps and finalSchedules. Lets try to schedule again.
 		schedule(currentTimeSlot, generateScheduleMatrix(equiplets, (ProductStep[])newProductSteps.toArray(), currentTimeSlot));
+	}
+	
+	public void updateStep(ProductStep productStep, StepState stepState){
+		//wat moet ik nu doen met deze update?
+		
+		//
 	}
 
 	@Override

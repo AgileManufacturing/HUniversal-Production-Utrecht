@@ -41,6 +41,16 @@ package simulation.data;
 
 
 public class ProductStep {
+	
+	public enum StepState{
+		Working,
+		ScheduleError,
+		ProductError,
+		Finished,
+		Scheduled,
+		Evaluating
+	}
+	
 	private Capability capability;
 	private long duration;
 	private boolean finished;
