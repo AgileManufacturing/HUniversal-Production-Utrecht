@@ -46,7 +46,7 @@ import java.util.Date;
 public class Simulation implements Runnable{
 	
 	private boolean isRunning = false;
-	private double interval = 0.0; // seconds
+	private double interval = 0.01; // seconds
 	private double turnTime = 0.01; // seconds
 	
 	private long turn = 0;
@@ -71,15 +71,15 @@ public class Simulation implements Runnable{
 		thread.start();
 	}
 	
-	public long getCurrentSimulationTime() {
+	public synchronized long getCurrentSimulationTime() {
 		return currentSimulationTime;
 	}
 	
-	public long getStartSimulationTime() {
+	public synchronized long getStartSimulationTime() {
 		return startSimulationTime;
 	}
 	
-	public void addUpdateable(Updatable updateable) {
+	public synchronized void addUpdateable(Updatable updateable) {
 		updateablesToBeAdded.add(updateable);
 	}
 	
@@ -99,7 +99,7 @@ public class Simulation implements Runnable{
 				// update the time
 				currentSimulationTime += turnTime * 1000;
 				
-				//System.out.println("--- Simulation: turn " + turn + " time " + currentSimulationTime);
+				System.out.println("--- Simulation: turn " + turn + " time " + currentSimulationTime);
 				
 				// update simulation
 				for (Updatable updateable : updateables) {
@@ -119,7 +119,10 @@ public class Simulation implements Runnable{
 				} else {
 					// no need to sleep at all
 				}
-				updateables.addAll(updateablesToBeAdded);
+				
+				while(updateablesToBeAdded.size() != 0) {
+					updateables.add(updateablesToBeAdded.remove(0));
+				}
 			}
 		}
 		// exit simulation thread
