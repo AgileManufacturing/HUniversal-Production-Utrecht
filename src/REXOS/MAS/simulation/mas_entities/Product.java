@@ -99,7 +99,7 @@ public class Product implements Updatable{
 
 	private void schedule(long currentTimeSlot, Matrix scheduleMatrix) {
 		// Read the matrix. Write function to iterate each seperate row ( productsteps ) and pick each equiplet 
-		Equiplet previousEquiplet, currentEquiplet;
+		Equiplet previousEquiplet, currentEquiplet = null;
 		for (int column = 0; column < scheduleMatrix.getNumberOfColumns(); column++) { //Productsteps 
 			
 			int highestEquipletScoreIndex = -1;
@@ -120,7 +120,12 @@ public class Product implements Updatable{
 				return;
 			}
 			
+			if(currentEquiplet == null){ // first iteration
+				currentEquiplet = equiplets[0];
+			}
+			
 			//Can we assume that all productSteps are ordered? What about parallel steps? Lets get the equiplet.
+			previousEquiplet = currentEquiplet;
 			currentEquiplet = equiplets[highestEquipletScoreIndex]; //this might not work.
 			
 			//Get first free timeslot
@@ -132,6 +137,9 @@ public class Product implements Updatable{
 			
 			//add the time to the currenttimeslot
 			currentTimeSlot += productStep.getCapability().getDuration();
+			
+			//transportdistance
+			currentTimeSlot += grid.getDistanceBetweenEquiplets(previousEquiplet, currentEquiplet);
 		}
 		// Message all the equiplets with their correspondig equiplet steps
 		for (ProductStep step : finalSchedules.keySet()) {
@@ -166,8 +174,16 @@ public class Product implements Updatable{
 	
 	public void updateStep(ProductStep productStep, StepState stepState){
 		//wat moet ik nu doen met deze update?
-		
-		//
+		switch(stepState){
+		case Working:
+		case Finished:
+		case Scheduled:
+		case Evaluating:
+			productStep.setState(stepState);
+		break;
+		case ScheduleError:
+		case ProductError:
+		}
 	}
 
 	@Override

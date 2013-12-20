@@ -42,6 +42,8 @@ package simulation.mas_entities;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.omg.CORBA.PRIVATE_MEMBER;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -217,15 +219,40 @@ public class Equiplet implements Updatable{
 	@Override
 	public void update(long time) {
 		
-		long currentTimeSlot = TimeSlot.getTimeSlotFromMillis(gridProperties, time);
-		//check if an error has occurred
+		EquipletError worstError = null;
+		//check if an error has occurred and get the worst error ( the damaging type is the worsts)
 		for (EquipletError eqError : equipletErrors){
-			if (eqError.startTime == currentTimeSlot){
+			if (eqError.isActive(time)){
+				worstError = eqError;
+				if (worstError.damagesProduct){
+					break;
+				}
+			}
+		}
+		//process the error 
+		if (worstError != null){
+			if (equipletState == EquipletState.Working){
+				ProductStep pStep = schedule.get(0).getProductStep();
+				if (worstError.damagesProduct){
+					
+				}
+				else{
+					
+				}
 				
+				//notify product
+			}
+			equipletState = EquipletState.Error;
+		}
+		else{
+			//if there was an error that does not exist now, bring state to idle
+			if (equipletState == EquipletState.Error){
+				equipletState = EquipletState.Idle;
 			}
 		}
 		
-		//update the schedule 
+		long currentTimeSlot = TimeSlot.getTimeSlotFromMillis(gridProperties, time);
+		//update the schedule / simulate it is working
 		if (schedule.size() > 0){
 			if (equipletState == EquipletState.Working){
 				ProductStepSchedule curProductStepSchedule = schedule.get(0);
@@ -248,6 +275,10 @@ public class Equiplet implements Updatable{
 			}
 		}
 		
+	}
+	
+	public EquipletState getEquipletState(){
+		return equipletState;
 	}
 	
 	@Override
