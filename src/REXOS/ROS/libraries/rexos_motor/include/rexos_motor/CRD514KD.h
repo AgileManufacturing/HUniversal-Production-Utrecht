@@ -87,7 +87,10 @@ namespace rexos_motor{
 				BROADCAST = 0,
 				MOTOR_0 = 1,
 				MOTOR_1 = 2,
-				MOTOR_2 = 3
+				MOTOR_2 = 3,
+				MOTOR_3 = 4,
+				MOTOR_4 = 5,
+				MOTOR_5 = 6
 			} t;
 		}
 
