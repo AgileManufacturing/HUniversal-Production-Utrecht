@@ -4,11 +4,6 @@ project(simulation_node)
 ## Find catkin and any catkin packages
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs std_msgs message_generation gazebo_ros)
 
-file(GLOB_RECURSE msgs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/msg" "*.msg")
-add_message_files(
-DIRECTORY msg
-FILES ${msgs} )
-
 find_package(gazebo REQUIRED)
   	
 file(GLOB_RECURSE srvs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/srv" "*.srv")
