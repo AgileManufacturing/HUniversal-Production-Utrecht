@@ -5,11 +5,14 @@
 #include "ros/ros.h"
 #include <rexos_motor/CRD514KD.h>
 
-/** 
- * Main that creates the environment cache
- **/
+
+
 int main(int argc, char **argv){
-	while(true) {
+	ros::init(argc, argv, "motor_controller_configurator");
+	ros::start();
+	ros::Rate loop_rate(15);
+	
+	while(ros::ok()) {
 		rexos_modbus::ModbusController modbus = rexos_modbus::ModbusController(modbus_new_rtu(
 			"/dev/ttyS0",
 			rexos_motor::CRD514KD::RtuConfig::BAUDRATE,
@@ -58,7 +61,8 @@ int main(int argc, char **argv){
 			
 		}
 		
-		
+		ros::spinOnce();
+		loop_rate.sleep();
 	}	
 	return 0;
 }
