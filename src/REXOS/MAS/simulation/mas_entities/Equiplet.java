@@ -55,6 +55,7 @@ import simulation.data.GridProperties;
 import simulation.data.ProductStep;
 import simulation.data.ProductStepSchedule;
 import simulation.data.TimeSlot;
+import simulation.data.ProductStep.StepState;
 
 public class Equiplet implements Updatable{
 	
@@ -175,18 +176,18 @@ public class Equiplet implements Updatable{
 		return true;
 	}
 	
-	public void schedule(ProductStep step, TimeSlot timeslot){
+	public boolean schedule(ProductStep step, TimeSlot timeslot){
 		ProductStepSchedule newPSS= new ProductStepSchedule(step, timeslot);
 		
 		if (schedule.size() == 0 ){
 			schedule.add(newPSS);
-			return;
+			return true;
 		}
 		
 		//new step is at the first time
 		if (newPSS.getStartTimeSlot() < schedule.get(0).getStartTimeSlot()){
 			schedule.add(0,newPSS);
-			return;
+			return true;
 		}
 		
 		// new step has to be somewhere in between the rest of the planned steps
@@ -198,7 +199,7 @@ public class Equiplet implements Updatable{
 			if (newPSS.getStartTimeSlot() < curProductStepSchedule.getStartTimeSlot() && 
 					newPSS.getStartTimeSlot() > prevProductStepSchedule.getStartTimeSlot() + prevProductStepSchedule.getDuration() -1){
 					schedule.add(iPlannedSteps, newPSS);
-					return;
+					return true;
 			}
 			prevProductStepSchedule = curProductStepSchedule;
 		}
@@ -206,10 +207,12 @@ public class Equiplet implements Updatable{
 		//new schedule is after all the other scheduled steps
 		if(newPSS.getStartTimeSlot() > schedule.get(schedule.size()-1).getStartTimeSlot()){
 			schedule.add(newPSS);
-			return;
+			return true;
 		}
 		
 		System.err.println("A step could not be added to the schedule, it does not fit anywhere in the schedule.");
+		
+		return false;
 	}
 	
 	public void removeFromSchedule(ProductStep step){
@@ -220,7 +223,7 @@ public class Equiplet implements Updatable{
 	public void update(long time) {
 		
 		EquipletError worstError = null;
-		//check if an error has occurred and get the worst error ( the damaging type is the worsts)
+		//check if an error has occurred and get the worst error ( the damaging type is the worst)
 		for (EquipletError eqError : equipletErrors){
 			if (eqError.isActive(time)){
 				worstError = eqError;
@@ -231,16 +234,16 @@ public class Equiplet implements Updatable{
 		}
 		//process the error 
 		if (worstError != null){
+			ArrayList<Product> notifiedProducts = new ArrayList<Product>();
 			if (equipletState == EquipletState.Working){
 				ProductStep pStep = schedule.get(0).getProductStep();
 				if (worstError.damagesProduct){
-					
+					pStep.getProduct().updateStep(pStep, StepState.ProductError);
 				}
 				else{
+					pStep.getProduct().updateStep(pStep, StepState.ScheduleError);
 					
 				}
-				
-				//notify product
 			}
 			equipletState = EquipletState.Error;
 		}
@@ -274,7 +277,6 @@ public class Equiplet implements Updatable{
 				}
 			}
 		}
-		
 	}
 	
 	public EquipletState getEquipletState(){
