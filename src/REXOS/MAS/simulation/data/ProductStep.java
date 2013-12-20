@@ -39,6 +39,7 @@
 
 package simulation.data;
 
+import simulation.mas_entities.Product;
 
 public class ProductStep {
 	
@@ -54,13 +55,21 @@ public class ProductStep {
 	private Capability capability;
 	private long duration;
 	private boolean finished;
+	private Product product;
+	private StepState state;
 	
 
-	public ProductStep(Capability capability){
+	public ProductStep(Product product, Capability capability){
 		this.capability = capability;
+		this.product = product;
+		this.state = StepState.Evaluating;
 		finished = false;
 	}
 	
+	public Product getProduct() {
+		return product;
+	}
+
 	public boolean isFinished() {
 		return finished;
 	}
@@ -79,6 +88,14 @@ public class ProductStep {
 	
 	public Capability getCapability(){
 		return capability;
+	}
+
+	public StepState getState() {
+		return state;
+	}
+
+	public void setState(StepState state) {
+		this.state = state;
 	}
 	
 }
