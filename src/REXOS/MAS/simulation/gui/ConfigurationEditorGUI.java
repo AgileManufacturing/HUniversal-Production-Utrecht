@@ -3,6 +3,7 @@ package simulation.gui;
 import jade.util.leap.Iterator;
 
 import java.awt.Dialog.ModalityType;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -13,6 +14,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -24,35 +26,38 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
+import simulation.data.BatchDescription;
+import simulation.data.Capability;
+import simulation.data.EquipletDescription;
+import simulation.data.ProductDescription;
+import simulation.mas_entities.Batch;
+import simulation.mas_entities.Product;
+import javax.swing.SwingConstants;
+
 public class ConfigurationEditorGUI extends JFrame {
 	Window win;
 	
-	LinkedHashMap<String, String> capabilities = new LinkedHashMap<String, String>();
-	DefaultListModel<String> capNames = new DefaultListModel<String>();
-
-	LinkedHashMap<String, LinkedHashMap<String, String>> batches = new LinkedHashMap<String, LinkedHashMap<String, String>>();
-	DefaultListModel<String> batchNames = new DefaultListModel<String>();
-
-	LinkedHashMap<String, LinkedHashMap<String, String>> products = new LinkedHashMap<String, LinkedHashMap<String, String>>();
-	DefaultListModel<String> productNames = new DefaultListModel<String>();
-
-	LinkedHashMap<String, LinkedHashMap<String, String>> equiplets = new LinkedHashMap<String, LinkedHashMap<String, String>>();
-	DefaultListModel<String> equipletNames = new DefaultListModel<String>();
+	DefaultListModel<Capability> capabilities = new DefaultListModel<Capability>();
+	DefaultListModel<BatchDescription> batches = new DefaultListModel<BatchDescription>();
+	DefaultListModel<ProductDescription> products = new DefaultListModel<ProductDescription>();
+	DefaultListModel<EquipletDescription> equiplets = new DefaultListModel<EquipletDescription>();
+	DefaultListModel<EquipletDescription> gridContent = new DefaultListModel<EquipletDescription>();
 
 	JPanel capPanel = new JPanel();
 
 	public ConfigurationEditorGUI() {
 		setTitle("Configuration Editor");
-		setSize(417, 308);
+		setSize(new Dimension(300, 800));
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
 		capPanel.setBorder(new TitledBorder(null, "Capability",
 				TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		getContentPane().add(capPanel);
 		win = SwingUtilities.getWindowAncestor(capPanel);
-		capPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		capPanel.setLayout(new BoxLayout(capPanel, BoxLayout.Y_AXIS));
+		
 
 		JButton addCap = new JButton("Create Capability");
 		addCap.addActionListener(new ActionListener() {
@@ -63,7 +68,7 @@ public class ConfigurationEditorGUI extends JFrame {
 		capPanel.add(addCap);
 
 		JList capList = new JList();
-		capList.setModel(capNames);
+		capList.setModel(capabilities);
 		capList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		JScrollPane capListPane = new JScrollPane(capList);
@@ -73,7 +78,7 @@ public class ConfigurationEditorGUI extends JFrame {
 		prodPanel.setBorder(new TitledBorder(null, "Product",
 				TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		getContentPane().add(prodPanel);
-		prodPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		prodPanel.setLayout(new BoxLayout(prodPanel, BoxLayout.Y_AXIS));
 
 		JButton addProd = new JButton("Create Product");
 		addProd.addActionListener(new ActionListener() {
@@ -84,7 +89,7 @@ public class ConfigurationEditorGUI extends JFrame {
 		prodPanel.add(addProd);
 
 		JList productList = new JList();
-		productList.setModel(productNames);
+		productList.setModel(products);
 		productList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		JScrollPane productListPane = new JScrollPane(productList);
@@ -94,7 +99,7 @@ public class ConfigurationEditorGUI extends JFrame {
 		batchPanel.setBorder(new TitledBorder(null, "Batch",
 				TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		getContentPane().add(batchPanel);
-		batchPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		batchPanel.setLayout(new BoxLayout(batchPanel, BoxLayout.Y_AXIS));
 
 		JButton addBatch = new JButton("Create Batch");
 		addBatch.addActionListener(new ActionListener() {
@@ -105,7 +110,7 @@ public class ConfigurationEditorGUI extends JFrame {
 		batchPanel.add(addBatch);
 
 		JList batchList = new JList();
-		batchList.setModel(batchNames);
+		batchList.setModel(batches);
 		batchList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		JScrollPane batchListPane = new JScrollPane(batchList);
@@ -115,7 +120,7 @@ public class ConfigurationEditorGUI extends JFrame {
 		eqPanel.setBorder(new TitledBorder(null, "Equiplet",
 				TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		getContentPane().add(eqPanel);
-		eqPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		eqPanel.setLayout(new BoxLayout(eqPanel, BoxLayout.Y_AXIS));
 
 		JButton addEquiplet = new JButton("Create Equiplet");
 		addEquiplet.addActionListener(new ActionListener() {
@@ -126,7 +131,7 @@ public class ConfigurationEditorGUI extends JFrame {
 		eqPanel.add(addEquiplet);
 
 		JList eqList = new JList();
-		eqList.setModel(equipletNames);
+		eqList.setModel(equiplets);
 		eqList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		JScrollPane eqListPane = new JScrollPane(eqList);
@@ -136,7 +141,7 @@ public class ConfigurationEditorGUI extends JFrame {
 		gridPanel.setBorder(new TitledBorder(null, "Grid",
 				TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		getContentPane().add(gridPanel);
-		gridPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		gridPanel.setLayout(new BoxLayout(gridPanel, BoxLayout.Y_AXIS));
 
 		JButton addGrid = new JButton("Create Grid");
 		addEquiplet.addActionListener(new ActionListener() {
@@ -145,98 +150,113 @@ public class ConfigurationEditorGUI extends JFrame {
 			}
 		});
 		gridPanel.add(addGrid);
-
+		
 		JList gridList = new JList();
-		gridList.setModel(equipletNames);
+		gridList.setModel(gridContent);
 		gridList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		JScrollPane gridListPane = new JScrollPane(gridList);
 		gridPanel.add(gridListPane);
+		
+		JPanel buttonPanel = new JPanel();
+		getContentPane().add(buttonPanel);
+		
+		JButton exportButton = new JButton("Export Files");
+		exportButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				writeBatchesCSV();
+				writeCapabilitiesCSV();
+				writeGridJSON();
+				writeProductsCSV();
+			}
+		});
+		buttonPanel.add(exportButton);
 	}
 
 	protected void showCapabilityDialog() {
 		if (win != null) {
-			JDialog dialog = new JDialog(win, "Create new capability",
-					ModalityType.APPLICATION_MODAL);
-			CreateCapabilityDialog capDialog = new CreateCapabilityDialog();
-			dialog.getContentPane().add(capDialog);
+			CreateCapabilityDialog dialog = new CreateCapabilityDialog(win, "Create new capability", ModalityType.APPLICATION_MODAL);
 			dialog.pack();
 			dialog.setLocationRelativeTo(null); // fix this
-
 			dialog.setVisible(true);
 
-			// add new capability to the list
-			capabilities.put(capDialog.getCapabilityName(),
-					capDialog.getCapabilityDuration());
-			capNames.addElement(capDialog.getCapabilityName());
+			if(dialog.isSuccess) {
+				capabilities.addElement(dialog.getCapability());
+			}
 		}
 	}
 
 	protected void showBatchDialog() {
 		if (win != null) {
-			JDialog dialog = new JDialog(win, "Create new batch",
-					ModalityType.APPLICATION_MODAL);
-			CreateBatchDialog batchDialog = new CreateBatchDialog();
-			dialog.getContentPane().add(batchDialog);
+			CreateBatchDialog dialog = new CreateBatchDialog(win, "Create new batch", ModalityType.APPLICATION_MODAL, products);
 			dialog.pack();
 			dialog.setLocationRelativeTo(null); // fix this
-
 			dialog.setVisible(true);
-			
-			writeCapabilitiesCSV();
-			
-//			batches.put(batchDialog.getBatchName(), batchDialog.getValues());
-//			batchNames.addElement(batchDialog.getBatchName());
+
+			if(dialog.isSuccess) {
+				batches.addElement(dialog.getBatch());
+			}
 		}
 	}
 
 	protected void showEquipletDialog() {
 		if (win != null) {
-			JDialog dialog = new JDialog(win, "Create new equiplet",
-					ModalityType.APPLICATION_MODAL);
-			CreateEquipletDialog eqDialog = new CreateEquipletDialog();
-			dialog.getContentPane().add(eqDialog);
+			CreateEquipletDialog dialog = new CreateEquipletDialog(win, "Create new equiplet", ModalityType.APPLICATION_MODAL, capabilities, batches);
 			dialog.pack();
 			dialog.setLocationRelativeTo(null); // fix this
-
 			dialog.setVisible(true);
-			
-//			equiplets.put(eqDialog.getEquipletName(), eqDialog.getValues());
-//			equipletNames.addElement(eqDialog.getEquipletName());
+
+			if(dialog.isSuccess) {
+				equiplets.addElement(dialog.getEquiplet());
+			}
 		}
 	}
 
 	protected void showProductDialog() {
 		if (win != null) {
-			JDialog dialog = new JDialog(win, "Create new product",
-					ModalityType.APPLICATION_MODAL);
-			CreateProductDialog productDialog = new CreateProductDialog();
-			dialog.getContentPane().add(productDialog);
+			CreateProductDialog dialog = new CreateProductDialog(win, "Create new product", ModalityType.APPLICATION_MODAL, capabilities);
 			dialog.pack();
 			dialog.setLocationRelativeTo(null); // fix this
-
 			dialog.setVisible(true);
-			
-//			products.put(productDialog.getProductName(), productDialog.getValues());
-//			productNames.addElement(productDialog.getProductName());
+
+			if(dialog.isSuccess) {
+				products.addElement(dialog.getProduct());
+			}
 		}
 	}
 	
 	protected void showGridDialog() {
+		/*
 		if (win != null) {
-			JDialog dialog = new JDialog(win, "Create new grid",
-					ModalityType.APPLICATION_MODAL);
-			CreateGridDialog gridDialog = new CreateGridDialog();
-			dialog.getContentPane().add(gridDialog);
+			CreateCapabilityDialog dialog = new CreateCapabilityDialog(win, "Create new capability", ModalityType.APPLICATION_MODAL, equiplets);
 			dialog.pack();
 			dialog.setLocationRelativeTo(null); // fix this
-
 			dialog.setVisible(true);
-		}
+
+			if(dialog.isSuccess) {
+				capabilities.addElement(dialog.getCapability());
+				writeCapabilitiesCSV();
+			}
+		}*/
 	}
 	
 	private void writeProductsCSV() {
-		
+		try {
+			PrintWriter writer = new PrintWriter("products.csv", "UTF-8");
+			
+			for (int i = 0; i < products.getSize(); i++) {
+				writer.write(products.getElementAt(i).toCsvString());
+			}
+			
+			writer.flush();
+			writer.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void writeGridJSON() {
@@ -247,12 +267,8 @@ public class ConfigurationEditorGUI extends JFrame {
 		try {
 			PrintWriter writer = new PrintWriter("capabilities.csv", "UTF-8");
 			
-			java.util.Iterator<Entry<String, String>> it = capabilities.entrySet().iterator();
-			int id = 0;
-			while(it.hasNext()) {
-				Entry<String, String> entry = it.next();
-				writer.write(id + "," + entry.getKey() + "," + entry.getValue() + "\r\n");
-				id++;
+			for (int i = 0; i < capabilities.getSize(); i++) {
+				writer.write(capabilities.getElementAt(i).toCsvString());
 			}
 			
 			writer.flush();
@@ -267,7 +283,22 @@ public class ConfigurationEditorGUI extends JFrame {
 	}
 	
 	private void writeBatchesCSV() {
-		
+		try {
+			PrintWriter writer = new PrintWriter("batches.csv", "UTF-8");
+			
+			for (int i = 0; i < batches.getSize(); i++) {
+				writer.write(batches.getElementAt(i).toCsvString());
+			}
+			
+			writer.flush();
+			writer.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public static void main(String[] args) {

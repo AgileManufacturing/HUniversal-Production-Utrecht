@@ -71,4 +71,8 @@ public class ProductStep {
 		return capability;
 	}
 	
+	public String toString() {
+		return "" + capability;
+	}
+	
 }
