@@ -42,16 +42,20 @@ package simulation.mas_entities;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.omg.CORBA.PRIVATE_MEMBER;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import simulation.Simulation;
 import simulation.Updatable;
 import simulation.data.Capability;
+import simulation.data.EquipletError;
 import simulation.data.GridProperties;
 import simulation.data.ProductStep;
 import simulation.data.ProductStepSchedule;
 import simulation.data.TimeSlot;
+import simulation.data.ProductStep.StepState;
 
 public class Equiplet implements Updatable{
 	
@@ -66,6 +70,8 @@ public class Equiplet implements Updatable{
 	private Capability[] capabilities;
 	private String equipletName;
 	private int reservedFor = 0;
+	
+	private EquipletError[] equipletErrors;
 	
 	private GridProperties gridProperties;
 	
@@ -140,7 +146,7 @@ public class Equiplet implements Updatable{
 		
 		//nothing is scheduled so just give it back with indefinite duration
 		if (schedule.size() == 0 ) {
-			return new TimeSlot(startTimeSlot + 1, null);
+			return new TimeSlot(startTimeSlot + 1, -1);
 		}
 		else{
 			ProductStepSchedule curProductStepSchedule = schedule.get(0);
@@ -162,7 +168,7 @@ public class Equiplet implements Updatable{
 			}
 			
 			//we have no other space then at the end of the schedule
-			return new TimeSlot(schedule.get(schedule.size()-1).getStartTimeSlot() + schedule.get(schedule.size()-1).getDuration(), null);
+			return new TimeSlot(schedule.get(schedule.size()-1).getStartTimeSlot() + schedule.get(schedule.size()-1).getDuration(), -1);
 		}
 	}
 	
@@ -170,18 +176,18 @@ public class Equiplet implements Updatable{
 		return true;
 	}
 	
-	public void schedule(ProductStep step, TimeSlot timeslot){
+	public boolean schedule(ProductStep step, TimeSlot timeslot){
 		ProductStepSchedule newPSS= new ProductStepSchedule(step, timeslot);
 		
 		if (schedule.size() == 0 ){
 			schedule.add(newPSS);
-			return;
+			return true;
 		}
 		
 		//new step is at the first time
 		if (newPSS.getStartTimeSlot() < schedule.get(0).getStartTimeSlot()){
 			schedule.add(0,newPSS);
-			return;
+			return true;
 		}
 		
 		// new step has to be somewhere in between the rest of the planned steps
@@ -193,7 +199,7 @@ public class Equiplet implements Updatable{
 			if (newPSS.getStartTimeSlot() < curProductStepSchedule.getStartTimeSlot() && 
 					newPSS.getStartTimeSlot() > prevProductStepSchedule.getStartTimeSlot() + prevProductStepSchedule.getDuration() -1){
 					schedule.add(iPlannedSteps, newPSS);
-					return;
+					return true;
 			}
 			prevProductStepSchedule = curProductStepSchedule;
 		}
@@ -201,10 +207,12 @@ public class Equiplet implements Updatable{
 		//new schedule is after all the other scheduled steps
 		if(newPSS.getStartTimeSlot() > schedule.get(schedule.size()-1).getStartTimeSlot()){
 			schedule.add(newPSS);
-			return;
+			return true;
 		}
 		
 		System.err.println("A step could not be added to the schedule, it does not fit anywhere in the schedule.");
+		
+		return false;
 	}
 	
 	public void removeFromSchedule(ProductStep step){
@@ -214,19 +222,53 @@ public class Equiplet implements Updatable{
 	@Override
 	public void update(long time) {
 		
+		EquipletError worstError = null;
+		//check if an error has occurred and get the worst error ( the damaging type is the worst)
+		for (EquipletError eqError : equipletErrors){
+			if (eqError.isActive(time)){
+				worstError = eqError;
+				if (worstError.damagesProduct){
+					break;
+				}
+			}
+		}
+		//process the error 
+		if (worstError != null){
+			ArrayList<Product> notifiedProducts = new ArrayList<Product>();
+			if (equipletState == EquipletState.Working){
+				ProductStep pStep = schedule.get(0).getProductStep();
+				if (worstError.damagesProduct){
+					pStep.getProduct().updateStep(pStep, StepState.ProductError);
+				}
+				else{
+					pStep.getProduct().updateStep(pStep, StepState.ScheduleError);
+					
+				}
+			}
+			equipletState = EquipletState.Error;
+		}
+		else{
+			//if there was an error that does not exist now, bring state to idle
+			if (equipletState == EquipletState.Error){
+				equipletState = EquipletState.Idle;
+			}
+		}
+		
 		long currentTimeSlot = TimeSlot.getTimeSlotFromMillis(gridProperties, time);
-		//update the schedule 
+		//update the schedule / simulate it is working
 		if (schedule.size() > 0){
 			if (equipletState == EquipletState.Working){
 				ProductStepSchedule curProductStepSchedule = schedule.get(0);
-				if (curProductStepSchedule.getStartTimeSlot() + curProductStepSchedule.getDuration() -1 < currentTimeSlot){
+				if (curProductStepSchedule.getStartTimeSlot() + curProductStepSchedule.getDuration() < currentTimeSlot){
 					//the step is done
 					schedule.remove(0);
 					equipletState = EquipletState.Idle;
-					//TODO: Set the product step on done 
-					//notify the product object?
+					//notify the product object
+					curProductStepSchedule.getProductStep().setFinished(true);
 				}
 			}
+		}
+		if (schedule.size() > 0){
 			if (equipletState == EquipletState.Idle){
 				ProductStepSchedule curProductStepSchedule = schedule.get(0);
 				if ( currentTimeSlot == curProductStepSchedule.getStartTimeSlot()){
@@ -235,8 +277,10 @@ public class Equiplet implements Updatable{
 				}
 			}
 		}
-		
-		//TODO: check if an error has to be initiated 
+	}
+	
+	public EquipletState getEquipletState(){
+		return equipletState;
 	}
 	
 	@Override
@@ -259,5 +303,11 @@ public class Equiplet implements Updatable{
 			capabilities[iCaps] =  Capability.getCapabilityById(caps.get(iCaps).getAsInt());
 		}
 		reservedFor = arguments.get("reservedFor").getAsInt();
+		
+		JsonArray errors = arguments.get("equipletErrors").getAsJsonArray();
+		equipletErrors = new EquipletError[errors.size()];
+		for (int iErrors = 0 ; iErrors < errors.size(); iErrors++){
+			equipletErrors[iErrors] = new EquipletError(errors.get(iErrors).getAsJsonObject());
+		}
 	}
 }
