@@ -51,6 +51,8 @@ public class Capability {
 	private String name;
 	private int durationInTimeslots;
 	
+	public static Capability DummyCapability = new Capability("Dummy Capability", 1); 
+	
 	private static int idCounter = 0;
 	private static HashMap<Integer, Capability> availableCapabilities = new HashMap<Integer, Capability>();
 	

@@ -1,21 +1,24 @@
 package simulation.gui;
 
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BoxLayout;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
 import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import simulation.data.Capability;
-import sun.java2d.Disposer;
-
-import java.awt.Window;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Component;
 
 public class CreateCapabilityDialog extends JDialog {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4057365795259631191L;
 	private JTextField capName;
 	private JTextField capDuration;
 	private JButton create;
@@ -46,8 +49,24 @@ public class CreateCapabilityDialog extends JDialog {
 		create = new JButton("Create");
 		create.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				isSuccess = true;
-				dispose();
+				boolean pass = true;
+				
+				if(capName.getText().equals("")) {
+					JOptionPane.showMessageDialog(null, "You must enter a name");
+					pass = false;
+				}
+				
+				try {
+					Integer.parseInt(capDuration.getText());
+				} catch (NumberFormatException e) {
+					JOptionPane.showMessageDialog(null, "Wrong format for Duration. Must be a number");
+					pass = false;
+				}
+				
+				if(pass) {
+					isSuccess = true;
+					dispose();
+				}
 			}
 		});
 		panel.add(create);

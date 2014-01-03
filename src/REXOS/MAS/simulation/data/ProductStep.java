@@ -58,6 +58,7 @@ public class ProductStep {
 	private Product product;
 	private StepState state;
 	
+	public static ProductStep DummyProductStep = new ProductStep(null, Capability.DummyCapability);
 
 	public ProductStep(Product product, Capability capability){
 		this.capability = capability;
@@ -65,9 +66,13 @@ public class ProductStep {
 		this.state = StepState.Evaluating;
 		finished = false;
 	}
-	
+
 	public Product getProduct() {
 		return product;
+	}
+	
+	public void setProduct(Product prod) {
+		product = prod;
 	}
 
 	public boolean isFinished() {

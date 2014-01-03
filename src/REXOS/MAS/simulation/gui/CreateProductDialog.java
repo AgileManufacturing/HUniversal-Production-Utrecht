@@ -5,12 +5,16 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -21,12 +25,11 @@ import simulation.data.Capability;
 import simulation.data.ProductDescription;
 import simulation.data.ProductStep;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
-
 public class CreateProductDialog extends JDialog {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6493937764076335161L;
 	private DefaultListModel<Capability> productSteps = new DefaultListModel<Capability>();
 	private DefaultListModel<Capability> capabilities;
 	public boolean isSuccess = false;
@@ -34,8 +37,8 @@ public class CreateProductDialog extends JDialog {
 	private JTextField txtDeadline;
 	private JTextField txtCount;
 	private JTextField txtInterval;
-	private JList capList = new JList();
-	private JList prodStepList = new JList();
+	private JList<Capability> capList = new JList<Capability>();
+	private JList<Capability> prodStepList = new JList<Capability>();
 
 	public CreateProductDialog(Window win, String title, ModalityType applicationModal, DefaultListModel<Capability> caps) {
 		super(win, title, applicationModal);
@@ -108,7 +111,9 @@ public class CreateProductDialog extends JDialog {
 		JButton addStep = new JButton("Queue");
 		addStep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				productSteps.addElement(capabilities.getElementAt(capList.getSelectedIndex()));
+				if(capList.getSelectedIndex() != -1) {
+					productSteps.addElement(capabilities.getElementAt(capList.getSelectedIndex()));
+				}
 			}
 		});
 		GridBagConstraints gbc_addStep = new GridBagConstraints();
@@ -120,7 +125,9 @@ public class CreateProductDialog extends JDialog {
 		JButton removeStep = new JButton("Remove");
 		removeStep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				prodStepList.remove(prodStepList.getSelectedIndex());
+				if(prodStepList.getSelectedIndex() != -1) {
+					productSteps.removeElementAt(prodStepList.getSelectedIndex());
+				}
 			}
 		});
 		GridBagConstraints gbc_removeStep = new GridBagConstraints();
@@ -145,8 +152,38 @@ public class CreateProductDialog extends JDialog {
 		JButton btnCreate = new JButton("Create");
 		btnCreate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				isSuccess = true;
-				dispose();
+				boolean pass = true;
+				
+				if(prodStepList.getModel().getSize() == 0) {
+					JOptionPane.showMessageDialog(null, "You must add product steps");
+					pass = false;
+				}
+				
+				try {
+					Integer.parseInt(txtCount.getText());
+				} catch (NumberFormatException e) {
+					JOptionPane.showMessageDialog(null, "Wrong format for Count. Must be a number");
+					pass = false;
+				}
+				
+				try {
+					Integer.parseInt(txtInterval.getText());
+				} catch (NumberFormatException e) {
+					JOptionPane.showMessageDialog(null, "Wrong format for Interval. Must be a number");
+					pass = false;
+				}
+				
+				try {
+					Duration.parseDurationString(txtDeadline.getText());
+				} catch (NumberFormatException e) {
+					JOptionPane.showMessageDialog(null, "Wrong format for Deadline. Format must be hours:minutes:seconds");
+					pass = false;
+				}
+				
+				if(pass) {
+					isSuccess = true;
+					dispose();
+				}
 			}
 		});
 		GridBagConstraints gbc_btnCreate = new GridBagConstraints();
@@ -175,10 +212,8 @@ public class CreateProductDialog extends JDialog {
 		
 		for(int i = 0; i < prodStepList.getModel().getSize(); i++) {
 			Capability capability = (Capability)prodStepList.getModel().getElementAt(i);
-			steps.add(new ProductStep(capability));
+			steps.add(new ProductStep(null, capability));
 		}
-		
-		System.out.println("Content: " + txtName.getText());
 		
 		if(txtName.getText().equals("")) {
 			productDescription = new ProductDescription(Duration.parseDurationString(txtDeadline.getText()), Integer.parseInt(txtCount.getText()), Integer.parseInt(txtInterval.getText()), steps);
@@ -188,5 +223,4 @@ public class CreateProductDialog extends JDialog {
 		
 		return productDescription;
 	}
-
 }

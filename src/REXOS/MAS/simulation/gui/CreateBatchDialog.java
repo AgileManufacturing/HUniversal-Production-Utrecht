@@ -1,39 +1,35 @@
 package simulation.gui;
 
-import java.awt.Dialog.ModalityType;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
 import simulation.data.BatchDescription;
-import simulation.data.Capability;
 import simulation.data.ProductDescription;
-import simulation.data.ProductStep;
-
-import java.awt.BorderLayout;
-
-import javax.swing.BoxLayout;
-import javax.swing.JTextField;
-
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-
-import javax.swing.JButton;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class CreateBatchDialog extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8717232835614496486L;
 	public boolean isSuccess = false;
 	private JTextField numRuns;
-	private JList prodList = new JList();
+	private JList<ProductDescription> prodList = new JList<ProductDescription>();
 	private DefaultListModel<ProductDescription> products;
 
 	public CreateBatchDialog(Window win, String title, 	ModalityType applicationModal, DefaultListModel<ProductDescription> products) {
@@ -77,8 +73,24 @@ public class CreateBatchDialog extends JDialog {
 		JButton btnCreate = new JButton("Create");
 		btnCreate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				isSuccess = true;
-				dispose();
+				boolean pass = true;
+				
+				try{
+					Integer.parseInt(numRuns.getText());
+				} catch (NumberFormatException e) {
+					pass = false;
+					JOptionPane.showMessageDialog(null, "Wrong format used for number of runs, must be a number.");
+				}
+				
+				if(prodList.getSelectedIndex() == -1) {
+					pass = false;
+					JOptionPane.showMessageDialog(null, "You must select a product");
+				}
+				
+				if(pass) {
+					isSuccess = true;
+					dispose();
+				}
 			}
 		});
 		GridBagConstraints gbc_btnCreate = new GridBagConstraints();
@@ -102,8 +114,8 @@ public class CreateBatchDialog extends JDialog {
 	}
 
 	public BatchDescription getBatch() {
-		int prodId = products.getElementAt(prodList.getSelectedIndex()).getId();
-		BatchDescription batchDescription = new BatchDescription(prodId, Integer.parseInt(numRuns.getText()));
+		ProductDescription product = products.getElementAt(prodList.getSelectedIndex());
+		BatchDescription batchDescription = new BatchDescription(product, Integer.parseInt(numRuns.getText()));
 		return batchDescription;
 	}
 

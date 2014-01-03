@@ -1,23 +1,16 @@
 package simulation.gui;
 
-import jade.util.leap.Iterator;
-
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
-
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -30,18 +23,21 @@ import simulation.data.BatchDescription;
 import simulation.data.Capability;
 import simulation.data.EquipletDescription;
 import simulation.data.ProductDescription;
-import simulation.mas_entities.Batch;
-import simulation.mas_entities.Product;
-import javax.swing.SwingConstants;
 
 public class ConfigurationEditorGUI extends JFrame {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5558864594487651654L;
+
 	Window win;
 	
-	DefaultListModel<Capability> capabilities = new DefaultListModel<Capability>();
-	DefaultListModel<BatchDescription> batches = new DefaultListModel<BatchDescription>();
-	DefaultListModel<ProductDescription> products = new DefaultListModel<ProductDescription>();
-	DefaultListModel<EquipletDescription> equiplets = new DefaultListModel<EquipletDescription>();
-	DefaultListModel<EquipletDescription> gridContent = new DefaultListModel<EquipletDescription>();
+	public DefaultListModel<Capability> capabilities = new DefaultListModel<Capability>();
+	public DefaultListModel<BatchDescription> batches = new DefaultListModel<BatchDescription>();
+	public DefaultListModel<ProductDescription> products = new DefaultListModel<ProductDescription>();
+	public DefaultListModel<EquipletDescription> equiplets = new DefaultListModel<EquipletDescription>();
+	public DefaultListModel<EquipletDescription> gridContent = new DefaultListModel<EquipletDescription>();
+	public EquipletDescription[][] grid;
 
 	JPanel capPanel = new JPanel();
 
@@ -51,6 +47,11 @@ public class ConfigurationEditorGUI extends JFrame {
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+		
+		capabilities.addElement(Capability.DummyCapability);
+		batches.addElement(BatchDescription.DummyBatch);
+		products.addElement(ProductDescription.DummyProduct);
+		equiplets.addElement(EquipletDescription.DummyEquiplet);
 
 		capPanel.setBorder(new TitledBorder(null, "Capability",
 				TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -67,7 +68,7 @@ public class ConfigurationEditorGUI extends JFrame {
 		});
 		capPanel.add(addCap);
 
-		JList capList = new JList();
+		JList<Capability> capList = new JList<Capability>();
 		capList.setModel(capabilities);
 		capList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -88,7 +89,7 @@ public class ConfigurationEditorGUI extends JFrame {
 		});
 		prodPanel.add(addProd);
 
-		JList productList = new JList();
+		JList<ProductDescription> productList = new JList<ProductDescription>();
 		productList.setModel(products);
 		productList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -109,7 +110,7 @@ public class ConfigurationEditorGUI extends JFrame {
 		});
 		batchPanel.add(addBatch);
 
-		JList batchList = new JList();
+		JList<BatchDescription> batchList = new JList<BatchDescription>();
 		batchList.setModel(batches);
 		batchList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -130,7 +131,7 @@ public class ConfigurationEditorGUI extends JFrame {
 		});
 		eqPanel.add(addEquiplet);
 
-		JList eqList = new JList();
+		JList<EquipletDescription> eqList = new JList<EquipletDescription>();
 		eqList.setModel(equiplets);
 		eqList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -144,14 +145,14 @@ public class ConfigurationEditorGUI extends JFrame {
 		gridPanel.setLayout(new BoxLayout(gridPanel, BoxLayout.Y_AXIS));
 
 		JButton addGrid = new JButton("Create Grid");
-		addEquiplet.addActionListener(new ActionListener() {
+		addGrid.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				showGridDialog();
 			}
 		});
 		gridPanel.add(addGrid);
 		
-		JList gridList = new JList();
+		JList<EquipletDescription> gridList = new JList<EquipletDescription>();
 		gridList.setModel(gridContent);
 		gridList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -226,18 +227,23 @@ public class ConfigurationEditorGUI extends JFrame {
 	}
 	
 	protected void showGridDialog() {
-		/*
 		if (win != null) {
-			CreateCapabilityDialog dialog = new CreateCapabilityDialog(win, "Create new capability", ModalityType.APPLICATION_MODAL, equiplets);
+			CreateGridDialog dialog = new CreateGridDialog(win, "Assemble Grid", ModalityType.APPLICATION_MODAL, equiplets);
 			dialog.pack();
 			dialog.setLocationRelativeTo(null); // fix this
 			dialog.setVisible(true);
 
 			if(dialog.isSuccess) {
-				capabilities.addElement(dialog.getCapability());
-				writeCapabilitiesCSV();
+				gridContent.clear();
+				grid = dialog.getGrid();
+				
+				for(int i = 0; i < grid.length; i++) {
+					for(int j = 0; j < grid[i].length; j++) {
+						gridContent.addElement(grid[i][j]);
+					}
+				}
 			}
-		}*/
+		}
 	}
 	
 	private void writeProductsCSV() {
@@ -251,16 +257,48 @@ public class ConfigurationEditorGUI extends JFrame {
 			writer.flush();
 			writer.close();
 		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void writeGridJSON() {
+		try {
+			PrintWriter writer = new PrintWriter("grid.json", "UTF-8");
+			
+			writer.write("{\n"
+					+ "\t\"grid\" : [\n");
+			
+			for (int i = 0; i < grid.length; i++) {
+				writer.write("\t\t[\n");
+				
+				for(int j = 0; j < grid[i].length; j++) {
+					writer.write(grid[i][j].toJsonString());
+					
+					if(j < grid[i].length - 1) {
+						writer.write("\n\t\t\t,\n");
+					}
+				}
+				
+				writer.write("\n\t\t]\n");
+				
+				if(i < grid.length - 1) {
+					writer.write("\t\t,\n");
+				}
+			}
+			
+			writer.write("\n}");
+			
+			writer.flush();
+			writer.close();
+		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	private void writeGridJSON() {
-		
 	}
 	
 	private void writeCapabilitiesCSV() {
