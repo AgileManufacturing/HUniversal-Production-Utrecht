@@ -6,16 +6,16 @@
  *           .MMMMMMM#=`.gNMMMMM.       \_| \_|\____/\/   \/ \___/ \____/
  *             7HMM9`   .MMMMMM#`		
  *                     ...MMMMMF .      
- *         dN.       .jMN, TMMM`.MM     	@file 	ProductStep.java
+ *         dN.       .jMN, TMMM`.MM     	@file 	TableUpdateThread.java
  *         .MN.      MMMMM;  ?^ ,THM		@brief 	...
- *          dM@      dMMM3  .ga...g,    	@date Created:	2013-12-17
+ *          dM@      dMMM3  .ga...g,    	@date Created:	2013-12-19
  *       ..MMM#      ,MMr  .MMMMMMMMr   
- *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Alexander Streng
+ *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Alexander Hustinx
  *   .dMMMMMF           7Y=d9  dMMMMMr    
  *  .MMMMMMF        JMMm.?T!   JMMMMM#		@section LICENSE
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	License:	newBSD
  *  MMMMMM@        dMMMMM, ?MMMMMMMMMF    
- *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright ï¿½ 2013, HU University of Applied Sciences Utrecht. 
+ *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright © 2013, HU University of Applied Sciences Utrecht. 
  *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		All rights reserved.
  *   WMMMMMMMMNNN,.TMMM@ .MMMMMMMM#`.M  
  *    JMMMMMMMMMMMN,?MD  TYYYYYYY= dM     
@@ -37,73 +37,75 @@
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package simulation.data;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.util.List;
 
-import simulation.mas_entities.Product;
+import javax.swing.JTable;
+import javax.swing.RowSorter;
+import javax.swing.SwingWorker;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
-public class ProductStep {
+class TableUpdateThread extends SwingWorker<Void, Void> {
+
+	public static final int PLACEHOLDER = 0;
+
+	private EquipletListFrame elf;
+	private JTable jTable;
 	
-	public enum StepState{
-		Working,
-		ScheduleError,
-		ProductError,
-		Finished,
-		Scheduled,
-		Evaluating
+	private boolean isPaused = false;
+
+	public TableUpdateThread(EquipletListFrame elf) {
+		super();
+		this.elf = elf;
+		System.out.println("[DEBUG]\t\tCreated TableUpdateThread");
+		
+		jTable = elf.getJTable();
 	}
+
+	@Override
+	public Void doInBackground() {
+		while (!isCancelled()) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			if (!isPaused) {
+				updateTable();
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return null;
+	}
+
+	// @ TODO Add actual data to the Table ...
+    public void updateTable(){
+    	jTable = elf.getJTable();
+    	DefaultTableModel model = (DefaultTableModel) jTable.getModel();
+    	model.addRow(new Object[]{"", "", 0.0, 0});
+    }
 	
-	private Capability capability;
-	private boolean finished;
-	private Product product;
-	private StepState state;
-	
-	public static ProductStep DummyProductStep = new ProductStep(null, Capability.DummyCapability);
-
-	public ProductStep(Product product, Capability capability){
-		this.capability = capability;
-		this.product = product;
-		this.state = StepState.Evaluating;
-		finished = false;
+	public void pause() {
+		isPaused = true;
+		System.out.println("[DEBUG]\t\tPaused TableUpdateThread");
 	}
 
-	public Product getProduct() {
-		return product;
-	}
-	
-	public void setProduct(Product prod) {
-		product = prod;
-	}
-
-	public boolean isFinished() {
-		return finished;
-	}
-
-	public void setFinished(boolean finished) {
-		this.finished = finished;
-	}
-
-	public long getDuration() {
-		return capability.getDuration();
-	}
-
-	/*public void setDuration(int duration) {
-		this.duration = duration;
-	}*/
-	
-	public Capability getCapability(){
-		return capability;
-	}
-
-	public StepState getState() {
-		return state;
-	}
-
-	public void setState(StepState state) {
-		this.state = state;
-	}
-	
-	public String toString() {
-		return "" + capability;
+	public void resume() {
+		isPaused = false;
+		System.out.println("[DEBUG]\t\tResumed TableUpdateThread");
 	}
 	
+	public boolean isPaused(){
+		return isPaused;
+	}
+
+	protected void done() {
+		System.out.println("[DEBUG]\t\tCancelled TableUpdateThread");
+	}
 }

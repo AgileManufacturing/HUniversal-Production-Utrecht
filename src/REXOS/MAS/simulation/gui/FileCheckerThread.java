@@ -6,16 +6,16 @@
  *           .MMMMMMM#=`.gNMMMMM.       \_| \_|\____/\/   \/ \___/ \____/
  *             7HMM9`   .MMMMMM#`		
  *                     ...MMMMMF .      
- *         dN.       .jMN, TMMM`.MM     	@file 	ProductStep.java
+ *         dN.       .jMN, TMMM`.MM     	@file 	FileCheckerThread.java
  *         .MN.      MMMMM;  ?^ ,THM		@brief 	...
- *          dM@      dMMM3  .ga...g,    	@date Created:	2013-12-17
+ *          dM@      dMMM3  .ga...g,    	@date Created:	2013-12-19
  *       ..MMM#      ,MMr  .MMMMMMMMr   
- *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Alexander Streng
+ *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Alexander Hustinx
  *   .dMMMMMF           7Y=d9  dMMMMMr    
  *  .MMMMMMF        JMMm.?T!   JMMMMM#		@section LICENSE
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	License:	newBSD
  *  MMMMMM@        dMMMMM, ?MMMMMMMMMF    
- *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright ï¿½ 2013, HU University of Applied Sciences Utrecht. 
+ *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright © 2013, HU University of Applied Sciences Utrecht. 
  *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		All rights reserved.
  *   WMMMMMMMMNNN,.TMMM@ .MMMMMMMM#`.M  
  *    JMMMMMMMMMMMN,?MD  TYYYYYYY= dM     
@@ -37,73 +37,51 @@
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package simulation.data;
+import javax.swing.SwingWorker;
 
-import simulation.mas_entities.Product;
+class FileCheckerThread extends SwingWorker<Void, Void> {
 
-public class ProductStep {
-	
-	public enum StepState{
-		Working,
-		ScheduleError,
-		ProductError,
-		Finished,
-		Scheduled,
-		Evaluating
-	}
-	
-	private Capability capability;
-	private boolean finished;
-	private Product product;
-	private StepState state;
-	
-	public static ProductStep DummyProductStep = new ProductStep(null, Capability.DummyCapability);
+	public static final int PLACEHOLDER = 0;
 
-	public ProductStep(Product product, Capability capability){
-		this.capability = capability;
-		this.product = product;
-		this.state = StepState.Evaluating;
-		finished = false;
+	private MainGUI mG;
+	private boolean isPaused = false;
+
+	public FileCheckerThread(MainGUI mG) {
+		super();
+		this.mG = mG;
+		System.out.println("[DEBUG]\t\tCreated FileCheckerThread");
 	}
 
-	public Product getProduct() {
-		return product;
-	}
-	
-	public void setProduct(Product prod) {
-		product = prod;
-	}
-
-	public boolean isFinished() {
-		return finished;
-	}
-
-	public void setFinished(boolean finished) {
-		this.finished = finished;
-	}
-
-	public long getDuration() {
-		return capability.getDuration();
+	@Override
+	public Void doInBackground() {
+		while (!isCancelled()) {
+			try {
+				Thread.sleep(5);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			if (!isPaused) {
+				mG.checkFiles();
+			}
+		}
+		return null;
 	}
 
-	/*public void setDuration(int duration) {
-		this.duration = duration;
-	}*/
-	
-	public Capability getCapability(){
-		return capability;
+	public void pause() {
+		isPaused = true;
+		System.out.println("[DEBUG]\t\tPaused FileCheckerThread");
 	}
 
-	public StepState getState() {
-		return state;
-	}
-
-	public void setState(StepState state) {
-		this.state = state;
+	public void resume() {
+		isPaused = false;
+		System.out.println("[DEBUG]\t\tResumed FileCheckerThread");
 	}
 	
-	public String toString() {
-		return "" + capability;
+	public boolean isPaused(){
+		return isPaused;
 	}
-	
+
+	protected void done() {
+		System.out.println("[DEBUG]\t\tCancelled FileCheckerThread");
+	}
 }

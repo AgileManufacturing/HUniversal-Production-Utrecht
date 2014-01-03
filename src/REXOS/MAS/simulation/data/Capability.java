@@ -51,6 +51,9 @@ public class Capability {
 	private String name;
 	private int durationInTimeslots;
 	
+	public static Capability DummyCapability = new Capability("Dummy Capability", 1); 
+	
+	private static int idCounter = 0;
 	private static HashMap<Integer, Capability> availableCapabilities = new HashMap<Integer, Capability>();
 	
 	public static void loadCapabilities(String capabilitiesFilePath) {
@@ -58,8 +61,15 @@ public class Capability {
 		parseCapabilitiesCSV(fields);
 	}
 	
+	/*
 	public Capability(int id, String name, int durationInTimeSlots){
 		this.id = id;
+		this.name = name;
+		this.durationInTimeslots = durationInTimeSlots;
+	}*/
+	
+	public Capability(String name, int durationInTimeSlots) {
+		id = idCounter++;
 		this.name = name;
 		this.durationInTimeslots = durationInTimeSlots;
 	}
@@ -76,14 +86,22 @@ public class Capability {
 		return durationInTimeslots;
 	}
 	
+	public String toCsvString() {
+		return id + "," + name + "," + durationInTimeslots + "\r\n";
+	}
+
+	public String toString() {
+		return name + " { " + durationInTimeslots + " }";
+	}
+	
 	public static void parseCapabilitiesCSV(String[][] fields){
 		try{
 			for(int i = 0; i < fields.length; i++) {
-				int capabilityId = Integer.parseInt(fields[i][0]);
-				String capabiityName = fields[i][1];
-				int capabilityDuration = Integer.parseInt(fields[i][2].trim());
+				String capabiityName = fields[i][0];
+				int capabilityDuration = Integer.parseInt(fields[i][1].trim());
+				Capability capability = new Capability(capabiityName, capabilityDuration);
 				
-				availableCapabilities.put(capabilityId, new Capability(capabilityId, capabiityName, capabilityDuration));
+				availableCapabilities.put(capability.getId(), capability);
 			}
 		} catch(NumberFormatException e){
 			System.err.println("Could not parse capabilties");

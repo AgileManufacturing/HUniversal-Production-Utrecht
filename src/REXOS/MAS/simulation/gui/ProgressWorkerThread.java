@@ -6,16 +6,16 @@
  *           .MMMMMMM#=`.gNMMMMM.       \_| \_|\____/\/   \/ \___/ \____/
  *             7HMM9`   .MMMMMM#`		
  *                     ...MMMMMF .      
- *         dN.       .jMN, TMMM`.MM     	@file 	ProductStep.java
+ *         dN.       .jMN, TMMM`.MM     	@file 	ProgressWorkerThread.java
  *         .MN.      MMMMM;  ?^ ,THM		@brief 	...
- *          dM@      dMMM3  .ga...g,    	@date Created:	2013-12-17
+ *          dM@      dMMM3  .ga...g,    	@date Created:	2013-12-18
  *       ..MMM#      ,MMr  .MMMMMMMMr   
- *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Alexander Streng
+ *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Alexander Hustinx
  *   .dMMMMMF           7Y=d9  dMMMMMr    
  *  .MMMMMMF        JMMm.?T!   JMMMMM#		@section LICENSE
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	License:	newBSD
  *  MMMMMM@        dMMMMM, ?MMMMMMMMMF    
- *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright ï¿½ 2013, HU University of Applied Sciences Utrecht. 
+ *  MMMMMMN,      .MMMMMMF .MMMMMMMM#`    	Copyright © 2013, HU University of Applied Sciences Utrecht. 
  *  JMMMMMMMm.    MMMMMM#!.MMMMMMMMM'.		All rights reserved.
  *   WMMMMMMMMNNN,.TMMM@ .MMMMMMMM#`.M  
  *    JMMMMMMMMMMMN,?MD  TYYYYYYY= dM     
@@ -37,73 +37,58 @@
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package simulation.data;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-import simulation.mas_entities.Product;
+import javax.swing.JComponent;
+import javax.swing.JProgressBar;
+import javax.swing.JTextField;
+import javax.swing.SwingWorker;
 
-public class ProductStep {
+class ProgressWorkerThread extends SwingWorker<Void, Void> {
 	
-	public enum StepState{
-		Working,
-		ScheduleError,
-		ProductError,
-		Finished,
-		Scheduled,
-		Evaluating
-	}
+	public static final int PLACEHOLDER = 0;
 	
-	private Capability capability;
-	private boolean finished;
-	private Product product;
-	private StepState state;
+	private MainGUI mG;
+	private JComponent[] components;
+	DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 	
-	public static ProductStep DummyProductStep = new ProductStep(null, Capability.DummyCapability);
-
-	public ProductStep(Product product, Capability capability){
-		this.capability = capability;
-		this.product = product;
-		this.state = StepState.Evaluating;
-		finished = false;
-	}
-
-	public Product getProduct() {
-		return product;
+	int i;
+	
+	public ProgressWorkerThread(MainGUI mG){
+		super();
+		this.mG = mG;
+		components = mG.getProgressComponents();
+		System.out.println("[DEBUG]\t\tCreated ProgressWorkerThread");
+		i = 0;
 	}
 	
-	public void setProduct(Product prod) {
-		product = prod;
-	}
+	@Override
+	public Void doInBackground() {
+		while(!isCancelled()){
+			//@ TODO Update progressBar with Sim-data
+			Date date = new Date();
+			
+			i++;
+			if(i >= 100)	i = 0;
+			
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			((JProgressBar) components[0]).setValue(PLACEHOLDER+i);
+			((JTextField) 	components[1]).setText(dateFormat.format(date));
 
-	public boolean isFinished() {
-		return finished;
-	}
-
-	public void setFinished(boolean finished) {
-		this.finished = finished;
-	}
-
-	public long getDuration() {
-		return capability.getDuration();
-	}
-
-	/*public void setDuration(int duration) {
-		this.duration = duration;
-	}*/
-	
-	public Capability getCapability(){
-		return capability;
-	}
-
-	public StepState getState() {
-		return state;
-	}
-
-	public void setState(StepState state) {
-		this.state = state;
+			mG.setProgressComponents(components);
+		}
+		return null;
 	}
 	
-	public String toString() {
-		return "" + capability;
+	protected void done(){
+		System.out.println("[DEBUG]\t\tCancelled ProgressWorkerThread");
 	}
-	
 }
+
