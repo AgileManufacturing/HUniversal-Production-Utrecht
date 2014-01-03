@@ -1,4 +1,4 @@
-package Visualisation;
+package simulation.gui.Visualisation;
 
 public class Equiplet {
 

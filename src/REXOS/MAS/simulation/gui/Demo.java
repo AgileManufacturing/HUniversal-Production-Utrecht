@@ -1,3 +1,5 @@
+package simulation.gui;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -11,7 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import Visualisation.DrawGrid;
+import simulation.gui.Visualisation.DrawGrid;
 
 public class Demo extends javax.swing.JPanel {
     private DrawGrid eq = new DrawGrid(50, 50);
