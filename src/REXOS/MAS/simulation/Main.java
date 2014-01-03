@@ -59,7 +59,7 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		Capability.loadCapabilities(pathToCapabilitiesCsv);
 		
-		simulation = new Simulation();
+		/*simulation = new Simulation();
 		EquipletDataCollector edc = new EquipletDataCollector(simulation);
 		ProductDataCollector pdc = new ProductDataCollector(simulation);
 		
@@ -70,13 +70,13 @@ public class Main {
 		ProductSpawner ps1 = new ProductSpawner(simulation, grid);
 		simulation.addUpdateable(ps1);
 		
-		simulation.resumeSimulation();
+		simulation.resumeSimulation();*/
 		
 		new MainGUI();
 		
-		simulation.waitUntilFinished();
+		/*simulation.waitUntilFinished();*/
 		
-		System.out.println(edc.getEquipletLoads());
+		/*System.out.println(edc.getEquipletLoads());*/
 		System.out.println("Hurray, we survived!");
 	}
 }

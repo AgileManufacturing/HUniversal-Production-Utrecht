@@ -1,5 +1,3 @@
-package simulation.gui;
-
 /**                                     ______  _______   __ _____  _____
  *                  ...++,              | ___ \|  ___\ \ / /|  _  |/  ___|
  *                .+MM9WMMN.M,          | |_/ /| |__  \ V / | | | |\ `--.
@@ -41,11 +39,19 @@ package simulation.gui;
 package simulation.gui;
 
 import java.io.File;
+import java.text.ParseException;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
+
+import simulation.BatchSpawner;
+import simulation.ProductSpawner;
+import simulation.Simulation;
+import simulation.collectors.EquipletDataCollector;
+import simulation.collectors.ProductDataCollector;
+import simulation.mas_entities.Grid;
 
 public class MainGUI extends javax.swing.JFrame {
 
@@ -69,6 +75,9 @@ public class MainGUI extends javax.swing.JFrame {
 	private boolean isCheckingFiles				= false;
 	private boolean isVisualisationWindowOpen 	= false;
 	private boolean isEquipletListOpen 			= false;
+	
+	private Simulation simulation;
+	private Grid grid;
 
 	/**
 	 * Creates new form MainGUI
@@ -264,7 +273,7 @@ public class MainGUI extends javax.swing.JFrame {
 		if(!isEquipletListOpen || !elf.isActive()){
 			// TODO open Equiplet List stuff:
 			isEquipletListOpen = true;
-			elf = new EquipletListFrame();
+			elf = new EquipletListFrame(grid);
 		} else {
 			System.out.println("[DEBUG]\t\tEquiplet List is already opened ...");
 		}
@@ -288,7 +297,13 @@ public class MainGUI extends javax.swing.JFrame {
 			if(!checkFiles()){
 				pauseFileChecker();
 				
-				System.out.println("[DEBUG]\t\tStarting Simulation ...");
+				try{
+					System.out.println("[DEBUG]\t\tStarting Simulation ...");
+					startNewSimulation();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+				
 				isRunning = true;
 				startButton.setText("Stop Simulation");
 
@@ -307,6 +322,23 @@ public class MainGUI extends javax.swing.JFrame {
 			stopSimulation();
 		}
 	}             
+
+	private void startNewSimulation() throws ParseException {
+		simulation = new Simulation();
+		EquipletDataCollector edc = new EquipletDataCollector(simulation);
+		ProductDataCollector pdc = new ProductDataCollector(simulation);
+		
+		grid = new Grid("/home/t/sim/equipletLayout.json", simulation);
+		System.out.println(grid);
+		
+		simulation.addUpdateable(grid);
+		ProductSpawner ps1 = new ProductSpawner(simulation, grid);
+		simulation.addUpdateable(ps1);
+		BatchSpawner bs1 = new BatchSpawner(simulation, grid);
+		simulation.addUpdateable(bs1);
+		
+		simulation.resumeSimulation();
+	}
 
 	public boolean checkFiles(){
 		boolean areAllFilesFound = true;
@@ -352,13 +384,16 @@ public class MainGUI extends javax.swing.JFrame {
 	}
 
 	private void stopSimulation(){
+		System.out.println("[DEBUG]\t\tStopping Simulation ...");
+		simulation.abort();
+		simulation = null;
+		
 		isRunning = false;
 		startButton.setText("Start Simulation");
 		
 		progressWorker.cancel(false);
 		resumeFileChecker();
 		
-		System.out.println("[DEBUG]\t\tStopping Simulation ...");
 	}
 	
 	private void shutdownSimulator(){
@@ -371,7 +406,7 @@ public class MainGUI extends javax.swing.JFrame {
 
 		System.out.println("[DEBUG]\t\tShutting down Simulator ...");
 		this.dispose();
-		System.exit(0);
+		//System.exit(0);
 	}
 
 	/**
@@ -483,4 +518,8 @@ public class MainGUI extends javax.swing.JFrame {
 	private javax.swing.JLabel timeLeftLabel;
 	private javax.swing.JTextField timeLeftText;
 	// End of variables declaration                   
+
+	public Simulation getSimulation() {
+		return simulation;
+	}
 }

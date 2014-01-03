@@ -50,9 +50,10 @@ import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 public class Simulation implements Runnable{
 	
 	private boolean isRunning = false;
-	private double interval = 1.00; // seconds
+	private boolean isAborted = false;
+	private double interval = 0.01; // seconds
 	private double turnTime = 0.01; // seconds
-	private double duration = 60 * 60 * 1000; // milliseconds
+	private double duration = 1 * 60 * 60 * 1000; // milliseconds
 	
 	private long turn = 0;
 	private long startSimulationTime;
@@ -66,9 +67,12 @@ public class Simulation implements Runnable{
 	public void pauseSimulation(){
 		isRunning = false;
 	}
-	public synchronized void resumeSimulation(){
+	public synchronized void resumeSimulation() {
 		isRunning = true;
 		notify();
+	}
+	public synchronized void abort() {
+		isAborted = true;
 	}
 	
 	public void waitUntilFinished() throws Exception{
@@ -99,8 +103,12 @@ public class Simulation implements Runnable{
 		dataCollectorsToBeAdded.add(dataCollector);
 	}
 	
+	public synchronized double getProgress(){
+		return (currentSimulationTime - startSimulationTime) / duration;
+	}
+	
 	public void run(){
-		while(true) {
+		while(isAborted == false) {
 			synchronized (this) {
 				long cycleStartTime = System.currentTimeMillis();
 				if(isRunning == false) {

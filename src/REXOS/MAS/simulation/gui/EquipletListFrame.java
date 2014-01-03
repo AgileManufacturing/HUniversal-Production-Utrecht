@@ -1,5 +1,3 @@
-package simulation.gui;
-
 /**                                     ______  _______   __ _____  _____
  *                  ...++,              | ___ \|  ___\ \ / /|  _  |/  ___|
  *                .+MM9WMMN.M,          | |_/ /| |__  \ V / | | | |\ `--.
@@ -44,6 +42,8 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JTable;
 
+import simulation.mas_entities.Grid;
+
 public class EquipletListFrame extends javax.swing.JFrame {
 
 	//
@@ -52,12 +52,13 @@ public class EquipletListFrame extends javax.swing.JFrame {
 	//
 	private TableUpdateThread tableUpdateWorker;
 	
-	//private Grid grid;
+	private Grid grid;
 	
     /**
      * Creates new form EquipletListFrame
      */
-    public EquipletListFrame() {	//EquipletListFrame(Grid grid)
+    public EquipletListFrame(Grid grid) {	//EquipletListFrame(Grid grid)
+    	this.grid = grid;
     	System.out.println("[DEBUG]\t\tCreated EquipletListFrame");
     	initComponents();
         
@@ -153,6 +154,10 @@ public class EquipletListFrame extends javax.swing.JFrame {
     
     public void setTable(JTable table){
     	jTable1 = table;
+    }
+    
+    public Grid getGrid(){
+    	return grid;
     }
     
     // Variables declaration - do not modify                     

@@ -1,5 +1,3 @@
-package simulation.gui;
-
 /**                                     ______  _______   __ _____  _____
  *                  ...++,              | ___ \|  ___\ \ / /|  _  |/  ___|
  *                .+MM9WMMN.M,          | |_/ /| |__  \ V / | | | |\ `--.
@@ -42,7 +40,9 @@ package simulation.gui;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 import javax.swing.JComponent;
 import javax.swing.JProgressBar;
@@ -51,20 +51,20 @@ import javax.swing.SwingWorker;
 
 class ProgressWorkerThread extends SwingWorker<Void, Void> {
 	
-	public static final int PLACEHOLDER = 0;
+	public static final int UPDATE_INTERVAL = 100;
 	
 	private MainGUI mG;
 	private JComponent[] components;
 	DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 	
-	int i;
+	double previousProgress = 0;
 	
 	public ProgressWorkerThread(MainGUI mG){
 		super();
 		this.mG = mG;
 		components = mG.getProgressComponents();
+		dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 		System.out.println("[DEBUG]\t\tCreated ProgressWorkerThread");
-		i = 0;
 	}
 	
 	@Override
@@ -73,19 +73,25 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 			//@ TODO Update progressBar with Sim-data
 			Date date = new Date();
 			
-			i++;
-			if(i >= 100)	i = 0;
+			
+			double currentProgress = mG.getSimulation().getProgress();
+			double progressIncrement = currentProgress - previousProgress;
+			if(progressIncrement != 0.0) {
+				int milliesRemaining = (int)(((1.0 - currentProgress) / progressIncrement) * UPDATE_INTERVAL);
+				date.setTime(milliesRemaining);
+				((JTextField) 	components[1]).setText(dateFormat.format(date));
+				
+			}
+			previousProgress = currentProgress;
+			((JProgressBar) components[0]).setValue((int)(currentProgress * 100));
+
+			mG.setProgressComponents(components);
 			
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(UPDATE_INTERVAL);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			
-			((JProgressBar) components[0]).setValue(PLACEHOLDER+i);
-			((JTextField) 	components[1]).setText(dateFormat.format(date));
-
-			mG.setProgressComponents(components);
 		}
 		return null;
 	}

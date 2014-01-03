@@ -41,6 +41,7 @@ package simulation.mas_entities;
 
 import java.io.File;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Date;
 
 import com.google.gson.JsonArray;
@@ -109,6 +110,8 @@ public class Grid implements Updatable{
 				//System.out.println(i + " " + j + " " + distance);
 			}
 		}
+		System.out.println("Grid distanceMatrix:");
+		distanceMatrix.show();
 	}
 	
 	public Matrix getDistanceMatrix(){
@@ -160,6 +163,23 @@ public class Grid implements Updatable{
 			}
 		}
 		return output;
+	}
+	public Equiplet[] getEquipletsWithoutReservation() {
+		Equiplet[] allEquiplets = this.getEquiplets();
+		ArrayList<Equiplet> equipletsWithoutReservation = new ArrayList<Equiplet>();
+		for (Equiplet equiplet : allEquiplets) {
+			if(equiplet.getBatchReservation() == -1) equipletsWithoutReservation.add(equiplet);
+		}
+		return equipletsWithoutReservation.toArray(new Equiplet[equipletsWithoutReservation.size()]);
+	}
+	
+	public Equiplet[] getEquipletsForReservation(int batchGroup) {
+		Equiplet[] allEquiplets = this.getEquiplets();
+		ArrayList<Equiplet> equipletsForReservation = new ArrayList<Equiplet>();
+		for (Equiplet equiplet : allEquiplets) {
+			if(equiplet.getBatchReservation() == batchGroup) equipletsForReservation.add(equiplet);
+		}
+		return equipletsForReservation.toArray(new Equiplet[equipletsForReservation.size()]);
 	}
 	
 	public GridProperties getGridProperties(){

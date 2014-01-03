@@ -39,16 +39,28 @@
 
 package simulation.mas_entities;
 
+import java.util.ArrayList;
+
 
 public class Batch {
-	private Product[] products;
+	private ArrayList<Product> products;
+	private int batchGroup;
 	
-	public Batch(int id, Product[] products){
-		this.products = products;
+	public Batch(int batchGroup){
+		this.batchGroup = batchGroup;
+		this.products = new ArrayList<Product>();
 	}
 	
 	//batch schedule
 	public void Schedule(){
 		
+	}
+	
+	public void addProduct(Product p) {
+		products.add(p);
+	}
+	
+	public int getBatchGroup() {
+		return batchGroup;
 	}
 }

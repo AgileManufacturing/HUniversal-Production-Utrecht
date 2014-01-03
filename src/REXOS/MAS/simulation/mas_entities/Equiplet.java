@@ -218,7 +218,7 @@ public class Equiplet implements Updatable{
 			return true;
 		}
 		
-		System.err.println("A step could not be added to the schedule, it does not fit anywhere in the schedule.");
+		System.err.println("Equiplet " + equipletName + ": A step could not be added to the schedule, it does not fit anywhere in the schedule.");
 		
 		return false;
 	}
@@ -324,5 +324,13 @@ public class Equiplet implements Updatable{
 		for (int iErrors = 0 ; iErrors < errors.size(); iErrors++){
 			equipletErrors[iErrors] = new EquipletError(gridProperties.getSimulation(), errors.get(iErrors).getAsJsonObject());
 		}
+	}
+
+	public String getName() {
+		// TODO Auto-generated method stub
+		return equipletName;
+	}
+	public int getBatchReservation() {
+		return reservedFor;
 	}
 }

@@ -32,7 +32,11 @@ public class Product implements Updatable{
 		this.simulation = simulation;
 		this.grid = grid;
 		this.batch = batch;
-		this.equiplets = grid.getEquiplets();
+		if(batch == null) {
+			this.equiplets = grid.getEquipletsWithoutReservation();
+		} else {
+			this.equiplets = grid.getEquipletsForReservation(batch.getBatchGroup());
+		}
 		finalSchedules = new LinkedHashMap<ProductStep, Schedule>();
 		
 		long currentTimeSlot = TimeSlot.getCurrentTimeSlot(simulation, grid.getGridProperties());

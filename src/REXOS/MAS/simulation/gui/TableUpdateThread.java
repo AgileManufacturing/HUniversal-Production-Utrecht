@@ -1,5 +1,3 @@
-package simulation.gui;
-
 /**                                     ______  _______   __ _____  _____
  *                  ...++,              | ___ \|  ___\ \ / /|  _  |/  ___|
  *                .+MM9WMMN.M,          | |_/ /| |__  \ V / | | | |\ `--.
@@ -50,6 +48,10 @@ import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
+import simulation.Simulation;
+import simulation.mas_entities.Equiplet;
+import simulation.mas_entities.Grid;
+
 class TableUpdateThread extends SwingWorker<Void, Void> {
 
 	public static final int PLACEHOLDER = 0;
@@ -90,8 +92,23 @@ class TableUpdateThread extends SwingWorker<Void, Void> {
 	// @ TODO Add actual data to the Table ...
     public void updateTable(){
     	jTable = elf.getJTable();
+    	Grid grid = elf.getGrid();
+    	System.out.println("grid " + grid);
+    	Equiplet[] equiplets = grid.getEquiplets();
+    	
     	DefaultTableModel model = (DefaultTableModel) jTable.getModel();
-    	model.addRow(new Object[]{"", "", 0.0, 0});
+    	
+    	System.out.println(equiplets);
+    	for(int i = 0; i < equiplets.length; i++) {
+    		if(i >= model.getRowCount()) {
+    			model.addRow(new Object[]{"", "", 0.0, 0});
+    		}
+    		
+    		model.setValueAt(equiplets[i].getName(), i, 0);
+    		model.setValueAt(equiplets[i].getEquipletState().toString(), i, 1);
+    		model.setValueAt(equiplets[i].getLoad(), i, 2);
+    		model.setValueAt(equiplets[i].getBatchReservation(), i, 3);
+    	}
     }
 	
 	public void pause() {
