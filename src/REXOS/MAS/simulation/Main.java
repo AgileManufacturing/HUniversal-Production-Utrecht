@@ -39,16 +39,13 @@
 
 package simulation;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-
+import simulation.collectors.DataCollector;
+import simulation.collectors.EquipletDataCollector;
+import simulation.collectors.ProductDataCollector;
 import simulation.data.Capability;
+import simulation.gui.MainGUI;
+import simulation.gui.SimGUI;
 import simulation.mas_entities.Grid;
-
-import javax.xml.datatype.Duration;
 
 public class Main {
 
@@ -63,6 +60,8 @@ public class Main {
 		Capability.loadCapabilities(pathToCapabilitiesCsv);
 		
 		simulation = new Simulation();
+		EquipletDataCollector edc = new EquipletDataCollector(simulation);
+		ProductDataCollector pdc = new ProductDataCollector(simulation);
 		
 		grid = new Grid(pathToEquipletLayoutJson, simulation);
 		System.out.println(grid);
@@ -73,6 +72,11 @@ public class Main {
 		
 		simulation.resumeSimulation();
 		
+		new MainGUI();
+		
+		simulation.waitUntilFinished();
+		
+		System.out.println(edc.getEquipletLoads());
 		System.out.println("Hurray, we survived!");
 	}
 }

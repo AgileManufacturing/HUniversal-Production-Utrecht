@@ -78,8 +78,8 @@ public class Equiplet implements Updatable{
 	private ArrayList<ProductStepSchedule> schedule = new ArrayList<ProductStepSchedule>();
 	
 	public Equiplet(JsonObject jsonArguments, GridProperties gridProperties){
-		parseEquipletJson(jsonArguments);
 		this.gridProperties = gridProperties;
+		parseEquipletJson(jsonArguments);
 	}
 	
 	/*public ArrayList<FreeTimeSlot> getFreeTimeSlots(){
@@ -111,6 +111,13 @@ public class Equiplet implements Updatable{
 			return false;
 		}
 		return Arrays.asList(capabilities).contains(capability);
+	}
+	
+	public double getLoad() {
+		return getLoad(new TimeSlot(
+				TimeSlot.getCurrentTimeSlot(gridProperties.getSimulation(), gridProperties), 
+				gridProperties.getTimeSlotLength()
+		));
 	}
 	
 	public double getLoad(TimeSlot timeSlot){
@@ -177,6 +184,7 @@ public class Equiplet implements Updatable{
 	}
 	
 	public boolean schedule(ProductStep step, TimeSlot timeslot){
+		//System.out.println("Equiplet: name " + equipletName + " scheduling " + step.toString());
 		ProductStepSchedule newPSS= new ProductStepSchedule(step, timeslot);
 		
 		if (schedule.size() == 0 ){
@@ -234,14 +242,17 @@ public class Equiplet implements Updatable{
 		}
 		//process the error 
 		if (worstError != null){
+			if(equipletState != EquipletState.Error) {
+				System.out.println("Equipet: " + equipletName + "has encountered error " + worstError);
+			}
 			ArrayList<Product> notifiedProducts = new ArrayList<Product>();
 			if (equipletState == EquipletState.Working){
 				ProductStep pStep = schedule.get(0).getProductStep();
 				if (worstError.damagesProduct){
-					pStep.getProduct().updateStep(pStep, StepState.ProductError);
+					pStep.setState(StepState.ProductError);
 				}
 				else{
-					pStep.getProduct().updateStep(pStep, StepState.ScheduleError);
+					pStep.setState(StepState.ScheduleError);
 					
 				}
 			}
@@ -250,6 +261,7 @@ public class Equiplet implements Updatable{
 		else{
 			//if there was an error that does not exist now, bring state to idle
 			if (equipletState == EquipletState.Error){
+				System.out.println("Equipet: " + equipletName + "has resolved its errors");
 				equipletState = EquipletState.Idle;
 			}
 		}
@@ -260,6 +272,9 @@ public class Equiplet implements Updatable{
 			if (equipletState == EquipletState.Working){
 				ProductStepSchedule curProductStepSchedule = schedule.get(0);
 				if (curProductStepSchedule.getStartTimeSlot() + curProductStepSchedule.getDuration() < currentTimeSlot){
+					System.out.println("Equiplet: name " + equipletName + " has completed {" + 
+							curProductStepSchedule.getProductStep().getCapability() + "} of product {" + 
+							curProductStepSchedule.getProductStep().getProduct() + "}");
 					//the step is done
 					schedule.remove(0);
 					equipletState = EquipletState.Idle;
@@ -300,14 +315,14 @@ public class Equiplet implements Updatable{
 		JsonArray caps= arguments.get("capabilities").getAsJsonArray();
 		capabilities = new Capability[caps.size()];
 		for ( int iCaps = 0; iCaps < caps.size(); iCaps ++){
-			capabilities[iCaps] =  Capability.getCapabilityById(caps.get(iCaps).getAsInt());
+			capabilities[iCaps] =  Capability.getCapabilityByName(caps.get(iCaps).getAsString());
 		}
 		reservedFor = arguments.get("reservedFor").getAsInt();
 		
 		JsonArray errors = arguments.get("equipletErrors").getAsJsonArray();
 		equipletErrors = new EquipletError[errors.size()];
 		for (int iErrors = 0 ; iErrors < errors.size(); iErrors++){
-			equipletErrors[iErrors] = new EquipletError(errors.get(iErrors).getAsJsonObject());
+			equipletErrors[iErrors] = new EquipletError(gridProperties.getSimulation(), errors.get(iErrors).getAsJsonObject());
 		}
 	}
 }

@@ -39,11 +39,7 @@
 
 package simulation;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 import simulation.data.Capability;
 import simulation.data.ProductStep;
@@ -57,9 +53,9 @@ public class ProductSpawner implements Updatable {
 	
 	String productName;
 	long productDeadline;
-	ProductStep[] productSteps;
 	int amountPerSpawn;
 	double spawnInterval;
+	Capability[] productStepCapabilities;
 	
 	Simulation simulation;
 	Grid grid;
@@ -78,9 +74,9 @@ public class ProductSpawner implements Updatable {
 		amountPerSpawn = Integer.parseInt(fields[3][0]);
 		spawnInterval = Integer.parseInt(fields[4][0]);
 		
-		productSteps = new ProductStep[fields.length - 5];
+		productStepCapabilities = new Capability[fields.length - 5];
 		for(int i = 5; i < fields.length; i++) {
-			productSteps[i - 5] = new ProductStep(Capability.getCapabilityById(Integer.parseInt(fields[i][0])));
+			productStepCapabilities[i - 5] = Capability.getCapabilityByName(fields[i][0]);
 		}		
 	}
 	
@@ -93,15 +89,15 @@ public class ProductSpawner implements Updatable {
 			}
 			
 			nextSpawnTime += spawnInterval * 1000;
-			System.out.println("Spawned products " + spawnInterval + " " + nextSpawnTime);
+			System.out.println("ProductSpawner: Spawned " + amountPerSpawn + " " + productName + "s, next spawn in " + spawnInterval + " (" + nextSpawnTime + ")");
 		}
 
 	}
 	private Product[] spawnProducts() {
 		Product[] products = new Product[amountPerSpawn];
 		for(int i = 0; i < products.length; i++) {
-			products[i] = new Product(simulation, grid, productSteps, simulation.getCurrentSimulationTime() + productDeadline);
+			products[i] = new Product(simulation, grid, productStepCapabilities, simulation.getCurrentSimulationTime() + productDeadline);
 		}
-		return products; 
+		return products;
 	}
 }

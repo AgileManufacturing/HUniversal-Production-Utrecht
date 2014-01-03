@@ -71,7 +71,7 @@ public class Grid implements Updatable{
 		JsonObject jsonObject = CSVReader.parseJsonObjectFile(equipletLayoutJsonFilePath);
 		JsonArray jsonEquipletsArray2D = jsonObject.get("grid").getAsJsonArray();
 		
-		gridProperties = new GridProperties(jsonObject.get("firstTimeSlot").getAsLong(), 
+		gridProperties = new GridProperties(simulation, jsonObject.get("firstTimeSlot").getAsLong(), 
 														   jsonObject.get("timeSlotLength").getAsLong(), 
 														   jsonObject.get("equipletLoadWindow").getAsLong());
 		

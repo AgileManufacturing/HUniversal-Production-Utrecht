@@ -1,723 +1,978 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CodeLite_Project Name="VISIONdevelopment" InternalType="Console">
   <VirtualDirectory Name="src">
-    <VirtualDirectory Name="www">
-      <VirtualDirectory Name="WIMP_Server">
-        <VirtualDirectory Name="WebContent">
-          <VirtualDirectory Name="wimp-client">
-            <File Name="src/www/WIMP_Server/WebContent/wimp-client/.DS_Store"/>
+    <VirtualDirectory Name="REXOS">
+      <VirtualDirectory Name="GatewayServer">
+        <VirtualDirectory Name="src">
+          <VirtualDirectory Name="gatewayserver">
+            <VirtualDirectory Name="data">
+              <File Name="src/REXOS/GatewayServer/src/gatewayserver/data/build.xml"/>
+              <File Name="src/REXOS/GatewayServer/src/gatewayserver/data/Command.java"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/GatewayServer/src/gatewayserver/Main.java"/>
+            <File Name="src/REXOS/GatewayServer/src/gatewayserver/build.xml"/>
+            <File Name="src/REXOS/GatewayServer/src/gatewayserver/GatewayServer.java"/>
+            <File Name="src/REXOS/GatewayServer/src/gatewayserver/ClientSocketThread.java"/>
+            <File Name="src/REXOS/GatewayServer/src/gatewayserver/CommandAgent.java"/>
           </VirtualDirectory>
-          <VirtualDirectory Name="WEB-INF">
-            <File Name="src/www/WIMP_Server/WebContent/WEB-INF/web.xml"/>
-          </VirtualDirectory>
-          <File Name="src/www/WIMP_Server/WebContent/.DS_Store"/>
-          <File Name="src/www/WIMP_Server/WebContent/objectCreationPnP.txt"/>
-          <File Name="src/www/WIMP_Server/WebContent/README"/>
+          <File Name="src/REXOS/GatewayServer/src/build.xml"/>
+          <File Name="src/REXOS/GatewayServer/src/Command.java"/>
         </VirtualDirectory>
-        <File Name="src/www/WIMP_Server/.gitignore"/>
-        <File Name="src/www/WIMP_Server/.DS_Store"/>
-        <File Name="src/www/WIMP_Server/.project"/>
-        <File Name="src/www/WIMP_Server/.classpath"/>
+        <File Name="src/REXOS/GatewayServer/build.xml"/>
       </VirtualDirectory>
-    </VirtualDirectory>
-    <VirtualDirectory Name="java">
-      <VirtualDirectory Name="rexos">
-        <VirtualDirectory Name="utillities">
-          <VirtualDirectory Name="log">
-            <File Name="src/java/rexos/utillities/log/build.xml"/>
+      <VirtualDirectory Name="www">
+        <VirtualDirectory Name="WIMP_Server">
+          <VirtualDirectory Name="src">
+            <VirtualDirectory Name="beans">
+              <File Name="src/REXOS/www/WIMP_Server/src/beans/ProductBean.java"/>
+            </VirtualDirectory>
+            <VirtualDirectory Name="pa_server">
+              <File Name="src/REXOS/www/WIMP_Server/src/pa_server/Response.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/pa_server/PAServer.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/pa_server/Service.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/pa_server/SocketInputStream.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/pa_server/PACommunicationServer.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/pa_server/PACommunicationContainer.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/pa_server/Request.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/pa_server/Servlet.java"/>
+            </VirtualDirectory>
+            <VirtualDirectory Name="newDataClasses">
+              <File Name="src/REXOS/www/WIMP_Server/src/newDataClasses/Mapper.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/newDataClasses/ProductionEquipletMapper.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/newDataClasses/Production.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/newDataClasses/ParameterList.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/newDataClasses/ProductLog.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/newDataClasses/MapperValueList.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/newDataClasses/ProductionStep.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/newDataClasses/ParameterGroup.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/newDataClasses/Parameter.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/newDataClasses/Product.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/newDataClasses/LogMessage.java"/>
+            </VirtualDirectory>
+            <VirtualDirectory Name="data">
+              <File Name="src/REXOS/www/WIMP_Server/src/data/Production.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/data/LoginData.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/data/ProductionStep.java"/>
+              <File Name="src/REXOS/www/WIMP_Server/src/data/CommandContainer.java"/>
+            </VirtualDirectory>
+            <VirtualDirectory Name="servlets">
+              <File Name="src/REXOS/www/WIMP_Server/src/servlets/ProductServlet.java"/>
+            </VirtualDirectory>
           </VirtualDirectory>
-          <VirtualDirectory Name="ACLMsg">
-            <File Name="src/java/rexos/utillities/ACLMsg/build.xml"/>
+          <VirtualDirectory Name="WebContent">
+            <VirtualDirectory Name="WEB-INF">
+              <File Name="src/REXOS/www/WIMP_Server/WebContent/WEB-INF/web.xml"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/www/WIMP_Server/WebContent/objectCreationPnP.txt"/>
+            <File Name="src/REXOS/www/WIMP_Server/WebContent/README"/>
           </VirtualDirectory>
-          <File Name="src/java/rexos/utillities/build.xml"/>
+        </VirtualDirectory>
+      </VirtualDirectory>
+      <VirtualDirectory Name="ROS">
+        <VirtualDirectory Name="shared_msgs">
+          <VirtualDirectory Name="rexos_std_msgs">
+            <VirtualDirectory Name="msg">
+              <File Name="src/REXOS/ROS/shared_msgs/rexos_std_msgs/msg/StdReturn.msg"/>
+              <File Name="src/REXOS/ROS/shared_msgs/rexos_std_msgs/msg/KeyValuePair.msg"/>
+              <File Name="src/REXOS/ROS/shared_msgs/rexos_std_msgs/msg/Map.msg"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/shared_msgs/rexos_std_msgs/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/shared_msgs/rexos_std_msgs/package.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="environment_communication_msgs">
+            <VirtualDirectory Name="msg">
+              <File Name="src/REXOS/ROS/shared_msgs/environment_communication_msgs/msg/KeyValuePair.msg"/>
+              <File Name="src/REXOS/ROS/shared_msgs/environment_communication_msgs/msg/Map.msg"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/shared_msgs/environment_communication_msgs/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/shared_msgs/environment_communication_msgs/package.xml"/>
+          </VirtualDirectory>
         </VirtualDirectory>
         <VirtualDirectory Name="libraries">
-          <VirtualDirectory Name="dynamicloader">
-            <File Name="src/java/rexos/libraries/dynamicloader/build.xml"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="knowledgedb_client">
-            <File Name="src/java/rexos/libraries/knowledgedb_client/build.xml"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="blackboard_client">
-            <File Name="src/java/rexos/libraries/blackboard_client/build.xml"/>
-          </VirtualDirectory>
-          <File Name="src/java/rexos/libraries/build.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="mas">
-          <VirtualDirectory Name="main_agent">
-            <File Name="src/java/rexos/mas/main_agent/build.xml"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="service_agent">
-            <File Name="src/java/rexos/mas/service_agent/build.xml"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="logistics_agent">
-            <File Name="src/java/rexos/mas/logistics_agent/build.xml"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="hardware_agent">
-            <File Name="src/java/rexos/mas/hardware_agent/build.xml"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="equiplet_agent">
-            <File Name="src/java/rexos/mas/equiplet_agent/build.xml"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="behaviours">
-            <File Name="src/java/rexos/mas/behaviours/build.xml"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="product_agent">
-            <File Name="src/java/rexos/mas/product_agent/build.xml"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="data">
-            <File Name="src/java/rexos/mas/data/build.xml"/>
-          </VirtualDirectory>
-          <File Name="src/java/rexos/mas/build.xml"/>
-        </VirtualDirectory>
-        <File Name="src/java/rexos/build.xml"/>
-      </VirtualDirectory>
-      <VirtualDirectory Name="tools">
-        <File Name="src/java/tools/build.xml"/>
-      </VirtualDirectory>
-      <VirtualDirectory Name="configuration">
-        <File Name="src/java/configuration/build.xml"/>
-      </VirtualDirectory>
-      <File Name="src/java/build.xml"/>
-    </VirtualDirectory>
-    <VirtualDirectory Name="cpp">
-      <VirtualDirectory Name="libraries">
-        <VirtualDirectory Name="rexos_modbus">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="rexos_modbus">
-              <File Name="src/cpp/libraries/rexos_modbus/include/rexos_modbus/ModbusException.h"/>
-              <File Name="src/cpp/libraries/rexos_modbus/include/rexos_modbus/ModbusController.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/libraries/rexos_modbus/src/ModbusController.cpp"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/libraries/rexos_modbus/CMakeLists.txt"/>
-          <File Name="src/cpp/libraries/rexos_modbus/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="libjson">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="libjson">
-              <VirtualDirectory Name="Dependencies">
-                <VirtualDirectory Name="mempool++">
-                  <File Name="src/cpp/libraries/libjson/include/libjson/Dependencies/mempool++/mempool.h"/>
-                  <File Name="src/cpp/libraries/libjson/include/libjson/Dependencies/mempool++/._mempool.h"/>
-                </VirtualDirectory>
-                <VirtualDirectory Name="libbase64++">
-                  <File Name="src/cpp/libraries/libjson/include/libjson/Dependencies/libbase64++/._libbase64++.h"/>
-                  <File Name="src/cpp/libraries/libjson/include/libjson/Dependencies/libbase64++/libbase64++.h"/>
-                </VirtualDirectory>
-                <File Name="src/cpp/libraries/libjson/include/libjson/Dependencies/._mempool++"/>
-                <File Name="src/cpp/libraries/libjson/include/libjson/Dependencies/._libbase64++"/>
+          <VirtualDirectory Name="rexos_gripper">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="rexos_gripper">
+                <File Name="src/REXOS/ROS/libraries/rexos_gripper/include/rexos_gripper/OutputDevice.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_gripper/include/rexos_gripper/InputOutputController.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_gripper/include/rexos_gripper/Gripper.h"/>
               </VirtualDirectory>
-              <VirtualDirectory Name="JSONDefs">
-                <File Name="src/cpp/libraries/libjson/include/libjson/JSONDefs/Visual_C.h"/>
-                <File Name="src/cpp/libraries/libjson/include/libjson/JSONDefs/Unknown_C.h"/>
-                <File Name="src/cpp/libraries/libjson/include/libjson/JSONDefs/GNU_C.h"/>
-                <File Name="src/cpp/libraries/libjson/include/libjson/JSONDefs/Strings_Defs.h"/>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
+              <File Name="src/REXOS/ROS/libraries/rexos_gripper/src/Gripper.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_gripper/src/OutputDevice.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_gripper/src/InputOutputController.cpp"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/libraries/rexos_gripper/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/libraries/rexos_gripper/package.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="rexos_modbus">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="rexos_modbus">
+                <File Name="src/REXOS/ROS/libraries/rexos_modbus/include/rexos_modbus/ModbusException.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_modbus/include/rexos_modbus/ModbusController.h"/>
               </VirtualDirectory>
-              <File Name="src/cpp/libraries/libjson/include/libjson/JSONValidator.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/JSONDefs.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/JSONWorker.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/JSONStats.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/JSONPreparse.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/JSONAllocator.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/JSONMemory.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/JSONMemoryPool.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/JSON_Base64.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/JSONStream.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/NumberToString.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/JSONOptions.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/JSONGlobals.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/libjson.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/internalJSONNode.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/JSONDebug.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/JSONSingleton.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/JSONNode.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/JSONChildren.h"/>
-              <File Name="src/cpp/libraries/libjson/include/libjson/JSONSharedString.h"/>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
+              <File Name="src/REXOS/ROS/libraries/rexos_modbus/src/ModbusController.cpp"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/libraries/rexos_modbus/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/libraries/rexos_modbus/package.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="libjson">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="libjson">
+                <VirtualDirectory Name="Dependencies">
+                  <VirtualDirectory Name="mempool++">
+                    <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/Dependencies/mempool++/mempool.h"/>
+                  </VirtualDirectory>
+                  <VirtualDirectory Name="libbase64++">
+                    <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/Dependencies/libbase64++/libbase64++.h"/>
+                  </VirtualDirectory>
+                </VirtualDirectory>
+                <VirtualDirectory Name="JSONDefs">
+                  <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONDefs/Visual_C.h"/>
+                  <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONDefs/Unknown_C.h"/>
+                  <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONDefs/GNU_C.h"/>
+                  <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONDefs/Strings_Defs.h"/>
+                </VirtualDirectory>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONValidator.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONDefs.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONWorker.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONStats.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONPreparse.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONAllocator.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONMemory.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONMemoryPool.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSON_Base64.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONStream.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/NumberToString.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONOptions.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONGlobals.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/libjson.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/internalJSONNode.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONDebug.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONSingleton.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONNode.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONChildren.h"/>
+                <File Name="src/REXOS/ROS/libraries/libjson/include/libjson/JSONSharedString.h"/>
+              </VirtualDirectory>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
+              <File Name="src/REXOS/ROS/libraries/libjson/src/JSONWriter.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/libjson/src/JSONStream.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/libjson/src/JSONPreparse.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/libjson/src/JSONNode_Mutex.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/libjson/src/JSONAllocator.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/libjson/src/internalJSONNode.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/libjson/src/libjson.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/libjson/src/JSONMemory.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/libjson/src/JSONDebug.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/libjson/src/JSONChildren.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/libjson/src/JSONIterators.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/libjson/src/JSONWorker.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/libjson/src/JSONNode.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/libjson/src/JSONValidator.cpp"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/libraries/libjson/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/libraries/libjson/package.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="rexos_coordinates">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="rexos_coordinates">
+                <File Name="src/REXOS/ROS/libraries/rexos_coordinates/include/rexos_coordinates/Module.h"/>
+              </VirtualDirectory>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
+              <File Name="src/REXOS/ROS/libraries/rexos_coordinates/src/Module.cpp"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/libraries/rexos_coordinates/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/libraries/rexos_coordinates/package.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="rexos_most">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="rexos_most">
+                <File Name="src/REXOS/ROS/libraries/rexos_most/include/rexos_most/MOSTDatabaseClient.h"/>
+              </VirtualDirectory>
+            </VirtualDirectory>
+            <VirtualDirectory Name="test">
+              <File Name="src/REXOS/ROS/libraries/rexos_most/test/SanityTest.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_most/test/MOSTStateMachineTest.cpp"/>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
+              <File Name="src/REXOS/ROS/libraries/rexos_most/src/dummy.cpp"/>
+            </VirtualDirectory>
+            <VirtualDirectory Name="msg">
+              <File Name="src/REXOS/ROS/libraries/rexos_most/msg/ModuleInfo.msg"/>
+            </VirtualDirectory>
+            <VirtualDirectory Name="srv">
+              <File Name="src/REXOS/ROS/libraries/rexos_most/srv/ModuleUpdate.srv"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/libraries/rexos_most/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/libraries/rexos_most/package.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="rexos_blackboard_cpp_client">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="rexos_blackboard_cpp_client">
+                <File Name="src/REXOS/ROS/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/BasicOperationSubscription.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/FieldUpdateSubscription.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/BlackboardSubscription.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/BlackboardSubscriber.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/OplogEntry.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/MongoOperation.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/BlackboardCppClient.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/OplogMonitor.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/InvalidDBNamespaceException.h"/>
+              </VirtualDirectory>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
+              <File Name="src/REXOS/ROS/libraries/rexos_blackboard_cpp_client/src/BlackboardCppClient.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_blackboard_cpp_client/src/FieldUpdateSubscription.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_blackboard_cpp_client/src/BasicOperationSubscription.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_blackboard_cpp_client/src/BlackboardSubscription.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_blackboard_cpp_client/src/OplogEntry.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_blackboard_cpp_client/src/OplogMonitor.cpp"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/libraries/rexos_blackboard_cpp_client/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/libraries/rexos_blackboard_cpp_client/package.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="rexos_motor">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="rexos_motor">
+                <File Name="src/REXOS/ROS/libraries/rexos_motor/include/rexos_motor/StepperMotor.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_motor/include/rexos_motor/CRD514KDException.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_motor/include/rexos_motor/CRD514KD.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_motor/include/rexos_motor/MotorException.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_motor/include/rexos_motor/MotorManager.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_motor/include/rexos_motor/MotorInterface.h"/>
+              </VirtualDirectory>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
+              <File Name="src/REXOS/ROS/libraries/rexos_motor/src/MotorManager.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_motor/src/StepperMotor.cpp"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/libraries/rexos_motor/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/libraries/rexos_motor/package.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="rexos_delta_robot">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="rexos_delta_robot">
+                <File Name="src/REXOS/ROS/libraries/rexos_delta_robot/include/rexos_delta_robot/DeltaRobot.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_delta_robot/include/rexos_delta_robot/InverseKinematicsException.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_delta_robot/include/rexos_delta_robot/Measures.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_delta_robot/include/rexos_delta_robot/InverseKinematicsModel.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_delta_robot/include/rexos_delta_robot/EffectorBoundaries.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_delta_robot/include/rexos_delta_robot/InverseKinematics.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_delta_robot/include/rexos_delta_robot/EffectorBoundariesException.h"/>
+              </VirtualDirectory>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
+              <File Name="src/REXOS/ROS/libraries/rexos_delta_robot/src/DeltaRobot.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_delta_robot/src/EffectorBoundaries.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_delta_robot/src/InverseKinematics.cpp"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/libraries/rexos_delta_robot/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/libraries/rexos_delta_robot/package.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="camera">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="camera">
+                <File Name="src/REXOS/ROS/libraries/camera/include/camera/unicap_cv_bridge.h"/>
+                <File Name="src/REXOS/ROS/libraries/camera/include/camera/RectifyImage.h"/>
+              </VirtualDirectory>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
+              <File Name="src/REXOS/ROS/libraries/camera/src/unicap_cv_bridge.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/camera/src/RectifyImage.cpp"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/libraries/camera/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/libraries/camera/package.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="rexos_datatypes">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="rexos_datatypes">
+                <File Name="src/REXOS/ROS/libraries/rexos_datatypes/include/rexos_datatypes/MotorRotation.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_datatypes/include/rexos_datatypes/InstructionData.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_datatypes/include/rexos_datatypes/Crate.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_datatypes/include/rexos_datatypes/Point3D.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_datatypes/include/rexos_datatypes/EquipletStep.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_datatypes/include/rexos_datatypes/QrCode.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_datatypes/include/rexos_datatypes/TimeData.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_datatypes/include/rexos_datatypes/DeltaRobotMeasures.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_datatypes/include/rexos_datatypes/Point2D.h"/>
+              </VirtualDirectory>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
+              <File Name="src/REXOS/ROS/libraries/rexos_datatypes/src/QrCodes.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_datatypes/src/InstructionData.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_datatypes/src/TimeData.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_datatypes/src/EquipletStep.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_datatypes/src/Crate.cpp"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/libraries/rexos_datatypes/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/libraries/rexos_datatypes/package.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="rexos_knowledge_database">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="rexos_knowledge_database">
+                <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/include/rexos_knowledge_database/rexos_knowledge_database.h"/>
+              </VirtualDirectory>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
+              <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/src/rexos_knowledge_database.cpp"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/package.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="rexos_utilities">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="rexos_utilities">
+                <File Name="src/REXOS/ROS/libraries/rexos_utilities/include/rexos_utilities/Utilities.h"/>
+              </VirtualDirectory>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
+              <File Name="src/REXOS/ROS/libraries/rexos_utilities/src/Utilities.cpp"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/libraries/rexos_utilities/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/libraries/rexos_utilities/package.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="Matrices">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="Matrices">
+                <File Name="src/REXOS/ROS/libraries/Matrices/include/Matrices/Matrices.h"/>
+              </VirtualDirectory>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
+              <File Name="src/REXOS/ROS/libraries/Matrices/src/Matrices.cpp"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/libraries/Matrices/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/libraries/Matrices/package.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="rexos_vision">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="rexos_vision">
+                <File Name="src/REXOS/ROS/libraries/rexos_vision/include/rexos_vision/QRCodeDetector.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_vision/include/rexos_vision/FiducialDetector.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_vision/include/rexos_vision/CrateTracker.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_vision/include/rexos_vision/PixelAndRealCoordinateTransformer.h"/>
+              </VirtualDirectory>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
+              <File Name="src/REXOS/ROS/libraries/rexos_vision/src/CrateTracker.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_vision/src/FiducialDetector.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_vision/src/QRCodeDetector.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_vision/src/PixelAndRealCoordinateTransformer.cpp"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/libraries/rexos_vision/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/libraries/rexos_vision/package.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="rexos_statemachine">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="rexos_statemachine">
+                <File Name="src/REXOS/ROS/libraries/rexos_statemachine/include/rexos_statemachine/ModuleStateMachine.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_statemachine/include/rexos_statemachine/State.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_statemachine/include/rexos_statemachine/Transitions.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_statemachine/include/rexos_statemachine/Listener.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_statemachine/include/rexos_statemachine/EquipletStateMachine.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_statemachine/include/rexos_statemachine/Mode.h"/>
+                <File Name="src/REXOS/ROS/libraries/rexos_statemachine/include/rexos_statemachine/StateMachine.h"/>
+              </VirtualDirectory>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
+              <File Name="src/REXOS/ROS/libraries/rexos_statemachine/src/StateMachine.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_statemachine/src/ModuleStateMachine.cpp"/>
+              <File Name="src/REXOS/ROS/libraries/rexos_statemachine/src/EquipletStateMachine.cpp"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/libraries/rexos_statemachine/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/libraries/rexos_statemachine/package.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="Vectors">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="Vectors">
+                <File Name="src/REXOS/ROS/libraries/Vectors/include/Vectors/Vectors.h"/>
+              </VirtualDirectory>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
+              <File Name="src/REXOS/ROS/libraries/Vectors/src/Vectors.cpp"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/libraries/Vectors/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/libraries/Vectors/package.xml"/>
+          </VirtualDirectory>
+        </VirtualDirectory>
+        <VirtualDirectory Name="tools">
+          <VirtualDirectory Name="follow_node">
+            <File Name="src/REXOS/ROS/tools/follow_node/CMakeLists.txt"/>
+          </VirtualDirectory>
+        </VirtualDirectory>
+        <VirtualDirectory Name="shared_srvs">
+          <VirtualDirectory Name="rexos_std_srvs">
+            <VirtualDirectory Name="srv">
+              <File Name="src/REXOS/ROS/shared_srvs/rexos_std_srvs/srv/Module.srv"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/shared_srvs/rexos_std_srvs/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/shared_srvs/rexos_std_srvs/package.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="rexos_statemachine_srvs">
+            <VirtualDirectory Name="srv">
+              <File Name="src/REXOS/ROS/shared_srvs/rexos_statemachine_srvs/srv/ModeUpdate.srv"/>
+              <File Name="src/REXOS/ROS/shared_srvs/rexos_statemachine_srvs/srv/RegisterModule.srv"/>
+              <File Name="src/REXOS/ROS/shared_srvs/rexos_statemachine_srvs/srv/StateUpdate.srv"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/ROS/shared_srvs/rexos_statemachine_srvs/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/shared_srvs/rexos_statemachine_srvs/package.xml"/>
+          </VirtualDirectory>
+        </VirtualDirectory>
+        <VirtualDirectory Name="nodes">
+          <VirtualDirectory Name="_demonstrators">
+            <VirtualDirectory Name="follow_node">
+              <VirtualDirectory Name="include">
+                <VirtualDirectory Name="FollowNode">
+                  <File Name="src/REXOS/ROS/nodes/_demonstrators/follow_node/include/FollowNode/FollowNode.h"/>
+                </VirtualDirectory>
+              </VirtualDirectory>
+              <VirtualDirectory Name="src">
+                <File Name="src/REXOS/ROS/nodes/_demonstrators/follow_node/src/FollowNode.cpp"/>
+              </VirtualDirectory>
+              <File Name="src/REXOS/ROS/nodes/_demonstrators/follow_node/CMakeLists.txt"/>
+              <File Name="src/REXOS/ROS/nodes/_demonstrators/follow_node/package.xml"/>
             </VirtualDirectory>
           </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/libraries/libjson/src/JSONWriter.cpp"/>
-            <File Name="src/cpp/libraries/libjson/src/JSONStream.cpp"/>
-            <File Name="src/cpp/libraries/libjson/src/JSONPreparse.cpp"/>
-            <File Name="src/cpp/libraries/libjson/src/JSONNode_Mutex.cpp"/>
-            <File Name="src/cpp/libraries/libjson/src/JSONAllocator.cpp"/>
-            <File Name="src/cpp/libraries/libjson/src/internalJSONNode.cpp"/>
-            <File Name="src/cpp/libraries/libjson/src/libjson.cpp"/>
-            <File Name="src/cpp/libraries/libjson/src/JSONMemory.cpp"/>
-            <File Name="src/cpp/libraries/libjson/src/JSONDebug.cpp"/>
-            <File Name="src/cpp/libraries/libjson/src/JSONChildren.cpp"/>
-            <File Name="src/cpp/libraries/libjson/src/JSONIterators.cpp"/>
-            <File Name="src/cpp/libraries/libjson/src/JSONWorker.cpp"/>
-            <File Name="src/cpp/libraries/libjson/src/JSONNode.cpp"/>
-            <File Name="src/cpp/libraries/libjson/src/JSONValidator.cpp"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/libraries/libjson/CMakeLists.txt"/>
-          <File Name="src/cpp/libraries/libjson/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="rexos_coordinates">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="rexos_coordinates">
-              <File Name="src/cpp/libraries/rexos_coordinates/include/rexos_coordinates/Module.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/libraries/rexos_coordinates/src/Module.cpp"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/libraries/rexos_coordinates/CMakeLists.txt"/>
-          <File Name="src/cpp/libraries/rexos_coordinates/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="rexos_most">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="rexos_most">
-              <File Name="src/cpp/libraries/rexos_most/include/rexos_most/MOSTDatabaseClient.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="test">
-            <File Name="src/cpp/libraries/rexos_most/test/SanityTest.cpp"/>
-            <File Name="src/cpp/libraries/rexos_most/test/MOSTStateMachineTest.cpp"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/libraries/rexos_most/src/dummy.cpp"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="msg">
-            <File Name="src/cpp/libraries/rexos_most/msg/ModuleInfo.msg"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="srv">
-            <File Name="src/cpp/libraries/rexos_most/srv/ModuleUpdate.srv"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/libraries/rexos_most/CMakeLists.txt"/>
-          <File Name="src/cpp/libraries/rexos_most/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="rexos_blackboard_cpp_client">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="rexos_blackboard_cpp_client">
-              <File Name="src/cpp/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/BasicOperationSubscription.h"/>
-              <File Name="src/cpp/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/FieldUpdateSubscription.h"/>
-              <File Name="src/cpp/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/BlackboardSubscription.h"/>
-              <File Name="src/cpp/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/BlackboardSubscriber.h"/>
-              <File Name="src/cpp/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/OplogEntry.h"/>
-              <File Name="src/cpp/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/MongoOperation.h"/>
-              <File Name="src/cpp/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/BlackboardCppClient.h"/>
-              <File Name="src/cpp/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/OplogMonitor.h"/>
-              <File Name="src/cpp/libraries/rexos_blackboard_cpp_client/include/rexos_blackboard_cpp_client/InvalidDBNamespaceException.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/libraries/rexos_blackboard_cpp_client/src/BlackboardCppClient.cpp"/>
-            <File Name="src/cpp/libraries/rexos_blackboard_cpp_client/src/FieldUpdateSubscription.cpp"/>
-            <File Name="src/cpp/libraries/rexos_blackboard_cpp_client/src/BasicOperationSubscription.cpp"/>
-            <File Name="src/cpp/libraries/rexos_blackboard_cpp_client/src/BlackboardSubscription.cpp"/>
-            <File Name="src/cpp/libraries/rexos_blackboard_cpp_client/src/OplogEntry.cpp"/>
-            <File Name="src/cpp/libraries/rexos_blackboard_cpp_client/src/OplogMonitor.cpp"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/libraries/rexos_blackboard_cpp_client/CMakeLists.txt"/>
-          <File Name="src/cpp/libraries/rexos_blackboard_cpp_client/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="rexos_motor">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="rexos_motor">
-              <File Name="src/cpp/libraries/rexos_motor/include/rexos_motor/StepperMotor.h"/>
-              <File Name="src/cpp/libraries/rexos_motor/include/rexos_motor/CRD514KDException.h"/>
-              <File Name="src/cpp/libraries/rexos_motor/include/rexos_motor/CRD514KD.h"/>
-              <File Name="src/cpp/libraries/rexos_motor/include/rexos_motor/MotorException.h"/>
-              <File Name="src/cpp/libraries/rexos_motor/include/rexos_motor/MotorManager.h"/>
-              <File Name="src/cpp/libraries/rexos_motor/include/rexos_motor/MotorInterface.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/libraries/rexos_motor/src/MotorManager.cpp"/>
-            <File Name="src/cpp/libraries/rexos_motor/src/StepperMotor.cpp"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/libraries/rexos_motor/CMakeLists.txt"/>
-          <File Name="src/cpp/libraries/rexos_motor/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="rexos_delta_robot">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="rexos_delta_robot">
-              <File Name="src/cpp/libraries/rexos_delta_robot/include/rexos_delta_robot/DeltaRobot.h"/>
-              <File Name="src/cpp/libraries/rexos_delta_robot/include/rexos_delta_robot/InverseKinematicsException.h"/>
-              <File Name="src/cpp/libraries/rexos_delta_robot/include/rexos_delta_robot/Measures.h"/>
-              <File Name="src/cpp/libraries/rexos_delta_robot/include/rexos_delta_robot/InverseKinematicsModel.h"/>
-              <File Name="src/cpp/libraries/rexos_delta_robot/include/rexos_delta_robot/EffectorBoundaries.h"/>
-              <File Name="src/cpp/libraries/rexos_delta_robot/include/rexos_delta_robot/InverseKinematics.h"/>
-              <File Name="src/cpp/libraries/rexos_delta_robot/include/rexos_delta_robot/EffectorBoundariesException.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/libraries/rexos_delta_robot/src/DeltaRobot.cpp"/>
-            <File Name="src/cpp/libraries/rexos_delta_robot/src/EffectorBoundaries.cpp"/>
-            <File Name="src/cpp/libraries/rexos_delta_robot/src/InverseKinematics.cpp"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/libraries/rexos_delta_robot/CMakeLists.txt"/>
-          <File Name="src/cpp/libraries/rexos_delta_robot/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="camera">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="camera">
-              <File Name="src/cpp/libraries/camera/include/camera/unicap_cv_bridge.h"/>
-              <File Name="src/cpp/libraries/camera/include/camera/RectifyImage.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/libraries/camera/src/unicap_cv_bridge.cpp"/>
-            <File Name="src/cpp/libraries/camera/src/RectifyImage.cpp"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/libraries/camera/CMakeLists.txt"/>
-          <File Name="src/cpp/libraries/camera/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="rexos_datatypes">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="rexos_datatypes">
-              <File Name="src/cpp/libraries/rexos_datatypes/include/rexos_datatypes/MotorRotation.h"/>
-              <File Name="src/cpp/libraries/rexos_datatypes/include/rexos_datatypes/InstructionData.h"/>
-              <File Name="src/cpp/libraries/rexos_datatypes/include/rexos_datatypes/Crate.h"/>
-              <File Name="src/cpp/libraries/rexos_datatypes/include/rexos_datatypes/Point3D.h"/>
-              <File Name="src/cpp/libraries/rexos_datatypes/include/rexos_datatypes/EquipletStep.h"/>
-              <File Name="src/cpp/libraries/rexos_datatypes/include/rexos_datatypes/QrCode.h"/>
-              <File Name="src/cpp/libraries/rexos_datatypes/include/rexos_datatypes/TimeData.h"/>
-              <File Name="src/cpp/libraries/rexos_datatypes/include/rexos_datatypes/DeltaRobotMeasures.h"/>
-              <File Name="src/cpp/libraries/rexos_datatypes/include/rexos_datatypes/Point2D.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/libraries/rexos_datatypes/src/QrCodes.cpp"/>
-            <File Name="src/cpp/libraries/rexos_datatypes/src/InstructionData.cpp"/>
-            <File Name="src/cpp/libraries/rexos_datatypes/src/TimeData.cpp"/>
-            <File Name="src/cpp/libraries/rexos_datatypes/src/EquipletStep.cpp"/>
-            <File Name="src/cpp/libraries/rexos_datatypes/src/Crate.cpp"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/libraries/rexos_datatypes/CMakeLists.txt"/>
-          <File Name="src/cpp/libraries/rexos_datatypes/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="rexos_utilities">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="rexos_utilities">
-              <File Name="src/cpp/libraries/rexos_utilities/include/rexos_utilities/Utilities.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/libraries/rexos_utilities/src/Utilities.cpp"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/libraries/rexos_utilities/CMakeLists.txt"/>
-          <File Name="src/cpp/libraries/rexos_utilities/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="Matrices">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="Matrices">
-              <File Name="src/cpp/libraries/Matrices/include/Matrices/Matrices.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/libraries/Matrices/src/Matrices.cpp"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/libraries/Matrices/CMakeLists.txt"/>
-          <File Name="src/cpp/libraries/Matrices/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="rexos_vision">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="rexos_vision">
-              <File Name="src/cpp/libraries/rexos_vision/include/rexos_vision/QRCodeDetector.h"/>
-              <File Name="src/cpp/libraries/rexos_vision/include/rexos_vision/FiducialDetector.h"/>
-              <File Name="src/cpp/libraries/rexos_vision/include/rexos_vision/CrateTracker.h"/>
-              <File Name="src/cpp/libraries/rexos_vision/include/rexos_vision/PixelAndRealCoordinateTransformer.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/libraries/rexos_vision/src/CrateTracker.cpp"/>
-            <File Name="src/cpp/libraries/rexos_vision/src/FiducialDetector.cpp"/>
-            <File Name="src/cpp/libraries/rexos_vision/src/QRCodeDetector.cpp"/>
-            <File Name="src/cpp/libraries/rexos_vision/src/PixelAndRealCoordinateTransformer.cpp"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/libraries/rexos_vision/CMakeLists.txt"/>
-          <File Name="src/cpp/libraries/rexos_vision/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="rexos_statemachine">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="rexos_statemachine">
-              <File Name="src/cpp/libraries/rexos_statemachine/include/rexos_statemachine/ModuleStateMachine.h"/>
-              <File Name="src/cpp/libraries/rexos_statemachine/include/rexos_statemachine/State.h"/>
-              <File Name="src/cpp/libraries/rexos_statemachine/include/rexos_statemachine/Transitions.h"/>
-              <File Name="src/cpp/libraries/rexos_statemachine/include/rexos_statemachine/Listener.h"/>
-              <File Name="src/cpp/libraries/rexos_statemachine/include/rexos_statemachine/Mode.h"/>
-              <File Name="src/cpp/libraries/rexos_statemachine/include/rexos_statemachine/StateMachine.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/libraries/rexos_statemachine/src/StateMachine.cpp"/>
-            <File Name="src/cpp/libraries/rexos_statemachine/src/ModuleStateMachine.cpp"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/libraries/rexos_statemachine/CMakeLists.txt"/>
-          <File Name="src/cpp/libraries/rexos_statemachine/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="Vectors">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="Vectors">
-              <File Name="src/cpp/libraries/Vectors/include/Vectors/Vectors.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/libraries/Vectors/src/Vectors.cpp"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/libraries/Vectors/CMakeLists.txt"/>
-          <File Name="src/cpp/libraries/Vectors/package.xml"/>
-        </VirtualDirectory>
-      </VirtualDirectory>
-      <VirtualDirectory Name="ros">
-        <VirtualDirectory Name="rexos_std_srvs">
-          <VirtualDirectory Name="srv">
-            <File Name="src/cpp/ros/rexos_std_srvs/srv/Module.srv"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/ros/rexos_std_srvs/CMakeLists.txt"/>
-          <File Name="src/cpp/ros/rexos_std_srvs/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="gripperNode">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="GripperNode">
-              <File Name="src/cpp/ros/gripperNode/include/GripperNode/Services.h"/>
-              <File Name="src/cpp/ros/gripperNode/include/GripperNode/GripperNode.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/ros/gripperNode/src/GripperNode.cpp"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="srv">
-            <File Name="src/cpp/ros/gripperNode/srv/Release.srv"/>
-            <File Name="src/cpp/ros/gripperNode/srv/Grip.srv"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/ros/gripperNode/CMakeLists.txt"/>
-          <File Name="src/cpp/ros/gripperNode/manifest.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="dummy_module_node">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="dummy_module_node">
-              <File Name="src/cpp/ros/dummy_module_node/include/dummy_module_node/DummyModuleNode.h"/>
-              <File Name="src/cpp/ros/dummy_module_node/include/dummy_module_node/Services.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/ros/dummy_module_node/src/DummyModuleNode.cpp"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/ros/dummy_module_node/CMakeLists.txt"/>
-          <File Name="src/cpp/ros/dummy_module_node/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="rexos_statemachine_srvs">
-          <VirtualDirectory Name="srv">
-            <File Name="src/cpp/ros/rexos_statemachine_srvs/srv/ModeUpdate.srv"/>
-            <File Name="src/cpp/ros/rexos_statemachine_srvs/srv/RegisterModule.srv"/>
-            <File Name="src/cpp/ros/rexos_statemachine_srvs/srv/StateUpdate.srv"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/ros/rexos_statemachine_srvs/CMakeLists.txt"/>
-          <File Name="src/cpp/ros/rexos_statemachine_srvs/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="environment_cache">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="environment_cache">
-              <File Name="src/cpp/ros/environment_cache/include/environment_cache/EnvironmentCache.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/ros/environment_cache/src/EnvironmentCache.cpp"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="msg">
-            <File Name="src/cpp/ros/environment_cache/msg/EnvironmentCacheUpdate.msg"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="srv">
-            <File Name="src/cpp/ros/environment_cache/srv/UpdateEnvironmentCache.srv"/>
-            <File Name="src/cpp/ros/environment_cache/srv/LookupEnvironmentObject.srv"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/ros/environment_cache/CMakeLists.txt"/>
-          <File Name="src/cpp/ros/environment_cache/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="rexos_std_msgs">
-          <VirtualDirectory Name="msg">
-            <File Name="src/cpp/ros/rexos_std_msgs/msg/StdReturn.msg"/>
-            <File Name="src/cpp/ros/rexos_std_msgs/msg/KeyValuePair.msg"/>
-            <File Name="src/cpp/ros/rexos_std_msgs/msg/Map.msg"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/ros/rexos_std_msgs/CMakeLists.txt"/>
-          <File Name="src/cpp/ros/rexos_std_msgs/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="delta_robot_node">
-          <VirtualDirectory Name="include">
+          <VirtualDirectory Name="delta_robot">
             <VirtualDirectory Name="delta_robot_node">
-              <File Name="src/cpp/ros/delta_robot_node/include/delta_robot_node/deltaRobotNode.h"/>
-              <File Name="src/cpp/ros/delta_robot_node/include/delta_robot_node/Point.h"/>
-              <File Name="src/cpp/ros/delta_robot_node/include/delta_robot_node/Services.h"/>
+              <VirtualDirectory Name="include">
+                <VirtualDirectory Name="delta_robot_node">
+                  <File Name="src/REXOS/ROS/nodes/delta_robot/delta_robot_node/include/delta_robot_node/deltaRobotNode.h"/>
+                  <File Name="src/REXOS/ROS/nodes/delta_robot/delta_robot_node/include/delta_robot_node/Point.h"/>
+                  <File Name="src/REXOS/ROS/nodes/delta_robot/delta_robot_node/include/delta_robot_node/Services.h"/>
+                </VirtualDirectory>
+              </VirtualDirectory>
+              <VirtualDirectory Name="src">
+                <File Name="src/REXOS/ROS/nodes/delta_robot/delta_robot_node/src/DeltaRobotNode.cpp"/>
+              </VirtualDirectory>
+              <VirtualDirectory Name="msg">
+                <File Name="src/REXOS/ROS/nodes/delta_robot/delta_robot_node/msg/Motion.msg"/>
+              </VirtualDirectory>
+              <VirtualDirectory Name="srv">
+                <File Name="src/REXOS/ROS/nodes/delta_robot/delta_robot_node/srv/MoveToRelativePoint.srv"/>
+                <File Name="src/REXOS/ROS/nodes/delta_robot/delta_robot_node/srv/MoveRelativePath.srv"/>
+                <File Name="src/REXOS/ROS/nodes/delta_robot/delta_robot_node/srv/MoveToPoint.srv"/>
+                <File Name="src/REXOS/ROS/nodes/delta_robot/delta_robot_node/srv/Calibrate.srv"/>
+                <File Name="src/REXOS/ROS/nodes/delta_robot/delta_robot_node/srv/MovePath.srv"/>
+              </VirtualDirectory>
+              <File Name="src/REXOS/ROS/nodes/delta_robot/delta_robot_node/CMakeLists.txt"/>
+              <File Name="src/REXOS/ROS/nodes/delta_robot/delta_robot_node/package.xml"/>
+            </VirtualDirectory>
+            <VirtualDirectory Name="keyboard_control_node">
+              <VirtualDirectory Name="include">
+                <VirtualDirectory Name="keyboard_control_node">
+                  <File Name="src/REXOS/ROS/nodes/delta_robot/keyboard_control_node/include/keyboard_control_node/KeyBoardControlNode.h"/>
+                </VirtualDirectory>
+              </VirtualDirectory>
+              <VirtualDirectory Name="src">
+                <File Name="src/REXOS/ROS/nodes/delta_robot/keyboard_control_node/src/KeyBoardControlNode.cpp"/>
+              </VirtualDirectory>
+              <File Name="src/REXOS/ROS/nodes/delta_robot/keyboard_control_node/CMakeLists.txt"/>
+              <File Name="src/REXOS/ROS/nodes/delta_robot/keyboard_control_node/package.xml"/>
             </VirtualDirectory>
           </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/ros/delta_robot_node/src/DeltaRobotNode.cpp"/>
+          <VirtualDirectory Name="environment_cache">
+            <VirtualDirectory Name="environment_cache_node">
+              <VirtualDirectory Name="include">
+                <VirtualDirectory Name="environment_cache">
+                  <File Name="src/REXOS/ROS/nodes/environment_cache/environment_cache_node/include/environment_cache/EnvironmentCache.h"/>
+                </VirtualDirectory>
+              </VirtualDirectory>
+              <VirtualDirectory Name="src">
+                <File Name="src/REXOS/ROS/nodes/environment_cache/environment_cache_node/src/EnvironmentCache.cpp"/>
+              </VirtualDirectory>
+              <VirtualDirectory Name="msg">
+                <File Name="src/REXOS/ROS/nodes/environment_cache/environment_cache_node/msg/EnvironmentCacheUpdate.msg"/>
+              </VirtualDirectory>
+              <VirtualDirectory Name="srv">
+                <File Name="src/REXOS/ROS/nodes/environment_cache/environment_cache_node/srv/UpdateEnvironmentCache.srv"/>
+                <File Name="src/REXOS/ROS/nodes/environment_cache/environment_cache_node/srv/LookupEnvironmentObject.srv"/>
+              </VirtualDirectory>
+              <File Name="src/REXOS/ROS/nodes/environment_cache/environment_cache_node/CMakeLists.txt"/>
+              <File Name="src/REXOS/ROS/nodes/environment_cache/environment_cache_node/package.xml"/>
+            </VirtualDirectory>
           </VirtualDirectory>
-          <VirtualDirectory Name="msg">
-            <File Name="src/cpp/ros/delta_robot_node/msg/Motion.msg"/>
+          <VirtualDirectory Name="gripper">
+            <VirtualDirectory Name="gripper_node">
+              <VirtualDirectory Name="include">
+                <VirtualDirectory Name="gripper_node">
+                  <File Name="src/REXOS/ROS/nodes/gripper/gripper_node/include/gripper_node/Services.h"/>
+                  <File Name="src/REXOS/ROS/nodes/gripper/gripper_node/include/gripper_node/GripperNode.h"/>
+                </VirtualDirectory>
+              </VirtualDirectory>
+              <VirtualDirectory Name="src">
+                <File Name="src/REXOS/ROS/nodes/gripper/gripper_node/src/GripperNode.cpp"/>
+              </VirtualDirectory>
+              <VirtualDirectory Name="srv">
+                <File Name="src/REXOS/ROS/nodes/gripper/gripper_node/srv/Release.srv"/>
+                <File Name="src/REXOS/ROS/nodes/gripper/gripper_node/srv/Grip.srv"/>
+              </VirtualDirectory>
+              <File Name="src/REXOS/ROS/nodes/gripper/gripper_node/CMakeLists.txt"/>
+              <File Name="src/REXOS/ROS/nodes/gripper/gripper_node/package.xml"/>
+            </VirtualDirectory>
           </VirtualDirectory>
-          <VirtualDirectory Name="srv">
-            <File Name="src/cpp/ros/delta_robot_node/srv/MoveToRelativePoint.srv"/>
-            <File Name="src/cpp/ros/delta_robot_node/srv/MoveRelativePath.srv"/>
-            <File Name="src/cpp/ros/delta_robot_node/srv/MoveToPoint.srv"/>
-            <File Name="src/cpp/ros/delta_robot_node/srv/Calibrate.srv"/>
-            <File Name="src/cpp/ros/delta_robot_node/srv/MovePath.srv"/>
-            <File Name="src/cpp/ros/delta_robot_node/srv/EquipletStepServ.srv"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/ros/delta_robot_node/CMakeLists.txt"/>
-          <File Name="src/cpp/ros/delta_robot_node/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="crate_locator_node">
-          <VirtualDirectory Name="include">
+          <VirtualDirectory Name="_depricated">
+            <VirtualDirectory Name="dummy_module_node">
+              <VirtualDirectory Name="include">
+                <VirtualDirectory Name="dummy_module_node">
+                  <File Name="src/REXOS/ROS/nodes/_depricated/dummy_module_node/include/dummy_module_node/DummyModuleNode.h"/>
+                  <File Name="src/REXOS/ROS/nodes/_depricated/dummy_module_node/include/dummy_module_node/Services.h"/>
+                </VirtualDirectory>
+              </VirtualDirectory>
+              <VirtualDirectory Name="src">
+                <File Name="src/REXOS/ROS/nodes/_depricated/dummy_module_node/src/DummyModuleNode.cpp"/>
+              </VirtualDirectory>
+              <File Name="src/REXOS/ROS/nodes/_depricated/dummy_module_node/CMakeLists.txt"/>
+              <File Name="src/REXOS/ROS/nodes/_depricated/dummy_module_node/package.xml"/>
+            </VirtualDirectory>
             <VirtualDirectory Name="crate_locator_node">
-              <File Name="src/cpp/ros/crate_locator_node/include/crate_locator_node/CrateLocatorNode.h"/>
-              <File Name="src/cpp/ros/crate_locator_node/include/crate_locator_node/Topics.h"/>
-              <File Name="src/cpp/ros/crate_locator_node/include/crate_locator_node/Services.h"/>
+              <VirtualDirectory Name="include">
+                <VirtualDirectory Name="crate_locator_node">
+                  <File Name="src/REXOS/ROS/nodes/_depricated/crate_locator_node/include/crate_locator_node/CrateLocatorNode.h"/>
+                  <File Name="src/REXOS/ROS/nodes/_depricated/crate_locator_node/include/crate_locator_node/Topics.h"/>
+                  <File Name="src/REXOS/ROS/nodes/_depricated/crate_locator_node/include/crate_locator_node/Services.h"/>
+                </VirtualDirectory>
+              </VirtualDirectory>
+              <VirtualDirectory Name="src">
+                <File Name="src/REXOS/ROS/nodes/_depricated/crate_locator_node/src/CrateLocatorNode.cpp"/>
+              </VirtualDirectory>
+              <VirtualDirectory Name="msg">
+                <File Name="src/REXOS/ROS/nodes/_depricated/crate_locator_node/msg/CrateMsg.msg"/>
+                <File Name="src/REXOS/ROS/nodes/_depricated/crate_locator_node/msg/CrateEventMsg.msg"/>
+              </VirtualDirectory>
+              <VirtualDirectory Name="srv">
+                <File Name="src/REXOS/ROS/nodes/_depricated/crate_locator_node/srv/getCrate.srv"/>
+                <File Name="src/REXOS/ROS/nodes/_depricated/crate_locator_node/srv/getAllCrates.srv"/>
+              </VirtualDirectory>
+              <File Name="src/REXOS/ROS/nodes/_depricated/crate_locator_node/CMakeLists.txt"/>
+              <File Name="src/REXOS/ROS/nodes/_depricated/crate_locator_node/package.xml"/>
+            </VirtualDirectory>
+            <VirtualDirectory Name="delta_robot_test_node">
+              <VirtualDirectory Name="src">
+                <File Name="src/REXOS/ROS/nodes/_depricated/delta_robot_test_node/src/DeltaRobotTest.cpp"/>
+              </VirtualDirectory>
+              <File Name="src/REXOS/ROS/nodes/_depricated/delta_robot_test_node/CMakeLists.txt"/>
+              <File Name="src/REXOS/ROS/nodes/_depricated/delta_robot_test_node/package.xml"/>
+            </VirtualDirectory>
+            <VirtualDirectory Name="unused files">
+              <File Name="src/REXOS/ROS/nodes/_depricated/unused files/HardwareModuleProperties.h"/>
             </VirtualDirectory>
           </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/ros/crate_locator_node/src/CrateLocatorNode.cpp"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="msg">
-            <File Name="src/cpp/ros/crate_locator_node/msg/CrateMsg.msg"/>
-            <File Name="src/cpp/ros/crate_locator_node/msg/CrateEventMsg.msg"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="srv">
-            <File Name="src/cpp/ros/crate_locator_node/srv/getCrate.srv"/>
-            <File Name="src/cpp/ros/crate_locator_node/srv/getAllCrates.srv"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/ros/crate_locator_node/CMakeLists.txt"/>
-          <File Name="src/cpp/ros/crate_locator_node/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="equiplet_node">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="equiplet_node">
+          <VirtualDirectory Name="equiplet_node">
+            <VirtualDirectory Name="include">
+              <VirtualDirectory Name="equiplet_node">
+                <VirtualDirectory Name="state_machine">
+                  <File Name="src/REXOS/ROS/nodes/equiplet_node/include/equiplet_node/state_machine/EquipletStateMachine.h"/>
+                </VirtualDirectory>
+                <VirtualDirectory Name="scada">
+                  <File Name="src/REXOS/ROS/nodes/equiplet_node/include/equiplet_node/scada/mongoose.h"/>
+                  <File Name="src/REXOS/ROS/nodes/equiplet_node/include/equiplet_node/scada/EquipletScada.h"/>
+                </VirtualDirectory>
+                <File Name="src/REXOS/ROS/nodes/equiplet_node/include/equiplet_node/StateBlackboard.h"/>
+                <File Name="src/REXOS/ROS/nodes/equiplet_node/include/equiplet_node/ModuleRegistry.h"/>
+                <File Name="src/REXOS/ROS/nodes/equiplet_node/include/equiplet_node/ModuleProxyListener.h"/>
+                <File Name="src/REXOS/ROS/nodes/equiplet_node/include/equiplet_node/ModuleRegistryListener.h"/>
+                <File Name="src/REXOS/ROS/nodes/equiplet_node/include/equiplet_node/EquipletNode.h"/>
+                <File Name="src/REXOS/ROS/nodes/equiplet_node/include/equiplet_node/ModuleProxy.h"/>
+                <File Name="src/REXOS/ROS/nodes/equiplet_node/include/equiplet_node/HardwareModuleProperties.h"/>
+              </VirtualDirectory>
+            </VirtualDirectory>
+            <VirtualDirectory Name="src">
               <VirtualDirectory Name="state_machine">
-                <File Name="src/cpp/ros/equiplet_node/include/equiplet_node/state_machine/EquipletStateMachine.h"/>
+                <File Name="src/REXOS/ROS/nodes/equiplet_node/src/state_machine/EquipletStateMachine.cpp"/>
               </VirtualDirectory>
               <VirtualDirectory Name="scada">
-                <File Name="src/cpp/ros/equiplet_node/include/equiplet_node/scada/mongoose.h"/>
-                <File Name="src/cpp/ros/equiplet_node/include/equiplet_node/scada/EquipletScada.h"/>
+                <File Name="src/REXOS/ROS/nodes/equiplet_node/src/scada/EquipletScada.cpp"/>
               </VirtualDirectory>
-              <File Name="src/cpp/ros/equiplet_node/include/equiplet_node/StateBlackboard.h"/>
-              <File Name="src/cpp/ros/equiplet_node/include/equiplet_node/ModuleRegistry.h"/>
-              <File Name="src/cpp/ros/equiplet_node/include/equiplet_node/ModuleProxyListener.h"/>
-              <File Name="src/cpp/ros/equiplet_node/include/equiplet_node/ModuleRegistryListener.h"/>
-              <File Name="src/cpp/ros/equiplet_node/include/equiplet_node/EquipletNode.h"/>
-              <File Name="src/cpp/ros/equiplet_node/include/equiplet_node/ModuleProxy.h"/>
-              <File Name="src/cpp/ros/equiplet_node/include/equiplet_node/HardwareModuleProperties.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <VirtualDirectory Name="state_machine">
-              <File Name="src/cpp/ros/equiplet_node/src/state_machine/EquipletStateMachine.cpp"/>
-            </VirtualDirectory>
-            <VirtualDirectory Name="scada">
-              <File Name="src/cpp/ros/equiplet_node/src/scada/EquipletScada.cpp"/>
-            </VirtualDirectory>
-            <File Name="src/cpp/ros/equiplet_node/src/EquipletNodeMain.cpp"/>
-            <File Name="src/cpp/ros/equiplet_node/src/ModuleProxy.cpp"/>
-            <File Name="src/cpp/ros/equiplet_node/src/EquipletNode.cpp"/>
-            <File Name="src/cpp/ros/equiplet_node/src/ModuleRegistry.cpp"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="srv">
-            <File Name="src/cpp/ros/equiplet_node/srv/ModeUpdate.srv"/>
-            <File Name="src/cpp/ros/equiplet_node/srv/RegisterModule.srv"/>
-            <File Name="src/cpp/ros/equiplet_node/srv/StateUpdate.srv"/>
-            <File Name="src/cpp/ros/equiplet_node/srv/SetInstruction.srv"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/ros/equiplet_node/CMakeLists.txt"/>
-          <File Name="src/cpp/ros/equiplet_node/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="environment_communication_msgs">
-          <VirtualDirectory Name="msg">
-            <File Name="src/cpp/ros/environment_communication_msgs/msg/KeyValuePair.msg"/>
-            <File Name="src/cpp/ros/environment_communication_msgs/msg/Map.msg"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/ros/environment_communication_msgs/CMakeLists.txt"/>
-          <File Name="src/cpp/ros/environment_communication_msgs/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="huniversal_camera">
-          <VirtualDirectory Name="module_detector_node">
-            <VirtualDirectory Name="include">
-              <VirtualDirectory Name="module_detector_node">
-                <File Name="src/cpp/ros/huniversal_camera/module_detector_node/include/module_detector_node/module_detector_node.h"/>
-              </VirtualDirectory>
-            </VirtualDirectory>
-            <VirtualDirectory Name="src">
-              <File Name="src/cpp/ros/huniversal_camera/module_detector_node/src/module_detector_node.cpp"/>
-            </VirtualDirectory>
-            <File Name="src/cpp/ros/huniversal_camera/module_detector_node/CMakeLists.txt"/>
-            <File Name="src/cpp/ros/huniversal_camera/module_detector_node/package.xml"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="camera_calibration_node">
-            <VirtualDirectory Name="include">
-              <VirtualDirectory Name="camera_calibration_node">
-                <File Name="src/cpp/ros/huniversal_camera/camera_calibration_node/include/camera_calibration_node/camera_calibration_node.h"/>
-                <File Name="src/cpp/ros/huniversal_camera/camera_calibration_node/include/camera_calibration_node/Services.h"/>
-              </VirtualDirectory>
-            </VirtualDirectory>
-            <VirtualDirectory Name="src">
-              <File Name="src/cpp/ros/huniversal_camera/camera_calibration_node/src/camera_calibration_node.cpp"/>
+              <File Name="src/REXOS/ROS/nodes/equiplet_node/src/EquipletNodeMain.cpp"/>
+              <File Name="src/REXOS/ROS/nodes/equiplet_node/src/ModuleProxy.cpp"/>
+              <File Name="src/REXOS/ROS/nodes/equiplet_node/src/EquipletNode.cpp"/>
+              <File Name="src/REXOS/ROS/nodes/equiplet_node/src/ModuleRegistry.cpp"/>
             </VirtualDirectory>
             <VirtualDirectory Name="srv">
-              <File Name="src/cpp/ros/huniversal_camera/camera_calibration_node/srv/calibrateLens.srv"/>
-              <File Name="src/cpp/ros/huniversal_camera/camera_calibration_node/srv/calibrateBrightness.srv"/>
-              <File Name="src/cpp/ros/huniversal_camera/camera_calibration_node/srv/calibrateEffector.srv"/>
+              <File Name="src/REXOS/ROS/nodes/equiplet_node/srv/ModeUpdate.srv"/>
+              <File Name="src/REXOS/ROS/nodes/equiplet_node/srv/RegisterModule.srv"/>
+              <File Name="src/REXOS/ROS/nodes/equiplet_node/srv/StateUpdate.srv"/>
+              <File Name="src/REXOS/ROS/nodes/equiplet_node/srv/SetInstruction.srv"/>
             </VirtualDirectory>
-            <File Name="src/cpp/ros/huniversal_camera/camera_calibration_node/CMakeLists.txt"/>
-            <File Name="src/cpp/ros/huniversal_camera/camera_calibration_node/package.xml"/>
+            <File Name="src/REXOS/ROS/nodes/equiplet_node/CMakeLists.txt"/>
+            <File Name="src/REXOS/ROS/nodes/equiplet_node/package.xml"/>
           </VirtualDirectory>
-          <VirtualDirectory Name="part_locator_node">
-            <VirtualDirectory Name="include">
-              <VirtualDirectory Name="part_locator_node">
-                <File Name="src/cpp/ros/huniversal_camera/part_locator_node/include/part_locator_node/part_locator_node.h"/>
+          <VirtualDirectory Name="huniversal_camera">
+            <VirtualDirectory Name="camera_calibration_node">
+              <VirtualDirectory Name="include">
+                <VirtualDirectory Name="camera_calibration_node">
+                  <File Name="src/REXOS/ROS/nodes/huniversal_camera/camera_calibration_node/include/camera_calibration_node/camera_calibration_node.h"/>
+                  <File Name="src/REXOS/ROS/nodes/huniversal_camera/camera_calibration_node/include/camera_calibration_node/Services.h"/>
+                </VirtualDirectory>
               </VirtualDirectory>
-            </VirtualDirectory>
-            <VirtualDirectory Name="src">
-              <File Name="src/cpp/ros/huniversal_camera/part_locator_node/src/part_locator_node.cpp"/>
-            </VirtualDirectory>
-            <File Name="src/cpp/ros/huniversal_camera/part_locator_node/CMakeLists.txt"/>
-            <File Name="src/cpp/ros/huniversal_camera/part_locator_node/package.xml"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="image_stream_node">
-            <VirtualDirectory Name="include">
-              <VirtualDirectory Name="image_stream_node">
-                <File Name="src/cpp/ros/huniversal_camera/image_stream_node/include/image_stream_node/image_stream_node.h"/>
-                <File Name="src/cpp/ros/huniversal_camera/image_stream_node/include/image_stream_node/Services.h"/>
+              <VirtualDirectory Name="src">
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/camera_calibration_node/src/camera_calibration_node.cpp"/>
               </VirtualDirectory>
-            </VirtualDirectory>
-            <VirtualDirectory Name="src">
-              <File Name="src/cpp/ros/huniversal_camera/image_stream_node/src/image_stream_node.cpp"/>
-            </VirtualDirectory>
-            <VirtualDirectory Name="msg">
-              <File Name="src/cpp/ros/huniversal_camera/image_stream_node/msg/matrix3x3.msg"/>
-            </VirtualDirectory>
-            <VirtualDirectory Name="srv">
-              <File Name="src/cpp/ros/huniversal_camera/image_stream_node/srv/CorrectionMatrices.srv"/>
-              <File Name="src/cpp/ros/huniversal_camera/image_stream_node/srv/AutoWhiteBalance.srv"/>
-              <File Name="src/cpp/ros/huniversal_camera/image_stream_node/srv/FishEyeCorrection.srv"/>
-            </VirtualDirectory>
-            <File Name="src/cpp/ros/huniversal_camera/image_stream_node/CMakeLists.txt"/>
-            <File Name="src/cpp/ros/huniversal_camera/image_stream_node/package.xml"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="fiducial_reader_node">
-            <VirtualDirectory Name="include">
-              <VirtualDirectory Name="fiducial_reader_node">
-                <File Name="src/cpp/ros/huniversal_camera/fiducial_reader_node/include/fiducial_reader_node/fiducial_reader_node.h"/>
-                <File Name="src/cpp/ros/huniversal_camera/fiducial_reader_node/include/fiducial_reader_node/Services.h"/>
+              <VirtualDirectory Name="srv">
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/camera_calibration_node/srv/calibrateLens.srv"/>
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/camera_calibration_node/srv/calibrateBrightness.srv"/>
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/camera_calibration_node/srv/calibrateEffector.srv"/>
               </VirtualDirectory>
+              <File Name="src/REXOS/ROS/nodes/huniversal_camera/camera_calibration_node/CMakeLists.txt"/>
+              <File Name="src/REXOS/ROS/nodes/huniversal_camera/camera_calibration_node/package.xml"/>
             </VirtualDirectory>
-            <VirtualDirectory Name="src">
-              <File Name="src/cpp/ros/huniversal_camera/fiducial_reader_node/src/fiducial_reader_node.cpp"/>
-            </VirtualDirectory>
-            <VirtualDirectory Name="msg">
-              <File Name="src/cpp/ros/huniversal_camera/fiducial_reader_node/msg/point64.msg"/>
-              <File Name="src/cpp/ros/huniversal_camera/fiducial_reader_node/msg/Fiducials.msg"/>
-            </VirtualDirectory>
-            <File Name="src/cpp/ros/huniversal_camera/fiducial_reader_node/CMakeLists.txt"/>
-            <File Name="src/cpp/ros/huniversal_camera/fiducial_reader_node/package.xml"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="camera_control_node">
-            <VirtualDirectory Name="include">
-              <VirtualDirectory Name="camera_control_node">
-                <File Name="src/cpp/ros/huniversal_camera/camera_control_node/include/camera_control_node/camera_control_node.h"/>
+            <VirtualDirectory Name="part_locator_node">
+              <VirtualDirectory Name="include">
+                <VirtualDirectory Name="part_locator_node">
+                  <File Name="src/REXOS/ROS/nodes/huniversal_camera/part_locator_node/include/part_locator_node/part_locator_node.h"/>
+                </VirtualDirectory>
               </VirtualDirectory>
-            </VirtualDirectory>
-            <VirtualDirectory Name="src">
-              <File Name="src/cpp/ros/huniversal_camera/camera_control_node/src/camera_control_node.cpp"/>
-            </VirtualDirectory>
-            <File Name="src/cpp/ros/huniversal_camera/camera_control_node/CMakeLists.txt"/>
-            <File Name="src/cpp/ros/huniversal_camera/camera_control_node/package.xml"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="qr_code_reader_node">
-            <VirtualDirectory Name="include">
-              <VirtualDirectory Name="qr_code_reader_node">
-                <File Name="src/cpp/ros/huniversal_camera/qr_code_reader_node/include/qr_code_reader_node/qr_code_reader_node.h"/>
-                <File Name="src/cpp/ros/huniversal_camera/qr_code_reader_node/include/qr_code_reader_node/Services.h"/>
+              <VirtualDirectory Name="src">
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/part_locator_node/src/part_locator_node.cpp"/>
               </VirtualDirectory>
+              <File Name="src/REXOS/ROS/nodes/huniversal_camera/part_locator_node/CMakeLists.txt"/>
+              <File Name="src/REXOS/ROS/nodes/huniversal_camera/part_locator_node/package.xml"/>
             </VirtualDirectory>
-            <VirtualDirectory Name="src">
-              <File Name="src/cpp/ros/huniversal_camera/qr_code_reader_node/src/qr_code_reader_node.cpp"/>
-            </VirtualDirectory>
-            <VirtualDirectory Name="msg">
-              <File Name="src/cpp/ros/huniversal_camera/qr_code_reader_node/msg/point64.msg"/>
-              <File Name="src/cpp/ros/huniversal_camera/qr_code_reader_node/msg/Collection.msg"/>
-              <File Name="src/cpp/ros/huniversal_camera/qr_code_reader_node/msg/qrCode.msg"/>
-            </VirtualDirectory>
-            <File Name="src/cpp/ros/huniversal_camera/qr_code_reader_node/CMakeLists.txt"/>
-            <File Name="src/cpp/ros/huniversal_camera/qr_code_reader_node/package.xml"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="camera_node">
-            <VirtualDirectory Name="include">
-              <VirtualDirectory Name="camera_node">
-                <File Name="src/cpp/ros/huniversal_camera/camera_node/include/camera_node/camera_node.h"/>
-                <File Name="src/cpp/ros/huniversal_camera/camera_node/include/camera_node/Services.h"/>
+            <VirtualDirectory Name="image_stream_node">
+              <VirtualDirectory Name="include">
+                <VirtualDirectory Name="image_stream_node">
+                  <File Name="src/REXOS/ROS/nodes/huniversal_camera/image_stream_node/include/image_stream_node/image_stream_node.h"/>
+                  <File Name="src/REXOS/ROS/nodes/huniversal_camera/image_stream_node/include/image_stream_node/Services.h"/>
+                </VirtualDirectory>
               </VirtualDirectory>
+              <VirtualDirectory Name="src">
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/image_stream_node/src/image_stream_node.cpp"/>
+              </VirtualDirectory>
+              <VirtualDirectory Name="msg">
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/image_stream_node/msg/matrix3x3.msg"/>
+              </VirtualDirectory>
+              <VirtualDirectory Name="srv">
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/image_stream_node/srv/CorrectionMatrices.srv"/>
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/image_stream_node/srv/AutoWhiteBalance.srv"/>
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/image_stream_node/srv/FishEyeCorrection.srv"/>
+              </VirtualDirectory>
+              <File Name="src/REXOS/ROS/nodes/huniversal_camera/image_stream_node/CMakeLists.txt"/>
+              <File Name="src/REXOS/ROS/nodes/huniversal_camera/image_stream_node/package.xml"/>
             </VirtualDirectory>
-            <VirtualDirectory Name="src">
-              <File Name="src/cpp/ros/huniversal_camera/camera_node/src/camera_node.cpp"/>
+            <VirtualDirectory Name="vision_node">
+              <VirtualDirectory Name="include">
+                <VirtualDirectory Name="vision_node">
+                  <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/include/vision_node/VisionNode.h"/>
+                  <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/include/vision_node/FishEyeCorrector.h"/>
+                  <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/include/vision_node/fish_eye_correction_node.h"/>
+                  <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/include/vision_node/QrCodeReader.h"/>
+                  <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/include/vision_node/FiducialDetector.h"/>
+                  <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/include/vision_node/Services.h"/>
+                </VirtualDirectory>
+              </VirtualDirectory>
+              <VirtualDirectory Name="src">
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/src/vision_node.cpp"/>
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/src/VisionNode.cpp"/>
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/src/FiducialDetector.cpp"/>
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/src/FishEyeCorrector.cpp"/>
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/src/QrCodeReader.cpp"/>
+              </VirtualDirectory>
+              <VirtualDirectory Name="msg">
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/msg/Matrix3x3.msg"/>
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/msg/QrCodes.msg"/>
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/msg/QrCode.msg"/>
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/msg/Fiducials.msg"/>
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/msg/Point64.msg"/>
+              </VirtualDirectory>
+              <VirtualDirectory Name="srv">
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/srv/setCorrectionMatrices.srv"/>
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/srv/fishEyeCorrection.srv"/>
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/srv/getCorrectionMatrices.srv"/>
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/srv/enableComponent.srv"/>
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/srv/autoWhiteBalance.srv"/>
+              </VirtualDirectory>
+              <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/CMakeLists.txt"/>
+              <File Name="src/REXOS/ROS/nodes/huniversal_camera/vision_node/package.xml"/>
             </VirtualDirectory>
-            <VirtualDirectory Name="msg">
-              <File Name="src/cpp/ros/huniversal_camera/camera_node/msg/matrix3x3.msg"/>
+            <VirtualDirectory Name="camera_control_node">
+              <VirtualDirectory Name="include">
+                <VirtualDirectory Name="camera_control_node">
+                  <File Name="src/REXOS/ROS/nodes/huniversal_camera/camera_control_node/include/camera_control_node/camera_control_node.h"/>
+                </VirtualDirectory>
+              </VirtualDirectory>
+              <VirtualDirectory Name="src">
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/camera_control_node/src/camera_control_node.cpp"/>
+              </VirtualDirectory>
+              <File Name="src/REXOS/ROS/nodes/huniversal_camera/camera_control_node/CMakeLists.txt"/>
+              <File Name="src/REXOS/ROS/nodes/huniversal_camera/camera_control_node/package.xml"/>
             </VirtualDirectory>
-            <VirtualDirectory Name="srv">
-              <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/setCorrectionMatrices.srv"/>
-              <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/fishEyeCorrection.srv"/>
-              <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/getCorrectionMatrices.srv"/>
-              <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/AutoWhiteBalance.srv"/>
-              <File Name="src/cpp/ros/huniversal_camera/camera_node/srv/enableCamera.srv"/>
-            </VirtualDirectory>
-            <File Name="src/cpp/ros/huniversal_camera/camera_node/CMakeLists.txt"/>
-            <File Name="src/cpp/ros/huniversal_camera/camera_node/DeltaLens_2012-01-20.xml"/>
-            <File Name="src/cpp/ros/huniversal_camera/camera_node/package.xml"/>
-          </VirtualDirectory>
-        </VirtualDirectory>
-        <VirtualDirectory Name="lookup_handler">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="lookup_handler">
-              <File Name="src/cpp/ros/lookup_handler/include/lookup_handler/LookupHandler.h"/>
+            <VirtualDirectory Name="module_detector_node">
+              <VirtualDirectory Name="include">
+                <VirtualDirectory Name="module_detector_node">
+                  <File Name="src/REXOS/ROS/nodes/huniversal_camera/module_detector_node/include/module_detector_node/module_detector_node.h"/>
+                </VirtualDirectory>
+              </VirtualDirectory>
+              <VirtualDirectory Name="src">
+                <File Name="src/REXOS/ROS/nodes/huniversal_camera/module_detector_node/src/module_detector_node.cpp"/>
+              </VirtualDirectory>
+              <File Name="src/REXOS/ROS/nodes/huniversal_camera/module_detector_node/CMakeLists.txt"/>
+              <File Name="src/REXOS/ROS/nodes/huniversal_camera/module_detector_node/package.xml"/>
             </VirtualDirectory>
           </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/ros/lookup_handler/src/LookupHandler.cpp"/>
+          <VirtualDirectory Name="lookup_handler">
+            <VirtualDirectory Name="lookup_handler_node">
+              <VirtualDirectory Name="include">
+                <VirtualDirectory Name="lookup_handler">
+                  <File Name="src/REXOS/ROS/nodes/lookup_handler/lookup_handler_node/include/lookup_handler/LookupHandler.h"/>
+                </VirtualDirectory>
+              </VirtualDirectory>
+              <VirtualDirectory Name="src">
+                <File Name="src/REXOS/ROS/nodes/lookup_handler/lookup_handler_node/src/LookupHandler.cpp"/>
+              </VirtualDirectory>
+              <VirtualDirectory Name="msg">
+                <File Name="src/REXOS/ROS/nodes/lookup_handler/lookup_handler_node/msg/LookupMessage.msg"/>
+              </VirtualDirectory>
+              <VirtualDirectory Name="srv">
+                <File Name="src/REXOS/ROS/nodes/lookup_handler/lookup_handler_node/srv/LookupServer.srv"/>
+              </VirtualDirectory>
+              <File Name="src/REXOS/ROS/nodes/lookup_handler/lookup_handler_node/CMakeLists.txt"/>
+              <File Name="src/REXOS/ROS/nodes/lookup_handler/lookup_handler_node/package.xml"/>
+            </VirtualDirectory>
           </VirtualDirectory>
-          <VirtualDirectory Name="msg">
-            <File Name="src/cpp/ros/lookup_handler/msg/LookupMessage.msg"/>
-          </VirtualDirectory>
-          <VirtualDirectory Name="srv">
-            <File Name="src/cpp/ros/lookup_handler/srv/LookupServer.srv"/>
-          </VirtualDirectory>
-          <File Name="src/cpp/ros/lookup_handler/CMakeLists.txt"/>
-          <File Name="src/cpp/ros/lookup_handler/package.xml"/>
         </VirtualDirectory>
       </VirtualDirectory>
-      <VirtualDirectory Name="tools">
-        <VirtualDirectory Name="follow_node">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="FollowNode">
-              <File Name="src/cpp/tools/follow_node/include/FollowNode/FollowNode.h"/>
+      <VirtualDirectory Name="MAS">
+        <VirtualDirectory Name="agents">
+          <VirtualDirectory Name="product_agent">
+            <VirtualDirectory Name="behaviours">
+              <File Name="src/REXOS/MAS/agents/product_agent/behaviours/OverviewBehaviour.java"/>
+              <File Name="src/REXOS/MAS/agents/product_agent/behaviours/SchedulerBehaviour.java"/>
+              <File Name="src/REXOS/MAS/agents/product_agent/behaviours/SubInformerBehaviour.java"/>
+              <File Name="src/REXOS/MAS/agents/product_agent/behaviours/HeartbeatReceiver.java"/>
+              <File Name="src/REXOS/MAS/agents/product_agent/behaviours/ScheduleInformationBehaviour.java"/>
+              <File Name="src/REXOS/MAS/agents/product_agent/behaviours/InformerBehaviour.java"/>
+              <File Name="src/REXOS/MAS/agents/product_agent/behaviours/RescheduleBehaviour.java"/>
+              <File Name="src/REXOS/MAS/agents/product_agent/behaviours/HeartBeatBehaviour.java"/>
+              <File Name="src/REXOS/MAS/agents/product_agent/behaviours/PlannerBehaviour.java"/>
+              <File Name="src/REXOS/MAS/agents/product_agent/behaviours/ProduceBehaviour.java"/>
+              <File Name="src/REXOS/MAS/agents/product_agent/behaviours/SocketBehaviour.java"/>
             </VirtualDirectory>
+            <File Name="src/REXOS/MAS/agents/product_agent/ProductAgent.java"/>
+            <File Name="src/REXOS/MAS/agents/product_agent/build.xml"/>
+            <File Name="src/REXOS/MAS/agents/product_agent/BehaviourCallback.java"/>
           </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/tools/follow_node/src/FollowNode.cpp"/>
+          <VirtualDirectory Name="equiplet_agent">
+            <VirtualDirectory Name="behaviours">
+              <File Name="src/REXOS/MAS/agents/equiplet_agent/behaviours/CanPerformProductionStep.java"/>
+              <File Name="src/REXOS/MAS/agents/equiplet_agent/behaviours/ServiceAgentDied.java"/>
+              <File Name="src/REXOS/MAS/agents/equiplet_agent/behaviours/CanPerformStep.java"/>
+              <File Name="src/REXOS/MAS/agents/equiplet_agent/behaviours/ProductStepDuration.java"/>
+              <File Name="src/REXOS/MAS/agents/equiplet_agent/behaviours/ScheduleStep.java"/>
+              <File Name="src/REXOS/MAS/agents/equiplet_agent/behaviours/ReleaseScheduleLock.java"/>
+              <File Name="src/REXOS/MAS/agents/equiplet_agent/behaviours/AbortStep.java"/>
+              <File Name="src/REXOS/MAS/agents/equiplet_agent/behaviours/ProductionDuration.java"/>
+              <File Name="src/REXOS/MAS/agents/equiplet_agent/behaviours/ScheduleInformation.java"/>
+              <File Name="src/REXOS/MAS/agents/equiplet_agent/behaviours/InitialisationFinished.java"/>
+              <File Name="src/REXOS/MAS/agents/equiplet_agent/behaviours/StartStep.java"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/MAS/agents/equiplet_agent/NextProductStepTimer.java"/>
+            <File Name="src/REXOS/MAS/agents/equiplet_agent/EquipletDirectoryEntry.java"/>
+            <File Name="src/REXOS/MAS/agents/equiplet_agent/build.xml"/>
+            <File Name="src/REXOS/MAS/agents/equiplet_agent/EquipletAgent.java"/>
           </VirtualDirectory>
-          <File Name="src/cpp/tools/follow_node/CMakeLists.txt"/>
-          <File Name="src/cpp/tools/follow_node/package.xml"/>
+          <VirtualDirectory Name="hardware_agent">
+            <VirtualDirectory Name="behaviours">
+              <File Name="src/REXOS/MAS/agents/hardware_agent/behaviours/RequiredModulesPresent.java"/>
+              <File Name="src/REXOS/MAS/agents/hardware_agent/behaviours/ServiceAgentDied.java"/>
+              <File Name="src/REXOS/MAS/agents/hardware_agent/behaviours/FillPlaceholders.java"/>
+              <File Name="src/REXOS/MAS/agents/hardware_agent/behaviours/EvaluateDuration.java"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/MAS/agents/hardware_agent/InstructionData.java"/>
+            <File Name="src/REXOS/MAS/agents/hardware_agent/EquipletStep.java"/>
+            <File Name="src/REXOS/MAS/agents/hardware_agent/Module.java"/>
+            <File Name="src/REXOS/MAS/agents/hardware_agent/GripperModule.java"/>
+            <File Name="src/REXOS/MAS/agents/hardware_agent/TimeData.java"/>
+            <File Name="src/REXOS/MAS/agents/hardware_agent/DeltaRobotModule.java"/>
+            <File Name="src/REXOS/MAS/agents/hardware_agent/DummyModule.java"/>
+            <File Name="src/REXOS/MAS/agents/hardware_agent/build.xml"/>
+            <File Name="src/REXOS/MAS/agents/hardware_agent/ModuleFactory.java"/>
+            <File Name="src/REXOS/MAS/agents/hardware_agent/PenModule.java"/>
+            <File Name="src/REXOS/MAS/agents/hardware_agent/HardwareAgent.java"/>
+            <File Name="src/REXOS/MAS/agents/hardware_agent/ModuleUpdateListener.java"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="logistics_agent">
+            <VirtualDirectory Name="behaviours">
+              <File Name="src/REXOS/MAS/agents/logistics_agent/behaviours/ArePartsAvailableInTime.java"/>
+              <File Name="src/REXOS/MAS/agents/logistics_agent/behaviours/ArePartsAvailable.java"/>
+              <File Name="src/REXOS/MAS/agents/logistics_agent/behaviours/CancelTransportBehaviour.java"/>
+              <File Name="src/REXOS/MAS/agents/logistics_agent/behaviours/PartsInfo.java"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/MAS/agents/logistics_agent/build.xml"/>
+            <File Name="src/REXOS/MAS/agents/logistics_agent/LogisticsAgent.java"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="service_agent">
+            <VirtualDirectory Name="behaviours">
+              <File Name="src/REXOS/MAS/agents/service_agent/behaviours/ArePartsAvailableInTime.java"/>
+              <File Name="src/REXOS/MAS/agents/service_agent/behaviours/RequiredModulesPresent.java"/>
+              <File Name="src/REXOS/MAS/agents/service_agent/behaviours/CanPerformProductionStep.java"/>
+              <File Name="src/REXOS/MAS/agents/service_agent/behaviours/ProductStepDuration.java"/>
+              <File Name="src/REXOS/MAS/agents/service_agent/behaviours/OtherAgentDied.java"/>
+              <File Name="src/REXOS/MAS/agents/service_agent/behaviours/ScheduleStep.java"/>
+              <File Name="src/REXOS/MAS/agents/service_agent/behaviours/ArePartsAvailable.java"/>
+              <File Name="src/REXOS/MAS/agents/service_agent/behaviours/ServiceStepDuration.java"/>
+              <File Name="src/REXOS/MAS/agents/service_agent/behaviours/InitialisationFinished.java"/>
+              <File Name="src/REXOS/MAS/agents/service_agent/behaviours/PartsInfo.java"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/MAS/agents/service_agent/ServiceStep.java"/>
+            <File Name="src/REXOS/MAS/agents/service_agent/DrawLineService.java"/>
+            <File Name="src/REXOS/MAS/agents/service_agent/Service.java"/>
+            <File Name="src/REXOS/MAS/agents/service_agent/ServiceFactory.java"/>
+            <File Name="src/REXOS/MAS/agents/service_agent/build.xml"/>
+            <File Name="src/REXOS/MAS/agents/service_agent/ServiceAgent.java"/>
+            <File Name="src/REXOS/MAS/agents/service_agent/DrawPointService.java"/>
+            <File Name="src/REXOS/MAS/agents/service_agent/PickAndPlaceService.java"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="main_agent">
+            <File Name="src/REXOS/MAS/agents/main_agent/MainAgent.java"/>
+            <File Name="src/REXOS/MAS/agents/main_agent/build.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="data_classes">
+            <File Name="src/REXOS/MAS/agents/data_classes/StepStatusCode.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/GUIMessage.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/EquipletState.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/Mapper.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/ProductionEquipletMapper.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/Production.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/BehaviourCallbackItem.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/BehaviourStatus.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/ProductStepScheduleInformation.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/ProductLog.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/DbData.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/MapperValueList.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/build.xml"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/ProductionStep.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/Callback.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/EquipletStateEntry.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/ProductStep.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/Part.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/AgentStatus.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/EquipletMode.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/ParentBehaviourCallback.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/ProductAgentProperties.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/Product.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/Position.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/Command.java"/>
+            <File Name="src/REXOS/MAS/agents/data_classes/Matrix.java"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="shared_behaviours">
+            <File Name="src/REXOS/MAS/agents/shared_behaviours/ReceiveBehaviour.java"/>
+            <File Name="src/REXOS/MAS/agents/shared_behaviours/build.xml"/>
+            <File Name="src/REXOS/MAS/agents/shared_behaviours/ReceiveOnceBehaviour.java"/>
+          </VirtualDirectory>
+          <File Name="src/REXOS/MAS/agents/build.xml"/>
         </VirtualDirectory>
-        <VirtualDirectory Name="delta_robot_test">
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/tools/delta_robot_test/src/DeltaRobotTest.cpp"/>
+        <VirtualDirectory Name="libraries">
+          <VirtualDirectory Name="utillities">
+            <VirtualDirectory Name="log">
+              <File Name="src/REXOS/MAS/libraries/utillities/log/build.xml"/>
+              <File Name="src/REXOS/MAS/libraries/utillities/log/Logger.java"/>
+              <File Name="src/REXOS/MAS/libraries/utillities/log/LogLevel.java"/>
+            </VirtualDirectory>
+            <VirtualDirectory Name="ACLMsg">
+              <File Name="src/REXOS/MAS/libraries/utillities/ACLMsg/build.xml"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/MAS/libraries/utillities/build.xml"/>
           </VirtualDirectory>
-          <File Name="src/cpp/tools/delta_robot_test/CMakeLists.txt"/>
-          <File Name="src/cpp/tools/delta_robot_test/package.xml"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="keyboard_control_node">
-          <VirtualDirectory Name="src">
-            <File Name="src/cpp/tools/keyboard_control_node/src/KeyBoardControlNode.cpp"/>
+          <VirtualDirectory Name="blackboard_client">
+            <VirtualDirectory Name="data_classes">
+              <File Name="src/REXOS/MAS/libraries/blackboard_client/data_classes/MongoDBConnection.java"/>
+              <File Name="src/REXOS/MAS/libraries/blackboard_client/data_classes/BlackboardSubscriber.java"/>
+              <File Name="src/REXOS/MAS/libraries/blackboard_client/data_classes/BlackboardSubscription.java"/>
+              <File Name="src/REXOS/MAS/libraries/blackboard_client/data_classes/InvalidDBNamespaceException.java"/>
+              <File Name="src/REXOS/MAS/libraries/blackboard_client/data_classes/BasicOperationSubscription.java"/>
+              <File Name="src/REXOS/MAS/libraries/blackboard_client/data_classes/MongoSaveable.java"/>
+              <File Name="src/REXOS/MAS/libraries/blackboard_client/data_classes/DBAuthException.java"/>
+              <File Name="src/REXOS/MAS/libraries/blackboard_client/data_classes/OplogEntry.java"/>
+              <File Name="src/REXOS/MAS/libraries/blackboard_client/data_classes/InvalidJSONException.java"/>
+              <File Name="src/REXOS/MAS/libraries/blackboard_client/data_classes/MongoOperation.java"/>
+              <File Name="src/REXOS/MAS/libraries/blackboard_client/data_classes/FieldUpdateSubscription.java"/>
+              <File Name="src/REXOS/MAS/libraries/blackboard_client/data_classes/GeneralMongoException.java"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/MAS/libraries/blackboard_client/BlackboardClient.java"/>
+            <File Name="src/REXOS/MAS/libraries/blackboard_client/OplogMonitorThread.java"/>
+            <File Name="src/REXOS/MAS/libraries/blackboard_client/build.xml"/>
+            <File Name="src/REXOS/MAS/libraries/blackboard_client/OplogCallbackThread.java"/>
           </VirtualDirectory>
-          <File Name="src/cpp/tools/keyboard_control_node/CMakeLists.txt"/>
-          <File Name="src/cpp/tools/keyboard_control_node/package.xml"/>
+          <VirtualDirectory Name="schedule">
+            <VirtualDirectory Name="data_classes">
+              <File Name="src/REXOS/MAS/libraries/schedule/data_classes/ScheduleException.java"/>
+              <File Name="src/REXOS/MAS/libraries/schedule/data_classes/ProductStepSchedule.java"/>
+              <File Name="src/REXOS/MAS/libraries/schedule/data_classes/TimeSlot.java"/>
+              <File Name="src/REXOS/MAS/libraries/schedule/data_classes/FreeTimeSlot.java"/>
+              <File Name="src/REXOS/MAS/libraries/schedule/data_classes/TimeSlotSynchronization.java"/>
+              <File Name="src/REXOS/MAS/libraries/schedule/data_classes/ScheduleLock.java"/>
+              <File Name="src/REXOS/MAS/libraries/schedule/data_classes/ScheduleAccessException.java"/>
+              <File Name="src/REXOS/MAS/libraries/schedule/data_classes/Schedule.java"/>
+              <File Name="src/REXOS/MAS/libraries/schedule/data_classes/EquipletScheduleInformation.java"/>
+            </VirtualDirectory>
+            <File Name="src/REXOS/MAS/libraries/schedule/EquipletSchedule.java"/>
+            <File Name="src/REXOS/MAS/libraries/schedule/build.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="dynamicloader">
+            <File Name="src/REXOS/MAS/libraries/dynamicloader/DynamicClassData.java"/>
+            <File Name="src/REXOS/MAS/libraries/dynamicloader/DynamicClassFactory.java"/>
+            <File Name="src/REXOS/MAS/libraries/dynamicloader/DynamicClassLoader.java"/>
+            <File Name="src/REXOS/MAS/libraries/dynamicloader/InstantiateClassException.java"/>
+            <File Name="src/REXOS/MAS/libraries/dynamicloader/DynamicClassDescription.java"/>
+            <File Name="src/REXOS/MAS/libraries/dynamicloader/build.xml"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="knowledgedb_client">
+            <File Name="src/REXOS/MAS/libraries/knowledgedb_client/Row.java"/>
+            <File Name="src/REXOS/MAS/libraries/knowledgedb_client/KnowledgeDBClient.java"/>
+            <File Name="src/REXOS/MAS/libraries/knowledgedb_client/build.xml"/>
+            <File Name="src/REXOS/MAS/libraries/knowledgedb_client/KnowledgeException.java"/>
+            <File Name="src/REXOS/MAS/libraries/knowledgedb_client/Queries.java"/>
+            <File Name="src/REXOS/MAS/libraries/knowledgedb_client/KeyNotFoundException.java"/>
+          </VirtualDirectory>
+          <File Name="src/REXOS/MAS/libraries/build.xml"/>
         </VirtualDirectory>
-        <File Name="src/cpp/tools/build.xml"/>
+        <VirtualDirectory Name="simulation">
+          <VirtualDirectory Name="gui">
+            <File Name="src/REXOS/MAS/simulation/gui/CreateCapabilityDialog.java"/>
+            <File Name="src/REXOS/MAS/simulation/gui/CreateProductDialog.java"/>
+            <File Name="src/REXOS/MAS/simulation/gui/CreateEquipletDialog.java"/>
+            <File Name="src/REXOS/MAS/simulation/gui/CreateBatchDialog.java"/>
+            <File Name="src/REXOS/MAS/simulation/gui/ConfigurationEditorGUI.java"/>
+            <File Name="src/REXOS/MAS/simulation/gui/CreateGridDialog.java"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="mas_entities">
+            <File Name="src/REXOS/MAS/simulation/mas_entities/Batch.java"/>
+            <File Name="src/REXOS/MAS/simulation/mas_entities/Equiplet.java"/>
+            <File Name="src/REXOS/MAS/simulation/mas_entities/Grid.java"/>
+            <File Name="src/REXOS/MAS/simulation/mas_entities/Product.java"/>
+          </VirtualDirectory>
+          <VirtualDirectory Name="data">
+            <File Name="src/REXOS/MAS/simulation/data/ProductStepSchedule.java"/>
+            <File Name="src/REXOS/MAS/simulation/data/TimeSlot.java"/>
+            <File Name="src/REXOS/MAS/simulation/data/FreeTimeSlot.java"/>
+            <File Name="src/REXOS/MAS/simulation/data/EquipletError.java"/>
+            <File Name="src/REXOS/MAS/simulation/data/GridProperties.java"/>
+            <File Name="src/REXOS/MAS/simulation/data/ProductStep.java"/>
+            <File Name="src/REXOS/MAS/simulation/data/Capability.java"/>
+            <File Name="src/REXOS/MAS/simulation/data/Schedule.java"/>
+          </VirtualDirectory>
+          <File Name="src/REXOS/MAS/simulation/CSVReader.java"/>
+          <File Name="src/REXOS/MAS/simulation/DataCollector.java"/>
+          <File Name="src/REXOS/MAS/simulation/Main.java"/>
+          <File Name="src/REXOS/MAS/simulation/Duration.java"/>
+          <File Name="src/REXOS/MAS/simulation/MainGui.java"/>
+          <File Name="src/REXOS/MAS/simulation/Simulation.java"/>
+          <File Name="src/REXOS/MAS/simulation/Updatable.java"/>
+          <File Name="src/REXOS/MAS/simulation/ProductSpawner.java"/>
+        </VirtualDirectory>
+        <VirtualDirectory Name="tools">
+          <File Name="src/REXOS/MAS/tools/build.xml"/>
+        </VirtualDirectory>
+        <VirtualDirectory Name="configuration">
+          <File Name="src/REXOS/MAS/configuration/ConfigurationFiles.java"/>
+          <File Name="src/REXOS/MAS/configuration/Configuration.java"/>
+          <File Name="src/REXOS/MAS/configuration/build.xml"/>
+        </VirtualDirectory>
+        <File Name="src/REXOS/MAS/build.xml"/>
       </VirtualDirectory>
     </VirtualDirectory>
     <File Name="src/CMakeLists.txt"/>

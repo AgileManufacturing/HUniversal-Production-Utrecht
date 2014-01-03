@@ -1,26 +1,35 @@
 package simulation.data;
 
+import simulation.Simulation;
+
 public class GridProperties {
 
 	//timedata
-	private long firstTimeSlot = 1387360454938l;
+	//private long firstTimeSlot = 1387360454938l;
 	private long timeSlotLength = 10l;
 	
 	//equipletdata
 	private long equipletLoadWindow = 10000l;
+	
+	private Simulation simulation;
 
-	public GridProperties(long firstTimeSlot, long timeSlotLength, long equipletLoadWindow){
-		this.firstTimeSlot = firstTimeSlot;
+	public GridProperties(Simulation simulation, long firstTimeSlot, long timeSlotLength, long equipletLoadWindow){
+		this.simulation = simulation;
+		//this.firstTimeSlot = firstTimeSlot;
 		this.timeSlotLength = timeSlotLength;
 		this.equipletLoadWindow = equipletLoadWindow;
 	}
 	
+	public Simulation getSimulation() {
+		return simulation;
+	}
+	
 	public long getFirstTimeSlot() {
-		return firstTimeSlot;
+		return simulation.getStartSimulationTime();
 	}
 
 	public void setFirstTimeSlot(long firstTimeSlot) {
-		this.firstTimeSlot = firstTimeSlot;
+		//this.firstTimeSlot = firstTimeSlot;
 	}
 
 	public long getTimeSlotLength() {

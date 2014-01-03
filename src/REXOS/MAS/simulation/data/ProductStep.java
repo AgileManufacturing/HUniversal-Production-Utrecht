@@ -65,7 +65,7 @@ public class ProductStep {
 		this.state = StepState.Evaluating;
 		finished = false;
 	}
-
+	
 	public Product getProduct() {
 		return product;
 	}
@@ -102,8 +102,7 @@ public class ProductStep {
 		this.state = state;
 	}
 	
-	public String toString() {
-		return "" + capability;
+	public String toString(){
+		return "capability:{" + capability + "} state:" + getState() + " isFinished:" + isFinished();
 	}
-	
 }

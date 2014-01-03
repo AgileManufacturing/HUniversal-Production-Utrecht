@@ -21,12 +21,17 @@ public class Product implements Updatable{
 	private LinkedHashMap<ProductStep, Schedule> finalSchedules; //We might want to keep the order of the list.
 	private Simulation simulation;
 	private Grid grid;
+	private Batch batch;
 	
 	public Product(Simulation simulation, Grid grid, Capability[] capabilities, long deadline){
-		this.productSteps = generateProducts(capabilities);
+		this(simulation, grid, capabilities, deadline, null);
+	}
+	public Product(Simulation simulation, Grid grid, Capability[] capabilities, long deadline, Batch batch){
+		this.productSteps = generateProductSteps(capabilities);
 		this.deadline = deadline;
 		this.simulation = simulation;
 		this.grid = grid;
+		this.batch = batch;
 		this.equiplets = grid.getEquiplets();
 		finalSchedules = new LinkedHashMap<ProductStep, Schedule>();
 		
@@ -35,7 +40,7 @@ public class Product implements Updatable{
 		schedule(currentTimeSlot, generateScheduleMatrix(equiplets, productSteps, currentTimeSlot));
 	}
 	
-	private ProductStep[] generateProducts(Capability[] capabilities){
+	private ProductStep[] generateProductSteps(Capability[] capabilities){
 		ProductStep[] productSteps = new ProductStep[capabilities.length];
 		for (int i = 0; i < capabilities.length; i++) {
 			productSteps[i] = new ProductStep(this, capabilities[i]); 
@@ -57,16 +62,16 @@ public class Product implements Updatable{
 		
 		//Iterate through them steps to fill the matrix
 		for (int row = 0; row < equiplets.length; row++) { // row ( equiplets )
-			System.out.println("row " + row);
+			//System.out.println("row " + row);
 			sequenceLength = 0; firstInSequence = -1; // always set sequenceLength to 0 and firstInsequence to -1 when doing a new row.
 			
 			long scheduleTimeSlot = currentTimeSlot; // scheduletimeslot has to be the same for each equiplet.
 			
 			for (int column = 0; column < productSteps.length; column++) { // column ( product steps
-				System.out.println("col " + column);
+				//System.out.println("col " + column);
 				
 				double canPerformStepValue = equiplets[row].canPerformStep(productSteps[column].getCapability()) ? 1.0 : 0.0;
-				System.out.println("canPerformStepValue " + canPerformStepValue);
+				//System.out.println("canPerformStepValue " + canPerformStepValue);
 				
 				if(canPerformStepValue == 1.0) {   //increase sequence counter.
 					scheduleMatrix.set(row, column, canPerformStepValue);
@@ -82,8 +87,6 @@ public class Product implements Updatable{
 					sequenceLength = 0;
 					firstInSequence = -1;
 				}
-				scheduleMatrix.show();
-				
 				TimeSlot loadSlot = equiplets[row].getFirstFreeTimeSlot(scheduleTimeSlot, productSteps[column].getDuration());
 				
 				//value might have changed since we added sequence multiplier 
@@ -166,7 +169,6 @@ public class Product implements Updatable{
 	private void setSequenceValues(int row, int firstInSequence, int sequenceLength, Matrix matrix){
 		int value = sequenceLength -1;
 		for(int i = firstInSequence; i < firstInSequence + sequenceLength; i++){
-			System.out.println("setting " + row + " " + i + " to " + (matrix.get(row, i) + value));
 			matrix.set(row, i, (matrix.get(row, i) + value));
 		}
 	}
@@ -201,4 +203,8 @@ public class Product implements Updatable{
 		// TODO Auto-generated method stub
 		
 	}
+	public long getDeadline() {
+		return deadline;
+	}
+
 }

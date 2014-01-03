@@ -54,7 +54,8 @@ public class Capability {
 	public static Capability DummyCapability = new Capability("Dummy Capability", 1); 
 	
 	private static int idCounter = 0;
-	private static HashMap<Integer, Capability> availableCapabilities = new HashMap<Integer, Capability>();
+	private static HashMap<Integer, Capability> availableCapabilitiesById = new HashMap<Integer, Capability>();
+	private static HashMap<String, Capability> availableCapabilitiesByName = new HashMap<String, Capability>();
 	
 	public static void loadCapabilities(String capabilitiesFilePath) {
 		String[][] fields = CSVReader.parseCsvFile(capabilitiesFilePath);
@@ -90,10 +91,6 @@ public class Capability {
 		return id + "," + name + "," + durationInTimeslots + "\r\n";
 	}
 
-	public String toString() {
-		return name + " { " + durationInTimeslots + " }";
-	}
-	
 	public static void parseCapabilitiesCSV(String[][] fields){
 		try{
 			for(int i = 0; i < fields.length; i++) {
@@ -101,7 +98,8 @@ public class Capability {
 				int capabilityDuration = Integer.parseInt(fields[i][1].trim());
 				Capability capability = new Capability(capabiityName, capabilityDuration);
 				
-				availableCapabilities.put(capability.getId(), capability);
+				availableCapabilitiesById.put(capability.getId(), capability);
+				availableCapabilitiesByName.put(capabiityName, capability);
 			}
 		} catch(NumberFormatException e){
 			System.err.println("Could not parse capabilties");
@@ -114,12 +112,23 @@ public class Capability {
 	}
 	
 	public static Capability getCapabilityById(int id){
-		return availableCapabilities.get(id);
+		Capability output = availableCapabilitiesById.get(id);
+		if(output == null) throw new NullPointerException("No capability with id:" + id);
+		return output;
+	}
+	public static Capability getCapabilityByName(String name){
+		Capability output = availableCapabilitiesByName.get(name);
+		if(output == null) throw new NullPointerException("No capability with name:" + name);
+		return output;
 	}
 	private static void printAvailableCapabilities(){
-		Collection<Capability> values = availableCapabilities.values();
+		Collection<Capability> values = availableCapabilitiesById.values();
 		for ( Capability c1 : values){
 			System.out.println("id: " + c1.getId() + ", name: " + c1.getName() + ", duration: " + c1.getDuration());
 		}
+	}
+	
+	public String toString() {
+		return "id:" + id + " name:" + name + " durationInTimeslots: " + durationInTimeslots; 
 	}
 }

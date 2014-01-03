@@ -40,6 +40,7 @@
 package simulation.data;
 
 import simulation.Duration;
+import simulation.Simulation;
 
 import com.google.gson.JsonObject;
 
@@ -55,7 +56,10 @@ public class EquipletError {
 	public long interval;
 	public long startTime;
 	
-	public EquipletError(ErrorType type, long duration, long startTime, long interval, boolean damagesProduct){
+	private Simulation simulation;
+	
+	public EquipletError(Simulation simulation, ErrorType type, long duration, long startTime, long interval, boolean damagesProduct){
+		this.simulation = simulation;
 		this.type = type;
 		this.duration = duration;
 		this.startTime = startTime;
@@ -63,10 +67,12 @@ public class EquipletError {
 		this.damagesProduct = damagesProduct;
 	}
 	
-	public EquipletError(JsonObject input) {
+	public EquipletError(Simulation simulation, JsonObject input) {
+		this.simulation = simulation;
 		this.type = ErrorType.valueOf(input.get("type").getAsString());
 		this.duration = Duration.parseDurationString(input.get("duration").getAsString());
 		this.startTime = Duration.parseDurationString(input.get("startTime").getAsString());
+		this.startTime += simulation.getCurrentSimulationTime();
 		this.interval = Duration.parseDurationString(input.get("interval").getAsString());
 		this.damagesProduct = input.get("damagesProduct").getAsBoolean();
 	}

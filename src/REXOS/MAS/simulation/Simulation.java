@@ -43,17 +43,24 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import simulation.collectors.DataCollector;
+
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+
 public class Simulation implements Runnable{
 	
 	private boolean isRunning = false;
-	private double interval = 0.01; // seconds
+	private double interval = 1.00; // seconds
 	private double turnTime = 0.01; // seconds
+	private double duration = 60 * 60 * 1000; // milliseconds
 	
 	private long turn = 0;
 	private long startSimulationTime;
 	private long currentSimulationTime;
-	private ArrayList<Updatable> updateables = new ArrayList<Updatable>();
-	private ArrayList<Updatable> updateablesToBeAdded = new ArrayList<Updatable>();
+	private ArrayList<Updatable> updatables = new ArrayList<Updatable>();
+	private ArrayList<Updatable> updatablesToBeAdded = new ArrayList<Updatable>();
+	private ArrayList<DataCollector> dataCollectors = new ArrayList<DataCollector>();
+	private ArrayList<DataCollector> dataCollectorsToBeAdded = new ArrayList<DataCollector>();
 	private Thread thread;
 	
 	public void pauseSimulation(){
@@ -64,9 +71,14 @@ public class Simulation implements Runnable{
 		notify();
 	}
 	
+	public void waitUntilFinished() throws Exception{
+		if(isRunning == false) throw new Exception("Pointsless to wait on a simulation which is not running");
+		thread.join();
+	}
+	
 	public Simulation() {
 		startSimulationTime = System.currentTimeMillis();
-		
+		currentSimulationTime = startSimulationTime;
 		thread = new Thread(this);
 		thread.start();
 	}
@@ -80,7 +92,11 @@ public class Simulation implements Runnable{
 	}
 	
 	public synchronized void addUpdateable(Updatable updateable) {
-		updateablesToBeAdded.add(updateable);
+		updatablesToBeAdded.add(updateable);
+	}
+	
+	public synchronized void addDataCollector(DataCollector dataCollector) {
+		dataCollectorsToBeAdded.add(dataCollector);
 	}
 	
 	public void run(){
@@ -96,17 +112,23 @@ public class Simulation implements Runnable{
 					}
 				}
 				
-				// update the time
-				currentSimulationTime += turnTime * 1000;
-				
-				System.out.println("--- Simulation: turn " + turn + " time " + currentSimulationTime);
+				/*System.out.println("--- Simulation: turn " + turn + " time " + 
+						currentSimulationTime + " (" + (currentSimulationTime - startSimulationTime + ")"));*/
 				
 				// update simulation
-				for (Updatable updateable : updateables) {
+				for (Updatable updateable : updatables) {
 					updateable.update(currentSimulationTime);
 				}
 				
+				// gather information
+				for (DataCollector dataCollector : dataCollectors) {
+					dataCollector.collectData(currentSimulationTime);
+				}
+				
+				// update the time
+				currentSimulationTime += turnTime * 1000;
 				turn++;
+				
 				// sleep if dealing with 'realtime' simulation
 				long cycleEndTime = System.currentTimeMillis();
 				long cycleDuration = cycleEndTime - cycleStartTime;
@@ -120,11 +142,22 @@ public class Simulation implements Runnable{
 					// no need to sleep at all
 				}
 				
-				while(updateablesToBeAdded.size() != 0) {
-					updateables.add(updateablesToBeAdded.remove(0));
+				while(updatablesToBeAdded.size() != 0) {
+					updatables.add(updatablesToBeAdded.remove(0));
+				}
+				while(dataCollectorsToBeAdded.size() != 0) {
+					dataCollectors.add(dataCollectorsToBeAdded.remove(0));
+				}
+				
+				// are we finished?
+				if(currentSimulationTime - startSimulationTime > duration) {
+					break;
 				}
 			}
 		}
 		// exit simulation thread
+	}
+	public Updatable[] getUpdatables() {
+		return updatables.toArray(new Updatable[updatables.size()]);
 	}
 }
