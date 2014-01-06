@@ -179,6 +179,11 @@ public class Grid implements Updatable{
 		for (Equiplet equiplet : allEquiplets) {
 			if(equiplet.getBatchReservation() == batchGroup) equipletsForReservation.add(equiplet);
 		}
+		Equiplet[] equipletsWithoutReservation = getEquipletsWithoutReservation();
+		for (Equiplet equiplet : equipletsWithoutReservation) {
+			equipletsForReservation.add(equiplet);
+		}
+		
 		return equipletsForReservation.toArray(new Equiplet[equipletsForReservation.size()]);
 	}
 	

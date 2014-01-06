@@ -3,20 +3,25 @@ package simulation.collectors;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import simulation.Simulation;
 import simulation.Updatable;
+import simulation.data.ProductStep;
+import simulation.data.Schedule;
 import simulation.mas_entities.Equiplet;
 import simulation.mas_entities.Product;
 
 public class ProductDataCollector extends DataCollector {
 	HashMap<Long, ArrayList<Product>> productCount;
 	HashMap<Long, ArrayList<Product>> productsOverDeadline;
+	HashMap<Product, HashMap<Long, LinkedHashMap<ProductStep, Schedule>>> productSchedules;
 
 	public ProductDataCollector(Simulation simulation) {
 		super(simulation);
 		productCount = new HashMap<Long, ArrayList<Product>>(); 
-		productsOverDeadline = new HashMap<Long, ArrayList<Product>>(); 
+		productsOverDeadline = new HashMap<Long, ArrayList<Product>>();
+		productSchedules = new HashMap<Product, HashMap<Long, LinkedHashMap<ProductStep, Schedule>>>();
 	}
 	
 	
@@ -42,6 +47,40 @@ public class ProductDataCollector extends DataCollector {
 		if(product.getDeadline() < simulation.getCurrentSimulationTime()) {
 			productsOverDeadline.get(simulation.getCurrentSimulationTime()).add(product);
 		}
+		
+		LinkedHashMap<ProductStep, Schedule> currentSchedule = product.getFinalSchedules();
+		if(productSchedules.containsKey(product) == false) {
+			productSchedules.put(product, new HashMap<Long, LinkedHashMap<ProductStep, Schedule>>());
+			productSchedules.get(product).put(
+					simulation.getCurrentSimulationTime(), (LinkedHashMap<ProductStep, Schedule>) currentSchedule.clone());
+		}
+		else {
+			Long[] previousScheduleTimes = productSchedules.get(product).keySet().toArray(
+					new Long[productSchedules.get(product).size() - 1]);
+			Arrays.sort(previousScheduleTimes);
+			LinkedHashMap<ProductStep, Schedule> previousSchedule = productSchedules.get(product).get(
+					previousScheduleTimes[previousScheduleTimes.length - 1]);
+			
+			// are the schedule equal?
+			if(compareSchedules(currentSchedule, previousSchedule) == false) {
+				
+				productSchedules.get(product).put(
+						simulation.getCurrentSimulationTime(), (LinkedHashMap<ProductStep, Schedule>) currentSchedule.clone());
+			}
+		}
+		
+		
+	}
+	private boolean compareSchedules(LinkedHashMap<ProductStep, Schedule> scheduleA, LinkedHashMap<ProductStep, Schedule> scheduleB) {
+		if(scheduleA.size() != scheduleB.size()) {
+			return false;
+		}
+		for (Schedule schedule : scheduleA.values()) {
+			if(scheduleB.values().contains(schedule)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 

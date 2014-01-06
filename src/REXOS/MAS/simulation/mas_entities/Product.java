@@ -22,6 +22,7 @@ public class Product implements Updatable{
 	private Simulation simulation;
 	private Grid grid;
 	private Batch batch;
+	private boolean needNewSchedule;
 	
 	public Product(Simulation simulation, Grid grid, Capability[] capabilities, long deadline){
 		this(simulation, grid, capabilities, deadline, null);
@@ -106,6 +107,7 @@ public class Product implements Updatable{
 				scheduleTimeSlot += grid.GetMeanDistance(); 
 			}
 		}
+		System.out.println("Product {" + this + "} schedule: ");
 		scheduleMatrix.show();
 		return scheduleMatrix;
 	}
@@ -164,7 +166,7 @@ public class Product implements Updatable{
 			if(schedule.getEquiplet().schedule(step, schedule.getTimeSlot())){
 				step.setState(StepState.Scheduled);
 			} else {
-				//couldnt schedule?? HO NOES
+				needNewSchedule = true;
 			}
 			
 		}
@@ -180,7 +182,10 @@ public class Product implements Updatable{
 	private void reschedule(boolean fromStart){
 		ArrayList<ProductStep> newProductSteps = new ArrayList<ProductStep>();
 		//only cancel future steps. Lets assume that steps that are already completed are still usable.
-		for (ProductStep step : finalSchedules.keySet()) {
+		
+		ProductStep[] steps = finalSchedules.keySet().toArray(new ProductStep[finalSchedules.size()]);
+		for(int i = 0; i < finalSchedules.size(); i++) {
+			ProductStep step = steps[i];
 			Schedule schedule = finalSchedules.get(step);
 			if(fromStart || (!fromStart && !step.isFinished())){
 				schedule.getEquiplet().removeFromSchedule(step);
@@ -190,7 +195,8 @@ public class Product implements Updatable{
 		}
 		long currentTimeSlot = TimeSlot.getCurrentTimeSlot(simulation, grid.getGridProperties());
 		//so now we have a newProductSteps and finalSchedules. Lets try to schedule again.
-		schedule(currentTimeSlot, generateScheduleMatrix(equiplets, (ProductStep[])newProductSteps.toArray(), currentTimeSlot));
+		schedule(currentTimeSlot, generateScheduleMatrix(equiplets, 
+				newProductSteps.toArray(new ProductStep[newProductSteps.size()]), currentTimeSlot));
 	}
 	
 	public void handleEquipletError(StepState stepState){
@@ -204,11 +210,22 @@ public class Product implements Updatable{
 
 	@Override
 	public void update(long time) {
-		// TODO Auto-generated method stub
-		
+		if(needNewSchedule == true) {
+			needNewSchedule = false;
+			reschedule(true);
+		}
 	}
 	public long getDeadline() {
 		return deadline;
 	}
-
+	public LinkedHashMap<ProductStep, Schedule> getFinalSchedules() {
+		return finalSchedules;
+	}
+	public String toString() {
+		if(batch != null) {
+			return "id:" + this.hashCode() + " batch:" + batch.getBatchGroup();
+		} else {
+			return "id:" + this.hashCode() + " batch:-";
+		}
+	}
 }
