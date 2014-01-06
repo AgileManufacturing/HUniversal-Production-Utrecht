@@ -4,7 +4,6 @@
     <VirtualDirectory Name="nodes">
       <VirtualDirectory Name="motor_controller_configurator">
         <VirtualDirectory Name="src">
-          <File Name="src/REXOS/ROS/nodes/motor_controller_configurator/src/EnvironmentCache.cpp"/>
           <File Name="src/REXOS/ROS/nodes/motor_controller_configurator/src/MotorControllerConfigurator.cpp"/>
         </VirtualDirectory>
       </VirtualDirectory>
@@ -89,29 +88,11 @@
       <VirtualDirectory Name="simulation_node">
         <VirtualDirectory Name="include">
           <VirtualDirectory Name="simulation_node">
-            <File Name="src/REXOS/ROS/nodes/simulation_node/include/simulation_node/GazeboSDF.h"/>
             <File Name="src/REXOS/ROS/nodes/simulation_node/include/simulation_node/SimulationNode.h"/>
-            <File Name="src/REXOS/ROS/nodes/simulation_node/include/simulation_node/MotorJoint.h"/>
           </VirtualDirectory>
         </VirtualDirectory>
         <VirtualDirectory Name="src">
           <File Name="src/REXOS/ROS/nodes/simulation_node/src/SimulationNode.cpp"/>
-          <File Name="src/REXOS/ROS/nodes/simulation_node/src/GazeboSDF.cpp"/>
-          <File Name="src/REXOS/ROS/nodes/simulation_node/src/MotorJoint.cpp"/>
-        </VirtualDirectory>
-      </VirtualDirectory>
-      <VirtualDirectory Name="stewart_gough">
-        <VirtualDirectory Name="stewart_gough_node">
-          <VirtualDirectory Name="include">
-            <VirtualDirectory Name="stewart_gough_node">
-              <File Name="src/REXOS/ROS/nodes/stewart_gough/stewart_gough_node/include/stewart_gough_node/StewartGoughNode.h"/>
-              <File Name="src/REXOS/ROS/nodes/stewart_gough/stewart_gough_node/include/stewart_gough_node/Point.h"/>
-              <File Name="src/REXOS/ROS/nodes/stewart_gough/stewart_gough_node/include/stewart_gough_node/Services.h"/>
-            </VirtualDirectory>
-          </VirtualDirectory>
-          <VirtualDirectory Name="src">
-            <File Name="src/REXOS/ROS/nodes/stewart_gough/stewart_gough_node/src/StewartGoughNode.cpp"/>
-          </VirtualDirectory>
         </VirtualDirectory>
       </VirtualDirectory>
       <VirtualDirectory Name="equiplet_node">
@@ -173,6 +154,20 @@
         <VirtualDirectory Name="src">
           <File Name="src/REXOS/ROS/nodes/arm_control_node/src/MoveCalculation.cpp"/>
           <File Name="src/REXOS/ROS/nodes/arm_control_node/src/ArmControlNode.cpp"/>
+        </VirtualDirectory>
+      </VirtualDirectory>
+      <VirtualDirectory Name="stewart_gough_node">
+        <VirtualDirectory Name="stewart_gough">
+          <VirtualDirectory Name="include">
+            <VirtualDirectory Name="stewart_gough_node">
+              <File Name="src/REXOS/ROS/nodes/stewart_gough_node/stewart_gough/include/stewart_gough_node/StewartGoughNode.h"/>
+              <File Name="src/REXOS/ROS/nodes/stewart_gough_node/stewart_gough/include/stewart_gough_node/Point.h"/>
+              <File Name="src/REXOS/ROS/nodes/stewart_gough_node/stewart_gough/include/stewart_gough_node/Services.h"/>
+            </VirtualDirectory>
+          </VirtualDirectory>
+          <VirtualDirectory Name="src">
+            <File Name="src/REXOS/ROS/nodes/stewart_gough_node/stewart_gough/src/StewartGoughNode.cpp"/>
+          </VirtualDirectory>
         </VirtualDirectory>
       </VirtualDirectory>
       <VirtualDirectory Name="part_follow_node">
@@ -553,6 +548,18 @@
         </VirtualDirectory>
         <VirtualDirectory Name="src">
           <File Name="src/REXOS/ROS/libraries/rexos_coordinates/src/Module.cpp"/>
+        </VirtualDirectory>
+      </VirtualDirectory>
+      <VirtualDirectory Name="rexos_gazebo">
+        <VirtualDirectory Name="include">
+          <VirtualDirectory Name="rexos_gazebo">
+            <File Name="src/REXOS/ROS/libraries/rexos_gazebo/include/rexos_gazebo/GazeboSDF.h"/>
+            <File Name="src/REXOS/ROS/libraries/rexos_gazebo/include/rexos_gazebo/MotorJoint.h"/>
+          </VirtualDirectory>
+        </VirtualDirectory>
+        <VirtualDirectory Name="src">
+          <File Name="src/REXOS/ROS/libraries/rexos_gazebo/src/GazeboSDF.cpp"/>
+          <File Name="src/REXOS/ROS/libraries/rexos_gazebo/src/MotorJoint.cpp"/>
         </VirtualDirectory>
       </VirtualDirectory>
       <VirtualDirectory Name="vectors">

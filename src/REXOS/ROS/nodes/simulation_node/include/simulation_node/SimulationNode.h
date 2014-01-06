@@ -32,8 +32,8 @@
 #ifndef SIMULATIONNODE_H_
 #define SIMULATIONNODE_H_
 
-#include "simulation_node/GazeboSDF.h"
-#include "simulation_node/MotorJoint.h"
+#include "rexos_gazebo/GazeboSDF.h"
+#include "rexos_gazebo/MotorJoint.h"
 #include "simulation_node/rotate.h"
 #include <vector>
 

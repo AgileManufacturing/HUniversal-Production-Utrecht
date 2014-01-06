@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(simulation_node)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs std_msgs message_generation gazebo_ros)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs std_msgs message_generation gazebo_ros rexos_gazebo)
 
 find_package(gazebo REQUIRED)
   	
@@ -21,7 +21,7 @@ generate_messages (
 catkin_package(
 INCLUDE_DIRS include 
 LIBRARIES  
-CATKIN_DEPENDS roscpp message_runtime
+CATKIN_DEPENDS roscpp message_runtime rexos_gazebo
 DEPENDS 
 gazebo_ros
 )
