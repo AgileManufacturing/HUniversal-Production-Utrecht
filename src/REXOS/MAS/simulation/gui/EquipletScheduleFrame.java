@@ -76,6 +76,9 @@ public class EquipletScheduleFrame extends javax.swing.JFrame {
      */
     @SuppressWarnings("unchecked")                         
     private void initComponents() {
+    	
+    	setPreferredSize(new Dimension(500, 300));
+    	
         java.awt.GridBagConstraints gridBagConstraints;
         
         jScrollPane1 = new javax.swing.JScrollPane();
