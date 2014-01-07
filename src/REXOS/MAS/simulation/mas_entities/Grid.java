@@ -56,7 +56,7 @@ import simulation.data.GridProperties;
 
 
 public class Grid implements Updatable{
-	private static final double defaultDistance = 1.0;
+	private static final double defaultDistance = 2.0;
 	
 	private Equiplet[][] equiplets;
 	
@@ -148,7 +148,6 @@ public class Grid implements Updatable{
 				equiplets[i][j].update(time);
 			}
 		}
-		
 	}
 	//In timeslots (PLEASE)
 	public long GetMeanDistance() {

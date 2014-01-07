@@ -44,6 +44,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 import simulation.collectors.DataCollector;
+import simulation.data.TimeSlot;
+import simulation.mas_entities.Grid;
 
 import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
@@ -51,9 +53,9 @@ public class Simulation implements Runnable{
 	
 	private boolean isRunning = false;
 	private boolean isAborted = false;
-	private double interval = 0.01; // seconds
+	private double interval = 0.000; // seconds
 	private double turnTime = 0.01; // seconds
-	private double duration = 1 * 60 * 60 * 1000; // milliseconds
+	private double duration = 5 * 60 * 60 * 1000; // milliseconds
 	
 	private long turn = 0;
 	private long startSimulationTime;
@@ -63,6 +65,8 @@ public class Simulation implements Runnable{
 	private ArrayList<DataCollector> dataCollectors = new ArrayList<DataCollector>();
 	private ArrayList<DataCollector> dataCollectorsToBeAdded = new ArrayList<DataCollector>();
 	private Thread thread;
+	
+	public Grid grid;
 	
 	public void pauseSimulation(){
 		isRunning = false;
@@ -121,7 +125,8 @@ public class Simulation implements Runnable{
 				}
 				
 				/*System.out.println("--- Simulation: turn " + turn + " time " + 
-						currentSimulationTime + " (" + (currentSimulationTime - startSimulationTime + ")"));*/
+						currentSimulationTime + " (" + (currentSimulationTime - startSimulationTime) + ")" + 
+						"timeSlot " + TimeSlot.getCurrentTimeSlot(this, grid.getGridProperties()));*/
 				
 				// update simulation
 				for (Updatable updateable : updatables) {

@@ -6,10 +6,10 @@ public class GridProperties {
 
 	//timedata
 	//private long firstTimeSlot = 1387360454938l;
-	private long timeSlotLength = 10l;
+	private long timeSlotLength;
 	
 	//equipletdata
-	private long equipletLoadWindow = 10000l;
+	private long equipletLoadWindow;
 	
 	private Simulation simulation;
 

@@ -53,7 +53,6 @@ public class ProductStep {
 	}
 	
 	private Capability capability;
-	private boolean finished;
 	private Product product;
 	private StepState state;
 	
@@ -63,7 +62,6 @@ public class ProductStep {
 		this.capability = capability;
 		this.product = product;
 		this.state = StepState.Evaluating;
-		finished = false;
 	}
 	
 	public Product getProduct() {
@@ -73,15 +71,7 @@ public class ProductStep {
 	public void setProduct(Product prod) {
 		product = prod;
 	}
-
-	public boolean isFinished() {
-		return finished;
-	}
-
-	public void setFinished(boolean finished) {
-		this.finished = finished;
-	}
-
+	
 	public long getDuration() {
 		return capability.getDuration();
 	}
@@ -103,6 +93,6 @@ public class ProductStep {
 	}
 	
 	public String toString(){
-		return "capability:{" + capability + "} state:" + getState() + " isFinished:" + isFinished();
+		return "capability:{" + capability + "} state:" + getState() + " product:{" + product + "}";
 	}
 }

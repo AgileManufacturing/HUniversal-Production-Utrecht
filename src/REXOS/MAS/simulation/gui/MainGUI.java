@@ -329,6 +329,7 @@ public class MainGUI extends javax.swing.JFrame {
 		ProductDataCollector pdc = new ProductDataCollector(simulation);
 		
 		grid = new Grid("/home/t/sim/equipletLayout.json", simulation);
+		simulation.grid = grid;
 		System.out.println(grid);
 		
 		simulation.addUpdateable(grid);

@@ -33,5 +33,8 @@ public class ProductStepSchedule {
 		return timeSlot.getDuration();
 	}
 	
+	public String toString() {
+		return "start:" + getStartTimeSlot() + " duration:" + getDuration();
+	}
 	
 }

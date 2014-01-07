@@ -22,7 +22,9 @@ public class Product implements Updatable{
 	private Simulation simulation;
 	private Grid grid;
 	private Batch batch;
-	private boolean needNewSchedule;
+	
+	private boolean needNewSchedule = false;
+	private int scheduleFailures = 0;
 	
 	public Product(Simulation simulation, Grid grid, Capability[] capabilities, long deadline){
 		this(simulation, grid, capabilities, deadline, null);
@@ -42,7 +44,7 @@ public class Product implements Updatable{
 		
 		long currentTimeSlot = TimeSlot.getCurrentTimeSlot(simulation, grid.getGridProperties());
 		//We need to pass the current timeslot, to prevent synchronisation issues.
-		schedule(currentTimeSlot, generateScheduleMatrix(equiplets, productSteps, currentTimeSlot));
+		schedule(currentTimeSlot, generateScheduleMatrix(equiplets, productSteps, currentTimeSlot), productSteps);
 	}
 	
 	private ProductStep[] generateProductSteps(Capability[] capabilities){
@@ -92,10 +94,10 @@ public class Product implements Updatable{
 					sequenceLength = 0;
 					firstInSequence = -1;
 				}
-				TimeSlot loadSlot = equiplets[row].getFirstFreeTimeSlot(scheduleTimeSlot, productSteps[column].getDuration());
+				//TimeSlot loadSlot = equiplets[row].getFirstFreeTimeSlot(scheduleTimeSlot, productSteps[column].getDuration());
 				
 				//value might have changed since we added sequence multiplier 
-				double loadValue = equiplets[row].getLoad(loadSlot);
+				double loadValue = equiplets[row].getLoad(new TimeSlot(scheduleTimeSlot, 0));
 				
 				//Multiply with load value ( e.g. the load of the equiplet )
 				scheduleMatrix.set(row, column, (scheduleMatrix.get(row, column) * (1 - loadValue)));
@@ -112,13 +114,13 @@ public class Product implements Updatable{
 		return scheduleMatrix;
 	}
 
-	private void schedule(long currentTimeSlot, Matrix scheduleMatrix) {
+	private void schedule(long currentTimeSlot, Matrix scheduleMatrix, ProductStep[] productStepsToSchedule) {
 		// Read the matrix. Write function to iterate each seperate row ( productsteps ) and pick each equiplet 
 		Equiplet previousEquiplet, currentEquiplet = null;
 		for (int column = 0; column < scheduleMatrix.getNumberOfColumns(); column++) { //Productsteps 
 			
 			int highestEquipletScoreIndex = -1;
-			ProductStep productStep = productSteps[column];
+			ProductStep productStep = productStepsToSchedule[column];
 			
 			for (int row = 0; row < scheduleMatrix.getNumberOfRows(); row++) { //AID'S
 				if(highestEquipletScoreIndex == -1) {
@@ -132,6 +134,8 @@ public class Product implements Updatable{
 			
 			if(highestEquipletScoreIndex < 0){
 				System.out.println("No suitable equiplet found for this step! Scheduling has gone wrong.. Reschedule?");
+				needNewSchedule = true;
+				scheduleFailures++;
 				return;
 			}
 			
@@ -143,32 +147,49 @@ public class Product implements Updatable{
 			previousEquiplet = currentEquiplet;
 			currentEquiplet = equiplets[highestEquipletScoreIndex]; //this might not work.
 			
-			//Get first free timeslot
-			TimeSlot timeSlot = currentEquiplet.getFirstFreeTimeSlot(currentTimeSlot, productStep.getCapability().getDuration());
-			
 			//transportdistance
 			currentTimeSlot += grid.getDistanceBetweenEquiplets(previousEquiplet, currentEquiplet);
+			
+			//Get first free timeslot
+			System.out.println("productStep " + productStep + " EQ " + currentEquiplet);
+			System.out.println("? currentTimeslot = " + currentTimeSlot);
+			TimeSlot timeSlot = currentEquiplet.getFirstFreeTimeSlot(currentTimeSlot, productStep.getCapability().getDuration());
+			System.out.println("^timeSlot.getStartTimeSlot() = " + timeSlot.getStartTimeSlot() + 
+					" timeSlot.getDuration() = " + timeSlot.getDuration());
+			if(timeSlot.getStartTimeSlot() < currentTimeSlot) {
+				timeSlot = new TimeSlot(currentTimeSlot, timeSlot.getDuration());
+			}
+			if(timeSlot.getDuration() > productStep.getCapability().getDuration() || timeSlot.getDuration() == -1) {
+				timeSlot = new TimeSlot(timeSlot.getStartTimeSlot(), productStep.getCapability().getDuration());
+			}
+			
+			System.out.println("# currentTimeslot = " + currentTimeSlot);
+			currentTimeSlot = timeSlot.getStartTimeSlot() + timeSlot.getDuration();
+			System.out.println("& timeSlot = " + timeSlot.getStartTimeSlot());
+			System.out.println("* currentTimeslot = " + currentTimeSlot);
+			System.out.println("timeSlot.getStartTimeSlot() = " + timeSlot.getStartTimeSlot() + 
+					" timeSlot.getDuration() = " + timeSlot.getDuration());
+			
 			
 			//Check the equiplets schedule. Lets check if the schedule fits. 
 			//TODO Keep in mind that the deadline is met.
 			finalSchedules.put(productStep, new Schedule(timeSlot, currentEquiplet));
 			
 			//add the time to the currenttimeslot
-			currentTimeSlot += productStep.getCapability().getDuration();
-			
-			//transportdistance
-			currentTimeSlot += grid.getDistanceBetweenEquiplets(previousEquiplet, currentEquiplet);
+			//currentTimeSlot += productStep.getCapability().getDuration();
 		}
 		// Message all the equiplets with their correspondig equiplet steps
 		for (ProductStep step : finalSchedules.keySet()) {
 			Schedule schedule = finalSchedules.get(step);
-			
-			if(schedule.getEquiplet().schedule(step, schedule.getTimeSlot())){
-				step.setState(StepState.Scheduled);
-			} else {
-				needNewSchedule = true;
+			if(step.getState() == StepState.Evaluating) {
+				System.out.println("productStep " + step + " equiplet " + schedule.getEquiplet());
+				System.out.println("! currentTimeslot = " + schedule.getTimeSlot().getStartTimeSlot());
+				if(schedule.getEquiplet().schedule(step, schedule.getTimeSlot())){
+					step.setState(StepState.Scheduled);
+				} else {
+				//	needNewSchedule = true;
+				}
 			}
-			
 		}
 	}
 	
@@ -180,23 +201,43 @@ public class Product implements Updatable{
 	}
 	
 	private void reschedule(boolean fromStart){
+		System.out.println("product " + this + " is rescheduling, fromstart:" + fromStart);
+		System.out.println(finalSchedules.size());
+		System.out.println(productSteps.length);
+		for (ProductStep ps : productSteps) {
+			System.out.println("\t" + ps);
+		}
+		
 		ArrayList<ProductStep> newProductSteps = new ArrayList<ProductStep>();
 		//only cancel future steps. Lets assume that steps that are already completed are still usable.
 		
-		ProductStep[] steps = finalSchedules.keySet().toArray(new ProductStep[finalSchedules.size()]);
-		for(int i = 0; i < finalSchedules.size(); i++) {
-			ProductStep step = steps[i];
+		//ProductStep[] steps = finalSchedules.keySet().toArray(new ProductStep[finalSchedules.size()]);
+		for(int i = 0; i < productSteps.length; i++) {
+			ProductStep step = productSteps[i];
 			Schedule schedule = finalSchedules.get(step);
-			if(fromStart || (!fromStart && !step.isFinished())){
+			if(schedule == null) {
+				// already removed i guess
+				continue;
+			}
+			if(fromStart || (fromStart == false && step.getState() != StepState.Finished)){
+				System.out.println("resetting step");
 				schedule.getEquiplet().removeFromSchedule(step);
 				finalSchedules.remove(step);
+				step.setState(StepState.Evaluating);
 				newProductSteps.add(step);
 			}
 		}
 		long currentTimeSlot = TimeSlot.getCurrentTimeSlot(simulation, grid.getGridProperties());
+		
+		
+		for (ProductStep ps : productSteps) {
+			System.out.println("\t" + ps);
+		}
+		
+		
 		//so now we have a newProductSteps and finalSchedules. Lets try to schedule again.
 		schedule(currentTimeSlot, generateScheduleMatrix(equiplets, 
-				newProductSteps.toArray(new ProductStep[newProductSteps.size()]), currentTimeSlot));
+				newProductSteps.toArray(new ProductStep[newProductSteps.size()]), currentTimeSlot), newProductSteps.toArray(new ProductStep[newProductSteps.size()]));
 	}
 	
 	public void handleEquipletError(StepState stepState){
@@ -210,9 +251,21 @@ public class Product implements Updatable{
 
 	@Override
 	public void update(long time) {
+		if(scheduleFailures == 3) return;
+		
+		for (ProductStep ps : productSteps) {
+			if(ps.getState() == StepState.ProductError || ps.getState() == StepState.ScheduleError) {
+				handleEquipletError(ps.getState());
+				for (ProductStep ps1 : productSteps) {
+					System.out.println("\t" + ps1);
+				}
+				break;
+			}
+		}
+		
 		if(needNewSchedule == true) {
 			needNewSchedule = false;
-			reschedule(true);
+			reschedule(false);
 		}
 	}
 	public long getDeadline() {
