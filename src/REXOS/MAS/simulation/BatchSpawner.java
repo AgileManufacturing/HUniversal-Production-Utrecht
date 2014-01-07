@@ -51,7 +51,7 @@ public class BatchSpawner extends ProductSpawner{
 		Product[] products = new Product[amountPerSpawn];
 		
 		for(int i = 0; i < products.length; i++) {
-			products[i] = new Product(simulation, grid, productStepCapabilities, simulation.getCurrentSimulationTime() + productDeadline, batch);
+			products[i] = new Product(productName, simulation, grid, productStepCapabilities, simulation.getCurrentSimulationTime() + productDeadline, batch);
 			batch.addProduct(products[i]);
 		}
 		return products;

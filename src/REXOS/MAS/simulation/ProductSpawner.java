@@ -96,7 +96,7 @@ public class ProductSpawner implements Updatable {
 	private Product[] spawnProducts() {
 		Product[] products = new Product[amountPerSpawn];
 		for(int i = 0; i < products.length; i++) {
-			products[i] = new Product(simulation, grid, productStepCapabilities, simulation.getCurrentSimulationTime() + productDeadline);
+			products[i] = new Product(productName, simulation, grid, productStepCapabilities, simulation.getCurrentSimulationTime() + productDeadline);
 		}
 		return products;
 	}

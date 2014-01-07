@@ -161,7 +161,7 @@ public class Equiplet implements Updatable{
 		//is sorted from lowest starttimeslot to highest starttimeslot
 		System.out.println(equipletName + "getFree " + TimeSlot.getCurrentTimeSlot(gridProperties.getSimulation(), gridProperties) + " " + startTimeSlot + " " + duration);
 		for (ProductStepSchedule s : schedule) {
-			System.out.println("\t" + s.getStartTimeSlot() + "\t" + s.getDuration());
+//			System.out.println("\t" + s.getStartTimeSlot() + "\t" + s.getDuration());
 		}
 		
 		if(startTimeSlot == TimeSlot.getCurrentTimeSlot(gridProperties.getSimulation(), gridProperties)) {
@@ -209,7 +209,7 @@ curProductStepSchedule.getStartTimeSlot() - (prevProductStepSchedule.getStartTim
 		//System.out.println("Equiplet: name " + equipletName + " scheduling " + step.toString());
 		System.out.println(equipletName + "schedule " + TimeSlot.getCurrentTimeSlot(gridProperties.getSimulation(), gridProperties) + " " + timeslot.getStartTimeSlot() + " " + timeslot.getDuration());
 		for (ProductStepSchedule s : schedule) {
-			System.out.println("\t" + s.getStartTimeSlot() + "\t" + s.getDuration());
+//			System.out.println("\t" + s.getStartTimeSlot() + "\t" + s.getDuration());
 		}
 		ProductStepSchedule newPSS= new ProductStepSchedule(step, timeslot);
 		
@@ -398,5 +398,8 @@ curProductStepSchedule.getStartTimeSlot() - (prevProductStepSchedule.getStartTim
 	}
 	public int getBatchReservation() {
 		return reservedFor;
+	}
+	public ArrayList<ProductStepSchedule> getSchedule() {
+		return schedule;
 	}
 }

@@ -14,7 +14,7 @@ import simulation.data.TimeSlot;
 import agents.data_classes.Matrix;
 
 public class Product implements Updatable{
-	
+	private String productType;
 	private ProductStep[] productSteps;
 	private Equiplet[] equiplets;
 	private long deadline;
@@ -26,10 +26,11 @@ public class Product implements Updatable{
 	private boolean needNewSchedule = false;
 	private int scheduleFailures = 0;
 	
-	public Product(Simulation simulation, Grid grid, Capability[] capabilities, long deadline){
-		this(simulation, grid, capabilities, deadline, null);
+	public Product(String productType, Simulation simulation, Grid grid, Capability[] capabilities, long deadline){
+		this(productType, simulation, grid, capabilities, deadline, null);
 	}
-	public Product(Simulation simulation, Grid grid, Capability[] capabilities, long deadline, Batch batch){
+	public Product(String productType, Simulation simulation, Grid grid, Capability[] capabilities, long deadline, Batch batch){
+		this.productType = productType;
 		this.productSteps = generateProductSteps(capabilities);
 		this.deadline = deadline;
 		this.simulation = simulation;
