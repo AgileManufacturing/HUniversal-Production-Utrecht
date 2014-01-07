@@ -216,14 +216,13 @@ public class Product implements Updatable{
 		for(int i = 0; i < productSteps.length; i++) {
 			ProductStep step = productSteps[i];
 			Schedule schedule = finalSchedules.get(step);
-			if(schedule == null) {
-				// already removed i guess
-				continue;
-			}
 			if(fromStart || (fromStart == false && step.getState() != StepState.Finished)){
 				System.out.println("resetting step");
-				schedule.getEquiplet().removeFromSchedule(step);
-				finalSchedules.remove(step);
+				if(schedule != null) {
+					// already removed i guess
+					schedule.getEquiplet().removeFromSchedule(step);
+					finalSchedules.remove(step);
+				}
 				step.setState(StepState.Evaluating);
 				newProductSteps.add(step);
 			}
@@ -252,7 +251,16 @@ public class Product implements Updatable{
 
 	@Override
 	public void update(long time) {
-		if(scheduleFailures == 3) return;
+		if(scheduleFailures == 3) {
+			System.out.println("product failed?");
+			/*try {
+				//Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
+			return;
+		}
 		
 		for (ProductStep ps : productSteps) {
 			if(ps.getState() == StepState.ProductError || ps.getState() == StepState.ScheduleError) {

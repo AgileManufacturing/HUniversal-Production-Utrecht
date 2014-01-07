@@ -49,6 +49,9 @@ import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 
+import simulation.data.Capability;
+import simulation.data.TimeSlot;
+
 class ProgressWorkerThread extends SwingWorker<Void, Void> {
 	
 	public static final int UPDATE_INTERVAL = 100;
@@ -84,8 +87,12 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 			}
 			previousProgress = currentProgress;
 			((JProgressBar) components[0]).setValue((int)(currentProgress * 100));
-
 			mG.setProgressComponents(components);
+			
+			mG.capabilitiesText.setText(	String.valueOf(mG.getSimulation().getCurrentSimulationTime() - mG.getSimulation().getStartSimulationTime()));
+			mG.productsText.setText(		String.valueOf(TimeSlot.getCurrentTimeSlot(mG.getSimulation(), mG.getGrid().getGridProperties())));
+			mG.gridText.setText("");
+			
 			
 			try {
 				Thread.sleep(UPDATE_INTERVAL);

@@ -56,10 +56,10 @@ import simulation.mas_entities.Grid;
 public class MainGUI extends javax.swing.JFrame {
 
 	// Files
-	public static File capabilitiesFile		= new File("C:/Users/Alexander/Documents/School/Jaar 3/Stage/HUniversal/src/REXOS/MAS/simulation/csvFiles/capabilities.csv");
-	public static File productsFile			= new File("C:/Users/Alexander/Documents/School/Jaar 3/Stage/HUniversal/src/REXOS/MAS/simulation/csvFiles/productA.csv");
-	public static File batchesFile			= new File("C:/Users/Alexander/Documents/School/Jaar 3/Stage/HUniversal/src/REXOS/MAS/simulation/csvFiles/BatchA.csv");
-	public static File gridFile				= new File("C:/Users/Alexander/Documents/School/Jaar 3/Stage/HUniversal/src/REXOS/MAS/simulation/csvFiles/equipletLayout.json");
+	public static File capabilitiesFile		= new File("/home/t/sim/capabilities.csv");
+	public static File productsFile			= new File("/home/t/sim/productA.csv");
+	public static File batchesFile			= new File("/home/t/sim/BatchA.csv");
+	public static File gridFile				= new File("/home/t/sim/equipletLayout.json");
 
 	// BackgroundWorkers
 	private ProgressWorkerThread progressWorker;
@@ -516,11 +516,11 @@ public class MainGUI extends javax.swing.JFrame {
 
 	// Variables declaration - do not modify                     
 	private javax.swing.JLabel batchesLabel;
-	private javax.swing.JTextField batchesText;
+	public javax.swing.JTextField batchesText;
 	private javax.swing.JLabel capabilitiesLabel;
-	private javax.swing.JTextField capabilitiesText;
+	public javax.swing.JTextField capabilitiesText;
 	private javax.swing.JLabel gridLabel;
-	private javax.swing.JTextField gridText;
+	public javax.swing.JTextField gridText;
 	private javax.swing.JMenu menuFile;
 	private javax.swing.JMenu menuEdit;
 	private javax.swing.JMenuBar jMenuBar1;
@@ -532,7 +532,7 @@ public class MainGUI extends javax.swing.JFrame {
 	private javax.swing.JPopupMenu.Separator jSeparator1;
 	private javax.swing.JSeparator jSeparator2;
 	private javax.swing.JLabel productsLabel;
-	private javax.swing.JTextField productsText;
+	public javax.swing.JTextField productsText;
 	private javax.swing.JProgressBar progressBar;
 	private javax.swing.JLabel progressLabel;
 	private javax.swing.JButton startButton;
@@ -542,5 +542,8 @@ public class MainGUI extends javax.swing.JFrame {
 
 	public Simulation getSimulation() {
 		return simulation;
+	}
+	public Grid getGrid() {
+		return grid;
 	}
 }

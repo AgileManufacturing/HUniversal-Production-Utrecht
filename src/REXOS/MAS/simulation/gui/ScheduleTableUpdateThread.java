@@ -75,17 +75,12 @@ class ScheduleTableUpdateThread extends SwingWorker<Void, Void> {
 	public Void doInBackground() {
 		while (!isCancelled()) {
 			try {
-				Thread.sleep(100);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			if (!isPaused) {
 				updateTable();
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
 			}
 		}
 		return null;
@@ -97,25 +92,24 @@ class ScheduleTableUpdateThread extends SwingWorker<Void, Void> {
 		Equiplet equiplet = esf.getEquiplet();
 		System.out.println("equiplet " + equiplet);
 		ArrayList<ProductStepSchedule> schedule = equiplet.getSchedule();
-
+		
 		DefaultTableModel model = (DefaultTableModel) jTable.getModel();
-
-		System.out.println(schedule);
 
 		for(int i = 0; i < model.getRowCount(); i++){
 			model.removeRow(i);
 		}
-		
-		for(int i = 0; i < schedule.size(); i++) {
-			if(i >= model.getRowCount()) {
-				model.addRow(new Object[]{0L, 0L, "", 0, ""});
+		synchronized (schedule) {
+			for(int i = 0; i < schedule.size(); i++) {
+				if(i >= model.getRowCount()) {
+					model.addRow(new Object[]{0L, 0L, "", 0, ""});
+				}
+	
+				model.setValueAt(schedule.get(i).getStartTimeSlot(), i, 0);
+				model.setValueAt(schedule.get(i).getDuration(), i, 1);
+				model.setValueAt(schedule.get(i).getProductStep().getCapability().toString(), i, 2);
+				model.setValueAt(schedule.get(i).getProductStep().getProduct().hashCode(), i, 3);
+				model.setValueAt(schedule.get(i).getProductStep().getProduct().getType(), i, 4);
 			}
-
-			model.setValueAt(schedule.get(i).getStartTimeSlot(), i, 0);
-			model.setValueAt(schedule.get(i).getDuration(), i, 1);
-			model.setValueAt(schedule.get(i).getProductStep().getCapability().toString(), i, 2);
-			model.setValueAt(schedule.get(i).getProductStep().getProduct().hashCode(), i, 3);
-			model.setValueAt(schedule.get(i).getProductStep().getProduct().getType(), i, 4);
 		}
 	}
 
