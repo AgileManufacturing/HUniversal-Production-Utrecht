@@ -553,13 +553,13 @@
       <VirtualDirectory Name="rexos_gazebo">
         <VirtualDirectory Name="include">
           <VirtualDirectory Name="rexos_gazebo">
-            <File Name="src/REXOS/ROS/libraries/rexos_gazebo/include/rexos_gazebo/GazeboSDF.h"/>
-            <File Name="src/REXOS/ROS/libraries/rexos_gazebo/include/rexos_gazebo/MotorJoint.h"/>
+            <File Name="src/REXOS/ROS/libraries/rexos_gazebo/include/rexos_gazebo/SimulatedMotor.h"/>
+            <File Name="src/REXOS/ROS/libraries/rexos_gazebo/include/rexos_gazebo/SDFController.h"/>
           </VirtualDirectory>
         </VirtualDirectory>
         <VirtualDirectory Name="src">
-          <File Name="src/REXOS/ROS/libraries/rexos_gazebo/src/GazeboSDF.cpp"/>
-          <File Name="src/REXOS/ROS/libraries/rexos_gazebo/src/MotorJoint.cpp"/>
+          <File Name="src/REXOS/ROS/libraries/rexos_gazebo/src/SimulatedMotor.cpp"/>
+          <File Name="src/REXOS/ROS/libraries/rexos_gazebo/src/SDFController.cpp"/>
         </VirtualDirectory>
       </VirtualDirectory>
       <VirtualDirectory Name="vectors">

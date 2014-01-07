@@ -1,6 +1,7 @@
 /**
  * @file MotorJoint.h
- * @brief the node that handles the simulation
+ * @brief this object simulates a real life motor (stepper, dc, servo, etc) in gazebo. It does this by taking a joint of a
+ * given gazebo robot and manipulating its rotations limits to  make it rotate and hold the current angle.
  * @date Created: 2013-10-30
  * @date Revisioned: 2013-01-21
  *
@@ -29,24 +30,45 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef MOTORJOINT_H_
-#define MOTORJOINT_H_
+#ifndef SIMULATEDMOTOR_H_
+#define SIMULATEDMOTOR_H_
 
-#include "rexos_gazebo/GazeboSDF.h"
+#include "rexos_gazebo/SDFController.h"
 #include "gazebo_msgs/LinkState.h"
 
 #include <vector>
 
-class MotorJoint{
+class SimulatedMotor{
 	
 public:
-	MotorJoint();
-	void run(const char * jointName, GazeboSDF sdfController);
+	SimulatedMotor();
+	
+	/**
+	* initialises the motor with the parameters required for it to function
+	* @param const char * jointName - the joint to manipulate as a motor
+	**/
+	void init(const char * jointName);
+	
+	/**
+	* rotates the motor (the joint this instance is controlling) to a given angle in degrees
+	* @param double degrees
+	**/
 	void goToAngleDegrees(double degrees);
+	
+	/**
+	* rotates the motor (the joint this instance is controlling) to a given angle in radians
+	* @param double radians
+	**/
 	void goToAngleRadians(double radians);
+	
+	/**
+	* updates the position of the motor. This method checks if the current position of the motor 
+	* is up to date with the simulation and updates it accordingly
+	**/
 	void update();
+	
 private:
-	GazeboSDF gazeboSDF;
+	SDFController sdfController;
 	const char * name;
 	double currentAngle;
 	double destinationAngle;

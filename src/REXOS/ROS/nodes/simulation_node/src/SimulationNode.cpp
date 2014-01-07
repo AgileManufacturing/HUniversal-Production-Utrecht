@@ -18,12 +18,12 @@ void SimulationNode::run(int argc, char **argv){
 	ros::Rate loop_rate(60);
 	
 	
-	motors[0].run("upperArmToMotor1", gazeboSDF);
-	motors[1].run("upperArmToMotor2", gazeboSDF);
-	motors[2].run("upperArmToMotor3", gazeboSDF);
-	motors[3].run("upperArmToMotor4", gazeboSDF);
-	motors[4].run("upperArmToMotor5", gazeboSDF);
-	motors[5].run("upperArmToMotor6", gazeboSDF);
+	motors[0].init("upperArmToMotor1");
+	motors[1].init("upperArmToMotor2");
+	motors[2].init("upperArmToMotor3");
+	motors[3].init("upperArmToMotor4");
+	motors[4].init("upperArmToMotor5");
+	motors[5].init("upperArmToMotor6");
 	
 	//motor1.goToAngleDegrees(10);
 	//motor2.goToAngleDegrees(10);

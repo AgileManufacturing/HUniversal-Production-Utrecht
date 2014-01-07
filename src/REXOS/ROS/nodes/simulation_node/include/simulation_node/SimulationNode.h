@@ -32,8 +32,8 @@
 #ifndef SIMULATIONNODE_H_
 #define SIMULATIONNODE_H_
 
-#include "rexos_gazebo/GazeboSDF.h"
-#include "rexos_gazebo/MotorJoint.h"
+#include "rexos_gazebo/SDFController.h"
+#include "rexos_gazebo/SimulatedMotor.h"
 #include "simulation_node/rotate.h"
 #include <vector>
 
@@ -44,13 +44,13 @@ public:
 	void run(int argc, char **argv);
 	bool rotateMotorToDegrees(simulation_node::rotate::Request  &req, simulation_node::rotate::Response  & res);
 	
-	MotorJoint motors[6];
+	SimulatedMotor motors[6];
 	
 	
 private:
 	
 	//globals
-	GazeboSDF gazeboSDF;
+	SDFController sdfController;
 
 
 };

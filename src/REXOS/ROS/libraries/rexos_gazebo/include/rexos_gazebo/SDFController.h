@@ -29,8 +29,8 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef GAZEBOSDF_H_
-#define GAZEBOSDF_H_
+#ifndef SDFCONTROLLER_H_
+#define SDFCONTROLLER_H_
 
 #include "gazebo_msgs/ApplyJointEffort.h"
 //#include "gazebo_msgs/ClearJointForces.h"
@@ -45,6 +45,14 @@
 
 #include <vector>
 
+
+/**
+* Struct containing joint properties used by the SDFController
+* @param int type - the type of the joint
+* @param double damping;
+* @param double position;
+* @param double rate;
+**/
 struct JointProperties {
 	int type;
 	double damping;
@@ -58,16 +66,17 @@ struct JointProperties {
 	}
 } ;
 
-class GazeboSDF{
+class SDFController{
 	
 public:
-	GazeboSDF();
+	SDFController();
 
 	/**
 	* Returns a JointProperties object containing the properties of the joint specified by jointName
 	* @param const char * linkName
 	**/
 	JointProperties getJointProperties(const char * jointName);
+	
 	/**
 	* Returns a gazebo_msgs::LinkState object containing the properties of the link specified by linkName
 	* @param const char * linkName
@@ -80,12 +89,14 @@ public:
 	* @param gazebo_msgs::LinkState state
 	**/
 	void setLinkState(const char * linkName, gazebo_msgs::LinkState state);
+	
 	/**
 	* sets the properties of the joint specified by jointName
 	* @param const char * jointName
 	* @param gazebo_msgs::ODEJointProperties jointConfig
 	**/
 	void setJointProperties(const char * jointName, gazebo_msgs::ODEJointProperties jointConfig);
+	
 	/**
 	* applies force to the joint specified by jointName
 	* @param const char * jointName
@@ -93,6 +104,7 @@ public:
 	* @param double durationTime in ms
 	**/
 	void applyForceToJoint(const char * jointName, double force, double durationTime);
+	
 	/**
 	* Rotates the joint specified by jointName by a given speed. Negative speed will rotate to the counter direction
 	* @param const char * jointName

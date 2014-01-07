@@ -1,19 +1,19 @@
 #include "ros/ros.h"
-#include "rexos_gazebo/GazeboSDF.h"
+#include "rexos_gazebo/SDFController.h"
 #include <sstream>
 
-GazeboSDF::GazeboSDF(){
+SDFController::SDFController(){
 	
 }
 
-void GazeboSDF::rotateJoint(const char * jointName, double speed){
+void SDFController::rotateJoint(const char * jointName, double speed){
 	gazebo_msgs::ODEJointProperties jointConfig;
 	jointConfig.hiStop.push_back(speed+0.0001);
 	jointConfig.loStop.push_back(speed);
 	setJointProperties(jointName,jointConfig);
 }
 
-void GazeboSDF::setLinkState(const char * linkName, gazebo_msgs::LinkState state){
+void SDFController::setLinkState(const char * linkName, gazebo_msgs::LinkState state){
 	ros::NodeHandle nodeHandle;
 	ros::ServiceClient client = nodeHandle.serviceClient<gazebo_msgs::SetLinkState>("gazebo/set_link_state", 1);
 	gazebo_msgs::SetLinkState service;
@@ -27,7 +27,7 @@ void GazeboSDF::setLinkState(const char * linkName, gazebo_msgs::LinkState state
 }
 
 
-gazebo_msgs::LinkState GazeboSDF::getLinkState(const char * linkName){
+gazebo_msgs::LinkState SDFController::getLinkState(const char * linkName){
 	ros::NodeHandle nodeHandle;
 	ros::ServiceClient client = nodeHandle.serviceClient<gazebo_msgs::GetLinkState>("/gazebo/get_link_state");
 	gazebo_msgs::GetLinkState service;
@@ -42,7 +42,7 @@ gazebo_msgs::LinkState GazeboSDF::getLinkState(const char * linkName){
 	}
 }
 
-void GazeboSDF::setJointProperties(const char * jointName, gazebo_msgs::ODEJointProperties jointConfig){
+void SDFController::setJointProperties(const char * jointName, gazebo_msgs::ODEJointProperties jointConfig){
 	ros::NodeHandle nodeHandle;
 	ros::ServiceClient client = nodeHandle.serviceClient<gazebo_msgs::SetJointProperties>("/gazebo/set_joint_properties");
 	gazebo_msgs::SetJointProperties service;
@@ -57,7 +57,7 @@ void GazeboSDF::setJointProperties(const char * jointName, gazebo_msgs::ODEJoint
 	
 }
 
-JointProperties GazeboSDF::getJointProperties(const char * jointName){
+JointProperties SDFController::getJointProperties(const char * jointName){
 	ros::NodeHandle nodeHandle;
 	ros::ServiceClient client = nodeHandle.serviceClient<gazebo_msgs::GetJointProperties>("/gazebo/get_joint_properties");
 	gazebo_msgs::GetJointProperties service;
@@ -79,7 +79,7 @@ JointProperties GazeboSDF::getJointProperties(const char * jointName){
 	
 }
 
-void GazeboSDF::applyForceToJoint(const char * jointName, double force, double durationTime){
+void SDFController::applyForceToJoint(const char * jointName, double force, double durationTime){
 	ros::NodeHandle nodeHandle;
 	ros::ServiceClient client = nodeHandle.serviceClient<gazebo_msgs::ApplyJointEffort>("/gazebo/apply_joint_effort");
 	gazebo_msgs::ApplyJointEffort service;

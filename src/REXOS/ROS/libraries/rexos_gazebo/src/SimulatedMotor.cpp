@@ -1,32 +1,30 @@
 #include "ros/ros.h"
-
-#include "rexos_gazebo/MotorJoint.h"
+#include "rexos_gazebo/SimulatedMotor.h"
 #include <sstream>
 
 
 
-MotorJoint::MotorJoint()
+SimulatedMotor::SimulatedMotor()
 {
 	
 }
 
-void MotorJoint::run(const char * jointName, GazeboSDF sdfController){
-	gazeboSDF = sdfController;
+void SimulatedMotor::init(const char * jointName){
 	name = jointName;
 }
 
-void MotorJoint::goToAngleDegrees(double degrees){
+void SimulatedMotor::goToAngleDegrees(double degrees){
 	double radiansAngle = degrees*0.0174532925;
 	goToAngleRadians(radiansAngle);
 }
 
-void MotorJoint::goToAngleRadians(double radians){
+void SimulatedMotor::goToAngleRadians(double radians){
 	destinationAngle = radians;
 }
 
 
-void MotorJoint::update(){
-	currentAngle = gazeboSDF.getJointProperties(name).position;
+void SimulatedMotor::update(){
+	currentAngle = sdfController.getJointProperties(name).position;
 	
 	if((destinationAngle - currentAngle)/100 > 0.0001){
 		double progressiveAngle = currentAngle;
@@ -34,14 +32,14 @@ void MotorJoint::update(){
 		if((destinationAngle - currentAngle)/100 < 0.0001){
 			progressiveAngle = destinationAngle;
 		}
-		gazeboSDF.rotateJoint(name, progressiveAngle);
+		sdfController.rotateJoint(name, progressiveAngle);
 	}else if((destinationAngle - currentAngle)/100 < -0.0001){
 		double progressiveAngle = currentAngle;
 		progressiveAngle += (destinationAngle - currentAngle)/30;
 		if((destinationAngle - currentAngle)/100 > -0.0001){
 			progressiveAngle = destinationAngle;
 		}
-		gazeboSDF.rotateJoint(name, progressiveAngle);
+		sdfController.rotateJoint(name, progressiveAngle);
 			
 	}
 }
