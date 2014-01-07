@@ -3,6 +3,7 @@ package simulation;
 import java.text.ParseException;
 
 import simulation.data.Capability;
+import simulation.gui.MainGUI;
 import simulation.mas_entities.Batch;
 import simulation.mas_entities.Grid;
 import simulation.mas_entities.Product;
@@ -16,7 +17,7 @@ public class BatchSpawner extends ProductSpawner{
 		super(simulation, grid);
 		
 		
-		String[][] fields = CSVReader.parseCsvFile(pathToBatchCsvFile);
+		String[][] fields = CSVReader.parseCsvFile(MainGUI.batchesFile.getAbsolutePath());
 		
 		productName = fields[0][0];
 		productDeadline = Duration.parseDurationString(fields[1][0]);

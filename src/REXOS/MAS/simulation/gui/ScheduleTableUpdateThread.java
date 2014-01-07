@@ -6,11 +6,11 @@
  *           .MMMMMMM#=`.gNMMMMM.       \_| \_|\____/\/   \/ \___/ \____/
  *             7HMM9`   .MMMMMM#`		
  *                     ...MMMMMF .      
- *         dN.       .jMN, TMMM`.MM     	@file 	ProductSpawner.java
+ *         dN.       .jMN, TMMM`.MM     	@file 	ScheduleTableUpdateThread.java
  *         .MN.      MMMMM;  ?^ ,THM		@brief 	...
- *          dM@      dMMM3  .ga...g,    	@date Created:	2013-12-18
+ *          dM@      dMMM3  .ga...g,    	@date Created:	2013-12-19
  *       ..MMM#      ,MMr  .MMMMMMMMr   
- *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Tommas Bakker
+ *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Alexander Hustinx
  *   .dMMMMMF           7Y=d9  dMMMMMr    
  *  .MMMMMMF        JMMm.?T!   JMMMMM#		@section LICENSE
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	License:	newBSD
@@ -36,69 +36,97 @@
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
+package simulation.gui;
 
-package simulation;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.util.List;
 
-import java.text.ParseException;
+import javax.swing.JTable;
+import javax.swing.RowSorter;
+import javax.swing.SwingWorker;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
-import simulation.data.Capability;
-import simulation.data.ProductStep;
-import simulation.gui.MainGUI;
+import simulation.Simulation;
+import simulation.mas_entities.Equiplet;
 import simulation.mas_entities.Grid;
-import simulation.mas_entities.Product;
 
-public class ProductSpawner implements Updatable {
-	private static final String pathToProductCsvFile = "/home/t/sim/productA.csv";
+class ScheduleTableUpdateThread extends SwingWorker<Void, Void> {
+
+	public static final int PLACEHOLDER = 0;
+
+	private EquipletScheduleFrame esf;
+	private JTable jTable;
 	
-	long nextSpawnTime;
-	
-	String productName;
-	long productDeadline;
-	int amountPerSpawn;
-	double spawnInterval;
-	Capability[] productStepCapabilities;
-	
-	Simulation simulation;
-	Grid grid;
-	
-	public ProductSpawner(Simulation simulation, Grid grid) throws ParseException {
-		this.simulation = simulation;
-		this.grid = grid;
+	private boolean isPaused = false;
+
+	public ScheduleTableUpdateThread(EquipletScheduleFrame esf) {
+		super();
+		this.esf = esf;
+		System.out.println("[DEBUG]\t\tCreated ScheduleTableUpdateThread");
 		
-		String[][] fields = CSVReader.parseCsvFile(MainGUI.productsFile.getAbsolutePath());
-		
-		productName = fields[0][0];
-		productDeadline = Duration.parseDurationString(fields[1][0]);
-		long start = Duration.parseDurationString(fields[2][0]);
-		nextSpawnTime = simulation.getCurrentSimulationTime() + start;
-		
-		amountPerSpawn = Integer.parseInt(fields[3][0]);
-		spawnInterval = Integer.parseInt(fields[4][0]);
-		
-		productStepCapabilities = new Capability[fields.length - 5];
-		for(int i = 5; i < fields.length; i++) {
-			productStepCapabilities[i - 5] = Capability.getCapabilityByName(fields[i][0]);
-		}		
+		jTable = esf.getJTable();
 	}
-	
+
 	@Override
-	public void update(long time) {
-		if(time >= nextSpawnTime) {
-			Product[] products = spawnProducts();
-			for(int i = 0; i < products.length; i++) {
-				simulation.addUpdateable(products[i]);
+	public Void doInBackground() {
+		while (!isCancelled()) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-			
-			nextSpawnTime += spawnInterval * 1000;
-			System.out.println("ProductSpawner: Spawned " + amountPerSpawn + " " + productName + "s, next spawn in " + spawnInterval + " (" + nextSpawnTime + ")");
+			if (!isPaused) {
+				updateTable();
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		}
-
+		return null;
 	}
-	private Product[] spawnProducts() {
-		Product[] products = new Product[amountPerSpawn];
-		for(int i = 0; i < products.length; i++) {
-			products[i] = new Product(productName, simulation, grid, productStepCapabilities, simulation.getCurrentSimulationTime() + productDeadline);
-		}
-		return products;
+
+	// @ TODO Add actual data to the Table ...
+    public void updateTable(){
+    	jTable = esf.getJTable();
+    	Equiplet equiplet = esf.getEquiplet();
+    	System.out.println("equiplet " + equiplet);
+    	Equiplet[] equiplets = equiplet.getSchedule();
+    	
+    	DefaultTableModel model = (DefaultTableModel) jTable.getModel();
+    	
+    	System.out.println(equiplets);
+    	for(int i = 0; i < equiplets.length; i++) {
+    		if(i >= model.getRowCount()) {
+    			model.addRow(new Object[]{0L, 0L, "", 0, ""});
+    		}
+    		
+    		model.setValueAt(equiplets[i].getName(), i, 0);
+    		model.setValueAt(equiplets[i].getEquipletState().toString(), i, 1);
+    		model.setValueAt(equiplets[i].getLoad(), i, 2);
+    		model.setValueAt(equiplets[i].getBatchReservation(), i, 3);
+    		model.setValueAt(equiplets[i].getBatchReservation(), i, 3);
+    	}
+    }
+	
+	public void pause() {
+		isPaused = true;
+		System.out.println("[DEBUG]\t\tPaused TableUpdateThread");
+	}
+
+	public void resume() {
+		isPaused = false;
+		System.out.println("[DEBUG]\t\tResumed TableUpdateThread");
+	}
+	
+	public boolean isPaused(){
+		return isPaused;
+	}
+
+	protected void done() {
+		System.out.println("[DEBUG]\t\tCancelled TableUpdateThread");
 	}
 }
