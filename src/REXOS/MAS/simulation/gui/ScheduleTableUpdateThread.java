@@ -40,6 +40,7 @@ package simulation.gui;
 
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JTable;
@@ -49,6 +50,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import simulation.Simulation;
+import simulation.data.ProductStepSchedule;
 import simulation.mas_entities.Equiplet;
 import simulation.mas_entities.Grid;
 
@@ -58,14 +60,14 @@ class ScheduleTableUpdateThread extends SwingWorker<Void, Void> {
 
 	private EquipletScheduleFrame esf;
 	private JTable jTable;
-	
+
 	private boolean isPaused = false;
 
 	public ScheduleTableUpdateThread(EquipletScheduleFrame esf) {
 		super();
 		this.esf = esf;
 		System.out.println("[DEBUG]\t\tCreated ScheduleTableUpdateThread");
-		
+
 		jTable = esf.getJTable();
 	}
 
@@ -90,43 +92,48 @@ class ScheduleTableUpdateThread extends SwingWorker<Void, Void> {
 	}
 
 	// @ TODO Add actual data to the Table ...
-    public void updateTable(){
-    	jTable = esf.getJTable();
-    	Equiplet equiplet = esf.getEquiplet();
-    	System.out.println("equiplet " + equiplet);
-    	Equiplet[] equiplets = equiplet.getSchedule();
-    	
-    	DefaultTableModel model = (DefaultTableModel) jTable.getModel();
-    	
-    	System.out.println(equiplets);
-    	for(int i = 0; i < equiplets.length; i++) {
-    		if(i >= model.getRowCount()) {
-    			model.addRow(new Object[]{0L, 0L, "", 0, ""});
-    		}
-    		
-    		model.setValueAt(equiplets[i].getName(), i, 0);
-    		model.setValueAt(equiplets[i].getEquipletState().toString(), i, 1);
-    		model.setValueAt(equiplets[i].getLoad(), i, 2);
-    		model.setValueAt(equiplets[i].getBatchReservation(), i, 3);
-    		model.setValueAt(equiplets[i].getBatchReservation(), i, 3);
-    	}
-    }
-	
+	public void updateTable(){
+		jTable = esf.getJTable();
+		Equiplet equiplet = esf.getEquiplet();
+		System.out.println("equiplet " + equiplet);
+		ArrayList<ProductStepSchedule> schedule = equiplet.getSchedule();
+
+		DefaultTableModel model = (DefaultTableModel) jTable.getModel();
+
+		System.out.println(schedule);
+
+		for(int i = 0; i < model.getRowCount(); i++){
+			model.removeRow(i);
+		}
+		
+		for(int i = 0; i < schedule.size(); i++) {
+			if(i >= model.getRowCount()) {
+				model.addRow(new Object[]{0L, 0L, "", 0, ""});
+			}
+
+			model.setValueAt(schedule.get(i).getStartTimeSlot(), i, 0);
+			model.setValueAt(schedule.get(i).getDuration(), i, 1);
+			model.setValueAt(schedule.get(i).getProductStep().getCapability().toString(), i, 2);
+			model.setValueAt(schedule.get(i).getProductStep().getProduct().hashCode(), i, 3);
+			model.setValueAt(schedule.get(i).getProductStep().getProduct().getType(), i, 4);
+		}
+	}
+
 	public void pause() {
 		isPaused = true;
-		System.out.println("[DEBUG]\t\tPaused TableUpdateThread");
+		System.out.println("[DEBUG]\t\tPaused ScheduleTableUpdateThread");
 	}
 
 	public void resume() {
 		isPaused = false;
-		System.out.println("[DEBUG]\t\tResumed TableUpdateThread");
+		System.out.println("[DEBUG]\t\tResumed ScheduleTableUpdateThread");
 	}
-	
+
 	public boolean isPaused(){
 		return isPaused;
 	}
 
 	protected void done() {
-		System.out.println("[DEBUG]\t\tCancelled TableUpdateThread");
+		System.out.println("[DEBUG]\t\tCancelled ScheduleTableUpdateThread");
 	}
 }

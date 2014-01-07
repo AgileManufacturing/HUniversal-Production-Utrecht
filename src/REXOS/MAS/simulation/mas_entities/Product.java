@@ -282,4 +282,8 @@ public class Product implements Updatable{
 			return "id:" + this.hashCode() + " batch:-";
 		}
 	}
+	
+	public String getType() {
+		return productType;
+	}
 }

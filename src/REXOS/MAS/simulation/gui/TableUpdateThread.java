@@ -106,7 +106,7 @@ class TableUpdateThread extends SwingWorker<Void, Void> {
     		
     		model.setValueAt(equiplets[i].getName(), i, 0);
     		model.setValueAt(equiplets[i].getEquipletState().toString(), i, 1);
-    		model.setValueAt(equiplets[i].getLoad(), i, 2);
+    		model.setValueAt((equiplets[i].getLoad() * 100), i, 2);
     		model.setValueAt(equiplets[i].getBatchReservation(), i, 3);
     	}
     }

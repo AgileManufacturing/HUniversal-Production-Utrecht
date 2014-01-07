@@ -38,6 +38,8 @@
  **/
 package simulation.gui;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JTable;
@@ -58,6 +60,8 @@ public class EquipletListFrame extends javax.swing.JFrame {
      * Creates new form EquipletListFrame
      */
     public EquipletListFrame(Grid grid) {	//EquipletListFrame(Grid grid)
+    	super("Equiplet List");
+    	
     	this.grid = grid;
     	System.out.println("[DEBUG]\t\tCreated EquipletListFrame");
     	initComponents();
@@ -105,6 +109,19 @@ public class EquipletListFrame extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        
+        jTable1.addMouseListener(new MouseAdapter() {
+        	  public void mouseClicked(MouseEvent e) {
+        	    if (e.getClickCount() == 2) {
+        	      JTable target = (JTable)e.getSource();
+        	      int row = target.getSelectedRow();
+        	      int column = target.getSelectedColumn();
+        	      // do some action if appropriate column
+        	      new EquipletScheduleFrame(grid.getEquiplets()[row]);
+        	    }
+        	  }
+        	});
+        
         jScrollPane1.setViewportView(jTable1);
 
         this.addWindowListener(new java.awt.event.WindowAdapter() {

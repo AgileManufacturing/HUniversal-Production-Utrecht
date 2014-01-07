@@ -38,6 +38,7 @@
  **/
 package simulation.gui;
 
+import java.awt.Dimension;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JTable;
@@ -59,6 +60,8 @@ public class EquipletScheduleFrame extends javax.swing.JFrame {
      * Creates new form EquipletListFrame
      */
     public EquipletScheduleFrame(Equiplet eq) {	//EquipletListFrame(Grid grid)
+    	super(eq.getName());
+    	
     	this.equiplet = eq;
     	System.out.println("[DEBUG]\t\tCreated EquipletScheduleFrame");
     	initComponents();
@@ -74,7 +77,7 @@ public class EquipletScheduleFrame extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")                         
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
-
+        
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
 
