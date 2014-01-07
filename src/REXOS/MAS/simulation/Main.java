@@ -57,7 +57,7 @@ public class Main {
 	
 	
 	public static void main(String[] args) throws Exception {
-		Capability.loadCapabilities(pathToCapabilitiesCsv);
+		Capability.loadCapabilities(MainGUI.capabilitiesFile.getAbsolutePath());
 		
 		/*simulation = new Simulation();
 		EquipletDataCollector edc = new EquipletDataCollector(simulation);
