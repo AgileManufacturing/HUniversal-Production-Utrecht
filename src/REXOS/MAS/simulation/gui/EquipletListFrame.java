@@ -38,6 +38,7 @@
  **/
 package simulation.gui;
 
+import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
@@ -59,7 +60,7 @@ public class EquipletListFrame extends javax.swing.JFrame {
     /**
      * Creates new form EquipletListFrame
      */
-    public EquipletListFrame(Grid grid) {	//EquipletListFrame(Grid grid)
+    public EquipletListFrame(Grid grid) {	
     	super("Equiplet List");
     	
     	this.grid = grid;
@@ -76,6 +77,9 @@ public class EquipletListFrame extends javax.swing.JFrame {
      */
     @SuppressWarnings("unchecked")                         
     private void initComponents() {
+    	
+    	setPreferredSize(new Dimension(600, 400));
+    	
         java.awt.GridBagConstraints gridBagConstraints;
 
         jScrollPane1 = new javax.swing.JScrollPane();
