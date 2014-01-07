@@ -53,6 +53,7 @@ import simulation.Simulation;
 import simulation.Updatable;
 import simulation.data.Capability;
 import simulation.data.GridProperties;
+import simulation.gui.MainGUI;
 
 
 public class Grid implements Updatable{
@@ -69,7 +70,7 @@ public class Grid implements Updatable{
 	}
 	public Grid(String equipletLayoutJsonFilePath, Simulation simulation) {
 		
-		JsonObject jsonObject = CSVReader.parseJsonObjectFile(equipletLayoutJsonFilePath);
+		JsonObject jsonObject = CSVReader.parseJsonObjectFile(MainGUI.gridFile.getAbsolutePath());
 		JsonArray jsonEquipletsArray2D = jsonObject.get("grid").getAsJsonArray();
 		
 		gridProperties = new GridProperties(simulation, jsonObject.get("firstTimeSlot").getAsLong(), 

@@ -56,10 +56,10 @@ import simulation.mas_entities.Grid;
 public class MainGUI extends javax.swing.JFrame {
 
 	// Files
-	private File capabilitiesFile				= new File("C:\\Users\\Alexander\\workspace\\SimGUI\\bin\\capabilities.csv");
-	private File productsFile					= new File("C:\\Users\\Alexander\\workspace\\SimGUI\\bin\\products.csv");
-	private File batchesFile					= new File("C:\\Users\\Alexander\\workspace\\SimGUI\\bin\\batches.csv");
-	private File gridFile						= new File("C:\\Users\\Alexander\\workspace\\SimGUI\\bin\\grid.csv");
+	public static File capabilitiesFile		= new File("C:/Users/Alexander/Documents/School/Jaar 3/Stage/HUniversal/src/REXOS/MAS/simulation/csvFiles/capabilities.csv");
+	public static File productsFile			= new File("C:/Users/Alexander/Documents/School/Jaar 3/Stage/HUniversal/src/REXOS/MAS/simulation/csvFiles/productA.csv");
+	public static File batchesFile			= new File("C:/Users/Alexander/Documents/School/Jaar 3/Stage/HUniversal/src/REXOS/MAS/simulation/csvFiles/BatchA.csv");
+	public static File gridFile				= new File("C:/Users/Alexander/Documents/School/Jaar 3/Stage/HUniversal/src/REXOS/MAS/simulation/csvFiles/equipletLayout.json");
 
 	// BackgroundWorkers
 	private ProgressWorkerThread progressWorker;
@@ -73,6 +73,7 @@ public class MainGUI extends javax.swing.JFrame {
 
 	// BackgroundWorker checks
 	private boolean isCheckingFiles				= false;
+	private boolean isChartWindowOpen			= false;
 	private boolean isVisualisationWindowOpen 	= false;
 	private boolean isEquipletListOpen 			= false;
 	
@@ -82,7 +83,7 @@ public class MainGUI extends javax.swing.JFrame {
 	/**
 	 * Creates new form MainGUI
 	 */
-	public MainGUI() {	//MainGUI(Grid grid)
+	public MainGUI() {	
 		super("SimGUI");
 		initComponents();
 
@@ -115,6 +116,7 @@ public class MainGUI extends javax.swing.JFrame {
 		jMenuBar1 = new javax.swing.JMenuBar();
 		menuFile = new javax.swing.JMenu();
 		menuFileVisual = new javax.swing.JMenuItem();
+		menuFileGraph = new javax.swing.JMenuItem();
 		menuFileEquiplet = new javax.swing.JMenuItem();
 		jSeparator1 = new javax.swing.JPopupMenu.Separator();
 		menuFileExit = new javax.swing.JMenuItem();
@@ -168,6 +170,14 @@ public class MainGUI extends javax.swing.JFrame {
 		});
 		menuFile.add(menuFileVisual);
 
+		menuFileGraph.setText("Show Graphs");
+		menuFileGraph.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				menuFileGraphActionPerformed(evt);
+			}
+		});
+		menuFile.add(menuFileGraph);
+		
 		menuFileEquiplet.setText("Show Equiplet Info");
 		menuFileEquiplet.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -279,9 +289,18 @@ public class MainGUI extends javax.swing.JFrame {
 		}
 	}             
 
+	private void menuFileGraphActionPerformed(java.awt.event.ActionEvent evt){
+		if(!isChartWindowOpen){
+			// TODO open Graph Window:
+		} else {
+			System.out.println("[DEBUG]\t\tChart Window is already opened ...");
+		}
+	}
+	
 	private void menuFileVisualActionPerformed(java.awt.event.ActionEvent evt) {                                           
 		if(!isVisualisationWindowOpen){
 			// TODO open Visualisation Window stuff:
+			isVisualisationWindowOpen = true;
 		} else {
 			System.out.println("[DEBUG]\t\tVisualisation Window is already opened ...");
 		}
@@ -294,7 +313,7 @@ public class MainGUI extends javax.swing.JFrame {
 	private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {                                            
 		// TODO add your handling code here:
 		if(!isRunning){
-			if(!checkFiles()){
+			if(checkFiles()){
 				pauseFileChecker();
 				
 				try{
@@ -507,6 +526,7 @@ public class MainGUI extends javax.swing.JFrame {
 	private javax.swing.JMenuBar jMenuBar1;
 	private javax.swing.JMenuItem menuFileVisual;
 	private javax.swing.JMenuItem menuFileEquiplet;
+	private javax.swing.JMenuItem menuFileGraph;
 	private javax.swing.JMenuItem menuFileExit;
 	private javax.swing.JMenuItem menuEditConfig;
 	private javax.swing.JPopupMenu.Separator jSeparator1;
