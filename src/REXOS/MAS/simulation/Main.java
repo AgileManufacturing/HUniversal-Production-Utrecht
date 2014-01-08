@@ -39,12 +39,8 @@
 
 package simulation;
 
-import simulation.collectors.DataCollector;
-import simulation.collectors.EquipletDataCollector;
-import simulation.collectors.ProductDataCollector;
 import simulation.data.Capability;
 import simulation.gui.MainGUI;
-import simulation.gui.SimGUI;
 import simulation.mas_entities.Grid;
 
 public class Main {

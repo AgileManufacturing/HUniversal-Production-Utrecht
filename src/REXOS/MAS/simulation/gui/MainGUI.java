@@ -40,12 +40,9 @@ package simulation.gui;
 
 import java.io.File;
 import java.text.ParseException;
-
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
-
 import simulation.BatchSpawner;
 import simulation.ProductSpawner;
 import simulation.Simulation;
@@ -344,6 +341,8 @@ public class MainGUI extends javax.swing.JFrame {
 
 	private void startNewSimulation() throws ParseException {
 		simulation = new Simulation();
+		
+		//Data collectors for the Graphs
 		EquipletDataCollector edc = new EquipletDataCollector(simulation);
 		ProductDataCollector pdc = new ProductDataCollector(simulation);
 		
@@ -464,8 +463,8 @@ public class MainGUI extends javax.swing.JFrame {
 		return capabilitiesFile;
 	}
 
-	public void setCapabilitiesFile(File capabilitiesFile) {
-		if(capabilitiesFile.exists())	this.capabilitiesFile = capabilitiesFile;
+	public static void setCapabilitiesFile(File newFile) {
+		if(capabilitiesFile.exists())	capabilitiesFile = newFile;
 		else							System.out.println("[DEBUG]\t\tGiven batchesFile doesn't exist! ...");
 	}
 
@@ -473,8 +472,8 @@ public class MainGUI extends javax.swing.JFrame {
 		return productsFile;
 	}
 
-	public void setProductsFile(File productsFile) {
-		if(productsFile.exists())	this.productsFile = productsFile;
+	public static void setProductsFile(File newFile) {
+		if(productsFile.exists())	productsFile = newFile;
 		else						System.out.println("[DEBUG]\t\tGiven batchesFile doesn't exist! ...");
 	}
 
@@ -482,8 +481,8 @@ public class MainGUI extends javax.swing.JFrame {
 		return batchesFile;
 	}
 
-	public void setBatchesFile(File batchesFile) {
-		if(batchesFile.exists())	this.batchesFile = batchesFile;
+	public static void setBatchesFile(File newFile) {
+		if(batchesFile.exists())	batchesFile = newFile;
 		else						System.out.println("[DEBUG]\t\tGiven batchesFile doesn't exist! ...");
 	}
 
@@ -491,8 +490,8 @@ public class MainGUI extends javax.swing.JFrame {
 		return gridFile;
 	}
 
-	public void setGridFile(File gridFile) {
-		if(gridFile.exists())		this.gridFile = gridFile;
+	public static void setGridFile(File newFile) {
+		if(gridFile.exists())		gridFile = newFile;
 		else						System.out.println("[DEBUG]\t\tGiven batchesFile doesn't exist! ...");
 
 	}

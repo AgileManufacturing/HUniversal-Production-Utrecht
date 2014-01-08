@@ -8,7 +8,7 @@
  *                     ...MMMMMF .      
  *         dN.       .jMN, TMMM`.MM     	@file 	EquipletScheduleFrame.java
  *         .MN.      MMMMM;  ?^ ,THM		@brief 	...
- *          dM@      dMMM3  .ga...g,    	@date Created:	2013-12-19
+ *          dM@      dMMM3  .ga...g,    	@date Created:	2014-01-7
  *       ..MMM#      ,MMr  .MMMMMMMMr   
  *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Alexander Hustinx
  *   .dMMMMMF           7Y=d9  dMMMMMr    
@@ -36,15 +36,13 @@
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
+
 package simulation.gui;
 
 import java.awt.Dimension;
 import java.awt.event.WindowEvent;
-
 import javax.swing.JTable;
-
 import simulation.mas_entities.Equiplet;
-import simulation.mas_entities.Grid;
 
 public class EquipletScheduleFrame extends javax.swing.JFrame {
 
