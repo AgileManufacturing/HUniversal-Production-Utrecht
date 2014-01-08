@@ -3,6 +3,7 @@ package simulation.collectors;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 
 import simulation.Simulation;
@@ -14,25 +15,34 @@ import simulation.mas_entities.Product;
 import simulation.mas_entities.Product.ProductState;
 
 public class ProductDataCollector extends DataCollector {
-	public HashMap<Long, ArrayList<Product>> products;
-	public HashMap<Long, ArrayList<Product>> productInProgres;
-	public HashMap<Long, ArrayList<Product>> productsOverDeadline;
+	public HashSet<Product> knownProducts;
+	public HashSet<Product> knownFailedProducts;
+	public HashMap<Long, Integer> products;
+	public HashMap<Long, Integer> productInProgres;
+	public HashMap<Long, Integer> productsOverDeadline;
 	public HashMap<Product, HashMap<Long, LinkedHashMap<ProductStep, Schedule>>> productSchedules;
+	Integer productCount;
+	Integer productInProgressCount;
+	Integer productOverDeadlineCount;
+	
 
 	public ProductDataCollector(Simulation simulation) {
 		super(simulation);
-		products = new HashMap<Long, ArrayList<Product>>(); 
-		productInProgres = new HashMap<Long, ArrayList<Product>>(); 
-		productsOverDeadline = new HashMap<Long, ArrayList<Product>>();
+		knownProducts = new HashSet<Product>();
+		knownFailedProducts = new HashSet<Product>();
+		products = new HashMap<Long, Integer>(); 
+		productInProgres = new HashMap<Long, Integer>(); 
+		productsOverDeadline = new HashMap<Long, Integer>();
 		productSchedules = new HashMap<Product, HashMap<Long, LinkedHashMap<ProductStep, Schedule>>>();
+		productCount = 0;
+		productInProgressCount = 0;
+		productOverDeadlineCount = 0;
 	}
 	
 	
 	public void collectData(long time) {
 		if(needNewSample(time) == true) {
-			products.put(simulation.getCurrentSimulationTime(), new ArrayList<Product>());
-			productInProgres.put(simulation.getCurrentSimulationTime(), new ArrayList<Product>());
-			productsOverDeadline.put(simulation.getCurrentSimulationTime(), new ArrayList<Product>());
+			productInProgressCount = 0;
 			Updatable[] updatables = this.simulation.getUpdatables();
 			
 			for (Updatable updatable : updatables) {
@@ -40,18 +50,32 @@ public class ProductDataCollector extends DataCollector {
 					processProduct((Product) updatable);
 				}
 			}
+			
+			for (Product product : knownProducts) {
+				if(product.getState() == ProductState.failed) {
+					if(knownFailedProducts.contains(product) == false) {
+						productOverDeadlineCount++;
+						knownFailedProducts.add(product);
+					}
+				}				
+			}
+			
+			
+			products.put(simulation.getCurrentSimulationTime(), knownProducts.size());
+			productInProgres.put(simulation.getCurrentSimulationTime(), productInProgressCount);
+			productsOverDeadline.put(simulation.getCurrentSimulationTime(), productOverDeadlineCount);
 		}
 	}
 	private void processProduct(Product product) {
+		if(knownProducts.contains(product) == false) knownProducts.add(product);
+		
+		
 		/*if(equipletStates.containsKey(equiplet) == false) {
 			equipletStates.put(equiplet, new HashMap<Long, Equiplet.EquipletState>());
 			getEquipletLoads().put(equiplet, new HashMap<Long, Double>());
 		}*/
-		products.get(simulation.getCurrentSimulationTime()).add(product);
-		if(product.getState() == ProductState.failed) {
-			productsOverDeadline.get(simulation.getCurrentSimulationTime()).add(product);
-		} else if (product.getState() == ProductState.inProgress) {
-			productInProgres.get(simulation.getCurrentSimulationTime()).add(product);
+		if (product.getState() == ProductState.inProgress) {
+			productInProgressCount++;
 		}
 		
 		LinkedHashMap<ProductStep, Schedule> currentSchedule = product.getFinalSchedules();
@@ -90,10 +114,10 @@ public class ProductDataCollector extends DataCollector {
 	}
 
 
-	public HashMap<Long, ArrayList<Product>> getProductCount() {
-		return new HashMap<Long, ArrayList<Product>>(products);
+	public HashMap<Long, Integer> getProductCount() {
+		return new HashMap<Long, Integer>(products);
 	}
-	public double[] getProductCount(int resolution) {
+	/*public double[] getProductCount(int resolution) {
 		Long[] entries = products.keySet().toArray(new Long[products.size()]);
 		Arrays.sort(entries);
 		try {
@@ -192,6 +216,6 @@ public class ProductDataCollector extends DataCollector {
 			output[i] = productsOverDeadline.get(leftIndex).size() * leftWeight + productsOverDeadline.get(rightIndex).size() * rightWeight; 
 		}
 		return output;
-	}
+	}*/
 
 }

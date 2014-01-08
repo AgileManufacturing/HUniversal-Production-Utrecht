@@ -3,7 +3,7 @@ package simulation.collectors;
 import simulation.Simulation;
 
 public abstract class DataCollector{
-	final long sampleInterval = 5000; // milliseconds
+	final long sampleInterval = 20000; // milliseconds
 	long lastSample = -1;
 	
 	Simulation simulation;

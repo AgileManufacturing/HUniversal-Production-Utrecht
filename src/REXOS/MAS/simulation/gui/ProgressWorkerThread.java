@@ -41,7 +41,9 @@ package simulation.gui;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TimeZone;
@@ -98,8 +100,13 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 			
 			if(mG.getSimulation().getIsFinished() == true) {
 				System.out.println("FINISHED SiM");
-				for (ArrayList<Product> entry :  mG.productDataCollector.productInProgres.values()) {
-					System.out.println(entry.size());
+				
+				HashMap<Long, Integer> pig = mG.productDataCollector.products;
+				Long[] keys = pig.keySet().toArray(new Long[pig.size()]);
+				Arrays.sort(keys);
+				
+				for (Long key : keys) {
+					System.out.println(pig.get(key));
 				}
 				this.cancel(false);
 			}
