@@ -47,7 +47,7 @@
 
 namespace rexos_stewart_gough{
     /**
-     * Constructor of a deltarobot.
+     * Constructor of a sixaxis robot.
      * 
      * @param steqartGoughMeasures The measures of the steqart gough configuration in use.
      * @param motorManager The manager that allows all motors to be simultaneously activated.
@@ -96,7 +96,7 @@ namespace rexos_stewart_gough{
     }
 
     /**
-     * Deconstructor of a deltarobot. Turns off the motors and deletes the kinematics model.
+     * Deconstructor of a stewart gough. Turns off the motors and deletes the kinematics model.
      **/
     StewartGough::~StewartGough(void){
         if(motorManager->isPoweredOn()){

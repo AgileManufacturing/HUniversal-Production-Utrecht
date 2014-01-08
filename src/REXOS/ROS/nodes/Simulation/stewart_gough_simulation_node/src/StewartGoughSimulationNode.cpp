@@ -1,17 +1,17 @@
 #include "ros/ros.h"
 
-#include "simulation_node/SimulationNode.h"
+#include "stewart_gough_simulation_node/StewartGoughSimulationNode.h"
 #include <sstream>
 #include <cstdlib>
 #include "gazebo_msgs/LinkState.h"
 
 
-SimulationNode::SimulationNode()
+StewartGoughSimulationNode::StewartGoughSimulationNode()
 {
 	
 }
 
-void SimulationNode::run(int argc, char **argv){
+void StewartGoughSimulationNode::run(int argc, char **argv){
 	
 	
 	ros::start();
@@ -34,7 +34,7 @@ void SimulationNode::run(int argc, char **argv){
 	
 	ros::NodeHandle nodeHandle;
 
-	ros::ServiceServer service = nodeHandle.advertiseService("rotate_motor_to_degrees", & SimulationNode::rotateMotorToDegrees, this);
+	ros::ServiceServer service = nodeHandle.advertiseService("rotate_motor_to_degrees", & StewartGoughSimulationNode::rotateMotorToDegrees, this);
 	
 	int timer = 0;
 	double degrees[11][6]{
@@ -51,16 +51,19 @@ void SimulationNode::run(int argc, char **argv){
 		{0,0,0,0,0,0}
 	};
 	int patternIndex = 0;
-	bool pattern = false;
+	bool pattern = true;
 	ROS_INFO("=====Simulation is running======");
 	while (ros::ok())
 	{
-		
+		ROS_INFO("effector X: %f",sdfController.getLinkState("platform").pose.position.x);
+		ROS_INFO("effector Y: %f",sdfController.getLinkState("platform").pose.position.y);
+		ROS_INFO("effector Z: %f",sdfController.getLinkState("platform").pose.position.z);
 		for(int i = 0; i < 6; i++){
 			motors[i].update();
 		}
 		
 		if(pattern == true){
+			ROS_INFO("in pattern");
 			if(timer > 100){
 				for(int i = 0; i < 6; i++){
 					motors[i].goToAngleDegrees(degrees[patternIndex][i]);
@@ -79,17 +82,17 @@ void SimulationNode::run(int argc, char **argv){
 	//ros::spin();
 }
 
-bool SimulationNode::rotateMotorToDegrees(simulation_node::rotate::Request  & req,
-									 simulation_node::rotate::Response  & res){
+bool StewartGoughSimulationNode::rotateMotorToDegrees(stewart_gough_simulation_node::rotate::Request  & req,
+									 stewart_gough_simulation_node::rotate::Response  & res){
   motors[req.motorIndex].goToAngleDegrees(req.degrees);
   return true;
 }
 
 int main(int argc, char **argv){
-	ros::init(argc, argv, "Simulsation_node_client");
+	ros::init(argc, argv, "stewart_gough_simulation_node_client");
 	
-	SimulationNode simulationNode;
-	simulationNode.run(argc, argv);
+	StewartGoughSimulationNode stewartGoughSimulation;
+	stewartGoughSimulation.run(argc, argv);
 
 	return 0;
 }

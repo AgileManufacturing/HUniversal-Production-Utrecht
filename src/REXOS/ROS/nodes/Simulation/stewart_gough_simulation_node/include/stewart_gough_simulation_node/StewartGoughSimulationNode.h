@@ -29,15 +29,29 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef AEMCONTROLNODE_H_
-#define AEMCONTROLNODE_H_
+#ifndef STEWARTGOUGHSIMULATIONNODE_H_
+#define STEWARTGOUGHSIMULATIONNODE_H_
 
-class ArmControlNode{
+#include "rexos_gazebo/SDFController.h"
+#include "rexos_gazebo/SimulatedMotor.h"
+#include "stewart_gough_simulation_node/rotate.h"
+#include <vector>
+
+class StewartGoughSimulationNode{
 	
 public:
-	ArmControlNode();
+	StewartGoughSimulationNode();
 	void run(int argc, char **argv);
+	bool rotateMotorToDegrees(stewart_gough_simulation_node::rotate::Request  &req, stewart_gough_simulation_node::rotate::Response  & res);
+	
+	SimulatedMotor motors[6];
+	
+	
 private:
+	
+	//globals
+	SDFController sdfController;
+
 
 };
 

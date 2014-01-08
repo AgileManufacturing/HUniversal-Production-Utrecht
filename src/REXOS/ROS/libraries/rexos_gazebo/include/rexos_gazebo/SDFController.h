@@ -1,6 +1,6 @@
 /**
  * @file GazeboSDF.h
- * @brief the node that handles the simulation
+ * @brief The SDFController handles services provided by gazebo to provide an interface for controlling a gazebo simulated robot
  * @date Created: 2013-10-30
  * @date Revisioned: 2013-01-21
  *
@@ -33,7 +33,6 @@
 #define SDFCONTROLLER_H_
 
 #include "gazebo_msgs/ApplyJointEffort.h"
-//#include "gazebo_msgs/ClearJointForces.h"
 #include "gazebo_msgs/LinkStates.h"
 #include "gazebo_msgs/LinkState.h"
 #include "gazebo_msgs/SetLinkState.h"
@@ -80,6 +79,9 @@ public:
 	/**
 	* Returns a gazebo_msgs::LinkState object containing the properties of the link specified by linkName
 	* @param const char * linkName
+	* 
+	* LinkState contains: link_name(), pose(), twist(), reference_frame()
+	* where pose contains position.x or y,z
 	**/
 	gazebo_msgs::LinkState getLinkState(const char * linkName);
 

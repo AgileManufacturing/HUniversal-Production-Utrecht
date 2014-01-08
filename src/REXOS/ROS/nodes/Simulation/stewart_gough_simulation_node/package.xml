@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>simulation_node</name>
+  <name>stewart_gough_simulation_node</name>
   <version>0.0.0</version>
   <description>The simulation_node package</description>
   <maintainer email="lowcostvision@gmail.com">Leau Caust</maintainer>

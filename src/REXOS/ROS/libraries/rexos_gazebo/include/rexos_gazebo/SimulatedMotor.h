@@ -66,7 +66,7 @@ public:
 	* is up to date with the simulation and updates it accordingly
 	**/
 	void update();
-	
+	bool jump;
 private:
 	SDFController sdfController;
 	const char * name;
