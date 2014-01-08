@@ -8,7 +8,7 @@
  *                     ...MMMMMF .      
  *         dN.       .jMN, TMMM`.MM     	@file 	ScheduleTableUpdateThread.java
  *         .MN.      MMMMM;  ?^ ,THM		@brief 	...
- *          dM@      dMMM3  .ga...g,    	@date Created:	2013-12-19
+ *          dM@      dMMM3  .ga...g,    	@date Created:	2014-01-7
  *       ..MMM#      ,MMr  .MMMMMMMMr   
  *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Alexander Hustinx
  *   .dMMMMMF           7Y=d9  dMMMMMr    
@@ -38,25 +38,14 @@
  **/
 package simulation.gui;
 
-import java.awt.MouseInfo;
-import java.awt.Point;
 import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.JTable;
-import javax.swing.RowSorter;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-
-import simulation.Simulation;
 import simulation.data.ProductStepSchedule;
 import simulation.mas_entities.Equiplet;
-import simulation.mas_entities.Grid;
 
 class ScheduleTableUpdateThread extends SwingWorker<Void, Void> {
-
-	public static final int PLACEHOLDER = 0;
 
 	private EquipletScheduleFrame esf;
 	private JTable jTable;

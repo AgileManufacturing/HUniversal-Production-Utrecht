@@ -119,7 +119,6 @@ public class EquipletListFrame extends javax.swing.JFrame {
         	    if (e.getClickCount() == 2) {
         	      JTable target = (JTable)e.getSource();
         	      int row = target.getSelectedRow();
-        	      int column = target.getSelectedColumn();
         	      // do some action if appropriate column
         	      new EquipletScheduleFrame(grid.getEquiplets()[row]);
         	    }

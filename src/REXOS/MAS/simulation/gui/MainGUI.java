@@ -40,12 +40,9 @@ package simulation.gui;
 
 import java.io.File;
 import java.text.ParseException;
-
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
-
 import simulation.BatchSpawner;
 import simulation.ProductSpawner;
 import simulation.Simulation;
@@ -347,6 +344,8 @@ public class MainGUI extends javax.swing.JFrame {
 
 	private void startNewSimulation() throws ParseException {
 		simulation = new Simulation();
+		
+		//Data collectors for the Graphs
 		equipletDataCollector = new EquipletDataCollector(simulation);
 		productDataCollector = new ProductDataCollector(simulation);
 		

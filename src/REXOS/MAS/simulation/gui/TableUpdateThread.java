@@ -38,17 +38,9 @@
  **/
 package simulation.gui;
 
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.util.List;
-
 import javax.swing.JTable;
-import javax.swing.RowSorter;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-
-import simulation.Simulation;
 import simulation.mas_entities.Equiplet;
 import simulation.mas_entities.Grid;
 
