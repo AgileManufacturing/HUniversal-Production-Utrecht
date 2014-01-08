@@ -53,9 +53,10 @@ public class Simulation implements Runnable{
 	
 	private boolean isRunning = false;
 	private boolean isAborted = false;
+	private boolean isFinished = false;
 	private double interval = 0.00; // seconds
 	private double turnTime = 0.01; // seconds
-	private double duration = 5 * 60 * 60 * 1000; // milliseconds
+	private double duration = 2 * 60 * 60 * 1000; // milliseconds
 	
 	private long turn = 0;
 	private long startSimulationTime;
@@ -170,6 +171,7 @@ public class Simulation implements Runnable{
 				
 				// are we finished?
 				if(currentSimulationTime - startSimulationTime > duration) {
+					isFinished = true;
 					break;
 				}
 			}
@@ -181,5 +183,8 @@ public class Simulation implements Runnable{
 	}
 	public void removeUpdateable(Updatable updateable) {
 		updatablesToBeRemoved.add(updateable);
+	}
+	public boolean getIsFinished() {
+		return isFinished;
 	}
 }

@@ -40,8 +40,10 @@ package simulation.gui;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.TimeZone;
 
 import javax.swing.JComponent;
@@ -51,6 +53,7 @@ import javax.swing.SwingWorker;
 
 import simulation.data.Capability;
 import simulation.data.TimeSlot;
+import simulation.mas_entities.Product;
 
 class ProgressWorkerThread extends SwingWorker<Void, Void> {
 	
@@ -93,6 +96,13 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 			mG.productsText.setText(		String.valueOf(TimeSlot.getCurrentTimeSlot(mG.getSimulation(), mG.getGrid().getGridProperties())));
 			mG.gridText.setText("");
 			
+			if(mG.getSimulation().getIsFinished() == true) {
+				System.out.println("FINISHED SiM");
+				for (ArrayList<Product> entry :  mG.productDataCollector.productInProgres.values()) {
+					System.out.println(entry.size());
+				}
+				this.cancel(false);
+			}
 			
 			try {
 				Thread.sleep(UPDATE_INTERVAL);

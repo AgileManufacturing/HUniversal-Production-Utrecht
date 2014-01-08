@@ -79,6 +79,9 @@ public class MainGUI extends javax.swing.JFrame {
 	
 	private Simulation simulation;
 	private Grid grid;
+	
+	public EquipletDataCollector equipletDataCollector;
+	public ProductDataCollector productDataCollector;
 
 	/**
 	 * Creates new form MainGUI
@@ -344,8 +347,8 @@ public class MainGUI extends javax.swing.JFrame {
 
 	private void startNewSimulation() throws ParseException {
 		simulation = new Simulation();
-		EquipletDataCollector edc = new EquipletDataCollector(simulation);
-		ProductDataCollector pdc = new ProductDataCollector(simulation);
+		equipletDataCollector = new EquipletDataCollector(simulation);
+		productDataCollector = new ProductDataCollector(simulation);
 		
 		grid = new Grid("/home/t/sim/equipletLayout.json", simulation);
 		simulation.grid = grid;

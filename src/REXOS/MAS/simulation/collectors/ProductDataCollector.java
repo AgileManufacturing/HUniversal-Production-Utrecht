@@ -11,15 +11,18 @@ import simulation.data.ProductStep;
 import simulation.data.Schedule;
 import simulation.mas_entities.Equiplet;
 import simulation.mas_entities.Product;
+import simulation.mas_entities.Product.ProductState;
 
 public class ProductDataCollector extends DataCollector {
-	HashMap<Long, ArrayList<Product>> productCount;
-	HashMap<Long, ArrayList<Product>> productsOverDeadline;
-	HashMap<Product, HashMap<Long, LinkedHashMap<ProductStep, Schedule>>> productSchedules;
+	public HashMap<Long, ArrayList<Product>> products;
+	public HashMap<Long, ArrayList<Product>> productInProgres;
+	public HashMap<Long, ArrayList<Product>> productsOverDeadline;
+	public HashMap<Product, HashMap<Long, LinkedHashMap<ProductStep, Schedule>>> productSchedules;
 
 	public ProductDataCollector(Simulation simulation) {
 		super(simulation);
-		productCount = new HashMap<Long, ArrayList<Product>>(); 
+		products = new HashMap<Long, ArrayList<Product>>(); 
+		productInProgres = new HashMap<Long, ArrayList<Product>>(); 
 		productsOverDeadline = new HashMap<Long, ArrayList<Product>>();
 		productSchedules = new HashMap<Product, HashMap<Long, LinkedHashMap<ProductStep, Schedule>>>();
 	}
@@ -27,7 +30,8 @@ public class ProductDataCollector extends DataCollector {
 	
 	public void collectData(long time) {
 		if(needNewSample(time) == true) {
-			productCount.put(simulation.getCurrentSimulationTime(), new ArrayList<Product>());
+			products.put(simulation.getCurrentSimulationTime(), new ArrayList<Product>());
+			productInProgres.put(simulation.getCurrentSimulationTime(), new ArrayList<Product>());
 			productsOverDeadline.put(simulation.getCurrentSimulationTime(), new ArrayList<Product>());
 			Updatable[] updatables = this.simulation.getUpdatables();
 			
@@ -43,9 +47,11 @@ public class ProductDataCollector extends DataCollector {
 			equipletStates.put(equiplet, new HashMap<Long, Equiplet.EquipletState>());
 			getEquipletLoads().put(equiplet, new HashMap<Long, Double>());
 		}*/
-		productCount.get(simulation.getCurrentSimulationTime()).add(product);
-		if(product.getDeadline() < simulation.getCurrentSimulationTime()) {
+		products.get(simulation.getCurrentSimulationTime()).add(product);
+		if(product.getState() == ProductState.failed) {
 			productsOverDeadline.get(simulation.getCurrentSimulationTime()).add(product);
+		} else if (product.getState() == ProductState.inProgress) {
+			productInProgres.get(simulation.getCurrentSimulationTime()).add(product);
 		}
 		
 		LinkedHashMap<ProductStep, Schedule> currentSchedule = product.getFinalSchedules();
@@ -85,10 +91,10 @@ public class ProductDataCollector extends DataCollector {
 
 
 	public HashMap<Long, ArrayList<Product>> getProductCount() {
-		return new HashMap<Long, ArrayList<Product>>(productCount);
+		return new HashMap<Long, ArrayList<Product>>(products);
 	}
 	public double[] getProductCount(int resolution) {
-		Long[] entries = productCount.keySet().toArray(new Long[productCount.size()]);
+		Long[] entries = products.keySet().toArray(new Long[products.size()]);
 		Arrays.sort(entries);
 		try {
 			return getProductCount(resolution, entries[0], entries[entries.length - 1]);
@@ -99,7 +105,7 @@ public class ProductDataCollector extends DataCollector {
 		return null; // dead code, fucking java crap shit
 	}
 	public double[] getProductCount(int resolution, long startTime, long endTime) throws Exception {
-		Long[] entries = productCount.keySet().toArray(new Long[productCount.size()]);
+		Long[] entries = products.keySet().toArray(new Long[products.size()]);
 		Arrays.sort(entries);
 		
 		if(startTime < entries[0] || endTime > entries[entries.length - 1]) {
@@ -133,7 +139,7 @@ public class ProductDataCollector extends DataCollector {
 				// we matched the exact same index, and the weight will be 0. compensate...
 				leftWeight = 1;
 			}
-			output[i] = productCount.get(leftIndex).size() * leftWeight + productCount.get(rightIndex).size() * rightWeight; 
+			output[i] = products.get(leftIndex).size() * leftWeight + products.get(rightIndex).size() * rightWeight; 
 		}
 		return output;
 	}
