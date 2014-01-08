@@ -57,7 +57,7 @@ import simulation.gui.MainGUI;
 
 
 public class Grid implements Updatable{
-	private static final double defaultDistance = 2.0;
+	private static final double defaultDistance = 200.0;
 	
 	private Equiplet[][] equiplets;
 	

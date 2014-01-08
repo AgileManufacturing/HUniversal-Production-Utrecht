@@ -6,15 +6,17 @@ import java.util.HashMap;
 import simulation.Simulation;
 import simulation.Updatable;
 import simulation.mas_entities.Equiplet;
+import simulation.mas_entities.Equiplet.EquipletState;
+import simulation.mas_entities.Grid;
 
 public class EquipletDataCollector extends DataCollector {
-	HashMap<Equiplet, HashMap<Long, Equiplet.EquipletState>> equipletStates;
-	private HashMap<Equiplet, HashMap<Long, Double>> equipletLoads;
+	HashMap<Long, HashMap<Equiplet, EquipletState>> equipletStates;
+	private HashMap<Long, HashMap<Equiplet, Double>> equipletLoads;
 
 	public EquipletDataCollector(Simulation simulation) {
 		super(simulation);
-		equipletStates = new HashMap<Equiplet, HashMap<Long, Equiplet.EquipletState>>(); 
-		equipletLoads = new HashMap<Equiplet, HashMap<Long, Double>>(); 
+		equipletStates = new HashMap<Long, HashMap<Equiplet, Equiplet.EquipletState>>(); 
+		equipletLoads = new HashMap<Long, HashMap<Equiplet, Double>>(); 
 	}
 	
 	
@@ -22,28 +24,39 @@ public class EquipletDataCollector extends DataCollector {
 		if(needNewSample(time) == true) {
 			Updatable[] updatables = this.simulation.getUpdatables();
 			
+			equipletStates.put(time, new HashMap<Equiplet, Equiplet.EquipletState>());
+			equipletLoads.put(time, new HashMap<Equiplet, Double>());
+			
+			Grid grid = null;
 			for (Updatable updatable : updatables) {
-				if(updatable instanceof Equiplet) {
-					processEquiplet((Equiplet) updatable);
+				if(updatable instanceof Grid) {
+					grid = (Grid) updatable;
 				}
+			}
+			if(grid == null) {
+				// no grid?
+				return;
+			}
+			for (Equiplet equiplet : grid.getEquiplets()) {
+				processEquiplet(equiplet, time);
 			}
 		}
 	}
-	private void processEquiplet(Equiplet equiplet) {
-		if(equipletStates.containsKey(equiplet) == false) {
-			equipletStates.put(equiplet, new HashMap<Long, Equiplet.EquipletState>());
-			getEquipletLoads().put(equiplet, new HashMap<Long, Double>());
-		}
-		equipletStates.get(equiplet).put(simulation.getCurrentSimulationTime(), equiplet.getEquipletState());
-		getEquipletLoads().get(equiplet).put(simulation.getCurrentSimulationTime(), equiplet.getLoad());
+	private void processEquiplet(Equiplet equiplet, long time) {
+		equipletLoads.get(time).put(equiplet, equiplet.getLoad());
+		equipletStates.get(time).put(equiplet, equiplet.getEquipletState());
+		System.out.println("EQ data collected");
 	}
 
 
-	public HashMap<Equiplet, HashMap<Long, Double>> getEquipletLoads() {
-		return new HashMap<Equiplet, HashMap<Long, Double>>(equipletLoads);
+	public HashMap<Long, HashMap<Equiplet, Double>> getEquipletLoads() {
+		return new HashMap<Long, HashMap<Equiplet, Double>>(equipletLoads);
+	}
+	public HashMap<Long, HashMap<Equiplet, EquipletState>> getEquipletState() {
+		return new HashMap<Long, HashMap<Equiplet, EquipletState>>(equipletStates);
 	}
 	
-	public double[] getLoadForEquiplet(Equiplet subject, int resolution) {
+	/*public double[] getLoadForEquiplet(Equiplet subject, int resolution) {
 		HashMap<Long, Double> equipletLoad = equipletLoads.get(subject);
 		Long[] entries = equipletLoad.keySet().toArray(new Long[equipletLoad.size()]);
 		Arrays.sort(entries);
@@ -94,8 +107,8 @@ public class EquipletDataCollector extends DataCollector {
 			output[i] = equipletLoad.get(leftIndex) * leftWeight + equipletLoad.get(rightIndex) * rightWeight; 
 		}
 		return output;
-	}
-	public Equiplet.EquipletState[] getEquipletStateForEquiplet(Equiplet subject, int resolution) {
+	}*/
+	/*public Equiplet.EquipletState[] getEquipletStateForEquiplet(Equiplet subject, int resolution) {
 		HashMap<Long, Equiplet.EquipletState> equipletState = equipletStates.get(subject);
 		Long[] entries = equipletState.keySet().toArray(new Long[equipletState.size()]);
 		Arrays.sort(entries);
@@ -140,5 +153,5 @@ public class EquipletDataCollector extends DataCollector {
 			output[i] = equipletState.get(index); 
 		}
 		return output;
-	}
+	}*/
 }
