@@ -45,6 +45,11 @@ public class ConfigurationEditorGUI extends JFrame {
 	JPanel capPanel = new JPanel();
 
 	public ConfigurationEditorGUI() {
+		initComponents();
+		setVisible(true);
+	}
+
+	private void initComponents(){
 		setTitle("Configuration Editor");
 		setSize(new Dimension(800, 415));
 		setLocationRelativeTo(null);
@@ -289,7 +294,7 @@ public class ConfigurationEditorGUI extends JFrame {
 																										gbc_exportButton.gridy = 2;
 																										buttonPanel.add(exportButton, gbc_exportButton);
 	}
-
+	
 	protected void showCapabilityDialog() {
 		if (win != null) {
 			CreateCapabilityDialog dialog = new CreateCapabilityDialog(win, "Create new capability", ModalityType.APPLICATION_MODAL);
@@ -381,7 +386,7 @@ public class ConfigurationEditorGUI extends JFrame {
 	
 	private void writeGridJSON() {
 		try {
-			PrintWriter writer = new PrintWriter("grid.json", "UTF-8");
+			PrintWriter writer = new PrintWriter("equipletLayout.json", "UTF-8");
 			
 			writer.write("{\n"
 					+ "\t\"grid\" : [\n");
@@ -451,7 +456,7 @@ public class ConfigurationEditorGUI extends JFrame {
 		}
 	}
 
-	public static void main(String[] args) {
+/*	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -459,5 +464,5 @@ public class ConfigurationEditorGUI extends JFrame {
 				gui.setVisible(true);
 			}
 		});
-	}
+	}*/
 }

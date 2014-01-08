@@ -53,10 +53,10 @@ import simulation.mas_entities.Grid;
 public class MainGUI extends javax.swing.JFrame {
 
 	// Files
-	public static File capabilitiesFile		= new File("/home/t/sim/capabilities.csv");
-	public static File productsFile			= new File("/home/t/sim/productA.csv");
-	public static File batchesFile			= new File("/home/t/sim/BatchA.csv");
-	public static File gridFile				= new File("/home/t/sim/equipletLayout.json");
+	public static File capabilitiesFile		= new File("src/REXOS/MAS/simulation/csvFiles/capabilities.csv");
+	public static File productsFile			= new File("src/REXOS/MAS/simulation/csvFiles/products.csv");
+	public static File batchesFile			= new File("src/REXOS/MAS/simulation/csvFiles/batches.csv");
+	public static File gridFile				= new File("src/REXOS/MAS/simulation/csvFiles/equipletLayout.json");
 
 	// BackgroundWorkers
 	private ProgressWorkerThread progressWorker;
@@ -366,7 +366,7 @@ public class MainGUI extends javax.swing.JFrame {
 		equipletDataCollector = new EquipletDataCollector(simulation);
 		productDataCollector = new ProductDataCollector(simulation);
 		
-		grid = new Grid("/home/t/sim/equipletLayout.json", simulation);
+		grid = new Grid(gridFile.getAbsolutePath(), simulation);
 		simulation.grid = grid;
 		System.out.println(grid);
 		
