@@ -46,20 +46,15 @@ public class ConfigurationEditorGUI extends JFrame {
 
 	public ConfigurationEditorGUI() {
 		setTitle("Configuration Editor");
-		setSize(new Dimension(547, 415));
+		setSize(new Dimension(800, 415));
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		
-		capabilities.addElement(Capability.DummyCapability);
-		batches.addElement(BatchDescription.DummyBatch);
-		products.addElement(ProductDescription.DummyProduct);
-		equiplets.addElement(EquipletDescription.DummyEquiplet);
-		
 		JPanel panel = new JPanel();
 		getContentPane().add(panel);
 				GridBagLayout gbl_panel = new GridBagLayout();
-				gbl_panel.columnWidths = new int[]{175, 175, 175, 0};
+				gbl_panel.columnWidths = new int[]{255, 255, 255, 0};
 				gbl_panel.rowHeights = new int[]{180, 180, 0};
 				gbl_panel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
 				gbl_panel.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
@@ -75,7 +70,7 @@ public class ConfigurationEditorGUI extends JFrame {
 														TitledBorder.LEADING, TitledBorder.TOP, null, null));
 												win = SwingUtilities.getWindowAncestor(capPanel);
 												GridBagLayout gbl_capPanel = new GridBagLayout();
-												gbl_capPanel.columnWidths = new int[]{168, 0};
+												gbl_capPanel.columnWidths = new int[]{250, 0};
 												gbl_capPanel.rowHeights = new int[]{25, 133, 0};
 												gbl_capPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
 												gbl_capPanel.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
@@ -116,7 +111,7 @@ public class ConfigurationEditorGUI extends JFrame {
 														prodPanel.setBorder(new TitledBorder(null, "Product",
 																TitledBorder.LEADING, TitledBorder.TOP, null, null));
 																GridBagLayout gbl_prodPanel = new GridBagLayout();
-																gbl_prodPanel.columnWidths = new int[]{160, 0};
+																gbl_prodPanel.columnWidths = new int[]{250, 0};
 																gbl_prodPanel.rowHeights = new int[]{25, 133, 0};
 																gbl_prodPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
 																gbl_prodPanel.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
@@ -156,7 +151,7 @@ public class ConfigurationEditorGUI extends JFrame {
 												batchPanel.setBorder(new TitledBorder(null, "Batch",
 														TitledBorder.LEADING, TitledBorder.TOP, null, null));
 														GridBagLayout gbl_batchPanel = new GridBagLayout();
-														gbl_batchPanel.columnWidths = new int[]{165, 0};
+														gbl_batchPanel.columnWidths = new int[]{250, 0};
 														gbl_batchPanel.rowHeights = new int[]{25, 133, 0};
 														gbl_batchPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
 														gbl_batchPanel.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
@@ -196,7 +191,7 @@ public class ConfigurationEditorGUI extends JFrame {
 														eqPanel.setBorder(new TitledBorder(null, "Equiplet",
 																TitledBorder.LEADING, TitledBorder.TOP, null, null));
 																GridBagLayout gbl_eqPanel = new GridBagLayout();
-																gbl_eqPanel.columnWidths = new int[]{168, 0};
+																gbl_eqPanel.columnWidths = new int[]{250, 0};
 																gbl_eqPanel.rowHeights = new int[]{25, 133, 0};
 																gbl_eqPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
 																gbl_eqPanel.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
@@ -236,7 +231,7 @@ public class ConfigurationEditorGUI extends JFrame {
 												gridPanel.setBorder(new TitledBorder(null, "Grid",
 														TitledBorder.LEADING, TitledBorder.TOP, null, null));
 														GridBagLayout gbl_gridPanel = new GridBagLayout();
-														gbl_gridPanel.columnWidths = new int[]{160, 0};
+														gbl_gridPanel.columnWidths = new int[]{250, 0};
 														gbl_gridPanel.rowHeights = new int[]{25, 133, 0};
 														gbl_gridPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
 														gbl_gridPanel.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
@@ -274,7 +269,7 @@ public class ConfigurationEditorGUI extends JFrame {
 																										gbc_buttonPanel.gridy = 1;
 																										panel.add(buttonPanel, gbc_buttonPanel);
 																										GridBagLayout gbl_buttonPanel = new GridBagLayout();
-																										gbl_buttonPanel.columnWidths = new int[] {25, 116, 0};
+																										gbl_buttonPanel.columnWidths = new int[] {50, 116, 0};
 																										gbl_buttonPanel.rowHeights = new int[] {25, 25, 25, 0};
 																										gbl_buttonPanel.columnWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
 																										gbl_buttonPanel.rowWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
