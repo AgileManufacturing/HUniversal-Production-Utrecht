@@ -88,7 +88,7 @@ public class Capability {
 	}
 	
 	public String toCsvString() {
-		return id + "," + name + "," + durationInTimeslots + "\r\n";
+		return name + ", " + durationInTimeslots + "\r\n";
 	}
 
 	public static void parseCapabilitiesCSV(String[][] fields){
