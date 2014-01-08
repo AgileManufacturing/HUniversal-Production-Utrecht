@@ -149,8 +149,8 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 				PrintWriter equipletLoadWriter = new PrintWriter(equipletLoadFile);
 				HashMap<Long, HashMap<Equiplet, Double>> equipletLoads = mG.equipletDataCollector.getEquipletLoads();
 				Long[] keys4 = equipletLoads.keySet().toArray(new Long[equipletLoads.size()]);
+				Arrays.sort(keys4);
 				for (Equiplet eq : equipletLoads.get(keys4[0]).keySet()) {
-					System.out.println("EQ header");
 					equipletLoadWriter.print(eq.getName() + "\t");
 				}
 				equipletLoadWriter.println();
@@ -167,8 +167,9 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 				PrintWriter equipletStateWriter = new PrintWriter(equipletStateFile);
 				HashMap<Long, HashMap<Equiplet, EquipletState>> equipletState = mG.equipletDataCollector.getEquipletState();
 				Long[] keys5 = equipletLoads.keySet().toArray(new Long[equipletLoads.size()]);
+				Arrays.sort(keys5);
 				for (Equiplet eq : equipletLoads.get(keys5[0]).keySet()) {
-					equipletLoadWriter.print(eq.getName() + "\t");
+					equipletStateWriter.print(eq.getName() + "\t");
 				}
 				equipletStateWriter.println();
 				for (Long key : keys5) {
