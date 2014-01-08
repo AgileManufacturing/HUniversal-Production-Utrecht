@@ -44,23 +44,24 @@ public class CreateProductDialog extends JDialog {
 		super(win, title, applicationModal);
 		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		capabilities = caps;
-		setPreferredSize(new Dimension(350, 200));
+		setPreferredSize(new Dimension(600, 400));
 		
 		JPanel panel = new JPanel();
 		getContentPane().add(panel);
 		GridBagLayout gbl_panel = new GridBagLayout();
-		gbl_panel.columnWidths = new int[] {75, 75, 75, 75, 75, 0};
+		gbl_panel.columnWidths = new int[] {100, 100, 150, 104, 100, 0};
 		gbl_panel.rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_panel.columnWeights = new double[]{0.0, 1.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
-		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0};
 		panel.setLayout(gbl_panel);
 		
 		txtName = new JTextField();
 		txtName.setUI(new WatermarkTextFieldUI("Name"));
 		GridBagConstraints gbc_txtName = new GridBagConstraints();
+		gbc_txtName.gridwidth = 2;
 		gbc_txtName.insets = new Insets(0, 0, 5, 5);
 		gbc_txtName.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtName.gridx = 1;
+		gbc_txtName.gridx = 0;
 		gbc_txtName.gridy = 0;
 		panel.add(txtName, gbc_txtName);
 		txtName.setColumns(10);
@@ -68,6 +69,7 @@ public class CreateProductDialog extends JDialog {
 		txtCount = new JTextField();
 		txtCount.setUI(new WatermarkTextFieldUI("Count"));
 		GridBagConstraints gbc_txtCount = new GridBagConstraints();
+		gbc_txtCount.gridwidth = 2;
 		gbc_txtCount.insets = new Insets(0, 0, 5, 5);
 		gbc_txtCount.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtCount.gridx = 3;
@@ -91,9 +93,10 @@ public class CreateProductDialog extends JDialog {
 		txtDeadline = new JTextField();
 		txtDeadline.setUI(new WatermarkTextFieldUI("Deadline"));
 		GridBagConstraints gbc_txtDeadline = new GridBagConstraints();
+		gbc_txtDeadline.gridwidth = 2;
 		gbc_txtDeadline.insets = new Insets(0, 0, 5, 5);
 		gbc_txtDeadline.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtDeadline.gridx = 1;
+		gbc_txtDeadline.gridx = 0;
 		gbc_txtDeadline.gridy = 1;
 		panel.add(txtDeadline, gbc_txtDeadline);
 		txtDeadline.setColumns(10);
@@ -101,6 +104,7 @@ public class CreateProductDialog extends JDialog {
 		txtInterval = new JTextField();
 		txtInterval.setUI(new WatermarkTextFieldUI("Interval"));
 		GridBagConstraints gbc_txtInterval = new GridBagConstraints();
+		gbc_txtInterval.gridwidth = 2;
 		gbc_txtInterval.insets = new Insets(0, 0, 5, 5);
 		gbc_txtInterval.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtInterval.gridx = 3;
@@ -187,8 +191,9 @@ public class CreateProductDialog extends JDialog {
 			}
 		});
 		GridBagConstraints gbc_btnCreate = new GridBagConstraints();
+		gbc_btnCreate.gridwidth = 2;
 		gbc_btnCreate.insets = new Insets(0, 0, 0, 5);
-		gbc_btnCreate.gridx = 1;
+		gbc_btnCreate.gridx = 0;
 		gbc_btnCreate.gridy = 7;
 		panel.add(btnCreate, gbc_btnCreate);
 		
@@ -200,6 +205,7 @@ public class CreateProductDialog extends JDialog {
 			}
 		});
 		GridBagConstraints gbc_btnCancel = new GridBagConstraints();
+		gbc_btnCancel.gridwidth = 2;
 		gbc_btnCancel.insets = new Insets(0, 0, 0, 5);
 		gbc_btnCancel.gridx = 3;
 		gbc_btnCancel.gridy = 7;
