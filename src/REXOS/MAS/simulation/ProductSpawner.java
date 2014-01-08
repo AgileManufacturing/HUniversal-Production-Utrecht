@@ -90,7 +90,7 @@ public class ProductSpawner implements Updatable {
 			}
 			
 			nextSpawnTime += spawnInterval * 1000;
-			System.out.println("ProductSpawner: Spawned " + amountPerSpawn + " " + productName + "s, next spawn in " + spawnInterval + " (" + nextSpawnTime + ")");
+			//System.out.println("ProductSpawner: Spawned " + amountPerSpawn + " " + productName + "s, next spawn in " + spawnInterval + " (" + nextSpawnTime + ")");
 		}
 
 	}

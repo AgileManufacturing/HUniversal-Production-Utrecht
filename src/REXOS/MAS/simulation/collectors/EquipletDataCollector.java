@@ -45,7 +45,6 @@ public class EquipletDataCollector extends DataCollector {
 	private void processEquiplet(Equiplet equiplet, long time) {
 		equipletLoads.get(time).put(equiplet, equiplet.getLoad());
 		equipletStates.get(time).put(equiplet, equiplet.getEquipletState());
-		System.out.println("EQ data collected");
 	}
 
 

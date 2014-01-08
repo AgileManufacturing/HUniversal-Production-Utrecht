@@ -56,7 +56,7 @@ public class Simulation implements Runnable{
 	private boolean isFinished = false;
 	private double interval = 0.00; // seconds
 	private double turnTime = 0.01; // seconds
-	private double duration = 2 * 60 * 60 * 1000; // milliseconds
+	private double duration = 2 * 60 * 60 * 1000 + 0 * 60 * 1000; // milliseconds
 	
 	private long turn = 0;
 	private long startSimulationTime;

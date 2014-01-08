@@ -149,7 +149,7 @@ public class Equiplet implements Updatable{
 				}
 			}
 			if (amountOfTimeSlotsBusy > gridProperties.getEquipletLoadWindow() ) {
-				System.out.println("The amount of count slots is higher than the window... wtf m8");
+				System.err.println("The amount of count slots is higher than the window... wtf m8");
 			}
 			
 			return (double) amountOfTimeSlotsBusy / (double) gridProperties.getEquipletLoadWindow();
@@ -160,7 +160,7 @@ public class Equiplet implements Updatable{
 		synchronized (schedule) {
 			//we want to have the first schedule available ... we expect here that the schedule 
 			//is sorted from lowest starttimeslot to highest starttimeslot
-			System.out.println(equipletName + "getFree " + TimeSlot.getCurrentTimeSlot(gridProperties.getSimulation(), gridProperties) + " " + startTimeSlot + " " + duration);
+			//System.out.println(equipletName + "getFree " + TimeSlot.getCurrentTimeSlot(gridProperties.getSimulation(), gridProperties) + " " + startTimeSlot + " " + duration);
 			for (ProductStepSchedule s : schedule) {
 	//			System.out.println("\t" + s.getStartTimeSlot() + "\t" + s.getDuration());
 			}
@@ -189,7 +189,7 @@ public class Equiplet implements Updatable{
 					
 					if ( prevProductStepSchedule.getStartTimeSlot() + prevProductStepSchedule.getDuration() - 1 >= startTimeSlot && 
 	curProductStepSchedule.getStartTimeSlot() - (prevProductStepSchedule.getStartTimeSlot() + prevProductStepSchedule.getDuration()) >= duration ){
-						System.out.println("between");
+						//System.out.println("between");
 						return new TimeSlot(prevProductStepSchedule.getStartTimeSlot() + prevProductStepSchedule.getDuration(), 
 								curProductStepSchedule.getStartTimeSlot() - (prevProductStepSchedule.getStartTimeSlot() + prevProductStepSchedule.getDuration()));
 					}
@@ -197,7 +197,7 @@ public class Equiplet implements Updatable{
 				}
 				
 				//we have no other space then at the end of the schedule
-				System.out.println("end");
+				//System.out.println("end");
 				return new TimeSlot(schedule.get(schedule.size()-1).getStartTimeSlot() + schedule.get(schedule.size()-1).getDuration(), -1);
 			}
 		}
@@ -210,7 +210,7 @@ public class Equiplet implements Updatable{
 	public boolean schedule(ProductStep step, TimeSlot timeslot){
 		synchronized (schedule) {
 			//System.out.println("Equiplet: name " + equipletName + " scheduling " + step.toString());
-			System.out.println(equipletName + "schedule " + TimeSlot.getCurrentTimeSlot(gridProperties.getSimulation(), gridProperties) + " " + timeslot.getStartTimeSlot() + " " + timeslot.getDuration());
+			//System.out.println(equipletName + "schedule " + TimeSlot.getCurrentTimeSlot(gridProperties.getSimulation(), gridProperties) + " " + timeslot.getStartTimeSlot() + " " + timeslot.getDuration());
 			for (ProductStepSchedule s : schedule) {
 	//			System.out.println("\t" + s.getStartTimeSlot() + "\t" + s.getDuration());
 			}
@@ -263,11 +263,11 @@ public class Equiplet implements Updatable{
 	
 	public void removeFromSchedule(ProductStep step){
 		synchronized (schedule) {
-			System.out.print(equipletName + "is removing " + step);
+			//System.out.print(equipletName + "is removing " + step);
 			for (ProductStepSchedule pss : schedule) {
 				if(pss.getProductStep() == step) { 
 					boolean r = schedule.remove(pss);
-					System.out.println(r);
+					//System.out.println(r);
 					break;
 				}
 			}
@@ -289,25 +289,25 @@ public class Equiplet implements Updatable{
 		//process the error 
 		if (worstError != null){
 			if(equipletState != EquipletState.Error) {
-				System.out.println("Equipet: " + equipletName + "has encountered error " + worstError);
+				//System.out.println("Equipet: " + equipletName + "has encountered error " + worstError);
 			}
 			if (equipletState == EquipletState.Working){
 				ProductStep pStep = schedule.get(0).getProductStep();
 				if (worstError.damagesProduct){
-					System.out.println(equipletName + "@1 setting " + schedule.get(0).getProductStep() + "to " + StepState.ProductError);
+					//System.out.println(equipletName + "@1 setting " + schedule.get(0).getProductStep() + "to " + StepState.ProductError);
 					pStep.setState(StepState.ProductError);
 				} else{
-					System.out.println(equipletName + "@2 setting " + schedule.get(0).getProductStep() + "to " + StepState.ScheduleError);
+					//System.out.println(equipletName + "@2 setting " + schedule.get(0).getProductStep() + "to " + StepState.ScheduleError);
 					pStep.setState(StepState.ScheduleError);
 				}
 				// flush the remaining schedule
 				for(int i = 1; i < schedule.size(); i++) {
-					System.out.println(equipletName + "@3 setting " + schedule.get(i).getProductStep() + "to " + StepState.ScheduleError);
+					//System.out.println(equipletName + "@3 setting " + schedule.get(i).getProductStep() + "to " + StepState.ScheduleError);
 					schedule.get(i).getProductStep().setState(StepState.ScheduleError);
 				}
 			} else {
 				for(int i = 0; i < schedule.size(); i++) {
-					System.out.println(equipletName + "@4 setting " + schedule.get(i).getProductStep() + "to " + StepState.ScheduleError);
+					//System.out.println(equipletName + "@4 setting " + schedule.get(i).getProductStep() + "to " + StepState.ScheduleError);
 					schedule.get(i).getProductStep().setState(StepState.ScheduleError);
 				}
 			}
@@ -316,7 +316,7 @@ public class Equiplet implements Updatable{
 		else{
 			//if there was an error that does not exist now, bring state to idle
 			if (equipletState == EquipletState.Error){
-				System.out.println("Equipet: " + equipletName + "has resolved its errors");
+				//System.out.println("Equipet: " + equipletName + "has resolved its errors");
 				equipletState = EquipletState.Idle;
 			}
 		}
@@ -327,9 +327,9 @@ public class Equiplet implements Updatable{
 			if (equipletState == EquipletState.Working){
 				ProductStepSchedule curProductStepSchedule = schedule.get(0);
 				if (curProductStepSchedule.getStartTimeSlot() + curProductStepSchedule.getDuration() - 1 < currentTimeSlot){
-					System.out.println("Equiplet: name " + equipletName + " has completed {" + 
+					/*System.out.println("Equiplet: name " + equipletName + " has completed {" + 
 							curProductStepSchedule.getProductStep().getCapability() + "} of product {" + 
-							curProductStepSchedule.getProductStep().getProduct() + "}");
+							curProductStepSchedule.getProductStep().getProduct() + "}");*/
 					//the step is done
 					schedule.remove(0);
 					equipletState = EquipletState.Idle;
@@ -342,9 +342,9 @@ public class Equiplet implements Updatable{
 			if (equipletState == EquipletState.Idle){
 				ProductStepSchedule curProductStepSchedule = schedule.get(0);
 				if ( currentTimeSlot == curProductStepSchedule.getStartTimeSlot()){
-					System.out.println("Equiplet: name " + equipletName + " is working on {" + 
+					/*System.out.println("Equiplet: name " + equipletName + " is working on {" + 
 							curProductStepSchedule.getProductStep().getCapability() + "} of product {" + 
-							curProductStepSchedule.getProductStep().getProduct() + "}");
+							curProductStepSchedule.getProductStep().getProduct() + "}");*/
 					equipletState = EquipletState.Working;
 					curProductStepSchedule.getProductStep().setState(StepState.Working);
 				} else if( currentTimeSlot > curProductStepSchedule.getStartTimeSlot()) {

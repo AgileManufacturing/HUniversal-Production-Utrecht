@@ -43,7 +43,7 @@ public class BatchSpawner extends ProductSpawner{
 			}
 			
 			nextSpawnTime += spawnInterval * 1000;
-			System.out.println("BatchSpawner: Spawned " + amountPerSpawn + " " + productName + "s, next spawn in " + spawnInterval + " (" + nextSpawnTime + ")");
+			//System.out.println("BatchSpawner: Spawned " + amountPerSpawn + " " + productName + "s, next spawn in " + spawnInterval + " (" + nextSpawnTime + ")");
 		}
 
 	}
