@@ -93,12 +93,10 @@ class TableUpdateThread extends SwingWorker<Void, Void> {
     public void updateTable(){
     	jTable = elf.getJTable();
     	Grid grid = elf.getGrid();
-    	System.out.println("grid " + grid);
     	Equiplet[] equiplets = grid.getEquiplets();
     	
     	DefaultTableModel model = (DefaultTableModel) jTable.getModel();
     	
-    	System.out.println(equiplets);
     	for(int i = 0; i < equiplets.length; i++) {
     		if(i >= model.getRowCount()) {
     			model.addRow(new Object[]{"", "", 0.0, 0});

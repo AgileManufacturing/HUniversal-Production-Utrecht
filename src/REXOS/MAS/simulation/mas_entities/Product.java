@@ -14,6 +14,14 @@ import simulation.data.TimeSlot;
 import agents.data_classes.Matrix;
 
 public class Product implements Updatable{
+	public enum ProductState {
+		inProgress,
+		finished,
+		failed
+	}
+	private static long rescheduleDelay = 60000;
+	private static int rescheduleAttempts = 3;
+	
 	private String productType;
 	private ProductStep[] productSteps;
 	private Equiplet[] equiplets;
@@ -25,6 +33,8 @@ public class Product implements Updatable{
 	
 	private boolean needNewSchedule = false;
 	private int scheduleFailures = 0;
+	private ProductState state;
+	private long rescheduleTime;
 	
 	public Product(String productType, Simulation simulation, Grid grid, Capability[] capabilities, long deadline){
 		this(productType, simulation, grid, capabilities, deadline, null);
@@ -43,6 +53,7 @@ public class Product implements Updatable{
 		}
 		finalSchedules = new LinkedHashMap<ProductStep, Schedule>();
 		
+		this.state = ProductState.inProgress;
 		long currentTimeSlot = TimeSlot.getCurrentTimeSlot(simulation, grid.getGridProperties());
 		//We need to pass the current timeslot, to prevent synchronisation issues.
 		schedule(currentTimeSlot, generateScheduleMatrix(equiplets, productSteps, currentTimeSlot), productSteps);
@@ -137,6 +148,7 @@ public class Product implements Updatable{
 				System.out.println("No suitable equiplet found for this step! Scheduling has gone wrong.. Reschedule?");
 				needNewSchedule = true;
 				scheduleFailures++;
+				rescheduleTime = simulation.getCurrentSimulationTime() + rescheduleDelay;
 				return;
 			}
 			
@@ -216,7 +228,8 @@ public class Product implements Updatable{
 		for(int i = 0; i < productSteps.length; i++) {
 			ProductStep step = productSteps[i];
 			Schedule schedule = finalSchedules.get(step);
-			if(fromStart || (fromStart == false && step.getState() != StepState.Finished)){
+			if(fromStart || (fromStart == false && 
+					(step.getState() == StepState.Scheduled || step.getState() == StepState.ProductError || step.getState() == StepState.ScheduleError || step.getState() == StepState.Evaluating))){
 				System.out.println("resetting step");
 				if(schedule != null) {
 					// already removed i guess
@@ -251,17 +264,14 @@ public class Product implements Updatable{
 
 	@Override
 	public void update(long time) {
-		if(scheduleFailures == 3) {
-			System.out.println("product failed?");
-			/*try {
-				//Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
-			return;
+		// product failed?
+		if(scheduleFailures == rescheduleAttempts) {
+			System.out.println("product " + this + "failed!");
+			this.state = ProductState.failed;
+			simulation.removeUpdateable(this);
 		}
 		
+		// EQ error occured?
 		for (ProductStep ps : productSteps) {
 			if(ps.getState() == StepState.ProductError || ps.getState() == StepState.ScheduleError) {
 				handleEquipletError(ps.getState());
@@ -272,7 +282,13 @@ public class Product implements Updatable{
 			}
 		}
 		
-		if(needNewSchedule == true) {
+		// are we finished?
+		if(getProgress() == 1.0) {
+			this.state = ProductState.finished;
+		}
+		
+		
+		if(needNewSchedule == true && time >= rescheduleTime) {
 			needNewSchedule = false;
 			reschedule(false);
 		}
@@ -293,5 +309,17 @@ public class Product implements Updatable{
 	
 	public String getType() {
 		return productType;
+	}
+	
+	public double getProgress() {
+		int finishedSteps = 0;
+		for (ProductStep step : productSteps) {
+			if(step.getState() == StepState.Finished) finishedSteps++;
+		}
+		return finishedSteps / productSteps.length;
+	}
+	
+	public ProductState getState() {
+		return state;
 	}
 }

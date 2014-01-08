@@ -90,7 +90,6 @@ class ScheduleTableUpdateThread extends SwingWorker<Void, Void> {
 	public void updateTable(){
 		jTable = esf.getJTable();
 		Equiplet equiplet = esf.getEquiplet();
-		System.out.println("equiplet " + equiplet);
 		ArrayList<ProductStepSchedule> schedule = equiplet.getSchedule();
 		
 		DefaultTableModel model = (DefaultTableModel) jTable.getModel();

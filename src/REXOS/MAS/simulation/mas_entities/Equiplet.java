@@ -152,8 +152,6 @@ public class Equiplet implements Updatable{
 				System.out.println("The amount of count slots is higher than the window... wtf m8");
 			}
 			
-			System.out.println("Equiplet " + equipletName + " load " + (double) amountOfTimeSlotsBusy / (double) gridProperties.getEquipletLoadWindow() + 
-					"    " + amountOfTimeSlotsBusy);
 			return (double) amountOfTimeSlotsBusy / (double) gridProperties.getEquipletLoadWindow();
 		}
 	}

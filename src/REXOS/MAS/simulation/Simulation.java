@@ -62,6 +62,7 @@ public class Simulation implements Runnable{
 	private long currentSimulationTime;
 	private ArrayList<Updatable> updatables = new ArrayList<Updatable>();
 	private ArrayList<Updatable> updatablesToBeAdded = new ArrayList<Updatable>();
+	private ArrayList<Updatable> updatablesToBeRemoved = new ArrayList<Updatable>();
 	private ArrayList<DataCollector> dataCollectors = new ArrayList<DataCollector>();
 	private ArrayList<DataCollector> dataCollectorsToBeAdded = new ArrayList<DataCollector>();
 	private Thread thread;
@@ -158,6 +159,11 @@ public class Simulation implements Runnable{
 				while(updatablesToBeAdded.size() != 0) {
 					updatables.add(updatablesToBeAdded.remove(0));
 				}
+				while(updatablesToBeRemoved.size() != 0) {
+					updatables.remove(updatablesToBeRemoved.remove(0));
+				}
+				
+				
 				while(dataCollectorsToBeAdded.size() != 0) {
 					dataCollectors.add(dataCollectorsToBeAdded.remove(0));
 				}
@@ -172,5 +178,8 @@ public class Simulation implements Runnable{
 	}
 	public Updatable[] getUpdatables() {
 		return updatables.toArray(new Updatable[updatables.size()]);
+	}
+	public void removeUpdateable(Updatable updateable) {
+		updatablesToBeRemoved.add(updateable);
 	}
 }
