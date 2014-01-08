@@ -108,7 +108,7 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 			if(mG.getSimulation().getIsFinished() == true) {
 				System.out.println("FINISHED SiM");
 				try{
-				String path = "/home/t/sim/";
+				String path = "";
 				
 				FileWriter productsInGridFile = new FileWriter(path + "productsInGrid.csv");
 				PrintWriter productsInGridWriter = new PrintWriter(productsInGridFile);
@@ -181,22 +181,9 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 				equipletStateWriter.close();
 				equipletStateFile.close();
 				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
 				} catch(Exception ex) {
 					// tralala
 				}
-				
-				
-				
 				
 				this.cancel(false);
 			}
