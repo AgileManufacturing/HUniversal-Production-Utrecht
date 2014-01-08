@@ -53,10 +53,10 @@ import simulation.mas_entities.Grid;
 public class MainGUI extends javax.swing.JFrame {
 
 	// Files
-	public static File capabilitiesFile		= new File("/home/t/sim/capabilities.csv");
-	public static File productsFile			= new File("/home/t/sim/productA.csv");
-	public static File batchesFile			= new File("/home/t/sim/BatchA.csv");
-	public static File gridFile				= new File("/home/t/sim/equipletLayout.json");
+	public static File capabilitiesFile		= new File("C:/Users/Alexander/Documents/School/Jaar 3/Stage/HUniversal/src/REXOS/MAS/simulation/csvFiles/capabilities.csv");
+	public static File productsFile			= new File("C:/Users/Alexander/Documents/School/Jaar 3/Stage/HUniversal/src/REXOS/MAS/simulation/csvFiles/productA.csv");
+	public static File batchesFile			= new File("C:/Users/Alexander/Documents/School/Jaar 3/Stage/HUniversal/src/REXOS/MAS/simulation/csvFiles/BatchA.csv");
+	public static File gridFile				= new File("C:/Users/Alexander/Documents/School/Jaar 3/Stage/HUniversal/src/REXOS/MAS/simulation/csvFiles/equipletLayout.json");
 
 	// BackgroundWorkers
 	private ProgressWorkerThread progressWorker;
@@ -64,6 +64,7 @@ public class MainGUI extends javax.swing.JFrame {
 
 	//Frames
 	private EquipletListFrame elf;
+	private ConfigurationEditorGUI conf;
 	
 	// is the Simulator running
 	private boolean isRunning 					= false;
@@ -73,6 +74,7 @@ public class MainGUI extends javax.swing.JFrame {
 	private boolean isChartWindowOpen			= false;
 	private boolean isVisualisationWindowOpen 	= false;
 	private boolean isEquipletListOpen 			= false;
+	private boolean isConfigOpen	 			= false;
 	
 	private Simulation simulation;
 	private Grid grid;
@@ -201,6 +203,11 @@ public class MainGUI extends javax.swing.JFrame {
 		menuEdit.setText("Edit");
 
 		menuEditConfig.setText("Edit Configurations");
+		menuEditConfig.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				menuEditConfigActionPerformed(evt);
+			}
+		});
 		menuEdit.add(menuEditConfig);
 
 		jMenuBar1.add(menuEdit);
@@ -287,8 +294,18 @@ public class MainGUI extends javax.swing.JFrame {
 		} else {
 			System.out.println("[DEBUG]\t\tEquiplet List is already opened ...");
 		}
-	}             
-
+	} 
+	
+	private void menuEditConfigActionPerformed(java.awt.event.ActionEvent evt) {                                           
+		if(!isConfigOpen || !conf.isActive()){
+			// TODO open Equiplet List stuff:
+			isConfigOpen = true;
+			conf = new ConfigurationEditorGUI();
+		} else {
+			System.out.println("[DEBUG]\t\tEquiplet List is already opened ...");
+		}
+	}
+	
 	private void menuFileGraphActionPerformed(java.awt.event.ActionEvent evt){
 		if(!isChartWindowOpen){
 			// TODO open Graph Window:
@@ -515,6 +532,13 @@ public class MainGUI extends javax.swing.JFrame {
 		this.isEquipletListOpen = isEquipletListOpen;
 	}
 
+	public boolean isConfigOpen() {
+		return isConfigOpen;
+	}
+
+	public void isConfigOpen(boolean isConfigOpen) {
+		this.isConfigOpen = isConfigOpen;
+	}
 
 	// Variables declaration - do not modify                     
 	private javax.swing.JLabel batchesLabel;

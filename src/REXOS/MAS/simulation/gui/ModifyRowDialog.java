@@ -91,7 +91,7 @@ public class ModifyRowDialog extends JDialog {
 		btnAddToRow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// Add Equiplet to Row (and eventually remove from equiplets)
-				if(rowList.getSelectedIndex() != -1) {
+				if(eqList.getSelectedIndex() != -1) {
 					rowContents.addElement(equiplets.elementAt(eqList.getSelectedIndex())); // Change to multiple indexes
 					equiplets.remove(eqList.getSelectedIndex());
 				}
