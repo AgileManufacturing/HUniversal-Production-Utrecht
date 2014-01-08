@@ -38,6 +38,11 @@
  **/
 package simulation.gui;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -55,6 +60,8 @@ import javax.swing.SwingWorker;
 
 import simulation.data.Capability;
 import simulation.data.TimeSlot;
+import simulation.mas_entities.Equiplet;
+import simulation.mas_entities.Equiplet.EquipletState;
 import simulation.mas_entities.Product;
 
 class ProgressWorkerThread extends SwingWorker<Void, Void> {
@@ -100,14 +107,96 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 			
 			if(mG.getSimulation().getIsFinished() == true) {
 				System.out.println("FINISHED SiM");
+				try{
+				String path = "/home/t/sim/";
 				
-				HashMap<Long, Integer> pig = mG.productDataCollector.products;
-				Long[] keys = pig.keySet().toArray(new Long[pig.size()]);
-				Arrays.sort(keys);
-				
-				for (Long key : keys) {
-					System.out.println(pig.get(key));
+				FileWriter productsInGridFile = new FileWriter(path + "productsInGrid.csv");
+				PrintWriter productsInGridWriter = new PrintWriter(productsInGridFile);
+				HashMap<Long, Integer> productsInProgres = mG.productDataCollector.productInProgres;
+				Long[] keys1 = productsInProgres.keySet().toArray(new Long[productsInProgres.size()]);
+				Arrays.sort(keys1);
+				for (Long key : keys1) {
+					productsInGridWriter.println(productsInProgres.get(key));
 				}
+				productsInGridWriter.close();
+				productsInGridFile.close();
+				
+				FileWriter productsFile = new FileWriter(path + "products.csv");
+				PrintWriter productsWriter = new PrintWriter(productsFile);
+				HashMap<Long, Integer> products = mG.productDataCollector.products;
+				Long[] keys2 = products.keySet().toArray(new Long[products.size()]);
+				Arrays.sort(keys2);
+				for (Long key : keys2) {
+					productsWriter.println(products.get(key));
+				}
+				productsWriter.close();
+				productsFile.close();
+				
+				FileWriter productsFailedFile = new FileWriter(path + "productsFailed.csv");
+				PrintWriter productsFailedWriter = new PrintWriter(productsFailedFile);
+				HashMap<Long, Integer> productsFailed = mG.productDataCollector.productsOverDeadline;
+				Long[] keys3 = products.keySet().toArray(new Long[productsFailed.size()]);
+				Arrays.sort(keys3);
+				for (Long key : keys3) {
+					productsFailedWriter.println(productsFailed.get(key));
+				}
+				productsFailedWriter.close();
+				productsFailedFile.close();
+				
+				
+				
+				FileWriter equipletLoadFile = new FileWriter(path + "equipletLoad.csv");
+				PrintWriter equipletLoadWriter = new PrintWriter(equipletLoadFile);
+				HashMap<Long, HashMap<Equiplet, Double>> equipletLoads = mG.equipletDataCollector.getEquipletLoads();
+				Long[] keys4 = equipletLoads.keySet().toArray(new Long[equipletLoads.size()]);
+				for (Equiplet eq : equipletLoads.get(keys4[0]).keySet()) {
+					System.out.println("EQ header");
+					equipletLoadWriter.print(eq.getName() + "\t");
+				}
+				equipletLoadWriter.println();
+				for (Long key : keys4) {
+					for (Double load : equipletLoads.get(key).values()) {
+						equipletLoadWriter.print(load + "\t");
+					}
+					equipletLoadWriter.println();
+				}
+				equipletLoadWriter.close();
+				equipletLoadFile.close();
+				
+				FileWriter equipletStateFile = new FileWriter(path + "equipletState.csv");
+				PrintWriter equipletStateWriter = new PrintWriter(equipletStateFile);
+				HashMap<Long, HashMap<Equiplet, EquipletState>> equipletState = mG.equipletDataCollector.getEquipletState();
+				Long[] keys5 = equipletLoads.keySet().toArray(new Long[equipletLoads.size()]);
+				for (Equiplet eq : equipletLoads.get(keys5[0]).keySet()) {
+					equipletLoadWriter.print(eq.getName() + "\t");
+				}
+				equipletStateWriter.println();
+				for (Long key : keys5) {
+					for (EquipletState state : equipletState.get(key).values()) {
+						equipletStateWriter.print(state + "\t");
+					}
+					equipletStateWriter.println();
+				}
+				equipletStateWriter.close();
+				equipletStateFile.close();
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				} catch(Exception ex) {
+					// tralala
+				}
+				
+				
+				
+				
 				this.cancel(false);
 			}
 			

@@ -187,6 +187,12 @@ public class Product implements Updatable{
 			//Check the equiplets schedule. Lets check if the schedule fits. 
 			//TODO Keep in mind that the deadline is met.
 			finalSchedules.put(productStep, new Schedule(timeSlot, currentEquiplet));
+			if(currentTimeSlot > deadline) {
+				System.out.println("Product" + this + "is over deadline");
+				needNewSchedule = true;
+				scheduleFailures++;
+				rescheduleTime = simulation.getCurrentSimulationTime() + rescheduleDelay;
+			}
 			
 			//add the time to the currenttimeslot
 			//currentTimeSlot += productStep.getCapability().getDuration();
