@@ -73,6 +73,7 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 	DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 	
 	double previousProgress = 0;
+	long previousTime;
 	
 	public ProgressWorkerThread(MainGUI mG){
 		super();
@@ -84,6 +85,7 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 	
 	@Override
 	public Void doInBackground() {
+		previousTime = System.currentTimeMillis();
 		while(!isCancelled()){
 			//@ TODO Update progressBar with Sim-data
 			Date date = new Date();
@@ -91,13 +93,15 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 			
 			double currentProgress = mG.getSimulation().getProgress();
 			double progressIncrement = currentProgress - previousProgress;
+			long currentTime = System.currentTimeMillis();
 			if(progressIncrement != 0.0) {
-				int milliesRemaining = (int)(((1.0 - currentProgress) / progressIncrement) * UPDATE_INTERVAL);
+				int milliesRemaining = (int)(((1.0 - currentProgress) / progressIncrement) * (currentTime - previousTime));
 				date.setTime(milliesRemaining);
 				((JTextField) 	components[1]).setText(dateFormat.format(date));
 				
 			}
 			previousProgress = currentProgress;
+			previousTime = currentTime;
 			((JProgressBar) components[0]).setValue((int)(currentProgress * 100));
 			mG.setProgressComponents(components);
 			
