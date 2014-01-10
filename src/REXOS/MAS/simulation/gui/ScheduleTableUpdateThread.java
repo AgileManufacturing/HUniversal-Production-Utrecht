@@ -39,9 +39,14 @@
 package simulation.gui;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+
 import javax.swing.JTable;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
+
+import org.apache.commons.collections4.list.TreeList;
+
 import simulation.data.ProductStepSchedule;
 import simulation.mas_entities.Equiplet;
 
@@ -79,7 +84,7 @@ class ScheduleTableUpdateThread extends SwingWorker<Void, Void> {
 	public void updateTable(){
 		jTable = esf.getJTable();
 		Equiplet equiplet = esf.getEquiplet();
-		ArrayList<ProductStepSchedule> schedule = equiplet.getSchedule();
+		TreeList<ProductStepSchedule> schedule = equiplet.getSchedule();
 		
 		DefaultTableModel model = (DefaultTableModel) jTable.getModel();
 

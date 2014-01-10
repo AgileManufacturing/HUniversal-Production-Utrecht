@@ -192,6 +192,7 @@ public class Product implements Updatable{
 				needNewSchedule = true;
 				scheduleFailures++;
 				rescheduleTime = simulation.getCurrentSimulationTime() + rescheduleDelay;
+				return;
 			}
 			
 			//add the time to the currenttimeslot
@@ -213,7 +214,7 @@ public class Product implements Updatable{
 	}
 	
 	private void setSequenceValues(int row, int firstInSequence, int sequenceLength, Matrix matrix){
-		int value = sequenceLength -1;
+		int value = (int)((sequenceLength -1) * 0.5);
 		for(int i = firstInSequence; i < firstInSequence + sequenceLength; i++){
 			matrix.set(row, i, (matrix.get(row, i) + value));
 		}
@@ -235,7 +236,8 @@ public class Product implements Updatable{
 			ProductStep step = productSteps[i];
 			Schedule schedule = finalSchedules.get(step);
 			if(fromStart || (fromStart == false && 
-					(step.getState() == StepState.Scheduled || step.getState() == StepState.ProductError || step.getState() == StepState.ScheduleError || step.getState() == StepState.Evaluating))){
+					(step.getState() == StepState.Scheduled || step.getState() == StepState.ProductError || 
+					step.getState() == StepState.ScheduleError || step.getState() == StepState.Evaluating))){
 				//System.out.println("resetting step");
 				if(schedule != null) {
 					// already removed i guess

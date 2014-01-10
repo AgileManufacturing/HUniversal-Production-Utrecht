@@ -78,7 +78,7 @@ public class ProductDataCollector extends DataCollector {
 			productInProgressCount++;
 		}
 		
-		LinkedHashMap<ProductStep, Schedule> currentSchedule = product.getFinalSchedules();
+		/*LinkedHashMap<ProductStep, Schedule> currentSchedule = product.getFinalSchedules();
 		if(productSchedules.containsKey(product) == false) {
 			productSchedules.put(product, new HashMap<Long, LinkedHashMap<ProductStep, Schedule>>());
 			productSchedules.get(product).put(
@@ -97,7 +97,7 @@ public class ProductDataCollector extends DataCollector {
 				productSchedules.get(product).put(
 						simulation.getCurrentSimulationTime(), (LinkedHashMap<ProductStep, Schedule>) currentSchedule.clone());
 			}
-		}
+		}*/
 		
 		
 	}

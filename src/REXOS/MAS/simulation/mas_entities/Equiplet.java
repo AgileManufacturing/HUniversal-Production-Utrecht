@@ -58,6 +58,9 @@ import simulation.data.Schedule;
 import simulation.data.TimeSlot;
 import simulation.data.ProductStep.StepState;
 
+import org.apache.commons.collections4.list.TreeList;;
+
+
 public class Equiplet implements Updatable{
 	
 	public enum EquipletState{
@@ -65,7 +68,6 @@ public class Equiplet implements Updatable{
 		Error,
 		Working
 	}
-	
 	private EquipletState equipletState = EquipletState.Idle;
 	
 	private Capability[] capabilities;
@@ -76,7 +78,7 @@ public class Equiplet implements Updatable{
 	
 	private GridProperties gridProperties;
 	
-	private ArrayList<ProductStepSchedule> schedule = new ArrayList<ProductStepSchedule>();
+	private TreeList<ProductStepSchedule> schedule = new TreeList<ProductStepSchedule>();
 	
 	public Equiplet(JsonObject jsonArguments, GridProperties gridProperties){
 		this.gridProperties = gridProperties;
@@ -312,6 +314,7 @@ public class Equiplet implements Updatable{
 				}
 			}
 			equipletState = EquipletState.Error;
+//			schedule.clear();
 		}
 		else{
 			//if there was an error that does not exist now, bring state to idle
@@ -405,7 +408,7 @@ public class Equiplet implements Updatable{
 	public int getBatchReservation() {
 		return reservedFor;
 	}
-	public ArrayList<ProductStepSchedule> getSchedule() {
+	public TreeList<ProductStepSchedule> getSchedule() {
 		return schedule;
 	}
 }

@@ -55,7 +55,7 @@ public class Simulation implements Runnable{
 	private boolean isAborted = false;
 	private boolean isFinished = false;
 	private double interval = 0.00; // seconds
-	private double turnTime = 0.01; // seconds
+	private double turnTime = 0.1; // seconds
 	private double duration = 2 * 60 * 60 * 1000 + 0 * 60 * 1000; // milliseconds
 	
 	private long turn = 0;
@@ -90,6 +90,7 @@ public class Simulation implements Runnable{
 		startSimulationTime = System.currentTimeMillis();
 		currentSimulationTime = startSimulationTime;
 		thread = new Thread(this);
+		thread.setPriority(Thread.MIN_PRIORITY + 1);
 		thread.start();
 	}
 	
@@ -175,6 +176,7 @@ public class Simulation implements Runnable{
 					break;
 				}
 			}
+			Thread.yield();
 		}
 		// exit simulation thread
 	}
