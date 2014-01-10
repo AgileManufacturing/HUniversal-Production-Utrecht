@@ -39,6 +39,7 @@
 
 package simulation.data;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
@@ -120,6 +121,13 @@ public class Capability {
 		Capability output = availableCapabilitiesByName.get(name);
 		if(output == null) throw new NullPointerException("No capability with name:" + name);
 		return output;
+	}
+	public static Capability[] getCapabilities() {
+		ArrayList<Capability> output = new ArrayList<Capability>(availableCapabilitiesById.size());
+		for (Capability capability : availableCapabilitiesById.values()) {
+			output.add(capability);
+		}
+		return output.toArray(new Capability[availableCapabilitiesById.size()]);
 	}
 	private static void printAvailableCapabilities(){
 		Collection<Capability> values = availableCapabilitiesById.values();
