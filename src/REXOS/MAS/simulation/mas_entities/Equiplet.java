@@ -72,7 +72,7 @@ public class Equiplet implements Updatable{
 	
 	private Capability[] capabilities;
 	private String equipletName;
-	private int reservedFor = 0;
+	private ArrayList<Integer> reservedFor = new ArrayList<Integer>();
 	
 	private EquipletError[] equipletErrors;
 	
@@ -392,7 +392,10 @@ public class Equiplet implements Updatable{
 		for ( int iCaps = 0; iCaps < caps.size(); iCaps ++){
 			capabilities[iCaps] =  Capability.getCapabilityByName(caps.get(iCaps).getAsString());
 		}
-		reservedFor = arguments.get("reservedFor").getAsInt();
+		JsonArray reservedForArray = arguments.get("reservedFor").getAsJsonArray();
+		for ( int i = 0; i < reservedForArray.size(); i++) {
+			reservedFor.add(reservedForArray.getAsInt());
+		}
 		
 		JsonArray errors = arguments.get("equipletErrors").getAsJsonArray();
 		equipletErrors = new EquipletError[errors.size()];
@@ -405,8 +408,8 @@ public class Equiplet implements Updatable{
 		// TODO Auto-generated method stub
 		return equipletName;
 	}
-	public int getBatchReservation() {
-		return reservedFor;
+	public Integer[] getBatchReservation() {
+		return reservedFor.toArray(new Integer[reservedFor.size()]);
 	}
 	public TreeList<ProductStepSchedule> getSchedule() {
 		return schedule;

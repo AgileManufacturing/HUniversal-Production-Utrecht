@@ -6,68 +6,42 @@
 		[
 			{
 				"name" : "EQ1",
-				"capabilities" : ["place", "screw"],
-				"reservedFor" : -1,
+				"capabilities" : ["drink"],
+				"reservedFor" : [],
 				"equipletErrors" : [
-				    {
-					"type" : "software",
-					"interval" : "0:05:00",
-					"duration" : "0:00:10",
-					"startTime" : "0:00:30",
-					"damagesProduct" : false
-				    }, {
-					"type" : "hardware",
-					"interval" : "0:40:00",
-					"duration" : "0:03:00",
-					"startTime" : "0:10:00",
-					"damagesProduct" : true
-				    }
 				]
 			}, {
 				"name" : "EQ2",
-				"capabilities" : ["drill", "screw"],
-				"reservedFor" : -1, 
+				"capabilities" : ["drink"],
+				"reservedFor" : [], 
 				"equipletErrors" : [
 				]
 			}
 		], [
 			{
 				"name" : "EQ3",
-				"capabilities" : ["glue"],
-				"reservedFor" : -1, 
+				"capabilities" : ["drink"],
+				"reservedFor" : [], 
 				"equipletErrors" : [
 				]
 			}, {
 				"name" : "EQ4",
-				"capabilities" : ["place"],
-				"reservedFor" : -1, 
+				"capabilities" : ["drink"],
+				"reservedFor" : [], 
 				"equipletErrors" : [
-				    {
-					"type" : "hardware",
-					"interval" : "0:30:00",
-					"duration" : "0:05:00",
-					"startTime" : "0:20:00",
-					"damagesProduct" : true
-				    }, {
-					"type" : "software",
-					"interval" : "0:05:00",
-					"duration" : "0:00:30",
-					"startTime" : "0:10:00",
-					"damagesProduct" : false
-				    }
 				]
 			}
 		], [
 			{
 				"name" : "EQ5",
-				"capabilities" : [],
-				"reservedFor" : -1, 
+				"capabilities" : ["drink"],
+				"reservedFor" : [], 
 				"equipletErrors" : [
 				]
 			}, {
 				"name" : "EQ6",
-				"capabilities" : ["drill"],
-				"reservedFor" : -1, 
+				"capabilities" : ["drink"],
+				"reservedFor" : [], 
 				"equipletErrors" : [
 				]
 			}
