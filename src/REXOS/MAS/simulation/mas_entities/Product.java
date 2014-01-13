@@ -110,6 +110,7 @@ public class Product implements Updatable{
 				
 				//value might have changed since we added sequence multiplier 
 				double loadValue = equiplets[row].getLoad(new TimeSlot(scheduleTimeSlot, 0));
+				//System.out.println("loadValue " + loadValue);
 				
 				//Multiply with load value ( e.g. the load of the equiplet )
 				scheduleMatrix.set(row, column, (scheduleMatrix.get(row, column) * (1 - loadValue)));
@@ -215,6 +216,7 @@ public class Product implements Updatable{
 	
 	private void setSequenceValues(int row, int firstInSequence, int sequenceLength, Matrix matrix){
 		int value = (int)((sequenceLength -1) * 0.5);
+//		System.out.println("value " + value);
 		for(int i = firstInSequence; i < firstInSequence + sequenceLength; i++){
 			matrix.set(row, i, (matrix.get(row, i) + value));
 		}
@@ -320,6 +322,9 @@ public class Product implements Updatable{
 	}
 	
 	public double getProgress() {
+		// check for retarded products
+		if(productSteps.length == 0) return 1;
+		
 		int finishedSteps = 0;
 		for (ProductStep step : productSteps) {
 			if(step.getState() == StepState.Finished) finishedSteps++;
@@ -329,5 +334,8 @@ public class Product implements Updatable{
 	
 	public ProductState getState() {
 		return state;
+	}
+	public ProductStep[] getProductSteps() {
+		return productSteps;
 	}
 }

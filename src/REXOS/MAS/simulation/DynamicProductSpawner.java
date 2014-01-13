@@ -47,6 +47,7 @@ import java.util.Random;
 
 import simulation.data.Capability;
 import simulation.data.ProductStep;
+import simulation.data.Schedule;
 import simulation.data.TimeSlot;
 import simulation.gui.MainGUI;
 import simulation.mas_entities.Equiplet;
@@ -61,6 +62,7 @@ public class DynamicProductSpawner implements Updatable {
 	int seed;
 	int minProductLength;
 	int maxProductLength;
+	double chance;
 	HashMap<Capability, Integer> workForce = new HashMap<Capability, Integer>();
 	HashMap<Capability, Double> capabilityProgress = new HashMap<Capability, Double>();
 	
@@ -81,6 +83,7 @@ public class DynamicProductSpawner implements Updatable {
 		minProductLength = Integer.parseInt(fields[3][0]);
 		maxProductLength = Integer.parseInt(fields[4][0]);
 		targetLoad = Double.parseDouble(fields[5][0]);
+		chance = Double.parseDouble(fields[6][0]);
 		random = new Random(seed);
 		
 		Capability[] capabilities = Capability.getCapabilities();
@@ -94,13 +97,13 @@ public class DynamicProductSpawner implements Updatable {
 			}
 			workForce.put(capability, workForceForCurrentCapability);
 			capabilityProgress.put(capability, 0.0);
+			System.out.println(capability + " : " + workForceForCurrentCapability);
 		}
 	}
 	
 	@Override
 	public void update(long time) {
 		double timeSlotsElapsed = (time - prevTime) / (double) grid.getGridProperties().getTimeSlotLength();
-		System.out.println("spawning" + timeSlotsElapsed + " " + minProductLength + " " + maxProductLength);
 		
 		boolean needToSpawnProducts = false;
 		for (Capability capability : capabilityProgress.keySet()) {
@@ -108,12 +111,18 @@ public class DynamicProductSpawner implements Updatable {
 			capabilityProgress.put(capability, newValue);
 			if(newValue >= 1) needToSpawnProducts = true;
 		}
-		if(needToSpawnProducts == true) {
+		if(needToSpawnProducts == true && random.nextDouble() < chance) {
 			Product[] products = spawnProducts();
 			for(int i = 0; i < products.length; i++) {
 				simulation.addUpdateable(products[i]);
 			}
-			//System.out.println("DynamicProductSpawner: Spawned " + products.length + " " + productName + "s");
+			System.out.println("DynamicProductSpawner: Spawned " + products.length + " " + productName + "s:");
+			for (Product product : products) {
+				System.out.println("\t" + product);
+				for (ProductStep step : product.getProductSteps()) {
+					System.out.println("\t\t" + step);
+				}
+			}
 		}
 		prevTime = time;
 	}
