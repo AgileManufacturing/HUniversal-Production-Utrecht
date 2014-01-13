@@ -42,6 +42,10 @@ sync.sh
 *.orig
 *.jar
 *.json
+*.csv*
+
+ src/REXOS/MAS/simulation/csvFiles/*
+
 
 APDescription.txt
 MTPs-Main-Container.txt

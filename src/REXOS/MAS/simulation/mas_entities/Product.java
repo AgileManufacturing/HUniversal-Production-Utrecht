@@ -14,11 +14,14 @@ import simulation.data.TimeSlot;
 import agents.data_classes.Matrix;
 
 public class Product implements Updatable{
+	
 	public enum ProductState {
 		inProgress,
 		finished,
 		failed
 	}
+	
+	private static double loadTreshold = 0.8500;
 	private static long rescheduleDelay = 60000;
 	private static int rescheduleAttempts = 3;
 	
@@ -56,7 +59,14 @@ public class Product implements Updatable{
 		this.state = ProductState.inProgress;
 		long currentTimeSlot = TimeSlot.getCurrentTimeSlot(simulation, grid.getGridProperties());
 		//We need to pass the current timeslot, to prevent synchronisation issues.
-		schedule(currentTimeSlot, generateScheduleMatrix(equiplets, productSteps, currentTimeSlot), productSteps);
+		try {
+			schedule(currentTimeSlot, generateScheduleMatrix(equiplets, productSteps, currentTimeSlot), productSteps);
+		} catch (Exception e) {
+			//Loadthreshold has been reached. Reschedule in next update.
+			needNewSchedule = true;
+			scheduleFailures++;
+			rescheduleTime = simulation.getCurrentSimulationTime() + rescheduleDelay;
+		}
 	}
 	
 	private ProductStep[] generateProductSteps(Capability[] capabilities){
@@ -72,8 +82,9 @@ public class Product implements Updatable{
 	 * @param currentTimeSlot 
 	 * @ref to paper 'Multiagent-based agile manufacturing: from user requirements to product' - Leo van Moergestel section 3.2 
 	 * @return the generated scheduleMatrix
+	 * @throws Exception 
 	 */
-	private Matrix generateScheduleMatrix(Equiplet[] equiplets, ProductStep[] productSteps, long currentTimeSlot) {		
+	private Matrix generateScheduleMatrix(Equiplet[] equiplets, ProductStep[] productSteps, long currentTimeSlot) throws Exception {		
 		//construct a new matrices to perform a neat-o selection
 		Matrix scheduleMatrix = new Matrix(equiplets.length, productSteps.length);
 		
@@ -109,8 +120,12 @@ public class Product implements Updatable{
 				//TimeSlot loadSlot = equiplets[row].getFirstFreeTimeSlot(scheduleTimeSlot, productSteps[column].getDuration());
 				
 				//value might have changed since we added sequence multiplier 
-				double loadValue = equiplets[row].getLoad(new TimeSlot(scheduleTimeSlot, 0));
-				//System.out.println("loadValue " + loadValue);
+				//double loadValue = equiplets[row].getLoad(new TimeSlot(scheduleTimeSlot, 0));
+				double loadValue = equiplets[row].getLoad(new TimeSlot(scheduleTimeSlot, (this.deadline - scheduleTimeSlot)));
+				
+				if(loadValue >= loadTreshold){
+					throw new Exception("Loadthreshold has been reached. Stopping scheduling.");
+				}
 				
 				//Multiply with load value ( e.g. the load of the equiplet )
 				scheduleMatrix.set(row, column, (scheduleMatrix.get(row, column) * (1 - loadValue)));
@@ -216,7 +231,6 @@ public class Product implements Updatable{
 	
 	private void setSequenceValues(int row, int firstInSequence, int sequenceLength, Matrix matrix){
 		int value = (int)((sequenceLength -1) * 0.5);
-//		System.out.println("value " + value);
 		for(int i = firstInSequence; i < firstInSequence + sequenceLength; i++){
 			matrix.set(row, i, (matrix.get(row, i) + value));
 		}
@@ -259,8 +273,16 @@ public class Product implements Updatable{
 		
 		
 		//so now we have a newProductSteps and finalSchedules. Lets try to schedule again.
-		schedule(currentTimeSlot, generateScheduleMatrix(equiplets, 
-				newProductSteps.toArray(new ProductStep[newProductSteps.size()]), currentTimeSlot), newProductSteps.toArray(new ProductStep[newProductSteps.size()]));
+		try {
+			schedule(currentTimeSlot, 
+					generateScheduleMatrix(equiplets, newProductSteps.toArray(new ProductStep[newProductSteps.size()]), currentTimeSlot), 
+					newProductSteps.toArray(new ProductStep[newProductSteps.size()]));
+		} catch (Exception e) { 
+			//Loadthreshold has been reached. Reschedule in next update.
+			needNewSchedule = true;
+			scheduleFailures++;
+			rescheduleTime = simulation.getCurrentSimulationTime() + rescheduleDelay;
+		}
 	}
 	
 	public void handleEquipletError(StepState stepState){
@@ -297,12 +319,12 @@ public class Product implements Updatable{
 			this.state = ProductState.finished;
 		}
 		
-		
 		if(needNewSchedule == true && time >= rescheduleTime) {
 			needNewSchedule = false;
 			reschedule(false);
 		}
 	}
+	
 	public long getDeadline() {
 		return deadline;
 	}
@@ -322,9 +344,6 @@ public class Product implements Updatable{
 	}
 	
 	public double getProgress() {
-		// check for retarded products
-		if(productSteps.length == 0) return 1;
-		
 		int finishedSteps = 0;
 		for (ProductStep step : productSteps) {
 			if(step.getState() == StepState.Finished) finishedSteps++;
@@ -334,8 +353,5 @@ public class Product implements Updatable{
 	
 	public ProductState getState() {
 		return state;
-	}
-	public ProductStep[] getProductSteps() {
-		return productSteps;
 	}
 }

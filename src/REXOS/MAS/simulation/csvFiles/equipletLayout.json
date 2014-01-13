@@ -6,44 +6,38 @@
 		[
 			{
 				"name" : "EQ1",
-				"capabilities" : ["drink"],
-				"reservedFor" : [],
-				"equipletErrors" : [
-				]
+				"capabilities" : ["dingen"],
+				"reservedFor" : -1,
+				"equipletErrors" : []
 			}, {
 				"name" : "EQ2",
-				"capabilities" : ["drink"],
-				"reservedFor" : [], 
-				"equipletErrors" : [
-				]
+				"capabilities" : ["dingen"],
+				"reservedFor" : -1, 
+				"equipletErrors" : []
 			}
 		], [
 			{
 				"name" : "EQ3",
-				"capabilities" : ["drink"],
-				"reservedFor" : [], 
-				"equipletErrors" : [
-				]
+				"capabilities" : ["dingen"],
+				"reservedFor" : -1, 
+				"equipletErrors" : []
 			}, {
 				"name" : "EQ4",
-				"capabilities" : ["drink"],
-				"reservedFor" : [], 
-				"equipletErrors" : [
-				]
+				"capabilities" : ["dingen"],
+				"reservedFor" : -1, 
+				"equipletErrors" : []
 			}
 		], [
 			{
 				"name" : "EQ5",
-				"capabilities" : ["drink"],
-				"reservedFor" : [], 
-				"equipletErrors" : [
-				]
+				"capabilities" : ["dingen"],
+				"reservedFor" : -1, 
+				"equipletErrors" : []
 			}, {
 				"name" : "EQ6",
-				"capabilities" : ["drink"],
-				"reservedFor" : [], 
-				"equipletErrors" : [
-				]
+				"capabilities" : ["dingen"],
+				"reservedFor" : -1, 
+				"equipletErrors" : []
 			}
 		]
 	]
