@@ -80,6 +80,9 @@ public class Equiplet implements Updatable{
 	
 	private TreeList<ProductStepSchedule> schedule = new TreeList<ProductStepSchedule>();
 	
+	private long timeSlotsActive = 0;
+	private long timeSlotsIdle = 0;
+	
 	public Equiplet(JsonObject jsonArguments, GridProperties gridProperties){
 		this.gridProperties = gridProperties;
 		parseEquipletJson(jsonArguments);
@@ -278,6 +281,12 @@ public class Equiplet implements Updatable{
 	
 	@Override
 	public void update(long time) {
+		if(equipletState == EquipletState.Idle) {
+			timeSlotsIdle++;
+		} else if(equipletState == EquipletState.Working) {
+			timeSlotsActive++;
+		}
+		
 		EquipletError worstError = null;
 		//check if an error has occurred and get the worst error ( the damaging type is the worst)
 		for (EquipletError eqError : equipletErrors){
@@ -413,5 +422,12 @@ public class Equiplet implements Updatable{
 	}
 	public TreeList<ProductStepSchedule> getSchedule() {
 		return schedule;
+	}
+	public double getCurrentLoad() {
+		return timeSlotsActive / (double)(timeSlotsActive + timeSlotsIdle);
+	}
+	public void resetCurrentLoad() {
+		timeSlotsActive = 0;
+		timeSlotsIdle = 0;
 	}
 }

@@ -10,13 +10,15 @@ import simulation.mas_entities.Equiplet.EquipletState;
 import simulation.mas_entities.Grid;
 
 public class EquipletDataCollector extends DataCollector {
-	HashMap<Long, HashMap<Equiplet, EquipletState>> equipletStates;
+	private HashMap<Long, HashMap<Equiplet, EquipletState>> equipletStates;
 	private HashMap<Long, HashMap<Equiplet, Double>> equipletLoads;
+	private HashMap<Long, HashMap<Equiplet, Double>> equipletCurrentLoads;
 
 	public EquipletDataCollector(Simulation simulation) {
 		super(simulation);
 		equipletStates = new HashMap<Long, HashMap<Equiplet, Equiplet.EquipletState>>(); 
 		equipletLoads = new HashMap<Long, HashMap<Equiplet, Double>>(); 
+		equipletCurrentLoads = new HashMap<Long, HashMap<Equiplet, Double>>(); 
 	}
 	
 	
@@ -26,6 +28,7 @@ public class EquipletDataCollector extends DataCollector {
 			
 			equipletStates.put(time, new HashMap<Equiplet, Equiplet.EquipletState>());
 			equipletLoads.put(time, new HashMap<Equiplet, Double>());
+			equipletCurrentLoads.put(time, new HashMap<Equiplet, Double>());
 			
 			Grid grid = null;
 			for (Updatable updatable : updatables) {
@@ -44,12 +47,17 @@ public class EquipletDataCollector extends DataCollector {
 	}
 	private void processEquiplet(Equiplet equiplet, long time) {
 		equipletLoads.get(time).put(equiplet, equiplet.getLoad());
+		equipletCurrentLoads.get(time).put(equiplet, equiplet.getCurrentLoad());
+		equiplet.resetCurrentLoad();
 		equipletStates.get(time).put(equiplet, equiplet.getEquipletState());
 	}
 
 
 	public HashMap<Long, HashMap<Equiplet, Double>> getEquipletLoads() {
 		return new HashMap<Long, HashMap<Equiplet, Double>>(equipletLoads);
+	}
+	public HashMap<Long, HashMap<Equiplet, Double>> getEquipletCurrentLoads() {
+		return new HashMap<Long, HashMap<Equiplet, Double>>(equipletCurrentLoads);
 	}
 	public HashMap<Long, HashMap<Equiplet, EquipletState>> getEquipletState() {
 		return new HashMap<Long, HashMap<Equiplet, EquipletState>>(equipletStates);
