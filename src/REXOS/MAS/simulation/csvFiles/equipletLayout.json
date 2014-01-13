@@ -5,39 +5,45 @@
 	"grid" : [ 
 		[
 			{
-				"name" : "EQ1",
-				"capabilities" : ["dingen"],
-				"reservedFor" : -1,
-				"equipletErrors" : []
+				"name" : "EQ-Analyzer-1",
+				"capabilities" : ["analyze"],
+				"reservedFor" : [],
+				"equipletErrors" : [
+				]
 			}, {
-				"name" : "EQ2",
-				"capabilities" : ["dingen"],
-				"reservedFor" : -1, 
-				"equipletErrors" : []
+				"name" : "EQ-Designer-1",
+				"capabilities" : ["design"],
+				"reservedFor" : [], 
+				"equipletErrors" : [
+				]
 			}
 		], [
 			{
-				"name" : "EQ3",
-				"capabilities" : ["dingen"],
-				"reservedFor" : -1, 
-				"equipletErrors" : []
+				"name" : "EQ-Analyzer-2",
+				"capabilities" : ["analyze"],
+				"reservedFor" : [],
+				"equipletErrors" : [
+				]
 			}, {
-				"name" : "EQ4",
-				"capabilities" : ["dingen"],
-				"reservedFor" : -1, 
-				"equipletErrors" : []
+				"name" : "EQ-Designer-2",
+				"capabilities" : ["design"],
+				"reservedFor" : [], 
+				"equipletErrors" : [
+				]
 			}
 		], [
 			{
-				"name" : "EQ5",
-				"capabilities" : ["dingen"],
-				"reservedFor" : -1, 
-				"equipletErrors" : []
+				"name" : "-",
+				"capabilities" : [],
+				"reservedFor" : [],
+				"equipletErrors" : [
+				]
 			}, {
-				"name" : "EQ6",
-				"capabilities" : ["dingen"],
-				"reservedFor" : -1, 
-				"equipletErrors" : []
+				"name" : "EQ-Designer-3",
+				"capabilities" : ["design"],
+				"reservedFor" : [], 
+				"equipletErrors" : [
+				]
 			}
 		]
 	]
