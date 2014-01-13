@@ -12,6 +12,7 @@ import simulation.data.ProductStep;
 import simulation.data.Schedule;
 import simulation.mas_entities.Equiplet;
 import simulation.mas_entities.Product;
+import simulation.mas_entities.Product.FailureReason;
 import simulation.mas_entities.Product.ProductState;
 
 public class ProductDataCollector extends DataCollector {
@@ -19,13 +20,13 @@ public class ProductDataCollector extends DataCollector {
 	public HashSet<Product> knownFailedProducts;
 	public HashMap<Long, Integer> products;
 	public HashMap<Long, Integer> productInProgres;
-	public HashMap<Long, Integer> productsOverDeadline;
-	public HashMap<Long, Integer> productsInBatchOverDeadline;
+	public HashMap<Long, HashMap<FailureReason, Integer>> productsOverDeadline;
+	public HashMap<Long, HashMap<FailureReason, Integer>> productsInBatchOverDeadline;
 	public HashMap<Product, HashMap<Long, LinkedHashMap<ProductStep, Schedule>>> productSchedules;
 	Integer productCount;
 	Integer productInProgressCount;
-	Integer productOverDeadlineCount;
-	Integer productInBatchOverDeadlineCount;
+	HashMap<FailureReason, Integer> productOverDeadlineCount;
+	HashMap<FailureReason, Integer> productInBatchOverDeadlineCount;
 	
 
 	public ProductDataCollector(Simulation simulation) {
@@ -34,12 +35,17 @@ public class ProductDataCollector extends DataCollector {
 		knownFailedProducts = new HashSet<Product>();
 		products = new HashMap<Long, Integer>(); 
 		productInProgres = new HashMap<Long, Integer>(); 
-		productsOverDeadline = new HashMap<Long, Integer>();
-		productsInBatchOverDeadline = new HashMap<Long, Integer>();
+		productsOverDeadline = new HashMap<Long, HashMap<FailureReason, Integer>>();
+		productsInBatchOverDeadline = new HashMap<Long, HashMap<FailureReason, Integer>>();
 		productSchedules = new HashMap<Product, HashMap<Long, LinkedHashMap<ProductStep, Schedule>>>();
 		productCount = 0;
-		productOverDeadlineCount = 0;
-		productInBatchOverDeadlineCount = 0;
+		productOverDeadlineCount = new HashMap<FailureReason, Integer>();
+		productInBatchOverDeadlineCount = new HashMap<FailureReason, Integer>();
+		
+		for (FailureReason type : FailureReason.values()) {
+			productOverDeadlineCount.put(type, 0);
+			productInBatchOverDeadlineCount.put(type, 0);
+		}
 	}
 	
 	
@@ -57,20 +63,29 @@ public class ProductDataCollector extends DataCollector {
 			for (Product product : knownProducts) {
 				if(product.getState() == ProductState.failed) {
 					if(knownFailedProducts.contains(product) == false) {
-						productOverDeadlineCount++;
+						productOverDeadlineCount.put(product.getLastFailureReason(), 
+								productOverDeadlineCount.get(product.getLastFailureReason()) + 1);
 						if(product.getBatch() != null) {
-							productInBatchOverDeadlineCount++;
+							productInBatchOverDeadlineCount.put(product.getLastFailureReason(), 
+									productInBatchOverDeadlineCount.get(product.getLastFailureReason()) + 1);
 						}
 						knownFailedProducts.add(product);
 					}
 				}				
 			}
 			
+			HashMap<FailureReason, Integer> map1 = new HashMap<FailureReason, Integer>();
+			HashMap<FailureReason, Integer> map2 = new HashMap<FailureReason, Integer>();
+			
+			for (FailureReason type : FailureReason.values()) {
+				map1.put(type, productOverDeadlineCount.get(type));
+				map2.put(type, productInBatchOverDeadlineCount.get(type));
+			}
+			productsOverDeadline.put(simulation.getCurrentSimulationTime(), map1);
+			productsInBatchOverDeadline.put(simulation.getCurrentSimulationTime(), map2);
 			
 			products.put(simulation.getCurrentSimulationTime(), knownProducts.size());
 			productInProgres.put(simulation.getCurrentSimulationTime(), productInProgressCount);
-			productsOverDeadline.put(simulation.getCurrentSimulationTime(), productOverDeadlineCount);
-			productsInBatchOverDeadline.put(simulation.getCurrentSimulationTime(), productInBatchOverDeadlineCount);
 		}
 	}
 	private void processProduct(Product product) {

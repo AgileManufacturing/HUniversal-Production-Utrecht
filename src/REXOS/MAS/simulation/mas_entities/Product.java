@@ -20,6 +20,11 @@ public class Product implements Updatable{
 		finished,
 		failed
 	}
+	public enum FailureReason {
+		noSuitableEquiplet,
+		deadline,
+		equipletLoadToHigh
+	}
 	
 	private static double loadTreshold = 0.8500;
 	private static long rescheduleDelay = 60000;
@@ -36,6 +41,7 @@ public class Product implements Updatable{
 	
 	private boolean needNewSchedule = false;
 	private int scheduleFailures = 0;
+	private FailureReason lastFailureReason = null;
 	private ProductState state;
 	private long rescheduleTime;
 	
@@ -66,6 +72,7 @@ public class Product implements Updatable{
 			needNewSchedule = true;
 			scheduleFailures++;
 			rescheduleTime = simulation.getCurrentSimulationTime() + rescheduleDelay;
+			lastFailureReason = FailureReason.equipletLoadToHigh;
 		}
 	}
 	
@@ -165,6 +172,7 @@ public class Product implements Updatable{
 				needNewSchedule = true;
 				scheduleFailures++;
 				rescheduleTime = simulation.getCurrentSimulationTime() + rescheduleDelay;
+				lastFailureReason = FailureReason.noSuitableEquiplet;
 				return;
 			}
 			
@@ -201,13 +209,13 @@ public class Product implements Updatable{
 			*/
 			
 			//Check the equiplets schedule. Lets check if the schedule fits. 
-			//TODO Keep in mind that the deadline is met.
 			finalSchedules.put(productStep, new Schedule(timeSlot, currentEquiplet));
 			if(currentTimeSlot > TimeSlot.getTimeSlotFromMillis(grid.getGridProperties(), deadline)) {
 				//System.out.println("Product" + this + "is over deadline");
 				needNewSchedule = true;
 				scheduleFailures++;
 				rescheduleTime = simulation.getCurrentSimulationTime() + rescheduleDelay;
+				lastFailureReason = FailureReason.deadline;
 				return;
 			}
 			
@@ -353,6 +361,9 @@ public class Product implements Updatable{
 	
 	public ProductState getState() {
 		return state;
+	}
+	public FailureReason getLastFailureReason() {
+		return lastFailureReason;
 	}
 	public ProductStep[] getProductSteps() {
 		return productSteps.clone();

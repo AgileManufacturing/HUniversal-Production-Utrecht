@@ -62,6 +62,7 @@ import simulation.data.Capability;
 import simulation.data.TimeSlot;
 import simulation.mas_entities.Equiplet;
 import simulation.mas_entities.Equiplet.EquipletState;
+import simulation.mas_entities.Product.FailureReason;
 import simulation.mas_entities.Product;
 
 class ProgressWorkerThread extends SwingWorker<Void, Void> {
@@ -136,24 +137,41 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 				productsWriter.close();
 				productsFile.close();
 				
+				// does the FailureReason.values() change?
+				FailureReason[] failureReasonTypes = FailureReason.values();
+				
 				FileWriter productsFailedFile = new FileWriter(path + "productsFailed.csv");
 				PrintWriter productsFailedWriter = new PrintWriter(productsFailedFile);
-				HashMap<Long, Integer> productsFailed = mG.productDataCollector.productsOverDeadline;
+				HashMap<Long, HashMap<FailureReason, Integer>> productsFailed = mG.productDataCollector.productsOverDeadline;
 				Long[] keys3 = productsFailed.keySet().toArray(new Long[productsFailed.size()]);
 				Arrays.sort(keys3);
+				for (FailureReason failureReason : failureReasonTypes) {
+					productsFailedWriter.print(failureReason + "\t");
+				}
+				productsFailedWriter.println();
 				for (Long key : keys3) {
-					productsFailedWriter.println(productsFailed.get(key));
+					for (FailureReason failureReason : failureReasonTypes) {
+						productsFailedWriter.print(productsFailed.get(key).get(failureReason) + "\t");
+					}
+					productsFailedWriter.println();
 				}
 				productsFailedWriter.close();
 				productsFailedFile.close();
 				
 				FileWriter productsInBatchFailedFile = new FileWriter(path + "productsInBatchFailed.csv");
 				PrintWriter productsInBatchFailedWriter = new PrintWriter(productsInBatchFailedFile);
-				HashMap<Long, Integer> productsInBatchFailed = mG.productDataCollector.productsInBatchOverDeadline;
+				HashMap<Long, HashMap<FailureReason, Integer>> productsInBatchFailed = mG.productDataCollector.productsInBatchOverDeadline;
 				Long[] keys4 = productsInBatchFailed.keySet().toArray(new Long[productsInBatchFailed.size()]);
 				Arrays.sort(keys4);
+				for (FailureReason failureReason : failureReasonTypes) {
+					productsInBatchFailedWriter.print(failureReason + "\t");
+				}
+				productsInBatchFailedWriter.println();
 				for (Long key : keys4) {
-					productsInBatchFailedWriter.println(productsInBatchFailed.get(key));
+					for (FailureReason failureReason : failureReasonTypes) {
+						productsInBatchFailedWriter.print(productsInBatchFailed.get(key).get(failureReason) + "\t");
+					}
+					productsInBatchFailedWriter.println();
 				}
 				productsInBatchFailedWriter.close();
 				productsInBatchFailedFile.close();
