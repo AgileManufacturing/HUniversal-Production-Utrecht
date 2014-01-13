@@ -354,4 +354,7 @@ public class Product implements Updatable{
 	public ProductState getState() {
 		return state;
 	}
+	public ProductStep[] getProductSteps() {
+		return productSteps.clone();
+	}
 }
