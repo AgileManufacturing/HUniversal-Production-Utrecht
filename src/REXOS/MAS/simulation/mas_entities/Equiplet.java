@@ -123,7 +123,7 @@ public class Equiplet implements Updatable{
 		));
 	}
 	
-	public double getLoad(TimeSlot timeSlot){
+	public double getLoad(TimeSlot timeSlot, int twaalf){
 		synchronized (schedule) {
 			long amountOfTimeSlotsBusy = 0;
 			
@@ -155,6 +155,42 @@ public class Equiplet implements Updatable{
 			}
 			
 			return (double) amountOfTimeSlotsBusy / (double) gridProperties.getEquipletLoadWindow();
+		}
+	}
+	
+	public double getLoad(TimeSlot timeSlot){
+		synchronized (schedule) {
+			long amountOfTimeSlotsBusy = 0;
+			
+			for (ProductStepSchedule productStepSchedule : schedule){
+				if (productStepSchedule.getStartTimeSlot() + productStepSchedule.getDuration() - 1 > timeSlot.getStartTimeSlot() && 
+						productStepSchedule.getStartTimeSlot() < (timeSlot.getStartTimeSlot() + timeSlot.getDuration() - 1)){
+					
+					// current product step starts before the start of the window
+					if(productStepSchedule.getStartTimeSlot() < timeSlot.getStartTimeSlot()){
+						//System.out.println("A" + (productStepSchedule.getDuration() - (timeSlot.getStartTimeSlot() - productStepSchedule.getStartTimeSlot())));
+						amountOfTimeSlotsBusy += productStepSchedule.getDuration() - (timeSlot.getStartTimeSlot() - productStepSchedule.getStartTimeSlot());
+						//amountOfTimeSlotsBusy +=  productStepSchedule.getDuration() - (productStepSchedule.getStartTimeSlot() - timeSlot.getStartTimeSlot());
+					}
+					// current product step ends after the end of the window
+					else if(productStepSchedule.getStartTimeSlot() + productStepSchedule.getDuration() - 1 > (timeSlot.getStartTimeSlot() + timeSlot.getDuration()) - 1){
+						//System.out.println("B" + ((timeSlot.getStartTimeSlot() + gridProperties.getEquipletLoadWindow() - 1) - productStepSchedule.getStartTimeSlot()));
+						amountOfTimeSlotsBusy += (timeSlot.getStartTimeSlot() + timeSlot.getDuration() - 1) - productStepSchedule.getStartTimeSlot();
+						//amountOfTimeSlotsBusy += productStepSchedule.getDuration() - (productStepSchedule.getStartTimeSlot() - timeSlot.getStartTimeSlot());
+						break;
+					}
+					else{
+						//System.out.println("C" + (productStepSchedule.getDuration()));
+						amountOfTimeSlotsBusy += productStepSchedule.getDuration();
+					}
+				}
+			}
+			
+			if (amountOfTimeSlotsBusy > timeSlot.getDuration()) {
+				System.err.println("The amount of count slots is higher than the window... wtf m8");
+			}
+			
+			return (double)amountOfTimeSlotsBusy / (double)timeSlot.getDuration();
 		}
 	}
 	

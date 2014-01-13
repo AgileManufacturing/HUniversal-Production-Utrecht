@@ -6,70 +6,38 @@
 		[
 			{
 				"name" : "EQ1",
-				"capabilities" : ["place", "screw"],
+				"capabilities" : ["dingen"],
 				"reservedFor" : -1,
-				"equipletErrors" : [
-				    {
-					"type" : "software",
-					"interval" : "0:05:00",
-					"duration" : "0:00:10",
-					"startTime" : "0:00:30",
-					"damagesProduct" : false
-				    }, {
-					"type" : "hardware",
-					"interval" : "0:40:00",
-					"duration" : "0:03:00",
-					"startTime" : "0:10:00",
-					"damagesProduct" : true
-				    }
-				]
+				"equipletErrors" : []
 			}, {
 				"name" : "EQ2",
-				"capabilities" : ["drill", "screw"],
+				"capabilities" : ["dingen"],
 				"reservedFor" : -1, 
-				"equipletErrors" : [
-				]
+				"equipletErrors" : []
 			}
 		], [
 			{
 				"name" : "EQ3",
-				"capabilities" : ["glue"],
+				"capabilities" : ["dingen"],
 				"reservedFor" : -1, 
-				"equipletErrors" : [
-				]
+				"equipletErrors" : []
 			}, {
 				"name" : "EQ4",
-				"capabilities" : ["place"],
+				"capabilities" : ["dingen"],
 				"reservedFor" : -1, 
-				"equipletErrors" : [
-				    {
-					"type" : "hardware",
-					"interval" : "0:30:00",
-					"duration" : "0:05:00",
-					"startTime" : "0:20:00",
-					"damagesProduct" : true
-				    }, {
-					"type" : "software",
-					"interval" : "0:05:00",
-					"duration" : "0:00:30",
-					"startTime" : "0:10:00",
-					"damagesProduct" : false
-				    }
-				]
+				"equipletErrors" : []
 			}
 		], [
 			{
 				"name" : "EQ5",
-				"capabilities" : [],
+				"capabilities" : ["dingen"],
 				"reservedFor" : -1, 
-				"equipletErrors" : [
-				]
+				"equipletErrors" : []
 			}, {
 				"name" : "EQ6",
-				"capabilities" : ["drill"],
+				"capabilities" : ["dingen"],
 				"reservedFor" : -1, 
-				"equipletErrors" : [
-				]
+				"equipletErrors" : []
 			}
 		]
 	]
