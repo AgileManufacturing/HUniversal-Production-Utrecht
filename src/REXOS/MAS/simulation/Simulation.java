@@ -67,7 +67,7 @@ public class Simulation implements Runnable{
 	 * Normally set to 0 (for maximum simulation speed). Adjust when running a realtime simulation.
 	 */
 	private double interval = 0.00; // seconds
-	private double turnTime = 0.1; // seconds
+	private double tickTime = 0.1; // seconds
 	private double duration = 2 * 60 * 60 * 1000 + 0 * 60 * 1000; // milliseconds
 	
 	/**
