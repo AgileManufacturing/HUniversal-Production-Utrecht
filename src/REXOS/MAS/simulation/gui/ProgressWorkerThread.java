@@ -167,16 +167,34 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 				equipletLoadWriter.close();
 				equipletLoadFile.close();
 				
+				FileWriter equipletCurrentLoadFile = new FileWriter(path + "equipletCurrentLoad.csv");
+				PrintWriter equipletCurrentLoadWriter = new PrintWriter(equipletCurrentLoadFile);
+				HashMap<Long, HashMap<Equiplet, Double>> equipletCurrentLoads = mG.equipletDataCollector.getEquipletCurrentLoads();
+				Long[] keys5 = equipletCurrentLoads.keySet().toArray(new Long[equipletCurrentLoads.size()]);
+				Arrays.sort(keys5);
+				for (Equiplet eq : equipletCurrentLoads.get(keys5[0]).keySet()) {
+					equipletCurrentLoadWriter.print(eq.getName() + "\t");
+				}
+				equipletCurrentLoadWriter.println();
+				for (Long key : keys5) {
+					for (Double load : equipletCurrentLoads.get(key).values()) {
+						equipletCurrentLoadWriter.print(load + "\t");
+					}
+					equipletCurrentLoadWriter.println();
+				}
+				equipletCurrentLoadWriter.close();
+				equipletCurrentLoadFile.close();
+				
 				FileWriter equipletStateFile = new FileWriter(path + "equipletState.csv");
 				PrintWriter equipletStateWriter = new PrintWriter(equipletStateFile);
 				HashMap<Long, HashMap<Equiplet, EquipletState>> equipletState = mG.equipletDataCollector.getEquipletState();
-				Long[] keys5 = equipletLoads.keySet().toArray(new Long[equipletLoads.size()]);
-				Arrays.sort(keys5);
-				for (Equiplet eq : equipletLoads.get(keys5[0]).keySet()) {
+				Long[] keys6 = equipletLoads.keySet().toArray(new Long[equipletLoads.size()]);
+				Arrays.sort(keys6);
+				for (Equiplet eq : equipletLoads.get(keys6[0]).keySet()) {
 					equipletStateWriter.print(eq.getName() + "\t");
 				}
 				equipletStateWriter.println();
-				for (Long key : keys5) {
+				for (Long key : keys6) {
 					for (EquipletState state : equipletState.get(key).values()) {
 						equipletStateWriter.print(state + "\t");
 					}

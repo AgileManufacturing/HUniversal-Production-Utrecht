@@ -40,10 +40,13 @@ package simulation.gui;
 
 import java.io.File;
 import java.text.ParseException;
+
 import javax.swing.JComponent;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
+
 import simulation.BatchSpawner;
+import simulation.DynamicProductSpawner;
 import simulation.ProductSpawner;
 import simulation.Simulation;
 import simulation.collectors.EquipletDataCollector;
@@ -55,6 +58,7 @@ public class MainGUI extends javax.swing.JFrame {
 	// Files
 	public static File capabilitiesFile		= new File("src/REXOS/MAS/simulation/csvFiles/capabilities.csv");
 	public static File productsFile			= new File("src/REXOS/MAS/simulation/csvFiles/products.csv");
+	public static File dynamicProductsFile	= new File("src/REXOS/MAS/simulation/csvFiles/dynamicProducts.csv");
 	public static File batchesFile			= new File("src/REXOS/MAS/simulation/csvFiles/batches.csv");
 	public static File gridFile				= new File("src/REXOS/MAS/simulation/csvFiles/equipletLayout.json");
 
@@ -373,6 +377,8 @@ public class MainGUI extends javax.swing.JFrame {
 		simulation.addUpdateable(grid);
 		ProductSpawner ps1 = new ProductSpawner(simulation, grid);
 		simulation.addUpdateable(ps1);
+		DynamicProductSpawner dps1 = new DynamicProductSpawner(simulation, grid);
+		simulation.addUpdateable(dps1);
 		BatchSpawner bs1 = new BatchSpawner(simulation, grid);
 		simulation.addUpdateable(bs1);
 		

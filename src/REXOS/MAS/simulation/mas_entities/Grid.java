@@ -152,8 +152,7 @@ public class Grid implements Updatable {
 	}
 	//In timeslots (PLEASE)
 	public long GetMeanDistance() {
-		// TODO Auto-generated method stub
-		return 0;
+		return (long) (equiplets[0].length / 2 * defaultDistance + equiplets.length / 2 * defaultDistance); 
 	}
 	public Equiplet[] getEquiplets() {
 		Equiplet[] output = new Equiplet[equiplets.length * equiplets[0].length];
@@ -168,7 +167,7 @@ public class Grid implements Updatable {
 		Equiplet[] allEquiplets = this.getEquiplets();
 		ArrayList<Equiplet> equipletsWithoutReservation = new ArrayList<Equiplet>();
 		for (Equiplet equiplet : allEquiplets) {
-			if(equiplet.getBatchReservation() == -1) equipletsWithoutReservation.add(equiplet);
+			if(equiplet.getBatchReservation().length == 0) equipletsWithoutReservation.add(equiplet);
 		}
 		return equipletsWithoutReservation.toArray(new Equiplet[equipletsWithoutReservation.size()]);
 	}
@@ -177,7 +176,10 @@ public class Grid implements Updatable {
 		Equiplet[] allEquiplets = this.getEquiplets();
 		ArrayList<Equiplet> equipletsForReservation = new ArrayList<Equiplet>();
 		for (Equiplet equiplet : allEquiplets) {
-			if(equiplet.getBatchReservation() == batchGroup) equipletsForReservation.add(equiplet);
+			Integer[] reservations = equiplet.getBatchReservation();
+			for (Integer reservation : reservations) {
+				if(reservation == batchGroup) equipletsForReservation.add(equiplet);
+			}
 		}
 		Equiplet[] equipletsWithoutReservation = getEquipletsWithoutReservation();
 		for (Equiplet equiplet : equipletsWithoutReservation) {

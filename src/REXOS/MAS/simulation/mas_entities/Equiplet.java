@@ -72,13 +72,16 @@ public class Equiplet implements Updatable{
 	
 	private Capability[] capabilities;
 	private String equipletName;
-	private int reservedFor = 0;
+	private ArrayList<Integer> reservedFor = new ArrayList<Integer>();
 	
 	private EquipletError[] equipletErrors;
 	
 	private GridProperties gridProperties;
 	
 	private TreeList<ProductStepSchedule> schedule = new TreeList<ProductStepSchedule>();
+	
+	private long timeSlotsActive = 0;
+	private long timeSlotsIdle = 0;
 	
 	public Equiplet(JsonObject jsonArguments, GridProperties gridProperties){
 		this.gridProperties = gridProperties;
@@ -314,6 +317,12 @@ public class Equiplet implements Updatable{
 	
 	@Override
 	public void update(long time) {
+		if(equipletState == EquipletState.Idle) {
+			timeSlotsIdle++;
+		} else if(equipletState == EquipletState.Working) {
+			timeSlotsActive++;
+		}
+		
 		EquipletError worstError = null;
 		//check if an error has occurred and get the worst error ( the damaging type is the worst)
 		for (EquipletError eqError : equipletErrors){
@@ -428,7 +437,10 @@ public class Equiplet implements Updatable{
 		for ( int iCaps = 0; iCaps < caps.size(); iCaps ++){
 			capabilities[iCaps] =  Capability.getCapabilityByName(caps.get(iCaps).getAsString());
 		}
-		reservedFor = arguments.get("reservedFor").getAsInt();
+		JsonArray reservedForArray = arguments.get("reservedFor").getAsJsonArray();
+		for ( int i = 0; i < reservedForArray.size(); i++) {
+			reservedFor.add(reservedForArray.getAsInt());
+		}
 		
 		JsonArray errors = arguments.get("equipletErrors").getAsJsonArray();
 		equipletErrors = new EquipletError[errors.size()];
@@ -441,10 +453,17 @@ public class Equiplet implements Updatable{
 		// TODO Auto-generated method stub
 		return equipletName;
 	}
-	public int getBatchReservation() {
-		return reservedFor;
+	public Integer[] getBatchReservation() {
+		return reservedFor.toArray(new Integer[reservedFor.size()]);
 	}
 	public TreeList<ProductStepSchedule> getSchedule() {
 		return schedule;
+	}
+	public double getCurrentLoad() {
+		return timeSlotsActive / (double)(timeSlotsActive + timeSlotsIdle);
+	}
+	public void resetCurrentLoad() {
+		timeSlotsActive = 0;
+		timeSlotsIdle = 0;
 	}
 }
