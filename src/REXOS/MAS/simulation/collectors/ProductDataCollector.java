@@ -20,10 +20,12 @@ public class ProductDataCollector extends DataCollector {
 	public HashMap<Long, Integer> products;
 	public HashMap<Long, Integer> productInProgres;
 	public HashMap<Long, Integer> productsOverDeadline;
+	public HashMap<Long, Integer> productsInBatchOverDeadline;
 	public HashMap<Product, HashMap<Long, LinkedHashMap<ProductStep, Schedule>>> productSchedules;
 	Integer productCount;
 	Integer productInProgressCount;
 	Integer productOverDeadlineCount;
+	Integer productInBatchOverDeadlineCount;
 	
 
 	public ProductDataCollector(Simulation simulation) {
@@ -33,10 +35,11 @@ public class ProductDataCollector extends DataCollector {
 		products = new HashMap<Long, Integer>(); 
 		productInProgres = new HashMap<Long, Integer>(); 
 		productsOverDeadline = new HashMap<Long, Integer>();
+		productsInBatchOverDeadline = new HashMap<Long, Integer>();
 		productSchedules = new HashMap<Product, HashMap<Long, LinkedHashMap<ProductStep, Schedule>>>();
 		productCount = 0;
-		productInProgressCount = 0;
 		productOverDeadlineCount = 0;
+		productInBatchOverDeadlineCount = 0;
 	}
 	
 	
@@ -55,6 +58,9 @@ public class ProductDataCollector extends DataCollector {
 				if(product.getState() == ProductState.failed) {
 					if(knownFailedProducts.contains(product) == false) {
 						productOverDeadlineCount++;
+						if(product.getBatch() != null) {
+							productInBatchOverDeadlineCount++;
+						}
 						knownFailedProducts.add(product);
 					}
 				}				
@@ -64,6 +70,7 @@ public class ProductDataCollector extends DataCollector {
 			products.put(simulation.getCurrentSimulationTime(), knownProducts.size());
 			productInProgres.put(simulation.getCurrentSimulationTime(), productInProgressCount);
 			productsOverDeadline.put(simulation.getCurrentSimulationTime(), productOverDeadlineCount);
+			productsInBatchOverDeadline.put(simulation.getCurrentSimulationTime(), productInBatchOverDeadlineCount);
 		}
 	}
 	private void processProduct(Product product) {

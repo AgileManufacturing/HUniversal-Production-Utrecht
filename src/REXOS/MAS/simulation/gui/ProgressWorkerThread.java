@@ -139,7 +139,7 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 				FileWriter productsFailedFile = new FileWriter(path + "productsFailed.csv");
 				PrintWriter productsFailedWriter = new PrintWriter(productsFailedFile);
 				HashMap<Long, Integer> productsFailed = mG.productDataCollector.productsOverDeadline;
-				Long[] keys3 = products.keySet().toArray(new Long[productsFailed.size()]);
+				Long[] keys3 = productsFailed.keySet().toArray(new Long[productsFailed.size()]);
 				Arrays.sort(keys3);
 				for (Long key : keys3) {
 					productsFailedWriter.println(productsFailed.get(key));
@@ -147,18 +147,29 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 				productsFailedWriter.close();
 				productsFailedFile.close();
 				
+				FileWriter productsInBatchFailedFile = new FileWriter(path + "productsInBatchFailed.csv");
+				PrintWriter productsInBatchFailedWriter = new PrintWriter(productsInBatchFailedFile);
+				HashMap<Long, Integer> productsInBatchFailed = mG.productDataCollector.productsInBatchOverDeadline;
+				Long[] keys4 = productsInBatchFailed.keySet().toArray(new Long[productsInBatchFailed.size()]);
+				Arrays.sort(keys4);
+				for (Long key : keys4) {
+					productsInBatchFailedWriter.println(productsInBatchFailed.get(key));
+				}
+				productsInBatchFailedWriter.close();
+				productsInBatchFailedFile.close();
+				
 				
 				
 				FileWriter equipletLoadFile = new FileWriter(path + "equipletLoad.csv");
 				PrintWriter equipletLoadWriter = new PrintWriter(equipletLoadFile);
 				HashMap<Long, HashMap<Equiplet, Double>> equipletLoads = mG.equipletDataCollector.getEquipletLoads();
-				Long[] keys4 = equipletLoads.keySet().toArray(new Long[equipletLoads.size()]);
-				Arrays.sort(keys4);
-				for (Equiplet eq : equipletLoads.get(keys4[0]).keySet()) {
+				Long[] keys5 = equipletLoads.keySet().toArray(new Long[equipletLoads.size()]);
+				Arrays.sort(keys5);
+				for (Equiplet eq : equipletLoads.get(keys5[0]).keySet()) {
 					equipletLoadWriter.print(eq.getName() + "\t");
 				}
 				equipletLoadWriter.println();
-				for (Long key : keys4) {
+				for (Long key : keys5) {
 					for (Double load : equipletLoads.get(key).values()) {
 						equipletLoadWriter.print(load + "\t");
 					}
@@ -170,13 +181,13 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 				FileWriter equipletCurrentLoadFile = new FileWriter(path + "equipletCurrentLoad.csv");
 				PrintWriter equipletCurrentLoadWriter = new PrintWriter(equipletCurrentLoadFile);
 				HashMap<Long, HashMap<Equiplet, Double>> equipletCurrentLoads = mG.equipletDataCollector.getEquipletCurrentLoads();
-				Long[] keys5 = equipletCurrentLoads.keySet().toArray(new Long[equipletCurrentLoads.size()]);
-				Arrays.sort(keys5);
-				for (Equiplet eq : equipletCurrentLoads.get(keys5[0]).keySet()) {
+				Long[] keys6 = equipletCurrentLoads.keySet().toArray(new Long[equipletCurrentLoads.size()]);
+				Arrays.sort(keys6);
+				for (Equiplet eq : equipletCurrentLoads.get(keys6[0]).keySet()) {
 					equipletCurrentLoadWriter.print(eq.getName() + "\t");
 				}
 				equipletCurrentLoadWriter.println();
-				for (Long key : keys5) {
+				for (Long key : keys6) {
 					for (Double load : equipletCurrentLoads.get(key).values()) {
 						equipletCurrentLoadWriter.print(load + "\t");
 					}
@@ -188,13 +199,13 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 				FileWriter equipletStateFile = new FileWriter(path + "equipletState.csv");
 				PrintWriter equipletStateWriter = new PrintWriter(equipletStateFile);
 				HashMap<Long, HashMap<Equiplet, EquipletState>> equipletState = mG.equipletDataCollector.getEquipletState();
-				Long[] keys6 = equipletLoads.keySet().toArray(new Long[equipletLoads.size()]);
-				Arrays.sort(keys6);
-				for (Equiplet eq : equipletLoads.get(keys6[0]).keySet()) {
+				Long[] keys7 = equipletState.keySet().toArray(new Long[equipletState.size()]);
+				Arrays.sort(keys7);
+				for (Equiplet eq : equipletState.get(keys7[0]).keySet()) {
 					equipletStateWriter.print(eq.getName() + "\t");
 				}
 				equipletStateWriter.println();
-				for (Long key : keys6) {
+				for (Long key : keys7) {
 					for (EquipletState state : equipletState.get(key).values()) {
 						equipletStateWriter.print(state + "\t");
 					}

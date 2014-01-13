@@ -357,4 +357,7 @@ public class Product implements Updatable{
 	public ProductStep[] getProductSteps() {
 		return productSteps.clone();
 	}
+	public Batch getBatch() {
+		return batch;
+	}
 }
