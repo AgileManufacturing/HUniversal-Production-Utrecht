@@ -1,6 +1,6 @@
 <sdf version='1.4'>
 
-	<model name="sixAxis">
+	<model name="DeltaRobot">
 	<static>false</static>
 
 <!-- ============================Start Links========================================  --> 
@@ -304,7 +304,6 @@
 
 <!-- =Joint= these connect links together useing joints to simulate motors  --> 
 
-
 	<!-- connecting the base to a kind of hacked object to make it stay on its place --> 
 	<joint type="prismatic" name="BaseToWorld">
 		<pose>0 0 0 0 0 0</pose>
@@ -326,7 +325,7 @@
 	<joint type="revolute" name="upperArm1ToMotor1"><!-- upper arm 1 to motor 1--> 
 		<pose>0 0 0 0 0 0</pose>
 		<child>upperArm1</child>
-		<parent>motor1</parent>
+		<parent>base</parent>
 		<axis>
 			<xyz>1 0 0</xyz>
 			<limit>
@@ -340,7 +339,7 @@
 	<joint type="revolute" name="upperArm2ToMotor2"><!-- upper arm 2 to motor 2--> 
 		<pose>0 0 0 0 0 0</pose>
 		<child>upperArm2</child>
-		<parent>motor2</parent>
+		<parent>base</parent>
 		<axis>
 			<xyz>1 0 0</xyz>
 			<limit>
@@ -354,7 +353,7 @@
 	<joint type="revolute" name="upperArm3ToMotor3"><!-- upper arm 3 to motor 3--> 
 		<pose>0 0 0 0 0 0</pose>
 		<child>upperArm3</child>
-		<parent>motor3</parent>
+		<parent>base</parent>
 		<axis>
 			<xyz>-0.5 -0.8660 0</xyz>
 			
@@ -392,7 +391,7 @@
 	<joint type="ball" name="lowerArm2ToUpperArm1"><!--  lower arm 2 to upper arm 1 --> 
 		<pose>0 0 0 0 0 0</pose>
 		<child>lowerArm2</child>
-		<parent>upperArm2</parent>
+		<parent>upperArm1</parent>
 		<axis>
 			<xyz>0 0 1</xyz>
 			
@@ -413,7 +412,7 @@
 	<joint type="ball" name="lowerArm3ToUpperArm2"><!--  lower arm 3 to upper arm 2 --> 
 		<pose>0 0 0 0 0 0</pose>
 		<child>lowerArm3</child>
-		<parent>upperArm3</parent>
+		<parent>upperArm2</parent>
 		<axis>
 			<xyz>0 0 1</xyz>
 			
@@ -434,7 +433,7 @@
 	<joint type="ball" name="lowerArm4ToUpperArm2"><!--  lower arm 4 to upper arm 2 --> 
 		<pose>0 0 0 0 0 0</pose>
 		<child>lowerArm4</child>
-		<parent>upperArm4</parent>
+		<parent>upperArm2</parent>
 		<axis>
 			<xyz>0 0 1</xyz>
 			
@@ -455,7 +454,7 @@
 	<joint type="ball" name="lowerArm5ToUpperArm3"><!--  lower arm 5 to upper arm 3 --> 
 		<pose>0 0 0 0 0 0</pose>
 		<child>lowerArm5</child>
-		<parent>upperArm5</parent>
+		<parent>upperArm3</parent>
 		<axis>
 			<xyz>0 0 1</xyz>
 			
@@ -476,7 +475,7 @@
 	<joint type="ball" name="lowerArm6ToUpperArm3"><!--  lower arm 6 to upper arm 3 --> 
 		<pose>0 0 0 0 0 0</pose>
 		<child>lowerArm6</child>
-		<parent>upperArm6</parent>
+		<parent>upperArm3</parent>
 		<axis>
 			<xyz>0 0 1</xyz>
 			
