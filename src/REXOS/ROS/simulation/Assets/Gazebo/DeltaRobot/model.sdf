@@ -34,7 +34,7 @@
 
 	<!-- Upper arms --> 
 	<link name='upperArm1'> 
-		<pose>-0.10431 2.9926 9.49426 1.570796327 0 1.570796327</pose>
+		<pose>0.167 -14.582 0.151 1.570796327 0 1.570796327</pose>
 		<gravity>false</gravity>
 		
 		<collision name='collision'>
