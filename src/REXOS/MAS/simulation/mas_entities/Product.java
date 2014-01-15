@@ -1,6 +1,7 @@
 package simulation.mas_entities;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 import simulation.Simulation;
@@ -26,6 +27,8 @@ public class Product implements Updatable{
 		equipletLoadToHigh
 	}
 	
+
+	private static boolean useEquipletsOutsideReservation = false;
 	private static double loadTreshold = 0.8500;
 	private static long rescheduleDelay = 60000;
 	private static int rescheduleAttempts = 3;
@@ -55,11 +58,26 @@ public class Product implements Updatable{
 		this.simulation = simulation;
 		this.grid = grid;
 		this.batch = batch;
-		if(batch == null) {
-			this.equiplets = grid.getEquipletsWithoutReservation();
+
+		if(batch != null) {
+			if(useEquipletsOutsideReservation &&
+						grid.containsEquipletInError(grid.getEquipletsForReservation(batch.getBatchGroup()))) {
+				this.equiplets = grid.getEquipletsWithoutReservation();
+			
+				//TOMMAS PLS DUN RED HER
+				ArrayList<Equiplet> equipletList = new ArrayList<>();
+				equipletList.addAll(Arrays.asList(grid.getEquipletsWithoutReservation()));
+				equipletList.addAll(Arrays.asList(grid.getEquipletsForReservation(batch.getBatchGroup())));
+				this.equiplets = (Equiplet[]) equipletList.toArray(new Equiplet[equipletList.size()]);
+				//U KEN RED HER
+				
+			} else {
+				this.equiplets = grid.getEquipletsForReservation(batch.getBatchGroup());
+			}
 		} else {
-			this.equiplets = grid.getEquipletsForReservation(batch.getBatchGroup());
+			this.equiplets = grid.getEquipletsWithoutReservation();
 		}
+		
 		finalSchedules = new LinkedHashMap<ProductStep, Schedule>();
 		
 		this.state = ProductState.inProgress;

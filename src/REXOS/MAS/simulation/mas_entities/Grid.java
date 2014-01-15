@@ -172,6 +172,26 @@ public class Grid implements Updatable {
 		return equipletsWithoutReservation.toArray(new Equiplet[equipletsWithoutReservation.size()]);
 	}
 	
+	public boolean containsEquipletInError(Equiplet[] equiplets) {
+		//Equiplet[] allEquiplets = this.getEquiplets();
+		//java.util.List<Equiplet> equipletList = Arrays.asList(allEquiplets);
+		for (Equiplet equiplet1 : this.getEquiplets()) {
+			for (Equiplet equiplet2 : equiplets) {
+				//if(equipletList.contains(equiplet)){
+					//return (equipletList.get(equipletList.indexOf(equiplet)).getEquipletState() == EquipletState.Error);
+				//}
+				if(equiplet1.getName() == equiplet2.getName()){
+				//System.out.println("Identical!" + equiplet1.getName() + " status: " + equiplet1.getEquipletState());
+					if((equiplet1.getEquipletState() == simulation.mas_entities.Equiplet.EquipletState.Error)){
+						return true;
+					}
+					//return (equiplet1.getEquipletState() == EquipletState.Error);
+				}
+			}
+		}
+		return false;  // no equiplet found
+	}
+	
 	public Equiplet[] getEquipletsForReservation(int batchGroup) {
 		Equiplet[] allEquiplets = this.getEquiplets();
 		ArrayList<Equiplet> equipletsForReservation = new ArrayList<Equiplet>();
