@@ -232,6 +232,9 @@ class ProgressWorkerThread extends SwingWorker<Void, Void> {
 				equipletStateWriter.close();
 				equipletStateFile.close();
 				
+				
+				System.out.println("totalDurationInTimeSlots " + mG.dps1.totalDurationInTimeSlots);
+				
 				} catch(Exception ex) {
 					// tralala
 				}

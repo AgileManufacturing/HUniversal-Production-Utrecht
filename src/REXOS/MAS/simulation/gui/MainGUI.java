@@ -85,6 +85,8 @@ public class MainGUI extends javax.swing.JFrame {
 	
 	public EquipletDataCollector equipletDataCollector;
 	public ProductDataCollector productDataCollector;
+	
+	public DynamicProductSpawner dps1;
 
 	/**
 	 * Creates new form MainGUI
@@ -377,7 +379,7 @@ public class MainGUI extends javax.swing.JFrame {
 		simulation.addUpdateable(grid);
 		ProductSpawner ps1 = new ProductSpawner(simulation, grid);
 		simulation.addUpdateable(ps1);
-		DynamicProductSpawner dps1 = new DynamicProductSpawner(simulation, grid);
+		dps1 = new DynamicProductSpawner(simulation, grid);
 		simulation.addUpdateable(dps1);
 		BatchSpawner bs1 = new BatchSpawner(simulation, grid);
 		simulation.addUpdateable(bs1);

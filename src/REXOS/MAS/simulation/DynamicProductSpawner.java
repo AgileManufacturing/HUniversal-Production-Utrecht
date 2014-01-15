@@ -65,6 +65,8 @@ public class DynamicProductSpawner implements Updatable {
 	double chance;
 	HashMap<Capability, Integer> workForce = new HashMap<Capability, Integer>();
 	HashMap<Capability, Double> capabilityProgress = new HashMap<Capability, Double>();
+	public long totalDurationInTimeSlots = 0;
+	
 	
 	Simulation simulation;
 	Grid grid;
@@ -89,7 +91,7 @@ public class DynamicProductSpawner implements Updatable {
 		Capability[] capabilities = Capability.getCapabilities();
 		for (Capability capability : capabilities) {
 			int workForceForCurrentCapability = 0;
-			Equiplet[] equiplets = grid.getEquipletsWithoutReservation();
+			Equiplet[] equiplets = grid.getEquiplets();
 			for (Equiplet equiplet : equiplets) {
 				if(equiplet.canPerformStep(capability) == true) {
 					workForceForCurrentCapability++;
@@ -114,6 +116,7 @@ public class DynamicProductSpawner implements Updatable {
 		if(needToSpawnProducts == true && random.nextDouble() < chance) {
 			Product[] products = spawnProducts();
 			for(int i = 0; i < products.length; i++) {
+				
 				simulation.addUpdateable(products[i]);
 			}
 			//System.out.println("DynamicProductSpawner: Spawned " + products.length + " " + productName + "s:");
@@ -145,6 +148,7 @@ public class DynamicProductSpawner implements Updatable {
 					int index = random.nextInt(capabilitiesToPerform.size());
 					//System.out.println(capabilitiesToPerform.get(index));
 					productCapabilities.add(capabilitiesToPerform.get(index));
+					totalDurationInTimeSlots += capabilitiesToPerform.get(index).getDuration();
 					capabilitiesToPerform.remove(index);
 				}
 			}
