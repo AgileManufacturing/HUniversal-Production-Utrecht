@@ -28,7 +28,7 @@ public class Product implements Updatable{
 	}
 	
 
-	private static boolean useEquipletsOutsideReservation = false;
+	private static boolean useEquipletsOutsideReservation = true;
 	private static double loadTreshold = 0.8500;
 	private static long rescheduleDelay = 60000;
 	private static int rescheduleAttempts = 3;

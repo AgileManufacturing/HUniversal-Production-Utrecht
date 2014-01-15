@@ -97,7 +97,7 @@ public class DynamicProductSpawner implements Updatable {
 			}
 			workForce.put(capability, workForceForCurrentCapability);
 			capabilityProgress.put(capability, 0.0);
-			System.out.println(capability + " : " + workForceForCurrentCapability);
+			//System.out.println(capability + " : " + workForceForCurrentCapability);
 		}
 	}
 	
@@ -116,13 +116,13 @@ public class DynamicProductSpawner implements Updatable {
 			for(int i = 0; i < products.length; i++) {
 				simulation.addUpdateable(products[i]);
 			}
-			System.out.println("DynamicProductSpawner: Spawned " + products.length + " " + productName + "s:");
-			for (Product product : products) {
-				System.out.println("\t" + product);
+			//System.out.println("DynamicProductSpawner: Spawned " + products.length + " " + productName + "s:");
+		/*	for (Product product : products) {
+				//System.out.println("\t" + product);
 				for (ProductStep step : product.getProductSteps()) {
-					System.out.println("\t\t" + step);
+					//System.out.println("\t\t" + step);
 				}
-			}
+			} */
 		}
 		prevTime = time;
 	}
@@ -139,16 +139,16 @@ public class DynamicProductSpawner implements Updatable {
 		while(capabilitiesToPerform.size() != 0) {
 			int stepsCount = random.nextInt(maxProductLength - minProductLength + 1) + minProductLength;
 			ArrayList<Capability> productCapabilities = new ArrayList<Capability>();
-			System.out.println(stepsCount + "  " + capabilitiesToPerform.size());
+			//System.out.println(stepsCount + "  " + capabilitiesToPerform.size());
 			for(int i = 0; i < stepsCount; i++) {
 				if(capabilitiesToPerform.size() != 0) {
 					int index = random.nextInt(capabilitiesToPerform.size());
-					System.out.println(capabilitiesToPerform.get(index));
+					//System.out.println(capabilitiesToPerform.get(index));
 					productCapabilities.add(capabilitiesToPerform.get(index));
 					capabilitiesToPerform.remove(index);
 				}
 			}
-			products.add(new Product(productName, simulation, grid, productCapabilities.toArray(new Capability[productCapabilities.size()]), simulation.getCurrentSimulationTime() + 1 * 60 * 60 * 1000));
+			products.add(new Product(productName, simulation, grid, productCapabilities.toArray(new Capability[productCapabilities.size()]), simulation.getCurrentSimulationTime() + 86 * 1000));
 		}
 		return products.toArray(new Product[products.size()]);
 	}

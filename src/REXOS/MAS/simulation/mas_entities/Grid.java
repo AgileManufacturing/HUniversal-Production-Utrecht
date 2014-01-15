@@ -201,10 +201,10 @@ public class Grid implements Updatable {
 				if(reservation == batchGroup) equipletsForReservation.add(equiplet);
 			}
 		}
-		Equiplet[] equipletsWithoutReservation = getEquipletsWithoutReservation();
+		/*Equiplet[] equipletsWithoutReservation = getEquipletsWithoutReservation();
 		for (Equiplet equiplet : equipletsWithoutReservation) {
 			equipletsForReservation.add(equiplet);
-		}
+		} */
 		
 		return equipletsForReservation.toArray(new Equiplet[equipletsForReservation.size()]);
 	}

@@ -460,7 +460,12 @@ public class Equiplet implements Updatable{
 		return schedule;
 	}
 	public double getCurrentLoad() {
-		return timeSlotsActive / (double)(timeSlotsActive + timeSlotsIdle);
+		double result = (double)(timeSlotsActive + timeSlotsIdle);
+		if(result > 0){
+			return timeSlotsActive / (double)(timeSlotsActive + timeSlotsIdle);
+		} else {
+			return 0;//division by zero is not allowed!
+		}
 	}
 	public void resetCurrentLoad() {
 		timeSlotsActive = 0;
