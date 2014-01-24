@@ -29,7 +29,7 @@ public class Product implements Updatable{
 	
 
 	private static boolean useEquipletsOutsideReservation = true;
-	private static double loadTreshold = 0.8500;
+	private static double loadTreshold = 0.850000;
 	private static long rescheduleDelay = 60000;
 	private static int rescheduleAttempts = 3;
 	
@@ -146,8 +146,10 @@ public class Product implements Updatable{
 				
 				//value might have changed since we added sequence multiplier 
 				//double loadValue = equiplets[row].getLoad(new TimeSlot(scheduleTimeSlot, 0));
-				double loadValue = equiplets[row].getLoad(new TimeSlot(scheduleTimeSlot, (this.deadline - scheduleTimeSlot)));
-				
+				long deadlineInTimeSlots = TimeSlot.getTimeSlotFromMillis(this.grid.getGridProperties(), deadline);
+				double loadValue = equiplets[row].getLoad(new TimeSlot(scheduleTimeSlot, (deadlineInTimeSlots - scheduleTimeSlot)));
+				System.out.println(scheduleTimeSlot + " " + deadlineInTimeSlots + " " + simulation.getCurrentSimulationTime() + " " + this.deadline);
+				System.out.println(equiplets[row] + ": " + loadValue);
 				if(loadValue >= loadTreshold){
 					throw new Exception("Loadthreshold has been reached. Stopping scheduling.");
 				}
@@ -162,8 +164,8 @@ public class Product implements Updatable{
 				scheduleTimeSlot += grid.GetMeanDistance(); 
 			}
 		}
-		/*System.out.println("Product {" + this + "} schedule: ");
-		scheduleMatrix.show();*/
+		System.out.println("Product {" + this + "} schedule: ");
+		scheduleMatrix.show();
 		return scheduleMatrix;
 	}
 
