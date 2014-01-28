@@ -30,11 +30,17 @@
  **/
 package libraries.utillities.log;
 
+import jade.core.AID;
+import jade.lang.acl.ACLMessage;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+
+import agents.data.PrintableACLMessage;
 
 /**
  * Helper for log messages, providing a single point for controlling program origin.
@@ -47,20 +53,39 @@ public class Logger {
 	private static final boolean debugEnabled = true;
 
 	/**
-	 * @var boolean logToFileEnabled
-	 * Controls whether or not to write log messages to a text-file.
-	 **/
-	private static final boolean logToFileEnabled = true;
-
-	private static final File logFile = new File("gridLog.txt");
-
+	 * @var boolean testingEnabled
+	 * Controls wether or not logging of test messages is enabled
+	 */
+	private static final boolean testingEnabled = true;
+	private static String TEST_DATA_DIR = "";
+	
+    private static final String PATH_ENVIRONMENT_VARIABLE = "MSGPATH";
+	
 	/**
 	 * @var int logleveltreshhold
 	 * treshhold for showing log msg
 	 **/
 	public static final int loglevelThreshold = LogLevel.DEBUG.getLevel();
-
-
+	
+	static {
+		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
+		File dir = new File (msgsFilePath);
+		if(dir.exists()) {
+			System.out.println("Log Directory detected - Removing old log files");
+			String[] files = dir.list();
+			
+			for(String filename : files) {
+					File file = new File(filename);
+					if (file.exists()){	
+						file.delete();					
+					}
+			}
+		}
+		else{
+			dir.mkdirs();
+		}
+	}
+	
 	/**
 	 * Returns whether or not debugging is enabled.
 	 * @return true if debugging is enabled, false otherwise.
@@ -101,8 +126,47 @@ public class Logger {
 	public static void log(LogLevel level, String msg, Object... objects) {
 		printToOut(level, String.format(msg, objects));
 	}
+	
+	
+	public static void logAclMessage(ACLMessage msg, char type) {
+    	if(testingEnabled && msg != null) {
+    		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
+    		
+    		java.util.Date date = new java.util.Date();
+    		java.sql.Timestamp timeStamp = new java.sql.Timestamp(date.getTime());
+    		
+    		if(TEST_DATA_DIR == "") { 
+    			TEST_DATA_DIR = msgsFilePath + "/" + timeStamp.getTime();
+			}
+    		try {	    		
+	    		File dir = new File(TEST_DATA_DIR);
+	    		if(!dir.exists()) {
+	    			dir.mkdirs();
+	    		}
+	    		String filename = "null.log";
+	    		if ( msg.getConversationId() != null){
+	    			filename = msg.getConversationId() + ".log";
+	    		}
+	    		File file = new File(dir, filename);
+	    		if(!file.exists()) {
+					file.createNewFile();
+	    		}
 
-	public static void log(LogLevel level, String msg, Throwable throwable) {
+	    		PrintableACLMessage printmsg = new PrintableACLMessage(msg, timeStamp, "" + type);
+	    		
+	    		FileWriter fileWriter = new FileWriter(file, true);
+	    		BufferedWriter writer = new BufferedWriter(fileWriter);
+	    		
+    			writer.write(printmsg.toString() + "\r\n");
+	    		
+	    		writer.close();
+    		} catch (IOException e) {
+				e.printStackTrace();
+			}
+    	}
+	}
+	
+	public static void log(LogLevel level, String msg,  Throwable throwable) {
 		printToOut(level, msg);
 		printToOut(level, throwable.getStackTrace().toString());
 	}
