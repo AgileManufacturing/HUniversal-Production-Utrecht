@@ -4,6 +4,7 @@
  * @date Created: 2013-04-02
  * 
  * @author Hessel Meulenbeld
+ * 		   Roy Scheefhals
  * 
  * @section LICENSE
  *          License: newBSD
@@ -53,18 +54,20 @@ import jade.lang.acl.UnreadableException;
 import java.io.IOException;
 
 import libraries.blackboard_client.BlackboardClient;
-import libraries.blackboard_client.GeneralMongoException;
-import libraries.blackboard_client.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.GeneralMongoException;
+import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
-import agents.data.Part;
-import agents.data.ProductStep;
-import agents.data.ProductionStep;
-import agents.data.ScheduleData;
-import agents.data.StepStatusCode;
+import agents.data_classes.BehaviourCallbackItem;
+import agents.data_classes.ParentBehaviourCallback;
+import agents.data_classes.Part;
+import agents.data_classes.ProductStep;
+import agents.data_classes.ProductionStep;
+import agents.data_classes.ScheduleData;
+import agents.data_classes.StepStatusCode;
 import agents.equiplet_agent.EquipletAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 
@@ -78,7 +81,7 @@ import com.mongodb.BasicDBObject;
  * Starts a CanDoProductionStepResponse to wait on the response of the service agent.
  * When there is an error the agent sends a message to the sender with ACLMessage.FAILURE
  */
-public class CanPerformStep extends ReceiveBehaviour {
+public class CanPerformStep extends ReceiveBehaviour implements ParentBehaviourCallback{
 	/**
 	 * @var static final long serialVersionUID
 	 *      The serial version UID for this class
@@ -86,11 +89,12 @@ public class CanPerformStep extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
+	 * @var MessageTemplate MESSAGE_TEMPLATE
 	 *      The messageTemplate this behaviour listens to. This behaviour
 	 *      listens to the ontology: CanPeformStep.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("CanPerformStep");
+	
+	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("CanPerformStep");
 
 	/**
 	 * @var EquipletAgent equipletAgent
@@ -99,21 +103,27 @@ public class CanPerformStep extends ReceiveBehaviour {
 	private EquipletAgent equipletAgent;
 
 	/**
-	 * @var BlackboardClient equipletBBClient
-	 *      The blackboard client for the Equiplet.
+	 * @var BlackboardClient productStepsBlackBoard
+	 *      The productStepsBlackBoard client for the Equiplet.
 	 **/
-	private BlackboardClient equipletBBClient;
+	private BlackboardClient productStepsBlackboard;
 
+	/**
+	 * @var ProductStep currentProductStep
+	 * 		The used prodcut step in the current question
+	 */
+	private ProductStep currentProductStep;
+	
 	/**
 	 * Instantiates a new can perform step.
 	 * 
-	 * @param a The agent for this behaviour
-	 * @param equipletBBClient The BlackboardClient for the EquipletBlackboard.
+	 * @param equipletAgent The agent for this behaviour
+	 * @param productStepsBlackBoard The BlackboardClient for the EquipletBlackboard.
 	 */
-	public CanPerformStep(EquipletAgent a, BlackboardClient equipletBBClient) {
-		super(a, messageTemplate);
-		equipletAgent = a;
-		this.equipletBBClient = equipletBBClient;
+	public CanPerformStep(EquipletAgent equipletAgent, BlackboardClient productStepsBlackBoard) {
+		super(equipletAgent, MESSAGE_TEMPLATE);
+		this.equipletAgent = equipletAgent;
+		this.productStepsBlackboard = productStepsBlackBoard;
 	}
 
 	/**
@@ -125,45 +135,80 @@ public class CanPerformStep extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		//Logger.log("%s received message from %s%n", myAgent.getLocalName(), message.getSender().getLocalName(),
-				//message.getOntology());
 
-		ProductionStep productStep = null;
-		try {
-			// gets the productstep out of the message.
-			productStep = (ProductionStep) message.getContentObject();
-			ObjectId productStepEntryId = null;
-
-			// puts the productstep on the blackboard.
-			// TODO: get inputParts instead of dummy data (overleggen met productagent)
-			Part[] inputParts = {
-					new Part(1), new Part(2)
-			};
-			ProductStep entry =
-					new ProductStep(message.getSender(), productStep.getCapability(), productStep.getParameters(),
-							inputParts, null, StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
-			productStepEntryId = equipletBBClient.insertDocument(entry.toBasicDBObject());
-			equipletAgent.addCommunicationRelation(message.getConversationId(), productStepEntryId);
-
-			// asks the service agent if the productionstep can be done.
-			ACLMessage responseMessage = new ACLMessage(ACLMessage.REQUEST);
-			responseMessage.setConversationId(message.getConversationId());
-			responseMessage.addReceiver(equipletAgent.getServiceAgent());
-			responseMessage.setOntology("CanDoProductionStep");
-			responseMessage.setContentObject(productStepEntryId);
-			equipletAgent.send(responseMessage);
-		} catch(IOException | InvalidDBNamespaceException | GeneralMongoException | NullPointerException e) {
-			Logger.log(LogLevel.ERROR, e);
-			ACLMessage reply = message.createReply();
-			reply.setPerformative(ACLMessage.FAILURE);
-			reply.setContent("Failed to process the step");
-			equipletAgent.send(reply);
-		} catch(UnreadableException e) {
-			Logger.log(LogLevel.ERROR, e);
-			ACLMessage reply = message.createReply();
-			reply.setPerformative(ACLMessage.FAILURE);
-			reply.setContent("No step given");
-			equipletAgent.send(reply);
+		if(message.getPerformative() == ACLMessage.QUERY_IF){
+			
+			try {
+				// gets the productstep out of the message.
+				ProductionStep productStep = null;
+				ObjectId productStepEntryId = null;
+				
+				productStep = (ProductionStep) message.getContentObject();
+	
+				// puts the productstep on the blackboard.
+				// TODO: get inputParts instead of dummy data (overleggen met productagent)
+				
+				// Set up inputParts depending on capability
+				Part[] inputParts = null;
+				
+				if(productStep != null) {
+					if(productStep.getCapability() == 1) {
+						inputParts = new Part[]{
+							new Part(1), new Part(2)
+						};
+					} else if(productStep.getCapability() == 3) {
+						inputParts = new Part[]{
+							new Part(3)
+						};
+					}
+				} else {
+					// error
+				}
+				currentProductStep =
+						new ProductStep(message.getSender(), productStep.getCapability(), productStep.getParameters(),
+								inputParts, null, StepStatusCode.EVALUATING, new BasicDBObject(), new ScheduleData());
+				productStepEntryId = productStepsBlackboard.insertDocument(currentProductStep.toBasicDBObject());
+				equipletAgent.addCommunicationRelation(message.getConversationId(), productStepEntryId);
+				
+				// start behaviour to ask the service agent if the productionstep can be done.
+				equipletAgent.addBehaviour(new CanPerformProductionStep(equipletAgent, productStepsBlackboard, this,
+																		message.getConversationId(), productStepEntryId));
+				
+				
+				
+				
+			} catch(InvalidDBNamespaceException | GeneralMongoException | NullPointerException e) {
+				Logger.log(LogLevel.ERROR, "", e);
+				ACLMessage errorResponse = message.createReply();
+				errorResponse.setPerformative(ACLMessage.FAILURE);
+				errorResponse.setContent("Failed to process the step");
+				equipletAgent.send(errorResponse);
+			} catch(UnreadableException e) {
+				Logger.log(LogLevel.ERROR, "", e);
+				ACLMessage errorResponse = message.createReply();
+				errorResponse.setPerformative(ACLMessage.FAILURE);
+				errorResponse.setContent("No step given");
+				equipletAgent.send(errorResponse);
+			}
 		}
+		else if (message.getPerformative() == ACLMessage.DISCONFIRM){
+			
+		}
+	}
+
+	/**
+	 * Function to handle the callback from subbehaviours
+	 * @param message The message received in the subbehaviour
+	 * @param arguments Optional arguments from the subbehaviour
+	 */
+	@Override
+	public void callback(ACLMessage message, BehaviourCallbackItem arguments){
+		// sends a message with the result of the behaviour subroutine
+		// to the productAgent to answer to the question CanPerformStep.
+		ACLMessage resultMessage = new ACLMessage(message.getPerformative());
+		resultMessage.setConversationId(message.getConversationId());
+		resultMessage.setOntology("CanPerformStep");
+		resultMessage.addReceiver(currentProductStep.getProductAgentId());
+		equipletAgent.send(resultMessage);
 	}
 }

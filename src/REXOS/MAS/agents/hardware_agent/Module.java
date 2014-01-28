@@ -55,7 +55,7 @@ import com.mongodb.BasicDBObject;
 /**
  * The abstract class for a Module
  */
-public abstract class Module {
+public abstract  class Module {
 	/**
 	 * @var String name
 	 *      The name of the module. It should be the same as the one in the knowledge database.

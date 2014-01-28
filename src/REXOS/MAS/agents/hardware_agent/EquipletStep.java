@@ -38,8 +38,8 @@ package agents.hardware_agent;
 
 import org.bson.types.ObjectId;
 
-import agents.data.MongoSaveable;
-import agents.data.StepStatusCode;
+import agents.data_classes.MongoSaveable;
+import agents.data_classes.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 
@@ -74,15 +74,15 @@ public class EquipletStep implements MongoSaveable {
 	 */
 	private InstructionData instructionData;
 	/**
-	 * @var StepStatusCode status
-	 *      The status of this step.
+	 * @var StepStatusCode equipletStepStatus
+	 *      The status of this Equiplet Step.
 	 */
-	private StepStatusCode status;
+	private StepStatusCode equipletStepStatus;
 
 	/**
 	 * @var BasicDBObject statusData
 	 *      The extra data provided by the status for
-	 *      this product step.
+	 *      this equiplet step.
 	 */
 	private BasicDBObject statusData;
 
@@ -114,7 +114,7 @@ public class EquipletStep implements MongoSaveable {
 		this.serviceStepID = serviceStepID;
 		this.moduleId = moduleId;
 		this.instructionData = instructionData;
-		this.status = status;
+		this.equipletStepStatus = status;
 		this.statusData = statusData;
 		this.timeData = timeData;
 	}
@@ -163,7 +163,7 @@ public class EquipletStep implements MongoSaveable {
 	 * @param EquipletStep
 	 *            The EquipletStep to set it to.
 	 */
-	public void setNextStep(ObjectId EquipletStep) {
+	public void setNextEquipletStep(ObjectId EquipletStep) {
 		this.nextStep = EquipletStep;
 	}
 
@@ -172,7 +172,7 @@ public class EquipletStep implements MongoSaveable {
 	 * 
 	 * @return The nextStep
 	 */
-	public ObjectId getNextStep() {
+	public ObjectId getNextEquipletStep() {
 		return nextStep;
 	}
 
@@ -215,22 +215,22 @@ public class EquipletStep implements MongoSaveable {
 	}
 
 	/**
-	 * Getter for the status
+	 * Getter for the equiplet step status
 	 * 
-	 * @return the status
+	 * @return the equiplet step status
 	 */
-	public StepStatusCode getStatus() {
-		return status;
+	public StepStatusCode getEquipletStepStatus() {
+		return equipletStepStatus;
 	}
 
 	/**
-	 * Setter for the status
+	 * Setter for the equiplet step status
 	 * 
-	 * @param status
-	 *            The status to set it to
+	 * @param equipletStepStatus
+	 *            The equiplet step status to set it to
 	 */
-	public void setStatus(StepStatusCode status) {
-		this.status = status;
+	public void setEquipletStepStatus(StepStatusCode equipletStepStatus) {
+		this.equipletStepStatus = equipletStepStatus;
 	}
 
 	/**
@@ -279,7 +279,7 @@ public class EquipletStep implements MongoSaveable {
 	@Override
 	public String toString() {
 		return String.format("EquipletStep [serviceStepID=%s, instructionData=%s, status=%s, timeData=%s]",
-				serviceStepID, instructionData, status, timeData);
+				serviceStepID, instructionData, equipletStepStatus, timeData);
 	}
 
 	/**
@@ -292,7 +292,7 @@ public class EquipletStep implements MongoSaveable {
 		object.put("nextStep", nextStep);
 		object.put("moduleId", moduleId);
 		object.put("instructionData", instructionData.toBasicDBObject());
-		object.put("status", status.toString());
+		object.put("status", equipletStepStatus.toString());
 		object.put("statusData", statusData);
 		object.put("timeData", timeData.toBasicDBObject());
 		return object;
@@ -309,7 +309,7 @@ public class EquipletStep implements MongoSaveable {
 		serviceStepID = (ObjectId) copy.remove("serviceStepID");
 		moduleId = (int) copy.remove("moduleId");
 		instructionData = new InstructionData((BasicDBObject) copy.remove("instructionData"));
-		status = StepStatusCode.valueOf((String) copy.remove("status"));
+		equipletStepStatus = StepStatusCode.valueOf((String) copy.remove("status"));
 		if(copy.containsField("statusData")) {
 			statusData = (BasicDBObject) copy.remove("statusData");
 		} else {
@@ -334,7 +334,7 @@ public class EquipletStep implements MongoSaveable {
 			EquipletStep firstServiceStep = null;
 			outer: for(EquipletStep serviceStep : unsortedSteps) {
 				for(EquipletStep equipletStep2 : unsortedSteps) {
-					if(equipletStep2.getNextStep() != null && equipletStep2.getNextStep().equals(serviceStep.getId())) {
+					if(equipletStep2.getNextEquipletStep() != null && equipletStep2.getNextEquipletStep().equals(serviceStep.getId())) {
 						continue outer;
 					}
 				}
@@ -348,7 +348,7 @@ public class EquipletStep implements MongoSaveable {
 			EquipletStep[] sortedSteps = new EquipletStep[stepsCount];
 			sortedSteps[0] = firstServiceStep;
 			for(int i = 1; i < stepsCount; i++) {
-				nextStepId = sortedSteps[i - 1].getNextStep();
+				nextStepId = sortedSteps[i - 1].getNextEquipletStep();
 				for(EquipletStep serviceStep : unsortedSteps) {
 					if(serviceStep.getId().equals(nextStepId)) {
 						sortedSteps[i] = serviceStep;

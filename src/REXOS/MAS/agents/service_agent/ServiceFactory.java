@@ -98,7 +98,7 @@ public class ServiceFactory {
 				serviceCache.put(description.getId(), service);
 			}
 		} catch (KnowledgeException | InstantiateClassException | KeyNotFoundException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 		}
 		
 		return service;
@@ -126,7 +126,7 @@ public class ServiceFactory {
 				}
 			}
 		} catch (KnowledgeException | KeyNotFoundException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 		}
 		
 		Service[] services = new Service[servicesForStep.size()];

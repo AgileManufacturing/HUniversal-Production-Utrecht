@@ -15,8 +15,11 @@ package agents.product_agent.behaviours;
 
 import java.util.concurrent.TimeUnit;
 
+import agents.logistics_agent.behaviours.ArePartsAvailable;
 import jade.core.Agent;
 import jade.core.behaviours.WakerBehaviour;
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.Logger;
 
 /**
  * @author Mike
@@ -67,7 +70,7 @@ public class HeartBeatBehaviour extends WakerBehaviour {
 			heartbeatSent = true;
 		}
 		} catch(Exception e) {
-			
+			Logger.log(LogLevel.ERROR, "gotta catch 'em all!", e);
 		}
 		this.reset(TimeUnit.SECONDS.toMillis(HEARTBEAT_INTERVAL));
 		
@@ -104,9 +107,4 @@ public class HeartBeatBehaviour extends WakerBehaviour {
 		this.stop();
 	}
 	
-	
-	
-	
-	
-
 }

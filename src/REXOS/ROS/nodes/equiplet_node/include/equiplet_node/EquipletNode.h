@@ -58,7 +58,7 @@ namespace equiplet_node {
 /**
  * The equipletNode, will manage all modules and keep track of their states
  **/
-class EquipletNode : public EquipletStateMachine,public Blackboard::BlackboardSubscriber
+class EquipletNode : public EquipletStateMachine, public Blackboard::BlackboardSubscriber
 {
 public:
 	static std::string nameFromId(int id){
@@ -81,20 +81,23 @@ private:
 	virtual void onStateChanged();
 	virtual void onModeChanged();
 
-	void callLookupHandler(std::string lookupType, std::string lookupID, std::map<std::string, std::string> payloadMap);
+	std::map<std::string, std::string> callLookupHandler(std::string lookupType, std::map<std::string, std::string> lookupParameters, std::map<std::string, std::string> payloadMap);
 
 	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
 
-	environment_communication_msgs::Map createMapMessage(std::map<std::string, std::string> &Map);
+	environment_communication_msgs::Map createMessageFromMap(std::map<std::string, std::string> &Map);
+	map<std::string, std::string> createMapFromMessage(environment_communication_msgs::Map Message);
+
+
 	bool setTransitionDone(rexos_statemachine::State transitionState);
 
 	void updateEquipletStateOnBlackboard();
 
-	/**
-	 * testdata
-	 **/
-	int amountOfIncomingMongoDBCalls;
+	void handleEquipletCommand(JSONNode n);
 
+	void handleEquipletStep(rexos_datatypes::EquipletStep * step, mongo::OID targetObjectId);
+
+	void handleDirectMoveCommand(int moduleId, mongo::OID targetObjectId);
 	/**
 	 * @var int equipletId
 	 * The id of the equiplet
@@ -105,9 +108,13 @@ private:
 	 * @var BlackboardCppClient  *blackboardClient
 	 * Client to read from blackboard
 	 **/
+	Blackboard::BlackboardCppClient *directMoveBlackBoardClient;
+	Blackboard::BlackboardSubscription* directMoveSubscription;
+
 
 	Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
 	Blackboard::FieldUpdateSubscription* equipletStepSubscription;
+	Blackboard::BlackboardSubscription* directEquipletStepSubscription;
 
 	Blackboard::BlackboardCppClient *equipletCommandBlackboardClient;
 	Blackboard::BlackboardSubscription* equipletCommandSubscription; 

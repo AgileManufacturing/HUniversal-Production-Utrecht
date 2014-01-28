@@ -34,6 +34,8 @@
 #include <rexos_modbus/ModbusController.h>
 #include <rexos_motor/StepperMotor.h>
 
+#include <vector>
+
 namespace rexos_motor{
 
 	/**
@@ -48,8 +50,8 @@ namespace rexos_motor{
 		 * @param motors Pointer array containing all motors for this manager.
 		 * @param numberOfMotors Number of motors in the pointer array.
 		 **/
-		MotorManager(rexos_modbus::ModbusController* modbus, StepperMotor** motors, int numberOfMotors) :
-			modbus(modbus), motors(motors), numberOfMotors(numberOfMotors), poweredOn(false){}
+		MotorManager(rexos_modbus::ModbusController* modbus, std::vector<StepperMotor*> motors) :
+			modbus(modbus), motors(motors), poweredOn(false){}
 
 		void powerOn(void);
 		void powerOff(void);
@@ -72,13 +74,7 @@ namespace rexos_motor{
 		 * @var StepperMotor** motors
 		 * Pointer array containing all motors for this manager.
 		 **/
-		StepperMotor** motors;
-
-		/**
-		 * @var int numberOfMotors
-		 * Number of motors in the pointer array.
-		 **/
-		int numberOfMotors;
+		std::vector<StepperMotor*> motors;
 
 		/**
 		 * @var bool poweredOn

@@ -3,7 +3,7 @@
 #include <equiplet_node/ModuleRegistry.h>
 #include <equiplet_node/scada/mongoose.h>
 
-#define SCADA_DEFAULT_DOCUMENT_ROOT "./src/www/equiplet_scada/"
+#define SCADA_DEFAULT_DOCUMENT_ROOT "./src/REXOS/www/equiplet_scada/"
 
 namespace equiplet_node {
 

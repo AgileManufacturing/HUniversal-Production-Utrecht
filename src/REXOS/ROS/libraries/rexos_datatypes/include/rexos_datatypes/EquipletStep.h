@@ -50,6 +50,7 @@ namespace rexos_datatypes{
         void setTimeData(TimeData timeData);
 
         JSONNode getJsonNode();
+        std::string toJSONString();
     private:
             JSONNode jsonNode;
             std::string _id;
@@ -61,9 +62,7 @@ namespace rexos_datatypes{
             std::map<std::string, std::string> statusData;
             TimeData timeData;
             void setValues(const JSONNode & n);
-            InstructionData setInstructionDataFromNode(const JSONNode & n);
             TimeData setTimeDataFromNode(const JSONNode & n);
-            std::map<std::string, std::string> setMapFromNode(const JSONNode & n);
     };
 }
 #endif	/* EQUIPLETSTEP_H */

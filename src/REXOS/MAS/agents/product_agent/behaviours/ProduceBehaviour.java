@@ -51,10 +51,10 @@ import java.util.HashMap;
 
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
-import agents.data.BehaviourStatus;
-import agents.data.ProductStep;
-import agents.data.Production;
-import agents.data.ProductionStep;
+import agents.data_classes.BehaviourStatus;
+import agents.data_classes.ProductStep;
+import agents.data_classes.Production;
+import agents.data_classes.ProductionStep;
 import agents.product_agent.BehaviourCallback;
 import agents.product_agent.ProductAgent;
 
@@ -173,7 +173,7 @@ public class ProduceBehaviour extends agents.shared_behaviours.ReceiveBehaviour 
 						_productionStepsCompleted++;
 						break;
 					default:
-						Logger.log(LogLevel.ERROR, new UnsupportedOperationException(
+						Logger.log(LogLevel.ERROR, "", new UnsupportedOperationException(
 								"No case for " + step.getStatus()));
 						break;
 					}
@@ -182,7 +182,7 @@ public class ProduceBehaviour extends agents.shared_behaviours.ReceiveBehaviour 
 					/* EquipletAgent taken down */
 					break;
 				default:
-					Logger.log(LogLevel.ERROR, new UnsupportedOperationException("No case for "
+					Logger.log(LogLevel.ERROR, "", new UnsupportedOperationException("No case for "
 							+ m.getOntology()));
 					break;
 				}
@@ -190,7 +190,7 @@ public class ProduceBehaviour extends agents.shared_behaviours.ReceiveBehaviour 
 				Logger.log(LogLevel.DEBUG, "No ontology set!");
 			}
 		} catch (Exception e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 			//_bc.handleCallback(BehaviourStatus.ERROR, null);
 			//_stopProduceBehaviour = true;
 		}

@@ -1,3 +1,7 @@
+# code lite
+*.session
+.codelite
+
 # Compiled Object files
 *.slo
 *.lo
@@ -42,6 +46,8 @@ sync.sh
 
 APDescription.txt
 MTPs-Main-Container.txt
+MTPs-GridAgents.txt
+gridLog.txt
 .classpath
 .project
 .settings/
@@ -50,3 +56,4 @@ doc
 
 ACLMsgs/
 product-*.xml
+gridLog.txt

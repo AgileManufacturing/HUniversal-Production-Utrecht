@@ -49,17 +49,17 @@ package agents.equiplet_agent.behaviours;
 
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import libraries.blackboard_client.BlackboardSubscriber;
-import libraries.blackboard_client.FieldUpdateSubscription;
-import libraries.blackboard_client.FieldUpdateSubscription.MongoUpdateLogOperation;
-import libraries.blackboard_client.GeneralMongoException;
-import libraries.blackboard_client.InvalidDBNamespaceException;
-import libraries.blackboard_client.MongoOperation;
-import libraries.blackboard_client.OplogEntry;
+import libraries.blackboard_client.data_classes.BlackboardSubscriber;
+import libraries.blackboard_client.data_classes.FieldUpdateSubscription;
+import libraries.blackboard_client.data_classes.GeneralMongoException;
+import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.MongoOperation;
+import libraries.blackboard_client.data_classes.OplogEntry;
+import libraries.blackboard_client.data_classes.FieldUpdateSubscription.MongoUpdateLogOperation;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
-import agents.data.EquipletState;
-import agents.data.EquipletStateEntry;
+import agents.data_classes.EquipletState;
+import agents.data_classes.EquipletStateEntry;
 import agents.equiplet_agent.EquipletAgent;
 import agents.equiplet_agent.EquipletDirectoryEntry;
 import agents.shared_behaviours.ReceiveOnceBehaviour;
@@ -80,11 +80,11 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
-	 *      The messageTemplate this behaviour listens to. This behaviour listens to the ontology:
-	 *      InitialisationFinished.
+	 * @var MessageTemplate MESSAGE_TEMPLATE
+	 *      The messageTemplate this behaviour listens to.
+	 *		This behaviour listens to the ontology: InitialisationFinished.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("InitialisationFinished");
+	private static MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("InitialisationFinished");
 
 	/**
 	 * @var EquipletAgent equipletAgent
@@ -97,11 +97,11 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 	/**
 	 * Instantiates a new can perform step.
 	 * 
-	 * @param a The agent for this behaviour
+	 * @param equipletAgent The agent for this behaviour
 	 */
-	public InitialisationFinished(EquipletAgent a) {
-		super(a, 3000, messageTemplate);
-		equipletAgent = a;
+	public InitialisationFinished(EquipletAgent equipletAgent) {
+		super(equipletAgent, 3000, MESSAGE_TEMPLATE);
+		this.equipletAgent = equipletAgent;
 		stateUpdateSubscription = new FieldUpdateSubscription("state", this);
 		stateUpdateSubscription.addOperation(MongoUpdateLogOperation.SET);
 	}
@@ -114,8 +114,6 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
-			//Logger.log("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(),
-					//message.getOntology());
 
 			try {
 				EquipletStateEntry equipletState = equipletAgent.getEquipletStateEntry();
@@ -130,15 +128,15 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 					equipletAgent.getCollectiveBBClient().insertDocument(directoryEntry.toBasicDBObject());
 				}
 			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-				Logger.log(LogLevel.ERROR, e);
+				Logger.log(LogLevel.ERROR, "", e);
 				equipletAgent.doDelete();
 			}
 
 			// starts the behaviour for receiving messages with the Ontology CanPerformStep.
 			equipletAgent.addBehaviour(new CanPerformStep(equipletAgent, equipletAgent.getProductStepBBClient()));
 
-			// starts the behaviour for receiving messages with the Ontology GetProductionDuration.
-			equipletAgent.addBehaviour(new GetProductionDuration(equipletAgent));
+			// starts the behaviour for receiving messages with the Ontology ProductionDuration.
+			equipletAgent.addBehaviour(new ProductionDuration(equipletAgent));
 
 			// starts the behaviour for receiving messages with the Ontology ScheduleStep.
 			equipletAgent.addBehaviour(new ScheduleStep(equipletAgent, equipletAgent.getProductStepBBClient()));
@@ -146,10 +144,8 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 			// starts the behaviour for receiving messages with the Ontology StartStep.
 			equipletAgent.addBehaviour(new StartStep(equipletAgent));
 			
-			// starts a behaviour which listens to the response of this question.
-			equipletAgent.addBehaviour(new CanDoProductionStepResponse(equipletAgent, equipletAgent.getProductStepBBClient()));
 		} else {
-			Logger.log(LogLevel.ERROR, equipletAgent.getName() + " - InitialisationFinished timeout!");
+			Logger.log(LogLevel.ERROR, "timeout!");
 			equipletAgent.doDelete();
 		}
 	}
@@ -176,9 +172,9 @@ public class InitialisationFinished extends ReceiveOnceBehaviour implements Blac
 					break;
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 			// Cannot add myself on the collective BB, so remove the agent since it cannot be found by product agents 
-			myAgent.doDelete();
+			equipletAgent.doDelete();
 		}
 	}
 }

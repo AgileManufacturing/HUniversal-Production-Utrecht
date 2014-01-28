@@ -5,6 +5,7 @@
  *
  * @author Dick van der Steen
  * @author Dennis Koole
+ * @authore Alexander Streng
  *
  * @section LICENSE
  * License: newBSD
@@ -29,7 +30,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include "delta_robot_node/deltaRobotNode.h"
+#include "delta_robot_node/DeltaRobotNode.h"
 #include "delta_robot_node/Point.h"
 #include <boost/bind.hpp>
 #include <execinfo.h>
@@ -38,116 +39,136 @@
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "DeltaRobotNode"
 // @endcond
-/**
- * The IP of the modbus we are connecting to
- **/
-#define MODBUS_IP "192.168.0.2"
-/** 
- * The port we are connecting to
- **/
-#define MODBUS_PORT 502
-
-#define Z_OFFSET -275
 
 /**
  * Constructor 
  * @param equipletID identifier for the equiplet
  * @param moduleID identifier for the deltarobot
  **/
-deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID) :
-	rexos_statemachine::ModuleStateMachine("delta_robot_node",equipletID, moduleID, true),
-	deltaRobot(NULL),
-	modbus(NULL),
-	motorManager(NULL),
-	setInstructionActionServer(nodeHandle, "delta_robot_node/set_instruction", boost::bind(&deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction, this, _1), false),
-	lastX(0.0),
-	lastY(0.0),
-	lastZ(-180.0){
+deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID, std::string manufacturer, std::string typeNumber, std::string serialNumber) :
+		rexos_knowledge_database::Module(manufacturer, typeNumber, serialNumber),
+		rexos_statemachine::ModuleStateMachine("delta_robot_node", equipletID, moduleID, true),
+		rexos_coordinates::Module(this),
+		deltaRobot(NULL),
+		moduleNodeName("delta_robot_node_" + std::to_string(equipletID) + "_" + std::to_string(moduleID)),
+		setInstructionActionServer(nodeHandle, moduleNodeName + "/set_instruction", boost::bind(&deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction, this, _1), false),
+		lastX(0.0),
+		lastY(0.0),
+		lastZ(0.0){
 	ROS_INFO("DeltaRobotnode Constructor entering...");
+	// get the properties and combine them for the deltarobot
+	rexos_knowledge_database::ModuleType* moduleType = this->getModuleType();
+	std::string properties = this->getModuleProperties();
+	std::string typeProperties = moduleType->getModuleTypeProperties();
 
-	ROS_INFO("Configuring Modbus...");
 
-	ROS_INFO("Advertising ActionServer at : delta_robot_node_1_1");
+	JSONNode jsonNode = libjson::parse(properties);
+	JSONNode typeJsonNode = libjson::parse(typeProperties);
 
-
-	// Initialize modbus for IO controller
-	modbus_t *modbusIO = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
-
-	if(modbusIO == NULL){
-		throw std::runtime_error("Unable to allocate libmodbus context");
+	for(JSONNode::const_iterator it = typeJsonNode.begin(); it != typeJsonNode.end(); it++) {
+		jsonNode.push_back(*it);
 	}
 
-	if(modbus_connect(modbusIO) == -1) {
-		throw std::runtime_error("Modbus connection to IO controller failed");
-	}
-
-	assert(modbusIO != NULL);
-
-	rexos_datatypes::DeltaRobotMeasures drm;
-	drm.base = rexos_delta_robot::Measures::BASE;
-	drm.hip = rexos_delta_robot::Measures::HIP;
-	drm.effector = rexos_delta_robot::Measures::EFFECTOR;
-	drm.ankle = rexos_delta_robot::Measures::ANKLE;
-	drm.maxAngleHipAnkle = rexos_delta_robot::Measures::HIP_ANKLE_ANGLE_MAX;
-
-	modbus = new rexos_modbus::ModbusController(modbus_new_rtu(
-		"/dev/ttyS0",
-		rexos_motor::CRD514KD::RtuConfig::BAUDRATE,
-		rexos_motor::CRD514KD::RtuConfig::PARITY,
-		rexos_motor::CRD514KD::RtuConfig::DATA_BITS,
-		rexos_motor::CRD514KD::RtuConfig::STOP_BITS));
-
-	// Motors is declared in the header file, size = 3
-	motors[0] = new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_0, rexos_delta_robot::Measures::MOTOR_ROT_MIN, rexos_delta_robot::Measures::MOTOR_ROT_MAX);
-	motors[1] = new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_1, rexos_delta_robot::Measures::MOTOR_ROT_MIN, rexos_delta_robot::Measures::MOTOR_ROT_MAX);
-	motors[2] = new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_2, rexos_delta_robot::Measures::MOTOR_ROT_MIN, rexos_delta_robot::Measures::MOTOR_ROT_MAX);
-
-	motorManager = new rexos_motor::MotorManager(modbus, motors, 3);
-
+	ROS_INFO("%s", jsonNode.write_formatted().c_str());
+	
 	// Create a deltarobot
-	deltaRobot = new rexos_delta_robot::DeltaRobot(drm, motorManager, motors, modbusIO);
+	deltaRobot = new rexos_delta_robot::DeltaRobot(jsonNode);
 
 	setInstructionActionServer.start();
-	ROS_INFO("DeltaRobot Node initialized");
+
+	ROS_INFO_STREAM("DeltaRobotNode initialized. Advertising actionserver on " << moduleNodeName << "/set_instruction");
 }
 
 
 
-deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode(){
+deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
 	delete deltaRobot;
-	delete motors[0];
-	delete motors[1];
-	delete motors[2];
-	delete modbus;
-	delete motorManager;	
 }
 
 
 void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
-
-	JSONNode n = libjson::parse(goal->json);
+	JSONNode instructionDataNode = libjson::parse(goal->json);
 	rexos_statemachine::SetInstructionResult result_;
-
 	result_.OID = goal->OID;
+	bool lookupIsSet = false;
+	bool movementZ = false;
+	std::string setValues;
 
-    JSONNode::const_iterator i = n.begin();
+    //construct a payload
+    //construct lookupvalues.
+	Point payloadPoint, lookupResultPoint;
+	double angle, rotatedX, rotatedY;
+    JSONNode::const_iterator i = instructionDataNode.begin();
+    while (i != instructionDataNode.end()){
+        const char * nodeName = i -> name().c_str();
+	    // keep in mind that a payload may or may not contain all values. Use lastXYZ to determine these values if they are not set.
+        if (strcmp(nodeName, "payload") == 0){
 
-    //We want to retrieve the payload from the msg.
-	if (strcmp(i[4].name().c_str(), "payload") == 0){
+			payloadPoint = parsePoint(*i, &setValues);
+			lookupResultPoint = parseLookup(*i);
+			std::string angleValue = parseNodeValue("angle", *i);
+			angle = rexos_utilities::stringToDouble(angleValue);
 
-			Point p = parsePoint(i[4]);
-
-			if(moveToPoint(p.x, p.y, p.z, p.maxAcceleration)){
-				//Move is succesfull, set the result.
-    			setInstructionActionServer.setSucceeded(result_);
-			} else {
-				ROS_INFO("Failed moving to point");
-    			setInstructionActionServer.setAborted(result_);
+			//check whether lookup is set. If all values are 0, we can presume the lookup isnt set.
+			//Bit dangerous tho, what happends if they are all exactly 0?
+			if(!(lookupResultPoint.x == 0 && lookupResultPoint.y == 0 && angle == 0)){
+				lookupIsSet = true;
 			}
-			
-    } else {
-    	setInstructionActionServer.setAborted(result_);
+
+			if(setValues.find("x") == -1 && setValues.find("y") == -1) {
+				// Probably a Z movement
+				payloadPoint.x = deltaRobot->getEffectorLocation().x;
+				payloadPoint.y = deltaRobot->getEffectorLocation().y;
+				movementZ = true;
+			}
+
+			if(setValues.find("z") == -1) {
+				// Probably a XY movement
+				payloadPoint.z = deltaRobot->getEffectorLocation().z;
+			}
+
+        }
+        ++i;
     }
+
+    Vector3 moveVector;
+    //lookup is set, so transform the (rotated) crate to a normal position.
+    if(lookupIsSet) {
+		Vector3 lookupVector(lookupResultPoint.x, lookupResultPoint.y, lookupResultPoint.z);
+
+		double theta = angle * 3.141592653589793 / 180.0;
+		double cs = cos(theta);
+		double sn = sin(theta);
+		rotatedX = payloadPoint.x * cs - payloadPoint.y * sn;
+		rotatedY = payloadPoint.x * sn + payloadPoint.y * cs;
+
+	    //translate the relative point to real equiplet coordinates.
+		Vector3 translatedVector = convertToModuleCoordinate(lookupVector);
+
+		std::cout << "[TranslatedVectorX]: \t" << translatedVector.x << "\n[TranslatedVectorY]: \t" << translatedVector.y << std::endl;
+
+		if(movementZ) {
+			// Z Movement
+			moveVector.set(payloadPoint.x, payloadPoint.y, (translatedVector.z + payloadPoint.z));
+		} else {
+			// XY Movement
+			moveVector.set((translatedVector.x + rotatedX), (translatedVector.y + rotatedY), payloadPoint.z);
+			std::cout << "[MoveVectorX]: \t" << moveVector.x << "\n[MoveVectorY]: \t" << moveVector.y << std::endl;
+		}
+
+	} else {
+		moveVector.set(payloadPoint.x, payloadPoint.y, payloadPoint.z);
+	}
+
+	//std::cout << "trying to move to x: " << moveVector.x << " y: " << moveVector.y << " z: " <<  moveVector.z << " with acceleration: " << payloadPoint.maxAcceleration << std::endl;
+	if(moveToPoint(moveVector.x, moveVector.y, moveVector.z, payloadPoint.maxAcceleration)){
+		setInstructionActionServer.setSucceeded(result_);
+		return;
+	}
+
+  	//finally move to point.
+	ROS_INFO("Failed moving to point");
+	setInstructionActionServer.setAborted(result_);
 }
 
 
@@ -178,8 +199,6 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate(){
 bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(double x, double y, double z, double maxAcceleration){
 	rexos_datatypes::Point3D<double> oldLocation(deltaRobot->getEffectorLocation());
 	rexos_datatypes::Point3D<double> newLocation(x,y,z);
-
-	ROS_INFO("moveTo: (%f, %f, %f) maxAcceleration=%f", x, y, z, maxAcceleration);
 
 	if(deltaRobot->checkPath(oldLocation, newLocation)){
 
@@ -222,7 +241,6 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(double x, doub
  **/
 void deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Setup transition called");
-
 	// Generate the effector boundaries with voxel size 2
 	deltaRobot->generateBoundaries(2);
 	// Power on the deltarobot and calibrate the motors.
@@ -232,7 +250,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(rexos_statemachine
 		ROS_ERROR("Calibration FAILED. EXITING.");
 			as->setAborted();
 	} else {
-	as->setSucceeded();
+		as->setSucceeded();
 	}
 }
 
@@ -275,55 +293,70 @@ void deltaRobotNodeNamespace::DeltaRobotNode::transitionStop(rexos_statemachine:
  *
  * @return Point object that is initialized from the data in the JSON
  **/
-deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoint(const JSONNode & n){
+deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoint(const JSONNode & n, std::string * valuesSet){
 
 	JSONNode::const_iterator i = n.begin();
 	Point p;
 
-	bool xSet = false;
-	bool ySet = false;
-
-	ROS_INFO("parsing json to point");
 	while(i != n.end()){
 		// get the JSON node name and value as a string
 		std::string node_name = i->name();
 
-		if(node_name == "x")
-		{
+		if(node_name == "x") {
 			p.x = i->as_float();
-			lastX = p.x;
-			xSet = true;
-		} 
-		else if(node_name == "y")
-		{
+			*valuesSet += "x";
+		} else if(node_name == "y") {
 			p.y = i->as_float();
-			lastY = p.y;
-			ySet = true;
-		} 
-		else if(node_name == "z")
-		{
-			p.z = i->as_float() + Z_OFFSET;
-			lastZ = p.z;
-		} 
-		else if(node_name == "maxAcceleration"){
+			*valuesSet += "y";
+		} else if(node_name == "z") {
+			p.z = i->as_float();
+			*valuesSet += "z";
+		} else if(node_name == "maxAcceleration"){
 			p.maxAcceleration = i->as_float();
 		}
 
 		++i;
 	}
+	
+	return p;
+}
 
-	if(p.x == 0 && !xSet){
-		p.x = lastX;
-	}
-	if(p.y == 0 && !ySet){
-		p.y = lastY;
-	}
-	if(p.z  == 0){
-		p.z = lastZ;
+deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parseLookup(const JSONNode & n){
+
+	Point p;
+	JSONNode::const_iterator i = n.begin();
+	while(i != n.end()) {
+		// get the JSON node name and value as a string
+		std::string node_name = i->name();
+		if(node_name == "locationX") {
+			p.x = i->as_float();
+		} else if(node_name == "locationY") {
+			p.y = i->as_float();
+		} else if(node_name == "locationZ") {
+			p.z = i->as_float();
+		}
+		++i;
 	}
 
 	return p;
 }
+
+std::string deltaRobotNodeNamespace::DeltaRobotNode::parseNodeValue(const std::string nodeName, const JSONNode & n){
+
+	JSONNode::const_iterator i = n.begin();
+	std::string result;
+	while(i != n.end()){
+		// get the JSON node name and value as a string
+		std::string node_name = i->name();
+		if(node_name == nodeName)
+		{
+			result = i->as_string();
+		} 
+		++i;
+	}
+	return result;
+}
+
 
 /**
  * Parse a JSON string to a Point object
@@ -335,13 +368,14 @@ deltaRobotNodeNamespace::Point deltaRobotNodeNamespace::DeltaRobotNode::parsePoi
  **/
 deltaRobotNodeNamespace::Point* deltaRobotNodeNamespace::DeltaRobotNode::parsePointArray(std::string json, int &size){
 	ROS_INFO("Parsing JSON Array");
+	std::string discarded;
 	JSONNode pathArray = libjson::parse(json);
 	Point *path = new Point[pathArray.size()];
 	int counter = 0;
 
 	JSONNode::const_iterator i = pathArray.begin();
 	while(i != pathArray.end()){
-		Point p = parsePoint(*i);
+		Point p = parsePoint(*i, &discarded);
 		path[counter++] = p;
 		++i;
 	}
@@ -359,19 +393,27 @@ deltaRobotNodeNamespace::Point* deltaRobotNodeNamespace::DeltaRobotNode::parsePo
  * Main that creates the deltaRobotNode and starts the statemachine
  **/
 int main(int argc, char **argv){
-	int equipletID = 0;
-	int moduleID = 0;
-
-	if(argc < 3 || !(rexos_utilities::stringToInt(equipletID, argv[1]) == 0 && rexos_utilities::stringToInt(moduleID, argv[2]) == 0)){ 	 	
-		ROS_INFO("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
+	ros::init(argc, argv, NODE_NAME);
+	
+	if(argc < 6){
+		ROS_ERROR("Usage: delta_robot_node equipletId, moduleId, manufacturer, typeNumber, serialNumber");
 		return -1;
 	}
-
-	ros::init(argc, argv, NODE_NAME);
-
+	
+	
+	int equipletID;
+	int moduleID;
+	try{
+		equipletID = rexos_utilities::stringToInt(argv[1]);
+		moduleID = rexos_utilities::stringToInt(argv[2]);
+	} catch(std::runtime_error ex) {
+		ROS_ERROR("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
+		return -2;
+	}
+	
 	ROS_INFO("Creating DeltaRobotNode");
 
-	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID);
+	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID, argv[3], argv[4], argv[5]);
 
 	ROS_INFO("Running StateEngine");
 	ros::spin();

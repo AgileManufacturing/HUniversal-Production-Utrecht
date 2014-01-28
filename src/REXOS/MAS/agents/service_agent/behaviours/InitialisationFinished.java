@@ -55,11 +55,11 @@ public class InitialisationFinished extends ReceiveBehaviour {
 	private static final long serialVersionUID = 581780075377109392L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
+	 * @var MessageTemplate MESSAGE_TEMPLATE
 	 *      The messageTemplate this behaviour listens to. This behaviour listens to the ontology:
 	 *      InitialisationFinished.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("InitialisationFinished");
+	private static MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("InitialisationFinished");
 
 	/**
 	 * @var ServiceAgent serviceAgent
@@ -70,11 +70,11 @@ public class InitialisationFinished extends ReceiveBehaviour {
 	/**
 	 * Instantiates a new InitialisationFinished.
 	 * 
-	 * @param a The agent for this behaviour
+	 * @param serviceAgent The agent for this behaviour
 	 */
-	public InitialisationFinished(ServiceAgent a) {
-		super(a, messageTemplate);
-		serviceAgent = a;
+	public InitialisationFinished(ServiceAgent serviceAgent) {
+		super(serviceAgent, MESSAGE_TEMPLATE);
+		this.serviceAgent = serviceAgent;
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class InitialisationFinished extends ReceiveBehaviour {
 			response.setOntology("InitialisationFinished");
 			serviceAgent.send(response);
 		} else {
-			Logger.log(LogLevel.DEBUG, serviceAgent.getName() + " - InitialisationFinished timeout!");
+			Logger.log(LogLevel.DEBUG, "" + serviceAgent.getName() + " - InitialisationFinished timeout!");
 			serviceAgent.doDelete();
 		}
 	}

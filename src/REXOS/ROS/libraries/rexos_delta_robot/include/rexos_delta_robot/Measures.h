@@ -40,96 +40,96 @@ namespace rexos_delta_robot{
     	 * @var double BASE
     	 * Radius of the base in millimeters.
     	 **/
-		const double BASE		= 101.3;
+//		const double BASE		= 101.3;
 
 		/**
 		 * @var double HIP
 		 * Length of the hip in millimeters.
 		 **/
-		const double HIP		= 100;
+//		const double HIP		= 100;
 
 		/**
 		 * @var double EFFECTOR
 		 * Radius of the effector in millimeters.
 		 **/
-		const double EFFECTOR	= 46.19;
+//		const double EFFECTOR	= 46.19;
 
 		/**
 		 * @var double ANKLE
 		 * Length of the ankle in millimeters.
 		 **/
-		const double ANKLE		= 250;
+//		const double ANKLE		= 250;
 		
 		/**
 		 * @var double HIP_ANKLE_ANGLE_MAX
 		 * Maximum angle between hip and ankle when moving the ankle sideways in radians.
 		 **/
-		const double HIP_ANKLE_ANGLE_MAX = rexos_utilities::degreesToRadians(22);
+//		const double HIP_ANKLE_ANGLE_MAX = rexos_utilities::degreesToRadians(22);
 
 		/**
 		 * @var double MOTOR_ROT_MIN
 		 * Mathematical minimum angle the motor is allowed to move to in radians.
 		 **/
-		const double MOTOR_ROT_MIN = rexos_utilities::degreesToRadians(-42);
+//		const double MOTOR_ROT_MIN = rexos_utilities::degreesToRadians(-18);
 
 		/**
 		 * @var double MOTOR_ROT_MAX
 		 * Mathematical maximum angle the motor is allowed to move to in radians.
 		 **/
-		const double MOTOR_ROT_MAX = rexos_utilities::degreesToRadians(55);
+//		const double MOTOR_ROT_MAX = rexos_utilities::degreesToRadians(43);
 		
 		/**
 		 * @var double MOTORS_FROM_ZERO_TO_TOP_POSITION
 		 * The angle from zero (horizontal) to the top position in radians.
 		 **/
-		const double MOTORS_FROM_ZERO_TO_TOP_POSITION = rexos_utilities::degreesToRadians(42.5); 
+//		const double MOTORS_FROM_ZERO_TO_TOP_POSITION = rexos_utilities::degreesToRadians(20); 
 
 		/**
 		 * @var double BOUNDARY_BOX_MAX_X
 		 * The max x-coordinate of the effector boundary box in millimeters.
 		 **/
- 		const double BOUNDARY_BOX_MAX_X = 500;
+// 		const double BOUNDARY_BOX_MAX_X = 50;
 
  		/**
 		 * @var double BOUNDARY_BOX_MAX_Y
 		 * The max y-coordinate of the effector boundary box in millimeters.
 		 **/
-		const double BOUNDARY_BOX_MAX_Y = BOUNDARY_BOX_MAX_X;
+//		const double BOUNDARY_BOX_MAX_Y = BOUNDARY_BOX_MAX_X;
 
 		/**
 		 * @var double BOUNDARY_BOX_MIN_X
 		 * The min x-coordinate of the effector boundary box in millimeters.
 		 **/
-		const double BOUNDARY_BOX_MIN_X = -BOUNDARY_BOX_MAX_X;
+//		const double BOUNDARY_BOX_MIN_X = -BOUNDARY_BOX_MAX_X;
 
 		/**
 		 * @var double BOUNDARY_BOX_MIN_Y
 		 * The min y-coordinate of the effector boundary box in millimeters.
 		 **/
-		const double BOUNDARY_BOX_MIN_Y = -BOUNDARY_BOX_MAX_Y;
+//		const double BOUNDARY_BOX_MIN_Y = -BOUNDARY_BOX_MAX_Y;
 
 		/**
 		 * @var double BOUNDARY_BOX_MIN_Z
 		 * The min z-coordinate of the effector boundary box in millimeters.
 		 **/
-		const double BOUNDARY_BOX_MIN_Z = -275;
+//		const double BOUNDARY_BOX_MIN_Z = -275;
 
 		/**
 		 * @var double BOUNDARY_BOX_MAX_Z
 		 * The max z-coordinate of the effector boundary box in millimeters.
 		 **/
-		const double BOUNDARY_BOX_MAX_Z = -180;
+//		const double BOUNDARY_BOX_MAX_Z = -180;
 
 		/**
 		 * @var double CALIBRATION_STEP_SMALL
 		 * The size of the small steps in the calibration in radians.
 		 **/
-		const double CALIBRATION_STEP_SMALL = rexos_motor::CRD514KD::MOTOR_STEP_ANGLE;
+//		const double CALIBRATION_STEP_SMALL = rexos_motor::CRD514KD::MOTOR_STEP_ANGLE;
 		
 		/**
 		 * @var double CALIBRATION_STEP_BIG
 		 * The size of the big calibration steps in radians. Currently equal to 20 small calibration steps.
 		 **/
-		 const double CALIBRATION_STEP_BIG = CALIBRATION_STEP_SMALL * 20;
+//		 const double CALIBRATION_STEP_BIG = CALIBRATION_STEP_SMALL * 20;
 	}
 }

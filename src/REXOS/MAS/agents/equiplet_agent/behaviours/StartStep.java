@@ -37,21 +37,21 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import libraries.blackboard_client.BlackboardClient;
-import libraries.blackboard_client.BlackboardSubscriber;
-import libraries.blackboard_client.FieldUpdateSubscription;
-import libraries.blackboard_client.FieldUpdateSubscription.MongoUpdateLogOperation;
-import libraries.blackboard_client.GeneralMongoException;
-import libraries.blackboard_client.InvalidDBNamespaceException;
-import libraries.blackboard_client.MongoOperation;
-import libraries.blackboard_client.OplogEntry;
+import libraries.blackboard_client.data_classes.BlackboardSubscriber;
+import libraries.blackboard_client.data_classes.FieldUpdateSubscription;
+import libraries.blackboard_client.data_classes.GeneralMongoException;
+import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.MongoOperation;
+import libraries.blackboard_client.data_classes.OplogEntry;
+import libraries.blackboard_client.data_classes.FieldUpdateSubscription.MongoUpdateLogOperation;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
-import agents.data.EquipletState;
-import agents.data.EquipletStateEntry;
-import agents.data.StepStatusCode;
+import agents.data_classes.EquipletState;
+import agents.data_classes.EquipletStateEntry;
+import agents.data_classes.StepStatusCode;
 import agents.equiplet_agent.EquipletAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 
@@ -71,11 +71,11 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
+	 * @var MessageTemplate MESSAGE_TEMPLATE
 	 *      The messageTemplate this behaviour listens to.
 	 *      This behaviour listens to the ontology: StartStep.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("StartStep");
+	private static MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("StartStep");
 
 	/**
 	 * @var EquipletAgent equipletAgent
@@ -90,12 +90,12 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 	/**
 	 * Instantiates a new can perform step.
 	 * 
-	 * @param a The agent for this behaviour
+	 * @param equipletAgent The agent for this behaviour
 	 * @param equipletBBClient The BlackboardClient for this equiplet's blackboard.
 	 */
-	public StartStep(Agent a) {
-		super(a, messageTemplate);
-		equipletAgent = (EquipletAgent) a;
+	public StartStep(EquipletAgent equipletAgent) {
+		super(equipletAgent, MESSAGE_TEMPLATE);
+		this.equipletAgent = equipletAgent;
 		stateUpdateSubscription = new FieldUpdateSubscription("state", this);
 		stateUpdateSubscription.addOperation(MongoUpdateLogOperation.SET);
 	}
@@ -107,14 +107,12 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		//Logger.log("%s received message from %s (%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(),
-				//message.getOntology());
 
 		// Gets the productStepId and updates all the productsteps on the blackboard the status to waiting.
 		try {
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
 			if(false){//equipletAgent.getEquipletStateEntry().getEquipletState() != EquipletState.NORMAL) {
-				Logger.log(LogLevel.DEBUG, "%d Equiplet agent - changing state%n", EquipletAgent.getCurrentTimeSlot());
+				Logger.log(LogLevel.DEBUG, "%d Equiplet Agent-changing state%n", equipletAgent.getCurrentTimeSlot());
 
 				//equipletAgent.getStateBBClient().subscribe(stateUpdateSubscription);
 				//equipletAgent.setDesiredEquipletState(EquipletState.NORMAL);
@@ -123,14 +121,14 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 				
 				equipletAgent.getTimer().rescheduleTimer();
 			} else {
-				Logger.log(LogLevel.DEBUG, "%d Equiplet agent - Starting prod. step.%n", EquipletAgent.getCurrentTimeSlot());
+				Logger.log(LogLevel.DEBUG, "%d Equiplet Agent-Starting prod. step.%n", equipletAgent.getCurrentTimeSlot());
 				equipletAgent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
 						new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));
 				
 				equipletAgent.getTimer().rescheduleTimer();
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 			//TODO handle error
 			equipletAgent.doDelete();
 		}
@@ -146,7 +144,7 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 			if(dbObject != null) {
 				EquipletStateEntry state = new EquipletStateEntry((BasicDBObject) dbObject);
 				if(state.getEquipletState() == EquipletState.NORMAL) {
-					Logger.log(LogLevel.DEBUG, "%d Equiplet agent - equip. state changed to NORMAL. Starting prod. step.", EquipletAgent.getCurrentTimeSlot());
+					Logger.log(LogLevel.DEBUG, "%d Equiplet Agent-equip. state changed to NORMAL. Starting prod. step.", equipletAgent.getCurrentTimeSlot());
 
 					equipletAgent.getProductStepBBClient().updateDocuments(new BasicDBObject("_id", productStepId),
 							new BasicDBObject("$set", new BasicDBObject("status", StepStatusCode.WAITING.name())));
@@ -157,7 +155,7 @@ public class StartStep extends ReceiveBehaviour implements BlackboardSubscriber 
 				}
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 			//TODO handle error
 		}
 	}

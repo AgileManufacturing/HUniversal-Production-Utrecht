@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(delta_robot_node)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation rexos_statemachine rexos_modbus rexos_std_msgs rexos_std_srvs rexos_utilities rexos_datatypes rexos_delta_robot libjson)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation rexos_statemachine rexos_modbus rexos_std_msgs rexos_std_srvs rexos_utilities rexos_datatypes rexos_delta_robot libjson actionlib rexos_coordinates)
 find_package(Log4cxx)
 
 file(GLOB_RECURSE msgs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/msg" "*.msg")
@@ -23,7 +23,7 @@ generate_messages (
 catkin_package(
 INCLUDE_DIRS include 
 LIBRARIES  
-CATKIN_DEPENDS rexos_statemachine rexos_modbus rexos_std_msgs rexos_std_srvs rexos_utilities rexos_datatypes rexos_delta_robot libjson roscpp std_msgs
+CATKIN_DEPENDS actionlib rexos_statemachine rexos_modbus rexos_std_msgs rexos_std_srvs rexos_utilities rexos_datatypes rexos_delta_robot libjson roscpp std_msgs rexos_coordinates
 DEPENDS)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
@@ -34,4 +34,4 @@ add_executable(delta_robot_node src/DeltaRobotNode.cpp)
 target_link_libraries(delta_robot_node ${catkin_LIBRARIES} ${LOG4CXX_LIBRARIES})
 add_dependencies(delta_robot_node delta_robot_node_gencpp)
 
-
+add_definitions("-std=c++0x")

@@ -106,8 +106,6 @@ mongo::Query OplogMonitor::createOplogQuery()
 	} else {
 		query = QUERY("$or" << orArray.arr());
 	}
-
-	std::cout << "Using query to create oplog: " << query << std::endl;
 	return query;
 }
 
@@ -133,7 +131,6 @@ void OplogMonitor::run()
 		while(!tailedCursor->isDead()){
 			while (tailedCursor->more()) {
 				const OplogEntry oplogEntry(tailedCursor->nextSafe());
-				std::cout << oplogEntry.toString() << std::endl;
 				subscriptionsMutex.lock();
 				for (std::vector<BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
 					if ((*iter)->matchesWithEntry(oplogEntry)) {
@@ -145,7 +142,7 @@ void OplogMonitor::run()
 			}
 			boost::this_thread::interruption_point();
 		}
-		std::cout << "Cursor is dead." << std::endl;
+		std::cout << "Cursor is dead. Blackboard might be empty." << std::endl;
 	} catch (boost::thread_interrupted& e) {
 		// Thread has been interrupted, work is done.
 		std::cout << "Interrupted cursorid: " << currentCursorId << "\noplogNamespace: " << oplogNamespace << "\nquery: " << query << "\nskipCount: " << skipCount << std::endl;

@@ -50,7 +50,8 @@ ModuleProxy* ModuleRegistry::getModule(int moduleId){
 
 bool ModuleRegistry::onRegisterServiceModuleCallback(RegisterModule::Request &req, RegisterModule::Response &res) {
 	ROS_INFO("ModuleRegistry: New module %s with id %d registering", req.name.c_str(), req.id);
-	if(!newRegistrationsAllowed){
+	
+	if(!newRegistrationsAllowed) {
 		ROS_INFO("registration of new module not allowed");
 		return false;
 	}
@@ -96,6 +97,17 @@ void ModuleRegistry::onInstructionStepCompleted(
 	
 	if(moduleRegistryListener != NULL){
 		moduleRegistryListener->onInstructionStepCompleted(moduleProxy, id, completed);
+	}
+}
+
+void ModuleRegistry::onModuleDied(ModuleProxy* moduleProxy){
+	ROS_WARN("Module has died! :(");
+	for(std::vector<ModuleProxy*>::iterator it = registeredModules.begin(); it != registeredModules.end(); it++){
+		if(*it == moduleProxy){
+			ROS_INFO("found me");
+			registeredModules.erase(it);
+			break;
+		}
 	}
 }
 

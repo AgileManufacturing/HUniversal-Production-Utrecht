@@ -1,0 +1,997 @@
+<sdf version='1.4'>
+
+	<model name="sixAxis">
+	<static>false</static>
+
+<!-- ============================Start Links========================================  --> 
+
+<!-- =Links= these define the objects used to build the robot -->
+	
+	<link name='base'> <!-- the base of the robot --> 
+		<pose>0 0 0 0 0 0</pose>
+		<gravity>false</gravity>
+		
+		<inertial>
+			<mass>200</mass>
+		</inertial>
+		<collision name='collision'>
+			<pose>0 0 5 0 0 0</pose>
+			<geometry>
+				<box>
+				  <size> 10 10 10 </size>
+				</box>
+			</geometry>
+		</collision>
+	
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/base.dae</uri></mesh>
+		  </geometry>
+		  
+		</visual>
+	</link>
+
+	<!-- Motors --> 
+	<link name='motor1'> 
+		<pose>-0.02924 2.9926 9.49426 0 0 0</pose>
+		<gravity>false</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/motorL.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>0.3 0.1 0.2 1</ambient>
+			<diffuse>0.3 0.1 0.2</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+	
+	<link name='motor2'> 
+		<pose>0.02924 2.9926 9.49426 0 0 0</pose>
+		<gravity>false</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/motorR.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>0.3 0.1 0.2 1</ambient>
+			<diffuse>0.3 0.1 0.2</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+
+	<link name='motor3'> 
+		<pose>0.88071 1.51837 9.49426 0 0 1.047197551</pose>
+		<gravity>false</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/motorR.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>0.3 0.1 0.2 1</ambient>
+			<diffuse>0.3 0.1 0.2</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+	
+	<link name='motor4'> 
+		<pose>0.85135 1.46699 9.49426 0 0 1.047197551</pose>
+		<gravity>false</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/motorL.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>0.3 0.1 0.2 1</ambient>
+			<diffuse>0.3 0.1 0.2</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+  
+  	<link name='motor5'> 
+		<pose>-0.85135 1.46699 9.49426 0 0 -1.047197551</pose>
+		<gravity>true</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/motorR.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>0.3 0.1 0.2 1</ambient>
+			<diffuse>0.3 0.1 0.2</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+  
+	<link name='motor6'> 
+		<pose>-0.88071 1.51837 9.49426 0 0 -1.047197551</pose>
+		<gravity>false</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/motorL.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>0.3 0.1 0.2 1</ambient>
+			<diffuse>0.3 0.1 0.2</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+ 
+	<!-- Upper arms --> 
+	<link name='upperArm1'> 
+		<pose>-0.10431 2.9926 9.49426 1.570796327 0 1.570796327</pose>
+		<gravity>false</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/upperArmL.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>1 1 1 1</ambient>
+			<diffuse>1 1 1 1</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+	
+ 	<link name='upperArm2'> 
+		<pose>0.10727 2.9926 9.49426 1.570796327 0 1.570796327</pose>
+		<gravity>false</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/upperArmR.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>1 1 1 1</ambient>
+			<diffuse>1 1 1 1</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+	
+ 	<link name='upperArm3'> 
+		<pose>0.9194 1.5846 9.49426 1.570796327 0 -0.523598776</pose>
+		<gravity>false</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/upperArmL.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>1 1 1 1</ambient>
+			<diffuse>1 1 1 1</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+	
+   	<link name='upperArm4'> 
+		<pose>0.81266 1.40076 9.49426 1.570796327 0 -0.523598776</pose>
+		<gravity>false</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/upperArmR.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>1 1 1 1</ambient>
+			<diffuse>1 1 1 1</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+	
+	<link name='upperArm5'> 
+		<pose>-0.81266 1.40076 9.49426 1.570796327 0 3.665191429</pose>
+		<gravity>false</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/upperArmL.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>1 1 1 1</ambient>
+			<diffuse>1 1 1 1</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+
+ 	<link name='upperArm6'> 
+		<pose>-0.9194 1.5846 9.49426 1.570796327 0 3.665191429</pose>
+		<gravity>false</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/upperArmR.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>1 1 1 1</ambient>
+			<diffuse>1 1 1 1</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+
+	<!-- Lower arms --> 
+	<link name='lowerArm1'> 
+		<pose>-0.26051 3.99159 9.49215 0.541052068 3.141592654 0</pose>
+		<gravity>false</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/lowerArm.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>0.1 10.1 0.1 1</ambient>
+			<diffuse>0.1 0.1 0.1 1</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+	
+	<link name='lowerArm2'> 
+		<pose>0.26191 3.99159 9.49215 0.541052068 3.141592654 0</pose>
+		<gravity>false</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/lowerArm.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>0.1 10.1 0.1 1</ambient>
+			<diffuse>0.1 0.1 0.1 1</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+	
+	<link name='lowerArm3'> 
+		<pose>1.86084 1.22328 9.49215 0.541052068 3.141592654 -2.094395102</pose>
+		<gravity>false</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/lowerArm.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>0.1 10.1 0.1 1</ambient>
+			<diffuse>0.1 0.1 0.1 1</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+
+	<link name='lowerArm4'> 
+		<pose>1.59767 0.76795 9.49215 0.541052068 3.141592654 -2.094395102</pose>
+		<gravity>false</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/lowerArm.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>0.1 10.1 0.1 1</ambient>
+			<diffuse>0.1 0.1 0.1 1</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+
+	<link name='lowerArm5'> 
+		<pose>-1.59767 0.76795 9.49215 0.541052068 3.141592654 2.094395102</pose>
+		<gravity>false</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/lowerArm.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>0.1 10.1 0.1 1</ambient>
+			<diffuse>0.1 0.1 0.1 1</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+
+	<link name='lowerArm6'> 
+		<pose>-1.86084 1.22328 9.49215 0.541052068 3.141592654 2.094395102</pose>
+		<gravity>false</gravity>
+		
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/lowerArm.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>0.1 10.1 0.1 1</ambient>
+			<diffuse>0.1 0.1 0.1 1</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+
+	<!-- platform --> 
+	<link name='platform'> 
+		<pose>0 1.99156 6.78392 1.570796327 0 0.523598776</pose>
+		<gravity>true</gravity>
+		<inertial>
+			<mass>1</mass>
+		</inertial>
+		<collision name='collision'>
+		  <geometry>
+			<box>
+			  <size> 0.1 0.1 0.1</size>
+			</box>
+		  </geometry>
+		</collision>
+		
+		<visual name='visual'>
+		
+		  <geometry>
+			<mesh><uri>/home/huniversal/.gazebo/models/sixAxis/platformFull.dae</uri></mesh>
+		  </geometry>
+		  <material>
+			<ambient>1 0 0 1</ambient>
+			<diffuse>1 0 0 1</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<emissive>0 0 0 0</emissive>
+		  </material>
+		</visual>
+	</link>
+	
+<!-- ============================End Links========================================  --> 
+
+<!-- ============================Start Joints========================================  --> 
+
+<!-- =Joint= these connect links together useing joints to simulate motors  --> 
+
+
+	<!-- connecting the motors to the base --> 
+	<joint type="prismatic" name="MotortoBase1"><!-- motor1 to base--> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>world</child>
+		<parent>motor1</parent>
+		<axis>
+			<xyz>1 0 0</xyz>
+			<limit>
+				<upper>0.0</upper>
+				<lower>0.0</lower>
+			</limit>
+			<dynamics>
+				<damping>20</damping>
+			</dynamics>
+		</axis>
+	</joint>
+	
+	<joint type="prismatic" name="MotortoBase2"><!-- motor2 to base--> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>world</child>
+		<parent>motor2</parent>
+		<axis>
+			<xyz>1 0 0</xyz>
+			<limit>
+				<upper>0.0</upper>
+				<lower>0.0</lower>
+			</limit>
+			<dynamics>
+				<damping>20</damping>
+			</dynamics>
+		</axis>
+	</joint>
+	
+	<joint type="prismatic" name="MotortoBase3"><!-- motor3 to base--> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>world</child>
+		<parent>motor3</parent>
+		<axis>
+			<xyz>1 0 0</xyz>
+			<limit>
+				<upper>0.0</upper>
+				<lower>0.0</lower>
+			</limit>
+			<dynamics>
+				<damping>20</damping>
+			</dynamics>
+		</axis>
+	</joint>
+	
+	<joint type="prismatic" name="MotortoBase4"><!-- motor4 to base--> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>world</child>
+		<parent>motor4</parent>
+		<axis>
+			<xyz>1 0 0</xyz>
+			<limit>
+				<upper>0.0</upper>
+				<lower>0.0</lower>
+			</limit>
+			<dynamics>
+				<damping>20</damping>
+			</dynamics>
+		</axis>
+	</joint>	
+	
+	<joint type="prismatic" name="MotortoBase5"><!-- motor5 to base--> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>world</child>
+		<parent>motor5</parent>
+		<axis>
+			<xyz>1 0 0</xyz>
+			<limit>
+				<upper>0.0</upper>
+				<lower>0.0</lower>
+			</limit>
+			<dynamics>
+				<damping>20</damping>
+			</dynamics>
+		</axis>
+	</joint>
+	
+	<joint type="prismatic" name="MotortoBase6"><!-- motor6 to base--> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>world</child>
+		<parent>motor6</parent>
+		<axis>
+			<xyz>1 0 0</xyz>
+			<limit>
+				<upper>0.0</upper>
+				<lower>0.0</lower>
+			</limit>
+			<dynamics>
+				<damping>20</damping>
+			</dynamics>
+		</axis>
+	</joint>
+	
+	<!-- connecting the base to a kind of hacked object to make it stay on its place --> 
+	<joint type="prismatic" name="BaseToWorld">
+		<pose>0 0 0 0 0 0</pose>
+		<child>world</child>
+		<parent>base</parent>
+		<axis>
+			<xyz>1 0 0</xyz>
+			<limit>
+				<upper>0.0</upper>
+				<lower>0.0</lower>
+			</limit>
+			<dynamics>
+				<damping>20</damping>
+			</dynamics>
+		</axis>
+	</joint>
+
+	<!-- connecting upper arms to respective motors --> 
+	<joint type="revolute" name="upperArmToMotor1"><!-- upper arm 1 to motor 1--> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>upperArm1</child>
+		<parent>motor1</parent>
+		<axis>
+			<xyz>1 0 0</xyz>
+			<limit>
+				<upper>0</upper>
+				<lower>0</lower>
+			</limit>
+			
+		</axis>
+	</joint>
+
+	<joint type="revolute" name="upperArmToMotor2"><!-- upper arm 2 to motor 2--> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>upperArm2</child>
+		<parent>motor2</parent>
+		<axis>
+			<xyz>1 0 0</xyz>
+			<limit>
+				<upper>0</upper>
+				<lower>0</lower>
+			</limit>
+			
+		</axis>
+	</joint>
+
+	<joint type="revolute" name="upperArmToMotor3"><!-- upper arm 3 to motor 3--> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>upperArm3</child>
+		<parent>motor3</parent>
+		<axis>
+			<xyz>-0.5 -0.8660 0</xyz>
+			
+			<limit>
+				<upper>0</upper>
+				<lower>0</lower>
+			</limit>
+		</axis>
+	</joint>
+
+	<joint type="revolute" name="upperArmToMotor4"><!-- upper arm 4 to motor 4--> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>upperArm4</child>
+		<parent>motor4</parent>
+		<axis>
+			<xyz>-0.5 -0.8660 0</xyz>
+			<limit>
+				<upper>0</upper>
+				<lower>0</lower>
+			</limit>
+			
+		</axis>
+	</joint>
+
+	<joint type="revolute" name="upperArmToMotor5"><!-- upper arm 5 to motor 5--> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>upperArm5</child>
+		<parent>motor5</parent>
+		<axis>
+			<xyz>-0.5 0.8660 0</xyz>
+			<limit>
+				<upper>0</upper>
+				<lower>0</lower>
+			</limit>
+			
+		</axis>
+	</joint>
+
+	<joint type="revolute" name="upperArmToMotor6"><!-- upper arm 6 to motor 6--> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>upperArm6</child>
+		<parent>motor6</parent>
+		<axis>
+			<xyz>-0.5 0.8660 0</xyz>
+			<limit>
+				<upper>0</upper>
+				<lower>0</lower>
+			</limit>
+			
+		</axis>
+	</joint>
+
+	<!-- connecting lower arms to respective upper arms --> 
+
+	<joint type="ball" name="lowerArmToUpperArm1"><!--  lower arm 1 to upper arm 1 --> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>lowerArm1</child>
+		<parent>upperArm1</parent>
+		<axis>
+			<xyz>0 0 1</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis>
+		
+		<axis2>
+			<xyz>1 0 0</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis2>
+	</joint>
+
+	<joint type="ball" name="lowerArmToUpperArm2"><!--  lower arm 2 to upper arm 2 --> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>lowerArm2</child>
+		<parent>upperArm2</parent>
+		<axis>
+			<xyz>0 0 1</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis>
+		
+		<axis2>
+			<xyz>1 0 0</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis2>
+	</joint>
+
+	<joint type="ball" name="lowerArmToUpperArm3"><!--  lower arm 3 to upper arm 3 --> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>lowerArm3</child>
+		<parent>upperArm3</parent>
+		<axis>
+			<xyz>0 0 1</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis>
+		
+		<axis2>
+			<xyz>1 0 0</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis2>
+	</joint>
+
+	<joint type="ball" name="lowerArmToUpperArm4"><!--  lower arm 4 to upper arm 4 --> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>lowerArm4</child>
+		<parent>upperArm4</parent>
+		<axis>
+			<xyz>0 0 1</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis>
+		
+		<axis2>
+			<xyz>1 0 0</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis2>
+	</joint>
+
+	<joint type="ball" name="lowerArmToUpperArm5"><!--  lower arm 3 to upper arm 3 --> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>lowerArm5</child>
+		<parent>upperArm5</parent>
+		<axis>
+			<xyz>0 0 1</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis>
+		
+		<axis2>
+			<xyz>1 0 0</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis2>
+	</joint>
+
+	<joint type="ball" name="lowerArmToUpperArm6"><!--  lower arm 4 to upper arm 4 --> 
+		<pose>0 0 0 0 0 0</pose>
+		<child>lowerArm6</child>
+		<parent>upperArm6</parent>
+		<axis>
+			<xyz>0 0 1</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis>
+		
+		<axis2>
+			<xyz>1 0 0</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis2>
+	</joint>
+
+
+	<joint type="ball" name="lowerArmToPlatform1"><!--  lower arm 1 to upper arm 1 --> 
+		<pose>0 0 3.05 0 0 0</pose>
+		<child>lowerArm1</child>
+		<parent>platform</parent>
+		<axis>
+			<xyz>0 0 1</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis>
+		
+		<axis2>
+			<xyz>1 0 0</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis2>
+	</joint>
+	
+	<joint type="ball" name="lowerArmToPlatform2"><!--  lower arm 1 to upper arm 1 --> 
+		<pose>0 0 3.05 0 0 0</pose>
+		<child>lowerArm2</child>
+		<parent>platform</parent>
+		<axis>
+			<xyz>0 0 1</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis>
+		
+		<axis2>
+			<xyz>1 0 0</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis2>
+	</joint>
+	
+	<joint type="ball" name="lowerArmToPlatform3"><!--  lower arm 1 to upper arm 1 --> 
+		<pose>0 0 3.05 0 0 0</pose>
+		<child>lowerArm3</child>
+		<parent>platform</parent>
+		<axis>
+			<xyz>0 0 1</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis>
+		
+		<axis2>
+			<xyz>1 0 0</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis2>
+	</joint>
+	
+	<joint type="ball" name="lowerArmToPlatform4"><!--  lower arm 1 to upper arm 1 --> 
+		<pose>0 0 3.05 0 0 0</pose>
+		<child>lowerArm4</child>
+		<parent>platform</parent>
+		<axis>
+			<xyz>0 0 1</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis>
+		
+		<axis2>
+			<xyz>1 0 0</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis2>
+	</joint>
+	
+	<joint type="ball" name="lowerArmToPlatform5"><!--  lower arm 1 to upper arm 1 --> 
+		<pose>0 0 3.05 0 0 0</pose>
+		<child>lowerArm5</child>
+		<parent>platform</parent>
+		<axis>
+			<xyz>0 0 1</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis>
+		
+		<axis2>
+			<xyz>1 0 0</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis2>
+	</joint>
+	
+	<joint type="ball" name="lowerArmToPlatform6"><!--  lower arm 1 to upper arm 1 --> 
+		<pose>0 0 3.05 0 0 0</pose>
+		<child>lowerArm6</child>
+		<parent>platform</parent>
+		<axis>
+			<xyz>0 0 1</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis>
+		
+		<axis2>
+			<xyz>1 0 0</xyz>
+			
+			<dynamics>
+				<damping>100</damping>
+			</dynamics>
+		</axis2>
+	</joint>
+
+  </model>
+</sdf>

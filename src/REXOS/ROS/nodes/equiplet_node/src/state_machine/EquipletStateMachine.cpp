@@ -2,7 +2,7 @@
 
 using namespace equiplet_node;
 
-EquipletStateMachine::EquipletStateMachine(std::string name,int id):
+EquipletStateMachine::EquipletStateMachine(std::string name, int id):
 	StateMachine(name,
 		{
 			rexos_statemachine::MODE_NORMAL, 
@@ -71,6 +71,10 @@ void EquipletStateMachine::onModuleModeChanged(ModuleProxy* moduleProxy, rexos_s
 	if(newMode > getCurrentMode()){
 		changeMode(newMode);
 	}
+}
+
+void EquipletStateMachine::onModuleDied(ModuleProxy* moduleProxy){
+	ROS_ERROR("module has died!");
 }
 
 bool EquipletStateMachine::allModulesInDesiredState(rexos_statemachine::State desiredState){

@@ -50,16 +50,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import libraries.blackboard_client.BlackboardClient;
-import libraries.blackboard_client.GeneralMongoException;
-import libraries.blackboard_client.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.GeneralMongoException;
+import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
-import agents.data.BehaviourStatus;
-import agents.data.Product;
-import agents.data.Production;
-import agents.data.ProductionEquipletMapper;
-import agents.data.ProductionStep;
-import agents.data.StepStatusCode;
+import agents.data_classes.BehaviourStatus;
+import agents.data_classes.Product;
+import agents.data_classes.Production;
+import agents.data_classes.ProductionEquipletMapper;
+import agents.data_classes.ProductionStep;
+import agents.data_classes.StepStatusCode;
 import agents.product_agent.BehaviourCallback;
 import agents.product_agent.ProductAgent;
 
@@ -100,7 +100,7 @@ public class PlannerBehaviour extends Behaviour {
 
 			BlackboardClient bbc = new BlackboardClient(
 					Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"), 
-					Integer.parseInt(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbPort")));
+					Configuration.getPropertyInt(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbPort"));
 			
 			bbc.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbName"));
 			bbc.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletDirectoryName"));
@@ -143,7 +143,7 @@ public class PlannerBehaviour extends Behaviour {
 		} catch (NullPointerException | InvalidDBNamespaceException
 				| GeneralMongoException | UnknownHostException e) {
 			Logger.log(LogLevel.ERROR,
-					"Exception PlannerBehaviour - onStart() : ", e);
+					"Exception - onStart() : ", e);
 			this._isError = true;
 		}
 	}

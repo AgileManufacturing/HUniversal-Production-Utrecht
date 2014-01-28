@@ -51,7 +51,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import agents.data.Position;
+import agents.data_classes.Position;
 
 import com.mongodb.BasicDBObject;
 
@@ -63,29 +63,20 @@ public class PenModule extends Module {
 	 * @var int PEN_OFFSET
 	 *      A static value that contains the offset of the pen in relation to the movement module.
 	 */
-	private static final int PEN_OFFSET = 0;
+	private static final double PEN_OFFSET = 96.6;
 
 	/**
 	 * @var double PEN_SIZE
 	 *      A static value that contains the size of the pen in centimeters.
 	 */
 	private static final double PEN_SIZE = 1.0;
-	/**
-	 * @var double SAFE_MOVEMENT_PLANE
-	 *      A static value that contains the height of the safe movement plane.
-	
+
 	/**
 	 * @var double MAX_ACCELERATION
 	 * 		A static value with the max accelaration 
 	 */
 	private static final double MAX_ACCELERATION = 50.0;
-
-	/**
-	 * @var int TIMESLOTS_NEEDED_PER_STEP
-	 * 		A static value with the timeslots needed per step.
-	 */
-	private static final int TIMESLOTS_NEEDED_PER_STEP = 6;
-
+	
 	/**
 	 * @var Module movementModule
 	 *      The module that moves this module.
@@ -123,12 +114,7 @@ public class PenModule extends Module {
 	@Override
 	public EquipletStep[] fillPlaceHolders(EquipletStep[] steps, BasicDBObject parameters) {
 		// get the new position parameters from the parameters
-				double extraSize = 0;
-				
-				if(parameters.containsField("extra_size"))
-				{
-					extraSize = parameters.getDouble("extra_size");
-				}
+				double extraSize = PEN_OFFSET;
 				
 				Position position = new Position((BasicDBObject) parameters.get("position"));
 
@@ -143,7 +129,7 @@ public class PenModule extends Module {
 							&& lookUpParameters.getString("ID").equals("RELATIVE-TO-PLACEHOLDER")
 							&& position.getRelativeToPart() != null) 
 					{
-						lookUpParameters.put("ID", position.getRelativeToPart().getId());
+						lookUpParameters.put("ID", position.getRelativeToPart().getPartName());
 					}
 					
 					if(payload.containsField("x") && payload.getString("x").equals("X-PLACEHOLDER")) 
@@ -277,9 +263,6 @@ public class PenModule extends Module {
 		BasicDBObject dotParameters = new BasicDBObject("position", parameters.get("position"));
 		dotParameters.put("extraSize", PEN_OFFSET);
 
-		// get steps from the movementModule to move to the safe movement plane.
-		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, dotParameters)));
-
 		// get steps from the movementModule to move on the x and y axis.
 		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(2, dotParameters)));
 
@@ -287,7 +270,14 @@ public class PenModule extends Module {
 		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, dotParameters)));
 
 		// get steps from the movementModule to move to the safe movement plane(not needed).
-		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(1, dotParameters)));
+		// L33T HACKING !!!!!!!!!!!!!
+		BasicDBObject moveParameters2 = new BasicDBObject();
+		moveParameters2.put("extraSize", PEN_OFFSET);
+		Position p = new Position();
+		p.setZ(20.0);
+		moveParameters2.put("position", p.toBasicDBObject());
+		steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, moveParameters2)));
+		//steps.addAll(Arrays.asList(movementModule.getEquipletSteps(3, dotParameters)));
 
 		// convert the ArrayList to an array and return it.
 		EquipletStep[] equipletSteps = new EquipletStep[steps.size()];

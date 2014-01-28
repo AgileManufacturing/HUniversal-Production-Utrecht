@@ -36,7 +36,8 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
-import agents.data.Part;
+import agents.data_classes.Part;
+import agents.logistics_agent.LogisticsAgent;
 import agents.shared_behaviours.ReceiveOnceBehaviour;
 
 /**
@@ -51,6 +52,18 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * @var MessageTemplate MESSAGE_TEMPLATE
+	 *      The messageTemplate to match the messages.
+	 */
+	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("ArePartsAvailableInTime");
+	
+	/**
+	 * @var LogisticsAgent logisticsAgent
+	 *      The logisticsAgent of this behaviour.
+	 */
+	private LogisticsAgent logisticsAgent;
+	
+	/**
 	 * Constructs the behaviour for the given agent.
 	 * 
 	 * @param a
@@ -58,8 +71,9 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 	 * @param conversationId
 	 *            The conversationId that should be used for this behaviour.
 	 */
-	public ArePartsAvailableInTime(Agent a, String conversationId) {
-		this(a, 2000, conversationId);
+	public ArePartsAvailableInTime(LogisticsAgent logisticsAgent, String conversationId) {
+		this(logisticsAgent, 2000, conversationId);
+		Logger.log(LogLevel.DEBUG, "ArePartsAvailableInTime behaviour started.");
 	}
 
 	/**
@@ -72,10 +86,10 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 	 * @param conversationId
 	 *            The conversationId that should be used for this behaviour.
 	 */
-	public ArePartsAvailableInTime(Agent a, int millis, String conversationId) {
-		super(a, millis, MessageTemplate.and(
-				MessageTemplate.MatchOntology("ArePartsAvailableInTime"),
-				MessageTemplate.MatchConversationId(conversationId)));
+	public ArePartsAvailableInTime(LogisticsAgent logisticsAgent, int millis, String conversationId) {
+		super(logisticsAgent, millis, MessageTemplate.and(
+				MESSAGE_TEMPLATE, MessageTemplate.MatchConversationId(conversationId)));
+		this.logisticsAgent = logisticsAgent;
 	}
 
 	/**
@@ -88,26 +102,24 @@ public class ArePartsAvailableInTime extends ReceiveOnceBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if (message != null) {
+			Logger.log(LogLevel.DEBUG, "Received message.");
 			try {
-				Logger.log(LogLevel.DEBUG, "%s ArePartsAvailableInTime%n",
-						myAgent.getLocalName());
 				Part[] parts = (Part[]) message.getContentObject();
 
 				ACLMessage reply = message.createReply();
-				reply.setOntology("ArePartsAvailableInTimeResponse");
+				reply.setOntology("ArePartsAvailableInTime");
 				reply.setPerformative(ACLMessage.CONFIRM);
-				myAgent.send(reply);
-
-				myAgent.addBehaviour(new GetPartsInfo(myAgent, message
+				logisticsAgent.send(reply);
+				logisticsAgent.addBehaviour(new PartsInfo(logisticsAgent, message
 						.getConversationId()));
+				Logger.log(LogLevel.INFORMATION, "Parts are available in time.");
 			} catch (UnreadableException e) {
-				Logger.log(LogLevel.ERROR, e);
-				myAgent.doDelete();
+				Logger.log(LogLevel.ERROR, "Message unreadable!", e);
+				logisticsAgent.doDelete();
 			}
 		} else {
-			Logger.log(LogLevel.ERROR, myAgent.getLocalName()
-					+ " - ArePartsAvailableInTime timeout!");
-			myAgent.removeBehaviour(this);
+			logisticsAgent.removeBehaviour(this);
+			Logger.log(LogLevel.ALERT, "Parts are NOT available in time.");
 		}
 	}
 }

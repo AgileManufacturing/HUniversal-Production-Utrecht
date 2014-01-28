@@ -49,15 +49,15 @@ package agents.equiplet_agent.behaviours;
 
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import libraries.blackboard_client.GeneralMongoException;
-import libraries.blackboard_client.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.GeneralMongoException;
+import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
-import agents.data.ProductStep;
-import agents.data.StepStatusCode;
+import agents.data_classes.ProductStep;
+import agents.data_classes.StepStatusCode;
 import agents.equiplet_agent.EquipletAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 
@@ -75,11 +75,11 @@ public class AbortStep extends ReceiveBehaviour {
 	private static final long serialVersionUID = -9022585847666136289L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
+	 * @var MessageTemplate MESSAGE_TEMPLATE
 	 *      The messageTemplate this behaviour
 	 *      listens to. This behaviour listens to the ontology: AbortStep.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("AbortStep");
+	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("AbortStep");
 
 	/**
 	 * @var EquipletAgent equipletAgent
@@ -91,11 +91,11 @@ public class AbortStep extends ReceiveBehaviour {
 	/**
 	 * Instantiates a new can perform step.
 	 * 
-	 * @param agent The agent for this behaviour
+	 * @param equipletAgent The EsquipletAgent for this behaviour
 	 */
-	public AbortStep(EquipletAgent agent) {
-		super(agent, messageTemplate);
-		equipletAgent = agent;
+	public AbortStep(EquipletAgent equipletAgent) {
+		super(equipletAgent, MESSAGE_TEMPLATE);
+		this.equipletAgent = equipletAgent;
 	}
 
 	/**
@@ -110,8 +110,6 @@ public class AbortStep extends ReceiveBehaviour {
 	@Override
 	public void handle(ACLMessage message) {
 		if(message != null) {
-			//Logger.log("%s received message from %s(%s)%n", myAgent.getLocalName(), message.getSender().getLocalName(),
-					//message.getOntology());
 	
 			try {
 				// gets the productstep out of the message.
@@ -132,7 +130,7 @@ public class AbortStep extends ReceiveBehaviour {
 					myAgent.send(reply);
 				}
 			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-				Logger.log(LogLevel.ERROR, e);
+				Logger.log(LogLevel.ERROR, "", e);
 				equipletAgent.doDelete();
 			}
 		}

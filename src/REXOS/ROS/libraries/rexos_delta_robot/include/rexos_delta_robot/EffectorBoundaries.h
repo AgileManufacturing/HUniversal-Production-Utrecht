@@ -35,6 +35,8 @@
 #include <iostream>
 #include <rexos_datatypes/Point3D.h>
 #include <rexos_motor/StepperMotor.h>
+#include <rexos_motor/StepperMotorProperties.h>
+#include <rexos_datatypes/DeltaRobotMeasures.h>
 #include <rexos_delta_robot/Measures.h>
 #include <rexos_delta_robot/InverseKinematicsModel.h>
 #include <vector>
@@ -49,12 +51,15 @@ namespace rexos_delta_robot{
 	public:
 		~EffectorBoundaries();
 		
-		static EffectorBoundaries* generateEffectorBoundaries(const InverseKinematicsModel& model, double motorMinAngles[3], double motorMaxAngles[3], double voxelSize);
+		static EffectorBoundaries* generateEffectorBoundaries(const InverseKinematicsModel& model, 
+				const rexos_datatypes::DeltaRobotMeasures* deltaRobotMeasures, 
+				const std::vector<rexos_motor::StepperMotor*> motors, double voxelSize);
 
 		bool checkPath(const rexos_datatypes::Point3D<double>& from, const rexos_datatypes::Point3D<double>& to) const;
 
 	private:
-		EffectorBoundaries(const InverseKinematicsModel& model, double motorMinAngles[3], double motormaxAngles[3], double voxelSize);
+		EffectorBoundaries(const InverseKinematicsModel& model, const rexos_datatypes::DeltaRobotMeasures* deltaRobotMeasures, 
+				const std::vector<rexos_motor::StepperMotor*> motors, double voxelSize);
 
 		/**
 		 * Represents a 3-dimensional point in the 3D voxel array.
@@ -99,9 +104,9 @@ namespace rexos_delta_robot{
 		 **/
 		inline rexos_datatypes::Point3D<double> fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const{
 			return rexos_datatypes::Point3D<double>(
-					(double) coordinate.x * voxelSize + Measures::BOUNDARY_BOX_MIN_X,
-					(double) coordinate.y * voxelSize + Measures::BOUNDARY_BOX_MIN_Y,
-					(double) coordinate.z * voxelSize + Measures::BOUNDARY_BOX_MIN_Z);
+					(double) coordinate.x * voxelSize + deltaRobotMeasures->boundaryBoxMinX,
+					(double) coordinate.y * voxelSize + deltaRobotMeasures->boundaryBoxMinY,
+					(double) coordinate.z * voxelSize + deltaRobotMeasures->boundaryBoxMinZ);
 		}
 
 		/**
@@ -111,18 +116,19 @@ namespace rexos_delta_robot{
 		 **/
 		inline EffectorBoundaries::BitmapCoordinate fromRealCoordinate(rexos_datatypes::Point3D<double> coordinate) const{
 			return EffectorBoundaries::BitmapCoordinate(
-				(coordinate.x - Measures::BOUNDARY_BOX_MIN_X) / voxelSize,
-				(coordinate.y - Measures::BOUNDARY_BOX_MIN_Y) / voxelSize,
-				(coordinate.z - Measures::BOUNDARY_BOX_MIN_Z) / voxelSize);
+				(coordinate.x - deltaRobotMeasures->boundaryBoxMinX) / voxelSize,
+				(coordinate.y - deltaRobotMeasures->boundaryBoxMinY) / voxelSize,
+				(coordinate.z - deltaRobotMeasures->boundaryBoxMinZ) / voxelSize);
 		}
 
 		/**
 		 * An enum holding the values an entry in the pointValidityCache can have. They indicate whether a point fits within the boundaries or not, or if this has not yet been determined.
 		 **/
-		enum cacheEntry{
+		enum entry{
 			UNKNOWN,
 			VALID,
-			INVALID
+			INVALID,
+			BORDER
 		};
 
 		/**
@@ -144,29 +150,27 @@ namespace rexos_delta_robot{
 		int depth;
 
 		/**
-		 * @var bool* boundariesBitmap
+		 * @var int8_t* boundariesBitmap
 		 * A pointer to the boundaries bitmap. This bitmap is a one dimensional array of booleans, defaulted to false, where voxels are checked and set to true if they are reachable.
 		 **/
-		bool* boundariesBitmap;
+		entry* boundariesBitmap;
 
 		/**
 		 * @var InverseKinematicsModel& kinematics
 		 * A reference to the InverseKinematicsModel of the deltarobot, which is used to calculate the boundaries.
 		 **/
 		const InverseKinematicsModel &kinematics;
-
 		/**
-		 * @var double motorMinAngles 
-		 * Holds the minimum angles of the motors.
+		 * @var rexos_datatypes::DeltaRobotMeasures& deltaRobotMeasures
+		 * A reference to the InverseKinematicsModel of the deltarobot, which is used to calculate the boundaries.
 		 **/
-		double motorMinAngles[3];
-
+		const rexos_datatypes::DeltaRobotMeasures* deltaRobotMeasures;
 		/**
-		 * @var double motorMaxAngles 
-		 * Holds the maximum angles of the motors.
+		 * @var rexos_motor::StepperMotorProperties* stepperMotorProperties[3]
+		 * A reference to the InverseKinematicsModel of the deltarobot, which is used to calculate the boundaries.
 		 **/
-		double motorMaxAngles[3];
-
+		const std::vector<rexos_motor::StepperMotor*> motors;
+		
 		/**
 		 * @var double voxelSize
 		 * The size of the voxels in the boundary bitmap.

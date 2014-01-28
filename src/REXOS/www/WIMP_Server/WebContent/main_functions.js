@@ -4,6 +4,7 @@
 var CURRENT_USER = "";
 var currentApplication = 'undefined';
 
+var PIXEL_MULTIPLIER = 2;
 /*
  * Tab control
  */
@@ -156,6 +157,8 @@ function createProductionCommand() {
 			window.parent.showNotification('success', 'Done', 3000);
 			break;
 		case 'pickAndPlace':
+			createProductionCommandFromCrateObject();
+			window.parent.showNotification('success', 'Done', 3000);
 			break;
 		case 'stacking':
 			break;
@@ -166,11 +169,54 @@ function createProductionCommand() {
 
 }
 
+function createProductionCommandFromCrateObject() {
+	var frame = productionArray = document.getElementById("currentApplication").contentWindow;
+	var cubeArray = frame.cubes;
+	var crateRows = frame.CrateRows;
+	var crateColumns = frame.CrateColumns;
+
+	var cc = new pa_server.CommandContainer("CREATE_PA");
+
+	cc.data = document.getElementById("gwip").value + ":" + document.getElementById("gwport").value;
+
+	for(var i = 0; i < cubeArray.length; i++) {
+		if(cubeArray[i] === undefined) {
+			continue;
+		}
+
+		var color; // TODO-Duncan: Get color from ((Three.MeshLambertMaterial)cubes[i]).color ?
+		var row = arrayNumberToRow(i, crateRows);
+		var column = arrayNumberToColumn(i, crateColumns);
+
+		var step = new pa_server.ProductionStep({
+			"capability" : 1,
+			"id" : i,
+			"row" : row,
+			"column" : column,
+			"color" : color,
+			"part" : 1
+		});
+		
+		cc.payload.product.production.productionSteps.push(step);
+	}
+	
+	cc.send();
+	var xml = json2xml(cc.payload.product," ");
+	cc.payload="";
+	cc.command="SAVE_DATA";
+	cc.data = xml;
+	cc.send();
+}
+
 function createProductionCommandFromColorArray() {
 	var frame = productionArray = document.getElementById("currentApplication").contentWindow;
 	var pixels = frame.pixels;
 	var columns = frame.columns;
-
+	var rows = frame.rows;
+	
+	var columnOffset = columns / 2;
+	var rowOffset = rows / 2;
+	
 	var cc = new pa_server.CommandContainer("CREATE_PA");
 
 	cc.data = document.getElementById("gwip").value + ":" + document.getElementById("gwport").value;
@@ -184,14 +230,15 @@ function createProductionCommandFromColorArray() {
 		if (pixels[i] === undefined)
 			continue;
 
-		y = arrayNumberToRow(i, columns);
+		y = arrayNumberToRow(i, rows);
 		x = arrayNumberToColumn(i, columns);
 		
 		//make sure the PA receives doubles :| TODO: Remove. This should get fixed in the PA code
-		y = y + 0.1;
-		x = x + 0.1;
+		y = (y - rowOffset) * PIXEL_MULTIPLIER;
+		x = (x - columnOffset) * PIXEL_MULTIPLIER;
 		
 		var step = new pa_server.ProductionStep({
+			"capability" : 3,
 			"id" : i,
 			"shapeName" : "dot",
 			"color" : pixels[x],

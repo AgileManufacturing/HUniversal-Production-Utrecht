@@ -39,6 +39,7 @@
 #include <rexos_modbus/ModbusController.h>
 #include <rexos_motor/CRD514KD.h>
 #include <rexos_motor/MotorInterface.h>
+#include <rexos_motor/StepperMotorProperties.h>
 
 namespace rexos_motor{
 	/**
@@ -46,7 +47,7 @@ namespace rexos_motor{
 	 **/
 	class StepperMotor : public MotorInterface{
 	public:
-		StepperMotor(rexos_modbus::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, double minAngle, double maxAngle);
+		StepperMotor(rexos_modbus::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, StepperMotorProperties properties);
 
 		virtual ~StepperMotor(void);
 
@@ -65,20 +66,29 @@ namespace rexos_motor{
 		void waitTillReady(void);
 
 		bool isPoweredOn(void){ return poweredOn; }
+		
+		bool isValidAngle(double angle);
 
 		/**
 		 * Returns the minimum angle, in radians, the StepperMotor can travel on the theoretical plane.
 		 * 
 		 * @return The minimum angle, in radians, the StepperMotor can travel on the theoretical plane.
 		 **/
-		inline double getMinAngle(void) const{ return minAngle; }
+		inline double getMinAngle(void) const{ return properties.motorMinAngle; }
+		
+		/**
+		 * Returns the angle per microstep, in radians.
+		 * 
+		 * @return The minimum angle, in radians, the StepperMotor can travel on the theoretical plane.
+		 **/
+		inline double getMicroStepAngle(void) const{ return properties.microStepAngle; }
 
 		/**
 		 * Returns the maximum angle, in radians, the StepperMotor can travel on the theoretical plane.
 		 * 
 		 * @return The maximum angle, in radians, the StepperMotor can travel on the theoretical plane. 
 		 **/
-		inline double getMaxAngle(void) const{ return maxAngle; }
+		inline double getMaxAngle(void) const{ return properties.motorMaxAngle; }
 
 		/**
 		 * Gets the current angle of the motor in radians.
@@ -111,6 +121,7 @@ namespace rexos_motor{
 		void setAbsoluteMode(int motionSlot);
 
 	private:
+		StepperMotorProperties properties;
 		/**
 		 * @var double currentAngle
 		 * The angle most recently written to the motors since the most recently executed movement.
@@ -128,19 +139,7 @@ namespace rexos_motor{
 		 * The deviation between the motors 0 degrees and the horizontal 0 degrees.
 		 **/
 		double deviation;
-
-		/**
-		 * @var double minAngle
-		 * The minimum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
-		 **/
-		double minAngle;
-
-		/**
-		 * @var double maxAngle
-		 * The maximum angle, in radians, the StepperMotor can travel on the theoretical plane.
-		 **/
-		double maxAngle;
-
+		
 		/**
 		 * @var ModbusController* modbus
 		 * Controller for the modbus communication.

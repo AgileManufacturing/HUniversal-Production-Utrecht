@@ -1,5 +1,3 @@
-package agents.hardware_agent.behaviours;
-
 /**
  * @file rexos/mas/hardware_agent/behaviours/FillPlaceholders.java
  * @brief
@@ -48,6 +46,7 @@ package agents.hardware_agent.behaviours;
  *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *          SUCH DAMAGE.
  **/
+package agents.hardware_agent.behaviours;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
@@ -57,8 +56,8 @@ import jade.lang.acl.UnreadableException;
 import java.util.List;
 
 import libraries.blackboard_client.BlackboardClient;
-import libraries.blackboard_client.GeneralMongoException;
-import libraries.blackboard_client.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.GeneralMongoException;
+import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
@@ -85,10 +84,10 @@ public class FillPlaceholders extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
+	 * @var MessageTemplate MESSAGE_TEMPLATE
 	 *      The messageTemplate to match the messages to.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate.MatchOntology("FillPlaceholders");
+	private static MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("FillPlaceholders");
 
 	/**
 	 * @var HardwareAgent hardwareAgent
@@ -107,9 +106,9 @@ public class FillPlaceholders extends ReceiveBehaviour {
 	 * @param a the agent
 	 * @param moduleFactory the moduleFactory
 	 */
-	public FillPlaceholders(Agent a, ModuleFactory moduleFactory) {
-		super(a, messageTemplate);
-		hardwareAgent = (HardwareAgent) a;
+	public FillPlaceholders(HardwareAgent hardwareAgent, ModuleFactory moduleFactory) {
+		super(hardwareAgent, MESSAGE_TEMPLATE);
+		this.hardwareAgent = hardwareAgent;
 		this.moduleFactory = moduleFactory;
 	}
 
@@ -124,7 +123,7 @@ public class FillPlaceholders extends ReceiveBehaviour {
 					message.getOntology());
 			FillStepPlaceholders(serviceStepId);
 		} catch(UnreadableException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 			myAgent.doDelete();
 		}
 	}
@@ -159,7 +158,7 @@ public class FillPlaceholders extends ReceiveBehaviour {
 
 			// Fill the placeholders
 			equipletSteps = module.fillPlaceHolders(equipletSteps, serviceStep.getParameters());
-			Logger.log(LogLevel.DEBUG, "Hardware agent - Saving updated instructionData of %d equipletSteps%n", equipletSteps.length);
+			Logger.log(LogLevel.DEBUG, "Saving updated instructionData of %d equipletSteps%n", equipletSteps.length);
 			
 			for(EquipletStep step : equipletSteps)
 			{
@@ -168,15 +167,15 @@ public class FillPlaceholders extends ReceiveBehaviour {
 			}
 			
 			// if the serviceStep has a nextStep fill the placeholders for that one to.
-			if(serviceStep.getNextStep() != null) 
+			if(serviceStep.getNextServiceStep() != null) 
 			{
-				FillStepPlaceholders(serviceStep.getNextStep());
+				FillStepPlaceholders(serviceStep.getNextServiceStep());
 			}
 		}
 		catch(InvalidDBNamespaceException | GeneralMongoException e) 
 		{
-			Logger.log(LogLevel.ERROR, e);
-			myAgent.doDelete();
+			Logger.log(LogLevel.ERROR, "", e);
+			hardwareAgent.doDelete();
 		}
 	}
 }

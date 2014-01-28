@@ -39,16 +39,16 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import libraries.blackboard_client.GeneralMongoException;
-import libraries.blackboard_client.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.GeneralMongoException;
+import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
-import agents.data.ProductStep;
-import agents.data.ScheduleData;
-import agents.data.StepStatusCode;
+import agents.data_classes.ProductStep;
+import agents.data_classes.ScheduleData;
+import agents.data_classes.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -118,14 +118,10 @@ public class NextProductStepTimer extends Timer {
 			long startPlannedTimeSlot = (nextUsedTimeSlot * timeSlotLength) + firstTimeSlot;
 			long currentTime = System.currentTimeMillis();
 			task = new NextProductStepTask();
-			Logger.log(LogLevel.DEBUG, "%d Equiplet agent - trying to schedule: %d (%d - %d)%n", EquipletAgent.getCurrentTimeSlot(), (startPlannedTimeSlot - currentTime),
-					startPlannedTimeSlot, currentTime);
 			if(startPlannedTimeSlot > currentTime) {
 				schedule(task, startPlannedTimeSlot - currentTime);
-				Logger.log(LogLevel.DEBUG, "Equiplet agent - schedule set to: %d (%d - %d)%n", (startPlannedTimeSlot - currentTime),
-						startPlannedTimeSlot, currentTime);
 			} else {
-				Logger.log(LogLevel.ERROR, "Equiplet agent - timer startPlannedTimeSlot is in the past " + startPlannedTimeSlot);
+				
 			}
 		}
 	}
@@ -172,6 +168,7 @@ public class NextProductStepTimer extends Timer {
 	 * 
 	 */
 	public void rescheduleTimer() {
+		Logger.log(LogLevel.INFORMATION, "Rescheduling the next step's timer.");
 		try {
 			BasicDBObject query = new BasicDBObject("status", StepStatusCode.PLANNED.name());
 			BasicDBObject orderby = new BasicDBObject("scheduleData", new BasicDBObject("startTime", "1"));
@@ -184,10 +181,10 @@ public class NextProductStepTimer extends Timer {
 				if(nextUsedTimeSlot == -1 || scheduleData.getStartTime() < nextUsedTimeSlot) {
 					setNextUsedTimeSlot(scheduleData.getStartTime());
 				} else {
-					Logger.log(LogLevel.DEBUG, "%d Equiplet agent - Earliest step is not before current step (%d)%n", EquipletAgent.getCurrentTimeSlot(), scheduleData.getStartTime());
+					Logger.log(LogLevel.DEBUG, "%d Equiplet Agent-Earliest step is not before current step (%d)%n", equipletAgent.getCurrentTimeSlot(), scheduleData.getStartTime());
 				}
 			} else {
-				Logger.log(LogLevel.DEBUG, "%d Equiplet agent - no more steps on PLANNED%n", EquipletAgent.getCurrentTimeSlot());
+				Logger.log(LogLevel.DEBUG, "%d Equiplet Agent-no more steps on PLANNED%n", equipletAgent.getCurrentTimeSlot());
 				setNextUsedTimeSlot(-1);
 			}
 		} catch(GeneralMongoException | InvalidDBNamespaceException e) {
@@ -215,8 +212,6 @@ public class NextProductStepTimer extends Timer {
 				ProductStep productStep =
 						new ProductStep((BasicDBObject) equipletAgent.getProductStepBBClient().findDocumentById(productStepEntry));
 
-				Logger.log(LogLevel.DEBUG, "%d Equiplet agent - Asking PA to start with step at time (%d)%n", EquipletAgent.getCurrentTimeSlot(), productStep.getScheduleData().getStartTime());
-				
 				// ask the productAgent to start the production of the step.
 //				ACLMessage answer = new ACLMessage(ACLMessage.QUERY_IF);
 //				answer.setConversationId(conversationId);
@@ -233,7 +228,7 @@ public class NextProductStepTimer extends Timer {
 				 test.setOntology("StartStep");
 				 equipletAgent.send(test);
 			} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-				Logger.log(LogLevel.ERROR, e);
+				
 			}
 		}
 	}

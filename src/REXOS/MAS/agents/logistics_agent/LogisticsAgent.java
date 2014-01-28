@@ -4,6 +4,7 @@
  * @date Created: 22 apr. 2013
  *
  * @author Peter Bonnema
+ * @author Roy Scheefhals
  *
  * @section LICENSE
  * License: newBSD
@@ -30,10 +31,17 @@
  **/
 package agents.logistics_agent;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
+
 import jade.core.Agent;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
+import agents.data_classes.Part;
+import agents.data_classes.Position;
 import agents.logistics_agent.behaviours.ArePartsAvailable;
+//import agents.logistics_agent.behaviours.FillSupplyCrate;
 
 /**
  * Agent charged with handling the logistics.
@@ -50,12 +58,69 @@ public class LogisticsAgent extends Agent {
 	 * Instantiates the agent and starts its behaviours.
 	 * @see jade.core.Agent#setup()
 	 */
+	
+
+	private Part supplyCratePart = new Part(2, 100, "GC4x4MB_1");
+	private Part productCratePart = new Part(2, 101, "GC4x4MB_2");
+	private Part whitePaper = new Part(3, 102, "Paper");
+	
+	private HashMap<Part, Position> supplyCrateContent = new HashMap<Part, Position>();
+	
 	@Override
 	public void setup() {
-		Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as a logistics agent.");
+		
+		Logger.log(LogLevel.DEBUG, "LogisticsAgent created.");
+		
 		addBehaviour(new ArePartsAvailable(this));
+		
+		//addBehaviour(new FillSupplyCrate(this));
+		
+		fillSupplyCrate();
+		supplyCrateContent.put(new Part(1, 1), new Position(0.0, 0.0, supplyCratePart));
+	}	
+	
+	public synchronized void fillSupplyCrate(){
+		//TODO: do we need this line ? 
+		synchronized (supplyCrateContent) {
+			supplyCrateContent.clear();
+			for(int i = 0; i < 4; i++) {
+				for(int j = 0; j < 4; j++) {
+					supplyCrateContent.put(new Part(1, (i * 4) + j), new Position(j + 0.0, i + 0.0, supplyCratePart));
+				}
+			}
+		}
 	}
-
+	
+	public synchronized Entry<Part, Position> getBallPart(){
+		Iterator<Entry<Part, Position>> it = supplyCrateContent.entrySet().iterator();
+		if(it.hasNext()) {
+			Entry<Part, Position> ball = it.next();
+			supplyCrateContent.remove(ball.getKey());
+			return ball;
+		}
+		return null;
+	}
+	
+	public synchronized boolean isBallPartAvailable(){
+		Iterator<Entry<Part, Position>> it = supplyCrateContent.entrySet().iterator();
+		if(it.hasNext()) {
+			return true;
+		}
+		return false;
+	}
+	
+	public synchronized Part getSupplyCrate(){
+		return supplyCratePart;
+	}
+	
+	public synchronized Part getProductCrate(){
+		return productCratePart;
+	}
+	
+	public synchronized Part getWhitePaper(){
+		return whitePaper;
+	}
+	
 	/**
 	 * 
 	 * @see jade.core.Agent#takeDown()

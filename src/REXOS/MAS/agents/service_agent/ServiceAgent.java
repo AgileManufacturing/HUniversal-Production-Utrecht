@@ -51,30 +51,26 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import libraries.blackboard_client.BlackboardClient;
-import libraries.blackboard_client.BlackboardSubscriber;
-import libraries.blackboard_client.FieldUpdateSubscription;
-import libraries.blackboard_client.FieldUpdateSubscription.MongoUpdateLogOperation;
-import libraries.blackboard_client.GeneralMongoException;
-import libraries.blackboard_client.InvalidDBNamespaceException;
-import libraries.blackboard_client.MongoOperation;
-import libraries.blackboard_client.OplogEntry;
+import libraries.blackboard_client.data_classes.BlackboardSubscriber;
+import libraries.blackboard_client.data_classes.FieldUpdateSubscription;
+import libraries.blackboard_client.data_classes.GeneralMongoException;
+import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.MongoOperation;
+import libraries.blackboard_client.data_classes.OplogEntry;
+import libraries.blackboard_client.data_classes.FieldUpdateSubscription.MongoUpdateLogOperation;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
-import agents.data.DbData;
-import agents.data.Part;
-import agents.data.ProductStep;
-import agents.data.StepStatusCode;
-import agents.service_agent.behaviours.ArePartsAvailableInTimeResponse;
-import agents.service_agent.behaviours.ArePartsAvailableResponse;
-import agents.service_agent.behaviours.CanDoProductStep;
-import agents.service_agent.behaviours.CheckForModulesResponse;
-import agents.service_agent.behaviours.GetPartsInfoResponse;
-import agents.service_agent.behaviours.GetProductStepDuration;
-import agents.service_agent.behaviours.GetServiceStepsDurationResponse;
+import agents.data_classes.DbData;
+import agents.data_classes.Part;
+import agents.data_classes.ProductStep;
+import agents.data_classes.StepStatusCode;
+import agents.service_agent.behaviours.CanPerformProductionStep;
+import agents.service_agent.behaviours.ProductStepDuration;
 import agents.service_agent.behaviours.InitialisationFinished;
+import agents.service_agent.behaviours.RemoveServiceStepBehaviour;
 import agents.service_agent.behaviours.ScheduleStep;
 
 import com.mongodb.BasicDBObject;
@@ -158,7 +154,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	 */
 	@Override
 	public void setup() {
-		Logger.log(LogLevel.NOTIFICATION, this.getAID().getLocalName() + " spawned as an service agent.");
+		Logger.log(LogLevel.NOTIFICATION, "" + this.getAID().getLocalName() + " spawned as an service agent.");
 
 		// handle arguments given to this agent
 		Object[] args = getArguments();
@@ -179,7 +175,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			hardwareAgentCnt.start();
 			hardwareAgentAID = new AID(hardwareAgentCnt.getName(), AID.ISGUID);
 		} catch(StaleProxyException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 			doDelete();
 		}
 
@@ -201,7 +197,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			serviceStepBBClient.subscribe(statusSubscription);
 			serviceStepBBClient.removeDocuments(new BasicDBObject());
 		} catch(UnknownHostException | GeneralMongoException | InvalidDBNamespaceException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.CRITICAL, "Database connection error. Deleting ServiceAgent.", e);
 			doDelete();
 		}
 
@@ -212,14 +208,10 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 
 		// Add behaviours
 		addBehaviour(new InitialisationFinished(this));
-		addBehaviour(new CanDoProductStep(this));
-		addBehaviour(new CheckForModulesResponse(this));
-		addBehaviour(new GetProductStepDuration(this));
-		addBehaviour(new GetServiceStepsDurationResponse(this));
+		addBehaviour(new CanPerformProductionStep(this));
+		addBehaviour(new ProductStepDuration(this));
 		addBehaviour(new ScheduleStep(this));
-		addBehaviour(new ArePartsAvailableResponse(this));
-		addBehaviour(new ArePartsAvailableInTimeResponse(this));
-		addBehaviour(new GetPartsInfoResponse(this));
+		addBehaviour(new RemoveServiceStepBehaviour(this));
 	}
 
 	/**
@@ -251,7 +243,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 			
 			serviceStepBBClient.removeDocuments(new BasicDBObject());
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.CRITICAL, "Database connection error.", e);
 		}
 
 		ACLMessage message = new ACLMessage(ACLMessage.INFORM);
@@ -289,7 +281,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 				send(message);
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException | IOException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.CRITICAL, "Database connection error.", e);
 		}
 	}
 
@@ -311,7 +303,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 						case UPDATE:
 							StepStatusCode status = productionStep.getStatus();
 
-							Logger.log(LogLevel.DEBUG, "Service agent - prod.Step %s status set to %s%n",
+							Logger.log(LogLevel.DEBUG, "prod.Step %s status set to %s%n",
 									productionStep.getId(), status);
 							switch(status) {
 								case WAITING:
@@ -326,7 +318,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 									}
 									serviceSteps = ServiceStep.sort(serviceSteps);
 
-									Logger.log(LogLevel.DEBUG, "Service agent - setting status of serv.Step %s to %s%n",
+									Logger.log(LogLevel.DEBUG, "setting status of serv.Step %s to %s%n",
 											serviceSteps[0].getId(), status);
 
 									// update the status of the first serviceStep to WAITING
@@ -336,7 +328,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 													.append("statusData", productionStep.getStatusData())));
 									break;
 								case ABORTED:
-									Logger.log(LogLevel.DEBUG, "Service agent - aboring all serviceSteps of prod.Step%n",
+									Logger.log(LogLevel.DEBUG, "aboring all serviceSteps of prod.Step%n",
 											entry.getTargetObjectId());
 
 									cancelAllStepsForProductStep(entry.getTargetObjectId(), productionStep
@@ -357,8 +349,8 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					ObjectId productStepId = serviceStep.getProductStepId();
 					switch(operation) {
 						case UPDATE:
-							StepStatusCode status = serviceStep.getStatus();
-							Logger.log(LogLevel.DEBUG, "Service agent - serv.Step %s status set to %s%n", serviceStepId, status);
+							StepStatusCode status = serviceStep.getServiceStepStatus();
+							Logger.log(LogLevel.DEBUG, "serv.Step %s status set to %s%n", serviceStepId, status);
 							switch(status) {
 								case DELETED:
 
@@ -381,18 +373,16 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 									break;
 								case DONE:
 
-									if(serviceStep.getNextStep() != null) {
-										Logger.log(LogLevel.DEBUG, "Service agent - setting status of next serv.Step %s to %s%n",
-												serviceStep.getNextStep(), StepStatusCode.WAITING);
+									if(serviceStep.getNextServiceStep() != null) {
+										Logger.log(LogLevel.DEBUG, "setting status of next serv.Step %s to %s%n",
+												serviceStep.getNextServiceStep(), StepStatusCode.WAITING);
 										serviceStepBBClient.updateDocuments(
-												new BasicDBObject("_id", serviceStep.getNextStep()),
+												new BasicDBObject("_id", serviceStep.getNextServiceStep()),
 												new BasicDBObject("$set", new BasicDBObject("status",
 														StepStatusCode.WAITING.name())));
 										break;
 									}
-
-									Logger.log(LogLevel.DEBUG, "Service agent - saving log in prod.Step %s%n", productStepId);
-
+									Logger.log(LogLevel.DEBUG, "saving log in prod.Step %s%n", productStepId);
 									// save the log in the productStep
 									productStepBBClient.updateDocuments(
 											new BasicDBObject("_id", productStepId),
@@ -409,7 +399,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 															+ status.name()).append("log", buildLog(productStepId)))));
 									//$FALL-THROUGH$
 								case IN_PROGRESS:
-									Logger.log(LogLevel.DEBUG, "Service agent - setting status of prod.Step %s to %s%n", productStepId,
+									Logger.log(LogLevel.DEBUG, "setting status of prod.Step %s to %s%n", productStepId,
 											status);
 									productStepBBClient.updateDocuments(
 											new BasicDBObject("_id", productStepId),
@@ -427,7 +417,7 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 					break;
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.CRITICAL, "Database connection error. Deleting ServiceAgent.", e);
 			doDelete();
 		}
 	}
@@ -491,16 +481,26 @@ public class ServiceAgent extends Agent implements BlackboardSubscriber {
 	}
 
 	public void removeAllMappingsForProductStepId(ObjectId productStepId) {
-		String conversationId = null;
-		for(Entry<String, ObjectId> mapping : convIdProductStepIdMapping.entrySet()) {
-			if(productStepId.equals(mapping.getValue())) {
-				conversationId = mapping.getKey();
-				break;
-			}
-		}
-		convIdProductStepIdMapping.remove(conversationId);
+		String conversationId = getConvIdforProductStepId(productStepId);
+		removeConvIdProductStepIdMapping(conversationId);
 	}
 
+	public ArrayList<ObjectId> getServiceStepIdsByProductStepId(ObjectId productStepId) throws InvalidDBNamespaceException, GeneralMongoException{
+		List<DBObject> resultDbObjects = serviceStepBBClient.findDocuments(new BasicDBObject("productStepId", productStepId));
+		ArrayList<ObjectId> serviceSteps = new ArrayList<ObjectId>();
+		for ( DBObject dbObject: resultDbObjects){
+			serviceSteps.add(new ServiceStep((BasicDBObject)dbObject).getId());
+		}
+		return serviceSteps;
+	}
+	
+	public void removeServiceStepsByProductStepId(ObjectId productStepId) throws InvalidDBNamespaceException, GeneralMongoException{
+		
+		int removedSteps = serviceStepBBClient.removeDocuments(new BasicDBObject("productStepId", productStepId));
+		Logger.log(LogLevel.DEBUG, "Removing service steps: " + removedSteps);
+		removeAllMappingsForProductStepId(productStepId);
+	}
+	
 	/**
 	 * Maps the specified conversation id with the specified service object. Once a service object has been created (by
 	 * the service factory) it's mapped with the conversation id of the scheduling negotiation of the corresponding

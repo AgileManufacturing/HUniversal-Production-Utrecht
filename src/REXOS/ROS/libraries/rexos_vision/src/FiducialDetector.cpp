@@ -55,9 +55,9 @@ namespace rexos_vision{
 		this->minRad = minRad;
 		this->maxRad = maxRad;
 		// Distance between the recognized circles in pixels.
-		this->distance = 70;
+		this->distance = 20;
 		// Quality of the circle needed for it to be detected, higher is more perfect circle.
-		this->circleVotes = 100;
+		this->circleVotes = 70;
 
 		// Center lines detection of fiducial min and max distance
 		this->minDist = 1.5f;

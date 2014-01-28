@@ -1,3 +1,3 @@
 string lookupType
-string lookupID
+environment_communication_msgs/Map lookupParameters
 environment_communication_msgs/Map payLoad

@@ -33,8 +33,8 @@ import jade.core.AID;
 
 import java.util.ArrayList;
 
-import agents.data.DbData;
-import agents.data.MongoSaveable;
+import agents.data_classes.DbData;
+import agents.data_classes.MongoSaveable;
 
 import com.mongodb.BasicDBObject;
 

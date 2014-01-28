@@ -41,15 +41,18 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 import java.io.IOException;
+import java.io.Serializable;
 
-import libraries.blackboard_client.GeneralMongoException;
-import libraries.blackboard_client.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.GeneralMongoException;
+import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
 import org.bson.types.ObjectId;
 
-import agents.data.ProductStep;
+import agents.data_classes.BehaviourCallbackItem;
+import agents.data_classes.ParentBehaviourCallback;
+import agents.data_classes.ProductStep;
 import agents.service_agent.ServiceAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 
@@ -62,7 +65,7 @@ import com.mongodb.BasicDBObject;
  * @author Peter Bonnema
  * 
  */
-public class ScheduleStep extends ReceiveBehaviour {
+public class ScheduleStep extends ReceiveBehaviour implements ParentBehaviourCallback{
 	/**
 	 * @var long serialVersionUID
 	 *      The serialVersionUID of this class.
@@ -70,19 +73,25 @@ public class ScheduleStep extends ReceiveBehaviour {
 	private static final long serialVersionUID = -346155137703956948L;
 
 	/**
+	 * @var MessageTemplate MESSAGE_TEMPLATE
+	 *      The messageTemplate to match the messages.
+	 */
+	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("ScheduleStep");
+	
+	/**
 	 * @var ServiceAgent agent
 	 *      The service agent this behaviour belongs to.
 	 */
-	private ServiceAgent agent;
+	private ServiceAgent serviceAgent;
 
 	/**
 	 * Creates a new ScheduleStep instance with the specified parameters.
 	 * 
-	 * @param agent the agent this behaviour belongs to.
+	 * @param serviceAgent the service agent this behaviour belongs to.
 	 */
-	public ScheduleStep(Agent agent) {
-		super(agent, MessageTemplate.MatchOntology("ScheduleStep"));
-		this.agent = (ServiceAgent) agent;
+	public ScheduleStep(ServiceAgent serviceAgent) {
+		super(serviceAgent, MESSAGE_TEMPLATE);
+		this.serviceAgent = serviceAgent;
 	}
 
 	/**
@@ -99,24 +108,62 @@ public class ScheduleStep extends ReceiveBehaviour {
 	public void handle(ACLMessage message) {
 		if(message != null) {
 			try {
-				Logger.log(LogLevel.DEBUG, "%s scheduling step with Logistics%n", agent.getLocalName());
+				Logger.log(LogLevel.DEBUG, "%s scheduling step with Logistics%n", serviceAgent.getLocalName());
 
 				ProductStep productStep =
-						new ProductStep((BasicDBObject) agent.getProductStepBBClient().findDocumentById(
+						new ProductStep((BasicDBObject) serviceAgent.getProductStepBBClient().findDocumentById(
 								(ObjectId) message.getContentObject()));
 				
-				agent.mapConvIdWithProductStepId(message.getConversationId(), productStep.getId());
+				serviceAgent.mapConvIdWithProductStepId(message.getConversationId(), productStep.getId());
 
-				ACLMessage sendMsg = new ACLMessage(ACLMessage.QUERY_IF);
-				sendMsg.setConversationId(message.getConversationId());
-				sendMsg.addReceiver(agent.getLogisticsAID());
-				sendMsg.setOntology("ArePartsAvailable");
-				sendMsg.setContentObject(productStep);
-				agent.send(sendMsg);
-			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException | IOException e) {
-				Logger.log(LogLevel.ERROR, e);
-				agent.doDelete();
+				serviceAgent.addBehaviour(new ArePartsAvailable(serviceAgent, this, message.getConversationId(), productStep));
+			//	ACLMessage sendMsg = new ACLMessage(ACLMessage.QUERY_IF);
+			//	sendMsg.setConversationId(message.getConversationId());
+			//	sendMsg.addReceiver(agent.getLogisticsAID());
+			//	sendMsg.setOntology("ArePartsAvailable");
+			//	sendMsg.setContentObject(productStep);
+			//	agent.send(sendMsg);
+			} catch(InvalidDBNamespaceException | GeneralMongoException | UnreadableException e) {
+				Logger.log(LogLevel.ERROR, "", e);
+				serviceAgent.doDelete();
 			}
 		}
+	}
+
+	@Override
+	public void callback(ACLMessage result, BehaviourCallbackItem arguments) {
+		
+		switch(result.getOntology()){
+			
+		case "ArePartsAvailable":
+			serviceAgent.addBehaviour(new ArePartsAvailableInTime(serviceAgent, this, result.getConversationId(),
+					(ProductStep) arguments.getArgument("productStep")));
+			break;
+			
+		case "ArePartsAvailableInTime":
+			ProductStep test = (ProductStep) arguments.getArgument("productStep");
+			Logger.log(LogLevel.DEBUG, "Productstep: " + test);
+			serviceAgent.addBehaviour(new PartsInfo(serviceAgent, this, result.getConversationId(),
+					(ProductStep) arguments.getArgument("productStep")));
+			break;
+			
+		case "PartsInfo":
+			//TODO: Fillplaceholders message has to be sent, but there is no response.. so creating a new behaviour is now not viable..
+			//for now we just send the message.
+			ACLMessage informMsg = new ACLMessage(ACLMessage.INFORM);
+			informMsg.setOntology("FillPlaceholders");
+			informMsg.setConversationId(result.getConversationId());
+			informMsg.addReceiver(serviceAgent.getHardwareAgentAID());
+			try {
+				informMsg.setContentObject((Serializable) arguments.getArgument("stepId"));
+			} catch (IOException e) {
+				Logger.log(LogLevel.ERROR, "", e);
+			}
+			serviceAgent.send(informMsg);
+			break;
+			
+		}
+		
+		
 	}
 }

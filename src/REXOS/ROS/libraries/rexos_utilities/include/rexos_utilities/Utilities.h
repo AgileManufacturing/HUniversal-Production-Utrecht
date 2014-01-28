@@ -37,14 +37,18 @@
 #include <vector>
 #include <sstream>
 
+ // GCC system header to suppress libjson warnings
+#pragma GCC system_header
+#include <libjson/libjson.h>
+
 namespace rexos_utilities{
     long timeNow(void);
     void sleep(long milliseconds);
     double radiansToDegrees(double radians);
     double degreesToRadians(double degrees);
-    int stringToInt(int &i, char const *s, int base = 0);
+    int stringToInt(const std::string s, int base=0);
     double stringToDouble(const std::string& s);
-
+    std::string doubleToString(double x);
     /**
      * Utility class to time stuff.
      **/
@@ -109,6 +113,8 @@ namespace rexos_utilities{
 		}
     };
 
+    std::map<std::string, std::string> setMapFromNode(const JSONNode & n);
+ 	std::string mapToJsonString(std::map<std::string, std::string> map);
     template<typename T>
     /**
      * Checks if the vector contains the element.

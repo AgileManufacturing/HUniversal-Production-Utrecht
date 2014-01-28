@@ -1,14 +1,18 @@
 #!/usr/bin/env sh
 REXOS_BUILD_TARGET=""
+ROS_ONLY=false
+MAS_ONLY=false
+
 function usage() {
 	echo "Builds or cleans the cpp and java parts for the REXOS project."
-	echo "Usage: source rexos-build.sh [-c]"
-	echo "Defaults to build, use -c to clean."
+	echo "Usage: source rexos-build.sh [-c] [-r] [-m]"
+	echo "Defaults to build both ROS and MAS. Use -c to clean, -r to only build ROS, and -m to only build MAS."
 }
+
 
 #Have to clear OPTIND because this file as sourced and OPTIND is only cleared when creating a new shell.
 OPTIND=0
-while getopts ":ch" opt; do
+while getopts ":chrm" opt; do
 	case $opt in
 		c)
 			REXOS_BUILD_TARGET="clean"
@@ -16,6 +20,12 @@ while getopts ":ch" opt; do
 		h)
 			usage
 			return
+			;;
+		r)
+			ROS_ONLY=true
+			;;
+		m)
+			MAS_ONLY=true
 			;;
 		\?)
 			usage
@@ -26,28 +36,33 @@ done
 
 echo -e "\033[36m===== Setting ROS_PACKAGE_PATH =====\033[0m"
 . ./.export-rospath
-
-echo -e "\033[36m===== Building C++ =====\033[0m"
-catkin_make $REXOS_BUILD_TARGET
-echo -e "\033[35m===== DONE BUILDING C++ =====\033[0m"
-
-if [ "$REXOS_BUILD_TARGET" != "clean" ];
+if [ "$MAS_ONLY" == false ] || [ "$ROS_ONLY" == true ];
 then
-	. ./devel/setup.sh
+	echo -e "\033[36m===== Building C++ =====\033[0m"
+	catkin_make $REXOS_BUILD_TARGET
+	echo -e "\033[35m===== DONE BUILDING C++ =====\033[0m"
+
+	if [ "$REXOS_BUILD_TARGET" != "clean" ];
+	then
+		. ./devel/setup.sh
+	fi
+	
+	#rosrun apparently caches its module list. Force an update so tab complete works.
+	rospack list > /dev/null
 fi
 
-#rosrun apparently caches its module list. Force an update so tab complete works.
-rospack list > /dev/null
-
 echo ""
-echo -e "\033[36m===== Building JAVA =====\033[0m"
-ant -buildfile src/REXOS/MAS/build.xml $REXOS_BUILD_TARGET
-echo -e "\033[35m===== DONE JAVA =====\033[0m"
-
-
-if [ "$REXOS_BUILD_TARGET" != "clean" ];
+if [ "$ROS_ONLY" == false ] || [ "$MAS_ONLY" == true ];
 then
-	. ./build/REXOS/MAS/.export-classpath
+	echo -e "\033[36m===== Building JAVA =====\033[0m"
+	ant -buildfile src/REXOS/MAS/build.xml $REXOS_BUILD_TARGET
+	echo -e "\033[35m===== DONE JAVA =====\033[0m"
+
+
+	if [ "$REXOS_BUILD_TARGET" != "clean" ];
+	then
+		. ./build/REXOS/MAS/.export-classpath
+	fi
 fi
 
 #Have to clear OPTIND because this file as sourced and OPTIND is only cleared when creating a new shell.

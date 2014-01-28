@@ -61,16 +61,16 @@ public class ServiceAgentDied extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @var MessageTemplate messageTemplate
+	 * @var MessageTemplate MESSAGE_TEMPLATE
 	 *      The messageTemplate this behaviour listens to. This behaviour
 	 *      listens to the ontology: ServiceAgentDied.
 	 */
-	private static MessageTemplate messageTemplate = MessageTemplate
+	private static MessageTemplate MESSAGE_TEMPLATE = MessageTemplate
 			.MatchOntology("ServiceAgentDied");
 
 	/**
 	 * @var HardwareAgent hardwareAgent
-	 *      The equipletAgent related to this behaviour.
+	 *      The hardwareAgent related to this behaviour.
 	 */
 	private HardwareAgent hardwareAgent;
 
@@ -80,9 +80,9 @@ public class ServiceAgentDied extends ReceiveBehaviour {
 	 * @param a
 	 *            The agent for this behaviour
 	 */
-	public ServiceAgentDied(Agent a) {
-		super(a, messageTemplate);
-		hardwareAgent = (HardwareAgent) a;
+	public ServiceAgentDied(HardwareAgent hardwareAgent) {
+		super(hardwareAgent, MESSAGE_TEMPLATE);
+		this.hardwareAgent = hardwareAgent;
 	}
 
 	/**
@@ -94,9 +94,6 @@ public class ServiceAgentDied extends ReceiveBehaviour {
 	 */
 	@Override
 	public void handle(ACLMessage message) {
-		//Logger.log("%s received message from %s (%s)%n",
-				//myAgent.getLocalName(), message.getSender().getLocalName(),
-				//message.getOntology());
 		//remove the hardwareAgent
 		hardwareAgent.doDelete();
 	}

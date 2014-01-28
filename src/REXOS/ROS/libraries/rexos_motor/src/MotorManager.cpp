@@ -43,7 +43,7 @@ namespace rexos_motor{
 	 **/
 	void MotorManager::powerOn(void){
 		if(!poweredOn){
-			for(int i = 0; i < numberOfMotors; ++i){
+			for(int i = 0; i < motors.size(); ++i){
 				motors[i]->powerOn();
 			}
 		}
@@ -55,7 +55,7 @@ namespace rexos_motor{
 	 **/
 	void MotorManager::powerOff(void){
 		if(poweredOn){
-			for(int i = 0; i < numberOfMotors; ++i){
+			for(int i = 0; i < motors.size(); ++i){
 				motors[i]->powerOff();
 			}
 		}
@@ -71,15 +71,16 @@ namespace rexos_motor{
 		}
 
 		// Execute motion.
-		motors[0]->waitTillReady();
-		motors[1]->waitTillReady();
-		motors[2]->waitTillReady();
-
+		for(int i = 0; i < motors.size(); ++i){
+				motors[i]->waitTillReady();
+		}
+		
 		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
 		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
+		
+		for(int i = 0; i < motors.size(); ++i){
+				motors[i]->updateAngle();
+		}
 
-		motors[0]->updateAngle();
-		motors[1]->updateAngle();
-		motors[2]->updateAngle();
 	}
 }

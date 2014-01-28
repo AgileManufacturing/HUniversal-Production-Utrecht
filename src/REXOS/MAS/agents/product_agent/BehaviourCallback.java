@@ -13,7 +13,7 @@
  */
 package agents.product_agent;
 
-import agents.data.BehaviourStatus;
+import agents.data_classes.BehaviourStatus;
 
 /**
  * @author Mike

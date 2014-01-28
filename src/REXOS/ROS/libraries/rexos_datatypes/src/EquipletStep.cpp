@@ -29,8 +29,13 @@
  **/
 
 #include "rexos_datatypes/EquipletStep.h"
+#include "rexos_utilities/Utilities.h"
 
 namespace rexos_datatypes{
+
+    EquipletStep::EquipletStep(JSONNode n) {
+        setValues(n);
+    }
 
     std::string EquipletStep::getId(){
         return this->_id;
@@ -95,11 +100,6 @@ namespace rexos_datatypes{
     void EquipletStep::setTimeData(TimeData timeData){
         this->timeData = timeData;
     }
-    
-    EquipletStep::EquipletStep(JSONNode n) {
-        std::cout << "Equipletstep called." << std::endl;
-        setValues(n);
-    }
 
     EquipletStep::~EquipletStep() {
         //std::cout << "Delete Equipletstep called." std::endl;
@@ -127,51 +127,34 @@ namespace rexos_datatypes{
                 setModuleId(i -> as_int());
             }
             else if (strcmp(node_name, "instructionData") == 0){
-                setInstructionData(setInstructionDataFromNode(*i));
+                setInstructionData(InstructionData(*i));
             }
             else if (strcmp(node_name, "status") == 0){
                 setStatus(i -> as_string());
             }
             else if (strcmp(node_name, "statusData") == 0){
-                setStatusData(setMapFromNode(*i));
+                setStatusData(rexos_utilities::setMapFromNode(*i));
             }
             else if (strcmp(node_name, "timeData") == 0){
                 setTimeData(setTimeDataFromNode(*i));
             }
-            //increment the iterator
             ++i;
         }        
     }
-    
-    InstructionData EquipletStep::setInstructionDataFromNode(const JSONNode & n){
-         //Iterate them nodes.
-        JSONNode::const_iterator i = n.begin();
-        InstructionData * instructData = new InstructionData();
-        instructData->setJsonNode(n);
-        
-        while (i != n.end()){
-            
-            const char * node_name = i -> name().c_str();
-            
-            if (strcmp(node_name, "command") == 0){
-                instructData->setCommand(i -> as_string());
-            }
-            else if (strcmp(node_name, "destination") == 0){
-                instructData->setDestination(i -> as_string());
-            }
-            else if (strcmp(node_name, "look_up") == 0){
-                instructData->setLook_up(i -> as_string());
-            }
-            else if (strcmp(node_name, "look_up_parameters") == 0){
-                instructData->setLook_up_parameters(setMapFromNode(*i));
-            }
-            else if (strcmp(node_name, "payload") == 0){
-                instructData->setPayload(setMapFromNode(*i));
-            }
-            //increment the iterator
-            ++i;
-        }
-        return *instructData;
+
+    std::string EquipletStep::toJSONString(){
+
+        std::stringstream ss;
+
+        ss << "{ ";
+        ss << "\"serviceStepID\" : \"" << this->serviceStepID << "\", ";
+        ss << "\"nextStep\" : \"" << this->nextStep << "\", ";
+        ss << "\"moduleId\" : \"" << this->moduleId << "\", ";
+        ss << "\"instructionData\" : " << this->instructionData.toJSONString() << ", ";
+        ss << "\"status\" : \"" << this->status << "\" ";
+        ss << " } ";
+
+        return ss.str();
     }
     
     TimeData EquipletStep::setTimeDataFromNode(const JSONNode & n){
@@ -183,21 +166,7 @@ namespace rexos_datatypes{
             timeData->setDuration(i-> as_int());
             i++;
         }
-        
         return *timeData;
     }
-    
-    std::map<std::string, std::string> EquipletStep::setMapFromNode(const JSONNode & n)
-    {
-        std::map<std::string, std::string> * newMap = new std::map<std::string, std::string>();
-        
-        JSONNode::const_iterator i = n.begin();
-         while (i != n.end()){
-             newMap->insert(std::pair<std::string,std::string>(i->name(),i->as_string()));
-             i++;
-         }
-        
-        return *newMap;
-    }
-    
+   
 }

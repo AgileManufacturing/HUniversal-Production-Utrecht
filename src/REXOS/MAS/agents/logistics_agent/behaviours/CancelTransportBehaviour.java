@@ -41,7 +41,8 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
-import agents.data.Part;
+import agents.data_classes.Part;
+import agents.logistics_agent.LogisticsAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 
 public class CancelTransportBehaviour extends ReceiveBehaviour {
@@ -52,12 +53,24 @@ public class CancelTransportBehaviour extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * @var MessageTemplate MESSAGE_TEMPLATE
+	 *      The messageTemplate to match the messages.
+	 */
+	private static final MessageTemplate MESSAGE_TEMPLATE = MessageTemplate.MatchOntology("CancelTransport");
+	
+	/**
+	 * @var LogisticsAgent logisticsAgent
+	 *      The logisticsAgent of this behaviour.
+	 */
+	private LogisticsAgent logisticsAgent;
+	/**
 	 * Constructs the behaviour for the given agent.
 	 * 
 	 * @param a The agent associated with this behaviour.
 	 */
-	public CancelTransportBehaviour(Agent a) {
-		super(a, MessageTemplate.MatchOntology("CancelTransport"));
+	public CancelTransportBehaviour(LogisticsAgent logisticsAgent) {
+		super(logisticsAgent, MESSAGE_TEMPLATE);
+		this.logisticsAgent = logisticsAgent;
 	}
 
 	/**
@@ -69,9 +82,9 @@ public class CancelTransportBehaviour extends ReceiveBehaviour {
 		try {
 			// TODO (out of scope) cancel the transport of the parts in parts[]
 			Part[] parts = (Part[]) message.getContentObject();
-			Logger.log(LogLevel.DEBUG, "Logistics agent - cancelling parts");
+			Logger.log(LogLevel.DEBUG, "cancelling parts");
 		} catch(UnreadableException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 		}
 	}
 }

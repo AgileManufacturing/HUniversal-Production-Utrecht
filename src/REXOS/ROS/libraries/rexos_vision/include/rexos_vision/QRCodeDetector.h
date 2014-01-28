@@ -40,6 +40,7 @@
 #include <vector>
 #include <opencv2/core/core.hpp>
 #include "rexos_datatypes/Crate.h"
+#include "rexos_datatypes/QrCode.h"
 
 namespace rexos_vision{
 	/**
@@ -57,6 +58,8 @@ namespace rexos_vision{
 		QRCodeDetector();
 
 		void detectQRCodes(cv::Mat& image, std::vector<rexos_datatypes::Crate>& crates, cv::TermCriteria criteria =
+				cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 15, 0.1));
+		void detectQRCodes(cv::Mat& image, std::vector<rexos_datatypes::QrCode>& crates, cv::TermCriteria criteria =
 				cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 15, 0.1));
 		void detectQRCodes(cv::Mat& image, std::vector<std::string>& reconfigureCommands);
 	};

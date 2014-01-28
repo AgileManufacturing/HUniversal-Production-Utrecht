@@ -30,6 +30,8 @@
 
 #include <rexos_utilities/Utilities.h>
 
+#include <stdexcept>
+
 namespace rexos_utilities{
     /**
      * Get the current time in milliseconds.
@@ -85,23 +87,19 @@ namespace rexos_utilities{
      *  - 2 is underflow
      *  - 3 is inconvertible
      **/
-    int stringToInt(int &i, char const *s, int base) {
+    int stringToInt(const std::string s, int base) {
         char *end;
         long  l;
         errno = 0;
-        l = strtol(s, &end, base);
+        l = strtol(s.c_str(), &end, base);
         if ((errno == ERANGE && l == LONG_MAX) || l > INT_MAX) {
-            return 1;
+            throw std::runtime_error("rexos_utilities::stringToInt: overflow");
+        } else if ((errno == ERANGE && l == LONG_MIN) || l < INT_MIN) {
+            throw std::runtime_error("rexos_utilities::stringToInt: underflow");
+        } else if (s[0] == '\0' || *end != '\0') {
+            throw std::runtime_error("rexos_utilities::stringToInt: inconvertible");
         }
-        if ((errno == ERANGE && l == LONG_MIN) || l < INT_MIN) {
-            return 2;
-        }
-        if (*s == '\0' || *end != '\0') {
-            return 3;
-        }
-        i = l;
-
-        return 0;
+        return l;
     }
 
     /**
@@ -112,9 +110,45 @@ namespace rexos_utilities{
      **/
     double stringToDouble(const std::string& s){
         std::istringstream i(s);
-        double x;
+        double x = 0;
         if (!(i >> x))
-            return 0;
+            
         return x;
+    }
+
+    std::string doubleToString(double x){
+        std::ostringstream o;
+
+        if (!(o << x)) {
+            return "";
+        }
+
+        return o.str();
+    }
+
+    std::string mapToJsonString(std::map<std::string, std::string> map){
+        std::stringstream mapStream;
+        std::map<std::string, std::string>::iterator iter;
+
+        for (iter = map.begin(); iter != map.end(); ++iter) {
+            if ((iter != map.end()) && (iter == --map.end())) {
+                mapStream << "\"" << iter->first << "\" : \"" << iter->second << "\" ";
+            } else {
+                mapStream << "\"" << iter->first << "\" : \"" << iter->second << "\", ";
+            }
+        }
+        return mapStream.str();
+    }
+
+    std::map<std::string, std::string> setMapFromNode(const JSONNode & n) {
+        std::map<std::string, std::string> * newMap = new std::map<std::string, std::string>();
+        
+        JSONNode::const_iterator i = n.begin();
+         while (i != n.end()){
+             newMap->insert(std::pair<std::string,std::string>(i->name(),i->as_string()));
+             i++;
+         }
+        
+        return *newMap;
     }
 }

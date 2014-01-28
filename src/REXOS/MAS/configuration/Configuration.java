@@ -55,23 +55,19 @@ public class Configuration {
 		try { 
 			switch(File)
 			{
-				case MONGO_DB_PROPERTIES:
-					p.load(new FileInputStream(propertiesFilePath + "mongo_db.properties"));
-					return p.getProperty(key);
-					
-				case KNOWLEDGE_DB_PROPERTIES:
-					p.load(new FileInputStream(propertiesFilePath + "knowledge_db.properties"));
-					return p.getProperty(key);
-					
 				case EQUIPLET_DB_PROPERTIES:
-					p.load(new FileInputStream(propertiesFilePath + "equiplet_db.properties"));
+					p.load(new FileInputStream(propertiesFilePath + File.getFileName()));
 					return p.getProperty(EquipletName + key);
 					
 				default:
+					if(File != null){
+						p.load(new FileInputStream(propertiesFilePath + File.getFileName()));
+						return p.getProperty(key);
+					}
 					System.out.println("Property file not known.");
 					break;
 			}
-		}catch(NullPointerException e){
+		}catch(NullPointerException e) {
 			System.out.println("Property doesnt exist: " + key + " in file " + File.toString());
 		} catch (FileNotFoundException e) {
 			System.out.println("File doesnt exist: " + File.toString());
@@ -79,6 +75,26 @@ public class Configuration {
 			System.out.println(e);
 		}
 		return "";
+	}
+	
+	public static int getPropertyInt(ConfigurationFiles File, String key)
+	{
+		if(File != ConfigurationFiles.EQUIPLET_DB_PROPERTIES){
+			return getPropertyInt(File, key, null);
+		} else {
+			System.out.println("Need a equiplet name to read equiplet db properties");
+			return -1;
+		}
+	}
+	
+	public static int getPropertyInt(ConfigurationFiles File, String key, String EquipletName)
+	{
+		try {
+			return Integer.parseInt(getProperty(File, key, EquipletName));
+		} catch(NumberFormatException e){
+			System.out.println("Cant parse integer in configurationfile: " + File.getFileName());
+			return -1;
+		}
 	}
 	
 }

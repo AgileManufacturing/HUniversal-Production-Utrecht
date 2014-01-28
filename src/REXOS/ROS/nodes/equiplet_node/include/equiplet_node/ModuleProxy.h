@@ -10,6 +10,8 @@
 
 #include <actionlib/client/simple_action_client.h>
 
+#include <rexos_bond/Bond.h>
+
 #include <rexos_statemachine/State.h>
 #include <rexos_statemachine/Mode.h>
 
@@ -35,7 +37,7 @@ typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction> Cha
 typedef actionlib::SimpleActionClient<rexos_statemachine::ChangeModeAction> ChangeModeActionClient;
 typedef actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> SetInstructionActionClient;
 
-class ModuleProxy {
+class ModuleProxy : public rexos_bond::BondListener{
 public:
 	ModuleProxy(std::string equipletNodeName, std::string moduleName, int equipletId, int moduleId, ModuleProxyListener* mpl = NULL);
 	virtual ~ModuleProxy();
@@ -59,6 +61,7 @@ private:
 	bool onStateChangeServiceCallback(StateUpdateRequest &req, StateUpdateResponse &res);
 	bool onModeChangeServiceCallback(ModeUpdateRequest &req, ModeUpdateResponse &res);
 	void onInstructionServiceCallback(const actionlib::SimpleClientGoalState& state, const rexos_statemachine::SetInstructionResultConstPtr& result);
+	void onModuleDied();
 
 	int moduleId;
 
@@ -78,6 +81,13 @@ private:
 
 	rexos_statemachine::State currentState;
 	rexos_statemachine::Mode currentMode;
+	
+	/**
+	 * The bond to bind the module with the equiplet
+	 **/
+	rexos_bond::Bond* bond;
+protected:
+	virtual void onBondCallback(rexos_bond::Bond* bond, Event event);
 };
 
 } /* namespace equiplet_node */

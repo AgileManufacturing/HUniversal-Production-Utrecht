@@ -10,8 +10,8 @@ import java.io.IOException;
 
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
-import agents.data.BehaviourStatus;
-import agents.data.ProductionStep;
+import agents.data_classes.BehaviourStatus;
+import agents.data_classes.ProductionStep;
 
 public class SubInformerBehaviour extends agents.shared_behaviours.ReceiveBehaviour {
 
@@ -63,14 +63,14 @@ public class SubInformerBehaviour extends agents.shared_behaviours.ReceiveBehavi
 	public void onStart() {
 		super.onStart();
 		try {
-			ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+			ACLMessage message = new ACLMessage(ACLMessage.QUERY_IF);
 			message.setConversationId(_conversationId);
 			message.addReceiver(_targetEquiplet);
 			message.setOntology("CanPerformStep");
 			message.setContentObject(_productionStep);
 			myAgent.send(message);
 		} catch (IOException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 		}
 	}
 
@@ -84,14 +84,15 @@ public class SubInformerBehaviour extends agents.shared_behaviours.ReceiveBehavi
 		try {
 			if (message != null) {
 				switch (_currentState) {
+				
 				case 0:
 					if (message.getPerformative() == ACLMessage.CONFIRM) 
 					{
 						ACLMessage newMessage = new ACLMessage(
-								ACLMessage.REQUEST);
+								ACLMessage.QUERY_REF);
 						newMessage.setConversationId(_conversationId);
 						newMessage.addReceiver(_targetEquiplet);
-						newMessage.setOntology("GetProductionDuration");
+						newMessage.setOntology("ProductionDuration");
 						newMessage.setContentObject(_productionStep);
 						myAgent.send(newMessage);
 						_currentState++;
@@ -123,7 +124,7 @@ public class SubInformerBehaviour extends agents.shared_behaviours.ReceiveBehavi
 				_parentBehaviour.callbackSubInformerBehaviour(BehaviourStatus.ERROR, this);
 			}
 		} catch (IOException | UnreadableException e) {
-			Logger.log(LogLevel.ERROR, e);
+			Logger.log(LogLevel.ERROR, "", e);
 			_parentBehaviour.callbackSubInformerBehaviour(BehaviourStatus.ERROR, this);
 		}
 	}

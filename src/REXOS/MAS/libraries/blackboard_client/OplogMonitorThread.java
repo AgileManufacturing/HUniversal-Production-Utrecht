@@ -31,6 +31,8 @@ package libraries.blackboard_client;
 
 import java.util.ArrayList;
 
+import libraries.blackboard_client.data_classes.BlackboardSubscription;
+import libraries.blackboard_client.data_classes.OplogEntry;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
@@ -56,6 +58,7 @@ class OplogMonitorThread extends Thread {
 	 **/
 	private static final int POLL_INTERVAL = 100;
 
+	private DB database;
 	/**
 	 * @var DBCursor tailedCursor
 	 * Tailed cursor for this thread.
@@ -82,9 +85,9 @@ class OplogMonitorThread extends Thread {
 	 * @param query The query that will be used in the tailed cursor.
 	 **/
 	public OplogMonitorThread(Mongo mongo, String oplogDBName, String oplogCollectionName, DBObject query) {
-		DB database = mongo.getDB(oplogDBName);
+		database = mongo.getDB(oplogDBName);
 		DBCollection collection = database.getCollection(oplogCollectionName);
-
+		
 		tailedCursor = collection.find(query);
 		tailedCursor.addOption(Bytes.QUERYOPTION_TAILABLE);
 		tailedCursor.addOption(Bytes.QUERYOPTION_AWAITDATA);
@@ -104,11 +107,11 @@ class OplogMonitorThread extends Thread {
 	 * @param query The query that will be used in the tailed cursor.
 	 **/
 	public OplogMonitorThread(Mongo mongo, String oplogDBName, String oplogCollectionName,
-			String username, String password, DBObject query) {
-		DB database = mongo.getDB(oplogDBName);
+		String username, String password, DBObject query) {
+		database = mongo.getDB(oplogDBName);
 		database.authenticate(username, password.toCharArray());
 		DBCollection collection = database.getCollection(oplogCollectionName);
-
+		
 		tailedCursor = collection.find(query);
 		tailedCursor.addOption(Bytes.QUERYOPTION_TAILABLE);
 		tailedCursor.addOption(Bytes.QUERYOPTION_AWAITDATA);
@@ -116,7 +119,7 @@ class OplogMonitorThread extends Thread {
 		callbackThread = new OplogCallbackThread();
 	}
 	
-	/**
+	/**.requestStart()
 	 * Sets the subscriptions that are used for the query of this oplog monitor.
 	 * @param subscriptions ArrayList containing all the subscriptions this monitor will subscribe to.
 	 **/
@@ -124,25 +127,24 @@ class OplogMonitorThread extends Thread {
 		this.subscriptions = new BlackboardSubscription[subscriptions.size()];
 		subscriptions.toArray(this.subscriptions);
 	}
-	
+
 	/**
 	 * Run method for the TailedCursorThread.
 	 * This will check for changes within the cursor and calls the onMessage method of its subscriber.
-	 **/
+	 */
 	@Override
 	public void run() {
-		try {
+		try{
 			do {
 				while (!Thread.interrupted() && tailedCursor.hasNext()) {
 					OplogEntry entry = new OplogEntry(tailedCursor.next());
-
+	
 					for (BlackboardSubscription sub : subscriptions) {
 						if (sub.matchesWithEntry(entry)) {
 							callbackThread.addCallback(sub.getSubscriber(), entry);
 						}
 					}
 				}
-				
 				Thread.sleep(POLL_INTERVAL);
 			} while (!Thread.interrupted() && tailedCursor.getCursorId() != 0);
 		} catch (MongoInterruptedException | MongoException.CursorNotFound | InterruptedException ex) {
@@ -155,8 +157,7 @@ class OplogMonitorThread extends Thread {
 			 * MongoException.CursorNotFound indicates the cursor was killed while blocking on hasNext.
 			 * We purposely kill the cursor when the OplogMonitorThread is interrupted, thus expect this to happen.
 			 */
-			
-			Logger.log(LogLevel.CRITICAL,"OplogMonitorThread ending due to %s:\n%s\n", ex.getClass().getName(), ex.getMessage());
+			Logger.log(LogLevel.ERROR,"OplogMonitorThread ending due to %s:\n%s\n", ex.getClass().getName(), ex.getMessage());
 		} finally {
 			try {
 				if (tailedCursor != null) {
@@ -164,10 +165,10 @@ class OplogMonitorThread extends Thread {
 				}
 			} catch (Throwable t) {
 				// If closing the cursor throws something, it's most likely not something we can fix.
-			Logger.log(LogLevel.ERROR, "%s thrown while closing cursor:\n%s\n", t.getClass().getName(), t.getMessage());
+				Logger.log(LogLevel.ERROR, "%s thrown while closing cursor:\n%s\n", t.getClass().getName(), t.getMessage());
 			}
+			//
 		}
-		
 		callbackThread.shutdown();
 	}
 }

@@ -47,8 +47,8 @@
  **/
 package agents.hardware_agent;
 
-import agents.data.Position;
-import agents.data.StepStatusCode;
+import agents.data_classes.Position;
+import agents.data_classes.StepStatusCode;
 
 import com.mongodb.BasicDBObject;
 
