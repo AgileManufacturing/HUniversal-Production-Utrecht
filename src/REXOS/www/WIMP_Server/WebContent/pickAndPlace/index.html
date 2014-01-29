@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Product Agent Client</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="styling.css">
+	</head>
+	<body>
+
+		<script src="js/Three.js"></script>
+		<script src="js/click.js"></script>
+		<script src='js/csg.js'></script>
+		<script src="js/ThreeCSG.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/Stats.js"></script>
+		<script src='js/DAT.GUI.min.js'></script>
+		<script src='jquery-1.4.1.js'></script>
+		<script src="Fonts/gentilis_regular.typeface.js"></script>
+		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+		<script type="text/javascript">
+			google.load("jquery", "1");
+			google.load("jqueryui", "1");
+		</script>
+		<script>
+			// CONTROLEREN OF WEBGL ONDERSTEUNT WORDT
+			if (!Detector.webgl)
+				Detector.addGetWebGLMessage();
+
+			// Basic scene variables
+			var container, stats;
+			var camera, scene, renderer, topcamera, selectcamera, cameraRotation = 0;
+			var projector;
+			var mouse2D = new THREE.Vector3(0, 0, 0), ray;
+			var Crate, CrateCenter;
+			var CrateColumns = 4;
+			var CrateRows = 4;
+			var CrateCenter;
+			var rollOver, rollOverColor;
+
+			//Objects contains all objects for intersection, cubes contains all placed objects, selectItems contains all selectable objects
+			var objects = [], cubes = [], selectItems = [], availableItems = [], selectedIndex = 0, positionToSelectedIndex = [];
+
+			//Mousecontrols -> drag
+			var drag = 0, selectDrag = 0, selectMouseDown;
+			var maxDragSpeed = 15;
+			var cursorX, cursorY;
+			var isMouseDown = false, upperhalf = true;
+			var previousPositionX, previousPositionY;
+
+			//Cameracontrol
+			var degree = (2 * Math.PI) / 360;
+			var cameraPathRadius = 700;
+			var cameraHeight = 800;
+
+			// Colors
+			var backgroundColor = 0xFFFFFF;
+			var crateColor = 0xFFE373;
+
+			// Skybox
+			var skyBoxGeometry = new THREE.CubeGeometry(2000, 2000, 2000, 1, 1, 1, null, true);
+			var skyBoxMaterial = new THREE.MeshBasicMaterial({
+				color : backgroundColor
+			});
+
+			init();
+			animate();
+
+			function animate() {
+				requestAnimationFrame(animate);
+				render();
+				stats.update();
+			}
+
+			//Override the current alert function, since the alert is blocking some of the click events are missed.
+			(function() {
+				var _old_alert = window.alert;
+				window.alert = function() {
+					_old_alert.apply(window, arguments);
+					isMouseDown = false;
+					selectMouseDown = false;
+				};
+			})();
+
+			function init() {
+				window.parent.showCreateTab('pickAndPlace');
+				// Main div
+				container = document.createElement('div');
+				document.body.appendChild(container);
+
+				//Create debug div
+				var debugdiv = document.createElement('div');
+				debugdiv.id = 'debugdiv';
+				container.appendChild(debugdiv);
+
+				scene = new THREE.Scene();
+				projector = new THREE.Projector();
+
+				// Create cameras
+				camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 20000);
+				topcamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 20000);
+				selectcamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 20000);
+				selectcamera.postion = new THREE.Vector3(10010, 30, 100);
+
+				scene.add(topcamera);
+				scene.add(camera);
+				scene.add(selectcamera);
+
+				//Create Crate
+				Crate = generateCrate(CrateColumns, CrateRows);
+				CrateCenter = new THREE.Vector3((CrateColumns * 63) / 2 - 33, 0, (CrateRows * 63) / 2 - 33);
+				scene.add(Crate);
+				objects.push(Crate);
+
+				//Initial camera settings
+				rotateCamera(-90);
+				camera.position.y = cameraHeight;
+				camera.position.x = Math.floor(Math.cos(0) * cameraPathRadius) + CrateCenter.x;
+				camera.position.z = Math.floor(Math.sin(0) * cameraPathRadius) + CrateCenter.z;
+				topcamera.position.y = cameraHeight;
+				camera.aspect = 0.75 * window.innerWidth / window.innerHeight;
+				topcamera.aspect = 0.5 * window.innerWidth / window.innerHeight;
+				selectcamera.aspect = 0.5 * window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				topcamera.updateProjectionMatrix();
+				selectcamera.updateProjectionMatrix();
+
+				//Create RollOver
+				rollOverColor = 0x0ff0ff;
+				rollOver = new THREE.Mesh(new THREE.SphereGeometry(25, 25, 25), new THREE.MeshLambertMaterial({
+					color : rollOverColor,
+					opacity : 0.5,
+					transparent : true
+				}));
+				rollOver.position = new THREE.Vector3(0, 20, 0);
+				scene.add(rollOver);
+
+				//Create Skyboxes
+				var skyBox = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
+				skyBox.flipSided = true;
+				var skyBox2 = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
+				skyBox2.flipSided = true;
+				skyBox2.position = new THREE.Vector3(10000, 0, 0);
+				scene.add(skyBox);
+				scene.add(skyBox2);
+
+				//Create light
+				var directionalLight = new THREE.DirectionalLight(0xffffff);
+				directionalLight.position.set(1, 0.85, 0.5).normalize();
+				directionalLight.target = Crate;
+				scene.add(directionalLight);
+
+				var spotlight = new THREE.SpotLight(0xffffff, 0.7, 3000);
+				spotlight.position = new THREE.Vector3(-487, 0, -216);
+				scene.add(spotlight);
+
+				//Create renderer
+				renderer = new THREE.WebGLRenderer({
+					antialias : true,
+					preserveDrawingBuffer : true
+				});
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				renderer.setClearColorHex(0x000000, 1);
+				renderer.autoClear = false;
+				container.appendChild(renderer.domElement);
+
+				//Create stats(FPS)
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.bottom = '0px';
+				container.appendChild(stats.domElement);
+
+				//Add eventlisteners
+				var click = new Click();
+				click.init();
+				window.addEventListener('resize', onWindowResize, false);
+
+				//Add selectable items
+				addSelectable(new THREE.Mesh(new THREE.SphereGeometry(25, 25, 25), new THREE.MeshLambertMaterial({color: rollOverColor})), 0);
+				addSelectable(new THREE.Mesh(new THREE.SphereGeometry(25, 25, 25), new THREE.MeshLambertMaterial({color: 0x0000ff})), 16);
+				addSelectable(new THREE.Mesh(new THREE.SphereGeometry(25,25,25), new THREE.MeshLambertMaterial({color: 0x0ff000})), 0);
+				addSelectable(new THREE.Mesh(new THREE.SphereGeometry(25,25,25), new THREE.MeshLambertMaterial({color: 0xff0000})), 0);
+				addSelectable(new THREE.Mesh(new THREE.SphereGeometry(25,25,25), new THREE.MeshLambertMaterial({color: 0xff00ff})), 0);
+
+			}
+
+			function render() {
+				var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+
+				//Perform Drag
+				if (upperhalf) {
+					rotateCamera(-drag / 2);
+				} else {
+					rotateCamera(drag / 2);
+				}
+				if (!isMouseDown && drag > 0) {
+					drag = drag - 0.25;
+				}
+				if (!isMouseDown && drag < 0) {
+					drag = drag + 0.25;
+				}
+				if (!selectMouseDown && selectDrag > 0) {
+					selectDrag = selectDrag - 0.25;
+				}
+				if (!selectMouseDown && selectDrag < 0) {
+					selectDrag = selectDrag + 0.25;
+				}
+				if (cursorX == previousPositionX && isMouseDown) {
+					drag = 0;
+				}
+
+				scrollSelectables(selectDrag);
+
+				//Camera
+				camera.lookAt(CrateCenter);
+				setTopCamera();
+
+				//Clear screen
+				renderer.setViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+				renderer.clear();
+
+				//Render mainView
+				renderer.setViewport(0.75 * SCREEN_WIDTH + 1, 1, 0.25 * SCREEN_WIDTH - 2, 0.5 * SCREEN_HEIGHT - 2);
+				renderer.render(scene, selectcamera);
+
+				//Render upperRight
+				renderer.setViewport(1, 1, 0.75 * SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2);
+				renderer.render(scene, camera);
+
+				//Render lowerRight
+				renderer.setViewport(0.75 * SCREEN_WIDTH + 1, 0.5 * SCREEN_HEIGHT, 0.25 * SCREEN_WIDTH - 2, 0.5 * SCREEN_HEIGHT - 2);
+				renderer.render(scene, topcamera);
+
+			}
+
+			//Generates the crate mesh
+			function generateCrate(columns, rows) {
+				var SmallCube = new THREE.CSG.toCSG(new THREE.CubeGeometry(50, 60, 50), new THREE.Vector3(0, 25, 0));
+				var BigCube = new THREE.CSG.toCSG(new THREE.CubeGeometry(76, 40, 76));
+				var CrateUnit = BigCube.subtract(SmallCube);
+				var Crate = THREE.CSG.fromCSG(CrateUnit);
+				for (var i = 0; i < columns; i++) {
+					CrateUnit = CrateUnit.union(new THREE.CSG.toCSG(Crate, new THREE.Vector3(i * 63, 0, 0)));
+				}
+				Crate = THREE.CSG.fromCSG(CrateUnit);
+				for (var i = 0; i < rows; i++) {
+					CrateUnit = CrateUnit.union(new THREE.CSG.toCSG(Crate, new THREE.Vector3(0, 0, i * 63)));
+				}
+				var mesh = new THREE.Mesh(THREE.CSG.fromCSG(CrateUnit), new THREE.MeshLambertMaterial({
+					color : crateColor
+				}));
+				return mesh;
+			}
+
+			//Returns coordinates to ViewPort, Main Crate viewport = 0, topView(upper right) viewport = 1, selectablesView(lower right) viewport = 2
+			function getViewPortFromCoords(x, y) {
+				if (x > (window.innerWidth - (window.innerWidth / 4))) {
+					if (y > window.innerHeight / 2) {
+						return 2;
+					} else {
+						return 1;
+					}
+				} else {
+					return 0;
+				}
+			}
+
+			//scrolls the selectCamera, negative pixels will move the camera down, positive pixels will move it up, The position is limited to the amount of selectables
+			function scrollSelectables(pixels) {
+				var min = 50;
+				var max = min + (selectItems.length * 70);
+				if (selectcamera.position.y + pixels <= min) {
+					selectcamera.position = new THREE.Vector3(10010, min, 200);
+				} else if (selectcamera.position.y + pixels >= max) {
+					selectcamera.position = new THREE.Vector3(10010, max, 200);
+				} else {
+					selectcamera.position = new THREE.Vector3(10010, selectcamera.position.y + pixels, 200);
+				}
+				selectcamera.rotation = new THREE.Vector3(-0.5, 0, 0);
+			}
+
+			//Add item to select, Item = THREE.Mesh
+			function addSelectable(Item, amount) {
+				Item.position = new THREE.Vector3(10000, selectItems.length * 75, 0);
+				scene.add(Item);
+				selectItems.push(Item);
+				//Add amount text
+				var TextMesh = getMeshFromText(amount + 'x');
+				TextMesh.position = new THREE.Vector3(Item.position.x + 30, Item.position.y - 20, Item.position.z);
+				var selectable = new Object();
+				selectable.mesh = TextMesh;
+				selectable.amount = amount;
+				availableItems.push(selectable);
+				scene.add(TextMesh);
+			}
+
+			//Updates the selectable amount, Item= object from availableItems[], amount= is usually 1 or -1
+			function updateSelectable(Item, amount) {
+				scene.remove(Item.mesh);
+				var newMesh = getMeshFromText(Item.amount + amount + 'x');
+				newMesh.position = new THREE.Vector3(Item.mesh.position.x, Item.mesh.position.y, Item.mesh.position.z);
+				Item.mesh = newMesh;
+				Item.amount = Item.amount + amount;
+				scene.add(newMesh);
+			}
+
+			//Convert a String to a Mesh object
+			function getMeshFromText(Text) {
+				textGeo = new THREE.TextGeometry(Text, {
+					size : 15,
+					height : 2,
+					curveSegments : 5,
+					font : 'gentilis',
+					weight : 'normal',
+					bevelThickness : 1,
+					bevelSize : 0.5,
+					bevelEnabled : true
+				});
+				var wrapper = new THREE.MeshLambertMaterial({
+					color : 0xff0000
+				});
+				var words = new THREE.Mesh(textGeo, wrapper);
+				return words;
+			}
+
+			//Sets the location of the TopCamera
+			function setTopCamera() {
+				topcamera.lookAt(CrateCenter);
+				topcamera.rotation.z = 0;
+				if (CrateCenter.z >= CrateCenter.x) {
+					topcamera.position = new THREE.Vector3(CrateColumns * 55, CrateRows * 100, CrateCenter.z + CrateColumns * 20);
+				} else {
+					topcamera.position = new THREE.Vector3(CrateColumns * 55, CrateColumns * 100, CrateCenter.z + CrateColumns * 20);
+				}
+			}
+
+			//Rotate camera, negative rotate results in rotating the other way, rotate = degrees
+			function rotateCamera(rotate) {
+				cameraRotation = cameraRotation + (rotate * degree);
+				camera.position.x = Math.floor(Math.cos(cameraRotation) * cameraPathRadius) + CrateCenter.x;
+				camera.position.z = Math.floor(Math.sin(-cameraRotation) * cameraPathRadius) + CrateCenter.z;
+				camera.updateMatrix();
+			}
+
+			//Converts position to fixed location in the crate, position = THREE.Vector3()
+			function checkPosition(position) {
+				var row = 0;
+				var column = 0;
+				for (var i = 0; i < 10; i++) {
+					if (position.x <= (i * 63) + 38) {
+						break;
+					} else {
+						row++;
+					}
+				}
+				for (var i = 0; i < 10; i++) {
+					if (position.z <= (i * 63) + 38) {
+						break;
+					} else {
+						column++;
+					}
+				}
+				return new THREE.Vector3(row * 63, 20, column * 63);
+			}
+
+			//Converts position to a location in the Array(The upperleft position of the crate results in a 0), position has to be one of the positions in the crate, position = THREE.Vector3()
+			function getArrayPosition(position) {
+				x = 0;
+				z = 0;
+				b = position.x;
+				for (var i = 0; i <= CrateColumns; i++) {
+					b = b - 63;
+					if (b < 0) {
+						break;
+					} else {
+						x++;
+					}
+				}
+				b = position.z;
+				for (var i = 0; i <= CrateRows; i++) {
+					b = b - 63;
+					if (b < 0) {
+						break;
+					} else {
+						z++;
+					}
+				}
+				var array = z * (CrateColumns - 1) + x + z;
+				return array;
+			}
+
+			//Cast a ray into the 3d scene and returns the first object that intersects the ray
+			function getIntersectedObject(mouseVector, IntersectCamera, objectArray) {
+				var vector = new THREE.Vector3(mouseVector.x, mouseVector.y, 0.5);
+
+				projector.unprojectVector(vector, IntersectCamera);
+
+				var ray = new THREE.Ray(IntersectCamera.position, vector.subSelf(IntersectCamera.position).normalize());
+
+				var intersects = ray.intersectObjects(objectArray);
+				return intersects;
+			}
+
+			function onDocumentMouseDown(event) {
+
+				if (event.clientY > window.innerHeight / 2) {
+					upperhalf = true;
+				} else {
+					upperhalf = false;
+				}
+				previousPositionX = event.clientX;
+				previousPositionY = event.clientY;
+				var viewPort = getViewPortFromCoords(event.clientX, event.clientY);
+
+				if (viewPort == 0) {
+					drag = 0;
+					isMouseDown = true;
+
+					//mouse2D = direction vector value has to be between -1 and 1
+					mouse2D.x = (event.clientX / (window.innerWidth * 0.75) ) * 2 - 1;
+					mouse2D.y = -(event.clientY / window.innerHeight ) * 2 + 1;
+					var intersects = getIntersectedObject(mouse2D, camera, objects);
+
+					//Check if the cursor is hovering the crate
+					if (intersects.length > 0) {
+						rollOver.position = intersects[0].point;
+						var lo = checkPosition(rollOver.position);
+						rollOver.position = lo;
+						var balletje = new THREE.Mesh(new THREE.SphereGeometry(25, 25, 25), new THREE.MeshLambertMaterial({
+							color : rollOverColor
+						}));
+						balletje.position = lo;
+						var ar = getArrayPosition(balletje.position);
+						//Check if there is an object on the selected position
+						//alert(cubes[ar]);
+						if (cubes[ar] == null) {
+							if (availableItems[selectedIndex].amount > 0) {
+								cubes[ar] = balletje;
+								scene.add(balletje);
+								positionToSelectedIndex[ar] = selectedIndex;
+								updateSelectable(availableItems[selectedIndex], -1);
+							} else {
+								window.parent.showNotification('error', "This object is not in stock", 3000);
+								// alert("This object is not in stock");
+							}
+						} else {
+							scene.remove(cubes[ar]);
+							cubes[ar] = undefined;
+							updateSelectable(availableItems[positionToSelectedIndex[ar]], 1);
+							positionToSelectedIndex[ar] = null;
+						}
+					}
+					//Cursor is not hovering the crate
+					else {
+
+						rollOver.material.opacity = 0.0;
+					}
+				}
+				if (viewPort == 2) {
+					selectDrag = 0;
+					selectMouseDown = true;
+					var cursorX = event.clientX;
+					var cursorY = event.clientY;
+
+					mouse2D.x = (cursorX / (window.innerWidth * 0.25) ) * 2 - 7;
+					mouse2D.y = -(cursorY / window.innerHeight * 2 ) * 2 + 3;
+					var intersects = getIntersectedObject(mouse2D, selectcamera, selectItems);
+
+					if (intersects.length > 0) {
+						rollOverColor = "0x" + intersects[0].object.material.color.getHex().toString(16);
+						rollOver.material.color.setHex(rollOverColor);
+						var position = intersects[0].object.position.y;
+						selectedIndex = 0;
+						for (var i = 0; i <= selectItems.length; i++) {
+							if (position == 0) {
+								break;
+							} else {
+								position = position - 75;
+								selectedIndex++;
+							}
+						}
+					}
+				}
+
+			}
+
+			function onDocumentMouseMove(event) {
+
+				cursorX = event.clientX;
+				cursorY = event.clientY;
+				var viewPort = getViewPortFromCoords(cursorX, cursorY);
+
+				if (viewPort == 0) {
+
+					mouse2D.x = (cursorX / (window.innerWidth * 0.75) ) * 2 - 1;
+					mouse2D.y = -(cursorY / window.innerHeight ) * 2 + 1;
+
+					var intersects = getIntersectedObject(mouse2D, camera, objects);
+
+					//Check if cursor hoovers the crate, else make rollOver transparent
+					if (intersects.length > 0) {
+						rollOver.position = intersects[0].point;
+						lo = checkPosition(rollOver.position);
+						rollOver.position = lo;
+						rollOver.material.opacity = 0.5;
+					} else {
+						rollOver.material.opacity = 0.0;
+					}
+
+					//Check if the user is performing a drag
+					if (isMouseDown) {
+						if (previousPositionX != cursorX) {
+							drag = cursorX - previousPositionX;
+							if (drag > maxDragSpeed) {
+								drag = maxDragSpeed;
+							}
+							if (drag < -maxDragSpeed) {
+								drag = -maxDragSpeed;
+							}
+						} else {
+							drag = 0;
+						}
+						previousPositionX = cursorX;
+					}
+				}
+				if (viewPort == 2) {
+					if (selectMouseDown) {
+						if (cursorY - previousPositionY >= -5 || cursorY - previousPositionY <= 5) {
+							selectDrag = cursorY - previousPositionY;
+							if (selectDrag > maxDragSpeed) {
+								selectDrag = maxDragSpeed;
+							}
+							if (selectDrag < -maxDragSpeed) {
+								selectDrag = -maxDragSpeed;
+							}
+							previousPositionY = cursorY;
+						}
+					}
+				}
+			}
+
+			function onDocumentMouseUp(event) {
+				isMouseDown = false;
+				selectMouseDown = false;
+			}
+
+			function onWindowResize() {
+				camera.aspect = 0.75 * window.innerWidth / window.innerHeight;
+				topcamera.aspect = 0.5 * window.innerWidth / window.innerHeight;
+				selectcamera.aspect = 0.5 * window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				topcamera.updateProjectionMatrix();
+				selectcamera.updateProjectionMatrix();
+
+				renderer.setSize(window.innerWidth, window.innerHeight);
+			}
+
+		</script>
+	</body>
+</html>

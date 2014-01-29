@@ -1,0 +1,93 @@
+body {
+	font-family: helvetica, arial, sans-serif;
+}
+
+#login {
+	text-align: center;
+	background: #e3e3e3;/* url(../images/whiteGradient.png) no-repeat top left;*/
+	border: 1px solid #CFCFCF;
+	min-height: 330px;
+	_height: 330px;
+	width: 705px;
+	position: absolute;
+	left: 50%;
+	margin-left: -352px;
+	top: 50%;
+	margin-top: -165px;
+	-moz-border-radius-bottomright: 30px;
+	-webkit-border-bottom-right-radius: 30px;
+	_height: 100%; /* IE FIX */
+}
+
+#login h2 {
+	padding: 15px 0 15px 75px;
+	_padding-left: 38px;
+	margin-top: 25px;
+	font-size: 45px;
+	background: #BFBFBF url(../images/h2BG.png) no-repeat;
+	color: #2F2F2F;
+	border-top: 1px solid #9F9F9F;
+	text-indent: -9999px;
+	width: 676px;
+	height: 73px;
+	position: relative;
+	left: -23px;
+}
+
+#login label {
+	font-size: 24px;
+}
+
+#login input {
+	width: 40%;
+	height: 30px;
+	position: relative;
+	top: -4px;
+	font-size: 20px;
+	padding: 0 .3em;
+	color: #555555;
+}
+
+#login input#submit {
+	width: 15%;
+	font-size: 14px;
+}
+#login small {
+	font-size: 16px;
+	position: relative;
+	top: -4px;
+}
+
+#login h4 {
+	color: #5F5F5F;
+	font-size: 23px;
+}
+
+#login h4.alert {
+	background-Color: #bfbfbf;
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+	padding: .4em;
+	border: 1px dotted white;
+	font-size: 19px;
+	line-height: 19px;
+	position: relative;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+}
+
+#login span.exit {
+	position: absolute;
+	top: 0;
+	right: 0;
+	background: #6361DF;
+	color: #292929;
+	font-size: 10px;
+	line-height: 14px;
+	font-weight: bold;
+	padding: 0 .3em;
+	cursor: pointer;
+	border-left: 1px dotted white;
+	border-bottom: 1px dotted white;
+}

@@ -1,0 +1,207 @@
+<html>
+	<head>
+		<title>WIMP - Web Interface Product Management</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="stylesheet" type="text/css" href="css/login.css" />
+		<link rel="stylesheet" type="text/css" href="css/list.css" />
+		<script src="jquery.js"></script>
+		<script src="main_functions.js"></script>
+
+		<script src="noty/jquery.noty.js"></script>
+		<script src="noty/bottomRight.js"></script>
+		<script src="noty/default_theme.js"></script>
+
+		<script src="js/Settings.js" type="text/javascript"></script>
+		<script src="js/Debug.js" type="text/javascript"></script>
+		<script src="js/Communication.js" type="text/javascript"></script>
+		<script src="js/login.js" type="text/javascript"></script>
+		<script src="js/json2xml.js" type="text/javascript"></script>
+		<script src="js/list.js" type="text/javascript"></script>
+		<meta name = "viewport" content = "user-scalable=no, initial-scale=1.0, maximum-scale=1.0, width=device-width">
+<link href="/WIMP_Server/favicon.ico" rel="icon" type="image/x-icon" />
+		<script>
+			function init() {
+			setSelectedItem('home');
+				Settings.setUp();
+				DEBUG_ENABLED = (Settings.debug || Settings.localDebug);
+
+				if (Settings.login)
+					document.getElementById("login").style.display = 'block';
+				else
+					document.getElementById("login").style.display = 'none';
+
+				
+				document.getElementById("gwip").value = DEFAULT_PAGW_SERVER;
+				document.getElementById("gwport").value = DEFAULT_PAGW_PORT;
+                
+                document.getElementById("paintAppHeight").value = PAINTAPP_ROWS;
+                document.getElementById("paintAppWidth").value = PAINTAPP_COLUMNS;
+
+			}
+            
+            function connect(){
+                
+                
+                var port = document.getElementById("GUIServerPort").value
+                
+                WS_IP = document.getElementById("GUIServerIP").value;
+                WS_SERVER_URL = "ws://" + WS_IP + ":" + port + "/WIMP_Server/ProductServlet";
+                
+                if (Settings.localDebug) {
+					WS_URL = WS_LOCAL_URL;
+				} else {
+					WS_URL = WS_SERVER_URL;
+				}
+                
+                pa_server = new Communication();
+				pa_server.start();
+            }
+		</script>
+	</head>
+
+	<body onload="init()">
+
+		<div id="mainUIDiv" style="display: none">
+
+			<div id="tabs">
+				<div id='home' class="tab"
+				style="background-image: url(images/home.png);"
+				onclick="activateTab('home')"></div>
+				<div id='progress' class="tab"
+				style="background-image: url(images/progress.png);"
+				onclick="activateTab('progress')"></div>
+				<div id='preferences' class="tab"
+				style="background-image: url(images/preferences.png);"
+				onclick="activateTab('preferences')"></div>
+				<div id='create' class="tab"
+				style="background-image: url(images/check.png); display: none;"
+				onclick="activateTab('create')"></div>
+			</div>
+
+			<div id="currentApplicationDiv" class="page">
+				<iframe id="currentApplication" src="Carousel/index.html"></iframe>
+			</div>
+
+			<div id="settings" class="page" style="display: none; padding:20px;">
+				<div class="pageContainer" style="width: 500px;">
+                    
+					<h3>Paintapp</h3>
+					Height: <br /><input type="number"
+					id="paintAppHeight"></input>
+					
+					<br/>			
+					Width:<br /> <input type="number"
+					id="paintAppWidth"></input>
+					</input>
+					<br />
+					<hr />
+					<h3>PA Gateway Server</h3>
+					<span class="info">Gateway ip: </span>
+					<br />
+					<input type="text"
+					id="gwip">
+					</input>
+					<br />
+					port:
+					<br />
+					<input type="number"
+					id="gwport" style="">
+					</input>
+					<br />
+					<br />
+					<br />
+					<hr />
+					<button id="start" onclick="startPAServer();">
+						StartPAServer
+					</button>
+					<br />
+
+					<br />
+				</div>
+			</div>
+		</div>
+
+		<div id="progressDiv" class="page" style="display: none">
+
+			<div id="swirl">
+				<div id="swirlImage"></div>
+			</div>
+
+			<div id="refreshbutton" onclick="refresh()"></div>
+
+			<div style="margin-left: 0; position: absolute; width: 100%;">
+				<div class="messagepop pop" style="width: 50%;">
+					<p id="testLabel"></p>
+					<p>
+						NOT IMPLEMENTED
+					</p>
+					<!-- TODO: -->
+					or <a class="close" href="/">Cancel</a>
+					</p>
+
+				</div>
+			</div>
+			<table id="productOverviewTable" class="">
+				<thead>
+					<tr>
+						<th align="left">Product</th>
+						<th align="left">Status</th>
+						<th align="left">Started</th>
+						<th align="left">Completed</th>
+						<th align="left">Progress</th>
+					</tr>
+				</thead>
+				<body>
+					</tbody>
+			</table>
+
+		</div>
+
+		<div id="debugDiv" style="display: none;" class="page"></div>
+
+		<!--begin login-->
+		<div id="login" style="display: block">
+            
+			<h2> Login <small>enter your credentials</small></h2>
+            <div id="connectDiv">
+                <p>
+                <label for="GUIServerIP">&nbsp;&nbsp;IP: </label>
+                <input type="text"
+                name="GUIServerIP" id="GUIServerIP" value="192.168.0.107" />
+                </p>
+                
+                <p>
+                <label for="GUIServerPort">Port: </label>
+                <input type="text"
+                name="GUIServerPort" id="GUIServerPort" value="8080" />
+                </p>
+                
+                <button onclick="connect()" >Connect</button>
+                <hr />
+            </div>
+            
+			<p>
+				<label for="name">Username: </label>
+				<input type="text"
+				name="username" id="username" value="admin" />
+			</p>
+
+			<p>
+				<label for="pwd">Password: </label>
+				<input type="password" name="pwd"
+				id="password" value="admin" />
+			</p>
+
+			<p>
+				<input type="submit" id="submit" value="Login" name="submit"
+				onclick="login(document.getElementById('username').value, document.getElementById('password').value)" />
+			</p>
+
+			<h4 id="loginMessageBox" class="alert" style="display: none;"><span id="loginMessageText"></span><span class="exit"
+			onclick="document.getElementById('loginMessageBox').style.display='none'">X</span></h4>
+
+		</div>
+		<!--end login-->
+
+	</body>
+</html>

@@ -1,0 +1,11 @@
+naam
+deadline (HH:MM:SS)
+offset start-time (HH:MM:SS)
+aantal
+interval (sec)
+batch-group (int)
+cap (string)
+cap
+cap	
+cap
+etc ...

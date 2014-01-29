@@ -1,3 +1,7 @@
+# code lite
+*.session
+.codelite
+
 # Compiled Object files
 *.slo
 *.lo
@@ -28,7 +32,6 @@ libraries/blackboardJavaClient/*.jar
 build/
 devel/
 
-
 # Ignore project file, cmake text file and editor temporary files
 
 .rexos-export
@@ -38,11 +41,23 @@ sync.sh
 *~
 *.class
 *.orig
+*.jar
+*.json
+*.csv*
+
+ src/REXOS/MAS/simulation/csvFiles/*
+
 
 APDescription.txt
 MTPs-Main-Container.txt
+MTPs-GridAgents.txt
+gridLog.txt
 .classpath
 .project
 .settings/
 doxy
 doc
+
+ACLMsgs/
+product-*.xml
+gridLog.txt

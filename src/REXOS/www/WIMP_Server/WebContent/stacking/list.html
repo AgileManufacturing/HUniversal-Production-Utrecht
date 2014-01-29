@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/> <!--320-->
+<!-- script src="http://code.jquery.com/jquery-2.0.1.min.js"></script-->
+<script src="file://localhost/Users/roel/Desktop/dev/wimp/wimp-server/WebContent/wimp-client/PickandPlace/jquery-1.4.1.js"></script>
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+font-size:1em;
+padding:0;
+margin:5px;
+}
+
+table{
+border:0;
+border-collapse: collapse;
+}
+table tr:nth-child(even) {  
+  background-color: #FFF;
+}
+table tr:nth-child(odd) {  
+  background-color: #F6F4F0;
+}
+
+table tr:hover {  
+  background-color: #ccc;
+  cursor: hand; cursor: pointer;
+}
+
+table tr td{
+padding: 25px;
+padding-top: 3px;
+padding-bottom: 3px;
+}
+
+table tr th{
+padding: 25px;
+padding-top: 0px;
+padding-bottom: 0px;
+}
+
+table tr:nth-child(1) {
+background-color: #555;
+color: white;
+cursor: auto;
+}
+
+canvas{
+border: 1px solid black;
+}
+
+.progressCanvas {
+}
+
+
+@media only screen and (max-width: 1000px) {
+  body{
+  	
+  }
+}
+
+</style>
+
+<script>
+productList = [
+               {"id":1, "name":"one", "status":"Completed", "started": "2013-03-01 10:30", "completed": "2013-03-01 10:30", "progress":100},
+               {"id":2, "name":"two", "status":"Completed", "started": "2013-03-01 10:30", "completed": "2013-03-01 10:30", "progress":100},
+               {"id":3, "name":"three", "status":"Processing", "started": "2013-03-01 10:30", "completed": "", "progress":89},
+               {"id":4, "name":"six", "status":"Waiting", "started": "", "completed": "", "progress":0}
+               ];
+
+
+function refresh(){
+	console.log('refresh');
+	showSwirl(true);
+	var table=document.getElementById("productOverviewTable");
+	
+	for(var i = table.rows.length - 1; i > 0; i--)
+	{
+	    table.deleteRow(i);
+	}
+	
+	for(val in productList){
+		
+		var row=table.insertRow(-1);
+		row.id = "Row" + val;
+		
+		row.onclick=function(){
+		console.log(this.id); 
+		$("#testLabel").html( productList[this.id.replace("Row","")].name );
+		$(".pop").slideFadeToggle(function() { 
+            $("#email").focus();
+        });};
+		var cell1=row.insertCell(0);
+		var cell2=row.insertCell(1);
+		var cell3=row.insertCell(2);
+		var cell4=row.insertCell(3);
+		var cell5=row.insertCell(4);
+		cell1.innerHTML=productList[val].name;
+		
+		cell2.innerHTML=productList[val].status;
+		cell3.innerHTML=productList[val].started;
+		cell4.innerHTML=productList[val].completed;
+		cell5.innerHTML="<canvas id='productProgressBar" + productList[val].id + "' class='processCanvas' height='15' width='200'> No support for HTML5 Canvas.</canvas>";
+		
+		
+		setProgress("productProgressBar"+productList[val].id , productList[val].progress);
+	}
+	showSwirl(false);
+	
+}
+
+function setProgress(canvasID, percentage){
+	
+
+perc=percentage*2;
+var canvas = document.getElementById(canvasID);
+var x = canvas.width / 2;
+var y = canvas.height/4*3;
+
+
+if (canvas.getContext) {
+	var ctx = canvas.getContext("2d");
+	ctx.clearRect(0, 0, canvas.width, canvas.height)
+	ctx.fillStyle = "rgb(150,150,255)";
+	ctx.fillRect (0, 0, perc, canvas.height);
+	
+	ctx.fillStyle = "rgb(0,0,0)";
+	ctx.font=canvas.height*0.75 + "px Arial";
+	ctx.textAlign = 'center';
+	ctx.fillText(percentage + "%", x, y);
+	
+}
+}
+
+function showSwirl(show){
+	if(show)
+		document.getElementById('swirl').style.display = 'block';
+	else
+		document.getElementById('swirl').style.display = 'none';
+	
+	//$('#swirl').display = 'block'; 
+}
+</script>
+</head>
+<body onload="refresh()">
+
+<div id="productListDiv" >
+<style>
+#refreshbutton {
+	cursor: hand; cursor: pointer;
+	float:right;
+	background-image:url('images/refresh.png');
+	background-repeat:no-repeat;
+	height: 37px;
+	width: 25px;
+}
+#refreshbutton:hover{
+background-image:url('images/refresh_hover.png');
+}
+
+#productOverviewTable{
+	width:100%;
+}
+
+#swirl {
+position: absolute;
+margin-left:50%;
+margin-top:50%;
+display:none;
+}
+#swirlImage {
+	background-image:url('images/animated_progress.gif');
+	background-repeat:no-repeat;
+	height: 48px;
+	width: 48px;
+	position: relative;
+	margin-left:-50%;
+	margin-top:-50%;
+}
+</style>
+
+<div id="swirl"><div id="swirlImage"></div></div>
+
+<div id="refreshbutton" onclick="refresh()">
+</div>
+
+<div style="margin-left:0; position:absolute; width:100%;">
+<div class="messagepop pop" style="width:50%;">
+        <p id="testLabel"></p>
+        <p>NOT IMPLEMENTED</p>
+        <!-- TODO: -->
+        or <a class="close" href="/">Cancel</a></p>
+
+</div>
+</div>
+<table id="productOverviewTable" class="">
+<thead><tr>
+<th align="left">Product</th>
+<th align="left">Status</th>
+<th align="left">Started</th>
+<th align="left">Completed</th>
+<th align="left">Progress</th>
+</tr>
+</thead>
+<body>
+</tbody></table>
+
+<style>
+a.selected {
+  background-color:#1F75CC;
+  color:white;
+  z-index:100;
+}
+
+.messagepop {
+  background-color:#FFFFFF;
+  border:1px solid #999999;
+  cursor:default;
+  display:none;
+  margin-left:auto;
+  margin-right:auto;
+  /*text-align:left;*/
+  z-index:50;
+  padding: 25px 25px 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 3px;
+  padding-left: 15px;
+  text-indent: -15px;
+}
+
+.messagepop p, .messagepop.div {
+  border-bottom: 1px solid #EFEFEF;
+  padding-bottom: 8px;
+}
+</style>
+<script>
+function deselect() {
+    $(".pop").slideFadeToggle(function() { 
+        $("#contact").removeClass("selected");
+    });    
+}
+
+$(function() {
+    $("#contact").click(function() {
+        if($(this).hasClass("selected")) {
+            deselect();               
+        } else {
+            $(this).addClass("selected");
+            $(".pop").slideFadeToggle(function() { 
+                $("#email").focus();
+            });
+        }
+        return false;
+    });
+
+    $(".close").click( function() {
+        deselect();
+        return false;
+    });
+});
+
+$.fn.slideFadeToggle = function(easing, callback) {
+    return this.animate({ opacity: 'toggle', height: 'toggle' }, "fast", easing, callback);
+};
+</script>
+
+</div>
+</body>
+</html>

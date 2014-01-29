@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="data" default="build" basedir=".">
+
+	<import file="../build.xml"/>
+	
+	<echo message = "Reading data antfile"/> 
+
+	<target name="build"> 			
+		<!-- defined in the root build.xml -->
+		<buildjava dir="${basedir}"/>
+	</target>
+
+	<target name="clean">
+		 <cleanjava dir="${basedir}"/>
+	</target>
+
+</project>

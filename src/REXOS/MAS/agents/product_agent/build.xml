@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="product_agent" default="build" basedir=".">
+
+	<import file="../build.xml"/>
+
+	<target name="build" depends="src, behaviours">
+	</target>
+	
+	<target name="src" depends="behaviours">
+		<buildjava dir="${basedir}/behaviours"/>
+	</target>
+	
+	<target name="behaviours">
+		<buildjava dir="${basedir}"/>
+	</target>
+
+	<target name="clean">
+		 <cleanjava dir="${basedir}"/>
+		 <cleanjava dir="${basedir}/behaviours"/>
+	</target>
+
+</project>

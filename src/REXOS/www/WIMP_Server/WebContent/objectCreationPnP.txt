@@ -1,0 +1,40 @@
+			function ProductionStep() {
+				this.step = null;
+				this.colorCode = null;
+				this.shapeCode = null;
+				this.row = null;
+				this.column = null;
+			}
+
+			function Production() {
+				this.id = 0;
+				this.productionSteps = [];
+			}
+
+			function CommandContainer(cmd) {
+				this.id = 0;
+				this.command = cmd;
+				this.production = {};
+			}
+
+			function createProductionCommandFromCubeArray(cubeArray) {
+
+				var cc = new CommandContainer("CREATE_PA");
+				cc.production = new Production();
+
+				for ( i = 0; i < cubeArray.length; i++) {
+					if (cubeArray[i] != null) {
+						var column = i % CrateRows;
+						var row = Math.round(i / CrateRows);
+						cc.production.productionSteps.push({
+							"colorCode" : cubeArray[i].material.color.getHex().toString(16),
+							"column" : column,
+							"row" : row,
+							"shapeCode" : 1
+						});
+
+					}
+				}
+				return cc;
+
+			}
