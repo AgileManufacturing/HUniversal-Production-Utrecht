@@ -5,6 +5,7 @@
  * 
  * @author Ricky van Rijn
  * @author Mike Schaap
+ * @author Alexander Streng
  * 
  * @section LICENSE License: newBSD
  * 
@@ -41,59 +42,60 @@
 package agents.product_agent.behaviours;
 
 import jade.core.AID;
-import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 
-import libraries.blackboard_client.BlackboardClient;
-import libraries.blackboard_client.data_classes.GeneralMongoException;
-import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
+import libraries.schedule.data_classes.EquipletScheduleInformation;
+import libraries.schedule.data_classes.FreeTimeSlot;
+import libraries.schedule.data_classes.ProductStepSchedule;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 import agents.data_classes.BehaviourStatus;
-import agents.data_classes.DbData;
+import agents.data_classes.Matrix;
 import agents.data_classes.Product;
+import agents.data_classes.ProductStepScheduleInformation;
 import agents.data_classes.Production;
+import agents.data_classes.ProductionEquipletMapper;
 import agents.data_classes.ProductionStep;
 import agents.data_classes.StepStatusCode;
 import agents.product_agent.BehaviourCallback;
 import agents.product_agent.ProductAgent;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.QueryBuilder;
-
-import configuration.Configuration;
-import configuration.ConfigurationFiles;
-
 @SuppressWarnings("serial")
 public class SchedulerBehaviour extends Behaviour {
 
-	private ProductAgent _productAgent;
-	private ProductionStep _prodStep;
+	private ProductAgent productAgent;
+	private ProductionStep prodStep;
 
-	private boolean _isError = false;
-	private boolean _isCompleted = false;
+	private boolean isError = false;
+	private boolean isCompleted = false;
 
-	private BehaviourCallback _bc;
+	private BehaviourCallback behaviourCallback;
 
-	private int _schedulersStarted = 0;
-	private int _schedulersCompleted = 0;
+	private int schedulersStarted = 0;
+	private int schedulersCompleted = 0;
+	
+	private boolean scheduleInformationDone = false;
+	
+	private LinkedHashMap<AID, EquipletScheduleInformation> equipletSchedules = new LinkedHashMap<AID, EquipletScheduleInformation>();
 
+	private ArrayList<ProductionStep> productionSteps;
 	/**
-	 * Construct scheudler behavior
+	 * Construct scheduler behavior
 	 * @param myAgent
 	 * @param bc
 	 */
-	public SchedulerBehaviour(Agent myAgent, BehaviourCallback bc) {
-		super(myAgent);
-		this._bc = bc;
+	public SchedulerBehaviour(ProductAgent productAgent, BehaviourCallback bc) {
+		super(productAgent);
+		this.productAgent = productAgent;
+		this.behaviourCallback = bc;
 	}
 
 	/**
@@ -102,86 +104,249 @@ public class SchedulerBehaviour extends Behaviour {
 	@Override
 	public void onStart() {
 		try {
-			// Shedule the PA with the equiplet agents in the current list.
-			_productAgent = (ProductAgent) myAgent;
-			_productAgent.getProduct().getProduction()
+			ProductionEquipletMapper pem = productAgent.getProduct().getProduction()
 					.getProductionEquipletMapping();
-
-			Product product = this._productAgent.getProduct();
+			
+			// Shedule the PA with the equiplet agents in the current list.
+			Product product = productAgent.getProduct();
 			Production production = product.getProduction();
-			ArrayList<ProductionStep> psa = production.getProductionSteps();
-
-			// Notify the OverviewBehaviour that the scheduler is running. The
-			// overview behaviour will start the produceBehaviour so it's
-			// possible to
-			// schedule and produce at the same time.
-			this._bc.handleCallback(BehaviourStatus.RUNNING, null);
-
-			for (ProductionStep ps : psa) {
-				Logger.log(LogLevel.DEBUG, "Trying to schedule a new step (id "
-						+ ps.getId() + "). status: " + ps.getStatus());
-
-				if ((ps.getStatus() == StepStatusCode.EVALUATING || ps
-						.getStatus() == StepStatusCode.RESCHEDULE)
-						&& _isError == false) {
-					int PS_Id = ps.getId();
-					java.util.HashMap<AID, Long> equiplets = production.getProductionEquipletMapping().getEquipletsForProductionStep(PS_Id);
-
-					if (equiplets != null && equiplets.size() != 0) 
-					{
-						Logger.log(LogLevel.INFORMATION, "Added scheduler");
-						Scheduler(equiplets.keySet(), ps);
-						_schedulersStarted++;
-					} 
-					else 
-					{
-						Logger.log(LogLevel.ERROR, "Equiplets are null ( or size is 0 )");
-						_isError = true;
+			productionSteps = production.getProductionSteps();
+			
+			//get a list of equiplets we need to get the schedule of
+			ArrayList<AID> equipletSchedulesToGet = new ArrayList<AID>();
+			for (ProductionStep productStep : productionSteps){
+				int productStepId = productStep.getId();
+				HashMap <AID, Long> equipletMapping = pem.getEquipletsForProductionStep(productStepId);
+				
+				for (AID equiplet : equipletMapping.keySet()) {
+					if (!equipletSchedulesToGet.contains(equiplet)){
+						equipletSchedulesToGet.add(equiplet);
 					}
 				}
 			}
-		} 
+
+			productAgent.addBehaviour(new ScheduleInformationBehaviour(productAgent, this, equipletSchedulesToGet.toArray(new AID[equipletSchedulesToGet.size()])));
+
+			this.behaviourCallback.handleCallback(BehaviourStatus.RUNNING, null);
+		}
 		catch (Exception e) 
 		{
 			Logger.log(LogLevel.ERROR, "", e.toString());
 		}
 	}
-
+	
 	/**
 	 * Sets the status of the behavior
 	 */
 	@Override
 	public void action() {
-
-		if (_schedulersStarted == _schedulersCompleted && _isError == false) {
-			Logger.log(LogLevel.INFORMATION, "Setting scheduler to complete");
-			this._bc.handleCallback(BehaviourStatus.COMPLETED, null);
-			_isCompleted = true;
-		} else if (_isError) {
-			this._bc.handleCallback(BehaviourStatus.ERROR, null);
-			_isCompleted = true;
+		if (isError) {
+				behaviourCallback.handleCallback(BehaviourStatus.ERROR, null);
+			isCompleted = true;
+		}
+		
+		//we need to wait until we have the scheduleinformation
+		if (!scheduleInformationDone){
+			block();
+		} else if (scheduleInformationDone){
+			//Generate the scheduleMatrix
+			Matrix scheduleMatrix = generateScheduleMatrix();
+			
+			//start scheduling
+			if(schedule(scheduleMatrix)){
+				//scheduling is done
+				//smth like set callback behaviour
+			} else {
+				//Need to reschedule?
+			}
 		}
 	}
 
+	/**
+	 * Generates the scheduleMatrix for all productsteps & equiplets. For more information see 
+	 * @ref to paper 'Multiagent-based agile manufacturing: from user requirements to product' - Leo van Moergestel section 3.2 
+	 * @return the generated scheduleMatrix
+	 */
+	private Matrix generateScheduleMatrix() {
+		ProductionEquipletMapper equipletMapper = productAgent.getProduct().getProduction().getProductionEquipletMapping();
+		
+		//construct a new matrices to perform a neat-o selection
+		Matrix scheduleMatrix = new Matrix(equipletSchedules.size(), productionSteps.size());
+		
+		int row = 0, column = 0, sequenceLength, firstInSequence;
+			//Iterate through them steps to fill the matrix
+			for (AID equiplet : equipletSchedules.keySet()) { // row
+				sequenceLength = 0; firstInSequence = -1; // always set sequenceLength to 0 and firstInsequence to -1 when doing a new row.
+				for (ProductionStep productStep : productionSteps) { // column
+				
+				double canPerformStepValue = (equipletMapper.canEquipletPerformProductStep(productStep.getId(), equiplet)) ? 1.0 : 0.0;
+			
+				if(canPerformStepValue == 1.0) {   //increase sequence counter.
+					if(firstInSequence < 0){	  //set the first item in the sequence.
+						firstInSequence = column;
+					}
+					sequenceLength++;
+					if(column == productionSteps.size()){ // end of row
+						setSequenceValues(row, firstInSequence, sequenceLength, scheduleMatrix);
+					}
+				} else if(canPerformStepValue == 0.0 && sequenceLength > 0) { // end of sequence
+					setSequenceValues(row, firstInSequence, sequenceLength, scheduleMatrix);
+					sequenceLength = 0;
+					firstInSequence = -1;
+				}
+				
+				//value might have changed since we added sequence multiplier
+				double loadValue = ((EquipletScheduleInformation)equipletSchedules.get(equiplet)).getLoad();
+				
+				//TODO: perform supermagic calculation of currentValue * load here
+				scheduleMatrix.set(row, column, (scheduleMatrix.get(row, column) * loadValue));
+				column++;
+			}
+			row++;
+		}
+		return scheduleMatrix;
+	}
+
+	@SuppressWarnings("unchecked")
+	private boolean schedule(Matrix scheduleMatrix) {
+		ArrayList<ProductStepScheduleInformation> finalSchedules = new ArrayList<ProductStepScheduleInformation>();
+		
+		// Read the matrix. Write function to iterate each seperate row ( productsteps ) and pick each equiplet 
+		for (int column = 0; column < scheduleMatrix.getNumberOfColumns(); column++) { //Productsteps 
+			int highestEquipletScoreIndex = -1;
+			ProductionStep productionStep = productionSteps.get(column);
+			
+			for (int row = 0; row < scheduleMatrix.getNumberOfRows(); row++) { //AID'S
+				highestEquipletScoreIndex = (scheduleMatrix.get(row, column) > scheduleMatrix.get(highestEquipletScoreIndex, column)) ? row : highestEquipletScoreIndex;
+			}
+			
+			if(highestEquipletScoreIndex < 0){
+				Logger.log(LogLevel.ERROR, "No suitable equiplet found for this step! Scheduling has gone wrong.. Reschedule?");
+				return false;
+			}
+			
+			//Can we assume that all productSteps are ordered? What about parallel steps?
+			EquipletScheduleInformation scheduleInformation = ((ArrayList<EquipletScheduleInformation>)equipletSchedules.values()).get(highestEquipletScoreIndex);
+			AID equipletId = ((ArrayList<AID>)equipletSchedules.keySet()).get(highestEquipletScoreIndex);
+			
+			//Get first free timeslot
+			FreeTimeSlot freeTimeSlot = scheduleInformation.getFreeTimeSlots(productionStep.getDurationForEquiplet(equipletId)).get(0);
+			
+			//Check the equiplets schedule. Lets check if the schedule fits. Keep in mind that the deadline is met.
+			if(scheduleInformation.getIsEquipletScheduleLocked() && freeTimeSlot != null) {
+				
+				//We should still set the proper deadline. ( none is given for now )
+				finalSchedules.add(new ProductStepScheduleInformation(productionStep, equipletId, 
+						new ProductStepSchedule(productionStep.getConversationId(), freeTimeSlot.getTimeSlot(), 5l)));
+				
+				//plan the timeslot
+				scheduleInformation.planTimeSlot(freeTimeSlot);
+			}
+			
+			// If the schedule fits, save the equiplet with corresponding step(s) ( maybe equipletmapper? )
+		}
+		// Message all the equiplets with their correspondig equiplet steps
+		return sendScheduleMessages(finalSchedules);
+	}
+	
+	private boolean sendScheduleMessages(ArrayList<ProductStepScheduleInformation> productStepScheduleInformations){
+		
+		HashMap<AID, ArrayList<ProductStepSchedule>> sendMap = new HashMap<>();
+		ArrayList<ProductStepSchedule> tempList;
+		
+		for (ProductStepScheduleInformation productStepScheduleInformation : productStepScheduleInformations) {
+			AID equipletAid = productStepScheduleInformation.getEquipletAid();
+			
+			if(sendMap.keySet().contains(equipletAid)){
+				//item already exists. Get the list and insert the productStep schedule
+				tempList = sendMap.get(equipletAid);
+			} else {
+				//its a new entry!
+				tempList = new ArrayList<>();
+			}
+
+			tempList.add(productStepScheduleInformation.getProductStepSchedule());
+			sendMap.put(equipletAid, tempList);
+		}
+		
+		for (AID equipletAid : sendMap.keySet()) {
+			
+			ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+			msg.setConversationId(this.prodStep.getConversationIdForEquiplet(equipletAid));
+			msg.setOntology("ScheduleStep");
+			
+			try {
+				msg.setContentObject(sendMap.get(equipletAid));
+			} catch (IOException e) {
+				Logger.log(LogLevel.ERROR, "Could not parse productStep schedule array: ", e);
+			}
+			
+			msg.addReceiver(equipletAid);
+			myAgent.send(msg);
+
+			ACLMessage returnMsg = myAgent.blockingReceive(MessageTemplate.MatchOntology("Planned"), 10000);
+			if (returnMsg != null){
+				if (returnMsg.getPerformative() == ACLMessage.CONFIRM) {
+					prodStep.setStatus(StepStatusCode.PLANNED);
+					prodStep.setUsedEquiplet(returnMsg.getSender());
+				} else if (returnMsg.getPerformative() == ACLMessage.DISCONFIRM) {
+					isError = true;
+					//behaviourCallback.handleCallback(BehaviourStatus.ERROR, null);
+				}	
+			}
+			else {
+				//TODO: error handling
+			}
+			prodStep.setConversationId(returnMsg.getConversationId());
+		}
+		
+		return isError;
+	}
+	
+	/**
+	 * Sets the value of the sequences. @ref to paper Multiagent-based agile manufacturing: from user requirements to product leo van moergestel
+	 * section 3.2 
+	 */
+	private void setSequenceValues(int row, int firstInSequence, int sequenceLength, Matrix matrix){
+		int value = sequenceLength -1;
+		for(int i = firstInSequence; i <= sequenceLength; i++){
+			matrix.set(row, i, (matrix.get(row, i) + value));
+		}
+	}
+	
 	/**
 	 * Returns true when the behavior is done
 	 * @return
 	 */
 	@Override
 	public boolean done() {
-		return _isCompleted;
+		return isCompleted;
 	}
 
 	@Override
 	public void reset() {
 		super.reset();
-		_isError = false;
-		_isCompleted = false;
+		isError = false;
+        isCompleted = false;
 
-		_schedulersStarted = 0;
-		_schedulersCompleted = 0;
+        schedulersStarted = 0;
+        schedulersCompleted = 0;
+	}
+	
+	@Override
+	public void restart(){
+		super.restart();
 	}
 
+	public void callbackScheduleInformation(LinkedHashMap<AID, EquipletScheduleInformation> equipletSchedules, SchedulerBehaviour schedulerBehaviour){
+		schedulerBehaviour.equipletSchedules = equipletSchedules;		
+		Logger.log(LogLevel.DEBUG, "ScheduleInformationBehaviour is done, continuing the ScheduleBehaviour");
+		scheduleInformationDone = true;
+		restart();
+	}
+}
+	/*
+	public 
 	/**
 	 * Scheduler function schedules the given production step
 	 * 
@@ -189,13 +354,14 @@ public class SchedulerBehaviour extends Behaviour {
 	 * @param productionStep
 	 * @throws Exception
 	 */
+	/*
 	public void Scheduler(Set<AID> equipletList,
 			final ProductionStep productionstep) {
 		try {
-			this._prodStep = productionstep;
+			this.prodStep = productionstep;
 	
 			List<AID> equipletlist = new ArrayList<AID>(equipletList);
-	
+
 			BlackboardClient bbc = new BlackboardClient(
 					Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"), 
 					Integer.parseInt(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbPort")));
@@ -243,7 +409,7 @@ public class SchedulerBehaviour extends Behaviour {
 	
 				int requiredTimeSlots = (int) prodAgent.getProduct()
 						.getProduction().getProductionEquipletMapping()
-						.getTimeSlotsForEquiplet(_prodStep.getId(), aid);
+						.getTimeSlotsForEquiplet(prodStep.getId(), aid);
 	
 				// Gets planned steps TODO: improve query
 				DBObject query = QueryBuilder.start("scheduleData.startTime")
@@ -263,7 +429,7 @@ public class SchedulerBehaviour extends Behaviour {
 				for (int i = 0; i < plannedSteps.size(); i++) 
 				{
 					long startTime = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getLong("startTime");
-					int duration = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getInt("duration");
+					long duration = ((BasicDBObject) plannedSteps.get(i).get("scheduleData")).getLong("duration");
 					schedules.add(new Schedule(startTime, duration, aid));
 					Logger.log(LogLevel.NOTIFICATION, "@ SchedulerBehaviour duration ... : " + duration);
 				}
@@ -319,7 +485,7 @@ public class SchedulerBehaviour extends Behaviour {
 			}
 	
 			ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-			msg.setConversationId(this._prodStep.getConversationIdForEquiplet(freetimeslotEq.getEquipletName()));
+			msg.setConversationId(this.prodStep.getConversationIdForEquiplet(freetimeslotEq.getEquipletName()));
 			msg.setOntology("ScheduleStep");
 			msg.setContentObject(freetimeslotEq.getStartTime());
 			msg.addReceiver(freetimeslotEq.getEquipletName());
@@ -328,148 +494,22 @@ public class SchedulerBehaviour extends Behaviour {
 			ACLMessage returnMsg = myAgent.blockingReceive(MessageTemplate.MatchOntology("Planned"), 10000);
 			if (returnMsg != null){
 				if (returnMsg.getPerformative() == ACLMessage.CONFIRM) {
-					_prodStep.setStatus(StepStatusCode.PLANNED);
-					_prodStep.setUsedEquiplet(returnMsg.getSender());
+					prodStep.setStatus(StepStatusCode.PLANNED);
+					prodStep.setUsedEquiplet(returnMsg.getSender());
 				} else if (returnMsg.getPerformative() == ACLMessage.DISCONFIRM) {
-					_isError = true;
-					_bc.handleCallback(BehaviourStatus.ERROR, null);
+					isError = true;
+					behaviourCallback.handleCallback(BehaviourStatus.ERROR, null);
 				}	
 			}
 			else{
 				//TODO: error handling
 			}
-			_prodStep.setConversationId(returnMsg.getConversationId());
-			_schedulersCompleted++;
+			prodStep.setConversationId(returnMsg.getConversationId());
+			schedulersCompleted++;
 
-		} catch (InvalidDBNamespaceException
-				| GeneralMongoException e) {
+		} catch (InvalidDBNamespaceException | GeneralMongoException e) {
 			Logger.log(LogLevel.ERROR, "Database exception at scheduling", e);
 		} catch (IOException e1){
 			Logger.log(LogLevel.ERROR, "Message content exception at scheduling", e1);
 		}
-	}
-
-	private class FreeTimeSlot {
-		private long startTimeSlot = -1;
-		private long duration = -1;
-		private AID equipletName = null;
-
-		/**
-		 * Construct free time slot
-		 * @param start
-		 * @param dura
-		 * @param equiplet
-		 */
-		public FreeTimeSlot(long start, int dura, AID equiplet) {
-			this.startTimeSlot = start;
-			this.duration = dura;
-			this.equipletName = equiplet;
-		}
-
-		/**
-		 * Gets the equiplet name
-		 * @return
-		 */
-		public AID getEquipletName() {
-			return this.equipletName;
-		}
-
-		/**
-		 * Gets the start time of timeslot
-		 * @return
-		 */
-		public long getStartTime() {
-			return this.startTimeSlot;
-		}
-
-		/**
-		 * Gets the duration of the timeslot
-		 * @return
-		 */
-		public long getDuration() {
-			return this.duration;
-		}
-
-		/**
-		 * ToString annotation
-		 */
-		@Override
-		public String toString() {
-			return "{Start TimeSlot: " + this.startTimeSlot + ", Duration: "
-					+ this.duration + ", EquipletName: " + this.equipletName
-					+ "}";
-		}
-	}
-
-	private class Schedule {
-		private long startTime = -1;
-		private int duration = -1;
-		private long deadline = -1;
-		private AID equipletName;
-
-		/**
-		 * Constructs Schedule object
-		 * @param start
-		 * @param dura
-		 * @param equiplet
-		 */
-		public Schedule(long start, int dura, AID equiplet) {
-			this.startTime = start;
-			this.duration = dura;
-			this.deadline = start + dura + 1;
-			this.equipletName = equiplet;
-		}
-
-		/**
-		 * get starting time
-		 * @return
-		 */
-		public long getStartTime() {
-			return this.startTime;
-		}
-
-		/**
-		 * Set starting time
-		 * @param newStartTime
-		 */
-		@SuppressWarnings("unused")
-		public void setStartTime(int newStartTime) {
-			this.startTime = newStartTime;
-		}
-
-		/**
-		 * Gets equiplet name
-		 * @return
-		 */
-		public AID getEquipletName() {
-			return this.equipletName;
-		}
-		
-		/**
-		 * Gets deadline time
-		 * @return
-		 */
-		public long getDeadline() {
-			return this.deadline;
-		}
-
-		/**
-		 * Sets the deadline time
-		 * @param newDeadline
-		 */
-		@SuppressWarnings("unused")
-		public void setDeadline(int newDeadline) {
-			this.deadline = newDeadline;
-		}
-
-		/**
-		 * ToString Annotation
-		 */
-		@Override
-		public String toString() {
-			return "{ startTime:" + startTime + ", duration:" + duration
-					+ ", deadline:" + deadline + ", EquipletName:"
-					+ equipletName + getEquipletName() + " }";
-		}
-	}
-}
+	} */

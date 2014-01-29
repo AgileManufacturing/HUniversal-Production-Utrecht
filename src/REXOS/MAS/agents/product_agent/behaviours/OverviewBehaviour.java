@@ -102,7 +102,7 @@ public class OverviewBehaviour extends Behaviour implements BehaviourCallback {
 
 		_informerBehaviour = new InformerBehaviour(myAgent, this);
 
-		_schedulerBehaviour = new SchedulerBehaviour(myAgent, this);
+		_schedulerBehaviour = new SchedulerBehaviour((ProductAgent) myAgent, this);
 
 		_produceBehaviour = new ProduceBehaviour(myAgent, this);
 

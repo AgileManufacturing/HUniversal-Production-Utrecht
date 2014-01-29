@@ -1,0 +1,50 @@
+{
+	"firstTimeSlot" : 1124097829587629578,
+	"timeSlotLength" : 100,
+	"equipletLoadWindow" : 1000,
+	"grid" : [ 
+		[
+			{
+				"name" : "EQ-Analyzer-1",
+				"capabilities" : ["analyze"],
+				"reservedFor" : [],
+				"equipletErrors" : [
+				]
+			}, {
+				"name" : "EQ-Designer-1",
+				"capabilities" : ["design"],
+				"reservedFor" : [], 
+				"equipletErrors" : [
+				]
+			}
+		], [
+			{
+				"name" : "EQ-Analyzer-2",
+				"capabilities" : ["analyze"],
+				"reservedFor" : [],
+				"equipletErrors" : [
+				]
+			}, {
+				"name" : "EQ-Designer-2",
+				"capabilities" : ["design"],
+				"reservedFor" : [], 
+				"equipletErrors" : [
+				]
+			}
+		], [
+			{
+				"name" : "-",
+				"capabilities" : [],
+				"reservedFor" : [],
+				"equipletErrors" : [
+				]
+			}, {
+				"name" : "EQ-Designer-3",
+				"capabilities" : ["design"],
+				"reservedFor" : [], 
+				"equipletErrors" : [
+				]
+			}
+		]
+	]
+}

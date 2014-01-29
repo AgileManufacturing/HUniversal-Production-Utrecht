@@ -70,10 +70,10 @@ public class DummyModule extends Module {
 	private static final double MAX_ACCELERATION = 255.0;
 
 	/**
-	 * @var int TIMESLOTS_NEEDED_PER_STEP
+	 * @var long TIMESLOTS_NEEDED_PER_STEP
 	 * 		A static value with the timeslots needed per step.
 	 */
-	private static final int TIMESLOTS_NEEDED_PER_STEP = 6;
+	private static final long TIMESLOTS_NEEDED_PER_STEP = 6;
 	
 	/**
 	 * @see Module#getEquipletSteps(int, BasicDBObject)

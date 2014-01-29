@@ -49,6 +49,8 @@ package agents.data_classes;
 
 import java.io.Serializable;
 
+import libraries.blackboard_client.data_classes.MongoSaveable;
+
 import com.mongodb.BasicDBObject;
 
 /**

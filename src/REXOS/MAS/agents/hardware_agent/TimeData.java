@@ -29,7 +29,7 @@
  **/
 package agents.hardware_agent;
 
-import agents.data_classes.MongoSaveable;
+import libraries.blackboard_client.data_classes.MongoSaveable;
 
 import com.mongodb.BasicDBObject;
 
@@ -39,16 +39,16 @@ import com.mongodb.BasicDBObject;
 public class TimeData implements MongoSaveable {
 	
 	/**
-	 * @var int duration
+	 * @var long duration
 	 * The duration in timeslots
 	 */
-	private int duration;
+	private long duration;
 
 	/**
 	 * Constructor
 	 * @param duration The duration in timeslots
 	 */
-	public TimeData(int duration) {
+	public TimeData(long duration) {
 		this.duration = duration;
 	}
 
@@ -64,7 +64,7 @@ public class TimeData implements MongoSaveable {
 	 * getter for the duration.
 	 * @return duration
 	 */
-	public int getDuration() {
+	public long getDuration() {
 
 		return duration;
 
@@ -74,7 +74,7 @@ public class TimeData implements MongoSaveable {
 	 * setter to set the duration
 	 * @param duration The duration in timeslots
 	 */
-	public void setDuration(int duration) {
+	public void setDuration(long duration) {
 
 		this.duration = duration;
 
@@ -96,7 +96,7 @@ public class TimeData implements MongoSaveable {
 	@Override
 	public void fromBasicDBObject(BasicDBObject object) {
 		BasicDBObject copy = (BasicDBObject) object.copy();
-		duration = (int) copy.remove("duration");
+		duration = (long) copy.remove("duration");
 		if(!copy.isEmpty()){
 			throw new IllegalArgumentException();
 		}

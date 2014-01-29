@@ -49,6 +49,12 @@ public abstract class ReceiveOnceBehaviour extends ReceiveBehaviour {
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * @var boolean timeoutThrown
+	 * Indicator whether the timeout has been thrown yes or no
+	 */
+	private boolean timeoutThrown = false;
+		
+	/**
 	 * Instantiates a new <code>ReceiveOnceBehaviour</code> without a <code>MessageTemplate</code> and no timeout.
 	 * 
 	 * @param a
@@ -116,10 +122,15 @@ public abstract class ReceiveOnceBehaviour extends ReceiveBehaviour {
 			if (dt > 0)
 				block(dt);
 			else {
+				timeoutThrown = true;
 				handle((ACLMessage) null);
 				if(myAgent != null)
 					myAgent.removeBehaviour(this);
 			}
 		}
+	}
+	
+	public boolean getTimeoutThrown(){
+		return timeoutThrown;
 	}
 }

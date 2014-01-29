@@ -70,7 +70,7 @@ import agents.product_agent.ProductAgent;
  */
 public class InformerBehaviour extends Behaviour {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;	
 	private ProductAgent _productAgent;
 	private Product _product;
 	private Production _production;
@@ -139,8 +139,10 @@ public class InformerBehaviour extends Behaviour {
 							productionStep.setConversationIdForEquiplet(aid,convId);
 							// _parBehaviour.addSubBehaviour(new
 							// Conversation(aid, productionStep, _prodEQmap));
-							_subInformerBehaviours.add(new SubInformerBehaviour(myAgent,this, productionStep, aid));
 							_totalSubinformers++;
+							_subInformerBehaviours.add(new SubInformerBehaviour(myAgent,this, productionStep, aid));
+							
+							
 						}
 					} else {
 						Logger.log(LogLevel.ERROR, "Can't find any equiplets that can execute this production step. Capability: "
@@ -175,6 +177,7 @@ public class InformerBehaviour extends Behaviour {
 			} 
 			else 
 			{
+				//all of the subinformers are done, the durations of all the product steps for all the equiplets are done
 				if (_isDone) 
 				{
 					_production.setProductionEquipletMapping(_prodEQmap);
@@ -189,7 +192,8 @@ public class InformerBehaviour extends Behaviour {
 					_isCompleted = true;
 				}
 			}
-			//block();
+			//iteration is done, stay blocked waiting for the next subinformer
+			block();
 		} catch (NullPointerException e) {
 			Logger.log(LogLevel.ERROR, "", e);
 		}
@@ -198,11 +202,16 @@ public class InformerBehaviour extends Behaviour {
 	@Override 
 	public void reset() {
 		super.reset();
-		_isDone = false;;
+		_isDone = false;
 		_isError = false;
 		_isCompleted = false;
 		_subInformersCompleted = 0;
 		_totalSubinformers = 0;
+	}
+	
+	@Override
+	public void restart(){
+		super.restart();
 	}
 
 	/**
@@ -220,25 +229,26 @@ public class InformerBehaviour extends Behaviour {
 	 * @param subBehaviour
 	 */
 	public void callbackSubInformerBehaviour(BehaviourStatus bs,
-			SubInformerBehaviour subBehaviour) 
+			SubInformerBehaviour subBehaviour )
 	{
 		if (bs == BehaviourStatus.COMPLETED) 
 		{
 			Logger.log(LogLevel.DEBUG, "Setting time slots for equiplet: " + subBehaviour.getTargetEquiplet() + " duration: " + subBehaviour.getTimeslotDuration());
 			_prodEQmap.setTimeSlotsForEquiplet(subBehaviour.getProductionStepId(), subBehaviour.getTargetEquiplet(), subBehaviour.getTimeslotDuration());
-		} 
+		}
 		else 
 		{
 			Logger.log(LogLevel.ERROR, "callbackSubInformerBehaviour ended with error!");
 		}
 		
-		_parBehaviour.removeSubBehaviour(subBehaviour);
+		
 		_currentRunningSubInformerBehaviours--;
 		_subInformersCompleted++;
-		
 		if(_subInformersCompleted == _totalSubinformers) 
 		{
 			_isDone = true;
 		}
+		_parBehaviour.removeSubBehaviour(subBehaviour);
+		restart();
 	}
 }

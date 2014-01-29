@@ -32,7 +32,7 @@
  *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  **/
-package agents.data_classes;
+package libraries.blackboard_client.data_classes;
 
 import com.mongodb.BasicDBObject;
 

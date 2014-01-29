@@ -48,7 +48,6 @@ import org.bson.types.ObjectId;
 import agents.data_classes.BehaviourCallbackItem;
 import agents.data_classes.ParentBehaviourCallback;
 import agents.data_classes.ProductStep;
-import agents.data_classes.ScheduleData;
 import agents.equiplet_agent.EquipletAgent;
 import agents.shared_behaviours.ReceiveBehaviour;
 
@@ -100,13 +99,13 @@ public class ProductionDuration extends ReceiveBehaviour implements ParentBehavi
 		Logger.log(LogLevel.DEBUG, "%s received message from %s%n", equipletAgent.getLocalName(), message.getSender().getLocalName(),
 				message.getOntology());
 		try {
-			// gets the productstepId and sends it to the service agent with the ontology GetProductionStepDuration.
+			// gets the productstepId and sends it to the service agent with the ontology ProductStepDuration.
 			ObjectId productStepId = equipletAgent.getRelatedObjectId(message.getConversationId());
 			if(productStepId == null) {
 				Logger.log(LogLevel.DEBUG, "Conversation id not known");
 				ACLMessage responseMessage = message.createReply();
 				responseMessage.setPerformative(ACLMessage.DISCONFIRM);
-				//TODO: why change the ontology ?
+				//TODO: why change the ontology ? also, the ontology is not accepted by any behaviour/agent
 				responseMessage.setOntology("ConversationIdUnknown");
 				equipletAgent.send(responseMessage);
 			} else {
@@ -136,14 +135,14 @@ public class ProductionDuration extends ReceiveBehaviour implements ParentBehavi
 		// duration.
 		
 		ProductStep productStep = (ProductStep)arguments.getArgument("productStep");
-		ScheduleData schedule = (ScheduleData)arguments.getArgument("schedule");
+		long duration = (Long)arguments.getArgument("duration");
 		
 		ACLMessage responseMessage = new ACLMessage(ACLMessage.INFORM);
 		responseMessage.addReceiver(productStep.getProductAgentId());
 		responseMessage.setOntology("ProductionDuration");
 		responseMessage.setConversationId(result.getConversationId());
 		try {
-			responseMessage.setContentObject(new Long(schedule.getDuration()));
+			responseMessage.setContentObject(duration);
 		} catch (IOException e) {
 			Logger.log(LogLevel.ERROR, "", e);
 		}

@@ -11,20 +11,20 @@ package agents.data_classes;
 final public class Matrix {
     private final int M;             // number of rows
     private final int N;             // number of columns
-    private int[][] data;   			// M-by-N array
+    private double[][] data;   			// M-by-N array
 
     // create M-by-N matrix of 0's
     public Matrix(int M, int N) {
         this.M = M;
         this.N = N;
-        data = new int[M][N];
+        data = new double[M][N];
     }
 
     // create matrix based on 2d array
-    public Matrix(int[][] data) {
+    public Matrix(double[][] data) {
         M = data.length;
         N = data[0].length;
-        this.data = new int[M][N];
+        this.data = new double[M][N];
         for (int i = 0; i < M; i++)
             for (int j = 0; j < N; j++)
                     this.data[i][j] = data[i][j];
@@ -45,15 +45,20 @@ final public class Matrix {
     }
     
     // create and return a random M-by-N matrix with values between 0 and 1
-    public void set(int row, int column, int value) {
+    public void set(int row, int column, double value) {
     	data[row][column] = value;
     }
     
     // create and return a random M-by-N matrix with values between 0 and 1
-    public int get(int row, int column) {
+    public double get(int row, int column) {
     	return data[row][column];
     }
-
+    
+    // get the complete row
+    public double[] getRow(int row) {
+    	return data[row];
+    }
+    
     // create and return the N-by-N identity matrix
     public static Matrix identity(int N) {
         Matrix I = new Matrix(N, N);
@@ -64,7 +69,7 @@ final public class Matrix {
 
     // swap rows i and j
     private void swap(int i, int j) {
-        int[] temp = data[i];
+    	double[] temp = data[i];
         data[i] = data[j];
         data[j] = temp;
     }
@@ -151,7 +156,7 @@ final public class Matrix {
 
             // pivot within A
             for (int j = i + 1; j < N; j++) {
-                int m = A.data[j][i] / A.data[i][i];
+            	double m = A.data[j][i] / A.data[i][i];
                 for (int k = i+1; k < N; k++) {
                     A.data[j][k] -= A.data[i][k] * m;
                 }
@@ -170,7 +175,13 @@ final public class Matrix {
         return x;
    
     }
-
+    public int getNumberOfRows(){
+    	return M;
+    }
+    
+    public int getNumberOfColumns(){
+    	return N;
+    }
     // print matrix to standard output
     public void show() {
         for (int i = 0; i < M; i++) {
