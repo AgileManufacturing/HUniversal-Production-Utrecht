@@ -1,5 +1,5 @@
 /**
- * @file rexos/libraries/blackboard_client/MongoDBConnection.java
+ * @file src/REXOS/MAS/libraries/blackboard_client/data_classes/MongoDBConnection.java
  * @brief Helper class for managing Mongo connections.
  * @date Created: 2012-04-05
  *

@@ -6,7 +6,7 @@
  *           .MMMMMMM#=`.gNMMMMM.       \_| \_|\____/\/   \/ \___/ \____/
  *             7HMM9`   .MMMMMM#`		
  *                     ...MMMMMF .      
- *         dN.       .jMN, TMMM`.MM     	@file 	EquipletScheduleFrame.java
+ *         dN.       .jMN, TMMM`.MM     	@file src/REXOS/MAS/simulation/gui/EquipletScheduleFrame.java
  *         .MN.      MMMMM;  ?^ ,THM		@brief 	...
  *          dM@      dMMM3  .ga...g,    	@date Created:	2014-01-7
  *       ..MMM#      ,MMr  .MMMMMMMMr   

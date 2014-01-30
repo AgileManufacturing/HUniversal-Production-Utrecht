@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/productAgent/ProductAgent.java
+ * @file src/REXOS/MAS/agents/product_agent/ProductAgent.java
  * @brief Initial product agent creation for testing purposes
  * @date Created: 08-04-2013
  * 

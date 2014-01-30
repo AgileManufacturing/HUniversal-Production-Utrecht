@@ -1,5 +1,5 @@
 /**
- * @file REXOS/MAS/libraries/schedule/data_classes/Schedule.java
+ * @file src/REXOS/MAS/libraries/schedule/data_classes/Schedule.java
  * @brief abstract class for a schedule in REXOS MAS system
  * @date Created: 14 nov 2013
  * 

@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/hardware_agent/behaviours/ServiceAgentDied.java
+ * @file src/REXOS/MAS/agents/hardware_agent/behaviours/ServiceAgentDied.java
  * @brief Behaviour for handling the messages with the ontology ServiceAgentDied
  * @date Created: 2013-04-02
  * 

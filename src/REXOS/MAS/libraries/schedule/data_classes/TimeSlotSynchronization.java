@@ -1,5 +1,5 @@
 /**
- * @file REXOS/MAS/libraries/schedule/data_classes/TimeSlotSynchronization.java
+ * @file src/REXOS/MAS/libraries/schedule/data_classes/TimeSlotSynchronization.java
  * @brief Data class representing the synchronization of timeslots
  * @date Created: 14 nov 2013
  * 

@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/hardware_agent/ModuleFactory.java
+ * @file src/REXOS/MAS/agents/hardware_agent/ModuleFactory.java
  * @brief Creates and caches instances of the software required for modules.
  * @date Created: 22 apr. 2013
  *

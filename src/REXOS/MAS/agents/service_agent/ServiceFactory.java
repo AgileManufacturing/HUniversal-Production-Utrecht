@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/ServiceFactory.java
+ * @file src/REXOS/MAS/agents/service_agent/ServiceFactory.java
  * @brief Helper class for creating Service objects based on knowledgebase data.
  * @date Created: 12 apr. 2013
  *

@@ -1,5 +1,5 @@
 /**
- * @file REXOS/MAS/libraries/schedule/data_classes/ProductStepSchedule.java
+ * @file src/REXOS/MAS/agents/data_classes/ProductStepScheduleInformation.java
  * @brief Object that holds information about the product schedule
  * @date Created: 04 nov 2013
  * 

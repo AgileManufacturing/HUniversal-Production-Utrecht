@@ -1,5 +1,5 @@
 /**
- * @file REXOS/MAS/agents/product_agent/behaviours/ScheduleInformationBehaviour.java
+ * @file src/REXOS/MAS/agents/product_agent/behaviours/ScheduleInformationBehaviour.java
  * @brief Behaviour for getting information about the current schedule of the given equiplets
  * 			Will also set the lock on the schedule of this equiplet
  * @date Created: 04 nov. 2013

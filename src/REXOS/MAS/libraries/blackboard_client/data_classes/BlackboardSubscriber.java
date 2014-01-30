@@ -1,5 +1,5 @@
 /**
- * @file rexos/libraries/blackboard_client/BlackboardSubscriber.java
+ * @file src/REXOS/MAS/libraries/blackboard_client/data_classes/BlackboardSubscriber.java
  * @brief Interface for subscribing to blackboard events.
  * @date Created: 2013-04-04
  *

@@ -1,5 +1,5 @@
 /**
- * @file rexos/libraries/log/Logger.java
+ * @file src/REXOS/MAS/libraries/utillities/ACLMessageAnalyzer/ACLMessageParser.java
  * @brief Processes logged messages to get testresults
  * @date Created: 17 september 2013
  *

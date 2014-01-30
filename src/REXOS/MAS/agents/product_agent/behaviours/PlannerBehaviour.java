@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/productAgent/PlannerBehaviour.java
+ * @file src/REXOS/MAS/agents/product_agent/behaviours/PlannerBehaviour.java
  * @brief Behaviour in which the product agent reads from the equiplet directory
  *        blackboard to see which equiplets are capable to perform the step.
  * @date Created: 02-04-2013

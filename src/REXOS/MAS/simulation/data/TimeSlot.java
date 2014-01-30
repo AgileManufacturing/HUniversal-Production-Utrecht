@@ -6,7 +6,7 @@
  *           .MMMMMMM#=`.gNMMMMM.       \_| \_|\____/\/   \/ \___/ \____/
  *             7HMM9`   .MMMMMM#`		
  *                     ...MMMMMF .      
- *         dN.       .jMN, TMMM`.MM     	@file 	TimeSlot.java
+ *         dN.       .jMN, TMMM`.MM     	@file src/REXOS/MAS/simulation/data/TimeSlot.java
  *         .MN.      MMMMM;  ?^ ,THM		@brief 	DataClass for TimeSlots
  *          dM@      dMMM3  .ga...g,    	@date Created:	2013-12-18
  *       ..MMM#      ,MMr  .MMMMMMMMr   

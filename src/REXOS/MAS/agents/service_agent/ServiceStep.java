@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/ServiceStep.java
+ * @file src/REXOS/MAS/agents/service_agent/ServiceStep.java
  * @brief Provides a message for the serviceStep blackboard.
  * @date Created: 2013-04-03
  * 

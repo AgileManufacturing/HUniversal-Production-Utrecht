@@ -1,5 +1,5 @@
 /**
- * @file REXOS/MAS/libraries/schedule/data_classes/ScheduleException.java
+ * @file src/REXOS/MAS/libraries/schedule/data_classes/ScheduleException.java
  * @brief Exception used for general schedule exceptions
  * @date Created: 15 nov 2013
  * 

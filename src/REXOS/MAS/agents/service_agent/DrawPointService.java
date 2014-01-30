@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/DrawPointService.java
+ * @file src/REXOS/MAS/agents/service_agent/DrawPointService.java
  * @brief Service for drawing a point
  * @date Created: 18 jun. 2013
  *

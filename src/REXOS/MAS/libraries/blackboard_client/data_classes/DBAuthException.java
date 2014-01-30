@@ -1,5 +1,5 @@
 /**
- * @file rexos/libraries/blackboard_client/DBAuthException.java
+ * @file src/REXOS/MAS/libraries/blackboard_client/data_classes/DBAuthException.java
  * @brief Thrown when authentication with a database fails.
  * @date Created: 5 apr. 2013
  *

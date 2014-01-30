@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/behaviours/ArePartsAvailable.java
+ * @file src/REXOS/MAS/agents/service_agent/behaviours/ArePartsAvailable.java
  * @brief Handles the ArePartsAvailable message which is an answer to ArePartsAvailable and indicates
  *        whether the specified parts are present and available in general.
  * @date Created: 23 apr. 2013

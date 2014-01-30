@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/productAgent/SchedulerBehaviour.java
+ * @file src/REXOS/MAS/agents/product_agent/behaviours/SchedulerBehaviour.java
  * @brief Behaviour in which the product agent schedules the productsteps.
  * @date Created: 23-04-2013
  * 

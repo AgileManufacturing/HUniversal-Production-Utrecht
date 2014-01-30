@@ -1,5 +1,5 @@
 /**
- * @file REXOS/MAS/libraries/data_classes/ProductStepSchedule.java
+ * @file src/REXOS/MAS/libraries/schedule/EquipletSchedule.java
  * @brief Data object for the schedule of a product step primarily in the planningblackboard
  * @date Created: 04 nov 2013
  * 

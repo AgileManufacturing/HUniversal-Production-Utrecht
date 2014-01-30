@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/behaviours/CanPerformProductionStep.java
+ * @file src/REXOS/MAS/agents/service_agent/behaviours/CanPerformProductionStep.java
  * @brief Handles the CanPerformProductionStep message that the equipletAgent sends to ask whether the equiplet is able to
  *        perform a certain productStep.
  * @date Created: 20 apr. 2013

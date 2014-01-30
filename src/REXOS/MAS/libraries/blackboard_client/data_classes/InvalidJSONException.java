@@ -1,5 +1,5 @@
 /**
- * @file rexos/libraries/blackboard_client/InvalidJSONException.java
+ * @file src/REXOS/MAS/libraries/blackboard_client/data_classes/InvalidJSONException.java
  * @brief Thrown when invalid JSON is encountered.
  * @date Created: 2012-04-05
  *

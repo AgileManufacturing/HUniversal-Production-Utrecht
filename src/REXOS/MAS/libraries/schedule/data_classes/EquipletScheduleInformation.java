@@ -1,5 +1,5 @@
 /**
- * @file REXOS/MAS/libraries/schedule/data_classes/EquipletScheduleInformation.java
+ * @file src/REXOS/MAS/libraries/schedule/data_classes/EquipletScheduleInformation.java
  * @brief Data object for the representation of freetimeslots for the EquipletSchedule. 
  * @date Created: 15 nov 2013
  * 

@@ -1,5 +1,5 @@
 /**
- * @file tools/ACLMessageParser/ACLMessageTestResult
+ * @file src/REXOS/MAS/libraries/utillities/ACLMessageAnalyzer/ACLMessageTestResult.java
  * @brief Data object for the result of processing the logged ACLMessages
  * @date Created: 18 September 2013
  *

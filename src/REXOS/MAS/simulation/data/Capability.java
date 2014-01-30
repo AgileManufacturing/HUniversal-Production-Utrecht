@@ -6,7 +6,7 @@
  *           .MMMMMMM#=`.gNMMMMM.       \_| \_|\____/\/   \/ \___/ \____/
  *             7HMM9`   .MMMMMM#`		
  *                     ...MMMMMF .      
- *         dN.       .jMN, TMMM`.MM     	@file 	Capability.java
+ *         dN.       .jMN, TMMM`.MM     	@file src/REXOS/MAS/simulation/data/Capability.java
  *         .MN.      MMMMM;  ?^ ,THM		@brief 	Dataclass for the representation of the capabilities that an equiplet can hold
  *          dM@      dMMM3  .ga...g,    	@date Created:	2013-12-17
  *       ..MMM#      ,MMr  .MMMMMMMMr   

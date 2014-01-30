@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/logistics_agent/behaviours/CancelTransportBehaviour.java
+ * @file src/REXOS/MAS/agents/logistics_agent/behaviours/CancelTransportBehaviour.java
  * @brief Responds to message to cancel transport.
  * @date Created: 25 juni 2013
  * 

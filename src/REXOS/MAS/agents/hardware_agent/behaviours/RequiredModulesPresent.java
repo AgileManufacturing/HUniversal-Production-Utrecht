@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/hardware_agent/behaviours/RequiredModulesPresent.java
+ * @file src/REXOS/MAS/agents/hardware_agent/behaviours/RequiredModulesPresent.java
  * @brief Handles the RequiredModulesPresent message
  * @date Created: 12-04-13
  * 

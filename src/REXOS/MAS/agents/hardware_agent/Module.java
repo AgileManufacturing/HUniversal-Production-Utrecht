@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/hardware_agent/Module.java
+ * @file src/REXOS/MAS/agents/hardware_agent/Module.java
  * @brief Provides an inteface to make modules.
  * @date Created: 2013-04-18
  * 

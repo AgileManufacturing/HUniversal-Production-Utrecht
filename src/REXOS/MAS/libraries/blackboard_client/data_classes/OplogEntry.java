@@ -1,5 +1,5 @@
 /**
- * @file rexos/libraries/blackboard_client/OplogEntry.java
+ * @file src/REXOS/MAS/libraries/blackboard_client/data_classes/OplogEntry.java
  * @brief Representation of a document in the oplog collection.
  * @date Created: 2012-04-04
  *

@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/equiplet_agent/behaviours/ProductionDuration.java
+ * @file src/REXOS/MAS/agents/equiplet_agent/behaviours/ProductionDuration.java
  * @brief Behaviour for handling the messages with the ontology ProductionDuration
  * @date Created: 2013-14-10
  * 

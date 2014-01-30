@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/productAgent/InformerBehaviour.java
+ * @file src/REXOS/MAS/agents/product_agent/behaviours/InformerBehaviour.java
  * @brief Behaviour in which the product agent communicates with the equiplet
  *        agents to check if they can perform steps with the desired parameters.
  * @date Created: 02-04-2013

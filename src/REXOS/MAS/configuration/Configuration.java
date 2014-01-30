@@ -1,5 +1,5 @@
 /**
- * @file Configuration.java
+ * @file src/REXOS/MAS/configuration/Configuration.java
  * @brief Configuration file for getting ( and setting? ) configuration properties.
  * @date Created: 18 jun. 2013
  *

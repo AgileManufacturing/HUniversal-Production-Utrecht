@@ -1,5 +1,5 @@
 /**
- * @file rexos/libraries/log/Logger.java
+ * @file src/REXOS/MAS/libraries/utillities/log/Logger.java
  * @brief Helper for log messages, providing a single point for controlling program origin.
  * @date Created: 17 mei 2013
  *

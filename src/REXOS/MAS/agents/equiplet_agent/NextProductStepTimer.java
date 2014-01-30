@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/equiplet_agent/NextProductStepTimer.java
+ * @file src/REXOS/MAS/agents/equiplet_agent/NextProductStepTimer.java
  * @brief Timer for executing the next product step.
  * @date Created: 2013-04-02
  * 

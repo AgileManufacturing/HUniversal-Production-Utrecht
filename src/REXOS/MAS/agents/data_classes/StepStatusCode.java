@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/data/StepStatusCode.java
+ * @file src/REXOS/MAS/agents/data_classes/StepStatusCode.java
  * @brief Provides an enum with status codes for a product/service/equiplet step.
  * @date Created: 2013-04-02
  *

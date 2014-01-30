@@ -1,5 +1,5 @@
 /**
- * @file REXOS/MAS/libraries/schedule/data_classes/ScheduleAccessException.java
+ * @file src/REXOS/MAS/libraries/schedule/data_classes/ScheduleAccessException.java
  * @brief Exception used for schedule lock access errors
  * @date Created: 15 nov 2013
  * 

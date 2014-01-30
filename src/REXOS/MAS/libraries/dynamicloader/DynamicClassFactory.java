@@ -1,5 +1,5 @@
 /**
- * @file rexos/libraries/dynamicloader/DynamicClassFactory.java
+ * @file src/REXOS/MAS/libraries/dynamicloader/DynamicClassFactory.java
  * @brief Generic class for loading class data from a remote server based on a description.
  * @date Created: 12 apr. 2013
  *

@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/behaviours/OtherAgentDied.java
+ * @file src/REXOS/MAS/agents/service_agent/behaviours/OtherAgentDied.java
  * @brief
  * @date Created: 31 mei 2013
  * 

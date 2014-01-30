@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/equiplet_agent/behaviours/ScheduleStep.java
+ * @file src/REXOS/MAS/agents/equiplet_agent/behaviours/ScheduleStep.java
  * @brief Behaviour for handling the messages with the ontology ScheduleStep
  * @date Created: 2013-04-02
  * 

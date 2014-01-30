@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/logistics_agent/behaviours/ArePartsAvailable.java
+ * @file src/REXOS/MAS/agents/logistics_agent/behaviours/ArePartsAvailable.java
  * @brief Responds to questions whether or not a specific part is available.
  * @date Created: 20 apr. 2013
  *

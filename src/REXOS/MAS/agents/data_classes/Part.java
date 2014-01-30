@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/data/Part.java
+ * @file src/REXOS/MAS/agents/data_classes/Part.java
  * @brief Data object for storing a part.
  * @date Created: 28 may 2013
  * 

@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/data/ProductStep.java
+ * @file src/REXOS/MAS/agents/data_classes/ProductStep.java
  * @brief Provides a message for the productstep blackboard
  * @date Created: 2013-04-03
  * 

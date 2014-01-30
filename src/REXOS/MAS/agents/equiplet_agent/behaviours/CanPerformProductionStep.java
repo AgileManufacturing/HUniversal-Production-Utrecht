@@ -1,5 +1,5 @@
 /**
-* @file REXOS/MAS/equiplet_agent/behaviours/CanPerformProductionStep.java
+* @file src/REXOS/MAS/agents/equiplet_agent/behaviours/CanPerformProductionStep.java
 * @brief Redirecting behaviour for handling the messages with the ontology CanPerformProductionStep
 * @date Created: 2013-04-02
 *

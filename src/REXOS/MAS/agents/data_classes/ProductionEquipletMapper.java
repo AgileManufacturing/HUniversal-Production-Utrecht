@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/data/ProductionEquipletMapper.java
+ * @file src/REXOS/MAS/agents/data_classes/ProductionEquipletMapper.java
  * @brief Class in which the equiplet can be assigned to/removed from a
  *        production step, same goes for the timeslots needed for the step.
  * @date Created: 02-04-2013

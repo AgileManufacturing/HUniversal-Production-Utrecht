@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/hardware_agent/ModuleUpdateListener.java
+ * @file src/REXOS/MAS/agents/hardware_agent/ModuleUpdateListener.java
  * @brief The listener interface for receiving module update events.
  * @date Created: 7 mei 2013
  *

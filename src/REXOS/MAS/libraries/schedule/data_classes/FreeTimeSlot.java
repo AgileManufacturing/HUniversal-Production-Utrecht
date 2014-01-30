@@ -1,5 +1,5 @@
 /**
- * @file REXOS/MAS/libraries/schedule/data_classes/FreeTimeSlot.java
+ * @file src/REXOS/MAS/libraries/schedule/data_classes/FreeTimeSlot.java
  * @brief Data object representing a freetimeslot in a schedule.
  * @date Created: 04 nov 2013
  * 

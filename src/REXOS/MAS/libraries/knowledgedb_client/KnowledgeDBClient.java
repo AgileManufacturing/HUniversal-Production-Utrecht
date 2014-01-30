@@ -2,7 +2,7 @@
  * @author Ammar Abdulamir
  * @author Arjen van Zanten
  * @author Jan-Willem Willebrands
- * @file rexos/libraries/knowledgedb_client/KnowledgeDBClient.java
+ * @file src/REXOS/MAS/libraries/knowledgedb_client/KnowledgeDBClient.java
  * @brief A client to communicate with knowledge database.
  * @date Created: 2013-04-05
  * @section LICENSE

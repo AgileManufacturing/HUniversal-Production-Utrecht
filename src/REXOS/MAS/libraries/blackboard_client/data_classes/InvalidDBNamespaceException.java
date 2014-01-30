@@ -1,5 +1,5 @@
 /**
- * @file rexos/libraries/blackboard_client/InvalidDBNamespaceException.java
+ * @file src/REXOS/MAS/libraries/blackboard_client/data_classes/InvalidDBNamespaceException.java
  * @brief Thrown when the database namespace is incorrect.
  * @date Created: 2013-04-05
  *
