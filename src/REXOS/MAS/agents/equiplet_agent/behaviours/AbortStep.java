@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/equiplet_agent/behaviours/AbortStep.java
+ * @file src/REXOS/MAS/agents/equiplet_agent/behaviours/AbortStep.java
  * @brief responds to abort step message.
  * @date Created: 2013-05-17
  * 

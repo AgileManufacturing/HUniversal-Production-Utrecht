@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/behaviours/ServiceStepDuration.java
+ * @file src/REXOS/MAS/agents/service_agent/behaviours/ServiceStepDuration.java
  * @brief Handles the ServiceStepDuration message from the hardwareAgent that indicates that the duration of
  *        all serviceSteps have been saved on the serviceStepsBlackBoard.
  * @date Created: 11 apr. 2013

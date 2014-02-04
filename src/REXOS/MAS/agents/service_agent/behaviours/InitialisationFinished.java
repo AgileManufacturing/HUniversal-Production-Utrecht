@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/behaviours/InitialisationFinished.java
+ * @file src/REXOS/MAS/agents/service_agent/behaviours/InitialisationFinished.java
  * @brief Handles the InitialisationFinished message which the hardwareAgent sends to indicate its initialized.
  * @date Created: 2013-04-02
  * 

@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/behaviours/ArePartsAvailableInTime.java
+ * @file src/REXOS/MAS/agents/service_agent/behaviours/ArePartsAvailableInTime.java
  * @brief Handles the ArePartsAvailableInTime message which is an answer to ArePartsAvailableInTime and
  *        indicates whether the specified parts will be available in time.
  * @date Created: 23 apr. 2013

@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/ServiceAgent.java
+ * @file src/REXOS/MAS/agents/service_agent/ServiceAgent.java
  * @brief This agent manages services and oversees generation and scheduling of serviceSteps. It also handles
  *        communication with the logistics agent.
  * @date Created: 5 apr. 2013

@@ -1,5 +1,5 @@
 /**
- * @file rexos/libraries/blackboard_client/FieldUpdateSubscription.java
+ * @file src/REXOS/MAS/libraries/blackboard_client/data_classes/FieldUpdateSubscription.java
  * @brief Represents a subscription to a specified set of changes for a certain field.
  * @date Created: 10 apr. 2013
  *

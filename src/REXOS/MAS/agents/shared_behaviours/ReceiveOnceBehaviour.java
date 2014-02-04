@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/behaviours/ReceiveOnceBehaviour.java
+ * @file src/REXOS/MAS/agents/shared_behaviours/ReceiveOnceBehaviour.java
  * @brief Behaviour that receives a single message.
  * @date Created: 11 apr. 2013
  *

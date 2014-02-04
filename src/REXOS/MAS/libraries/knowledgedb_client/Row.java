@@ -1,6 +1,6 @@
 /**
  * @author Ammar Abdulamir
- * @file rexos/libraries/knowledgedb_client/Row.java
+ * @file src/REXOS/MAS/libraries/knowledgedb_client/Row.java
  * @brief A class representing a database row.
  * @date Created: 2013-04-08
  * @section LICENSE

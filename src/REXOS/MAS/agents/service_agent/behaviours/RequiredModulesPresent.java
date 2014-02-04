@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/behaviours/RequiredModulesPresent.java
+ * @file src/REXOS/MAS/agents/service_agent/behaviours/RequiredModulesPresent.java
  * @brief Handles the RequiredModulesPresent message from the hardwareAgent that indicates whether all required modules
  *        for a service are present.
  * @date Created: 10 oct. 2013

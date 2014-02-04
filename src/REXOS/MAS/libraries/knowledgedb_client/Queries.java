@@ -1,7 +1,7 @@
 
 /**
  * @author Ammar Abdulamir
- * @file rexos/libraries/knowledgedb_client/Queries.java
+ * @file src/REXOS/MAS/libraries/knowledgedb_client/Queries.java
  * @brief Contains all queries.
  * @date Created: 2013-04-05
  * @section LICENSE

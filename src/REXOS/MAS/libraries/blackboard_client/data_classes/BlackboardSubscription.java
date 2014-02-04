@@ -1,5 +1,5 @@
 /**
- * @file rexos/libraries/blackboard_client/BlackboardSubscription.java
+ * @file src/REXOS/MAS/libraries/blackboard_client/data_classes/BlackboardSubscription.java
  * @brief Object representing a subscription to a blackboard event.
  * @date Created: 8 apr. 2013
  *

@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/jadeagentx/JadeAgentX.java
+ * @file src/REXOS/MAS/agents/main_agent/MainAgent.java
  * @brief Makes the agents with specific variables to test with.
  * @date Created: 12-04-13
  * 

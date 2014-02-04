@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/data/ProductionStep.java
+ * @file src/REXOS/MAS/agents/data_classes/ProductionStep.java
  * @brief Class in which information about the current production step can be
  *        obtained
  * @date Created: 02-04-2013

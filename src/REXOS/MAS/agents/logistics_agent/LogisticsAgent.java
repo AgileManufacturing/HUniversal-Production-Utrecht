@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/logistics_agent/LogisticsAgent.java
+ * @file src/REXOS/MAS/agents/logistics_agent/LogisticsAgent.java
  * @brief Agent charged with handling the logistics.
  * @date Created: 22 apr. 2013
  *

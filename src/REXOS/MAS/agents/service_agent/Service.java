@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/Service.java
+ * @file src/REXOS/MAS/agents/service_agent/Service.java
  * @brief A service object represents a service an equiplet can perform. Services translate productSteps into
  *        serviceSteps.
  * @date Created: 11 apr. 2013

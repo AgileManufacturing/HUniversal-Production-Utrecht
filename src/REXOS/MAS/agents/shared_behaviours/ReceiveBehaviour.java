@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/behaviours/ReceiveBehaviour.java
+ * @file src/REXOS/MAS/agents/shared_behaviours/ReceiveBehaviour.java
  * @brief Used for waiting for and responding to messages.
  * @date Created: 11 apr. 2013
  *

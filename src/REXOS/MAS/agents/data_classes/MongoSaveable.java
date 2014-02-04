@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/data/MongoSaveable.java
+ * @file src/REXOS/MAS/agents/data_classes/MongoSaveable.java
  * @brief Allows load/store behaviour in a mongo DB.
  * @date Created: 19 apr. 2013
  * 

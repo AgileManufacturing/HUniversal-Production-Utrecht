@@ -1,5 +1,5 @@
 /**
- * @file rexos/libraries/dynamicloader/DynamicClassLoader.java
+ * @file src/REXOS/MAS/libraries/dynamicloader/DynamicClassLoader.java
  * @brief Custom class loader.
  * @date Created: 12 apr. 2013
  *

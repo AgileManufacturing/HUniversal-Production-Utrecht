@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/data/Mapper.java
+ * @file src/REXOS/MAS/agents/data_classes/Mapper.java
  * @brief Class where the key and value can be added to/ removed from the
  *        hashmap aswell as the posibility to retrieve the value.
  * @date Created: 02-04-2013

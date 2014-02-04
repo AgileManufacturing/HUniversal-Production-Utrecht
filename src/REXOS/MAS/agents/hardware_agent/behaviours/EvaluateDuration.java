@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/hardware_agent/behaviours/EvaluateDuration.java
+ * @file src/REXOS/MAS/agents/hardware_agent/behaviours/EvaluateDuration.java
  * @brief Handles the GetServiceStepDuratation Message.
  * @date Created: 12-04-13
  * 

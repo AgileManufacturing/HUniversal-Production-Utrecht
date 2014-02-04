@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/data/EquipletMode.java
+ * @file src/REXOS/MAS/agents/data_classes/EquipletMode.java
  * @brief
  * @date Created: 24 jun. 2013
  * 

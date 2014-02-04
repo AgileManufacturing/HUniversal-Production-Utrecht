@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/logistics_agent/behaviours/ArePartsAvailableInTime.java
+ * @file src/REXOS/MAS/agents/logistics_agent/behaviours/ArePartsAvailableInTime.java
  * @brief Responds to ArePartsAvailableInTime messages, returning whether or not the parts are available in time.
  * @date Created: 25 apr. 2013
  *

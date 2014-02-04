@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/logistics_agent/behaviours/PartsInfo.java
+ * @file src/REXOS/MAS/agents/logistics_agent/behaviours/PartsInfo.java
  * @brief Responds to PartsInfo messages, returning a mapping of part id to type and position.
  * @date Created: 22 apr. 2013
  * 

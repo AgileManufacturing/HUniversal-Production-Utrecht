@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/behaviours/PartsInfo.java
+ * @file src/REXOS/MAS/agents/service_agent/behaviours/PartsInfo.java
  * @brief Handles the PartsInfo message which is an answer to PartsInfo and contains positional
  *        information about the specified parts.
  * @date Created: 23 apr. 2013

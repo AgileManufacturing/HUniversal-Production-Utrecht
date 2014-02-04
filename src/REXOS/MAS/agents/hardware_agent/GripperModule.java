@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/hardware_agent/GripperModule.java
+ * @file src/REXOS/MAS/agents/hardware_agent/GripperModule.java
  * @brief Provides the data to be used for hardware agents.
  * @date Created: 12-04-13
  * 

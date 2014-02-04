@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/behaviours/ProductStepDuration.java
+ * @file src/REXOS/MAS/agents/service_agent/behaviours/ProductStepDuration.java
  * @brief Handles the ProductStepDuration message which the equipletAgent sends to ask for the duration of a
  *        certain productStep.
  * @date Created: 23 apr. 2013

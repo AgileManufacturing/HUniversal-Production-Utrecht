@@ -1,5 +1,5 @@
 /**
- * @file rexos/libraries/dynamicloader/DynamicClassData.java
+ * @file src/REXOS/MAS/libraries/dynamicloader/DynamicClassData.java
  * @brief Contains all data required to instantiate an object of a class.
  * @date Created: 13 apr. 2013
  *

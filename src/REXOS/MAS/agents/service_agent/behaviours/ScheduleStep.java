@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/service_agent/behaviours/ScheduleStep.java
+ * @file src/REXOS/MAS/agents/service_agent/behaviours/ScheduleStep.java
  * @brief Handles the ScheduleStep message which the equipletAgent sends to let the serviceAgent schedule the
  *        serviceSteps.
  * @date Created: 23 apr. 2013

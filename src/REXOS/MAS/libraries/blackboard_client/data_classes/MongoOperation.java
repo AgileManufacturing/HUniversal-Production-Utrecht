@@ -1,5 +1,5 @@
 /**
- * @file rexos/libraries/blackboard_client/MongoOperation.java
+ * @file src/REXOS/MAS/libraries/blackboard_client/data_classes/MongoOperation.java
  * @brief Enum representing the different CRUD operations in MongoDB.
  * @date Created: 2012-04-04
  *

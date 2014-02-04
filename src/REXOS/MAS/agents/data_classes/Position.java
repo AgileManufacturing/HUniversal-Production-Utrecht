@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/data/Position.java
+ * @file src/REXOS/MAS/agents/data_classes/Position.java
  * @brief Data object for storing a 3d position.
  * @date Created: 22 apr. 2013
  * 

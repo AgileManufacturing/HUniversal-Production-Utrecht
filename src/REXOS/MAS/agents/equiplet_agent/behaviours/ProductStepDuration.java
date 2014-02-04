@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/equiplet_agent/behaviours/GetProductionDuration.java
+ * @file src/REXOS/MAS/agents/equiplet_agent/behaviours/ProductStepDuration.java
  * @brief redirecting Behaviour for handling the messages with the ontology ProductStepDuration
  * @date Created: 2013-04-02
  * 

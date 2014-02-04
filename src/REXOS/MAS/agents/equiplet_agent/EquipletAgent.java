@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/equiplet_agent/EquipletAgent.java
+ * @file src/REXOS/MAS/agents/equiplet_agent/EquipletAgent.java
  * @brief Provides an equiplet agent that communicates with product agents and
  *        with its own service agent.
  * @date Created: 2013-04-02

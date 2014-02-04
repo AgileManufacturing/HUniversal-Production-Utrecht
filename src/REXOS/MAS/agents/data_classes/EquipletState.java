@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/data/EquipletState.java
+ * @file src/REXOS/MAS/agents/data_classes/EquipletState.java
  * @brief 
  * @date Created: 24 jun. 2013
  *

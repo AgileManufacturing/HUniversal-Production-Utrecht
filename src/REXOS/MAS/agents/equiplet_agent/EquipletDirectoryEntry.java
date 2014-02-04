@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/equiplet_agent/EquipletDirectoryEntry.java
+ * @file src/REXOS/MAS/agents/equiplet_agent/EquipletDirectoryEntry.java
  * @brief Provides an entry class for the EquipletDirectory blackboard.
  * @date Created: 2013-04-02
  *

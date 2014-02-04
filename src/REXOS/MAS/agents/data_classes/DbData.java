@@ -1,5 +1,5 @@
 /**
- * @file rexos/mas/data/DbData.java
+ * @file src/REXOS/MAS/agents/data_classes/DbData.java
  * @brief Data object for storing connection details for a database.
  * @date Created: 11 apr. 2013
  *
