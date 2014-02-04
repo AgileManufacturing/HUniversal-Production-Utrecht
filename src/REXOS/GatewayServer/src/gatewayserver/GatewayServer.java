@@ -36,11 +36,11 @@ public class GatewayServer implements Runnable {
 	
 	private String agentHost = "";
 	
-	private int cooldown = 0;
+	private long cooldown = 0;
 	
 	private long lastTimeOfCooldown = 0;
 	
-	private final int cooldownLength = 10000;
+	private final long cooldownLength = 10000;
 	
 	public GatewayServer(int port, String agentHost) throws IOException {
 		super();
@@ -57,7 +57,7 @@ public class GatewayServer implements Runnable {
 				
 				long currentTime = System.currentTimeMillis();
 				long differenceCooldown = currentTime - lastTimeOfCooldown;
-				cooldown = cooldown - (int)differenceCooldown;
+				cooldown = cooldown - differenceCooldown;
 				if (  cooldown < 0 ) {
 					cooldown = 0;
 				}

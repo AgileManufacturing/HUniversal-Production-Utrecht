@@ -38,9 +38,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
-import agents.data.PrintableACLMessage;
+import java.util.Calendar;
 
 /**
  * Helper for log messages, providing a single point for controlling program origin.
@@ -66,6 +66,10 @@ public class Logger {
 	 * treshhold for showing log msg
 	 **/
 	public static final int loglevelThreshold = LogLevel.DEBUG.getLevel();
+
+	public static final boolean logToFileEnabled = false;
+
+	public static final File logFile = new File("log.txt");
 	
 	static {
 		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
@@ -125,45 +129,6 @@ public class Logger {
 	 **/
 	public static void log(LogLevel level, String msg, Object... objects) {
 		printToOut(level, String.format(msg, objects));
-	}
-	
-	
-	public static void logAclMessage(ACLMessage msg, char type) {
-    	if(testingEnabled && msg != null) {
-    		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
-    		
-    		java.util.Date date = new java.util.Date();
-    		java.sql.Timestamp timeStamp = new java.sql.Timestamp(date.getTime());
-    		
-    		if(TEST_DATA_DIR == "") { 
-    			TEST_DATA_DIR = msgsFilePath + "/" + timeStamp.getTime();
-			}
-    		try {	    		
-	    		File dir = new File(TEST_DATA_DIR);
-	    		if(!dir.exists()) {
-	    			dir.mkdirs();
-	    		}
-	    		String filename = "null.log";
-	    		if ( msg.getConversationId() != null){
-	    			filename = msg.getConversationId() + ".log";
-	    		}
-	    		File file = new File(dir, filename);
-	    		if(!file.exists()) {
-					file.createNewFile();
-	    		}
-
-	    		PrintableACLMessage printmsg = new PrintableACLMessage(msg, timeStamp, "" + type);
-	    		
-	    		FileWriter fileWriter = new FileWriter(file, true);
-	    		BufferedWriter writer = new BufferedWriter(fileWriter);
-	    		
-    			writer.write(printmsg.toString() + "\r\n");
-	    		
-	    		writer.close();
-    		} catch (IOException e) {
-				e.printStackTrace();
-			}
-    	}
 	}
 	
 	public static void log(LogLevel level, String msg,  Throwable throwable) {
