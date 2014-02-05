@@ -44,10 +44,10 @@ public class ClientSocketThread extends Thread implements Runnable {
 	private BufferedReader _clientInSocket = null;
 
 	private String agentHost;
-	private int cooldown;
+	private long cooldown;
 
 	public ClientSocketThread(String productAgentId, Socket socket,
-			String agentHost, int cooldown) {
+			String agentHost, long cooldown) {
 		this.productAgentId = productAgentId;
 		this.agentHost = agentHost;
 		this._clientSocket = socket;
