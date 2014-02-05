@@ -41,7 +41,6 @@
 #include <rexos_statemachine/ModuleStateMachine.h>
 #include <rexos_statemachine/Transitions.h>
 #include "equiplet_node/RegisterModule.h"
-#include <rexos_knowledge_database/Module.h>
 
 #include <actionlib/server/simple_action_server.h>
 #include <rexos_statemachine/SetInstructionAction.h>
@@ -55,11 +54,10 @@
  **/
 typedef actionlib::SimpleActionServer<rexos_statemachine::SetInstructionAction> SetInstructionActionServer;
 
-class GripperNode : public rexos_statemachine::ModuleStateMachine, 
-		public rexos_knowledge_database::Module {
+class GripperNode : public rexos_statemachine::ModuleStateMachine  {
 public:
 
-	GripperNode(int equipletID, int moduleID, std::string manufacturer, std::string typeNumber, std::string serialNumber);
+	GripperNode(int equipletID, int moduleID);
 	virtual ~GripperNode();
 
 	virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
@@ -74,20 +72,16 @@ public:
 	bool release(gripper_node::Release::Request &req, gripper_node::Release::Response &res);
 
 	void onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal);
+	std::string parseNodeValue(const std::string nodeName, const JSONNode & n);
+
 private:
 	/**
 	 * @var modbus_t* modbusContext
 	 * Connection to the IO modbus
 	 **/
-	//modbus_t* modbusContext;
+	modbus_t* modbusContext;
 
 
-	std::string moduleNodeName;
-	/**
-	 * @var ros::NodeHandle node
-	 * The nodeHandle used by ros services and topics
-	 **/
-	ros::NodeHandle nodeHandle;
 	SetInstructionActionServer setInstructionActionServer;
 
 	/**
@@ -100,13 +94,13 @@ private:
 	 * @var ModbusController::ModbusController* modbus
 	 * Connection to the IO modbus controller
 	 **/
-	//rexos_modbus::ModbusController* modbus;
+	rexos_modbus::ModbusController* modbus;
 
 	/**
 	 * @var InputOutput::InputOutputController* controller;
 	 * Input output controller that contains the logic to switch devices
 	 */
-	//rexos_gripper::InputOutputController* controller;
+	rexos_gripper::InputOutputController* controller;
 
 	/**
 	 * @var ros::ServiceServer gripService
