@@ -36,7 +36,7 @@ public class ExecutionProcess implements Runnable, ModuleListener{
 	public void onProcessStateChanged(String state, long hardwareStepSerialId, Module module) {
 		if (hardwareSteps.size() > 0){
 			HardwareStep hardwareStep = hardwareSteps.get(0);
-			hardwareAbstractionLayerListener.onProcessStateChanged(state, hardwareStepSerialId, hardwareStep);
+			hardwareAbstractionLayerListener.onProcessStateChanged(state, hardwareStepSerialId, module, hardwareStep);
 			hardwareSteps.remove(0);
 			this.notify();
 		}

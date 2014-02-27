@@ -2,18 +2,17 @@ package HAL.modules;
 
 import java.util.ArrayList;
 
+
 import HAL.CompositeStep;
 import HAL.HardwareStep;
 import HAL.Module;
-import HAL.listeners.ModuleListener;
 
-public class PickAndPlace extends Module {
+public class Gripper extends Module {
 
-	
-
-	public PickAndPlace(ModuleListener moduleListener) {
-		super(moduleListener);
-		// TODO Auto-generated constructor stub
+	@Override
+	protected void setRequiredAttributes() {
+		typeNumber = "HU_gripper_type_a";
+		manufacturer = "HU";
 	}
 
 	@Override
@@ -23,10 +22,8 @@ public class PickAndPlace extends Module {
 	}
 
 	@Override
-	public ArrayList<HardwareStep> translateCompositeStep(
-			CompositeStep compositeStep) {
+	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }
