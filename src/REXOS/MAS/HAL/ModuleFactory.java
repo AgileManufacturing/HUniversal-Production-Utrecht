@@ -2,8 +2,10 @@ package HAL;
 
 import java.util.ArrayList;
 
+import HAL.listeners.ModuleListener;
+
 public class ModuleFactory {
-	public ModuleFactory(HardwareAbstractionLayer hardwareAbractionLayer){
+	public ModuleFactory(ModuleListener moduleListener){
 		
 	}
 	public ArrayList<Module> getBottomModules(){

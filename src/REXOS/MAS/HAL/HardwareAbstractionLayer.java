@@ -3,28 +3,27 @@ package HAL;
 import java.util.ArrayList;
 
 import HAL.listeners.HardwareAbstractionLayerListener;
-import HAL.listeners.ModuleListener;
+import HAL.tasks.ExecutionProcess;
+import HAL.tasks.TranslationProcess;
 
-public class HardwareAbstractionLayer implements ModuleListener {
+public class HardwareAbstractionLayer{
+	private CapabilityFactory capabilityFactory;
+	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
+	
 	public HardwareAbstractionLayer(HardwareAbstractionLayerListener hardwareAbstractionLayerListener){
-		
+		this.hardwareAbstractionLayerListener = hardwareAbstractionLayerListener;
+		capabilityFactory = new CapabilityFactory();
 	}
-	public void executeProductStep(ProductStep productStep){
-		
+	
+	public void executeHardwareSteps(ArrayList<HardwareStep> hardwareSteps){
+		ExecutionProcess executionProcess = new ExecutionProcess(this.hardwareAbstractionLayerListener, hardwareSteps);
+		executionProcess.run();
 	}
-	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep){
-		return null;		
+	public void translateProductStep(ProductStep productStep){
+		TranslationProcess translationProcess = new TranslationProcess(this.hardwareAbstractionLayerListener, productStep);
+		translationProcess.run();
 	}
 	public ArrayList<Capability> getAllCapabilities(){
-		return null;
-	}
-	public void onProcessStateChanged(String state, long hardwareStepSerialId){
-		
-	}
-	public void onModuleStateChanged(String state, Module module){
-		
-	}
-	public void onModuleModeChanged(String state, Module module){
-		
+		return capabilityFactory.getAllCapabilities();
 	}
 }

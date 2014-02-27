@@ -4,26 +4,28 @@ import java.util.ArrayList;
 
 import HAL.listeners.ModuleListener;
 
-public class Module {
+public abstract class Module { //implements mongolistener
+	private ModuleListener moduleListener;
+	
 	public Module(ModuleListener moduleListener){
-		
+		this.moduleListener = moduleListener;
 	}
+	@SuppressWarnings("unused")
 	private Module getParentModule(){
+		//TODO
 		return null;
 	}
-	public void executeHardwareStep(HardwareStep hardwareStep){
-		
-	}
-	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep){
-		return null;
-	}
+	
+	abstract public void executeHardwareStep(HardwareStep hardwareStep);
+	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep);
+	
 	public void onHardwareStepChanged(String state, long hardwareStepSerialId){
-		
+		moduleListener.onProcessStateChanged(state, hardwareStepSerialId, this);
 	}
 	public void onModuleStateChanged(String state){
-		
+		moduleListener.onModuleStateChanged(state, this);
 	}
 	public void onModuleModeChanged(String mode){
-		
+		moduleListener.onModuleModeChanged(mode, this);
 	}
 }
