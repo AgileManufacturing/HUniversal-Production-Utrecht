@@ -2,8 +2,10 @@ package HAL;
 
 import java.util.ArrayList;
 
+import HAL.listeners.ModuleListener;
+
 public class Module {
-	public Module(HardwareAbstractionLayer hardwareAbstractionLayer){
+	public Module(ModuleListener moduleListener){
 		
 	}
 	private Module getParentModule(){

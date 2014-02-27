@@ -1,10 +1,12 @@
 package HAL;
 
 import java.util.ArrayList;
-import agents.equiplet_agent.EquipletAgent;
 
-public class HardwareAbstractionLayer {
-	public HardwareAbstractionLayer(EquipletAgent equipletAgent){
+import HAL.listeners.HardwareAbstractionLayerListener;
+import HAL.listeners.ModuleListener;
+
+public class HardwareAbstractionLayer implements ModuleListener {
+	public HardwareAbstractionLayer(HardwareAbstractionLayerListener hardwareAbstractionLayerListener){
 		
 	}
 	public void executeProductStep(ProductStep productStep){
