@@ -1,8 +1,11 @@
 package HAL;
 
+import java.io.Serializable;
+
 import com.mongodb.util.JSON;
 
-public class CompositeStep {
+public class CompositeStep implements Serializable{
+	private static final long serialVersionUID = 1206944727256435741L;
 	private ProductStep productStep;
 	private JSON command;
 	

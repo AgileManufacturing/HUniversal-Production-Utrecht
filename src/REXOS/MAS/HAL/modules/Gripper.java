@@ -2,17 +2,21 @@ package HAL.modules;
 
 import java.util.ArrayList;
 
+import libraries.knowledgedb_client.KeyNotFoundException;
+import libraries.knowledgedb_client.KnowledgeException;
+
 
 import HAL.CompositeStep;
 import HAL.HardwareStep;
 import HAL.Module;
+import HAL.ModuleIdentifier;
 
 public class Gripper extends Module {
 
-	@Override
-	protected void setRequiredAttributes() {
-		typeNumber = "HU_gripper_type_a";
-		manufacturer = "HU";
+
+	public Gripper(ModuleIdentifier moduleIdentifier) throws KnowledgeException {
+		super(moduleIdentifier);
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -22,8 +26,13 @@ public class Gripper extends Module {
 	}
 
 	@Override
-	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) {
+	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws KnowledgeException, KeyNotFoundException {
+		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
+		
+		HardwareStep hardwareStep = new HardwareStep(compositeStep, null, moduleIdentifier);
 		// TODO Auto-generated method stub
-		return null;
+		
+		hardwareSteps.addAll(getParentModule().translateCompositeStep(compositeStep));
+		return hardwareSteps;
 	}
 }
