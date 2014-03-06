@@ -2,14 +2,14 @@ package HAL;
 
 import java.io.Serializable;
 
-import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 public class CompositeStep implements Serializable{
 	private static final long serialVersionUID = 1206944727256435741L;
 	private ProductStep productStep;
-	private Gson command;
+	private JsonObject command;
 	
-	public CompositeStep(ProductStep productStep, Gson command){
+	public CompositeStep(ProductStep productStep, JsonObject command){
 		this.command = command;
 		this.productStep = productStep;
 	}
@@ -17,7 +17,7 @@ public class CompositeStep implements Serializable{
 	public ProductStep getProductStep(){
 		return this.productStep;
 	}
-	public Gson getCommand(){
+	public JsonObject getCommand(){
 		return command;
 	}
 }

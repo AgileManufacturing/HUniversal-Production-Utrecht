@@ -2,7 +2,7 @@ package HAL;
 
 import java.util.ArrayList;
 
-import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ModuleListener;
@@ -32,13 +32,13 @@ public class HardwareAbstractionLayer implements ModuleListener{
 		return capabilityFactory.getAllCapabilities();
 	}
 	
-	public boolean insertModule(ModuleIdentifier moduleIdentifier,Gson module, Gson dynamicSettings, Gson staticSettings){
+	public boolean insertModule(ModuleIdentifier moduleIdentifier,JsonObject module, JsonObject dynamicSettings, JsonObject staticSettings){
 		return moduleFactory.insertModule(moduleIdentifier, module, dynamicSettings, staticSettings);
 	}
-	public boolean updateModule(ModuleIdentifier moduleIdentifier,Gson module, Gson dynamicSettings){
+	public boolean updateModule(ModuleIdentifier moduleIdentifier,JsonObject module, JsonObject dynamicSettings){
 		return moduleFactory.updateModule(moduleIdentifier, module, dynamicSettings);
 	}
-	public Gson deleteModule(ModuleIdentifier moduleIdentifier){
+	public JsonObject deleteModule(ModuleIdentifier moduleIdentifier){
 		return moduleFactory.deleteModule(moduleIdentifier);
 	}
 	public ArrayList<Module> getBottomModules(){

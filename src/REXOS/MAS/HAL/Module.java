@@ -1,24 +1,13 @@
 package HAL;
 
-import java.util.ArrayList;
-
 import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.knowledgedb_client.Row;
 
-import HAL.listeners.ModuleListener;
-
-public abstract class Module { //implements mongolistener
-	protected ModuleListener moduleListener;
+public abstract class Module { 
 	protected KnowledgeDBClient knowledgeDBClient;
 	protected ModuleIdentifier moduleIdentifier;
-	protected String equiplet;
-	protected String moduleProperties;
-	protected int attachedToLeft;
-	protected int attachedToRight;
-	protected int mountPointX;
-	protected int mountPointY;
 	
 	public Module(ModuleIdentifier moduleIdentifier) throws KnowledgeException{
 		this.moduleIdentifier = moduleIdentifier;
@@ -26,12 +15,7 @@ public abstract class Module { //implements mongolistener
 	}	
 	
 	
-	public void setModuleListener(ModuleListener moduleListener){
-		this.moduleListener = moduleListener;
-	}
 	protected Module getParentModule() throws KnowledgeException, KeyNotFoundException{
-		//TODO
-		
 		String sql = "SELECT * FROM Module " +
 						"WHERE attachedToLeft < (" +
 							"SELECT attachedToLeft FROM Module " +
@@ -51,20 +35,9 @@ public abstract class Module { //implements mongolistener
 																 resultSet[0].get("typeNumber").toString(),
 																 resultSet[0].get("serialNumber").toString()
 																);
-		ModuleFactory moduleFactory = new ModuleFactory(moduleListener);		
+		ModuleFactory moduleFactory = new ModuleFactory(null);		
 		return moduleFactory.getModuleByIdentifier(moduleIdentifier);
 	}
 	
-	abstract public void executeHardwareStep(HardwareStep hardwareStep);
-	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws KnowledgeException, KeyNotFoundException;
 	
-	public void onHardwareStepChanged(String state, long hardwareStepSerialId){
-		moduleListener.onProcessStateChanged(state, hardwareStepSerialId, this);
-	}
-	public void onModuleStateChanged(String state){
-		moduleListener.onModuleStateChanged(state, this);
-	}
-	public void onModuleModeChanged(String mode){
-		moduleListener.onModuleModeChanged(mode, this);
-	}
 }
