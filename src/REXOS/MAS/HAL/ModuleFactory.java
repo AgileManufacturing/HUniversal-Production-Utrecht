@@ -2,7 +2,7 @@ package HAL;
 
 import java.util.ArrayList;
 
-import com.mongodb.util.JSON;
+import com.google.gson.Gson;
 
 import HAL.listeners.ModuleListener;
 
@@ -20,13 +20,13 @@ public class ModuleFactory {
 		return null;
 		
 	}
-	public boolean insertModule(ModuleIdentifier moduleIdentifier,JSON module, JSON dynamicSettings, JSON staticSettings){
+	public boolean insertModule(ModuleIdentifier moduleIdentifier,Gson module, Gson dynamicSettings, Gson staticSettings){
 		return true;
 	}
-	public boolean updateModule(ModuleIdentifier moduleIdentifier,JSON module, JSON dynamicSettings){
+	public boolean updateModule(ModuleIdentifier moduleIdentifier,Gson module, Gson dynamicSettings){
 		return true;
 	}
-	public JSON deleteModule(ModuleIdentifier moduleIdentifier){
+	public Gson deleteModule(ModuleIdentifier moduleIdentifier){
 		return null;
 	}
 }

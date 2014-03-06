@@ -29,7 +29,6 @@ public abstract class Module { //implements mongolistener
 	public void setModuleListener(ModuleListener moduleListener){
 		this.moduleListener = moduleListener;
 	}
-	@SuppressWarnings("unused")
 	protected Module getParentModule() throws KnowledgeException, KeyNotFoundException{
 		//TODO
 		
@@ -48,10 +47,10 @@ public abstract class Module { //implements mongolistener
 		
 		Row[] resultSet = knowledgeDBClient.executeSelectQuery(sql);
 		
-		ModuleIdentifier moduleIdentifier = new ModuleIdentifier();
-		moduleIdentifier.setManufacturer(resultSet[0].get("manufacturer").toString());
-		moduleIdentifier.setTypeNumber(resultSet[0].get("typeNumber").toString());
-		moduleIdentifier.setSerialNumber(resultSet[0].get("serialNumber").toString());
+		ModuleIdentifier moduleIdentifier = new ModuleIdentifier(resultSet[0].get("manufacturer").toString(),
+																 resultSet[0].get("typeNumber").toString(),
+																 resultSet[0].get("serialNumber").toString()
+																);
 		ModuleFactory moduleFactory = new ModuleFactory(moduleListener);		
 		return moduleFactory.getModuleByIdentifier(moduleIdentifier);
 	}

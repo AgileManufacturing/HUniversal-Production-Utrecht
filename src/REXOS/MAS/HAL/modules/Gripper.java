@@ -2,9 +2,10 @@ package HAL.modules;
 
 import java.util.ArrayList;
 
+import com.google.gson.Gson;
+
 import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeException;
-
 
 import HAL.CompositeStep;
 import HAL.HardwareStep;
@@ -12,7 +13,7 @@ import HAL.Module;
 import HAL.ModuleIdentifier;
 
 public class Gripper extends Module {
-
+	//MONGO HOST 145.89.191.131
 
 	public Gripper(ModuleIdentifier moduleIdentifier) throws KnowledgeException {
 		super(moduleIdentifier);
@@ -28,6 +29,7 @@ public class Gripper extends Module {
 	@Override
 	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws KnowledgeException, KeyNotFoundException {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
+		
 		
 		HardwareStep hardwareStep = new HardwareStep(compositeStep, null, moduleIdentifier);
 		// TODO Auto-generated method stub

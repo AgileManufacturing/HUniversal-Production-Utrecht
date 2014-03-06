@@ -2,7 +2,7 @@ package HAL;
 
 import java.util.ArrayList;
 
-import com.mongodb.util.JSON;
+import com.google.gson.Gson;
 
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ModuleListener;
@@ -32,14 +32,17 @@ public class HardwareAbstractionLayer implements ModuleListener{
 		return capabilityFactory.getAllCapabilities();
 	}
 	
-	public boolean insertModule(ModuleIdentifier moduleIdentifier,JSON module, JSON dynamicSettings, JSON staticSettings){
+	public boolean insertModule(ModuleIdentifier moduleIdentifier,Gson module, Gson dynamicSettings, Gson staticSettings){
 		return moduleFactory.insertModule(moduleIdentifier, module, dynamicSettings, staticSettings);
 	}
-	public boolean updateModule(ModuleIdentifier moduleIdentifier,JSON module, JSON dynamicSettings){
+	public boolean updateModule(ModuleIdentifier moduleIdentifier,Gson module, Gson dynamicSettings){
 		return moduleFactory.updateModule(moduleIdentifier, module, dynamicSettings);
 	}
-	public JSON deleteModule(ModuleIdentifier moduleIdentifier){
+	public Gson deleteModule(ModuleIdentifier moduleIdentifier){
 		return moduleFactory.deleteModule(moduleIdentifier);
+	}
+	public ArrayList<Module> getBottomModules(){
+		return moduleFactory.getBottomModules();
 	}
 
 	@Override
