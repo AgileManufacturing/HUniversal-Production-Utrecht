@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import HAL.HardwareStep;
 import HAL.Module;
 import HAL.ModuleFactory;
+import HAL.exceptions.HardwareAbstractionLayerProcessException;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ModuleListener;
 
@@ -27,13 +28,12 @@ public class ExecutionProcess implements Runnable, ModuleListener{
 				this.wait();
 			}
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 	@Override
-	public void onProcessStateChanged(String state, long hardwareStepSerialId, Module module) {
+	public void onProcessStateChanged(String state, long hardwareStepSerialId, Module module) throws HardwareAbstractionLayerProcessException {
 		if (hardwareSteps.size() > 0){
 			HardwareStep hardwareStep = hardwareSteps.get(0);
 			hardwareAbstractionLayerListener.onProcessStateChanged(state, hardwareStepSerialId, module, hardwareStep);
@@ -41,7 +41,7 @@ public class ExecutionProcess implements Runnable, ModuleListener{
 			this.notify();
 		}
 		else {
-			//TODO HALListener call processStep error?
+			throw new HardwareAbstractionLayerProcessException("No more hardwareSteps while there should be at least one more");
 		}
 	}
 	@Override

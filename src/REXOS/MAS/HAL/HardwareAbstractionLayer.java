@@ -32,11 +32,11 @@ public class HardwareAbstractionLayer implements ModuleListener{
 		return capabilityFactory.getAllCapabilities();
 	}
 	
-	public boolean insertModule(ModuleIdentifier moduleIdentifier,JsonObject module, JsonObject dynamicSettings, JsonObject staticSettings){
-		return moduleFactory.insertModule(moduleIdentifier, module, dynamicSettings, staticSettings);
+	public boolean insertModule(ModuleIdentifier moduleIdentifier, JsonObject rosSoftware, JsonObject module, JsonObject dynamicSettings, JsonObject staticSettings){
+		return moduleFactory.insertModule(moduleIdentifier, rosSoftware, module, dynamicSettings, staticSettings);
 	}
-	public boolean updateModule(ModuleIdentifier moduleIdentifier,JsonObject module, JsonObject dynamicSettings){
-		return moduleFactory.updateModule(moduleIdentifier, module, dynamicSettings);
+	public boolean updateModule(ModuleIdentifier moduleIdentifier, JsonObject rosSoftware, JsonObject module, JsonObject dynamicSettings){
+		return moduleFactory.updateModule(moduleIdentifier, rosSoftware, module, dynamicSettings);
 	}
 	public JsonObject deleteModule(ModuleIdentifier moduleIdentifier){
 		return moduleFactory.deleteModule(moduleIdentifier);

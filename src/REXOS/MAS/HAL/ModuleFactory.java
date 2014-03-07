@@ -20,10 +20,10 @@ public class ModuleFactory {
 		return null;
 		
 	}
-	public boolean insertModule(ModuleIdentifier moduleIdentifier,JsonObject module, JsonObject dynamicSettings, JsonObject staticSettings){
+	public boolean insertModule(ModuleIdentifier moduleIdentifier, JsonObject rosSoftware, JsonObject module, JsonObject dynamicSettings, JsonObject staticSettings){
 		return true;
 	}
-	public boolean updateModule(ModuleIdentifier moduleIdentifier,JsonObject module, JsonObject dynamicSettings){
+	public boolean updateModule(ModuleIdentifier moduleIdentifier, JsonObject rosSoftware, JsonObject module, JsonObject dynamicSettings){
 		return true;
 	}
 	public JsonObject deleteModule(ModuleIdentifier moduleIdentifier){
