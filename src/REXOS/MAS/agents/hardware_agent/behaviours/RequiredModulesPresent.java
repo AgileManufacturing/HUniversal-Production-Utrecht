@@ -94,7 +94,7 @@ public class RequiredModulesPresent extends ReceiveBehaviour {
 		ArrayList<Integer> availableModules = new ArrayList<Integer>();
 		try {
 			// get the availablemoduleGroups
-			KnowledgeDBClient client = KnowledgeDBClient.getClient();
+			KnowledgeDBClient client = new KnowledgeDBClient();
 			Row[] rows =
 					client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, hardwareAgent.getEquipletAgentAID()
 							.getLocalName());

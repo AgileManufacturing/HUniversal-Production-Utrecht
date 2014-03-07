@@ -81,7 +81,7 @@ public class ModuleFactory {
 	 **/
 	private void updateModuleInCache(int moduleId) {
 		try {
-			KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
+			KnowledgeDBClient knowledgeClient = new KnowledgeDBClient();
 		
 			Row[] rows = knowledgeClient.executeSelectQuery(
 					Queries.SOFTWARE_FOR_MODULE,

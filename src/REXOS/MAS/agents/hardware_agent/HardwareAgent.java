@@ -255,7 +255,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 
 		// Get the modules for the equiplet and register the modules
 		try {
-			KnowledgeDBClient client = KnowledgeDBClient.getClient();
+			KnowledgeDBClient client = new KnowledgeDBClient();
 			Row[] rows = client.executeSelectQuery(Queries.MODULES_PER_EQUIPLET, equipletAgentAID.getLocalName());
 			Module module;
 			int id;

@@ -83,7 +83,7 @@ public class ServiceFactory {
 	private Service	getServiceByServiceID(int serviceID) {
 		Service service = null;
 		try {
-			KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
+			KnowledgeDBClient knowledgeClient = new KnowledgeDBClient();
 			Row[] rows = knowledgeClient.executeSelectQuery(Queries.SOFTWARE_FOR_SERVICE, serviceID);
 			if (rows.length > 0) {
 				DynamicClassDescription description = new DynamicClassDescription(
@@ -112,7 +112,7 @@ public class ServiceFactory {
 	public Service[] getServicesForStep(int stepType) {
 		ArrayList<Service> servicesForStep = new ArrayList<Service>();
 		try {
-			KnowledgeDBClient knowledgeClient = KnowledgeDBClient.getClient();
+			KnowledgeDBClient knowledgeClient = new KnowledgeDBClient();
 			Row[] rows = knowledgeClient.executeSelectQuery(
 					Queries.SERVICES_FOR_STEP_FOR_EQUIPLET,
 					equipletAID, stepType);

@@ -71,6 +71,19 @@ for(int i = 0 ; i < array.length() ; i++){
 		JsonElement pick = command.remove("pick");
 		JsonElement place = command.remove("place");
 		JsonElement move = command.remove("move");
+		JsonArray moveParameters = move.getAsJsonArray();
+		double x = moveParameters.get(0).getAsDouble();
+		double y = moveParameters.get(1).getAsDouble();
+		double z = moveParameters.get(2).getAsDouble();
+		JsonObject mParameters = new JsonObject();
+		mParameters.addProperty("x",x);
+		mParameters.addProperty("y",y);
+		mParameters.addProperty("z",z);
+		moveParameters = new JsonArray();
+		moveParameters.add(mParameters.get("x"));
+		moveParameters.add(mParameters.get("y"));
+		moveParameters.add(mParameters.get("z"));
+		command.add("move", moveParameters);
 		//command.addProperty("move", move.getAsDouble());
 		//Adjustments for gripper dimentions
 		

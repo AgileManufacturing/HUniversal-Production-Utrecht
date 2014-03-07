@@ -81,7 +81,7 @@ public abstract class Service {
 	 */
 	public int[] getModuleGroupIds(int productStepType, BasicDBObject parameters) {
 		try {
-			KnowledgeDBClient client = KnowledgeDBClient.getClient();
+			KnowledgeDBClient client = new KnowledgeDBClient();
 			Row[] moduleGroups = client.executeSelectQuery(Queries.MODULEGROUPS_REQUIRED_PER_SERVICE, name);
 			int[] moduleIds = new int[moduleGroups.length];
 			for(int i = 0; i < moduleGroups.length; i++) {

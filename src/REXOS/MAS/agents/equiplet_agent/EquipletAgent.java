@@ -279,7 +279,7 @@ public class EquipletAgent extends Agent implements BlackboardSubscriber {
 			AID logisticsAgent = new AID(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "LogisticsAgentAID", getAID().getLocalName()), AID.ISGUID);
 
 			capabilities = new ArrayList<Integer>();
-			KnowledgeDBClient client = KnowledgeDBClient.getClient();
+			KnowledgeDBClient client = new KnowledgeDBClient();
 			// Register modules
 			Row[] steps = client.executeSelectQuery(Queries.POSSIBLE_STEPS_PER_EQUIPLET, getAID().getLocalName());
 			for(Row step : steps) {
