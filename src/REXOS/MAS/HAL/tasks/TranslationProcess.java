@@ -22,18 +22,23 @@ public class TranslationProcess implements Runnable{
 		CapabilityFactory capabilityFactory = new CapabilityFactory();
 		ArrayList<Capability> capabilities = capabilityFactory.getAllCapabilities();
 		
-		int numCapabilities = capabilities.size();
-		if (numCapabilities == 0){
-			hardwareAbstractionLayerListener.onIncapableCapabilities(productStep);
+		if (capabilities != null){
+			int numCapabilities = capabilities.size();
+			if (numCapabilities == 0){
+				hardwareAbstractionLayerListener.onIncapableCapabilities(productStep);
+			}
+			else {
+				ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
+				
+				for (int i=0;i<numCapabilities;i++){
+					hardwareSteps.addAll(capabilities.get(i).translateProductStep(productStep));
+				}			
+				
+				hardwareAbstractionLayerListener.onTranslationFinished(productStep, hardwareSteps);			
+			}
 		}
 		else {
-			ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
-			
-			for (int i=0;i<numCapabilities;i++){
-				hardwareSteps.addAll(capabilities.get(i).translateProductStep(productStep));
-			}			
-			
-			hardwareAbstractionLayerListener.onTranslationFinished(productStep, hardwareSteps);			
-		}		
+			hardwareAbstractionLayerListener.onIncapableCapabilities(productStep);			
+		}
 	}
 }
