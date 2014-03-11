@@ -15,7 +15,7 @@ public abstract class Module {
 	}	
 	
 	
-	protected Module getParentModule() throws KnowledgeException, KeyNotFoundException{
+	protected Module getParentModule() throws Exception{
 		String sql = "SELECT * FROM Module " +
 						"WHERE attachedToLeft < (" +
 							"SELECT attachedToLeft FROM Module " +

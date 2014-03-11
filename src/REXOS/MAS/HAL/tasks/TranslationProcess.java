@@ -19,6 +19,7 @@ public class TranslationProcess implements Runnable{
 	
 	@Override
 	public void run() {
+		System.out.println("Starting translation process");
 		CapabilityFactory capabilityFactory = new CapabilityFactory();
 		ArrayList<Capability> capabilities = capabilityFactory.getAllCapabilities();
 		

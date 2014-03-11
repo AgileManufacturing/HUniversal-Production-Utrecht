@@ -2,6 +2,7 @@ package HAL.tasks;
 
 import java.util.ArrayList;
 
+import libraries.knowledgedb_client.KnowledgeException;
 import HAL.HardwareStep;
 import HAL.Module;
 import HAL.ModuleFactory;
@@ -27,13 +28,14 @@ public class ExecutionProcess implements Runnable, ModuleListener{
 				moduleFactory.executeHardwareStep(hardwareSteps.get(0));
 				this.wait();
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} catch (InterruptedException | KnowledgeException ex) {
+			// TODO Auto-generated catch block
+			ex.printStackTrace();
 		}
 	}
 
 	@Override
-	public void onProcessStateChanged(String state, long hardwareStepSerialId, Module module) throws HardwareAbstractionLayerProcessException {
+	public void onProcessStateChanged(String state, long hardwareStepSerialId, Module module) throws HardwareAbstractionLayerProcessException{
 		if (hardwareSteps.size() > 0){
 			HardwareStep hardwareStep = hardwareSteps.get(0);
 			hardwareAbstractionLayerListener.onProcessStateChanged(state, hardwareStepSerialId, module, hardwareStep);

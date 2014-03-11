@@ -2,6 +2,7 @@ package HAL;
 
 import java.util.ArrayList;
 
+import libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.HardwareAbstractionLayerListener;
 
 public class HALTesterClass implements HardwareAbstractionLayerListener {
@@ -9,8 +10,9 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 	/**
 	 * @param args
+	 * @throws KnowledgeException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws KnowledgeException {
 		// TODO Auto-generated method stub
 		HardwareAbstractionLayer hal = new HardwareAbstractionLayer(htc);
 		Service service = new Service("PickAndPlace");

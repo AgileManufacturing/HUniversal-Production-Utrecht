@@ -12,7 +12,6 @@ import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.blackboard_client.data_classes.InvalidJSONException;
 import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeException;
-
 import HAL.CompositeStep;
 import HAL.HardwareStep;
 import HAL.ModuleActor;
@@ -92,7 +91,13 @@ for(int i = 0 ; i < array.length() ; i++){
 		
 		compositeStep = new CompositeStep(compositeStep.getProductStep(),command);
 		
-		ModuleActor moduleActor = (ModuleActor) getParentModule();
+		ModuleActor moduleActor = null;
+		try {
+			moduleActor = (ModuleActor) getParentModule();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		if (moduleActor != null){
 			hardwareSteps.addAll(moduleActor.translateCompositeStep(compositeStep));
 		}

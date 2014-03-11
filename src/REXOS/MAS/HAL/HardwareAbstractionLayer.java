@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.google.gson.JsonObject;
 
+import libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ModuleListener;
 import HAL.tasks.ExecutionProcess;
@@ -14,7 +15,7 @@ public class HardwareAbstractionLayer implements ModuleListener{
 	private ModuleFactory moduleFactory;
 	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
 	
-	public HardwareAbstractionLayer(HardwareAbstractionLayerListener hardwareAbstractionLayerListener){
+	public HardwareAbstractionLayer(HardwareAbstractionLayerListener hardwareAbstractionLayerListener) throws KnowledgeException{
 		this.hardwareAbstractionLayerListener = hardwareAbstractionLayerListener;
 		capabilityFactory = new CapabilityFactory();
 		moduleFactory = new ModuleFactory(this);
@@ -41,7 +42,7 @@ public class HardwareAbstractionLayer implements ModuleListener{
 	public JsonObject deleteModule(ModuleIdentifier moduleIdentifier){
 		return moduleFactory.deleteModule(moduleIdentifier);
 	}
-	public ArrayList<Module> getBottomModules(){
+	public ArrayList<Module> getBottomModules() throws Exception{
 		return moduleFactory.getBottomModules();
 	}
 
