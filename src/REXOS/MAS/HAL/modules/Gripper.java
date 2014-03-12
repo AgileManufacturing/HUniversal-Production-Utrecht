@@ -76,17 +76,13 @@ for(int i = 0 ; i < array.length() ; i++){
 		double z = moveParameters.get(2).getAsDouble();
 		JsonObject mParameters = new JsonObject();
 		mParameters.addProperty("x",x);
-		mParameters.addProperty("y",y);
+		mParameters.addProperty("y",y-GRIPPER_SIZE);
 		mParameters.addProperty("z",z);
 		moveParameters = new JsonArray();
 		moveParameters.add(mParameters.get("x"));
 		moveParameters.add(mParameters.get("y"));
 		moveParameters.add(mParameters.get("z"));
-		command.add("move", moveParameters);
-		//command.addProperty("move", move.getAsDouble());
-		//Adjustments for gripper dimentions
-		
-		
+		command.add("move", moveParameters);		
 		//TODO adjust for dimentions of gripper
 		
 		compositeStep = new CompositeStep(compositeStep.getProductStep(),command);
