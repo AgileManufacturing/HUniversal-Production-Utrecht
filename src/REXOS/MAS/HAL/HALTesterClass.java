@@ -15,6 +15,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	public static void main(String[] args) throws KnowledgeException {
 		// TODO Auto-generated method stub
 		HardwareAbstractionLayer hal = new HardwareAbstractionLayer(htc);
+		
 		Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);
 		hal.translateProductStep(productStep);
