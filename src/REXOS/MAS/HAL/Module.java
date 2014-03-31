@@ -31,12 +31,15 @@ public abstract class Module {
 		
 		Row[] resultSet = knowledgeDBClient.executeSelectQuery(sql);
 		
-		ModuleIdentifier moduleIdentifier = new ModuleIdentifier(resultSet[0].get("manufacturer").toString(),
-																 resultSet[0].get("typeNumber").toString(),
-																 resultSet[0].get("serialNumber").toString()
-																);
-		ModuleFactory moduleFactory = new ModuleFactory(null);		
-		return moduleFactory.getModuleByIdentifier(moduleIdentifier);
+		if (resultSet.length > 0){
+			ModuleIdentifier moduleIdentifier = new ModuleIdentifier(resultSet[0].get("manufacturer").toString(),
+																	 resultSet[0].get("typeNumber").toString(),
+																	 resultSet[0].get("serialNumber").toString()
+																	);
+			ModuleFactory moduleFactory = new ModuleFactory(null);		
+			return moduleFactory.getModuleByIdentifier(moduleIdentifier);
+		}
+		else return null;
 	}
 	
 	

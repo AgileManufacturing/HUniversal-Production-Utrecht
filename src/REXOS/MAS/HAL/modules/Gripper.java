@@ -58,7 +58,7 @@ for(int i = 0 ; i < array.length() ; i++){
 			}
 		}
 		else {
-			//Impossible
+			//Impossible unless a retard calls this method
 		}
 	}
 
