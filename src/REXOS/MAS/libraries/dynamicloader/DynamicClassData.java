@@ -53,7 +53,7 @@ class DynamicClassData {
 	 * @var long lastModified
 	 * Timestamp indicating when the class data was last updated.
 	 **/
-	private long lastModified = 0;
+	private long buildNumber = 0;
 	
 	/**
 	 * @var SoftwareDescription description
@@ -97,8 +97,8 @@ class DynamicClassData {
 	 * Returns the last modified timestamp.
 	 * @return the last modified timestamp.
 	 **/
-	public long getLastModified() {
-		return lastModified;
+	public long getBuildNumber() {
+		return buildNumber;
 	}
 
 	/**
@@ -106,8 +106,9 @@ class DynamicClassData {
 	 * If updating the class data fails for whatever reason, a loader for the previous version is returned if available.
 	 * @return A SoftwareClassLoader for the class represented by this object.
 	 * @throws InstantiateClassException Retrieving the class data failed.
+	 * @throws JarFileLoaderException 
 	 **/
-	public DynamicClassLoader getLoader() throws InstantiateClassException {
+	public DynamicClassLoader getLoader() throws InstantiateClassException, JarFileLoaderException {
 		// Attempt to update the class data.
 		// If an error occurs but a previous version is in cache, use that instead.
 		try {
@@ -141,7 +142,7 @@ class DynamicClassData {
 	 **/
 	public void setDescription(DynamicClassDescription description) {
 		if (!description.equals(this.description)) {
-			this.lastModified = 0;
+			this.buildNumber = 0;
 			classDataChanged = true;
 		}
 		this.description = description;
@@ -151,8 +152,8 @@ class DynamicClassData {
 	 * Sets the last modified timestamp.
 	 * @param lastModified The last time the class data was updated.
 	 **/
-	private void setLastModified(long lastModified) {
-		this.lastModified = lastModified;
+	private void setBuildNumber(long buildNumber) {
+		this.buildNumber = buildNumber;
 	}
 	
 	/**
@@ -191,8 +192,9 @@ class DynamicClassData {
 	/**
 	 * Attempts to update the stored class data to the latest version if available.
 	 * @throws IOException Retrieving an updated version of the class data failed.
+	 * @throws JarFileLoaderException 
 	 **/
-	private void updateClassData() throws IOException {
+	private void updateClassData() throws IOException, JarFileLoaderException {
 		
 		
 		byte[] data = jarFileLoader.loadJarFile(description);
@@ -232,7 +234,7 @@ class DynamicClassData {
 		if (jarFile != null) {
 			try {
 				setClassData(extractClassDataFromJar(jarFile, description.getClassName()));
-				setLastModified(jarFileLoader.getLastModified(description));
+				setBuildNumber(jarFileLoader.getBuildNumber(description));
 			}
 			finally {
 				jarFile.close();

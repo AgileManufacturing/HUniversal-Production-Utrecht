@@ -55,8 +55,9 @@ public class DynamicClassFactory<T> {
 	 * @param description DynamicClassDescription containing the relevant information for the software.
 	 * @return A DynamicClassLoader that is able to create an object for the given description.
 	 * @throws InstantiateClassException No loader could be created.
+	 * @throws JarFileLoaderException 
 	 **/
-	private DynamicClassLoader getClassLoader(DynamicClassDescription description) throws InstantiateClassException {
+	private DynamicClassLoader getClassLoader(DynamicClassDescription description) throws InstantiateClassException, JarFileLoaderException {
 		DynamicClassData entry = softwareCache.get(description.getId());
 		if (entry == null) {
 			entry = new DynamicClassData(description, jarFileLoader);
@@ -92,9 +93,10 @@ public class DynamicClassFactory<T> {
 	 * @param description DynamicClassDescription containing the relevant information for the software.
 	 * @return An object of the class specified in the description.
 	 * @throws InstantiateClassException The object of the specified class could not be instantiated.
+	 * @throws JarFileLoaderException 
 	 *
 	 **/
-	public Class<T> getClassFromDescription(DynamicClassDescription description) throws InstantiateClassException {
+	public Class<T> getClassFromDescription(DynamicClassDescription description) throws InstantiateClassException, JarFileLoaderException {
 			DynamicClassLoader loader = getClassLoader(description);
 			return getClassWithLoader(loader, description.getClassName());
 	}
