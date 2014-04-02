@@ -224,4 +224,8 @@ public class KnowledgeDBClient {
         
         return queryReturnValue;
     }
+    
+    public Connection getConnection() {
+    	return connection;
+    }
 }
