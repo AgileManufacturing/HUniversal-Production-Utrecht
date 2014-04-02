@@ -11,13 +11,22 @@ drop table if exists SupportedMutation;
 drop table if exists Module;
 drop table if exists ModuleType;
 drop table if exists Equiplet;
-drop table if exists HalSoftware;
+drop table if exists RosSoftware;
+drop table if exists JavaSoftware;
 
-create table HalSoftware(
+create table JavaSoftware(
   id int NOT NULL AUTO_INCREMENT,
-  className char(200) NOT NULL,
+  buildNumber int NOT NULL,
   jarFile longblob NOT NULL,
-  primary key(id)
+  className char(200),
+  primary key (id)
+);
+create table RosSoftware(
+  id int NOT NULL AUTO_INCREMENT,
+  buildNumber int NOT NULL,
+  jarFile longblob NOT NULL,
+  className char(200),
+  primary key (id)
 );
 
 create table Equiplet(
@@ -26,20 +35,22 @@ create table Equiplet(
   mountPointsY int NOT NULL,
   mountPointDistanceX double NOT NULL,
   mountPointDistanceY double NOT NULL,
-  softwareBuildNumber int NOT NULL,
-  rosSoftware longblob NOT NULL,
-  HalSoftware_id int NOT NULL,
-  primary key (name)
+  rosSoftware int NOT NULL,
+  masSoftware int NOT NULL,
+  primary key (name),
+  foreign key (rosSoftware) references RosSoftware(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  foreign key (masSoftware) references JavaSoftware(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 create table ModuleType(
   manufacturer char(200) NOT NULL,
   typeNumber char(200) NOT NULL,
   moduleTypeProperties text NOT NULL,
-  rosSoftwareBuildNumber int NOT NULL,
-  rosSoftware longblob NOT NULL,
-  HalSoftware_id int NOT NULL,
-  primary key (manufacturer, typeNumber)
+  rosSoftware int NOT NULL,
+  halSoftware int NOT NULL,
+  primary key (manufacturer, typeNumber),
+  foreign key (rosSoftware) references RosSoftware(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  foreign key (halSoftware) references JavaSoftware(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 create table Module(
@@ -53,7 +64,7 @@ create table Module(
   attachedToRight int NOT NULL,
   moduleProperties text NOT NULL,
   primary key (manufacturer, typeNumber, serialNumber),
-  foreign key (equiplet) references Equiplet(name) ON DELETE CASCADE ON UPDATE NO ACTION
+  foreign key (equiplet) references Equiplet(name) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 create table SupportedMutation(
@@ -61,7 +72,7 @@ create table SupportedMutation(
   typeNumber char(200) NOT NULL,
   mutation char(200) NOT NULL,
   primary key (manufacturer, typeNumber, mutation),
-  foreign key (manufacturer, typeNumber) references ModuleType(manufacturer, typeNumber) ON DELETE CASCADE ON UPDATE NO ACTION
+  foreign key (manufacturer, typeNumber) references ModuleType(manufacturer, typeNumber) ON DELETE NO ACTION ON UPDATE NO ACTION
 );  
 
 create table ModuleCalibration(
@@ -83,8 +94,9 @@ create table ModuleCalibrationModuleSet(
 
 create table CapabilityType(
   name char(200) NOT NULL,
-  HalSoftware_id int NOT NULL,
-  primary key (name)
+  halSoftware int NOT NULL,
+  primary key (name),
+  foreign key (halSoftware) references JavaSoftware(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 create table CapabilityTypeRequiredMutation(
