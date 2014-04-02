@@ -3,9 +3,9 @@ package HAL.tasks;
 import java.util.ArrayList;
 
 import HAL.Capability;
-import HAL.CapabilityFactory;
 import HAL.HardwareStep;
 import HAL.ProductStep;
+import HAL.factories.CapabilityFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
 
 public class TranslationProcess implements Runnable{
@@ -21,7 +21,7 @@ public class TranslationProcess implements Runnable{
 	public void run() {
 		System.out.println("Starting translation process");
 		CapabilityFactory capabilityFactory = new CapabilityFactory();
-		ArrayList<Capability> capabilities = capabilityFactory.getAllCapabilities();
+		ArrayList<Capability> capabilities = capabilityFactory.getAllSupportedCapabilities();
 		
 		if (capabilities != null){
 			int numCapabilities = capabilities.size();

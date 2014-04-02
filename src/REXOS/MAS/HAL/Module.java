@@ -1,5 +1,6 @@
 package HAL;
 
+import HAL.factories.ModuleFactory;
 import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;

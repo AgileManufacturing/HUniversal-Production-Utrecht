@@ -5,7 +5,7 @@ public class ModuleIdentifier {
 	private String typeNumber;
 	private String serialNumber;
 	
-	ModuleIdentifier(String manufacturer, String typeNumber, String serialNumber){
+	public ModuleIdentifier(String manufacturer, String typeNumber, String serialNumber){
 		this.manufacturer = manufacturer;
 		this.typeNumber = typeNumber;
 		this.serialNumber = serialNumber;
