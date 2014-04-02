@@ -24,7 +24,7 @@ import HAL.exceptions.ModuleTranslatingException;
 public class PickAndPlace extends Capability {
 
 	@Override
-	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) {
+	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws KnowledgeException, KeyNotFoundException, ModuleTranslatingException {
 		// TODO Auto-generated method stub
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<>();
 		String serviceName = productStep.getService().getName();
@@ -49,20 +49,26 @@ public class PickAndPlace extends Capability {
 			
 
 			ModuleFactory moduleFactory = null;
+			
 			ArrayList<ModuleActor> modules = moduleFactory.getBottomModuleActors();
+			
 			for (ModuleActor moduleActor : modules) {
 				try {
+					
 					hardwareSteps.addAll(moduleActor.translateCompositeStep(pick));
 					hardwareSteps.addAll(moduleActor.translateCompositeStep(place));
+					
 				} catch (KnowledgeException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					
+					throw new KnowledgeException(e.toString());
+					
 				} catch (KeyNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					
+					throw new KeyNotFoundException(e.toString());
+					
 				} catch (ModuleTranslatingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					
+					throw new ModuleTranslatingException(e.toString());
 				}
 				
 			}
