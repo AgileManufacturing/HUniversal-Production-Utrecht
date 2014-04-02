@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import libraries.knowledgedb_client.KnowledgeException;
 import HAL.HardwareStep;
 import HAL.Module;
-import HAL.ModuleFactory;
 import HAL.exceptions.HardwareAbstractionLayerProcessException;
+import HAL.factories.ModuleFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ModuleListener;
 

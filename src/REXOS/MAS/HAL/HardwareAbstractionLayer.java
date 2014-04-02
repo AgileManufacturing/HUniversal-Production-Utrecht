@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import com.google.gson.JsonObject;
 
 import libraries.knowledgedb_client.KnowledgeException;
+import HAL.factories.CapabilityFactory;
+import HAL.factories.ModuleFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ModuleListener;
 import HAL.tasks.ExecutionProcess;
@@ -15,10 +17,16 @@ public class HardwareAbstractionLayer implements ModuleListener{
 	private ModuleFactory moduleFactory;
 	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
 	
+	// TODO move somewhere else?? 
+	private String equipletName;
+	public String getEquipletName() {
+		return equipletName;
+	}
+
 	public HardwareAbstractionLayer(HardwareAbstractionLayerListener hardwareAbstractionLayerListener) throws KnowledgeException{
 		this.hardwareAbstractionLayerListener = hardwareAbstractionLayerListener;
-		capabilityFactory = new CapabilityFactory();
-		moduleFactory = new ModuleFactory(this);
+		capabilityFactory = new CapabilityFactory(this);
+		moduleFactory = new ModuleFactory(this, this);
 	}
 	
 	public void executeHardwareSteps(ArrayList<HardwareStep> hardwareSteps){
@@ -29,8 +37,8 @@ public class HardwareAbstractionLayer implements ModuleListener{
 		TranslationProcess translationProcess = new TranslationProcess(this.hardwareAbstractionLayerListener, productStep);
 		translationProcess.run();
 	}
-	public ArrayList<Capability> getAllCapabilities(){
-		return capabilityFactory.getAllCapabilities();
+	public ArrayList<Capability> getAllCapabilities() throws Exception{
+		return capabilityFactory.getAllSupportedCapabilities();
 	}
 	
 	public boolean insertModule(ModuleIdentifier moduleIdentifier, JsonObject rosSoftware, JsonObject module, JsonObject dynamicSettings, JsonObject staticSettings){

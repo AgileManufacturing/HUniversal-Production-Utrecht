@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 
 
+
 import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeException;
 
@@ -17,9 +18,9 @@ import HAL.CompositeStep;
 import HAL.HardwareStep;
 import HAL.Module;
 import HAL.ModuleActor;
-import HAL.ModuleFactory;
 import HAL.ProductStep;
 import HAL.exceptions.ModuleTranslatingException;
+import HAL.factories.ModuleFactory;
 
 public class PickAndPlace extends Capability {
 
