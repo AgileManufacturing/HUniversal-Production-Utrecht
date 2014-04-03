@@ -15,8 +15,11 @@ public abstract class Module {
 		this.knowledgeDBClient = new KnowledgeDBClient();
 	}	
 	
+	public ModuleIdentifier getModuleIdentifier(){
+		return this.moduleIdentifier;
+	}
 	
-	protected Module getParentModule() throws Exception{
+	public Module getParentModule() throws Exception{
 		String sql = "SELECT * FROM Module " +
 						"WHERE attachedToLeft < (" +
 							"SELECT attachedToLeft FROM Module " +
@@ -42,6 +45,4 @@ public abstract class Module {
 		}
 		else return null;
 	}
-	
-	
 }
