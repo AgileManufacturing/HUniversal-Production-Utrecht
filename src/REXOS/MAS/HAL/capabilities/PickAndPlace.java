@@ -20,14 +20,14 @@ import HAL.HardwareStep;
 import HAL.Module;
 import HAL.ModuleActor;
 import HAL.ProductStep;
-import HAL.exceptions.CapabilitiesException;
+import HAL.exceptions.CapabilityException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 
 public class PickAndPlace extends Capability {
 
 	@Override
-	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws CapabilitiesException {
+	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws CapabilityException {
 		// TODO Auto-generated method stub
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<>();
 		String serviceName = productStep.getService().getName();
@@ -63,15 +63,15 @@ public class PickAndPlace extends Capability {
 					
 				} catch (KnowledgeException e) {
 					
-					throw new CapabilitiesException(e.toString());
+					throw new CapabilityException(e.toString());
 					
 				} catch (KeyNotFoundException e) {
 					
-					throw new CapabilitiesException(e.toString());
+					throw new CapabilityException(e.toString());
 					
 				} catch (ModuleTranslatingException e) {
 					
-					throw new CapabilitiesException(e.toString());
+					throw new CapabilityException(e.toString());
 				}
 				
 			}
