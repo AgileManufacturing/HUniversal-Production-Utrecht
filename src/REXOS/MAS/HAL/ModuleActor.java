@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 import HAL.exceptions.HardwareAbstractionLayerProcessException;
 import HAL.exceptions.ModuleExecutingException;
 import HAL.exceptions.ModuleTranslatingException;
+import HAL.factories.ModuleFactory;
 import HAL.listeners.ModuleListener;
 import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
@@ -35,8 +36,8 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 	protected BlackboardClient mongoClient;
 	protected static final String MONGO_HOST = "145.89.191.131";
 	
-	public ModuleActor(ModuleIdentifier moduleIdentifier) throws KnowledgeException, UnknownHostException, GeneralMongoException {
-		super(moduleIdentifier);
+	public ModuleActor(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory) throws KnowledgeException, UnknownHostException, GeneralMongoException {
+		super(moduleIdentifier, moduleFactory);
 		mongoClient = new BlackboardClient(MONGO_HOST);
 	}
 	

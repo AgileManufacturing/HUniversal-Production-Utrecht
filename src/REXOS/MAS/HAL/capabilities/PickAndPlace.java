@@ -27,7 +27,7 @@ import HAL.factories.ModuleFactory;
 public class PickAndPlace extends Capability {
 
 	@Override
-	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws CapabilityException {
+	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws Exception {
 		// TODO Auto-generated method stub
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<>();
 		String serviceName = productStep.getService().getName();

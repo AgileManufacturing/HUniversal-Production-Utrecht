@@ -14,6 +14,6 @@ public abstract class Capability {
 	}
 	
 	abstract public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) 
-			throws CapabilityException;
+			throws CapabilityException, Exception;
 	
 }

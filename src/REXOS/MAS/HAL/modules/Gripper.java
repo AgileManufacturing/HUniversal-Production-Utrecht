@@ -13,6 +13,7 @@ import HAL.HardwareStep;
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
 import HAL.exceptions.ModuleExecutingException;
+import HAL.factories.ModuleFactory;
 
 public class Gripper extends ModuleActor {
 	//Gonna be loaded from KDB:
@@ -27,8 +28,8 @@ public class Gripper extends ModuleActor {
 	private static final String PLACE = "place";
 
 	
-	public Gripper(ModuleIdentifier moduleIdentifier) throws KnowledgeException, UnknownHostException, GeneralMongoException {
-		super(moduleIdentifier);
+	public Gripper(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory) throws KnowledgeException, UnknownHostException, GeneralMongoException {
+		super(moduleIdentifier, moduleFactory);
 	}
 
 	@Override

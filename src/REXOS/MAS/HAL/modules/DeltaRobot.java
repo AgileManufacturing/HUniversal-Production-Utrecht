@@ -12,12 +12,13 @@ import HAL.HardwareStep;
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
 import HAL.exceptions.ModuleExecutingException;
+import HAL.factories.ModuleFactory;
 
 public class DeltaRobot extends ModuleActor {
 	private static final String MOVE_DELTA_ROBOT = "move_delta_robot";
 
-	public DeltaRobot(ModuleIdentifier moduleIdentifier) throws KnowledgeException, UnknownHostException, GeneralMongoException {
-		super(moduleIdentifier);
+	public DeltaRobot(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory) throws KnowledgeException, UnknownHostException, GeneralMongoException {
+		super(moduleIdentifier, moduleFactory);
 	}
 
 	@Override
