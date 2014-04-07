@@ -2,6 +2,7 @@ package HAL;
 
 import java.util.ArrayList;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import libraries.knowledgedb_client.KnowledgeException;
@@ -27,28 +28,39 @@ public class HardwareAbstractionLayer implements ModuleListener{
 		this.hardwareAbstractionLayerListener = hardwareAbstractionLayerListener;
 		capabilityFactory = new CapabilityFactory(this);
 		moduleFactory = new ModuleFactory(this, this);
+		// TODO hardcoded
+		equipletName = "EQ1";
 	}
 	
 	public void executeHardwareSteps(ArrayList<HardwareStep> hardwareSteps){
-		ExecutionProcess executionProcess = new ExecutionProcess(this.hardwareAbstractionLayerListener, hardwareSteps);
+		ExecutionProcess executionProcess = new ExecutionProcess(this.hardwareAbstractionLayerListener, hardwareSteps, moduleFactory);
 		executionProcess.run();
 	}
 	public void translateProductStep(ProductStep productStep){
-		TranslationProcess translationProcess = new TranslationProcess(this.hardwareAbstractionLayerListener, productStep);
+		TranslationProcess translationProcess = new TranslationProcess(this.hardwareAbstractionLayerListener, productStep, capabilityFactory);
 		translationProcess.run();
 	}
 	public ArrayList<Capability> getAllCapabilities() throws Exception{
 		return capabilityFactory.getAllSupportedCapabilities();
 	}
 	
-	public boolean insertModule(JsonObject dynamicSettings, JsonObject staticSettings){
-		return moduleFactory.insertModule(dynamicSettings, staticSettings);
+	public boolean insertModule(JsonObject staticSettings, JsonObject dynamicSettings){
+		boolean isModuleAdditionSuccesful = moduleFactory.insertModule(staticSettings, dynamicSettings);
+		JsonArray capabilities = staticSettings.get("type").getAsJsonObject().get("capabilities").getAsJsonArray();
+		boolean isCapabilityAdditionSuccesful = capabilityFactory.insertCapabilities(capabilities);
+		return isModuleAdditionSuccesful == true && isCapabilityAdditionSuccesful == true;
 	}
-	public boolean updateModule(JsonObject dynamicSettings){
-		return moduleFactory.updateModule(dynamicSettings);
+	public boolean updateModule(JsonObject staticSettings, JsonObject dynamicSettings){
+		return moduleFactory.updateModule(staticSettings, dynamicSettings);
 	}
 	public JsonObject deleteModule(ModuleIdentifier moduleIdentifier){
-		return moduleFactory.deleteModule(moduleIdentifier);
+		try {
+			return moduleFactory.deleteModule(moduleIdentifier);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 	}
 	public ArrayList<Module> getBottomModules() throws Exception{
 		return moduleFactory.getBottomModules();
