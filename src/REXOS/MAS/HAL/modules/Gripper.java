@@ -7,12 +7,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import libraries.blackboard_client.data_classes.GeneralMongoException;
+import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
 import HAL.CompositeStep;
 import HAL.HardwareStep;
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
+import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleExecutingException;
+import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 
 public class Gripper extends ModuleActor {
@@ -45,7 +48,7 @@ public class Gripper extends ModuleActor {
 	}
 
 	@Override
-	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws Exception {
+	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 		
 		JsonObject command = compositeStep.getCommand();

@@ -7,6 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import HAL.exceptions.FactoryException;
 import HAL.exceptions.HardwareAbstractionLayerProcessException;
 import HAL.exceptions.ModuleExecutingException;
 import HAL.exceptions.ModuleTranslatingException;
@@ -16,6 +17,7 @@ import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.blackboard_client.data_classes.InvalidJSONException;
+import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeException;
 
@@ -57,7 +59,7 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 		}
 	}
 	
-	protected ArrayList<HardwareStep> forwardCompositeStep(CompositeStep compositeStep, JsonObject command) throws KnowledgeException, KeyNotFoundException, ModuleTranslatingException, Exception{
+	protected ArrayList<HardwareStep> forwardCompositeStep(CompositeStep compositeStep, JsonObject command) throws ModuleTranslatingException, FactoryException, JarFileLoaderException{
 		ModuleActor moduleActor = null;
 		moduleActor = (ModuleActor) getParentModule();
 		if (moduleActor != null){
@@ -74,7 +76,7 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 	}
 	
 	abstract public void executeHardwareStep(HardwareStep hardwareStep) throws ModuleExecutingException;
-	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws KnowledgeException, KeyNotFoundException, ModuleTranslatingException, Exception;
+	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException;
 	
 	public void onHardwareStepChanged(String state, long hardwareStepSerialId) throws HardwareAbstractionLayerProcessException{
 		moduleListener.onProcessStateChanged(state, hardwareStepSerialId, this);

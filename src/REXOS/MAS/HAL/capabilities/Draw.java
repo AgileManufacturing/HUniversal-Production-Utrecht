@@ -2,6 +2,7 @@ package HAL.capabilities;
 
 import java.util.ArrayList;
 
+import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeException;
 
@@ -14,6 +15,7 @@ import HAL.HardwareStep;
 import HAL.ModuleActor;
 import HAL.ProductStep;
 import HAL.exceptions.CapabilityException;
+import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 
@@ -21,7 +23,7 @@ public class Draw extends Capability {
 
 	@Override
 	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep)
-			throws CapabilityException {
+			throws CapabilityException, FactoryException, JarFileLoaderException {
 		
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<>();
 		String serviceName = productStep.getService().getName();
@@ -49,14 +51,6 @@ public class Draw extends Capability {
 					
 					hardwareSteps.addAll(moduleActor.translateCompositeStep(move));
 					hardwareSteps.addAll(moduleActor.translateCompositeStep(draw));
-					
-				} catch (KnowledgeException e) {
-					
-					throw new CapabilityException(e.toString());
-					
-				} catch (KeyNotFoundException e) {
-					
-					throw new CapabilityException(e.toString());
 					
 				} catch (ModuleTranslatingException e) {
 					

@@ -7,6 +7,8 @@ import java.util.ArrayList;
 
 
 
+
+import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeException;
 
@@ -21,13 +23,14 @@ import HAL.Module;
 import HAL.ModuleActor;
 import HAL.ProductStep;
 import HAL.exceptions.CapabilityException;
+import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 
 public class PickAndPlace extends Capability {
 
 	@Override
-	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws Exception {
+	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws FactoryException, JarFileLoaderException, CapabilityException {
 		// TODO Auto-generated method stub
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<>();
 		String serviceName = productStep.getService().getName();
@@ -60,14 +63,6 @@ public class PickAndPlace extends Capability {
 					
 					hardwareSteps.addAll(moduleActor.translateCompositeStep(pick));
 					hardwareSteps.addAll(moduleActor.translateCompositeStep(place));
-					
-				} catch (KnowledgeException e) {
-					
-					throw new CapabilityException(e.toString());
-					
-				} catch (KeyNotFoundException e) {
-					
-					throw new CapabilityException(e.toString());
 					
 				} catch (ModuleTranslatingException e) {
 					

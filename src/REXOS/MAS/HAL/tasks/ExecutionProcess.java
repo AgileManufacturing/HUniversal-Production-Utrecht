@@ -13,22 +13,23 @@ import HAL.listeners.ModuleListener;
 public class ExecutionProcess implements Runnable, ModuleListener{
 	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
 	private ArrayList<HardwareStep> hardwareSteps;
+	private ModuleFactory moduleFactory;
 	
-	public ExecutionProcess(HardwareAbstractionLayerListener hardwareAbstractionLayerListener, ArrayList<HardwareStep> hardwareSteps){
+	public ExecutionProcess(HardwareAbstractionLayerListener hardwareAbstractionLayerListener, ArrayList<HardwareStep> hardwareSteps, ModuleFactory moduleFactory){
 		this.hardwareAbstractionLayerListener = hardwareAbstractionLayerListener;
 		this.hardwareSteps = new ArrayList<HardwareStep>();
 		this.hardwareSteps.addAll(hardwareSteps);
+		this.moduleFactory = moduleFactory;
 	}
 
 	@Override
 	public void run() {
 		try {
-			ModuleFactory moduleFactory = new ModuleFactory(this);
 			while (hardwareSteps.size() > 0){
 				moduleFactory.executeHardwareStep(hardwareSteps.get(0));
 				this.wait();
 			}
-		} catch (InterruptedException | KnowledgeException ex) {
+		} catch (InterruptedException ex) {
 			// TODO Auto-generated catch block
 			ex.printStackTrace();
 		}
