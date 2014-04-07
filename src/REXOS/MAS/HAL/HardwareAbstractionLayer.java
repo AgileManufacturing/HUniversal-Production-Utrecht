@@ -83,4 +83,8 @@ public class HardwareAbstractionLayer implements ModuleListener{
 		// TODO Auto-generated method stub
 		
 	}
+
+	public ModuleFactory getModuleFactory() {
+		return moduleFactory;
+	}
 }

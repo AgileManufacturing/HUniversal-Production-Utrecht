@@ -20,6 +20,10 @@ import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 
 public class Draw extends Capability {
+	
+	public Draw(ModuleFactory moduleFactory) {
+		super(moduleFactory, "Draw");
+	}
 
 	@Override
 	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep)
@@ -43,8 +47,6 @@ public class Draw extends Capability {
 			moveCommand.add("draw", target.getAsJsonObject().get("draw").getAsJsonArray());
 			CompositeStep draw = new CompositeStep(productStep, drawCommand);
 		
-			ModuleFactory moduleFactory = null;
-			
 			ArrayList<ModuleActor> modules = moduleFactory.getBottomModuleActors();
 			for (ModuleActor moduleActor : modules) {
 				try {

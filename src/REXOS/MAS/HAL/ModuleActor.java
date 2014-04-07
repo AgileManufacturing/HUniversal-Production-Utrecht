@@ -60,6 +60,8 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 	}
 	
 	protected ArrayList<HardwareStep> forwardCompositeStep(CompositeStep compositeStep, JsonObject command) throws ModuleTranslatingException, FactoryException, JarFileLoaderException{
+		System.out.println("Forwarding compositeStep: "+command.toString());
+		
 		ModuleActor moduleActor = null;
 		moduleActor = (ModuleActor) getParentModule();
 		if (moduleActor != null){
@@ -67,8 +69,7 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 		}
 		else { //Root module, no more parents			
 			//Check for remaining commands, then not capable
-			JsonArray array = command.getAsJsonArray();
-			if (array.size() > 0){
+			if (!command.toString().trim().equalsIgnoreCase("{}")){
 				throw new ModuleTranslatingException("The compositestep isn't completely empty.");
 			}
 			return null;
@@ -89,20 +90,16 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 	}
 	
 	protected JsonObject adjustMoveWithDimentions(JsonObject command, double height){
-		JsonElement move = command.remove(MOVE);
-		JsonArray moveParameters = move.getAsJsonArray();
-		double x = moveParameters.get(0).getAsDouble();
-		double y = moveParameters.get(1).getAsDouble();
-		double z = moveParameters.get(2).getAsDouble();
+		System.out.println("Adjusting move with dimentions: "+command.toString());
+		JsonObject move = command.remove(MOVE).getAsJsonObject();
+		double x = move.get(X).getAsDouble();
+		double y = move.get(Y).getAsDouble();
+		double z = move.get(Z).getAsDouble();
 		JsonObject mParameters = new JsonObject();
 		mParameters.addProperty(X,x);
 		mParameters.addProperty(Y,y-height);
 		mParameters.addProperty(Z,z);
-		moveParameters = new JsonArray();
-		moveParameters.add(mParameters.get(X));
-		moveParameters.add(mParameters.get(Y));
-		moveParameters.add(mParameters.get(Z));
-		command.add(MOVE, moveParameters);		
+		command.add(MOVE, mParameters);		
 		return command;		
 	}
 }

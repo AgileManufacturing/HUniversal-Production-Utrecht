@@ -96,6 +96,11 @@ public class CapabilityFactory extends Factory{
 			"(name, halSoftware) \n" + 
 			"VALUES(?, ?);";
 	
+	private static final String addServiceType =
+			"INSERT IGNORE INTO ServiceType \n" + 
+			"(name) \n" + 
+			"VALUES(?);";
+	
 	private static final String addRequiredMutationForCapabilityType =
 			"INSERT INTO CapabilityTypeRequiredMutation \n" + 
 			"(treeNumber, capabilityType, mutation) \n" + 
@@ -111,6 +116,7 @@ public class CapabilityFactory extends Factory{
 	public CapabilityFactory(HardwareAbstractionLayer hal) throws KnowledgeException {
 		super(new KnowledgeDBClient());
 		this.hal = hal;
+		this.dynamicClassFactory = new DynamicClassFactory<>(this);
 	}
 	
 	public ArrayList<Capability> getAllSupportedCapabilities() throws Exception{
@@ -148,9 +154,9 @@ public class CapabilityFactory extends Factory{
 		return capabilities;
 	}
 	private Capability getCapabilityByName(String capabilityName) throws Exception {
-		DynamicClassDescription description = new DynamicClassDescription(1, "a");
+		DynamicClassDescription description = JavaSoftware.getDynamicClassDescriptionForCapabilityName(knowledgeDBClient, capabilityName);
 		Class<Capability> capabilityClass = dynamicClassFactory.getClassFromDescription(description);
-		return capabilityClass.getConstructor().newInstance();
+		return capabilityClass.getConstructor(ModuleFactory.class).newInstance(hal.getModuleFactory());
 	}
 
 	
@@ -168,6 +174,11 @@ public class CapabilityFactory extends Factory{
 					
 					JsonArray requiredMutationsTrees = capabilityEntry.get("requiredMutationsTrees").getAsJsonArray();
 					deserializeRequiredMutations(name, requiredMutationsTrees);
+					
+					for (JsonElement serviceElement : capabilityEntry.get("services").getAsJsonArray()) {
+						String serviceName = serviceElement.getAsString();
+						knowledgeDBClient.executeUpdateQuery(addServiceType, serviceName);
+					}
 				}
 			} catch(Exception ex) {
 				System.err.println("HAL::CapabilityFactory::insertCapabilities(): Error occured while inserting capability " + ex);

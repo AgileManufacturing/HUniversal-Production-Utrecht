@@ -41,6 +41,7 @@ public class DeltaRobot extends ModuleActor {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 		
 		JsonObject command = compositeStep.getCommand();
+		JsonObject move = command.remove(MOVE).getAsJsonObject();
 		
 		compositeStep = new CompositeStep(compositeStep.getProductStep(),command);		
 		ArrayList<HardwareStep> hStep = forwardCompositeStep(compositeStep,command);
@@ -50,6 +51,7 @@ public class DeltaRobot extends ModuleActor {
 		//Set hardwareSteps
 		JsonObject hardwareCommand = new JsonObject();
 		hardwareCommand.addProperty(MODULE_COMMAND, MOVE_DELTA_ROBOT);
+		hardwareCommand.addProperty(COMMAND, "move");
 		hardwareSteps.add(new HardwareStep(compositeStep,hardwareCommand,moduleIdentifier));
 		
 		return hardwareSteps;

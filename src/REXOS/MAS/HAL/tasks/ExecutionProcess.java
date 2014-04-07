@@ -23,7 +23,7 @@ public class ExecutionProcess implements Runnable, ModuleListener{
 	}
 
 	@Override
-	public void run() {
+	public synchronized void run() {
 		try {
 			while (hardwareSteps.size() > 0){
 				moduleFactory.executeHardwareStep(hardwareSteps.get(0));

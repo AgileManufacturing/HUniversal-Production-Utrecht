@@ -72,8 +72,6 @@ public class Gripper extends ModuleActor {
 				hardwareCommand.addProperty(MODULE_COMMAND, DEACTIVATE_GRIPPER);
 				hardwareCommand.addProperty(COMMAND, DEACTIVATE);
 			}
-			hardwareCommand.addProperty(DESTINATION, GRIPPER);
-			hardwareCommand.addProperty(LOOK_UP, NULL);
 			
 			hardwareSteps.add(new HardwareStep(compositeStep,hardwareCommand,moduleIdentifier));
 		}

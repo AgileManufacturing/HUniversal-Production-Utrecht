@@ -64,23 +64,23 @@ public class ModuleFactory extends Factory {
 			"	attachedToRight = attachedToLeft + 1;"; 
 	private static final String getModuleIdentifiersOfPhysicalModuleTreesForCapability = 
 			"SELECT * \n" + 
-			"FROM CapabilityTypeDependencySet AS currentDependencySet \n" + 
+			"FROM CapabilityTypeRequiredMutation AS currentRequiredMutation \n" + 
 			"JOIN Module AS currentModule \n" + 
-			"WHERE currentDependencySet.capabilityType = ? AND \n" + 
-			"  currentDependencySet.treeNumber = ? AND \n" + 
-			"  currentDependencySet.Equiplet = ? \n" + 
+			"WHERE currentRequiredMutation.capabilityType = ? AND \n" + 
+			"  currentRequiredMutation.treeNumber = ? AND \n" + 
 			"  NOT EXISTS( \n" + 
 			"	SELECT * \n" + 
-			"	FROM CapabilityTypeDependencySet \n" + 
-			"	WHERE currentDependencySet.capabilityType = capabilityType AND \n" + 
-			"	  currentDependencySet.treeNumber = treeNumber AND \n" + 
-			"	  commandType NOT IN( \n" + 
-			"		SELECT commandType \n" + 
-			"		FROM ModuleCommandType \n" + 
-			"		JOIN Module ON ModuleCommandType.manufacturer = Module.manufacturer AND \n" +  
-			"		  ModuleCommandType.typeNumber = Module.typeNumber \n" + 
+			"	FROM CapabilityTypeRequiredMutation \n" + 
+			"	WHERE currentRequiredMutation.capabilityType = capabilityType AND \n" + 
+			"	  currentRequiredMutation.treeNumber = treeNumber AND \n" + 
+			"	  mutation NOT IN( \n" + 
+			"		SELECT mutation \n" + 
+			"		FROM SupportedMutation \n" + 
+			"		JOIN Module ON SupportedMutation.manufacturer = Module.manufacturer AND \n" +  
+			"		  SupportedMutation.typeNumber = Module.typeNumber \n" + 
 			"		WHERE currentModule.attachedToLeft >= attachedToLeft AND \n" + 
-			"		  currentModule.attachedToRight <= attachedToRight \n" + 
+			"		  currentModule.attachedToRight <= attachedToRight \n AND \n" + 
+			"		  currentModule.equiplet = ?" + 
 			"	  ) \n" + 
 			"  ) AND \n" + 
 			"  currentModule.attachedToRight = currentModule.attachedToLeft + 1; \n";
@@ -201,17 +201,17 @@ public class ModuleFactory extends Factory {
 		this.hal = hal;
 		this.loadedModules = new HashMap<ModuleIdentifier, Module>();
 	}
-	public ArrayList<Module> getBottomModulesForFunctionalModuleTree(Capability capability, int treeNumber) throws Exception{
-		ArrayList<Module> modules = new ArrayList<Module>();
+	public ArrayList<ModuleActor> getBottomModulesForFunctionalModuleTree(Capability capability, int treeNumber) throws FactoryException, JarFileLoaderException{
+		ArrayList<ModuleActor> modules = new ArrayList<ModuleActor>();
 		
 		try {
-			Row[] rows = knowledgeDBClient.executeSelectQuery(getModuleIdentifiersOfPhysicalModuleTreesForCapability, capability.getName(), treeNumber, hal);
+			Row[] rows = knowledgeDBClient.executeSelectQuery(getModuleIdentifiersOfPhysicalModuleTreesForCapability, capability.getName(), treeNumber, hal.getEquipletName());
 			for (Row row : rows) {
 				String manufacturer = (String) row.get("manufacturer");
 				String typeNumber = (String) row.get("typeNumber");
 				String serialNumber = (String) row.get("serialNumber");
 				ModuleIdentifier identifier = new ModuleIdentifier(manufacturer, typeNumber, serialNumber);
-				modules.add(this.getModuleByIdentifier(identifier));
+				modules.add((ModuleActor) this.getModuleByIdentifier(identifier));
 			}
 		} catch (KnowledgeException | KeyNotFoundException ex) {
 			System.err.println("HAL::ModuleFactory::getBottomModules(): Error occured which is considered to be impossible " + ex);

@@ -44,6 +44,7 @@ public class TranslationProcess implements Runnable{
 				for (int i=0;i<numCapabilities;i++){
 					try {
 						hardwareSteps.addAll(capabilities.get(i).translateProductStep(productStep));
+						
 					} catch (CapabilityException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -54,7 +55,11 @@ public class TranslationProcess implements Runnable{
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				}			
+				}
+				
+				for (HardwareStep hardwareStep : hardwareSteps) {
+					System.out.println(hardwareStep.getCommand().toString()+"\n");
+				} 
 				
 				hardwareAbstractionLayerListener.onTranslationFinished(productStep, hardwareSteps);			
 			}

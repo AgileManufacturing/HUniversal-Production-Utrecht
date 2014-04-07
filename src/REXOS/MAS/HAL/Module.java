@@ -58,11 +58,12 @@ public abstract class Module {
 			
 			Row[] resultSet = knowledgeDBClient.executeSelectQuery(sql);
 			
-			if (resultSet.length == 1){
+			if (resultSet.length >= 1){
 				ModuleIdentifier moduleIdentifier = new ModuleIdentifier(resultSet[0].get("manufacturer").toString(),
 																		 resultSet[0].get("typeNumber").toString(),
 																		 resultSet[0].get("serialNumber").toString()
-																		);	
+																		);
+				System.out.println(resultSet[0].get("manufacturer").toString()+resultSet[0].get("typeNumber").toString()+resultSet[0].get("serialNumber").toString());
 				return this.moduleFactory.getModuleByIdentifier(moduleIdentifier);
 			}
 			else return null;
