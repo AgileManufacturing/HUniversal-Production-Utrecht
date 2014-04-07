@@ -12,12 +12,12 @@ public class Factory implements JarFileLoader {
 	// SQL queries
 	private static final String getJarFileForDescription = 
 			"SELECT jarFile \n" + 
-			"FROM HalSoftware +\n" + 
-			"WHERE id = ?);";
+			"FROM JavaSoftware \n" + 
+			"WHERE id = ?;";
 	private static final String getBuildNumberForDescription = 
 			"SELECT buildNumber \n" + 
-			"FROM HalSoftware +\n" + 
-			"WHERE id = ?);";
+			"FROM JavaSoftware \n" + 
+			"WHERE id = ?;";
 	
 	protected KnowledgeDBClient knowledgeDBClient;
 	
@@ -27,6 +27,7 @@ public class Factory implements JarFileLoader {
 			Row[] rows = knowledgeDBClient.executeSelectQuery(getJarFileForDescription, description.getId());
 			for (Row row : rows) {
 				byte[] jarFile = (byte[]) row.get("jarFile");
+				System.out.println("file size: " + jarFile.length);
 				return jarFile;
 			}
 			throw new JarFileLoaderException("HAL::Factory::loadJarFile(): Unable to retrieve the software");
@@ -40,7 +41,7 @@ public class Factory implements JarFileLoader {
 		try {
 			Row[] rows = knowledgeDBClient.executeSelectQuery(getBuildNumberForDescription, description.getId());
 			for (Row row : rows) {
-				long buildNumber = (long) row.get("buildNumber");
+				long buildNumber = (Integer) row.get("buildNumber");
 				return buildNumber;
 			}
 			throw new JarFileLoaderException("HAL::Factory::getBuildNumber(): Unable to retrieve the software");
