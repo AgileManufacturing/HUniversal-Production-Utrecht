@@ -42,110 +42,165 @@
 #include <rexos_datatypes/MotorRotation.h>
 #include <rexos_stewart_gough/InverseKinematics.h>
 #include <rexos_stewart_gough/InverseKinematicsException.h>
-#include <rexos_utilities/Utilities.h>
+
+
 
 namespace rexos_stewart_gough {
-	/**
-	 * Constructor for inverse kinematics.
-	 *
-	 * @param base Radius of the base in millimeters.
-	 * @param hip Length of the hip in millimeters.
-	 * @param effector Radius of the effector in millimeters.
-	 * @param ankle Length of the ankle in millimeters.
-	 * @param maxAngleHipAnkle Maximal angle between the hip and ankle when moving the hip sideways, in radians.
-	 **/
-	InverseKinematics::InverseKinematics(const double base, const double hip,
-			const double effector, const double ankle,
-			const double maxAngleHipAnkle) :
-			InverseKinematicsModel(base, hip, effector, ankle, maxAngleHipAnkle){
+
+double InverseKinematics::getAngleForMotor(Point3D moveTo, double motorPositionOnCircle){
+
+	double x, y;
+
+	if(motorPositionOnCircle != 0){
+
+		vector< vector<double> > matrixIdentity = getIdentityMatrix();
+		vector< vector<double> >  matrixRotation = getRotationMatrix(motorPositionOnCircle);
+		vector< vector<double> >  matrixTransalation = getTransalationMatrix(-motorAxisToCenterDistance, 0);
+		vector< vector<double> >  matrixRotationAndIdentity = multiplyMatrix(matrixIdentity, 3, 3, matrixRotation, 3, 3);
+		vector< vector<double> >  calculationMatrix = multiplyMatrix(matrixTransalation, 3, 3, matrixRotationAndIdentity, 3, 3);
+		vector< vector<double> >  pointMatrix = getPointMatrix(moveTo);
+		vector< vector<double> >  resultPoint = multiplyMatrix(calculationMatrix, 3, 3, pointMatrix, 3, 1);
+
+		x = resultPoint[0][0];
+		y = resultPoint[1][0];
+
+	} else {
+		x = moveTo.x - motorAxisToCenterDistance;
+		y = moveTo.y;
 	}
 
-	/**
-	 * Constructor for inverse kinematics.
-	 * 
-	 * @param deltaRobotMeasures The measures of the deltarobot configuration.
-	 **/
-	InverseKinematics::InverseKinematics(rexos_datatypes::DeltaRobotMeasures & deltaRobotMeasures) :
-			InverseKinematicsModel(deltaRobotMeasures.base, deltaRobotMeasures.hip, deltaRobotMeasures.effector, deltaRobotMeasures.ankle, deltaRobotMeasures.maxAngleHipAnkle){
-	}	
 
-	InverseKinematics::~InverseKinematics(void){
+	InverseKinematics::Point3D engine(0, 0, 0);
+	InverseKinematics::Point3D moveToTransalated(x, y, moveTo.z);
+
+	double ab = calculateAB(engine,  moveToTransalated);
+
+	double xd = calculateCircleIntersectionX(std::abs((double) (engine.z - moveToTransalated.z)), upperArmLength, ab);
+
+
+
+	double d = calculateCircleDistanceD(engine, moveToTransalated);
+	double d2 = d - xd;
+
+
+	double calculatedAngle = calculateAngle(d2);
+
+	return calculatedAngle;
+}
+
+
+
+
+vector< vector<double> > InverseKinematics::getIdentityMatrix(){
+	vector< vector<double> > matrix(3, vector<double>(3));
+
+	matrix[0][0] = 1;
+	matrix[0][1] = 0;
+	matrix[0][2] = 0;
+
+	matrix[1][0] = 0;
+	matrix[1][1] = 1;
+	matrix[1][2] = 0;
+
+	matrix[2][0] = 0;
+	matrix[2][1] = 0;
+	matrix[2][2] = 1;
+
+	return matrix;
+}
+
+vector< vector<double> > InverseKinematics::getPointMatrix(InverseKinematics::Point3D point){
+	vector< vector<double> > matrix(3, vector<double>(1));
+	matrix[0][0] = point.x;
+	matrix[1][0] = point.y;
+	matrix[2][0] = 1;
+	return matrix;
+}
+
+vector< vector<double> > InverseKinematics::getRotationMatrix(double degrees){
+	double radians = rexos_utilities::degreesToRadians(degrees);
+
+	vector< vector<double> > matrix(3, vector<double>(3));
+
+	matrix[0][0] = cos(radians);
+	matrix[0][1] = -sin(radians);
+	matrix[0][2] = 0;
+
+	matrix[1][0] = sin(radians);
+	matrix[1][1] = cos(radians);
+	matrix[1][2] = 0;
+
+	matrix[2][0] = 0;
+	matrix[2][1] = 0;
+	matrix[2][2] = 1;
+
+	return matrix;
+}
+
+vector< vector<double> > InverseKinematics::getTransalationMatrix(double x, double y){
+	vector< vector<double> > matrix(3, vector<double>(3));
+
+	matrix[0][0] = 1;
+	matrix[0][1] = 0;
+	matrix[0][2] = x;
+
+	matrix[1][0] = 0;
+	matrix[1][1] = 1;
+	matrix[1][2] = y;
+
+	matrix[2][0] = 0;
+	matrix[2][1] = 0;
+	matrix[2][2] = 1;
+
+	return matrix;
+}
+
+void InverseKinematics::deleteMatrixArray(double** matrix, int rows, int cols){
+	int i;
+	for(i = 0; i < rows; i++){
+		delete[] matrix[i];
+	}
+	delete[] matrix;
+}
+
+
+
+vector< vector<double> > InverseKinematics::multiplyMatrix(vector< vector<double> > matrixA, const int rowsA, const int colsA, vector< vector<double> > matrixB, const int rowsB, const int colsB){
+
+
+	if (colsA != rowsB) {
+		throw std::length_error("MatrixA:Columns did not match MatrixB:Rows!");
 	}
 
-	/**
-	 * Translates a point to an angle for a motor.
-	 * 
-	 * @param destinationPoint Point where the midpoint of the effector is wanted.
-	 * @param motorLocation Angle of the motor on the z axis where 0 radians is directly in front of the deltarobot.
-	 * 
-	 * @return The angle, in radians, the motor should move to.
-	 **/
-	double InverseKinematics::motorAngle(const rexos_datatypes::Point3D<double>& destinationPoint, double motorLocation) const{
-		// Rotate the destination point so calculations can be made as if the motor is always in front
-		// (rotating the point places it in the same position relative to the front motor
-		// as it would be relative to the motor indicated by motor_angle).
-		rexos_datatypes::Point3D<double> destinationPointRotatedAroundZAxis =
-				destinationPoint.rotateAroundZAxis(-motorLocation);
+	vector< vector<double> > matrixC(rowsA, vector<double>(colsB));
 
-		// Places the point towards the "ankle to effector connection".
-		destinationPointRotatedAroundZAxis.y -= effector;
-		
-		// Places the point relative to a motor in (x,y,z) = (0, 0, 0).
-		destinationPointRotatedAroundZAxis.y += base;
-
-		double distanceMotorToEffectorOnYAndZAxis = sqrt(pow(destinationPointRotatedAroundZAxis.y, 2)
-				+ pow(destinationPointRotatedAroundZAxis.z, 2));
-
-		// Checks if the "ankle to effector connection" is directly to the left of, to the right of, or in the motor.
-		if(distanceMotorToEffectorOnYAndZAxis == 0){
-			throw InverseKinematicsException("point out of range", destinationPoint);
+	for (int i = 0; i < rowsA; i++) { // aRow
+		for (int j = 0; j < colsB; j++) { // bColumn
+			for (int k = 0; k < colsA; k++) { // aColumn
+				matrixC[i][j] += matrixA[i][k] * matrixB[k][j];
+			}
 		}
-
-		// To calculate alpha, the angle between actuator arm and goal vector.
-		double alphaAcosInput = (
-				pow(destinationPointRotatedAroundZAxis.x, 2)
-				- pow(ankle, 2) + pow(hip, 2)
-				+ pow(distanceMotorToEffectorOnYAndZAxis, 2)
-				)/(
-				2 
-				* hip 
-				* distanceMotorToEffectorOnYAndZAxis);
-
-		if(alphaAcosInput < -1 || alphaAcosInput > 1){
-			throw InverseKinematicsException("point out of range", destinationPoint);
-		}
-
-		// The required angle between actuator arm and goal vector.
-		double alpha = acos(alphaAcosInput);
-		
-		// The required angle between the base and goal vector.
-		double beta = atan2(destinationPointRotatedAroundZAxis.z, destinationPointRotatedAroundZAxis.y);
-		
-		// The required angle between actuator arm and base (0 degrees).
-		double rho = beta - alpha;
-
-		double hipAnkleAngle = asin(abs(destinationPointRotatedAroundZAxis.x) / ankle);
-		if (hipAnkleAngle > maxAngleHipAnkle) {
-			throw InverseKinematicsException("angle between hip and ankle is out of range", destinationPoint);
-		}
-
-		return rho;
 	}
 
-	/**
-	 * Translates a point to the motor rotations.
-	 *
-	 * @param destinationPoint The destination point.
-	 * @param rotations Array of MotorRotation objects, will be adjusted by the function to the correct rotations per motor.
-	 **/
-	void InverseKinematics::destinationPointToMotorRotations(const rexos_datatypes::Point3D<double>& destinationPoint, rexos_datatypes::MotorRotation* (&rotations)[3]) const{
-		// Adding 180 degrees switches 0 degrees for the motor from the midpoint of the engines to directly opposite.
-		// When determining motorAngle the degrees determine the position of the engines:
-		// 	  0 degrees: the hip from this motor moves on the yz plane
-		//  120 degrees: this motor is located 120 degrees counter clockwise of the 0 degrees motor when looking at the side the effector is not located
-		//  240 degrees: this motor is located 240 degrees counter clockwise of the 0 degrees motor when looking at the side the effector is not located
-		rotations[0]->angle = rexos_utilities::degreesToRadians(180) + motorAngle(destinationPoint, rexos_utilities::degreesToRadians(1 * 120));
-		rotations[1]->angle = rexos_utilities::degreesToRadians(180) + motorAngle(destinationPoint, rexos_utilities::degreesToRadians(0 * 120));
-		rotations[2]->angle = rexos_utilities::degreesToRadians(180) + motorAngle(destinationPoint, rexos_utilities::degreesToRadians(2 * 120));
-	}
+	return matrixC;
+}
+
+double InverseKinematics::calculateAngle(double d2){
+	return rexos_utilities::radiansToDegrees((asin(d2/upperArmLength)));
+}
+
+double InverseKinematics::calculateCircleIntersectionX(double CenterDistance, double radiusOne, double radiusTwo){
+	return ((pow(CenterDistance, 2) - pow(radiusOne, 2) + pow(radiusTwo, 2)) / (2 * CenterDistance));
+}
+
+//Euclidean distance
+double InverseKinematics::calculateCircleDistanceD(InverseKinematics::Point3D motorOrgin, InverseKinematics::Point3D effectorJointA){
+	return sqrt(pow(motorOrgin.x - effectorJointA.x, 2) + pow(motorOrgin.y - effectorJointA.y, 2) +pow(motorOrgin.z - effectorJointA.z, 2));
+}
+
+double InverseKinematics::calculateAB(Point3D enginePosition, Point3D jointPosition){
+	double ac = enginePosition.y - jointPosition.y; //TODO was x
+	return sqrt(pow(lowerArmLength, 2) + pow(ac, 2));
+}
+	
 }

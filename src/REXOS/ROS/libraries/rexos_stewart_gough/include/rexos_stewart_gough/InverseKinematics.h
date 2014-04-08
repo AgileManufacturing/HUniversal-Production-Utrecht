@@ -40,31 +40,67 @@
 #include <rexos_datatypes/MotorRotation.h>
 #include <rexos_datatypes/DeltaRobotMeasures.h>
 #include <rexos_stewart_gough/InverseKinematicsModel.h>
+#include <rexos_utilities/Utilities.h>
+#include <iostream>
+#include <cmath>
+#include <stdexcept>
+#include <vector>
+using namespace std;
+
+// Converts degrees to radians.
+//#define degreesToRadians(angleDegrees) (angleDegrees * M_PI / 180.0)
+
+// Converts radians to degrees.
+//#define radiansToDegrees(angleRadians) (angleRadians * 180.0 / M_PI)
 
 namespace rexos_stewart_gough{
-	/**
-	 * Inverse kinematics implementation. Based on work from Viacheslav Slavinsky\n
-	 * Conventions sitting in front of delta robot:\n
-	 * x-axis goes from left to right\n
-	 * y-axis goes from front to back\n
-	 * z-axis goes from bottom to top\n
-	 * point (0,0,0) lies in the middle of all the motors at the motor's height
-	 **/
-	class InverseKinematics : public InverseKinematicsModel{
-	private:
-		double motorAngle(const rexos_datatypes::Point3D<double>& destinationPoint,
-				double motorLocation) const;
 
+class InverseKinematics {
+	
+	
 	public:
-		InverseKinematics(const double base, const double hip,
-			const double effector, const double ankle,
-			const double maxAngleHipAnkle);
+        struct Point3D {
+        	double x, y, z;
+        	Point3D(double x = 0, double y = 0, double z = 0) : x(x), y(y), z(z) {
+        	}
+        };
 
-		InverseKinematics(rexos_datatypes::DeltaRobotMeasures& deltaRobotMeasures);
+		InverseKinematics(double upperArmLength = 10, double lowerArmLength = 30, double motorAxisToCenterDistance = 10.13):
+			upperArmLength(upperArmLength),
+			lowerArmLength(lowerArmLength),
+			motorAxisToCenterDistance(motorAxisToCenterDistance){
+				
+		};
+		/*
+		InverseKinematics(rexos_datatypes::StewartGoughMeasures& measures){
+			upperArmLength = measures->hip;
+			upperArmLength = measures->ankle;
+			motorAxisToCenterDistance = 10.13;
+		};*/
+		double getAngleForMotor(Point3D moveTo, double motorPositionOnCircle);
 
-		virtual ~InverseKinematics(void);
-		
-		void destinationPointToMotorRotations(const rexos_datatypes::Point3D<double>& destinationPoint,
-				rexos_datatypes::MotorRotation* (&rotations)[3]) const;
-	};
+		static constexpr double MOTOR_A_POS_ON_CIRCLE = 0;
+		static constexpr double MOTOR_B_POS_ON_CIRCLE = 120;
+		static constexpr double MOTOR_C_POS_ON_CIRCLE = 240;
+
+
+	private:
+        double upperArmLength;
+        double lowerArmLength;
+        double motorAxisToCenterDistance;
+
+        vector< vector<double> > getIdentityMatrix();
+        vector< vector<double> > getPointMatrix(Point3D point);
+        vector< vector<double> > getRotationMatrix(double degrees);
+        vector< vector<double> > getTransalationMatrix(double x, double y);
+        vector< vector<double> > multiplyMatrix(vector< vector<double> > matrixA, int rowsA, int colsA, vector< vector<double> > matrixB, int rowsB, int colsB);
+
+        double calculateAngle(double d2);
+        double calculateCircleIntersectionX(double CenterDistance, double radiusOne, double radiusTwo);
+        double calculateCircleDistanceD(Point3D motorOrgin, Point3D effectorJointA);
+        double calculateAB(Point3D enginePosition, Point3D jointPosition);
+
+        void deleteMatrixArray(double**, int rows, int cols);
+
+};
 }

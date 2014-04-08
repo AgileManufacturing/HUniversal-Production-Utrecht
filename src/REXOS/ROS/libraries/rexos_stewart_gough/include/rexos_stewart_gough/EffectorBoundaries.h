@@ -37,7 +37,6 @@
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/StepperMotorProperties.h>
 #include <rexos_datatypes/DeltaRobotMeasures.h>
-#include <rexos_stewart_gough/Measures.h>
 #include <rexos_stewart_gough/InverseKinematicsModel.h>
 #include <vector>
 

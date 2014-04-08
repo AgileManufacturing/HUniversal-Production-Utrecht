@@ -31,7 +31,6 @@
  **/
 
 #include <iostream>
-#include <rexos_stewart_gough/Measures.h>
 #include <rexos_stewart_gough/EffectorBoundaries.h>
 #include <rexos_stewart_gough/InverseKinematicsException.h>
 #include <rexos_stewart_gough/EffectorBoundariesException.h>

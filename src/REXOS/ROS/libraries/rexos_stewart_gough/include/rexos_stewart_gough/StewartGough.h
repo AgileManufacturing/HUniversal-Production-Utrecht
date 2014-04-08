@@ -31,18 +31,18 @@
 
 #include <modbus/modbus.h>
 #include <rexos_datatypes/Point3D.h>
-#include <rexos_datatypes/DeltaRobotMeasures.h>
+#include <rexos_datatypes/StewartGoughMeasures.h>
 #include <rexos_motor/MotorInterface.h>
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/MotorManager.h>
 #include <rexos_motor/StepperMotorProperties.h>
-#include <rexos_datatypes/DeltaRobotMeasures.h>
 #include <rexos_stewart_gough/EffectorBoundaries.h>
+#include <rexos_stewart_gough/InverseKinematics.h>
 
 #include <vector>
 
 namespace rexos_stewart_gough{
-	class InverseKinematicsModel;
+	class StewartGough;
 	/**
 	 * A class that symbolizes an entire deltarobot.
 	 **/
@@ -81,9 +81,9 @@ namespace rexos_stewart_gough{
 		 * @var InverseKinematicsModel* kinematics
 		 * A pointer to the kinematics model used by the DeltaRobot.
 		 **/
-		InverseKinematicsModel* kinematics;
+		InverseKinematics* kinematics;
 
-		rexos_datatypes::DeltaRobotMeasures* stewartGoughMeasures;
+		rexos_datatypes::StewartGoughMeasures* stewartGoughMeasures;
 		rexos_motor::StepperMotorProperties* stepperMotorProperties;
 	
 		int calibrationBigStepFactor;

@@ -92,7 +92,7 @@ namespace rexos_stewart_gough{
 
 		motorManager = new rexos_motor::MotorManager(modbus, motors);
 
-        kinematics = new InverseKinematics(*stewartGoughMeasures);
+        kinematics = new InverseKinematics;
     }
 
     /**
@@ -125,7 +125,7 @@ namespace rexos_stewart_gough{
 				ROS_INFO_STREAM("found stepperMotorProperties");
 			} else if(it->name() == "stewartGoughMeasures"){
 				JSONNode node = it->as_node();
-				stewartGoughMeasures = new rexos_datatypes::DeltaRobotMeasures(node);
+				stewartGoughMeasures = new rexos_datatypes::StewartGoughMeasures(node);
 				ROS_INFO_STREAM("found stewartGoughMeasures");
 			} else {
 				// some other property, ignore it
@@ -136,12 +136,12 @@ namespace rexos_stewart_gough{
      * Generates the effectorBoundaries for the given voxelSize.
      *
      * @param voxelSize The size in millimeters of a side of a voxel in the boundaries.
-     **/
+     *
     void StewartGough::generateBoundaries(double voxelSize) {
 		boundaries = EffectorBoundaries::generateEffectorBoundaries((*kinematics), stewartGoughMeasures, motors, voxelSize);
 		boundariesGenerated = true;
     }
-
+*/
     /**
      * Checks the validity of an angle for a motor.
      *
