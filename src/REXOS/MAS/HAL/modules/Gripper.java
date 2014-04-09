@@ -26,7 +26,6 @@ public class Gripper extends ModuleActor {
 	private static final String DEACTIVATE_GRIPPER = "deactivate_gripper";
 	private static final String ACTIVATE = "activate";
 	private static final String DEACTIVATE = "deactivate";
-	private static final String GRIPPER = "gripper";
 	private static final String PICK = "pick";
 	private static final String PLACE = "place";
 

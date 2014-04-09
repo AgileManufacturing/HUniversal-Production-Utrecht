@@ -27,7 +27,7 @@ public class DeltaRobot extends ModuleActor {
 	@Override
 	public void executeHardwareStep(HardwareStep hardwareStep) throws ModuleExecutingException {
 		JsonObject command = hardwareStep.getCommand();
-		String moduleCommand = command.get(MODULE_COMMAND).getAsString();
+		String moduleCommand = command.remove(MODULE_COMMAND).getAsString();
 		if (moduleCommand.equals(MOVE_DELTA_ROBOT)){
 			executeMongoCommand(command.toString());
 		}
@@ -51,7 +51,33 @@ public class DeltaRobot extends ModuleActor {
 		//Set hardwareSteps
 		JsonObject hardwareCommand = new JsonObject();
 		hardwareCommand.addProperty(MODULE_COMMAND, MOVE_DELTA_ROBOT);
-		hardwareCommand.addProperty(COMMAND, "move");
+		JsonObject m = new JsonObject();
+		m.addProperty(X,move.remove(X).getAsNumber());
+		m.addProperty(Y,move.remove(Y).getAsNumber());
+		m.addProperty(Z,move.remove(Z).getAsNumber());
+		m.addProperty("maxAcceleration",50);
+		hardwareCommand.addProperty("command", "move");
+		hardwareCommand.addProperty("destination","deltarobot" );
+		hardwareCommand.addProperty("look_up","FIND_ID" );
+		JsonObject parameters = new JsonObject();
+		parameters.addProperty("ID", "Paper");
+		hardwareCommand.add("look_up_parameters",parameters);
+		hardwareCommand.add("payload",m);
+		
+		JsonObject jsonCommand = new JsonObject();
+		jsonCommand.add("instructionData",hardwareCommand);
+		jsonCommand.addProperty("moduleId",1);
+		jsonCommand.addProperty("status","WAITING");
+		jsonCommand.add("statusData",new JsonObject());
+		
+		jsonCommand.addProperty("nextStep","NULL");
+		jsonCommand.addProperty("serviceStepID","NULL");
+		
+		JsonObject timeData = new JsonObject();
+		timeData.addProperty("duration", 59);
+		jsonCommand.add("timeData",timeData);
+		
+		
 		hardwareSteps.add(new HardwareStep(compositeStep,hardwareCommand,moduleIdentifier));
 		
 		return hardwareSteps;
