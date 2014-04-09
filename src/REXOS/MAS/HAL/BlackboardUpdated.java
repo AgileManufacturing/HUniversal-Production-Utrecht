@@ -27,6 +27,10 @@ import configuration.Configuration;
 import configuration.ConfigurationFiles;
 
 public class BlackboardUpdated extends Agent implements BlackboardSubscriber {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ArrayList<BlackboardListener> updateSubscribers;
 	private BlackboardClient serviceStepBBClient;
 	private BlackboardClient productStepBBClient;
@@ -48,7 +52,7 @@ public class BlackboardUpdated extends Agent implements BlackboardSubscriber {
 		try {
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient.setDatabase(dbData.getName());
-			serviceStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ServiceStepsBlackBoardName", equipletAgentAID.getLocalName()));
+			serviceStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ServiceStepsBlackBoardName", serviceAgentAID.getLocalName()));
 		
 			equipletStepBBClient = new BlackboardClient(dbData.getIp());
 			equipletStepBBClient.setDatabase(dbData.getName());
@@ -61,7 +65,7 @@ public class BlackboardUpdated extends Agent implements BlackboardSubscriber {
 			
 			stateBlackboardBBClient = new BlackboardClient(dbData.getIp());
 			stateBlackboardBBClient.setDatabase("StateBlackboardDbName");
-			stateBlackboardBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "StateBlackboardequipletStateName", "StateBlackboard"));
+			stateBlackboardBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletStateCollectionName", "stateBlackBoardName"));
 			
 		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException e) {
 			// TODO Auto-generated catch block
@@ -99,26 +103,35 @@ public class BlackboardUpdated extends Agent implements BlackboardSubscriber {
 				break;
 				
 			case "ProductStepsBlackboard":
-				status = entry.getUpdateDocument().get("status").toString();
-				for(BlackboardListener changedListener: updateSubscribers){
-					changedListener.onProcessStateChanged(status);
+				dbObject = productStepBBClient.findDocumentById(entry.getTargetObjectId());
+				if(dbObject != null) {
+					status = dbObject.get("status").toString();
+					for(BlackboardListener changedListener: updateSubscribers){
+						changedListener.onProcessStateChanged(status);
+					}
 				}
+				
 				break;
 				
 			case "ServiceStepsBlackboard":
-				status = entry.getUpdateDocument().get("status").toString();
-				for(BlackboardListener changedListener: updateSubscribers){
-					changedListener.onProcessStateChanged(status);
+				dbObject = serviceStepBBClient.findDocumentById(entry.getTargetObjectId());
+				if(dbObject != null) {
+					status = dbObject.get("status").toString();
+					for(BlackboardListener changedListener: updateSubscribers){
+						changedListener.onProcessStateChanged(status);
+					}
 				}
 				break;
 				
 			case "EquipletStepsBlackboard":
-				status = entry.getUpdateDocument().get("status").toString();
-				for(BlackboardListener changedListener: updateSubscribers){
-					changedListener.onProcessStateChanged(status);
+				dbObject = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
+				if(dbObject != null) {
+					status = dbObject.get("status").toString();
+					for(BlackboardListener changedListener: updateSubscribers){
+						changedListener.onProcessStateChanged(status);
+					}
 				}
-				break;
-				
+				break;		
 	
 			default:
 				break;
