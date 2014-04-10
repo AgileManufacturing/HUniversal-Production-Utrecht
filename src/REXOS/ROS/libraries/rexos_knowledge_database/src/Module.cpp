@@ -27,7 +27,8 @@ namespace rexos_knowledge_database{
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
-			throw KnowledgeDatabaseException("This module does not exist");
+			std::string message = "This module (" + moduleIdentifier + ") does not exist";
+			throw KnowledgeDatabaseException(message.c_str());
 		}
 		ROS_INFO_STREAM("Constructed module with manufacturer=" << moduleIdentifier.getManufacturer() << 
 				" typeNumber=" << moduleIdentifier.getTypeNumber() << " serialNumber=" << moduleIdentifier.getSerialNumber());

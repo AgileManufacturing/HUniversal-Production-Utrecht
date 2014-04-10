@@ -57,9 +57,9 @@ create table Module(
   manufacturer char(200) NOT NULL,
   typeNumber char(200) NOT NULL,
   serialNumber char(200) NOT NULL,
-  equiplet char(200) NULL,
-  mountPointX int NOT NULL,
-  mountPointY int NOT NULL,
+  equiplet char(200) NOT NULL,
+  mountPointX int NULL,
+  mountPointY int NULL,
   attachedToLeft int NOT NULL,
   attachedToRight int NOT NULL,
   moduleProperties text NOT NULL,
@@ -88,7 +88,7 @@ create table ModuleCalibrationModuleSet(
   typeNumber char(200) NOT NULL,
   serialNumber char(200) NOT NULL,
   primary key (ModuleCalibration, manufacturer, typeNumber, serialNumber),
-  foreign key (manufacturer, typeNumber, serialNumber) references Module(manufacturer, typeNumber, serialNumber) ON DELETE CASCADE ON UPDATE NO ACTION,
+  -- foreign key (manufacturer, typeNumber, serialNumber) references Module(manufacturer, typeNumber, serialNumber) ON DELETE CASCADE ON UPDATE NO ACTION,
   foreign key (ModuleCalibration) references ModuleCalibration(id) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
@@ -135,25 +135,33 @@ DELIMITER $$
 create trigger module_insert before insert on Module
 FOR EACH ROW
 BEGIN
-  IF NEW.mountPointX <= (
+  IF NEW.mountPointX >= (
     SELECT mountPointsX
     FROM Equiplet
-    WHERE name = Module.equiplet
-  ) OR NEW.mountPointY <= (
+    WHERE name = NEW.equiplet
+  ) OR NEW.mountPointY >= (
     SELECT mountPointsY
     FROM Equiplet
-    WHERE name = Module.equiplet
+    WHERE name = NEW.equiplet
   ) THEN
     SIGNAL SQLSTATE 'Z0001'
       SET MESSAGE_TEXT = 'moduleMountPoint: mountPointX <= mountPointsX || mountPointY <= mountPointsY';
-  ELSEIF NEW.equiplet IS NOT NULL AND 
-    (NEW.mountPointX IS NULL OR NEW.mountPointY IS NULL) THEN
+  ELSEIF NEW.mountPointX IS NOT NULL AND NEW.mountPointY IS NOT NULL AND
+    (
+		SELECT count(*) 
+		FROM Module 
+		WHERE attachedToLeft < NEW.attachedToLeft AND attachedToRight > NEW.attachedToRight
+	) != 0 THEN
     SIGNAL SQLSTATE 'Z0001'
-      SET MESSAGE_TEXT = 'moduleAttachedToModule: attached to equiplet and mountplate IS NULL';
-  ELSEIF NEW.attachedToLeft + 1 != NEW.attachedToRight AND 
-    (NEW.mountPointX IS NOT NULL OR NEW.mountPointY IS NOT NULL OR NEW.equiplet IS NULL) THEN
+      SET MESSAGE_TEXT = 'moduleAttachedToModule: attached to module and mountplate at the same time';
+  ELSEIF (NEW.mountPointX IS NULL OR NEW.mountPointY IS NULL) AND 
+    (
+		SELECT count(*) 
+		FROM Module 
+		WHERE attachedToLeft < NEW.attachedToLeft AND attachedToRight > NEW.attachedToRight
+	) = 0 THEN
     SIGNAL SQLSTATE 'Z0001'
-      SET MESSAGE_TEXT = 'moduleAttachedToModule: attached to module and mountplate IS NULL or equiplet IS NULL';
+      SET MESSAGE_TEXT = 'moduleAttachedToModule: module not attached to mountplate and has no parent module';
   END IF;
 END$$
 DELIMITER ;
