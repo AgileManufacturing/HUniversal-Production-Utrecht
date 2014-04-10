@@ -17,10 +17,6 @@ import libraries.blackboard_client.data_classes.OplogEntry;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
-import org.bson.types.ObjectId;
-
-import sun.org.mozilla.javascript.internal.ast.CatchClause;
-
 import com.mongodb.DBObject;
 
 import configuration.Configuration;
@@ -88,12 +84,15 @@ public class BlackboardUpdated extends Agent implements BlackboardSubscriber {
 		DBObject dbObject;
 		try{
 			switch (entry.getNamespace().split("\\.")[1]) {
+			
+			
 			case "equipletState":
 				dbObject = stateBlackboardBBClient.findDocumentById(entry.getTargetObjectId());
 				if(dbObject != null) {
 					id = dbObject.get("id").toString();
 					state = dbObject.get("state").toString();
 					mode = dbObject.get("mode").toString();
+					Logger.log(LogLevel.DEBUG, "Ari EquipletState State set to: %s%n", state);
 					for(BlackboardListener changedListener: updateSubscribers){
 						changedListener.OnEquipleStateChanged(id,state);
 						changedListener.OnEquipleModeChanged(id, mode);
@@ -106,6 +105,7 @@ public class BlackboardUpdated extends Agent implements BlackboardSubscriber {
 				dbObject = productStepBBClient.findDocumentById(entry.getTargetObjectId());
 				if(dbObject != null) {
 					status = dbObject.get("status").toString();
+					Logger.log(LogLevel.DEBUG, "Ari ProductStep status set to: %s%n", status);
 					for(BlackboardListener changedListener: updateSubscribers){
 						changedListener.onProcessStateChanged(status);
 					}
