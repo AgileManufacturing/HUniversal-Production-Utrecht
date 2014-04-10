@@ -30,21 +30,18 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <memory>
 
 #include "mysql_connection.h"
 
 namespace rexos_knowledge_database {
-	class Equiplet {
+	class ModuleTypeIdentifier{
 	public:
-		Equiplet(std::string name);
-		
-		int getMointPointsX();
-		int getMointPointsY();
-		double getMointPointDistanceX();
-		double getMointPointDistanceY();
+		ModuleTypeIdentifier(std::string manufacturer, std::string typeNumber);
+		std::string getManufacturer() const;
+		std::string getTypeNumber() const;
 	private:
-		std::string name;
-		std::unique_ptr<sql::Connection> connection;
+		std::string manufacturer, typeNumber;
 	};
 }

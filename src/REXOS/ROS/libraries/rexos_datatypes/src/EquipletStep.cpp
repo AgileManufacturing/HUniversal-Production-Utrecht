@@ -33,8 +33,10 @@
 
 namespace rexos_datatypes{
 
-    EquipletStep::EquipletStep(JSONNode n) {
-        setValues(n);
+    EquipletStep::EquipletStep(JSONNode n) :
+			moduleIdentifier("", "", "") // shut up the complaining compiler. TODO: nicer solution
+	{
+		setValues(n);
     }
 
     std::string EquipletStep::getId(){
@@ -61,13 +63,35 @@ namespace rexos_datatypes{
         this->nextStep = nextStep;
     }
 
-    int EquipletStep::getModuleId(){
-        return this->moduleId;
+    rexos_knowledge_database::ModuleIdentifier EquipletStep::getModuleIdentifier(){
+        return this->moduleIdentifier;
     }
 
-    void EquipletStep::setModuleId(int id){
-        this->moduleId = id;
+    void EquipletStep::setModuleIdentifier(rexos_knowledge_database::ModuleIdentifier moduleIdentifier){
+        this->moduleIdentifier = moduleIdentifier;
     }
+
+    void EquipletStep::setModuleIdentifier(const JSONNode & n){
+		std::string manufacturer;
+		std::string typeNumber;
+		std::string serialNumber;
+		
+       //Iterate them nodes.
+       JSONNode::const_iterator i = n.begin();
+
+       while (i != n.end()){
+			const char * node_name = i -> name().c_str();
+			
+           if (strcmp(node_name, "manufacturer") == 0){
+               manufacturer = i -> as_string();
+           } else if (strcmp(node_name, "typeNumber") == 0){
+               manufacturer = i -> as_string();
+           } else if (strcmp(node_name, "serialNumber") == 0){
+               manufacturer = i -> as_string();
+           }
+	   }
+       this->moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(manufacturer, typeNumber, serialNumber);
+	 }
 
     InstructionData EquipletStep::getInstructionData(){
         return this->instructionData;
@@ -123,8 +147,8 @@ namespace rexos_datatypes{
             else if (strcmp(node_name, "nextStep") == 0){
                 setNextStep(i -> as_string());
             }
-            else if (strcmp(node_name, "moduleId") == 0){
-                setModuleId(i -> as_int());
+            else if (strcmp(node_name, "moduleIdentifier") == 0){
+                setModuleIdentifier(i -> as_node());
             }
             else if (strcmp(node_name, "instructionData") == 0){
                 setInstructionData(InstructionData(*i));
@@ -149,7 +173,7 @@ namespace rexos_datatypes{
         ss << "{ ";
         ss << "\"serviceStepID\" : \"" << this->serviceStepID << "\", ";
         ss << "\"nextStep\" : \"" << this->nextStep << "\", ";
-        ss << "\"moduleId\" : \"" << this->moduleId << "\", ";
+        ss << "\"moduleIdentifier\" : " << this->moduleIdentifier.toString() << ", ";
         ss << "\"instructionData\" : " << this->instructionData.toJSONString() << ", ";
         ss << "\"status\" : \"" << this->status << "\" ";
         ss << " } ";

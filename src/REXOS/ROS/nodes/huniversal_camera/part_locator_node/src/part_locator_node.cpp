@@ -50,7 +50,7 @@ const string PartLocatorNode::BOTTOM_RIGHT_VALUE = "WP_800_400_BR";*/
 
 
 PartLocatorNode::PartLocatorNode(int equipletId, std::string cameraManufacturer, std::string cameraTypeNumber, std::string cameraSerialNumber):
-		rexos_knowledge_database::Module(cameraManufacturer, cameraTypeNumber, cameraSerialNumber),
+		rexos_knowledge_database::Module(rexos_knowledge_database::ModuleIdentifier(cameraManufacturer, cameraTypeNumber, cameraSerialNumber)),
 		rexos_coordinates::Module(this),
 		environmentCacheClient(nodeHandle.serviceClient<environment_cache::UpdateEnvironmentCache>("updateEnvironmentCache")),
 		samplesTopLeft(minCornerSamples),
@@ -59,8 +59,7 @@ PartLocatorNode::PartLocatorNode(int equipletId, std::string cameraManufacturer,
 {
 	ROS_INFO("Constructing");
 	
-	rexos_knowledge_database::ModuleType* moduleType = this->getModuleType();
-	std::string properties = moduleType->getModuleTypeProperties();
+	std::string properties = this->getModuleTypeProperties();
 	JSONNode jsonNode = libjson::parse(properties);
 	
 	topLeftValue = std::string();

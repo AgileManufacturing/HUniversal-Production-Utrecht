@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rexos_datatypes)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS libjson rexos_utilities)
+find_package(catkin REQUIRED COMPONENTS libjson rexos_utilities rexos_knowledge_database)
 find_package(Boost)
 find_package(OpenCV)
 
@@ -10,7 +10,7 @@ find_package(OpenCV)
 catkin_package(
 INCLUDE_DIRS include 
 LIBRARIES rexos_datatypes 
-CATKIN_DEPENDS libjson rexos_utilities
+CATKIN_DEPENDS libjson rexos_utilities rexos_knowledge_database
 DEPENDS Boost OpenCV)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

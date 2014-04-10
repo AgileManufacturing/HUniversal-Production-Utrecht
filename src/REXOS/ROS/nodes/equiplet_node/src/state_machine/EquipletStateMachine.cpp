@@ -2,8 +2,8 @@
 
 using namespace equiplet_node;
 
-EquipletStateMachine::EquipletStateMachine(std::string name, int id):
-	StateMachine(name,
+EquipletStateMachine::EquipletStateMachine(std::string equipletName, int id):
+	StateMachine(equipletName,
 		{
 			rexos_statemachine::MODE_NORMAL, 
 			rexos_statemachine::MODE_SERVICE, 
@@ -14,7 +14,7 @@ EquipletStateMachine::EquipletStateMachine(std::string name, int id):
 			rexos_statemachine::MODE_STEP	
 		}
 	),
-	moduleRegistry(name, id),
+	moduleRegistry(equipletName),
 	desiredState(rexos_statemachine::STATE_NOSTATE)
 {
 	rexos_statemachine::StateMachine::setListener(this);
@@ -60,14 +60,18 @@ void EquipletStateMachine::onModeChanged(){
 
 void EquipletStateMachine::onModuleStateChanged(ModuleProxy* moduleProxy,rexos_statemachine::State newState, rexos_statemachine::State previousState){
 	ROS_INFO("Module State Changed received from %s a state change from %s to %s",
-		moduleProxy->getModuleNodeName().c_str(),rexos_statemachine::state_txt[previousState],rexos_statemachine::state_txt[newState]);
+			moduleProxy->getModuleIdentifier().toString().c_str(),
+			rexos_statemachine::state_txt[previousState],
+			rexos_statemachine::state_txt[newState]);
 	if(rexos_statemachine::is_transition_state[getCurrentState()] && allModulesInDesiredState(desiredState) )
 		condit.notify_one();
 }
 
 void EquipletStateMachine::onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode){
 	ROS_INFO("Module Mode Changed received from %s a mode change from %s to %s",
-		moduleProxy->getModuleNodeName().c_str(),rexos_statemachine::mode_txt[previousMode],rexos_statemachine::mode_txt[newMode]);
+			moduleProxy->getModuleIdentifier().toString().c_str(),
+			rexos_statemachine::mode_txt[previousMode],
+			rexos_statemachine::mode_txt[newMode]);
 	if(newMode > getCurrentMode()){
 		changeMode(newMode);
 	}

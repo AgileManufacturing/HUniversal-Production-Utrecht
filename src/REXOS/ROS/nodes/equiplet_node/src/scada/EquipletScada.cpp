@@ -81,14 +81,19 @@ int EquipletScada::mongooseBeginRequestCallback(mg_connection* connection) {
 }
 
 void EquipletScada::mongooseProcessChangeModuleMode(mg_connection* conn, mg_request_info* request_info) {
-	char moduleId[64], moduleModi[64];
+	char moduleManufacturer[201], moduleTypeNumber[201], moduleSerialNumber[201], moduleModi[64];
 	const char* query = request_info->query_string;
 	const size_t query_len = strlen(query);
 
-	mg_get_var(query, query_len, "id", moduleId, sizeof(moduleId));
+	mg_get_var(query, query_len, "manufacturer", moduleManufacturer, sizeof(moduleManufacturer));
+	mg_get_var(query, query_len, "typeNumber", moduleTypeNumber, sizeof(moduleTypeNumber));
+	mg_get_var(query, query_len, "serialNumber", moduleSerialNumber, sizeof(moduleSerialNumber));
 	mg_get_var(query, query_len, "mode", moduleModi, sizeof(moduleModi));
+	
+	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(
+			moduleManufacturer, moduleTypeNumber, moduleSerialNumber);
 
-	ModuleProxy* moduleProxy = moduleRegistry->getModule(atoi(moduleId));
+	ModuleProxy* moduleProxy = moduleRegistry->getModule(moduleIdentifier);
 	if(moduleProxy == NULL) {
 		mg_printf(conn, "%s", ajax_reply_start_failed);
 		return;
@@ -199,10 +204,11 @@ void EquipletScada::mongooseProcessModuleInfo(mg_connection* conn, mg_request_in
 			continue;
 		}
 
-		jsonModule.push_back(JSONNode("id", proxy->getModuleId()));
+		JSONNode jsonIdentifier = proxy->getModuleIdentifier().toJSONObject();
+		jsonIdentifier.set_name("identifier");
+		jsonModule.push_back(jsonIdentifier);
 		jsonModule.push_back(JSONNode("mode", rexos_statemachine::mode_txt[proxy->getCurrentMode()]));
 		jsonModule.push_back(JSONNode("state", rexos_statemachine::state_txt[proxy->getCurrentState()]));
-		jsonModule.push_back(JSONNode("name", proxy->getModuleNodeName()));
 		jsonModules.push_back(jsonModule);
 	}
 

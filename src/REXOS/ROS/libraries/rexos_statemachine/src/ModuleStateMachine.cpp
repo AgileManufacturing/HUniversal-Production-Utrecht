@@ -6,39 +6,35 @@
 
 using namespace rexos_statemachine;
 
-ModuleStateMachine::ModuleStateMachine(std::string moduleName, int equipletId, int moduleId,bool actorModule)
-:StateMachine(moduleName + "_" + std::to_string(equipletId) + "_" + std::to_string(moduleId),
-		{rexos_statemachine::MODE_NORMAL, 
-		rexos_statemachine::MODE_SERVICE, 
-		actorModule ? rexos_statemachine::MODE_CRITICAL_ERROR : rexos_statemachine::MODE_ERROR,
-		rexos_statemachine::MODE_E_STOP}
-	)
-,moduleName(moduleName)
-,moduleId(moduleId)
-,equipletId(equipletId)
-,actorModule(actorModule)
-,bond(NULL)
-{
-	std::string moduleNamespaceName = moduleName + "_" + std::to_string(equipletId) + "_" + std::to_string(moduleId);
-	std::string equipletNamespaceName = "equiplet_" + std::to_string(equipletId);
+ModuleStateMachine::ModuleStateMachine(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier, bool actorModule) : 
+		StateMachine(equipletName + "/" + moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber(),
+			{rexos_statemachine::MODE_NORMAL, 
+			rexos_statemachine::MODE_SERVICE, 
+			actorModule ? rexos_statemachine::MODE_CRITICAL_ERROR : rexos_statemachine::MODE_ERROR,
+			rexos_statemachine::MODE_E_STOP}
+		), 
+		equipletName(equipletName), moduleIdentifier(moduleIdentifier), actorModule(actorModule), bond(NULL) {
+	std::string moduleNamespaceName = moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber();
+	std::string equipletNamespaceName = equipletName;
 
 	//Register module on equiplet
 	ros::ServiceClient registerModuleServiceClient = nodeHandle.serviceClient<rexos_statemachine_srvs::RegisterModule>(equipletNamespaceName + "/register_module");
 	registerModuleServiceClient.waitForExistence();
 	rexos_statemachine_srvs::RegisterModuleRequest req;
 	rexos_statemachine_srvs::RegisterModuleResponse res;
-	req.name = moduleName;
-	req.id = moduleId;
+	req.manufacturer = moduleIdentifier.getManufacturer();
+	req.typeNumber = moduleIdentifier.getTypeNumber();
+	req.serialNumber = moduleIdentifier.getSerialNumber();
 	if(!registerModuleServiceClient.call(req, res)) {
-		throw new std::runtime_error("Module registration failed");
+		throw std::runtime_error("Module registration failed");
 	}
 
 	changeStateNotificationClient = nodeHandle.serviceClient<rexos_statemachine_srvs::StateUpdate>(equipletNamespaceName + "/" + moduleNamespaceName + "/state_update");
 	changeModeNotificationClient = nodeHandle.serviceClient<rexos_statemachine_srvs::ModeUpdate>(equipletNamespaceName + "/" + moduleNamespaceName + "/mode_update");
 	setListener(this);
 	
-	ROS_INFO_STREAM("binding A on " << (moduleName + "/bond")<< " id " << std::to_string(moduleId));
-	bond = new rexos_bond::Bond(moduleName + "/bond", std::to_string(moduleId), this);
+	ROS_INFO_STREAM("binding A on " << (equipletNamespaceName + "/bond")<< " id " << moduleNamespaceName);
+	bond = new rexos_bond::Bond(equipletNamespaceName + "/bond", moduleNamespaceName, this);
 	bond->start();
 }
 

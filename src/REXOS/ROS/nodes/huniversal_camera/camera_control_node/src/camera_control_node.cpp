@@ -46,19 +46,16 @@
 #include <string>
 #include <iostream>
 
-CameraControlNode::CameraControlNode(int equipletId, std::string cameraManufacturer, std::string cameraTypeNumber, std::string cameraSerialNumber) :
-		increaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(							vision_node_services::INCREASE_EXPOSURE)),
-		decreaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(							vision_node_services::DECREASE_EXPOSURE)),
-		autoWhiteBalanceClient(			nodeHandle.serviceClient<vision_node::autoWhiteBalance>(			vision_node_services::AUTO_WHITE_BALANCE)),
-		fishEyeCorrectionClient(		nodeHandle.serviceClient<vision_node::enableComponent>(				vision_node_services::FISH_EYE_CORRECTION)),
+CameraControlNode::CameraControlNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier) :
+		increaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(								vision_node_services::INCREASE_EXPOSURE)),
+		decreaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(								vision_node_services::DECREASE_EXPOSURE)),
+		autoWhiteBalanceClient(			nodeHandle.serviceClient<vision_node::autoWhiteBalance>(				vision_node_services::AUTO_WHITE_BALANCE)),
+		fishEyeCorrectionClient(			nodeHandle.serviceClient<vision_node::enableComponent>(				vision_node_services::FISH_EYE_CORRECTION)),
 		enableCameraClient(				nodeHandle.serviceClient<vision_node::enableComponent>(				vision_node_services::ENABLE_CAMERA)),
-		getCorrectionMatricesClient(	nodeHandle.serviceClient<vision_node::getCorrectionMatrices>(		vision_node_services::GET_CORRECTION_MATRICES)),
-		calibrateLensClient(			nodeHandle.serviceClient<camera_calibration_node::calibrateLens>(	camera_calibration_node_services::CALIBRATE_LENS)),
-		rexos_statemachine::ModuleStateMachine("camera_control_node",equipletId, cameraModuleId, true),
-		rexos_knowledge_database::Module(cameraManufacturer, cameraTypeNumber, cameraSerialNumber),
-		equipletId(equipletId),
-		cameraModuleId(cameraModuleId),
-		lensModuleId(lensModuleId)
+		getCorrectionMatricesClient(		nodeHandle.serviceClient<vision_node::getCorrectionMatrices>(		vision_node_services::GET_CORRECTION_MATRICES)),
+		calibrateLensClient(				nodeHandle.serviceClient<camera_calibration_node::calibrateLens>(	camera_calibration_node_services::CALIBRATE_LENS)),
+		rexos_statemachine::ModuleStateMachine(equipletName, moduleIdentifier, false),
+		rexos_knowledge_database::Module(moduleIdentifier)
 {
 }
 
@@ -149,7 +146,7 @@ bool CameraControlNode::mannuallyCalibrateLens(){
 void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Setup transition called");
 	
-	std::vector<rexos_knowledge_database::Module*> children = this->getChildModules();
+	std::vector<rexos_knowledge_database::ModuleIdentifier> children = this->getChildModulesIdentifiers();
 	if(children.size() != 1){
 		ROS_ERROR_STREAM("CameraControlNode::transitionSetup: Expected 1 child module (the lens), got " << children.size());
 		as->setAborted();
@@ -236,21 +233,16 @@ void CameraControlNode::transitionStop(rexos_statemachine::TransitionActionServe
 int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "camera_control_node");
 	
-if(argc < 5){
-		ROS_ERROR("Usage: camera_control_node equipletId, manufacturer, typeNumber, serialNumber");
+	if(argc < 5){
+		ROS_ERROR("Usage: gripper_node equipletName manufacturer typeNumber serialNumber");
 		return -1;
 	}
 	
-	int equipletId;
-	try{
-		equipletId = rexos_utilities::stringToInt(argv[1]);
-	} catch(std::runtime_error ex) {
-		ROS_ERROR("Cannot read equiplet id from commandline please use correct values.");
-		return -2;
-	}
+	std::string equipletName = argv[1];
+	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
 	
-	CameraControlNode node(equipletId, argv[2], argv[3], argv[4]);
-
+	CameraControlNode node(equipletName, moduleIdentifier);
+	
 	std::cout << "Welcome to the camera node controller. Using this tool you can adjust camera settings on the fly :)."
 	        << std::endl << "A\tEnable auto white balance" << std::endl << "Z\tDisable auto white balance" << std::endl
 	        << "S\tIncrease exposure" << std::endl << "X\tDecrease exposure" << std::endl << "Q\tQuit program"

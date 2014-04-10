@@ -41,6 +41,8 @@
 #include <Matrices/Matrices.h>
 #include <Vectors/Vectors.h>
 #include <rexos_coordinates/Module.h>
+#include <rexos_knowledge_database/Module.h>
+#include <rexos_knowledge_database/ModuleIdentifier.h>
 
 #include <vision_node/QrCodes.h>
 

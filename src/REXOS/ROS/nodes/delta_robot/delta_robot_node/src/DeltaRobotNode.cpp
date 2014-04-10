@@ -45,21 +45,23 @@
  * @param equipletID identifier for the equiplet
  * @param moduleID identifier for the deltarobot
  **/
-deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int moduleID, std::string manufacturer, std::string typeNumber, std::string serialNumber) :
-		rexos_knowledge_database::Module(manufacturer, typeNumber, serialNumber),
-		rexos_statemachine::ModuleStateMachine("delta_robot_node", equipletID, moduleID, true),
+deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier) :
+		rexos_knowledge_database::Module(moduleIdentifier),
+		rexos_statemachine::ModuleStateMachine(equipletName, moduleIdentifier, true),
 		rexos_coordinates::Module(this),
 		deltaRobot(NULL),
-		moduleNodeName("delta_robot_node_" + std::to_string(equipletID) + "_" + std::to_string(moduleID)),
-		setInstructionActionServer(nodeHandle, moduleNodeName + "/set_instruction", boost::bind(&deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction, this, _1), false),
+		setInstructionActionServer(
+				nodeHandle, 
+				moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() + "/set_instruction", 
+				boost::bind(&deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction, this, _1), 
+				false),
 		lastX(0.0),
 		lastY(0.0),
 		lastZ(0.0){
 	ROS_INFO("DeltaRobotnode Constructor entering...");
 	// get the properties and combine them for the deltarobot
-	rexos_knowledge_database::ModuleType* moduleType = this->getModuleType();
 	std::string properties = this->getModuleProperties();
-	std::string typeProperties = moduleType->getModuleTypeProperties();
+	std::string typeProperties = this->getModuleTypeProperties();
 
 
 	JSONNode jsonNode = libjson::parse(properties);
@@ -76,7 +78,9 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(int equipletID, int modu
 
 	setInstructionActionServer.start();
 
-	ROS_INFO_STREAM("DeltaRobotNode initialized. Advertising actionserver on " << moduleNodeName << "/set_instruction");
+	ROS_INFO_STREAM("DeltaRobotNode initialized. Advertising actionserver on " << 
+			moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() << 
+			"/set_instruction");
 }
 
 
@@ -395,25 +399,17 @@ deltaRobotNodeNamespace::Point* deltaRobotNodeNamespace::DeltaRobotNode::parsePo
 int main(int argc, char **argv){
 	ros::init(argc, argv, NODE_NAME);
 	
-	if(argc < 6){
-		ROS_ERROR("Usage: delta_robot_node equipletId, moduleId, manufacturer, typeNumber, serialNumber");
+	if(argc < 5){
+		ROS_ERROR("Usage: delta_robot_node equipletName manufacturer typeNumber serialNumber");
 		return -1;
 	}
 	
-	
-	int equipletID;
-	int moduleID;
-	try{
-		equipletID = rexos_utilities::stringToInt(argv[1]);
-		moduleID = rexos_utilities::stringToInt(argv[2]);
-	} catch(std::runtime_error ex) {
-		ROS_ERROR("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
-		return -2;
-	}
+	std::string equipletName = argv[1];
+	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
 	
 	ROS_INFO("Creating DeltaRobotNode");
 
-	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletID, moduleID, argv[3], argv[4], argv[5]);
+	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletName, moduleIdentifier);
 
 	ROS_INFO("Running StateEngine");
 	ros::spin();

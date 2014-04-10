@@ -75,7 +75,7 @@ namespace deltaRobotNodeNamespace{
 		
 		
 	public:
-		DeltaRobotNode(int equipletID, int moduleID, std::string manufacturer, std::string typeNumber, std::string serialNumber);
+		DeltaRobotNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
 		virtual ~DeltaRobotNode();
 		
 		virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);

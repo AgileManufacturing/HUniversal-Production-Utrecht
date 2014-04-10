@@ -34,19 +34,24 @@
 #include <memory>
 
 #include <rexos_knowledge_database/ModuleType.h>
+#include <rexos_knowledge_database/ModuleIdentifier.h>
 
 #include "mysql_connection.h"
 
 namespace rexos_knowledge_database {
-	class Module{
+	class Module : public ModuleType {
+	private:
+		ModuleIdentifier moduleIdentifier;
+		std::unique_ptr<sql::Connection> connection;
 	public:
-		Module(std::string manufacturer, std::string typeNumber, std::string serialNumber);
+		Module(ModuleIdentifier moduleIdentifier);
 		
-		ModuleType* getModuleType();
+		ModuleIdentifier getModuleIdentifier();
+		
 		std::string getModuleProperties();
 		void setModuleProperties(std::string jsonProperties);
 		Module* getParentModule();
-		std::vector<Module*> getChildModules();
+		std::vector<ModuleIdentifier> getChildModulesIdentifiers();
 		
 		int getMountPointX();
 		void setMountPointX(int mountPointX);
@@ -55,15 +60,12 @@ namespace rexos_knowledge_database {
 		
 		std::string getCalibrationDataForModuleOnly();
 		std::string getCalibrationDataForModuleAndChilds();
-		std::string getCalibrationDataForModuleAndOtherModules(std::vector<Module*> modules);
+		std::string getCalibrationDataForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers);
 		void setCalibrationDataForModuleOnly(std::string properties);
 		void setCalibrationDataForModuleAndChilds(std::string properties);
-		void setCalibrationDataForModuleAndOtherModules(std::vector<Module*> modules, std::string properties);
+		void setCalibrationDataForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers, std::string properties);
 	private:
-		int getCalibrationGroupForModuleAndOtherModules(std::vector<Module*> modules);
+		int getCalibrationGroupForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers);
 		
-	private:
-		std::string manufacturer, typeNumber, serialNumber;
-		std::unique_ptr<sql::Connection> connection;
 	};
 }

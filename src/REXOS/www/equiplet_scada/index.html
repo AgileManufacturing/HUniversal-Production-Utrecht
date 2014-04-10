@@ -77,7 +77,7 @@
 						});
 			});
 
-	//Start equipletInfo pollig
+	//Start equipletInfo polling
 	$(document).ready(
 			function() {
 				(function worker() {
@@ -115,9 +115,10 @@
 								var module = $("#moduleinfotemplate").clone();
 								module.removeClass("hidden");
 								module.addClass("moduleinfo");
-								$(".module_name", module).text(value["name"]);
-								$(".module_id", module).text(value["id"]);
-								$(".module_form_id", module).val(value["id"]);
+								$(".module_manufacturer", module).text(value["identifier"]["manufacturer"]);
+								$(".module_typeNumber", module).text(value["identifier"]["typeNumber"]);
+								$(".module_serialNumber", module).text(value["identifier"]["serialNumber"]);
+								$(".module_form_identifier", module).val(value["identifier"]);
 								$(".module_state", module).text(value["state"]);
 								$(".module_mode", module).text(value["mode"]);
 								
@@ -162,12 +163,12 @@
 </head>
 <body>
     <div id="moduleinfotemplate" class="hidden">
-		<h3><span class="module_name">...</span></h3>
-		<div>id: <span class="module_id">...</span></div>
+		<h3><span class="module_manufacturer">...</span><span class="module_typeNumber">...</span></h3>
+		<div>serial number: <span class="module_serialNumber">...</span></div>
 		<div>state: <span class="module_state">...</span></div>
 		<div>mode: <span class="module_mode">...</span></div>
 		<form>
-			<input type="hidden" name="id" class="module_form_id" />
+			<input type="hidden" name="identifier" class="module_form_identifier" />
 			<input type="submit" value="Normal" class="modulechangemode_normal"/>
 			<input type="submit" value="Error" class="modulechangemode_error"/>
 		</form>

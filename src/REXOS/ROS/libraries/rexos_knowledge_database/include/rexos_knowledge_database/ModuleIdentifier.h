@@ -30,21 +30,22 @@
 #pragma once
 
 #include <string>
-#include <memory>
-
-#include "mysql_connection.h"
+#include <rexos_knowledge_database/ModuleTypeIdentifier.h>
+#include <libjson/libjson.h>
 
 namespace rexos_knowledge_database {
-	class Equiplet {
+	class ModuleIdentifier : public ModuleTypeIdentifier{
+	protected:
+		std::string manufacturer;
+		std::string typeNumber;
+		std::string serialNumber;
 	public:
-		Equiplet(std::string name);
+		ModuleIdentifier(std::string manufacturer, std::string typeNumber, std::string serialNumber);
 		
-		int getMointPointsX();
-		int getMointPointsY();
-		double getMointPointDistanceX();
-		double getMointPointDistanceY();
-	private:
-		std::string name;
-		std::unique_ptr<sql::Connection> connection;
+		std::string getSerialNumber() const;
+		std::string toString();
+		JSONNode toJSONObject();
+		bool operator==(const ModuleIdentifier& rhs);
 	};
 }
+

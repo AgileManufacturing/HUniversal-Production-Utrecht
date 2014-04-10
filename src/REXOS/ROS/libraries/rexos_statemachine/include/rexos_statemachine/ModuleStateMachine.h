@@ -6,18 +6,18 @@
 
 #include <rexos_statemachine/StateMachine.h>
 #include <rexos_statemachine/Listener.h>
+#include <rexos_knowledge_database/ModuleIdentifier.h>
 
 namespace rexos_statemachine{
 
 class ModuleStateMachine : public StateMachine, public Listener, public rexos_bond::BondListener {
-	std::string moduleName;
-	int moduleId;
-	int equipletId;
+	std::string equipletName;
+	rexos_knowledge_database::ModuleIdentifier moduleIdentifier;
 
 	ros::ServiceClient changeStateNotificationClient;
 	ros::ServiceClient changeModeNotificationClient;
 public:
-	ModuleStateMachine(std::string moduleName, int equipletId, int moduleId, bool actorModule);
+	ModuleStateMachine(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier, bool actorModule);
 	~ModuleStateMachine();
 protected:
 	virtual void onStateChanged();

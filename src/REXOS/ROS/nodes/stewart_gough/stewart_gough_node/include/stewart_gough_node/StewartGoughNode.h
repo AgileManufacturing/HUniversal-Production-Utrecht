@@ -43,6 +43,8 @@
 #include <rexos_statemachine/ModuleStateMachine.h>
 #include <rexos_statemachine/Transitions.h>
 #include <rexos_coordinates/Module.h>
+#include <rexos_knowledge_database/Module.h>
+
 #include "equiplet_node/RegisterModule.h"
 
 #include <actionlib/server/simple_action_server.h>
@@ -75,7 +77,7 @@ namespace stewartGoughNodeNamespace{
 		
 		
 	public:
-		StewartGoughNode(int equipletID, int moduleID, std::string manufacturer, std::string typeNumber, std::string serialNumber);
+		StewartGoughNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
 		virtual ~StewartGoughNode();
 		
 		virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
@@ -99,7 +101,6 @@ namespace stewartGoughNodeNamespace{
 		float lastX;
 		float lastY;
 		float lastZ;
-		std::string moduleNodeName;
 		/**
 		 * @var ros::NodeHandle node
 		 * The nodeHandle used by ros services and topics

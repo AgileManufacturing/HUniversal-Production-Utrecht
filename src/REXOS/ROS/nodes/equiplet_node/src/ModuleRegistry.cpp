@@ -11,11 +11,13 @@
 
 namespace equiplet_node {
 
-ModuleRegistry::ModuleRegistry(std::string nodeName, int equipletId, ModuleRegistryListener* mrl)
-:newRegistrationsAllowed(false),equipletId(equipletId),moduleRegistryListener(mrl)
+ModuleRegistry::ModuleRegistry(std::string equipletName, ModuleRegistryListener* mrl) :
+		newRegistrationsAllowed(false),
+		equipletName(equipletName),
+		moduleRegistryListener(mrl)
 {
 	registerModuleServiceServer = rosNodeHandle.advertiseService(
-			nodeName + "/register_module",
+			equipletName + "/register_module",
 			&ModuleRegistry::onRegisterServiceModuleCallback,
 			this);
 }
@@ -40,16 +42,16 @@ std::vector<ModuleProxy*> ModuleRegistry::getRegisteredModules(){
 	return registeredModules;
 }
 
-ModuleProxy* ModuleRegistry::getModule(int moduleId){
+ModuleProxy* ModuleRegistry::getModule(rexos_knowledge_database::ModuleIdentifier moduleIdentifier){
 	for(ModuleProxy* proxy : registeredModules){
-		if(proxy->getModuleId() == moduleId)
+		if(proxy->getModuleIdentifier() == moduleIdentifier)
 			return proxy;
 	}
 	return NULL;
 }
 
 bool ModuleRegistry::onRegisterServiceModuleCallback(RegisterModule::Request &req, RegisterModule::Response &res) {
-	ROS_INFO("ModuleRegistry: New module %s with id %d registering", req.name.c_str(), req.id);
+	ROS_INFO("ModuleRegistry: New module %s %s %s registering", req.manufacturer.c_str(), req.typeNumber.c_str(), req.serialNumber.c_str());
 	
 	if(!newRegistrationsAllowed) {
 		ROS_INFO("registration of new module not allowed");
@@ -57,10 +59,9 @@ bool ModuleRegistry::onRegisterServiceModuleCallback(RegisterModule::Request &re
 	}
 
 	ModuleProxy* proxy = new ModuleProxy(
-			EquipletNode::nameFromId(equipletId),
-			req.name,
-			equipletId,
-			req.id,this);
+			equipletName,
+			rexos_knowledge_database::ModuleIdentifier(req.manufacturer, req.typeNumber, req.serialNumber),
+			this);
 	registeredModules.push_back(proxy);
 
 	ROS_INFO("registration successful");

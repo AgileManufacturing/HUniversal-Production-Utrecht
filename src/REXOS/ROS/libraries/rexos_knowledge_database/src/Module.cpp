@@ -1,4 +1,5 @@
 #include <rexos_knowledge_database/Module.h>
+#include <rexos_knowledge_database/ModuleIdentifier.h>
 #include <rexos_knowledge_database/KnowledgeDatabaseException.h>
 #include <rexos_knowledge_database/rexos_knowledge_database.h>
 
@@ -8,8 +9,9 @@
 #include "ros/ros.h"
 
 namespace rexos_knowledge_database{
-	Module::Module(std::string manufacturer, std::string typeNumber, std::string serialNumber) :
-				manufacturer(manufacturer), typeNumber(typeNumber), serialNumber(serialNumber)
+	Module::Module(ModuleIdentifier moduleIdentifier) :
+			ModuleType(moduleIdentifier), 
+			moduleIdentifier(moduleIdentifier)
 	{
 		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
 		
@@ -19,19 +21,19 @@ namespace rexos_knowledge_database{
 		WHERE manufacturer = ? AND \
 		typeNumber = ? AND \
 		serialNumber = ?;");
-		preparedStmt->setString(1, manufacturer);
-		preparedStmt->setString(2, typeNumber);
-		preparedStmt->setString(3, serialNumber);
+		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
+		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
+		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
 			throw KnowledgeDatabaseException("This module does not exist");
 		}
-		ROS_INFO_STREAM("Constructed module with manufacturer=" << manufacturer << 
-				" typeNumber=" << typeNumber << " serialNumber=" << serialNumber);
+		ROS_INFO_STREAM("Constructed module with manufacturer=" << moduleIdentifier.getManufacturer() << 
+				" typeNumber=" << moduleIdentifier.getTypeNumber() << " serialNumber=" << moduleIdentifier.getSerialNumber());
 	}
-	ModuleType* Module::getModuleType(){
-		return new rexos_knowledge_database::ModuleType(manufacturer, typeNumber);
+	ModuleIdentifier Module::getModuleIdentifier() {
+		return moduleIdentifier;
 	}
 	std::string Module::getModuleProperties(){
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
@@ -40,9 +42,9 @@ namespace rexos_knowledge_database{
 		WHERE manufacturer = ? AND \
 		typeNumber = ? AND \
 		serialNumber = ?;");
-		preparedStmt->setString(1, manufacturer);
-		preparedStmt->setString(2, typeNumber);
-		preparedStmt->setString(3, serialNumber);
+		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
+		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
+		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
@@ -63,59 +65,85 @@ namespace rexos_knowledge_database{
 		typeNumber = ? AND \
 		serialNumber = ?;");
 		preparedStmt->setString(1, jsonProperties);
-		preparedStmt->setString(2, manufacturer);
-		preparedStmt->setString(3, typeNumber);
-		preparedStmt->setString(4, serialNumber);
+		preparedStmt->setString(2, moduleIdentifier.getManufacturer());
+		preparedStmt->setString(3, moduleIdentifier.getTypeNumber());
+		preparedStmt->setString(4, moduleIdentifier.getSerialNumber());
 
 		preparedStmt->executeQuery();
 		delete preparedStmt;
 	}
 	Module* Module::getParentModule(){
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT attachedToManufacturer, attachedToTypeNumber, attachedToSerialNumber \
+		SELECT manufacturer, typeNumber, serialNumber \
 		FROM Module \
-		WHERE manufacturer = ? AND \
-		typeNumber = ? AND \
-		serialNumber = ?;");
-		preparedStmt->setString(1, manufacturer);
-		preparedStmt->setString(2, typeNumber);
-		preparedStmt->setString(3, serialNumber);
+		WHERE attachedToLeft < (\
+			SELECT attachedToLeft FROM Module \
+			WHERE manufacturer = ? \
+				AND typeNumber = ? \
+				AND serialNumber = ? \
+		) AND attachedToRight > (\
+	 		SELECT attachedToRight FROM Module \
+			WHERE manufacturer = ? \
+				AND typeNumber = ? \
+				AND serialNumber = ? \
+		)\
+		ORDER BY abs(attachedToLeft - attachedToRight) \
+		ASC LIMIT 1;");
+		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
+		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
+		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
+		preparedStmt->setString(4, moduleIdentifier.getManufacturer());
+		preparedStmt->setString(5, moduleIdentifier.getTypeNumber());
+		preparedStmt->setString(6, moduleIdentifier.getSerialNumber());
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1) {
-			throw std::runtime_error("Unable to find current module (someone deleted this instance in the database)");
+			return 0;
 		} else {
 			// set the cursor at the first result
 			result->next();
-			if(result->isNull("attachedToManufacturer") || result->isNull("attachedToTypeNumber") || result->isNull("attachedToSerialNumber")) {
-				return 0;
-			} else {
-				std::string attachedToManufacturer = result->getString("attachedToManufacturer");
-				std::string attachedToTypeNumber = result->getString("attachedToTypeNumber");
-				std::string attachedToSerialNumber = result->getString("attachedToSerialNumber");
-				
-				delete preparedStmt;
-				return new Module(attachedToManufacturer, attachedToTypeNumber, attachedToSerialNumber);
-			}
+			ModuleIdentifier identifier = ModuleIdentifier(
+				result->getString("manufacturer"),
+				result->getString("typeNumber"),
+				result->getString("serialNumber")
+			);
+			delete preparedStmt;
+			return new Module(identifier);
 		}
 	}
-	std::vector<Module*> Module::getChildModules(){
+	std::vector<ModuleIdentifier> Module::getChildModulesIdentifiers(){
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT manufacturer, typeNumber, serialNumber \
 		FROM Module \
-		WHERE attachedToManufacturer = ? AND \
-		attachedToTypeNumber = ? AND \
-		attachedToSerialNumber = ?;");
-		preparedStmt->setString(1, manufacturer);
-		preparedStmt->setString(2, typeNumber);
-		preparedStmt->setString(3, serialNumber);
+		WHERE attachedToLeft > (\
+			SELECT attachedToLeft FROM Module \
+			WHERE manufacturer = ? \
+				AND typeNumber = ? \
+				AND serialNumber = ? \
+		) AND attachedToRight < (\
+	 		SELECT attachedToRight FROM Module \
+			WHERE manufacturer = ? \
+				AND typeNumber = ? \
+				AND serialNumber = ? \
+		);");
+		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
+		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
+		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
+		preparedStmt->setString(4, moduleIdentifier.getManufacturer());
+		preparedStmt->setString(5, moduleIdentifier.getTypeNumber());
+		preparedStmt->setString(6, moduleIdentifier.getSerialNumber());
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
-		std::vector<Module* > childModules;
+		std::vector<ModuleIdentifier> childModules;
 		if(result->rowsCount() != 0){
 			// get all the childs
 			while(result->next()){
-				childModules.push_back(new Module(result->getString("manufacturer"), result->getString("typeNumber"), result->getString("serialNumber")));
+				ModuleIdentifier identifier = ModuleIdentifier(
+					result->getString("manufacturer"),
+					result->getString("typeNumber"),
+					result->getString("serialNumber")
+				);
+				childModules.push_back(identifier);
 			}
 		}
 		delete preparedStmt;
@@ -129,9 +157,9 @@ namespace rexos_knowledge_database{
 		WHERE manufacturer = ? AND \
 		typeNumber = ? AND \
 		serialNumber = ?;");
-		preparedStmt->setString(1, manufacturer);
-		preparedStmt->setString(2, typeNumber);
-		preparedStmt->setString(3, serialNumber);
+		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
+		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
+		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
 		
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
@@ -152,9 +180,9 @@ namespace rexos_knowledge_database{
 		typeNumber = ? AND \
 		serialNumber = ?;");
 		preparedStmt->setInt(1, mountPointX);
-		preparedStmt->setString(2, manufacturer);
-		preparedStmt->setString(3, typeNumber);
-		preparedStmt->setString(4, serialNumber);
+		preparedStmt->setString(2, moduleIdentifier.getManufacturer());
+		preparedStmt->setString(3, moduleIdentifier.getTypeNumber());
+		preparedStmt->setString(4, moduleIdentifier.getSerialNumber());
 		
 		preparedStmt->executeQuery();
 		delete preparedStmt;
@@ -166,9 +194,9 @@ namespace rexos_knowledge_database{
 		WHERE manufacturer = ? AND \
 		typeNumber = ? AND \
 		serialNumber = ?;");
-		preparedStmt->setString(1, manufacturer);
-		preparedStmt->setString(2, typeNumber);
-		preparedStmt->setString(3, serialNumber);
+		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
+		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
+		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
 		
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
@@ -189,9 +217,9 @@ namespace rexos_knowledge_database{
 		typeNumber = ? AND \
 		serialNumber = ?;");
 		preparedStmt->setInt(1, mountPointY);
-		preparedStmt->setString(2, manufacturer);
-		preparedStmt->setString(3, typeNumber);
-		preparedStmt->setString(4, serialNumber);
+		preparedStmt->setString(2, moduleIdentifier.getManufacturer());
+		preparedStmt->setString(3, moduleIdentifier.getTypeNumber());
+		preparedStmt->setString(4, moduleIdentifier.getSerialNumber());
 		
 		preparedStmt->executeQuery();
 		delete preparedStmt;
@@ -210,9 +238,9 @@ namespace rexos_knowledge_database{
 			FROM ModuleCalibrationGroup AS subTable \
 			WHERE ModuleCalibrationGroup.ModuleCalibration = subTable.ModuleCalibration \
 		) = 1;");
-		preparedStmt->setString(1, manufacturer);
-		preparedStmt->setString(2, typeNumber);
-		preparedStmt->setString(3, serialNumber);
+		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
+		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
+		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
@@ -226,11 +254,11 @@ namespace rexos_knowledge_database{
 		return properties;
 	}
 	std::string Module::getCalibrationDataForModuleAndChilds(){
-		std::vector<Module*> childs = getChildModules();
+		std::vector<ModuleIdentifier> childs = getChildModulesIdentifiers();
 		return getCalibrationDataForModuleAndOtherModules(childs);
 	}
-	std::string Module::getCalibrationDataForModuleAndOtherModules(std::vector<Module*> modules){
-		int calibrationId = getCalibrationGroupForModuleAndOtherModules(modules);
+	std::string Module::getCalibrationDataForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers){
+		int calibrationId = getCalibrationGroupForModuleAndOtherModules(moduleIdentifiers);
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT properties \
 		FROM ModuleCalibration \
@@ -250,7 +278,7 @@ namespace rexos_knowledge_database{
 	void Module::setCalibrationDataForModuleOnly(std::string properties){
 		sql::PreparedStatement* preparedStmt;
 		try{
-			std::vector<Module*> emptyList;
+			std::vector<ModuleIdentifier> emptyList;
 			int calibrationId = getCalibrationGroupForModuleAndOtherModules(emptyList);
 			
 			// update existing entry
@@ -276,22 +304,22 @@ namespace rexos_knowledge_database{
 			INSERT INTO ModuleCalibrationGroup (ModuleCalibration, manufacturer, typeNumber, serialNumber) \
 			VALUES (LAST_INSERT_ID(), ?, ?, ?);");
 			
-			preparedStmt->setString(1, manufacturer);
-			preparedStmt->setString(2, typeNumber);
-			preparedStmt->setString(3, serialNumber);
+			preparedStmt->setString(1, moduleIdentifier.getManufacturer());
+			preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
+			preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
 			
 			preparedStmt->executeQuery();
 			delete preparedStmt;
 		}
 	}
 	void Module::setCalibrationDataForModuleAndChilds(std::string properties){
-		std::vector<Module*> childs = getChildModules();
+		std::vector<ModuleIdentifier> childs = getChildModulesIdentifiers();
 		setCalibrationDataForModuleAndOtherModules(childs, properties);
 	}
-	void Module::setCalibrationDataForModuleAndOtherModules(std::vector<Module*> modules, std::string properties){
+	void Module::setCalibrationDataForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers, std::string properties){
 		sql::PreparedStatement* preparedStmt;
 		try{
-			int calibrationId = getCalibrationGroupForModuleAndOtherModules(modules);
+			int calibrationId = getCalibrationGroupForModuleAndOtherModules(moduleIdentifiers);
 			
 			// update existing entry
 			preparedStmt = connection->prepareStatement("\
@@ -316,15 +344,15 @@ namespace rexos_knowledge_database{
 			INSERT INTO ModuleCalibrationGroup (ModuleCalibration, manufacturer, typeNumber, serialNumber) \
 			VALUES (LAST_INSERT_ID(), ?, ?, ?);");
 			
-			preparedStmt->setString(1, manufacturer);
-			preparedStmt->setString(2, typeNumber);
-			preparedStmt->setString(3, serialNumber);
+			preparedStmt->setString(1, moduleIdentifier.getManufacturer());
+			preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
+			preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
 			preparedStmt->executeQuery();
 			
-			for(int i = 0; i < modules.size(); i++){
-				preparedStmt->setString(1, modules.at(i)->manufacturer);
-				preparedStmt->setString(2, modules.at(i)->typeNumber);
-				preparedStmt->setString(3, modules.at(i)->serialNumber);
+			for(int i = 0; i < moduleIdentifiers.size(); i++){
+				preparedStmt->setString(1, moduleIdentifiers.at(i).getManufacturer());
+				preparedStmt->setString(2, moduleIdentifiers.at(i).getTypeNumber());
+				preparedStmt->setString(3, moduleIdentifiers.at(i).getSerialNumber());
 				preparedStmt->executeQuery();
 			}
 			delete preparedStmt;
@@ -332,7 +360,7 @@ namespace rexos_knowledge_database{
 	}
 	
 	
-	int Module::getCalibrationGroupForModuleAndOtherModules(std::vector<Module*> modules){
+	int Module::getCalibrationGroupForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers){
 		// create a temp table for storing the modules
 		sql::PreparedStatement* preparedStmt;
 		preparedStmt = connection->prepareStatement("\
@@ -351,10 +379,10 @@ namespace rexos_knowledge_database{
 		) VALUES ( \
 			?, ?, ? \
 		);");
-		for(int i = 0; i < modules.size(); i++){
-			preparedStmt->setString(1, modules.at(i)->manufacturer);
-			preparedStmt->setString(2, modules.at(i)->typeNumber);
-			preparedStmt->setString(3, modules.at(i)->serialNumber);
+		for(int i = 0; i < moduleIdentifiers.size(); i++){
+				preparedStmt->setString(1, moduleIdentifiers.at(i).getManufacturer());
+				preparedStmt->setString(2, moduleIdentifiers.at(i).getTypeNumber());
+				preparedStmt->setString(3, moduleIdentifiers.at(i).getSerialNumber());
 			preparedStmt->executeQuery();
 		}
 		delete preparedStmt;
@@ -385,11 +413,11 @@ namespace rexos_knowledge_database{
 				listGroup.serialNumber != ModuleCalibrationGroup.serialNumber \n\
 			) \n\
 		) = ?;");
-		preparedStmt->setString(1, manufacturer);
-		preparedStmt->setString(2, typeNumber);
-		preparedStmt->setString(3, serialNumber);
-		preparedStmt->setInt(4, modules.size());
-		preparedStmt->setInt(5, modules.size());
+		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
+		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
+		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
+		preparedStmt->setInt(4, moduleIdentifiers.size());
+		preparedStmt->setInt(5, moduleIdentifiers.size());
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){

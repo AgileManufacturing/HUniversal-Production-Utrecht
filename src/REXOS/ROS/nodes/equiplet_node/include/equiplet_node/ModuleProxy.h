@@ -19,6 +19,8 @@
 #include <rexos_statemachine/ChangeModeAction.h>
 #include <rexos_statemachine/SetInstructionAction.h>
 
+#include <rexos_knowledge_database/ModuleIdentifier.h>
+
 #include <equiplet_node/StateUpdate.h>
 #include <equiplet_node/ModeUpdate.h>
 #include <equiplet_node/SetInstruction.h>
@@ -39,7 +41,7 @@ typedef actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> 
 
 class ModuleProxy : public rexos_bond::BondListener{
 public:
-	ModuleProxy(std::string equipletNodeName, std::string moduleName, int equipletId, int moduleId, ModuleProxyListener* mpl = NULL);
+	ModuleProxy(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier, ModuleProxyListener* mpl = NULL);
 	virtual ~ModuleProxy();
 
 	void setModuleProxyListener(ModuleProxyListener* mpl);
@@ -47,27 +49,24 @@ public:
 	rexos_statemachine::State getCurrentState();
 	rexos_statemachine::Mode getCurrentMode();
 
-	int getModuleId();
-
-	std::string getModuleNodeName();
+	rexos_knowledge_database::ModuleIdentifier getModuleIdentifier();
 
 	void changeState(rexos_statemachine::State state);
 	void changeMode(rexos_statemachine::Mode mode);
 	void setInstruction(std::string OID, JSONNode n);
 
-private:
-	ModuleProxy(std::string equipletNodeName, std::string moduleNodeName, ModuleProxyListener* mpl = NULL);
-
+	private:
+	std::string moduleNamespaceName;
+	std::string equipletNamespaceName;
+	
 	bool onStateChangeServiceCallback(StateUpdateRequest &req, StateUpdateResponse &res);
 	bool onModeChangeServiceCallback(ModeUpdateRequest &req, ModeUpdateResponse &res);
 	void onInstructionServiceCallback(const actionlib::SimpleClientGoalState& state, const rexos_statemachine::SetInstructionResultConstPtr& result);
 	void onModuleDied();
 
-	int moduleId;
+	rexos_knowledge_database::ModuleIdentifier moduleIdentifier;
 
 	ModuleProxyListener* moduleProxyListener;
-
-	std::string moduleNodeName;
 
 	ros::NodeHandle nodeHandle;
 
