@@ -32,30 +32,60 @@ void StewartGoughSimulationNode::run(int argc, char **argv){
 	motors[4].goToAngleDegrees(0);
 	motors[5].goToAngleDegrees(0);
 
-	SixAxisMath math(10,35, 10.13);
-	SixAxisMath::Point3D moveTo(0,0,-43.50);
 
-	double angleA = math.getAngleForMotor(moveTo, SixAxisMath::MOTOR_A_POS_ON_CIRCLE);
-	double angleB = math.getAngleForMotor(moveTo, SixAxisMath::MOTOR_B_POS_ON_CIRCLE);
-	double angleC = math.getAngleForMotor(moveTo, SixAxisMath::MOTOR_C_POS_ON_CIRCLE);
+
+
+
+double angles[10][6] = {
+
+{12.5454, 12.5454, 12.5454, 12.5454, 12.5454, 12.5454},
+
+	{11.6507, 14.1764, 11.6507, 14.1764, 11.6507, 14.1764},
+
+	{11.4274, 15.3098, 11.4274, 15.3098, 11.4274, 15.3098},
+
+	{11.3349, 16.6566, 11.3349, 16.6566, 11.3349, 16.6566},
+
+	{11.3714, 18.1977, 11.3714, 18.1977, 11.3714, 18.1977},
+
+	{12.5454, 12.5454, 12.5454, 12.5454, 12.5454, 12.5454},
+
+	{14.1764, 11.6507, 14.1764, 11.6507, 14.1764, 11.6507},
+
+	{15.3098, 11.4274, 15.3098, 11.4274, 15.3098, 11.4274},
+
+	{16.6566, 11.3349, 16.6566, 11.3349, 16.6566, 11.3349},
+
+	{18.1977, 11.3714, 18.1977, 11.3714, 18.1977, 11.3714}};
+
+
 	
-	motors[0].goToAngleDegrees(15.2558);
-	motors[1].goToAngleDegrees(15.4123);
-	motors[2].goToAngleDegrees(18.8276);
-	motors[3].goToAngleDegrees(24.1848);
-	motors[4].goToAngleDegrees(24.3017);
-	motors[5].goToAngleDegrees(18.7872);
-
-
 	ros::NodeHandle nodeHandle;
 	ros::ServiceServer service = nodeHandle.advertiseService("rotate_motor_to_degrees", & StewartGoughSimulationNode::rotateMotorToDegrees, this);
-	
-
+	int timer = 0;
+	int patternIndex = 0;
+	bool pattern = true;
 	ROS_INFO("=====Simulation is running======");
 	
 	while (ros::ok()){
+		
 		for(int i = 0; i < 6; i++){
 			motors[i].update();
+		}
+		ROS_INFO("I iz inside1");
+	
+		if(pattern == true){
+			if(timer > 100){
+				for(int i = 0; i < 6; i++){
+					motors[i].goToAngleDegrees(angles[patternIndex][i]);
+				}
+				ROS_INFO("I iz inside2");
+	
+				patternIndex++;
+				if(patternIndex > 9){patternIndex = 0;}
+				timer = 0;
+			}
+			timer++;
 		}
 		ros::spinOnce();
 		loop_rate.sleep();
