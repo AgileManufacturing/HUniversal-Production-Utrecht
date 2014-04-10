@@ -54,7 +54,7 @@ class EquipletStateMachine :
 	ModuleRegistryListener {
 
 public:
-	EquipletStateMachine(std::string name, int id);
+	EquipletStateMachine(std::string name);
 
 	virtual ~EquipletStateMachine();
 

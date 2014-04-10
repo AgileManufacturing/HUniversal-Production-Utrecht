@@ -47,16 +47,16 @@ using namespace equiplet_node;
  * Create a new EquipletNode
  * @param id The unique identifier of the Equiplet
  **/
-EquipletNode::EquipletNode(int id, std::string blackboardIp) :
-		equipletId(id),
-		EquipletStateMachine(nameFromId(id),id),
+EquipletNode::EquipletNode(std::string equipletName, std::string blackboardIp) :
+		equipletName(equipletName),
+		EquipletStateMachine(equipletName),
 		equipletStepBlackboardClient(NULL),
 		equipletCommandBlackboardClient(NULL),
 		directMoveBlackBoardClient(NULL),
 		scada(this, &moduleRegistry) 
 {
 	ROS_DEBUG("Subscribing to EquipletStepsBlackBoard");
-	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, std::string("EQ") + std::to_string(id), "EquipletStepsBlackBoard");
+	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, equipletName, "EquipletStepsBlackBoard");
 	equipletStepSubscription = new Blackboard::FieldUpdateSubscription("status", *this);
 	equipletStepSubscription->addOperation(Blackboard::SET);
 	equipletStepBlackboardClient->subscribe(*equipletStepSubscription);
@@ -79,7 +79,7 @@ EquipletNode::EquipletNode(int id, std::string blackboardIp) :
 	sleep(1);
 
 	ROS_DEBUG("Subscribing to DirectMoveStepsBlackBoard");
-	directMoveBlackBoardClient = new Blackboard::BlackboardCppClient(blackboardIp, std::string("EQ") + std::to_string(id), "DirectMoveStepsBlackBoard");
+	directMoveBlackBoardClient = new Blackboard::BlackboardCppClient(blackboardIp, equipletName, "DirectMoveStepsBlackBoard");
 	directMoveSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
 	directMoveBlackBoardClient->subscribe(*directMoveSubscription);
 	subscriptions.push_back(directMoveSubscription);
@@ -233,7 +233,7 @@ void EquipletNode::onModeChanged(){
 
 void EquipletNode::updateEquipletStateOnBlackboard(){
 	JSONNode jsonUpdateQuery;
-	jsonUpdateQuery.push_back(JSONNode("id",equipletId));
+	jsonUpdateQuery.push_back(JSONNode("equipletName", equipletName));
 
 	std::ostringstream stringStream;
 	stringStream << "{$set: { state: " << getCurrentState() << ",mode: " << getCurrentMode() << "}}";
@@ -242,8 +242,8 @@ void EquipletNode::updateEquipletStateOnBlackboard(){
 	equipletStateBlackboardClient->updateDocuments(jsonUpdateQuery.write().c_str(),stringStream.str());
 }
 
-std::string EquipletNode::getName() {
-	return nameFromId(equipletId);
+std::string EquipletNode::getEquipletName() {
+	return equipletName;
 }
 
 ros::NodeHandle& EquipletNode::getNodeHandle() {

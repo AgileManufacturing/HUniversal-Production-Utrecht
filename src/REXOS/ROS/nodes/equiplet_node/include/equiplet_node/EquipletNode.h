@@ -61,17 +61,13 @@ namespace equiplet_node {
 class EquipletNode : public EquipletStateMachine, public Blackboard::BlackboardSubscriber
 {
 public:
-	static std::string nameFromId(int id){
-		return std::string("equiplet_") + std::to_string(id);
-	}
-
-	EquipletNode(int id, std::string blackboardIp);
+	EquipletNode(std::string equipletName, std::string blackboardIp);
 
 	virtual ~EquipletNode();
 
 	void blackboardReadCallback(std::string json);
 
-	std::string getName();
+	std::string getEquipletName();
 
 	ros::NodeHandle& getNodeHandle();
 
@@ -102,7 +98,7 @@ private:
 	 * @var int equipletId
 	 * The id of the equiplet
 	 **/
-	int equipletId;
+	std::string equipletName;
 
 	/**
 	 * @var BlackboardCppClient  *blackboardClient
