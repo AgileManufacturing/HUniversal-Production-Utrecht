@@ -48,16 +48,16 @@ public class BlackboardUpdated extends Agent implements BlackboardSubscriber {
 			
 		try {
 			
-			serviceStepBBClient = new BlackboardClient(dbData.getIp());
-			serviceStepBBClient.setDatabase(dbData.getName());
-			serviceStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ServiceStepsBlackBoardName", equipletAgentAID.getLocalName()));
-
-
-			equipletStepBBClient = new BlackboardClient(dbData.getIp());
-			equipletStepBBClient.setDatabase(dbData.getName());
-			equipletStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EquipletStepsBlackBoardName", equipletAgentAID.getLocalName()));
-
-			
+//			serviceStepBBClient = new BlackboardClient(dbData.getIp());
+//			serviceStepBBClient.setDatabase(dbData.getName());
+//			serviceStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ServiceStepsBlackBoardName", equipletAgentAID.getLocalName()));
+//
+//
+//			equipletStepBBClient = new BlackboardClient(dbData.getIp());
+//			equipletStepBBClient.setDatabase(dbData.getName());
+//			equipletStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EquipletStepsBlackBoardName", equipletAgentAID.getLocalName()));
+//
+//			
 			stateBlackboardBBClient = new BlackboardClient("145.89.191.131");
 			stateBlackboardBBClient.setDatabase("StateBlackboardDbName");
 			stateBlackboardBBClient.setCollection("equipletStateCollectionName");
@@ -90,7 +90,7 @@ public class BlackboardUpdated extends Agent implements BlackboardSubscriber {
 					id = dbObject.get("id").toString();
 					state = dbObject.get("state").toString();
 					mode = dbObject.get("mode").toString();
-					Logger.log(LogLevel.DEBUG, "Ari EquipletState State set to: %s%n", state);
+					System.out.println("Ari EquipletState State set to: "+ state);
 					for(BlackboardListener changedListener: updateSubscribers){
 						changedListener.OnEquipleStateChanged(id,state);
 						changedListener.OnEquipleModeChanged(id, mode);
@@ -111,32 +111,32 @@ public class BlackboardUpdated extends Agent implements BlackboardSubscriber {
 //				
 //				break;
 //				
-			case "ServiceStepsBlackboard":
-				dbObject = serviceStepBBClient.findDocumentById(entry.getTargetObjectId());
-				if(dbObject != null) {
-					status = dbObject.get("status").toString();
-					for(BlackboardListener changedListener: updateSubscribers){
-						changedListener.onProcessStateChanged(status);
-					}
-				}
-				break;
-				
-			case "EquipletStepsBlackboard":
-				dbObject = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
-				if(dbObject != null) {
-					status = dbObject.get("status").toString();
-					for(BlackboardListener changedListener: updateSubscribers){
-						changedListener.onProcessStateChanged(status);
-					}
-				}
-				break;		
+//			case "ServiceStepsBlackboard":
+//				dbObject = serviceStepBBClient.findDocumentById(entry.getTargetObjectId());
+//				if(dbObject != null) {
+//					status = dbObject.get("status").toString();
+//					for(BlackboardListener changedListener: updateSubscribers){
+//						changedListener.onProcessStateChanged(status);
+//					}
+//				}
+//				break;
+//				
+//			case "EquipletStepsBlackboard":
+//				dbObject = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
+//				if(dbObject != null) {
+//					status = dbObject.get("status").toString();
+//					for(BlackboardListener changedListener: updateSubscribers){
+//						changedListener.onProcessStateChanged(status);
+//					}
+//				}
+//				break;		
 	
 			default:
 				break;
 			}
 	
 		}catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			Logger.log(LogLevel.ERROR, "", e);
+			//Logger.log(LogLevel.ERROR, "", e);
 		}
 	}
 }
