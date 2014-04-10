@@ -228,7 +228,7 @@ public class HardwareAgent extends Agent implements BlackboardSubscriber, Module
 
 			equipletStepBBClient = new BlackboardClient(dbData.getIp());
 			equipletStepBBClient.setDatabase(dbData.getName());
-			equipletStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletStateCollectionName", "stateBlackBoardName"));
+			equipletStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EquipletStepsBlackBoardName", equipletAgentAID.getLocalName()));
 			equipletStepBBClient.subscribe(stepStatusSubscription);
 
 			equipletStepBBClient.removeDocuments(new BasicDBObject());
