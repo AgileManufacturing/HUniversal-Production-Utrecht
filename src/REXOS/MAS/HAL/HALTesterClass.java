@@ -14,6 +14,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import libraries.knowledgedb_client.KnowledgeException;
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.Logger;
+import HAL.listeners.BlackboardListener;
 import HAL.listeners.HardwareAbstractionLayerListener;
 
 public class HALTesterClass implements HardwareAbstractionLayerListener {
@@ -126,6 +129,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		// TODO Auto-generated method stub
 		hal = new HardwareAbstractionLayer(htc);
 		
+		
 		FileInputStream fis;
 		byte[] content;
 
@@ -188,6 +192,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		/*Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);
 		hal.translateProductStep(productStep);*/
+
 	}
 
 	@Override

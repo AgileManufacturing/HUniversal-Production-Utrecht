@@ -17,10 +17,6 @@ import libraries.blackboard_client.data_classes.OplogEntry;
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
-import org.bson.types.ObjectId;
-
-import sun.org.mozilla.javascript.internal.ast.CatchClause;
-
 import com.mongodb.DBObject;
 
 import configuration.Configuration;
@@ -42,6 +38,7 @@ public class BlackboardUpdated extends Agent implements BlackboardSubscriber {
 
 	public BlackboardUpdated(){
 		updateSubscribers = new ArrayList<BlackboardListener>();
+		
 		Object[] args = getArguments();
 		if(args != null && args.length > 0) {
 			dbData = (DbData) args[0];
@@ -50,22 +47,20 @@ public class BlackboardUpdated extends Agent implements BlackboardSubscriber {
 		}
 			
 		try {
+			
 			serviceStepBBClient = new BlackboardClient(dbData.getIp());
 			serviceStepBBClient.setDatabase(dbData.getName());
-			serviceStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ServiceStepsBlackBoardName", serviceAgentAID.getLocalName()));
-		
+			serviceStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ServiceStepsBlackBoardName", equipletAgentAID.getLocalName()));
+
+
 			equipletStepBBClient = new BlackboardClient(dbData.getIp());
 			equipletStepBBClient.setDatabase(dbData.getName());
 			equipletStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EquipletStepsBlackBoardName", equipletAgentAID.getLocalName()));
-		
-			productStepBBClient = new BlackboardClient(dbData.getIp());
-			productStepBBClient.setDatabase(dbData.getName());
-			productStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ProductstepsBlackBoardName", equipletAgentAID.getLocalName()));
+
 			
-			
-			stateBlackboardBBClient = new BlackboardClient(dbData.getIp());
+			stateBlackboardBBClient = new BlackboardClient("145.89.191.131");
 			stateBlackboardBBClient.setDatabase("StateBlackboardDbName");
-			stateBlackboardBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletStateCollectionName", "stateBlackBoardName"));
+			stateBlackboardBBClient.setCollection("equipletStateCollectionName");
 			
 		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException e) {
 			// TODO Auto-generated catch block
@@ -88,12 +83,14 @@ public class BlackboardUpdated extends Agent implements BlackboardSubscriber {
 		DBObject dbObject;
 		try{
 			switch (entry.getNamespace().split("\\.")[1]) {
+			
 			case "equipletState":
 				dbObject = stateBlackboardBBClient.findDocumentById(entry.getTargetObjectId());
 				if(dbObject != null) {
 					id = dbObject.get("id").toString();
 					state = dbObject.get("state").toString();
 					mode = dbObject.get("mode").toString();
+					Logger.log(LogLevel.DEBUG, "Ari EquipletState State set to: %s%n", state);
 					for(BlackboardListener changedListener: updateSubscribers){
 						changedListener.OnEquipleStateChanged(id,state);
 						changedListener.OnEquipleModeChanged(id, mode);
@@ -102,17 +99,18 @@ public class BlackboardUpdated extends Agent implements BlackboardSubscriber {
 					
 				break;
 				
-			case "ProductStepsBlackboard":
-				dbObject = productStepBBClient.findDocumentById(entry.getTargetObjectId());
-				if(dbObject != null) {
-					status = dbObject.get("status").toString();
-					for(BlackboardListener changedListener: updateSubscribers){
-						changedListener.onProcessStateChanged(status);
-					}
-				}
-				
-				break;
-				
+//			case "ProductStepsBlackboard":
+//				dbObject = productStepBBClient.findDocumentById(entry.getTargetObjectId());
+//				if(dbObject != null) {
+//					status = dbObject.get("status").toString();
+//					Logger.log(LogLevel.DEBUG, "Ari ProductStep status set to: %s%n", status);
+//					for(BlackboardListener changedListener: updateSubscribers){
+//						changedListener.onProcessStateChanged(status);
+//					}
+//				}
+//				
+//				break;
+//				
 			case "ServiceStepsBlackboard":
 				dbObject = serviceStepBBClient.findDocumentById(entry.getTargetObjectId());
 				if(dbObject != null) {
