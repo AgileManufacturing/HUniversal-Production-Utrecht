@@ -32,6 +32,7 @@
 #include <rexos_motor/MotorManager.h>
 #include <rexos_motor/CRD514KD.h>
 #include <rexos_motor/MotorException.h>
+using namespace std;
 
 extern "C"{
 	#include <modbus/modbus.h>
@@ -44,6 +45,7 @@ namespace rexos_motor{
 	void MotorManager::powerOn(void){
 		if(!poweredOn){
 			for(int i = 0; i < motors.size(); ++i){
+				cout << "motor power on" << endl;
 				motors[i]->powerOn();
 			}
 		}

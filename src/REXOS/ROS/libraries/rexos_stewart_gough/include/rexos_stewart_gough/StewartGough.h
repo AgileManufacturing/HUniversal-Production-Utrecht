@@ -42,6 +42,20 @@
 #include <vector>
 
 namespace rexos_stewart_gough{
+	
+	
+	struct MotorMap
+	{
+		int motor;
+		int sensor;
+		
+		MotorMap(int motor = 0, int sensor = 0):
+				motor(motor),
+				sensor(sensor){}
+				
+	};
+	
+	
 	class StewartGough;
 	/**
 	 * A class that symbolizes an entire deltarobot.
@@ -75,8 +89,8 @@ namespace rexos_stewart_gough{
 		void powerOff();
 		void powerOn();
 		rexos_datatypes::Point3D<double>& getEffectorLocation();
-
-	private:
+		MotorMap motorMap[6];
+private:
 		/**
 		 * @var InverseKinematicsModel* kinematics
 		 * A pointer to the kinematics model used by the DeltaRobot.

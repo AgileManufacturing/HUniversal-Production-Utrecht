@@ -89,10 +89,21 @@ namespace rexos_stewart_gough{
 		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_3, *stepperMotorProperties));
 		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_4, *stepperMotorProperties));
 		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_5, *stepperMotorProperties));
+		
+		motorMap[0] = MotorMap(0,3);
+		motorMap[1] = MotorMap(1,2);
+		motorMap[2] = MotorMap(2,1);
+		motorMap[3] = MotorMap(3,0);
+		motorMap[4] = MotorMap(4,4);
+		motorMap[5] = MotorMap(5,5);
 
+		//int motorMap1[][2] = {{1, 2}, {1, 2}};
+		
 		motorManager = new rexos_motor::MotorManager(modbus, motors);
 
         kinematics = new InverseKinematics;
+		
+		ROS_INFO("end of constructor reached");
     }
 
     /**
@@ -214,7 +225,7 @@ namespace rexos_stewart_gough{
         if (result == -1){
             throw std::runtime_error(modbus_strerror(errno));
         }
-        return (sensorRegister ^ 7) & 1 << sensorIndex;
+        return (sensorRegister ^ 63) & 1 << sensorIndex;
     }
 
     /**
@@ -228,13 +239,17 @@ namespace rexos_stewart_gough{
      * @return The amount of motor steps the motor has moved.
      **/
     int StewartGough::moveMotorUntilSensorIsOfValue(int motorIndex, rexos_datatypes::MotorRotation motorRotation, bool sensorValue){
+		ROS_INFO("move Motor Until Sensor Is Of Value...");
         motors[motorIndex]->writeRotationData(motorRotation, 1, false);
 
         int steps = 0;
+		ROS_INFO("check1");
         do {
+			ROS_INFO("check2");
             motors[motorIndex]->startMovement(1);
+			
             steps += (motorRotation.angle / rexos_motor::CRD514KD::MOTOR_STEP_ANGLE);  
-        } while(checkSensor(motorIndex) != sensorValue);
+        } while(checkSensor(motorMap[motorIndex].sensor) != sensorValue);
 
         return steps;
     }
@@ -249,7 +264,36 @@ namespace rexos_stewart_gough{
     * @param motorIndex Index of the motor to be calibrated. When standing in front of the robot looking towards it, 0 is the right motor, 1 is the front motor and 2 is the left motor.
     **/
     void StewartGough::calibrateMotor(int motorIndex){
+       std::cout << "[DEBUG] Calibrating motor number " << motorIndex << std::endl;
+
+        // Setup for incremental motion in big steps, to get to the sensor quickly.
+        motors[motorIndex]->setIncrementalMode(1);
+        rexos_datatypes::MotorRotation motorRotation;
+        motorRotation.angle = -motors.at(motorIndex)->getMicroStepAngle() * calibrationBigStepFactor;
         
+        // Move to the sensor in large steps until it is pushed
+        // actualAngleInSteps keeps track of how many motor steps the motor has moved. This is necessary to avoid accummulating errors.
+        int actualAngleInSteps = moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, true);
+
+        // Move away from the sensor in big steps until it is no longer pushed.
+        motorRotation.angle = -motorRotation.angle;
+        actualAngleInSteps += moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, false);
+        
+        // Move back to the sensor in small steps until it is pushed.
+        motorRotation.angle = -motors.at(motorIndex)->getMicroStepAngle();
+        actualAngleInSteps += moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, true);
+
+		//calculate and set the deviation.
+        //double deviation = (actualAngleInSteps * motors.at(motorIndex)->getMicroStepAngle()) + deltaRobotMeasures->motorFromZeroToTopAngle;
+        //motors[motorIndex]->setDeviationAndWriteMotorLimits(deviation);
+        
+        // Move back to the new 0.
+		
+        motors[motorIndex]->setAbsoluteMode(1);
+        motorRotation.angle = 0;
+        motors[motorIndex]->moveTo(motorRotation, 1);
+
+        motors[motorIndex]->waitTillReady();
     }
 
     /**
@@ -260,7 +304,70 @@ namespace rexos_stewart_gough{
     * @return true if the calibration was succesful. False otherwise (e.g. failure on sensors.)
     **/
     bool StewartGough::calibrateMotors(){       
-        std::cout << "calibration is yet to be implemented" << std::endl; 
+        std::cout << "calibrating" << std::endl;
+		// Check the availability of the sensors
+
+        bool sensorFailure = false;
+		
+		for(int i =0; i < 6; i++){
+			if(checkSensor(i)){
+				std::cerr << "Sensor 0 failure (is the hardware connected?)" << std::endl;
+				sensorFailure = true;
+			}
+		}
+
+        if(sensorFailure){
+            return false;
+        }
+
+        // Return to base! Remove the deviation, we have to find the controller 0 point.
+        rexos_datatypes::MotorRotation motorRotation;
+        motorRotation.speed = 0.1;
+        motorRotation.angle = 0;
+
+
+		for(int i =0; i < 6; i++){
+
+			motors[i]->setDeviationAndWriteMotorLimits(0);
+			//motors[1]->setDeviationAndWriteMotorLimits(0);
+			//motors[2]->setDeviationAndWriteMotorLimits(0);
+
+			motors[i]->writeRotationData(motorRotation, 1);
+			//motors[1]->writeRotationData(motorRotation, 1);
+			//motors[2]->writeRotationData(motorRotation, 1);
+		}
+		
+		motorManager->startMovement(1);
+		
+		
+		for(int i =0; i < 6; i++){
+			
+
+			motors[i]->waitTillReady();
+			//motors[1]->waitTillReady();
+			//motors[2]->waitTillReady();
+
+			// Disable limitations
+			motors[i]->disableAngleLimitations();
+			//motors[1]->disableAngleLimitations();
+			//motors[2]->disableAngleLimitations();
+			
+			// Calibrate motors
+			calibrateMotor(i);
+			//calibrateMotor(1);
+			//calibrateMotor(2);
+
+			// Enable angle limitations
+			motors[i]->enableAngleLimitations();
+			//motors[1]->enableAngleLimitations();
+			//motors[2]->enableAngleLimitations();
+		}
+		
+        effectorLocation.x = 0;
+        effectorLocation.y = 0;
+        effectorLocation.z = 0; // yet to be set
+        std::cout << "[DEBUG] effector location z: " << effectorLocation.z << std::endl; 
+		
         return true;
     }
 
@@ -277,6 +384,7 @@ namespace rexos_stewart_gough{
      * Turns on the stewart gough's hardware.
      **/
     void StewartGough::powerOn(void){
+		ROS_INFO("powering motors on");
         if(!motorManager->isPoweredOn()){
             motorManager->powerOn();
         }

@@ -68,21 +68,25 @@ namespace rexos_motor {
 	 **/
 	void StepperMotor::powerOn(void){
 		if(!poweredOn){
+			
 			//Reset alarm
+			std::cout << "motor index: ";
+			std::cout << motorIndex << std::endl;
+			
 			modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 0);
 			modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 1);
 			modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 0);
-
+			std::cout << "i did reset alarm" << std::endl;
 			// Set operating modes
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, 0);
-
+			std::cout << "I did set operating modes" << std::endl;
 			// set modes for all used motion slots
 			for(int i = 0; i < CRD514KD::MOTION_SLOTS_USED; i++){
 				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_POSMODE + i, 1);
 				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_OPMODE + i, 0);
 				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SEQ_MODE + i, 1);
 			}
-
+			std::cout << "i did set modes for all used slots" << std::endl;
 			// Excite motor
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 			
@@ -218,17 +222,21 @@ namespace rexos_motor {
 	 * Start the motor to move according to the set registers. Will wait for the motor to be ready before moving.
 	 **/
 	void StepperMotor::startMovement(int motionSlot){
+		
+		std::cout << "Im at the start";
 		checkMotionSlot(motionSlot);
+		std::cout << "I did check motion slot fk tom";
 		if(!poweredOn){
 			throw MotorException("motor drivers are not powered on");
 		}
-
 		// Execute motion.
 		waitTillReady();
-
+		std::cout << "wait to ready has ended";
+		
 		modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
 		modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 		updateAngle();
+		std::cout << "Im at the end jow";
 	}
 
 	/**
@@ -237,6 +245,7 @@ namespace rexos_motor {
 	void StepperMotor::waitTillReady(void){
 		uint16_t status_1;
 		while(!((status_1 = modbus->readU16(motorIndex, CRD514KD::Registers::STATUS_1)) & CRD514KD::Status1Bits::READY)){
+			std::cout << "test" << std::endl;
 			if((status_1 & CRD514KD::Status1Bits::ALARM) || (status_1 & CRD514KD::Status1Bits::WARNING)){
 				std::cerr << "Motor: " << motorIndex << " Alarm code: " << std::hex << modbus->readU16(motorIndex, CRD514KD::Registers::PRESENT_ALARM) << "h" << std::endl;
 

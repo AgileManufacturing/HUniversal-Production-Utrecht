@@ -224,10 +224,11 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToRelativePoint(double x, 
 void stewartGoughNodeNamespace::StewartGoughNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Setup transition called");
 	// Generate the effector boundaries with voxel size 2
-	stewartGough->generateBoundaries(2);
+	//stewartGough->generateBoundaries(2);
 	// Power on the deltarobot and calibrate the motors.
 	stewartGough->powerOn();
 	// Calibrate the motors
+
 	if(!stewartGough->calibrateMotors()){
 		ROS_ERROR("Calibration FAILED. EXITING.");
 			as->setAborted();
