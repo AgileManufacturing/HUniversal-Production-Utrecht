@@ -23,6 +23,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static HALTesterClass htc = new HALTesterClass();
 	static ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 	static HardwareAbstractionLayer hal;
+	static BlackboardUpdated blackboardUpdated;
 	
 	static String moduleA_01 = "{"
 			+ "	\"manufacturer\":\"manA\","
@@ -127,12 +128,13 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	 */
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
-		//hal = new HardwareAbstractionLayer(htc);
+		hal = new HardwareAbstractionLayer(htc);
 		BlackboardListener blackboardListener = new BlackboardListener() {
 			
 			@Override
-			public void onProcessStateChanged(String state) {
+			public void onProcessStatusChanged(String status) {
 				// TODO Auto-generated method stub
+				System.out.println("New Process Status = "+ status);
 				
 			}
 			
@@ -151,18 +153,26 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			@Override
 			public void OnEquipleStateChanged(String id, String state) {
 				// TODO Auto-generated method stub
+				System.out.println("New State of EQ "+id + " = "+ state);
 				
 			}
 			
 			@Override
 			public void OnEquipleModeChanged(String id, String mode) {
 				// TODO Auto-generated method stub
+				System.out.println("New mode of EQ "+id + " = "+ mode);
 				
 			}
 		};
 		
-		BlackboardUpdated blackboardUpdated = new BlackboardUpdated();
+		blackboardUpdated = new BlackboardUpdated();
 		blackboardUpdated.setOnBlackBoardUpdatedListener(blackboardListener);
+//		while(true){
+//			System.out.println("Waiting on status change");
+//			Thread.sleep(4000);
+//		}
+		
+		
 		
 		
 //		FileInputStream fis;

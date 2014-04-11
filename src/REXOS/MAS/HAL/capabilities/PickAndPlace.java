@@ -23,6 +23,8 @@ import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 
 public class PickAndPlace extends Capability {
+	private static final int MAX_ACCELERATION = 30;
+	
 	public PickAndPlace(ModuleFactory moduleFactory) {
 		super(moduleFactory, "PickAndPlace");
 	}
@@ -40,14 +42,20 @@ public class PickAndPlace extends Capability {
 		if(serviceName.equals("place")){
 			JsonObject pickCommand = new JsonObject();
 			JsonObject placeCommand = new JsonObject();
+			JsonObject subjectMoveCommand = subjects.getAsJsonArray().get(0).getAsJsonObject().get("move").getAsJsonObject();
+			
+			subjectMoveCommand.addProperty("maxAcceleration", MAX_ACCELERATION);
 			
 			pickCommand.addProperty("pick" , "null");
-			pickCommand.add("move" ,  subjects.getAsJsonArray().get(0).getAsJsonObject().get("move"));
+			pickCommand.add("move" ,  subjectMoveCommand);
+			
 			//pickCommand.add("rotation", subjects.getAsJsonArray().get(0).getAsJsonObject().get("rotation"));
 			CompositeStep pick = new CompositeStep(productStep, pickCommand);
 			
+			subjectMoveCommand = target.getAsJsonObject().get("move").getAsJsonObject();
+			subjectMoveCommand.addProperty("maxAcceleration", MAX_ACCELERATION);
 			placeCommand.addProperty("place", "null");
-			placeCommand.add("move" ,  target.getAsJsonObject().get("move"));
+			placeCommand.add("move" ,  subjectMoveCommand);
 			//placeCommand.add("rotation", target.getAsJsonObject().get("rotation"));
 			CompositeStep place = new CompositeStep(productStep, placeCommand);
 			

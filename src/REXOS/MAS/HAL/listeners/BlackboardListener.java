@@ -4,9 +4,9 @@ package HAL.listeners;
 
 public interface BlackboardListener {
 	
-	public void OnEquipleStateChanged(String id, String state);
-	public void OnEquipleModeChanged(String id, String mode);
-	public void onProcessStateChanged(String state);
+	public void OnEquipleStateChanged(String equipletName, String state);
+	public void OnEquipleModeChanged(String equipletName, String mode);
+	public void onProcessStatusChanged(String status);
 	public void onModuleStateChanged(String state);
 	public void onModuleModeChanged(String mode);
 

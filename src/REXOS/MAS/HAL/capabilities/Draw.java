@@ -20,6 +20,7 @@ import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 
 public class Draw extends Capability {
+	private static final int MAX_ACCELERATION = 50;
 	
 	public Draw(ModuleFactory moduleFactory) {
 		super(moduleFactory, "Draw");
@@ -38,13 +39,19 @@ public class Draw extends Capability {
 		if(serviceName.equals("draw")){
 			JsonObject moveCommand = new JsonObject();
 			JsonObject drawCommand = new JsonObject();
+			JsonObject subjectMoveCommand =target.getAsJsonObject().get("move").getAsJsonArray().getAsJsonObject();
+			
+			subjectMoveCommand.addProperty("maxAcceleration", MAX_ACCELERATION);
 			
 			moveCommand.addProperty("move", "null");
-			moveCommand.add("move", target.getAsJsonObject().get("move").getAsJsonArray());	
+			moveCommand.add("move", subjectMoveCommand);	
 			CompositeStep move = new CompositeStep(productStep, moveCommand);
 			
+			subjectMoveCommand = target.getAsJsonObject().get("draw").getAsJsonArray().getAsJsonObject();
+			subjectMoveCommand.addProperty("maxAcceleration", MAX_ACCELERATION);
+			
 			drawCommand.addProperty("draw", "null");
-			moveCommand.add("draw", target.getAsJsonObject().get("draw").getAsJsonArray());
+			moveCommand.add("draw", subjectMoveCommand);
 			CompositeStep draw = new CompositeStep(productStep, drawCommand);
 		
 			ArrayList<ModuleActor> modules = moduleFactory.getBottomModuleActors();

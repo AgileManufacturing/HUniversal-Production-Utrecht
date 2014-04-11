@@ -72,7 +72,7 @@ public class Logger {
 	public static final File logFile = new File("log.txt");
 	
 	static {
-		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
+		String msgsFilePath = "/bin";
 		File dir = new File (msgsFilePath);
 		if(dir.exists()) {
 			System.out.println("Log Directory detected - Removing old log files");

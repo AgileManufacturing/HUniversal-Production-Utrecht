@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class Configuration {
-	private static String propertiesFilePath = System.getenv("PROPERTIESPATH");
+	private static String propertiesFilePath ="src/REXOS/MAS/configuration/";
 	
 	public static String getProperty(ConfigurationFiles File, String key)
 	{
