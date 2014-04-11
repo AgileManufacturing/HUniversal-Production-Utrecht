@@ -54,40 +54,43 @@ public class PickAndPlace extends Capability {
 		if(serviceName.equals("place")){
 			JsonObject pickCommand = new JsonObject();
 			JsonObject placeCommand = new JsonObject();
-			JsonObject subjectMoveCommand = subjects.getAsJsonArray().get(0).getAsJsonObject().get("move").getAsJsonObject();
-			
-			subjectMoveCommand.addProperty("maxAcceleration", MAX_ACCELERATION);
-			
-			pickCommand.addProperty("pick" , "null");
-			pickCommand.add("move" ,  subjectMoveCommand);
-			
-			//pickCommand.add("rotation", subjects.getAsJsonArray().get(0).getAsJsonObject().get("rotation"));
-			CompositeStep pick = new CompositeStep(productStep, pickCommand);
-			
-			subjectMoveCommand = target.getAsJsonObject().get("move").getAsJsonObject();
-			subjectMoveCommand.addProperty("maxAcceleration", MAX_ACCELERATION);
-			placeCommand.addProperty("place", "null");
-			placeCommand.add("move" ,  subjectMoveCommand);
-			//placeCommand.add("rotation", target.getAsJsonObject().get("rotation"));
-			CompositeStep place = new CompositeStep(productStep, placeCommand);
-			
-
-			ArrayList<ModuleActor> modules = moduleFactory.getBottomModulesForFunctionalModuleTree(this, 1);
-			
-			for (ModuleActor moduleActor : modules) {
-				try {
-					
-					hardwareSteps.addAll(moduleActor.translateCompositeStep(pick));
-					hardwareSteps.addAll(moduleActor.translateCompositeStep(place));
-					
-				} catch (ModuleTranslatingException e) {
-					
-					throw new CapabilityException(e.toString());
-				}
+			for(int i = 0; i<subjects.getAsJsonArray().size();i++){
+				JsonObject subjectMoveCommand = subjects.getAsJsonArray().get(i).getAsJsonObject().get("move").getAsJsonObject();
 				
-			}
+				subjectMoveCommand.addProperty("maxAcceleration", MAX_ACCELERATION);
+				
+				pickCommand.addProperty("pick" , "null");
+				pickCommand.add("move" ,  subjectMoveCommand);
+				
+				//pickCommand.add("rotation", subjects.getAsJsonArray().get(0).getAsJsonObject().get("rotation"));
+				CompositeStep pick = new CompositeStep(productStep, pickCommand);
+				
+				subjectMoveCommand = target.getAsJsonObject().get("move").getAsJsonObject();
+				subjectMoveCommand.addProperty("maxAcceleration", MAX_ACCELERATION);
+				placeCommand.addProperty("place", "null");
+				placeCommand.add("move" ,  subjectMoveCommand);
+				//placeCommand.add("rotation", target.getAsJsonObject().get("rotation"));
+				CompositeStep place = new CompositeStep(productStep, placeCommand);
+				
 
+				ArrayList<ModuleActor> modules = moduleFactory.getBottomModulesForFunctionalModuleTree(this, 1);
+				
+				for (ModuleActor moduleActor : modules) {
+					try {
+						
+						hardwareSteps.addAll(moduleActor.translateCompositeStep(pick));
+						hardwareSteps.addAll(moduleActor.translateCompositeStep(place));
+						
+					} catch (ModuleTranslatingException e) {
+						
+						throw new CapabilityException(e.toString());
+					}
+					
+				}
+
+			}
 		}
+			
 		return hardwareSteps;
 	}
 
