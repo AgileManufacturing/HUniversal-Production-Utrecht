@@ -184,7 +184,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(double x, double y
 
 	if(stewartGough->checkPath(oldLocation, newLocation)){
 
-		stewartGough->moveTo(newLocation, maxAcceleration);
+		//stewartGough->moveTo(newLocation, maxAcceleration);
 
 		return true;
 	}
