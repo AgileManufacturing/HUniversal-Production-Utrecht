@@ -22,13 +22,25 @@ import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 
+/**
+ * 
+ * @author Aristides Ayala Mendoza
+ *
+ */
 public class PickAndPlace extends Capability {
 	private static final int MAX_ACCELERATION = 30;
 	
+	/**
+	 * 
+	 * @param moduleFactory
+	 */
 	public PickAndPlace(ModuleFactory moduleFactory) {
 		super(moduleFactory, "PickAndPlace");
 	}
 
+	/**
+	 * @see Capability#translateProductStep(ProductStep)
+	 */
 	@Override
 	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws FactoryException, JarFileLoaderException, CapabilityException {
 		// TODO Auto-generated method stub

@@ -88,7 +88,7 @@ class OplogMonitorThread extends Thread {
 		database = mongo.getDB(oplogDBName);
 		DBCollection collection = database.getCollection(oplogCollectionName);
 		
-		tailedCursor = collection.find();
+		tailedCursor = collection.find(query);
 		tailedCursor.addOption(Bytes.QUERYOPTION_TAILABLE);
 		tailedCursor.addOption(Bytes.QUERYOPTION_AWAITDATA);
 		tailedCursor.skip(tailedCursor.size());

@@ -3,6 +3,7 @@ package HAL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import HAL.exceptions.BlackboardUpdateException;
 import HAL.listeners.BlackboardListener;
 import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.BlackboardSubscriber;
@@ -12,34 +13,39 @@ import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.blackboard_client.data_classes.MongoOperation;
 import libraries.blackboard_client.data_classes.OplogEntry;
 import libraries.blackboard_client.data_classes.FieldUpdateSubscription.MongoUpdateLogOperation;
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.Logger;
+
 import com.mongodb.DBObject;
 
+import configuration.Configuration;
+import configuration.ConfigurationFiles;
+
+
+/**
+ * 
+ * @author Aristides Ayala Mendoza
+ *
+ */
 public class BlackboardUpdated implements BlackboardSubscriber {
+	
 	private ArrayList<BlackboardListener> updateSubscribers;
-	private BlackboardClient equipletStepBBClient;
 	private BlackboardClient stateBlackboardBBClient;
+	private BlackboardClient modeBlackboardBBClient;
 	private FieldUpdateSubscription stateSubscription;
 	private FieldUpdateSubscription modeSubscription;
-	private BlackboardClient modeBlackboardBBClient;
+	private String equipletName = null;
+	private String state = null;
+	private String mode = null;
 	
-	String equipletName = null;
-	String state = null;
-	String mode = null;
-	String status;
-
-	private FieldUpdateSubscription statusSubscription;
-
-	public BlackboardUpdated(){
+	/**
+	 * @throws BlackboardUpdateException 
+	 * 
+	 */
+	public BlackboardUpdated() throws BlackboardUpdateException{
 		updateSubscribers = new ArrayList<BlackboardListener>();
 			
 		try {
-			
-//			serviceStepBBClient = new BlackboardClient(dbData.getIp());
-//			serviceStepBBClient.setDatabase(dbData.getName());
-//			serviceStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ServiceStepsBlackBoardName", equipletAgentAID.getLocalName()));
-//
-			statusSubscription = new FieldUpdateSubscription("status", this);
-			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 			
 			stateSubscription = new FieldUpdateSubscription("state", this);
 			stateSubscription.addOperation(MongoUpdateLogOperation.SET);
@@ -47,33 +53,37 @@ public class BlackboardUpdated implements BlackboardSubscriber {
 			modeSubscription = new FieldUpdateSubscription("mode", this);
 			modeSubscription.addOperation(MongoUpdateLogOperation.SET);
 			
-			equipletStepBBClient = new BlackboardClient("145.89.191.131");
-			equipletStepBBClient.setDatabase("EQ1");
-			equipletStepBBClient.setCollection("EquipletStepsBlackBoard");
-			equipletStepBBClient.subscribe(statusSubscription);
 			
-			stateBlackboardBBClient = new BlackboardClient("145.89.191.131");
-			stateBlackboardBBClient.setDatabase("StateBlackboard");
-			stateBlackboardBBClient.setCollection("equipletState");
+			stateBlackboardBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"));
+			stateBlackboardBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "stateBlackBoardName"));
+			stateBlackboardBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletStateCollectionName"));
 			stateBlackboardBBClient.subscribe(stateSubscription);
 			
-			modeBlackboardBBClient = new BlackboardClient("145.89.191.131");
-			modeBlackboardBBClient.setDatabase("StateBlackboard");
-			modeBlackboardBBClient.setCollection("equipletState");
+			modeBlackboardBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"));
+			modeBlackboardBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "stateBlackBoardName"));
+			modeBlackboardBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletStateCollectionName"));
 			modeBlackboardBBClient.subscribe(modeSubscription);
 
 			
 		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new BlackboardUpdateException(e.toString());
 		}
 	}
+	
 
+	/**
+	 * 
+	 * @param blackboardListener
+	 */
 	public void setOnBlackBoardUpdatedListener(BlackboardListener blackboardListener){
 		updateSubscribers.add(blackboardListener);
 		
 	}
 
+	/**
+	 * @see BlackboardSubscriber#onMessage(MongoOperation, OplogEntry)
+	 */
 	@Override
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
 		// TODO Auto-generated method stub
@@ -93,55 +103,21 @@ public class BlackboardUpdated implements BlackboardSubscriber {
 						mode = dbObject.get("mode").toString();
 					}	
 					for(BlackboardListener changedListener: updateSubscribers){
-						changedListener.OnEquipleStateChanged(equipletName,state);
-						changedListener.OnEquipleModeChanged(equipletName, mode);
+						changedListener.OnEquipletStateChanged(equipletName,state);
+						changedListener.OnEquipletModeChanged(equipletName, mode);
 					}
 				}
 					
 				break;
 				
-//			case "ProductStepsBlackboard":
-//				dbObject = productStepBBClient.findDocumentById(entry.getTargetObjectId());
-//				if(dbObject != null) {
-//					status = dbObject.get("status").toString();
-//					Logger.log(LogLevel.DEBUG, "Ari ProductStep status set to: %s%n", status);
-//					for(BlackboardListener changedListener: updateSubscribers){
-//						changedListener.onProcessStateChanged(status);
-//					}
-//				}
-//				
-//				break;
-//				
-//			case "ServiceStepsBlackboard":
-//				dbObject = serviceStepBBClient.findDocumentById(entry.getTargetObjectId());
-//				if(dbObject != null) {
-//					status = dbObject.get("status").toString();
-//					for(BlackboardListener changedListener: updateSubscribers){
-//						changedListener.onProcessStateChanged(status);
-//					}
-//				}
-//				break;
-//				
-			case "EquipletStepsBlackBoard":
-				dbObject = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
-				if(dbObject != null) {
-					status = dbObject.get("status").toString();
-					for(BlackboardListener changedListener: updateSubscribers){
-						changedListener.onProcessStatusChanged(status);
-					}
-				}
-				break;		
-	
+
 			default:
 				break;
 			}
 	
 		}catch(InvalidDBNamespaceException | GeneralMongoException e) {
-			//Logger.log(LogLevel.ERROR, "", e);
+			Logger.log(LogLevel.ERROR, "", e);
 		}
 	}
-	public void test(){
-		updateSubscribers.get(0).OnEquipleStateChanged("1","test");
-		updateSubscribers.get(0).OnEquipleModeChanged("1","mode test");
-	}
+
 }

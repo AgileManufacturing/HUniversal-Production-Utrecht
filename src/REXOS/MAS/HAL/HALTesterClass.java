@@ -151,26 +151,29 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			}
 			
 			@Override
-			public void OnEquipleStateChanged(String id, String state) {
+			public void OnEquipletStateChanged(String id, String state) {
 				// TODO Auto-generated method stub
 				System.out.println("New State of EQ "+id + " = "+ state);
 				
 			}
 			
 			@Override
-			public void OnEquipleModeChanged(String id, String mode) {
+			public void OnEquipletModeChanged(String id, String mode) {
 				// TODO Auto-generated method stub
 				System.out.println("New mode of EQ "+id + " = "+ mode);
+				
+			}
+
+			@Override
+			public void OnEquipletIpChanged(String ip) {
+				// TODO Auto-generated method stub
 				
 			}
 		};
 		
 		blackboardUpdated = new BlackboardUpdated();
 		blackboardUpdated.setOnBlackBoardUpdatedListener(blackboardListener);
-//		while(true){
-//			System.out.println("Waiting on status change");
-//			Thread.sleep(4000);
-//		}
+
 		
 		
 		

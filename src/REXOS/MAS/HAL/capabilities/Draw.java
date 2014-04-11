@@ -19,13 +19,26 @@ import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 
+/**
+ * 
+ * @author Aristides Ayala Mendoza
+ *
+ */
 public class Draw extends Capability {
 	private static final int MAX_ACCELERATION = 50;
 	
+	
+	/**
+	 * 
+	 * @param moduleFactory
+	 */
 	public Draw(ModuleFactory moduleFactory) {
 		super(moduleFactory, "Draw");
 	}
 
+	/**
+	 * @see Capability#translateProductStep(ProductStep)
+	 */
 	@Override
 	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep)
 			throws CapabilityException, FactoryException, JarFileLoaderException {
