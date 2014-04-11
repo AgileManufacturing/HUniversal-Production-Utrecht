@@ -102,12 +102,12 @@ namespace rexos_stewart_gough{
 		motorManager = new rexos_motor::MotorManager(modbus, motors);
 
         kinematics = new InverseKinematics;
-
 		
 		ROS_INFO("end of constructor reached");
 
 		ROS_INFO("Reached the end of the constructor");
-
+		ROS_INFO("end of constructor reached");
+		ROS_INFO("Reached the end of the constructor");
     }
 
     /**
@@ -247,11 +247,8 @@ namespace rexos_stewart_gough{
         motors[motorIndex]->writeRotationData(motorRotation, 1, false);
 
         int steps = 0;
-		ROS_INFO("check1");
         do {
-			ROS_INFO("check2");
             motors[motorIndex]->startMovement(1);
-			
             steps += (motorRotation.angle / rexos_motor::CRD514KD::MOTOR_STEP_ANGLE);  
         } while(checkSensor(motorMap[motorIndex].sensor) != sensorValue);
 
@@ -286,11 +283,14 @@ namespace rexos_stewart_gough{
         // Move back to the sensor in small steps until it is pushed.
         motorRotation.angle = -motors.at(motorIndex)->getMicroStepAngle();
         actualAngleInSteps += moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, true);
-
+		
+		std::cout << "actual steps: " << std::endl;
+		std::cout << actualAngleInSteps << std::endl;
 		//calculate and set the deviation.
-        //double deviation = (actualAngleInSteps * motors.at(motorIndex)->getMicroStepAngle()) + deltaRobotMeasures->motorFromZeroToTopAngle;
-        //motors[motorIndex]->setDeviationAndWriteMotorLimits(deviation);
-        
+		//std::cout << stewartGoughMeasures->motorFromZeroToTopAngle << std::endl;
+        double deviation = (actualAngleInSteps * motors.at(motorIndex)->getMicroStepAngle()) + stewartGoughMeasures->motorFromZeroToTopAngle;
+        std::cout << "passed 1" << std::endl;
+		motors[motorIndex]->setDeviationAndWriteMotorLimits(deviation);
         // Move back to the new 0.
 		
         motors[motorIndex]->setAbsoluteMode(1);
@@ -331,40 +331,21 @@ namespace rexos_stewart_gough{
 
 
 		for(int i =0; i < 6; i++){
-
 			motors[i]->setDeviationAndWriteMotorLimits(0);
-			//motors[1]->setDeviationAndWriteMotorLimits(0);
-			//motors[2]->setDeviationAndWriteMotorLimits(0);
-
 			motors[i]->writeRotationData(motorRotation, 1);
-			//motors[1]->writeRotationData(motorRotation, 1);
-			//motors[2]->writeRotationData(motorRotation, 1);
 		}
 		
 		motorManager->startMovement(1);
 		
 		
 		for(int i =0; i < 6; i++){
-			
-
 			motors[i]->waitTillReady();
-			//motors[1]->waitTillReady();
-			//motors[2]->waitTillReady();
-
 			// Disable limitations
 			motors[i]->disableAngleLimitations();
-			//motors[1]->disableAngleLimitations();
-			//motors[2]->disableAngleLimitations();
-			
 			// Calibrate motors
 			calibrateMotor(i);
-			//calibrateMotor(1);
-			//calibrateMotor(2);
-
 			// Enable angle limitations
 			motors[i]->enableAngleLimitations();
-			//motors[1]->enableAngleLimitations();
-			//motors[2]->enableAngleLimitations();
 		}
 		
         effectorLocation.x = 0;

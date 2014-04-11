@@ -223,20 +223,17 @@ namespace rexos_motor {
 	 **/
 	void StepperMotor::startMovement(int motionSlot){
 		
-		std::cout << "Im at the start";
+
 		checkMotionSlot(motionSlot);
-		std::cout << "I did check motion slot fk tom";
 		if(!poweredOn){
 			throw MotorException("motor drivers are not powered on");
 		}
 		// Execute motion.
 		waitTillReady();
-		std::cout << "wait to ready has ended";
 		
 		modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
 		modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 		updateAngle();
-		std::cout << "Im at the end jow";
 	}
 
 	/**
@@ -245,9 +242,7 @@ namespace rexos_motor {
 	void StepperMotor::waitTillReady(void){
 		uint16_t status_1;
 		while(!((status_1 = modbus->readU16(motorIndex, CRD514KD::Registers::STATUS_1)) & CRD514KD::Status1Bits::READY)){
-			std::cout << "test" << std::endl;
 			if((status_1 & CRD514KD::Status1Bits::ALARM) || (status_1 & CRD514KD::Status1Bits::WARNING)){
-				std::cerr << "Motor: " << motorIndex << " Alarm code: " << std::hex << modbus->readU16(motorIndex, CRD514KD::Registers::PRESENT_ALARM) << "h" << std::endl;
 
 				throw CRD514KDException(motorIndex, status_1 & CRD514KD::Status1Bits::WARNING, status_1 & CRD514KD::Status1Bits::ALARM);
 			}

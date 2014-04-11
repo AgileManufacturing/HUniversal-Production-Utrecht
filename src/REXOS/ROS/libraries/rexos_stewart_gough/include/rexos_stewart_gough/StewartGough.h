@@ -89,6 +89,9 @@ namespace rexos_stewart_gough{
 		void powerOff();
 		void powerOn();
 		rexos_datatypes::Point3D<double>& getEffectorLocation();
+		
+		// the inital motors and sensors are positioned on the wrong locations
+		// this is used to map them on the right locations
 		MotorMap motorMap[6];
 private:
 		/**
@@ -97,8 +100,8 @@ private:
 		 **/
 		InverseKinematics* kinematics;
 
-		rexos_datatypes::StewartGoughMeasures* stewartGoughMeasures;
-		rexos_motor::StepperMotorProperties* stepperMotorProperties;
+		rexos_datatypes::StewartGoughMeasures * stewartGoughMeasures;
+		rexos_motor::StepperMotorProperties * stepperMotorProperties;
 	
 		int calibrationBigStepFactor;
 		/**

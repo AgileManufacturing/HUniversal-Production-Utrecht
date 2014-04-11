@@ -42,7 +42,7 @@ insert into ModuleType(
 	\"midPointX\" : 75.0,
 	\"midPointY\" : -200.0,
 	\"midPointZ\" : -35.3,
-	\"deltaRobotMeasures\" : {
+	\"stewartGoughMeasures\" : {
 		\"baseRadius\" : 101.3,
 		\"hipLength\" : 100.0,
 		\"effectorRadius\" : 46.19,
