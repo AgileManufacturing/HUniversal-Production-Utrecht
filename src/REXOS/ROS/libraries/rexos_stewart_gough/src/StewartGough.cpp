@@ -102,12 +102,12 @@ namespace rexos_stewart_gough{
 		motorManager = new rexos_motor::MotorManager(modbus, motors);
 
         kinematics = new InverseKinematics;
-<<<<<<< HEAD
+
 		
 		ROS_INFO("end of constructor reached");
-=======
+
 		ROS_INFO("Reached the end of the constructor");
->>>>>>> 98831652dc41662521587ab9abb9de3ffcf89903
+
     }
 
     /**
