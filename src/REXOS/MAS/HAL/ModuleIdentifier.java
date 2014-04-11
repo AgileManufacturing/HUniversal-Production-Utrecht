@@ -1,5 +1,7 @@
 package HAL;
 
+import com.google.gson.JsonObject;
+
 public class ModuleIdentifier {
 	private String manufacturer;
 	private String typeNumber;
@@ -19,5 +21,13 @@ public class ModuleIdentifier {
 	}
 	public String getSerialNumber(){
 		return this.serialNumber;
+	}
+	
+	public JsonObject getAsJSON(){
+		JsonObject moduleIdentifier = new JsonObject();
+		moduleIdentifier.addProperty("manufacturer", manufacturer);
+		moduleIdentifier.addProperty("typeNumber", typeNumber);
+		moduleIdentifier.addProperty("serialNumber", serialNumber);
+		return moduleIdentifier;
 	}
 }

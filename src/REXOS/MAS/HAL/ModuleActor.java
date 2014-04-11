@@ -59,9 +59,7 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 		}
 	}
 	
-	protected ArrayList<HardwareStep> forwardCompositeStep(CompositeStep compositeStep, JsonObject command) throws ModuleTranslatingException, FactoryException, JarFileLoaderException{
-		System.out.println("Forwarding compositeStep: "+command.toString());
-		
+	protected ArrayList<HardwareStep> forwardCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException{
 		ModuleActor moduleActor = null;
 		moduleActor = (ModuleActor) getParentModule();
 		if (moduleActor != null){
@@ -69,14 +67,17 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 		}
 		else { //Root module, no more parents			
 			//Check for remaining commands, then not capable
-			if (!command.toString().trim().equalsIgnoreCase("{}")){
+			if (!compositeStep.getCommand().toString().trim().equalsIgnoreCase("{}")){
 				throw new ModuleTranslatingException("The compositestep isn't completely empty.");
 			}
 			return null;
 		}
 	}
 	
-	abstract public void executeHardwareStep(HardwareStep hardwareStep) throws ModuleExecutingException;
+	public void executeHardwareStep(HardwareStep hardwareStep) throws ModuleExecutingException{
+		JsonObject command = hardwareStep.getCommand();
+		executeMongoCommand(command.toString());
+	}
 	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException;
 	
 	public void onHardwareStepChanged(String state, long hardwareStepSerialId) throws HardwareAbstractionLayerProcessException{

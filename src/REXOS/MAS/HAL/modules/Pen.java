@@ -3,7 +3,6 @@ package HAL.modules;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import libraries.blackboard_client.data_classes.GeneralMongoException;
@@ -17,17 +16,11 @@ import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 
-public class Gripper extends ModuleActor {
+public class Pen extends ModuleActor {
 	//Gonna be loaded from KDB:
-	private static final double GRIPPER_SIZE = 18.24; // in cm
-	
-	private static final String ACTIVATE = "activate";
-	private static final String DEACTIVATE = "deactivate";
-	private static final String PICK = "pick";
-	private static final String PLACE = "place";
+	private static final double PEN_SIZE = 96.6; // in cm
 
-	
-	public Gripper(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory) throws KnowledgeException, UnknownHostException, GeneralMongoException {
+	public Pen(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory) throws KnowledgeException, UnknownHostException, GeneralMongoException {
 		super(moduleIdentifier, moduleFactory);
 	}
 
@@ -36,27 +29,13 @@ public class Gripper extends ModuleActor {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 		
 		JsonObject command = compositeStep.getCommand();
-		command = adjustMoveWithDimentions(command, GRIPPER_SIZE);
-		JsonElement pick = command.remove(PICK);
-		JsonElement place = command.remove(PLACE);
+		command = adjustMoveWithDimentions(command, PEN_SIZE);
+		command.addProperty("forceStraightLine", true);
 		
 		compositeStep = new CompositeStep(compositeStep.getProductStep(),command);		
 		ArrayList<HardwareStep> hStep = forwardCompositeStep(compositeStep);
 		if (hStep != null)
 			hardwareSteps.addAll(hStep);
-		
-		//Set hardwareSteps
-		if (pick != null || place != null){
-			JsonObject hardwareCommand = new JsonObject();
-			if (pick != null){
-				hardwareCommand.addProperty(COMMAND, ACTIVATE);
-			}
-			else{
-				hardwareCommand.addProperty(COMMAND, DEACTIVATE);
-			}
-			
-			hardwareSteps.add(new HardwareStep(compositeStep,hardwareCommand,moduleIdentifier));
-		}
 		
 		return hardwareSteps;
 	}
