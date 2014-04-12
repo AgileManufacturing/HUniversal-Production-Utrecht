@@ -52,7 +52,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(std::string equipletName
 		deltaRobot(NULL),
 		setInstructionActionServer(
 				nodeHandle, 
-				moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() + "/set_instruction", 
+				equipletName + "/" + moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() + "/set_instruction", 
 				boost::bind(&deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction, this, _1), 
 				false),
 		lastX(0.0),

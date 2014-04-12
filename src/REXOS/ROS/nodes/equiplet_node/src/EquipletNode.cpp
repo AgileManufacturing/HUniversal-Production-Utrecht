@@ -114,12 +114,16 @@ EquipletNode::~EquipletNode(){
  * @param json The message parsed in the json format
  **/
 void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) {
+std::cout << "A" << std::endl;
 	mongo::OID targetObjectId;
 	oplogEntry.getTargetObjectId(targetObjectId);
 
+std::cout << "B" << std::endl;
 	if(&subscription == equipletStepSubscription || &subscription == directEquipletStepSubscription) {
 		JSONNode n = libjson::parse(equipletStepBlackboardClient->findDocumentById(targetObjectId).jsonString());
+std::cout << "C" << n.write_formatted() << std::endl;
 	    rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
+std::cout << "C" << step->toJSONString() << std::endl;
 	    //We only need to handle the step if its status is 'WAITING'
 	    if (step->getStatus().compare("WAITING") == 0) {
 	    	std::cout << "handling step: " << n.write_formatted() << std::endl;
@@ -135,15 +139,17 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 }
 
 void EquipletNode::handleEquipletStep(rexos_datatypes::EquipletStep * step, mongo::OID targetObjectId){
-	
+std::cout << "1" << std::endl;
 	rexos_statemachine::Mode currentMode = getCurrentMode();
 	if (currentMode == rexos_statemachine::MODE_NORMAL) {
+std::cout << "2" << std::endl;
 
 		rexos_statemachine::State currentState = getCurrentState();
 		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
 			
 			rexos_datatypes::InstructionData instructionData = step->getInstructionData();
 
+std::cout << "3" << std::endl;
 						//we need to call the lookup handler first
 			if(instructionData.getLook_up().length() > 0 && instructionData.getLook_up().compare("NULL") != 0) {
 				std::cout << "Calling lookuphandler" << std::endl;
@@ -151,11 +157,21 @@ void EquipletNode::handleEquipletStep(rexos_datatypes::EquipletStep * step, mong
 				instructionData.setPayload(newPayload);
 			}
 			
+std::cout << "4 " << step->getModuleIdentifier().toString() << std::endl;
 				//we might still need to update the payload on the bb
-		    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleIdentifier());    
-			//prox->changeState(rexos_statemachine::STATE_NORMAL);
-		    equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
-		    prox->setInstruction(targetObjectId.toString(), libjson::parse(instructionData.toJSONString()));
+		    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleIdentifier());
+			if(prox != 0) {
+std::cout << "5" << std::endl;
+				//prox->changeState(rexos_statemachine::STATE_NORMAL);
+				equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
+std::cout << "6" << std::endl;
+				prox->setInstruction(targetObjectId.toString(), libjson::parse(instructionData.toJSONString()));
+std::cout << "7" << std::endl;
+
+			} else {
+				ROS_WARN("Recieved equiplet step for module which is not in the moduleRegister");
+				equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\" } } ");
+			}
 		} else {
 			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\" } } ");
 		}
