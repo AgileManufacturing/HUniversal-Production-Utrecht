@@ -29,8 +29,8 @@ public class Gripper extends ModuleActor {
 	private static final String PLACE = "place";
 
 	
-	public Gripper(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener, ProcessListener processListener) throws KnowledgeException, UnknownHostException, GeneralMongoException {
-		super(moduleIdentifier, moduleFactory, moduleListener, processListener);
+	public Gripper(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) throws KnowledgeException, UnknownHostException, GeneralMongoException {
+		super(moduleIdentifier, moduleFactory, moduleListener);
 	}
 
 	@Override

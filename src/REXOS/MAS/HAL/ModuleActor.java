@@ -35,9 +35,9 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 	protected BlackboardClient mongoClient;
 	protected static final String MONGO_HOST = "145.89.191.131";
 	
-	public ModuleActor(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener, ProcessListener processListener) 
+	public ModuleActor(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) 
 			throws KnowledgeException, UnknownHostException, GeneralMongoException {
-		super(moduleIdentifier, moduleFactory,moduleListener, processListener);
+		super(moduleIdentifier, moduleFactory,moduleListener);
 		mongoClient = new BlackboardClient(MONGO_HOST);
 		try {
 			mongoClient.setDatabase("EQ1");
@@ -78,9 +78,10 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 		}
 	}
 	
-	public void executeHardwareStep(HardwareStep hardwareStep) throws ModuleExecutingException{
+	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws ModuleExecutingException{
 		JsonObject command = hardwareStep.getCommand();
 		executeMongoCommand(command.toString());
+		this.processListener = processListener;
 	}
 	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException;
 	
@@ -106,5 +107,18 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 		move.addProperty(Z,z+height);
 		command.add(MOVE, move);		
 		return command;		
+	}
+	
+
+
+	@Override
+	public void onProcessStateChanged(String state) {
+		// TODO Auto-generated method stub
+		try {
+			processListener.onProcessStateChanged(state, 0, this);
+		} catch (HardwareAbstractionLayerProcessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
