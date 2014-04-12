@@ -39,14 +39,12 @@ public class DynamicClassFactory<T> {
 	 * @var Hashtable<Long, DynamicClassData> softwareCache
 	 * A cache holding the DynamicClassData for each id.
 	 **/
-	private Hashtable<Integer, DynamicClassData>softwareCache;
+	private Hashtable<Integer, DynamicClassData> softwareCache;
 	
-	private JarFileLoader jarFileLoader;
 	/**
 	 * Constructs a new DynamicClassFactory.
 	 **/
-	public DynamicClassFactory(JarFileLoader jarFileLoader) {
-		this.jarFileLoader = jarFileLoader;
+	public DynamicClassFactory() {
 		softwareCache = new Hashtable<Integer, DynamicClassData>();
 	}
 	
@@ -60,7 +58,7 @@ public class DynamicClassFactory<T> {
 	private DynamicClassLoader getClassLoader(DynamicClassDescription description) throws InstantiateClassException, JarFileLoaderException {
 		DynamicClassData entry = softwareCache.get(description.getId());
 		if (entry == null) {
-			entry = new DynamicClassData(description, jarFileLoader);
+			entry = new DynamicClassData(description, description.getJarFileLoader());
 			softwareCache.put(description.getId(), entry);
 		}
 		// Update the description.

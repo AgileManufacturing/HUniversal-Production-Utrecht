@@ -79,7 +79,7 @@ public class DynamicClassLoader extends ClassLoader {
 		if (!registeredClasses.containsKey(className)) {
 			return super.loadClass(className);
 		}
-		
+		System.out.println(registeredClasses.toString());
 		byte[] classData = registeredClasses.get(className);
 		return defineClass(className, classData, 0, classData.length);
 	}

@@ -197,7 +197,7 @@ class DynamicClassData {
 	private void updateClassData() throws IOException, JarFileLoaderException {
 		
 		
-		byte[] data = jarFileLoader.loadJarFile(description);
+		byte[] data = jarFileLoader.loadJarFile();
 		
 		JarFile jarFile = null;
 		/*URL jarLocationURL = new URL(description.getJarLocation());
@@ -220,7 +220,8 @@ class DynamicClassData {
 			//String jarFileName = jarLocationURL.getPath().substring(lastSlashPos > -1 ? lastSlashPos + 1 : 0);
 			String jarFileName = description.getId() + ".jar";
 			File file = new File(jarFileName);
-			file.deleteOnExit();
+			System.out.println(jarFileName);
+			//file.deleteOnExit();
 			FileOutputStream fos = new FileOutputStream(file);
 			try {
 				fos.write(data);
@@ -234,7 +235,7 @@ class DynamicClassData {
 		if (jarFile != null) {
 			try {
 				setClassData(extractClassDataFromJar(jarFile, description.getClassName()));
-				setBuildNumber(jarFileLoader.getBuildNumber(description));
+				setBuildNumber(jarFileLoader.getBuildNumber());
 			}
 			finally {
 				jarFile.close();

@@ -45,6 +45,7 @@ public class DynamicClassDescription {
 	 **/
 	private String className;
 	
+	private JarFileLoader jarFileLoader;
 	/**
 	 * Constructs a new DynamicClassDescription object.
 	 * @param ID The ID (corresponding to the Knowledge Database) of this piece of software.
@@ -53,9 +54,10 @@ public class DynamicClassDescription {
 	 * @param className The (fully distinguished) name of the class that represents this object.
 	 * @param jarLocation The location of the jar containing the data for the representing class.
 	 **/
-	public DynamicClassDescription(int id, String className) {
+	public DynamicClassDescription(int id, String className, JarFileLoader jarFileLoader) {
 		this.id = id;
 		this.className = className;
+		this.jarFileLoader = jarFileLoader;
 	}
 
 	/**
@@ -72,6 +74,10 @@ public class DynamicClassDescription {
 	 **/
 	public String getClassName() {
 		return className;
+	}
+	
+	public JarFileLoader getJarFileLoader() {
+		return jarFileLoader;
 	}
 
 	/**
