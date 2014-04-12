@@ -57,8 +57,9 @@ EquipletNode::EquipletNode(std::string equipletName, std::string blackboardIp) :
 {
 	ROS_DEBUG("Subscribing to EquipletStepsBlackBoard");
 	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, equipletName, "EquipletStepsBlackBoard");
-	equipletStepSubscription = new Blackboard::FieldUpdateSubscription("status", *this);
-	equipletStepSubscription->addOperation(Blackboard::SET);
+	//equipletStepSubscription = new Blackboard::FieldUpdateSubscription("status", *this);
+	equipletStepSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
+	//equipletStepSubscription->addOperation(Blackboard::SET);
 	equipletStepBlackboardClient->subscribe(*equipletStepSubscription);
 	subscriptions.push_back(equipletStepSubscription);
 	sleep(1);
