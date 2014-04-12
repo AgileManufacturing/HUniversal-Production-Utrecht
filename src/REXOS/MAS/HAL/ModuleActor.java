@@ -41,6 +41,13 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 	public ModuleActor(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory) throws KnowledgeException, UnknownHostException, GeneralMongoException {
 		super(moduleIdentifier, moduleFactory);
 		mongoClient = new BlackboardClient(MONGO_HOST);
+		try {
+			mongoClient.setDatabase("EQ1");
+			mongoClient.setCollection("EquipletStepsBlackBoard");
+		} catch (InvalidDBNamespaceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void setModuleListener(ModuleListener moduleListener){
@@ -93,14 +100,14 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 	protected JsonObject adjustMoveWithDimentions(JsonObject command, double height){
 		System.out.println("Adjusting move with dimentions: "+command.toString());
 		JsonObject move = command.remove(MOVE).getAsJsonObject();
-		double x = move.get(X).getAsDouble();
-		double y = move.get(Y).getAsDouble();
-		double z = move.get(Z).getAsDouble();
-		JsonObject mParameters = new JsonObject();
-		mParameters.addProperty(X,x);
-		mParameters.addProperty(Y,y-height);
-		mParameters.addProperty(Z,z);
-		command.add(MOVE, mParameters);		
+		double x = move.remove(X).getAsDouble();
+		double y = move.remove(Y).getAsDouble();
+		double z = move.remove(Z).getAsDouble();
+		
+		move.addProperty(X,x);
+		move.addProperty(Y,y);
+		move.addProperty(Z,z+height);
+		command.add(MOVE, move);		
 		return command;		
 	}
 }

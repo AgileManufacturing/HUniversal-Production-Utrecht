@@ -54,7 +54,7 @@ public class Draw extends Capability {
 			moveCommand.add("draw", subjectMoveCommand);
 			CompositeStep draw = new CompositeStep(productStep, drawCommand);
 		
-			ArrayList<ModuleActor> modules = moduleFactory.getBottomModuleActors();
+			ArrayList<ModuleActor> modules = moduleFactory.getBottomModulesForFunctionalModuleTree(this, 1);
 			for (ModuleActor moduleActor : modules) {
 				try {
 					

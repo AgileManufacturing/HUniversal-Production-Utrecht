@@ -25,20 +25,26 @@ public abstract class Module {
 		return this.moduleIdentifier;
 	}
 	
-	public ArrayList<Integer> getMountPosition() throws KnowledgeException, KeyNotFoundException{
-		String sql = "SELECT * FROM Module " +
-				"WHERE manufacturer = '" + moduleIdentifier.getManufacturer() +
-				"' AND typeNumber = '" + moduleIdentifier.getTypeNumber() +
-				"' AND serialNumber = '" + moduleIdentifier.getSerialNumber() +
-				"'";
-		Row[] resultSet = knowledgeDBClient.executeSelectQuery(sql);
-		if (resultSet.length == 1){
-			ArrayList<Integer> position = new ArrayList<Integer>();
-			position.add((Integer) resultSet[0].get("mountPointX"));
-			position.add((Integer) resultSet[0].get("mountPointY"));
-			return position;
+	public ArrayList<Integer> getMountPosition() {
+		try{
+			String sql = "SELECT mountPointX, mountPointY FROM Module " +
+					"WHERE manufacturer = '" + moduleIdentifier.getManufacturer() +
+					"' AND typeNumber = '" + moduleIdentifier.getTypeNumber() +
+					"' AND serialNumber = '" + moduleIdentifier.getSerialNumber() +
+					"'";
+			Row[] resultSet = knowledgeDBClient.executeSelectQuery(sql);
+			if (resultSet.length == 1){
+				ArrayList<Integer> position = new ArrayList<Integer>();
+				position.add((Integer) resultSet[0].get("mountPointX"));
+				position.add((Integer) resultSet[0].get("mountPointY"));
+				return position;
+			}
+			return null;
+		} catch (KnowledgeException | KeyNotFoundException ex) {
+			System.err.println("Error occured which is considered to be impossible " + ex);
+			ex.printStackTrace();
+			return null;
 		}
-		return null;
 	}
 	
 	public Module getParentModule() throws FactoryException, JarFileLoaderException {

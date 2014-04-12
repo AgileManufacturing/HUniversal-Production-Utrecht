@@ -55,7 +55,9 @@ public class HardwareAbstractionLayer implements ModuleListener{
 	}
 	public JsonObject deleteModule(ModuleIdentifier moduleIdentifier){
 		try {
-			return moduleFactory.deleteModule(moduleIdentifier);
+			JsonObject module = moduleFactory.deleteModule(moduleIdentifier);
+			module.add("capabilities", capabilityFactory.removeCapabilities(moduleIdentifier));
+			return module;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

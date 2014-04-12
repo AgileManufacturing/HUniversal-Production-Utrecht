@@ -12,6 +12,8 @@ import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.blackboard_client.data_classes.MongoOperation;
 import libraries.blackboard_client.data_classes.OplogEntry;
 import libraries.blackboard_client.data_classes.FieldUpdateSubscription.MongoUpdateLogOperation;
+import org.bson.types.ObjectId;
+
 import com.mongodb.DBObject;
 
 public class BlackboardUpdated implements BlackboardSubscriber {
@@ -91,7 +93,7 @@ public class BlackboardUpdated implements BlackboardSubscriber {
 					}
 					if(dbObject.containsField("mode")){
 						mode = dbObject.get("mode").toString();
-					}	
+					}
 					for(BlackboardListener changedListener: updateSubscribers){
 						changedListener.OnEquipleStateChanged(equipletName,state);
 						changedListener.OnEquipleModeChanged(equipletName, mode);
@@ -139,9 +141,5 @@ public class BlackboardUpdated implements BlackboardSubscriber {
 		}catch(InvalidDBNamespaceException | GeneralMongoException e) {
 			//Logger.log(LogLevel.ERROR, "", e);
 		}
-	}
-	public void test(){
-		updateSubscribers.get(0).OnEquipleStateChanged("1","test");
-		updateSubscribers.get(0).OnEquipleModeChanged("1","mode test");
 	}
 }

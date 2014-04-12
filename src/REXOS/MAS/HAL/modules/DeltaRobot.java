@@ -36,9 +36,10 @@ public class DeltaRobot extends ModuleActor {
 		
 		//Set hardwareSteps
 		JsonObject hardwareCommand = new JsonObject();
+		System.out.println(command.toString());
 		int maxAcceleration = move.get("maxAcceleration").getAsInt();
-		int subjectMaxAcceleration = compositeStep.getProductStep().getCriteria().get("partProperties").getAsJsonObject().get("maxAcceleration").getAsInt();
-		if (subjectMaxAcceleration > maxAcceleration) maxAcceleration = subjectMaxAcceleration;
+		/*int subjectMaxAcceleration = compositeStep.getProductStep().getCriteria().get("partProperties").getAsJsonObject().get("maxAcceleration").getAsInt();
+		if (subjectMaxAcceleration > maxAcceleration) maxAcceleration = subjectMaxAcceleration;*/
 		if (maxAcceleration > MAX_ACCELERATION) maxAcceleration = MAX_ACCELERATION;
 		
 		hardwareCommand.addProperty(COMMAND, "move");
@@ -56,7 +57,7 @@ public class DeltaRobot extends ModuleActor {
 		
 		
 		
-		hardwareSteps.add(new HardwareStep(compositeStep,hardwareCommand,moduleIdentifier));
+		hardwareSteps.add(new HardwareStep(compositeStep,jsonCommand,moduleIdentifier));
 		
 		return hardwareSteps;
 	}

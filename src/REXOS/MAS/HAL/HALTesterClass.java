@@ -7,6 +7,9 @@ import java.util.ArrayList;
 
 import org.apache.commons.codec.binary.Base64;
 
+import reconfigure.qr_receiver.QrReceiver;
+import reconfigure.server.ReconfigureServer;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -127,6 +130,8 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
+		System.out.println("Starting");
+		
 		// TODO Auto-generated method stub
 		hal = new HardwareAbstractionLayer(htc);
 		BlackboardListener blackboardListener = new BlackboardListener() {
@@ -172,67 +177,67 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 //			Thread.sleep(4000);
 //		}
 		
+		FileInputStream fis;
+		byte[] content;
+
+		File deltaRobotJar = new File("/home/t/Desktop/DeltaRobot.jar");
+		fis = new FileInputStream(deltaRobotJar);
+		content = new byte[(int) deltaRobotJar.length()];
+		fis.read(content);
+		fis.close();
+		String base64Module = new String(Base64.encodeBase64(content));
+		System.out.println("delta robot module: " + base64Module);
+		
+		File gripperJar = new File("/home/t/Desktop/Gripper.jar");
+		fis = new FileInputStream(gripperJar);
+		content = new byte[(int) gripperJar.length()];
+		fis.read(content);
+		fis.close();
+		String base64Gripper = new String(Base64.encodeBase64(content));
+		System.out.println("gripper module: " + base64Gripper);
+		
+		File pickAndPlaceJar = new File("/home/t/Desktop/PickAndPlace.jar");
+		fis = new FileInputStream(pickAndPlaceJar);
+		content = new byte[(int) pickAndPlaceJar.length()];
+		fis.read(content);
+		fis.close();
+		String base64Capability = new String(Base64.encodeBase64(content));
+		System.out.println("pick and place capability: " + base64Capability);
+		
+		String moduleA = moduleA_01 + base64Module + moduleA_02 + base64Capability + moduleA_03; 
+		JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
+		hal.insertModule(a, a);
+		
+		String moduleB = moduleB_01 + base64Gripper + moduleB_02; 
+		JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
+		hal.insertModule(b, b);
+		
+		hal.getBottomModules();
 		
 		
+		JsonObject criteria = new JsonObject();
+		JsonObject target = new JsonObject();
+		JsonObject targetMove = new JsonObject();
+		targetMove.addProperty("x", 3.0);
+		targetMove.addProperty("y", 0.0);
+		targetMove.addProperty("z", -23.0);
+		target.add("move",targetMove);
 		
-//		FileInputStream fis;
-//		byte[] content;
-//
-//		File deltaRobotJar = new File("/home/t/Desktop/DeltaRobot.jar");
-//		fis = new FileInputStream(deltaRobotJar);
-//		content = new byte[(int) deltaRobotJar.length()];
-//		fis.read(content);
-//		fis.close();
-//		String base64Module = new String(Base64.encodeBase64(content));
-//		
-//		File gripperJar = new File("/home/t/Desktop/Gripper.jar");
-//		fis = new FileInputStream(gripperJar);
-//		content = new byte[(int) gripperJar.length()];
-//		fis.read(content);
-//		fis.close();
-//		String base64Gripper = new String(Base64.encodeBase64(content));
-//		
-//		File pickAndPlaceJar = new File("/home/t/Desktop/PickAndPlace.jar");
-//		fis = new FileInputStream(pickAndPlaceJar);
-//		content = new byte[(int) pickAndPlaceJar.length()];
-//		fis.read(content);
-//		fis.close();
-//		String base64Capability = new String(Base64.encodeBase64(content));
-//		
-//		String moduleA = moduleA_01 + base64Module + moduleA_02 + base64Capability + moduleA_03; 
-//		JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
-//		hal.insertModule(a, a);
-//		
-//		String moduleB = moduleB_01 + base64Gripper + moduleB_02; 
-//		JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
-//		hal.insertModule(b, b);
-//		
-//		hal.getBottomModules();
-//		
-//		
-//		JsonObject criteria = new JsonObject();
-//		JsonObject target = new JsonObject();
-//		JsonObject targetMove = new JsonObject();
-//		targetMove.addProperty("x", 3.0);
-//		targetMove.addProperty("y", 0.0);
-//		targetMove.addProperty("z", 3.0);
-//		target.add("move",targetMove);
-//		
-//		JsonArray subjects = new JsonArray();
-//		JsonObject subject = new JsonObject();
-//		JsonObject subjectMove = new JsonObject();
-//		subjectMove.addProperty("x", -3.0);
-//		subjectMove.addProperty("y", 0.0);
-//		subjectMove.addProperty("z", -3.0);
-//		subject.add("move",subjectMove);
-//		subjects.add(subject);
-//		
-//		criteria.add("target",target);
-//		criteria.add("subjects",subjects);
-//		
-//		
-//		hal.translateProductStep(
-//				new ProductStep(1, criteria, new Service("place")));
+		JsonArray subjects = new JsonArray();
+		JsonObject subject = new JsonObject();
+		JsonObject subjectMove = new JsonObject();
+		subjectMove.addProperty("x", -3.0);
+		subjectMove.addProperty("y", 0.0);
+		subjectMove.addProperty("z", -200.0);
+		subject.add("move",subjectMove);
+		subjects.add(subject);
+		
+		criteria.add("target",target);
+		criteria.add("subjects",subjects);
+		
+		
+		hal.translateProductStep(
+				new ProductStep(1, criteria, new Service("place")));
 		
 		/*Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);
@@ -261,8 +266,8 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	@Override
 	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareStep) {
 		// TODO Auto-generated method stub
-		//hardwareSteps.addAll(hardwareStep);// = hardwareStep;
-		//hal.executeHardwareSteps(hardwareSteps);
+		hardwareSteps.addAll(hardwareStep);// = hardwareStep;
+		hal.executeHardwareSteps(hardwareSteps);
 	}
 
 	@Override

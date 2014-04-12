@@ -29,7 +29,7 @@ public class ExecutionProcess implements Runnable, ModuleListener{
 				moduleFactory.executeHardwareStep(hardwareSteps.get(0));
 				this.wait();
 			}
-		} catch (InterruptedException ex) {
+		} catch (Exception ex) {
 			// TODO Auto-generated catch block
 			ex.printStackTrace();
 		}

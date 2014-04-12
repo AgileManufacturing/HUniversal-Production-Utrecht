@@ -21,6 +21,7 @@ import HAL.Capability;
 import HAL.HardwareAbstractionLayer;
 import HAL.JavaSoftware;
 import HAL.ModuleIdentifier;
+import HAL.Mutation;
 import HAL.Service;
 
 public class CapabilityFactory extends Factory{
@@ -100,6 +101,10 @@ public class CapabilityFactory extends Factory{
 			"INSERT IGNORE INTO ServiceType \n" + 
 			"(name) \n" + 
 			"VALUES(?);";
+	private static final String getServiceTypeForCapabilityType =
+			"SELECT serviceType \n" + 
+			"FROM ServiceType_CapabilityType \n" + 
+			"WHERE capabiltyType = ?;";
 	
 	private static final String addRequiredMutationForCapabilityType =
 			"INSERT INTO CapabilityTypeRequiredMutation \n" + 
@@ -110,13 +115,22 @@ public class CapabilityFactory extends Factory{
 			"FROM CapabilityTypeRequiredMutation \n" + 
 			"WHERE capabilityType = ?;";
 	
+	private static final String getAllAssociatedCapabilityTypesForModuleIdentifier = 
+			"SELECT DESTINCT capabilityType \n" + 
+			"FROM CapabilityTypeRequiredMutation \n" + 
+			"WHERE mutation IN( \n" + 
+			"	SELECT mutation \n" + 
+			"	FROM SupportedMutation \n" + 
+			"	WHERE manufacturer = ? AND \n" + 
+			"		typeNumber = ?;";
+	
 	private DynamicClassFactory<Capability> dynamicClassFactory;
 	private HardwareAbstractionLayer hal;
 	
 	public CapabilityFactory(HardwareAbstractionLayer hal) throws KnowledgeException {
 		super(new KnowledgeDBClient());
 		this.hal = hal;
-		this.dynamicClassFactory = new DynamicClassFactory<>(this);
+		this.dynamicClassFactory = new DynamicClassFactory<>();
 	}
 	
 	public ArrayList<Capability> getAllSupportedCapabilities() throws Exception{
@@ -154,7 +168,8 @@ public class CapabilityFactory extends Factory{
 		return capabilities;
 	}
 	private Capability getCapabilityByName(String capabilityName) throws Exception {
-		DynamicClassDescription description = JavaSoftware.getDynamicClassDescriptionForCapabilityName(knowledgeDBClient, capabilityName);
+		JavaSoftware javaSoftware = JavaSoftware.getJavaSoftwareForCapabilityName(capabilityName);
+		DynamicClassDescription description = javaSoftware.getDynamicClassDescription();
 		Class<Capability> capabilityClass = dynamicClassFactory.getClassFromDescription(description);
 		return capabilityClass.getConstructor(ModuleFactory.class).newInstance(hal.getModuleFactory());
 	}
@@ -168,7 +183,8 @@ public class CapabilityFactory extends Factory{
 					String name = capabilityEntry.get("name").getAsString();
 					
 					JsonObject capabilitySoftware = capabilityEntry.get("halSoftware").getAsJsonObject();
-					int halSoftwareId = JavaSoftware.deserializeJavaSoftware(knowledgeDBClient, capabilitySoftware);
+					JavaSoftware halSoftware = JavaSoftware.insertJavaSoftware(capabilitySoftware, knowledgeDBClient);
+					int halSoftwareId = halSoftware.getId();
 					
 					knowledgeDBClient.executeUpdateQuery(addCapabilityType, name, halSoftwareId);
 					
@@ -192,6 +208,48 @@ public class CapabilityFactory extends Factory{
 		}
 		return true;
 	}
+	public JsonArray removeCapabilities(ModuleIdentifier moduleIdentifier) {
+		ArrayList<String> capabilityNames = new ArrayList<String>();
+		try{
+			try{
+				Row[] rows = knowledgeDBClient.executeSelectQuery(getAllAssociatedCapabilityTypesForModuleIdentifier, 
+						moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
+				for (Row row : rows) {
+					capabilityNames.add((String) row.get("capabilityType"));
+				}
+				
+				JsonArray capabilities = new JsonArray();
+				for (String capabilityName : capabilityNames) {
+					JsonObject capability = new JsonObject();
+					capability.addProperty("name", capabilityName);
+					
+					JavaSoftware javaSoftware = JavaSoftware.getJavaSoftwareForCapabilityName(capabilityName);
+					capability.add("halSoftware", javaSoftware.serialize());
+					
+					capability.add("requiredMutations", serializeRequiredMutations(capabilityName));
+					
+					JsonArray services = new JsonArray();
+					Row[] serviceRows = knowledgeDBClient.executeSelectQuery(getServiceTypeForCapabilityType, capabilityName);
+					for (Row serviceRow : serviceRows) {
+						services.add(new JsonPrimitive((String) serviceRow.get("serviceType")));
+					}
+					capability.add("services", services);
+					
+					capabilities.add(capability);
+				}
+				return capabilities;
+			} catch(Exception ex) {
+				System.err.println("HAL::CapabilityFactory::insertCapabilities(): Error occured while inserting capability " + ex);
+				ex.printStackTrace();
+				knowledgeDBClient.getConnection().rollback();
+				knowledgeDBClient.getConnection().setAutoCommit(true);
+				return null;
+			}
+		} catch (SQLException ex) {
+			return null;
+		}
+	}
+	
 	private JsonArray serializeRequiredMutations(String capabilityTypeName) {
 		HashMap<Integer, JsonObject> requiredTreesMap = new HashMap<Integer, JsonObject>();
 		try {
