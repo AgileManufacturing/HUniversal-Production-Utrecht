@@ -69,12 +69,6 @@ public class HardwareAbstractionLayer implements ModuleListener{
 	}
 
 	@Override
-	public void onProcessStateChanged(String state, long hardwareStepSerialId,
-			Module module) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public void onModuleStateChanged(String state, Module module) {
 		// TODO Auto-generated method stub
 		

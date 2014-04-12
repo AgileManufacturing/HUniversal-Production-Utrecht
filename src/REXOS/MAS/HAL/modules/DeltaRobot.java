@@ -15,12 +15,14 @@ import HAL.ModuleIdentifier;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
+import HAL.listeners.ModuleListener;
+import HAL.listeners.ProcessListener;
 
 public class DeltaRobot extends ModuleActor {
 	public final static int MAX_ACCELERATION = 50;
 	
-	public DeltaRobot(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory) throws KnowledgeException, UnknownHostException, GeneralMongoException {
-		super(moduleIdentifier, moduleFactory);
+	public DeltaRobot(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener, ProcessListener processListener) throws KnowledgeException, UnknownHostException, GeneralMongoException {
+		super(moduleIdentifier, moduleFactory, moduleListener, processListener);
 	}
 
 	@Override

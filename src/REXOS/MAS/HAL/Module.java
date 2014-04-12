@@ -3,22 +3,31 @@ package HAL;
 import java.util.ArrayList;
 
 import HAL.exceptions.FactoryException;
+import HAL.exceptions.HardwareAbstractionLayerProcessException;
 import HAL.factories.ModuleFactory;
+import HAL.listeners.BlackboardListener;
+import HAL.listeners.ModuleListener;
+import HAL.listeners.ProcessListener;
 import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.knowledgedb_client.Row;
 
-public abstract class Module { 
+public abstract class Module implements BlackboardListener{ 
 	protected KnowledgeDBClient knowledgeDBClient;
 	protected ModuleIdentifier moduleIdentifier;
 	protected ModuleFactory moduleFactory;
+	protected ModuleListener moduleListener;
+	protected ProcessListener processListener;
 	
-	public Module(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory) throws KnowledgeException{
+	public Module(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener, ProcessListener processListener) 
+			throws KnowledgeException{
 		this.moduleIdentifier = moduleIdentifier;
 		this.knowledgeDBClient = new KnowledgeDBClient();
 		this.moduleFactory = moduleFactory;
+		this.moduleListener = moduleListener;
+		this.processListener = processListener;
 	}	
 	
 	public ModuleIdentifier getModuleIdentifier(){
@@ -85,5 +94,35 @@ public abstract class Module {
 	public String getProperties() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	
+	@Override
+	public void OnEquipletStateChanged(String equipletName, String state) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void OnEquipletModeChanged(String equipletName, String mode) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onProcessStateChanged(String state) {
+		// TODO Auto-generated method stub
+		try {
+			processListener.onProcessStateChanged(state, 0, this);
+		} catch (HardwareAbstractionLayerProcessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void OnEquipletIpChanged(String ip) {
+		// TODO Auto-generated method stub
+		
 	}
 }
