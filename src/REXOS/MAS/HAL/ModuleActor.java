@@ -3,8 +3,6 @@ package HAL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import HAL.exceptions.FactoryException;
@@ -18,7 +16,6 @@ import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.blackboard_client.data_classes.InvalidJSONException;
 import libraries.dynamicloader.JarFileLoaderException;
-import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeException;
 
 public abstract class ModuleActor extends Module {//implements mongolistener
@@ -67,7 +64,10 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 		}
 		else { //Root module, no more parents			
 			//Check for remaining commands, then not capable
-			if (!compositeStep.getCommand().toString().trim().equalsIgnoreCase("{}")){
+			if (compositeStep.getCommand().get(COMMAND).getAsJsonObject() == null){
+				throw new ModuleTranslatingException("The compositestep doesn't contain any \"command\" key.");
+			}
+			if (!compositeStep.getCommand().get(COMMAND).getAsJsonObject().toString().trim().equalsIgnoreCase("{}")){
 				throw new ModuleTranslatingException("The compositestep isn't completely empty.");
 			}
 			return null;

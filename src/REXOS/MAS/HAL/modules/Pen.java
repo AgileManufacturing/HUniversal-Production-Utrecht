@@ -17,8 +17,8 @@ import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 
 public class Pen extends ModuleActor {
-	//Gonna be loaded from KDB:
 	private static final double PEN_SIZE = 96.6; // in cm
+	private static final int MAX_ACCELERATION = 50;
 
 	public Pen(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory) throws KnowledgeException, UnknownHostException, GeneralMongoException {
 		super(moduleIdentifier, moduleFactory);
@@ -28,14 +28,29 @@ public class Pen extends ModuleActor {
 	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 		
-		JsonObject command = compositeStep.getCommand();
-		command = adjustMoveWithDimentions(command, PEN_SIZE);
-		command.addProperty("forceStraightLine", true);
+		JsonObject jsonCommand = compositeStep.getCommand();
+		JsonObject command = jsonCommand.remove(COMMAND).getAsJsonObject();
 		
-		compositeStep = new CompositeStep(compositeStep.getProductStep(),command);		
-		ArrayList<HardwareStep> hStep = forwardCompositeStep(compositeStep);
-		if (hStep != null)
-			hardwareSteps.addAll(hStep);
+		if (command != null){
+			//Remove corresponding commands to module.
+			if (command.remove("draw") == null){
+				throw new ModuleTranslatingException ("Pen module didn't find a \"draw\" key in CompositeStep command: "+jsonCommand.toString());
+			}			
+			
+			//Adjust the move with the Pen module it's height.
+			command = adjustMoveWithDimentions(command, PEN_SIZE);
+			command.addProperty("maxAcceleration", MAX_ACCELERATION);
+			jsonCommand.add(COMMAND, command);
+			
+			//Translate it's parents composite steps into hardware steps.
+			compositeStep = new CompositeStep(compositeStep.getProductStep(),jsonCommand);		
+			ArrayList<HardwareStep> hStep = forwardCompositeStep(compositeStep);
+			if (hStep != null)
+				hardwareSteps.addAll(hStep);
+		}
+		else {
+			throw new ModuleTranslatingException ("Pen module didn't receive any \"command\" key in CompositeStep command: "+jsonCommand.toString());
+		}
 		
 		return hardwareSteps;
 	}

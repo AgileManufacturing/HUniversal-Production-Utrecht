@@ -3,6 +3,7 @@ package HAL.modules;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import libraries.blackboard_client.data_classes.GeneralMongoException;
@@ -27,36 +28,97 @@ public class DeltaRobot extends ModuleActor {
 	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 		
-		JsonObject command = compositeStep.getCommand();
-		JsonObject move = command.remove(MOVE).getAsJsonObject();
+		JsonObject jsonCommand = compositeStep.getCommand();
+		JsonObject command = jsonCommand.get(COMMAND).getAsJsonObject();
 		
-		ArrayList<HardwareStep> hStep = forwardCompositeStep(new CompositeStep(compositeStep.getProductStep(),command));
-		if (hStep != null)
-			hardwareSteps.addAll(hStep);
-		
-		//Set hardwareSteps
-		JsonObject hardwareCommand = new JsonObject();
-		int maxAcceleration = move.get("maxAcceleration").getAsInt();
-		int subjectMaxAcceleration = compositeStep.getProductStep().getCriteria().get("partProperties").getAsJsonObject().get("maxAcceleration").getAsInt();
-		if (subjectMaxAcceleration > maxAcceleration) maxAcceleration = subjectMaxAcceleration;
-		if (maxAcceleration > MAX_ACCELERATION) maxAcceleration = MAX_ACCELERATION;
-		
-		hardwareCommand.addProperty(COMMAND, "move");
-		hardwareCommand.addProperty("look_up","NULL" );
-		//JsonObject parameters = new JsonObject();
-		//parameters.addProperty("ID", "Paper");
-		//hardwareCommand.add("look_up_parameters",parameters);
-		hardwareCommand.add("payload",move);
-		
-		JsonObject jsonCommand = new JsonObject();
-		jsonCommand.add("instructionData",hardwareCommand);
-		jsonCommand.add("moduleIdentifier",moduleIdentifier.getAsJSON());
-		jsonCommand.addProperty("status","WAITING");
-		
-		
-		
-		
-		hardwareSteps.add(new HardwareStep(compositeStep,hardwareCommand,moduleIdentifier));
+		if (command != null){
+			//Get move
+			JsonObject move = command.remove(MOVE).getAsJsonObject();			
+			if (move == null){
+				throw new ModuleTranslatingException ("DeltaRobot module didn't find a \"move\" key in CompositeStep command: "+jsonCommand.toString());
+			}
+			
+			
+			
+			//Set hardwareSteps
+			JsonObject hardwareCommand = new JsonObject();
+			
+			//Adjust for maxAcceleration
+			int maxAcceleration = MAX_ACCELERATION;
+			if (move.get("maxAcceleration") != null)
+				maxAcceleration = move.get("maxAcceleration").getAsInt();
+			JsonElement partProperties = compositeStep.getProductStep().getCriteria().get("partProperties");
+			if (partProperties != null){
+				JsonElement subjectMaxAccelerationJson = partProperties.getAsJsonObject().get("maxAcceleration");
+				if (subjectMaxAccelerationJson != null){
+					if (subjectMaxAccelerationJson.getAsInt() < maxAcceleration){
+						maxAcceleration = subjectMaxAccelerationJson.getAsInt();
+					}
+				}
+			}
+			if (maxAcceleration > MAX_ACCELERATION) maxAcceleration = MAX_ACCELERATION;
+			
+			
+			hardwareCommand.addProperty(COMMAND, "move");
+			
+			//Add target to move relative to
+			hardwareCommand.addProperty("look_up","FIND_ID" );
+			JsonObject parameters = new JsonObject();
+			parameters.addProperty("ID", jsonCommand.get("look_up").getAsString());
+			hardwareCommand.add("look_up_parameters",parameters);
+			
+			
+			JsonObject hardwareJsonCommand = new JsonObject();
+			hardwareJsonCommand.add("moduleIdentifier",moduleIdentifier.getAsJSON());
+			hardwareJsonCommand.addProperty("status","WAITING");
+			
+			//Add hopping a.k.a. safe movement pane
+			if (command.get("forceStraightLine") != null){
+				if (!command.get("forceStraightLine").getAsBoolean()){
+					//Entry point
+					int z = move.remove(Z).getAsInt();
+					z -= 20; //20cm above actual point
+					move.addProperty(Z, z);
+					hardwareCommand.add("payload",move);
+					hardwareJsonCommand.add("instructionData",hardwareCommand);
+					hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));
+					
+					//Actual point
+					z = move.remove(Z).getAsInt();
+					z += 20; //actual point
+					move.addProperty(Z, z);
+					hardwareCommand.remove("payload");
+					hardwareCommand.add("payload",move);
+					hardwareJsonCommand.remove("instructionData");
+					hardwareJsonCommand.add("instructionData",hardwareCommand);
+					hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));
+					
+					//Exit point
+					z = move.remove(Z).getAsInt();
+					z -= 20; //20cm above actual point
+					move.addProperty(Z, z);
+					hardwareCommand.remove("payload");
+					hardwareCommand.add("payload",move);
+					hardwareJsonCommand.remove("instructionData");
+					hardwareJsonCommand.add("instructionData",hardwareCommand);
+					hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));
+				}
+			}
+			else {
+				//Straight line
+				hardwareCommand.add("payload",move);
+				hardwareJsonCommand.add("instructionData",hardwareCommand);
+				hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));				
+			}
+			
+
+			ArrayList<HardwareStep> hStep = forwardCompositeStep(new CompositeStep(compositeStep.getProductStep(),jsonCommand));
+			if (hStep != null)
+				hardwareSteps.addAll(hStep);
+		}
+		else {
+			throw new ModuleTranslatingException ("DeltaRobot module didn't receive any \"command\" key in CompositeStep command: "+jsonCommand.toString());
+		}
 		
 		return hardwareSteps;
 	}
