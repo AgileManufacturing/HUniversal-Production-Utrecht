@@ -21,13 +21,12 @@ public abstract class Module implements BlackboardListener{
 	protected ModuleListener moduleListener;
 	protected ProcessListener processListener;
 	
-	public Module(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener, ProcessListener processListener) 
+	public Module(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) 
 			throws KnowledgeException{
 		this.moduleIdentifier = moduleIdentifier;
 		this.knowledgeDBClient = new KnowledgeDBClient();
 		this.moduleFactory = moduleFactory;
 		this.moduleListener = moduleListener;
-		this.processListener = processListener;
 	}	
 	
 	public ModuleIdentifier getModuleIdentifier(){
@@ -101,17 +100,6 @@ public abstract class Module implements BlackboardListener{
 	public void OnEquipletModeChanged(String equipletName, String mode) {
 		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public void onProcessStateChanged(String state) {
-		// TODO Auto-generated method stub
-		try {
-			processListener.onProcessStateChanged(state, 0, this);
-		} catch (HardwareAbstractionLayerProcessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	@Override
