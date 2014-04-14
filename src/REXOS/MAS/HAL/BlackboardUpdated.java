@@ -37,6 +37,11 @@ public class BlackboardUpdated implements BlackboardSubscriber {
 	private String equipletName = null;
 	private String state = null;
 	private String mode = null;
+	private String status = null;
+	private BlackboardClient equipletStepBBClient;
+	private FieldUpdateSubscription statusSubscription;
+	private BlackboardClient productStepBBClient;
+	private BlackboardClient serviceStepBBClient;
 	
 	/**
 	 * @throws BlackboardUpdateException 
@@ -50,9 +55,26 @@ public class BlackboardUpdated implements BlackboardSubscriber {
 			stateSubscription = new FieldUpdateSubscription("state", this);
 			stateSubscription.addOperation(MongoUpdateLogOperation.SET);
 			
+			statusSubscription = new FieldUpdateSubscription("status", this);
+			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
+			
 			modeSubscription = new FieldUpdateSubscription("mode", this);
 			modeSubscription.addOperation(MongoUpdateLogOperation.SET);
 			
+			equipletStepBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EQ1DbIp"));
+			equipletStepBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EQ1DbName"));
+			equipletStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EQ1EquipletStepsBlackBoardName"));
+			equipletStepBBClient.subscribe(statusSubscription);
+			
+			productStepBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EQ1DbIp"));
+			productStepBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EQ1DbName"));
+			productStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EQ1ProductStepsBlackBoardName"));
+			productStepBBClient.subscribe(statusSubscription);
+			
+			serviceStepBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EQ1DbIp"));
+			serviceStepBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EQ1DbName"));
+			serviceStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EQ1ServiceStepsBlackBoardName"));
+			serviceStepBBClient.subscribe(statusSubscription);
 			
 			stateBlackboardBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"));
 			stateBlackboardBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "stateBlackBoardName"));
@@ -110,7 +132,32 @@ public class BlackboardUpdated implements BlackboardSubscriber {
 					
 				break;
 				
-
+			case "EquipletStepsBlackBoard":
+				dbObject = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
+				if(dbObject != null) {
+					status= dbObject.get("status").toString();
+					for(BlackboardListener changedListener: updateSubscribers){
+						changedListener.onProcessStateChanged(status);	
+					}
+				}
+				
+			case "ProductStepsBlackBoard":
+				dbObject = productStepBBClient.findDocumentById(entry.getTargetObjectId());
+				if(dbObject != null) {
+					status= dbObject.get("status").toString();
+					for(BlackboardListener changedListener: updateSubscribers){
+						changedListener.onProcessStateChanged(status);	
+					}
+				}
+				
+			case "ServiceStepsBlackBoard":
+				dbObject = serviceStepBBClient.findDocumentById(entry.getTargetObjectId());
+				if(dbObject != null) {
+					status= dbObject.get("status").toString();
+					for(BlackboardListener changedListener: updateSubscribers){
+						changedListener.onProcessStateChanged(status);	
+					}
+				}
 			default:
 				break;
 			}
