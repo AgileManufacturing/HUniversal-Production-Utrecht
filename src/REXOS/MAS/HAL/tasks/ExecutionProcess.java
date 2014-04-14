@@ -2,15 +2,14 @@ package HAL.tasks;
 
 import java.util.ArrayList;
 
-import libraries.knowledgedb_client.KnowledgeException;
 import HAL.HardwareStep;
 import HAL.Module;
 import HAL.exceptions.HardwareAbstractionLayerProcessException;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
-import HAL.listeners.ModuleListener;
+import HAL.listeners.ProcessListener;
 
-public class ExecutionProcess implements Runnable, ModuleListener{
+public class ExecutionProcess implements Runnable, ProcessListener{
 	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
 	private ArrayList<HardwareStep> hardwareSteps;
 	private ModuleFactory moduleFactory;
@@ -26,7 +25,7 @@ public class ExecutionProcess implements Runnable, ModuleListener{
 	public synchronized void run() {
 		try {
 			while (hardwareSteps.size() > 0){
-				moduleFactory.executeHardwareStep(hardwareSteps.get(0));
+				moduleFactory.executeHardwareStep(this, hardwareSteps.get(0));
 				this.wait();
 			}
 		} catch (InterruptedException ex) {
@@ -46,13 +45,5 @@ public class ExecutionProcess implements Runnable, ModuleListener{
 		else {
 			throw new HardwareAbstractionLayerProcessException("No more hardwareSteps while there should be at least one more");
 		}
-	}
-	@Override
-	public void onModuleStateChanged(String state, Module module) {
-		hardwareAbstractionLayerListener.onModuleStateChanged(state, module);
-	}
-	@Override
-	public void onModuleModeChanged(String mode, Module module) {
-		hardwareAbstractionLayerListener.onModuleModeChanged(mode, module);
 	}
 }

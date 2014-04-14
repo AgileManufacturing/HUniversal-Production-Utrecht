@@ -15,13 +15,15 @@ import HAL.ModuleIdentifier;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
+import HAL.listeners.ModuleListener;
+import HAL.listeners.ProcessListener;
 
 public class Pen extends ModuleActor {
 	private static final double PEN_SIZE = 96.6; // in cm
 	private static final int MAX_ACCELERATION = 50;
 
-	public Pen(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory) throws KnowledgeException, UnknownHostException, GeneralMongoException {
-		super(moduleIdentifier, moduleFactory);
+	public Pen(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener, ProcessListener processListener) throws KnowledgeException, UnknownHostException, GeneralMongoException {
+		super(moduleIdentifier, moduleFactory, moduleListener, processListener);
 	}
 
 	@Override

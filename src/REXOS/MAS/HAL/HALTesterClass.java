@@ -132,7 +132,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		BlackboardListener blackboardListener = new BlackboardListener() {
 			
 			@Override
-			public void onProcessStatusChanged(String status) {
+			public void onProcessStateChanged(String status) {
 				// TODO Auto-generated method stub
 				System.out.println("New Process Status = "+ status);
 				

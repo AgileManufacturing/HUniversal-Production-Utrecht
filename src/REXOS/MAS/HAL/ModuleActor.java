@@ -11,6 +11,7 @@ import HAL.exceptions.ModuleExecutingException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.ModuleListener;
+import HAL.listeners.ProcessListener;
 import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
@@ -31,17 +32,13 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 	
 	
 	
-	protected ModuleListener moduleListener;
 	protected BlackboardClient mongoClient;
 	protected static final String MONGO_HOST = "145.89.191.131";
 	
-	public ModuleActor(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory) throws KnowledgeException, UnknownHostException, GeneralMongoException {
-		super(moduleIdentifier, moduleFactory);
+	public ModuleActor(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener, ProcessListener processListener) 
+			throws KnowledgeException, UnknownHostException, GeneralMongoException {
+		super(moduleIdentifier, moduleFactory,moduleListener, processListener);
 		mongoClient = new BlackboardClient(MONGO_HOST);
-	}
-	
-	public void setModuleListener(ModuleListener moduleListener){
-		this.moduleListener = moduleListener;
 	}
 	
 	protected void executeMongoCommand(String command) throws ModuleExecutingException{
@@ -81,7 +78,7 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException;
 	
 	public void onHardwareStepChanged(String state, long hardwareStepSerialId) throws HardwareAbstractionLayerProcessException{
-		moduleListener.onProcessStateChanged(state, hardwareStepSerialId, this);
+		processListener.onProcessStateChanged(state, hardwareStepSerialId, this);
 	}
 	public void onModuleStateChanged(String state){
 		moduleListener.onModuleStateChanged(state, this);
