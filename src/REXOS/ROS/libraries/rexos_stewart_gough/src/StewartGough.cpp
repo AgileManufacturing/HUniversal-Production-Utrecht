@@ -172,8 +172,8 @@ namespace rexos_stewart_gough{
 		std::cout << "angle: " << angle << std::endl;		
 		std::cout << "angleMin: " << motors[motorIndex]->getMinAngle() << std::endl;	
 		std::cout << "angleMax: " << motors[motorIndex]->getMaxAngle() << std::endl;	
-        //return angle > motors[motorIndex]->getMinAngle() && angle < motors[motorIndex]->getMaxAngle();
-		return true;
+        return angle > motors[motorIndex]->getMinAngle() && angle < motors[motorIndex]->getMaxAngle();
+		//return true;
     }
 
     /**
@@ -220,14 +220,21 @@ namespace rexos_stewart_gough{
 
 
     void StewartGough::moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration, double rotationX, double rotationY, double rotationZ){
-        // check whether the motors are powered on.
-        if(!motorManager->isPoweredOn()){
-            throw rexos_motor::MotorException("motor drivers are not powered on");
-        }
+        
+		
+		// check whether the motors are powered on.
+		if(!motorManager->isPoweredOn()){
+			throw rexos_motor::MotorException("motor drivers are not powered on");
+		}
 
-        if(effectorLocation == point){
-            // The effector is already at the requested location, the method can be cut short.
-            return;
+
+		//check if the requested location is the effectors current location,
+		//if so the method can be cut short.
+        if(effectorLocation == point
+				&& currentEffectorRotationX == rotationX
+				&& currentEffectorRotationY == rotationY
+				&& currentEffectorRotationZ == rotationZ){
+			return;
         }
 
         if(maxAcceleration > rexos_motor::CRD514KD::MOTOR_MAX_ACCELERATION){
@@ -412,6 +419,10 @@ namespace rexos_stewart_gough{
 		delete rotations[3];
         delete rotations[4];
         delete rotations[5];
+		
+		currentEffectorRotationX = rotationX;
+		currentEffectorRotationY = rotationY;
+		currentEffectorRotationZ = rotationZ;
         effectorLocation = point;
     }
 
@@ -458,7 +469,7 @@ namespace rexos_stewart_gough{
 			if(checkSensor(motorMap[motorIndex1].sensor) != sensorValue)
 			{
 				motors[motorIndex1]->startMovement(1);
-				motorGroupSteps.motor1 += (motorRotation1.angle / rexos_motor::CRD514KD::MOTOR_STEP_ANGLE); 
+				motorGroupSteps.motorIndex1 += (motorRotation1.angle / rexos_motor::CRD514KD::MOTOR_STEP_ANGLE); 
 			}else{
 				done1 = true;
 			}
@@ -466,7 +477,7 @@ namespace rexos_stewart_gough{
 			if(checkSensor(motorMap[motorIndex2].sensor) != sensorValue)
 			{
 				motors[motorIndex2]->startMovement(1);
-				motorGroupSteps.motor2 += (motorRotation2.angle / rexos_motor::CRD514KD::MOTOR_STEP_ANGLE); 
+				motorGroupSteps.motorIndex2 += (motorRotation2.angle / rexos_motor::CRD514KD::MOTOR_STEP_ANGLE); 
 			}else{
 				done2 = true;
 			}
@@ -507,22 +518,22 @@ namespace rexos_stewart_gough{
         // actualAngleInSteps keeps track of how many motor steps the motor has moved. This is necessary to avoid accummulating errors.
         MotorGroup actualAnglesInSteps = moveMotorUntilSensorIsOfValue(motorIndex1,motorIndex2, motorRotation1,motorRotation2, true);
 		
-		int actualAngleInSteps1 = actualAnglesInSteps.motor1;
-		int actualAngleInSteps2 = actualAnglesInSteps.motor2;
+		int actualAngleInSteps1 = actualAnglesInSteps.motorIndex1;
+		int actualAngleInSteps2 = actualAnglesInSteps.motorIndex2;
 		
         // Move away from the sensor in big steps until it is no longer pushed.
         motorRotation1.angle = -motorRotation1.angle;
 		motorRotation2.angle = -motorRotation2.angle;
         actualAnglesInSteps = moveMotorUntilSensorIsOfValue(motorIndex1,motorIndex2, motorRotation1,motorRotation2, false);
-		actualAngleInSteps1 += actualAnglesInSteps.motor1;
-		actualAngleInSteps2 += actualAnglesInSteps.motor2;
+		actualAngleInSteps1 += actualAnglesInSteps.motorIndex1;
+		actualAngleInSteps2 += actualAnglesInSteps.motorIndex2;
 
         // Move back to the sensor in small steps until it is pushed.
         motorRotation1.angle = -motors.at(motorIndex1)->getMicroStepAngle();
 		motorRotation2.angle = -motors.at(motorIndex2)->getMicroStepAngle();
         actualAnglesInSteps = moveMotorUntilSensorIsOfValue(motorIndex1,motorIndex2, motorRotation1,motorRotation2, true);
-		actualAngleInSteps1 += actualAnglesInSteps.motor1;
-		actualAngleInSteps2 += actualAnglesInSteps.motor2;
+		actualAngleInSteps1 += actualAnglesInSteps.motorIndex1;
+		actualAngleInSteps2 += actualAnglesInSteps.motorIndex2;
 		
 		
 		
@@ -678,11 +689,22 @@ namespace rexos_stewart_gough{
 		
         effectorLocation.x = 0;
         effectorLocation.y = 0;
-        effectorLocation.z = -280; // yet to be set 
+        effectorLocation.z = -270; // yet to be set 
 		
-		moveTo(rexos_datatypes::Point3D<double>(50, 50, -280), 10, 0, 0, 0);
+		currentEffectorRotationX = 0;
+		currentEffectorRotationY = 0;
+		currentEffectorRotationZ = 0;
 		
 		
+		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 10, 0, 0, 30);
+		
+		sleep(3);
+		
+		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 10, 0, 0, 0);
+		
+		sleep(3);
+		
+		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 10, 0, 0, -30);
 		
 		
         std::cout << "[DEBUG] effector location z: " << effectorLocation.z << std::endl; 
@@ -717,4 +739,16 @@ namespace rexos_stewart_gough{
     rexos_datatypes::Point3D<double>& StewartGough::getEffectorLocation(){
         return effectorLocation;
     }
+	
+	double StewartGough::getEffectorRotationX(){
+		return currentEffectorRotationX;
+	}
+	
+	double StewartGough::getEffectorRotationY(){
+		return currentEffectorRotationY;
+	}
+	
+	double StewartGough::getEffectorRotationZ(){
+		return currentEffectorRotationZ;
+	}
 }

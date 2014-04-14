@@ -44,26 +44,22 @@
 namespace rexos_stewart_gough{
 	
 	
-	struct MotorMap
-	{
+	struct MotorMap {
 		int motor;
 		int sensor;
 		
 		MotorMap(int motor = 0, int sensor = 0):
 				motor(motor),
 				sensor(sensor){}
-				
 	};
 	
-	struct MotorGroup
-	{
-		int motor1;
-		int motor2;
+	struct MotorGroup {
+		int motorIndex1;
+		int motorIndex2;
 		
-		MotorGroup(int motor1 = 0, int motor2 = 0):
-				motor1(motor1),
-				motor2(motor2){}
-				
+		MotorGroup(int motorIndex1 = 0, int motorIndex2 = 0):
+				motorIndex1(motorIndex1),
+				motorIndex2(motorIndex2){}
 	};
 	
 	
@@ -102,7 +98,13 @@ namespace rexos_stewart_gough{
 		bool calibrateMotors();
 		void powerOff();
 		void powerOn();
+		
 		rexos_datatypes::Point3D<double>& getEffectorLocation();
+		
+		double getEffectorRotationX();
+		double getEffectorRotationY();
+		double getEffectorRotationZ();
+
 		
 		// the inital motors and sensors are positioned on the wrong locations
 		// this is used to map them on the right locations
@@ -141,6 +143,25 @@ private:
 		 * A 3D point in doubles that points to the location of the effector.
 		 **/
 		rexos_datatypes::Point3D<double> effectorLocation;
+		
+		/**
+		 * @var double rotationX
+		 * Current effector rotation around the x axis
+		 **/
+		double currentEffectorRotationX;
+		
+		/**
+		 * @var double rotationY
+		 * Current effector rotation around the y axis
+		 **/
+		double currentEffectorRotationY;
+		
+		/**
+		 * @var double rotationZ
+		 * Current effector rotation around the z axis
+		 **/
+		double currentEffectorRotationZ;
+		
 
 		/**
 		 * @var bool boundariesGenerated
