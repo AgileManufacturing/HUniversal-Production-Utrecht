@@ -179,17 +179,18 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_s
  * @return false if the path is illegal, true if the motion is executed succesfully.
  **/
 bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(double x, double y, double z, double maxAcceleration){
+		std::cout << " weird function!!!!! @_@" << std::endl;
 	rexos_datatypes::Point3D<double> oldLocation(stewartGough->getEffectorLocation());
 	rexos_datatypes::Point3D<double> newLocation(x,y,z);
 
-	if(stewartGough->checkPath(oldLocation, newLocation)){
+	//if(stewartGough->checkPath(oldLocation, newLocation)){
 
 		//stewartGough->moveTo(newLocation, maxAcceleration);
 
 		return true;
-	}
+	//}
 
-	return false;
+	//return false;
 } 
 
 /**
@@ -207,13 +208,19 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToRelativePoint(double x, 
 	rexos_datatypes::Point3D<double> newLocation(x,y,z);
 	newLocation += oldLocation;
 
-	if(stewartGough->checkPath(oldLocation, newLocation)){
-		ROS_INFO("Moving to: (%f, %f, %f) maxAcceleration=%f", x, y, z, maxAcceleration);
-		stewartGough->moveTo(newLocation, maxAcceleration);
-		return true;
-	} else {
-		return false;
-	}
+	//if(stewartGough->checkPath(oldLocation, newLocation)){
+		
+		try {
+			ROS_INFO("Moving to: (%f, %f, %f) maxAcceleration=%f", x, y, z, maxAcceleration);
+			stewartGough->moveTo(newLocation, maxAcceleration);
+			return true;
+		} catch(std::out_of_range& ex){
+			return false;
+		}
+		
+	//} else {
+	//	return false;
+	//}
 }
 
 

@@ -36,8 +36,8 @@
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/MotorManager.h>
 #include <rexos_motor/StepperMotorProperties.h>
-#include <rexos_stewart_gough/EffectorBoundaries.h>
-#include <rexos_stewart_gough/InverseKinematics.h>
+//#include <rexos_stewart_gough/EffectorBoundaries.h>
+//#include <rexos_stewart_gough/InverseKinematics.h>
 
 #include <vector>
 
@@ -52,6 +52,17 @@ namespace rexos_stewart_gough{
 		MotorMap(int motor = 0, int sensor = 0):
 				motor(motor),
 				sensor(sensor){}
+				
+	};
+	
+	struct MotorGroup
+	{
+		int motor1;
+		int motor2;
+		
+		MotorGroup(int motor1 = 0, int motor2 = 0):
+				motor1(motor1),
+				motor2(motor2){}
 				
 	};
 	
@@ -71,7 +82,7 @@ namespace rexos_stewart_gough{
 		 * Gets the EffectorBoundaries of the deltarobot.
 		 * @return The EffectorBoundaries of the deltarobot.
 		 **/
-		inline EffectorBoundaries* getBoundaries(){ return boundaries; }
+		//inline EffectorBoundaries* getBoundaries(){ return boundaries; }
 
 		/**
 		 * Checks whether the EffectorBoundaries have been generated, via the boundariesGenerated boolean.
@@ -82,8 +93,11 @@ namespace rexos_stewart_gough{
 		void generateBoundaries(double voxelSize);
 		bool checkPath(const rexos_datatypes::Point3D<double>& begin, const rexos_datatypes::Point3D<double>& end);
 
+
+		void moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration, double rotationX, double rotationY, double rotationZ);
 		void moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration);
-		void calibrateMotor(int motorIndex);
+		
+		void calibrateMotor(int motorIndex1,int motorIndex2);
 		bool checkSensor(int sensorIndex);
 		bool calibrateMotors();
 		void powerOff();
@@ -98,7 +112,7 @@ private:
 		 * @var InverseKinematicsModel* kinematics
 		 * A pointer to the kinematics model used by the DeltaRobot.
 		 **/
-		InverseKinematics* kinematics;
+		//InverseKinematics* kinematics;
 
 		rexos_datatypes::StewartGoughMeasures * stewartGoughMeasures;
 		rexos_motor::StepperMotorProperties * stepperMotorProperties;
@@ -120,7 +134,7 @@ private:
 		 * @var EffectorBoundaries* boundaries
 		 * A pointer to the EffectorBoundaries of the DeltaRobot.
 		 **/
-		EffectorBoundaries* boundaries;
+		//EffectorBoundaries* boundaries;
 
 		/**
 		 * @var Point3D<double> effectorLocation
@@ -155,7 +169,7 @@ private:
 		int currentMotionSlot;
 
 		bool isValidAngle(int motorIndex, double angle);
-		int moveMotorUntilSensorIsOfValue(int motorIndex, rexos_datatypes::MotorRotation motorRotation, bool sensorValue);
+		MotorGroup moveMotorUntilSensorIsOfValue(int motorIndex1,int motorIndex2, rexos_datatypes::MotorRotation motorRotation1 ,rexos_datatypes::MotorRotation motorRotation2, bool sensorValue);
 		double getSpeedForRotation(double relativeAngle, double moveTime, double acceleration);
 		double getAccelerationForRotation(double relativeAngle, double moveTime);
 	};

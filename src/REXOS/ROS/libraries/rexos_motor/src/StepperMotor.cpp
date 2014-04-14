@@ -249,6 +249,18 @@ namespace rexos_motor {
 		}
 	}
 	
+	bool StepperMotor::isReady(void){
+		uint16_t status_1;
+		if(!((status_1 = modbus->readU16(motorIndex, CRD514KD::Registers::STATUS_1)) & CRD514KD::Status1Bits::READY)){
+			if((status_1 & CRD514KD::Status1Bits::ALARM) || (status_1 & CRD514KD::Status1Bits::WARNING)){
+
+				throw CRD514KDException(motorIndex, status_1 & CRD514KD::Status1Bits::WARNING, status_1 & CRD514KD::Status1Bits::ALARM);
+			}
+			return false;
+		}
+		return true;
+	}
+	
 	bool StepperMotor::isValidAngle(double angle){
 		return (angle >= getMinAngle() && angle <= getMaxAngle());
 	}

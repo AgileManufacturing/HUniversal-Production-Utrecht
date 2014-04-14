@@ -54,6 +54,8 @@ namespace rexos_motor{
 			modbus(modbus), motors(motors), poweredOn(false){}
 
 		void powerOn(void);
+		void powerOnSingleMotor(int motorIndex);
+		void powerOffSingleMotor(int motorIndex);
 		void powerOff(void);
 
 		/**

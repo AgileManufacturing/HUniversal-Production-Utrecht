@@ -68,6 +68,7 @@ namespace rexos_motor{
 		bool isPoweredOn(void){ return poweredOn; }
 		
 		bool isValidAngle(double angle);
+		bool isReady();
 
 		/**
 		 * Returns the minimum angle, in radians, the StepperMotor can travel on the theoretical plane.

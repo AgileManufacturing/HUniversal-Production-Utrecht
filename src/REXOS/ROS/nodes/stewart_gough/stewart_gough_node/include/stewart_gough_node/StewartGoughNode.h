@@ -35,6 +35,7 @@
 #include "stewart_gough_node/Point.h"
 
 #include <rexos_datatypes/Point3D.h>
+#include <rexos_utilities/Utilities.h>
 #include <rexos_stewart_gough/StewartGough.h>
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/StepperMotorProperties.h>
@@ -66,7 +67,7 @@ namespace stewartGoughNodeNamespace{
 			public rexos_coordinates::Module{
 	protected:
 		rexos_motor::StepperMotorProperties* stepperMotorProperties;
-		rexos_datatypes::DeltaRobotMeasures* deltaRobotMeasures;
+		rexos_datatypes::StewartGoughMeasures* stewartGoughMeasures;
 	
 		std::string modbusIp;
 		int modbusPort;

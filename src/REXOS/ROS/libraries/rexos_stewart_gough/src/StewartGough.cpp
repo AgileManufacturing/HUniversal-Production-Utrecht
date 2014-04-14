@@ -35,15 +35,18 @@
 #include <cmath>
 
 #include <rexos_datatypes/Point3D.h>
-#include <rexos_stewart_gough/EffectorBoundaries.h>
-#include <rexos_stewart_gough/InverseKinematics.h>
-#include <rexos_stewart_gough/InverseKinematicsException.h>
+//#include <rexos_stewart_gough/EffectorBoundaries.h>
+
+//#include <rexos_stewart_gough/InverseKinematics.h>
+//#include <rexos_stewart_gough/InverseKinematicsException.h>
 #include <rexos_stewart_gough/StewartGough.h>
 #include <rexos_motor/MotorException.h>
 #include <rexos_motor/MotorInterface.h>
 #include <rexos_utilities/Utilities.h>
 
 #include "ros/ros.h"
+
+#include "rexos_stewart_gough/SixAxisCalculations.h"
 
 namespace rexos_stewart_gough{
     /**
@@ -55,9 +58,7 @@ namespace rexos_stewart_gough{
      * @param modbusIO The TCP modbus connection for the IO controller.
      **/
     StewartGough::StewartGough(JSONNode node) :
-			kinematics(NULL),
 			motorManager(NULL),
-			boundaries(NULL),
 			effectorLocation(rexos_datatypes::Point3D<double>(0, 0, 0)), 
 			boundariesGenerated(false),
 			currentMotionSlot(1){
@@ -101,7 +102,7 @@ namespace rexos_stewart_gough{
 		
 		motorManager = new rexos_motor::MotorManager(modbus, motors);
 
-        kinematics = new InverseKinematics;
+       // kinematics = new InverseKinematics;
 		
 		ROS_INFO("end of constructor reached");
 
@@ -117,7 +118,7 @@ namespace rexos_stewart_gough{
         if(motorManager->isPoweredOn()){
             motorManager->powerOff();
         }
-        delete kinematics;
+        //delete kinematics;
     }
     
 	void StewartGough::readJSONNode(const JSONNode node) {
@@ -166,8 +167,13 @@ namespace rexos_stewart_gough{
      * @return If the angle is valid for the motor.
      **/
     bool StewartGough::isValidAngle(int motorIndex, double angle) {
-        assert(motorIndex >= 0 && motorIndex < 3);
-        return angle > motors[motorIndex]->getMinAngle() && angle < motors[motorIndex]->getMaxAngle();
+        assert(motorIndex >= 0 && motorIndex < 6);
+		
+		std::cout << "angle: " << angle << std::endl;		
+		std::cout << "angleMin: " << motors[motorIndex]->getMinAngle() << std::endl;	
+		std::cout << "angleMax: " << motors[motorIndex]->getMaxAngle() << std::endl;	
+        //return angle > motors[motorIndex]->getMinAngle() && angle < motors[motorIndex]->getMaxAngle();
+		return true;
     }
 
     /**
@@ -178,9 +184,9 @@ namespace rexos_stewart_gough{
      * 
      * @return if the path between two points is valid.
      **/
-    bool StewartGough::checkPath(const rexos_datatypes::Point3D<double>& begin, const rexos_datatypes::Point3D<double>& end){
-        return boundaries->checkPath(begin, end);
-    }
+    //bool StewartGough::checkPath(const rexos_datatypes::Point3D<double>& begin, const rexos_datatypes::Point3D<double>& end){
+        //return boundaries->checkPath(begin, end);
+   // }
 
     /**
      * Gets the acceleration in radians/s² for a motor rotation with a certain relative angle and time, which is half acceleration and half deceleration (there is no period of constant speed).
@@ -208,8 +214,205 @@ namespace rexos_stewart_gough{
     }
 
 
-    void StewartGough::moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration){
-        
+	void StewartGough::moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration){
+		moveTo(point, maxAcceleration, 0, 0, 0);
+	}
+
+
+    void StewartGough::moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration, double rotationX, double rotationY, double rotationZ){
+        // check whether the motors are powered on.
+        if(!motorManager->isPoweredOn()){
+            throw rexos_motor::MotorException("motor drivers are not powered on");
+        }
+
+        if(effectorLocation == point){
+            // The effector is already at the requested location, the method can be cut short.
+            return;
+        }
+
+        if(maxAcceleration > rexos_motor::CRD514KD::MOTOR_MAX_ACCELERATION){
+            // The acceleration is too high, putting it down to the maximum CRD514KD acceleration.
+            maxAcceleration = rexos_motor::CRD514KD::MOTOR_MAX_ACCELERATION;
+        } else if(maxAcceleration < rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION){
+            // The acceleration is too low, throwing an exception.
+            throw std::out_of_range("maxAcceleration too low");            
+        }
+
+        // Create MotorRotation objects.
+        rexos_datatypes::MotorRotation* rotations[6];
+        rotations[0] = new rexos_datatypes::MotorRotation();
+        rotations[1] = new rexos_datatypes::MotorRotation();
+        rotations[2] = new rexos_datatypes::MotorRotation();
+		rotations[3] = new rexos_datatypes::MotorRotation();
+        rotations[4] = new rexos_datatypes::MotorRotation();
+        rotations[5] = new rexos_datatypes::MotorRotation();
+
+        // Get the motor angles from the kinematics model
+        try{
+			
+			SixAxisCalculations calc;
+			
+			double angles[6];
+			
+			calc.getAngles(angles, SixAxisCalculations::Point3D(point.x/10, point.y/10, point.z/10), rotationX, rotationY, rotationZ);
+			
+			if(!calc.isValidMove(angles)){
+				throw std::out_of_range("invalid angles"); 
+			}
+			
+			for(int i = 0; i < 6;i++){
+				rotations[i]->angle = angles[i];
+			}
+			
+			
+            //kinematics->destinationPointToMotorRotations(point, rotations);
+        } catch(std::out_of_range& ex){
+            delete rotations[0];
+            delete rotations[1];
+            delete rotations[2];
+			delete rotations[3];
+            delete rotations[4];
+            delete rotations[5];
+            throw ex;
+        }
+
+		
+        // Check if the angles fit within the boundaries
+        if(	!isValidAngle(0, rotations[0]->angle) || 
+			!isValidAngle(1, rotations[1]->angle) || 
+			!isValidAngle(2, rotations[2]->angle) ||
+			!isValidAngle(3, rotations[3]->angle) || 
+			!isValidAngle(4, rotations[4]->angle) || 
+			!isValidAngle(5, rotations[5]->angle)
+		){
+            delete rotations[0];
+            delete rotations[1];
+            delete rotations[2];
+			delete rotations[3];
+            delete rotations[4];
+            delete rotations[5];
+		
+            throw std::out_of_range("motion angles outside of valid range");
+        }
+		
+
+		//Not needed for new calculations
+		/*
+		
+        // Check if the path fits within the boundaries
+        if(!boundaries->checkPath(effectorLocation, point)){
+            delete rotations[0];
+            delete rotations[1];
+            delete rotations[2];
+			delete rotations[3];
+            delete rotations[4];
+            delete rotations[5];
+            throw std::out_of_range("invalid path", point);
+        }
+	*/
+
+        try{
+            // An array to hold the relative angles for the motors
+            double relativeAngles[6] = {0.0,0.0,0.0,0.0,0.0,0.0};
+
+            // An array that indicates for each motor whether it moves in this motion or not.
+            bool motorIsMoved[6] = {true, true, true,true, true, true};
+
+            // Index for the motor with the biggest motion
+            int motorWithBiggestMotion = 0;
+
+            for(int i = 0; i < 6; i++){
+                relativeAngles[i] = fabs(rotations[i]->angle - motors[i]->getCurrentAngle());
+                if (relativeAngles[i] > relativeAngles[motorWithBiggestMotion]){
+                    motorWithBiggestMotion = i;
+                }
+
+                if(relativeAngles[i] < rexos_motor::CRD514KD::MOTOR_STEP_ANGLE){
+                    // motor does not have to move at all
+                    motorIsMoved[i] = false;
+                }
+            }
+
+            if(!(	motorIsMoved[0] || motorIsMoved[1] || motorIsMoved[2] ||
+					motorIsMoved[3] || motorIsMoved[4] || motorIsMoved[5]
+			)){
+                // none of the motors have to move, method can be cut short
+                delete rotations[0];
+                delete rotations[1];
+                delete rotations[2];
+				delete rotations[3];
+                delete rotations[4];
+                delete rotations[5];
+                return;
+            }
+
+             // switch currentMotionSlot
+            currentMotionSlot++;
+            if(currentMotionSlot > rexos_motor::CRD514KD::MOTION_SLOTS_USED){
+                currentMotionSlot = 1;
+            }
+
+            // Set the acceleration of the motor with the biggest motion to the given maximum.
+            rotations[motorWithBiggestMotion]->acceleration = maxAcceleration;
+            rotations[motorWithBiggestMotion]->deceleration = maxAcceleration;
+
+            // Calculate the time the motion will take, based on the assumption that the motion is two-phase (half acceleration and half deceleration).
+            // TODO: Take the motor's maximum speed into account.
+            double moveTime;
+
+            if(sqrt(relativeAngles[motorWithBiggestMotion] * rotations[motorWithBiggestMotion]->acceleration) > rexos_motor::CRD514KD::MOTOR_MAX_SPEED){
+                // In case of a two-phase motion, the top speed would come out above the motor's maximum, so a three-phase motion must be made.
+                rotations[motorWithBiggestMotion]->speed = rexos_motor::CRD514KD::MOTOR_MAX_SPEED;
+                moveTime = (relativeAngles[motorWithBiggestMotion] / rotations[motorWithBiggestMotion]->speed) + (rotations[motorWithBiggestMotion]->speed / rotations[motorWithBiggestMotion]->acceleration);  
+            } else {
+                // The motion is fine as a two-phase motion.
+                moveTime = 2 * sqrt(relativeAngles[motorWithBiggestMotion] / rotations[motorWithBiggestMotion]->acceleration);
+            }
+            
+            // Set speed, and also the acceleration for the smaller motion motors
+            for(int i = 0; i < 6; i++){
+                rotations[i]->speed = rexos_motor::CRD514KD::MOTOR_MAX_SPEED;
+
+                if(i != motorWithBiggestMotion){
+                    if(motorIsMoved[i]){
+                        rotations[i]->acceleration = getAccelerationForRotation(relativeAngles[i], moveTime);
+                        rotations[i]->deceleration = rotations[i]->acceleration;  
+                        if(rotations[i]->acceleration < rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION){
+                            // The acceleration comes out too low, this means the motion cannot be half acceleration and half deceleration (without a consant speed phase).
+                            // To make it comply with the move time, as well as the minimum acceleration requirements, we have to add a top speed.
+                            rotations[i]->acceleration = rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION;
+                            rotations[i]->deceleration = rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION;
+                            rotations[i]->speed = getSpeedForRotation(relativeAngles[i], moveTime, rotations[i]->acceleration);
+                        } else if(rotations[i]->acceleration > rexos_motor::CRD514KD::MOTOR_MAX_ACCELERATION){
+                            throw std::out_of_range("acceleration too high");
+                        }
+                    } else {
+                        rotations[i]->acceleration = rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION;
+                        rotations[i]->deceleration = rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION;
+                        rotations[i]->angle = motors[i]->getCurrentAngle();
+                    }
+                }
+                motors[i]->writeRotationData(*rotations[i], currentMotionSlot);
+            }
+
+            motorManager->startMovement(currentMotionSlot);
+        } catch(std::out_of_range& ex){
+            delete rotations[0];
+            delete rotations[1];
+            delete rotations[2];
+			delete rotations[3];
+            delete rotations[4];
+            delete rotations[5];
+            throw ex;
+        }
+
+        delete rotations[0];
+        delete rotations[1];
+        delete rotations[2];
+		delete rotations[3];
+        delete rotations[4];
+        delete rotations[5];
+        effectorLocation = point;
     }
 
     /**
@@ -242,17 +445,42 @@ namespace rexos_stewart_gough{
      *
      * @return The amount of motor steps the motor has moved.
      **/
-    int StewartGough::moveMotorUntilSensorIsOfValue(int motorIndex, rexos_datatypes::MotorRotation motorRotation, bool sensorValue){
+    MotorGroup StewartGough::moveMotorUntilSensorIsOfValue(int motorIndex1,int motorIndex2,rexos_datatypes::MotorRotation motorRotation1 ,rexos_datatypes::MotorRotation motorRotation2, bool sensorValue){
 		ROS_INFO("move Motor Until Sensor Is Of Value...");
-        motors[motorIndex]->writeRotationData(motorRotation, 1, false);
+        motors[motorIndex1]->writeRotationData(motorRotation1, 1, false);
+		motors[motorIndex2]->writeRotationData(motorRotation2, 1, false);
+		bool done1 = false;
+		bool done2 = false;
+        MotorGroup motorGroupSteps(0,0);
+		
+		while(1)
+		{
+			if(checkSensor(motorMap[motorIndex1].sensor) != sensorValue)
+			{
+				motors[motorIndex1]->startMovement(1);
+				motorGroupSteps.motor1 += (motorRotation1.angle / rexos_motor::CRD514KD::MOTOR_STEP_ANGLE); 
+			}else{
+				done1 = true;
+			}
+			
+			if(checkSensor(motorMap[motorIndex2].sensor) != sensorValue)
+			{
+				motors[motorIndex2]->startMovement(1);
+				motorGroupSteps.motor2 += (motorRotation2.angle / rexos_motor::CRD514KD::MOTOR_STEP_ANGLE); 
+			}else{
+				done2 = true;
+			}
+			
+			if(done1 == true && done2 == true)
+			{
+				return motorGroupSteps;
+			}
+		
+		}
+		
 
-        int steps = 0;
-        do {
-            motors[motorIndex]->startMovement(1);
-            steps += (motorRotation.angle / rexos_motor::CRD514KD::MOTOR_STEP_ANGLE);  
-        } while(checkSensor(motorMap[motorIndex].sensor) != sensorValue);
-
-        return steps;
+		return motorGroupSteps;
+        
     }
 
     /**
@@ -264,40 +492,61 @@ namespace rexos_stewart_gough{
     * 
     * @param motorIndex Index of the motor to be calibrated. When standing in front of the robot looking towards it, 0 is the right motor, 1 is the front motor and 2 is the left motor.
     **/
-    void StewartGough::calibrateMotor(int motorIndex){
-       std::cout << "[DEBUG] Calibrating motor number " << motorIndex << std::endl;
+    void StewartGough::calibrateMotor(int motorIndex1, int motorIndex2){
+       std::cout << "[DEBUG] Calibrating motor number " << motorIndex1 << std::endl;
 
         // Setup for incremental motion in big steps, to get to the sensor quickly.
-        motors[motorIndex]->setIncrementalMode(1);
-        rexos_datatypes::MotorRotation motorRotation;
-        motorRotation.angle = -motors.at(motorIndex)->getMicroStepAngle() * calibrationBigStepFactor;
+        motors[motorIndex1]->setIncrementalMode(1);
+		motors[motorIndex2]->setIncrementalMode(1);
+        rexos_datatypes::MotorRotation motorRotation1;
+		rexos_datatypes::MotorRotation motorRotation2;
+        motorRotation1.angle = -motors.at(motorIndex1)->getMicroStepAngle() * calibrationBigStepFactor;
+		motorRotation2.angle = -motors.at(motorIndex2)->getMicroStepAngle() * calibrationBigStepFactor;
         
         // Move to the sensor in large steps until it is pushed
         // actualAngleInSteps keeps track of how many motor steps the motor has moved. This is necessary to avoid accummulating errors.
-        int actualAngleInSteps = moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, true);
-
+        MotorGroup actualAnglesInSteps = moveMotorUntilSensorIsOfValue(motorIndex1,motorIndex2, motorRotation1,motorRotation2, true);
+		
+		int actualAngleInSteps1 = actualAnglesInSteps.motor1;
+		int actualAngleInSteps2 = actualAnglesInSteps.motor2;
+		
         // Move away from the sensor in big steps until it is no longer pushed.
-        motorRotation.angle = -motorRotation.angle;
-        actualAngleInSteps += moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, false);
-        
+        motorRotation1.angle = -motorRotation1.angle;
+		motorRotation2.angle = -motorRotation2.angle;
+        actualAnglesInSteps = moveMotorUntilSensorIsOfValue(motorIndex1,motorIndex2, motorRotation1,motorRotation2, false);
+		actualAngleInSteps1 += actualAnglesInSteps.motor1;
+		actualAngleInSteps2 += actualAnglesInSteps.motor2;
+
         // Move back to the sensor in small steps until it is pushed.
-        motorRotation.angle = -motors.at(motorIndex)->getMicroStepAngle();
-        actualAngleInSteps += moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, true);
+        motorRotation1.angle = -motors.at(motorIndex1)->getMicroStepAngle();
+		motorRotation2.angle = -motors.at(motorIndex2)->getMicroStepAngle();
+        actualAnglesInSteps = moveMotorUntilSensorIsOfValue(motorIndex1,motorIndex2, motorRotation1,motorRotation2, true);
+		actualAngleInSteps1 += actualAnglesInSteps.motor1;
+		actualAngleInSteps2 += actualAnglesInSteps.motor2;
+		
+		
 		
 		std::cout << "actual steps: " << std::endl;
-		std::cout << actualAngleInSteps << std::endl;
+		std::cout << actualAngleInSteps1 << std::endl;
 		//calculate and set the deviation.
 		//std::cout << stewartGoughMeasures->motorFromZeroToTopAngle << std::endl;
-        double deviation = (actualAngleInSteps * motors.at(motorIndex)->getMicroStepAngle()) + stewartGoughMeasures->motorFromZeroToTopAngle;
-        std::cout << "passed 1" << std::endl;
-		motors[motorIndex]->setDeviationAndWriteMotorLimits(deviation);
+        double deviation1 = (actualAngleInSteps1 * motors.at(motorIndex1)->getMicroStepAngle()) + stewartGoughMeasures->motorFromZeroToTopAngle;
+        double deviation2 = (actualAngleInSteps2 * motors.at(motorIndex2)->getMicroStepAngle()) + stewartGoughMeasures->motorFromZeroToTopAngle;
+		
+		std::cout << "passed 1" << std::endl;
+		motors[motorIndex1]->setDeviationAndWriteMotorLimits(deviation1);
+		motors[motorIndex2]->setDeviationAndWriteMotorLimits(deviation2);
         // Move back to the new 0.
 		
-        motors[motorIndex]->setAbsoluteMode(1);
-        motorRotation.angle = 0;
-        motors[motorIndex]->moveTo(motorRotation, 1);
-
-        motors[motorIndex]->waitTillReady();
+        motors[motorIndex1]->setAbsoluteMode(1);
+		motors[motorIndex2]->setAbsoluteMode(1);
+        motorRotation1.angle = 0;
+		motorRotation2.angle = 0;
+        motors[motorIndex1]->moveTo(motorRotation1, 1);
+		motors[motorIndex2]->moveTo(motorRotation2, 1);
+		
+        motors[motorIndex1]->waitTillReady();
+		motors[motorIndex2]->waitTillReady();
     }
 
     /**
@@ -310,6 +559,12 @@ namespace rexos_stewart_gough{
     bool StewartGough::calibrateMotors(){       
         std::cout << "calibrating" << std::endl;
 		// Check the availability of the sensors
+		motorManager->powerOffSingleMotor(0);
+		motorManager->powerOffSingleMotor(1);
+		motorManager->powerOffSingleMotor(2);
+		motorManager->powerOffSingleMotor(3);
+		motorManager->powerOffSingleMotor(4);
+		motorManager->powerOffSingleMotor(5);
 
         bool sensorFailure = false;
 		
@@ -329,15 +584,84 @@ namespace rexos_stewart_gough{
         motorRotation.speed = 0.1;
         motorRotation.angle = 0;
 
-
-		for(int i =0; i < 6; i++){
-			motors[i]->setDeviationAndWriteMotorLimits(0);
-			motors[i]->writeRotationData(motorRotation, 1);
-		}
+		motorManager->powerOnSingleMotor(0);
+		motorManager->powerOnSingleMotor(1);
+		
+		std::cout << "powered on 1 and 2" << std::endl;
+		motors[0]->setDeviationAndWriteMotorLimits(0);
+		motors[0]->writeRotationData(motorRotation, 1);
+		motors[1]->setDeviationAndWriteMotorLimits(0);
+		motors[1]->writeRotationData(motorRotation, 1);
+		std::cout << "wrote diviation and rotation data" << std::endl;
 		
 		motorManager->startMovement(1);
+		std::cout << "did start movement" << std::endl;
+		
+		motors[0]->waitTillReady();
+		motors[1]->waitTillReady();
+		
+		motors[0]->disableAngleLimitations();
+		motors[1]->disableAngleLimitations();
+		// Calibrate motors
+		calibrateMotor(0,1);
+		// Enable angle limitations
+		motors[0]->enableAngleLimitations();
+		motors[1]->enableAngleLimitations();
+		
+		std::cout << "1 and 2 done" << std::endl;
+		
+		motorManager->powerOnSingleMotor(2);
+		motorManager->powerOnSingleMotor(3);
+		
+		std::cout << "powered on 3 and 4" << std::endl;
+		motors[2]->setDeviationAndWriteMotorLimits(0);
+		motors[3]->writeRotationData(motorRotation, 1);
+		motors[2]->setDeviationAndWriteMotorLimits(0);
+		motors[3]->writeRotationData(motorRotation, 1);
+		std::cout << "wrote diviation and rotation data" << std::endl;
+		
+		motorManager->startMovement(1);
+		std::cout << "did start movement" << std::endl;
+		
+		motors[2]->waitTillReady();
+		motors[3]->waitTillReady();
+		
+		motors[2]->disableAngleLimitations();
+		motors[3]->disableAngleLimitations();
+		// Calibrate motors
+		calibrateMotor(2,3);
+		// Enable angle limitations
+		motors[2]->enableAngleLimitations();
+		motors[3]->enableAngleLimitations();
+		
+		std::cout << "3 and 4 done" << std::endl;
+		
+		motorManager->powerOnSingleMotor(4);
+		motorManager->powerOnSingleMotor(5);
+		
+		std::cout << "powered on 4 and 5" << std::endl;
+		motors[4]->setDeviationAndWriteMotorLimits(0);
+		motors[5]->writeRotationData(motorRotation, 1);
+		motors[4]->setDeviationAndWriteMotorLimits(0);
+		motors[5]->writeRotationData(motorRotation, 1);
+		std::cout << "wrote diviation and rotation data" << std::endl;
+		
+		motorManager->startMovement(1);
+		std::cout << "did start movement" << std::endl;
+		
+		motors[4]->waitTillReady();
+		motors[5]->waitTillReady();
+		
+		motors[4]->disableAngleLimitations();
+		motors[5]->disableAngleLimitations();
+		// Calibrate motors
+		calibrateMotor(4,5);
+		// Enable angle limitations
+		motors[4]->enableAngleLimitations();
+		motors[5]->enableAngleLimitations();
 		
 		
+		/*
 		for(int i =0; i < 6; i++){
 			motors[i]->waitTillReady();
 			// Disable limitations
@@ -346,11 +670,21 @@ namespace rexos_stewart_gough{
 			calibrateMotor(i);
 			// Enable angle limitations
 			motors[i]->enableAngleLimitations();
-		}
+		}*/
+		
+		
+		
+		
 		
         effectorLocation.x = 0;
         effectorLocation.y = 0;
-        effectorLocation.z = 0; // yet to be set
+        effectorLocation.z = -280; // yet to be set 
+		
+		moveTo(rexos_datatypes::Point3D<double>(50, 50, -280), 10, 0, 0, 0);
+		
+		
+		
+		
         std::cout << "[DEBUG] effector location z: " << effectorLocation.z << std::endl; 
 		
         return true;
