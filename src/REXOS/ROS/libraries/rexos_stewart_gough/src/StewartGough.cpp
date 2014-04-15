@@ -611,19 +611,19 @@ namespace rexos_stewart_gough{
 		
 		sleep(1);
 		
-		moveTo(rexos_datatypes::Point3D<double>(0, 5, -280), 10, 0, 0, 0);
+		moveTo(rexos_datatypes::Point3D<double>(0, 50, -280), 10, 0, 0, 0);
 		
 		sleep(1);
 		
-		moveTo(rexos_datatypes::Point3D<double>(0, -5, -280), 10, 0, 0, 0);
+		moveTo(rexos_datatypes::Point3D<double>(0, -50, -280), 10, 0, 0, 0);
 		
 		sleep(1);
 		
-		moveTo(rexos_datatypes::Point3D<double>(5, 0, -280), 10, 0, 0, 0);
+		moveTo(rexos_datatypes::Point3D<double>(50, 0, -280), 10, 0, 0, 0);
 		
 		sleep(1);
 		
-		moveTo(rexos_datatypes::Point3D<double>(-5, 0, -280), 10, 0, 0, 0);
+		moveTo(rexos_datatypes::Point3D<double>(-50, 0, -280), 10, 0, 0, 0);
 		
 		
 		
