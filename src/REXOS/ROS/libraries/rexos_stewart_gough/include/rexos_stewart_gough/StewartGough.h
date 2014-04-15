@@ -197,5 +197,7 @@ private:
 		rexos_motor::StepperMotor* getMotor(int number);
 		int getMotorIndexByNumber(int number);
 		
+		void deleteMotorRotationObjects(rexos_datatypes::MotorRotation* rotations[6]);
+		
 	};
 }
