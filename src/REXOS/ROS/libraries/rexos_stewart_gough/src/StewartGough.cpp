@@ -168,12 +168,7 @@ namespace rexos_stewart_gough{
      **/
     bool StewartGough::isValidAngle(int motorIndex, double angle) {
         assert(motorIndex >= 0 && motorIndex < 6);
-		
-		std::cout << "angle: " << angle << std::endl;		
-		std::cout << "angleMin: " << motors[motorIndex]->getMinAngle() << std::endl;	
-		std::cout << "angleMax: " << motors[motorIndex]->getMaxAngle() << std::endl;	
         return angle > motors[motorIndex]->getMinAngle() && angle < motors[motorIndex]->getMaxAngle();
-		//return true;
     }
 
     /**
@@ -595,31 +590,38 @@ namespace rexos_stewart_gough{
         motorRotation.speed = 0.1;
         motorRotation.angle = 0;
 
-		motorManager->powerOnSingleMotor(0);
-		motorManager->powerOnSingleMotor(1);
+
+
+		for(int i = 0; i < 6; i = i + 2){
+
+			motorManager->powerOnSingleMotor(getMotorIndexByNumber(0 + i));
+			motorManager->powerOnSingleMotor(getMotorIndexByNumber(1 + i));
+			
+			//std::cout << "powered on 1 and 2" << std::endl;
+			getMotor(0 + i)->setDeviationAndWriteMotorLimits(0);
+			getMotor(0 + i)->writeRotationData(motorRotation, 1);
+			getMotor(1 + i)->setDeviationAndWriteMotorLimits(0);
+			getMotor(1 + i)->writeRotationData(motorRotation, 1);
+			//std::cout << "wrote diviation and rotation data" << std::endl;
+			
+			motorManager->startMovement(1);
+			//std::cout << "did start movement" << std::endl;
+			
+			getMotor(0 + i)->waitTillReady();
+			getMotor(1 + i)->waitTillReady();
+			
+			getMotor(0 + i)->disableAngleLimitations();
+			getMotor(1 + i)->disableAngleLimitations();
+			// Calibrate motors
+			calibrateMotor(getMotorIndexByNumber(0 + i), getMotorIndexByNumber(1 + i));
+			// Enable angle limitations
+			getMotor(0 + i)->enableAngleLimitations();
+			getMotor(1 + i)->enableAngleLimitations();
+			
+			std::cout << "Motors " << (0 + i) << " and " << (1 + i) << " done calibrating!" << std::endl;
+		}
 		
-		std::cout << "powered on 1 and 2" << std::endl;
-		motors[0]->setDeviationAndWriteMotorLimits(0);
-		motors[0]->writeRotationData(motorRotation, 1);
-		motors[1]->setDeviationAndWriteMotorLimits(0);
-		motors[1]->writeRotationData(motorRotation, 1);
-		std::cout << "wrote diviation and rotation data" << std::endl;
-		
-		motorManager->startMovement(1);
-		std::cout << "did start movement" << std::endl;
-		
-		motors[0]->waitTillReady();
-		motors[1]->waitTillReady();
-		
-		motors[0]->disableAngleLimitations();
-		motors[1]->disableAngleLimitations();
-		// Calibrate motors
-		calibrateMotor(0,1);
-		// Enable angle limitations
-		motors[0]->enableAngleLimitations();
-		motors[1]->enableAngleLimitations();
-		
-		std::cout << "1 and 2 done" << std::endl;
+		/*
 		
 		motorManager->powerOnSingleMotor(2);
 		motorManager->powerOnSingleMotor(3);
@@ -670,7 +672,7 @@ namespace rexos_stewart_gough{
 		// Enable angle limitations
 		motors[4]->enableAngleLimitations();
 		motors[5]->enableAngleLimitations();
-		
+		*/
 		
 		/*
 		for(int i =0; i < 6; i++){
@@ -751,4 +753,13 @@ namespace rexos_stewart_gough{
 	double StewartGough::getEffectorRotationZ(){
 		return currentEffectorRotationZ;
 	}
+	
+	rexos_motor::StepperMotor* StewartGough::getMotor(int number){
+		return motors[getMotorIndexByNumber(number)];
+	}
+	int StewartGough::getMotorIndexByNumber(int number){
+		return motorMap[number].motor;
+	}
+	
+	
 }

@@ -193,5 +193,9 @@ private:
 		MotorGroup moveMotorUntilSensorIsOfValue(int motorIndex1,int motorIndex2, rexos_datatypes::MotorRotation motorRotation1 ,rexos_datatypes::MotorRotation motorRotation2, bool sensorValue);
 		double getSpeedForRotation(double relativeAngle, double moveTime, double acceleration);
 		double getAccelerationForRotation(double relativeAngle, double moveTime);
+		
+		rexos_motor::StepperMotor* getMotor(int number);
+		int getMotorIndexByNumber(int number);
+		
 	};
 }
