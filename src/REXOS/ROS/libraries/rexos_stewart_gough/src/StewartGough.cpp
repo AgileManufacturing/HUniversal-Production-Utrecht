@@ -267,7 +267,7 @@ namespace rexos_stewart_gough{
 		bool isInvalidAngles = false;
 		
 		for(int i = 0; i < 6; i++){
-			if(isValidAngle(i, rotations[i]->angle)){
+			if(!isValidAngle(i, rotations[i]->angle)){
 				deleteMotorRotationObjects(rotations);
 				throw std::out_of_range("motion angles outside of valid range");
 			}
@@ -538,6 +538,9 @@ namespace rexos_stewart_gough{
         motorRotation.angle = 0;
 
 
+		//for(int i = 0; i < 6; i = i + 2){
+
+		//}
 
 		for(int i = 0; i < 6; i = i + 2){
 
@@ -551,6 +554,7 @@ namespace rexos_stewart_gough{
 			getMotor(1 + i)->writeRotationData(motorRotation, 1);
 			//std::cout << "wrote diviation and rotation data" << std::endl;
 			
+			//getMotor(0 + i)->startMovement(1);
 			motorManager->startMovement(1);
 			//std::cout << "did start movement" << std::endl;
 			
@@ -579,15 +583,15 @@ namespace rexos_stewart_gough{
 		currentEffectorRotationZ = 0;
 		
 		
-		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 10, 0, 0, 30);
+		//moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 10, 0, 0, 30);
 		
-		sleep(3);
+		//sleep(3);
 		
-		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 10, 0, 0, 0);
+		//moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 10, 0, 0, 0);
 		
-		sleep(3);
+		//sleep(3);
 		
-		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 10, 0, 0, -30);
+		//moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 10, 0, 0, -30);
 		
 		
         std::cout << "[DEBUG] effector location z: " << effectorLocation.z << std::endl; 
