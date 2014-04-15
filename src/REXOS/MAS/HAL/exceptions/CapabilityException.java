@@ -13,8 +13,8 @@ public class CapabilityException extends Exception {
 	 * 
 	 * @param msg
 	 */
-	public CapabilityException(String msg){
-		super(msg);
+	public CapabilityException(String msg, Throwable throwable){
+		super(msg, throwable);
 	}
 
 }

@@ -49,6 +49,7 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 	}
 	
 	protected void executeMongoCommand(String command) throws ModuleExecutingException{
+		System.out.println("Executing mongoCommand: "+command);
 		try {
 			mongoClient.insertDocument(command.toString());
 		} catch (InvalidJSONException e) {
@@ -72,28 +73,19 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 				throw new ModuleTranslatingException("The compositestep doesn't contain any \"command\" key.");
 			}
 			if (!compositeStep.getCommand().get(COMMAND).getAsJsonObject().toString().trim().equalsIgnoreCase("{}")){
-				throw new ModuleTranslatingException("The compositestep isn't completely empty.");
+				throw new ModuleTranslatingException("The compositestep isn't completely empty." + 
+						compositeStep.getCommand().get(COMMAND).getAsJsonObject());
 			}
 			return null;
 		}
 	}
 	
-	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws ModuleExecutingException{
+	public synchronized void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws ModuleExecutingException{
+		this.processListener = processListener;
 		JsonObject command = hardwareStep.getCommand();
 		executeMongoCommand(command.toString());
-		this.processListener = processListener;
 	}
 	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException;
-	
-	public void onHardwareStepChanged(String state, long hardwareStepSerialId) throws HardwareAbstractionLayerProcessException{
-		processListener.onProcessStateChanged(state, hardwareStepSerialId, this);
-	}
-	public void onModuleStateChanged(String state){
-		moduleListener.onModuleStateChanged(state, this);
-	}
-	public void onModuleModeChanged(String mode){
-		moduleListener.onModuleModeChanged(mode, this);
-	}
 	
 	protected JsonObject adjustMoveWithDimentions(JsonObject command, double height){
 		System.out.println("Adjusting move with dimentions: "+command.toString());
@@ -112,10 +104,15 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 
 
 	@Override
-	public void onProcessStateChanged(String state) {
+	public synchronized void onProcessStatusChanged(String status) {
+		System.out.println("Process Status changed - ModuleActor");
 		// TODO Auto-generated method stub
 		try {
-			processListener.onProcessStateChanged(state, 0, this);
+			if (processListener != null){
+				System.out.println("Process Listener active - ModuleActor");
+				processListener.onProcessStatusChanged(status, 0, this);
+				processListener = null;
+			}
 		} catch (HardwareAbstractionLayerProcessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

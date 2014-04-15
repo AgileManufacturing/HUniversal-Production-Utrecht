@@ -4,5 +4,5 @@ import HAL.Module;
 import HAL.exceptions.HardwareAbstractionLayerProcessException;
 
 public interface ProcessListener {
-	public void onProcessStateChanged(String state, long hardwareStepSerialId, Module module) throws HardwareAbstractionLayerProcessException;
+	public void onProcessStatusChanged(String status, long hardwareStepSerialId, Module module) throws HardwareAbstractionLayerProcessException;
 }

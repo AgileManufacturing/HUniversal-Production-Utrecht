@@ -106,9 +106,9 @@ public class PickAndPlace extends Capability {
 						hardwareSteps.addAll(moduleActor.translateCompositeStep(pick));
 						hardwareSteps.addAll(moduleActor.translateCompositeStep(place));
 						
-					} catch (ModuleTranslatingException e) {
+					} catch (ModuleTranslatingException ex) {
 						
-						throw new CapabilityException(e.toString());
+						throw new CapabilityException(ex.toString(), ex);
 					}
 					
 				}

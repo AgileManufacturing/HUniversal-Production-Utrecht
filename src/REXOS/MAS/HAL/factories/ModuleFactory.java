@@ -30,6 +30,7 @@ import HAL.RosSoftware;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleExecutingException;
 import HAL.listeners.ModuleListener;
+import HAL.listeners.ProcessListener;
 
 public class ModuleFactory extends Factory {
 	// SQL queries
@@ -202,17 +203,25 @@ public class ModuleFactory extends Factory {
 			"	typeNumber = ? AND \n" + 
 			"	serialNumber = ?;"; 
 	
+	private ModuleListener moduleListener;
 	private DynamicClassFactory<Module> dynamicClassFactory;
 	private HardwareAbstractionLayer hal;
 	
 	private HashMap<ModuleIdentifier, Module> loadedModules;
+
 	
 	public ModuleFactory(ModuleListener moduleListener, HardwareAbstractionLayer hal) throws KnowledgeException{
 		super(new KnowledgeDBClient());
+		this.moduleListener = moduleListener;
 		this.dynamicClassFactory = new DynamicClassFactory<>();
 		this.hal = hal;
 		this.loadedModules = new HashMap<ModuleIdentifier, Module>();
 	}
+	
+	public HardwareAbstractionLayer getHAL(){
+		return this.hal;
+	}
+	
 	public ArrayList<ModuleActor> getBottomModulesForFunctionalModuleTree(Capability capability, int treeNumber) throws FactoryException, JarFileLoaderException{
 		ArrayList<ModuleActor> modules = new ArrayList<ModuleActor>();
 		
@@ -254,24 +263,31 @@ public class ModuleFactory extends Factory {
 		return modules;
 		
 	}
-	public void executeHardwareStep(HardwareStep hardwareStep) throws FactoryException, JarFileLoaderException, ModuleExecutingException{
+	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws FactoryException, JarFileLoaderException, ModuleExecutingException{
 		ModuleActor module = (ModuleActor) getModuleByIdentifier(hardwareStep.getModuleIdentifier());
-		module.executeHardwareStep(hardwareStep);
+		module.executeHardwareStep(processListener, hardwareStep);
 	}
 	
 	public Module getModuleByIdentifier(ModuleIdentifier moduleIdentifier) throws FactoryException, JarFileLoaderException{
-		if(loadedModules.containsKey(moduleIdentifier)) {
-			return loadedModules.get(moduleIdentifier);
-		} else {
-			DynamicClassDescription description = JavaSoftware.getJavaSoftwareForModuleIdentifier(moduleIdentifier).getDynamicClassDescription();
-			try {
-				Class<Module> moduleClass = dynamicClassFactory.getClassFromDescription(description);
-				return moduleClass.getConstructor(ModuleIdentifier.class, ModuleFactory.class).newInstance(moduleIdentifier, this);
-			} catch (InstantiateClassException | InstantiationException | IllegalAccessException
-					| IllegalArgumentException | InvocationTargetException
-					| NoSuchMethodException | SecurityException ex) {
-				throw new FactoryException("well, we are fucked", ex);
+		System.out.println(loadedModules);
+		
+		for (ModuleIdentifier loadedModuleIdentifier : loadedModules.keySet()) {
+			if(moduleIdentifier.equals(loadedModuleIdentifier) == true) {
+				return loadedModules.get(loadedModuleIdentifier);
 			}
+			
+		}
+		DynamicClassDescription description = JavaSoftware.getJavaSoftwareForModuleIdentifier(moduleIdentifier, knowledgeDBClient).getDynamicClassDescription();
+		try {
+			Class<Module> moduleClass = dynamicClassFactory.getClassFromDescription(description);
+			Module module = moduleClass.getConstructor(ModuleIdentifier.class, ModuleFactory.class, ModuleListener.class).
+					newInstance(moduleIdentifier, this, moduleListener);
+			loadedModules.put(moduleIdentifier, module);
+			return module;
+		} catch (InstantiateClassException | InstantiationException | IllegalAccessException
+				| IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException ex) {
+			throw new FactoryException("well, we are fucked", ex);
 		}
 	}
 	private boolean isModuleTypeKnown(ModuleIdentifier moduleIdentifier) {

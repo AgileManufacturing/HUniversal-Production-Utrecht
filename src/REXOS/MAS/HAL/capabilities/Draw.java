@@ -3,8 +3,9 @@ package HAL.capabilities;
 import java.util.ArrayList;
 
 import libraries.dynamicloader.JarFileLoaderException;
-import com.google.gson.JsonElement;
+
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import HAL.Capability;
 import HAL.CompositeStep;
@@ -40,10 +41,10 @@ public class Draw extends Capability {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<>();
 		String serviceName = productStep.getService().getName();
 		JsonObject productStepCriteria = productStep.getCriteria();
-		JsonElement target = productStepCriteria.get("target");
+		JsonObject target = productStepCriteria.get("target").getAsJsonObject();
 		
 		if(serviceName.equals("draw") && target != null){
-			JsonObject moveCommand = target.getAsJsonObject().get("move").getAsJsonArray().getAsJsonObject();
+			JsonObject moveCommand = target.get("move").getAsJsonObject();
 
 			JsonObject command = new JsonObject();
 			command.addProperty("draw", "null");
@@ -52,19 +53,23 @@ public class Draw extends Capability {
 			JsonObject jsonCommand = new JsonObject();
 			jsonCommand.add("command", command);
 			
-			jsonCommand.add("look_up", target);
+			jsonCommand.addProperty("look_up", target.get("identifier").getAsString());
 			
-			CompositeStep draw = new CompositeStep(productStep, jsonCommand);
+			System.out.println("command" + jsonCommand);
+			
 		
 			ArrayList<ModuleActor> modules = moduleFactory.getBottomModulesForFunctionalModuleTree(this, 1);
+			//System.
 			for (ModuleActor moduleActor : modules) {
+				JsonObject a = new JsonParser().parse(jsonCommand.toString()).getAsJsonObject();
+				CompositeStep draw = new CompositeStep(productStep, a);
 				try {
 					
 					hardwareSteps.addAll(moduleActor.translateCompositeStep(draw));
+					return hardwareSteps;
+				} catch (ModuleTranslatingException ex) {
 					
-				} catch (ModuleTranslatingException e) {
-					
-					throw new CapabilityException(e.toString());
+					throw new CapabilityException(ex.toString(), ex);
 				}
 			}
 		}

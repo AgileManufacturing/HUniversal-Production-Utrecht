@@ -19,8 +19,8 @@ import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 
 public class Pen extends ModuleActor {
-	private static final double PEN_SIZE = 96.6; // in cm
-	private static final int MAX_ACCELERATION = 50;
+	private static final double PEN_SIZE = 97.6; // in mm
+	private static final int MAX_ACCELERATION = 150;
 
 	public Pen(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) throws KnowledgeException, UnknownHostException, GeneralMongoException {
 		super(moduleIdentifier, moduleFactory, moduleListener);
@@ -36,12 +36,13 @@ public class Pen extends ModuleActor {
 		if (command != null){
 			//Remove corresponding commands to module.
 			if (command.remove("draw") == null){
-				throw new ModuleTranslatingException ("Pen module didn't find a \"draw\" key in CompositeStep command: "+jsonCommand.toString());
+				throw new ModuleTranslatingException ("Pen module didn't find a \"draw\" key in CompositeStep command: " + command.toString());
 			}			
 			
 			//Adjust the move with the Pen module it's height.
 			command = adjustMoveWithDimentions(command, PEN_SIZE);
 			command.addProperty("maxAcceleration", MAX_ACCELERATION);
+			command.addProperty("forceStraightLine", false);
 			jsonCommand.add(COMMAND, command);
 			
 			//Translate it's parents composite steps into hardware steps.

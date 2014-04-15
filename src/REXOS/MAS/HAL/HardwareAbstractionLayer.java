@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import libraries.knowledgedb_client.KnowledgeException;
+import HAL.exceptions.BlackboardUpdateException;
 import HAL.factories.CapabilityFactory;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
@@ -16,7 +17,8 @@ import HAL.tasks.TranslationProcess;
 public class HardwareAbstractionLayer implements ModuleListener{
 	private CapabilityFactory capabilityFactory;
 	private ModuleFactory moduleFactory;
-	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
+	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener; 
+	private BlackboardUpdated blackboardUpdater;
 	
 	// TODO move somewhere else?? 
 	private String equipletName;
@@ -30,15 +32,27 @@ public class HardwareAbstractionLayer implements ModuleListener{
 		moduleFactory = new ModuleFactory(this, this);
 		// TODO hardcoded
 		equipletName = "EQ1";
+		try {
+			blackboardUpdater = new BlackboardUpdated();
+		} catch (BlackboardUpdateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public BlackboardUpdated getBlackboardUpdater(){
+		return this.blackboardUpdater;
 	}
 	
 	public void executeHardwareSteps(ArrayList<HardwareStep> hardwareSteps){
 		ExecutionProcess executionProcess = new ExecutionProcess(this.hardwareAbstractionLayerListener, hardwareSteps, moduleFactory);
-		executionProcess.run();
+		Thread t = new Thread(executionProcess);
+		t.start();
 	}
 	public void translateProductStep(ProductStep productStep){
 		TranslationProcess translationProcess = new TranslationProcess(this.hardwareAbstractionLayerListener, productStep, capabilityFactory);
-		translationProcess.run();
+		Thread t = new Thread(translationProcess);
+		t.start();
 	}
 	public ArrayList<Capability> getAllCapabilities() throws Exception{
 		return capabilityFactory.getAllSupportedCapabilities();
