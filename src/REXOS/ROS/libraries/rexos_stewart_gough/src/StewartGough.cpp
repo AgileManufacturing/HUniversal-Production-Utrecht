@@ -318,10 +318,10 @@ namespace rexos_stewart_gough{
             }
 
              // switch currentMotionSlot
-            currentMotionSlot++;
-            if(currentMotionSlot > rexos_motor::CRD514KD::MOTION_SLOTS_USED){
-                currentMotionSlot = 1;
-            }
+            //currentMotionSlot++;
+            //if(currentMotionSlot > rexos_motor::CRD514KD::MOTION_SLOTS_USED){
+			currentMotionSlot = 1;
+            //}
 
             // Set the acceleration of the motor with the biggest motion to the given maximum.
             rotations[motorWithBiggestMotion]->acceleration = maxAcceleration;
@@ -538,12 +538,23 @@ namespace rexos_stewart_gough{
         motorRotation.angle = 0;
 
 
-		//for(int i = 0; i < 6; i = i + 2){
-
-		//}
+		for(int i = 0; i < 6; i++){
+			motorManager->powerOnSingleMotor(getMotorIndexByNumber(0 + i));
+			
+			getMotor(0 + i)->setDeviationAndWriteMotorLimits(0);
+			getMotor(0 + i)->writeRotationData(motorRotation, 1);
+			
+			
+			getMotor(0 + i)->startMovement(1);
+			//motorManager->startMovement(1);
+			//std::cout << "did start movement" << std::endl;
+			
+			getMotor(0 + i)->waitTillReady();
+			getMotor(0 + i)->disableAngleLimitations();
+		}
 
 		for(int i = 0; i < 6; i = i + 2){
-
+			/*
 			motorManager->powerOnSingleMotor(getMotorIndexByNumber(0 + i));
 			motorManager->powerOnSingleMotor(getMotorIndexByNumber(1 + i));
 			
@@ -563,6 +574,8 @@ namespace rexos_stewart_gough{
 			
 			getMotor(0 + i)->disableAngleLimitations();
 			getMotor(1 + i)->disableAngleLimitations();
+			*/
+			
 			// Calibrate motors
 			calibrateMotor(getMotorIndexByNumber(0 + i), getMotorIndexByNumber(1 + i));
 			// Enable angle limitations
