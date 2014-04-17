@@ -34,7 +34,7 @@
 #include <queue>
 #include <boost/thread.hpp>
 
-#include <rexos_datatypes/MotorRotation.h>
+#include <rexos_motor/MotorRotation.h>
 #include <rexos_modbus/ModbusException.h>
 #include <rexos_modbus/ModbusController.h>
 #include <rexos_motor/CRD514KD.h>

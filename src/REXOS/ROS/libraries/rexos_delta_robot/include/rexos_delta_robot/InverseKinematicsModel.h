@@ -37,7 +37,7 @@
 #pragma once
 
 #include <rexos_datatypes/Point3D.h>
-#include <rexos_datatypes/MotorRotation.h>
+#include <rexos_motor/MotorRotation.h>
 
 namespace rexos_delta_robot{
 	/**

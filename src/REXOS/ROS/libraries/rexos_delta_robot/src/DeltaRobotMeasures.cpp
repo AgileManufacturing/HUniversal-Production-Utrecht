@@ -28,7 +28,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <rexos_datatypes/DeltaRobotMeasures.h>
+#include <rexos_delta_robot/DeltaRobotMeasures.h>
 
 #include <cmath>
 #include <iostream>

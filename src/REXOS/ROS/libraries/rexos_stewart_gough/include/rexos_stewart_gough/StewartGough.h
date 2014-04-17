@@ -31,7 +31,7 @@
 
 #include <modbus/modbus.h>
 #include <rexos_datatypes/Point3D.h>
-#include <rexos_datatypes/StewartGoughMeasures.h>
+#include <rexos_stewart_gough/StewartGoughMeasures.h>
 #include <rexos_motor/MotorInterface.h>
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/MotorManager.h>

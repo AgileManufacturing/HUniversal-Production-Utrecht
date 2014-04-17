@@ -39,7 +39,7 @@
 #include <cmath>
 #include <cstdio>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <rexos_datatypes/MotorRotation.h>
+#include <rexos_motor/MotorRotation.h>
 #include <rexos_delta_robot/InverseKinematics.h>
 #include <rexos_delta_robot/InverseKinematicsException.h>
 #include <rexos_utilities/Utilities.h>

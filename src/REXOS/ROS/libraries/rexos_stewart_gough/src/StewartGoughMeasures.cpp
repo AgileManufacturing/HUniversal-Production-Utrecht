@@ -28,7 +28,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <rexos_datatypes/StewartGoughMeasures.h>
+#include <rexos_stewart_gough/StewartGoughMeasures.h>
 #include <cmath>
 #include <iostream>
 #include <rexos_utilities/Utilities.h>
