@@ -596,51 +596,54 @@ namespace rexos_stewart_gough{
 		currentEffectorRotationZ = 0;
 		
 		
-		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 10, 0, 0, 30);
+		for(int i = 0; i < 2000; i++){
 		
-		sleep(1);
+			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 30, 0, 0, 30);
+			
+			//sleep(1);
+			
+			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 30, 0, 0, 0);
+			
+			//sleep(1);
+			
+			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 30, 0, 0, -30);
+			
+			
+			
+			
+			//sleep(1);
+			
+			moveTo(rexos_datatypes::Point3D<double>(0, 50, -280), 30, 0, 0, 0);
+			
+			//sleep(1);
+			
+			moveTo(rexos_datatypes::Point3D<double>(0, -50, -280), 30, 0, 0, 0);
+			
+			//sleep(1);
+			
+			moveTo(rexos_datatypes::Point3D<double>(50, 0, -280), 30, 0, 0, 0);
+			
+			//sleep(1);
+			
+			moveTo(rexos_datatypes::Point3D<double>(-50, 0, -280), 30, 0, 0, 0);
+			
+			
+			
+			
+			//sleep(1);
+			
+			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 30, 0, 0, 0);
+			
+			//sleep(1);
+			
+			moveTo(rexos_datatypes::Point3D<double>(0, 0, -300), 30, 0, 0, 0);
+			
+			//sleep(1);
+			
+			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 30, 0, 0, 0);
+			
 		
-		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 10, 0, 0, 0);
-		
-		sleep(1);
-		
-		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 10, 0, 0, -30);
-		
-		
-		
-		
-		sleep(1);
-		
-		moveTo(rexos_datatypes::Point3D<double>(0, 50, -280), 10, 0, 0, 0);
-		
-		sleep(1);
-		
-		moveTo(rexos_datatypes::Point3D<double>(0, -50, -280), 10, 0, 0, 0);
-		
-		sleep(1);
-		
-		moveTo(rexos_datatypes::Point3D<double>(50, 0, -280), 10, 0, 0, 0);
-		
-		sleep(1);
-		
-		moveTo(rexos_datatypes::Point3D<double>(-50, 0, -280), 10, 0, 0, 0);
-		
-		
-		
-		
-		sleep(1);
-		
-		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 10, 0, 0, 0);
-		
-		sleep(1);
-		
-		moveTo(rexos_datatypes::Point3D<double>(0, 0, -300), 10, 0, 0, 0);
-		
-		sleep(1);
-		
-		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 10, 0, 0, 0);
-		
-		
+		}
         std::cout << "[DEBUG] effector location z: " << effectorLocation.z << std::endl; 
 		
         return true;
