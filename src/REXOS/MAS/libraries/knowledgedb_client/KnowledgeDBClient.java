@@ -26,6 +26,7 @@
  **/
 package libraries.knowledgedb_client;
 
+import java.lang.reflect.Array;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -203,7 +204,11 @@ public class KnowledgeDBClient {
 
 			if (parameters != null) {
 			    for (int i = 0; i < parameters.length; i++) {
-			        statement.setString(i + 1, parameters[i].toString());
+			    	if(parameters[i] instanceof byte[]) {
+				        statement.setBytes(i + 1, (byte[])parameters[i]);
+			    	} else {
+			    		statement.setString(i + 1, parameters[i].toString());
+			    	}
 			    }
 			}
 

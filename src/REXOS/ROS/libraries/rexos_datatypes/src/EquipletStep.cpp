@@ -85,10 +85,11 @@ namespace rexos_datatypes{
            if (strcmp(node_name, "manufacturer") == 0){
                manufacturer = i -> as_string();
            } else if (strcmp(node_name, "typeNumber") == 0){
-               manufacturer = i -> as_string();
+               typeNumber = i -> as_string();
            } else if (strcmp(node_name, "serialNumber") == 0){
-               manufacturer = i -> as_string();
+               serialNumber = i -> as_string();
            }
+		    i++;
 	   }
        this->moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(manufacturer, typeNumber, serialNumber);
 	 }

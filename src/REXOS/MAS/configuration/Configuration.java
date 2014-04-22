@@ -36,12 +36,13 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class Configuration {
-	private static String propertiesFilePath ="src/REXOS/MAS/configuration/";
+	//private static String propertiesFilePath = System.getenv("PROPERTIESPATH");
+	private static String propertiesFilePath = "src/REXOS/MAS/configuration/";
 	
-	public static String getProperty(ConfigurationFiles File, String key)
+	public static String getProperty(ConfigurationFiles file, String key)
 	{
-		if(File != ConfigurationFiles.EQUIPLET_DB_PROPERTIES){
-			return getProperty(File, key, null);
+		if(file != ConfigurationFiles.EQUIPLET_DB_PROPERTIES){
+			return getProperty(file, key, null);
 		} else {
 			System.out.println("Need a equiplet name to read equiplet db properties");
 			return "";

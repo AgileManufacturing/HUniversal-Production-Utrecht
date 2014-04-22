@@ -72,21 +72,23 @@ public class Logger {
 	public static final File logFile = new File("log.txt");
 	
 	static {
-		String msgsFilePath = "/bin";
-		File dir = new File (msgsFilePath);
-		if(dir.exists()) {
-			System.out.println("Log Directory detected - Removing old log files");
-			String[] files = dir.list();
-			
-			for(String filename : files) {
-					File file = new File(filename);
-					if (file.exists()){	
-						file.delete();					
-					}
+		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
+		if (msgsFilePath != null){
+			File dir = new File (msgsFilePath);
+			if(dir.exists()) {
+				System.out.println("Log Directory detected - Removing old log files");
+				String[] files = dir.list();
+				
+				for(String filename : files) {
+						File file = new File(filename);
+						if (file.exists()){	
+							file.delete();					
+						}
+				}
 			}
-		}
-		else{
-			dir.mkdirs();
+			else{
+				dir.mkdirs();
+			}
 		}
 	}
 	

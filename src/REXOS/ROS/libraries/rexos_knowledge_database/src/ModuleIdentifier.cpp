@@ -21,6 +21,9 @@ namespace rexos_knowledge_database{
 		return output;
 	}
 	bool ModuleIdentifier::operator==(const ModuleIdentifier& rhs) {
+		std::cout << this->getManufacturer() << " and " << rhs.getManufacturer() << " ? " << (this->getManufacturer() == rhs.getManufacturer()) << std::endl;
+		std::cout << this->getTypeNumber() << " and " << rhs.getTypeNumber() << " ? " << (this->getTypeNumber() == rhs.getTypeNumber()) << std::endl;
+		std::cout << this->getSerialNumber() << " and " << rhs.getSerialNumber() << " ? " << (this->getSerialNumber() == rhs.getSerialNumber()) << std::endl;
 		if(
 				this->getManufacturer() == rhs.getManufacturer() &&
 				this->getTypeNumber() == rhs.getTypeNumber() &&
