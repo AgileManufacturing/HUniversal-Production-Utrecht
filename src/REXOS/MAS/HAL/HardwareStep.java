@@ -25,8 +25,4 @@ public class HardwareStep implements Serializable {
 	public ModuleIdentifier getModuleIdentifier(){
 		return this.moduleIdentifier;
 	}
-	
-	public String toString() {
-		return moduleIdentifier + ": " + command.toString();
-	}
 }

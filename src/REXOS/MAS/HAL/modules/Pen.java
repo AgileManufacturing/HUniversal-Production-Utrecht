@@ -19,8 +19,8 @@ import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 
 public class Pen extends ModuleActor {
-	private static final double PEN_SIZE = 97.6; // in mm
-	private static final int MAX_ACCELERATION = 150;
+	private static final double PEN_SIZE = 96.6; // in mm
+	private static final int MAX_ACCELERATION = 50;
 
 	public Pen(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) throws KnowledgeException, UnknownHostException, GeneralMongoException {
 		super(moduleIdentifier, moduleFactory, moduleListener);
@@ -42,7 +42,6 @@ public class Pen extends ModuleActor {
 			//Adjust the move with the Pen module it's height.
 			command = adjustMoveWithDimentions(command, PEN_SIZE);
 			command.addProperty("maxAcceleration", MAX_ACCELERATION);
-			command.addProperty("forceStraightLine", false);
 			jsonCommand.add(COMMAND, command);
 			
 			//Translate it's parents composite steps into hardware steps.

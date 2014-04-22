@@ -104,7 +104,7 @@ public class CapabilityFactory extends Factory{
 	private static final String getServiceTypeForCapabilityType =
 			"SELECT serviceType \n" + 
 			"FROM ServiceType_CapabilityType \n" + 
-			"WHERE capabiltyType = ?;";
+			"WHERE capabilityType = ?;";
 	
 	private static final String addRequiredMutationForCapabilityType =
 			"INSERT INTO CapabilityTypeRequiredMutation \n" + 
@@ -116,13 +116,19 @@ public class CapabilityFactory extends Factory{
 			"WHERE capabilityType = ?;";
 	
 	private static final String getAllAssociatedCapabilityTypesForModuleIdentifier = 
-			"SELECT DESTINCT capabilityType \n" + 
+			"SELECT DISTINCT capabilityType \n" + 
 			"FROM CapabilityTypeRequiredMutation \n" + 
 			"WHERE mutation IN( \n" + 
 			"	SELECT mutation \n" + 
 			"	FROM SupportedMutation \n" + 
 			"	WHERE manufacturer = ? AND \n" + 
-			"		typeNumber = ?;";
+			"		typeNumber = ? \n" + 
+			");";
+	
+	private static final String addServiceType_CapabilityType = 
+			"INSERT IGNORE INTO ServiceType_CapabilityType \n" + 
+					"(serviceType,capabilityType) \n" + 
+					"VALUES(?, ?);";
 	
 	private DynamicClassFactory<Capability> dynamicClassFactory;
 	private HardwareAbstractionLayer hal;
@@ -187,13 +193,14 @@ public class CapabilityFactory extends Factory{
 					int halSoftwareId = halSoftware.getId();
 					
 					knowledgeDBClient.executeUpdateQuery(addCapabilityType, name, halSoftwareId);
-					
+					//TODO
 					JsonArray requiredMutationsTrees = capabilityEntry.get("requiredMutationsTrees").getAsJsonArray();
 					deserializeRequiredMutations(name, requiredMutationsTrees);
 					
 					for (JsonElement serviceElement : capabilityEntry.get("services").getAsJsonArray()) {
 						String serviceName = serviceElement.getAsString();
 						knowledgeDBClient.executeUpdateQuery(addServiceType, serviceName);
+						knowledgeDBClient.executeUpdateQuery(addServiceType_CapabilityType, serviceName,name);
 					}
 				}
 			} catch(Exception ex) {
@@ -226,8 +233,9 @@ public class CapabilityFactory extends Factory{
 					JavaSoftware javaSoftware = JavaSoftware.getJavaSoftwareForCapabilityName(capabilityName);
 					capability.add("halSoftware", javaSoftware.serialize());
 					
-					capability.add("requiredMutations", serializeRequiredMutations(capabilityName));
+					capability.add("requiredMutationsTrees", serializeRequiredMutations(capabilityName));
 					
+					//TODO
 					JsonArray services = new JsonArray();
 					Row[] serviceRows = knowledgeDBClient.executeSelectQuery(getServiceTypeForCapabilityType, capabilityName);
 					for (Row serviceRow : serviceRows) {

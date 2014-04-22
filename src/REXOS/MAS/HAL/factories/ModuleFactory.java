@@ -217,11 +217,6 @@ public class ModuleFactory extends Factory {
 		this.hal = hal;
 		this.loadedModules = new HashMap<ModuleIdentifier, Module>();
 	}
-	
-	public HardwareAbstractionLayer getHAL(){
-		return this.hal;
-	}
-	
 	public ArrayList<ModuleActor> getBottomModulesForFunctionalModuleTree(Capability capability, int treeNumber) throws FactoryException, JarFileLoaderException{
 		ArrayList<ModuleActor> modules = new ArrayList<ModuleActor>();
 		
@@ -277,7 +272,7 @@ public class ModuleFactory extends Factory {
 			}
 			
 		}
-		DynamicClassDescription description = JavaSoftware.getJavaSoftwareForModuleIdentifier(moduleIdentifier, knowledgeDBClient).getDynamicClassDescription();
+		DynamicClassDescription description = JavaSoftware.getJavaSoftwareForModuleIdentifier(moduleIdentifier).getDynamicClassDescription();
 		try {
 			Class<Module> moduleClass = dynamicClassFactory.getClassFromDescription(description);
 			Module module = moduleClass.getConstructor(ModuleIdentifier.class, ModuleFactory.class, ModuleListener.class).
@@ -383,6 +378,7 @@ public class ModuleFactory extends Factory {
 			type.add("halSoftware", halSoftware.serialize());
 			// fetch rosSoftware
 			RosSoftware rosSoftware = RosSoftware.getRosSoftwareForModuleIdentifier(moduleIdentifier);
+			System.out.println("RosSoftware ="+rosSoftware.serialize());
 			type.add("rosSoftware", rosSoftware.serialize());
 			
 			type.add("supportedMutations", Mutation.serializeAllSupportedMutations(moduleIdentifier, knowledgeDBClient));

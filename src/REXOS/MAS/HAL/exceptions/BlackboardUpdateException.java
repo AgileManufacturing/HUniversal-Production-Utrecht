@@ -17,8 +17,8 @@ public class BlackboardUpdateException extends Exception {
 	 * 
 	 * @param msg
 	 */
-	public BlackboardUpdateException(String msg, Throwable throwable){
-		super(msg,throwable);
+	public BlackboardUpdateException(String msg){
+		super(msg);
 	}
 
 }

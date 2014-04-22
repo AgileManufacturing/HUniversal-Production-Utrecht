@@ -37,11 +37,6 @@ public class BlackboardUpdated implements BlackboardSubscriber {
 	private String equipletName = null;
 	private String state = null;
 	private String mode = null;
-	private String status = null;
-	private BlackboardClient equipletStepBBClient;
-	private FieldUpdateSubscription statusSubscription;
-	private BlackboardClient productStepBBClient;
-	private BlackboardClient serviceStepBBClient;
 	
 	/**
 	 * @throws BlackboardUpdateException 
@@ -55,26 +50,9 @@ public class BlackboardUpdated implements BlackboardSubscriber {
 			stateSubscription = new FieldUpdateSubscription("state", this);
 			stateSubscription.addOperation(MongoUpdateLogOperation.SET);
 			
-			statusSubscription = new FieldUpdateSubscription("status", this);
-			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
-			
 			modeSubscription = new FieldUpdateSubscription("mode", this);
 			modeSubscription.addOperation(MongoUpdateLogOperation.SET);
 			
-			equipletStepBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbIp", "EQ1"));
-			equipletStepBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbName", "EQ1"));
-			equipletStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EquipletStepsBlackBoardName", "EQ1"));
-			equipletStepBBClient.subscribe(statusSubscription);
-			
-			productStepBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbIp", "EQ1"));
-			productStepBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbName", "EQ1"));
-			productStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ProductStepsBlackBoardName", "EQ1"));
-			productStepBBClient.subscribe(statusSubscription);
-			
-			serviceStepBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbIp", "EQ1"));
-			serviceStepBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbName", "EQ1"));
-			serviceStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "ServiceStepsBlackBoardName", "EQ1"));
-			serviceStepBBClient.subscribe(statusSubscription);
 			
 			stateBlackboardBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"));
 			stateBlackboardBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "stateBlackBoardName"));
@@ -87,9 +65,9 @@ public class BlackboardUpdated implements BlackboardSubscriber {
 			modeBlackboardBBClient.subscribe(modeSubscription);
 
 			
-		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException ex) {
+		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException e) {
 			// TODO Auto-generated catch block
-			throw new BlackboardUpdateException(ex.toString(), ex);
+			throw new BlackboardUpdateException(e.toString());
 		}
 	}
 	
@@ -98,7 +76,7 @@ public class BlackboardUpdated implements BlackboardSubscriber {
 	 * 
 	 * @param blackboardListener
 	 */
-	public void addOnBlackBoardUpdatedListener(BlackboardListener blackboardListener){
+	public void setOnBlackBoardUpdatedListener(BlackboardListener blackboardListener){
 		updateSubscribers.add(blackboardListener);
 		
 	}
@@ -132,40 +110,8 @@ public class BlackboardUpdated implements BlackboardSubscriber {
 					
 				break;
 				
-			case "EquipletStepsBlackBoard":
-				dbObject = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
-				if(dbObject != null) {
-					status= dbObject.get("status").toString();
-					System.out.println("EQ step process status changed");
-					
-					if (!status.equals("IN_PROGRESS")){
-						for(BlackboardListener changedListener: updateSubscribers){
-							changedListener.onProcessStatusChanged(status);	
-						}
-					}
-				}
-				break;
-				
-			case "ProductStepsBlackBoard":
-				System.out.println("Product step process status changed");
-				dbObject = productStepBBClient.findDocumentById(entry.getTargetObjectId());
-				if(dbObject != null) {
-					status= dbObject.get("status").toString();
-					for(BlackboardListener changedListener: updateSubscribers){
-						changedListener.onProcessStatusChanged(status);	
-					}
-				}
-				break;
-				
-			case "ServiceStepsBlackBoard":
-				System.out.println("Service step process status changed");
-				dbObject = serviceStepBBClient.findDocumentById(entry.getTargetObjectId());
-				if(dbObject != null) {
-					status= dbObject.get("status").toString();
-					for(BlackboardListener changedListener: updateSubscribers){
-						changedListener.onProcessStatusChanged(status);	
-					}
-				}
+
+			default:
 				break;
 			}
 	

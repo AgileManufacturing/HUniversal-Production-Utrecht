@@ -7,9 +7,6 @@ import java.util.ArrayList;
 
 import org.apache.commons.codec.binary.Base64;
 
-import reconfigure.qr_receiver.QrReceiver;
-import reconfigure.server.ReconfigureServer;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -27,13 +24,6 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 	static HardwareAbstractionLayer hal;
 	static BlackboardUpdated blackboardUpdated;
-	
-	static boolean translationFinished = false;
-	
-	double stepX = 30.0;
-	boolean dirLeft = false;
-	
-	static ArrayList<ArrayList<HardwareStep>> translatedProductSteps = new ArrayList<ArrayList<HardwareStep>>(); 
 	
 	static String moduleA_01 = "{"
 			+ "	\"manufacturer\":\"HU\","
@@ -130,7 +120,50 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		
 		// TODO Auto-generated method stub
 		hal = new HardwareAbstractionLayer(htc);
+		BlackboardListener blackboardListener = new BlackboardListener() {
+			
+			@Override
+			public void onProcessStateChanged(String status) {
+				// TODO Auto-generated method stub
+				System.out.println("New Process Status = "+ status);
+				
+			}
+			
+			@Override
+			public void onModuleStateChanged(String state) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onModuleModeChanged(String mode) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void OnEquipletStateChanged(String id, String state) {
+				// TODO Auto-generated method stub
+				System.out.println("New State of EQ "+id + " = "+ state);
+				
+			}
+			
+			@Override
+			public void OnEquipletModeChanged(String id, String mode) {
+				// TODO Auto-generated method stub
+				System.out.println("New mode of EQ "+id + " = "+ mode);
+				
+			}
+
+			@Override
+			public void OnEquipletIpChanged(String ip) {
+				// TODO Auto-generated method stub
+				
+			}
+		};
 		
+		blackboardUpdated = new BlackboardUpdated();
+		blackboardUpdated.setOnBlackBoardUpdatedListener(blackboardListener);
 
 		
 		FileInputStream fis;
@@ -170,44 +203,42 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		
 		hal.getBottomModules();
 		
-
+		
 		JsonObject criteria = new JsonObject();
 		JsonObject target = new JsonObject();
 		JsonObject targetMove = new JsonObject();
-		targetMove.addProperty("x", 0.0);
+		targetMove.addProperty("x", 3.0);
 		targetMove.addProperty("y", 0.0);
-		targetMove.addProperty("z", -320.0);
+		targetMove.addProperty("z", 30.0);
 		target.add("move",targetMove);
 		target.addProperty("identifier", "Paper");
 		
-		criteria.add("target",target);
-		criteria.add("subjects", new JsonArray()); 
-		hal.translateProductStep(new ProductStep(1, criteria, new Service("draw")));
+		/*JsonArray subjects = new JsonArray();
+		JsonObject subject = new JsonObject();
+		JsonObject subjectMove = new JsonObject();
+		subjectMove.addProperty("x", -3.0);
+		subjectMove.addProperty("y", 0.0);
+		subjectMove.addProperty("z", 0.0);
+		subject.add("move",subjectMove);
+		subjects.add(subject);*/
 		
-		System.out.println("While loop starting");
+		criteria.add("target",target);
+		//criteria.add("subjects",subjects);
+		criteria.add("subjects", new JsonArray());
+		
+		
+		hal.translateProductStep(
+				new ProductStep(1, criteria, new Service("draw")));
+		
 		/*Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);
 		hal.translateProductStep(productStep);*/
-		while(true){
-			Thread.sleep(1);
-			//System.out.println("While loop");
-			if (translationFinished){
-				// TODO Auto-generated method stub
-				//hardwareSteps.addAll(hardwareStep);// = hardwareStep;
-				//translatedProductSteps.add(hardwareSteps);
-				
-				System.out.println("translation result " + hardwareSteps);
-				
-				hal.executeHardwareSteps(hardwareSteps);
-				translationFinished = false;
-			}
-		}
 
 	}
 
 	@Override
 	public void onProcessStateChanged(String state, long hardwareStepSerialId, Module module, HardwareStep hardwareStep) {
-		System.out.println("ik ben klaar!!!!!!!!!!!!!!!!!!!!");
+		// TODO Auto-generated method stub
 		
 	}
 
@@ -225,35 +256,16 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 
 	@Override
 	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareStep) {
-		translationFinished = true;
-		hardwareSteps = (ArrayList<HardwareStep>) hardwareStep.clone();
-		System.out.println("onTranslationFinished");
+		// TODO Auto-generated method stub
+		System.out.println("Translation finished");
+		hardwareSteps.addAll(hardwareStep);// = hardwareStep;
+		hal.executeHardwareSteps(hardwareSteps);
 	}
 
 	@Override
 	public void onIncapableCapabilities(ProductStep productStep) {
 		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public void onExecutionFinished() {
-		stepX = -stepX;
-		// TODO Auto-generated method stub
-		JsonObject criterias = new JsonObject();
-		JsonObject targets = new JsonObject();
-		JsonObject targetMoves = new JsonObject();
-		targetMoves.addProperty("x", stepX);
-		targetMoves.addProperty("y", 0.0);
-		targetMoves.addProperty("z", -320.0);
-		targets.add("move",targetMoves);
-		targets.addProperty("identifier", "Paper");
-		
-		criterias.add("target",targets);
-		criterias.add("subjects", new JsonArray()); 
-		System.out.println("target Moves: " + targetMoves);
-		new Exception().printStackTrace(System.out);
-		hal.translateProductStep(new ProductStep(2, criterias, new Service("draw")));
 	}
 
 }

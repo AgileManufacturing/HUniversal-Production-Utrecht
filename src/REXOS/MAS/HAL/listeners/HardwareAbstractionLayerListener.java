@@ -8,7 +8,6 @@ import HAL.Module;
 
 public interface HardwareAbstractionLayerListener {
 	public void onProcessStateChanged(String state, long hardwareStepSerialId, Module module, HardwareStep hardwareStep);
-	public void onExecutionFinished();
 	public void onModuleStateChanged(String state, Module module);
 	public void onModuleModeChanged(String mode, Module module);
 	

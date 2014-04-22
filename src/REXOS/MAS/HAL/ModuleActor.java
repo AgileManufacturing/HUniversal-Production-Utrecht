@@ -49,7 +49,6 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 	}
 	
 	protected void executeMongoCommand(String command) throws ModuleExecutingException{
-		System.out.println("Executing mongoCommand: "+command);
 		try {
 			mongoClient.insertDocument(command.toString());
 		} catch (InvalidJSONException e) {
@@ -80,12 +79,22 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 		}
 	}
 	
-	public synchronized void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws ModuleExecutingException{
-		this.processListener = processListener;
+	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws ModuleExecutingException{
 		JsonObject command = hardwareStep.getCommand();
 		executeMongoCommand(command.toString());
+		this.processListener = processListener;
 	}
 	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException;
+	
+	public void onHardwareStepChanged(String state, long hardwareStepSerialId) throws HardwareAbstractionLayerProcessException{
+		processListener.onProcessStateChanged(state, hardwareStepSerialId, this);
+	}
+	public void onModuleStateChanged(String state){
+		moduleListener.onModuleStateChanged(state, this);
+	}
+	public void onModuleModeChanged(String mode){
+		moduleListener.onModuleModeChanged(mode, this);
+	}
 	
 	protected JsonObject adjustMoveWithDimentions(JsonObject command, double height){
 		System.out.println("Adjusting move with dimentions: "+command.toString());
@@ -104,15 +113,10 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 
 
 	@Override
-	public synchronized void onProcessStatusChanged(String status) {
-		System.out.println("Process Status changed - ModuleActor");
+	public void onProcessStateChanged(String state) {
 		// TODO Auto-generated method stub
 		try {
-			if (processListener != null){
-				System.out.println("Process Listener active - ModuleActor");
-				processListener.onProcessStatusChanged(status, 0, this);
-				processListener = null;
-			}
+			processListener.onProcessStateChanged(state, 0, this);
 		} catch (HardwareAbstractionLayerProcessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -27,7 +27,6 @@ public abstract class Module implements BlackboardListener{
 		this.knowledgeDBClient = new KnowledgeDBClient();
 		this.moduleFactory = moduleFactory;
 		this.moduleListener = moduleListener;
-		moduleFactory.getHAL().getBlackboardUpdater().addOnBlackBoardUpdatedListener(this);
 	}	
 	
 	public ModuleIdentifier getModuleIdentifier(){
@@ -113,11 +112,5 @@ public abstract class Module implements BlackboardListener{
 	public void OnEquipletIpChanged(String ip) {
 		// TODO Auto-generated method stub
 		
-	}
-	public void onModuleStateChanged(String state) {
-		moduleListener.onModuleStateChanged(state, this);
-	}
-	public void onModuleModeChanged(String mode) {
-		moduleListener.onModuleModeChanged(mode, this);
 	}
 }

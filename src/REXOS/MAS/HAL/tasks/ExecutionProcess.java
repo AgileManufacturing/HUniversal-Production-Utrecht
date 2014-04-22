@@ -25,12 +25,9 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 	public synchronized void run() {
 		try {
 			while (hardwareSteps.size() > 0){
-				System.out.println("Executing Hardwarestep: "+hardwareSteps.get(0));
 				moduleFactory.executeHardwareStep(this, hardwareSteps.get(0));
 				this.wait();
-				System.out.println("resumed");
 			}
-			hardwareAbstractionLayerListener.onExecutionFinished();
 		} catch (Exception ex) {
 			// TODO Auto-generated catch block
 			ex.printStackTrace();
@@ -38,13 +35,11 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 	}
 
 	@Override
-	public synchronized void onProcessStatusChanged(String state, long hardwareStepSerialId, Module module) throws HardwareAbstractionLayerProcessException{
-		System.out.println("Hardware step completed!");
+	public void onProcessStateChanged(String state, long hardwareStepSerialId, Module module) throws HardwareAbstractionLayerProcessException{
 		if (hardwareSteps.size() > 0){
 			HardwareStep hardwareStep = hardwareSteps.get(0);
 			hardwareAbstractionLayerListener.onProcessStateChanged(state, hardwareStepSerialId, module, hardwareStep);
 			hardwareSteps.remove(0);
-			System.out.println("Notify");
 			this.notify();
 		}
 		else {

@@ -14,7 +14,7 @@ import org.apache.commons.codec.binary.Base64;
 
 import com.google.gson.JsonObject;
 
-public class RosSoftware implements JarFileLoader {
+public class RosSoftware {
 	private static final String getRosSoftwareForId =
 			"SELECT id, buildNumber, className, jarFile \n" + 
 			"FROM RosSoftware \n" + 
@@ -68,6 +68,7 @@ public class RosSoftware implements JarFileLoader {
 	}
 	public static RosSoftware insertRosSoftware(JsonObject rosSoftware, KnowledgeDBClient knowledgeDBClient) {
 		try {
+			System.out.println(rosSoftware.toString());
 			byte[] jarFile = Base64.decodeBase64(rosSoftware.get("rosFile").getAsString().getBytes());
 			int buildNumber = getBuildNumber(rosSoftware);
 			String className = getClassName(rosSoftware);
@@ -96,7 +97,6 @@ public class RosSoftware implements JarFileLoader {
 	public int getId() {
 		return id;
 	}
-	@Override
 	public int getBuildNumber() {
 		return buildNumber;
 	}
@@ -162,9 +162,6 @@ public class RosSoftware implements JarFileLoader {
 		}
 	}
 	
-	public DynamicClassDescription getDynamicClassDescription() {
-			return new DynamicClassDescription(id, className, this);
-	}
 	/**
 	 * Serializes java software from the knowledge database 
 	 * @param knowledgeDBClient
@@ -178,7 +175,7 @@ public class RosSoftware implements JarFileLoader {
 			javaSoftware.addProperty("buildNumber", (Integer) rows[0].get("buildNumber"));
 			javaSoftware.addProperty("className", (String) rows[0].get("className"));
 			byte[] jarFile = (byte[]) rows[0].get("jarFile");
-			javaSoftware.addProperty("jarFile", new String(Base64.encodeBase64(jarFile)));
+			javaSoftware.addProperty("rosFile", new String(Base64.encodeBase64(jarFile)));
 			return javaSoftware;
 		} catch (KnowledgeException | KeyNotFoundException ex) {
 			System.err.println("HAL::RosSoftware::serializeRosSoftwareForModuleIdentifier(): Error occured which is considered to be impossible" + ex);
@@ -187,23 +184,6 @@ public class RosSoftware implements JarFileLoader {
 		}
 	}
 	
-	@Override
-	public byte[] loadJarFile() throws JarFileLoaderException {
-		try {
-			Row[] rows = knowledgeDBClient.executeSelectQuery(getJarFileForDescription, this.id);
-			if(rows.length == 0) {
-				byte[] jarFile = (byte[]) rows[0].get("jarFile");
-				return jarFile;
-			} else {
-				throw new JarFileLoaderException("HAL::Factory::loadJarFile(): Unable to retrieve the software");
-			}
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			System.err.println("HAL::Factory::loadJarFile(): Error occured which is considered to be impossible" + ex);
-			ex.printStackTrace();
-			return null;
-		}
-	}
-
 	public void updateRosSoftware(JsonObject javaSoftware) {
 		try {
 			byte[] jarFile = Base64.decodeBase64(javaSoftware.get("jarFile").getAsString().getBytes());
