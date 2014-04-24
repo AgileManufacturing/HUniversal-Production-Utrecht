@@ -67,7 +67,7 @@ namespace stewartGoughNodeNamespace{
 			public rexos_coordinates::Module{
 	protected:
 		rexos_motor::StepperMotorProperties* stepperMotorProperties;
-		rexos_datatypes::StewartGoughMeasures* stewartGoughMeasures;
+		rexos_stewart_gough::StewartGoughMeasures* stewartGoughMeasures;
 	
 		std::string modbusIp;
 		int modbusPort;

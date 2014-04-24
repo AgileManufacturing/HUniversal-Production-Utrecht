@@ -141,7 +141,7 @@ namespace rexos_stewart_gough{
 				ROS_INFO_STREAM("found stepperMotorProperties");
 			} else if(it->name() == "stewartGoughMeasures"){
 				JSONNode node = it->as_node();
-				stewartGoughMeasures = new rexos_datatypes::StewartGoughMeasures(node);
+				stewartGoughMeasures = new rexos_stewart_gough::StewartGoughMeasures(node);
 				ROS_INFO_STREAM("found stewartGoughMeasures");
 			} else {
 				// some other property, ignore it
@@ -239,9 +239,9 @@ namespace rexos_stewart_gough{
         }
 
         // Create MotorRotation objects.
-        rexos_datatypes::MotorRotation* rotations[6];
+        rexos_motor::MotorRotation* rotations[6];
 		for(int i = 0; i < 6; i++){
-			 rotations[i] = new rexos_datatypes::MotorRotation();
+			 rotations[i] = new rexos_motor::MotorRotation();
 		}
 		
         // Get the motor angles from the kinematics model
@@ -410,7 +410,7 @@ namespace rexos_stewart_gough{
      *
      * @return The amount of motor steps the motor has moved.
      **/
-    MotorGroup StewartGough::moveMotorUntilSensorIsOfValue(int motorIndex1, int motorIndex2, rexos_datatypes::MotorRotation motorRotation1 ,rexos_datatypes::MotorRotation motorRotation2, bool sensorValue){
+    MotorGroup StewartGough::moveMotorUntilSensorIsOfValue(int motorIndex1, int motorIndex2, rexos_motor::MotorRotation motorRotation1 ,rexos_motor::MotorRotation motorRotation2, bool sensorValue){
 		ROS_INFO("move Motor Until Sensor Is Of Value...");
         motors[motorIndex1]->writeRotationData(motorRotation1, 1, false);
 		motors[motorIndex2]->writeRotationData(motorRotation2, 1, false);
@@ -454,8 +454,8 @@ namespace rexos_stewart_gough{
         // Setup for incremental motion in big steps, to get to the sensor quickly.
         motors[motorIndex1]->setIncrementalMode(1);
 		motors[motorIndex2]->setIncrementalMode(1);
-        rexos_datatypes::MotorRotation motorRotation1;
-		rexos_datatypes::MotorRotation motorRotation2;
+        rexos_motor::MotorRotation motorRotation1;
+		rexos_motor::MotorRotation motorRotation2;
         motorRotation1.angle = -motors.at(motorIndex1)->getMicroStepAngle() * calibrationBigStepFactor;
 		motorRotation2.angle = -motors.at(motorIndex2)->getMicroStepAngle() * calibrationBigStepFactor;
         
@@ -533,7 +533,7 @@ namespace rexos_stewart_gough{
         }
 
         // Return to base! Remove the deviation, we have to find the controller 0 point.
-        rexos_datatypes::MotorRotation motorRotation;
+        rexos_motor::MotorRotation motorRotation;
         motorRotation.speed = 0.1;
         motorRotation.angle = 0;
 
@@ -697,7 +697,7 @@ namespace rexos_stewart_gough{
 		return motorMap[number].motor;
 	}
 	
-	void StewartGough::deleteMotorRotationObjects(rexos_datatypes::MotorRotation* rotations[6]){
+	void StewartGough::deleteMotorRotationObjects(rexos_motor::MotorRotation* rotations[6]){
 		for(int i = 0; i < 6; i++){
 			delete rotations[i];
 		}

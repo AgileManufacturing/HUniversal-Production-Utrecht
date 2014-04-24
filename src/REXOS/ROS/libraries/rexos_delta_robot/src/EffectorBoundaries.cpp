@@ -31,7 +31,6 @@
  **/
 
 #include <iostream>
-#include <rexos_delta_robot/Measures.h>
 #include <rexos_delta_robot/EffectorBoundaries.h>
 #include <rexos_delta_robot/InverseKinematicsException.h>
 #include <rexos_delta_robot/EffectorBoundariesException.h>
@@ -52,7 +51,7 @@ namespace rexos_delta_robot{
 	 * @return Pointer to the object.
 	 **/
 	EffectorBoundaries* EffectorBoundaries::generateEffectorBoundaries(const InverseKinematicsModel& model, 
-				const rexos_datatypes::DeltaRobotMeasures* deltaRobotMeasures, 
+				const rexos_delta_robot::DeltaRobotMeasures* deltaRobotMeasures, 
 				const std::vector<rexos_motor::StepperMotor*> motors, double voxelSize){
 		EffectorBoundaries* boundaries = new EffectorBoundaries(model, deltaRobotMeasures, motors, voxelSize);
 		
@@ -136,7 +135,7 @@ namespace rexos_delta_robot{
 	 * @param motorMaxAngles An array holding the maximum angle of each of the three motors.
 	 * @param voxelSize The size of the voxels.
 	 **/
-    EffectorBoundaries::EffectorBoundaries(const InverseKinematicsModel& model, const rexos_datatypes::DeltaRobotMeasures* deltaRobotMeasures, 
+    EffectorBoundaries::EffectorBoundaries(const InverseKinematicsModel& model, const rexos_delta_robot::DeltaRobotMeasures* deltaRobotMeasures, 
 			const std::vector<rexos_motor::StepperMotor*> motors, double voxelSize) : 
 			width(0), 
 			height(0), 
@@ -202,10 +201,10 @@ namespace rexos_delta_robot{
     	}
 
     	if(*fromCache == UNKNOWN){
-    		rexos_datatypes::MotorRotation* rotations[3];
-    		rotations[0] = new rexos_datatypes::MotorRotation();
-    		rotations[1] = new rexos_datatypes::MotorRotation();
-    		rotations[2] = new rexos_datatypes::MotorRotation();
+    		rexos_motor::MotorRotation* rotations[3];
+    		rotations[0] = new rexos_motor::MotorRotation();
+    		rotations[1] = new rexos_motor::MotorRotation();
+    		rotations[2] = new rexos_motor::MotorRotation();
 
 			try{
 				kinematics.destinationPointToMotorRotations(fromBitmapCoordinate(coordinate), rotations);

@@ -154,7 +154,7 @@ namespace rexos_motor {
 	 * @param motorRotation The rotational data for the motor.
 	 * @param motionSlot the motion slot to be used.
 	 **/
-	void StepperMotor::moveTo(const rexos_datatypes::MotorRotation& motorRotation, int motionSlot){
+	void StepperMotor::moveTo(const rexos_motor::MotorRotation& motorRotation, int motionSlot){
 		checkMotionSlot(motionSlot);
 
 		writeRotationData(motorRotation, motionSlot);
@@ -166,7 +166,7 @@ namespace rexos_motor {
 	 *
 	 * @param motorRotation The rotational data for the motor.
 	 **/
-	void StepperMotor::moveTo(const rexos_datatypes::MotorRotation& motorRotation){
+	void StepperMotor::moveTo(const rexos_motor::MotorRotation& motorRotation){
 		moveTo(motorRotation, 1);
 	}
 
@@ -177,7 +177,7 @@ namespace rexos_motor {
 	 * @param motionSlot the motion slot to be written to
 	 * @param useDeviation Sets whether or not to use the deviation. Defaults to true.
 	 **/
-	void StepperMotor::writeRotationData(const rexos_datatypes::MotorRotation& motorRotation, int motionSlot, bool useDeviation){
+	void StepperMotor::writeRotationData(const rexos_motor::MotorRotation& motorRotation, int motionSlot, bool useDeviation){
 		if(!poweredOn){
 			throw MotorException("motor drivers are not powered on");
 		}

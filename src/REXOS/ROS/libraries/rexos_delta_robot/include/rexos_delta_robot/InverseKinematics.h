@@ -60,11 +60,11 @@ namespace rexos_delta_robot{
 			const double effector, const double ankle,
 			const double maxAngleHipAnkle);
 
-		InverseKinematics(rexos_datatypes::DeltaRobotMeasures& deltaRobotMeasures);
+		InverseKinematics(rexos_delta_robot::DeltaRobotMeasures& deltaRobotMeasures);
 
 		virtual ~InverseKinematics(void);
 		
 		void destinationPointToMotorRotations(const rexos_datatypes::Point3D<double>& destinationPoint,
-				rexos_datatypes::MotorRotation* (&rotations)[3]) const;
+				rexos_motor::MotorRotation* (&rotations)[3]) const;
 	};
 }

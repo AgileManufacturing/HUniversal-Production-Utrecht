@@ -34,7 +34,7 @@
 #include <rexos_utilities/Utilities.h>
 #include "ros/ros.h"
 
-namespace rexos_datatypes {
+namespace rexos_stewart_gough {
 	StewartGoughMeasures::StewartGoughMeasures(JSONNode properties) {
 		for(JSONNode::const_iterator it = properties.begin(); it != properties.end(); it++) {
 			if(it->name() == "baseRadius"){

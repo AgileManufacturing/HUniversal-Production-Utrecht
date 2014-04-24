@@ -65,7 +65,7 @@ namespace rexos_motor{
 		 * 
 		 * @param motorRotation Defines the angles, speed, acceleration and deceleration of the motors.
 		 **/
-		virtual void moveTo(const rexos_datatypes::MotorRotation& motorRotation) = 0;
+		virtual void moveTo(const rexos_motor::MotorRotation& motorRotation) = 0;
 
 		/**
 		 * Wait till the motor has finished any rotations.

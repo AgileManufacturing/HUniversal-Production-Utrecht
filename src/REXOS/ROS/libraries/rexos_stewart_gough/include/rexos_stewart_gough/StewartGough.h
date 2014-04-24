@@ -116,7 +116,7 @@ private:
 		 **/
 		//InverseKinematics* kinematics;
 
-		rexos_datatypes::StewartGoughMeasures * stewartGoughMeasures;
+		rexos_stewart_gough::StewartGoughMeasures * stewartGoughMeasures;
 		rexos_motor::StepperMotorProperties * stepperMotorProperties;
 	
 		int calibrationBigStepFactor;
@@ -190,14 +190,14 @@ private:
 		int currentMotionSlot;
 
 		bool isValidAngle(int motorIndex, double angle);
-		MotorGroup moveMotorUntilSensorIsOfValue(int motorIndex1,int motorIndex2, rexos_datatypes::MotorRotation motorRotation1 ,rexos_datatypes::MotorRotation motorRotation2, bool sensorValue);
+		MotorGroup moveMotorUntilSensorIsOfValue(int motorIndex1,int motorIndex2, rexos_motor::MotorRotation motorRotation1 ,rexos_motor::MotorRotation motorRotation2, bool sensorValue);
 		double getSpeedForRotation(double relativeAngle, double moveTime, double acceleration);
 		double getAccelerationForRotation(double relativeAngle, double moveTime);
 		
 		rexos_motor::StepperMotor* getMotor(int number);
 		int getMotorIndexByNumber(int number);
 		
-		void deleteMotorRotationObjects(rexos_datatypes::MotorRotation* rotations[6]);
+		void deleteMotorRotationObjects(rexos_motor::MotorRotation* rotations[6]);
 		
 	};
 }

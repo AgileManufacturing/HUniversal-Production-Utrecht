@@ -31,7 +31,7 @@
 
 #pragma once
 
-namespace rexos_datatypes{
+namespace rexos_motor {
 	/**
 	 * Data entity for rotation data for the motor.
 	 **/

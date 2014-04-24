@@ -37,7 +37,7 @@
 
 #include "ros/ros.h"
 
-namespace rexos_datatypes {
+namespace rexos_delta_robot {
 	DeltaRobotMeasures::DeltaRobotMeasures(JSONNode properties) {
 		for(JSONNode::const_iterator it = properties.begin(); it != properties.end(); it++) {
 			if(it->name() == "baseRadius"){

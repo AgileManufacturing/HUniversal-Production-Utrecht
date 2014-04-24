@@ -31,8 +31,6 @@
 
 #pragma once
 
-#include <rexos_delta_robot/EffectorBoundaries.h>
-
 #include <stdexcept>
 #include <string>
 #include <sstream>

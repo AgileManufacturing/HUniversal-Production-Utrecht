@@ -57,10 +57,10 @@ namespace rexos_motor{
 
 		void resetCounter(void);
 
-		void moveTo(const rexos_datatypes::MotorRotation& motorRotation, int motionSlot);
-		void moveTo(const rexos_datatypes::MotorRotation& motorRotation);
+		void moveTo(const rexos_motor::MotorRotation& motorRotation, int motionSlot);
+		void moveTo(const rexos_motor::MotorRotation& motorRotation);
 
-		void writeRotationData(const rexos_datatypes::MotorRotation& motorRotation, int motionSlot, bool useDeviation = true);
+		void writeRotationData(const rexos_motor::MotorRotation& motorRotation, int motionSlot, bool useDeviation = true);
 
 		void startMovement(int motionSlot);
 		void waitTillReady(void);
