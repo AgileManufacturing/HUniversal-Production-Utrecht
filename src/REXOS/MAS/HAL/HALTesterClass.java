@@ -7,9 +7,6 @@ import java.util.ArrayList;
 
 import org.apache.commons.codec.binary.Base64;
 
-import reconfigure.qr_receiver.QrReceiver;
-import reconfigure.server.ReconfigureServer;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
