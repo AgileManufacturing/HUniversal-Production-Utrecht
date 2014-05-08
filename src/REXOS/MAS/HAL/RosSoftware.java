@@ -2,9 +2,6 @@ package HAL;
 
 import java.util.HashMap;
 
-import libraries.dynamicloader.DynamicClassDescription;
-import libraries.dynamicloader.JarFileLoader;
-import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;
@@ -16,11 +13,11 @@ import com.google.gson.JsonObject;
 
 public class RosSoftware {
 	private static final String getRosSoftwareForId =
-			"SELECT id, buildNumber, className, jarFile \n" + 
+			"SELECT id, buildNumber, command, zipFile \n" + 
 			"FROM RosSoftware \n" + 
 			"WHERE id = ?;"; 
 	private static final String getRosSoftwareForModuleType =
-			"SELECT id, buildNumber, className \n" + 
+			"SELECT id, buildNumber, command \n" + 
 			"FROM RosSoftware \n" + 
 			"WHERE id = ( \n" + 
 			"	SELECT rosSoftware \n" + 
@@ -29,27 +26,22 @@ public class RosSoftware {
 			"		typeNumber = ? \n" + 
 			");"; 
 	private static final String getRosSoftwareForCapabilityName =
-			"SELECT id, buildNumber, className \n" + 
+			"SELECT id, buildNumber, command \n" + 
 			"FROM RosSoftware \n" + 
 			"WHERE id = ( \n" + 
 			"	SELECT rosSoftware \n" + 
 			"	FROM CapabilityType \n" + 
 			"	WHERE name = ? \n" + 
 			");"; 
-	private static final String getJarFileForDescription = 
-			"SELECT jarFile \n" + 
-			"FROM RosSoftware \n" + 
-			"WHERE id = ?;";
-	
 	private static final String addRosSoftware =
 			"INSERT INTO RosSoftware \n" + 
-			"(buildNumber, className, jarFile) \n" + 
+			"(buildNumber, command, zipFile) \n" + 
 			"VALUES(?, ?, ?);";
 	private static final String updateRosSoftware =
 			"UPDATE RosSoftware \n" + 
 			"SET buildNumber =? AND \n" + 
-			"className = ? AND \n" + 
-			"jarFile = ?;";
+			"command = ? AND \n" + 
+			"zipFile = ?;";
 	
 	private static HashMap<Integer, RosSoftware> rosSoftwareInstances = new HashMap<Integer, RosSoftware>(); 
 	/**
@@ -69,13 +61,13 @@ public class RosSoftware {
 	public static RosSoftware insertRosSoftware(JsonObject rosSoftware, KnowledgeDBClient knowledgeDBClient) {
 		try {
 			System.out.println(rosSoftware.toString());
-			byte[] jarFile = Base64.decodeBase64(rosSoftware.get("rosFile").getAsString().getBytes());
+			byte[] zipFile = Base64.decodeBase64(rosSoftware.get("rosFile").getAsString().getBytes());
 			int buildNumber = getBuildNumber(rosSoftware);
-			String className = getClassName(rosSoftware);
+			String command = getCommand(rosSoftware);
 			
 			int id = knowledgeDBClient.executeUpdateQuery(addRosSoftware, 
-					buildNumber, className, jarFile);
-			return new RosSoftware(id, buildNumber, className, knowledgeDBClient);
+					buildNumber, command, zipFile);
+			return new RosSoftware(id, buildNumber, command, knowledgeDBClient);
 		} catch (KnowledgeException ex) {
 			System.err.println("HAL::RosSoftware::deserializeRosSoftware(): Error occured which is considered to be impossible" + ex);
 			ex.printStackTrace();
@@ -86,13 +78,13 @@ public class RosSoftware {
 	public static int getBuildNumber(JsonObject rosSoftware) {
 		return rosSoftware.get("buildNumber").getAsInt();
 	}
-	public static String getClassName(JsonObject rosSoftware) {
-		return rosSoftware.get("className").getAsString();
+	public static String getCommand(JsonObject rosSoftware) {
+		return rosSoftware.get("command").getAsString();
 	}
 	
 	private int id;
 	private int buildNumber;
-	private String className;
+	private String command;
 	
 	public int getId() {
 		return id;
@@ -100,16 +92,16 @@ public class RosSoftware {
 	public int getBuildNumber() {
 		return buildNumber;
 	}
-	public String getClassName() {
-		return className;
+	public String getCommandName() {
+		return command;
 	}
 
 	private KnowledgeDBClient knowledgeDBClient;
 	
-	private RosSoftware(int id, int buildNumber, String className, KnowledgeDBClient knowledgeDBClient) throws KnowledgeException {
+	private RosSoftware(int id, int buildNumber, String command, KnowledgeDBClient knowledgeDBClient) throws KnowledgeException {
 		this.id = id;
 		this.buildNumber = buildNumber;
-		this.className = className;
+		this.command = command;
 		this.knowledgeDBClient = knowledgeDBClient;
 		
 		rosSoftwareInstances.put(id, this);
@@ -129,12 +121,12 @@ public class RosSoftware {
 			
 			int id = (Integer) rows[0].get("id");
 			int buildNumber = (Integer) rows[0].get("buildNumber");
-			String className = (String) rows[0].get("className");
+			String command = (String) rows[0].get("command");
 			
 			if(rosSoftwareInstances.containsKey(id) == true) {
 				return rosSoftwareInstances.get(id);
 			} else {
-				return new RosSoftware(id, buildNumber, className, knowledgeDBClient);
+				return new RosSoftware(id, buildNumber, command, knowledgeDBClient);
 			}
 		} catch (KnowledgeException | KeyNotFoundException ex) {
 			System.err.println("HAL::RosSoftware::getRosSoftwareForModuleIdentifier(): Error occured which is considered to be impossible" + ex);
@@ -149,12 +141,12 @@ public class RosSoftware {
 			
 			int id = (Integer) rows[0].get("id");
 			int buildNumber = (Integer) rows[0].get("buildNumber");
-			String className = (String) rows[0].get("className");
+			String command = (String) rows[0].get("command");
 			
 			if(rosSoftwareInstances.containsKey(id) == true) {
 				return rosSoftwareInstances.get(id);
 			} else {
-				return new RosSoftware(id, buildNumber, className, knowledgeDBClient);
+				return new RosSoftware(id, buildNumber, command, knowledgeDBClient);
 			}
 		} catch(KnowledgeException | KeyNotFoundException ex) {
 			System.err.println("HAL::RosSoftware::getRosSoftwareForCapabilityName(): Error occured which is considered to be impossible " + ex);
@@ -170,13 +162,13 @@ public class RosSoftware {
 	 */
 	public JsonObject serialize() {
 		try{
-			JsonObject javaSoftware = new JsonObject();
+			JsonObject rosSoftware = new JsonObject();
 			Row[] rows = knowledgeDBClient.executeSelectQuery(getRosSoftwareForId, this.id);
-			javaSoftware.addProperty("buildNumber", (Integer) rows[0].get("buildNumber"));
-			javaSoftware.addProperty("className", (String) rows[0].get("className"));
-			byte[] jarFile = (byte[]) rows[0].get("jarFile");
-			javaSoftware.addProperty("rosFile", new String(Base64.encodeBase64(jarFile)));
-			return javaSoftware;
+			rosSoftware.addProperty("buildNumber", (Integer) rows[0].get("buildNumber"));
+			rosSoftware.addProperty("command", (String) rows[0].get("command"));
+			byte[] zipFile = (byte[]) rows[0].get("zipFile");
+			rosSoftware.addProperty("rosFile", new String(Base64.encodeBase64(zipFile)));
+			return rosSoftware;
 		} catch (KnowledgeException | KeyNotFoundException ex) {
 			System.err.println("HAL::RosSoftware::serializeRosSoftwareForModuleIdentifier(): Error occured which is considered to be impossible" + ex);
 			ex.printStackTrace();
@@ -184,14 +176,14 @@ public class RosSoftware {
 		}
 	}
 	
-	public void updateRosSoftware(JsonObject javaSoftware) {
+	public void updateRosSoftware(JsonObject rosSoftware) {
 		try {
-			byte[] jarFile = Base64.decodeBase64(javaSoftware.get("jarFile").getAsString().getBytes());
-			int buildNumber = getBuildNumber(javaSoftware);
-			String className = getClassName(javaSoftware);
+			byte[] zipFile = Base64.decodeBase64(rosSoftware.get("zipFile").getAsString().getBytes());
+			int buildNumber = getBuildNumber(rosSoftware);
+			String command = getCommand(rosSoftware);
 			
 			knowledgeDBClient.executeUpdateQuery(updateRosSoftware, 
-					buildNumber, className, jarFile);
+					buildNumber, command, zipFile);
 		} catch (KnowledgeException ex) {
 			System.err.println("HAL::RosSoftware::deserializeRosSoftware(): Error occured which is considered to be impossible" + ex);
 			ex.printStackTrace();

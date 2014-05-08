@@ -16,6 +16,8 @@ import libraries.blackboard_client.data_classes.FieldUpdateSubscription.MongoUpd
 import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 
+import org.bson.types.ObjectId;
+
 import com.mongodb.DBObject;
 
 import configuration.Configuration;

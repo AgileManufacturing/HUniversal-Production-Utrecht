@@ -18,6 +18,7 @@ import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.knowledgedb_client.Row;
+
 import HAL.Capability;
 import HAL.HardwareAbstractionLayer;
 import HAL.HardwareStep;
@@ -114,7 +115,7 @@ public class ModuleFactory extends Factory {
 			"	WHERE manufacturer = ? AND \n" + 
 			"		typeNumber = ? AND \n" + 
 			"		serialNumber = ? \n" + 
-			");";
+			"); \n";
 	
 	
 	
@@ -128,13 +129,13 @@ public class ModuleFactory extends Factory {
 			"FROM ModuleType \n" +
 			"WHERE manufacturer = ? AND \n" + 
 			"	typeNumber = ?;"; 
-	private static final String removeModuleTypeWithNoModules =
+	private static final String removeModuleTypesWithNoModules =
 			"DELETE FROM ModuleType \n" + 
 			"WHERE NOT EXISTS( \n" +  
 			"	SELECT * \n" +
 			"	FROM Module \n" +
-			"	WHERE manufacturer = ? AND \n" + 
-			"		typeNumber = ? \n" +
+			"	WHERE manufacturer = ModuleType.manufacturer AND \n" + 
+			"		typeNumber = ModuleType.typeNumber \n" +
 			");";
 	
 	private static final String addTopModule =
@@ -398,8 +399,7 @@ public class ModuleFactory extends Factory {
 			
 			knowledgeDBClient.executeUpdateQuery(removeModule, 
 					moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
-			knowledgeDBClient.executeUpdateQuery(removeModuleTypeWithNoModules, 
-					moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
+			knowledgeDBClient.executeUpdateQuery(removeModuleTypesWithNoModules);
 			
 			output.add("type", type);
 			return output;

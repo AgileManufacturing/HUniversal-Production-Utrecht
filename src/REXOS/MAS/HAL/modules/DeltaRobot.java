@@ -14,6 +14,7 @@ import HAL.HardwareStep;
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
 import HAL.exceptions.FactoryException;
+import HAL.exceptions.ModuleExecutingException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.ModuleListener;
@@ -34,10 +35,10 @@ public class DeltaRobot extends ModuleActor {
 		
 		if (command != null){
 			//Get move
-			JsonObject move = command.remove(MOVE).getAsJsonObject();			
-			if (move == null){
-				throw new ModuleTranslatingException ("DeltaRobot module didn't find a \"move\" key in CompositeStep command: "+jsonCommand.toString());
+			if (command.has(MOVE) == false){
+				throw new ModuleTranslatingException ("DeltaRobot module didn't find a \"move\" key in CompositeStep command: "+command.toString());
 			}
+			JsonObject move = command.remove(MOVE).getAsJsonObject();			
 			
 			
 			
@@ -58,7 +59,7 @@ public class DeltaRobot extends ModuleActor {
 				}
 			}
 			if (maxAcceleration > MAX_ACCELERATION) maxAcceleration = MAX_ACCELERATION;
-			
+			move.addProperty("maxAcceleration", maxAcceleration);
 			
 			hardwareCommand.addProperty(COMMAND, "move");
 			
@@ -118,7 +119,7 @@ public class DeltaRobot extends ModuleActor {
 				//hardwareSteps.addAll(hStep);
 		}
 		else {
-			throw new ModuleTranslatingException ("DeltaRobot module didn't receive any \"command\" key in CompositeStep command: "+jsonCommand.toString());
+			throw new ModuleTranslatingException ("DeltaRobot module didn't receive any \"command\" key in CompositeStep command: "+command.toString());
 		}
 		
 		return hardwareSteps;

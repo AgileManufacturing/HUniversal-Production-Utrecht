@@ -48,6 +48,10 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 		}
 	}
 	
+	public void setModuleListener(ModuleListener moduleListener){
+		this.moduleListener = moduleListener;
+	}
+	
 	protected void executeMongoCommand(String command) throws ModuleExecutingException{
 		try {
 			mongoClient.insertDocument(command.toString());
@@ -99,14 +103,14 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 	protected JsonObject adjustMoveWithDimentions(JsonObject command, double height){
 		System.out.println("Adjusting move with dimentions: "+command.toString());
 		JsonObject move = command.remove(MOVE).getAsJsonObject();
-		double x = move.remove(X).getAsDouble();
-		double y = move.remove(Y).getAsDouble();
-		double z = move.remove(Z).getAsDouble();
-		
-		move.addProperty(X,x);
-		move.addProperty(Y,y);
-		move.addProperty(Z,z+height);
-		command.add(MOVE, move);		
+		double x = move.get(X).getAsDouble();
+		double y = move.get(Y).getAsDouble();
+		double z = move.get(Z).getAsDouble();
+		JsonObject mParameters = new JsonObject();
+		mParameters.addProperty(X,x);
+		mParameters.addProperty(Y,y);
+		mParameters.addProperty(Z,z+height);
+		command.add(MOVE, mParameters);		
 		return command;		
 	}
 	

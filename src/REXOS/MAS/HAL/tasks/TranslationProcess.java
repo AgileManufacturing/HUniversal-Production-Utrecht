@@ -68,4 +68,9 @@ public class TranslationProcess implements Runnable{
 			hardwareAbstractionLayerListener.onIncapableCapabilities(productStep);			
 		}
 	}
+
+	public void start() {
+		Thread t = new Thread(this);
+		t.start();
+	}
 }

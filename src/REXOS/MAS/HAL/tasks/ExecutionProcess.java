@@ -46,4 +46,9 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 			throw new HardwareAbstractionLayerProcessException("No more hardwareSteps while there should be at least one more");
 		}
 	}
+
+	public void start() {
+		Thread t = new Thread(this);
+		t.start();
+	}
 }

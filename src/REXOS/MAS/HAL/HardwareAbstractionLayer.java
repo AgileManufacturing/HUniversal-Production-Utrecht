@@ -34,11 +34,11 @@ public class HardwareAbstractionLayer implements ModuleListener{
 	
 	public void executeHardwareSteps(ArrayList<HardwareStep> hardwareSteps){
 		ExecutionProcess executionProcess = new ExecutionProcess(this.hardwareAbstractionLayerListener, hardwareSteps, moduleFactory);
-		executionProcess.run();
+		executionProcess.start();
 	}
 	public void translateProductStep(ProductStep productStep){
 		TranslationProcess translationProcess = new TranslationProcess(this.hardwareAbstractionLayerListener, productStep, capabilityFactory);
-		translationProcess.run();
+		translationProcess.start();
 	}
 	public ArrayList<Capability> getAllCapabilities() throws Exception{
 		return capabilityFactory.getAllSupportedCapabilities();
@@ -57,7 +57,7 @@ public class HardwareAbstractionLayer implements ModuleListener{
 		try {
 			JsonArray capabilities =capabilityFactory.removeCapabilities(moduleIdentifier);
 			JsonObject module = moduleFactory.deleteModule(moduleIdentifier);			
-			module.add("capabilities", capabilities);
+			module.get("type").getAsJsonObject().add("capabilities", capabilities);
 			return module;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

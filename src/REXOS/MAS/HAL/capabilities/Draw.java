@@ -3,7 +3,10 @@ package HAL.capabilities;
 import java.util.ArrayList;
 
 import libraries.dynamicloader.JarFileLoaderException;
+import libraries.knowledgedb_client.KeyNotFoundException;
+import libraries.knowledgedb_client.KnowledgeException;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -42,6 +45,7 @@ public class Draw extends Capability {
 		String serviceName = productStep.getService().getName();
 		JsonObject productStepCriteria = productStep.getCriteria();
 		JsonObject target = productStepCriteria.get("target").getAsJsonObject();
+		JsonElement subjects = productStepCriteria.get("subjects");
 		
 		if(serviceName.equals("draw") && target != null){
 			JsonObject moveCommand = target.get("move").getAsJsonObject();
@@ -49,17 +53,15 @@ public class Draw extends Capability {
 			JsonObject command = new JsonObject();
 			command.addProperty("draw", "null");
 			command.add("move", moveCommand);
-			
+
 			JsonObject jsonCommand = new JsonObject();
 			jsonCommand.add("command", command);
-			
+
 			jsonCommand.addProperty("look_up", target.get("identifier").getAsString());
-			
+
 			System.out.println("command" + jsonCommand);
 			
-		
 			ArrayList<ModuleActor> modules = moduleFactory.getBottomModulesForFunctionalModuleTree(this, 1);
-			//System.
 			for (ModuleActor moduleActor : modules) {
 				JsonObject a = new JsonParser().parse(jsonCommand.toString()).getAsJsonObject();
 				CompositeStep draw = new CompositeStep(productStep, a);
@@ -68,7 +70,6 @@ public class Draw extends Capability {
 					hardwareSteps.addAll(moduleActor.translateCompositeStep(draw));
 					return hardwareSteps;
 				} catch (ModuleTranslatingException ex) {
-					
 					throw new CapabilityException(ex.toString(), ex);
 				}
 			}

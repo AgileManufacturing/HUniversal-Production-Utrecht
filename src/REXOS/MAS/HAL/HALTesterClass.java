@@ -30,16 +30,45 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			+ "	\"typeNumber\":\"delta_robot_type_A\","
 			+ "	\"serialNumber\":\"1\","
 			+ "	\"type\":{"
-			+ "		\"properties\":\"hoi!\","
+			+ "		\"properties\":\"{"
+			+ "	\\\"midPointX\\\" : 75.0,"
+			+ "	\\\"midPointY\\\" : -200.0,"
+			+ "	\\\"midPointZ\\\" : -35.3,"
+			+ "	\\\"deltaRobotMeasures\\\" : {"
+			+ "		\\\"baseRadius\\\" : 101.3,"
+			+ "		\\\"hipLength\\\" : 100.0,"
+			+ "		\\\"effectorRadius\\\" : 46.19,"
+			+ "		\\\"ankleLength\\\" : 250.0,"
+			+ "		\\\"hipAnleMaxAngleDegrees\\\" : 22.0,"
+			+ "		\\\"motorFromZeroToTopAngleDegrees\\\" : 20.0,"
+			+ "		\\\"boundaryBoxMinX\\\" : -200.0,"
+			+ "		\\\"boundaryBoxMaxX\\\" : 200.0,"
+			+ "		\\\"boundaryBoxMinY\\\" : -200.0,"
+			+ "		\\\"boundaryBoxMaxY\\\" : 200.0,"
+			+ "		\\\"boundaryBoxMinZ\\\" : -330.0,"
+			+ "		\\\"boundaryBoxMaxZ\\\" : -180.0"
+			+ "	},"
+			+ "	\\\"calibrationBigStepFactor\\\" : 20,"
+			+ "	\\\"stepperMotorProperties\\\" : {"
+			+ "		\\\"motorMinAngleDegrees\\\" : -18.0,"
+			+ "		\\\"motorMaxAngleDegrees\\\" : 80.0,"
+			+ "		\\\"microStepAngleDegrees\\\" : 0.036,"
+			+ "		\\\"minAccelerationDegrees\\\" : 36,"
+			+ "		\\\"maxAccelerationDegrees\\\" : 36000,"
+			+ "		\\\"minSpeedDegrees\\\" : 0.036,"
+			+ "		\\\"maxSpeedDegrees\\\" : 18000"
+			+ "	}"
+			+ "}","
 			+ "		\"rosSoftware\":{"
 			+ "			\"buildNumber\":1,"
-			+ "			\"rosFile\": \"\","
-			+ "			\"className\":\"moduleClass\""
+			+ "			\"rosFile\": \"";
+	static String moduleA_02 = "\","
+			+ "			\"command\":\"rosrun delta_robot_node delta_robot_node {equipletName} {manufacturer} {typeNumber} {serialNumber}\""
 			+ "		},"
 			+ "		\"halSoftware\":{"
 			+ "			\"buildNumber\":1,"
 			+ "			\"jarFile\": \"";
-	static String moduleA_02 = "\","
+	static String moduleA_03 = "\","
 			+ "			\"className\":\"HAL.modules.DeltaRobot\""
 			+ "		},"
 			+ "		\"supportedMutations\": ["
@@ -52,7 +81,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			+ "				\"halSoftware\":{"
 			+ "					\"buildNumber\":1,"
 			+ "					\"jarFile\": \"";
-	static String moduleA_03 = "\","
+	static String moduleA_04 = "\","
 			+ "					\"className\":\"HAL.capabilities.Draw\""
 			+ "				},"
 			+ "				\"requiredMutationsTrees\":["
@@ -69,8 +98,22 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			+ "			}"
 			+ "		]"
 			+ "	},"
-			+ "	\"properties\":\"name\","
+			+ "	\"properties\":\"{"
+			+ "	\"modbusIp\" : \"192.168.0.22\","
+			+ "	\"modbusPort\" : 502"
+			+ "}\","
 			+ "	\"calibrationData\":["
+			+ "		{"
+			+ "			\"date\":\"2014-01-01\","
+			+ "			\"data\":\"aapkip\","
+			+ "			\"moduleSet\":["
+			+ "				{"
+			+ "					\"manufacturer\":\"manA\","
+			+ "					\"typeNumber\":\"typeA\","
+			+ "					\"serialNumber\":\"serA\""
+			+ "				}"
+			+ "			]"
+			+ "		}"
 			+ "	],"
 			+ "	\"attachedTo\":null,"
 			+ "\"mountPointX\":3,"
@@ -85,7 +128,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			+ "		\"rosSoftware\":{"
 			+ "			\"buildNumber\":1,"
 			+ "			\"rosFile\": \"\","
-			+ "			\"className\":\"moduleClass\""
+			+ "			\"command\":\"moduleClass\""
 			+ "		},"
 			+ "		\"halSoftware\":{"
 			+ "			\"buildNumber\":1,"
@@ -162,8 +205,8 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			}
 		};
 		
-		blackboardUpdated = new BlackboardUpdated();
-		blackboardUpdated.setOnBlackBoardUpdatedListener(blackboardListener);
+		/*blackboardUpdated = new BlackboardUpdated();
+		blackboardUpdated.setOnBlackBoardUpdatedListener(blackboardListener);*/
 
 		
 		FileInputStream fis;
@@ -175,7 +218,15 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		fis.read(content);
 		fis.close();
 		String base64Module = new String(Base64.encodeBase64(content));
-		System.out.println("delta robot module: " + base64Module);
+		//System.out.println("delta robot module: " + base64Module);
+		
+		File deltaRobotZip = new File("/home/t/Desktop/nodes.zip");
+		fis = new FileInputStream(deltaRobotZip);
+		content = new byte[(int) deltaRobotZip.length()];
+		fis.read(content);
+		fis.close();
+		String base64ModuleRos = new String(Base64.encodeBase64(content));
+		//System.out.println("delta robot module zip: " + base64ModuleRos);
 		
 		File gripperJar = new File("/home/t/Desktop/Pen.jar");
 		fis = new FileInputStream(gripperJar);
@@ -183,7 +234,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		fis.read(content);
 		fis.close();
 		String base64Gripper = new String(Base64.encodeBase64(content));
-		System.out.println("gripper module: " + base64Gripper);
+		//System.out.println("gripper module: " + base64Gripper);
 		
 		File pickAndPlaceJar = new File("/home/t/Desktop/Draw.jar");
 		fis = new FileInputStream(pickAndPlaceJar);
@@ -191,36 +242,40 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		fis.read(content);
 		fis.close();
 		String base64Capability = new String(Base64.encodeBase64(content));
-		System.out.println("pick and place capability: " + base64Capability);
+		//System.out.println("pick and place capability: " + base64Capability);
 		
-		String moduleA = moduleA_01 + base64Module + moduleA_02 + base64Capability + moduleA_03; 
+		String moduleA = moduleA_01 + base64ModuleRos + moduleA_02 + base64Module + moduleA_03 + base64Capability + moduleA_04; 
 		JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
 		hal.insertModule(a, a);
 		
 		String moduleB = moduleB_01 + base64Gripper + moduleB_02; 
 		JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
-		hal.insertModule(b, b);
+		//hal.insertModule(b, b);
 		
 		hal.getBottomModules();
 		
-		
+		ModuleIdentifier moduleIdentifier = new ModuleIdentifier("HU", "delta_robot_type_A", "1");
+		/*JsonObject tommasgtaylordfuckzooi =hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);*/
+
+		/*
 		JsonObject criteria = new JsonObject();
 		JsonObject target = new JsonObject();
 		JsonObject targetMove = new JsonObject();
-		targetMove.addProperty("x", 3.0);
+		targetMove.addProperty("x", 0.0);
 		targetMove.addProperty("y", 0.0);
-		targetMove.addProperty("z", 30.0);
+		targetMove.addProperty("z", 20.0);
 		target.add("move",targetMove);
 		target.addProperty("identifier", "Paper");
 		
-		/*JsonArray subjects = new JsonArray();
+		JsonArray subjects = new JsonArray();
 		JsonObject subject = new JsonObject();
 		JsonObject subjectMove = new JsonObject();
 		subjectMove.addProperty("x", -3.0);
 		subjectMove.addProperty("y", 0.0);
 		subjectMove.addProperty("z", 0.0);
 		subject.add("move",subjectMove);
-		subjects.add(subject);*/
+		subjects.add(subject);
 		
 		criteria.add("target",target);
 		//criteria.add("subjects",subjects);
@@ -233,6 +288,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		/*Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);
 		hal.translateProductStep(productStep);*/
+		
 
 	}
 
