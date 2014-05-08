@@ -77,27 +77,22 @@ public class PickAndPlace extends Capability {
 		JsonElement subjects = productStepCriteria.get("subjects");
 		
 		
-		if(serviceName.equals("place")){
+		if(serviceName.equals("PickAndPlace")){
 			JsonObject pickCommand = new JsonObject();
 			JsonObject placeCommand = new JsonObject();
 			for(int i = 0; i<subjects.getAsJsonArray().size();i++){
 				JsonObject subjectMoveCommand = subjects.getAsJsonArray().get(i).getAsJsonObject().get("move").getAsJsonObject();
 				
-				
-				
 				pickCommand.addProperty("pick" , "null");
 				pickCommand.add("move" ,  subjectMoveCommand);
 				
-				//pickCommand.add("rotation", subjects.getAsJsonArray().get(0).getAsJsonObject().get("rotation"));
 				CompositeStep pick = new CompositeStep(productStep, pickCommand);
 				
-				subjectMoveCommand = target.getAsJsonObject().get("move").getAsJsonObject();
+				JsonObject targetMoveCommand = target.getAsJsonObject().get("move").getAsJsonObject();
 				placeCommand.addProperty("place", "null");
-				placeCommand.add("move" ,  subjectMoveCommand);
-				//placeCommand.add("rotation", target.getAsJsonObject().get("rotation"));
-				CompositeStep place = new CompositeStep(productStep, placeCommand);
-				
+				placeCommand.add("move" ,  targetMoveCommand);
 
+				CompositeStep place = new CompositeStep(productStep, placeCommand);
 				ArrayList<ModuleActor> modules = moduleFactory.getBottomModulesForFunctionalModuleTree(this, 1);
 				
 				for (ModuleActor moduleActor : modules) {
