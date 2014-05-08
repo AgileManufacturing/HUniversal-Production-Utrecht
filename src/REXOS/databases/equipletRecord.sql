@@ -3,8 +3,8 @@ insert into JavaSoftware
 values(1, "", "equiplet");
 
 insert into RosSoftware
-(buildNumber, jarFile, className)
-values(1, "", "equiplet");
+(buildNumber, zipFile, command)
+values(1, "", "rosrun equiplet_node equiplet_node {equipletName}");
 
 insert into Equiplet
 (name, mountPointsX, mountPointsY, mountPointDistanceX, mountPointDistanceY, rosSoftware, masSoftware)

@@ -24,8 +24,8 @@ create table JavaSoftware(
 create table RosSoftware(
   id int NOT NULL AUTO_INCREMENT,
   buildNumber int NOT NULL,
-  jarFile longblob NOT NULL,
-  className char(200),
+  zipFile longblob NOT NULL,
+  command char(200),
   primary key (id)
 );
 
