@@ -41,6 +41,7 @@ static void show_usage(std::string name) {
 
 int main(int argc, char **argv) {
 	std::string blackboardIP = DEFAULT_BLACKBOARD_IP;
+	bool spawnNodesForModules = false;
 	
 	for (int i = 0; i < argc; i++) {
 		std::string arg = argv[i];
@@ -54,18 +55,21 @@ int main(int argc, char **argv) {
 				std::cerr << "--blackboard requires one argument";
 				return -1;
 			}
+		} else if (arg == "--spawnNodes") {
+			spawnNodesForModules = true;
 		}
 	}
 	if(argc < 2) {
-		ROS_ERROR("Usage: equiplet_node (-r-blackboard <ip-address>) equipletName");
+		ROS_ERROR("Usage: equiplet_node (--blackboard <ip-address>) (--spawnNodes) equipletName");
 		return -2;
 	}
+	
 
 	// Set the name of the Equiplet
 	std::string equipletName = argv[argc - 1];
 
 	ros::init(argc, argv, equipletName);
-	equiplet_node::EquipletNode equipletNode(equipletName, blackboardIP);
+	equiplet_node::EquipletNode equipletNode(equipletName, blackboardIP, spawnNodesForModules);
 
 	ros::Rate poll_rate(10);
 	ros::spin();

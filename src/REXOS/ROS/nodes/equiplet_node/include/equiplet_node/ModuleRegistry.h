@@ -17,6 +17,7 @@
 #include "equiplet_node/ModuleRegistryListener.h"
 
 #include <rexos_knowledge_database/ModuleIdentifier.h>
+#include <rexos_knowledge_database/Equiplet.h>
 
 namespace equiplet_node {
 

@@ -11,7 +11,7 @@ EquipletStateMachine::EquipletStateMachine(std::string equipletName):
 			rexos_statemachine::MODE_CRITICAL_ERROR, 
 			rexos_statemachine::MODE_E_STOP,
 			rexos_statemachine::MODE_LOCK,
-			rexos_statemachine::MODE_STEP	
+			rexos_statemachine::MODE_STEP
 		}
 	),
 	moduleRegistry(equipletName),
@@ -39,14 +39,14 @@ void EquipletStateMachine::onStateChanged(){
 }
 
 void EquipletStateMachine::onModeChanged(){
-	ROS_INFO("Mode Changed to %s",rexos_statemachine::mode_txt[getCurrentMode()]);	
+	ROS_INFO("Mode Changed to %s",rexos_statemachine::mode_txt[getCurrentMode()]);
 	bool changeModuleModes = false;
 
 	rexos_statemachine::Mode currentMode = getCurrentMode();
 	switch(currentMode){
-		case rexos_statemachine::MODE_NORMAL:	
+		case rexos_statemachine::MODE_NORMAL:
 		case rexos_statemachine::MODE_SERVICE:
-		case rexos_statemachine::MODE_E_STOP:	
+		case rexos_statemachine::MODE_E_STOP:
 			changeModuleModes = true; break;
 	}
 
@@ -91,6 +91,28 @@ bool EquipletStateMachine::allModulesInDesiredState(rexos_statemachine::State de
 	return true;
 }
 
+void EquipletStateMachine::transitionInitialize(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO( "transitionInitialize called");
+	changeModuleStates(rexos_statemachine::STATE_SAFE);
+	
+	if(!allModulesInDesiredState(desiredState = rexos_statemachine::STATE_SAFE)) {
+		boost::unique_lock<boost::mutex> lock( mutexit );
+		condit.wait( lock );
+	}
+	
+	as->setSucceeded();
+}
+void EquipletStateMachine::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO( "transitionDeinitialize called");
+	changeModuleStates(rexos_statemachine::STATE_OFFLINE);
+	
+	if(!allModulesInDesiredState(desiredState = rexos_statemachine::STATE_OFFLINE)) {
+		boost::unique_lock<boost::mutex> lock( mutexit );
+		condit.wait( lock );
+	}
+	
+	as->setSucceeded();
+}
 void EquipletStateMachine::transitionSetup(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO( "transitionSetup called");
 	moduleRegistry.setNewRegistrationsAllowed(false);

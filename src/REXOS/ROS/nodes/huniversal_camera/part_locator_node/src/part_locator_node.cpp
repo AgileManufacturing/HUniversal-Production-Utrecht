@@ -145,7 +145,7 @@ void PartLocatorNode::qrCodeCallback(const vision_node::QrCodes & message) {
 		
 		storeInEnviromentCache(message.qrCodes[i].value, equipletCoor, qrCode.angle);
 		
-		delete points;
+		delete[] points;
 	}
 }
 PartLocatorNode::QrCode PartLocatorNode::calculateSmoothPos(std::string name, PartLocatorNode::QrCode lastPosition) {

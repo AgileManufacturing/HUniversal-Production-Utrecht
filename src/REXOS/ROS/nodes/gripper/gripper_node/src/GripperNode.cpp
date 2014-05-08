@@ -57,23 +57,6 @@ GripperNode::GripperNode(std::string equipletName, rexos_knowledge_database::Mod
 
 	std::cout << "[DEBUG] Opening modbus connection" << std::endl;
 
-	/*
-		modbusContext = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
-
-		if (modbusContext == NULL) {
-			throw std::runtime_error("Unable to allocate libmodbus context");
-		}
-
-		if (modbus_connect(modbusContext) == -1) {
-			throw std::runtime_error("Modbus connection to IO controller failed");
-		}
-
-		assert(modbusContext != NULL);
-
-		modbus = new rexos_modbus::ModbusController(modbusContext);
-		controller = new rexos_gripper::InputOutputController(modbus);
-		gripper = new rexos_gripper::Gripper(controller, this, wrapperForGripperError);
-	*/
 }
 
 GripperNode::~GripperNode() {
@@ -131,6 +114,15 @@ void GripperNode::wrapperForGripperError(void* gripperNodeObject) {
  **/
 void GripperNode::error() {
 	//sendErrorMessage(-1);
+}
+
+void GripperNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as) {
+	ROS_INFO("Initialize transition called");
+}
+
+void GripperNode::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as) {
+	ROS_INFO("Deinitialize transition called");
+	ros::shutdown();
 }
 
 /**

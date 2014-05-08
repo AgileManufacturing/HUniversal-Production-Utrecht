@@ -43,6 +43,8 @@ public:
 	virtual ~Transitions() {
 	}
 protected:
+	virtual void transitionDeinitialize(TransitionActionServer* as) = 0;
+	virtual void transitionInitialize(TransitionActionServer* as) = 0;
 	virtual void transitionStart(TransitionActionServer* as) = 0;
 	virtual void transitionStop(TransitionActionServer* as) = 0;
 	virtual void transitionSetup(TransitionActionServer* as) = 0;

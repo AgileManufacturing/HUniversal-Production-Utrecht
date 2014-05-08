@@ -30,21 +30,33 @@
 #ifndef STATES_H
 #define STATES_H
 
-#define STATE_COUNT 7
+#define STATE_COUNT 10
 
 namespace rexos_statemachine{
 	/**
 	 * @ enum State
 	 * The enumeration for the states
 	 **/
-	typedef enum { STATE_SAFE = 0, STATE_SETUP = 1, STATE_SHUTDOWN = 2, STATE_STANDBY = 3, STATE_START = 4, STATE_STOP = 5, STATE_NORMAL = 6, STATE_NOSTATE = 7 } State;
+	typedef enum {
+		STATE_OFFLINE = 0,
+		STATE_INITIALIZE = 1,
+		STATE_DEINITIALIZE = 2,
+		STATE_SAFE = 3,
+		STATE_SETUP = 4,
+		STATE_SHUTDOWN = 5,
+		STATE_STANDBY = 6,
+		STATE_START = 7,
+		STATE_STOP = 8,
+		STATE_NORMAL = 9,
+		STATE_NOSTATE = 10
+	} State;
 
 	/**
 	 * @var const char* const state_txt[]
 	 * The representation of the states in a char array so its easy to print the enum values instead of the integer
 	 **/
-	const char* const state_txt[] = { "Safe", "Setup", "Shutdown", "Standby", "Start", "Stop", "Normal", "no state" };
+	const char* const state_txt[] = { "Offline", "Initialize", "Deinitialize", "Safe", "Setup", "Shutdown", "Standby", "Start", "Stop", "Normal", "no state" };
 
-	const char is_transition_state[] = { 0, 1, 1, 0, 1, 1, 0, 0 };
+	const char is_transition_state[] = { 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0 };
 }
 #endif

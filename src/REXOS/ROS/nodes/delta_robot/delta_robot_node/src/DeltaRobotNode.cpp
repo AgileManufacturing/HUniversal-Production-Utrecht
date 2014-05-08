@@ -239,6 +239,15 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(double x, doub
 }
 
 
+void deltaRobotNodeNamespace::DeltaRobotNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as) {
+	ROS_INFO("Initialize transition called");
+}
+
+void deltaRobotNodeNamespace::DeltaRobotNode::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as) {
+	ROS_INFO("Deinitialize transition called");
+	ros::shutdown();
+}
+
 /**
  * Transition from Safe to Standby state
  * @return 0 if everything went OK else error

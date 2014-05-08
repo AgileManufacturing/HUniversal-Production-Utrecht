@@ -37,6 +37,7 @@
 #include <string>
 #include <vector>
 
+#include <rexos_node_spawner/NodeSpawner.h>
 #include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
 #include <rexos_blackboard_cpp_client/BlackboardSubscriber.h>
 #include <rexos_blackboard_cpp_client/FieldUpdateSubscription.h>
@@ -61,7 +62,7 @@ namespace equiplet_node {
 class EquipletNode : public EquipletStateMachine, public Blackboard::BlackboardSubscriber
 {
 public:
-	EquipletNode(std::string equipletName, std::string blackboardIp);
+	EquipletNode(std::string equipletName, std::string blackboardIp, bool spawnNodesForModules);
 
 	virtual ~EquipletNode();
 

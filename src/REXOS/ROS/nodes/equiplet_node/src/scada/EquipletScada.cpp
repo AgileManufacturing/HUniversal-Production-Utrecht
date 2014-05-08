@@ -76,8 +76,6 @@ int EquipletScada::mongooseBeginRequestCallback(mg_connection* connection) {
 	}
 
 	return processed;
-
-	return 1;
 }
 
 void EquipletScada::mongooseProcessChangeModuleMode(mg_connection* conn, mg_request_info* request_info) {

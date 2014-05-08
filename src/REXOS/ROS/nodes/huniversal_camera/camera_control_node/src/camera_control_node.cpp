@@ -143,6 +143,16 @@ bool CameraControlNode::mannuallyCalibrateLens(){
 	return true;
 }
 
+void CameraControlNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as) {
+	ROS_INFO("Initialize transition called");
+}
+
+void CameraControlNode::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as) {
+	ROS_INFO("Deinitialize transition called");
+	ros::shutdown();
+}
+
+
 void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Setup transition called");
 	
@@ -161,18 +171,15 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 		JSONNode* cameraMatrix = NULL;
 		for(JSONNode::const_iterator it = jsonNode.begin(); it != jsonNode.end(); it++) {
 			if(it->name() == "distCoeffs"){
-				distCoeffs = new JSONNode(it->as_node());
+				*distCoeffs = it->as_node();
 				ROS_INFO("found distCoeffs");
 			} else if (it->name() == "cameraMatrix") {
-				cameraMatrix = new JSONNode(it->as_node());
+				*cameraMatrix = it->as_node();
 				ROS_INFO("found cameraMatrix");
 			} else {
 				// some other property, ignore it
 			}
 		}
-		
-		std::cout << jsonNode.write_formatted();
-		std::cout << "a" << cameraMatrix->write_formatted() << "b";
 		
 		if(distCoeffs == NULL || cameraMatrix == NULL){
 			if(mannuallyCalibrateLens() == false){

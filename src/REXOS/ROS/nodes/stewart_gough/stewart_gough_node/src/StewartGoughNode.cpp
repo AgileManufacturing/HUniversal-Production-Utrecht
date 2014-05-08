@@ -220,6 +220,11 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToRelativePoint(double x, 
 	}
 }
 
+void stewartGoughNodeNamespace::StewartGoughNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as){
+}
+void stewartGoughNodeNamespace::StewartGoughNode::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as){
+	ros::shutdown();
+}
 
 /**
  * Transition from Safe to Standby state
@@ -234,7 +239,7 @@ void stewartGoughNodeNamespace::StewartGoughNode::transitionSetup(rexos_statemac
 	// Calibrate the motors
 	if(!stewartGough->calibrateMotors()){
 		ROS_ERROR("Calibration FAILED. EXITING.");
-			as->setAborted();
+		as->setAborted();
 	} else {
 		as->setSucceeded();
 	}

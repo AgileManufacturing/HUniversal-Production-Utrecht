@@ -81,12 +81,18 @@ public:
 	rexos_statemachine::State currentState;
 	rexos_statemachine::Mode currentMode;
 	
+	boost::condition_variable nodeStartupCondition;
+	boost::mutex nodeStartupMutex;
+	
+	bool connectedWithNode;
 	/**
 	 * The bond to bind the module with the equiplet
 	 **/
 	rexos_bond::Bond* bond;
 protected:
 	virtual void onBondCallback(rexos_bond::Bond* bond, Event event);
+public:
+	void bind();
 };
 
 } /* namespace equiplet_node */

@@ -78,6 +78,8 @@ namespace deltaRobotNodeNamespace{
 		DeltaRobotNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
 		virtual ~DeltaRobotNode();
 		
+		virtual void transitionInitialize(rexos_statemachine::TransitionActionServer* as);
+		virtual void transitionDeinitialize(rexos_statemachine::TransitionActionServer* as);
 		virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
 		virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
 		virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);

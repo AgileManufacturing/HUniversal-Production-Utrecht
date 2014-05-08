@@ -349,6 +349,8 @@
             <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/include/rexos_knowledge_database/Equiplet.h"/>
             <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/include/rexos_knowledge_database/rexos_knowledge_database.h"/>
             <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/include/rexos_knowledge_database/ModuleType.h"/>
+            <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/include/rexos_knowledge_database/ModuleIdentifier.h"/>
+            <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/include/rexos_knowledge_database/ModuleTypeIdentifier.h"/>
           </VirtualDirectory>
         </VirtualDirectory>
         <VirtualDirectory Name="src">
@@ -357,6 +359,8 @@
           <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/src/Equiplet.cpp"/>
           <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/src/KnowledgeDatabaseException.cpp"/>
           <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/src/ModuleType.cpp"/>
+          <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/src/ModuleIdentifier.cpp"/>
+          <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/src/ModuleTypeIdentifier.cpp"/>
         </VirtualDirectory>
       </VirtualDirectory>
       <VirtualDirectory Name="rexos_most">

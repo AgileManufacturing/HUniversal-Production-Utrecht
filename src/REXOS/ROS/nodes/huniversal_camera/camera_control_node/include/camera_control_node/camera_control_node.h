@@ -65,6 +65,8 @@ public:
 
 	void run();
 	
+	virtual void transitionInitialize(rexos_statemachine::TransitionActionServer* as);
+	virtual void transitionDeinitialize(rexos_statemachine::TransitionActionServer* as);
 	/**
 	 * MAST transition from safe to standby is handled by this method. 
 	 * see http://wiki.agilemanufacturing.nl/index.php/Vision_system#camera_control_node
