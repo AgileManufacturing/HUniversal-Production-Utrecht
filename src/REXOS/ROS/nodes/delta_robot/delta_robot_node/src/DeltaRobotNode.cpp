@@ -100,6 +100,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 
     //construct a payload
     //construct lookupvalues.
+    std::cout << "onSetInstruction" << std::endl;
 	Point payloadPoint, lookupResultPoint;
 	double angle, rotatedX, rotatedY;
     JSONNode::const_iterator i = instructionDataNode.begin();
@@ -107,6 +108,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
         const char * nodeName = i -> name().c_str();
 	    // keep in mind that a payload may or may not contain all values. Use lastXYZ to determine these values if they are not set.
         if (strcmp(nodeName, "payload") == 0){
+		    std::cout << "payload" << std::endl;
 
 			payloadPoint = parsePoint(*i, &setValues);
 			lookupResultPoint = parseLookup(*i);
@@ -116,21 +118,35 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 			//check whether lookup is set. If all values are 0, we can presume the lookup isnt set.
 			//Bit dangerous tho, what happends if they are all exactly 0?
 			if(!(lookupResultPoint.x == 0 && lookupResultPoint.y == 0 && angle == 0)){
+			    std::cout << "lookupIsSet" << std::endl;
 				lookupIsSet = true;
 			}
 
-			if(setValues.find("x") == -1 && setValues.find("y") == -1) {
-				// Probably a Z movement
+			if(setValues.find("x") == -1) {
 				payloadPoint.x = deltaRobot->getEffectorLocation().x;
-				payloadPoint.y = deltaRobot->getEffectorLocation().y;
-				movementZ = true;
 			}
-
+			if(setValues.find("y") == -1) {
+				payloadPoint.y = deltaRobot->getEffectorLocation().y;
+			}
 			if(setValues.find("z") == -1) {
-				// Probably a XY movement
 				payloadPoint.z = deltaRobot->getEffectorLocation().z;
 			}
 
+			// if(setValues.find("x") == -1 && setValues.find("y") == -1) {
+			//     std::cout << "movementZ" << std::endl;
+			// 	// Probably a Z movement
+			// 	payloadPoint.x = deltaRobot->getEffectorLocation().x;
+			// 	payloadPoint.y = deltaRobot->getEffectorLocation().y;
+			// 	movementZ = true;
+			// }
+
+			// if(setValues.find("z") == -1) {
+			//     std::cout << "find z is not found" << std::endl;
+			// 	// Probably a XY movement
+			// 	payloadPoint.z = deltaRobot->getEffectorLocation().z;
+			// }
+		    std::cout << payloadPoint.x << " " << payloadPoint.y << " " << payloadPoint.z << std::endl;
+		    std::cout << lookupResultPoint.x << " " << lookupResultPoint.y << " " << lookupResultPoint.z << std::endl;
         }
         ++i;
     }
@@ -138,6 +154,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
     Vector3 moveVector;
     //lookup is set, so transform the (rotated) crate to a normal position.
     if(lookupIsSet) {
+	    std::cout << "lookupIsSet == true" << std::endl;
 		Vector3 lookupVector(lookupResultPoint.x, lookupResultPoint.y, lookupResultPoint.z);
 
 		double theta = angle * 3.141592653589793 / 180.0;
@@ -151,14 +168,19 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 
 		std::cout << "[TranslatedVectorX]: \t" << translatedVector.x << "\n[TranslatedVectorY]: \t" << translatedVector.y << std::endl;
 
-		if(movementZ) {
-			// Z Movement
-			moveVector.set(payloadPoint.x, payloadPoint.y, (translatedVector.z + payloadPoint.z));
-		} else {
-			// XY Movement
-			moveVector.set((translatedVector.x + rotatedX), (translatedVector.y + rotatedY), payloadPoint.z);
-			std::cout << "[MoveVectorX]: \t" << moveVector.x << "\n[MoveVectorY]: \t" << moveVector.y << std::endl;
+		if(setValues.find("x")!= -1 && setValues.find("y")!= -1 
+				&& setValues.find("z")!= -1){
+			moveVector.set((translatedVector.x + rotatedX), (translatedVector.y + rotatedY), (translatedVector.z + payloadPoint.z));
+
 		}
+		// if(movementZ) {
+		// 	// Z Movement
+		// 	moveVector.set(payloadPoint.x, payloadPoint.y, (translatedVector.z + payloadPoint.z));
+		// } else {
+		// 	// XY Movement
+		// 	moveVector.set((translatedVector.x + rotatedX), (translatedVector.y + rotatedY), payloadPoint.z);
+		// 	std::cout << "[MoveVectorX]: \t" << moveVector.x << "\n[MoveVectorY]: \t" << moveVector.y << std::endl;
+		// }
 
 	} else {
 		moveVector.set(payloadPoint.x, payloadPoint.y, payloadPoint.z);

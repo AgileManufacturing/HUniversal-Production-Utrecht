@@ -49,7 +49,7 @@ const string PartLocatorNode::TOP_RIGHT_VALUE = "WP_800_400_TR";
 const string PartLocatorNode::BOTTOM_RIGHT_VALUE = "WP_800_400_BR";*/
 
 
-PartLocatorNode::PartLocatorNode(int equipletId, std::string cameraManufacturer, std::string cameraTypeNumber, std::string cameraSerialNumber):
+PartLocatorNode::PartLocatorNode(std::string equipletName, std::string cameraManufacturer, std::string cameraTypeNumber, std::string cameraSerialNumber):
 		rexos_knowledge_database::Module(rexos_knowledge_database::ModuleIdentifier(cameraManufacturer, cameraTypeNumber, cameraSerialNumber)),
 		rexos_coordinates::Module(this),
 		environmentCacheClient(nodeHandle.serviceClient<environment_cache::UpdateEnvironmentCache>("updateEnvironmentCache")),
@@ -391,15 +391,10 @@ int main(int argc, char* argv[]) {
 		return -1;
 	}
 	
-	int equipletId;
-	try{
-		equipletId = rexos_utilities::stringToInt(argv[1]);
-	} catch(std::runtime_error ex) {
-		ROS_ERROR("Cannot read equiplet id from commandline please use correct values.");
-		return -2;
-	}
+	std::string equipletName = argv[1];
+
 	ROS_INFO("Constructing node");
-	PartLocatorNode node(equipletId, argv[2], argv[3], argv[4]);
+	PartLocatorNode node(equipletName, argv[2], argv[3], argv[4]);
 	
 	node.run();
 	return 0;
