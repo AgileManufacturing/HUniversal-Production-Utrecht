@@ -1,11 +1,13 @@
 /**
- * @file DatabaseConnection.h
- * @brief Coordinate system for communication between nodes
- * @date Created: 2012-01-??  TODO: Date
+ * @file EquipletNode.cpp
+ * @brief Main for EquipletNode
+ * @date Created: 2012-10-12
  *
- * @author Tommas Bakker
+ * @author Joris Vergeer
  *
  * @section LICENSE
+ * License: newBSD
+ *
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
@@ -24,30 +26,32 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
  **/
 
-#pragma once
+#include <node_spawner_node/NodeSpawnerNode.h>
 
-#include <string>
-#include <memory>
+int main(int argc, char **argv) {
+	bool spawnEquipletNode = false;
+	
+	for (int i = 0; i < argc; i++) {
+		std::string arg = argv[i];
+		if (arg == "--spawnEquipletNode") {
+			spawnEquipletNode = true;
+		}
+	}
+	if(argc < 2) {
+		ROS_ERROR("Usage: node_spawner_node (--spawnEquipletNode) equipletName");
+		return -2;
+	}
+	
 
-#include <rexos_knowledge_database/ModuleIdentifier.h>
+	// Set the name of the Equiplet
+	std::string equipletName = argv[argc - 1];
 
-#include "mysql_connection.h"
-
-namespace rexos_knowledge_database {
-	class Equiplet {
-	public:
-		Equiplet(std::string name);
-		
-		int getMointPointsX();
-		int getMointPointsY();
-		double getMointPointDistanceX();
-		double getMointPointDistanceY();
-		std::vector<ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
-	private:
-		std::string name;
-		std::unique_ptr<sql::Connection> connection;
-	};
+	ros::init(argc, argv, "nodeSpawner");
+	node_spawner_node::NodeSpawnerNode nodeSpawnerNode(equipletName, spawnEquipletNode);
+	
+	ros::spin();
+	
+	return 0;
 }

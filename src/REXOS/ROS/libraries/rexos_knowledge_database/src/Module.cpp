@@ -32,6 +32,8 @@ namespace rexos_knowledge_database{
 		}
 		ROS_INFO_STREAM("Constructed module with manufacturer=" << moduleIdentifier.getManufacturer() << 
 				" typeNumber=" << moduleIdentifier.getTypeNumber() << " serialNumber=" << moduleIdentifier.getSerialNumber());
+		
+		delete result;
 	}
 	ModuleIdentifier Module::getModuleIdentifier() {
 		return moduleIdentifier;
@@ -55,6 +57,7 @@ namespace rexos_knowledge_database{
 		result->next();
 		std::string jsonProperties = result->getString("moduleProperties");
 		
+		delete result;
 		delete preparedStmt;
 		return jsonProperties;
 	}
@@ -99,6 +102,8 @@ namespace rexos_knowledge_database{
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1) {
+			delete result;
+			delete preparedStmt;
 			return 0;
 		} else {
 			// set the cursor at the first result
@@ -108,6 +113,7 @@ namespace rexos_knowledge_database{
 				result->getString("typeNumber"),
 				result->getString("serialNumber")
 			);
+			delete result;
 			delete preparedStmt;
 			return new Module(identifier);
 		}
@@ -147,10 +153,11 @@ namespace rexos_knowledge_database{
 				childModules.push_back(identifier);
 			}
 		}
+		delete result;
 		delete preparedStmt;
 		return childModules;
 	}
-
+	
 	int Module::getMountPointX(){
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT mountPointX \
@@ -170,6 +177,7 @@ namespace rexos_knowledge_database{
 		result->next();
 		int mountPointX = result->getInt("mountPointX");
 		
+		delete result;
 		delete preparedStmt;
 		return mountPointX;
 	}
@@ -207,6 +215,7 @@ namespace rexos_knowledge_database{
 		result->next();
 		int mountPointY = result->getInt("mountPointY");
 		
+		delete result;
 		delete preparedStmt;
 		return mountPointY;		
 	}
@@ -251,6 +260,7 @@ namespace rexos_knowledge_database{
 		// set the cursor at the first result
 		result->next();
 		std::string properties = result->getString("properties");
+		delete result;
 		delete preparedStmt;
 		return properties;
 	}
@@ -273,6 +283,7 @@ namespace rexos_knowledge_database{
 		// set the cursor at the first result
 		result->next();
 		std::string properties = result->getString("properties");
+		delete result;
 		delete preparedStmt;
 		return properties;
 	}
@@ -432,6 +443,7 @@ namespace rexos_knowledge_database{
 		// set the cursor at the first result
 		result->next();
 		int calibrationId = result->getInt("id");
+		delete result;
 		delete preparedStmt;
 		
 		// delete the temp table for storing the modules

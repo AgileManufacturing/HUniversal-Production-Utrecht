@@ -45,7 +45,7 @@ namespace rexos_gripper
 		InputOutputController(JSONNode node);
 		void readJSONNode(const JSONNode node);
 		//InputOutputController(rexos_modbus::ModbusController* modbus);
-
+		virtual ~InputOutputController();
 		void pinHigh(uint32_t address, uint8_t pin);
 		void pinLow(uint32_t address, uint8_t pin);
 

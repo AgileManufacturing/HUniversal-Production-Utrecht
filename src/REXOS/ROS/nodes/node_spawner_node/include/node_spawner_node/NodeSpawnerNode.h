@@ -1,11 +1,14 @@
 /**
- * @file DatabaseConnection.h
- * @brief Coordinate system for communication between nodes
- * @date Created: 2012-01-??  TODO: Date
+ * @file EquipletNode.h
+ * @brief Symbolizes an entire EquipletNode.
+ * @date Created: 2012-10-12
  *
- * @author Tommas Bakker
+ * @author Dennis Koole
+ * @author Gerben Boot & Joris Vergeer
  *
  * @section LICENSE
+ * License: newBSD
+ *
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
@@ -24,30 +27,42 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
  **/
 
 #pragma once
 
+#include "ros/ros.h"
+#include "lookup_handler/LookupServer.h"
+
 #include <string>
-#include <memory>
+#include <vector>
 
-#include <rexos_knowledge_database/ModuleIdentifier.h>
+#include <node_spawner_node/spawnNode.h>
+#include <rexos_node_spawner/NodeSpawner.h>
 
-#include "mysql_connection.h"
+namespace node_spawner_node {
 
-namespace rexos_knowledge_database {
-	class Equiplet {
-	public:
-		Equiplet(std::string name);
-		
-		int getMointPointsX();
-		int getMointPointsY();
-		double getMointPointDistanceX();
-		double getMointPointDistanceY();
-		std::vector<ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
-	private:
-		std::string name;
-		std::unique_ptr<sql::Connection> connection;
-	};
+/**
+ * The equipletNode, will manage all modules and keep track of their states
+ **/
+class NodeSpawnerNode : public rexos_node_spawner::NodeSpawner
+{
+public:
+	NodeSpawnerNode(std::string equipletName, bool spawnEquipletNode);
+	virtual ~NodeSpawnerNode();
+
+private:
+	bool spawnNode(spawnNode::Request &request, spawnNode::Response &response);
+	std::vector<rexos_knowledge_database::ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
+	/**
+	 * @var int equipletId
+	 * The id of the equiplet
+	 **/
+	std::string equipletName;
+
+	ros::NodeHandle nh;
+	
+	ros::ServiceServer spawnNodeServer;
+};
+
 }

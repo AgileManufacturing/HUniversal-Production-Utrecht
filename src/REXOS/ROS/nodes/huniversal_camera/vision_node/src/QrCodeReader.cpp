@@ -83,10 +83,10 @@ void QrCodeReader::handleFrame(cv::Mat& frame, cv::Mat* debugFrame) {
 	}
 	if(debugFrame != NULL && debugImagePublisher.getNumSubscribers() != 0){
 		// we are changing the image, so we need a copy
-		cv::Mat* debugImage = new cv::Mat(*debugFrame);
+		cv::Mat debugImage = cv::Mat(*debugFrame);
 		
 		for(int i = 0; i < qrCodes.size(); i++){
-			qrCodes[i].draw(*debugImage);
+			qrCodes[i].draw(debugImage);
 		}
 		
 		cv_bridge::CvImage cvi;
@@ -94,12 +94,10 @@ void QrCodeReader::handleFrame(cv::Mat& frame, cv::Mat* debugFrame) {
 		cvi.header.stamp = time;
 		cvi.header.frame_id = "qr_debug_image";
 		cvi.encoding = sensor_msgs::image_encodings::BGR8;
-		cvi.image = *debugImage;
+		cvi.image = debugImage;
 		
 		debugImagePublisher.publish(cvi.toImageMsg());
 		//cv::imwrite("/home/t/Desktop/test_results/trollolololol.png", *image);
-		
-		delete debugImage;
 	}
 	
 	

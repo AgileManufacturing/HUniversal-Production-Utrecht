@@ -29,6 +29,7 @@ namespace rexos_knowledge_database{
 		result->next();
 		std::string jsonProperties = result->getString("moduleTypeProperties");
 		
+		delete result;
 		delete preparedStmt;
 		return jsonProperties;
 	}

@@ -1,11 +1,13 @@
 /**
- * @file DatabaseConnection.h
- * @brief Coordinate system for communication between nodes
- * @date Created: 2012-01-??  TODO: Date
+ * @file StepperMotorProperties.cpp
+ * @brief Contains the properties of a stepper motor.
+ * @date Created: 2012-10-02
  *
  * @author Tommas Bakker
  *
  * @section LICENSE
+ * License: newBSD
+ * 
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
@@ -24,30 +26,23 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
  **/
 
 #pragma once
-
-#include <string>
-#include <memory>
+#include <rexos_knowledge_database/RosSoftware.h>
 
 #include <rexos_knowledge_database/ModuleIdentifier.h>
+#include <rexos_knowledge_database/rexos_knowledge_database.h>
 
-#include "mysql_connection.h"
-
-namespace rexos_knowledge_database {
-	class Equiplet {
-	public:
-		Equiplet(std::string name);
-		
-		int getMointPointsX();
-		int getMointPointsY();
-		double getMointPointDistanceX();
-		double getMointPointDistanceY();
-		std::vector<ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
+namespace rexos_node_spawner{
+	class NodeSpawner{
+	protected:
+		NodeSpawner(std::string equipletName);
+		void spawnNode(rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
+		void spawnEquipletNode();
 	private:
-		std::string name;
-		std::unique_ptr<sql::Connection> connection;
+		std::string equipletName;
+		
+		void extractZipArchive(rexos_knowledge_database::RosSoftware& rosSoftware);
 	};
 }

@@ -1,11 +1,14 @@
 /**
- * @file DatabaseConnection.h
- * @brief Coordinate system for communication between nodes
- * @date Created: 2012-01-??  TODO: Date
+ * @file EquipletNode.cpp
+ * @brief Symbolizes an entire EquipletNode.
+ * @date Created: 2012-10-12
  *
- * @author Tommas Bakker
+ * @author Dennis Koole
+ * @author Alexander Streng
  *
  * @section LICENSE
+ * License: newBSD
+ *
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
@@ -24,30 +27,43 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
  **/
 
-#pragma once
+#include <unistd.h>
+#include <node_spawner_node/NodeSpawnerNode.h>
+#include <rexos_knowledge_database/Equiplet.h>
+using namespace node_spawner_node;
 
-#include <string>
-#include <memory>
 
-#include <rexos_knowledge_database/ModuleIdentifier.h>
+/**
+ * Create a new EquipletNode
+ * @param id The unique identifier of the Equiplet
+ **/
+NodeSpawnerNode::NodeSpawnerNode(std::string equipletName, bool spawnEquipletNode) :
+		equipletName(equipletName),
+		NodeSpawner(equipletName)
+{
+	if(spawnEquipletNode == true) {
+		ROS_INFO("spawning equiplet node");
+		NodeSpawner::spawnEquipletNode();
+	}
+	spawnNodeServer = nh.advertiseService("spawnNode", &NodeSpawnerNode::spawnNode, this);
+	
+	ROS_INFO("node_spawner_node has been started");
+}
 
-#include "mysql_connection.h"
+/**
+ * Destructor for the NodeSpawnerNode
+ **/
+NodeSpawnerNode::~NodeSpawnerNode(){
+}
 
-namespace rexos_knowledge_database {
-	class Equiplet {
-	public:
-		Equiplet(std::string name);
-		
-		int getMointPointsX();
-		int getMointPointsY();
-		double getMointPointDistanceX();
-		double getMointPointDistanceY();
-		std::vector<ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
-	private:
-		std::string name;
-		std::unique_ptr<sql::Connection> connection;
-	};
+bool NodeSpawnerNode::spawnNode(spawnNode::Request &request, spawnNode::Response &response) {
+	rexos_knowledge_database::ModuleIdentifier identifier(request.manufacturer, request.typeNumber, request.serialNumber);
+	NodeSpawner::spawnNode(identifier);
+	return true;
+}
+std::vector<rexos_knowledge_database::ModuleIdentifier> NodeSpawnerNode::getModuleIdentifiersOfAttachedModules() {
+	rexos_knowledge_database::Equiplet equiplet = rexos_knowledge_database::Equiplet(equipletName);
+	return equiplet.getModuleIdentifiersOfAttachedModules();
 }

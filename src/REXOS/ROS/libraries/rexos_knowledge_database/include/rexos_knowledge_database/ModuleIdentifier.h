@@ -47,5 +47,6 @@ namespace rexos_knowledge_database {
 		JSONNode toJSONObject();
 		bool operator==(const ModuleIdentifier& rhs);
 	};
+	std::ostream& operator<<(std::ostream& os, const ModuleIdentifier& obj);
 }
 

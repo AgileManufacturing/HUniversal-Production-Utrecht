@@ -37,17 +37,16 @@
 #include "mysql_connection.h"
 
 namespace rexos_knowledge_database {
-	class Equiplet {
+	class RosSoftware {
 	public:
-		Equiplet(std::string name);
+		RosSoftware(ModuleIdentifier moduleIdentifier);
+		RosSoftware(std::string equipletName);
 		
-		int getMointPointsX();
-		int getMointPointsY();
-		double getMointPointDistanceX();
-		double getMointPointDistanceY();
-		std::vector<ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
+		std::istream* getRosFile();
+		std::string getCommand();
+		int getId();
 	private:
-		std::string name;
+		int id;
 		std::unique_ptr<sql::Connection> connection;
 	};
 }
