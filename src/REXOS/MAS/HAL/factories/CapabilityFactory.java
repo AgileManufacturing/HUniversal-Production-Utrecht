@@ -4,8 +4,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.commons.codec.binary.Base64;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -17,12 +15,11 @@ import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.knowledgedb_client.Row;
-import HAL.Capability;
 import HAL.HardwareAbstractionLayer;
 import HAL.JavaSoftware;
 import HAL.ModuleIdentifier;
-import HAL.Mutation;
 import HAL.Service;
+import HAL.capabilities.Capability;
 
 public class CapabilityFactory extends Factory{
 	// SQL queries

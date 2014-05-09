@@ -1,6 +1,8 @@
-package HAL;
+package HAL.steps;
 
 import java.io.Serializable;
+
+import HAL.Service;
 
 import com.google.gson.JsonObject;
 

@@ -3,13 +3,13 @@ package HAL.tasks;
 import java.util.ArrayList;
 
 import libraries.dynamicloader.JarFileLoaderException;
-import HAL.Capability;
-import HAL.HardwareStep;
-import HAL.ProductStep;
+import HAL.capabilities.Capability;
 import HAL.exceptions.CapabilityException;
 import HAL.exceptions.FactoryException;
 import HAL.factories.CapabilityFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
+import HAL.steps.HardwareStep;
+import HAL.steps.ProductStep;
 
 public class TranslationProcess implements Runnable{
 	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;

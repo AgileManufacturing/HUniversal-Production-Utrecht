@@ -9,8 +9,6 @@ import com.google.gson.JsonObject;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
-import HAL.CompositeStep;
-import HAL.HardwareStep;
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
 import HAL.exceptions.FactoryException;
@@ -18,6 +16,8 @@ import HAL.exceptions.ModuleExecutingException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.ModuleListener;
+import HAL.steps.CompositeStep;
+import HAL.steps.HardwareStep;
 
 public class DeltaRobot extends ModuleActor {
 	public final static int MAX_ACCELERATION = 50;

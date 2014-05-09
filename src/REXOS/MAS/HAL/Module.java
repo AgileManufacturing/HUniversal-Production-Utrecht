@@ -3,7 +3,6 @@ package HAL;
 import java.util.ArrayList;
 
 import HAL.exceptions.FactoryException;
-import HAL.exceptions.HardwareAbstractionLayerProcessException;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.BlackboardListener;
 import HAL.listeners.ModuleListener;

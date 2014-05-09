@@ -10,15 +10,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import HAL.Capability;
-import HAL.CompositeStep;
-import HAL.HardwareStep;
 import HAL.ModuleActor;
-import HAL.ProductStep;
 import HAL.exceptions.CapabilityException;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
+import HAL.steps.CompositeStep;
+import HAL.steps.HardwareStep;
+import HAL.steps.ProductStep;
 
 /**
  * 

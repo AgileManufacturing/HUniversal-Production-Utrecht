@@ -6,10 +6,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import libraries.knowledgedb_client.KnowledgeException;
+import HAL.capabilities.Capability;
 import HAL.factories.CapabilityFactory;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ModuleListener;
+import HAL.steps.HardwareStep;
+import HAL.steps.ProductStep;
 import HAL.tasks.ExecutionProcess;
 import HAL.tasks.TranslationProcess;
 

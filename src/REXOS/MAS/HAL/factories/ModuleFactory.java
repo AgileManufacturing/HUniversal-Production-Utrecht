@@ -18,20 +18,19 @@ import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.knowledgedb_client.Row;
-
-import HAL.Capability;
 import HAL.HardwareAbstractionLayer;
-import HAL.HardwareStep;
 import HAL.JavaSoftware;
 import HAL.Module;
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
 import HAL.Mutation;
 import HAL.RosSoftware;
+import HAL.capabilities.Capability;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleExecutingException;
 import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
+import HAL.steps.HardwareStep;
 
 public class ModuleFactory extends Factory {
 	// SQL queries

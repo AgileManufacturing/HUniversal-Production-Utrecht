@@ -12,6 +12,8 @@ import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
+import HAL.steps.CompositeStep;
+import HAL.steps.HardwareStep;
 import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;

@@ -1,4 +1,4 @@
-package HAL;
+package HAL.steps;
 
 import java.io.Serializable;
 

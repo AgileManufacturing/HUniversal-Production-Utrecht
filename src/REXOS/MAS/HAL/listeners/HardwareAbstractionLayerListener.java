@@ -2,9 +2,9 @@ package HAL.listeners;
 
 import java.util.ArrayList;
 
-import HAL.ProductStep;
-import HAL.HardwareStep;
 import HAL.Module;
+import HAL.steps.HardwareStep;
+import HAL.steps.ProductStep;
 
 public interface HardwareAbstractionLayerListener {
 	public void onProcessStateChanged(String state, long hardwareStepSerialId, Module module, HardwareStep hardwareStep);

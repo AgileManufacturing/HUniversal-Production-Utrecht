@@ -18,6 +18,8 @@ import libraries.utillities.log.LogLevel;
 import libraries.utillities.log.Logger;
 import HAL.listeners.BlackboardListener;
 import HAL.listeners.HardwareAbstractionLayerListener;
+import HAL.steps.HardwareStep;
+import HAL.steps.ProductStep;
 
 public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static HALTesterClass htc = new HALTesterClass();
@@ -58,7 +60,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			+ "		\\\"minSpeedDegrees\\\" : 0.036,"
 			+ "		\\\"maxSpeedDegrees\\\" : 18000"
 			+ "	}"
-			+ "}","
+			+ "}\","
 			+ "		\"rosSoftware\":{"
 			+ "			\"buildNumber\":1,"
 			+ "			\"rosFile\": \"";
@@ -99,8 +101,8 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			+ "		]"
 			+ "	},"
 			+ "	\"properties\":\"{"
-			+ "	\"modbusIp\" : \"192.168.0.22\","
-			+ "	\"modbusPort\" : 502"
+			+ "	\\\"modbusIp\\\" : \\\"192.168.0.22\\\","
+			+ "	\\\"modbusPort\\\" : 502"
 			+ "}\","
 			+ "	\"calibrationData\":["
 			+ "		{"

@@ -2,12 +2,12 @@ package HAL.tasks;
 
 import java.util.ArrayList;
 
-import HAL.HardwareStep;
 import HAL.Module;
 import HAL.exceptions.HardwareAbstractionLayerProcessException;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ProcessListener;
+import HAL.steps.HardwareStep;
 
 public class ExecutionProcess implements Runnable, ProcessListener{
 	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
