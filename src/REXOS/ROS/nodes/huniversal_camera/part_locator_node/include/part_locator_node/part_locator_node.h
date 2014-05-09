@@ -70,7 +70,7 @@ protected:
 	std::map<std::string, boost::circular_buffer<QrCode> > smoothBuffer;
 
 public:
-	PartLocatorNode(int equipletId, std::string cameraManufacturer, std::string cameraTypeNumber, std::string cameraSerialNumber);
+	PartLocatorNode(std::string equipletName, std::string cameraManufacturer, std::string cameraTypeNumber, std::string cameraSerialNumber);
 	void run();
 private:
 	/**

@@ -162,6 +162,12 @@ void EquipletNode::handleEquipletStep(rexos_datatypes::EquipletStep * step, mong
 			if(instructionData.getLook_up().length() > 0 && instructionData.getLook_up().compare("NULL") != 0) {
 				ROS_INFO("Calling lookuphandler");
 				map<std::string, std::string> newPayload = callLookupHandler(instructionData.getLook_up(), instructionData.getLook_up_parameters(), instructionData.getPayload());
+				std::cout << "newPayload" << std::endl;
+
+				for(std::map<std::string,std::string>::iterator iter = newPayload.begin(); iter != newPayload.end(); ++iter)
+				{
+					std::cout << iter->first << " " << iter->second << std::endl;
+				}
 				instructionData.setPayload(newPayload);
 			}
 			
