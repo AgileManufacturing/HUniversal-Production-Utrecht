@@ -2,19 +2,20 @@
 	
 	<import file="../build.xml"/>
 
-	<target name="build" depends="log, aclmsgs">
+	<target name="build" depends="log, jars">
 	</target>
 
-	<target name="log">
+	<target name="jars">
+		<antcall target="add-jar-to-classpath"><param name="jar" value="commons-codec-1.3.jar"/></antcall>
+		<antcall target="add-jar-to-classpath"><param name="jar" value="commons-lang-2.3.jar"/></antcall>
+		<antcall target="add-jar-to-classpath"><param name="jar" value="jade.jar"/></antcall>
+	</target>
+
+	<target name="log" depends="jars">
 		<ant antfile="build.xml" target="build" dir="log" inheritRefs="true" useNativeBasedir="true"/>  
 	</target>
 
-	<target name="aclmsgs">
-		<ant antfile="build.xml" target="build" dir="ACLMsg" inheritRefs="true" useNativeBasedir="true"/>  
-	</target>
-
 	<target name="clean">
-		<ant antfile="build.xml" target="clean" dir="ACLMsg" inheritRefs="true" useNativeBasedir="true"/> 
 		<ant antfile="build.xml" target="clean" dir="log" inheritRefs="true" useNativeBasedir="true"/> 
 	</target>
 

@@ -36,15 +36,15 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class Configuration {
-	//private static String propertiesFilePath = System.getenv("PROPERTIESPATH");
-	private static String propertiesFilePath = "src/REXOS/MAS/configuration/";
+	private static String propertiesFilePath = System.getenv("PROPERTIESPATH");
+	//private static String propertiesFilePath = "src/REXOS/MAS/configuration/";
 	
 	public static String getProperty(ConfigurationFiles file, String key)
 	{
 		if(file != ConfigurationFiles.EQUIPLET_DB_PROPERTIES){
 			return getProperty(file, key, null);
 		} else {
-			System.out.println("Need a equiplet name to read equiplet db properties");
+			System.err.println("Need a equiplet name to read equiplet db properties");
 			return "";
 		}
 	}
@@ -69,11 +69,14 @@ public class Configuration {
 					break;
 			}
 		}catch(NullPointerException e) {
-			System.out.println("Property doesnt exist: " + key + " in file " + File.toString());
+			System.err.println("Property doesnt exist: " + key + " in file " + File.toString());
 		} catch (FileNotFoundException e) {
-			System.out.println("File doesnt exist: " + File.toString());
+			System.err.println(
+					"File doesnt exist: " + File.toString() + 
+					", using path: " + propertiesFilePath + 
+					", using working directory: " + System.getProperty("user.dir"));
 		} catch (IOException e) {
-			System.out.println(e);
+			System.err.println(e);
 		}
 		return "";
 	}
@@ -83,7 +86,7 @@ public class Configuration {
 		if(File != ConfigurationFiles.EQUIPLET_DB_PROPERTIES){
 			return getPropertyInt(File, key, null);
 		} else {
-			System.out.println("Need a equiplet name to read equiplet db properties");
+			System.err.println("Need a equiplet name to read equiplet db properties");
 			return -1;
 		}
 	}
@@ -93,7 +96,7 @@ public class Configuration {
 		try {
 			return Integer.parseInt(getProperty(File, key, EquipletName));
 		} catch(NumberFormatException e){
-			System.out.println("Cant parse integer in configurationfile: " + File.getFileName());
+			System.err.println("Cant parse integer in configurationfile: " + File.getFileName());
 			return -1;
 		}
 	}

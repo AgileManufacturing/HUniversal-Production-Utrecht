@@ -33,7 +33,9 @@
    			<loadfile property="classpath" srcFile="${buildpath}/.export-classpath"/>
    			<mkdir dir="${buildpath}/${relative.dir}"/>
   
-			<javac srcdir="@{dir}" includeantruntime="true" destdir="${buildpath}/${relative.dir}" classpath="${classpath}"  encoding="ISO-8859-1"/>
+			<javac srcdir="@{dir}" includeantruntime="true" destdir="${buildpath}/${relative.dir}" classpath="${classpath}"  encoding="ISO-8859-1">
+				<compilerarg line="-Xlint:unchecked" />
+			</javac>
    			
 			<antcall target="add-path-to-classpath">
 				<param name="path" value="${buildpath}/${relative.dir}"/>
@@ -98,10 +100,10 @@
 	</target>
 	
 	<!-- allpackages target, add the required targets to depends -->
-	<target name="allpackages" depends="agents, configuration, libraries, tools"/>
+	<target name="allpackages" depends="HAL, configuration, libraries, tools"/>
 
-	<target name="agents" depends="configuration, libraries">
-    	<ant antfile="build.xml" target="all" dir="agents" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
+	<target name="HAL" depends="configuration, libraries">
+    	<ant antfile="build.xml" target="all" dir="HAL" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
 
 	<target name="libraries" depends="configuration">
@@ -120,7 +122,7 @@
 	<target name="clean">    	
 		<delete file="${export-classpath-file}" />
     	<delete dir="${buildpath}" />
-    	<ant antfile="build.xml" target="clean" dir="agents" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
+    	<ant antfile="build.xml" target="clean" dir="HAL" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
     	<ant antfile="build.xml" target="clean" dir="configuration" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
     	<ant antfile="build.xml" target="clean" dir="libraries" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
     	<ant antfile="build.xml" target="clean" dir="tools" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
@@ -169,6 +171,17 @@
 			<env key="MSGPATH" value="${repo-root}/ACLMsgs/"/>
 			<arg line="-container -container-name 'Equiplet ${equipletnumber}' -local-host ${localip} -host ${gridip} -port ${gridport} EQ${equipletnumber}:agents.equiplet_agent.EquipletAgent"/>
 			<!-- get local public ip? Probably from a config file / run script to get it for the first time -->
+			<classpath refid="java" />
+			<classpath>
+				<pathelement path="${classpath-file-content}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="Launch-HAL">
+		<loadfile property="classpath-file-content" srcfile="${export-classpath-file}"/>
+		<java classname="HAL.HALTesterClass" failonerror="true" fork="yes">
+			<env key="PROPERTIESPATH" value="${repo-root}/src/REXOS/MAS/configuration/"/>
 			<classpath refid="java" />
 			<classpath>
 				<pathelement path="${classpath-file-content}" />
