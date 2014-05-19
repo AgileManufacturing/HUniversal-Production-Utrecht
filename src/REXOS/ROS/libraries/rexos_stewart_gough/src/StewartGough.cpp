@@ -247,14 +247,25 @@ namespace rexos_stewart_gough{
         // Get the motor angles from the kinematics model
         try{
 			
+			
+			double upperArm = stewartGoughMeasures->hip;
+			double lowerArm = stewartGoughMeasures->ankle;
+			
+			std::cout << "upperArm: " << upperArm << std::endl;
+			std::cout << "lowerArm: " << lowerArm << std::endl;
+			
 			SixAxisCalculations calc;
-			double angles[6];
-			calc.getAngles(angles, SixAxisCalculations::Point3D(point.x/10, point.y/10, point.z/10), rotationX, rotationY, rotationZ);
-			if(!calc.isValidMove(angles)){
+			SixAxisCalculations::EffectorMove effectorMove;
+			
+			
+			effectorMove = calc.getMotorAngles(SixAxisCalculations::Point3D(point.x, point.y, point.z), rotationX, rotationY, rotationZ);
+			
+			//calc.getAngles(angles, SixAxisCalculations::Point3D(point.x/10, point.y/10, point.z/10), rotationX, rotationY, rotationZ);
+			if(!effectorMove.validMove){
 				throw std::out_of_range("invalid angles"); 
 			}
 			for(int i = 0; i < 6;i++){
-				rotations[i]->angle = angles[i];
+				rotations[i]->angle = effectorMove.angles[i];
 			}
 			
             //kinematics->destinationPointToMotorRotations(point, rotations);
@@ -598,7 +609,7 @@ namespace rexos_stewart_gough{
 		
 		for(int i = 0; i < 2000; i++){
 		
-			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 30, 0, 0, 30);
+			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 30, 0, 0, 0);
 			
 			//sleep(1);
 			
@@ -606,7 +617,7 @@ namespace rexos_stewart_gough{
 			
 			//sleep(1);
 			
-			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 30, 0, 0, -30);
+			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 30, 0, 0, 0);
 			
 			
 			
