@@ -58,28 +58,28 @@ public class CapabilityFactory extends Factory{
 			"FROM CapabilityType \n" + 
 			"WHERE \n" +
 			"	name IN(\n" +
-			"		SELECT * CapabilityType\n" +
-			"		FROM ServiceType_CapabilityType\n" +
-			"		WHERE ServiceType = ?\n" +
+			"		SELECT CapabilityType \n" +
+			"		FROM ServiceType_CapabilityType \n" +
+			"		WHERE ServiceType = ? \n" +
 			"	) AND NOT EXISTS( \n" +
 			"		SELECT * \n" +
-			"		FROM CapabilityTypeDependencySet \n" +
-			"		WHERE CapabilityType.name =CapabilityTypeDependencySet.capabilityType AND \n" +
+			"		FROM CapabilityTypeRequiredMutation \n" +
+			"		WHERE CapabilityType.name = CapabilityTypeRequiredMutation.capabilityType AND \n" +
 			"		treeNumber NOT IN( \n" +
 			"			SELECT treeNumber \n" +
-			"			FROM CapabilityTypeDependencySet AS currentDependencySet \n" +
+			"			FROM CapabilityTypeRequiredMutation AS currentRequiredMutation \n" +
 			"			JOIN Module AS currentModule \n" +
-			"			WHERE CapabilityType.name = currentDependencySet.capabilityType AND \n" +
+			"			WHERE CapabilityType.name = currentRequiredMutation.capabilityType AND \n" +
 			"			NOT EXISTS( \n" +
 			"				SELECT * \n" +
-			"				FROM CapabilityTypeDependencySet \n" +
-			"				WHERE currentDependencySet.capabilityType = capabilityType AND \n" +
-			"				currentDependencySet.treeNumber = treeNumber AND \n" +
+			"				FROM CapabilityTypeRequiredMutation \n" +
+			"				WHERE currentRequiredMutation.capabilityType = capabilityType AND \n" +
+			"				currentRequiredMutation.treeNumber = treeNumber AND \n" +
 			"				mutation NOT IN( \n" +
 			"					SELECT mutation \n" +
-			"					FROM ModuleCommandType \n" +
-			"					JOIN Module ON ModuleCommandType.manufacturer = Module.manufacturer AND \n" +
-			"						ModuleCommandType.typeNumber = Module.typeNumber \n" +
+			"					FROM SupportedMutation \n" +
+			"					JOIN Module ON SupportedMutation.manufacturer = Module.manufacturer AND \n" +
+			"						SupportedMutation.typeNumber = Module.typeNumber \n" +
 			"					WHERE currentModule.attachedToLeft >= attachedToLeft AND \n" +
 			"						currentModule.attachedToRight <= attachedToRight AND \n" +
 			"						currentModule.equiplet = ? \n" +
@@ -90,7 +90,7 @@ public class CapabilityFactory extends Factory{
 			"	);";
 	
 	private static final String addCapabilityType =
-			"INSERT INTO CapabilityType \n" + 
+			"INSERT IGNORE INTO CapabilityType \n" + 
 			"(name, halSoftware) \n" + 
 			"VALUES(?, ?);";
 	
@@ -104,7 +104,7 @@ public class CapabilityFactory extends Factory{
 			"WHERE capabilityType = ?;";
 	
 	private static final String addRequiredMutationForCapabilityType =
-			"INSERT INTO CapabilityTypeRequiredMutation \n" + 
+			"INSERT IGNORE INTO CapabilityTypeRequiredMutation \n" + 
 			"(treeNumber, capabilityType, mutation) \n" + 
 			"VALUES(?, ?, ?);";
 	private static final String getRequiredMutationsForCapabilityType =

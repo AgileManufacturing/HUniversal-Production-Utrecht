@@ -3,21 +3,20 @@ package HAL.modules;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
 import HAL.exceptions.FactoryException;
-import HAL.exceptions.ModuleExecutingException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.ModuleListener;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class DeltaRobot extends ModuleActor {
 	public final static int MAX_ACCELERATION = 50;
@@ -119,7 +118,7 @@ public class DeltaRobot extends ModuleActor {
 				//hardwareSteps.addAll(hStep);
 		}
 		else {
-			throw new ModuleTranslatingException ("DeltaRobot module didn't receive any \"command\" key in CompositeStep command: "+command.toString());
+			throw new ModuleTranslatingException ("DeltaRobot module didn't receive any \"command\" key in CompositeStep command");
 		}
 		
 		return hardwareSteps;

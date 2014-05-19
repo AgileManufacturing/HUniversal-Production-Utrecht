@@ -60,7 +60,6 @@ public class RosSoftware {
 	}
 	public static RosSoftware insertRosSoftware(JsonObject rosSoftware, KnowledgeDBClient knowledgeDBClient) {
 		try {
-			System.out.println(rosSoftware.toString());
 			byte[] zipFile = Base64.decodeBase64(rosSoftware.get("rosFile").getAsString().getBytes());
 			int buildNumber = getBuildNumber(rosSoftware);
 			String command = getCommand(rosSoftware);

@@ -2,6 +2,8 @@ package HAL;
 
 import java.util.ArrayList;
 
+import org.junit.Ignore;
+
 import HAL.exceptions.FactoryException;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.BlackboardListener;
@@ -26,6 +28,8 @@ public abstract class Module implements BlackboardListener{
 		this.knowledgeDBClient = new KnowledgeDBClient();
 		this.moduleFactory = moduleFactory;
 		this.moduleListener = moduleListener;
+		
+		moduleFactory.getHAL().getBlackBoardHandler().addBlackboardListener(this);
 	}	
 	
 	public ModuleIdentifier getModuleIdentifier(){
@@ -72,11 +76,10 @@ public abstract class Module implements BlackboardListener{
 			Row[] resultSet = knowledgeDBClient.executeSelectQuery(sql);
 			
 			if (resultSet.length >= 1){
-				ModuleIdentifier moduleIdentifier = new ModuleIdentifier(resultSet[0].get("manufacturer").toString(),
-																		 resultSet[0].get("typeNumber").toString(),
-																		 resultSet[0].get("serialNumber").toString()
-																		);
-				System.out.println(resultSet[0].get("manufacturer").toString()+resultSet[0].get("typeNumber").toString()+resultSet[0].get("serialNumber").toString());
+				ModuleIdentifier moduleIdentifier = new ModuleIdentifier(
+						resultSet[0].get("manufacturer").toString(),
+						resultSet[0].get("typeNumber").toString(),
+						resultSet[0].get("serialNumber").toString());
 				return this.moduleFactory.getModuleByIdentifier(moduleIdentifier);
 			}
 			else return null;
@@ -95,21 +98,18 @@ public abstract class Module implements BlackboardListener{
 	}
 	
 	
-	@Override
+	@Override @Ignore
 	public void OnEquipletStateChanged(String equipletName, String state) {
-		// TODO Auto-generated method stub
-		
+		// ignore
 	}
 
-	@Override
+	@Override @Ignore
 	public void OnEquipletModeChanged(String equipletName, String mode) {
-		// TODO Auto-generated method stub
-		
+		// ignore
 	}
 
-	@Override
+	@Override @Ignore
 	public void OnEquipletIpChanged(String ip) {
-		// TODO Auto-generated method stub
-		
+		// ignore
 	}
 }

@@ -7,8 +7,10 @@ import com.google.gson.JsonObject;
 
 import libraries.knowledgedb_client.KnowledgeException;
 import HAL.capabilities.Capability;
+import HAL.exceptions.BlackboardUpdateException;
 import HAL.factories.CapabilityFactory;
 import HAL.factories.ModuleFactory;
+import HAL.listeners.BlackboardListener;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ModuleListener;
 import HAL.steps.HardwareStep;
@@ -20,6 +22,7 @@ public class HardwareAbstractionLayer implements ModuleListener{
 	private CapabilityFactory capabilityFactory;
 	private ModuleFactory moduleFactory;
 	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
+	private BlackboardHandler blackboardHandler;
 	
 	// TODO move somewhere else?? 
 	private String equipletName;
@@ -27,12 +30,14 @@ public class HardwareAbstractionLayer implements ModuleListener{
 		return equipletName;
 	}
 
-	public HardwareAbstractionLayer(HardwareAbstractionLayerListener hardwareAbstractionLayerListener) throws KnowledgeException{
+	public HardwareAbstractionLayer(HardwareAbstractionLayerListener hardwareAbstractionLayerListener) throws KnowledgeException, BlackboardUpdateException{
 		this.hardwareAbstractionLayerListener = hardwareAbstractionLayerListener;
 		capabilityFactory = new CapabilityFactory(this);
 		moduleFactory = new ModuleFactory(this, this);
+		blackboardHandler = new BlackboardHandler();
+		
 		// TODO hardcoded
-		equipletName = "EQ1";
+		equipletName = hardwareAbstractionLayerListener.getEquipletName();
 	}
 	
 	public void executeHardwareSteps(ArrayList<HardwareStep> hardwareSteps){
@@ -86,5 +91,8 @@ public class HardwareAbstractionLayer implements ModuleListener{
 
 	public ModuleFactory getModuleFactory() {
 		return moduleFactory;
+	}
+	public BlackboardHandler getBlackBoardHandler() {
+		return blackboardHandler;
 	}
 }

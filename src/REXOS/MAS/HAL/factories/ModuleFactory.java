@@ -34,28 +34,6 @@ import HAL.steps.HardwareStep;
 
 public class ModuleFactory extends Factory {
 	// SQL queries
-	private static final String getModuleIdentifiersForCapability = 
-			"SELECT * \n" + 
-			"FROM CapabilityTypeDependencySet AS currentDependencySet \n" + 
-			"JOIN Module AS currentModule \n" + 
-			"WHERE currentDependencySet.capabilityType = ? AND \n" + 
-			"  currentDependencySet.Equiplet = ? \n" + 
-			"  NOT EXISTS( \n" + 
-			"	SELECT * \n" + 
-			"	FROM CapabilityTypeDependencySet \n" + 
-			"	WHERE currentDependencySet.capabilityType = capabilityType AND \n" + 
-			"	  currentDependencySet.treeNumber = treeNumber AND \n" + 
-			"	  commandType NOT IN( \n" + 
-			"		SELECT commandType \n" + 
-			"		FROM ModuleCommandType \n" + 
-			"		JOIN Module ON ModuleCommandType.manufacturer = Module.manufacturer AND \n" +  
-			"		  ModuleCommandType.typeNumber = Module.typeNumber \n" + 
-			"		WHERE currentModule.attachedToLeft >= attachedToLeft AND \n" + 
-			"		  currentModule.attachedToRight <= attachedToRight \n" + 
-			"	  ) \n" + 
-			"  ) AND \n" + 
-			"  currentModule.attachedToRight = currentModule.attachedToLeft + 1; \n";
-
 	private static final String getModuleIdentifiersForBotomModules = 
 			"SELECT manufacturer, typeNumber, serialNumber \n" + 
 			"FROM Module \n" + 
@@ -120,7 +98,7 @@ public class ModuleFactory extends Factory {
 	
 	
 	private static final String addModuleType =
-			"INSERT INTO ModuleType \n" + 
+			"INSERT IGNORE INTO ModuleType \n" + 
 			"(manufacturer, typeNumber, moduleTypeProperties, halSoftware, rosSoftware) \n" +  
 			"VALUES (?, ?, ?, ?, ?);"; 
 	private static final String getModuleType =
@@ -202,6 +180,26 @@ public class ModuleFactory extends Factory {
 			"WHERE manufacturer = ? AND \n" +  
 			"	typeNumber = ? AND \n" + 
 			"	serialNumber = ?;"; 
+	private static final String removeSpaceInNestedTreeForModuleLeft =
+			"UPDATE Module \n" + 
+			"SET attachedToLeft = attachedToLeft - 2 \n" +  
+			"WHERE attachedToLeft >= ( \n" + 
+			"	SELECT attachedToRight \n" + 
+			"	FROM (SELECT * FROM Module) AS tbl1 \n" + 
+			"	WHERE manufacturer = ? AND \n" + 
+			"		typeNumber = ? AND \n" + 
+			"		serialNumber = ? \n" + 
+			");"; 
+	private static final String removeSpaceInNestedTreeForModuleRight =
+			"UPDATE Module \n" + 
+			"SET attachedToRight = attachedToRight - 2 \n" +  
+			"WHERE attachedToRight >= ( \n" + 
+			"	SELECT attachedToRight \n" + 
+			"	FROM (SELECT * FROM Module) AS tbl1 \n" + 
+			"	WHERE manufacturer = ? AND \n" + 
+			"		typeNumber = ? AND \n" + 
+			"		serialNumber = ? \n" + 
+			");"; 
 	
 	private ModuleListener moduleListener;
 	private DynamicClassFactory<Module> dynamicClassFactory;
@@ -264,8 +262,6 @@ public class ModuleFactory extends Factory {
 	}
 	
 	public Module getModuleByIdentifier(ModuleIdentifier moduleIdentifier) throws FactoryException, JarFileLoaderException{
-		System.out.println(loadedModules);
-		
 		for (ModuleIdentifier loadedModuleIdentifier : loadedModules.keySet()) {
 			if(moduleIdentifier.equals(loadedModuleIdentifier) == true) {
 				return loadedModules.get(loadedModuleIdentifier);
@@ -378,7 +374,6 @@ public class ModuleFactory extends Factory {
 			type.add("halSoftware", halSoftware.serialize());
 			// fetch rosSoftware
 			RosSoftware rosSoftware = RosSoftware.getRosSoftwareForModuleIdentifier(moduleIdentifier);
-			System.out.println("RosSoftware ="+rosSoftware.serialize());
 			type.add("rosSoftware", rosSoftware.serialize());
 			
 			type.add("supportedMutations", Mutation.serializeAllSupportedMutations(moduleIdentifier, knowledgeDBClient));
@@ -396,6 +391,7 @@ public class ModuleFactory extends Factory {
 					moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
 			output.addProperty("properties", (String) moduleRows[0].get("moduleProperties"));
 			
+			removeSpace(moduleIdentifier);
 			knowledgeDBClient.executeUpdateQuery(removeModule, 
 					moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
 			knowledgeDBClient.executeUpdateQuery(removeModuleTypesWithNoModules);
@@ -412,7 +408,12 @@ public class ModuleFactory extends Factory {
 				parentModuleIdentifier.getTypeNumber(), parentModuleIdentifier.getSerialNumber());
 		knowledgeDBClient.executeUpdateQuery(insertSpaceInNestedTreeForModuleRight, parentModuleIdentifier.getManufacturer(), 
 				parentModuleIdentifier.getTypeNumber(), parentModuleIdentifier.getSerialNumber());
-		
+	}
+	private void removeSpace(ModuleIdentifier moduleIdentifier) throws KnowledgeException {
+		knowledgeDBClient.executeUpdateQuery(removeSpaceInNestedTreeForModuleLeft, moduleIdentifier.getManufacturer(), 
+				moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
+		knowledgeDBClient.executeUpdateQuery(removeSpaceInNestedTreeForModuleRight, moduleIdentifier.getManufacturer(), 
+				moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
 	}
 	private boolean insertModuleType(ModuleIdentifier moduleIdentifier, JsonObject type) throws KnowledgeException {
 		JsonObject halSoftwareObject = type.get("halSoftware").getAsJsonObject();
@@ -520,5 +521,9 @@ public class ModuleFactory extends Factory {
 			System.err.println("HAL::ModuleFactory::serializeCalibrationData(): Error occured which is considered to be impossible " + ex);
 			ex.printStackTrace();
 		}
+	}
+	
+	public HardwareAbstractionLayer getHAL() {
+		return hal;
 	}
 }

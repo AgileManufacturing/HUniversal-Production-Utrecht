@@ -2,30 +2,24 @@ package HAL;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 import org.apache.commons.codec.binary.Base64;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import libraries.knowledgedb_client.KnowledgeException;
-import libraries.utillities.log.LogLevel;
-import libraries.utillities.log.Logger;
 import HAL.listeners.BlackboardListener;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
 import HAL.steps.ProductStep;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static HALTesterClass htc = new HALTesterClass();
 	static ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 	static HardwareAbstractionLayer hal;
-	static BlackboardUpdated blackboardUpdated;
+	static BlackboardHandler blackboardUpdated;
 	
 	static String moduleA_01 = "{"
 			+ "	\"manufacturer\":\"HU\","
@@ -165,50 +159,6 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		
 		// TODO Auto-generated method stub
 		hal = new HardwareAbstractionLayer(htc);
-		BlackboardListener blackboardListener = new BlackboardListener() {
-			
-			@Override
-			public void onProcessStateChanged(String status) {
-				// TODO Auto-generated method stub
-				System.out.println("New Process Status = "+ status);
-				
-			}
-			
-			@Override
-			public void onModuleStateChanged(String state) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onModuleModeChanged(String mode) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void OnEquipletStateChanged(String id, String state) {
-				// TODO Auto-generated method stub
-				System.out.println("New State of EQ "+id + " = "+ state);
-				
-			}
-			
-			@Override
-			public void OnEquipletModeChanged(String id, String mode) {
-				// TODO Auto-generated method stub
-				System.out.println("New mode of EQ "+id + " = "+ mode);
-				
-			}
-
-			@Override
-			public void OnEquipletIpChanged(String ip) {
-				// TODO Auto-generated method stub
-				
-			}
-		};
-		
-		/*blackboardUpdated = new BlackboardUpdated();
-		blackboardUpdated.setOnBlackBoardUpdatedListener(blackboardListener);*/
 
 		
 		FileInputStream fis;
@@ -252,15 +202,100 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		
 		String moduleB = moduleB_01 + base64Gripper + moduleB_02; 
 		JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
-		//hal.insertModule(b, b);
+		hal.insertModule(b, b);
 		
 		hal.getBottomModules();
 		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		/*JsonObject tommasgtaylordfuckzooi;
 		ModuleIdentifier moduleIdentifier = new ModuleIdentifier("HU", "delta_robot_type_A", "1");
-		/*JsonObject tommasgtaylordfuckzooi =hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);*/
+		
+		
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
+		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
+		hal.insertModule(tommasgtaylordfuckzooi, a);
+		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);*/
 
-		/*
+		
 		JsonObject criteria = new JsonObject();
 		JsonObject target = new JsonObject();
 		JsonObject targetMove = new JsonObject();
@@ -293,9 +328,23 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		
 
 	}
+	
+	@Override
+	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareStep) {
+		// TODO Auto-generated method stub
+		System.out.println("Translation finished");
+		hardwareSteps.addAll(hardwareStep);// = hardwareStep;
+		hal.executeHardwareSteps(hardwareSteps);
+	}
 
 	@Override
-	public void onProcessStateChanged(String state, long hardwareStepSerialId, Module module, HardwareStep hardwareStep) {
+	public void onIncapableCapabilities(ProductStep productStep) {
+		System.out.println("Translation failed because productStep with service " + productStep.getService().getName() + " has no supported capabilities");
+	}
+
+	@Override
+	public void onProcessStateChanged(String state, long hardwareStepSerialId,
+			Module module, HardwareStep hardwareStep) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -313,17 +362,9 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	}
 
 	@Override
-	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareStep) {
-		// TODO Auto-generated method stub
-		System.out.println("Translation finished");
-		hardwareSteps.addAll(hardwareStep);// = hardwareStep;
-		hal.executeHardwareSteps(hardwareSteps);
-	}
-
-	@Override
-	public void onIncapableCapabilities(ProductStep productStep) {
-		// TODO Auto-generated method stub
-		
+	public String getEquipletName() {
+		// TODO hardcoded!!!!!!
+		return "EQ1";
 	}
 
 }

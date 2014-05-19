@@ -3,13 +3,6 @@ package HAL.capabilities;
 import java.util.ArrayList;
 
 import libraries.dynamicloader.JarFileLoaderException;
-import libraries.knowledgedb_client.KeyNotFoundException;
-import libraries.knowledgedb_client.KnowledgeException;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import HAL.ModuleActor;
 import HAL.exceptions.CapabilityException;
 import HAL.exceptions.FactoryException;
@@ -18,6 +11,9 @@ import HAL.factories.ModuleFactory;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 import HAL.steps.ProductStep;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * 
@@ -44,7 +40,6 @@ public class Draw extends Capability {
 		String serviceName = productStep.getService().getName();
 		JsonObject productStepCriteria = productStep.getCriteria();
 		JsonObject target = productStepCriteria.get("target").getAsJsonObject();
-		JsonElement subjects = productStepCriteria.get("subjects");
 		
 		if(serviceName.equals("draw") && target != null){
 			JsonObject moveCommand = target.get("move").getAsJsonObject();

@@ -3,9 +3,6 @@ package HAL.modules;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
@@ -15,9 +12,11 @@ import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.ModuleListener;
-import HAL.listeners.ProcessListener;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class Gripper extends ModuleActor {
 	//Gonna be loaded from KDB:

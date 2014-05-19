@@ -27,7 +27,7 @@ public class TranslationProcess implements Runnable{
 		System.out.println("Starting translation process");
 		ArrayList<Capability> capabilities = null;
 		try {
-			capabilities = capabilityFactory.getAllSupportedCapabilities();
+			capabilities = capabilityFactory.getCapabilitiesForService(productStep.getService());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

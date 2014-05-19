@@ -220,7 +220,6 @@ class DynamicClassData {
 			//String jarFileName = jarLocationURL.getPath().substring(lastSlashPos > -1 ? lastSlashPos + 1 : 0);
 			String jarFileName = description.getId() + ".jar";
 			File file = new File(jarFileName);
-			System.out.println(jarFileName);
 			//file.deleteOnExit();
 			FileOutputStream fos = new FileOutputStream(file);
 			try {

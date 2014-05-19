@@ -92,9 +92,6 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 	}
 	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException;
 	
-	public void onHardwareStepChanged(String state, long hardwareStepSerialId) throws HardwareAbstractionLayerProcessException{
-		processListener.onProcessStateChanged(state, hardwareStepSerialId, this);
-	}
 	public void onModuleStateChanged(String state){
 		moduleListener.onModuleStateChanged(state, this);
 	}
@@ -119,7 +116,7 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 
 
 	@Override
-	public void onProcessStateChanged(String state) {
+	public void onProcessStatusChanged(String state) {
 		// TODO Auto-generated method stub
 		try {
 			processListener.onProcessStateChanged(state, 0, this);
