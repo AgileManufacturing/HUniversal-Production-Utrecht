@@ -106,13 +106,11 @@ namespace rexos_stewart_gough{
 		sixAxisCalculations = new SixAxisCalculations(
 			stewartGoughMeasures->hip,
 			//stewartGoughMesuares->ankle,
-			300.00, //ankle currently returns wrong value: 250.0 19-05-2014
+			300.00, //ankle currently returns wrong value: 250.0, 19-05-2014
 			stewartGoughMeasures->base,
-			stewartGoughMeasures->effector,
+			//stewartGoughMeasures->effector,
+			55.0, //effector retuns wrong value: 44.x, 19-05-2014
 			stewartGoughMeasures->maxAngleHipAnkle);
-
-
-		std::cout << "Base: " << stewartGoughMeasures->base << std::endl;
 
 	
 
@@ -132,6 +130,7 @@ namespace rexos_stewart_gough{
         if(motorManager->isPoweredOn()){
             motorManager->powerOff();
         }
+		delete sixAxisCalculations;
         //delete kinematics;
     }
     
@@ -270,17 +269,9 @@ namespace rexos_stewart_gough{
         try{
 			
 			
-			double upperArm = stewartGoughMeasures->hip;
-			double lowerArm = stewartGoughMeasures->ankle;
-			
-			std::cout << "upperArm: " << upperArm << std::endl;
-			std::cout << "lowerArm: " << lowerArm << std::endl;
-			
-			SixAxisCalculations calc;
+	
 			SixAxisCalculations::EffectorMove effectorMove;
-			
-			
-			effectorMove = calc.getMotorAngles(SixAxisCalculations::Point3D(point.x, point.y, point.z), rotationX, rotationY, rotationZ);
+			effectorMove = sixAxisCalculations->getMotorAngles(SixAxisCalculations::Point3D(point.x, point.y, point.z), rotationX, rotationY, rotationZ);
 			
 			//calc.getAngles(angles, SixAxisCalculations::Point3D(point.x/10, point.y/10, point.z/10), rotationX, rotationY, rotationZ);
 			if(!effectorMove.validMove){

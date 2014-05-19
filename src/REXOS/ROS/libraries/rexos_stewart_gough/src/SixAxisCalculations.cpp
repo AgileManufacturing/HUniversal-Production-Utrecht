@@ -800,7 +800,7 @@ bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double 
 			double y = (from.y + stepLengthY * step);
 			double z = (from.z + stepLengthZ * step);
 			
-			std::cout << "checking coordinate: " << x << ", " << y << ", " << z << std::endl;
+			//std::cout << "checking coordinate: " << x << ", " << y << ", " << z << std::endl;
 			
 			////BitmapCoordinate temp = fromRealCoordinate(rexos_datatypes::Point3D<double>(x, y, z));
 			//int index = temp.x + temp.y * width + temp.z * width * depth;
@@ -825,6 +825,7 @@ bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double 
 			
 			EffectorMove move = getMotorAngles(Point3D(x, y, z), 0, 0, 0);
 			if(!move.validMove){
+				std::cout << "invalid position in path: " << move.moveTo << std::endl;
 				return false;
 			}
 			
