@@ -102,6 +102,20 @@ namespace rexos_stewart_gough{
 		
 		motorManager = new rexos_motor::MotorManager(modbus, motors);
 
+
+		sixAxisCalculations = new SixAxisCalculations(
+			stewartGoughMeasures->hip,
+			//stewartGoughMesuares->ankle,
+			300.00, //ankle currently returns wrong value: 250.0 19-05-2014
+			stewartGoughMeasures->base,
+			stewartGoughMeasures->effector,
+			stewartGoughMeasures->maxAngleHipAnkle);
+
+
+		std::cout << "Base: " << stewartGoughMeasures->base << std::endl;
+
+	
+
        // kinematics = new InverseKinematics;
 		
 		ROS_INFO("end of constructor reached");
@@ -179,9 +193,17 @@ namespace rexos_stewart_gough{
      * 
      * @return if the path between two points is valid.
      **/
-    //bool StewartGough::checkPath(const rexos_datatypes::Point3D<double>& begin, const rexos_datatypes::Point3D<double>& end){
+    bool StewartGough::checkPath(const rexos_datatypes::Point3D<double>& begin, const rexos_datatypes::Point3D<double>& end){
+		return sixAxisCalculations->checkPath(
+			SixAxisCalculations::Point3D(begin.x, begin.y, begin.z), 
+			0, 0, 0, //Rotations start
+			SixAxisCalculations::Point3D(end.x, end.y, end.z),
+			0, 0, 0 //Rotations end
+			);
+			
+		//return true;
         //return boundaries->checkPath(begin, end);
-   // }
+    }
 
     /**
      * Gets the acceleration in radians/s² for a motor rotation with a certain relative angle and time, which is half acceleration and half deceleration (there is no period of constant speed).
@@ -284,19 +306,18 @@ namespace rexos_stewart_gough{
 			}
 		}
 
-		/*
-		//TODO
+		
+
         // Check if the path fits within the boundaries
-        if(!boundaries->checkPath(effectorLocation, point)){
+        if(!checkPath(effectorLocation, point)){
             delete rotations[0];
             delete rotations[1];
             delete rotations[2];
 			delete rotations[3];
             delete rotations[4];
             delete rotations[5];
-            throw std::out_of_range("invalid path", point);
+            throw std::out_of_range("invalid path");
         }
-	*/
 
         try{
             // An array to hold the relative angles for the motors

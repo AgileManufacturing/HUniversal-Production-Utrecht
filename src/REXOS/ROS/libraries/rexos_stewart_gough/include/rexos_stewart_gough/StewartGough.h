@@ -36,6 +36,7 @@
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/MotorManager.h>
 #include <rexos_motor/StepperMotorProperties.h>
+#include <rexos_stewart_gough/SixAxisCalculations.h>
 //#include <rexos_stewart_gough/EffectorBoundaries.h>
 //#include <rexos_stewart_gough/InverseKinematics.h>
 
@@ -109,7 +110,13 @@ namespace rexos_stewart_gough{
 		// the inital motors and sensors are positioned on the wrong locations
 		// this is used to map them on the right locations
 		MotorMap motorMap[6];
-private:
+	private:
+
+		
+		SixAxisCalculations * sixAxisCalculations;
+
+
+		
 		/**
 		 * @var InverseKinematicsModel* kinematics
 		 * A pointer to the kinematics model used by the DeltaRobot.

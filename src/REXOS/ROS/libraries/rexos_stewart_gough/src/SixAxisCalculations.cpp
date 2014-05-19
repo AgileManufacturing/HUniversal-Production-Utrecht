@@ -488,7 +488,7 @@ double SixAxisCalculations::getEffectorJointAngle(Point3D effectorJointPosition,
 	/* The motors are positioned on the circle in a different angle than the effector joints.
 	 * Get the right motor angles for the given effector joint angle.
 	 */
-	double rad = degreesToRadians(motorPositionOnCircle);
+	double rad = DEGREES_TO_RADIANS(motorPositionOnCircle);
 
 	double motorX = sin(rad) * motorAxisToCenterDistance;
 	double motorY = cos(rad) * motorAxisToCenterDistance;
@@ -534,8 +534,8 @@ double SixAxisCalculations::getAngleForMotor(Point3D moveTo, double groupPositio
 	double xJoint, yJoint;
 
 	//Get the effector joint position based on the effector center and effector joint position on the circle
-	xJoint = sin(degreesToRadians(effectorJointPositionOnCircle)) * effectorJointtoCenterDistance;
-	yJoint = cos(degreesToRadians(effectorJointPositionOnCircle)) * effectorJointtoCenterDistance;
+	xJoint = sin(DEGREES_TO_RADIANS(effectorJointPositionOnCircle)) * effectorJointtoCenterDistance;
+	yJoint = cos(DEGREES_TO_RADIANS(effectorJointPositionOnCircle)) * effectorJointtoCenterDistance;
 
 
 
@@ -608,11 +608,11 @@ double SixAxisCalculations::getAngleForMotor(Point3D moveTo, double groupPositio
 	double matrixIdentity[] = MATRIX_IDENTITY_3X3;
 	double matrixRotation[3*3];
 
-	get3x3RotationMatrix(matrixRotation, degreesToRadians(groupPositionOnCircle));
+	get3x3RotationMatrix(matrixRotation, DEGREES_TO_RADIANS(groupPositionOnCircle));
 
 
 	//Calculate the needed translation on the x axis
-	double xTrans = tan(degreesToRadians((effectorJointPositionOnCircle -groupPositionOnCircle))) * motorAxisToCenterDistance;
+	double xTrans = tan(DEGREES_TO_RADIANS((effectorJointPositionOnCircle -groupPositionOnCircle))) * motorAxisToCenterDistance;
 	//double xTrans = tan(motorPositionOnCircle -motorGroupPositionOnCircle) * motorAxisToCenterDistance;
 
 	/*
@@ -768,3 +768,78 @@ bool SixAxisCalculations::isValidMove(double angles[6]){
 	}
 	return true;
 }
+
+
+
+bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double startRotationY, double startRotationZ, Point3D to, double endRotationX, double endRotationY, double endRotationZ){
+	
+		std::cout << "path check start" << std::endl;
+    	std::cout << "fromx: " << from.x << " fromy: " << from.y << " fromz: " << from.z << std::endl;
+		std::cout << "tox: " << to.x << " toy: " << to.y << " toz: " << to.z << std::endl;
+
+		//Calculate lengths to travel
+    	double x_length = to.x - from.x;
+    	double y_length = to.y - from.y;
+    	double z_length = to.z - from.z;
+		
+		
+		
+    	double largest_length = (double)	(fabs(x_length) > fabs(y_length) ?
+												(fabs(x_length) > fabs(z_length) ? fabs(x_length) : fabs(z_length)) :
+												(fabs(y_length) > fabs(z_length) ? fabs(y_length) : fabs(z_length))	);
+
+    	double stepLengthX = x_length / largest_length;
+    	double stepLengthY = y_length / largest_length;
+    	double stepLengthZ = z_length / largest_length;
+ 
+		std::cout << "path length: " << largest_length << std::endl;
+		
+		for(double step = 1; step <= largest_length; step++){
+			
+			double x = (from.x + stepLengthX * step);
+			double y = (from.y + stepLengthY * step);
+			double z = (from.z + stepLengthZ * step);
+			
+			std::cout << "checking coordinate: " << x << ", " << y << ", " << z << std::endl;
+			
+			////BitmapCoordinate temp = fromRealCoordinate(rexos_datatypes::Point3D<double>(x, y, z));
+			//int index = temp.x + temp.y * width + temp.z * width * depth;
+
+			//if(temp.x < 0 || temp.y < 0 || temp.z < 0) {
+				//std::cout << "temp.x: " << temp.x << " or temp.y: " << temp.y << std::endl;
+				//return false;
+			//}
+
+			//if(temp.x > width){
+				//std::cout << "temp.x: " << temp.x << " > width: " << width << std::endl;
+			//	return false;
+			//}
+			//if(temp.y > depth){
+				//std::cout << "temp.y: " << temp.y << " > depth: " << depth << std::endl;
+				//return false;
+			//}
+			//if(temp.z > height){
+				//std::cout << "temp.z: " << temp.z << " > height: " << height << std::endl;
+				//return false;
+			//}
+			
+			EffectorMove move = getMotorAngles(Point3D(x, y, z), 0, 0, 0);
+			if(!move.validMove){
+				return false;
+			}
+			
+			
+			//if(boundariesBitmap[index] != VALID){
+				//std::cout << "boundariesBitmap[index]: " << boundariesBitmap[index] << "!= VALID: " << VALID << std::endl;
+				//return false;
+			//}
+		}
+        return true;
+	
+}
+
+
+
+
+
+

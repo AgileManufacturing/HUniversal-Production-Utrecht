@@ -15,10 +15,10 @@
 
 
 // Converts degrees to radians.
-#define degreesToRadians(angleDegrees) (angleDegrees * M_PI / 180.0)
+#define DEGREES_TO_RADIANS(angleDegrees) (angleDegrees * M_PI / 180.0)
 
 // Converts radians to degrees.
-#define radiansToDegrees(angleRadians) (angleRadians * 180.0 / M_PI)
+#define RADIANS_TO_DEGREES(angleRadians) (angleRadians * 180.0 / M_PI)
 
 #define HALF_PI (M_PI/2)
 #define GET_INDEX(row, col, maxCols) (row * maxCols + col)
@@ -68,6 +68,9 @@ class SixAxisCalculations {
 
 		EffectorMove getMotorAngles(Point3D moveTo, double xRotation, double yRotation, double zRotation);
 		double * getAngles(double angles[6], Point3D moveTo, double xRotation, double yRotation, double zRotation);
+
+		bool checkPath(Point3D from, double startRotationX, double startRotationY, double startRotationZ, Point3D to, double endRotationX, double endRotationY, double endRotationZ);
+
 
 		//
 		bool isValidMove(double angles[6]);
