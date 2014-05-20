@@ -619,51 +619,53 @@ namespace rexos_stewart_gough{
 		currentEffectorRotationZ = 0;
 		
 		
+		double ac = 600;
+		
 		for(int i = 0; i < 2000; i++){
 		
-			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 30, 0, 0, 0);
+			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), ac, 0, 0, 0);
 			
 			//sleep(1);
 			
-			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 30, 0, 0, 0);
+			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), ac, 0, 0, 0);
 			
 			//sleep(1);
 			
-			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 30, 0, 0, 0);
-			
-			
-			
-			
-			//sleep(1);
-			
-			moveTo(rexos_datatypes::Point3D<double>(0, 50, -280), 30, 0, 0, 0);
-			
-			//sleep(1);
-			
-			moveTo(rexos_datatypes::Point3D<double>(0, -50, -280), 30, 0, 0, 0);
-			
-			//sleep(1);
-			
-			moveTo(rexos_datatypes::Point3D<double>(50, 0, -280), 30, 0, 0, 0);
-			
-			//sleep(1);
-			
-			moveTo(rexos_datatypes::Point3D<double>(-50, 0, -280), 30, 0, 0, 0);
+			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), ac, 0, 0, 0);
 			
 			
 			
 			
 			//sleep(1);
 			
-			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 30, 0, 0, 0);
+			moveTo(rexos_datatypes::Point3D<double>(0, 50, -280), ac, 0, 0, 0);
 			
 			//sleep(1);
 			
-			moveTo(rexos_datatypes::Point3D<double>(0, 0, -300), 30, 0, 0, 0);
+			moveTo(rexos_datatypes::Point3D<double>(0, -50, -280), ac, 0, 0, 0);
 			
 			//sleep(1);
 			
-			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 30, 0, 0, 0);
+			moveTo(rexos_datatypes::Point3D<double>(50, 0, -280), ac, 0, 0, 0);
+			
+			//sleep(1);
+			
+			moveTo(rexos_datatypes::Point3D<double>(-50, 0, -280), ac, 0, 0, 0);
+			
+			
+			
+			
+			//sleep(1);
+			
+			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), ac, 0, 0, 0);
+			
+			//sleep(1);
+			
+			moveTo(rexos_datatypes::Point3D<double>(0, 0, -300), ac, 0, 0, 0);
+			
+			//sleep(1);
+			
+			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), ac, 0, 0, 0);
 			
 		
 		}

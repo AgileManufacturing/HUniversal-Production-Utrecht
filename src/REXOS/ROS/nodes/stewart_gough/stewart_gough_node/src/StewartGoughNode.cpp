@@ -183,14 +183,12 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(double x, double y
 	rexos_datatypes::Point3D<double> oldLocation(stewartGough->getEffectorLocation());
 	rexos_datatypes::Point3D<double> newLocation(x,y,z);
 
-	//if(stewartGough->checkPath(oldLocation, newLocation)){
-
-		//stewartGough->moveTo(newLocation, maxAcceleration);
-
+	try {
+		stewartGough->moveTo(newLocation, maxAcceleration);
 		return true;
-	//}
-
-	//return false;
+	} catch(std::out_of_range& ex){
+		return false;
+	}
 } 
 
 /**
@@ -207,20 +205,13 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToRelativePoint(double x, 
 	rexos_datatypes::Point3D<double> oldLocation(stewartGough->getEffectorLocation());
 	rexos_datatypes::Point3D<double> newLocation(x,y,z);
 	newLocation += oldLocation;
-
-	//if(stewartGough->checkPath(oldLocation, newLocation)){
-		
-		try {
-			ROS_INFO("Moving to: (%f, %f, %f) maxAcceleration=%f", x, y, z, maxAcceleration);
-			stewartGough->moveTo(newLocation, maxAcceleration);
-			return true;
-		} catch(std::out_of_range& ex){
-			return false;
-		}
-		
-	//} else {
-	//	return false;
-	//}
+	try {
+		ROS_INFO("Moving to: (%f, %f, %f) maxAcceleration=%f", x, y, z, maxAcceleration);
+		stewartGough->moveTo(newLocation, maxAcceleration);
+		return true;
+	} catch(std::out_of_range& ex){
+		return false;
+	}
 }
 
 
