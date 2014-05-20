@@ -200,7 +200,9 @@ public class KnowledgeDBClient {
 
 			if (parameters != null) {
 			    for (int i = 0; i < parameters.length; i++) {
-			    	if(parameters[i] instanceof byte[]) {
+			    	if(parameters[i] == null) {
+				        statement.setString(i + 1, null);
+			    	} else if(parameters[i] instanceof byte[]) {
 				        statement.setBytes(i + 1, (byte[])parameters[i]);
 			    	} else {
 			    		statement.setString(i + 1, parameters[i].toString());

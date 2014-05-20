@@ -420,9 +420,12 @@ public class ModuleFactory extends Factory {
 		JavaSoftware halSoftware = JavaSoftware.insertJavaSoftware(halSoftwareObject, knowledgeDBClient);
 		int halSoftwareId = halSoftware.getId();
 		
-		JsonObject rosSoftwareObject = type.get("rosSoftware").getAsJsonObject();
-		RosSoftware rosSoftware = RosSoftware.insertRosSoftware(rosSoftwareObject, knowledgeDBClient);
-		int rosSoftwareId = rosSoftware.getId();
+		Integer rosSoftwareId = null;
+		if(type.get("rosSoftware").isJsonNull() == false) {
+			JsonObject rosSoftwareObject = type.get("rosSoftware").getAsJsonObject();
+			RosSoftware rosSoftware = RosSoftware.insertRosSoftware(rosSoftwareObject, knowledgeDBClient);
+			rosSoftwareId = rosSoftware.getId();
+		}
 		
 		String properties = type.get("properties").getAsString();
 		knowledgeDBClient.executeUpdateQuery(addModuleType, moduleIdentifier.getManufacturer(), 

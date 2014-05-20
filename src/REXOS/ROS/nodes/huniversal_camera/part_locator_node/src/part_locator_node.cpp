@@ -49,9 +49,10 @@ const string PartLocatorNode::TOP_RIGHT_VALUE = "WP_800_400_TR";
 const string PartLocatorNode::BOTTOM_RIGHT_VALUE = "WP_800_400_BR";*/
 
 
-PartLocatorNode::PartLocatorNode(std::string equipletName, std::string cameraManufacturer, std::string cameraTypeNumber, std::string cameraSerialNumber):
-		rexos_knowledge_database::Module(rexos_knowledge_database::ModuleIdentifier(cameraManufacturer, cameraTypeNumber, cameraSerialNumber)),
+PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier):
+		rexos_knowledge_database::Module(moduleIdentifier),
 		rexos_coordinates::Module(this),
+		rexos_statemachine::ModuleStateMachine(equipletName, moduleIdentifier, false),
 		environmentCacheClient(nodeHandle.serviceClient<environment_cache::UpdateEnvironmentCache>("updateEnvironmentCache")),
 		samplesTopLeft(minCornerSamples),
 		samplesTopRight(minCornerSamples),
@@ -382,6 +383,34 @@ void PartLocatorNode::run() {
 	
 	ros::spin();
 }
+void PartLocatorNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as) {
+	ROS_INFO("Initialize transition called");
+	as->setSucceeded();
+}
+
+void PartLocatorNode::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as) {
+	ROS_INFO("Deinitialize transition called");
+	ros::shutdown();
+	as->setSucceeded();
+}
+
+
+void PartLocatorNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO("Setup transition called");
+	as->setSucceeded();
+}
+void PartLocatorNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO("Shutdown transition called");
+	as->setSucceeded();
+}
+void PartLocatorNode::transitionStart(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO("Start transition called");
+	as->setSucceeded();
+}
+void PartLocatorNode::transitionStop(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO("Stop transition called");
+	as->setSucceeded();
+}
 
 int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "part_locator_node");
@@ -392,10 +421,11 @@ int main(int argc, char* argv[]) {
 	}
 	
 	std::string equipletName = argv[1];
+	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
 
-	ROS_INFO("Constructing node");
-	PartLocatorNode node(equipletName, argv[2], argv[3], argv[4]);
-	
+	ROS_INFO("Creating PartLocatorNode");
+	PartLocatorNode node(equipletName, moduleIdentifier);
 	node.run();
+	
 	return 0;
 }

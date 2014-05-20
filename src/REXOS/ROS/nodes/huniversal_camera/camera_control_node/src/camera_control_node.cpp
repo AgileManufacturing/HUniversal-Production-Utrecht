@@ -145,11 +145,13 @@ bool CameraControlNode::mannuallyCalibrateLens(){
 
 void CameraControlNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Initialize transition called");
+	as->setSucceeded();
 }
 
 void CameraControlNode::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Deinitialize transition called");
 	ros::shutdown();
+	as->setSucceeded();
 }
 
 

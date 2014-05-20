@@ -7,6 +7,8 @@ drop table if exists CapabilityTypeRequiredMutation;
 drop table if exists CapabilityType;
 drop table if exists ModuleCalibrationModuleSet;
 drop table if exists ModuleCalibration;
+drop table SupportedCalibrationMutation;
+drop table RequiredCalibrationMutation;
 drop table if exists SupportedMutation;
 drop table if exists Module;
 drop table if exists ModuleType;
@@ -46,7 +48,7 @@ create table ModuleType(
   manufacturer char(200) NOT NULL,
   typeNumber char(200) NOT NULL,
   moduleTypeProperties text NOT NULL,
-  rosSoftware int NOT NULL,
+  rosSoftware int NULL,
   halSoftware int NOT NULL,
   primary key (manufacturer, typeNumber),
   foreign key (rosSoftware) references RosSoftware(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -68,6 +70,23 @@ create table Module(
 );
 
 create table SupportedMutation(
+  manufacturer char(200) NOT NULL,
+  typeNumber char(200) NOT NULL,
+  mutation char(200) NOT NULL,
+  primary key (manufacturer, typeNumber, mutation),
+  foreign key (manufacturer, typeNumber) references ModuleType(manufacturer, typeNumber) ON DELETE NO ACTION ON UPDATE NO ACTION
+);  
+
+create table RequiredCalibrationMutation(
+  manufacturer char(200) NOT NULL,
+  typeNumber char(200) NOT NULL,
+  mutation char(200) NOT NULL,
+  isOptional tinyint(1) NOT NULL,
+  primary key (manufacturer, typeNumber, mutation),
+  foreign key (manufacturer, typeNumber) references ModuleType(manufacturer, typeNumber) ON DELETE NO ACTION ON UPDATE NO ACTION
+);  
+
+create table SupportedCalibrationMutation(
   manufacturer char(200) NOT NULL,
   typeNumber char(200) NOT NULL,
   mutation char(200) NOT NULL,

@@ -2,8 +2,6 @@ package HAL;
 
 import java.util.ArrayList;
 
-import org.junit.Ignore;
-
 import HAL.exceptions.FactoryException;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.BlackboardListener;
@@ -98,17 +96,17 @@ public abstract class Module implements BlackboardListener{
 	}
 	
 	
-	@Override @Ignore
+	@Override
 	public void OnEquipletStateChanged(String equipletName, String state) {
 		// ignore
 	}
 
-	@Override @Ignore
+	@Override
 	public void OnEquipletModeChanged(String equipletName, String mode) {
 		// ignore
 	}
 
-	@Override @Ignore
+	@Override
 	public void OnEquipletIpChanged(String ip) {
 		// ignore
 	}

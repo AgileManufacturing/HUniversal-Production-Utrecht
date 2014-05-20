@@ -36,8 +36,8 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class Configuration {
-	//private static String propertiesFilePath = System.getenv("PROPERTIESPATH");
-	private static String propertiesFilePath = "src/REXOS/MAS/configuration/";
+	private static String propertiesFilePath = System.getenv("PROPERTIESPATH");
+	//private static String propertiesFilePath = "src/REXOS/MAS/configuration/";
 	
 	public static String getProperty(ConfigurationFiles file, String key)
 	{
@@ -50,7 +50,7 @@ public class Configuration {
 	}
 	
 	
-	public static String getProperty(ConfigurationFiles File, String key, String EquipletName)
+	public static String getProperty(ConfigurationFiles File, String key, String equipletName)
 	{
 		Properties p = new Properties();
 		try { 
@@ -58,7 +58,7 @@ public class Configuration {
 			{
 				case EQUIPLET_DB_PROPERTIES:
 					p.load(new FileInputStream(propertiesFilePath + File.getFileName()));
-					return p.getProperty(EquipletName + key);
+					return p.getProperty(equipletName + key);
 					
 				default:
 					if(File != null){

@@ -39,7 +39,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	private FieldUpdateSubscription modeSubscription;
 	private FieldUpdateSubscription statusSubscription;
 	
-	private String equipletName = null;
+	private String equipletName;
 	private String state = null;
 	private String mode = null;
 	
@@ -47,7 +47,8 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	 * @throws BlackboardUpdateException 
 	 * 
 	 */
-	public BlackboardHandler() throws BlackboardUpdateException{
+	public BlackboardHandler(String equipletName) throws BlackboardUpdateException{
+		this.equipletName = equipletName;
 		updateSubscribers = new ArrayList<BlackboardListener>();
 			
 		try {
@@ -76,8 +77,8 @@ public class BlackboardHandler implements BlackboardSubscriber {
 			equipletStepBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbName", equipletName));
 			equipletStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EquipletStepsBlackBoardName", equipletName));
 			equipletStepBBClient.subscribe(statusSubscription);		   
-		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException e) {
-			throw new BlackboardUpdateException(e.toString());
+		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException ex) {
+			throw new BlackboardUpdateException("Unable to initialize HAL.BlackBoardHandler", ex);
 		}
 	}
 	

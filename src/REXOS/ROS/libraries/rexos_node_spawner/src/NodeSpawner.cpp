@@ -68,7 +68,6 @@ namespace rexos_node_spawner {
 			throw std::runtime_error("Unable to execl");
 		} else {
 			// we are the old parent
-			ROS_ERROR("p");
 			ROS_INFO("node has been spawned");
 		}
 	}
@@ -90,7 +89,6 @@ namespace rexos_node_spawner {
 			throw std::runtime_error("Unable to execl");
 		} else {
 			// we are the old parent
-			ROS_ERROR("p");
 			ROS_INFO("node has been spawned");
 		}
 	}
@@ -100,7 +98,8 @@ namespace rexos_node_spawner {
 		std::istream* rosFile = rosSoftware.getRosFile();
 		std::ofstream zipFileOutputStream;
 		std::string zipArchiveFileName = boost::lexical_cast<std::string>(rosSoftware.getId()) + ".zip";
-		zipFileOutputStream.open(zipArchiveFileName, 
+		std::string zipArchivePath = std::string("/tmp/rexos_node_spawner/");
+		zipFileOutputStream.open(zipArchivePath + zipArchiveFileName, 
 				std::ios::out | std::ios::binary); 
 		
 		while(rosFile->good() == true) {
@@ -111,7 +110,7 @@ namespace rexos_node_spawner {
 		ROS_INFO_STREAM("zip archive has been written at " << zipArchiveFileName);
 		
 		int err = 0;
-		zip* zipArchive = zip_open(zipArchiveFileName.c_str(), 0, &err);
+		zip* zipArchive = zip_open((zipArchivePath + zipArchiveFileName).c_str(), 0, &err);
 		ROS_INFO_STREAM("zip archive opened with " << err);
 		
 		struct zip_stat zipStat;
@@ -132,7 +131,7 @@ namespace rexos_node_spawner {
 					}
 					
 					std::ofstream fs;
-					fs.open(zipStat.name, std::ios::out | std::ios::binary); 
+					fs.open((zipArchivePath + std::string(zipStat.name)).c_str(), std::ios::out | std::ios::binary); 
 					if (fs.good() != true) {
 						throw std::runtime_error("Unable to open fstream");
 					}

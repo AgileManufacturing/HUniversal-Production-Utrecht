@@ -21,6 +21,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static HardwareAbstractionLayer hal;
 	static BlackboardHandler blackboardUpdated;
 	
+	// delta robot
 	static String moduleA_01 = "{"
 			+ "	\"manufacturer\":\"HU\","
 			+ "	\"typeNumber\":\"delta_robot_type_A\","
@@ -115,17 +116,14 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			+ "\"mountPointX\":3,"
 			+ "\"mountPointY\":2"
 			+ "}";
+	// pen
 	static String moduleB_01 = "{"
 			+ "	\"manufacturer\":\"HU\","
 			+ "	\"typeNumber\":\"blue_pen_type_A\","
 			+ "	\"serialNumber\":\"1\","
 			+ "	\"type\":{"
-			+ "		\"properties\":\"hoi!\","
-			+ "		\"rosSoftware\":{"
-			+ "			\"buildNumber\":1,"
-			+ "			\"rosFile\": \"\","
-			+ "			\"command\":\"moduleClass\""
-			+ "		},"
+			+ "		\"properties\":\"\","
+			+ "		\"rosSoftware\":null,"
 			+ "		\"halSoftware\":{"
 			+ "			\"buildNumber\":1,"
 			+ "			\"jarFile\": \"";
@@ -144,6 +142,67 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			+ "	\"attachedTo\":{"
 			+ "		\"manufacturer\":\"HU\","
 			+ "		\"typeNumber\":\"delta_robot_type_A\","
+			+ "		\"serialNumber\":\"1\""
+			+ "	},"
+			+ "\"mountPointX\":null,"
+			+ "\"mountPointY\":null"
+			+ "}";
+	// camera
+	static String moduleC_01 = "{"
+			+ "	\"manufacturer\":\"The_Imaging_Source_Europe_GmbH\","
+			+ "	\"typeNumber\":\"DFK_22AUC03\","
+			+ "	\"serialNumber\":\"1\","
+			+ "	\"type\":{"
+			+ "		\"properties\":\"\","
+			+ "		\"rosSoftware\":{"
+			+ "			\"buildNumber\":1,"
+			+ "			\"rosFile\": \"";
+	static String moduleC_02 = "\","
+			+ "			\"command\":\"roslaunch camera.launch {equipletName} {manufacturer} {typeNumber} {serialNumber}\""
+			+ "		},"
+			+ "		\"halSoftware\":{"
+			+ "			\"buildNumber\":1,"
+			+ "			\"jarFile\": \"";
+	static String moduleC_03 = "\","
+			+ "			\"className\":\"HAL.modules.Camera\""
+			+ "		},"
+			+ "		\"supportedMutations\": ["
+			+ "		],"
+			+ "		\"capabilities\":["
+			+ "		]"
+			+ "	},"
+			+ "	\"properties\":\"\","
+			+ "	\"calibrationData\":["
+			+ "	],"
+			+ "	\"attachedTo\":null,"
+			+ "\"mountPointX\":3,"
+			+ "\"mountPointY\":16"
+			+ "}";
+	// lens
+	static String moduleD_01 = "{"
+			+ "	\"manufacturer\":\"The_Imaging_Source_Europe_GmbH\","
+			+ "	\"typeNumber\":\"Cheap_ass_lens\","
+			+ "	\"serialNumber\":\"1\","
+			+ "	\"type\":{"
+			+ "		\"properties\":\"\","
+			+ "		\"rosSoftware\":null,"
+			+ "		\"halSoftware\":{"
+			+ "			\"buildNumber\":1,"
+			+ "			\"jarFile\": \"";
+	static String moduleD_02 = "\","
+			+ "			\"className\":\"HAL.modules.Lens\""
+			+ "		},"
+			+ "		\"supportedMutations\": ["
+			+ "		],"
+			+ "		\"capabilities\":["
+			+ "		]"
+			+ "	},"
+			+ "	\"properties\":\"\","
+			+ "	\"calibrationData\":["
+			+ "	],"
+			+ "	\"attachedTo\":{"
+			+ "		\"manufacturer\":\"The_Imaging_Source_Europe_GmbH\","
+			+ "		\"typeNumber\":\"DFK_22AUC03\","
 			+ "		\"serialNumber\":\"1\""
 			+ "	},"
 			+ "\"mountPointX\":null,"
@@ -170,23 +229,27 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		fis.read(content);
 		fis.close();
 		String base64Module = new String(Base64.encodeBase64(content));
-		//System.out.println("delta robot module: " + base64Module);
 		
 		File deltaRobotZip = new File("/home/t/Desktop/nodes.zip");
 		fis = new FileInputStream(deltaRobotZip);
 		content = new byte[(int) deltaRobotZip.length()];
 		fis.read(content);
 		fis.close();
-		String base64ModuleRos = new String(Base64.encodeBase64(content));
-		//System.out.println("delta robot module zip: " + base64ModuleRos);
+		String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
 		
-		File gripperJar = new File("/home/t/Desktop/Pen.jar");
-		fis = new FileInputStream(gripperJar);
-		content = new byte[(int) gripperJar.length()];
+		File cameraZip = new File("/home/t/Desktop/nodes.zip");
+		fis = new FileInputStream(cameraZip);
+		content = new byte[(int) cameraZip.length()];
 		fis.read(content);
 		fis.close();
-		String base64Gripper = new String(Base64.encodeBase64(content));
-		//System.out.println("gripper module: " + base64Gripper);
+		String base64CameraRos = new String(Base64.encodeBase64(content));
+		
+		File penJar = new File("/home/t/Desktop/Pen.jar");
+		fis = new FileInputStream(penJar);
+		content = new byte[(int) penJar.length()];
+		fis.read(content);
+		fis.close();
+		String base64Pen = new String(Base64.encodeBase64(content));
 		
 		File pickAndPlaceJar = new File("/home/t/Desktop/Draw.jar");
 		fis = new FileInputStream(pickAndPlaceJar);
@@ -194,25 +257,26 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		fis.read(content);
 		fis.close();
 		String base64Capability = new String(Base64.encodeBase64(content));
-		//System.out.println("pick and place capability: " + base64Capability);
 		
-		String moduleA = moduleA_01 + base64ModuleRos + moduleA_02 + base64Module + moduleA_03 + base64Capability + moduleA_04; 
+		// deltarobot
+		String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64Module + moduleA_03 + base64Capability + moduleA_04; 
 		JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
 		hal.insertModule(a, a);
 		
-		String moduleB = moduleB_01 + base64Gripper + moduleB_02; 
+		// pen
+		String moduleB = moduleB_01 + base64Pen + moduleB_02; 
 		JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
 		hal.insertModule(b, b);
 		
-		hal.getBottomModules();
+		// camera
+		String moduleC = moduleC_01 + base64CameraRos + moduleC_02 + base64Pen + moduleC_03;
+		JsonObject c = new JsonParser().parse(moduleC).getAsJsonObject();
+		hal.insertModule(c, c);
 		
-		
-		
-		
-		
-		
-		
-		
+		// lens
+		String moduleD = moduleD_01 + base64Pen + moduleD_02; 
+		JsonObject d = new JsonParser().parse(moduleD).getAsJsonObject();
+		hal.insertModule(d, d);
 		
 		
 		/*JsonObject tommasgtaylordfuckzooi;

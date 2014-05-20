@@ -263,11 +263,13 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(double x, doub
 
 void deltaRobotNodeNamespace::DeltaRobotNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Initialize transition called");
+	as->setSucceeded();
 }
 
 void deltaRobotNodeNamespace::DeltaRobotNode::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Deinitialize transition called");
 	ros::shutdown();
+	as->setSucceeded();
 }
 
 /**
@@ -439,10 +441,8 @@ int main(int argc, char **argv){
 	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
 	
 	ROS_INFO("Creating DeltaRobotNode");
-
 	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletName, moduleIdentifier);
 
-	ROS_INFO("Running StateEngine");
 	ros::spin();
 	return 0;
 }

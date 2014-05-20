@@ -31,13 +31,13 @@ public class HardwareAbstractionLayer implements ModuleListener{
 	}
 
 	public HardwareAbstractionLayer(HardwareAbstractionLayerListener hardwareAbstractionLayerListener) throws KnowledgeException, BlackboardUpdateException{
+		equipletName = hardwareAbstractionLayerListener.getEquipletName();
+		
 		this.hardwareAbstractionLayerListener = hardwareAbstractionLayerListener;
 		capabilityFactory = new CapabilityFactory(this);
 		moduleFactory = new ModuleFactory(this, this);
-		blackboardHandler = new BlackboardHandler();
+		blackboardHandler = new BlackboardHandler(equipletName);
 		
-		// TODO hardcoded
-		equipletName = hardwareAbstractionLayerListener.getEquipletName();
 	}
 	
 	public void executeHardwareSteps(ArrayList<HardwareStep> hardwareSteps){
