@@ -160,7 +160,7 @@ class SixAxisCalculations {
         //Motor angle calculation and validation
         double getAngleForMotor(Point3D moveTo, double groupPositionOnCircle, double effectorJointPositionOnCircle, double rotationX, double rotationY, double rotationZ);
         bool isValidPosition(Point3D relativeJointPosition, Point3D relativeNeighbourJointPosition, double motorAngle, double motorGroupPositionOnCircle, double motorPositionOnCircle);
-        double getEffectorJointAngle(Point3D effectorJointPosition, Point3D neighbourEffectorJointPosition, double groupPositionOnCircle, double motorPositionOnCircle);
+        double getEffectorJointAngle(Point3D effectorJointPosition, Point3D neighbourEffectorJointPosition, double groupPositionOnCircle, double motorPositionOnCircle, double motorAngle);
 
         //Inverse kinematics
         double calculateAngle(double d2);

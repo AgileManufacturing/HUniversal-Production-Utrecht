@@ -478,7 +478,7 @@ double SixAxisCalculations::calculateAB(Point3D enginePosition, Point3D jointPos
 	return sqrt(pow(lowerArmLength, 2) + pow(ac, 2));
 }
 
-double SixAxisCalculations::getEffectorJointAngle(Point3D effectorJointPosition, Point3D neighbourEffectorJointPosition, double groupPositionOnCircle, double motorPositionOnCircle){
+double SixAxisCalculations::getEffectorJointAngle(Point3D effectorJointPosition, Point3D neighbourEffectorJointPosition, double groupPositionOnCircle, double motorPositionOnCircle, double motorAngle){
 
 	//Step 1: determinate the two vectors and transalte them so their intersection lies on the origin
 	Point3D vectorEffector(	neighbourEffectorJointPosition.x - effectorJointPosition.x,
@@ -489,13 +489,77 @@ double SixAxisCalculations::getEffectorJointAngle(Point3D effectorJointPosition,
 	 * Get the right motor angles for the given effector joint angle.
 	 */
 	double rad = DEGREES_TO_RADIANS(motorPositionOnCircle);
+	
+	
+
+	/*
+
+
+	
+	double matrixIdentity[] = MATRIX_IDENTITY_3X3;
+	double matrixRotation[3*3];
+
+	get3x3RotationMatrix(matrixRotation, rad);
+
+
+
+	double matrixTransalation[3*3];
+	get3x3TransalationMatrix(matrixTransalation, xTrans, -motorAxisToCenterDistance);
+
+
+	//Calculate the complete rotation and translation matrix, and create the point matrix
+	double matrixRotationAndIdentity[3*3];
+	getMultiplyMatrix(matrixRotationAndIdentity, matrixIdentity, 3, 3, matrixRotation, 3, 3);
+
+	double calculationMatrix[3*3];
+	getMultiplyMatrix(calculationMatrix, matrixTransalation, 3, 3, matrixRotationAndIdentity, 3, 3);
+
+	double rotatedPointMatrix[3*1];
+	get1x3PointMatrix(rotatedPointMatrix, effectorJointPosition);
+	
+	
+	
+	
+	Point3D rotatedEffectorJointPosition()
+	
+	
+	rotatedPointMatrix[GET_INDEX(0, 0, 1)] + moveTo.x, rotatedPointMatrix[GET_INDEX(1, 0, 1)] + moveTo.y, rotatedPointMatrix[GET_INDEX(2, 0, 1)] + moveTo.z);
+	
+	
+	
+	*/
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	double upperArmJointY = cos(motorAngle) * upperArmLength;
+	double upperArmJointZ = sin(motorAngle) * upperArmLength;
+	
+	
+	Point3D motorPosition(0 -effectorJointPosition.x, upperArmJointY -effectorJointPosition.y , upperArmJointZ - effectorJointPosition.z);
+	
+	
+	
+	
+	
+	
+	
+	
 
 	double motorX = sin(rad) * motorAxisToCenterDistance;
 	double motorY = cos(rad) * motorAxisToCenterDistance;
 
 	Point3D vectorMotor(motorX - effectorJointPosition.x, motorY - effectorJointPosition.y, 0 - effectorJointPosition.z);
 
-	return getAngleBetween(vectorMotor, vectorEffector);
+	return getAngleBetween(motorPosition, vectorEffector);
 }
 
 bool SixAxisCalculations::isValidPosition(Point3D effectorJointPosition, Point3D neighbourEffectorJointPosition, double motorAngle, double groupPositionOnCircle, double motorPositionOnCircle){
@@ -504,8 +568,8 @@ bool SixAxisCalculations::isValidPosition(Point3D effectorJointPosition, Point3D
 	}
 
 
-	double angle = abs(HALF_PI - getEffectorJointAngle(effectorJointPosition, neighbourEffectorJointPosition, groupPositionOnCircle, motorPositionOnCircle));
-	//std::cout << "Critical angle: " << radiansToDegrees(angle) << std::endl;
+	double angle = abs(HALF_PI - getEffectorJointAngle(effectorJointPosition, neighbourEffectorJointPosition, groupPositionOnCircle, motorPositionOnCircle, motorAngle));
+	std::cout << "Critical angle: " << RADIANS_TO_DEGREES(angle) << std::endl;
 	if(angle > maxJointAngle){
 		return false;
 	}
@@ -578,21 +642,7 @@ double SixAxisCalculations::getAngleForMotor(Point3D moveTo, double groupPositio
 	//std::cout << resultMatrix[GET_INDEX(1, 0, 1)] << std::endl;
 	//std::cout << resultMatrix[GET_INDEX(2, 0, 1)] << std::endl;
 
-	//Ugly cache method, so 6 matrix 3d rotations can be skipped in the calculation of the safety angles
-	if(effectorJointPositionOnCircle == EFFECTOR_JOINT_A1_POS){
-		this->effectorJointPositionCache[0] = rotatedPoint;
-	} else if(effectorJointPositionOnCircle == EFFECTOR_JOINT_A2_POS){
-		this->effectorJointPositionCache[1] = rotatedPoint;
-	} else if(effectorJointPositionOnCircle == EFFECTOR_JOINT_B1_POS){
-		this->effectorJointPositionCache[2] = rotatedPoint;
-	} else if(effectorJointPositionOnCircle == EFFECTOR_JOINT_B2_POS){
-		this->effectorJointPositionCache[3] = rotatedPoint;
-	} else if(effectorJointPositionOnCircle == EFFECTOR_JOINT_C1_POS){
-		this->effectorJointPositionCache[4] = rotatedPoint;
-	} else if(effectorJointPositionOnCircle == EFFECTOR_JOINT_C2_POS){
-		this->effectorJointPositionCache[5] = rotatedPoint;
-	}
-
+	
 	/**
 	 * Step 3: Rotate around the z axis and translate the joint position as if the engine would be at position 0, 0, 0
 	 */
@@ -660,6 +710,28 @@ double SixAxisCalculations::getAngleForMotor(Point3D moveTo, double groupPositio
 
 
 	SixAxisCalculations::Point3D moveToTransalated( resultPoint[GET_INDEX(0, 0, 1)], resultPoint[GET_INDEX(1, 0, 1)], rotatedPoint.z);
+
+
+
+
+	//Ugly cache method, so 6 matrix 3d rotations can be skipped in the calculation of the safety angles
+	if(effectorJointPositionOnCircle == EFFECTOR_JOINT_A1_POS){
+		this->effectorJointPositionCache[0] = moveToTransalated;
+	} else if(effectorJointPositionOnCircle == EFFECTOR_JOINT_A2_POS){
+		this->effectorJointPositionCache[1] = moveToTransalated;
+	} else if(effectorJointPositionOnCircle == EFFECTOR_JOINT_B1_POS){
+		this->effectorJointPositionCache[2] = moveToTransalated;
+	} else if(effectorJointPositionOnCircle == EFFECTOR_JOINT_B2_POS){
+		this->effectorJointPositionCache[3] = moveToTransalated;
+	} else if(effectorJointPositionOnCircle == EFFECTOR_JOINT_C1_POS){
+		this->effectorJointPositionCache[4] = moveToTransalated;
+	} else if(effectorJointPositionOnCircle == EFFECTOR_JOINT_C2_POS){
+		this->effectorJointPositionCache[5] = moveToTransalated;
+	}
+	
+
+
+
 
 
 	SixAxisCalculations::Point3D engine(0, 0, 0);
@@ -773,16 +845,14 @@ bool SixAxisCalculations::isValidMove(double angles[6]){
 
 bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double startRotationY, double startRotationZ, Point3D to, double endRotationX, double endRotationY, double endRotationZ){
 	
-		//std::cout << "path check start" << std::endl;
-    	
+		std::cout << "path check start" << std::endl;
+    	std::cout << "fromx: " << from.x << " fromy: " << from.y << " fromz: " << from.z << std::endl;
+		std::cout << "tox: " << to.x << " toy: " << to.y << " toz: " << to.z << std::endl;
+
 		//Calculate lengths to travel
     	double x_length = to.x - from.x;
     	double y_length = to.y - from.y;
     	double z_length = to.z - from.z;
-		
-		double xr_length = endRotationX - startRotationX;
-    	double yr_length = endRotationY - startRotationY;
-    	double zr_length = endRotationZ - startRotationZ;
 		
 		
 		
@@ -793,14 +863,8 @@ bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double 
     	double stepLengthX = x_length / largest_length;
     	double stepLengthY = y_length / largest_length;
     	double stepLengthZ = z_length / largest_length;
-		
-		
-		double stepLengthXr = xr_length / largest_length;
-    	double stepLengthYr = yr_length / largest_length;
-    	double stepLengthZr = zr_length / largest_length;
-		
-
-		//std::cout << "path length: " << largest_length << std::endl;
+ 
+		std::cout << "path length: " << largest_length << std::endl;
 		
 		for(double step = 1; step <= largest_length; step++){
 			
@@ -808,11 +872,7 @@ bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double 
 			double y = (from.y + stepLengthY * step);
 			double z = (from.z + stepLengthZ * step);
 			
-			double xr = (startRotationX + stepLengthXr * step);
-			double yr = (startRotationY + stepLengthYr * step);
-			double zr = (startRotationZ + stepLengthZr * step);
-			
-			//std::cout << "checking coordinate: " << xr << ", " << yr << ", " << zr << std::endl;
+			//std::cout << "checking coordinate: " << x << ", " << y << ", " << z << std::endl;
 			
 			////BitmapCoordinate temp = fromRealCoordinate(rexos_datatypes::Point3D<double>(x, y, z));
 			//int index = temp.x + temp.y * width + temp.z * width * depth;
@@ -835,13 +895,9 @@ bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double 
 				//return false;
 			//}
 			
-			EffectorMove move = getMotorAngles(Point3D(x, y, z), xr, yr, zr);
+			EffectorMove move = getMotorAngles(Point3D(x, y, z), 0, 0, 0);
 			if(!move.validMove){
 				std::cout << "invalid position in path: " << move.moveTo << std::endl;
-						
-				std::cout << "fromx: " << from.x << " fromy: " << from.y << " fromz: " << from.z << std::endl;
-				std::cout << "tox: " << to.x << " toy: " << to.y << " toz: " << to.z << std::endl;
- 
 				return false;
 			}
 			

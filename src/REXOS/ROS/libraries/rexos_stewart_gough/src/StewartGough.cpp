@@ -691,8 +691,10 @@ namespace rexos_stewart_gough{
 		int maxRotation = 60;
 
 		
+						moveTo(rexos_datatypes::Point3D<double>(0, 0, -300), 30, 0, 0, 0);
 		
-		for(int i = 0; i < 2000000; i++){
+		
+		for(int i = 0; i < 0; i++){
 			
 			x = (rand() % (maxX-minX))+minX;
 			y = (rand() % (maxY-minY))+minY;
