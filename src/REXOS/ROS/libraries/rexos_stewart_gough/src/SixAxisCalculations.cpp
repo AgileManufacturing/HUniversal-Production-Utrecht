@@ -488,7 +488,7 @@ double SixAxisCalculations::getEffectorJointAngle(Point3D effectorJointPosition,
 	/* The motors are positioned on the circle in a different angle than the effector joints.
 	 * Get the right motor angles for the given effector joint angle.
 	 */
-	double rad = DEGREES_TO_RADIANS(motorPositionOnCircle);
+	double rad = DEGREES_TO_RADIANS(groupPositionOnCircle);
 	
 	
 
@@ -518,34 +518,48 @@ double SixAxisCalculations::getEffectorJointAngle(Point3D effectorJointPosition,
 	get3x3RotationMatrix(matrixRotation, rad);
 
 
+	//Calculate the needed translation on the x axis
+	double xTrans = tan(DEGREES_TO_RADIANS((motorPositionOnCircle -groupPositionOnCircle))) * motorAxisToCenterDistance;
+	//double xTrans = tan(motorPositionOnCircle -motorGroupPositionOnCircle) * motorAxisToCenterDistance;
 
-	//double matrixTransalation[3*3];
-	//get3x3TransalationMatrix(matrixTransalation, xTrans, -motorAxisToCenterDistance);
+
+
+	std::cout << "xTrans: " << xTrans << std::endl;
+	
+
+	double matrixTransalation[3*3];
+	get3x3TransalationMatrix(matrixTransalation, xTrans, -motorAxisToCenterDistance);
 
 
 	//Calculate the complete rotation and translation matrix, and create the point matrix
 	double matrixRotationAndIdentity[3*3];
 	getMultiplyMatrix(matrixRotationAndIdentity, matrixIdentity, 3, 3, matrixRotation, 3, 3);
 
-	//double calculationMatrix[3*3];
-	//getMultiplyMatrix(calculationMatrix, matrixTransalation, 3, 3, matrixRotationAndIdentity, 3, 3);
+	double calculationMatrix[3*3];
+	getMultiplyMatrix(calculationMatrix, matrixTransalation, 3, 3, matrixRotationAndIdentity, 3, 3);
 
 	double rotatedPointMatrix[3*1];
 	get1x3PointMatrix(rotatedPointMatrix, upperArmJointPosition);
 	
 	
+
+	//Calculate the translated and rotated position of the 3d rotated point from step 1
+	double resultPoint[3*1];
+	getMultiplyMatrix(resultPoint, calculationMatrix, 3, 3, rotatedPointMatrix, 3, 1);
+	
+	
 	
 	
 	Point3D rotatedUpperArmJointPosition(
-	rotatedPointMatrix[GET_INDEX(0, 0, 1)] - effectorJointPosition.x,
-	rotatedPointMatrix[GET_INDEX(1, 0, 1)] - effectorJointPosition.y,
-	rotatedPointMatrix[GET_INDEX(2, 0, 1)] - effectorJointPosition.z);
+	resultPoint[GET_INDEX(0, 0, 1)] - effectorJointPosition.x,
+	resultPoint[GET_INDEX(1, 0, 1)] - effectorJointPosition.y,
+	resultPoint[GET_INDEX(2, 0, 1)] - effectorJointPosition.z);
 	
 	
 		Point3D rotatedUpperArmJointPositionTemp(
-	rotatedPointMatrix[GET_INDEX(0, 0, 1)],
-	rotatedPointMatrix[GET_INDEX(1, 0, 1)],
-	rotatedPointMatrix[GET_INDEX(2, 0, 1)]);
+	resultPoint[GET_INDEX(0, 0, 1)],
+	resultPoint[GET_INDEX(1, 0, 1)],
+	resultPoint[GET_INDEX(2, 0, 1)]);
 	
 
 	std::cout << "rotated UpperArmJoint pos: " << rotatedUpperArmJointPositionTemp << std::endl;
