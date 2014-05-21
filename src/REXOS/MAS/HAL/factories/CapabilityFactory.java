@@ -23,8 +23,38 @@ import HAL.capabilities.Capability;
 
 public class CapabilityFactory extends Factory{
 	// SQL queries
+	private static final String getSupportedServices = 
+			"SELECT serviceType \n" + 
+			"FROM ServiceType_CapabilityType \n" + 
+			"WHERE NOT EXISTS( \n" +
+			"	SELECT * \n" +
+			"	FROM CapabilityTypeRequiredMutation \n" +
+			"	WHERE ServiceType_CapabilityType.name = CapabilityTypeRequiredMutation.capabilityType AND \n" +
+			"	treeNumber NOT IN( \n" +
+			"		SELECT treeNumber \n" +
+			"		FROM CapabilityTypeRequiredMutation AS currentRequiredMutation \n" +
+			"		JOIN Module AS currentModule \n" +
+			"		WHERE ServiceType_CapabilityType.name = currentRequiredMutation.capabilityType AND \n" +
+			"		NOT EXISTS( \n" +
+			"			SELECT * \n" +
+			"			FROM CapabilityTypeRequiredMutation \n" +
+			"			WHERE currentRequiredMutation.capabilityType = capabilityType AND \n" +
+			"			currentRequiredMutation.treeNumber = treeNumber AND \n" +
+			"			mutation NOT IN( \n" +
+			"				SELECT mutation \n" +
+			"				FROM SupportedMutation \n" +
+			"				JOIN Module ON SupportedMutation.manufacturer = Module.manufacturer AND \n" +
+			"					SupportedMutation.typeNumber = Module.typeNumber \n" +
+			"				WHERE currentModule.attachedToLeft >= attachedToLeft AND \n" +
+			"					currentModule.attachedToRight <= attachedToRight AND \n" +
+			"					currentModule.equiplet = ? \n" +
+			"			) \n" +
+			"		) AND \n" +
+			"		currentModule.attachedToRight = currentModule.attachedToLeft + 1 \n" +
+			"	) \n" +
+			");";
 	private static final String getSupportedCapabilities = 
-			"SELECT * \n" + 
+			"SELECT name \n" + 
 			"FROM CapabilityType \n" + 
 			"WHERE NOT EXISTS( \n" +
 			"	SELECT * \n" +
@@ -152,6 +182,23 @@ public class CapabilityFactory extends Factory{
 		}
 		
 		return capabilities;
+	}
+	public ArrayList<Service> getAllSupportedServices() throws Exception{
+		ArrayList<Service> services = new ArrayList<Service>();
+		
+		try {
+			Row[] rows = knowledgeDBClient.executeSelectQuery(getSupportedServices, hal.getEquipletName());
+			for (Row row : rows) {
+				String serviceName = (String) row.get("serviceType");
+				services.add(new Service(serviceName));
+			}
+		} catch (KnowledgeException | KeyNotFoundException ex) {
+			System.err.println("HAL::CapabilityFactory::getAllSupportedServices(): Error occured which is considered to be impossible " + ex);
+			ex.printStackTrace();
+			return null;
+		}
+		
+		return services;
 	}
 	public ArrayList<Capability> getCapabilitiesForService(Service service) throws Exception{
 		ArrayList<Capability> capabilities = new ArrayList<Capability>();

@@ -48,9 +48,6 @@ public class HardwareAbstractionLayer implements ModuleListener{
 		TranslationProcess translationProcess = new TranslationProcess(this.hardwareAbstractionLayerListener, productStep, capabilityFactory);
 		translationProcess.start();
 	}
-	public ArrayList<Capability> getAllCapabilities() throws Exception{
-		return capabilityFactory.getAllSupportedCapabilities();
-	}
 	
 	public boolean insertModule(JsonObject staticSettings, JsonObject dynamicSettings){
 		boolean isModuleAdditionSuccesful = moduleFactory.insertModule(staticSettings, dynamicSettings);
@@ -73,16 +70,20 @@ public class HardwareAbstractionLayer implements ModuleListener{
 			return null;
 		}
 	}
+	
 	public ArrayList<Module> getBottomModules() throws Exception{
 		return moduleFactory.getBottomModules();
 	}
-
+	public ArrayList<Service> getSupportedServices() throws Exception{
+		return capabilityFactory.getAllSupportedServices();
+	}
+	
+	
 	@Override
 	public void onModuleStateChanged(String state, Module module) {
 		// TODO Auto-generated method stub
 		
 	}
-
 	@Override
 	public void onModuleModeChanged(String mode, Module module) {
 		// TODO Auto-generated method stub

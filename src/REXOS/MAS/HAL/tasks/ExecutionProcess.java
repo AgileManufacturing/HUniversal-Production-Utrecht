@@ -28,6 +28,7 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 				moduleFactory.executeHardwareStep(this, hardwareSteps.get(0));
 				this.wait();
 			}
+			hardwareAbstractionLayerListener.onExecutionFinished();
 		} catch (Exception ex) {
 			// TODO Auto-generated catch block
 			ex.printStackTrace();

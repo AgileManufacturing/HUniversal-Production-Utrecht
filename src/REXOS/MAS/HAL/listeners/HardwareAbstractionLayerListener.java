@@ -13,6 +13,7 @@ public interface HardwareAbstractionLayerListener {
 	
 	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareStep);
 	public void onIncapableCapabilities(ProductStep productStep);
+	public void onExecutionFinished();
 	
 	public String getEquipletName();
 }

@@ -10,10 +10,10 @@ public class ProductStep implements Serializable {
 	private static final long serialVersionUID = 6788269249283740246L;
 	private Service service;
 	private JsonObject criteria;
-	private int id;
+	private String id;
 	
-	public ProductStep(int id, JsonObject criteria, Service service){
-		this.id = id;
+	public ProductStep(String productStepId, JsonObject criteria, Service service){
+		this.id = productStepId;
 		this.criteria = criteria;
 		this.service = service;
 	}
@@ -24,7 +24,7 @@ public class ProductStep implements Serializable {
 	public JsonObject getCriteria(){
 		return this.criteria;
 	}
-	public int getId(){
+	public String getId(){
 		return this.id;
 	}
 }
