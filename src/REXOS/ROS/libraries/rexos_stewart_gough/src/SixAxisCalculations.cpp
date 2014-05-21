@@ -488,9 +488,9 @@ double SixAxisCalculations::getEffectorJointAngle(Point3D effectorJointPosition,
 	/* The motors are positioned on the circle in a different angle than the effector joints.
 	 * Get the right motor angles for the given effector joint angle.
 	 */
-	double rad = DEGREES_TO_RADIANS(groupPositionOnCircle);
+	double rad = DEGREES_TO_RADIANS(-groupPositionOnCircle);
 	
-	
+	//std::cout << "Angle: " << (-groupPositionOnCircle) << std::endl;
 
 	
 
@@ -502,19 +502,19 @@ double SixAxisCalculations::getEffectorJointAngle(Point3D effectorJointPosition,
 	double xTrans = tan(DEGREES_TO_RADIANS((motorPositionOnCircle -groupPositionOnCircle))) * motorAxisToCenterDistance;
 	//double xTrans = tan(motorPositionOnCircle -motorGroupPositionOnCircle) * motorAxisToCenterDistance;
 
-	double yTrans = sin(DEGREES_TO_RADIANS((motorPositionOnCircle -groupPositionOnCircle))) * motorAxisToCenterDistance;
+	double yTrans = cos(DEGREES_TO_RADIANS((motorPositionOnCircle -groupPositionOnCircle))) * motorAxisToCenterDistance;
 	//double xTrans = tan(motorPositionOnCircle -motorGroupPositionOnCircle) * motorAxisToCenterDistance;
 
 
-	std::cout << "xTrans: " << xTrans << std::endl;
-	std::cout << "yTrans: " << yTrans << std::endl;
+	//std::cout << "xTrans: " << xTrans << std::endl;
+	//std::cout << "yTrans: " << yTrans << std::endl;
 	
 	double upperArmJointY = cos(motorAngle) * upperArmLength;
 	double upperArmJointZ = sin(motorAngle) * upperArmLength;
-	Point3D upperArmJointPosition(xTrans, upperArmJointY + motorAxisToCenterDistance, upperArmJointZ);
+	Point3D upperArmJointPosition(xTrans, upperArmJointY + yTrans, upperArmJointZ);
 	
 	
-	std::cout << "upperArmJointPosition: " << upperArmJointPosition << std::endl;
+	//std::cout << "upperArmJointPosition: " << upperArmJointPosition << std::endl;
 	
 
 
@@ -561,15 +561,17 @@ double SixAxisCalculations::getEffectorJointAngle(Point3D effectorJointPosition,
 	upperArmJointPosition.z - effectorJointPosition.z);
 	
 	
-		Point3D rotatedUpperArmJointPositionTemp(
-	resultPoint[GET_INDEX(0, 0, 1)],
-	resultPoint[GET_INDEX(1, 0, 1)],
-	upperArmJointPosition.z);
+		//Point3D rotatedUpperArmJointPositionTemp(
+	//resultPoint[GET_INDEX(0, 0, 1)],
+	//resultPoint[GET_INDEX(1, 0, 1)],
+	//upperArmJointPosition.z);
 	
 
-	std::cout << "rotated UpperArmJoint pos: " << rotatedUpperArmJointPositionTemp << std::endl;
+	//std::cout << "rotated UpperArmJoint pos: " << rotatedUpperArmJointPositionTemp << std::endl;
 	
+	//std::cout << "neighbourEffectorJointPosition: " << neighbourEffectorJointPosition << std::endl;
 	
+	//std::cout << "effectorJointPosition: " << effectorJointPosition << std::endl;
 	
 	
 	
@@ -594,10 +596,10 @@ double SixAxisCalculations::getEffectorJointAngle(Point3D effectorJointPosition,
 	
 	
 
-	double motorX = sin(rad) * motorAxisToCenterDistance;
-	double motorY = cos(rad) * motorAxisToCenterDistance;
+	//double motorX = sin(rad) * motorAxisToCenterDistance;
+	//double motorY = cos(rad) * motorAxisToCenterDistance;
 
-	Point3D vectorMotor(motorX - effectorJointPosition.x, motorY - effectorJointPosition.y, 0 - effectorJointPosition.z);
+	//Point3D vectorMotor(motorX - effectorJointPosition.x, motorY - effectorJointPosition.y, 0 - effectorJointPosition.z);
 
 	return getAngleBetween(rotatedUpperArmJointPosition, vectorEffector);
 }
@@ -609,7 +611,7 @@ bool SixAxisCalculations::isValidPosition(Point3D effectorJointPosition, Point3D
 
 
 	double angle = abs(HALF_PI - getEffectorJointAngle(effectorJointPosition, neighbourEffectorJointPosition, groupPositionOnCircle, motorPositionOnCircle, motorAngle));
-	std::cout << "Critical angle: " << RADIANS_TO_DEGREES(angle) << std::endl;
+	//std::cout << "Critical angle: " << RADIANS_TO_DEGREES(angle) << std::endl;
 	if(angle > maxJointAngle){
 		return false;
 	}
