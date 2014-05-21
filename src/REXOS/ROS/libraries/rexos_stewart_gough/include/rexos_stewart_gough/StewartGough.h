@@ -89,6 +89,8 @@ namespace rexos_stewart_gough{
 
 		void generateBoundaries(double voxelSize);
 		bool checkPath(const rexos_datatypes::Point3D<double>& begin, const rexos_datatypes::Point3D<double>& end);
+		
+		bool checkPath(const rexos_datatypes::Point3D<double>& begin, const double beginRotationX, const double beginRotationY, const double beginRotationZ, const rexos_datatypes::Point3D<double>& end, const double endRotationX, const double endRotationY, const double endRotationZ);
 
 
 		void moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration, double rotationX, double rotationY, double rotationZ);

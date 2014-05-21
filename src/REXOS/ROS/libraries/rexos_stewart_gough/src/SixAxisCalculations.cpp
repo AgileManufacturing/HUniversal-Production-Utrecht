@@ -773,14 +773,16 @@ bool SixAxisCalculations::isValidMove(double angles[6]){
 
 bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double startRotationY, double startRotationZ, Point3D to, double endRotationX, double endRotationY, double endRotationZ){
 	
-		std::cout << "path check start" << std::endl;
-    	std::cout << "fromx: " << from.x << " fromy: " << from.y << " fromz: " << from.z << std::endl;
-		std::cout << "tox: " << to.x << " toy: " << to.y << " toz: " << to.z << std::endl;
-
+		//std::cout << "path check start" << std::endl;
+    	
 		//Calculate lengths to travel
     	double x_length = to.x - from.x;
     	double y_length = to.y - from.y;
     	double z_length = to.z - from.z;
+		
+		double xr_length = endRotationX - startRotationX;
+    	double yr_length = endRotationY - startRotationY;
+    	double zr_length = endRotationZ - startRotationZ;
 		
 		
 		
@@ -791,8 +793,14 @@ bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double 
     	double stepLengthX = x_length / largest_length;
     	double stepLengthY = y_length / largest_length;
     	double stepLengthZ = z_length / largest_length;
- 
-		std::cout << "path length: " << largest_length << std::endl;
+		
+		
+		double stepLengthXr = xr_length / largest_length;
+    	double stepLengthYr = yr_length / largest_length;
+    	double stepLengthZr = zr_length / largest_length;
+		
+
+		//std::cout << "path length: " << largest_length << std::endl;
 		
 		for(double step = 1; step <= largest_length; step++){
 			
@@ -800,7 +808,11 @@ bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double 
 			double y = (from.y + stepLengthY * step);
 			double z = (from.z + stepLengthZ * step);
 			
-			//std::cout << "checking coordinate: " << x << ", " << y << ", " << z << std::endl;
+			double xr = (startRotationX + stepLengthXr * step);
+			double yr = (startRotationY + stepLengthYr * step);
+			double zr = (startRotationZ + stepLengthZr * step);
+			
+			//std::cout << "checking coordinate: " << xr << ", " << yr << ", " << zr << std::endl;
 			
 			////BitmapCoordinate temp = fromRealCoordinate(rexos_datatypes::Point3D<double>(x, y, z));
 			//int index = temp.x + temp.y * width + temp.z * width * depth;
@@ -823,9 +835,13 @@ bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double 
 				//return false;
 			//}
 			
-			EffectorMove move = getMotorAngles(Point3D(x, y, z), 0, 0, 0);
+			EffectorMove move = getMotorAngles(Point3D(x, y, z), xr, yr, zr);
 			if(!move.validMove){
 				std::cout << "invalid position in path: " << move.moveTo << std::endl;
+						
+				std::cout << "fromx: " << from.x << " fromy: " << from.y << " fromz: " << from.z << std::endl;
+				std::cout << "tox: " << to.x << " toy: " << to.y << " toz: " << to.z << std::endl;
+ 
 				return false;
 			}
 			

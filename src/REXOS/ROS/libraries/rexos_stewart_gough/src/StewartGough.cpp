@@ -31,6 +31,7 @@
 #include <iostream>
 #include <string>
 #include <cstdio>
+#include <stdlib.h> 
 #include <stdexcept>
 #include <cmath>
 
@@ -110,8 +111,11 @@ namespace rexos_stewart_gough{
 			stewartGoughMeasures->base,
 			//stewartGoughMeasures->effector,
 			55.0, //effector retuns wrong value: 44.x, 19-05-2014
-			stewartGoughMeasures->maxAngleHipAnkle);
+			//stewartGoughMeasures->maxAngleHipAnkle
+			0.26
+			);
 
+		std::cout << " max angle: " << stewartGoughMeasures->maxAngleHipAnkle << std::endl; 
 	
 
        // kinematics = new InverseKinematics;
@@ -203,12 +207,39 @@ namespace rexos_stewart_gough{
 		//return true;
         //return boundaries->checkPath(begin, end);
     }
+	
+	/**
+     * Checks the path between two points.
+     * 
+     * @param begin The starting point.
+     * @param end The end point.
+     * 
+     * @return if the path between two points is valid.
+     **/
+	bool StewartGough::checkPath(const rexos_datatypes::Point3D<double>& begin,
+		const double beginRotationX,
+		const double beginRotationY,
+		const double beginRotationZ,
+		const rexos_datatypes::Point3D<double>& end,
+		const double endRotationX,
+		const double endRotationY,
+		const double endRotationZ){
+    		return sixAxisCalculations->checkPath(
+			SixAxisCalculations::Point3D(begin.x, begin.y, begin.z), 
+			beginRotationX, beginRotationY, beginRotationZ, //Rotations start
+			SixAxisCalculations::Point3D(end.x, end.y, end.z),
+			endRotationX, endRotationY, endRotationZ //Rotations end
+			);
+	}
+			
+	
+	
 
     /**
      * Gets the acceleration in radians/s² for a motor rotation with a certain relative angle and time, which is half acceleration and half deceleration (there is no period of constant speed).
      * 
-     * @param relativeAngle The relative angle
      * @param moveTime the move time.
+     * @param relativeAngle The relative angle
      *
      * @return the acceleration in radians/s²
      **/
@@ -271,7 +302,12 @@ namespace rexos_stewart_gough{
 			
 	
 			SixAxisCalculations::EffectorMove effectorMove;
+			
+			
+			
 			effectorMove = sixAxisCalculations->getMotorAngles(SixAxisCalculations::Point3D(point.x, point.y, point.z), rotationX, rotationY, rotationZ);
+			
+			
 			
 			//calc.getAngles(angles, SixAxisCalculations::Point3D(point.x/10, point.y/10, point.z/10), rotationX, rotationY, rotationZ);
 			if(!effectorMove.validMove){
@@ -297,10 +333,17 @@ namespace rexos_stewart_gough{
 			}
 		}
 
-		
 
+		
         // Check if the path fits within the boundaries
-        if(!checkPath(effectorLocation, point)){
+        if(!checkPath(effectorLocation,
+			currentEffectorRotationX,
+			currentEffectorRotationY,
+			currentEffectorRotationZ,
+			point,
+			rotationX,
+			rotationY,
+			rotationZ)){
             delete rotations[0];
             delete rotations[1];
             delete rotations[2];
@@ -309,6 +352,8 @@ namespace rexos_stewart_gough{
             delete rotations[5];
             throw std::out_of_range("invalid path");
         }
+			
+
 
         try{
             // An array to hold the relative angles for the motors
@@ -388,8 +433,14 @@ namespace rexos_stewart_gough{
                 }
                 motors[i]->writeRotationData(*rotations[i], currentMotionSlot);
             }
-
+			
+			
+			long timer2 = rexos_utilities::timeNow();
             motorManager->startMovement(currentMotionSlot);
+			std::cout << "start movement time: " << rexos_utilities::timeNow() - timer2 << "ms" << std::endl;
+		
+			
+			
         } catch(std::out_of_range& ex){
 			deleteMotorRotationObjects(rotations);
             throw ex;
@@ -619,54 +670,50 @@ namespace rexos_stewart_gough{
 		currentEffectorRotationZ = 0;
 		
 		
-		double ac = 600;
+		double ac = 1;
 		
-		for(int i = 0; i < 2000; i++){
 		
-			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), ac, 0, 0, 0);
+		int x, y, z;
+		double xr, yr, zr;
+		
+		int minX = -200;
+		int maxX = 200;
+		
+		int minY = -200;
+		int maxY = 200;
+		
+		int minZ = -270;
+		int maxZ = -310;
+		
+		
+		
+		int minRotation = -60;
+		int maxRotation = 60;
+
+		
+		
+		for(int i = 0; i < 2000000; i++){
 			
-			//sleep(1);
-			
-			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), ac, 0, 0, 0);
-			
-			//sleep(1);
-			
-			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), ac, 0, 0, 0);
-			
-			
-			
-			
-			//sleep(1);
-			
-			moveTo(rexos_datatypes::Point3D<double>(0, 50, -280), ac, 0, 0, 0);
-			
-			//sleep(1);
-			
-			moveTo(rexos_datatypes::Point3D<double>(0, -50, -280), ac, 0, 0, 0);
-			
-			//sleep(1);
-			
-			moveTo(rexos_datatypes::Point3D<double>(50, 0, -280), ac, 0, 0, 0);
-			
-			//sleep(1);
-			
-			moveTo(rexos_datatypes::Point3D<double>(-50, 0, -280), ac, 0, 0, 0);
+			x = (rand() % (maxX-minX))+minX;
+			y = (rand() % (maxY-minY))+minY;
+			z = (rand() % (maxZ-minZ))+minZ;
 			
 			
+			xr = (rand() % (maxRotation-minRotation))+minRotation;
+			yr = (rand() % (maxRotation-minRotation))+minRotation;
+			zr = (rand() % (maxRotation-minRotation))+minRotation;
+
+			xr = (xr/360.0) * M_PI;
+			yr = (yr/360.0) * M_PI;
+			zr = (zr/360.0) * M_PI;
 			
-			
-			//sleep(1);
-			
-			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), ac, 0, 0, 0);
-			
-			//sleep(1);
-			
-			moveTo(rexos_datatypes::Point3D<double>(0, 0, -300), ac, 0, 0, 0);
-			
-			//sleep(1);
-			
-			moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), ac, 0, 0, 0);
-			
+			try {
+				moveTo(rexos_datatypes::Point3D<double>(x, y, z), ac, xr, yr, zr);
+			} catch(std::out_of_range& ex){
+				std::cout << "Invalid position" << std::endl;
+				std::cout << "Position: " << x << ", " << y << ", " << z << std::endl; 
+				std::cout << "Rotation: " << xr << ", " << yr << ", " << zr << std::endl; 
+			}
 		
 		}
         std::cout << "[DEBUG] effector location z: " << effectorLocation.z << std::endl; 

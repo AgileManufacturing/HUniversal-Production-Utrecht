@@ -32,6 +32,9 @@
 #include <rexos_motor/MotorManager.h>
 #include <rexos_motor/CRD514KD.h>
 #include <rexos_motor/MotorException.h>
+
+#include <rexos_utilities/Utilities.h>
+
 using namespace std;
 
 extern "C"{
@@ -91,8 +94,12 @@ namespace rexos_motor{
 				
 		}
 		
+		
+		long timer2 = rexos_utilities::timeNow();
 		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
 		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
+		
+		std::cout << "modbus writeU16 time: " << (rexos_utilities::timeNow()-timer2) << std::endl;
 		
 		for(int i = 0; i < motors.size(); ++i){
 			if(motors[i]->isPoweredOn())
