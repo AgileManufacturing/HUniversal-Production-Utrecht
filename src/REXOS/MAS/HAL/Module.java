@@ -1,7 +1,5 @@
 package HAL;
 
-import java.util.ArrayList;
-
 import HAL.exceptions.FactoryException;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.BlackboardListener;
@@ -12,14 +10,25 @@ import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.knowledgedb_client.Row;
-
-public abstract class Module implements BlackboardListener{ 
+/**
+ * Abstract representation of a module in the HAL.
+ * @author Bas Voskuijlen
+ *
+ */
+public abstract class Module implements BlackboardListener { 
 	protected KnowledgeDBClient knowledgeDBClient;
 	protected ModuleIdentifier moduleIdentifier;
 	protected ModuleFactory moduleFactory;
 	protected ModuleListener moduleListener;
 	protected ProcessListener processListener;
 	
+	/**
+	 * Constructs a new Module and subscribes to the blackboardHandler.
+	 * @param moduleIdentifier
+	 * @param moduleFactory
+	 * @param moduleListener
+	 * @throws KnowledgeException
+	 */
 	public Module(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) 
 			throws KnowledgeException{
 		this.moduleIdentifier = moduleIdentifier;
@@ -34,7 +43,12 @@ public abstract class Module implements BlackboardListener{
 		return this.moduleIdentifier;
 	}
 	
-	public ArrayList<Integer> getMountPosition() {
+	/**
+	 * This method will return the mount position of the module on the mountplate of the equiplet.
+	 * @see http://wiki.agilemanufacturing.nl/index.php/Coordinate_systems
+	 * @return An integer array with 2 elements containing the zero-indexed x and y position on the mountplate (corresponding with the x and the -z axis in the equiplet coordinate system).
+	 */
+	public int[] getMountPosition() {
 		try{
 			String sql = "SELECT mountPointX, mountPointY FROM Module " +
 					"WHERE manufacturer = '" + moduleIdentifier.getManufacturer() +
@@ -43,9 +57,9 @@ public abstract class Module implements BlackboardListener{
 					"'";
 			Row[] resultSet = knowledgeDBClient.executeSelectQuery(sql);
 			if (resultSet.length == 1){
-				ArrayList<Integer> position = new ArrayList<Integer>();
-				position.add((Integer) resultSet[0].get("mountPointX"));
-				position.add((Integer) resultSet[0].get("mountPointY"));
+				int[] position = new int[2];
+				position[0] = (int) resultSet[0].get("mountPointX");
+				position[1] = (int) resultSet[0].get("mountPointY");
 				return position;
 			}
 			return null;
@@ -56,6 +70,12 @@ public abstract class Module implements BlackboardListener{
 		}
 	}
 	
+	/**
+	 * This method will return the parent module of this module
+	 * @return The parent module or null if no parent module exists
+	 * @throws FactoryException
+	 * @throws JarFileLoaderException
+	 */
 	public Module getParentModule() throws FactoryException, JarFileLoaderException {
 		try{
 			String sql = "SELECT * FROM Module " +
@@ -73,7 +93,7 @@ public abstract class Module implements BlackboardListener{
 			
 			Row[] resultSet = knowledgeDBClient.executeSelectQuery(sql);
 			
-			if (resultSet.length >= 1){
+			if (resultSet.length == 1){
 				ModuleIdentifier moduleIdentifier = new ModuleIdentifier(
 						resultSet[0].get("manufacturer").toString(),
 						resultSet[0].get("typeNumber").toString(),
@@ -89,23 +109,35 @@ public abstract class Module implements BlackboardListener{
 		}
 	}
 
-
+	/**
+	 * This method will return the properties of this specific module
+	 * @return
+	 */
 	public String getProperties() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
 	
+	/**
+	 * This method is called by the {@link BlackboardHandler} but is ignored.
+	 */
 	@Override
 	public void OnEquipletStateChanged(String equipletName, String state) {
 		// ignore
 	}
 
+	/**
+	 * This method is called by the {@link BlackboardHandler} but is ignored.
+	 */
 	@Override
 	public void OnEquipletModeChanged(String equipletName, String mode) {
 		// ignore
 	}
 
+	/**
+	 * This method is called by the {@link BlackboardHandler} but is ignored.
+	 */
 	@Override
 	public void OnEquipletIpChanged(String ip) {
 		// ignore

@@ -41,6 +41,7 @@ public class Pen extends ModuleActor {
 			//Adjust the move with the Pen module it's height.
 			command = adjustMoveWithDimentions(command, PEN_SIZE);
 			command.addProperty("maxAcceleration", MAX_ACCELERATION);
+			command.addProperty("forceStraightLine", true);
 			jsonCommand.add(COMMAND, command);
 			
 			//Translate it's parents composite steps into hardware steps.

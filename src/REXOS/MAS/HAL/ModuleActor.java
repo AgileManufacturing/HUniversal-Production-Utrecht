@@ -20,8 +20,12 @@ import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.blackboard_client.data_classes.InvalidJSONException;
 import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
-
-public abstract class ModuleActor extends Module {//implements mongolistener
+/**
+ * Abstract representation of a actor module in HAL 
+ * @author Bas Voskuijlen
+ *
+ */
+public abstract class ModuleActor extends Module {
 	protected static final String COMMAND = "command";
 	protected static final String MODULE_COMMAND = "module_command";
 	protected static final String DESTINATION = "destination";
@@ -33,10 +37,22 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 	protected static final String MOVE = "move";
 	
 	
-	
+	/**
+	 * The blackboard client used for writing the hardware steps.
+	 * The results from ROS are not processed with this client.
+	 */
 	protected BlackboardClient mongoClient;
 	protected static final String MONGO_HOST = "145.89.191.131";
 	
+	/**
+	 * Constructs a new ModuleActor and connects to the blackboard.
+	 * @param moduleIdentifier
+	 * @param moduleFactory
+	 * @param moduleListener
+	 * @throws KnowledgeException
+	 * @throws UnknownHostException
+	 * @throws GeneralMongoException
+	 */
 	public ModuleActor(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) 
 			throws KnowledgeException, UnknownHostException, GeneralMongoException {
 		super(moduleIdentifier, moduleFactory,moduleListener);
@@ -49,26 +65,37 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 			e.printStackTrace();
 		}
 	}
-	
 	public void setModuleListener(ModuleListener moduleListener){
 		this.moduleListener = moduleListener;
 	}
-	
+	/**
+	 * Executes a command by inserting it in the blackboard.
+	 * @param command
+	 * @throws ModuleExecutingException
+	 */
 	protected void executeMongoCommand(String command) throws ModuleExecutingException{
 		try {
 			mongoClient.insertDocument(command.toString());
-		} catch (InvalidJSONException e) {
-			throw new ModuleExecutingException("Executing invalid JSON",e);
-		} catch (InvalidDBNamespaceException e) {
-			throw new ModuleExecutingException("Executing invalid DBNamespace",e);
-		} catch (GeneralMongoException e) {
-			throw new ModuleExecutingException("General mongo exception while trying to execute",e);
+		} catch (InvalidJSONException ex) {
+			throw new ModuleExecutingException("Executing invalid JSON", ex);
+		} catch (InvalidDBNamespaceException ex) {
+			throw new ModuleExecutingException("Executing invalid DBNamespace", ex);
+		} catch (GeneralMongoException ex) {
+			throw new ModuleExecutingException("General mongo exception while trying to execute", ex);
 		}
 	}
 	
+	/**
+	 * Forwards the remainder of the {@link CompositeStep} to the parent after this module has translated the CompositeStep
+	 * @see http://wiki.agilemanufacturing.nl/index.php/HAL#Translation
+	 * @param compositeStep
+	 * @return The hardware steps resulted from the translation of the CompositeStep done by the parent modules.
+	 * @throws ModuleTranslatingException if the CompositeStep could not completely be translated (which is the case if there is no parent module and the CompositeStep is not empty)  
+	 * @throws FactoryException
+	 * @throws JarFileLoaderException
+	 */
 	protected ArrayList<HardwareStep> forwardCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException{
-		ModuleActor moduleActor = null;
-		moduleActor = (ModuleActor) getParentModule();
+		ModuleActor moduleActor = (ModuleActor) getParentModule();
 		if (moduleActor != null){
 			return(moduleActor.translateCompositeStep(compositeStep));
 		}
@@ -84,17 +111,37 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 			return null;
 		}
 	}
-	
+	/**
+	 * This method will execute the hardware step and forward any result to the {@link ProcessListener}
+	 * @param processListener
+	 * @param hardwareStep
+	 * @throws ModuleExecutingException
+	 */
 	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws ModuleExecutingException{
+		this.processListener = processListener;
 		JsonObject command = hardwareStep.getCommand();
 		executeMongoCommand(command.toString());
-		this.processListener = processListener;
 	}
+	/**
+	 * This method will translate the {@link CompositeStep} and forward the remainder to its parent.
+	 * @param compositeStep
+	 * @return The hardware steps resulted from the translation of the CompositeStep. 
+	 * @throws ModuleTranslatingException
+	 * @throws FactoryException
+	 * @throws JarFileLoaderException
+	 */
 	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException;
-	
+	/**
+	 * This method will forward the changed MAST module state to the {@link ModuleListener}
+	 * Do not call this method!
+	 */
 	public void onModuleStateChanged(String state){
 		moduleListener.onModuleStateChanged(state, this);
 	}
+	/**
+	 * This method will forward the changed MAST module mode to the {@link ModuleListener}
+	 * Do not call this method!
+	 */
 	public void onModuleModeChanged(String mode){
 		moduleListener.onModuleModeChanged(mode, this);
 	}
@@ -119,7 +166,10 @@ public abstract class ModuleActor extends Module {//implements mongolistener
 	public void onProcessStatusChanged(String state) {
 		// TODO Auto-generated method stub
 		try {
-			processListener.onProcessStateChanged(state, 0, this);
+			if(processListener != null){
+				processListener.onProcessStateChanged(state, 0, this);
+				processListener =null;
+			}
 		} catch (HardwareAbstractionLayerProcessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

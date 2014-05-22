@@ -1,7 +1,11 @@
 package HAL;
 
 import com.google.gson.JsonObject;
-
+/**
+ * This class provides a method of identifying modules
+ * @author Tommas Bakker
+ *
+ */
 public class ModuleIdentifier {
 	private String manufacturer;
 	private String typeNumber;

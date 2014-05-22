@@ -8,7 +8,11 @@ import HAL.factories.ModuleFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.HardwareStep;
-
+/**
+ * The thread that manages the execution of hardware steps
+ * @author Bas Voskuijlen
+ *
+ */
 public class ExecutionProcess implements Runnable, ProcessListener{
 	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
 	private ArrayList<HardwareStep> hardwareSteps;
@@ -28,6 +32,7 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 				moduleFactory.executeHardwareStep(this, hardwareSteps.get(0));
 				this.wait();
 			}
+			hardwareAbstractionLayerListener.onExecutionFinished();
 		} catch (Exception ex) {
 			// TODO Auto-generated catch block
 			ex.printStackTrace();
@@ -35,15 +40,18 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 	}
 
 	@Override
-	public void onProcessStateChanged(String state, long hardwareStepSerialId, Module module) throws HardwareAbstractionLayerProcessException{
-		if (hardwareSteps.size() > 0){
-			HardwareStep hardwareStep = hardwareSteps.get(0);
-			hardwareAbstractionLayerListener.onProcessStateChanged(state, hardwareStepSerialId, module, hardwareStep);
-			hardwareSteps.remove(0);
-			this.notify();
-		}
-		else {
-			throw new HardwareAbstractionLayerProcessException("No more hardwareSteps while there should be at least one more");
+	public synchronized void onProcessStateChanged(String state, long hardwareStepSerialId, Module module) throws HardwareAbstractionLayerProcessException{
+		System.out.println("State = "+ state);
+		if(state.equals("DONE")){
+			if (hardwareSteps.size() > 0){
+				HardwareStep hardwareStep = hardwareSteps.get(0);
+				hardwareAbstractionLayerListener.onProcessStateChanged(state, hardwareStepSerialId, module, hardwareStep);
+				hardwareSteps.remove(0);
+				this.notify();
+			}
+			else {
+				throw new HardwareAbstractionLayerProcessException("No more hardwareSteps while there should be at least one more");
+			}
 		}
 	}
 
