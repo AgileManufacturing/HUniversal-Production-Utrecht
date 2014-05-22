@@ -40,11 +40,13 @@ using namespace rexos_statemachine;
  **/
 StateMachine::StateMachine(std::string nodeName,std::vector<rexos_statemachine::Mode> modes):
 		listener(NULL),
-		currentState(STATE_SAFE),
-		currentMode(MODE_NORMAL),
+		currentState(STATE_OFFLINE),
+		currentMode(MODE_SERVICE),
 		modes(modes),
 		changeStateActionServer(nodeHandle, nodeName + "/change_state", boost::bind(&StateMachine::onChangeStateAction, this, _1), false),
 		changeModeActionServer(nodeHandle, nodeName + "/change_mode", boost::bind(&StateMachine::onChangeModeAction, this, _1), false),
+		transitionDeinitializeServer(nodeHandle, nodeName + "/transition_deinitialize", boost::bind(&StateMachine::onTransitionDeinitializeAction, this, &transitionDeinitializeServer), false),
+		transitionInitializeServer(nodeHandle, nodeName + "/transition_initialize", boost::bind(&StateMachine::onTransitionInitializeAction, this, &transitionInitializeServer), false),
 		transitionSetupServer(nodeHandle, nodeName + "/transition_setup", boost::bind(&StateMachine::onTransitionSetupAction, this, &transitionSetupServer), false),
 		transitionShutdownServer(nodeHandle, nodeName + "/transition_shutdown", boost::bind(&StateMachine::onTransitionShutdownAction, this, &transitionShutdownServer), false),
 		transitionStartServer(nodeHandle, nodeName + "/transition_start", boost::bind(&StateMachine::onTransitionStartAction, this, &transitionStartServer), false),
@@ -53,37 +55,47 @@ StateMachine::StateMachine(std::string nodeName,std::vector<rexos_statemachine::
 		changeModeActionClient(nodeHandle, nodeName + "/change_mode")
 {
 
+	StatePair transitionInitializeStatePair(STATE_OFFLINE, STATE_SAFE);
 	StatePair transitionSetupStatePair(STATE_SAFE, STATE_STANDBY);
 	StatePair transitionStartStatePair(STATE_STANDBY, STATE_NORMAL);
 	StatePair transitionStopStatePair(STATE_NORMAL, STATE_STANDBY);
 	StatePair transitionShutdownStatePair(STATE_STANDBY, STATE_SAFE);
+	StatePair transitionDeinitializeStatePair(STATE_SAFE, STATE_OFFLINE);
 
-	TransitionActionClient* transitionActionClientShutdown = new TransitionActionClient(nodeName + "/transition_shutdown",true);
+	TransitionActionClient* transitionActionClientDeinitialize = new TransitionActionClient(nodeName + "/transition_deinitialize",true);
+	TransitionActionClient* transitionActionClientInitialize = new TransitionActionClient(nodeName + "/transition_initialize",true);
 	TransitionActionClient* transitionActionClientSetup = new TransitionActionClient(nodeName + "/transition_setup",true);
-	TransitionActionClient* transitionActionClientStop = new TransitionActionClient(nodeName + "/transition_stop",true);
 	TransitionActionClient* transitionActionClientStart = new TransitionActionClient(nodeName + "/transition_start",true);
+	TransitionActionClient* transitionActionClientStop = new TransitionActionClient(nodeName + "/transition_stop",true);
+	TransitionActionClient* transitionActionClientShutdown = new TransitionActionClient(nodeName + "/transition_shutdown",true);
 
-	Transition *transitionShutdown = new Transition{transitionActionClientShutdown, STATE_SHUTDOWN};
-	Transition *transitionSetup = new Transition{transitionActionClientSetup, STATE_SETUP};
-	Transition *transitionStop = new Transition{transitionActionClientStop, STATE_STOP};
-	Transition *transitionStart = new Transition{transitionActionClientStart, STATE_START};
+	Transition* transitionDeinitialize = new Transition{transitionActionClientDeinitialize, STATE_DEINITIALIZE};
+	Transition* transitionInitialize = new Transition{transitionActionClientInitialize, STATE_INITIALIZE};
+	Transition* transitionShutdown = new Transition{transitionActionClientShutdown, STATE_SHUTDOWN};
+	Transition* transitionSetup = new Transition{transitionActionClientSetup, STATE_SETUP};
+	Transition* transitionStop = new Transition{transitionActionClientStop, STATE_STOP};
+	Transition* transitionStart = new Transition{transitionActionClientStart, STATE_START};
 
+	transitionMap[transitionInitializeStatePair]= {transitionInitialize,transitionDeinitialize,transitionInitializeStatePair};
+	transitionMap[transitionDeinitializeStatePair]= {transitionDeinitialize,NULL,transitionDeinitializeStatePair};
 	transitionMap[transitionSetupStatePair]= {transitionSetup,transitionShutdown,transitionSetupStatePair};
 	transitionMap[transitionShutdownStatePair]= {transitionShutdown,NULL,transitionShutdownStatePair};
 	transitionMap[transitionStartStatePair]= {transitionStart,transitionStop,transitionStartStatePair};
 	transitionMap[transitionStopStatePair]= {transitionStop,NULL,transitionStopStatePair};
 
-	modePossibleStates[MODE_NORMAL] = {STATE_NORMAL,STATE_STANDBY,STATE_SAFE, STATE_SETUP, STATE_SHUTDOWN, STATE_START, STATE_STOP};
-	modePossibleStates[MODE_SERVICE] = {STATE_NORMAL,STATE_STANDBY,STATE_SAFE, STATE_SETUP, STATE_SHUTDOWN, STATE_START, STATE_STOP};
-	modePossibleStates[MODE_ERROR] = {STATE_STANDBY,STATE_SAFE,STATE_SETUP,STATE_SHUTDOWN,STATE_STOP};
-	modePossibleStates[MODE_CRITICAL_ERROR] = {STATE_SAFE,STATE_STOP,STATE_SHUTDOWN};
-	modePossibleStates[MODE_E_STOP] = {STATE_SAFE};
-	modePossibleStates[MODE_LOCK] = {STATE_NORMAL,STATE_STANDBY,STATE_SAFE, STATE_STOP};
-	modePossibleStates[MODE_STEP] = {STATE_NORMAL,STATE_STANDBY,STATE_SAFE, STATE_SETUP, STATE_SHUTDOWN, STATE_START, STATE_STOP};
+	modePossibleStates[MODE_NORMAL] = 			{					STATE_SAFE, STATE_STANDBY, STATE_NORMAL, 												STATE_SETUP, 	STATE_SHUTDOWN, 	STATE_START, 	STATE_STOP};
+	modePossibleStates[MODE_SERVICE] =	 		{STATE_OFFLINE, 	STATE_SAFE, STATE_STANDBY, STATE_NORMAL, 	STATE_INITIALIZE, 	STATE_DEINITIALIZE, 	STATE_SETUP, 	STATE_SHUTDOWN, 	STATE_START, 	STATE_STOP};
+	modePossibleStates[MODE_ERROR] = 			{					STATE_SAFE, STATE_STANDBY, 																STATE_SETUP, 	STATE_SHUTDOWN, 					STATE_STOP};
+	modePossibleStates[MODE_CRITICAL_ERROR] = 	{STATE_OFFLINE, 	STATE_SAFE, 													STATE_DEINITIALIZE, 					STATE_SHUTDOWN, 					STATE_STOP};
+	modePossibleStates[MODE_E_STOP] = 			{					STATE_SAFE};
+	modePossibleStates[MODE_LOCK] = 			{					STATE_SAFE, STATE_STANDBY, STATE_NORMAL, 																									STATE_STOP};
+	modePossibleStates[MODE_STEP] = 			{					STATE_SAFE, STATE_STANDBY, STATE_NORMAL, 												STATE_SETUP, 	STATE_SHUTDOWN, 	STATE_START, 	STATE_STOP};
 
 	changeStateActionServer.start();
 	changeModeActionServer.start();
 
+	transitionInitializeServer.start();
+	transitionDeinitializeServer.start();
 	transitionSetupServer.start();
 	transitionShutdownServer.start();
 	transitionStartServer.start();
@@ -91,7 +103,23 @@ StateMachine::StateMachine(std::string nodeName,std::vector<rexos_statemachine::
 }
 
 StateMachine::~StateMachine() {
-	delete listener;
+	/*delete transitionActionClientStart;
+	delete transitionActionClientStop;
+	delete transitionActionClientSetup;
+	delete transitionActionClientShutdown;
+
+	delete transitionStart;
+	delete transitionStop ;
+	delete transitionSetup;
+	delete transitionShutdown;*/
+}
+
+void StateMachine::onTransitionInitializeAction(TransitionActionServer* as){
+	transitionInitialize(as);
+}
+
+void StateMachine::onTransitionDeinitializeAction(TransitionActionServer* as){
+	transitionDeinitialize(as);
 }
 
 void StateMachine::onTransitionSetupAction(TransitionActionServer* as){
@@ -185,7 +213,7 @@ bool StateMachine::_changeState(rexos_statemachine::State newState) {
 			if (transitionActionClient->getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
 				_setState(changeStateEntry.statePair.second);
 			} else if(changeStateEntry.abortTransition == NULL) {
-				throw new std::logic_error("Trying to access a null abortTransitions state");
+				throw std::logic_error("Trying to access a null abortTransitions state");
 			} else if(transitionActionClient->getState() == actionlib::SimpleClientGoalState::PREEMPTED) {
 			} else if(transitionActionClient->getState() == actionlib::SimpleClientGoalState::PENDING) {
 			} else{

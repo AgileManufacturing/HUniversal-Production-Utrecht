@@ -39,16 +39,13 @@ public class DynamicClassFactory<T> {
 	 * @var Hashtable<Long, DynamicClassData> softwareCache
 	 * A cache holding the DynamicClassData for each id.
 	 **/
-	private Hashtable<Long, DynamicClassData>softwareCache;
-	
-	private Class<T> type;
+	private Hashtable<Integer, DynamicClassData> softwareCache;
 	
 	/**
 	 * Constructs a new DynamicClassFactory.
 	 **/
-	public DynamicClassFactory(Class<T> type) {
-		this.type = type;
-		softwareCache = new Hashtable<Long, DynamicClassData>();
+	public DynamicClassFactory() {
+		softwareCache = new Hashtable<Integer, DynamicClassData>();
 	}
 	
 	/**
@@ -56,11 +53,12 @@ public class DynamicClassFactory<T> {
 	 * @param description DynamicClassDescription containing the relevant information for the software.
 	 * @return A DynamicClassLoader that is able to create an object for the given description.
 	 * @throws InstantiateClassException No loader could be created.
+	 * @throws JarFileLoaderException 
 	 **/
-	private DynamicClassLoader getClassLoader(DynamicClassDescription description) throws InstantiateClassException {
+	private DynamicClassLoader getClassLoader(DynamicClassDescription description) throws InstantiateClassException, JarFileLoaderException {
 		DynamicClassData entry = softwareCache.get(description.getId());
 		if (entry == null) {
-			entry = new DynamicClassData(description);
+			entry = new DynamicClassData(description, description.getJarFileLoader());
 			softwareCache.put(description.getId(), entry);
 		}
 		// Update the description.
@@ -77,17 +75,14 @@ public class DynamicClassFactory<T> {
 	 * @throws InstantiateClassException The object of the specified class could not be instantiated.
 	 *
 	 **/
-	private T createObjectWithLoader(DynamicClassLoader loader, String className) throws InstantiateClassException {
+	private Class<T> getClassWithLoader(DynamicClassLoader loader, String className) throws InstantiateClassException {
 		try {
-			Class<?> cls = loader.loadClass(className);
-			
-			Object obj = cls.newInstance();
-			return type.cast(obj);
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-			throw new InstantiateClassException("Failed to instantiate object of class " + className, e);
+			return (Class<T>) loader.loadClass(className);
+		} catch (ClassNotFoundException ex) {
+			throw new InstantiateClassException("Failed to instantiate object of class " + className, ex);
 		} catch (ClassCastException ce) {
-			throw new InstantiateClassException("The described class " + className + " is not castable to "
-					+ type.getName(), ce);
+			throw new InstantiateClassException("The described class " + className + " is not castable to "/*
+					+ String.class.getName()*/, ce);
 		}
 	}
 	
@@ -96,11 +91,12 @@ public class DynamicClassFactory<T> {
 	 * @param description DynamicClassDescription containing the relevant information for the software.
 	 * @return An object of the class specified in the description.
 	 * @throws InstantiateClassException The object of the specified class could not be instantiated.
+	 * @throws JarFileLoaderException 
 	 *
 	 **/
-	public T createObjectFromDescription(DynamicClassDescription description) throws InstantiateClassException {
+	public Class<T> getClassFromDescription(DynamicClassDescription description) throws InstantiateClassException, JarFileLoaderException {
 			DynamicClassLoader loader = getClassLoader(description);
-			return createObjectWithLoader(loader, description.getClassName());
+			return getClassWithLoader(loader, description.getClassName());
 	}
 	
 	/**
@@ -111,12 +107,12 @@ public class DynamicClassFactory<T> {
 	 * @return An object of type T that is up to date according to the given description.
 	 * @throws InstantiateClassException The object of the specified class could not be instantiated.
 	 **/
-	public T createNewObjectIfOutdated(DynamicClassDescription description, T obj) throws InstantiateClassException {
+/*	public T gObjectIfOutdated(DynamicClassDescription description, T obj) throws InstantiateClassException {
 		T objToReturn = obj;
 		DynamicClassLoader loader = getClassLoader(description);
 		if (obj == null || !obj.getClass().getClassLoader().equals(loader)) {
 			objToReturn = createObjectWithLoader(loader, description.getClassName());
 		}
 		return objToReturn;
-	}
+	}*/
 }

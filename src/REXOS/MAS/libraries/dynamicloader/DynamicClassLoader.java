@@ -56,8 +56,8 @@ public class DynamicClassLoader extends ClassLoader {
 	 * @param name The name of the class.
 	 * @return Whether or not the specified class has been registered for loading.
 	 **/
-	public boolean isClassRegistered(String name) {
-		return registeredClasses.containsKey(name);
+	public boolean isClassRegistered(String className) {
+		return registeredClasses.containsKey(className);
 	}
 	
 	/**
@@ -65,8 +65,8 @@ public class DynamicClassLoader extends ClassLoader {
 	 * @param name The name of the class.
 	 * @param data A byte[] containing the definition of the class. (i.e. contents of the .class file)
 	 **/
-	public void registerClass(String name, byte[] data) {
-		registeredClasses.put(name, data);
+	public void registerClass(String className, byte[] data) {
+		registeredClasses.put(className, data);
 	}
 	
 	/**
@@ -75,12 +75,12 @@ public class DynamicClassLoader extends ClassLoader {
 	 * @return The resulting Class object.
 	 * @see java.lang.ClassLoader#loadClass(java.lang.String)
 	 **/
-	public Class<?> loadClass(String name) throws ClassNotFoundException {
-		if (!registeredClasses.containsKey(name)) {
-			return super.loadClass(name);
+	public Class<?> loadClass(String className) throws ClassNotFoundException {
+		if (!registeredClasses.containsKey(className)) {
+			return super.loadClass(className);
 		}
-		
-		byte[] classData = registeredClasses.get(name);
-		return defineClass(name, classData, 0, classData.length);
+		System.out.println(registeredClasses.toString());
+		byte[] classData = registeredClasses.get(className);
+		return defineClass(className, classData, 0, classData.length);
 	}
 }

@@ -11,8 +11,11 @@
   <buildtool_depend>catkin</buildtool_depend>
     <build_depend>libjson</build_depend>
     <build_depend>rexos_utilities</build_depend>
+    <build_depend>rexos_knowledge_database</build_depend>
     <run_depend>libjson</run_depend>
     <run_depend>rexos_utilities</run_depend>
+    <run_depend>rexos_knowledge_database</run_depend>
+
   <export>
     <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lrexos_datatypes"/>
   </export>

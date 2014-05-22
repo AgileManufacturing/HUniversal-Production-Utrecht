@@ -40,13 +40,14 @@
 #include "equiplet_node/RegisterModule.h"
 #include <rexos_knowledge_database/rexos_knowledge_database.h>
 #include <rexos_knowledge_database/Module.h>
+#include <rexos_knowledge_database/ModuleIdentifier.h>
 
 
 
 class CameraControlNode : public rexos_statemachine::ModuleStateMachine, 
 		public rexos_knowledge_database::Module{
 public:
-	CameraControlNode(int equipletId, std::string cameraManufacturer, std::string cameraTypeNumber, std::string cameraSerialNumber);
+	CameraControlNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
 	
 	/**
 	 * calls increaseExposure service of the camera_node
@@ -64,6 +65,8 @@ public:
 
 	void run();
 	
+	virtual void transitionInitialize(rexos_statemachine::TransitionActionServer* as);
+	virtual void transitionDeinitialize(rexos_statemachine::TransitionActionServer* as);
 	/**
 	 * MAST transition from safe to standby is handled by this method. 
 	 * see http://wiki.agilemanufacturing.nl/index.php/Vision_system#camera_control_node
@@ -101,10 +104,6 @@ private:
 	 * Used for calling some services of the camera_node which have no srv file specified
 	 **/
 	std_srvs::Empty emptyService;
-	
-	int equipletId;
-	int cameraModuleId;
-	int lensModuleId;
 };
 
 #endif /* CAMERACONTROLNODE_H_ */

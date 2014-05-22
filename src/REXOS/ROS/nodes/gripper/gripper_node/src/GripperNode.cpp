@@ -47,29 +47,16 @@
 /**
  * Constructor
  **/
-GripperNode::GripperNode(int equipletID, int moduleID) :
-	rexos_statemachine::ModuleStateMachine("gripper_node", equipletID, moduleID, true),
-	setInstructionActionServer(nodeHandle, "gripper_node/set_instruction", boost::bind(&GripperNode::onSetInstruction, this, _1), false) {
+GripperNode::GripperNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier) :
+		rexos_statemachine::ModuleStateMachine(equipletName, moduleIdentifier, true),
+		setInstructionActionServer(
+				nodeHandle, 
+				moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() + "/set_instruction", 
+				boost::bind(&GripperNode::onSetInstruction, this, _1), 
+				false) {
 
 	std::cout << "[DEBUG] Opening modbus connection" << std::endl;
 
-	/*
-		modbusContext = modbus_new_tcp(MODBUS_IP, MODBUS_PORT);
-
-		if (modbusContext == NULL) {
-			throw std::runtime_error("Unable to allocate libmodbus context");
-		}
-
-		if (modbus_connect(modbusContext) == -1) {
-			throw std::runtime_error("Modbus connection to IO controller failed");
-		}
-
-		assert(modbusContext != NULL);
-
-		modbus = new rexos_modbus::ModbusController(modbusContext);
-		controller = new rexos_gripper::InputOutputController(modbus);
-		gripper = new rexos_gripper::Gripper(controller, this, wrapperForGripperError);
-	*/
 }
 
 GripperNode::~GripperNode() {
@@ -127,6 +114,15 @@ void GripperNode::wrapperForGripperError(void* gripperNodeObject) {
  **/
 void GripperNode::error() {
 	//sendErrorMessage(-1);
+}
+
+void GripperNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as) {
+	ROS_INFO("Initialize transition called");
+}
+
+void GripperNode::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as) {
+	ROS_INFO("Deinitialize transition called");
+	ros::shutdown();
 }
 
 /**
@@ -217,28 +213,21 @@ std::string GripperNode::parseNodeValue(const std::string nodeName, const JSONNo
  * Main that starts the gripper node and its statemachine.
  **/
 int main(int argc, char** argv) {
-
 	ros::init(argc, argv, NODE_NAME);
-	int equipletID = 0;
-	int moduleID = 0;
 	
-	if (argc < 3) {
-		ROS_INFO("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
+	if(argc < 5){
+		ROS_ERROR("Usage: gripper_node equipletName manufacturer typeNumber serialNumber");
 		return -1;
 	}
+	
+	std::string equipletName = argv[1];
+	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
+	
+	ROS_INFO("Creating GripperNode");
 
-	try{
-		equipletID = rexos_utilities::stringToInt(argv[1]);
-		moduleID = rexos_utilities::stringToInt(argv[2]);
-	} catch(std::runtime_error ex) {
-		ROS_ERROR("Cannot read equiplet id and/or moduleId from commandline please use correct values.");
-		return -2;
-	}
+	GripperNode gripperNode(equipletName, moduleIdentifier);
 
-	std::cout << "Starting gripper node" << std::endl;
-
-	GripperNode gripperNode(equipletID, moduleID);
-
+	ROS_INFO("Running StateEngine");
 	ros::spin();
 	return 0;
 }

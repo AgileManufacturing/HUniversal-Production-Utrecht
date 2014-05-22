@@ -53,7 +53,7 @@ class DynamicClassData {
 	 * @var long lastModified
 	 * Timestamp indicating when the class data was last updated.
 	 **/
-	private long lastModified = 0;
+	private long buildNumber = 0;
 	
 	/**
 	 * @var SoftwareDescription description
@@ -71,14 +71,17 @@ class DynamicClassData {
 	 * @var SoftwareClassLoader loader
 	 * Current instance of the DynamicClassLoader for this class.
 	 **/
-	private DynamicClassLoader loader;
+	private DynamicClassLoader dynamicClassLoader;
+	
+	private JarFileLoader jarFileLoader;
 	
 	/**
 	 * Construct an object for the given description.
 	 * @param description DynamicClassDescription describing the class.
 	 **/
-	public DynamicClassData(DynamicClassDescription description) {
+	public DynamicClassData(DynamicClassDescription description, JarFileLoader jarFileLoader) {
 		this.description = description;
+		this.jarFileLoader = jarFileLoader;
 	}
 	
 	/**
@@ -94,8 +97,8 @@ class DynamicClassData {
 	 * Returns the last modified timestamp.
 	 * @return the last modified timestamp.
 	 **/
-	public long getLastModified() {
-		return lastModified;
+	public long getBuildNumber() {
+		return buildNumber;
 	}
 
 	/**
@@ -103,23 +106,24 @@ class DynamicClassData {
 	 * If updating the class data fails for whatever reason, a loader for the previous version is returned if available.
 	 * @return A SoftwareClassLoader for the class represented by this object.
 	 * @throws InstantiateClassException Retrieving the class data failed.
+	 * @throws JarFileLoaderException 
 	 **/
-	public DynamicClassLoader getLoader() throws InstantiateClassException {
+	public DynamicClassLoader getLoader() throws InstantiateClassException, JarFileLoaderException {
 		// Attempt to update the class data.
 		// If an error occurs but a previous version is in cache, use that instead.
 		try {
 			updateClassData();
 		} catch (IOException ex) {
-			if (loader == null) {
+			if (dynamicClassLoader == null) {
 				throw new InstantiateClassException("Failed to retrieve software.", ex);
 			}
 		}
 		if (classDataChanged) {
 			setLoader(new DynamicClassLoader(DynamicClassData.class.getClassLoader()));
-			loader.registerClass(description.getClassName(), classData);
+			dynamicClassLoader.registerClass(description.getClassName(), classData);
 			classDataChanged = false;
 		}
-		return loader;
+		return dynamicClassLoader;
 	}
 	
 	/**
@@ -138,7 +142,7 @@ class DynamicClassData {
 	 **/
 	public void setDescription(DynamicClassDescription description) {
 		if (!description.equals(this.description)) {
-			this.lastModified = 0;
+			this.buildNumber = 0;
 			classDataChanged = true;
 		}
 		this.description = description;
@@ -148,8 +152,8 @@ class DynamicClassData {
 	 * Sets the last modified timestamp.
 	 * @param lastModified The last time the class data was updated.
 	 **/
-	private void setLastModified(long lastModified) {
-		this.lastModified = lastModified;
+	private void setBuildNumber(long buildNumber) {
+		this.buildNumber = buildNumber;
 	}
 	
 	/**
@@ -157,7 +161,7 @@ class DynamicClassData {
 	 * @param loader DynamicClassLoader capable of instantiating an object for the lastest version of the represented class.
 	 **/
 	private void setLoader(DynamicClassLoader loader) {
-		this.loader = loader;
+		this.dynamicClassLoader = loader;
 	}
 	
 	/**
@@ -188,10 +192,15 @@ class DynamicClassData {
 	/**
 	 * Attempts to update the stored class data to the latest version if available.
 	 * @throws IOException Retrieving an updated version of the class data failed.
+	 * @throws JarFileLoaderException 
 	 **/
-	private void updateClassData() throws IOException {
+	private void updateClassData() throws IOException, JarFileLoaderException {
+		
+		
+		byte[] data = jarFileLoader.loadJarFile();
+		
 		JarFile jarFile = null;
-		URL jarLocationURL = new URL(description.getJarLocation());
+		/*URL jarLocationURL = new URL(description.getJarLocation());
 		URLConnection con = jarLocationURL.openConnection();
 		
 		// Set last modified date so new data is only obtained when something has actually changed.
@@ -204,16 +213,17 @@ class DynamicClassData {
 		while ((data = inputStream.read()) != -1) {
 			buffer.write(data);
 		}
-		inputStream.close();
+		inputStream.close();*/
 		
-		if (buffer.size() > 1) {
-			int lastSlashPos = jarLocationURL.getPath().lastIndexOf('/');
-			String jarFileName = jarLocationURL.getPath().substring(lastSlashPos > -1 ? lastSlashPos + 1 : 0);
+		if (data.length > 1) {
+			//int lastSlashPos = jarLocationURL.getPath().lastIndexOf('/');
+			//String jarFileName = jarLocationURL.getPath().substring(lastSlashPos > -1 ? lastSlashPos + 1 : 0);
+			String jarFileName = description.getId() + ".jar";
 			File file = new File(jarFileName);
-			file.deleteOnExit();
+			//file.deleteOnExit();
 			FileOutputStream fos = new FileOutputStream(file);
 			try {
-				fos.write(buffer.toByteArray());
+				fos.write(data);
 			}
 			finally {
 				fos.close();
@@ -224,7 +234,7 @@ class DynamicClassData {
 		if (jarFile != null) {
 			try {
 				setClassData(extractClassDataFromJar(jarFile, description.getClassName()));
-				setLastModified(con.getLastModified());
+				setBuildNumber(jarFileLoader.getBuildNumber());
 			}
 			finally {
 				jarFile.close();

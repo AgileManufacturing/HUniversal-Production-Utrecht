@@ -3,7 +3,7 @@ project(part_locator_node)
 
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation vision_node vectors matrices rexos_coordinates rexos_utilities environment_cache environment_communication_msgs)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation vision_node vectors matrices rexos_statemachine rexos_coordinates rexos_utilities environment_cache environment_communication_msgs)
 find_package(OpenCV REQUIRED COMPONENTS)
 find_package(Mongo)
 

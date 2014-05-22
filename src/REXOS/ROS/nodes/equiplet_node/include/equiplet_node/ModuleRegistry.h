@@ -16,13 +16,16 @@
 
 #include "equiplet_node/ModuleRegistryListener.h"
 
+#include <rexos_knowledge_database/ModuleIdentifier.h>
+#include <rexos_knowledge_database/Equiplet.h>
+
 namespace equiplet_node {
 
 class EquipletNode;
 
 class ModuleRegistry : public equiplet_node::ModuleProxyListener {
 public:
-	ModuleRegistry(std::string nodeName, int equipletId, ModuleRegistryListener* mrl = NULL);
+	ModuleRegistry(std::string equipletName, ModuleRegistryListener* mrl = NULL);
 	virtual ~ModuleRegistry();
 
 	void setModuleRegistryListener(ModuleRegistryListener* mrl);
@@ -39,7 +42,7 @@ public:
 
 	std::vector<ModuleProxy*> getRegisteredModules();
 
-	ModuleProxy* getModule(int moduleId);
+	ModuleProxy* getModule(rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
 
 private:
 	bool onRegisterServiceModuleCallback(RegisterModule::Request &req, RegisterModule::Response &res);
@@ -50,7 +53,7 @@ private:
 	ros::ServiceServer registerModuleServiceServer;
 
 	bool newRegistrationsAllowed;
-	int equipletId;
+	std::string equipletName;
 
 	std::vector<ModuleProxy*> registeredModules;
 };

@@ -48,17 +48,6 @@
           <File Name="src/REXOS/ROS/nodes/_depricated/crate_locator_node/src/CrateLocatorNode.cpp"/>
         </VirtualDirectory>
       </VirtualDirectory>
-      <VirtualDirectory Name="dummy_module_node">
-        <VirtualDirectory Name="include">
-          <VirtualDirectory Name="dummy_module_node">
-            <File Name="src/REXOS/ROS/nodes/_depricated/dummy_module_node/include/dummy_module_node/DummyModuleNode.h"/>
-            <File Name="src/REXOS/ROS/nodes/_depricated/dummy_module_node/include/dummy_module_node/Services.h"/>
-          </VirtualDirectory>
-        </VirtualDirectory>
-        <VirtualDirectory Name="src">
-          <File Name="src/REXOS/ROS/nodes/_depricated/dummy_module_node/src/DummyModuleNode.cpp"/>
-        </VirtualDirectory>
-      </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="environment_cache">
       <VirtualDirectory Name="environment_cache_node">
@@ -134,10 +123,6 @@
     <VirtualDirectory Name="gripper">
       <VirtualDirectory Name="gripper_node">
         <VirtualDirectory Name="include">
-          <VirtualDirectory Name="GripperNode">
-            <File Name="src/REXOS/ROS/nodes/gripper/gripper_node/include/GripperNode/GripperNode.h"/>
-            <File Name="src/REXOS/ROS/nodes/gripper/gripper_node/include/GripperNode/Services.h"/>
-          </VirtualDirectory>
           <VirtualDirectory Name="gripper_node">
             <File Name="src/REXOS/ROS/nodes/gripper/gripper_node/include/gripper_node/GripperNode.h"/>
             <File Name="src/REXOS/ROS/nodes/gripper/gripper_node/include/gripper_node/Services.h"/>
@@ -149,6 +134,17 @@
         <VirtualDirectory Name="src">
           <File Name="src/REXOS/ROS/nodes/gripper/gripper_node/src/GripperNode.cpp"/>
         </VirtualDirectory>
+      </VirtualDirectory>
+    </VirtualDirectory>
+    <VirtualDirectory Name="node_spawner_node">
+      <VirtualDirectory Name="include">
+        <VirtualDirectory Name="node_spawner_node">
+          <File Name="src/REXOS/ROS/nodes/node_spawner_node/include/node_spawner_node/NodeSpawnerNode.h"/>
+        </VirtualDirectory>
+      </VirtualDirectory>
+      <VirtualDirectory Name="src">
+        <File Name="src/REXOS/ROS/nodes/node_spawner_node/src/node_spawner_node.cpp"/>
+        <File Name="src/REXOS/ROS/nodes/node_spawner_node/src/NodeSpawnerNode.cpp"/>
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="part_follow_node">
@@ -341,18 +337,24 @@
       <VirtualDirectory Name="include">
         <VirtualDirectory Name="rexos_knowledge_database">
           <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/include/rexos_knowledge_database/KnowledgeDatabaseException.h"/>
+          <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/include/rexos_knowledge_database/ModuleTypeIdentifier.h"/>
           <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/include/rexos_knowledge_database/Module.h"/>
           <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/include/rexos_knowledge_database/Equiplet.h"/>
           <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/include/rexos_knowledge_database/rexos_knowledge_database.h"/>
+          <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/include/rexos_knowledge_database/ModuleIdentifier.h"/>
+          <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/include/rexos_knowledge_database/RosSoftware.h"/>
           <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/include/rexos_knowledge_database/ModuleType.h"/>
         </VirtualDirectory>
       </VirtualDirectory>
       <VirtualDirectory Name="src">
+        <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/src/RosSoftware.cpp"/>
+        <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/src/ModuleTypeIdentifier.cpp"/>
         <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/src/rexos_knowledge_database.cpp"/>
         <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/src/Module.cpp"/>
         <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/src/Equiplet.cpp"/>
         <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/src/KnowledgeDatabaseException.cpp"/>
         <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/src/ModuleType.cpp"/>
+        <File Name="src/REXOS/ROS/libraries/rexos_knowledge_database/src/ModuleIdentifier.cpp"/>
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="rexos_most">
@@ -522,6 +524,16 @@
       <VirtualDirectory Name="src">
         <File Name="src/REXOS/ROS/libraries/camera/src/unicap_cv_bridge.cpp"/>
         <File Name="src/REXOS/ROS/libraries/camera/src/RectifyImage.cpp"/>
+      </VirtualDirectory>
+    </VirtualDirectory>
+    <VirtualDirectory Name="rexos_node_spawner">
+      <VirtualDirectory Name="include">
+        <VirtualDirectory Name="rexos_node_spawner">
+          <File Name="src/REXOS/ROS/libraries/rexos_node_spawner/include/rexos_node_spawner/NodeSpawner.h"/>
+        </VirtualDirectory>
+      </VirtualDirectory>
+      <VirtualDirectory Name="src">
+        <File Name="src/REXOS/ROS/libraries/rexos_node_spawner/src/NodeSpawner.cpp"/>
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="rexos_utilities">

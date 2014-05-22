@@ -37,19 +37,20 @@ import java.util.Properties;
 
 public class Configuration {
 	private static String propertiesFilePath = System.getenv("PROPERTIESPATH");
+	//private static String propertiesFilePath = "src/REXOS/MAS/configuration/";
 	
-	public static String getProperty(ConfigurationFiles File, String key)
+	public static String getProperty(ConfigurationFiles file, String key)
 	{
-		if(File != ConfigurationFiles.EQUIPLET_DB_PROPERTIES){
-			return getProperty(File, key, null);
+		if(file != ConfigurationFiles.EQUIPLET_DB_PROPERTIES){
+			return getProperty(file, key, null);
 		} else {
-			System.out.println("Need a equiplet name to read equiplet db properties");
+			System.err.println("Need a equiplet name to read equiplet db properties");
 			return "";
 		}
 	}
 	
 	
-	public static String getProperty(ConfigurationFiles File, String key, String EquipletName)
+	public static String getProperty(ConfigurationFiles File, String key, String equipletName)
 	{
 		Properties p = new Properties();
 		try { 
@@ -57,7 +58,7 @@ public class Configuration {
 			{
 				case EQUIPLET_DB_PROPERTIES:
 					p.load(new FileInputStream(propertiesFilePath + File.getFileName()));
-					return p.getProperty(EquipletName + key);
+					return p.getProperty(equipletName + key);
 					
 				default:
 					if(File != null){
@@ -68,11 +69,14 @@ public class Configuration {
 					break;
 			}
 		}catch(NullPointerException e) {
-			System.out.println("Property doesnt exist: " + key + " in file " + File.toString());
+			System.err.println("Property doesnt exist: " + key + " in file " + File.toString());
 		} catch (FileNotFoundException e) {
-			System.out.println("File doesnt exist: " + File.toString());
+			System.err.println(
+					"File doesnt exist: " + File.toString() + 
+					", using path: " + propertiesFilePath + 
+					", using working directory: " + System.getProperty("user.dir"));
 		} catch (IOException e) {
-			System.out.println(e);
+			System.err.println(e);
 		}
 		return "";
 	}
@@ -82,7 +86,7 @@ public class Configuration {
 		if(File != ConfigurationFiles.EQUIPLET_DB_PROPERTIES){
 			return getPropertyInt(File, key, null);
 		} else {
-			System.out.println("Need a equiplet name to read equiplet db properties");
+			System.err.println("Need a equiplet name to read equiplet db properties");
 			return -1;
 		}
 	}
@@ -92,7 +96,7 @@ public class Configuration {
 		try {
 			return Integer.parseInt(getProperty(File, key, EquipletName));
 		} catch(NumberFormatException e){
-			System.out.println("Cant parse integer in configurationfile: " + File.getFileName());
+			System.err.println("Cant parse integer in configurationfile: " + File.getFileName());
 			return -1;
 		}
 	}

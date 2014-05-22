@@ -54,20 +54,18 @@ void FiducialDetector::handleFrame(cv::Mat& frame, cv::Mat* debugFrame) {
 	
 	if(debugFrame != NULL && debugImagePublisher.getNumSubscribers() != 0) {
 		// we are changing the image, so we need a copy
-		cv::Mat* debugImage = new cv::Mat(*debugFrame);
-		fiducialDetector.detect(frame, points, debugImage);
+		cv::Mat debugImage = cv::Mat(*debugFrame);
+		fiducialDetector.detect(frame, points, &debugImage);
 		
 		cv_bridge::CvImage cvi;
 		ros::Time time = ros::Time::now();
 		cvi.header.stamp = time;
 		cvi.header.frame_id = "fiducial_debug_image";
 		cvi.encoding = sensor_msgs::image_encodings::BGR8;
-		cvi.image = *debugImage;
+		cvi.image = debugImage;
 	
 		debugImagePublisher.publish(cvi.toImageMsg());
 		//cv::imwrite("/home/blagtoof/Desktop/test_results/trollolololol2.png", *image);
-	
-		delete debugImage;
 	} else {
 		fiducialDetector.detect(frame, points);
 	}

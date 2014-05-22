@@ -54,7 +54,7 @@ class EquipletStateMachine :
 	ModuleRegistryListener {
 
 public:
-	EquipletStateMachine(std::string name, int id);
+	EquipletStateMachine(std::string name);
 
 	virtual ~EquipletStateMachine();
 
@@ -72,6 +72,8 @@ private:
 
 	void changeModuleStates(rexos_statemachine::State desiredState);
 
+	virtual void transitionInitialize(rexos_statemachine::TransitionActionServer* as);
+	virtual void transitionDeinitialize(rexos_statemachine::TransitionActionServer* as);
 	virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
 	virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
 	virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);

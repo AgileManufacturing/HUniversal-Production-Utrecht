@@ -75,9 +75,11 @@ namespace deltaRobotNodeNamespace{
 		
 		
 	public:
-		DeltaRobotNode(int equipletID, int moduleID, std::string manufacturer, std::string typeNumber, std::string serialNumber);
+		DeltaRobotNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
 		virtual ~DeltaRobotNode();
 		
+		virtual void transitionInitialize(rexos_statemachine::TransitionActionServer* as);
+		virtual void transitionDeinitialize(rexos_statemachine::TransitionActionServer* as);
 		virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
 		virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
 		virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
@@ -99,7 +101,6 @@ namespace deltaRobotNodeNamespace{
 		float lastX;
 		float lastY;
 		float lastZ;
-		std::string moduleNodeName;
 		/**
 		 * @var ros::NodeHandle node
 		 * The nodeHandle used by ros services and topics

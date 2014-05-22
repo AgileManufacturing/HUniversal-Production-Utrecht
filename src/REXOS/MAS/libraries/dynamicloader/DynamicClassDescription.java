@@ -37,19 +37,7 @@ public class DynamicClassDescription {
 	 * @var long id
 	 * The ID (corresponding to the Knowledge Database) of this piece of software.
 	 **/
-	private long id;
-	
-	/**
-	 * @var String name
-	 * The name of this piece of software.
-	 **/
-	private String name;
-	
-	/**
-	 * @var String description
-	 * A description of the software.
-	 **/
-	private String description;
+	private int id;
 	
 	/**
 	 * @var String className
@@ -57,13 +45,7 @@ public class DynamicClassDescription {
 	 **/
 	private String className;
 	
-	/**
-	 * @var String jarLocation
-	 * The location of the jar containing the data for the representing class.
-	 **/
-	private String jarLocation;
-
-	
+	private JarFileLoader jarFileLoader;
 	/**
 	 * Constructs a new DynamicClassDescription object.
 	 * @param ID The ID (corresponding to the Knowledge Database) of this piece of software.
@@ -72,36 +54,18 @@ public class DynamicClassDescription {
 	 * @param className The (fully distinguished) name of the class that represents this object.
 	 * @param jarLocation The location of the jar containing the data for the representing class.
 	 **/
-	public DynamicClassDescription(long ID, String name, String description, String className, String jarLocation) {
-		this.id = ID;
-		this.name = name;
-		this.description = description;
+	public DynamicClassDescription(int id, String className, JarFileLoader jarFileLoader) {
+		this.id = id;
 		this.className = className;
-		this.jarLocation = jarLocation;
+		this.jarFileLoader = jarFileLoader;
 	}
 
 	/**
 	 * Returns the ID (corresponding to the Knowledge Database) of this piece of software.
 	 * @return The ID (corresponding to the Knowledge Database) of this piece of software.
 	 **/
-	public long getId() {
+	public int getId() {
 		return id;
-	}
-
-	/**
-	 * Returns the name of this piece of software.
-	 * @return The name of this piece of software.
-	 **/
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * Returns the description of the software.
-	 * @return The description of the software.
-	 **/
-	public String getDescription() {
-		return description;
 	}
 
 	/**
@@ -111,13 +75,9 @@ public class DynamicClassDescription {
 	public String getClassName() {
 		return className;
 	}
-
-	/**
-	 * Returns the location of the jar containing the data for the representing class.
-	 * @return The location of the jar containing the data for the representing class.
-	 **/
-	public String getJarLocation() {
-		return jarLocation;
+	
+	public JarFileLoader getJarFileLoader() {
+		return jarFileLoader;
 	}
 
 	/**
@@ -130,11 +90,6 @@ public class DynamicClassDescription {
 		result = prime * result + (int) (id ^ (id >>> 32));
 		result = prime * result
 				+ ((className == null) ? 0 : className.hashCode());
-		result = prime * result
-				+ ((description == null) ? 0 : description.hashCode());
-		result = prime * result
-				+ ((jarLocation == null) ? 0 : jarLocation.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
 
@@ -156,21 +111,6 @@ public class DynamicClassDescription {
 			if (other.className != null)
 				return false;
 		} else if (!className.equals(other.className))
-			return false;
-		if (description == null) {
-			if (other.description != null)
-				return false;
-		} else if (!description.equals(other.description))
-			return false;
-		if (jarLocation == null) {
-			if (other.jarLocation != null)
-				return false;
-		} else if (!jarLocation.equals(other.jarLocation))
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
 			return false;
 		return true;
 	}

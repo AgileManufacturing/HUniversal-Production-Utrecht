@@ -49,9 +49,10 @@ const string PartLocatorNode::TOP_RIGHT_VALUE = "WP_800_400_TR";
 const string PartLocatorNode::BOTTOM_RIGHT_VALUE = "WP_800_400_BR";*/
 
 
-PartLocatorNode::PartLocatorNode(int equipletId, std::string cameraManufacturer, std::string cameraTypeNumber, std::string cameraSerialNumber):
-		rexos_knowledge_database::Module(cameraManufacturer, cameraTypeNumber, cameraSerialNumber),
+PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier):
+		rexos_knowledge_database::Module(moduleIdentifier),
 		rexos_coordinates::Module(this),
+		rexos_statemachine::ModuleStateMachine(equipletName, moduleIdentifier, false),
 		environmentCacheClient(nodeHandle.serviceClient<environment_cache::UpdateEnvironmentCache>("updateEnvironmentCache")),
 		samplesTopLeft(minCornerSamples),
 		samplesTopRight(minCornerSamples),
@@ -59,8 +60,7 @@ PartLocatorNode::PartLocatorNode(int equipletId, std::string cameraManufacturer,
 {
 	ROS_INFO("Constructing");
 	
-	rexos_knowledge_database::ModuleType* moduleType = this->getModuleType();
-	std::string properties = moduleType->getModuleTypeProperties();
+	std::string properties = this->getModuleTypeProperties();
 	JSONNode jsonNode = libjson::parse(properties);
 	
 	topLeftValue = std::string();
@@ -146,7 +146,7 @@ void PartLocatorNode::qrCodeCallback(const vision_node::QrCodes & message) {
 		
 		storeInEnviromentCache(message.qrCodes[i].value, equipletCoor, qrCode.angle);
 		
-		delete points;
+		delete[] points;
 	}
 }
 PartLocatorNode::QrCode PartLocatorNode::calculateSmoothPos(std::string name, PartLocatorNode::QrCode lastPosition) {
@@ -383,6 +383,34 @@ void PartLocatorNode::run() {
 	
 	ros::spin();
 }
+void PartLocatorNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as) {
+	ROS_INFO("Initialize transition called");
+	as->setSucceeded();
+}
+
+void PartLocatorNode::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as) {
+	ROS_INFO("Deinitialize transition called");
+	ros::shutdown();
+	as->setSucceeded();
+}
+
+
+void PartLocatorNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO("Setup transition called");
+	as->setSucceeded();
+}
+void PartLocatorNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO("Shutdown transition called");
+	as->setSucceeded();
+}
+void PartLocatorNode::transitionStart(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO("Start transition called");
+	as->setSucceeded();
+}
+void PartLocatorNode::transitionStop(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO("Stop transition called");
+	as->setSucceeded();
+}
 
 int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "part_locator_node");
@@ -392,16 +420,12 @@ int main(int argc, char* argv[]) {
 		return -1;
 	}
 	
-	int equipletId;
-	try{
-		equipletId = rexos_utilities::stringToInt(argv[1]);
-	} catch(std::runtime_error ex) {
-		ROS_ERROR("Cannot read equiplet id from commandline please use correct values.");
-		return -2;
-	}
-	ROS_INFO("Constructing node");
-	PartLocatorNode node(equipletId, argv[2], argv[3], argv[4]);
-	
+	std::string equipletName = argv[1];
+	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
+
+	ROS_INFO("Creating PartLocatorNode");
+	PartLocatorNode node(equipletName, moduleIdentifier);
 	node.run();
+	
 	return 0;
 }

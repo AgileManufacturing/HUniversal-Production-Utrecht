@@ -126,6 +126,7 @@ class OplogMonitorThread extends Thread {
 	public void setSubscriptions(ArrayList<BlackboardSubscription> subscriptions) {
 		this.subscriptions = new BlackboardSubscription[subscriptions.size()];
 		subscriptions.toArray(this.subscriptions);
+		
 	}
 
 	/**

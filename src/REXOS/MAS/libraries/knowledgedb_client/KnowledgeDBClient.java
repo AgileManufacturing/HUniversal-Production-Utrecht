@@ -26,8 +26,7 @@
  **/
 package libraries.knowledgedb_client;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.lang.reflect.Array;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -35,7 +34,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Properties;
 
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.JDBC4PreparedStatement;
@@ -47,13 +45,6 @@ import configuration.ConfigurationFiles;
  * A client to communicate with knowledge database.
  **/
 public class KnowledgeDBClient {
-    
-    /**
-     * @var rexos.libraries.knowledgedb_client.KnowledgeDBClient client
-     *
-     * The only rexos.libraries.knowledgedb_client.KnowledgeDBClient instance.
-     **/
-    private static KnowledgeDBClient client;
 
     /**
      * @var Connection connection
@@ -62,25 +53,12 @@ public class KnowledgeDBClient {
      **/
     private Connection connection;
 
-    /**
-     * Get current rexos.libraries.knowledgedb_client.KnowledgeDBClient instance.
-     *
-     * @return The current rexos.libraries.knowledgedb_client.KnowledgeDBClient.
-     * @throws KnowledgeException Creating a connection to the knowledge database has failed.
-     **/
-    public static synchronized KnowledgeDBClient getClient() throws KnowledgeException {
-        if (client == null) {
-            client = new KnowledgeDBClient();
-        }
-
-        return client;
-    }
 
     /**
      * Private constructor to create a mysql connection.
      * @throws KnowledgeException Creating a connection to the knowledge database has failed.
      **/
-    private KnowledgeDBClient() throws KnowledgeException {
+    public KnowledgeDBClient() throws KnowledgeException {
         try {
 
             String url = "jdbc:mysql://" + Configuration.getProperty(ConfigurationFiles.KNOWLEDGE_DB_PROPERTIES, "host") +
@@ -204,10 +182,6 @@ public class KnowledgeDBClient {
      * @return Last insert ID on successful insert query, or 0 for an update query.
      * @throws KnowledgeException Reading from the knowledge database failed.
      **/
-    public int executeUpdateQuery(String query) throws KnowledgeException{
-        return executeUpdateQuery(query, (Object) null);
-    }
-
     /**
      * Executes an insert or update query.
      *
@@ -226,7 +200,13 @@ public class KnowledgeDBClient {
 
 			if (parameters != null) {
 			    for (int i = 0; i < parameters.length; i++) {
-			        statement.setString(i + 1, parameters[i].toString());
+			    	if(parameters[i] == null) {
+				        statement.setString(i + 1, null);
+			    	} else if(parameters[i] instanceof byte[]) {
+				        statement.setBytes(i + 1, (byte[])parameters[i]);
+			    	} else {
+			    		statement.setString(i + 1, parameters[i].toString());
+			    	}
 			    }
 			}
 
@@ -246,5 +226,9 @@ public class KnowledgeDBClient {
 		}
         
         return queryReturnValue;
+    }
+    
+    public Connection getConnection() {
+    	return connection;
     }
 }

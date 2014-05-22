@@ -11,13 +11,26 @@
 
 namespace equiplet_node {
 
-ModuleRegistry::ModuleRegistry(std::string nodeName, int equipletId, ModuleRegistryListener* mrl)
-:newRegistrationsAllowed(false),equipletId(equipletId),moduleRegistryListener(mrl)
+ModuleRegistry::ModuleRegistry(std::string equipletName, ModuleRegistryListener* mrl) :
+		newRegistrationsAllowed(false),
+		equipletName(equipletName),
+		moduleRegistryListener(mrl)
 {
 	registerModuleServiceServer = rosNodeHandle.advertiseService(
-			nodeName + "/register_module",
+			equipletName + "/register_module",
 			&ModuleRegistry::onRegisterServiceModuleCallback,
 			this);
+	rexos_knowledge_database::Equiplet equiplet = rexos_knowledge_database::Equiplet(equipletName);
+	std::vector<rexos_knowledge_database::ModuleIdentifier> identifiers = equiplet.getModuleIdentifiersOfAttachedModules();
+	
+	for(std::vector<rexos_knowledge_database::ModuleIdentifier>::iterator it = identifiers.begin(); it < identifiers.end(); it++) {
+		ModuleProxy* proxy = new ModuleProxy(
+				equipletName,
+				rexos_knowledge_database::ModuleIdentifier(it->getManufacturer(), it->getTypeNumber(), it->getSerialNumber()),
+				this);
+		registeredModules.push_back(proxy);
+	}
+	
 }
 
 ModuleRegistry::~ModuleRegistry() {
@@ -40,32 +53,32 @@ std::vector<ModuleProxy*> ModuleRegistry::getRegisteredModules(){
 	return registeredModules;
 }
 
-ModuleProxy* ModuleRegistry::getModule(int moduleId){
+ModuleProxy* ModuleRegistry::getModule(rexos_knowledge_database::ModuleIdentifier moduleIdentifier){
 	for(ModuleProxy* proxy : registeredModules){
-		if(proxy->getModuleId() == moduleId)
+		if(proxy->getModuleIdentifier() == moduleIdentifier)
 			return proxy;
 	}
 	return NULL;
 }
 
 bool ModuleRegistry::onRegisterServiceModuleCallback(RegisterModule::Request &req, RegisterModule::Response &res) {
-	ROS_INFO("ModuleRegistry: New module %s with id %d registering", req.name.c_str(), req.id);
+	ROS_INFO("ModuleRegistry: Module %s %s %s registering", req.manufacturer.c_str(), req.typeNumber.c_str(), req.serialNumber.c_str());
 	
 	if(!newRegistrationsAllowed) {
 		ROS_INFO("registration of new module not allowed");
 		return false;
 	}
-
-	ModuleProxy* proxy = new ModuleProxy(
-			EquipletNode::nameFromId(equipletId),
-			req.name,
-			equipletId,
-			req.id,this);
-	registeredModules.push_back(proxy);
-
-	ROS_INFO("registration successful");
-
-	return true;
+	
+	rexos_knowledge_database::ModuleIdentifier newModuleIdentifier(req.manufacturer, req.typeNumber, req.serialNumber);
+	for (int i = 0; i < registeredModules.size(); i++) {
+		if(registeredModules[i]->getModuleIdentifier() == newModuleIdentifier) {
+			registeredModules[i]->bind();
+			ROS_INFO("registration successful");
+			return true;
+		}
+	}
+	ROS_WARN("registration failed because no module with this identifier exists in registry (did someone manually start a module with the wrong equipletName?)");
+	return false;
 }
 
 void ModuleRegistry::onModuleStateChanged(
@@ -106,6 +119,7 @@ void ModuleRegistry::onModuleDied(ModuleProxy* moduleProxy){
 		if(*it == moduleProxy){
 			ROS_INFO("found me");
 			registeredModules.erase(it);
+			delete *it;
 			break;
 		}
 	}

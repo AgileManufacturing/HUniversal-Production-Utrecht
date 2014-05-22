@@ -37,6 +37,7 @@
 #include <string>
 #include <vector>
 
+#include <rexos_node_spawner/NodeSpawner.h>
 #include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
 #include <rexos_blackboard_cpp_client/BlackboardSubscriber.h>
 #include <rexos_blackboard_cpp_client/FieldUpdateSubscription.h>
@@ -61,17 +62,13 @@ namespace equiplet_node {
 class EquipletNode : public EquipletStateMachine, public Blackboard::BlackboardSubscriber
 {
 public:
-	static std::string nameFromId(int id){
-		return std::string("equiplet_") + std::to_string(id);
-	}
-
-	EquipletNode(int id, std::string blackboardIp);
+	EquipletNode(std::string equipletName, std::string blackboardIp, bool spawnNodesForModules);
 
 	virtual ~EquipletNode();
 
 	void blackboardReadCallback(std::string json);
 
-	std::string getName();
+	std::string getEquipletName();
 
 	ros::NodeHandle& getNodeHandle();
 
@@ -97,12 +94,12 @@ private:
 
 	void handleEquipletStep(rexos_datatypes::EquipletStep * step, mongo::OID targetObjectId);
 
-	void handleDirectMoveCommand(int moduleId, mongo::OID targetObjectId);
+	void handleDirectMoveCommand(rexos_knowledge_database::ModuleIdentifier moduleIdentifier, mongo::OID targetObjectId);
 	/**
 	 * @var int equipletId
 	 * The id of the equiplet
 	 **/
-	int equipletId;
+	std::string equipletName;
 
 	/**
 	 * @var BlackboardCppClient  *blackboardClient
@@ -113,7 +110,8 @@ private:
 
 
 	Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
-	Blackboard::FieldUpdateSubscription* equipletStepSubscription;
+	Blackboard::BlackboardSubscription* equipletStepSubscription;
+	//Blackboard::FieldUpdateSubscription* equipletStepSubscription;
 	Blackboard::BlackboardSubscription* directEquipletStepSubscription;
 
 	Blackboard::BlackboardCppClient *equipletCommandBlackboardClient;

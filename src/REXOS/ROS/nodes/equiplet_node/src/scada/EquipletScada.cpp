@@ -76,19 +76,22 @@ int EquipletScada::mongooseBeginRequestCallback(mg_connection* connection) {
 	}
 
 	return processed;
-
-	return 1;
 }
 
 void EquipletScada::mongooseProcessChangeModuleMode(mg_connection* conn, mg_request_info* request_info) {
-	char moduleId[64], moduleModi[64];
+	char moduleManufacturer[201], moduleTypeNumber[201], moduleSerialNumber[201], moduleModi[64];
 	const char* query = request_info->query_string;
 	const size_t query_len = strlen(query);
 
-	mg_get_var(query, query_len, "id", moduleId, sizeof(moduleId));
+	mg_get_var(query, query_len, "manufacturer", moduleManufacturer, sizeof(moduleManufacturer));
+	mg_get_var(query, query_len, "typeNumber", moduleTypeNumber, sizeof(moduleTypeNumber));
+	mg_get_var(query, query_len, "serialNumber", moduleSerialNumber, sizeof(moduleSerialNumber));
 	mg_get_var(query, query_len, "mode", moduleModi, sizeof(moduleModi));
+	
+	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(
+			moduleManufacturer, moduleTypeNumber, moduleSerialNumber);
 
-	ModuleProxy* moduleProxy = moduleRegistry->getModule(atoi(moduleId));
+	ModuleProxy* moduleProxy = moduleRegistry->getModule(moduleIdentifier);
 	if(moduleProxy == NULL) {
 		mg_printf(conn, "%s", ajax_reply_start_failed);
 		return;
@@ -130,7 +133,7 @@ void EquipletScada::mongooseProcessChangeEquipletMode(mg_connection* conn, mg_re
 		std::replace(equipletModeStr.begin(), equipletModeStr.end(),' ', '_');
 
 		if(testModi == equipletModeStr){
-			actionlib::SimpleActionClient<rexos_statemachine::ChangeModeAction> client(equiplet->getNodeHandle(), equiplet->getName() + "/change_mode");
+			actionlib::SimpleActionClient<rexos_statemachine::ChangeModeAction> client(equiplet->getNodeHandle(), equiplet->getEquipletName() + "/change_mode");
 			rexos_statemachine::ChangeModeGoal goal;
 			goal.desiredMode = static_cast<rexos_statemachine::Mode>(i);
 			client.sendGoal(goal);
@@ -160,7 +163,7 @@ void EquipletScada::mongooseProcessChangeEquipletState(mg_connection* conn, mg_r
 		std::replace(equipletStateStr.begin(), equipletStateStr.end(),' ', '_');
 
 		if(testState == equipletStateStr){
-			actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction> client(equiplet->getNodeHandle(), equiplet->getName() + "/change_state");
+			actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction> client(equiplet->getNodeHandle(), equiplet->getEquipletName() + "/change_state");
 			rexos_statemachine::ChangeStateGoal goal;
 			goal.desiredState = static_cast<rexos_statemachine::State>(i);
 			client.sendGoal(goal);
@@ -177,7 +180,7 @@ void EquipletScada::mongooseProcessEquipletInfo(mg_connection* conn, mg_request_
 	const char* state = rexos_statemachine::state_txt[equiplet->getCurrentState()];
 	const char* mode = rexos_statemachine::mode_txt[equiplet->getCurrentMode()];
 	JSONNode jsonObject;
-	jsonObject.push_back(JSONNode("name", equiplet->getName()));
+	jsonObject.push_back(JSONNode("name", equiplet->getEquipletName()));
 	jsonObject.push_back(JSONNode("state", state));
 	jsonObject.push_back(JSONNode("mode", mode));
 
@@ -199,10 +202,11 @@ void EquipletScada::mongooseProcessModuleInfo(mg_connection* conn, mg_request_in
 			continue;
 		}
 
-		jsonModule.push_back(JSONNode("id", proxy->getModuleId()));
+		JSONNode jsonIdentifier = proxy->getModuleIdentifier().toJSONObject();
+		jsonIdentifier.set_name("identifier");
+		jsonModule.push_back(jsonIdentifier);
 		jsonModule.push_back(JSONNode("mode", rexos_statemachine::mode_txt[proxy->getCurrentMode()]));
 		jsonModule.push_back(JSONNode("state", rexos_statemachine::state_txt[proxy->getCurrentState()]));
-		jsonModule.push_back(JSONNode("name", proxy->getModuleNodeName()));
 		jsonModules.push_back(jsonModule);
 	}
 

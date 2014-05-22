@@ -27,8 +27,7 @@ namespace rexos_coordinates{
 		int mountPointX = module->getMountPointX();
 		int mountPointY = module->getMountPointY();
 		
-		rexos_knowledge_database::ModuleType* moduleType = module->getModuleType();
-		std::string properties = moduleType->getModuleTypeProperties();
+		std::string properties = module->getModuleTypeProperties();
 		JSONNode jsonNode = libjson::parse(properties);
 		
 		double midPointX = std::numeric_limits<double>::quiet_NaN();

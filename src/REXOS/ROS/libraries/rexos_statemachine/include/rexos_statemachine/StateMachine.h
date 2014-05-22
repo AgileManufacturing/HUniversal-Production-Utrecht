@@ -90,6 +90,8 @@ public:
 
 private:
 	//the statemachine call transitions by an action, so it starts by an own thread
+	void onTransitionDeinitializeAction(TransitionActionServer* as);
+	void onTransitionInitializeAction(TransitionActionServer* as);
 	void onTransitionSetupAction(TransitionActionServer* as);
 	void onTransitionShutdownAction(TransitionActionServer* as);
 	void onTransitionStartAction(TransitionActionServer* as);
@@ -190,6 +192,8 @@ private:
 	ChangeStateActionClient changeStateActionClient;
 	ChangeModeActionClient changeModeActionClient;
 
+	TransitionActionServer transitionDeinitializeServer;
+	TransitionActionServer transitionInitializeServer;
 	TransitionActionServer transitionSetupServer;
 	TransitionActionServer transitionShutdownServer;
 	TransitionActionServer transitionStartServer;

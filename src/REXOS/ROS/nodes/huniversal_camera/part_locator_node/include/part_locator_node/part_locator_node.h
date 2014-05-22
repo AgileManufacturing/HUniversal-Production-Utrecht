@@ -40,7 +40,12 @@
 
 #include <Matrices/Matrices.h>
 #include <Vectors/Vectors.h>
+#include <rexos_statemachine/ModuleStateMachine.h>
+#include <rexos_statemachine/Transitions.h>
+#include "equiplet_node/RegisterModule.h"
 #include <rexos_coordinates/Module.h>
+#include <rexos_knowledge_database/Module.h>
+#include <rexos_knowledge_database/ModuleIdentifier.h>
 
 #include <vision_node/QrCodes.h>
 
@@ -48,7 +53,7 @@
 #include <map>
 
 class PartLocatorNode : public rexos_knowledge_database::Module,
-		public rexos_coordinates::Module {
+		public rexos_coordinates::Module, public rexos_statemachine::ModuleStateMachine {
 public:
 	struct QrCode {
 		Vector2 location;
@@ -68,8 +73,31 @@ protected:
 	std::map<std::string, boost::circular_buffer<QrCode> > smoothBuffer;
 
 public:
-	PartLocatorNode(int equipletId, std::string cameraManufacturer, std::string cameraTypeNumber, std::string cameraSerialNumber);
+	PartLocatorNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
 	void run();
+	
+	virtual void transitionInitialize(rexos_statemachine::TransitionActionServer* as);
+	virtual void transitionDeinitialize(rexos_statemachine::TransitionActionServer* as);
+	/**
+	 * MAST transition from safe to standby is handled by this method. 
+	 * see http://wiki.agilemanufacturing.nl/index.php/Vision_system#camera_control_node
+	 **/
+	virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
+	/**
+	 * MAST transition from standby to safe is handled by this method. 
+	 * see http://wiki.agilemanufacturing.nl/index.php/Vision_system#camera_control_node
+	 **/
+	virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
+	/**
+	 * MAST transition from standby to normal is handled by this method. 
+	 * see http://wiki.agilemanufacturing.nl/index.php/Vision_system#camera_control_node
+	 **/
+	virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
+	/**
+	 * MAST transition from normal to standby is handled by this method. 
+	 * see http://wiki.agilemanufacturing.nl/index.php/Vision_system#camera_control_node
+	 **/
+	virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
 private:
 	/**
 	 * The first known position of the top left corner

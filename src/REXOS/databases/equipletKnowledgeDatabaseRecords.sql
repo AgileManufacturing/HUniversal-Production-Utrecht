@@ -1,14 +1,32 @@
+insert into JavaSoftware(
+	id,
+	buildNumber,
+	jarFile,
+	className
+) values
+(1, 0, "", "dummy");
+
+insert into RosSoftware(
+	id,
+	buildNumber,
+	jarFile,
+	className
+) values
+(1, 0, "", "dummy");
+
+insert into Equiplet
+(name, mountPointsX, mountPointsY, mountPointDistanceX, mountPointDistanceY, rosSoftware, masSoftware)
+values("EQ1", 10, 10, 50, 50, 1, 1);
+
 insert into ModuleType(
 	manufacturer, 
 	typeNumber,
 	moduleTypeProperties,
-	rosSoftwareBuildNumber,
 	rosSoftware,
-	masSoftwareBuildNumber,
-	masSoftware
+	halSoftware
 ) values 
-("The_Imaging_Source_Europe_GmbH", "DFK_22AUC03", "", 1, "", 1, ""),
-("The_Imaging_Source_Europe_GmbH", "Cheap_ass_lens", "", 1, "", 1, ""),
+("The_Imaging_Source_Europe_GmbH", "DFK_22AUC03", "", 1, 1),
+("The_Imaging_Source_Europe_GmbH", "Cheap_ass_lens", "", 1, 1),
 ("HU", "delta_robot_type_A", "{
 	\"midPointX\" : 75.0,
 	\"midPointY\" : -200.0,
@@ -66,7 +84,7 @@ insert into ModuleType(
 		\"minSpeedDegrees\" : 0.036,
 		\"maxSpeedDegrees\" : 18000
 	}
-}", 1, "", 1, ""),
+}", 1, 1), 
 ("HU", "work_plane_type_A", "{
 	\"midPointX\" : 175.0,
 	\"midPointY\" : -200.0,
@@ -76,7 +94,7 @@ insert into ModuleType(
 	\"bottomRightValue\" : \"_WP_BR\",
 	\"workPlaneWidth\" : 80.0,
 	\"workPlaneHeight\" : 80.0
-}", 1, "", 1, ""), 
+}", 1, 1), 
 ("HU", "gripper_type_A", "{
 	\"modbusAddress\" : 8001,
 	\"modbusDevicePin\" : 0,
@@ -84,22 +102,22 @@ insert into ModuleType(
 	\"gripperEnabledWarningSeconds\" : 50,
 	\"gripperEnabledCooldownSeconds\" : 180,
 	\"watchdogInterval\" : 100
-}", 1, "", 1, "");
+}", 1, 1);
 
 insert into Module(
+	equiplet,
 	manufacturer,
 	typeNumber,
 	serialNumber,
 	mountPointX,
 	mountPointY,
-	attachedToManufacturer,
-	attachedToTypeNumber,
-	attachedToSerialNumber,
+	attachedToLeft,
+	attachedToRight,
 	moduleProperties
 ) values 
-("The_Imaging_Source_Europe_GmbH", "DFK_22AUC03", "26210035", 3, 2, null, null, null, ""),
-("The_Imaging_Source_Europe_GmbH", "Cheap_ass_lens", "1", 6, 4, "The_Imaging_Source_Europe_GmbH", "DFK_22AUC03", "26210035", ""),
-("HU", "delta_robot_type_A", "1", 3, 2, null, null, null, "{
+("EQ1", "The_Imaging_Source_Europe_GmbH", "DFK_22AUC03", "26210035", 3, 2, 1, 4, ""),
+("EQ1", "The_Imaging_Source_Europe_GmbH", "Cheap_ass_lens", "1", null, null, 2, 3, ""),
+("EQ1", "HU", "delta_robot_type_A", "1", 3, 2, 5, 8, "{
 	\"modbusIp\" : \"192.168.0.22\",
 	\"modbusPort\" : 502
 }"),
@@ -107,8 +125,8 @@ insert into Module(
 	\"modbusIp\" : \"192.168.0.32\",
 	\"modbusPort\" : 502
 }"),
-("HU", "work_plane_type_A", "1", 1, 10, null, null, null, ""),
-("HU", "gripper_type_A", "1", 1, 10, null, null, null, "{
+("EQ1", "HU", "work_plane_type_A", "1", 1, 2, 9, 10, ""),
+("EQ1", "HU", "gripper_type_A", "1", null, null, 6, 7, "{
 	\"modbusIp\" : \"192.168.0.22\",
 	\"modbusPort\" : 502
 }");
@@ -141,7 +159,7 @@ insert into ModuleCalibration (id, properties) values
 	}
 }");
 
-insert into ModuleCalibrationGroup (ModuleCalibration, manufacturer, typeNumber, serialNumber) values
+insert into ModuleCalibrationModuleSet (ModuleCalibration, manufacturer, typeNumber, serialNumber) values
 (1, "The_Imaging_Source_Europe_GmbH", "Cheap_ass_lens", "1"), 
 (1, "The_Imaging_Source_Europe_GmbH", "DFK_22AUC03", "26210035");
 

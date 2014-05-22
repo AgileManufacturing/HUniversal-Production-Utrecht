@@ -6,8 +6,8 @@
 #include <cppconn/prepared_statement.h>
 
 namespace rexos_knowledge_database{
-	ModuleType::ModuleType(std::string manufacturer, std::string typeNumber) :
-				manufacturer(manufacturer), typeNumber(typeNumber)
+	ModuleType::ModuleType(ModuleTypeIdentifier moduleTypeIdentifier) :
+				moduleTypeIdentifier(moduleTypeIdentifier)
 	{
 		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
 	}
@@ -18,8 +18,8 @@ namespace rexos_knowledge_database{
 		FROM ModuleType \
 		WHERE manufacturer = ? AND \
 		typeNumber = ?;");
-		preparedStmt->setString(1, manufacturer);
-		preparedStmt->setString(2, typeNumber);
+		preparedStmt->setString(1, moduleTypeIdentifier.getManufacturer());
+		preparedStmt->setString(2, moduleTypeIdentifier.getTypeNumber());
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
@@ -29,6 +29,7 @@ namespace rexos_knowledge_database{
 		result->next();
 		std::string jsonProperties = result->getString("moduleTypeProperties");
 		
+		delete result;
 		delete preparedStmt;
 		return jsonProperties;
 	}

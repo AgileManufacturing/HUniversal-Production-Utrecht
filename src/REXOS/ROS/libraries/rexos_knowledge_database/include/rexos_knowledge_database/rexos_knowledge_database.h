@@ -38,7 +38,7 @@
 
 // TEMP!
 #define MYSQL_SERVER "tcp://127.0.0.1:3306"
-#define MYSQL_DATABASE "equiplet"
+#define MYSQL_DATABASE "equiplet2"
 #define MYSQL_USERNAME "rexos"
 #define MYSQL_PASSWORD "soxer"
 

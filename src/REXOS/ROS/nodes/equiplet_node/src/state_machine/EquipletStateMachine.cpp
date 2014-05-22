@@ -2,8 +2,8 @@
 
 using namespace equiplet_node;
 
-EquipletStateMachine::EquipletStateMachine(std::string name, int id):
-	StateMachine(name,
+EquipletStateMachine::EquipletStateMachine(std::string equipletName):
+	StateMachine(equipletName,
 		{
 			rexos_statemachine::MODE_NORMAL, 
 			rexos_statemachine::MODE_SERVICE, 
@@ -11,10 +11,10 @@ EquipletStateMachine::EquipletStateMachine(std::string name, int id):
 			rexos_statemachine::MODE_CRITICAL_ERROR, 
 			rexos_statemachine::MODE_E_STOP,
 			rexos_statemachine::MODE_LOCK,
-			rexos_statemachine::MODE_STEP	
+			rexos_statemachine::MODE_STEP
 		}
 	),
-	moduleRegistry(name, id),
+	moduleRegistry(equipletName),
 	desiredState(rexos_statemachine::STATE_NOSTATE)
 {
 	rexos_statemachine::StateMachine::setListener(this);
@@ -39,14 +39,14 @@ void EquipletStateMachine::onStateChanged(){
 }
 
 void EquipletStateMachine::onModeChanged(){
-	ROS_INFO("Mode Changed to %s",rexos_statemachine::mode_txt[getCurrentMode()]);	
+	ROS_INFO("Mode Changed to %s",rexos_statemachine::mode_txt[getCurrentMode()]);
 	bool changeModuleModes = false;
 
 	rexos_statemachine::Mode currentMode = getCurrentMode();
 	switch(currentMode){
-		case rexos_statemachine::MODE_NORMAL:	
+		case rexos_statemachine::MODE_NORMAL:
 		case rexos_statemachine::MODE_SERVICE:
-		case rexos_statemachine::MODE_E_STOP:	
+		case rexos_statemachine::MODE_E_STOP:
 			changeModuleModes = true; break;
 	}
 
@@ -60,14 +60,18 @@ void EquipletStateMachine::onModeChanged(){
 
 void EquipletStateMachine::onModuleStateChanged(ModuleProxy* moduleProxy,rexos_statemachine::State newState, rexos_statemachine::State previousState){
 	ROS_INFO("Module State Changed received from %s a state change from %s to %s",
-		moduleProxy->getModuleNodeName().c_str(),rexos_statemachine::state_txt[previousState],rexos_statemachine::state_txt[newState]);
+			moduleProxy->getModuleIdentifier().toString().c_str(),
+			rexos_statemachine::state_txt[previousState],
+			rexos_statemachine::state_txt[newState]);
 	if(rexos_statemachine::is_transition_state[getCurrentState()] && allModulesInDesiredState(desiredState) )
 		condit.notify_one();
 }
 
 void EquipletStateMachine::onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode){
 	ROS_INFO("Module Mode Changed received from %s a mode change from %s to %s",
-		moduleProxy->getModuleNodeName().c_str(),rexos_statemachine::mode_txt[previousMode],rexos_statemachine::mode_txt[newMode]);
+			moduleProxy->getModuleIdentifier().toString().c_str(),
+			rexos_statemachine::mode_txt[previousMode],
+			rexos_statemachine::mode_txt[newMode]);
 	if(newMode > getCurrentMode()){
 		changeMode(newMode);
 	}
@@ -87,6 +91,28 @@ bool EquipletStateMachine::allModulesInDesiredState(rexos_statemachine::State de
 	return true;
 }
 
+void EquipletStateMachine::transitionInitialize(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO( "transitionInitialize called");
+	changeModuleStates(rexos_statemachine::STATE_SAFE);
+	
+	if(!allModulesInDesiredState(desiredState = rexos_statemachine::STATE_SAFE)) {
+		boost::unique_lock<boost::mutex> lock( mutexit );
+		condit.wait( lock );
+	}
+	
+	as->setSucceeded();
+}
+void EquipletStateMachine::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO( "transitionDeinitialize called");
+	changeModuleStates(rexos_statemachine::STATE_OFFLINE);
+	
+	if(!allModulesInDesiredState(desiredState = rexos_statemachine::STATE_OFFLINE)) {
+		boost::unique_lock<boost::mutex> lock( mutexit );
+		condit.wait( lock );
+	}
+	
+	as->setSucceeded();
+}
 void EquipletStateMachine::transitionSetup(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO( "transitionSetup called");
 	moduleRegistry.setNewRegistrationsAllowed(false);

@@ -32,17 +32,18 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <rexos_knowledge_database/ModuleTypeIdentifier.h>
 
 #include "mysql_connection.h"
 
 namespace rexos_knowledge_database {
 	class ModuleType{
+	private:
+		ModuleTypeIdentifier moduleTypeIdentifier;
+		std::unique_ptr<sql::Connection> connection;
 	public:
-		ModuleType(std::string manufacturer, std::string typeNumber);
+		ModuleType(ModuleTypeIdentifier moduleTypeIdentifier);
 		
 		std::string getModuleTypeProperties();
-	private:
-		std::string manufacturer, typeNumber;
-		std::unique_ptr<sql::Connection> connection;
 	};
 }
