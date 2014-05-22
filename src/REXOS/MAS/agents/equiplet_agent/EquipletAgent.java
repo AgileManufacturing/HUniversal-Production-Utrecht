@@ -208,7 +208,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	  * The onTranslationFinished function is being called upon when this process has finished.
 	  */
 	private void executeProductStep(){
-		if(scheduleCounter <= equipletSchedule.size()){
+		if(scheduleCounter < equipletSchedule.size()){
+			System.out.println("Execute PS");
 			hal.translateProductStep(equipletSchedule.get(scheduleCounter).getProductStep());	
 			scheduleCounter++;
 		}
@@ -237,6 +238,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	public void onTranslationFinished(ProductStep productStep,
 			java.util.ArrayList<HardwareStep> hardwareStep) {
 		System.out.println("Translating finished, Hardwarestep created");
+		System.out.println(hardwareStep.size());
 			hal.executeHardwareSteps(hardwareStep);
 	}
 
@@ -247,13 +249,14 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	@Override
 	public void onExecutionFinished() {
+		System.out.println("Hardware Step Executed");
 		executeProductStep();		
 	}
 
 	@Override
 	public String getEquipletName() {
 		// TODO Auto-generated method stub
-		return "EQ";
+		return "EQ1";
 	}
 	
 }
