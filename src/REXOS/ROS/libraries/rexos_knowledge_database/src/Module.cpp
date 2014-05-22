@@ -239,14 +239,14 @@ namespace rexos_knowledge_database{
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT properties \
 		FROM ModuleCalibration \
-		JOIN ModuleCalibrationGroup ON ModuleCalibrationGroup.ModuleCalibration = ModuleCalibration.id \
+		JOIN ModuleCalibrationModuleSet ON ModuleCalibrationModuleSet.ModuleCalibration = ModuleCalibration.id \
 		WHERE manufacturer = ? AND \
 		typeNumber = ? AND \
 		serialNumber = ? AND \
 		( \
 			SELECT count(*) \
-			FROM ModuleCalibrationGroup AS subTable \
-			WHERE ModuleCalibrationGroup.ModuleCalibration = subTable.ModuleCalibration \
+			FROM ModuleCalibrationModuleSet AS subTable \
+			WHERE ModuleCalibrationModuleSet.ModuleCalibration = subTable.ModuleCalibration \
 		) = 1;");
 		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
@@ -313,7 +313,7 @@ namespace rexos_knowledge_database{
 			
 			sql::PreparedStatement* preparedStmt;
 			preparedStmt = connection->prepareStatement("\
-			INSERT INTO ModuleCalibrationGroup (ModuleCalibration, manufacturer, typeNumber, serialNumber) \
+			INSERT INTO ModuleCalibrationModuleSet (ModuleCalibration, manufacturer, typeNumber, serialNumber) \
 			VALUES (LAST_INSERT_ID(), ?, ?, ?);");
 			
 			preparedStmt->setString(1, moduleIdentifier.getManufacturer());
@@ -353,7 +353,7 @@ namespace rexos_knowledge_database{
 			
 			sql::PreparedStatement* preparedStmt;
 			preparedStmt = connection->prepareStatement("\
-			INSERT INTO ModuleCalibrationGroup (ModuleCalibration, manufacturer, typeNumber, serialNumber) \
+			INSERT INTO ModuleCalibrationModuleSet (ModuleCalibration, manufacturer, typeNumber, serialNumber) \
 			VALUES (LAST_INSERT_ID(), ?, ?, ?);");
 			
 			preparedStmt->setString(1, moduleIdentifier.getManufacturer());
@@ -403,26 +403,26 @@ namespace rexos_knowledge_database{
 		preparedStmt = connection->prepareStatement("\n\
 		SELECT id \n\
 		FROM ModuleCalibration \n\
-		JOIN ModuleCalibrationGroup ON ModuleCalibrationGroup.ModuleCalibration = ModuleCalibration.id \n\
+		JOIN ModuleCalibrationModuleSet ON ModuleCalibrationModuleSet.ModuleCalibration = ModuleCalibration.id \n\
 		WHERE manufacturer = ? AND \n\
 		typeNumber = ? AND \n\
 		serialNumber = ? AND \n\
 		( -- to narrow group. The number of modules in this group must match the number of other modules \n\
 			SELECT count(*) \n\
-			FROM ModuleCalibrationGroup AS inListGroup \n\
+			FROM ModuleCalibrationModuleSet AS inListGroup \n\
 			JOIN otherModules ON \n\
 				inListGroup.manufacturer = otherModules.manufacturer AND \n\
 				inListGroup.typeNumber = otherModules.typeNumber AND \n\
 				inListGroup.serialNumber = otherModules.serialNumber \n\
-			WHERE ModuleCalibrationGroup.ModuleCalibration = inListGroup.ModuleCalibration \n\
+			WHERE ModuleCalibrationModuleSet.ModuleCalibration = inListGroup.ModuleCalibration \n\
 		) = ? AND \n\
 		( -- to wide group. The number of modules in this group must match the number of other modules \n\
 			SELECT count(*) \n\
-			FROM ModuleCalibrationGroup AS listGroup \n\
-			WHERE ModuleCalibrationGroup.ModuleCalibration = listGroup.ModuleCalibration AND ( \n\
-				listGroup.manufacturer != ModuleCalibrationGroup.manufacturer OR \n\
-				listGroup.typeNumber != ModuleCalibrationGroup.typeNumber OR \n\
-				listGroup.serialNumber != ModuleCalibrationGroup.serialNumber \n\
+			FROM ModuleCalibrationModuleSet AS listGroup \n\
+			WHERE ModuleCalibrationModuleSet.ModuleCalibration = listGroup.ModuleCalibration AND ( \n\
+				listGroup.manufacturer != ModuleCalibrationModuleSet.manufacturer OR \n\
+				listGroup.typeNumber != ModuleCalibrationModuleSet.typeNumber OR \n\
+				listGroup.serialNumber != ModuleCalibrationModuleSet.serialNumber \n\
 			) \n\
 		) = ?;");
 		preparedStmt->setString(1, moduleIdentifier.getManufacturer());

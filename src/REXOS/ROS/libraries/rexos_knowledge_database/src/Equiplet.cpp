@@ -109,4 +109,27 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		return moduleIdentifiersOfAttachedModules;
 	}
+	std::vector<ModuleIdentifier> Equiplet::getModuleIdentifiersOfAttachedModulesWithRosSoftware() {
+		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		SELECT Module.manufacturer, Module.typeNumber, Module.serialNumber \
+		FROM Module \
+		JOIN ModuleType ON Module.manufacturer = ModuleType.manufacturer AND \
+			Module.typeNumber = ModuleType.typeNumber \
+		WHERE Module.equiplet = ? AND \
+			ModuleType.rosSoftware IS NOT NULL;");
+		preparedStmt->setString(1, name);
+
+		sql::ResultSet* result = preparedStmt->executeQuery();
+		
+		std::vector<ModuleIdentifier> moduleIdentifiersOfAttachedModules;
+		while(result->next()) {
+			ModuleIdentifier identifier = ModuleIdentifier(
+					result->getString("manufacturer"), result->getString("typeNumber"), result->getString("serialNumber"));
+			moduleIdentifiersOfAttachedModules.push_back(identifier);
+		}
+		
+		delete result;
+		delete preparedStmt;
+		return moduleIdentifiersOfAttachedModules;
+	}
 }

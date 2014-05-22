@@ -23,6 +23,8 @@ namespace rexos_knowledge_database{
 		
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
+			delete result;
+			delete preparedStmt;
 			throw std::runtime_error("Unable to find current rosSoftware (someone deleted this instance in the database)");
 		}
 		// set the cursor at the first result
