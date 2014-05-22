@@ -234,7 +234,7 @@ public class ModuleFactory extends Factory {
 		
 		return modules;
 	}
-	public ArrayList<Module> getBottomModules() throws Exception {
+	public ArrayList<Module> getBottomModules() throws FactoryException, JarFileLoaderException {
 		ArrayList<Module> modules = new ArrayList<Module>();
 		
 		try {
@@ -357,7 +357,7 @@ public class ModuleFactory extends Factory {
 		// TODO Auto-generated method stub
 		return false;
 	}
-	public JsonObject deleteModule(ModuleIdentifier moduleIdentifier) throws Exception{
+	public JsonObject deleteModule(ModuleIdentifier moduleIdentifier) throws FactoryException, JarFileLoaderException{
 		try{
 			JsonObject output = new JsonObject();
 			output.addProperty("manufacturer", moduleIdentifier.getManufacturer());
@@ -398,7 +398,7 @@ public class ModuleFactory extends Factory {
 			
 			output.add("type", type);
 			return output;
-		} catch (KnowledgeException ex) {
+		} catch (KnowledgeException | KeyNotFoundException ex) {
 			throw new FactoryException("deletion of module failed :(", ex);
 		}
 	}

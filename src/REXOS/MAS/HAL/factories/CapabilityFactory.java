@@ -183,7 +183,7 @@ public class CapabilityFactory extends Factory{
 		
 		return capabilities;
 	}
-	public ArrayList<Service> getAllSupportedServices() throws Exception{
+	public ArrayList<Service> getAllSupportedServices() {
 		ArrayList<Service> services = new ArrayList<Service>();
 		
 		try {

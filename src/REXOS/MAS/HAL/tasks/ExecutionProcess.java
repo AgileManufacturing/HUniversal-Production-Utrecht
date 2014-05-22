@@ -8,7 +8,11 @@ import HAL.factories.ModuleFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.HardwareStep;
-
+/**
+ * The thread that manages the execution of hardware steps
+ * @author Bas Voskuijlen
+ *
+ */
 public class ExecutionProcess implements Runnable, ProcessListener{
 	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
 	private ArrayList<HardwareStep> hardwareSteps;

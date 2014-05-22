@@ -13,7 +13,11 @@ import libraries.knowledgedb_client.Row;
 import org.apache.commons.codec.binary.Base64;
 
 import com.google.gson.JsonObject;
-
+/**
+ * This class provides methods for serializing and deserializing of JavaSoftware and the loading of jarFiles. 
+ * @author Tommas Bakker
+ *
+ */
 public class JavaSoftware implements JarFileLoader {
 	private static final String getJavaSoftwareForId =
 			"SELECT id, buildNumber, className, jarFile \n" + 
@@ -50,10 +54,13 @@ public class JavaSoftware implements JarFileLoader {
 			"SET buildNumber =? AND \n" + 
 			"className = ? AND \n" + 
 			"jarFile = ?;";
-	
+	/**
+	 * The map used for the multiton pattern
+	 */
 	private static HashMap<Integer, JavaSoftware> javaSoftwareInstances = new HashMap<Integer, JavaSoftware>(); 
 	/**
-	 * Deserializes java software from a JsonObject and stores in in the knowledge database 
+	 * Deserializes java software from a JsonObject and stores in in the knowledge database.
+	 * This method uses a new KnowledgeDBClient which may cause locking issues. It is recommended to provide your own KnowledgeDBClient.
 	 * @param javaSoftware the JsonObject to be used
 	 * @return the now stored java software
 	 */
@@ -66,6 +73,12 @@ public class JavaSoftware implements JarFileLoader {
 			return null;
 		}
 	}
+	/**
+	 * Deserializes java software from a JsonObject and stores in in the knowledge database using the provided KnowledgeDBClient.
+	 * @param javaSoftware
+	 * @param knowledgeDBClient
+	 * @return the now stored java software
+	 */
 	public static JavaSoftware insertJavaSoftware(JsonObject javaSoftware, KnowledgeDBClient knowledgeDBClient) {
 		try {
 			byte[] jarFile = Base64.decodeBase64(javaSoftware.get("jarFile").getAsString().getBytes());
@@ -81,32 +94,47 @@ public class JavaSoftware implements JarFileLoader {
 			return null;
 		}
 	}
-	
+	/**
+	 * This method allows the extraction of the build number of the javaSoftware from the JsonObject. Used for updating.
+	 * @param javaSoftware
+	 * @return
+	 */
 	public static int getBuildNumber(JsonObject javaSoftware) {
 		return javaSoftware.get("buildNumber").getAsInt();
 	}
+	/**
+	 * This method allows the extraction of the class name of the javaSoftware from the JsonObject.
+	 * @param javaSoftware
+	 * @return
+	 */
 	public static String getClassName(JsonObject javaSoftware) {
 		return javaSoftware.get("className").getAsString();
 	}
 	
 	private int id;
-	private int buildNumber;
-	private String className;
-	
 	public int getId() {
 		return id;
 	}
+	private int buildNumber;
 	@Override
 	public int getBuildNumber() {
 		return buildNumber;
 	}
+	private String className;
 	public String getClassName() {
 		return className;
 	}
 
 	private KnowledgeDBClient knowledgeDBClient;
 	
-	private JavaSoftware(int id, int buildNumber, String className, KnowledgeDBClient knowledgeDBClient) throws KnowledgeException {
+	/**
+	 * Constructs a new JavaSoftware object using the provided KnowledgeDBClient and adds it to the multiton.
+	 * @param id
+	 * @param buildNumber
+	 * @param className
+	 * @param knowledgeDBClient
+	 */
+	private JavaSoftware(int id, int buildNumber, String className, KnowledgeDBClient knowledgeDBClient) {
 		this.id = id;
 		this.buildNumber = buildNumber;
 		this.className = className;
@@ -114,6 +142,12 @@ public class JavaSoftware implements JarFileLoader {
 		
 		javaSoftwareInstances.put(id, this);
 	}
+	/**
+	 * This method will get the JavaSoftware associated with the module. 
+	 * If the JavaSoftware has not been instantiated, it will be constructed with a new KnowledgeDBClient.
+	 * @param moduleIdentifier
+	 * @return
+	 */
 	public static JavaSoftware getJavaSoftwareForModuleIdentifier(ModuleIdentifier moduleIdentifier) {
 		try{
 			return getJavaSoftwareForModuleIdentifier(moduleIdentifier, new KnowledgeDBClient());
@@ -123,6 +157,11 @@ public class JavaSoftware implements JarFileLoader {
 			return null;
 		}
 	}
+	/**
+	 * This method will get the JavaSoftware associated with the module. 
+	 * @param moduleIdentifier
+	 * @return
+	 */
 	public static JavaSoftware getJavaSoftwareForModuleIdentifier(ModuleIdentifier moduleIdentifier, KnowledgeDBClient knowledgeDBClient) {
 		try {
 			Row[] rows = knowledgeDBClient.executeSelectQuery(getJavaSoftwareForModuleType, moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
@@ -142,6 +181,12 @@ public class JavaSoftware implements JarFileLoader {
 			return null;
 		}
 	}
+	/**
+	 * This method will get the JavaSoftware associated with the capability. 
+	 * If the JavaSoftware has not been instantiated, it will be constructed with a new KnowledgeDBClient.
+	 * @param capabilityName
+	 * @return
+	 */
 	public static JavaSoftware getJavaSoftwareForCapabilityName(String capabilityName) {
 		try{
 			KnowledgeDBClient knowledgeDBClient = new KnowledgeDBClient();
@@ -161,15 +206,18 @@ public class JavaSoftware implements JarFileLoader {
 			return null;
 		}
 	}
-	
+	/**
+	 * Constructs a new DynamicClassDescription for this JavaSoftware.
+	 * @return
+	 */
 	public DynamicClassDescription getDynamicClassDescription() {
 			return new DynamicClassDescription(id, className, this);
 	}
 	/**
-	 * Serializes java software from the knowledge database 
+	 * This method serializes java software from the knowledge database. This method does NOT remove the java software from the knowledge database.
 	 * @param knowledgeDBClient
 	 * @param moduleIdentifier
-	 * @return
+	 * @return The JsonObject for the JavaSoftware
 	 */
 	public JsonObject serialize() {
 		try{
@@ -187,6 +235,9 @@ public class JavaSoftware implements JarFileLoader {
 		}
 	}
 	
+	/**
+	 * This method will load the jar file from the knowledge database and will return the contents of it.
+	 */
 	@Override
 	public byte[] loadJarFile() throws JarFileLoaderException {
 		try {
@@ -203,7 +254,11 @@ public class JavaSoftware implements JarFileLoader {
 			return null;
 		}
 	}
-
+	
+	/**
+	 * This method will update the java software in the knowledge database. 
+	 * @param javaSoftware
+	 */
 	public void updateJavaSoftware(JsonObject javaSoftware) {
 		try {
 			byte[] jarFile = Base64.decodeBase64(javaSoftware.get("jarFile").getAsString().getBytes());
