@@ -118,9 +118,9 @@ public abstract class ModuleActor extends Module {
 	 * @throws ModuleExecutingException
 	 */
 	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws ModuleExecutingException{
+		this.processListener = processListener;
 		JsonObject command = hardwareStep.getCommand();
 		executeMongoCommand(command.toString());
-		this.processListener = processListener;
 	}
 	/**
 	 * This method will translate the {@link CompositeStep} and forward the remainder to its parent.
@@ -166,7 +166,10 @@ public abstract class ModuleActor extends Module {
 	public void onProcessStatusChanged(String state) {
 		// TODO Auto-generated method stub
 		try {
-			processListener.onProcessStateChanged(state, 0, this);
+			if(processListener != null){
+				processListener.onProcessStateChanged(state, 0, this);
+				processListener =null;
+			}
 		} catch (HardwareAbstractionLayerProcessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

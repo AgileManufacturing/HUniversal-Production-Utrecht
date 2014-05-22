@@ -121,7 +121,7 @@ namespace rexos_node_spawner {
 					boost::filesystem::create_directories(zipStat.name);
 				} else {
 					// files could be specified before the upper directories. create these directories
-					boost::filesystem3::path path = boost::filesystem3::path(zipStat.name);
+					boost::filesystem3::path path = boost::filesystem3::path(zipArchivePath + std::string(zipStat.name));
 					boost::filesystem::create_directories(path.parent_path());
 					
 					struct zip_file* zipFile;
@@ -133,7 +133,7 @@ namespace rexos_node_spawner {
 					std::ofstream fs;
 					fs.open((zipArchivePath + std::string(zipStat.name)).c_str(), std::ios::out | std::ios::binary); 
 					if (fs.good() != true) {
-						throw std::runtime_error("Unable to open fstream");
+						throw std::runtime_error("Unable to open fstream with path" + (zipArchivePath + std::string(zipStat.name)));
 					}
 					
 					int sum = 0;

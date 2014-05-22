@@ -46,6 +46,7 @@ namespace rexos_knowledge_database {
 		double getMointPointDistanceX();
 		double getMointPointDistanceY();
 		std::vector<ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
+		std::vector<ModuleIdentifier> getModuleIdentifiersOfAttachedModulesWithRosSoftware();
 	private:
 		std::string name;
 		std::unique_ptr<sql::Connection> connection;

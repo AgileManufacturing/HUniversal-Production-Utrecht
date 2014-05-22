@@ -21,7 +21,7 @@ ModuleRegistry::ModuleRegistry(std::string equipletName, ModuleRegistryListener*
 			&ModuleRegistry::onRegisterServiceModuleCallback,
 			this);
 	rexos_knowledge_database::Equiplet equiplet = rexos_knowledge_database::Equiplet(equipletName);
-	std::vector<rexos_knowledge_database::ModuleIdentifier> identifiers = equiplet.getModuleIdentifiersOfAttachedModules();
+	std::vector<rexos_knowledge_database::ModuleIdentifier> identifiers = equiplet.getModuleIdentifiersOfAttachedModulesWithRosSoftware();
 	
 	for(std::vector<rexos_knowledge_database::ModuleIdentifier>::iterator it = identifiers.begin(); it < identifiers.end(); it++) {
 		ModuleProxy* proxy = new ModuleProxy(

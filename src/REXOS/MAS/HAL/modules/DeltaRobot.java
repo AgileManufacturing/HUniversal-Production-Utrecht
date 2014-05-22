@@ -75,7 +75,7 @@ public class DeltaRobot extends ModuleActor {
 			
 			//Add hopping a.k.a. safe movement pane
 			if (command.get("forceStraightLine") != null){
-				if (!command.get("forceStraightLine").getAsBoolean()){
+				if (!command.remove("forceStraightLine").getAsBoolean()){
 					//Entry point
 					int z = move.remove(Z).getAsInt();
 					z -= 20; //20cm above actual point

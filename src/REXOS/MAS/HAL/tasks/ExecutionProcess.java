@@ -40,15 +40,18 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 	}
 
 	@Override
-	public void onProcessStateChanged(String state, long hardwareStepSerialId, Module module) throws HardwareAbstractionLayerProcessException{
-		if (hardwareSteps.size() > 0){
-			HardwareStep hardwareStep = hardwareSteps.get(0);
-			hardwareAbstractionLayerListener.onProcessStateChanged(state, hardwareStepSerialId, module, hardwareStep);
-			hardwareSteps.remove(0);
-			this.notify();
-		}
-		else {
-			throw new HardwareAbstractionLayerProcessException("No more hardwareSteps while there should be at least one more");
+	public synchronized void onProcessStateChanged(String state, long hardwareStepSerialId, Module module) throws HardwareAbstractionLayerProcessException{
+		System.out.println("State = "+ state);
+		if(state.equals("DONE")){
+			if (hardwareSteps.size() > 0){
+				HardwareStep hardwareStep = hardwareSteps.get(0);
+				hardwareAbstractionLayerListener.onProcessStateChanged(state, hardwareStepSerialId, module, hardwareStep);
+				hardwareSteps.remove(0);
+				this.notify();
+			}
+			else {
+				throw new HardwareAbstractionLayerProcessException("No more hardwareSteps while there should be at least one more");
+			}
 		}
 	}
 

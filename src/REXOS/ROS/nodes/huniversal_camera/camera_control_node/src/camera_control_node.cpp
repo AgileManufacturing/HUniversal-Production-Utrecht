@@ -166,23 +166,33 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 	}
 	
 	try{
+		ROS_INFO("a");
 		std::string properties = this->getCalibrationDataForModuleAndChilds();
+		ROS_INFO("a");
+		ROS_INFO(properties.c_str());
 		JSONNode jsonNode = libjson::parse(properties);
+		ROS_INFO("a");
 		
 		JSONNode* distCoeffs = NULL;
 		JSONNode* cameraMatrix = NULL;
 		for(JSONNode::const_iterator it = jsonNode.begin(); it != jsonNode.end(); it++) {
+ROS_INFO("b");
+ROS_INFO(it->name().c_str());
 			if(it->name() == "distCoeffs"){
-				*distCoeffs = it->as_node();
+ROS_INFO("1");
+				distCoeffs = new JSONNode(it->as_node());
 				ROS_INFO("found distCoeffs");
 			} else if (it->name() == "cameraMatrix") {
-				*cameraMatrix = it->as_node();
+ROS_INFO("2");
+				cameraMatrix = new JSONNode(it->as_node());
 				ROS_INFO("found cameraMatrix");
 			} else {
+ROS_INFO("c");
 				// some other property, ignore it
 			}
 		}
 		
+ROS_INFO("d");
 		if(distCoeffs == NULL || cameraMatrix == NULL){
 			if(mannuallyCalibrateLens() == false){
 				as->setAborted();
@@ -212,6 +222,7 @@ void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServ
 
 		as->setSucceeded();
 	} catch(rexos_knowledge_database::KnowledgeDatabaseException ex) {
+ROS_INFO("e");
 		if(mannuallyCalibrateLens() == false) as->setAborted();
 		else as->setSucceeded();
 	}

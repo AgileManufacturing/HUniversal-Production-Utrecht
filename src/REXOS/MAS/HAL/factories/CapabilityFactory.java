@@ -29,12 +29,12 @@ public class CapabilityFactory extends Factory{
 			"WHERE NOT EXISTS( \n" +
 			"	SELECT * \n" +
 			"	FROM CapabilityTypeRequiredMutation \n" +
-			"	WHERE ServiceType_CapabilityType.name = CapabilityTypeRequiredMutation.capabilityType AND \n" +
+			"	WHERE ServiceType_CapabilityType.capabilityType = CapabilityTypeRequiredMutation.capabilityType AND \n" +
 			"	treeNumber NOT IN( \n" +
 			"		SELECT treeNumber \n" +
 			"		FROM CapabilityTypeRequiredMutation AS currentRequiredMutation \n" +
 			"		JOIN Module AS currentModule \n" +
-			"		WHERE ServiceType_CapabilityType.name = currentRequiredMutation.capabilityType AND \n" +
+			"		WHERE ServiceType_CapabilityType.capabilityType = currentRequiredMutation.capabilityType AND \n" +
 			"		NOT EXISTS( \n" +
 			"			SELECT * \n" +
 			"			FROM CapabilityTypeRequiredMutation \n" +
