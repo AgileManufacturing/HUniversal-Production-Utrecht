@@ -138,15 +138,11 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_s
 				payloadPoint.y = stewartGough->getEffectorLocation().y;
 				movementZ = true;
 			}
-
 			if(setValues.find("z") == -1) {
 				// Probably a XY movement
 				payloadPoint.z = stewartGough->getEffectorLocation().z;
 			}
 			*/
-
-
-
         }
         i++;
     }
@@ -173,7 +169,8 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_s
 			moveVector.set((translatedVector.x + rotatedX), (translatedVector.y + rotatedY), (translatedVector.z + payloadPoint.z));
 
 		}
-		/* if(movementZ) {
+		/*
+		if(movementZ) {
 			// Z Movement
 			moveVector.set(payloadPoint.x, payloadPoint.y, (translatedVector.z + payloadPoint.z));
 		} else {
