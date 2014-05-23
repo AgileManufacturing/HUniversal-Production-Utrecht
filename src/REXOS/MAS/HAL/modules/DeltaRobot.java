@@ -17,6 +17,7 @@ import HAL.steps.HardwareStep;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class DeltaRobot extends ModuleActor {
 	public final static int MAX_ACCELERATION = 50;
@@ -77,29 +78,29 @@ public class DeltaRobot extends ModuleActor {
 			if (command.get("forceStraightLine") != null){
 				if (!command.remove("forceStraightLine").getAsBoolean()){
 					//Entry point
-					int z = move.remove(Z).getAsInt();
-					z -= 20; //20cm above actual point
-					move.addProperty(Z, z);
-					hardwareCommand.add("payload",move);
+					JsonObject entry_move = new JsonParser().parse(move.toString()).getAsJsonObject();
+					int z = entry_move.remove(Z).getAsInt();
+					z += 20; //20mm above actual point
+					entry_move.addProperty(Z, z);
+					hardwareCommand.add("payload",entry_move);
 					hardwareJsonCommand.add("instructionData",hardwareCommand);
 					hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));
 					
 					//Actual point
-					z = move.remove(Z).getAsInt();
-					z += 20; //actual point
-					move.addProperty(Z, z);
+					JsonObject actual_move = new JsonParser().parse(move.toString()).getAsJsonObject();
 					hardwareCommand.remove("payload");
-					hardwareCommand.add("payload",move);
+					hardwareCommand.add("payload",actual_move);
 					hardwareJsonCommand.remove("instructionData");
 					hardwareJsonCommand.add("instructionData",hardwareCommand);
 					hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));
 					
 					//Exit point
-					z = move.remove(Z).getAsInt();
-					z -= 20; //20cm above actual point
-					move.addProperty(Z, z);
+					JsonObject exit_move = new JsonParser().parse(move.toString()).getAsJsonObject();
+					z = exit_move.get(Z).getAsInt();
+					z += 20; //20mm above actual point
+					exit_move.addProperty(Z, z);
 					hardwareCommand.remove("payload");
-					hardwareCommand.add("payload",move);
+					hardwareCommand.add("payload",exit_move);
 					hardwareJsonCommand.remove("instructionData");
 					hardwareJsonCommand.add("instructionData",hardwareCommand);
 					hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));
