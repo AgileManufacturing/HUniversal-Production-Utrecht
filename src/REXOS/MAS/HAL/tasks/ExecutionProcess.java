@@ -61,6 +61,8 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 			else {
 				hardwareAbstractionLayerListener.onProcessStateChanged(state, hardwareStepSerialId, module, null);				
 			}
+			hardwareSteps.clear();
+			this.notify();
 		}
 	}
 
