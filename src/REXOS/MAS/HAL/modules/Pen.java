@@ -28,7 +28,7 @@ public class Pen extends ModuleActor {
 	@Override
 	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
-		
+		System.out.println("Translating pen module");
 		JsonObject jsonCommand = compositeStep.getCommand();
 		JsonObject command = jsonCommand.remove(COMMAND).getAsJsonObject();
 		
@@ -45,10 +45,13 @@ public class Pen extends ModuleActor {
 			jsonCommand.add(COMMAND, command);
 			
 			//Translate it's parents composite steps into hardware steps.
-			compositeStep = new CompositeStep(compositeStep.getProductStep(),jsonCommand);		
+			compositeStep = new CompositeStep(compositeStep.getProductStep(),jsonCommand);	
+			System.out.println("Translating pen module");	
 			ArrayList<HardwareStep> hStep = forwardCompositeStep(compositeStep);
-			if (hStep != null)
+			if (hStep != null){
 				hardwareSteps.addAll(hStep);
+				System.out.println("Translating pen module");
+			}
 		}
 		else {
 			throw new ModuleTranslatingException ("Pen module didn't receive any \"command\" key in CompositeStep command: "+jsonCommand.toString());

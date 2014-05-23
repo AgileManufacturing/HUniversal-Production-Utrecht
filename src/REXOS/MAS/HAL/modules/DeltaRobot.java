@@ -73,44 +73,64 @@ public class DeltaRobot extends ModuleActor {
 			JsonObject hardwareJsonCommand = new JsonObject();
 			hardwareJsonCommand.add("moduleIdentifier",moduleIdentifier.getAsJSON());
 			hardwareJsonCommand.addProperty("status","WAITING");
-			
+			System.out.println("DeltaRobot: translating..");
 			//Add hopping a.k.a. safe movement pane
 			if (command.get("forceStraightLine") != null){
+				System.out.println("DeltaRobot: forceStraightLine not null");
 				if (!command.remove("forceStraightLine").getAsBoolean()){
-					//Entry point
+					System.out.println("DeltaRobot: forceStraightLine true");
 					JsonObject entry_move = new JsonParser().parse(move.toString()).getAsJsonObject();
+					JsonObject actual_move = new JsonParser().parse(move.toString()).getAsJsonObject();
+					JsonObject exit_move = new JsonParser().parse(move.toString()).getAsJsonObject();
+					
+					JsonObject entry_hardwareCommand = new JsonParser().parse(hardwareCommand.toString()).getAsJsonObject();
+					JsonObject actual_hardwareCommand = new JsonParser().parse(hardwareCommand.toString()).getAsJsonObject();
+					JsonObject exit_hardwareCommand = new JsonParser().parse(hardwareCommand.toString()).getAsJsonObject();
+
+					JsonObject entry_point = new JsonParser().parse(hardwareJsonCommand.toString()).getAsJsonObject();
+					JsonObject actual_point = new JsonParser().parse(hardwareJsonCommand.toString()).getAsJsonObject();
+					JsonObject exit_point = new JsonParser().parse(hardwareJsonCommand.toString()).getAsJsonObject();
+
+					System.out.println("DeltaRobot: points parsed");
+					//Entry point
 					int z = entry_move.remove(Z).getAsInt();
 					z += 20; //20mm above actual point
 					entry_move.addProperty(Z, z);
-					hardwareCommand.add("payload",entry_move);
-					hardwareJsonCommand.add("instructionData",hardwareCommand);
-					hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));
-					
+					entry_hardwareCommand.add("payload",entry_move);
+					entry_point.add("instructionData",entry_hardwareCommand);
+					hardwareSteps.add(new HardwareStep(compositeStep,entry_point,moduleIdentifier));
+
+					System.out.println("DeltaRobot: entry point added");
 					//Actual point
-					JsonObject actual_move = new JsonParser().parse(move.toString()).getAsJsonObject();
 					hardwareCommand.remove("payload");
-					hardwareCommand.add("payload",actual_move);
-					hardwareJsonCommand.remove("instructionData");
-					hardwareJsonCommand.add("instructionData",hardwareCommand);
-					hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));
-					
+					actual_hardwareCommand.add("payload",actual_move);
+					actual_point.add("instructionData",actual_hardwareCommand);
+					hardwareSteps.add(new HardwareStep(compositeStep,actual_point,moduleIdentifier));
+
+					System.out.println("DeltaRobot: actual point added");
 					//Exit point
-					JsonObject exit_move = new JsonParser().parse(move.toString()).getAsJsonObject();
 					z = exit_move.get(Z).getAsInt();
 					z += 20; //20mm above actual point
 					exit_move.addProperty(Z, z);
-					hardwareCommand.remove("payload");
-					hardwareCommand.add("payload",exit_move);
-					hardwareJsonCommand.remove("instructionData");
+					exit_hardwareCommand.add("payload",exit_move);
+					exit_point.add("instructionData",exit_hardwareCommand);
+					hardwareSteps.add(new HardwareStep(compositeStep,exit_point,moduleIdentifier));
+					System.out.println("DeltaRobot: exit point added");
+				}
+				else {
+					//Straight line
+					hardwareCommand.add("payload",move);
 					hardwareJsonCommand.add("instructionData",hardwareCommand);
-					hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));
+					hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));	
+					System.out.println("DeltaRobot: straight line added");				
 				}
 			}
 			else {
 				//Straight line
 				hardwareCommand.add("payload",move);
 				hardwareJsonCommand.add("instructionData",hardwareCommand);
-				hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));				
+				hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));		
+				System.out.println("DeltaRobot: straight line added");							
 			}
 			
 			jsonCommand.add(COMMAND, command);
