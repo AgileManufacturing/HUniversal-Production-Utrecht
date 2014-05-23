@@ -56,6 +56,7 @@ public class Draw extends Capability {
 			System.out.println("command" + jsonCommand);
 			
 			ArrayList<ModuleActor> modules = moduleFactory.getBottomModulesForFunctionalModuleTree(this, 1);
+			System.out.println("Functional module size: "+modules.size());
 			for (ModuleActor moduleActor : modules) {
 				JsonObject a = new JsonParser().parse(jsonCommand.toString()).getAsJsonObject();
 				CompositeStep draw = new CompositeStep(productStep, a);
@@ -68,6 +69,8 @@ public class Draw extends Capability {
 				}
 			}
 		}
+		else
+			throw new CapabilityException("Invalid service type or no target specified", null);
 		return hardwareSteps;
 	}
 

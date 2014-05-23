@@ -34,4 +34,11 @@ public class ModuleIdentifier {
 		moduleIdentifier.addProperty("serialNumber", serialNumber);
 		return moduleIdentifier;
 	}
+	
+	public boolean equals(ModuleIdentifier rhs) {
+		if(this.manufacturer.equals(rhs.getManufacturer()) == false) return false;
+		if(this.typeNumber.equals(rhs.getTypeNumber()) == false) return false;
+		if(this.serialNumber.equals(rhs.getSerialNumber()) == false) return false;
+		return true;
+	}
 }

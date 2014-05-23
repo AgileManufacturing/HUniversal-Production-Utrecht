@@ -223,35 +223,35 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		FileInputStream fis;
 		byte[] content;
 
-		File deltaRobotJar = new File("/home/t/Desktop/DeltaRobot.jar");
+		File deltaRobotJar = new File("C:/Users/Tommy/Contacts/Desktop/DeltaRobot.jar");
 		fis = new FileInputStream(deltaRobotJar);
 		content = new byte[(int) deltaRobotJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Module = new String(Base64.encodeBase64(content));
 		
-		File deltaRobotZip = new File("/home/t/Desktop/nodes.zip");
+		File deltaRobotZip = new File("C:/Users/Tommy/Contacts/Desktop/nodes.zip");
 		fis = new FileInputStream(deltaRobotZip);
 		content = new byte[(int) deltaRobotZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
 		
-		File cameraZip = new File("/home/t/Desktop/nodes.zip");
+		File cameraZip = new File("C:/Users/Tommy/Contacts/Desktop/nodes.zip");
 		fis = new FileInputStream(cameraZip);
 		content = new byte[(int) cameraZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64CameraRos = new String(Base64.encodeBase64(content));
 		
-		File penJar = new File("/home/t/Desktop/Pen.jar");
+		File penJar = new File("C:/Users/Tommy/Contacts/Desktop/Pen.jar");
 		fis = new FileInputStream(penJar);
 		content = new byte[(int) penJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Pen = new String(Base64.encodeBase64(content));
 		
-		File pickAndPlaceJar = new File("/home/t/Desktop/Draw.jar");
+		File pickAndPlaceJar = new File("C:/Users/Tommy/Contacts/Desktop/Draw.jar");
 		fis = new FileInputStream(pickAndPlaceJar);
 		content = new byte[(int) pickAndPlaceJar.length()];
 		fis.read(content);

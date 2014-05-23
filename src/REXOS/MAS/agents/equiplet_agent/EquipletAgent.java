@@ -158,6 +158,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	  * @return false if the service can't be executed, returns an startTime, duration and ID of the product step if it can be executed.
 	  */
 	private String canExecute(String msg){
+		System.out.println("Can execute?");
 		JsonObject productSteps = new JsonParser().parse(msg).getAsJsonObject();
 		for(int i =0; i < serviceList.size(); i++){
 	        if(serviceList.get(i).getName().equals(productSteps.get("service").getAsString())){
@@ -178,6 +179,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	  * @return true if the planning has been done succesfull.
 	  */
 	private String schedule(String msg){
+		System.out.println("Can Schedule?");
+
 		JsonObject productSteps = new JsonParser().parse(msg).getAsJsonObject();
 		Job job = new Job(productSteps.get("startTime").getAsString(),productSteps.get("duration").getAsString(),productSteps.get("productStepId").getAsString(),productSteps.get("productStep").getAsJsonObject());
     	equipletSchedule.add(job);
@@ -212,6 +215,9 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			System.out.println("Execute PS");
 			hal.translateProductStep(equipletSchedule.get(scheduleCounter).getProductStep());	
 			scheduleCounter++;
+		}else{
+			scheduleCounter=0;
+			equipletSchedule.clear();
 		}
 	}
 
@@ -244,7 +250,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	@Override
 	public void onIncapableCapabilities(ProductStep productStep) {
-		System.out.println("Translating Failed");		
+		System.out.println("Translating Failed");	
+		executeProductStep();
 	}
 
 	@Override
