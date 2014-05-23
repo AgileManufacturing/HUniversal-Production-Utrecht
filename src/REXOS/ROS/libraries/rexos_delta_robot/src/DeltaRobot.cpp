@@ -124,7 +124,7 @@ namespace rexos_delta_robot{
 				ROS_INFO_STREAM("found stepperMotorProperties");
 			} else if(it->name() == "deltaRobotMeasures"){
 				JSONNode node = it->as_node();
-				deltaRobotMeasures = new rexos_datatypes::DeltaRobotMeasures(node);
+				deltaRobotMeasures = new rexos_delta_robot::DeltaRobotMeasures(node);
 				ROS_INFO_STREAM("found deltraRobotMeasures");
 			} else {
 				// some other property, ignore it
@@ -137,7 +137,7 @@ namespace rexos_delta_robot{
      * @param voxelSize The size in millimeters of a side of a voxel in the boundaries.
      **/
     void DeltaRobot::generateBoundaries(double voxelSize) {
-		boundaries = EffectorBoundaries::generateEffectorBoundaries((*kinematics), deltaRobotMeasures, motors, voxelSize);
+		boundaries = rexos_delta_robot::EffectorBoundaries::generateEffectorBoundaries((*kinematics), deltaRobotMeasures, motors, voxelSize);
 		boundariesGenerated = true;
     }
 
@@ -217,10 +217,10 @@ namespace rexos_delta_robot{
         }
 
         // Create MotorRotation objects.
-        rexos_datatypes::MotorRotation* rotations[3];
-        rotations[0] = new rexos_datatypes::MotorRotation();
-        rotations[1] = new rexos_datatypes::MotorRotation();
-        rotations[2] = new rexos_datatypes::MotorRotation();
+        rexos_motor::MotorRotation* rotations[3];
+        rotations[0] = new rexos_motor::MotorRotation();
+        rotations[1] = new rexos_motor::MotorRotation();
+        rotations[2] = new rexos_motor::MotorRotation();
 
         // Get the motor angles from the kinematics model
         try{
@@ -371,7 +371,7 @@ namespace rexos_delta_robot{
      *
      * @return The amount of motor steps the motor has moved.
      **/
-    int DeltaRobot::moveMotorUntilSensorIsOfValue(int motorIndex, rexos_datatypes::MotorRotation motorRotation, bool sensorValue){
+    int DeltaRobot::moveMotorUntilSensorIsOfValue(int motorIndex, rexos_motor::MotorRotation motorRotation, bool sensorValue){
         motors[motorIndex]->writeRotationData(motorRotation, 1, false);
 
         int steps = 0;
@@ -397,7 +397,7 @@ namespace rexos_delta_robot{
 
         // Setup for incremental motion in big steps, to get to the sensor quickly.
         motors[motorIndex]->setIncrementalMode(1);
-        rexos_datatypes::MotorRotation motorRotation;
+        rexos_motor::MotorRotation motorRotation;
         motorRotation.angle = -motors.at(motorIndex)->getMicroStepAngle() * calibrationBigStepFactor;
         
         // Move to the sensor in large steps until it is pushed
@@ -454,7 +454,7 @@ namespace rexos_delta_robot{
         }
 
         // Return to base! Remove the deviation, we have to find the controller 0 point.
-        rexos_datatypes::MotorRotation motorRotation;
+        rexos_motor::MotorRotation motorRotation;
         motorRotation.speed = 0.1;
         motorRotation.angle = 0;
 

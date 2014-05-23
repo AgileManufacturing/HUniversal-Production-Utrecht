@@ -39,7 +39,7 @@
 #include <cmath>
 #include <cstdio>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <rexos_datatypes/MotorRotation.h>
+#include <rexos_motor/MotorRotation.h>
 #include <rexos_delta_robot/InverseKinematics.h>
 #include <rexos_delta_robot/InverseKinematicsException.h>
 #include <rexos_utilities/Utilities.h>
@@ -65,7 +65,7 @@ namespace rexos_delta_robot {
 	 * 
 	 * @param deltaRobotMeasures The measures of the deltarobot configuration.
 	 **/
-	InverseKinematics::InverseKinematics(rexos_datatypes::DeltaRobotMeasures & deltaRobotMeasures) :
+	InverseKinematics::InverseKinematics(rexos_delta_robot::DeltaRobotMeasures & deltaRobotMeasures) :
 			InverseKinematicsModel(deltaRobotMeasures.base, deltaRobotMeasures.hip, deltaRobotMeasures.effector, deltaRobotMeasures.ankle, deltaRobotMeasures.maxAngleHipAnkle){
 	}	
 
@@ -138,7 +138,7 @@ namespace rexos_delta_robot {
 	 * @param destinationPoint The destination point.
 	 * @param rotations Array of MotorRotation objects, will be adjusted by the function to the correct rotations per motor.
 	 **/
-	void InverseKinematics::destinationPointToMotorRotations(const rexos_datatypes::Point3D<double>& destinationPoint, rexos_datatypes::MotorRotation* (&rotations)[3]) const{
+	void InverseKinematics::destinationPointToMotorRotations(const rexos_datatypes::Point3D<double>& destinationPoint, rexos_motor::MotorRotation* (&rotations)[3]) const{
 		// Adding 180 degrees switches 0 degrees for the motor from the midpoint of the engines to directly opposite.
 		// When determining motorAngle the degrees determine the position of the engines:
 		// 	  0 degrees: the hip from this motor moves on the yz plane

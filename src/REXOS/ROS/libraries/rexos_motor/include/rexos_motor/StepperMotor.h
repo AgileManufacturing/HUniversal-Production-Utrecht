@@ -34,7 +34,7 @@
 #include <queue>
 #include <boost/thread.hpp>
 
-#include <rexos_datatypes/MotorRotation.h>
+#include <rexos_motor/MotorRotation.h>
 #include <rexos_modbus/ModbusException.h>
 #include <rexos_modbus/ModbusController.h>
 #include <rexos_motor/CRD514KD.h>
@@ -57,10 +57,10 @@ namespace rexos_motor{
 
 		void resetCounter(void);
 
-		void moveTo(const rexos_datatypes::MotorRotation& motorRotation, int motionSlot);
-		void moveTo(const rexos_datatypes::MotorRotation& motorRotation);
+		void moveTo(const rexos_motor::MotorRotation& motorRotation, int motionSlot);
+		void moveTo(const rexos_motor::MotorRotation& motorRotation);
 
-		void writeRotationData(const rexos_datatypes::MotorRotation& motorRotation, int motionSlot, bool useDeviation = true);
+		void writeRotationData(const rexos_motor::MotorRotation& motorRotation, int motionSlot, bool useDeviation = true);
 
 		void startMovement(int motionSlot);
 		void waitTillReady(void);
@@ -68,6 +68,7 @@ namespace rexos_motor{
 		bool isPoweredOn(void){ return poweredOn; }
 		
 		bool isValidAngle(double angle);
+		bool isReady();
 
 		/**
 		 * Returns the minimum angle, in radians, the StepperMotor can travel on the theoretical plane.

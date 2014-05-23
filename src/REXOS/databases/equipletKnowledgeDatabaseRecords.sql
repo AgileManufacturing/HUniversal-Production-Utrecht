@@ -55,6 +55,35 @@ insert into ModuleType(
 		\"minSpeedDegrees\" : 0.036,
 		\"maxSpeedDegrees\" : 18000
 	}
+}", 1, "", 1, ""),
+("HU", "six_axis_type_A", "{
+	\"midPointX\" : 75.0,
+	\"midPointY\" : -200.0,
+	\"midPointZ\" : -35.3,
+	\"stewartGoughMeasures\" : {
+		\"baseRadius\" : 101.3,
+		\"hipLength\" : 100.0,
+		\"effectorRadius\" : 46.19,
+		\"ankleLength\" : 250.0,
+		\"hipAnleMaxAngleDegrees\" : 22.0,
+		\"motorFromZeroToTopAngleDegrees\" : 20.0,
+		\"boundaryBoxMinX\" : -200.0,
+		\"boundaryBoxMaxX\" : 200.0,
+		\"boundaryBoxMinY\" : -200.0,
+		\"boundaryBoxMaxY\" : 200.0,
+		\"boundaryBoxMinZ\" : -330.0,
+		\"boundaryBoxMaxZ\" : -180.0
+	}, 
+	\"calibrationBigStepFactor\" : 20,
+	\"stepperMotorProperties\" : {
+		\"motorMinAngleDegrees\" : -18.0,
+		\"motorMaxAngleDegrees\" : 80.0,
+		\"microStepAngleDegrees\" : 0.036,
+		\"minAccelerationDegrees\" : 36,
+		\"maxAccelerationDegrees\" : 36000,
+		\"minSpeedDegrees\" : 0.036,
+		\"maxSpeedDegrees\" : 18000
+	}
 }", 1, 1), 
 ("HU", "work_plane_type_A", "{
 	\"midPointX\" : 175.0,
@@ -90,6 +119,10 @@ insert into Module(
 ("EQ1", "The_Imaging_Source_Europe_GmbH", "Cheap_ass_lens", "1", null, null, 2, 3, ""),
 ("EQ1", "HU", "delta_robot_type_A", "1", 3, 2, 5, 8, "{
 	\"modbusIp\" : \"192.168.0.22\",
+	\"modbusPort\" : 502
+}"),
+("HU", "six_axis_type_A", "1", 3, 2, null, null, null, "{
+	\"modbusIp\" : \"192.168.0.32\",
 	\"modbusPort\" : 502
 }"),
 ("EQ1", "HU", "work_plane_type_A", "1", 1, 2, 9, 10, ""),

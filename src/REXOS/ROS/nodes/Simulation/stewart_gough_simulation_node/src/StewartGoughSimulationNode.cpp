@@ -4,6 +4,7 @@
 #include <sstream>
 #include <cstdlib>
 #include "gazebo_msgs/LinkState.h"
+#include "stewart_gough_simulation_node/SixAxisMath.h"
 
 
 StewartGoughSimulationNode::StewartGoughSimulationNode()
@@ -11,13 +12,12 @@ StewartGoughSimulationNode::StewartGoughSimulationNode()
 	
 }
 
+
+
 void StewartGoughSimulationNode::run(int argc, char **argv){
-	
-	
 	ros::start();
 	ros::Rate loop_rate(60);
-	
-	
+
 	motors[0].init("upperArmToMotor1");
 	motors[1].init("upperArmToMotor2");
 	motors[2].init("upperArmToMotor3");
@@ -25,52 +25,64 @@ void StewartGoughSimulationNode::run(int argc, char **argv){
 	motors[4].init("upperArmToMotor5");
 	motors[5].init("upperArmToMotor6");
 	
-	//motor1.goToAngleDegrees(10);
-	//motor2.goToAngleDegrees(10);
-	//motor3.goToAngleDegrees(10);
-	//motor4.goToAngleDegrees(10);
-	//motor5.goToAngleDegrees(0);
-	//motor6.goToAngleDegrees(0);
+	motors[0].goToAngleDegrees(0);
+	motors[1].goToAngleDegrees(0);
+	motors[2].goToAngleDegrees(0);
+	motors[3].goToAngleDegrees(0);
+	motors[4].goToAngleDegrees(0);
+	motors[5].goToAngleDegrees(0);
+
+
+
+
+
+double angles[10][6] = {
+
+{12.5454, 12.5454, 12.5454, 12.5454, 12.5454, 12.5454},
+
+	{11.6507, 14.1764, 11.6507, 14.1764, 11.6507, 14.1764},
+
+	{11.4274, 15.3098, 11.4274, 15.3098, 11.4274, 15.3098},
+
+	{11.3349, 16.6566, 11.3349, 16.6566, 11.3349, 16.6566},
+
+	{11.3714, 18.1977, 11.3714, 18.1977, 11.3714, 18.1977},
+
+	{12.5454, 12.5454, 12.5454, 12.5454, 12.5454, 12.5454},
+
+	{14.1764, 11.6507, 14.1764, 11.6507, 14.1764, 11.6507},
+
+	{15.3098, 11.4274, 15.3098, 11.4274, 15.3098, 11.4274},
+
+	{16.6566, 11.3349, 16.6566, 11.3349, 16.6566, 11.3349},
+
+	{18.1977, 11.3714, 18.1977, 11.3714, 18.1977, 11.3714}};
+
+
 	
 	ros::NodeHandle nodeHandle;
-
 	ros::ServiceServer service = nodeHandle.advertiseService("rotate_motor_to_degrees", & StewartGoughSimulationNode::rotateMotorToDegrees, this);
-	
 	int timer = 0;
-	double degrees[11][6]{
-		{30,30,30,30,30,30},
-		{-40,-40,-40,-40,-40,-40},
-		{-10,10,-10,10,-10,10},
-		{10,-10,10,-10,10,-10},
-		{-50,-50,20,20,20,20},
-		{20,20,-50,-50,20,20},
-		{-50,-50,20,20,-50,-50},
-		{15,05,-30,-40,-30,-40},
-		{-40,-30,15,5,-30,-40},
-		{30,30,-40,-40,-40,-40},
-		{0,0,0,0,0,0}
-	};
 	int patternIndex = 0;
 	bool pattern = true;
 	ROS_INFO("=====Simulation is running======");
-	while (ros::ok())
-	{
-		ROS_INFO("effector X: %f",sdfController.getLinkState("platform").pose.position.x);
-		ROS_INFO("effector Y: %f",sdfController.getLinkState("platform").pose.position.y);
-		ROS_INFO("effector Z: %f",sdfController.getLinkState("platform").pose.position.z);
+	
+	while (ros::ok()){
+		
 		for(int i = 0; i < 6; i++){
 			motors[i].update();
 		}
-		
+		ROS_INFO("I iz inside1");
+	
 		if(pattern == true){
-			ROS_INFO("in pattern");
 			if(timer > 100){
 				for(int i = 0; i < 6; i++){
-					motors[i].goToAngleDegrees(degrees[patternIndex][i]);
+					motors[i].goToAngleDegrees(angles[patternIndex][i]);
 				}
-				
+				ROS_INFO("I iz inside2");
+	
 				patternIndex++;
-				if(patternIndex > 10){patternIndex = 0;}
+				if(patternIndex > 9){patternIndex = 0;}
 				timer = 0;
 			}
 			timer++;
@@ -78,13 +90,16 @@ void StewartGoughSimulationNode::run(int argc, char **argv){
 		ros::spinOnce();
 		loop_rate.sleep();
 	}
-	
-	//ros::spin();
 }
 
 bool StewartGoughSimulationNode::rotateMotorToDegrees(stewart_gough_simulation_node::rotate::Request  & req,
 									 stewart_gough_simulation_node::rotate::Response  & res){
-  motors[req.motorIndex].goToAngleDegrees(req.degrees);
+  motors[0].goToAngleDegrees(req.motor1);
+  motors[1].goToAngleDegrees(req.motor2);
+  motors[2].goToAngleDegrees(req.motor3);
+  motors[3].goToAngleDegrees(req.motor4);
+  motors[4].goToAngleDegrees(req.motor5);
+  motors[5].goToAngleDegrees(req.motor6);
   return true;
 }
 

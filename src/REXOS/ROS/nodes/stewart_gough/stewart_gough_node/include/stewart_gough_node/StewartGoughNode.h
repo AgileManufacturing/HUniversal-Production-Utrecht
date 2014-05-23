@@ -35,6 +35,7 @@
 #include "stewart_gough_node/Point.h"
 
 #include <rexos_datatypes/Point3D.h>
+#include <rexos_utilities/Utilities.h>
 #include <rexos_stewart_gough/StewartGough.h>
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/StepperMotorProperties.h>
@@ -44,7 +45,6 @@
 #include <rexos_statemachine/Transitions.h>
 #include <rexos_coordinates/Module.h>
 #include <rexos_knowledge_database/Module.h>
-
 #include "equiplet_node/RegisterModule.h"
 
 #include <actionlib/server/simple_action_server.h>
@@ -54,8 +54,6 @@
 #pragma GCC system_header
 #include <libjson/libjson.h>
 // ---------------------------------------------
-
-
 namespace stewartGoughNodeNamespace{
 
 	typedef actionlib::SimpleActionServer<rexos_statemachine::SetInstructionAction> SetInstructionActionServer;
@@ -68,7 +66,7 @@ namespace stewartGoughNodeNamespace{
 			public rexos_coordinates::Module{
 	protected:
 		rexos_motor::StepperMotorProperties* stepperMotorProperties;
-		rexos_datatypes::DeltaRobotMeasures* deltaRobotMeasures;
+		rexos_stewart_gough::StewartGoughMeasures* stewartGoughMeasures;
 	
 		std::string modbusIp;
 		int modbusPort;

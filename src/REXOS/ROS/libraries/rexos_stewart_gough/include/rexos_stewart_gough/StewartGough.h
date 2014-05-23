@@ -31,18 +31,40 @@
 
 #include <modbus/modbus.h>
 #include <rexos_datatypes/Point3D.h>
-#include <rexos_datatypes/DeltaRobotMeasures.h>
+#include <rexos_stewart_gough/StewartGoughMeasures.h>
 #include <rexos_motor/MotorInterface.h>
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/MotorManager.h>
 #include <rexos_motor/StepperMotorProperties.h>
-#include <rexos_datatypes/DeltaRobotMeasures.h>
-#include <rexos_stewart_gough/EffectorBoundaries.h>
+#include <rexos_stewart_gough/SixAxisCalculations.h>
+//#include <rexos_stewart_gough/EffectorBoundaries.h>
+//#include <rexos_stewart_gough/InverseKinematics.h>
 
 #include <vector>
 
 namespace rexos_stewart_gough{
-	class InverseKinematicsModel;
+	
+	
+	struct MotorMap {
+		int motor;
+		int sensor;
+		
+		MotorMap(int motor = 0, int sensor = 0):
+				motor(motor),
+				sensor(sensor){}
+	};
+	
+	struct MotorGroup {
+		int motorIndex1;
+		int motorIndex2;
+		
+		MotorGroup(int motorIndex1 = 0, int motorIndex2 = 0):
+				motorIndex1(motorIndex1),
+				motorIndex2(motorIndex2){}
+	};
+	
+	
+	class StewartGough;
 	/**
 	 * A class that symbolizes an entire deltarobot.
 	 **/
@@ -57,7 +79,7 @@ namespace rexos_stewart_gough{
 		 * Gets the EffectorBoundaries of the deltarobot.
 		 * @return The EffectorBoundaries of the deltarobot.
 		 **/
-		inline EffectorBoundaries* getBoundaries(){ return boundaries; }
+		//inline EffectorBoundaries* getBoundaries(){ return boundaries; }
 
 		/**
 		 * Checks whether the EffectorBoundaries have been generated, via the boundariesGenerated boolean.
@@ -67,24 +89,44 @@ namespace rexos_stewart_gough{
 
 		void generateBoundaries(double voxelSize);
 		bool checkPath(const rexos_datatypes::Point3D<double>& begin, const rexos_datatypes::Point3D<double>& end);
+		
+		bool checkPath(const rexos_datatypes::Point3D<double>& begin, const double beginRotationX, const double beginRotationY, const double beginRotationZ, const rexos_datatypes::Point3D<double>& end, const double endRotationX, const double endRotationY, const double endRotationZ);
 
+
+		void moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration, double rotationX, double rotationY, double rotationZ);
 		void moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration);
-		void calibrateMotor(int motorIndex);
+		
+		void calibrateMotor(int motorIndex1,int motorIndex2);
 		bool checkSensor(int sensorIndex);
 		bool calibrateMotors();
 		void powerOff();
 		void powerOn();
+		
 		rexos_datatypes::Point3D<double>& getEffectorLocation();
+		
+		double getEffectorRotationX();
+		double getEffectorRotationY();
+		double getEffectorRotationZ();
 
+		
+		// the inital motors and sensors are positioned on the wrong locations
+		// this is used to map them on the right locations
+		MotorMap motorMap[6];
 	private:
+
+		
+		SixAxisCalculations * sixAxisCalculations;
+
+
+		
 		/**
 		 * @var InverseKinematicsModel* kinematics
 		 * A pointer to the kinematics model used by the DeltaRobot.
 		 **/
-		InverseKinematicsModel* kinematics;
+		//InverseKinematics* kinematics;
 
-		rexos_datatypes::DeltaRobotMeasures* stewartGoughMeasures;
-		rexos_motor::StepperMotorProperties* stepperMotorProperties;
+		rexos_stewart_gough::StewartGoughMeasures * stewartGoughMeasures;
+		rexos_motor::StepperMotorProperties * stepperMotorProperties;
 	
 		int calibrationBigStepFactor;
 		/**
@@ -103,13 +145,32 @@ namespace rexos_stewart_gough{
 		 * @var EffectorBoundaries* boundaries
 		 * A pointer to the EffectorBoundaries of the DeltaRobot.
 		 **/
-		EffectorBoundaries* boundaries;
+		//EffectorBoundaries* boundaries;
 
 		/**
 		 * @var Point3D<double> effectorLocation
 		 * A 3D point in doubles that points to the location of the effector.
 		 **/
 		rexos_datatypes::Point3D<double> effectorLocation;
+		
+		/**
+		 * @var double rotationX
+		 * Current effector rotation around the x axis
+		 **/
+		double currentEffectorRotationX;
+		
+		/**
+		 * @var double rotationY
+		 * Current effector rotation around the y axis
+		 **/
+		double currentEffectorRotationY;
+		
+		/**
+		 * @var double rotationZ
+		 * Current effector rotation around the z axis
+		 **/
+		double currentEffectorRotationZ;
+		
 
 		/**
 		 * @var bool boundariesGenerated
@@ -138,8 +199,14 @@ namespace rexos_stewart_gough{
 		int currentMotionSlot;
 
 		bool isValidAngle(int motorIndex, double angle);
-		int moveMotorUntilSensorIsOfValue(int motorIndex, rexos_datatypes::MotorRotation motorRotation, bool sensorValue);
+		MotorGroup moveMotorUntilSensorIsOfValue(int motorIndex1,int motorIndex2, rexos_motor::MotorRotation motorRotation1 ,rexos_motor::MotorRotation motorRotation2, bool sensorValue);
 		double getSpeedForRotation(double relativeAngle, double moveTime, double acceleration);
 		double getAccelerationForRotation(double relativeAngle, double moveTime);
+		
+		rexos_motor::StepperMotor* getMotor(int number);
+		int getMotorIndexByNumber(int number);
+		
+		void deleteMotorRotationObjects(rexos_motor::MotorRotation* rotations[6]);
+		
 	};
 }

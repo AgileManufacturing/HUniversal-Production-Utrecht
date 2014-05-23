@@ -1,9 +1,10 @@
 /**
  * @file StewartGoughNode.cpp
  * @brief Provide the services to move the Stewart Gough robot.
- * @date Created: 2012-09-19
+ * @date Created: 2014-02-19
  *
  * @author Garik Hakopian
+ * @author Rolf Smit
  *
  * @section LICENSE
  * License: newBSD
@@ -28,10 +29,12 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
+
 #include "stewart_gough_node/StewartGoughNode.h"
 #include "stewart_gough_node/Point.h"
 #include <execinfo.h>
 #include <signal.h>
+
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "StewartGoughNode"
@@ -97,6 +100,7 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_s
 	
     //construct a payload
     //construct lookupvalues.
+	std::cout <<"onSetInstruction" << std::endl;
 	Point payloadPoint, lookupResultPoint;
 	double angle, rotatedX, rotatedY;
     JSONNode::const_iterator i = instructionDataNode.begin();
@@ -105,6 +109,7 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_s
 	    // keep in mind that a payload may or may not contain all values. Use lastXYZ to determine these values if they are not set.
         if (strcmp(nodeName, "payload") == 0){
 
+			
 			payloadPoint = parsePoint(*i, &setValues);
 			lookupResultPoint = parseLookup(*i);
 			std::string angleValue = parseNodeValue("angle", *i);
@@ -115,19 +120,29 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_s
 			if(!(lookupResultPoint.x == 0 && lookupResultPoint.y == 0 && angle == 0)){
 				lookupIsSet = true;
 			}
+			
 
+			if(setValues.find("x") == -1) {
+				payloadPoint.x = stewartGough->getEffectorLocation().x;
+			}
+			if(setValues.find("y") == -1) {
+				payloadPoint.y = stewartGough->getEffectorLocation().y;
+			}
+			if(setValues.find("z") == -1) {
+				payloadPoint.z = stewartGough->getEffectorLocation().z;
+			}
+			/*
 			if(setValues.find("x") == -1 && setValues.find("y") == -1) {
 				// Probably a Z movement
 				payloadPoint.x = stewartGough->getEffectorLocation().x;
 				payloadPoint.y = stewartGough->getEffectorLocation().y;
 				movementZ = true;
 			}
-
 			if(setValues.find("z") == -1) {
 				// Probably a XY movement
 				payloadPoint.z = stewartGough->getEffectorLocation().z;
 			}
-
+			*/
         }
         i++;
     }
@@ -135,6 +150,7 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_s
     Vector3 moveVector;
     //lookup is set, so transform the (rotated) crate to a normal position.
     if(lookupIsSet) {
+		
 		Vector3 lookupVector(lookupResultPoint.x, lookupResultPoint.y, lookupResultPoint.z);
 
 		double theta = angle * 3.141592653589793 / 180.0;
@@ -147,7 +163,13 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_s
 		Vector3 translatedVector = convertToModuleCoordinate(lookupVector);
 
 		std::cout << "[TranslatedVectorX]: \t" << translatedVector.x << "\n[TranslatedVectorY]: \t" << translatedVector.y << std::endl;
+		
+		if(setValues.find("x")!= -1 && setValues.find("y")!= -1 
+				&& setValues.find("z")!= -1){
+			moveVector.set((translatedVector.x + rotatedX), (translatedVector.y + rotatedY), (translatedVector.z + payloadPoint.z));
 
+		}
+		/*
 		if(movementZ) {
 			// Z Movement
 			moveVector.set(payloadPoint.x, payloadPoint.y, (translatedVector.z + payloadPoint.z));
@@ -156,7 +178,7 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_s
 			moveVector.set((translatedVector.x + rotatedX), (translatedVector.y + rotatedY), payloadPoint.z);
 			std::cout << "[MoveVectorX]: \t" << moveVector.x << "\n[MoveVectorY]: \t" << moveVector.y << std::endl;
 		}
-
+		*/
 	} else {
 		moveVector.set(payloadPoint.x, payloadPoint.y, payloadPoint.z);
 	}
@@ -170,6 +192,21 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_s
   	//finally move to point.
 	ROS_INFO("Failed moving to point");
 	setInstructionActionServer.setAborted(result_);
+}
+
+
+// Calibrate service functions ------------------------------------------------
+/**
+ * Main function for starting the (re)calibratiion of the robot. Is called from the service functions. 
+ *
+ * @return true if the calibration was successful else false 
+ **/
+bool stewartGoughNodeNamespace::StewartGoughNode::calibrate(){
+	if(!stewartGough->calibrateMotors()){
+		ROS_ERROR("Calibration FAILED. EXITING.");
+		return false;
+	}
+	return true;
 }
 
 /**
@@ -186,15 +223,15 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(double x, double y
 	rexos_datatypes::Point3D<double> oldLocation(stewartGough->getEffectorLocation());
 	rexos_datatypes::Point3D<double> newLocation(x,y,z);
 
-	if(stewartGough->checkPath(oldLocation, newLocation)){
-
+	try {
 		stewartGough->moveTo(newLocation, maxAcceleration);
-
 		return true;
+	} catch(std::out_of_range& ex){
+		return false;
 	}
-
-	return false;
-} 
+	
+	
+}
 
 /**
  * Function that moves the stewart int that is relative to the current. 
@@ -210,20 +247,26 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToRelativePoint(double x, 
 	rexos_datatypes::Point3D<double> oldLocation(stewartGough->getEffectorLocation());
 	rexos_datatypes::Point3D<double> newLocation(x,y,z);
 	newLocation += oldLocation;
-
-	if(stewartGough->checkPath(oldLocation, newLocation)){
+	try {
 		ROS_INFO("Moving to: (%f, %f, %f) maxAcceleration=%f", x, y, z, maxAcceleration);
 		stewartGough->moveTo(newLocation, maxAcceleration);
 		return true;
-	} else {
+	} catch(std::out_of_range& ex){
 		return false;
 	}
+	
 }
 
+
 void stewartGoughNodeNamespace::StewartGoughNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO("Initialize transition called");
+	as->setSucceeded();
 }
+
 void stewartGoughNodeNamespace::StewartGoughNode::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as){
+	ROS_INFO("Deinitialize transition called");
 	ros::shutdown();
+	as->setSucceeded();
 }
 
 /**
@@ -232,11 +275,11 @@ void stewartGoughNodeNamespace::StewartGoughNode::transitionDeinitialize(rexos_s
  **/
 void stewartGoughNodeNamespace::StewartGoughNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Setup transition called");
-	// Generate the effector boundaries with voxel size 2
-	stewartGough->generateBoundaries(2);
+
 	// Power on the deltarobot and calibrate the motors.
 	stewartGough->powerOn();
 	// Calibrate the motors
+
 	if(!stewartGough->calibrateMotors()){
 		ROS_ERROR("Calibration FAILED. EXITING.");
 		as->setAborted();
@@ -391,15 +434,12 @@ int main(int argc, char **argv){
 		return -1;
 	}
 	
-	
 	std::string equipletName = argv[1];
 	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
 	
 	ROS_INFO("Creating StewartGoughNode");
-
 	stewartGoughNodeNamespace::StewartGoughNode drn(equipletName, moduleIdentifier);
 
-	ROS_INFO("Running StateEngine");
 	ros::spin();
 	return 0;
 }
