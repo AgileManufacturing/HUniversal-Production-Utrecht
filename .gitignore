@@ -1,6 +1,8 @@
 # code lite
 *.session
 .codelite
+*.tags
+*.project
 
 # Compiled Object files
 *.slo
