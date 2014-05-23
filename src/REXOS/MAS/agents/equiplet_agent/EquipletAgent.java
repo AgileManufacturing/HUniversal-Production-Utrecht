@@ -224,8 +224,10 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	@Override
 	public void onProcessStateChanged(String state, long hardwareStepSerialId,
 			Module module, HardwareStep hardwareStep) {
-		// TODO Auto-generated method stub
-		
+		if(state.equals("FAILED")){
+			executeProductStep();
+			//Log that process execute failed.
+		}
 	}
 
 	@Override
@@ -250,8 +252,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	@Override
 	public void onIncapableCapabilities(ProductStep productStep) {
-		System.out.println("Translating Failed");	
-		executeProductStep();
 	}
 
 	@Override
