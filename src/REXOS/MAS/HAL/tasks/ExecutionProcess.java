@@ -53,6 +53,15 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 				throw new HardwareAbstractionLayerProcessException("No more hardwareSteps while there should be at least one more");
 			}
 		}
+		else {
+			if (hardwareSteps.size() > 0){
+				HardwareStep hardwareStep = hardwareSteps.get(0);
+				hardwareAbstractionLayerListener.onProcessStateChanged(state, hardwareStepSerialId, module, hardwareStep);	
+			}
+			else {
+				hardwareAbstractionLayerListener.onProcessStateChanged(state, hardwareStepSerialId, module, null);				
+			}
+		}
 	}
 
 	public void start() {
