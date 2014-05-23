@@ -52,7 +52,7 @@ stewartGoughNodeNamespace::StewartGoughNode::StewartGoughNode(std::string equipl
 		stewartGough(NULL),
 		setInstructionActionServer(
 				nodeHandle, 
-				moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() + "/set_instruction", 
+				equipletName + "/" + moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() + "/set_instruction", 
 				boost::bind(&stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction, this, _1), 
 				false),
 		lastX(0.0),

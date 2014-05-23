@@ -694,7 +694,7 @@ namespace rexos_stewart_gough{
 		moveTo(rexos_datatypes::Point3D<double>(0, 0, -300), 30, 0, 0, 0);
 		
 		
-		for(int i = 0; i < 2000000; i++){
+		/*for(int i = 0; i < 2000000; i++){
 			
 			x = (rand() % (maxX-minX))+minX;
 			y = (rand() % (maxY-minY))+minY;
@@ -717,7 +717,7 @@ namespace rexos_stewart_gough{
 				std::cout << "Rotation: " << xr << ", " << yr << ", " << zr << std::endl; 
 			}
 		
-		}
+		}*/
         std::cout << "[DEBUG] effector location z: " << effectorLocation.z << std::endl; 
 		
         return true;
