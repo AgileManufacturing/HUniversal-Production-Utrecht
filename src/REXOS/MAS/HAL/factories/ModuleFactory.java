@@ -32,14 +32,31 @@ import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.HardwareStep;
 
+/**
+ * The ModuleFactory is the factory for the {@link Module}s. 
+ * It does not only instantiate capabilities using the {@link DynamicClassFactory} (allowing dynamic addition of classes) but also manages part of the knowledge database.
+ * @author Tommas Bakker
+ *
+ */
 public class ModuleFactory extends Factory {
 	// SQL queries
+	/**
+	 * SQL query for selecting the moduleIdentifiers of the modules which are bottomModules for an equiplet
+	 * Input: equipletName
+	 * A module is considered to be a bottomModule when is has no children.
+	 */
 	private static final String getModuleIdentifiersForBotomModules = 
 			"SELECT manufacturer, typeNumber, serialNumber \n" + 
 			"FROM Module \n" + 
 			"WHERE equiplet = ? AND \n" + 
 			"	attachedToRight = attachedToLeft + 1;"; 
-	private static final String getModuleIdentifiersOfPhysicalModuleTreesForCapability = 
+	/**
+	 * SQL query for selecting the moduleIdentifiers of the physicalModuleTrees for a functionalModuleTree of a capabilityType on an equiplet
+	 * Input: capabilityTypeName, equipletName
+	 * A physicalModuleTree is identified by the bottomModule of that tree.
+	 * A physicalModuleTree is suitable for a functionalModuleTree if all the required mutations could be matched with a supported mutation. 
+	 */
+	private static final String getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType = 
 			"SELECT * \n" + 
 			"FROM CapabilityTypeRequiredMutation AS currentRequiredMutation \n" + 
 			"JOIN Module AS currentModule \n" + 
@@ -61,8 +78,12 @@ public class ModuleFactory extends Factory {
 			"	  ) \n" + 
 			"  ) AND \n" + 
 			"  currentModule.attachedToRight = currentModule.attachedToLeft + 1; \n";
-	
-	private static final String getAllCalibrationDataForModule =
+	/**
+	 * SQL query for selecting all the associated ModuleCalibrationData for a module (which is identified using a {@link ModuleIdentifier}).
+	 * Input: moduleManufacturer, moduleTypeNumber, moduleSerialNumber
+	 * ModuleCalibrationData is associated when at least one of the ModuleIdentifiers in the module set matches the ModuleIdentifier of this module.
+	 */
+	private static final String getAllModuleCalibrationDataForModule =
 			"SELECT id, date, properties \n" + 
 			"FROM ModuleCalibration \n" + 
 			"WHERE id IN ( \n" +
@@ -72,18 +93,37 @@ public class ModuleFactory extends Factory {
 			"		typeNumber = ? AND \n" + 
 			"		serialNumber = ? \n" + 
 			"); \n";
-	private static final String getModuleSetForCalibrationData =
+	/**
+	 * SQL query for selecting all the {@link ModuleIdentifier} in the moduleSet of the ModuleCalibrationData.
+	 * Input: ModuleCalibrationId
+	 */
+	private static final String getModuleSetForModuleCalibrationData =
 			"SELECT manufacturer, typeNumber, serialNumber \n" + 
 			"FROM ModuleCalibrationModuleSet \n" + 
 			"WHERE ModuleCalibration = ?;";
-	private static final String addCalibrationData =
+	/**
+	 * SQL query for adding ModuleCalibrationData.
+	 * Input: date, properties
+	 */
+	private static final String addModuleCalibrationData =
 			"INSERT INTO ModuleCalibration \n" + 
 			"(date, properties) \n" + 
 			"VALUES(?, ?);";
+	/**
+	 * SQL query for adding ModuleCalibrationData.
+	 * Input: ModuleCalibrationDataId, moduleManufacturer, moduleTypeNumber, moduleSerialNumber
+	 */
 	private static final String addModuleToCalibrationData =
 			"INSERT INTO ModuleCalibrationModuleSet \n" + 
 			"(ModuleCalibration, manufacturer, typeNumber, serialNumber) \n" + 
 			"VALUES(?, ?, ?, ?);";
+	/**
+	 * SQL query for removing ModuleCalibrationData associated with a module (which is identified using a {@link ModuleIdentifier}).
+	 * This effectively removes obsolete ModuleCalibrationData.
+	 * Input: moduleManufacturer, moduleTypeNumber, moduleSerialNumber
+	 * ModuleCalibrationData is associated when at least one of the ModuleIdentifiers in the module set matches the ModuleIdentifier of this module.
+	 * ModuleCalibrationData is considered to be obsolete when at least one of the ModuleIdentifiers in the no longer matches the ModuleIdentifier of the modules attached to the equiplet.
+	 */
 	private static final String removeAllCalibrationDataForModule =
 			"DELETE FROM ModuleCalibration \n" + 
 			"WHERE id IN( \n" + 
@@ -94,18 +134,29 @@ public class ModuleFactory extends Factory {
 			"		serialNumber = ? \n" + 
 			"); \n";
 	
-	
-	
-	
+	/**
+	 * SQL query for adding a moduleType.
+	 * Input: moduleTypeManufacturer, moduleTypeTypeNumber, halSoftwareId, rosSoftwareId
+	 * Ignored if a record with the same primairy key already exists.
+	 */
 	private static final String addModuleType =
 			"INSERT IGNORE INTO ModuleType \n" + 
 			"(manufacturer, typeNumber, moduleTypeProperties, halSoftware, rosSoftware) \n" +  
 			"VALUES (?, ?, ?, ?, ?);"; 
+	/**
+	 * SQL query for selecting all the data of moduleType.
+	 * Input: moduleTypeManufacturer, moduleTypeTypeNumber
+	 */
 	private static final String getModuleType =
 			"SELECT * \n" +
 			"FROM ModuleType \n" +
 			"WHERE manufacturer = ? AND \n" + 
 			"	typeNumber = ?;"; 
+	/**
+	 * SQL query for removing all the moduleType which are obsolete.
+	 * Input: -
+	 * A moduleType is considered to be obsolete if there are no modules of that type connected to any equiplet.
+	 */
 	private static final String removeModuleTypesWithNoModules =
 			"DELETE FROM ModuleType \n" + 
 			"WHERE NOT EXISTS( \n" +  
@@ -115,6 +166,11 @@ public class ModuleFactory extends Factory {
 			"		typeNumber = ModuleType.typeNumber \n" +
 			");";
 	
+	/**
+	 * SQL query for adding a module which is connected to the mountPlate. 
+	 * Input: moduleManufacturer, moduleTypeNumber, moduleSerialNumber, moduleProperties, equiplet, mountPointX, mountPointY
+	 * The module is added to the right of the nested set tree.
+	 */
 	private static final String addTopModule =
 			"INSERT INTO Module \n" + 
 			"(manufacturer, typeNumber, serialNumber, moduleProperties, equiplet, mountPointX, mountPointY, attachedToLeft, attachedToRight) \n" +  
@@ -133,12 +189,22 @@ public class ModuleFactory extends Factory {
 			"		2 \n" +  
 			"	) ) \n" +  
 			"));"; 
+	/**
+	 * SQL query for selecting all the data of a module 
+	 * Input: moduleManufacturer, moduleTypeNumber
+	 */
 	private static final String getModule =
 			"SELECT * \n" +
 			"FROM Module \n" +
 			"WHERE manufacturer = ? AND \n" + 
 			"	typeNumber = ? AND \n" + 
 			"	serialNumber = ?;"; 
+	/**
+	 * SQL query for adding a module which is connected to another module. The space required is the nested set tree is NOT inserted.
+	 * Input: parentModuleManufacturer, parentModuleTypeNumber, parentModuleSerialNumber, parentModuleManufacturer, parentModuleTypeNumber, parentModuleSerialNumber
+	 * The module is added to the left of all the children of the parent module.
+	 */
+	// TODO store the input params so they dont have to be specified twice
 	private static final String addModuleAttachedToModule =
 			"INSERT INTO Module \n" + 
 			"(manufacturer, typeNumber, serialNumber, moduleProperties, equiplet, attachedToLeft, attachedToRight) \n" +  
@@ -155,6 +221,10 @@ public class ModuleFactory extends Factory {
 			"		typeNumber = ? AND \n" + 
 			"		serialNumber = ? \n" + 
 			"));"; 
+	/**
+	 * SQL query for inserting the left space in the nested set tree for a module which is connected to another module. 
+	 * Input: parentModuleManufacturer, parentModuleTypeNumber, parentModuleSerialNumber
+	 */
 	private static final String insertSpaceInNestedTreeForModuleLeft =
 			"UPDATE Module \n" + 
 			"SET attachedToLeft = attachedToLeft + 2 \n" +  
@@ -165,6 +235,10 @@ public class ModuleFactory extends Factory {
 			"		typeNumber = ? AND \n" + 
 			"		serialNumber = ? \n" + 
 			");"; 
+	/**
+	 * SQL query for inserting the right space in the nested set tree for a module which is connected to another module. 
+	 * Input: parentModuleManufacturer, parentModuleTypeNumber, parentModuleSerialNumber
+	 */
 	private static final String insertSpaceInNestedTreeForModuleRight =
 			"UPDATE Module \n" + 
 			"SET attachedToRight = attachedToRight + 2 \n" +  
@@ -175,11 +249,19 @@ public class ModuleFactory extends Factory {
 			"		typeNumber = ? AND \n" + 
 			"		serialNumber = ? \n" + 
 			");"; 
+	/**
+	 * SQL query for removing a module. 
+	 * Input: moduleManufacturer, moduleTypeNumber, moduleSerialNumber
+	 */
 	private static final String removeModule =
 			"DELETE FROM Module \n" + 
 			"WHERE manufacturer = ? AND \n" +  
 			"	typeNumber = ? AND \n" + 
 			"	serialNumber = ?;"; 
+	/**
+	 * SQL query for removing the left space of a module in the nested set tree.
+	 * Input: moduleManufacturer, moduleTypeNumber, moduleSerialNumber
+	 */
 	private static final String removeSpaceInNestedTreeForModuleLeft =
 			"UPDATE Module \n" + 
 			"SET attachedToLeft = attachedToLeft - 2 \n" +  
@@ -190,6 +272,10 @@ public class ModuleFactory extends Factory {
 			"		typeNumber = ? AND \n" + 
 			"		serialNumber = ? \n" + 
 			");"; 
+	/**
+	 * SQL query for removing the right space of a module in the nested set tree.
+	 * Input: moduleManufacturer, moduleTypeNumber, moduleSerialNumber
+	 */
 	private static final String removeSpaceInNestedTreeForModuleRight =
 			"UPDATE Module \n" + 
 			"SET attachedToRight = attachedToRight - 2 \n" +  
@@ -201,13 +287,23 @@ public class ModuleFactory extends Factory {
 			"		serialNumber = ? \n" + 
 			");"; 
 	
+	/**
+	 * The {@link ModuleListener} that is passed to the instantiated modules.
+	 */
 	private ModuleListener moduleListener;
+	/**
+	 * The {@link DynamicClassFactory} used by the CapabilityFactory to load classes of capabilities.
+	 */
 	private DynamicClassFactory<Module> dynamicClassFactory;
 	private HardwareAbstractionLayer hal;
 	
 	private HashMap<ModuleIdentifier, Module> loadedModules;
 
-	
+	/**
+	 * Constructs a new ModuleFactory with a new {@link KnowledgeDBClient}.
+	 * @param hal
+	 * @throws KnowledgeException
+	 */
 	public ModuleFactory(ModuleListener moduleListener, HardwareAbstractionLayer hal) throws KnowledgeException{
 		super(new KnowledgeDBClient());
 		this.moduleListener = moduleListener;
@@ -215,11 +311,20 @@ public class ModuleFactory extends Factory {
 		this.hal = hal;
 		this.loadedModules = new HashMap<ModuleIdentifier, Module>();
 	}
+	/**
+	 * This method gets the bottomModules that match with a functionalModuleTree of a capability.
+	 * @param capability
+	 * @param treeNumber
+	 * @return
+	 * @throws FactoryException
+	 * @throws JarFileLoaderException
+	 */
 	public ArrayList<ModuleActor> getBottomModulesForFunctionalModuleTree(Capability capability, int treeNumber) throws FactoryException, JarFileLoaderException{
 		ArrayList<ModuleActor> modules = new ArrayList<ModuleActor>();
 		
 		try {
-			Row[] rows = knowledgeDBClient.executeSelectQuery(getModuleIdentifiersOfPhysicalModuleTreesForCapability, capability.getName(), treeNumber, hal.getEquipletName());
+			Row[] rows = knowledgeDBClient.executeSelectQuery(getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType, 
+					capability.getName(), treeNumber, hal.getEquipletName());
 			for (Row row : rows) {
 				String manufacturer = (String) row.get("manufacturer");
 				String typeNumber = (String) row.get("typeNumber");
@@ -234,6 +339,12 @@ public class ModuleFactory extends Factory {
 		
 		return modules;
 	}
+	/**
+	 * This method gets all the bottomModules of the equiplet.
+	 * @return
+	 * @throws FactoryException
+	 * @throws JarFileLoaderException
+	 */
 	public ArrayList<Module> getBottomModules() throws FactoryException, JarFileLoaderException {
 		ArrayList<Module> modules = new ArrayList<Module>();
 		
@@ -254,13 +365,28 @@ public class ModuleFactory extends Factory {
 		}
 		
 		return modules;
-		
 	}
+	/**
+	 * This method executes the {@link HardwareStep} by instantiating the module and forwarding the HardwareStep to it.
+	 * @param processListener
+	 * @param hardwareStep
+	 * @throws FactoryException
+	 * @throws JarFileLoaderException
+	 * @throws ModuleExecutingException
+	 */
 	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws FactoryException, JarFileLoaderException, ModuleExecutingException{
 		ModuleActor module = (ModuleActor) getModuleByIdentifier(hardwareStep.getModuleIdentifier());
 		module.executeHardwareStep(processListener, hardwareStep);
 	}
 	
+	/**
+	 * This method will return the instantiated module for the {@link ModuleIdentifier}.
+	 * If the module has not been instantiated, it will be instantiated by downloading the software from the knowledge database and dynamically loading the class.
+	 * @param moduleIdentifier
+	 * @return
+	 * @throws FactoryException
+	 * @throws JarFileLoaderException
+	 */
 	public Module getModuleByIdentifier(ModuleIdentifier moduleIdentifier) throws FactoryException, JarFileLoaderException{
 		for (ModuleIdentifier loadedModuleIdentifier : loadedModules.keySet()) {
 			if(moduleIdentifier.equals(loadedModuleIdentifier) == true) {
@@ -281,6 +407,11 @@ public class ModuleFactory extends Factory {
 			throw new FactoryException("well, we are fucked", ex);
 		}
 	}
+	/**
+	 * This method determines if a moduleType (identified by the {@link ModuleIdentifier}) is known in the knowledge database.
+	 * @param moduleIdentifier
+	 * @return true if the moduleType is known in the knowledge database, false otherwise.
+	 */
 	private boolean isModuleTypeKnown(ModuleIdentifier moduleIdentifier) {
 		try {
 			Row[] rows = knowledgeDBClient.executeSelectQuery(getModuleType, moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
@@ -296,6 +427,12 @@ public class ModuleFactory extends Factory {
 		}
 	}
 	
+	/**
+	 * This methods attempts to insert a module in the database using the data provided in the JsonObjects.
+	 * @param staticSettings contains all the static information of the module (software, properties, calibrationData, etc).
+	 * @param dynamicSettings contains all the dynamic information of the module (mount position, attached to other modules, orientation, etc).
+	 * @return true if insertion of the module is successful, false otherwise. 
+	 */
 	public boolean insertModule(JsonObject staticSettings, JsonObject dynamicSettings) {
 		try{
 			try{
@@ -336,7 +473,7 @@ public class ModuleFactory extends Factory {
 				
 				// calibration
 				JsonArray calibrationEntries = staticSettings.get("calibrationData").getAsJsonArray();
-				deserializeCalibrationData(calibrationEntries);
+				deserializeModuleCalibrationData(calibrationEntries);
 				
 			} catch(Exception ex) {
 				System.err.println("HAL::ModuleFactory::insertModule(): Error occured while inserting module " + ex);
@@ -352,12 +489,24 @@ public class ModuleFactory extends Factory {
 			return false;
 		}
 	}
+	/**
+	 * This methods attempts to update a module in the database using the data provided in the JsonObjects.
+	 * @param staticSettings contains all the static information of the module (software, properties, calibrationData, etc).
+	 * @return true if insertion of the module is successful, false otherwise. 
+	 */
 	public boolean updateModule(JsonObject staticSettings,
 			JsonObject dynamicSettings) {
 		// TODO Auto-generated method stub
 		return false;
 	}
-	public JsonObject deleteModule(ModuleIdentifier moduleIdentifier) throws FactoryException, JarFileLoaderException{
+	/**
+	 * This method removes a module from the knowledge database.
+	 * @param moduleIdentifier
+	 * @return the static information of the module.
+	 * @throws FactoryException
+	 * @throws JarFileLoaderException
+	 */
+	public JsonObject renoveModule(ModuleIdentifier moduleIdentifier) throws FactoryException, JarFileLoaderException{
 		try{
 			JsonObject output = new JsonObject();
 			output.addProperty("manufacturer", moduleIdentifier.getManufacturer());
@@ -379,7 +528,7 @@ public class ModuleFactory extends Factory {
 			type.add("supportedMutations", Mutation.serializeAllSupportedMutations(moduleIdentifier, knowledgeDBClient));
 			Mutation.removeSupportedMutations(moduleIdentifier, knowledgeDBClient);
 			
-			output.add("calibrationData", serializeCalibrationData(moduleIdentifier));
+			output.add("calibrationData", serializeModuleCalibrationData(moduleIdentifier));
 			knowledgeDBClient.executeUpdateQuery(removeAllCalibrationDataForModule, 
 					moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
 			
@@ -403,18 +552,35 @@ public class ModuleFactory extends Factory {
 		}
 	}
 	
+	/**
+	 * This method inserts space in the nested set tree for a module to be attached to the parentModule.
+	 * @param parentModuleIdentifier
+	 * @throws KnowledgeException
+	 */
 	private void insertSpace(ModuleIdentifier parentModuleIdentifier) throws KnowledgeException {
 		knowledgeDBClient.executeUpdateQuery(insertSpaceInNestedTreeForModuleLeft, parentModuleIdentifier.getManufacturer(), 
 				parentModuleIdentifier.getTypeNumber(), parentModuleIdentifier.getSerialNumber());
 		knowledgeDBClient.executeUpdateQuery(insertSpaceInNestedTreeForModuleRight, parentModuleIdentifier.getManufacturer(), 
 				parentModuleIdentifier.getTypeNumber(), parentModuleIdentifier.getSerialNumber());
 	}
+	/**
+	 * This method removes space in the nested set tree for a module.
+	 * @param moduleIdentifier is the identifier of the module to be removed. 
+	 * @throws KnowledgeException
+	 */
 	private void removeSpace(ModuleIdentifier moduleIdentifier) throws KnowledgeException {
 		knowledgeDBClient.executeUpdateQuery(removeSpaceInNestedTreeForModuleLeft, moduleIdentifier.getManufacturer(), 
 				moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
 		knowledgeDBClient.executeUpdateQuery(removeSpaceInNestedTreeForModuleRight, moduleIdentifier.getManufacturer(), 
 				moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
 	}
+	/**
+	 * This method inserts a moduleType in the knowledge database.
+	 * @param moduleIdentifier
+	 * @param type
+	 * @return
+	 * @throws KnowledgeException
+	 */
 	private boolean insertModuleType(ModuleIdentifier moduleIdentifier, JsonObject type) throws KnowledgeException {
 		JsonObject halSoftwareObject = type.get("halSoftware").getAsJsonObject();
 		JavaSoftware halSoftware = JavaSoftware.insertJavaSoftware(halSoftwareObject, knowledgeDBClient);
@@ -436,6 +602,12 @@ public class ModuleFactory extends Factory {
 		
 		return true;
 	}
+	/**
+	 * This method updates a moduleType in the knowledge database.
+	 * It will update the software of the moduleType if the buildNumber of the provided software is higher than the buildNumber of the currently stored software.
+	 * @param moduleIdentifier
+	 * @param type
+	 */
 	private void updateModuleType(ModuleIdentifier moduleIdentifier, JsonObject type) {
 		JsonObject halSoftwareObject = type.get("halSoftware").getAsJsonObject();
 		JavaSoftware javaSoftware = JavaSoftware.getJavaSoftwareForModuleIdentifier(moduleIdentifier, knowledgeDBClient);
@@ -461,10 +633,16 @@ public class ModuleFactory extends Factory {
 		
 	}
 	
-	private JsonArray serializeCalibrationData(ModuleIdentifier moduleIdentifier) {
+	/**
+	 * This method will serialize all the moduleCalibrationData associated with the module identified by the {@link ModuleIdentifier}.
+	 * This metohd will NOT remove the serialized moduleCalibrationData. 
+	 * @param moduleIdentifier
+	 * @return
+	 */
+	private JsonArray serializeModuleCalibrationData(ModuleIdentifier moduleIdentifier) {
 		JsonArray calibrationEntries = new JsonArray();
 		try {
-			Row[] calibrationDataRows = knowledgeDBClient.executeSelectQuery(getAllCalibrationDataForModule, 
+			Row[] calibrationDataRows = knowledgeDBClient.executeSelectQuery(getAllModuleCalibrationDataForModule, 
 					moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
 			for (Row calibrationDataRow : calibrationDataRows) {
 				Integer moduleCalibrationId = (Integer) calibrationDataRow.get("id");
@@ -476,9 +654,8 @@ public class ModuleFactory extends Factory {
 				calibrationDataEntry.addProperty("data", properties);
 				
 				// fetch the moduleSet for the calibration data
-				// TODO prepare the statement!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				JsonArray moduleEntries = new JsonArray();
-				Row[] moduleSetrows = knowledgeDBClient.executeSelectQuery(getModuleSetForCalibrationData, moduleCalibrationId);
+				Row[] moduleSetrows = knowledgeDBClient.executeSelectQuery(getModuleSetForModuleCalibrationData, moduleCalibrationId);
 				for (Row moduleSetrow : moduleSetrows) {
 					String manufacturer = (String) moduleSetrow.get("manufacturer");
 					String typeNumber = (String) moduleSetrow.get("typeNumber");
@@ -501,13 +678,17 @@ public class ModuleFactory extends Factory {
 		}
 		return calibrationEntries;
 	}
-	private void deserializeCalibrationData(JsonArray moduleCalibrationEntries) {
+	/**
+	 * This method will deserialize all the moduleCalibration data provided and store it in the knowledge database.
+	 * @param moduleCalibrationEntries
+	 */
+	private void deserializeModuleCalibrationData(JsonArray moduleCalibrationEntries) {
 		try {
 			for (JsonElement moduleCalibrationEntryElement : moduleCalibrationEntries) {
 				JsonObject moduleCalibrationEntry = moduleCalibrationEntryElement.getAsJsonObject();
 				String dateTime = moduleCalibrationEntry.get("date").getAsString();
 				String properties = moduleCalibrationEntry.get("data").getAsString();
-				int calibrationDataId = knowledgeDBClient.executeUpdateQuery(addCalibrationData, dateTime, properties);
+				int calibrationDataId = knowledgeDBClient.executeUpdateQuery(addModuleCalibrationData, dateTime, properties);
 				
 				JsonArray moduleSetEntries = moduleCalibrationEntry.get("moduleSet").getAsJsonArray();
 				for (JsonElement moduleSetEntryElement : moduleSetEntries) {
