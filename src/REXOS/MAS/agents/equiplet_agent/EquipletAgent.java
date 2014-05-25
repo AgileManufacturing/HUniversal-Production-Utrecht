@@ -222,7 +222,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	@Override
-	public void onProcessStateChanged(String state, long hardwareStepSerialId,
+	public void onProcessStatusChanged(String state, long hardwareStepSerialId,
 			Module module, HardwareStep hardwareStep) {
 		if(state.equals("FAILED")){
 			executeProductStep();
@@ -264,6 +264,18 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	public String getEquipletName() {
 		// TODO Auto-generated method stub
 		return "EQ1";
+	}
+
+	@Override
+	public void onEquipletStateChanged(String state, Module module) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onEquipletModeChanged(String mode, Module module) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

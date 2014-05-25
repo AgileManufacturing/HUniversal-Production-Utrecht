@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 import org.apache.commons.codec.binary.Base64;
 
-import HAL.listeners.BlackboardListener;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
 import HAL.steps.ProductStep;
@@ -407,7 +406,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	}
 
 	@Override
-	public void onProcessStateChanged(String state, long hardwareStepSerialId,
+	public void onProcessStatusChanged(String state, long hardwareStepSerialId,
 			Module module, HardwareStep hardwareStep) {
 		// TODO Auto-generated method stub
 		
@@ -433,6 +432,18 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 
 	@Override
 	public void onExecutionFinished() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onEquipletStateChanged(String state, Module module) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onEquipletModeChanged(String mode, Module module) {
 		// TODO Auto-generated method stub
 		
 	}

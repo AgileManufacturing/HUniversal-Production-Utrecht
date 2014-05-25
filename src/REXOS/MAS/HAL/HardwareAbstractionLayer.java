@@ -81,7 +81,7 @@ public class HardwareAbstractionLayer implements ModuleListener {
 	public boolean insertModule(JsonObject staticSettings, JsonObject dynamicSettings) throws InvalidMastModeException {
 		boolean isModuleAdditionSuccesful = moduleFactory.insertModule(staticSettings, dynamicSettings);
 		JsonArray capabilities = staticSettings.get("type").getAsJsonObject().get("capabilities").getAsJsonArray();
-		boolean isCapabilityAdditionSuccesful = capabilityFactory.insertCapabilities(capabilities);
+		boolean isCapabilityAdditionSuccesful = capabilityFactory.insertCapabilityTypes(capabilities);
 		return isModuleAdditionSuccesful == true && isCapabilityAdditionSuccesful == true;
 	}
 	/**
@@ -107,7 +107,7 @@ public class HardwareAbstractionLayer implements ModuleListener {
 	 */
 	public JsonObject deleteModule(ModuleIdentifier moduleIdentifier) throws FactoryException, JarFileLoaderException, InvalidMastModeException {
 		JsonArray capabilities = capabilityFactory.removeCapabilities(moduleIdentifier);
-		JsonObject module = moduleFactory.deleteModule(moduleIdentifier);			
+		JsonObject module = moduleFactory.removeModule(moduleIdentifier);			
 		module.get("type").getAsJsonObject().add("capabilities", capabilities);
 		return module;
 	}

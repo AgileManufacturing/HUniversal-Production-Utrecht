@@ -73,7 +73,7 @@ public class TranslationProcess implements Runnable{
 				}
 				
 				for (HardwareStep hardwareStep : hardwareSteps) {
-					System.out.println(hardwareStep.getCommand().toString()+"\n");
+					System.out.println(hardwareStep.getRosCommand().toString()+"\n");
 				} 
 				
 				hardwareAbstractionLayerListener.onTranslationFinished(productStep, hardwareSteps);			

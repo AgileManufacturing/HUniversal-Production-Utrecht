@@ -173,7 +173,7 @@ public class QrReceiver implements HardwareAbstractionLayerListener {
 	 * @see HAL.listeners.HardwareAbstractionLayerListener#onProcessStateChanged(java.lang.String, long, HAL.Module, HAL.HardwareStep)
 	 */
 	@Override
-	public void onProcessStateChanged(String state, long hardwareStepSerialId,
+	public void onProcessStatusChanged(String state, long hardwareStepSerialId,
 			Module module, HardwareStep hardwareStep) {
 		// TODO Auto-generated method stub		
 	}
@@ -226,5 +226,17 @@ public class QrReceiver implements HardwareAbstractionLayerListener {
 	public String getEquipletName() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void onEquipletStateChanged(String state, Module module) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onEquipletModeChanged(String mode, Module module) {
+		// TODO Auto-generated method stub
+		
 	}
 }

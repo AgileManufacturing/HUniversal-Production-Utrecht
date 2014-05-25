@@ -506,7 +506,7 @@ public class ModuleFactory extends Factory {
 	 * @throws FactoryException
 	 * @throws JarFileLoaderException
 	 */
-	public JsonObject renoveModule(ModuleIdentifier moduleIdentifier) throws FactoryException, JarFileLoaderException{
+	public JsonObject removeModule(ModuleIdentifier moduleIdentifier) throws FactoryException, JarFileLoaderException{
 		try{
 			JsonObject output = new JsonObject();
 			output.addProperty("manufacturer", moduleIdentifier.getManufacturer());

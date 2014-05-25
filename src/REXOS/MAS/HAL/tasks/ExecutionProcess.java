@@ -58,7 +58,7 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 		if(state.equals("DONE")){
 			if (hardwareSteps.size() > 0){
 				HardwareStep hardwareStep = hardwareSteps.get(0);
-				hardwareAbstractionLayerListener.onProcessStateChanged(state, hardwareStepSerialId, module, hardwareStep);
+				hardwareAbstractionLayerListener.onProcessStatusChanged(state, hardwareStepSerialId, module, hardwareStep);
 				hardwareSteps.remove(0);
 				this.notify();
 			}
@@ -69,10 +69,10 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 		else {
 			if (hardwareSteps.size() > 0){
 				HardwareStep hardwareStep = hardwareSteps.get(0);
-				hardwareAbstractionLayerListener.onProcessStateChanged(state, hardwareStepSerialId, module, hardwareStep);	
+				hardwareAbstractionLayerListener.onProcessStatusChanged(state, hardwareStepSerialId, module, hardwareStep);	
 			}
 			else {
-				hardwareAbstractionLayerListener.onProcessStateChanged(state, hardwareStepSerialId, module, null);				
+				hardwareAbstractionLayerListener.onProcessStatusChanged(state, hardwareStepSerialId, module, null);				
 			}
 			hardwareSteps.clear();
 			this.notify();

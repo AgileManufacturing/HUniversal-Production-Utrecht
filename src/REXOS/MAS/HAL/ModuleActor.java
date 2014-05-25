@@ -119,7 +119,7 @@ public abstract class ModuleActor extends Module {
 	 */
 	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws ModuleExecutingException{
 		this.processListener = processListener;
-		JsonObject command = hardwareStep.getCommand();
+		JsonObject command = hardwareStep.getRosCommand();
 		executeMongoCommand(command.toString());
 	}
 	/**
