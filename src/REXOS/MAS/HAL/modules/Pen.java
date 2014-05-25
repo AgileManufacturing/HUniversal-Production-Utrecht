@@ -18,7 +18,7 @@ import HAL.steps.HardwareStep;
 import com.google.gson.JsonObject;
 
 public class Pen extends ModuleActor {
-	private static final double PEN_SIZE = 96.6; // in mm
+	private static final double PEN_SIZE = 102.6; // in mm
 	private static final int MAX_ACCELERATION = 50;
 
 	public Pen(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) throws KnowledgeException, UnknownHostException, GeneralMongoException {
