@@ -304,9 +304,9 @@ public class ModuleFactory extends Factory {
 						staticSettings.get("typeNumber").getAsString(), staticSettings.get("serialNumber").getAsString());
 				
 				if(isModuleTypeKnown(moduleIdentifier)) {
-					updateModuleType(moduleIdentifier, staticSettings.get("type").getAsJsonObject());
+					updateModuleType(moduleIdentifier, staticSettings.get("moduleType").getAsJsonObject());
 				} else {
-					insertModuleType(moduleIdentifier, staticSettings.get("type").getAsJsonObject());
+					insertModuleType(moduleIdentifier, staticSettings.get("moduleType").getAsJsonObject());
 				}
 				
 				String properties = staticSettings.get("properties").getAsString();
@@ -447,7 +447,7 @@ public class ModuleFactory extends Factory {
 			// update the halSoftware
 			javaSoftware.updateJavaSoftware(halSoftwareObject);
 		}
-		
+		System.out.println(type.toString());
 		JsonObject rosSoftwareObject = type.get("rosSoftware").getAsJsonObject();
 		RosSoftware rosSoftware = RosSoftware.getRosSoftwareForModuleIdentifier(moduleIdentifier, knowledgeDBClient);
 		int currentRosSoftwareBuildNumber = rosSoftware.getBuildNumber();
