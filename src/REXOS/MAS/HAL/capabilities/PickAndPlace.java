@@ -40,6 +40,7 @@ import libraries.dynamicloader.JarFileLoaderException;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import HAL.ModuleActor;
 import HAL.exceptions.CapabilityException;
@@ -74,26 +75,40 @@ public class PickAndPlace extends Capability {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<>();
 		String serviceName = productStep.getService().getName();
 		JsonObject productStepCriteria = productStep.getCriteria();
-		JsonElement target = productStepCriteria.get("target");
-		JsonElement subjects = productStepCriteria.get("subjects");
+		JsonObject target = productStepCriteria.get("target").getAsJsonObject();
+		JsonObject subjects = productStepCriteria.get("subjects").getAsJsonObject();
 		
 		
-		if(serviceName.equals("PickAndPlace")){
-			JsonObject pickCommand = new JsonObject();
-			JsonObject placeCommand = new JsonObject();
+		if(serviceName.equals("pickAndPlace") && subjects != null && target != null){	
 			for(int i = 0; i<subjects.getAsJsonArray().size();i++){
 				JsonObject subjectMoveCommand = subjects.getAsJsonArray().get(i).getAsJsonObject().get("move").getAsJsonObject();
 				
+				JsonObject pickCommand = new JsonObject();
 				pickCommand.addProperty("pick" , "null");
 				pickCommand.add("move" ,  subjectMoveCommand);
 				
-				CompositeStep pick = new CompositeStep(productStep, pickCommand);
+				JsonObject pickJsonCommand = new JsonObject();
+				pickJsonCommand.add("command", pickCommand);
+				pickJsonCommand.addProperty("look_up", subjects.getAsJsonArray().get(i).getAsJsonObject().get("identifier").getAsString());
+				
+				JsonObject command = new JsonParser().parse(pickJsonCommand.toString()).getAsJsonObject();
+				
+				CompositeStep pick = new CompositeStep(productStep, command);
 				
 				JsonObject targetMoveCommand = target.getAsJsonObject().get("move").getAsJsonObject();
+				
+				JsonObject placeCommand = new JsonObject();
 				placeCommand.addProperty("place", "null");
 				placeCommand.add("move" ,  targetMoveCommand);
-
-				CompositeStep place = new CompositeStep(productStep, placeCommand);
+				
+				JsonObject placeJsonCommand = new JsonObject();
+				placeJsonCommand.add("command", placeCommand);	
+				placeJsonCommand.addProperty("look_up", target.get("identifier").getAsString());
+				
+				command = new JsonParser().parse(placeJsonCommand.toString()).getAsJsonObject();
+				
+				CompositeStep place = new CompositeStep(productStep, command);
+				
 				ArrayList<ModuleActor> modules = moduleFactory.getBottomModulesForFunctionalModuleTree(this, 1);
 				
 				for (ModuleActor moduleActor : modules) {
