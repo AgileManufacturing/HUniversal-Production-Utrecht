@@ -79,7 +79,7 @@ public class PickAndPlace extends Capability {
 		JsonObject subjects = productStepCriteria.get("subjects").getAsJsonObject();
 		
 		
-		if(serviceName.equals("pickAndPlace") && subjects != null && target != null){	
+		if(serviceName.equals("place") && subjects != null && target != null){	
 			for(int i = 0; i<subjects.getAsJsonArray().size();i++){
 				JsonObject subjectMoveCommand = subjects.getAsJsonArray().get(i).getAsJsonObject().get("move").getAsJsonObject();
 				
