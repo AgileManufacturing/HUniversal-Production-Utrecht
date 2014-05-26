@@ -17,7 +17,6 @@ import libraries.knowledgedb_client.KnowledgeException;
 import libraries.knowledgedb_client.Row;
 import HAL.HardwareAbstractionLayer;
 import HAL.JavaSoftware;
-import HAL.Module;
 import HAL.ModuleIdentifier;
 import HAL.Service;
 import HAL.capabilities.Capability;
