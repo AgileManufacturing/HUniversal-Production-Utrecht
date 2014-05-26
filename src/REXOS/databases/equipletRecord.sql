@@ -8,4 +8,4 @@ values(1, "", "rosrun equiplet_node equiplet_node {equipletName}");
 
 insert into Equiplet
 (name, mountPointsX, mountPointsY, mountPointDistanceX, mountPointDistanceY, rosSoftware, masSoftware)
-values("EQ3", 10, 18, 50, 50, 1, 1);
+values("EQ2", 10, 18, 50, 50, 1, 1);
