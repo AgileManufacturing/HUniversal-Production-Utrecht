@@ -225,7 +225,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	public void onProcessStatusChanged(String state, long hardwareStepSerialId,
 			Module module, HardwareStep hardwareStep) {
 		if(state.equals("FAILED")){
-			executeProductStep();
+			//executeProductStep();
+			//Notify Product that failed and remove from schedule.
 			//Log that process execute failed.
 		}
 	}
