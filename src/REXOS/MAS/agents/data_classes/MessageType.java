@@ -64,4 +64,10 @@ public class MessageType {
   * The ACL message is used by the EquipletAgent to inform the ProductAgent wether or not the requested product step can be executed by this equiplet.
   */
  public static final int AVAILABLE_TO_PLAN = ACLMessage.ACCEPT_PROPOSAL; // Send By EquipletAgent
+ 
+ public static final int SUPPLIER_REQUEST = ACLMessage.PROPAGATE; // Send By EquipletAgent
+ 
+ public static final int SUPPLIER_REQUEST_REPLY= ACLMessage.AGREE; // Send By EquipletAgent
+
+
 }
