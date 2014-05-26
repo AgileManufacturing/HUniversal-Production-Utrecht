@@ -2,7 +2,7 @@
 	
 	<import file="../build.xml"/>
 
-	<target name="all" depends="blackboard_client, knowledgedb_client, dynamicloader, utillities">
+	<target name="all" depends="blackboard_client, knowledgedb_client, dynamicloader, utillities, math">
 	</target>
 
 	<target name="blackboard_client" depends="utillities">
@@ -19,6 +19,10 @@
 
 	<target name="utillities">
 		<ant antfile="build.xml" target="build" dir="utillities" inheritRefs="true" useNativeBasedir="true"/>  
+	</target>
+
+	<target name="math">
+		<ant antfile="build.xml" target="build" dir="math" inheritRefs="true" useNativeBasedir="true"/>  
 	</target>
 
 	<target name="clean">

@@ -2,8 +2,6 @@ package HAL.listeners;
 
 import java.util.ArrayList;
 
-import agents.equiplet_agent.EquipletAgent;
-import agents.product_agent.ProductAgent;
 import HAL.HALTesterClass;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;

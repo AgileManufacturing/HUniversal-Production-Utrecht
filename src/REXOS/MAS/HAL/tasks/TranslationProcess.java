@@ -2,7 +2,6 @@ package HAL.tasks;
 
 import java.util.ArrayList;
 
-import agents.equiplet_agent.EquipletAgent;
 import libraries.dynamicloader.JarFileLoaderException;
 import HAL.capabilities.Capability;
 import HAL.exceptions.CapabilityException;

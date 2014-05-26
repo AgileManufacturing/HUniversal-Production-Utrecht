@@ -1,0 +1,13 @@
+<project name="math" default="build" basedir=".">
+
+	<import file="../build.xml"/>
+
+	<target name="build"> 
+		<buildjava dir="${basedir}"/>  
+	</target>
+
+	<target name="clean">
+		 <cleanjava dir="${basedir}"/>
+	</target>
+
+</project>

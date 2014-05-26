@@ -1,0 +1,28 @@
+<project name="agents" default="all">
+	
+	<import file="../build.xml"/>
+
+	<target name="all" depends="data_classes, equiplet_agent, product_agent">
+	</target>
+
+	<target name="data_classes">
+		<ant antfile="build.xml" target="build" dir="data_classes" inheritRefs="true" useNativeBasedir="true"/>  
+	</target>
+	
+	<target name="equiplet_agent" depends="data_classes">
+		<ant antfile="build.xml" target="build" dir="equiplet_agent" inheritRefs="true" useNativeBasedir="true"/>  
+	</target>
+
+	<target name="product_agent" depends="data_classes">
+		<ant antfile="build.xml" target="build" dir="product_agent" inheritRefs="true" useNativeBasedir="true"/>  
+	</target>
+
+	
+
+	<target name="clean">
+		<ant antfile="build.xml" target="clean" dir="data_classes" inheritRefs="true" useNativeBasedir="true"/> 
+		<ant antfile="build.xml" target="clean" dir="equiplet_agent" inheritRefs="true" useNativeBasedir="true"/>
+		<ant antfile="build.xml" target="clean" dir="product_agent" inheritRefs="true" useNativeBasedir="true"/>
+	</target>
+
+</project>
