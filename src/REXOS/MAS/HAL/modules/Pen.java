@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
+import libraries.math.Vector3;
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
 import HAL.exceptions.FactoryException;
@@ -39,7 +40,7 @@ public class Pen extends ModuleActor {
 			}			
 			
 			//Adjust the move with the Pen module it's height.
-			command = adjustMoveWithDimentions(command, PEN_SIZE);
+			command = adjustMoveWithDimensions(command, new Vector3(0, 0, PEN_SIZE));
 			command.addProperty("maxAcceleration", MAX_ACCELERATION);
 			command.addProperty("forceStraightLine", false);
 			jsonCommand.add(COMMAND, command);

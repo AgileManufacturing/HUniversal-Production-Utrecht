@@ -20,6 +20,9 @@ import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.blackboard_client.data_classes.InvalidJSONException;
 import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
+import libraries.math.Matrix;
+import libraries.math.RotationAngles;
+import libraries.math.Vector3;
 /**
  * Abstract representation of a actor module in HAL 
  * @author Bas Voskuijlen
@@ -146,18 +149,29 @@ public abstract class ModuleActor extends Module {
 		moduleListener.onModuleModeChanged(mode, this);
 	}
 	
-	protected JsonObject adjustMoveWithDimentions(JsonObject command, double height){
-		System.out.println("Adjusting move with dimentions: "+command.toString());
-		JsonObject move = command.remove(MOVE).getAsJsonObject();
-		double x = move.get(X).getAsDouble();
-		double y = move.get(Y).getAsDouble();
-		double z = move.get(Z).getAsDouble();
-		JsonObject mParameters = new JsonObject();
-		mParameters.addProperty(X,x);
-		mParameters.addProperty(Y,y);
-		mParameters.addProperty(Z,z+height);
-		command.add(MOVE, mParameters);		
-		return command;		
+	protected JsonObject adjustMoveWithDimensions(JsonObject compositeCommand, Vector3 offsetVector){
+		return adjustMoveWithDimensions(compositeCommand, offsetVector, new RotationAngles(0, 0, 0));
+	}
+	protected JsonObject adjustMoveWithDimensions(JsonObject compositeCommand, Vector3 offsetVector, RotationAngles directionAngles){
+		System.out.println("Adjusting move with dimentions: " + compositeCommand.toString() + 
+				", offsetVector: " + offsetVector + " directionAngles: " + directionAngles);
+		
+		JsonObject originalMove = compositeCommand.remove(MOVE).getAsJsonObject();
+		double originalX = originalMove.get(X).getAsDouble();
+		double originalY = originalMove.get(Y).getAsDouble();
+		double originalZ = originalMove.get(Z).getAsDouble();
+		
+		Matrix rotationMatrix = directionAngles.generateRotationMatrix();
+		
+		Vector3 originalVector = offsetVector;
+		Vector3 rotatedVector = originalVector.rotate(rotationMatrix);
+		
+		JsonObject adjustedMove = new JsonObject();
+		adjustedMove.addProperty(X, originalX + rotatedVector.x);
+		adjustedMove.addProperty(Y, originalY + rotatedVector.y);
+		adjustedMove.addProperty(Z, originalZ + rotatedVector.z);
+		compositeCommand.add(MOVE, adjustedMove);
+		return compositeCommand;
 	}
 	
 

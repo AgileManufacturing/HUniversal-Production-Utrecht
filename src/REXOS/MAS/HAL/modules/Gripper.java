@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
+import libraries.math.Vector3;
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
 import HAL.exceptions.FactoryException;
@@ -37,7 +38,7 @@ public class Gripper extends ModuleActor {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 		
 		JsonObject command = compositeStep.getCommand();
-		command = adjustMoveWithDimentions(command, GRIPPER_SIZE);
+		command = adjustMoveWithDimensions(command, new Vector3(0, 0, GRIPPER_SIZE));
 		JsonElement pick = command.remove(PICK);
 		JsonElement place = command.remove(PLACE);
 		
