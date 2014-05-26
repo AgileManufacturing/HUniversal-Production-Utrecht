@@ -68,21 +68,25 @@ namespace rexos_motor {
 	 **/
 	void StepperMotor::powerOn(void){
 		if(!poweredOn){
+			
 			//Reset alarm
+			std::cout << "motor index: ";
+			std::cout << motorIndex << std::endl;
+			
 			modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 0);
 			modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 1);
 			modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 0);
-
+			std::cout << "i did reset alarm" << std::endl;
 			// Set operating modes
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, 0);
-
+			std::cout << "I did set operating modes" << std::endl;
 			// set modes for all used motion slots
 			for(int i = 0; i < CRD514KD::MOTION_SLOTS_USED; i++){
 				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_POSMODE + i, 1);
 				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_OPMODE + i, 0);
 				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SEQ_MODE + i, 1);
 			}
-
+			std::cout << "i did set modes for all used slots" << std::endl;
 			// Excite motor
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 			
@@ -150,7 +154,7 @@ namespace rexos_motor {
 	 * @param motorRotation The rotational data for the motor.
 	 * @param motionSlot the motion slot to be used.
 	 **/
-	void StepperMotor::moveTo(const rexos_datatypes::MotorRotation& motorRotation, int motionSlot){
+	void StepperMotor::moveTo(const rexos_motor::MotorRotation& motorRotation, int motionSlot){
 		checkMotionSlot(motionSlot);
 
 		writeRotationData(motorRotation, motionSlot);
@@ -162,7 +166,7 @@ namespace rexos_motor {
 	 *
 	 * @param motorRotation The rotational data for the motor.
 	 **/
-	void StepperMotor::moveTo(const rexos_datatypes::MotorRotation& motorRotation){
+	void StepperMotor::moveTo(const rexos_motor::MotorRotation& motorRotation){
 		moveTo(motorRotation, 1);
 	}
 
@@ -173,7 +177,7 @@ namespace rexos_motor {
 	 * @param motionSlot the motion slot to be written to
 	 * @param useDeviation Sets whether or not to use the deviation. Defaults to true.
 	 **/
-	void StepperMotor::writeRotationData(const rexos_datatypes::MotorRotation& motorRotation, int motionSlot, bool useDeviation){
+	void StepperMotor::writeRotationData(const rexos_motor::MotorRotation& motorRotation, int motionSlot, bool useDeviation){
 		if(!poweredOn){
 			throw MotorException("motor drivers are not powered on");
 		}
@@ -218,14 +222,15 @@ namespace rexos_motor {
 	 * Start the motor to move according to the set registers. Will wait for the motor to be ready before moving.
 	 **/
 	void StepperMotor::startMovement(int motionSlot){
+		
+
 		checkMotionSlot(motionSlot);
 		if(!poweredOn){
 			throw MotorException("motor drivers are not powered on");
 		}
-
 		// Execute motion.
 		waitTillReady();
-
+		
 		modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
 		modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 		updateAngle();
@@ -238,11 +243,22 @@ namespace rexos_motor {
 		uint16_t status_1;
 		while(!((status_1 = modbus->readU16(motorIndex, CRD514KD::Registers::STATUS_1)) & CRD514KD::Status1Bits::READY)){
 			if((status_1 & CRD514KD::Status1Bits::ALARM) || (status_1 & CRD514KD::Status1Bits::WARNING)){
-				std::cerr << "Motor: " << motorIndex << " Alarm code: " << std::hex << modbus->readU16(motorIndex, CRD514KD::Registers::PRESENT_ALARM) << "h" << std::endl;
 
 				throw CRD514KDException(motorIndex, status_1 & CRD514KD::Status1Bits::WARNING, status_1 & CRD514KD::Status1Bits::ALARM);
 			}
 		}
+	}
+	
+	bool StepperMotor::isReady(void){
+		uint16_t status_1;
+		if(!((status_1 = modbus->readU16(motorIndex, CRD514KD::Registers::STATUS_1)) & CRD514KD::Status1Bits::READY)){
+			if((status_1 & CRD514KD::Status1Bits::ALARM) || (status_1 & CRD514KD::Status1Bits::WARNING)){
+
+				throw CRD514KDException(motorIndex, status_1 & CRD514KD::Status1Bits::WARNING, status_1 & CRD514KD::Status1Bits::ALARM);
+			}
+			return false;
+		}
+		return true;
 	}
 	
 	bool StepperMotor::isValidAngle(double angle){

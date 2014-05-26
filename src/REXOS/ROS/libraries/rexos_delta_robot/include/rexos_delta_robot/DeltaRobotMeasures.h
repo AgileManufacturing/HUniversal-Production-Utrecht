@@ -32,7 +32,7 @@
 
 #include <libjson/libjson.h>
 
-namespace rexos_datatypes{
+namespace rexos_delta_robot{
 	/**
 	 * A class that holds all measures for the DeltaRobot.
 	 **/

@@ -1,17 +1,17 @@
 /**
- * @file InverseKinematicsException.h
- * @brief Exception thrown if an invalid value is calculated during inverse kinematics.
+ * @file MotorRotation.h
+ * @brief Template class for rotation data for the motor.
+ * @date Created: 2012-10-03
  *
- * @author 1.0 Lukas Vermond
- * @author 1.0 Kasper van Nieuwland
- * @author 1.1 Daan Veltman
+ * @author Koen Braham
+ * @author Dennis Koole
  *
  * @section LICENSE
  * License: newBSD
- * 
+ *  
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
  * - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
  * - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
@@ -31,43 +31,48 @@
 
 #pragma once
 
-#include <stdexcept>
-
-#include <rexos_datatypes/MotorRotation.h>
-#include <rexos_datatypes/Point3D.h>
-
-namespace rexos_stewart_gough{
+namespace rexos_motor {
 	/**
-	 * Exception thrown if an invalid value is calculated during inverse kinematics.
+	 * Data entity for rotation data for the motor.
 	 **/
-	class InverseKinematicsException: public std::runtime_error{
-	private:
-		/**
-		 * @var Point3D<double> notConvertablePoint
-		 * Point that could not be converted into angles for the motors.
-		 **/
-		rexos_datatypes::Point3D<double> notConvertablePoint;
-
+	class MotorRotation{
 	public:
 		/**
-		 * Constructor for InverseKinematicsException.
-		 * @param exceptionMessage The exception message
-		 * @param destinationPoint The point of the destination.
+		 * @var double angle
+		 * The angle in radians the motor has to travel towards
 		 **/
-		InverseKinematicsException(const char* exceptionMessage, rexos_datatypes::Point3D<double> destinationPoint) :
-				std::runtime_error(exceptionMessage), notConvertablePoint(destinationPoint){}
+		double angle;
 
 		/**
-		 * Destructor for InverseKinematicsException.
+		 * @var double speed
+		 * The speed in radians per second.
 		 **/
-		virtual ~InverseKinematicsException(void) throw(){}
+		double speed;
 
 		/**
-		 * Used to access the point that could not be converted.
-		 * @return A point3D<double> of the point that could not be converted.
+		 * @var double acceleration
+		 * The acceleration in radians per second per second.\n 
+		 * Minimum: 1.256637061 rad\n
+		 * Maximum: 1256637.061 rad
 		 **/
-		rexos_datatypes::Point3D<double> getNotConvertablePoint(void){
-			return notConvertablePoint;
-		}
+		double acceleration;
+
+		/**
+		 * @var double deceleration
+		 * The deceleration in radians per second per second.\n 
+		 * Minimum: 1.256637061 rad\n
+		 * Maximum: 1256637.061 rad
+		 **/
+		double deceleration;
+
+		/**
+		 * Instantiation of rotation data for the motor.
+		 *
+		 * @param angle The angle in radians the motor has to travel towards. Defaults to 0.
+		 * @param speed The speed in radians per second. Defaults to 1.
+		 * @param acceleration The acceleration in radians per second per second. Defaults to 10.
+		 * @param deceleration The deceleration in radians per second per second. Defaults to 10.
+		 **/
+		MotorRotation(double angle = 0, double speed = 1, double acceleration = 10, double deceleration = 10) : angle(angle), speed(speed), acceleration(acceleration), deceleration(deceleration){}
 	};
 }

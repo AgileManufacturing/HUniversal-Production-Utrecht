@@ -66,7 +66,7 @@ namespace deltaRobotNodeNamespace{
 			public rexos_coordinates::Module{
 	protected:
 		rexos_motor::StepperMotorProperties* stepperMotorProperties;
-		rexos_datatypes::DeltaRobotMeasures* deltaRobotMeasures;
+		rexos_delta_robot::DeltaRobotMeasures* deltaRobotMeasures;
 	
 		std::string modbusIp;
 		int modbusPort;
@@ -101,7 +101,6 @@ namespace deltaRobotNodeNamespace{
 		float lastX;
 		float lastY;
 		float lastZ;
-		std::string moduleNodeName;
 		/**
 		 * @var ros::NodeHandle node
 		 * The nodeHandle used by ros services and topics

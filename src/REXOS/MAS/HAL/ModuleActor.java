@@ -61,7 +61,7 @@ public abstract class ModuleActor extends Module {
 		super(moduleIdentifier, moduleFactory,moduleListener);
 		mongoClient = new BlackboardClient(MONGO_HOST);
 		try {
-			mongoClient.setDatabase("EQ1");
+			mongoClient.setDatabase(moduleFactory.getHAL().getEquipletName());
 			mongoClient.setCollection("EquipletStepsBlackBoard");
 		} catch (InvalidDBNamespaceException e) {
 			// TODO Auto-generated catch block

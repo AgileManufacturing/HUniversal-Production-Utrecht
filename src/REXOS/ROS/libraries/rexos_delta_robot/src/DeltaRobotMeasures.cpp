@@ -28,7 +28,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <rexos_datatypes/DeltaRobotMeasures.h>
+#include <rexos_delta_robot/DeltaRobotMeasures.h>
 
 #include <cmath>
 #include <iostream>
@@ -37,7 +37,7 @@
 
 #include "ros/ros.h"
 
-namespace rexos_datatypes {
+namespace rexos_delta_robot {
 	DeltaRobotMeasures::DeltaRobotMeasures(JSONNode properties) {
 		for(JSONNode::const_iterator it = properties.begin(); it != properties.end(); it++) {
 			if(it->name() == "baseRadius"){

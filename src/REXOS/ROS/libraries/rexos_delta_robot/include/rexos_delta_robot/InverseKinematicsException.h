@@ -33,7 +33,7 @@
 
 #include <stdexcept>
 
-#include <rexos_datatypes/MotorRotation.h>
+#include <rexos_motor/MotorRotation.h>
 #include <rexos_datatypes/Point3D.h>
 
 namespace rexos_delta_robot{

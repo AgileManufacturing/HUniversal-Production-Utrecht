@@ -1,11 +1,9 @@
 /**
- * @file Measures.h
- * @brief Miscellaneous measures.
+ * @file DeltaRobotMeasures.h
+ * @brief Holds all measures for the DeltaRobot
+ * @date Created: 2012-10-03
  *
- * @author 1.0 Lukas Vermond
- * @author 1.0 Kasper van Nieuwland
- * @author 1.1 Daan Veltman
- * @author 1.1 Koen Braham
+ * @author Garik Hakopian
  *
  * @section LICENSE
  * License: newBSD
@@ -31,105 +29,82 @@
  **/
 
 #pragma once
-#include <rexos_utilities/Utilities.h>
-#include <rexos_motor/CRD514KD.h>
+
+#include <libjson/libjson.h>
 
 namespace rexos_stewart_gough{
-	namespace Measures{
+	/**
+	 * A class that holds all measures for the DeltaRobot.
+	 **/
+	class StewartGoughMeasures{
+	public:
 		/**
-    	 * @var double BASE
-    	 * Radius of the base in millimeters.
-    	 **/
-//		const double BASE		= 101.3;
+		 * @var double base
+		 * Radius of the base in millimeters.
+		 **/
+		double base;
 
 		/**
-		 * @var double HIP
+		 * @var double hip
 		 * Length of the hip in millimeters.
 		 **/
-//		const double HIP		= 100;
+		double hip;
 
 		/**
-		 * @var double EFFECTOR
+		 * @var double effector
 		 * Radius of the effector in millimeters.
 		 **/
-//		const double EFFECTOR	= 46.19;
+		double effector; 
 
 		/**
-		 * @var double ANKLE
+		 * @var double ankle
 		 * Length of the ankle in millimeters.
 		 **/
-//		const double ANKLE		= 250;
-		
-		/**
-		 * @var double HIP_ANKLE_ANGLE_MAX
-		 * Maximum angle between hip and ankle when moving the ankle sideways in radians.
-		 **/
-//		const double HIP_ANKLE_ANGLE_MAX = rexos_utilities::degreesToRadians(22);
+		double ankle; 
 
 		/**
-		 * @var double MOTOR_ROT_MIN
-		 * Mathematical minimum angle the motor is allowed to move to in radians.
+		 * @var double maxAngleHipAnkle
+		 * Maximum angle between hip and ankle when moving the ankle sideways.
 		 **/
-//		const double MOTOR_ROT_MIN = rexos_utilities::degreesToRadians(-18);
-
-		/**
-		 * @var double MOTOR_ROT_MAX
-		 * Mathematical maximum angle the motor is allowed to move to in radians.
-		 **/
-//		const double MOTOR_ROT_MAX = rexos_utilities::degreesToRadians(43);
-		
+		double maxAngleHipAnkle;
 		/**
 		 * @var double MOTORS_FROM_ZERO_TO_TOP_POSITION
 		 * The angle from zero (horizontal) to the top position in radians.
 		 **/
-//		const double MOTORS_FROM_ZERO_TO_TOP_POSITION = rexos_utilities::degreesToRadians(20); 
-
+		double motorFromZeroToTopAngle;
+		
 		/**
-		 * @var double BOUNDARY_BOX_MAX_X
+		 * @var double boundaryBoxMinX
 		 * The max x-coordinate of the effector boundary box in millimeters.
 		 **/
-// 		const double BOUNDARY_BOX_MAX_X = 50;
-
+		double boundaryBoxMinX;
  		/**
-		 * @var double BOUNDARY_BOX_MAX_Y
+		 * @var double boundaryBoxMaxX
 		 * The max y-coordinate of the effector boundary box in millimeters.
 		 **/
-//		const double BOUNDARY_BOX_MAX_Y = BOUNDARY_BOX_MAX_X;
-
+		double boundaryBoxMaxX;
 		/**
 		 * @var double BOUNDARY_BOX_MIN_X
 		 * The min x-coordinate of the effector boundary box in millimeters.
 		 **/
-//		const double BOUNDARY_BOX_MIN_X = -BOUNDARY_BOX_MAX_X;
-
+		double boundaryBoxMinY;
 		/**
 		 * @var double BOUNDARY_BOX_MIN_Y
 		 * The min y-coordinate of the effector boundary box in millimeters.
 		 **/
-//		const double BOUNDARY_BOX_MIN_Y = -BOUNDARY_BOX_MAX_Y;
-
+		double boundaryBoxMaxY;
 		/**
 		 * @var double BOUNDARY_BOX_MIN_Z
 		 * The min z-coordinate of the effector boundary box in millimeters.
 		 **/
-//		const double BOUNDARY_BOX_MIN_Z = -275;
-
+		double boundaryBoxMinZ;
 		/**
 		 * @var double BOUNDARY_BOX_MAX_Z
 		 * The max z-coordinate of the effector boundary box in millimeters.
 		 **/
-//		const double BOUNDARY_BOX_MAX_Z = -180;
-
-		/**
-		 * @var double CALIBRATION_STEP_SMALL
-		 * The size of the small steps in the calibration in radians.
-		 **/
-//		const double CALIBRATION_STEP_SMALL = rexos_motor::CRD514KD::MOTOR_STEP_ANGLE;
+		double boundaryBoxMaxZ;
 		
-		/**
-		 * @var double CALIBRATION_STEP_BIG
-		 * The size of the big calibration steps in radians. Currently equal to 20 small calibration steps.
-		 **/
-//		 const double CALIBRATION_STEP_BIG = CALIBRATION_STEP_SMALL * 20;
-	}
+		
+		StewartGoughMeasures(JSONNode properties);
+	};
 }

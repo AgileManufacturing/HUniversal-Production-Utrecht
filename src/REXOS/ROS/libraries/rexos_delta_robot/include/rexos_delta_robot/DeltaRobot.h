@@ -34,12 +34,12 @@
 
 #include <modbus/modbus.h>
 #include <rexos_datatypes/Point3D.h>
-#include <rexos_datatypes/DeltaRobotMeasures.h>
+#include <rexos_delta_robot/DeltaRobotMeasures.h>
 #include <rexos_motor/MotorInterface.h>
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/MotorManager.h>
 #include <rexos_motor/StepperMotorProperties.h>
-#include <rexos_datatypes/DeltaRobotMeasures.h>
+#include <rexos_delta_robot/DeltaRobotMeasures.h>
 #include <rexos_delta_robot/EffectorBoundaries.h>
 
 #include <vector>
@@ -86,7 +86,7 @@ namespace rexos_delta_robot{
 		 **/
 		InverseKinematicsModel* kinematics;
 
-		rexos_datatypes::DeltaRobotMeasures* deltaRobotMeasures;
+		rexos_delta_robot::DeltaRobotMeasures* deltaRobotMeasures;
 		rexos_motor::StepperMotorProperties* stepperMotorProperties;
 	
 		int calibrationBigStepFactor;
@@ -106,7 +106,7 @@ namespace rexos_delta_robot{
 		 * @var EffectorBoundaries* boundaries
 		 * A pointer to the EffectorBoundaries of the DeltaRobot.
 		 **/
-		EffectorBoundaries* boundaries;
+		rexos_delta_robot::EffectorBoundaries* boundaries;
 
 		/**
 		 * @var Point3D<double> effectorLocation
@@ -141,7 +141,7 @@ namespace rexos_delta_robot{
 		int currentMotionSlot;
 
 		bool isValidAngle(int motorIndex, double angle);
-		int moveMotorUntilSensorIsOfValue(int motorIndex, rexos_datatypes::MotorRotation motorRotation, bool sensorValue);
+		int moveMotorUntilSensorIsOfValue(int motorIndex, rexos_motor::MotorRotation motorRotation, bool sensorValue);
 		double getSpeedForRotation(double relativeAngle, double moveTime, double acceleration);
 		double getAccelerationForRotation(double relativeAngle, double moveTime);
 	};

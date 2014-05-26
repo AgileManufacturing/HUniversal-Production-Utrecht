@@ -36,7 +36,7 @@
 #include <rexos_datatypes/Point3D.h>
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/StepperMotorProperties.h>
-#include <rexos_datatypes/DeltaRobotMeasures.h>
+#include <rexos_delta_robot/DeltaRobotMeasures.h>
 #include <rexos_delta_robot/Measures.h>
 #include <rexos_delta_robot/InverseKinematicsModel.h>
 #include <vector>
@@ -52,13 +52,13 @@ namespace rexos_delta_robot{
 		~EffectorBoundaries();
 		
 		static EffectorBoundaries* generateEffectorBoundaries(const InverseKinematicsModel& model, 
-				const rexos_datatypes::DeltaRobotMeasures* deltaRobotMeasures, 
+				const rexos_delta_robot::DeltaRobotMeasures* deltaRobotMeasures, 
 				const std::vector<rexos_motor::StepperMotor*> motors, double voxelSize);
 
 		bool checkPath(const rexos_datatypes::Point3D<double>& from, const rexos_datatypes::Point3D<double>& to) const;
 
 	private:
-		EffectorBoundaries(const InverseKinematicsModel& model, const rexos_datatypes::DeltaRobotMeasures* deltaRobotMeasures, 
+		EffectorBoundaries(const InverseKinematicsModel& model, const rexos_delta_robot::DeltaRobotMeasures* deltaRobotMeasures, 
 				const std::vector<rexos_motor::StepperMotor*> motors, double voxelSize);
 
 		/**
@@ -164,7 +164,7 @@ namespace rexos_delta_robot{
 		 * @var rexos_datatypes::DeltaRobotMeasures& deltaRobotMeasures
 		 * A reference to the InverseKinematicsModel of the deltarobot, which is used to calculate the boundaries.
 		 **/
-		const rexos_datatypes::DeltaRobotMeasures* deltaRobotMeasures;
+		const rexos_delta_robot::DeltaRobotMeasures* deltaRobotMeasures;
 		/**
 		 * @var rexos_motor::StepperMotorProperties* stepperMotorProperties[3]
 		 * A reference to the InverseKinematicsModel of the deltarobot, which is used to calculate the boundaries.
