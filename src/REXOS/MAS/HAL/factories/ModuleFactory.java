@@ -57,7 +57,7 @@ public class ModuleFactory extends Factory {
 	 * A physicalModuleTree is suitable for a functionalModuleTree if all the required mutations could be matched with a supported mutation. 
 	 */
 	private static final String getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType = 
-			"SELECT * \n" + 
+			"SELECT DISTINCT currentModule.manufacturer, currentModule.typeNumber, currentModule.serialNumber \n" + 
 			"FROM CapabilityTypeRequiredMutation AS currentRequiredMutation \n" + 
 			"JOIN Module AS currentModule \n" + 
 			"WHERE currentRequiredMutation.capabilityType = ? AND \n" + 
@@ -336,7 +336,7 @@ public class ModuleFactory extends Factory {
 			System.err.println("HAL::ModuleFactory::getBottomModules(): Error occured which is considered to be impossible " + ex);
 			ex.printStackTrace();
 		}
-		
+		System.out.println(modules);
 		return modules;
 	}
 	/**

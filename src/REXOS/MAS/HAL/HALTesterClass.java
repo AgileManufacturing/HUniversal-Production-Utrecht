@@ -296,78 +296,78 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		FileInputStream fis;
 		byte[] content;
 
-		File deltaRobotJar = new File("/home/agileman/Desktop/DeltaRobot.jar");
+		File deltaRobotJar = new File("C:/Users/Aristides/Desktop/Delta Robot/DeltaRobot.jar");
 		fis = new FileInputStream(deltaRobotJar);
 		content = new byte[(int) deltaRobotJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Module = new String(Base64.encodeBase64(content));
 		
-		File deltaRobotZip = new File("/home/agileman/Desktop/nodes.zip");
+		File deltaRobotZip = new File("C:/Users/Aristides/Desktop/Delta Robot/nodes.zip");
 		fis = new FileInputStream(deltaRobotZip);
 		content = new byte[(int) deltaRobotZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
 		
-		File gripperZip = new File("/home/agileman/Desktop/nodes.zip");
+		File gripperZip = new File("C:/Users/Aristides/Desktop/Delta Robot/nodes.zip");
 		fis = new FileInputStream(gripperZip);
 		content = new byte[(int) gripperZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64GripperRos = new String(Base64.encodeBase64(content));
 		
-		File cameraZip = new File("/home/agileman/Desktop/nodes.zip");
+		File cameraZip = new File("C:/Users/Aristides/Desktop/Delta Robot/nodes.zip");
 		fis = new FileInputStream(cameraZip);
 		content = new byte[(int) cameraZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64CameraRos = new String(Base64.encodeBase64(content));
 		
-		File workplaneZip = new File("/home/agileman/Desktop/nodes.zip");
+		File workplaneZip = new File("C:/Users/Aristides/Desktop/Delta Robot/nodes.zip");
 		fis = new FileInputStream(workplaneZip);
 		content = new byte[(int) workplaneZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64WorkplaneRos = new String(Base64.encodeBase64(content));
 		
-		File penJar = new File("/home/agileman/Desktop/Pen.jar");
+		File penJar = new File("C:/Users/Aristides/Desktop/Delta Robot/Pen.jar");
 		fis = new FileInputStream(penJar);
 		content = new byte[(int) penJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Pen = new String(Base64.encodeBase64(content));
 		
-		File gripperJar = new File("/home/agileman/Desktop/Gripper.jar");
+		File gripperJar = new File("C:/Users/Aristides/Desktop/Delta Robot/Gripper.jar");
 		fis = new FileInputStream(gripperJar);
 		content = new byte[(int) gripperJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Gripper = new String(Base64.encodeBase64(content));
 		
-		File drawJar = new File("/home/agileman/Desktop/Draw.jar");
+		File drawJar = new File("C:/Users/Aristides/Desktop/Delta Robot/Draw.jar");
 		fis = new FileInputStream(drawJar);
 		content = new byte[(int) drawJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Draw = new String(Base64.encodeBase64(content));
 		
-		File pickAndPlaceJar = new File("/home/agileman/Desktop/Draw.jar");
+		File pickAndPlaceJar = new File("C:/Users/Aristides/Desktop/Delta Robot/PickAndPlace.jar");
 		fis = new FileInputStream(pickAndPlaceJar);
 		content = new byte[(int) pickAndPlaceJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64PickAndPlace = new String(Base64.encodeBase64(content));
 		
-		// deltarobot
+		/*// deltarobot
 		String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64Module + moduleA_03 + base64Draw + moduleA_04 + base64PickAndPlace + moduleA_05; 
 		JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
 		hal.insertModule(a, a);
 		
-		/*// pen
-		String moduleB = moduleB_01 + base64Pen + moduleB_02; 
-		JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
-		hal.insertModule(b, b);*/
+//		// pen
+//		String moduleB = moduleB_01 + base64Pen + moduleB_02; 
+//		JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
+//		hal.insertModule(b, b);
 		
 		// gripper
 		String moduleB = moduleB_01 + base64GripperRos + moduleB_02 + base64Gripper + moduleB_03; 
@@ -387,114 +387,35 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		// workplane
 		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64Pen + moduleE_03;
 		JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
-		hal.insertModule(e, e);
+		hal.insertModule(e, e);*/
 		
-		/*JsonObject tommasgtaylordfuckzooi;
-		ModuleIdentifier moduleIdentifier = new ModuleIdentifier("HU", "delta_robot_type_A", "1");
-		
-		
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);
-		tommasgtaylordfuckzooi = hal.deleteModule(moduleIdentifier);
-		hal.insertModule(tommasgtaylordfuckzooi, a);
-		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);*/
 
 		
 		JsonObject criteria = new JsonObject();
 		JsonObject target = new JsonObject();
 		JsonObject targetMove = new JsonObject();
-		targetMove.addProperty("x", 0.0);
-		targetMove.addProperty("y", 0.0);
-		targetMove.addProperty("z", 20.0);
+		targetMove.addProperty("x", -2.0);
+		targetMove.addProperty("y", 1.0);
+		targetMove.addProperty("z", 15.0);
 		target.add("move",targetMove);
-		target.addProperty("identifier", "Paper");
+		target.addProperty("identifier", "GC4x4MB_1");
 		
 		JsonArray subjects = new JsonArray();
 		JsonObject subject = new JsonObject();
 		JsonObject subjectMove = new JsonObject();
 		subjectMove.addProperty("x", -3.0);
-		subjectMove.addProperty("y", 0.0);
-		subjectMove.addProperty("z", 0.0);
+		subjectMove.addProperty("y", 3.0);
+		subjectMove.addProperty("z", 35.0);
 		subject.add("move",subjectMove);
+		subject.addProperty("identifier", "GC4x4MB_6");
 		subjects.add(subject);
 		
 		criteria.add("target",target);
-		//criteria.add("subjects",subjects);
-		criteria.add("subjects", new JsonArray());
+		criteria.add("subjects", subjects);
 		
 		
 		hal.translateProductStep(
-				new ProductStep("1", criteria, new Service("draw")));
+				new ProductStep("1", criteria, new Service("place")));
 		
 		/*Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);
