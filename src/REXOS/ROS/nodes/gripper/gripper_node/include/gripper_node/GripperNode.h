@@ -40,6 +40,7 @@
 #include <rexos_gripper/Gripper.h>
 #include <rexos_statemachine/ModuleStateMachine.h>
 #include <rexos_statemachine/Transitions.h>
+#include <rexos_knowledge_database/Module.h>
 #include "equiplet_node/RegisterModule.h"
 
 #include <actionlib/server/simple_action_server.h>
@@ -54,7 +55,8 @@
  **/
 typedef actionlib::SimpleActionServer<rexos_statemachine::SetInstructionAction> SetInstructionActionServer;
 
-class GripperNode : public rexos_statemachine::ModuleStateMachine  {
+class GripperNode : public rexos_statemachine::ModuleStateMachine, 
+		public rexos_knowledge_database::Module  {
 public:
 
 	GripperNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
