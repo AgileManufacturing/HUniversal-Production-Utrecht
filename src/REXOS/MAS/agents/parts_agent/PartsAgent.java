@@ -40,9 +40,7 @@ package agents.parts_agent;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mongodb.util.JSON;
 
-import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -93,7 +91,7 @@ public class PartsAgent extends Agent{
 		lookUpTable[16]=-16.5;
 		lookUpTable[17]=-5.5;
 		
-		lookUpTable[18]=32;
+		lookUpTable[18]=-5.5;
 		lookUpTable[19]=-5.5;
 		
 		lookUpTable[20]=5.5;

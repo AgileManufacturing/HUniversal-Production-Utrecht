@@ -25,7 +25,7 @@ public class ProductAgentSpawnerAgent extends Agent {
 		  System.out.println("Send message: " + message);
 		 }
 	protected void setup(){
-		Object[] arguments =this.getArguments();
+		Object[] arguments = this.getArguments();
 		String arg="";
 		for(int i = 0; i < arguments.length; i++){
 			arg += arguments[i].toString();

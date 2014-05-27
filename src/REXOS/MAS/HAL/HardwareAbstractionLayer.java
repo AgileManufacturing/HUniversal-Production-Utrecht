@@ -59,6 +59,7 @@ public class HardwareAbstractionLayer implements ModuleListener {
 	 * @param hardwareSteps
 	 */
 	public void executeHardwareSteps(ArrayList<HardwareStep> hardwareSteps){
+		System.out.println(hardwareSteps.toString());
 		ExecutionProcess executionProcess = new ExecutionProcess(this.hardwareAbstractionLayerListener, hardwareSteps, moduleFactory);
 		executionProcess.start();
 	}

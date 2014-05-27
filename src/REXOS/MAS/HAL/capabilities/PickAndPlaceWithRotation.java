@@ -38,7 +38,7 @@ import java.util.ArrayList;
 
 import libraries.dynamicloader.JarFileLoaderException;
 
-import com.google.gson.JsonElement;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import HAL.ModuleActor;
@@ -62,7 +62,7 @@ public class PickAndPlaceWithRotation extends Capability {
 	 * @param moduleFactory
 	 */
 	public PickAndPlaceWithRotation(ModuleFactory moduleFactory) {
-		super(moduleFactory, "PickAndPlace");
+		super(moduleFactory, "Place");
 	}
 
 	/**
@@ -75,18 +75,18 @@ public class PickAndPlaceWithRotation extends Capability {
 		String serviceName = productStep.getService().getName();
 		JsonObject productStepCriteria = productStep.getCriteria();
 		JsonObject target = productStepCriteria.get("target").getAsJsonObject();
-		JsonObject subjects = productStepCriteria.get("subjects").getAsJsonObject();
+		JsonArray subjects = productStepCriteria.get("subjects").getAsJsonArray();
 		
 		
-		if(serviceName.equals("pickAndPlaceWithRotation") && subjects != null && target != null){
+		if(serviceName.equals("place") && subjects != null && target != null){
 			JsonObject pickCommand = new JsonObject();
 			JsonObject placeCommand = new JsonObject();
 			for(int i = 0; i<subjects.getAsJsonArray().size();i++){
-				JsonObject subjectMoveCommand = subjects.getAsJsonArray().get(i).getAsJsonObject().get("move").getAsJsonObject();
+				JsonObject subjectMoveCommand = subjects.get(i).getAsJsonObject().get("move").getAsJsonObject();
 				
 				pickCommand.addProperty("pick" , "null");
 				pickCommand.add("move" ,  subjectMoveCommand);
-				pickCommand.addProperty("look_up", subjects.getAsJsonArray().get(i).getAsJsonObject().get("identifier").getAsString());
+				pickCommand.addProperty("look_up", subjects.get(i).getAsJsonObject().get("identifier").getAsString());
 				
 				CompositeStep pick = new CompositeStep(productStep, pickCommand);
 				
@@ -111,6 +111,7 @@ public class PickAndPlaceWithRotation extends Capability {
 					}
 					
 				}
+				System.out.println(hardwareSteps.toString());
 
 			}
 		}
