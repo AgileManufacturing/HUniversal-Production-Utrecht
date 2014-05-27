@@ -40,9 +40,7 @@ package agents.parts_agent;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mongodb.util.JSON;
 
-import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;

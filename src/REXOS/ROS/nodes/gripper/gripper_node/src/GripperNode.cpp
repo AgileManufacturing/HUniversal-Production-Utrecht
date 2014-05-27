@@ -118,11 +118,13 @@ void GripperNode::error() {
 
 void GripperNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Initialize transition called");
+	as->setSucceeded();
 }
 
 void GripperNode::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Deinitialize transition called");
 	ros::shutdown();
+	as->setSucceeded();
 }
 
 /**

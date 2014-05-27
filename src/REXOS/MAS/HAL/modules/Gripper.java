@@ -36,13 +36,16 @@ public class Gripper extends ModuleActor {
 	@Override
 	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
+		JsonObject jsonCommand = compositeStep.getCommand();
+		JsonObject command = jsonCommand.remove(COMMAND).getAsJsonObject();
 		
-		JsonObject command = compositeStep.getCommand();
 		command = adjustMoveWithDimensions(command, new Vector3(0, 0, GRIPPER_SIZE));
 		JsonElement pick = command.remove(PICK);
 		JsonElement place = command.remove(PLACE);
 		
-		compositeStep = new CompositeStep(compositeStep.getProductStep(),command);		
+		jsonCommand.add(COMMAND, command);
+		
+		compositeStep = new CompositeStep(compositeStep.getProductStep(),jsonCommand);		
 		ArrayList<HardwareStep> hStep = forwardCompositeStep(compositeStep);
 		if (hStep != null)
 			hardwareSteps.addAll(hStep);
