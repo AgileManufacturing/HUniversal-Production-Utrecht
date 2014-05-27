@@ -358,7 +358,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		hal.insertModule(tommasgtaylordfuckzooi, a);
 		hal.getModuleFactory().getModuleByIdentifier(moduleIdentifier);*/
 
-		
+		/*
 		JsonObject criteria = new JsonObject();
 		JsonObject target = new JsonObject();
 		JsonObject targetMove = new JsonObject();
@@ -384,7 +384,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		
 		hal.translateProductStep(
 				new ProductStep("1", criteria, new Service("draw")));
-		
+		*/
 		/*Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);
 		hal.translateProductStep(productStep);*/

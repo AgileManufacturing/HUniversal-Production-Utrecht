@@ -93,7 +93,7 @@ public class PartsAgent extends Agent{
 		lookUpTable[16]=-16.5;
 		lookUpTable[17]=-5.5;
 		
-		lookUpTable[18]=32;
+		lookUpTable[18]=-5.5;
 		lookUpTable[19]=-5.5;
 		
 		lookUpTable[20]=5.5;

@@ -186,6 +186,8 @@ public class ProductAgent extends Agent{
 		}
 		else { //Finished planning product steps
 			System.out.println("No more product steps to plan");
+			System.out.println("Product Agent AWAYYYYYYY!!!!");
+			this.doDelete();
 		}
 	}
 	
