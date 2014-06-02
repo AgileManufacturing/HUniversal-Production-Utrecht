@@ -82,6 +82,13 @@ public class StewartGough extends ModuleActor {
 					int z = entry_move.remove(Z).getAsInt();
 					z += 20; //20mm above actual point
 					entry_move.addProperty(Z, z);
+					
+					
+					
+					
+					
+					
+					
 					hardwareCommand.add("payload",entry_move);
 					hardwareJsonCommand.add("instructionData",hardwareCommand);
 					hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));
