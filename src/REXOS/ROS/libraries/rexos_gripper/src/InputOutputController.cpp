@@ -68,12 +68,9 @@ namespace rexos_gripper {
 		}
 	}
 	
-	/**
-	 * Virtual destructor for extensions of InputOutputController.
-	 */
-	InputOutputController::~InputOutputController(){
-		delete modbus;
-	}
+	/*InputOutputController::InputOutputController(rexos_modbus::ModbusController* modbus) :
+			modbus(modbus) {
+	}*/
 
 	/**
 	 * Sets a pin (bit) in a register high (active?)

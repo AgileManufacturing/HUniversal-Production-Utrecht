@@ -20,6 +20,8 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	static HardwareAbstractionLayer hal;
 	static BlackboardHandler blackboardUpdated;
 	
+	static final String baseDir = "/home/agileman/Desktop/";
+	
 	// delta robot
 	static String moduleA_01 = "{"
 			+ "	\"manufacturer\":\"HU\","
@@ -168,7 +170,10 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			+ "		\"capabilities\":["
 			+ "		]"
 			+ "	},"
-			+ "	\"properties\":\"name\","
+			+ "	\"properties\":\"{"
+			+ "	\\\"modbusIp\\\" : \\\"192.168.0.22\\\","
+			+ "	\\\"modbusPort\\\" : 502"
+			+ "}\","
 			+ "	\"calibrationData\":["
 			+ "	],"
 			+ "	\"attachedTo\":{"
@@ -296,70 +301,70 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		FileInputStream fis;
 		byte[] content;
 
-		File deltaRobotJar = new File("C:/Users/Aristides/Desktop/Delta Robot/DeltaRobot.jar");
+		File deltaRobotJar = new File(baseDir + "DeltaRobot.jar");
 		fis = new FileInputStream(deltaRobotJar);
 		content = new byte[(int) deltaRobotJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Module = new String(Base64.encodeBase64(content));
 		
-		File deltaRobotZip = new File("C:/Users/Aristides/Desktop/Delta Robot/nodes.zip");
+		File deltaRobotZip = new File(baseDir + "nodes.zip");
 		fis = new FileInputStream(deltaRobotZip);
 		content = new byte[(int) deltaRobotZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
 		
-		File gripperZip = new File("C:/Users/Aristides/Desktop/Delta Robot/nodes.zip");
+		File gripperZip = new File(baseDir + "nodes.zip");
 		fis = new FileInputStream(gripperZip);
 		content = new byte[(int) gripperZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64GripperRos = new String(Base64.encodeBase64(content));
 		
-		File cameraZip = new File("C:/Users/Aristides/Desktop/Delta Robot/nodes.zip");
+		File cameraZip = new File(baseDir + "nodes.zip");
 		fis = new FileInputStream(cameraZip);
 		content = new byte[(int) cameraZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64CameraRos = new String(Base64.encodeBase64(content));
 		
-		File workplaneZip = new File("C:/Users/Aristides/Desktop/Delta Robot/nodes.zip");
+		File workplaneZip = new File(baseDir + "nodes.zip");
 		fis = new FileInputStream(workplaneZip);
 		content = new byte[(int) workplaneZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64WorkplaneRos = new String(Base64.encodeBase64(content));
 		
-		File penJar = new File("C:/Users/Aristides/Desktop/Delta Robot/Pen.jar");
+		File penJar = new File(baseDir + "Pen.jar");
 		fis = new FileInputStream(penJar);
 		content = new byte[(int) penJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Pen = new String(Base64.encodeBase64(content));
 		
-		File gripperJar = new File("C:/Users/Aristides/Desktop/Delta Robot/Gripper.jar");
+		File gripperJar = new File(baseDir + "Gripper.jar");
 		fis = new FileInputStream(gripperJar);
 		content = new byte[(int) gripperJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Gripper = new String(Base64.encodeBase64(content));
 		
-		File drawJar = new File("C:/Users/Aristides/Desktop/Delta Robot/Draw.jar");
+		File drawJar = new File(baseDir + "Draw.jar");
 		fis = new FileInputStream(drawJar);
 		content = new byte[(int) drawJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Draw = new String(Base64.encodeBase64(content));
 		
-		File pickAndPlaceJar = new File("C:/Users/Aristides/Desktop/Delta Robot/PickAndPlace.jar");
+		File pickAndPlaceJar = new File(baseDir + "PickAndPlace.jar");
 		fis = new FileInputStream(pickAndPlaceJar);
 		content = new byte[(int) pickAndPlaceJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64PickAndPlace = new String(Base64.encodeBase64(content));
 		
-		/*// deltarobot
+		// deltarobot
 		String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64Module + moduleA_03 + base64Draw + moduleA_04 + base64PickAndPlace + moduleA_05; 
 		JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
 		hal.insertModule(a, a);
@@ -387,7 +392,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		// workplane
 		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64Pen + moduleE_03;
 		JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
-		hal.insertModule(e, e);*/
+		hal.insertModule(e, e);
 		
 
 		

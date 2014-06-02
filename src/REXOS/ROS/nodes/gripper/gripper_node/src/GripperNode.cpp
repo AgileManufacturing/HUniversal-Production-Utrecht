@@ -56,13 +56,20 @@ GripperNode::GripperNode(std::string equipletName, rexos_knowledge_database::Mod
 				boost::bind(&GripperNode::onSetInstruction, this, _1), 
 				false) {
 	ROS_INFO("GripperNode Constructor entering...");
+	ROS_INFO("1");
+	// get the properties and combine them for the deltarobot
 	// get the properties and combine them for the deltarobot
 	std::string properties = this->getModuleProperties();
 	std::string typeProperties = this->getModuleTypeProperties();
 
-
 	JSONNode jsonNode = libjson::parse(properties);
+	JSONNode typeJsonNode = libjson::parse(typeProperties);
 
+	for(JSONNode::const_iterator it = typeJsonNode.begin(); it != typeJsonNode.end(); it++) {
+		jsonNode.push_back(*it);
+	}
+
+	ROS_INFO("4");
 	gripper = new rexos_gripper::Gripper(jsonNode, this, NULL);
 	setInstructionActionServer.start();
 }

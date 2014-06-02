@@ -63,7 +63,6 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(std::string equipletName
 	std::string properties = this->getModuleProperties();
 	std::string typeProperties = this->getModuleTypeProperties();
 
-
 	JSONNode jsonNode = libjson::parse(properties);
 	JSONNode typeJsonNode = libjson::parse(typeProperties);
 

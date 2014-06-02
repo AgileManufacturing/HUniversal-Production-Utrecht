@@ -52,7 +52,7 @@ public class ModuleFactory extends Factory {
 			"	attachedToRight = attachedToLeft + 1;"; 
 	/**
 	 * SQL query for selecting the moduleIdentifiers of the physicalModuleTrees for a functionalModuleTree of a capabilityType on an equiplet
-	 * Input: capabilityTypeName, equipletName
+	 * Input: capabilityTypeName, capabilityTypeFunctionalTreeNumber, equipletName
 	 * A physicalModuleTree is identified by the bottomModule of that tree.
 	 * A physicalModuleTree is suitable for a functionalModuleTree if all the required mutations could be matched with a supported mutation. 
 	 */
