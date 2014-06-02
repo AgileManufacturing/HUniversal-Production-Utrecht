@@ -76,7 +76,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 			equipletStepBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbIp", equipletName));
 			equipletStepBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbName", equipletName));
 			equipletStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EquipletStepsBlackBoardName", equipletName));
-			equipletStepBBClient.subscribe(statusSubscription);		   
+			equipletStepBBClient.subscribe(statusSubscription);
 		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException ex) {
 			throw new BlackboardUpdateException("Unable to initialize HAL.BlackBoardHandler", ex);
 		}

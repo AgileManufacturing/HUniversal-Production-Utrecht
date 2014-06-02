@@ -64,7 +64,6 @@ public class KnowledgeDBClient {
             String url = "jdbc:mysql://" + Configuration.getProperty(ConfigurationFiles.KNOWLEDGE_DB_PROPERTIES, "host") +
             		":" + Configuration.getProperty(ConfigurationFiles.KNOWLEDGE_DB_PROPERTIES, "port")
                     + "/" + Configuration.getProperty(ConfigurationFiles.KNOWLEDGE_DB_PROPERTIES, "db");
-
             connection = (Connection) DriverManager.getConnection(url,
             		Configuration.getProperty(ConfigurationFiles.KNOWLEDGE_DB_PROPERTIES, "username"), 
             		Configuration.getProperty(ConfigurationFiles.KNOWLEDGE_DB_PROPERTIES, "password"));

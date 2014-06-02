@@ -52,18 +52,18 @@ import HAL.steps.HardwareStep;
 import HAL.steps.ProductStep;
 
 /**
- * Pick and place capability class that translate
+ * Pick and place capability class that translate with rotation.
  * 
  *
  */
-public class PickAndPlace extends Capability {
+public class PickAndPlaceWithRotation extends Capability {
 	
 	/**
 	 * 
 	 * @param moduleFactory
 	 */
-	public PickAndPlace(ModuleFactory moduleFactory) {
-		super(moduleFactory, "PickAndPlace");
+	public PickAndPlaceWithRotation(ModuleFactory moduleFactory) {
+		super(moduleFactory, "PickAndPlaceWithRotation");
 	}
 
 	/**
@@ -79,13 +79,15 @@ public class PickAndPlace extends Capability {
 		JsonObject subjects = productStepCriteria.get("subjects").getAsJsonObject();
 		
 		
-		if(serviceName.equals("place") && subjects != null && target != null){	
+		if(serviceName.equals("pickAndPlaceWithRotation") && subjects != null && target != null){	
 			for(int i = 0; i<subjects.getAsJsonArray().size();i++){
 				JsonObject subjectMoveCommand = subjects.getAsJsonArray().get(i).getAsJsonObject().get("move").getAsJsonObject();
+				JsonObject subjectRotationCommand = subjects.getAsJsonArray().get(i).getAsJsonObject().get("rotation").getAsJsonObject();
 				
 				JsonObject pickCommand = new JsonObject();
 				pickCommand.addProperty("pick" , "null");
 				pickCommand.add("move" ,  subjectMoveCommand);
+				pickCommand.add("rotation" ,  subjectRotationCommand);
 				
 				JsonObject pickJsonCommand = new JsonObject();
 				pickJsonCommand.add("command", pickCommand);
@@ -96,10 +98,12 @@ public class PickAndPlace extends Capability {
 				CompositeStep pick = new CompositeStep(productStep, command);
 				
 				JsonObject targetMoveCommand = target.getAsJsonObject().get("move").getAsJsonObject();
+				JsonObject targetRotationCommand = target.getAsJsonObject().get("rotation").getAsJsonObject();
 				
 				JsonObject placeCommand = new JsonObject();
 				placeCommand.addProperty("place", "null");
 				placeCommand.add("move" ,  targetMoveCommand);
+				placeCommand.add("rotation" ,  targetRotationCommand);
 				
 				JsonObject placeJsonCommand = new JsonObject();
 				placeJsonCommand.add("command", placeCommand);	
