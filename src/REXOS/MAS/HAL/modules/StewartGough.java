@@ -84,7 +84,7 @@ public class StewartGough extends ModuleActor {
 					entry_move.addProperty(Z, z);
 					
 					
-					
+					System.out.println("rotationX: " + entry_move.get("rotationX").toString());
 					
 					
 					
