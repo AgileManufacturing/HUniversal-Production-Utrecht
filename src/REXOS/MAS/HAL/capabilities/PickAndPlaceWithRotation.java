@@ -83,16 +83,20 @@ public class PickAndPlaceWithRotation extends Capability {
 			JsonObject placeCommand = new JsonObject();
 			for(int i = 0; i<subjects.getAsJsonArray().size();i++){
 				JsonObject subjectMoveCommand = subjects.get(i).getAsJsonObject().get("move").getAsJsonObject();
+				JsonObject subjectRotationCommand = subjects.get(i).getAsJsonObject().get("rotation").getAsJsonObject();
 				
 				pickCommand.addProperty("pick" , "null");
 				pickCommand.add("move" ,  subjectMoveCommand);
+				pickCommand.add("rotation" ,  subjectRotationCommand);
 				pickCommand.addProperty("look_up", subjects.get(i).getAsJsonObject().get("identifier").getAsString());
 				
 				CompositeStep pick = new CompositeStep(productStep, pickCommand);
 				
 				JsonObject targetMoveCommand = target.getAsJsonObject().get("move").getAsJsonObject();
+				JsonObject targetRotationCommand = target.getAsJsonObject().get("rotation").getAsJsonObject();
 				placeCommand.addProperty("place", "null");
 				placeCommand.add("move" ,  targetMoveCommand);
+				placeCommand.add("rotation" ,  targetRotationCommand);
 				placeCommand.addProperty("look_up", target.get("identifier").getAsString());
 
 				CompositeStep place = new CompositeStep(productStep, placeCommand);

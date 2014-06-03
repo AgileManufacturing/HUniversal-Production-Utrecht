@@ -37,6 +37,12 @@ public abstract class ModuleActor extends Module {
 	protected static final String X = "x";
 	protected static final String Y = "y";
 	protected static final String Z = "z";
+	
+	//TODO Check this (added by Rolf)
+	protected static final String ROTATION_X = "rotationX";
+	protected static final String ROTATION_Y = "rotationY";
+	protected static final String ROTATION_Z = "rotationZ";
+	
 	protected static final String MOVE = "move";
 	
 	
