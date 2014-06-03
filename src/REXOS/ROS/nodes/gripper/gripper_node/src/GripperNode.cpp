@@ -151,6 +151,9 @@ void GripperNode::transitionDeinitialize(rexos_statemachine::TransitionActionSer
  **/
 void GripperNode::transitionSetup(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Setup transition called");
+	// Set currentState to start
+	gripper->startWatchdog();
+	
 	//The service servers should be set, to provide the normal methods for the equiplet
 	as->setSucceeded();
 }
@@ -161,6 +164,11 @@ void GripperNode::transitionSetup(rexos_statemachine::TransitionActionServer* as
  **/
 void GripperNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Shutdown transition called");
+	// Set currentState to stop
+	gripper->stopWatchdog();
+	gripper->release();
+	gripper->disable();
+
 	as->setSucceeded();
 }
 
@@ -171,8 +179,6 @@ void GripperNode::transitionShutdown(rexos_statemachine::TransitionActionServer*
 void GripperNode::transitionStart(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Start transition called");
 
-	// Set currentState to start
-	gripper->startWatchdog();
 	as->setSucceeded();
 }
 /**
@@ -182,10 +188,6 @@ void GripperNode::transitionStart(rexos_statemachine::TransitionActionServer* as
 void GripperNode::transitionStop(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Stop transition called");
 
-	// Set currentState to stop
-	gripper->stopWatchdog();
-	gripper->release();
-	gripper->disable();
 	as->setSucceeded();
 }
 
