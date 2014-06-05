@@ -19,15 +19,12 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	static ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 	static HardwareAbstractionLayer hal;
 	static BlackboardHandler blackboardUpdated;
-<<<<<<< HEAD
 	static JsonObject criteria = new JsonObject();
 	static JsonObject criteria1 = new JsonObject();
 	boolean state = false;
-=======
 	
 	static final String baseDir = "/home/agileman/Desktop/";
 	
->>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 	// delta robot
 	static String moduleA_01 = "{"
 			+ "	\"manufacturer\":\"HU\","
