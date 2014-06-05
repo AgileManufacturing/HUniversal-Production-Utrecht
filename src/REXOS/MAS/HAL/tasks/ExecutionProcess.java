@@ -60,6 +60,12 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 				HardwareStep hardwareStep = hardwareSteps.get(0);
 				hardwareAbstractionLayerListener.onProcessStatusChanged(state, hardwareStepSerialId, module, hardwareStep);
 				hardwareSteps.remove(0);
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				this.notify();
 			}
 			else {
@@ -74,8 +80,8 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 			else {
 				hardwareAbstractionLayerListener.onProcessStatusChanged(state, hardwareStepSerialId, module, null);				
 			}
-			hardwareSteps.clear();
-			this.notify();
+			//hardwareSteps.clear();
+			
 		}
 	}
 	

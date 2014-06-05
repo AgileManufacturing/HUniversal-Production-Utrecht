@@ -182,7 +182,9 @@ public abstract class ModuleActor extends Module {
 		try {
 			if(processListener != null){
 				processListener.onProcessStateChanged(state, 0, this);
-				processListener =null;
+				if(state.equals("DONE")){
+					processListener =null;
+				}
 			}
 		} catch (HardwareAbstractionLayerProcessException e) {
 			// TODO Auto-generated catch block

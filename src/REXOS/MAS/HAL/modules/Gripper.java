@@ -42,25 +42,45 @@ public class Gripper extends ModuleActor {
 		command = adjustMoveWithDimensions(command, new Vector3(0, 0, GRIPPER_SIZE));
 		JsonElement pick = command.remove(PICK);
 		JsonElement place = command.remove(PLACE);
+		command.addProperty("forceStraightLine", false);
 		
 		jsonCommand.add(COMMAND, command);
 		
 		compositeStep = new CompositeStep(compositeStep.getProductStep(),jsonCommand);		
 		ArrayList<HardwareStep> hStep = forwardCompositeStep(compositeStep);
-		if (hStep != null)
+		int placeholderId = -1;
+		if (hStep != null){
 			hardwareSteps.addAll(hStep);
+			for (int i=0;i<hStep.size();i++){
+				if (hStep.get(i) == null){
+					placeholderId = i;
+					i = hStep.size();
+				}
+			}
+		}
 		
 		//Set hardwareSteps
 		if (pick != null || place != null){
 			JsonObject hardwareCommand = new JsonObject();
 			if (pick != null){
-				hardwareCommand.addProperty(COMMAND, ACTIVATE);
+				JsonObject instructionData = new JsonObject();
+				instructionData.addProperty(COMMAND, ACTIVATE);
+				hardwareCommand.add("instructionData", instructionData);
 			}
 			else{
-				hardwareCommand.addProperty(COMMAND, DEACTIVATE);
+				JsonObject instructionData = new JsonObject();
+				instructionData.addProperty(COMMAND, DEACTIVATE);
+				hardwareCommand.add("instructionData", instructionData);
 			}
+			hardwareCommand.add("moduleIdentifier",moduleIdentifier.getAsJSON());
+			hardwareCommand.addProperty("status","WAITING");
 			
-			hardwareSteps.add(new HardwareStep(compositeStep,hardwareCommand,moduleIdentifier));
+			if (placeholderId == -1){
+				hardwareSteps.add(new HardwareStep(compositeStep,hardwareCommand,moduleIdentifier));
+			}
+			else {
+				hardwareSteps.set(placeholderId, new HardwareStep(compositeStep,hardwareCommand,moduleIdentifier));
+			}
 		}
 		
 		return hardwareSteps;

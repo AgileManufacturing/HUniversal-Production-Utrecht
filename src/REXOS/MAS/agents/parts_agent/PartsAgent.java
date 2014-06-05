@@ -38,6 +38,7 @@
  **/
 package agents.parts_agent;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -56,27 +57,31 @@ public class PartsAgent extends Agent{
 	private static double[] lookUpTable = new double[32];
 	
 	private static final long serialVersionUID = 1L;
-	private static final double maxStep = 16.5;
+	private static final double maxStep = 17.0;
 	private static final double smallStep = 5.5;
+	private static String targetCrate = "GC4x4MB_6";
+	double offsetX = -2.0;
+	double offsetY = 1.6;
 	
 	private static String[] GC4x4MB_1 = new String[16];
 	private static String[] GC4x4MB_4 = new String[16];
 	private static String[] GC4x4MB_5 = new String[16];
 	protected void setup(){	
 		
-		lookUpTable[0]=-16.5;
-		lookUpTable[1]=16.5;
+		
+		lookUpTable[0]=-17.0;
+		lookUpTable[1]=17.0;
 		
 		lookUpTable[2]=-5.5;
-		lookUpTable[3]=16.5;
+		lookUpTable[3]=17.0;
 		
 		lookUpTable[4]=5.5;
-		lookUpTable[5]=16.5;
+		lookUpTable[5]=17.0;
 		
-		lookUpTable[6]=16.5;
-		lookUpTable[7]=16.5;
+		lookUpTable[6]=17.0;
+		lookUpTable[7]=17.0;
 		
-		lookUpTable[8]=-16.5;
+		lookUpTable[8]=-17.0;
 		lookUpTable[9]=5.5;
 		
 		lookUpTable[10]=-5.5;
@@ -85,10 +90,10 @@ public class PartsAgent extends Agent{
 		lookUpTable[12]=5.5;
 		lookUpTable[13]=5.5;
 		
-		lookUpTable[14]=16.5;
+		lookUpTable[14]=17.0;
 		lookUpTable[15]=5.5;
 		
-		lookUpTable[16]=-16.5;
+		lookUpTable[16]=-17.0;
 		lookUpTable[17]=-5.5;
 		
 		lookUpTable[18]=-5.5;
@@ -97,20 +102,20 @@ public class PartsAgent extends Agent{
 		lookUpTable[20]=5.5;
 		lookUpTable[21]=-5.5;
 		
-		lookUpTable[22]=16.5;
+		lookUpTable[22]=17.0;
 		lookUpTable[23]=-5.5;
 		
-		lookUpTable[24]=-16.5;
-		lookUpTable[25]=-16.5;
+		lookUpTable[24]=-17.0;
+		lookUpTable[25]=-17.0;
 		
 		lookUpTable[26]=-5.5;
-		lookUpTable[27]=-16.5;
+		lookUpTable[27]=-17.0;
 		
 		lookUpTable[28]=5.5;
-		lookUpTable[29]=-16.5;
+		lookUpTable[29]=-17.0;
 		
-		lookUpTable[30]=16.5;
-		lookUpTable[31]=-16.5;
+		lookUpTable[30]=17.0;
+		lookUpTable[31]=-17.0;
 		
 		for(int i = 0; i < 16; i++){
 			GC4x4MB_1[i]="blue";
@@ -133,11 +138,15 @@ public class PartsAgent extends Agent{
 
 					if (msg.getPerformative() == MessageType.AVAILABLE_TO_PLAN){
 						JsonObject partRequest = new JsonParser().parse(msg.getContent()).getAsJsonObject();
-						JsonObject parts =findPart(partRequest.getAsJsonObject("criteria").get("color").toString());
+						partRequest.getAsJsonObject("criteria").getAsJsonObject("target").remove("identifier");
+						partRequest.getAsJsonObject("criteria").getAsJsonObject("target").addProperty("identifier", targetCrate);
+						JsonArray parts =findPart(partRequest.getAsJsonObject("criteria").getAsJsonObject("subjects").get("color").toString());
 						
+						partRequest.getAsJsonObject("criteria").remove("subjects");
+						partRequest.getAsJsonObject("criteria").add("subjects", parts);
 						ACLMessage reply = msg.createReply();
 	                    reply.setPerformative( MessageType.SUPPLIER_REQUEST_REPLY );
-	                    reply.setContent(parts.toString());
+	                    reply.setContent(partRequest.toString());
 	                    send(reply);   
 					}
 					else {
@@ -150,16 +159,20 @@ public class PartsAgent extends Agent{
 		});  
 	}
 	
-	private JsonObject findPart(String color){
-		JsonObject parts = new JsonObject();
+	private JsonArray findPart(String color){
+		JsonArray subjects = new JsonArray();
+		JsonObject subject = new JsonObject();
+		JsonObject subjectMove = new JsonObject();
 		
 		if(color.equals("red")){
 			for(int i =0; i < GC4x4MB_5.length; i++){
 				if(GC4x4MB_5[i].equals("red")){
-					parts.addProperty("identifier", "GC4x4MB_5");
-					parts.addProperty("x", lookUpTable[(i*2)]);
-					parts.addProperty("y", lookUpTable[(i*2)+1]);
-					parts.addProperty("z", "35");
+					subjectMove.addProperty("x", (lookUpTable[(i*2)]+offsetX));
+					subjectMove.addProperty("y", (lookUpTable[(i*2)+1]+offsetY));
+					subjectMove.addProperty("z", "35");					
+					subject.add("move",subjectMove);
+					subject.addProperty("identifier", "GC4x4MB_5");
+					subjects.add(subject);
 					GC4x4MB_5[i]="";
 				}
 			}				
@@ -167,10 +180,13 @@ public class PartsAgent extends Agent{
 		} else if(color.equals("blue")){
 			for(int i =0; i < GC4x4MB_1.length; i++){	
 				if(GC4x4MB_1[i].equals("blue")){
-					parts.addProperty("identifier", "GC4x4MB_1");
-					parts.addProperty("x", lookUpTable[(i*2)]);
-					parts.addProperty("y", lookUpTable[(i*2)+1]);
-					parts.addProperty("z", "35");
+					subjectMove.addProperty("identifier", "GC4x4MB_1");
+					subjectMove.addProperty("x", (lookUpTable[(i*2)]+offsetX));
+					subjectMove.addProperty("y", (lookUpTable[(i*2)+1]+offsetY));
+					subjectMove.addProperty("z", "35");
+					subject.add("move",subjectMove);
+					subject.addProperty("identifier", "GC4x4MB_1");
+					subjects.add(subject);
 					GC4x4MB_1[i]="";
 				}
 			}
@@ -178,21 +194,18 @@ public class PartsAgent extends Agent{
 		} else if(color.equals("green")){
 			for(int i =0; i < GC4x4MB_4.length; i++){	
 				if(GC4x4MB_4[i].equals("green")){
-					parts.addProperty("identifier", "GC4x4MB_4");
-					parts.addProperty("x", lookUpTable[(i*2)]);
-					parts.addProperty("y", lookUpTable[(i*2)+1]);
-					parts.addProperty("z", "35");
+					subjectMove.addProperty("identifier", "GC4x4MB_4");
+					subjectMove.addProperty("x", (lookUpTable[(i*2)]+offsetX));
+					subjectMove.addProperty("y", (lookUpTable[(i*2)+1]+offsetY));
+					subjectMove.addProperty("z", "35");
+					subject.add("move",subjectMove);
+					subject.addProperty("identifier", "GC4x4MB_4");
+					subjects.add(subject);
 					GC4x4MB_4[i]="";
 				}
 			}
 			
 		}
-		return parts;		
+		return subjects;		
 	}
-	
-	/**
-	  * sendMessage()
-	  * The function sendMessage sends an ACL message to only one other agent.
-	  * The language is mostly "meta".
-	  */
 }

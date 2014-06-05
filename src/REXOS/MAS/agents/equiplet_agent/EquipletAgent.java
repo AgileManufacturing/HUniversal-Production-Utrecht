@@ -264,7 +264,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	@Override
 	public String getEquipletName() {
 		// TODO Auto-generated method stub
-		return "EQ1";
+		return "EQ2";
 	}
 
 	@Override

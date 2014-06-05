@@ -106,6 +106,8 @@ public class DeltaRobot extends ModuleActor {
 					actual_hardwareCommand.add("payload",actual_move);
 					actual_point.add("instructionData",actual_hardwareCommand);
 					hardwareSteps.add(new HardwareStep(compositeStep,actual_point,moduleIdentifier));
+					
+					hardwareSteps.add(null);
 
 					System.out.println("DeltaRobot: actual point added");
 					//Exit point

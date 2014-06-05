@@ -256,7 +256,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		fis.read(content);
 		fis.close();
 		String base64Capability = new String(Base64.encodeBase64(content));
-		
+		/*
 		// deltarobot
 		String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64Module + moduleA_03 + base64Capability + moduleA_04; 
 		JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
@@ -276,7 +276,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		String moduleD = moduleD_01 + base64Pen + moduleD_02; 
 		JsonObject d = new JsonParser().parse(moduleD).getAsJsonObject();
 		hal.insertModule(d, d);
-		
+		*/
 		
 		/*JsonObject tommasgtaylordfuckzooi;
 		ModuleIdentifier moduleIdentifier = new ModuleIdentifier("HU", "delta_robot_type_A", "1");

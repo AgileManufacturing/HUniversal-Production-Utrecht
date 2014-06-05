@@ -57,8 +57,13 @@ public class TranslationProcess implements Runnable{
 				
 				for (int i=0;i<numCapabilities;i++){
 					try {
-						hardwareSteps.addAll(capabilities.get(i).translateProductStep(productStep));
-						
+						ArrayList<HardwareStep> translatedSteps = new ArrayList<HardwareStep>();
+						translatedSteps = capabilities.get(i).translateProductStep(productStep);
+						for (int j=0;j<translatedSteps.size();j++){
+							if (translatedSteps.get(j) != null){
+								hardwareSteps.add(translatedSteps.get(j));
+							}
+						}						
 					} catch (CapabilityException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
