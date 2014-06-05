@@ -156,7 +156,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 	    std::cout << "lookupIsSet == true" << std::endl;
 		Vector3 lookupVector(lookupResultPoint.x, lookupResultPoint.y, lookupResultPoint.z);
 
-		double theta = angle * 3.141592653589793 / 180.0;
+		double theta = angle;
 		double cs = cos(theta);
 		double sn = sin(theta);
 		rotatedX = payloadPoint.x * cs - payloadPoint.y * sn;
