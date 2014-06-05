@@ -186,7 +186,7 @@ void EquipletNode::handleEquipletStep(rexos_datatypes::EquipletStep * step, mong
 		}
 	} else {
 		ROS_INFO("Instruction received but current mode is %s", rexos_statemachine::mode_txt[currentMode]);
-		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"FAILED\"");
+		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"FAILED\" } } ");
 	}
 }
 

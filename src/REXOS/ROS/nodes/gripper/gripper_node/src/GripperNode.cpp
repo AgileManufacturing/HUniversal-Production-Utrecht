@@ -48,15 +48,30 @@
  * Constructor
  **/
 GripperNode::GripperNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier) :
+		rexos_knowledge_database::Module(moduleIdentifier),
 		rexos_statemachine::ModuleStateMachine(equipletName, moduleIdentifier, true),
 		setInstructionActionServer(
 				nodeHandle, 
-				moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() + "/set_instruction", 
+				equipletName + "/" + moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() + "/set_instruction", 
 				boost::bind(&GripperNode::onSetInstruction, this, _1), 
 				false) {
+	ROS_INFO("GripperNode Constructor entering...");
+	ROS_INFO("1");
+	// get the properties and combine them for the deltarobot
+	// get the properties and combine them for the deltarobot
+	std::string properties = this->getModuleProperties();
+	std::string typeProperties = this->getModuleTypeProperties();
 
-	std::cout << "[DEBUG] Opening modbus connection" << std::endl;
+	JSONNode jsonNode = libjson::parse(properties);
+	JSONNode typeJsonNode = libjson::parse(typeProperties);
 
+	for(JSONNode::const_iterator it = typeJsonNode.begin(); it != typeJsonNode.end(); it++) {
+		jsonNode.push_back(*it);
+	}
+
+	ROS_INFO("4");
+	gripper = new rexos_gripper::Gripper(jsonNode, this, NULL);
+	setInstructionActionServer.start();
 }
 
 GripperNode::~GripperNode() {
@@ -68,6 +83,7 @@ GripperNode::~GripperNode() {
 
 void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
 	JSONNode instructionDataNode = libjson::parse(goal->json);
+	ROS_WARN_STREAM(goal->json);
 	rexos_statemachine::SetInstructionResult result_;
 	result_.OID = goal->OID;
 
@@ -76,10 +92,12 @@ void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalC
     while (i != instructionDataNode.end()){
 
         const char * nodeName = i -> name().c_str();
+		ROS_WARN_STREAM("command " << nodeName);
 
 		if(strcmp(nodeName, "command") == 0) {
-			std::string value = parseNodeValue("command", *i);
+			std::string value = parseNodeValue("command", instructionDataNode);
 
+			ROS_WARN_STREAM("value " << value);
 			if(strcmp(value.c_str(), "activate") == 0) {
 				std::cout << "Activating gripper" << std::endl;
 				gripper->grab();
@@ -133,6 +151,9 @@ void GripperNode::transitionDeinitialize(rexos_statemachine::TransitionActionSer
  **/
 void GripperNode::transitionSetup(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Setup transition called");
+	// Set currentState to start
+	gripper->startWatchdog();
+	
 	//The service servers should be set, to provide the normal methods for the equiplet
 	as->setSucceeded();
 }
@@ -143,6 +164,11 @@ void GripperNode::transitionSetup(rexos_statemachine::TransitionActionServer* as
  **/
 void GripperNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Shutdown transition called");
+	// Set currentState to stop
+	gripper->stopWatchdog();
+	gripper->release();
+	gripper->disable();
+
 	as->setSucceeded();
 }
 
@@ -153,8 +179,6 @@ void GripperNode::transitionShutdown(rexos_statemachine::TransitionActionServer*
 void GripperNode::transitionStart(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Start transition called");
 
-	// Set currentState to start
-	gripper->startWatchdog();
 	as->setSucceeded();
 }
 /**
@@ -164,10 +188,6 @@ void GripperNode::transitionStart(rexos_statemachine::TransitionActionServer* as
 void GripperNode::transitionStop(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Stop transition called");
 
-	// Set currentState to stop
-	gripper->stopWatchdog();
-	gripper->release();
-	gripper->disable();
 	as->setSucceeded();
 }
 
@@ -198,11 +218,14 @@ bool GripperNode::release(gripper_node::Release::Request &req, gripper_node::Rel
 std::string GripperNode::parseNodeValue(const std::string nodeName, const JSONNode & n){
 	JSONNode::const_iterator i = n.begin();
 	std::string result;
+	ROS_ERROR_STREAM(nodeName);
 	while(i != n.end()) {
 		// get the JSON node name and value as a string
 		std::string node_name = i->name();
+		ROS_ERROR_STREAM(" " << node_name);
 
 		if(node_name == nodeName) {
+			ROS_ERROR_STREAM(" found");
 			result = i->as_string();
 		} 
 

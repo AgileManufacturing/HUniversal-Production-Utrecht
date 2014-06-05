@@ -327,7 +327,7 @@
 			 if (json_likely(is_valid(json))){
 				return parse(json);
 			 }
-			 throw std::invalid_argument("");
+			 throw std::invalid_argument("JSON is invalid");
 		  }
 	   #endif
     #endif

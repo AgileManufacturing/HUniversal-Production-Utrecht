@@ -43,7 +43,9 @@ namespace rexos_gripper {
 		Gripper::Gripper(JSONNode node, void* gripperNodeObject, watchdogWarningHandler warningHandler) : 
 				OutputDevice(node), warningHandler(warningHandler), gripperNode(gripperNodeObject), 
 				watchdogRunning(false), state(false), previousState(false), warned(false), overheated(false) {
+			std::cout << "a";
 			readJSONNode(node);
+			std::cout << "b";
 		}
 
 		void Gripper::readJSONNode(const JSONNode node) {

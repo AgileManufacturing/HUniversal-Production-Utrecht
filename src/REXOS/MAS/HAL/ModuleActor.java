@@ -37,6 +37,12 @@ public abstract class ModuleActor extends Module {
 	protected static final String X = "x";
 	protected static final String Y = "y";
 	protected static final String Z = "z";
+	
+	//TODO Check this (added by Rolf)
+	protected static final String ROTATION_X = "rotationX";
+	protected static final String ROTATION_Y = "rotationY";
+	protected static final String ROTATION_Z = "rotationZ";
+	
 	protected static final String MOVE = "move";
 	
 	
@@ -170,6 +176,13 @@ public abstract class ModuleActor extends Module {
 		adjustedMove.addProperty(X, originalX + rotatedVector.x);
 		adjustedMove.addProperty(Y, originalY + rotatedVector.y);
 		adjustedMove.addProperty(Z, originalZ + rotatedVector.z);
+		
+		
+		//TODO added by Rolf, Check this!!!!!!!!!!!!!!!!!!!
+		adjustedMove.addProperty(ROTATION_X, originalMove.get(ROTATION_X).getAsDouble());
+		adjustedMove.addProperty(ROTATION_Y, originalMove.get(ROTATION_Y).getAsDouble());
+		adjustedMove.addProperty(ROTATION_Z, originalMove.get(ROTATION_Z).getAsDouble());
+		
 		compositeCommand.add(MOVE, adjustedMove);
 		return compositeCommand;
 	}

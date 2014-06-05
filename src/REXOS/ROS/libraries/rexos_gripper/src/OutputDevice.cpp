@@ -65,7 +65,6 @@ namespace rexos_gripper {
 	 * Virtual destructor for extensions of OutputDevice.
 	 */
 	OutputDevice::~OutputDevice(){
-		delete ioController;
 	}
 
 	/**
