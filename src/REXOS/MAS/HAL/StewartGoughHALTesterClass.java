@@ -278,7 +278,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 				+ "     ],"
 				+ "     \"attachedTo\":null,"
 				+ "\"mountPointX\":1,"
-				+ "\"mountPointY\":10"
+				+ "\"mountPointY\":9"
 				+ "}";
 			
 	/**
@@ -405,31 +405,31 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		JsonObject criteria = new JsonObject();
 		JsonObject target = new JsonObject();
 		JsonObject targetMove = new JsonObject();
-		targetMove.addProperty("x", -10.0);
-		targetMove.addProperty("y", -10.0);
-		targetMove.addProperty("z", -335.0);
+		targetMove.addProperty("x", 5.5);
+		targetMove.addProperty("y", 5.5);
+		targetMove.addProperty("z", 25.0);
 		targetMove.addProperty("maxAcceleration", 2);
 		
 		targetMove.addProperty("rotationX", 0);
 		targetMove.addProperty("rotationY", 0);
-		targetMove.addProperty("rotationZ", Math.toRadians(25));
+		targetMove.addProperty("rotationZ", 0);
 		target.add("move",targetMove);
-		target.addProperty("identifier", "Paper");
+		target.addProperty("identifier", "GC4x4MB_3");
 		
 		JsonArray subjects = new JsonArray();
 		JsonObject subject = new JsonObject();
 		JsonObject subjectMove = new JsonObject();
-		subjectMove.addProperty("x", 0.0);
-		subjectMove.addProperty("y", 0.0);
-		subjectMove.addProperty("z", -360.0);
+		subjectMove.addProperty("x", 5.5);
+		subjectMove.addProperty("y", 5.5);
+		subjectMove.addProperty("z", 25.0);
 		
 		subjectMove.addProperty("rotationX", 0);
 		subjectMove.addProperty("rotationY", 0);
-		subjectMove.addProperty("rotationZ", Math.toRadians(25));
+		subjectMove.addProperty("rotationZ", 0);
 		
 		
 		subject.add("move",subjectMove);
-		subject.addProperty("identifier", "Paper");
+		subject.addProperty("identifier", "GC4x4MB_1");
 		subjects.add(subject);
 		
 		criteria.add("target",target);
