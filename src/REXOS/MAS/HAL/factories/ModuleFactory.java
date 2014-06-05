@@ -304,9 +304,9 @@ public class ModuleFactory extends Factory {
 						staticSettings.get("typeNumber").getAsString(), staticSettings.get("serialNumber").getAsString());
 				
 				if(isModuleTypeKnown(moduleIdentifier)) {
-					updateModuleType(moduleIdentifier, staticSettings.get("moduleType").getAsJsonObject());
+					updateModuleType(moduleIdentifier, staticSettings.get("type").getAsJsonObject());
 				} else {
-					insertModuleType(moduleIdentifier, staticSettings.get("moduleType").getAsJsonObject());
+					insertModuleType(moduleIdentifier, staticSettings.get("type").getAsJsonObject());
 				}
 				
 				String properties = staticSettings.get("properties").getAsString();
