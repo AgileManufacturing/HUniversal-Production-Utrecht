@@ -80,7 +80,7 @@ public class HardwareAbstractionLayer implements ModuleListener {
 	 */
 	public boolean insertModule(JsonObject staticSettings, JsonObject dynamicSettings) throws InvalidMastModeException {
 		boolean isModuleAdditionSuccesful = moduleFactory.insertModule(staticSettings, dynamicSettings);
-		JsonArray capabilities = staticSettings.get("moduleType").getAsJsonObject().get("capabilities").getAsJsonArray();
+		JsonArray capabilities = staticSettings.get("type").getAsJsonObject().get("capabilities").getAsJsonArray();
 		boolean isCapabilityAdditionSuccesful = capabilityFactory.insertCapabilities(capabilities);
 		return isModuleAdditionSuccesful == true && isCapabilityAdditionSuccesful == true;
 	}
