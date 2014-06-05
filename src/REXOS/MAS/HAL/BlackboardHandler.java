@@ -121,11 +121,11 @@ public class BlackboardHandler implements BlackboardSubscriber {
 						String status = dbObject.get("status").toString();
 						System.out.println("EQ step process status changed");
 						
-						if(!status.equals("IN_PROGRESS")) {
+						//if(!status.equals("IN_PROGRESS")) {
 							for(BlackboardListener listener: updateSubscribers) {
 								listener.onProcessStatusChanged(status); 
 							}
-						}
+						//}
 					}
 				    break;
 				default:

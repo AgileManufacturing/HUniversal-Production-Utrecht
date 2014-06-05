@@ -176,6 +176,13 @@ public abstract class ModuleActor extends Module {
 		adjustedMove.addProperty(X, originalX + rotatedVector.x);
 		adjustedMove.addProperty(Y, originalY + rotatedVector.y);
 		adjustedMove.addProperty(Z, originalZ + rotatedVector.z);
+		
+		
+		//TODO added by Rolf, Check this!!!!!!!!!!!!!!!!!!!
+		adjustedMove.addProperty(ROTATION_X, originalMove.get(ROTATION_X).getAsDouble());
+		adjustedMove.addProperty(ROTATION_Y, originalMove.get(ROTATION_Y).getAsDouble());
+		adjustedMove.addProperty(ROTATION_Z, originalMove.get(ROTATION_Z).getAsDouble());
+		
 		compositeCommand.add(MOVE, adjustedMove);
 		return compositeCommand;
 	}
@@ -188,7 +195,9 @@ public abstract class ModuleActor extends Module {
 		try {
 			if(processListener != null){
 				processListener.onProcessStateChanged(state, 0, this);
-				processListener =null;
+				if(state.equals("DONE")){
+					processListener =null;
+				}
 			}
 		} catch (HardwareAbstractionLayerProcessException e) {
 			// TODO Auto-generated catch block

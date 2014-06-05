@@ -19,6 +19,9 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	static ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 	static HardwareAbstractionLayer hal;
 	static BlackboardHandler blackboardUpdated;
+	static JsonObject criteria = new JsonObject();
+	static JsonObject criteria1 = new JsonObject();
+	boolean state = false;
 	
 	static final String baseDir = "/home/agileman/Desktop/";
 	
@@ -301,63 +304,99 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		FileInputStream fis;
 		byte[] content;
 
+<<<<<<< HEAD
+		File deltaRobotJar = new File("C:/Users/Tommy/Contacts/Desktop/DeltaRobot.jar");
+=======
 		File deltaRobotJar = new File(baseDir + "DeltaRobot.jar");
+>>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(deltaRobotJar);
 		content = new byte[(int) deltaRobotJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Module = new String(Base64.encodeBase64(content));
 		
+<<<<<<< HEAD
+		File deltaRobotZip = new File("C:/Users/Tommy/Contacts/Desktop/nodes.zip");
+=======
 		File deltaRobotZip = new File(baseDir + "nodes.zip");
+>>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(deltaRobotZip);
 		content = new byte[(int) deltaRobotZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
 		
+<<<<<<< HEAD
+		File gripperZip = new File("C:/Users/Tommy/Contacts/Desktop/nodes.zip");
+=======
 		File gripperZip = new File(baseDir + "nodes.zip");
+>>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(gripperZip);
 		content = new byte[(int) gripperZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64GripperRos = new String(Base64.encodeBase64(content));
 		
+<<<<<<< HEAD
+		File cameraZip = new File("C:/Users/Tommy/Contacts/Desktop/nodes.zip");
+=======
 		File cameraZip = new File(baseDir + "nodes.zip");
+>>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(cameraZip);
 		content = new byte[(int) cameraZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64CameraRos = new String(Base64.encodeBase64(content));
 		
+<<<<<<< HEAD
+		File workplaneZip = new File("C:/Users/Tommy/Contacts/Desktop/nodes.zip");
+=======
 		File workplaneZip = new File(baseDir + "nodes.zip");
+>>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(workplaneZip);
 		content = new byte[(int) workplaneZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64WorkplaneRos = new String(Base64.encodeBase64(content));
 		
+<<<<<<< HEAD
+		File penJar = new File("C:/Users/Tommy/Contacts/Desktop/Pen.jar");
+=======
 		File penJar = new File(baseDir + "Pen.jar");
+>>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(penJar);
 		content = new byte[(int) penJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Pen = new String(Base64.encodeBase64(content));
 		
+<<<<<<< HEAD
+		File gripperJar = new File("C:/Users/Tommy/Contacts/Desktop/Gripper.jar");
+=======
 		File gripperJar = new File(baseDir + "Gripper.jar");
+>>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(gripperJar);
 		content = new byte[(int) gripperJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Gripper = new String(Base64.encodeBase64(content));
 		
+<<<<<<< HEAD
+		File drawJar = new File("C:/Users/Tommy/Contacts/Desktop/Draw.jar");
+=======
 		File drawJar = new File(baseDir + "Draw.jar");
+>>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(drawJar);
 		content = new byte[(int) drawJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Draw = new String(Base64.encodeBase64(content));
 		
+<<<<<<< HEAD
+		File pickAndPlaceJar = new File("C:/Users/Tommy/Contacts/Desktop/PickAndPlace.jar");
+=======
 		File pickAndPlaceJar = new File(baseDir + "PickAndPlace.jar");
+>>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(pickAndPlaceJar);
 		content = new byte[(int) pickAndPlaceJar.length()];
 		fis.read(content);
@@ -393,35 +432,73 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64Pen + moduleE_03;
 		JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
 		hal.insertModule(e, e);
+<<<<<<< HEAD
+		*/
+=======
 		
+>>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 
+		//Bakje 6 GOED
+		double falsex = -2.7;
+		double falsey = 1.3;
 		
-		JsonObject criteria = new JsonObject();
+		//Bakje 4 GOED
+		//double falsex = -2.2;
+		//double falsey = 1.3;
+		
+		//Bakje 1 GOED
+		double falsex1 = -2.7;
+		double falsey1 = 1.6;
+		
+		//Bakje 3 GOED MORE TEST
+		//double falsex = -2.2;
+		//double falsey = 2.4;
 		JsonObject target = new JsonObject();
 		JsonObject targetMove = new JsonObject();
-		targetMove.addProperty("x", -2.0);
-		targetMove.addProperty("y", 1.0);
-		targetMove.addProperty("z", 15.0);
+		targetMove.addProperty("x", (5.5+falsex1));
+		targetMove.addProperty("y", (5.5+falsey1));
+		targetMove.addProperty("z", -26.5);
 		target.add("move",targetMove);
 		target.addProperty("identifier", "GC4x4MB_1");
 		
 		JsonArray subjects = new JsonArray();
 		JsonObject subject = new JsonObject();
 		JsonObject subjectMove = new JsonObject();
-		subjectMove.addProperty("x", -3.0);
-		subjectMove.addProperty("y", 3.0);
-		subjectMove.addProperty("z", 35.0);
+		subjectMove.addProperty("x", (-5.5+falsex));
+		subjectMove.addProperty("y", (-5.5+falsey));
+		subjectMove.addProperty("z", -26.5);
 		subject.add("move",subjectMove);
 		subject.addProperty("identifier", "GC4x4MB_6");
 		subjects.add(subject);
 		
 		criteria.add("target",target);
-		criteria.add("subjects", subjects);
+		criteria.add("subjects", subjects);	
 		
+		
+		
+		JsonObject target1 = new JsonObject();
+		JsonObject targetMove1 = new JsonObject();
+		targetMove1.addProperty("x", (-5.5+falsex));
+		targetMove1.addProperty("y", (-5.5+falsey));
+		targetMove1.addProperty("z", -26.5);
+		target1.add("move",targetMove1);
+		target1.addProperty("identifier", "GC4x4MB_6");
+		
+		JsonArray subjects1 = new JsonArray();
+		JsonObject subject1 = new JsonObject();
+		JsonObject subjectMove1 = new JsonObject();
+		subjectMove1.addProperty("x", (5.5+falsex1));
+		subjectMove1.addProperty("y", (5.5+falsey1));
+		subjectMove1.addProperty("z", -26.5);
+		subject1.add("move",subjectMove1);
+		subject1.addProperty("identifier", "GC4x4MB_1");
+		subjects1.add(subject1);
+		
+		criteria1.add("target",target1);
+		criteria1.add("subjects", subjects1);	
 		
 		hal.translateProductStep(
-				new ProductStep("1", criteria, new Service("place")));
-		
+				new ProductStep("1", criteria, new Service("place")));		
 
 	}
 	
@@ -465,8 +542,15 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 
 	@Override
 	public void onExecutionFinished() {
-		// TODO Auto-generated method stub
-		
+		if(state){
+			state = false;
+			hal.translateProductStep(
+					new ProductStep("1", criteria, new Service("place")));	
+		}else{
+			state = true;
+			hal.translateProductStep(
+					new ProductStep("1", criteria1, new Service("place")));
+		}
 	}
 
 	@Override

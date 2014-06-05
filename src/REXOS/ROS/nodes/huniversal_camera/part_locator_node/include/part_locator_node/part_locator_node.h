@@ -70,6 +70,14 @@ protected:
 	double workPlaneWidth;
 	double workPlaneHeight;
 	
+	double actualWorkPlaneWidth;
+	double actualWorkPlaneHeight;
+	double topLeftOffsetX, topLeftOffsetY;
+	double topRightOffsetX, topRightOffsetY;
+	double bottomRightOffsetX, bottomRightOffsetY;
+	
+	std::string equipletName;
+	
 	std::map<std::string, boost::circular_buffer<QrCode> > smoothBuffer;
 
 public:
@@ -124,6 +132,7 @@ private:
 	 **/
 	QrCode currentBottomRightCoor;
 	Matrix3 totalMatrix;
+	Matrix3 postCorrectionTotalMatrix;
 	
 	boost::circular_buffer<QrCode> samplesTopLeft;
 	boost::circular_buffer<QrCode> samplesTopRight;

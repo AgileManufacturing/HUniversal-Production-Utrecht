@@ -38,6 +38,11 @@
 #include <algorithm>
 #include <vector>
 
+#include <actionlib/client/simple_action_client.h>
+#include <rexos_statemachine/SetInstructionAction.h>
+
+
+
 using namespace std;
 
 const Vector2 PartLocatorNode::EXPECTED_DIRECTION = Vector2(-1, 0);
@@ -50,6 +55,7 @@ const string PartLocatorNode::BOTTOM_RIGHT_VALUE = "WP_800_400_BR";*/
 
 
 PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier):
+		equipletName(equipletName),
 		rexos_knowledge_database::Module(moduleIdentifier),
 		rexos_coordinates::Module(this),
 		rexos_statemachine::ModuleStateMachine(equipletName, moduleIdentifier, false),
@@ -397,6 +403,136 @@ void PartLocatorNode::transitionDeinitialize(rexos_statemachine::TransitionActio
 
 void PartLocatorNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
 	ROS_INFO("Setup transition called");
+	
+	actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> setInstructionActionClient(nodeHandle, equipletName + "/HU/delta_robot_type_A/1/set_instruction");
+	std::string hardwareStep;
+	rexos_statemachine::SetInstructionGoal goal;
+	
+	
+	ROS_INFO("Press any key after mover has calibrated");
+	cin.get();
+	cin.ignore();
+	
+	ROS_INFO("Moving to top left corner");
+	hardwareStep = "{\"command\":\"move\", \"look_up\":\"FIND_ID\", \"look_up_parameters\":{\"ID\":\"" + topLeftValue + "\"}, \"payload\":{\"x\":0,\"y\":0,\"z\":5} }";
+	goal.json = hardwareStep;
+	goal.OID = 1;
+	
+	setInstructionActionClient.sendGoal(goal);
+	ROS_INFO("X");
+	std::cin >> topLeftOffsetX;
+	ROS_INFO("Y");
+	std::cin >> topLeftOffsetY;
+	
+	ROS_INFO("Moving to top right corner");
+	hardwareStep = "{\"command\":\"move\", \"look_up\":\"FIND_ID\", \"look_up_parameters\":{\"ID\":\"" + topRightValue + "\"}, \"payload\":{\"x\":0,\"y\":0,\"z\":5} }";
+	goal.json = hardwareStep;
+	goal.OID = 1;
+	
+	setInstructionActionClient.sendGoal(goal);
+	ROS_INFO("X");
+	std::cin >> topRightOffsetX;
+	ROS_INFO("Y");
+	std::cin >> topRightOffsetY;
+	
+	ROS_INFO("Moving to bottom right corner");
+	hardwareStep = "{\"command\":\"move\", \"look_up\":\"FIND_ID\", \"look_up_parameters\":{\"ID\":\"" + bottomRightValue + "\"}, \"payload\":{\"x\":0,\"y\":0,\"z\":5} }";
+	goal.json = hardwareStep;
+	goal.OID = 1;
+	
+	setInstructionActionClient.sendGoal(goal);
+	ROS_INFO("X");
+	std::cin >> bottomRightOffsetX;
+	ROS_INFO("Y");
+	std::cin >> bottomRightOffsetY;
+	
+	
+	Vector3 A = Vector3(0						, 0						, 1);
+	Vector3 B = Vector3(0 + workPlaneWidth	, 0						, 1);
+	Vector3 C = Vector3(0 + workPlaneWidth	, 0 - workPlaneHeight	, 1);
+	
+	Vector3 Aproj = Vector3(A.x + topLeftOffsetX, A.y + topLeftOffsetY, 1);
+	Vector3 Bproj = Vector3(B.x + topRightOffsetX, B.y + topRightOffsetY, 1);
+	Vector3 Cproj = Vector3(C.x + bottomRightOffsetX, C.y + bottomRightOffsetY, 1);
+	
+	ROS_INFO_STREAM("workPlaneWidth " << workPlaneWidth << " workPlaneHeight " << workPlaneHeight);
+	ROS_INFO_STREAM("A " << A << " B " << B << " C " << C);
+	ROS_INFO_STREAM("Aproj " << Aproj << " Bproj " << Bproj << " Cproj " << Cproj);
+	
+	// fancy calulation here
+	// first translate so that A' matches A
+	Matrix3 postCorrectionTranslationMatrix = Matrix3();
+	postCorrectionTranslationMatrix[2] = -topLeftOffsetX;
+	postCorrectionTranslationMatrix[5] = -topLeftOffsetY;
+	
+	Aproj = postCorrectionTranslationMatrix * Aproj;
+	Bproj = postCorrectionTranslationMatrix * Bproj;
+	Cproj = postCorrectionTranslationMatrix * Cproj;
+	
+	ROS_INFO_STREAM("translated: Aproj " << Aproj << " Bproj " << Bproj << " Cproj " << Cproj);
+	
+	// second rotate so that normalize(A'B') matches normalize(AB)
+	// calulate the angle between A' and B'
+	double angleAprojBproj = std::atan2(Bproj.y - Aproj.y, Bproj.x - Aproj.x);
+	// calulate the angle between A and B
+	double angleAB = std::atan2(B.y - A.y, B.x - A.x); // should be 0
+	double rotationAngle = angleAB - angleAprojBproj;
+	ROS_INFO_STREAM("angleAprojBproj " << angleAprojBproj << " angleAB " << angleAB << " rotationAngle " << rotationAngle);
+	
+	Matrix3 postCorrectionRotationMatrix = Matrix3();
+	postCorrectionRotationMatrix[0] = cos(rotationAngle);
+	postCorrectionRotationMatrix[1] = -sin(rotationAngle);
+	postCorrectionRotationMatrix[3] = sin(rotationAngle);
+	postCorrectionRotationMatrix[4] = cos(rotationAngle);
+	
+	
+	Aproj = postCorrectionRotationMatrix * Aproj;
+	Bproj = postCorrectionRotationMatrix * Bproj;
+	Cproj = postCorrectionRotationMatrix * Cproj;
+	
+	ROS_INFO_STREAM("rotated: Aproj " << Aproj << " Bproj " << Bproj << " Cproj " << Cproj);
+	
+	// third shear so that normalize(B'C') mathces normalize(BC)
+	// calulate the angle between A' and B'
+	double angleBprojCproj = std::atan2(Cproj.y - Bproj.y, Cproj.x - Bproj.x);
+	// calulate the angle between A and B
+	double angleBC = std::atan2(C.y - B.y, C.x - B.x); // should be -1/2*Pi
+	double shearAngle = angleBprojCproj - angleBC;
+	double shearFactor = tan(shearAngle);
+	ROS_INFO_STREAM("angleBprojCproj " << angleBprojCproj << " angleBC " << angleBC << 
+			" shearAngle " << shearAngle << " shearFactor " << shearFactor);
+	
+	Matrix3 postCorrectionShearMatrix = Matrix3(
+			1, shearFactor, 0,
+			0, 1, 0,
+			0, 0, 1);
+	
+	
+	Aproj = postCorrectionShearMatrix * Aproj;
+	Bproj = postCorrectionShearMatrix * Bproj;
+	Cproj = postCorrectionShearMatrix * Cproj;
+	
+	ROS_INFO_STREAM("sheared: Aproj " << Aproj << " Bproj " << Bproj << " Cproj " << Cproj);
+	
+	// fourth scale so that A'B' matches AB and B'C' matches BC
+	Matrix3 postCorrectionScaleMatrix = Matrix3();
+	double scaleX = (B - A).length() / (Bproj - Aproj).length();
+	double scaleY = (C - B).length() / (Cproj - Bproj).length();
+	postCorrectionScaleMatrix[0] = scaleX;
+	postCorrectionScaleMatrix[4] = scaleY;
+	ROS_INFO_STREAM("scaleX: " << scaleX << " scaleY " << scaleY);
+	
+	
+	Aproj = postCorrectionScaleMatrix * Aproj;
+	Bproj = postCorrectionScaleMatrix * Bproj;
+	Cproj = postCorrectionScaleMatrix * Cproj;
+	
+	
+	ROS_INFO_STREAM("scale: Aproj " << Aproj << " Bproj " << Bproj << " Cproj " << Cproj);
+	
+	postCorrectionTotalMatrix = postCorrectionTranslationMatrix * postCorrectionRotationMatrix * 
+			postCorrectionShearMatrix * postCorrectionScaleMatrix;
+	
 	as->setSucceeded();
 }
 void PartLocatorNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as){

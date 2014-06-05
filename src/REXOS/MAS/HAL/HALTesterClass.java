@@ -358,8 +358,13 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		content = new byte[(int) pickAndPlaceJar.length()];
 		fis.read(content);
 		fis.close();
+<<<<<<< HEAD
+		String base64Capability = new String(Base64.encodeBase64(content));
+		/*
+=======
 		String base64PickAndPlace = new String(Base64.encodeBase64(content));
 		
+>>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		// deltarobot
 		String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64Module + moduleA_03 + base64Draw + moduleA_04 + base64PickAndPlace + moduleA_05; 
 		JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
@@ -384,11 +389,15 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		String moduleD = moduleD_01 + base64Pen + moduleD_02; 
 		JsonObject d = new JsonParser().parse(moduleD).getAsJsonObject();
 		hal.insertModule(d, d);
+<<<<<<< HEAD
+		*/
+=======
 		
 		// workplane
 		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64Pen + moduleE_03;
 		JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
 		hal.insertModule(e, e);
+>>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		
 
 		

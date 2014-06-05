@@ -68,7 +68,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 				+ "			\"className\":\"HAL.modules.StewartGough\""
 				+ "		},"
 				+ "		\"supportedMutations\": ["
-				+ "			\"move\",\"rotate\""
+				+ "			\"move\""
 				+ "		],"
 				+ "		\"capabilities\":["
 				+ "			{"
@@ -295,40 +295,6 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		FileInputStream fis;
 		byte[] content;
 
-/*		File stewartGoughJar = new File("C:/Users/Aristides/Desktop/Six Axis/StewartGough.jar");
-		fis = new FileInputStream(stewartGoughJar);
-		content = new byte[(int) stewartGoughJar.length()];
-		fis.read(content);
-		fis.close();
-		String base64Module = new String(Base64.encodeBase64(content));
-		
-		File stewartGoughZip = new File("C:/Users/Aristides/Desktop/Six Axis/nodes.zip");
-		fis = new FileInputStream(stewartGoughZip);
-		content = new byte[(int) stewartGoughZip.length()];
-		fis.read(content);
-		fis.close();
-		String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
-		
-		File cameraZip = new File("C:/Users/Aristides/Desktop/Six Axis/nodes.zip");
-		fis = new FileInputStream(cameraZip);
-		content = new byte[(int) cameraZip.length()];
-		fis.read(content);
-		fis.close();
-		String base64CameraRos = new String(Base64.encodeBase64(content));
-		
-		File penJar = new File("C:/Users/Aristides/Desktop/Six Axis/Pen.jar");
-		fis = new FileInputStream(penJar);
-		content = new byte[(int) penJar.length()];
-		fis.read(content);
-		fis.close();
-		String base64Pen = new String(Base64.encodeBase64(content));
-		
-		File pickAndPlaceJar = new File("C:/Users/Aristides/Desktop/Six Axis/PickAndPlaceWithRotation.jar");
-		fis = new FileInputStream(pickAndPlaceJar);
-		content = new byte[(int) pickAndPlaceJar.length()];
-		fis.read(content);
-		fis.close();
-		String base64Capability = new String(Base64.encodeBase64(content));*/
 		
 		System.out.println("Start insertig module");
 		
@@ -395,7 +361,9 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		fis.close();
 		String base64PickAndPlace = new String(Base64.encodeBase64(content));
 		
-		// gripper
+		
+		
+		/*// gripper
 		String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64Module + moduleA_03 + base64Draw + moduleA_04 + base64PickAndPlace + moduleA_05; 
 		JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
 		hal.insertModule(a, a);
@@ -423,30 +391,8 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		// workplane
 		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64Pen + moduleE_03;
 		JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
-		hal.insertModule(e, e);
-		
-		// deltarobot
-		/*String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64Module + moduleA_03 + base64Capability + moduleA_04; 
-		//System.out.println(moduleA);
-		JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
-		hal.insertModule(a, a);
-		System.out.println("Inserted moduleA");
-		// pen
-		String moduleB = moduleB_01 + base64Pen + moduleB_02; 
-		JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
-		hal.insertModule(b, b);
-		System.out.println("Inserted moduleB");
-		// camera
-		String moduleC = moduleC_01 + base64CameraRos + moduleC_02 + base64Pen + moduleC_03;
-		JsonObject c = new JsonParser().parse(moduleC).getAsJsonObject();
-		hal.insertModule(c, c);
-		System.out.println("Inserted moduleC");
-		// lens
-		String moduleD = moduleD_01 + base64Pen + moduleD_02; 
-		JsonObject d = new JsonParser().parse(moduleD).getAsJsonObject();
-		hal.insertModule(d, d);
-		
-		System.out.println("Inserted moduleD");*/
+		hal.insertModule(e, e);*/
+
 		
 
 		
@@ -459,33 +405,39 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		JsonObject criteria = new JsonObject();
 		JsonObject target = new JsonObject();
 		JsonObject targetMove = new JsonObject();
-		targetMove.addProperty("x", -15.0);
-		targetMove.addProperty("y", -15.0);
-		targetMove.addProperty("z", -420.0);
+		targetMove.addProperty("x", -10.0);
+		targetMove.addProperty("y", -10.0);
+		targetMove.addProperty("z", -335.0);
+		targetMove.addProperty("maxAcceleration", 2);
+		
+		targetMove.addProperty("rotationX", 0);
+		targetMove.addProperty("rotationY", 0);
+		targetMove.addProperty("rotationZ", Math.toRadians(25));
 		target.add("move",targetMove);
 		target.addProperty("identifier", "Paper");
 		
 		JsonArray subjects = new JsonArray();
 		JsonObject subject = new JsonObject();
 		JsonObject subjectMove = new JsonObject();
-		subjectMove.addProperty("x", -3.0);
+		subjectMove.addProperty("x", 0.0);
 		subjectMove.addProperty("y", 0.0);
-		subjectMove.addProperty("z", 0.0);
+		subjectMove.addProperty("z", -360.0);
 		
-		subjectMove.addProperty("rotationX", Math.toRadians(10));
+		subjectMove.addProperty("rotationX", 0);
 		subjectMove.addProperty("rotationY", 0);
-		subjectMove.addProperty("rotationZ", 0);
+		subjectMove.addProperty("rotationZ", Math.toRadians(25));
 		
 		
 		subject.add("move",subjectMove);
+		subject.addProperty("identifier", "Paper");
 		subjects.add(subject);
 		
 		criteria.add("target",target);
-		//criteria.add("subjects",subjects);
-		criteria.add("subjects", new JsonArray());
+		criteria.add("subjects",subjects);
+		//criteria.add("subjects", new JsonArray());
 		
 		
-		hal.translateProductStep(new ProductStep("1", criteria, new Service("draw")));
+		hal.translateProductStep(new ProductStep("1", criteria, new Service("place")));
 		
 		/*Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);
