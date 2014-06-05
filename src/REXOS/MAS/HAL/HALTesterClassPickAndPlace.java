@@ -304,99 +304,63 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		FileInputStream fis;
 		byte[] content;
 
-<<<<<<< HEAD
-		File deltaRobotJar = new File("C:/Users/Tommy/Contacts/Desktop/DeltaRobot.jar");
-=======
 		File deltaRobotJar = new File(baseDir + "DeltaRobot.jar");
->>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(deltaRobotJar);
 		content = new byte[(int) deltaRobotJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Module = new String(Base64.encodeBase64(content));
 		
-<<<<<<< HEAD
-		File deltaRobotZip = new File("C:/Users/Tommy/Contacts/Desktop/nodes.zip");
-=======
 		File deltaRobotZip = new File(baseDir + "nodes.zip");
->>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(deltaRobotZip);
 		content = new byte[(int) deltaRobotZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
 		
-<<<<<<< HEAD
-		File gripperZip = new File("C:/Users/Tommy/Contacts/Desktop/nodes.zip");
-=======
 		File gripperZip = new File(baseDir + "nodes.zip");
->>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(gripperZip);
 		content = new byte[(int) gripperZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64GripperRos = new String(Base64.encodeBase64(content));
 		
-<<<<<<< HEAD
-		File cameraZip = new File("C:/Users/Tommy/Contacts/Desktop/nodes.zip");
-=======
 		File cameraZip = new File(baseDir + "nodes.zip");
->>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(cameraZip);
 		content = new byte[(int) cameraZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64CameraRos = new String(Base64.encodeBase64(content));
 		
-<<<<<<< HEAD
-		File workplaneZip = new File("C:/Users/Tommy/Contacts/Desktop/nodes.zip");
-=======
 		File workplaneZip = new File(baseDir + "nodes.zip");
->>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(workplaneZip);
 		content = new byte[(int) workplaneZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64WorkplaneRos = new String(Base64.encodeBase64(content));
 		
-<<<<<<< HEAD
-		File penJar = new File("C:/Users/Tommy/Contacts/Desktop/Pen.jar");
-=======
 		File penJar = new File(baseDir + "Pen.jar");
->>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(penJar);
 		content = new byte[(int) penJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Pen = new String(Base64.encodeBase64(content));
 		
-<<<<<<< HEAD
-		File gripperJar = new File("C:/Users/Tommy/Contacts/Desktop/Gripper.jar");
-=======
 		File gripperJar = new File(baseDir + "Gripper.jar");
->>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(gripperJar);
 		content = new byte[(int) gripperJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Gripper = new String(Base64.encodeBase64(content));
 		
-<<<<<<< HEAD
-		File drawJar = new File("C:/Users/Tommy/Contacts/Desktop/Draw.jar");
-=======
 		File drawJar = new File(baseDir + "Draw.jar");
->>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(drawJar);
 		content = new byte[(int) drawJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Draw = new String(Base64.encodeBase64(content));
 		
-<<<<<<< HEAD
-		File pickAndPlaceJar = new File("C:/Users/Tommy/Contacts/Desktop/PickAndPlace.jar");
-=======
 		File pickAndPlaceJar = new File(baseDir + "PickAndPlace.jar");
->>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		fis = new FileInputStream(pickAndPlaceJar);
 		content = new byte[(int) pickAndPlaceJar.length()];
 		fis.read(content);
@@ -432,12 +396,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64Pen + moduleE_03;
 		JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
 		hal.insertModule(e, e);
-<<<<<<< HEAD
-		*/
-=======
 		
->>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
-
 		//Bakje 6 GOED
 		double falsex = -2.7;
 		double falsey = 1.3;

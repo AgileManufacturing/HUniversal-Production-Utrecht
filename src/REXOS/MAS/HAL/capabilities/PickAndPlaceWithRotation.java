@@ -63,7 +63,7 @@ public class PickAndPlaceWithRotation extends Capability {
 	 * @param moduleFactory
 	 */
 	public PickAndPlaceWithRotation(ModuleFactory moduleFactory) {
-		super(moduleFactory, "Place");
+		super(moduleFactory, "PickAndPlaceWithRotation");
 	}
 
 	/**
@@ -80,7 +80,7 @@ public class PickAndPlaceWithRotation extends Capability {
 		
 		
 		if(serviceName.equals("place") && subjects != null && target != null){
-			
+		
 			
 			for(int i = 0; i<subjects.getAsJsonArray().size();i++){
 				JsonObject subjectMoveCommand = subjects.get(i).getAsJsonObject().get("move").getAsJsonObject();

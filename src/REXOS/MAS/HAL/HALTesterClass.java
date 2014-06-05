@@ -20,6 +20,8 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static HardwareAbstractionLayer hal;
 	static BlackboardHandler blackboardUpdated;
 	
+	static final String baseDir = "/home/agileman/Desktop/";
+	
 	// delta robot
 	static String moduleA_01 = "{"
 			+ "	\"manufacturer\":\"HU\","
@@ -296,42 +298,42 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		FileInputStream fis;
 		byte[] content;
 
-		File deltaRobotJar = new File("/home/agileman/Desktop/DeltaRobot.jar");
+		File deltaRobotJar = new File(baseDir + "DeltaRobot.jar");
 		fis = new FileInputStream(deltaRobotJar);
 		content = new byte[(int) deltaRobotJar.length()];
 		fis.read(content);
 		fis.close();
-		String base64Module = new String(Base64.encodeBase64(content));
+		String base64DeltaRobot = new String(Base64.encodeBase64(content));
 		
-		File deltaRobotZip = new File("/home/agileman/Desktop/nodes.zip");
+		File deltaRobotZip = new File(baseDir + "nodes.zip");
 		fis = new FileInputStream(deltaRobotZip);
 		content = new byte[(int) deltaRobotZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
 		
-		File gripperZip = new File("/home/agileman/Desktop/nodes.zip");
+		File gripperZip = new File(baseDir + "nodes.zip");
 		fis = new FileInputStream(gripperZip);
 		content = new byte[(int) gripperZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64GripperRos = new String(Base64.encodeBase64(content));
 		
-		File cameraZip = new File("/home/agileman/Desktop/nodes.zip");
+		File cameraZip = new File(baseDir + "nodes.zip");
 		fis = new FileInputStream(cameraZip);
 		content = new byte[(int) cameraZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64CameraRos = new String(Base64.encodeBase64(content));
 		
-		File workplaneZip = new File("/home/agileman/Desktop/nodes.zip");
+		File workplaneZip = new File(baseDir + "nodes.zip");
 		fis = new FileInputStream(workplaneZip);
 		content = new byte[(int) workplaneZip.length()];
 		fis.read(content);
 		fis.close();
 		String base64WorkplaneRos = new String(Base64.encodeBase64(content));
 		
-		File penJar = new File("/home/agileman/Desktop/Pen.jar");
+		File penJar = new File(baseDir + "Pen.jar");
 		
 		fis = new FileInputStream(penJar);
 		content = new byte[(int) penJar.length()];
@@ -339,34 +341,30 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		fis.close();
 		String base64Pen = new String(Base64.encodeBase64(content));
 		
-		File gripperJar = new File("/home/agileman/Desktop/Gripper.jar");
+		File gripperJar = new File(baseDir + "Gripper.jar");
 		fis = new FileInputStream(gripperJar);
 		content = new byte[(int) gripperJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Gripper = new String(Base64.encodeBase64(content));
 		
-		File drawJar = new File("/home/agileman/Desktop/Draw.jar");
+		File drawJar = new File(baseDir + "Draw.jar");
 		fis = new FileInputStream(drawJar);
 		content = new byte[(int) drawJar.length()];
 		fis.read(content);
 		fis.close();
 		String base64Draw = new String(Base64.encodeBase64(content));
 		
-		File pickAndPlaceJar = new File("/home/agileman/Desktop/Draw.jar");
+		File pickAndPlaceJar = new File(baseDir + "PickAndPlace.jar");
 		fis = new FileInputStream(pickAndPlaceJar);
 		content = new byte[(int) pickAndPlaceJar.length()];
 		fis.read(content);
 		fis.close();
-<<<<<<< HEAD
-		String base64Capability = new String(Base64.encodeBase64(content));
-		/*
-=======
 		String base64PickAndPlace = new String(Base64.encodeBase64(content));
 		
->>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
+		
 		// deltarobot
-		String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64Module + moduleA_03 + base64Draw + moduleA_04 + base64PickAndPlace + moduleA_05; 
+		String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64DeltaRobot + moduleA_03 + base64Draw + moduleA_04 + base64PickAndPlace + moduleA_05; 
 		JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
 		hal.insertModule(a, a);
 		
@@ -389,17 +387,12 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		String moduleD = moduleD_01 + base64Pen + moduleD_02; 
 		JsonObject d = new JsonParser().parse(moduleD).getAsJsonObject();
 		hal.insertModule(d, d);
-<<<<<<< HEAD
-		*/
-=======
 		
 		// workplane
 		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64Pen + moduleE_03;
 		JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
 		hal.insertModule(e, e);
->>>>>>> 59004226391afd883bd2f53fbd2bc1c76c27a30e
 		
-
 		
 		JsonObject criteria = new JsonObject();
 		JsonObject target = new JsonObject();

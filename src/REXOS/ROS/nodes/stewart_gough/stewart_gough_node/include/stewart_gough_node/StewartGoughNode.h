@@ -90,6 +90,9 @@ namespace stewartGoughNodeNamespace{
 		bool moveToPoint(double x, double y, double z, double maxAcceleration);
 		bool moveToRelativePoint(double x, double y, double z, double maxAcceleration);
 
+		bool moveToPoint(double x, double y, double z, double rotationX, double rotationY, double rotationZ, double maxAcceleration);
+		
+
 		Point parsePoint(const JSONNode & n, std::string * valuesSet);
 		std::string parseNodeValue(const std::string nodeName, const JSONNode & n);
 		Point parseLookup(const JSONNode & n);

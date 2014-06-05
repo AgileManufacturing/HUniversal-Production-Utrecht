@@ -669,7 +669,7 @@ namespace rexos_stewart_gough{
 		currentEffectorRotationY = 0;
 		currentEffectorRotationZ = 0;
 		
-		
+		/*
 		double ac = 1;
 		
 		
@@ -689,7 +689,7 @@ namespace rexos_stewart_gough{
 		
 		int minRotation = -60;
 		int maxRotation = 60;
-
+		*/
 		
 		moveTo(rexos_datatypes::Point3D<double>(0, 0, -300), 30, 0, 0, 0);
 		

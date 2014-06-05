@@ -63,7 +63,7 @@ public class PickAndPlace extends Capability {
 	 * @param moduleFactory
 	 */
 	public PickAndPlace(ModuleFactory moduleFactory) {
-		super(moduleFactory, "Place");
+		super(moduleFactory, "PickAndPlace");
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class PickAndPlace extends Capability {
 		System.out.println(productStep.getCriteria());
 		if(serviceName.equals("place") && subjects != null && target != null){	
 			for(int i = 0; i<subjects.getAsJsonArray().size();i++){
-				JsonObject subjectMoveCommand = subjects.get(i).getAsJsonObject().get("move").getAsJsonObject();
+				JsonObject subjectMoveCommand = subjects.getAsJsonArray().get(i).getAsJsonObject().get("move").getAsJsonObject();
 				
 				JsonObject pickCommand = new JsonObject();
 				pickCommand.addProperty("pick" , "null");
@@ -89,7 +89,7 @@ public class PickAndPlace extends Capability {
 				
 				JsonObject pickJsonCommand = new JsonObject();
 				pickJsonCommand.add("command", pickCommand);
-				pickJsonCommand.addProperty("look_up", subjects.get(i).getAsJsonObject().get("identifier").getAsString());
+				pickJsonCommand.addProperty("look_up", subjects.getAsJsonArray().get(i).getAsJsonObject().get("identifier").getAsString());
 				
 				JsonObject command = new JsonParser().parse(pickJsonCommand.toString()).getAsJsonObject();
 				
