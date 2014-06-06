@@ -1,4 +1,6 @@
 package web_socket_server;
+import grid_server.ServerConfigurations;
+
 import com.google.gson.JsonArray;
 
 import jade.core.AID;
@@ -12,8 +14,6 @@ import jade.wrapper.StaleProxyException;
 
 public class ProductAgentSpawnerAgent extends Agent {
 	private static final long serialVersionUID = 1L;
-	private static final String SERVER_NAME = "Grid@Platform2";
-	private static final String SERVER_ADDRESS = "http://Tommy-PC.wired.hu.nl:7778/acc";
 	 
 	private String productSteps;
 	 
@@ -23,8 +23,8 @@ public class ProductAgentSpawnerAgent extends Agent {
 	 
 	public void sendMessage(String message, int type){
 		  ACLMessage acl = new ACLMessage(type);
-		  AID aid=new AID(SERVER_NAME,AID.ISGUID);
-		  aid.addAddresses(SERVER_ADDRESS);
+		  AID aid=new AID(ServerConfigurations.GS_NAME,AID.ISGUID);
+		  aid.addAddresses(ServerConfigurations.GS_ADDRESS);
 		  
 		  acl.addReceiver(aid);
 		  acl.setContent(message);

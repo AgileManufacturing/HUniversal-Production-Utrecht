@@ -1,6 +1,6 @@
 package web_socket_server;
 
-import jade.wrapper.ControllerException;
+import grid_server.ServerConfigurations;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,7 +40,7 @@ public class Main extends WebSocketServer {
 
 	@Override
 	public void onClose( WebSocket conn, int code, String reason, boolean remote ) {
-		this.sendToAll( conn + " has left the room!" );
+		//this.sendToAll( conn + " has left the room!" );
 		System.out.println( conn + " has left the room!" );
 	}
 
@@ -69,7 +69,7 @@ public class Main extends WebSocketServer {
 
 	public static void main( String[] args ) throws InterruptedException , IOException {
 		WebSocketImpl.DEBUG = true;
-		int port = 8887; // 843 flash policy port
+		int port = Integer.parseInt(ServerConfigurations.WSS_PORT); // 843 flash policy port
 		try {
 			port = Integer.parseInt( args[ 0 ] );
 		} catch ( Exception ex ) {
