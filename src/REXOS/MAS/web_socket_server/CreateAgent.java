@@ -1,11 +1,13 @@
 package web_socket_server;
 
+import grid_server.ServerConfigurations;
+
 import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import WebSocketServer.java.org.java_websocket.client.WebSocketClient;
-import WebSocketServer.java.org.java_websocket.handshake.ServerHandshake;
+import web_socket_server.java.org.java_websocket.client.WebSocketClient;
+import web_socket_server.java.org.java_websocket.handshake.ServerHandshake;
 
 import com.google.gson.JsonObject;
 
@@ -18,19 +20,7 @@ import jade.wrapper.ControllerException;
 import jade.wrapper.StaleProxyException;
 
 
-public class CreateAgent {
-	/**
-	  * @var MAIN_HOST
-	  * The string has the IP of the server that is hosting the Grid Agent Container.
-	  */
-	private static final String MAIN_HOST = "145.89.126.159";
-	
-	/**
-	  * @var MAIN_PORT
-	  * The string has the PORT of the server that is hosting the Grid Agent Container.
-	  */
-	private static final String MAIN_PORT = "1234";
-	
+public class CreateAgent {	
 	/**
 	  * @var CONTAINER_NAME
 	  * The string holds the container name where in the EquipletAgent is being spawned.
@@ -50,8 +40,8 @@ public class CreateAgent {
 		
 		try {
 			Profile profile = new ProfileImpl();		
-			profile.setParameter(Profile.MAIN_HOST,MAIN_HOST);
-			profile.setParameter(Profile.MAIN_PORT,MAIN_PORT);
+			profile.setParameter(Profile.MAIN_HOST,ServerConfigurations.GS_IP);
+			profile.setParameter(Profile.MAIN_PORT,ServerConfigurations.GS_PORT);
 			profile.setParameter(Profile.CONTAINER_NAME,CONTAINER_NAME+date.getTime());
 			jade.wrapper.AgentContainer container = runtime.createAgentContainer( profile );
 			ProductAgentSpawnerAgent agent = new ProductAgentSpawnerAgent();
@@ -74,7 +64,7 @@ public class CreateAgent {
 		catch(Exception ex){
 			System.out.println("create exception");
 			try {
-				MyWebsocket mws = new MyWebsocket(new URI("ws://127.0.0.1:8887"));
+				MyWebsocket mws = new MyWebsocket(new URI(ServerConfigurations.WSS_URI));
 				boolean connected = mws.connectBlocking();
 				System.out.println(connected);
 			} catch (URISyntaxException e) {

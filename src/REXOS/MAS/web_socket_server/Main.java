@@ -1,5 +1,6 @@
 package web_socket_server;
 
+import grid_server.ServerConfigurations;
 import jade.wrapper.ControllerException;
 
 import java.io.BufferedReader;
@@ -69,7 +70,7 @@ public class Main extends WebSocketServer {
 
 	public static void main( String[] args ) throws InterruptedException , IOException {
 		WebSocketImpl.DEBUG = true;
-		int port = 8887; // 843 flash policy port
+		int port = Integer.parseInt(ServerConfigurations.WSS_PORT); // 843 flash policy port
 		try {
 			port = Integer.parseInt( args[ 0 ] );
 		} catch ( Exception ex ) {
