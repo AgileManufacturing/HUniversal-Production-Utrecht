@@ -60,6 +60,10 @@ public class CreateAgent {
 					e1.printStackTrace();
 				}
 			}
+			MyWebsocket mws = new MyWebsocket(new URI(ServerConfigurations.WSS_URI));
+			mws.setCreated(true);
+			boolean connected = mws.connectBlocking();
+			System.out.println(connected);
 		}
 		catch(Exception ex){
 			System.out.println("create exception");
@@ -79,6 +83,12 @@ public class CreateAgent {
 	}
 	
 	private class MyWebsocket extends WebSocketClient {
+		boolean created = false;
+		
+		public void setCreated(boolean created){
+			this.created = created;
+		}
+		
 		public MyWebsocket(URI serverURI) {
 			super(serverURI);
 			// TODO Auto-generated constructor stub
@@ -94,7 +104,13 @@ public class CreateAgent {
 		public void onOpen(ServerHandshake handshakedata) {
 			// TODO Auto-generated method stub
 			System.out.println("onOpen");
-			send("{\"receiver\":\"interface\", \"message\":\"Could not create product, connection error!!\", \"type\":\"danger\"}");
+			if (created){
+				send("{\"receiver\":\"interface\", \"message\":\"Created product\", \"type\":\"success\"}");
+			}
+			else {
+				send("{\"receiver\":\"interface\", \"message\":\"Could not create product, connection error!!\", \"type\":\"danger\"}");
+			}
+			
 			close();
 		}
 

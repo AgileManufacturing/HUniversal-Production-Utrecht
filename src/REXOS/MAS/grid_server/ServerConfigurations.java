@@ -1,7 +1,7 @@
 package grid_server;
 
 public class ServerConfigurations {
-	public final static String WSS_URI = "ws://127.0.0.1:8887";
+	public final static String WSS_URI = "ws://145.89.126.11:8887";
 	public final static String WSS_PORT = "8887";
 	public final static String GS_IP = "145.89.126.159";
 	public final static String GS_PORT = "1234";

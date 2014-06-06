@@ -1,7 +1,6 @@
 package web_socket_server;
 
 import grid_server.ServerConfigurations;
-import jade.wrapper.ControllerException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,7 +40,7 @@ public class Main extends WebSocketServer {
 
 	@Override
 	public void onClose( WebSocket conn, int code, String reason, boolean remote ) {
-		this.sendToAll( conn + " has left the room!" );
+		//this.sendToAll( conn + " has left the room!" );
 		System.out.println( conn + " has left the room!" );
 	}
 
