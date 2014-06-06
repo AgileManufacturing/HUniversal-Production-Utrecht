@@ -7,7 +7,7 @@
  *             7HMM9`   .MMMMMM#`		
  *                     ...MMMMMF .      
  *         dN.       .jMN, TMMM`.MM     	@file 	PartsAgent
- *         .MN.      MMMMM;  ?^ ,THM		@brief 	This agent is responsible for finding the parts that a Product Agent requires.
+ *         .MN.      MMMMM;  ?^ ,THM		@brief 	This agent is responsible for finding the parts that a Product Agent needs.
  *          dM@      dMMM3  .ga...g,    	@date Created:	2014-05-26
  *       ..MMM#      ,MMr  .MMMMMMMMr   
  *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Tom Oosterwijk
@@ -51,6 +51,7 @@ import agents.data_classes.MessageType;
 
 /**
  * PartsAgent that communicates with ProductAgent to locate the needed parts.
+ * This information is now hardcode'd but should come from a Database in the future.
  **/
 public class PartsAgent extends Agent{
 	

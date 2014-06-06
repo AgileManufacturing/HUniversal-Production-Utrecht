@@ -90,16 +90,46 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	
 	
 	
-	
+	/**
+	  * @var serverLists
+	  * The string serverLists Holds all the services that the equiplet can exectute.
+	  * This variable is used in the WIMP.
+	  */
 	private String serverLists = "";
 	
 	
+	/**
+	  * @var EQName
+	  * Hardcoded EquipletName. This should be changed in the future.
+	  */
 	private String EQName = "EQ2";
 	
+	/**
+	  * @var equipletActive
+	  * The boolean equipletActive keeps track wether or not the equiplet is currently in use or not.
+	  * This information is displayed in the WIMP.
+	  */
 	private boolean equipletActive = false;
 	
+	/**
+	  * @var productStepCounter
+	  * The productStepCounter keeps track off all the planned productSteps.
+	  * This information is displayed in the WIMP.
+	  */
 	private int productStepCounter = 0;
+	
+	/**
+	  * @var productStepFailedCounter
+	  * The productStepFailedCounter keeps track off all the failed productSteps.
+	  * This information is displayed in the WIMP.
+	  */
 	private int productStepFailedCounter =0;
+	
+	/**
+	  * @var productStepSuccesCounter
+	  * The productStepSuccesCounter keeps track off all the successfully executed productSteps.
+	  * This information is displayed in the WIMP.
+	  */
 	private int productStepSuccesCounter =0;
 	
 	/**
@@ -160,6 +190,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
                     	}
                     	if(msg.getPerformative()==MessageType.PULSE_UPDATE){
                     		
+                    		//This is the update information for the WIMP!
                     		JsonObject equipletUpdate = new JsonObject();
                     		equipletUpdate.addProperty("receiver", "interface");
                     		equipletUpdate.addProperty("subject", "update_equiplet");
