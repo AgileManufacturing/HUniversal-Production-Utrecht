@@ -6,11 +6,11 @@
  *           .MMMMMMM#=`.gNMMMMM.       \_| \_|\____/\/   \/ \___/ \____/
  *             7HMM9`   .MMMMMM#`		
  *                     ...MMMMMF .      
- *         dN.       .jMN, TMMM`.MM     	@file 	ProductStep
- *         .MN.      MMMMM;  ?^ ,THM		@brief 	This class creates new productStep information objects.
- *          dM@      dMMM3  .ga...g,    	@date Created:	2014-05-20
+ *         dN.       .jMN, TMMM`.MM     	@file 	ServerConfigurations
+ *         .MN.      MMMMM;  ?^ ,THM		@brief 	This AgentBehaviour is asking for a new update from every equiplet. This happens every 10 seconds.
+ *          dM@      dMMM3  .ga...g,    	@date Created:	2014-06-06
  *       ..MMM#      ,MMr  .MMMMMMMMr   
- *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Bas Voskuijlen && Tom Oosterwijk
+ *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Tom Oosterwijk
  *   .dMMMMMF           7Y=d9  dMMMMMr    
  *  .MMMMMMF        JMMm.?T!   JMMMMM#		@section LICENSE
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	License:	newBSD
@@ -38,50 +38,49 @@
  **/
 package grid_server;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 
-import com.google.gson.JsonObject;
+import jade.core.AID;
+import jade.core.Agent;
+import jade.core.behaviours.TickerBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.lang.acl.ACLMessage;
 
-	
-	public class ProductStep implements Serializable {
-		 private static final long serialVersionUID = 6788269249283740246L;
-		 private Service service;
-		 private JsonObject criteria;
-		 private int id;
-		 
-		 public ProductStep(int id, JsonObject criteria, Service service){
-		  this.id = id;
-		  this.criteria = criteria;
-		  this.service = service;
-		 }
-		 
-		 public ProductStep(JsonObject json){
-		  if (json.has("id")){
-		   this.id = json.get("id").getAsInt();
-		  }
-		  if (json.has("service")){
-		   this.service = new Service(json.get("service").getAsString());
-		  }
-		  if (json.has("criteria")){
-		   this.criteria = json.get("criteria").getAsJsonObject();
-		  }
-		 }
-		 
-		 public Service getService(){
-		  return this.service;
-		 }
-		 public JsonObject getCriteria(){
-		  return this.criteria;
-		 }
-		 public int getId(){
-		  return this.id;
-		 }
-		 
-		 public String toJSON(){
-		  return  "{" +
-		    " id:" + id + ",\n" +
-		    " service:" + service.toJSON() + ",\n" +
-		    " criteria: {" + criteria + "}\n" +
-		    "}";
-		 }
+public class HeartBeatBehaviour extends TickerBehaviour {
+	private final String pulseMessage = "Update status";
+	Agent a;
+	public HeartBeatBehaviour(Agent a, long period) {
+		super(a, period);
+		this.a = a;
+	}
+
+	@Override
+	protected void onTick() {
+		DFAgentDescription dfd = new DFAgentDescription();
+		
+		try {
+			DFAgentDescription[] equipletAgents;
+			equipletAgents = DFService.search(a, dfd);
+			for(int i =0; i < equipletAgents.length; i++){
+				AID aid = equipletAgents[i].getName();
+				sendMessage(MessageType.PULSE_UPDATE, myAgent.getAID(), aid, pulseMessage, "meta");
+			}
+			System.out.println(equipletAgents.length + " size of found EA");
+		}catch (FIPAException e) {
+			System.out.println("DF Search Error");
+			e.printStackTrace();
 		}
+	}
+	
+	private void sendMessage(int messageType, AID sender, AID receiver, String content, String language){
+		ACLMessage message = new ACLMessage( messageType );
+		message.setSender(sender);
+		message.addReceiver(receiver);
+		message.setLanguage(language);
+		message.setContent(content);
+		myAgent.send(message);
+	}
+}
