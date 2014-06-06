@@ -21,7 +21,7 @@ import com.google.gson.JsonObject;
 
 public class Gripper extends ModuleActor {
 	//Gonna be loaded from KDB:
-	private static final double GRIPPER_SIZE = 18.24; // in cm
+	private static final double GRIPPER_SIZE = 46.54; 
 	
 	private static final String ACTIVATE = "activate";
 	private static final String DEACTIVATE = "deactivate";

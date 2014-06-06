@@ -89,6 +89,19 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	private HardwareAbstractionLayer hal;
 	
 	
+	
+	
+	private String serverLists = "";
+	
+	
+	private String EQName = "EQ2";
+	
+	private boolean equipletActive = false;
+	
+	private int productStepCounter = 0;
+	private int productStepFailedCounter =0;
+	private int productStepSuccesCounter =0;
+	
 	/**
 	  * setup()
 	  * The function setup creates the HAL object and initialized the serviceList.
@@ -112,6 +125,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	        sd.setName( serviceList.get(i).getName() );
 	        sd.setType(serviceList.get(i).getName());
 	        dfd.addServices(sd);
+	        serverLists += serviceList.get(i).getName() +",";
 		}
 		try {
 			DFService.register(this, dfd );
@@ -126,7 +140,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			public void action() {
 				ACLMessage msg = receive();
 				if (msg!=null) {
-					System.out.println(msg.getSender() + msg.getContent());
 					if(!msg.getSender().equals(this.getAgent().getAID())) {  
                     	if(msg.getPerformative()==MessageType.CAN_EXECUTE_PRODUCT_STEP){
                     		String result =canExecute(msg.getContent());
@@ -144,6 +157,36 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
     	                    reply.setPerformative( MessageType.CONFIRM_PLANNED );
     	                    reply.setContent(result);
     	                    send(reply);                    		
+                    	}
+                    	if(msg.getPerformative()==MessageType.PULSE_UPDATE){
+                    		
+                    		JsonObject equipletUpdate = new JsonObject();
+                    		equipletUpdate.addProperty("receiver", "interface");
+                    		equipletUpdate.addProperty("subject", "update_equiplet");
+                    		equipletUpdate.addProperty("id", EQName);
+                    		equipletUpdate.addProperty("services", serverLists);
+                    		JsonObject status = new JsonObject();
+                    		status.addProperty("type", "success");
+                    		status.addProperty("content", "NORMAL");
+                    		equipletUpdate.add("status", status);
+                    		
+                    		JsonObject mode = new JsonObject();
+                    		mode.addProperty("type", "success");
+                    		mode.addProperty("content", "NORMAL");
+                    		equipletUpdate.add("mode", mode);
+
+                    		JsonObject equipletDetails = new JsonObject();
+                    		equipletDetails.addProperty("status", equipletActive);
+                    		equipletDetails.addProperty("plannedSteps", productStepCounter);
+                    		equipletDetails.addProperty("successfulSteps", productStepSuccesCounter);
+                    		equipletDetails.addProperty("failedSteps", productStepFailedCounter);
+                    		
+                    		equipletUpdate.add("details", equipletDetails);
+                    		
+                    		ACLMessage reply = msg.createReply();
+    	                    reply.setPerformative( MessageType.PULSE_UPDATE );
+    	                    reply.setContent(equipletUpdate.toString());
+    	                    send(reply);
                     	}
 					}
 				}
@@ -184,6 +227,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		JsonObject productSteps = new JsonParser().parse(msg).getAsJsonObject();
 		Job job = new Job(productSteps.get("startTime").getAsString(),productSteps.get("duration").getAsString(),productSteps.get("productStepId").getAsString(),productSteps.get("productStep").getAsJsonObject());
     	equipletSchedule.add(job);
+    	productStepCounter++;
 		System.out.println(equipletSchedule.size()+" =Length");
 		if(scheduleCounter == 0){
 			executeProductStep();
@@ -212,10 +256,12 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	  */
 	private void executeProductStep(){
 		if(scheduleCounter < equipletSchedule.size()){
+			equipletActive = true;
 			System.out.println("Execute PS");
 			hal.translateProductStep(equipletSchedule.get(scheduleCounter).getProductStep());	
 			scheduleCounter++;
 		}else{
+			equipletActive=false;
 			scheduleCounter=0;
 			equipletSchedule.clear();
 		}
@@ -225,9 +271,12 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	public void onProcessStatusChanged(String state, long hardwareStepSerialId,
 			Module module, HardwareStep hardwareStep) {
 		if(state.equals("FAILED")){
-			//executeProductStep();
+			equipletActive=false;
+			scheduleCounter=0;
+			equipletSchedule.clear();
 			//Notify Product that failed and remove from schedule.
 			//Log that process execute failed.
+			productStepFailedCounter++;
 		}
 	}
 
@@ -258,13 +307,14 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	@Override
 	public void onExecutionFinished() {
 		System.out.println("Hardware Step Executed");
+		productStepSuccesCounter++;
 		executeProductStep();		
 	}
 
 	@Override
 	public String getEquipletName() {
 		// TODO Auto-generated method stub
-		return "EQ2";
+		return EQName;
 	}
 
 	@Override

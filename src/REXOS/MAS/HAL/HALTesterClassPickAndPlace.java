@@ -23,7 +23,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	static JsonObject criteria1 = new JsonObject();
 	boolean state = false;
 	
-	static final String baseDir = "/home/agileman/Desktop/";
+	static final String baseDir = "C:/Users/Tommy/Contacts/Desktop/";
 	
 	// delta robot
 	static String moduleA_01 = "{"
@@ -98,7 +98,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			+ "				]"
 			+ "			},"
 			+ "			{"
-			+ "				\"name\":\"Place\","
+			+ "				\"name\":\"PickAndPlace\","
 			+ "				\"treeNumber\":1,"
 			+ "				\"halSoftware\":{"
 			+ "					\"buildNumber\":1,"
@@ -299,7 +299,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		
 		// TODO Auto-generated method stub
 		hal = new HardwareAbstractionLayer(htc);
-
+/*
 		
 		FileInputStream fis;
 		byte[] content;
@@ -396,26 +396,26 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64Pen + moduleE_03;
 		JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
 		hal.insertModule(e, e);
-		
+		*/
 		//Bakje 6 GOED
-		double falsex = -2.7;
-		double falsey = 1.3;
+		//double falsex = -2.7;
+		//double falsey = 1.3;
 		
 		//Bakje 4 GOED
 		//double falsex = -2.2;
 		//double falsey = 1.3;
 		
 		//Bakje 1 GOED
-		double falsex1 = -2.7;
-		double falsey1 = 1.6;
+		//double falsex1 = -2.7;
+		//double falsey1 = 1.6;
 		
 		//Bakje 3 GOED MORE TEST
 		//double falsex = -2.2;
 		//double falsey = 2.4;
 		JsonObject target = new JsonObject();
 		JsonObject targetMove = new JsonObject();
-		targetMove.addProperty("x", (5.5+falsex1));
-		targetMove.addProperty("y", (5.5+falsey1));
+		targetMove.addProperty("x", (5.5));
+		targetMove.addProperty("y", (5.5));
 		targetMove.addProperty("z", -26.5);
 		target.add("move",targetMove);
 		target.addProperty("identifier", "GC4x4MB_1");
@@ -423,8 +423,8 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		JsonArray subjects = new JsonArray();
 		JsonObject subject = new JsonObject();
 		JsonObject subjectMove = new JsonObject();
-		subjectMove.addProperty("x", (-5.5+falsex));
-		subjectMove.addProperty("y", (-5.5+falsey));
+		subjectMove.addProperty("x", (-5.5));
+		subjectMove.addProperty("y", (-5.5));
 		subjectMove.addProperty("z", -26.5);
 		subject.add("move",subjectMove);
 		subject.addProperty("identifier", "GC4x4MB_6");
@@ -437,8 +437,8 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		
 		JsonObject target1 = new JsonObject();
 		JsonObject targetMove1 = new JsonObject();
-		targetMove1.addProperty("x", (-5.5+falsex));
-		targetMove1.addProperty("y", (-5.5+falsey));
+		targetMove1.addProperty("x", (-5.5));
+		targetMove1.addProperty("y", (-5.5));
 		targetMove1.addProperty("z", -26.5);
 		target1.add("move",targetMove1);
 		target1.addProperty("identifier", "GC4x4MB_6");
@@ -446,8 +446,8 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		JsonArray subjects1 = new JsonArray();
 		JsonObject subject1 = new JsonObject();
 		JsonObject subjectMove1 = new JsonObject();
-		subjectMove1.addProperty("x", (5.5+falsex1));
-		subjectMove1.addProperty("y", (5.5+falsey1));
+		subjectMove1.addProperty("x", (5.5));
+		subjectMove1.addProperty("y", (5.5));
 		subjectMove1.addProperty("z", -26.5);
 		subject1.add("move",subjectMove1);
 		subject1.addProperty("identifier", "GC4x4MB_1");

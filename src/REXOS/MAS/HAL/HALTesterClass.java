@@ -294,7 +294,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		// TODO Auto-generated method stub
 		hal = new HardwareAbstractionLayer(htc);
 
-		
+		/*
 		FileInputStream fis;
 		byte[] content;
 
@@ -367,11 +367,11 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64DeltaRobot + moduleA_03 + base64Draw + moduleA_04 + base64PickAndPlace + moduleA_05; 
 		JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
 		hal.insertModule(a, a);
-		
+		*/
 		/*// pen
 		String moduleB = moduleB_01 + base64Pen + moduleB_02; 
 		JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
-		hal.insertModule(b, b);*/
+		hal.insertModule(b, b);
 		
 		// gripper
 		String moduleB = moduleB_01 + base64GripperRos + moduleB_02 + base64Gripper + moduleB_03; 
@@ -392,7 +392,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64Pen + moduleE_03;
 		JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
 		hal.insertModule(e, e);
-		
+		*/
 		
 		JsonObject criteria = new JsonObject();
 		JsonObject target = new JsonObject();

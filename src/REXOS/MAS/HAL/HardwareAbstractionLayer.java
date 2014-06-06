@@ -50,7 +50,7 @@ public class HardwareAbstractionLayer implements ModuleListener {
 		this.hardwareAbstractionLayerListener = hardwareAbstractionLayerListener;
 		capabilityFactory = new CapabilityFactory(this);
 		moduleFactory = new ModuleFactory(this, this);
-		//blackboardHandler = new BlackboardHandler(equipletName);
+		blackboardHandler = new BlackboardHandler(equipletName);
 		
 	}
 	/**
