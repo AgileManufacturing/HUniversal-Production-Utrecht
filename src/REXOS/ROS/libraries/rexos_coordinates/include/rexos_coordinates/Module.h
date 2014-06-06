@@ -44,7 +44,7 @@ namespace rexos_coordinates {
 		Vector3 moduleToEquiplet;
 		Vector3 equipletToModule;
 		
-	protected:
+	public:
 		/**
 		 * Converts a module coordinate to an equiplet coordinate, using the moduleToEquiplet vector
 		 */
