@@ -42,15 +42,28 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import org.apache.commons.lang.StringUtils;
+
+import libraries.knowledgedb_client.Row;
+
 /**
  * Helper for log messages, providing a single point for controlling program origin.
  **/
-public class Logger {	
-	/**
-	 * @var boolean debugEnabled
-	 * Controls whether or not printing of log messages is enabled.
-	 **/
-	private static final boolean debugEnabled = true;
+public class Logger {
+	protected static final Character bufferCharacter = ' ';
+	protected static final SimpleDateFormat fileDateFormat = new SimpleDateFormat("YY-MM-dd HH:mm:ss");
+	protected static final SimpleDateFormat outputDateFormat = new SimpleDateFormat("YY-MM-dd HH:mm:ss");
+	protected static final long relativeTimeReferenceTime = Calendar.getInstance().getTimeInMillis();
+	protected static final boolean useRelativeTime = false;
+	
+	protected static FileWriter logFileFileWriter = null;
+	protected static BufferedWriter logFileBufferedWriter = null;
+
+	protected static final File logFile = new File("log.txt");
+	
+	
+	private static final boolean isPrintToConsoleEnabled = true;
+	private static final boolean isPrintToLogFileEnabled = false;
 
 	/**
 	 * @var boolean testingEnabled
@@ -69,8 +82,6 @@ public class Logger {
 
 	public static final boolean logToFileEnabled = false;
 
-	public static final File logFile = new File("log.txt");
-	
 	static {
 		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
 		if (msgsFilePath != null){
@@ -92,172 +103,170 @@ public class Logger {
 		}
 	}
 	
-	/**
-	 * Returns whether or not debugging is enabled.
-	 * @return true if debugging is enabled, false otherwise.
-	 **/
-	public static boolean isDebugEnabled() {
-		return debugEnabled;
+
+
+
+	public static boolean eraseLogFile(){
+		if(logFile.exists())	return logFile.delete();
+		else					return false;
 	}
 
-	/**
-	 * Returns whether or not debugging is enabled.
-	 * @return true if debugging is enabled, false otherwise.
-	 **/
-	public static boolean islogToFileEnabled() {
-		return logToFileEnabled;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public static void log(LogLevel logLevel, String message, Object object) {
+		handleLogEntry(LogSection.NONE, logLevel, message, new Object[] {} );
 	}
-
-	/**
-	 * Writes the String representation (as returned by obj.toString) of the given object to the origin stream.
-	 * @param obj The Object that should be printed.
-	 **/
-	public static void log(LogLevel level, Object obj) {
-		printToOut(level, obj.toString());
+	public static void log(LogLevel logLevel, String message, Object[] objects) {
+		handleLogEntry(LogSection.NONE, logLevel, message, objects);
 	}
-
-	/**
-	 * Writes the specified message to the origin stream.
-	 * @param msg The message that should be printed.
-	 **/
-	public static void log(LogLevel level, String msg) {
-		printToOut(level, msg);
+	public static void log(LogSection logSection, LogLevel logLevel, String message) {
+		handleLogEntry(logSection, logLevel, message, new Object[] {} );
+	}	
+	public static void log(LogSection logSection, LogLevel logLevel, String message, Object object) {
+		handleLogEntry(logSection, logLevel, message, new Object[] {object} );
 	}
-
-	/**
-	 * Writes the specified message to the origin stream using the PrintStream format method.
-	 * @param msg A format string as described in http://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
-	 * @param objects Arguments referenced by the format specifiers in the format string.
-	 **/
-	public static void log(LogLevel level, String msg, Object... objects) {
-		printToOut(level, String.format(msg, objects));
+	public static void log(LogSection logSection, LogLevel logLevel, String message, Object[] objects) {
+		handleLogEntry(logSection, logLevel, message, objects);
 	}
 	
-	public static void log(LogLevel level, String msg,  Throwable throwable) {
-		printToOut(level, msg);
-		printToOut(level, throwable.getStackTrace().toString());
+	protected static void handleLogEntry(LogSection logSection, LogLevel logLevel, String message, Object[] objects) {
+		String serializedLogEntry = serializeLogEntry(logSection, logLevel, message, objects);
+		if(isPrintToConsoleEnabled == true) {
+			printToOut(logLevel, serializedLogEntry);
+		}
+		if(isPrintToLogFileEnabled == true) {
+			printToFile(serializedLogEntry);
+		}
 	}
-
-
-	public static void log(LogLevel level, Throwable throwable) {
-		printToOut(level, throwable.getStackTrace().toString());
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	protected static int calulateMaxLengthOfLogSection() {
+		int maxLength = 0;
+		for (LogSection logSection : LogSection.values()) {
+			if(logSection.getName().length() > maxLength) {
+				maxLength = logSection.getName().length();
+			}
+		}
+		return maxLength;
 	}
-
-	/** 
-	 * Writes the specified message to the origin stream using the PrintStream format method.
-	 * @param msg A format string as described in http://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
-	 * @param objects Arguments referenced by the format specifiers in the format string.
-	 **/
-	private static void printToOut(LogLevel level, Object msg)
+	protected static int calulateMaxLengthOfLogLevel() {
+		int maxLength = 0;
+		for (LogLevel logLevel : LogLevel.values()) {
+			if(logLevel.getName().length() > maxLength) {
+				maxLength = logLevel.getName().length();
+			}
+		}
+		return maxLength;
+	}
+	
+	protected static String serializeLogEntry(LogSection logSection, LogLevel logLevel, String message, Object[] objects) {
+		int maxLogSectionLength = calulateMaxLengthOfLogSection();
+		int maxLogLevelLength = calulateMaxLengthOfLogLevel();
+		
+		// write the logLevel en logSection segments for the output and stuff them with spaces so that all the outputs are vertically aligned
+		int currentlogLevelLength = logLevel.getName().length();
+		String logLevelSegment = logLevel.getName() + StringUtils.repeat(String.valueOf(bufferCharacter), maxLogLevelLength - currentlogLevelLength);
+		int currentlogSectionLength = logSection.getName().length();
+		String logSectionSegment = logSection.getName() + StringUtils.repeat(String.valueOf(bufferCharacter), maxLogSectionLength - currentlogSectionLength);
+		
+		String logLevelAndSectionSegment = "[" + logLevelSegment + "] [" + logSectionSegment + "] "; 
+		
+		if(message == null) {
+			throw new RuntimeException("Unable to serialize a logEntry which has no message");
+		} else if(objects == null) {
+			throw new RuntimeException("Unable to serialize a logEntry if objects is null (instead use an empty array)");
+		}
+		
+		if(objects.length != 0) {
+			String output = logLevelAndSectionSegment + message + "\n";
+			for (Object object : objects) {
+				// stuff every line so that all the outputs are vertically aligned
+				output += StringUtils.repeat(String.valueOf(bufferCharacter), logLevelAndSectionSegment.length()) + object.toString() + "\n";
+			}
+			return output;
+		} else {
+			String output = logLevelAndSectionSegment + message;
+			return output;
+		}
+	}
+	
+	private static void printToOut(LogLevel logLevel, String serializedLogEntry)
 	{
-		if(level.getLevel() >= loglevelThreshold){
-			switch(level){		
-
+		switch(logLevel) {		
 			case EMERGENCY:					
 			case ALERT:
 			case CRITICAL:
 			case ERROR:
-
-				if(msg.getClass() == Throwable.class){
-					System.err.println(level.name() + "\t" + ((Throwable)msg).getStackTrace().toString());
-					if(logToFileEnabled)	printToFile(level, msg, true);
-				}
-				else{
-					System.err.println("ERROR:\t" + msg);
-					if(logToFileEnabled)	printToFile(level, msg, false);
-				}
+				System.err.println(serializedLogEntry);
 				break;
-
 			case WARNING:
 			case NOTIFICATION:
 			case INFORMATION:
 			case DEBUG:
-				System.out.println(level.name() + "\t" + msg);
-				if(logToFileEnabled)		printToFile(level, msg, false);
+				System.out.println(serializedLogEntry);
 				break;
-
-			}
 		}
 	}
-
 	/** 
 	 * Writes the specified message to the gridLog.txt using the BufferedWriter and FileWriter, also adding the class the Logger was called from.
 	 * @param level The LoggerLevel of the message
 	 * @param msg A format string as described in http://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 	 * @param hasThrowable PrintToOut already looks for a Throwable, it sets a boolean 
 	 **/
-	private static void printToFile(LogLevel level, Object msg, boolean hasThrowable){
+	private static void printToFile(String serializedLogEntry){
 		//Set date format
-		String timeLog = new SimpleDateFormat("MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
-
-		//when logToFileEnabled is true write to gridLog.txt
-		if(logToFileEnabled){
-			
-			BufferedWriter writer = null;
-			try
-			{
-				if(logFile.exists()){
-					//if the file exists write to it, not overwriting old data.
-					writer = new BufferedWriter(new FileWriter(logFile, true));
-					
-					//logs date, time and LoggerLevel
-					writer.write("[" + timeLog + "][" + level + "]\t");
-					
-					//if the LogLevel is DEBUG, ERROR or ALERT we add an extra indention for more structure
-					if(level == LogLevel.DEBUG || level == LogLevel.ALERT || level == LogLevel.ERROR){
-						writer.write("\t");
-					}
-
-					//track from where the Logger has been called, and add it to the gridLog.txt
-					String[] stack = Thread.currentThread().getStackTrace()[4].getClassName().split("\\.");
-					String origin = "";
-					
-					//if this segment of stack equals to "behaviours" you should print an additional part of the path
-					if(stack[stack.length-1].equals("behaviours")){
-						origin = "@" + stack[stack.length-3] + "/" + stack[stack.length-2] + "/" + stack[stack.length-1] + ":";
-					} else {
-						origin = "@" + stack[stack.length-2] + "/" + stack[stack.length-1] + ":";
-					}				
-
-					//to outline the gridLog.txt we want to add different amounts of tabs according to the length of the origin
-					if(origin.length() < 24){
-						origin += "\t\t\t";
-					} else if(origin.length() < 32){
-						origin += "\t\t";
-					} else if(origin.length() < 40){
-						origin += "\t";
-					}
-
-					writer.write(origin);
-					
-					if(hasThrowable)					writer.write(((Throwable)msg).getStackTrace().toString());
-					else								writer.write(msg.toString());
-
-					//if the message already ends with a line break we shouldn't add a new one
-					//if(!msg.toString().endsWith("\n"))	writer.write("\n");
-					writer.write((msg.toString().replace("%n", "; ")).replace("\n", "; ") + "\n");
-					
-					//close the writer
-					writer.close();
-				} else {
-					//if the file doesn't exist create it
+		String timeLog = fileDateFormat.format(Calendar.getInstance().getTime());
+		
+		if(logFileFileWriter == null) {
+			// first time we write a entry to the logFile, so we need to create the writers
+			try {
+				if(logFile.exists() == false) {
 					logFile.createNewFile();
 				}
-			} catch(Exception e) {
-				e.printStackTrace();
+				logFileFileWriter = new FileWriter(logFile, true);
+				logFileBufferedWriter = new BufferedWriter(logFileFileWriter);
+				
+				logFileBufferedWriter.write(serializedLogEntry);
+				
+				
+			} catch (IOException ex) {
+				System.err.println("Unable to write to logFile:");
+				ex.printStackTrace();
 			} finally {
 				try {
 					//Close the writer regardless of what happens...
-					writer.close();
-				} catch (Exception e) {
+					logFileBufferedWriter.close();
+					logFileFileWriter.close();
+				} catch (Exception ex) {
 					//Well ... we tried ...
 				}
 			}
 		}
-	}
-
-	public static boolean eraseLogFile(){
-		if(logFile.exists())	return logFile.delete();
-		else					return false;
 	}
 }

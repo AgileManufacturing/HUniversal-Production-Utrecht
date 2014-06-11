@@ -50,7 +50,7 @@ public class TranslationProcess implements Runnable{
 		if (capabilities != null){
 			int numCapabilities = capabilities.size();
 			if (numCapabilities == 0){
-				hardwareAbstractionLayerListener.onIncapableCapabilities(productStep);
+				hardwareAbstractionLayerListener.onTranslationFailed(productStep);
 			}
 			else {
 				ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
@@ -84,7 +84,7 @@ public class TranslationProcess implements Runnable{
 			}
 		}
 		else {
-			hardwareAbstractionLayerListener.onIncapableCapabilities(productStep);			
+			hardwareAbstractionLayerListener.onTranslationFailed(productStep);			
 		}
 	}
 
