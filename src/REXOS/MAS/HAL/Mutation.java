@@ -45,19 +45,13 @@ public class Mutation {
 	 * @return
 	 */
 	public static ArrayList<Mutation> getSupportedMutations(ModuleIdentifier moduleIdentifier, KnowledgeDBClient knowledgeDBClient) {
-		try{
-			ArrayList<Mutation> mutations = new ArrayList<Mutation>();
-			Row[] rows = knowledgeDBClient.executeSelectQuery(getSupportedMutationTypesForModuleType, 
-					moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
-			for (Row row : rows) {
-				mutations.add(new Mutation((String) row.get("mutation")));
-			}
-			return mutations;
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			System.err.println("HAL::Mutation::getSupportedMutations(): Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
-			return null;
+		ArrayList<Mutation> mutations = new ArrayList<Mutation>();
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getSupportedMutationTypesForModuleType, 
+				moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
+		for (Row row : rows) {
+			mutations.add(new Mutation((String) row.get("mutation")));
 		}
+		return mutations;
 	}
 	/**
 	 * This method serializes the supported mutations from the knowledge database for the module identified by the {@link ModuleIdentifier}. This method does NOT remove the supported mutations from the knowledge database.
@@ -66,13 +60,7 @@ public class Mutation {
 	 * @return
 	 */
 	public static JsonArray serializeAllSupportedMutations(ModuleIdentifier moduleIdentifier) {
-		try {
-			return serializeAllSupportedMutations(moduleIdentifier, new KnowledgeDBClient());
-		} catch (KnowledgeException ex) {
-			System.err.println("HAL::Mutation::serializeAllSupportedMutations(): Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
-			return null;
-		}
+		return serializeAllSupportedMutations(moduleIdentifier, new KnowledgeDBClient());
 	}
 	/**
 	 * This method serializes the supported mutations from the knowledge database for the module identified by the {@link ModuleIdentifier}. This method does NOT remove the supported mutations from the knowledge database.
@@ -97,13 +85,7 @@ public class Mutation {
 	 * @return
 	 */
 	public static ArrayList<Mutation> insertSupportedMutations(ModuleIdentifier moduleIdentifier, JsonArray supportedMutationEntries) {
-		try{
-			return insertSupportedMutations(moduleIdentifier, supportedMutationEntries, new KnowledgeDBClient());
-		} catch (KnowledgeException ex) {
-			System.err.println("HAL::Mutation::insertSupportedMutations(): Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
-			return null;
-		}
+		return insertSupportedMutations(moduleIdentifier, supportedMutationEntries, new KnowledgeDBClient());
 	}
 	/**
 	 * This method deserializes the supported mutations and copies it to the knowledge database for the module identified by the {@link ModuleIdentifier}.
@@ -114,21 +96,15 @@ public class Mutation {
 	 */
 	public static ArrayList<Mutation> insertSupportedMutations(ModuleIdentifier moduleIdentifier, 
 			JsonArray supportedMutationEntries, KnowledgeDBClient knowledgeDBClient) {
-		try {
-			ArrayList<Mutation> mutations = new ArrayList<Mutation>();
-			
-			for (JsonElement supportedMutationEntryElement : supportedMutationEntries) {
-				String mutationType = supportedMutationEntryElement.getAsString();
-				knowledgeDBClient.executeUpdateQuery(addSupportedMutationTypeForModuleType, 
-						moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), mutationType);
-				mutations.add(new Mutation(mutationType));
-			}
-			return mutations;
-		} catch (KnowledgeException ex) {
-			System.err.println("HAL::Mutation::insertSupportedMutations(): Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
-			return null;
+		ArrayList<Mutation> mutations = new ArrayList<Mutation>();
+		
+		for (JsonElement supportedMutationEntryElement : supportedMutationEntries) {
+			String mutationType = supportedMutationEntryElement.getAsString();
+			knowledgeDBClient.executeUpdateQuery(addSupportedMutationTypeForModuleType, 
+					moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), mutationType);
+			mutations.add(new Mutation(mutationType));
 		}
+		return mutations;
 	}
 	/**
 	 * This method removes the supported mutations from the knowledge database for the module identified by the {@link ModuleIdentifier} 
@@ -136,12 +112,7 @@ public class Mutation {
 	 * @param moduleIdentifier
 	 */
 	public static void removeSupportedMutations(ModuleIdentifier moduleIdentifier) {
-		try {
-			removeSupportedMutations(moduleIdentifier, new KnowledgeDBClient());
-		} catch (KnowledgeException ex) {
-			System.err.println("HAL::Mutation::removeSupportedMutations(): Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
-		}
+		removeSupportedMutations(moduleIdentifier, new KnowledgeDBClient());
 	}
 	/**
 	 * This method removes the supported mutations from the knowledge database for the module identified by the {@link ModuleIdentifier} 
@@ -149,12 +120,7 @@ public class Mutation {
 	 * @param knowledgeDBClient
 	 */
 	public static void removeSupportedMutations(ModuleIdentifier moduleIdentifier, KnowledgeDBClient knowledgeDBClient) {
-		try {
-			knowledgeDBClient.executeUpdateQuery(removeAllSupportedMutationTypesForModuleType, 
-					moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
-		} catch (KnowledgeException ex) {
-			System.err.println("HAL::Mutation::removeSupportedMutations(): Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
-		}
+		knowledgeDBClient.executeUpdateQuery(removeAllSupportedMutationTypesForModuleType, 
+				moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
 	}
 }

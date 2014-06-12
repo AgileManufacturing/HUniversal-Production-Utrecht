@@ -9,13 +9,16 @@ import libraries.blackboard_client.data_classes.FieldUpdateSubscription;
 import libraries.blackboard_client.data_classes.FieldUpdateSubscription.MongoUpdateLogOperation;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.InvalidJSONException;
 import libraries.blackboard_client.data_classes.MongoOperation;
 import libraries.blackboard_client.data_classes.OplogEntry;
 import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.LogSection;
 import libraries.utillities.log.Logger;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.listeners.BlackboardListener;
 
+import com.google.gson.JsonObject;
 import com.mongodb.DBObject;
 
 import configuration.Configuration;
@@ -100,6 +103,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 		try{
 			switch (entry.getNamespace().split("\\.")[1]) {
 				case "equipletState":
+					Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ state or mode changed");
 					dbObject = stateBlackboardBBClient.findDocumentById(entry.getTargetObjectId());
 					if(dbObject != null) {
 						equipletName = dbObject.get("equipletName").toString();
@@ -119,21 +123,23 @@ public class BlackboardHandler implements BlackboardSubscriber {
 					dbObject = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
 					if(dbObject != null) {
 						String status = dbObject.get("status").toString();
-						System.out.println("EQ step process status changed");
+						Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ step process status changed");
 						
-						//if(!status.equals("IN_PROGRESS")) {
-							for(BlackboardListener listener: updateSubscribers) {
-								listener.onProcessStatusChanged(status); 
-							}
-						//}
+						for(BlackboardListener listener: updateSubscribers) {
+							listener.onProcessStatusChanged(status); 
+						}
 					}
 				    break;
 				default:
 					break;
 			}
 		}catch(InvalidDBNamespaceException | GeneralMongoException ex) {
-			Logger.log(LogLevel.ERROR, "", ex);
+			Logger.log(LogLevel.ERROR, "Unknown exception occured:", ex);
 		}
+	}
+	
+	public void postHardwareStep(JsonObject hardwareStep) throws InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
+		equipletStepBBClient.insertDocument(hardwareStep.toString());
 	}
 
 }

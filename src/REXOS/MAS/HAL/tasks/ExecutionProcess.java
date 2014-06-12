@@ -2,6 +2,9 @@ package HAL.tasks;
 
 import java.util.ArrayList;
 
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.LogSection;
+import libraries.utillities.log.Logger;
 import HAL.Module;
 import HAL.exceptions.HardwareAbstractionLayerProcessException;
 import HAL.factories.ModuleFactory;
@@ -36,6 +39,7 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 	 */
 	@Override
 	public synchronized void run() {
+		Logger.log(LogSection.HAL_EXECUTION, LogLevel.INFORMATION, "Execution started with the following hardware steps:", hardwareSteps);
 		try {
 			while (hardwareSteps.size() > 0){
 				moduleFactory.executeHardwareStep(this, hardwareSteps.get(0));
@@ -53,12 +57,13 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 	 * Do not call this method! 
 	 */
 	@Override
-	public synchronized void onProcessStateChanged(String state, long hardwareStepSerialId, Module module) throws HardwareAbstractionLayerProcessException{
-		System.out.println("State = "+ state);
-		if(state.equals("DONE")){
+	public synchronized void onProcessStateChanged(String status, long hardwareStepSerialId, Module module) throws HardwareAbstractionLayerProcessException{
+		Logger.log(LogSection.HAL_EXECUTION, LogLevel.DEBUG, "The status of hardwareStep identified by " + 
+				hardwareStepSerialId + " (being processed by module " + module + ") has changed to " + status);
+		if(status.equals("DONE")){
 			if (hardwareSteps.size() > 0){
 				HardwareStep hardwareStep = hardwareSteps.get(0);
-				hardwareAbstractionLayerListener.onProcessStatusChanged(state, hardwareStepSerialId, module, hardwareStep);
+				hardwareAbstractionLayerListener.onProcessStatusChanged(status, module, hardwareStep);
 				hardwareSteps.remove(0);
 				try {
 					Thread.sleep(500);
@@ -75,10 +80,7 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 		else {
 			if (hardwareSteps.size() > 0){
 				HardwareStep hardwareStep = hardwareSteps.get(0);
-				hardwareAbstractionLayerListener.onProcessStatusChanged(state, hardwareStepSerialId, module, hardwareStep);	
-			}
-			else {
-				hardwareAbstractionLayerListener.onProcessStatusChanged(state, hardwareStepSerialId, module, null);				
+				hardwareAbstractionLayerListener.onProcessStatusChanged(status, module, hardwareStep);	
 			}
 			//hardwareSteps.clear();
 			

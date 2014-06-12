@@ -1,11 +1,19 @@
-package HAL;
+package HAL.testerClasses;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.LogSection;
+import libraries.utillities.log.Logger;
+
 import org.apache.commons.codec.binary.Base64;
 
+import HAL.BlackboardHandler;
+import HAL.HardwareAbstractionLayer;
+import HAL.Module;
+import HAL.Service;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
 import HAL.steps.ProductStep;
@@ -20,7 +28,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static HardwareAbstractionLayer hal;
 	static BlackboardHandler blackboardUpdated;
 	
-	static final String baseDir = "/home/agileman/Desktop/";
+	static final String baseDir = "/home/t/Desktop/";
 	
 	// delta robot
 	static String moduleA_01 = "{"
@@ -95,7 +103,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			+ "				]"
 			+ "			},"
 			+ "			{"
-			+ "				\"name\":\"Place\","
+			+ "				\"name\":\"PickAndPlace\","
 			+ "				\"treeNumber\":1,"
 			+ "				\"halSoftware\":{"
 			+ "					\"buildNumber\":1,"
@@ -289,12 +297,10 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		System.out.println("Starting");
+		Logger.log(LogSection.HAL, LogLevel.DEBUG, "Starting");
 		
-		// TODO Auto-generated method stub
 		hal = new HardwareAbstractionLayer(htc);
 
-		
 		FileInputStream fis;
 		byte[] content;
 
@@ -363,15 +369,15 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		String base64PickAndPlace = new String(Base64.encodeBase64(content));
 		
 		
-		// deltarobot
+		/*// deltarobot
 		String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64DeltaRobot + moduleA_03 + base64Draw + moduleA_04 + base64PickAndPlace + moduleA_05; 
 		JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
 		hal.insertModule(a, a);
 		
-		/*// pen
-		String moduleB = moduleB_01 + base64Pen + moduleB_02; 
-		JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
-		hal.insertModule(b, b);*/
+		// pen
+		//String moduleB = moduleB_01 + base64Pen + moduleB_02; 
+		//JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
+		//hal.insertModule(b, b);
 		
 		// gripper
 		String moduleB = moduleB_01 + base64GripperRos + moduleB_02 + base64Gripper + moduleB_03; 
@@ -391,7 +397,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		// workplane
 		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64Pen + moduleE_03;
 		JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
-		hal.insertModule(e, e);
+		hal.insertModule(e, e);*/
 		
 		
 		JsonObject criteria = new JsonObject();
@@ -429,34 +435,30 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	
 	@Override
 	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareStep) {
-		// TODO Auto-generated method stub
-		System.out.println("Translation finished");
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Translation finished");
 		hardwareSteps.addAll(hardwareStep);// = hardwareStep;
 		hal.executeHardwareSteps(hardwareSteps);
 	}
 
 	@Override
-	public void onIncapableCapabilities(ProductStep productStep) {
-		System.out.println("Translation failed because productStep with service " + productStep.getService().getName() + " has no supported capabilities");
+	public void onTranslationFailed(ProductStep productStep) {
+		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", productStep);
 	}
 
 	@Override
-	public void onProcessStatusChanged(String state, long hardwareStepSerialId,
+	public void onProcessStatusChanged(String status, 
 			Module module, HardwareStep hardwareStep) {
-		// TODO Auto-generated method stub
-		
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The status of " + hardwareStep + " (being processed by module " + module + ") has changed to " + status);
 	}
 
 	@Override
 	public void onModuleStateChanged(String state, Module module) {
-		// TODO Auto-generated method stub
-		
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of module " + module + " has changed to " + state);
 	}
 
 	@Override
 	public void onModuleModeChanged(String mode, Module module) {
-		// TODO Auto-generated method stub
-		
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of module " + module + " has changed to " + mode);
 	}
 
 	@Override
@@ -467,20 +469,16 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 
 	@Override
 	public void onExecutionFinished() {
-		// TODO Auto-generated method stub
-		
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Execution finished");
 	}
 
 	@Override
-	public void onEquipletStateChanged(String state, Module module) {
-		// TODO Auto-generated method stub
-		
+	public void onEquipletStateChanged(String state) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of equiplet " + getEquipletName() + " has changed to " + state);
 	}
 
 	@Override
-	public void onEquipletModeChanged(String mode, Module module) {
-		// TODO Auto-generated method stub
-		
+	public void onEquipletModeChanged(String mode) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of equiplet " + getEquipletName() + " has changed to " + mode);
 	}
-
 }

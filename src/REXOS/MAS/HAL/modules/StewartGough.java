@@ -27,7 +27,7 @@ public class StewartGough extends ModuleActor {
 	}
 
 	@Override
-	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException {
+	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 		
 		JsonObject jsonCommand = compositeStep.getCommand();
@@ -36,7 +36,7 @@ public class StewartGough extends ModuleActor {
 		if (command != null){
 			//Get move
 			if (command.has(MOVE) == false){
-				throw new ModuleTranslatingException ("StewartGough module didn't find a \"move\" key in CompositeStep command: "+command.toString());
+				throw new IllegalArgumentException("DeltaRobot module didn't find a \"move\" key in CompositeStep command: " + command.toString());
 			}
 			JsonObject move = command.remove(MOVE).getAsJsonObject();			
 			
@@ -79,9 +79,6 @@ public class StewartGough extends ModuleActor {
 				if (!command.remove("forceStraightLine").getAsBoolean()){
 					//Entry point
 					JsonObject entry_move = new JsonParser().parse(move.toString()).getAsJsonObject();
-					int z = entry_move.remove(Z).getAsInt();
-					z += 20; //20mm above actual point
-					entry_move.addProperty(Z, z);
 					
 					
 					System.out.println("rotationX: " + entry_move.get("rotationX").toString());
@@ -103,9 +100,6 @@ public class StewartGough extends ModuleActor {
 					
 					//Exit point
 					JsonObject exit_move = new JsonParser().parse(move.toString()).getAsJsonObject();
-					z = exit_move.get(Z).getAsInt();
-					z += 20; //20mm above actual point
-					exit_move.addProperty(Z, z);
 					hardwareCommand.remove("payload");
 					hardwareCommand.add("payload",exit_move);
 					hardwareJsonCommand.remove("instructionData");
@@ -121,12 +115,11 @@ public class StewartGough extends ModuleActor {
 			}
 			
 			jsonCommand.add(COMMAND, command);
-			//ArrayList<HardwareStep> hStep = forwardCompositeStep(new CompositeStep(compositeStep.getProductStep(),jsonCommand));
-			//if (hStep != null)
-				//hardwareSteps.addAll(hStep);
+			ArrayList<HardwareStep> hStep = forwardCompositeStep(new CompositeStep(compositeStep.getProductStep(),jsonCommand));
+			if (hStep != null) hardwareSteps.addAll(hStep);
 		}
 		else {
-			throw new ModuleTranslatingException ("StewartGough module didn't receive any \"command\" key in CompositeStep command");
+			throw new IllegalArgumentException ("DeltaRobot module didn't receive any \"command\" key in CompositeStep command" + compositeStep);
 		}
 		
 		return hardwareSteps;

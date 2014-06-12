@@ -51,13 +51,7 @@ public class RosSoftware {
 	 * @return the now stored ros software
 	 */
 	public static RosSoftware insertRosSoftware(JsonObject rosSoftware) {
-		try{
-			return insertRosSoftware(rosSoftware, new KnowledgeDBClient());
-		} catch (KnowledgeException ex) {
-			System.err.println("HAL::RosSoftware::deserializeRosSoftware(): Error occured which is considered to be impossible" + ex);
-			ex.printStackTrace();
-			return null;
-		}
+		return insertRosSoftware(rosSoftware, new KnowledgeDBClient());
 	}
 	/**
 	 * Deserializes ros software from a JsonObject and stores in in the knowledge database using the provided KnowledgeDBClient.
@@ -66,19 +60,13 @@ public class RosSoftware {
 	 * @return the now stored ros software
 	 */
 	public static RosSoftware insertRosSoftware(JsonObject rosSoftware, KnowledgeDBClient knowledgeDBClient) {
-		try {
-			byte[] zipFile = Base64.decodeBase64(rosSoftware.get("rosFile").getAsString().getBytes());
-			int buildNumber = getBuildNumber(rosSoftware);
-			String command = getCommand(rosSoftware);
-			
-			int id = knowledgeDBClient.executeUpdateQuery(addRosSoftware, 
-					buildNumber, command, zipFile);
-			return new RosSoftware(id, buildNumber, command, knowledgeDBClient);
-		} catch (KnowledgeException ex) {
-			System.err.println("HAL::RosSoftware::deserializeRosSoftware(): Error occured which is considered to be impossible" + ex);
-			ex.printStackTrace();
-			return null;
-		}
+		byte[] zipFile = Base64.decodeBase64(rosSoftware.get("rosFile").getAsString().getBytes());
+		int buildNumber = getBuildNumber(rosSoftware);
+		String command = getCommand(rosSoftware);
+		
+		int id = knowledgeDBClient.executeUpdateQuery(addRosSoftware, 
+				buildNumber, command, zipFile);
+		return new RosSoftware(id, buildNumber, command, knowledgeDBClient);
 	}
 	
 	/**
@@ -136,13 +124,7 @@ public class RosSoftware {
 	 * @return
 	 */
 	public static RosSoftware getRosSoftwareForModuleIdentifier(ModuleIdentifier moduleIdentifier) {
-		try {
-			return getRosSoftwareForModuleIdentifier(moduleIdentifier, new KnowledgeDBClient()); 
-		} catch (KnowledgeException ex) {
-			System.err.println("HAL::RosSoftware::getRosSoftwareForModuleIdentifier(): Error occured which is considered to be impossible" + ex);
-			ex.printStackTrace();
-			return null;
-		}
+		return getRosSoftwareForModuleIdentifier(moduleIdentifier, new KnowledgeDBClient()); 
 	}
 	/**
 	 * This method will get the RosSoftware associated with the module.
@@ -151,22 +133,16 @@ public class RosSoftware {
 	 * @return
 	 */
 	public static RosSoftware getRosSoftwareForModuleIdentifier(ModuleIdentifier moduleIdentifier, KnowledgeDBClient knowledgeDBClient) {
-		try {
-			Row[] rows = knowledgeDBClient.executeSelectQuery(getRosSoftwareForModuleType, moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
-			
-			int id = (Integer) rows[0].get("id");
-			int buildNumber = (Integer) rows[0].get("buildNumber");
-			String command = (String) rows[0].get("command");
-			
-			if(rosSoftwareInstances.containsKey(id) == true) {
-				return rosSoftwareInstances.get(id);
-			} else {
-				return new RosSoftware(id, buildNumber, command, knowledgeDBClient);
-			}
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			System.err.println("HAL::RosSoftware::getRosSoftwareForModuleIdentifier(): Error occured which is considered to be impossible" + ex);
-			ex.printStackTrace();
-			return null;
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getRosSoftwareForModuleType, moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
+		
+		int id = (Integer) rows[0].get("id");
+		int buildNumber = (Integer) rows[0].get("buildNumber");
+		String command = (String) rows[0].get("command");
+		
+		if(rosSoftwareInstances.containsKey(id) == true) {
+			return rosSoftwareInstances.get(id);
+		} else {
+			return new RosSoftware(id, buildNumber, command, knowledgeDBClient);
 		}
 	}
 	
@@ -177,19 +153,13 @@ public class RosSoftware {
 	 * @return The JsonObject for the RosSoftware
 	 */
 	public JsonObject serialize() {
-		try{
-			JsonObject rosSoftware = new JsonObject();
-			Row[] rows = knowledgeDBClient.executeSelectQuery(getRosSoftwareForId, this.id);
-			rosSoftware.addProperty("buildNumber", (Integer) rows[0].get("buildNumber"));
-			rosSoftware.addProperty("command", (String) rows[0].get("command"));
-			byte[] zipFile = (byte[]) rows[0].get("zipFile");
-			rosSoftware.addProperty("rosFile", new String(Base64.encodeBase64(zipFile)));
-			return rosSoftware;
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			System.err.println("HAL::RosSoftware::serializeRosSoftwareForModuleIdentifier(): Error occured which is considered to be impossible" + ex);
-			ex.printStackTrace();
-			return null;
-		}
+		JsonObject rosSoftware = new JsonObject();
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getRosSoftwareForId, this.id);
+		rosSoftware.addProperty("buildNumber", (Integer) rows[0].get("buildNumber"));
+		rosSoftware.addProperty("command", (String) rows[0].get("command"));
+		byte[] zipFile = (byte[]) rows[0].get("zipFile");
+		rosSoftware.addProperty("rosFile", new String(Base64.encodeBase64(zipFile)));
+		return rosSoftware;
 	}
 	
 	/**
@@ -197,16 +167,10 @@ public class RosSoftware {
 	 * @param rosSoftware
 	 */
 	public void updateRosSoftware(JsonObject rosSoftware) {
-		try {
-			byte[] zipFile = Base64.decodeBase64(rosSoftware.get("zipFile").getAsString().getBytes());
-			int buildNumber = getBuildNumber(rosSoftware);
-			String command = getCommand(rosSoftware);
-			
-			knowledgeDBClient.executeUpdateQuery(updateRosSoftware, 
-					buildNumber, command, zipFile);
-		} catch (KnowledgeException ex) {
-			System.err.println("HAL::RosSoftware::deserializeRosSoftware(): Error occured which is considered to be impossible" + ex);
-			ex.printStackTrace();
-		}
+		byte[] zipFile = Base64.decodeBase64(rosSoftware.get("zipFile").getAsString().getBytes());
+		int buildNumber = getBuildNumber(rosSoftware);
+		String command = getCommand(rosSoftware);
+		
+		knowledgeDBClient.executeUpdateQuery(updateRosSoftware, buildNumber, command, zipFile);
 	}	
 }

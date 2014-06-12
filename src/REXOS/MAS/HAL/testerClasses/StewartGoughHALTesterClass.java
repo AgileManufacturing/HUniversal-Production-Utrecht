@@ -1,11 +1,19 @@
-package HAL;
+package HAL.testerClasses;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.LogSection;
+import libraries.utillities.log.Logger;
+
 import org.apache.commons.codec.binary.Base64;
 
+import HAL.BlackboardHandler;
+import HAL.HardwareAbstractionLayer;
+import HAL.Module;
+import HAL.Service;
 import HAL.listeners.BlackboardListener;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
@@ -443,34 +451,31 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	
 	@Override
 	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareStep) {
-		// TODO Auto-generated method stub
-		System.out.println("Translation finished");
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Translation finished");
 		hardwareSteps.addAll(hardwareStep);// = hardwareStep;
 		hal.executeHardwareSteps(hardwareSteps);
 	}
 
+
 	@Override
-	public void onIncapableCapabilities(ProductStep productStep) {
-		System.out.println("Translation failed because productStep with service " + productStep.getService().getName() + " has no supported capabilities");
+	public void onTranslationFailed(ProductStep productStep) {
+		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", productStep);
 	}
 
 	@Override
-	public void onProcessStatusChanged(String state, long hardwareStepSerialId,
+	public void onProcessStatusChanged(String status, 
 			Module module, HardwareStep hardwareStep) {
-		// TODO Auto-generated method stub
-		
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The status of " + hardwareStep + " (being processed by module " + module + ") has changed to " + status);
 	}
 
 	@Override
 	public void onModuleStateChanged(String state, Module module) {
-		// TODO Auto-generated method stub
-		
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of module " + module + " has changed to " + state);
 	}
 
 	@Override
 	public void onModuleModeChanged(String mode, Module module) {
-		// TODO Auto-generated method stub
-		
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of module " + module + " has changed to " + mode);
 	}
 
 	@Override
@@ -481,20 +486,16 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 
 	@Override
 	public void onExecutionFinished() {
-		// TODO Auto-generated method stub
-		
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Execution finished");
 	}
 
 	@Override
-	public void onEquipletStateChanged(String state, Module module) {
-		// TODO Auto-generated method stub
-		
+	public void onEquipletStateChanged(String state) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of equiplet " + getEquipletName() + " has changed to " + state);
 	}
 
 	@Override
-	public void onEquipletModeChanged(String mode, Module module) {
-		// TODO Auto-generated method stub
-		
+	public void onEquipletModeChanged(String mode) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of equiplet " + getEquipletName() + " has changed to " + mode);
 	}
-
 }

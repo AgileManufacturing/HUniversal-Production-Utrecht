@@ -17,4 +17,8 @@ public class CapabilityException extends Exception {
 		super(msg, throwable);
 	}
 
+	public CapabilityException(String msg) {
+		super(msg);
+	}
+
 }

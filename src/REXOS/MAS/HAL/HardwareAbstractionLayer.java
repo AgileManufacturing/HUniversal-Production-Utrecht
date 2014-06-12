@@ -7,6 +7,9 @@ import com.google.gson.JsonObject;
 
 import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.LogSection;
+import libraries.utillities.log.Logger;
 import HAL.capabilities.Capability;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.FactoryException;
@@ -50,7 +53,7 @@ public class HardwareAbstractionLayer implements ModuleListener {
 		this.hardwareAbstractionLayerListener = hardwareAbstractionLayerListener;
 		capabilityFactory = new CapabilityFactory(this);
 		moduleFactory = new ModuleFactory(this, this);
-		//blackboardHandler = new BlackboardHandler(equipletName);
+		blackboardHandler = new BlackboardHandler(equipletName);
 		
 	}
 	/**
@@ -59,7 +62,6 @@ public class HardwareAbstractionLayer implements ModuleListener {
 	 * @param hardwareSteps
 	 */
 	public void executeHardwareSteps(ArrayList<HardwareStep> hardwareSteps){
-		System.out.println(hardwareSteps.toString());
 		ExecutionProcess executionProcess = new ExecutionProcess(this.hardwareAbstractionLayerListener, hardwareSteps, moduleFactory);
 		executionProcess.start();
 	}
@@ -106,7 +108,7 @@ public class HardwareAbstractionLayer implements ModuleListener {
 	 * @throws JarFileLoaderException if the loading of the jarFile by the factories failed
 	 * @throws FactoryException if the instantiation of the class in the jarFile failed 
 	 */
-	public JsonObject deleteModule(ModuleIdentifier moduleIdentifier) throws FactoryException, JarFileLoaderException, InvalidMastModeException {
+	public JsonObject deleteModule(ModuleIdentifier moduleIdentifier) throws FactoryException, InvalidMastModeException {
 		JsonArray capabilities = capabilityFactory.removeCapabilities(moduleIdentifier);
 		JsonObject module = moduleFactory.removeModule(moduleIdentifier);			
 		module.get("type").getAsJsonObject().add("capabilities", capabilities);
@@ -115,10 +117,9 @@ public class HardwareAbstractionLayer implements ModuleListener {
 	/**
 	 * This method will return the modules which have no child (and thus are the bottom modules)
 	 * @return
-	 * @throws JarFileLoaderException if the loading of the jarFile by the factories failed
 	 * @throws FactoryException if the instantiation of the class in the jarFile failed 
 	 */
-	public ArrayList<Module> getBottomModules() throws FactoryException, JarFileLoaderException {
+	public ArrayList<Module> getBottomModules() throws FactoryException {
 		return moduleFactory.getBottomModules();
 	}
 	/**

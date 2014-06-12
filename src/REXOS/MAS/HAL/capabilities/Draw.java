@@ -2,18 +2,17 @@ package HAL.capabilities;
 
 import java.util.ArrayList;
 
-import libraries.dynamicloader.JarFileLoaderException;
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.LogSection;
+import libraries.utillities.log.Logger;
 import HAL.ModuleActor;
 import HAL.exceptions.CapabilityException;
-import HAL.exceptions.FactoryException;
-import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 import HAL.steps.ProductStep;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 /**
  * 
@@ -34,7 +33,7 @@ public class Draw extends Capability {
 	 */
 	@Override
 	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep)
-			throws CapabilityException, FactoryException, JarFileLoaderException {
+			throws CapabilityException {
 		
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<>();
 		String serviceName = productStep.getService().getName();
@@ -53,21 +52,13 @@ public class Draw extends Capability {
 
 			jsonCommand.addProperty("look_up", target.get("identifier").getAsString());
 
-			System.out.println("command" + jsonCommand);
+			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "command " + jsonCommand);
 			
 			ArrayList<ModuleActor> modules = moduleFactory.getBottomModulesForFunctionalModuleTree(this, 1);
-			System.out.println("Functional module size: "+modules.size());
-			for (ModuleActor moduleActor : modules) {
-				JsonObject a = new JsonParser().parse(jsonCommand.toString()).getAsJsonObject();
-				CompositeStep draw = new CompositeStep(productStep, a);
-				try {
-					
-					hardwareSteps.addAll(moduleActor.translateCompositeStep(draw));
-					return hardwareSteps;
-				} catch (ModuleTranslatingException ex) {
-					throw new CapabilityException(ex.toString(), ex);
-				}
-			}
+			CompositeStep draw = new CompositeStep(productStep, command);
+			hardwareSteps.addAll(translateCompositeStep(modules, draw));
+			
+			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.INFORMATION, "Translated hardware steps: " + hardwareSteps.toString());
 		}
 		else
 			throw new CapabilityException("Invalid service type or no target specified", null);

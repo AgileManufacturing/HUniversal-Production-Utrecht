@@ -4,7 +4,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import libraries.blackboard_client.data_classes.GeneralMongoException;
-import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.math.Vector3;
 import HAL.ModuleActor;
@@ -27,7 +26,7 @@ public class Pen extends ModuleActor {
 	}
 
 	@Override
-	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException {
+	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 		System.out.println("Translating pen module");
 		JsonObject jsonCommand = compositeStep.getCommand();
@@ -36,7 +35,7 @@ public class Pen extends ModuleActor {
 		if (command != null){
 			//Remove corresponding commands to module.
 			if (command.remove("draw") == null){
-				throw new ModuleTranslatingException ("Pen module didn't find a \"draw\" key in CompositeStep command: " + command.toString());
+				throw new ModuleTranslatingException ("Pen module didn't find a \"draw\" key in CompositeStep command: " + command.toString(), compositeStep);
 			}			
 			
 			//Adjust the move with the Pen module it's height.
@@ -55,7 +54,7 @@ public class Pen extends ModuleActor {
 			}
 		}
 		else {
-			throw new ModuleTranslatingException ("Pen module didn't receive any \"command\" key in CompositeStep command: "+jsonCommand.toString());
+			throw new ModuleTranslatingException ("Pen module didn't receive any \"command\" key in CompositeStep command: "+jsonCommand.toString(), compositeStep);
 		}
 		
 		return hardwareSteps;

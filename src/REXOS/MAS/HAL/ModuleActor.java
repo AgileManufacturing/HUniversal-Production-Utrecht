@@ -23,6 +23,9 @@ import libraries.knowledgedb_client.KnowledgeException;
 import libraries.math.Matrix;
 import libraries.math.RotationAngles;
 import libraries.math.Vector3;
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.LogSection;
+import libraries.utillities.log.Logger;
 /**
  * Abstract representation of a actor module in HAL 
  * @author Bas Voskuijlen
@@ -34,24 +37,16 @@ public abstract class ModuleActor extends Module {
 	protected static final String DESTINATION = "destination";
 	protected static final String LOOK_UP = "look_up";
 	protected static final String NULL = "NULL";
-	protected static final String X = "x";
-	protected static final String Y = "y";
-	protected static final String Z = "z";
+	protected static final String MOVE_X = "x";
+	protected static final String MOVE_Y = "y";
+	protected static final String MOVE_Z = "z";
 	
-	//TODO Check this (added by Rolf)
 	protected static final String ROTATION_X = "rotationX";
 	protected static final String ROTATION_Y = "rotationY";
 	protected static final String ROTATION_Z = "rotationZ";
 	
 	protected static final String MOVE = "move";
 	
-	
-	/**
-	 * The blackboard client used for writing the hardware steps.
-	 * The results from ROS are not processed with this client.
-	 */
-	protected BlackboardClient mongoClient;
-	protected static final String MONGO_HOST = "145.89.191.131";
 	
 	/**
 	 * Constructs a new ModuleActor and connects to the blackboard.
@@ -65,14 +60,14 @@ public abstract class ModuleActor extends Module {
 	public ModuleActor(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) 
 			throws KnowledgeException, UnknownHostException, GeneralMongoException {
 		super(moduleIdentifier, moduleFactory,moduleListener);
-		mongoClient = new BlackboardClient(MONGO_HOST);
-		try {
+		
+		/*try {
 			mongoClient.setDatabase(moduleFactory.getHAL().getEquipletName());
 			mongoClient.setCollection("EquipletStepsBlackBoard");
 		} catch (InvalidDBNamespaceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 	}
 	public void setModuleListener(ModuleListener moduleListener){
 		this.moduleListener = moduleListener;
@@ -82,9 +77,9 @@ public abstract class ModuleActor extends Module {
 	 * @param command
 	 * @throws ModuleExecutingException
 	 */
-	protected void executeMongoCommand(String command) throws ModuleExecutingException{
+	protected void executeMongoCommand(JsonObject command) throws ModuleExecutingException{
 		try {
-			mongoClient.insertDocument(command.toString());
+			moduleFactory.getHAL().getBlackBoardHandler().postHardwareStep(command);
 		} catch (InvalidJSONException ex) {
 			throw new ModuleExecutingException("Executing invalid JSON", ex);
 		} catch (InvalidDBNamespaceException ex) {
@@ -101,23 +96,21 @@ public abstract class ModuleActor extends Module {
 	 * @return The hardware steps resulted from the translation of the CompositeStep done by the parent modules.
 	 * @throws ModuleTranslatingException if the CompositeStep could not completely be translated (which is the case if there is no parent module and the CompositeStep is not empty)  
 	 * @throws FactoryException
-	 * @throws JarFileLoaderException
 	 */
-	protected ArrayList<HardwareStep> forwardCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException{
+	protected ArrayList<HardwareStep> forwardCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException {
 		ModuleActor moduleActor = (ModuleActor) getParentModule();
-		if (moduleActor != null){
+		if (moduleActor != null) {
 			return(moduleActor.translateCompositeStep(compositeStep));
-		}
-		else { //Root module, no more parents			
-			//Check for remaining commands, then not capable
-			if (compositeStep.getCommand().get(COMMAND).getAsJsonObject() == null){
-				throw new ModuleTranslatingException("The compositestep doesn't contain any \"command\" key.");
-			}
+		} else {
+			// root module, no more parents			
+			// if commands remain then the modules were not able to fully translate the compositeStep
+			// TODO better comparison method
 			if (!compositeStep.getCommand().get(COMMAND).getAsJsonObject().toString().trim().equalsIgnoreCase("{}")){
 				throw new ModuleTranslatingException("The compositestep isn't completely empty." + 
-						compositeStep.getCommand().get(COMMAND).getAsJsonObject());
+						compositeStep.getCommand().get(COMMAND).getAsJsonObject(), compositeStep);
+			} else {
+				return null;
 			}
-			return null;
 		}
 	}
 	/**
@@ -129,7 +122,7 @@ public abstract class ModuleActor extends Module {
 	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws ModuleExecutingException{
 		this.processListener = processListener;
 		JsonObject command = hardwareStep.getRosCommand();
-		executeMongoCommand(command.toString());
+		executeMongoCommand(command);
 	}
 	/**
 	 * This method will translate the {@link CompositeStep} and forward the remainder to its parent.
@@ -137,9 +130,8 @@ public abstract class ModuleActor extends Module {
 	 * @return The hardware steps resulted from the translation of the CompositeStep. 
 	 * @throws ModuleTranslatingException
 	 * @throws FactoryException
-	 * @throws JarFileLoaderException
 	 */
-	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException;
+	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException;
 	/**
 	 * This method will forward the changed MAST module state to the {@link ModuleListener}
 	 * Do not call this method!
@@ -159,13 +151,13 @@ public abstract class ModuleActor extends Module {
 		return adjustMoveWithDimensions(compositeCommand, offsetVector, new RotationAngles(0, 0, 0));
 	}
 	protected JsonObject adjustMoveWithDimensions(JsonObject compositeCommand, Vector3 offsetVector, RotationAngles directionAngles){
-		System.out.println("Adjusting move with dimentions: " + compositeCommand.toString() + 
+		Logger.log(LogSection.HAL_MODULES, LogLevel.DEBUG, "Adjusting move with dimentions: " + compositeCommand.toString() + 
 				", offsetVector: " + offsetVector + " directionAngles: " + directionAngles);
 		
 		JsonObject originalMove = compositeCommand.remove(MOVE).getAsJsonObject();
-		double originalX = originalMove.get(X).getAsDouble();
-		double originalY = originalMove.get(Y).getAsDouble();
-		double originalZ = originalMove.get(Z).getAsDouble();
+		double originalX = originalMove.get(MOVE_X).getAsDouble();
+		double originalY = originalMove.get(MOVE_Y).getAsDouble();
+		double originalZ = originalMove.get(MOVE_Z).getAsDouble();
 		
 		Matrix rotationMatrix = directionAngles.generateRotationMatrix();
 		
@@ -173,15 +165,9 @@ public abstract class ModuleActor extends Module {
 		Vector3 rotatedVector = originalVector.rotate(rotationMatrix);
 		
 		JsonObject adjustedMove = new JsonObject();
-		adjustedMove.addProperty(X, originalX + rotatedVector.x);
-		adjustedMove.addProperty(Y, originalY + rotatedVector.y);
-		adjustedMove.addProperty(Z, originalZ + rotatedVector.z);
-		
-		
-		//TODO added by Rolf, Check this!!!!!!!!!!!!!!!!!!!
-		adjustedMove.addProperty(ROTATION_X, originalMove.get(ROTATION_X).getAsDouble());
-		adjustedMove.addProperty(ROTATION_Y, originalMove.get(ROTATION_Y).getAsDouble());
-		adjustedMove.addProperty(ROTATION_Z, originalMove.get(ROTATION_Z).getAsDouble());
+		adjustedMove.addProperty(MOVE_X, originalX + rotatedVector.x);
+		adjustedMove.addProperty(MOVE_Y, originalY + rotatedVector.y);
+		adjustedMove.addProperty(MOVE_Z, originalZ + rotatedVector.z);
 		
 		compositeCommand.add(MOVE, adjustedMove);
 		return compositeCommand;
@@ -190,18 +176,12 @@ public abstract class ModuleActor extends Module {
 
 
 	@Override
-	public void onProcessStatusChanged(String state) {
-		// TODO Auto-generated method stub
-		try {
-			if(processListener != null){
-				processListener.onProcessStateChanged(state, 0, this);
-				if(state.equals("DONE")){
-					processListener =null;
-				}
+	public void onProcessStatusChanged(String status) {
+		if(processListener != null){
+			processListener.onProcessStateChanged(status, 0, this);
+			if(status.equals("DONE")){
+				processListener = null;
 			}
-		} catch (HardwareAbstractionLayerProcessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 }

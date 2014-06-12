@@ -4,7 +4,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import libraries.blackboard_client.data_classes.GeneralMongoException;
-import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
@@ -27,7 +26,7 @@ public class DeltaRobot extends ModuleActor {
 	}
 
 	@Override
-	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException {
+	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 		
 		JsonObject jsonCommand = compositeStep.getCommand();
@@ -36,7 +35,7 @@ public class DeltaRobot extends ModuleActor {
 		if (command != null){
 			//Get move
 			if (command.has(MOVE) == false){
-				throw new ModuleTranslatingException ("DeltaRobot module didn't find a \"move\" key in CompositeStep command: "+command.toString());
+				throw new IllegalArgumentException("DeltaRobot module didn't find a \"move\" key in CompositeStep command: " + command.toString());
 			}
 			JsonObject move = command.remove(MOVE).getAsJsonObject();			
 			
@@ -92,10 +91,7 @@ public class DeltaRobot extends ModuleActor {
 					JsonObject exit_point = new JsonParser().parse(hardwareJsonCommand.toString()).getAsJsonObject();
 
 					System.out.println("DeltaRobot: points parsed");
-					//Entry point
-					int z = entry_move.remove(Z).getAsInt();
-					z += 20; //20mm above actual point
-					entry_move.addProperty(Z, z);
+					
 					entry_hardwareCommand.add("payload",entry_move);
 					entry_point.add("instructionData",entry_hardwareCommand);
 					hardwareSteps.add(new HardwareStep(compositeStep,entry_point,moduleIdentifier));
@@ -111,9 +107,6 @@ public class DeltaRobot extends ModuleActor {
 
 					System.out.println("DeltaRobot: actual point added");
 					//Exit point
-					z = exit_move.get(Z).getAsInt();
-					z += 20; //20mm above actual point
-					exit_move.addProperty(Z, z);
 					exit_hardwareCommand.add("payload",exit_move);
 					exit_point.add("instructionData",exit_hardwareCommand);
 					hardwareSteps.add(new HardwareStep(compositeStep,exit_point,moduleIdentifier));
@@ -136,12 +129,11 @@ public class DeltaRobot extends ModuleActor {
 			}
 			
 			jsonCommand.add(COMMAND, command);
-			//ArrayList<HardwareStep> hStep = forwardCompositeStep(new CompositeStep(compositeStep.getProductStep(),jsonCommand));
-			//if (hStep != null)
-				//hardwareSteps.addAll(hStep);
+			ArrayList<HardwareStep> hStep = forwardCompositeStep(new CompositeStep(compositeStep.getProductStep(),jsonCommand));
+			if (hStep != null) hardwareSteps.addAll(hStep);
 		}
 		else {
-			throw new ModuleTranslatingException ("DeltaRobot module didn't receive any \"command\" key in CompositeStep command");
+			throw new IllegalArgumentException ("DeltaRobot module didn't receive any \"command\" key in CompositeStep command" + compositeStep);
 		}
 		
 		return hardwareSteps;

@@ -1,5 +1,6 @@
 package HAL.factories;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,15 +12,21 @@ import com.google.gson.JsonPrimitive;
 
 import libraries.dynamicloader.DynamicClassDescription;
 import libraries.dynamicloader.DynamicClassFactory;
+import libraries.dynamicloader.InstantiateClassException;
+import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.knowledgedb_client.Row;
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.LogSection;
+import libraries.utillities.log.Logger;
 import HAL.HardwareAbstractionLayer;
 import HAL.JavaSoftware;
 import HAL.ModuleIdentifier;
 import HAL.Service;
 import HAL.capabilities.Capability;
+import HAL.exceptions.FactoryException;
 
 /**
  * The CapabilityFactory is the factory for the {@link Capability}. 
@@ -234,18 +241,11 @@ public class CapabilityFactory extends Factory{
 	public ArrayList<Capability> getAllSupportedCapabilities() throws Exception{
 		ArrayList<Capability> capabilities = new ArrayList<Capability>();
 		
-		try {
-			Row[] rows = knowledgeDBClient.executeSelectQuery(getSupportedCapabilityTypes, hal.getEquipletName());
-			for (Row row : rows) {
-				String capabilityName = (String) row.get("name");
-				capabilities.add(this.getCapabilityByName(capabilityName));
-			}
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			System.err.println("HAL::CapabilityFactory::getAllSupportedCapabilities(): Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
-			return null;
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getSupportedCapabilityTypes, hal.getEquipletName());
+		for (Row row : rows) {
+			String capabilityName = (String) row.get("name");
+			capabilities.add(this.getCapabilityByName(capabilityName));
 		}
-		
 		return capabilities;
 	}
 	/**
@@ -255,18 +255,11 @@ public class CapabilityFactory extends Factory{
 	public ArrayList<Service> getAllSupportedServices() {
 		ArrayList<Service> services = new ArrayList<Service>();
 		
-		try {
-			Row[] rows = knowledgeDBClient.executeSelectQuery(getSupportedServiceTypes, hal.getEquipletName());
-			for (Row row : rows) {
-				String serviceName = (String) row.get("serviceType");
-				services.add(new Service(serviceName));
-			}
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			System.err.println("HAL::CapabilityFactory::getAllSupportedServices(): Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
-			return null;
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getSupportedServiceTypes, hal.getEquipletName());
+		for (Row row : rows) {
+			String serviceName = (String) row.get("serviceType");
+			services.add(new Service(serviceName));
 		}
-		
 		return services;
 	}
 	/**
@@ -275,21 +268,18 @@ public class CapabilityFactory extends Factory{
 	 * @return
 	 * @throws Exception
 	 */
-	public ArrayList<Capability> getCapabilitiesForService(Service service) throws Exception{
+	public ArrayList<Capability> getCapabilitiesForService(Service service) {
 		ArrayList<Capability> capabilities = new ArrayList<Capability>();
 		
-		try {
-			Row[] rows = knowledgeDBClient.executeSelectQuery(getSupportedCapabilityTypesForServiceType, service.getName(), hal.getEquipletName());
-			for (Row row : rows) {
-				String capabilityName = (String) row.get("name");
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getSupportedCapabilityTypesForServiceType, service.getName(), hal.getEquipletName());
+		for (Row row : rows) {
+			String capabilityName = (String) row.get("name");
+			try{
 				capabilities.add(this.getCapabilityByName(capabilityName));
+			} catch (FactoryException | JarFileLoaderException ex) {
+				Logger.log(LogSection.HAL_CAPABILITY_FACTORY, LogLevel.ERROR, "Unable to get capability with name: " + capabilityName, ex);
 			}
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			System.err.println("HAL::CapabilityFactory::getCapabilitiesForService(): Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
-			return null;
 		}
-		
 		return capabilities;
 	}
 	/**
@@ -297,13 +287,21 @@ public class CapabilityFactory extends Factory{
 	 * If the capability has not been instantiated, it will be instantiated by downloading the software from the knowledge database and dynamically loading the class.
 	 * @param capabilityName
 	 * @return
-	 * @throws Exception
+	 * @throws FactoryException 
+	 * @throws JarFileLoaderException 
+	 * @throws  
 	 */
-	private Capability getCapabilityByName(String capabilityTypeName) throws Exception {
+	private Capability getCapabilityByName(String capabilityTypeName) throws FactoryException, JarFileLoaderException {
 		JavaSoftware javaSoftware = JavaSoftware.getJavaSoftwareForCapabilityName(capabilityTypeName);
 		DynamicClassDescription description = javaSoftware.getDynamicClassDescription();
-		Class<Capability> capabilityClass = dynamicClassFactory.getClassFromDescription(description);
-		return capabilityClass.getConstructor(ModuleFactory.class).newInstance(hal.getModuleFactory());
+		try {
+			Class<Capability> capabilityClass = dynamicClassFactory.getClassFromDescription(description);
+			return capabilityClass.getConstructor(ModuleFactory.class).newInstance(hal.getModuleFactory());
+		} catch (InstantiationException | IllegalAccessException
+				| IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException | InstantiateClassException ex) {
+			throw new FactoryException("well, we are fucked", ex);
+		}
 	}
 
 	/**
@@ -334,8 +332,7 @@ public class CapabilityFactory extends Factory{
 					}
 				}
 			} catch(Exception ex) {
-				System.err.println("HAL::CapabilityFactory::insertCapabilities(): Error occured while inserting capability " + ex);
-				ex.printStackTrace();
+				Logger.log(LogSection.HAL_CAPABILITY_FACTORY, LogLevel.WARNING, "Error occured while inserting capability ", ex);
 				knowledgeDBClient.getConnection().rollback();
 				knowledgeDBClient.getConnection().setAutoCommit(true);
 				return false;
@@ -384,8 +381,7 @@ public class CapabilityFactory extends Factory{
 				}
 				return capabilities;
 			} catch(Exception ex) {
-				System.err.println("HAL::CapabilityFactory::insertCapabilities(): Error occured while inserting capability " + ex);
-				ex.printStackTrace();
+				Logger.log(LogSection.HAL_CAPABILITY_FACTORY, LogLevel.WARNING, "Error occured while removing capability ", ex);
 				knowledgeDBClient.getConnection().rollback();
 				knowledgeDBClient.getConnection().setAutoCommit(true);
 				return null;
@@ -402,25 +398,20 @@ public class CapabilityFactory extends Factory{
 	 */
 	private JsonArray serializeRequiredMutations(String capabilityTypeName) {
 		HashMap<Integer, JsonObject> requiredTreesMap = new HashMap<Integer, JsonObject>();
-		try {
-			Row[] rows = knowledgeDBClient.executeSelectQuery(getRequiredMutationsForCapabilityType, 
-					capabilityTypeName);
-			for (Row row : rows) {
-				Integer treeNumber = (Integer) row.get("treeNumber");
-				String mutation = (String) row.get("mutation");
-				
-				if(requiredTreesMap.containsKey(treeNumber) == false) {
-					JsonObject tree = new JsonObject();
-					tree.addProperty("treeNumber", treeNumber);
-					tree.add("mutations", new JsonArray());
-					requiredTreesMap.put(treeNumber, tree);
-				}
-				
-				requiredTreesMap.get(treeNumber).get("mutations").getAsJsonArray().add(new JsonPrimitive(mutation));
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getRequiredMutationsForCapabilityType, 
+				capabilityTypeName);
+		for (Row row : rows) {
+			Integer treeNumber = (Integer) row.get("treeNumber");
+			String mutation = (String) row.get("mutation");
+			
+			if(requiredTreesMap.containsKey(treeNumber) == false) {
+				JsonObject tree = new JsonObject();
+				tree.addProperty("treeNumber", treeNumber);
+				tree.add("mutations", new JsonArray());
+				requiredTreesMap.put(treeNumber, tree);
 			}
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			System.err.println("HAL::ModuleFactory::serializeCalibrationData(): Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
+			
+			requiredTreesMap.get(treeNumber).get("mutations").getAsJsonArray().add(new JsonPrimitive(mutation));
 		}
 		JsonArray requiredMutationTrees = new JsonArray();
 		for (JsonObject entry : requiredTreesMap.values()) {
@@ -434,20 +425,15 @@ public class CapabilityFactory extends Factory{
 	 * @param requiredMutationTrees
 	 */
 	private void deserializeRequiredMutations(String capabilityTypeName, JsonArray requiredMutationTrees) {
-		try {
-			for (JsonElement requiredMutationTreeElement : requiredMutationTrees) {
-				JsonObject requiredMutationTree = requiredMutationTreeElement.getAsJsonObject();
-				Integer requiredMutationTreeNumber = requiredMutationTree.get("treeNumber").getAsInt();
-				JsonArray requiredMutations = requiredMutationTree.get("mutations").getAsJsonArray();
-				for (JsonElement requiredMutationElement : requiredMutations) {
-					String requiredMutation = requiredMutationElement.getAsString();
-					knowledgeDBClient.executeUpdateQuery(addRequiredMutationForCapabilityType, 
-							requiredMutationTreeNumber, capabilityTypeName, requiredMutation);
-				}
+		for (JsonElement requiredMutationTreeElement : requiredMutationTrees) {
+			JsonObject requiredMutationTree = requiredMutationTreeElement.getAsJsonObject();
+			Integer requiredMutationTreeNumber = requiredMutationTree.get("treeNumber").getAsInt();
+			JsonArray requiredMutations = requiredMutationTree.get("mutations").getAsJsonArray();
+			for (JsonElement requiredMutationElement : requiredMutations) {
+				String requiredMutation = requiredMutationElement.getAsString();
+				knowledgeDBClient.executeUpdateQuery(addRequiredMutationForCapabilityType, 
+						requiredMutationTreeNumber, capabilityTypeName, requiredMutation);
 			}
-		} catch (KnowledgeException ex) {
-			System.err.println("HAL::CapabilityFactory::deserializeRequiredMutations(): Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
 		}
 	}
 }

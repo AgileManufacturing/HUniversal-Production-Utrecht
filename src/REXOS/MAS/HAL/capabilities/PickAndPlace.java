@@ -36,20 +36,20 @@ package HAL.capabilities;
 
 import java.util.ArrayList;
 
-import libraries.dynamicloader.JarFileLoaderException;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
+import libraries.utillities.log.LogLevel;
+import libraries.utillities.log.LogSection;
+import libraries.utillities.log.Logger;
 import HAL.ModuleActor;
 import HAL.exceptions.CapabilityException;
-import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 import HAL.steps.ProductStep;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * Pick and place capability class that translate
@@ -67,10 +67,11 @@ public class PickAndPlace extends Capability {
 	}
 
 	/**
+	 * @throws ModuleTranslatingException 
 	 * @see Capability#translateProductStep(ProductStep)
 	 */
 	@Override
-	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws FactoryException, JarFileLoaderException, CapabilityException {
+	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws CapabilityException {
 		// TODO Auto-generated method stub
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<>();
 		String serviceName = productStep.getService().getName();
@@ -78,9 +79,9 @@ public class PickAndPlace extends Capability {
 		JsonObject target = productStepCriteria.get("target").getAsJsonObject();
 		JsonArray subjects = productStepCriteria.get("subjects").getAsJsonArray();
 		
-		System.out.println(productStep.getCriteria());
+		Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "productStep criteria " + productStep.getCriteria());
 		if(serviceName.equals("place") && subjects != null && target != null){	
-			for(int i = 0; i<subjects.getAsJsonArray().size();i++){
+			for(int i = 0; i < subjects.getAsJsonArray().size(); i++){
 				JsonObject subjectMoveCommand = subjects.getAsJsonArray().get(i).getAsJsonObject().get("move").getAsJsonObject();
 				
 				JsonObject pickCommand = new JsonObject();
@@ -110,21 +111,12 @@ public class PickAndPlace extends Capability {
 				CompositeStep place = new CompositeStep(productStep, command);
 				
 				ArrayList<ModuleActor> modules = moduleFactory.getBottomModulesForFunctionalModuleTree(this, 1);
-				//System.out.println(modules);
-				for (ModuleActor moduleActor : modules) {
-					try {
-						
-						hardwareSteps.addAll(moduleActor.translateCompositeStep(pick));
-						hardwareSteps.addAll(moduleActor.translateCompositeStep(place));
-						
-					} catch (ModuleTranslatingException ex) {
-						
-						throw new CapabilityException(ex.toString(), ex);
-					}
-					
-				}
+				ArrayList<CompositeStep> capabilities = new ArrayList<CompositeStep>();
+				capabilities.add(pick);
+				capabilities.add(place);
+				hardwareSteps.addAll(translateCompositeStep(modules, capabilities));
 				
-				System.out.println(hardwareSteps.toString());
+				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.INFORMATION, "Translated hardware steps: " + hardwareSteps.toString());
 			}
 		}
 			

@@ -4,7 +4,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import libraries.blackboard_client.data_classes.GeneralMongoException;
-import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.math.Vector3;
 import HAL.ModuleActor;
@@ -34,7 +33,7 @@ public class Gripper extends ModuleActor {
 	}
 
 	@Override
-	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException {
+	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 		JsonObject jsonCommand = compositeStep.getCommand();
 		JsonObject command = jsonCommand.remove(COMMAND).getAsJsonObject();
