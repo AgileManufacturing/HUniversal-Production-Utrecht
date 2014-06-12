@@ -4,9 +4,9 @@ import generic.ProductStep;
 
 import java.util.ArrayList;
 
-import libraries.utillities.log.LogLevel;
-import libraries.utillities.log.LogSection;
-import libraries.utillities.log.Logger;
+import libraries.log.LogLevel;
+import libraries.log.LogSection;
+import libraries.log.Logger;
 import HAL.capabilities.Capability;
 import HAL.exceptions.CapabilityException;
 import HAL.factories.CapabilityFactory;

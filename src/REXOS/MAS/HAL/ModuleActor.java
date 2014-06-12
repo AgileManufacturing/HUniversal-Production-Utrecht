@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import com.google.gson.JsonObject;
 
 import HAL.exceptions.FactoryException;
-import HAL.exceptions.HardwareAbstractionLayerProcessException;
 import HAL.exceptions.ModuleExecutingException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
@@ -14,18 +13,16 @@ import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
-import libraries.blackboard_client.BlackboardClient;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.blackboard_client.data_classes.InvalidJSONException;
-import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.math.Matrix;
 import libraries.math.RotationAngles;
 import libraries.math.Vector3;
-import libraries.utillities.log.LogLevel;
-import libraries.utillities.log.LogSection;
-import libraries.utillities.log.Logger;
+import libraries.log.LogLevel;
+import libraries.log.LogSection;
+import libraries.log.Logger;
 /**
  * Abstract representation of a actor module in HAL 
  * @author Bas Voskuijlen

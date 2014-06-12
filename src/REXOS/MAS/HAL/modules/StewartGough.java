@@ -4,7 +4,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import libraries.blackboard_client.data_classes.GeneralMongoException;
-import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;

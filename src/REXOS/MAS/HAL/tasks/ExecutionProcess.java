@@ -2,9 +2,9 @@ package HAL.tasks;
 
 import java.util.ArrayList;
 
-import libraries.utillities.log.LogLevel;
-import libraries.utillities.log.LogSection;
-import libraries.utillities.log.Logger;
+import libraries.log.LogLevel;
+import libraries.log.LogSection;
+import libraries.log.Logger;
 import HAL.Module;
 import HAL.exceptions.HardwareAbstractionLayerProcessException;
 import HAL.factories.ModuleFactory;

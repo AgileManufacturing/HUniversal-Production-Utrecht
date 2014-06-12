@@ -4,10 +4,9 @@ import generic.ProductStep;
 
 import java.util.ArrayList;
 
-import libraries.dynamicloader.JarFileLoaderException;
-import libraries.utillities.log.LogLevel;
-import libraries.utillities.log.LogSection;
-import libraries.utillities.log.Logger;
+import libraries.log.LogLevel;
+import libraries.log.LogSection;
+import libraries.log.Logger;
 import HAL.ModuleActor;
 import HAL.exceptions.CapabilityException;
 import HAL.exceptions.FactoryException;

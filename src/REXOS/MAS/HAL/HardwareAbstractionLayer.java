@@ -10,16 +10,11 @@ import com.google.gson.JsonObject;
 
 import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
-import libraries.utillities.log.LogLevel;
-import libraries.utillities.log.LogSection;
-import libraries.utillities.log.Logger;
-import HAL.capabilities.Capability;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.InvalidMastModeException;
 import HAL.factories.CapabilityFactory;
 import HAL.factories.ModuleFactory;
-import HAL.listeners.BlackboardListener;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ModuleListener;
 import HAL.steps.HardwareStep;

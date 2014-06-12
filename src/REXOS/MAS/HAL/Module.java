@@ -5,8 +5,6 @@ import HAL.factories.ModuleFactory;
 import HAL.listeners.BlackboardListener;
 import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
-import libraries.dynamicloader.JarFileLoaderException;
-import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.knowledgedb_client.Row;

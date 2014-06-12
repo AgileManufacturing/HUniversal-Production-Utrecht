@@ -12,9 +12,9 @@ import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.blackboard_client.data_classes.InvalidJSONException;
 import libraries.blackboard_client.data_classes.MongoOperation;
 import libraries.blackboard_client.data_classes.OplogEntry;
-import libraries.utillities.log.LogLevel;
-import libraries.utillities.log.LogSection;
-import libraries.utillities.log.Logger;
+import libraries.log.LogLevel;
+import libraries.log.LogSection;
+import libraries.log.Logger;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.listeners.BlackboardListener;
 

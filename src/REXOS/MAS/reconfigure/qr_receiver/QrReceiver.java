@@ -48,9 +48,9 @@ import javax.jws.WebService;
 
 import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
-import libraries.utillities.log.LogLevel;
-import libraries.utillities.log.LogSection;
-import libraries.utillities.log.Logger;
+import libraries.log.LogLevel;
+import libraries.log.LogSection;
+import libraries.log.Logger;
 import reconfigure.ModuleDataManager;
 import reconfigure.datatypes.ModuleTree;
 import HAL.HardwareAbstractionLayer;

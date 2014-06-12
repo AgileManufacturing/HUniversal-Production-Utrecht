@@ -2,9 +2,7 @@ package HAL;
 
 import java.util.ArrayList;
 
-import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
-import libraries.knowledgedb_client.KnowledgeException;
 import libraries.knowledgedb_client.Row;
 
 import com.google.gson.JsonArray;

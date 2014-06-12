@@ -7,9 +7,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 
-import libraries.utillities.log.LogLevel;
-import libraries.utillities.log.LogSection;
-import libraries.utillities.log.Logger;
+import libraries.log.LogLevel;
+import libraries.log.LogSection;
+import libraries.log.Logger;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -29,7 +29,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static HardwareAbstractionLayer hal;
 	static BlackboardHandler blackboardUpdated;
 	
-	static final String baseDir = "/home/agileman/Desktop/";
+	static final String baseDir = "/home/t/Desktop/";
 	
 	// delta robot
 	static String moduleA_01 = "{"

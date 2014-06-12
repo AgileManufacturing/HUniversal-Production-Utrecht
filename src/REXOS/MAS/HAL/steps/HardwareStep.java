@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import HAL.Module;
 import HAL.ModuleIdentifier;
-import HAL.capabilities.Capability;
 
 import com.google.gson.JsonObject;
 

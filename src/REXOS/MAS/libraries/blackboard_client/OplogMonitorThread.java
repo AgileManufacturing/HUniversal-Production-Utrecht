@@ -33,8 +33,8 @@ import java.util.ArrayList;
 
 import libraries.blackboard_client.data_classes.BlackboardSubscription;
 import libraries.blackboard_client.data_classes.OplogEntry;
-import libraries.utillities.log.LogLevel;
-import libraries.utillities.log.Logger;
+import libraries.log.LogLevel;
+import libraries.log.Logger;
 
 import com.mongodb.Bytes;
 import com.mongodb.DB;

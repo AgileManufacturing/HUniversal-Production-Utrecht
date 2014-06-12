@@ -1,10 +1,11 @@
 /**
- * @file src/REXOS/MAS/libraries/utillities/log/Logger.java
+ * @file src/REXOS/MAS/libraries/log/Logger.java
  * @brief Helper for log messages, providing a single point for controlling program origin.
  * @date Created: 17 mei 2013
  *
  * @author Jan-Willem Willebrands
  * @author Alexander Streng
+ * @author Tommas Bakker
  *
  * @section LICENSE
  * License: newBSD
@@ -28,10 +29,7 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package libraries.utillities.log;
-
-import jade.core.AID;
-import jade.lang.acl.ACLMessage;
+package libraries.log;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -41,16 +39,29 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
  * Helper for log messages, providing a single point for controlling program origin.
  **/
 public class Logger {
+	enum LogSectionSelection {
+		INCLUDED,
+		EXCLUDED,
+		UNDEFINED;
+	}
+	
 	protected static final Character stuffCharacter = ' ';
+	protected static final String logFileSeperator = "\n" + 
+			"##############################################################################" + 
+			"##############################################################################\n" + 
+			"##############################################################################" + 
+			"##############################################################################\n" + 
+			"##############################################################################" + 
+			"##############################################################################\n\n";
 	protected static final SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss.SSS");
 	protected static final long relativeTimeReferenceTime = Calendar.getInstance().getTimeInMillis();
 	
@@ -58,8 +69,11 @@ public class Logger {
 	protected static BufferedWriter logFileBufferedWriter = null;
 	protected static final File logFile = new File("log.txt");
 	
-	protected static final boolean isPrintToConsoleEnabled = true;
-	protected static final boolean isPrintToLogFileEnabled = false;
+	protected static boolean isPrintToConsoleEnabled = true;
+	protected static boolean isPrintToLogFileEnabled = true;
+	protected static boolean printLogSectionsWithUndefinedSelections = true;
+	protected static boolean eraseLogFileOnStartup = false;
+	protected static boolean seperateStartupInLogFile = true;
 	
 	protected static boolean useRelativeTime = false;
 	protected static boolean logTime = true;
@@ -71,49 +85,9 @@ public class Logger {
 	protected static boolean logObjects = true;
 	
 	
-
-
-	public static final int loglevelThreshold = LogLevel.DEBUG.getLevel();
-
-
-	/*static {
-		String msgsFilePath = System.getenv(PATH_ENVIRONMENT_VARIABLE);
-		if (msgsFilePath != null){
-			File dir = new File (msgsFilePath);
-			if(dir.exists()) {
-				System.out.println("Log Directory detected - Removing old log files");
-				String[] files = dir.list();
-				
-				for(String filename : files) {
-						File file = new File(filename);
-						if (file.exists()){	
-							file.delete();					
-						}
-				}
-			}
-			else{
-				dir.mkdirs();
-			}
-		}
-	}*/
-	
-
-
-
-	public static boolean eraseLogFile(){
-		if(logFile.exists())	return logFile.delete();
-		else					return false;
-	}
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	protected static LogSection[] includedLogSections = new LogSection[] {LogSection.NONE, LogSection.HAL};
+	protected static LogSection[] excludedLogSections = new LogSection[] {};
+	protected static LogLevel loglevelThreshold = LogLevel.DEBUG;
 	
 	
 	public static void log(String message) {
@@ -139,15 +113,36 @@ public class Logger {
 	}
 	
 	protected static void handleLogEntry(LogSection logSection, LogLevel logLevel, String message, Object[] objects) {
-		String serializedLogEntry = serializeLogEntry(logSection, logLevel, message, objects);
-		if(isPrintToConsoleEnabled == true) {
-			printToOut(logLevel, serializedLogEntry);
-		}
-		if(isPrintToLogFileEnabled == true) {
-			printToFile(serializedLogEntry);
+		boolean logLevelAboveThreshold = calculateLogLevelAboveThreshold(logLevel);
+		LogSectionSelection selection = calculateLogSectionSelection(logSection);
+		
+		if(logLevelAboveThreshold == true && (selection == LogSectionSelection.INCLUDED || 
+				(selection == LogSectionSelection.UNDEFINED && printLogSectionsWithUndefinedSelections == true)
+				)) {
+			String serializedLogEntry = serializeLogEntry(logSection, logLevel, message, objects);
+			if(isPrintToConsoleEnabled == true) {
+				printToOut(logLevel, serializedLogEntry);
+			}
+			if(isPrintToLogFileEnabled == true) {
+				printToFile(serializedLogEntry);
+			}
 		}
 	}
-	
+	private static boolean calculateLogLevelAboveThreshold(LogLevel logLevel) {
+		if(logLevel.getLevel() >= loglevelThreshold.getLevel()) return true;
+		else return false;
+	}
+	private static LogSectionSelection calculateLogSectionSelection(LogSection logSection) {
+		LogSection currentLogSection = logSection;
+		// search the tree of logSections to determine the selection of the logSection
+		while(currentLogSection != null) {
+			if(ArrayUtils.contains(includedLogSections, currentLogSection) == true) return LogSectionSelection.INCLUDED;
+			if(ArrayUtils.contains(excludedLogSections, currentLogSection) == true) return LogSectionSelection.EXCLUDED;
+			currentLogSection = currentLogSection.getParentSection();
+		}
+		return LogSectionSelection.UNDEFINED;
+	}
+
 	protected static int calulateMaxLengthOfLogSection() {
 		int maxLength = 0;
 		for (LogSection logSection : LogSection.values()) {
@@ -215,7 +210,7 @@ public class Logger {
 			String methodName = Thread.currentThread().getStackTrace()[4].getMethodName();
 			String fileName = 	Thread.currentThread().getStackTrace()[4].getFileName();
 			int lineNumber = 	Thread.currentThread().getStackTrace()[4].getLineNumber();
-			String sourceSegment = "@" + className + "." + methodName + "(" + fileName + ":" + lineNumber + ")";
+			String sourceSegment = "@ " + className + "." + methodName + "(" + fileName + ":" + lineNumber + ")";
 			output += sourceSegment;
 			// a new line is required, but we also have to make sure that stuffing is done if needed. So set the newLineRequired
 			newLineRequired = true;
@@ -300,36 +295,49 @@ public class Logger {
 	}
 
 	/** 
-	 * Writes the specified message to the gridLog.txt using the BufferedWriter and FileWriter, also adding the class the Logger was called from.
-	 * @param level The LoggerLevel of the message
-	 * @param msg A format string as described in http://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
-	 * @param hasThrowable PrintToOut already looks for a Throwable, it sets a boolean 
+	 * Writes the serialized logEntry message to the logFile using the BufferedWriter and FileWriter.
+	 * If the logFile was not yet created, it will be created.
 	 **/
 	private static void printToFile(String serializedLogEntry){
-		if(logFileFileWriter == null) {
-			// first time we write a entry to the logFile, so we need to create the writers
-			try {
+		try {
+			if(logFileFileWriter == null) {
+				// first time we write a entry to the logFile, so we need to create the writers
 				if(logFile.exists() == false) {
 					logFile.createNewFile();
+				} else if(eraseLogFileOnStartup == true) {
+					eraseLogFile();
+				} else if(seperateStartupInLogFile == true) {
+					logFileFileWriter = new FileWriter(logFile, true);
+					logFileBufferedWriter = new BufferedWriter(logFileFileWriter);
+					logFileBufferedWriter.write(logFileSeperator);
+				} else {
+					logFileFileWriter = new FileWriter(logFile, true);
+					logFileBufferedWriter = new BufferedWriter(logFileFileWriter);
 				}
-				logFileFileWriter = new FileWriter(logFile, true);
-				logFileBufferedWriter = new BufferedWriter(logFileFileWriter);
-				
-				logFileBufferedWriter.write(serializedLogEntry);
-				
-				
-			} catch (IOException ex) {
-				System.err.println("Logger was unable to write to logFile:");
-				ex.printStackTrace();
-			} finally {
-				try {
-					//Close the writer regardless of what happens...
-					logFileBufferedWriter.close();
-					logFileFileWriter.close();
-				} catch (Exception ex) {
-					//Well ... we tried ...
-				}
+			}
+			logFileBufferedWriter.write(serializedLogEntry);
+			// mimic println by adding a new line at the end of every logEntry
+			logFileBufferedWriter.write("\n");
+			
+			// always flush the streams to make sure that the content has been written
+			logFileBufferedWriter.flush();
+			logFileFileWriter.flush();
+		} catch (IOException ex) {
+			System.err.println("Logger was unable to write to logFile:");
+			ex.printStackTrace();
+			
+			try {
+				logFileBufferedWriter.close();
+				logFileFileWriter.close();
+			} catch (Exception ex2) {
+				System.err.println("Logger was unable to close the logFile:");
+				ex2.printStackTrace();
 			}
 		}
 	}
+	public static boolean eraseLogFile(){
+		if(logFile.exists()) return logFile.delete();
+		else return false;
+	}
+	
 }

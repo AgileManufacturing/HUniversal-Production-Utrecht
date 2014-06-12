@@ -5,7 +5,6 @@ import java.util.HashMap;
 import libraries.dynamicloader.DynamicClassDescription;
 import libraries.dynamicloader.JarFileLoader;
 import libraries.dynamicloader.JarFileLoaderException;
-import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.knowledgedb_client.Row;
