@@ -32,7 +32,7 @@ package libraries.knowledgedb_client;
 /**
  * Thrown when connecting to or reading from the knowledge database fails.
  **/
-public class KnowledgeException extends Exception {
+public class KnowledgeException extends RuntimeException {
 
 	/**
 	 * @var long serialVersionUID
