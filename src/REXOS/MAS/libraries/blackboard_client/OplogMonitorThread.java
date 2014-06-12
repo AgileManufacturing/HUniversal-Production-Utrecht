@@ -158,15 +158,15 @@ class OplogMonitorThread extends Thread {
 			 * MongoException.CursorNotFound indicates the cursor was killed while blocking on hasNext.
 			 * We purposely kill the cursor when the OplogMonitorThread is interrupted, thus expect this to happen.
 			 */
-			Logger.log(LogLevel.ERROR,"OplogMonitorThread ending due to %s:\n%s\n", ex.getClass().getName(), ex.getMessage());
+			Logger.log(LogLevel.ERROR, "OplogMonitorThread ending due to exception: ", ex);
 		} finally {
 			try {
 				if (tailedCursor != null) {
 					tailedCursor.close();
 				}
-			} catch (Throwable t) {
+			} catch (Exception ex) {
 				// If closing the cursor throws something, it's most likely not something we can fix.
-				Logger.log(LogLevel.ERROR, "%s thrown while closing cursor:\n%s\n", t.getClass().getName(), t.getMessage());
+				Logger.log(LogLevel.ERROR, "Exception thrown while closing cursor", ex);
 			}
 			//
 		}
