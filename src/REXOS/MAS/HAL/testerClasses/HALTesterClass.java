@@ -28,7 +28,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static HardwareAbstractionLayer hal;
 	static BlackboardHandler blackboardUpdated;
 	
-	static final String baseDir = "/home/t/Desktop/";
+	static final String baseDir = "/home/agileman/Desktop/";
 	
 	// delta robot
 	static String moduleA_01 = "{"
@@ -369,7 +369,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		String base64PickAndPlace = new String(Base64.encodeBase64(content));
 		
 		
-		/*// deltarobot
+		// deltarobot
 		String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64DeltaRobot + moduleA_03 + base64Draw + moduleA_04 + base64PickAndPlace + moduleA_05; 
 		JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
 		hal.insertModule(a, a);
@@ -397,7 +397,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		// workplane
 		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64Pen + moduleE_03;
 		JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
-		hal.insertModule(e, e);*/
+		hal.insertModule(e, e);
 		
 		
 		JsonObject criteria = new JsonObject();

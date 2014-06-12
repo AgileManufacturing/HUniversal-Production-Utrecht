@@ -68,5 +68,7 @@ public class MessageType {
  
  public static final int SUPPLIER_REQUEST_REPLY= ACLMessage.AGREE; // Send By EquipletAgent
 
+ public static final int PULSE_UPDATE= ACLMessage.FAILURE; // Send By Monitoring Agent
+
 
 }

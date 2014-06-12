@@ -6,9 +6,9 @@
  *           .MMMMMMM#=`.gNMMMMM.       \_| \_|\____/\/   \/ \___/ \____/
  *             7HMM9`   .MMMMMM#`		
  *                     ...MMMMMF .      
- *         dN.       .jMN, TMMM`.MM     	@file 	EQSpawnClass
- *         .MN.      MMMMM;  ?^ ,THM		@brief 	This class is responsible for creating the EquipletAgent.
- *          dM@      dMMM3  .ga...g,    	@date Created:	2014-05-20
+ *         dN.       .jMN, TMMM`.MM     	@file 	ServerConfigurations
+ *         .MN.      MMMMM;  ?^ ,THM		@brief 	This AgentBehaviour is asking for a new update from every equiplet. This happens every 10 seconds.
+ *          dM@      dMMM3  .ga...g,    	@date Created:	2014-06-06
  *       ..MMM#      ,MMr  .MMMMMMMMr   
  *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Tom Oosterwijk
  *   .dMMMMMF           7Y=d9  dMMMMMr    
@@ -36,18 +36,51 @@
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
+package grid_server;
 
+import java.util.ArrayList;
 
-public class PASpawnClass {
+import jade.core.AID;
+import jade.core.Agent;
+import jade.core.behaviours.TickerBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.lang.acl.ACLMessage;
 
-	public static void main(String[] args) throws Exception {
-		ProductAgentSpawnerAgent PA = new ProductAgentSpawnerAgent();
-		String argu = "";
-		for(int i =0; i < args.length; i++){
-			argu += args[i];
-		}
-		PA.sendMessage(argu, 1);
+public class HeartBeatBehaviour extends TickerBehaviour {
+	private final String pulseMessage = "Update status";
+	Agent a;
+	public HeartBeatBehaviour(Agent a, long period) {
+		super(a, period);
+		this.a = a;
+	}
 
+	@Override
+	protected void onTick() {
+		DFAgentDescription dfd = new DFAgentDescription();
 		
+		try {
+			DFAgentDescription[] equipletAgents;
+			equipletAgents = DFService.search(a, dfd);
+			for(int i =0; i < equipletAgents.length; i++){
+				AID aid = equipletAgents[i].getName();
+				sendMessage(MessageType.PULSE_UPDATE, myAgent.getAID(), aid, pulseMessage, "meta");
+			}
+			System.out.println(equipletAgents.length + " size of found EA");
+		}catch (FIPAException e) {
+			System.out.println("DF Search Error");
+			e.printStackTrace();
+		}
+	}
+	
+	private void sendMessage(int messageType, AID sender, AID receiver, String content, String language){
+		ACLMessage message = new ACLMessage( messageType );
+		message.setSender(sender);
+		message.addReceiver(receiver);
+		message.setLanguage(language);
+		message.setContent(content);
+		myAgent.send(message);
 	}
 }

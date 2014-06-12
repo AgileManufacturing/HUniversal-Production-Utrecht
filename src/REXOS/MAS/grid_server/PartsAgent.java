@@ -57,11 +57,9 @@ public class PartsAgent extends Agent{
 	private static double[] lookUpTable = new double[32];
 	
 	private static final long serialVersionUID = 1L;
-	private static final double maxStep = 17.0;
+	private static final double maxStep = 16.5;
 	private static final double smallStep = 5.5;
 	private static String targetCrate = "GC4x4MB_6";
-	double offsetX = -2.0;
-	double offsetY = 1.6;
 	
 	private static String[] GC4x4MB_1 = new String[16];
 	private static String[] GC4x4MB_4 = new String[16];
@@ -69,19 +67,19 @@ public class PartsAgent extends Agent{
 	protected void setup(){	
 		
 		
-		lookUpTable[0]=-17.0;
-		lookUpTable[1]=17.0;
+		lookUpTable[0]=-16.5;
+		lookUpTable[1]=16.5;
 		
 		lookUpTable[2]=-5.5;
-		lookUpTable[3]=17.0;
+		lookUpTable[3]=16.5;
 		
 		lookUpTable[4]=5.5;
-		lookUpTable[5]=17.0;
+		lookUpTable[5]=16.5;
 		
-		lookUpTable[6]=17.0;
-		lookUpTable[7]=17.0;
+		lookUpTable[6]=16.5;
+		lookUpTable[7]=16.5;
 		
-		lookUpTable[8]=-17.0;
+		lookUpTable[8]=-16.5;
 		lookUpTable[9]=5.5;
 		
 		lookUpTable[10]=-5.5;
@@ -90,10 +88,10 @@ public class PartsAgent extends Agent{
 		lookUpTable[12]=5.5;
 		lookUpTable[13]=5.5;
 		
-		lookUpTable[14]=17.0;
+		lookUpTable[14]=16.5;
 		lookUpTable[15]=5.5;
 		
-		lookUpTable[16]=-17.0;
+		lookUpTable[16]=-16.5;
 		lookUpTable[17]=-5.5;
 		
 		lookUpTable[18]=-5.5;
@@ -102,20 +100,20 @@ public class PartsAgent extends Agent{
 		lookUpTable[20]=5.5;
 		lookUpTable[21]=-5.5;
 		
-		lookUpTable[22]=17.0;
+		lookUpTable[22]=16.5;
 		lookUpTable[23]=-5.5;
 		
-		lookUpTable[24]=-17.0;
-		lookUpTable[25]=-17.0;
+		lookUpTable[24]=-16.5;
+		lookUpTable[25]=-16.5;
 		
 		lookUpTable[26]=-5.5;
-		lookUpTable[27]=-17.0;
+		lookUpTable[27]=-16.5;
 		
 		lookUpTable[28]=5.5;
-		lookUpTable[29]=-17.0;
+		lookUpTable[29]=-16.5;
 		
-		lookUpTable[30]=17.0;
-		lookUpTable[31]=-17.0;
+		lookUpTable[30]=16.5;
+		lookUpTable[31]=-16.5;
 		for(int i = 0; i < 16; i++){
 			GC4x4MB_1[i]="";
 			GC4x4MB_4[i]="";
@@ -170,9 +168,9 @@ public class PartsAgent extends Agent{
 		if(color.equals("red")){
 			for(int i =0; i < GC4x4MB_3.length; i++){
 				if(GC4x4MB_3[i].equals("red")){
-					subjectMove.addProperty("x", (lookUpTable[(i*2)]+offsetX));
-					subjectMove.addProperty("y", (lookUpTable[(i*2)+1]+offsetY));
-					subjectMove.addProperty("z", "-16.5");					
+					subjectMove.addProperty("x", (lookUpTable[(i*2)]));
+					subjectMove.addProperty("y", (lookUpTable[(i*2)+1]));
+					subjectMove.addProperty("z", "-26.5");					
 					subject.add("move",subjectMove);
 					subject.addProperty("identifier", "GC4x4MB_3");
 					subjects.add(subject);
@@ -185,9 +183,9 @@ public class PartsAgent extends Agent{
 			for(int i =0; i < GC4x4MB_1.length; i++){	
 				if(GC4x4MB_1[i].equals("blue")){
 					subjectMove.addProperty("identifier", "GC4x4MB_1");
-					subjectMove.addProperty("x", (lookUpTable[(i*2)]+offsetX));
-					subjectMove.addProperty("y", (lookUpTable[(i*2)+1]+offsetY));
-					subjectMove.addProperty("z", "-16.5");
+					subjectMove.addProperty("x", (lookUpTable[(i*2)]));
+					subjectMove.addProperty("y", (lookUpTable[(i*2)+1]));
+					subjectMove.addProperty("z", "-26.5");
 					subject.add("move",subjectMove);
 					subject.addProperty("identifier", "GC4x4MB_1");
 					subjects.add(subject);
@@ -200,9 +198,9 @@ public class PartsAgent extends Agent{
 			for(int i =0; i < GC4x4MB_4.length; i++){	
 				if(GC4x4MB_4[i].equals("green")){
 					subjectMove.addProperty("identifier", "GC4x4MB_4");
-					subjectMove.addProperty("x", (lookUpTable[(i*2)]+offsetX));
-					subjectMove.addProperty("y", (lookUpTable[(i*2)+1]+offsetY));
-					subjectMove.addProperty("z", "-16.5");
+					subjectMove.addProperty("x", (lookUpTable[(i*2)]));
+					subjectMove.addProperty("y", (lookUpTable[(i*2)+1]));
+					subjectMove.addProperty("z", "-26.5");
 					subject.add("move",subjectMove);
 					subject.addProperty("identifier", "GC4x4MB_4");
 					subjects.add(subject);

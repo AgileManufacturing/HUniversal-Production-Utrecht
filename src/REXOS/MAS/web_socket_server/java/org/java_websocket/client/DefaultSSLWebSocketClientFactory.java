@@ -41,11 +41,13 @@ public class DefaultSSLWebSocketClientFactory implements WebSocketClientFactory 
 		return new SSLSocketChannel2( channel, e, exec, key );
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public WebSocketImpl createWebSocket( WebSocketAdapter a, Draft d, Socket c ) {
 		return new WebSocketImpl( a, d, c );
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public WebSocketImpl createWebSocket( WebSocketAdapter a, List<Draft> d, Socket s ) {
 		return new WebSocketImpl( a, d, s );

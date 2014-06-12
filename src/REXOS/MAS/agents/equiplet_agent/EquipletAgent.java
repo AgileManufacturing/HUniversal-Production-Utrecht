@@ -89,6 +89,49 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	private HardwareAbstractionLayer hal;
 	
 	
+	
+	/**
+	  * @var serverLists
+	  * The string serverLists Holds all the services that the equiplet can exectute.
+	  * This variable is used in the WIMP.
+	  */
+	private String serverLists = "";
+	
+	
+	/**
+	  * @var EQName
+	  * Hardcoded EquipletName. This should be changed in the future.
+	  */
+	private String EQName = "EQ2";
+	
+	/**
+	  * @var equipletActive
+	  * The boolean equipletActive keeps track wether or not the equiplet is currently in use or not.
+	  * This information is displayed in the WIMP.
+	  */
+	private boolean equipletActive = false;
+	
+	/**
+	  * @var productStepCounter
+	  * The productStepCounter keeps track off all the planned productSteps.
+	  * This information is displayed in the WIMP.
+	  */
+	private int productStepCounter = 0;
+	
+	/**
+	  * @var productStepFailedCounter
+	  * The productStepFailedCounter keeps track off all the failed productSteps.
+	  * This information is displayed in the WIMP.
+	  */
+	private int productStepFailedCounter =0;
+	
+	/**
+	  * @var productStepSuccesCounter
+	  * The productStepSuccesCounter keeps track off all the successfully executed productSteps.
+	  * This information is displayed in the WIMP.
+	  */
+	private int productStepSuccesCounter =0;
+	
 	/**
 	  * setup()
 	  * The function setup creates the HAL object and initialized the serviceList.
@@ -112,6 +155,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	        sd.setName( serviceList.get(i).getName() );
 	        sd.setType(serviceList.get(i).getName());
 	        dfd.addServices(sd);
+	        serverLists += serviceList.get(i).getName() +",";
 		}
 		try {
 			DFService.register(this, dfd );
@@ -144,6 +188,37 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
     	                    reply.setPerformative( MessageType.CONFIRM_PLANNED );
     	                    reply.setContent(result);
     	                    send(reply);                    		
+                    	}
+                    	if(msg.getPerformative()==MessageType.PULSE_UPDATE){
+                    		
+                    		//This is the update information for the WIMP!
+                    		JsonObject equipletUpdate = new JsonObject();
+                    		equipletUpdate.addProperty("receiver", "interface");
+                    		equipletUpdate.addProperty("subject", "update_equiplet");
+                    		equipletUpdate.addProperty("id", EQName);
+                    		equipletUpdate.addProperty("services", serverLists);
+                    		JsonObject status = new JsonObject();
+                    		status.addProperty("type", "success");
+                    		status.addProperty("content", "NORMAL");
+                    		equipletUpdate.add("status", status);
+                    		
+                    		JsonObject mode = new JsonObject();
+                    		mode.addProperty("type", "success");
+                    		mode.addProperty("content", "NORMAL");
+                    		equipletUpdate.add("mode", mode);
+
+                    		JsonObject equipletDetails = new JsonObject();
+                    		equipletDetails.addProperty("status", equipletActive);
+                    		equipletDetails.addProperty("plannedSteps", productStepCounter);
+                    		equipletDetails.addProperty("successfulSteps", productStepSuccesCounter);
+                    		equipletDetails.addProperty("failedSteps", productStepFailedCounter);
+                    		
+                    		equipletUpdate.add("details", equipletDetails);
+                    		
+                    		ACLMessage reply = msg.createReply();
+    	                    reply.setPerformative( MessageType.PULSE_UPDATE );
+    	                    reply.setContent(equipletUpdate.toString());
+    	                    send(reply);
                     	}
 					}
 				}
@@ -184,6 +259,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		JsonObject productSteps = new JsonParser().parse(msg).getAsJsonObject();
 		Job job = new Job(productSteps.get("startTime").getAsString(),productSteps.get("duration").getAsString(),productSteps.get("productStepId").getAsString(),productSteps.get("productStep").getAsJsonObject());
     	equipletSchedule.add(job);
+    	productStepCounter++;
 		System.out.println(equipletSchedule.size()+" =Length");
 		if(scheduleCounter == 0){
 			executeProductStep();
@@ -212,22 +288,26 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	  */
 	private void executeProductStep(){
 		if(scheduleCounter < equipletSchedule.size()){
+			equipletActive = true;
 			System.out.println("Execute PS");
 			hal.translateProductStep(equipletSchedule.get(scheduleCounter).getProductStep());	
 			scheduleCounter++;
 		}else{
+			equipletActive=false;
 			scheduleCounter=0;
 			equipletSchedule.clear();
 		}
 	}
 
 	@Override
-	public void onProcessStatusChanged(String state, long hardwareStepSerialId,
-			Module module, HardwareStep hardwareStep) {
-		if(state.equals("FAILED")){
-			//executeProductStep();
+	public void onProcessStatusChanged(String status, Module module, HardwareStep hardwareStep) {
+		if(status.equals("FAILED")){
+			equipletActive=false;
+			scheduleCounter=0;
+			equipletSchedule.clear();
 			//Notify Product that failed and remove from schedule.
 			//Log that process execute failed.
+			productStepFailedCounter++;
 		}
 	}
 
@@ -252,29 +332,30 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	@Override
-	public void onIncapableCapabilities(ProductStep productStep) {
+	public void onTranslationFailed(ProductStep productStep) {
 	}
 
 	@Override
 	public void onExecutionFinished() {
 		System.out.println("Hardware Step Executed");
+		productStepSuccesCounter++;
 		executeProductStep();		
 	}
 
 	@Override
 	public String getEquipletName() {
 		// TODO Auto-generated method stub
-		return "EQ2";
+		return EQName;
 	}
 
 	@Override
-	public void onEquipletStateChanged(String state, Module module) {
+	public void onEquipletStateChanged(String state) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onEquipletModeChanged(String mode, Module module) {
+	public void onEquipletModeChanged(String mode) {
 		// TODO Auto-generated method stub
 		
 	}

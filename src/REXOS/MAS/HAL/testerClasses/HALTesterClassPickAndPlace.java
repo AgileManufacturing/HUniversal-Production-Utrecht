@@ -31,7 +31,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	static JsonObject criteria1 = new JsonObject();
 	boolean state = false;
 	
-	static final String baseDir = "/home/t/Desktop/";
+	static final String baseDir = "/home/agileman/Desktop/";
 	
 	// delta robot
 	static String moduleA_01 = "{"
@@ -106,7 +106,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			+ "				]"
 			+ "			},"
 			+ "			{"
-			+ "				\"name\":\"Place\","
+			+ "				\"name\":\"PickAndPlace\","
 			+ "				\"treeNumber\":1,"
 			+ "				\"halSoftware\":{"
 			+ "					\"buildNumber\":1,"
@@ -303,7 +303,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		Logger.log(LogSection.HAL, LogLevel.DEBUG, "Starting");
+		Logger.log(LogSection.NONE, LogLevel.DEBUG, "Starting");
 		
 		hal = new HardwareAbstractionLayer(htc);
 		
@@ -403,17 +403,6 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
 		hal.insertModule(e, e);
 		
-		//Bakje 6 GOED
-		double falsex = -2.7;
-		double falsey = 1.3;
-		
-		//Bakje 4 GOED
-		//double falsex = -2.2;
-		//double falsey = 1.3;
-		
-		//Bakje 1 GOED
-		double falsex1 = -2.7;
-		double falsey1 = 1.6;
 		
 		//Bakje 3 GOED MORE TEST
 		//double falsex = -2.2;
@@ -524,4 +513,5 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	public void onEquipletModeChanged(String mode) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of equiplet " + getEquipletName() + " has changed to " + mode);
 	}
+
 }
