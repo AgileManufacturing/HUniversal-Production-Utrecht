@@ -2,25 +2,28 @@ package libraries.utillities.log;
 
 public enum LogLevel {
 
-	EMERGENCY(7),
-	ALERT(6),
-	CRITICAL(5),
-	ERROR(4),
-	WARNING(3),
-	NOTIFICATION(2),
-	INFORMATION(1),
-	DEBUG(0);
+	EMERGENCY(7, "EMERG"),
+	ALERT(6, "ALERT"),
+	CRITICAL(5, "CRIT"),
+	ERROR(4, "ERROR"),
+	WARNING(3, "WARN"),
+	NOTIFICATION(2, "NOTE"),
+	INFORMATION(1, "INFO"),
+	DEBUG(0, "DEBUG");
 
 	private int level;
+	private String name;
 	
-	private LogLevel(int level)
-	{
+	private LogLevel(int level, String name) {
 		this.level = level;
+		this.name = name;
 	}
 	
-	public int getLevel()
-	{
+	public int getLevel() {
 		return level;
+	}
+	public String getName() {
+		return name;
 	}
 
 }
