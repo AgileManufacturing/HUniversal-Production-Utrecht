@@ -45,7 +45,7 @@ public class Gripper extends ModuleActor {
 		
 		jsonCommand.add(HardwareStep.COMMAND, command);
 		
-		compositeStep = new CompositeStep(compositeStep.getProductStep(),jsonCommand);		
+		compositeStep = new CompositeStep(compositeStep.getProductStep(),jsonCommand, null);		
 		ArrayList<HardwareStep> hStep = forwardCompositeStep(compositeStep);
 		int placeholderId = -1;
 		if (hStep != null){

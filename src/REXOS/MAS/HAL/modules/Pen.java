@@ -29,36 +29,22 @@ public class Pen extends ModuleActor {
 
 	@Override
 	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException {
-		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
-		System.out.println("Translating pen module");
-		JsonObject jsonCommand = compositeStep.getCommand();
-		JsonObject command = jsonCommand.remove(HardwareStep.COMMAND).getAsJsonObject();
+		compositeStep.popCommandIdentifier(COMMAND_IDENTIFIER);
 		
-		if (command != null){
-			//Remove corresponding commands to module.
-			if (command.remove(COMMAND_IDENTIFIER) == null){
-				throw new ModuleTranslatingException ("Pen module didn't find a \"draw\" key in CompositeStep command: " + command.toString(), compositeStep);
-			}			
+		JsonObject command = compositeStep.getCommand();		
 			
-			//Adjust the move with the Pen module it's height.
-			command = adjustMoveWithDimensions(command, new Vector3(0, 0, PEN_SIZE));
-			command.addProperty("maxAcceleration", MAX_ACCELERATION);
-			command.addProperty("forceStraightLine", false);
-			jsonCommand.add(HardwareStep.COMMAND, command);
+		//Adjust the move with the Pen module it's height.
+		command = adjustMoveWithDimensions(command, new Vector3(0, 0, PEN_SIZE));
+		command.addProperty(ModuleActor.MAX_ACCELERATION, MAX_ACCELERATION);
+		command.addProperty(FORCE_STRAIGHT_LINE, false);
 			
-			//Translate it's parents composite steps into hardware steps.
-			compositeStep = new CompositeStep(compositeStep.getProductStep(),jsonCommand);	
-			System.out.println("Translating pen module");	
-			ArrayList<HardwareStep> hStep = forwardCompositeStep(compositeStep);
-			if (hStep != null){
-				hardwareSteps.addAll(hStep);
-				System.out.println("Translating pen module");
-			}
-		}
-		else {
-			throw new ModuleTranslatingException ("Pen module didn't receive any \"command\" key in CompositeStep command: "+jsonCommand.toString(), compositeStep);
+		//Translate it's parents composite steps into hardware steps.
+		compositeStep = new CompositeStep(compositeStep.getProductStep(), command, compositeStep.getRelativeTo());	
+		ArrayList<HardwareStep> hStep = forwardCompositeStep(compositeStep);
+		if (hStep != null){
+			translatedHardwareSteps.addAll(hStep);
 		}
 		
-		return hardwareSteps;
+		return translatedHardwareSteps;
 	}
 }

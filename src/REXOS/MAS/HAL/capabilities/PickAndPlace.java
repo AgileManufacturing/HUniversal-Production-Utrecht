@@ -96,7 +96,7 @@ public class PickAndPlace extends Capability {
 				
 				JsonObject command = new JsonParser().parse(pickJsonCommand.toString()).getAsJsonObject();
 				
-				CompositeStep pick = new CompositeStep(productStep, command);
+				CompositeStep pick = new CompositeStep(productStep, command, null);
 				
 				JsonObject targetMoveCommand = target.getAsJsonObject().get("move").getAsJsonObject();
 				
@@ -110,7 +110,7 @@ public class PickAndPlace extends Capability {
 				
 				command = new JsonParser().parse(placeJsonCommand.toString()).getAsJsonObject();
 				
-				CompositeStep place = new CompositeStep(productStep, command);
+				CompositeStep place = new CompositeStep(productStep, command, null);
 				
 				ArrayList<ModuleActor> modules = moduleFactory.getBottomModulesForFunctionalModuleTree(this, 1);
 				ArrayList<CompositeStep> capabilities = new ArrayList<CompositeStep>();

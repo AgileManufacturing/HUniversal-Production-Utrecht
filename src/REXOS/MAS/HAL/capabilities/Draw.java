@@ -34,8 +34,7 @@ public class Draw extends Capability {
 	 * @see Capability#translateProductStep(ProductStep)
 	 */
 	@Override
-	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep)
-			throws CapabilityException {
+	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws CapabilityException {
 		
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<>();
 		String serviceName = productStep.getService().getName();
@@ -49,15 +48,13 @@ public class Draw extends Capability {
 			command.addProperty("draw", "null");
 			command.add("move", moveCommand);
 
-			JsonObject jsonCommand = new JsonObject();
-			jsonCommand.add("command", command);
+			JsonObject relativeTo = new JsonObject();
+			relativeTo.add("identifier", target.get("identifier"));
 
-			jsonCommand.addProperty("look_up", target.get("identifier").getAsString());
-
-			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "command " + jsonCommand);
+			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "command: " + command + ", relativeTo: " + relativeTo);
 			
 			ArrayList<ModuleActor> modules = moduleFactory.getBottomModulesForFunctionalModuleTree(this, 1);
-			CompositeStep draw = new CompositeStep(productStep, command);
+			CompositeStep draw = new CompositeStep(productStep, command, relativeTo);
 			hardwareSteps.addAll(translateCompositeStep(modules, draw));
 			
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.INFORMATION, "Translated hardware steps: " + hardwareSteps.toString());

@@ -33,6 +33,7 @@ public abstract class ModuleActor extends Module {
 	protected static final String DESTINATION = "destination";
 	protected static final String NULL = "NULL";
 	protected static final String MAX_ACCELERATION = "maxAcceleration";
+	protected static final String FORCE_STRAIGHT_LINE = "forceStraightLine";
 	protected static final String MOVE_X = "x";
 	protected static final String MOVE_Y = "y";
 	protected static final String MOVE_Z = "z";
@@ -42,6 +43,8 @@ public abstract class ModuleActor extends Module {
 	protected static final String ROTATION_Z = "rotationZ";
 	
 	protected static final String MOVE = "move";
+	
+	protected ArrayList<HardwareStep> translatedHardwareSteps;
 	
 	
 	/**
@@ -57,13 +60,7 @@ public abstract class ModuleActor extends Module {
 			throws KnowledgeException, UnknownHostException, GeneralMongoException {
 		super(moduleIdentifier, moduleFactory,moduleListener);
 		
-		/*try {
-			mongoClient.setDatabase(moduleFactory.getHAL().getEquipletName());
-			mongoClient.setCollection("EquipletStepsBlackBoard");
-		} catch (InvalidDBNamespaceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
+		translatedHardwareSteps = new ArrayList<HardwareStep>();
 	}
 	public void setModuleListener(ModuleListener moduleListener){
 		this.moduleListener = moduleListener;

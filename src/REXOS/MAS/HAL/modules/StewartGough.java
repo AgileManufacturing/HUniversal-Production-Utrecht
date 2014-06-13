@@ -114,7 +114,7 @@ public class StewartGough extends ModuleActor {
 			}
 			
 			jsonCommand.add(HardwareStep.COMMAND, command);
-			ArrayList<HardwareStep> hStep = forwardCompositeStep(new CompositeStep(compositeStep.getProductStep(),jsonCommand));
+			ArrayList<HardwareStep> hStep = forwardCompositeStep(new CompositeStep(compositeStep.getProductStep(),jsonCommand, null));
 			if (hStep != null) hardwareSteps.addAll(hStep);
 		}
 		else {

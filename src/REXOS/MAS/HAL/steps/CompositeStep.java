@@ -5,7 +5,9 @@ import generic.ProductStep;
 
 import HAL.Capability;
 import HAL.Module;
+import HAL.exceptions.ModuleTranslatingException;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 /**
@@ -17,9 +19,11 @@ import com.google.gson.JsonObject;
 public class CompositeStep{
 	private ProductStep productStep;
 	private JsonObject command;
+	private JsonObject relativeTo;
 	
-	public CompositeStep(ProductStep productStep, JsonObject command){
+	public CompositeStep(ProductStep productStep, JsonObject command, JsonObject relativeTo){
 		this.command = command;
+		this.relativeTo = relativeTo;
 		this.productStep = productStep;
 	}
 	
@@ -28,5 +32,15 @@ public class CompositeStep{
 	}
 	public JsonObject getCommand(){
 		return this.command;
+	}
+	public JsonObject getRelativeTo(){
+		return this.relativeTo;
+	}
+	public JsonObject popCommandIdentifier(String identifier) throws ModuleTranslatingException{
+		JsonElement jsonIdentifier = command.remove(identifier);
+		if (jsonIdentifier == null){
+			throw new ModuleTranslatingException ("Module didn't find a \"" + identifier + "\" key in CompositeStep command: " + command, this);
+		}		
+		return jsonIdentifier.getAsJsonObject();
 	}
 }
