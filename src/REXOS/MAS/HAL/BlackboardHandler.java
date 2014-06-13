@@ -16,7 +16,7 @@ import libraries.log.LogLevel;
 import libraries.log.LogSection;
 import libraries.log.Logger;
 import HAL.exceptions.BlackboardUpdateException;
-import HAL.listeners.BlackboardListener;
+import HAL.listeners.BlackboardModuleListener;
 
 import com.google.gson.JsonObject;
 import com.mongodb.DBObject;
@@ -32,7 +32,7 @@ import configuration.ConfigurationFiles;
  */
 public class BlackboardHandler implements BlackboardSubscriber {
 	
-	private ArrayList<BlackboardListener> updateSubscribers;
+	private ArrayList<BlackboardModuleListener> updateSubscribers;
 	
 	private BlackboardClient stateBlackboardBBClient;
 	private BlackboardClient modeBlackboardBBClient;
@@ -52,7 +52,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	 */
 	public BlackboardHandler(String equipletName) throws BlackboardUpdateException{
 		this.equipletName = equipletName;
-		updateSubscribers = new ArrayList<BlackboardListener>();
+		updateSubscribers = new ArrayList<BlackboardModuleListener>();
 			
 		try {
 			stateSubscription = new FieldUpdateSubscription("state", this);
@@ -90,7 +90,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	 * 
 	 * @param blackboardListener
 	 */
-	public void addBlackboardListener(BlackboardListener blackboardListener){
+	public void addBlackboardListener(BlackboardModuleListener blackboardListener){
 		updateSubscribers.add(blackboardListener);
 	}
 
@@ -113,7 +113,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 						if(dbObject.containsField("mode")){
 							mode = dbObject.get("mode").toString();
 						}	
-						for(BlackboardListener listener: updateSubscribers){
+						for(BlackboardModuleListener listener: updateSubscribers){
 							listener.OnEquipletStateChanged(equipletName,state);
 							listener.OnEquipletModeChanged(equipletName, mode);
 						}
@@ -125,7 +125,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 						String status = dbObject.get("status").toString();
 						Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ step process status changed");
 						
-						for(BlackboardListener listener: updateSubscribers) {
+						for(BlackboardModuleListener listener: updateSubscribers) {
 							listener.onProcessStatusChanged(status); 
 						}
 					}

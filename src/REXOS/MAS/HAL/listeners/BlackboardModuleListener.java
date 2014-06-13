@@ -7,7 +7,7 @@ import HAL.steps.HardwareStep;
  * @author Aristides Ayala Mendoza
  *
  */
-public interface BlackboardListener {
+public interface BlackboardModuleListener {
 	/**
 	 * This method is called when the MAST state of the equiplet changes
 	 * @param equipletName

@@ -16,7 +16,7 @@ import org.apache.commons.codec.binary.Base64;
 import HAL.BlackboardHandler;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
-import HAL.listeners.BlackboardListener;
+import HAL.listeners.BlackboardModuleListener;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
 

@@ -2,7 +2,7 @@ package HAL;
 
 import HAL.exceptions.FactoryException;
 import HAL.factories.ModuleFactory;
-import HAL.listeners.BlackboardListener;
+import HAL.listeners.BlackboardModuleListener;
 import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import libraries.knowledgedb_client.KnowledgeDBClient;
@@ -13,7 +13,7 @@ import libraries.knowledgedb_client.Row;
  * @author Bas Voskuijlen
  *
  */
-public abstract class Module implements BlackboardListener { 
+public abstract class Module implements BlackboardModuleListener { 
 	protected KnowledgeDBClient knowledgeDBClient;
 	protected ModuleIdentifier moduleIdentifier;
 	protected ModuleFactory moduleFactory;
