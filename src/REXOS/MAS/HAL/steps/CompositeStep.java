@@ -3,8 +3,8 @@ package HAL.steps;
 import generic.ProductStep;
 
 
+import HAL.Capability;
 import HAL.Module;
-import HAL.capabilities.Capability;
 
 import com.google.gson.JsonObject;
 

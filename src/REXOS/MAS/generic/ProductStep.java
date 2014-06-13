@@ -1,6 +1,6 @@
 package generic;
 
-import HAL.capabilities.Capability;
+import HAL.Capability;
 
 import com.google.gson.JsonObject;
 
@@ -12,19 +12,27 @@ import com.google.gson.JsonObject;
  *
  */
 public class ProductStep {
+	public static final String TARGET = "target";
+	public static final String SUBJECTS = "subjects";
+
+	public static final String CRITERIA = "criteria";
+	public static final String SERVICE = "service";
+	public static final String ID = "id";
+	
+	
 	private Service service;
 	private JsonObject criteria;
 	private String id;
 	
 	public ProductStep(JsonObject json){
-		if (json.has("id")){
-			this.id = json.get("id").getAsString();
+		if (json.has(ID)){
+			this.id = json.get(ID).getAsString();
 		}
-		if (json.has("service")){
-			this.service = new Service(json.get("service").getAsString());
+		if (json.has(SERVICE)){
+			this.service = new Service(json.get(SERVICE).getAsString());
 		}
-		if (json.has("criteria")){
-			this.criteria = json.get("criteria").getAsJsonObject();
+		if (json.has("CRITERIA")){
+			this.criteria = json.get("CRITERIA").getAsJsonObject();
 		}
 	}
 	
@@ -46,9 +54,9 @@ public class ProductStep {
 	
 	public String toJSON(){
 		  return  "{" +
-		    " id:" + id + ",\n" +
-		    " service:" + service.toJSON() + ",\n" +
-		    " criteria: {" + criteria + "}\n" +
+		    " " + ID + ":" + id + ",\n" +
+		    " " + SERVICE + ":" + service.toJSON() + ",\n" +
+		    " " + CRITERIA + ": {" + criteria + "}\n" +
 		    "}";
 	}
 }

@@ -12,6 +12,17 @@ import com.google.gson.JsonObject;
  *
  */
 public class HardwareStep {
+	public static final String STATUS_DONE = "DONE";
+	public static final String STATUS_FAILED = "FAILED";
+	public static final String STATUS_IN_PROGRESS = "IN_PROGRESS";
+	public static final String STATUS_WAITING = "WAITING";
+	
+	public static final String COMMAND = "command";
+	public static final String LOOK_UP = "look_up";
+	public static final String INSTRUCTION_DATA = "instructionData";
+	public static final String PAYLOAD = "payload";
+	
+	
 	private CompositeStep compositeStep;
 	private JsonObject rosCommand;
 	private ModuleIdentifier moduleIdentifier;

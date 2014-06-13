@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import libraries.log.LogLevel;
 import libraries.log.LogSection;
 import libraries.log.Logger;
+import HAL.Capability;
 import HAL.ModuleActor;
 import HAL.exceptions.CapabilityException;
 import HAL.factories.ModuleFactory;
@@ -39,7 +40,7 @@ public class Draw extends Capability {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<>();
 		String serviceName = productStep.getService().getName();
 		JsonObject productStepCriteria = productStep.getCriteria();
-		JsonObject target = productStepCriteria.get("target").getAsJsonObject();
+		JsonObject target = productStepCriteria.get(ProductStep.TARGET).getAsJsonObject();
 		
 		if(serviceName.equals("draw") && target != null){
 			JsonObject moveCommand = target.get("move").getAsJsonObject();

@@ -360,5 +360,11 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void onExecutionFailed() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

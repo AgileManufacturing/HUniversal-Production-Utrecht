@@ -36,14 +36,14 @@ public class Gripper extends ModuleActor {
 	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 		JsonObject jsonCommand = compositeStep.getCommand();
-		JsonObject command = jsonCommand.remove(COMMAND).getAsJsonObject();
+		JsonObject command = jsonCommand.remove(HardwareStep.COMMAND).getAsJsonObject();
 		
 		command = adjustMoveWithDimensions(command, new Vector3(0, 0, GRIPPER_SIZE));
 		JsonElement pick = command.remove(PICK);
 		JsonElement place = command.remove(PLACE);
 		command.addProperty("forceStraightLine", false);
 		
-		jsonCommand.add(COMMAND, command);
+		jsonCommand.add(HardwareStep.COMMAND, command);
 		
 		compositeStep = new CompositeStep(compositeStep.getProductStep(),jsonCommand);		
 		ArrayList<HardwareStep> hStep = forwardCompositeStep(compositeStep);
@@ -63,12 +63,12 @@ public class Gripper extends ModuleActor {
 			JsonObject hardwareCommand = new JsonObject();
 			if (pick != null){
 				JsonObject instructionData = new JsonObject();
-				instructionData.addProperty(COMMAND, ACTIVATE);
+				instructionData.addProperty(HardwareStep.COMMAND, ACTIVATE);
 				hardwareCommand.add("instructionData", instructionData);
 			}
 			else{
 				JsonObject instructionData = new JsonObject();
-				instructionData.addProperty(COMMAND, DEACTIVATE);
+				instructionData.addProperty(HardwareStep.COMMAND, DEACTIVATE);
 				hardwareCommand.add("instructionData", instructionData);
 			}
 			hardwareCommand.add("moduleIdentifier",moduleIdentifier.getAsJSON());

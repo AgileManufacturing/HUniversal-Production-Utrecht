@@ -30,7 +30,7 @@ public class DeltaRobot extends ModuleActor {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 		
 		JsonObject jsonCommand = compositeStep.getCommand();
-		JsonObject command = jsonCommand.remove(COMMAND).getAsJsonObject();
+		JsonObject command = jsonCommand.remove(HardwareStep.COMMAND).getAsJsonObject();
 		
 		if (command != null){
 			//Get move
@@ -46,11 +46,14 @@ public class DeltaRobot extends ModuleActor {
 			
 			//Adjust for maxAcceleration
 			int maxAcceleration = MAX_ACCELERATION;
-			if (move.get("maxAcceleration") != null)
-				maxAcceleration = move.remove("maxAcceleration").getAsInt();
+			if (move.get(ModuleActor.MAX_ACCELERATION) != null){
+				if (move.get(ModuleActor.MAX_ACCELERATION).getAsInt() < maxAcceleration){
+					maxAcceleration = move.remove(ModuleActor.MAX_ACCELERATION).getAsInt();
+				}
+			}
 			JsonElement partProperties = compositeStep.getProductStep().getCriteria().get("partProperties");
 			if (partProperties != null){
-				JsonElement subjectMaxAccelerationJson = partProperties.getAsJsonObject().get("maxAcceleration");
+				JsonElement subjectMaxAccelerationJson = partProperties.getAsJsonObject().get(ModuleActor.MAX_ACCELERATION);
 				if (subjectMaxAccelerationJson != null){
 					if (subjectMaxAccelerationJson.getAsInt() < maxAcceleration){
 						maxAcceleration = subjectMaxAccelerationJson.getAsInt();
@@ -58,9 +61,9 @@ public class DeltaRobot extends ModuleActor {
 				}
 			}
 			if (maxAcceleration > MAX_ACCELERATION) maxAcceleration = MAX_ACCELERATION;
-			move.addProperty("maxAcceleration", maxAcceleration);
+			move.addProperty(ModuleActor.MAX_ACCELERATION, maxAcceleration);
 			
-			hardwareCommand.addProperty(COMMAND, "move");
+			hardwareCommand.addProperty(HardwareStep.COMMAND, "move");
 			
 			//Add target to move relative to
 			hardwareCommand.addProperty("look_up","FIND_ID" );
@@ -128,7 +131,7 @@ public class DeltaRobot extends ModuleActor {
 				System.out.println("DeltaRobot: straight line added");							
 			}
 			
-			jsonCommand.add(COMMAND, command);
+			jsonCommand.add(HardwareStep.COMMAND, command);
 			ArrayList<HardwareStep> hStep = forwardCompositeStep(new CompositeStep(compositeStep.getProductStep(),jsonCommand));
 			if (hStep != null) hardwareSteps.addAll(hStep);
 		}

@@ -1,4 +1,4 @@
-package HAL.capabilities;
+package HAL;
 
 import generic.ProductStep;
 
@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import libraries.log.LogLevel;
 import libraries.log.LogSection;
 import libraries.log.Logger;
-import HAL.ModuleActor;
 import HAL.exceptions.CapabilityException;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleTranslatingException;
@@ -20,7 +19,7 @@ import HAL.steps.HardwareStep;
  * @author Aristides Ayala Mendoza
  *
  */
-public abstract class Capability {
+public abstract class Capability {	
 	private String name;
 	protected ModuleFactory moduleFactory;
 	

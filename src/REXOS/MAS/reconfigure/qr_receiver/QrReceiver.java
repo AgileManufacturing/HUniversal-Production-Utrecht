@@ -218,4 +218,10 @@ public class QrReceiver implements HardwareAbstractionLayerListener {
 	public void onEquipletModeChanged(String mode) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of equiplet " + getEquipletName() + " has changed to " + mode);
 	}
+
+	@Override
+	public void onExecutionFailed() {
+		// TODO Auto-generated method stub
+		
+	}
 }

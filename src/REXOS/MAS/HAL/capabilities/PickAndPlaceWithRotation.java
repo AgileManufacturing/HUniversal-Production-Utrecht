@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import libraries.log.LogLevel;
 import libraries.log.LogSection;
 import libraries.log.Logger;
+import HAL.Capability;
 import HAL.ModuleActor;
 import HAL.exceptions.CapabilityException;
 import HAL.factories.ModuleFactory;
@@ -75,8 +76,8 @@ public class PickAndPlaceWithRotation extends Capability {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<>();
 		String serviceName = productStep.getService().getName();
 		JsonObject productStepCriteria = productStep.getCriteria();
-		JsonObject target = productStepCriteria.get("target").getAsJsonObject();
-		JsonArray subjects = productStepCriteria.get("subjects").getAsJsonArray();
+		JsonObject target = productStepCriteria.get(ProductStep.TARGET).getAsJsonObject();
+		JsonArray subjects = productStepCriteria.get(ProductStep.SUBJECTS).getAsJsonArray();
 		
 		
 		if(serviceName.equals("place") && subjects != null && target != null) {

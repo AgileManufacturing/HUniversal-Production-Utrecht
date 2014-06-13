@@ -18,6 +18,8 @@ import HAL.steps.HardwareStep;
 import com.google.gson.JsonObject;
 
 public class Pen extends ModuleActor {
+	private static final String COMMAND_IDENTIFIER = "draw";
+	
 	private static final double PEN_SIZE = 102.6; // in mm
 	private static final int MAX_ACCELERATION = 50;
 
@@ -30,11 +32,11 @@ public class Pen extends ModuleActor {
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 		System.out.println("Translating pen module");
 		JsonObject jsonCommand = compositeStep.getCommand();
-		JsonObject command = jsonCommand.remove(COMMAND).getAsJsonObject();
+		JsonObject command = jsonCommand.remove(HardwareStep.COMMAND).getAsJsonObject();
 		
 		if (command != null){
 			//Remove corresponding commands to module.
-			if (command.remove("draw") == null){
+			if (command.remove(COMMAND_IDENTIFIER) == null){
 				throw new ModuleTranslatingException ("Pen module didn't find a \"draw\" key in CompositeStep command: " + command.toString(), compositeStep);
 			}			
 			
@@ -42,7 +44,7 @@ public class Pen extends ModuleActor {
 			command = adjustMoveWithDimensions(command, new Vector3(0, 0, PEN_SIZE));
 			command.addProperty("maxAcceleration", MAX_ACCELERATION);
 			command.addProperty("forceStraightLine", false);
-			jsonCommand.add(COMMAND, command);
+			jsonCommand.add(HardwareStep.COMMAND, command);
 			
 			//Translate it's parents composite steps into hardware steps.
 			compositeStep = new CompositeStep(compositeStep.getProductStep(),jsonCommand);	

@@ -20,6 +20,7 @@ import libraries.knowledgedb_client.Row;
 import libraries.log.LogLevel;
 import libraries.log.LogSection;
 import libraries.log.Logger;
+import HAL.Capability;
 import HAL.HardwareAbstractionLayer;
 import HAL.JavaSoftware;
 import HAL.Module;
@@ -27,7 +28,6 @@ import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
 import HAL.Mutation;
 import HAL.RosSoftware;
-import HAL.capabilities.Capability;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleExecutingException;
 import HAL.listeners.ModuleListener;
@@ -370,7 +370,7 @@ public class ModuleFactory extends Factory {
 	 * @throws FactoryException
 	 * @throws ModuleExecutingException
 	 */
-	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws FactoryException, ModuleExecutingException{
+	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws FactoryException{
 		ModuleActor module = (ModuleActor) getModuleByIdentifier(hardwareStep.getModuleIdentifier());
 		module.executeHardwareStep(processListener, hardwareStep);
 	}

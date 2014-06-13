@@ -26,6 +26,10 @@ public interface HardwareAbstractionLayerListener {
 	 * This method is called when the execution of the {@link HardwareStep}s has finished (e.g. when a {@link ExecutionProcess} finishes)
 	 */
 	public void onExecutionFinished();
+	/**
+	 * This method is called when the execution of the {@link HardwareStep}s has finished (e.g. when a {@link ExecutionProcess} finishes)
+	 */
+	public void onExecutionFailed();
 	
 	/**
 	 * This method is called when the MAST state of the equiplet changes

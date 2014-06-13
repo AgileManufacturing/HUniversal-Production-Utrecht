@@ -29,11 +29,10 @@ import libraries.log.Logger;
  *
  */
 public abstract class ModuleActor extends Module {
-	protected static final String COMMAND = "command";
 	protected static final String MODULE_COMMAND = "module_command";
 	protected static final String DESTINATION = "destination";
-	protected static final String LOOK_UP = "look_up";
 	protected static final String NULL = "NULL";
+	protected static final String MAX_ACCELERATION = "maxAcceleration";
 	protected static final String MOVE_X = "x";
 	protected static final String MOVE_Y = "y";
 	protected static final String MOVE_Z = "z";
@@ -74,15 +73,15 @@ public abstract class ModuleActor extends Module {
 	 * @param command
 	 * @throws ModuleExecutingException
 	 */
-	protected void executeMongoCommand(JsonObject command) throws ModuleExecutingException{
+	protected void executeMongoCommand(JsonObject command){
 		try {
 			moduleFactory.getHAL().getBlackBoardHandler().postHardwareStep(command);
 		} catch (InvalidJSONException ex) {
-			throw new ModuleExecutingException("Executing invalid JSON", ex);
+			throw new RuntimeException("Executing invalid JSON", ex);
 		} catch (InvalidDBNamespaceException ex) {
-			throw new ModuleExecutingException("Executing invalid DBNamespace", ex);
+			throw new RuntimeException("Executing invalid DBNamespace", ex);
 		} catch (GeneralMongoException ex) {
-			throw new ModuleExecutingException("General mongo exception while trying to execute", ex);
+			throw new RuntimeException("General mongo exception while trying to execute", ex);
 		}
 	}
 	
@@ -102,9 +101,9 @@ public abstract class ModuleActor extends Module {
 			// root module, no more parents			
 			// if commands remain then the modules were not able to fully translate the compositeStep
 			// TODO better comparison method
-			if (!compositeStep.getCommand().get(COMMAND).getAsJsonObject().toString().trim().equalsIgnoreCase("{}")){
+			if (!compositeStep.getCommand().get(HardwareStep.COMMAND).getAsJsonObject().toString().trim().equalsIgnoreCase("{}")){
 				throw new ModuleTranslatingException("The compositestep isn't completely empty." + 
-						compositeStep.getCommand().get(COMMAND).getAsJsonObject(), compositeStep);
+						compositeStep.getCommand().get(HardwareStep.COMMAND).getAsJsonObject(), compositeStep);
 			} else {
 				return null;
 			}
@@ -116,7 +115,7 @@ public abstract class ModuleActor extends Module {
 	 * @param hardwareStep
 	 * @throws ModuleExecutingException
 	 */
-	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws ModuleExecutingException{
+	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) {
 		this.processListener = processListener;
 		JsonObject command = hardwareStep.getRosCommand();
 		executeMongoCommand(command);
@@ -176,7 +175,7 @@ public abstract class ModuleActor extends Module {
 	public void onProcessStatusChanged(String status) {
 		if(processListener != null){
 			processListener.onProcessStateChanged(status, 0, this);
-			if(status.equals("DONE")){
+			if(status.equals(HardwareStep.STATUS_DONE) || status.equals(HardwareStep.STATUS_FAILED)){
 				processListener = null;
 			}
 		}

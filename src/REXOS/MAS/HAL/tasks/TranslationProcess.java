@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import libraries.log.LogLevel;
 import libraries.log.LogSection;
 import libraries.log.Logger;
-import HAL.capabilities.Capability;
+import HAL.Capability;
 import HAL.exceptions.CapabilityException;
 import HAL.factories.CapabilityFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
@@ -58,7 +58,6 @@ public class TranslationProcess implements Runnable{
 					translatedSteps = capabilities.get(i).translateProductStep(productStep);
 					
 					for (int j = 0; j < translatedSteps.size(); j++){
-						// TODO is this the right place for this?
 						// a translated hardware step from a module might be null if it is a place holder, we skip these place holders
 						if (translatedSteps.get(j) != null) hardwareSteps.add(translatedSteps.get(j));
 					}

@@ -22,10 +22,10 @@ import libraries.knowledgedb_client.Row;
 import libraries.log.LogLevel;
 import libraries.log.LogSection;
 import libraries.log.Logger;
+import HAL.Capability;
 import HAL.HardwareAbstractionLayer;
 import HAL.JavaSoftware;
 import HAL.ModuleIdentifier;
-import HAL.capabilities.Capability;
 import HAL.exceptions.FactoryException;
 
 /**
